@@ -236,8 +236,8 @@ QList<std::shared_ptr<QGraphicsItem>> SchematicEditorState::findItemsAtPos(
       processItem(
           it.value(), it.value(),
           Toolbox::nearestPointOnLine(pos.mappedToGrid(getGridInterval()),
-                                      it.key()->getStartPoint().getPosition(),
-                                      it.key()->getEndPoint().getPosition()),
+                                      it.key()->getP1().getPosition(),
+                                      it.key()->getP2().getPosition()),
           20, true, std::nullopt);  // Large grab area, better usability!
     }
   }

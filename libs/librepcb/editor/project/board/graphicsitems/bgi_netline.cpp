@@ -144,15 +144,15 @@ void BGI_NetLine::layerEdited(const GraphicsLayer& layer,
 
 void BGI_NetLine::updateLine() noexcept {
   prepareGeometryChange();
-  mLineF.setP1(mNetLine.getStartPoint().getPosition().toPxQPointF());
-  mLineF.setP2(mNetLine.getEndPoint().getPosition().toPxQPointF());
+  mLineF.setP1(mNetLine.getP1().getPosition().toPxQPointF());
+  mLineF.setP2(mNetLine.getP2().getPosition().toPxQPointF());
   mBoundingRect = QRectF(mLineF.p1(), mLineF.p2()).normalized();
   mBoundingRect.adjust(
       -mNetLine.getWidth()->toPx() / 2, -mNetLine.getWidth()->toPx() / 2,
       mNetLine.getWidth()->toPx() / 2, mNetLine.getWidth()->toPx() / 2);
   mShape = QPainterPath();
-  mShape.moveTo(mNetLine.getStartPoint().getPosition().toPxQPointF());
-  mShape.lineTo(mNetLine.getEndPoint().getPosition().toPxQPointF());
+  mShape.moveTo(mNetLine.getP1().getPosition().toPxQPointF());
+  mShape.lineTo(mNetLine.getP2().getPosition().toPxQPointF());
   mShape = Toolbox::shapeFromPath(mShape, QPen(Qt::SolidPattern, 0), QBrush(),
                                   positiveToUnsigned(mNetLine.getWidth()));
   update();

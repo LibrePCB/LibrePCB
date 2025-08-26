@@ -93,14 +93,14 @@ bool CmdCombineBoardNetSegments::performExecute() {
     }
   }
   foreach (BI_NetLine* netline, mOldSegment.getNetLines()) {
-    BI_NetLineAnchor* startPoint =
-        anchorMap.value(&netline->getStartPoint(), &netline->getStartPoint());
-    Q_ASSERT(startPoint);
-    BI_NetLineAnchor* endPoint =
-        anchorMap.value(&netline->getEndPoint(), &netline->getEndPoint());
-    Q_ASSERT(endPoint);
-    BI_NetLine* newNetLine = cmdAdd->addNetLine(
-        *startPoint, *endPoint, netline->getLayer(), netline->getWidth());
+    BI_NetLineAnchor* p1 =
+        anchorMap.value(&netline->getP1(), &netline->getP1());
+    Q_ASSERT(p1);
+    BI_NetLineAnchor* p2 =
+        anchorMap.value(&netline->getP2(), &netline->getP2());
+    Q_ASSERT(p2);
+    BI_NetLine* newNetLine =
+        cmdAdd->addNetLine(*p1, *p2, netline->getLayer(), netline->getWidth());
     Q_ASSERT(newNetLine);
   }
   execNewChildCmd(new CmdBoardNetSegmentRemove(mOldSegment));  // can throw

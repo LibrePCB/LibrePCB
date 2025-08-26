@@ -43,17 +43,21 @@ namespace librepcb {
  ******************************************************************************/
 
 SI_NetLine::SI_NetLine(SI_NetSegment& segment, const Uuid& uuid,
-                       SI_NetLineAnchor& startPoint, SI_NetLineAnchor& endPoint,
+                       SI_NetLineAnchor& a, SI_NetLineAnchor& b,
                        const UnsignedLength& width)
   : SI_Base(segment.getSchematic()),
     onEdited(*this),
     mNetSegment(segment),
-    mNetLine(uuid, width, startPoint.toNetLineAnchor(),
-             endPoint.toNetLineAnchor()),
-    mStartPoint(&startPoint),
-    mEndPoint(&endPoint) {
+    mNetLine(uuid, width, a.toNetLineAnchor(), b.toNetLineAnchor()),
+    mP1(&a),
+    mP2(&b) {
+  // Sort anchors to get a canonical file format.
+  if (mP2->toNetLineAnchor() < mP1->toNetLineAnchor()) {
+    std::swap(mP1, mP2);
+  }
+
   // check if both netpoints are different
-  if (mStartPoint == mEndPoint) {
+  if (mP1 == mP2) {
     throw LogicError(__FILE__, __LINE__,
                      "SI_NetLine: both endpoints are the same.");
   }
@@ -71,10 +75,10 @@ SI_NetLine::~SI_NetLine() noexcept {
 
 SI_NetLineAnchor* SI_NetLine::getOtherPoint(
     const SI_NetLineAnchor& firstPoint) const noexcept {
-  if (&firstPoint == mStartPoint) {
-    return mEndPoint;
-  } else if (&firstPoint == mEndPoint) {
-    return mStartPoint;
+  if (&firstPoint == mP1) {
+    return mP2;
+  } else if (&firstPoint == mP2) {
+    return mP1;
   } else {
     return nullptr;
   }
@@ -101,9 +105,9 @@ void SI_NetLine::addToSchematic() {
     throw LogicError(__FILE__, __LINE__);
   }
 
-  mStartPoint->registerNetLine(*this);  // can throw
-  auto sg = scopeGuard([&]() { mStartPoint->unregisterNetLine(*this); });
-  mEndPoint->registerNetLine(*this);  // can throw
+  mP1->registerNetLine(*this);  // can throw
+  auto sg = scopeGuard([&]() { mP1->unregisterNetLine(*this); });
+  mP2->registerNetLine(*this);  // can throw
 
   SI_Base::addToSchematic();
   sg.dismiss();
@@ -114,9 +118,9 @@ void SI_NetLine::removeFromSchematic() {
     throw LogicError(__FILE__, __LINE__);
   }
 
-  mEndPoint->unregisterNetLine(*this);  // can throw
-  auto sg = scopeGuard([&]() { mEndPoint->registerNetLine(*this); });
-  mStartPoint->unregisterNetLine(*this);  // can throw
+  mP2->unregisterNetLine(*this);  // can throw
+  auto sg = scopeGuard([&]() { mP2->registerNetLine(*this); });
+  mP1->unregisterNetLine(*this);  // can throw
 
   SI_Base::removeFromSchematic();
   sg.dismiss();

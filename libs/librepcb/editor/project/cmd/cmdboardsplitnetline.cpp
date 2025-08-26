@@ -56,10 +56,10 @@ bool CmdBoardSplitNetLine::performExecute() {
   std::unique_ptr<CmdBoardNetSegmentAddElements> cmdAdd(
       new CmdBoardNetSegmentAddElements(mOldNetLine.getNetSegment()));
   cmdAdd->addNetPoint(*mSplitPoint);
-  cmdAdd->addNetLine(*mSplitPoint, mOldNetLine.getStartPoint(),
-                     mOldNetLine.getLayer(), mOldNetLine.getWidth());
-  cmdAdd->addNetLine(*mSplitPoint, mOldNetLine.getEndPoint(),
-                     mOldNetLine.getLayer(), mOldNetLine.getWidth());
+  cmdAdd->addNetLine(*mSplitPoint, mOldNetLine.getP1(), mOldNetLine.getLayer(),
+                     mOldNetLine.getWidth());
+  cmdAdd->addNetLine(*mSplitPoint, mOldNetLine.getP2(), mOldNetLine.getLayer(),
+                     mOldNetLine.getWidth());
   std::unique_ptr<CmdBoardNetSegmentRemoveElements> cmdRemove(
       new CmdBoardNetSegmentRemoveElements(mOldNetLine.getNetSegment()));
   cmdRemove->removeNetLine(mOldNetLine);

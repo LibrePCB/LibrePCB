@@ -320,12 +320,12 @@ QList<std::shared_ptr<QGraphicsItem>> BoardEditorState::findItemsAtPos(
           netsignals.contains(it.key()->getNetSegment().getNetSignal())) {
         const Layer& layer = it.key()->getLayer();
         if ((!cuLayer) || (*cuLayer == layer)) {
-          processItem(it.value(), it.value(),
-                      Toolbox::nearestPointOnLine(
-                          pos.mappedToGrid(getGridInterval()),
-                          it.key()->getStartPoint().getPosition(),
-                          it.key()->getEndPoint().getPosition()),
-                      20 + priorityFromLayer(layer), false);
+          processItem(
+              it.value(), it.value(),
+              Toolbox::nearestPointOnLine(pos.mappedToGrid(getGridInterval()),
+                                          it.key()->getP1().getPosition(),
+                                          it.key()->getP2().getPosition()),
+              20 + priorityFromLayer(layer), false);
         }
       }
     }

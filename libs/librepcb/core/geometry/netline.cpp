@@ -70,6 +70,27 @@ bool NetLineAnchor::operator==(const NetLineAnchor& rhs) const noexcept {
   return (mJunction == rhs.mJunction) && (mPin == rhs.mPin);
 }
 
+bool NetLineAnchor::operator<(const NetLineAnchor& rhs) const noexcept {
+  // Note: This operator is relevant for the file format, do not modify
+  // unless you know exactly what you're doing!
+  if (mJunction.has_value() != rhs.mJunction.has_value()) {
+    return rhs.mJunction.has_value();
+  } else if (mPin.has_value() != rhs.mPin.has_value()) {
+    return rhs.mPin.has_value();
+  } else if (mJunction) {
+    return (*mJunction) < (*rhs.mJunction);
+  } else if (mPin) {
+    if (mPin->symbol != rhs.mPin->symbol) {
+      return mPin->symbol < rhs.mPin->symbol;
+    } else {
+      return mPin->pin < rhs.mPin->pin;
+    }
+  } else {
+    qWarning() << "Unhandled branch in NetLineAnchor::operator<().";
+    return false;
+  }
+}
+
 NetLineAnchor& NetLineAnchor::operator=(const NetLineAnchor& rhs) noexcept {
   mJunction = rhs.mJunction;
   mPin = rhs.mPin;
@@ -92,8 +113,8 @@ NetLine::NetLine(const NetLine& other) noexcept
   : onEdited(*this),
     mUuid(other.mUuid),
     mWidth(other.mWidth),
-    mStart(other.mStart),
-    mEnd(other.mEnd) {
+    mP1(other.mP1),
+    mP2(other.mP2) {
 }
 
 NetLine::NetLine(const Uuid& uuid, const NetLine& other) noexcept
@@ -102,16 +123,18 @@ NetLine::NetLine(const Uuid& uuid, const NetLine& other) noexcept
 }
 
 NetLine::NetLine(const Uuid& uuid, const UnsignedLength& width,
-                 const NetLineAnchor& start, const NetLineAnchor& end) noexcept
-  : onEdited(*this), mUuid(uuid), mWidth(width), mStart(start), mEnd(end) {
+                 const NetLineAnchor& a, const NetLineAnchor& b) noexcept
+  : onEdited(*this), mUuid(uuid), mWidth(width), mP1(a), mP2(b) {
+  normalizeAnchors(mP1, mP2);
 }
 
 NetLine::NetLine(const SExpression& node)
   : onEdited(*this),
     mUuid(deserialize<Uuid>(node.getChild("@0"))),
     mWidth(deserialize<UnsignedLength>(node.getChild("width/@0"))),
-    mStart(node.getChild("from")),
-    mEnd(node.getChild("to")) {
+    mP1(node.getChild("from")),
+    mP2(node.getChild("to")) {
+  normalizeAnchors(mP1, mP2);
 }
 
 NetLine::~NetLine() noexcept {
@@ -141,23 +164,15 @@ bool NetLine::setWidth(const UnsignedLength& width) noexcept {
   return true;
 }
 
-bool NetLine::setStartPoint(const NetLineAnchor& start) noexcept {
-  if (start == mStart) {
+bool NetLine::setAnchors(NetLineAnchor a, NetLineAnchor b) noexcept {
+  normalizeAnchors(a, b);
+  if ((a == mP1) && (b == mP2)) {
     return false;
   }
 
-  mStart = start;
-  onEdited.notify(Event::StartPointChanged);
-  return true;
-}
-
-bool NetLine::setEndPoint(const NetLineAnchor& end) noexcept {
-  if (end == mEnd) {
-    return false;
-  }
-
-  mEnd = end;
-  onEdited.notify(Event::EndPointChanged);
+  mP1 = a;
+  mP2 = b;
+  onEdited.notify(Event::AnchorsChanged);
   return true;
 }
 
@@ -169,9 +184,9 @@ void NetLine::serialize(SExpression& root) const {
   root.appendChild(mUuid);
   root.appendChild("width", mWidth);
   root.ensureLineBreak();
-  mStart.serialize(root.appendList("from"));
+  mP1.serialize(root.appendList("from"));
   root.ensureLineBreak();
-  mEnd.serialize(root.appendList("to"));
+  mP2.serialize(root.appendList("to"));
   root.ensureLineBreak();
 }
 
@@ -182,17 +197,27 @@ void NetLine::serialize(SExpression& root) const {
 bool NetLine::operator==(const NetLine& rhs) const noexcept {
   if (mUuid != rhs.mUuid) return false;
   if (mWidth != rhs.mWidth) return false;
-  if (mStart != rhs.mStart) return false;
-  if (mEnd != rhs.mEnd) return false;
+  if (mP1 != rhs.mP1) return false;
+  if (mP2 != rhs.mP2) return false;
   return true;
 }
 
 NetLine& NetLine::operator=(const NetLine& rhs) noexcept {
   setUuid(rhs.mUuid);
   setWidth(rhs.mWidth);
-  setStartPoint(rhs.mStart);
-  setEndPoint(rhs.mEnd);
+  setAnchors(rhs.mP1, rhs.mP2);
   return *this;
+}
+
+/*******************************************************************************
+ *  Private Methods
+ ******************************************************************************/
+
+void NetLine::normalizeAnchors(NetLineAnchor& start,
+                               NetLineAnchor& end) noexcept {
+  if (end < start) {
+    std::swap(start, end);
+  }
 }
 
 /*******************************************************************************

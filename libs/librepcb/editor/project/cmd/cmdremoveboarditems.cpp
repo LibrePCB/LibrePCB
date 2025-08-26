@@ -219,34 +219,33 @@ void CmdRemoveBoardItems::removeNetSegmentItems(
       junctionMap.insert(junction.getUuid(), newNetPoint);
     }
     for (const Trace& trace : segment.traces) {
-      BI_NetLineAnchor* start = nullptr;
-      if (std::optional<Uuid> anchor = trace.getStartPoint().tryGetJunction()) {
-        start = junctionMap[*anchor];
-      } else if (std::optional<Uuid> anchor =
-                     trace.getStartPoint().tryGetVia()) {
-        start = viaMap[*anchor];
+      BI_NetLineAnchor* p1 = nullptr;
+      if (std::optional<Uuid> anchor = trace.getP1().tryGetJunction()) {
+        p1 = junctionMap[*anchor];
+      } else if (std::optional<Uuid> anchor = trace.getP1().tryGetVia()) {
+        p1 = viaMap[*anchor];
       } else if (std::optional<TraceAnchor::PadAnchor> anchor =
-                     trace.getStartPoint().tryGetPad()) {
+                     trace.getP1().tryGetPad()) {
         BI_Device* device =
             mBoard.getDeviceInstanceByComponentUuid(anchor->device);
-        start = device ? device->getPad(anchor->pad) : nullptr;
+        p1 = device ? device->getPad(anchor->pad) : nullptr;
       }
-      BI_NetLineAnchor* end = nullptr;
-      if (std::optional<Uuid> anchor = trace.getEndPoint().tryGetJunction()) {
-        end = junctionMap[*anchor];
-      } else if (std::optional<Uuid> anchor = trace.getEndPoint().tryGetVia()) {
-        end = viaMap[*anchor];
+      BI_NetLineAnchor* p2 = nullptr;
+      if (std::optional<Uuid> anchor = trace.getP2().tryGetJunction()) {
+        p2 = junctionMap[*anchor];
+      } else if (std::optional<Uuid> anchor = trace.getP2().tryGetVia()) {
+        p2 = viaMap[*anchor];
       } else if (std::optional<TraceAnchor::PadAnchor> anchor =
-                     trace.getEndPoint().tryGetPad()) {
+                     trace.getP2().tryGetPad()) {
         BI_Device* device =
             mBoard.getDeviceInstanceByComponentUuid(anchor->device);
-        end = device ? device->getPad(anchor->pad) : nullptr;
+        p2 = device ? device->getPad(anchor->pad) : nullptr;
       }
-      if ((!start) || (!end)) {
+      if ((!p1) || (!p2)) {
         throw LogicError(__FILE__, __LINE__);
       }
       BI_NetLine* newNetLine = cmdAddElements->addNetLine(
-          *start, *end, trace.getLayer(), trace.getWidth());
+          *p1, *p2, trace.getLayer(), trace.getWidth());
       Q_ASSERT(newNetLine);
     }
     execNewChildCmd(cmdAddElements);  // can throw

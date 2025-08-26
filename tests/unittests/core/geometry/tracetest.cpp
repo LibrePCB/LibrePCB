@@ -41,12 +41,58 @@ class TraceTest : public ::testing::Test {};
  *  Test Methods
  ******************************************************************************/
 
+TEST_F(TraceTest, testAnchorLessThan) {
+  // The comparison operator is relevant for the file format.
+  const QVector<TraceAnchor> input = {
+      TraceAnchor::junction(
+          Uuid::fromString("5bed2074-1b02-4db5-9b0e-293c42d8728f")),
+      TraceAnchor::pad(
+          Uuid::fromString("d14141ff-651f-40f0-87be-b4f86831375a"),
+          Uuid::fromString("65ab6c75-b264-4fed-b445-d3d98c956008")),
+      TraceAnchor::via(
+          Uuid::fromString("c893f5a0-3fec-498b-99d6-467d5d69825d")),
+      TraceAnchor::pad(
+          Uuid::fromString("94ca7c55-bf86-43e0-8399-d713ce1f1929"),
+          Uuid::fromString("65ab6c75-b264-4fed-b445-d3d98c956008")),
+      TraceAnchor::junction(
+          Uuid::fromString("0d8f2ef9-34f4-4400-a313-f17cdcdfe924")),
+      TraceAnchor::via(
+          Uuid::fromString("1e80206f-158b-48e6-9cb4-6e368af7b7d7")),
+      TraceAnchor::pad(
+          Uuid::fromString("94ca7c55-bf86-43e0-8399-d713ce1f1929"),
+          Uuid::fromString("04bb6ac3-34d7-4fb3-b274-44f845f8d3b5")),
+  };
+  const QVector<TraceAnchor> expected = {
+      TraceAnchor::pad(
+          Uuid::fromString("94ca7c55-bf86-43e0-8399-d713ce1f1929"),
+          Uuid::fromString("04bb6ac3-34d7-4fb3-b274-44f845f8d3b5")),
+      TraceAnchor::pad(
+          Uuid::fromString("94ca7c55-bf86-43e0-8399-d713ce1f1929"),
+          Uuid::fromString("65ab6c75-b264-4fed-b445-d3d98c956008")),
+      TraceAnchor::pad(
+          Uuid::fromString("d14141ff-651f-40f0-87be-b4f86831375a"),
+          Uuid::fromString("65ab6c75-b264-4fed-b445-d3d98c956008")),
+      TraceAnchor::via(
+          Uuid::fromString("1e80206f-158b-48e6-9cb4-6e368af7b7d7")),
+      TraceAnchor::via(
+          Uuid::fromString("c893f5a0-3fec-498b-99d6-467d5d69825d")),
+      TraceAnchor::junction(
+          Uuid::fromString("0d8f2ef9-34f4-4400-a313-f17cdcdfe924")),
+      TraceAnchor::junction(
+          Uuid::fromString("5bed2074-1b02-4db5-9b0e-293c42d8728f")),
+  };
+
+  QVector<TraceAnchor> actual = input;
+  std::sort(actual.begin(), actual.end());
+  EXPECT_EQ(expected, actual);
+}
+
 TEST_F(TraceTest, testConstructFromSExpression) {
   std::unique_ptr<SExpression> sexpr = SExpression::parse(
       "(trace c893f5a0-3fec-498b-99d6-467d5d69825d (layer bot_cu) (width 0.5) "
-      "(from (device 0d8f2ef9-34f4-4400-a313-f17cdcdfe924) "
-      "(pad 65ab6c75-b264-4fed-b445-d3d98c956008)) "
-      "(to (via 1e80206f-158b-48e6-9cb4-6e368af7b7d7)))",
+      "(from (via 1e80206f-158b-48e6-9cb4-6e368af7b7d7)) "
+      "(to (device 0d8f2ef9-34f4-4400-a313-f17cdcdfe924) "
+      "(pad 65ab6c75-b264-4fed-b445-d3d98c956008)))",
       FilePath());
   Trace obj(*sexpr);
   EXPECT_EQ(Uuid::fromString("c893f5a0-3fec-498b-99d6-467d5d69825d"),
@@ -56,10 +102,10 @@ TEST_F(TraceTest, testConstructFromSExpression) {
   EXPECT_EQ(TraceAnchor::pad(
                 Uuid::fromString("0d8f2ef9-34f4-4400-a313-f17cdcdfe924"),
                 Uuid::fromString("65ab6c75-b264-4fed-b445-d3d98c956008")),
-            obj.getStartPoint());
+            obj.getP1());
   EXPECT_EQ(TraceAnchor::via(
                 Uuid::fromString("1e80206f-158b-48e6-9cb4-6e368af7b7d7")),
-            obj.getEndPoint());
+            obj.getP2());
 }
 
 TEST_F(TraceTest, testSerializeAndDeserialize) {

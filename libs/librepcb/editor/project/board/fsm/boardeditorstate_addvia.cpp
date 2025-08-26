@@ -288,9 +288,9 @@ bool BoardEditorState_AddVia::fixPosition(const Point& pos) noexcept {
     // Split net lines.
     foreach (BI_NetLine* netline, otherNetLines) {
       if (!otherNetPoints.contains(
-              dynamic_cast<BI_NetPoint*>(&netline->getStartPoint())) &&
+              dynamic_cast<BI_NetPoint*>(&netline->getP1())) &&
           !otherNetPoints.contains(
-              dynamic_cast<BI_NetPoint*>(&netline->getEndPoint()))) {
+              dynamic_cast<BI_NetPoint*>(&netline->getP2()))) {
         // TODO(5n8ke) is this the best way to check whtether the NetLine
         // should be split?
         std::unique_ptr<CmdBoardSplitNetLine> cmdSplit(

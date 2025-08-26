@@ -231,29 +231,28 @@ void CmdRemoveSelectedSchematicItems::removeNetSegmentItems(
       junctionMap.insert(junction.getUuid(), newNetPoint);
     }
     for (const NetLine& netline : segment.netlines) {
-      SI_NetLineAnchor* start = nullptr;
-      if (std::optional<Uuid> anchor =
-              netline.getStartPoint().tryGetJunction()) {
-        start = junctionMap[*anchor];
+      SI_NetLineAnchor* p1 = nullptr;
+      if (std::optional<Uuid> anchor = netline.getP1().tryGetJunction()) {
+        p1 = junctionMap[*anchor];
       } else if (std::optional<NetLineAnchor::PinAnchor> anchor =
-                     netline.getStartPoint().tryGetPin()) {
+                     netline.getP1().tryGetPin()) {
         SI_Symbol* symbol =
             mScene.getSchematic().getSymbols().value(anchor->symbol);
-        start = symbol ? symbol->getPin(anchor->pin) : nullptr;
+        p1 = symbol ? symbol->getPin(anchor->pin) : nullptr;
       }
-      SI_NetLineAnchor* end = nullptr;
-      if (std::optional<Uuid> anchor = netline.getEndPoint().tryGetJunction()) {
-        end = junctionMap[*anchor];
+      SI_NetLineAnchor* p2 = nullptr;
+      if (std::optional<Uuid> anchor = netline.getP2().tryGetJunction()) {
+        p2 = junctionMap[*anchor];
       } else if (std::optional<NetLineAnchor::PinAnchor> anchor =
-                     netline.getEndPoint().tryGetPin()) {
+                     netline.getP2().tryGetPin()) {
         SI_Symbol* symbol =
             mScene.getSchematic().getSymbols().value(anchor->symbol);
-        end = symbol ? symbol->getPin(anchor->pin) : nullptr;
+        p2 = symbol ? symbol->getPin(anchor->pin) : nullptr;
       }
-      if ((!start) || (!end)) {
+      if ((!p1) || (!p2)) {
         throw LogicError(__FILE__, __LINE__);
       }
-      SI_NetLine* newNetLine = cmdAddElements->addNetLine(*start, *end);
+      SI_NetLine* newNetLine = cmdAddElements->addNetLine(*p1, *p2);
       Q_ASSERT(newNetLine);
     }
     execNewChildCmd(cmdAddElements);  // can throw

@@ -124,9 +124,9 @@ BoardPainter::BoardPainter(const Board& board)
           via->getStopMaskDiameterTop(), via->getStopMaskDiameterBottom()});
     }
     for (const BI_NetLine* netline : segment->getNetLines()) {
-      mTraces.append(
-          Trace{&netline->getLayer(), netline->getStartPoint().getPosition(),
-                netline->getEndPoint().getPosition(), netline->getWidth()});
+      mTraces.append(Trace{&netline->getLayer(), netline->getP1().getPosition(),
+                           netline->getP2().getPosition(),
+                           netline->getWidth()});
     }
   }
 }

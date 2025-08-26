@@ -1779,7 +1779,7 @@ void BoardEditorState_Select::measureLengthInDirection(
     const BI_NetLine& netline, QSet<Uuid>& visitedNetLines,
     UnsignedLength& totalLength) {
   const BI_NetLineAnchor* currentAnchor =
-      directionBackwards ? &netline.getStartPoint() : &netline.getEndPoint();
+      directionBackwards ? &netline.getP1() : &netline.getP2();
 
   for (;;) {
     const BI_NetLine* nextNetline = nullptr;

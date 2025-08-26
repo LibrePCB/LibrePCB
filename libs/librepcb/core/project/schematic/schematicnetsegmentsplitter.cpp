@@ -68,8 +68,8 @@ void SchematicNetSegmentSplitter::addJunction(
 
 void SchematicNetSegmentSplitter::addNetLine(const NetLine& netline) noexcept {
   std::shared_ptr<NetLine> copy = std::make_shared<NetLine>(netline);
-  copy->setStartPoint(replacePinAnchor(copy->getStartPoint()));
-  copy->setEndPoint(replacePinAnchor(copy->getEndPoint()));
+  copy->setAnchors(replacePinAnchor(copy->getP1()),
+                   replacePinAnchor(copy->getP2()));
   mNetLines.append(copy);
 }
 
@@ -88,7 +88,7 @@ QList<SchematicNetSegmentSplitter::Segment>
   QList<std::shared_ptr<NetLine>> availableNetLines = mNetLines.values();
   while (!availableNetLines.isEmpty()) {
     Segment segment;
-    findConnectedLinesAndPoints(availableNetLines.first()->getStartPoint(),
+    findConnectedLinesAndPoints(availableNetLines.first()->getP1(),
                                 availableNetLines, segment);
     segments.append(segment);
   }
@@ -124,16 +124,13 @@ void SchematicNetSegmentSplitter::findConnectedLinesAndPoints(
   }
   for (int i = 0; i < mNetLines.count(); ++i) {
     std::shared_ptr<NetLine> netline = mNetLines.value(i);
-    if (((netline->getStartPoint() == anchor) ||
-         (netline->getEndPoint() == anchor)) &&
+    if (((netline->getP1() == anchor) || (netline->getP2() == anchor)) &&
         availableNetLines.contains(netline) &&
         (!segment.netlines.contains(netline->getUuid()))) {
       segment.netlines.append(netline);
       availableNetLines.removeOne(netline);
-      findConnectedLinesAndPoints(netline->getStartPoint(), availableNetLines,
-                                  segment);
-      findConnectedLinesAndPoints(netline->getEndPoint(), availableNetLines,
-                                  segment);
+      findConnectedLinesAndPoints(netline->getP1(), availableNetLines, segment);
+      findConnectedLinesAndPoints(netline->getP2(), availableNetLines, segment);
     }
   }
 }
@@ -162,8 +159,8 @@ Length SchematicNetSegmentSplitter::getDistanceBetweenNetLabelAndNetSegment(
   Length nearestDistance;
   for (const NetLine& netline : netsegment.netlines) {
     UnsignedLength distance = Toolbox::shortestDistanceBetweenPointAndLine(
-        netlabel.getPosition(), getAnchorPosition(netline.getStartPoint()),
-        getAnchorPosition(netline.getEndPoint()));
+        netlabel.getPosition(), getAnchorPosition(netline.getP1()),
+        getAnchorPosition(netline.getP2()));
     if ((distance < nearestDistance) || firstRun) {
       nearestDistance = *distance;
       firstRun = false;

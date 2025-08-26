@@ -521,11 +521,11 @@ std::unique_ptr<SExpression> BoardSpecctraExport::genWiring() const {
     for (const auto& trace : segment->getNetLines()) {
       root->ensureLineBreak();
       auto& wireNode = root->appendList("wire");
-      wireNode.appendChild(toPath(
-          trace->getLayer().getId(), positiveToUnsigned(trace->getWidth()),
-          Path::line(trace->getStartPoint().getPosition(),
-                     trace->getEndPoint().getPosition()),
-          false));
+      wireNode.appendChild(toPath(trace->getLayer().getId(),
+                                  positiveToUnsigned(trace->getWidth()),
+                                  Path::line(trace->getP1().getPosition(),
+                                             trace->getP2().getPosition()),
+                                  false));
       wireNode.appendChild("net", getNetName(*segment));
       wireNode.appendChild("type", SExpression::createToken("route"));
     }

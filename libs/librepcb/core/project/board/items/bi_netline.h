@@ -85,9 +85,9 @@ public:
   // Constructors / Destructor
   BI_NetLine() = delete;
   BI_NetLine(const BI_NetLine& other) = delete;
-  BI_NetLine(BI_NetSegment& segment, const Uuid& uuid,
-             BI_NetLineAnchor& startPoint, BI_NetLineAnchor& endPoint,
-             const Layer& layer, const PositiveLength& width);
+  BI_NetLine(BI_NetSegment& segment, const Uuid& uuid, BI_NetLineAnchor& a,
+             BI_NetLineAnchor& b, const Layer& layer,
+             const PositiveLength& width);
   ~BI_NetLine() noexcept;
 
   // Getters
@@ -96,8 +96,8 @@ public:
   const Uuid& getUuid() const noexcept { return mTrace.getUuid(); }
   const Layer& getLayer() const noexcept { return mTrace.getLayer(); }
   const PositiveLength& getWidth() const noexcept { return mTrace.getWidth(); }
-  BI_NetLineAnchor& getStartPoint() const noexcept { return *mStartPoint; }
-  BI_NetLineAnchor& getEndPoint() const noexcept { return *mEndPoint; }
+  BI_NetLineAnchor& getP1() const noexcept { return *mP1; }
+  BI_NetLineAnchor& getP2() const noexcept { return *mP2; }
   BI_NetLineAnchor* getOtherPoint(
       const BI_NetLineAnchor& firstPoint) const noexcept;
   Path getSceneOutline(const Length& expansion = Length(0)) const noexcept;
@@ -124,8 +124,8 @@ private:
   QMetaObject::Connection mNetSignalNameChangedConnection;
 
   // References
-  BI_NetLineAnchor* mStartPoint;
-  BI_NetLineAnchor* mEndPoint;
+  BI_NetLineAnchor* mP1;
+  BI_NetLineAnchor* mP2;
 };
 
 /*******************************************************************************

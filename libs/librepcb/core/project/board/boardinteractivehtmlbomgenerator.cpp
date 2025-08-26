@@ -172,9 +172,8 @@ std::shared_ptr<InteractiveHtmlBom> BoardInteractiveHtmlBomGenerator::generate(
         net ? std::make_optional(*net->getName()) : std::nullopt;
     for (const auto nl : seg->getNetLines()) {
       if (layerMap.contains(&nl->getLayer())) {
-        ibom->addTrack(
-            layerMap[&nl->getLayer()], nl->getStartPoint().getPosition(),
-            nl->getEndPoint().getPosition(), nl->getWidth(), netName);
+        ibom->addTrack(layerMap[&nl->getLayer()], nl->getP1().getPosition(),
+                       nl->getP2().getPosition(), nl->getWidth(), netName);
       }
     }
     for (const auto via : seg->getVias()) {

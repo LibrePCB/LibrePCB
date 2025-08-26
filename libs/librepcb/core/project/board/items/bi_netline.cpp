@@ -82,15 +82,19 @@ BI_NetSegment* BI_NetLineAnchor::getNetSegmentOfLines() const noexcept {
  ******************************************************************************/
 
 BI_NetLine::BI_NetLine(BI_NetSegment& segment, const Uuid& uuid,
-                       BI_NetLineAnchor& startPoint, BI_NetLineAnchor& endPoint,
+                       BI_NetLineAnchor& a, BI_NetLineAnchor& b,
                        const Layer& layer, const PositiveLength& width)
   : BI_Base(segment.getBoard()),
     onEdited(*this),
     mNetSegment(segment),
-    mTrace(uuid, layer, width, startPoint.toTraceAnchor(),
-           endPoint.toTraceAnchor()),
-    mStartPoint(&startPoint),
-    mEndPoint(&endPoint) {
+    mTrace(uuid, layer, width, a.toTraceAnchor(), b.toTraceAnchor()),
+    mP1(&a),
+    mP2(&b) {
+  // Sort anchors to get a canonical file format.
+  if (mP2->toTraceAnchor() < mP1->toTraceAnchor()) {
+    std::swap(mP1, mP2);
+  }
+
   // check layer
   if (!mTrace.getLayer().isCopper()) {
     throw RuntimeError(__FILE__, __LINE__,
@@ -100,7 +104,7 @@ BI_NetLine::BI_NetLine(BI_NetSegment& segment, const Uuid& uuid,
   }
 
   // check if both netpoints are different
-  if (mStartPoint == mEndPoint) {
+  if (mP1 == mP2) {
     throw LogicError(__FILE__, __LINE__,
                      "BI_NetLine: both endpoints are the same.");
   }
@@ -115,10 +119,10 @@ BI_NetLine::~BI_NetLine() noexcept {
 
 BI_NetLineAnchor* BI_NetLine::getOtherPoint(
     const BI_NetLineAnchor& firstPoint) const noexcept {
-  if (&firstPoint == mStartPoint) {
-    return mEndPoint;
-  } else if (&firstPoint == mEndPoint) {
-    return mStartPoint;
+  if (&firstPoint == mP1) {
+    return mP2;
+  } else if (&firstPoint == mP2) {
+    return mP1;
   } else {
     return nullptr;
   }
@@ -127,7 +131,7 @@ BI_NetLineAnchor* BI_NetLine::getOtherPoint(
 Path BI_NetLine::getSceneOutline(const Length& expansion) const noexcept {
   Length width = getWidth() + (expansion * 2);
   if (width > 0) {
-    return Path::obround(mStartPoint->getPosition(), mEndPoint->getPosition(),
+    return Path::obround(mP1->getPosition(), mP2->getPosition(),
                          PositiveLength(width));
   } else {
     return Path();
@@ -135,7 +139,7 @@ Path BI_NetLine::getSceneOutline(const Length& expansion) const noexcept {
 }
 
 UnsignedLength BI_NetLine::getLength() const noexcept {
-  return (mEndPoint->getPosition() - mStartPoint->getPosition()).getLength();
+  return (mP2->getPosition() - mP1->getPosition()).getLength();
 }
 
 /*******************************************************************************
@@ -170,9 +174,9 @@ void BI_NetLine::addToBoard() {
     throw LogicError(__FILE__, __LINE__);
   }
 
-  mStartPoint->registerNetLine(*this);  // can throw
-  auto sg = scopeGuard([&]() { mStartPoint->unregisterNetLine(*this); });
-  mEndPoint->registerNetLine(*this);  // can throw
+  mP1->registerNetLine(*this);  // can throw
+  auto sg = scopeGuard([&]() { mP1->unregisterNetLine(*this); });
+  mP2->registerNetLine(*this);  // can throw
 
   BI_Base::addToBoard();
   sg.dismiss();
@@ -191,9 +195,9 @@ void BI_NetLine::removeFromBoard() {
     throw LogicError(__FILE__, __LINE__);
   }
 
-  mStartPoint->unregisterNetLine(*this);  // can throw
-  auto sg = scopeGuard([&]() { mEndPoint->registerNetLine(*this); });
-  mEndPoint->unregisterNetLine(*this);  // can throw
+  mP1->unregisterNetLine(*this);  // can throw
+  auto sg = scopeGuard([&]() { mP2->registerNetLine(*this); });
+  mP2->unregisterNetLine(*this);  // can throw
 
   BI_Base::removeFromBoard();
   sg.dismiss();

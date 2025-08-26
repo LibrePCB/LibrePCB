@@ -347,7 +347,7 @@ bool BI_NetSegment::areAllNetPointsConnectedTogether() const noexcept {
   } else if (mNetPoints.count() > 0) {
     p = mNetPoints.first();
   } else if (mNetLines.count() > 0) {
-    p = &mNetLines.first()->getStartPoint();
+    p = &mNetLines.first()->getP1();
   } else {
     return true;  // Empty net segment is considered as valid.
   }
@@ -370,16 +370,13 @@ void BI_NetSegment::findAllConnectedNetPoints(
     if (vias.contains(via)) return;
     vias.insert(via);
     foreach (const BI_NetLine* netline, mNetLines) {
-      if (&netline->getStartPoint() == via) {
-        findAllConnectedNetPoints(netline->getEndPoint(), vias, pads, points,
-                                  lines);
+      if (&netline->getP1() == via) {
+        findAllConnectedNetPoints(netline->getP2(), vias, pads, points, lines);
       }
-      if (&netline->getEndPoint() == via) {
-        findAllConnectedNetPoints(netline->getStartPoint(), vias, pads, points,
-                                  lines);
+      if (&netline->getP2() == via) {
+        findAllConnectedNetPoints(netline->getP1(), vias, pads, points, lines);
       }
-      if ((&netline->getStartPoint() == via) ||
-          (&netline->getEndPoint() == via)) {
+      if ((&netline->getP1() == via) || (&netline->getP2() == via)) {
         lines.insert(netline);
       }
     }
@@ -388,16 +385,13 @@ void BI_NetSegment::findAllConnectedNetPoints(
     if (pads.contains(pad)) return;
     pads.insert(pad);
     foreach (const BI_NetLine* netline, mNetLines) {
-      if (&netline->getStartPoint() == pad) {
-        findAllConnectedNetPoints(netline->getEndPoint(), vias, pads, points,
-                                  lines);
+      if (&netline->getP1() == pad) {
+        findAllConnectedNetPoints(netline->getP2(), vias, pads, points, lines);
       }
-      if (&netline->getEndPoint() == pad) {
-        findAllConnectedNetPoints(netline->getStartPoint(), vias, pads, points,
-                                  lines);
+      if (&netline->getP2() == pad) {
+        findAllConnectedNetPoints(netline->getP1(), vias, pads, points, lines);
       }
-      if ((&netline->getStartPoint() == pad) ||
-          (&netline->getEndPoint() == pad)) {
+      if ((&netline->getP1() == pad) || (&netline->getP2() == pad)) {
         lines.insert(netline);
       }
     }
@@ -405,16 +399,13 @@ void BI_NetSegment::findAllConnectedNetPoints(
     if (points.contains(np)) return;
     points.insert(np);
     foreach (const BI_NetLine* netline, mNetLines) {
-      if (&netline->getStartPoint() == np) {
-        findAllConnectedNetPoints(netline->getEndPoint(), vias, pads, points,
-                                  lines);
+      if (&netline->getP1() == np) {
+        findAllConnectedNetPoints(netline->getP2(), vias, pads, points, lines);
       }
-      if (&netline->getEndPoint() == np) {
-        findAllConnectedNetPoints(netline->getStartPoint(), vias, pads, points,
-                                  lines);
+      if (&netline->getP2() == np) {
+        findAllConnectedNetPoints(netline->getP1(), vias, pads, points, lines);
       }
-      if ((&netline->getStartPoint() == np) ||
-          (&netline->getEndPoint() == np)) {
+      if ((&netline->getP1() == np) || (&netline->getP2() == np)) {
         lines.insert(netline);
       }
     }

@@ -257,8 +257,8 @@ std::shared_ptr<SceneData3D> Board::buildScene3D(
     }
     foreach (const BI_NetLine* netLine, netSegment->getNetLines()) {
       data->addStroke(netLine->getLayer(),
-                      {Path({Vertex(netLine->getStartPoint().getPosition()),
-                             Vertex(netLine->getEndPoint().getPosition())})},
+                      {Path({Vertex(netLine->getP1().getPosition()),
+                             Vertex(netLine->getP2().getPosition())})},
                       *netLine->getWidth(), Transform());
     }
   }
@@ -781,12 +781,12 @@ void Board::copyFrom(const Board& other) {
     // Copy netlines.
     QList<BI_NetLine*> netLines;
     foreach (const BI_NetLine* netLine, netSegment->getNetLines()) {
-      BI_NetLineAnchor* start = anchorsMap.value(&netLine->getStartPoint());
-      Q_ASSERT(start);
-      BI_NetLineAnchor* end = anchorsMap.value(&netLine->getEndPoint());
-      Q_ASSERT(end);
+      BI_NetLineAnchor* p1 = anchorsMap.value(&netLine->getP1());
+      Q_ASSERT(p1);
+      BI_NetLineAnchor* p2 = anchorsMap.value(&netLine->getP2());
+      Q_ASSERT(p2);
       BI_NetLine* netLineCopy =
-          new BI_NetLine(*copy, Uuid::createRandom(), *start, *end,
+          new BI_NetLine(*copy, Uuid::createRandom(), *p1, *p2,
                          netLine->getLayer(), netLine->getWidth());
       netLines.append(netLineCopy);
     }

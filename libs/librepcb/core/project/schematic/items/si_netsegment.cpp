@@ -73,8 +73,8 @@ bool SI_NetSegment::isUsed() const noexcept {
 QSet<QString> SI_NetSegment::getForcedNetNames() const noexcept {
   QSet<QString> names;
   foreach (SI_NetLine* netline, mNetLines) {
-    SI_SymbolPin* pin1 = dynamic_cast<SI_SymbolPin*>(&netline->getStartPoint());
-    SI_SymbolPin* pin2 = dynamic_cast<SI_SymbolPin*>(&netline->getEndPoint());
+    SI_SymbolPin* pin1 = dynamic_cast<SI_SymbolPin*>(&netline->getP1());
+    SI_SymbolPin* pin2 = dynamic_cast<SI_SymbolPin*>(&netline->getP2());
     ComponentSignalInstance* sig1 =
         pin1 ? pin1->getComponentSignalInstance() : nullptr;
     ComponentSignalInstance* sig2 =
@@ -102,8 +102,8 @@ Point SI_NetSegment::calcNearestPoint(const Point& p) const noexcept {
   for (auto it = mNetLines.begin(); it != mNetLines.end(); it++) {
     Point lp;
     UnsignedLength ld = Toolbox::shortestDistanceBetweenPointAndLine(
-        p, it.value()->getStartPoint().getPosition(),
-        it.value()->getEndPoint().getPosition(), &lp);
+        p, it.value()->getP1().getPosition(), it.value()->getP2().getPosition(),
+        &lp);
     if ((it == mNetLines.begin()) || (ld < dist)) {
       dist = *ld;
       pos = lp;
@@ -116,8 +116,8 @@ QSet<SI_SymbolPin*> SI_NetSegment::getAllConnectedPins() const noexcept {
   Q_ASSERT(isAddedToSchematic());
   QSet<SI_SymbolPin*> pins;
   foreach (const SI_NetLine* netline, mNetLines) {
-    SI_SymbolPin* p1 = dynamic_cast<SI_SymbolPin*>(&netline->getStartPoint());
-    SI_SymbolPin* p2 = dynamic_cast<SI_SymbolPin*>(&netline->getEndPoint());
+    SI_SymbolPin* p1 = dynamic_cast<SI_SymbolPin*>(&netline->getP1());
+    SI_SymbolPin* p2 = dynamic_cast<SI_SymbolPin*>(&netline->getP2());
     if (p1) {
       pins.insert(p1);
       Q_ASSERT(p1->getCompSigInstNetSignal() == mNetSignal);
@@ -391,7 +391,7 @@ bool SI_NetSegment::areAllNetPointsConnectedTogether() const noexcept {
   if (mNetPoints.count() > 0) {
     p = mNetPoints.first();
   } else if (mNetLines.count() > 0) {
-    p = &mNetLines.first()->getStartPoint();
+    p = &mNetLines.first()->getP1();
   } else {
     return true;  // Empty net segment is considered as valid.
   }
@@ -412,15 +412,13 @@ void SI_NetSegment::findAllConnectedNetPoints(
     if (pins.contains(pin)) return;
     pins.insert(pin);
     foreach (const SI_NetLine* netline, mNetLines) {
-      if (&netline->getStartPoint() == pin) {
-        findAllConnectedNetPoints(netline->getEndPoint(), pins, points, lines);
+      if (&netline->getP1() == pin) {
+        findAllConnectedNetPoints(netline->getP2(), pins, points, lines);
       }
-      if (&netline->getEndPoint() == pin) {
-        findAllConnectedNetPoints(netline->getStartPoint(), pins, points,
-                                  lines);
+      if (&netline->getP2() == pin) {
+        findAllConnectedNetPoints(netline->getP1(), pins, points, lines);
       }
-      if ((&netline->getStartPoint() == pin) ||
-          (&netline->getEndPoint() == pin)) {
+      if ((&netline->getP1() == pin) || (&netline->getP2() == pin)) {
         lines.insert(netline);
       }
     }
@@ -428,15 +426,13 @@ void SI_NetSegment::findAllConnectedNetPoints(
     if (points.contains(np)) return;
     points.insert(np);
     foreach (const SI_NetLine* netline, mNetLines) {
-      if (&netline->getStartPoint() == np) {
-        findAllConnectedNetPoints(netline->getEndPoint(), pins, points, lines);
+      if (&netline->getP1() == np) {
+        findAllConnectedNetPoints(netline->getP2(), pins, points, lines);
       }
-      if (&netline->getEndPoint() == np) {
-        findAllConnectedNetPoints(netline->getStartPoint(), pins, points,
-                                  lines);
+      if (&netline->getP2() == np) {
+        findAllConnectedNetPoints(netline->getP1(), pins, points, lines);
       }
-      if ((&netline->getStartPoint() == np) ||
-          (&netline->getEndPoint() == np)) {
+      if ((&netline->getP1() == np) || (&netline->getP2() == np)) {
         lines.insert(netline);
       }
     }

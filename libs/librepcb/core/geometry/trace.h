@@ -83,6 +83,7 @@ public:
   bool operator!=(const TraceAnchor& rhs) const noexcept {
     return !(*this == rhs);
   }
+  bool operator<(const TraceAnchor& rhs) const noexcept;
   TraceAnchor& operator=(const TraceAnchor& rhs) noexcept;
 
   // Static Methods
@@ -109,6 +110,10 @@ private:  // Data
  * @brief The Trace class represents a trace within a board
  *
  * The main purpose of this class is to serialize and deserialize traces.
+ *
+ * @note The order of anchors (P1 & P2) is deterministic (sorted) to ensure a
+ *       canonical file format & behavior. The constructor and #setAnchors()
+ *       will automatically swap the passed anchors if needed.
  */
 class Trace final {
   Q_DECLARE_TR_FUNCTIONS(Trace)
@@ -119,8 +124,7 @@ public:
     UuidChanged,
     LayerChanged,
     WidthChanged,
-    StartPointChanged,
-    EndPointChanged,
+    AnchorsChanged,
   };
   Signal<Trace, Event> onEdited;
   typedef Slot<Trace, Event> OnEditedSlot;
@@ -130,7 +134,7 @@ public:
   Trace(const Trace& other) noexcept;
   Trace(const Uuid& uuid, const Trace& other) noexcept;
   Trace(const Uuid& uuid, const Layer& layer, const PositiveLength& width,
-        const TraceAnchor& start, const TraceAnchor& end) noexcept;
+        const TraceAnchor& a, const TraceAnchor& b) noexcept;
   explicit Trace(const SExpression& node);
   ~Trace() noexcept;
 
@@ -138,15 +142,14 @@ public:
   const Uuid& getUuid() const noexcept { return mUuid; }
   const Layer& getLayer() const noexcept { return *mLayer; }
   const PositiveLength& getWidth() const noexcept { return mWidth; }
-  const TraceAnchor& getStartPoint() const noexcept { return mStart; }
-  const TraceAnchor& getEndPoint() const noexcept { return mEnd; }
+  const TraceAnchor& getP1() const noexcept { return mP1; }
+  const TraceAnchor& getP2() const noexcept { return mP2; }
 
   // Setters
   bool setUuid(const Uuid& uuid) noexcept;
   bool setLayer(const Layer& layer) noexcept;
   bool setWidth(const PositiveLength& width) noexcept;
-  bool setStartPoint(const TraceAnchor& start) noexcept;
-  bool setEndPoint(const TraceAnchor& end) noexcept;
+  bool setAnchors(TraceAnchor a, TraceAnchor b) noexcept;
 
   // General Methods
 
@@ -162,12 +165,15 @@ public:
   bool operator!=(const Trace& rhs) const noexcept { return !(*this == rhs); }
   Trace& operator=(const Trace& rhs) noexcept;
 
+private:  // Methods
+  static void normalizeAnchors(TraceAnchor& start, TraceAnchor& end) noexcept;
+
 private:  // Data
   Uuid mUuid;
   const Layer* mLayer;
   PositiveLength mWidth;
-  TraceAnchor mStart;
-  TraceAnchor mEnd;
+  TraceAnchor mP1;
+  TraceAnchor mP2;
 };
 
 /*******************************************************************************

@@ -53,8 +53,8 @@ struct BoardDesignRuleCheckData final {
   };
   struct Trace {
     Uuid uuid;
-    Point startPosition;
-    Point endPosition;
+    Point p1;
+    Point p2;
     PositiveLength width;
     const Layer* layer;
   };
