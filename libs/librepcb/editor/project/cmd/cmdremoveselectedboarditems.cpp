@@ -53,6 +53,16 @@ CmdRemoveSelectedBoardItems::~CmdRemoveSelectedBoardItems() noexcept {
 }
 
 /*******************************************************************************
+ *  Public Methods
+ ******************************************************************************/
+
+QList<BI_NetSegment*> CmdRemoveSelectedBoardItems::getModifiedNetSegments()
+    const noexcept {
+  return mWrappedCommand ? mWrappedCommand->getModifiedNetSegments()
+                         : QList<BI_NetSegment*>{};
+}
+
+/*******************************************************************************
  *  Inherited from UndoCommand
  ******************************************************************************/
 

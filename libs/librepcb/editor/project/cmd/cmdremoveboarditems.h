@@ -114,6 +114,11 @@ public:
     mHoles += set;
   }
 
+  // Output
+  const QList<BI_NetSegment*>& getModifiedNetSegments() const noexcept {
+    return mModifiedNetSegments;
+  }
+
   // Operator Overloadings
   CmdRemoveBoardItems& operator=(const CmdRemoveBoardItems& other) = delete;
 
@@ -141,6 +146,9 @@ private:  // Data
   QSet<BI_Polygon*> mPolygons;
   QSet<BI_StrokeText*> mStrokeTexts;
   QSet<BI_Hole*> mHoles;
+
+  // Output
+  QList<BI_NetSegment*> mModifiedNetSegments;
 };
 
 /*******************************************************************************
