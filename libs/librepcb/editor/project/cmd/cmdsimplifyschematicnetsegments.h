@@ -17,13 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_CMDREMOVESELECTEDSCHEMATICITEMS_H
-#define LIBREPCB_EDITOR_CMDREMOVESELECTEDSCHEMATICITEMS_H
+#ifndef LIBREPCB_EDITOR_CMDSIMPLIFYSCHEMATICNETSEGMENTS_H
+#define LIBREPCB_EDITOR_CMDSIMPLIFYSCHEMATICNETSEGMENTS_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
 #include "../../undocommandgroup.h"
+
+#include <librepcb/core/geometry/netline.h>
 
 #include <QtCore>
 
@@ -32,52 +34,42 @@
  ******************************************************************************/
 namespace librepcb {
 
-class ComponentSignalInstance;
-class SI_NetLabel;
-class SI_NetLine;
-class SI_NetPoint;
+class Point;
+class SI_NetLineAnchor;
 class SI_NetSegment;
-class SI_Symbol;
 
 namespace editor {
 
-class SchematicGraphicsScene;
-
 /*******************************************************************************
- *  Class CmdRemoveSelectedSchematicItems
+ *  Class CmdSimplifySchematicNetSegments
  ******************************************************************************/
 
 /**
- * @brief The CmdRemoveSelectedSchematicItems class
+ * @brief Undo command which runs ::librepcb::NetSegmentSimplifier on a
+ *        ::librepcb::SI_NetSegment
  */
-class CmdRemoveSelectedSchematicItems final : public UndoCommandGroup {
+class CmdSimplifySchematicNetSegments final : public UndoCommandGroup {
 public:
   // Constructors / Destructor
-  explicit CmdRemoveSelectedSchematicItems(
-      SchematicGraphicsScene& scene) noexcept;
-  ~CmdRemoveSelectedSchematicItems() noexcept;
+  CmdSimplifySchematicNetSegments() = delete;
+  CmdSimplifySchematicNetSegments(
+      const CmdSimplifySchematicNetSegments& other) = delete;
+  explicit CmdSimplifySchematicNetSegments(
+      const QList<SI_NetSegment*>& segments) noexcept;
+  ~CmdSimplifySchematicNetSegments() noexcept;
 
-  // Output
-  QList<SI_NetSegment*> getModifiedNetSegments() const noexcept;
+  // Operator Overloadings
+  CmdSimplifySchematicNetSegments& operator=(
+      const CmdSimplifySchematicNetSegments& rhs) = delete;
 
-private:
-  // Private Methods
-
+private:  // Methods
   /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
   bool performExecute() override;
 
-  void removeNetSegmentItems(SI_NetSegment& netsegment,
-                             const QSet<SI_NetPoint*>& netpointsToRemove,
-                             const QSet<SI_NetLine*>& netlinesToRemove,
-                             const QSet<SI_NetLabel*>& netlabelsToRemove);
-  void removeSymbol(SI_Symbol& symbol);
-  void disconnectComponentSignalInstance(ComponentSignalInstance& signal);
+  void simplifySegment(SI_NetSegment& segment);
 
-  // Attributes from the constructor
-  SchematicGraphicsScene& mScene;
-
-  // Output
-  QList<SI_NetSegment*> mModifiedNetSegments;
+private:  // Data
+  QList<SI_NetSegment*> mSegments;
 };
 
 /*******************************************************************************

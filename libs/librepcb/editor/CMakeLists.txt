@@ -673,6 +673,8 @@ add_library(
   project/cmd/cmdschematictextremove.h
   project/cmd/cmdsimplifyboardnetsegments.cpp
   project/cmd/cmdsimplifyboardnetsegments.h
+  project/cmd/cmdsimplifyschematicnetsegments.cpp
+  project/cmd/cmdsimplifyschematicnetsegments.h
   project/cmd/cmdsymbolinstanceadd.cpp
   project/cmd/cmdsymbolinstanceadd.h
   project/cmd/cmdsymbolinstanceedit.cpp

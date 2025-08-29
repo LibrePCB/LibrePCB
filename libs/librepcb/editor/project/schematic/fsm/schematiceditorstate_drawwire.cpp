@@ -33,6 +33,7 @@
 #include "../../cmd/cmdschematicnetsegmentadd.h"
 #include "../../cmd/cmdschematicnetsegmentaddelements.h"
 #include "../../cmd/cmdschematicnetsegmentremoveelements.h"
+#include "../../cmd/cmdsimplifyschematicnetsegments.h"
 #include "../graphicsitems/sgi_netline.h"
 #include "../graphicsitems/sgi_netpoint.h"
 #include "../graphicsitems/sgi_symbolpin.h"
@@ -67,6 +68,7 @@ SchematicEditorState_DrawWire::SchematicEditorState_DrawWire(
     mCurrentWireMode(WireMode::HV),
     mCursorPos(),
     mFixedStartAnchor(nullptr),
+    mCurrentNetSegment(nullptr),
     mPositioningNetLine1(nullptr),
     mPositioningNetPoint1(nullptr),
     mPositioningNetLine2(nullptr),
@@ -92,7 +94,7 @@ bool SchematicEditorState_DrawWire::entry() noexcept {
 bool SchematicEditorState_DrawWire::exit() noexcept {
   // abort the currently active command
   if (mSubState != SubState::IDLE) {
-    abortPositioning(true);
+    abortPositioning(true, true);
   }
 
   mAdapter.fsmSetViewCursor(std::nullopt);
@@ -106,7 +108,7 @@ bool SchematicEditorState_DrawWire::exit() noexcept {
 
 bool SchematicEditorState_DrawWire::processAbortCommand() noexcept {
   if (mSubState == SubState::POSITIONING_NETPOINT) {
-    return abortPositioning(true);
+    return abortPositioning(true, true);
   }
 
   return false;
@@ -249,23 +251,23 @@ bool SchematicEditorState_DrawWire::startPositioning(
 
     // determine the fixed anchor (create one if it doesn't exist already)
     NetSignal* netsignal = nullptr;
-    SI_NetSegment* netsegment = nullptr;
+    mCurrentNetSegment = nullptr;
     std::optional<CircuitIdentifier> forcedNetName;
     Point pos = mCursorPos.mappedToGrid(getGridInterval());
     if (snap || fixedPoint) {
       std::shared_ptr<QGraphicsItem> item = findItem(mCursorPos);
       if (fixedPoint) {
         mFixedStartAnchor = fixedPoint;
-        netsegment = &fixedPoint->getNetSegment();
+        mCurrentNetSegment = &fixedPoint->getNetSegment();
         pos = fixedPoint->getPosition();
       } else if (auto netpoint =
                      std::dynamic_pointer_cast<SGI_NetPoint>(item)) {
         mFixedStartAnchor = &netpoint->getNetPoint();
-        netsegment = &netpoint->getNetPoint().getNetSegment();
+        mCurrentNetSegment = &netpoint->getNetPoint().getNetSegment();
         pos = netpoint->getNetPoint().getPosition();
       } else if (auto pin = std::dynamic_pointer_cast<SGI_SymbolPin>(item)) {
         mFixedStartAnchor = &pin->getPin();
-        netsegment = pin->getPin().getNetSegmentOfLines();
+        mCurrentNetSegment = pin->getPin().getNetSegmentOfLines();
         netsignal = pin->getPin().getCompSigInstNetSignal();
         pos = pin->getPin().getPosition();
         if (ComponentSignalInstance* sig =
@@ -284,9 +286,9 @@ bool SchematicEditorState_DrawWire::startPositioning(
         }
       } else if (auto netline = std::dynamic_pointer_cast<SGI_NetLine>(item)) {
         // split netline
-        netsegment = &netline->getNetLine().getNetSegment();
+        mCurrentNetSegment = &netline->getNetLine().getNetSegment();
         std::unique_ptr<CmdSchematicNetSegmentAddElements> cmdAdd(
-            new CmdSchematicNetSegmentAddElements(*netsegment));
+            new CmdSchematicNetSegmentAddElements(*mCurrentNetSegment));
         mFixedStartAnchor = cmdAdd->addNetPoint(Toolbox::nearestPointOnLine(
             pos, netline->getNetLine().getP1().getPosition(),
             netline->getNetLine().getP2().getPosition()));
@@ -294,7 +296,7 @@ bool SchematicEditorState_DrawWire::startPositioning(
         cmdAdd->addNetLine(*mFixedStartAnchor, netline->getNetLine().getP2());
         mContext.undoStack.appendToCmdGroup(cmdAdd.release());  // can throw
         std::unique_ptr<CmdSchematicNetSegmentRemoveElements> cmdRemove(
-            new CmdSchematicNetSegmentRemoveElements(*netsegment));
+            new CmdSchematicNetSegmentRemoveElements(*mCurrentNetSegment));
         cmdRemove->removeNetLine(netline->getNetLine());
         mContext.undoStack.appendToCmdGroup(cmdRemove.release());  // can throw
       }
@@ -306,7 +308,7 @@ bool SchematicEditorState_DrawWire::startPositioning(
     }
 
     // create new netsignal if none found
-    if ((!netsegment) && (!netsignal)) {
+    if ((!mCurrentNetSegment) && (!netsignal)) {
       // get or add netclass with the name "default"
       NetClass* netclass = mCircuit.getNetClassByName(ElementName("default"));
       if (!netclass) {
@@ -325,7 +327,7 @@ bool SchematicEditorState_DrawWire::startPositioning(
     }
 
     // create new netsegment if none found
-    if (!netsegment) {
+    if (!mCurrentNetSegment) {
       // connect pin if needed
       if (SI_SymbolPin* pin = dynamic_cast<SI_SymbolPin*>(mFixedStartAnchor)) {
         Q_ASSERT(pin->getComponentSignalInstance());
@@ -337,13 +339,13 @@ bool SchematicEditorState_DrawWire::startPositioning(
       CmdSchematicNetSegmentAdd* cmd =
           new CmdSchematicNetSegmentAdd(scene.getSchematic(), *netsignal);
       mContext.undoStack.appendToCmdGroup(cmd);  // can throw
-      netsegment = cmd->getNetSegment();
+      mCurrentNetSegment = cmd->getNetSegment();
     }
 
     // add netpoint if none found
-    Q_ASSERT(netsegment);
+    Q_ASSERT(mCurrentNetSegment);
     CmdSchematicNetSegmentAddElements* cmd =
-        new CmdSchematicNetSegmentAddElements(*netsegment);
+        new CmdSchematicNetSegmentAddElements(*mCurrentNetSegment);
     if (!mFixedStartAnchor) {
       mFixedStartAnchor = cmd->addNetPoint(pos);
     }
@@ -370,13 +372,13 @@ bool SchematicEditorState_DrawWire::startPositioning(
     updateNetpointPositions(snap);
 
     // Highlight all elements of the current netsignal.
-    mAdapter.fsmSetHighlightedNetSignals({&netsegment->getNetSignal()});
+    mAdapter.fsmSetHighlightedNetSignals({&mCurrentNetSegment->getNetSignal()});
 
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     if (mSubState != SubState::IDLE) {
-      abortPositioning(false);
+      abortPositioning(false, false);
     }
     return false;
   }
@@ -391,7 +393,7 @@ bool SchematicEditorState_DrawWire::addNextNetPoint(
 
   // abort if p2 == p0 (no line drawn)
   if (pos == mFixedStartAnchor->getPosition()) {
-    abortPositioning(true);
+    abortPositioning(true, true);
     return false;
   } else {
     bool finishCommand = false;
@@ -523,6 +525,7 @@ bool SchematicEditorState_DrawWire::addNextNetPoint(
               new CmdCombineSchematicNetSegments(
                   mPositioningNetPoint2->getNetSegment(),
                   *mPositioningNetPoint2, *otherNetSegment, *otherAnchor));
+          mCurrentNetSegment = otherNetSegment;
         }
         if (!otherForcedNetName.isEmpty()) {
           // change net name if connected to a pin with forced net name
@@ -568,7 +571,7 @@ bool SchematicEditorState_DrawWire::addNextNetPoint(
       // abort or start a new command
       if (finishCommand) {
         mContext.undoStack.beginCmdGroup(QString());  // this is ugly!
-        abortPositioning(true);
+        abortPositioning(true, true);
         return false;
       } else {
         return startPositioning(scene, snap, mPositioningNetPoint2);
@@ -576,7 +579,7 @@ bool SchematicEditorState_DrawWire::addNextNetPoint(
     } catch (const Exception& e) {
       QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
       if (mSubState != SubState::IDLE) {
-        abortPositioning(false);
+        abortPositioning(false, false);
       }
       return false;
     }
@@ -584,22 +587,37 @@ bool SchematicEditorState_DrawWire::addNextNetPoint(
 }
 
 bool SchematicEditorState_DrawWire::abortPositioning(
-    bool showErrMsgBox) noexcept {
+    bool showErrMsgBox, bool simplifySegment) noexcept {
+  bool success = false;
+
+  SI_NetSegment* segment = simplifySegment ? mCurrentNetSegment : nullptr;
+
   try {
     mAdapter.fsmSetHighlightedNetSignals({});
     mSubState = SubState::IDLE;
     mFixedStartAnchor = nullptr;
+    mCurrentNetSegment = nullptr;
     mPositioningNetLine1 = nullptr;
     mPositioningNetLine2 = nullptr;
     mPositioningNetPoint1 = nullptr;
     mPositioningNetPoint2 = nullptr;
     mContext.undoStack.abortCmdGroup();  // can throw
-    return true;
+    success = true;
   } catch (const Exception& e) {
     if (showErrMsgBox)
       QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
-    return false;
   }
+
+  if (segment) {
+    try {
+      mContext.undoStack.execCmd(
+          new CmdSimplifySchematicNetSegments({segment}));
+    } catch (const Exception& e) {
+      qCritical() << "Failed to simplify net segments:" << e.getMsg();
+    }
+  }
+
+  return success;
 }
 
 std::shared_ptr<QGraphicsItem> SchematicEditorState_DrawWire::findItem(

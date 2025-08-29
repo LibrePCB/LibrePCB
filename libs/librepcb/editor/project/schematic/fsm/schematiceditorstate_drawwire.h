@@ -38,6 +38,7 @@ class Circuit;
 class SI_NetLine;
 class SI_NetLineAnchor;
 class SI_NetPoint;
+class SI_NetSegment;
 class SI_SymbolPin;
 
 namespace editor {
@@ -112,7 +113,7 @@ private:  //  Methods
   bool startPositioning(SchematicGraphicsScene& scene, bool snap,
                         SI_NetPoint* fixedPoint = nullptr) noexcept;
   bool addNextNetPoint(SchematicGraphicsScene& scene, bool snap) noexcept;
-  bool abortPositioning(bool showErrMsgBox) noexcept;
+  bool abortPositioning(bool showErrMsgBox, bool simplifySegment) noexcept;
   std::shared_ptr<QGraphicsItem> findItem(
       const Point& pos,
       const QVector<std::shared_ptr<QGraphicsItem>>& except = {}) noexcept;
@@ -125,8 +126,10 @@ private:  // Data
   SubState mSubState;  ///< the current substate
   WireMode mCurrentWireMode;  ///< the current wire mode
   Point mCursorPos;  ///< the current cursor position
-  SI_NetLineAnchor*
-      mFixedStartAnchor;  ///< the fixed anchor (start point of the line)
+  SI_NetLineAnchor* mFixedStartAnchor;  ///< the fixed anchor (start point of
+                                        ///< the line)
+  SI_NetSegment* mCurrentNetSegment;  ///< the net segment that is currently
+                                      ///< edited
   SI_NetLine* mPositioningNetLine1;  ///< line between fixed point and p1
   SI_NetPoint* mPositioningNetPoint1;  ///< the first netpoint to place
   SI_NetLine* mPositioningNetLine2;  ///< line between p1 and p2
