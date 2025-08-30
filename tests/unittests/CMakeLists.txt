@@ -15,6 +15,7 @@ add_executable(
   librepcb_unittests
   core/3d/occmodeltest.cpp
   core/algorithm/airwiresbuildertest.cpp
+  core/algorithm/netsegmentsimplifiertest.cpp
   core/applicationtest.cpp
   core/attribute/attributekeytest.cpp
   core/attribute/attributesubstitutortest.cpp
