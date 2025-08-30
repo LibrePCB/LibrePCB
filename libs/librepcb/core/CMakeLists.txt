@@ -75,6 +75,8 @@ add_library(
   3d/stepexport.h
   algorithm/airwiresbuilder.cpp
   algorithm/airwiresbuilder.h
+  algorithm/netsegmentsimplifier.cpp
+  algorithm/netsegmentsimplifier.h
   application.cpp
   application.h
   attribute/attribute.cpp

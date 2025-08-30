@@ -17,64 +17,59 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_CMDREMOVESELECTEDBOARDITEMS_H
-#define LIBREPCB_EDITOR_CMDREMOVESELECTEDBOARDITEMS_H
+#ifndef LIBREPCB_EDITOR_CMDSIMPLIFYBOARDNETSEGMENTS_H
+#define LIBREPCB_EDITOR_CMDSIMPLIFYBOARDNETSEGMENTS_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../undocommand.h"
+#include "../../undocommandgroup.h"
+
+#include <librepcb/core/geometry/trace.h>
 
 #include <QtCore>
-
-#include <memory>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 
-class BI_NetLine;
-class BI_NetPoint;
+class BI_NetLineAnchor;
 class BI_NetSegment;
-class BI_Via;
+class Point;
 
 namespace editor {
 
-class BoardGraphicsScene;
-class CmdRemoveBoardItems;
-
 /*******************************************************************************
- *  Class CmdRemoveSelectedBoardItems
+ *  Class CmdSimplifyBoardNetSegments
  ******************************************************************************/
 
 /**
- * @brief The CmdRemoveSelectedBoardItems class
+ * @brief Undo command which runs ::librepcb::NetSegmentSimplifier on a
+ *        ::librepcb::BI_NetSegment
  */
-class CmdRemoveSelectedBoardItems final : public UndoCommand {
+class CmdSimplifyBoardNetSegments final : public UndoCommandGroup {
 public:
   // Constructors / Destructor
-  explicit CmdRemoveSelectedBoardItems(BoardGraphicsScene& scene,
-                                       bool includeLockedItems) noexcept;
-  ~CmdRemoveSelectedBoardItems() noexcept;
+  CmdSimplifyBoardNetSegments() = delete;
+  CmdSimplifyBoardNetSegments(const CmdSimplifyBoardNetSegments& other) =
+      delete;
+  explicit CmdSimplifyBoardNetSegments(
+      const QList<BI_NetSegment*>& segments) noexcept;
+  ~CmdSimplifyBoardNetSegments() noexcept;
 
-  // Output
-  QList<BI_NetSegment*> getModifiedNetSegments() const noexcept;
+  // Operator Overloadings
+  CmdSimplifyBoardNetSegments& operator=(
+      const CmdSimplifyBoardNetSegments& rhs) = delete;
 
 private:  // Methods
   /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
   bool performExecute() override;
 
-  /// @copydoc ::librepcb::editor::UndoCommand::performUndo()
-  void performUndo() override;
-
-  /// @copydoc ::librepcb::editor::UndoCommand::performRedo()
-  void performRedo() override;
+  void simplifySegment(BI_NetSegment& segment);
 
 private:  // Data
-  BoardGraphicsScene& mScene;
-  bool mIncludeLockedItems;
-  std::unique_ptr<CmdRemoveBoardItems> mWrappedCommand;
+  QList<BI_NetSegment*> mSegments;
 };
 
 /*******************************************************************************

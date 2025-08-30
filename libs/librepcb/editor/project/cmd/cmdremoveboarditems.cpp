@@ -250,6 +250,7 @@ void CmdRemoveBoardItems::removeNetSegmentItems(
       Q_ASSERT(newNetLine);
     }
     execNewChildCmd(cmdAddElements);  // can throw
+    mModifiedNetSegments.append(newNetSegment);
   }
 }
 

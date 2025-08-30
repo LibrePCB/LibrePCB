@@ -29,6 +29,7 @@
 #include "../../cmd/cmdboardsplitnetline.h"
 #include "../../cmd/cmdboardviaedit.h"
 #include "../../cmd/cmdcombineboardnetsegments.h"
+#include "../../cmd/cmdsimplifyboardnetsegments.h"
 #include "../boardgraphicsscene.h"
 #include "../graphicsitems/bgi_footprintpad.h"
 #include "../graphicsitems/bgi_netline.h"
@@ -109,7 +110,7 @@ bool BoardEditorState_DrawTrace::entry() noexcept {
 
 bool BoardEditorState_DrawTrace::exit() noexcept {
   // Abort the currently active command
-  if (!abortPositioning(true)) return false;
+  if (!abortPositioning(true, true)) return false;
 
   mAdapter.fsmSetViewCursor(std::nullopt);
   mAdapter.fsmToolLeave();
@@ -123,7 +124,7 @@ bool BoardEditorState_DrawTrace::exit() noexcept {
 bool BoardEditorState_DrawTrace::processAbortCommand() noexcept {
   if (mSubState == SubState_PositioningNetPoint) {
     // Just finish the current trace, not exiting the whole tool.
-    abortPositioning(true);
+    abortPositioning(true, true);
     return true;
   } else {
     // Allow leaving the tool.
@@ -253,7 +254,7 @@ void BoardEditorState_DrawTrace::setLayer(const Layer& layer) noexcept {
       pad = nullptr;
     }
     if (via || pad) {
-      abortPositioning(false);
+      abortPositioning(false, false);
       mCurrentLayer = &layer;
       startPositioning(mContext.board, startPos, nullptr, via, pad);
       updateNetpointPositions();
@@ -487,7 +488,7 @@ bool BoardEditorState_DrawTrace::startPositioning(
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
-    abortPositioning(false);
+    abortPositioning(false, false);
     return false;
   }
 }
@@ -498,7 +499,7 @@ bool BoardEditorState_DrawTrace::addNextNetPoint(
 
   // abort if no via should be added and p2 == p0 (no line drawn)
   if (!mTempVia && mTargetPos == mFixedStartAnchor->getPosition()) {
-    abortPositioning(true);
+    abortPositioning(true, true);
     return false;
   }
   // All the positioning is done by updateNetPoints already
@@ -655,7 +656,7 @@ bool BoardEditorState_DrawTrace::addNextNetPoint(
     return false;
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
-    abortPositioning(false);
+    abortPositioning(false, false);
     return false;
   }
 
@@ -665,23 +666,28 @@ bool BoardEditorState_DrawTrace::addNextNetPoint(
     mSubState = SubState_Idle;
     // abort or start a new command
     if (finishCommand) {
-      abortPositioning(true);
+      abortPositioning(true, true);
       return true;
     } else {
       BI_NetPoint* nextStartPoint = mPositioningNetPoint2;
       BI_Via* nextStartVia = mTempVia;
-      abortPositioning(false);
+      abortPositioning(false, false);
       return startPositioning(scene.getBoard(), mTargetPos, nextStartPoint,
                               nextStartVia);
     }
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
-    abortPositioning(false);
+    abortPositioning(false, false);
     return false;
   }
 }
 
-bool BoardEditorState_DrawTrace::abortPositioning(bool showErrMsgBox) noexcept {
+bool BoardEditorState_DrawTrace::abortPositioning(
+    bool showErrMsgBox, bool simplifySegment) noexcept {
+  bool success = false;
+
+  BI_NetSegment* segment = simplifySegment ? mCurrentNetSegment : nullptr;
+
   try {
     mAdapter.fsmSetHighlightedNetSignals({});
     mFixedStartAnchor = nullptr;
@@ -697,14 +703,23 @@ bool BoardEditorState_DrawTrace::abortPositioning(bool showErrMsgBox) noexcept {
       mContext.undoStack.abortCmdGroup();  // can throw
     }
     mSubState = SubState_Idle;
-    return true;
+    success = true;
   } catch (const Exception& e) {
     if (showErrMsgBox) {
       QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     }
     mSubState = SubState_Idle;
-    return false;
   }
+
+  if (segment) {
+    try {
+      mContext.undoStack.execCmd(new CmdSimplifyBoardNetSegments({segment}));
+    } catch (const Exception& e) {
+      qCritical() << "Failed to simplify net segments:" << e.getMsg();
+    }
+  }
+
+  return success;
 }
 
 void BoardEditorState_DrawTrace::updateNetpointPositions() noexcept {

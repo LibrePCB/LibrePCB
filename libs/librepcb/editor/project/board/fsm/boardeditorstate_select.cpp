@@ -46,6 +46,7 @@
 #include "../../cmd/cmdpasteboarditems.h"
 #include "../../cmd/cmdremoveselectedboarditems.h"
 #include "../../cmd/cmdreplacedevice.h"
+#include "../../cmd/cmdsimplifyboardnetsegments.h"
 #include "../boardclipboarddatabuilder.h"
 #include "../boardgraphicsscene.h"
 #include "../boardplanepropertiesdialog.h"
@@ -1436,7 +1437,9 @@ bool BoardEditorState_Select::removeSelectedItems() noexcept {
   try {
     CmdRemoveSelectedBoardItems* cmd =
         new CmdRemoveSelectedBoardItems(*scene, getIgnoreLocks());
-    mContext.undoStack.execCmd(cmd);
+    mContext.undoStack.execCmd(cmd);  // can throw
+    mContext.undoStack.execCmd(new CmdSimplifyBoardNetSegments(
+        cmd->getModifiedNetSegments()));  // can throw
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
