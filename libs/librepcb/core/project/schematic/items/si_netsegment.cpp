@@ -158,10 +158,6 @@ void SI_NetSegment::setNetSignal(NetSignal& netsignal) {
 
 void SI_NetSegment::addNetPointsAndNetLines(
     const QList<SI_NetPoint*>& netpoints, const QList<SI_NetLine*>& netlines) {
-  if (!isAddedToSchematic()) {
-    throw LogicError(__FILE__, __LINE__);
-  }
-
   ScopeGuardList sgl(netpoints.count() + netlines.count());
   foreach (SI_NetPoint* netpoint, netpoints) {
     if ((mNetPoints.values().contains(netpoint)) ||
@@ -174,10 +170,14 @@ void SI_NetSegment::addNetPointsAndNetLines(
           QString("There is already a netpoint with the UUID \"%1\"!")
               .arg(netpoint->getUuid().toStr()));
     }
-    netpoint->addToSchematic();  // can throw
+    if (isAddedToSchematic()) {
+      netpoint->addToSchematic();  // can throw
+    }
     mNetPoints.insert(netpoint->getUuid(), netpoint);
     sgl.add([this, netpoint]() {
-      netpoint->removeFromSchematic();
+      if (isAddedToSchematic()) {
+        netpoint->removeFromSchematic();
+      }
       mNetPoints.remove(netpoint->getUuid());
     });
   }
@@ -192,10 +192,14 @@ void SI_NetSegment::addNetPointsAndNetLines(
           QString("There is already a netline with the UUID \"%1\"!")
               .arg(netline->getUuid().toStr()));
     }
-    netline->addToSchematic();  // can throw
+    if (isAddedToSchematic()) {
+      netline->addToSchematic();  // can throw
+    }
     mNetLines.insert(netline->getUuid(), netline);
     sgl.add([this, netline]() {
-      netline->removeFromSchematic();
+      if (isAddedToSchematic()) {
+        netline->removeFromSchematic();
+      }
       mNetLines.remove(netline->getUuid());
     });
   }

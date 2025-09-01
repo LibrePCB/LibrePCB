@@ -84,6 +84,15 @@ CmdRemoveSelectedSchematicItems::~CmdRemoveSelectedSchematicItems() noexcept {
 }
 
 /*******************************************************************************
+ *  Public Methods
+ ******************************************************************************/
+
+QList<SI_NetSegment*> CmdRemoveSelectedSchematicItems::getModifiedNetSegments()
+    const noexcept {
+  return mModifiedNetSegments;
+}
+
+/*******************************************************************************
  *  Inherited from UndoCommand
  ******************************************************************************/
 
@@ -212,6 +221,7 @@ void CmdRemoveSelectedSchematicItems::removeNetSegmentItems(
     SI_NetSegment* newNetSegment = cmdAddNetSegment->getNetSegment();
     Q_ASSERT(newNetSegment);
     newNetSegments.append(newNetSegment);
+    mModifiedNetSegments.append(newNetSegment);
 
     // Add new netpoints and netlines
     CmdSchematicNetSegmentAddElements* cmdAddElements =

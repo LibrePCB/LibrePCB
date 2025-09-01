@@ -34,6 +34,7 @@
 #include "../../cmd/cmddragselectedschematicitems.h"
 #include "../../cmd/cmdpasteschematicitems.h"
 #include "../../cmd/cmdremoveselectedschematicitems.h"
+#include "../../cmd/cmdsimplifyschematicnetsegments.h"
 #include "../graphicsitems/sgi_netlabel.h"
 #include "../graphicsitems/sgi_symbol.h"
 #include "../graphicsitems/sgi_text.h"
@@ -811,7 +812,9 @@ bool SchematicEditorState_Select::removeSelectedItems() noexcept {
   try {
     CmdRemoveSelectedSchematicItems* cmd =
         new CmdRemoveSelectedSchematicItems(*scene);
-    execCmd(cmd);
+    execCmd(cmd);  // can throw
+    execCmd(new CmdSimplifySchematicNetSegments(
+        cmd->getModifiedNetSegments()));  // can throw
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
