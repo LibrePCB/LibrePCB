@@ -163,24 +163,29 @@ void Board3dTab::setDerivedUiData(const ui::Board3dTabData& data) noexcept {
 }
 
 void Board3dTab::activate() noexcept {
-  mView.reset(new SlintOpenGlView(*mProjection));
-  mView->setAlpha(mAlpha);
-  connect(mView.get(), &SlintOpenGlView::stateChanged, this,
-          [this]() { onDerivedUiDataChanged.notify(); });
-  connect(mView.get(), &SlintOpenGlView::contentChanged, this,
-          &Board3dTab::requestRepaint);
+  if (!mView) {
+    mView.reset(new SlintOpenGlView(*mProjection));
+    mView->setAlpha(mAlpha);
+    connect(mView.get(), &SlintOpenGlView::stateChanged, this,
+            [this]() { onDerivedUiDataChanged.notify(); });
+    connect(mView.get(), &SlintOpenGlView::contentChanged, this,
+            &Board3dTab::requestRepaint);
+  }
 
-  mSceneBuilder.reset(new OpenGlSceneBuilder(this));
-  connect(mSceneBuilder.get(), &OpenGlSceneBuilder::objectAdded, mView.get(),
-          &SlintOpenGlView::addObject);
-  connect(mSceneBuilder.get(), &OpenGlSceneBuilder::objectRemoved, mView.get(),
-          &SlintOpenGlView::removeObject);
-  connect(mSceneBuilder.get(), &OpenGlSceneBuilder::finished, this,
-          [this](QStringList errors) {
-            mSceneBuilderErrors = errors;
-            mTimestampOfLastSceneRebuild = QDateTime::currentMSecsSinceEpoch();
-            onDerivedUiDataChanged.notify();
-          });
+  if (!mSceneBuilder) {
+    mSceneBuilder.reset(new OpenGlSceneBuilder(this));
+    connect(mSceneBuilder.get(), &OpenGlSceneBuilder::objectAdded, mView.get(),
+            &SlintOpenGlView::addObject);
+    connect(mSceneBuilder.get(), &OpenGlSceneBuilder::objectRemoved,
+            mView.get(), &SlintOpenGlView::removeObject);
+    connect(mSceneBuilder.get(), &OpenGlSceneBuilder::finished, this,
+            [this](QStringList errors) {
+              mSceneBuilderErrors = errors;
+              mTimestampOfLastSceneRebuild =
+                  QDateTime::currentMSecsSinceEpoch();
+              onDerivedUiDataChanged.notify();
+            });
+  }
 
   // Setup timer for automatic scene rebuild.
   mSceneRebuildTimer.reset(new QTimer(this));
@@ -200,8 +205,14 @@ void Board3dTab::deactivate() noexcept {
   }
   mSceneRebuildTimer.reset();
   mBoardEditor.unregisterActiveTab(this);
-  mSceneBuilder.reset();
-  mView.reset();
+
+  // We could reset the view here to release memory. But it leads to a (possibly
+  // expensive/slow) scene rebuild when switching to this tab again, which is
+  // a bit annoying. In future we may implement some memory management which
+  // releases the OpenGL view when many tabs are opened or when this tab is
+  // not shown for a long time.
+  // mSceneBuilder.reset();
+  // mView.reset();
 }
 
 void Board3dTab::trigger(ui::TabAction a) noexcept {
