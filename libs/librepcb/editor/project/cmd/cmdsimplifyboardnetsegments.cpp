@@ -114,8 +114,8 @@ void CmdSimplifyBoardNetSegments::simplifySegment(BI_NetSegment& segment) {
     return *id;
   };
   foreach (BI_NetLine* netline, segment.getNetLines()) {
-    const int p1 = addAnchor(netline->getP1());
-    const int p2 = addAnchor(netline->getP2());
+    const int p1 = addAnchor(netline->getStartPoint());
+    const int p2 = addAnchor(netline->getEndPoint());
     const int id =
         simplifier.addLine(p1, p2, &netline->getLayer(), *netline->getWidth());
     lines.insert(netline, id);
