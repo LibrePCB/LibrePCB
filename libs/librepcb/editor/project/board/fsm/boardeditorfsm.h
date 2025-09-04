@@ -23,6 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include <librepcb/core/geometry/pad.h>
+
 #include <QtCore>
 
 /*******************************************************************************
@@ -70,6 +72,15 @@ public:
     ADD_STROKE_TEXT,
     /// ::librepcb::editor::BoardEditorState_AddVia
     ADD_VIA,
+    /// ::librepcb::editor::BoardEditorState_AddPad
+    ADD_THT_PAD,
+    ADD_SMT_PAD_STANDARD,
+    ADD_SMT_PAD_THERMAL,
+    ADD_SMT_PAD_BGA,
+    ADD_SMT_PAD_EDGE_CONNECTOR,
+    ADD_SMT_PAD_TEST,
+    ADD_SMT_PAD_LOCAL_FIDUCIAL,
+    ADD_SMT_PAD_GLOBAL_FIDUCIAL,
     /// ::librepcb::editor::BoardEditorState_AddDevice
     ADD_DEVICE,
     /// ::librepcb::editor::BoardEditorState_DrawPolygon
@@ -109,6 +120,8 @@ public:
   bool processAddHole() noexcept;
   bool processAddStrokeText() noexcept;
   bool processAddVia() noexcept;
+  bool processAddThtPad() noexcept;
+  bool processAddSmtPad(Pad::Function function) noexcept;
   bool processAddDevice(ComponentInstance& component, const Uuid& device,
                         const Uuid& footprint) noexcept;
   bool processDrawPolygon() noexcept;

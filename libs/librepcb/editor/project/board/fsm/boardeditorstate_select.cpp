@@ -49,6 +49,7 @@
 #include "../../cmd/cmdsimplifyboardnetsegments.h"
 #include "../boardclipboarddatabuilder.h"
 #include "../boardgraphicsscene.h"
+#include "../boardpadpropertiesdialog.h"
 #include "../boardplanepropertiesdialog.h"
 #include "../boardselectionquery.h"
 #include "../boardviapropertiesdialog.h"
@@ -458,6 +459,7 @@ bool BoardEditorState_Select::processEditProperties() noexcept {
 
   BoardSelectionQuery query(*scene, true);
   query.addDeviceInstancesOfSelectedFootprints();
+  query.addSelectedBoardPads();
   query.addSelectedVias();
   query.addSelectedPlanes();
   query.addSelectedZones();
@@ -467,6 +469,10 @@ bool BoardEditorState_Select::processEditProperties() noexcept {
   query.addSelectedHoles();
   foreach (auto ptr, query.getDeviceInstances()) {
     openDevicePropertiesDialog(*ptr);
+    return true;
+  }
+  foreach (auto ptr, query.getPads()) {
+    openPadPropertiesDialog(*ptr);
     return true;
   }
   foreach (auto ptr, query.getVias()) {
@@ -1818,6 +1824,11 @@ bool BoardEditorState_Select::openPropertiesDialog(
   if (auto device = std::dynamic_pointer_cast<BGI_Device>(item)) {
     openDevicePropertiesDialog(device->getDevice());
     return true;
+  } else if (auto pad = std::dynamic_pointer_cast<BGI_Pad>(item)) {
+    if (pad->getPad().getNetSegment()) {
+      openPadPropertiesDialog(pad->getPad());
+      return true;
+    }
   } else if (auto via = std::dynamic_pointer_cast<BGI_Via>(item)) {
     openViaPropertiesDialog(via->getVia());
     return true;
@@ -1845,6 +1856,13 @@ void BoardEditorState_Select::openDevicePropertiesDialog(
   DeviceInstancePropertiesDialog dialog(
       mContext.workspace, mContext.project, device, mContext.undoStack,
       getLengthUnit(), "board_editor/device_properties_dialog", parentWidget());
+  dialog.exec();
+}
+
+void BoardEditorState_Select::openPadPropertiesDialog(BI_Pad& pad) noexcept {
+  BoardPadPropertiesDialog dialog(pad, mContext.undoStack, getLengthUnit(),
+                                  "board_editor/pad_properties_dialog",
+                                  parentWidget());
   dialog.exec();
 }
 
@@ -1965,6 +1983,7 @@ void BoardEditorState_Select::updateAvailableFeatures() noexcept {
 
     BoardSelectionQuery query(*scene, true);
     query.addDeviceInstancesOfSelectedFootprints();
+    query.addSelectedBoardPads();
     query.addSelectedVias();
     query.addSelectedNetPoints();
     query.addSelectedNetLines();
@@ -1985,8 +2004,9 @@ void BoardEditorState_Select::updateAvailableFeatures() noexcept {
       features |= BoardEditorFsmAdapter::Feature::ResetTexts;
     }
     if ((!query.getDeviceInstances().isEmpty()) ||
-        (!query.getVias().isEmpty()) || (!query.getPlanes().isEmpty()) ||
-        (!query.getZones().isEmpty()) || (!query.getPolygons().isEmpty()) ||
+        (!query.getPads().isEmpty()) || (!query.getVias().isEmpty()) ||
+        (!query.getPlanes().isEmpty()) || (!query.getZones().isEmpty()) ||
+        (!query.getPolygons().isEmpty()) ||
         (!query.getStrokeTexts().isEmpty()) || (!query.getHoles().isEmpty())) {
       features |= BoardEditorFsmAdapter::Feature::Properties;
     }
@@ -2005,6 +2025,19 @@ void BoardEditorState_Select::updateAvailableFeatures() noexcept {
         features |= BoardEditorFsmAdapter::Feature::SnapToGrid;
       }
       if (ptr->isLocked()) {
+        features |= BoardEditorFsmAdapter::Feature::Unlock;
+      } else {
+        features |= BoardEditorFsmAdapter::Feature::Lock;
+      }
+    }
+    foreach (auto ptr, query.getPads()) {
+      if (features.testFlag(BoardEditorFsmAdapter::Feature::SnapToGrid)) {
+        break;
+      }
+      if (!ptr->getPosition().isOnGrid(getGridInterval())) {
+        features |= BoardEditorFsmAdapter::Feature::SnapToGrid;
+      }
+      if (ptr->getProperties().isLocked()) {
         features |= BoardEditorFsmAdapter::Feature::Unlock;
       } else {
         features |= BoardEditorFsmAdapter::Feature::Lock;
