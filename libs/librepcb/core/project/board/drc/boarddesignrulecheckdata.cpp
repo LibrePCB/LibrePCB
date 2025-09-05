@@ -67,12 +67,42 @@ BoardDesignRuleCheckData::BoardDesignRuleCheckData(
   copperLayers = board.getCopperLayers();
   silkscreenLayersTop = board.getSilkscreenLayersTop();
   silkscreenLayersBot = board.getSilkscreenLayersBot();
+
+  // Helper to convert a pad.
+  auto convertPad = [](const BI_Pad* pad) {
+    QSet<const Layer*> layersWithTraces;
+    foreach (const BI_NetLine* netLine, pad->getNetLines()) {
+      layersWithTraces.insert(&netLine->getLayer());
+    }
+    const NetSignal* net = pad->getNetSignal();
+    Pad pd{
+        pad->getUuid(),
+        pad->getLibPackagePad() ? *pad->getLibPackagePad()->getName()
+                                : QString(),
+        pad->getPosition(),
+        pad->getRotation(),
+        pad->getMirrored(),
+        {},
+        pad->getGeometries(),
+        layersWithTraces,
+        pad->getProperties().getCopperClearance(),
+        net ? std::make_optional(net->getUuid()) : std::optional<Uuid>(),
+        net ? *net->getName() : QString(),
+    };
+    for (const PadHole& hole : pad->getProperties().getHoles()) {
+      pd.holes.append(Hole{hole.getUuid(), hole.getDiameter(), hole.getPath(),
+                           std::optional<Length>()});
+    }
+    return pd;
+  };
+
   foreach (const BI_NetSegment* ns, board.getNetSegments()) {
     const NetSignal* net = ns->getNetSignal();
     Segment nsd{
         ns->getUuid(),
         net ? net->getUuid() : std::optional<Uuid>(),
         net ? *net->getName() : QString(),
+        {},
         {},
         {},
         {},
@@ -106,6 +136,9 @@ BoardDesignRuleCheckData::BoardDesignRuleCheckData(
               &via.getEndLayer(), biVia->getDrillLayerSpan(), via.isBuried(),
               via.isBlind(), biVia->getStopMaskDiameterTop(),
               biVia->getStopMaskDiameterBottom()});
+    }
+    foreach (const BI_Pad* biPad, ns->getPads()) {
+      nsd.pads.insert(biPad->getUuid(), convertPad(biPad));
     }
     segments.insert(ns->getUuid(), nsd);
   }
@@ -155,30 +188,7 @@ BoardDesignRuleCheckData::BoardDesignRuleCheckData(
         {},
     };
     foreach (const BI_Pad* pad, dev->getPads()) {
-      QSet<const Layer*> layersWithTraces;
-      foreach (const BI_NetLine* netLine, pad->getNetLines()) {
-        layersWithTraces.insert(&netLine->getLayer());
-      }
-      const NetSignal* net = pad->getCompSigInstNetSignal();
-      Pad pd{
-          pad->getLibPadUuid(),
-          pad->getLibPackagePad() ? *pad->getLibPackagePad()->getName()
-                                  : QString(),
-          pad->getPosition(),
-          pad->getRotation(),
-          pad->getMirrored(),
-          {},
-          pad->getGeometries(),
-          layersWithTraces,
-          pad->getLibPad().getCopperClearance(),
-          net ? std::make_optional(net->getUuid()) : std::optional<Uuid>(),
-          net ? *net->getName() : QString(),
-      };
-      for (const PadHole& hole : pad->getLibPad().getHoles()) {
-        pd.holes.append(Hole{hole.getUuid(), hole.getDiameter(), hole.getPath(),
-                             std::optional<Length>()});
-      }
-      dd.pads.insert(pad->getLibPadUuid(), pd);
+      dd.pads.insert(pad->getUuid(), convertPad(pad));
     }
     for (const librepcb::Polygon& polygon :
          dev->getLibFootprint().getPolygons()) {
@@ -217,8 +227,14 @@ BoardDesignRuleCheckData::BoardDesignRuleCheckData(
     AirWireAnchor ret;
     ret.position = a.getPosition();
     if (const BI_Pad* pad = dynamic_cast<const BI_Pad*>(&a)) {
-      ret.device = pad->getDevice().getComponentInstanceUuid();
-      ret.pad = pad->getLibPadUuid();
+      if (const BI_Device* dev = pad->getDevice()) {
+        ret.device = dev->getComponentInstanceUuid();
+      } else if (const BI_NetSegment* seg = pad->getNetSegment()) {
+        ret.segment = seg->getUuid();
+      } else {
+        qCritical() << "Unknown pad anchor type, DRC will fail later.";
+      }
+      ret.pad = pad->getUuid();
     } else if (const BI_NetPoint* np = dynamic_cast<const BI_NetPoint*>(&a)) {
       ret.segment = np->getNetSegment().getUuid();
       ret.junction = np->getUuid();

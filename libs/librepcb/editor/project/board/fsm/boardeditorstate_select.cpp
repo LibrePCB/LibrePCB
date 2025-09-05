@@ -766,7 +766,7 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
     if (auto pad = std::dynamic_pointer_cast<BGI_Pad>(selectedItem)) {
       // Pads have no context menu, thus open the context menu of its footprint.
       // Fixes https://github.com/LibrePCB/LibrePCB/issues/1060.
-      if (auto fpt = scene->getDevices().value(&pad->getPad().getDevice())) {
+      if (auto fpt = scene->getDevices().value(pad->getPad().getDevice())) {
         selectedItem = fpt;
         selectedItem->setSelected(true);
       }

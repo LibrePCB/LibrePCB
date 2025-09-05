@@ -116,8 +116,6 @@ public:
   BI_NetLine& operator=(const BI_NetLine& rhs) = delete;
 
 private:
-  BI_NetLineAnchor* getAnchor(const TraceAnchor& anchor);
-
   // General
   BI_NetSegment& mNetSegment;
   Trace mTrace;

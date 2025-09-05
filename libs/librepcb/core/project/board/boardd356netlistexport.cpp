@@ -90,39 +90,60 @@ QByteArray BoardD356NetlistExport::generate() const {
     }
   }
 
-  // Footprint Pads.
+  // Helper to add a pad.
+  int boardPadNumber = 1;
+  auto addPad = [this, &gen, &boardPadNumber](const BI_Pad* pad) {
+    QString netName;
+    if (const NetSignal* netSignal = pad->getNetSignal()) {
+      netName = *netSignal->getName();
+    }
+    QString cmpName;
+    if (const BI_Device* dev = pad->getDevice()) {
+      cmpName = *dev->getComponentInstance().getName();
+    } else {
+      cmpName = "BOARD";
+    }
+    QString padName;
+    if (const PackagePad* pkgPad = pad->getLibPackagePad()) {
+      padName = *pkgPad->getName();
+    } else if (!pad->getDevice()) {
+      padName = QString("P%1").arg(boardPadNumber);
+      ++boardPadNumber;
+    }
+    const Angle rotation = pad->getMirrored()
+        ? (pad->getRotation() + Angle::deg180())
+        : pad->getRotation();
+    if (pad->getProperties().isTht()) {
+      // THT pad. Not sure if we really need to export all holes, if there
+      // are multiple. Also slots are probably not supported by IPC-D-356A.
+      // I suspect it's good enough to export only a single, circular hole?
+      gen.thtPad(netName, cmpName, padName, pad->getPosition(),
+                 pad->getProperties().getWidth(),
+                 pad->getProperties().getHeight(), rotation,
+                 pad->getProperties().getHoles().first()->getDiameter());
+    } else {
+      // SMT pad.
+      const int layerNumber =
+          (pad->getComponentSide() == Pad::ComponentSide::Top)
+          ? 1
+          : (mBoard.getInnerLayerCount() + 2);
+      gen.smtPad(netName, cmpName, padName, pad->getPosition(),
+                 pad->getProperties().getWidth(),
+                 pad->getProperties().getHeight(), rotation, layerNumber);
+    }
+  };
+
+  // Footprint pads.
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
     foreach (const BI_Pad* pad, device->getPads()) {
-      QString netName;
-      if (const NetSignal* netSignal = pad->getCompSigInstNetSignal()) {
-        netName = *netSignal->getName();
-      }
-      const QString cmpName = *device->getComponentInstance().getName();
-      QString padName;
-      if (const PackagePad* pkgPad = pad->getLibPackagePad()) {
-        padName = *pkgPad->getName();
-      }
-      const Angle rotation = pad->getMirrored()
-          ? (pad->getRotation() + Angle::deg180())
-          : pad->getRotation();
-      if (pad->getLibPad().isTht()) {
-        // THT pad. Not sure if we really need to export all holes, if there
-        // are multiple. Also slots are probably not supported by IPC-D-356A.
-        // I suspect it's good enough to export only a single, circular hole?
-        gen.thtPad(netName, cmpName, padName, pad->getPosition(),
-                   pad->getLibPad().getWidth(), pad->getLibPad().getHeight(),
-                   rotation,
-                   pad->getLibPad().getHoles().first()->getDiameter());
-      } else {
-        // SMT pad.
-        const int layerNumber =
-            (pad->getComponentSide() == Pad::ComponentSide::Top)
-            ? 1
-            : (mBoard.getInnerLayerCount() + 2);
-        gen.smtPad(netName, cmpName, padName, pad->getPosition(),
-                   pad->getLibPad().getWidth(), pad->getLibPad().getHeight(),
-                   rotation, layerNumber);
-      }
+      addPad(pad);
+    }
+  }
+
+  // Board pads.
+  foreach (const BI_NetSegment* segment, mBoard.getNetSegments()) {
+    foreach (const BI_Pad* pad, segment->getPads()) {
+      addPad(pad);
     }
   }
 

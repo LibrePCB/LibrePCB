@@ -111,6 +111,23 @@ TEST(BoardClipboardDataTest, testToFromMimeDataPopulated) {
   std::shared_ptr<BoardClipboardData::NetSegment> netSegment1 =
       std::make_shared<BoardClipboardData::NetSegment>(
           CircuitIdentifier("net1"));
+  netSegment1->pads.append(std::make_shared<BoardPadData>(
+      Uuid::createRandom(), Point(12, 34), Angle(56),
+      Pad::Shape::RoundedOctagon, PositiveLength(11), PositiveLength(22),
+      UnsignedLimitedRatio(Ratio::fromPercent(50)), Path(), MaskConfig::off(),
+      MaskConfig::automatic(), UnsignedLength(0), Pad::ComponentSide::Bottom,
+      Pad::Function::Unspecified, PadHoleList{}, false));
+  netSegment1->pads.append(std::make_shared<BoardPadData>(
+      Uuid::createRandom(), Point(12, 34), Angle(56), Pad::Shape::RoundedRect,
+      PositiveLength(123), PositiveLength(456),
+      UnsignedLimitedRatio(Ratio::fromPercent(100)),
+      Path({Vertex(Point(1, 2), Angle(3)), Vertex(Point(4, 5), Angle(6))}),
+      MaskConfig::automatic(), MaskConfig::manual(Length(123456)),
+      UnsignedLength(123456), Pad::ComponentSide::Top, Pad::Function::TestPad,
+      PadHoleList{std::make_shared<PadHole>(Uuid::createRandom(),
+                                            PositiveLength(789),
+                                            makeNonEmptyPath(Point(0, 0)))},
+      true));
   netSegment1->vias.append(std::make_shared<Via>(
       Uuid::createRandom(), Layer::topCopper(), Layer::botCopper(), Point(1, 2),
       PositiveLength(10), PositiveLength(3), MaskConfig::off()));
@@ -124,7 +141,7 @@ TEST(BoardClipboardDataTest, testToFromMimeDataPopulated) {
       std::make_shared<Junction>(Uuid::createRandom(), Point(3, 4)));
   netSegment1->traces.append(std::make_shared<Trace>(
       Uuid::createRandom(), Layer::topCopper(), PositiveLength(1),
-      TraceAnchor::junction(Uuid::createRandom()),
+      TraceAnchor::pad(Uuid::createRandom()),
       TraceAnchor::via(Uuid::createRandom())));
   netSegment1->traces.append(std::make_shared<Trace>(
       Uuid::createRandom(), Layer::botCopper(), PositiveLength(10),
@@ -151,7 +168,7 @@ TEST(BoardClipboardDataTest, testToFromMimeDataPopulated) {
       TraceAnchor::via(Uuid::createRandom())));
   netSegment2->traces.append(std::make_shared<Trace>(
       Uuid::createRandom(), Layer::botCopper(), PositiveLength(10),
-      TraceAnchor::junction(Uuid::createRandom()),
+      TraceAnchor::pad(Uuid::createRandom()),
       TraceAnchor::footprintPad(Uuid::createRandom(), Uuid::createRandom())));
 
   std::shared_ptr<BoardClipboardData::Plane> plane1 =

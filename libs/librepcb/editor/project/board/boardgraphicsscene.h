@@ -180,10 +180,12 @@ private:  // Methods
   void removePad(BI_Pad& pad) noexcept;
   void addNetSegment(BI_NetSegment& netSegment) noexcept;
   void removeNetSegment(BI_NetSegment& netSegment) noexcept;
-  void addNetSegmentElements(const QList<BI_Via*>& vias,
+  void addNetSegmentElements(const QList<BI_Pad*>& pads,
+                             const QList<BI_Via*>& vias,
                              const QList<BI_NetPoint*>& netPoints,
                              const QList<BI_NetLine*>& netLines) noexcept;
-  void removeNetSegmentElements(const QList<BI_Via*>& vias,
+  void removeNetSegmentElements(const QList<BI_Pad*>& pads,
+                                const QList<BI_Via*>& vias,
                                 const QList<BI_NetPoint*>& netPoints,
                                 const QList<BI_NetLine*>& netLines) noexcept;
   void addVia(BI_Via& via) noexcept;

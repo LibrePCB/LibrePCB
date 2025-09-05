@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_CMDBOARDNETSEGMENTADDELEMENTS_H
-#define LIBREPCB_EDITOR_CMDBOARDNETSEGMENTADDELEMENTS_H
+#ifndef LIBREPCB_EDITOR_CMDBOARDPADEDIT_H
+#define LIBREPCB_EDITOR_CMDBOARDPADEDIT_H
 
 /*******************************************************************************
  *  Includes
@@ -26,7 +26,6 @@
 #include "../../undocommand.h"
 
 #include <librepcb/core/project/board/items/bi_pad.h>
-#include <librepcb/core/project/board/items/bi_via.h>
 #include <librepcb/core/types/point.h>
 
 #include <QtCore>
@@ -36,37 +35,43 @@
  ******************************************************************************/
 namespace librepcb {
 
-class BI_NetLine;
-class BI_NetLineAnchor;
-class BI_NetPoint;
-class BI_NetSegment;
-class Layer;
+class NetSignal;
 
 namespace editor {
 
 /*******************************************************************************
- *  Class CmdBoardNetSegmentAddElements
+ *  Class CmdBoardPadEdit
  ******************************************************************************/
 
 /**
- * @brief The CmdBoardNetSegmentAddElements class
+ * @brief The CmdBoardPadEdit class
  */
-class CmdBoardNetSegmentAddElements final : public UndoCommand {
+class CmdBoardPadEdit final : public UndoCommand {
 public:
   // Constructors / Destructor
-  CmdBoardNetSegmentAddElements(BI_NetSegment& segment) noexcept;
-  ~CmdBoardNetSegmentAddElements() noexcept;
+  explicit CmdBoardPadEdit(BI_Pad& pad) noexcept;
+  ~CmdBoardPadEdit() noexcept;
 
-  // General Methods
-  BI_Pad* addPad(BI_Pad& pad);
-  BI_Pad* addPad(const BoardPadData& pad);
-  BI_Via* addVia(BI_Via& via);
-  BI_Via* addVia(const Via& via);
-  BI_NetPoint* addNetPoint(BI_NetPoint& netpoint);
-  BI_NetPoint* addNetPoint(const Point& position);
-  BI_NetLine* addNetLine(BI_NetLine& netline);
-  BI_NetLine* addNetLine(BI_NetLineAnchor& a, BI_NetLineAnchor& b,
-                         const Layer& layer, const PositiveLength& width);
+  // Setters
+  void setComponentSideAndHoles(Pad::ComponentSide side,
+                                const PadHoleList& holes, bool immediate);
+  void setFunction(Pad::Function function, bool immediate) noexcept;
+  void setShape(Pad::Shape shape, bool immediate) noexcept;
+  void setWidth(const PositiveLength& width, bool immediate) noexcept;
+  void setHeight(const PositiveLength& height, bool immediate) noexcept;
+  void setRadius(const UnsignedLimitedRatio& radius, bool immediate) noexcept;
+  void setCustomShapeOutline(const Path& outline) noexcept;
+  void setStopMaskConfig(const MaskConfig& config, bool immediate) noexcept;
+  void setSolderPasteConfig(const MaskConfig& config) noexcept;
+  void setCopperClearance(const UnsignedLength& clearance,
+                          bool immediate) noexcept;
+  void setPosition(const Point& pos, bool immediate) noexcept;
+  void translate(const Point& deltaPos, bool immediate) noexcept;
+  void snapToGrid(const PositiveLength& gridInterval, bool immediate) noexcept;
+  void setRotation(const Angle& angle, bool immediate) noexcept;
+  void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
+  void mirror(const Point& center, Qt::Orientation orientation, bool immediate);
+  void setLocked(bool locked) noexcept;
 
 private:
   // Private Methods
@@ -81,11 +86,13 @@ private:
   void performRedo() override;
 
   // Private Member Variables
-  BI_NetSegment& mNetSegment;
-  QList<BI_Pad*> mPads;
-  QList<BI_Via*> mVias;
-  QList<BI_NetPoint*> mNetPoints;
-  QList<BI_NetLine*> mNetLines;
+
+  // Attributes from the constructor
+  BI_Pad& mPad;
+
+  // General Attributes
+  BoardPadData mOldProperties;
+  BoardPadData mNewProperties;
 };
 
 /*******************************************************************************

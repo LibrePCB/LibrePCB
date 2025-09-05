@@ -75,6 +75,15 @@ bool CmdCombineBoardNetSegments::performExecute() {
   std::unique_ptr<CmdBoardNetSegmentAddElements> cmdAdd(
       new CmdBoardNetSegmentAddElements(mNewSegment));
   QHash<BI_NetLineAnchor*, BI_NetLineAnchor*> anchorMap;
+  foreach (BI_Pad* pad, mOldSegment.getPads()) {
+    if (pad == &mOldAnchor) {
+      anchorMap.insert(pad, &mNewAnchor);
+    } else {
+      BI_Pad* newPad = cmdAdd->addPad(
+          BoardPadData(Uuid::createRandom(), pad->getProperties()));
+      anchorMap.insert(pad, newPad);
+    }
+  }
   foreach (BI_Via* via, mOldSegment.getVias()) {
     if (via == &mOldAnchor) {
       anchorMap.insert(via, &mNewAnchor);

@@ -75,6 +75,7 @@ std::unique_ptr<BoardClipboardData> BoardClipboardDataBuilder::generate(
   // Get all selected items
   BoardSelectionQuery query(mScene, true);
   query.addDeviceInstancesOfSelectedFootprints();
+  query.addSelectedBoardPads();
   query.addSelectedVias();
   query.addSelectedNetLines();
   query.addSelectedPlanes();
@@ -112,13 +113,12 @@ std::unique_ptr<BoardClipboardData> BoardClipboardDataBuilder::generate(
     // Add pad positions
     foreach (const BI_Pad* pad, device->getPads()) {
       data->getPadPositions().insert(
-          std::make_pair(device->getComponentInstanceUuid(),
-                         pad->getLibPadUuid()),
+          std::make_pair(device->getComponentInstanceUuid(), pad->getUuid()),
           pad->getPosition());
     }
   }
 
-  // Add (splitted) net segments including vias, netpoints, and netlines
+  // Add (splitted) net segments including pads, vias, netpoints, and netlines
   QHash<BI_NetSegment*, BoardSelectionQuery::NetSegmentItems> netSegmentItems =
       query.getNetSegmentItems();
   for (auto it = netSegmentItems.constBegin(); it != netSegmentItems.constEnd();
@@ -135,6 +135,10 @@ std::unique_ptr<BoardClipboardData> BoardClipboardDataBuilder::generate(
           }
         }
       }
+    }
+    foreach (BI_Pad* pad, it.key()->getPads()) {
+      bool replaceByJunctions = !it.value().pads.contains(pad);
+      splitter.addPad(pad->getProperties(), replaceByJunctions);
     }
     foreach (BI_Via* via, it.key()->getVias()) {
       bool replaceByJunctions = !it.value().vias.contains(via);
@@ -155,6 +159,7 @@ std::unique_ptr<BoardClipboardData> BoardClipboardDataBuilder::generate(
       }
       std::shared_ptr<BoardClipboardData::NetSegment> newSegment =
           std::make_shared<BoardClipboardData::NetSegment>(netName);
+      newSegment->pads = segment.pads;
       newSegment->vias = segment.vias;
       newSegment->junctions = segment.junctions;
       newSegment->traces = segment.traces;

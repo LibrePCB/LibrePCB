@@ -81,6 +81,8 @@ private:
       std::vector<std::unique_ptr<SExpression>>& fptPadStacks,
       std::vector<std::unique_ptr<SExpression>>& viaPadStacks) const;
   std::unique_ptr<SExpression> genLibraryImage(
+      std::vector<std::unique_ptr<SExpression>>& fptPadStacks) const;
+  std::unique_ptr<SExpression> genLibraryImage(
       const BI_Device& dev,
       std::vector<std::unique_ptr<SExpression>>& fptPadStacks) const;
   std::unique_ptr<SExpression> genLibraryPadStack(const BI_Pad& pad) const;

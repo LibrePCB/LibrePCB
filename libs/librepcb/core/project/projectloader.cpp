@@ -695,6 +695,13 @@ void ProjectLoader::loadBoardNetSegment(Board& b, const SExpression& node) {
       new BI_NetSegment(b, deserialize<Uuid>(node.getChild("@0")), netSignal);
   b.addNetSegment(*netSegment);
 
+  // Load pads.
+  QList<BI_Pad*> pads;
+  foreach (const SExpression* child, node.getChildren("pad")) {
+    BI_Pad* pad = new BI_Pad(*netSegment, BoardPadData(*child));
+    pads.append(pad);
+  }
+
   // Load vias.
   QList<BI_Via*> vias;
   foreach (const SExpression* child, node.getChildren("via")) {
@@ -714,7 +721,8 @@ void ProjectLoader::loadBoardNetSegment(Board& b, const SExpression& node) {
   // Load net lines.
   QList<BI_NetLine*> netLines;
   foreach (const SExpression* child, node.getChildren("trace")) {
-    auto parseAnchor = [&b, &vias, &netPoints](const SExpression& aNode) {
+    auto parseAnchor = [&b, &pads, &vias,
+                        &netPoints](const SExpression& aNode) {
       BI_NetLineAnchor* anchor = nullptr;
       if (const SExpression* junctionNode = aNode.tryGetChild("junction")) {
         const Uuid netPointUuid =
@@ -744,8 +752,8 @@ void ProjectLoader::loadBoardNetSegment(Board& b, const SExpression& node) {
                              QString("Via '%1' does not exist in board.")
                                  .arg(viaUuid.toStr()));
         }
-      } else {
-        const Uuid deviceUuid = deserialize<Uuid>(aNode.getChild("device/@0"));
+      } else if (const SExpression* devNode = aNode.tryGetChild("device")) {
+        const Uuid deviceUuid = deserialize<Uuid>(devNode->getChild("@0"));
         BI_Device* device = b.getDeviceInstanceByComponentUuid(deviceUuid);
         if (!device) {
           throw RuntimeError(
@@ -761,6 +769,19 @@ void ProjectLoader::loadBoardNetSegment(Board& b, const SExpression& node) {
               QString("Footprint pad '%1' does not exist in board.")
                   .arg(padUuid.toStr()));
         }
+      } else {
+        const Uuid padUuid = deserialize<Uuid>(aNode.getChild("pad/@0"));
+        foreach (BI_Pad* pad, pads) {
+          if (pad->getUuid() == padUuid) {
+            anchor = pad;
+            break;
+          }
+        }
+        if (!anchor) {
+          throw RuntimeError(__FILE__, __LINE__,
+                             QString("Pad '%1' does not exist in board.")
+                                 .arg(padUuid.toStr()));
+        }
       }
       return anchor;
     };
@@ -774,7 +795,7 @@ void ProjectLoader::loadBoardNetSegment(Board& b, const SExpression& node) {
   }
 
   // Add vias, net points & net lines.
-  netSegment->addElements(vias, netPoints, netLines);
+  netSegment->addElements(pads, vias, netPoints, netLines);
 }
 
 void ProjectLoader::loadBoardPlane(Board& b, const SExpression& node) {

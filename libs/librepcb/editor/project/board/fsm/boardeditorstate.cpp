@@ -375,19 +375,24 @@ QList<std::shared_ptr<QGraphicsItem>> BoardEditorState::findItemsAtPos(
     }
   }
 
-  if (flags.testFlag(FindFlag::FootprintPads)) {
+  if (flags.testFlag(FindFlag::FootprintPads) ||
+      flags.testFlag(FindFlag::BoardPads)) {
     for (auto it = scene->getPads().begin(); it != scene->getPads().end();
          it++) {
-      if (netsignals.isEmpty() ||
-          netsignals.contains(it.key()->getCompSigInstNetSignal())) {
+      if (((it.key()->getDevice() && flags.testFlag(FindFlag::FootprintPads)) ||
+           (it.key()->getNetSegment() &&
+            flags.testFlag(FindFlag::BoardPads))) &&
+          (netsignals.isEmpty() ||
+           netsignals.contains(it.key()->getNetSignal()))) {
         if ((!cuLayer) || (it.key()->isOnLayer(*cuLayer))) {
           // Give THT pads high priority to fix
           // https://github.com/LibrePCB/LibrePCB/issues/1073.
-          const int priority = it.key()->getLibPad().isTht()
+          const int priority = it.key()->getProperties().isTht()
               ? 1
               : (50 + (it.key()->getMirrored() ? 300 : 100));
           std::shared_ptr<QGraphicsItem> itemToAdd;
-          if (flags.testFlag(FindFlag::DevicesOfPads)) {
+          if (flags.testFlag(FindFlag::DevicesOfPads) &&
+              it.key()->getDevice()) {
             // See https://github.com/LibrePCB/LibrePCB/issues/1531.
             itemToAdd = it.value()->getDeviceGraphicsItem().lock();
           } else {

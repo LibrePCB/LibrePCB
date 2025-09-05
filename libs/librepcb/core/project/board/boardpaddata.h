@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CORE_FOOTPRINTPAD_H
-#define LIBREPCB_CORE_FOOTPRINTPAD_H
+#ifndef LIBREPCB_CORE_BOARDPADDATA_H
+#define LIBREPCB_CORE_BOARDPADDATA_H
 
 /*******************************************************************************
  *  Includes
@@ -34,14 +34,14 @@
 namespace librepcb {
 
 /*******************************************************************************
- *  Class FootprintPad
+ *  Class BoardPadData
  ******************************************************************************/
 
 /**
- * @brief The FootprintPad class represents a pad of a footprint
+ * @brief The BoardPadData class represents a pad in a board
  */
-class FootprintPad final : public Pad {
-  Q_DECLARE_TR_FUNCTIONS(FootprintPad)
+class BoardPadData final : public Pad {
+  Q_DECLARE_TR_FUNCTIONS(BoardPadData)
 
 public:
   // Signals
@@ -62,32 +62,30 @@ public:
     FunctionChanged,
     HolesEdited,
     // Derived class properties
-    PackagePadUuidChanged,
+    LockedChanged,
   };
-  Signal<FootprintPad, Event> onEdited;
-  typedef Slot<FootprintPad, Event> OnEditedSlot;
+  Signal<BoardPadData, Event> onEdited;
+  typedef Slot<BoardPadData, Event> OnEditedSlot;
 
   // Constructors / Destructor
-  FootprintPad() = delete;
-  FootprintPad(const FootprintPad& other) noexcept;
-  FootprintPad(const Uuid& uuid, const FootprintPad& other) noexcept;
-  FootprintPad(const Uuid& uuid, const std::optional<Uuid>& pkgPadUuid,
-               const Point& pos, const Angle& rot, Shape shape,
-               const PositiveLength& width, const PositiveLength& height,
-               const UnsignedLimitedRatio& radius,
+  BoardPadData() = delete;
+  BoardPadData(const BoardPadData& other) noexcept;
+  BoardPadData(const Uuid& uuid, const BoardPadData& other) noexcept;
+  BoardPadData(const Uuid& uuid, const Point& pos, const Angle& rot,
+               Shape shape, const PositiveLength& width,
+               const PositiveLength& height, const UnsignedLimitedRatio& radius,
                const Path& customShapeOutline, const MaskConfig& autoStopMask,
                const MaskConfig& autoSolderPaste,
                const UnsignedLength& copperClearance, ComponentSide side,
-               Function function, const PadHoleList& holes) noexcept;
-  explicit FootprintPad(const SExpression& node);
-  ~FootprintPad() noexcept;
+               Function function, const PadHoleList& holes,
+               bool locked) noexcept;
+  explicit BoardPadData(const SExpression& node);
+  ~BoardPadData() noexcept;
 
   // Getters
   using Pad::getHoles;
   PadHoleList& getHoles() noexcept { return mHoles; }
-  const std::optional<Uuid>& getPackagePadUuid() const noexcept {
-    return mPackagePadUuid;
-  }
+  bool isLocked() const noexcept { return mLocked; }
 
   // Setters
   bool setPosition(const Point& pos) noexcept;
@@ -102,7 +100,7 @@ public:
   bool setCopperClearance(const UnsignedLength& clearance) noexcept;
   bool setComponentSide(ComponentSide side) noexcept;
   bool setFunction(Function function) noexcept;
-  bool setPackagePadUuid(const std::optional<Uuid>& pad) noexcept;
+  bool setLocked(bool locked) noexcept;
 
   // General Methods
 
@@ -114,11 +112,11 @@ public:
   void serialize(SExpression& root) const;
 
   // Operator Overloadings
-  bool operator==(const FootprintPad& rhs) const noexcept;
-  bool operator!=(const FootprintPad& rhs) const noexcept {
+  bool operator==(const BoardPadData& rhs) const noexcept;
+  bool operator!=(const BoardPadData& rhs) const noexcept {
     return !(*this == rhs);
   }
-  FootprintPad& operator=(const FootprintPad& rhs) noexcept;
+  BoardPadData& operator=(const BoardPadData& rhs) noexcept;
 
 private:  // Methods
   void holesEdited(const PadHoleList& list, int index,
@@ -126,27 +124,22 @@ private:  // Methods
                    PadHoleList::Event event) noexcept;
 
 private:  // Data
-  /// The connected package pad
-  ///
-  /// This is the UUID of the package pad where this footprint pad is
-  /// connected to. It can be std::nullopt, which means that the footprint pad
-  /// is electrically not connected (e.g. for mechanical-only pads).
-  std::optional<Uuid> mPackagePadUuid;
+  bool mLocked;
 
   // Slots
   PadHoleList::OnEditedSlot mHolesEditedSlot;
 };
 
 /*******************************************************************************
- *  Class FootprintPadList
+ *  Class BoardPadDataList
  ******************************************************************************/
 
-struct FootprintPadListNameProvider {
+struct BoardPadDataListNameProvider {
   static constexpr const char* tagname = "pad";
 };
-using FootprintPadList =
-    SerializableObjectList<FootprintPad, FootprintPadListNameProvider,
-                           FootprintPad::Event>;
+using BoardPadDataList =
+    SerializableObjectList<BoardPadData, BoardPadDataListNameProvider,
+                           BoardPadData::Event>;
 
 /*******************************************************************************
  *  End of File

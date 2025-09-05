@@ -386,9 +386,32 @@ RuleCheckMessageList BoardDesignRuleCheck::checkCopperCopperClearances(
   typedef QList<Item> Items;
   Items items;
 
-  // Net segments.
+  // Helper for pads.
   BoardClipperPathGenerator gen(maxArcTolerance());
+  auto addPad = [&](const Data::Pad& pad,
+                    const DrcMsgCopperCopperClearanceViolation::Object& obj) {
+    const UnsignedLength padClearance =
+        std::max(clearance, pad.copperClearance);
+    for (const Layer* layer : data.copperLayers) {
+      if (!pad.geometries.value(layer).isEmpty()) {
+        auto it = items.insert(
+            items.end(),
+            Item{obj, layer, layer, pad.net, *padClearance, {}, {}});
+        gen.addPad(pad, *layer);
+        gen.takePathsTo(it->copperArea);
+        gen.addPad(pad, *layer, padClearance - tolerance);
+        gen.takePathsTo(it->clearanceArea);
+      }
+    }
+  };
+
+  // Net segments.
   for (const Data::Segment& ns : data.segments) {
+    // Pads.
+    for (const Data::Pad& pad : ns.pads) {
+      addPad(pad, DrcMsgCopperCopperClearanceViolation::Object::pad(pad, ns));
+    }
+
     // vias.
     for (const Data::Via& via : ns.vias) {
       auto it = items.insert(
@@ -495,25 +518,9 @@ RuleCheckMessageList BoardDesignRuleCheck::checkCopperCopperClearances(
 
     // Pads.
     for (const Data::Pad& pad : dev.pads) {
-      const UnsignedLength padClearance =
-          std::max(clearance, pad.copperClearance);
-      for (const Layer* layer : data.copperLayers) {
-        if (!pad.geometries.value(layer).isEmpty()) {
-          auto it = items.insert(
-              items.end(),
-              Item{DrcMsgCopperCopperClearanceViolation::Object::pad(pad, dev),
-                   layer,
-                   layer,
-                   pad.net,
-                   *padClearance,
-                   {},
-                   {}});
-          gen.addPad(pad, *layer);
-          gen.takePathsTo(it->copperArea);
-          gen.addPad(pad, *layer, padClearance - tolerance);
-          gen.takePathsTo(it->clearanceArea);
-        }
-      }
+      addPad(
+          pad,
+          DrcMsgCopperCopperClearanceViolation::Object::footprintPad(pad, dev));
     }
 
     // Polygons.
@@ -697,8 +704,30 @@ RuleCheckMessageList BoardDesignRuleCheck::checkCopperBoardClearances(
     return (!locations.isEmpty());
   };
 
+  // Helper for pads.
+  auto checkPad = [&](const Data::Pad& pad) {
+    for (const Layer* layer : data.copperLayers) {
+      if (!pad.geometries.value(layer).isEmpty()) {
+        BoardClipperPathGenerator gen(maxArcTolerance());
+        gen.addPad(pad, *layer);
+        if (intersects(gen.getPaths())) {
+          return true;  // Mention every pad only once.
+        }
+      }
+    }
+    return false;
+  };
+
   // Check net segments.
   for (const Data::Segment& ns : data.segments) {
+    // Check pads.
+    for (const Data::Pad& pad : ns.pads) {
+      if (checkPad(pad)) {
+        messages.append(std::make_shared<DrcMsgCopperBoardClearanceViolation>(
+            ns, pad, clearance, locations));
+      }
+    }
+
     // Check vias.
     for (const Data::Via& via : ns.vias) {
       BoardClipperPathGenerator gen(maxArcTolerance());
@@ -762,17 +791,9 @@ RuleCheckMessageList BoardDesignRuleCheck::checkCopperBoardClearances(
 
     // Check pads.
     for (const Data::Pad& pad : dev.pads) {
-      for (const Layer* layer : data.copperLayers) {
-        if (!pad.geometries.value(layer).isEmpty()) {
-          BoardClipperPathGenerator gen(maxArcTolerance());
-          gen.addPad(pad, *layer);
-          if (intersects(gen.getPaths())) {
-            messages.append(
-                std::make_shared<DrcMsgCopperBoardClearanceViolation>(
-                    dev, pad, clearance, locations));
-            break;  // Mention every pad only once.
-          }
-        }
+      if (checkPad(pad)) {
+        messages.append(std::make_shared<DrcMsgCopperBoardClearanceViolation>(
+            dev, pad, clearance, locations));
       }
     }
 
@@ -908,8 +929,15 @@ RuleCheckMessageList BoardDesignRuleCheck::checkDrillDrillClearances(
     items.append(Item{obj, paths});
   };
 
-  // Vias.
+  // Pads & Vias.
   for (const Data::Segment& ns : data.segments) {
+    for (const Data::Pad& pad : ns.pads) {
+      const Transform padTransform(pad.position, pad.rotation, pad.mirror);
+      for (const Data::Hole& hole : pad.holes) {
+        addItem(DrcHoleRef::padHole(ns, pad, hole), padTransform.map(hole.path),
+                hole.diameter);
+      }
+    }
     for (const Data::Via& via : ns.vias) {
       addItem(DrcHoleRef::via(ns, via), makeNonEmptyPath(via.position),
               via.drillDiameter);
@@ -929,7 +957,7 @@ RuleCheckMessageList BoardDesignRuleCheck::checkDrillDrillClearances(
     for (const Data::Pad& pad : dev.pads) {
       const Transform padTransform(pad.position, pad.rotation, pad.mirror);
       for (const Data::Hole& hole : pad.holes) {
-        addItem(DrcHoleRef::padHole(dev, pad, hole),
+        addItem(DrcHoleRef::footprintPadHole(dev, pad, hole),
                 padTransform.map(hole.path), hole.diameter);
       }
     }
@@ -994,8 +1022,17 @@ RuleCheckMessageList BoardDesignRuleCheck::checkDrillBoardClearances(
     return (!locations.isEmpty());
   };
 
-  // Check vias.
+  // Check pads & vias.
   for (const Data::Segment& ns : data.segments) {
+    for (const Data::Pad& pad : ns.pads) {
+      const Transform padTransform(pad.position, pad.rotation, pad.mirror);
+      for (const Data::Hole& hole : pad.holes) {
+        if (intersects(padTransform.map(hole.path), hole.diameter)) {
+          messages.append(std::make_shared<DrcMsgDrillBoardClearanceViolation>(
+              DrcHoleRef::padHole(ns, pad, hole), clearance, locations));
+        }
+      }
+    }
     for (const Data::Via& via : ns.vias) {
       if (intersects(makeNonEmptyPath(via.position), via.drillDiameter)) {
         messages.append(std::make_shared<DrcMsgDrillBoardClearanceViolation>(
@@ -1022,7 +1059,8 @@ RuleCheckMessageList BoardDesignRuleCheck::checkDrillBoardClearances(
       for (const Data::Hole& hole : pad.holes) {
         if (intersects(padTransform.map(hole.path), hole.diameter)) {
           messages.append(std::make_shared<DrcMsgDrillBoardClearanceViolation>(
-              DrcHoleRef::padHole(dev, pad, hole), clearance, locations));
+              DrcHoleRef::footprintPadHole(dev, pad, hole), clearance,
+              locations));
         }
       }
     }
@@ -1169,8 +1207,47 @@ RuleCheckMessageList BoardDesignRuleCheck::checkMinimumPthAnnularRing(
   const ClipperLib::Paths thtCopperAreaPaths =
       ClipperHelpers::treeToPaths(*thtCopperAreaIntersections);
 
-  // Check via annular rings.
+  // Helper.
+  QVector<Path> locations;
+  auto checkPad = [&](const Data::Pad& pad) {
+    // Determine hole areas including minimum annular ring.
+    const Transform transform(pad.position, pad.rotation, pad.mirror);
+    ClipperLib::Paths areas;
+    for (const Data::Hole& hole : pad.holes) {
+      const Length diameter = hole.diameter + (*annularWidth * 2) - 1;
+      if (diameter <= 0) {
+        continue;
+      }
+      ClipperHelpers::unite(
+          areas,
+          ClipperHelpers::convert(transform.map(hole.path->toOutlineStrokes(
+                                      PositiveLength(diameter))),
+                                  maxArcTolerance()),
+          ClipperLib::pftEvenOdd, ClipperLib::pftNonZero);
+    }
+
+    // Check if there's not a 100% overlap.
+    const std::unique_ptr<ClipperLib::PolyTree> remainingAreasTree =
+        ClipperHelpers::subtractToTree(areas, thtCopperAreaPaths,
+                                       ClipperLib::pftEvenOdd,
+                                       ClipperLib::pftEvenOdd);
+    const ClipperLib::Paths remainingAreas =
+        ClipperHelpers::flattenTree(*remainingAreasTree);
+    if (!remainingAreas.empty()) {
+      locations = ClipperHelpers::convert(remainingAreas);
+      return true;
+    }
+    return false;
+  };
+
+  // Check pad & via annular rings.
   for (const Data::Segment& ns : data.segments) {
+    for (const Data::Pad& pad : ns.pads) {
+      if (checkPad(pad)) {
+        messages.append(std::make_shared<DrcMsgMinimumAnnularRingViolation>(
+            ns, pad, annularWidth, locations));
+      }
+    }
     for (const Data::Via& via : ns.vias) {
       const Length annular = (*via.size - *via.drillDiameter) / 2;
       if (annular < (*annularWidth)) {
@@ -1180,34 +1257,10 @@ RuleCheckMessageList BoardDesignRuleCheck::checkMinimumPthAnnularRing(
     }
   }
 
-  // Check pad annular rings.
+  // Check footprint pad annular rings.
   for (const Data::Device& dev : data.devices) {
     for (const Data::Pad& pad : dev.pads) {
-      // Determine hole areas including minimum annular ring.
-      const Transform transform(pad.position, pad.rotation, pad.mirror);
-      ClipperLib::Paths areas;
-      for (const Data::Hole& hole : pad.holes) {
-        const Length diameter = hole.diameter + (*annularWidth * 2) - 1;
-        if (diameter <= 0) {
-          continue;
-        }
-        ClipperHelpers::unite(
-            areas,
-            ClipperHelpers::convert(transform.map(hole.path->toOutlineStrokes(
-                                        PositiveLength(diameter))),
-                                    maxArcTolerance()),
-            ClipperLib::pftEvenOdd, ClipperLib::pftNonZero);
-      }
-
-      // Check if there's not a 100% overlap.
-      const std::unique_ptr<ClipperLib::PolyTree> remainingAreasTree =
-          ClipperHelpers::subtractToTree(areas, thtCopperAreaPaths,
-                                         ClipperLib::pftEvenOdd,
-                                         ClipperLib::pftEvenOdd);
-      const ClipperLib::Paths remainingAreas =
-          ClipperHelpers::flattenTree(*remainingAreasTree);
-      if (!remainingAreas.empty()) {
-        const QVector<Path> locations = ClipperHelpers::convert(remainingAreas);
+      if (checkPad(pad)) {
         messages.append(std::make_shared<DrcMsgMinimumAnnularRingViolation>(
             dev, pad, annularWidth, locations));
       }
@@ -1299,8 +1352,20 @@ RuleCheckMessageList BoardDesignRuleCheck::checkMinimumPthDrillDiameter(
 
   emitStatus(tr("Check PTH drill diameters..."));
 
-  // Vias.
+  // Pads & vias.
   for (const Data::Segment& ns : data.segments) {
+    for (const Data::Pad& pad : ns.pads) {
+      for (const Data::Hole& hole : pad.holes) {
+        if ((hole.path->getVertices().count() < 2) &&
+            (hole.diameter < *minDiameter)) {
+          PositiveLength diameter(qMax(*hole.diameter, Length(50000)));
+          const QVector<Path> locations{
+              Path::circle(diameter).translated(pad.position)};
+          messages.append(std::make_shared<DrcMsgMinimumDrillDiameterViolation>(
+              DrcHoleRef::padHole(ns, pad, hole), minDiameter, locations));
+        }
+      }
+    }
     for (const Data::Via& via : ns.vias) {
       if (via.drillDiameter < minDiameter) {
         const QVector<Path> locations{
@@ -1311,7 +1376,7 @@ RuleCheckMessageList BoardDesignRuleCheck::checkMinimumPthDrillDiameter(
     }
   }
 
-  // Pads.
+  // Footprint pads.
   for (const Data::Device& dev : data.devices) {
     for (const Data::Pad& pad : dev.pads) {
       for (const Data::Hole& hole : pad.holes) {
@@ -1321,7 +1386,8 @@ RuleCheckMessageList BoardDesignRuleCheck::checkMinimumPthDrillDiameter(
           const QVector<Path> locations{
               Path::circle(diameter).translated(pad.position)};
           messages.append(std::make_shared<DrcMsgMinimumDrillDiameterViolation>(
-              DrcHoleRef::padHole(dev, pad, hole), minDiameter, locations));
+              DrcHoleRef::footprintPadHole(dev, pad, hole), minDiameter,
+              locations));
         }
       }
     }
@@ -1342,6 +1408,21 @@ RuleCheckMessageList BoardDesignRuleCheck::checkMinimumPthSlotWidth(
   emitStatus(tr("Check PTH slot widths..."));
 
   // Pads.
+  for (const Data::Segment& ns : data.segments) {
+    for (const Data::Pad& pad : ns.pads) {
+      const Transform transform(pad.position, pad.rotation, pad.mirror);
+      for (const Data::Hole& hole : pad.holes) {
+        if ((hole.path->getVertices().count() > 1) &&
+            (hole.diameter < *minWidth)) {
+          messages.append(std::make_shared<DrcMsgMinimumSlotWidthViolation>(
+              DrcHoleRef::padHole(ns, pad, hole), minWidth,
+              getHoleLocation(hole, transform)));
+        }
+      }
+    }
+  }
+
+  // Footprint pads.
   for (const Data::Device& dev : data.devices) {
     for (const Data::Pad& pad : dev.pads) {
       const Transform transform(pad.position, pad.rotation, pad.mirror);
@@ -1349,7 +1430,7 @@ RuleCheckMessageList BoardDesignRuleCheck::checkMinimumPthSlotWidth(
         if ((hole.path->getVertices().count() > 1) &&
             (hole.diameter < *minWidth)) {
           messages.append(std::make_shared<DrcMsgMinimumSlotWidthViolation>(
-              DrcHoleRef::padHole(dev, pad, hole), minWidth,
+              DrcHoleRef::footprintPadHole(dev, pad, hole), minWidth,
               getHoleLocation(hole, transform)));
         }
       }
@@ -1591,6 +1672,18 @@ RuleCheckMessageList BoardDesignRuleCheck::checkZones(const Data& data) {
 
     // Check net segments.
     for (const Data::Segment& ns : data.segments) {
+      // Check pads.
+      for (const Data::Pad& pad : ns.pads) {
+        if (intersectsPad(pad, noCopperLayers)) {
+          messages.append(std::make_shared<DrcMsgCopperInKeepoutZone>(
+              *zone.zone, zone.device, ns, pad, locations));
+        }
+        if (intersectsPad(pad, noStopMaskLayers)) {
+          messages.append(std::make_shared<DrcMsgExposureInKeepoutZone>(
+              *zone.zone, zone.device, ns, pad, locations));
+        }
+      }
+
       // Check vias.
       for (const Data::Via& via : ns.vias) {
         if (Via::isOnAnyLayer(noCopperLayers, *via.startLayer, *via.endLayer)) {
@@ -1728,6 +1821,19 @@ RuleCheckMessageList BoardDesignRuleCheck::checkAllowedPthSlots(
   }
 
   // Pads.
+  for (const Data::Segment& ns : data.segments) {
+    for (const Data::Pad& pad : ns.pads) {
+      const Transform transform(pad.position, pad.rotation, pad.mirror);
+      for (const Data::Hole& hole : pad.holes) {
+        if (requiresHoleSlotWarning(hole, allowed)) {
+          messages.append(std::make_shared<DrcMsgForbiddenSlot>(
+              hole, ns, pad, getHoleLocation(hole, transform)));
+        }
+      }
+    }
+  }
+
+  // Footprint pads.
   for (const Data::Device& dev : data.devices) {
     for (const Data::Pad& pad : dev.pads) {
       const Transform transform(pad.position, pad.rotation, pad.mirror);
@@ -1747,26 +1853,44 @@ RuleCheckMessageList BoardDesignRuleCheck::checkInvalidPadConnections(
     const Data& data) {
   RuleCheckMessageList messages;
   emitStatus(tr("Check pad connections..."));
+
+  QVector<Path> locations;
+  auto checkPad = [&locations](const Data::Pad& pad, const Layer* layer) {
+    foreach (const PadGeometry& geometry, pad.geometries.value(layer)) {
+      if (geometry.toFilledQPainterPathPx().contains(QPointF(0, 0))) {
+        return false;
+      }
+    }
+    locations = {
+        Path::circle(PositiveLength(500000)).translated(pad.position),
+    };
+    return true;
+  };
+
+  // Pads.
+  for (const Data::Segment& ns : data.segments) {
+    for (const Data::Pad& pad : ns.pads) {
+      foreach (const Layer* layer, pad.layersWithTraces) {
+        if (checkPad(pad, layer)) {
+          messages.append(std::make_shared<DrcMsgInvalidPadConnection>(
+              ns, pad, *layer, locations));
+        }
+      }
+    }
+  }
+
+  // Footprint pads.
   for (const Data::Device& dev : data.devices) {
     for (const Data::Pad& pad : dev.pads) {
       foreach (const Layer* layer, pad.layersWithTraces) {
-        bool isOriginInCopper = false;
-        foreach (const PadGeometry& geometry, pad.geometries.value(layer)) {
-          if (geometry.toFilledQPainterPathPx().contains(QPointF(0, 0))) {
-            isOriginInCopper = true;
-            break;
-          }
-        }
-        if (!isOriginInCopper) {
-          const QVector<Path> locations{
-              Path::circle(PositiveLength(500000)).translated(pad.position),
-          };
+        if (checkPad(pad, layer)) {
           messages.append(std::make_shared<DrcMsgInvalidPadConnection>(
               dev, pad, *layer, locations));
         }
       }
     }
   }
+
   return messages;
 }
 
@@ -1986,7 +2110,13 @@ RuleCheckMessageList BoardDesignRuleCheck::checkForMissingConnections(
       const Data::Device& dev = *data.devices.find(*anchor.device);
       Q_ASSERT(dev.pads.contains(*anchor.pad));
       const Data::Pad& pad = *dev.pads.find(*anchor.pad);
-      return DrcMsgMissingConnection::Anchor::pad(dev, pad);
+      return DrcMsgMissingConnection::Anchor::footprintPad(dev, pad);
+    } else if (anchor.segment && anchor.pad) {
+      Q_ASSERT(data.segments.contains(*anchor.segment));
+      const Data::Segment& seg = *data.segments.find(*anchor.segment);
+      Q_ASSERT(seg.pads.contains(*anchor.pad));
+      const Data::Pad& pad = *seg.pads.find(*anchor.pad);
+      return DrcMsgMissingConnection::Anchor::pad(seg, pad);
     } else if (anchor.segment && anchor.junction) {
       Q_ASSERT(data.segments.contains(*anchor.segment));
       const Data::Segment& seg = *data.segments.find(*anchor.segment);
@@ -2022,7 +2152,8 @@ RuleCheckMessageList BoardDesignRuleCheck::checkForStaleObjects(
   emitStatus(tr("Check for stale objects..."));
   for (const Data::Segment& ns : data.segments) {
     // Warn about empty net segments.
-    if (ns.junctions.isEmpty() && ns.traces.isEmpty() && ns.vias.isEmpty()) {
+    if (ns.junctions.isEmpty() && ns.traces.isEmpty() && ns.vias.isEmpty() &&
+        ns.pads.isEmpty()) {
       messages.append(std::make_shared<DrcMsgEmptyNetSegment>(ns));
     }
 

@@ -211,7 +211,7 @@ void ComponentSignalInstance::updatePadNames() noexcept {
   QSet<QString> names;
   if (const BI_Device* device = mComponentInstance.getPrimaryDevice()) {
     foreach (const BI_Pad* pad, mRegisteredFootprintPads) {
-      if (&pad->getDevice() == device) {
+      if (pad->getDevice() == device) {
         if (const PackagePad* pkgPad = pad->getLibPackagePad()) {
           names.insert(*pkgPad->getName());
         }

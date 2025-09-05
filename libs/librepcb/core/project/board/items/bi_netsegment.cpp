@@ -103,10 +103,32 @@ void BI_NetSegment::setNetSignal(NetSignal* netsignal) {
  *  NetPoint+NetLine Methods
  ******************************************************************************/
 
-void BI_NetSegment::addElements(const QList<BI_Via*>& vias,
+void BI_NetSegment::addElements(const QList<BI_Pad*>& pads,
+                                const QList<BI_Via*>& vias,
                                 const QList<BI_NetPoint*>& netpoints,
                                 const QList<BI_NetLine*>& netlines) {
-  ScopeGuardList sgl(netpoints.count() + netlines.count());
+  ScopeGuardList sgl(pads.count() + vias.count() + netpoints.count() +
+                     netlines.count());
+  foreach (BI_Pad* pad, pads) {
+    if ((mPads.values().contains(pad)) || (pad->getNetSegment() != this)) {
+      throw LogicError(__FILE__, __LINE__);
+    }
+    if (mPads.contains(pad->getUuid())) {
+      throw RuntimeError(__FILE__, __LINE__,
+                         QString("There is already a pad with the UUID \"%1\"!")
+                             .arg(pad->getUuid().toStr()));
+    }
+    if (isAddedToBoard()) {
+      pad->addToBoard();  // can throw
+    }
+    mPads.insert(pad->getUuid(), pad);
+    sgl.add([this, pad]() {
+      if (isAddedToBoard()) {
+        pad->removeFromBoard();
+      }
+      mPads.remove(pad->getUuid());
+    });
+  }
   foreach (BI_Via* via, vias) {
     if ((mVias.values().contains(via)) || (&via->getNetSegment() != this)) {
       throw LogicError(__FILE__, __LINE__);
@@ -183,13 +205,15 @@ void BI_NetSegment::addElements(const QList<BI_Via*>& vias,
 
   sgl.dismiss();
 
-  emit elementsAdded(vias, netpoints, netlines);
+  emit elementsAdded(pads, vias, netpoints, netlines);
 }
 
-void BI_NetSegment::removeElements(const QList<BI_Via*>& vias,
+void BI_NetSegment::removeElements(const QList<BI_Pad*>& pads,
+                                   const QList<BI_Via*>& vias,
                                    const QList<BI_NetPoint*>& netpoints,
                                    const QList<BI_NetLine*>& netlines) {
-  ScopeGuardList sgl(netpoints.count() + netlines.count());
+  ScopeGuardList sgl(pads.count() + vias.count() + netpoints.count() +
+                     netlines.count());
   foreach (BI_NetLine* netline, netlines) {
     if (mNetLines.value(netline->getUuid()) != netline) {
       throw LogicError(__FILE__, __LINE__);
@@ -235,6 +259,21 @@ void BI_NetSegment::removeElements(const QList<BI_Via*>& vias,
       mVias.insert(via->getUuid(), via);
     });
   }
+  foreach (BI_Pad* pad, pads) {
+    if (mPads.value(pad->getUuid()) != pad) {
+      throw LogicError(__FILE__, __LINE__);
+    }
+    if (isAddedToBoard()) {
+      pad->removeFromBoard();  // can throw
+    }
+    mPads.remove(pad->getUuid());
+    sgl.add([this, pad]() {
+      if (isAddedToBoard()) {
+        pad->addToBoard();
+      }
+      mPads.insert(pad->getUuid(), pad);
+    });
+  }
 
   if (!areAllNetPointsConnectedTogether()) {
     throw LogicError(
@@ -245,7 +284,7 @@ void BI_NetSegment::removeElements(const QList<BI_Via*>& vias,
 
   sgl.dismiss();
 
-  emit elementsRemoved(vias, netpoints, netlines);
+  emit elementsRemoved(pads, vias, netpoints, netlines);
 }
 
 /*******************************************************************************
@@ -257,10 +296,15 @@ void BI_NetSegment::addToBoard() {
     throw LogicError(__FILE__, __LINE__);
   }
 
-  ScopeGuardList sgl(mNetPoints.count() + mNetLines.count() + 1);
+  ScopeGuardList sgl(mPads.count() + mVias.count() + mNetPoints.count() +
+                     mNetLines.count() + 1);
   if (mNetSignal) {
     mNetSignal->registerBoardNetSegment(*this);  // can throw
     sgl.add([&]() { mNetSignal->unregisterBoardNetSegment(*this); });
+  }
+  foreach (BI_Pad* pad, mPads) {
+    pad->addToBoard();  // can throw
+    sgl.add([pad]() { pad->removeFromBoard(); });
   }
   foreach (BI_Via* via, mVias) {
     via->addToBoard();  // can throw
@@ -284,7 +328,8 @@ void BI_NetSegment::removeFromBoard() {
     throw LogicError(__FILE__, __LINE__);
   }
 
-  ScopeGuardList sgl(mNetPoints.count() + mNetLines.count() + 1);
+  ScopeGuardList sgl(mPads.count() + mVias.count() + mNetPoints.count() +
+                     mNetLines.count() + 1);
   foreach (BI_NetLine* netline, mNetLines) {
     netline->removeFromBoard();  // can throw
     sgl.add([netline]() { netline->addToBoard(); });
@@ -296,6 +341,10 @@ void BI_NetSegment::removeFromBoard() {
   foreach (BI_Via* via, mVias) {
     via->removeFromBoard();  // can throw
     sgl.add([via]() { via->addToBoard(); });
+  }
+  foreach (BI_Pad* pad, mPads) {
+    pad->removeFromBoard();  // can throw
+    sgl.add([pad]() { pad->addToBoard(); });
   }
   if (mNetSignal) {
     mNetSignal->unregisterBoardNetSegment(*this);  // can throw
@@ -313,6 +362,11 @@ void BI_NetSegment::serialize(SExpression& root) const {
   root.ensureLineBreak();
   root.appendChild("net",
                    mNetSignal ? mNetSignal->getUuid() : std::optional<Uuid>());
+  root.ensureLineBreak();
+  for (const BI_Pad* obj : mPads) {
+    root.ensureLineBreak();
+    obj->getProperties().serialize(root.appendList("pad"));
+  }
   root.ensureLineBreak();
   for (const BI_Via* obj : mVias) {
     root.ensureLineBreak();
@@ -342,7 +396,9 @@ bool BI_NetSegment::checkAttributesValidity() const noexcept {
 
 bool BI_NetSegment::areAllNetPointsConnectedTogether() const noexcept {
   const BI_NetLineAnchor* p = nullptr;
-  if (mVias.count() > 0) {
+  if (mPads.count() > 0) {
+    p = mPads.first();
+  } else if (mVias.count() > 0) {
     p = mVias.first();
   } else if (mNetPoints.count() > 0) {
     p = mNetPoints.first();
@@ -356,25 +412,30 @@ bool BI_NetSegment::areAllNetPointsConnectedTogether() const noexcept {
   QSet<const BI_NetPoint*> points;
   QSet<const BI_NetLine*> lines;
   QSet<const BI_Pad*> pads;
-  findAllConnectedNetPoints(*p, vias, pads, points, lines);
-  return (vias.count() == mVias.count()) &&
+  int boardPads = 0;
+  findAllConnectedNetPoints(*p, vias, pads, points, lines, boardPads);
+  return (boardPads == mPads.count()) && (vias.count() == mVias.count()) &&
       (points.count() == mNetPoints.count()) &&
       (lines.count() == mNetLines.count());
 }
 
-void BI_NetSegment::findAllConnectedNetPoints(
-    const BI_NetLineAnchor& p, QSet<const BI_Via*>& vias,
-    QSet<const BI_Pad*>& pads, QSet<const BI_NetPoint*>& points,
-    QSet<const BI_NetLine*>& lines) const noexcept {
+void BI_NetSegment::findAllConnectedNetPoints(const BI_NetLineAnchor& p,
+                                              QSet<const BI_Via*>& vias,
+                                              QSet<const BI_Pad*>& pads,
+                                              QSet<const BI_NetPoint*>& points,
+                                              QSet<const BI_NetLine*>& lines,
+                                              int& boardPads) const noexcept {
   if (const BI_Via* via = dynamic_cast<const BI_Via*>(&p)) {
     if (vias.contains(via)) return;
     vias.insert(via);
     foreach (const BI_NetLine* netline, mNetLines) {
       if (&netline->getP1() == via) {
-        findAllConnectedNetPoints(netline->getP2(), vias, pads, points, lines);
+        findAllConnectedNetPoints(netline->getP2(), vias, pads, points, lines,
+                                  boardPads);
       }
       if (&netline->getP2() == via) {
-        findAllConnectedNetPoints(netline->getP1(), vias, pads, points, lines);
+        findAllConnectedNetPoints(netline->getP1(), vias, pads, points, lines,
+                                  boardPads);
       }
       if ((&netline->getP1() == via) || (&netline->getP2() == via)) {
         lines.insert(netline);
@@ -383,12 +444,18 @@ void BI_NetSegment::findAllConnectedNetPoints(
   } else if (const BI_Pad* pad = dynamic_cast<const BI_Pad*>(&p)) {
     if (pads.contains(pad)) return;
     pads.insert(pad);
+    if (pad->getNetSegment()) {
+      Q_ASSERT(pad->getNetSegment() == this);
+      ++boardPads;
+    }
     foreach (const BI_NetLine* netline, mNetLines) {
       if (&netline->getP1() == pad) {
-        findAllConnectedNetPoints(netline->getP2(), vias, pads, points, lines);
+        findAllConnectedNetPoints(netline->getP2(), vias, pads, points, lines,
+                                  boardPads);
       }
       if (&netline->getP2() == pad) {
-        findAllConnectedNetPoints(netline->getP1(), vias, pads, points, lines);
+        findAllConnectedNetPoints(netline->getP1(), vias, pads, points, lines,
+                                  boardPads);
       }
       if ((&netline->getP1() == pad) || (&netline->getP2() == pad)) {
         lines.insert(netline);
@@ -399,10 +466,12 @@ void BI_NetSegment::findAllConnectedNetPoints(
     points.insert(np);
     foreach (const BI_NetLine* netline, mNetLines) {
       if (&netline->getP1() == np) {
-        findAllConnectedNetPoints(netline->getP2(), vias, pads, points, lines);
+        findAllConnectedNetPoints(netline->getP2(), vias, pads, points, lines,
+                                  boardPads);
       }
       if (&netline->getP2() == np) {
-        findAllConnectedNetPoints(netline->getP1(), vias, pads, points, lines);
+        findAllConnectedNetPoints(netline->getP1(), vias, pads, points, lines,
+                                  boardPads);
       }
       if ((&netline->getP1() == np) || (&netline->getP2() == np)) {
         lines.insert(netline);

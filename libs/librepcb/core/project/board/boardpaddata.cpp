@@ -20,7 +20,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "footprintpad.h"
+#include "boardpaddata.h"
 
 #include <QtCore>
 
@@ -33,51 +33,50 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-FootprintPad::FootprintPad(const FootprintPad& other) noexcept
+BoardPadData::BoardPadData(const BoardPadData& other) noexcept
   : Pad(other),
     onEdited(*this),
-    mPackagePadUuid(other.mPackagePadUuid),
-    mHolesEditedSlot(*this, &FootprintPad::holesEdited) {
+    mLocked(other.mLocked),
+    mHolesEditedSlot(*this, &BoardPadData::holesEdited) {
   mHoles.onEdited.attach(mHolesEditedSlot);
 }
 
-FootprintPad::FootprintPad(const Uuid& uuid, const FootprintPad& other) noexcept
-  : FootprintPad(other) {
+BoardPadData::BoardPadData(const Uuid& uuid, const BoardPadData& other) noexcept
+  : BoardPadData(other) {
   mUuid = uuid;
 }
 
-FootprintPad::FootprintPad(
-    const Uuid& uuid, const std::optional<Uuid>& pkgPadUuid, const Point& pos,
-    const Angle& rot, Shape shape, const PositiveLength& width,
-    const PositiveLength& height, const UnsignedLimitedRatio& radius,
-    const Path& customShapeOutline, const MaskConfig& autoStopMask,
-    const MaskConfig& autoSolderPaste, const UnsignedLength& copperClearance,
-    ComponentSide side, Function function, const PadHoleList& holes) noexcept
+BoardPadData::BoardPadData(
+    const Uuid& uuid, const Point& pos, const Angle& rot, Shape shape,
+    const PositiveLength& width, const PositiveLength& height,
+    const UnsignedLimitedRatio& radius, const Path& customShapeOutline,
+    const MaskConfig& autoStopMask, const MaskConfig& autoSolderPaste,
+    const UnsignedLength& copperClearance, ComponentSide side,
+    Function function, const PadHoleList& holes, bool locked) noexcept
   : Pad(uuid, pos, rot, shape, width, height, radius, customShapeOutline,
         autoStopMask, autoSolderPaste, copperClearance, side, function, holes),
     onEdited(*this),
-    mPackagePadUuid(pkgPadUuid),
-    mHolesEditedSlot(*this, &FootprintPad::holesEdited) {
+    mLocked(locked),
+    mHolesEditedSlot(*this, &BoardPadData::holesEdited) {
   mHoles.onEdited.attach(mHolesEditedSlot);
 }
 
-FootprintPad::FootprintPad(const SExpression& node)
+BoardPadData::BoardPadData(const SExpression& node)
   : Pad(node),
     onEdited(*this),
-    mPackagePadUuid(
-        deserialize<std::optional<Uuid>>(node.getChild("package_pad/@0"))),
-    mHolesEditedSlot(*this, &FootprintPad::holesEdited) {
+    mLocked(deserialize<bool>(node.getChild("lock/@0"))),
+    mHolesEditedSlot(*this, &BoardPadData::holesEdited) {
   mHoles.onEdited.attach(mHolesEditedSlot);
 }
 
-FootprintPad::~FootprintPad() noexcept {
+BoardPadData::~BoardPadData() noexcept {
 }
 
 /*******************************************************************************
  *  Setters
  ******************************************************************************/
 
-bool FootprintPad::setPosition(const Point& pos) noexcept {
+bool BoardPadData::setPosition(const Point& pos) noexcept {
   if (pos == mPosition) {
     return false;
   }
@@ -87,7 +86,7 @@ bool FootprintPad::setPosition(const Point& pos) noexcept {
   return true;
 }
 
-bool FootprintPad::setRotation(const Angle& rot) noexcept {
+bool BoardPadData::setRotation(const Angle& rot) noexcept {
   if (rot == mRotation) {
     return false;
   }
@@ -97,7 +96,7 @@ bool FootprintPad::setRotation(const Angle& rot) noexcept {
   return true;
 }
 
-bool FootprintPad::setShape(Shape shape) noexcept {
+bool BoardPadData::setShape(Shape shape) noexcept {
   if (shape == mShape) {
     return false;
   }
@@ -107,7 +106,7 @@ bool FootprintPad::setShape(Shape shape) noexcept {
   return true;
 }
 
-bool FootprintPad::setWidth(const PositiveLength& width) noexcept {
+bool BoardPadData::setWidth(const PositiveLength& width) noexcept {
   if (width == mWidth) {
     return false;
   }
@@ -117,7 +116,7 @@ bool FootprintPad::setWidth(const PositiveLength& width) noexcept {
   return true;
 }
 
-bool FootprintPad::setHeight(const PositiveLength& height) noexcept {
+bool BoardPadData::setHeight(const PositiveLength& height) noexcept {
   if (height == mHeight) {
     return false;
   }
@@ -127,7 +126,7 @@ bool FootprintPad::setHeight(const PositiveLength& height) noexcept {
   return true;
 }
 
-bool FootprintPad::setRadius(const UnsignedLimitedRatio& radius) noexcept {
+bool BoardPadData::setRadius(const UnsignedLimitedRatio& radius) noexcept {
   if (radius == mRadius) {
     return false;
   }
@@ -137,7 +136,7 @@ bool FootprintPad::setRadius(const UnsignedLimitedRatio& radius) noexcept {
   return true;
 }
 
-bool FootprintPad::setCustomShapeOutline(const Path& outline) noexcept {
+bool BoardPadData::setCustomShapeOutline(const Path& outline) noexcept {
   if (outline == mCustomShapeOutline) {
     return false;
   }
@@ -147,7 +146,7 @@ bool FootprintPad::setCustomShapeOutline(const Path& outline) noexcept {
   return true;
 }
 
-bool FootprintPad::setStopMaskConfig(const MaskConfig& config) noexcept {
+bool BoardPadData::setStopMaskConfig(const MaskConfig& config) noexcept {
   if (config == mStopMaskConfig) {
     return false;
   }
@@ -157,7 +156,7 @@ bool FootprintPad::setStopMaskConfig(const MaskConfig& config) noexcept {
   return true;
 }
 
-bool FootprintPad::setSolderPasteConfig(const MaskConfig& config) noexcept {
+bool BoardPadData::setSolderPasteConfig(const MaskConfig& config) noexcept {
   if (config == mSolderPasteConfig) {
     return false;
   }
@@ -167,7 +166,7 @@ bool FootprintPad::setSolderPasteConfig(const MaskConfig& config) noexcept {
   return true;
 }
 
-bool FootprintPad::setCopperClearance(
+bool BoardPadData::setCopperClearance(
     const UnsignedLength& clearance) noexcept {
   if (clearance == mCopperClearance) {
     return false;
@@ -178,7 +177,7 @@ bool FootprintPad::setCopperClearance(
   return true;
 }
 
-bool FootprintPad::setComponentSide(ComponentSide side) noexcept {
+bool BoardPadData::setComponentSide(ComponentSide side) noexcept {
   if (side == mComponentSide) {
     return false;
   }
@@ -188,7 +187,7 @@ bool FootprintPad::setComponentSide(ComponentSide side) noexcept {
   return true;
 }
 
-bool FootprintPad::setFunction(Function function) noexcept {
+bool BoardPadData::setFunction(Function function) noexcept {
   if (function == mFunction) {
     return false;
   }
@@ -198,13 +197,13 @@ bool FootprintPad::setFunction(Function function) noexcept {
   return true;
 }
 
-bool FootprintPad::setPackagePadUuid(const std::optional<Uuid>& pad) noexcept {
-  if (pad == mPackagePadUuid) {
+bool BoardPadData::setLocked(bool locked) noexcept {
+  if (locked == mLocked) {
     return false;
   }
 
-  mPackagePadUuid = pad;
-  onEdited.notify(Event::PackagePadUuidChanged);
+  mLocked = locked;
+  onEdited.notify(Event::LockedChanged);
   return true;
 }
 
@@ -212,7 +211,7 @@ bool FootprintPad::setPackagePadUuid(const std::optional<Uuid>& pad) noexcept {
  *  General Methods
  ******************************************************************************/
 
-void FootprintPad::serialize(SExpression& root) const {
+void BoardPadData::serialize(SExpression& root) const {
   root.appendChild(mUuid);
   root.appendChild("side", mComponentSide);
   root.appendChild("shape", mShape);
@@ -227,7 +226,7 @@ void FootprintPad::serialize(SExpression& root) const {
   root.appendChild("clearance", mCopperClearance);
   root.appendChild("function", mFunction);
   root.ensureLineBreak();
-  root.appendChild("package_pad", mPackagePadUuid);
+  root.appendChild("lock", mLocked);
   root.ensureLineBreak();
   mCustomShapeOutline.serialize(root);
   root.ensureLineBreak();
@@ -239,13 +238,13 @@ void FootprintPad::serialize(SExpression& root) const {
  *  Operator Overloadings
  ******************************************************************************/
 
-bool FootprintPad::operator==(const FootprintPad& rhs) const noexcept {
+bool BoardPadData::operator==(const BoardPadData& rhs) const noexcept {
   if (Pad::operator!=(rhs)) return false;
-  if (mPackagePadUuid != rhs.mPackagePadUuid) return false;
+  if (mLocked != rhs.mLocked) return false;
   return true;
 }
 
-FootprintPad& FootprintPad::operator=(const FootprintPad& rhs) noexcept {
+BoardPadData& BoardPadData::operator=(const BoardPadData& rhs) noexcept {
   if (mUuid != rhs.mUuid) {
     mUuid = rhs.mUuid;
     onEdited.notify(Event::UuidChanged);
@@ -263,7 +262,7 @@ FootprintPad& FootprintPad::operator=(const FootprintPad& rhs) noexcept {
   setComponentSide(rhs.mComponentSide);
   setFunction(rhs.mFunction);
   mHoles = rhs.mHoles;
-  setPackagePadUuid(rhs.mPackagePadUuid);
+  setLocked(rhs.mLocked);
   return *this;
 }
 
@@ -271,7 +270,7 @@ FootprintPad& FootprintPad::operator=(const FootprintPad& rhs) noexcept {
  *  Private Methods
  ******************************************************************************/
 
-void FootprintPad::holesEdited(const PadHoleList& list, int index,
+void BoardPadData::holesEdited(const PadHoleList& list, int index,
                                const std::shared_ptr<const PadHole>& hole,
                                PadHoleList::Event event) noexcept {
   Q_UNUSED(list);

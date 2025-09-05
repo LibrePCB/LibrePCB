@@ -70,8 +70,9 @@ bool CmdSimplifyBoardNetSegments::performExecute() {
  ******************************************************************************/
 
 void CmdSimplifyBoardNetSegments::simplifySegment(BI_NetSegment& segment) {
-  // A segment which contains no traces and no vias can entirely be removed.
-  if (segment.getVias().isEmpty() && segment.getNetLines().isEmpty()) {
+  // A segment which contains no traces/vias/pads can entirely be removed.
+  if (segment.getPads().isEmpty() && segment.getVias().isEmpty() &&
+      segment.getNetLines().isEmpty()) {
     appendChild(new CmdBoardNetSegmentRemove(segment));
     return;
   }
@@ -92,7 +93,7 @@ void CmdSimplifyBoardNetSegments::simplifySegment(BI_NetSegment& segment) {
     }
     std::optional<int> id;
     if (auto pad = dynamic_cast<const BI_Pad*>(&anchor)) {
-      const bool isTht = pad->getLibPad().isTht();
+      const bool isTht = pad->getProperties().isTht();
       id = simplifier.addAnchor(
           NetSegmentSimplifier::AnchorType::PinOrPad, pad->getPosition(),
           isTht ? &Layer::topCopper() : &pad->getSolderLayer(),
@@ -133,6 +134,11 @@ void CmdSimplifyBoardNetSegments::simplifySegment(BI_NetSegment& segment) {
   // Add new segment, if there is anything to add.
   std::unique_ptr<BI_NetSegment> newSegment(new BI_NetSegment(
       segment.getBoard(), segment.getUuid(), segment.getNetSignal()));
+  QHash<int, BI_Pad*> newPads;
+  foreach (BI_Pad* pad, segment.getPads()) {
+    newPads.insert(anchors.value(pad),
+                   new BI_Pad(*newSegment, pad->getProperties()));
+  }
   QHash<int, BI_Via*> newVias;
   foreach (BI_Via* via, segment.getVias()) {
     newVias.insert(anchors.value(via), new BI_Via(*newSegment, via->getVia()));
@@ -141,6 +147,9 @@ void CmdSimplifyBoardNetSegments::simplifySegment(BI_NetSegment& segment) {
   auto getOrCreateAnchor = [&](int anchorId) {
     if (auto np = newPoints.value(anchorId)) {
       return static_cast<BI_NetLineAnchor*>(np);
+    }
+    if (auto pad = newPads.value(anchorId)) {
+      return static_cast<BI_NetLineAnchor*>(pad);
     }
     if (auto via = newVias.value(anchorId)) {
       return static_cast<BI_NetLineAnchor*>(via);
@@ -173,8 +182,9 @@ void CmdSimplifyBoardNetSegments::simplifySegment(BI_NetSegment& segment) {
     newLines.append(new BI_NetLine(*newSegment, uuid, *p1, *p2, *line.layer,
                                    PositiveLength(line.width)));
   }
-  if ((!newVias.isEmpty()) || (!newLines.isEmpty())) {
-    newSegment->addElements(newVias.values(), newPoints.values(), newLines);
+  if ((!newPads.isEmpty()) || (!newVias.isEmpty()) || (!newLines.isEmpty())) {
+    newSegment->addElements(newPads.values(), newVias.values(),
+                            newPoints.values(), newLines);
     appendChild(new CmdBoardNetSegmentAdd(*newSegment.release()));
   }
 }

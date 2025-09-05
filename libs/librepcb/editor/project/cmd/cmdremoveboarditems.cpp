@@ -81,9 +81,15 @@ bool CmdRemoveBoardItems::performExecute() {
     Q_ASSERT(device->isAddedToBoard());
     foreach (BI_Pad* pad, device->getPads()) {
       if (BI_NetSegment* segment = pad->getNetSegmentOfLines()) {
-        netSegmentItemsToRemove[segment].pads.insert(pad);
+        netSegmentItemsToRemove[segment].padsToDisconnect.insert(pad);
       }
     }
+  }
+  foreach (BI_Pad* pad, mPads) {
+    Q_ASSERT(pad->isAddedToBoard());
+    Q_ASSERT(pad->getNetSegment());
+    if (!pad->getNetSegment()) continue;
+    netSegmentItemsToRemove[pad->getNetSegment()].pads.insert(pad);
   }
   foreach (BI_Via* via, mVias) {
     Q_ASSERT(via->isAddedToBoard());
@@ -103,7 +109,8 @@ bool CmdRemoveBoardItems::performExecute() {
   for (auto it = netSegmentItemsToRemove.begin();
        it != netSegmentItemsToRemove.end(); ++it) {
     Q_ASSERT(it.key()->isAddedToBoard());
-    removeNetSegmentItems(*it.key(), it.value().pads, it.value().vias,
+    removeNetSegmentItems(*it.key(), it.value().padsToDisconnect,
+                          it.value().pads, it.value().vias,
                           it.value().netpoints,
                           it.value().netlines);  // can throw
   }
@@ -168,7 +175,7 @@ bool CmdRemoveBoardItems::performExecute() {
 
 void CmdRemoveBoardItems::removeNetSegmentItems(
     BI_NetSegment& netsegment, const QSet<BI_Pad*>& padsToDisconnect,
-    const QSet<BI_Via*>& viasToRemove,
+    const QSet<BI_Pad*>& padsToRemove, const QSet<BI_Via*>& viasToRemove,
     const QSet<BI_NetPoint*>& netpointsToRemove,
     const QSet<BI_NetLine*>& netlinesToRemove) {
   // Determine resulting sub-netsegments
@@ -177,8 +184,12 @@ void CmdRemoveBoardItems::removeNetSegmentItems(
     splitter.replaceFootprintPadByJunctions(pad->toTraceAnchor(),
                                             pad->getPosition());
   }
+  foreach (BI_Pad* pad, netsegment.getPads()) {
+    const bool replaceByJunctions = padsToRemove.contains(pad);
+    splitter.addPad(pad->getProperties(), replaceByJunctions);
+  }
   foreach (BI_Via* via, netsegment.getVias()) {
-    bool replaceByJunctions = viasToRemove.contains(via);
+    const bool replaceByJunctions = viasToRemove.contains(via);
     splitter.addVia(via->getVia(), replaceByJunctions);
   }
   foreach (BI_NetPoint* netpoint, netsegment.getNetPoints()) {
@@ -204,9 +215,14 @@ void CmdRemoveBoardItems::removeNetSegmentItems(
     BI_NetSegment* newNetSegment = cmdAddNetSegment->getNetSegment();
     Q_ASSERT(newNetSegment);
 
-    // Add new vias, netpoints, netlines
+    // Add new pads, vias, netpoints, netlines
     CmdBoardNetSegmentAddElements* cmdAddElements =
         new CmdBoardNetSegmentAddElements(*newNetSegment);
+    QHash<Uuid, BI_NetLineAnchor*> padMap;
+    for (const BoardPadData& pad : segment.pads) {
+      BI_Pad* newPad = cmdAddElements->addPad(pad);
+      padMap.insert(pad.getUuid(), newPad);
+    }
     QHash<Uuid, BI_NetLineAnchor*> viaMap;
     for (const Via& via : segment.vias) {
       BI_Via* newVia = cmdAddElements->addVia(via);
@@ -224,6 +240,8 @@ void CmdRemoveBoardItems::removeNetSegmentItems(
         p1 = junctionMap[*anchor];
       } else if (std::optional<Uuid> anchor = trace.getP1().tryGetVia()) {
         p1 = viaMap[*anchor];
+      } else if (std::optional<Uuid> anchor = trace.getP1().tryGetPad()) {
+        p1 = padMap[*anchor];
       } else if (std::optional<TraceAnchor::PadAnchor> anchor =
                      trace.getP1().tryGetFootprintPad()) {
         BI_Device* device =
@@ -235,6 +253,8 @@ void CmdRemoveBoardItems::removeNetSegmentItems(
         p2 = junctionMap[*anchor];
       } else if (std::optional<Uuid> anchor = trace.getP2().tryGetVia()) {
         p2 = viaMap[*anchor];
+      } else if (std::optional<Uuid> anchor = trace.getP2().tryGetPad()) {
+        p2 = padMap[*anchor];
       } else if (std::optional<TraceAnchor::PadAnchor> anchor =
                      trace.getP2().tryGetFootprintPad()) {
         BI_Device* device =

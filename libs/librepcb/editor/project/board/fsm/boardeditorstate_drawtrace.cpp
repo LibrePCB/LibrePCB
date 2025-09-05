@@ -250,7 +250,7 @@ void BoardEditorState_DrawTrace::setLayer(const Layer& layer) noexcept {
     Point startPos = mFixedStartAnchor->getPosition();
     BI_Via* via = dynamic_cast<BI_Via*>(mFixedStartAnchor);
     BI_Pad* pad = dynamic_cast<BI_Pad*>(mFixedStartAnchor);
-    if (pad && (!pad->getLibPad().isTht())) {
+    if (pad && (!pad->getProperties().isTht())) {
       pad = nullptr;
     }
     if (via || pad) {
@@ -351,13 +351,21 @@ bool BoardEditorState_DrawTrace::startPositioning(Board& board,
     }
 
     // helper to avoid defining the translation string multiple times
-    auto throwPadNotConnectedException = []() {
-      throw Exception(
-          __FILE__, __LINE__,
-          tr("This pad is not connected to any net, therefore no trace can be "
-             "attached to it. To allow attaching a trace, first connect this "
-             "pad to a net in the schematics. So this is a problem of the "
-             "schematics, not of the board."));
+    auto throwPadNotConnectedException = [](const BI_Pad& p) {
+      if (p.getDevice()) {
+        throw Exception(
+            __FILE__, __LINE__,
+            tr("This pad is not connected to any net, therefore no trace can "
+               "be attached to it. To allow attaching a trace, first connect "
+               "this pad to a net in the schematics. So this is a problem of "
+               "the schematics, not of the board."));
+      } else {
+        throw Exception(__FILE__, __LINE__,
+                        "Sorry, this operation is not implemented yet! "
+                        ":-/\nPlease let us know if you need this feature so "
+                        "we can priorize it. As a workaround, you can assign "
+                        "the pad to a net while adding it.");
+      }
     };
 
     // determine the fixed anchor (create one if it doesn't exist already)
@@ -366,7 +374,8 @@ bool BoardEditorState_DrawTrace::startPositioning(Board& board,
     std::shared_ptr<QGraphicsItem> item = findItemAtPos(
         pos,
         FindFlag::Vias | FindFlag::NetPoints | FindFlag::NetLines |
-            FindFlag::FootprintPads | FindFlag::AcceptNextGridMatch);
+            FindFlag::BoardPads | FindFlag::FootprintPads |
+            FindFlag::AcceptNextGridMatch);
     if (fixedPoint) {
       mFixedStartAnchor = fixedPoint;
       mCurrentNetSegment = &fixedPoint->getNetSegment();
@@ -378,21 +387,23 @@ bool BoardEditorState_DrawTrace::startPositioning(Board& board,
       mCurrentNetSegment = &fixedVia->getNetSegment();
     } else if (fixedPad) {
       mFixedStartAnchor = fixedPad;
-      if (BI_NetSegment* segment = fixedPad->getNetSegmentOfLines()) {
+      if (BI_NetSegment* segment = fixedPad->getNetSegment()) {
+        mCurrentNetSegment = segment;
+      } else if (BI_NetSegment* segment = fixedPad->getNetSegmentOfLines()) {
         mCurrentNetSegment = segment;
       }
       if ((!fixedPad->isOnLayer(*layer)) &&
           board.getCopperLayers().contains(&fixedPad->getSolderLayer())) {
-        Q_ASSERT(!fixedPad->getLibPad().isTht());
+        Q_ASSERT(!fixedPad->getProperties().isTht());
         layer = &fixedPad->getSolderLayer();
       }
-      netsignal = fixedPad->getCompSigInstNetSignal();
+      netsignal = fixedPad->getNetSignal();
       if (!netsignal) {
         // Note: We might remove this restriction some day, but then we should
         // ensure that it's not possible to connect several pads together with
         // a trace of no net. For now, we simply disallow connecting traces
         // to pads of no net.
-        throwPadNotConnectedException();
+        throwPadNotConnectedException(*fixedPad);
       }
     } else if (auto netpoint = std::dynamic_pointer_cast<BGI_NetPoint>(item)) {
       mFixedStartAnchor = &netpoint->getNetPoint();
@@ -411,16 +422,18 @@ bool BoardEditorState_DrawTrace::startPositioning(Board& board,
       }
     } else if (auto pad = std::dynamic_pointer_cast<BGI_Pad>(item)) {
       mFixedStartAnchor = &pad->getPad();
-      mCurrentNetSegment = pad->getPad().getNetSegmentOfLines();
-      netsignal = pad->getPad().getCompSigInstNetSignal();
+      mCurrentNetSegment = pad->getPad().getDevice()
+          ? pad->getPad().getNetSegmentOfLines()
+          : pad->getPad().getNetSegment();
+      netsignal = pad->getPad().getNetSignal();
       if (!netsignal) {
         // Note: We might remove this restriction some day, but then we should
         // ensure that it's not possible to connect several pads together with
         // a trace of no net. For now, we simply disallow connecting traces
         // to pads of no net.
-        throwPadNotConnectedException();
+        throwPadNotConnectedException(pad->getPad());
       }
-      if (!pad->getPad().getLibPad().isTht()) {
+      if (!pad->getPad().getProperties().isTht()) {
         layer = &pad->getPad().getSolderLayer();
       }
     } else if (auto netline = std::dynamic_pointer_cast<BGI_NetLine>(item)) {
@@ -537,13 +550,14 @@ bool BoardEditorState_DrawTrace::addNextNetPoint(
           }
         }
       }
-      if (auto pad = findItemAtPos<BGI_Pad>(
-              mTargetPos,
-              FindFlag::FootprintPads | FindFlag::AcceptNextGridMatch, &layer,
-              {netsignal})) {
+      if (auto pad = findItemAtPos<BGI_Pad>(mTargetPos,
+                                            FindFlag::BoardPads |
+                                                FindFlag::FootprintPads |
+                                                FindFlag::AcceptNextGridMatch,
+                                            &layer, {netsignal})) {
         if (mCurrentSnapActive || mTargetPos == pad->getPad().getPosition()) {
           otherAnchors.append(&pad->getPad());
-          if (mAddVia && mViaLayer && pad->getPad().getLibPad().isTht()) {
+          if (mAddVia && mViaLayer && pad->getPad().getProperties().isTht()) {
             mCurrentLayer = mViaLayer;
           }
         }
@@ -603,10 +617,14 @@ bool BoardEditorState_DrawTrace::addNextNetPoint(
           if (BI_Via* via = dynamic_cast<BI_Via*>(otherAnchor)) {
             otherNetSegment = &via->getNetSegment();
           } else if (BI_Pad* pad = dynamic_cast<BI_Pad*>(otherAnchor)) {
-            CmdBoardNetSegmentAdd* cmd = new CmdBoardNetSegmentAdd(
-                scene.getBoard(), pad->getCompSigInstNetSignal());
-            mContext.undoStack.appendToCmdGroup(cmd);  // can throw
-            otherNetSegment = cmd->getNetSegment();
+            if (BI_NetSegment* ns = pad->getNetSegment()) {
+              otherNetSegment = ns;
+            } else {
+              CmdBoardNetSegmentAdd* cmd = new CmdBoardNetSegmentAdd(
+                  scene.getBoard(), pad->getNetSignal());
+              mContext.undoStack.appendToCmdGroup(cmd);  // can throw
+              otherNetSegment = cmd->getNetSegment();
+            }
           }
         }
         if (!otherNetSegment) {
@@ -738,7 +756,8 @@ void BoardEditorState_DrawTrace::updateNetpointPositions() noexcept {
     std::shared_ptr<QGraphicsItem> item = findItemAtPos(
         mCursorPos,
         FindFlag::Vias | FindFlag::NetPoints | FindFlag::NetLines |
-            FindFlag::FootprintPads | FindFlag::AcceptNextGridMatch,
+            FindFlag::BoardPads | FindFlag::FootprintPads |
+            FindFlag::AcceptNextGridMatch,
         &layer, {netsignal},
         {
             scene->getVias().value(mTempVia),
@@ -753,7 +772,7 @@ void BoardEditorState_DrawTrace::updateNetpointPositions() noexcept {
       isOnVia = true;
     } else if (auto pad = std::dynamic_pointer_cast<BGI_Pad>(item)) {
       mTargetPos = pad->getPad().getPosition();
-      isOnVia = (pad->getPad().getLibPad().isTht());
+      isOnVia = (pad->getPad().getProperties().isTht());
     } else if (auto netpoint = std::dynamic_pointer_cast<BGI_NetPoint>(item)) {
       mTargetPos = netpoint->getNetPoint().getPosition();
     } else if (auto netline = std::dynamic_pointer_cast<BGI_NetLine>(item)) {

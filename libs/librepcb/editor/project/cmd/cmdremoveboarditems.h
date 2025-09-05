@@ -58,10 +58,11 @@ class CmdRemoveBoardItems final : public UndoCommandGroup {
 private:
   // Private Types
   struct NetSegmentItems {
+    QSet<BI_Pad*> pads;
     QSet<BI_Via*> vias;
     QSet<BI_NetPoint*> netpoints;
     QSet<BI_NetLine*> netlines;
-    QSet<BI_Pad*> pads;
+    QSet<BI_Pad*> padsToDisconnect;
   };
   typedef QHash<BI_NetSegment*, NetSegmentItems> NetSegmentItemList;
 
@@ -80,6 +81,10 @@ public:
   void removeNetSegments(const QSet<BI_NetSegment*>& set) {
     Q_ASSERT(!wasEverExecuted());
     mNetSegments += set;
+  }
+  void removeBoardPads(const QSet<BI_Pad*>& set) {
+    Q_ASSERT(!wasEverExecuted());
+    mPads += set;
   }
   void removeVias(const QSet<BI_Via*>& set) {
     Q_ASSERT(!wasEverExecuted());
@@ -128,6 +133,7 @@ private:  // Methods
 
   void removeNetSegmentItems(BI_NetSegment& netsegment,
                              const QSet<BI_Pad*>& padsToDisconnect,
+                             const QSet<BI_Pad*>& padsToRemove,
                              const QSet<BI_Via*>& viasToRemove,
                              const QSet<BI_NetPoint*>& netpointsToRemove,
                              const QSet<BI_NetLine*>& netlinesToRemove);
@@ -138,6 +144,7 @@ private:  // Data
   // Items to remove
   QSet<BI_Device*> mDeviceInstances;
   QSet<BI_NetSegment*> mNetSegments;
+  QSet<BI_Pad*> mPads;
   QSet<BI_Via*> mVias;
   QSet<BI_NetPoint*> mNetPoints;
   QSet<BI_NetLine*> mNetLines;

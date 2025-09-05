@@ -263,7 +263,7 @@ void BoardGerberExport::exportComponentLayer(BoardSide side,
 
       // Export component pins.
       foreach (const BI_Pad* pad, device->getPads()) {
-        if (pad->getLibPad().getFunctionIsFiducial()) {
+        if (pad->getProperties().getFunctionIsFiducial()) {
           continue;
         }
         QString pinName, pinSignal;
@@ -288,7 +288,8 @@ void BoardGerberExport::exportComponentLayer(BoardSide side,
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
     int padNumber = 1;
     foreach (const BI_Pad* pad, device->getPads()) {
-      if (pad->getLibPad().getFunctionIsFiducial() && pad->isOnLayer(cuLayer)) {
+      if (pad->getProperties().getFunctionIsFiducial() &&
+          pad->isOnLayer(cuLayer)) {
         ProjectAttributeLookup lookup(*device, nullptr);
         const QString designator =
             QString("%1:%2")
@@ -303,6 +304,17 @@ void BoardGerberExport::exportComponentLayer(BoardSide side,
                            value, GerberGenerator::MountType::Fiducial,
                            QString(), QString(), footprintName);
         ++padNumber;
+      }
+    }
+  }
+  foreach (const BI_NetSegment* netSegment, mBoard.getNetSegments()) {
+    foreach (const BI_Pad* pad, netSegment->getPads()) {
+      if (pad->getProperties().getFunctionIsFiducial() &&
+          pad->isOnLayer(cuLayer)) {
+        // Is there any useful attribute we could or should set?
+        gen.flashComponent(pad->getPosition(), pad->getRotation(), QString(),
+                           QString(), GerberGenerator::MountType::Fiducial,
+                           QString(), QString(), QString());
       }
     }
   }
@@ -615,25 +627,33 @@ int BoardGerberExport::drawNpthDrills(ExcellonGenerator& gen) const {
 int BoardGerberExport::drawPthDrills(ExcellonGenerator& gen) const {
   int count = 0;
 
+  // Helper to draw a pad.
+  auto drawPad = [&gen, &count](const BI_Pad* pad) {
+    const BoardPadData& data = pad->getProperties();
+    const Transform transform(*pad);
+    const ExcellonGenerator::Function function =
+        (data.getFunction() == Pad::Function::PressFitPad)
+        ? ExcellonGenerator::Function::ComponentDrillPressFit
+        : ExcellonGenerator::Function::ComponentDrill;
+    for (const PadHole& hole : data.getHoles()) {
+      gen.drill(transform.map(hole.getPath()), hole.getDiameter(), true,
+                function);  // can throw
+      ++count;
+    }
+  };
+
   // footprint pads
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
     foreach (const BI_Pad* pad, device->getPads()) {
-      const FootprintPad& libPad = pad->getLibPad();
-      const Transform transform(*pad);
-      const ExcellonGenerator::Function function =
-          (libPad.getFunction() == Pad::Function::PressFitPad)
-          ? ExcellonGenerator::Function::ComponentDrillPressFit
-          : ExcellonGenerator::Function::ComponentDrill;
-      for (const PadHole& hole : libPad.getHoles()) {
-        gen.drill(transform.map(hole.getPath()), hole.getDiameter(), true,
-                  function);  // can throw
-        ++count;
-      }
+      drawPad(pad);
     }
   }
 
-  // vias
+  // board pads & vias
   foreach (const BI_NetSegment* netsegment, mBoard.getNetSegments()) {
+    foreach (const BI_Pad* pad, netsegment->getPads()) {
+      drawPad(pad);
+    }
     foreach (const BI_Via* via, netsegment->getVias()) {
       if (via->getVia().isThrough()) {
         gen.drill(via->getPosition(), via->getDrillDiameter(), true,
@@ -690,12 +710,15 @@ void BoardGerberExport::drawGlueLayer(GerberGenerator& gen, const Layer& layer,
 
 void BoardGerberExport::drawLayerExceptDevices(GerberGenerator& gen,
                                                const Layer& layer) const {
-  // draw vias and traces (grouped by net)
+  // draw board pads, vias and traces (grouped by net)
   foreach (const BI_NetSegment* netsegment, mBoard.getNetSegments()) {
     Q_ASSERT(netsegment);
     QString net = netsegment->getNetSignal()
         ? *netsegment->getNetSignal()->getName()  // Named net.
         : "N/C";  // Anonymous net (reserved name by Gerber specs).
+    foreach (const BI_Pad* pad, netsegment->getPads()) {
+      drawPad(gen, *pad, layer);
+    }
     foreach (const BI_Via* via, netsegment->getVias()) {
       Q_ASSERT(via);
       drawVia(gen, *via, layer, net);
@@ -916,18 +939,24 @@ void BoardGerberExport::drawPad(GerberGenerator& gen, const BI_Pad& pad,
     // Pad attributes (most of them only on copper layers).
     GerberGenerator::Function function = std::nullopt;
     std::optional<QString> net = std::nullopt;
-    QString component = *pad.getDevice().getComponentInstance().getName();
+    QString component;
+    if (const BI_Device* dev = pad.getDevice()) {
+      component = *dev->getComponentInstance().getName();
+    }
     QString pin, signal;
     if (layer.isCopper()) {
-      if (pad.getLibPad().isTht()) {
+      if (pad.getProperties().isTht()) {
         function = ApertureFunction::ComponentPad;
       } else {
         function = ApertureFunction::SmdPadCopperDefined;
       }
-      function = functionMap.value(pad.getLibPad().getFunction(), *function);
-      net = pad.getCompSigInstNetSignal()
-          ? *pad.getCompSigInstNetSignal()->getName()  // Named net.
-          : "N/C";  // Anonymous net (reserved name by Gerber specs).
+      function =
+          functionMap.value(pad.getProperties().getFunction(), *function);
+      if (const NetSignal* netSignal = pad.getNetSignal()) {
+        net = *netSignal->getName();
+      } else {
+        net = "N/C";  // Anonymous net (reserved name by Gerber specs).
+      }
       if (const PackagePad* pkgPad = pad.getLibPackagePad()) {
         pin = *pkgPad->getName();
       }

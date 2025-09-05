@@ -212,6 +212,8 @@ void BoardGraphicsScene::selectItemsInRect(const Point& p1,
           item->mapToScene(item->shape()).intersects(rectPx)) {
         selectedDevices.insert(device);
       }
+    } else {
+      item->setSelected(item->mapToScene(item->shape()).intersects(rectPx));
     }
   }
   foreach (auto item, mDevices) {
@@ -254,6 +256,14 @@ void BoardGraphicsScene::selectNetSegment(BI_NetSegment& netSegment) noexcept {
       item->setSelected(true);
     }
   }
+  // Not sure if we should also select the pads. For example, when invoking the
+  // "remove whole trace" in the board editor, I'd expect only traces will be
+  // deleted but the pads should be kept.
+  // foreach (BI_Pad* obj, netSegment.getPads()) {
+  //   if (auto item = mPads.value(obj)) {
+  //     item->setSelected(true);
+  //   }
+  // }
   foreach (BI_NetPoint* obj, netSegment.getNetPoints()) {
     if (auto item = mNetPoints.value(obj)) {
       item->setSelected(true);
@@ -304,6 +314,9 @@ void BoardGraphicsScene::updateHighlightedNetSignals() noexcept {
     item->updateHighlightedNetSignals();
   }
   foreach (auto item, mVias) {
+    item->update();
+  }
+  foreach (auto item, mPads) {
     item->update();
   }
   foreach (auto item, mNetLines) {
@@ -394,6 +407,9 @@ void BoardGraphicsScene::removePad(BI_Pad& pad) noexcept {
 }
 
 void BoardGraphicsScene::addNetSegment(BI_NetSegment& netSegment) noexcept {
+  foreach (BI_Pad* obj, netSegment.getPads()) {
+    addPad(*obj, std::weak_ptr<BGI_Device>());
+  }
   foreach (BI_Via* obj, netSegment.getVias()) {
     addVia(*obj);
   }
@@ -423,11 +439,18 @@ void BoardGraphicsScene::removeNetSegment(BI_NetSegment& netSegment) noexcept {
   foreach (BI_Via* obj, netSegment.getVias()) {
     removeVia(*obj);
   }
+  foreach (BI_Pad* obj, netSegment.getPads()) {
+    removePad(*obj);
+  }
 }
 
 void BoardGraphicsScene::addNetSegmentElements(
-    const QList<BI_Via*>& vias, const QList<BI_NetPoint*>& netPoints,
+    const QList<BI_Pad*>& pads, const QList<BI_Via*>& vias,
+    const QList<BI_NetPoint*>& netPoints,
     const QList<BI_NetLine*>& netLines) noexcept {
+  foreach (BI_Pad* obj, pads) {
+    addPad(*obj, std::weak_ptr<BGI_Device>());
+  }
   foreach (BI_Via* obj, vias) {
     addVia(*obj);
   }
@@ -440,7 +463,8 @@ void BoardGraphicsScene::addNetSegmentElements(
 }
 
 void BoardGraphicsScene::removeNetSegmentElements(
-    const QList<BI_Via*>& vias, const QList<BI_NetPoint*>& netPoints,
+    const QList<BI_Pad*>& pads, const QList<BI_Via*>& vias,
+    const QList<BI_NetPoint*>& netPoints,
     const QList<BI_NetLine*>& netLines) noexcept {
   foreach (BI_NetLine* obj, netLines) {
     removeNetLine(*obj);
@@ -450,6 +474,9 @@ void BoardGraphicsScene::removeNetSegmentElements(
   }
   foreach (BI_Via* obj, vias) {
     removeVia(*obj);
+  }
+  foreach (BI_Pad* obj, pads) {
+    removePad(*obj);
   }
 }
 

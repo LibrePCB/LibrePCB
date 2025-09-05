@@ -28,6 +28,7 @@
 #include <librepcb/core/library/cmp/componentsignal.h>
 #include <librepcb/core/library/pkg/packagepad.h>
 #include <librepcb/core/project/board/items/bi_device.h>
+#include <librepcb/core/project/board/items/bi_netsegment.h>
 #include <librepcb/core/project/board/items/bi_pad.h>
 #include <librepcb/core/project/circuit/componentsignalinstance.h>
 #include <librepcb/core/project/circuit/netsignal.h>
@@ -66,7 +67,7 @@ BGI_Pad::BGI_Pad(BI_Pad& pad, std::weak_ptr<BGI_Device> deviceItem,
   mGraphicsItem->setMirrored(mPad.getMirrored());
   mGraphicsItem->setText(mPad.getText());
   mGraphicsItem->setGeometries(mPad.getGeometries(),
-                               *mPad.getLibPad().getCopperClearance());
+                               *mPad.getProperties().getCopperClearance());
   updateLayer();
   updateToolTip();
 
@@ -111,6 +112,17 @@ QVariant BGI_Pad::itemChange(GraphicsItemChange change,
 void BGI_Pad::padEdited(const BI_Pad& obj, BI_Pad::Event event) noexcept {
   Q_UNUSED(obj);
   switch (event) {
+    case BI_Pad::Event::UuidChanged:
+    case BI_Pad::Event::ShapeChanged:
+    case BI_Pad::Event::WidthChanged:
+    case BI_Pad::Event::HeightChanged:
+    case BI_Pad::Event::RadiusChanged:
+    case BI_Pad::Event::CustomShapeOutlineChanged:
+    case BI_Pad::Event::StopMaskConfigChanged:
+    case BI_Pad::Event::SolderPasteConfigChanged:
+    case BI_Pad::Event::FunctionChanged:
+    case BI_Pad::Event::LockedChanged:
+      break;
     case BI_Pad::Event::PositionChanged:
       setPos(obj.getPosition().toPxQPointF());
       break;
@@ -121,13 +133,18 @@ void BGI_Pad::padEdited(const BI_Pad& obj, BI_Pad::Event event) noexcept {
       mGraphicsItem->setMirrored(obj.getMirrored());
       updateLayer();
       break;
+    case BI_Pad::Event::ComponentSideChanged:
+    case BI_Pad::Event::HolesEdited:
+      updateLayer();
+      break;
     case BI_Pad::Event::TextChanged:
       mGraphicsItem->setText(obj.getText());
       updateToolTip();
       break;
     case BI_Pad::Event::GeometriesChanged:
+    case BI_Pad::Event::CopperClearanceChanged:
       mGraphicsItem->setGeometries(obj.getGeometries(),
-                                   *obj.getLibPad().getCopperClearance());
+                                   *obj.getProperties().getCopperClearance());
       break;
     default:
       qWarning() << "Unhandled switch-case in BGI_Pad::padEdited():"
@@ -144,7 +161,7 @@ void BGI_Pad::deviceGraphicsItemEdited(const BGI_Device& obj,
 }
 
 void BGI_Pad::updateLayer() noexcept {
-  if (mPad.getLibPad().isTht()) {
+  if (mPad.getProperties().isTht()) {
     setZValue(BoardGraphicsScene::ZValue_PadsTop);
     mGraphicsItem->setLayer(Theme::Color::sBoardPads);
   } else if (mPad.getSolderLayer() == Layer::topCopper()) {
@@ -172,7 +189,7 @@ void BGI_Pad::updateToolTip() noexcept {
     s += "✖";
   }
   s += "<br>" % tr("Net:") % " ";
-  if (const NetSignal* net = mPad.getCompSigInstNetSignal()) {
+  if (const NetSignal* net = mPad.getNetSignal()) {
     s += *net->getName();
   } else {
     s += "✖";
@@ -182,8 +199,7 @@ void BGI_Pad::updateToolTip() noexcept {
 
 void BGI_Pad::updateHightlighted(bool selected) noexcept {
   mGraphicsItem->setSelected(
-      selected ||
-      mHighlightedNetSignals->contains(mPad.getCompSigInstNetSignal()));
+      selected || mHighlightedNetSignals->contains(mPad.getNetSignal()));
 }
 
 /*******************************************************************************

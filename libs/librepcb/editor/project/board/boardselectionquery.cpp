@@ -27,6 +27,7 @@
 #include "graphicsitems/bgi_hole.h"
 #include "graphicsitems/bgi_netline.h"
 #include "graphicsitems/bgi_netpoint.h"
+#include "graphicsitems/bgi_pad.h"
 #include "graphicsitems/bgi_plane.h"
 #include "graphicsitems/bgi_polygon.h"
 #include "graphicsitems/bgi_stroketext.h"
@@ -39,6 +40,7 @@
 #include <librepcb/core/project/board/items/bi_netline.h>
 #include <librepcb/core/project/board/items/bi_netpoint.h>
 #include <librepcb/core/project/board/items/bi_netsegment.h>
+#include <librepcb/core/project/board/items/bi_pad.h>
 #include <librepcb/core/project/board/items/bi_plane.h>
 #include <librepcb/core/project/board/items/bi_polygon.h>
 #include <librepcb/core/project/board/items/bi_stroketext.h>
@@ -73,6 +75,11 @@ BoardSelectionQuery::~BoardSelectionQuery() noexcept {
 QHash<BI_NetSegment*, BoardSelectionQuery::NetSegmentItems>
     BoardSelectionQuery::getNetSegmentItems() const noexcept {
   QHash<BI_NetSegment*, NetSegmentItems> result;
+  foreach (BI_Pad* pad, mResultPads) {
+    if (BI_NetSegment* ns = pad->getNetSegment()) {
+      result[ns].pads.insert(pad);
+    }
+  }
   foreach (BI_Via* via, mResultVias) {
     result[&via->getNetSegment()].vias.insert(via);
   }
@@ -87,8 +94,8 @@ QHash<BI_NetSegment*, BoardSelectionQuery::NetSegmentItems>
 
 int BoardSelectionQuery::getResultCount() const noexcept {
   return mResultDeviceInstances.count() + mResultNetPoints.count() +
-      mResultNetLines.count() + mResultVias.count() + mResultPlanes.count() +
-      mResultZones.count() + mResultPolygons.count() +
+      mResultNetLines.count() + mResultPads.count() + mResultVias.count() +
+      mResultPlanes.count() + mResultZones.count() + mResultPolygons.count() +
       mResultStrokeTexts.count() + mResultHoles.count();
 }
 
@@ -102,6 +109,15 @@ void BoardSelectionQuery::addDeviceInstancesOfSelectedFootprints() noexcept {
     if (it.value()->isSelected() &&
         ((!it.key()->isLocked()) || mIncludeLockedItems)) {
       mResultDeviceInstances.insert(it.key());
+    }
+  }
+}
+
+void BoardSelectionQuery::addSelectedBoardPads() noexcept {
+  for (auto it = mScene.getPads().begin(); it != mScene.getPads().end(); it++) {
+    if ((!it.key()->getDevice()) && it.value()->isSelected() &&
+        ((!it.key()->getProperties().isLocked()) || mIncludeLockedItems)) {
+      mResultPads.insert(it.key());
     }
   }
 }
