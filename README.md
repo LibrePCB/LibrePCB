@@ -166,6 +166,7 @@ mkdir build && cd build
 cmake ..
 make -j8
 ```
+***<h5>Note: If <code>make -j8</code> is terminated, you can always run it again later and will continue from last step as changes will be writen to a build folder.</h5>***
 
 The binary can then be found in `build/apps/librepcb/`.
 
