@@ -58,7 +58,7 @@ public:
   PackageEditorState_AddPads() = delete;
   PackageEditorState_AddPads(const PackageEditorState_AddPads& other) = delete;
   explicit PackageEditorState_AddPads(Context& context, PadType type,
-                                      FootprintPad::Function function) noexcept;
+                                      Pad::Function function) noexcept;
   virtual ~PackageEditorState_AddPads() noexcept;
 
   // General Methods
@@ -80,14 +80,12 @@ public:
     return mCurrentProperties.getPackagePadUuid();
   }
   void setPackagePad(const std::optional<Uuid>& pad) noexcept;
-  FootprintPad::ComponentSide getComponentSide() const noexcept {
+  Pad::ComponentSide getComponentSide() const noexcept {
     return mCurrentProperties.getComponentSide();
   }
-  void setComponentSide(FootprintPad::ComponentSide side) noexcept;
-  FootprintPad::Shape getShape() const noexcept {
-    return mCurrentProperties.getShape();
-  }
-  void setShape(FootprintPad::Shape shape) noexcept;
+  void setComponentSide(Pad::ComponentSide side) noexcept;
+  Pad::Shape getShape() const noexcept { return mCurrentProperties.getShape(); }
+  void setShape(Pad::Shape shape) noexcept;
   const PositiveLength& getWidth() const noexcept {
     return mCurrentProperties.getWidth();
   }
@@ -117,13 +115,13 @@ public:
     return mCurrentProperties.getStopMaskConfig();
   }
   void setStopMaskConfig(const MaskConfig& cfg) noexcept;
-  FootprintPad::Function getFunction() const noexcept {
+  Pad::Function getFunction() const noexcept {
     return mCurrentProperties.getFunction();
   }
   bool getFunctionIsFiducial() const noexcept {
     return mCurrentProperties.getFunctionIsFiducial();
   }
-  void setFunction(FootprintPad::Function function) noexcept;
+  void setFunction(Pad::Function function) noexcept;
 
   // Operator Overloadings
   PackageEditorState_AddPads& operator=(const PackageEditorState_AddPads& rhs) =
@@ -131,15 +129,15 @@ public:
 
 signals:
   void packagePadChanged(const std::optional<Uuid>& pad);
-  void componentSideChanged(FootprintPad::ComponentSide side);
-  void shapeChanged(FootprintPad::Shape shape);
+  void componentSideChanged(Pad::ComponentSide side);
+  void shapeChanged(Pad::Shape shape);
   void widthChanged(const PositiveLength& width);
   void heightChanged(const PositiveLength& height);
   void radiusChanged(const UnsignedLimitedRatio& radius);
   void drillDiameterChanged(const PositiveLength& diameter);
   void copperClearanceChanged(const UnsignedLength& clearance);
   void stopMaskConfigChanged(const MaskConfig& cfg);
-  void functionChanged(FootprintPad::Function function);
+  void functionChanged(Pad::Function function);
 
 private:  // Methods
   bool startAddPad(const Point& pos) noexcept;

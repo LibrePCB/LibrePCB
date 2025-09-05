@@ -147,7 +147,7 @@ PackageTab::PackageTab(LibraryEditor& editor, std::unique_ptr<Package> pkg,
         std::make_shared<slint::VectorModel<slint::SharedString>>()),
     mToolPackagePads(
         std::make_shared<slint::VectorModel<slint::SharedString>>()),
-    mToolComponentSide(FootprintPad::ComponentSide::Top),
+    mToolComponentSide(Pad::ComponentSide::Top),
     mToolShape(ui::PadShape::Round),
     mToolFiducial(false),
     mToolPressFit(false),
@@ -410,7 +410,7 @@ ui::PackageTabData PackageTab::getDerivedUiData() const noexcept {
           static_cast<int>(
               mToolPackagePadsQt.indexOf(mToolPackagePad)),  // Current index
       },
-      mToolComponentSide == FootprintPad::ComponentSide::Bottom,  // Tool bottom
+      mToolComponentSide == Pad::ComponentSide::Bottom,  // Tool bottom
       mToolShape,  // Tool shape
       mToolFiducial,  // Tool fiducial
       mToolPressFit,  // Tool press fit
@@ -550,9 +550,8 @@ void PackageTab::setDerivedUiData(const ui::PackageTabData& data) noexcept {
   emit vAlignRequested(s2l(data.tool_valign));
   emit packagePadRequested(
       mToolPackagePadsQt.value(data.tool_package_pad.current_index));
-  emit componentSideRequested(data.tool_bottom
-                                  ? FootprintPad::ComponentSide::Bottom
-                                  : FootprintPad::ComponentSide::Top);
+  emit componentSideRequested(data.tool_bottom ? Pad::ComponentSide::Bottom
+                                               : Pad::ComponentSide::Top);
   emit shapeRequested(data.tool_shape);
   emit pressFitRequested(data.tool_pressfit);
   emit zoneLayerRequested(Zone::Layer::Top, data.tool_layer_top);
@@ -889,36 +888,31 @@ void PackageTab::trigger(ui::TabAction a) noexcept {
       break;
     }
     case ui::TabAction::ToolPadSmt: {
-      mFsm->processStartAddingFootprintSmtPads(
-          FootprintPad::Function::StandardPad);
+      mFsm->processStartAddingFootprintSmtPads(Pad::Function::StandardPad);
       break;
     }
     case ui::TabAction::ToolPadThermal: {
-      mFsm->processStartAddingFootprintSmtPads(
-          FootprintPad::Function::ThermalPad);
+      mFsm->processStartAddingFootprintSmtPads(Pad::Function::ThermalPad);
       break;
     }
     case ui::TabAction::ToolPadBga: {
-      mFsm->processStartAddingFootprintSmtPads(FootprintPad::Function::BgaPad);
+      mFsm->processStartAddingFootprintSmtPads(Pad::Function::BgaPad);
       break;
     }
     case ui::TabAction::ToolPadEdgeConnector: {
-      mFsm->processStartAddingFootprintSmtPads(
-          FootprintPad::Function::EdgeConnectorPad);
+      mFsm->processStartAddingFootprintSmtPads(Pad::Function::EdgeConnectorPad);
       break;
     }
     case ui::TabAction::ToolPadTestPoint: {
-      mFsm->processStartAddingFootprintSmtPads(FootprintPad::Function::TestPad);
+      mFsm->processStartAddingFootprintSmtPads(Pad::Function::TestPad);
       break;
     }
     case ui::TabAction::ToolPadLocalFiducial: {
-      mFsm->processStartAddingFootprintSmtPads(
-          FootprintPad::Function::LocalFiducial);
+      mFsm->processStartAddingFootprintSmtPads(Pad::Function::LocalFiducial);
       break;
     }
     case ui::TabAction::ToolPadGlobalFiducial: {
-      mFsm->processStartAddingFootprintSmtPads(
-          FootprintPad::Function::GlobalFiducial);
+      mFsm->processStartAddingFootprintSmtPads(Pad::Function::GlobalFiducial);
       break;
     }
     case ui::TabAction::ToolZone: {
@@ -1634,7 +1628,7 @@ void PackageTab::fsmToolEnter(PackageEditorState_AddPads& state) noexcept {
 
   // Component side
   if (state.getType() == PackageEditorState_AddPads::PadType::SMT) {
-    auto setComponentSide = [this](FootprintPad::ComponentSide side) {
+    auto setComponentSide = [this](Pad::ComponentSide side) {
       mToolComponentSide = side;
       onDerivedUiDataChanged.notify();
     };
@@ -1649,9 +1643,9 @@ void PackageTab::fsmToolEnter(PackageEditorState_AddPads& state) noexcept {
 
   // Shape
   auto getCurrentShape = [](PackageEditorState_AddPads& s) {
-    if (s.getShape() == FootprintPad::Shape::RoundedOctagon) {
+    if (s.getShape() == Pad::Shape::RoundedOctagon) {
       return ui::PadShape::Octagon;
-    } else if (s.getShape() == FootprintPad::Shape::Custom) {
+    } else if (s.getShape() == Pad::Shape::Custom) {
       return ui::PadShape::Octagon;  // Not currect but should never be the
                                      // case.
     } else if (*s.getRadius() == Ratio::fromPercent(0)) {
@@ -1669,21 +1663,21 @@ void PackageTab::fsmToolEnter(PackageEditorState_AddPads& state) noexcept {
         if (shape != mToolShape) {
           switch (shape) {
             case ui::PadShape::Round:
-              state.setShape(FootprintPad::Shape::RoundedRect);
+              state.setShape(Pad::Shape::RoundedRect);
               state.setRadius(UnsignedLimitedRatio(Ratio::fromPercent(100)));
               break;
             case ui::PadShape::RoundedRect:
-              state.setShape(FootprintPad::Shape::RoundedRect);
+              state.setShape(Pad::Shape::RoundedRect);
               state.setRadius(
                   UnsignedLimitedRatio(FootprintPad::getRecommendedRadius(
                       state.getWidth(), state.getHeight())));
               break;
             case ui::PadShape::Rect:
-              state.setShape(FootprintPad::Shape::RoundedRect);
+              state.setShape(Pad::Shape::RoundedRect);
               state.setRadius(UnsignedLimitedRatio(Ratio::fromPercent(0)));
               break;
             case ui::PadShape::Octagon:
-              state.setShape(FootprintPad::Shape::RoundedOctagon);
+              state.setShape(Pad::Shape::RoundedOctagon);
               state.setRadius(UnsignedLimitedRatio(Ratio::fromPercent(0)));
               break;
             default:
@@ -1766,8 +1760,8 @@ void PackageTab::fsmToolEnter(PackageEditorState_AddPads& state) noexcept {
 
   // Press-fit
   if (state.getType() == PackageEditorState_AddPads::PadType::THT) {
-    auto setFunction = [this](FootprintPad::Function function) {
-      mToolPressFit = function == FootprintPad::Function::PressFitPad;
+    auto setFunction = [this](Pad::Function function) {
+      mToolPressFit = function == Pad::Function::PressFitPad;
       onDerivedUiDataChanged.notify();
     };
     setFunction(state.getFunction());
@@ -1776,8 +1770,8 @@ void PackageTab::fsmToolEnter(PackageEditorState_AddPads& state) noexcept {
                 setFunction));
     mFsmStateConnections.append(connect(
         this, &PackageTab::pressFitRequested, &state, [&state](bool pressFit) {
-          state.setFunction(pressFit ? FootprintPad::Function::PressFitPad
-                                     : FootprintPad::Function::StandardPad);
+          state.setFunction(pressFit ? Pad::Function::PressFitPad
+                                     : Pad::Function::StandardPad);
         }));
   }
 
@@ -2108,7 +2102,7 @@ void PackageTab::autoFix(const MsgInvalidCustomPadOutline& msg) {
   std::shared_ptr<FootprintPad> pad =
       footprint->getPads().get(msg.getPad().get());
   std::unique_ptr<CmdFootprintPadEdit> cmd(new CmdFootprintPadEdit(*pad));
-  cmd->setShape(FootprintPad::Shape::RoundedRect, false);
+  cmd->setShape(Pad::Shape::RoundedRect, false);
   mUndoStack->execCmd(cmd.release());
 }
 
@@ -2206,9 +2200,9 @@ void PackageTab::fixPadFunction(const MessageType& msg) {
   QAction* aAll = menu.addAction(tr("Apply to all unspecified pads"));
   aAll->setCheckable(true);
   menu.addSeparator();
-  for (int i = 0; i < static_cast<int>(FootprintPad::Function::_COUNT); ++i) {
-    const FootprintPad::Function value = static_cast<FootprintPad::Function>(i);
-    if (value != FootprintPad::Function::Unspecified) {
+  for (int i = 0; i < static_cast<int>(Pad::Function::_COUNT); ++i) {
+    const Pad::Function value = static_cast<Pad::Function>(i);
+    if (value != Pad::Function::Unspecified) {
       QAction* action =
           menu.addAction(FootprintPad::getFunctionDescriptionTr(value));
       action->setData(QVariant::fromValue(value));
@@ -2222,17 +2216,16 @@ void PackageTab::fixPadFunction(const MessageType& msg) {
   } while (action == aAll);
 
   if (action && action->data().isValid() &&
-      action->data().canConvert<FootprintPad::Function>()) {
+      action->data().canConvert<Pad::Function>()) {
     if (aAll->isChecked()) {
       UndoStackTransaction transaction(*mUndoStack,
                                        tr("Fix Unspecified Pad Functions"));
       for (auto& footprint : mPackage->getFootprints()) {
         for (auto& pad : footprint.getPads()) {
-          if (pad.getFunction() == FootprintPad::Function::Unspecified) {
+          if (pad.getFunction() == Pad::Function::Unspecified) {
             std::unique_ptr<CmdFootprintPadEdit> cmd(
                 new CmdFootprintPadEdit(pad));
-            cmd->setFunction(action->data().value<FootprintPad::Function>(),
-                             false);
+            cmd->setFunction(action->data().value<Pad::Function>(), false);
             transaction.append(cmd.release());
           }
         }
@@ -2244,7 +2237,7 @@ void PackageTab::fixPadFunction(const MessageType& msg) {
       std::shared_ptr<FootprintPad> pad =
           footprint->getPads().get(msg.getPad().get());
       std::unique_ptr<CmdFootprintPadEdit> cmd(new CmdFootprintPadEdit(*pad));
-      cmd->setFunction(action->data().value<FootprintPad::Function>(), false);
+      cmd->setFunction(action->data().value<Pad::Function>(), false);
       mUndoStack->execCmd(cmd.release());
     }
   }

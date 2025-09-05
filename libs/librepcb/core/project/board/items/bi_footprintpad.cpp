@@ -104,12 +104,11 @@ const Uuid& BI_FootprintPad::getLibPadUuid() const noexcept {
   return mFootprintPad->getUuid();
 }
 
-FootprintPad::ComponentSide BI_FootprintPad::getComponentSide() const noexcept {
+Pad::ComponentSide BI_FootprintPad::getComponentSide() const noexcept {
   if (getMirrored()) {
-    return (mFootprintPad->getComponentSide() ==
-            FootprintPad::ComponentSide::Top)
-        ? FootprintPad::ComponentSide::Bottom
-        : FootprintPad::ComponentSide::Top;
+    return (mFootprintPad->getComponentSide() == Pad::ComponentSide::Top)
+        ? Pad::ComponentSide::Bottom
+        : Pad::ComponentSide::Top;
   } else {
     return mFootprintPad->getComponentSide();
   }
@@ -117,11 +116,11 @@ FootprintPad::ComponentSide BI_FootprintPad::getComponentSide() const noexcept {
 
 const Layer& BI_FootprintPad::getSolderLayer() const noexcept {
   if (mFootprintPad->isTht()) {
-    return (getComponentSide() == FootprintPad::ComponentSide::Bottom)
+    return (getComponentSide() == Pad::ComponentSide::Bottom)
         ? Layer::topCopper()
         : Layer::botCopper();
   } else {
-    return (getComponentSide() == FootprintPad::ComponentSide::Bottom)
+    return (getComponentSide() == Pad::ComponentSide::Bottom)
         ? Layer::botCopper()
         : Layer::topCopper();
   }
@@ -374,7 +373,7 @@ QString BI_FootprintPad::getNetSignalName() const noexcept {
 
 UnsignedLength BI_FootprintPad::getSizeForMaskOffsetCalculaton()
     const noexcept {
-  if (mFootprintPad->getShape() == FootprintPad::Shape::Custom) {
+  if (mFootprintPad->getShape() == Pad::Shape::Custom) {
     // Width/height of the shape are not directly known and difficulat/heavy to
     // determine. So let's consider the pad as small to always get the smallest
     // offset from the design rule. Not perfect, but should be good enough.
@@ -396,8 +395,7 @@ QList<PadGeometry> BI_FootprintPad::getGeometryOnLayer(
   if (layer.isStopMask()) {
     const MaskConfig& cfg = mFootprintPad->getStopMaskConfig();
     const bool isThtSolderSide =
-        (layer.isTop() ==
-         (getComponentSide() == FootprintPad::ComponentSide::Bottom));
+        (layer.isTop() == (getComponentSide() == Pad::ComponentSide::Bottom));
     const bool autoAnnularRing =
         mBoard.getDesignRules().getPadCmpSideAutoAnnularRing();
     if (cfg.isEnabled() && cfg.getOffset() &&
@@ -412,8 +410,7 @@ QList<PadGeometry> BI_FootprintPad::getGeometryOnLayer(
   } else if (layer.isSolderPaste()) {
     const MaskConfig& cfg = mFootprintPad->getSolderPasteConfig();
     const bool isThtSolderSide =
-        (layer.isTop() ==
-         (getComponentSide() == FootprintPad::ComponentSide::Bottom));
+        (layer.isTop() == (getComponentSide() == Pad::ComponentSide::Bottom));
     if (cfg.isEnabled() && ((!mFootprintPad->isTht()) || isThtSolderSide)) {
       if (const std::optional<Length>& manualOffset = cfg.getOffset()) {
         // Use offset configured in pad.
@@ -444,14 +441,12 @@ QList<PadGeometry> BI_FootprintPad::getGeometryOnCopperLayer(
   bool autoAnnular = false;
   bool minimalAnnular = false;
   const Layer& componentSideLayer =
-      (getComponentSide() == FootprintPad::ComponentSide::Top)
-      ? Layer::topCopper()
-      : Layer::botCopper();
+      (getComponentSide() == Pad::ComponentSide::Top) ? Layer::topCopper()
+                                                      : Layer::botCopper();
   if (mFootprintPad->isTht()) {
     const Layer& solderSideLayer =
-        (getComponentSide() == FootprintPad::ComponentSide::Top)
-        ? Layer::botCopper()
-        : Layer::topCopper();
+        (getComponentSide() == Pad::ComponentSide::Top) ? Layer::botCopper()
+                                                        : Layer::topCopper();
     const bool fullComponentSide =
         !mBoard.getDesignRules().getPadCmpSideAutoAnnularRing();
     const bool fullInner =

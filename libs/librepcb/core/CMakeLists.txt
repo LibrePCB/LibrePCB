@@ -177,6 +177,8 @@ add_library(
   geometry/netlabel.h
   geometry/netline.cpp
   geometry/netline.h
+  geometry/pad.cpp
+  geometry/pad.h
   geometry/padgeometry.cpp
   geometry/padgeometry.h
   geometry/padhole.cpp

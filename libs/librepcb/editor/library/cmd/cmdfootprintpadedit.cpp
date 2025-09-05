@@ -62,22 +62,21 @@ void CmdFootprintPadEdit::setPackagePadUuid(const std::optional<Uuid>& pad,
   if (immediate) mPad.setPackagePadUuid(pad);
 }
 
-void CmdFootprintPadEdit::setComponentSide(FootprintPad::ComponentSide side,
+void CmdFootprintPadEdit::setComponentSide(Pad::ComponentSide side,
                                            bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewProperties.setComponentSide(side);
   if (immediate) mPad.setComponentSide(side);
 }
 
-void CmdFootprintPadEdit::setFunction(FootprintPad::Function function,
+void CmdFootprintPadEdit::setFunction(Pad::Function function,
                                       bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewProperties.setFunction(function);
   if (immediate) mPad.setFunction(function);
 }
 
-void CmdFootprintPadEdit::setShape(FootprintPad::Shape shape,
-                                   bool immediate) noexcept {
+void CmdFootprintPadEdit::setShape(Pad::Shape shape, bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewProperties.setShape(shape);
   if (immediate) mPad.setShape(shape);
@@ -189,10 +188,10 @@ void CmdFootprintPadEdit::mirrorGeometry(Qt::Orientation orientation,
 }
 
 void CmdFootprintPadEdit::mirrorLayer(bool immediate) noexcept {
-  if (mNewProperties.getComponentSide() == FootprintPad::ComponentSide::Top) {
-    mNewProperties.setComponentSide(FootprintPad::ComponentSide::Bottom);
+  if (mNewProperties.getComponentSide() == Pad::ComponentSide::Top) {
+    mNewProperties.setComponentSide(Pad::ComponentSide::Bottom);
   } else {
-    mNewProperties.setComponentSide(FootprintPad::ComponentSide::Top);
+    mNewProperties.setComponentSide(Pad::ComponentSide::Top);
   }
   if (immediate) {
     mPad.setComponentSide(mNewProperties.getComponentSide());

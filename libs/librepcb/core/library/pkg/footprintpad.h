@@ -23,17 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../exceptions.h"
-#include "../../geometry/padgeometry.h"
-#include "../../geometry/padhole.h"
-#include "../../geometry/path.h"
+#include "../../geometry/pad.h"
 #include "../../serialization/serializableobjectlist.h"
-#include "../../types/angle.h"
-#include "../../types/length.h"
-#include "../../types/maskconfig.h"
-#include "../../types/point.h"
-#include "../../types/ratio.h"
-#include "../../types/uuid.h"
 
 #include <QtCore>
 
@@ -42,8 +33,6 @@
  ******************************************************************************/
 namespace librepcb {
 
-class Layer;
-
 /*******************************************************************************
  *  Class FootprintPad
  ******************************************************************************/
@@ -51,39 +40,14 @@ class Layer;
 /**
  * @brief The FootprintPad class represents a pad of a footprint
  */
-class FootprintPad final {
+class FootprintPad final : public Pad {
   Q_DECLARE_TR_FUNCTIONS(FootprintPad)
 
 public:
-  // Types
-  enum class Shape {
-    RoundedRect,
-    RoundedOctagon,
-    Custom,
-  };
-
-  enum class ComponentSide {
-    Top,
-    Bottom,
-  };
-
-  enum class Function {
-    Unspecified = 0,
-    StandardPad,
-    PressFitPad,
-    ThermalPad,
-    BgaPad,
-    EdgeConnectorPad,
-    TestPad,
-    LocalFiducial,
-    GlobalFiducial,
-    _COUNT,
-  };
-
   // Signals
   enum class Event {
+    // Base class properties
     UuidChanged,
-    PackagePadUuidChanged,
     PositionChanged,
     RotationChanged,
     ShapeChanged,
@@ -97,6 +61,8 @@ public:
     ComponentSideChanged,
     FunctionChanged,
     HolesEdited,
+    // Derived class properties
+    PackagePadUuidChanged,
   };
   Signal<FootprintPad, Event> onEdited;
   typedef Slot<FootprintPad, Event> OnEditedSlot;
@@ -116,49 +82,13 @@ public:
   ~FootprintPad() noexcept;
 
   // Getters
-  const Uuid& getUuid() const noexcept { return mUuid; }
+  using Pad::getHoles;
+  PadHoleList& getHoles() noexcept { return mHoles; }
   const std::optional<Uuid>& getPackagePadUuid() const noexcept {
     return mPackagePadUuid;
   }
-  const Point& getPosition() const noexcept { return mPosition; }
-  const Angle& getRotation() const noexcept { return mRotation; }
-  Shape getShape() const noexcept { return mShape; }
-  const PositiveLength& getWidth() const noexcept { return mWidth; }
-  const PositiveLength& getHeight() const noexcept { return mHeight; }
-  const UnsignedLimitedRatio& getRadius() const noexcept { return mRadius; }
-  const Path& getCustomShapeOutline() const noexcept {
-    return mCustomShapeOutline;
-  }
-  const MaskConfig& getStopMaskConfig() const noexcept {
-    return mStopMaskConfig;
-  }
-  const MaskConfig& getSolderPasteConfig() const noexcept {
-    return mSolderPasteConfig;
-  }
-  const UnsignedLength& getCopperClearance() const noexcept {
-    return mCopperClearance;
-  }
-  ComponentSide getComponentSide() const noexcept { return mComponentSide; }
-  Function getFunction() const noexcept { return mFunction; }
-  bool getFunctionIsFiducial() const noexcept;
-  bool getFunctionNeedsSoldering() const noexcept;
-  const PadHoleList& getHoles() const noexcept { return mHoles; }
-  PadHoleList& getHoles() noexcept { return mHoles; }
-  bool isTht() const noexcept;
-  bool isOnLayer(const Layer& layer) const noexcept;
-  const Layer& getSmtLayer() const noexcept;
-  bool hasTopCopper() const noexcept;
-  bool hasBottomCopper() const noexcept;
-  bool hasAutoTopStopMask() const noexcept;
-  bool hasAutoBottomStopMask() const noexcept;
-  bool hasAutoTopSolderPaste() const noexcept;
-  bool hasAutoBottomSolderPaste() const noexcept;
-  PadGeometry getGeometry() const noexcept;
-  QHash<const Layer*, QList<PadGeometry>> buildPreviewGeometries()
-      const noexcept;
 
   // Setters
-  bool setPackagePadUuid(const std::optional<Uuid>& pad) noexcept;
   bool setPosition(const Point& pos) noexcept;
   bool setRotation(const Angle& rot) noexcept;
   bool setShape(Shape shape) noexcept;
@@ -171,6 +101,7 @@ public:
   bool setCopperClearance(const UnsignedLength& clearance) noexcept;
   bool setComponentSide(ComponentSide side) noexcept;
   bool setFunction(Function function) noexcept;
+  bool setPackagePadUuid(const std::optional<Uuid>& pad) noexcept;
 
   // General Methods
 
@@ -188,51 +119,22 @@ public:
   }
   FootprintPad& operator=(const FootprintPad& rhs) noexcept;
 
-  // Static Methods
-  static UnsignedLimitedRatio getRecommendedRadius(
-      const PositiveLength& width, const PositiveLength& height) noexcept;
-  static QString getFunctionDescriptionTr(Function function) noexcept;
-
 private:  // Methods
   void holesEdited(const PadHoleList& list, int index,
                    const std::shared_ptr<const PadHole>& hole,
                    PadHoleList::Event event) noexcept;
 
 private:  // Data
-  Uuid mUuid;
-
   /// The connected package pad
   ///
   /// This is the UUID of the package pad where this footprint pad is
   /// connected to. It can be std::nullopt, which means that the footprint pad
   /// is electrically not connected (e.g. for mechanical-only pads).
   std::optional<Uuid> mPackagePadUuid;
-  Point mPosition;
-  Angle mRotation;
-  Shape mShape;
-  PositiveLength mWidth;
-  PositiveLength mHeight;
-  UnsignedLimitedRatio mRadius;
-  Path mCustomShapeOutline;  ///< Empty if not needed; Implicitly closed
-  MaskConfig mStopMaskConfig;
-  MaskConfig mSolderPasteConfig;
-  UnsignedLength mCopperClearance;
-  ComponentSide mComponentSide;
-  Function mFunction;
-  PadHoleList mHoles;  ///< If not empty, it's a THT pad.
 
   // Slots
   PadHoleList::OnEditedSlot mHolesEditedSlot;
 };
-
-/*******************************************************************************
- *  Non-Member Functions
- ******************************************************************************/
-
-inline std::size_t qHash(const FootprintPad::Function& key,
-                         std::size_t seed = 0) noexcept {
-  return ::qHash(static_cast<int>(key), seed);
-}
 
 /*******************************************************************************
  *  Class FootprintPadList
@@ -250,7 +152,5 @@ using FootprintPadList =
  ******************************************************************************/
 
 }  // namespace librepcb
-
-Q_DECLARE_METATYPE(librepcb::FootprintPad::Function)
 
 #endif

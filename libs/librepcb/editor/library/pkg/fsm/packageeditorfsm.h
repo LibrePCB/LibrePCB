@@ -145,8 +145,7 @@ public:
   bool processAbortCommand() noexcept;
   bool processStartSelecting() noexcept;
   bool processStartAddingFootprintThtPads() noexcept;
-  bool processStartAddingFootprintSmtPads(
-      FootprintPad::Function function) noexcept;
+  bool processStartAddingFootprintSmtPads(Pad::Function function) noexcept;
   bool processStartAddingNames() noexcept;
   bool processStartAddingValues() noexcept;
   bool processStartDrawLines() noexcept;

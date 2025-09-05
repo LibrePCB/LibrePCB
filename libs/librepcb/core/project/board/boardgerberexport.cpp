@@ -621,7 +621,7 @@ int BoardGerberExport::drawPthDrills(ExcellonGenerator& gen) const {
       const FootprintPad& libPad = pad->getLibPad();
       const Transform transform(*pad);
       const ExcellonGenerator::Function function =
-          (libPad.getFunction() == FootprintPad::Function::PressFitPad)
+          (libPad.getFunction() == Pad::Function::PressFitPad)
           ? ExcellonGenerator::Function::ComponentDrillPressFit
           : ExcellonGenerator::Function::ComponentDrill;
       for (const PadHole& hole : libPad.getHoles()) {
@@ -902,21 +902,16 @@ void BoardGerberExport::drawDevice(GerberGenerator& gen,
 void BoardGerberExport::drawFootprintPad(GerberGenerator& gen,
                                          const BI_FootprintPad& pad,
                                          const Layer& layer) const {
-  const QMap<FootprintPad::Function, GerberAttribute::ApertureFunction>
-      functionMap = {
-          {FootprintPad::Function::ThermalPad,
-           GerberAttribute::ApertureFunction::HeatsinkPad},
-          {FootprintPad::Function::BgaPad,
-           GerberAttribute::ApertureFunction::BgaPadCopperDefined},
-          {FootprintPad::Function::EdgeConnectorPad,
-           GerberAttribute::ApertureFunction::ConnectorPad},
-          {FootprintPad::Function::TestPad,
-           GerberAttribute::ApertureFunction::TestPad},
-          {FootprintPad::Function::LocalFiducial,
-           GerberAttribute::ApertureFunction::FiducialPadLocal},
-          {FootprintPad::Function::GlobalFiducial,
-           GerberAttribute::ApertureFunction::FiducialPadGlobal},
-      };
+  using PadFunction = Pad::Function;
+  using ApertureFunction = GerberAttribute::ApertureFunction;
+  const QMap<PadFunction, ApertureFunction> functionMap = {
+      {PadFunction::ThermalPad, ApertureFunction::HeatsinkPad},
+      {PadFunction::BgaPad, ApertureFunction::BgaPadCopperDefined},
+      {PadFunction::EdgeConnectorPad, ApertureFunction::ConnectorPad},
+      {PadFunction::TestPad, ApertureFunction::TestPad},
+      {PadFunction::LocalFiducial, ApertureFunction::FiducialPadLocal},
+      {PadFunction::GlobalFiducial, ApertureFunction::FiducialPadGlobal},
+  };
 
   foreach (const PadGeometry& geometry, pad.getGeometries().value(&layer)) {
     // Pad attributes (most of them only on copper layers).
@@ -926,9 +921,9 @@ void BoardGerberExport::drawFootprintPad(GerberGenerator& gen,
     QString pin, signal;
     if (layer.isCopper()) {
       if (pad.getLibPad().isTht()) {
-        function = GerberAttribute::ApertureFunction::ComponentPad;
+        function = ApertureFunction::ComponentPad;
       } else {
-        function = GerberAttribute::ApertureFunction::SmdPadCopperDefined;
+        function = ApertureFunction::SmdPadCopperDefined;
       }
       function = functionMap.value(pad.getLibPad().getFunction(), *function);
       net = pad.getCompSigInstNetSignal()

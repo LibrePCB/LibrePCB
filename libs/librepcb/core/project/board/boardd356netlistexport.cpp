@@ -116,7 +116,7 @@ QByteArray BoardD356NetlistExport::generate() const {
       } else {
         // SMT pad.
         const int layerNumber =
-            (pad->getComponentSide() == FootprintPad::ComponentSide::Top)
+            (pad->getComponentSide() == Pad::ComponentSide::Top)
             ? 1
             : (mBoard.getInnerLayerCount() + 2);
         gen.smtPad(netName, cmpName, padName, pad->getPosition(),

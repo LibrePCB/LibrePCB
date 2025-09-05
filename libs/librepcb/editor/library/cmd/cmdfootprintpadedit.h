@@ -56,10 +56,9 @@ public:
   // Setters
   void setPackagePadUuid(const std::optional<Uuid>& pad,
                          bool immediate) noexcept;
-  void setComponentSide(FootprintPad::ComponentSide side,
-                        bool immediate) noexcept;
-  void setFunction(FootprintPad::Function function, bool immediate) noexcept;
-  void setShape(FootprintPad::Shape shape, bool immediate) noexcept;
+  void setComponentSide(Pad::ComponentSide side, bool immediate) noexcept;
+  void setFunction(Pad::Function function, bool immediate) noexcept;
+  void setShape(Pad::Shape shape, bool immediate) noexcept;
   void setWidth(const PositiveLength& width, bool immediate) noexcept;
   void setHeight(const PositiveLength& height, bool immediate) noexcept;
   void setRadius(const UnsignedLimitedRatio& radius, bool immediate) noexcept;

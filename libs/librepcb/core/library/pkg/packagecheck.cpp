@@ -548,11 +548,11 @@ void PackageCheck::checkCustomPadOutline(MsgList& msgs) const {
       std::shared_ptr<const PackagePad> pkgPad = pad->getPackagePadUuid()
           ? mPackage.getPads().find(*pad->getPackagePadUuid())
           : nullptr;
-      if ((pad->getShape() == FootprintPad::Shape::Custom) &&
+      if ((pad->getShape() == Pad::Shape::Custom) &&
           (!PadGeometry::isValidCustomOutline(pad->getCustomShapeOutline()))) {
         msgs.append(std::make_shared<MsgInvalidCustomPadOutline>(
             footprint, pad, pkgPad ? *pkgPad->getName() : QString()));
-      } else if ((pad->getShape() != FootprintPad::Shape::Custom) &&
+      } else if ((pad->getShape() != Pad::Shape::Custom) &&
                  (!pad->getCustomShapeOutline().getVertices().isEmpty())) {
         msgs.append(std::make_shared<MsgUnusedCustomPadOutline>(
             footprint, pad, pkgPad ? *pkgPad->getName() : QString()));
@@ -633,18 +633,15 @@ void PackageCheck::checkCopperClearanceOnPads(MsgList& msgs) const {
 }
 
 void PackageCheck::checkPadFunctions(MsgList& msgs) const {
-  const QSet<FootprintPad::Function> thtFuncs = {
-      FootprintPad::Function::StandardPad,
-      FootprintPad::Function::PressFitPad,
+  const QSet<Pad::Function> thtFuncs = {
+      Pad::Function::StandardPad,
+      Pad::Function::PressFitPad,
   };
-  const QSet<FootprintPad::Function> smtFuncs = {
-      FootprintPad::Function::StandardPad,
-      FootprintPad::Function::ThermalPad,
-      FootprintPad::Function::BgaPad,
-      FootprintPad::Function::EdgeConnectorPad,
-      FootprintPad::Function::TestPad,
-      FootprintPad::Function::LocalFiducial,
-      FootprintPad::Function::GlobalFiducial,
+  const QSet<Pad::Function> smtFuncs = {
+      Pad::Function::StandardPad,    Pad::Function::ThermalPad,
+      Pad::Function::BgaPad,         Pad::Function::EdgeConnectorPad,
+      Pad::Function::TestPad,        Pad::Function::LocalFiducial,
+      Pad::Function::GlobalFiducial,
   };
 
   for (auto itFtp = mPackage.getFootprints().begin();
@@ -658,7 +655,7 @@ void PackageCheck::checkPadFunctions(MsgList& msgs) const {
           : nullptr;
       const bool isTht = pad->isTht();
       const bool isConnected = pad->getPackagePadUuid().has_value();
-      if (pad->getFunction() == FootprintPad::Function::Unspecified) {
+      if (pad->getFunction() == Pad::Function::Unspecified) {
         msgs.append(std::make_shared<MsgUnspecifiedPadFunction>(
             footprint, pad, pkgPad ? *pkgPad->getName() : QString()));
       } else if ((isTht && (!thtFuncs.contains(pad->getFunction()))) ||

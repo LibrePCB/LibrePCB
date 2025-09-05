@@ -45,16 +45,16 @@ class FootprintPadTest : public ::testing::Test {};
  ******************************************************************************/
 
 TEST_F(FootprintPadTest, testFunctionsSerialization) {
-  const std::vector<std::pair<FootprintPad::Function, QString>> items = {
-      {FootprintPad::Function::Unspecified, "unspecified"},
-      {FootprintPad::Function::StandardPad, "standard"},
-      {FootprintPad::Function::PressFitPad, "pressfit"},
-      {FootprintPad::Function::ThermalPad, "thermal"},
-      {FootprintPad::Function::BgaPad, "bga"},
-      {FootprintPad::Function::EdgeConnectorPad, "edge_connector"},
-      {FootprintPad::Function::TestPad, "test"},
-      {FootprintPad::Function::LocalFiducial, "local_fiducial"},
-      {FootprintPad::Function::GlobalFiducial, "global_fiducial"},
+  const std::vector<std::pair<Pad::Function, QString>> items = {
+      {Pad::Function::Unspecified, "unspecified"},
+      {Pad::Function::StandardPad, "standard"},
+      {Pad::Function::PressFitPad, "pressfit"},
+      {Pad::Function::ThermalPad, "thermal"},
+      {Pad::Function::BgaPad, "bga"},
+      {Pad::Function::EdgeConnectorPad, "edge_connector"},
+      {Pad::Function::TestPad, "test"},
+      {Pad::Function::LocalFiducial, "local_fiducial"},
+      {Pad::Function::GlobalFiducial, "global_fiducial"},
   };
   for (const auto& item : items) {
     // Serialize
@@ -64,16 +64,15 @@ TEST_F(FootprintPadTest, testFunctionsSerialization) {
 
     // Deserialize
     sexpr = SExpression::createToken(item.second);
-    EXPECT_EQ(item.first, deserialize<FootprintPad::Function>(*sexpr));
+    EXPECT_EQ(item.first, deserialize<Pad::Function>(*sexpr));
   }
 
   // In LibrePCB 1.x, "press_fit" shall also be deserializable.
   auto sexpr = SExpression::createToken("press_fit");
   if (Application::getFileFormatVersion() == Version::fromString("1")) {
-    EXPECT_EQ(FootprintPad::Function::PressFitPad,
-              deserialize<FootprintPad::Function>(*sexpr));
+    EXPECT_EQ(Pad::Function::PressFitPad, deserialize<Pad::Function>(*sexpr));
   } else {
-    EXPECT_THROW(deserialize<FootprintPad::Function>(*sexpr), Exception);
+    EXPECT_THROW(deserialize<Pad::Function>(*sexpr), Exception);
   }
 }
 
@@ -93,15 +92,15 @@ TEST_F(FootprintPadTest, testConstructFromSExpressionConnected) {
             obj.getPackagePadUuid());
   EXPECT_EQ(Point(1234000, 2345000), obj.getPosition());
   EXPECT_EQ(Angle::deg45(), obj.getRotation());
-  EXPECT_EQ(FootprintPad::Shape::RoundedRect, obj.getShape());
+  EXPECT_EQ(Pad::Shape::RoundedRect, obj.getShape());
   EXPECT_EQ(PositiveLength(1100000), obj.getWidth());
   EXPECT_EQ(UnsignedLength(2200000), obj.getHeight());
   EXPECT_EQ(UnsignedLimitedRatio(Ratio::fromPercent(50)), obj.getRadius());
   EXPECT_EQ(MaskConfig::automatic(), obj.getStopMaskConfig());
   EXPECT_EQ(MaskConfig::manual(Length(250000)), obj.getSolderPasteConfig());
   EXPECT_EQ(UnsignedLength(330000), obj.getCopperClearance());
-  EXPECT_EQ(FootprintPad::ComponentSide::Top, obj.getComponentSide());
-  EXPECT_EQ(FootprintPad::Function::Unspecified, obj.getFunction());
+  EXPECT_EQ(Pad::ComponentSide::Top, obj.getComponentSide());
+  EXPECT_EQ(Pad::Function::Unspecified, obj.getFunction());
   EXPECT_EQ(0, obj.getHoles().count());
 }
 
@@ -129,15 +128,15 @@ TEST_F(FootprintPadTest, testConstructFromSExpressionUnconnected) {
   EXPECT_EQ(std::nullopt, obj.getPackagePadUuid());
   EXPECT_EQ(Point(1234000, 2345000), obj.getPosition());
   EXPECT_EQ(Angle::deg45(), obj.getRotation());
-  EXPECT_EQ(FootprintPad::Shape::Custom, obj.getShape());
+  EXPECT_EQ(Pad::Shape::Custom, obj.getShape());
   EXPECT_EQ(PositiveLength(1100000), obj.getWidth());
   EXPECT_EQ(UnsignedLength(2200000), obj.getHeight());
   EXPECT_EQ(UnsignedLimitedRatio(Ratio::fromPercent(50)), obj.getRadius());
   EXPECT_EQ(MaskConfig::off(), obj.getStopMaskConfig());
   EXPECT_EQ(MaskConfig::automatic(), obj.getSolderPasteConfig());
   EXPECT_EQ(UnsignedLength(330000), obj.getCopperClearance());
-  EXPECT_EQ(FootprintPad::ComponentSide::Bottom, obj.getComponentSide());
-  EXPECT_EQ(FootprintPad::Function::StandardPad, obj.getFunction());
+  EXPECT_EQ(Pad::ComponentSide::Bottom, obj.getComponentSide());
+  EXPECT_EQ(Pad::Function::StandardPad, obj.getFunction());
   EXPECT_EQ(3, obj.getCustomShapeOutline().getVertices().count());
   EXPECT_EQ(2, obj.getHoles().count());
 }
@@ -145,12 +144,12 @@ TEST_F(FootprintPadTest, testConstructFromSExpressionUnconnected) {
 TEST_F(FootprintPadTest, testSerializeAndDeserialize) {
   FootprintPad obj1(
       Uuid::createRandom(), Uuid::createRandom(), Point(123, 567), Angle(789),
-      FootprintPad::Shape::RoundedOctagon, PositiveLength(123),
-      PositiveLength(456), UnsignedLimitedRatio(Ratio::fromPercent(50)),
+      Pad::Shape::RoundedOctagon, PositiveLength(123), PositiveLength(456),
+      UnsignedLimitedRatio(Ratio::fromPercent(50)),
       Path({Vertex(Point(1, 2), Angle(3)), Vertex(Point(4, 5), Angle(6))}),
       MaskConfig::automatic(), MaskConfig::manual(Length(123456)),
-      UnsignedLength(98765), FootprintPad::ComponentSide::Top,
-      FootprintPad::Function::Unspecified,
+      UnsignedLength(98765), Pad::ComponentSide::Top,
+      Pad::Function::Unspecified,
       PadHoleList{
           std::make_shared<PadHole>(Uuid::createRandom(),
                                     PositiveLength(100000),
