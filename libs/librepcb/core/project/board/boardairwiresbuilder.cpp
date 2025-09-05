@@ -30,10 +30,10 @@
 #include "../circuit/netsignal.h"
 #include "../project.h"
 #include "board.h"
-#include "items/bi_footprintpad.h"
 #include "items/bi_netline.h"
 #include "items/bi_netpoint.h"
 #include "items/bi_netsegment.h"
+#include "items/bi_pad.h"
 #include "items/bi_plane.h"
 #include "items/bi_via.h"
 
@@ -70,14 +70,14 @@ QVector<std::pair<const BI_NetLineAnchor*, const BI_NetLineAnchor*>>
   // Map from anchor to ID
   QHash<const BI_NetLineAnchor*, int> anchorMap;
 
-  // pads
+  // footprint pads
   foreach (ComponentSignalInstance* cmpSig, mNetSignal.getComponentSignals()) {
     Q_ASSERT(cmpSig);
-    foreach (BI_FootprintPad* pad, cmpSig->getRegisteredFootprintPads()) {
+    foreach (BI_Pad* pad, cmpSig->getRegisteredFootprintPads()) {
       if (&pad->getBoard() != &mBoard) continue;
       const Point& pos = pad->getPosition();
       int id = builder.addPoint(pos);
-      if (pad->getLibPad().isTht()) {
+      if (pad->getProperties().isTht()) {
         pointLayerMap[id] =
             std::make_tuple(pos, Layer::topCopper().getCopperNumber(),
                             Layer::botCopper().getCopperNumber());
@@ -90,10 +90,25 @@ QVector<std::pair<const BI_NetLineAnchor*, const BI_NetLineAnchor*>>
     }
   }
 
-  // vias, netpoints, netlines
+  // board pads, vias, netpoints, netlines
   foreach (const BI_NetSegment* netsegment, mNetSignal.getBoardNetSegments()) {
     Q_ASSERT(netsegment);
     if (&netsegment->getBoard() != &mBoard) continue;
+    foreach (const BI_Pad* pad, netsegment->getPads()) {
+      Q_ASSERT(pad);
+      const Point& pos = pad->getPosition();
+      int id = builder.addPoint(pos);
+      if (pad->getProperties().isTht()) {
+        pointLayerMap[id] =
+            std::make_tuple(pos, Layer::topCopper().getCopperNumber(),
+                            Layer::botCopper().getCopperNumber());
+      } else {
+        pointLayerMap[id] =
+            std::make_tuple(pos, pad->getSolderLayer().getCopperNumber(),
+                            pad->getSolderLayer().getCopperNumber());
+      }
+      anchorMap[pad] = id;
+    }
     foreach (const BI_Via* via, netsegment->getVias()) {
       Q_ASSERT(via);
       const Point& pos = via->getPosition();

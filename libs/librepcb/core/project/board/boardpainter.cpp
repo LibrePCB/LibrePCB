@@ -31,10 +31,10 @@
 #include "../project.h"
 #include "board.h"
 #include "items/bi_device.h"
-#include "items/bi_footprintpad.h"
 #include "items/bi_hole.h"
 #include "items/bi_netline.h"
 #include "items/bi_netsegment.h"
+#include "items/bi_pad.h"
 #include "items/bi_plane.h"
 #include "items/bi_polygon.h"
 #include "items/bi_stroketext.h"
@@ -55,22 +55,27 @@ namespace librepcb {
 BoardPainter::BoardPainter(const Board& board)
   : mMonospaceFont(Application::getDefaultMonospaceFont()),
     mCopperLayers(board.getCopperLayers()) {
+  // Helper to add a pad.
+  auto addPad = [this](const BI_Pad* pad) {
+    Pad padObj;
+    padObj.transform = Transform(*pad);
+    for (const PadHole& hole : pad->getProperties().getHoles()) {
+      padObj.holes.append(hole);
+    }
+    for (auto it = pad->getGeometries().begin();
+         it != pad->getGeometries().end(); it++) {
+      foreach (const PadGeometry& geometry, it.value()) {
+        padObj.layerGeometries.append(std::make_pair(it.key(), geometry));
+      }
+    }
+    mPads.append(padObj);
+  };
+
   foreach (const BI_Device* device, board.getDeviceInstances()) {
     Footprint fpt;
     fpt.transform = Transform(*device);
-    foreach (const BI_FootprintPad* pad, device->getPads()) {
-      Pad padObj;
-      padObj.transform = Transform(*pad);
-      for (const PadHole& hole : pad->getLibPad().getHoles()) {
-        padObj.holes.append(hole);
-      }
-      for (auto it = pad->getGeometries().begin();
-           it != pad->getGeometries().end(); it++) {
-        foreach (const PadGeometry& geometry, it.value()) {
-          padObj.layerGeometries.append(std::make_pair(it.key(), geometry));
-        }
-      }
-      fpt.pads.append(padObj);
+    foreach (const BI_Pad* pad, device->getPads()) {
+      addPad(pad);
     }
     for (const Polygon& polygon : device->getLibFootprint().getPolygons()) {
       fpt.polygons.append(PolygonData{
@@ -117,6 +122,9 @@ BoardPainter::BoardPainter(const Board& board)
                            hole->getStopMaskOffset()});
   }
   foreach (const BI_NetSegment* segment, board.getNetSegments()) {
+    foreach (const BI_Pad* pad, segment->getPads()) {
+      addPad(pad);
+    }
     for (const BI_Via* via : segment->getVias()) {
       mVias.append(ViaData{
           via->getPosition(), via->getSize(), via->getDrillDiameter(),
@@ -265,31 +273,6 @@ void BoardPainter::initContentByColor() const noexcept {
         mContentByColor[Theme::Color::sBoardStopMaskTop].areas.append(stopMask);
         mContentByColor[Theme::Color::sBoardStopMaskBot].areas.append(stopMask);
       }
-
-      // Footprint pads.
-      foreach (const Pad& pad, footprint.pads) {
-        foreach (const auto& layerGeometry, pad.layerGeometries) {
-          const QPainterPath path =
-              pad.transform.mapPx(layerGeometry.second.toQPainterPathPx());
-          const QString color = layerGeometry.first->getThemeColor();
-          if ((!pad.holes.isEmpty()) &&
-              Theme::getCopperColorNames().contains(color)) {
-            ColorContent& tht = mContentByColor[Theme::Color::sBoardPads];
-            if (!tht.areas.contains(path)) {
-              tht.areas.append(path);
-            }
-            mContentByColor[color].thtPadAreas.append(path);
-          } else {
-            mContentByColor[color].areas.append(path);
-          }
-        }
-        // Also add the holes for THT pads.
-        for (const PadHole& hole : pad.holes) {
-          mContentByColor[Theme::Color::sBoardHoles].padHoles.append(
-              HoleData{hole.getDiameter(), pad.transform.map(hole.getPath()),
-                       std::nullopt});
-        }
-      }
     }
 
     // Planes.
@@ -297,6 +280,31 @@ void BoardPainter::initContentByColor() const noexcept {
       const QString color = plane.layer->getThemeColor();
       foreach (const Path& path, plane.fragments) {
         mContentByColor[color].areas.append(path.toQPainterPathPx());
+      }
+    }
+
+    // Pads.
+    foreach (const Pad& pad, mPads) {
+      foreach (const auto& layerGeometry, pad.layerGeometries) {
+        const QPainterPath path =
+            pad.transform.mapPx(layerGeometry.second.toQPainterPathPx());
+        const QString color = layerGeometry.first->getThemeColor();
+        if ((!pad.holes.isEmpty()) &&
+            Theme::getCopperColorNames().contains(color)) {
+          ColorContent& tht = mContentByColor[Theme::Color::sBoardPads];
+          if (!tht.areas.contains(path)) {
+            tht.areas.append(path);
+          }
+          mContentByColor[color].thtPadAreas.append(path);
+        } else {
+          mContentByColor[color].areas.append(path);
+        }
+      }
+      // Also add the holes for THT pads.
+      for (const PadHole& hole : pad.holes) {
+        mContentByColor[Theme::Color::sBoardHoles].padHoles.append(
+            HoleData{hole.getDiameter(), pad.transform.map(hole.getPath()),
+                     std::nullopt});
       }
     }
 

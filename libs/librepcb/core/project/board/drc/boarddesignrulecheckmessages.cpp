@@ -31,11 +31,11 @@
 #include "../../circuit/netsignal.h"
 #include "../board.h"
 #include "../items/bi_device.h"
-#include "../items/bi_footprintpad.h"
 #include "../items/bi_hole.h"
 #include "../items/bi_netline.h"
 #include "../items/bi_netpoint.h"
 #include "../items/bi_netsegment.h"
+#include "../items/bi_pad.h"
 #include "../items/bi_plane.h"
 #include "../items/bi_polygon.h"
 #include "../items/bi_stroketext.h"
@@ -85,6 +85,14 @@ void DrcHoleRef::serialize(SExpression& node) const {
     node.ensureLineBreak();
     node.appendChild("hole", mHole->uuid);
     node.ensureLineBreak();
+  } else if (mSegment && mPad && mHole) {
+    node.ensureLineBreak();
+    node.appendChild("netsegment", mSegment->uuid);
+    node.ensureLineBreak();
+    node.appendChild("pad", mPad->uuid);
+    node.ensureLineBreak();
+    node.appendChild("hole", mHole->uuid);
+    node.ensureLineBreak();
   } else if (mSegment && mVia) {
     node.ensureLineBreak();
     node.appendChild("netsegment", mSegment->uuid);
@@ -128,6 +136,8 @@ QString DrcMsgMissingConnection::Anchor::getName() const {
       name += ":" % mPad->libPkgPadName;
     }
     name += "'";
+  } else if (mSegment && mPad) {
+    name = tr("Pad");
   } else if (mSegment && mVia) {
     name = tr("Via");
   } else if (mSegment && mJunction) {
@@ -145,12 +155,15 @@ void DrcMsgMissingConnection::Anchor::serialize(SExpression& node) const {
     node.ensureLineBreak();
     node.appendChild("pad", mPad->uuid);
     node.ensureLineBreak();
+  } else if (mSegment && mPad) {
+    // I *guess* we don't need to serialize the pad since only one connection
+    // between a net segment and any other object can be missing(?).
+    node.appendChild("netsegment", mSegment->uuid);
   } else if (mSegment && mVia) {
-    // I *guess* we don't need to serialize the via since only one connection
-    // between a net segment any any other object can be missing(?).
+    // Same as for pads.
     node.appendChild("netsegment", mSegment->uuid);
   } else if (mSegment && mJunction) {
-    // Same as for vias.
+    // Same as for pads.
     node.appendChild("netsegment", mSegment->uuid);
   } else {
     throw LogicError(__FILE__, __LINE__, "Unknown airwire anchor type.");
@@ -276,8 +289,8 @@ DrcMsgEmptyNetSegment::DrcMsgEmptyNetSegment(const Data::Segment& ns) noexcept
                      tr("Empty segment of net '%1': '%2'",
                         "Placeholders: Net name, segment UUID")
                          .arg(netNameWithFallback(ns.netName), ns.uuid.toStr()),
-                     "There's a net segment in the board without any via or "
-                     "trace. This should not happen, please report it as a "
+                     "There's a net segment in the board without any pad, via "
+                     "or trace. This should not happen, please report it as a "
                      "bug. But no worries, this issue is not harmful at all "
                      "so you can safely ignore this message.",
                      "empty_netsegment", {}) {
@@ -499,6 +512,8 @@ QString DrcMsgCopperCopperClearanceViolation::Object::getName() const {
       name += ":" % mPad->libPkgPadName;
     }
     name += "'";
+  } else if (mPad && mSegment) {
+    name += tr("pad");
   } else if (mTrace) {
     name += tr("trace");
   } else if (mVia) {
@@ -522,6 +537,12 @@ void DrcMsgCopperCopperClearanceViolation::Object::serialize(
   if (mPad && mDevice) {
     node.ensureLineBreak();
     node.appendChild("device", mDevice->uuid);
+    node.ensureLineBreak();
+    node.appendChild("pad", mPad->uuid);
+    node.ensureLineBreak();
+  } else if (mPad && mSegment) {
+    node.ensureLineBreak();
+    node.appendChild("netsegment", mSegment->uuid);
     node.ensureLineBreak();
     node.appendChild("pad", mPad->uuid);
     node.ensureLineBreak();
@@ -619,6 +640,19 @@ QString DrcMsgCopperCopperClearanceViolation::getLayerName(
  ******************************************************************************/
 
 DrcMsgCopperBoardClearanceViolation::DrcMsgCopperBoardClearanceViolation(
+    const Data::Segment& segment, const Data::Pad& pad,
+    const UnsignedLength& minClearance, const QVector<Path>& locations) noexcept
+  : RuleCheckMessage(Severity::Error, determineMessage(pad, minClearance),
+                     determineDescription(pad),
+                     "copper_board_clearance_violation", locations) {
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("netsegment", segment.uuid);
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("pad", pad.uuid);
+  mApproval->ensureLineBreak();
+}
+
+DrcMsgCopperBoardClearanceViolation::DrcMsgCopperBoardClearanceViolation(
     const Data::Segment& segment, const Data::Via& via,
     const UnsignedLength& minClearance, const QVector<Path>& locations) noexcept
   : RuleCheckMessage(Severity::Error,
@@ -665,18 +699,9 @@ DrcMsgCopperBoardClearanceViolation::DrcMsgCopperBoardClearanceViolation(
     const BoardDesignRuleCheckData::Device& device,
     const BoardDesignRuleCheckData::Pad& pad,
     const UnsignedLength& minClearance, const QVector<Path>& locations) noexcept
-  : RuleCheckMessage(
-        Severity::Error,
-        tr("Clearance pad ↔ board outline < %1 %2",
-           "Placeholders: Clearance value, unit")
-            .arg(minClearance->toMmString(), "mm"),
-        tr("The clearance between a footprint pad and the board outline is "
-           "smaller than the board outline clearance configured in the DRC "
-           "settings.") %
-            " " % seriousTroublesTr() % "\n\n" %
-            tr("Check the DRC settings and move the device away from the board "
-               "outline if needed."),
-        "copper_board_clearance_violation", locations) {
+  : RuleCheckMessage(Severity::Error, determineMessage(pad, minClearance),
+                     determineDescription(pad),
+                     "copper_board_clearance_violation", locations) {
   mApproval->ensureLineBreak();
   mApproval->appendChild("device", device.uuid);
   mApproval->ensureLineBreak();
@@ -774,6 +799,25 @@ DrcMsgCopperBoardClearanceViolation::DrcMsgCopperBoardClearanceViolation(
   mApproval->ensureLineBreak();
 }
 
+QString DrcMsgCopperBoardClearanceViolation::determineMessage(
+    const Data::Pad& pad, const UnsignedLength& minClearance) noexcept {
+  Q_UNUSED(pad);
+  return tr("Clearance pad ↔ board outline < %1 %2",
+            "Placeholders: Clearance value, unit")
+      .arg(minClearance->toMmString(), "mm");
+}
+
+QString DrcMsgCopperBoardClearanceViolation::determineDescription(
+    const Data::Pad& pad) noexcept {
+  Q_UNUSED(pad);
+  return tr("The clearance between a pad and the board outline is "
+            "smaller than the board outline clearance configured "
+            "in the DRC settings.") %
+      " " % seriousTroublesTr() % "\n\n" %
+      tr("Check the DRC settings and move the pad away from "
+         "the board outline if needed.");
+}
+
 /*******************************************************************************
  *  DrcMsgCopperHoleClearanceViolation
  ******************************************************************************/
@@ -812,11 +856,24 @@ DrcMsgCopperInKeepoutZone::DrcMsgCopperInKeepoutZone(
     const BoardDesignRuleCheckData::Pad& pad,
     const QVector<Path>& locations) noexcept
   : RuleCheckMessage(
-        Severity::Error,
-        tr("Pad in copper keepout zone: '%1'", "Placeholder is pad name")
-            .arg(pad.libPkgPadName),
-        getDescription(), "copper_in_keepout_zone", locations) {
+        Severity::Error, determineMessage(pad, device.cmpInstanceName),
+        determineDescription(), "copper_in_keepout_zone", locations) {
   mApproval->appendChild("device", device.uuid);
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("pad", pad.uuid);
+  mApproval->ensureLineBreak();
+  addZoneApprovalNodes(zone, zoneDevice);
+  mApproval->ensureLineBreak();
+}
+
+DrcMsgCopperInKeepoutZone::DrcMsgCopperInKeepoutZone(
+    const Data::Zone& zone, const BoardDesignRuleCheckData::Device* zoneDevice,
+    const Data::Segment& ns, const Data::Pad& pad,
+    const QVector<Path>& locations) noexcept
+  : RuleCheckMessage(Severity::Error, determineMessage(pad, QString()),
+                     determineDescription(), "copper_in_keepout_zone",
+                     locations) {
+  mApproval->appendChild("netsegment", ns.uuid);
   mApproval->ensureLineBreak();
   mApproval->appendChild("pad", pad.uuid);
   mApproval->ensureLineBreak();
@@ -832,7 +889,7 @@ DrcMsgCopperInKeepoutZone::DrcMsgCopperInKeepoutZone(
         Severity::Error,
         tr("Via in copper keepout zone: '%1'", "Placeholder is net name")
             .arg(netNameWithFallback(ns.netName)),
-        getDescription(), "copper_in_keepout_zone", locations) {
+        determineDescription(), "copper_in_keepout_zone", locations) {
   mApproval->appendChild("netsegment", ns.uuid);
   mApproval->ensureLineBreak();
   mApproval->appendChild("via", via.uuid);
@@ -849,7 +906,7 @@ DrcMsgCopperInKeepoutZone::DrcMsgCopperInKeepoutZone(
         Severity::Error,
         tr("Trace in copper keepout zone: '%1'", "Placeholder is net name")
             .arg(netNameWithFallback(ns.netName)),
-        getDescription(), "copper_in_keepout_zone", locations) {
+        determineDescription(), "copper_in_keepout_zone", locations) {
   mApproval->appendChild("netsegment", ns.uuid);
   mApproval->ensureLineBreak();
   mApproval->appendChild("trace", trace.uuid);
@@ -862,7 +919,8 @@ DrcMsgCopperInKeepoutZone::DrcMsgCopperInKeepoutZone(
     const Data::Zone& zone, const BoardDesignRuleCheckData::Device* zoneDevice,
     const Data::Polygon& polygon, const QVector<Path>& locations) noexcept
   : RuleCheckMessage(Severity::Error, tr("Polygon in copper keepout zone"),
-                     getDescription(), "copper_in_keepout_zone", locations) {
+                     determineDescription(), "copper_in_keepout_zone",
+                     locations) {
   mApproval->appendChild("polygon", polygon.uuid);
   mApproval->ensureLineBreak();
   addZoneApprovalNodes(zone, zoneDevice);
@@ -877,7 +935,7 @@ DrcMsgCopperInKeepoutZone::DrcMsgCopperInKeepoutZone(
         Severity::Error,
         tr("Polygon in copper keepout zone: '%1'", "Placeholder is device name")
             .arg(device.cmpInstanceName),
-        getDescription(), "copper_in_keepout_zone", locations) {
+        determineDescription(), "copper_in_keepout_zone", locations) {
   mApproval->appendChild("device", device.uuid);
   mApproval->ensureLineBreak();
   mApproval->appendChild("polygon", polygon.uuid);
@@ -894,7 +952,7 @@ DrcMsgCopperInKeepoutZone::DrcMsgCopperInKeepoutZone(
         Severity::Error,
         tr("Circle in copper keepout zone: '%1'", "Placeholder is device name")
             .arg(device.cmpInstanceName),
-        getDescription(), "copper_in_keepout_zone", locations) {
+        determineDescription(), "copper_in_keepout_zone", locations) {
   mApproval->appendChild("device", device.uuid);
   mApproval->ensureLineBreak();
   mApproval->appendChild("circle", circle.uuid);
@@ -914,7 +972,21 @@ void DrcMsgCopperInKeepoutZone::addZoneApprovalNodes(
   }
 }
 
-QString DrcMsgCopperInKeepoutZone::getDescription() noexcept {
+QString DrcMsgCopperInKeepoutZone::determineMessage(
+    const Data::Pad& pad, const QString& cmpInstName) noexcept {
+  QString name;
+  if (!cmpInstName.isEmpty()) {
+    name = cmpInstName % ":" % pad.libPkgPadName;
+  }
+  if (name.isEmpty()) {
+    name = netNameWithFallback(pad.netName);
+  }
+  return tr("Pad in copper keepout zone: '%1'",
+            "Placeholder is pad- or net name")
+      .arg(name);
+}
+
+QString DrcMsgCopperInKeepoutZone::determineDescription() noexcept {
   return tr("There is a copper object within a copper keepout zone.") % "\n\n" %
       tr("Move the object to outside the keepout zone.");
 }
@@ -1030,7 +1102,7 @@ DrcMsgOverlappingDevices::DrcMsgOverlappingDevices(
 }
 
 /*******************************************************************************
- *  DrcMsgExposureInKeepoutZone
+ *  DrcMsgDeviceInKeepoutZone
  ******************************************************************************/
 
 DrcMsgDeviceInKeepoutZone::DrcMsgDeviceInKeepoutZone(
@@ -1041,7 +1113,7 @@ DrcMsgDeviceInKeepoutZone::DrcMsgDeviceInKeepoutZone(
         Severity::Error,
         tr("Device in keepout zone: '%1'", "Placeholder is device name")
             .arg(device.cmpInstanceName),
-        getDescription(), "device_in_keepout_zone", locations) {
+        determineDescription(), "device_in_keepout_zone", locations) {
   mApproval->appendChild("device", device.uuid);
   mApproval->ensureLineBreak();
   addZoneApprovalNodes(zone, zoneDevice);
@@ -1059,7 +1131,7 @@ void DrcMsgDeviceInKeepoutZone::addZoneApprovalNodes(
   }
 }
 
-QString DrcMsgDeviceInKeepoutZone::getDescription() noexcept {
+QString DrcMsgDeviceInKeepoutZone::determineDescription() noexcept {
   return tr("There is a device within a keepout zone.") % "\n\n" %
       tr("Move the device to outside the keepout zone.");
 }
@@ -1074,11 +1146,24 @@ DrcMsgExposureInKeepoutZone::DrcMsgExposureInKeepoutZone(
     const BoardDesignRuleCheckData::Pad& pad,
     const QVector<Path>& locations) noexcept
   : RuleCheckMessage(
-        Severity::Error,
-        tr("Pad in exposure keepout zone: '%1'", "Placeholder is pad name")
-            .arg(pad.libPkgPadName),
-        getDescription(), "exposure_in_keepout_zone", locations) {
+        Severity::Error, determineMessage(pad, device.cmpInstanceName),
+        determineDescription(), "exposure_in_keepout_zone", locations) {
   mApproval->appendChild("device", device.uuid);
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("pad", pad.uuid);
+  mApproval->ensureLineBreak();
+  addZoneApprovalNodes(zone, zoneDevice);
+  mApproval->ensureLineBreak();
+}
+
+DrcMsgExposureInKeepoutZone::DrcMsgExposureInKeepoutZone(
+    const Data::Zone& zone, const BoardDesignRuleCheckData::Device* zoneDevice,
+    const Data::Segment& ns, const Data::Pad& pad,
+    const QVector<Path>& locations) noexcept
+  : RuleCheckMessage(Severity::Error, determineMessage(pad, QString()),
+                     determineDescription(), "exposure_in_keepout_zone",
+                     locations) {
+  mApproval->appendChild("netsegment", ns.uuid);
   mApproval->ensureLineBreak();
   mApproval->appendChild("pad", pad.uuid);
   mApproval->ensureLineBreak();
@@ -1094,7 +1179,7 @@ DrcMsgExposureInKeepoutZone::DrcMsgExposureInKeepoutZone(
         Severity::Error,
         tr("Via in exposure keepout zone: '%1'", "Placeholder is net name")
             .arg(netNameWithFallback(ns.netName)),
-        getDescription(), "exposure_in_keepout_zone", locations) {
+        determineDescription(), "exposure_in_keepout_zone", locations) {
   mApproval->appendChild("netsegment", ns.uuid);
   mApproval->ensureLineBreak();
   mApproval->appendChild("via", via.uuid);
@@ -1107,7 +1192,8 @@ DrcMsgExposureInKeepoutZone::DrcMsgExposureInKeepoutZone(
     const Data::Zone& zone, const BoardDesignRuleCheckData::Device* zoneDevice,
     const Data::Polygon& polygon, const QVector<Path>& locations) noexcept
   : RuleCheckMessage(Severity::Error, tr("Polygon in exposure keepout zone"),
-                     getDescription(), "exposure_in_keepout_zone", locations) {
+                     determineDescription(), "exposure_in_keepout_zone",
+                     locations) {
   mApproval->appendChild("polygon", polygon.uuid);
   mApproval->ensureLineBreak();
   addZoneApprovalNodes(zone, zoneDevice);
@@ -1122,7 +1208,8 @@ DrcMsgExposureInKeepoutZone::DrcMsgExposureInKeepoutZone(
                      tr("Polygon in exposure keepout zone: '%1'",
                         "Placeholder is device name")
                          .arg(device.cmpInstanceName),
-                     getDescription(), "exposure_in_keepout_zone", locations) {
+                     determineDescription(), "exposure_in_keepout_zone",
+                     locations) {
   mApproval->appendChild("device", device.uuid);
   mApproval->ensureLineBreak();
   mApproval->appendChild("polygon", polygon.uuid);
@@ -1139,7 +1226,8 @@ DrcMsgExposureInKeepoutZone::DrcMsgExposureInKeepoutZone(
                      tr("Circle in exposure keepout zone: '%1'",
                         "Placeholder is device name")
                          .arg(device.cmpInstanceName),
-                     getDescription(), "exposure_in_keepout_zone", locations) {
+                     determineDescription(), "exposure_in_keepout_zone",
+                     locations) {
   mApproval->appendChild("device", device.uuid);
   mApproval->ensureLineBreak();
   mApproval->appendChild("circle", circle.uuid);
@@ -1159,7 +1247,21 @@ void DrcMsgExposureInKeepoutZone::addZoneApprovalNodes(
   }
 }
 
-QString DrcMsgExposureInKeepoutZone::getDescription() noexcept {
+QString DrcMsgExposureInKeepoutZone::determineMessage(
+    const Data::Pad& pad, const QString& cmpInstName) noexcept {
+  QString name;
+  if (!cmpInstName.isEmpty()) {
+    name = cmpInstName % ":" % pad.libPkgPadName;
+  }
+  if (name.isEmpty()) {
+    name = netNameWithFallback(pad.netName);
+  }
+  return tr("Pad in exposure keepout zone: '%1'",
+            "Placeholder is pad- or net name")
+      .arg(name);
+}
+
+QString DrcMsgExposureInKeepoutZone::determineDescription() noexcept {
   return tr("There is a solder resist opening within an exposure keepout "
             "zone.") %
       "\n\n" % tr("Move the object to outside the keepout zone.");
@@ -1193,27 +1295,60 @@ DrcMsgMinimumAnnularRingViolation::DrcMsgMinimumAnnularRingViolation(
 }
 
 DrcMsgMinimumAnnularRingViolation::DrcMsgMinimumAnnularRingViolation(
+    const Data::Segment& ns, const Data::Pad& pad,
+    const UnsignedLength& minAnnularWidth,
+    const QVector<Path>& locations) noexcept
+  : RuleCheckMessage(Severity::Error,
+                     determineMessage(pad, minAnnularWidth, QString()),
+                     determineDescription(pad),
+                     "minimum_annular_ring_violation", locations) {
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("netsegment", ns.uuid);
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("pad", pad.uuid);
+  mApproval->ensureLineBreak();
+}
+
+DrcMsgMinimumAnnularRingViolation::DrcMsgMinimumAnnularRingViolation(
     const BoardDesignRuleCheckData::Device& device,
     const BoardDesignRuleCheckData::Pad& pad,
     const UnsignedLength& minAnnularWidth,
     const QVector<Path>& locations) noexcept
   : RuleCheckMessage(
         Severity::Error,
-        tr("Pad annular ring of '%1' < %2 %3",
-           "Placeholders: Net name, minimum annular width, unit")
-            .arg(device.cmpInstanceName + "::" + pad.libPkgPadName,
-                 minAnnularWidth->toMmString(), "mm"),
-        tr("The through-hole pad annular ring width (i.e. the copper around "
-           "the hole) is smaller than the minimum annular width configured in "
-           "the DRC settings.") %
-            " " % seriousTroublesTr() % "\n\n" %
-            tr("Check the DRC settings and increase the pad size if needed."),
-        "minimum_annular_ring_violation", locations) {
+        determineMessage(pad, minAnnularWidth, device.cmpInstanceName),
+        determineDescription(pad), "minimum_annular_ring_violation",
+        locations) {
   mApproval->ensureLineBreak();
   mApproval->appendChild("device", device.uuid);
   mApproval->ensureLineBreak();
   mApproval->appendChild("pad", pad.uuid);
   mApproval->ensureLineBreak();
+}
+
+QString DrcMsgMinimumAnnularRingViolation::determineMessage(
+    const Data::Pad& pad, const UnsignedLength& minAnnularWidth,
+    const QString& cmpInstName) noexcept {
+  QString name;
+  if (!cmpInstName.isEmpty()) {
+    name = cmpInstName + ":" + pad.libPkgPadName;
+  }
+  if (name.isEmpty()) {
+    name = netNameWithFallback(pad.netName);
+  }
+  return tr("Pad annular ring of '%1' < %2 %3",
+            "Placeholders: Pad- or net name, minimum annular width, unit")
+      .arg(name, minAnnularWidth->toMmString(), "mm");
+}
+
+QString DrcMsgMinimumAnnularRingViolation::determineDescription(
+    const Data::Pad& pad) noexcept {
+  Q_UNUSED(pad);
+  return tr("The through-hole pad annular ring width (i.e. the copper around "
+            "the hole) is smaller than the minimum annular width configured in "
+            "the DRC settings.") %
+      " " % seriousTroublesTr() % "\n\n" %
+      tr("Check the DRC settings and increase the pad size if needed.");
 }
 
 /*******************************************************************************
@@ -1328,20 +1463,50 @@ DrcMsgInvalidPadConnection::DrcMsgInvalidPadConnection(
     const BoardDesignRuleCheckData::Pad& pad, const Layer& layer,
     const QVector<Path>& locations) noexcept
   : RuleCheckMessage(
-        Severity::Error,
-        tr("Invalid connection of pad '%1' on '%2'",
-           "Placeholders: Pad name, layer name")
-            .arg(pad.libPkgPadName),
-        tr("The pad origin must be located within the pads copper area, "
-           "or for THT pads within a hole. Otherwise traces might not be"
-           "connected fully. This issue needs to be fixed in the library."),
-        "invalid_pad_connection", locations) {
+        Severity::Error, determineMessage(pad, device.cmpInstanceName),
+        determineDescription(), "invalid_pad_connection", locations) {
   mApproval->appendChild("layer", layer);
   mApproval->ensureLineBreak();
   mApproval->appendChild("device", device.uuid);
   mApproval->ensureLineBreak();
   mApproval->appendChild("pad", pad.uuid);
   mApproval->ensureLineBreak();
+}
+
+DrcMsgInvalidPadConnection::DrcMsgInvalidPadConnection(
+    const BoardDesignRuleCheckData::Segment& ns,
+    const BoardDesignRuleCheckData::Pad& pad, const Layer& layer,
+    const QVector<Path>& locations) noexcept
+  : RuleCheckMessage(Severity::Error, determineMessage(pad, QString()),
+                     determineDescription(), "invalid_pad_connection",
+                     locations) {
+  mApproval->appendChild("layer", layer);
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("netsegment", ns.uuid);
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("pad", pad.uuid);
+  mApproval->ensureLineBreak();
+}
+
+QString DrcMsgInvalidPadConnection::determineMessage(
+    const Data::Pad& pad, const QString& cmpInstName) noexcept {
+  QString name;
+  if (!cmpInstName.isEmpty()) {
+    name = cmpInstName % ":" % pad.libPkgPadName;
+  }
+  if (name.isEmpty()) {
+    name = netNameWithFallback(pad.netName);
+  }
+  return tr("Invalid connection of pad '%1' on '%2'",
+            "Placeholders: Pad- or net name, layer name")
+      .arg(name);
+}
+
+QString DrcMsgInvalidPadConnection::determineDescription() noexcept {
+  return tr(
+      "The pad origin must be located within the pads copper area, "
+      "or for THT pads within a hole. Otherwise traces might not be"
+      "connected fully. This issue needs to be fixed in the library.");
 }
 
 /*******************************************************************************
@@ -1365,6 +1530,23 @@ DrcMsgForbiddenSlot::DrcMsgForbiddenSlot(
     mApproval->appendChild("pad", pad->uuid);
     mApproval->ensureLineBreak();
   }
+  mApproval->appendChild("hole", hole.uuid);
+  mApproval->ensureLineBreak();
+}
+
+DrcMsgForbiddenSlot::DrcMsgForbiddenSlot(
+    const BoardDesignRuleCheckData::Hole& hole,
+    const BoardDesignRuleCheckData::Segment& ns,
+    const BoardDesignRuleCheckData::Pad& pad,
+    const QVector<Path>& locations) noexcept
+  : RuleCheckMessage(Severity::Warning, determineMessage(hole.path),
+                     determineDescription(hole.path), "forbidden_slot",
+                     locations) {
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("netsegment", ns.uuid);
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("pad", pad.uuid);
+  mApproval->ensureLineBreak();
   mApproval->appendChild("hole", hole.uuid);
   mApproval->ensureLineBreak();
 }

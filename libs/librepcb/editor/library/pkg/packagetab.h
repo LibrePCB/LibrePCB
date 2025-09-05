@@ -174,7 +174,7 @@ signals:
   void hAlignRequested(const HAlign& align);
   void vAlignRequested(const VAlign& align);
   void packagePadRequested(const std::optional<Uuid>& pad);
-  void componentSideRequested(FootprintPad::ComponentSide side);
+  void componentSideRequested(Pad::ComponentSide side);
   void shapeRequested(const ui::PadShape shape);
   void pressFitRequested(bool pressFit);
   void zoneLayerRequested(Zone::Layer layer, bool enable);
@@ -280,7 +280,7 @@ private:
   QVector<std::optional<Uuid>> mToolPackagePadsQt;
   std::shared_ptr<slint::VectorModel<slint::SharedString>> mToolPackagePads;
   std::optional<Uuid> mToolPackagePad;
-  FootprintPad::ComponentSide mToolComponentSide;
+  Pad::ComponentSide mToolComponentSide;
   ui::PadShape mToolShape;
   bool mToolFiducial;
   bool mToolPressFit;

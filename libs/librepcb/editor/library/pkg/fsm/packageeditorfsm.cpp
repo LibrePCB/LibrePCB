@@ -58,35 +58,35 @@ PackageEditorFsm::PackageEditorFsm(const Context& context) noexcept
   mStates.insert(State::ADD_THT_PADS,
                  new PackageEditorState_AddPads(
                      mContext, PackageEditorState_AddPads::PadType::THT,
-                     FootprintPad::Function::StandardPad));
+                     Pad::Function::StandardPad));
   mStates.insert(State::ADD_SMT_PADS_STANDARD,
                  new PackageEditorState_AddPads(
                      mContext, PackageEditorState_AddPads::PadType::SMT,
-                     FootprintPad::Function::StandardPad));
+                     Pad::Function::StandardPad));
   mStates.insert(State::ADD_SMT_PADS_THERMAL,
                  new PackageEditorState_AddPads(
                      mContext, PackageEditorState_AddPads::PadType::SMT,
-                     FootprintPad::Function::ThermalPad));
+                     Pad::Function::ThermalPad));
   mStates.insert(State::ADD_SMT_PADS_BGA,
                  new PackageEditorState_AddPads(
                      mContext, PackageEditorState_AddPads::PadType::SMT,
-                     FootprintPad::Function::BgaPad));
+                     Pad::Function::BgaPad));
   mStates.insert(State::ADD_SMT_PADS_EDGE_CONNECTOR,
                  new PackageEditorState_AddPads(
                      mContext, PackageEditorState_AddPads::PadType::SMT,
-                     FootprintPad::Function::EdgeConnectorPad));
+                     Pad::Function::EdgeConnectorPad));
   mStates.insert(State::ADD_SMT_PADS_TEST,
                  new PackageEditorState_AddPads(
                      mContext, PackageEditorState_AddPads::PadType::SMT,
-                     FootprintPad::Function::TestPad));
+                     Pad::Function::TestPad));
   mStates.insert(State::ADD_SMT_PADS_LOCAL_FIDUCIAL,
                  new PackageEditorState_AddPads(
                      mContext, PackageEditorState_AddPads::PadType::SMT,
-                     FootprintPad::Function::LocalFiducial));
+                     Pad::Function::LocalFiducial));
   mStates.insert(State::ADD_SMT_PADS_GLOBAL_FIDUCIAL,
                  new PackageEditorState_AddPads(
                      mContext, PackageEditorState_AddPads::PadType::SMT,
-                     FootprintPad::Function::GlobalFiducial));
+                     Pad::Function::GlobalFiducial));
   mStates.insert(State::ADD_NAMES, new PackageEditorState_AddNames(mContext));
   mStates.insert(State::ADD_VALUES, new PackageEditorState_AddValues(mContext));
   mStates.insert(State::DRAW_LINE, new PackageEditorState_DrawLine(mContext));
@@ -369,19 +369,19 @@ bool PackageEditorFsm::processStartAddingFootprintThtPads() noexcept {
 }
 
 bool PackageEditorFsm::processStartAddingFootprintSmtPads(
-    FootprintPad::Function function) noexcept {
+    Pad::Function function) noexcept {
   switch (function) {
-    case FootprintPad::Function::ThermalPad:
+    case Pad::Function::ThermalPad:
       return setNextState(State::ADD_SMT_PADS_THERMAL);
-    case FootprintPad::Function::BgaPad:
+    case Pad::Function::BgaPad:
       return setNextState(State::ADD_SMT_PADS_BGA);
-    case FootprintPad::Function::EdgeConnectorPad:
+    case Pad::Function::EdgeConnectorPad:
       return setNextState(State::ADD_SMT_PADS_EDGE_CONNECTOR);
-    case FootprintPad::Function::TestPad:
+    case Pad::Function::TestPad:
       return setNextState(State::ADD_SMT_PADS_TEST);
-    case FootprintPad::Function::LocalFiducial:
+    case Pad::Function::LocalFiducial:
       return setNextState(State::ADD_SMT_PADS_LOCAL_FIDUCIAL);
-    case FootprintPad::Function::GlobalFiducial:
+    case Pad::Function::GlobalFiducial:
       return setNextState(State::ADD_SMT_PADS_GLOBAL_FIDUCIAL);
     default:
       return setNextState(State::ADD_SMT_PADS_STANDARD);

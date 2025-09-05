@@ -76,11 +76,12 @@ void D356NetlistGenerator::smtPad(const QString& netName,
                                   const PositiveLength& width,
                                   const PositiveLength& height,
                                   const Angle& rotation, int layer) {
-  mRecords.append(Record{
-      OperationCode::SurfaceMount, netName, checkedComponentName(cmpName),
-      padName, false, std::nullopt, layer, position, width, height, rotation,
-      (layer == 1) ? SolderMask::SecondarySide : SolderMask::PrimarySide,
-      std::nullopt, std::nullopt});
+  mRecords.append(
+      Record{OperationCode::SurfaceMount, netName,
+             checkedComponentName(cmpName), checkedPadName(padName), false,
+             std::nullopt, layer, position, width, height, rotation,
+             (layer == 1) ? SolderMask::SecondarySide : SolderMask::PrimarySide,
+             std::nullopt, std::nullopt});
 }
 
 void D356NetlistGenerator::thtPad(const QString& netName,
@@ -90,10 +91,11 @@ void D356NetlistGenerator::thtPad(const QString& netName,
                                   const PositiveLength& height,
                                   const Angle& rotation,
                                   const PositiveLength& drillDiameter) {
-  mRecords.append(Record{
-      OperationCode::ThroughHole, netName, checkedComponentName(cmpName),
-      padName, false, std::make_pair(drillDiameter, true), 0, position, width,
-      height, rotation, SolderMask::None, std::nullopt, std::nullopt});
+  mRecords.append(Record{OperationCode::ThroughHole, netName,
+                         checkedComponentName(cmpName), checkedPadName(padName),
+                         false, std::make_pair(drillDiameter, true), 0,
+                         position, width, height, rotation, SolderMask::None,
+                         std::nullopt, std::nullopt});
 }
 
 void D356NetlistGenerator::throughVia(
@@ -261,8 +263,24 @@ QString D356NetlistGenerator::checkedComponentName(
     const QString& name) noexcept {
   if (name.toLower() == "via") {
     return name % "_";
-  } else {
+  } else if (name.toLower() == "noref") {
+    return name % "_";
+  } else if (!name.isEmpty()) {
     return name;
+  } else {
+    // The spec is not clear about what to export for records not related to
+    // a component, but in their examples there are a lot of "NOREF".
+    return "NOREF";
+  }
+}
+
+QString D356NetlistGenerator::checkedPadName(const QString& name) noexcept {
+  if (!name.isEmpty()) {
+    return name;
+  } else {
+    // The spec is not clear about what to export for records not related to
+    // a component, but in their examples there are a lot of "NPAD".
+    return "NPAD";
   }
 }
 

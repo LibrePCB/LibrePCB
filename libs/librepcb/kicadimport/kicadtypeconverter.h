@@ -80,7 +80,7 @@ public:
     UnsignedLength width;
     QVector<Path> paths;
   };
-  struct Pad {
+  struct PadReplacements {
     std::shared_ptr<FootprintPad> fptPad;
     std::shared_ptr<Hole> hole;
     QList<std::shared_ptr<Polygon>> polygons;
@@ -141,9 +141,11 @@ public:
       const KiCadFootprintText& t);
   static std::shared_ptr<StrokeText> convertFootprintPropertyToText(
       const KiCadProperty& p);
-  static Pad convertPad(const KiCadFootprintPad& p, qreal fptSolderMaskMargin,
-                        qreal fptSolderPasteMargin, qreal fptSolderPasteRatio,
-                        qreal fptClearance, MessageLogger& log);
+  static PadReplacements convertPad(const KiCadFootprintPad& p,
+                                    qreal fptSolderMaskMargin,
+                                    qreal fptSolderPasteMargin,
+                                    qreal fptSolderPasteRatio,
+                                    qreal fptClearance, MessageLogger& log);
   static std::optional<KiCadProperty> findProperty(
       const QList<KiCadProperty>& props, const QString& key);
 

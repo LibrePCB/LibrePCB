@@ -31,7 +31,8 @@
 #include "../projectattributelookup.h"
 #include "board.h"
 #include "items/bi_device.h"
-#include "items/bi_footprintpad.h"
+#include "items/bi_netsegment.h"
+#include "items/bi_pad.h"
 
 #include <QtCore>
 
@@ -70,6 +71,7 @@ std::shared_ptr<PickPlaceData> BoardPickPlaceGenerator::generate() noexcept {
       *mBoard.getName());
   const QStringList& locale = mBoard.getProject().getLocaleOrder();
 
+  QSet<QString> exportedDesignators;
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
     auto part = device->getParts(mAssemblyVariant).value(0);
     ProjectAttributeLookup lookup(*device, part);
@@ -82,8 +84,8 @@ std::shared_ptr<PickPlaceData> BoardPickPlaceGenerator::generate() noexcept {
     const QString pkgName = *device->getLibPackage().getNames().value(locale);
 
     // Determine fiducials to be exported.
-    foreach (const BI_FootprintPad* pad, device->getPads()) {
-      if (pad->getLibPad().getFunctionIsFiducial()) {
+    foreach (const BI_Pad* pad, device->getPads()) {
+      if (pad->getProperties().getFunctionIsFiducial()) {
         QVector<PickPlaceDataItem::BoardSide> sides;
         if (pad->isOnLayer(Layer::topCopper())) {
           sides.append(PickPlaceDataItem::BoardSide::Top);
@@ -122,10 +124,42 @@ std::shared_ptr<PickPlaceData> BoardPickPlaceGenerator::generate() noexcept {
     items.append(PickPlaceDataItem(designator, value, devName, pkgName,
                                    position, rotation, boardSide, assemblyType,
                                    part ? true : false));
+    exportedDesignators.insert(designator);
 
     // Add all items.
     for (const PickPlaceDataItem& item : items) {
       data->addItem(item);
+    }
+  }
+
+  // Export board-level fiducials.
+  int fiducialNumber = 0;
+  foreach (const BI_NetSegment* netSegment, mBoard.getNetSegments()) {
+    foreach (const BI_Pad* pad, netSegment->getPads()) {
+      if (pad->getProperties().getFunctionIsFiducial()) {
+        QVector<PickPlaceDataItem::BoardSide> sides;
+        if (pad->isOnLayer(Layer::topCopper())) {
+          sides.append(PickPlaceDataItem::BoardSide::Top);
+        }
+        if (pad->isOnLayer(Layer::botCopper())) {
+          sides.append(PickPlaceDataItem::BoardSide::Bottom);
+        }
+
+        // Determine a unique designator.
+        QString designator;
+        do {
+          ++fiducialNumber;
+          designator = QString("FID%1").arg(fiducialNumber);
+        } while (exportedDesignators.contains(designator));
+
+        const Angle rotation =
+            pad->getMirrored() ? -pad->getRotation() : pad->getRotation();
+        foreach (const auto side, sides) {
+          data->addItem(PickPlaceDataItem(
+              designator, QString(), QString(), QString(), pad->getPosition(),
+              rotation, side, PickPlaceDataItem::Type::Fiducial, true));
+        }
+      }
     }
   }
 

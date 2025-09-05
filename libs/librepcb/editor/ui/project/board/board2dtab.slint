@@ -1,4 +1,5 @@
 import { DrawTraceToolBar } from "drawtracetoolbar.slint";
+import { AddPadToolBar } from "addpadtoolbar.slint";
 import { AddViaToolBar } from "addviatoolbar.slint";
 import { DrawPolygonToolBar } from "drawpolygontoolbar.slint";
 import { AddStrokeTextToolBar } from "addstroketexttoolbar.slint";
@@ -9,6 +10,8 @@ import { Tab } from "../../tab.slint";
 import {
     Button,
     LinkText,
+    MenuItem,
+    MenuPopup,
     MessageBox,
     SceneButton,
     Spinner,
@@ -119,6 +122,25 @@ export component Board2dTab inherits Tab {
                 if tabs[index].tool == EditorTool.via: via-toolbar := AddViaToolBar {
                     section-index: section-index;
                     section: section;
+                }
+
+                if tabs[index].tool == EditorTool.pad-tht: pad-tht-toolbar := AddPadToolBar {
+                    section-index: section-index;
+                    section: section;
+                    show-side-selector: false;
+                    show-drill-edt: true;
+                    show-ratio-sw: root.width > 850px;
+                    show-pressfit-sw: root.width > 900px;
+                    fiducial-mode: tabs[index].tool-fiducial;
+                }
+
+                if tabs[index].tool == EditorTool.pad-smt: pad-smt-toolbar := AddPadToolBar {
+                    section-index: section-index;
+                    section: section;
+                    show-side-selector: true;
+                    show-drill-edt: false;
+                    show-pressfit-sw: false;
+                    fiducial-mode: tabs[index].tool-fiducial;
                 }
 
                 if tabs[index].tool == EditorTool.polygon: polygon-toolbar := DrawPolygonToolBar {
@@ -290,10 +312,101 @@ export component Board2dTab inherits Tab {
 
             tool-via-btn := ToolButton {
                 cmd: Cmd.tool-via;
-                checked: tabs[index].tool == EditorTool.via;
+                has-menu: true;
+                checked: (tabs[index].tool == EditorTool.via) || (tabs[index].tool == EditorTool.pad-tht) || (tabs[index].tool == EditorTool.pad-smt);
 
                 clicked => {
                     tool-triggered(TabAction.tool-via);
+                }
+
+                right-clicked => {
+                    pads-popup.show();
+                }
+
+                pads-popup := MenuPopup {
+                    x: parent.width + 5px;
+                    y: 0;
+
+                    tool-pad-tht-item := MenuItem {
+                        cmd: Cmd.tool-pad-tht;
+                        icon: @image-url("../../../../../../img/actions/add_tht_pad.png");
+                        icon-color: transparent;  // Do not colorize.
+
+                        clicked => {
+                            Backend.trigger-tab(section-index, index, TabAction.tool-pad-tht);
+                        }
+                    }
+
+                    tool-pad-smt-item := MenuItem {
+                        cmd: Cmd.tool-pad-smt;
+                        icon: @image-url("../../../../../../img/actions/add_smt_pad.png");
+                        icon-color: transparent;  // Do not colorize.
+
+                        clicked => {
+                            Backend.trigger-tab(section-index, index, TabAction.tool-pad-smt);
+                        }
+                    }
+
+                    tool-pad-thermal-item := MenuItem {
+                        cmd: Cmd.tool-pad-thermal;
+                        icon: @image-url("../../../../../../img/actions/add_smt_pad.png");
+                        icon-color: transparent;  // Do not colorize.
+
+                        clicked => {
+                            Backend.trigger-tab(section-index, index, TabAction.tool-pad-thermal);
+                        }
+                    }
+
+                    // BGA pads probably really make no sense in a board(?).
+                    // tool-pad-bga-item := MenuItem {
+                    //     cmd: Cmd.tool-pad-bga;
+                    //     icon: @image-url("../../../../../../img/actions/add_smt_pad.png");
+                    //     icon-color: transparent;  // Do not colorize.
+                    //
+                    //     clicked => {
+                    //         Backend.trigger-tab(section-index, index, TabAction.tool-pad-bga);
+                    //     }
+                    // }
+
+                    tool-pad-edge-connector-item := MenuItem {
+                        cmd: Cmd.tool-pad-edge-connector;
+                        icon: @image-url("../../../../../../img/actions/add_smt_pad.png");
+                        icon-color: transparent;  // Do not colorize.
+
+                        clicked => {
+                            Backend.trigger-tab(section-index, index, TabAction.tool-pad-edge-connector);
+                        }
+                    }
+
+                    tool-pad-test-point-item := MenuItem {
+                        cmd: Cmd.tool-pad-test-point;
+                        icon: @image-url("../../../../../../img/actions/add_smt_pad.png");
+                        icon-color: transparent;  // Do not colorize.
+
+                        clicked => {
+                            Backend.trigger-tab(section-index, index, TabAction.tool-pad-test-point);
+                        }
+                    }
+
+                    tool-pad-local-fiducial-item := MenuItem {
+                        cmd: Cmd.tool-pad-local-fiducial;
+                        icon: @image-url("../../../../../../img/actions/add_smt_pad.png");
+                        icon-color: transparent;  // Do not colorize.
+
+                        clicked => {
+                            Backend.trigger-tab(section-index, index, TabAction.tool-pad-local-fiducial);
+                        }
+                    }
+
+                    tool-pad-global-fiducial-item := MenuItem {
+                        cmd: Cmd.tool-pad-global-fiducial;
+                        icon: @image-url("../../../../../../img/actions/add_smt_pad.png");
+                        icon-color: transparent;  // Do not colorize.
+
+                        clicked => {
+                            Backend.trigger-tab(section-index, index, TabAction.tool-pad-global-fiducial);
+                        }
+                    }
                 }
             }
 

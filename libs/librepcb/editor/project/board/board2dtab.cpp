@@ -43,6 +43,7 @@
 #include "boardpickplacegeneratordialog.h"
 #include "fsm/boardeditorfsm.h"
 #include "fsm/boardeditorstate_addhole.h"
+#include "fsm/boardeditorstate_addpad.h"
 #include "fsm/boardeditorstate_addstroketext.h"
 #include "fsm/boardeditorstate_addvia.h"
 #include "fsm/boardeditorstate_drawplane.h"
@@ -159,6 +160,11 @@ Board2dTab::Board2dTab(GuiApplication& app, BoardEditor& editor,
     mToolMirrored(false),
     mToolValueSuggestions(
         std::make_shared<slint::VectorModel<slint::SharedString>>()),
+    mToolComponentSide(Pad::ComponentSide::Top),
+    mToolShape(ui::PadShape::Round),
+    mToolRatio(Ratio(0)),
+    mToolFiducial(false),
+    mToolPressFit(false),
     mToolZoneRules(),
     mUnplacedComponentIndex(0),
     mUnplacedComponentDeviceIndex(0),
@@ -383,6 +389,20 @@ ui::Board2dTabData Board2dTab::getDerivedUiData() const noexcept {
           slint::SharedString(),  // Placeholder
           mToolValueSuggestions,  // Suggestions
       },
+      mToolComponentSide == Pad::ComponentSide::Bottom,  // Tool bottom
+      mToolShape,  // Tool shape
+      ui::RatioEditData{
+          // Tool ratio
+          l2s(*mToolRatio),  // Ratio
+          l2s(Ratio::fromPercent(0)),  // Minimum
+          l2s(Ratio::fromPercent(100)),  // Maximum
+          (*mToolRatio) < Ratio::fromPercent(100),  // Can increase
+          (*mToolRatio) > Ratio::fromPercent(0),  // Can decrease
+          false,  // Increase
+          false,  // Decrease
+      },
+      mToolFiducial,  // Tool fiducial
+      mToolPressFit,  // Tool press fit
       mToolZoneRules.testFlag(Zone::Rule::NoCopper),  // Tool no copper
       mToolZoneRules.testFlag(Zone::Rule::NoPlanes),  // Tool no planes
       mToolZoneRules.testFlag(Zone::Rule::NoExposure),  // Tool no exposure
@@ -463,6 +483,31 @@ void Board2dTab::setDerivedUiData(const ui::Board2dTabData& data) noexcept {
 
   // Tool value
   emit valueRequested(EditorToolbox::toMultiLine(s2q(data.tool_value.text)));
+
+  // Tool component side
+  emit componentSideRequested(data.tool_bottom ? Pad::ComponentSide::Bottom
+                                               : Pad::ComponentSide::Top);
+
+  // Tool ratio (must be emiteed *before* the shape!)
+  if (data.tool_ratio.increase) {
+    emit ratioRequested(UnsignedLimitedRatio(std::min(
+        *mToolRatio + Ratio::fromPercent(1), Ratio::fromPercent(100))));
+  } else if (data.tool_ratio.decrease) {
+    emit ratioRequested(UnsignedLimitedRatio(
+        std::max(*mToolRatio - Ratio::fromPercent(1), Ratio::fromPercent(0))));
+  } else {
+    const Ratio ratio = s2ratio(data.tool_ratio.value);
+    if ((ratio >= Ratio::fromPercent(0)) &&
+        (ratio <= Ratio::fromPercent(100))) {
+      emit ratioRequested(UnsignedLimitedRatio(ratio));
+    }
+  }
+
+  // Tool shape
+  emit shapeRequested(data.tool_shape);
+
+  // Tool press-fit
+  emit pressFitRequested(data.tool_pressfit);
 
   // Tool zone rules
   emit zoneRuleRequested(Zone::Rule::NoCopper, data.tool_no_copper);
@@ -823,6 +868,38 @@ void Board2dTab::trigger(ui::TabAction a) noexcept {
     }
     case ui::TabAction::ToolVia: {
       mFsm->processAddVia();
+      break;
+    }
+    case ui::TabAction::ToolPadTht: {
+      mFsm->processAddThtPad();
+      break;
+    }
+    case ui::TabAction::ToolPadSmt: {
+      mFsm->processAddSmtPad(Pad::Function::StandardPad);
+      break;
+    }
+    case ui::TabAction::ToolPadThermal: {
+      mFsm->processAddSmtPad(Pad::Function::ThermalPad);
+      break;
+    }
+    case ui::TabAction::ToolPadBga: {
+      mFsm->processAddSmtPad(Pad::Function::BgaPad);
+      break;
+    }
+    case ui::TabAction::ToolPadEdgeConnector: {
+      mFsm->processAddSmtPad(Pad::Function::EdgeConnectorPad);
+      break;
+    }
+    case ui::TabAction::ToolPadTestPoint: {
+      mFsm->processAddSmtPad(Pad::Function::TestPad);
+      break;
+    }
+    case ui::TabAction::ToolPadLocalFiducial: {
+      mFsm->processAddSmtPad(Pad::Function::LocalFiducial);
+      break;
+    }
+    case ui::TabAction::ToolPadGlobalFiducial: {
+      mFsm->processAddSmtPad(Pad::Function::GlobalFiducial);
       break;
     }
     case ui::TabAction::ToolPolygon: {
@@ -1191,6 +1268,187 @@ void Board2dTab::fsmToolEnter(BoardEditorState_AddVia& state) noexcept {
       connect(&state, &BoardEditorState_AddVia::netChanged, this, setNet));
   mFsmStateConnections.append(connect(this, &Board2dTab::netRequested, &state,
                                       &BoardEditorState_AddVia::setNet));
+
+  onDerivedUiDataChanged.notify();
+}
+
+void Board2dTab::fsmToolEnter(BoardEditorState_AddPad& state) noexcept {
+  mTool = state.getType() == BoardEditorState_AddPad::PadType::THT
+      ? ui::EditorTool::PadTht
+      : ui::EditorTool::PadSmt;
+
+  // Nets
+  mToolNetsQt.clear();
+  mToolNets->clear();
+  mToolNetsQt.append(std::make_pair(false, std::nullopt));
+  mToolNets->push_back(q2s("[" % tr("None") % "]"));
+  for (const auto& item : state.getAvailableNets()) {
+    mToolNetsQt.append(std::make_pair(false, item.first));
+    mToolNets->push_back(q2s(item.second));
+  }
+
+  // Net
+  auto setNet = [this](const std::optional<Uuid>& net) {
+    mToolNet = std::make_pair(false, net);
+    onDerivedUiDataChanged.notify();
+  };
+  setNet(state.getNet());
+  mFsmStateConnections.append(
+      connect(&state, &BoardEditorState_AddPad::netChanged, this, setNet));
+  mFsmStateConnections.append(
+      connect(this, &Board2dTab::netRequested, &state,
+              [&state](bool autoNet, const std::optional<Uuid>& net) {
+                Q_UNUSED(autoNet);
+                state.setNet(net);
+              }));
+
+  // Component side
+  if (state.getType() == BoardEditorState_AddPad::PadType::SMT) {
+    auto setComponentSide = [this](Pad::ComponentSide side) {
+      mToolComponentSide = side;
+      onDerivedUiDataChanged.notify();
+    };
+    setComponentSide(state.getComponentSide());
+    mFsmStateConnections.append(
+        connect(&state, &BoardEditorState_AddPad::componentSideChanged, this,
+                setComponentSide));
+    mFsmStateConnections.append(
+        connect(this, &Board2dTab::componentSideRequested, &state,
+                &BoardEditorState_AddPad::setComponentSide));
+  }
+
+  // Shape
+  auto getCurrentShape = [](BoardEditorState_AddPad& s) {
+    if (s.getShape() == Pad::Shape::RoundedOctagon) {
+      return ui::PadShape::Octagon;
+    } else if (s.getShape() == Pad::Shape::Custom) {
+      return ui::PadShape::Octagon;  // Not currect but should never be the
+                                     // case.
+    } else if (*s.getRadius() == Ratio::fromPercent(0)) {
+      return ui::PadShape::Rect;
+    } else if (*s.getRadius() == Ratio::fromPercent(100)) {
+      return ui::PadShape::Round;
+    } else {
+      return ui::PadShape::RoundedRect;
+    }
+  };
+  mToolShape = getCurrentShape(state);
+  mFsmStateConnections.append(connect(
+      this, &Board2dTab::shapeRequested, &state,
+      [this, &state](ui::PadShape shape) {
+        if (shape != mToolShape) {
+          switch (shape) {
+            case ui::PadShape::Round:
+              state.setShape(Pad::Shape::RoundedRect);
+              state.setRadius(UnsignedLimitedRatio(Ratio::fromPercent(100)));
+              break;
+            case ui::PadShape::RoundedRect:
+              state.setShape(Pad::Shape::RoundedRect);
+              state.setRadius(
+                  UnsignedLimitedRatio(FootprintPad::getRecommendedRadius(
+                      state.getWidth(), state.getHeight())));
+              break;
+            case ui::PadShape::Rect:
+              state.setShape(Pad::Shape::RoundedRect);
+              state.setRadius(UnsignedLimitedRatio(Ratio::fromPercent(0)));
+              break;
+            case ui::PadShape::Octagon:
+              state.setShape(Pad::Shape::RoundedOctagon);
+              state.setRadius(UnsignedLimitedRatio(Ratio::fromPercent(0)));
+              break;
+            default:
+              break;
+          }
+          mToolShape = shape;
+        }
+      }));
+
+  // Width / size
+  mToolLineWidth.configure(state.getWidth(),
+                           LengthEditContext::Steps::generic(),
+                           "board_editor/add_pad/width");
+  mFsmStateConnections.append(
+      connect(&state, &BoardEditorState_AddPad::widthChanged, &mToolLineWidth,
+              &LengthEditContext::setValuePositive));
+  mFsmStateConnections.append(
+      connect(&mToolLineWidth, &LengthEditContext::valueChangedPositive, &state,
+              &BoardEditorState_AddPad::setWidth));
+  if (state.getFunctionIsFiducial()) {
+    mFsmStateConnections.append(
+        connect(&mToolLineWidth, &LengthEditContext::valueChangedPositive,
+                &state, &BoardEditorState_AddPad::setHeight));
+  }
+
+  // Height
+  if (!state.getFunctionIsFiducial()) {
+    mToolSize.configure(state.getHeight(), LengthEditContext::Steps::generic(),
+                        "board_editor/add_pad/height");
+    mFsmStateConnections.append(
+        connect(&state, &BoardEditorState_AddPad::heightChanged, &mToolSize,
+                &LengthEditContext::setValuePositive));
+    mFsmStateConnections.append(
+        connect(&mToolSize, &LengthEditContext::valueChangedPositive, &state,
+                &BoardEditorState_AddPad::setHeight));
+  }
+
+  // Fiducial clearance
+  const auto clearance = state.getStopMaskConfig().getOffset();
+  if (state.getFunctionIsFiducial() && clearance && (clearance >= 0)) {
+    mToolSize.configure(UnsignedLength(*clearance),
+                        LengthEditContext::Steps::generic(),
+                        "board_editor/add_pad/fiducial_clearance");
+    mFsmStateConnections.append(
+        connect(&state, &BoardEditorState_AddPad::copperClearanceChanged,
+                &mToolSize, &LengthEditContext::setValueUnsigned));
+    mFsmStateConnections.append(
+        connect(&mToolSize, &LengthEditContext::valueChangedUnsigned, &state,
+                [&state](const UnsignedLength& value) {
+                  state.setCopperClearance(value);
+                  state.setStopMaskConfig(MaskConfig::manual(*value));
+                }));
+  }
+
+  // Drill
+  if (auto drill = state.getDrillDiameter()) {
+    mToolDrill.configure(*drill, LengthEditContext::Steps::drillDiameter(),
+                         "board_editor/add_pad/drill_diameter");
+    mFsmStateConnections.append(
+        connect(&state, &BoardEditorState_AddPad::drillDiameterChanged,
+                &mToolDrill, &LengthEditContext::setValuePositive));
+    mFsmStateConnections.append(
+        connect(&mToolDrill, &LengthEditContext::valueChangedPositive, &state,
+                &BoardEditorState_AddPad::setDrillDiameter));
+  }
+
+  // Radius
+  auto setRadius = [this](const UnsignedLimitedRatio& radius) {
+    mToolRatio = radius;
+    onDerivedUiDataChanged.notify();
+  };
+  setRadius(state.getRadius());
+  mFsmStateConnections.append(connect(
+      &state, &BoardEditorState_AddPad::radiusChanged, this, setRadius));
+  mFsmStateConnections.append(connect(this, &Board2dTab::ratioRequested, &state,
+                                      &BoardEditorState_AddPad::setRadius));
+
+  // Fiducial
+  mToolFiducial = state.getFunctionIsFiducial();
+
+  // Press-fit
+  if (state.getType() == BoardEditorState_AddPad::PadType::THT) {
+    auto setFunction = [this](Pad::Function function) {
+      mToolPressFit = function == Pad::Function::PressFitPad;
+      onDerivedUiDataChanged.notify();
+    };
+    setFunction(state.getFunction());
+    mFsmStateConnections.append(connect(
+        &state, &BoardEditorState_AddPad::functionChanged, this, setFunction));
+    mFsmStateConnections.append(connect(
+        this, &Board2dTab::pressFitRequested, &state, [&state](bool pressFit) {
+          state.setFunction(pressFit ? Pad::Function::PressFitPad
+                                     : Pad::Function::StandardPad);
+        }));
+  }
 
   onDerivedUiDataChanged.notify();
 }

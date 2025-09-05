@@ -73,6 +73,25 @@ struct BoardDesignRuleCheckData final {
     std::optional<PositiveLength> stopMaskDiameterTop;
     std::optional<PositiveLength> stopMaskDiameterBot;
   };
+  struct Hole {
+    Uuid uuid;
+    PositiveLength diameter;
+    NonEmptyPath path;
+    std::optional<Length> stopMaskOffset;
+  };
+  struct Pad {
+    Uuid uuid;
+    QString libPkgPadName;  // Empty if not connected to a package pad.
+    Point position;  // Absolute transform.
+    Angle rotation;  // Absolute transform.
+    bool mirror;  // Absolute transform.
+    QList<Hole> holes;
+    QHash<const Layer*, QList<PadGeometry>> geometries;
+    QSet<const Layer*> layersWithTraces;  // Layers where traces are connected.
+    UnsignedLength copperClearance;
+    std::optional<Uuid> net;
+    QString netName;  // Empty if no net.
+  };
   struct Segment {
     Uuid uuid;
     std::optional<Uuid> net;
@@ -80,12 +99,13 @@ struct BoardDesignRuleCheckData final {
     QHash<Uuid, Junction> junctions;
     QList<Trace> traces;
     QHash<Uuid, Via> vias;
+    QHash<Uuid, Pad> pads;
   };
   struct AirWireAnchor {
     Point position;
-    std::optional<Uuid> device;  // If it's a pad.
+    std::optional<Uuid> device;  // If it's a footprint pad.
     std::optional<Uuid> pad;  // If it's a pad.
-    std::optional<Uuid> segment;  // If it's a junction or via.
+    std::optional<Uuid> segment;  // If it's a junction or via or board pad.
     std::optional<Uuid> junction;  // If it's a junction.
     std::optional<Uuid> via;  // If it's a via.
   };
@@ -128,31 +148,12 @@ struct BoardDesignRuleCheckData final {
     PositiveLength height;
     QVector<Path> paths;
   };
-  struct Hole {
-    Uuid uuid;
-    PositiveLength diameter;
-    NonEmptyPath path;
-    std::optional<Length> stopMaskOffset;
-  };
   struct Zone {
     Uuid uuid;
     QSet<const Layer*> boardLayers;  // Only set for board zones!
     librepcb::Zone::Layers footprintLayers;  // Only set for device zones!
     librepcb::Zone::Rules rules;
     Path outline;
-  };
-  struct Pad {
-    Uuid uuid;
-    QString libPkgPadName;  // Empty if not connected to a package pad.
-    Point position;  // Absolute transform.
-    Angle rotation;  // Absolute transform.
-    bool mirror;  // Absolute transform.
-    QList<Hole> holes;
-    QHash<const Layer*, QList<PadGeometry>> geometries;
-    QSet<const Layer*> layersWithTraces;  // Layers where traces are connected.
-    UnsignedLength copperClearance;
-    std::optional<Uuid> net;
-    QString netName;  // Empty if no net.
   };
   struct Device {
     Uuid uuid;

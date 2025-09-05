@@ -427,22 +427,30 @@ public:
   }
   SerializableObjectList<T, P, OnEditedArgs...>& operator=(
       const SerializableObjectList<T, P, OnEditedArgs...>& rhs) noexcept {
-    clear();
-    mObjects.reserve(rhs.count());
-    for (const std::shared_ptr<T>& ptr : rhs.mObjects) {
-      append(copyObject(
-          *ptr, typename std::is_nothrow_copy_constructible<T>::type()));
+    // Important: Self-assignment would accidentally clear the container, thus
+    // it must be replaced by a no-op!
+    if (&rhs != this) {
+      clear();
+      mObjects.reserve(rhs.count());
+      for (const std::shared_ptr<T>& ptr : rhs.mObjects) {
+        append(copyObject(
+            *ptr, typename std::is_nothrow_copy_constructible<T>::type()));
+      }
     }
     return *this;
   }
   SerializableObjectList<T, P, OnEditedArgs...>& operator=(
       SerializableObjectList<T, P, OnEditedArgs...>&& rhs) noexcept {
-    clear();
-    mObjects.reserve(rhs.count());
-    for (const std::shared_ptr<T>& ptr : rhs.mObjects) {
-      append(ptr);  // copy only the pointer, NOT the object
+    // Important: Self-assignment would accidentally clear the container, thus
+    // it must be replaced by a no-op!
+    if (&rhs != this) {
+      clear();
+      mObjects.reserve(rhs.count());
+      for (const std::shared_ptr<T>& ptr : rhs.mObjects) {
+        append(ptr);  // copy only the pointer, NOT the object
+      }
+      rhs.clear();
     }
-    rhs.clear();
     return *this;
   }
 

@@ -25,6 +25,7 @@
  ******************************************************************************/
 #include "../../undocommand.h"
 
+#include <librepcb/core/project/board/items/bi_pad.h>
 #include <librepcb/core/project/board/items/bi_via.h>
 #include <librepcb/core/types/point.h>
 
@@ -57,6 +58,8 @@ public:
   ~CmdBoardNetSegmentAddElements() noexcept;
 
   // General Methods
+  BI_Pad* addPad(BI_Pad& pad);
+  BI_Pad* addPad(const BoardPadData& pad);
   BI_Via* addVia(BI_Via& via);
   BI_Via* addVia(const Via& via);
   BI_NetPoint* addNetPoint(BI_NetPoint& netpoint);
@@ -79,6 +82,7 @@ private:
 
   // Private Member Variables
   BI_NetSegment& mNetSegment;
+  QList<BI_Pad*> mPads;
   QList<BI_Via*> mVias;
   QList<BI_NetPoint*> mNetPoints;
   QList<BI_NetLine*> mNetLines;

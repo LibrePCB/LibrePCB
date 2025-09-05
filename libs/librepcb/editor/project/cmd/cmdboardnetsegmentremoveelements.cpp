@@ -41,7 +41,7 @@ namespace editor {
 
 CmdBoardNetSegmentRemoveElements::CmdBoardNetSegmentRemoveElements(
     BI_NetSegment& segment) noexcept
-  : UndoCommand(tr("Remove net segment elements")), mNetSegment(segment) {
+  : UndoCommand(tr("Remove Vias/Pads/Traces")), mNetSegment(segment) {
 }
 
 CmdBoardNetSegmentRemoveElements::~CmdBoardNetSegmentRemoveElements() noexcept {
@@ -50,6 +50,10 @@ CmdBoardNetSegmentRemoveElements::~CmdBoardNetSegmentRemoveElements() noexcept {
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
+
+void CmdBoardNetSegmentRemoveElements::removePad(BI_Pad& pad) {
+  mPads.append(&pad);
+}
 
 void CmdBoardNetSegmentRemoveElements::removeVia(BI_Via& via) {
   mVias.append(&via);
@@ -74,11 +78,11 @@ bool CmdBoardNetSegmentRemoveElements::performExecute() {
 }
 
 void CmdBoardNetSegmentRemoveElements::performUndo() {
-  mNetSegment.addElements(mVias, mNetPoints, mNetLines);  // can throw
+  mNetSegment.addElements(mPads, mVias, mNetPoints, mNetLines);  // can throw
 }
 
 void CmdBoardNetSegmentRemoveElements::performRedo() {
-  mNetSegment.removeElements(mVias, mNetPoints, mNetLines);  // can throw
+  mNetSegment.removeElements(mPads, mVias, mNetPoints, mNetLines);  // can throw
 }
 
 /*******************************************************************************

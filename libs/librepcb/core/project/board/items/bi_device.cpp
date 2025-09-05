@@ -34,7 +34,7 @@
 #include "../../projectlibrary.h"
 #include "../board.h"
 #include "../boarddesignrules.h"
-#include "bi_footprintpad.h"
+#include "bi_pad.h"
 
 #include <QtCore>
 
@@ -148,7 +148,7 @@ BI_Device::BI_Device(Board& board, ComponentInstance& compInstance,
                              .arg(libPad.getPackagePadUuid()->toStr(),
                                   mLibDevice->getUuid().toStr()));
     }
-    BI_FootprintPad* pad = new BI_FootprintPad(*this, libPad.getUuid());
+    BI_Pad* pad = new BI_Pad(*this, libPad.getUuid());
     mPads.insert(libPad.getUuid(), pad);
   }
 
@@ -234,7 +234,7 @@ bool BI_Device::doesPackageRequireAssembly(bool resolveAuto) const noexcept {
 }
 
 bool BI_Device::isUsed() const noexcept {
-  foreach (const BI_FootprintPad* pad, mPads) {
+  foreach (const BI_Pad* pad, mPads) {
     if (pad->isUsed()) return true;
   }
   return false;
@@ -355,7 +355,7 @@ void BI_Device::addToBoard() {
   ScopeGuardList sgl(mPads.count() + mStrokeTexts.count() + 1);
   mCompInstance.registerDevice(*this);  // can throw
   sgl.add([&]() { mCompInstance.unregisterDevice(*this); });
-  foreach (BI_FootprintPad* pad, mPads) {
+  foreach (BI_Pad* pad, mPads) {
     pad->addToBoard();  // can throw
     sgl.add([pad]() { pad->removeFromBoard(); });
   }
@@ -373,7 +373,7 @@ void BI_Device::removeFromBoard() {
     throw LogicError(__FILE__, __LINE__);
   }
   ScopeGuardList sgl(mPads.count() + mStrokeTexts.count() + 1);
-  foreach (BI_FootprintPad* pad, mPads) {
+  foreach (BI_Pad* pad, mPads) {
     pad->removeFromBoard();  // can throw
     sgl.add([pad]() { pad->addToBoard(); });
   }

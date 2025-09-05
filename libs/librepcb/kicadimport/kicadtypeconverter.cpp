@@ -620,7 +620,7 @@ std::shared_ptr<StrokeText> KiCadTypeConverter::convertFootprintPropertyToText(
       !p.unlocked);
 }
 
-KiCadTypeConverter::Pad KiCadTypeConverter::convertPad(
+KiCadTypeConverter::PadReplacements KiCadTypeConverter::convertPad(
     const KiCadFootprintPad& p, qreal fptSolderMaskMargin,
     qreal fptSolderPasteMargin, qreal fptSolderPasteRatio, qreal fptClearance,
     MessageLogger& log) {
@@ -663,12 +663,12 @@ KiCadTypeConverter::Pad KiCadTypeConverter::convertPad(
   PositiveLength width(Length::fromMm(p.size.width()));
   PositiveLength height(Length::fromMm(p.size.height()));
   UnsignedLimitedRatio radius(Ratio::fromPercent(0));
-  FootprintPad::Shape shape = FootprintPad::Shape::RoundedRect;
+  Pad::Shape shape = Pad::Shape::RoundedRect;
   Path customShapeOutline;
   Path actualShapeOutline;  // Used for creating polygon.
   if ((p.shape == KiCadPadShape::Circle) || (p.shape == KiCadPadShape::Oval)) {
     // Circle or obround.
-    shape = FootprintPad::Shape::RoundedRect;
+    shape = Pad::Shape::RoundedRect;
     radius = UnsignedLimitedRatio(Ratio::fromPercent(100));
     actualShapeOutline = Path::obround(width, height);
   } else if ((p.shape == KiCadPadShape::Rect) ||
@@ -679,7 +679,7 @@ KiCadTypeConverter::Pad KiCadTypeConverter::convertPad(
     const Length chmferSize = std::min(width, height)->scaled(p.chamferRatio);
     if ((chmferSize > 0) && (!p.chamferEdges.isEmpty())) {
       // Chamfered rect.
-      shape = FootprintPad::Shape::Custom;
+      shape = Pad::Shape::Custom;
       customShapeOutline =
           Path::chamferedRect(width, height, UnsignedLength(chmferSize),
                               p.chamferEdges.contains(KiCadEdge::TopLeft),
@@ -689,13 +689,13 @@ KiCadTypeConverter::Pad KiCadTypeConverter::convertPad(
       actualShapeOutline = customShapeOutline;
     } else {
       // Plain rect.
-      shape = FootprintPad::Shape::RoundedRect;
+      shape = Pad::Shape::RoundedRect;
       radius = UnsignedLimitedRatio(Ratio::fromPercent(0));
       actualShapeOutline = Path::centeredRect(width, height);
     }
   } else if (p.shape == KiCadPadShape::RoundRect) {
     // Rounded rect.
-    shape = FootprintPad::Shape::RoundedRect;
+    shape = Pad::Shape::RoundedRect;
     radius = UnsignedLimitedRatio(Ratio::fromNormalized(
         qBound(qreal(0), p.roundRectRRatio * 2, qreal(1))));
     actualShapeOutline = Path::centeredRect(
@@ -707,7 +707,7 @@ KiCadTypeConverter::Pad KiCadTypeConverter::convertPad(
     }
   } else if (p.shape == KiCadPadShape::Trapezoid) {
     // Trapezoidal.
-    shape = FootprintPad::Shape::Custom;
+    shape = Pad::Shape::Custom;
     customShapeOutline =
         Path::trapezoid(width, height, -Length::fromMm(p.rectDelta.height()),
                         -Length::fromMm(p.rectDelta.width()));
@@ -769,7 +769,7 @@ KiCadTypeConverter::Pad KiCadTypeConverter::convertPad(
     }
     // Add pad anchor.
     if (p.customPadAnchor == KiCadCustomPadAnchor::Rect) {
-      shape = FootprintPad::Shape::RoundedRect;  // Fallback.
+      shape = Pad::Shape::RoundedRect;  // Fallback.
       radius = UnsignedLimitedRatio(Ratio::fromPercent(0));  // Fallback.
       actualShapeOutline = Path::centeredRect(width, height);  // Fallback.
       if (!paths.empty()) {
@@ -781,7 +781,7 @@ KiCadTypeConverter::Pad KiCadTypeConverter::convertPad(
             QString("Invalid custom pad anchor %1, using circular shape.")
                 .arg(static_cast<int>(p.customPadAnchor)));
       }
-      shape = FootprintPad::Shape::RoundedRect;  // Fallback.
+      shape = Pad::Shape::RoundedRect;  // Fallback.
       radius = UnsignedLimitedRatio(Ratio::fromPercent(100));  // Fallback.
       actualShapeOutline = Path::obround(width, height);  // Fallback.
       if (!paths.empty()) {
@@ -797,7 +797,7 @@ KiCadTypeConverter::Pad KiCadTypeConverter::convertPad(
             "Custom pad shape consists of multiple separated primitives, "
             "considering only one of them.");
       }
-      shape = FootprintPad::Shape::Custom;
+      shape = Pad::Shape::Custom;
       customShapeOutline = ClipperHelpers::convert(paths.front());
       actualShapeOutline = customShapeOutline;
     } else {
@@ -807,7 +807,7 @@ KiCadTypeConverter::Pad KiCadTypeConverter::convertPad(
     log.critical(
         QString("Unsupported pad shape %1, using circular shape instead.")
             .arg(static_cast<int>(p.shape)));
-    shape = FootprintPad::Shape::RoundedRect;
+    shape = Pad::Shape::RoundedRect;
     radius = UnsignedLimitedRatio(Ratio::fromPercent(100));
     actualShapeOutline = Path::obround(width, height);
   }
@@ -888,18 +888,18 @@ KiCadTypeConverter::Pad KiCadTypeConverter::convertPad(
       Length::fromMm(std::max(p.clearance, fptClearance)));
 
   // Handle pad.
-  Pad result;
+  PadReplacements result;
   if ((p.type != KiCadPadType::NpThruHole) &&
       (layers.contains(&Layer::topCopper()) ||
        layers.contains(&Layer::botCopper()))) {
     // Determine pad type/side.
     PadHoleList holes;
-    FootprintPad::ComponentSide cmpSide = FootprintPad::ComponentSide::Top;
+    Pad::ComponentSide cmpSide = Pad::ComponentSide::Top;
     if ((p.type == KiCadPadType::ThruHole) && (drillDiameter) && (drillPath) &&
         layers.contains(&Layer::topCopper()) &&
         layers.contains(&Layer::botCopper())) {
       // It's a THT pad.
-      cmpSide = FootprintPad::ComponentSide::Top;
+      cmpSide = Pad::ComponentSide::Top;
       holes.append(std::make_shared<PadHole>(
           Uuid::createRandom(), *drillDiameter,
           NonEmptyPath(
@@ -913,14 +913,14 @@ KiCadTypeConverter::Pad KiCadTypeConverter::convertPad(
     } else if (layers.contains(&Layer::topCopper()) &&
                (!layers.contains(&Layer::botCopper()))) {
       // It's a top side pad.
-      cmpSide = FootprintPad::ComponentSide::Top;
+      cmpSide = Pad::ComponentSide::Top;
       handledLayers.insert(&Layer::topCopper());
       handledLayers.insert(&Layer::topStopMask());
       handledLayers.insert(&Layer::topSolderPaste());
     } else if (layers.contains(&Layer::botCopper()) &&
                (!layers.contains(&Layer::topCopper()))) {
       // It's a bottom side pad.
-      cmpSide = FootprintPad::ComponentSide::Bottom;
+      cmpSide = Pad::ComponentSide::Bottom;
       handledLayers.insert(&Layer::botCopper());
       handledLayers.insert(&Layer::botStopMask());
       handledLayers.insert(&Layer::botSolderPaste());
@@ -940,14 +940,14 @@ KiCadTypeConverter::Pad KiCadTypeConverter::convertPad(
         log.warning(
             "THT pad with solder paste only on one side is not supported.");
       }
-    } else if ((cmpSide == FootprintPad::ComponentSide::Top) &&
+    } else if ((cmpSide == Pad::ComponentSide::Top) &&
                layers.contains(&Layer::topSolderPaste())) {
       hasSolderPaste = true;
       if (layers.contains(&Layer::botSolderPaste())) {
         log.warning(
             "SMD pad with solder paste on both sides is not supported.");
       }
-    } else if ((cmpSide == FootprintPad::ComponentSide::Bottom) &&
+    } else if ((cmpSide == Pad::ComponentSide::Bottom) &&
                layers.contains(&Layer::botSolderPaste())) {
       hasSolderPaste = true;
       if (layers.contains(&Layer::topSolderPaste())) {
@@ -969,19 +969,19 @@ KiCadTypeConverter::Pad KiCadTypeConverter::convertPad(
                : MaskConfig::automatic());
 
     // Determine pad function.
-    FootprintPad::Function function = FootprintPad::Function::Unspecified;
+    Pad::Function function = Pad::Function::Unspecified;
     if (p.property == KiCadPadProperty::Bga) {
-      function = FootprintPad::Function::BgaPad;
+      function = Pad::Function::BgaPad;
     } else if (p.property == KiCadPadProperty::FiducialGlobal) {
-      function = FootprintPad::Function::GlobalFiducial;
+      function = Pad::Function::GlobalFiducial;
     } else if (p.property == KiCadPadProperty::FiducialLocal) {
-      function = FootprintPad::Function::LocalFiducial;
+      function = Pad::Function::LocalFiducial;
     } else if (p.property == KiCadPadProperty::Testpoint) {
-      function = FootprintPad::Function::TestPad;
+      function = Pad::Function::TestPad;
     } else if (p.property == KiCadPadProperty::Heatsink) {
-      function = FootprintPad::Function::ThermalPad;
+      function = Pad::Function::ThermalPad;
     } else if (p.type == KiCadPadType::Connect) {
-      function = FootprintPad::Function::EdgeConnectorPad;
+      function = Pad::Function::EdgeConnectorPad;
     }
 
     // Determine positioning.

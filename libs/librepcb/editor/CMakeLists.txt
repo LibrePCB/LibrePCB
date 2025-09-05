@@ -432,6 +432,9 @@ add_library(
   project/board/boardeditor.h
   project/board/boardgraphicsscene.cpp
   project/board/boardgraphicsscene.h
+  project/board/boardpadpropertiesdialog.cpp
+  project/board/boardpadpropertiesdialog.h
+  project/board/boardpadpropertiesdialog.ui
   project/board/boardpickplacegeneratordialog.cpp
   project/board/boardpickplacegeneratordialog.h
   project/board/boardpickplacegeneratordialog.ui
@@ -458,6 +461,8 @@ add_library(
   project/board/fsm/boardeditorstate_adddevice.h
   project/board/fsm/boardeditorstate_addhole.cpp
   project/board/fsm/boardeditorstate_addhole.h
+  project/board/fsm/boardeditorstate_addpad.cpp
+  project/board/fsm/boardeditorstate_addpad.h
   project/board/fsm/boardeditorstate_addstroketext.cpp
   project/board/fsm/boardeditorstate_addstroketext.h
   project/board/fsm/boardeditorstate_addvia.cpp
@@ -478,14 +483,14 @@ add_library(
   project/board/graphicsitems/bgi_airwire.h
   project/board/graphicsitems/bgi_device.cpp
   project/board/graphicsitems/bgi_device.h
-  project/board/graphicsitems/bgi_footprintpad.cpp
-  project/board/graphicsitems/bgi_footprintpad.h
   project/board/graphicsitems/bgi_hole.cpp
   project/board/graphicsitems/bgi_hole.h
   project/board/graphicsitems/bgi_netline.cpp
   project/board/graphicsitems/bgi_netline.h
   project/board/graphicsitems/bgi_netpoint.cpp
   project/board/graphicsitems/bgi_netpoint.h
+  project/board/graphicsitems/bgi_pad.cpp
+  project/board/graphicsitems/bgi_pad.h
   project/board/graphicsitems/bgi_plane.cpp
   project/board/graphicsitems/bgi_plane.h
   project/board/graphicsitems/bgi_polygon.cpp
@@ -535,6 +540,8 @@ add_library(
   project/cmd/cmdboardnetsegmentremove.h
   project/cmd/cmdboardnetsegmentremoveelements.cpp
   project/cmd/cmdboardnetsegmentremoveelements.h
+  project/cmd/cmdboardpadedit.cpp
+  project/cmd/cmdboardpadedit.h
   project/cmd/cmdboardplaneadd.cpp
   project/cmd/cmdboardplaneadd.h
   project/cmd/cmdboardplaneedit.cpp

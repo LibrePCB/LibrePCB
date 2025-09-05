@@ -39,10 +39,10 @@
 #include "../projectattributelookup.h"
 #include "board.h"
 #include "items/bi_device.h"
-#include "items/bi_footprintpad.h"
 #include "items/bi_hole.h"
 #include "items/bi_netline.h"
 #include "items/bi_netsegment.h"
+#include "items/bi_pad.h"
 #include "items/bi_plane.h"
 #include "items/bi_polygon.h"
 #include "items/bi_via.h"
@@ -164,6 +164,21 @@ std::shared_ptr<InteractiveHtmlBom> BoardInteractiveHtmlBomGenerator::generate(
       addDrawing(Layer::boardCutouts(), p, UnsignedLength(0), false);
     }
   }
+  // Currently we do not directly support drawing pads which are not part of
+  // a footprint. Also I think we cannot draw copper for documentation purpose
+  // only? Let's just draw the pad hole for now, and imrpve it when necessary.
+  for (const auto seg : mBoard.getNetSegments()) {
+    for (const auto pad : seg->getPads()) {
+      const Transform transform(*pad);
+      for (const PadHole& hole : pad->getProperties().getHoles()) {
+        for (const Path& p :
+             hole.getPath()->toOutlineStrokes(hole.getDiameter())) {
+          addDrawing(Layer::boardCutouts(), transform.map(p), UnsignedLength(0),
+                     false);
+        }
+      }
+    }
+  }
 
   // Add tracks & vias.
   for (const auto seg : mBoard.getNetSegments()) {
@@ -214,7 +229,7 @@ std::shared_ptr<InteractiveHtmlBom> BoardInteractiveHtmlBomGenerator::generate(
         d->getLibFootprint().calculateBoundingRect(true);
     QList<InteractiveHtmlBom::Pad> pads;
     for (const auto& p : d->getPads()) {
-      const NetSignal* net = p->getCompSigInstNetSignal();
+      const NetSignal* net = p->getNetSignal();
       const bool pin1 = (d->getPads().count() > 1) &&
           (QStringList{"1", "A"}.contains(*p->getLibPackagePad()->getName()));
       pads.append(InteractiveHtmlBom::Pad{
@@ -224,7 +239,7 @@ std::shared_ptr<InteractiveHtmlBom> BoardInteractiveHtmlBomGenerator::generate(
           p->getRotation(),
           p->getMirrored(),
           p->getGeometries().value(&p->getSolderLayer()),
-          p->getLibPad().getHoles(),
+          p->getProperties().getHoles(),
           net ? std::make_optional(*net->getName()) : std::nullopt,
           pin1,
       });

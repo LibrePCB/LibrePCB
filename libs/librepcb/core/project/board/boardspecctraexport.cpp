@@ -39,11 +39,11 @@
 #include "board.h"
 #include "drc/boarddesignrulechecksettings.h"
 #include "items/bi_device.h"
-#include "items/bi_footprintpad.h"
 #include "items/bi_hole.h"
 #include "items/bi_netline.h"
 #include "items/bi_netpoint.h"
 #include "items/bi_netsegment.h"
+#include "items/bi_pad.h"
 #include "items/bi_plane.h"
 #include "items/bi_polygon.h"
 #include "items/bi_stroketext.h"
@@ -259,26 +259,39 @@ std::unique_ptr<SExpression> BoardSpecctraExport::genStructureRule() const {
 
 std::unique_ptr<SExpression> BoardSpecctraExport::genPlacement() const {
   std::unique_ptr<SExpression> root = SExpression::createList("placement");
-  for (const BI_Device* dev : mBoard.getDeviceInstances()) {
-    const QString imageId = *dev->getComponentInstance().getName() % ":" %
-        *dev->getLibPackage().getNames().getDefaultValue();
+
+  // Helper.
+  auto addComponent = [&](const QString& imageId, const QString& designator,
+                          const Point& pos, const Angle& rotation,
+                          bool mirrored) {
     root->ensureLineBreak();
     auto& componentNode = root->appendList("component");
     componentNode.appendChild(imageId);
     componentNode.ensureLineBreak();
     auto& placeNode = componentNode.appendList("place");
-    placeNode.appendChild(*dev->getComponentInstance().getName());
-    placeNode.appendChild(toToken(dev->getPosition().getX()));
-    placeNode.appendChild(toToken(dev->getPosition().getY()));
-    if (!dev->getMirrored()) {
+    placeNode.appendChild(designator);
+    placeNode.appendChild(toToken(pos.getX()));
+    placeNode.appendChild(toToken(pos.getY()));
+    if (!mirrored) {
       placeNode.appendChild(SExpression::createToken("front"));
     } else {
       placeNode.appendChild(SExpression::createToken("back"));
     }
-    placeNode.appendChild(
-        SExpression::createToken(dev->getRotation().toDegString()));
+    placeNode.appendChild(SExpression::createToken(rotation.toDegString()));
     componentNode.ensureLineBreak();
+  };
+
+  // Dummy placement for board (which may contain pads).
+  addComponent("BOARD", "BOARD", Point(0, 0), Angle::deg0(), false);
+
+  // Real devices.
+  for (const BI_Device* dev : mBoard.getDeviceInstances()) {
+    const QString imageId = *dev->getComponentInstance().getName() % ":" %
+        *dev->getLibPackage().getNames().getDefaultValue();
+    addComponent(imageId, *dev->getComponentInstance().getName(),
+                 dev->getPosition(), dev->getRotation(), dev->getMirrored());
   }
+
   root->ensureLineBreak();
   return root;
 }
@@ -287,6 +300,8 @@ std::unique_ptr<SExpression> BoardSpecctraExport::genLibrary(
     std::vector<std::unique_ptr<SExpression>>& fptPadStacks,
     std::vector<std::unique_ptr<SExpression>>& viaPadStacks) const {
   std::unique_ptr<SExpression> root = SExpression::createList("library");
+  root->ensureLineBreak();
+  root->appendChild(genLibraryImage(fptPadStacks));
   for (const BI_Device* dev : mBoard.getDeviceInstances()) {
     root->ensureLineBreak();
     root->appendChild(genLibraryImage(*dev, fptPadStacks));
@@ -304,6 +319,35 @@ std::unique_ptr<SExpression> BoardSpecctraExport::genLibrary(
   }
   fptPadStacks.clear();
   viaPadStacks.clear();
+  root->ensureLineBreak();
+  return root;
+}
+
+std::unique_ptr<SExpression> BoardSpecctraExport::genLibraryImage(
+    std::vector<std::unique_ptr<SExpression>>& fptPadStacks) const {
+  const QString id = "BOARD";
+
+  std::unique_ptr<SExpression> root = SExpression::createList("image");
+  root->appendChild(id);
+  for (const auto& segment : mBoard.getNetSegments()) {
+    for (const auto& pad : segment->getPads()) {
+      const QString id = "pad-" +
+          QString::number(addToPadStacks(fptPadStacks,
+                                         genLibraryPadStack(*pad)));
+      root->ensureLineBreak();
+      auto& pinNode = root->appendList("pin");
+      pinNode.appendChild(id);
+      pinNode.appendChild(
+          "rotate",
+          SExpression::createToken(
+              pad->getProperties().getRotation().toDegString()));
+      pinNode.appendChild(
+          QString(segment->getUuid().toStr() + ":" + pad->getUuid().toStr())
+              .replace("-", ""));
+      pinNode.appendChild(toToken(pad->getProperties().getPosition().getX()));
+      pinNode.appendChild(toToken(pad->getProperties().getPosition().getY()));
+    }
+  }
   root->ensureLineBreak();
   return root;
 }
@@ -340,12 +384,12 @@ std::unique_ptr<SExpression> BoardSpecctraExport::genLibraryImage(
     root->ensureLineBreak();
     auto& pinNode = root->appendList("pin");
     pinNode.appendChild(id);
-    pinNode.appendChild(
-        "rotate",
-        SExpression::createToken(pad->getLibPad().getRotation().toDegString()));
-    pinNode.appendChild(pad->getLibPadUuid().toStr().replace("-", ""));
-    pinNode.appendChild(toToken(pad->getLibPad().getPosition().getX()));
-    pinNode.appendChild(toToken(pad->getLibPad().getPosition().getY()));
+    pinNode.appendChild("rotate",
+                        SExpression::createToken(
+                            pad->getProperties().getRotation().toDegString()));
+    pinNode.appendChild(pad->getUuid().toStr().replace("-", ""));
+    pinNode.appendChild(toToken(pad->getProperties().getPosition().getX()));
+    pinNode.appendChild(toToken(pad->getProperties().getPosition().getY()));
   }
   for (const auto& hole : dev.getLibFootprint().getHoles()) {
     root->ensureLineBreak();
@@ -378,7 +422,7 @@ std::unique_ptr<SExpression> BoardSpecctraExport::genLibraryImage(
 }
 
 std::unique_ptr<SExpression> BoardSpecctraExport::genLibraryPadStack(
-    const BI_FootprintPad& pad) const {
+    const BI_Pad& pad) const {
   std::unique_ptr<SExpression> root = SExpression::createList("padstack");
   root->appendChild(QString("pad-"));
   root->ensureLineBreak();
@@ -388,7 +432,7 @@ std::unique_ptr<SExpression> BoardSpecctraExport::genLibraryPadStack(
   typedef std::pair<const Layer*, QList<PadGeometry>> LayerGeometry;
   QList<LayerGeometry> geometries;
   const Layer& solderLayer = pad.getSolderLayer();
-  if (pad.getLibPad().isTht()) {
+  if (pad.getProperties().isTht()) {
     // Always use full THT pad annular rings because automatic annulars depend
     // on whether a trace is connected or not. But connections might be made
     // in an external software, so we don't know which pads will be connected.
@@ -483,30 +527,59 @@ std::unique_ptr<SExpression> BoardSpecctraExport::genLibraryPadStack(
 
 std::unique_ptr<SExpression> BoardSpecctraExport::genNetwork() const {
   std::unique_ptr<SExpression> root = SExpression::createList("network");
-  for (const auto& net : mBoard.getProject().getCircuit().getNetSignals()) {
+
+  // Helper.
+  auto addNet = [&](const QString& name, const QStringList& pads) {
     root->ensureLineBreak();
     auto& netNode = root->appendList("net");
-    netNode.appendChild(net->getName());
-    netNode.ensureLineBreak();
-    auto& pinsNode = netNode.appendList("pins");
+    netNode.appendChild(name);
+    if (!pads.isEmpty()) {
+      netNode.ensureLineBreak();
+      auto& pinsNode = netNode.appendList("pins");
+      for (const QString& pad : pads) {
+        pinsNode.ensureLineBreak();
+        pinsNode.appendChild(SExpression::createToken(pad));
+      }
+      pinsNode.ensureLineBreak();
+      netNode.ensureLineBreak();
+    }
+  };
+
+  for (const auto& net : mBoard.getProject().getCircuit().getNetSignals()) {
+    QStringList pads;
     for (const auto& cmpSig : net->getComponentSignals()) {
       const QString cmpName = *cmpSig->getComponentInstance().getName();
       for (const auto& pad : cmpSig->getRegisteredFootprintPads()) {
-        const QString padId = pad->getLibPadUuid().toStr().replace("-", "");
-        pinsNode.ensureLineBreak();
-        pinsNode.appendChild(SExpression::createToken(cmpName + "-" + padId));
+        if (&pad->getBoard() == &mBoard) {
+          const QString padId = pad->getUuid().toStr().replace("-", "");
+          pads.append(cmpName + "-" + padId);
+        }
       }
     }
-    pinsNode.ensureLineBreak();
-    netNode.ensureLineBreak();
+    for (const auto& segment : net->getBoardNetSegments()) {
+      if (&segment->getBoard() == &mBoard) {
+        for (const auto& pad : segment->getPads()) {
+          const QString padId =
+              QString(segment->getUuid().toStr() + ":" + pad->getUuid().toStr())
+                  .replace("-", "");
+          pads.append("BOARD-" + padId);
+        }
+      }
+    }
+    addNet(*net->getName(), pads);
   }
 
   // For net segments without a net, add a separate dummy net for each of them.
   for (const auto& segment : mBoard.getNetSegments()) {
     if (!segment->getNetSignal()) {
-      root->ensureLineBreak();
-      auto& netNode = root->appendList("net");
-      netNode.appendChild(getNetName(*segment));
+      QStringList pads;
+      for (const auto& pad : segment->getPads()) {
+        const QString padId =
+            QString(segment->getUuid().toStr() + ":" + pad->getUuid().toStr())
+                .replace("-", "");
+        pads.append("BOARD-" + padId);
+      }
+      addNet(getNetName(*segment), pads);
     }
   }
 

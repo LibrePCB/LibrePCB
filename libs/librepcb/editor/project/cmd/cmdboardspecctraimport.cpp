@@ -31,10 +31,10 @@
 #include <librepcb/core/project/board/boarddesignrules.h>
 #include <librepcb/core/project/board/boardnetsegmentsplitter.h>
 #include <librepcb/core/project/board/items/bi_device.h>
-#include <librepcb/core/project/board/items/bi_footprintpad.h>
 #include <librepcb/core/project/board/items/bi_netline.h>
 #include <librepcb/core/project/board/items/bi_netpoint.h>
 #include <librepcb/core/project/board/items/bi_netsegment.h>
+#include <librepcb/core/project/board/items/bi_pad.h>
 #include <librepcb/core/project/board/items/bi_via.h>
 #include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/circuit/componentinstance.h>
@@ -297,10 +297,11 @@ bool CmdBoardSpecctraImport::performExecute() {
     QList<OldJunction> junctions;
     QList<OldTrace> traces;
     QList<Via> vias;
+    QList<BoardPadData> pads;
   };
   QList<OldSegment> oldSegments;
   foreach (const BI_NetSegment* seg, mBoard.getNetSegments()) {
-    OldSegment oldSeg{seg->getUuid(), seg->getNetSignal(), {}, {}, {}};
+    OldSegment oldSeg{seg->getUuid(), seg->getNetSignal(), {}, {}, {}, {}};
     foreach (const BI_NetPoint* np, seg->getNetPoints()) {
       oldSeg.junctions.append(OldJunction{np->getUuid(), np->getPosition(),
                                           np->getLayerOfTraces()});
@@ -312,6 +313,9 @@ bool CmdBoardSpecctraImport::performExecute() {
     }
     foreach (const BI_Via* via, seg->getVias()) {
       oldSeg.vias.append(via->getVia());
+    }
+    foreach (const BI_Pad* pad, seg->getPads()) {
+      oldSeg.pads.append(pad->getProperties());
     }
     oldSegments.append(oldSeg);
   }
@@ -402,6 +406,11 @@ bool CmdBoardSpecctraImport::performExecute() {
         return true;
       }
     }
+    foreach (const BoardPadData& pad, seg.pads) {
+      if (refs.contains(pad.getUuid())) {
+        return true;
+      }
+    }
     return false;
   };
   auto findNetSegment = [&](const NetSignal* net, const QSet<Uuid>& refs) {
@@ -429,6 +438,9 @@ bool CmdBoardSpecctraImport::performExecute() {
   QSet<Uuid> updatedComponents;
   if (mComponents) {
     for (const auto& item : *mComponents) {
+      if (item.name == "BOARD") {
+        continue;  // Currently board-level pads cannot be edited.
+      }
       importedComponents.insert(item.name);
       ComponentInstance* cmp = mCircuit.getComponentInstanceByName(item.name);
       BI_Device* dev = cmp
@@ -474,7 +486,13 @@ bool CmdBoardSpecctraImport::performExecute() {
     }
   }
 
-  // Import nets.
+  // Find the corresponding net signal for each imported net. In addition,
+  // explicitly add any net that has board-level pads in it if they haven't
+  // been imported anymore. The external router may have removed such nets if
+  // they didn't contain traces, which would cause board-level pads to be
+  // accidentally removed.
+  QSet<NetSignal*> importedNets;
+  QVector<NetOutProcessed> nets;
   for (const auto& net : mNets) {
     NetSignal* netSignal = mCircuit.getNetSignalByName(net.netName);
     // ATTENTION: The ~anonymous~ comes from our own Specctra export!
@@ -484,7 +502,18 @@ bool CmdBoardSpecctraImport::performExecute() {
                            .arg(net.netName));
       continue;
     }
+    nets.append(NetOutProcessed{netSignal, net.vias, net.wires});
+    importedNets.insert(netSignal);
+  }
+  for (const auto& ns : oldSegments) {
+    if ((!importedNets.contains(ns.net)) && (!ns.pads.isEmpty())) {
+      nets.append(NetOutProcessed{ns.net, {}, {}});
+      importedNets.insert(ns.net);
+    }
+  }
 
+  // Import nets.
+  for (const NetOutProcessed& net : nets) {
     // Helper data to memorize anchors.
     struct AnchorData {
       Point pos;
@@ -514,47 +543,65 @@ bool CmdBoardSpecctraImport::performExecute() {
         wireCoordinatesPerLayer[wire.layer].append(vertex.getPos());
       }
     }
-    for (const ComponentSignalInstance* cmpSig :
-         (netSignal ? netSignal->getComponentSignals()
-                    : QList<ComponentSignalInstance*>{})) {
-      for (const BI_FootprintPad* pad : cmpSig->getRegisteredFootprintPads()) {
-        Point pos = pad->getPosition();
-        QList<Point>& coordinates = pad->getLibPad().isTht()
-            ? wireCoordinates
-            : wireCoordinatesPerLayer[&pad->getSolderLayer()];
-        if (!coordinates.contains(pos)) {
-          // Find another coordinate which is very close (rounding errors).
-          // In some tests, errors were up to 70 nm!
-          std::sort(coordinates.begin(), coordinates.end(),
-                    [&pos](const Point& a, const Point& b) {
-                      return (a - pos).getLength() < (b - pos).getLength();
-                    });
-          if ((!coordinates.isEmpty()) &&
-              fuzzyCompare(pos, coordinates.first())) {
-            pos = coordinates.first();
-          } else {
-            continue;
-          }
+    auto addPadAnchor = [&](const Uuid& uuid, Point pos, bool tht,
+                            const Layer& solderLayer, const BI_Device* device) {
+      QList<Point>& coordinates =
+          tht ? wireCoordinates : wireCoordinatesPerLayer[&solderLayer];
+      if (!coordinates.contains(pos)) {
+        // Find another coordinate which is very close (rounding errors).
+        // In some tests, errors were up to 70 nm!
+        std::sort(coordinates.begin(), coordinates.end(),
+                  [&pos](const Point& a, const Point& b) {
+                    return (a - pos).getLength() < (b - pos).getLength();
+                  });
+        if ((!coordinates.isEmpty()) &&
+            fuzzyCompare(pos, coordinates.first())) {
+          pos = coordinates.first();
+        } else {
+          return;
         }
-        const Layer* startLayer = pad->getLibPad().isTht()
-            ? &Layer::topCopper()
-            : &pad->getSolderLayer();
-        const Layer* endLayer = pad->getLibPad().isTht()
-            ? &Layer::botCopper()
-            : &pad->getSolderLayer();
-        anchors.append(AnchorData{
-            pos, startLayer, endLayer,
-            TraceAnchor::pad(pad->getDevice().getComponentInstanceUuid(),
-                             pad->getLibPadUuid())});
+      }
+      const Layer* startLayer = tht ? &Layer::topCopper() : &solderLayer;
+      const Layer* endLayer = tht ? &Layer::botCopper() : &solderLayer;
+      if (device) {
+        anchors.append(
+            AnchorData{pos, startLayer, endLayer,
+                       TraceAnchor::footprintPad(
+                           device->getComponentInstanceUuid(), uuid)});
+      } else {
+        anchors.append(
+            AnchorData{pos, startLayer, endLayer, TraceAnchor::pad(uuid)});
+      }
+    };
+    for (const ComponentSignalInstance* cmpSig :
+         (net.netSignal ? net.netSignal->getComponentSignals()
+                        : QList<ComponentSignalInstance*>{})) {
+      for (const BI_Pad* pad : cmpSig->getRegisteredFootprintPads()) {
+        addPadAnchor(pad->getUuid(), pad->getPosition(),
+                     pad->getProperties().isTht(), pad->getSolderLayer(),
+                     pad->getDevice());
       }
     }
 
     // Define net segments with BoardNetSegmentSplitter.
     BoardNetSegmentSplitter splitter;
+    for (const auto& ns : oldSegments) {
+      if (ns.net == net.netSignal) {
+        for (const BoardPadData& pad : ns.pads) {
+          splitter.addPad(pad, false);
+          const Layer& solderLayer =
+              (pad.getComponentSide() == Pad::ComponentSide::Top)
+              ? Layer::topCopper()
+              : Layer::botCopper();
+          addPadAnchor(pad.getUuid(), pad.getPosition(), pad.isTht(),
+                       solderLayer, nullptr);
+        }
+      }
+    }
     for (const auto& via : net.vias) {
       const PadStackOut& padStack = mPadStacks.value(via.padStackId);
-      const std::optional<Via> oldVia =
-          findVia(netSignal, via.pos, *padStack.startLayer, *padStack.endLayer);
+      const std::optional<Via> oldVia = findVia(
+          net.netSignal, via.pos, *padStack.startLayer, *padStack.endLayer);
       const Uuid uuid = oldVia ? oldVia->getUuid() : Uuid::createRandom();
       // Note: How can we know the drill diameter??? Use this logic for now:
       //  - If position & size not modified, keep original drill diameter too
@@ -591,7 +638,7 @@ bool CmdBoardSpecctraImport::performExecute() {
       } else {
         // Create new junction.
         const std::optional<OldJunction> oldNp =
-            findNetPoint(netSignal, pos, layer);
+            findNetPoint(net.netSignal, pos, layer);
         const Uuid uuid = oldNp ? oldNp->uuid : Uuid::createRandom();
         splitter.addJunction(Junction(uuid, oldNp ? oldNp->pos : pos));
         const TraceAnchor a = TraceAnchor::junction(uuid);
@@ -604,7 +651,7 @@ bool CmdBoardSpecctraImport::performExecute() {
         Point p0 = wire.path.getVertices().at(i - 1).getPos();
         Point p1 = wire.path.getVertices().at(i).getPos();
         const std::optional<OldTrace> oldNl =
-            findNetLine(netSignal, p0, p1, *wire.layer, wire.width);
+            findNetLine(net.netSignal, p0, p1, *wire.layer, wire.width);
         if (oldNl && (!fuzzyCompare(oldNl->p1, p0))) {
           std::swap(p0, p1);  // Avoid change in file format.
         }
@@ -629,16 +676,25 @@ bool CmdBoardSpecctraImport::performExecute() {
       for (const Via& via : segment.vias) {
         nsRefs.insert(via.getUuid());
       }
-      const std::optional<OldSegment> oldNs = findNetSegment(netSignal, nsRefs);
+      for (const BoardPadData& pad : segment.pads) {
+        nsRefs.insert(pad.getUuid());
+      }
+      const std::optional<OldSegment> oldNs =
+          findNetSegment(net.netSignal, nsRefs);
 
       // Add new segment
       BI_NetSegment* copy = new BI_NetSegment(
-          mBoard, oldNs ? oldNs->uuid : Uuid::createRandom(), netSignal);
+          mBoard, oldNs ? oldNs->uuid : Uuid::createRandom(), net.netSignal);
       execNewChildCmd(new CmdBoardNetSegmentAdd(*copy));
 
-      // Add vias, netpoints and netlines
+      // Add pads, vias, netpoints and netlines
       std::unique_ptr<CmdBoardNetSegmentAddElements> cmdAddElements(
           new CmdBoardNetSegmentAddElements(*copy));
+      QHash<Uuid, BI_Pad*> padMap;
+      for (const BoardPadData& p : segment.pads) {
+        BI_Pad* pad = cmdAddElements->addPad(BoardPadData(p));
+        padMap.insert(p.getUuid(), pad);
+      }
       QHash<Uuid, BI_Via*> viaMap;
       for (const Via& v : segment.vias) {
         BI_Via* via = cmdAddElements->addVia(Via(
@@ -659,8 +715,10 @@ bool CmdBoardSpecctraImport::performExecute() {
           p1 = netPointMap[*anchor];
         } else if (std::optional<Uuid> anchor = trace.getP1().tryGetVia()) {
           p1 = viaMap[*anchor];
+        } else if (std::optional<Uuid> anchor = trace.getP1().tryGetPad()) {
+          p1 = padMap[*anchor];
         } else if (std::optional<TraceAnchor::PadAnchor> anchor =
-                       trace.getP1().tryGetPad()) {
+                       trace.getP1().tryGetFootprintPad()) {
           BI_Device* device =
               mBoard.getDeviceInstanceByComponentUuid(anchor->device);
           p1 = device ? device->getPad(anchor->pad) : nullptr;
@@ -670,8 +728,10 @@ bool CmdBoardSpecctraImport::performExecute() {
           p2 = netPointMap[*anchor];
         } else if (std::optional<Uuid> anchor = trace.getP2().tryGetVia()) {
           p2 = viaMap[*anchor];
+        } else if (std::optional<Uuid> anchor = trace.getP2().tryGetPad()) {
+          p2 = padMap[*anchor];
         } else if (std::optional<TraceAnchor::PadAnchor> anchor =
-                       trace.getP2().tryGetPad()) {
+                       trace.getP2().tryGetFootprintPad()) {
           BI_Device* device =
               mBoard.getDeviceInstanceByComponentUuid(anchor->device);
           p2 = device ? device->getPad(anchor->pad) : nullptr;

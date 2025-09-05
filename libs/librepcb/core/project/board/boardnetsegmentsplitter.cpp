@@ -37,7 +37,7 @@ namespace librepcb {
  ******************************************************************************/
 
 BoardNetSegmentSplitter::BoardNetSegmentSplitter() noexcept
-  : mJunctions(), mVias(), mTraces() {
+  : mJunctions(), mPads(), mVias(), mTraces() {
 }
 
 BoardNetSegmentSplitter::~BoardNetSegmentSplitter() noexcept {
@@ -54,6 +54,15 @@ void BoardNetSegmentSplitter::replaceFootprintPadByJunctions(
 
 void BoardNetSegmentSplitter::addJunction(const Junction& junction) noexcept {
   mJunctions.append(std::make_shared<Junction>(junction));
+}
+
+void BoardNetSegmentSplitter::addPad(const BoardPadData& pad,
+                                     bool replaceByJunctions) noexcept {
+  if (replaceByJunctions) {
+    mAnchorsToReplace[TraceAnchor::pad(pad.getUuid())] = pad.getPosition();
+  } else {
+    mPads.append(std::make_shared<BoardPadData>(pad));
+  }
 }
 
 void BoardNetSegmentSplitter::addVia(const Via& via,
@@ -79,17 +88,24 @@ QList<BoardNetSegmentSplitter::Segment>
   // Split netsegment by anchors and lines.
   // IMPORTANT: Make shallow copies to keep all references valid even though
   // findConnectedLinesAndPoints() removes items from these lists.
+  QList<std::shared_ptr<BoardPadData>> availablePads = mPads.values();
   QList<std::shared_ptr<Via>> availableVias = mVias.values();
   QList<std::shared_ptr<Trace>> availableTraces = mTraces.values();
   while (!availableTraces.isEmpty()) {
     Segment segment;
-    findConnectedLinesAndPoints(availableTraces.first()->getP1(), availableVias,
-                                availableTraces, segment);
+    findConnectedLinesAndPoints(availableTraces.first()->getP1(), availablePads,
+                                availableVias, availableTraces, segment);
     segments.append(segment);
   }
   Q_ASSERT(availableTraces.isEmpty());
 
-  // Add remaining vias as separate segments
+  // Add remaining pads & vias as separate segments
+  while (!availablePads.isEmpty()) {
+    Segment segment;
+    segment.pads.append(availablePads.takeAt(0));
+    segments.append(segment);
+  }
+  Q_ASSERT(availablePads.isEmpty());
   while (!availableVias.isEmpty()) {
     Segment segment;
     segment.vias.append(availableVias.takeAt(0));
@@ -123,12 +139,21 @@ TraceAnchor BoardNetSegmentSplitter::replaceAnchor(
 }
 
 void BoardNetSegmentSplitter::findConnectedLinesAndPoints(
-    const TraceAnchor& anchor, QList<std::shared_ptr<Via>>& availableVias,
+    const TraceAnchor& anchor,
+    QList<std::shared_ptr<BoardPadData>>& availablePads,
+    QList<std::shared_ptr<Via>>& availableVias,
     QList<std::shared_ptr<Trace>>& availableTraces, Segment& segment) noexcept {
   if (std::optional<Uuid> junctionUuid = anchor.tryGetJunction()) {
     if (std::shared_ptr<Junction> junction = mJunctions.find(*junctionUuid)) {
       if (!segment.junctions.contains(junction->getUuid())) {
         segment.junctions.append(junction);
+      }
+    }
+  } else if (std::optional<Uuid> padUuid = anchor.tryGetPad()) {
+    if (std::shared_ptr<BoardPadData> pad = mPads.find(*padUuid)) {
+      if (availablePads.contains(pad)) {
+        segment.pads.append(pad);
+        availablePads.removeOne(pad);
       }
     }
   } else if (std::optional<Uuid> viaUuid = anchor.tryGetVia()) {
@@ -146,9 +171,9 @@ void BoardNetSegmentSplitter::findConnectedLinesAndPoints(
         (!segment.traces.contains(trace.get()))) {
       segment.traces.append(trace);
       availableTraces.removeOne(trace);
-      findConnectedLinesAndPoints(trace->getP1(), availableVias,
+      findConnectedLinesAndPoints(trace->getP1(), availablePads, availableVias,
                                   availableTraces, segment);
-      findConnectedLinesAndPoints(trace->getP2(), availableVias,
+      findConnectedLinesAndPoints(trace->getP2(), availablePads, availableVias,
                                   availableTraces, segment);
     }
   }

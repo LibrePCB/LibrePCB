@@ -20,3 +20,4 @@ Useful Links:
 - [DXF Specifications](http://images.autodesk.com/adsk/files/autocad_2012_pdf_dxf-reference_enu.pdf)
 - [IPC-D-356A Netlist Format](https://web.pa.msu.edu/hep/atlas/l1calo/hub/hardware/components/circuit_board/ipc_356a_net_list.pdf)
 - [IPC-D-356 Simplified](https://www.downstreamtech.com/downloads/IPCD356_Simplified.pdf)
+- [Specctra Format](https://cdn.hackaday.io/files/1666717130852064/specctra.pdf)

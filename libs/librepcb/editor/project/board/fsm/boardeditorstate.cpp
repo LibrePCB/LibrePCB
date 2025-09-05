@@ -28,10 +28,10 @@
 #include "../../../widgets/graphicsview.h"
 #include "../boardgraphicsscene.h"
 #include "../graphicsitems/bgi_device.h"
-#include "../graphicsitems/bgi_footprintpad.h"
 #include "../graphicsitems/bgi_hole.h"
 #include "../graphicsitems/bgi_netline.h"
 #include "../graphicsitems/bgi_netpoint.h"
+#include "../graphicsitems/bgi_pad.h"
 #include "../graphicsitems/bgi_plane.h"
 #include "../graphicsitems/bgi_polygon.h"
 #include "../graphicsitems/bgi_stroketext.h"
@@ -41,11 +41,11 @@
 #include <librepcb/core/geometry/polygon.h>
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/items/bi_device.h>
-#include <librepcb/core/project/board/items/bi_footprintpad.h>
 #include <librepcb/core/project/board/items/bi_hole.h>
 #include <librepcb/core/project/board/items/bi_netline.h>
 #include <librepcb/core/project/board/items/bi_netpoint.h>
 #include <librepcb/core/project/board/items/bi_netsegment.h>
+#include <librepcb/core/project/board/items/bi_pad.h>
 #include <librepcb/core/project/board/items/bi_plane.h>
 #include <librepcb/core/project/board/items/bi_polygon.h>
 #include <librepcb/core/project/board/items/bi_stroketext.h>
@@ -375,19 +375,24 @@ QList<std::shared_ptr<QGraphicsItem>> BoardEditorState::findItemsAtPos(
     }
   }
 
-  if (flags.testFlag(FindFlag::FootprintPads)) {
-    for (auto it = scene->getFootprintPads().begin();
-         it != scene->getFootprintPads().end(); it++) {
-      if (netsignals.isEmpty() ||
-          netsignals.contains(it.key()->getCompSigInstNetSignal())) {
+  if (flags.testFlag(FindFlag::FootprintPads) ||
+      flags.testFlag(FindFlag::BoardPads)) {
+    for (auto it = scene->getPads().begin(); it != scene->getPads().end();
+         it++) {
+      if (((it.key()->getDevice() && flags.testFlag(FindFlag::FootprintPads)) ||
+           (it.key()->getNetSegment() &&
+            flags.testFlag(FindFlag::BoardPads))) &&
+          (netsignals.isEmpty() ||
+           netsignals.contains(it.key()->getNetSignal()))) {
         if ((!cuLayer) || (it.key()->isOnLayer(*cuLayer))) {
           // Give THT pads high priority to fix
           // https://github.com/LibrePCB/LibrePCB/issues/1073.
-          const int priority = it.key()->getLibPad().isTht()
+          const int priority = it.key()->getProperties().isTht()
               ? 1
               : (50 + (it.key()->getMirrored() ? 300 : 100));
           std::shared_ptr<QGraphicsItem> itemToAdd;
-          if (flags.testFlag(FindFlag::DevicesOfPads)) {
+          if (flags.testFlag(FindFlag::DevicesOfPads) &&
+              it.key()->getDevice()) {
             // See https://github.com/LibrePCB/LibrePCB/issues/1531.
             itemToAdd = it.value()->getDeviceGraphicsItem().lock();
           } else {

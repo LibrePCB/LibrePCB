@@ -46,12 +46,14 @@ TEST_F(TraceTest, testAnchorLessThan) {
   const QVector<TraceAnchor> input = {
       TraceAnchor::junction(
           Uuid::fromString("5bed2074-1b02-4db5-9b0e-293c42d8728f")),
-      TraceAnchor::pad(
+      TraceAnchor::footprintPad(
           Uuid::fromString("d14141ff-651f-40f0-87be-b4f86831375a"),
           Uuid::fromString("65ab6c75-b264-4fed-b445-d3d98c956008")),
+      TraceAnchor::pad(
+          Uuid::fromString("e706fdf8-4ced-4cc4-a49f-757ca395272b")),
       TraceAnchor::via(
           Uuid::fromString("c893f5a0-3fec-498b-99d6-467d5d69825d")),
-      TraceAnchor::pad(
+      TraceAnchor::footprintPad(
           Uuid::fromString("94ca7c55-bf86-43e0-8399-d713ce1f1929"),
           Uuid::fromString("65ab6c75-b264-4fed-b445-d3d98c956008")),
       TraceAnchor::junction(
@@ -59,19 +61,25 @@ TEST_F(TraceTest, testAnchorLessThan) {
       TraceAnchor::via(
           Uuid::fromString("1e80206f-158b-48e6-9cb4-6e368af7b7d7")),
       TraceAnchor::pad(
+          Uuid::fromString("70c4ec26-2d47-441d-beeb-43aa968b4d2e")),
+      TraceAnchor::footprintPad(
           Uuid::fromString("94ca7c55-bf86-43e0-8399-d713ce1f1929"),
           Uuid::fromString("04bb6ac3-34d7-4fb3-b274-44f845f8d3b5")),
   };
   const QVector<TraceAnchor> expected = {
-      TraceAnchor::pad(
+      TraceAnchor::footprintPad(
           Uuid::fromString("94ca7c55-bf86-43e0-8399-d713ce1f1929"),
           Uuid::fromString("04bb6ac3-34d7-4fb3-b274-44f845f8d3b5")),
-      TraceAnchor::pad(
+      TraceAnchor::footprintPad(
           Uuid::fromString("94ca7c55-bf86-43e0-8399-d713ce1f1929"),
           Uuid::fromString("65ab6c75-b264-4fed-b445-d3d98c956008")),
-      TraceAnchor::pad(
+      TraceAnchor::footprintPad(
           Uuid::fromString("d14141ff-651f-40f0-87be-b4f86831375a"),
           Uuid::fromString("65ab6c75-b264-4fed-b445-d3d98c956008")),
+      TraceAnchor::pad(
+          Uuid::fromString("70c4ec26-2d47-441d-beeb-43aa968b4d2e")),
+      TraceAnchor::pad(
+          Uuid::fromString("e706fdf8-4ced-4cc4-a49f-757ca395272b")),
       TraceAnchor::via(
           Uuid::fromString("1e80206f-158b-48e6-9cb4-6e368af7b7d7")),
       TraceAnchor::via(
@@ -99,7 +107,7 @@ TEST_F(TraceTest, testConstructFromSExpression) {
             obj.getUuid());
   EXPECT_EQ("bot_cu", obj.getLayer().getId());
   EXPECT_EQ(PositiveLength(500000), obj.getWidth());
-  EXPECT_EQ(TraceAnchor::pad(
+  EXPECT_EQ(TraceAnchor::footprintPad(
                 Uuid::fromString("0d8f2ef9-34f4-4400-a313-f17cdcdfe924"),
                 Uuid::fromString("65ab6c75-b264-4fed-b445-d3d98c956008")),
             obj.getP1());
@@ -111,7 +119,7 @@ TEST_F(TraceTest, testConstructFromSExpression) {
 TEST_F(TraceTest, testSerializeAndDeserialize) {
   Trace obj1(Uuid::createRandom(), Layer::topCopper(), PositiveLength(123),
              TraceAnchor::junction(Uuid::createRandom()),
-             TraceAnchor::pad(Uuid::createRandom(), Uuid::createRandom()));
+             TraceAnchor::pad(Uuid::createRandom()));
   std::unique_ptr<SExpression> sexpr1 = SExpression::createList("obj");
   obj1.serialize(*sexpr1);
 

@@ -27,6 +27,7 @@
 #include "cmdboardholeedit.h"
 #include "cmdboardnetlineedit.h"
 #include "cmdboardnetpointedit.h"
+#include "cmdboardpadedit.h"
 #include "cmdboardplaneedit.h"
 #include "cmdboardpolygonedit.h"
 #include "cmdboardstroketextedit.h"
@@ -40,6 +41,7 @@
 #include <librepcb/core/project/board/items/bi_hole.h>
 #include <librepcb/core/project/board/items/bi_netline.h>
 #include <librepcb/core/project/board/items/bi_netpoint.h>
+#include <librepcb/core/project/board/items/bi_pad.h>
 #include <librepcb/core/project/board/items/bi_polygon.h>
 #include <librepcb/core/project/board/items/bi_stroketext.h>
 #include <librepcb/core/project/board/items/bi_via.h>
@@ -75,6 +77,7 @@ CmdDragSelectedBoardItems::CmdDragSelectedBoardItems(
   // get all selected items
   BoardSelectionQuery query(mScene, includeLockedItems);
   query.addDeviceInstancesOfSelectedFootprints();
+  query.addSelectedBoardPads();
   query.addSelectedVias();
   query.addSelectedNetPoints();
   if (includeNetLines) {
@@ -97,6 +100,13 @@ CmdDragSelectedBoardItems::CmdDragSelectedBoardItems(
     CmdDeviceInstanceEdit* cmd = new CmdDeviceInstanceEdit(*device);
     mDeviceEditCmds.append(cmd);
     mDeviceStrokeTextsResetCmds.append(new CmdDeviceStrokeTextsReset(*device));
+  }
+  foreach (BI_Pad* pad, query.getPads()) {
+    Q_ASSERT(pad);
+    mCenterPos += pad->getPosition();
+    ++mItemCount;
+    CmdBoardPadEdit* cmd = new CmdBoardPadEdit(*pad);
+    mPadEditCmds.append(cmd);
   }
   foreach (BI_Via* via, query.getVias()) {
     Q_ASSERT(via);
@@ -204,6 +214,9 @@ void CmdDragSelectedBoardItems::snapToGrid() noexcept {
   foreach (CmdDeviceInstanceEdit* cmd, mDeviceEditCmds) {
     cmd->snapToGrid(grid, true);
   }
+  foreach (CmdBoardPadEdit* cmd, mPadEditCmds) {
+    cmd->snapToGrid(grid, true);
+  }
   foreach (CmdBoardViaEdit* cmd, mViaEditCmds) {
     cmd->snapToGrid(grid, true);
   }
@@ -234,6 +247,9 @@ void CmdDragSelectedBoardItems::snapToGrid() noexcept {
 
 void CmdDragSelectedBoardItems::setLocked(bool locked) noexcept {
   foreach (CmdDeviceInstanceEdit* cmd, mDeviceEditCmds) {
+    cmd->setLocked(locked);
+  }
+  foreach (CmdBoardPadEdit* cmd, mPadEditCmds) {
     cmd->setLocked(locked);
   }
   foreach (CmdBoardPlaneEdit* cmd, mPlaneEditCmds) {
@@ -286,6 +302,9 @@ void CmdDragSelectedBoardItems::setCurrentPosition(
     foreach (CmdDeviceInstanceEdit* cmd, mDeviceEditCmds) {
       cmd->translate(delta - mDeltaPos, true);
     }
+    foreach (CmdBoardPadEdit* cmd, mPadEditCmds) {
+      cmd->translate(delta - mDeltaPos, true);
+    }
     foreach (CmdBoardViaEdit* cmd, mViaEditCmds) {
       cmd->translate(delta - mDeltaPos, true);
     }
@@ -324,6 +343,9 @@ void CmdDragSelectedBoardItems::rotate(const Angle& angle,
 
   // rotate selected elements
   foreach (CmdDeviceInstanceEdit* cmd, mDeviceEditCmds) {
+    cmd->rotate(angle, center, true);
+  }
+  foreach (CmdBoardPadEdit* cmd, mPadEditCmds) {
     cmd->rotate(angle, center, true);
   }
   foreach (CmdBoardViaEdit* cmd, mViaEditCmds) {
@@ -367,6 +389,8 @@ bool CmdDragSelectedBoardItems::performExecute() {
     mDeviceEditCmds.clear();
     qDeleteAll(mDeviceStrokeTextsResetCmds);
     mDeviceStrokeTextsResetCmds.clear();
+    qDeleteAll(mPadEditCmds);
+    mPadEditCmds.clear();
     qDeleteAll(mViaEditCmds);
     mViaEditCmds.clear();
     qDeleteAll(mNetPointEditCmds);
@@ -395,6 +419,9 @@ bool CmdDragSelectedBoardItems::performExecute() {
     appendChild(cmd);  // can throw
   }
   foreach (CmdDeviceStrokeTextsReset* cmd, mDeviceStrokeTextsResetCmds) {
+    appendChild(cmd);  // can throw
+  }
+  foreach (CmdBoardPadEdit* cmd, mPadEditCmds) {
     appendChild(cmd);  // can throw
   }
   foreach (CmdBoardViaEdit* cmd, mViaEditCmds) {

@@ -109,7 +109,6 @@ class BoardPainter final : public GraphicsPagePainter {
 
   struct Footprint {
     Transform transform;
-    QList<Pad> pads;
     QList<PolygonData> polygons;
     QList<Circle> circles;
     QList<HoleData> holes;
@@ -153,6 +152,7 @@ private:  // Data
   QFont mMonospaceFont;
   QSet<const Layer*> mCopperLayers;
   QList<Footprint> mFootprints;
+  QList<Pad> mPads;
   QList<ViaData> mVias;
   QList<Trace> mTraces;
   QList<Plane> mPlanes;

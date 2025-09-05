@@ -70,6 +70,7 @@ bool CmdRemoveSelectedBoardItems::performExecute() {
   // get all selected items
   BoardSelectionQuery query(mScene, mIncludeLockedItems);
   query.addDeviceInstancesOfSelectedFootprints();
+  query.addSelectedBoardPads();
   query.addSelectedVias();
   query.addSelectedNetLines();
   query.addNetPointsOfNetLines(true);
@@ -86,6 +87,7 @@ bool CmdRemoveSelectedBoardItems::performExecute() {
   // remove items
   mWrappedCommand.reset(new CmdRemoveBoardItems(mScene.getBoard()));
   mWrappedCommand->removeDeviceInstances(query.getDeviceInstances());
+  mWrappedCommand->removeBoardPads(query.getPads());
   mWrappedCommand->removeVias(query.getVias());
   mWrappedCommand->removeNetLines(query.getNetLines());
   mWrappedCommand->removePlanes(query.getPlanes());

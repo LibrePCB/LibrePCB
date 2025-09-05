@@ -46,11 +46,11 @@
 #include "drc/boarddesignrulechecksettings.h"
 #include "items/bi_airwire.h"
 #include "items/bi_device.h"
-#include "items/bi_footprintpad.h"
 #include "items/bi_hole.h"
 #include "items/bi_netline.h"
 #include "items/bi_netpoint.h"
 #include "items/bi_netsegment.h"
+#include "items/bi_pad.h"
 #include "items/bi_plane.h"
 #include "items/bi_polygon.h"
 #include "items/bi_stroketext.h"
@@ -179,7 +179,7 @@ std::shared_ptr<SceneData3D> Board::buildScene3D(
                         *obj->getComponentInstance().getName());
       }
     }
-    foreach (const BI_FootprintPad* pad, obj->getPads()) {
+    foreach (const BI_Pad* pad, obj->getPads()) {
       const Transform padTransform(*pad);
       auto geometries = pad->getGeometries();
       for (auto it = geometries.begin(); it != geometries.end(); it++) {
@@ -249,6 +249,21 @@ std::shared_ptr<SceneData3D> Board::buildScene3D(
     }
   }
   foreach (const BI_NetSegment* netSegment, mNetSegments) {
+    foreach (const BI_Pad* pad, netSegment->getPads()) {
+      const Transform padTransform(pad->getPosition(), pad->getRotation());
+      auto geometries = pad->getGeometries();
+      for (auto it = geometries.begin(); it != geometries.end(); it++) {
+        foreach (const PadGeometry& geometry, it.value()) {
+          foreach (const Path& outline, geometry.toOutlines()) {
+            data->addArea(*it.key(), outline, padTransform);
+          }
+          for (const PadHole& hole : geometry.getHoles()) {
+            data->addHole(hole.getPath(), hole.getDiameter(), true, false,
+                          padTransform);
+          }
+        }
+      }
+    }
     foreach (const BI_Via* via, netSegment->getVias()) {
       data->addVia(via->getPosition(), via->getSize(), via->getDrillDiameter(),
                    via->getVia().getStartLayer(), via->getVia().getEndLayer(),
@@ -755,9 +770,18 @@ void Board::copyFrom(const Board& other) {
     for (auto it = devMap.begin(); it != devMap.end(); ++it) {
       const BI_Device& oldDev = *it.key();
       BI_Device& newDev = *it.value();
-      foreach (const BI_FootprintPad* pad, oldDev.getPads()) {
-        anchorsMap.insert(pad, newDev.getPad(pad->getLibPadUuid()));
+      foreach (const BI_Pad* pad, oldDev.getPads()) {
+        anchorsMap.insert(pad, newDev.getPad(pad->getUuid()));
       }
+    }
+
+    // Copy pads.
+    QList<BI_Pad*> pads;
+    foreach (const BI_Pad* pad, netSegment->getPads()) {
+      BI_Pad* padCopy = new BI_Pad(
+          *copy, BoardPadData(Uuid::createRandom(), pad->getProperties()));
+      pads.append(padCopy);
+      anchorsMap.insert(pad, padCopy);
     }
 
     // Copy vias.
@@ -791,7 +815,7 @@ void Board::copyFrom(const Board& other) {
       netLines.append(netLineCopy);
     }
 
-    copy->addElements(vias, netPoints, netLines);
+    copy->addElements(pads, vias, netPoints, netLines);
     addNetSegment(*copy);
   }
 

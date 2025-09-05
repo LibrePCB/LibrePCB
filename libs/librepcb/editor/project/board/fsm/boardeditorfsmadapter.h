@@ -43,6 +43,7 @@ namespace editor {
 class BoardEditorState;
 class BoardEditorState_AddDevice;
 class BoardEditorState_AddHole;
+class BoardEditorState_AddPad;
 class BoardEditorState_AddStrokeText;
 class BoardEditorState_AddVia;
 class BoardEditorState_DrawPlane;
@@ -105,6 +106,7 @@ public:
   virtual void fsmToolEnter(BoardEditorState_Select& state) noexcept = 0;
   virtual void fsmToolEnter(BoardEditorState_DrawTrace& state) noexcept = 0;
   virtual void fsmToolEnter(BoardEditorState_AddVia& state) noexcept = 0;
+  virtual void fsmToolEnter(BoardEditorState_AddPad& state) noexcept = 0;
   virtual void fsmToolEnter(BoardEditorState_DrawPolygon& state) noexcept = 0;
   virtual void fsmToolEnter(BoardEditorState_AddStrokeText& state) noexcept = 0;
   virtual void fsmToolEnter(BoardEditorState_DrawPlane& state) noexcept = 0;

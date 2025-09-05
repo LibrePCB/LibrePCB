@@ -86,6 +86,7 @@ public:
 private:  // Methods
   static QString cleanString(QString str) noexcept;
   static QString checkedComponentName(const QString& name) noexcept;
+  static QString checkedPadName(const QString& name) noexcept;
   static QString formatLength(const Length& value, bool isSigned,
                               int digits) noexcept;
 
