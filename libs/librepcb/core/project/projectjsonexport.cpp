@@ -28,9 +28,9 @@
 #include "../types/pcbcolor.h"
 #include "board/board.h"
 #include "board/items/bi_device.h"
-#include "board/items/bi_footprintpad.h"
 #include "board/items/bi_hole.h"
 #include "board/items/bi_netsegment.h"
+#include "board/items/bi_pad.h"
 #include "board/items/bi_plane.h"
 #include "board/items/bi_via.h"
 #include "circuit/assemblyvariant.h"
@@ -122,6 +122,15 @@ QJsonObject ProjectJsonExport::toJson(const Board& obj) const {
   ToolList npthSlots;
   QSet<Length> copperWidths;
   foreach (const BI_NetSegment* netSegment, obj.getNetSegments()) {
+    foreach (const BI_Pad* pad, netSegment->getPads()) {
+      for (const PadHole& hole : pad->getProperties().getHoles()) {
+        if (hole.isSlot()) {
+          pthSlots.diameters.append(*hole.getDiameter());
+        } else {
+          pthDrills.diameters.append(*hole.getDiameter());
+        }
+      }
+    }
     foreach (const BI_Via* via, netSegment->getVias()) {
       if (auto span = via->getDrillLayerSpan()) {
         if (span->first->isTop() && span->second->isBottom()) {
@@ -138,8 +147,8 @@ QJsonObject ProjectJsonExport::toJson(const Board& obj) const {
     }
   }
   foreach (const BI_Device* device, obj.getDeviceInstances()) {
-    foreach (const BI_FootprintPad* pad, device->getPads()) {
-      for (const PadHole& hole : pad->getLibPad().getHoles()) {
+    foreach (const BI_Pad* pad, device->getPads()) {
+      for (const PadHole& hole : pad->getProperties().getHoles()) {
         if (hole.isSlot()) {
           pthSlots.diameters.append(*hole.getDiameter());
         } else {

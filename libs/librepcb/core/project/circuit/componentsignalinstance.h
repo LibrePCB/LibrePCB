@@ -32,7 +32,7 @@
  ******************************************************************************/
 namespace librepcb {
 
-class BI_FootprintPad;
+class BI_Pad;
 class Circuit;
 class ComponentInstance;
 class ComponentSignal;
@@ -74,7 +74,7 @@ public:
   const QList<SI_SymbolPin*>& getRegisteredSymbolPins() const noexcept {
     return mRegisteredSymbolPins;
   }
-  const QList<BI_FootprintPad*>& getRegisteredFootprintPads() const noexcept {
+  const QList<BI_Pad*>& getRegisteredFootprintPads() const noexcept {
     return mRegisteredFootprintPads;
   }
   int getRegisteredElementsCount() const noexcept;
@@ -101,8 +101,8 @@ public:
   void removeFromCircuit();
   void registerSymbolPin(SI_SymbolPin& pin);
   void unregisterSymbolPin(SI_SymbolPin& pin);
-  void registerFootprintPad(BI_FootprintPad& pad);
-  void unregisterFootprintPad(BI_FootprintPad& pad);
+  void registerFootprintPad(BI_Pad& pad);
+  void unregisterFootprintPad(BI_Pad& pad);
 
   /**
    * @brief Serialize into ::librepcb::SExpression node
@@ -136,7 +136,7 @@ private:  // Data
 
   // Registered Elements
   QList<SI_SymbolPin*> mRegisteredSymbolPins;
-  QList<BI_FootprintPad*> mRegisteredFootprintPads;
+  QList<BI_Pad*> mRegisteredFootprintPads;
 };
 
 /*******************************************************************************

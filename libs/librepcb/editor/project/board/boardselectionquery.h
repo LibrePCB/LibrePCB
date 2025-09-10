@@ -31,11 +31,11 @@
 namespace librepcb {
 
 class BI_Device;
-class BI_FootprintPad;
 class BI_Hole;
 class BI_NetLine;
 class BI_NetPoint;
 class BI_NetSegment;
+class BI_Pad;
 class BI_Plane;
 class BI_Polygon;
 class BI_StrokeText;
@@ -60,6 +60,7 @@ class BoardSelectionQuery final : public QObject {
 public:
   // Types
   struct NetSegmentItems {
+    QSet<BI_Pad*> pads;
     QSet<BI_Via*> vias;
     QSet<BI_NetPoint*> netpoints;
     QSet<BI_NetLine*> netlines;
@@ -83,6 +84,7 @@ public:
   const QSet<BI_NetLine*>& getNetLines() const noexcept {
     return mResultNetLines;
   }
+  const QSet<BI_Pad*>& getPads() const noexcept { return mResultPads; }
   const QSet<BI_Via*>& getVias() const noexcept { return mResultVias; }
   const QSet<BI_Plane*>& getPlanes() const noexcept { return mResultPlanes; }
   const QSet<BI_Zone*>& getZones() const noexcept { return mResultZones; }
@@ -95,11 +97,11 @@ public:
   const QSet<BI_Hole*>& getHoles() const noexcept { return mResultHoles; }
 
   /**
-   * @brief Get vias, net points and net lines grouped by net segment
+   * @brief Get pads, vias, net points and net lines grouped by net segment
    *
-   * Same as #getVias(), #getNetPoints() and #getNetLines(), but grouped
-   * by their corresponding net segments. Only net segments containing selected
-   * items are returned.
+   * Same as #getPads(), #getVias(), #getNetPoints() and #getNetLines(), but
+   * grouped by their corresponding net segments. Only net segments containing
+   * selected items are returned.
    *
    * @return List of net segments containing the selected items
    */
@@ -110,6 +112,7 @@ public:
   // General Methods
   void addDeviceInstancesOfSelectedFootprints() noexcept;
   void addSelectedVias() noexcept;
+  void addSelectedBoardPads() noexcept;
   void addSelectedNetPoints() noexcept;
   void addSelectedNetLines() noexcept;
   void addSelectedPlanes() noexcept;
@@ -140,6 +143,7 @@ private:  // Data
   QSet<BI_Device*> mResultDeviceInstances;
   QSet<BI_NetPoint*> mResultNetPoints;
   QSet<BI_NetLine*> mResultNetLines;
+  QSet<BI_Pad*> mResultPads;
   QSet<BI_Via*> mResultVias;
   QSet<BI_Plane*> mResultPlanes;
   QSet<BI_Zone*> mResultZones;

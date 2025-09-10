@@ -17,14 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CORE_BI_FOOTPRINTPAD_H
-#define LIBREPCB_CORE_BI_FOOTPRINTPAD_H
+#ifndef LIBREPCB_CORE_BI_PAD_H
+#define LIBREPCB_CORE_BI_PAD_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
 #include "../../../geometry/path.h"
-#include "../../../library/pkg/footprintpad.h"
+#include "../boardpaddata.h"
 #include "bi_device.h"
 #include "bi_netline.h"
 
@@ -36,37 +36,81 @@
 namespace librepcb {
 
 class ComponentSignalInstance;
+class FootprintPad;
 class PackagePad;
 
 /*******************************************************************************
- *  Class BI_FootprintPad
+ *  Class BI_Pad
  ******************************************************************************/
 
 /**
- * @brief The BI_FootprintPad class
+ * @brief A pad in a board (either standalone or from a footprint)
  */
-class BI_FootprintPad final : public BI_Base, public BI_NetLineAnchor {
+class BI_Pad final : public BI_Base, public BI_NetLineAnchor {
   Q_OBJECT
 
 public:
   // Signals
   enum class Event {
+    // Common pad events
+    UuidChanged,
     PositionChanged,
     RotationChanged,
+    ShapeChanged,
+    WidthChanged,
+    HeightChanged,
+    RadiusChanged,
+    CustomShapeOutlineChanged,
+    StopMaskConfigChanged,
+    SolderPasteConfigChanged,
+    CopperClearanceChanged,
+    ComponentSideChanged,
+    FunctionChanged,
+    HolesEdited,
+    // Specific events
     MirroredChanged,
+    LockedChanged,
     TextChanged,
     GeometriesChanged,
   };
-  Signal<BI_FootprintPad, Event> onEdited;
-  typedef Slot<BI_FootprintPad, Event> OnEditedSlot;
+  Signal<BI_Pad, Event> onEdited;
+  typedef Slot<BI_Pad, Event> OnEditedSlot;
 
   // Constructors / Destructor
-  BI_FootprintPad() = delete;
-  BI_FootprintPad(const BI_FootprintPad& other) = delete;
-  BI_FootprintPad(BI_Device& device, const Uuid& padUuid);
-  ~BI_FootprintPad();
+  BI_Pad() = delete;
+  BI_Pad(const BI_Pad& other) = delete;
+  /**
+   * @brief Construct a board pad (not related to a footprint)
+   *
+   * @attention This kind of pad needs to be added to the board with
+   *            ::librepcb::BI_NetSegment::addElements().
+   *
+   * @param netsegment  Net segment of the pad.
+   * @param properties  Pad properties.
+   */
+  BI_Pad(BI_NetSegment& netsegment, const BoardPadData& properties);
+  /**
+   * @brief Construct a footprint pad
+   *
+   * @attention This kind of pad is added to the board exclusively from
+   *            the constructor ::librepcb::BI_Device::BI_Device().
+   *
+   * @param device    The device of the pad's footprint.
+   * @param padUuid   Footprint pad UUID.
+   */
+  BI_Pad(BI_Device& device, const Uuid& padUuid);
+  ~BI_Pad() noexcept;
 
   // Getters
+  BI_NetSegment* getNetSegment() const noexcept { return mNetSegment; }
+  BI_Device* getDevice() const noexcept { return mDevice; }
+  const PackagePad* getLibPackagePad() const noexcept { return mPackagePad; }
+  ComponentSignalInstance* getComponentSignalInstance() const noexcept {
+    return mComponentSignalInstance;
+  }
+  NetSignal* getNetSignal() const noexcept;
+  const BoardPadData& getProperties() const noexcept { return mProperties; }
+  const Uuid& getUuid() const noexcept { return mProperties.getUuid(); }
 
   /**
    * @brief Get the absolute position of the pad (global scene coordinates)
@@ -89,25 +133,32 @@ public:
    */
   bool getMirrored() const noexcept { return mMirrored; }
 
-  const QString& getText() const noexcept { return mText; }
-
-  const Uuid& getLibPadUuid() const noexcept;
-  BI_Device& getDevice() const noexcept { return mDevice; }
-  FootprintPad::ComponentSide getComponentSide() const noexcept;
+  Pad::ComponentSide getComponentSide() const noexcept;
   const Layer& getSolderLayer() const noexcept;
   bool isOnLayer(const Layer& layer) const noexcept;
-  const FootprintPad& getLibPad() const noexcept { return *mFootprintPad; }
-  const PackagePad* getLibPackagePad() const noexcept { return mPackagePad; }
-  ComponentSignalInstance* getComponentSignalInstance() const noexcept {
-    return mComponentSignalInstance;
-  }
-  NetSignal* getCompSigInstNetSignal() const noexcept;
+  const QString& getText() const noexcept { return mText; }
   bool isUsed() const noexcept { return (mRegisteredNetLines.count() > 0); }
   const QHash<const Layer*, QList<PadGeometry>>& getGeometries()
       const noexcept {
     return mGeometries;
   }
   TraceAnchor toTraceAnchor() const noexcept override;
+
+  // Setters
+  void setPosition(const Point& position) noexcept;
+  void setRotation(const Angle& rotation) noexcept;
+  void setShape(Pad::Shape shape) noexcept;
+  void setWidth(const PositiveLength& width) noexcept;
+  void setHeight(const PositiveLength& height) noexcept;
+  void setRadius(const UnsignedLimitedRatio& radius) noexcept;
+  void setCustomShapeOutline(const Path& outline) noexcept;
+  void setStopMaskConfig(const MaskConfig& config) noexcept;
+  void setSolderPasteConfig(const MaskConfig& config) noexcept;
+  void setCopperClearance(const UnsignedLength& clearance) noexcept;
+  void setComponentSideAndHoles(Pad::ComponentSide side,
+                                const PadHoleList& holes);
+  void setFunction(Pad::Function function) noexcept;
+  void setLocked(bool locked) noexcept;
 
   // General Methods
   void addToBoard() override;
@@ -121,7 +172,7 @@ public:
   }
 
   // Operator Overloadings
-  BI_FootprintPad& operator=(const BI_FootprintPad& rhs) = delete;
+  BI_Pad& operator=(const BI_Pad& rhs) = delete;
 
 private:  // Methods
   void deviceEdited(const BI_Device& obj, BI_Device::Event event) noexcept;
@@ -141,18 +192,42 @@ private:  // Methods
   bool isConnectedOnLayer(const Layer& layer) const noexcept;
 
 private:  // Data
-  BI_Device& mDevice;
+  /// The net segment this pad is part of
+  ///
+  /// @attention  This is `nullptr if this is a footprint pad.
+  BI_NetSegment* mNetSegment;
+
+  /// The device this pad is part of
+  ///
+  /// @attention  This is `nullptr if this is a board pad.
+  BI_Device* mDevice;
+
+  /// The footprint pad of the device
+  ///
+  /// @attention  This is `nullptr` if this is a board pad!
   const FootprintPad* mFootprintPad;
 
   /// The package pad where this footprint pad is connected to
   ///
-  /// @attention This is `nullptr` if the footprint pad is not connected!
+  /// @attention  This is `nullptr` if this is a board pad or the footprint pad
+  ///             is not connected!
   const PackagePad* mPackagePad;
 
   /// The net signal where this footprint pad is connected to
   ///
-  /// @attention This is `nullptr` if the footprint pad is not connected!
+  /// @attention  This is `nullptr` if this is a board pad or the footprint pad
+  ///             is not connected!
   ComponentSignalInstance* mComponentSignalInstance;
+
+  /// The pad's properties
+  ///
+  /// If this is a footprint pad, the properties will be copied from the
+  /// corresponding pad from the footprint in the project library and are
+  /// considered read-only.
+  ///
+  /// If this is a board pad, the properties are the single source of truth,
+  /// and can be modified with the setters on this class.
+  BoardPadData mProperties;
 
   // Cached Properties
   Point mPosition;

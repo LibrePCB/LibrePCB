@@ -37,11 +37,11 @@ namespace librepcb {
 
 class BI_AirWire;
 class BI_Device;
-class BI_FootprintPad;
 class BI_Hole;
 class BI_NetLine;
 class BI_NetPoint;
 class BI_NetSegment;
+class BI_Pad;
 class BI_Plane;
 class BI_Polygon;
 class BI_StrokeText;
@@ -55,10 +55,10 @@ namespace editor {
 
 class BGI_AirWire;
 class BGI_Device;
-class BGI_FootprintPad;
 class BGI_Hole;
 class BGI_NetLine;
 class BGI_NetPoint;
+class BGI_Pad;
 class BGI_Plane;
 class BGI_Plane;
 class BGI_Polygon;
@@ -94,14 +94,14 @@ public:
     ZValue_PolygonsBottom,  ///< For ::librepcb::BI_Polygon items
     ZValue_DevicesBottom,  ///< For ::librepcb::BI_Device items
     ZValue_CopperBottom,
-    ZValue_FootprintPadsBottom,  ///< For ::librepcb::BI_FootprintPad items
+    ZValue_PadsBottom,  ///< For ::librepcb::BI_Pad items
     ZValue_ZonesBottom,  ///< For ::librepcb::BI_Zone items
     ZValue_PlanesBottom,  ///< For ::librepcb::BI_Plane items
     ZValue_InnerBottom,
     ZValue_InnerTop,
     ZValue_PlanesTop,  ///< For ::librepcb::BI_Plane items
     ZValue_ZonesTop,  ///< For ::librepcb::BI_Zone items
-    ZValue_FootprintPadsTop,  ///< For ::librepcb::BI_FootprintPad items
+    ZValue_PadsTop,  ///< For ::librepcb::BI_Pad items
     ZValue_CopperTop,
     ZValue_DevicesTop,  ///< For ::librepcb::BI_Device items
     ZValue_PolygonsTop,  ///< For ::librepcb::BI_Polygon items
@@ -126,9 +126,8 @@ public:
   const QHash<BI_Device*, std::shared_ptr<BGI_Device>>& getDevices() noexcept {
     return mDevices;
   }
-  const QHash<BI_FootprintPad*, std::shared_ptr<BGI_FootprintPad>>&
-      getFootprintPads() noexcept {
-    return mFootprintPads;
+  const QHash<BI_Pad*, std::shared_ptr<BGI_Pad>>& getPads() noexcept {
+    return mPads;
   }
   const QHash<BI_Via*, std::shared_ptr<BGI_Via>>& getVias() noexcept {
     return mVias;
@@ -177,15 +176,16 @@ public:
 private:  // Methods
   void addDevice(BI_Device& device) noexcept;
   void removeDevice(BI_Device& device) noexcept;
-  void addFootprintPad(BI_FootprintPad& pad,
-                       std::weak_ptr<BGI_Device> device) noexcept;
-  void removeFootprintPad(BI_FootprintPad& pad) noexcept;
+  void addPad(BI_Pad& pad, std::weak_ptr<BGI_Device> device) noexcept;
+  void removePad(BI_Pad& pad) noexcept;
   void addNetSegment(BI_NetSegment& netSegment) noexcept;
   void removeNetSegment(BI_NetSegment& netSegment) noexcept;
-  void addNetSegmentElements(const QList<BI_Via*>& vias,
+  void addNetSegmentElements(const QList<BI_Pad*>& pads,
+                             const QList<BI_Via*>& vias,
                              const QList<BI_NetPoint*>& netPoints,
                              const QList<BI_NetLine*>& netLines) noexcept;
-  void removeNetSegmentElements(const QList<BI_Via*>& vias,
+  void removeNetSegmentElements(const QList<BI_Pad*>& pads,
+                                const QList<BI_Via*>& vias,
                                 const QList<BI_NetPoint*>& netPoints,
                                 const QList<BI_NetLine*>& netLines) noexcept;
   void addVia(BI_Via& via) noexcept;
@@ -212,7 +212,7 @@ private:  // Data
   const GraphicsLayerList& mLayers;
   std::shared_ptr<const QSet<const NetSignal*>> mHighlightedNetSignals;
   QHash<BI_Device*, std::shared_ptr<BGI_Device>> mDevices;
-  QHash<BI_FootprintPad*, std::shared_ptr<BGI_FootprintPad>> mFootprintPads;
+  QHash<BI_Pad*, std::shared_ptr<BGI_Pad>> mPads;
   QHash<BI_Via*, std::shared_ptr<BGI_Via>> mVias;
   QHash<BI_NetPoint*, std::shared_ptr<BGI_NetPoint>> mNetPoints;
   QHash<BI_NetLine*, std::shared_ptr<BGI_NetLine>> mNetLines;

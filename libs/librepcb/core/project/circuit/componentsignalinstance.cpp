@@ -28,7 +28,7 @@
 #include "../../library/pkg/packagepad.h"
 #include "../../utils/scopeguardlist.h"
 #include "../../utils/toolbox.h"
-#include "../board/items/bi_footprintpad.h"
+#include "../board/items/bi_pad.h"
 #include "../project.h"
 #include "../projectattributelookup.h"
 #include "../schematic/items/si_symbolpin.h"
@@ -93,7 +93,7 @@ bool ComponentSignalInstance::arePinsOrPadsUsed() const noexcept {
       return true;
     }
   }
-  foreach (const BI_FootprintPad* pad, mRegisteredFootprintPads) {
+  foreach (const BI_Pad* pad, mRegisteredFootprintPads) {
     if (pad->isUsed()) {
       return true;
     }
@@ -179,7 +179,7 @@ void ComponentSignalInstance::unregisterSymbolPin(SI_SymbolPin& pin) {
   mRegisteredSymbolPins.removeOne(&pin);
 }
 
-void ComponentSignalInstance::registerFootprintPad(BI_FootprintPad& pad) {
+void ComponentSignalInstance::registerFootprintPad(BI_Pad& pad) {
   if ((!mIsAddedToCircuit) || (pad.getCircuit() != mCircuit) ||
       (mRegisteredFootprintPads.contains(&pad))) {
     throw LogicError(__FILE__, __LINE__);
@@ -188,7 +188,7 @@ void ComponentSignalInstance::registerFootprintPad(BI_FootprintPad& pad) {
   updatePadNames();
 }
 
-void ComponentSignalInstance::unregisterFootprintPad(BI_FootprintPad& pad) {
+void ComponentSignalInstance::unregisterFootprintPad(BI_Pad& pad) {
   if ((!mIsAddedToCircuit) || (!mRegisteredFootprintPads.contains(&pad))) {
     throw LogicError(__FILE__, __LINE__);
   }
@@ -210,8 +210,8 @@ void ComponentSignalInstance::serialize(SExpression& root) const {
 void ComponentSignalInstance::updatePadNames() noexcept {
   QSet<QString> names;
   if (const BI_Device* device = mComponentInstance.getPrimaryDevice()) {
-    foreach (const BI_FootprintPad* pad, mRegisteredFootprintPads) {
-      if (&pad->getDevice() == device) {
+    foreach (const BI_Pad* pad, mRegisteredFootprintPads) {
+      if (pad->getDevice() == device) {
         if (const PackagePad* pkgPad = pad->getLibPackagePad()) {
           names.insert(*pkgPad->getName());
         }

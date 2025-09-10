@@ -84,7 +84,7 @@ TEST_F(D356NetlistGeneratorTest, testSmtPad) {
              -Angle::deg180(), 5);
 
   const QString expected = sHeader %  // clang-format off
-  "327N/C                                A01X+000001Y-000002X0123Y0654R000 S2\n"
+  "327N/C              NOREF -NPAD       A01X+000001Y-000002X0123Y0654R000 S2\n"
   "327N/C{2}           U1    -42         A01X-000011Y+000022X0235Y0765R090 S2\n"
   "327N/C{2}           U2    -1337       A05X-000011Y+000022X0235Y0765R270 S1\n"
   "327TooooLooogN{3}   AlsoTo-AsWe       A05X+000056Y-000067X9999Y9999R180 S1\n"
@@ -109,7 +109,7 @@ TEST_F(D356NetlistGeneratorTest, testThtPad) {
              -Angle::deg180(), PositiveLength(20000000));
 
   const QString expected = sHeader %  // clang-format off
-  "317N/C                          D1300PA00X+000001Y-000002X0123Y0654R000 S0\n"
+  "317N/C              NOREF -NPAD D1300PA00X+000001Y-000002X0123Y0654R000 S0\n"
   "317N/C{2}           U1    -42   D0444PA00X-000011Y+000022X0235Y0765R090 S0\n"
   "317N/C{2}           U2    -1337 D0556PA00X-000011Y+000022X0235Y0765R270 S0\n"
   "317TooooLooogN{3}   AlsoTo-AsWe D9999PA00X+000056Y-000067X9999Y9999R180 S0\n"

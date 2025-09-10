@@ -820,26 +820,26 @@ std::pair<std::shared_ptr<PackagePad>, std::shared_ptr<FootprintPad>>
   PositiveLength width(size);
   PositiveLength height(size);
   UnsignedLimitedRatio radius(Ratio::fromPercent(0));
-  FootprintPad::Shape shape;
+  Pad::Shape shape;
   Path customShapeOutline;
   switch (p.getShape()) {
     case parseagle::PadShape::Square:
-      shape = FootprintPad::Shape::RoundedRect;
+      shape = Pad::Shape::RoundedRect;
       break;
     case parseagle::PadShape::Octagon:
-      shape = FootprintPad::Shape::RoundedOctagon;
+      shape = Pad::Shape::RoundedOctagon;
       break;
     case parseagle::PadShape::Round:
-      shape = FootprintPad::Shape::RoundedRect;
+      shape = Pad::Shape::RoundedRect;
       radius = UnsignedLimitedRatio(Ratio::fromPercent(100));
       break;
     case parseagle::PadShape::Long:
-      shape = FootprintPad::Shape::RoundedRect;
+      shape = Pad::Shape::RoundedRect;
       radius = UnsignedLimitedRatio(Ratio::fromPercent(100));
       width = PositiveLength(size * 2);
       break;
     case parseagle::PadShape::Offset:
-      shape = FootprintPad::Shape::Custom;
+      shape = Pad::Shape::Custom;
       radius = UnsignedLimitedRatio(Ratio::fromPercent(100));
       width = PositiveLength(size * 2);
       customShapeOutline =
@@ -868,8 +868,8 @@ std::pair<std::shared_ptr<PackagePad>, std::shared_ptr<FootprintPad>>
                       : MaskConfig::off(),  // Stop mask
           MaskConfig::off(),  // Solder paste
           UnsignedLength(0),  // Copper clearance
-          FootprintPad::ComponentSide::Top,  // Side
-          FootprintPad::Function::Unspecified,  // Function
+          Pad::ComponentSide::Top,  // Side
+          Pad::Function::Unspecified,  // Function
           PadHoleList{std::make_shared<PadHole>(
               Uuid::createRandom(), drillDiameter,
               makeNonEmptyPath(Point(0, 0)))}  // Holes
@@ -880,11 +880,11 @@ std::pair<std::shared_ptr<PackagePad>, std::shared_ptr<FootprintPad>>
     EagleTypeConverter::convertSmtPad(const parseagle::SmtPad& p) {
   Uuid uuid = Uuid::createRandom();
   const Layer* layer = tryConvertBoardLayer(p.getLayer());
-  FootprintPad::ComponentSide side;
+  Pad::ComponentSide side;
   if (layer == &Layer::topCopper()) {
-    side = FootprintPad::ComponentSide::Top;
+    side = Pad::ComponentSide::Top;
   } else if (layer == &Layer::botCopper()) {
-    side = FootprintPad::ComponentSide::Bottom;
+    side = Pad::ComponentSide::Bottom;
   } else {
     throw RuntimeError(__FILE__, __LINE__,
                        QString("Invalid pad layer: %1").arg(p.getLayer()));
@@ -898,7 +898,7 @@ std::pair<std::shared_ptr<PackagePad>, std::shared_ptr<FootprintPad>>
           uuid,  // Package pad UUID
           convertPoint(p.getPosition()),  // Position
           convertAngle(p.getRotation().getAngle()),  // Rotation
-          FootprintPad::Shape::RoundedRect,  // Shape
+          Pad::Shape::RoundedRect,  // Shape
           PositiveLength(convertLength(p.getWidth())),  // Width
           PositiveLength(convertLength(p.getHeight())),  // Height
           UnsignedLimitedRatio(Ratio::fromPercent(p.getRoundness())),  // Radius
@@ -909,7 +909,7 @@ std::pair<std::shared_ptr<PackagePad>, std::shared_ptr<FootprintPad>>
                        : MaskConfig::off(),  // Solder paste
           UnsignedLength(0),  // Copper clearance
           side,  // Side
-          FootprintPad::Function::Unspecified,  // Function
+          Pad::Function::Unspecified,  // Function
           PadHoleList{}  // Holes
           ));
 }

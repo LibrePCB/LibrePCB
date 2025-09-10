@@ -43,6 +43,7 @@ class BI_Device;
 class BI_Hole;
 class BI_NetLine;
 class BI_NetSegment;
+class BI_Pad;
 class BI_Plane;
 class BI_Polygon;
 class BI_StrokeText;
@@ -179,6 +180,7 @@ private:  // Methods
 
   bool openPropertiesDialog(std::shared_ptr<QGraphicsItem> item);
   void openDevicePropertiesDialog(BI_Device& device) noexcept;
+  void openPadPropertiesDialog(BI_Pad& pad) noexcept;
   void openViaPropertiesDialog(BI_Via& via) noexcept;
   void openPlanePropertiesDialog(BI_Plane& plane) noexcept;
   void openZonePropertiesDialog(BI_Zone& zone) noexcept;

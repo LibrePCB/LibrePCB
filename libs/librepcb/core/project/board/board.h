@@ -43,11 +43,11 @@ namespace librepcb {
 class BI_AirWire;
 class BI_Base;
 class BI_Device;
-class BI_FootprintPad;
 class BI_Hole;
 class BI_NetLine;
 class BI_NetPoint;
 class BI_NetSegment;
+class BI_Pad;
 class BI_Plane;
 class BI_Polygon;
 class BI_StrokeText;

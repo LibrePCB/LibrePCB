@@ -40,7 +40,7 @@
 namespace librepcb {
 
 class BI_Device;
-class BI_FootprintPad;
+class BI_Pad;
 class BI_Via;
 class Board;
 class BoardFabricationOutputSettings;
@@ -131,8 +131,8 @@ private:
                const QString& netName) const;
   void drawDevice(GerberGenerator& gen, const BI_Device& device,
                   const Layer& layer) const;
-  void drawFootprintPad(GerberGenerator& gen, const BI_FootprintPad& pad,
-                        const Layer& layer) const;
+  void drawPad(GerberGenerator& gen, const BI_Pad& pad,
+               const Layer& layer) const;
   void drawPolygon(GerberGenerator& gen, const Layer& layer,
                    const Path& outline, const UnsignedLength& lineWidth,
                    bool fill, GerberGenerator::Function function,

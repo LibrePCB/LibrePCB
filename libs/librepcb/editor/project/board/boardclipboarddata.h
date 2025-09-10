@@ -28,6 +28,7 @@
 #include <librepcb/core/geometry/trace.h>
 #include <librepcb/core/geometry/via.h>
 #include <librepcb/core/project/board/boardholedata.h>
+#include <librepcb/core/project/board/boardpaddata.h>
 #include <librepcb/core/project/board/boardpolygondata.h>
 #include <librepcb/core/project/board/boardstroketextdata.h>
 #include <librepcb/core/project/board/boardzonedata.h>
@@ -149,17 +150,24 @@ public:
     static constexpr const char* tagname = "netsegment";
 
     std::optional<CircuitIdentifier> netName;
+    BoardPadDataList pads;
     ViaList vias;
     JunctionList junctions;
     TraceList traces;
     Signal<NetSegment> onEdited;  ///< Dummy event, not used
 
     explicit NetSegment(const std::optional<CircuitIdentifier>& netName)
-      : netName(netName), vias(), junctions(), traces(), onEdited(*this) {}
+      : netName(netName),
+        pads(),
+        vias(),
+        junctions(),
+        traces(),
+        onEdited(*this) {}
 
     explicit NetSegment(const SExpression& node)
       : netName(deserialize<std::optional<CircuitIdentifier>>(
             node.getChild("net/@0"))),
+        pads(node),
         vias(node),
         junctions(node),
         traces(node),
@@ -168,6 +176,8 @@ public:
     void serialize(SExpression& root) const {
       root.ensureLineBreak();
       root.appendChild("net", netName);
+      root.ensureLineBreak();
+      pads.serialize(root);
       root.ensureLineBreak();
       vias.serialize(root);
       root.ensureLineBreak();
@@ -178,8 +188,9 @@ public:
     }
 
     bool operator!=(const NetSegment& rhs) noexcept {
-      return (netName != rhs.netName) || (vias != rhs.vias) ||
-          (junctions != rhs.junctions) || (traces != rhs.traces);
+      return (netName != rhs.netName) || (pads != rhs.pads) ||
+          (vias != rhs.vias) || (junctions != rhs.junctions) ||
+          (traces != rhs.traces);
     }
   };
 

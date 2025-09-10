@@ -199,7 +199,7 @@ std::unique_ptr<Package> KiCadLibraryConverter::createPackage(
   for (const KiCadFootprintPad& obj : kiFpt.pads) {
     tryOrLogError(
         [&]() {
-          C::Pad res = C::convertPad(
+          C::PadReplacements res = C::convertPad(
               obj, kiFpt.solderMaskMargin, kiFpt.solderPasteMargin,
               kiFpt.solderPasteRatio, kiFpt.clearance, log);
           if (res.fptPad) {

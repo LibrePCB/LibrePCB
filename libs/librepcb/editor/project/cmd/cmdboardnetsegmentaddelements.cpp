@@ -40,7 +40,7 @@ namespace editor {
 
 CmdBoardNetSegmentAddElements::CmdBoardNetSegmentAddElements(
     BI_NetSegment& segment) noexcept
-  : UndoCommand(tr("Add net segment elements")), mNetSegment(segment) {
+  : UndoCommand(tr("Add Vias/Pads/Traces")), mNetSegment(segment) {
 }
 
 CmdBoardNetSegmentAddElements::~CmdBoardNetSegmentAddElements() noexcept {
@@ -49,6 +49,16 @@ CmdBoardNetSegmentAddElements::~CmdBoardNetSegmentAddElements() noexcept {
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
+
+BI_Pad* CmdBoardNetSegmentAddElements::addPad(BI_Pad& pad) {
+  mPads.append(&pad);
+  return &pad;
+}
+
+BI_Pad* CmdBoardNetSegmentAddElements::addPad(const BoardPadData& pad) {
+  BI_Pad* p = new BI_Pad(mNetSegment, pad);
+  return addPad(*p);
+}
 
 BI_Via* CmdBoardNetSegmentAddElements::addVia(BI_Via& via) {
   mVias.append(&via);
@@ -96,11 +106,11 @@ bool CmdBoardNetSegmentAddElements::performExecute() {
 }
 
 void CmdBoardNetSegmentAddElements::performUndo() {
-  mNetSegment.removeElements(mVias, mNetPoints, mNetLines);  // can throw
+  mNetSegment.removeElements(mPads, mVias, mNetPoints, mNetLines);  // can throw
 }
 
 void CmdBoardNetSegmentAddElements::performRedo() {
-  mNetSegment.addElements(mVias, mNetPoints, mNetLines);  // can throw
+  mNetSegment.addElements(mPads, mVias, mNetPoints, mNetLines);  // can throw
 }
 
 /*******************************************************************************

@@ -28,6 +28,7 @@
 #include "bi_base.h"
 #include "bi_netline.h"
 #include "bi_netpoint.h"
+#include "bi_pad.h"
 #include "bi_via.h"
 
 #include <QtCore>
@@ -38,8 +39,8 @@
 namespace librepcb {
 
 class BI_Device;
-class BI_FootprintPad;
 class BI_NetLineAnchor;
+class BI_Pad;
 class NetSignal;
 
 /*******************************************************************************
@@ -89,6 +90,7 @@ public:
   void setNetSignal(NetSignal* netsignal);
 
   // Element Getters
+  const QMap<Uuid, BI_Pad*>& getPads() const noexcept { return mPads; }
   const QMap<Uuid, BI_Via*>& getVias() const noexcept { return mVias; }
   const QMap<Uuid, BI_NetPoint*>& getNetPoints() const noexcept {
     return mNetPoints;
@@ -98,10 +100,10 @@ public:
   }
 
   // NetPoint+NetLine Methods
-  void addElements(const QList<BI_Via*>& vias,
+  void addElements(const QList<BI_Pad*>& pads, const QList<BI_Via*>& vias,
                    const QList<BI_NetPoint*>& netpoints,
                    const QList<BI_NetLine*>& netlines);
-  void removeElements(const QList<BI_Via*>& vias,
+  void removeElements(const QList<BI_Pad*>& pads, const QList<BI_Via*>& vias,
                       const QList<BI_NetPoint*>& netpoints,
                       const QList<BI_NetLine*>& netlines);
 
@@ -122,10 +124,10 @@ public:
   bool operator!=(const BI_NetSegment& rhs) noexcept { return (this != &rhs); }
 
 signals:
-  void elementsAdded(const QList<BI_Via*>& vias,
+  void elementsAdded(const QList<BI_Pad*>& pads, const QList<BI_Via*>& vias,
                      const QList<BI_NetPoint*>& netPoints,
                      const QList<BI_NetLine*>& netLines);
-  void elementsRemoved(const QList<BI_Via*>& vias,
+  void elementsRemoved(const QList<BI_Pad*>& pads, const QList<BI_Via*>& vias,
                        const QList<BI_NetPoint*>& netPoints,
                        const QList<BI_NetLine*>& netLines);
 
@@ -134,9 +136,10 @@ private:
   bool areAllNetPointsConnectedTogether() const noexcept;
   void findAllConnectedNetPoints(const BI_NetLineAnchor& p,
                                  QSet<const BI_Via*>& vias,
-                                 QSet<const BI_FootprintPad*>& pads,
+                                 QSet<const BI_Pad*>& pads,
                                  QSet<const BI_NetPoint*>& points,
-                                 QSet<const BI_NetLine*>& lines) const noexcept;
+                                 QSet<const BI_NetLine*>& lines,
+                                 int& boardPads) const noexcept;
 
   // Attributes
   Uuid mUuid;
@@ -147,6 +150,7 @@ private:
   NetSignal* mNetSignal;
 
   // Items
+  QMap<Uuid, BI_Pad*> mPads;
   QMap<Uuid, BI_Via*> mVias;
   QMap<Uuid, BI_NetPoint*> mNetPoints;
   QMap<Uuid, BI_NetLine*> mNetLines;

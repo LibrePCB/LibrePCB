@@ -29,6 +29,7 @@
 #include "cmdboardnetpointedit.h"
 #include "cmdboardnetsegmentadd.h"
 #include "cmdboardnetsegmentremove.h"
+#include "cmdboardpadedit.h"
 #include "cmdboardplaneedit.h"
 #include "cmdboardpolygonedit.h"
 #include "cmdboardstroketextedit.h"
@@ -40,10 +41,10 @@
 #include <librepcb/core/library/pkg/footprintpad.h>
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/items/bi_device.h>
-#include <librepcb/core/project/board/items/bi_footprintpad.h>
 #include <librepcb/core/project/board/items/bi_hole.h>
 #include <librepcb/core/project/board/items/bi_netline.h>
 #include <librepcb/core/project/board/items/bi_netpoint.h>
+#include <librepcb/core/project/board/items/bi_pad.h>
 #include <librepcb/core/project/board/items/bi_plane.h>
 #include <librepcb/core/project/board/items/bi_polygon.h>
 #include <librepcb/core/project/board/items/bi_stroketext.h>
@@ -89,6 +90,7 @@ bool CmdFlipSelectedBoardItems::performExecute() {
   // get all selected items
   BoardSelectionQuery query(mScene, mIncludeLockedItems);
   query.addDeviceInstancesOfSelectedFootprints();
+  query.addSelectedBoardPads();
   query.addSelectedNetLines();
   query.addSelectedVias();
   query.addSelectedPlanes();
@@ -105,6 +107,12 @@ bool CmdFlipSelectedBoardItems::performExecute() {
   foreach (BI_Device* device, query.getDeviceInstances()) {
     center += device->getPosition();
     ++count;
+  }
+  foreach (BI_Pad* pad, query.getPads()) {
+    if (!pad->getDevice()) {
+      center += pad->getPosition();
+      ++count;
+    }
   }
   foreach (BI_NetLine* netline, query.getNetLines()) {
     center += netline->getP1().getPosition();
@@ -169,8 +177,13 @@ bool CmdFlipSelectedBoardItems::performExecute() {
   foreach (BI_Via* via, query.getVias()) {
     netsegments.insert(&via->getNetSegment());
   }
+  foreach (BI_Pad* pad, query.getPads()) {
+    if (auto ns = pad->getNetSegment()) {
+      netsegments.insert(ns);
+    }
+  }
   foreach (BI_Device* device, query.getDeviceInstances()) {
-    foreach (BI_FootprintPad* pad, device->getPads()) {
+    foreach (BI_Pad* pad, device->getPads()) {
       if (pad->getNetSegmentOfLines()) {
         netsegments.insert(pad->getNetSegmentOfLines());
       }
@@ -217,6 +230,14 @@ bool CmdFlipSelectedBoardItems::performExecute() {
     std::unique_ptr<CmdBoardViaEdit> cmd(new CmdBoardViaEdit(*via));
     cmd->setPosition(via->getPosition().mirrored(mOrientation, center), false);
     cmd->mirrorLayers(innerLayerCount);
+    execNewChildCmd(cmd.release());  // can throw
+  }
+
+  // flip all pads
+  foreach (BI_Pad* pad, query.getPads()) {
+    Q_ASSERT(pad);
+    std::unique_ptr<CmdBoardPadEdit> cmd(new CmdBoardPadEdit(*pad));
+    cmd->mirror(center, mOrientation, false);  // can throw
     execNewChildCmd(cmd.release());  // can throw
   }
 

@@ -29,11 +29,11 @@
 #include "../circuit/netsignal.h"
 #include "board.h"
 #include "items/bi_device.h"
-#include "items/bi_footprintpad.h"
 #include "items/bi_hole.h"
 #include "items/bi_netline.h"
 #include "items/bi_netpoint.h"
 #include "items/bi_netsegment.h"
+#include "items/bi_pad.h"
 #include "items/bi_plane.h"
 #include "items/bi_polygon.h"
 #include "items/bi_via.h"
@@ -169,13 +169,13 @@ std::shared_ptr<BoardPlaneFragmentsBuilder::JobData>
   layers.insert(&Layer::boardCutouts());
   foreach (const BI_Device* device, board.getDeviceInstances()) {
     const Transform transform(*device);
-    foreach (const BI_FootprintPad* pad, device->getPads()) {
+    foreach (const BI_Pad* pad, device->getPads()) {
       std::optional<Uuid> netSignalUuid;
-      if (const NetSignal* netSignal = pad->getCompSigInstNetSignal()) {
+      if (const NetSignal* netSignal = pad->getNetSignal()) {
         netSignalUuid = netSignal->getUuid();
       }
       data->pads.append(PadData{Transform(*pad), netSignalUuid,
-                                pad->getLibPad().getCopperClearance(),
+                                pad->getProperties().getCopperClearance(),
                                 pad->getGeometries()});
     }
     for (const Polygon& polygon : device->getLibFootprint().getPolygons()) {
@@ -260,6 +260,11 @@ std::shared_ptr<BoardPlaneFragmentsBuilder::JobData>
     std::optional<Uuid> netSignalUuid;
     if (const NetSignal* netSignal = segment->getNetSignal()) {
       netSignalUuid = netSignal->getUuid();
+    }
+    for (const BI_Pad* pad : segment->getPads()) {
+      data->pads.append(PadData{Transform(*pad), netSignalUuid,
+                                pad->getProperties().getCopperClearance(),
+                                pad->getGeometries()});
     }
     for (const BI_Via* via : segment->getVias()) {
       data->vias.append(ViaData{

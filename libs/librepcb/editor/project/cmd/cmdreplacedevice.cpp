@@ -31,9 +31,9 @@
 #include <librepcb/core/library/dev/device.h>
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/items/bi_device.h>
-#include <librepcb/core/project/board/items/bi_footprintpad.h>
 #include <librepcb/core/project/board/items/bi_netpoint.h>
 #include <librepcb/core/project/board/items/bi_netsegment.h>
+#include <librepcb/core/project/board/items/bi_pad.h>
 #include <librepcb/core/project/circuit/componentinstance.h>
 #include <librepcb/core/utils/scopeguard.h>
 
@@ -73,7 +73,7 @@ bool CmdReplaceDevice::performExecute() {
   auto undoScopeGuard = scopeGuard([&]() { performUndo(); });
 
   // remove all connected netlines
-  foreach (BI_FootprintPad* pad, mDeviceInstance.getPads()) {
+  foreach (BI_Pad* pad, mDeviceInstance.getPads()) {
     BI_NetSegment* netsegment = pad->getNetSegmentOfLines();
     if (netsegment) {
       std::unique_ptr<CmdBoardNetSegmentAddElements> cmdAdd(

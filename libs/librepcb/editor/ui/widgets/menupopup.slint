@@ -20,6 +20,7 @@ export component MenuItem inherits Rectangle {
     in property <image> icon-checked: @image-url("../../../../font-awesome/svgs/regular/square-check.svg");
     in property <image> icon-unchecked: @image-url("../../../../font-awesome/svgs/regular/square.svg");
     in property <angle> icon-rotation: 0deg;
+    in property <color> icon-color: text-color;
     in property <bool> enabled: true;
     in property <bool> checkable: false;
     in property <bool> checked: false;
@@ -63,7 +64,7 @@ export component MenuItem inherits Rectangle {
                 y: self.x;
                 width: parent.width - 2 * self.x;
                 height: self.width;
-                colorize: text-color;
+                colorize: icon-color;
                 image-fit: contain;
                 vertical-alignment: center;
                 horizontal-alignment: center;

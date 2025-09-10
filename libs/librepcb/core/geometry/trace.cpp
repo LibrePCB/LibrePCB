@@ -35,15 +35,20 @@ namespace librepcb {
 
 TraceAnchor::TraceAnchor(const std::optional<Uuid>& junction,
                          const std::optional<Uuid>& via,
-                         const std::optional<PadAnchor>& pad) noexcept
-  : mJunction(junction), mVia(via), mPad(pad) {
-  Q_ASSERT(((junction) && (!via) && (!pad)) ||
-           ((!junction) && (via) && (!pad)) ||
-           ((!junction) && (!via) && (pad)));
+                         const std::optional<Uuid>& pad,
+                         const std::optional<PadAnchor>& footprintPad) noexcept
+  : mJunction(junction), mVia(via), mPad(pad), mFootprintPad(footprintPad) {
+  Q_ASSERT(((junction) && (!via) && (!pad) && (!footprintPad)) ||
+           ((!junction) && (via) && (!pad) && (!footprintPad)) ||
+           ((!junction) && (!via) && (pad) && (!footprintPad)) ||
+           ((!junction) && (!via) && (!pad) && (footprintPad)));
 }
 
 TraceAnchor::TraceAnchor(const TraceAnchor& other) noexcept
-  : mJunction(other.mJunction), mVia(other.mVia), mPad(other.mPad) {
+  : mJunction(other.mJunction),
+    mVia(other.mVia),
+    mPad(other.mPad),
+    mFootprintPad(other.mFootprintPad) {
 }
 
 TraceAnchor::TraceAnchor(const SExpression& node) {
@@ -51,9 +56,11 @@ TraceAnchor::TraceAnchor(const SExpression& node) {
     mJunction = deserialize<Uuid>(junctionNode->getChild("@0"));
   } else if (const SExpression* viaNode = node.tryGetChild("via")) {
     mVia = deserialize<Uuid>(viaNode->getChild("@0"));
+  } else if (const SExpression* devNode = node.tryGetChild("device")) {
+    mFootprintPad = PadAnchor{deserialize<Uuid>(devNode->getChild("@0")),
+                              deserialize<Uuid>(node.getChild("pad/@0"))};
   } else {
-    mPad = PadAnchor{deserialize<Uuid>(node.getChild("device/@0")),
-                     deserialize<Uuid>(node.getChild("pad/@0"))};
+    mPad = deserialize<Uuid>(node.getChild("pad/@0"));
   }
 }
 
@@ -66,8 +73,10 @@ void TraceAnchor::serialize(SExpression& root) const {
   } else if (mVia) {
     root.appendChild("via", *mVia);
   } else if (mPad) {
-    root.appendChild("device", mPad->device);
-    root.appendChild("pad", mPad->pad);
+    root.appendChild("pad", *mPad);
+  } else if (mFootprintPad) {
+    root.appendChild("device", mFootprintPad->device);
+    root.appendChild("pad", mFootprintPad->pad);
   } else {
     throw LogicError(__FILE__, __LINE__);
   }
@@ -75,7 +84,7 @@ void TraceAnchor::serialize(SExpression& root) const {
 
 bool TraceAnchor::operator==(const TraceAnchor& rhs) const noexcept {
   return (mJunction == rhs.mJunction) && (mVia == rhs.mVia) &&
-      (mPad == rhs.mPad);
+      (mPad == rhs.mPad) && (mFootprintPad == rhs.mFootprintPad);
 }
 
 bool TraceAnchor::operator<(const TraceAnchor& rhs) const noexcept {
@@ -87,15 +96,19 @@ bool TraceAnchor::operator<(const TraceAnchor& rhs) const noexcept {
     return rhs.mVia.has_value();
   } else if (mPad.has_value() != rhs.mPad.has_value()) {
     return rhs.mPad.has_value();
+  } else if (mFootprintPad.has_value() != rhs.mFootprintPad.has_value()) {
+    return rhs.mFootprintPad.has_value();
   } else if (mJunction) {
     return (*mJunction) < (*rhs.mJunction);
   } else if (mVia) {
     return (*mVia) < (*rhs.mVia);
   } else if (mPad) {
-    if (mPad->device != rhs.mPad->device) {
-      return mPad->device < rhs.mPad->device;
+    return (*mPad) < (*rhs.mPad);
+  } else if (mFootprintPad) {
+    if (mFootprintPad->device != rhs.mFootprintPad->device) {
+      return mFootprintPad->device < rhs.mFootprintPad->device;
     } else {
-      return mPad->pad < rhs.mPad->pad;
+      return mFootprintPad->pad < rhs.mFootprintPad->pad;
     }
   } else {
     qWarning() << "Unhandled branch in TraceAnchor::operator<().";
@@ -107,19 +120,26 @@ TraceAnchor& TraceAnchor::operator=(const TraceAnchor& rhs) noexcept {
   mJunction = rhs.mJunction;
   mVia = rhs.mVia;
   mPad = rhs.mPad;
+  mFootprintPad = rhs.mFootprintPad;
   return *this;
 }
 
 TraceAnchor TraceAnchor::junction(const Uuid& junction) noexcept {
-  return TraceAnchor(junction, std::nullopt, std::nullopt);
+  return TraceAnchor(junction, std::nullopt, std::nullopt, std::nullopt);
 }
 
 TraceAnchor TraceAnchor::via(const Uuid& via) noexcept {
-  return TraceAnchor(std::nullopt, via, std::nullopt);
+  return TraceAnchor(std::nullopt, via, std::nullopt, std::nullopt);
 }
 
-TraceAnchor TraceAnchor::pad(const Uuid& device, const Uuid& pad) noexcept {
-  return TraceAnchor(std::nullopt, std::nullopt, PadAnchor{device, pad});
+TraceAnchor TraceAnchor::pad(const Uuid& pad) noexcept {
+  return TraceAnchor(std::nullopt, std::nullopt, pad, std::nullopt);
+}
+
+TraceAnchor TraceAnchor::footprintPad(const Uuid& device,
+                                      const Uuid& pad) noexcept {
+  return TraceAnchor(std::nullopt, std::nullopt, std::nullopt,
+                     PadAnchor{device, pad});
 }
 
 /*******************************************************************************

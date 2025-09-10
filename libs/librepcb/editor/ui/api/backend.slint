@@ -88,8 +88,10 @@ export global Backend {
             Data.sections[section].symbol-tabs[tab].tool = EditorTool.pin;
         } else if action == TabAction.tool-pad-tht {
             Data.sections[section].package-tabs[tab].tool = EditorTool.pad-tht;
+            Data.sections[section].board-2d-tabs[tab].tool = EditorTool.pad-tht;
         } else if action == TabAction.tool-pad-smt {
             Data.sections[section].package-tabs[tab].tool = EditorTool.pad-smt;
+            Data.sections[section].board-2d-tabs[tab].tool = EditorTool.pad-smt;
         } else if action == TabAction.tool-wire {
             Data.sections[section].schematic-tabs[tab].tool = EditorTool.wire;
             Data.sections[section].board-2d-tabs[tab].tool = EditorTool.wire;

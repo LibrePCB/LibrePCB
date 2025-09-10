@@ -35,6 +35,7 @@ namespace librepcb {
 class BI_NetLine;
 class BI_NetPoint;
 class BI_NetSegment;
+class BI_Pad;
 class BI_Via;
 
 namespace editor {
@@ -53,6 +54,7 @@ public:
   ~CmdBoardNetSegmentRemoveElements() noexcept;
 
   // General Methods
+  void removePad(BI_Pad& pad);
   void removeVia(BI_Via& via);
   void removeNetPoint(BI_NetPoint& netpoint);
   void removeNetLine(BI_NetLine& netline);
@@ -71,6 +73,7 @@ private:
 
   // Private Member Variables
   BI_NetSegment& mNetSegment;
+  QList<BI_Pad*> mPads;
   QList<BI_Via*> mVias;
   QList<BI_NetPoint*> mNetPoints;
   QList<BI_NetLine*> mNetLines;

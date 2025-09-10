@@ -39,6 +39,7 @@
 #include "../board/graphicsitems/bgi_hole.h"
 #include "../board/graphicsitems/bgi_netline.h"
 #include "../board/graphicsitems/bgi_netpoint.h"
+#include "../board/graphicsitems/bgi_pad.h"
 #include "../board/graphicsitems/bgi_plane.h"
 #include "../board/graphicsitems/bgi_polygon.h"
 #include "../board/graphicsitems/bgi_stroketext.h"
@@ -51,11 +52,11 @@
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/boardnetsegmentsplitter.h>
 #include <librepcb/core/project/board/items/bi_device.h>
-#include <librepcb/core/project/board/items/bi_footprintpad.h>
 #include <librepcb/core/project/board/items/bi_hole.h>
 #include <librepcb/core/project/board/items/bi_netline.h>
 #include <librepcb/core/project/board/items/bi_netpoint.h>
 #include <librepcb/core/project/board/items/bi_netsegment.h>
+#include <librepcb/core/project/board/items/bi_pad.h>
 #include <librepcb/core/project/board/items/bi_plane.h>
 #include <librepcb/core/project/board/items/bi_polygon.h>
 #include <librepcb/core/project/board/items/bi_stroketext.h>
@@ -178,9 +179,12 @@ bool CmdPasteBoardItems::performExecute() {
       const Uuid& pad = it.key().second;
       if (!pastedDevices.contains(device)) {
         // Device was not pasted, so we have to replace all pads by junctions
-        splitter.replaceFootprintPadByJunctions(TraceAnchor::pad(device, pad),
-                                                it.value());
+        splitter.replaceFootprintPadByJunctions(
+            TraceAnchor::footprintPad(device, pad), it.value());
       }
+    }
+    for (const BoardPadData& p : seg.pads) {
+      splitter.addPad(p, false);
     }
     for (const Via& v : seg.vias) {
       splitter.addVia(v, false);
@@ -201,9 +205,19 @@ bool CmdPasteBoardItems::performExecute() {
           new BI_NetSegment(mBoard, Uuid::createRandom(), netsignal);
       execNewChildCmd(new CmdBoardNetSegmentAdd(*copy));
 
-      // Add vias, netpoints and netlines
+      // Add pads, vias, netpoints and netlines
       std::unique_ptr<CmdBoardNetSegmentAddElements> cmdAddElements(
           new CmdBoardNetSegmentAddElements(*copy));
+      QHash<Uuid, BI_Pad*> padMap;
+      for (const BoardPadData& p : segment.pads) {
+        BI_Pad* pad = cmdAddElements->addPad(BoardPadData(
+            Uuid::createRandom(), p.getPosition() + mPosOffset, p.getRotation(),
+            p.getShape(), p.getWidth(), p.getHeight(), p.getRadius(),
+            p.getCustomShapeOutline(), p.getStopMaskConfig(),
+            p.getSolderPasteConfig(), p.getCopperClearance(),
+            p.getComponentSide(), p.getFunction(), p.getHoles(), p.isLocked()));
+        padMap.insert(p.getUuid(), pad);
+      }
       QHash<Uuid, BI_Via*> viaMap;
       for (const Via& v : segment.vias) {
         BI_Via* via = cmdAddElements->addVia(
@@ -222,10 +236,12 @@ bool CmdPasteBoardItems::performExecute() {
         BI_NetLineAnchor* p1 = nullptr;
         if (std::optional<Uuid> anchor = trace.getP1().tryGetJunction()) {
           p1 = netPointMap[*anchor];
+        } else if (std::optional<Uuid> anchor = trace.getP1().tryGetPad()) {
+          p1 = padMap[*anchor];
         } else if (std::optional<Uuid> anchor = trace.getP1().tryGetVia()) {
           p1 = viaMap[*anchor];
         } else if (std::optional<TraceAnchor::PadAnchor> anchor =
-                       trace.getP1().tryGetPad()) {
+                       trace.getP1().tryGetFootprintPad()) {
           Q_ASSERT(pastedDevices.contains(anchor->device));
           BI_Device* device =
               mBoard.getDeviceInstanceByComponentUuid(anchor->device);
@@ -234,10 +250,12 @@ bool CmdPasteBoardItems::performExecute() {
         BI_NetLineAnchor* p2 = nullptr;
         if (std::optional<Uuid> anchor = trace.getP2().tryGetJunction()) {
           p2 = netPointMap[*anchor];
+        } else if (std::optional<Uuid> anchor = trace.getP2().tryGetPad()) {
+          p2 = padMap[*anchor];
         } else if (std::optional<Uuid> anchor = trace.getP2().tryGetVia()) {
           p2 = viaMap[*anchor];
         } else if (std::optional<TraceAnchor::PadAnchor> anchor =
-                       trace.getP2().tryGetPad()) {
+                       trace.getP2().tryGetFootprintPad()) {
           Q_ASSERT(pastedDevices.contains(anchor->device));
           BI_Device* device =
               mBoard.getDeviceInstanceByComponentUuid(anchor->device);
@@ -252,6 +270,11 @@ bool CmdPasteBoardItems::performExecute() {
       execNewChildCmd(cmdAddElements.release());
 
       // Select pasted net segment items.
+      foreach (BI_Pad* pad, copy->getPads()) {
+        if (auto item = mScene.getPads().value(pad)) {
+          item->setSelected(true);
+        }
+      }
       foreach (BI_Via* via, copy->getVias()) {
         if (auto item = mScene.getVias().value(via)) {
           item->setSelected(true);

@@ -40,7 +40,9 @@ namespace librepcb {
 struct DrcHoleRef {
   using Data = BoardDesignRuleCheckData;
 
-  bool isPadHole() const noexcept { return mDevice && mPad && mHole; }
+  bool isPadHole() const noexcept {
+    return (mDevice || mSegment) && mPad && mHole;
+  }
   bool isViaHole() const noexcept { return mSegment && mVia; }
   bool isPlated() const noexcept { return isPadHole() || isViaHole(); }
   const QString& getNetName() const noexcept { return mNetName; }
@@ -70,10 +72,20 @@ struct DrcHoleRef {
     obj.mHole = &hole;
     return obj;
   }
-  static DrcHoleRef padHole(const Data::Device& device, const Data::Pad& pad,
-                            const Data::Hole& hole) {
+  static DrcHoleRef footprintPadHole(const Data::Device& device,
+                                     const Data::Pad& pad,
+                                     const Data::Hole& hole) {
     DrcHoleRef obj;
     obj.mDevice = &device;
+    obj.mPad = &pad;
+    obj.mHole = &hole;
+    obj.mNetName = pad.netName;
+    return obj;
+  }
+  static DrcHoleRef padHole(const Data::Segment& segment, const Data::Pad& pad,
+                            const Data::Hole& hole) {
+    DrcHoleRef obj;
+    obj.mSegment = &segment;
     obj.mPad = &pad;
     obj.mHole = &hole;
     obj.mNetName = pad.netName;
@@ -131,9 +143,16 @@ public:
     QString getName() const;
     void serialize(SExpression& node) const;
 
-    static Anchor pad(const Data::Device& device, const Data::Pad& pad) {
+    static Anchor footprintPad(const Data::Device& device,
+                               const Data::Pad& pad) {
       Anchor obj;
       obj.mDevice = &device;
+      obj.mPad = &pad;
+      return obj;
+    }
+    static Anchor pad(const Data::Segment& segment, const Data::Pad& pad) {
+      Anchor obj;
+      obj.mSegment = &segment;
       obj.mPad = &pad;
       return obj;
     }
@@ -379,10 +398,18 @@ public:
     QString getName() const;
     void serialize(SExpression& node) const;
 
-    static Object pad(const Data::Pad& pad, const Data::Device& device) {
+    static Object footprintPad(const Data::Pad& pad,
+                               const Data::Device& device) {
       Object obj;
       obj.mPad = &pad;
       obj.mDevice = &device;
+      obj.mNetName = pad.netName;
+      return obj;
+    }
+    static Object pad(const Data::Pad& pad, const Data::Segment& segment) {
+      Object obj;
+      obj.mPad = &pad;
+      obj.mSegment = &segment;
       obj.mNetName = pad.netName;
       return obj;
     }
@@ -484,6 +511,10 @@ public:
   // Constructors / Destructor
   DrcMsgCopperBoardClearanceViolation() = delete;
   DrcMsgCopperBoardClearanceViolation(const Data::Segment& segment,
+                                      const Data::Pad& pad,
+                                      const UnsignedLength& minClearance,
+                                      const QVector<Path>& locations) noexcept;
+  DrcMsgCopperBoardClearanceViolation(const Data::Segment& segment,
                                       const Data::Via& via,
                                       const UnsignedLength& minClearance,
                                       const QVector<Path>& locations) noexcept;
@@ -514,6 +545,11 @@ public:
       const DrcMsgCopperBoardClearanceViolation& other) noexcept
     : RuleCheckMessage(other) {}
   virtual ~DrcMsgCopperBoardClearanceViolation() noexcept {}
+
+private:
+  static QString determineMessage(const Data::Pad& pad,
+                                  const UnsignedLength& minClearance) noexcept;
+  static QString determineDescription(const Data::Pad& pad) noexcept;
 };
 
 /*******************************************************************************
@@ -562,6 +598,10 @@ public:
                             const QVector<Path>& locations) noexcept;
   DrcMsgCopperInKeepoutZone(const Data::Zone& zone,
                             const Data::Device* zoneDevice,
+                            const Data::Segment& ns, const Data::Pad& pad,
+                            const QVector<Path>& locations) noexcept;
+  DrcMsgCopperInKeepoutZone(const Data::Zone& zone,
+                            const Data::Device* zoneDevice,
                             const Data::Segment& ns, const Data::Via& via,
                             const QVector<Path>& locations) noexcept;
   DrcMsgCopperInKeepoutZone(const Data::Zone& zone,
@@ -589,7 +629,9 @@ public:
 private:
   void addZoneApprovalNodes(const Data::Zone& zone,
                             const Data::Device* zoneDevice) noexcept;
-  static QString getDescription() noexcept;
+  static QString determineMessage(const Data::Pad& pad,
+                                  const QString& cmpInstName) noexcept;
+  static QString determineDescription() noexcept;
 };
 
 /*******************************************************************************
@@ -709,7 +751,7 @@ public:
 private:
   void addZoneApprovalNodes(const Data::Zone& zone,
                             const Data::Device* zoneDevice) noexcept;
-  static QString getDescription() noexcept;
+  static QString determineDescription() noexcept;
 };
 
 /*******************************************************************************
@@ -730,6 +772,10 @@ public:
   DrcMsgExposureInKeepoutZone(const Data::Zone& zone,
                               const Data::Device* zoneDevice,
                               const Data::Device& device, const Data::Pad& pad,
+                              const QVector<Path>& locations) noexcept;
+  DrcMsgExposureInKeepoutZone(const Data::Zone& zone,
+                              const Data::Device* zoneDevice,
+                              const Data::Segment& ns, const Data::Pad& pad,
                               const QVector<Path>& locations) noexcept;
   DrcMsgExposureInKeepoutZone(const Data::Zone& zone,
                               const Data::Device* zoneDevice,
@@ -756,7 +802,9 @@ public:
 private:
   void addZoneApprovalNodes(const Data::Zone& zone,
                             const Data::Device* zoneDevice) noexcept;
-  static QString getDescription() noexcept;
+  static QString determineMessage(const Data::Pad& pad,
+                                  const QString& cmpInstName) noexcept;
+  static QString determineDescription() noexcept;
 };
 
 /*******************************************************************************
@@ -778,6 +826,10 @@ public:
                                     const Data::Via& via,
                                     const UnsignedLength& minAnnularWidth,
                                     const QVector<Path>& locations) noexcept;
+  DrcMsgMinimumAnnularRingViolation(const Data::Segment& ns,
+                                    const Data::Pad& pad,
+                                    const UnsignedLength& minAnnularWidth,
+                                    const QVector<Path>& locations) noexcept;
   DrcMsgMinimumAnnularRingViolation(const Data::Device& device,
                                     const Data::Pad& pad,
                                     const UnsignedLength& minAnnularWidth,
@@ -786,6 +838,12 @@ public:
       const DrcMsgMinimumAnnularRingViolation& other) noexcept
     : RuleCheckMessage(other) {}
   virtual ~DrcMsgMinimumAnnularRingViolation() noexcept {}
+
+private:
+  static QString determineMessage(const Data::Pad& pad,
+                                  const UnsignedLength& minAnnularWidth,
+                                  const QString& cmpInstName) noexcept;
+  static QString determineDescription(const Data::Pad& pad) noexcept;
 };
 
 /*******************************************************************************
@@ -861,9 +919,17 @@ public:
   DrcMsgInvalidPadConnection(const Data::Device& device, const Data::Pad& pad,
                              const Layer& layer,
                              const QVector<Path>& locations) noexcept;
+  DrcMsgInvalidPadConnection(const Data::Segment& ns, const Data::Pad& pad,
+                             const Layer& layer,
+                             const QVector<Path>& locations) noexcept;
   DrcMsgInvalidPadConnection(const DrcMsgInvalidPadConnection& other) noexcept
     : RuleCheckMessage(other) {}
   virtual ~DrcMsgInvalidPadConnection() noexcept {}
+
+private:
+  static QString determineMessage(const Data::Pad& pad,
+                                  const QString& cmpInstName) noexcept;
+  static QString determineDescription() noexcept;
 };
 
 /*******************************************************************************
@@ -883,6 +949,9 @@ public:
   DrcMsgForbiddenSlot() = delete;
   DrcMsgForbiddenSlot(const Data::Hole& hole, const Data::Device* device,
                       const Data::Pad* pad,
+                      const QVector<Path>& locations) noexcept;
+  DrcMsgForbiddenSlot(const Data::Hole& hole, const Data::Segment& ns,
+                      const Data::Pad& pad,
                       const QVector<Path>& locations) noexcept;
   DrcMsgForbiddenSlot(const DrcMsgForbiddenSlot& other) noexcept
     : RuleCheckMessage(other) {}

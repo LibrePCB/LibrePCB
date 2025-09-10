@@ -67,7 +67,10 @@ public:
     return mJunction;
   }
   const std::optional<Uuid>& tryGetVia() const noexcept { return mVia; }
-  const std::optional<PadAnchor>& tryGetPad() const noexcept { return mPad; }
+  const std::optional<Uuid>& tryGetPad() const noexcept { return mPad; }
+  const std::optional<PadAnchor>& tryGetFootprintPad() const noexcept {
+    return mFootprintPad;
+  }
 
   // General Methods
 
@@ -89,17 +92,19 @@ public:
   // Static Methods
   static TraceAnchor junction(const Uuid& junction) noexcept;
   static TraceAnchor via(const Uuid& via) noexcept;
-  static TraceAnchor pad(const Uuid& device, const Uuid& pad) noexcept;
+  static TraceAnchor pad(const Uuid& pad) noexcept;
+  static TraceAnchor footprintPad(const Uuid& device, const Uuid& pad) noexcept;
 
 private:  // Methods
   TraceAnchor(const std::optional<Uuid>& junction,
-              const std::optional<Uuid>& via,
-              const std::optional<PadAnchor>& pad) noexcept;
+              const std::optional<Uuid>& via, const std::optional<Uuid>& pad,
+              const std::optional<PadAnchor>& footprintPad) noexcept;
 
 private:  // Data
   std::optional<Uuid> mJunction;
   std::optional<Uuid> mVia;
-  std::optional<PadAnchor> mPad;
+  std::optional<Uuid> mPad;
+  std::optional<PadAnchor> mFootprintPad;
 };
 
 /*******************************************************************************
@@ -199,7 +204,10 @@ inline std::size_t qHash(const TraceAnchor& key,
   if (std::optional<Uuid> anchor = key.tryGetVia()) {
     s += anchor->toStr();
   }
-  if (std::optional<TraceAnchor::PadAnchor> anchor = key.tryGetPad()) {
+  if (std::optional<Uuid> anchor = key.tryGetPad()) {
+    s += anchor->toStr();
+  }
+  if (std::optional<TraceAnchor::PadAnchor> anchor = key.tryGetFootprintPad()) {
     s += anchor->device.toStr();
     s += anchor->pad.toStr();
   }

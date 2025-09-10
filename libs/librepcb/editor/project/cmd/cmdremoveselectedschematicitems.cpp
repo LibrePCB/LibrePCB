@@ -43,9 +43,9 @@
 
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/items/bi_device.h>
-#include <librepcb/core/project/board/items/bi_footprintpad.h>
 #include <librepcb/core/project/board/items/bi_netline.h>
 #include <librepcb/core/project/board/items/bi_netpoint.h>
+#include <librepcb/core/project/board/items/bi_pad.h>
 #include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/circuit/componentinstance.h>
 #include <librepcb/core/project/circuit/componentsignalinstance.h>
@@ -343,7 +343,7 @@ void CmdRemoveSelectedSchematicItems::disconnectComponentSignalInstance(
     ComponentSignalInstance& signal) {
   // disconnect traces from pads in all boards
   QHash<Board*, QSet<BI_NetLine*>> boardNetLinesToRemove;
-  foreach (BI_FootprintPad* pad, signal.getRegisteredFootprintPads()) {
+  foreach (BI_Pad* pad, signal.getRegisteredFootprintPads()) {
     Q_ASSERT(pad);
     boardNetLinesToRemove[&pad->getBoard()] += pad->getNetLines();
   }

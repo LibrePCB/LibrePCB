@@ -177,6 +177,8 @@ add_library(
   geometry/netlabel.h
   geometry/netline.cpp
   geometry/netline.h
+  geometry/pad.cpp
+  geometry/pad.h
   geometry/padgeometry.cpp
   geometry/padgeometry.h
   geometry/padhole.cpp
@@ -334,6 +336,8 @@ add_library(
   project/board/boardinteractivehtmlbomgenerator.h
   project/board/boardnetsegmentsplitter.cpp
   project/board/boardnetsegmentsplitter.h
+  project/board/boardpaddata.cpp
+  project/board/boardpaddata.h
   project/board/boardpainter.cpp
   project/board/boardpainter.h
   project/board/boardpickplacegenerator.cpp
@@ -364,8 +368,6 @@ add_library(
   project/board/items/bi_base.h
   project/board/items/bi_device.cpp
   project/board/items/bi_device.h
-  project/board/items/bi_footprintpad.cpp
-  project/board/items/bi_footprintpad.h
   project/board/items/bi_hole.cpp
   project/board/items/bi_hole.h
   project/board/items/bi_netline.cpp
@@ -374,6 +376,8 @@ add_library(
   project/board/items/bi_netpoint.h
   project/board/items/bi_netsegment.cpp
   project/board/items/bi_netsegment.h
+  project/board/items/bi_pad.cpp
+  project/board/items/bi_pad.h
   project/board/items/bi_plane.cpp
   project/board/items/bi_plane.h
   project/board/items/bi_polygon.cpp

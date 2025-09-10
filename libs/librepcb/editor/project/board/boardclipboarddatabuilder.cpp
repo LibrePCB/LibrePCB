@@ -30,11 +30,11 @@
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/boardnetsegmentsplitter.h>
 #include <librepcb/core/project/board/items/bi_device.h>
-#include <librepcb/core/project/board/items/bi_footprintpad.h>
 #include <librepcb/core/project/board/items/bi_hole.h>
 #include <librepcb/core/project/board/items/bi_netline.h>
 #include <librepcb/core/project/board/items/bi_netpoint.h>
 #include <librepcb/core/project/board/items/bi_netsegment.h>
+#include <librepcb/core/project/board/items/bi_pad.h>
 #include <librepcb/core/project/board/items/bi_plane.h>
 #include <librepcb/core/project/board/items/bi_polygon.h>
 #include <librepcb/core/project/board/items/bi_stroketext.h>
@@ -75,6 +75,7 @@ std::unique_ptr<BoardClipboardData> BoardClipboardDataBuilder::generate(
   // Get all selected items
   BoardSelectionQuery query(mScene, true);
   query.addDeviceInstancesOfSelectedFootprints();
+  query.addSelectedBoardPads();
   query.addSelectedVias();
   query.addSelectedNetLines();
   query.addSelectedPlanes();
@@ -110,22 +111,21 @@ std::unique_ptr<BoardClipboardData> BoardClipboardDataBuilder::generate(
         device->getRotation(), device->getMirrored(), device->isLocked(),
         device->isGlueEnabled(), device->getAttributes(), strokeTexts));
     // Add pad positions
-    foreach (const BI_FootprintPad* pad, device->getPads()) {
+    foreach (const BI_Pad* pad, device->getPads()) {
       data->getPadPositions().insert(
-          std::make_pair(device->getComponentInstanceUuid(),
-                         pad->getLibPadUuid()),
+          std::make_pair(device->getComponentInstanceUuid(), pad->getUuid()),
           pad->getPosition());
     }
   }
 
-  // Add (splitted) net segments including vias, netpoints, and netlines
+  // Add (splitted) net segments including pads, vias, netpoints, and netlines
   QHash<BI_NetSegment*, BoardSelectionQuery::NetSegmentItems> netSegmentItems =
       query.getNetSegmentItems();
   for (auto it = netSegmentItems.constBegin(); it != netSegmentItems.constEnd();
        ++it) {
     BoardNetSegmentSplitter splitter;
     foreach (BI_Device* device, mScene.getBoard().getDeviceInstances()) {
-      foreach (BI_FootprintPad* pad, device->getPads()) {
+      foreach (BI_Pad* pad, device->getPads()) {
         if (pad->getNetSegmentOfLines() == it.key()) {
           if (!query.getDeviceInstances().contains(device)) {
             // Pad is currently connected to this net segment, but will not be
@@ -135,6 +135,10 @@ std::unique_ptr<BoardClipboardData> BoardClipboardDataBuilder::generate(
           }
         }
       }
+    }
+    foreach (BI_Pad* pad, it.key()->getPads()) {
+      bool replaceByJunctions = !it.value().pads.contains(pad);
+      splitter.addPad(pad->getProperties(), replaceByJunctions);
     }
     foreach (BI_Via* via, it.key()->getVias()) {
       bool replaceByJunctions = !it.value().vias.contains(via);
@@ -155,6 +159,7 @@ std::unique_ptr<BoardClipboardData> BoardClipboardDataBuilder::generate(
       }
       std::shared_ptr<BoardClipboardData::NetSegment> newSegment =
           std::make_shared<BoardClipboardData::NetSegment>(netName);
+      newSegment->pads = segment.pads;
       newSegment->vias = segment.vias;
       newSegment->junctions = segment.junctions;
       newSegment->traces = segment.traces;

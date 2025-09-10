@@ -32,16 +32,16 @@
 #include "../../cmd/cmdboardviaedit.h"
 #include "../../cmd/cmdcombineboardnetsegments.h"
 #include "../boardgraphicsscene.h"
-#include "../graphicsitems/bgi_footprintpad.h"
 #include "../graphicsitems/bgi_netline.h"
 #include "../graphicsitems/bgi_netpoint.h"
+#include "../graphicsitems/bgi_pad.h"
 #include "../graphicsitems/bgi_via.h"
 
 #include <librepcb/core/project/board/board.h>
-#include <librepcb/core/project/board/items/bi_footprintpad.h>
 #include <librepcb/core/project/board/items/bi_netline.h>
 #include <librepcb/core/project/board/items/bi_netpoint.h>
 #include <librepcb/core/project/board/items/bi_netsegment.h>
+#include <librepcb/core/project/board/items/bi_pad.h>
 #include <librepcb/core/project/board/items/bi_via.h>
 #include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/circuit/netsignal.h>
@@ -414,8 +414,8 @@ void BoardEditorState_AddVia::updateClosestNetSignal(
                       nullptr, {}, {scene.getVias().value(mCurrentViaToPlace)});
     if (auto netline = std::dynamic_pointer_cast<BGI_NetLine>(item)) {
       netsignal = netline->getNetLine().getNetSegment().getNetSignal();
-    } else if (auto pad = std::dynamic_pointer_cast<BGI_FootprintPad>(item)) {
-      netsignal = pad->getPad().getCompSigInstNetSignal();
+    } else if (auto pad = std::dynamic_pointer_cast<BGI_Pad>(item)) {
+      netsignal = pad->getPad().getNetSignal();
     } else if (auto via = std::dynamic_pointer_cast<BGI_Via>(item)) {
       netsignal = via->getVia().getNetSegment().getNetSignal();
     } else if (!netsignal) {

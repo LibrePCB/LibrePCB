@@ -37,11 +37,11 @@
 #include <librepcb/core/project/board/boardnetsegmentsplitter.h>
 #include <librepcb/core/project/board/drc/boarddesignrulechecksettings.h>
 #include <librepcb/core/project/board/items/bi_device.h>
-#include <librepcb/core/project/board/items/bi_footprintpad.h>
 #include <librepcb/core/project/board/items/bi_hole.h>
 #include <librepcb/core/project/board/items/bi_netline.h>
 #include <librepcb/core/project/board/items/bi_netpoint.h>
 #include <librepcb/core/project/board/items/bi_netsegment.h>
+#include <librepcb/core/project/board/items/bi_pad.h>
 #include <librepcb/core/project/board/items/bi_plane.h>
 #include <librepcb/core/project/board/items/bi_polygon.h>
 #include <librepcb/core/project/board/items/bi_stroketext.h>
@@ -1041,7 +1041,7 @@ void EagleProjectImport::importBoard(Project& project,
 
     try {
       BoardNetSegmentSplitter splitter;
-      QMap<std::pair<Uuid, Uuid>, BI_FootprintPad*> padMap;
+      QMap<std::pair<Uuid, Uuid>, BI_Pad*> padMap;
       QHash<Uuid, BI_Via*> viaMap;
       QHash<Uuid, BI_NetPoint*> netPointMap;
       QHash<std::pair<const Layer*, Point>, TraceAnchor> anchorMap;
@@ -1094,17 +1094,17 @@ void EagleProjectImport::importBoard(Project& project,
         if ((it == anchorMap.end()) && netSignal) {
           foreach (ComponentSignalInstance* cmpSigInst,
                    netSignal->getComponentSignals()) {
-            foreach (BI_FootprintPad* pad,
-                     cmpSigInst->getRegisteredFootprintPads()) {
+            foreach (BI_Pad* pad, cmpSigInst->getRegisteredFootprintPads()) {
               if ((pad->isOnLayer(layer)) &&
                   (pad->getPosition() - pos).getLength() < Length(100)) {
+                Q_ASSERT(pad->getDevice());  // Always set for footprint pads.
                 padMap.insert(
-                    std::make_pair(pad->getDevice().getComponentInstanceUuid(),
-                                   pad->getLibPadUuid()),
+                    std::make_pair(pad->getDevice()->getComponentInstanceUuid(),
+                                   pad->getUuid()),
                     pad);
-                return TraceAnchor::pad(
-                    pad->getDevice().getComponentInstanceUuid(),
-                    pad->getLibPadUuid());
+                return TraceAnchor::footprintPad(
+                    pad->getDevice()->getComponentInstanceUuid(),
+                    pad->getUuid());
               }
             }
           }
@@ -1163,7 +1163,7 @@ void EagleProjectImport::importBoard(Project& project,
       // Determine segments and add them to the board.
       auto getAnchor = [&padMap, &viaMap,
                         &netPointMap](const TraceAnchor& anchor) {
-        if (auto pad = anchor.tryGetPad()) {
+        if (auto pad = anchor.tryGetFootprintPad()) {
           auto padPtr = padMap.value(std::make_pair(pad->device, pad->pad));
           if (padPtr) {
             return static_cast<BI_NetLineAnchor*>(padPtr);
@@ -1183,6 +1183,7 @@ void EagleProjectImport::importBoard(Project& project,
         BI_NetSegment* netSegment =
             new BI_NetSegment(*board, Uuid::createRandom(), netSignal);
         board->addNetSegment(*netSegment);
+        QList<BI_Pad*> pads;
         QList<BI_Via*> vias;
         QList<BI_NetPoint*> netPoints;
         QList<BI_NetLine*> netLines;
@@ -1202,7 +1203,7 @@ void EagleProjectImport::importBoard(Project& project,
               *netSegment, trace.getUuid(), *getAnchor(trace.getP1()),
               *getAnchor(trace.getP2()), trace.getLayer(), trace.getWidth()));
         }
-        netSegment->addElements(vias, netPoints, netLines);
+        netSegment->addElements(pads, vias, netPoints, netLines);
       }
     } catch (const Exception& e) {
       log.critical(QString("Failed to import segment of net '%1': %2")

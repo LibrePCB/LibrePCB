@@ -44,6 +44,7 @@ class Board;
 class Circuit;
 class Layer;
 class MessageLogger;
+class NetSignal;
 class Project;
 class SExpression;
 
@@ -87,6 +88,12 @@ public:
 
   struct NetOut {
     QString netName;
+    QList<ViaOut> vias;
+    QList<WireOut> wires;
+  };
+
+  struct NetOutProcessed {
+    NetSignal* netSignal;
     QList<ViaOut> vias;
     QList<WireOut> wires;
   };

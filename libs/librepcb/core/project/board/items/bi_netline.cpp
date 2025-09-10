@@ -27,9 +27,9 @@
 #include "../../circuit/netsignal.h"
 #include "../board.h"
 #include "bi_device.h"
-#include "bi_footprintpad.h"
 #include "bi_netpoint.h"
 #include "bi_netsegment.h"
+#include "bi_pad.h"
 #include "bi_via.h"
 
 #include <QtCore>
@@ -212,20 +212,6 @@ void BI_NetLine::removeFromBoard() {
 
 void BI_NetLine::updatePositions() noexcept {
   onEdited.notify(Event::PositionsChanged);
-}
-
-BI_NetLineAnchor* BI_NetLine::getAnchor(const TraceAnchor& anchor) {
-  if (const std::optional<Uuid>& uuid = anchor.tryGetJunction()) {
-    return mNetSegment.getNetPoints().value(*uuid);
-  } else if (const std::optional<Uuid>& uuid = anchor.tryGetVia()) {
-    return mNetSegment.getVias().value(*uuid);
-  } else if (const std::optional<TraceAnchor::PadAnchor>& pad =
-                 anchor.tryGetPad()) {
-    BI_Device* device = mBoard.getDeviceInstanceByComponentUuid(pad->device);
-    return device ? device->getPad(pad->pad) : nullptr;
-  } else {
-    return nullptr;
-  }
 }
 
 /*******************************************************************************
