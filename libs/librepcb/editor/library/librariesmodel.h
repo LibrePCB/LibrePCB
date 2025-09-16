@@ -108,6 +108,7 @@ private:
 
   Workspace& mWorkspace;
   const Mode mMode;
+  bool mInitialized;
   std::vector<ui::LibraryInfoData> mInstalledLibs;  /// Either local or remote
   QStringList mInstalledLibsErrors;
   QHash<Uuid, ApiEndpoint::Library> mOnlineLibs;
