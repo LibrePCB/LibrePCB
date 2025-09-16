@@ -94,13 +94,13 @@ Following resources are available:
 | [/parts]     | Request live information about parts  |
 
 
-# API Info {#doc_server_api_resources_info}
+# Info {#doc_server_api_resources_info}
 
-At the resource path `/info`, the client can check the capabilities of the
-API server, for example which resource endpoints are implemented. Checking
-this resource avoids needing to call every resource individually (and possibly
-ending up in HTTP errors). It is recommended that clients check this info
-e.g. once a day before trying to access any other API resource.
+At the resource path `/info`, the client can query various information, for
+example which resource endpoints are implemented. Checking this resource
+avoids needing to call every resource individually (and possibly ending up
+in HTTP errors). It is recommended that clients check this info e.g. once per
+day before trying to access any other API resource.
 
 The response to the GET request is an object with a child for every supported
 resource (no pagination used):

@@ -23,6 +23,7 @@
 #include "librariesmodel.h"
 
 #include "../utils/slinthelpers.h"
+#include "guiapplication.h"
 #include "librarydownload.h"
 
 #include <librepcb/core/fileio/fileutils.h>
@@ -48,14 +49,21 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-LibrariesModel::LibrariesModel(Workspace& ws, Mode mode,
+LibrariesModel::LibrariesModel(GuiApplication& app, Mode mode,
                                QObject* parent) noexcept
-  : QObject(parent), mWorkspace(ws), mMode(mode), mRequestIcons(false) {
+  : QObject(parent),
+    mApp(app),
+    mWorkspace(app.getWorkspace()),
+    mMode(mode),
+    mInitialized(false),
+    mRequestIcons(false) {
   connect(&mWorkspace.getLibraryDb(),
           &WorkspaceLibraryDb::scanLibraryListUpdated, this,
           &LibrariesModel::updateLibraries, Qt::QueuedConnection);
 
-  QTimer::singleShot(1000, this, [this]() { ensurePopulated(false); });
+  connect(&mApp, &GuiApplication::apiEndpointsUpdated, this, [this]() {
+    QTimer::singleShot(1000, this, [this]() { ensurePopulated(false); });
+  });
 }
 
 LibrariesModel::~LibrariesModel() noexcept {
@@ -67,7 +75,7 @@ LibrariesModel::~LibrariesModel() noexcept {
 
 ui::LibraryListData LibrariesModel::getUiData() const noexcept {
   ui::LibraryListData data = {};
-  data.refreshing = !mApiEndpointsInProgress.isEmpty();
+  data.refreshing = (!mInitialized) || (!mApiEndpointsInProgress.isEmpty());
   data.refreshing_error =
       q2s((mInstalledLibsErrors + mOnlineLibsErrors).join("\n\n"));
   data.count = mMergedLibs.size();
@@ -330,6 +338,7 @@ void LibrariesModel::updateLibraries(bool resetHighlight) noexcept {
               return a.name < b.name;
             });
 
+  mInitialized = true;
   updateMergedLibraries();
 
   if (resetHighlight) {
@@ -341,14 +350,13 @@ void LibrariesModel::requestOnlineLibraries() noexcept {
   mApiEndpointsInProgress.clear();  // Disconnects all signal/slot connections.
   mOnlineLibs.clear();
   mOnlineLibsErrors.clear();
-  foreach (const QUrl& url, mWorkspace.getSettings().apiEndpoints.get()) {
-    std::shared_ptr<ApiEndpoint> repo = std::make_shared<ApiEndpoint>(url);
-    connect(repo.get(), &ApiEndpoint::libraryListReceived, this,
+  for (std::shared_ptr<ApiEndpoint> ep : mApp.getApiEndpoints()) {
+    connect(ep.get(), &ApiEndpoint::libraryListReceived, this,
             &LibrariesModel::onlineLibraryListReceived);
-    connect(repo.get(), &ApiEndpoint::errorWhileFetchingLibraryList, this,
+    connect(ep.get(), &ApiEndpoint::errorWhileFetchingLibraryList, this,
             &LibrariesModel::errorWhileFetchingLibraryList);
-    mApiEndpointsInProgress.append(repo);
-    repo->requestLibraryList();
+    mApiEndpointsInProgress.append(ep);
+    ep->requestLibraryList();
   }
   if (!mApiEndpointsInProgress.isEmpty()) {
     emit uiDataChanged(getUiData());

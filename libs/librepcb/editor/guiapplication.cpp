@@ -48,6 +48,7 @@
 #include <librepcb/core/attribute/attributeunit.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/library/library.h>
+#include <librepcb/core/network/apiendpoint.h>
 #include <librepcb/core/norms.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectloader.h>
@@ -55,6 +56,7 @@
 #include <librepcb/core/utils/scopeguard.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
+#include <librepcb/core/workspace/workspacesettings.h>
 
 #include <QtCore>
 
@@ -110,8 +112,9 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
     mLibraryElementCache(new LibraryElementCache(ws.getLibraryDb())),
     mNotifications(new NotificationsModel(ws)),
     mQuickAccessModel(new QuickAccessModel(ws)),
-    mLocalLibraries(new LibrariesModel(ws, LibrariesModel::Mode::LocalLibs)),
-    mRemoteLibraries(new LibrariesModel(ws, LibrariesModel::Mode::RemoteLibs)),
+    mLocalLibraries(new LibrariesModel(*this, LibrariesModel::Mode::LocalLibs)),
+    mRemoteLibraries(
+        new LibrariesModel(*this, LibrariesModel::Mode::RemoteLibs)),
     mLibrariesFilter(new SlintKeyEventTextBuilder()),
     mProjects(new UiObjectList<ProjectEditor, ui::ProjectData>()),
     mLibraries(new UiObjectList<LibraryEditor, ui::LibraryData>()) {
@@ -259,6 +262,12 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
     cs.setValue("global/windows", ids);
     qDebug().noquote() << "Saved opened window IDs:" << ids.join(", ");
   });
+
+  // Build ApiEndpoint instance for each configured URL.
+  connect(&mWorkspace.getSettings().apiEndpoints,
+          &WorkspaceSettingsItem::edited, this,
+          &GuiApplication::updateApiEndpoints, Qt::QueuedConnection);
+  updateApiEndpoints();
 
   // slightly delay opening projects to make sure the control panel window goes
   // to background (schematic editor should be the top most window)
@@ -1019,6 +1028,43 @@ std::shared_ptr<MainWindow> GuiApplication::getWindowById(int id) noexcept {
     }
   }
   return nullptr;
+}
+
+void GuiApplication::updateApiEndpoints() noexcept {
+  QList<QUrl> urls;
+  for (const QUrl& url : mWorkspace.getSettings().apiEndpoints.get()) {
+    if (url.isValid() && (!urls.contains(url))) {
+      urls.append(url);
+    }
+  }
+
+  // Delete obsolete endpoints.
+  for (int i = mApiEndpoints.count() - 1; i >= 0; --i) {
+    if (!urls.contains(mApiEndpoints.at(i)->getUrl())) {
+      mApiEndpoints.removeAt(i);
+    }
+  }
+
+  // Reorder existing endpoints.
+  std::sort(mApiEndpoints.begin(), mApiEndpoints.end(),
+            [&urls](const std::shared_ptr<ApiEndpoint>& a,
+                    const std::shared_ptr<ApiEndpoint>& b) {
+              return urls.indexOf(a->getUrl()) < urls.indexOf(b->getUrl());
+            });
+
+  // Add new endpoints.
+  for (int i = 0; i < urls.count(); ++i) {
+    std::shared_ptr<ApiEndpoint> ep = mApiEndpoints.value(i);
+    if ((!ep) || (ep->getUrl() != urls.at(i))) {
+      ep = std::make_shared<ApiEndpoint>(urls.at(i));
+      mApiEndpoints.insert(i, ep);
+    }
+  }
+
+  // Sanity check.
+  Q_ASSERT(mApiEndpoints.count() == urls.count());
+
+  emit apiEndpointsUpdated();
 }
 
 /*******************************************************************************

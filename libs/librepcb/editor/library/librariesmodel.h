@@ -42,6 +42,7 @@ class Workspace;
 
 namespace editor {
 
+class GuiApplication;
 class LibraryDownload;
 
 /*******************************************************************************
@@ -62,8 +63,8 @@ public:
   // Constructors / Destructor
   LibrariesModel() = delete;
   LibrariesModel(const LibrariesModel& other) = delete;
-  explicit LibrariesModel(Workspace& ws, Mode mode,
-                          QObject* parent = nullptr) noexcept;
+  LibrariesModel(GuiApplication& app, Mode mode,
+                 QObject* parent = nullptr) noexcept;
   virtual ~LibrariesModel() noexcept;
 
   // General Methods
@@ -106,8 +107,10 @@ private:
   static bool isMarkedForUninstall(const ui::LibraryInfoData& lib) noexcept;
   std::optional<std::size_t> indexOf(const Uuid& uuid) noexcept;
 
+  GuiApplication& mApp;
   Workspace& mWorkspace;
   const Mode mMode;
+  bool mInitialized;
   std::vector<ui::LibraryInfoData> mInstalledLibs;  /// Either local or remote
   QStringList mInstalledLibsErrors;
   QHash<Uuid, ApiEndpoint::Library> mOnlineLibs;

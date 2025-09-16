@@ -92,6 +92,8 @@ signals:
   void errorWhileFetchingPartsInformation(const QString& errorMsg);
 
 private:  // Methods
+  void requestInfo() noexcept;
+  void infoResponseReceived(const QByteArray& data) noexcept;
   void requestLibraryList(const QUrl& url) const noexcept;
   void libraryListResponseReceived(const QByteArray& data) noexcept;
   void partsInformationStatusResponseReceived(const QByteArray& data) noexcept;
@@ -99,6 +101,12 @@ private:  // Methods
 
 private:  // Data
   QUrl mUrl;
+  bool mInfoAvailable;
+  QString mInfoError;
+
+  bool mProvidesLibraries;
+  bool mProvidesOrder;
+  bool mProvidesParts;
 };
 
 /*******************************************************************************

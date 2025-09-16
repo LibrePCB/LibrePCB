@@ -38,7 +38,12 @@ namespace librepcb {
  ******************************************************************************/
 
 ApiEndpoint::ApiEndpoint(const QUrl& url) noexcept
-  : QObject(nullptr), mUrl(url) {
+  : QObject(nullptr),
+    mUrl(url),
+    mInfoAvailable(),
+    mProvidesLibraries(false),
+    mProvidesOrder(false),
+    mProvidesParts(false){
 }
 
 ApiEndpoint::~ApiEndpoint() noexcept {
@@ -101,6 +106,46 @@ void ApiEndpoint::requestPartsInformation(
  *  Private Methods
  ******************************************************************************/
 
+void ApiEndpoint::requestInfo() noexcept {
+  NetworkRequest* request =
+      new NetworkRequest(QUrl(mUrl.toString() % "/api/v1/info"));
+  request->setMinimumCacheTime(24*3600);
+  request->setHeaderField("Accept", "application/json;charset=UTF-8");
+  request->setHeaderField("Accept-Charset", "UTF-8");
+  connect(
+      request, &NetworkRequest::errored, this,
+      [this](const QString& err) {
+        mInfoError = err;
+        mInfoAvailable = false;
+      },
+      Qt::QueuedConnection);
+  connect(request, &NetworkRequest::dataReceived, this,
+          &ApiEndpoint::infoResponseReceived, Qt::QueuedConnection);
+  request->start();
+}
+
+void ApiEndpoint::infoResponseReceived(const QByteArray& data) noexcept {
+  const QJsonDocument doc = QJsonDocument::fromJson(data);
+  if (doc.isNull() || doc.isEmpty() || (!doc.isObject())) {
+    mInfoError = "Received JSON object is not valid.";
+    mInfoAvailable = false;
+    return;
+  }
+
+  const QJsonObject obj = doc.object();
+  mProvidesLibraries = obj.value("libraries").isObject();
+  mProvidesOrder = obj.value("order").isObject();
+  mProvidesParts = obj.value("parts").isObject();
+  mInfoAvailable = true;
+  mInfoError.clear();
+
+  QString msg = QString("Received info for %1: ").arg(mUrl.toString());
+  msg += QString("libraries=%1").arg(mProvidesLibraries);
+  msg += QString("order=%1").arg(mProvidesOrder);
+  msg += QString("parts=%1").arg(mProvidesParts);
+  qDebug().noquote() << msg;
+}
+
 void ApiEndpoint::requestLibraryList(const QUrl& url) const noexcept {
   NetworkRequest* request = new NetworkRequest(url);
   request->setHeaderField("Accept", "application/json;charset=UTF-8");
@@ -115,8 +160,7 @@ void ApiEndpoint::requestLibraryList(const QUrl& url) const noexcept {
 void ApiEndpoint::libraryListResponseReceived(const QByteArray& data) noexcept {
   QJsonDocument doc = QJsonDocument::fromJson(data);
   if (doc.isNull() || doc.isEmpty() || (!doc.isObject())) {
-    emit errorWhileFetchingLibraryList(
-        tr("Received JSON object is not valid."));
+    emit errorWhileFetchingLibraryList("Received JSON object is not valid.");
     return;
   }
   QJsonValue nextResultsLink = doc.object().value("next");
@@ -134,8 +178,7 @@ void ApiEndpoint::libraryListResponseReceived(const QByteArray& data) noexcept {
   const QJsonValue results = doc.object().value("results");
   if ((results.isNull()) || (!results.isArray())) {
     emit errorWhileFetchingLibraryList(
-        tr("Received JSON object does not contain "
-           "any results."));
+        "Received JSON object does not contain any results.");
     return;
   }
 
@@ -186,7 +229,7 @@ void ApiEndpoint::partsInformationStatusResponseReceived(
   QJsonDocument doc = QJsonDocument::fromJson(data);
   if (doc.isNull() || doc.isEmpty() || (!doc.isObject())) {
     emit errorWhileFetchingPartsInformation(
-        tr("Received JSON object is not valid."));
+        "Received JSON object is not valid.");
     return;
   }
   emit partsInformationStatusReceived(doc.object());
@@ -197,7 +240,7 @@ void ApiEndpoint::partsInformationResponseReceived(
   QJsonDocument doc = QJsonDocument::fromJson(data);
   if (doc.isNull() || doc.isEmpty() || (!doc.isObject())) {
     emit errorWhileFetchingPartsInformation(
-        tr("Received JSON object is not valid."));
+        "Received JSON object is not valid.");
     return;
   }
   emit partsInformationReceived(doc.object());

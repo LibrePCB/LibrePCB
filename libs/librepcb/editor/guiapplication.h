@@ -37,6 +37,7 @@
  ******************************************************************************/
 namespace librepcb {
 
+class ApiEndpoint;
 class RuleCheckMessage;
 class Workspace;
 
@@ -87,6 +88,9 @@ public:
   const LibraryElementCache& getLibraryElementCache() const noexcept {
     return *mLibraryElementCache;
   }
+  const QList<std::shared_ptr<ApiEndpoint>>& getApiEndpoints() const noexcept {
+    return mApiEndpoints;
+  }
 
   // Libraries
   LibrariesModel& getLocalLibraries() noexcept { return *mLocalLibraries; }
@@ -133,6 +137,7 @@ public:
   GuiApplication& operator=(const GuiApplication& rhs) = delete;
 
 signals:
+  void apiEndpointsUpdated();
   void statusBarMessageChanged(const QString& message, int timeoutMs);
   void librariesContainStandardComponentsChanged(bool contains);
 
@@ -157,10 +162,13 @@ private:
                bool forceSwitchToTab) noexcept;
   std::shared_ptr<MainWindow> getWindowById(int id) noexcept;
 
+  void updateApiEndpoints() noexcept;
+
   Workspace& mWorkspace;
   bool mLibrariesContainStandardComponents;
   std::unique_ptr<GraphicsLayerList> mPreviewLayers;
   std::shared_ptr<LibraryElementCache> mLibraryElementCache;
+  QList<std::shared_ptr<ApiEndpoint>> mApiEndpoints;
   std::shared_ptr<NotificationsModel> mNotifications;
   std::shared_ptr<Notification> mNotificationNoLibrariesInstalled;
   std::shared_ptr<Notification> mNotificationDesktopIntegration;
