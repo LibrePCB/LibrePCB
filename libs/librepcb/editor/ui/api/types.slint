@@ -1283,7 +1283,7 @@ export struct LibraryInfoData {
 
 // Metadata for a list of LibraryInfoData
 export struct LibraryListData {
-    refreshing: bool,  // Only for remote libraries (async operation)
+    refreshing: bool,  // If data is not ready yet
     refreshing-error: string,
     count: int,  // Count before filtering
     installed: int,  // Only for remote libraries

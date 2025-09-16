@@ -50,7 +50,11 @@ namespace editor {
 
 LibrariesModel::LibrariesModel(Workspace& ws, Mode mode,
                                QObject* parent) noexcept
-  : QObject(parent), mWorkspace(ws), mMode(mode), mRequestIcons(false) {
+  : QObject(parent),
+    mWorkspace(ws),
+    mMode(mode),
+    mInitialized(false),
+    mRequestIcons(false) {
   connect(&mWorkspace.getLibraryDb(),
           &WorkspaceLibraryDb::scanLibraryListUpdated, this,
           &LibrariesModel::updateLibraries, Qt::QueuedConnection);
@@ -67,7 +71,7 @@ LibrariesModel::~LibrariesModel() noexcept {
 
 ui::LibraryListData LibrariesModel::getUiData() const noexcept {
   ui::LibraryListData data = {};
-  data.refreshing = !mApiEndpointsInProgress.isEmpty();
+  data.refreshing = (!mInitialized) || (!mApiEndpointsInProgress.isEmpty());
   data.refreshing_error =
       q2s((mInstalledLibsErrors + mOnlineLibsErrors).join("\n\n"));
   data.count = mMergedLibs.size();
@@ -330,6 +334,7 @@ void LibrariesModel::updateLibraries(bool resetHighlight) noexcept {
               return a.name < b.name;
             });
 
+  mInitialized = true;
   updateMergedLibraries();
 
   if (resetHighlight) {

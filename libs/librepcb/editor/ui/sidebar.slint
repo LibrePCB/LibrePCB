@@ -357,6 +357,9 @@ export component SideBar inherits Rectangle {
             states [
                 // Note: Do not display the "refreshing" state as it is usually
                 // very short would would look like a flicker.
+                refreshing when Data.local-libraries-data.refreshing || Data.remote-libraries-data.refreshing: {
+                    // Just keep the previous state.
+                }
                 busy when Data.libraries-operation-in-progress: {
                     emblem: Emblem.running;
                 }
