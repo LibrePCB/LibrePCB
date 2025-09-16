@@ -75,6 +75,7 @@ public:
     QUrl url;
   };
   struct PartInformation {
+    QString source;  // API server URL; Empty for entries from LibrePCB < 2.0
     qint64 timestamp;  // Seconds since epoch
     QString mpn;
     QString manufacturer;
@@ -163,6 +164,7 @@ private:  // Data
   // Configuration
   FilePath mCacheFp;
   QScopedPointer<ApiEndpoint> mEndpoint;
+  QString mSource;  ///< URL of #mEndpoint
 
   // Error handling
   int mErrorCounter;
@@ -183,8 +185,8 @@ private:  // Data
   QVector<Part> mScheduledParts;
   QSet<Part> mRequestedParts;
 
-  // Cache
-  QMap<Part, std::shared_ptr<PartInformation>> mCache;  // Sorted for file I/O!
+  // Cache (Sorted for file I/O!)
+  QMap<Part, QMap<QString, std::shared_ptr<PartInformation>>> mCache;
   bool mCacheModified;
 };
 
