@@ -82,65 +82,56 @@ curl 'https://api.librepcb.org/api/v1/libraries/v0.1'
 ~~~
 
 
-# API Info {#doc_server_api_info}
-
-At the base URL `/api/info`, the client can check the capabilities of the
-API server, for example which API versions and which resource endpoints are
-implemented. Calling this endpoint avoids needing to call every resource
-endpoint individually (and possibly ending up in HTTP errors). It is
-recommended that clients check this endpoint e.g. once a day before trying
-to access any other API endpoint.
-
-The response to the GET request is an object with a child for every supported
-API version (no pagination used):
-
-| Name | Type   | Description                                             |
-|------|--------|---------------------------------------------------------|
-| v1   | object | Only provided if API v1 is supported, see details below |
-
-Each of these childs is an object with a child for every supported resource
-endpoint. Typically those childs are empty objects but may be extended with
-properties in future. Unsupported resource endpoints may either not appear
-in the response at all (preferred), or as `null` values.
-
-The `v1` object may contain the following properties:
-
-| Name      | Type           | Description                                    |
-|-----------|----------------|------------------------------------------------|
-| libraries | `null` or `{}` | Whether the `/libraries` endpoint is supported |
-| order     | `null` or `{}` | Whether the `/order` endpoint is supported     |
-| parts     | `null` or `{}` | Whether the `/parts` endpoint is supported     |
-
-### Example
-
-**Request:**
-
-~~~{.sh}
-curl 'https://api.librepcb.org/api/info'
-~~~
-
-**Response:**
-
-~~~{.json}
-{
-  "v1": {
-    "libraries": {},
-    "order": null,
-    "parts": {},
-  },
-}
-~~~
-
-
 # Available Resources {#doc_server_api_resources}
 
 Following resources are available:
 
 | Path         | Description                           |
 |--------------|---------------------------------------|
+| [/info]      | Get information about the API server  |
 | [/libraries] | Fetch list of available libraries     |
 | [/order]     | Upload a project to start ordering it |
 | [/parts]     | Request live information about parts  |
+
+
+# API Info {#doc_server_api_resources_info}
+
+At the resource path `/info`, the client can check the capabilities of the
+API server, for example which resource endpoints are implemented. Checking
+this resource avoids needing to call every resource individually (and possibly
+ending up in HTTP errors). It is recommended that clients check this info
+e.g. once a day before trying to access any other API resource.
+
+The response to the GET request is an object with a child for every supported
+resource (no pagination used):
+
+| Name      | Type           | Description                                    |
+|-----------|----------------|------------------------------------------------|
+| libraries | `null` or `{}` | Whether the `/libraries` resource is supported |
+| order     | `null` or `{}` | Whether the `/order` resource is supported     |
+| parts     | `null` or `{}` | Whether the `/parts` resource is supported     |
+
+Typically those childs are empty objects but may be extended with properties
+in future. Unsupported resources may either not appear in the response at all
+(preferred), or as `null` values.
+
+### Example
+
+**Request:**
+
+~~~{.sh}
+curl 'https://api.librepcb.org/api/v1/info'
+~~~
+
+**Response:**
+
+~~~{.json}
+{
+  "libraries": {},
+  "order": null,
+  "parts": {}
+}
+~~~
 
 
 ## Libraries {#doc_server_api_resources_libraries}
