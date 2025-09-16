@@ -42,7 +42,7 @@ namespace librepcb {
  * @brief Generic implementation of ::librepcb::WorkspaceSettingsItem
  *        for simple, value-in-list-type settings
  */
-template <typename T>
+template <typename T, bool SerializeRaw = false>
 class WorkspaceSettingsItem_GenericValueList final
   : public WorkspaceSettingsItem {
 public:
@@ -123,7 +123,11 @@ private:  // Methods
   void loadImpl(const SExpression& root) override {
     T values;  // temporary object to make this method atomic
     foreach (const SExpression* child, root.getChildren(mItemKey)) {
-      values << deserialize<typename T::value_type>(child->getChild("@0"));
+      if (SerializeRaw) {
+        values << deserialize<typename T::value_type>(*child);
+      } else {
+        values << deserialize<typename T::value_type>(child->getChild("@0"));
+      }
     }
     set(values);
   }
@@ -157,7 +161,15 @@ private:  // Methods
   void serializeImpl(SExpression& root) const override {
     foreach (const auto& item, makeCanonical(mCurrentValue)) {
       root.ensureLineBreak();
-      root.appendChild(mItemKey, item);
+      std::unique_ptr<SExpression> node = ::librepcb::serialize(item);
+      if (SerializeRaw) {
+        if (node->getName() != mItemKey) {
+          throw LogicError(__FILE__, __LINE__);
+        }
+        root.appendChild(std::move(node));
+      } else {
+        root.appendChild(mItemKey, std::move(node));
+      }
     }
     root.ensureLineBreak();
   }

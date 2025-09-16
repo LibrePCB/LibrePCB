@@ -307,10 +307,10 @@ void BoardEditor::prepareOrderPcb() noexcept {
     return;  // Already prepared.
   }
 
-  if (mProjectEditor.getWorkspace()
-          .getSettings()
-          .apiEndpoints.get()
-          .isEmpty()) {
+  // Determine API endpoint.
+  const auto ep =
+      mProjectEditor.getWorkspace().getSettings().getApiEndpointForOrder();
+  if (!ep) {
     mOrderStatus =
         tr("This feature is not available because there is no API server "
            "configured in your workspace settings.");
@@ -319,8 +319,7 @@ void BoardEditor::prepareOrderPcb() noexcept {
   }
 
   // Prepare network request.
-  mOrderRequest.reset(new OrderPcbApiRequest(
-      mProjectEditor.getWorkspace().getSettings().apiEndpoints.get().first()));
+  mOrderRequest.reset(new OrderPcbApiRequest(ep->url));
   connect(mOrderRequest.get(), &OrderPcbApiRequest::infoRequestSucceeded, this,
           [this]() { onUiDataChanged.notify(); });
   connect(mOrderRequest.get(), &OrderPcbApiRequest::infoRequestFailed, this,

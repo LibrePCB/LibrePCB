@@ -254,6 +254,27 @@ void FileFormatMigrationV1::upgradeWorkspaceData(TransactionalDirectory& dir) {
       librariesDir.removeFile(fileName);
     }
   }
+
+  // Upgrade settings.
+  const QString settingsFp = "settings.lp";
+  if (dir.fileExists(settingsFp)) {
+    std::unique_ptr<SExpression> root =
+        SExpression::parse(dir.read(settingsFp), dir.getAbsPath(settingsFp));
+    if (SExpression* node = root->tryGetChild("api_endpoints")) {
+      int index = 0;
+      foreach (SExpression* child, node->getChildren("url")) {
+        child->setName("endpoint");
+        child->appendChild("libraries", SExpression::createToken("true"));
+        child->appendChild(
+            "parts", SExpression::createToken((index == 0) ? "true" : "false"));
+        child->appendChild(
+            "order", SExpression::createToken((index == 0) ? "true" : "false"));
+        ++index;
+      }
+      node->setName("api_endpoints");
+    }
+    dir.write(settingsFp, root->toByteArray());
+  }
 }
 
 /*******************************************************************************

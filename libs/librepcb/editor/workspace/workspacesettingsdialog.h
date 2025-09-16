@@ -25,6 +25,7 @@
  ******************************************************************************/
 #include "../modelview/editablelistmodel.h"
 
+#include <librepcb/core/workspace/workspacesettings.h>
 #include <librepcb/core/workspace/workspacesettingsitem_genericvaluelist.h>
 
 #include <QtCore>
@@ -42,6 +43,7 @@ class WorkspaceSettings;
 
 namespace editor {
 
+class ApiEndpointListModelLegacy;
 class KeyboardShortcutsModel;
 
 namespace Ui {
@@ -61,7 +63,6 @@ class WorkspaceSettingsDialog final : public QDialog {
   using LibraryLocaleOrderModel =
       EditableListModel<QStringList, EditableListModelType::LOCALE>;
   using LibraryNormOrderModel = EditableListModel<QStringList>;
-  using ApiEndpointModel = EditableListModel<QList<QUrl>>;
 
   struct ExternalApplication {
     QPointer<WorkspaceSettingsItem_GenericValueList<QStringList>> setting;
@@ -105,7 +106,7 @@ private:
   WorkspaceSettings& mSettings;  ///< Reference to the WorkspaceSettings object
   QScopedPointer<LibraryLocaleOrderModel> mLibLocaleOrderModel;
   QScopedPointer<LibraryNormOrderModel> mLibNormOrderModel;
-  QScopedPointer<ApiEndpointModel> mApiEndpointModel;
+  QScopedPointer<ApiEndpointListModelLegacy> mApiEndpointModel;
   QScopedPointer<KeyboardShortcutsModel> mKeyboardShortcutsModel;
   QScopedPointer<QSortFilterProxyModel> mKeyboardShortcutsFilterModel;
   QScopedPointer<Ui::WorkspaceSettingsDialog> mUi;

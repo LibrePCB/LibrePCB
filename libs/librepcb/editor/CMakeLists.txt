@@ -390,6 +390,8 @@ add_library(
   mainwindowtestadapter.h
   modelview/angledelegate.cpp
   modelview/angledelegate.h
+  modelview/apiendpointlistmodellegacy.cpp
+  modelview/apiendpointlistmodellegacy.h
   modelview/attributelistmodel.cpp
   modelview/attributelistmodel.h
   modelview/attributelistmodellegacy.cpp
