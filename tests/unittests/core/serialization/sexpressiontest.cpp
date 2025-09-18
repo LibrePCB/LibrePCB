@@ -79,7 +79,7 @@ TEST(SExpressionTest, testParseString) {
   std::unique_ptr<SExpression> s =
       SExpression::parse("(test \"foo bar\")", FilePath());
   EXPECT_TRUE(s->isList());
-  EXPECT_EQ(1, s->getChildCount());
+  EXPECT_EQ(1U, s->getChildCount());
   EXPECT_EQ("foo bar", s->getChild("@0").getValue());
 }
 
@@ -87,7 +87,7 @@ TEST(SExpressionTest, testParseStringWithQuotes) {
   std::unique_ptr<SExpression> s =
       SExpression::parse("(test \"foo \\\"bar\\\"\")", FilePath());
   EXPECT_TRUE(s->isList());
-  EXPECT_EQ(1, s->getChildCount());
+  EXPECT_EQ(1U, s->getChildCount());
   EXPECT_EQ("foo \"bar\"", s->getChild("@0").getValue());
 }
 
@@ -95,7 +95,7 @@ TEST(SExpressionTest, testParseStringWithNewlines) {
   std::unique_ptr<SExpression> s =
       SExpression::parse("(test \"foo\\nbar\")", FilePath());
   EXPECT_TRUE(s->isList());
-  EXPECT_EQ(1, s->getChildCount());
+  EXPECT_EQ(1U, s->getChildCount());
   EXPECT_EQ("foo\nbar", s->getChild("@0").getValue());
 }
 
@@ -103,7 +103,7 @@ TEST(SExpressionTest, testParseStringWithBackslash) {
   std::unique_ptr<SExpression> s =
       SExpression::parse("(test \"foo\\\\bar\")", FilePath());
   EXPECT_TRUE(s->isList());
-  EXPECT_EQ(1, s->getChildCount());
+  EXPECT_EQ(1U, s->getChildCount());
   EXPECT_EQ("foo\\bar", s->getChild("@0").getValue());
 }
 

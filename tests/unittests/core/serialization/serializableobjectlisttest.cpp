@@ -305,20 +305,20 @@ TEST_F(SerializableObjectListTest, testSerialize) {
   //   (name "pcb")
   //  )
   // )
-  EXPECT_EQ(7, e->getChildCount());
+  EXPECT_EQ(7U, e->getChildCount());
   for (int i = 0; i < 3; ++i) {
     const SExpression& lineBreak = e->getChild(i * 2);
     EXPECT_EQ(SExpression::Type::LineBreak, lineBreak.getType());
     const SExpression& list = e->getChild(i * 2 + 1);
     EXPECT_EQ(SExpression::Type::List, list.getType());
     EXPECT_EQ("test", list.getName().toStdString());
-    EXPECT_EQ(4, list.getChildCount());
+    EXPECT_EQ(4U, list.getChildCount());
     EXPECT_EQ(SExpression::Type::Token, list.getChild(0).getType());
     EXPECT_EQ(mMocks[i]->getUuid().toStr(), list.getChild(0).getValue());
     EXPECT_EQ(SExpression::Type::LineBreak, list.getChild(1).getType());
     EXPECT_EQ(SExpression::Type::List, list.getChild(2).getType());
     EXPECT_EQ("name", list.getChild(2).getName());
-    EXPECT_EQ(1, list.getChild(2).getChildCount());
+    EXPECT_EQ(1U, list.getChild(2).getChildCount());
     EXPECT_EQ(mMocks[i]->getName(), list.getChild(2).getChild(0).getValue());
     EXPECT_EQ(SExpression::Type::LineBreak, list.getChild(3).getType());
   }
@@ -331,7 +331,7 @@ TEST_F(SerializableObjectListTest, testSerializeEmpty) {
   l.serialize(*e);
   // (list
   // )
-  EXPECT_EQ(1, e->getChildCount());
+  EXPECT_EQ(1U, e->getChildCount());
   EXPECT_EQ(SExpression::Type::LineBreak, e->getChild(0).getType());
 }
 

@@ -622,7 +622,7 @@ TEST_F(TransactionalFileSystemTest, testExportZipByFilePathWithFilter) {
   fs.exportToZip(zipFp, filter);
 
   ZipArchive zip(zipFp);
-  EXPECT_EQ(2, zip.getEntriesCount());
+  EXPECT_EQ(2U, zip.getEntriesCount());
 }
 
 TEST_F(TransactionalFileSystemTest, testExportImportZipByByteArray) {
@@ -646,7 +646,7 @@ TEST_F(TransactionalFileSystemTest, testExportZipByByteArrayWithFilter) {
   QByteArray content = fs.exportToZip(filter);
 
   ZipArchive zip(content);
-  EXPECT_EQ(2, zip.getEntriesCount());
+  EXPECT_EQ(2U, zip.getEntriesCount());
 }
 
 TEST_F(TransactionalFileSystemTest, testDiscardChanges) {
