@@ -13,6 +13,9 @@ if [ "$OS" = "windows" ]; then  # Workaround for permission error
 fi
 git -C ./i18n checkout master && git -C ./i18n pull origin master
 
+# fail on Slint compiler warnings
+export SLINT_COMPILER_DENY_WARNINGS=1
+
 # build librepcb
 echo "Using CXX=$CXX"
 echo "Using CC=$CC"
