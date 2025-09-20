@@ -62,7 +62,7 @@ TEST_F(ZipWriterZipArchiveTest, testInMemory) {
   w.finish();
 
   ZipArchive a(w.getData());
-  ASSERT_EQ(2, a.getEntriesCount());
+  ASSERT_EQ(2U, a.getEntriesCount());
   EXPECT_EQ("test dir/file 1", a.getFileName(0).toStdString());
   EXPECT_EQ("test dir/file 2", a.getFileName(1).toStdString());
   EXPECT_EQ("a", a.readFile(0));
@@ -76,7 +76,7 @@ TEST_F(ZipWriterZipArchiveTest, testWriteReadEmptyArchive) {
   EXPECT_TRUE(mZipFilePath.isExistingFile());
 
   ZipArchive a(mZipFilePath);
-  EXPECT_EQ(0, a.getEntriesCount());
+  EXPECT_EQ(0U, a.getEntriesCount());
 }
 
 TEST_F(ZipWriterZipArchiveTest, testWriteReadEmptyFile) {
@@ -87,7 +87,7 @@ TEST_F(ZipWriterZipArchiveTest, testWriteReadEmptyFile) {
   EXPECT_TRUE(mZipFilePath.isExistingFile());
 
   ZipArchive a(mZipFilePath);
-  ASSERT_EQ(1, a.getEntriesCount());
+  ASSERT_EQ(1U, a.getEntriesCount());
   EXPECT_EQ("empty.txt", a.getFileName(0));
   EXPECT_EQ(QByteArray(), a.readFile(0));
 }
@@ -106,7 +106,7 @@ TEST_F(ZipWriterZipArchiveTest, testWriteReadLargeFile) {
   EXPECT_TRUE(mZipFilePath.isExistingFile());
 
   ZipArchive a(mZipFilePath);
-  ASSERT_EQ(1, a.getEntriesCount());
+  ASSERT_EQ(1U, a.getEntriesCount());
   EXPECT_EQ("test dir/large file.bin", a.getFileName(0).toStdString());
   const QByteArray readback = a.readFile(0);
   EXPECT_EQ(arr.size(), readback.size());
@@ -122,7 +122,7 @@ TEST_F(ZipWriterZipArchiveTest, testExtractTo) {
   EXPECT_TRUE(mZipFilePath.isExistingFile());
 
   ZipArchive a(mZipFilePath);
-  ASSERT_EQ(2, a.getEntriesCount());
+  ASSERT_EQ(2U, a.getEntriesCount());
   const FilePath dst = mTmpDir.getPathTo("sub dir");
   a.extractTo(dst);
   EXPECT_EQ("a", FileUtils::readFile(dst.getPathTo("test dir/file 1")));

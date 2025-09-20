@@ -1,19 +1,28 @@
 jobs:
 - job: macOS
   pool:
-    vmImage: 'macOS-13'
-  timeoutInMinutes: 180
+    vmImage: 'macOS-14'
+  timeoutInMinutes: 240
   variables:
     OS: 'mac'
     ARCH: 'x86_64'
     COPYFILE_DISABLE: 1 # Stop creating shit files (https://superuser.com/questions/259703/get-mac-tar-to-stop-putting-filenames-in-tar-archives)
     HOMEBREW_NO_INSTALL_CLEANUP: 1 # Might speed up homebrew commands(?)
+    # Qt 6.5.6 is the last version that runs on macOS 10.14.
+    QT_URL: 'https://qt.mirror.constant.com/archive/qt/6.5/6.5.6/src/single/qt-everywhere-opensource-src-6.5.6.tar.xz'
+    QT_SHA256: '607d5ca0671907592f0a75cec4cc97f3ec68640d396fb2c6d0ad77ca969de30d'
+    QT_ROOT: $(Agent.TempDirectory)/qt
+    OCC_VERSION: '7_9_1'
+    OCC_ROOT: $(Agent.TempDirectory)/occ
+    MACOSX_DEPLOYMENT_TARGET: '10.14'  # Picked up by CMake and Rust
+    CMAKE_PREFIX_PATH: "$(Agent.TempDirectory)/qt/lib/cmake/Qt6:$(Agent.TempDirectory)/occ/lib/cmake/opencascade"
   steps:
   - checkout: self
     clean: true
     submodules: recursive
   - bash: ./ci/print_environment.sh
     displayName: Print Environment
+  - template: azure-cache.yml
   - bash: |
       source ./ci/install_dependencies.sh
       # Pass modified PATH to following steps:
@@ -21,7 +30,6 @@ jobs:
     displayName: Install Dependencies
     env:
       SLINT_UI_TESTING_AUTH: $(SLINT_UI_TESTING_AUTH)
-  - template: azure-cache.yml
   - bash: ./ci/print_environment.sh
     displayName: Print New Environment  # Print again since it has been modified
   - bash: ./ci/build_librepcb.sh
@@ -34,11 +42,9 @@ jobs:
     displayName: Run LibrePCB Unittests
   - bash: uv --directory ./tests/cli run --no-dev pytest -vvv --librepcb-executable="../../build/install/LibrePCB.app/Contents/MacOS/librepcb-cli"
     displayName: Run LibrePCB-CLI Functional Tests
-  # Note: Functional tests need to be run with the non-bundled app,
-  # otherwise we get errors due to multiple definitions of Qt symbols.
-  - bash: uv --directory ./tests/funq run --no-dev pytest -vvv --librepcb-executable="../../build/install/bin/librepcb.app/Contents/MacOS/librepcb" --reruns 5 --reruns-delay 10
+  - bash: uv --directory ./tests/funq run --no-dev pytest -vvv --librepcb-executable="../../build/install/LibrePCB.app/Contents/MacOS/librepcb" --reruns 5 --reruns-delay 10
     displayName: Run LibrePCB Functional Tests
-  - bash: uv --directory "./tests/ui" run --no-dev pytest -vvv --librepcb-executable="../../build/install/bin/librepcb.app/Contents/MacOS/librepcb"
+  - bash: uv --directory "./tests/ui" run --no-dev pytest -vvv --librepcb-executable="../../build/install/LibrePCB.app/Contents/MacOS/librepcb"
     displayName: Run LibrePCB UI Tests
     condition: and(succeeded(), variables['SLINT_UI_TESTING_AUTH'])
     env:

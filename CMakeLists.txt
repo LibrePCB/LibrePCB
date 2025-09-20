@@ -2,13 +2,6 @@
 # (Note: The minimal version 3.22 is shipped with Ubuntu 22.04)
 cmake_minimum_required(VERSION 3.22)
 
-# Support older macOS versions. Needs to be set before calling project()!
-# https://github.com/LibrePCB/LibrePCB/issues/1091
-set(CMAKE_OSX_DEPLOYMENT_TARGET
-    "10.15"
-    CACHE STRING "Minimum OS X deployment version"
-)
-
 # Fix missing libOpenGL.so.0 error of binary Linux releases, see
 # https://github.com/probonopd/linuxdeployqt/issues/486.
 set(OpenGL_GL_PREFERENCE LEGACY)

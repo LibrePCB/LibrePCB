@@ -126,19 +126,20 @@ jobs:
       HOMEBREW_NO_INSTALL_CLEANUP: 1 # Might speed up homebrew commands(?)
       CCACHE_DIR: '/Users/runner/ccache-dir'
       CARGO_HOME: '/Users/runner/cargo-home'
+      # Qt 6.7.3 is the last version that runs on macOS 11.
+      QT_URL: 'https://qt.mirror.constant.com/archive/qt/6.7/6.7.3/single/qt-everywhere-src-6.7.3.tar.xz'
+      QT_SHA256: 'a3f1d257cbb14c6536585ffccf7c203ce7017418e1a0c2ed7c316c20c729c801'
+      QT_ROOT: '/Users/runner/qt'
+      OCC_VERSION: '7_9_1'
+      OCC_ROOT: '/Users/runner/occ'
+      MACOSX_DEPLOYMENT_TARGET: '11'  # Picked up by CMake and Rust
+      CMAKE_PREFIX_PATH: '/Users/runner/qt/lib/cmake/Qt6:/Users/runner/occ/lib/cmake/opencascade'
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
       - name: Print Environment
         run: ./ci/print_environment.sh
-      - name: Install Dependencies
-        run: |
-          source ./ci/install_dependencies.sh
-          # Pass modified PATH to following steps:
-          echo "$PATH" > "$GITHUB_PATH"
-        env:
-          SLINT_UI_TESTING_AUTH: ${{ secrets.SLINT_UI_TESTING_AUTH }}
       # caching --->
       - name: Cache .ccache
         uses: actions/cache@v4
@@ -158,7 +159,24 @@ jobs:
             ${{ env.CARGO_HOME }}/git/db/
             ./build/cargo/
             ./libs/librepcb/rust-core/target/
+      - name: Cache Qt
+        uses: actions/cache@v4
+        with:
+          key: qt-${{ env.QT_SHA256 }}-macos-${{ env.MACOSX_DEPLOYMENT_TARGET }}-v6
+          path: ${{ env.QT_ROOT }}
+      - name: Cache OpenCascade
+        uses: actions/cache@v4
+        with:
+          key: occ-${{ env.OCC_VERSION }}-macos-${{ env.MACOSX_DEPLOYMENT_TARGET }}-v6
+          path: ${{ env.OCC_ROOT }}
       # <--- caching
+      - name: Install Dependencies
+        run: |
+          source ./ci/install_dependencies.sh
+          # Pass modified PATH to following steps:
+          echo "$PATH" > "$GITHUB_PATH"
+        env:
+          SLINT_UI_TESTING_AUTH: ${{ secrets.SLINT_UI_TESTING_AUTH }}
       - name: Print New Environment
         run: ./ci/print_environment.sh
       - name: Build LibrePCB
@@ -171,13 +189,11 @@ jobs:
         run: ./build/tests/unittests/librepcb-unittests
       - name: Run LibrePCB-CLI Functional Tests
         run: uv --directory ./tests/cli run --no-dev pytest -vvv --librepcb-executable="../../build/install/LibrePCB.app/Contents/MacOS/librepcb-cli"
-      # Note: Functional tests need to be run with the non-bundled app,
-      # otherwise we get errors due to multiple definitions of Qt symbols.
       - name: Run LibrePCB Functional Tests
-        run: uv --directory ./tests/funq run --no-dev pytest -vvv --librepcb-executable="../../build/install/bin/librepcb.app/Contents/MacOS/librepcb" --reruns 5 --reruns-delay 10
+        run: uv --directory ./tests/funq run --no-dev pytest -vvv --librepcb-executable="../../build/install/LibrePCB.app/Contents/MacOS/librepcb" --reruns 5 --reruns-delay 10
       - name: Run LibrePCB UI Tests
         if: ${{ success() && env.SLINT_UI_TESTING_AUTH }}
-        run: uv --directory ./tests/ui run --no-dev pytest -vvv --librepcb-executable="../../build/install/bin/librepcb.app/Contents/MacOS/librepcb"
+        run: uv --directory ./tests/ui run --no-dev pytest -vvv --librepcb-executable="../../build/install/LibrePCB.app/Contents/MacOS/librepcb"
         env:
           SLINT_UI_TESTING_AUTH: ${{ secrets.SLINT_UI_TESTING_AUTH }}
       - name: Tar & Upload Artifacts

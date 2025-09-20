@@ -36,7 +36,9 @@ dylibbundler -ns -od -b \
   -x LibrePCB.app/Contents/MacOS/librepcb-cli \
   -x lib/liblibrepcbslint.dylib \
   -d LibrePCB.app/Contents/Frameworks/ \
-  -p @executable_path/../Frameworks/
+  -p @executable_path/../Frameworks/ \
+  -s "$QT_ROOT/lib" \
+  -s "$OCC_ROOT/lib"
 if [ "$ARCH" = "arm64" ]
 then
   # Apple Silicon requires the binary to be signed, but somehow macdeployqt
@@ -46,8 +48,7 @@ then
   macdeployqt "LibrePCB.app" -always-overwrite \
     -executable="./LibrePCB.app/Contents/MacOS/librepcb" \
     -executable="./LibrePCB.app/Contents/MacOS/librepcb-cli" \
-    -executable="./LibrePCB.app/Contents/Frameworks/liblibrepcbslint.dylib" \
-    -qmldir="../../ci"
+    -executable="./LibrePCB.app/Contents/Frameworks/liblibrepcbslint.dylib"
   codesign --force --deep -s - ./LibrePCB.app/Contents/MacOS/librepcb
   codesign --force --deep -s - ./LibrePCB.app/Contents/MacOS/librepcb-cli
   # This is so crappy unstable, we have to try it several times :sob:
@@ -68,8 +69,7 @@ else
       macdeployqt "LibrePCB.app" -dmg -always-overwrite \
         -executable="./LibrePCB.app/Contents/MacOS/librepcb" \
         -executable="./LibrePCB.app/Contents/MacOS/librepcb-cli" \
-        -executable="./LibrePCB.app/Contents/Frameworks/liblibrepcbslint.dylib" \
-        -qmldir="../../ci"
+        -executable="./LibrePCB.app/Contents/Frameworks/liblibrepcbslint.dylib"
       sleep 5
     fi
   done
