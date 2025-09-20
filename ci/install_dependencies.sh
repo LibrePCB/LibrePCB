@@ -22,17 +22,6 @@ then
   echo "Upgrading packages..."
   brew upgrade || true
 
-  # Install Qt
-  echo "Installing qt6..."
-  brew install --force-bottle --overwrite qt6
-  echo "Linking qt6..."
-  brew link --force --overwrite qt6
-  export PATH="$(brew --prefix qt6)/bin:$PATH"
-
-  # Install OpenCascade
-  echo "Installing opencascade..."
-  brew install --force-bottle opencascade
-
   # Install create-dmg
   echo "Installing create-dmg..."
   brew install --force-bottle create-dmg
@@ -46,8 +35,12 @@ then
   brew install --force-bottle ninja
 
   # Install Rust toolchain
+  # IMPORTANT: Rust from homebrew contains a stdlib that does not run on older
+  # macOS versions, therefore we use rustup to install an official build!
   echo "Installing Rust toolchain..."
-  brew install --force-bottle rust
+  brew install --force-bottle rustup
+  rustup install --profile minimal 1.89.0
+  export PATH="/usr/local/opt/rustup/bin:$PATH"
 
   # Install ccache
   echo "Installing ccache..."
@@ -61,6 +54,106 @@ then
   echo "Killing XProtect..."
   sudo pkill -9 XProtect >/dev/null || true;
   while pgrep XProtect; do sleep 3; done;
+
+  # Build Qt from source if not available from cache
+  if [ ! -d "$QT_ROOT" ]; then
+    echo "Qt is not available, building from source..."
+    curl -o qt.tar.xz -L "$QT_URL"
+    echo "$QT_SHA256  qt.tar.xz" | shasum -a 256 --check
+    tar -xf qt.tar.xz
+    pushd qt-everywhere-src-*
+    ./configure \
+      -prefix "$QT_ROOT" \
+      -opensource \
+      -confirm-license \
+      -release \
+      -platform macx-clang \
+      -qt-zlib -qt-libpng -qt-libjpeg \
+      -nomake examples \
+      -nomake tests \
+      -skip qt3d \
+      -skip qtactiveqt \
+      -skip qtcharts \
+      -skip qtcoap \
+      -skip qtdatavis3d \
+      -skip qtdeclarative \
+      -skip qtdoc \
+      -skip qtgraphs \
+      -skip qtgrpc \
+      -skip qthttpserver \
+      -skip qtlanguageserver \
+      -skip qtlocation \
+      -skip qtlottie \
+      -skip qtmqtt \
+      -skip qtmultimedia \
+      -skip qtopcua \
+      -skip qtpositioning \
+      -skip qtquick1 \
+      -skip qtquick3d \
+      -skip qtquick3dphysics \
+      -skip qtquickcontrols \
+      -skip qtquickeffectmaker \
+      -skip qtquicktimeline \
+      -skip qtremoteobjects \
+      -skip qtscxml \
+      -skip qtsensors \
+      -skip qtserialbus \
+      -skip qtserialport \
+      -skip qtshadertools \
+      -skip qtspeech \
+      -skip qtvirtualkeyboard \
+      -skip qtwayland \
+      -skip qtwebchannel \
+      -skip qtwebengine \
+      -skip qtwebkit \
+      -skip qtwebkit-examples \
+      -skip qtwebsockets \
+      -skip qtwebview \
+      -skip qtwinextras \
+      -- \
+      -DQT_FORCE_WARN_APPLE_SDK_AND_XCODE_CHECK=ON \
+      -DCMAKE_OSX_DEPLOYMENT_TARGET="$MACOSX_DEPLOYMENT_TARGET" \
+      -DCMAKE_CXX_STANDARD=11
+    ninja
+    ninja install
+    popd
+  fi
+  export PATH="$QT_ROOT/bin:$PATH"
+
+  # Build OpenCascade from source if not available from cache
+  OCC_URL="https://github.com/Open-Cascade-SAS/OCCT/archive/refs/tags/V${OCC_VERSION}.tar.gz"
+  if [ ! -d "$OCC_ROOT" ]; then
+    echo "OpenCascade is not available, building from source..."
+    curl -o occ.tar.gz -L "$OCC_URL"
+    tar -xf occ.tar.gz
+    pushd OCCT-*
+    cmake . -G "Ninja" \
+      -DCMAKE_BUILD_TYPE=Release \
+      -DINSTALL_DIR="$OCC_ROOT" \
+      -DBUILD_LIBRARY_TYPE=Shared \
+      -DBUILD_DOC_Overview=0 \
+      -DBUILD_MODULE_ApplicationFramework=0 \
+      -DBUILD_MODULE_DataExchange=1 \
+      -DBUILD_MODULE_Draw=0 \
+      -DBUILD_MODULE_FoundationClasses=0 \
+      -DBUILD_MODULE_ModelingAlgorithms=0 \
+      -DBUILD_MODULE_ModelingData=0 \
+      -DBUILD_MODULE_Visualization=0 \
+      -DUSE_DRACO=0 \
+      -DUSE_FREEIMAGE=0 \
+      -DUSE_FREETYPE=0 \
+      -DUSE_GLES2=0 \
+      -DUSE_OPENGL=0 \
+      -DUSE_OPENVR=0 \
+      -DUSE_RAPIDJSON=0 \
+      -DUSE_TBB=0 \
+      -DUSE_TK=0 \
+      -DUSE_VTK=0 \
+      -DCMAKE_OSX_DEPLOYMENT_TARGET="$MACOSX_DEPLOYMENT_TARGET"
+    ninja
+    ninja install
+    popd
+  fi
 fi
 
 # Install Python packages
