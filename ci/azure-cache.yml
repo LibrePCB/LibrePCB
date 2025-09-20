@@ -50,3 +50,15 @@ steps:
     path: ./libs/librepcb/rust-core/target/
     key: 'libs/librepcb/**/Cargo.lock | "rust-core-target" | "$(System.JobDisplayName)" | "$(Build.SourceBranch)" | "dummy"'
     restoreKeys: 'libs/librepcb/**/Cargo.lock | "rust-core-target" | "$(System.JobDisplayName)" | "refs/heads/master"'
+- task: Cache@2
+  displayName: Cache Qt
+  inputs:
+    path: $(QT_ROOT)
+    key: '"qt-$(QT_SHA256)-macos-$(MACOSX_DEPLOYMENT_TARGET)-v6"'
+  condition: eq(variables.OS, 'mac')
+- task: Cache@2
+  displayName: Cache OpenCascade
+  inputs:
+    path: $(OCC_ROOT)
+    key: '"occ-$(OCC_VERSION)-macos-$(MACOSX_DEPLOYMENT_TARGET)-v6"'
+  condition: eq(variables.OS, 'mac')
