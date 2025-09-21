@@ -271,7 +271,6 @@ void FileFormatMigrationV1::upgradeWorkspaceData(TransactionalDirectory& dir) {
             "order", SExpression::createToken((index == 0) ? "true" : "false"));
         ++index;
       }
-      node->setName("api_endpoints");
     }
     dir.write(settingsFp, root->toByteArray());
   }
