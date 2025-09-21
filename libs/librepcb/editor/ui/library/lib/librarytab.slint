@@ -35,6 +35,7 @@ import {
     LibraryAction,
     LibraryDependency,
     LibraryElementAction,
+    LibraryElementsMoveAction,
     LibraryTabData,
     TabAction,
     WindowSectionData,
@@ -530,6 +531,7 @@ component LibraryTreeViewToolBar inherits Rectangle {
     height: l.preferred-height;
 
     callback duplicate-clicked <=> duplicate-btn.clicked;
+    callback copy-clicked <=> copy-btn.clicked;
     callback move-clicked <=> move-btn.clicked;
     callback remove-clicked <=> remove-btn.clicked;
 
@@ -553,13 +555,23 @@ component LibraryTreeViewToolBar inherits Rectangle {
             enabled: (!read-only) && (count == 1);
         }
 
+        copy-btn := IconButton {
+            style: hyperlink;
+            icon-scale: 0.7;
+            tooltip: @tr("Copy to Other Library");
+            tooltip-position: left;
+            status-tip: @tr("Copy library element(s) to another library while keeping all UUIDs, e.g. for overriding a read-only element");
+            icon: @image-url("../../../../../font-awesome/svgs/solid/share-from-square.svg");
+        }
+
         move-btn := IconButton {
             style: hyperlink;
             icon-scale: 0.7;
             tooltip: @tr("Move to Other Library");
             tooltip-position: left;
-            status-tip: @tr("Move or copy library element(s) to another library");
-            icon: @image-url("../../../../../font-awesome/svgs/solid/arrow-right-from-bracket.svg");
+            status-tip: @tr("Move library element(s) to another library");
+            icon: @image-url("../../../../../font-awesome/svgs/solid/right-from-bracket.svg");
+            enabled: !read-only;
         }
 
         remove-btn := IconButton {
@@ -578,6 +590,7 @@ component LibraryContentTab inherits HorizontalLayout {
     in-out property <[LibraryTabData]> tabs;
     in property <int> index;
     in property <bool> read-only;
+    property <LibraryElementsMoveAction> move-or-copy-action;
 
     // If the tab is switched, restore scroll positions.
     changed index => {
@@ -623,13 +636,14 @@ component LibraryContentTab inherits HorizontalLayout {
                 }
             }
 
-            move-category-popup := ChooseLocalLibraryPopup {
+            move-or-copy-category-popup := ChooseLocalLibraryPopup {
                 width: parent.width;
                 height: parent.height;
                 hide-library-with-path: Data.libraries[tabs[index].library-index].path;
 
                 item-clicked(path) => {
-                    tabs[index].move-category-to-lib = path;
+                    tabs[index].move-or-copy-to-lib = path;
+                    tabs[index].move-or-copy-action = move-or-copy-action;
                 }
             }
 
@@ -671,8 +685,14 @@ component LibraryContentTab inherits HorizontalLayout {
                 Backend.trigger-tab(section-index, index, TabAction.library-categories-duplicate);
             }
 
+            copy-clicked => {
+                move-or-copy-action = LibraryElementsMoveAction.copy-categories;
+                move-or-copy-category-popup.show();
+            }
+
             move-clicked => {
-                move-category-popup.show();
+                move-or-copy-action = LibraryElementsMoveAction.move-categories;
+                move-or-copy-category-popup.show();
             }
 
             remove-clicked => {
@@ -755,13 +775,14 @@ component LibraryContentTab inherits HorizontalLayout {
                 }
             }
 
-            move-element-popup := ChooseLocalLibraryPopup {
+            move-or-copy-element-popup := ChooseLocalLibraryPopup {
                 width: parent.width;
                 height: parent.height;
                 hide-library-with-path: Data.libraries[tabs[index].library-index].path;
 
                 item-clicked(path) => {
-                    tabs[index].move-element-to-lib = path;
+                    tabs[index].move-or-copy-to-lib = path;
+                    tabs[index].move-or-copy-action = move-or-copy-action;
                 }
             }
 
@@ -800,8 +821,14 @@ component LibraryContentTab inherits HorizontalLayout {
                 Backend.trigger-tab(section-index, index, TabAction.library-elements-duplicate);
             }
 
+            copy-clicked => {
+                move-or-copy-action = LibraryElementsMoveAction.copy-elements;
+                move-or-copy-element-popup.show();
+            }
+
             move-clicked => {
-                move-element-popup.show();
+                move-or-copy-action = LibraryElementsMoveAction.move-elements;
+                move-or-copy-element-popup.show();
             }
 
             remove-clicked => {
