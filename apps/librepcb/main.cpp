@@ -323,8 +323,8 @@ static int openWorkspace(FilePath& path) {
   // Setup global parts information provider (with cache).
   PartInformationProvider::instance().setCacheDir(Application::getCacheDir());
   auto applyPartInformationProviderSettings = [&ws]() {
-    PartInformationProvider::instance().setApiEndpoint(
-        ws.getSettings().apiEndpoints.get().value(0));
+    const auto ep = ws.getSettings().getApiEndpointForPartsInfo();
+    PartInformationProvider::instance().setApiEndpoint(ep ? ep->url : QUrl());
   };
   applyPartInformationProviderSettings();
   QObject::connect(

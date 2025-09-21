@@ -35,6 +35,43 @@
 namespace librepcb {
 
 /*******************************************************************************
+ *  Non-Member Functions
+ ******************************************************************************/
+
+template <>
+std::unique_ptr<SExpression> serialize(
+    const WorkspaceSettings::ApiEndpoint& obj) {
+  std::unique_ptr<SExpression> node = SExpression::createList("endpoint");
+  node->appendChild(obj.url);
+  node->appendChild("libraries", obj.useForLibraries);
+  node->appendChild("parts", obj.useForPartsInfo);
+  node->appendChild("order", obj.useForOrder);
+  return node;
+}
+
+template <>
+WorkspaceSettings::ApiEndpoint deserialize(const SExpression& node) {
+  WorkspaceSettings::ApiEndpoint ep;
+  ep.url = deserialize<QUrl>(node.getChild("@0"));
+  if (const SExpression* child = node.tryGetChild("libraries")) {
+    ep.useForLibraries = deserialize<bool>(child->getChild("@0"));
+  } else {
+    ep.useForLibraries = true;
+  }
+  if (const SExpression* child = node.tryGetChild("parts")) {
+    ep.useForPartsInfo = deserialize<bool>(child->getChild("@0"));
+  } else {
+    ep.useForPartsInfo = (ep.url == QUrl("https://api.librepcb.org"));
+  }
+  if (const SExpression* child = node.tryGetChild("order")) {
+    ep.useForOrder = deserialize<bool>(child->getChild("@0"));
+  } else {
+    ep.useForOrder = (ep.url == QUrl("https://api.librepcb.org"));
+  }
+  return ep;
+}
+
+/*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
 
@@ -51,8 +88,16 @@ WorkspaceSettings::WorkspaceSettings(QObject* parent)
     useOpenGl("use_opengl", false, this),
     libraryLocaleOrder("library_locale_order", "locale", QStringList(), this),
     libraryNormOrder("library_norm_order", "norm", QStringList(), this),
-    apiEndpoints("api_endpoints", "url",
-                 QList<QUrl>{QUrl("https://api.librepcb.org")}, this),
+    apiEndpoints("api_endpoints", "endpoint",
+                 QList<ApiEndpoint>{
+                     ApiEndpoint{
+                         QUrl("https://api.librepcb.org"),
+                         true,  // Use for libraries
+                         true,  // Use for parts info
+                         true,  // Use for order
+                     },
+                 },
+                 this),
     autofetchLivePartInformation("autofetch_live_part_information", true, this),
     externalWebBrowserCommands("external_web_browser", "command", QStringList(),
                                this),
@@ -121,6 +166,26 @@ std::unique_ptr<SExpression> WorkspaceSettings::serialize() {
   }
   root->ensureLineBreak();
   return root;
+}
+
+std::optional<WorkspaceSettings::ApiEndpoint>
+    WorkspaceSettings::getApiEndpointForPartsInfo() const noexcept {
+  for (const ApiEndpoint& ep : apiEndpoints.get()) {
+    if (ep.useForPartsInfo && ep.url.isValid()) {
+      return ep;
+    }
+  }
+  return std::nullopt;
+}
+
+std::optional<WorkspaceSettings::ApiEndpoint>
+    WorkspaceSettings::getApiEndpointForOrder() const noexcept {
+  for (const ApiEndpoint& ep : apiEndpoints.get()) {
+    if (ep.useForOrder && ep.url.isValid()) {
+      return ep;
+    }
+  }
+  return std::nullopt;
 }
 
 /*******************************************************************************

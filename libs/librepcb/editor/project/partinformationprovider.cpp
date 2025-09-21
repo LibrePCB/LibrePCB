@@ -153,6 +153,8 @@ void PartInformationProvider::PartInformation::serialize(
   root.appendChild("mpn", mpn);
   root.appendChild("manufacturer", manufacturer);
   root.ensureLineBreak();
+  root.appendChild("source", source);
+  root.ensureLineBreak();
   root.appendChild("timestamp", timestamp);
   root.ensureLineBreak();
   root.appendChild("results", results);
@@ -194,6 +196,14 @@ void PartInformationProvider::PartInformation::serialize(
 }
 
 void PartInformationProvider::PartInformation::load(const SExpression& node) {
+  if (const SExpression* child = node.tryGetChild("source")) {
+    source = child->getChild("@0").getValue();  // Since LibrePCB 2.0
+  } else {
+    // For entries from LibrePCB older than 2.0, we assume the information
+    // was fetched from our official API. Even if this is wrong, it's not
+    // causing serious troubles.
+    source = "https://api.librepcb.org";
+  }
   timestamp = deserialize<qint64>(node.getChild("timestamp/@0"));
   mpn = node.getChild("mpn/@0").getValue();
   manufacturer = node.getChild("manufacturer/@0").getValue();
@@ -294,8 +304,10 @@ void PartInformationProvider::setApiEndpoint(const QUrl& url) noexcept {
   }
 
   mEndpoint.reset();
+  mSource.clear();
   if (url.isValid()) {
     mEndpoint.reset(new ApiEndpoint(url));
+    mSource = mEndpoint->getUrl().toString(QUrl::PrettyDecoded);
     connect(mEndpoint.data(),
             &ApiEndpoint::errorWhileFetchingPartsInformationStatus, this,
             &PartInformationProvider::errorWhileFetchingStatus);
@@ -326,7 +338,7 @@ bool PartInformationProvider::startOperation(int timeoutMs) noexcept {
 
 std::shared_ptr<PartInformationProvider::PartInformation>
     PartInformationProvider::getPartInfo(const Part& part) noexcept {
-  return mCache.value(part);
+  return mCache.value(part).value(mSource);
 }
 
 std::shared_ptr<PartInformationProvider::PartInformation>
@@ -361,7 +373,8 @@ void PartInformationProvider::requestScheduledParts() noexcept {
   const int count = std::min(int(mScheduledParts.count()), mQueryMaxPartCount);
   for (int i = 0; i < count; ++i) {
     const auto& part = mScheduledParts.at(i);
-    if (mCache.contains(part)) {
+    auto it = mCache.find(part);
+    if ((it != mCache.end()) && (it->contains(mSource))) {
       qWarning() << "Requested part information of already cached part.";
     }
     batch.append(ApiEndpoint::Part{part.mpn, part.manufacturer});
@@ -461,6 +474,7 @@ void PartInformationProvider::partsInformationReceived(
         partObj["manufacturer"].toString(),
     };
     std::shared_ptr<PartInformation> info = std::make_shared<PartInformation>();
+    info->source = mSource;
     info->timestamp = timestamp;
     info->mpn = part.mpn;
     info->manufacturer = part.manufacturer;
@@ -486,7 +500,7 @@ void PartInformationProvider::partsInformationReceived(
           resJson["url"].toString(),
       });
     }
-    mCache[part] = info;
+    mCache[part][info->source] = info;
     mCacheModified = true;
   }
   mRequestedParts.clear();
@@ -513,12 +527,19 @@ void PartInformationProvider::errorWhileFetchingPartsInformation(
 void PartInformationProvider::removeOutdatedInformation() noexcept {
   int count = 0;
   const qint64 timestamp = QDateTime::currentSecsSinceEpoch();
+  for (auto it = mCache.begin(); it != mCache.end(); it++) {
+    for (const QString& source : it->keys()) {
+      const qint64 lifetimeSecs = timestamp - it->value(source)->timestamp;
+      if (lifetimeSecs > 6 * 3600) {  // 6 hours
+        it->remove(source);
+        mCacheModified = true;
+        ++count;
+      }
+    }
+  }
   foreach (const Part& part, mCache.keys()) {
-    const qint64 lifetimeSecs = timestamp - mCache.value(part)->timestamp;
-    if (lifetimeSecs > 6 * 3600) {  // 6 hours
+    if (mCache.value(part).isEmpty()) {
       mCache.remove(part);
-      mCacheModified = true;
-      ++count;
     }
   }
   qDebug() << "Cleaned outdated live information about" << count << "parts.";
@@ -535,9 +556,10 @@ void PartInformationProvider::loadCacheFromDisk() noexcept {
           std::make_shared<PartInformation>();
       info->load(*node);
       const Part part{info->mpn, info->manufacturer};
-      auto it = mCache.find(part);
-      if ((it == mCache.end()) || (info->timestamp > it.value()->timestamp)) {
-        mCache.insert(part, info);
+      auto& map = mCache[part];
+      auto it = map.find(info->source);
+      if ((it == map.end()) || (info->timestamp > it.value()->timestamp)) {
+        map.insert(info->source, info);
       }
     }
     qInfo().nospace() << "Loaded parts information cache from "
@@ -557,9 +579,11 @@ void PartInformationProvider::saveCacheToDisk() noexcept {
     std::unique_ptr<SExpression> root =
         SExpression::createList("librepcb_parts_cache");
     root->ensureLineBreak();
-    for (auto it = mCache.begin(); it != mCache.end(); it++) {
-      it.value()->serialize(root->appendList("part"));
-      root->ensureLineBreak();
+    for (const auto& map : mCache) {
+      for (auto it = map.begin(); it != map.end(); it++) {
+        it.value()->serialize(root->appendList("part"));
+        root->ensureLineBreak();
+      }
     }
     FileUtils::writeFile(mCacheFp, root->toByteArray());
     qInfo().nospace() << "Saved parts information cache to "

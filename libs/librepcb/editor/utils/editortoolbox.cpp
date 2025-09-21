@@ -294,7 +294,7 @@ void EditorToolbox::addResourcesToMenu(const Workspace& ws, MenuBuilder& mb,
   }
 
   // If MPNs are available, provide search through API.
-  if (!ws.getSettings().apiEndpoints.get().isEmpty()) {
+  if (ws.getSettings().getApiEndpointForPartsInfo()) {
     QList<Part> parts;
     for (const ComponentAssemblyOption& ao : cmp.getAssemblyOptions()) {
       for (const Part& part : ao.getParts()) {

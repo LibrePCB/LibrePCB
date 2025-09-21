@@ -33,6 +33,8 @@
 namespace librepcb {
 namespace tests {
 
+using ApiEndpoint = WorkspaceSettings::ApiEndpoint;
+
 /*******************************************************************************
  *  Test Class
  ******************************************************************************/
@@ -43,9 +45,7 @@ class WorkspaceSettingsTest : public ::testing::Test {};
  *  Test Methods
  ******************************************************************************/
 
-TEST_F(WorkspaceSettingsTest, testLoadFromSExpressionV01) {
-  // Attention: Do NOT modify this string! It represents the freezed(!) file
-  // format V0.1 and even current versions of LibrePCB must be able to load it!
+TEST_F(WorkspaceSettingsTest, testLoadFromSExpression) {
   std::unique_ptr<SExpression> root = SExpression::parse(
       "(librepcb_workspace_settings\n"
       " (user \"Foo Bar\")\n"
@@ -60,42 +60,8 @@ TEST_F(WorkspaceSettingsTest, testLoadFromSExpressionV01) {
       "  (norm \"IEC 60617\")\n"
       " )\n"
       " (api_endpoints\n"
-      "  (url \"https://api.librepcb.org\")\n"
-      " )\n"
-      ")",
-      FilePath());
-
-  WorkspaceSettings obj;
-  obj.load(*root, Version::fromString("0.1"));
-  EXPECT_EQ("Foo Bar", obj.userName.get());
-  EXPECT_EQ("de_CH", obj.applicationLocale.get());
-  EXPECT_EQ(LengthUnit::micrometers(), obj.defaultLengthUnit.get());
-  EXPECT_EQ(120U, obj.projectAutosaveIntervalSeconds.get());
-  EXPECT_EQ(true, obj.useOpenGl.get());
-  EXPECT_EQ(QStringList{"de_DE"}, obj.libraryLocaleOrder.get());
-  EXPECT_EQ(QStringList{"IEC 60617"}, obj.libraryNormOrder.get());
-  EXPECT_EQ(QList<QUrl>{QUrl("https://api.librepcb.org")},
-            obj.apiEndpoints.get());
-  EXPECT_EQ(QStringList{}, obj.externalWebBrowserCommands.get());
-  EXPECT_EQ(QStringList{}, obj.externalFileManagerCommands.get());
-}
-
-TEST_F(WorkspaceSettingsTest, testLoadFromSExpressionCurrentVersion) {
-  std::unique_ptr<SExpression> root = SExpression::parse(
-      "(librepcb_workspace_settings\n"
-      " (user \"Foo Bar\")\n"
-      " (application_locale \"de_CH\")\n"
-      " (default_length_unit micrometers)\n"
-      " (project_autosave_interval 120)\n"
-      " (use_opengl true)\n"
-      " (library_locale_order\n"
-      "  (locale \"de_DE\")\n"
-      " )\n"
-      " (library_norm_order\n"
-      "  (norm \"IEC 60617\")\n"
-      " )\n"
-      " (api_endpoints\n"
-      "  (url \"https://api.librepcb.org\")\n"
+      "  (endpoint \"https://api.librepcb.org\" (libraries true) "
+      "(parts false) (order true))\n"
       " )\n"
       " (external_web_browser\n"
       "  (command \"firefox \\\"{{URL}}\\\"\")\n"
@@ -122,8 +88,11 @@ TEST_F(WorkspaceSettingsTest, testLoadFromSExpressionCurrentVersion) {
   EXPECT_EQ(true, obj.useOpenGl.get());
   EXPECT_EQ(QStringList{"de_DE"}, obj.libraryLocaleOrder.get());
   EXPECT_EQ(QStringList{"IEC 60617"}, obj.libraryNormOrder.get());
-  EXPECT_EQ(QList<QUrl>{QUrl("https://api.librepcb.org")},
-            obj.apiEndpoints.get());
+  EXPECT_EQ(
+      (QList<ApiEndpoint>{
+          ApiEndpoint{QUrl("https://api.librepcb.org"), true, false, true},
+      }),
+      obj.apiEndpoints.get());
   EXPECT_EQ(QStringList{"firefox \"{{URL}}\""},
             obj.externalWebBrowserCommands.get());
   EXPECT_EQ(QStringList{"nautilus \"{{FILEPATH}}\""},
@@ -144,7 +113,10 @@ TEST_F(WorkspaceSettingsTest, testStoreAndLoad) {
   obj1.useOpenGl.set(!obj1.useOpenGl.get());
   obj1.libraryLocaleOrder.set({"de_CH", "en_US"});
   obj1.libraryNormOrder.set({"foo", "bar"});
-  obj1.apiEndpoints.set({QUrl("https://foo"), QUrl("https://bar")});
+  obj1.apiEndpoints.set({
+      ApiEndpoint{QUrl("https://foo"), true, false, true},
+      ApiEndpoint{QUrl("https://bar"), false, true, false},
+  });
   obj1.externalWebBrowserCommands.set({"foo", "bar"});
   obj1.externalFileManagerCommands.set({"file", "manager"});
   obj1.externalPdfReaderCommands.set({"pdf", "reader"});

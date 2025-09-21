@@ -61,6 +61,16 @@ class WorkspaceSettings final : public QObject {
   Q_OBJECT
 
 public:
+  // Types
+  struct ApiEndpoint {
+    QUrl url;
+    bool useForLibraries = false;  ///< Can be set on 0..n endpoints
+    bool useForPartsInfo = false;  ///< Can be set on 0..1 endpoints
+    bool useForOrder = false;  ///< Can be set on 0..1 endpoints
+
+    bool operator==(const ApiEndpoint& rhs) const noexcept = default;
+  };
+
   // Constructors / Destructor
   WorkspaceSettings(const WorkspaceSettings& other) = delete;
   explicit WorkspaceSettings(QObject* parent = nullptr);
@@ -85,6 +95,20 @@ public:
    * @return ::librepcb::SExpression node containing all settings.
    */
   std::unique_ptr<SExpression> serialize();
+
+  /**
+   * @brief Get the API endpoint which is configured for parts information
+   *
+   * @return Endpoint for parts information, or std::nullopt if none
+   */
+  std::optional<ApiEndpoint> getApiEndpointForPartsInfo() const noexcept;
+
+  /**
+   * @brief Get the API endpoint which is configured for ordering projects
+   *
+   * @return Endpoint for ordering projects, or std::nullopt if none
+   */
+  std::optional<ApiEndpoint> getApiEndpointForOrder() const noexcept;
 
   // Operator Overloadings
   WorkspaceSettings& operator=(const WorkspaceSettings& rhs) = delete;
@@ -206,7 +230,7 @@ public:
    *
    * Default: ["https://api.librepcb.org"]
    */
-  WorkspaceSettingsItem_GenericValueList<QList<QUrl>> apiEndpoints;
+  WorkspaceSettingsItem_GenericValueList<QList<ApiEndpoint>, true> apiEndpoints;
 
   /**
    * @brief Enable auto-fetch of live parts information (through #apiEndpoints)

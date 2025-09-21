@@ -60,6 +60,18 @@ LibrariesModel::LibrariesModel(Workspace& ws, Mode mode,
           &LibrariesModel::updateLibraries, Qt::QueuedConnection);
 
   QTimer::singleShot(1000, this, [this]() { ensurePopulated(false); });
+
+  // When the list of API endpoints is modified, re-fetch all remote libraries.
+  if (mMode == Mode::RemoteLibs) {
+    connect(&mWorkspace.getSettings().apiEndpoints,
+            &WorkspaceSettingsItem::edited, this, [this]() {
+              mApiEndpointsInProgress.clear();
+              mOnlineLibsErrors.clear();
+              mOnlineLibs.clear();
+              updateMergedLibraries();
+              ensurePopulated(false);
+            });
+  }
 }
 
 LibrariesModel::~LibrariesModel() noexcept {
@@ -346,14 +358,17 @@ void LibrariesModel::requestOnlineLibraries() noexcept {
   mApiEndpointsInProgress.clear();  // Disconnects all signal/slot connections.
   mOnlineLibs.clear();
   mOnlineLibsErrors.clear();
-  foreach (const QUrl& url, mWorkspace.getSettings().apiEndpoints.get()) {
-    std::shared_ptr<ApiEndpoint> repo = std::make_shared<ApiEndpoint>(url);
-    connect(repo.get(), &ApiEndpoint::libraryListReceived, this,
-            &LibrariesModel::onlineLibraryListReceived);
-    connect(repo.get(), &ApiEndpoint::errorWhileFetchingLibraryList, this,
-            &LibrariesModel::errorWhileFetchingLibraryList);
-    mApiEndpointsInProgress.append(repo);
-    repo->requestLibraryList();
+  for (const WorkspaceSettings::ApiEndpoint& ep :
+       mWorkspace.getSettings().apiEndpoints.get()) {
+    if (ep.url.isValid() && ep.useForLibraries) {
+      std::shared_ptr<ApiEndpoint> repo = std::make_shared<ApiEndpoint>(ep.url);
+      connect(repo.get(), &ApiEndpoint::libraryListReceived, this,
+              &LibrariesModel::onlineLibraryListReceived);
+      connect(repo.get(), &ApiEndpoint::errorWhileFetchingLibraryList, this,
+              &LibrariesModel::errorWhileFetchingLibraryList);
+      mApiEndpointsInProgress.append(repo);
+      repo->requestLibraryList();
+    }
   }
   if (!mApiEndpointsInProgress.isEmpty()) {
     emit uiDataChanged(getUiData());

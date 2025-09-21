@@ -24,6 +24,7 @@
 
 #include "../dialogs/filedialog.h"
 #include "../editorcommandset.h"
+#include "../modelview/apiendpointlistmodellegacy.h"
 #include "../modelview/comboboxdelegate.h"
 #include "../modelview/editablelistmodel.h"
 #include "../modelview/keyboardshortcutsmodel.h"
@@ -59,7 +60,7 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
     mSettings(workspace.getSettings()),
     mLibLocaleOrderModel(new LibraryLocaleOrderModel()),
     mLibNormOrderModel(new LibraryNormOrderModel()),
-    mApiEndpointModel(new ApiEndpointModel()),
+    mApiEndpointModel(new ApiEndpointListModelLegacy()),
     mKeyboardShortcutsModel(new KeyboardShortcutsModel(this)),
     mKeyboardShortcutsFilterModel(new QSortFilterProxyModel(this)),
     mUi(new Ui::WorkspaceSettingsDialog) {
@@ -166,21 +167,21 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
 
   // Initialize API endpoint widgets
   {
-    mApiEndpointModel->setPlaceholderText(tr("Click here a add an URL"));
     mUi->edtApiEndpoints->setShowMoveButtons(true);
     mUi->edtApiEndpoints->setModel(mApiEndpointModel.data());
     mUi->edtApiEndpoints->horizontalHeader()->setSectionResizeMode(
-        ApiEndpointModel::COLUMN_TEXT, QHeaderView::Stretch);
+        ApiEndpointListModelLegacy::COLUMN_URL, QHeaderView::Stretch);
     mUi->edtApiEndpoints->horizontalHeader()->setSectionResizeMode(
-        ApiEndpointModel::COLUMN_ACTIONS, QHeaderView::ResizeToContents);
+        ApiEndpointListModelLegacy::COLUMN_ACTIONS,
+        QHeaderView::ResizeToContents);
     connect(mUi->edtApiEndpoints, &EditableTableWidget::btnAddClicked,
-            mApiEndpointModel.data(), &ApiEndpointModel::add);
+            mApiEndpointModel.data(), &ApiEndpointListModelLegacy::add);
     connect(mUi->edtApiEndpoints, &EditableTableWidget::btnRemoveClicked,
-            mApiEndpointModel.data(), &ApiEndpointModel::remove);
+            mApiEndpointModel.data(), &ApiEndpointListModelLegacy::remove);
     connect(mUi->edtApiEndpoints, &EditableTableWidget::btnMoveUpClicked,
-            mApiEndpointModel.data(), &ApiEndpointModel::moveUp);
+            mApiEndpointModel.data(), &ApiEndpointListModelLegacy::moveUp);
     connect(mUi->edtApiEndpoints, &EditableTableWidget::btnMoveDownClicked,
-            mApiEndpointModel.data(), &ApiEndpointModel::moveDown);
+            mApiEndpointModel.data(), &ApiEndpointListModelLegacy::moveDown);
     connect(mUi->lblApiEndpointsInfo, &QLabel::linkActivated, this,
             [this](const QString& url) {
               DesktopServices ds(mWorkspace.getSettings());
