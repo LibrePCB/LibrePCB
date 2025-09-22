@@ -146,8 +146,8 @@ private:
   QList<std::shared_ptr<TreeItem>> getSelectedElements() const noexcept;
   void duplicateElements(
       const QList<std::shared_ptr<TreeItem>>& items) noexcept;
-  void moveElementsTo(const QList<std::shared_ptr<TreeItem>>& items,
-                      const FilePath& dstLib) noexcept;
+  void moveOrCopyElementsTo(const QList<std::shared_ptr<TreeItem>>& items,
+                            const FilePath& dstLib, bool move) noexcept;
   void deleteElements(const QList<std::shared_ptr<TreeItem>>& items) noexcept;
 
 private:
@@ -192,6 +192,7 @@ private:
   std::shared_ptr<slint::VectorModel<ui::LibraryTreeViewItemData>> mElements;
   std::shared_ptr<slint::FilterModel<ui::LibraryTreeViewItemData>>
       mFilteredElements;
+  slint::SharedString mMoveOrCopyToLibraryPath;
 };
 
 /*******************************************************************************

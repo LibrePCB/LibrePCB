@@ -343,6 +343,15 @@ export enum LibraryElementAction {
     import-kicad-library,
 }
 
+// Move or copy actions for LibraryTabData
+export enum LibraryElementsMoveAction {
+    none,
+    copy-categories,
+    move-categories,
+    copy-elements,
+    move-elements,
+}
+
 // Type of LibraryTreeViewItemData
 // Note: The order of items defines the sort order in the UI.
 export enum LibraryTreeViewItemType {
@@ -835,8 +844,8 @@ export struct LibraryTabData {
     checks: RuleCheckData,
 
     // Actions
-    move-category-to-lib: string,  // File path to a local library
-    move-element-to-lib: string,  // File path to a local library
+    move-or-copy-to-lib: string,  // File path to a local library
+    move-or-copy-action: LibraryElementsMoveAction,
 }
 
 // Additional data for component- or package category editor tabs
