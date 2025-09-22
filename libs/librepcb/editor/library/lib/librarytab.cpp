@@ -192,8 +192,8 @@ ui::LibraryTabData LibraryTab::getDerivedUiData() const noexcept {
           mCheckError,  // Check execution error
           !mLibrary.getDirectory().isWritable(),  // Check read-only
       },
-      slint::SharedString(),  // Move category to
-      slint::SharedString(),  // Move element to
+      mMoveOrCopyToLibraryPath,  // Move or copy category to library path
+      ui::LibraryElementsMoveAction::None,  // Move or copy action
   };
 }
 
@@ -226,16 +226,26 @@ void LibraryTab::setDerivedUiData(const ui::LibraryTabData& data) noexcept {
   // Current element index
   mCurrentElementIndex = data.filtered_elements_index;
 
-  // Move category to other library
-  if (!data.move_category_to_lib.empty()) {
-    moveElementsTo(getSelectedCategories(),
-                   FilePath(s2q(data.move_category_to_lib)));
-  }
-
-  // Move elements to other library
-  if (!data.move_element_to_lib.empty()) {
-    moveElementsTo(getSelectedElements(),
-                   FilePath(s2q(data.move_element_to_lib)));
+  // Move/copy category or element to other library
+  mMoveOrCopyToLibraryPath = data.move_or_copy_to_lib;
+  if (!mMoveOrCopyToLibraryPath.empty()) {
+    const FilePath fp(s2q(mMoveOrCopyToLibraryPath));
+    switch (data.move_or_copy_action) {
+      case ui::LibraryElementsMoveAction::CopyCategories:
+        moveOrCopyElementsTo(getSelectedCategories(), fp, false);
+        break;
+      case ui::LibraryElementsMoveAction::MoveCategories:
+        moveOrCopyElementsTo(getSelectedCategories(), fp, true);
+        break;
+      case ui::LibraryElementsMoveAction::CopyElements:
+        moveOrCopyElementsTo(getSelectedElements(), fp, false);
+        break;
+      case ui::LibraryElementsMoveAction::MoveElements:
+        moveOrCopyElementsTo(getSelectedElements(), fp, true);
+        break;
+      default:
+        break;
+    }
   }
 
   // Update UI on changes
@@ -869,8 +879,14 @@ void LibraryTab::duplicateElements(
   }
 }
 
-void LibraryTab::moveElementsTo(const QList<std::shared_ptr<TreeItem>>& items,
-                                const FilePath& dstLib) noexcept {
+void LibraryTab::moveOrCopyElementsTo(
+    const QList<std::shared_ptr<TreeItem>>& items, const FilePath& dstLib,
+    bool move) noexcept {
+  // Basic sanity checks.
+  if (items.isEmpty() || (move && (!mEditor.isWritable()))) {
+    return;
+  }
+
   // Destination path sanity check.
   if ((!dstLib.isValid()) || (dstLib == mEditor.getFilePath()) ||
       (!dstLib.isLocatedInDir(
@@ -898,10 +914,18 @@ void LibraryTab::moveElementsTo(const QList<std::shared_ptr<TreeItem>>& items,
 
   // Build message (list only the first few elements to avoid a huge message
   // box)
-  QString msg =
-      tr("Are you sure to move the following elements into the library '%1'?")
-          .arg(libName) %
-      "\n\n";
+  QString msg;
+  if (move) {
+    msg =
+        tr("Are you sure to move the following elements into the library '%1'?")
+            .arg(libName) %
+        "\n\n";
+  } else {
+    msg =
+        tr("Are you sure to copy the following elements into the library '%1'?")
+            .arg(libName) %
+        "\n\n";
+  }
   const QStringList listedNames = names.mid(0, 10);
   for (const QString& name : listedNames) {
     msg.append(" - " % name % "\n");
@@ -909,48 +933,26 @@ void LibraryTab::moveElementsTo(const QList<std::shared_ptr<TreeItem>>& items,
   if (names.count() > listedNames.count()) {
     msg.append(" - ...\n");
   }
-  msg.append("\n" % tr("Note: This operation cannot be easily undone!") % "\n");
+  if (move) {
+    msg.append("\n" %
+               tr("Note: This operation cannot be easily undone, except by "
+                  "opening the destination library and moving the library "
+                  "elements back the same way."));
+  } else {
+    msg.append(
+        "\n" %
+        tr("Important: This operation copies the selected library elements "
+           "while retaining their UUIDs, so they must not be modified to "
+           "represent a different part afterwards. The main purpose of this "
+           "operation is to override library elements from a read-only library "
+           "with minor adjustments, which is only possible in local, writable "
+           "libraries."));
+  }
 
   // Show confirmation dialog.
-  QDialog dialog(qApp->activeWindow());
-  dialog.setWindowTitle(tr("Move %1 Elements").arg(items.count()));
-  QVBoxLayout* vLayoutOuter = new QVBoxLayout(&dialog);
-  QHBoxLayout* hLayoutTop = new QHBoxLayout();
-  vLayoutOuter->addItem(hLayoutTop);
-  hLayoutTop->setSpacing(9);
-  QVBoxLayout* vLayoutLeft = new QVBoxLayout();
-  hLayoutTop->addItem(vLayoutLeft);
-  QLabel* lblIcon = new QLabel(&dialog);
-  lblIcon->setPixmap(QPixmap(":/img/status/dialog_warning.png"));
-  lblIcon->setScaledContents(true);
-  lblIcon->setFixedSize(48, 48);
-  vLayoutLeft->addWidget(lblIcon);
-  vLayoutLeft->addItem(new QSpacerItem(0, 0, QSizePolicy::Minimum,
-                                       QSizePolicy::MinimumExpanding));
-  QVBoxLayout* vLayoutRight = new QVBoxLayout();
-  hLayoutTop->addItem(vLayoutRight);
-  QLabel* lblMsg = new QLabel(msg, &dialog);
-  lblMsg->setMinimumWidth(300);
-  lblMsg->setAlignment(Qt::AlignTop | Qt::AlignLeft);
-  lblMsg->setWordWrap(true);
-  vLayoutRight->addWidget(lblMsg);
-  QHBoxLayout* hLayoutBot = new QHBoxLayout();
-  hLayoutBot->setSpacing(9);
-  vLayoutOuter->addItem(hLayoutBot);
-  QCheckBox* cbxKeep = new QCheckBox(
-      tr("Keep elements in current library (make a copy)"), &dialog);
-  cbxKeep->setChecked(!mEditor.isWritable());
-  cbxKeep->setEnabled(mEditor.isWritable());
-  hLayoutBot->addWidget(cbxKeep);
-  hLayoutBot->setStretch(0, 1);
-  QDialogButtonBox* btnBox =
-      new QDialogButtonBox(QDialogButtonBox::Yes | QDialogButtonBox::Cancel,
-                           Qt::Horizontal, &dialog);
-  connect(btnBox, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
-  connect(btnBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
-  hLayoutBot->addWidget(btnBox);
-  const int ret = dialog.exec();
-
+  const int ret = QMessageBox::warning(
+      qApp->activeWindow(), tr("Move %1 Elements").arg(items.count()), msg,
+      QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Cancel);
   if (ret == QDialog::Accepted) {
     // Close opened tabs of elements to be moved.
     // TODO: Ask for saving if there are unsaved changes!
@@ -959,7 +961,7 @@ void LibraryTab::moveElementsTo(const QList<std::shared_ptr<TreeItem>>& items,
       const QString relPath = fp.toRelative(fp.getParentDir().getParentDir());
       const FilePath destination = dstLib.getPathTo(relPath);
       try {
-        if (!cbxKeep->isChecked()) {
+        if (move) {
           qInfo().nospace() << "Move library element from " << fp.toNative()
                             << " to " << destination.toNative() << "...";
           FileUtils::move(fp, destination);
