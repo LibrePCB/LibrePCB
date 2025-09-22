@@ -175,10 +175,12 @@ std::unique_ptr<BoardClipboardData> BoardClipboardDataBuilder::generate(
             plane->getNetSignal()
                 ? std::make_optional(plane->getNetSignal()->getName())
                 : std::nullopt,
-            plane->getOutline(), plane->getMinWidth(), plane->getMinClearance(),
-            plane->getKeepIslands(), plane->getPriority(),
-            plane->getConnectStyle(), plane->getThermalGap(),
-            plane->getThermalSpokeWidth(), plane->isLocked());
+            plane->getOutline(), plane->getMinWidth(),
+            plane->getMinClearanceToCopper(), plane->getMinClearanceToBoard(),
+            plane->getMinClearanceToNpth(), plane->getKeepIslands(),
+            plane->getPriority(), plane->getConnectStyle(),
+            plane->getThermalGap(), plane->getThermalSpokeWidth(),
+            plane->isLocked());
     data->getPlanes().append(newPlane);
   }
 

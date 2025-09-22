@@ -304,7 +304,9 @@ bool CmdPasteBoardItems::performExecute() {
         plane.outline.translated(mPosOffset)  // move
     );
     copy->setMinWidth(plane.minWidth);
-    copy->setMinClearance(plane.minClearance);
+    copy->setMinClearanceToCopper(plane.minClearanceToCopper);
+    copy->setMinClearanceToBoard(plane.minClearanceToBoard);
+    copy->setMinClearanceToNpth(plane.minClearanceToNpth);
     copy->setKeepIslands(plane.keepIslands);
     copy->setPriority(plane.priority);
     copy->setConnectStyle(plane.connectStyle);

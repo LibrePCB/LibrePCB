@@ -58,8 +58,15 @@ BoardPlanePropertiesDialog::BoardPlanePropertiesDialog(
   mUi->setupUi(this);
   mUi->edtMinWidth->configure(lengthUnit, LengthEditBase::Steps::generic(),
                               settingsPrefix % "/min_width");
-  mUi->edtMinClearance->configure(lengthUnit, LengthEditBase::Steps::generic(),
-                                  settingsPrefix % "/min_clearance");
+  mUi->edtMinClearanceToCopper->configure(
+      lengthUnit, LengthEditBase::Steps::generic(),
+      settingsPrefix % "/min_copper_clearance");
+  mUi->edtMinClearanceToBoard->configure(
+      lengthUnit, LengthEditBase::Steps::generic(),
+      settingsPrefix % "/min_board_clearance");
+  mUi->edtMinClearanceToNpth->configure(lengthUnit,
+                                        LengthEditBase::Steps::generic(),
+                                        settingsPrefix % "/min_npth_clearance");
   mUi->edtThermalGap->configure(lengthUnit, LengthEditBase::Steps::generic(),
                                 settingsPrefix % "/thermal_gap");
   mUi->edtThermalSpokeWidth->configure(lengthUnit,
@@ -99,9 +106,11 @@ BoardPlanePropertiesDialog::BoardPlanePropertiesDialog(
   mUi->cbxLayer->setLayers(mPlane.getBoard().getCopperLayers());
   mUi->cbxLayer->setCurrentLayer(mPlane.getLayer());
 
-  // minimum width / clearance spinbox
+  // minimum width / clearance spinboxes
   mUi->edtMinWidth->setValue(mPlane.getMinWidth());
-  mUi->edtMinClearance->setValue(mPlane.getMinClearance());
+  mUi->edtMinClearanceToCopper->setValue(mPlane.getMinClearanceToCopper());
+  mUi->edtMinClearanceToBoard->setValue(mPlane.getMinClearanceToBoard());
+  mUi->edtMinClearanceToNpth->setValue(mPlane.getMinClearanceToNpth());
 
   // connect style combobox
   mUi->cbxConnectStyle->addItem(tr("None"),
@@ -190,9 +199,11 @@ bool BoardPlanePropertiesDialog::applyChanges() noexcept {
       cmd->setLayer(*layer, false);  // can throw
     }
 
-    // min width/clearance
+    // min width/clearances
     cmd->setMinWidth(mUi->edtMinWidth->getValue());
-    cmd->setMinClearance(mUi->edtMinClearance->getValue());
+    cmd->setMinClearanceToCopper(mUi->edtMinClearanceToCopper->getValue());
+    cmd->setMinClearanceToBoard(mUi->edtMinClearanceToBoard->getValue());
+    cmd->setMinClearanceToNpth(mUi->edtMinClearanceToNpth->getValue());
 
     // connect style
     cmd->setConnectStyle(static_cast<BI_Plane::ConnectStyle>(

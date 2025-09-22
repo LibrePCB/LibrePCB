@@ -157,6 +157,19 @@ void FileFormatMigrationUnstable::upgradeBoard(SExpression& root) {
       }
     }
   }
+
+  // Planes
+  for (SExpression* planeNode : root.getChildren("plane")) {
+    if (SExpression* clrNode = planeNode->tryGetChild("min_clearance")) {
+      clrNode->setName("min_copper_clearance");
+      planeNode->appendChild(
+          "min_board_clearance",
+          std::make_unique<SExpression>(clrNode->getChild("@0")));
+      planeNode->appendChild(
+          "min_npth_clearance",
+          std::make_unique<SExpression>(clrNode->getChild("@0")));
+    }
+  }
 }
 
 /*******************************************************************************

@@ -63,7 +63,9 @@ public:
   void setLayer(const Layer& layer, bool immediate) noexcept;
   void setNetSignal(NetSignal* netsignal) noexcept;
   void setMinWidth(const UnsignedLength& minWidth) noexcept;
-  void setMinClearance(const UnsignedLength& minClearance) noexcept;
+  void setMinClearanceToCopper(const UnsignedLength& minClearance) noexcept;
+  void setMinClearanceToBoard(const UnsignedLength& minClearance) noexcept;
+  void setMinClearanceToNpth(const UnsignedLength& minClearance) noexcept;
   void setConnectStyle(BI_Plane::ConnectStyle style) noexcept;
   void setThermalGap(const PositiveLength& gap) noexcept;
   void setThermalSpokeWidth(const PositiveLength& width) noexcept;
@@ -97,8 +99,12 @@ private:
   NetSignal* mNewNetSignal;
   UnsignedLength mOldMinWidth;
   UnsignedLength mNewMinWidth;
-  UnsignedLength mOldMinClearance;
-  UnsignedLength mNewMinClearance;
+  UnsignedLength mOldMinClearanceToCopper;
+  UnsignedLength mNewMinClearanceToCopper;
+  UnsignedLength mOldMinClearanceToBoard;
+  UnsignedLength mNewMinClearanceToBoard;
+  UnsignedLength mOldMinClearanceToNpth;
+  UnsignedLength mNewMinClearanceToNpth;
   BI_Plane::ConnectStyle mOldConnectStyle;
   BI_Plane::ConnectStyle mNewConnectStyle;
   PositiveLength mOldThermalGap;

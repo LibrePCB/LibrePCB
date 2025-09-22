@@ -825,7 +825,9 @@ void Board::copyFrom(const Board& other) {
         new BI_Plane(*this, Uuid::createRandom(), plane->getLayer(),
                      plane->getNetSignal(), plane->getOutline());
     copy->setMinWidth(plane->getMinWidth());
-    copy->setMinClearance(plane->getMinClearance());
+    copy->setMinClearanceToCopper(plane->getMinClearanceToCopper());
+    copy->setMinClearanceToBoard(plane->getMinClearanceToBoard());
+    copy->setMinClearanceToNpth(plane->getMinClearanceToNpth());
     copy->setKeepIslands(plane->getKeepIslands());
     copy->setPriority(plane->getPriority());
     copy->setConnectStyle(plane->getConnectStyle());

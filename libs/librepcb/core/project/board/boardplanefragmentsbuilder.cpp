@@ -215,6 +215,15 @@ std::shared_ptr<BoardPlaneFragmentsBuilder::JobData>
       }
     }
   }
+  auto toOptionalClearance = [](const UnsignedLength& clearance) {
+    if (clearance > 1) {
+      return std::make_optional(clearance);
+    } else if (clearance == 1) {
+      return std::make_optional(UnsignedLength(0));
+    } else {
+      return std::optional<UnsignedLength>();
+    }
+  };
   foreach (const BI_Plane* plane, board.getPlanes()) {
     if (layers.contains(&plane->getLayer())) {
       data->planes.append(
@@ -223,9 +232,12 @@ std::shared_ptr<BoardPlaneFragmentsBuilder::JobData>
                         ? std::make_optional(plane->getNetSignal()->getUuid())
                         : std::nullopt,
                     plane->getOutline(), plane->getMinWidth(),
-                    plane->getMinClearance(), plane->getKeepIslands(),
-                    plane->getPriority(), plane->getConnectStyle(),
-                    plane->getThermalGap(), plane->getThermalSpokeWidth()});
+                    plane->getMinClearanceToCopper(),
+                    toOptionalClearance(plane->getMinClearanceToBoard()),
+                    toOptionalClearance(plane->getMinClearanceToNpth()),
+                    plane->getKeepIslands(), plane->getPriority(),
+                    plane->getConnectStyle(), plane->getThermalGap(),
+                    plane->getThermalSpokeWidth()});
     }
   }
   foreach (const BI_Zone* zone, board.getZones()) {
@@ -416,20 +428,25 @@ BoardPlaneFragmentsBuilder::LayerJobResult BoardPlaneFragmentsBuilder::runLayer(
       ClipperLib::Paths removedAreas;
       ClipperLib::Paths connectedNetSignalAreas;
 
-      // Start with board outline shrinked by the given clearance.
-      ClipperLib::Paths fragments = *data->boardArea;
-      ClipperHelpers::offset(fragments, -it->minClearance,
-                             maxArcTolerance());  // can throw
-      if (mAbort) {
-        break;
-      }
-
-      // Clip to plane outline.
+      // Start with board outline shrinked by the given clearance and clipped
+      // to the plane outline.
+      // Except if the board clearance is zero, in this case we don't clip the
+      // plane to the board outlines.
       const ClipperLib::Path planeOutline = ClipperHelpers::convert(
           it->outline.toClosedPath(), maxArcTolerance());
-      ClipperHelpers::intersect(fragments, {planeOutline},
-                                ClipperLib::pftEvenOdd,
-                                ClipperLib::pftEvenOdd);  // can throw
+      ClipperLib::Paths fragments = *data->boardArea;
+      if (it->minClearanceToBoard) {
+        fragments = *data->boardArea;
+        if (*it->minClearanceToBoard != 0) {
+          ClipperHelpers::offset(fragments, -(*(it->minClearanceToBoard)),
+                                 maxArcTolerance());  // can throw
+        }
+        ClipperHelpers::intersect(fragments, {planeOutline},
+                                  ClipperLib::pftEvenOdd,
+                                  ClipperLib::pftEvenOdd);  // can throw
+      } else {
+        fragments = {planeOutline};
+      }
       const ClipperLib::Paths fullPlaneArea = fragments;
       if (mAbort) {
         break;
@@ -440,7 +457,7 @@ BoardPlaneFragmentsBuilder::LayerJobResult BoardPlaneFragmentsBuilder::runLayer(
         if ((otherIt->layer == it->layer) &&
             (otherIt->netSignal != it->netSignal)) {
           const UnsignedLength clearance =
-              std::max(it->minClearance, otherIt->minClearance);
+              std::max(it->minClearanceToCopper, otherIt->minClearanceToCopper);
           ClipperLib::Paths clipperPaths = ClipperHelpers::convert(
               result.planes.value(otherIt->uuid), maxArcTolerance());
           ClipperHelpers::offset(clipperPaths, *clearance,
@@ -462,16 +479,18 @@ BoardPlaneFragmentsBuilder::LayerJobResult BoardPlaneFragmentsBuilder::runLayer(
         }
       }
 
-      // Collect holes.
-      foreach (const auto& tuple, data->holes) {
-        const PositiveLength diameter(std::get<1>(tuple) +
-                                      it->minClearance * 2);
-        const QVector<Path> paths =
-            std::get<2>(tuple)->toOutlineStrokes(diameter);
-        const ClipperLib::Paths clipperPaths =
-            ClipperHelpers::convert(paths, maxArcTolerance());
-        removedAreas.insert(removedAreas.end(), clipperPaths.begin(),
-                            clipperPaths.end());
+      // Collect holes, if clearance to holes is enabled
+      if (it->minClearanceToNpth) {
+        foreach (const auto& tuple, data->holes) {
+          const PositiveLength diameter(std::get<1>(tuple) +
+                                        *(it->minClearanceToNpth) * 2);
+          const QVector<Path> paths =
+              std::get<2>(tuple)->toOutlineStrokes(diameter);
+          const ClipperLib::Paths clipperPaths =
+              ClipperHelpers::convert(paths, maxArcTolerance());
+          removedAreas.insert(removedAreas.end(), clipperPaths.begin(),
+                              clipperPaths.end());
+        }
       }
       if (mAbort) {
         break;
@@ -496,7 +515,8 @@ BoardPlaneFragmentsBuilder::LayerJobResult BoardPlaneFragmentsBuilder::runLayer(
         } else {
           // Vias has different net than plane -> subtract with clearance.
           const Path path =
-              Path::circle(PositiveLength(via.diameter + it->minClearance * 2))
+              Path::circle(
+                  PositiveLength(via.diameter + it->minClearanceToCopper * 2))
                   .translated(via.position);
           const ClipperLib::Path clipperPath =
               ClipperHelpers::convert(path, maxArcTolerance());
@@ -534,7 +554,7 @@ BoardPlaneFragmentsBuilder::LayerJobResult BoardPlaneFragmentsBuilder::runLayer(
               // Area.
               ClipperLib::Paths clipperPaths{
                   ClipperHelpers::convert(polygon.path, maxArcTolerance())};
-              ClipperHelpers::offset(clipperPaths, *it->minClearance,
+              ClipperHelpers::offset(clipperPaths, *it->minClearanceToCopper,
                                      maxArcTolerance());  // can throw
               removedAreas.insert(removedAreas.end(), clipperPaths.begin(),
                                   clipperPaths.end());
@@ -542,8 +562,9 @@ BoardPlaneFragmentsBuilder::LayerJobResult BoardPlaneFragmentsBuilder::runLayer(
             if ((!polygon.filled) || (polygon.width > 0)) {
               // Outline strokes.
               const QVector<Path> paths =
-                  polygon.path.toOutlineStrokes(PositiveLength(std::max(
-                      *polygon.width + it->minClearance * 2, Length(1))));
+                  polygon.path.toOutlineStrokes(PositiveLength(
+                      std::max(*polygon.width + it->minClearanceToCopper * 2,
+                               Length(1))));
               const ClipperLib::Paths clipperPaths =
                   ClipperHelpers::convert(paths, maxArcTolerance());
               removedAreas.insert(removedAreas.end(), clipperPaths.begin(),
@@ -579,8 +600,9 @@ BoardPlaneFragmentsBuilder::LayerJobResult BoardPlaneFragmentsBuilder::runLayer(
             // pads of the same net, use the thermal gap clearance since usually
             // it is smaller than the planes clearance, so it leads to a higher
             // plane area.
-            const Length clearance = std::max(
-                sameNet ? *it->thermalGap : *it->minClearance, *pad.clearance);
+            const Length clearance =
+                std::max(sameNet ? *it->thermalGap : *it->minClearanceToCopper,
+                         *pad.clearance);
             QVector<Path> paths =
                 pad.transform.map(geometry.withOffset(clearance).toOutlines());
             ClipperLib::Paths clipperPaths =

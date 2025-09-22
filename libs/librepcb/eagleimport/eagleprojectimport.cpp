@@ -742,10 +742,14 @@ void EagleProjectImport::importBoard(Project& project,
   };
 
   // Design rules
+  std::optional<UnsignedLength> copperBoardDistance;
   try {
     BoardDesignRules r = board->getDesignRules();
     r.setPadCmpSideAutoAnnularRing(false);  // Not sure if EAGLE supports this.
     r.setPadInnerAutoAnnularRing(true);  // Not sure if EAGLE supports this.
+    if (auto p = mBoard->getDesignRules().tryGetParam("mdCopperDimension")) {
+      copperBoardDistance = C::convertParamTo<UnsignedLength>(*p);
+    }
     if (auto p = mBoard->getDesignRules().tryGetParam("mlViaStopLimit")) {
       const auto value = C::convertParamTo<UnsignedLength>(*p);
       r.setStopMaskMaxViaDiameter(value);
@@ -1248,10 +1252,14 @@ void EagleProjectImport::importBoard(Project& project,
                            C::convertVertices(eagleObj.getVertices(), false));
           obj->setMinWidth(
               UnsignedLength(C::convertLength(eagleObj.getWidth())));
-          obj->setMinClearance(
+          obj->setMinClearanceToCopper(
               (isolate > 0)
                   ? UnsignedLength(isolate)
                   : board->getDrcSettings().getMinCopperCopperClearance());
+          obj->setMinClearanceToBoard(copperBoardDistance
+                                          ? (*copperBoardDistance)
+                                          : obj->getMinClearanceToCopper());
+          obj->setMinClearanceToNpth(obj->getMinClearanceToBoard());
           obj->setConnectStyle(eagleObj.getThermals()
                                    ? BI_Plane::ConnectStyle::ThermalRelief
                                    : BI_Plane::ConnectStyle::Solid);

@@ -815,8 +815,12 @@ void ProjectLoader::loadBoardPlane(Board& b, const SExpression& node) {
                    netSignal, Path(node));
   plane->setMinWidth(
       deserialize<UnsignedLength>(node.getChild("min_width/@0")));
-  plane->setMinClearance(
-      deserialize<UnsignedLength>(node.getChild("min_clearance/@0")));
+  plane->setMinClearanceToCopper(
+      deserialize<UnsignedLength>(node.getChild("min_copper_clearance/@0")));
+  plane->setMinClearanceToBoard(
+      deserialize<UnsignedLength>(node.getChild("min_board_clearance/@0")));
+  plane->setMinClearanceToNpth(
+      deserialize<UnsignedLength>(node.getChild("min_npth_clearance/@0")));
   plane->setKeepIslands(deserialize<bool>(node.getChild("keep_islands/@0")));
   plane->setPriority(deserialize<int>(node.getChild("priority/@0")));
   plane->setConnectStyle(
