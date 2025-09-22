@@ -1196,8 +1196,8 @@ export struct Board2dTabData {
     tool-line-width: LengthEditData,
     tool-size: LengthEditData,
     tool-drill: LengthEditData,
-    tool-filled: bool,
-    tool-mirrored: bool,
+    tool-filled: bool,  // Also used for 'auto' trace width
+    tool-mirrored: bool,  // Also used for 'auto' via size
     tool-value: LineEditData,
     tool-bottom: bool,
     tool-shape: PadShape,

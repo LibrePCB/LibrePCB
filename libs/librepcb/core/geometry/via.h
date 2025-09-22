@@ -32,11 +32,14 @@
 
 #include <QtCore>
 
+#include <optional>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 
+class BoundedUnsignedRatio;
 class Layer;
 
 /*******************************************************************************
@@ -58,8 +61,7 @@ public:
     UuidChanged,
     LayersChanged,
     PositionChanged,
-    SizeChanged,
-    DrillDiameterChanged,
+    DrillOrSizeChanged,
     ExposureConfigChanged,
   };
   Signal<Via, Event> onEdited;
@@ -70,9 +72,9 @@ public:
   Via(const Via& other) noexcept;
   Via(const Uuid& uuid, const Via& other) noexcept;
   Via(const Uuid& uuid, const Layer& startLayer, const Layer& endLayer,
-      const Point& position, const PositiveLength& size,
-      const PositiveLength& drillDiameter,
-      const MaskConfig& exposureConfig) noexcept;
+      const Point& position, const PositiveLength& drillDiameter,
+      const std::optional<PositiveLength>& size,
+      const MaskConfig& exposureConfig);
   explicit Via(const SExpression& node);
   ~Via() noexcept;
 
@@ -81,29 +83,27 @@ public:
   const Layer& getStartLayer() const noexcept { return *mStartLayer; }
   const Layer& getEndLayer() const noexcept { return *mEndLayer; }
   const Point& getPosition() const noexcept { return mPosition; }
-  const PositiveLength& getSize() const noexcept { return mSize; }
   const PositiveLength& getDrillDiameter() const noexcept {
     return mDrillDiameter;
+  }
+  const std::optional<PositiveLength>& getSize() const noexcept {
+    return mSize;
   }
   const MaskConfig& getExposureConfig() const noexcept {
     return mExposureConfig;
   }
-  Path getOutline(const Length& expansion = Length(0)) const noexcept;
-  Path getSceneOutline(const Length& expansion = Length(0)) const noexcept;
   bool isThrough() const noexcept;
   bool isBlind() const noexcept;
   bool isBuried() const noexcept;
   bool isOnLayer(const Layer& layer) const noexcept;
   bool isOnAnyLayer(const QSet<const Layer*>& layers) const noexcept;
-  QPainterPath toQPainterPathPx(
-      const Length& expansion = Length(0)) const noexcept;
 
   // Setters
   bool setUuid(const Uuid& uuid) noexcept;
   bool setLayers(const Layer& from, const Layer& to);
   bool setPosition(const Point& position) noexcept;
-  bool setSize(const PositiveLength& size) noexcept;
-  bool setDrillDiameter(const PositiveLength& diameter) noexcept;
+  bool setDrillAndSize(const PositiveLength& drill,
+                       const std::optional<PositiveLength>& size);
   bool setExposureConfig(const MaskConfig& config) noexcept;
 
   // General Methods
@@ -121,6 +121,8 @@ public:
   Via& operator=(const Via& rhs) noexcept;
 
   // Static Methods
+  static PositiveLength calcSizeFromRules(
+      const PositiveLength& drill, const BoundedUnsignedRatio& ratio) noexcept;
   static Path getOutline(const PositiveLength& size,
                          const Length& expansion = Length(0)) noexcept;
   static bool isOnLayer(const Layer& layer, const Layer& from,
@@ -128,7 +130,7 @@ public:
   static bool isOnAnyLayer(const QSet<const Layer*>& layers, const Layer& from,
                            const Layer& to) noexcept;
   static QPainterPath toQPainterPathPx(
-      const PositiveLength& size, const PositiveLength& drillDiameter,
+      const PositiveLength& drillDiameter, const PositiveLength& size,
       const Length& expansion = Length(0)) noexcept;
 
 private:  // Data
@@ -136,8 +138,8 @@ private:  // Data
   const Layer* mStartLayer;
   const Layer* mEndLayer;
   Point mPosition;
-  PositiveLength mSize;
-  PositiveLength mDrillDiameter;
+  PositiveLength mDrillDiameter;  ///< Guaranteed to be <= #mSize
+  std::optional<PositiveLength> mSize;  ///< Guaranteed to be >= #mDrillDiameter
   MaskConfig mExposureConfig;
 };
 

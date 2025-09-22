@@ -109,6 +109,7 @@ public:
 
   // General Methods
   ui::LengthEditData getUiData() const noexcept;
+  const Length& getValue() const noexcept { return mValue; }
   void setUiData(const ui::LengthEditData& data) noexcept;
   void configure(const Length& value, const QVector<PositiveLength>& steps,
                  const QString& uniqueIdentifier) noexcept;

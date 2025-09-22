@@ -23,6 +23,7 @@
 #include <gtest/gtest.h>
 #include <librepcb/core/geometry/via.h>
 #include <librepcb/core/serialization/sexpression.h>
+#include <librepcb/core/types/boundedunsignedratio.h>
 #include <librepcb/core/types/layer.h>
 
 /*******************************************************************************
@@ -60,7 +61,7 @@ TEST_F(ViaTest, testConstructFromSExpression) {
 
 TEST_F(ViaTest, testSerializeAndDeserialize) {
   Via obj1(Uuid::createRandom(), Layer::topCopper(), Layer::botCopper(),
-           Point(123, 456), PositiveLength(789), PositiveLength(321),
+           Point(123, 456), PositiveLength(789), std::nullopt,
            MaskConfig::off());
   std::unique_ptr<SExpression> sexpr1 = SExpression::createList("obj");
   obj1.serialize(*sexpr1);
@@ -70,6 +71,37 @@ TEST_F(ViaTest, testSerializeAndDeserialize) {
   obj2.serialize(*sexpr2);
 
   EXPECT_EQ(sexpr1->toByteArray(), sexpr2->toByteArray());
+}
+
+TEST_F(ViaTest, testCalcSizeFromRulesZeroAnnular) {
+  const PositiveLength drill(1000000);
+  const BoundedUnsignedRatio ratio(UnsignedRatio(Ratio(0)), UnsignedLength(0),
+                                   UnsignedLength(0));
+  EXPECT_EQ(PositiveLength(1000000), Via::calcSizeFromRules(drill, ratio));
+}
+
+TEST_F(ViaTest, testCalcSizeFromRulesMinAnnular) {
+  const PositiveLength drill(1000000);
+  const BoundedUnsignedRatio ratio(UnsignedRatio(Ratio::fromPercent(10)),
+                                   UnsignedLength(200000),
+                                   UnsignedLength(1000000));
+  EXPECT_EQ(PositiveLength(1400000), Via::calcSizeFromRules(drill, ratio));
+}
+
+TEST_F(ViaTest, testCalcSizeFromRulesScaledAnnular) {
+  const PositiveLength drill(1000000);
+  const BoundedUnsignedRatio ratio(UnsignedRatio(Ratio::fromPercent(40)),
+                                   UnsignedLength(200000),
+                                   UnsignedLength(1000000));
+  EXPECT_EQ(PositiveLength(1800000), Via::calcSizeFromRules(drill, ratio));
+}
+
+TEST_F(ViaTest, testCalcSizeFromRulesMaxAnnular) {
+  const PositiveLength drill(1000000);
+  const BoundedUnsignedRatio ratio(UnsignedRatio(Ratio::fromPercent(40)),
+                                   UnsignedLength(200000),
+                                   UnsignedLength(300000));
+  EXPECT_EQ(PositiveLength(1600000), Via::calcSizeFromRules(drill, ratio));
 }
 
 /*******************************************************************************

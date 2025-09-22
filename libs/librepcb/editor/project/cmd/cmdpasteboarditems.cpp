@@ -222,7 +222,7 @@ bool CmdPasteBoardItems::performExecute() {
       for (const Via& v : segment.vias) {
         BI_Via* via = cmdAddElements->addVia(
             Via(Uuid::createRandom(), v.getStartLayer(), v.getEndLayer(),
-                v.getPosition() + mPosOffset, v.getSize(), v.getDrillDiameter(),
+                v.getPosition() + mPosOffset, v.getDrillDiameter(), v.getSize(),
                 v.getExposureConfig()));
         viaMap.insert(v.getUuid(), via);
       }

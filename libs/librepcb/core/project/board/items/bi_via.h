@@ -49,9 +49,9 @@ public:
   enum class Event {
     LayersChanged,
     PositionChanged,
-    SizeChanged,
-    DrillDiameterChanged,
+    DrillOrSizeChanged,
     NetSignalNameChanged,
+    ActualSizeChanged,
     StopMaskDiametersChanged,
   };
   Signal<BI_Via, Event> onEdited;
@@ -73,7 +73,10 @@ public:
   const PositiveLength& getDrillDiameter() const noexcept {
     return mVia.getDrillDiameter();
   }
-  const PositiveLength& getSize() const noexcept { return mVia.getSize(); }
+  const std::optional<PositiveLength>& getSize() const noexcept {
+    return mVia.getSize();
+  }
+  const PositiveLength& getActualSize() const noexcept { return mActualSize; }
   const std::optional<PositiveLength>& getStopMaskDiameterTop() const noexcept {
     return mStopMaskDiameterTop;
   }
@@ -89,8 +92,8 @@ public:
   // Setters
   void setLayers(const Layer& from, const Layer& to);
   void setPosition(const Point& position) noexcept;
-  void setSize(const PositiveLength& size) noexcept;
-  void setDrillDiameter(const PositiveLength& diameter) noexcept;
+  void setDrillAndSize(const PositiveLength& drill,
+                       const std::optional<PositiveLength>& size);
   void setExposureConfig(const MaskConfig& config) noexcept;
 
   // General Methods
@@ -110,6 +113,7 @@ public:
   bool operator!=(const BI_Via& rhs) noexcept { return (this != &rhs); }
 
 private:  // Methods
+  void updateActualSize() noexcept;
   void updateStopMaskDiameters() noexcept;
 
 private:  // Data
@@ -118,6 +122,7 @@ private:  // Data
   QMetaObject::Connection mNetSignalNameChangedConnection;
 
   // Cached Attributes
+  PositiveLength mActualSize;
   std::optional<PositiveLength> mStopMaskDiameterTop;
   std::optional<PositiveLength> mStopMaskDiameterBottom;
 

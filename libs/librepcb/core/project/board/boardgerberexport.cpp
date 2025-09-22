@@ -826,7 +826,7 @@ void BoardGerberExport::drawVia(GerberGenerator& gen, const BI_Via& via,
     }
 
     const PositiveLength diameter =
-        stopMaskDiameter ? (*stopMaskDiameter) : via.getSize();
+        stopMaskDiameter ? (*stopMaskDiameter) : via.getActualSize();
     gen.flashCircle(via.getPosition(), diameter, function, net, QString(),
                     QString(), QString());
   }

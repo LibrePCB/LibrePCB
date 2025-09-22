@@ -617,7 +617,14 @@ bool CmdBoardSpecctraImport::performExecute() {
             mBoard.getDesignRules().getViaAnnularRing().getMinValue();
         drillDiameter = PositiveLength(padStack.diameter - annularWidth * 2);
       }
-      // For the exposure config, use a similar mechanism.
+      // Determine if the size is manually set or automatic.
+      std::optional<PositiveLength> size = PositiveLength(padStack.diameter);
+      const PositiveLength autoSize = Via::calcSizeFromRules(
+          *drillDiameter, mBoard.getDesignRules().getViaAnnularRing());
+      if ((size == autoSize) && via.padStackId.contains("-auto-")) {
+        size = std::nullopt;
+      }
+      // For the exposure config, use a similar mechanism like for the drill.
       MaskConfig exposureConfig = MaskConfig::automatic();
       if (oldVia) {
         exposureConfig = oldVia->getExposureConfig();
@@ -626,8 +633,7 @@ bool CmdBoardSpecctraImport::performExecute() {
       }
       splitter.addVia(Via(uuid, *padStack.startLayer, *padStack.endLayer,
                           oldVia ? oldVia->getPosition() : via.pos,
-                          PositiveLength(padStack.diameter), *drillDiameter,
-                          exposureConfig),
+                          *drillDiameter, size, exposureConfig),
                       false);
       anchors.append(AnchorData{via.pos, padStack.startLayer, padStack.endLayer,
                                 TraceAnchor::via(uuid)});
@@ -699,7 +705,7 @@ bool CmdBoardSpecctraImport::performExecute() {
       for (const Via& v : segment.vias) {
         BI_Via* via = cmdAddElements->addVia(Via(
             v.getUuid(), v.getStartLayer(), v.getEndLayer(), v.getPosition(),
-            v.getSize(), v.getDrillDiameter(), v.getExposureConfig()));
+            v.getDrillDiameter(), v.getSize(), v.getExposureConfig()));
         viaMap.insert(v.getUuid(), via);
       }
       QHash<Uuid, BI_NetPoint*> netPointMap;
@@ -767,7 +773,7 @@ std::optional<PositiveLength> CmdBoardSpecctraImport::extractViaDrillDiameter(
   const QStringList tokens = padStackId.split("-");
   if ((tokens.count() >= 4) && (tokens[0] == "via")) {
     try {
-      return PositiveLength(Length::fromMm(tokens[2]));
+      return PositiveLength(Length::fromMm(tokens[1]));
     } catch (const Exception&) {
       // Not critical.
     }
@@ -779,18 +785,19 @@ std::optional<MaskConfig> CmdBoardSpecctraImport::extractViaExposureConfig(
     const QString& padStackId) noexcept {
   // Note: Keep in sync with BoardSpecctraExport::getWiringPadStackId().
   const QStringList tokens = padStackId.split("-");
-  if (((tokens.count() > 3) || (tokens.count() < 6)) && (tokens[0] == "via")) {
-    if (tokens.count() == 4) {
-      return MaskConfig::off();
-    } else if (tokens[4] == "exposed") {
+  if ((tokens.count() >= 4) && (tokens[0] == "via")) {
+    const QString exposure = tokens.last();
+    if (exposure == "exposed") {
       return MaskConfig::automatic();
-    } else if (tokens[4].startsWith("exposed:")) {
+    } else if (exposure.startsWith("exposed:")) {
       try {
-        const QString offset = QString(tokens[4]).remove("exposed:");
+        const QString offset = QString(exposure).remove("exposed:");
         return MaskConfig::manual(Length::fromMm(offset));
       } catch (const Exception&) {
         // Not critical.
       }
+    } else {
+      return MaskConfig::off();
     }
   }
   return std::nullopt;

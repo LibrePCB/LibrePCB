@@ -59,9 +59,9 @@ public:
   void snapToGrid(const PositiveLength& gridInterval, bool immediate) noexcept;
   void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
   void mirrorLayers(int innerLayers) noexcept;
-  void setSize(const PositiveLength& size, bool immediate) noexcept;
-  void setDrillDiameter(const PositiveLength& diameter,
-                        bool immediate) noexcept;
+  void setDrillAndSize(const PositiveLength& drill,
+                       const std::optional<PositiveLength>& size,
+                       bool immediate);
   void setExposureConfig(const MaskConfig& config) noexcept;
 
 private:
@@ -88,10 +88,10 @@ private:
   const Layer* mNewEndLayer;
   Point mOldPos;
   Point mNewPos;
-  PositiveLength mOldSize;
-  PositiveLength mNewSize;
   PositiveLength mOldDrillDiameter;
   PositiveLength mNewDrillDiameter;
+  std::optional<PositiveLength> mOldSize;
+  std::optional<PositiveLength> mNewSize;
   MaskConfig mOldExposureConfig;
   MaskConfig mNewExposureConfig;
 };

@@ -181,6 +181,7 @@ public:
 signals:
   void wireModeRequested(BoardEditorState_DrawTrace::WireMode mode);
   void netRequested(bool autoNet, const std::optional<Uuid>& net);
+  void viaSizeRequested(const std::optional<PositiveLength>& size);
   void layerRequested(const Layer& layer);
   void filledRequested(bool filled);
   void mirroredRequested(bool mirrored);

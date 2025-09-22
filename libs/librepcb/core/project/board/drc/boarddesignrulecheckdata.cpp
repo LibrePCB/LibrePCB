@@ -131,8 +131,8 @@ BoardDesignRuleCheckData::BoardDesignRuleCheckData(
       const librepcb::Via& via = biVia->getVia();
       nsd.vias.insert(
           biVia->getUuid(),
-          Via{biVia->getUuid(), biVia->getPosition(), biVia->getSize(),
-              biVia->getDrillDiameter(), connectedLayers, &via.getStartLayer(),
+          Via{biVia->getUuid(), biVia->getPosition(), biVia->getDrillDiameter(),
+              biVia->getActualSize(), connectedLayers, &via.getStartLayer(),
               &via.getEndLayer(), biVia->getDrillLayerSpan(), via.isBuried(),
               via.isBlind(), biVia->getStopMaskDiameterTop(),
               biVia->getStopMaskDiameterBottom()});

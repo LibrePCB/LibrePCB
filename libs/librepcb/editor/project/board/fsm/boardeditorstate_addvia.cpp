@@ -38,6 +38,7 @@
 #include "../graphicsitems/bgi_via.h"
 
 #include <librepcb/core/project/board/board.h>
+#include <librepcb/core/project/board/boarddesignrules.h>
 #include <librepcb/core/project/board/items/bi_netline.h>
 #include <librepcb/core/project/board/items/bi_netpoint.h>
 #include <librepcb/core/project/board/items/bi_netsegment.h>
@@ -69,8 +70,8 @@ BoardEditorState_AddVia::BoardEditorState_AddVia(
                        Layer::topCopper(),  // Start layer
                        Layer::botCopper(),  // End layer
                        Point(),  // Position is not relevant here
-                       PositiveLength(700000),  // Default size
                        PositiveLength(300000),  // Default drill diameter
+                       std::nullopt,  // Auto size
                        MaskConfig::off()  // Exposure
                        ),
     mUseAutoNetSignal(true),
@@ -138,35 +139,56 @@ bool BoardEditorState_AddVia::processGraphicsSceneLeftMouseButtonDoubleClicked(
  *  Connection to UI
  ******************************************************************************/
 
-void BoardEditorState_AddVia::setSize(const PositiveLength& size) noexcept {
-  if (mCurrentProperties.setSize(size)) {
-    emit sizeChanged(mCurrentProperties.getSize());
-  }
-
-  if (mCurrentViaEditCmd) {
-    mCurrentViaEditCmd->setSize(mCurrentProperties.getSize(), true);
-  }
-
-  // Avoid creating vias with a drill larger than size.
-  if (size < mCurrentProperties.getDrillDiameter()) {
-    setDrillDiameter(size);
-  }
-}
-
 void BoardEditorState_AddVia::setDrillDiameter(
     const PositiveLength& diameter) noexcept {
-  if (mCurrentProperties.setDrillDiameter(diameter)) {
+  // Avoid creating vias with a drill larger than size.
+  if (mCurrentProperties.getSize() &&
+      (diameter > *mCurrentProperties.getSize())) {
+    setSize(diameter);
+  }
+
+  const PositiveLength oldSize = getSize();
+  if (mCurrentProperties.setDrillAndSize(diameter,
+                                         mCurrentProperties.getSize())) {
     emit drillDiameterChanged(mCurrentProperties.getDrillDiameter());
   }
 
   if (mCurrentViaEditCmd) {
-    mCurrentViaEditCmd->setDrillDiameter(mCurrentProperties.getDrillDiameter(),
-                                         true);
+    mCurrentViaEditCmd->setDrillAndSize(mCurrentProperties.getDrillDiameter(),
+                                        mCurrentProperties.getSize(), true);
   }
 
+  const PositiveLength newSize = getSize();
+  if (newSize != oldSize) {
+    emit sizeChanged(!mCurrentProperties.getSize().has_value(), newSize);
+  }
+}
+
+PositiveLength BoardEditorState_AddVia::getSize() const noexcept {
+  if (auto size = mCurrentProperties.getSize()) {
+    return *size;
+  } else {
+    return Via::calcSizeFromRules(
+        mCurrentProperties.getDrillDiameter(),
+        mContext.board.getDesignRules().getViaAnnularRing());
+  }
+}
+
+void BoardEditorState_AddVia::setSize(
+    const std::optional<PositiveLength>& size) noexcept {
   // Avoid creating vias with a drill larger than size.
-  if (diameter > mCurrentProperties.getSize()) {
-    setSize(diameter);
+  if (size && ((*size) < mCurrentProperties.getDrillDiameter())) {
+    setDrillDiameter(*size);
+  }
+
+  if (mCurrentProperties.setDrillAndSize(mCurrentProperties.getDrillDiameter(),
+                                         size)) {
+    emit sizeChanged(!mCurrentProperties.getSize().has_value(), getSize());
+  }
+
+  if (mCurrentViaEditCmd) {
+    mCurrentViaEditCmd->setDrillAndSize(mCurrentProperties.getDrillDiameter(),
+                                        mCurrentProperties.getSize(), true);
   }
 }
 

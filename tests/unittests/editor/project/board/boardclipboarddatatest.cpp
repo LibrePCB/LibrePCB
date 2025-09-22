@@ -130,10 +130,10 @@ TEST(BoardClipboardDataTest, testToFromMimeDataPopulated) {
       true));
   netSegment1->vias.append(std::make_shared<Via>(
       Uuid::createRandom(), Layer::topCopper(), Layer::botCopper(), Point(1, 2),
-      PositiveLength(10), PositiveLength(3), MaskConfig::off()));
+      PositiveLength(3), PositiveLength(10), MaskConfig::off()));
   netSegment1->vias.append(std::make_shared<Via>(
       Uuid::createRandom(), *Layer::innerCopper(5), *Layer::innerCopper(7),
-      Point(10, 20), PositiveLength(100), PositiveLength(30),
+      Point(10, 20), PositiveLength(30), std::nullopt,
       MaskConfig::manual(Length(1234))));
   netSegment1->junctions.append(
       std::make_shared<Junction>(Uuid::createRandom(), Point(1, 2)));
@@ -153,10 +153,10 @@ TEST(BoardClipboardDataTest, testToFromMimeDataPopulated) {
           CircuitIdentifier("net2"));
   netSegment2->vias.append(std::make_shared<Via>(
       Uuid::createRandom(), Layer::topCopper(), Layer::botCopper(), Point(1, 2),
-      PositiveLength(10), PositiveLength(3), MaskConfig::off()));
+      PositiveLength(3), PositiveLength(10), MaskConfig::off()));
   netSegment2->vias.append(std::make_shared<Via>(
       Uuid::createRandom(), *Layer::innerCopper(5), *Layer::innerCopper(7),
-      Point(10, 20), PositiveLength(100), PositiveLength(30),
+      Point(10, 20), PositiveLength(30), std::nullopt,
       MaskConfig::manual(Length(1234))));
   netSegment2->junctions.append(
       std::make_shared<Junction>(Uuid::createRandom(), Point(1, 2)));

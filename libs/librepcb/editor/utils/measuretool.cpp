@@ -133,13 +133,8 @@ void MeasureTool::setBoard(const Board* board) noexcept {
       }
       foreach (const BI_Via* via, segment->getVias()) {
         mSnapCandidates.insert(via->getPosition());
-        Path path = via->getVia().getOutline();
-        path.addVertex(Point(via->getSize() / 2, 0));
-        path.addVertex(Point(-via->getSize() / 2, 0));
-        path.addVertex(Point(0, via->getSize() / 2));
-        path.addVertex(Point(0, -via->getSize() / 2));
         mSnapCandidates |=
-            snapCandidatesFromPath(path.translated(via->getPosition()));
+            snapCandidatesFromCircle(via->getPosition(), *via->getActualSize());
         mSnapCandidates |= snapCandidatesFromCircle(via->getPosition(),
                                                     *via->getDrillDiameter());
       }

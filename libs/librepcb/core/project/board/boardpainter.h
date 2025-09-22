@@ -61,8 +61,8 @@ class BoardPainter final : public GraphicsPagePainter {
 
   struct ViaData {
     Point position;
-    PositiveLength size;
     PositiveLength drill;
+    PositiveLength size;
     const Layer* startLayer;
     const Layer* endLayer;
     std::optional<PositiveLength> stopMaskDiameterTop;

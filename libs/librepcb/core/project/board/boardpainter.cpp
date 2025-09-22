@@ -127,7 +127,7 @@ BoardPainter::BoardPainter(const Board& board)
     }
     for (const BI_Via* via : segment->getVias()) {
       mVias.append(ViaData{
-          via->getPosition(), via->getSize(), via->getDrillDiameter(),
+          via->getPosition(), via->getDrillDiameter(), via->getActualSize(),
           &via->getVia().getStartLayer(), &via->getVia().getEndLayer(),
           via->getStopMaskDiameterTop(), via->getStopMaskDiameterBottom()});
     }
@@ -313,7 +313,7 @@ void BoardPainter::initContentByColor() const noexcept {
       foreach (const Layer* layer, mCopperLayers) {
         if ((layer->getCopperNumber() >= via.startLayer->getCopperNumber()) &&
             (layer->getCopperNumber() <= via.endLayer->getCopperNumber())) {
-          const QPainterPath path = Via::toQPainterPathPx(via.size, via.drill)
+          const QPainterPath path = Via::toQPainterPathPx(via.drill, via.size)
                                         .translated(via.position.toPxQPointF());
           ColorContent& vias = mContentByColor[Theme::Color::sBoardVias];
           if (!vias.areas.contains(path)) {

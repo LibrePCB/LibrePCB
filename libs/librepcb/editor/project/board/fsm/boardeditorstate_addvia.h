@@ -74,14 +74,15 @@ public:
       const GraphicsSceneMouseEvent& e) noexcept override;
 
   // Connection to UI
-  const PositiveLength& getSize() const noexcept {
-    return mCurrentProperties.getSize();
-  }
-  void setSize(const PositiveLength& size) noexcept;
   const PositiveLength& getDrillDiameter() const noexcept {
     return mCurrentProperties.getDrillDiameter();
   }
   void setDrillDiameter(const PositiveLength& diameter) noexcept;
+  bool getUseAutoSize() const noexcept {
+    return !mCurrentProperties.getSize().has_value();
+  }
+  PositiveLength getSize() const noexcept;
+  void setSize(const std::optional<PositiveLength>& size) noexcept;
   QVector<std::pair<Uuid, QString>> getAvailableNets() const noexcept;
   bool getUseAutoNet() const noexcept { return mUseAutoNetSignal; }
   std::optional<Uuid> getNet() const noexcept { return mCurrentNetSignal; }
@@ -92,8 +93,8 @@ public:
       delete;
 
 signals:
-  void sizeChanged(const PositiveLength& size);
   void drillDiameterChanged(const PositiveLength& diameter);
+  void sizeChanged(bool autoSize, const PositiveLength& size);
   void netChanged(bool autoNet, const std::optional<Uuid>& net);
 
 private:  // Methods

@@ -103,14 +103,15 @@ public:
   void setAutoWidth(bool autoWidth) noexcept;
   const PositiveLength& getWidth() const noexcept { return mCurrentWidth; }
   void setWidth(const PositiveLength& width) noexcept;
-  const PositiveLength& getViaSize() const noexcept {
-    return mCurrentViaProperties.getSize();
-  }
-  void setViaSize(const PositiveLength& size) noexcept;
   const PositiveLength& getViaDrillDiameter() const noexcept {
     return mCurrentViaProperties.getDrillDiameter();
   }
   void setViaDrillDiameter(const PositiveLength& diameter) noexcept;
+  bool getUseAutoViaSize() const noexcept {
+    return !mCurrentViaProperties.getSize().has_value();
+  }
+  PositiveLength getViaSize() const noexcept;
+  void setViaSize(const std::optional<PositiveLength>& size) noexcept;
 
   // Operator Overloadings
   BoardEditorState_DrawTrace& operator=(const BoardEditorState_DrawTrace& rhs) =
@@ -121,8 +122,8 @@ signals:
   void layerChanged(const Layer& layer);
   void autoWidthChanged(bool autoWidth);
   void widthChanged(const PositiveLength& width);
-  void viaSizeChanged(const PositiveLength& size);
   void viaDrillDiameterChanged(const PositiveLength& diameter);
+  void viaSizeChanged(bool autoSize, const PositiveLength& size);
 
 private:
   /// Internal FSM States (substates)
