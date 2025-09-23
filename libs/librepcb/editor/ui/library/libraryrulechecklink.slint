@@ -6,9 +6,9 @@ export component LibraryRuleCheckLink inherits HorizontalLayout {
     property <bool> has-messages: (data.unapproved > 0) || (data.messages.length > 0);
     property <string> text: {
         if data.unapproved > 0 {
-            @tr("{n} warning" | "{n} warnings" % data.unapproved)
+            @tr("" | "{n} warning(s)" % data.unapproved)
         } else if data.messages.length > 0 {
-            @tr("{n} approved message" | "{n} approved messages" % data.messages.length)
+            @tr("" | "{n} approved message(s)" % data.messages.length)
         } else {
             @tr("All checks passed!")
         }

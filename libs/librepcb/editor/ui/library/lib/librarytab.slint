@@ -544,7 +544,7 @@ component LibraryTreeViewToolBar inherits Rectangle {
 
         Text {
             overflow: elide;
-            text: @tr("Selected item" | "{n} selected items" % count) + ":";
+            text: @tr("" | "{n} selected item(s)" % count) + ":";
         }
 
         duplicate-btn := IconButton {

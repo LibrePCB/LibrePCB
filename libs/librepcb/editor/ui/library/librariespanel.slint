@@ -606,7 +606,7 @@ export component LibrariesPanel inherits Rectangle {
                                     @image-url("../../../../font-awesome/svgs/solid/check.svg");
                                 }
                             };
-                            text: (root.width > 300px) ? @tr("Apply {n} Modification" | "Apply {n} Modifications" % Data.remote-libraries-pending-operations) : @tr("Apply");
+                            text: (root.width > 300px) ? @tr("" | "Apply {n} Modification(s)" % Data.remote-libraries-pending-operations) : @tr("Apply");
                             primary: Data.remote-libraries-data.pending-oneway-uninstalls == 0;
                             border-color: (self.has-focus ? Constants.librepcb-color : red).darker(self.enabled ? 0 : 0.5);
                             border-width: (self.has-focus || (Data.remote-libraries-data.pending-oneway-uninstalls > 0)) ? 1px : 0;
