@@ -100,3 +100,33 @@ export component MenuItem inherits TouchArea {
     }
 }
 ```
+
+
+# Translations {#doc_slint_style_guide_i18n}
+
+To translate UI strings, we pass them through the `@tr()` macro as documented
+[here](https://docs.slint.dev/latest/docs/slint/guide/development/translations/).
+However, since we have integrated Slint's translation mechanism into our
+Qt-based translation workflow, we do not take the singular form of plural
+strings into account. They will be created by translators on Transifex,
+and the fallback from the source code is not used. Therefore we use the
+`@tr()` macro slightly different than officially documented:
+
+```Slint
+export component Example {
+    property <int> count;
+
+    // How we specify plural forms:
+    //  * Leave singular form empty
+    //  * If possible, use a generic plural form that also works for singular.
+    //    If not possible, just use the plural form (e.g. "{n} libraries").
+    Button {
+        text: @tr("" | "Apply {n} modification(s)" % count);
+    }
+
+    // Do *not* use the official variant like this:
+    Button {
+        text: @tr("Apply modification" | "Apply {n} modifications" % count);
+    }
+}
+```

@@ -42,7 +42,7 @@ component OrderPreCheckRow inherits HorizontalLayout {
         } else if (check.state == RuleCheckState.up-to-date) && (check.unapproved == 0) {
             @tr("Successful")
         } else if (check.state == RuleCheckState.up-to-date) && (check.unapproved != 0) {
-            @tr("{n} Message" | "{n} Messages" % check.unapproved)
+            @tr("" | "{n} Message(s)" % check.unapproved)
         } else if check.state == RuleCheckState.outdated {
             @tr("Outdated")
         } else {
