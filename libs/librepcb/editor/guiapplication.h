@@ -55,6 +55,16 @@ class QuickAccessModel;
 class SlintKeyEventTextBuilder;
 
 /*******************************************************************************
+ *  Translation Function
+ ******************************************************************************/
+
+void slintTr(slint::private_api::Slice<uint8_t> string,
+             slint::private_api::Slice<uint8_t> ctx,
+             slint::private_api::Slice<uint8_t> domain, int32_t n,
+             slint::private_api::Slice<uint8_t> plural,
+             slint::SharedString* out) noexcept;
+
+/*******************************************************************************
  *  Class GuiApplication
  ******************************************************************************/
 

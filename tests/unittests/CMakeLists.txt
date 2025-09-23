@@ -112,6 +112,7 @@ add_executable(
   eagleimport/eagletypeconvertertest.cpp
   editor/dialogs/dxfimportdialogtest.cpp
   editor/dialogs/graphicsexportdialogtest.cpp
+  editor/guiapplicationtest.cpp
   editor/library/cat/categorytreebuildertest.cpp
   editor/library/librarydownloadtest.cpp
   editor/library/pkg/footprintclipboarddatatest.cpp
@@ -166,3 +167,14 @@ add_executable(
   dummy.cpp
 )
 set_target_properties(dummy_binary PROPERTIES OUTPUT_NAME dummy-binary)
+
+# Generate translation file target
+set(UNITTESTS_I18N_FILES_DIR "${CMAKE_SOURCE_DIR}/tests/data/i18n")
+file(GLOB UNITTESTS_TS_FILES ${UNITTESTS_I18N_FILES_DIR}/unittests_*.ts)
+set_source_files_properties(
+  ${UNITTESTS_TS_FILES} PROPERTIES OUTPUT_LOCATION
+                                   "${UNITTESTS_I18N_FILES_DIR}"
+)
+qt6_add_translation(UNITTESTS_QM_FILES ${UNITTESTS_TS_FILES} OPTIONS -silent)
+add_custom_target(librepcb_unittests_translations DEPENDS ${UNITTESTS_QM_FILES})
+add_dependencies(librepcb_unittests librepcb_unittests_translations)
