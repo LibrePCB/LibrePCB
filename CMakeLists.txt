@@ -188,7 +188,10 @@ if(BUILD_TESTS)
 endif()
 
 # Generate translation file target
-set(LIBREPCB_QM_FILES_DIR "${CMAKE_BINARY_DIR}/i18n")
+# Note: It is not very nice that *.qm files will be generated into the source
+# "share" directory. However, this seems the only easy way to get translations
+# working in local builds (without "make install") and *should* not hurt much.
+set(LIBREPCB_QM_FILES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/share/librepcb/i18n")
 file(MAKE_DIRECTORY "${LIBREPCB_QM_FILES_DIR}")
 file(
   GLOB LIBREPCB_TS_FILES
@@ -223,7 +226,7 @@ install(
   DESTINATION ${CMAKE_INSTALL_DATAROOTDIR} OPTIONAL
 )
 install(
-  DIRECTORY ${CMAKE_BINARY_DIR}/i18n
+  DIRECTORY ${LIBREPCB_QM_FILES_DIR}
   DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/librepcb
 )
 
