@@ -75,26 +75,39 @@ void slintTr(slint::private_api::Slice<uint8_t> string,
              slint::private_api::Slice<uint8_t> plural,
              slint::SharedString* out) noexcept {
   Q_UNUSED(domain);
-  const QString context = "ui::" %
-      QString::fromUtf8(reinterpret_cast<const char*>(ctx.ptr), ctx.len);
-  QString str = plural.len
-      ? QString::fromUtf8(reinterpret_cast<const char*>(plural.ptr), plural.len)
-      : QString::fromUtf8(reinterpret_cast<const char*>(string.ptr),
-                          string.len);
+  const QByteArray context =
+      "ui::" + QByteArray(reinterpret_cast<const char*>(ctx.ptr), ctx.len);
+  QByteArray str =
+      (plural.len
+           ? QByteArray(reinterpret_cast<const char*>(plural.ptr), plural.len)
+           : QByteArray(reinterpret_cast<const char*>(string.ptr), string.len));
+
+  // Helpers to build pattern strings "{n}" and "%n".
+  QByteArray pattern;
+  auto buildSlintPattern = [&pattern](int i) -> const QByteArray& {
+    pattern = "{" + QByteArray::number(i) + "}";
+    return pattern;
+  };
+  auto buildQtPattern = [&pattern](int i) -> const QByteArray& {
+    pattern = "%" + QByteArray::number(i);
+    return pattern;
+  };
+
   str.replace("{n}", "%n");
-  for (int i = 0; str.contains(QString("{%1}").arg(i)); ++i) {
-    str.replace(QString("{%1}").arg(i), "%" % QString::number(i + 1));
+  for (int i = 0; str.contains(buildSlintPattern(i)); ++i) {
+    str.replace(pattern, "%" + QByteArray::number(i + 1));
   }
   for (int i = 1; str.contains("{}"); ++i) {
-    str.replace(str.indexOf("{}"), 2, "%" % QString::number(i));
+    str.replace(str.indexOf("{}"), 2, "%" + QByteArray::number(i));
   }
-  str = QCoreApplication::translate(qPrintable(context), qPrintable(str),
-                                    nullptr, n);
+  str = QCoreApplication::translate(context.data(), str.data(), nullptr,
+                                    plural.len ? n : -1)
+            .toUtf8();
   str.replace("%n", "{n}");
-  for (int i = 1; str.contains("%" % QString::number(i)); ++i) {
-    str.replace("%" % QString::number(i), QString("{%1}").arg(i - 1));
+  for (int i = 1; str.contains(buildQtPattern(i)); ++i) {
+    str.replace(pattern, "{" + QByteArray::number(i - 1) + "}");
   }
-  *out = q2s(str);
+  *out = std::string_view(str.data(), str.size());
 }
 
 /*******************************************************************************
