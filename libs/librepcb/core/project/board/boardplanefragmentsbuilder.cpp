@@ -268,7 +268,7 @@ std::shared_ptr<BoardPlaneFragmentsBuilder::JobData>
     }
     for (const BI_Via* via : segment->getVias()) {
       data->vias.append(ViaData{
-          netSignalUuid, via->getVia().getPosition(), via->getVia().getSize(),
+          netSignalUuid, via->getVia().getPosition(), via->getActualSize(),
           &via->getVia().getStartLayer(), &via->getVia().getEndLayer()});
     }
     for (const BI_NetLine* netline : segment->getNetLines()) {

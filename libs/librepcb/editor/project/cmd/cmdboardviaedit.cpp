@@ -46,10 +46,10 @@ CmdBoardViaEdit::CmdBoardViaEdit(BI_Via& via) noexcept
     mNewEndLayer(mOldEndLayer),
     mOldPos(via.getPosition()),
     mNewPos(mOldPos),
-    mOldSize(via.getSize()),
-    mNewSize(mOldSize),
     mOldDrillDiameter(via.getDrillDiameter()),
     mNewDrillDiameter(mOldDrillDiameter),
+    mOldSize(via.getSize()),
+    mNewSize(mOldSize),
     mOldExposureConfig(via.getVia().getExposureConfig()),
     mNewExposureConfig(mOldExposureConfig) {
 }
@@ -57,8 +57,7 @@ CmdBoardViaEdit::CmdBoardViaEdit(BI_Via& via) noexcept
 CmdBoardViaEdit::~CmdBoardViaEdit() noexcept {
   if (!wasEverExecuted()) {
     mVia.setPosition(mOldPos);
-    mVia.setSize(mOldSize);
-    mVia.setDrillDiameter(mOldDrillDiameter);
+    mVia.setDrillAndSize(mOldDrillDiameter, mOldSize);
   }
 }
 
@@ -105,18 +104,17 @@ void CmdBoardViaEdit::mirrorLayers(int innerLayers) noexcept {
   mNewEndLayer = &tmp->mirrored(innerLayers);
 }
 
-void CmdBoardViaEdit::setSize(const PositiveLength& size,
-                              bool immediate) noexcept {
+void CmdBoardViaEdit::setDrillAndSize(const PositiveLength& drill,
+                                      const std::optional<PositiveLength>& size,
+                                      bool immediate) {
   Q_ASSERT(!wasEverExecuted());
+  if (size && (*size < drill)) {
+    throw RuntimeError(__FILE__, __LINE__,
+                       "Via drill is larger than via size.");
+  }
+  mNewDrillDiameter = drill;
   mNewSize = size;
-  if (immediate) mVia.setSize(mNewSize);
-}
-
-void CmdBoardViaEdit::setDrillDiameter(const PositiveLength& diameter,
-                                       bool immediate) noexcept {
-  Q_ASSERT(!wasEverExecuted());
-  mNewDrillDiameter = diameter;
-  if (immediate) mVia.setDrillDiameter(mNewDrillDiameter);
+  if (immediate) mVia.setDrillAndSize(mNewDrillDiameter, mNewSize);
 }
 
 void CmdBoardViaEdit::setExposureConfig(const MaskConfig& config) noexcept {
@@ -134,8 +132,8 @@ bool CmdBoardViaEdit::performExecute() {
   if (mNewStartLayer != mOldStartLayer) return true;
   if (mNewEndLayer != mOldEndLayer) return true;
   if (mNewPos != mOldPos) return true;
-  if (mNewSize != mOldSize) return true;
   if (mNewDrillDiameter != mOldDrillDiameter) return true;
+  if (mNewSize != mOldSize) return true;
   if (mNewExposureConfig != mOldExposureConfig) return true;
   return false;
 }
@@ -143,16 +141,14 @@ bool CmdBoardViaEdit::performExecute() {
 void CmdBoardViaEdit::performUndo() {
   mVia.setLayers(*mOldStartLayer, *mOldEndLayer);  // can throw
   mVia.setPosition(mOldPos);
-  mVia.setSize(mOldSize);
-  mVia.setDrillDiameter(mOldDrillDiameter);
+  mVia.setDrillAndSize(mOldDrillDiameter, mOldSize);
   mVia.setExposureConfig(mOldExposureConfig);
 }
 
 void CmdBoardViaEdit::performRedo() {
   mVia.setLayers(*mNewStartLayer, *mNewEndLayer);  // can throw
   mVia.setPosition(mNewPos);
-  mVia.setSize(mNewSize);
-  mVia.setDrillDiameter(mNewDrillDiameter);
+  mVia.setDrillAndSize(mNewDrillDiameter, mNewSize);
   mVia.setExposureConfig(mNewExposureConfig);
 }
 

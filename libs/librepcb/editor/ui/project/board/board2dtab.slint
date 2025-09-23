@@ -117,6 +117,7 @@ export component Board2dTab inherits Tab {
                 if tabs[index].tool == EditorTool.wire: trace-toolbar := DrawTraceToolBar {
                     section-index: section-index;
                     section: section;
+                    show-via-size: root.width > 755px;
                 }
 
                 if tabs[index].tool == EditorTool.via: via-toolbar := AddViaToolBar {

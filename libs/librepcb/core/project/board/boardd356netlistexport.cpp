@@ -72,8 +72,9 @@ QByteArray BoardD356NetlistExport::generate() const {
       const bool solderMaskCovered = (!via->getStopMaskDiameterTop()) &&
           (!via->getStopMaskDiameterBottom());
       if (via->getVia().isBlind()) {
-        gen.blindVia(netName, via->getPosition(), via->getSize(),
-                     via->getSize(), Angle::deg0(), via->getDrillDiameter(),
+        gen.blindVia(netName, via->getPosition(), via->getActualSize(),
+                     via->getActualSize(), Angle::deg0(),
+                     via->getDrillDiameter(),
                      via->getVia().getStartLayer().getCopperNumber() + 1,
                      via->getVia().getEndLayer().getCopperNumber() + 1,
                      solderMaskCovered);
@@ -83,9 +84,9 @@ QByteArray BoardD356NetlistExport::generate() const {
                       via->getVia().getEndLayer().getCopperNumber() + 1);
       } else {
         Q_ASSERT(via->getVia().isThrough());
-        gen.throughVia(netName, via->getPosition(), via->getSize(),
-                       via->getSize(), Angle::deg0(), via->getDrillDiameter(),
-                       solderMaskCovered);
+        gen.throughVia(netName, via->getPosition(), via->getActualSize(),
+                       via->getActualSize(), Angle::deg0(),
+                       via->getDrillDiameter(), solderMaskCovered);
       }
     }
   }

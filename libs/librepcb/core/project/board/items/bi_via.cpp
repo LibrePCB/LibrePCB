@@ -44,12 +44,16 @@ BI_Via::BI_Via(BI_NetSegment& netsegment, const Via& via)
     onEdited(*this),
     mVia(via),
     mNetSegment(netsegment),
+    mActualSize(1),
     mStopMaskDiameterTop(),
     mStopMaskDiameterBottom() {
+  updateActualSize();
   updateStopMaskDiameters();
 
-  connect(&mBoard, &Board::designRulesModified, this,
-          &BI_Via::updateStopMaskDiameters);
+  connect(&mBoard, &Board::designRulesModified, this, [this]() {
+    updateActualSize();
+    updateStopMaskDiameters();
+  });
   connect(&mBoard, &Board::innerLayerCountChanged, this,
           [this]() { onEdited.notify(Event::LayersChanged); });
 }
@@ -126,17 +130,11 @@ void BI_Via::setPosition(const Point& position) noexcept {
   }
 }
 
-void BI_Via::setSize(const PositiveLength& size) noexcept {
-  if (mVia.setSize(size)) {
-    onEdited.notify(Event::SizeChanged);
-    updateStopMaskDiameters();
-    mBoard.invalidatePlanes();
-  }
-}
-
-void BI_Via::setDrillDiameter(const PositiveLength& diameter) noexcept {
-  if (mVia.setDrillDiameter(diameter)) {
-    onEdited.notify(Event::DrillDiameterChanged);
+void BI_Via::setDrillAndSize(const PositiveLength& drill,
+                             const std::optional<PositiveLength>& size) {
+  if (mVia.setDrillAndSize(drill, size)) {
+    onEdited.notify(Event::DrillOrSizeChanged);
+    updateActualSize();
     updateStopMaskDiameters();
     mBoard.invalidatePlanes();
   }
@@ -203,16 +201,28 @@ void BI_Via::unregisterNetLine(BI_NetLine& netline) {
   mRegisteredNetLines.remove(&netline);
 }
 
+void BI_Via::updateActualSize() noexcept {
+  const PositiveLength size = mVia.getSize()
+      ? (*mVia.getSize())
+      : Via::calcSizeFromRules(mVia.getDrillDiameter(),
+                               mBoard.getDesignRules().getViaAnnularRing());
+
+  if (size != mActualSize) {
+    mActualSize = size;
+    onEdited.notify(Event::ActualSizeChanged);
+  }
+}
+
 void BI_Via::updateStopMaskDiameters() noexcept {
   Length dia(0);
   if (const auto& value = mVia.getExposureConfig().getOffset()) {
     // Manual exposure offset -> relative to via size.
-    dia = mVia.getSize() + (*value * 2);
+    dia = mActualSize + (*value * 2);
   } else if (mVia.getExposureConfig().isEnabled()) {
     // Automatic exposure offset -> relative to via size.
-    dia = mVia.getSize() +
+    dia = mActualSize +
         (mBoard.getDesignRules().getStopMaskClearance().calcValue(
-             *mVia.getSize()) *
+             *mActualSize) *
          2);
   } else if (mBoard.getDesignRules().doesViaRequireStopMaskOpening(
                  *mVia.getDrillDiameter())) {

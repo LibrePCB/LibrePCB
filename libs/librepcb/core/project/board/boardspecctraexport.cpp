@@ -630,7 +630,7 @@ std::unique_ptr<SExpression> BoardSpecctraExport::genWiringPadStack(
     if (via.getVia().isOnLayer(*layer)) {
       root->ensureLineBreak();
       auto& node = root->appendList("shape");
-      node.appendChild(toCircle(layer->getId(), via.getSize()));
+      node.appendChild(toCircle(layer->getId(), via.getActualSize()));
     }
   }
   root->ensureLineBreak();
@@ -653,8 +653,11 @@ QString BoardSpecctraExport::getWiringPadStackId(const BI_Via& via) const {
   // Note: Keep in sync with CmdBoardSpecctraImport::extractViaDrillDiameter()
   // and CmdBoardSpecctraImport::extractViaExposureConfig().
   QString s = QString("via-%1-%2")
-                  .arg(via.getSize()->toMmString())
-                  .arg(via.getDrillDiameter()->toMmString());
+                  .arg(via.getDrillDiameter()->toMmString())
+                  .arg(via.getActualSize()->toMmString());
+  if (!via.getSize()) {
+    s += "-auto";
+  }
   if (via.getVia().isThrough()) {
     s += "-tht";
   } else {

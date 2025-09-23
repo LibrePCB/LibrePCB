@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "via.h"
 
+#include "../types/boundedunsignedratio.h"
 #include "../types/layer.h"
 
 #include <QtCore>
@@ -30,6 +31,29 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
+
+/*******************************************************************************
+ *  Non-Member Functions
+ ******************************************************************************/
+
+template <>
+std::unique_ptr<SExpression> serialize(
+    const std::optional<PositiveLength>& obj) {
+  if (obj) {
+    return serialize(*obj);
+  } else {
+    return SExpression::createToken("auto");
+  }
+}
+
+template <>
+std::optional<PositiveLength> deserialize(const SExpression& node) {
+  if (node.getValue() == QLatin1String("auto")) {
+    return std::nullopt;
+  } else {
+    return deserialize<PositiveLength>(node);
+  }
+}
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -41,8 +65,8 @@ Via::Via(const Via& other) noexcept
     mStartLayer(other.mStartLayer),
     mEndLayer(other.mEndLayer),
     mPosition(other.mPosition),
-    mSize(other.mSize),
     mDrillDiameter(other.mDrillDiameter),
+    mSize(other.mSize),
     mExposureConfig(other.mExposureConfig) {
 }
 
@@ -51,17 +75,21 @@ Via::Via(const Uuid& uuid, const Via& other) noexcept : Via(other) {
 }
 
 Via::Via(const Uuid& uuid, const Layer& startLayer, const Layer& endLayer,
-         const Point& position, const PositiveLength& size,
-         const PositiveLength& drillDiameter,
-         const MaskConfig& exposureConfig) noexcept
+         const Point& position, const PositiveLength& drillDiameter,
+         const std::optional<PositiveLength>& size,
+         const MaskConfig& exposureConfig)
   : onEdited(*this),
     mUuid(uuid),
     mStartLayer(&startLayer),
     mEndLayer(&endLayer),
     mPosition(position),
-    mSize(size),
     mDrillDiameter(drillDiameter),
+    mSize(size),
     mExposureConfig(exposureConfig) {
+  if (mSize && (*mSize < mDrillDiameter)) {
+    throw RuntimeError(__FILE__, __LINE__,
+                       "Via drill is larger than via size.");
+  }
 }
 
 Via::Via(const SExpression& node)
@@ -70,12 +98,16 @@ Via::Via(const SExpression& node)
     mStartLayer(&deserialize<const Layer&>(node.getChild("from/@0"))),
     mEndLayer(&deserialize<const Layer&>(node.getChild("to/@0"))),
     mPosition(node.getChild("position")),
-    mSize(deserialize<PositiveLength>(node.getChild("size/@0"))),
     mDrillDiameter(deserialize<PositiveLength>(node.getChild("drill/@0"))),
+    mSize(deserialize<std::optional<PositiveLength>>(node.getChild("size/@0"))),
     mExposureConfig(deserialize<MaskConfig>(node.getChild("exposure/@0"))) {
   if ((!mStartLayer->isCopper()) || (!mEndLayer->isCopper()) ||
       (mStartLayer->getCopperNumber() >= mEndLayer->getCopperNumber())) {
     throw RuntimeError(__FILE__, __LINE__, "Invalid via layer specification.");
+  }
+  if (mSize && (*mSize < mDrillDiameter)) {
+    throw RuntimeError(__FILE__, __LINE__,
+                       "Via drill is larger than via size.");
   }
 }
 
@@ -85,14 +117,6 @@ Via::~Via() noexcept {
 /*******************************************************************************
  *  Getters
  ******************************************************************************/
-
-Path Via::getOutline(const Length& expansion) const noexcept {
-  return getOutline(mSize, expansion);
-}
-
-Path Via::getSceneOutline(const Length& expansion) const noexcept {
-  return getOutline(expansion).translated(mPosition);
-}
 
 bool Via::isThrough() const noexcept {
   return ((mStartLayer == &Layer::topCopper()) &&
@@ -117,10 +141,6 @@ bool Via::isOnLayer(const Layer& layer) const noexcept {
 
 bool Via::isOnAnyLayer(const QSet<const Layer*>& layers) const noexcept {
   return isOnAnyLayer(layers, *mStartLayer, *mEndLayer);
-}
-
-QPainterPath Via::toQPainterPathPx(const Length& expansion) const noexcept {
-  return toQPainterPathPx(mSize, mDrillDiameter, expansion);
 }
 
 /*******************************************************************************
@@ -166,23 +186,20 @@ bool Via::setPosition(const Point& position) noexcept {
   return true;
 }
 
-bool Via::setSize(const PositiveLength& size) noexcept {
-  if (size == mSize) {
+bool Via::setDrillAndSize(const PositiveLength& drill,
+                          const std::optional<PositiveLength>& size) {
+  if ((drill == mDrillDiameter) && (size == mSize)) {
     return false;
   }
 
+  if (size && (*size < drill)) {
+    throw RuntimeError(__FILE__, __LINE__,
+                       "Via drill is larger than via size.");
+  }
+
+  mDrillDiameter = drill;
   mSize = size;
-  onEdited.notify(Event::SizeChanged);
-  return true;
-}
-
-bool Via::setDrillDiameter(const PositiveLength& diameter) noexcept {
-  if (diameter == mDrillDiameter) {
-    return false;
-  }
-
-  mDrillDiameter = diameter;
-  onEdited.notify(Event::DrillDiameterChanged);
+  onEdited.notify(Event::DrillOrSizeChanged);
   return true;
 }
 
@@ -206,8 +223,8 @@ void Via::serialize(SExpression& root) const {
   root.appendChild("to", *mEndLayer);
   root.ensureLineBreak();
   mPosition.serialize(root.appendList("position"));
-  root.appendChild("size", mSize);
   root.appendChild("drill", mDrillDiameter);
+  root.appendChild("size", mSize);
   root.appendChild("exposure", mExposureConfig);
   root.ensureLineBreak();
 }
@@ -221,8 +238,8 @@ bool Via::operator==(const Via& rhs) const noexcept {
   if (mStartLayer != rhs.mStartLayer) return false;
   if (mEndLayer != rhs.mEndLayer) return false;
   if (mPosition != rhs.mPosition) return false;
-  if (mSize != rhs.mSize) return false;
   if (mDrillDiameter != rhs.mDrillDiameter) return false;
+  if (mSize != rhs.mSize) return false;
   if (mExposureConfig != rhs.mExposureConfig) return false;
   return true;
 }
@@ -231,8 +248,7 @@ Via& Via::operator=(const Via& rhs) noexcept {
   setUuid(rhs.mUuid);
   setLayers(rhs.getStartLayer(), rhs.getEndLayer());
   setPosition(rhs.mPosition);
-  setSize(rhs.mSize);
-  setDrillDiameter(rhs.mDrillDiameter);
+  setDrillAndSize(rhs.mDrillDiameter, rhs.mSize);
   setExposureConfig(rhs.mExposureConfig);
   return *this;
 }
@@ -240,6 +256,11 @@ Via& Via::operator=(const Via& rhs) noexcept {
 /*******************************************************************************
  *  Static Methods
  ******************************************************************************/
+
+PositiveLength Via::calcSizeFromRules(
+    const PositiveLength& drill, const BoundedUnsignedRatio& ratio) noexcept {
+  return drill + UnsignedLength(ratio.calcValue(*drill) * 2);
+}
 
 Path Via::getOutline(const PositiveLength& size,
                      const Length& expansion) noexcept {
@@ -266,8 +287,8 @@ bool Via::isOnAnyLayer(const QSet<const Layer*>& layers, const Layer& from,
   return false;
 }
 
-QPainterPath Via::toQPainterPathPx(const PositiveLength& size,
-                                   const PositiveLength& drillDiameter,
+QPainterPath Via::toQPainterPathPx(const PositiveLength& drillDiameter,
+                                   const PositiveLength& size,
                                    const Length& expansion) noexcept {
   // Avoid creating inverted graphics if drill>size, since it looks correct.
   PositiveLength drill = std::min(drillDiameter, size);

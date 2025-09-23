@@ -82,8 +82,8 @@ public:
 
   struct ViaData {
     Point position;
-    PositiveLength size;
     PositiveLength drillDiameter;
+    PositiveLength size;
     const Layer* startLayer;
     const Layer* endLayer;
     std::optional<PositiveLength> stopMaskDiameterTop;
@@ -160,8 +160,8 @@ public:
   void addStroke(const Layer& layer, const QVector<Path>& paths,
                  const Length& width, const Transform& transform) noexcept;
   void addVia(
-      const Point& position, const PositiveLength& size,
-      const PositiveLength& drillDiameter, const Layer& startLayer,
+      const Point& position, const PositiveLength& drillDiameter,
+      const PositiveLength& size, const Layer& startLayer,
       const Layer& endLayer,
       const std::optional<PositiveLength>& stopMaskDiameterTop,
       const std::optional<PositiveLength>& stopMaskDiameterBottom) noexcept;

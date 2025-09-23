@@ -1,3 +1,4 @@
+import { Palette } from "std-widgets.slint";
 import { IconButton } from "iconbutton.slint";
 import { LinkText } from "linktext.slint";
 import { ToolTip } from "tooltip.slint";
@@ -133,7 +134,7 @@ export component LengthEdit inherits Rectangle {
             if icon.width > 0: Image {
                 width: 12px;
                 image-fit: contain;
-                colorize: edt.color;
+                colorize: enabled ? Palette.foreground : #909090;
                 source: icon;
                 accessible-role: none;
             }
@@ -144,6 +145,15 @@ export component LengthEdit inherits Rectangle {
                 single-line: true;
                 horizontal-alignment: right;
                 vertical-alignment: center;
+                color: {
+                    if !enabled {
+                        #909090
+                    } else if auto-supported && auto-checked {
+                        #a0a0a0
+                    } else {
+                        Palette.foreground
+                    }
+                };
                 selection-background-color: Constants.librepcb-color;
                 selection-foreground-color: black;
                 enabled: enabled;
@@ -199,6 +209,9 @@ export component LengthEdit inherits Rectangle {
                     } else if (event.text == Key.PageDown) && can-change-unit {
                         disable-update = false;
                         unit-changed(Helpers.get-next-unit(unit));
+                        return accept;
+                    } else if (event.text == "a") && auto-supported {
+                        auto-toggled(!auto-checked);
                         return accept;
                     } else if (event.text == Key.Escape) && disable-update {
                         disable-update = false;
@@ -261,8 +274,8 @@ export component LengthEdit inherits Rectangle {
                         width: self.preferred-width + 10px;
                         horizontal-alignment: center;
                         vertical-alignment: center;
-                        text-color: edt.color;
-                        text-color-disabled: edt.color;
+                        text-color: Palette.foreground;
+                        text-color-disabled: #909090;
                         text: Helpers.get-unit-short-str(root.unit);
                         enabled: can-change-unit;
 

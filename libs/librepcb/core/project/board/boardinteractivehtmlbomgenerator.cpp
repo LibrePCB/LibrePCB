@@ -199,7 +199,7 @@ std::shared_ptr<InteractiveHtmlBom> BoardInteractiveHtmlBomGenerator::generate(
       if (via->getVia().isOnLayer(Layer::botCopper())) {
         layers.insert(InteractiveHtmlBom::Layer::Bottom);
       }
-      ibom->addVia(layers, via->getVia().getPosition(), via->getSize(),
+      ibom->addVia(layers, via->getVia().getPosition(), via->getActualSize(),
                    via->getDrillDiameter(), netName);
     }
   }

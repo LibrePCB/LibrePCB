@@ -83,12 +83,11 @@ void SceneData3D::addStroke(const Layer& layer, const QVector<Path>& paths,
 }
 
 void SceneData3D::addVia(
-    const Point& position, const PositiveLength& size,
-    const PositiveLength& drillDiameter, const Layer& startLayer,
-    const Layer& endLayer,
+    const Point& position, const PositiveLength& drillDiameter,
+    const PositiveLength& size, const Layer& startLayer, const Layer& endLayer,
     const std::optional<PositiveLength>& stopMaskDiameterTop,
     const std::optional<PositiveLength>& stopMaskDiameterBottom) noexcept {
-  mVias.append(ViaData{position, size, drillDiameter, &startLayer, &endLayer,
+  mVias.append(ViaData{position, drillDiameter, size, &startLayer, &endLayer,
                        stopMaskDiameterTop, stopMaskDiameterBottom});
 }
 

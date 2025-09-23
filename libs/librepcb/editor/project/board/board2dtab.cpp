@@ -465,20 +465,25 @@ void Board2dTab::setDerivedUiData(const ui::Board2dTabData& data) noexcept {
   // Tool line width
   mToolLineWidth.setUiData(data.tool_line_width);
 
-  // Tool drill
-  // Note: We set the drill before (via) size to let the FSM decrease the
-  // drill if size is set to a smaller value. This clipping does
-  // not work in both directions yet because we don't know if the user edited
-  // the drill or size.
-  mToolDrill.setUiData(data.tool_drill);
-
   // Tool size
   mToolSize.setUiData(data.tool_size);
+
+  // Tool via size
+  // Note: We set the via size before (via) drill to let the FSM increase the
+  // size if drill is set to a larger value. This clipping does not work in both
+  //  directions yet because we don't know if the user edited the drill or size.
+  const Length size = mToolSize.getValue();
+  emit viaSizeRequested(((size > 0) && (!data.tool_mirrored))
+                            ? std::make_optional(PositiveLength(size))
+                            : std::nullopt);
+
+  // Tool drill
+  mToolDrill.setUiData(data.tool_drill);
 
   // Tool filled / auto-width
   emit filledRequested(data.tool_filled);
 
-  // Tool mirrored
+  // Tool mirrored / auto-size
   emit mirroredRequested(data.tool_mirrored);
 
   // Tool value
@@ -1194,16 +1199,6 @@ void Board2dTab::fsmToolEnter(BoardEditorState_DrawTrace& state) noexcept {
   mFsmStateConnections.append(connect(this, &Board2dTab::layerRequested, &state,
                                       &BoardEditorState_DrawTrace::setLayer));
 
-  // Via size
-  mToolSize.configure(state.getViaSize(), LengthEditContext::Steps::generic(),
-                      "board_editor/add_via/size");  // From via tool.
-  mFsmStateConnections.append(
-      connect(&state, &BoardEditorState_DrawTrace::viaSizeChanged, &mToolSize,
-              &LengthEditContext::setValuePositive));
-  mFsmStateConnections.append(
-      connect(&mToolSize, &LengthEditContext::valueChangedPositive, &state,
-              &BoardEditorState_DrawTrace::setViaSize));
-
   // Via drill
   mToolDrill.configure(state.getViaDrillDiameter(),
                        LengthEditContext::Steps::drillDiameter(),
@@ -1215,21 +1210,26 @@ void Board2dTab::fsmToolEnter(BoardEditorState_DrawTrace& state) noexcept {
       connect(&mToolDrill, &LengthEditContext::valueChangedPositive, &state,
               &BoardEditorState_DrawTrace::setViaDrillDiameter));
 
+  // Via size
+  mToolSize.configure(state.getViaSize(), LengthEditContext::Steps::generic(),
+                      "board_editor/add_via/size");  // From via tool.
+  auto setViaSize = [this](bool autoSize, const PositiveLength& size) {
+    mToolSize.setValuePositive(size);
+    mToolMirrored = autoSize;
+    onDerivedUiDataChanged.notify();
+  };
+  setViaSize(state.getUseAutoViaSize(), state.getViaSize());
+  mFsmStateConnections.append(connect(
+      &state, &BoardEditorState_DrawTrace::viaSizeChanged, this, setViaSize));
+  mFsmStateConnections.append(connect(this, &Board2dTab::viaSizeRequested,
+                                      &state,
+                                      &BoardEditorState_DrawTrace::setViaSize));
+
   onDerivedUiDataChanged.notify();
 }
 
 void Board2dTab::fsmToolEnter(BoardEditorState_AddVia& state) noexcept {
   mTool = ui::EditorTool::Via;
-
-  // Via size
-  mToolSize.configure(state.getSize(), LengthEditContext::Steps::generic(),
-                      "board_editor/add_via/size");
-  mFsmStateConnections.append(
-      connect(&state, &BoardEditorState_AddVia::sizeChanged, &mToolSize,
-              &LengthEditContext::setValuePositive));
-  mFsmStateConnections.append(
-      connect(&mToolSize, &LengthEditContext::valueChangedPositive, &state,
-              &BoardEditorState_AddVia::setSize));
 
   // Via drill
   mToolDrill.configure(state.getDrillDiameter(),
@@ -1241,6 +1241,21 @@ void Board2dTab::fsmToolEnter(BoardEditorState_AddVia& state) noexcept {
   mFsmStateConnections.append(
       connect(&mToolDrill, &LengthEditContext::valueChangedPositive, &state,
               &BoardEditorState_AddVia::setDrillDiameter));
+
+  // Via size
+  mToolSize.configure(state.getSize(), LengthEditContext::Steps::generic(),
+                      "board_editor/add_via/size");
+  auto setViaSize = [this](bool autoSize, const PositiveLength& size) {
+    mToolSize.setValuePositive(size);
+    mToolMirrored = autoSize;
+    onDerivedUiDataChanged.notify();
+  };
+  setViaSize(state.getUseAutoSize(), state.getSize());
+  mFsmStateConnections.append(
+      connect(&state, &BoardEditorState_AddVia::sizeChanged, this, setViaSize));
+  mFsmStateConnections.append(connect(this, &Board2dTab::viaSizeRequested,
+                                      &state,
+                                      &BoardEditorState_AddVia::setSize));
 
   // Nets
   mToolNetsQt.clear();

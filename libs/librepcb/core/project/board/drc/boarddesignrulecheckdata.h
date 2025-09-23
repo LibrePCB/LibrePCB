@@ -61,8 +61,8 @@ struct BoardDesignRuleCheckData final {
   struct Via {
     Uuid uuid;
     Point position;
-    PositiveLength size;
     PositiveLength drillDiameter;
+    PositiveLength size;
     // Only filled with the layers of traces directly connected to the via.
     QSet<const Layer*> connectedLayers;
     const Layer* startLayer;

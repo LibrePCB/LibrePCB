@@ -24,6 +24,7 @@
 
 #include "../fileio/transactionaldirectory.h"
 #include "../fileio/versionfile.h"
+#include "../types/length.h"
 #include "sexpression.h"
 
 #include <QtCore>
@@ -435,6 +436,21 @@ void FileFormatMigrationV1::upgradeBoard(SExpression& root) {
   // Devices
   for (SExpression* devNode : root.getChildren("device")) {
     devNode->appendChild("glue", SExpression::createToken("true"));
+  }
+
+  // Net segments
+  for (SExpression* devNode : root.getChildren("netsegment")) {
+    // Vias
+    for (SExpression* viaNode : devNode->getChildren("via")) {
+      SExpression& drillNode = viaNode->getChild("drill/@0");
+      SExpression& sizeNode = viaNode->getChild("size/@0");
+      const PositiveLength drill = deserialize<PositiveLength>(drillNode);
+      const PositiveLength size = deserialize<PositiveLength>(sizeNode);
+      if (size < drill) {
+        // No longer valid in LibrePCB 2.0!
+        sizeNode.setValue(drillNode.getValue());
+      }
+    }
   }
 }
 

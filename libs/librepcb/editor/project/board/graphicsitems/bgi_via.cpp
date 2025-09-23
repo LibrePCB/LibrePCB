@@ -126,7 +126,7 @@ void BGI_Via::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
     // Draw copper layers of blind or buried via.
     if (!mBlindBuriedCopperLayers.isEmpty()) {
       const qreal innerRadius = mVia.getDrillDiameter()->toPx() / 2;
-      const qreal outerRadius = mVia.getSize()->toPx() / 2;
+      const qreal outerRadius = mVia.getActualSize()->toPx() / 2;
       const qreal lineRadius = (innerRadius + outerRadius) / 2;
       const qreal lineWidth = (outerRadius - innerRadius) / 4;
       const QRectF rect(-lineRadius, -lineRadius, lineRadius * 2,
@@ -177,10 +177,10 @@ void BGI_Via::viaEdited(const BI_Via& obj, BI_Via::Event event) noexcept {
     case BI_Via::Event::PositionChanged:
       updatePosition();
       break;
-    case BI_Via::Event::SizeChanged:
+    case BI_Via::Event::ActualSizeChanged:
       updateTextHeight();
       // fallthrough
-    case BI_Via::Event::DrillDiameterChanged:
+    case BI_Via::Event::DrillOrSizeChanged:
     case BI_Via::Event::StopMaskDiametersChanged:
       updateShapes();
       break;
@@ -223,8 +223,9 @@ void BGI_Via::updatePosition() noexcept {
 void BGI_Via::updateShapes() noexcept {
   prepareGeometryChange();
 
-  mShape = mVia.getVia().getOutline().toQPainterPathPx();
-  mCopper = mVia.getVia().toQPainterPathPx();
+  mShape = Path::circle(mVia.getActualSize()).toQPainterPathPx();
+  mCopper =
+      Via::toQPainterPathPx(mVia.getDrillDiameter(), mVia.getActualSize());
   if (auto diameter = mVia.getStopMaskDiameterBottom()) {
     mStopMaskBottom = Path::circle(*diameter).toQPainterPathPx();
   } else {
@@ -274,7 +275,7 @@ void BGI_Via::updateText() noexcept {
 }
 
 void BGI_Via::updateTextHeight() noexcept {
-  const qreal viaSize = mVia.getSize()->toPx();
+  const qreal viaSize = mVia.getActualSize()->toPx();
   const QRectF textRect = mTextGraphicsItem->boundingRect();
   const qreal textSize = std::max(textRect.width(), textRect.height());
   if (textSize > 0) {

@@ -742,7 +742,6 @@ void EagleProjectImport::importBoard(Project& project,
   };
 
   // Design rules
-  UnsignedLength minViaAnnularWidth(0);
   try {
     BoardDesignRules r = board->getDesignRules();
     r.setPadCmpSideAutoAnnularRing(false);  // Not sure if EAGLE supports this.
@@ -769,7 +768,11 @@ void EagleProjectImport::importBoard(Project& project,
     if (auto v =
             tryGetDrcRatio("rvViaOuter", "rlMinViaOuter", "rlMaxViaOuter")) {
       r.setViaAnnularRing(*v);
-      minViaAnnularWidth = v->getMinValue();
+    } else {
+      log.warning(
+          "Design rules for via annular rings were missing, thus the automatic "
+          "size of some vias may be wrong. Please check & correct the via "
+          "design rules manually.");
     }
     if (auto v =
             tryGetDrcRatio("mvStopFrame", "mlMinStopFrame", "mlMaxStopFrame")) {
@@ -1063,8 +1066,17 @@ void EagleProjectImport::importBoard(Project& project,
         }
         const PositiveLength drillDiameter(
             C::convertLength(eagleVia.getDrill()));
-        const Length size = std::max(C::convertLength(eagleVia.getDiameter()),
-                                     drillDiameter + minViaAnnularWidth * 2);
+        const Length sizeRaw = C::convertLength(eagleVia.getDiameter());
+        std::optional<PositiveLength> size;
+        if (sizeRaw >= *drillDiameter) {
+          size = PositiveLength(sizeRaw);
+        } else if (size != 0) {
+          log.warning(
+              "Via size smaller than drill diameter, using automatic size "
+              "instead.");
+        } else {
+          // Automatic size from design rules.
+        }
         const MaskConfig stopMaskConfig = eagleVia.getAlwaysStop()
             ? MaskConfig::automatic()
             : MaskConfig::off();
@@ -1074,8 +1086,8 @@ void EagleProjectImport::importBoard(Project& project,
                  "circular."));
         }
         const Via via(Uuid::createRandom(), *startLayer, *endLayer,
-                      C::convertPoint(eagleVia.getPosition()),
-                      PositiveLength(size), drillDiameter, stopMaskConfig);
+                      C::convertPoint(eagleVia.getPosition()), drillDiameter,
+                      size, stopMaskConfig);
         splitter.addVia(via, false);
         const TraceAnchor viaAnchor = TraceAnchor::via(via.getUuid());
         anchorMap.insert(std::make_pair(nullptr, via.getPosition()), viaAnchor);
