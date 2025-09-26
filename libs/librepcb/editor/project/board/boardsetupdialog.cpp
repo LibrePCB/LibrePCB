@@ -100,6 +100,9 @@ BoardSetupDialog::BoardSetupDialog(Board& board, UndoStack& undoStack,
   mUi->edtDefaultTraceWidth->configure(
       mBoard.getGridUnit(), LengthEditBase::Steps::generic(),
       sSettingsPrefix % "/default_trace_width");
+  mUi->edtDefaultViaDrill->configure(mBoard.getGridUnit(),
+                                     LengthEditBase::Steps::drillDiameter(),
+                                     sSettingsPrefix % "/default_via_drill");
   mUi->edtRulesStopMaskClrRatio->setSingleStep(5.0);  // [%]
   mUi->edtRulesStopMaskClrMin->configure(
       mBoard.getGridUnit(), LengthEditBase::Steps::generic(),
@@ -304,6 +307,7 @@ void BoardSetupDialog::load() noexcept {
   // Tab: Design Rules
   const BoardDesignRules& r = mBoard.getDesignRules();
   mUi->edtDefaultTraceWidth->setValue(r.getDefaultTraceWidth());
+  mUi->edtDefaultViaDrill->setValue(r.getDefaultViaDrillDiameter());
   mUi->edtRulesStopMaskClrRatio->setValue(r.getStopMaskClearance().getRatio());
   mUi->edtRulesStopMaskClrMin->setValue(r.getStopMaskClearance().getMinValue());
   mUi->edtRulesStopMaskClrMax->setValue(r.getStopMaskClearance().getMaxValue());
@@ -397,6 +401,7 @@ bool BoardSetupDialog::apply() noexcept {
     // Tab: Design Rules
     BoardDesignRules r = mBoard.getDesignRules();
     r.setDefaultTraceWidth(mUi->edtDefaultTraceWidth->getValue());
+    r.setDefaultViaDrillDiameter(mUi->edtDefaultViaDrill->getValue());
     r.setStopMaskClearance(BoundedUnsignedRatio(
         mUi->edtRulesStopMaskClrRatio->getValue(),
         mUi->edtRulesStopMaskClrMin->getValue(),

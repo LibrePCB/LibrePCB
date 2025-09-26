@@ -73,14 +73,15 @@ BoardEditorState_DrawTrace::BoardEditorState_DrawTrace(
     mCurrentLayer(&Layer::topCopper()),
     mAddVia(false),
     mTempVia(nullptr),
-    mCurrentViaProperties(Uuid::createRandom(),  // UUID is not relevant here
-                          Layer::topCopper(),  // Start layer
-                          Layer::botCopper(),  // End layer
-                          Point(),  // Position is not relevant here
-                          PositiveLength(300000),  // Default drill diameter
-                          std::nullopt,  // Auto size
-                          MaskConfig::off()  // Exposure
-                          ),
+    mCurrentViaProperties(
+        Uuid::createRandom(),  // UUID is not relevant here
+        Layer::topCopper(),  // Start layer
+        Layer::botCopper(),  // End layer
+        Point(),  // Position is not relevant here
+        mContext.board.getDesignRules().getDefaultViaDrillDiameter(),  // Drill
+        std::nullopt,  // Auto size
+        MaskConfig::off()  // Exposure
+        ),
     mViaLayer(nullptr),
     mTargetPos(),
     mCursorPos(),
@@ -360,6 +361,47 @@ void BoardEditorState_DrawTrace::setViaDrillDiameter(
   }
 
   updateNetpointPositions();
+}
+
+void BoardEditorState_DrawTrace::saveViaDrillDiameterInBoard() noexcept {
+  try {
+    std::unique_ptr<CmdBoardEdit> cmd(new CmdBoardEdit(mContext.board));
+    BoardDesignRules r = mContext.board.getDesignRules();
+    r.setDefaultViaDrillDiameter(mCurrentViaProperties.getDrillDiameter());
+    cmd->setDesignRules(r);
+    if (mSubState == SubState::SubState_Idle) {
+      mContext.undoStack.execCmd(cmd.release());
+    } else {
+      // TODO: This is ugly because the modification will be reverted if the
+      // trace drawing tool is aborted! However, currently there is no clean
+      // way to apply the new value while the trace drawing tool is active :-(
+      mContext.undoStack.appendToCmdGroup(cmd.release());
+    }
+  } catch (const Exception& e) {
+    QMessageBox::critical(qApp->activeWindow(), "Error", e.getMsg());
+  }
+}
+
+void BoardEditorState_DrawTrace::saveViaDrillDiameterInNetClass() noexcept {
+  NetSignal* netSignal =
+      mCurrentNetSegment ? mCurrentNetSegment->getNetSignal() : nullptr;
+  if (!netSignal) return;
+
+  try {
+    std::unique_ptr<CmdNetClassEdit> cmd(
+        new CmdNetClassEdit(netSignal->getNetClass()));
+    cmd->setDefaultViaDrill(mCurrentViaProperties.getDrillDiameter());
+    if (mSubState == SubState::SubState_Idle) {
+      mContext.undoStack.execCmd(cmd.release());
+    } else {
+      // TODO: This is ugly because the modification will be reverted if the
+      // trace drawing tool is aborted! However, currently there is no clean
+      // way to apply the new value while the trace drawing tool is active :-(
+      mContext.undoStack.appendToCmdGroup(cmd.release());
+    }
+  } catch (const Exception& e) {
+    QMessageBox::critical(qApp->activeWindow(), "Error", e.getMsg());
+  }
 }
 
 PositiveLength BoardEditorState_DrawTrace::getViaSize() const noexcept {

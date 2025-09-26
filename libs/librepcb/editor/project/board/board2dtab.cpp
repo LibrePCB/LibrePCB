@@ -940,6 +940,14 @@ void Board2dTab::trigger(ui::TabAction a) noexcept {
       emit saveTraceWidthInNetClassRequested();
       break;
     }
+    case ui::TabAction::ToolbarViaDrillSaveInBoard: {
+      emit saveViaDrillInBoardRequested();
+      break;
+    }
+    case ui::TabAction::ToolbarViaDrillSaveInNetclass: {
+      emit saveViaDrillInNetClassRequested();
+      break;
+    }
     default: {
       WindowTab::trigger(a);
       break;
@@ -1234,6 +1242,12 @@ void Board2dTab::fsmToolEnter(BoardEditorState_DrawTrace& state) noexcept {
   mFsmStateConnections.append(
       connect(&mToolDrill, &LengthEditContext::valueChangedPositive, &state,
               &BoardEditorState_DrawTrace::setViaDrillDiameter));
+  mFsmStateConnections.append(
+      connect(this, &Board2dTab::saveViaDrillInBoardRequested, &state,
+              &BoardEditorState_DrawTrace::saveDrillInBoard));
+  mFsmStateConnections.append(
+      connect(this, &Board2dTab::saveViaDrillInNetClassRequested, &state,
+              &BoardEditorState_DrawTrace::saveDrillInNetClass));
 
   // Via size
   mToolSize.configure(state.getViaSize(), LengthEditContext::Steps::generic(),
@@ -1266,6 +1280,12 @@ void Board2dTab::fsmToolEnter(BoardEditorState_AddVia& state) noexcept {
   mFsmStateConnections.append(
       connect(&mToolDrill, &LengthEditContext::valueChangedPositive, &state,
               &BoardEditorState_AddVia::setDrillDiameter));
+  mFsmStateConnections.append(
+      connect(this, &Board2dTab::saveViaDrillInBoardRequested, &state,
+              &BoardEditorState_AddVia::saveDrillDiameterInBoard));
+  mFsmStateConnections.append(
+      connect(this, &Board2dTab::saveViaDrillInNetClassRequested, &state,
+              &BoardEditorState_AddVia::saveDrillDiameterInNetClass));
 
   // Via size
   mToolSize.configure(state.getSize(), LengthEditContext::Steps::generic(),

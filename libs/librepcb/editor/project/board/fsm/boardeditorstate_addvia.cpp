@@ -66,14 +66,15 @@ BoardEditorState_AddVia::BoardEditorState_AddVia(
     const Context& context) noexcept
   : BoardEditorState(context),
     mIsUndoCmdActive(false),
-    mCurrentProperties(Uuid::createRandom(),  // UUID is not relevant here
-                       Layer::topCopper(),  // Start layer
-                       Layer::botCopper(),  // End layer
-                       Point(),  // Position is not relevant here
-                       PositiveLength(300000),  // Default drill diameter
-                       std::nullopt,  // Auto size
-                       MaskConfig::off()  // Exposure
-                       ),
+    mCurrentProperties(
+        Uuid::createRandom(),  // UUID is not relevant here
+        Layer::topCopper(),  // Start layer
+        Layer::botCopper(),  // End layer
+        Point(),  // Position is not relevant here
+        mContext.board.getDesignRules().getDefaultViaDrillDiameter(),  // Drill
+        std::nullopt,  // Auto size
+        MaskConfig::off()  // Exposure
+        ),
     mUseAutoNetSignal(true),
     mCurrentNetSignal(std::nullopt),
     mClosestNetSignalIsUpToDate(false),

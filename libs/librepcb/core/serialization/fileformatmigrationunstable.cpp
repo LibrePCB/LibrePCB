@@ -145,6 +145,8 @@ void FileFormatMigrationUnstable::upgradeCircuit(SExpression& root,
   for (SExpression* classNode : root.getChildren("netclass")) {
     classNode->appendChild("default_trace_width",
                            SExpression::createToken("inherit"));
+    classNode->appendChild("default_via_drill",
+                           SExpression::createToken("inherit"));
   }
 }
 
@@ -154,6 +156,7 @@ void FileFormatMigrationUnstable::upgradeBoard(SExpression& root) {
     SExpression& rulesNode = root.getChild("design_rules");
     rulesNode.appendChild("default_trace_width",
                           SExpression::createToken("0.5"));
+    rulesNode.appendChild("default_via_drill", SExpression::createToken("0.3"));
   }
 
   // Devices

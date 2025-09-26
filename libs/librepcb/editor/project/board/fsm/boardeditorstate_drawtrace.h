@@ -112,6 +112,8 @@ public:
     return mCurrentViaProperties.getDrillDiameter();
   }
   void setViaDrillDiameter(const PositiveLength& diameter) noexcept;
+  void saveViaDrillDiameterInBoard() noexcept;
+  void saveViaDrillDiameterInNetClass() noexcept;
   bool getUseAutoViaSize() const noexcept {
     return !mCurrentViaProperties.getSize().has_value();
   }

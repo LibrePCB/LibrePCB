@@ -193,6 +193,8 @@ signals:
   void zoneRuleRequested(Zone::Rule rule, bool enable);
   void saveTraceWidthInBoardRequested();
   void saveTraceWidthInNetClassRequested();
+  void saveViaDrillInBoardRequested();
+  void saveViaDrillInNetClassRequested();
 
 private:
   void updateEnabledCopperLayers() noexcept;
