@@ -202,7 +202,9 @@ public:
     std::optional<CircuitIdentifier> netSignalName;
     Path outline;
     UnsignedLength minWidth;
-    UnsignedLength minClearance;
+    UnsignedLength minClearanceToCopper;
+    UnsignedLength minClearanceToBoard;
+    UnsignedLength minClearanceToNpth;
     bool keepIslands;
     int priority;
     BI_Plane::ConnectStyle connectStyle;
@@ -214,15 +216,20 @@ public:
     Plane(const Uuid& uuid, const Layer& layer,
           const std::optional<CircuitIdentifier>& netSignalName,
           const Path& outline, const UnsignedLength& minWidth,
-          const UnsignedLength& minClearance, bool keepIslands, int priority,
-          BI_Plane::ConnectStyle connectStyle, const PositiveLength& thermalGap,
+          const UnsignedLength& minClearanceToCopper,
+          const UnsignedLength& minClearanceToBoard,
+          const UnsignedLength& minClearanceToNpth, bool keepIslands,
+          int priority, BI_Plane::ConnectStyle connectStyle,
+          const PositiveLength& thermalGap,
           const PositiveLength& thermalSpokeWidth, bool locked)
       : uuid(uuid),
         layer(&layer),
         netSignalName(netSignalName),
         outline(outline),
         minWidth(minWidth),
-        minClearance(minClearance),
+        minClearanceToCopper(minClearanceToCopper),
+        minClearanceToBoard(minClearanceToBoard),
+        minClearanceToNpth(minClearanceToNpth),
         keepIslands(keepIslands),
         priority(priority),
         connectStyle(connectStyle),
@@ -238,8 +245,12 @@ public:
             node.getChild("net/@0"))),
         outline(node),
         minWidth(deserialize<UnsignedLength>(node.getChild("min_width/@0"))),
-        minClearance(
-            deserialize<UnsignedLength>(node.getChild("min_clearance/@0"))),
+        minClearanceToCopper(deserialize<UnsignedLength>(
+            node.getChild("min_copper_clearance/@0"))),
+        minClearanceToBoard(deserialize<UnsignedLength>(
+            node.getChild("min_board_clearance/@0"))),
+        minClearanceToNpth(deserialize<UnsignedLength>(
+            node.getChild("min_npth_clearance/@0"))),
         keepIslands(deserialize<bool>(node.getChild("keep_islands/@0"))),
         priority(deserialize<int>(node.getChild("priority/@0"))),
         connectStyle(deserialize<BI_Plane::ConnectStyle>(
@@ -257,13 +268,16 @@ public:
       root.ensureLineBreak();
       root.appendChild("net", netSignalName);
       root.appendChild("priority", priority);
-      root.ensureLineBreak();
       root.appendChild("min_width", minWidth);
-      root.appendChild("min_clearance", minClearance);
+      root.ensureLineBreak();
+      root.appendChild("min_copper_clearance", minClearanceToCopper);
+      root.appendChild("min_board_clearance", minClearanceToBoard);
+      root.appendChild("min_npth_clearance", minClearanceToNpth);
+      root.ensureLineBreak();
+      root.appendChild("connect_style", connectStyle);
       root.appendChild("thermal_gap", thermalGap);
       root.appendChild("thermal_spoke", thermalSpokeWidth);
       root.ensureLineBreak();
-      root.appendChild("connect_style", connectStyle);
       root.appendChild("keep_islands", keepIslands);
       root.appendChild("lock", locked);
       root.ensureLineBreak();
@@ -274,7 +288,10 @@ public:
     bool operator!=(const Plane& rhs) noexcept {
       return (uuid != rhs.uuid) || (layer != rhs.layer) ||
           (netSignalName != rhs.netSignalName) || (outline != rhs.outline) ||
-          (minWidth != rhs.minWidth) || (minClearance != rhs.minClearance) ||
+          (minWidth != rhs.minWidth) ||
+          (minClearanceToCopper != rhs.minClearanceToCopper) ||
+          (minClearanceToBoard != rhs.minClearanceToBoard) ||
+          (minClearanceToNpth != rhs.minClearanceToNpth) ||
           (keepIslands != rhs.keepIslands) || (priority != rhs.priority) ||
           (connectStyle != rhs.connectStyle) ||
           (thermalGap != rhs.thermalGap) ||

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>478</height>
+    <height>544</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <item>
     <layout class="QFormLayout" name="formLayout">
      <property name="fieldGrowthPolicy">
-      <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+      <enum>QFormLayout::FieldGrowthPolicy::AllNonFixedFieldsGrow</enum>
      </property>
      <item row="0" column="0">
       <widget class="QLabel" name="label_4">
@@ -46,31 +46,31 @@
      <item row="3" column="0">
       <widget class="QLabel" name="label_3">
        <property name="text">
-        <string>Min. Clearance:</string>
+        <string>Min. Copper Clearance:</string>
        </property>
       </widget>
      </item>
-     <item row="4" column="0">
+     <item row="6" column="0">
       <widget class="QLabel" name="label_2">
        <property name="text">
         <string>Priority:</string>
        </property>
       </widget>
      </item>
-     <item row="4" column="1">
+     <item row="6" column="1">
       <widget class="QSpinBox" name="spbPriority"/>
      </item>
-     <item row="5" column="0">
+     <item row="7" column="0">
       <widget class="QLabel" name="label_5">
        <property name="text">
         <string>Connect Style:</string>
        </property>
       </widget>
      </item>
-     <item row="5" column="1">
+     <item row="7" column="1">
       <widget class="QComboBox" name="cbxConnectStyle"/>
      </item>
-     <item row="8" column="0">
+     <item row="10" column="0">
       <widget class="QLabel" name="label_6">
        <property name="text">
         <string>Options:</string>
@@ -81,9 +81,9 @@
       <widget class="librepcb::editor::UnsignedLengthEdit" name="edtMinWidth" native="true"/>
      </item>
      <item row="3" column="1">
-      <widget class="librepcb::editor::UnsignedLengthEdit" name="edtMinClearance" native="true"/>
+      <widget class="librepcb::editor::UnsignedLengthEdit" name="edtMinClearanceToCopper" native="true"/>
      </item>
-     <item row="8" column="1">
+     <item row="10" column="1">
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
         <widget class="QCheckBox" name="cbKeepIslands">
@@ -104,7 +104,7 @@
        </item>
       </layout>
      </item>
-     <item row="6" column="0">
+     <item row="8" column="0">
       <widget class="QLabel" name="label_8">
        <property name="toolTip">
         <string>Clearance around thermal pads</string>
@@ -114,7 +114,7 @@
        </property>
       </widget>
      </item>
-     <item row="7" column="0">
+     <item row="9" column="0">
       <widget class="QLabel" name="label_9">
        <property name="toolTip">
         <string>Width of the thermal pad spokes</string>
@@ -124,14 +124,34 @@
        </property>
       </widget>
      </item>
-     <item row="6" column="1">
+     <item row="8" column="1">
       <widget class="librepcb::editor::PositiveLengthEdit" name="edtThermalGap" native="true"/>
      </item>
-     <item row="7" column="1">
+     <item row="9" column="1">
       <widget class="librepcb::editor::PositiveLengthEdit" name="edtThermalSpokeWidth" native="true"/>
      </item>
      <item row="1" column="1">
       <widget class="librepcb::editor::LayerComboBox" name="cbxLayer" native="true"/>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="label_10">
+       <property name="text">
+        <string>Min. Board Clearance:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="0">
+      <widget class="QLabel" name="label_11">
+       <property name="text">
+        <string>Min. Hole Clearance:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="librepcb::editor::UnsignedLengthEdit" name="edtMinClearanceToBoard" native="true"/>
+     </item>
+     <item row="5" column="1">
+      <widget class="librepcb::editor::UnsignedLengthEdit" name="edtMinClearanceToNpth" native="true"/>
      </item>
     </layout>
    </item>
@@ -148,10 +168,10 @@
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
-      <enum>Qt::Horizontal</enum>
+      <enum>Qt::Orientation::Horizontal</enum>
      </property>
      <property name="standardButtons">
-      <set>QDialogButtonBox::Apply|QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+      <set>QDialogButtonBox::StandardButton::Apply|QDialogButtonBox::StandardButton::Cancel|QDialogButtonBox::StandardButton::Ok</set>
      </property>
     </widget>
    </item>
@@ -186,7 +206,9 @@
  <tabstops>
   <tabstop>cbxNetSignal</tabstop>
   <tabstop>edtMinWidth</tabstop>
-  <tabstop>edtMinClearance</tabstop>
+  <tabstop>edtMinClearanceToCopper</tabstop>
+  <tabstop>edtMinClearanceToBoard</tabstop>
+  <tabstop>edtMinClearanceToNpth</tabstop>
   <tabstop>spbPriority</tabstop>
   <tabstop>cbxConnectStyle</tabstop>
   <tabstop>edtThermalGap</tabstop>

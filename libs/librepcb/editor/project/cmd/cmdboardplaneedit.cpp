@@ -48,8 +48,12 @@ CmdBoardPlaneEdit::CmdBoardPlaneEdit(BI_Plane& plane) noexcept
     mNewNetSignal(mOldNetSignal),
     mOldMinWidth(plane.getMinWidth()),
     mNewMinWidth(mOldMinWidth),
-    mOldMinClearance(plane.getMinClearance()),
-    mNewMinClearance(mOldMinClearance),
+    mOldMinClearanceToCopper(plane.getMinClearanceToCopper()),
+    mNewMinClearanceToCopper(mOldMinClearanceToCopper),
+    mOldMinClearanceToBoard(plane.getMinClearanceToBoard()),
+    mNewMinClearanceToBoard(mOldMinClearanceToBoard),
+    mOldMinClearanceToNpth(plane.getMinClearanceToNpth()),
+    mNewMinClearanceToNpth(mOldMinClearanceToNpth),
     mOldConnectStyle(plane.getConnectStyle()),
     mNewConnectStyle(mOldConnectStyle),
     mOldThermalGap(plane.getThermalGap()),
@@ -123,10 +127,22 @@ void CmdBoardPlaneEdit::setMinWidth(const UnsignedLength& minWidth) noexcept {
   mNewMinWidth = minWidth;
 }
 
-void CmdBoardPlaneEdit::setMinClearance(
+void CmdBoardPlaneEdit::setMinClearanceToCopper(
     const UnsignedLength& minClearance) noexcept {
   Q_ASSERT(!wasEverExecuted());
-  mNewMinClearance = minClearance;
+  mNewMinClearanceToCopper = minClearance;
+}
+
+void CmdBoardPlaneEdit::setMinClearanceToBoard(
+    const UnsignedLength& minClearance) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewMinClearanceToBoard = minClearance;
+}
+
+void CmdBoardPlaneEdit::setMinClearanceToNpth(
+    const UnsignedLength& minClearance) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewMinClearanceToNpth = minClearance;
 }
 
 void CmdBoardPlaneEdit::setConnectStyle(BI_Plane::ConnectStyle style) noexcept {
@@ -170,7 +186,9 @@ bool CmdBoardPlaneEdit::performExecute() {
   if (mNewLayer != mOldLayer) return true;
   if (mNewNetSignal != mOldNetSignal) return true;
   if (mNewMinWidth != mOldMinWidth) return true;
-  if (mNewMinClearance != mOldMinClearance) return true;
+  if (mNewMinClearanceToCopper != mOldMinClearanceToCopper) return true;
+  if (mNewMinClearanceToBoard != mOldMinClearanceToBoard) return true;
+  if (mNewMinClearanceToNpth != mOldMinClearanceToNpth) return true;
   if (mNewConnectStyle != mOldConnectStyle) return true;
   if (mNewThermalGap != mOldThermalGap) return true;
   if (mNewThermalSpokeWidth != mOldThermalSpokeWidth) return true;
@@ -185,7 +203,9 @@ void CmdBoardPlaneEdit::performUndo() {
   mPlane.setOutline(mOldOutline);
   mPlane.setLayer(*mOldLayer);
   mPlane.setMinWidth(mOldMinWidth);
-  mPlane.setMinClearance(mOldMinClearance);
+  mPlane.setMinClearanceToCopper(mOldMinClearanceToCopper);
+  mPlane.setMinClearanceToBoard(mOldMinClearanceToBoard);
+  mPlane.setMinClearanceToNpth(mOldMinClearanceToNpth);
   mPlane.setConnectStyle(mOldConnectStyle);
   mPlane.setThermalGap(mOldThermalGap);
   mPlane.setThermalSpokeWidth(mOldThermalSpokeWidth);
@@ -199,7 +219,9 @@ void CmdBoardPlaneEdit::performRedo() {
   mPlane.setOutline(mNewOutline);
   mPlane.setLayer(*mNewLayer);
   mPlane.setMinWidth(mNewMinWidth);
-  mPlane.setMinClearance(mNewMinClearance);
+  mPlane.setMinClearanceToCopper(mNewMinClearanceToCopper);
+  mPlane.setMinClearanceToBoard(mNewMinClearanceToBoard);
+  mPlane.setMinClearanceToNpth(mNewMinClearanceToNpth);
   mPlane.setConnectStyle(mNewConnectStyle);
   mPlane.setThermalGap(mNewThermalGap);
   mPlane.setThermalSpokeWidth(mNewThermalSpokeWidth);

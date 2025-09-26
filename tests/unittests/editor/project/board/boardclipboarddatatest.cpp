@@ -175,18 +175,18 @@ TEST(BoardClipboardDataTest, testToFromMimeDataPopulated) {
       std::make_shared<BoardClipboardData::Plane>(
           Uuid::createRandom(), Layer::topCopper(), CircuitIdentifier("bar"),
           Path({Vertex(Point(1, 2), Angle(3)), Vertex(Point(4, 5), Angle(6))}),
-          UnsignedLength(1), UnsignedLength(2), false, 0,
-          BI_Plane::ConnectStyle::None, PositiveLength(7), PositiveLength(8),
-          true);
+          UnsignedLength(1), UnsignedLength(2), UnsignedLength(3),
+          UnsignedLength(4), false, 0, BI_Plane::ConnectStyle::None,
+          PositiveLength(7), PositiveLength(8), true);
 
   std::shared_ptr<BoardClipboardData::Plane> plane2 =
       std::make_shared<BoardClipboardData::Plane>(
           Uuid::createRandom(), Layer::botCopper(), CircuitIdentifier("foo"),
           Path({Vertex(Point(10, 20), Angle(30)),
                 Vertex(Point(40, 50), Angle(60))}),
-          UnsignedLength(10), UnsignedLength(20), true, 5,
-          BI_Plane::ConnectStyle::Solid, PositiveLength(70), PositiveLength(80),
-          false);
+          UnsignedLength(10), UnsignedLength(20), UnsignedLength(30),
+          UnsignedLength(40), true, 5, BI_Plane::ConnectStyle::Solid,
+          PositiveLength(70), PositiveLength(80), false);
 
   BoardZoneData zone1(
       Uuid::createRandom(), {&Layer::topCopper()}, Zone::Rule::NoCopper,

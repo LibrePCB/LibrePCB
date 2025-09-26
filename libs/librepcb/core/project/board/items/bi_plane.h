@@ -83,8 +83,14 @@ public:
   const Layer& getLayer() const noexcept { return *mLayer; }
   NetSignal* getNetSignal() const noexcept { return mNetSignal; }
   const UnsignedLength& getMinWidth() const noexcept { return mMinWidth; }
-  const UnsignedLength& getMinClearance() const noexcept {
-    return mMinClearance;
+  const UnsignedLength& getMinClearanceToCopper() const noexcept {
+    return mMinClearanceToCopper;
+  }
+  const UnsignedLength& getMinClearanceToBoard() const noexcept {
+    return mMinClearanceToBoard;
+  }
+  const UnsignedLength& getMinClearanceToNpth() const noexcept {
+    return mMinClearanceToNpth;
   }
   bool getKeepIslands() const noexcept { return mKeepIslands; }
   int getPriority() const noexcept { return mPriority; }
@@ -103,7 +109,9 @@ public:
   void setLayer(const Layer& layer) noexcept;
   void setNetSignal(NetSignal* netsignal);
   void setMinWidth(const UnsignedLength& minWidth) noexcept;
-  void setMinClearance(const UnsignedLength& minClearance) noexcept;
+  void setMinClearanceToCopper(const UnsignedLength& minClearance) noexcept;
+  void setMinClearanceToBoard(const UnsignedLength& minClearance) noexcept;
+  void setMinClearanceToNpth(const UnsignedLength& minClearance) noexcept;
   void setConnectStyle(ConnectStyle style) noexcept;
   void setThermalGap(const PositiveLength& gap) noexcept;
   void setThermalSpokeWidth(const PositiveLength& width) noexcept;
@@ -133,7 +141,9 @@ private:  // Data
   NetSignal* mNetSignal;  ///< Optional (`nullptr` = no net)
   Path mOutline;
   UnsignedLength mMinWidth;
-  UnsignedLength mMinClearance;
+  UnsignedLength mMinClearanceToCopper;
+  UnsignedLength mMinClearanceToBoard;
+  UnsignedLength mMinClearanceToNpth;
   bool mKeepIslands;
   int mPriority;
   ConnectStyle mConnectStyle;

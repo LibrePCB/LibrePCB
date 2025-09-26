@@ -149,7 +149,9 @@ private:  // Methods
     std::optional<Uuid> netSignal;
     Path outline;
     UnsignedLength minWidth;
-    UnsignedLength minClearance;
+    UnsignedLength minClearanceToCopper;
+    std::optional<UnsignedLength> minClearanceToBoard;
+    std::optional<UnsignedLength> minClearanceToNpth;
     bool keepIslands;
     int priority;
     BI_Plane::ConnectStyle connectStyle;

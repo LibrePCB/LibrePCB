@@ -48,13 +48,15 @@ BI_Plane::BI_Plane(Board& board, const Uuid& uuid, const Layer& layer,
     mLayer(&layer),
     mNetSignal(netsignal),
     mOutline(outline),
-    mMinWidth(200000),
-    mMinClearance(300000),
+    mMinWidth(200000),  // 200um
+    mMinClearanceToCopper(250000),  // 250um
+    mMinClearanceToBoard(300000),  // 300um
+    mMinClearanceToNpth(300000),  // 300um
     mKeepIslands(false),
     mPriority(0),
     mConnectStyle(ConnectStyle::ThermalRelief),
-    mThermalGap(300000),
-    mThermalSpokeWidth(300000),
+    mThermalGap(300000),  // 300um
+    mThermalSpokeWidth(300000),  // 300um
     mLocked(false),
     mIsVisible(true),
     mFragments() {
@@ -112,9 +114,26 @@ void BI_Plane::setMinWidth(const UnsignedLength& minWidth) noexcept {
   }
 }
 
-void BI_Plane::setMinClearance(const UnsignedLength& minClearance) noexcept {
-  if (minClearance != mMinClearance) {
-    mMinClearance = minClearance;
+void BI_Plane::setMinClearanceToCopper(
+    const UnsignedLength& minClearance) noexcept {
+  if (minClearance != mMinClearanceToCopper) {
+    mMinClearanceToCopper = minClearance;
+    mBoard.invalidatePlanes(mLayer);
+  }
+}
+
+void BI_Plane::setMinClearanceToBoard(
+    const UnsignedLength& minClearance) noexcept {
+  if (minClearance != mMinClearanceToBoard) {
+    mMinClearanceToBoard = minClearance;
+    mBoard.invalidatePlanes(mLayer);
+  }
+}
+
+void BI_Plane::setMinClearanceToNpth(
+    const UnsignedLength& minClearance) noexcept {
+  if (minClearance != mMinClearanceToNpth) {
+    mMinClearanceToNpth = minClearance;
     mBoard.invalidatePlanes(mLayer);
   }
 }
@@ -218,13 +237,16 @@ void BI_Plane::serialize(SExpression& root) const {
       "net",
       mNetSignal ? std::make_optional(mNetSignal->getUuid()) : std::nullopt);
   root.appendChild("priority", mPriority);
-  root.ensureLineBreak();
   root.appendChild("min_width", mMinWidth);
-  root.appendChild("min_clearance", mMinClearance);
+  root.ensureLineBreak();
+  root.appendChild("min_copper_clearance", mMinClearanceToCopper);
+  root.appendChild("min_board_clearance", mMinClearanceToBoard);
+  root.appendChild("min_npth_clearance", mMinClearanceToNpth);
+  root.ensureLineBreak();
+  root.appendChild("connect_style", mConnectStyle);
   root.appendChild("thermal_gap", mThermalGap);
   root.appendChild("thermal_spoke", mThermalSpokeWidth);
   root.ensureLineBreak();
-  root.appendChild("connect_style", mConnectStyle);
   root.appendChild("keep_islands", mKeepIslands);
   root.appendChild("lock", mLocked);
   root.ensureLineBreak();
