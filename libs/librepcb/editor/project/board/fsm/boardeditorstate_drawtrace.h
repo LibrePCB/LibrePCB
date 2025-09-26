@@ -108,10 +108,9 @@ public:
   void setWidth(const PositiveLength& width) noexcept;
   void saveWidthInBoard() noexcept;
   void saveWidthInNetClass() noexcept;
-  const PositiveLength& getViaDrillDiameter() const noexcept {
-    return mCurrentViaProperties.getDrillDiameter();
-  }
-  void setViaDrillDiameter(const PositiveLength& diameter) noexcept;
+  PositiveLength getViaDrillDiameter() const noexcept;
+  void setViaDrillDiameter(
+      const std::optional<PositiveLength>& diameter) noexcept;
   void saveViaDrillDiameterInBoard() noexcept;
   void saveViaDrillDiameterInNetClass() noexcept;
   bool getUseAutoViaSize() const noexcept {
@@ -130,7 +129,7 @@ signals:
   void layerChanged(const Layer& layer);
   void autoWidthChanged(bool autoWidth);
   void widthChanged(const PositiveLength& width);
-  void viaDrillDiameterChanged(const PositiveLength& diameter);
+  void viaDrillDiameterChanged(bool autoSize, const PositiveLength& diameter);
   void viaSizeChanged(bool autoSize, const PositiveLength& size);
 
 private:

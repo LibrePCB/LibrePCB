@@ -70,6 +70,8 @@
 #include <librepcb/core/project/board/items/bi_plane.h>
 #include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/circuit/componentinstance.h>
+#include <librepcb/core/project/circuit/netclass.h>
+#include <librepcb/core/project/circuit/netsignal.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectattributelookup.h>
 #include <librepcb/core/project/projectlibrary.h>
@@ -1236,18 +1238,18 @@ void Board2dTab::fsmToolEnter(BoardEditorState_DrawTrace& state) noexcept {
   mToolDrill.configure(state.getViaDrillDiameter(),
                        LengthEditContext::Steps::drillDiameter(),
                        "board_editor/add_via/drill");  // From via tool.
-  mFsmStateConnections.append(
-      connect(&state, &BoardEditorState_DrawTrace::viaDrillDiameterChanged,
-              &mToolDrill, &LengthEditContext::setValuePositive));
+  // mFsmStateConnections.append(
+  //     connect(&state, &BoardEditorState_DrawTrace::viaDrillDiameterChanged,
+  //             &mToolDrill, &LengthEditContext::setValuePositive));
   mFsmStateConnections.append(
       connect(&mToolDrill, &LengthEditContext::valueChangedPositive, &state,
               &BoardEditorState_DrawTrace::setViaDrillDiameter));
   mFsmStateConnections.append(
       connect(this, &Board2dTab::saveViaDrillInBoardRequested, &state,
-              &BoardEditorState_DrawTrace::saveDrillInBoard));
+              &BoardEditorState_DrawTrace::saveViaDrillDiameterInBoard));
   mFsmStateConnections.append(
       connect(this, &Board2dTab::saveViaDrillInNetClassRequested, &state,
-              &BoardEditorState_DrawTrace::saveDrillInNetClass));
+              &BoardEditorState_DrawTrace::saveViaDrillDiameterInNetClass));
 
   // Via size
   mToolSize.configure(state.getViaSize(), LengthEditContext::Steps::generic(),
@@ -1274,9 +1276,9 @@ void Board2dTab::fsmToolEnter(BoardEditorState_AddVia& state) noexcept {
   mToolDrill.configure(state.getDrillDiameter(),
                        LengthEditContext::Steps::drillDiameter(),
                        "board_editor/add_via/drill");
-  mFsmStateConnections.append(
-      connect(&state, &BoardEditorState_AddVia::drillDiameterChanged,
-              &mToolDrill, &LengthEditContext::setValuePositive));
+  // mFsmStateConnections.append(
+  //     connect(&state, &BoardEditorState_AddVia::drillDiameterChanged,
+  //             &mToolDrill, &LengthEditContext::setValuePositive));
   mFsmStateConnections.append(
       connect(&mToolDrill, &LengthEditContext::valueChangedPositive, &state,
               &BoardEditorState_AddVia::setDrillDiameter));
@@ -1320,6 +1322,13 @@ void Board2dTab::fsmToolEnter(BoardEditorState_AddVia& state) noexcept {
       mToolNet = std::make_pair(true, std::nullopt);
     } else {
       mToolNet = std::make_pair(false, net);
+    }
+    mToolNetClassName.clear();
+    if (net) {
+      if (const NetSignal* ns =
+              mProject.getCircuit().getNetSignals().value(*net)) {
+        mToolNetClassName = *ns->getNetClass().getName();
+      }
     }
     onDerivedUiDataChanged.notify();
   };

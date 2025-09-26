@@ -170,6 +170,7 @@ void FileFormatMigrationUnstable::upgradeBoard(SExpression& root) {
     for (SExpression* viaNode : devNode->getChildren("via")) {
       SExpression& drillNode = viaNode->getChild("drill/@0");
       SExpression& sizeNode = viaNode->getChild("size/@0");
+      if (sizeNode.getValue() == "auto") continue;
       const PositiveLength drill = deserialize<PositiveLength>(drillNode);
       const PositiveLength size = deserialize<PositiveLength>(sizeNode);
       if (size < drill) {

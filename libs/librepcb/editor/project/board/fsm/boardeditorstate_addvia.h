@@ -74,10 +74,10 @@ public:
       const GraphicsSceneMouseEvent& e) noexcept override;
 
   // Connection to UI
-  const PositiveLength& getDrillDiameter() const noexcept {
-    return mCurrentProperties.getDrillDiameter();
-  }
-  void setDrillDiameter(const PositiveLength& diameter) noexcept;
+  PositiveLength getDrillDiameter() const noexcept;
+  void setDrillDiameter(const std::optional<PositiveLength>& diameter) noexcept;
+  void saveDrillDiameterInBoard() noexcept;
+  void saveDrillDiameterInNetClass() noexcept;
   bool getUseAutoSize() const noexcept {
     return !mCurrentProperties.getSize().has_value();
   }
@@ -93,7 +93,7 @@ public:
       delete;
 
 signals:
-  void drillDiameterChanged(const PositiveLength& diameter);
+  void drillDiameterChanged(bool autoDrill, const PositiveLength& diameter);
   void sizeChanged(bool autoSize, const PositiveLength& size);
   void netChanged(bool autoNet, const std::optional<Uuid>& net);
 

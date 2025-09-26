@@ -77,14 +77,25 @@ BoardViaPropertiesDialog::BoardViaPropertiesDialog(
   connect(mUi->buttonBox, &QDialogButtonBox::clicked, this,
           &BoardViaPropertiesDialog::buttonBoxClicked);
 
-  // Helper to apply the calculated size to the size spinbox.
+  // Helper to apply the calculated drill/size to the spinboxes.
+  auto applyDrillFromDesignRules = [this]() {
+    mUi->edtDrillDiameter->setValue(
+        mVia.getBoard().getDesignRules().getDefaultViaDrillDiameter());
+  };
   auto applySizeFromDesignRules = [this]() {
     mUi->edtSize->setValue(Via::calcSizeFromRules(
         mUi->edtDrillDiameter->getValue(),
         mVia.getBoard().getDesignRules().getViaAnnularRing()));
   };
 
-  // Set up automatic/manual size toggle switch.
+  // Set up automatic/manual drill/size toggle switch.
+  connect(mUi->cbxDrillDiameterFromDesignRules, &QCheckBox::toggled, this,
+          [this, applyDrillFromDesignRules](bool checked) {
+            mUi->edtDrillDiameter->setEnabled(!checked);
+            if (checked) {
+              applyDrillFromDesignRules();
+            }
+          });
   connect(mUi->cbxSizeFromDesignRules, &QCheckBox::toggled, this,
           [this, applySizeFromDesignRules](bool checked) {
             mUi->edtSize->setEnabled(!checked);
@@ -97,7 +108,8 @@ BoardViaPropertiesDialog::BoardViaPropertiesDialog(
   // See https://github.com/LibrePCB/LibrePCB/issues/946.
   connect(mUi->edtSize, &PositiveLengthEdit::valueChanged, this,
           [this](const PositiveLength& value) {
-            if (value < mUi->edtDrillDiameter->getValue()) {
+            if ((!mUi->cbxDrillDiameterFromDesignRules->isChecked()) &&
+                (value < mUi->edtDrillDiameter->getValue())) {
               mUi->edtDrillDiameter->setValue(value);
             }
           });
@@ -118,7 +130,12 @@ BoardViaPropertiesDialog::BoardViaPropertiesDialog(
   mUi->edtPosY->setValue(mVia.getPosition().getY());
 
   // drill diameter spinbox
-  mUi->edtDrillDiameter->setValue(mVia.getDrillDiameter());
+  mUi->cbxDrillDiameterFromDesignRules->setChecked(!mVia.getDrillDiameter());
+  if (const auto& drill = mVia.getDrillDiameter()) {
+    mUi->edtDrillDiameter->setValue(*drill);
+  } else {
+    applyDrillFromDesignRules();
+  }
 
   // size spinbox / checkbox
   mUi->cbxSizeFromDesignRules->setChecked(!mVia.getSize());
@@ -183,11 +200,14 @@ bool BoardViaPropertiesDialog::applyChanges() noexcept {
     std::unique_ptr<CmdBoardViaEdit> cmd(new CmdBoardViaEdit(mVia));
     cmd->setPosition(Point(mUi->edtPosX->getValue(), mUi->edtPosY->getValue()),
                      false);
-    cmd->setDrillAndSize(mUi->edtDrillDiameter->getValue(),
-                         mUi->cbxSizeFromDesignRules->isChecked()
-                             ? std::nullopt
-                             : std::make_optional(mUi->edtSize->getValue()),
-                         false);  // can throw
+    cmd->setDrillAndSize(
+        mUi->cbxDrillDiameterFromDesignRules->isChecked()
+            ? std::nullopt
+            : std::make_optional(mUi->edtDrillDiameter->getValue()),
+        mUi->cbxSizeFromDesignRules->isChecked()
+            ? std::nullopt
+            : std::make_optional(mUi->edtSize->getValue()),
+        false);  // can throw
     const Layer* startLayer = mUi->cbxStartLayer->getCurrentLayer();
     const Layer* endLayer = mUi->cbxEndLayer->getCurrentLayer();
     cmd->setLayers(startLayer ? *startLayer : mVia.getVia().getStartLayer(),

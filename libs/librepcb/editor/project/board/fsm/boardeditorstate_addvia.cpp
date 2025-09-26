@@ -23,6 +23,7 @@
 #include "boardeditorstate_addvia.h"
 
 #include "../../../undostack.h"
+#include "../../cmd/cmdboardedit.h"
 #include "../../cmd/cmdboardnetsegmentadd.h"
 #include "../../cmd/cmdboardnetsegmentaddelements.h"
 #include "../../cmd/cmdboardnetsegmentedit.h"
@@ -31,6 +32,7 @@
 #include "../../cmd/cmdboardsplitnetline.h"
 #include "../../cmd/cmdboardviaedit.h"
 #include "../../cmd/cmdcombineboardnetsegments.h"
+#include "../../cmd/cmdnetclassedit.h"
 #include "../boardgraphicsscene.h"
 #include "../graphicsitems/bgi_netline.h"
 #include "../graphicsitems/bgi_netpoint.h"
@@ -140,18 +142,28 @@ bool BoardEditorState_AddVia::processGraphicsSceneLeftMouseButtonDoubleClicked(
  *  Connection to UI
  ******************************************************************************/
 
+PositiveLength BoardEditorState_AddVia::getDrillDiameter() const noexcept {
+  if (auto drill = mCurrentProperties.getDrillDiameter()) {
+    return *drill;
+  } else {
+    return mContext.board.getDesignRules()
+        .getDefaultViaDrillDiameter();  // TODO
+  }
+}
+
 void BoardEditorState_AddVia::setDrillDiameter(
-    const PositiveLength& diameter) noexcept {
+    const std::optional<PositiveLength>& diameter) noexcept {
   // Avoid creating vias with a drill larger than size.
-  if (mCurrentProperties.getSize() &&
-      (diameter > *mCurrentProperties.getSize())) {
-    setSize(diameter);
+  if (diameter && mCurrentProperties.getSize() &&
+      (*diameter > *mCurrentProperties.getSize())) {
+    setSize(*diameter);
   }
 
   const PositiveLength oldSize = getSize();
   if (mCurrentProperties.setDrillAndSize(diameter,
                                          mCurrentProperties.getSize())) {
-    emit drillDiameterChanged(mCurrentProperties.getDrillDiameter());
+    emit drillDiameterChanged(
+        !mCurrentProperties.getDrillDiameter().has_value(), getDrillDiameter());
   }
 
   if (mCurrentViaEditCmd) {
@@ -165,12 +177,54 @@ void BoardEditorState_AddVia::setDrillDiameter(
   }
 }
 
+void BoardEditorState_AddVia::saveDrillDiameterInBoard() noexcept {
+  try {
+    std::unique_ptr<CmdBoardEdit> cmd(new CmdBoardEdit(mContext.board));
+    BoardDesignRules r = mContext.board.getDesignRules();
+    r.setDefaultViaDrillDiameter(getDrillDiameter());
+    cmd->setDesignRules(r);
+    if (!mIsUndoCmdActive) {
+      mContext.undoStack.execCmd(cmd.release());
+    } else {
+      // TODO: This is ugly because the modification will be reverted if the
+      // trace drawing tool is aborted! However, currently there is no clean
+      // way to apply the new value while the trace drawing tool is active :-(
+      mContext.undoStack.appendToCmdGroup(cmd.release());
+    }
+  } catch (const Exception& e) {
+    QMessageBox::critical(qApp->activeWindow(), "Error", e.getMsg());
+  }
+}
+
+void BoardEditorState_AddVia::saveDrillDiameterInNetClass() noexcept {
+  NetSignal* netSignal = mCurrentNetSignal
+      ? mContext.project.getCircuit().getNetSignals().value(*mCurrentNetSignal)
+      : nullptr;
+  if (!netSignal) return;
+
+  try {
+    std::unique_ptr<CmdNetClassEdit> cmd(
+        new CmdNetClassEdit(netSignal->getNetClass()));
+    cmd->setDefaultViaDrill(mCurrentProperties.getDrillDiameter());
+    if (!mIsUndoCmdActive) {
+      mContext.undoStack.execCmd(cmd.release());
+    } else {
+      // TODO: This is ugly because the modification will be reverted if the
+      // trace drawing tool is aborted! However, currently there is no clean
+      // way to apply the new value while the trace drawing tool is active :-(
+      mContext.undoStack.appendToCmdGroup(cmd.release());
+    }
+  } catch (const Exception& e) {
+    QMessageBox::critical(qApp->activeWindow(), "Error", e.getMsg());
+  }
+}
+
 PositiveLength BoardEditorState_AddVia::getSize() const noexcept {
   if (auto size = mCurrentProperties.getSize()) {
     return *size;
   } else {
     return Via::calcSizeFromRules(
-        mCurrentProperties.getDrillDiameter(),
+        getDrillDiameter(),
         mContext.board.getDesignRules().getViaAnnularRing());
   }
 }

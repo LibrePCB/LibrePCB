@@ -98,9 +98,12 @@ export component DrawTraceToolBar inherits HorizontalLayout {
         icon: @image-url("../../../../../font-awesome/svgs/solid/bore-hole.svg");
         tooltip: @tr("Via Drill Diameter");
         min-width-text: "1.234";
+        auto-supported: true;
+        auto-checked: tabs[section.current-tab-index].tool-filled;
         has-dropdown: true;
 
         value-changed(v) => {
+            tabs[section.current-tab-index].tool-bottom = false;
             tabs[section.current-tab-index].tool-drill.value = v;
         }
 
@@ -109,11 +112,17 @@ export component DrawTraceToolBar inherits HorizontalLayout {
         }
 
         increase-triggered => {
+            tabs[section.current-tab-index].tool-bottom = false;
             tabs[section.current-tab-index].tool-drill.increase = true;
         }
 
         decrease-triggered => {
+            tabs[section.current-tab-index].tool-bottom = false;
             tabs[section.current-tab-index].tool-drill.decrease = true;
+        }
+
+        auto-toggled(checked) => {
+            tabs[section.current-tab-index].tool-bottom = checked;
         }
 
         dropdown-triggered => {
@@ -153,7 +162,7 @@ export component DrawTraceToolBar inherits HorizontalLayout {
         tooltip: @tr("Via Outer Diameter");
         min-width-text: "1.234";
         auto-supported: true;
-        auto-checked: tabs[section.current-tab-index].tool-mirrored;
+        auto-checked: tabs[section.current-tab-index].tool-bottom;
 
         value-changed(v) => {
             tabs[section.current-tab-index].tool-mirrored = false;

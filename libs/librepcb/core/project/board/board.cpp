@@ -265,7 +265,7 @@ std::shared_ptr<SceneData3D> Board::buildScene3D(
       }
     }
     foreach (const BI_Via* via, netSegment->getVias()) {
-      data->addVia(via->getPosition(), via->getDrillDiameter(),
+      data->addVia(via->getPosition(), via->getActualDrillDiameter(),
                    via->getActualSize(), via->getVia().getStartLayer(),
                    via->getVia().getEndLayer(), via->getStopMaskDiameterTop(),
                    via->getStopMaskDiameterBottom());

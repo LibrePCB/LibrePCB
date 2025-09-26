@@ -653,7 +653,7 @@ QString BoardSpecctraExport::getWiringPadStackId(const BI_Via& via) const {
   // Note: Keep in sync with CmdBoardSpecctraImport::extractViaDrillDiameter()
   // and CmdBoardSpecctraImport::extractViaExposureConfig().
   QString s = QString("via-%1-%2")
-                  .arg(via.getDrillDiameter()->toMmString())
+                  .arg(via.getActualDrillDiameter()->toMmString())  // TODO
                   .arg(via.getActualSize()->toMmString());
   if (!via.getSize()) {
     s += "-auto";

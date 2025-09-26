@@ -36,8 +36,7 @@ namespace librepcb {
  *  Non-Member Functions
  ******************************************************************************/
 
-template <>
-inline std::unique_ptr<SExpression> serialize(
+static std::unique_ptr<SExpression> serializeSize(
     const std::optional<PositiveLength>& obj) {
   if (obj) {
     return serialize(*obj);
@@ -46,8 +45,7 @@ inline std::unique_ptr<SExpression> serialize(
   }
 }
 
-template <>
-inline std::optional<PositiveLength> deserialize(const SExpression& node) {
+static std::optional<PositiveLength> deserializeSize(const SExpression& node) {
   if (node.getValue() == QLatin1String("auto")) {
     return std::nullopt;
   } else {
@@ -75,7 +73,8 @@ Via::Via(const Uuid& uuid, const Via& other) noexcept : Via(other) {
 }
 
 Via::Via(const Uuid& uuid, const Layer& startLayer, const Layer& endLayer,
-         const Point& position, const PositiveLength& drillDiameter,
+         const Point& position,
+         const std::optional<PositiveLength>& drillDiameter,
          const std::optional<PositiveLength>& size,
          const MaskConfig& exposureConfig)
   : onEdited(*this),
@@ -98,14 +97,14 @@ Via::Via(const SExpression& node)
     mStartLayer(&deserialize<const Layer&>(node.getChild("from/@0"))),
     mEndLayer(&deserialize<const Layer&>(node.getChild("to/@0"))),
     mPosition(node.getChild("position")),
-    mDrillDiameter(deserialize<PositiveLength>(node.getChild("drill/@0"))),
-    mSize(deserialize<std::optional<PositiveLength>>(node.getChild("size/@0"))),
+    mDrillDiameter(deserializeSize(node.getChild("drill/@0"))),
+    mSize(deserializeSize(node.getChild("size/@0"))),
     mExposureConfig(deserialize<MaskConfig>(node.getChild("exposure/@0"))) {
   if ((!mStartLayer->isCopper()) || (!mEndLayer->isCopper()) ||
       (mStartLayer->getCopperNumber() >= mEndLayer->getCopperNumber())) {
     throw RuntimeError(__FILE__, __LINE__, "Invalid via layer specification.");
   }
-  if (mSize && (*mSize < mDrillDiameter)) {
+  if (mDrillDiameter && mSize && (*mSize < *mDrillDiameter)) {
     throw RuntimeError(__FILE__, __LINE__,
                        "Via drill is larger than via size.");
   }
@@ -186,13 +185,13 @@ bool Via::setPosition(const Point& position) noexcept {
   return true;
 }
 
-bool Via::setDrillAndSize(const PositiveLength& drill,
+bool Via::setDrillAndSize(const std::optional<PositiveLength>& drill,
                           const std::optional<PositiveLength>& size) {
   if ((drill == mDrillDiameter) && (size == mSize)) {
     return false;
   }
 
-  if (size && (*size < drill)) {
+  if (drill && size && (*size < *drill)) {
     throw RuntimeError(__FILE__, __LINE__,
                        "Via drill is larger than via size.");
   }
@@ -223,8 +222,8 @@ void Via::serialize(SExpression& root) const {
   root.appendChild("to", *mEndLayer);
   root.ensureLineBreak();
   mPosition.serialize(root.appendList("position"));
-  root.appendChild("drill", mDrillDiameter);
-  root.appendChild("size", mSize);
+  root.appendChild("drill", serializeSize(mDrillDiameter));
+  root.appendChild("size", serializeSize(mSize));
   root.appendChild("exposure", mExposureConfig);
   root.ensureLineBreak();
 }

@@ -341,18 +341,30 @@ void BoardEditorState_DrawTrace::saveWidthInNetClass() noexcept {
   }
 }
 
+PositiveLength BoardEditorState_DrawTrace::getViaDrillDiameter()
+    const noexcept {
+  if (auto drill = mCurrentViaProperties.getDrillDiameter()) {
+    return *drill;
+  } else {
+    return mContext.board.getDesignRules()
+        .getDefaultViaDrillDiameter();  // TODO
+  }
+}
+
 void BoardEditorState_DrawTrace::setViaDrillDiameter(
-    const PositiveLength& diameter) noexcept {
+    const std::optional<PositiveLength>& diameter) noexcept {
   // Avoid creating vias with a drill larger than size.
-  if (mCurrentViaProperties.getSize() &&
-      (diameter > *mCurrentViaProperties.getSize())) {
+  if (diameter && mCurrentViaProperties.getSize() &&
+      (*diameter > *mCurrentViaProperties.getSize())) {
     setViaSize(diameter);
   }
 
   const PositiveLength oldSize = getViaSize();
   if (mCurrentViaProperties.setDrillAndSize(diameter,
                                             mCurrentViaProperties.getSize())) {
-    emit viaDrillDiameterChanged(mCurrentViaProperties.getDrillDiameter());
+    emit viaDrillDiameterChanged(
+        !mCurrentViaProperties.getDrillDiameter().has_value(),
+        getViaDrillDiameter());
   }
 
   const PositiveLength newSize = getViaSize();
@@ -367,7 +379,7 @@ void BoardEditorState_DrawTrace::saveViaDrillDiameterInBoard() noexcept {
   try {
     std::unique_ptr<CmdBoardEdit> cmd(new CmdBoardEdit(mContext.board));
     BoardDesignRules r = mContext.board.getDesignRules();
-    r.setDefaultViaDrillDiameter(mCurrentViaProperties.getDrillDiameter());
+    r.setDefaultViaDrillDiameter(getViaDrillDiameter());
     cmd->setDesignRules(r);
     if (mSubState == SubState::SubState_Idle) {
       mContext.undoStack.execCmd(cmd.release());
@@ -409,7 +421,7 @@ PositiveLength BoardEditorState_DrawTrace::getViaSize() const noexcept {
     return *size;
   } else {
     return Via::calcSizeFromRules(
-        mCurrentViaProperties.getDrillDiameter(),
+        getViaDrillDiameter(),
         mContext.board.getDesignRules().getViaAnnularRing());
   }
 }

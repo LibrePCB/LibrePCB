@@ -74,19 +74,20 @@ QByteArray BoardD356NetlistExport::generate() const {
       if (via->getVia().isBlind()) {
         gen.blindVia(netName, via->getPosition(), via->getActualSize(),
                      via->getActualSize(), Angle::deg0(),
-                     via->getDrillDiameter(),
+                     via->getActualDrillDiameter(),
                      via->getVia().getStartLayer().getCopperNumber() + 1,
                      via->getVia().getEndLayer().getCopperNumber() + 1,
                      solderMaskCovered);
       } else if (via->getVia().isBuried()) {
-        gen.buriedVia(netName, via->getPosition(), via->getDrillDiameter(),
+        gen.buriedVia(netName, via->getPosition(),
+                      via->getActualDrillDiameter(),
                       via->getVia().getStartLayer().getCopperNumber() + 1,
                       via->getVia().getEndLayer().getCopperNumber() + 1);
       } else {
         Q_ASSERT(via->getVia().isThrough());
         gen.throughVia(netName, via->getPosition(), via->getActualSize(),
                        via->getActualSize(), Angle::deg0(),
-                       via->getDrillDiameter(), solderMaskCovered);
+                       via->getActualDrillDiameter(), solderMaskCovered);
       }
     }
   }

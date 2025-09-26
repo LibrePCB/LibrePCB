@@ -403,7 +403,7 @@ void BoardGerberExport::exportDrillsBlindBuried(
         BoardGerberExport::createExcellonGenerator(
             settings, ExcellonGenerator::Plating::Yes);
     foreach (const BI_Via* via, it.value()) {
-      gen->drill(via->getPosition(), via->getDrillDiameter(), true,
+      gen->drill(via->getPosition(), via->getActualDrillDiameter(), true,
                  ExcellonGenerator::Function::ViaDrill);
     }
     gen->generate();
@@ -656,7 +656,7 @@ int BoardGerberExport::drawPthDrills(ExcellonGenerator& gen) const {
     }
     foreach (const BI_Via* via, netsegment->getVias()) {
       if (via->getVia().isThrough()) {
-        gen.drill(via->getPosition(), via->getDrillDiameter(), true,
+        gen.drill(via->getPosition(), via->getActualDrillDiameter(), true,
                   ExcellonGenerator::Function::ViaDrill);
         ++count;
       }

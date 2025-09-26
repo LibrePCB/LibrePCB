@@ -66,6 +66,12 @@ void CmdNetClassEdit::setDefaultTraceWidth(
   mNewDefaultTraceWidth = value;
 }
 
+void CmdNetClassEdit::setDefaultViaDrill(
+    const std::optional<PositiveLength>& value) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewDefaultViaDrill = value;
+}
+
 /*******************************************************************************
  *  Inherited from UndoCommand
  ******************************************************************************/

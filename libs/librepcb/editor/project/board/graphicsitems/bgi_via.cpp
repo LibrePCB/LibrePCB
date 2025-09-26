@@ -119,13 +119,18 @@ void BGI_Via::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
 
   if (mViaLayer && mViaLayer->isVisible()) {
     // Draw through-hole via.
-    painter->setPen(Qt::NoPen);
-    painter->setBrush(mViaLayer->getColor(highlight));
+    if (mVia.getActualSize() > mVia.getActualDrillDiameter()) {
+      painter->setPen(Qt::NoPen);
+      painter->setBrush(mViaLayer->getColor(highlight));
+    } else {
+      painter->setPen(QPen(mViaLayer->getColor(highlight), 0));
+      painter->setBrush(Qt::NoBrush);
+    }
     painter->drawPath(mCopper);
 
     // Draw copper layers of blind or buried via.
     if (!mBlindBuriedCopperLayers.isEmpty()) {
-      const qreal innerRadius = mVia.getDrillDiameter()->toPx() / 2;
+      const qreal innerRadius = mVia.getActualDrillDiameter()->toPx() / 2;
       const qreal outerRadius = mVia.getActualSize()->toPx() / 2;
       const qreal lineRadius = (innerRadius + outerRadius) / 2;
       const qreal lineWidth = (outerRadius - innerRadius) / 4;
@@ -177,7 +182,7 @@ void BGI_Via::viaEdited(const BI_Via& obj, BI_Via::Event event) noexcept {
     case BI_Via::Event::PositionChanged:
       updatePosition();
       break;
-    case BI_Via::Event::ActualSizeChanged:
+    case BI_Via::Event::ActualDrillOrSizeChanged:
       updateTextHeight();
       // fallthrough
     case BI_Via::Event::DrillOrSizeChanged:
@@ -224,8 +229,12 @@ void BGI_Via::updateShapes() noexcept {
   prepareGeometryChange();
 
   mShape = Path::circle(mVia.getActualSize()).toQPainterPathPx();
-  mCopper =
-      Via::toQPainterPathPx(mVia.getDrillDiameter(), mVia.getActualSize());
+  if (mVia.getActualSize() > mVia.getActualDrillDiameter()) {
+    mCopper = Via::toQPainterPathPx(mVia.getActualDrillDiameter(),
+                                    mVia.getActualSize());
+  } else {
+    mCopper = Path::circle(mVia.getActualDrillDiameter()).toQPainterPathPx();
+  }
   if (auto diameter = mVia.getStopMaskDiameterBottom()) {
     mStopMaskBottom = Path::circle(*diameter).toQPainterPathPx();
   } else {
