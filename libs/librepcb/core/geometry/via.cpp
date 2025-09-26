@@ -37,7 +37,7 @@ namespace librepcb {
  ******************************************************************************/
 
 template <>
-std::unique_ptr<SExpression> serialize(
+inline std::unique_ptr<SExpression> serialize(
     const std::optional<PositiveLength>& obj) {
   if (obj) {
     return serialize(*obj);
@@ -47,7 +47,7 @@ std::unique_ptr<SExpression> serialize(
 }
 
 template <>
-std::optional<PositiveLength> deserialize(const SExpression& node) {
+inline std::optional<PositiveLength> deserialize(const SExpression& node) {
   if (node.getValue() == QLatin1String("auto")) {
     return std::nullopt;
   } else {

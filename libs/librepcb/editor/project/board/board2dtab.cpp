@@ -372,6 +372,7 @@ ui::Board2dTabData Board2dTab::getDerivedUiData() const noexcept {
           mToolNets,  // Items,
           static_cast<int>(mToolNetsQt.indexOf(mToolNet)),  // Current index
       },
+      q2s(mToolNetClassName),  // Tool net class name
       ui::ComboBoxData{
           // Tool layer
           mToolLayers,  // Items
@@ -931,6 +932,14 @@ void Board2dTab::trigger(ui::TabAction a) noexcept {
       mFsm->processMeasure();
       break;
     }
+    case ui::TabAction::ToolbarTraceWidthSaveInBoard: {
+      emit saveTraceWidthInBoardRequested();
+      break;
+    }
+    case ui::TabAction::ToolbarTraceWidthSaveInNetclass: {
+      emit saveTraceWidthInNetClassRequested();
+      break;
+    }
     default: {
       WindowTab::trigger(a);
       break;
@@ -1145,6 +1154,16 @@ void Board2dTab::fsmToolEnter(BoardEditorState_Select& state) noexcept {
 void Board2dTab::fsmToolEnter(BoardEditorState_DrawTrace& state) noexcept {
   mTool = ui::EditorTool::Wire;
 
+  // Net class name
+  auto setNetClassName = [this](const QString& name) {
+    mToolNetClassName = name;
+    onDerivedUiDataChanged.notify();
+  };
+  setNetClassName(state.getNetClassName());
+  mFsmStateConnections.append(
+      connect(&state, &BoardEditorState_DrawTrace::netClassNameChanged, this,
+              setNetClassName));
+
   // Wire mode
   auto setWireMode = [this](BoardEditorState_DrawTrace::WireMode m) {
     mToolWireMode = m;
@@ -1167,6 +1186,12 @@ void Board2dTab::fsmToolEnter(BoardEditorState_DrawTrace& state) noexcept {
   mFsmStateConnections.append(
       connect(&mToolLineWidth, &LengthEditContext::valueChangedPositive, &state,
               &BoardEditorState_DrawTrace::setWidth));
+  mFsmStateConnections.append(
+      connect(this, &Board2dTab::saveTraceWidthInBoardRequested, &state,
+              &BoardEditorState_DrawTrace::saveWidthInBoard));
+  mFsmStateConnections.append(
+      connect(this, &Board2dTab::saveTraceWidthInNetClassRequested, &state,
+              &BoardEditorState_DrawTrace::saveWidthInNetClass));
 
   // Auto width
   auto setAutoWidth = [this](bool autoWidth) {

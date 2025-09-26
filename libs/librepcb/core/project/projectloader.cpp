@@ -295,9 +295,7 @@ void ProjectLoader::loadCircuit(Project& p) {
 
   // Load net classes.
   foreach (const SExpression* node, root->getChildren("netclass")) {
-    NetClass* netclass =
-        new NetClass(p.getCircuit(), deserialize<Uuid>(node->getChild("@0")),
-                     deserialize<ElementName>(node->getChild("name/@0")));
+    NetClass* netclass = new NetClass(p.getCircuit(), *node);
     p.getCircuit().addNetClass(*netclass);
   }
 

@@ -28,6 +28,7 @@ export component LengthEdit inherits Rectangle {
     in property <bool> can-change-unit: true;
     in property <bool> auto-supported: false;
     in-out property <bool> auto-checked: false;
+    in property <bool> has-dropdown: false;
     in property <bool> enabled: true;
     property <LengthEditParseResult> parse-result;
     property <bool> disable-update: false;
@@ -52,6 +53,7 @@ export component LengthEdit inherits Rectangle {
 
     callback increase-triggered;
     callback decrease-triggered;
+    callback dropdown-triggered;
 
     public function select-all() {
         edt.select-all();
@@ -137,6 +139,18 @@ export component LengthEdit inherits Rectangle {
                 colorize: enabled ? Palette.foreground : #909090;
                 source: icon;
                 accessible-role: none;
+
+                if has-dropdown: Rectangle {
+                    x: (parent.width - self.width) / 2;
+                    y: parent.height - self.height;
+                    width: 8px;
+                    height: 5px;
+
+                    Path {
+                        commands: "M 100 0 L 50 40 L 0 0 Z";
+                        fill: enabled ? Palette.foreground : #909090;
+                    }
+                }
             }
 
             edt := TextInput {
@@ -340,6 +354,12 @@ export component LengthEdit inherits Rectangle {
                         }
                     }
                 }
+            }
+        }
+
+        pointer-event(event) => {
+            if has-dropdown && (event.kind == PointerEventKind.down) {
+                dropdown-triggered();
             }
         }
 

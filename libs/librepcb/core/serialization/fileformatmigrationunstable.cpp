@@ -137,7 +137,25 @@ void FileFormatMigrationUnstable::upgradeOutputJobs(SExpression& root,
   Q_UNUSED(context);
 }
 
+void FileFormatMigrationUnstable::upgradeCircuit(SExpression& root,
+                                                 QList<Message>& messages) {
+  Q_UNUSED(messages);
+
+  // Net classes.
+  for (SExpression* classNode : root.getChildren("netclass")) {
+    classNode->appendChild("default_trace_width",
+                           SExpression::createToken("inherit"));
+  }
+}
+
 void FileFormatMigrationUnstable::upgradeBoard(SExpression& root) {
+  // Design rules
+  {
+    SExpression& rulesNode = root.getChild("design_rules");
+    rulesNode.appendChild("default_trace_width",
+                          SExpression::createToken("0.5"));
+  }
+
   // Devices
   for (SExpression* devNode : root.getChildren("device")) {
     devNode->appendChild("glue", SExpression::createToken("true"));

@@ -191,6 +191,8 @@ signals:
   void ratioRequested(const UnsignedLimitedRatio& ratio);
   void pressFitRequested(bool pressFit);
   void zoneRuleRequested(Zone::Rule rule, bool enable);
+  void saveTraceWidthInBoardRequested();
+  void saveTraceWidthInNetClassRequested();
 
 private:
   void updateEnabledCopperLayers() noexcept;
@@ -265,6 +267,7 @@ private:
   QVector<std::pair<bool, std::optional<Uuid>>> mToolNetsQt;
   std::shared_ptr<slint::VectorModel<slint::SharedString>> mToolNets;
   std::pair<bool, std::optional<Uuid>> mToolNet;
+  QString mToolNetClassName;
   QVector<const Layer*> mToolLayersQt;
   std::shared_ptr<slint::VectorModel<slint::SharedString>> mToolLayers;
   const Layer* mToolLayer;

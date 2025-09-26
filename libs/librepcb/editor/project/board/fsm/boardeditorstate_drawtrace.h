@@ -94,6 +94,9 @@ public:
       const GraphicsSceneMouseEvent& e) noexcept override;
 
   // Connection to UI
+  const QString& getNetClassName() const noexcept {
+    return mCurrentNetClassName;
+  }
   WireMode getWireMode() const noexcept { return mCurrentWireMode; }
   void setWireMode(WireMode mode) noexcept;
   QSet<const Layer*> getAvailableLayers() noexcept;
@@ -103,6 +106,8 @@ public:
   void setAutoWidth(bool autoWidth) noexcept;
   const PositiveLength& getWidth() const noexcept { return mCurrentWidth; }
   void setWidth(const PositiveLength& width) noexcept;
+  void saveWidthInBoard() noexcept;
+  void saveWidthInNetClass() noexcept;
   const PositiveLength& getViaDrillDiameter() const noexcept {
     return mCurrentViaProperties.getDrillDiameter();
   }
@@ -118,6 +123,7 @@ public:
       delete;
 
 signals:
+  void netClassNameChanged(const QString& name);
   void wireModeChanged(WireMode mode);
   void layerChanged(const Layer& layer);
   void autoWidthChanged(bool autoWidth);
@@ -209,8 +215,14 @@ private:
   Point calcMiddlePointPos(const Point& p1, const Point p2,
                            WireMode mode) const noexcept;
 
+  /**
+   * @brief Update #mCurrentNetClassName and emit signal
+   */
+  void updateNetClassName() noexcept;
+
   // State
   SubState mSubState;  ///< the current substate
+  QString mCurrentNetClassName;  ///< Empty in idle state
   WireMode mCurrentWireMode;  ///< the current wire mode
   const Layer* mCurrentLayer;  ///< the current board layer name
   bool mAddVia;  ///< whether a via add is requested

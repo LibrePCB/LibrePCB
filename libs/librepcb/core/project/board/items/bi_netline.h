@@ -56,8 +56,8 @@ public:
   virtual TraceAnchor toTraceAnchor() const noexcept = 0;
 
   std::vector<PositiveLength> getLineWidths() const noexcept;
-  UnsignedLength getMaxLineWidth() const noexcept;
-  UnsignedLength getMedianLineWidth() const noexcept;
+  std::optional<PositiveLength> getMaxLineWidth() const noexcept;
+  std::optional<PositiveLength> getMedianLineWidth() const noexcept;
   BI_NetSegment* getNetSegmentOfLines() const noexcept;
 };
 

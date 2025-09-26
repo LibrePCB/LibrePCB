@@ -72,7 +72,10 @@ public:
       const FileFormatMigrationUnstable& rhs) = delete;
 
 protected:
-  virtual void upgradeOutputJobs(SExpression& root, ProjectContext& context) override;
+  virtual void upgradeOutputJobs(SExpression& root,
+                                 ProjectContext& context) override;
+  virtual void upgradeCircuit(SExpression& root,
+                              QList<Message>& messages) override;
   virtual void upgradeBoard(SExpression& root) override;
 };
 

@@ -36,7 +36,9 @@ namespace librepcb {
  ******************************************************************************/
 
 BoardDesignRules::BoardDesignRules() noexcept
-  :  // stop mask
+  :  // default values
+    mDefaultTraceWidth(500000),  // 0.5mm
+    // stop mask
     mStopMaskMaxViaDrillDiameter(500000),  // 0.5mm
     mStopMaskClearance(UnsignedRatio(Ratio::fromPercent(0)),  // 0%
                        UnsignedLength(100000),  // 0.1mm
@@ -64,7 +66,10 @@ BoardDesignRules::BoardDesignRules(const BoardDesignRules& other)
 }
 
 BoardDesignRules::BoardDesignRules(const SExpression& node)
-  :  // stop mask
+  :  // default values
+    mDefaultTraceWidth(
+        deserialize<PositiveLength>(node.getChild("default_trace_width/@0"))),
+    // stop mask
     mStopMaskMaxViaDrillDiameter(deserialize<UnsignedLength>(
         node.getChild("stopmask_max_via_drill_diameter/@0"))),
     mStopMaskClearance(node.getChild("stopmask_clearance")),
@@ -92,6 +97,10 @@ void BoardDesignRules::restoreDefaults() noexcept {
 }
 
 void BoardDesignRules::serialize(SExpression& root) const {
+  // default values
+  root.ensureLineBreak();
+  root.appendChild("default_trace_width", mDefaultTraceWidth);
+
   // stop mask
   root.ensureLineBreak();
   root.appendChild("stopmask_max_via_drill_diameter",
@@ -138,6 +147,8 @@ bool BoardDesignRules::doesViaRequireStopMaskOpening(
 
 BoardDesignRules& BoardDesignRules::operator=(
     const BoardDesignRules& rhs) noexcept {
+  // default values
+  mDefaultTraceWidth = rhs.mDefaultTraceWidth;
   // stop mask
   mStopMaskMaxViaDrillDiameter = rhs.mStopMaskMaxViaDrillDiameter;
   mStopMaskClearance = rhs.mStopMaskClearance;
@@ -153,6 +164,8 @@ BoardDesignRules& BoardDesignRules::operator=(
 }
 
 bool BoardDesignRules::operator==(const BoardDesignRules& rhs) const noexcept {
+  // default values
+  if (mDefaultTraceWidth != rhs.mDefaultTraceWidth) return false;
   // stop mask
   if (mStopMaskMaxViaDrillDiameter != rhs.mStopMaskMaxViaDrillDiameter)
     return false;

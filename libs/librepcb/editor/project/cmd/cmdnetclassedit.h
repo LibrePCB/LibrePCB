@@ -53,6 +53,8 @@ public:
 
   // Setters
   void setName(const ElementName& name) noexcept;
+  void setDefaultTraceWidth(
+      const std::optional<PositiveLength>& value) noexcept;
 
 private:
   // Private Methods
@@ -74,6 +76,8 @@ private:
   // General Attributes
   ElementName mOldName;
   ElementName mNewName;
+  std::optional<PositiveLength> mOldDefaultTraceWidth;
+  std::optional<PositiveLength> mNewDefaultTraceWidth;
 };
 
 /*******************************************************************************
