@@ -138,6 +138,7 @@ private:  // Data
   const Layer* mStartLayer;
   const Layer* mEndLayer;
   Point mPosition;
+  // Invariant: If no drill is set, the size must not be set either.
   std::optional<PositiveLength> mDrillDiameter;  ///< Guaranteed to be <= #mSize
   std::optional<PositiveLength> mSize;  ///< Guaranteed to be >= #mDrillDiameter
   MaskConfig mExposureConfig;

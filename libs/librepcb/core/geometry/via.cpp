@@ -191,6 +191,10 @@ bool Via::setDrillAndSize(const std::optional<PositiveLength>& drill,
     return false;
   }
 
+  if ((!drill) && size) {
+    throw RuntimeError(__FILE__, __LINE__,
+                       "Via drill is 'auto', but size is not 'auto'.");
+  }
   if (drill && size && (*size < *drill)) {
     throw RuntimeError(__FILE__, __LINE__,
                        "Via drill is larger than via size.");

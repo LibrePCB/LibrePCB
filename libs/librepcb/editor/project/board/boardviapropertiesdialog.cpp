@@ -93,6 +93,7 @@ BoardViaPropertiesDialog::BoardViaPropertiesDialog(
           [this, applyDrillFromDesignRules](bool checked) {
             mUi->edtDrillDiameter->setEnabled(!checked);
             if (checked) {
+              mUi->cbxSizeFromDesignRules->setChecked(true);
               applyDrillFromDesignRules();
             }
           });
@@ -101,6 +102,8 @@ BoardViaPropertiesDialog::BoardViaPropertiesDialog(
             mUi->edtSize->setEnabled(!checked);
             if (checked) {
               applySizeFromDesignRules();
+            } else {
+              mUi->cbxDrillDiameterFromDesignRules->setChecked(false);
             }
           });
 
