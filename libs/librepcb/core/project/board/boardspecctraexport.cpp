@@ -82,12 +82,17 @@ QByteArray BoardSpecctraExport::generate() const {
     }
   }
   // Sort for a more natural order of vias.
-  Toolbox::sortNumeric(
-      viaPadStacks,
-      [](const QCollator& cmp, const std::unique_ptr<SExpression>& a,
-         const std::unique_ptr<SExpression>& b) {
-        return cmp(a->getChild(0).getValue(), b->getChild(0).getValue());
-      });
+  QCollator collator;
+  collator.setLocale(QLocale::c());  // Important for locale-independent output.
+  collator.setNumericMode(true);
+  collator.setCaseSensitivity(Qt::CaseInsensitive);
+  collator.setIgnorePunctuation(false);
+  std::sort(viaPadStacks.begin(), viaPadStacks.end(),
+            [&collator](const std::unique_ptr<SExpression>& a,
+                        const std::unique_ptr<SExpression>& b) {
+              return collator(a->getChild(0).getValue(),
+                              b->getChild(0).getValue());
+            });
 
   // Project name must not contain spaces since quotation is not activated
   // until the "parser" node appears.
