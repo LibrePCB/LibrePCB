@@ -401,18 +401,43 @@ void FileFormatMigrationV01::upgradeProject(TransactionalDirectory& dir,
     }
   }
 
+  // Get schematics list.
+  // This is important to upgrade only the used schematics. If there are unused
+  // schematic files left over in the project, they could cause the upgrade to
+  // fail. It's better to just ignore the unused files (if any).
+  QStringList schematicFiles;  // Relative file paths
+  {
+    const QString fp = "schematics/schematics.lp";
+    const std::unique_ptr<const SExpression> root =
+        SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+    foreach (const SExpression* child, root->getChildren("schematic")) {
+      schematicFiles.append(child->getChild("@0").getValue());
+    }
+  }
+
+  // Get boards list.
+  // This is important to upgrade only the used boards. If there are unused
+  // board files left over in the project, they could cause the upgrade to
+  // fail. It's better to just ignore the unused files (if any).
+  QStringList boardFiles;  // Relative file paths
+  {
+    const QString fp = "boards/boards.lp";
+    const std::unique_ptr<const SExpression> root =
+        SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+    foreach (const SExpression* child, root->getChildren("board")) {
+      boardFiles.append(child->getChild("@0").getValue());
+    }
+  }
+
   // Scan boards.
-  foreach (const QString& dirName, dir.getDirs("boards")) {
-    QString fp = "boards/" % dirName % "/board.lp";
-    if (dir.fileExists(fp)) {
-      std::unique_ptr<SExpression> root =
-          SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
-      foreach (const SExpression* devNode, root->getChildren("device")) {
-        const Uuid cmpUuid = deserialize<Uuid>(devNode->getChild("@0"));
-        const Uuid libDevUuid =
-            deserialize<Uuid>(devNode->getChild("lib_device/@0"));
-        context.devicesUsedInBoards[cmpUuid].insert(libDevUuid);
-      }
+  foreach (const QString& fp, boardFiles) {
+    std::unique_ptr<SExpression> root =
+        SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+    foreach (const SExpression* devNode, root->getChildren("device")) {
+      const Uuid cmpUuid = deserialize<Uuid>(devNode->getChild("@0"));
+      const Uuid libDevUuid =
+          deserialize<Uuid>(devNode->getChild("lib_device/@0"));
+      context.devicesUsedInBoards[cmpUuid].insert(libDevUuid);
     }
   }
 
@@ -467,29 +492,23 @@ void FileFormatMigrationV01::upgradeProject(TransactionalDirectory& dir,
   }
 
   // Schematics.
-  foreach (const QString& dirName, dir.getDirs("schematics")) {
-    const QString fp = "schematics/" % dirName % "/schematic.lp";
-    if (dir.fileExists(fp)) {
-      std::unique_ptr<SExpression> root =
-          SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
-      upgradeSchematic(*root, context);
-      dir.write(fp, root->toByteArray());
-    }
+  foreach (const QString& fp, schematicFiles) {
+    std::unique_ptr<SExpression> root =
+        SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+    upgradeSchematic(*root, context);
+    dir.write(fp, root->toByteArray());
   }
 
   // Boards.
-  foreach (const QString& dirName, dir.getDirs("boards")) {
+  foreach (QString fp, boardFiles) {
     // Board content.
-    QString fp = "boards/" % dirName % "/board.lp";
-    if (dir.fileExists(fp)) {
-      std::unique_ptr<SExpression> root =
-          SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
-      upgradeBoard(*root, context);
-      dir.write(fp, root->toByteArray());
-    }
+    std::unique_ptr<SExpression> root =
+        SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+    upgradeBoard(*root, context);
+    dir.write(fp, root->toByteArray());
 
     // User settings.
-    fp = "boards/" % dirName % "/settings.user.lp";
+    fp.replace("/board.lp", "/settings.user.lp");
     if (dir.fileExists(fp)) {
       std::unique_ptr<SExpression> root =
           SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
@@ -762,6 +781,10 @@ void FileFormatMigrationV01::upgradeSchematic(SExpression& root,
   upgradeGrid(root);
   upgradeLayers(root);
 
+  const QString contactUs =
+      " If the project could be opened with older releases, this might be a "
+      "bug - please contact us then.";
+
   // Symbols.
   for (SExpression* symNode : root.getChildren("symbol")) {
     const Uuid cmpUuid = deserialize<Uuid>(symNode->getChild("component/@0"));
@@ -770,13 +793,16 @@ void FileFormatMigrationV01::upgradeSchematic(SExpression& root,
     if (cmpInstIt == context.componentInstances.end()) {
       throw RuntimeError(__FILE__, __LINE__,
                          QString("Failed to find component instance '%1'.")
-                             .arg(cmpUuid.toStr()));
+                                 .arg(cmpUuid.toStr()) +
+                             contactUs);
     }
     auto libCmpIt = context.components.find(cmpInstIt->libCmpUuid);
     if (libCmpIt == context.components.end()) {
       throw RuntimeError(__FILE__, __LINE__,
-                         QString("Failed to find component '%1'.")
-                             .arg(cmpInstIt->libCmpUuid.toStr()));
+                         QString("Failed to find component '%1'. This looks "
+                                 "like a bug, please contact us.")
+                                 .arg(cmpInstIt->libCmpUuid.toStr()) +
+                             contactUs);
     }
     const ComponentSymbolVariant* cmpSymbVar = nullptr;
     foreach (const auto& var, libCmpIt->symbolVariants) {
@@ -789,7 +815,8 @@ void FileFormatMigrationV01::upgradeSchematic(SExpression& root,
       throw RuntimeError(
           __FILE__, __LINE__,
           QString("Failed to find component symbol variant '%1'.")
-              .arg(cmpInstIt->libSymbVarUuid.toStr()));
+                  .arg(cmpInstIt->libSymbVarUuid.toStr()) +
+              contactUs);
     }
     const Gate* gate = nullptr;
     foreach (const auto& g, cmpSymbVar->gates) {
@@ -801,13 +828,15 @@ void FileFormatMigrationV01::upgradeSchematic(SExpression& root,
     if (!gate) {
       throw RuntimeError(
           __FILE__, __LINE__,
-          QString("Failed to find gate '%1'.").arg(gateUuid.toStr()));
+          QString("Failed to find gate '%1'.").arg(gateUuid.toStr()) +
+              contactUs);
     }
     auto symIt = context.symbols.find(gate->symbolUuid);
     if (symIt == context.symbols.end()) {
       throw RuntimeError(
           __FILE__, __LINE__,
-          QString("Failed to find symbol '%1'.").arg(gate->symbolUuid.toStr()));
+          QString("Failed to find symbol '%1'.").arg(gate->symbolUuid.toStr()) +
+              contactUs);
     }
     const Point symPos(symNode->getChild("position"));
     const Angle symRot = deserialize<Angle>(symNode->getChild("rotation/@0"));
