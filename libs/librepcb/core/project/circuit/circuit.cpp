@@ -169,6 +169,9 @@ void Circuit::removeNetClass(NetClass& netclass) {
 }
 
 void Circuit::setNetClassName(NetClass& netclass, const ElementName& newName) {
+  if (netclass.getName() == newName) {
+    return;
+  }
   // check if the netclass was added to the circuit
   if (mNetClasses.value(netclass.getUuid()) != &netclass) {
     throw LogicError(__FILE__, __LINE__);

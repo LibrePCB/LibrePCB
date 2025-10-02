@@ -72,7 +72,7 @@ public:
   BI_NetSegment& getNetSegment() const noexcept { return mNetSegment; }
   bool isUsed() const noexcept { return (mRegisteredNetLines.count() > 0); }
   const Layer* getLayerOfTraces() const noexcept { return mLayerOfTraces; }
-  const UnsignedLength& getMaxTraceWidth() const noexcept {
+  const std::optional<PositiveLength>& getMaxTraceWidth() const noexcept {
     return mMaxTraceWidth;
   }
   TraceAnchor toTraceAnchor() const noexcept override;
@@ -108,7 +108,7 @@ private:  // Data
 
   // Cached Attributes
   const Layer* mLayerOfTraces;
-  UnsignedLength mMaxTraceWidth;
+  std::optional<PositiveLength> mMaxTraceWidth;
 
   // Registered Elements
   QSet<BI_NetLine*> mRegisteredNetLines;  ///< all registered netlines

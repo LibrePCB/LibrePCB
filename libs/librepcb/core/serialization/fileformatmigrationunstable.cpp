@@ -63,30 +63,10 @@ void FileFormatMigrationUnstable::upgradePackageCategory(
 
 void FileFormatMigrationUnstable::upgradeSymbol(TransactionalDirectory& dir) {
   Q_UNUSED(dir);
-
-  // Content File.
-  {
-    const QString fp = "symbol.lp";
-    std::unique_ptr<SExpression> root =
-        SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
-    upgradeTexts(*root, true);
-    dir.write(fp, root->toByteArray());
-  }
 }
 
 void FileFormatMigrationUnstable::upgradePackage(TransactionalDirectory& dir) {
   Q_UNUSED(dir);
-
-  // Content File.
-  {
-    const QString fp = "package.lp";
-    std::unique_ptr<SExpression> root =
-        SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
-    if (!root->tryGetChild("grid_interval")) {
-      root->appendChild("grid_interval", SExpression::createToken("2.54"));
-    }
-    dir.write(fp, root->toByteArray());
-  }
 }
 
 void FileFormatMigrationUnstable::upgradeComponent(
@@ -105,26 +85,6 @@ void FileFormatMigrationUnstable::upgradeLibrary(TransactionalDirectory& dir) {
 void FileFormatMigrationUnstable::upgradeWorkspaceData(
     TransactionalDirectory& dir) {
   Q_UNUSED(dir);
-
-  // Upgrade settings.
-  const QString settingsFp = "settings.lp";
-  if (dir.fileExists(settingsFp)) {
-    std::unique_ptr<SExpression> root =
-        SExpression::parse(dir.read(settingsFp), dir.getAbsPath(settingsFp));
-    if (SExpression* node = root->tryGetChild("api_endpoints")) {
-      int index = 0;
-      foreach (SExpression* child, node->getChildren("url")) {
-        child->setName("endpoint");
-        child->appendChild("libraries", SExpression::createToken("true"));
-        child->appendChild(
-            "parts", SExpression::createToken((index == 0) ? "true" : "false"));
-        child->appendChild(
-            "order", SExpression::createToken((index == 0) ? "true" : "false"));
-        ++index;
-      }
-    }
-    dir.write(settingsFp, root->toByteArray());
-  }
 }
 
 /*******************************************************************************
@@ -137,38 +97,23 @@ void FileFormatMigrationUnstable::upgradeOutputJobs(SExpression& root,
   Q_UNUSED(context);
 }
 
+void FileFormatMigrationUnstable::upgradeCircuit(SExpression& root,
+                                                 QList<Message>& messages) {
+  Q_UNUSED(messages);
+
+  // Net classes.
+  for (SExpression* classNode : root.getChildren("netclass")) {
+    classNode->appendChild("default_trace_width",
+                           SExpression::createToken("inherit"));
+  }
+}
+
 void FileFormatMigrationUnstable::upgradeBoard(SExpression& root) {
-  // Devices
-  for (SExpression* devNode : root.getChildren("device")) {
-    devNode->appendChild("glue", SExpression::createToken("true"));
-  }
-
-  // Net segments
-  for (SExpression* devNode : root.getChildren("netsegment")) {
-    // Vias
-    for (SExpression* viaNode : devNode->getChildren("via")) {
-      SExpression& drillNode = viaNode->getChild("drill/@0");
-      SExpression& sizeNode = viaNode->getChild("size/@0");
-      const PositiveLength drill = deserialize<PositiveLength>(drillNode);
-      const PositiveLength size = deserialize<PositiveLength>(sizeNode);
-      if (size < drill) {
-        // No longer valid in LibrePCB 2.0!
-        sizeNode.setValue(drillNode.getValue());
-      }
-    }
-  }
-
-  // Planes
-  for (SExpression* planeNode : root.getChildren("plane")) {
-    if (SExpression* clrNode = planeNode->tryGetChild("min_clearance")) {
-      clrNode->setName("min_copper_clearance");
-      planeNode->appendChild(
-          "min_board_clearance",
-          std::make_unique<SExpression>(clrNode->getChild("@0")));
-      planeNode->appendChild(
-          "min_npth_clearance",
-          std::make_unique<SExpression>(clrNode->getChild("@0")));
-    }
+  // Design rules
+  {
+    SExpression& rulesNode = root.getChild("design_rules");
+    rulesNode.appendChild("default_trace_width",
+                          SExpression::createToken("0.5"));
   }
 }
 

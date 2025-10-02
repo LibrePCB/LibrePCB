@@ -23,12 +23,14 @@
 #include "boardeditorstate_drawtrace.h"
 
 #include "../../../undostack.h"
+#include "../../cmd/cmdboardedit.h"
 #include "../../cmd/cmdboardnetsegmentadd.h"
 #include "../../cmd/cmdboardnetsegmentaddelements.h"
 #include "../../cmd/cmdboardnetsegmentremoveelements.h"
 #include "../../cmd/cmdboardsplitnetline.h"
 #include "../../cmd/cmdboardviaedit.h"
 #include "../../cmd/cmdcombineboardnetsegments.h"
+#include "../../cmd/cmdnetclassedit.h"
 #include "../../cmd/cmdsimplifyboardnetsegments.h"
 #include "../boardgraphicsscene.h"
 #include "../graphicsitems/bgi_netline.h"
@@ -44,6 +46,8 @@
 #include <librepcb/core/project/board/items/bi_netsegment.h>
 #include <librepcb/core/project/board/items/bi_pad.h>
 #include <librepcb/core/project/circuit/circuit.h>
+#include <librepcb/core/project/circuit/netclass.h>
+#include <librepcb/core/project/circuit/netsignal.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/types/layer.h>
 #include <librepcb/core/utils/toolbox.h>
@@ -64,6 +68,7 @@ BoardEditorState_DrawTrace::BoardEditorState_DrawTrace(
     const Context& context) noexcept
   : BoardEditorState(context),
     mSubState(SubState_Idle),
+    mCurrentNetClassName(),
     mCurrentWireMode(WireMode::HV),
     mCurrentLayer(&Layer::topCopper()),
     mAddVia(false),
@@ -79,7 +84,7 @@ BoardEditorState_DrawTrace::BoardEditorState_DrawTrace(
     mViaLayer(nullptr),
     mTargetPos(),
     mCursorPos(),
-    mCurrentWidth(500000),
+    mCurrentWidth(mContext.board.getDesignRules().getDefaultTraceWidth()),
     mCurrentAutoWidth(false),
     mCurrentSnapActive(true),
     mFixedStartAnchor(nullptr),
@@ -91,7 +96,7 @@ BoardEditorState_DrawTrace::BoardEditorState_DrawTrace(
   // Restore client settings.
   QSettings cs;
   mCurrentAutoWidth =
-      cs.value("board_editor/draw_trace/width/auto", false).toBool();
+      cs.value("board_editor/draw_trace/width/auto", true).toBool();
 }
 
 BoardEditorState_DrawTrace::~BoardEditorState_DrawTrace() noexcept {
@@ -189,9 +194,13 @@ bool BoardEditorState_DrawTrace::processGraphicsSceneLeftMouseButtonPressed(
     return true;
   } else if (mSubState == SubState_Idle) {
     // Start adding netpoints/netlines
-    Point pos = e.scenePos;
+    const Point pos = e.scenePos;
     mCursorPos = pos;
-    startPositioning(scene->getBoard(), pos);
+    // To disable taking over the trace width from existing traces under the
+    // cursor, SHIFT can be pressed.
+    const bool autoWidthFromExistingTraces =
+        !e.modifiers.testFlag(Qt::ShiftModifier);
+    startPositioning(scene->getBoard(), pos, autoWidthFromExistingTraces);
     return true;
   }
 
@@ -257,7 +266,7 @@ void BoardEditorState_DrawTrace::setLayer(const Layer& layer) noexcept {
     if (via || pad) {
       abortPositioning(false, false);
       mCurrentLayer = &layer;
-      startPositioning(mContext.board, startPos, nullptr, via, pad);
+      startPositioning(mContext.board, startPos, true, nullptr, via, pad);
       updateNetpointPositions();
     } else {
       mAddVia = true;
@@ -292,6 +301,47 @@ void BoardEditorState_DrawTrace::setWidth(
 
   if (mSubState != SubState::SubState_PositioningNetPoint) return;
   updateNetpointPositions();
+}
+
+void BoardEditorState_DrawTrace::saveWidthInBoard() noexcept {
+  try {
+    std::unique_ptr<CmdBoardEdit> cmd(new CmdBoardEdit(mContext.board));
+    BoardDesignRules r = mContext.board.getDesignRules();
+    r.setDefaultTraceWidth(mCurrentWidth);
+    cmd->setDesignRules(r);
+    if (mSubState == SubState::SubState_Idle) {
+      mContext.undoStack.execCmd(cmd.release());
+    } else {
+      // TODO: This is ugly because the modification will be reverted if the
+      // trace drawing tool is aborted! However, currently there is no clean
+      // way to apply the new value while the trace drawing tool is active :-(
+      mContext.undoStack.appendToCmdGroup(cmd.release());
+    }
+  } catch (const Exception& e) {
+    QMessageBox::critical(qApp->activeWindow(), "Error", e.getMsg());
+  }
+}
+
+void BoardEditorState_DrawTrace::saveWidthInNetClass() noexcept {
+  NetSignal* netSignal =
+      mCurrentNetSegment ? mCurrentNetSegment->getNetSignal() : nullptr;
+  if (!netSignal) return;
+
+  try {
+    std::unique_ptr<CmdNetClassEdit> cmd(
+        new CmdNetClassEdit(netSignal->getNetClass()));
+    cmd->setDefaultTraceWidth(mCurrentWidth);
+    if (mSubState == SubState::SubState_Idle) {
+      mContext.undoStack.execCmd(cmd.release());
+    } else {
+      // TODO: This is ugly because the modification will be reverted if the
+      // trace drawing tool is aborted! However, currently there is no clean
+      // way to apply the new value while the trace drawing tool is active :-(
+      mContext.undoStack.appendToCmdGroup(cmd.release());
+    }
+  } catch (const Exception& e) {
+    QMessageBox::critical(qApp->activeWindow(), "Error", e.getMsg());
+  }
 }
 
 void BoardEditorState_DrawTrace::setViaDrillDiameter(
@@ -346,11 +396,9 @@ void BoardEditorState_DrawTrace::setViaSize(
  *  Private Methods
  ******************************************************************************/
 
-bool BoardEditorState_DrawTrace::startPositioning(Board& board,
-                                                  const Point& pos,
-                                                  BI_NetPoint* fixedPoint,
-                                                  BI_Via* fixedVia,
-                                                  BI_Pad* fixedPad) noexcept {
+bool BoardEditorState_DrawTrace::startPositioning(
+    Board& board, const Point& pos, bool autoWidthFromExistingTraces,
+    BI_NetPoint* fixedPoint, BI_Via* fixedVia, BI_Pad* fixedPad) noexcept {
   // Discard any temporary changes and release undo stack.
   abortBlockingToolsInOtherEditors();
 
@@ -478,6 +526,7 @@ bool BoardEditorState_DrawTrace::startPositioning(Board& board,
       mCurrentNetSegment = cmd->getNetSegment();
     }
     Q_ASSERT(mCurrentNetSegment);
+    updateNetClassName();
 
     // add netpoint if none found
     // TODO(5n8ke): Check if this could be even possible
@@ -495,9 +544,24 @@ bool BoardEditorState_DrawTrace::startPositioning(Board& board,
     emit layerChanged(*mCurrentLayer);
 
     // update line width
-    if (mCurrentAutoWidth && mFixedStartAnchor->getMaxLineWidth() > 0) {
-      mCurrentWidth = PositiveLength(*mFixedStartAnchor->getMedianLineWidth());
-      emit widthChanged(mCurrentWidth);
+    if (mCurrentAutoWidth) {
+      // Fallback: Use default trace width from board design rules.
+      PositiveLength autoWidth =
+          mContext.board.getDesignRules().getDefaultTraceWidth();
+      const auto tracesMedian = mFixedStartAnchor->getMedianLineWidth();
+      if (autoWidthFromExistingTraces && tracesMedian) {
+        // If there are already traces under the cursor, use their width.
+        autoWidth = *tracesMedian;
+      } else if (const NetSignal* ns = mCurrentNetSegment->getNetSignal()) {
+        // If the net class has a default trace width set, use it.
+        if (auto defaultTraceWidth = ns->getNetClass().getDefaultTraceWidth()) {
+          autoWidth = *defaultTraceWidth;
+        }
+      }
+      if (autoWidth != mCurrentWidth) {
+        mCurrentWidth = autoWidth;
+        emit widthChanged(mCurrentWidth);
+      }
     }
 
     // add the new netpoints & netlines
@@ -712,8 +776,8 @@ bool BoardEditorState_DrawTrace::addNextNetPoint(
       BI_NetPoint* nextStartPoint = mPositioningNetPoint2;
       BI_Via* nextStartVia = mTempVia;
       abortPositioning(false, false);
-      return startPositioning(scene.getBoard(), mTargetPos, nextStartPoint,
-                              nextStartVia);
+      return startPositioning(scene.getBoard(), mTargetPos, true,
+                              nextStartPoint, nextStartVia);
     }
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
@@ -758,6 +822,8 @@ bool BoardEditorState_DrawTrace::abortPositioning(
       qCritical() << "Failed to simplify net segments:" << e.getMsg();
     }
   }
+
+  updateNetClassName();
 
   return success;
 }
@@ -925,6 +991,20 @@ Point BoardEditorState_DrawTrace::calcMiddlePointPos(
     default:
       Q_ASSERT(false);
       return Point();
+  }
+}
+
+void BoardEditorState_DrawTrace::updateNetClassName() noexcept {
+  QString name;
+  if (mCurrentNetSegment) {
+    if (const NetSignal* sig = mCurrentNetSegment->getNetSignal()) {
+      name = *sig->getNetClass().getName();
+    }
+  }
+
+  if (name != mCurrentNetClassName) {
+    mCurrentNetClassName = name;
+    emit netClassNameChanged(mCurrentNetClassName);
   }
 }
 

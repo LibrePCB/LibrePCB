@@ -94,6 +94,9 @@ public:
       const GraphicsSceneMouseEvent& e) noexcept override;
 
   // Connection to UI
+  const QString& getNetClassName() const noexcept {
+    return mCurrentNetClassName;
+  }
   WireMode getWireMode() const noexcept { return mCurrentWireMode; }
   void setWireMode(WireMode mode) noexcept;
   QSet<const Layer*> getAvailableLayers() noexcept;
@@ -103,6 +106,8 @@ public:
   void setAutoWidth(bool autoWidth) noexcept;
   const PositiveLength& getWidth() const noexcept { return mCurrentWidth; }
   void setWidth(const PositiveLength& width) noexcept;
+  void saveWidthInBoard() noexcept;
+  void saveWidthInNetClass() noexcept;
   const PositiveLength& getViaDrillDiameter() const noexcept {
     return mCurrentViaProperties.getDrillDiameter();
   }
@@ -118,6 +123,7 @@ public:
       delete;
 
 signals:
+  void netClassNameChanged(const QString& name);
   void wireModeChanged(WireMode mode);
   void layerChanged(const Layer& layer);
   void autoWidthChanged(bool autoWidth);
@@ -139,6 +145,11 @@ private:
    * @param board             On which board the new traces are drawn.
    * @param pos               The position, where the tracing should begin. If
    *                          necessary, a new BI_NetPoint is created.
+   * @param autoWidthFromExistingTraces If true, #mCurrentAutoWidth will
+   *                          use the width from existing traces, if any.
+   *                          Otherwise, the default line width from the design
+   *                          rules will be applied no matter if there are
+   *                          traces already.
    * @param fixedPoint        The BI_NetPoint used as the start anchor, when
    *                          beginning a new trace.
    * @param fixedVia          The BI_Via used as the start anchor, when
@@ -148,6 +159,7 @@ private:
    * @return True, when the tracing is successfully started.
    */
   bool startPositioning(Board& board, const Point& pos,
+                        bool autoWidthFromExistingTraces = true,
                         BI_NetPoint* fixedPoint = nullptr,
                         BI_Via* fixedVia = nullptr,
                         BI_Pad* fixedPad = nullptr) noexcept;
@@ -209,8 +221,14 @@ private:
   Point calcMiddlePointPos(const Point& p1, const Point p2,
                            WireMode mode) const noexcept;
 
+  /**
+   * @brief Update #mCurrentNetClassName and emit signal
+   */
+  void updateNetClassName() noexcept;
+
   // State
   SubState mSubState;  ///< the current substate
+  QString mCurrentNetClassName;  ///< Empty in idle state
   WireMode mCurrentWireMode;  ///< the current wire mode
   const Layer* mCurrentLayer;  ///< the current board layer name
   bool mAddVia;  ///< whether a via add is requested

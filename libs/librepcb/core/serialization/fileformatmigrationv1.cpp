@@ -409,6 +409,12 @@ void FileFormatMigrationV1::upgradeCircuit(SExpression& root,
         "requirements. Please review the new names.",
         renamedAssemblyVariants));
   }
+
+  // Net classes.
+  for (SExpression* classNode : root.getChildren("netclass")) {
+    classNode->appendChild("default_trace_width",
+                           SExpression::createToken("inherit"));
+  }
 }
 
 void FileFormatMigrationV1::upgradeSchematic(SExpression& root) {
@@ -419,6 +425,13 @@ void FileFormatMigrationV1::upgradeSchematic(SExpression& root) {
 }
 
 void FileFormatMigrationV1::upgradeBoard(SExpression& root) {
+  // Design rules
+  {
+    SExpression& rulesNode = root.getChild("design_rules");
+    rulesNode.appendChild("default_trace_width",
+                          SExpression::createToken("0.5"));
+  }
+
   // DRC approvals.
   SExpression& drcNode = root.getChild("design_rule_check");
   const QString approvalsVersion =

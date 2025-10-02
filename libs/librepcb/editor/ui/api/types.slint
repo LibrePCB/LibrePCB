@@ -752,6 +752,10 @@ export enum TabAction {
     tool-component-gnd,
     tool-component-vcc,
     tool-measure,
+
+    // Toolbar
+    toolbar-trace-width-save-in-board,
+    toolbar-trace-width-save-in-netclass,
 }
 
 // Window tab base data
@@ -1192,6 +1196,7 @@ export struct Board2dTabData {
     tool-overlay-text: string,
     tool-wire-mode: WireMode,
     tool-net: ComboBoxData,
+    tool-netclass-name: string,  // Read-only, empty if not in routing state
     tool-layer: ComboBoxData,
     tool-line-width: LengthEditData,
     tool-size: LengthEditData,

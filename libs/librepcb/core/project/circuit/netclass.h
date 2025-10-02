@@ -35,6 +35,7 @@ namespace librepcb {
 
 class Circuit;
 class NetSignal;
+class SExpression;
 
 /*******************************************************************************
  *  Class NetClass
@@ -52,12 +53,16 @@ public:
   NetClass(const NetClass& other) = delete;
   explicit NetClass(Circuit& circuit, const Uuid& uuid,
                     const ElementName& name);
+  explicit NetClass(Circuit& circuit, const SExpression& node);
   ~NetClass() noexcept;
 
   // Getters
   Circuit& getCircuit() const noexcept { return mCircuit; }
   const Uuid& getUuid() const noexcept { return mUuid; }
   const ElementName& getName() const noexcept { return mName; }
+  const std::optional<PositiveLength>& getDefaultTraceWidth() const noexcept {
+    return mDefaultTraceWidth;
+  }
   int getNetSignalCount() const noexcept {
     return mRegisteredNetSignals.count();
   }
@@ -65,6 +70,8 @@ public:
 
   // Setters
   void setName(const ElementName& name) noexcept;
+  void setDefaultTraceWidth(
+      const std::optional<PositiveLength>& value) noexcept;
 
   // General Methods
   void addToCircuit();
@@ -90,6 +97,11 @@ private:
   // Attributes
   Uuid mUuid;
   ElementName mName;
+
+  // Design Rules
+  // Note: If `std::nullopt` (the default), the values from the corresponding
+  // board's design rules are used instead.
+  std::optional<PositiveLength> mDefaultTraceWidth;
 
   // Registered Elements
   /// @brief all registered netsignals
