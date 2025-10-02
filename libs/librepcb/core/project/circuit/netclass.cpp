@@ -67,7 +67,10 @@ NetClass::NetClass(Circuit& circuit, const Uuid& uuid, const ElementName& name)
     mUuid(uuid),
     mName(name),
     mDefaultTraceWidth(std::nullopt),
-    mDefaultViaDrill(std::nullopt) {
+    mDefaultViaDrill(std::nullopt),
+    mMinCopperCopperClearance(0),
+    mMinCopperWidth(0),
+    mMinViaDrillDiameter(0) {
 }
 
 NetClass::NetClass(Circuit& circuit, const SExpression& node)
@@ -79,7 +82,13 @@ NetClass::NetClass(Circuit& circuit, const SExpression& node)
     mDefaultTraceWidth(
         deserializeDesignRuleValue(node.getChild("default_trace_width/@0"))),
     mDefaultViaDrill(deserializeDesignRuleValue(
-        node.getChild("default_via_drill_diameter/@0"))) {
+        node.getChild("default_via_drill_diameter/@0"))),
+    mMinCopperCopperClearance(deserialize<UnsignedLength>(
+        node.getChild("min_copper_copper_clearance/@0"))),
+    mMinCopperWidth(
+        deserialize<UnsignedLength>(node.getChild("min_copper_width/@0"))),
+    mMinViaDrillDiameter(deserialize<UnsignedLength>(
+        node.getChild("min_via_drill_diameter/@0"))) {
 }
 
 NetClass::~NetClass() noexcept {
@@ -107,6 +116,19 @@ void NetClass::setDefaultViaDrill(
   }
   mDefaultViaDrill = value;
   emit designRulesModified();
+}
+
+void NetClass::setMinCopperCopperClearance(
+    const UnsignedLength& value) noexcept {
+  mMinCopperCopperClearance = value;
+}
+
+void NetClass::setMinCopperWidth(const UnsignedLength& value) noexcept {
+  mMinCopperWidth = value;
+}
+
+void NetClass::setMinViaDrillDiameter(const UnsignedLength& value) noexcept {
+  mMinViaDrillDiameter = value;
 }
 
 /*******************************************************************************
@@ -159,6 +181,12 @@ void NetClass::serialize(SExpression& root) const {
   root.ensureLineBreak();
   root.appendChild("default_via_drill_diameter",
                    serializeDesignRuleValue(mDefaultViaDrill));
+  root.ensureLineBreak();
+  root.appendChild("min_copper_copper_clearance", mMinCopperCopperClearance);
+  root.ensureLineBreak();
+  root.appendChild("min_copper_width", mMinCopperWidth);
+  root.ensureLineBreak();
+  root.appendChild("min_via_drill_diameter", mMinViaDrillDiameter);
   root.ensureLineBreak();
 }
 

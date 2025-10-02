@@ -66,6 +66,15 @@ public:
   const std::optional<PositiveLength>& getDefaultViaDrill() const noexcept {
     return mDefaultViaDrill;
   }
+  const UnsignedLength& getMinCopperCopperClearance() const noexcept {
+    return mMinCopperCopperClearance;
+  }
+  const UnsignedLength& getMinCopperWidth() const noexcept {
+    return mMinCopperWidth;
+  }
+  const UnsignedLength& getMinViaDrillDiameter() const noexcept {
+    return mMinViaDrillDiameter;
+  }
   int getNetSignalCount() const noexcept {
     return mRegisteredNetSignals.count();
   }
@@ -76,6 +85,9 @@ public:
   void setDefaultTraceWidth(
       const std::optional<PositiveLength>& value) noexcept;
   void setDefaultViaDrill(const std::optional<PositiveLength>& value) noexcept;
+  void setMinCopperCopperClearance(const UnsignedLength& value) noexcept;
+  void setMinCopperWidth(const UnsignedLength& value) noexcept;
+  void setMinViaDrillDiameter(const UnsignedLength& value) noexcept;
 
   // General Methods
   void addToCircuit();
@@ -110,6 +122,15 @@ private:
   // board's design rules are used instead.
   std::optional<PositiveLength> mDefaultTraceWidth;
   std::optional<PositiveLength> mDefaultViaDrill;
+
+  // DRC Settings
+  // Note: These values only have an effect if they are higher than the
+  // corresponding values in the board's DRC settings. This ensures it is not
+  // possible to end up with rules more relaxed than what is configured in the
+  // board.
+  UnsignedLength mMinCopperCopperClearance;
+  UnsignedLength mMinCopperWidth;
+  UnsignedLength mMinViaDrillDiameter;
 
   // Registered Elements
   /// @brief all registered netsignals

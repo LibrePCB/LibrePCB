@@ -32,6 +32,7 @@
 #include "../../../utils/clipperhelpers.h"
 #include "../../circuit/circuit.h"
 #include "../../circuit/componentinstance.h"
+#include "../../circuit/netclass.h"
 #include "../../circuit/netsignal.h"
 #include "../../project.h"
 #include "../board.h"
@@ -88,6 +89,7 @@ BoardDesignRuleCheckData::BoardDesignRuleCheckData(
         pad->getProperties().getCopperClearance(),
         net ? std::make_optional(net->getUuid()) : std::optional<Uuid>(),
         net ? *net->getName() : QString(),
+        net ? net->getNetClass().getUuid() : std::optional<Uuid>(),
     };
     for (const PadHole& hole : pad->getProperties().getHoles()) {
       pd.holes.append(Hole{hole.getUuid(), hole.getDiameter(), hole.getPath(),
@@ -96,12 +98,22 @@ BoardDesignRuleCheckData::BoardDesignRuleCheckData(
     return pd;
   };
 
+  foreach (const librepcb::NetClass* nc,
+           board.getProject().getCircuit().getNetClasses()) {
+    netClasses.insert(nc->getUuid(),
+                      NetClass{
+                          nc->getMinCopperCopperClearance(),
+                          nc->getMinCopperWidth(),
+                          nc->getMinViaDrillDiameter(),
+                      });
+  }
   foreach (const BI_NetSegment* ns, board.getNetSegments()) {
     const NetSignal* net = ns->getNetSignal();
     Segment nsd{
         ns->getUuid(),
         net ? net->getUuid() : std::optional<Uuid>(),
         net ? *net->getName() : QString(),
+        net ? net->getNetClass().getUuid() : std::optional<Uuid>(),
         {},
         {},
         {},
@@ -148,8 +160,13 @@ BoardDesignRuleCheckData::BoardDesignRuleCheckData(
     planes.append(Plane{
         plane->getUuid(),
         net ? std::make_optional(net->getUuid()) : std::optional<Uuid>(),
-        net ? *net->getName() : QString(), &plane->getLayer(),
-        plane->getMinWidth(), plane->getOutline(), plane->getFragments()});
+        net ? *net->getName() : QString(),
+        net ? net->getNetClass().getUuid() : std::optional<Uuid>(),
+        &plane->getLayer(),
+        plane->getMinWidth(),
+        plane->getOutline(),
+        plane->getFragments(),
+    });
   }
   foreach (const BI_Polygon* polygon, board.getPolygons()) {
     polygons.append(
