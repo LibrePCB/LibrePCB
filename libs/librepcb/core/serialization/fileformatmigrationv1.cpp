@@ -163,6 +163,34 @@ void FileFormatMigrationV1::upgradeProject(TransactionalDirectory& dir,
     }
   }
 
+  // Get schematics list.
+  // This is important to upgrade only the used schematics. If there are unused
+  // schematic files left over in the project, they could cause the upgrade to
+  // fail. It's better to just ignore the unused files (if any).
+  QStringList schematicFiles;  // Relative file paths
+  {
+    const QString fp = "schematics/schematics.lp";
+    const std::unique_ptr<const SExpression> root =
+        SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+    foreach (const SExpression* child, root->getChildren("schematic")) {
+      schematicFiles.append(child->getChild("@0").getValue());
+    }
+  }
+
+  // Get boards list.
+  // This is important to upgrade only the used boards. If there are unused
+  // board files left over in the project, they could cause the upgrade to
+  // fail. It's better to just ignore the unused files (if any).
+  QStringList boardFiles;  // Relative file paths
+  {
+    const QString fp = "boards/boards.lp";
+    const std::unique_ptr<const SExpression> root =
+        SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+    foreach (const SExpression* child, root->getChildren("board")) {
+      boardFiles.append(child->getChild("@0").getValue());
+    }
+  }
+
   // Metadata.
   {
     const QString fp = "project/metadata.lp";
@@ -200,26 +228,20 @@ void FileFormatMigrationV1::upgradeProject(TransactionalDirectory& dir,
   }
 
   // Schematics.
-  foreach (const QString& dirName, dir.getDirs("schematics")) {
-    QString fp = "schematics/" % dirName % "/schematic.lp";
-    if (dir.fileExists(fp)) {
-      std::unique_ptr<SExpression> root =
-          SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
-      upgradeSchematic(*root);
-      dir.write(fp, root->toByteArray());
-    }
+  foreach (const QString& fp, schematicFiles) {
+    std::unique_ptr<SExpression> root =
+        SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+    upgradeSchematic(*root);
+    dir.write(fp, root->toByteArray());
   }
 
   // Boards.
-  foreach (const QString& dirName, dir.getDirs("boards")) {
-    QString fp = "boards/" % dirName % "/board.lp";
-    if (dir.fileExists(fp)) {
-      ++context.boardCount;
-      std::unique_ptr<SExpression> root =
-          SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
-      upgradeBoard(*root);
-      dir.write(fp, root->toByteArray());
-    }
+  foreach (const QString& fp, boardFiles) {
+    ++context.boardCount;
+    std::unique_ptr<SExpression> root =
+        SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+    upgradeBoard(*root);
+    dir.write(fp, root->toByteArray());
   }
 
   // Emit messages at the very end to avoid duplicate messages caused my
