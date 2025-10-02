@@ -680,10 +680,12 @@ void ProjectEditor::showUpgradeMessages() noexcept {
   std::sort(mUpgradeMessages->begin(), mUpgradeMessages->end(),
             [](const FileFormatMigration::Message& a,
                const FileFormatMigration::Message& b) {
-              if (a.severity > b.severity) return true;
-              if (a.toVersion < b.toVersion) return true;
-              if (a.message < b.message) return true;
-              return false;
+              // It is most intuitive to have the oldest messages at top, and
+              // the newest messages at bottom since they might "depend" on
+              // each other.
+              if (a.toVersion != b.toVersion) return a.toVersion < b.toVersion;
+              if (a.severity != b.severity) return a.severity > b.severity;
+              return a.message < b.message;
             });
 
   QDialog dialog(qApp->activeWindow());
