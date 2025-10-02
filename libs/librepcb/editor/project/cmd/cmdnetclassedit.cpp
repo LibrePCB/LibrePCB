@@ -38,10 +38,12 @@ namespace editor {
  ******************************************************************************/
 
 CmdNetClassEdit::CmdNetClassEdit(NetClass& netclass) noexcept
-  : UndoCommand(tr("Edit netclass")),
+  : UndoCommand(tr("Edit Net Class")),
     mNetClass(netclass),
     mOldName(netclass.getName()),
-    mNewName(mOldName) {
+    mNewName(mOldName),
+    mOldDefaultTraceWidth(netclass.getDefaultTraceWidth()),
+    mNewDefaultTraceWidth(mOldDefaultTraceWidth) {
 }
 
 CmdNetClassEdit::~CmdNetClassEdit() noexcept {
@@ -56,6 +58,12 @@ void CmdNetClassEdit::setName(const ElementName& name) noexcept {
   mNewName = name;
 }
 
+void CmdNetClassEdit::setDefaultTraceWidth(
+    const std::optional<PositiveLength>& value) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewDefaultTraceWidth = value;
+}
+
 /*******************************************************************************
  *  Inherited from UndoCommand
  ******************************************************************************/
@@ -63,15 +71,19 @@ void CmdNetClassEdit::setName(const ElementName& name) noexcept {
 bool CmdNetClassEdit::performExecute() {
   performRedo();  // can throw
 
-  return true;
+  if (mNewName != mOldName) return true;
+  if (mNewDefaultTraceWidth != mOldDefaultTraceWidth) return true;
+  return false;
 }
 
 void CmdNetClassEdit::performUndo() {
   mNetClass.getCircuit().setNetClassName(mNetClass, mOldName);  // can throw
+  mNetClass.setDefaultTraceWidth(mOldDefaultTraceWidth);
 }
 
 void CmdNetClassEdit::performRedo() {
   mNetClass.getCircuit().setNetClassName(mNetClass, mNewName);  // can throw
+  mNetClass.setDefaultTraceWidth(mNewDefaultTraceWidth);
 }
 
 /*******************************************************************************

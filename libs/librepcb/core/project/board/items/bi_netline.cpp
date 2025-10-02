@@ -51,21 +51,26 @@ std::vector<PositiveLength> BI_NetLineAnchor::getLineWidths() const noexcept {
   return widths;
 }
 
-UnsignedLength BI_NetLineAnchor::getMaxLineWidth() const noexcept {
-  UnsignedLength w(0);
+std::optional<PositiveLength> BI_NetLineAnchor::getMaxLineWidth()
+    const noexcept {
+  std::optional<PositiveLength> w;
   foreach (const BI_NetLine* line, getNetLines()) {
-    if (line->getWidth() > w) {
-      w = positiveToUnsigned(line->getWidth());
+    if ((!w) || (line->getWidth() > *w)) {
+      w = line->getWidth();
     }
   }
   return w;
 }
 
-UnsignedLength BI_NetLineAnchor::getMedianLineWidth() const noexcept {
+std::optional<PositiveLength> BI_NetLineAnchor::getMedianLineWidth()
+    const noexcept {
   std::vector<PositiveLength> widths = getLineWidths();
-  std::sort(widths.begin(), widths.end());
-  return widths.size() > 0 ? positiveToUnsigned(widths[widths.size() / 2])
-                           : UnsignedLength(0);
+  if (!widths.empty()) {
+    std::sort(widths.begin(), widths.end());
+    return widths[widths.size() / 2];
+  } else {
+    return std::nullopt;
+  }
 }
 
 BI_NetSegment* BI_NetLineAnchor::getNetSegmentOfLines() const noexcept {

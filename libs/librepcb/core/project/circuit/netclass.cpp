@@ -23,6 +23,7 @@
 #include "netclass.h"
 
 #include "../../exceptions.h"
+#include "../../serialization/sexpression.h"
 #include "circuit.h"
 #include "netsignal.h"
 
@@ -34,6 +35,28 @@
 namespace librepcb {
 
 /*******************************************************************************
+ *  Non-Member Functions
+ ******************************************************************************/
+
+static std::unique_ptr<SExpression> serializeDesignRuleValue(
+    const std::optional<PositiveLength>& obj) {
+  if (obj) {
+    return serialize(*obj);
+  } else {
+    return SExpression::createToken("inherit");
+  }
+}
+
+static std::optional<PositiveLength> deserializeDesignRuleValue(
+    const SExpression& node) {
+  if (node.getValue() == QLatin1String("inherit")) {
+    return std::nullopt;
+  } else {
+    return deserialize<PositiveLength>(node);
+  }
+}
+
+/*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
 
@@ -42,7 +65,18 @@ NetClass::NetClass(Circuit& circuit, const Uuid& uuid, const ElementName& name)
     mCircuit(circuit),
     mIsAddedToCircuit(false),
     mUuid(uuid),
-    mName(name) {
+    mName(name),
+    mDefaultTraceWidth(std::nullopt) {
+}
+
+NetClass::NetClass(Circuit& circuit, const SExpression& node)
+  : QObject(&circuit),
+    mCircuit(circuit),
+    mIsAddedToCircuit(false),
+    mUuid(deserialize<Uuid>(node.getChild("@0"))),
+    mName(deserialize<ElementName>(node.getChild("name/@0"))),
+    mDefaultTraceWidth(
+        deserializeDesignRuleValue(node.getChild("default_trace_width/@0"))) {
 }
 
 NetClass::~NetClass() noexcept {
@@ -55,10 +89,12 @@ NetClass::~NetClass() noexcept {
  ******************************************************************************/
 
 void NetClass::setName(const ElementName& name) noexcept {
-  if (name == mName) {
-    return;
-  }
   mName = name;
+}
+
+void NetClass::setDefaultTraceWidth(
+    const std::optional<PositiveLength>& value) noexcept {
+  mDefaultTraceWidth = value;
 }
 
 /*******************************************************************************
@@ -105,6 +141,10 @@ void NetClass::unregisterNetSignal(NetSignal& signal) {
 void NetClass::serialize(SExpression& root) const {
   root.appendChild(mUuid);
   root.appendChild("name", mName);
+  root.ensureLineBreak();
+  root.appendChild("default_trace_width",
+                   serializeDesignRuleValue(mDefaultTraceWidth));
+  root.ensureLineBreak();
 }
 
 /*******************************************************************************

@@ -1,10 +1,14 @@
 import {
     ComboBox,
     LengthEdit,
+    MenuItem,
+    MenuPopup,
     WireModeSelector,
 } from "../../widgets.slint";
 import {
+    Backend,
     Board2dTabData,
+    TabAction,
     WindowSectionData,
     WireMode,
 } from "../../api.slint";
@@ -33,8 +37,10 @@ export component DrawTraceToolBar inherits HorizontalLayout {
         min-width-text: "1.234";
         auto-supported: true;
         auto-checked: tabs[section.current-tab-index].tool-filled;
+        has-dropdown: true;
 
         value-changed(v) => {
+            tabs[section.current-tab-index].tool-filled = false;
             tabs[section.current-tab-index].tool-line-width.value = v;
         }
 
@@ -43,15 +49,47 @@ export component DrawTraceToolBar inherits HorizontalLayout {
         }
 
         increase-triggered => {
+            tabs[section.current-tab-index].tool-filled = false;
             tabs[section.current-tab-index].tool-line-width.increase = true;
         }
 
         decrease-triggered => {
+            tabs[section.current-tab-index].tool-filled = false;
             tabs[section.current-tab-index].tool-line-width.decrease = true;
         }
 
         auto-toggled(checked) => {
             tabs[section.current-tab-index].tool-filled = checked;
+        }
+
+        dropdown-triggered => {
+            line-width-popup.show();
+        }
+
+        line-width-popup := MenuPopup {
+            x: 0;
+            y: parent.height;
+
+            line-width-save-in-board-item := MenuItem {
+                icon: @image-url("../../../../../font-awesome/svgs/solid/download.svg");
+                text: @tr("Set as Default in Board");
+                status-tip: @tr("Saves the entered value in the board design rules as default value");
+
+                clicked => {
+                    Backend.trigger-tab(section-index, section.current-tab-index, TabAction.toolbar-trace-width-save-in-board);
+                }
+            }
+
+            line-width-save-in-netclass-item := MenuItem {
+                icon: @image-url("../../../../../font-awesome/svgs/solid/download.svg");
+                text: @tr("Set as Default in Net Class '{}'", tabs[section.current-tab-index].tool-netclass-name);
+                status-tip: @tr("Saves the entered value as default value for the current net class");
+                enabled: !tabs[section.current-tab-index].tool-netclass-name.is-empty;
+
+                clicked => {
+                    Backend.trigger-tab(section-index, section.current-tab-index, TabAction.toolbar-trace-width-save-in-netclass);
+                }
+            }
         }
     }
 

@@ -44,7 +44,7 @@ BI_NetPoint::BI_NetPoint(BI_NetSegment& segment, const Uuid& uuid,
     mNetSegment(segment),
     mJunction(uuid, position),
     mLayerOfTraces(nullptr),
-    mMaxTraceWidth(0),
+    mMaxTraceWidth(std::nullopt),
     mOnNetLineEditedSlot(*this, &BI_NetPoint::netLineEdited) {
 }
 
@@ -178,7 +178,7 @@ void BI_NetPoint::updateLayerOfTraces() noexcept {
 }
 
 void BI_NetPoint::updateMaxTraceWidth() noexcept {
-  UnsignedLength width = getMaxLineWidth();
+  const std::optional<PositiveLength> width = getMaxLineWidth();
   if (width != mMaxTraceWidth) {
     mMaxTraceWidth = width;
     onEdited.notify(Event::MaxTraceWidthChanged);

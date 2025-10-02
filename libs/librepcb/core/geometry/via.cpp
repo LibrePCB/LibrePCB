@@ -36,8 +36,7 @@ namespace librepcb {
  *  Non-Member Functions
  ******************************************************************************/
 
-template <>
-std::unique_ptr<SExpression> serialize(
+static std::unique_ptr<SExpression> serializeSize(
     const std::optional<PositiveLength>& obj) {
   if (obj) {
     return serialize(*obj);
@@ -46,8 +45,7 @@ std::unique_ptr<SExpression> serialize(
   }
 }
 
-template <>
-std::optional<PositiveLength> deserialize(const SExpression& node) {
+static std::optional<PositiveLength> deserializeSize(const SExpression& node) {
   if (node.getValue() == QLatin1String("auto")) {
     return std::nullopt;
   } else {
@@ -99,7 +97,7 @@ Via::Via(const SExpression& node)
     mEndLayer(&deserialize<const Layer&>(node.getChild("to/@0"))),
     mPosition(node.getChild("position")),
     mDrillDiameter(deserialize<PositiveLength>(node.getChild("drill/@0"))),
-    mSize(deserialize<std::optional<PositiveLength>>(node.getChild("size/@0"))),
+    mSize(deserializeSize(node.getChild("size/@0"))),
     mExposureConfig(deserialize<MaskConfig>(node.getChild("exposure/@0"))) {
   if ((!mStartLayer->isCopper()) || (!mEndLayer->isCopper()) ||
       (mStartLayer->getCopperNumber() >= mEndLayer->getCopperNumber())) {
@@ -224,7 +222,7 @@ void Via::serialize(SExpression& root) const {
   root.ensureLineBreak();
   mPosition.serialize(root.appendList("position"));
   root.appendChild("drill", mDrillDiameter);
-  root.appendChild("size", mSize);
+  root.appendChild("size", serializeSize(mSize));
   root.appendChild("exposure", mExposureConfig);
   root.ensureLineBreak();
 }

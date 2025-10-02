@@ -52,6 +52,11 @@ public:
   explicit BoardDesignRules(const SExpression& node);
   ~BoardDesignRules() noexcept;
 
+  // Getters: Default Values
+  const PositiveLength& getDefaultTraceWidth() const noexcept {
+    return mDefaultTraceWidth;
+  }
+
   // Getters: Stop Mask
   const UnsignedLength& getStopMaskMaxViaDiameter() const noexcept {
     return mStopMaskMaxViaDrillDiameter;
@@ -82,6 +87,9 @@ public:
   }
 
   // Setters
+  void setDefaultTraceWidth(const PositiveLength& value) noexcept {
+    mDefaultTraceWidth = value;
+  }
   void setStopMaskMaxViaDiameter(const UnsignedLength& dia) noexcept {
     mStopMaskMaxViaDrillDiameter = dia;
   }
@@ -128,6 +136,9 @@ private:  // Methods
   static bool parsePadAutoAnnular(const SExpression& node);
 
 private:  // Data
+  // Default Values
+  PositiveLength mDefaultTraceWidth;
+
   // Stop Mask
   UnsignedLength mStopMaskMaxViaDrillDiameter;
   BoundedUnsignedRatio mStopMaskClearance;
