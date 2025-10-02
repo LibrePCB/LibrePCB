@@ -55,6 +55,7 @@ public:
   void setName(const ElementName& name) noexcept;
   void setDefaultTraceWidth(
       const std::optional<PositiveLength>& value) noexcept;
+  void setDefaultViaDrill(const std::optional<PositiveLength>& value) noexcept;
 
 private:
   // Private Methods
@@ -78,6 +79,8 @@ private:
   ElementName mNewName;
   std::optional<PositiveLength> mOldDefaultTraceWidth;
   std::optional<PositiveLength> mNewDefaultTraceWidth;
+  std::optional<PositiveLength> mOldDefaultViaDrill;
+  std::optional<PositiveLength> mNewDefaultViaDrill;
 };
 
 /*******************************************************************************

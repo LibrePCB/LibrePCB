@@ -56,6 +56,9 @@ public:
   const PositiveLength& getDefaultTraceWidth() const noexcept {
     return mDefaultTraceWidth;
   }
+  const PositiveLength& getDefaultViaDrillDiameter() const noexcept {
+    return mDefaultViaDrillDiameter;
+  }
 
   // Getters: Stop Mask
   const UnsignedLength& getStopMaskMaxViaDiameter() const noexcept {
@@ -89,6 +92,9 @@ public:
   // Setters
   void setDefaultTraceWidth(const PositiveLength& value) noexcept {
     mDefaultTraceWidth = value;
+  }
+  void setDefaultViaDrillDiameter(const PositiveLength& value) noexcept {
+    mDefaultViaDrillDiameter = value;
   }
   void setStopMaskMaxViaDiameter(const UnsignedLength& dia) noexcept {
     mStopMaskMaxViaDrillDiameter = dia;
@@ -138,6 +144,7 @@ private:  // Methods
 private:  // Data
   // Default Values
   PositiveLength mDefaultTraceWidth;
+  PositiveLength mDefaultViaDrillDiameter;
 
   // Stop Mask
   UnsignedLength mStopMaskMaxViaDrillDiameter;

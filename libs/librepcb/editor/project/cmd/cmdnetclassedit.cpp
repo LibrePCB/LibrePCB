@@ -43,7 +43,9 @@ CmdNetClassEdit::CmdNetClassEdit(NetClass& netclass) noexcept
     mOldName(netclass.getName()),
     mNewName(mOldName),
     mOldDefaultTraceWidth(netclass.getDefaultTraceWidth()),
-    mNewDefaultTraceWidth(mOldDefaultTraceWidth) {
+    mNewDefaultTraceWidth(mOldDefaultTraceWidth),
+    mOldDefaultViaDrill(netclass.getDefaultViaDrill()),
+    mNewDefaultViaDrill(mOldDefaultViaDrill) {
 }
 
 CmdNetClassEdit::~CmdNetClassEdit() noexcept {
@@ -64,6 +66,12 @@ void CmdNetClassEdit::setDefaultTraceWidth(
   mNewDefaultTraceWidth = value;
 }
 
+void CmdNetClassEdit::setDefaultViaDrill(
+    const std::optional<PositiveLength>& value) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewDefaultViaDrill = value;
+}
+
 /*******************************************************************************
  *  Inherited from UndoCommand
  ******************************************************************************/
@@ -73,17 +81,20 @@ bool CmdNetClassEdit::performExecute() {
 
   if (mNewName != mOldName) return true;
   if (mNewDefaultTraceWidth != mOldDefaultTraceWidth) return true;
+  if (mNewDefaultViaDrill != mOldDefaultViaDrill) return true;
   return false;
 }
 
 void CmdNetClassEdit::performUndo() {
   mNetClass.getCircuit().setNetClassName(mNetClass, mOldName);  // can throw
   mNetClass.setDefaultTraceWidth(mOldDefaultTraceWidth);
+  mNetClass.setDefaultViaDrill(mOldDefaultViaDrill);
 }
 
 void CmdNetClassEdit::performRedo() {
   mNetClass.getCircuit().setNetClassName(mNetClass, mNewName);  // can throw
   mNetClass.setDefaultTraceWidth(mNewDefaultTraceWidth);
+  mNetClass.setDefaultViaDrill(mNewDefaultViaDrill);
 }
 
 /*******************************************************************************

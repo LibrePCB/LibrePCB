@@ -44,6 +44,7 @@ TEST_F(BoardDesignRulesTest, testConstructFromSExpression) {
   std::unique_ptr<SExpression> sexpr = SExpression::parse(
       "(design_rules\n"
       " (default_trace_width 0.31)\n"
+      " (default_via_drill_diameter 0.51)\n"
       " (stopmask_max_via_drill_diameter 0.2)\n"
       " (stopmask_clearance (ratio 0.1) (min 1.1) (max 2.1))\n"
       " (solderpaste_clearance (ratio 0.3) (min 1.3) (max 2.3))\n"
@@ -54,6 +55,7 @@ TEST_F(BoardDesignRulesTest, testConstructFromSExpression) {
       FilePath());
   BoardDesignRules obj(*sexpr);
   EXPECT_EQ(PositiveLength(310000), obj.getDefaultTraceWidth());
+  EXPECT_EQ(PositiveLength(510000), obj.getDefaultViaDrillDiameter());
   EXPECT_EQ(UnsignedLength(200000), obj.getStopMaskMaxViaDiameter());
   EXPECT_EQ(UnsignedRatio(Ratio(100000)),
             obj.getStopMaskClearance().getRatio());
@@ -78,6 +80,7 @@ TEST_F(BoardDesignRulesTest, testConstructFromSExpression) {
 TEST_F(BoardDesignRulesTest, testSerializeAndDeserialize) {
   BoardDesignRules obj1;
   obj1.setDefaultTraceWidth(PositiveLength(33));
+  obj1.setDefaultViaDrillDiameter(PositiveLength(22));
   obj1.setStopMaskMaxViaDiameter(UnsignedLength(44));
   obj1.setStopMaskClearance(BoundedUnsignedRatio(
       UnsignedRatio(Ratio(11)), UnsignedLength(22), UnsignedLength(33)));

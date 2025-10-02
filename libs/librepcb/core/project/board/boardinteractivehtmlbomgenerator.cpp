@@ -200,7 +200,7 @@ std::shared_ptr<InteractiveHtmlBom> BoardInteractiveHtmlBomGenerator::generate(
         layers.insert(InteractiveHtmlBom::Layer::Bottom);
       }
       ibom->addVia(layers, via->getVia().getPosition(), via->getActualSize(),
-                   via->getDrillDiameter(), netName);
+                   via->getActualDrillDiameter(), netName);
     }
   }
 

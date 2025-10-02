@@ -606,23 +606,30 @@ bool CmdBoardSpecctraImport::performExecute() {
       // Note: How can we know the drill diameter??? Use this logic for now:
       //  - If position & size not modified, keep original drill diameter too
       //  - Try to extract drill diameter from pad stack ID
-      //  - If this didn't work, use minimum annular ring as fallback
+      //  - If this didn't work, use automatic drill diameter as fallback
+      // Not sure if this order makes sense. Maybe the pad stack ID should have
+      // highest priority?
       std::optional<PositiveLength> drillDiameter;
       if (oldVia) {
         drillDiameter = oldVia->getDrillDiameter();
-      } else if (auto dia = extractViaDrillDiameter(via.padStackId)) {
-        drillDiameter = *dia;
+      } else if (auto autoAndDia = extractViaDrillDiameter(via.padStackId)) {
+        drillDiameter = autoAndDia->first
+            ? std::nullopt
+            : std::make_optional(autoAndDia->second);
       } else {
-        const UnsignedLength annularWidth =
-            mBoard.getDesignRules().getViaAnnularRing().getMinValue();
-        drillDiameter = PositiveLength(padStack.diameter - annularWidth * 2);
+        // Automatic drill from design rules.
       }
       // Determine if the size is manually set or automatic.
-      std::optional<PositiveLength> size = PositiveLength(padStack.diameter);
-      const PositiveLength autoSize = Via::calcSizeFromRules(
-          *drillDiameter, mBoard.getDesignRules().getViaAnnularRing());
-      if ((size == autoSize) && via.padStackId.contains("-auto-")) {
-        size = std::nullopt;
+      std::optional<PositiveLength> size = drillDiameter
+          ? std::make_optional(PositiveLength(padStack.diameter))
+          : std::nullopt;  // Automatic drill with manual size is not allowed!
+      if (drillDiameter && size) {
+        const PositiveLength autoSize = Via::calcSizeFromRules(
+            *drillDiameter, mBoard.getDesignRules().getViaAnnularRing());
+        const auto autoAndDia = extractViaSize(via.padStackId);
+        if (autoAndDia && autoAndDia->first && (size == autoSize)) {
+          size = std::nullopt;  // Automatic size is correct, let's take it.
+        }
       }
       // For the exposure config, use a similar mechanism like for the drill.
       MaskConfig exposureConfig = MaskConfig::automatic();
@@ -633,7 +640,7 @@ bool CmdBoardSpecctraImport::performExecute() {
       }
       splitter.addVia(Via(uuid, *padStack.startLayer, *padStack.endLayer,
                           oldVia ? oldVia->getPosition() : via.pos,
-                          *drillDiameter, size, exposureConfig),
+                          drillDiameter, size, exposureConfig),
                       false);
       anchors.append(AnchorData{via.pos, padStack.startLayer, padStack.endLayer,
                                 TraceAnchor::via(uuid)});
@@ -767,18 +774,32 @@ bool CmdBoardSpecctraImport::performExecute() {
   return getChildCount() > 0;
 }
 
-std::optional<PositiveLength> CmdBoardSpecctraImport::extractViaDrillDiameter(
-    const QString& padStackId) noexcept {
+static std::optional<std::pair<bool, PositiveLength>> extractViaDimension(
+    const QString& padStackId, int index) noexcept {
   // Note: Keep in sync with BoardSpecctraExport::getWiringPadStackId().
   const QStringList tokens = padStackId.split("-");
   if ((tokens.count() >= 4) && (tokens[0] == "via")) {
+    const bool autoDrill = tokens[index].contains("auto");
     try {
-      return PositiveLength(Length::fromMm(tokens[1]));
+      return std::make_pair(
+          autoDrill,
+          PositiveLength(Length::fromMm(tokens[index].split(":").first())));
     } catch (const Exception&) {
       // Not critical.
     }
   }
   return std::nullopt;
+}
+
+std::optional<std::pair<bool, PositiveLength>>
+    CmdBoardSpecctraImport::extractViaDrillDiameter(
+        const QString& padStackId) noexcept {
+  return extractViaDimension(padStackId, 1);
+}
+
+std::optional<std::pair<bool, PositiveLength>>
+    CmdBoardSpecctraImport::extractViaSize(const QString& padStackId) noexcept {
+  return extractViaDimension(padStackId, 2);
 }
 
 std::optional<MaskConfig> CmdBoardSpecctraImport::extractViaExposureConfig(

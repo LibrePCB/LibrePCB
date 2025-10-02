@@ -135,8 +135,8 @@ void MeasureTool::setBoard(const Board* board) noexcept {
         mSnapCandidates.insert(via->getPosition());
         mSnapCandidates |=
             snapCandidatesFromCircle(via->getPosition(), *via->getActualSize());
-        mSnapCandidates |= snapCandidatesFromCircle(via->getPosition(),
-                                                    *via->getDrillDiameter());
+        mSnapCandidates |= snapCandidatesFromCircle(
+            via->getPosition(), *via->getActualDrillDiameter());
       }
     }
     foreach (const BI_Plane* plane, board->getPlanes()) {

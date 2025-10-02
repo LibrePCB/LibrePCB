@@ -134,11 +134,11 @@ QJsonObject ProjectJsonExport::toJson(const Board& obj) const {
     foreach (const BI_Via* via, netSegment->getVias()) {
       if (auto span = via->getDrillLayerSpan()) {
         if (span->first->isTop() && span->second->isBottom()) {
-          thtVias.diameters.append(*via->getDrillDiameter());
+          thtVias.diameters.append(*via->getActualDrillDiameter());
         } else if (span->first->isTop() || span->second->isBottom()) {
-          blindVias.diameters.append(*via->getDrillDiameter());
+          blindVias.diameters.append(*via->getActualDrillDiameter());
         } else {
-          buriedVias.diameters.append(*via->getDrillDiameter());
+          buriedVias.diameters.append(*via->getActualDrillDiameter());
         }
       }
     }

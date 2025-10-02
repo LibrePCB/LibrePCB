@@ -23,6 +23,7 @@
 #include "bi_via.h"
 
 #include "../../../types/layer.h"
+#include "../../circuit/netclass.h"
 #include "../../circuit/netsignal.h"
 #include "../board.h"
 #include "../boarddesignrules.h"
@@ -44,16 +45,10 @@ BI_Via::BI_Via(BI_NetSegment& netsegment, const Via& via)
     onEdited(*this),
     mVia(via),
     mNetSegment(netsegment),
+    mActualDrillDiameter(1),
     mActualSize(1),
     mStopMaskDiameterTop(),
     mStopMaskDiameterBottom() {
-  updateActualSize();
-  updateStopMaskDiameters();
-
-  connect(&mBoard, &Board::designRulesModified, this, [this]() {
-    updateActualSize();
-    updateStopMaskDiameters();
-  });
   connect(&mBoard, &Board::innerLayerCountChanged, this,
           [this]() { onEdited.notify(Event::LayersChanged); });
 }
@@ -64,6 +59,15 @@ BI_Via::~BI_Via() noexcept {
 /*******************************************************************************
  *  Getters
  ******************************************************************************/
+
+PositiveLength BI_Via::getAutoDrillDiameter() const noexcept {
+  const NetSignal* netSignal = mNetSegment.getNetSignal();
+  const NetClass* netClass = netSignal ? &netSignal->getNetClass() : nullptr;
+  const std::optional<PositiveLength> netClassDrill =
+      netClass ? netClass->getDefaultViaDrill() : std::nullopt;
+  return netClassDrill ? *netClassDrill
+                       : mBoard.getDesignRules().getDefaultViaDrillDiameter();
+}
 
 std::optional<std::pair<const Layer*, const Layer*>> BI_Via::getDrillLayerSpan()
     const noexcept {
@@ -130,11 +134,11 @@ void BI_Via::setPosition(const Point& position) noexcept {
   }
 }
 
-void BI_Via::setDrillAndSize(const PositiveLength& drill,
+void BI_Via::setDrillAndSize(const std::optional<PositiveLength>& drill,
                              const std::optional<PositiveLength>& size) {
   if (mVia.setDrillAndSize(drill, size)) {
     onEdited.notify(Event::DrillOrSizeChanged);
-    updateActualSize();
+    updateActualDrillAndSize();
     updateStopMaskDiameters();
     mBoard.invalidatePlanes();
   }
@@ -155,11 +159,18 @@ void BI_Via::addToBoard() {
     throw LogicError(__FILE__, __LINE__);
   }
   BI_Base::addToBoard();
+  updateActualDrillAndSize();
+  updateStopMaskDiameters();
   mBoard.invalidatePlanes();
+  mConnections.append(
+      connect(&mBoard, &Board::designRulesModified, this, [this]() {
+        updateActualDrillAndSize();
+        updateStopMaskDiameters();
+      }));
   if (NetSignal* netsignal = mNetSegment.getNetSignal()) {
-    mNetSignalNameChangedConnection =
+    mConnections.append(
         connect(netsignal, &NetSignal::nameChanged, this,
-                [this]() { onEdited.notify(Event::NetSignalNameChanged); });
+                [this]() { onEdited.notify(Event::NetSignalNameChanged); }));
     mBoard.scheduleAirWiresRebuild(netsignal);
   }
 }
@@ -173,9 +184,8 @@ void BI_Via::removeFromBoard() {
   if (NetSignal* netsignal = mNetSegment.getNetSignal()) {
     mBoard.scheduleAirWiresRebuild(netsignal);
   }
-  if (mNetSignalNameChangedConnection) {
-    disconnect(mNetSignalNameChangedConnection);
-    mNetSignalNameChangedConnection = QMetaObject::Connection();
+  while (!mConnections.isEmpty()) {
+    disconnect(mConnections.takeLast());
   }
 }
 
@@ -201,15 +211,19 @@ void BI_Via::unregisterNetLine(BI_NetLine& netline) {
   mRegisteredNetLines.remove(&netline);
 }
 
-void BI_Via::updateActualSize() noexcept {
+void BI_Via::updateActualDrillAndSize() noexcept {
+  const PositiveLength drill = mVia.getDrillDiameter()
+      ? (*mVia.getDrillDiameter())
+      : getAutoDrillDiameter();
   const PositiveLength size = mVia.getSize()
-      ? (*mVia.getSize())
-      : Via::calcSizeFromRules(mVia.getDrillDiameter(),
+      ? std::max(*mVia.getSize(), drill)  // Avoid invalid via if drill is auto.
+      : Via::calcSizeFromRules(drill,
                                mBoard.getDesignRules().getViaAnnularRing());
 
-  if (size != mActualSize) {
+  if ((drill != mActualDrillDiameter) || (size != mActualSize)) {
+    mActualDrillDiameter = drill;
     mActualSize = size;
-    onEdited.notify(Event::ActualSizeChanged);
+    onEdited.notify(Event::ActualDrillOrSizeChanged);
   }
 }
 
@@ -225,11 +239,11 @@ void BI_Via::updateStopMaskDiameters() noexcept {
              *mActualSize) *
          2);
   } else if (mBoard.getDesignRules().doesViaRequireStopMaskOpening(
-                 *mVia.getDrillDiameter())) {
+                 *mActualDrillDiameter)) {
     // No exposure, but automatic stop mask removal for drill.
-    dia = mVia.getDrillDiameter() +
+    dia = mActualDrillDiameter +
         (mBoard.getDesignRules().getStopMaskClearance().calcValue(
-             *mVia.getDrillDiameter()) *
+             *mActualDrillDiameter) *
          2);
   }
   const std::optional<PositiveLength> diaTop =

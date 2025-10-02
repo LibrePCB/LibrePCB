@@ -151,6 +151,7 @@ signals:
   void netSignalRemoved(NetSignal& netsignal);
   void componentAdded(ComponentInstance& cmp);
   void componentRemoved(ComponentInstance& cmp);
+  void netClassDesignRulesModified();
 
 private:
   Project& mProject;  ///< A reference to the Project object (from the ctor)

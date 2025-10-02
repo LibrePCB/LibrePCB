@@ -58,7 +58,18 @@
       </widget>
      </item>
      <item row="2" column="1">
-      <widget class="librepcb::editor::PositiveLengthEdit" name="edtDrillDiameter" native="true"/>
+      <layout class="QHBoxLayout" name="horizontalLayout_4">
+       <item>
+        <widget class="librepcb::editor::PositiveLengthEdit" name="edtDrillDiameter" native="true"/>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="cbxDrillDiameterFromDesignRules">
+         <property name="text">
+          <string>From Design Rules</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
      <item row="3" column="0">
       <widget class="QLabel" name="label_2">
@@ -193,6 +204,7 @@
   <tabstop>edtPosX</tabstop>
   <tabstop>edtPosY</tabstop>
   <tabstop>edtDrillDiameter</tabstop>
+  <tabstop>cbxDrillDiameterFromDesignRules</tabstop>
   <tabstop>edtSize</tabstop>
   <tabstop>cbxSizeFromDesignRules</tabstop>
   <tabstop>cbxStartLayer</tabstop>
