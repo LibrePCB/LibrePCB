@@ -956,6 +956,7 @@ void MainWindow::openComponentCategoryTab(LibraryEditor& editor,
           cat->setNames(copyLibraryElementNames(src->getNames()));
           cat->setDescriptions(src->getDescriptions());
           cat->setKeywords(src->getKeywords());
+          cat->setMessageApprovals(src->getMessageApprovals());
           cat->setParentUuid(src->getParentUuid());
         }
       }
@@ -995,6 +996,7 @@ void MainWindow::openPackageCategoryTab(LibraryEditor& editor,
           cat->setNames(copyLibraryElementNames(src->getNames()));
           cat->setDescriptions(src->getDescriptions());
           cat->setKeywords(src->getKeywords());
+          cat->setMessageApprovals(src->getMessageApprovals());
           cat->setParentUuid(src->getParentUuid());
         }
       }
@@ -1032,7 +1034,9 @@ void MainWindow::openSymbolTab(LibraryEditor& editor, const FilePath& fp,
           sym->setNames(copyLibraryElementNames(src->getNames()));
           sym->setDescriptions(src->getDescriptions());
           sym->setKeywords(src->getKeywords());
+          sym->setMessageApprovals(src->getMessageApprovals());
           sym->setCategories(src->getCategories());
+          sym->setResources(src->getResources());
           // Copy pins but generate new UUIDs.
           for (const SymbolPin& pin : src->getPins()) {
             sym->getPins().append(std::make_shared<SymbolPin>(
@@ -1098,7 +1102,9 @@ void MainWindow::openPackageTab(LibraryEditor& editor, const FilePath& fp,
           pkg->setNames(copyLibraryElementNames(src->getNames()));
           pkg->setDescriptions(src->getDescriptions());
           pkg->setKeywords(src->getKeywords());
+          pkg->setMessageApprovals(src->getMessageApprovals());
           pkg->setCategories(src->getCategories());
+          pkg->setResources(src->getResources());
           pkg->setAssemblyType(src->getAssemblyType(false));
           // Copy pads but generate new UUIDs.
           QHash<Uuid, std::optional<Uuid>> padUuidMap;
@@ -1227,7 +1233,9 @@ void MainWindow::openComponentTab(LibraryEditor& editor, const FilePath& fp,
           cmp->setNames(copyLibraryElementNames(src->getNames()));
           cmp->setDescriptions(src->getDescriptions());
           cmp->setKeywords(src->getKeywords());
+          cmp->setMessageApprovals(src->getMessageApprovals());
           cmp->setCategories(src->getCategories());
+          cmp->setResources(src->getResources());
           cmp->setIsSchematicOnly(src->isSchematicOnly());
           cmp->getAttributes() = src->getAttributes();
           cmp->setDefaultValue(src->getDefaultValue());
@@ -1313,7 +1321,9 @@ void MainWindow::openDeviceTab(LibraryEditor& editor, const FilePath& fp,
           dev->setNames(copyLibraryElementNames(src->getNames()));
           dev->setDescriptions(src->getDescriptions());
           dev->setKeywords(src->getKeywords());
+          dev->setMessageApprovals(src->getMessageApprovals());
           dev->setCategories(src->getCategories());
+          dev->setResources(src->getResources());
           dev->setComponentUuid(src->getComponentUuid());
           dev->setPackageUuid(src->getPackageUuid());
           dev->getPadSignalMap() = src->getPadSignalMap();
