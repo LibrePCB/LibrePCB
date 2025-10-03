@@ -90,6 +90,7 @@ Package::Package(const Uuid& uuid, const Version& version,
     mAlternativeNames(),
     mAssemblyType(assemblyType),
     mGridInterval(2540000),
+    mMinCopperClearance(200000),  // 200 µm
     mPads(),
     mModels(),
     mFootprints() {
@@ -103,6 +104,8 @@ Package::Package(std::unique_ptr<TransactionalDirectory> directory,
     mAssemblyType(deserialize<AssemblyType>(root.getChild("assembly_type/@0"))),
     mGridInterval(
         deserialize<PositiveLength>(root.getChild("grid_interval/@0"))),
+    mMinCopperClearance(
+        deserialize<UnsignedLength>(root.getChild("min_copper_clearance/@0"))),
     mPads(root),
     mModels(root),
     mFootprints(root) {
@@ -222,6 +225,8 @@ void Package::serialize(SExpression& root) const {
   root.appendChild("assembly_type", mAssemblyType);
   root.ensureLineBreak();
   root.appendChild("grid_interval", mGridInterval);
+  root.ensureLineBreak();
+  root.appendChild("min_copper_clearance", mMinCopperClearance);
   root.ensureLineBreak();
   mPads.serialize(root);
   root.ensureLineBreak();

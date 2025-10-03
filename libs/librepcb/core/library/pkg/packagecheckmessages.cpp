@@ -483,10 +483,10 @@ MsgPadClearanceViolation::MsgPadClearanceViolation(
         tr("Clearance of pad '%1' to pad '%2' in '%3'")
             .arg(pkgPad1Name, pkgPad2Name,
                  *footprint->getNames().getDefaultValue()),
-        tr("Pads should have at least %1 clearance between each other. In some "
-           "situations it might be needed to use smaller clearances but not "
-           "all PCB manufacturers are able to reliably produce such small "
-           "clearances, so usually this should be avoided.")
+        tr("Pads must have at least %1 clearance between each other, as "
+           "configured in the package. Either increase the clearance between "
+           "those pads, or reduce the configured minimum clearance value if "
+           "you are sure the PCB manufacturer can reliably handle it.")
             .arg(QString::number(clearance.toMm() * 1000) % "μm"),
         "small_pad_clearance"),
     mFootprint(footprint),

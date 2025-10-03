@@ -1,20 +1,26 @@
 import { ListView } from "std-widgets.slint";
 import {
+    Button,
     IconButton,
+    LengthEdit,
     ListViewItemButton,
     Palette,
     PanelHeader,
 } from "widgets.slint";
 import {
+    Backend,
     BoardAction,
     Data,
     EditorCommandSet as Cmd,
+    FeatureState,
     Helpers,
+    PackageTabData,
     RuleCheckData,
     RuleCheckMessageAction,
     RuleCheckMessageData,
     RuleCheckState,
     RuleCheckType,
+    TabAction,
 } from "api.slint";
 
 component RuleCheckListItem inherits Rectangle {
@@ -124,6 +130,7 @@ export component RuleCheckPanel inherits Rectangle {
             Data.erc-zoom-to-location
         }
     };
+    property <bool> settings-expanded: false;
 
     function set-current-index(index: int, force-zoom: bool) {
         if ((index + 1) * item-height) > (view.height - view.viewport-y) {
@@ -208,6 +215,18 @@ export component RuleCheckPanel inherits Rectangle {
                     }
                 }
 
+                if check.type == RuleCheckType.package-check: settings-btn := IconButton {
+                    width: self.height;
+                    icon: @image-url("../../../font-awesome/svgs/solid/sliders.svg");
+                    icon-scale: 0.7;
+                    tooltip: @tr("Settings");
+                    enabled: check.state != RuleCheckState.running;
+
+                    clicked => {
+                        settings-expanded = !settings-expanded;
+                    }
+                }
+
                 if (check.type == RuleCheckType.erc) || (check.type == RuleCheckType.drc): zoom-to-location-btn := IconButton {
                     width: self.height;
                     icon: @image-url("../../../font-awesome/svgs/solid/location-crosshairs.svg");
@@ -221,6 +240,80 @@ export component RuleCheckPanel inherits Rectangle {
                             Data.drc-zoom-to-location = !Data.drc-zoom-to-location;
                         } else {
                             Data.erc-zoom-to-location = !Data.erc-zoom-to-location;
+                        }
+                    }
+                }
+            }
+
+            if (check.type == RuleCheckType.package-check) && settings-expanded: Rectangle {
+                property <int> section-index: Data.current-section-index;
+                property <[PackageTabData]> tabs: Data.current-section.package-tabs;
+                property <int> index: Data.current-section.current-tab-index;
+                property <bool> read-only: Data.current-section.tabs[index].features.save != FeatureState.enabled;
+
+                Rectangle {
+                    y: parent.height - self.height;
+                    height: 1px;
+                    background: #555555;
+                }
+
+                GridLayout {
+                    padding: 5px;
+                    spacing: 5px;
+
+                    Row {
+                        Text {
+                            colspan: 2;
+                            text: @tr("These settings are stored in the currently opened package and don't affect other packages.");
+                            font-size: 11px;
+                            font-italic: true;
+                            wrap: word-wrap;
+                        }
+                    }
+
+                    Row {
+                        min-copper-clearance-txt := Text {
+                            width: self.preferred-width;
+                            text: @tr("Min. Copper Clearance:");
+                            vertical-alignment: center;
+                            accessible-role: none;
+                        }
+
+                        LengthEdit {
+                            z: 100;
+                            height: self.preferred-height;
+                            data: tabs[index].min-copper-clearance;
+                            enabled: !read-only;
+                            tooltip: @tr("Recommended: {} (default)", "200μm") + "\n" + @tr("Reduce it for packages with very small pitch");
+                            accessible-label: min-copper-clearance-txt.text;
+
+                            value-changed(value) => {
+                                tabs[index].min-copper-clearance.value = value;
+                            }
+
+                            unit-changed(unit) => {
+                                tabs[index].min-copper-clearance.unit = unit;
+                            }
+
+                            increase-triggered() => {
+                                tabs[index].min-copper-clearance.increase = true;
+                            }
+
+                            decrease-triggered() => {
+                                tabs[index].min-copper-clearance.decrease = true;
+                            }
+                        }
+                    }
+
+                    Row {
+                        settings-apply-btn := Button {
+                            colspan: 2;
+                            text: @tr("Apply");
+                            primary: true;
+
+                            clicked => {
+                                Backend.trigger-tab(section-index, index, TabAction.apply);
+                            }
                         }
                     }
                 }

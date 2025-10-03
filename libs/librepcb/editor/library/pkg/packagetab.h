@@ -251,6 +251,7 @@ private:
   std::shared_ptr<LibraryElementCategoriesModel> mCategories;
   std::shared_ptr<CategoryTreeModel> mCategoriesTree;
   Package::AssemblyType mAssemblyType;
+  LengthEditContext mMinCopperClearance;
   std::shared_ptr<PackagePadListModel> mPads;
   std::shared_ptr<slint::SortModel<ui::PackagePadData>> mPadsSorted;
   slint::SharedString mNewPadName;
