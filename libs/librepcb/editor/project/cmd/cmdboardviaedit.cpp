@@ -104,11 +104,15 @@ void CmdBoardViaEdit::mirrorLayers(int innerLayers) noexcept {
   mNewEndLayer = &tmp->mirrored(innerLayers);
 }
 
-void CmdBoardViaEdit::setDrillAndSize(const PositiveLength& drill,
-                                      const std::optional<PositiveLength>& size,
-                                      bool immediate) {
+void CmdBoardViaEdit::setDrillAndSize(
+    const std::optional<PositiveLength>& drill,
+    const std::optional<PositiveLength>& size, bool immediate) {
   Q_ASSERT(!wasEverExecuted());
-  if (size && (*size < drill)) {
+  if ((!drill) && size) {
+    throw RuntimeError(__FILE__, __LINE__,
+                       "Via drill is 'auto', but size is not 'auto'.");
+  }
+  if (drill && size && (*size < *drill)) {
     throw RuntimeError(__FILE__, __LINE__,
                        "Via drill is larger than via size.");
   }

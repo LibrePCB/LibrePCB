@@ -66,7 +66,8 @@ NetClass::NetClass(Circuit& circuit, const Uuid& uuid, const ElementName& name)
     mIsAddedToCircuit(false),
     mUuid(uuid),
     mName(name),
-    mDefaultTraceWidth(std::nullopt) {
+    mDefaultTraceWidth(std::nullopt),
+    mDefaultViaDrill(std::nullopt) {
 }
 
 NetClass::NetClass(Circuit& circuit, const SExpression& node)
@@ -76,7 +77,9 @@ NetClass::NetClass(Circuit& circuit, const SExpression& node)
     mUuid(deserialize<Uuid>(node.getChild("@0"))),
     mName(deserialize<ElementName>(node.getChild("name/@0"))),
     mDefaultTraceWidth(
-        deserializeDesignRuleValue(node.getChild("default_trace_width/@0"))) {
+        deserializeDesignRuleValue(node.getChild("default_trace_width/@0"))),
+    mDefaultViaDrill(deserializeDesignRuleValue(
+        node.getChild("default_via_drill_diameter/@0"))) {
 }
 
 NetClass::~NetClass() noexcept {
@@ -95,6 +98,15 @@ void NetClass::setName(const ElementName& name) noexcept {
 void NetClass::setDefaultTraceWidth(
     const std::optional<PositiveLength>& value) noexcept {
   mDefaultTraceWidth = value;
+}
+
+void NetClass::setDefaultViaDrill(
+    const std::optional<PositiveLength>& value) noexcept {
+  if (value == mDefaultViaDrill) {
+    return;
+  }
+  mDefaultViaDrill = value;
+  emit designRulesModified();
 }
 
 /*******************************************************************************
@@ -144,6 +156,9 @@ void NetClass::serialize(SExpression& root) const {
   root.ensureLineBreak();
   root.appendChild("default_trace_width",
                    serializeDesignRuleValue(mDefaultTraceWidth));
+  root.ensureLineBreak();
+  root.appendChild("default_via_drill_diameter",
+                   serializeDesignRuleValue(mDefaultViaDrill));
   root.ensureLineBreak();
 }
 

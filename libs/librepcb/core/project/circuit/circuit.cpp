@@ -156,6 +156,8 @@ void Circuit::addNetClass(NetClass& netclass) {
   }
   netclass.addToCircuit();  // can throw
   mNetClasses.insert(netclass.getUuid(), &netclass);
+  connect(&netclass, &NetClass::designRulesModified, this,
+          &Circuit::netClassDesignRulesModified);
   emit netClassAdded(netclass);
 }
 
@@ -163,6 +165,8 @@ void Circuit::removeNetClass(NetClass& netclass) {
   if (mNetClasses.value(netclass.getUuid()) != &netclass) {
     throw LogicError(__FILE__, __LINE__);
   }
+  disconnect(&netclass, &NetClass::designRulesModified, this,
+             &Circuit::netClassDesignRulesModified);
   netclass.removeFromCircuit();  // can throw
   mNetClasses.remove(netclass.getUuid());
   emit netClassRemoved(netclass);

@@ -756,6 +756,8 @@ export enum TabAction {
     // Toolbar
     toolbar-trace-width-save-in-board,
     toolbar-trace-width-save-in-netclass,
+    toolbar-via-drill-save-in-board,
+    toolbar-via-drill-save-in-netclass,
 }
 
 // Window tab base data
@@ -1208,7 +1210,7 @@ export struct Board2dTabData {
     tool-shape: PadShape,
     tool-ratio: RatioEditData,
     tool-fiducial: bool,  // Read-only
-    tool-pressfit: bool,
+    tool-pressfit: bool,  // Also used for 'auto' via drill
     tool-no-copper: bool,
     tool-no-planes: bool,
     tool-no-exposures: bool,

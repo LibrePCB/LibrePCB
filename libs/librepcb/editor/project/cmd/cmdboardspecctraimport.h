@@ -107,7 +107,9 @@ private:  // Methods
   /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
   bool performExecute() override;
 
-  static std::optional<PositiveLength> extractViaDrillDiameter(
+  static std::optional<std::pair<bool, PositiveLength>> extractViaDrillDiameter(
+      const QString& padStackId) noexcept;
+  static std::optional<std::pair<bool, PositiveLength>> extractViaSize(
       const QString& padStackId) noexcept;
   static std::optional<MaskConfig> extractViaExposureConfig(
       const QString& padStackId) noexcept;

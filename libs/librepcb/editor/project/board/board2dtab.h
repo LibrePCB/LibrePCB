@@ -181,6 +181,7 @@ public:
 signals:
   void wireModeRequested(BoardEditorState_DrawTrace::WireMode mode);
   void netRequested(bool autoNet, const std::optional<Uuid>& net);
+  void viaDrillRequested(const std::optional<PositiveLength>& drill);
   void viaSizeRequested(const std::optional<PositiveLength>& size);
   void layerRequested(const Layer& layer);
   void filledRequested(bool filled);
@@ -193,6 +194,8 @@ signals:
   void zoneRuleRequested(Zone::Rule rule, bool enable);
   void saveTraceWidthInBoardRequested();
   void saveTraceWidthInNetClassRequested();
+  void saveViaDrillInBoardRequested();
+  void saveViaDrillInNetClassRequested();
 
 private:
   void updateEnabledCopperLayers() noexcept;
@@ -274,8 +277,8 @@ private:
   LengthEditContext mToolLineWidth;
   LengthEditContext mToolSize;
   LengthEditContext mToolDrill;
-  bool mToolFilled;  // Also used for auto-width
-  bool mToolMirrored;
+  bool mToolFilled;  // Also used for auto width
+  bool mToolMirrored;  // Also used for auto via size
   QString mToolValue;
   std::shared_ptr<slint::VectorModel<slint::SharedString>>
       mToolValueSuggestions;
@@ -283,7 +286,7 @@ private:
   ui::PadShape mToolShape;
   UnsignedLimitedRatio mToolRatio;
   bool mToolFiducial;
-  bool mToolPressFit;
+  bool mToolPressFit;  // Also used for auto via drill
   Zone::Rules mToolZoneRules;
 
   // Unplaced components

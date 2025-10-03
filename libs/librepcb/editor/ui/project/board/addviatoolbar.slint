@@ -1,9 +1,13 @@
 import {
     ComboBox,
     LengthEdit,
+    MenuItem,
+    MenuPopup,
 } from "../../widgets.slint";
 import {
+    Backend,
     Board2dTabData,
+    TabAction,
     WindowSectionData,
 } from "../../api.slint";
 
@@ -28,8 +32,12 @@ export component AddViaToolBar inherits HorizontalLayout {
         icon: @image-url("../../../../../font-awesome/svgs/solid/bore-hole.svg");
         tooltip: @tr("Via Drill Diameter");
         min-width-text: "1.234";
+        auto-supported: true;
+        auto-checked: tabs[section.current-tab-index].tool-pressfit;
+        has-dropdown: true;
 
         value-changed(v) => {
+            tabs[section.current-tab-index].tool-pressfit = false;
             tabs[section.current-tab-index].tool-drill.value = v;
         }
 
@@ -38,11 +46,47 @@ export component AddViaToolBar inherits HorizontalLayout {
         }
 
         increase-triggered => {
+            tabs[section.current-tab-index].tool-pressfit = false;
             tabs[section.current-tab-index].tool-drill.increase = true;
         }
 
         decrease-triggered => {
+            tabs[section.current-tab-index].tool-pressfit = false;
             tabs[section.current-tab-index].tool-drill.decrease = true;
+        }
+
+        auto-toggled(checked) => {
+            tabs[section.current-tab-index].tool-pressfit = checked;
+        }
+
+        dropdown-triggered => {
+            via-drill-popup.show();
+        }
+
+        via-drill-popup := MenuPopup {
+            x: 0;
+            y: parent.height;
+
+            via-drill-save-in-board-item := MenuItem {
+                icon: @image-url("../../../../../font-awesome/svgs/solid/download.svg");
+                text: @tr("Set as Default in Board");
+                status-tip: @tr("Saves the entered value in the board design rules as default value");
+
+                clicked => {
+                    Backend.trigger-tab(section-index, section.current-tab-index, TabAction.toolbar-via-drill-save-in-board);
+                }
+            }
+
+            via-drill-save-in-netclass-item := MenuItem {
+                icon: @image-url("../../../../../font-awesome/svgs/solid/download.svg");
+                text: @tr("Set as Default in Net Class '{}'", tabs[section.current-tab-index].tool-netclass-name);
+                status-tip: @tr("Saves the entered value as default value for the current net class");
+                enabled: !tabs[section.current-tab-index].tool-netclass-name.is-empty;
+
+                clicked => {
+                    Backend.trigger-tab(section-index, section.current-tab-index, TabAction.toolbar-via-drill-save-in-netclass);
+                }
+            }
         }
     }
 
@@ -53,6 +97,7 @@ export component AddViaToolBar inherits HorizontalLayout {
         min-width-text: "1.234";
         auto-supported: true;
         auto-checked: tabs[section.current-tab-index].tool-mirrored;
+        enabled: !via-drill-edt.auto-checked;
 
         value-changed(v) => {
             tabs[section.current-tab-index].tool-mirrored = false;

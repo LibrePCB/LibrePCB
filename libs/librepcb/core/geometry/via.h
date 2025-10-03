@@ -72,7 +72,7 @@ public:
   Via(const Via& other) noexcept;
   Via(const Uuid& uuid, const Via& other) noexcept;
   Via(const Uuid& uuid, const Layer& startLayer, const Layer& endLayer,
-      const Point& position, const PositiveLength& drillDiameter,
+      const Point& position, const std::optional<PositiveLength>& drillDiameter,
       const std::optional<PositiveLength>& size,
       const MaskConfig& exposureConfig);
   explicit Via(const SExpression& node);
@@ -83,7 +83,7 @@ public:
   const Layer& getStartLayer() const noexcept { return *mStartLayer; }
   const Layer& getEndLayer() const noexcept { return *mEndLayer; }
   const Point& getPosition() const noexcept { return mPosition; }
-  const PositiveLength& getDrillDiameter() const noexcept {
+  const std::optional<PositiveLength>& getDrillDiameter() const noexcept {
     return mDrillDiameter;
   }
   const std::optional<PositiveLength>& getSize() const noexcept {
@@ -102,7 +102,7 @@ public:
   bool setUuid(const Uuid& uuid) noexcept;
   bool setLayers(const Layer& from, const Layer& to);
   bool setPosition(const Point& position) noexcept;
-  bool setDrillAndSize(const PositiveLength& drill,
+  bool setDrillAndSize(const std::optional<PositiveLength>& drill,
                        const std::optional<PositiveLength>& size);
   bool setExposureConfig(const MaskConfig& config) noexcept;
 
@@ -138,7 +138,8 @@ private:  // Data
   const Layer* mStartLayer;
   const Layer* mEndLayer;
   Point mPosition;
-  PositiveLength mDrillDiameter;  ///< Guaranteed to be <= #mSize
+  // Invariant: If no drill is set, the size must not be set either.
+  std::optional<PositiveLength> mDrillDiameter;  ///< Guaranteed to be <= #mSize
   std::optional<PositiveLength> mSize;  ///< Guaranteed to be >= #mDrillDiameter
   MaskConfig mExposureConfig;
 };

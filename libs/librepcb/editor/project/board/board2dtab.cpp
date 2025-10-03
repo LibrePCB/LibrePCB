@@ -70,6 +70,8 @@
 #include <librepcb/core/project/board/items/bi_plane.h>
 #include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/circuit/componentinstance.h>
+#include <librepcb/core/project/circuit/netclass.h>
+#include <librepcb/core/project/circuit/netsignal.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectattributelookup.h>
 #include <librepcb/core/project/projectlibrary.h>
@@ -480,6 +482,10 @@ void Board2dTab::setDerivedUiData(const ui::Board2dTabData& data) noexcept {
 
   // Tool drill
   mToolDrill.setUiData(data.tool_drill);
+  emit viaDrillRequested(
+      ((mToolDrill.getValue() > 0) && (!data.tool_pressfit))
+          ? std::make_optional(PositiveLength(mToolDrill.getValue()))
+          : std::nullopt);
 
   // Tool filled / auto-width
   emit filledRequested(data.tool_filled);
@@ -940,6 +946,14 @@ void Board2dTab::trigger(ui::TabAction a) noexcept {
       emit saveTraceWidthInNetClassRequested();
       break;
     }
+    case ui::TabAction::ToolbarViaDrillSaveInBoard: {
+      emit saveViaDrillInBoardRequested();
+      break;
+    }
+    case ui::TabAction::ToolbarViaDrillSaveInNetclass: {
+      emit saveViaDrillInNetClassRequested();
+      break;
+    }
     default: {
       WindowTab::trigger(a);
       break;
@@ -1154,15 +1168,14 @@ void Board2dTab::fsmToolEnter(BoardEditorState_Select& state) noexcept {
 void Board2dTab::fsmToolEnter(BoardEditorState_DrawTrace& state) noexcept {
   mTool = ui::EditorTool::Wire;
 
-  // Net class name
-  auto setNetClassName = [this](const QString& name) {
-    mToolNetClassName = name;
+  // Net class
+  auto setNetClass = [this](NetClass* nc) {
+    mToolNetClassName = nc ? *nc->getName() : QString();
     onDerivedUiDataChanged.notify();
   };
-  setNetClassName(state.getNetClassName());
-  mFsmStateConnections.append(
-      connect(&state, &BoardEditorState_DrawTrace::netClassNameChanged, this,
-              setNetClassName));
+  setNetClass(state.getNetClass());
+  mFsmStateConnections.append(connect(
+      &state, &BoardEditorState_DrawTrace::netClassChanged, this, setNetClass));
 
   // Wire mode
   auto setWireMode = [this](BoardEditorState_DrawTrace::WireMode m) {
@@ -1228,12 +1241,24 @@ void Board2dTab::fsmToolEnter(BoardEditorState_DrawTrace& state) noexcept {
   mToolDrill.configure(state.getViaDrillDiameter(),
                        LengthEditContext::Steps::drillDiameter(),
                        "board_editor/add_via/drill");  // From via tool.
+  auto setViaDrill = [this](bool autoDrill, const PositiveLength& drill) {
+    mToolDrill.setValuePositive(drill);
+    mToolPressFit = autoDrill;
+    onDerivedUiDataChanged.notify();
+  };
+  setViaDrill(state.getViaAutoDrillDiameter(), state.getViaDrillDiameter());
   mFsmStateConnections.append(
       connect(&state, &BoardEditorState_DrawTrace::viaDrillDiameterChanged,
-              &mToolDrill, &LengthEditContext::setValuePositive));
+              this, setViaDrill));
   mFsmStateConnections.append(
-      connect(&mToolDrill, &LengthEditContext::valueChangedPositive, &state,
+      connect(this, &Board2dTab::viaDrillRequested, &state,
               &BoardEditorState_DrawTrace::setViaDrillDiameter));
+  mFsmStateConnections.append(
+      connect(this, &Board2dTab::saveViaDrillInBoardRequested, &state,
+              &BoardEditorState_DrawTrace::saveViaDrillDiameterInBoard));
+  mFsmStateConnections.append(
+      connect(this, &Board2dTab::saveViaDrillInNetClassRequested, &state,
+              &BoardEditorState_DrawTrace::saveViaDrillDiameterInNetClass));
 
   // Via size
   mToolSize.configure(state.getViaSize(), LengthEditContext::Steps::generic(),
@@ -1243,7 +1268,7 @@ void Board2dTab::fsmToolEnter(BoardEditorState_DrawTrace& state) noexcept {
     mToolMirrored = autoSize;
     onDerivedUiDataChanged.notify();
   };
-  setViaSize(state.getUseAutoViaSize(), state.getViaSize());
+  setViaSize(state.getAutoViaSize(), state.getViaSize());
   mFsmStateConnections.append(connect(
       &state, &BoardEditorState_DrawTrace::viaSizeChanged, this, setViaSize));
   mFsmStateConnections.append(connect(this, &Board2dTab::viaSizeRequested,
@@ -1260,12 +1285,24 @@ void Board2dTab::fsmToolEnter(BoardEditorState_AddVia& state) noexcept {
   mToolDrill.configure(state.getDrillDiameter(),
                        LengthEditContext::Steps::drillDiameter(),
                        "board_editor/add_via/drill");
+  auto setViaDrill = [this](bool autoDrill, const PositiveLength& drill) {
+    mToolDrill.setValuePositive(drill);
+    mToolPressFit = autoDrill;
+    onDerivedUiDataChanged.notify();
+  };
+  setViaDrill(state.getAutoDrillDiameter(), state.getDrillDiameter());
   mFsmStateConnections.append(
-      connect(&state, &BoardEditorState_AddVia::drillDiameterChanged,
-              &mToolDrill, &LengthEditContext::setValuePositive));
+      connect(&state, &BoardEditorState_AddVia::drillDiameterChanged, this,
+              setViaDrill));
   mFsmStateConnections.append(
-      connect(&mToolDrill, &LengthEditContext::valueChangedPositive, &state,
+      connect(this, &Board2dTab::viaDrillRequested, &state,
               &BoardEditorState_AddVia::setDrillDiameter));
+  mFsmStateConnections.append(
+      connect(this, &Board2dTab::saveViaDrillInBoardRequested, &state,
+              &BoardEditorState_AddVia::saveDrillDiameterInBoard));
+  mFsmStateConnections.append(
+      connect(this, &Board2dTab::saveViaDrillInNetClassRequested, &state,
+              &BoardEditorState_AddVia::saveDrillDiameterInNetClass));
 
   // Via size
   mToolSize.configure(state.getSize(), LengthEditContext::Steps::generic(),
@@ -1300,6 +1337,11 @@ void Board2dTab::fsmToolEnter(BoardEditorState_AddVia& state) noexcept {
       mToolNet = std::make_pair(true, std::nullopt);
     } else {
       mToolNet = std::make_pair(false, net);
+    }
+    mToolNetClassName.clear();
+    if (const NetSignal* ns =
+            net ? mProject.getCircuit().getNetSignals().value(*net) : nullptr) {
+      mToolNetClassName = *ns->getNetClass().getName();
     }
     onDerivedUiDataChanged.notify();
   };

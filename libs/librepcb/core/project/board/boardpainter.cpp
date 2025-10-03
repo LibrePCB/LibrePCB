@@ -126,10 +126,11 @@ BoardPainter::BoardPainter(const Board& board)
       addPad(pad);
     }
     for (const BI_Via* via : segment->getVias()) {
-      mVias.append(ViaData{
-          via->getPosition(), via->getDrillDiameter(), via->getActualSize(),
-          &via->getVia().getStartLayer(), &via->getVia().getEndLayer(),
-          via->getStopMaskDiameterTop(), via->getStopMaskDiameterBottom()});
+      mVias.append(ViaData{via->getPosition(), via->getActualDrillDiameter(),
+                           via->getActualSize(), &via->getVia().getStartLayer(),
+                           &via->getVia().getEndLayer(),
+                           via->getStopMaskDiameterTop(),
+                           via->getStopMaskDiameterBottom()});
     }
     for (const BI_NetLine* netline : segment->getNetLines()) {
       mTraces.append(Trace{&netline->getLayer(), netline->getP1().getPosition(),

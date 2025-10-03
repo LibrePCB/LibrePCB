@@ -63,6 +63,9 @@ public:
   const std::optional<PositiveLength>& getDefaultTraceWidth() const noexcept {
     return mDefaultTraceWidth;
   }
+  const std::optional<PositiveLength>& getDefaultViaDrill() const noexcept {
+    return mDefaultViaDrill;
+  }
   int getNetSignalCount() const noexcept {
     return mRegisteredNetSignals.count();
   }
@@ -72,6 +75,7 @@ public:
   void setName(const ElementName& name) noexcept;
   void setDefaultTraceWidth(
       const std::optional<PositiveLength>& value) noexcept;
+  void setDefaultViaDrill(const std::optional<PositiveLength>& value) noexcept;
 
   // General Methods
   void addToCircuit();
@@ -89,6 +93,9 @@ public:
   // Operator Overloadings
   NetClass& operator=(const NetClass& rhs) = delete;
 
+signals:
+  void designRulesModified();
+
 private:
   // General
   Circuit& mCircuit;
@@ -102,6 +109,7 @@ private:
   // Note: If `std::nullopt` (the default), the values from the corresponding
   // board's design rules are used instead.
   std::optional<PositiveLength> mDefaultTraceWidth;
+  std::optional<PositiveLength> mDefaultViaDrill;
 
   // Registered Elements
   /// @brief all registered netsignals

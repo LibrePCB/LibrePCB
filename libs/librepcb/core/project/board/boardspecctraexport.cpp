@@ -82,12 +82,17 @@ QByteArray BoardSpecctraExport::generate() const {
     }
   }
   // Sort for a more natural order of vias.
-  Toolbox::sortNumeric(
-      viaPadStacks,
-      [](const QCollator& cmp, const std::unique_ptr<SExpression>& a,
-         const std::unique_ptr<SExpression>& b) {
-        return cmp(a->getChild(0).getValue(), b->getChild(0).getValue());
-      });
+  QCollator collator;
+  collator.setLocale(QLocale::c());  // Important for locale-independent output.
+  collator.setNumericMode(true);
+  collator.setCaseSensitivity(Qt::CaseInsensitive);
+  collator.setIgnorePunctuation(false);
+  std::sort(viaPadStacks.begin(), viaPadStacks.end(),
+            [&collator](const std::unique_ptr<SExpression>& a,
+                        const std::unique_ptr<SExpression>& b) {
+              return collator(a->getChild(0).getValue(),
+                              b->getChild(0).getValue());
+            });
 
   // Project name must not contain spaces since quotation is not activated
   // until the "parser" node appears.
@@ -650,13 +655,19 @@ QString BoardSpecctraExport::getWiringPadStackId(const BI_Via& via) const {
     }
   };
 
-  // Note: Keep in sync with CmdBoardSpecctraImport::extractViaDrillDiameter()
-  // and CmdBoardSpecctraImport::extractViaExposureConfig().
-  QString s = QString("via-%1-%2")
-                  .arg(via.getDrillDiameter()->toMmString())
-                  .arg(via.getActualSize()->toMmString());
-  if (!via.getSize()) {
-    s += "-auto";
+  // Note: Keep in sync with CmdBoardSpecctraImport::extractViaDrillDiameter(),
+  // CmdBoardSpecctraImport::extractViaSize() and
+  // CmdBoardSpecctraImport::extractViaExposureConfig().
+  QString s = "via";
+  if (auto drill = via.getDrillDiameter()) {
+    s += "-" % (*drill)->toMmString();
+  } else {
+    s += "-" % via.getActualDrillDiameter()->toMmString() % ":auto";
+  }
+  if (auto size = via.getSize()) {
+    s += "-" % (*size)->toMmString();
+  } else {
+    s += "-" % via.getActualSize()->toMmString() % ":auto";
   }
   if (via.getVia().isThrough()) {
     s += "-tht";

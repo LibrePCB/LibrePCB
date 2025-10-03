@@ -106,6 +106,10 @@ Board::Board(Project& project,
   // Emit the "attributesChanged" signal when the project has emitted it.
   connect(&mProject, &Project::attributesChanged, this,
           &Board::attributesChanged);
+
+  // Emit the "designRulesModified" signal when net class rules have changed.
+  connect(&mProject.getCircuit(), &Circuit::netClassDesignRulesModified, this,
+          &Board::designRulesModified);
 }
 
 Board::~Board() noexcept {
@@ -265,7 +269,7 @@ std::shared_ptr<SceneData3D> Board::buildScene3D(
       }
     }
     foreach (const BI_Via* via, netSegment->getVias()) {
-      data->addVia(via->getPosition(), via->getDrillDiameter(),
+      data->addVia(via->getPosition(), via->getActualDrillDiameter(),
                    via->getActualSize(), via->getVia().getStartLayer(),
                    via->getVia().getEndLayer(), via->getStopMaskDiameterTop(),
                    via->getStopMaskDiameterBottom());

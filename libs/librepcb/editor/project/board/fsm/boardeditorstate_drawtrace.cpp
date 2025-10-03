@@ -46,7 +46,6 @@
 #include <librepcb/core/project/board/items/bi_netsegment.h>
 #include <librepcb/core/project/board/items/bi_pad.h>
 #include <librepcb/core/project/circuit/circuit.h>
-#include <librepcb/core/project/circuit/netclass.h>
 #include <librepcb/core/project/circuit/netsignal.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/types/layer.h>
@@ -68,7 +67,7 @@ BoardEditorState_DrawTrace::BoardEditorState_DrawTrace(
     const Context& context) noexcept
   : BoardEditorState(context),
     mSubState(SubState_Idle),
-    mCurrentNetClassName(),
+    mCurrentNetClass(nullptr),
     mCurrentWireMode(WireMode::HV),
     mCurrentLayer(&Layer::topCopper()),
     mAddVia(false),
@@ -77,7 +76,7 @@ BoardEditorState_DrawTrace::BoardEditorState_DrawTrace(
                           Layer::topCopper(),  // Start layer
                           Layer::botCopper(),  // End layer
                           Point(),  // Position is not relevant here
-                          PositiveLength(300000),  // Default drill diameter
+                          std::nullopt,  // Drill
                           std::nullopt,  // Auto size
                           MaskConfig::off()  // Exposure
                           ),
@@ -323,13 +322,11 @@ void BoardEditorState_DrawTrace::saveWidthInBoard() noexcept {
 }
 
 void BoardEditorState_DrawTrace::saveWidthInNetClass() noexcept {
-  NetSignal* netSignal =
-      mCurrentNetSegment ? mCurrentNetSegment->getNetSignal() : nullptr;
-  if (!netSignal) return;
+  if (!mCurrentNetClass) return;
 
   try {
     std::unique_ptr<CmdNetClassEdit> cmd(
-        new CmdNetClassEdit(netSignal->getNetClass()));
+        new CmdNetClassEdit(*mCurrentNetClass));
     cmd->setDefaultTraceWidth(mCurrentWidth);
     if (mSubState == SubState::SubState_Idle) {
       mContext.undoStack.execCmd(cmd.release());
@@ -344,18 +341,39 @@ void BoardEditorState_DrawTrace::saveWidthInNetClass() noexcept {
   }
 }
 
+PositiveLength BoardEditorState_DrawTrace::getViaDrillDiameter()
+    const noexcept {
+  if (auto drill = mCurrentViaProperties.getDrillDiameter()) {
+    return *drill;
+  }
+
+  if (auto drill = mCurrentNetClass ? mCurrentNetClass->getDefaultViaDrill()
+                                    : std::nullopt) {
+    return *drill;
+  }
+
+  return mContext.board.getDesignRules().getDefaultViaDrillDiameter();
+}
+
 void BoardEditorState_DrawTrace::setViaDrillDiameter(
-    const PositiveLength& diameter) noexcept {
+    const std::optional<PositiveLength>& diameter) noexcept {
+  // Avoid creating a via with auto drill but manual size.
+  if ((!diameter) && mCurrentViaProperties.getSize()) {
+    setViaSize(std::nullopt);
+  }
+
   // Avoid creating vias with a drill larger than size.
-  if (mCurrentViaProperties.getSize() &&
-      (diameter > *mCurrentViaProperties.getSize())) {
+  if (diameter && mCurrentViaProperties.getSize() &&
+      (*diameter > *mCurrentViaProperties.getSize())) {
     setViaSize(diameter);
   }
 
   const PositiveLength oldSize = getViaSize();
   if (mCurrentViaProperties.setDrillAndSize(diameter,
                                             mCurrentViaProperties.getSize())) {
-    emit viaDrillDiameterChanged(mCurrentViaProperties.getDrillDiameter());
+    emit viaDrillDiameterChanged(
+        !mCurrentViaProperties.getDrillDiameter().has_value(),
+        getViaDrillDiameter());
   }
 
   const PositiveLength newSize = getViaSize();
@@ -366,18 +384,64 @@ void BoardEditorState_DrawTrace::setViaDrillDiameter(
   updateNetpointPositions();
 }
 
+void BoardEditorState_DrawTrace::saveViaDrillDiameterInBoard() noexcept {
+  try {
+    std::unique_ptr<CmdBoardEdit> cmd(new CmdBoardEdit(mContext.board));
+    BoardDesignRules r = mContext.board.getDesignRules();
+    r.setDefaultViaDrillDiameter(getViaDrillDiameter());
+    cmd->setDesignRules(r);
+    if (mSubState == SubState::SubState_Idle) {
+      mContext.undoStack.execCmd(cmd.release());
+    } else {
+      // TODO: This is ugly because the modification will be reverted if the
+      // trace drawing tool is aborted! However, currently there is no clean
+      // way to apply the new value while the trace drawing tool is active :-(
+      mContext.undoStack.appendToCmdGroup(cmd.release());
+    }
+  } catch (const Exception& e) {
+    QMessageBox::critical(qApp->activeWindow(), "Error", e.getMsg());
+  }
+}
+
+void BoardEditorState_DrawTrace::saveViaDrillDiameterInNetClass() noexcept {
+  NetSignal* netSignal =
+      mCurrentNetSegment ? mCurrentNetSegment->getNetSignal() : nullptr;
+  if (!netSignal) return;
+
+  try {
+    std::unique_ptr<CmdNetClassEdit> cmd(
+        new CmdNetClassEdit(netSignal->getNetClass()));
+    cmd->setDefaultViaDrill(mCurrentViaProperties.getDrillDiameter());
+    if (mSubState == SubState::SubState_Idle) {
+      mContext.undoStack.execCmd(cmd.release());
+    } else {
+      // TODO: This is ugly because the modification will be reverted if the
+      // trace drawing tool is aborted! However, currently there is no clean
+      // way to apply the new value while the trace drawing tool is active :-(
+      mContext.undoStack.appendToCmdGroup(cmd.release());
+    }
+  } catch (const Exception& e) {
+    QMessageBox::critical(qApp->activeWindow(), "Error", e.getMsg());
+  }
+}
+
 PositiveLength BoardEditorState_DrawTrace::getViaSize() const noexcept {
   if (auto size = mCurrentViaProperties.getSize()) {
     return *size;
   } else {
     return Via::calcSizeFromRules(
-        mCurrentViaProperties.getDrillDiameter(),
+        getViaDrillDiameter(),
         mContext.board.getDesignRules().getViaAnnularRing());
   }
 }
 
 void BoardEditorState_DrawTrace::setViaSize(
     const std::optional<PositiveLength>& size) noexcept {
+  // Avoid creating a via with auto drill but manual size.
+  if (size && (!mCurrentViaProperties.getDrillDiameter())) {
+    setViaDrillDiameter(getViaDrillDiameter());
+  }
+
   // Avoid creating vias with a drill larger than size.
   if (size && ((*size) < mCurrentViaProperties.getDrillDiameter())) {
     setViaDrillDiameter(*size);
@@ -526,7 +590,7 @@ bool BoardEditorState_DrawTrace::startPositioning(
       mCurrentNetSegment = cmd->getNetSegment();
     }
     Q_ASSERT(mCurrentNetSegment);
-    updateNetClassName();
+    updateNetClass();
 
     // add netpoint if none found
     // TODO(5n8ke): Check if this could be even possible
@@ -823,7 +887,7 @@ bool BoardEditorState_DrawTrace::abortPositioning(
     }
   }
 
-  updateNetClassName();
+  updateNetClass();
 
   return success;
 }
@@ -994,17 +1058,26 @@ Point BoardEditorState_DrawTrace::calcMiddlePointPos(
   }
 }
 
-void BoardEditorState_DrawTrace::updateNetClassName() noexcept {
-  QString name;
+void BoardEditorState_DrawTrace::updateNetClass() noexcept {
+  NetClass* nc = nullptr;
   if (mCurrentNetSegment) {
     if (const NetSignal* sig = mCurrentNetSegment->getNetSignal()) {
-      name = *sig->getNetClass().getName();
+      nc = &sig->getNetClass();
     }
   }
 
-  if (name != mCurrentNetClassName) {
-    mCurrentNetClassName = name;
-    emit netClassNameChanged(mCurrentNetClassName);
+  const PositiveLength oldDrill = getViaDrillDiameter();
+  if (nc != mCurrentNetClass) {
+    mCurrentNetClass = nc;
+    emit netClassChanged(mCurrentNetClass);
+  }
+
+  const PositiveLength newDrill = getViaDrillDiameter();
+  if (newDrill != oldDrill) {
+    emit viaDrillDiameterChanged(
+        !mCurrentViaProperties.getDrillDiameter().has_value(), newDrill);
+    emit viaSizeChanged(!mCurrentViaProperties.getSize().has_value(),
+                        getViaSize());
   }
 }
 

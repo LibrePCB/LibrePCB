@@ -76,7 +76,6 @@ public:
   const NetLabel& getNetLabel() const noexcept { return mNetLabel; }
   SI_NetSegment& getNetSegment() const noexcept { return mNetSegment; }
   NetSignal& getNetSignalOfNetSegment() const noexcept;
-  Length getApproximateWidth() noexcept;
 
   // Setters
   void setPosition(const Point& position) noexcept;

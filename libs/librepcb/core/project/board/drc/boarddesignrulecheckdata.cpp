@@ -131,10 +131,11 @@ BoardDesignRuleCheckData::BoardDesignRuleCheckData(
       const librepcb::Via& via = biVia->getVia();
       nsd.vias.insert(
           biVia->getUuid(),
-          Via{biVia->getUuid(), biVia->getPosition(), biVia->getDrillDiameter(),
-              biVia->getActualSize(), connectedLayers, &via.getStartLayer(),
-              &via.getEndLayer(), biVia->getDrillLayerSpan(), via.isBuried(),
-              via.isBlind(), biVia->getStopMaskDiameterTop(),
+          Via{biVia->getUuid(), biVia->getPosition(),
+              biVia->getActualDrillDiameter(), biVia->getActualSize(),
+              connectedLayers, &via.getStartLayer(), &via.getEndLayer(),
+              biVia->getDrillLayerSpan(), via.isBuried(), via.isBlind(),
+              biVia->getStopMaskDiameterTop(),
               biVia->getStopMaskDiameterBottom()});
     }
     foreach (const BI_Pad* biPad, ns->getPads()) {

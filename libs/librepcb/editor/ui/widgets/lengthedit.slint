@@ -346,7 +346,9 @@ export component LengthEdit inherits Rectangle {
                             vertical-alignment: center;
                             font-size: 10.5px;
                             text-color: auto-checked ? white : #909090;
+                            text-color-disabled: auto-checked ? #d0d0d0 : #707070;
                             text: "AUTO";
+                            enabled: enabled;
 
                             clicked => {
                                 root.auto-toggled(!auto-checked);

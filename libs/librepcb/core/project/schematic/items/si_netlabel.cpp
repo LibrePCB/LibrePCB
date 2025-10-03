@@ -60,10 +60,6 @@ NetSignal& SI_NetLabel::getNetSignalOfNetSegment() const noexcept {
   return mNetSegment.getNetSignal();
 }
 
-Length SI_NetLabel::getApproximateWidth() noexcept {
-  return Length();  // TODO
-}
-
 /*******************************************************************************
  *  Setters
  ******************************************************************************/

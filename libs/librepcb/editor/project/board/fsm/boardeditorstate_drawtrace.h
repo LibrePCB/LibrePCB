@@ -26,6 +26,7 @@
 #include "boardeditorstate.h"
 
 #include <librepcb/core/geometry/via.h>
+#include <librepcb/core/project/circuit/netclass.h>
 
 #include <QtCore>
 
@@ -94,9 +95,7 @@ public:
       const GraphicsSceneMouseEvent& e) noexcept override;
 
   // Connection to UI
-  const QString& getNetClassName() const noexcept {
-    return mCurrentNetClassName;
-  }
+  NetClass* getNetClass() const noexcept { return mCurrentNetClass; }
   WireMode getWireMode() const noexcept { return mCurrentWireMode; }
   void setWireMode(WireMode mode) noexcept;
   QSet<const Layer*> getAvailableLayers() noexcept;
@@ -108,11 +107,15 @@ public:
   void setWidth(const PositiveLength& width) noexcept;
   void saveWidthInBoard() noexcept;
   void saveWidthInNetClass() noexcept;
-  const PositiveLength& getViaDrillDiameter() const noexcept {
-    return mCurrentViaProperties.getDrillDiameter();
+  bool getViaAutoDrillDiameter() const noexcept {
+    return !mCurrentViaProperties.getDrillDiameter().has_value();
   }
-  void setViaDrillDiameter(const PositiveLength& diameter) noexcept;
-  bool getUseAutoViaSize() const noexcept {
+  PositiveLength getViaDrillDiameter() const noexcept;
+  void setViaDrillDiameter(
+      const std::optional<PositiveLength>& diameter) noexcept;
+  void saveViaDrillDiameterInBoard() noexcept;
+  void saveViaDrillDiameterInNetClass() noexcept;
+  bool getAutoViaSize() const noexcept {
     return !mCurrentViaProperties.getSize().has_value();
   }
   PositiveLength getViaSize() const noexcept;
@@ -123,12 +126,12 @@ public:
       delete;
 
 signals:
-  void netClassNameChanged(const QString& name);
+  void netClassChanged(NetClass* nc);
   void wireModeChanged(WireMode mode);
   void layerChanged(const Layer& layer);
   void autoWidthChanged(bool autoWidth);
   void widthChanged(const PositiveLength& width);
-  void viaDrillDiameterChanged(const PositiveLength& diameter);
+  void viaDrillDiameterChanged(bool autoSize, const PositiveLength& diameter);
   void viaSizeChanged(bool autoSize, const PositiveLength& size);
 
 private:
@@ -222,13 +225,13 @@ private:
                            WireMode mode) const noexcept;
 
   /**
-   * @brief Update #mCurrentNetClassName and emit signal
+   * @brief Update #mCurrentNetClass and emit #netClassChanged
    */
-  void updateNetClassName() noexcept;
+  void updateNetClass() noexcept;
 
   // State
   SubState mSubState;  ///< the current substate
-  QString mCurrentNetClassName;  ///< Empty in idle state
+  QPointer<NetClass> mCurrentNetClass;  ///< `nullptr` in idle state
   WireMode mCurrentWireMode;  ///< the current wire mode
   const Layer* mCurrentLayer;  ///< the current board layer name
   bool mAddVia;  ///< whether a via add is requested
