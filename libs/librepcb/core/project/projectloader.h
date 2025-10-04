@@ -90,12 +90,14 @@ private:  // Methods
   void loadSchematic(Project& p, const QString& relativeFilePath);
   void loadSchematicSymbol(Schematic& s, const SExpression& node);
   void loadSchematicNetSegment(Schematic& s, const SExpression& node);
+  void loadSchematicUserSettings(Schematic& s);
   void loadBoards(Project& p);
   void loadBoard(Project& p, const QString& relativeFilePath);
   void loadBoardDeviceInstance(Board& b, const SExpression& node);
   void loadBoardNetSegment(Board& b, const SExpression& node);
   void loadBoardPlane(Board& b, const SExpression& node);
   void loadBoardUserSettings(Board& b);
+  void loadProjectUserSettings(Project& p);
 
 private:  // Data
   bool mAutoAssignDeviceModels;

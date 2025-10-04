@@ -341,42 +341,53 @@ void Schematic::removeFromProject() {
 }
 
 void Schematic::save() {
-  std::unique_ptr<SExpression> root =
-      SExpression::createList("librepcb_schematic");
-  root->appendChild(mUuid);
-  root->ensureLineBreak();
-  root->appendChild("name", mName);
-  root->ensureLineBreak();
-  SExpression& gridNode = root->appendList("grid");
-  gridNode.appendChild("interval", mGridInterval);
-  gridNode.appendChild("unit", mGridUnit);
-  root->ensureLineBreak();
-  for (const SI_Symbol* obj : mSymbols) {
+  // Content.
+  {
+    std::unique_ptr<SExpression> root =
+        SExpression::createList("librepcb_schematic");
+    root->appendChild(mUuid);
     root->ensureLineBreak();
-    obj->serialize(root->appendList("symbol"));
-  }
-  root->ensureLineBreak();
-  for (const SI_NetSegment* obj : mNetSegments) {
+    root->appendChild("name", mName);
     root->ensureLineBreak();
-    obj->serialize(root->appendList("netsegment"));
-  }
-  root->ensureLineBreak();
-  for (const SI_Polygon* obj : mPolygons) {
+    SExpression& gridNode = root->appendList("grid");
+    gridNode.appendChild("interval", mGridInterval);
+    gridNode.appendChild("unit", mGridUnit);
     root->ensureLineBreak();
-    obj->getPolygon().serialize(root->appendList("polygon"));
-  }
-  root->ensureLineBreak();
-  for (const SI_Text* obj : mTexts) {
+    for (const SI_Symbol* obj : mSymbols) {
+      root->ensureLineBreak();
+      obj->serialize(root->appendList("symbol"));
+    }
     root->ensureLineBreak();
-    obj->getTextObj().serialize(root->appendList("text"));
-  }
-  root->ensureLineBreak();
-  for (const SI_Image* obj : mImages) {
+    for (const SI_NetSegment* obj : mNetSegments) {
+      root->ensureLineBreak();
+      obj->serialize(root->appendList("netsegment"));
+    }
     root->ensureLineBreak();
-    obj->getImage()->serialize(root->appendList("image"));
+    for (const SI_Polygon* obj : mPolygons) {
+      root->ensureLineBreak();
+      obj->getPolygon().serialize(root->appendList("polygon"));
+    }
+    root->ensureLineBreak();
+    for (const SI_Text* obj : mTexts) {
+      root->ensureLineBreak();
+      obj->getTextObj().serialize(root->appendList("text"));
+    }
+    root->ensureLineBreak();
+    for (const SI_Image* obj : mImages) {
+      root->ensureLineBreak();
+      obj->getImage()->serialize(root->appendList("image"));
+    }
+    root->ensureLineBreak();
+    mDirectory->write("schematic.lp", root->toByteArray());
   }
-  root->ensureLineBreak();
-  mDirectory->write("schematic.lp", root->toByteArray());
+
+  // User settings.
+  {
+    std::unique_ptr<SExpression> root =
+        SExpression::createList("librepcb_schematic_user_settings");
+    root->ensureLineBreak();
+    mDirectory->write("settings.user.lp", root->toByteArray());
+  }
 }
 
 void Schematic::updateAllNetLabelAnchors() noexcept {
