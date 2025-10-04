@@ -75,7 +75,7 @@ public:
   const QUrl& getUrl() const noexcept { return mUrl; }
 
   // General Methods
-  void requestLibraryList() const noexcept;
+  void requestLibraryList(bool forceNoCache = false) noexcept;
   void requestPartsInformationStatus() const noexcept;
   void requestPartsInformation(const QUrl& url,
                                const QVector<Part>& parts) const noexcept;
@@ -92,8 +92,9 @@ signals:
   void errorWhileFetchingPartsInformation(const QString& errorMsg);
 
 private:  // Methods
-  void requestLibraryList(const QUrl& url) const noexcept;
-  void libraryListResponseReceived(const QByteArray& data) noexcept;
+  void requestLibraryList(const QUrl& url, bool forceNoCache) noexcept;
+  void libraryListResponseReceived(const QByteArray& data,
+                                   bool forceNoCache) noexcept;
   void partsInformationStatusResponseReceived(const QByteArray& data) noexcept;
   void partsInformationResponseReceived(const QByteArray& data) noexcept;
 
