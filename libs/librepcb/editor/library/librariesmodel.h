@@ -71,6 +71,8 @@ public:
   void setOnlineVersions(const QHash<Uuid, Version>& versions) noexcept;
   void ensurePopulated(bool withIcons) noexcept;
   void highlightLibraryOnNextRescan(const FilePath& fp) noexcept;
+  void checkForUpdates() noexcept;
+  void cancelUpdateCheck() noexcept;
   void applyChanges() noexcept;
   void cancel() noexcept;
 
@@ -90,7 +92,7 @@ signals:
 
 private:
   void updateLibraries(bool resetHighlight = true) noexcept;
-  void requestOnlineLibraries() noexcept;
+  void requestOnlineLibraries(bool forceNoCache) noexcept;
   void onlineLibraryListReceived(QList<ApiEndpoint::Library> libs) noexcept;
   void requestMissingOnlineIcons() noexcept;
   void onlineIconReceived(const Uuid& uuid, const QByteArray& data) noexcept;

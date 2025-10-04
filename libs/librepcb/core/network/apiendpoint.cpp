@@ -48,10 +48,10 @@ ApiEndpoint::~ApiEndpoint() noexcept {
  *  General Methods
  ******************************************************************************/
 
-void ApiEndpoint::requestLibraryList() const noexcept {
+void ApiEndpoint::requestLibraryList(bool forceNoCache) noexcept {
   QString path =
       "/api/v1/libraries/v" % Application::getFileFormatVersion().toStr();
-  requestLibraryList(QUrl(mUrl.toString() % path));
+  requestLibraryList(QUrl(mUrl.toString() % path), forceNoCache);
 }
 
 void ApiEndpoint::requestPartsInformationStatus() const noexcept {
@@ -101,18 +101,27 @@ void ApiEndpoint::requestPartsInformation(
  *  Private Methods
  ******************************************************************************/
 
-void ApiEndpoint::requestLibraryList(const QUrl& url) const noexcept {
+void ApiEndpoint::requestLibraryList(const QUrl& url,
+                                     bool forceNoCache) noexcept {
   NetworkRequest* request = new NetworkRequest(url);
   request->setHeaderField("Accept", "application/json;charset=UTF-8");
   request->setHeaderField("Accept-Charset", "UTF-8");
+  if (forceNoCache) {
+    request->setCacheLoadControl(QNetworkRequest::AlwaysNetwork);
+  }
   connect(request, &NetworkRequest::errored, this,
           &ApiEndpoint::errorWhileFetchingLibraryList, Qt::QueuedConnection);
-  connect(request, &NetworkRequest::dataReceived, this,
-          &ApiEndpoint::libraryListResponseReceived, Qt::QueuedConnection);
+  connect(
+      request, &NetworkRequest::dataReceived, this,
+      [this, forceNoCache](const QByteArray& data) {
+        libraryListResponseReceived(data, forceNoCache);
+      },
+      Qt::QueuedConnection);
   request->start();
 }
 
-void ApiEndpoint::libraryListResponseReceived(const QByteArray& data) noexcept {
+void ApiEndpoint::libraryListResponseReceived(const QByteArray& data,
+                                              bool forceNoCache) noexcept {
   QJsonDocument doc = QJsonDocument::fromJson(data);
   if (doc.isNull() || doc.isEmpty() || (!doc.isObject())) {
     emit errorWhileFetchingLibraryList(
@@ -125,7 +134,7 @@ void ApiEndpoint::libraryListResponseReceived(const QByteArray& data) noexcept {
     if (url.isValid()) {
       qDebug().nospace() << "Request more results from API endpoint "
                          << url.toString() << "...";
-      requestLibraryList(url);
+      requestLibraryList(url, forceNoCache);
     } else {
       qWarning() << "Invalid URL in received JSON object:"
                  << nextResultsLink.toString();

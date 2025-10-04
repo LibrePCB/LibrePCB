@@ -303,6 +303,35 @@ component LibrariesPanelSection inherits FocusScope {
             highlight: root.has-focus;
             show-spinner: data.refreshing;
 
+            if remote && (!data.refreshing): LinkText {
+                width: self.preferred-width + 2px;
+                horizontal-alignment: left;
+                vertical-alignment: center;
+                font-size: 10px;
+                text-color: #c0c0c0;
+                text: @tr("Toggle All");
+                enabled: root.enabled;
+
+                clicked => {
+                    check-all = !check-all;
+                }
+            }
+
+            if remote: Rectangle {
+                width: 2px;
+            }
+
+            if !data.refreshing-error.is-empty: IconButton {
+                width: self.height;
+                style: read-only;
+                icon: @image-url("../../../../font-awesome/svgs/solid/triangle-exclamation.svg");
+                icon-scale: 0.7;
+                color-disabled: yellow.darker(1);
+                color-enabled: yellow;
+                tooltip: data.refreshing-error;
+                enabled: root.enabled;
+            }
+
             if !remote: download-by-url-btn := IconButton {
                 width: self.height;
                 icon: @image-url("../../../../bootstrap-icons/icons/cloud-arrow-down-fill.svg");
@@ -326,33 +355,29 @@ component LibrariesPanelSection inherits FocusScope {
                 }
             }
 
-            if remote: LinkText {
-                width: self.preferred-width + view.scrollbar-width + 2px;
-                horizontal-alignment: left;
-                vertical-alignment: center;
-                font-size: 10px;
-                text-color: #c0c0c0;
-                text: @tr("Toggle All");
-                enabled: root.enabled;
+            property <bool> check-for-updates-enabled: true;
+            if remote && (!data.refreshing): check-for-updates-btn := IconButton {
+                width: self.height;
+                icon: @image-url("../../../../font-awesome/svgs/solid/rotate.svg");
+                icon-scale: 0.7;
+                tooltip: @tr("Check For Updates");
+                enabled: root.enabled && check-for-updates-enabled;
 
                 clicked => {
-                    check-all = !check-all;
+                    check-for-updates-enabled = false;  // DoS attack prevention ;-)
+                    Backend.trigger(Action.library-panel-check-for-updates);
                 }
             }
 
-            if remote: Rectangle {
-                width: 5px;
-            }
-
-            if !data.refreshing-error.is-empty: IconButton {
+            if remote && data.refreshing: cancel-update-check-btn := IconButton {
                 width: self.height;
-                style: read-only;
-                icon: @image-url("../../../../font-awesome/svgs/solid/triangle-exclamation.svg");
+                icon: @image-url("../../../../font-awesome/svgs/solid/ban.svg");
                 icon-scale: 0.7;
-                color-disabled: yellow.darker(1);
-                color-enabled: yellow;
-                tooltip: data.refreshing-error;
-                enabled: root.enabled;
+                tooltip: @tr("Cancel Update Check");
+
+                clicked => {
+                    Backend.trigger(Action.library-panel-cancel-update-check);
+                }
             }
         }
 
