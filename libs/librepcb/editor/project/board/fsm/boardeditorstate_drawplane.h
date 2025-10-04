@@ -93,6 +93,7 @@ private:  // Methods
   bool startAddPlane(const Point& pos) noexcept;
   bool addSegment(const Point& pos) noexcept;
   bool updateLastVertexPosition(const Point& pos) noexcept;
+  void updatePlaneSettings() noexcept;
   bool abortCommand(bool showErrMsgBox) noexcept;
 
 signals:

@@ -363,8 +363,14 @@ RuleCheckMessageList BoardDesignRuleCheck::checkCopperCopperClearances(
     const Data& data) {
   RuleCheckMessageList messages;
 
-  const UnsignedLength clearance = data.settings.getMinCopperCopperClearance();
-  if (clearance == 0) {
+  // Skip this check if no minimum copper clearances are configured.
+  bool anyClearanceSet = data.settings.getMinCopperCopperClearance() > 0;
+  for (const auto& nc : data.netClasses) {
+    if (nc.minCopperCopperClearance > 0) {
+      anyClearanceSet = true;
+    }
+  }
+  if (!anyClearanceSet) {
     return messages;
   }
 
@@ -379,7 +385,7 @@ RuleCheckMessageList BoardDesignRuleCheck::checkCopperCopperClearances(
     const Layer* startLayer;
     const Layer* endLayer;
     std::optional<Uuid> net;  // nullopt = no net
-    Length clearance;
+    Length clearance;  // Either from object, net class or DRC settings.
     ClipperLib::Paths copperArea;  // Exact copper outlines
     ClipperLib::Paths clearanceArea;  // Copper outlines + clearance - tolerance
   };
@@ -390,8 +396,8 @@ RuleCheckMessageList BoardDesignRuleCheck::checkCopperCopperClearances(
   BoardClipperPathGenerator gen(maxArcTolerance());
   auto addPad = [&](const Data::Pad& pad,
                     const DrcMsgCopperCopperClearanceViolation::Object& obj) {
-    const UnsignedLength padClearance =
-        std::max(clearance, pad.copperClearance);
+    const UnsignedLength padClearance = std::max(
+        pad.copperClearance, data.getMinCopperCopperClearance(pad.netClass));
     for (const Layer* layer : data.copperLayers) {
       if (!pad.geometries.value(layer).isEmpty()) {
         auto it = items.insert(
@@ -399,7 +405,7 @@ RuleCheckMessageList BoardDesignRuleCheck::checkCopperCopperClearances(
             Item{obj, layer, layer, pad.net, *padClearance, {}, {}});
         gen.addPad(pad, *layer);
         gen.takePathsTo(it->copperArea);
-        gen.addPad(pad, *layer, padClearance - tolerance);
+        gen.addPad(pad, *layer, std::max(padClearance - tolerance, Length(0)));
         gen.takePathsTo(it->clearanceArea);
       }
     }
@@ -407,6 +413,9 @@ RuleCheckMessageList BoardDesignRuleCheck::checkCopperCopperClearances(
 
   // Net segments.
   for (const Data::Segment& ns : data.segments) {
+    const UnsignedLength clearance =
+        data.getMinCopperCopperClearance(ns.netClass);
+
     // Pads.
     for (const Data::Pad& pad : ns.pads) {
       addPad(pad, DrcMsgCopperCopperClearanceViolation::Object::pad(pad, ns));
@@ -425,7 +434,7 @@ RuleCheckMessageList BoardDesignRuleCheck::checkCopperCopperClearances(
                {}});
       gen.addVia(via);
       gen.takePathsTo(it->copperArea);
-      gen.addVia(via, clearance - tolerance);
+      gen.addVia(via, std::max(clearance - tolerance, Length(0)));
       gen.takePathsTo(it->clearanceArea);
     }
 
@@ -443,7 +452,7 @@ RuleCheckMessageList BoardDesignRuleCheck::checkCopperCopperClearances(
                  {}});
         gen.addTrace(trace);
         gen.takePathsTo(it->copperArea);
-        gen.addTrace(trace, clearance - tolerance);
+        gen.addTrace(trace, std::max(clearance - tolerance, Length(0)));
         gen.takePathsTo(it->clearanceArea);
       }
     }
@@ -453,6 +462,8 @@ RuleCheckMessageList BoardDesignRuleCheck::checkCopperCopperClearances(
   if (!data.quick) {
     for (const Data::Plane& plane : data.planes) {
       if (data.copperLayers.contains(plane.layer)) {
+        const UnsignedLength clearance =
+            data.getMinCopperCopperClearance(plane.netClass);
         auto it = items.insert(
             items.end(),
             Item{DrcMsgCopperCopperClearanceViolation::Object::plane(plane),
@@ -465,7 +476,8 @@ RuleCheckMessageList BoardDesignRuleCheck::checkCopperCopperClearances(
         gen.addPlane(plane.fragments);
         gen.takePathsTo(it->copperArea);
         it->clearanceArea = it->copperArea;
-        ClipperHelpers::offset(it->clearanceArea, clearance - tolerance,
+        ClipperHelpers::offset(it->clearanceArea,
+                               std::max(clearance - tolerance, Length(0)),
                                maxArcTolerance());
       }
     }
@@ -474,6 +486,8 @@ RuleCheckMessageList BoardDesignRuleCheck::checkCopperCopperClearances(
   // Board polygons.
   for (const Data::Polygon& polygon : data.polygons) {
     if (data.copperLayers.contains(polygon.layer)) {
+      const UnsignedLength clearance =
+          data.settings.getMinCopperCopperClearance();
       auto it = items.insert(
           items.end(),
           Item{DrcMsgCopperCopperClearanceViolation::Object::polygon(polygon,
@@ -487,7 +501,8 @@ RuleCheckMessageList BoardDesignRuleCheck::checkCopperCopperClearances(
       gen.addPolygon(polygon.path, polygon.lineWidth, polygon.filled);
       gen.takePathsTo(it->copperArea);
       it->clearanceArea = it->copperArea;
-      ClipperHelpers::offset(it->clearanceArea, clearance - tolerance,
+      ClipperHelpers::offset(it->clearanceArea,
+                             std::max(clearance - tolerance, Length(0)),
                              maxArcTolerance());
     }
   }
@@ -495,6 +510,8 @@ RuleCheckMessageList BoardDesignRuleCheck::checkCopperCopperClearances(
   // Board stroke texts.
   for (const Data::StrokeText& st : data.strokeTexts) {
     if (data.copperLayers.contains(st.layer)) {
+      const UnsignedLength clearance =
+          data.settings.getMinCopperCopperClearance();
       auto it = items.insert(
           items.end(),
           Item{DrcMsgCopperCopperClearanceViolation::Object::strokeText(
@@ -507,7 +524,7 @@ RuleCheckMessageList BoardDesignRuleCheck::checkCopperCopperClearances(
                {}});
       gen.addStrokeText(st);
       gen.takePathsTo(it->copperArea);
-      gen.addStrokeText(st, clearance - tolerance);
+      gen.addStrokeText(st, std::max(clearance - tolerance, Length(0)));
       gen.takePathsTo(it->clearanceArea);
     }
   }
@@ -527,6 +544,8 @@ RuleCheckMessageList BoardDesignRuleCheck::checkCopperCopperClearances(
     for (const Data::Polygon& polygon : dev.polygons) {
       const Layer& layer = transform.map(*polygon.layer);
       if (data.copperLayers.contains(&layer)) {
+        const UnsignedLength clearance =
+            data.settings.getMinCopperCopperClearance();
         auto it = items.insert(
             items.end(),
             Item{DrcMsgCopperCopperClearanceViolation::Object::polygon(polygon,
@@ -541,7 +560,8 @@ RuleCheckMessageList BoardDesignRuleCheck::checkCopperCopperClearances(
                        polygon.filled);
         gen.takePathsTo(it->copperArea);
         it->clearanceArea = it->copperArea;
-        ClipperHelpers::offset(it->clearanceArea, clearance - tolerance,
+        ClipperHelpers::offset(it->clearanceArea,
+                               std::max(clearance - tolerance, Length(0)),
                                maxArcTolerance());
       }
     }
@@ -550,6 +570,8 @@ RuleCheckMessageList BoardDesignRuleCheck::checkCopperCopperClearances(
     for (const Data::Circle& circle : dev.circles) {
       const Layer& layer = transform.map(*circle.layer);
       if (data.copperLayers.contains(&layer)) {
+        const UnsignedLength clearance =
+            data.settings.getMinCopperCopperClearance();
         auto it = items.insert(
             items.end(),
             Item{DrcMsgCopperCopperClearanceViolation::Object::circle(circle,
@@ -562,7 +584,8 @@ RuleCheckMessageList BoardDesignRuleCheck::checkCopperCopperClearances(
                  {}});
         gen.addCircle(circle, transform);
         gen.takePathsTo(it->copperArea);
-        gen.addCircle(circle, transform, clearance - tolerance);
+        gen.addCircle(circle, transform,
+                      std::max(clearance - tolerance, Length(0)));
         gen.takePathsTo(it->clearanceArea);
       }
     }
@@ -571,6 +594,8 @@ RuleCheckMessageList BoardDesignRuleCheck::checkCopperCopperClearances(
     for (const Data::StrokeText& st : dev.strokeTexts) {
       // Layer does not need to be transformed!
       if (data.copperLayers.contains(st.layer)) {
+        const UnsignedLength clearance =
+            data.settings.getMinCopperCopperClearance();
         auto it = items.insert(
             items.end(),
             Item{DrcMsgCopperCopperClearanceViolation::Object::strokeText(st,
@@ -583,7 +608,7 @@ RuleCheckMessageList BoardDesignRuleCheck::checkCopperCopperClearances(
                  {}});
         gen.addStrokeText(st);
         gen.takePathsTo(it->copperArea);
-        gen.addStrokeText(st, clearance - tolerance);
+        gen.addStrokeText(st, std::max(clearance - tolerance, Length(0)));
         gen.takePathsTo(it->clearanceArea);
       }
     }
@@ -646,7 +671,8 @@ RuleCheckMessageList BoardDesignRuleCheck::checkCopperCopperClearances(
   auto lastItem = items.isEmpty() ? items.end() : std::prev(items.end());
   for (auto it1 = items.begin(); it1 != lastItem; it1++) {
     for (auto it2 = it1 + 1; it2 != items.end(); it2++) {
-      if (((it1->net != it2->net) || (!it1->net) || (!it2->net)) &&
+      if (((it1->clearance > 0) || (it2->clearance > 0)) &&
+          ((it1->net != it2->net) || (!it1->net) || (!it2->net)) &&
           layersOverlap(it1->startLayer, it1->endLayer, it2->startLayer,
                         it2->endLayer)) {
         QVector<Path> locations;
@@ -1173,16 +1199,11 @@ RuleCheckMessageList BoardDesignRuleCheck::checkSilkscreenStopmaskClearances(
 RuleCheckMessageList BoardDesignRuleCheck::checkMinimumCopperWidth(
     const Data& data) {
   RuleCheckMessageList messages;
-
-  const UnsignedLength minWidth = data.settings.getMinCopperWidth();
-  if (minWidth == 0) {
-    return messages;
-  }
-
   emitStatus(tr("Check copper widths..."));
-  checkMinimumWidth(messages, data, minWidth, [&data](const Layer& layer) {
-    return data.copperLayers.contains(&layer);
-  });
+  checkMinimumWidth(messages, data, data.settings.getMinCopperWidth(),
+                    [&data](const Layer& layer) {
+                      return data.copperLayers.contains(&layer);
+                    });
   return messages;
 }
 
@@ -1344,13 +1365,8 @@ RuleCheckMessageList BoardDesignRuleCheck::checkMinimumNpthSlotWidth(
 RuleCheckMessageList BoardDesignRuleCheck::checkMinimumPthDrillDiameter(
     const Data& data) {
   RuleCheckMessageList messages;
-
-  const UnsignedLength minDiameter = data.settings.getMinPthDrillDiameter();
-  if (minDiameter == 0) {
-    return messages;
-  }
-
   emitStatus(tr("Check PTH drill diameters..."));
+  const UnsignedLength minDiameter = data.settings.getMinPthDrillDiameter();
 
   // Pads & vias.
   for (const Data::Segment& ns : data.segments) {
@@ -1366,12 +1382,13 @@ RuleCheckMessageList BoardDesignRuleCheck::checkMinimumPthDrillDiameter(
         }
       }
     }
+    const UnsignedLength minViaDrill = data.getMinViaDrillDiameter(ns.netClass);
     for (const Data::Via& via : ns.vias) {
-      if (via.drillDiameter < minDiameter) {
+      if (via.drillDiameter < minViaDrill) {
         const QVector<Path> locations{
             Path::circle(via.drillDiameter).translated(via.position)};
         messages.append(std::make_shared<DrcMsgMinimumDrillDiameterViolation>(
-            DrcHoleRef::via(ns, via), minDiameter, locations));
+            DrcHoleRef::via(ns, via), minViaDrill, locations));
       }
     }
   }
@@ -2215,11 +2232,13 @@ void BoardDesignRuleCheck::checkMinimumWidth(
     if (!layerFilter(*plane.layer)) {
       continue;
     }
-    if (plane.minWidth < minWidth) {
+    const UnsignedLength minNetWidth =
+        std::max(minWidth, data.getMinCopperWidth(plane.netClass));
+    if (plane.minWidth < minNetWidth) {
       const QVector<Path> locations =
           plane.outline.toClosedPath().toOutlineStrokes(PositiveLength(200000));
       messages.append(std::make_shared<DrcMsgMinimumWidthViolation>(
-          plane, minWidth, locations));
+          plane, minNetWidth, locations));
     }
   }
 
@@ -2283,9 +2302,11 @@ void BoardDesignRuleCheck::checkMinimumWidth(
       if (!layerFilter(*trace.layer)) {
         continue;
       }
-      if (trace.width < minWidth) {
+      const UnsignedLength minNetWidth =
+          std::max(minWidth, data.getMinCopperWidth(ns.netClass));
+      if (trace.width < minNetWidth) {
         messages.append(std::make_shared<DrcMsgMinimumWidthViolation>(
-            ns, trace, minWidth, getTraceLocation(trace)));
+            ns, trace, minNetWidth, getTraceLocation(trace)));
       }
     }
   }

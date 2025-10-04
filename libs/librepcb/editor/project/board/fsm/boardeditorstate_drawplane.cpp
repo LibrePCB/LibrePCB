@@ -27,8 +27,11 @@
 #include "../../cmd/cmdboardplaneedit.h"
 
 #include <librepcb/core/project/board/board.h>
+#include <librepcb/core/project/board/boarddesignrules.h>
+#include <librepcb/core/project/board/drc/boarddesignrulecheckmessages.h>
 #include <librepcb/core/project/board/items/bi_plane.h>
 #include <librepcb/core/project/circuit/circuit.h>
+#include <librepcb/core/project/circuit/netclass.h>
 #include <librepcb/core/project/circuit/netsignal.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/types/layer.h>
@@ -165,6 +168,8 @@ void BoardEditorState_DrawPlane::setNet(
   if (mCurrentPlaneEditCmd) {
     mCurrentPlaneEditCmd->setNetSignal(mCurrentNetSignal);
   }
+
+  updatePlaneSettings();
 }
 
 QSet<const Layer*> BoardEditorState_DrawPlane::getAvailableLayers() noexcept {
@@ -195,7 +200,7 @@ bool BoardEditorState_DrawPlane::startAddPlane(const Point& pos) noexcept {
 
   try {
     // Start a new undo command
-    mContext.undoStack.beginCmdGroup(tr("Draw board plane"));
+    mContext.undoStack.beginCmdGroup(tr("Draw Board Plane"));
     mIsUndoCmdActive = true;
 
     // Add plane with two vertices
@@ -209,6 +214,7 @@ bool BoardEditorState_DrawPlane::startAddPlane(const Point& pos) noexcept {
     mCurrentPlaneEditCmd.reset(new CmdBoardPlaneEdit(*mCurrentPlane));
     mLastVertexPos = pos;
     makeLayerVisible(mCurrentLayer->getThemeColor());
+    updatePlaneSettings();
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
@@ -265,6 +271,38 @@ bool BoardEditorState_DrawPlane::updateLastVertexPosition(
     return true;
   } else {
     return false;
+  }
+}
+
+void BoardEditorState_DrawPlane::updatePlaneSettings() noexcept {
+  auto getClearanceValue = [](const UnsignedLength& a, const UnsignedLength& b,
+                              const UnsignedLength& fallback) {
+    const UnsignedLength value = std::max(a, b);
+    return (value > 0) ? value : fallback;
+  };
+
+  // These settings are not editable in the toolbar (yet), thus it is important
+  // to automatically apply reasonable values that conform to the design rules
+  // and DRC settings.
+  if (mCurrentPlaneEditCmd) {
+    const NetClass* nc =
+        mCurrentNetSignal ? &mCurrentNetSignal->getNetClass() : nullptr;
+    mCurrentPlaneEditCmd->setMinWidth(positiveToUnsigned(
+        (nc && nc->getDefaultTraceWidth())
+            ? *nc->getDefaultTraceWidth()
+            : mContext.board.getDesignRules().getDefaultTraceWidth()));
+    mCurrentPlaneEditCmd->setMinClearanceToCopper(getClearanceValue(
+        nc ? nc->getMinCopperCopperClearance() : UnsignedLength(0),
+        mContext.board.getDrcSettings().getMinCopperCopperClearance(),
+        UnsignedLength(250000)));
+    mCurrentPlaneEditCmd->setMinClearanceToBoard(getClearanceValue(
+        nc ? nc->getMinCopperCopperClearance() : UnsignedLength(0),
+        mContext.board.getDrcSettings().getMinCopperBoardClearance(),
+        UnsignedLength(300000)));
+    mCurrentPlaneEditCmd->setMinClearanceToNpth(getClearanceValue(
+        nc ? nc->getMinCopperCopperClearance() : UnsignedLength(0),
+        mContext.board.getDrcSettings().getMinCopperNpthClearance(),
+        UnsignedLength(300000)));
   }
 }
 

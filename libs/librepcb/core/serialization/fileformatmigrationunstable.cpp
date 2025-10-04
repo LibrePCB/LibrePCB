@@ -107,6 +107,11 @@ void FileFormatMigrationUnstable::upgradeCircuit(SExpression& root,
                            SExpression::createToken("inherit"));
     classNode->appendChild("default_via_drill_diameter",
                            SExpression::createToken("inherit"));
+    classNode->appendChild("min_copper_copper_clearance",
+                           SExpression::createToken("0"));
+    classNode->appendChild("min_copper_width", SExpression::createToken("0"));
+    classNode->appendChild("min_via_drill_diameter",
+                           SExpression::createToken("0"));
   }
 }
 

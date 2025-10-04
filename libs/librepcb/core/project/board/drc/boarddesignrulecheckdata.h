@@ -46,6 +46,11 @@ class Layer;
  * @brief Input data structure for ::librepcb::BoardDesignRuleCheck
  */
 struct BoardDesignRuleCheckData final {
+  struct NetClass {
+    UnsignedLength minCopperCopperClearance;
+    UnsignedLength minCopperWidth;
+    UnsignedLength minViaDrillDiameter;
+  };
   struct Junction {
     Uuid uuid;
     Point position;
@@ -91,11 +96,13 @@ struct BoardDesignRuleCheckData final {
     UnsignedLength copperClearance;
     std::optional<Uuid> net;
     QString netName;  // Empty if no net.
+    std::optional<Uuid> netClass;
   };
   struct Segment {
     Uuid uuid;
     std::optional<Uuid> net;
     QString netName;  // Empty if no net.
+    std::optional<Uuid> netClass;
     QHash<Uuid, Junction> junctions;
     QList<Trace> traces;
     QHash<Uuid, Via> vias;
@@ -118,6 +125,7 @@ struct BoardDesignRuleCheckData final {
     Uuid uuid;
     std::optional<Uuid> net;
     QString netName;  // Empty if no net.
+    std::optional<Uuid> netClass;
     const Layer* layer;
     UnsignedLength minWidth;
     Path outline;
@@ -177,6 +185,7 @@ struct BoardDesignRuleCheckData final {
   QSet<const Layer*> copperLayers;  // All board copper layers.
   QVector<const Layer*> silkscreenLayersTop;
   QVector<const Layer*> silkscreenLayersBot;
+  QHash<Uuid, NetClass> netClasses;
   QHash<Uuid, Segment> segments;
   QList<Plane> planes;
   QList<Polygon> polygons;
@@ -191,6 +200,40 @@ struct BoardDesignRuleCheckData final {
   BoardDesignRuleCheckData(const Board& board,
                            const BoardDesignRuleCheckSettings& drcSettings,
                            bool quickCheck) noexcept;
+
+  // Helper Methods
+  UnsignedLength getMinCopperCopperClearance(
+      const std::optional<Uuid> netClass) const noexcept {
+    if (netClass) {
+      auto it = netClasses.find(*netClass);
+      if (it != netClasses.end()) {
+        return std::max(settings.getMinCopperCopperClearance(),
+                        it->minCopperCopperClearance);
+      }
+    }
+    return settings.getMinCopperCopperClearance();
+  }
+  UnsignedLength getMinCopperWidth(
+      const std::optional<Uuid> netClass) const noexcept {
+    if (netClass) {
+      auto it = netClasses.find(*netClass);
+      if (it != netClasses.end()) {
+        return std::max(settings.getMinCopperWidth(), it->minCopperWidth);
+      }
+    }
+    return settings.getMinCopperWidth();
+  }
+  UnsignedLength getMinViaDrillDiameter(
+      const std::optional<Uuid> netClass) const noexcept {
+    if (netClass) {
+      auto it = netClasses.find(*netClass);
+      if (it != netClasses.end()) {
+        return std::max(settings.getMinPthDrillDiameter(),
+                        it->minViaDrillDiameter);
+      }
+    }
+    return settings.getMinPthDrillDiameter();
+  }
 };
 
 /*******************************************************************************
