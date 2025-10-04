@@ -299,6 +299,9 @@ private:
   QVector<const Layer*> mSilkscreenLayersBot;
 
   // User settings
+  // Those are stored in settings.user.lp and usually not under version control.
+  // Therefore it is allowed to add/remove settings without introducing a new
+  // file format version.
   QMap<QString, bool> mLayersVisibility;
 
   // DRC

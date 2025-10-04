@@ -181,6 +181,13 @@ private:
   PositiveLength mGridInterval;
   LengthUnit mGridUnit;
 
+  // User settings
+  // Those are stored in settings.user.lp and usually not under version control.
+  // Therefore it is allowed to add/remove settings without introducing a new
+  // file format version.
+  // (no such settings yet)
+
+  // Items
   QMap<Uuid, SI_Symbol*> mSymbols;
   QMap<Uuid, SI_NetSegment*> mNetSegments;
   QMap<Uuid, SI_Polygon*> mPolygons;

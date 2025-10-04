@@ -450,6 +450,14 @@ void Project::save() {
     mDirectory->write("project/settings.lp", root->toByteArray());
   }
 
+  // User settings.
+  {
+    std::unique_ptr<SExpression> root =
+        SExpression::createList("librepcb_project_user_settings");
+    root->ensureLineBreak();
+    mDirectory->write("project/settings.user.lp", root->toByteArray());
+  }
+
   // Output jobs.
   {
     std::unique_ptr<SExpression> root =

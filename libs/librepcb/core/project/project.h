@@ -626,6 +626,12 @@ private:  // Data
   /// Default value for ::librepcb::ComponentInstance::mLockAssembly
   bool mDefaultLockComponentAssembly;
 
+  // User settings
+  // Those are stored in settings.user.lp and usually not under version control.
+  // Therefore it is allowed to add/remove settings without introducing a new
+  // file format version.
+  // (no such settings yet)
+
   /// Output jobs
   OutputJobList mOutputJobs;
 
