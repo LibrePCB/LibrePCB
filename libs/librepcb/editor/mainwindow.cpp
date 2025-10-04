@@ -590,6 +590,14 @@ void MainWindow::trigger(ui::Action a) noexcept {
       mApp.getRemoteLibraries().ensurePopulated(true);
       break;
     }
+    case ui::Action::LibraryPanelCheckForUpdates: {
+      mApp.getRemoteLibraries().checkForUpdates();
+      break;
+    }
+    case ui::Action::LibraryPanelCancelUpdateCheck: {
+      mApp.getRemoteLibraries().cancelUpdateCheck();
+      break;
+    }
     case ui::Action::LibraryPanelApply: {
       mApp.getRemoteLibraries().applyChanges();
       break;
