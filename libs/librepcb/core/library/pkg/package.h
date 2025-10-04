@@ -102,6 +102,9 @@ public:
   const PositiveLength& getGridInterval() const noexcept {
     return mGridInterval;
   }
+  const UnsignedLength& getMinCopperClearance() const noexcept {
+    return mMinCopperClearance;
+  }
   PackagePadList& getPads() noexcept { return mPads; }
   const PackagePadList& getPads() const noexcept { return mPads; }
   PackageModelList& getModels() noexcept { return mModels; }
@@ -115,6 +118,9 @@ public:
   void setAssemblyType(AssemblyType type) noexcept { mAssemblyType = type; }
   void setGridInterval(const PositiveLength& interval) noexcept {
     mGridInterval = interval;
+  }
+  void setMinCopperClearance(const UnsignedLength& value) noexcept {
+    mMinCopperClearance = value;
   }
 
   // General Methods
@@ -145,6 +151,7 @@ private:  // Data
   QList<AlternativeName> mAlternativeNames;  ///< Optional
   AssemblyType mAssemblyType;  ///< Package assembly type (metadata)
   PositiveLength mGridInterval;
+  UnsignedLength mMinCopperClearance;  ///< For the package checks
   PackagePadList mPads;  ///< empty list if the package has no pads
   PackageModelList mModels;  ///< 3D models (optional)
   FootprintList mFootprints;  ///< minimum one footprint

@@ -52,6 +52,7 @@ public:
 
   // Setters
   void setAssemblyType(Package::AssemblyType type) noexcept;
+  void setMinCopperClearance(const UnsignedLength& clr) noexcept;
 
   // Operator Overloadings
   CmdPackageEdit& operator=(const CmdPackageEdit& rhs) = delete;
@@ -71,6 +72,8 @@ private:  // Data
 
   Package::AssemblyType mOldAssemblyType;
   Package::AssemblyType mNewAssemblyType;
+  UnsignedLength mOldMinCopperClearance;
+  UnsignedLength mNewMinCopperClearance;
 };
 
 /*******************************************************************************

@@ -124,6 +124,7 @@ PackageTab::PackageTab(LibraryEditor& editor, std::unique_ptr<Package> pkg,
                                           editor.getWorkspace().getSettings(),
                                           CategoryTreeModel::Filter::PkgCat)),
     mAssemblyType(mPackage->getAssemblyType(false)),
+    mMinCopperClearance(mApp.getWorkspace().getSettings()),
     mPads(new PackagePadListModel()),
     mPadsSorted(new slint::SortModel<ui::PackagePadData>(
         mPads,
@@ -157,6 +158,10 @@ PackageTab::PackageTab(LibraryEditor& editor, std::unique_ptr<Package> pkg,
     mIsInterfaceBroken(false),
     mOriginalPackagePadUuids(mPackage->getPads().getUuidSet()),
     mOriginalFootprints(mPackage->getFootprints()) {
+  mMinCopperClearance.configure(mPackage->getMinCopperClearance(),
+                                LengthEditContext::Steps::generic(),
+                                "package_editor/min_copper_clearance");
+
   // Setup graphics view.
   mView->setUseOpenGl(mApp.getWorkspace().getSettings().useOpenGl.get());
   mView->setEventHandler(this);
@@ -329,6 +334,7 @@ ui::PackageTabData PackageTab::getDerivedUiData() const noexcept {
       mCategoriesTree,  // Categories tree
       mChooseCategory,  // Choose category
       l2s(mAssemblyType),  // Assembly type
+      mMinCopperClearance.getUiData(),  // Min. copper clearance
       mPadsSorted,  // Package pads
       mNewPadName,  // New pad name
       mNewPadNameError,  // New pad name error
@@ -466,6 +472,7 @@ void PackageTab::setDerivedUiData(const ui::PackageTabData& data) noexcept {
   if (auto at = s2assemblyType(data.assembly_type)) {
     mAssemblyType = *at;
   }
+  mMinCopperClearance.setUiData(data.min_copper_clearance);
 
   // New pad
   if (data.new_pad_name != mNewPadName) {
@@ -2321,6 +2328,7 @@ void PackageTab::refreshUiData() noexcept {
   mDeprecated = mPackage->isDeprecated();
   mCategories->setCategories(mPackage->getCategories());
   mAssemblyType = mPackage->getAssemblyType(false);
+  mMinCopperClearance.setValueUnsigned(mPackage->getMinCopperClearance());
 
   // Update "interface broken" only when no command is active since it would
   // be annoying to get it during intermediate states.
@@ -2382,6 +2390,10 @@ void PackageTab::commitUiData() noexcept {
     cmd->setDeprecated(mDeprecated);
     cmd->setCategories(mCategories->getCategories());
     cmd->setAssemblyType(mAssemblyType);
+    if (mMinCopperClearance.getValue() >= 0) {
+      cmd->setMinCopperClearance(
+          UnsignedLength(mMinCopperClearance.getValue()));
+    }
     mUndoStack->execCmd(cmd.release());  // can throw
 
     mPads->apply();  // can throw

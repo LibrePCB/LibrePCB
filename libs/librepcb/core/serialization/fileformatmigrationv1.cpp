@@ -87,6 +87,7 @@ void FileFormatMigrationV1::upgradePackage(TransactionalDirectory& dir) {
     std::unique_ptr<SExpression> root =
         SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
     root->appendChild("grid_interval", SExpression::createToken("2.54"));
+    root->appendChild("min_copper_clearance", SExpression::createToken("0.2"));
 
     // Footprints.
     for (SExpression* fptNode : root->getChildren("footprint")) {

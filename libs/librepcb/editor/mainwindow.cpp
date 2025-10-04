@@ -1122,6 +1122,7 @@ void MainWindow::openPackageTab(LibraryEditor& editor, const FilePath& fp,
           pkg->setResources(src->getResources());
           pkg->setAssemblyType(src->getAssemblyType(false));
           pkg->setGridInterval(src->getGridInterval());
+          pkg->setMinCopperClearance(src->getMinCopperClearance());
           // Copy pads but generate new UUIDs.
           QHash<Uuid, std::optional<Uuid>> padUuidMap;
           for (const PackagePad& pad : src->getPads()) {

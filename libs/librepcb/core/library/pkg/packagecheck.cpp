@@ -319,8 +319,8 @@ void PackageCheck::checkPadsPackagePadUuid(MsgList& msgs) const {
 }
 
 void PackageCheck::checkPadsClearanceToPads(MsgList& msgs) const {
-  Length clearance(200000);  // 200 µm
-  Length tolerance(10);  // 0.01 µm, to avoid rounding issues
+  const Length clearance = *mPackage.getMinCopperClearance();
+  const Length tolerance(10);  // 0.01 µm, to avoid rounding issues
 
   // Check all footprints.
   for (auto itFtp = mPackage.getFootprints().begin();

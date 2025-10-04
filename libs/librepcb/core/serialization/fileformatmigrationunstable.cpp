@@ -67,6 +67,15 @@ void FileFormatMigrationUnstable::upgradeSymbol(TransactionalDirectory& dir) {
 
 void FileFormatMigrationUnstable::upgradePackage(TransactionalDirectory& dir) {
   Q_UNUSED(dir);
+
+  // Content File.
+  {
+    const QString fp = "package.lp";
+    std::unique_ptr<SExpression> root =
+        SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+    root->appendChild("min_copper_clearance", SExpression::createToken("0.2"));
+    dir.write(fp, root->toByteArray());
+  }
 }
 
 void FileFormatMigrationUnstable::upgradeComponent(

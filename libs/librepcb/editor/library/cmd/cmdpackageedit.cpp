@@ -38,7 +38,9 @@ CmdPackageEdit::CmdPackageEdit(Package& package) noexcept
   : CmdLibraryElementEdit(package, tr("Edit Package Properties")),
     mPackage(package),
     mOldAssemblyType(package.getAssemblyType(false)),
-    mNewAssemblyType(mOldAssemblyType) {
+    mNewAssemblyType(mOldAssemblyType),
+    mOldMinCopperClearance(package.getMinCopperClearance()),
+    mNewMinCopperClearance(mOldMinCopperClearance) {
 }
 
 CmdPackageEdit::~CmdPackageEdit() noexcept {
@@ -53,6 +55,11 @@ void CmdPackageEdit::setAssemblyType(Package::AssemblyType type) noexcept {
   mNewAssemblyType = type;
 }
 
+void CmdPackageEdit::setMinCopperClearance(const UnsignedLength& clr) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewMinCopperClearance = clr;
+}
+
 /*******************************************************************************
  *  Inherited from UndoCommand
  ******************************************************************************/
@@ -60,17 +67,20 @@ void CmdPackageEdit::setAssemblyType(Package::AssemblyType type) noexcept {
 bool CmdPackageEdit::performExecute() {
   if (CmdLibraryElementEdit::performExecute()) return true;  // can throw
   if (mNewAssemblyType != mOldAssemblyType) return true;
+  if (mNewMinCopperClearance != mOldMinCopperClearance) return true;
   return false;
 }
 
 void CmdPackageEdit::performUndo() {
   CmdLibraryElementEdit::performUndo();  // can throw
   mPackage.setAssemblyType(mOldAssemblyType);
+  mPackage.setMinCopperClearance(mOldMinCopperClearance);
 }
 
 void CmdPackageEdit::performRedo() {
   CmdLibraryElementEdit::performRedo();  // can throw
   mPackage.setAssemblyType(mNewAssemblyType);
+  mPackage.setMinCopperClearance(mNewMinCopperClearance);
 }
 
 /*******************************************************************************
