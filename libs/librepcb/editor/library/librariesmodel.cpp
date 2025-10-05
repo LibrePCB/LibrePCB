@@ -134,7 +134,7 @@ void LibrariesModel::ensurePopulated(bool withIcons) noexcept {
   if ((mMode == Mode::RemoteLibs) &&
       (mApiEndpointsInProgress.isEmpty() &&
        (mOnlineLibs.isEmpty() || (!mOnlineLibsErrors.isEmpty())))) {
-    requestOnlineLibraries();
+    requestOnlineLibraries(false);
   }
   if (mRequestIcons) {
     requestMissingOnlineIcons();
@@ -143,6 +143,20 @@ void LibrariesModel::ensurePopulated(bool withIcons) noexcept {
 
 void LibrariesModel::highlightLibraryOnNextRescan(const FilePath& fp) noexcept {
   mHighlightedLib = fp;
+}
+
+void LibrariesModel::checkForUpdates() noexcept {
+  if (mMode != Mode::RemoteLibs) return;
+
+  requestOnlineLibraries(true);
+}
+
+void LibrariesModel::cancelUpdateCheck() noexcept {
+  if (mMode != Mode::RemoteLibs) return;
+
+  mApiEndpointsInProgress.clear();  // Should cancel the network requests.
+  mOnlineLibsErrors.clear();
+  emit uiDataChanged(getUiData());
 }
 
 void LibrariesModel::applyChanges() noexcept {
@@ -342,7 +356,7 @@ void LibrariesModel::updateLibraries(bool resetHighlight) noexcept {
   }
 }
 
-void LibrariesModel::requestOnlineLibraries() noexcept {
+void LibrariesModel::requestOnlineLibraries(bool forceNoCache) noexcept {
   mApiEndpointsInProgress.clear();  // Disconnects all signal/slot connections.
   mOnlineLibs.clear();
   mOnlineLibsErrors.clear();
@@ -353,7 +367,7 @@ void LibrariesModel::requestOnlineLibraries() noexcept {
     connect(repo.get(), &ApiEndpoint::errorWhileFetchingLibraryList, this,
             &LibrariesModel::errorWhileFetchingLibraryList);
     mApiEndpointsInProgress.append(repo);
-    repo->requestLibraryList();
+    repo->requestLibraryList(forceNoCache);
   }
   if (!mApiEndpointsInProgress.isEmpty()) {
     emit uiDataChanged(getUiData());
