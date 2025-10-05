@@ -24,6 +24,7 @@
 #include <gtest/gtest.h>
 #include <librepcb/core/algorithm/netsegmentsimplifier.h>
 #include <librepcb/core/types/layer.h>
+#include <librepcb/core/utils/toolbox.h>
 
 #include <QtCore>
 
@@ -61,6 +62,9 @@ protected:
                    .arg(it->getX().toMmString())
                    .arg(it->getY().toMmString()));
     }
+    for (int id : Toolbox::sortedQSet(result.disconnectedPinsOrPads)) {
+      s.append(QString("disconnected pin/pad id=%1").arg(id));
+    }
     s.append(QString("modified=%1").arg(result.modified ? "true" : "false"));
     return s.join("\n").toStdString();
   }
@@ -74,7 +78,7 @@ TEST_F(NetSegmentSimplifierTest, testEmpty) {
   NetSegmentSimplifier obj;
   const Result actual = obj.simplify();
 
-  const Result expected{{}, {}, false};
+  const Result expected{{}, {}, {}, false};
   EXPECT_EQ(str(expected), str(actual));
 }
 
@@ -104,7 +108,7 @@ TEST_F(NetSegmentSimplifierTest, testOnlyAnchors) {
   obj.addAnchor(AnchorType::Via, Point(1000, 1000), nullptr, nullptr);
   const Result actual = obj.simplify();
 
-  const Result expected{{}, {}, false};
+  const Result expected{{}, {}, {}, false};
   EXPECT_EQ(str(expected), str(actual));
 }
 
@@ -115,7 +119,8 @@ TEST_F(NetSegmentSimplifierTest, testOneLine) {
   obj.addLine(0, 1, nullptr, Length(1));
   const Result actual = obj.simplify();
 
-  const Result expected{{Line{0, 0, 1, nullptr, Length(1), false}}, {}, false};
+  const Result expected{
+      {Line{0, 0, 1, nullptr, Length(1), false}}, {}, {}, false};
   EXPECT_EQ(str(expected), str(actual));
 }
 
@@ -139,6 +144,7 @@ TEST_F(NetSegmentSimplifierTest, testDuplicateJunctions) {
                             Line{3, 0, 4, nullptr, Length(4), true},
                         },
                         {},
+                        {},
                         true};
   EXPECT_EQ(str(expected), str(actual));
 }
@@ -151,7 +157,8 @@ TEST_F(NetSegmentSimplifierTest, testTwoRedundantLines) {
   obj.addLine(1, 0, nullptr, Length(2));
   const Result actual = obj.simplify();
 
-  const Result expected{{Line{1, 1, 0, nullptr, Length(2), false}}, {}, true};
+  const Result expected{
+      {Line{1, 1, 0, nullptr, Length(2), false}}, {}, {}, true};
   EXPECT_EQ(str(expected), str(actual));
 }
 
@@ -162,7 +169,7 @@ TEST_F(NetSegmentSimplifierTest, testOneZeroLengthLineBetweenJunctions) {
   obj.addLine(0, 1, nullptr, Length(1));
   const Result actual = obj.simplify();
 
-  const Result expected{{}, {}, true};
+  const Result expected{{}, {}, {}, true};
   EXPECT_EQ(str(expected), str(actual));
 }
 
@@ -173,7 +180,8 @@ TEST_F(NetSegmentSimplifierTest, testKeepZeroLengthLineBetweenPins) {
   obj.addLine(0, 1, nullptr, Length(1));
   const Result actual = obj.simplify();
 
-  const Result expected{{Line{0, 0, 1, nullptr, Length(1), false}}, {}, false};
+  const Result expected{
+      {Line{0, 0, 1, nullptr, Length(1), false}}, {}, {}, false};
   EXPECT_EQ(str(expected), str(actual));
 }
 
@@ -193,6 +201,7 @@ TEST_F(NetSegmentSimplifierTest, testMergeStraightLines) {
           Line{0, 0, 2, nullptr, Length(1), true},
           Line{2, 2, 3, nullptr, Length(3), false},
       },
+      {},
       {},
       true,
   };
@@ -217,6 +226,7 @@ TEST_F(NetSegmentSimplifierTest, testKeepStraightLinesWithDifferentWidth) {
           Line{2, 2, 3, nullptr, Length(3), false},
       },
       {},
+      {},
       false,
   };
   EXPECT_EQ(str(expected), str(actual));
@@ -240,6 +250,7 @@ TEST_F(NetSegmentSimplifierTest, testSplitLineAtExistingAnchor) {
           Line{2, 2, 3, nullptr, Length(3), false},
           Line{3, 3, 1, nullptr, Length(1), true},  // new
       },
+      {},
       {},
       true,
   };
@@ -268,6 +279,7 @@ TEST_F(NetSegmentSimplifierTest, testSplitIntersectingLines) {
       {
           {4, Point(700, 0)},
       },
+      {},
       true,
   };
   EXPECT_EQ(str(expected), str(actual));
@@ -316,6 +328,23 @@ TEST_F(NetSegmentSimplifierTest, testSplitMultipleIntersectingLines) {
           {10, Point(600, 0)},
           {11, Point(400, 0)},
       },
+      {},
+      true,
+  };
+  EXPECT_EQ(str(expected), str(actual));
+}
+
+TEST_F(NetSegmentSimplifierTest, testDisconnectedPinsOrPads) {
+  NetSegmentSimplifier obj;
+  obj.addAnchor(AnchorType::Junction, Point(0, 0), nullptr, nullptr);
+  obj.addAnchor(AnchorType::PinOrPad, Point(0, 0), nullptr, nullptr);
+  obj.addLine(0, 1, nullptr, Length(1));
+  const Result actual = obj.simplify();
+
+  const Result expected{
+      {},  // Line removed
+      {},  // No new junctions
+      {1},  // Pin 1 disconnected
       true,
   };
   EXPECT_EQ(str(expected), str(actual));

@@ -68,6 +68,7 @@ int NetSegmentSimplifier::addLine(int p1, int p2, const Layer* layer,
 NetSegmentSimplifier::Result NetSegmentSimplifier::simplify() noexcept {
   // Clear state.
   mAnchorMap.clear();
+  mPinsOrPads.clear();
   mNextFreeLineId = mLines.count();
   mModified = false;
 
@@ -82,6 +83,16 @@ NetSegmentSimplifier::Result NetSegmentSimplifier::simplify() noexcept {
       return static_cast<int>(a.type) < static_cast<int>(b.type);
     });
   }
+
+  // Get all IDs of pins or pads.
+  for (const Anchor& anchor : mAnchors) {
+    if (anchor.type == AnchorType::PinOrPad) {
+      mPinsOrPads.insert(anchor.id);
+    }
+  }
+
+  // Memorize which pins or pads are currently connected.
+  const QSet<int> connectedPinsOrPads = getConnectedPinsOrPads();
 
   // Add junctions where lines are intersecting each other. Those lines will
   // then be split in the next step to connect with the new anchors.
@@ -108,7 +119,12 @@ NetSegmentSimplifier::Result NetSegmentSimplifier::simplify() noexcept {
     mModified = true;
   }
 
-  Result result{mLines.values(), {}, mModified};
+  Result result{
+      mLines.values(),
+      {},
+      connectedPinsOrPads - getConnectedPinsOrPads(),
+      mModified,
+  };
   for (const Anchor& anchor : mAnchors) {
     if (anchor.isNew) {
       result.newJunctions.insert(anchor.id, anchor.pos);
@@ -122,6 +138,15 @@ NetSegmentSimplifier::Result NetSegmentSimplifier::simplify() noexcept {
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
+
+QSet<int> NetSegmentSimplifier::getConnectedPinsOrPads() const noexcept {
+  QSet<int> ids;
+  for (const Line& line : mLines) {
+    ids.insert(line.p1);
+    ids.insert(line.p2);
+  }
+  return ids & mPinsOrPads;
+}
 
 void NetSegmentSimplifier::addJunctionsAtLineIntersections() noexcept {
   auto intersectsHorizontalVertical = [](const Point& a1, const Point& a2,
