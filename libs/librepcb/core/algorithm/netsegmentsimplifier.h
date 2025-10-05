@@ -74,6 +74,7 @@ public:
   struct Result {
     QList<Line> lines;
     QMap<int, Point> newJunctions;
+    QSet<int> disconnectedPinsOrPads;
     bool modified = false;
   };
 
@@ -153,6 +154,7 @@ private:
   };
 
   // Methods
+  QSet<int> getConnectedPinsOrPads() const noexcept;
   void addJunctionsAtLineIntersections() noexcept;
   void splitLinesAtAnchors() noexcept;
   void removeDuplicateJunctions() noexcept;
@@ -171,6 +173,7 @@ private:
 
   // State
   QHash<Point, QVector<Anchor>> mAnchorMap;
+  QSet<int> mPinsOrPads;
   bool mModified;
 };
 

@@ -22,10 +22,14 @@
  ******************************************************************************/
 #include "cmdsimplifyschematicnetsegments.h"
 
-#include "../../project/cmd/cmdschematicnetsegmentadd.h"
-#include "../../project/cmd/cmdschematicnetsegmentremove.h"
+#include "cmdcompsiginstsetnetsignal.h"
+#include "cmdremoveboarditems.h"
+#include "cmdschematicnetsegmentadd.h"
+#include "cmdschematicnetsegmentremove.h"
 
 #include <librepcb/core/algorithm/netsegmentsimplifier.h>
+#include <librepcb/core/project/board/items/bi_pad.h>
+#include <librepcb/core/project/circuit/componentsignalinstance.h>
 #include <librepcb/core/project/schematic/items/si_netline.h>
 #include <librepcb/core/project/schematic/items/si_netpoint.h>
 #include <librepcb/core/project/schematic/items/si_netsegment.h>
@@ -113,6 +117,32 @@ void CmdSimplifySchematicNetSegments::simplifySegment(SI_NetSegment& segment) {
 
   // Remove old segment.
   appendChild(new CmdSchematicNetSegmentRemove(segment));
+
+  // Disconnect component signals of pins which are no longer connected
+  // (i.e. their net line have been removed by the simplification).
+  for (auto id : result.disconnectedPinsOrPads) {
+    if (auto* pin = dynamic_cast<SI_SymbolPin*>(anchors.key(id, nullptr))) {
+      ComponentSignalInstance* sig = pin->getComponentSignalInstance();
+      if (sig && (sig->getRegisteredSymbolPins().count() <= 1)) {
+        // Last pin has been disconnected, thus deleting all traces from pads
+        // in boards and disconnect the component signal from the net signal.
+        QHash<Board*, QSet<BI_NetLine*>> boardNetLinesToRemove;
+        foreach (BI_Pad* pad, sig->getRegisteredFootprintPads()) {
+          boardNetLinesToRemove[&pad->getBoard()] += pad->getNetLines();
+        }
+        for (auto it = boardNetLinesToRemove.constBegin();
+             it != boardNetLinesToRemove.constEnd(); ++it) {
+          std::unique_ptr<CmdRemoveBoardItems> cmd(
+              new CmdRemoveBoardItems(*it.key()));
+          cmd->removeNetLines(it.value());
+          appendChild(cmd.release());
+        }
+        appendChild(new CmdCompSigInstSetNetSignal(*sig, nullptr));
+      }
+    } else {
+      throw LogicError(__FILE__, __LINE__, "ID does not correspond to a pin.");
+    }
+  }
 
   // Add new segment, if there is anything to add.
   std::unique_ptr<SI_NetSegment> newSegment(new SI_NetSegment(
