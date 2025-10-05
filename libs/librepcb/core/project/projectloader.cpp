@@ -148,6 +148,7 @@ std::unique_ptr<Project> ProjectLoader::open(
   loadErc(*p);
   loadSchematics(*p);
   loadBoards(*p);
+  loadProjectUserSettings(*p);
 
   // If the file format was migrated, clean up obsolete ERC messages.
   if (mUpgradeMessages) {
@@ -440,6 +441,9 @@ void ProjectLoader::loadSchematic(Project& p, const QString& relativeFilePath) {
     SI_Image* image = new SI_Image(*schematic, Image(*node));
     schematic->addImage(*image);
   }
+
+  // Load user settings.
+  loadSchematicUserSettings(*schematic);
 }
 
 void ProjectLoader::loadSchematicSymbol(Schematic& s, const SExpression& node) {
@@ -541,6 +545,21 @@ void ProjectLoader::loadSchematicNetSegment(Schematic& s,
   foreach (const SExpression* child, node.getChildren("label")) {
     SI_NetLabel* netLabel = new SI_NetLabel(*netSegment, NetLabel(*child));
     netSegment->addNetLabel(*netLabel);
+  }
+}
+
+void ProjectLoader::loadSchematicUserSettings(Schematic& s) {
+  try {
+    const QString fp = "settings.user.lp";
+    const std::unique_ptr<const SExpression> root = SExpression::parse(
+        s.getDirectory().read(fp), s.getDirectory().getAbsPath(fp));
+  } catch (const Exception&) {
+    // Project user settings are normally not put under version control and
+    // thus the likelyhood of parse errors is higher (e.g. when switching to
+    // an older, now incompatible revision). To avoid frustration, we just
+    // ignore these errors and load the default settings instead...
+    qCritical() << "Could not load schematic user settings, defaults will be "
+                   "used instead.";
   }
 }
 
@@ -860,6 +879,21 @@ void ProjectLoader::loadBoardUserSettings(Board& b) {
     // an older, now incompatible revision). To avoid frustration, we just
     // ignore these errors and load the default settings instead...
     qCritical() << "Could not load board user settings, defaults will be "
+                   "used instead.";
+  }
+}
+
+void ProjectLoader::loadProjectUserSettings(Project& p) {
+  try {
+    const QString fp = "project/settings.user.lp";
+    const std::unique_ptr<const SExpression> root = SExpression::parse(
+        p.getDirectory().read(fp), p.getDirectory().getAbsPath(fp));
+  } catch (const Exception&) {
+    // Project user settings are normally not put under version control and
+    // thus the likelyhood of parse errors is higher (e.g. when switching to
+    // an older, now incompatible revision). To avoid frustration, we just
+    // ignore these errors and load the default settings instead...
+    qCritical() << "Could not load project user settings, defaults will be "
                    "used instead.";
   }
 }
