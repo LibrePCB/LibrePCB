@@ -28,7 +28,7 @@
 #include "cmdschematicnetsegmentremove.h"
 
 #include <librepcb/core/algorithm/netsegmentsimplifier.h>
-#include <librepcb/core/project/board/items/bi_pad.h>
+#include <librepcb/core/project/board/items/bi_footprintpad.h>
 #include <librepcb/core/project/circuit/componentsignalinstance.h>
 #include <librepcb/core/project/schematic/items/si_netline.h>
 #include <librepcb/core/project/schematic/items/si_netpoint.h>
@@ -127,7 +127,7 @@ void CmdSimplifySchematicNetSegments::simplifySegment(SI_NetSegment& segment) {
         // Last pin has been disconnected, thus deleting all traces from pads
         // in boards and disconnect the component signal from the net signal.
         QHash<Board*, QSet<BI_NetLine*>> boardNetLinesToRemove;
-        foreach (BI_Pad* pad, sig->getRegisteredFootprintPads()) {
+        foreach (BI_FootprintPad* pad, sig->getRegisteredFootprintPads()) {
           boardNetLinesToRemove[&pad->getBoard()] += pad->getNetLines();
         }
         for (auto it = boardNetLinesToRemove.constBegin();
