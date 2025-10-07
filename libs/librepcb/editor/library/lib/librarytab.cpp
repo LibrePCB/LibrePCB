@@ -953,29 +953,35 @@ void LibraryTab::moveOrCopyElementsTo(
   const int ret = QMessageBox::warning(
       qApp->activeWindow(), tr("Move %1 Elements").arg(items.count()), msg,
       QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Cancel);
-  if (ret == QDialog::Accepted) {
-    // Close opened tabs of elements to be moved.
-    // TODO: Ask for saving if there are unsaved changes!
-    mEditor.forceClosingTabs(paths);
-    for (const FilePath& fp : paths) {
-      const QString relPath = fp.toRelative(fp.getParentDir().getParentDir());
-      const FilePath destination = dstLib.getPathTo(relPath);
-      try {
-        if (move) {
-          qInfo().nospace() << "Move library element from " << fp.toNative()
-                            << " to " << destination.toNative() << "...";
-          FileUtils::move(fp, destination);
-        } else {
-          qInfo().nospace() << "Copy library element from " << fp.toNative()
-                            << " to " << destination.toNative() << "...";
-          FileUtils::copyDirRecursively(fp, destination);
-        }
-      } catch (const Exception& e) {
-        QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
-      }
-    }
-    mEditor.getWorkspace().getLibraryDb().startLibraryRescan();
+  if (ret != QMessageBox::Yes) {
+    return;
   }
+
+  // Close opened tabs of elements to be moved.
+  // TODO: Ask for saving if there are unsaved changes!
+  mEditor.forceClosingTabs(paths);
+
+  // Copy/move elements.
+  for (const FilePath& fp : paths) {
+    const QString relPath = fp.toRelative(fp.getParentDir().getParentDir());
+    const FilePath destination = dstLib.getPathTo(relPath);
+    try {
+      if (move) {
+        qInfo().nospace() << "Move library element from " << fp.toNative()
+                          << " to " << destination.toNative() << "...";
+        FileUtils::move(fp, destination);
+      } else {
+        qInfo().nospace() << "Copy library element from " << fp.toNative()
+                          << " to " << destination.toNative() << "...";
+        FileUtils::copyDirRecursively(fp, destination);
+      }
+    } catch (const Exception& e) {
+      QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
+    }
+  }
+
+  // Start library rescan due to the changes made.
+  mEditor.getWorkspace().getLibraryDb().startLibraryRescan();
 }
 
 void LibraryTab::deleteElements(
