@@ -116,6 +116,17 @@ private:
   void registeredTabsModified() noexcept;
   void planesRebuildTimerTimeout() noexcept;
 
+  // DRC Autofixes
+  bool autoFixHandler(const std::shared_ptr<const RuleCheckMessage>& msg,
+                      bool checkOnly) noexcept;
+  bool autoFixImpl(const std::shared_ptr<const RuleCheckMessage>& msg,
+                   bool checkOnly);
+  template <typename MessageType>
+  bool autoFixHelper(const std::shared_ptr<const RuleCheckMessage>& msg,
+                     bool checkOnly);
+  template <typename MessageType>
+  bool autoFix(const MessageType& msg);
+
 private:
   ProjectEditor& mProjectEditor;
   Project& mProject;

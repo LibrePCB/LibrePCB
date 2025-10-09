@@ -30,6 +30,7 @@
 #include "../../undostack.h"
 #include "../../utils/slinthelpers.h"
 #include "../../workspace/desktopservices.h"
+#include "../cmd/cmdboardnetsegmentremove.h"
 #include "../projecteditor.h"
 #include "board2dtab.h"
 #include "board3dtab.h"
@@ -41,6 +42,7 @@
 #include <librepcb/core/network/orderpcbapirequest.h>
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/boardplanefragmentsbuilder.h>
+#include <librepcb/core/project/board/drc/boarddesignrulecheckmessages.h>
 #include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/types/layer.h>
@@ -98,6 +100,11 @@ BoardEditor::BoardEditor(ProjectEditor& prjEditor, Board& board, int uiIndex,
 BoardEditor::~BoardEditor() noexcept {
   // Stop ongoing operations, timers etc.
   mOrderRequest.reset();
+
+  // Unregister callbacks.
+  if (mDrcMessages) {
+    mDrcMessages->setAutofixHandler(nullptr);
+  }
 
   // Request all tabs to close.
   emit aboutToBeDestroyed();
@@ -452,6 +459,9 @@ void BoardEditor::setDrcResult(
   // Update UI.
   if (!mDrcMessages) {
     mDrcMessages.reset(new RuleCheckMessagesModel());
+    mDrcMessages->setAutofixHandler(std::bind(&BoardEditor::autoFixHandler,
+                                              this, std::placeholders::_1,
+                                              std::placeholders::_2));
     connect(mDrcMessages.get(), &RuleCheckMessagesModel::unapprovedCountChanged,
             this, [this]() { onUiDataChanged.notify(); });
     connect(mDrcMessages.get(), &RuleCheckMessagesModel::approvalChanged,
@@ -491,6 +501,53 @@ void BoardEditor::planesRebuildTimerTimeout() noexcept {
   if (pauseMs >= 1000) {
     startPlanesRebuild(false);
   }
+}
+
+/*******************************************************************************
+ *  Rule Check Autofixes
+ ******************************************************************************/
+
+bool BoardEditor::autoFixHandler(
+    const std::shared_ptr<const RuleCheckMessage>& msg,
+    bool checkOnly) noexcept {
+  try {
+    return autoFixImpl(msg, checkOnly);  // can throw
+  } catch (const Exception& e) {
+    if (!checkOnly) {
+      QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
+    }
+  }
+  return false;
+}
+
+bool BoardEditor::autoFixImpl(
+    const std::shared_ptr<const RuleCheckMessage>& msg, bool checkOnly) {
+  if (autoFixHelper<DrcMsgEmptyNetSegment>(msg, checkOnly)) return true;
+  return false;
+}
+
+template <typename MessageType>
+bool BoardEditor::autoFixHelper(
+    const std::shared_ptr<const RuleCheckMessage>& msg, bool checkOnly) {
+  if (msg) {
+    if (auto m = msg->as<MessageType>()) {
+      if (checkOnly) {
+        return true;
+      } else {
+        return autoFix(*m);  // can throw
+      }
+    }
+  }
+  return false;
+}
+
+template <>
+bool BoardEditor::autoFix(const DrcMsgEmptyNetSegment& msg) {
+  if (auto ns = mBoard.getNetSegments().value(msg.getUuid())) {
+    mProjectEditor.getUndoStack().execCmd(new CmdBoardNetSegmentRemove(*ns));
+    return true;
+  }
+  return false;
 }
 
 /*******************************************************************************

@@ -287,8 +287,13 @@ public:
   DrcMsgEmptyNetSegment() = delete;
   explicit DrcMsgEmptyNetSegment(const Data::Segment& ns) noexcept;
   DrcMsgEmptyNetSegment(const DrcMsgEmptyNetSegment& other) noexcept
-    : RuleCheckMessage(other) {}
+    : RuleCheckMessage(other), mUuid(other.mUuid) {}
   virtual ~DrcMsgEmptyNetSegment() noexcept {}
+
+  const Uuid& getUuid() const noexcept { return mUuid; }
+
+private:
+  Uuid mUuid;
 };
 
 /*******************************************************************************
