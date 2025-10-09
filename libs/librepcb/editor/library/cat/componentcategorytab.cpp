@@ -274,8 +274,11 @@ bool ComponentCategoryTab::autoFixHelper(
     const std::shared_ptr<const RuleCheckMessage>& msg, bool checkOnly) {
   if (msg) {
     if (auto m = msg->as<MessageType>()) {
-      if (!checkOnly) autoFix(*m);  // can throw
-      return true;
+      if (checkOnly) {
+        return true;
+      } else {
+        return autoFix(*m);  // can throw
+      }
     }
   }
   return false;
@@ -300,16 +303,18 @@ void ComponentCategoryTab::notifyDerivedUiDataChanged() noexcept {
  ******************************************************************************/
 
 template <>
-void ComponentCategoryTab::autoFix(const MsgNameNotTitleCase& msg) {
+bool ComponentCategoryTab::autoFix(const MsgNameNotTitleCase& msg) {
   mNameParsed = msg.getFixedName();
   commitUiData();
+  return true;
 }
 
 template <>
-void ComponentCategoryTab::autoFix(const MsgMissingAuthor& msg) {
+bool ComponentCategoryTab::autoFix(const MsgMissingAuthor& msg) {
   Q_UNUSED(msg);
   mAuthor = q2s(getWorkspaceSettingsUserName());
   commitUiData();
+  return true;
 }
 
 /*******************************************************************************

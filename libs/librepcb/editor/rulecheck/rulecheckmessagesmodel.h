@@ -89,6 +89,7 @@ private:
   AutofixHandler mAutofixHandler;
   RuleCheckMessageList mMessages;
   QSet<SExpression> mApprovals;
+  QSet<SExpression> mAutoFixed;
   int mUnapprovedCount;
   int mErrorCount;
 

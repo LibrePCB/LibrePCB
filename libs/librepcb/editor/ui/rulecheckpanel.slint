@@ -67,7 +67,7 @@ component RuleCheckListItem inherits Rectangle {
                     width: self.height;
                     height: parent.height - 2 * self.x;
                     source: Helpers.get-icon-for-notification-type(item.severity);
-                    colorize: (item.approved || (!root.enabled)) ? txt.color : Helpers.get-color-for-notification-type(item.severity);
+                    colorize: (item.approved || item.autofixed || (!root.enabled)) ? txt.color : Helpers.get-color-for-notification-type(item.severity);
                     accessible-role: none;
                 }
             }
@@ -77,7 +77,7 @@ component RuleCheckListItem inherits Rectangle {
                 font-size: 12px;
                 font-italic: item.approved;
                 overflow: elide;
-                color: root.enabled ? Palette.foreground : #707070;
+                color: (root.enabled && (!item.autofixed)) ? Palette.foreground : #707070;
                 text: item.message;
                 accessible-role: none;
             }
@@ -85,7 +85,7 @@ component RuleCheckListItem inherits Rectangle {
             if (!read-only) && item.supports-autofix && (selected || ta.has-hover): autofix-btn := ListViewItemButton {
                 icon: @image-url("../../../font-awesome/svgs/solid/wand-magic-sparkles.svg");
                 tooltip: @tr("Apply Automatic Fix");
-                enabled: root.enabled && (item.action != RuleCheckMessageAction.autofix);
+                enabled: root.enabled && (!item.autofixed) && (item.action != RuleCheckMessageAction.autofix);
 
                 clicked => {
                     model[index].action-window-id = Data.window-id;
@@ -96,7 +96,7 @@ component RuleCheckListItem inherits Rectangle {
             if (!read-only) && (selected || ta.has-hover || item.approved): approve-btn := ListViewItemButton {
                 icon: item.approved ? @image-url("../../../bootstrap-icons/icons/eye-slash-fill.svg") : @image-url("../../../bootstrap-icons/icons/eye-fill.svg");
                 tooltip: item.approved ? @tr("Remove Approval") : @tr("Approve");
-                enabled: root.enabled;
+                enabled: root.enabled && (!item.autofixed);
 
                 clicked => {
                     model[index].approved = !item.approved;
@@ -377,10 +377,15 @@ export component RuleCheckPanel inherits Rectangle {
                     padding: 8px;
 
                     selected-msg-txt := Text {
+                        // Only the DRC is not run automatically, thus the
+                        // autofix state persists until it is run again.
+                        property <bool> autofixed: selected-item.autofixed && (check.type == RuleCheckType.drc);
+
                         width: 100%;
                         font-size: 12px;
+                        font-italic: autofixed;
                         wrap: word-wrap;
-                        text: selected-item.description;
+                        text: autofixed ? @tr("This message is marked as fixed. Run the checks again to verify the message is really resolved and disappears.") : selected-item.description;
                     }
                 }
             }

@@ -1914,8 +1914,11 @@ bool PackageTab::autoFixHelper(
     const std::shared_ptr<const RuleCheckMessage>& msg, bool checkOnly) {
   if (msg) {
     if (auto m = msg->as<MessageType>()) {
-      if (!checkOnly) autoFix(*m);  // can throw
-      return true;
+      if (checkOnly) {
+        return true;
+      } else {
+        return autoFix(*m);  // can throw
+      }
     }
   }
   return false;
@@ -1940,58 +1943,65 @@ void PackageTab::notifyDerivedUiDataChanged() noexcept {
  ******************************************************************************/
 
 template <>
-void PackageTab::autoFix(const MsgNameNotTitleCase& msg) {
+bool PackageTab::autoFix(const MsgNameNotTitleCase& msg) {
   mNameParsed = msg.getFixedName();
   commitUiData();
+  return true;
 }
 
 template <>
-void PackageTab::autoFix(const MsgMissingAuthor& msg) {
+bool PackageTab::autoFix(const MsgMissingAuthor& msg) {
   Q_UNUSED(msg);
   mAuthor = q2s(getWorkspaceSettingsUserName());
   commitUiData();
+  return true;
 }
 
 template <>
-void PackageTab::autoFix(const MsgMissingCategories& msg) {
+bool PackageTab::autoFix(const MsgMissingCategories& msg) {
   Q_UNUSED(msg);
   mCurrentPageIndex = 0;
   mChooseCategory = true;
   onDerivedUiDataChanged.notify();
+  return true;
 }
 
 template <>
-void PackageTab::autoFix(const MsgDeprecatedAssemblyType& msg) {
+bool PackageTab::autoFix(const MsgDeprecatedAssemblyType& msg) {
   Q_UNUSED(msg);
   std::unique_ptr<CmdPackageEdit> cmd(new CmdPackageEdit(*mPackage));
   cmd->setAssemblyType(mPackage->guessAssemblyType());
   mUndoStack->execCmd(cmd.release());
+  return true;
 }
 
 template <>
-void PackageTab::autoFix(const MsgSuspiciousAssemblyType& msg) {
+bool PackageTab::autoFix(const MsgSuspiciousAssemblyType& msg) {
   Q_UNUSED(msg);
   std::unique_ptr<CmdPackageEdit> cmd(new CmdPackageEdit(*mPackage));
   cmd->setAssemblyType(mPackage->guessAssemblyType());
   mUndoStack->execCmd(cmd.release());
+  return true;
 }
 
 template <>
-void PackageTab::autoFix(const MsgMissingPackageOutline& msg) {
+bool PackageTab::autoFix(const MsgMissingPackageOutline& msg) {
   setCurrentFootprintIndex(
       mPackage->getFootprints().indexOf(msg.getFootprint().get()));
   mFsm->processGenerateOutline();
+  return true;
 }
 
 template <>
-void PackageTab::autoFix(const MsgMissingCourtyard& msg) {
+bool PackageTab::autoFix(const MsgMissingCourtyard& msg) {
   setCurrentFootprintIndex(
       mPackage->getFootprints().indexOf(msg.getFootprint().get()));
   mFsm->processGenerateCourtyard();
+  return true;
 }
 
 template <>
-void PackageTab::autoFix(const MsgMinimumWidthViolation& msg) {
+bool PackageTab::autoFix(const MsgMinimumWidthViolation& msg) {
   std::shared_ptr<Footprint> footprint =
       mPackage->getFootprints().get(msg.getFootprint().get());
   setCurrentFootprintIndex(mPackage->getFootprints().indexOf(footprint.get()));
@@ -2011,7 +2021,7 @@ void PackageTab::autoFix(const MsgMinimumWidthViolation& msg) {
   connect(btnBox, &QDialogButtonBox::accepted, &dlg, &QDialog::accept);
   vLayout->addWidget(btnBox);
   if (dlg.exec() != QDialog::Accepted) {
-    return;
+    return false;
   }
 
   if (auto p = footprint->getPolygons().find(msg.getPolygon().get())) {
@@ -2031,43 +2041,48 @@ void PackageTab::autoFix(const MsgMinimumWidthViolation& msg) {
     throw LogicError(__FILE__, __LINE__,
                      "Whoops, not implemented! Please open a bug report.");
   }
+  return true;
 }
 
 template <>
-void PackageTab::autoFix(const MsgMissingFootprint& msg) {
+bool PackageTab::autoFix(const MsgMissingFootprint& msg) {
   Q_UNUSED(msg);
   std::shared_ptr<Footprint> fpt = std::make_shared<Footprint>(
       Uuid::createRandom(), ElementName("default"), "");
   mUndoStack->execCmd(new CmdFootprintInsert(mPackage->getFootprints(), fpt));
+  return true;
 }
 
 template <>
-void PackageTab::autoFix(const MsgMissingFootprintModel& msg) {
+bool PackageTab::autoFix(const MsgMissingFootprintModel& msg) {
   setCurrentFootprintIndex(
       mPackage->getFootprints().indexOf(msg.getFootprint().get()));
   mCurrentPageIndex = 2;
   mView3d = true;
   onDerivedUiDataChanged.notify();
+  return true;
 }
 
 template <>
-void PackageTab::autoFix(const MsgMissingFootprintName& msg) {
+bool PackageTab::autoFix(const MsgMissingFootprintName& msg) {
   Q_UNUSED(msg);
   setCurrentFootprintIndex(
       mPackage->getFootprints().indexOf(msg.getFootprint().get()));
   mFsm->processStartAddingNames();
+  return true;
 }
 
 template <>
-void PackageTab::autoFix(const MsgMissingFootprintValue& msg) {
+bool PackageTab::autoFix(const MsgMissingFootprintValue& msg) {
   Q_UNUSED(msg);
   setCurrentFootprintIndex(
       mPackage->getFootprints().indexOf(msg.getFootprint().get()));
   mFsm->processStartAddingValues();
+  return true;
 }
 
 template <>
-void PackageTab::autoFix(const MsgFootprintOriginNotInCenter& msg) {
+bool PackageTab::autoFix(const MsgFootprintOriginNotInCenter& msg) {
   mFsm->processAbortCommand();
   mFsm->processAbortCommand();
   setCurrentFootprintIndex(
@@ -2075,10 +2090,11 @@ void PackageTab::autoFix(const MsgFootprintOriginNotInCenter& msg) {
   mFsm->processSelectAll();
   mFsm->processMove(-msg.getCenter());
   mFsm->processAbortCommand();  // Clear selection.
+  return true;
 }
 
 template <>
-void PackageTab::autoFix(const MsgWrongFootprintTextLayer& msg) {
+bool PackageTab::autoFix(const MsgWrongFootprintTextLayer& msg) {
   std::shared_ptr<Footprint> footprint =
       mPackage->getFootprints().get(msg.getFootprint().get());
   setCurrentFootprintIndex(mPackage->getFootprints().indexOf(footprint.get()));
@@ -2087,10 +2103,11 @@ void PackageTab::autoFix(const MsgWrongFootprintTextLayer& msg) {
   std::unique_ptr<CmdStrokeTextEdit> cmd(new CmdStrokeTextEdit(*text));
   cmd->setLayer(msg.getExpectedLayer(), false);
   mUndoStack->execCmd(cmd.release());
+  return true;
 }
 
 template <>
-void PackageTab::autoFix(const MsgUnusedCustomPadOutline& msg) {
+bool PackageTab::autoFix(const MsgUnusedCustomPadOutline& msg) {
   std::shared_ptr<Footprint> footprint =
       mPackage->getFootprints().get(msg.getFootprint().get());
   setCurrentFootprintIndex(mPackage->getFootprints().indexOf(footprint.get()));
@@ -2099,10 +2116,11 @@ void PackageTab::autoFix(const MsgUnusedCustomPadOutline& msg) {
   std::unique_ptr<CmdFootprintPadEdit> cmd(new CmdFootprintPadEdit(*pad));
   cmd->setCustomShapeOutline(Path());
   mUndoStack->execCmd(cmd.release());
+  return true;
 }
 
 template <>
-void PackageTab::autoFix(const MsgInvalidCustomPadOutline& msg) {
+bool PackageTab::autoFix(const MsgInvalidCustomPadOutline& msg) {
   std::shared_ptr<Footprint> footprint =
       mPackage->getFootprints().get(msg.getFootprint().get());
   setCurrentFootprintIndex(mPackage->getFootprints().indexOf(footprint.get()));
@@ -2111,10 +2129,11 @@ void PackageTab::autoFix(const MsgInvalidCustomPadOutline& msg) {
   std::unique_ptr<CmdFootprintPadEdit> cmd(new CmdFootprintPadEdit(*pad));
   cmd->setShape(Pad::Shape::RoundedRect, false);
   mUndoStack->execCmd(cmd.release());
+  return true;
 }
 
 template <>
-void PackageTab::autoFix(const MsgPadStopMaskOff& msg) {
+bool PackageTab::autoFix(const MsgPadStopMaskOff& msg) {
   std::shared_ptr<Footprint> footprint =
       mPackage->getFootprints().get(msg.getFootprint().get());
   setCurrentFootprintIndex(mPackage->getFootprints().indexOf(footprint.get()));
@@ -2123,10 +2142,11 @@ void PackageTab::autoFix(const MsgPadStopMaskOff& msg) {
   std::unique_ptr<CmdFootprintPadEdit> cmd(new CmdFootprintPadEdit(*pad));
   cmd->setStopMaskConfig(MaskConfig::automatic(), false);
   mUndoStack->execCmd(cmd.release());
+  return true;
 }
 
 template <>
-void PackageTab::autoFix(const MsgSmtPadWithSolderPaste& msg) {
+bool PackageTab::autoFix(const MsgSmtPadWithSolderPaste& msg) {
   std::shared_ptr<Footprint> footprint =
       mPackage->getFootprints().get(msg.getFootprint().get());
   setCurrentFootprintIndex(mPackage->getFootprints().indexOf(footprint.get()));
@@ -2135,10 +2155,11 @@ void PackageTab::autoFix(const MsgSmtPadWithSolderPaste& msg) {
   std::unique_ptr<CmdFootprintPadEdit> cmd(new CmdFootprintPadEdit(*pad));
   cmd->setSolderPasteConfig(MaskConfig::off());
   mUndoStack->execCmd(cmd.release());
+  return true;
 }
 
 template <>
-void PackageTab::autoFix(const MsgThtPadWithSolderPaste& msg) {
+bool PackageTab::autoFix(const MsgThtPadWithSolderPaste& msg) {
   std::shared_ptr<Footprint> footprint =
       mPackage->getFootprints().get(msg.getFootprint().get());
   setCurrentFootprintIndex(mPackage->getFootprints().indexOf(footprint.get()));
@@ -2147,10 +2168,11 @@ void PackageTab::autoFix(const MsgThtPadWithSolderPaste& msg) {
   std::unique_ptr<CmdFootprintPadEdit> cmd(new CmdFootprintPadEdit(*pad));
   cmd->setSolderPasteConfig(MaskConfig::off());
   mUndoStack->execCmd(cmd.release());
+  return true;
 }
 
 template <>
-void PackageTab::autoFix(const MsgPadWithCopperClearance& msg) {
+bool PackageTab::autoFix(const MsgPadWithCopperClearance& msg) {
   std::shared_ptr<Footprint> footprint =
       mPackage->getFootprints().get(msg.getFootprint().get());
   setCurrentFootprintIndex(mPackage->getFootprints().indexOf(footprint.get()));
@@ -2159,10 +2181,11 @@ void PackageTab::autoFix(const MsgPadWithCopperClearance& msg) {
   std::unique_ptr<CmdFootprintPadEdit> cmd(new CmdFootprintPadEdit(*pad));
   cmd->setCopperClearance(UnsignedLength(0), false);
   mUndoStack->execCmd(cmd.release());
+  return true;
 }
 
 template <>
-void PackageTab::autoFix(const MsgFiducialClearanceLessThanStopMask& msg) {
+bool PackageTab::autoFix(const MsgFiducialClearanceLessThanStopMask& msg) {
   std::shared_ptr<Footprint> footprint =
       mPackage->getFootprints().get(msg.getFootprint().get());
   setCurrentFootprintIndex(mPackage->getFootprints().indexOf(footprint.get()));
@@ -2173,11 +2196,13 @@ void PackageTab::autoFix(const MsgFiducialClearanceLessThanStopMask& msg) {
     std::unique_ptr<CmdFootprintPadEdit> cmd(new CmdFootprintPadEdit(*pad));
     cmd->setCopperClearance(UnsignedLength(*offset), false);
     mUndoStack->execCmd(cmd.release());
+    return true;
   }
+  return false;
 }
 
 template <>
-void PackageTab::autoFix(const MsgHoleWithoutStopMask& msg) {
+bool PackageTab::autoFix(const MsgHoleWithoutStopMask& msg) {
   std::shared_ptr<Footprint> footprint =
       mPackage->getFootprints().get(msg.getFootprint().get());
   setCurrentFootprintIndex(mPackage->getFootprints().indexOf(footprint.get()));
@@ -2185,24 +2210,25 @@ void PackageTab::autoFix(const MsgHoleWithoutStopMask& msg) {
   std::unique_ptr<CmdHoleEdit> cmd(new CmdHoleEdit(*hole));
   cmd->setStopMaskConfig(MaskConfig::automatic());
   mUndoStack->execCmd(cmd.release());
+  return true;
 }
 
 template <>
-void PackageTab::autoFix(const MsgUnspecifiedPadFunction& msg) {
+bool PackageTab::autoFix(const MsgUnspecifiedPadFunction& msg) {
   setCurrentFootprintIndex(
       mPackage->getFootprints().indexOf(msg.getFootprint().get()));
-  fixPadFunction(msg);
+  return fixPadFunction(msg);
 }
 
 template <>
-void PackageTab::autoFix(const MsgSuspiciousPadFunction& msg) {
+bool PackageTab::autoFix(const MsgSuspiciousPadFunction& msg) {
   setCurrentFootprintIndex(
       mPackage->getFootprints().indexOf(msg.getFootprint().get()));
-  fixPadFunction(msg);
+  return fixPadFunction(msg);
 }
 
 template <typename MessageType>
-void PackageTab::fixPadFunction(const MessageType& msg) {
+bool PackageTab::fixPadFunction(const MessageType& msg) {
   QMenu menu(qApp->activeWindow());
   QAction* aAll = menu.addAction(tr("Apply to all unspecified pads"));
   aAll->setCheckable(true);
@@ -2238,6 +2264,7 @@ void PackageTab::fixPadFunction(const MessageType& msg) {
         }
       }
       transaction.commit();
+      return true;
     } else {
       std::shared_ptr<Footprint> footprint =
           mPackage->getFootprints().get(msg.getFootprint().get());
@@ -2246,8 +2273,10 @@ void PackageTab::fixPadFunction(const MessageType& msg) {
       std::unique_ptr<CmdFootprintPadEdit> cmd(new CmdFootprintPadEdit(*pad));
       cmd->setFunction(action->data().value<Pad::Function>(), false);
       mUndoStack->execCmd(cmd.release());
+      return true;
     }
   }
+  return false;
 }
 
 /*******************************************************************************
