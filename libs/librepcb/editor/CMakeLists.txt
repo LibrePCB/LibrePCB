@@ -944,6 +944,7 @@ add_library(
   workspace/workspacesettingsdialog.cpp
   workspace/workspacesettingsdialog.h
   workspace/workspacesettingsdialog.ui
+  library/cmd/cmdsymbolreload.h library/cmd/cmdsymbolreload.cpp
 )
 # Maybe the explicit dependency fixes spurious race conditions on CI.
 add_dependencies(librepcb_editor Slint::Slint)

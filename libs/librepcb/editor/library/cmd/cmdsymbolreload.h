@@ -17,15 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_CMDLIBRARYELEMENTEDIT_H
-#define LIBREPCB_EDITOR_CMDLIBRARYELEMENTEDIT_H
+#ifndef LIBREPCB_EDITOR_CmdSymbolReload_H
+#define LIBREPCB_EDITOR_CmdSymbolReload_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "cmdlibrarybaseelementedit.h"
-
-#include <librepcb/core/library/sym/symbol.h>
+#include "cmdlibraryelementedit.h"
 
 #include <QtCore>
 
@@ -33,30 +31,28 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class Symbol;
+
 namespace editor {
 
 /*******************************************************************************
- *  Class CmdLibraryElementEdit
+ *  Class CmdSymbolReload
  ******************************************************************************/
 
 /**
- * @brief The CmdLibraryElementEdit class
+ * @brief The CmdSymbolReload class
  */
-class CmdLibraryElementEdit : public CmdLibraryBaseElementEdit {
+class CmdSymbolReload final : public CmdLibraryElementEdit {
 public:
   // Constructors / Destructor
-  CmdLibraryElementEdit() = delete;
-  CmdLibraryElementEdit(const CmdLibraryElementEdit& other) = delete;
-  explicit CmdLibraryElementEdit(LibraryElement& element,
-                                 const QString& text) noexcept;
-  virtual ~CmdLibraryElementEdit() noexcept;
-
-  // Setters
-  void setCategories(const QSet<Uuid>& uuids) noexcept;
-  void setResources(const ResourceList& resources) noexcept;
+  CmdSymbolReload() = delete;
+  CmdSymbolReload(const CmdSymbolReload& other) = delete;
+  explicit CmdSymbolReload(Symbol& element) noexcept;
+  virtual ~CmdSymbolReload() noexcept;
 
   // Operator Overloadings
-  CmdLibraryElementEdit& operator=(const CmdLibraryElementEdit& rhs) = delete;
+  CmdSymbolReload& operator=(const CmdSymbolReload& rhs) = delete;
 
 protected:  // Methods
   /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
@@ -69,12 +65,7 @@ protected:  // Methods
   virtual void performRedo() override;
 
 private:  // Data
-  LibraryElement& mElement;
-
-  QSet<Uuid> mOldCategories;
-  QSet<Uuid> mNewCategories;
-  ResourceList mOldResources;
-  ResourceList mNewResources;
+  Symbol& mElement;
 };
 
 /*******************************************************************************

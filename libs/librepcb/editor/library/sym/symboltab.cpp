@@ -21,7 +21,7 @@
  *  Includes
  ******************************************************************************/
 #include "symboltab.h"
-
+#include "../cmd/cmdsymbolreload.h"
 #include "../../cmd/cmdtextedit.h"
 #include "../../graphics/graphicsscene.h"
 #include "../../graphics/slintgraphicsview.h"
@@ -417,6 +417,17 @@ void SymbolTab::trigger(ui::TabAction a) noexcept {
     case ui::TabAction::Save: {
       commitUiData();
       save();
+      break;
+    }
+    case ui::TabAction::ReloadFromDisk: {
+      try {
+        mFsm->processAbortCommand();
+        mFsm->processAbortCommand();
+        mFsm->processAbortCommand();
+        mUndoStack->execCmd(new CmdSymbolReload(*mSymbol));
+      } catch (const Exception& e) {
+        QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
+      }
       break;
     }
     case ui::TabAction::Undo: {

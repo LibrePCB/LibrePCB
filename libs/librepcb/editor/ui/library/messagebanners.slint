@@ -1,4 +1,7 @@
-import { MessageBanner } from "../widgets.slint";
+import {
+    MessageBanner,
+    Button,
+ } from "../widgets.slint";
 
 export component BreakingChangesMessageBanner inherits MessageBanner {
     text: @tr("Attention").to-uppercase() + ": " + @tr("You have changed some important properties of this library element. This is a serious issue as it breaks all dependent library elements! If this library element is already used somewhere, it is highly recommended to create a new one instead of modifying this one.");
@@ -6,4 +9,29 @@ export component BreakingChangesMessageBanner inherits MessageBanner {
 
 export component CheckErrorsMessageBanner inherits MessageBanner {
     text: @tr("Attention").to-uppercase() + ": " + @tr("This library element contains serious errors. Please review them in the rule check panel.");
+}
+
+export component FilesModifiedMessageBanner inherits MessageBanner {
+    background: #32a1ff;
+
+    callback reload-clicked <=> reload-btn.clicked;
+
+    HorizontalLayout {
+        spacing: 5px;
+
+        Text {
+            horizontal-stretch: 1;
+            color: white;
+            font-weight: 600;
+            horizontal-alignment: left;
+            vertical-alignment: center;
+            wrap: word-wrap;
+            text: @tr("The files have been modified on disk.");
+        }
+
+        reload-btn := Button {
+            horizontal-stretch: 0;
+            text: @tr("Reload");
+        }
+    }
 }
