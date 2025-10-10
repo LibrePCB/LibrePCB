@@ -68,18 +68,27 @@ void SceneData3D::addDevice(const Uuid& uuid, const Transform& transform,
 
 void SceneData3D::addPolygon(const Polygon& polygon,
                              const Transform& transform) noexcept {
-  mPolygons.append(PolygonData{polygon, transform});
+  // For performance reasons, discard any object that won't be rendered.
+  if (isLayerNeeded(polygon.getLayer())) {
+    mPolygons.append(PolygonData{polygon, transform});
+  }
 }
 
 void SceneData3D::addCircle(const Circle& circle,
                             const Transform& transform) noexcept {
-  mCircles.append(CircleData{circle, transform});
+  // For performance reasons, discard any object that won't be rendered.
+  if (isLayerNeeded(circle.getLayer())) {
+    mCircles.append(CircleData{circle, transform});
+  }
 }
 
 void SceneData3D::addStroke(const Layer& layer, const QVector<Path>& paths,
                             const Length& width,
                             const Transform& transform) noexcept {
-  mStrokes.append(StrokeData{&layer, paths, width, transform});
+  // For performance reasons, discard any object that won't be rendered.
+  if (isLayerNeeded(layer)) {
+    mStrokes.append(StrokeData{&layer, paths, width, transform});
+  }
 }
 
 void SceneData3D::addVia(
@@ -100,7 +109,10 @@ void SceneData3D::addHole(const NonEmptyPath& path,
 
 void SceneData3D::addArea(const Layer& layer, const Path& outline,
                           const Transform& transform) noexcept {
-  mAreas.append(AreaData{&layer, outline, transform});
+  // For performance reasons, discard any object that won't be rendered.
+  if (isLayerNeeded(layer)) {
+    mAreas.append(AreaData{&layer, outline, transform});
+  }
 }
 
 void SceneData3D::preprocess(bool center, bool sortDevices, Length* width,
@@ -219,28 +231,32 @@ void SceneData3D::preprocess(bool center, bool sortDevices, Length* width,
   mVias.clear();
 
   // Determine bounding rect of board.
-  QPainterPath outlinesPx;
+  QRectF boundingRectPx;
+  auto addToBoundingRect = [&boundingRectPx](const QPainterPath& p) {
+    if (boundingRectPx.isNull()) {
+      boundingRectPx = p.boundingRect();
+    } else {
+      boundingRectPx = boundingRectPx.united(p.boundingRect());
+    }
+  };
   for (auto& area : mAreas) {
     if (area.layer->getId() == Layer::boardOutlines().getId()) {
-      outlinesPx |= area.outline.toQPainterPathPx();
+      addToBoundingRect(area.outline.toQPainterPathPx());
     }
   }
-  QRectF boundingRectPx = outlinesPx.boundingRect();
 
   // Auto-add board outline if there is none.
-  if (outlinesPx.isEmpty() && mAutoBoardOutline) {
+  if (boundingRectPx.isEmpty() && mAutoBoardOutline) {
     for (auto& area : mAreas) {
-      outlinesPx |= area.outline.toQPainterPathPx();
+      addToBoundingRect(area.outline.toQPainterPathPx());
     }
     for (auto& hole : mHoles) {
-      outlinesPx |= Path::toQPainterPathPx(
-          hole.path->toOutlineStrokes(hole.diameter), true);
+      addToBoundingRect(Path::toQPainterPathPx(
+          hole.path->toOutlineStrokes(hole.diameter), true));
     }
-    qreal ext = 0.1 *
-        std::max(outlinesPx.boundingRect().width(),
-                 outlinesPx.boundingRect().height());
+    qreal ext = 0.1 * std::max(boundingRectPx.width(), boundingRectPx.height());
     ext = qBound(Length(3000000).toPx(), ext, Length(20000000).toPx());
-    boundingRectPx = outlinesPx.boundingRect().adjusted(-ext, -ext, ext, ext);
+    boundingRectPx.adjust(-ext, -ext, ext, ext);
     mAreas.append(
         AreaData{&Layer::boardOutlines(),
                  Path::rect(Point::fromPx(boundingRectPx.topLeft()),
@@ -269,6 +285,27 @@ void SceneData3D::preprocess(bool center, bool sortDevices, Length* width,
       area.outline.translate(-centerPos);
     }
   }
+}
+
+/*******************************************************************************
+ *  Private Methods
+ ******************************************************************************/
+
+bool SceneData3D::isLayerNeeded(const Layer& layer) const noexcept {
+  static const QSet<const Layer*> layers = {
+      &Layer::boardOutlines(),  //
+      &Layer::boardCutouts(),  //
+      &Layer::boardPlatedCutouts(),  //
+      &Layer::topSolderPaste(),  //
+      &Layer::topStopMask(),  //
+      &Layer::topCopper(),  //
+      &Layer::botCopper(),  //
+      &Layer::botStopMask(),  //
+      &Layer::botSolderPaste(),  //
+  };
+
+  return layers.contains(&layer) || mSilkscreenLayersTop.contains(&layer) ||
+      mSilkscreenLayersBot.contains(&layer);
 }
 
 /*******************************************************************************
