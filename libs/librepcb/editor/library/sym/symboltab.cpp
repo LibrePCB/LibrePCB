@@ -21,7 +21,7 @@
  *  Includes
  ******************************************************************************/
 #include "symboltab.h"
-#include "../cmd/cmdsymbolreload.h"
+
 #include "../../cmd/cmdtextedit.h"
 #include "../../graphics/graphicsscene.h"
 #include "../../graphics/slintgraphicsview.h"
@@ -36,6 +36,7 @@
 #include "../../workspace/desktopservices.h"
 #include "../cmd/cmdlibraryelementedit.h"
 #include "../cmd/cmdsymbolpinedit.h"
+#include "../cmd/cmdsymbolreload.h"
 #include "../libraryeditor.h"
 #include "../libraryelementcategoriesmodel.h"
 #include "fsm/symboleditorfsm.h"

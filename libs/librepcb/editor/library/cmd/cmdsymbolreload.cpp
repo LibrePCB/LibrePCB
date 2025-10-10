@@ -21,8 +21,10 @@
  *  Includes
  ******************************************************************************/
 #include "cmdsymbolreload.h"
-#include <librepcb/core/fileio/transactionalfilesystem.h>
+
 #include <librepcb/core/fileio/transactionaldirectory.h>
+#include <librepcb/core/fileio/transactionalfilesystem.h>
+
 #include <QtCore>
 
 /*******************************************************************************
@@ -36,8 +38,7 @@ namespace editor {
  ******************************************************************************/
 
 CmdSymbolReload::CmdSymbolReload(Symbol& element) noexcept
-  : CmdLibraryElementEdit(element, tr("Reload Symbol")),
-    mElement(element) {
+  : CmdLibraryElementEdit(element, tr("Reload Symbol")), mElement(element) {
 }
 
 CmdSymbolReload::~CmdSymbolReload() noexcept {
@@ -49,11 +50,17 @@ CmdSymbolReload::~CmdSymbolReload() noexcept {
 
 bool CmdSymbolReload::performExecute() {
   // First of all, load the new symbol in read-only mode to verify it is valid.
-  auto fs = TransactionalFileSystem::openRO(mElement.getDirectory().getAbsPath()); // can throw
-  auto sym = Symbol::open(std::make_unique<TransactionalDirectory>(fs)); // can throw
+  auto fs = TransactionalFileSystem::openRO(
+      mElement.getDirectory().getAbsPath());  // can throw
+  auto sym =
+      Symbol::open(std::make_unique<TransactionalDirectory>(fs));  // can throw
 
   // Now discard any pending file I/O of the loaded symbol.
   // TODO: This needs to be undone when undoing this command!
+  if (mElement.getDirectory().getFileSystem()->getAbsPath() !=
+      mElement.getDirectory().getAbsPath()) {
+    throw LogicError(__FILE__, __LINE__);
+  }
   mElement.getDirectory().getFileSystem()->discardChanges();
 
   // Then copy over everything from the newly opened symbol.
@@ -65,7 +72,7 @@ bool CmdSymbolReload::performExecute() {
   setDeprecated(sym->isDeprecated());
   setCategories(sym->getCategories());
   setResources(sym->getResources());
-  return CmdLibraryBaseElementEdit::performExecute(); // can throw
+  return CmdLibraryBaseElementEdit::performExecute();  // can throw
 }
 
 void CmdSymbolReload::performUndo() {
