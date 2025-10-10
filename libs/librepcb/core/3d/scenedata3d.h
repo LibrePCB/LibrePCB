@@ -143,9 +143,13 @@ public:
   }
   void setSilkscreen(const PcbColor* value) noexcept { mSilkscreen = value; }
   void setSilkscreenLayersTop(const QSet<const Layer*>& value) noexcept {
+    Q_ASSERT(mPolygons.isEmpty() && mCircles.isEmpty() && mStrokes.isEmpty() &&
+             mAreas.isEmpty());
     mSilkscreenLayersTop = value;
   }
   void setSilkscreenLayersBot(const QSet<const Layer*>& value) noexcept {
+    Q_ASSERT(mPolygons.isEmpty() && mCircles.isEmpty() && mStrokes.isEmpty() &&
+             mAreas.isEmpty());
     mSilkscreenLayersBot = value;
   }
   void setAutoBoardOutline(bool value) noexcept { mAutoBoardOutline = value; }
@@ -175,7 +179,9 @@ public:
   // Operator Overloadings
   SceneData3D& operator=(const SceneData3D& rhs) = delete;
 
-private:  // Data
+private:
+  bool isLayerNeeded(const Layer& layer) const noexcept;
+
   std::shared_ptr<FileSystem> mFileSystem;
   PositiveLength mThickness;
   const PcbColor* mSolderResist;
