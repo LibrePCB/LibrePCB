@@ -426,8 +426,11 @@ bool ComponentTab::autoFixHelper(
     const std::shared_ptr<const RuleCheckMessage>& msg, bool checkOnly) {
   if (msg) {
     if (auto m = msg->as<MessageType>()) {
-      if (!checkOnly) autoFix(*m);  // can throw
-      return true;
+      if (checkOnly) {
+        return true;
+      } else {
+        return autoFix(*m);  // can throw
+      }
     }
   }
   return false;
@@ -452,30 +455,33 @@ void ComponentTab::notifyDerivedUiDataChanged() noexcept {
  ******************************************************************************/
 
 template <>
-void ComponentTab::autoFix(const MsgNameNotTitleCase& msg) {
+bool ComponentTab::autoFix(const MsgNameNotTitleCase& msg) {
   mCurrentPageIndex = 0;
   mNameParsed = msg.getFixedName();
   commitUiData();
+  return true;
 }
 
 template <>
-void ComponentTab::autoFix(const MsgMissingAuthor& msg) {
+bool ComponentTab::autoFix(const MsgMissingAuthor& msg) {
   Q_UNUSED(msg);
   mCurrentPageIndex = 0;
   mAuthor = q2s(getWorkspaceSettingsUserName());
   commitUiData();
+  return true;
 }
 
 template <>
-void ComponentTab::autoFix(const MsgMissingCategories& msg) {
+bool ComponentTab::autoFix(const MsgMissingCategories& msg) {
   Q_UNUSED(msg);
   mCurrentPageIndex = 0;
   mChooseCategory = true;
   onDerivedUiDataChanged.notify();
+  return true;
 }
 
 template <>
-void ComponentTab::autoFix(const MsgMissingComponentDefaultValue& msg) {
+bool ComponentTab::autoFix(const MsgMissingComponentDefaultValue& msg) {
   Q_UNUSED(msg);
   mCurrentPageIndex = 0;
   onDerivedUiDataChanged.notify();
@@ -494,15 +500,19 @@ void ComponentTab::autoFix(const MsgMissingComponentDefaultValue& msg) {
     mDefaultValue = "{{MPN or DEVICE or COMPONENT}}";
     commitUiData();
     refreshUiData();
+    return true;
   } else if (answer == QMessageBox::No) {
     mDefaultValue = "{{MPN or DEVICE}}";
     commitUiData();
     refreshUiData();
+    return true;
+  } else {
+    return false;  // Aborted
   }
 }
 
 template <>
-void ComponentTab::autoFix(const MsgMissingSymbolVariant& msg) {
+bool ComponentTab::autoFix(const MsgMissingSymbolVariant& msg) {
   Q_UNUSED(msg);
   std::shared_ptr<ComponentSymbolVariant> symbVar =
       std::make_shared<ComponentSymbolVariant>(Uuid::createRandom(), "",
@@ -512,10 +522,11 @@ void ComponentTab::autoFix(const MsgMissingSymbolVariant& msg) {
 
   mCurrentPageIndex = 2;
   onDerivedUiDataChanged.notify();
+  return true;
 }
 
 template <>
-void ComponentTab::autoFix(
+bool ComponentTab::autoFix(
     const MsgNonFunctionalComponentSignalInversionSign& msg) {
   std::shared_ptr<ComponentSignal> signal =
       mComponent->getSignals().get(msg.getSignal().get());
@@ -526,6 +537,7 @@ void ComponentTab::autoFix(
 
   mCurrentPageIndex = 1;
   onDerivedUiDataChanged.notify();
+  return true;
 }
 
 /*******************************************************************************
