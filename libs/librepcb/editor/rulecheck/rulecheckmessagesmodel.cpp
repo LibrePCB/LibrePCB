@@ -53,6 +53,7 @@ RuleCheckMessagesModel::~RuleCheckMessagesModel() noexcept {
 void RuleCheckMessagesModel::clear() noexcept {
   mMessages.clear();
   mApprovals.clear();
+  mAutoFixed.clear();
   notify_reset();
   updateCounters();
 }
@@ -68,6 +69,7 @@ void RuleCheckMessagesModel::setMessages(
     const QSet<SExpression>& approvals) noexcept {
   mMessages = messages;
   mApprovals = approvals;
+  mAutoFixed.clear();
   sortMessages();
   updateCounters();
 }
@@ -88,6 +90,7 @@ std::optional<ui::RuleCheckMessageData> RuleCheckMessagesModel::row_data(
         q2s(msg->getMessage()),  // Message
         q2s(msg->getDescription()),  // Description
         mApprovals.contains(msg->getApproval()),  // Approved
+        mAutoFixed.contains(msg->getApproval()),  // Auto-fixed
         mAutofixHandler && mAutofixHandler(msg, true),  // Supports autofix
         mActionWindowId,  // Action window ID
         ui::RuleCheckMessageAction::None,  // Action
@@ -118,9 +121,17 @@ void RuleCheckMessagesModel::set_row_data(
     } else if (data.action == ui::RuleCheckMessageAction::Autofix) {
       QMetaObject::invokeMethod(
           this,
-          [this, msg]() {
-            if (mAutofixHandler) {
-              mAutofixHandler(msg, false);
+          [this, i, msg]() {
+            if (mAutofixHandler && mAutofixHandler(msg, false)) {
+              // If the message is approved, clean up the now obsolete approval.
+              if (mApprovals.contains(msg->getApproval())) {
+                mApprovals.remove(msg->getApproval());
+                emit approvalChanged(msg->getApproval(), false);
+              }
+              mAutoFixed.insert(msg->getApproval());
+              if (mMessages.value(i) == msg) {
+                notify_row_changed(i);
+              }
             }
           },
           Qt::QueuedConnection);

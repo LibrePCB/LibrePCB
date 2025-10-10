@@ -189,9 +189,9 @@ protected:
   bool autoFixHelper(const std::shared_ptr<const RuleCheckMessage>& msg,
                      bool checkOnly);
   template <typename MessageType>
-  void autoFix(const MessageType& msg);
+  bool autoFix(const MessageType& msg);
   template <typename MessageType>
-  void fixPadFunction(const MessageType& msg);
+  bool fixPadFunction(const MessageType& msg);
   void messageApprovalChanged(const SExpression& approval,
                               bool approved) noexcept override;
   void notifyDerivedUiDataChanged() noexcept override;

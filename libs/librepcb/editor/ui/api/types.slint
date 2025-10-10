@@ -280,6 +280,7 @@ export struct RuleCheckMessageData {
     message: string,
     description: string,
     approved: bool,
+    autofixed: bool,  // A temporary state after triggering auto-fix
     supports-autofix: bool,
     action-window-id: int,  // Set by UI *before* action is set
     action: RuleCheckMessageAction,  // Set by UI, handled in backend

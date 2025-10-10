@@ -1298,8 +1298,11 @@ bool SymbolTab::autoFixHelper(
     const std::shared_ptr<const RuleCheckMessage>& msg, bool checkOnly) {
   if (msg) {
     if (auto m = msg->as<MessageType>()) {
-      if (!checkOnly) autoFix(*m);  // can throw
-      return true;
+      if (checkOnly) {
+        return true;
+      } else {
+        return autoFix(*m);  // can throw
+      }
     }
   }
   return false;
@@ -1324,70 +1327,79 @@ void SymbolTab::notifyDerivedUiDataChanged() noexcept {
  ******************************************************************************/
 
 template <>
-void SymbolTab::autoFix(const MsgNameNotTitleCase& msg) {
+bool SymbolTab::autoFix(const MsgNameNotTitleCase& msg) {
   mNameParsed = msg.getFixedName();
   commitUiData();
+  return true;
 }
 
 template <>
-void SymbolTab::autoFix(const MsgMissingAuthor& msg) {
+bool SymbolTab::autoFix(const MsgMissingAuthor& msg) {
   Q_UNUSED(msg);
   mAuthor = q2s(getWorkspaceSettingsUserName());
   commitUiData();
+  return true;
 }
 
 template <>
-void SymbolTab::autoFix(const MsgMissingCategories& msg) {
+bool SymbolTab::autoFix(const MsgMissingCategories& msg) {
   Q_UNUSED(msg);
   mCurrentPageIndex = 0;
   mChooseCategory = true;
   onDerivedUiDataChanged.notify();
+  return true;
 }
 
 template <>
-void SymbolTab::autoFix(const MsgMissingSymbolName& msg) {
+bool SymbolTab::autoFix(const MsgMissingSymbolName& msg) {
   Q_UNUSED(msg);
   mFsm->processStartAddingNames();
+  return true;
 }
 
 template <>
-void SymbolTab::autoFix(const MsgMissingSymbolValue& msg) {
+bool SymbolTab::autoFix(const MsgMissingSymbolValue& msg) {
   Q_UNUSED(msg);
   mFsm->processStartAddingValues();
+  return true;
 }
 
 template <>
-void SymbolTab::autoFix(const MsgWrongSymbolTextLayer& msg) {
+bool SymbolTab::autoFix(const MsgWrongSymbolTextLayer& msg) {
   std::shared_ptr<Text> text = mSymbol->getTexts().get(msg.getText().get());
   std::unique_ptr<CmdTextEdit> cmd(new CmdTextEdit(*text));
   cmd->setLayer(msg.getExpectedLayer(), false);
   mUndoStack->execCmd(cmd.release());
+  return true;
 }
 
 template <>
-void SymbolTab::autoFix(const MsgSymbolPinNotOnGrid& msg) {
+bool SymbolTab::autoFix(const MsgSymbolPinNotOnGrid& msg) {
   std::shared_ptr<SymbolPin> pin = mSymbol->getPins().get(msg.getPin().get());
   Point newPos = pin->getPosition().mappedToGrid(msg.getGridInterval());
   std::unique_ptr<CmdSymbolPinEdit> cmd(new CmdSymbolPinEdit(pin));
   cmd->setPosition(newPos, false);
   mUndoStack->execCmd(cmd.release());
+  return true;
 }
 
 template <>
-void SymbolTab::autoFix(const MsgNonFunctionalSymbolPinInversionSign& msg) {
+bool SymbolTab::autoFix(const MsgNonFunctionalSymbolPinInversionSign& msg) {
   std::shared_ptr<SymbolPin> pin = mSymbol->getPins().get(msg.getPin().get());
   std::unique_ptr<CmdSymbolPinEdit> cmd(new CmdSymbolPinEdit(pin));
   cmd->setName(CircuitIdentifier("!" % pin->getName()->mid(1)), false);
   mUndoStack->execCmd(cmd.release());
+  return true;
 }
 
 template <>
-void SymbolTab::autoFix(const MsgSymbolOriginNotInCenter& msg) {
+bool SymbolTab::autoFix(const MsgSymbolOriginNotInCenter& msg) {
   mFsm->processAbortCommand();
   mFsm->processAbortCommand();
   mFsm->processSelectAll();
   mFsm->processMove(-msg.getCenter().mappedToGrid(mGridInterval));
   mFsm->processAbortCommand();  // Clear selection.
+  return true;
 }
 
 /*******************************************************************************

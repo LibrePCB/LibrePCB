@@ -272,15 +272,17 @@ DrcMsgMinimumBoardOutlineInnerRadiusViolation::
  ******************************************************************************/
 
 DrcMsgEmptyNetSegment::DrcMsgEmptyNetSegment(const Data::Segment& ns) noexcept
-  : RuleCheckMessage(Severity::Hint,
-                     tr("Empty segment of net '%1': '%2'",
-                        "Placeholders: Net name, segment UUID")
-                         .arg(netNameWithFallback(ns.netName), ns.uuid.toStr()),
-                     "There's a net segment in the board without any via or "
-                     "trace. This should not happen, please report it as a "
-                     "bug. But no worries, this issue is not harmful at all "
-                     "so you can safely ignore this message.",
-                     "empty_netsegment", {}) {
+  : RuleCheckMessage(
+        Severity::Hint,
+        tr("Empty segment of net '%1': '%2'",
+           "Placeholders: Net name, segment UUID")
+            .arg(netNameWithFallback(ns.netName), ns.uuid.toStr()),
+        "There's a net segment in the board without any pad, via "
+        "or trace. This should not happen, please report it as a "
+        "bug. But no worries, this issue is not harmful at all and you can "
+        "just trigger the automatic fix to remove the empty net segment.",
+        "empty_netsegment", {}),
+    mUuid(ns.uuid) {
   mApproval->ensureLineBreak();
   mApproval->appendChild("netsegment", ns.uuid);
   mApproval->ensureLineBreak();
