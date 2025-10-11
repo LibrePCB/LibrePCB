@@ -918,6 +918,7 @@ export struct SymbolTabData {
     unit: LengthUnit,
 
     // Messages
+    files-modified: bool,  // From the file system watcher
     interface-broken-msg: bool,
     import-pins-msg: DismissableMessageData,
 

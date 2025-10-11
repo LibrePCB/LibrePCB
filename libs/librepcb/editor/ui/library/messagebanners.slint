@@ -26,12 +26,13 @@ export component FilesModifiedMessageBanner inherits MessageBanner {
             horizontal-alignment: left;
             vertical-alignment: center;
             wrap: word-wrap;
-            text: @tr("The files have been modified on disk.");
+            text: @tr("The files have been modified on disk. It is recommended to close and reopen this tab to see the modifications. The reload feature is currently considered experimental.");
         }
 
         reload-btn := Button {
             horizontal-stretch: 0;
             text: @tr("Reload");
+            status-tip: @tr("Discard modifications (if any) and reload the modified files from disk");
         }
     }
 }

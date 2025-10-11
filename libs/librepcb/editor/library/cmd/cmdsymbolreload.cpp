@@ -38,7 +38,22 @@ namespace editor {
  ******************************************************************************/
 
 CmdSymbolReload::CmdSymbolReload(Symbol& element) noexcept
-  : CmdLibraryElementEdit(element, tr("Reload Symbol")), mElement(element) {
+  : CmdLibraryElementEdit(element, tr("Reload Symbol")),
+    mElement(element),
+    mOldFiles(mElement.getDirectory().getFileSystem()->saveState()),
+    mNewFiles(),
+    mOldGridInterval(mElement.getGridInterval()),
+    mNewGridInterval(mOldGridInterval),
+    mOldPins(mElement.getPins()),
+    mNewPins(mOldPins),
+    mOldPolygons(mElement.getPolygons()),
+    mNewPolygons(mOldPolygons),
+    mOldCircles(mElement.getCircles()),
+    mNewCircles(mOldCircles),
+    mOldTexts(mElement.getTexts()),
+    mNewTexts(mOldTexts),
+    mOldImages(mElement.getImages()),
+    mNewImages(mOldImages) {
 }
 
 CmdSymbolReload::~CmdSymbolReload() noexcept {
@@ -56,7 +71,6 @@ bool CmdSymbolReload::performExecute() {
       Symbol::open(std::make_unique<TransactionalDirectory>(fs));  // can throw
 
   // Now discard any pending file I/O of the loaded symbol.
-  // TODO: This needs to be undone when undoing this command!
   if (mElement.getDirectory().getFileSystem()->getAbsPath() !=
       mElement.getDirectory().getAbsPath()) {
     throw LogicError(__FILE__, __LINE__);
@@ -72,15 +86,44 @@ bool CmdSymbolReload::performExecute() {
   setDeprecated(sym->isDeprecated());
   setCategories(sym->getCategories());
   setResources(sym->getResources());
-  return CmdLibraryBaseElementEdit::performExecute();  // can throw
+  mNewGridInterval = sym->getGridInterval();
+  mNewPins = sym->getPins();
+  mNewPolygons = sym->getPolygons();
+  mNewCircles = sym->getCircles();
+  mNewTexts = sym->getTexts();
+  mNewImages = sym->getImages();
+
+  // And apply the modifications.
+  if (CmdLibraryBaseElementEdit::performExecute()) return true;  // can throw
+  if (mNewGridInterval != mOldGridInterval) return true;
+  if (mNewPins != mOldPins) return true;
+  if (mNewPolygons != mOldPolygons) return true;
+  if (mNewCircles != mOldCircles) return true;
+  if (mNewTexts != mOldTexts) return true;
+  if (mNewImages != mOldImages) return true;
+  return false;
 }
 
 void CmdSymbolReload::performUndo() {
   CmdLibraryBaseElementEdit::performUndo();  // can throw
+  mElement.getDirectory().getFileSystem()->restoreState(mOldFiles);
+  mElement.setGridInterval(mOldGridInterval);
+  mElement.getPins() = mOldPins;
+  mElement.getPolygons() = mOldPolygons;
+  mElement.getCircles() = mOldCircles;
+  mElement.getTexts() = mOldTexts;
+  mElement.getImages() = mOldImages;
 }
 
 void CmdSymbolReload::performRedo() {
   CmdLibraryBaseElementEdit::performRedo();  // can throw
+  mElement.getDirectory().getFileSystem()->restoreState(mNewFiles);
+  mElement.setGridInterval(mNewGridInterval);
+  mElement.getPins() = mNewPins;
+  mElement.getPolygons() = mNewPolygons;
+  mElement.getCircles() = mNewCircles;
+  mElement.getTexts() = mNewTexts;
+  mElement.getImages() = mNewImages;
 }
 
 /*******************************************************************************

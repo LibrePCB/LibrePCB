@@ -118,7 +118,7 @@ QStringList TransactionalFileSystem::getDirs(
   }
 
   // add directories of new files
-  foreach (const QString& filepath, mModifiedFiles.keys()) {
+  foreach (const QString& filepath, mState.modifiedFiles.keys()) {
     if (filepath.startsWith(dirpath)) {
       QStringList relpath = filepath.mid(dirpath.length()).split('/');
       if (relpath.count() > 1) {
@@ -150,7 +150,7 @@ QStringList TransactionalFileSystem::getFiles(
   }
 
   // add new files
-  foreach (const QString& filepath, mModifiedFiles.keys()) {
+  foreach (const QString& filepath, mState.modifiedFiles.keys()) {
     if (filepath.startsWith(dirpath)) {
       QStringList relpath = filepath.mid(dirpath.length()).split('/');
       if (relpath.count() == 1) {
@@ -169,7 +169,7 @@ bool TransactionalFileSystem::fileExists(const QString& path) const noexcept {
   }
 
   QMutexLocker lock(&mMutex);
-  if (mModifiedFiles.contains(cleanedPath)) {
+  if (mState.modifiedFiles.contains(cleanedPath)) {
     return true;
   } else if (isRemoved(cleanedPath)) {
     return false;
@@ -194,8 +194,8 @@ QByteArray TransactionalFileSystem::readIfExists(const QString& path) const {
   sanitizePathOrThrow(cleanedPath);
 
   QMutexLocker lock(&mMutex);
-  if (mModifiedFiles.contains(cleanedPath)) {
-    return mModifiedFiles.value(cleanedPath);
+  if (mState.modifiedFiles.contains(cleanedPath)) {
+    return mState.modifiedFiles.value(cleanedPath);
   } else if (!isRemoved(cleanedPath)) {
     const FilePath fp = mFilePath.getPathTo(cleanedPath);
     if (fp.isExistingFile()) {
@@ -211,8 +211,8 @@ void TransactionalFileSystem::write(const QString& path,
   sanitizePathOrThrow(cleanedPath);
 
   QMutexLocker lock(&mMutex);
-  mModifiedFiles[cleanedPath] = content;
-  mRemovedFiles.remove(cleanedPath);
+  mState.modifiedFiles[cleanedPath] = content;
+  mState.removedFiles.remove(cleanedPath);
 }
 
 void TransactionalFileSystem::renameFile(const QString& src,
@@ -226,8 +226,8 @@ void TransactionalFileSystem::removeFile(const QString& path) {
   sanitizePathOrThrow(cleanedPath);
 
   QMutexLocker lock(&mMutex);
-  mModifiedFiles.remove(cleanedPath);
-  mRemovedFiles.insert(cleanedPath);
+  mState.modifiedFiles.remove(cleanedPath);
+  mState.removedFiles.insert(cleanedPath);
 }
 
 void TransactionalFileSystem::removeDirRecursively(const QString& path) {
@@ -236,17 +236,17 @@ void TransactionalFileSystem::removeDirRecursively(const QString& path) {
   if (!dirpath.isEmpty()) dirpath.append("/");
 
   QMutexLocker lock(&mMutex);
-  foreach (const QString& fp, mModifiedFiles.keys()) {
+  foreach (const QString& fp, mState.modifiedFiles.keys()) {
     if (dirpath.isEmpty() || fp.startsWith(dirpath)) {
-      mModifiedFiles.remove(fp);
+      mState.modifiedFiles.remove(fp);
     }
   }
-  foreach (const QString& fp, mRemovedFiles) {
+  foreach (const QString& fp, mState.removedFiles) {
     if (dirpath.isEmpty() || fp.startsWith(dirpath)) {
-      mRemovedFiles.remove(fp);
+      mState.removedFiles.remove(fp);
     }
   }
-  mRemovedDirs.insert(dirpath);
+  mState.removedDirs.insert(dirpath);
 }
 
 /*******************************************************************************
@@ -301,9 +301,9 @@ void TransactionalFileSystem::exportToZip(const FilePath& fp,
 
 void TransactionalFileSystem::discardChanges() noexcept {
   QMutexLocker lock(&mMutex);
-  mModifiedFiles.clear();
-  mRemovedFiles.clear();
-  mRemovedDirs.clear();
+  mState.modifiedFiles.clear();
+  mState.removedFiles.clear();
+  mState.removedDirs.clear();
 }
 
 QStringList TransactionalFileSystem::checkForModifications() const {
@@ -311,7 +311,7 @@ QStringList TransactionalFileSystem::checkForModifications() const {
   QStringList modifications;
 
   // removed directories
-  foreach (const QString& dir, mRemovedDirs) {
+  foreach (const QString& dir, mState.removedDirs) {
     FilePath fp = mFilePath.getPathTo(dir);
     if (fp.isExistingDir()) {
       modifications.append(dir);
@@ -319,7 +319,7 @@ QStringList TransactionalFileSystem::checkForModifications() const {
   }
 
   // removed files
-  foreach (const QString& filepath, mRemovedFiles) {
+  foreach (const QString& filepath, mState.removedFiles) {
     FilePath fp = mFilePath.getPathTo(filepath);
     if (fp.isExistingFile()) {
       modifications.append(filepath);
@@ -327,9 +327,9 @@ QStringList TransactionalFileSystem::checkForModifications() const {
   }
 
   // new or modified files
-  foreach (const QString& filepath, mModifiedFiles.keys()) {
+  foreach (const QString& filepath, mState.modifiedFiles.keys()) {
     FilePath fp = mFilePath.getPathTo(filepath);
-    QByteArray content = mModifiedFiles.value(filepath);
+    QByteArray content = mState.modifiedFiles.value(filepath);
     if ((!fp.isExistingFile()) ||
         (FileUtils::readFile(fp) != content)) {  // can throw
       modifications.append(filepath);
@@ -359,7 +359,7 @@ void TransactionalFileSystem::save() {
   removeDiff("autosave");  // can throw
 
   // remove directories
-  foreach (const QString& dir, mRemovedDirs) {
+  foreach (const QString& dir, mState.removedDirs) {
     FilePath fp = mFilePath.getPathTo(dir);
     if (fp.isExistingDir()) {
       FileUtils::removeDirRecursively(fp);  // can throw
@@ -367,7 +367,7 @@ void TransactionalFileSystem::save() {
   }
 
   // remove files
-  foreach (const QString& filepath, mRemovedFiles) {
+  foreach (const QString& filepath, mState.removedFiles) {
     FilePath fp = mFilePath.getPathTo(filepath);
     if (fp.isExistingFile()) {
       FileUtils::removeFile(fp);  // can throw
@@ -375,9 +375,9 @@ void TransactionalFileSystem::save() {
   }
 
   // save new or modified files
-  foreach (const QString& filepath, mModifiedFiles.keys()) {
+  foreach (const QString& filepath, mState.modifiedFiles.keys()) {
     FileUtils::writeFile(mFilePath.getPathTo(filepath),
-                         mModifiedFiles.value(filepath));  // can throw
+                         mState.modifiedFiles.value(filepath));  // can throw
   }
 
   // remove backup
@@ -410,11 +410,11 @@ QString TransactionalFileSystem::cleanPath(QString path) noexcept {
  ******************************************************************************/
 
 bool TransactionalFileSystem::isRemoved(const QString& path) const noexcept {
-  if (mRemovedFiles.contains(path)) {
+  if (mState.removedFiles.contains(path)) {
     return true;
   }
 
-  foreach (const QString dir, mRemovedDirs) {
+  foreach (const QString dir, mState.removedDirs) {
     if (path.startsWith(dir)) {
       return true;
     }
@@ -470,17 +470,20 @@ void TransactionalFileSystem::saveDiff(const QString& type) const {
   root->appendChild("created", dt);
   root->ensureLineBreak();
   root->appendChild("modified_files_directory", filesDir.getFilename());
-  foreach (const QString& filepath, Toolbox::sorted(mModifiedFiles.keys())) {
+  foreach (const QString& filepath,
+           Toolbox::sorted(mState.modifiedFiles.keys())) {
     root->ensureLineBreak();
     root->appendChild("modified_file", filepath);
     FileUtils::writeFile(filesDir.getPathTo(filepath),
-                         mModifiedFiles.value(filepath));  // can throw
+                         mState.modifiedFiles.value(filepath));  // can throw
   }
-  foreach (const QString& filepath, Toolbox::sorted(mRemovedFiles.values())) {
+  foreach (const QString& filepath,
+           Toolbox::sorted(mState.removedFiles.values())) {
     root->ensureLineBreak();
     root->appendChild("removed_file", filepath);
   }
-  foreach (const QString& filepath, Toolbox::sorted(mRemovedDirs.values())) {
+  foreach (const QString& filepath,
+           Toolbox::sorted(mState.removedDirs.values())) {
     root->ensureLineBreak();
     root->appendChild("removed_directory", filepath);
   }
@@ -503,15 +506,16 @@ void TransactionalFileSystem::loadDiff(const FilePath& fp) {
   foreach (const SExpression* node, root->getChildren("modified_file")) {
     QString relPath = node->getChild("@0").getValue();
     FilePath absPath = modifiedFilesDir.getPathTo(relPath);
-    mModifiedFiles.insert(relPath, FileUtils::readFile(absPath));  // can throw
+    mState.modifiedFiles.insert(relPath,
+                                FileUtils::readFile(absPath));  // can throw
   }
   foreach (const SExpression* node, root->getChildren("removed_file")) {
     QString relPath = node->getChild("@0").getValue();
-    mRemovedFiles.insert(relPath);
+    mState.removedFiles.insert(relPath);
   }
   foreach (const SExpression* node, root->getChildren("removed_directory")) {
     QString relPath = node->getChild("@0").getValue();
-    mRemovedDirs.insert(relPath);
+    mState.removedDirs.insert(relPath);
   }
 }
 

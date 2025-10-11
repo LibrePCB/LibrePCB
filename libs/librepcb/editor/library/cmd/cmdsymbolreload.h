@@ -25,6 +25,8 @@
  ******************************************************************************/
 #include "cmdlibraryelementedit.h"
 
+#include <librepcb/core/fileio/transactionalfilesystem.h>
+
 #include <QtCore>
 
 /*******************************************************************************
@@ -66,6 +68,22 @@ protected:  // Methods
 
 private:  // Data
   Symbol& mElement;
+
+  TransactionalFileSystem::State mOldFiles;
+  TransactionalFileSystem::State mNewFiles;
+
+  PositiveLength mOldGridInterval;
+  PositiveLength mNewGridInterval;
+  SymbolPinList mOldPins;
+  SymbolPinList mNewPins;
+  PolygonList mOldPolygons;
+  PolygonList mNewPolygons;
+  CircleList mOldCircles;
+  CircleList mNewCircles;
+  TextList mOldTexts;
+  TextList mNewTexts;
+  ImageList mOldImages;
+  ImageList mNewImages;
 };
 
 /*******************************************************************************

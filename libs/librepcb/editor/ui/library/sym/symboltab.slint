@@ -622,7 +622,7 @@ export component SymbolTab inherits Tab {
 
     VerticalLayout {
         FilesModifiedMessageBanner {
-            shown: true;
+            shown: tabs[index].files-modified;
 
             reload-clicked => {
                 Backend.trigger-tab(section-index, index, TabAction.reload-from-disk);
