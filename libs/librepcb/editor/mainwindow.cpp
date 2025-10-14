@@ -598,6 +598,10 @@ void MainWindow::trigger(ui::Action a) noexcept {
       mApp.getRemoteLibraries().cancelUpdateCheck();
       break;
     }
+    case ui::Action::LibraryPanelToggleAll: {
+      mApp.getRemoteLibraries().toggleAll();
+      break;
+    }
     case ui::Action::LibraryPanelApply: {
       mApp.getRemoteLibraries().applyChanges();
       break;

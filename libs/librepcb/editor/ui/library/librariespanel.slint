@@ -56,7 +56,6 @@ component LibraryListViewItem inherits Rectangle {
     in-out property <[LibraryInfoData]> model;
     in property <int> index;
     in property <bool> remote: false;
-    in property <bool> check-all: false;
     in property <bool> is-current: false;
     in property <bool> enabled: true;
     in property <length> scrollbar-width: 0;
@@ -107,10 +106,6 @@ component LibraryListViewItem inherits Rectangle {
 
     callback clicked <=> ta.clicked;
     callback uninstall-clicked(index: int);
-
-    changed check-all => {
-        model[index].checked = check-all;
-    }
 
     init => {
         if lib.highlight {
@@ -274,7 +269,6 @@ component LibrariesPanelSection inherits FocusScope {
     in property <LibraryListData> data;
     in property <bool> remote;
     in property <int> min-items-height: 1;
-    property <bool> check-all: false;
     property <int> current-index: -1;
     property <length> item-height: 50px;
 
@@ -313,7 +307,7 @@ component LibrariesPanelSection inherits FocusScope {
                 enabled: root.enabled;
 
                 clicked => {
-                    check-all = !check-all;
+                    Backend.trigger(Action.library-panel-toggle-all);
                 }
             }
 
@@ -450,7 +444,6 @@ component LibrariesPanelSection inherits FocusScope {
                 remote: remote;
                 scrollbar-width: scrollbar-width;
                 is-current: index == current-index;
-                check-all: root.check-all;
                 enabled: root.enabled;
 
                 clicked => {
@@ -473,7 +466,7 @@ component LibrariesPanelSection inherits FocusScope {
             set-current-index(max(current-index - 1, 0));
             return accept;
         } else if event.modifiers.control && (event.text == "a") {
-            check-all = !check-all;
+            Backend.trigger(Action.library-panel-toggle-all);
             return accept;
         } else if (event.text == Key.Escape) && remote && (Data.remote-libraries-pending-operations > 0) {
             Backend.trigger(Action.library-panel-cancel);
