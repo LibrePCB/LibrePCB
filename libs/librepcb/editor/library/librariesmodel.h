@@ -73,6 +73,7 @@ public:
   void highlightLibraryOnNextRescan(const FilePath& fp) noexcept;
   void checkForUpdates() noexcept;
   void cancelUpdateCheck() noexcept;
+  void toggleAll() noexcept;
   void applyChanges() noexcept;
   void cancel() noexcept;
 

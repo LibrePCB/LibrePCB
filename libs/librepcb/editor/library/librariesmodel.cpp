@@ -171,6 +171,33 @@ void LibrariesModel::cancelUpdateCheck() noexcept {
   emit uiDataChanged(getUiData());
 }
 
+void LibrariesModel::toggleAll() noexcept {
+  if (mMergedLibs.empty()) return;
+
+  // Determine new check state depending on how many libs are checked.
+  std::size_t checkedLibs = 0;
+  for (const auto& item : mMergedLibs) {
+    if (item.checked) {
+      ++checkedLibs;
+    }
+  }
+  const bool newCheckState = checkedLibs <= (mMergedLibs.size() / 2);
+
+  // Apply new check state to all libs.
+  for (const auto& item : mMergedLibs) {
+    if (auto uuid = Uuid::tryFromString(s2q(item.uuid))) {
+      mCheckStates[*uuid] = newCheckState;
+    }
+  }
+  if (newCheckState) {
+    checkMissingDependenciesOfLibs();
+  } else {
+    uncheckLibsWithUnmetDependencies();
+  }
+  updateCheckStates(true);
+  emit uiDataChanged(getUiData());
+}
+
 void LibrariesModel::applyChanges() noexcept {
   if (mMode != Mode::RemoteLibs) return;
 
