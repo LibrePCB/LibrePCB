@@ -60,6 +60,7 @@ public:
   void setKeywords(const LocalizedKeywordsMap& keywords) noexcept;
   void setVersion(const Version& version) noexcept;
   void setAuthor(const QString& author) noexcept;
+  void setCreated(const QDateTime& created) noexcept;
   void setDeprecated(bool deprecated) noexcept;
 
   // Operator Overloadings
@@ -89,6 +90,8 @@ private:  // Data
   Version mNewVersion;
   QString mOldAuthor;
   QString mNewAuthor;
+  QDateTime mOldCreated;
+  QDateTime mNewCreated;
   bool mOldDeprecated;
   bool mNewDeprecated;
 };

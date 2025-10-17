@@ -74,6 +74,7 @@ public:
       root.appendChild(name);
       root.appendChild("reference", reference);
     }
+    bool operator==(const AlternativeName& rhs) const noexcept = default;
   };
   enum class AssemblyType {
     None,  ///< Nothing to mount (i.e. not a package, just a footprint)
@@ -115,6 +116,9 @@ public:
   const FootprintList& getFootprints() const noexcept { return mFootprints; }
 
   // Setters
+  void setAlternativeNames(const QList<AlternativeName>& names) noexcept {
+    mAlternativeNames = names;
+  }
   void setAssemblyType(AssemblyType type) noexcept { mAssemblyType = type; }
   void setGridInterval(const PositiveLength& interval) noexcept {
     mGridInterval = interval;

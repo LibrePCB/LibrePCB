@@ -37,6 +37,7 @@
 namespace librepcb {
 
 class SExpression;
+class TransactionalDirectory;
 
 namespace editor {
 
@@ -71,6 +72,10 @@ public:
 protected:
   bool isPathOutsideLibDir() const noexcept;
   bool hasUnsavedChanges() const noexcept;
+  void setWatchedFiles(const TransactionalDirectory& dir,
+                       const QSet<QString>& filenames) noexcept;
+  virtual void watchedFilesModifiedChanged() noexcept {}
+  virtual void reloadFromDisk() {}
   void scheduleChecks() noexcept;
   void runChecks() noexcept;
   virtual std::optional<std::pair<RuleCheckMessageList, QSet<SExpression>>>
@@ -85,6 +90,8 @@ protected:
 private:
   bool autoFixHandler(const std::shared_ptr<const RuleCheckMessage>& msg,
                       bool checkOnly) noexcept;
+  void watchedFileChanged(const QString& path) noexcept;
+  void watchedFilesModifiedTimerElapsed() noexcept;
 
 protected:
   LibraryEditor& mEditor;
@@ -97,6 +104,13 @@ protected:
   std::shared_ptr<RuleCheckMessagesModel> mCheckMessages;
   slint::SharedString mCheckError;
   QTimer mRuleCheckDelayTimer;
+
+  // Monitoring of file modifications
+  QFileSystemWatcher mFileSystemWatcher;
+  QHash<FilePath, QByteArray> mWatchedFileHashes;  ///< To detect modifications
+  QSet<FilePath> mModifiedWatchedFiles;  ///< Modified, but not reloaded yet
+  bool mAutoReloadOnFileModifications;  ///< Set by derived classes
+  QTimer mWatchedFilesTimer;  ///< To delay/aggregate the notification & reload
 };
 
 /*******************************************************************************

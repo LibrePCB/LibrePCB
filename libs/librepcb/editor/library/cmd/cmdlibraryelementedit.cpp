@@ -38,6 +38,8 @@ CmdLibraryElementEdit::CmdLibraryElementEdit(LibraryElement& element,
                                              const QString& text) noexcept
   : CmdLibraryBaseElementEdit(element, text),
     mElement(element),
+    mOldGeneratedBy(element.getGeneratedBy()),
+    mNewGeneratedBy(mOldGeneratedBy),
     mOldCategories(element.getCategories()),
     mNewCategories(mOldCategories),
     mOldResources(element.getResources()),
@@ -50,6 +52,12 @@ CmdLibraryElementEdit::~CmdLibraryElementEdit() noexcept {
 /*******************************************************************************
  *  Setters
  ******************************************************************************/
+
+void CmdLibraryElementEdit::setGeneratedBy(
+    const QString& generatedBy) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewGeneratedBy = generatedBy;
+}
 
 void CmdLibraryElementEdit::setCategories(const QSet<Uuid>& uuids) noexcept {
   Q_ASSERT(!wasEverExecuted());
@@ -68,6 +76,7 @@ void CmdLibraryElementEdit::setResources(
 
 bool CmdLibraryElementEdit::performExecute() {
   if (CmdLibraryBaseElementEdit::performExecute()) return true;  // can throw
+  if (mNewGeneratedBy != mOldGeneratedBy) return true;
   if (mNewCategories != mOldCategories) return true;
   if (mNewResources != mOldResources) return true;
   return false;
@@ -75,12 +84,14 @@ bool CmdLibraryElementEdit::performExecute() {
 
 void CmdLibraryElementEdit::performUndo() {
   CmdLibraryBaseElementEdit::performUndo();  // can throw
+  mElement.setGeneratedBy(mOldGeneratedBy);
   mElement.setCategories(mOldCategories);
   mElement.setResources(mOldResources);
 }
 
 void CmdLibraryElementEdit::performRedo() {
   CmdLibraryBaseElementEdit::performRedo();  // can throw
+  mElement.setGeneratedBy(mNewGeneratedBy);
   mElement.setCategories(mNewCategories);
   mElement.setResources(mNewResources);
 }

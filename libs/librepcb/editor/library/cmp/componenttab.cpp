@@ -569,6 +569,7 @@ bool ComponentTab::isInterfaceBroken() const noexcept {
          original.getSymbolItems()) {
       const ComponentSymbolVariantItem* currentItem =
           current->getSymbolItems().find(originalItem.getUuid()).get();
+      if (!currentItem) return true;
       if (currentItem->getSymbolUuid() != originalItem.getSymbolUuid()) {
         return true;
       }
