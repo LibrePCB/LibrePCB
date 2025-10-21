@@ -127,8 +127,10 @@ protected:
    */
   virtual void performRedo() = 0;
 
-private:
+protected:
   QString mText;
+
+private:
   bool mIsExecuted;  ///< @brief Shows whether #execute() was called or not
   int mRedoCount;  ///< @brief Counter of how often #redo() was called
   int mUndoCount;  ///< @brief Counter of how often #undo() was called

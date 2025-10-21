@@ -28,6 +28,7 @@ import {
 import {
     BreakingChangesMessageBanner,
     CheckErrorsMessageBanner,
+    FilesModifiedMessageBanner,
 } from "../messagebanners.slint";
 import {
     Button,
@@ -1005,6 +1006,14 @@ export component PackageTab inherits Tab {
     }
 
     VerticalLayout {
+        FilesModifiedMessageBanner {
+            shown: tabs[index].files-modified;
+
+            reload-clicked => {
+                Backend.trigger-tab(section-index, index, TabAction.reload-from-disk);
+            }
+        }
+
         BreakingChangesMessageBanner {
             shown: tabs[index].interface-broken-msg;
         }

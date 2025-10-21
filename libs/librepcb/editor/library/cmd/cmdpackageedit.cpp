@@ -37,6 +37,8 @@ namespace editor {
 CmdPackageEdit::CmdPackageEdit(Package& package) noexcept
   : CmdLibraryElementEdit(package, tr("Edit Package Properties")),
     mPackage(package),
+    mOldAlternativeNames(package.getAlternativeNames()),
+    mNewAlternativeNames(mOldAlternativeNames),
     mOldAssemblyType(package.getAssemblyType(false)),
     mNewAssemblyType(mOldAssemblyType),
     mOldMinCopperClearance(package.getMinCopperClearance()),
@@ -49,6 +51,12 @@ CmdPackageEdit::~CmdPackageEdit() noexcept {
 /*******************************************************************************
  *  Setters
  ******************************************************************************/
+
+void CmdPackageEdit::setAlternativeNames(
+    const QList<Package::AlternativeName>& names) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewAlternativeNames = names;
+}
 
 void CmdPackageEdit::setAssemblyType(Package::AssemblyType type) noexcept {
   Q_ASSERT(!wasEverExecuted());
@@ -66,6 +74,7 @@ void CmdPackageEdit::setMinCopperClearance(const UnsignedLength& clr) noexcept {
 
 bool CmdPackageEdit::performExecute() {
   if (CmdLibraryElementEdit::performExecute()) return true;  // can throw
+  if (mNewAlternativeNames != mOldAlternativeNames) return true;
   if (mNewAssemblyType != mOldAssemblyType) return true;
   if (mNewMinCopperClearance != mOldMinCopperClearance) return true;
   return false;
@@ -73,12 +82,14 @@ bool CmdPackageEdit::performExecute() {
 
 void CmdPackageEdit::performUndo() {
   CmdLibraryElementEdit::performUndo();  // can throw
+  mPackage.setAlternativeNames(mOldAlternativeNames);
   mPackage.setAssemblyType(mOldAssemblyType);
   mPackage.setMinCopperClearance(mOldMinCopperClearance);
 }
 
 void CmdPackageEdit::performRedo() {
   CmdLibraryElementEdit::performRedo();  // can throw
+  mPackage.setAlternativeNames(mNewAlternativeNames);
   mPackage.setAssemblyType(mNewAssemblyType);
   mPackage.setMinCopperClearance(mNewMinCopperClearance);
 }

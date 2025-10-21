@@ -27,6 +27,8 @@
 #include "libraryeditor.h"
 #include "rulecheck/rulecheckmessagesmodel.h"
 
+#include <librepcb/core/fileio/fileutils.h>
+#include <librepcb/core/fileio/transactionaldirectory.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacesettings.h>
 
@@ -49,7 +51,8 @@ LibraryEditorTab::LibraryEditorTab(LibraryEditor& editor,
     mEditor(editor),
     mUndoStack(new UndoStack()),
     mManualModificationsMade(false),
-    mCheckMessages(new RuleCheckMessagesModel()) {
+    mCheckMessages(new RuleCheckMessagesModel()),
+    mAutoReloadOnFileModifications(false) {
   // Connect library editor.
   mEditor.registerTab(*this);
   connect(&mEditor, &LibraryEditor::uiIndexChanged, this,
@@ -73,6 +76,13 @@ LibraryEditorTab::LibraryEditorTab(LibraryEditor& editor,
   mRuleCheckDelayTimer.setInterval(100);
   connect(&mRuleCheckDelayTimer, &QTimer::timeout, this,
           &LibraryEditorTab::runChecks);
+
+  // Setup file system watcher.
+  mWatchedFilesTimer.setSingleShot(true);
+  connect(&mFileSystemWatcher, &QFileSystemWatcher::fileChanged, this,
+          &LibraryEditorTab::watchedFileChanged);
+  connect(&mWatchedFilesTimer, &QTimer::timeout, this,
+          &LibraryEditorTab::watchedFilesModifiedTimerElapsed);
 }
 
 LibraryEditorTab::~LibraryEditorTab() noexcept {
@@ -94,6 +104,46 @@ bool LibraryEditorTab::isPathOutsideLibDir() const noexcept {
 
 bool LibraryEditorTab::hasUnsavedChanges() const noexcept {
   return mManualModificationsMade || (!mUndoStack->isClean());
+}
+
+void LibraryEditorTab::setWatchedFiles(
+    const TransactionalDirectory& dir,
+    const QSet<QString>& filenames) noexcept {
+  mWatchedFilesTimer.stop();
+  mModifiedWatchedFiles.clear();
+  mWatchedFileHashes.clear();
+
+  // Memorize hashes of all watched files so we can detect actual modifications
+  // if QFileSystemWatcher reports any file modification.
+  for (const QString& name : filenames) {
+    const FilePath fp = dir.getAbsPath(name);
+    try {
+      const QByteArray content = dir.read(name);
+      const QByteArray sha256 = QCryptographicHash::hash(
+          content, QCryptographicHash::Algorithm::Sha256);
+      mWatchedFileHashes.insert(fp, sha256);
+    } catch (const Exception& e) {
+      qCritical().nospace().noquote()
+          << "Failed to hash file '" << fp.toNative() << "': " << e.getMsg();
+    }
+  }
+
+  // Register/unregister watched files with QFileSystemWatcher.
+  QSet<FilePath> watched;
+  for (QString path : mFileSystemWatcher.files()) {
+    const FilePath fp(path);
+    if (!mWatchedFileHashes.contains(fp)) {
+      mFileSystemWatcher.removePath(path);
+    } else {
+      watched.insert(fp);
+    }
+  }
+  for (const FilePath& fp : mWatchedFileHashes.keys()) {
+    if ((!watched.contains(fp)) && (!mFileSystemWatcher.addPath(fp.toStr()))) {
+      qCritical().nospace().noquote()
+          << "Failed to watch file '" << fp.toNative() << "'.";
+    }
+  }
 }
 
 void LibraryEditorTab::scheduleChecks() noexcept {
@@ -148,6 +198,46 @@ bool LibraryEditorTab::autoFixHandler(
     }
   }
   return false;
+}
+
+void LibraryEditorTab::watchedFileChanged(const QString& path) noexcept {
+  qInfo() << "Watched file modified:" << path;
+
+  const FilePath fp(path);
+
+  // If the file has been (temporarily) renamed, watch it again.
+  if ((!mFileSystemWatcher.files().contains(path)) && (fp.isExistingFile())) {
+    mFileSystemWatcher.addPath(path);
+  }
+
+  try {
+    const QByteArray content = FileUtils::readFile(fp);
+    const QByteArray sha256 = QCryptographicHash::hash(
+        content, QCryptographicHash::Algorithm::Sha256);
+    if (sha256 != mWatchedFileHashes.value(fp)) {
+      mModifiedWatchedFiles.insert(fp);
+    } else {
+      mModifiedWatchedFiles.remove(fp);
+    }
+    mWatchedFilesTimer.start(700);
+  } catch (const Exception& e) {
+    qCritical().nospace().noquote()
+        << "Failed to compare hash of watched file '" << fp.toNative()
+        << "': " << e.getMsg();
+  }
+}
+
+void LibraryEditorTab::watchedFilesModifiedTimerElapsed() noexcept {
+  try {
+    if ((!mModifiedWatchedFiles.isEmpty()) && mAutoReloadOnFileModifications) {
+      reloadFromDisk();
+    } else {
+      watchedFilesModifiedChanged();
+    }
+  } catch (const Exception& e) {
+    qCritical() << "Auto-reload failed:" << e.getMsg();
+    watchedFilesModifiedChanged();  // Just display the banner.
+  }
 }
 
 /*******************************************************************************

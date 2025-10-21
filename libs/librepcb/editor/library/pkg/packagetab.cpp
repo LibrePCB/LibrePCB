@@ -43,6 +43,7 @@
 #include "../cmd/cmdfootprintedit.h"
 #include "../cmd/cmdfootprintpadedit.h"
 #include "../cmd/cmdpackageedit.h"
+#include "../cmd/cmdpackagereload.h"
 #include "../libraryeditor.h"
 #include "../libraryelementcategoriesmodel.h"
 #include "footprintgraphicsitem.h"
@@ -176,12 +177,12 @@ PackageTab::PackageTab(LibraryEditor& editor, std::unique_ptr<Package> pkg,
           &PackageTab::notifyDerivedUiDataChanged);
 
   // Connect undo stack.
-  connect(mUndoStack.get(), &UndoStack::stateModified, this,
-          &PackageTab::scheduleChecks);
-  connect(mUndoStack.get(), &UndoStack::stateModified, this,
-          &PackageTab::scheduleOpenGlSceneUpdate);
-  connect(mUndoStack.get(), &UndoStack::stateModified, this,
-          &PackageTab::refreshUiData);
+  connect(mUndoStack.get(), &UndoStack::stateModified, this, [this]() {
+    mAutoReloadOnFileModifications = false;  // Disable auto-reload.
+    scheduleChecks();
+    scheduleOpenGlSceneUpdate();
+    refreshUiData();
+  });
 
   // Connect models.
   mPads->setReferences(&mPackage->getPads(), mUndoStack.get());
@@ -213,6 +214,9 @@ PackageTab::PackageTab(LibraryEditor& editor, std::unique_ptr<Package> pkg,
   // Refresh content.
   refreshUiData();
   scheduleChecks();
+
+  // Setup file system watcher.
+  updateWatchedFiles();
 
   // Clear name for new elements so the user can just start typing.
   if (mode == Mode::New) {
@@ -368,6 +372,7 @@ ui::PackageTabData PackageTab::getDerivedUiData() const noexcept {
       mAlpha.value(OpenGlObject::Type::Device, 1),  // Devices alpha
       refreshing,  // Refreshing
       q2s(errors.join("\n\n")),  // Error
+      !mModifiedWatchedFiles.isEmpty(),  // Watched files modified
       mIsInterfaceBroken,  // Interface broken
       mTool,  // Tool
       q2s(((mView3d && mOpenGlView) ? mOpenGlView->isPanning()
@@ -667,6 +672,14 @@ void PackageTab::trigger(ui::TabAction a) noexcept {
     case ui::TabAction::Save: {
       commitUiData();
       save();
+      break;
+    }
+    case ui::TabAction::ReloadFromDisk: {
+      try {
+        reloadFromDisk();
+      } catch (const Exception& e) {
+        QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
+      }
       break;
     }
     case ui::TabAction::Undo: {
@@ -1861,6 +1874,40 @@ void PackageTab::fsmToolEnter(PackageEditorState_Measure& state) noexcept {
  *  Protected Methods
  ******************************************************************************/
 
+void PackageTab::watchedFilesModifiedChanged() noexcept {
+  onDerivedUiDataChanged.notify();
+}
+
+void PackageTab::reloadFromDisk() {
+  const std::optional<Uuid> currentFpt = mFsm->getCurrentFootprint()
+      ? std::make_optional(mFsm->getCurrentFootprint()->getUuid())
+      : std::optional<Uuid>();
+  const std::optional<Uuid> currentModel = mCurrentModel
+      ? std::make_optional(mCurrentModel->getUuid())
+      : std::optional<Uuid>();
+
+  mFsm->processAbortCommand();
+  mFsm->processAbortCommand();
+  mFsm->processAbortCommand();
+  mUndoStack->execCmd(new CmdPackageReload(*mPackage));
+  mUndoStack->setClean();
+  memorizeInterface();
+  updateWatchedFiles();
+  mManualModificationsMade = false;
+  mAutoReloadOnFileModifications = true;  // Enable auto-reload.
+
+  if (currentFpt && mPackage->getFootprints().find(*currentFpt)) {
+    setCurrentFootprintIndex(mPackage->getFootprints().indexOf(*currentFpt));
+  }
+  if (currentModel && mPackage->getModels().find(*currentModel)) {
+    setCurrentModelIndex(mPackage->getModels().indexOf(*currentModel));
+  }
+
+  // This is actually already called by the undo stack change, but the
+  // memorized interface is updated afterwards, so we need to call it again.
+  refreshUiData();
+}
+
 std::optional<std::pair<RuleCheckMessageList, QSet<SExpression>>>
     PackageTab::runChecksImpl() {
   // Do not run checks during wizard mode as it would be too early.
@@ -2456,10 +2503,9 @@ bool PackageTab::save() noexcept {
     mPackage->getDirectory().getFileSystem()->save();
     mUndoStack->setClean();
     mManualModificationsMade = false;
-    mOriginalPackagePadUuids = mPackage->getPads().getUuidSet();
-    mOriginalFootprints = mPackage->getFootprints();
+    memorizeInterface();
+    updateWatchedFiles();
     mEditor.getWorkspace().getLibraryDb().startLibraryRescan();
-
     if (mWizardMode && (mCurrentPageIndex == 0)) {
       ++mCurrentPageIndex;
       scheduleChecks();
@@ -2471,6 +2517,19 @@ bool PackageTab::save() noexcept {
     refreshUiData();
     return false;
   }
+}
+
+void PackageTab::memorizeInterface() noexcept {
+  mOriginalPackagePadUuids = mPackage->getPads().getUuidSet();
+  mOriginalFootprints = mPackage->getFootprints();
+}
+
+void PackageTab::updateWatchedFiles() noexcept {
+  QSet<QString> files = {"package.lp"};
+  for (const PackageModel& model : mPackage->getModels()) {
+    files.insert(model.getFileName());
+  }
+  setWatchedFiles(mPackage->getDirectory(), files);
 }
 
 void PackageTab::setGridInterval(const PositiveLength& interval) noexcept {

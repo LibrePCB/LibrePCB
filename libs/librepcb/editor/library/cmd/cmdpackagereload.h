@@ -17,15 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_CMDLIBRARYELEMENTEDIT_H
-#define LIBREPCB_EDITOR_CMDLIBRARYELEMENTEDIT_H
+#ifndef LIBREPCB_EDITOR_CMDPACKAGERELOAD_H
+#define LIBREPCB_EDITOR_CMDPACKAGERELOAD_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "cmdlibrarybaseelementedit.h"
+#include "cmdpackageedit.h"
 
-#include <librepcb/core/library/libraryelement.h>
+#include <librepcb/core/fileio/transactionalfilesystem.h>
 
 #include <QtCore>
 
@@ -33,31 +33,28 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class Package;
+
 namespace editor {
 
 /*******************************************************************************
- *  Class CmdLibraryElementEdit
+ *  Class CmdPackageReload
  ******************************************************************************/
 
 /**
- * @brief The CmdLibraryElementEdit class
+ * @brief The CmdPackageReload class
  */
-class CmdLibraryElementEdit : public CmdLibraryBaseElementEdit {
+class CmdPackageReload final : public CmdPackageEdit {
 public:
   // Constructors / Destructor
-  CmdLibraryElementEdit() = delete;
-  CmdLibraryElementEdit(const CmdLibraryElementEdit& other) = delete;
-  explicit CmdLibraryElementEdit(LibraryElement& element,
-                                 const QString& text) noexcept;
-  virtual ~CmdLibraryElementEdit() noexcept;
-
-  // Setters
-  void setGeneratedBy(const QString& generatedBy) noexcept;
-  void setCategories(const QSet<Uuid>& uuids) noexcept;
-  void setResources(const ResourceList& resources) noexcept;
+  CmdPackageReload() = delete;
+  CmdPackageReload(const CmdPackageReload& other) = delete;
+  explicit CmdPackageReload(Package& element) noexcept;
+  virtual ~CmdPackageReload() noexcept;
 
   // Operator Overloadings
-  CmdLibraryElementEdit& operator=(const CmdLibraryElementEdit& rhs) = delete;
+  CmdPackageReload& operator=(const CmdPackageReload& rhs) = delete;
 
 protected:  // Methods
   /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
@@ -70,14 +67,19 @@ protected:  // Methods
   virtual void performRedo() override;
 
 private:  // Data
-  LibraryElement& mElement;
+  Package& mElement;
 
-  QString mOldGeneratedBy;
-  QString mNewGeneratedBy;
-  QSet<Uuid> mOldCategories;
-  QSet<Uuid> mNewCategories;
-  ResourceList mOldResources;
-  ResourceList mNewResources;
+  TransactionalFileSystem::State mOldFiles;
+  TransactionalFileSystem::State mNewFiles;
+
+  PositiveLength mOldGridInterval;
+  PositiveLength mNewGridInterval;
+  PackagePadList mOldPads;
+  PackagePadList mNewPads;
+  PackageModelList mOldModels;
+  PackageModelList mNewModels;
+  FootprintList mOldFootprints;
+  FootprintList mNewFootprints;
 };
 
 /*******************************************************************************

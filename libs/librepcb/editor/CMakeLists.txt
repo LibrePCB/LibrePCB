@@ -176,6 +176,8 @@ add_library(
   library/cmd/cmdpackagemodelremove.h
   library/cmd/cmdpackagepadedit.cpp
   library/cmd/cmdpackagepadedit.h
+  library/cmd/cmdpackagereload.cpp
+  library/cmd/cmdpackagereload.h
   library/cmd/cmdpartedit.cpp
   library/cmd/cmdpartedit.h
   library/cmd/cmdpastefootprintitems.cpp
@@ -188,6 +190,8 @@ add_library(
   library/cmd/cmdremoveselectedsymbolitems.h
   library/cmd/cmdsymbolpinedit.cpp
   library/cmd/cmdsymbolpinedit.h
+  library/cmd/cmdsymbolreload.cpp
+  library/cmd/cmdsymbolreload.h
   library/cmp/componentchooserdialog.cpp
   library/cmp/componentchooserdialog.h
   library/cmp/componentchooserdialog.ui
