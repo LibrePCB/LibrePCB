@@ -95,11 +95,11 @@ export component TreeView inherits FocusScope {
                             image-fit: contain;
                             source: @image-url("../../../../font-awesome/svgs/solid/angle-right.svg");
                             colorize: Palette.foreground;
-                            rotation-angle: item.expanded ? 90deg : 0;
+                            transform-rotation: item.expanded ? 90deg : 0;
                             visible: item.has-children;
                             accessible-role: none;
 
-                            animate rotation-angle { duration: 100ms; }
+                            animate transform-rotation { duration: 100ms; }
                         }
 
                         clicked => {
