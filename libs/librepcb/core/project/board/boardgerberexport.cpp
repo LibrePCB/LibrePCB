@@ -421,6 +421,12 @@ void BoardGerberExport::exportLayerBoardOutlines(
   gen.setFileFunctionOutlines(false);
   drawLayer(gen, Layer::boardOutlines());
   drawLayer(gen, Layer::boardCutouts());
+  // Note: Currently the "plated cutouts" layer is exported to the normal board
+  // outlines Gerber file, which is not ideal but unfortunately there doesn't
+  // exist a standardized way of exporting plated cutouts :-( This way may
+  // still work fine if there is copper around the plated cutout polygons,
+  // therefore we have implemented a DRC warning if this is not the case.
+  drawLayer(gen, Layer::boardPlatedCutouts());
   gen.generate();
   trackFileBeforeWrite(fp);  // can throw
   gen.saveToFile(fp);
