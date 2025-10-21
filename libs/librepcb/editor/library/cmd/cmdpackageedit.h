@@ -51,6 +51,8 @@ public:
   virtual ~CmdPackageEdit() noexcept;
 
   // Setters
+  void setAlternativeNames(
+      const QList<Package::AlternativeName>& names) noexcept;
   void setAssemblyType(Package::AssemblyType type) noexcept;
 
   // Operator Overloadings
@@ -69,6 +71,8 @@ protected:  // Methods
 private:  // Data
   Package& mPackage;
 
+  QList<Package::AlternativeName> mOldAlternativeNames;
+  QList<Package::AlternativeName> mNewAlternativeNames;
   Package::AssemblyType mOldAssemblyType;
   Package::AssemblyType mNewAssemblyType;
 };

@@ -35,6 +35,7 @@
 #include "../../workspace/desktopservices.h"
 #include "../cmd/cmdlibraryelementedit.h"
 #include "../cmd/cmdsymbolpinedit.h"
+#include "../cmd/cmdsymbolreload.h"
 #include "../libraryeditor.h"
 #include "../libraryelementcategoriesmodel.h"
 #include "fsm/symboleditorfsm.h"
@@ -132,10 +133,11 @@ SymbolTab::SymbolTab(LibraryEditor& editor, std::unique_ptr<Symbol> sym,
           &SymbolTab::notifyDerivedUiDataChanged);
 
   // Connect undo stack.
-  connect(mUndoStack.get(), &UndoStack::stateModified, this,
-          &SymbolTab::scheduleChecks);
-  connect(mUndoStack.get(), &UndoStack::stateModified, this,
-          &SymbolTab::refreshUiData);
+  connect(mUndoStack.get(), &UndoStack::stateModified, this, [this]() {
+    mAutoReloadOnFileModifications = false;  // Disable auto-reload.
+    scheduleChecks();
+    refreshUiData();
+  });
 
   // Connect models.
   connect(mCategories.get(), &LibraryElementCategoriesModel::modified, this,
@@ -153,6 +155,9 @@ SymbolTab::SymbolTab(LibraryEditor& editor, std::unique_ptr<Symbol> sym,
   // Refresh content.
   refreshUiData();
   scheduleChecks();
+
+  // Setup file system watcher.
+  updateWatchedFiles();
 
   // Clear name for new elements so the user can just start typing.
   if (mode == Mode::New) {
@@ -274,6 +279,7 @@ ui::SymbolTabData SymbolTab::getDerivedUiData() const noexcept {
       l2s(mGridStyle),  // Grid style
       l2s(*mGridInterval),  // Grid interval
       l2s(mUnit),  // Unit
+      !mModifiedWatchedFiles.isEmpty(),  // Watched files modified
       mIsInterfaceBroken,  // Interface broken
       mMsgImportPins.getUiData(),  // Message "import pins"
       mTool,  // Tool
@@ -417,6 +423,14 @@ void SymbolTab::trigger(ui::TabAction a) noexcept {
     case ui::TabAction::Save: {
       commitUiData();
       save();
+      break;
+    }
+    case ui::TabAction::ReloadFromDisk: {
+      try {
+        reloadFromDisk();
+      } catch (const Exception& e) {
+        QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
+      }
       break;
     }
     case ui::TabAction::Undo: {
@@ -1260,6 +1274,26 @@ void SymbolTab::fsmToolEnter(SymbolEditorState_Measure& state) noexcept {
  *  Protected Methods
  ******************************************************************************/
 
+void SymbolTab::watchedFilesModifiedChanged() noexcept {
+  onDerivedUiDataChanged.notify();
+}
+
+void SymbolTab::reloadFromDisk() {
+  mFsm->processAbortCommand();
+  mFsm->processAbortCommand();
+  mFsm->processAbortCommand();
+  mUndoStack->execCmd(new CmdSymbolReload(*mSymbol));
+  mUndoStack->setClean();
+  memorizeInterface();
+  updateWatchedFiles();
+  mManualModificationsMade = false;
+  mAutoReloadOnFileModifications = true;  // Enable auto-reload.
+
+  // This is actually already called by the undo stack change, but the
+  // memorized interface is updated afterwards, so we need to call it again.
+  refreshUiData();
+}
+
 std::optional<std::pair<RuleCheckMessageList, QSet<SExpression>>>
     SymbolTab::runChecksImpl() {
   // Do not run checks during wizard mode as it would be too early.
@@ -1491,7 +1525,8 @@ bool SymbolTab::save() noexcept {
     mSymbol->getDirectory().getFileSystem()->save();
     mUndoStack->setClean();
     mManualModificationsMade = false;
-    mOriginalSymbolPinUuids = mSymbol->getPins().getUuidSet();
+    memorizeInterface();
+    updateWatchedFiles();
     mEditor.getWorkspace().getLibraryDb().startLibraryRescan();
     if (mWizardMode && (mCurrentPageIndex == 0)) {
       ++mCurrentPageIndex;
@@ -1505,6 +1540,15 @@ bool SymbolTab::save() noexcept {
     refreshUiData();
     return false;
   }
+}
+
+void SymbolTab::memorizeInterface() noexcept {
+  mOriginalSymbolPinUuids = mSymbol->getPins().getUuidSet();
+}
+
+void SymbolTab::updateWatchedFiles() noexcept {
+  QSet<QString> files = {"symbol.lp"};
+  setWatchedFiles(mSymbol->getDirectory(), files);
 }
 
 void SymbolTab::setGridInterval(const PositiveLength& interval) noexcept {

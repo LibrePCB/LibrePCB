@@ -48,6 +48,8 @@ CmdLibraryBaseElementEdit::CmdLibraryBaseElementEdit(
     mNewVersion(mOldVersion),
     mOldAuthor(element.getAuthor()),
     mNewAuthor(mOldAuthor),
+    mOldCreated(element.getCreated()),
+    mNewCreated(mOldCreated),
     mOldDeprecated(element.isDeprecated()),
     mNewDeprecated(mOldDeprecated) {
 }
@@ -105,6 +107,11 @@ void CmdLibraryBaseElementEdit::setAuthor(const QString& author) noexcept {
   mNewAuthor = author;
 }
 
+void CmdLibraryBaseElementEdit::setCreated(const QDateTime& created) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewCreated = created;
+}
+
 void CmdLibraryBaseElementEdit::setDeprecated(bool deprecated) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewDeprecated = deprecated;
@@ -122,6 +129,7 @@ bool CmdLibraryBaseElementEdit::performExecute() {
   if (mNewKeywords != mOldKeywords) return true;
   if (mNewVersion != mOldVersion) return true;
   if (mNewAuthor != mOldAuthor) return true;
+  if (mNewCreated != mOldCreated) return true;
   if (mNewDeprecated != mOldDeprecated) return true;
   return false;
 }
@@ -132,6 +140,7 @@ void CmdLibraryBaseElementEdit::performUndo() {
   mElement.setKeywords(mOldKeywords);
   mElement.setVersion(mOldVersion);
   mElement.setAuthor(mOldAuthor);
+  mElement.setCreated(mOldCreated);
   mElement.setDeprecated(mOldDeprecated);
 }
 
@@ -141,6 +150,7 @@ void CmdLibraryBaseElementEdit::performRedo() {
   mElement.setKeywords(mNewKeywords);
   mElement.setVersion(mNewVersion);
   mElement.setAuthor(mNewAuthor);
+  mElement.setCreated(mNewCreated);
   mElement.setDeprecated(mNewDeprecated);
 }
 

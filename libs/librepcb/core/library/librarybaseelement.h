@@ -89,6 +89,7 @@ public:
   // Setters
   void setVersion(const Version& version) noexcept { mVersion = version; }
   void setAuthor(const QString& author) noexcept { mAuthor = author; }
+  void setCreated(const QDateTime& created) noexcept { mCreated = created; }
   void setDeprecated(bool deprecated) noexcept { mIsDeprecated = deprecated; }
   void setNames(const LocalizedNameMap& names) noexcept { mNames = names; }
   void setDescriptions(const LocalizedDescriptionMap& descriptions) noexcept {

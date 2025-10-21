@@ -112,6 +112,8 @@ add_executable(
   editor/dialogs/dxfimportdialogtest.cpp
   editor/dialogs/graphicsexportdialogtest.cpp
   editor/library/cat/categorytreebuildertest.cpp
+  editor/library/cmd/cmdpackagereloadtest.cpp
+  editor/library/cmd/cmdsymbolreloadtest.cpp
   editor/library/librarydownloadtest.cpp
   editor/library/pkg/footprintclipboarddatatest.cpp
   editor/library/sym/symbolclipboarddatatest.cpp

@@ -142,6 +142,15 @@ public:
     }
   };
 
+  /**
+   * @brief Snapshot of modifications made to the file system
+   */
+  struct State {
+    QHash<QString, QByteArray> modifiedFiles;
+    QSet<QString> removedFiles;
+    QSet<QString> removedDirs;
+  };
+
   // Constructors / Destructor
   TransactionalFileSystem() = delete;
   TransactionalFileSystem(
@@ -171,6 +180,8 @@ public:
   virtual void removeDirRecursively(const QString& path = "") override;
 
   // General Methods
+  State saveState() const noexcept { return mState; }
+  void restoreState(const State& state) noexcept { mState = state; }
   void loadFromZip(QByteArray content);
   void loadFromZip(const FilePath& fp);
   QByteArray exportToZip(FilterFunction filter = nullptr) const;
@@ -223,9 +234,7 @@ private:  // Data
   mutable QRecursiveMutex mMutex;
 
   // File system modifications
-  QHash<QString, QByteArray> mModifiedFiles;
-  QSet<QString> mRemovedFiles;
-  QSet<QString> mRemovedDirs;
+  State mState;
 };
 
 /*******************************************************************************

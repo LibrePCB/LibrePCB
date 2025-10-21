@@ -893,6 +893,16 @@ export component MainMenuBar inherits Rectangle {
                     }
                 }
 
+                reload-symbol-item := MenuItem {
+                    text: @tr("Reload Symbol From Disk");
+                    status-tip: @tr("Discard all modifications and reload the currently opened symbol from disk");
+                    icon: @image-url("../../../font-awesome/svgs/solid/arrows-rotate.svg");
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.reload-from-disk);
+                    }
+                }
+
                 open-symbol-folder-item := MenuItem {
                     cmd: Cmd.file-manager;
 
@@ -932,6 +942,16 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.close);
+                    }
+                }
+
+                reload-package-item := MenuItem {
+                    text: @tr("Reload Package From Disk");
+                    status-tip: @tr("Discard all modifications and reload the currently opened package from disk");
+                    icon: @image-url("../../../font-awesome/svgs/solid/arrows-rotate.svg");
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.reload-from-disk);
                     }
                 }
 

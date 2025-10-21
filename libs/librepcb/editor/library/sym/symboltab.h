@@ -162,6 +162,8 @@ signals:
   void vAlignRequested(const VAlign& align);
 
 protected:
+  void watchedFilesModifiedChanged() noexcept override;
+  void reloadFromDisk() override;
   std::optional<std::pair<RuleCheckMessageList, QSet<SExpression>>>
       runChecksImpl() override;
   bool autoFixImpl(const std::shared_ptr<const RuleCheckMessage>& msg,
@@ -180,6 +182,8 @@ private:
   void refreshUiData() noexcept;
   void commitUiData() noexcept;
   bool save() noexcept;
+  void memorizeInterface() noexcept;
+  void updateWatchedFiles() noexcept;
   void setGridInterval(const PositiveLength& interval) noexcept;
   bool execGraphicsExportDialog(GraphicsExportDialog::Output output,
                                 const QString& settingsKey) noexcept;

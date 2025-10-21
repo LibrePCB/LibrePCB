@@ -37,6 +37,8 @@ namespace editor {
 CmdPackageEdit::CmdPackageEdit(Package& package) noexcept
   : CmdLibraryElementEdit(package, tr("Edit Package Properties")),
     mPackage(package),
+    mOldAlternativeNames(package.getAlternativeNames()),
+    mNewAlternativeNames(mOldAlternativeNames),
     mOldAssemblyType(package.getAssemblyType(false)),
     mNewAssemblyType(mOldAssemblyType) {
 }
@@ -47,6 +49,12 @@ CmdPackageEdit::~CmdPackageEdit() noexcept {
 /*******************************************************************************
  *  Setters
  ******************************************************************************/
+
+void CmdPackageEdit::setAlternativeNames(
+    const QList<Package::AlternativeName>& names) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewAlternativeNames = names;
+}
 
 void CmdPackageEdit::setAssemblyType(Package::AssemblyType type) noexcept {
   Q_ASSERT(!wasEverExecuted());
@@ -59,17 +67,20 @@ void CmdPackageEdit::setAssemblyType(Package::AssemblyType type) noexcept {
 
 bool CmdPackageEdit::performExecute() {
   if (CmdLibraryElementEdit::performExecute()) return true;  // can throw
+  if (mNewAlternativeNames != mOldAlternativeNames) return true;
   if (mNewAssemblyType != mOldAssemblyType) return true;
   return false;
 }
 
 void CmdPackageEdit::performUndo() {
   CmdLibraryElementEdit::performUndo();  // can throw
+  mPackage.setAlternativeNames(mOldAlternativeNames);
   mPackage.setAssemblyType(mOldAssemblyType);
 }
 
 void CmdPackageEdit::performRedo() {
   CmdLibraryElementEdit::performRedo();  // can throw
+  mPackage.setAlternativeNames(mNewAlternativeNames);
   mPackage.setAssemblyType(mNewAssemblyType);
 }
 
