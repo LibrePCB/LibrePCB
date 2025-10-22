@@ -199,7 +199,8 @@ std::unique_ptr<SExpression> BoardSpecctraExport::genStructure(
 
   // Keepout areas.
   foreach (const auto& polygon, mBoard.getPolygons()) {
-    if (polygon->getData().getLayer() == Layer::boardCutouts()) {
+    if ((polygon->getData().getLayer() == Layer::boardCutouts()) ||
+        (polygon->getData().getLayer() == Layer::boardPlatedCutouts())) {
       root->ensureLineBreak();
       root->appendChild(
           toKeepout("cutout:" + polygon->getData().getUuid().toStr(),
@@ -376,7 +377,8 @@ std::unique_ptr<SExpression> BoardSpecctraExport::genLibraryImage(
       outlineNode.appendChild(
           toPath("signal", polygon.getLineWidth(), path, true));
       outlineNode.ensureLineBreak();
-    } else if (polygon.getLayer() == Layer::boardCutouts()) {
+    } else if ((polygon.getLayer() == Layer::boardCutouts()) ||
+               (polygon.getLayer() == Layer::boardPlatedCutouts())) {
       root->ensureLineBreak();
       root->appendChild(toKeepout(*dev.getComponentInstance().getName() + ":" +
                                       "cutout:" + polygon.getUuid().toStr(),
