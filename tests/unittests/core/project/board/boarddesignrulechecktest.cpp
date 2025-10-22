@@ -55,6 +55,7 @@ TEST(BoardDesignRuleCheckTest, testMessages) {
       {"missing_connection", {"checkForMissingConnections"}},
       {"unused_layer", {"checkUsedLayers"}},
       {"useless_via", {"checkVias", "checkVias2", "checkVias3"}},
+      {"plated_cutouts", {"checkBoardCutouts"}},
   };
 
   // Open project from test data directory.

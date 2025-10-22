@@ -132,6 +132,8 @@ private:  // Methods
   RuleCheckMessageList checkInvalidPadConnections(const Data& data);
   RuleCheckMessageList checkDeviceClearances(const Data& data);
   RuleCheckMessageList checkBoardOutline(const Data& data);
+  RuleCheckMessageList checkBoardCutouts(const Data& data,
+                                         const CalculatedJobData& calcData);
   RuleCheckMessageList checkUsedLayers(const Data& data);
   RuleCheckMessageList checkForUnplacedComponents(const Data& data);
   RuleCheckMessageList checkForMissingConnections(const Data& data);

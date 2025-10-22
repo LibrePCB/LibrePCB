@@ -271,6 +271,86 @@ public:
 };
 
 /*******************************************************************************
+ *  Class DrcMsgPlatedCutouts
+ ******************************************************************************/
+
+/**
+ * @brief The DrcMsgMultipleBoardOutlines class
+ */
+class DrcMsgPlatedCutouts final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(DrcMsgMultipleBoardOutlines)
+
+public:
+  // Constructors / Destructor
+  explicit DrcMsgPlatedCutouts(const QVector<Path>& locations) noexcept;
+  DrcMsgPlatedCutouts(const DrcMsgPlatedCutouts& other) noexcept
+    : RuleCheckMessage(other) {}
+  virtual ~DrcMsgPlatedCutouts() noexcept {}
+};
+
+/*******************************************************************************
+ *  Class DrcMsgPlatedCutoutWithoutCopper
+ ******************************************************************************/
+
+/**
+ * @brief The DrcMsgPlatedCutoutWithoutCopper class
+ */
+class DrcMsgPlatedCutoutWithoutCopper final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(DrcMsgPlatedCutoutWithoutCopper)
+
+public:
+  using Data = BoardDesignRuleCheckData;
+
+  // Constructors / Destructor
+  DrcMsgPlatedCutoutWithoutCopper() = delete;
+  DrcMsgPlatedCutoutWithoutCopper(const Data::Polygon& polygon,
+                                  const Data::Device* device,
+                                  const QVector<Path>& locations) noexcept;
+  DrcMsgPlatedCutoutWithoutCopper(const Data::Circle& circle,
+                                  const Data::Device* device,
+                                  const QVector<Path>& locations) noexcept;
+  DrcMsgPlatedCutoutWithoutCopper(
+      const DrcMsgPlatedCutoutWithoutCopper& other) noexcept
+    : RuleCheckMessage(other) {}
+  virtual ~DrcMsgPlatedCutoutWithoutCopper() noexcept {}
+
+private:
+  static QString determineMessage() noexcept;
+  static QString determineDescription() noexcept;
+};
+
+/*******************************************************************************
+ *  Class DrcMsgNonPlatedCutoutWithCopper
+ ******************************************************************************/
+
+/**
+ * @brief The DrcMsgNonPlatedCutoutWithCopper class
+ */
+class DrcMsgNonPlatedCutoutWithCopper final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(DrcMsgNonPlatedCutoutWithCopper)
+
+public:
+  using Data = BoardDesignRuleCheckData;
+
+  // Constructors / Destructor
+  DrcMsgNonPlatedCutoutWithCopper() = delete;
+  DrcMsgNonPlatedCutoutWithCopper(const Data::Polygon& polygon,
+                                  const Data::Device* device,
+                                  const QVector<Path>& locations) noexcept;
+  DrcMsgNonPlatedCutoutWithCopper(const Data::Circle& circle,
+                                  const Data::Device* device,
+                                  const QVector<Path>& locations) noexcept;
+  DrcMsgNonPlatedCutoutWithCopper(
+      const DrcMsgNonPlatedCutoutWithCopper& other) noexcept
+    : RuleCheckMessage(other) {}
+  virtual ~DrcMsgNonPlatedCutoutWithCopper() noexcept {}
+
+private:
+  static QString determineMessage() noexcept;
+  static QString determineDescription() noexcept;
+};
+
+/*******************************************************************************
  *  Class DrcMsgEmptyNetSegment
  ******************************************************************************/
 
