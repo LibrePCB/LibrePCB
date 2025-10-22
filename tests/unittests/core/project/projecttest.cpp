@@ -44,11 +44,13 @@ class ProjectTest : public ::testing::Test {
 protected:
   FilePath mProjectDir;
   FilePath mProjectFile;
+  FilePath mLogsDir;
 
   ProjectTest() {
     // the whitespaces in the path are there to make the test even stronger ;)
     mProjectDir = FilePath::getRandomTempPath().getPathTo("test project dir");
     mProjectFile = mProjectDir.getPathTo("test project.lpp");
+    mLogsDir = mProjectDir.getPathTo("logs");
   }
 
   virtual ~ProjectTest() {
@@ -76,6 +78,7 @@ TEST_F(ProjectTest, testUpgradeV01) {
   int boardCount = -1;
   ASSERT_TRUE(FileUtils::readFile(mProjectDir.getPathTo(".librepcb-project"))
                   .startsWith("0.1\n"));
+  ASSERT_FALSE(mLogsDir.isExistingDir());
   {
     ProjectLoader loader;
     std::unique_ptr<Project> project =
@@ -86,11 +89,16 @@ TEST_F(ProjectTest, testUpgradeV01) {
     project->getDirectory().getFileSystem()->save();
   }
 
-  // Re-open project.
-  ASSERT_TRUE(
+  // Check written files.
+  EXPECT_TRUE(
       FileUtils::readFile(mProjectDir.getPathTo(".librepcb-project"))
           .startsWith(Application::getFileFormatVersion().toStr().toUtf8() +
                       "\n"));
+  EXPECT_EQ(1,
+            FileUtils::getFilesInDirectory(mLogsDir, {"*.html"}, false, true)
+                .count());
+
+  // Re-open project.
   {
     ProjectLoader loader;
     std::unique_ptr<Project> project =
@@ -110,6 +118,7 @@ TEST_F(ProjectTest, testUpgradeV1) {
   int boardCount = -1;
   ASSERT_TRUE(FileUtils::readFile(mProjectDir.getPathTo(".librepcb-project"))
                   .startsWith("1\n"));
+  ASSERT_FALSE(mLogsDir.isExistingDir());
   {
     ProjectLoader loader;
     std::unique_ptr<Project> project =
@@ -120,11 +129,16 @@ TEST_F(ProjectTest, testUpgradeV1) {
     project->getDirectory().getFileSystem()->save();
   }
 
-  // Re-open project.
+  // Check written files.
   ASSERT_TRUE(
       FileUtils::readFile(mProjectDir.getPathTo(".librepcb-project"))
           .startsWith(Application::getFileFormatVersion().toStr().toUtf8() +
                       "\n"));
+  EXPECT_EQ(1,
+            FileUtils::getFilesInDirectory(mLogsDir, {"*.html"}, false, true)
+                .count());
+
+  // Re-open project.
   {
     ProjectLoader loader;
     std::unique_ptr<Project> project =
