@@ -54,9 +54,9 @@ public:
   SymbolPinGraphicsItem(const SymbolPinGraphicsItem& other) = delete;
   SymbolPinGraphicsItem(
       std::shared_ptr<SymbolPin> pin, const GraphicsLayerList& layers,
-      QPointer<const Component> cmp = nullptr,
-      std::shared_ptr<const ComponentSymbolVariantItem> cmpItem = nullptr,
-      QGraphicsItem* parent = nullptr) noexcept;
+      QPointer<const Component> cmp,
+      std::shared_ptr<const ComponentSymbolVariantItem> cmpItem,
+      bool hideIfUnused, QGraphicsItem* parent = nullptr) noexcept;
   ~SymbolPinGraphicsItem() noexcept;
 
   // Getters
@@ -85,6 +85,7 @@ private:  // Data
   const GraphicsLayerList& mLayers;
   QPointer<const Component> mComponent;  // Can be nullptr.
   std::shared_ptr<const ComponentSymbolVariantItem> mItem;  // Can be nullptr.
+  const bool mHideIfUnused;
   QScopedPointer<PrimitiveCircleGraphicsItem> mCircleGraphicsItem;
   QScopedPointer<LineGraphicsItem> mLineGraphicsItem;
   QScopedPointer<PrimitiveTextGraphicsItem> mNameGraphicsItem;

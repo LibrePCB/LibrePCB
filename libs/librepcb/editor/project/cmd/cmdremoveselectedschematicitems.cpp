@@ -202,11 +202,10 @@ void CmdRemoveSelectedSchematicItems::removeNetSegmentItems(
   }
   QSet<ComponentSignalInstance*> cmpSigsToBeDisconnected;
   foreach (SI_SymbolPin* pin, pinsToBeDisconnected) {
-    ComponentSignalInstance* cmpSig = pin->getComponentSignalInstance();
-    Q_ASSERT(cmpSig);
+    ComponentSignalInstance& cmpSig = pin->getComponentSignalInstance();
     if (pinsToBeDisconnected.contains(
-            Toolbox::toSet(cmpSig->getRegisteredSymbolPins()))) {
-      cmpSigsToBeDisconnected.insert(cmpSig);
+            Toolbox::toSet(cmpSig.getRegisteredSymbolPins()))) {
+      cmpSigsToBeDisconnected.insert(&cmpSig);
     }
   }
 

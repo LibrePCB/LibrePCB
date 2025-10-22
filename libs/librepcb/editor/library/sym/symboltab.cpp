@@ -392,7 +392,8 @@ void SymbolTab::activate() noexcept {
   connect(mScene.get(), &GraphicsScene::changed, this,
           &SymbolTab::requestRepaint);
 
-  mGraphicsItem.reset(new SymbolGraphicsItem(*mSymbol, *mLayers));
+  mGraphicsItem.reset(
+      new SymbolGraphicsItem(*mSymbol, *mLayers, nullptr, nullptr, {}, false));
   mScene->addItem(*mGraphicsItem);
 
   applyTheme();

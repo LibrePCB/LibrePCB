@@ -262,8 +262,8 @@ void ComponentChooserDialog::updatePreview(const FilePath& fp) noexcept {
             std::shared_ptr<SymbolGraphicsItem> graphicsItem =
                 std::make_shared<SymbolGraphicsItem>(
                     *sym, *mLayers, mComponent.get(),
-                    symbVar.getSymbolItems().get(item.getUuid()),
-                    localeOrder());
+                    symbVar.getSymbolItems().get(item.getUuid()), localeOrder(),
+                    true);
             graphicsItem->setPosition(item.getSymbolPosition());
             graphicsItem->setRotation(item.getSymbolRotation());
             mGraphicsScene->addItem(*graphicsItem);

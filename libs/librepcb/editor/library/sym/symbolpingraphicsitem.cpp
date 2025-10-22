@@ -50,12 +50,13 @@ SymbolPinGraphicsItem::SymbolPinGraphicsItem(
     std::shared_ptr<SymbolPin> pin, const GraphicsLayerList& layers,
     QPointer<const Component> cmp,
     std::shared_ptr<const ComponentSymbolVariantItem> cmpItem,
-    QGraphicsItem* parent) noexcept
+    bool hideIfUnused, QGraphicsItem* parent) noexcept
   : QGraphicsItemGroup(parent),
     mPin(pin),
     mLayers(layers),
     mComponent(cmp),
     mItem(cmpItem),
+    mHideIfUnused(hideIfUnused),
     mCircleGraphicsItem(new PrimitiveCircleGraphicsItem(this)),
     mLineGraphicsItem(new LineGraphicsItem(this)),
     mNameGraphicsItem(new PrimitiveTextGraphicsItem(this)),
@@ -115,8 +116,10 @@ SymbolPinGraphicsItem::~SymbolPinGraphicsItem() noexcept {
 
 void SymbolPinGraphicsItem::updateText() noexcept {
   QString text;
+  bool isConnected = false;
   if (mItem) {
     if (auto i = mItem->getPinSignalMap().find(mPin->getUuid())) {
+      isConnected = i->getSignalUuid().has_value();
       auto signal = (mComponent && i->getSignalUuid())
           ? mComponent->getSignals().find(*i->getSignalUuid())
           : nullptr;
@@ -155,6 +158,9 @@ void SymbolPinGraphicsItem::updateText() noexcept {
   }
   setToolTip(text);
   mNameGraphicsItem->setText(text, true);
+
+  // Also update the pin's visibility, despite the misleading method name o_o
+  setVisible(isConnected || (!mItem) || (!mHideIfUnused));
 }
 
 /*******************************************************************************

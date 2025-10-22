@@ -270,19 +270,18 @@ bool SchematicEditorState_DrawWire::startPositioning(
         mCurrentNetSegment = pin->getPin().getNetSegmentOfLines();
         netsignal = pin->getPin().getCompSigInstNetSignal();
         pos = pin->getPin().getPosition();
-        if (ComponentSignalInstance* sig =
-                pin->getPin().getComponentSignalInstance()) {
-          QString name = sig->getForcedNetSignalName();
-          try {
-            if (!name.isEmpty())
-              forcedNetName = CircuitIdentifier(name);  // can throw
-          } catch (const Exception& e) {
-            QMessageBox::warning(
-                parentWidget(), tr("Invalid net name"),
-                tr("Could not apply the forced net name because '%1' is "
-                   "not a valid net name.")
-                    .arg(name));
+        QString name =
+            pin->getPin().getComponentSignalInstance().getForcedNetSignalName();
+        try {
+          if (!name.isEmpty()) {
+            forcedNetName = CircuitIdentifier(name);  // can throw
           }
+        } catch (const Exception& e) {
+          QMessageBox::warning(
+              parentWidget(), tr("Invalid net name"),
+              tr("Could not apply the forced net name because '%1' is "
+                 "not a valid net name.")
+                  .arg(name));
         }
       } else if (auto netline = std::dynamic_pointer_cast<SGI_NetLine>(item)) {
         // split netline
@@ -330,9 +329,8 @@ bool SchematicEditorState_DrawWire::startPositioning(
     if (!mCurrentNetSegment) {
       // connect pin if needed
       if (SI_SymbolPin* pin = dynamic_cast<SI_SymbolPin*>(mFixedStartAnchor)) {
-        Q_ASSERT(pin->getComponentSignalInstance());
         mContext.undoStack.appendToCmdGroup(new CmdCompSigInstSetNetSignal(
-            *pin->getComponentSignalInstance(), netsignal));
+            pin->getComponentSignalInstance(), netsignal));
       }
       // add net segment
       Q_ASSERT(netsignal);
@@ -442,13 +440,12 @@ bool SchematicEditorState_DrawWire::addNextNetPoint(
           otherNetSegment = pin->getPin().getNetSegmentOfLines();
           // connect pin if needed
           if (!otherNetSegment) {
-            Q_ASSERT(pin->getPin().getComponentSignalInstance());
             mContext.undoStack.appendToCmdGroup(new CmdCompSigInstSetNetSignal(
-                *pin->getPin().getComponentSignalInstance(),
+                pin->getPin().getComponentSignalInstance(),
                 &mPositioningNetPoint2->getNetSignalOfNetSegment()));
             otherForcedNetName = pin->getPin()
                                      .getComponentSignalInstance()
-                                     ->getForcedNetSignalName();
+                                     .getForcedNetSignalName();
           }
         } else if (auto netline =
                        std::dynamic_pointer_cast<SGI_NetLine>(item)) {
@@ -624,12 +621,11 @@ std::shared_ptr<QGraphicsItem> SchematicEditorState_DrawWire::findItem(
     const Point& pos,
     const QVector<std::shared_ptr<QGraphicsItem>>& except) noexcept {
   // Only find pins which are connected to a component signal!
-  return findItemAtPos<QGraphicsItem>(
-      pos,
-      FindFlag::NetPoints | FindFlag::NetLines |
-          FindFlag::SymbolPinsWithComponentSignal |
-          FindFlag::AcceptNearestWithinGrid,
-      except);
+  return findItemAtPos<QGraphicsItem>(pos,
+                                      FindFlag::NetPoints | FindFlag::NetLines |
+                                          FindFlag::SymbolPins |
+                                          FindFlag::AcceptNearestWithinGrid,
+                                      except);
 }
 
 Point SchematicEditorState_DrawWire::updateNetpointPositions(

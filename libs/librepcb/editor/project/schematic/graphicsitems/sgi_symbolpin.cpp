@@ -268,11 +268,7 @@ void SGI_SymbolPin::updateToolTip() noexcept {
   Q_ASSERT(mCircleGraphicsItem && mNameGraphicsItem && mNumbersGraphicsItem);
   QString s;
   s += "<b>" % tr("Signal:") % " ";
-  if (const ComponentSignalInstance* sig = mPin.getComponentSignalInstance()) {
-    s += *sig->getCompSignal().getName();
-  } else {
-    s += "✖";
-  }
+  s += *mPin.getComponentSignalInstance().getCompSignal().getName();
   s += "</b><br>" % tr("Net:") % " ";
   if (const NetSignal* net = mPin.getCompSigInstNetSignal()) {
     s += *net->getName();

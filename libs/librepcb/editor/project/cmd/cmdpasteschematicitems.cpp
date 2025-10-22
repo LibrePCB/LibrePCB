@@ -275,12 +275,12 @@ bool CmdPasteSchematicItems::performExecute() {
         SI_SymbolPin* pin = symbol->getPin(anchor->pin);
         Q_ASSERT(pin);
         p1 = pin;
-        ComponentSignalInstance* sigInst = pin->getComponentSignalInstance();
-        if (sigInst && (sigInst->getNetSignal() != netSignal)) {
-          execNewChildCmd(new CmdCompSigInstSetNetSignal(*sigInst, netSignal));
+        ComponentSignalInstance& sigInst = pin->getComponentSignalInstance();
+        if (sigInst.getNetSignal() != netSignal) {
+          execNewChildCmd(new CmdCompSigInstSetNetSignal(sigInst, netSignal));
         }
-        if (sigInst && (sigInst->isNetSignalNameForced()) && (!forcedNetName)) {
-          forcedNetName = CircuitIdentifier(sigInst->getForcedNetSignalName());
+        if (sigInst.isNetSignalNameForced() && (!forcedNetName)) {
+          forcedNetName = CircuitIdentifier(sigInst.getForcedNetSignalName());
         }
       } else {
         throw LogicError(__FILE__, __LINE__);
@@ -297,12 +297,12 @@ bool CmdPasteSchematicItems::performExecute() {
         SI_SymbolPin* pin = symbol->getPin(anchor->pin);
         Q_ASSERT(pin);
         p2 = pin;
-        ComponentSignalInstance* sigInst = pin->getComponentSignalInstance();
-        if (sigInst && (sigInst->getNetSignal() != netSignal)) {
-          execNewChildCmd(new CmdCompSigInstSetNetSignal(*sigInst, netSignal));
+        ComponentSignalInstance& sigInst = pin->getComponentSignalInstance();
+        if (sigInst.getNetSignal() != netSignal) {
+          execNewChildCmd(new CmdCompSigInstSetNetSignal(sigInst, netSignal));
         }
-        if (sigInst && (sigInst->isNetSignalNameForced()) && (!forcedNetName)) {
-          forcedNetName = CircuitIdentifier(sigInst->getForcedNetSignalName());
+        if (sigInst.isNetSignalNameForced() && (!forcedNetName)) {
+          forcedNetName = CircuitIdentifier(sigInst.getForcedNetSignalName());
         }
       } else {
         throw LogicError(__FILE__, __LINE__);

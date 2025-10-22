@@ -122,12 +122,12 @@ void CmdSimplifySchematicNetSegments::simplifySegment(SI_NetSegment& segment) {
   // (i.e. their net line have been removed by the simplification).
   for (auto id : result.disconnectedPinsOrPads) {
     if (auto* pin = dynamic_cast<SI_SymbolPin*>(anchors.key(id, nullptr))) {
-      ComponentSignalInstance* sig = pin->getComponentSignalInstance();
-      if (sig && (sig->getRegisteredSymbolPins().count() <= 1)) {
+      ComponentSignalInstance& sig = pin->getComponentSignalInstance();
+      if (sig.getRegisteredSymbolPins().count() <= 1) {
         // Last pin has been disconnected, thus deleting all traces from pads
         // in boards and disconnect the component signal from the net signal.
         QHash<Board*, QSet<BI_NetLine*>> boardNetLinesToRemove;
-        foreach (BI_Pad* pad, sig->getRegisteredFootprintPads()) {
+        foreach (BI_Pad* pad, sig.getRegisteredFootprintPads()) {
           boardNetLinesToRemove[&pad->getBoard()] += pad->getNetLines();
         }
         for (auto it = boardNetLinesToRemove.constBegin();
@@ -137,7 +137,7 @@ void CmdSimplifySchematicNetSegments::simplifySegment(SI_NetSegment& segment) {
           cmd->removeNetLines(it.value());
           appendChild(cmd.release());
         }
-        appendChild(new CmdCompSigInstSetNetSignal(*sig, nullptr));
+        appendChild(new CmdCompSigInstSetNetSignal(sig, nullptr));
       }
     } else {
       throw LogicError(__FILE__, __LINE__, "ID does not correspond to a pin.");

@@ -280,7 +280,7 @@ ErcMsgConnectedPinWithoutWire::ErcMsgConnectedPinWithoutWire(
   mApproval->ensureLineBreak();
   mApproval->appendChild("symbol", pin.getSymbol().getUuid());
   mApproval->ensureLineBreak();
-  mApproval->appendChild("pin", pin.getLibPinUuid());
+  mApproval->appendChild("pin", pin.getLibPin().getUuid());
   mApproval->ensureLineBreak();
 
   setLocation(pin);

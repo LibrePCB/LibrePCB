@@ -68,10 +68,9 @@ public:
     NetLabels = (1 << 2),
     Symbols = (1 << 3),
     SymbolPins = (1 << 4),
-    SymbolPinsWithComponentSignal = (1 << 5),  // Subset of SymbolPins.
-    Polygons = (1 << 6),
-    Texts = (1 << 7),
-    Images = (1 << 8),
+    Polygons = (1 << 5),
+    Texts = (1 << 6),
+    Images = (1 << 7),
     All = NetPoints | NetLines | NetLabels | Symbols | SymbolPins | Polygons |
         Texts | Images,
 

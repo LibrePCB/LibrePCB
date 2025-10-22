@@ -570,10 +570,11 @@ void EagleProjectImport::importSchematic(Project& project,
           }
           auto symbolPin = cmpSigInst->getRegisteredSymbolPins().first();
           pinMap.insert(std::make_pair(symbolPin->getSymbol().getUuid(),
-                                       symbolPin->getLibPinUuid()),
+                                       symbolPin->getLibPin().getUuid()),
                         symbolPin);
-          const NetLineAnchor pinAnchor = NetLineAnchor::pin(
-              symbolPin->getSymbol().getUuid(), symbolPin->getLibPinUuid());
+          const NetLineAnchor pinAnchor =
+              NetLineAnchor::pin(symbolPin->getSymbol().getUuid(),
+                                 symbolPin->getLibPin().getUuid());
           splitter.addSymbolPin(pinAnchor, symbolPin->getPosition());
           auto it = anchorMap.find(symbolPin->getPosition());
           if (it != anchorMap.end()) {
