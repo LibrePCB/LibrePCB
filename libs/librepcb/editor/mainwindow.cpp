@@ -142,7 +142,7 @@ MainWindow::MainWindow(GuiApplication& app,
         &mWindow->window().window_handle()))),
     mSections(new UiObjectList<WindowSection, ui::WindowSectionData>()),
     mProjectPreviewRenderer(new ProjectReadmeRenderer(this)),
-    mTestAdapter(new MainWindowTestAdapter(app, *this, mWidget)) {
+    mTestAdapter() {
   Q_ASSERT(mWidget);
   mWidget->setObjectName("mainWindow");
 
@@ -299,9 +299,12 @@ MainWindow::MainWindow(GuiApplication& app,
           });
 
   // Setup test adapter.
-  connect(
-      mTestAdapter.get(), &MainWindowTestAdapter::actionTriggered, this,
-      [this](ui::Action a) { trigger(a); }, Qt::QueuedConnection);
+  if (qgetenv("LIBREPCB_ENABLE_TEST_ADAPTER") == "1") {
+    mTestAdapter.reset(new MainWindowTestAdapter(app, *this, mWidget));
+    connect(
+        mTestAdapter.get(), &MainWindowTestAdapter::actionTriggered, this,
+        [this](ui::Action a) { trigger(a); }, Qt::QueuedConnection);
+  }
 
   // Show window.
   mWindow->show();

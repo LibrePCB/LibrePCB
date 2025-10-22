@@ -99,12 +99,14 @@ class LibrePcbFixture(object):
         self.env = deepcopy(os.environ)
         # Make GUI independent from the system's language
         self.env["LC_ALL"] = "C"
+        # Use a neutral username
+        self.env["USERNAME"] = "testuser"
+        # Enable system test adapter
+        self.env["LIBREPCB_ENABLE_TEST_ADAPTER"] = "1"
         # Override configuration location to make tests independent of existing configs
         self.env["LIBREPCB_CONFIG_DIR"] = os.path.join(self.tmpdir, "config")
         # Override cache location to make each test indepotent
         self.env["LIBREPCB_CACHE_DIR"] = os.path.join(self.tmpdir, "cache")
-        # Use a neutral username
-        self.env["USERNAME"] = "testuser"
         # Force LibrePCB to use Qt-style file dialogs because native dialogs don't work
         self.env["LIBREPCB_DISABLE_NATIVE_DIALOGS"] = "1"
         # Disable warning about unstable file format, since tests are run also

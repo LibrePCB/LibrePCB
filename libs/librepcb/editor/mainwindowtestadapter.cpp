@@ -48,7 +48,7 @@ MainWindowTestAdapter::MainWindowTestAdapter(GuiApplication& app,
                                              QWidget* parent) noexcept
   : QWidget(parent), mApp(app), mWindow(win) {
   setObjectName("testAdapter");
-  setVisible(false);
+  resize(1, 1);  // Do not occupy parts of the UI.
 
   connect(&mApp.getWorkspace().getLibraryDb(), &WorkspaceLibraryDb::scanStarted,
           this, [this]() { mLibraryScanFinished = false; });
