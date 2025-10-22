@@ -130,3 +130,24 @@ export component Example {
     }
 }
 ```
+
+
+# Fonts {#doc_slint_style_guide_fonts}
+
+We bundle all our used fonts with the application for consistent rendering
+across all platforms. And since Slint doesn't support synthesis for weight
+and italic (see [here](https://github.com/slint-ui/slint/issues/9777)), we
+shall only use those font configurations that we actually bundle. These are:
+
+- Regular, Font Weight 300 (Light)
+- Regular, Font Weight 400 (Regular)
+- Regular, Font Weight 700 (Bold)
+- Italic, Font Weight 300 (Light)
+- Italic, Font Weight 400 (Regular)
+- Italic, Font Weight 700 (Bold)
+
+If more combinations are required, the corresponding fonts need to be added
+to the `share/librepcb/fonts` directory.
+
+Noto Sans naming is documented
+[here](https://notofonts.github.io/noto-docs/technical/Noto-Weight-Width-Style-Specification/).

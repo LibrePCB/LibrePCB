@@ -32,7 +32,7 @@ component LibraryUninstallPopup inherits MessagePopup {
     has-cancel: true;
 
     Text {
-        font-weight: 900;
+        font-weight: 700;
         text: @tr("Attention").to-uppercase() + ": " + @tr("This will remove the whole library directory and is not reversible:");
     }
 
@@ -166,7 +166,6 @@ component LibraryListViewItem inherits Rectangle {
                         horizontal-stretch: 0;
                         color: name-txt.color.darker(0.2);
                         font-size: 10px;
-                        font-weight: 400;
                         vertical-alignment: bottom;
                         overflow: elide;
                         text: "v" + (lib.installed-version.is-empty ? lib.online-version : lib.installed-version);
@@ -179,7 +178,6 @@ component LibraryListViewItem inherits Rectangle {
                     vertical-alignment: center;
                     color: name-txt.color;
                     font-size: 10px;
-                    font-weight: 400;
                     overflow: TextOverflow.elide;
                     wrap: word-wrap;
                     text: lib.description;
@@ -565,7 +563,7 @@ export component LibrariesPanel inherits Rectangle {
                         spacing: 3px;
 
                         if Data.remote-libraries-data.pending-installs > 0: pending-installs-badge := Badge {
-                            font-weight: 600;
+                            font-weight: 700;
                             font-size: 12px;
                             border-width: 1.3px;
                             text-color: (Data.remote-libraries-data.pending-installs > 0) ? lime : #707070;
@@ -573,7 +571,7 @@ export component LibrariesPanel inherits Rectangle {
                         }
 
                         if Data.remote-libraries-data.pending-updates > 0: pending-updates-badge := Badge {
-                            font-weight: 600;
+                            font-weight: 700;
                             font-size: 12px;
                             border-width: 1.3px;
                             text-color: (Data.remote-libraries-data.pending-updates > 0) ? yellow : #707070;
@@ -581,7 +579,7 @@ export component LibrariesPanel inherits Rectangle {
                         }
 
                         if Data.remote-libraries-data.pending-uninstalls > 0: pending-uninstalls-badge := Badge {
-                            font-weight: 600;
+                            font-weight: 700;
                             font-size: 12px;
                             border-width: 1.3px;
                             text-color: (Data.remote-libraries-data.pending-uninstalls > 0) ? red : #707070;
@@ -605,7 +603,7 @@ export component LibrariesPanel inherits Rectangle {
                         nonreversible-warning-txt := Text {
                             width: parent.width - 8px;
                             color: parent.border-color;
-                            font-weight: 600;
+                            font-weight: 700;
                             horizontal-alignment: left;
                             wrap: word-wrap;
                             text: @tr("Warning").to-uppercase() + ": " + @tr("Some libraries marked for uninstallation are currently not available for installation, thus their deletion will be non-reversible!");

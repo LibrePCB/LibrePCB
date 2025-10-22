@@ -48,7 +48,7 @@ export component DownloadLibraryTab inherits Tab {
                 colspan: 2;
                 height: self.preferred-height + 10px;
                 font-size: 14px;
-                font-weight: 900;
+                font-weight: 700;
                 wrap: TextWrap.word-wrap;
                 text: @tr("Download & install a library by URL");
             }
@@ -158,7 +158,6 @@ export component DownloadLibraryTab inherits Tab {
 
         Row {
             Rectangle { }
-
 
             // Note: Do not make the progress bar conditional as it would
             // make the layout jumping when starting the download (buttons

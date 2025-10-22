@@ -86,7 +86,7 @@ component ComponentGateListItem {
             symbol-name-txt := Text {
                 height: pinout-row-height;
                 font-size: 13px;
-                font-weight: 600;
+                font-weight: 700;
                 vertical-alignment: center;
                 overflow: elide;
                 text: model[index].symbol-name;
@@ -379,7 +379,7 @@ component ComponentVariantListItem inherits Rectangle {
             name-edt := LineEdit {
                 horizontal-stretch: 1;
                 font-size: 13px;
-                font-weight: 600;
+                font-weight: 700;
                 text: model[index].name;
                 show-clear-button: false;  // Empty name is not valid
                 read-only: read-only;
@@ -635,7 +635,7 @@ component ComponentVariantListItem inherits Rectangle {
 
             if !wizard-mode: Text {
                 color: red;
-                font-weight: 600;
+                font-weight: 700;
                 horizontal-alignment: center;
                 overflow: elide;
                 text: @tr("This variant contains no gate!");
