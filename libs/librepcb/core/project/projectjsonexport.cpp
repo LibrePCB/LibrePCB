@@ -32,6 +32,7 @@
 #include "board/items/bi_netsegment.h"
 #include "board/items/bi_pad.h"
 #include "board/items/bi_plane.h"
+#include "board/items/bi_polygon.h"
 #include "board/items/bi_via.h"
 #include "circuit/assemblyvariant.h"
 #include "circuit/circuit.h"
@@ -120,6 +121,7 @@ QJsonObject ProjectJsonExport::toJson(const Board& obj) const {
   ToolList pthSlots;
   ToolList npthDrills;
   ToolList npthSlots;
+  int platedCutoutsCount = 0;
   QSet<Length> copperWidths;
   foreach (const BI_NetSegment* netSegment, obj.getNetSegments()) {
     foreach (const BI_Pad* pad, netSegment->getPads()) {
@@ -163,6 +165,16 @@ QJsonObject ProjectJsonExport::toJson(const Board& obj) const {
         npthDrills.diameters.append(*hole.getDiameter());
       }
     }
+    for (const Polygon& polygon : device->getLibFootprint().getPolygons()) {
+      if (polygon.getLayer() == Layer::boardPlatedCutouts()) {
+        ++platedCutoutsCount;
+      }
+    }
+    for (const Circle& circle : device->getLibFootprint().getCircles()) {
+      if (circle.getLayer() == Layer::boardPlatedCutouts()) {
+        ++platedCutoutsCount;
+      }
+    }
   }
   foreach (const BI_Hole* hole, obj.getHoles()) {
     if (hole->getData().isSlot()) {
@@ -173,6 +185,11 @@ QJsonObject ProjectJsonExport::toJson(const Board& obj) const {
   }
   foreach (const BI_Plane* plane, obj.getPlanes()) {
     copperWidths.insert(*plane->getMinWidth());
+  }
+  for (const BI_Polygon* polygon : obj.getPolygons()) {
+    if (polygon->getData().getLayer() == Layer::boardPlatedCutouts()) {
+      ++platedCutoutsCount;
+    }
   }
   const std::optional<Length> minCopperWidth = copperWidths.isEmpty()
       ? std::nullopt
@@ -196,6 +213,7 @@ QJsonObject ProjectJsonExport::toJson(const Board& obj) const {
   json["pth_slots"] = toJson(pthSlots);
   json["npth_drills"] = toJson(npthDrills);
   json["npth_slots"] = toJson(npthSlots);
+  json["plated_cutouts"] = platedCutoutsCount;
   json["min_copper_width"] = toJson(minCopperWidth);
   return json;
 }

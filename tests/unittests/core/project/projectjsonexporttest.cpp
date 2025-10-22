@@ -208,6 +208,15 @@ TEST_F(ProjectJsonExportTest, testBoard) {
                              Vertex(Point(Length(7000000), Length(6000000))),
                              Vertex(Point(Length(5000000), Length(6000000)))}),
                        false, false, false)));
+  board->addPolygon(*new BI_Polygon(
+      *board,
+      BoardPolygonData(Uuid::createRandom(), Layer::boardPlatedCutouts(),
+                       UnsignedLength(0),
+                       Path({Vertex(Point(Length(5500000), Length(5500000))),
+                             Vertex(Point(Length(5500000), Length(95000000))),
+                             Vertex(Point(Length(6500000), Length(5500000))),
+                             Vertex(Point(Length(5500000), Length(5500000)))}),
+                       false, false, false)));
 
   ProjectJsonExport exp;
   const char* expected =
@@ -233,6 +242,7 @@ TEST_F(ProjectJsonExportTest, testBoard) {
       " \"pth_slots\": {\"count\": 0, \"diameters\": []},"
       " \"npth_drills\": {\"count\": 0, \"diameters\": []},"
       " \"npth_slots\": {\"count\": 0, \"diameters\": []},"
+      " \"plated_cutouts\": 1,"
       " \"min_copper_width\": null"
       "}";
   EXPECT_EQ(fmt(expected), fmt(exp.toJson(*board)));
@@ -277,6 +287,7 @@ TEST_F(ProjectJsonExportTest, testProject) {
       "   \"pth_slots\": {\"count\": 0, \"diameters\": []},"
       "   \"npth_drills\": {\"count\": 0, \"diameters\": []},"
       "   \"npth_slots\": {\"count\": 0, \"diameters\": []},"
+      "   \"plated_cutouts\": 0,"
       "   \"min_copper_width\": null"
       "  }"
       " ]"
@@ -329,6 +340,7 @@ TEST_F(ProjectJsonExportTest, testProjectToUtf8) {
       "    \"pth_slots\": {\"count\": 0, \"diameters\": []},"
       "    \"npth_drills\": {\"count\": 0, \"diameters\": []},"
       "    \"npth_slots\": {\"count\": 0, \"diameters\": []},"
+      "    \"plated_cutouts\": 0,"
       "    \"min_copper_width\": null"
       "   }"
       "  ]"
