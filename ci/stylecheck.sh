@@ -12,6 +12,9 @@ set -euv -o pipefail
 # check if no file contains tabulators (with some exceptions)
 (git grep -Il $'\t' -- ':/' ':!/LICENSES/' ':!/libs/polyclipping/' ':!/share/librepcb/licenses/' ':!*.ui') && exit 1
 
+# check if no font weights are used that we don't bundle font files for
+(git grep -E 'font-weight: [0-9]+' -- '*.slint' | grep -vE 'font-weight: (300|400|700)') && exit 1
+
 # check rust code formatting
 for f in $(git ls-files -- '*.rs'); do
   (rustfmt --check "$f") || exit 1

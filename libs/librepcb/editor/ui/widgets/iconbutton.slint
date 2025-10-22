@@ -79,7 +79,7 @@ export component IconButton inherits Rectangle {
             height: self.width;
             image-fit: contain;
             colorize: colorize ? (((!read-only) && ta.has-hover) ? color-hovered : (checked ? color-checked : (enabled ? color-enabled : color-disabled))) : transparent;
-            rotation-angle: icon-rotation;
+            transform-rotation: icon-rotation;
             source: icon;
             accessible-role: none;
         }

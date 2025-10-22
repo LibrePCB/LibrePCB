@@ -404,11 +404,11 @@ export component StatusBar inherits Rectangle {
             }
 
             if Data.notifications-unread > 0: notifications-unread-txt := Text {
-                y: (parent.height - self.height) / 2 - 1px;
+                y: (parent.height - self.height) / 2;
                 color: root.background;
                 horizontal-alignment: center;
                 font-size: 12px;
-                font-weight: 900;
+                font-weight: 700;
                 text: Data.notifications-unread;
                 accessible-role: none;
             }
