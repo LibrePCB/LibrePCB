@@ -691,9 +691,11 @@ void OutputJobRunner::runImpl(const LppzOutputJob& job) {
   // Export project to ZIP, but without the output directory since this can
   // be quite large and usually does not make sense, especially since *.lppz
   // files might even be stored in this directory as well because they are
-  // output files.
+  // output files. Additionally, logs and user settings will not be exported.
   auto filter = [](const QString& filePath) {
-    return !filePath.startsWith("output/");
+    return (!filePath.startsWith("output/"))  //
+        && (!filePath.startsWith("logs/"))  //
+        && (!filePath.endsWith(".user.lp"));
   };
   mProject.getDirectory().getFileSystem()->exportToZip(fp,
                                                        filter);  // can throw

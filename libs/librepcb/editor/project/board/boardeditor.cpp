@@ -411,8 +411,9 @@ void BoardEditor::startOrderPcbUpload(bool openBrowser) noexcept {
 
     // Export project to ZIP, but without the output directory since this can
     // be quite large and does not make sense to upload to the API server.
+    // Also logs and user settings will not be exported.
     auto filter = [&removedBoardDirs](const QString& filePath) {
-      if (filePath.startsWith("output/")) {
+      if (filePath.startsWith("output/") || filePath.startsWith("logs/")) {
         return false;
       }
       if (filePath.endsWith(".user.lp")) {
