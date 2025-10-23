@@ -387,9 +387,10 @@ int CommandLineInterface::execute(const QStringList& args) noexcept {
   } else if (command == "open-library") {
     parser.addPositionalArgument(command, commands[command].first,
                                  commands[command].second);
-    parser.addPositionalArgument("library",
-                                 tr("Path to library directory (*.lplib)."));
-    positionalArgNames.append("library");
+    parser.addPositionalArgument("libraries",
+                                 tr("Path(s) to library directory (*.lplib)."),
+                                 "libraries...");
+    positionalArgNames.append("libraries...");
     parser.addOption(libAllOption);
     parser.addOption(libCheckOption);
     parser.addOption(libMinifyStepOption);
@@ -484,7 +485,8 @@ int CommandLineInterface::execute(const QStringList& args) noexcept {
     printErr(usageHelpText);
     printErr(helpCommandText);
     return 1;
-  } else if (positionalArgs.count() > positionalArgNames.count()) {
+  } else if ((positionalArgs.count() > positionalArgNames.count()) &&
+             (!positionalArgNames.last().endsWith("..."))) {
     const QStringList args = positionalArgs.mid(positionalArgNames.count());
     printErr(tr("Unknown arguments:") % " " % args.join(" "));
     printErr(usageHelpText);
@@ -534,13 +536,14 @@ int CommandLineInterface::execute(const QStringList& args) noexcept {
         parser.isSet(prjStrictOption)  // strict mode
     );
   } else if (command == "open-library") {
-    cmdSuccess = openLibrary(positionalArgs.value(1),  // library directory
-                             parser.isSet(libAllOption),  // all elements
-                             parser.isSet(libCheckOption),  // run check
-                             parser.isSet(libMinifyStepOption),  // minify STEP
-                             parser.isSet(libSaveOption),  // save
-                             parser.isSet(libStrictOption)  // strict mode
-    );
+    cmdSuccess =
+        openLibraries(positionalArgs.mid(1),  // library directories
+                      parser.isSet(libAllOption),  // all elements
+                      parser.isSet(libCheckOption),  // run check
+                      parser.isSet(libMinifyStepOption),  // minify STEP
+                      parser.isSet(libSaveOption),  // save
+                      parser.isSet(libStrictOption)  // strict mode
+        );
   } else if (command == "open-symbol") {
     cmdSuccess = openSymbol(positionalArgs.value(1),  // symbol directory
                             parser.isSet(symCheckOption),  // run check
@@ -1166,6 +1169,19 @@ bool CommandLineInterface::openProject(
     printErr(tr("ERROR: %1").arg(e.getMsg()));
     return false;
   }
+}
+
+bool CommandLineInterface::openLibraries(const QStringList& libDirs, bool all,
+                                         bool runCheck, bool minifyStepFiles,
+                                         bool save,
+                                         bool strict) const noexcept {
+  bool success = true;
+  for (const QString& libDir : libDirs) {
+    if (!openLibrary(libDir, all, runCheck, minifyStepFiles, save, strict)) {
+      success = false;
+    }
+  }
+  return success;
 }
 
 bool CommandLineInterface::openLibrary(const QString& libDir, bool all,

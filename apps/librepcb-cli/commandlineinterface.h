@@ -78,7 +78,9 @@ private:  // Methods
       const QStringList& boardIndices, bool removeOtherBoards,
       const QStringList& avNames, const QStringList& avIndices,
       const QString& setDefaultAv, bool save, bool strict) const noexcept;
-
+  bool openLibraries(const QStringList& libDirs, bool all, bool runCheck,
+                     bool minifyStepFiles, bool save,
+                     bool strict) const noexcept;
   bool openLibrary(const QString& libDir, bool all, bool runCheck,
                    bool minifyStepFiles, bool save, bool strict) const noexcept;
 
