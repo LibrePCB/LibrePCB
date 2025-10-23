@@ -909,17 +909,12 @@ component PackageEditorTab inherits TouchArea {
             enabled: footprint-selected;
 
             clicked => {
-                tabs[index].view-3d = !view-3d;
-
                 // When switching to 3D this way (rather via navbar), hide
-                // the 3D models so the naked PCB can be reviewed. Note that
-                // the condition looks inversed but this is needed since the
-                // statement above already inverted view-3d. When swapping the
-                // order of the statements, the backend would reject a model
-                // index of -1.
-                if view-3d {
-                    tabs[index].model-index = -1;
+                // the 3D models so the naked PCB can be reviewed.
+                if !view-3d {
+                    tabs[index].devices-alpha = 0;
                 }
+                tabs[index].view-3d = !view-3d;
             }
         }
 
@@ -1089,6 +1084,11 @@ export component PackageTab inherits Tab {
                 if idx == 3 {
                     tabs[index].page-index = 2;
                     tabs[index].view-3d = true;
+                    // When switching to 3D this way (rather than via "3D" btn),
+                    // show the 3D models (but keep previous alpha if not 0).
+                    if tabs[index].devices-alpha == 0 {
+                        tabs[index].devices-alpha = 1;
+                    }
                 } else if idx == 2 {
                     tabs[index].page-index = 2;
                     tabs[index].view-3d = false;
