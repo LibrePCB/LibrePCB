@@ -44,36 +44,22 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-SI_SymbolPin::SI_SymbolPin(SI_Symbol& symbol, const Uuid& pinUuid)
+SI_SymbolPin::SI_SymbolPin(SI_Symbol& symbol, const SymbolPin& pin,
+                           const ComponentPinSignalMapItem& item)
   : SI_Base(symbol.getSchematic()),
     onEdited(*this),
     mSymbol(symbol),
-    mSymbolPin(nullptr),
-    mPinSignalMapItem(nullptr),
-    mComponentSignalInstance(nullptr),
+    mSymbolPin(pin),
+    mPinSignalMapItem(item),
+    mComponentSignalInstance(*mSymbol.getComponentInstance().getSignalInstance(
+        *mPinSignalMapItem.getSignalUuid())),
     mOnSymbolEditedSlot(*this, &SI_SymbolPin::symbolEdited) {
-  // read attributes
-  mSymbolPin =
-      mSymbol.getLibSymbol().getPins().get(pinUuid).get();  // can throw
-  mPinSignalMapItem = mSymbol.getCompSymbVarItem()
-                          .getPinSignalMap()
-                          .get(pinUuid)
-                          .get();  // can throw
-  std::optional<Uuid> cmpSignalUuid = mPinSignalMapItem->getSignalUuid();
-  if (cmpSignalUuid) {
-    mComponentSignalInstance =
-        mSymbol.getComponentInstance().getSignalInstance(*cmpSignalUuid);
-  }
-
   // Register to net signal changes.
-  if (mComponentSignalInstance) {
-    netSignalChanged(nullptr, mComponentSignalInstance->getNetSignal());
-    connect(mComponentSignalInstance,
-            &ComponentSignalInstance::netSignalChanged, this,
-            &SI_SymbolPin::netSignalChanged);
-    connect(mComponentSignalInstance, &ComponentSignalInstance::padNamesChanged,
-            this, &SI_SymbolPin::updateNumbers);
-  }
+  netSignalChanged(nullptr, mComponentSignalInstance.getNetSignal());
+  connect(&mComponentSignalInstance, &ComponentSignalInstance::netSignalChanged,
+          this, &SI_SymbolPin::netSignalChanged);
+  connect(&mComponentSignalInstance, &ComponentSignalInstance::padNamesChanged,
+          this, &SI_SymbolPin::updateNumbers);
 
   updateTransform();
   updateName();
@@ -91,16 +77,8 @@ SI_SymbolPin::~SI_SymbolPin() {
  *  Getters
  ******************************************************************************/
 
-const Uuid& SI_SymbolPin::getLibPinUuid() const noexcept {
-  return mSymbolPin->getUuid();
-}
-
 NetSignal* SI_SymbolPin::getCompSigInstNetSignal() const noexcept {
-  if (mComponentSignalInstance) {
-    return mComponentSignalInstance->getNetSignal();
-  } else {
-    return nullptr;
-  }
+  return mComponentSignalInstance.getNetSignal();
 }
 
 SI_NetSegment* SI_SymbolPin::getNetSegmentOfLines() const noexcept {
@@ -110,11 +88,7 @@ SI_NetSegment* SI_SymbolPin::getNetSegmentOfLines() const noexcept {
 }
 
 bool SI_SymbolPin::isRequired() const noexcept {
-  if (mComponentSignalInstance) {
-    return mComponentSignalInstance->getCompSignal().isRequired();
-  } else {
-    return false;
-  }
+  return mComponentSignalInstance.getCompSignal().isRequired();
 }
 
 bool SI_SymbolPin::isVisibleJunction() const noexcept {
@@ -122,7 +96,7 @@ bool SI_SymbolPin::isVisibleJunction() const noexcept {
 }
 
 NetLineAnchor SI_SymbolPin::toNetLineAnchor() const noexcept {
-  return NetLineAnchor::pin(mSymbol.getUuid(), mSymbolPin->getUuid());
+  return NetLineAnchor::pin(mSymbol.getUuid(), mSymbolPin.getUuid());
 }
 
 /*******************************************************************************
@@ -133,9 +107,7 @@ void SI_SymbolPin::addToSchematic() {
   if (isAddedToSchematic() || isUsed()) {
     throw LogicError(__FILE__, __LINE__);
   }
-  if (mComponentSignalInstance) {
-    mComponentSignalInstance->registerSymbolPin(*this);  // can throw
-  }
+  mComponentSignalInstance.registerSymbolPin(*this);  // can throw
   SI_Base::addToSchematic();
 }
 
@@ -143,9 +115,7 @@ void SI_SymbolPin::removeFromSchematic() {
   if ((!isAddedToSchematic()) || isUsed()) {
     throw LogicError(__FILE__, __LINE__);
   }
-  if (mComponentSignalInstance) {
-    mComponentSignalInstance->unregisterSymbolPin(*this);  // can throw
-  }
+  mComponentSignalInstance.unregisterSymbolPin(*this);  // can throw
   SI_Base::removeFromSchematic();
 }
 
@@ -161,7 +131,7 @@ void SI_SymbolPin::registerNetLine(SI_NetLine& netline) {
                 "pin \"%2\" of component \"%3\" (%4) since it is connected "
                 "to the net \"%5\".")
             .arg(*netline.getNetSignalOfNetSegment().getName(),
-                 getComponentSignalNameOrPinUuid(),
+                 *mComponentSignalInstance.getCompSignal().getName(),
                  *mSymbol.getComponentInstance().getName(),
                  getLibraryComponentName(), getNetSignalName()));
   }
@@ -171,7 +141,7 @@ void SI_SymbolPin::registerNetLine(SI_NetLine& netline) {
           __FILE__, __LINE__,
           QString("There are lines from multiple net segments connected to "
                   "the pin \"%1\" of component \"%2\" (%3).")
-              .arg(getComponentSignalNameOrPinUuid(),
+              .arg(*mComponentSignalInstance.getCompSignal().getName(),
                    *mSymbol.getComponentInstance().getName(),
                    getLibraryComponentName()));
     }
@@ -217,16 +187,14 @@ void SI_SymbolPin::netSignalChanged(NetSignal* from, NetSignal* to) noexcept {
     onEdited.notify(Event::JunctionChanged);
   }
 
-  if (mPinSignalMapItem) {
-    netSignalNameChanged();
-    if (from) {
-      disconnect(from, &NetSignal::nameChanged, this,
-                 &SI_SymbolPin::netSignalNameChanged);
-    }
-    if (to) {
-      connect(to, &NetSignal::nameChanged, this,
-              &SI_SymbolPin::netSignalNameChanged);
-    }
+  netSignalNameChanged();
+  if (from) {
+    disconnect(from, &NetSignal::nameChanged, this,
+               &SI_SymbolPin::netSignalNameChanged);
+  }
+  if (to) {
+    connect(to, &NetSignal::nameChanged, this,
+            &SI_SymbolPin::netSignalNameChanged);
   }
 }
 
@@ -237,8 +205,8 @@ void SI_SymbolPin::netSignalNameChanged() noexcept {
 
 void SI_SymbolPin::updateTransform() noexcept {
   Transform transform(mSymbol);
-  const Point position = transform.map(mSymbolPin->getPosition());
-  const Angle rotation = transform.mapNonMirrorable(mSymbolPin->getRotation());
+  const Point position = transform.map(mSymbolPin.getPosition());
+  const Angle rotation = transform.mapNonMirrorable(mSymbolPin.getRotation());
   if (position != mPosition) {
     mPosition = position;
     onEdited.notify(Event::PositionChanged);
@@ -255,16 +223,14 @@ void SI_SymbolPin::updateTransform() noexcept {
 
 void SI_SymbolPin::updateName() noexcept {
   QString text;
-  const CmpSigPinDisplayType displayType = mPinSignalMapItem->getDisplayType();
+  const CmpSigPinDisplayType displayType = mPinSignalMapItem.getDisplayType();
   if (displayType == CmpSigPinDisplayType::pinName()) {
-    text = *mSymbolPin->getName();
+    text = *mSymbolPin.getName();
   } else if (displayType == CmpSigPinDisplayType::componentSignal()) {
-    if (mComponentSignalInstance) {
-      text = *mComponentSignalInstance->getCompSignal().getName();
-    }
+    text = *mComponentSignalInstance.getCompSignal().getName();
   } else if (displayType == CmpSigPinDisplayType::netSignal()) {
-    if (mComponentSignalInstance && mComponentSignalInstance->getNetSignal()) {
-      text = *mComponentSignalInstance->getNetSignal()->getName();
+    if (auto ns = mComponentSignalInstance.getNetSignal()) {
+      text = *ns->getName();
     }
   } else {
     Q_ASSERT(displayType == CmpSigPinDisplayType::none());
@@ -277,9 +243,7 @@ void SI_SymbolPin::updateName() noexcept {
 }
 
 void SI_SymbolPin::updateNumbers() noexcept {
-  const QStringList numbers = mComponentSignalInstance
-      ? mComponentSignalInstance->getPadNames()
-      : QStringList();
+  const QStringList numbers = mComponentSignalInstance.getPadNames();
 
   if (numbers != mNumbers) {
     mNumbers = numbers;
@@ -290,9 +254,9 @@ void SI_SymbolPin::updateNumbers() noexcept {
     // and pad names are just numbers (1, 2, 3, ...). In such cases, hiding
     // pin numbers also reduces the risk of overlaps in case of non-standard
     // pin lengths (also often the case for connectors).
-    const bool allowHide = ((mPinSignalMapItem->getDisplayType() ==
+    const bool allowHide = ((mPinSignalMapItem.getDisplayType() ==
                              CmpSigPinDisplayType::pinName()) ||
-                            (mPinSignalMapItem->getDisplayType() ==
+                            (mPinSignalMapItem.getDisplayType() ==
                              CmpSigPinDisplayType::componentSignal()));
     if ((!allowHide) || (mNumbers.count() != 1) || (mNumbers.at(0) != mName)) {
       foreach (QString number, numbers) {
@@ -313,7 +277,7 @@ void SI_SymbolPin::updateNumbers() noexcept {
 
 void SI_SymbolPin::updateNumbersTransform() noexcept {
   const bool flip = Toolbox::isTextUpsideDown(mRotation);
-  const Point position = mSymbolPin->getNumbersPosition(flip);
+  const Point position = mSymbolPin.getNumbersPosition(flip);
   const Alignment alignment = SymbolPin::getNumbersAlignment(flip);
   if (position != mNumbersPosition) {
     mNumbersPosition = position;
@@ -330,12 +294,6 @@ QString SI_SymbolPin::getLibraryComponentName() const noexcept {
               .getLibComponent()
               .getNames()
               .getDefaultValue();
-}
-
-QString SI_SymbolPin::getComponentSignalNameOrPinUuid() const noexcept {
-  return mComponentSignalInstance
-      ? *mComponentSignalInstance->getCompSignal().getName()
-      : mSymbolPin->getUuid().toStr();
 }
 
 QString SI_SymbolPin::getNetSignalName() const noexcept {

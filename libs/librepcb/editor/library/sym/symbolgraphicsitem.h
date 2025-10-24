@@ -71,11 +71,11 @@ public:
   // Constructors / Destructor
   SymbolGraphicsItem() = delete;
   SymbolGraphicsItem(const SymbolGraphicsItem& other) = delete;
-  SymbolGraphicsItem(
-      Symbol& symbol, const GraphicsLayerList& layers,
-      QPointer<const Component> cmp = nullptr,
-      std::shared_ptr<const ComponentSymbolVariantItem> cmpItem = nullptr,
-      const QStringList& localeOrder = {}) noexcept;
+  SymbolGraphicsItem(Symbol& symbol, const GraphicsLayerList& layers,
+                     QPointer<const Component> cmp,
+                     std::shared_ptr<const ComponentSymbolVariantItem> cmpItem,
+                     const QStringList& localeOrder,
+                     bool hideUnusedPins) noexcept;
   ~SymbolGraphicsItem() noexcept;
 
   // Getters
@@ -133,7 +133,8 @@ private:  // Data
   const GraphicsLayerList& mLayers;
   QPointer<const Component> mComponent;  // Can be nullptr.
   std::shared_ptr<const ComponentSymbolVariantItem> mItem;  // Can be nullptr.
-  QStringList mLocaleOrder;
+  const QStringList mLocaleOrder;
+  const bool mHideUnusedPins;
   QMap<std::shared_ptr<SymbolPin>, std::shared_ptr<SymbolPinGraphicsItem>>
       mPinGraphicsItems;
   QMap<std::shared_ptr<Circle>, std::shared_ptr<CircleGraphicsItem>>

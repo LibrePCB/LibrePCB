@@ -107,10 +107,7 @@ void CmdChangeNetSignalOfSchematicNetSegment::changeNetSignalOfNetSegment() {
   // signals)
   foreach (SI_SymbolPin* pin, pins) {
     Q_ASSERT(pin);
-    ComponentSignalInstance* sig = pin->getComponentSignalInstance();
-    if (sig) {
-      updateCompSigInstNetSignal(*sig);
-    }
+    updateCompSigInstNetSignal(pin->getComponentSignalInstance());
   }
 
   // re-add netsegment

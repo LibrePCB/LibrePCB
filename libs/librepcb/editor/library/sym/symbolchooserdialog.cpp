@@ -244,7 +244,8 @@ void SymbolChooserDialog::setSelectedSymbol(const FilePath& fp) noexcept {
           *mSelectedSymbol->getNames().value(localeOrder()));
       mUi->lblSymbolDescription->setText(
           mSelectedSymbol->getDescriptions().value(localeOrder()));
-      mGraphicsItem.reset(new SymbolGraphicsItem(*mSelectedSymbol, mLayers));
+      mGraphicsItem.reset(new SymbolGraphicsItem(*mSelectedSymbol, mLayers,
+                                                 nullptr, nullptr, {}, false));
       mPreviewScene->addItem(*mGraphicsItem);
       mUi->graphicsView->zoomAll();
     } catch (const Exception& e) {

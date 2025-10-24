@@ -211,11 +211,13 @@ void ComponentGateEditor::reloadSymbol() noexcept {
   if (mSymbol) {
     mScene.reset(new GraphicsScene());
     mScene->setOriginCrossVisible(false);  // It's rather disruptive.
-    mGraphicsItem.reset(new SymbolGraphicsItem(const_cast<Symbol&>(*mSymbol),
-                                               mLayers, mComponent, mGate));
+    mGraphicsItem.reset(new SymbolGraphicsItem(
+        const_cast<Symbol&>(*mSymbol), mLayers, mComponent, mGate,
+        mWorkspace.getSettings().libraryLocaleOrder.get(), false));
     mScene->addItem(*mGraphicsItem);
     mComponentGraphicsItem.reset(new SymbolGraphicsItem(
-        const_cast<Symbol&>(*mSymbol), mLayers, mComponent, mGate));
+        const_cast<Symbol&>(*mSymbol), mLayers, mComponent, mGate,
+        mWorkspace.getSettings().libraryLocaleOrder.get(), false));
     mComponentGraphicsItem->setPosition(mGate->getSymbolPosition());
     mComponentGraphicsItem->setRotation(mGate->getSymbolRotation());
     if (mComponentScene) {

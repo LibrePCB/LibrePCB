@@ -50,13 +50,14 @@ SymbolGraphicsItem::SymbolGraphicsItem(
     Symbol& symbol, const GraphicsLayerList& layers,
     QPointer<const Component> cmp,
     std::shared_ptr<const ComponentSymbolVariantItem> cmpItem,
-    const QStringList& localeOrder) noexcept
+    const QStringList& localeOrder, bool hideUnusedPins) noexcept
   : QGraphicsItemGroup(nullptr),
     mSymbol(symbol),
     mLayers(layers),
     mComponent(cmp),
     mItem(cmpItem),
     mLocaleOrder(localeOrder),
+    mHideUnusedPins(hideUnusedPins),
     mOnEditedSlot(*this, &SymbolGraphicsItem::symbolEdited) {
   syncPins();
   syncCircles();
@@ -270,8 +271,8 @@ void SymbolGraphicsItem::syncPins() noexcept {
   for (auto& obj : mSymbol.getPins().values()) {
     if (!mPinGraphicsItems.contains(obj)) {
       Q_ASSERT(obj);
-      auto i = std::make_shared<SymbolPinGraphicsItem>(obj, mLayers, mComponent,
-                                                       mItem, this);
+      auto i = std::make_shared<SymbolPinGraphicsItem>(
+          obj, mLayers, mComponent, mItem, mHideUnusedPins, this);
       mPinGraphicsItems.insert(obj, i);
     }
   }

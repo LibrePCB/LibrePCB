@@ -70,7 +70,8 @@ public:
   // Constructors / Destructor
   SI_SymbolPin() = delete;
   SI_SymbolPin(const SI_SymbolPin& other) = delete;
-  explicit SI_SymbolPin(SI_Symbol& symbol, const Uuid& pinUuid);
+  explicit SI_SymbolPin(SI_Symbol& symbol, const SymbolPin& pin,
+                        const ComponentPinSignalMapItem& item);
   ~SI_SymbolPin();
 
   // Getters
@@ -103,10 +104,9 @@ public:
     return mNumbersAlignment;
   }
 
-  const Uuid& getLibPinUuid() const noexcept;
   SI_Symbol& getSymbol() const noexcept { return mSymbol; }
-  const SymbolPin& getLibPin() const noexcept { return *mSymbolPin; }
-  ComponentSignalInstance* getComponentSignalInstance() const noexcept {
+  const SymbolPin& getLibPin() const noexcept { return mSymbolPin; }
+  ComponentSignalInstance& getComponentSignalInstance() const noexcept {
     return mComponentSignalInstance;
   }
   NetSignal* getCompSigInstNetSignal() const noexcept;
@@ -143,14 +143,13 @@ private:
   void updateNumbers() noexcept;
   void updateNumbersTransform() noexcept;
   QString getLibraryComponentName() const noexcept;
-  QString getComponentSignalNameOrPinUuid() const noexcept;
   QString getNetSignalName() const noexcept;
 
   // General
   SI_Symbol& mSymbol;
-  const SymbolPin* mSymbolPin;
-  const ComponentPinSignalMapItem* mPinSignalMapItem;
-  ComponentSignalInstance* mComponentSignalInstance;
+  const SymbolPin& mSymbolPin;
+  const ComponentPinSignalMapItem& mPinSignalMapItem;
+  ComponentSignalInstance& mComponentSignalInstance;
 
   // Cached Properties
   Point mPosition;

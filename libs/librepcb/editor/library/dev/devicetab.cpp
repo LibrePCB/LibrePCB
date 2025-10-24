@@ -685,7 +685,8 @@ void DeviceTab::refreshDependentElements() noexcept {
           mSymbols.append(symbol);
           auto graphicsItem = std::make_shared<SymbolGraphicsItem>(
               const_cast<Symbol&>(*symbol), mApp.getPreviewLayers(),
-              mComponent.get(), gate);
+              mComponent.get(), gate,
+              mApp.getWorkspace().getSettings().libraryLocaleOrder.get(), true);
           graphicsItem->setPosition(gate->getSymbolPosition());
           graphicsItem->setRotation(gate->getSymbolRotation());
           mComponentScene->addItem(*graphicsItem);

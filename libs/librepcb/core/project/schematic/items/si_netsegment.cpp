@@ -76,9 +76,9 @@ QSet<QString> SI_NetSegment::getForcedNetNames() const noexcept {
     SI_SymbolPin* pin1 = dynamic_cast<SI_SymbolPin*>(&netline->getP1());
     SI_SymbolPin* pin2 = dynamic_cast<SI_SymbolPin*>(&netline->getP2());
     ComponentSignalInstance* sig1 =
-        pin1 ? pin1->getComponentSignalInstance() : nullptr;
+        pin1 ? &pin1->getComponentSignalInstance() : nullptr;
     ComponentSignalInstance* sig2 =
-        pin2 ? pin2->getComponentSignalInstance() : nullptr;
+        pin2 ? &pin2->getComponentSignalInstance() : nullptr;
     if (sig1 && sig1->isNetSignalNameForced())
       names.insert(sig1->getForcedNetSignalName());
     if (sig2 && sig2->isNetSignalNameForced())

@@ -263,15 +263,11 @@ QList<std::shared_ptr<QGraphicsItem>> SchematicEditorState::findItemsAtPos(
     }
   }
 
-  if (flags &
-      (FindFlag::SymbolPins | FindFlag::SymbolPinsWithComponentSignal)) {
+  if (flags.testFlag(FindFlag::SymbolPins)) {
     for (auto it = scene->getSymbolPins().begin();
          it != scene->getSymbolPins().end(); it++) {
-      if (flags.testFlag(FindFlag::SymbolPins) ||
-          (it.key()->getComponentSignalInstance())) {
-        processItem(it.value(), it.value(), it.key()->getPosition(), 40, false,
-                    std::nullopt);
-      }
+      processItem(it.value(), it.value(), it.key()->getPosition(), 40, false,
+                  std::nullopt);
     }
   }
 

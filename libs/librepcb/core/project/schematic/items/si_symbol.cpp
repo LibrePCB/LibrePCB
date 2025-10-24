@@ -77,22 +77,25 @@ SI_Symbol::SI_Symbol(Schematic& schematic, const Uuid& uuid,
     }
   }
 
+  if (mSymbol->getPins().count() != mSymbVarItem->getPinSignalMap().count()) {
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        QString("The pin count of the symbol instance \"%1\" "
+                "does not match with the pin-signal-map of its component.")
+            .arg(mUuid.toStr()));
+  }
   for (const SymbolPin& libPin : mSymbol->getPins()) {
-    SI_SymbolPin* pin = new SI_SymbolPin(*this, libPin.getUuid());  // can throw
+    const ComponentPinSignalMapItem& item =
+        *mSymbVarItem->getPinSignalMap().get(libPin.getUuid());  // can throw
+    if (!item.getSignalUuid()) continue;  // Hide pins which are not connected.
     if (mPins.contains(libPin.getUuid())) {
       throw RuntimeError(
           __FILE__, __LINE__,
           QString("The symbol pin UUID \"%1\" is defined multiple times.")
               .arg(libPin.getUuid().toStr()));
     }
+    SI_SymbolPin* pin = new SI_SymbolPin(*this, libPin, item);  // can throw
     mPins.insert(libPin.getUuid(), pin);
-  }
-  if (mPins.count() != mSymbVarItem->getPinSignalMap().count()) {
-    throw RuntimeError(__FILE__, __LINE__,
-                       QString("The pin count of the symbol instance \"%1\" "
-                               "does not match with "
-                               "the pin-signal-map of its component.")
-                           .arg(mUuid.toStr()));
   }
 
   // Emit the "attributesChanged" signal when the schematic or component
