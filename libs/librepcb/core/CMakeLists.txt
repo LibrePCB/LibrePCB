@@ -153,6 +153,8 @@ add_library(
   fileio/transactionaldirectory.h
   fileio/transactionalfilesystem.cpp
   fileio/transactionalfilesystem.h
+  fileio/translationscatalog.cpp
+  fileio/translationscatalog.h
   fileio/versionfile.cpp
   fileio/versionfile.h
   fileio/ziparchive.cpp

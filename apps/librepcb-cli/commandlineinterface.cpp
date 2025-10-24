@@ -33,6 +33,7 @@
 #include <librepcb/core/fileio/csvfile.h>
 #include <librepcb/core/fileio/fileutils.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
+#include <librepcb/core/fileio/translationscatalog.h>
 #include <librepcb/core/library/cat/componentcategory.h>
 #include <librepcb/core/library/cat/packagecategory.h>
 #include <librepcb/core/library/cmp/component.h>
@@ -259,6 +260,10 @@ int CommandLineInterface::execute(const QStringList& args) noexcept {
       "check",
       tr("Run the library element check, print all non-approved messages and "
          "report failure (exit code = 1) if there are non-approved messages."));
+  QCommandLineOption libExportTranslations(
+      "export-translations",
+      tr("Export all translatable source strings (English) to a *.po file."),
+      tr("file"));
   QCommandLineOption libMinifyStepOption(
       "minify-step",
       tr("Minify the STEP models of all packages. Only works in conjunction "
@@ -393,6 +398,7 @@ int CommandLineInterface::execute(const QStringList& args) noexcept {
     positionalArgNames.append("libraries...");
     parser.addOption(libAllOption);
     parser.addOption(libCheckOption);
+    parser.addOption(libExportTranslations);
     parser.addOption(libMinifyStepOption);
     parser.addOption(libSaveOption);
     parser.addOption(libStrictOption);
@@ -540,6 +546,7 @@ int CommandLineInterface::execute(const QStringList& args) noexcept {
         openLibraries(positionalArgs.mid(1),  // library directories
                       parser.isSet(libAllOption),  // all elements
                       parser.isSet(libCheckOption),  // run check
+                      parser.value(libExportTranslations),  // export to *.po
                       parser.isSet(libMinifyStepOption),  // minify STEP
                       parser.isSet(libSaveOption),  // save
                       parser.isSet(libStrictOption)  // strict mode
@@ -1172,21 +1179,47 @@ bool CommandLineInterface::openProject(
 }
 
 bool CommandLineInterface::openLibraries(const QStringList& libDirs, bool all,
-                                         bool runCheck, bool minifyStepFiles,
-                                         bool save,
+                                         bool runCheck,
+                                         const QString& exportTranslationsFile,
+                                         bool minifyStepFiles, bool save,
                                          bool strict) const noexcept {
   bool success = true;
+
+  // Prepare translations catalog if requested.
+  std::unique_ptr<TranslationsCatalog> exportTranslationsCatalog;
+  if (!exportTranslationsFile.isEmpty()) {
+    exportTranslationsCatalog.reset(new TranslationsCatalog());
+  }
+
+  // Process libraries.
   for (const QString& libDir : libDirs) {
-    if (!openLibrary(libDir, all, runCheck, minifyStepFiles, save, strict)) {
+    if (!openLibrary(libDir, all, runCheck, exportTranslationsCatalog.get(),
+                     minifyStepFiles, save, strict)) {
       success = false;
     }
   }
+
+  // Save translations catalog if requested.
+  if (exportTranslationsCatalog) {
+    try {
+      print(tr("Write %n translation(s) to '%1'...", "",
+               exportTranslationsCatalog->getCount())
+                .arg(exportTranslationsFile));
+      const FilePath fp(QFileInfo(exportTranslationsFile).absoluteFilePath());
+      exportTranslationsCatalog->saveTo(fp);  // can throw
+    } catch (const Exception& e) {
+      printErr(tr("ERROR: Failed to save translations: %1").arg(e.getMsg()));
+      success = false;
+    }
+  }
+
   return success;
 }
 
-bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
-                                       bool runCheck, bool minifyStepFiles,
-                                       bool save, bool strict) const noexcept {
+bool CommandLineInterface::openLibrary(
+    const QString& libDir, bool all, bool runCheck,
+    TranslationsCatalog* exportTranslationsCatalog, bool minifyStepFiles,
+    bool save, bool strict) const noexcept {
   try {
     bool success = true;
 
@@ -1199,8 +1232,8 @@ bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
     std::unique_ptr<Library> lib =
         Library::open(std::unique_ptr<TransactionalDirectory>(
             new TransactionalDirectory(libFs)));  // can throw
-    processLibraryElement(libDir, *libFs, *lib, runCheck, minifyStepFiles, save,
-                          strict,
+    processLibraryElement(libDir, *lib, *libFs, *lib, exportTranslationsCatalog,
+                          runCheck, minifyStepFiles, save, strict,
                           success);  // can throw
 
     // Open all component categories
@@ -1216,8 +1249,9 @@ bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
         std::unique_ptr<ComponentCategory> element =
             ComponentCategory::open(std::unique_ptr<TransactionalDirectory>(
                 new TransactionalDirectory(fs)));  // can throw
-        processLibraryElement(libDir, *fs, *element, runCheck, minifyStepFiles,
-                              save, strict,
+        processLibraryElement(libDir, *lib, *fs, *element,
+                              exportTranslationsCatalog, runCheck,
+                              minifyStepFiles, save, strict,
                               success);  // can throw
       }
     }
@@ -1235,8 +1269,9 @@ bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
         std::unique_ptr<PackageCategory> element =
             PackageCategory::open(std::unique_ptr<TransactionalDirectory>(
                 new TransactionalDirectory(fs)));  // can throw
-        processLibraryElement(libDir, *fs, *element, runCheck, minifyStepFiles,
-                              save, strict,
+        processLibraryElement(libDir, *lib, *fs, *element,
+                              exportTranslationsCatalog, runCheck,
+                              minifyStepFiles, save, strict,
                               success);  // can throw
       }
     }
@@ -1254,8 +1289,9 @@ bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
         std::unique_ptr<Symbol> element =
             Symbol::open(std::unique_ptr<TransactionalDirectory>(
                 new TransactionalDirectory(fs)));  // can throw
-        processLibraryElement(libDir, *fs, *element, runCheck, minifyStepFiles,
-                              save, strict,
+        processLibraryElement(libDir, *lib, *fs, *element,
+                              exportTranslationsCatalog, runCheck,
+                              minifyStepFiles, save, strict,
                               success);  // can throw
       }
     }
@@ -1273,8 +1309,9 @@ bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
         std::unique_ptr<Package> element =
             Package::open(std::unique_ptr<TransactionalDirectory>(
                 new TransactionalDirectory(fs)));  // can throw
-        processLibraryElement(libDir, *fs, *element, runCheck, minifyStepFiles,
-                              save, strict,
+        processLibraryElement(libDir, *lib, *fs, *element,
+                              exportTranslationsCatalog, runCheck,
+                              minifyStepFiles, save, strict,
                               success);  // can throw
       }
     }
@@ -1292,8 +1329,9 @@ bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
         std::unique_ptr<Component> element =
             Component::open(std::unique_ptr<TransactionalDirectory>(
                 new TransactionalDirectory(fs)));  // can throw
-        processLibraryElement(libDir, *fs, *element, runCheck, minifyStepFiles,
-                              save, strict,
+        processLibraryElement(libDir, *lib, *fs, *element,
+                              exportTranslationsCatalog, runCheck,
+                              minifyStepFiles, save, strict,
                               success);  // can throw
       }
     }
@@ -1311,8 +1349,9 @@ bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
         std::unique_ptr<Device> element =
             Device::open(std::unique_ptr<TransactionalDirectory>(
                 new TransactionalDirectory(fs)));  // can throw
-        processLibraryElement(libDir, *fs, *element, runCheck, minifyStepFiles,
-                              save, strict,
+        processLibraryElement(libDir, *lib, *fs, *element,
+                              exportTranslationsCatalog, runCheck,
+                              minifyStepFiles, save, strict,
                               success);  // can throw
       }
     }
@@ -1353,9 +1392,10 @@ QStringList CommandLineInterface::formatCheckSummary(
 }
 
 void CommandLineInterface::processLibraryElement(
-    const QString& libDir, TransactionalFileSystem& fs,
-    LibraryBaseElement& element, bool runCheck, bool minifyStepFiles, bool save,
-    bool strict, bool& success) const {
+    const QString& libDir, const Library& lib, TransactionalFileSystem& fs,
+    LibraryBaseElement& element, TranslationsCatalog* exportTranslationsCatalog,
+    bool runCheck, bool minifyStepFiles, bool save, bool strict,
+    bool& success) const {
   // Keep track of whether we've yet printed the error header for this element
   bool errorHeaderPrinted = false;
   auto printErrorHeaderOnce = [&errorHeaderPrinted, &element]() {
@@ -1366,6 +1406,41 @@ void CommandLineInterface::processLibraryElement(
       errorHeaderPrinted = true;
     }
   };
+
+  // Export translations, if needed.
+  const LibraryElement* libElement =
+      dynamic_cast<const LibraryElement*>(&element);
+  const QString description =
+      element.getDescriptions().getDefaultValue().toLower();
+  const bool isGenerated = description.contains("librepcb-parts-generator") ||
+      (libElement &&
+       libElement->getGeneratedBy().contains("librepcb-parts-generator"));
+  if (exportTranslationsCatalog && (!isGenerated)) {
+    QString locationPrefix = lib.getUuid().toStr() % ":" % element.getShortElementName() % ":";
+    QString commentSuffix;
+    if (&element != &lib) {
+       locationPrefix +=  element.getUuid().toStr() % ":";
+       commentSuffix += " in '" % *lib.getNames().getDefaultValue() % "'";
+    }
+    auto addTranslation = [&](const QString& location, const QString& description,
+                          const QString& string) {
+      if (!string.isEmpty()) {
+        const QString loc = locationPrefix % location;
+        const QString id = QString::fromUtf8(QCryptographicHash::hash(loc.toUtf8(),QCryptographicHash::Md5).toHex());
+        exportTranslationsCatalog->add(TranslationsCatalog::Message{
+            id,
+            string,
+            QString("%1 for '%2'")
+                .arg(description)
+                .arg(*element.getNames().getDefaultValue()) % commentSuffix,
+            loc,
+        });
+      }
+    };
+    addTranslation("name", "Name", *element.getNames().getDefaultValue());
+    addTranslation("description", "Description", element.getDescriptions().getDefaultValue());
+    addTranslation("keywords", "Keywords", element.getKeywords().getDefaultValue());
+  }
 
   // Save element to transactional file system, if needed
   if (strict || save) {

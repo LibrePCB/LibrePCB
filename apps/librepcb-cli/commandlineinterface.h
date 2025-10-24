@@ -33,9 +33,11 @@
 namespace librepcb {
 
 class FilePath;
+class Library;
 class LibraryBaseElement;
 class SExpression;
 class TransactionalFileSystem;
+class TranslationsCatalog;
 
 namespace cli {
 
@@ -79,9 +81,11 @@ private:  // Methods
       const QStringList& avNames, const QStringList& avIndices,
       const QString& setDefaultAv, bool save, bool strict) const noexcept;
   bool openLibraries(const QStringList& libDirs, bool all, bool runCheck,
+                     const QString& exportTranslationsFile,
                      bool minifyStepFiles, bool save,
                      bool strict) const noexcept;
   bool openLibrary(const QString& libDir, bool all, bool runCheck,
+                   TranslationsCatalog* exportTranslationsCatalog,
                    bool minifyStepFiles, bool save, bool strict) const noexcept;
 
   /**
@@ -103,10 +107,12 @@ private:  // Methods
   QStringList formatCheckSummary(int approvedCount, int nonApprovedCount,
                                  const QString& indent = "") const;
 
-  void processLibraryElement(const QString& libDir, TransactionalFileSystem& fs,
-                             LibraryBaseElement& element, bool runCheck,
-                             bool minifyStepFiles, bool save, bool strict,
-                             bool& success) const;
+  void processLibraryElement(const QString& libDir, const Library& lib,
+                             TransactionalFileSystem& fs,
+                             LibraryBaseElement& element,
+                             TranslationsCatalog* exportTranslationsCatalog,
+                             bool runCheck, bool minifyStepFiles, bool save,
+                             bool strict, bool& success) const;
   bool openSymbol(const QString& symbolFile, bool runCheck,
                   const QString& exportFile) const noexcept;
   bool openPackage(const QString& packageFile, bool runCheck,

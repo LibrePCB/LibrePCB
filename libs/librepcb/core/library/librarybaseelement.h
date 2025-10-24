@@ -65,6 +65,9 @@ public:
   virtual ~LibraryBaseElement() noexcept;
 
   // Getters: General
+  const QString& getShortElementName() const noexcept {
+    return mShortElementName;
+  }
   const TransactionalDirectory& getDirectory() const noexcept {
     return *mDirectory;
   }
