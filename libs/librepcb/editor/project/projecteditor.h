@@ -26,7 +26,7 @@
 #include "../utils/uiobjectlist.h"
 #include "appwindow.h"
 
-#include <librepcb/core/serialization/fileformatmigration.h>
+#include <librepcb/core/project/projectloader.h>
 #include <librepcb/core/serialization/sexpression.h>
 #include <librepcb/core/utils/signalslot.h>
 
@@ -73,7 +73,7 @@ public:
   ProjectEditor(const ProjectEditor& other) = delete;
   explicit ProjectEditor(
       GuiApplication& app, std::unique_ptr<Project> project, int uiIndex,
-      const std::optional<QList<FileFormatMigration::Message>>& upgradeMessages,
+      const std::optional<ProjectLoader::MigrationLog>& migrationLog,
       QObject* parent = nullptr) noexcept;
   ~ProjectEditor() noexcept;
 
@@ -200,9 +200,9 @@ signals:
 
 private:
   /**
-   * @brief Show a dialog with all project file format upgrade messages
+   * @brief Open the HTML with all project file format upgrade messages
    */
-  void showUpgradeMessages() noexcept;
+  void openMigrationLog() noexcept;
   void scheduleErcRun() noexcept;
   void runErc() noexcept;
   void projectSettingsChanged() noexcept;
@@ -213,7 +213,7 @@ private:
   std::unique_ptr<Project> mProject;
   int mUiIndex;
   bool mUseIeee315Symbols;
-  std::optional<QList<FileFormatMigration::Message>> mUpgradeMessages;
+  std::optional<ProjectLoader::MigrationLog> mMigrationLog;
   std::shared_ptr<UiObjectList<SchematicEditor, ui::SchematicData>> mSchematics;
   std::shared_ptr<UiObjectList<BoardEditor, ui::BoardData>> mBoards;
   std::unique_ptr<UndoStack> mUndoStack;

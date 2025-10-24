@@ -172,6 +172,8 @@ void NotificationsModel::itemChanged(bool dismissed) noexcept {
       } else {
         notify_row_changed(logicalIndex);
       }
+      updateUnreadNotificationsCount();
+      updateCurrentProgressIndex();
       return;
     }
     const QString dismissKey = mItems.at(i)->getDismissKey();

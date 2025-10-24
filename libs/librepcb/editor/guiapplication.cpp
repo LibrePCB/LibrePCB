@@ -551,7 +551,7 @@ std::shared_ptr<ProjectEditor> GuiApplication::openProject(
     // Open editor & keep handle.
     const int index = mProjects->count();
     auto editor = std::make_shared<ProjectEditor>(
-        *this, std::move(project), index, loader.getUpgradeMessages());
+        *this, std::move(project), index, loader.getMigrationLog());
     connect(editor.get(), &ProjectEditor::statusBarMessageChanged, this,
             &GuiApplication::statusBarMessageChanged);
     connect(editor.get(), &ProjectEditor::ercMessageHighlightRequested, this,

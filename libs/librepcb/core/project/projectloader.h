@@ -53,6 +53,17 @@ class ProjectLoader final : public QObject {
   Q_OBJECT
 
 public:
+  // Types
+  struct MigrationLog {
+    QString projectName;
+    QDateTime dateTime;
+    Version fromVersion;
+    Version toVersion;
+    QList<FileFormatMigration::Message> messages;  ///< Sorted
+
+    QByteArray toHtml(bool isTemporary) const noexcept;
+  };
+
   // Constructors / Destructor
   explicit ProjectLoader(QObject* parent = nullptr) noexcept;
   ProjectLoader(const ProjectLoader& other) = delete;
@@ -67,9 +78,8 @@ public:
   std::unique_ptr<Project> open(
       std::unique_ptr<TransactionalDirectory> directory,
       const QString& filename);
-  const std::optional<QList<FileFormatMigration::Message>>& getUpgradeMessages()
-      const noexcept {
-    return mUpgradeMessages;
+  const std::optional<MigrationLog>& getMigrationLog() const noexcept {
+    return mMigrationLog;
   }
 
   // Operator Overloadings
@@ -99,7 +109,7 @@ private:  // Methods
 
 private:  // Data
   bool mAutoAssignDeviceModels;
-  std::optional<QList<FileFormatMigration::Message>> mUpgradeMessages;
+  std::optional<MigrationLog> mMigrationLog;
 };
 
 /*******************************************************************************
