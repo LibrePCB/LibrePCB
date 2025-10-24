@@ -31,6 +31,7 @@
 #include "../utils/slinthelpers.h"
 #include "../utils/standardeditorcommandhandler.h"
 #include "../utils/uihelpers.h"
+#include "../workspace/desktopservices.h"
 #include "board/boardeditor.h"
 #include "bomreviewdialog.h"
 #include "cmd/cmdboardadd.h"
@@ -44,6 +45,7 @@
 #include "schematic/schematictab.h"
 
 #include <librepcb/core/application.h>
+#include <librepcb/core/fileio/fileutils.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/erc/electricalrulecheck.h>
@@ -68,7 +70,7 @@ namespace editor {
 
 ProjectEditor::ProjectEditor(
     GuiApplication& app, std::unique_ptr<Project> project, int uiIndex,
-    const std::optional<QList<FileFormatMigration::Message>>& upgradeMessages,
+    const std::optional<ProjectLoader::MigrationLog>& migrationLog,
     QObject* parent) noexcept
   : QObject(parent),
     onUiDataChanged(*this),
@@ -77,7 +79,7 @@ ProjectEditor::ProjectEditor(
     mProject(std::move(project)),
     mUiIndex(uiIndex),
     mUseIeee315Symbols(false),
-    mUpgradeMessages(upgradeMessages),
+    mMigrationLog(migrationLog),
     mSchematics(new UiObjectList<SchematicEditor, ui::SchematicData>()),
     mBoards(new UiObjectList<BoardEditor, ui::BoardData>()),
     mUndoStack(new UndoStack()),
@@ -143,26 +145,26 @@ ProjectEditor::ProjectEditor(
             }
           });
 
-  // Show notification if file format has been upgraded.
-  if (mUpgradeMessages) {
+  // Show notification if file format has been migrated.
+  if (mMigrationLog) {
     QString msg =
-        tr("The project '%1' has been upgraded to a new file format. "
+        tr("The project '%1' has been migrated to a new file format. "
            "After saving, it will not be possible anymore to open it with an "
            "older LibrePCB version!")
             .arg(*mProject->getName() % " " % mProject->getVersion());
-    if (!mUpgradeMessages->isEmpty()) {
+    if (!mMigrationLog->messages.isEmpty()) {
       msg += "\n\n" %
-          tr("The upgrade produced %n message(s), please review before "
+          tr("The migration produced %n message(s), please review before "
              "proceeding.",
-             nullptr, mUpgradeMessages->count());
+             nullptr, mMigrationLog->messages.count());
     }
     auto notification = std::make_shared<Notification>(
         ui::NotificationType::Warning,
         tr("ATTENTION: Project File Format Upgraded"), msg,
-        (!mUpgradeMessages->isEmpty()) ? tr("Show Messages") : QString(),
+        (!mMigrationLog->messages.isEmpty()) ? tr("Show Messages") : QString(),
         QString(), true);
     connect(notification.get(), &Notification::buttonClicked, this,
-            &ProjectEditor::showUpgradeMessages);
+            &ProjectEditor::openMigrationLog);
     connect(this, &ProjectEditor::projectSavedToDisk, notification.get(),
             &Notification::dismiss);
     connect(this, &ProjectEditor::destroyed, notification.get(),
@@ -330,8 +332,7 @@ void ProjectEditor::setHighlightedNetSignals(
 bool ProjectEditor::hasUnsavedChanges() const noexcept {
   // If the project was upgraded, show it as modified to make it clear that
   // saving the project will modify the files.
-  return mManualModificationsMade || (!mUndoStack->isClean()) ||
-      mUpgradeMessages;
+  return mManualModificationsMade || (!mUndoStack->isClean()) || mMigrationLog;
 }
 
 void ProjectEditor::undo() noexcept {
@@ -394,8 +395,8 @@ bool ProjectEditor::saveProject() noexcept {
 
     // Saving was successful --> clean the undo stack.
     mUndoStack->setClean();
-    if (mUpgradeMessages) {
-      mUpgradeMessages = std::nullopt;  // Not needed anymore.
+    if (mMigrationLog) {
+      mMigrationLog = std::nullopt;  // Not needed anymore.
       // It's a bit ugly, but if no changes were made to the project, the UI
       // remains in "modified" state so we manually emit the stateModified()
       // signal here to ensure it gets updated.
@@ -512,9 +513,11 @@ void ProjectEditor::execLppzExportDialog(QWidget* parent) noexcept {
     // Export project to ZIP, but without the output directory since this can
     // be quite large and usually does not make sense, especially since *.lppz
     // files might even be stored in this directory as well because they are
-    // output files.
+    // output files. Additionally, logs and user settings will not be exported.
     auto filter = [](const QString& filePath) {
-      return !filePath.startsWith("output/");
+      return (!filePath.startsWith("output/"))  //
+          && (!filePath.startsWith("logs/"))  //
+          && (!filePath.endsWith(".user.lp"));
     };
     mProject->getDirectory().getFileSystem()->exportToZip(fp,
                                                           filter);  // can throw
@@ -674,67 +677,23 @@ void ProjectEditor::unregisterActiveSchematicTab(SchematicTab* tab) noexcept {
  *  Private Methods
  ******************************************************************************/
 
-void ProjectEditor::showUpgradeMessages() noexcept {
-  if (!mUpgradeMessages) return;
-
-  std::sort(mUpgradeMessages->begin(), mUpgradeMessages->end(),
-            [](const FileFormatMigration::Message& a,
-               const FileFormatMigration::Message& b) {
-              // It is most intuitive to have the oldest messages at top, and
-              // the newest messages at bottom since they might "depend" on
-              // each other.
-              if (a.toVersion != b.toVersion) return a.toVersion < b.toVersion;
-              if (a.severity != b.severity) return a.severity > b.severity;
-              return a.message < b.message;
-            });
-
-  QDialog dialog(qApp->activeWindow());
-  dialog.setWindowTitle(tr("File Format Upgrade Messages"));
-  dialog.resize(800, 400);
-  QVBoxLayout* layout = new QVBoxLayout(&dialog);
-  QTableWidget* table = new QTableWidget(mUpgradeMessages->count(), 4, &dialog);
-  table->setHorizontalHeaderLabels(
-      {tr("Severity"), tr("Version"), tr("Occurrences"), tr("Message")});
-  table->horizontalHeader()->setSectionResizeMode(
-      0, QHeaderView::ResizeToContents);
-  table->horizontalHeader()->setSectionResizeMode(
-      1, QHeaderView::ResizeToContents);
-  table->horizontalHeader()->setSectionResizeMode(
-      2, QHeaderView::ResizeToContents);
-  table->horizontalHeader()->setStretchLastSection(true);
-  table->horizontalHeaderItem(3)->setTextAlignment(Qt::AlignLeft);
-  table->setEditTriggers(QAbstractItemView::NoEditTriggers);
-  table->setSelectionBehavior(QAbstractItemView::SelectRows);
-  table->setWordWrap(true);
-  for (int i = 0; i < mUpgradeMessages->count(); ++i) {
-    const FileFormatMigration::Message m = mUpgradeMessages->at(i);
-    QTableWidgetItem* item = new QTableWidgetItem(m.getSeverityStrTr());
-    item->setTextAlignment(Qt::AlignCenter);
-    table->setItem(i, 0, item);
-
-    item = new QTableWidgetItem(m.fromVersion.toStr() % " → " %
-                                m.toVersion.toStr());
-    item->setTextAlignment(Qt::AlignCenter);
-    table->setItem(i, 1, item);
-
-    item = new QTableWidgetItem(
-        (m.affectedItems > 0) ? QString::number(m.affectedItems) : QString());
-    item->setTextAlignment(Qt::AlignCenter);
-    table->setItem(i, 2, item);
-
-    item = new QTableWidgetItem(m.message);
-    item->setTextAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-    table->setItem(i, 3, item);
+void ProjectEditor::openMigrationLog() noexcept {
+  try {
+    if (mMigrationLog) {
+      const FilePath fp =
+          FilePath::getRandomTempPath().getPathTo("migration.html");
+      FileUtils::writeFile(fp, mMigrationLog->toHtml(true));
+      DesktopServices ds(mWorkspace.getSettings());
+      if (!ds.openLocalPath(fp)) {
+        throw RuntimeError(
+            __FILE__, __LINE__,
+            QString("Failed to open the file '%1' with the web browser.")
+                .arg(fp.toNative()));
+      }
+    }
+  } catch (const Exception& e) {
+    QMessageBox::critical(qApp->activeWindow(), "Error", e.getMsg());
   }
-  layout->addWidget(table);
-  QTimer::singleShot(10, table, &QTableWidget::resizeRowsToContents);
-  connect(table->horizontalHeader(), &QHeaderView::sectionResized, table,
-          &QTableWidget::resizeRowsToContents);
-  QDialogButtonBox* buttonBox =
-      new QDialogButtonBox(QDialogButtonBox::Close, &dialog);
-  connect(buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::close);
-  layout->addWidget(buttonBox);
-  dialog.exec();
 }
 
 void ProjectEditor::scheduleErcRun() noexcept {
