@@ -260,6 +260,7 @@ BoardDesignRuleCheck::Result BoardDesignRuleCheck::run(
   addToStage2(&BoardDesignRuleCheck::checkCopperHoleClearances, 3);
   if (!data->quick) {
     addToStage2(&BoardDesignRuleCheck::checkMinimumPthAnnularRing, 2);
+    addToStage2(&BoardDesignRuleCheck::checkBoardCutouts, 3);
   }
   addIndependent(&BoardDesignRuleCheck::checkCopperCopperClearances, 5);
   addIndependent(&BoardDesignRuleCheck::checkCopperBoardClearances, 3);
@@ -2039,6 +2040,137 @@ RuleCheckMessageList BoardDesignRuleCheck::checkBoardOutline(const Data& data) {
           std::make_shared<DrcMsgMinimumBoardOutlineInnerRadiusViolation>(
               minEdgeRadius, locations));
     }
+  }
+
+  return messages;
+}
+
+RuleCheckMessageList BoardDesignRuleCheck::checkBoardCutouts(
+    const Data& data, const CalculatedJobData& calcData) {
+  RuleCheckMessageList messages;
+  emitStatus(tr("Check board cutouts..."));
+
+  // Helper to stroke a path.
+  auto getLocations = [](const Path& path, const UnsignedLength& lineWidth) {
+    return path.toOutlineStrokes(
+        PositiveLength(std::max(*lineWidth, Length(100000))));
+  };
+
+  // Helper to get the locations of path segemnts.
+  QVector<Path> locations;
+  auto treeToLocations = [&](const ClipperLib::PolyTree& tree) {
+    locations.clear();
+    for (const Path& location :
+         ClipperHelpers::convert(ClipperHelpers::treeToPaths(tree))) {
+      locations.append(getLocations(location, UnsignedLength(0)));
+    }
+    return (!locations.isEmpty());
+  };
+
+  // Helpers to check non-plated cutouts for intersections with copper.
+  ClipperLib::Paths unitedCopperPaths;  // Top & bottom copper areas united.
+  auto getUnitedCopperPaths = [&]() {
+    if (unitedCopperPaths.empty()) {
+      unitedCopperPaths =
+          calcData.copperPathsPerLayer.value(&Layer::topCopper());
+      ClipperHelpers::unite(
+          unitedCopperPaths,
+          calcData.copperPathsPerLayer.value(&Layer::botCopper()),
+          ClipperLib::pftEvenOdd, ClipperLib::pftNonZero);
+    }
+    return unitedCopperPaths;
+  };
+  auto isNonPlatedButIntersectedByCopper = [&](const Layer& layer,
+                                               const Path& outline) {
+    if ((layer != Layer::boardCutouts()) || (!outline.isClosed())) {
+      return false;
+    }
+    ClipperLib::Paths paths{
+        ClipperHelpers::convert(outline, maxArcTolerance())};
+    std::unique_ptr<ClipperLib::PolyTree> intersections =
+        ClipperHelpers::intersectToTree(paths, getUnitedCopperPaths(),
+                                        ClipperLib::pftEvenOdd,
+                                        ClipperLib::pftEvenOdd, false);
+    return treeToLocations(*intersections);
+  };
+
+  // Helpers to check plated cutouts for missing copper along its outline.
+  ClipperLib::Paths intersectedCopperPaths;  // Top & bottom copper areas.
+  auto getIntersectedCopperPaths = [&]() {
+    if (intersectedCopperPaths.empty()) {
+      intersectedCopperPaths =
+          calcData.copperPathsPerLayer.value(&Layer::topCopper());
+      ClipperHelpers::intersect(
+          intersectedCopperPaths,
+          calcData.copperPathsPerLayer.value(&Layer::botCopper()),
+          ClipperLib::pftEvenOdd, ClipperLib::pftNonZero);
+    }
+    return intersectedCopperPaths;
+  };
+  auto isPlatedButNotSurroundedByCopper = [&](const Layer& layer,
+                                              const Path& outline) {
+    if ((layer != Layer::boardPlatedCutouts()) || (!outline.isClosed())) {
+      return false;
+    }
+    ClipperLib::Paths paths{
+        ClipperHelpers::convert(outline, maxArcTolerance())};
+    std::unique_ptr<ClipperLib::PolyTree> subtractions =
+        ClipperHelpers::subtractToTree(paths, getIntersectedCopperPaths(),
+                                       ClipperLib::pftEvenOdd,
+                                       ClipperLib::pftEvenOdd, false);
+    return treeToLocations(*subtractions);
+  };
+
+  // Check all plated and non-plated cutouts.
+  QVector<Path> platedCutoutsLocations;
+  for (const Data::Polygon& polygon : data.polygons) {
+    if (isNonPlatedButIntersectedByCopper(*polygon.layer, polygon.path)) {
+      messages.append(std::make_shared<DrcMsgNonPlatedCutoutWithCopper>(
+          polygon, nullptr, locations));
+    } else if (isPlatedButNotSurroundedByCopper(*polygon.layer, polygon.path)) {
+      messages.append(std::make_shared<DrcMsgPlatedCutoutWithoutCopper>(
+          polygon, nullptr, locations));
+    }
+    if (polygon.layer == &Layer::boardPlatedCutouts()) {
+      platedCutoutsLocations.append(
+          getLocations(polygon.path, polygon.lineWidth));
+    }
+  }
+  for (const Data::Device& dev : data.devices) {
+    Transform transform(dev.position, dev.rotation, dev.mirror);
+    for (const Data::Polygon& polygon : dev.polygons) {
+      const Path outline = transform.map(polygon.path);
+      if (isNonPlatedButIntersectedByCopper(*polygon.layer, outline)) {
+        messages.append(std::make_shared<DrcMsgNonPlatedCutoutWithCopper>(
+            polygon, &dev, locations));
+      } else if (isPlatedButNotSurroundedByCopper(*polygon.layer, outline)) {
+        messages.append(std::make_shared<DrcMsgPlatedCutoutWithoutCopper>(
+            polygon, &dev, locations));
+      }
+      if (polygon.layer == &Layer::boardPlatedCutouts()) {
+        platedCutoutsLocations.append(getLocations(outline, polygon.lineWidth));
+      }
+    }
+    for (const Data::Circle& circle : dev.circles) {
+      const Path outline =
+          Path::circle(circle.diameter).translated(dev.position);
+      if (isNonPlatedButIntersectedByCopper(*circle.layer, outline)) {
+        messages.append(std::make_shared<DrcMsgNonPlatedCutoutWithCopper>(
+            circle, &dev, locations));
+      } else if (isPlatedButNotSurroundedByCopper(*circle.layer, outline)) {
+        messages.append(std::make_shared<DrcMsgPlatedCutoutWithoutCopper>(
+            circle, &dev, locations));
+      }
+      if (circle.layer == &Layer::boardPlatedCutouts()) {
+        platedCutoutsLocations.append(getLocations(outline, circle.lineWidth));
+      }
+    }
+  }
+
+  // Warn if there are any plated cutouts.
+  if (!platedCutoutsLocations.isEmpty()) {
+    messages.append(
+        std::make_shared<DrcMsgPlatedCutouts>(platedCutoutsLocations));
   }
 
   return messages;

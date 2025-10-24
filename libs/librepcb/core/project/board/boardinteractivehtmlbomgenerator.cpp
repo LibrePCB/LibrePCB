@@ -113,6 +113,7 @@ std::shared_ptr<InteractiveHtmlBom> BoardInteractiveHtmlBomGenerator::generate(
   QMap<const Layer*, InteractiveHtmlBom::DrawingLayer> drawingLayerMap = {
       {&Layer::boardOutlines(), InteractiveHtmlBom::DrawingLayer::Edge},
       {&Layer::boardCutouts(), InteractiveHtmlBom::DrawingLayer::Edge},
+      {&Layer::boardPlatedCutouts(), InteractiveHtmlBom::DrawingLayer::Edge},
       {&Layer::topDocumentation(),
        InteractiveHtmlBom::DrawingLayer::FabricationFront},
       {&Layer::botDocumentation(),

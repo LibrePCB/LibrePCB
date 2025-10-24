@@ -281,6 +281,136 @@ DrcMsgMinimumBoardOutlineInnerRadiusViolation::
 }
 
 /*******************************************************************************
+ *  DrcMsgPlatedCutouts
+ ******************************************************************************/
+
+DrcMsgPlatedCutouts::DrcMsgPlatedCutouts(
+    const QVector<Path>& locations) noexcept
+  : RuleCheckMessage(
+        Severity::Hint, tr("Plated cutouts detected"),
+        tr("The board contains plated cutouts with arbitrary shape (polygons "
+           "or circles). Those are currently considered EXPERIMENTAL because "
+           "of the issues described below. In future releases, they might "
+           "behave differently.\n\n"
+           "1. Unfortunately, there is no standardized way to let PCB "
+           "manufacturers know that those cutouts need to be plated. The "
+           "Gerber export just includes those cutouts in the normal board "
+           "outlines layer (together with the non-plated cutouts), therefore "
+           "you need to ensure that the manufacturer will recognize them "
+           "correctly. Some manufacturers automatically detect plated vs. "
+           "non-plated cutouts by the existence of copper on the top & bottom "
+           "layers along the cutout path. The DRC will raise a separate "
+           "warning if this is not the case, but you should check if your "
+           "manufacturer will follow this convention.\n\n"
+           "2. The DRC does not yet detect every possible problem with such "
+           "cutouts, you have to be careful not to accidentally create "
+           "short-circuits with plated cutouts as the DRC won't warn you about "
+           "this."),
+        "plated_cutouts", locations) {
+}
+
+/*******************************************************************************
+ *  DrcMsgPlatedCutoutWithoutCopper
+ ******************************************************************************/
+
+DrcMsgPlatedCutoutWithoutCopper::DrcMsgPlatedCutoutWithoutCopper(
+    const Data::Polygon& polygon, const Data::Device* device,
+    const QVector<Path>& locations) noexcept
+  : RuleCheckMessage(Severity::Warning, determineMessage(),
+                     determineDescription(), "plated_cutout_without_copper",
+                     locations) {
+  mApproval->ensureLineBreak();
+  if (device) {
+    mApproval->appendChild("device", device->uuid);
+    mApproval->ensureLineBreak();
+  }
+  mApproval->appendChild("polygon", polygon.uuid);
+  mApproval->ensureLineBreak();
+}
+
+DrcMsgPlatedCutoutWithoutCopper::DrcMsgPlatedCutoutWithoutCopper(
+    const Data::Circle& circle, const Data::Device* device,
+    const QVector<Path>& locations) noexcept
+  : RuleCheckMessage(Severity::Warning, determineMessage(),
+                     determineDescription(), "plated_cutout_without_copper",
+                     locations) {
+  mApproval->ensureLineBreak();
+  if (device) {
+    mApproval->appendChild("device", device->uuid);
+    mApproval->ensureLineBreak();
+  }
+  mApproval->appendChild("circle", circle.uuid);
+  mApproval->ensureLineBreak();
+}
+
+QString DrcMsgPlatedCutoutWithoutCopper::determineMessage() noexcept {
+  return tr("Plated cutout not surrounded by copper");
+}
+
+QString DrcMsgPlatedCutoutWithoutCopper::determineDescription() noexcept {
+  return tr("Plated- and non-plated cutouts are exported to the same Gerber "
+            "file because there is no standardized way to send plated cutouts "
+            "to manufacturers. Some manufacturers just detect plated vs. "
+            "non-plated cutouts by the existence of copper along their "
+            "outline.\n\nThis cutout is on the \"%1\" layer but does not have "
+            "copper on both top & bottom layers along its complete outline, "
+            "therefore this detection might fail, possibly leading to wrong "
+            "manufacturing. It is recommended to draw copper along the "
+            "complete cutout outline.")
+      .arg(Layer::boardPlatedCutouts().getNameTr());
+}
+
+/*******************************************************************************
+ *  DrcMsgNonPlatedCutoutWithCopper
+ ******************************************************************************/
+
+DrcMsgNonPlatedCutoutWithCopper::DrcMsgNonPlatedCutoutWithCopper(
+    const Data::Polygon& polygon, const Data::Device* device,
+    const QVector<Path>& locations) noexcept
+  : RuleCheckMessage(Severity::Warning, determineMessage(),
+                     determineDescription(), "nonplated_cutout_with_copper",
+                     locations) {
+  mApproval->ensureLineBreak();
+  if (device) {
+    mApproval->appendChild("device", device->uuid);
+    mApproval->ensureLineBreak();
+  }
+  mApproval->appendChild("polygon", polygon.uuid);
+  mApproval->ensureLineBreak();
+}
+
+DrcMsgNonPlatedCutoutWithCopper::DrcMsgNonPlatedCutoutWithCopper(
+    const Data::Circle& circle, const Data::Device* device,
+    const QVector<Path>& locations) noexcept
+  : RuleCheckMessage(Severity::Warning, determineMessage(),
+                     determineDescription(), "nonplated_cutout_with_copper",
+                     locations) {
+  mApproval->ensureLineBreak();
+  if (device) {
+    mApproval->appendChild("device", device->uuid);
+    mApproval->ensureLineBreak();
+  }
+  mApproval->appendChild("circle", circle.uuid);
+  mApproval->ensureLineBreak();
+}
+
+QString DrcMsgNonPlatedCutoutWithCopper::determineMessage() noexcept {
+  return tr("Non-plated cutout intersects with copper");
+}
+
+QString DrcMsgNonPlatedCutoutWithCopper::determineDescription() noexcept {
+  return tr("Plated- and non-plated cutouts are exported to the same Gerber "
+            "file because there is no standardized way to send plated cutouts "
+            "to manufacturers. Some manufacturers just detect plated vs. "
+            "non-plated cutouts by the existence of copper along their "
+            "outline.\n\nThis cutout is on the \"%1\" layer but intersects "
+            "with copper layers along its outline, therefore this detection "
+            "might fail, possibly leading to wrong manufacturing. It is "
+            "recommended to remove any copper along the cutouts outline.")
+      .arg(Layer::boardCutouts().getNameTr());
+}
+
+/*******************************************************************************
  *  DrcMsgEmptyNetSegment
  ******************************************************************************/
 

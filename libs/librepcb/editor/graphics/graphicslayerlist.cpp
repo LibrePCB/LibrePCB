@@ -388,6 +388,7 @@ QSet<QString> GraphicsLayerList::getCommonLayers() noexcept {
   // layers.insert(Theme::Color::sBoardBackground));
   // layers.insert(Theme::Color::sBoardErcAirWires));
   layers.insert(Theme::Color::sBoardOutlines);
+  layers.insert(Theme::Color::sBoardPlatedCutouts);
   layers.insert(Theme::Color::sBoardHoles);
   layers.insert(Theme::Color::sBoardVias);
   layers.insert(Theme::Color::sBoardPads);
