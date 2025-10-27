@@ -35,7 +35,7 @@
 #include "../sqlitedatabase.h"
 #include "../types/uuid.h"
 #include "../types/version.h"
-
+#include "../library/corp/corporate.h"
 #include <QtCore>
 #include <QtSql>
 
@@ -313,6 +313,29 @@ void WorkspaceLibraryDbWriter::createAllTables() {
       "`unit` TEXT"
       ")");
 
+  // corporates
+  queries << QString(
+      "CREATE TABLE IF NOT EXISTS corporates ("
+      "`id` INTEGER PRIMARY KEY NOT NULL, "
+      "`library_id` INTEGER NOT NULL, "
+      "`filepath` TEXT UNIQUE NOT NULL, "
+      "`uuid` TEXT NOT NULL, "
+      "`version` TEXT NOT NULL, "
+      "`deprecated` BOOLEAN NOT NULL, "
+      "`url` TEXT"
+      ")");
+  queries << QString(
+      "CREATE TABLE IF NOT EXISTS corporates_tr ("
+      "`id` INTEGER PRIMARY KEY NOT NULL, "
+      "`element_id` INTEGER "
+      "REFERENCES corporates(id) ON DELETE CASCADE NOT NULL, "
+      "`locale` TEXT NOT NULL, "
+      "`name` TEXT, "
+      "`description` TEXT, "
+      "`keywords` TEXT, "
+      "UNIQUE(element_id, locale)"
+      ")");
+
   // execute queries
   foreach (const QString& string, queries) {
     QSqlQuery query = mDb.prepareQuery(string);
@@ -415,6 +438,23 @@ int WorkspaceLibraryDbWriter::addPartAttribute(int partId,
   return mDb.insert(query);
 }
 
+int WorkspaceLibraryDbWriter::addCorporate(int libId, const FilePath& fp,
+                                           const Uuid& uuid,
+                                           const Version& version,
+                                           bool deprecated, const QUrl& url) {
+  QSqlQuery query = mDb.prepareQuery(
+      "INSERT INTO corporates "
+      "(library_id, filepath, uuid, version, deprecated, url) VALUES "
+      "(:library_id, :filepath, :uuid, :version, :deprecated, :url)");
+  query.bindValue(":library_id", libId);
+  query.bindValue(":filepath", filePathToString(fp));
+  query.bindValue(":uuid", uuid.toStr());
+  query.bindValue(":version", version.toStr());
+  query.bindValue(":deprecated", deprecated);
+  query.bindValue(":url", url);
+  return mDb.insert(query);
+}
+
 int WorkspaceLibraryDbWriter::addAlternativeName(
     int pkgId, const ElementName& name, const SimpleString& reference) {
   QSqlQuery query = mDb.prepareQuery(
@@ -465,6 +505,11 @@ QString WorkspaceLibraryDbWriter::getElementTable<Component>() noexcept {
 template <>
 QString WorkspaceLibraryDbWriter::getElementTable<Device>() noexcept {
   return "devices";
+}
+
+template <>
+QString WorkspaceLibraryDbWriter::getElementTable<Corporate>() noexcept {
+  return "corporates";
 }
 
 template <>

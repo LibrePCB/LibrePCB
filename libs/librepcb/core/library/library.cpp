@@ -29,6 +29,7 @@
 #include "cat/componentcategory.h"
 #include "cat/packagecategory.h"
 #include "cmp/component.h"
+#include "corp/corporate.h"
 #include "dev/device.h"
 #include "pkg/package.h"
 #include "sym/symbol.h"
@@ -103,6 +104,7 @@ template QString Library::getElementsDirectoryName<Symbol>() const noexcept;
 template QString Library::getElementsDirectoryName<Package>() const noexcept;
 template QString Library::getElementsDirectoryName<Component>() const noexcept;
 template QString Library::getElementsDirectoryName<Device>() const noexcept;
+template QString Library::getElementsDirectoryName<Corporate>() const noexcept;
 
 QPixmap Library::getIconAsPixmap() const noexcept {
   QPixmap p;
@@ -165,6 +167,7 @@ template QStringList Library::searchForElements<Symbol>() const noexcept;
 template QStringList Library::searchForElements<Package>() const noexcept;
 template QStringList Library::searchForElements<Component>() const noexcept;
 template QStringList Library::searchForElements<Device>() const noexcept;
+template QStringList Library::searchForElements<Corporate>() const noexcept;
 
 std::unique_ptr<Library> Library::open(
     std::unique_ptr<TransactionalDirectory> directory,

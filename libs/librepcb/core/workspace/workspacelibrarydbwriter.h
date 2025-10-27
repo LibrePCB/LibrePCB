@@ -193,6 +193,20 @@ public:
   int addPartAttribute(int partId, const Attribute& attribute);
 
   /**
+   * @brief #addElement() specialized for corporates
+   *
+   * @param libId         ID of the library containing this corporate.
+   * @param fp            Filepath of the corporate.
+   * @param uuid          UUID of the corporate.
+   * @param version       Version of the corporate.
+   * @param deprecated    Whether the corporate is deprecated or not.
+   * @param url           Website URL.
+   * @return ID of the added corporate.
+   */
+  int addCorporate(int libId, const FilePath& fp, const Uuid& uuid,
+                   const Version& version, bool deprecated, const QUrl& url);
+
+  /**
    * @brief Remove a library element
    *
    * @note  This will automatically remove its translations and categories
