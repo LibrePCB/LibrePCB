@@ -28,6 +28,7 @@
 #include "../library/cat/componentcategory.h"
 #include "../library/cat/packagecategory.h"
 #include "../library/cmp/component.h"
+#include "../library/corp/corporate.h"
 #include "../library/dev/device.h"
 #include "../library/library.h"
 #include "../library/pkg/package.h"
@@ -35,7 +36,7 @@
 #include "../sqlitedatabase.h"
 #include "../types/uuid.h"
 #include "../types/version.h"
-#include "../library/corp/corporate.h"
+
 #include <QtCore>
 #include <QtSql>
 

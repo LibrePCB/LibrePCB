@@ -49,11 +49,11 @@ Corporate::Corporate(std::unique_ptr<TransactionalDirectory> directory,
                      const SExpression& root)
   : LibraryBaseElement(getShortElementName(), getLongElementName(), true,
                        std::move(directory), root),
+    mIcon(),  // Initialized below.
     // Note: Don't use SExpression::getValueByPath<QUrl>() because it would
     // throw an exception if the URL is empty, which is actually legal in this
     // case.
-    mUrl(root.getChild("url/@0").getValue(), QUrl::StrictMode),
-    mIcon()  // Initialized below.
+    mUrl(root.getChild("url/@0").getValue(), QUrl::StrictMode)
 {
   // Load image if available.
   mIcon = mDirectory->readIfExists("logo.png");  // can throw

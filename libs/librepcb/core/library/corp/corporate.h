@@ -54,13 +54,13 @@ public:
   ~Corporate() noexcept;
 
   // Getters
-  const QUrl& getUrl() const noexcept { return mUrl; }
   const QByteArray& getIcon() const noexcept { return mIcon; }
   QPixmap getIconAsPixmap() const noexcept;
+  const QUrl& getUrl() const noexcept { return mUrl; }
 
   // Setters
-  void setUrl(const QUrl& url) noexcept { mUrl = url; }
   void setIcon(const QByteArray& png) noexcept { mIcon = png; }
+  void setUrl(const QUrl& url) noexcept { mUrl = url; }
 
   // General Methods
   virtual RuleCheckMessageList runChecks() const override;
@@ -88,8 +88,8 @@ private:  // Methods
             const SExpression& root);
 
 private:  // Data
-  QUrl mUrl;
   QByteArray mIcon;
+  QUrl mUrl;
 };
 
 /*******************************************************************************

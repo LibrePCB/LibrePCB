@@ -175,8 +175,8 @@ void WorkspaceLibraryScanner::scan() noexcept {
                                        lib->searchForElements<Device>(), libId);
       emit scanProgressUpdate(percent += qreal(98) / fraction);
       if (mAbort || (mSemaphore.available() > 0)) break;
-      count += addElementsToDb<Corporate>(writer, fp,
-                                       lib->searchForElements<Corporate>(), libId);
+      count += addElementsToDb<Corporate>(
+          writer, fp, lib->searchForElements<Corporate>(), libId);
       emit scanProgressUpdate(percent += qreal(98) / fraction);
     }
 
