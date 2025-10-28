@@ -378,9 +378,11 @@ int WorkspaceLibraryScanner::addElementToDb<Device>(
 template <>
 int WorkspaceLibraryScanner::addElementToDb<Corporate>(
     WorkspaceLibraryDbWriter& writer, int libId, const Corporate& element) {
-  const int id = writer.addCorporate(libId, element.getDirectory().getAbsPath(),
-                                     element.getUuid(), element.getVersion(),
-                                     element.isDeprecated(), element.getUrl());
+  const int id = writer.addCorporate(
+      libId, element.getDirectory().getAbsPath(), element.getUuid(),
+      element.getVersion(), element.isDeprecated(), element.getIcon(),
+      element.getUrl(), element.getCountry(), element.getFabs(),
+      element.getShipping(), element.getPcbCapabilities().count());
   return id;
 }
 

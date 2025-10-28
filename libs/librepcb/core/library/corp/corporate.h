@@ -24,6 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include "../librarybaseelement.h"
+#include "pcbmanufacturercapabilities.h"
 
 #include <QtCore>
 
@@ -57,6 +58,13 @@ public:
   const QByteArray& getIcon() const noexcept { return mIcon; }
   QPixmap getIconAsPixmap() const noexcept;
   const QUrl& getUrl() const noexcept { return mUrl; }
+  const QString& getCountry() const noexcept { return mCountry; }
+  const QStringList& getFabs() const noexcept { return mFabs; }
+  const QStringList& getShipping() const noexcept { return mShipping; }
+  const QVector<PcbManufacturerCapabilities>& getPcbCapabilities()
+      const noexcept {
+    return mPcbCapabilities;
+  }
 
   // Setters
   void setIcon(const QByteArray& png) noexcept { mIcon = png; }
@@ -90,6 +98,14 @@ private:  // Methods
 private:  // Data
   QByteArray mIcon;
   QUrl mUrl;
+  QString mCountry;
+  QStringList mFabs;
+  QStringList mShipping;
+  QVector<PcbManufacturerCapabilities> mPcbCapabilities;
+
+  // Arbitrary options for forward compatibility in case we really need to
+  // add new settings in a minor release.
+  QMap<QString, QList<SExpression>> mOptions;
 };
 
 /*******************************************************************************

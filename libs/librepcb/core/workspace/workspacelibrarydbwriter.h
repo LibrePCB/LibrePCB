@@ -200,11 +200,19 @@ public:
    * @param uuid          UUID of the corporate.
    * @param version       Version of the corporate.
    * @param deprecated    Whether the corporate is deprecated or not.
+   * @param iconPng       Icon as a PNG.
    * @param url           Website URL.
+   * @param country       Country code (e.g. "DE").
+   * @param fabs          Country codes of fabs (e.g. "DE").
+   * @param shipping      Shipping options (e.g. "worldwide").
+   * @param pcbCaps       Number of available PCB capability sets.
    * @return ID of the added corporate.
    */
   int addCorporate(int libId, const FilePath& fp, const Uuid& uuid,
-                   const Version& version, bool deprecated, const QUrl& url);
+                   const Version& version, bool deprecated,
+                   const QByteArray& iconPng, const QUrl& url,
+                   const QString& country, const QStringList& fabs,
+                   const QStringList& shipping, int pcbCaps);
 
   /**
    * @brief Remove a library element

@@ -17,14 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CORE_PcbManufacturerCapabilities_H
-#define LIBREPCB_CORE_PcbManufacturerCapabilities_H
+#ifndef LIBREPCB_CORE_PCBMANUFACTURERCAPABILITIES_H
+#define LIBREPCB_CORE_PCBMANUFACTURERCAPABILITIES_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../types/length.h"
 #include "../../serialization/serializablekeyvaluemap.h"
+#include "../../types/length.h"
 #include "../../types/uuid.h"
 
 #include <QtCore>
@@ -34,8 +34,8 @@
  ******************************************************************************/
 namespace librepcb {
 
-class SExpression;
 class PcbColor;
+class SExpression;
 
 /*******************************************************************************
  *  Class PcbManufacturerCapabilities
@@ -57,7 +57,7 @@ public:
   // Constructors / Destructor
   PcbManufacturerCapabilities() noexcept = delete;
   PcbManufacturerCapabilities(
-      const PcbManufacturerCapabilities& other) noexcept = delete;
+      const PcbManufacturerCapabilities& other) noexcept;
   explicit PcbManufacturerCapabilities(const SExpression& node);
   ~PcbManufacturerCapabilities() noexcept;
 
@@ -66,6 +66,29 @@ public:
   const LocalizedNameMap& getNames() const noexcept { return mNames; }
   const LocalizedDescriptionMap& getDescriptions() const noexcept {
     return mDescriptions;
+  }
+  const QUrl& getUrl() const noexcept { return mUrl; }
+  const std::pair<UnsignedLength, UnsignedLength>& getMinBoardSize()
+      const noexcept {
+    return mMinBoardSize;
+  }
+  const std::pair<UnsignedLength, UnsignedLength>& getMaxBoardSizeDoubleSided()
+      const noexcept {
+    return mMaxBoardSizeDoubleSided;
+  }
+  const std::pair<UnsignedLength, UnsignedLength>& getMaxBoardSizeMultiLayer()
+      const noexcept {
+    return mMaxBoardSizeMultiLayer;
+  }
+  const QSet<PositiveLength>& getPcbThickness() const noexcept {
+    return mPcbThickness;
+  }
+  uint getMaxInnerLayerCount() const noexcept { return mMaxInnerLayerCount; }
+  const QSet<const PcbColor*>& getSolderResist() const noexcept {
+    return mSolderResist;
+  }
+  const QSet<const PcbColor*>& getSilkscreen() const noexcept {
+    return mSilkscreen;
   }
   const UnsignedLength& getMinCopperCopperClearance() const noexcept {
     return mMinCopperCopperClearance;
@@ -189,11 +212,7 @@ public:
 
   // Operator Overloadings
   PcbManufacturerCapabilities& operator=(
-      const PcbManufacturerCapabilities& rhs) noexcept = delete;
-  //bool operator==(const PcbManufacturerCapabilities& rhs) const noexcept;
-  //bool operator!=(const PcbManufacturerCapabilities& rhs) const noexcept {
-  //  return !(*this == rhs);
-  //}
+      const PcbManufacturerCapabilities& rhs) noexcept;
 
 private:  // Data
   // Attributes
@@ -203,14 +222,13 @@ private:  // Data
   QUrl mUrl;
 
   // General
-  UnsignedLength mMinBoardWidth;
-  UnsignedLength mMinBoardHeight;
-  UnsignedLength mMaxBoardWidth;
-  UnsignedLength mMaxBoardHeight;
+  std::pair<UnsignedLength, UnsignedLength> mMinBoardSize;
+  std::pair<UnsignedLength, UnsignedLength> mMaxBoardSizeDoubleSided;
+  std::pair<UnsignedLength, UnsignedLength> mMaxBoardSizeMultiLayer;
   QSet<PositiveLength> mPcbThickness;
-  int mMaxInnerLayerCount;
-  QSet<const PcbColor*> mSolderResist;
-  QSet<const PcbColor*> mSilkscreen;
+  uint mMaxInnerLayerCount;
+  QSet<const PcbColor*> mSolderResist;  ///< May include `nullptr`
+  QSet<const PcbColor*> mSilkscreen;  ///< May include `nullptr`
 
   // Clearances
   UnsignedLength mMinCopperCopperClearance;

@@ -323,7 +323,12 @@ void WorkspaceLibraryDbWriter::createAllTables() {
       "`uuid` TEXT NOT NULL, "
       "`version` TEXT NOT NULL, "
       "`deprecated` BOOLEAN NOT NULL, "
-      "`url` TEXT"
+      "`icon_png` BLOB, "
+      "`url` TEXT, "
+      "`country` TEXT NOT NULL, "
+      "`fabs` TEXT NOT NULL, "
+      "`shipping` TEXT NOT NULL, "
+      "`pcb_capabilities` INTEGER NOT NULL"
       ")");
   queries << QString(
       "CREATE TABLE IF NOT EXISTS corporates_tr ("
@@ -439,20 +444,28 @@ int WorkspaceLibraryDbWriter::addPartAttribute(int partId,
   return mDb.insert(query);
 }
 
-int WorkspaceLibraryDbWriter::addCorporate(int libId, const FilePath& fp,
-                                           const Uuid& uuid,
-                                           const Version& version,
-                                           bool deprecated, const QUrl& url) {
+int WorkspaceLibraryDbWriter::addCorporate(
+    int libId, const FilePath& fp, const Uuid& uuid, const Version& version,
+    bool deprecated, const QByteArray& iconPng, const QUrl& url,
+    const QString& country, const QStringList& fabs,
+    const QStringList& shipping, int pcbCaps) {
   QSqlQuery query = mDb.prepareQuery(
       "INSERT INTO corporates "
-      "(library_id, filepath, uuid, version, deprecated, url) VALUES "
-      "(:library_id, :filepath, :uuid, :version, :deprecated, :url)");
+      "(library_id, filepath, uuid, version, deprecated, icon_png, url, "
+      "country, fabs, shipping, pcb_capabilities) VALUES "
+      "(:library_id, :filepath, :uuid, :version, :deprecated, :icon_png, "
+      ":url, :country, :fabs, :shipping, :pcb_capabilities)");
   query.bindValue(":library_id", libId);
   query.bindValue(":filepath", filePathToString(fp));
   query.bindValue(":uuid", uuid.toStr());
   query.bindValue(":version", version.toStr());
   query.bindValue(":deprecated", deprecated);
+  query.bindValue(":icon_png", iconPng);
   query.bindValue(":url", url);
+  query.bindValue(":country", nonNull(country));
+  query.bindValue(":fabs", nonNull(fabs.join(",")));
+  query.bindValue(":shipping", nonNull(shipping.join(",")));
+  query.bindValue(":pcb_capabilities", pcbCaps);
   return mDb.insert(query);
 }
 

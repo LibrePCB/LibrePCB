@@ -53,10 +53,22 @@ Corporate::Corporate(std::unique_ptr<TransactionalDirectory> directory,
     // Note: Don't use SExpression::getValueByPath<QUrl>() because it would
     // throw an exception if the URL is empty, which is actually legal in this
     // case.
-    mUrl(root.getChild("url/@0").getValue(), QUrl::StrictMode)
+    mUrl(root.getChild("url/@0").getValue(), QUrl::StrictMode),
+    mCountry(root.getChild("country/@0").getValue()),
+    mFabs(root.getChild("fabs/@0").getValue().split(",")),
+    mShipping(root.getChild("shipping/@0").getValue().split(",")),
+    mPcbCapabilities(),  // Initialized below.
+    mOptions()  // Initialized below.
 {
   // Load image if available.
   mIcon = mDirectory->readIfExists("logo.png");  // can throw
+
+  if (const SExpression* node = root.tryGetChild("pcb_capabilities")) {
+    mPcbCapabilities.append(PcbManufacturerCapabilities(*node));  // can throw
+  }
+  foreach (const SExpression* child, root.getChildren("option")) {
+    mOptions[child->getChild("@0").getValue()].append(*child);
+  }
 }
 
 Corporate::~Corporate() noexcept {
@@ -128,6 +140,23 @@ void Corporate::serialize(SExpression& root) const {
   LibraryBaseElement::serialize(root);
   root.ensureLineBreak();
   root.appendChild("url", mUrl);
+  root.ensureLineBreak();
+  root.appendChild("country", mCountry);
+  root.ensureLineBreak();
+  root.appendChild("fabs", mFabs.join(","));
+  root.ensureLineBreak();
+  root.appendChild("shipping", mShipping.join(","));
+  root.ensureLineBreak();
+  for (const PcbManufacturerCapabilities& caps : mPcbCapabilities) {
+    caps.serialize(root.appendList("pcb_capabilities"));
+    root.ensureLineBreak();
+  }
+  foreach (const auto& list, mOptions) {
+    foreach (const auto& node, list) {
+      root.ensureLineBreak();
+      root.appendChild(node);
+    }
+  }
   root.ensureLineBreak();
   serializeMessageApprovals(root);
   root.ensureLineBreak();

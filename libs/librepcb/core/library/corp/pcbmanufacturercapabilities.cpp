@@ -75,11 +75,64 @@ inline PcbManufacturerCapabilities::AllowedSlots deserialize(
  ******************************************************************************/
 
 PcbManufacturerCapabilities::PcbManufacturerCapabilities(
+    const PcbManufacturerCapabilities& other) noexcept
+  : mUuid(other.mUuid),
+    mNames(other.mNames),
+    mDescriptions(other.mDescriptions),
+    mUrl(other.mUrl),
+    mMinBoardSize(other.mMinBoardSize),
+    mMaxBoardSizeDoubleSided(other.mMaxBoardSizeDoubleSided),
+    mMaxBoardSizeMultiLayer(other.mMaxBoardSizeMultiLayer),
+    mPcbThickness(other.mPcbThickness),
+    mMaxInnerLayerCount(other.mMaxInnerLayerCount),
+    mSolderResist(other.mSolderResist),
+    mSilkscreen(other.mSilkscreen),
+    mMinCopperCopperClearance(other.mMinCopperCopperClearance),
+    mMinCopperBoardClearance(other.mMinCopperBoardClearance),
+    mMinCopperNpthClearance(other.mMinCopperNpthClearance),
+    mMinDrillDrillClearance(other.mMinDrillDrillClearance),
+    mMinDrillBoardClearance(other.mMinDrillBoardClearance),
+    mMinSilkscreenStopmaskClearance(other.mMinSilkscreenStopmaskClearance),
+    mMinCopperWidth(other.mMinCopperWidth),
+    mMinPthAnnularRing(other.mMinPthAnnularRing),
+    mMinNpthDrillDiameter(other.mMinNpthDrillDiameter),
+    mMinPthDrillDiameter(other.mMinPthDrillDiameter),
+    mMinNpthSlotWidth(other.mMinNpthSlotWidth),
+    mMinPthSlotWidth(other.mMinPthSlotWidth),
+    mMinSilkscreenWidth(other.mMinSilkscreenWidth),
+    mMinSilkscreenTextHeight(other.mMinSilkscreenTextHeight),
+    mMinOutlineToolDiameter(other.mMinOutlineToolDiameter),
+    mBlindViasAllowed(other.mBlindViasAllowed),
+    mBuriedViasAllowed(other.mBuriedViasAllowed),
+    mAllowedNpthSlots(other.mAllowedNpthSlots),
+    mAllowedPthSlots(other.mAllowedPthSlots) {
+}
+
+PcbManufacturerCapabilities::PcbManufacturerCapabilities(
     const SExpression& node)
-  :
-    mUuid(deserialize<Uuid>(node.getChild("@0"))),
+  : mUuid(deserialize<Uuid>(node.getChild("@0"))),
     mNames(node),
     mDescriptions(node),
+    // Note: Don't use SExpression::getValueByPath<QUrl>() because it would
+    // throw an exception if the URL is empty, which is actually legal in this
+    // case.
+    mUrl(node.getChild("url/@0").getValue(), QUrl::StrictMode),
+    mMinBoardSize{
+        deserialize<UnsignedLength>(node.getChild("min_pcb_size/@0")),
+        deserialize<UnsignedLength>(node.getChild("min_pcb_size/@1"))},
+    mMaxBoardSizeDoubleSided{deserialize<UnsignedLength>(
+                                 node.getChild("max_pcb_size/double_sided/@0")),
+                             deserialize<UnsignedLength>(node.getChild(
+                                 "max_pcb_size/double_sided/@1"))},
+    mMaxBoardSizeMultiLayer{deserialize<UnsignedLength>(
+                                node.getChild("max_pcb_size/multilayer/@0")),
+                            deserialize<UnsignedLength>(
+                                node.getChild("max_pcb_size/multilayer/@1"))},
+    mPcbThickness(),  // Initialized below.
+    mMaxInnerLayerCount(
+        deserialize<uint>(node.getChild("max_inner_layers/@0"))),
+    mSolderResist(),  // Initialized below.
+    mSilkscreen(),  // Initialized below.
     mMinCopperCopperClearance(deserialize<UnsignedLength>(
         node.getChild("min_copper_copper_clearance/@0"))),
     mMinCopperBoardClearance(deserialize<UnsignedLength>(
@@ -118,6 +171,18 @@ PcbManufacturerCapabilities::PcbManufacturerCapabilities(
         deserialize<AllowedSlots>(node.getChild("allowed_npth_slots/@0"))),
     mAllowedPthSlots(
         deserialize<AllowedSlots>(node.getChild("allowed_pth_slots/@0"))) {
+  for (const SExpression* child :
+       node.getChild("pcb_thickness").getChildren(SExpression::Type::Token)) {
+    mPcbThickness.insert(deserialize<PositiveLength>(*child));
+  }
+  for (const SExpression* child :
+       node.getChild("solder_resist").getChildren(SExpression::Type::Token)) {
+    mSolderResist.insert(deserialize<const PcbColor*>(*child));
+  }
+  for (const SExpression* child :
+       node.getChild("silkscreen").getChildren(SExpression::Type::Token)) {
+    mSilkscreen.insert(deserialize<const PcbColor*>(*child));
+  }
 }
 
 PcbManufacturerCapabilities::~PcbManufacturerCapabilities() noexcept {
@@ -133,6 +198,45 @@ void PcbManufacturerCapabilities::serialize(SExpression& root) const {
   mNames.serialize(root);
   root.ensureLineBreak();
   mDescriptions.serialize(root);
+  root.ensureLineBreak();
+  root.appendChild("url", mUrl);
+  root.ensureLineBreak();
+  {
+    SExpression& child = root.appendList("min_pcb_size");
+    child.appendChild(mMinBoardSize.first);
+    child.appendChild(mMinBoardSize.second);
+  }
+  root.ensureLineBreak();
+  {
+    SExpression& child = root.appendList("max_pcb_size");
+    SExpression& doubleSided = child.appendList("double_sided");
+    doubleSided.appendChild(mMaxBoardSizeDoubleSided.first);
+    doubleSided.appendChild(mMaxBoardSizeDoubleSided.second);
+    SExpression& multilayer = child.appendList("multilayer");
+    multilayer.appendChild(mMaxBoardSizeMultiLayer.first);
+    multilayer.appendChild(mMaxBoardSizeMultiLayer.second);
+  }
+  root.ensureLineBreak();
+  {
+    SExpression& child = root.appendList("pcb_thickness");
+    for (const PositiveLength& value : mPcbThickness) {
+      child.appendChild(value);
+    }
+  }
+  root.ensureLineBreak();
+  {
+    SExpression& child = root.appendList("solder_resist");
+    for (const PcbColor* value : mSolderResist) {
+      child.appendChild(value);
+    }
+  }
+  root.ensureLineBreak();
+  {
+    SExpression& child = root.appendList("silkscreen");
+    for (const PcbColor* value : mSilkscreen) {
+      child.appendChild(value);
+    }
+  }
   root.ensureLineBreak();
   root.appendChild("min_copper_copper_clearance", mMinCopperCopperClearance);
   root.ensureLineBreak();
@@ -173,6 +277,45 @@ void PcbManufacturerCapabilities::serialize(SExpression& root) const {
   root.ensureLineBreak();
   root.appendChild("allowed_pth_slots", mAllowedPthSlots);
   root.ensureLineBreak();
+}
+
+/*******************************************************************************
+ *  Operator Overloadings
+ ******************************************************************************/
+
+PcbManufacturerCapabilities& PcbManufacturerCapabilities::operator=(
+    const PcbManufacturerCapabilities& rhs) noexcept {
+  mUuid = rhs.mUuid;
+  mNames = rhs.mNames;
+  mDescriptions = rhs.mDescriptions;
+  mUrl = rhs.mUrl;
+  mMinBoardSize = rhs.mMinBoardSize;
+  mMaxBoardSizeDoubleSided = rhs.mMaxBoardSizeDoubleSided;
+  mMaxBoardSizeMultiLayer = rhs.mMaxBoardSizeMultiLayer;
+  mPcbThickness = rhs.mPcbThickness;
+  mMaxInnerLayerCount = rhs.mMaxInnerLayerCount;
+  mSolderResist = rhs.mSolderResist;
+  mSilkscreen = rhs.mSilkscreen;
+  mMinCopperCopperClearance = rhs.mMinCopperCopperClearance;
+  mMinCopperBoardClearance = rhs.mMinCopperBoardClearance;
+  mMinCopperNpthClearance = rhs.mMinCopperNpthClearance;
+  mMinDrillDrillClearance = rhs.mMinDrillDrillClearance;
+  mMinDrillBoardClearance = rhs.mMinDrillBoardClearance;
+  mMinSilkscreenStopmaskClearance = rhs.mMinSilkscreenStopmaskClearance;
+  mMinCopperWidth = rhs.mMinCopperWidth;
+  mMinPthAnnularRing = rhs.mMinPthAnnularRing;
+  mMinNpthDrillDiameter = rhs.mMinNpthDrillDiameter;
+  mMinPthDrillDiameter = rhs.mMinPthDrillDiameter;
+  mMinNpthSlotWidth = rhs.mMinNpthSlotWidth;
+  mMinPthSlotWidth = rhs.mMinPthSlotWidth;
+  mMinSilkscreenWidth = rhs.mMinSilkscreenWidth;
+  mMinSilkscreenTextHeight = rhs.mMinSilkscreenTextHeight;
+  mMinOutlineToolDiameter = rhs.mMinOutlineToolDiameter;
+  mBlindViasAllowed = rhs.mBlindViasAllowed;
+  mBuriedViasAllowed = rhs.mBuriedViasAllowed;
+  mAllowedNpthSlots = rhs.mAllowedNpthSlots;
+  mAllowedPthSlots = rhs.mAllowedPthSlots;
+  return *this;
 }
 
 /*******************************************************************************

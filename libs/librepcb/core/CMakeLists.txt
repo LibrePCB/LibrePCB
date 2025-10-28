@@ -259,6 +259,8 @@ add_library(
   library/corp/corporatecheck.h
   library/corp/corporatecheckmessages.cpp
   library/corp/corporatecheckmessages.h
+  library/corp/pcbmanufacturercapabilities.cpp
+  library/corp/pcbmanufacturercapabilities.h
   library/dev/device.cpp
   library/dev/device.h
   library/dev/devicecheck.cpp
@@ -357,7 +359,6 @@ add_library(
   project/board/boardstroketextdata.cpp
   project/board/boardstroketextdata.h
   project/board/boardzonedata.cpp
-  library/corp/pcbmanufacturercapabilities.h library/corp/pcbmanufacturercapabilities.cpp
   project/board/boardzonedata.h
   project/board/drc/boardclipperpathgenerator.cpp
   project/board/drc/boardclipperpathgenerator.h
