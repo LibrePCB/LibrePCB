@@ -125,7 +125,7 @@ void FileFormatMigrationUnstable::upgradeCircuit(SExpression& root,
 }
 
 void FileFormatMigrationUnstable::upgradeBoard(SExpression& root) {
-  // Design rules
+  // Design rules.
   {
     SExpression& rulesNode = root.getChild("design_rules");
     rulesNode.appendChild("default_trace_width",

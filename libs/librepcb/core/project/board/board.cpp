@@ -326,6 +326,10 @@ void Board::setDrcSettings(
   *mDrcSettings = settings;
 }
 
+void Board::setManufacturers(const QVector<Manufacturer>& manufacturers) noexcept {
+  mManufacturers = manufacturers;
+}
+
 /*******************************************************************************
  *  DRC Message Approval Methods
  ******************************************************************************/

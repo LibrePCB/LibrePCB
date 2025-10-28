@@ -27,7 +27,7 @@
 #include "../library/dev/device.h"
 #include "../library/pkg/package.h"
 #include "../library/sym/symbol.h"
-
+#include "../library/corp/corporate.h"
 #include <QtCore>
 
 /*******************************************************************************
@@ -84,6 +84,10 @@ void ProjectLibrary::addDevice(Device& d) {
   addElement<Device>(d, mDevices);
 }
 
+void ProjectLibrary::addCorporate(Corporate& c) {
+  addElement<Corporate>(c, mCorporates);
+}
+
 void ProjectLibrary::removeSymbol(Symbol& s) {
   removeElement<Symbol>(s, mSymbols);
 }
@@ -98,6 +102,10 @@ void ProjectLibrary::removeComponent(Component& c) {
 
 void ProjectLibrary::removeDevice(Device& d) {
   removeElement<Device>(d, mDevices);
+}
+
+void ProjectLibrary::removeCorporate(Corporate& c) {
+  removeElement<Corporate>(c, mCorporates);
 }
 
 /*******************************************************************************

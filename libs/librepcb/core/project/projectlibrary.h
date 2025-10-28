@@ -41,6 +41,7 @@ class LibraryBaseElement;
 class Package;
 class Project;
 class Symbol;
+class Corporate;
 
 /*******************************************************************************
  *  Class ProjectLibrary
@@ -71,6 +72,7 @@ public:
     return mComponents;
   }
   const QHash<Uuid, Device*>& getDevices() const noexcept { return mDevices; }
+  const QHash<Uuid, Corporate*>& getCorporates() const noexcept { return mCorporates; }
   Symbol* getSymbol(const Uuid& uuid) const noexcept {
     return mSymbols.value(uuid);
   }
@@ -83,6 +85,9 @@ public:
   Device* getDevice(const Uuid& uuid) const noexcept {
     return mDevices.value(uuid);
   }
+  Corporate* getCorporate(const Uuid& uuid) const noexcept {
+    return mCorporates.value(uuid);
+  }
 
   // Getters: Special Queries
   QHash<Uuid, Device*> getDevicesOfComponent(
@@ -93,10 +98,12 @@ public:
   void addPackage(Package& p);
   void addComponent(Component& c);
   void addDevice(Device& d);
+  void addCorporate(Corporate& c);
   void removeSymbol(Symbol& s);
   void removePackage(Package& p);
   void removeComponent(Component& c);
   void removeDevice(Device& d);
+  void removeCorporate(Corporate& c);
 
   // Operator Overloadings
   ProjectLibrary& operator=(const ProjectLibrary& rhs) = delete;
@@ -117,6 +124,7 @@ private:
   QHash<Uuid, Package*> mPackages;
   QHash<Uuid, Component*> mComponents;
   QHash<Uuid, Device*> mDevices;
+  QHash<Uuid, Corporate*> mCorporates;
 
   QSet<LibraryBaseElement*> mAllElements;
 };

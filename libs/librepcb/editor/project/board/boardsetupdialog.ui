@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="tabGeneral">
       <attribute name="title">
@@ -457,7 +457,7 @@
             <string notr="true"/>
            </property>
            <property name="pixmap">
-            <pixmap>:/img/status/dialog_warning.png</pixmap>
+            <pixmap resource="../../../../../img/images.qrc">:/img/status/dialog_warning.png</pixmap>
            </property>
            <property name="scaledContents">
             <bool>true</bool>
@@ -566,7 +566,7 @@ QAbstractScrollArea {
             <x>0</x>
             <y>0</y>
             <width>753</width>
-            <height>340</height>
+            <height>371</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -579,109 +579,151 @@ QAbstractScrollArea {
            <property name="sizeConstraint">
             <enum>QLayout::SetMinimumSize</enum>
            </property>
-           <item row="6" column="1">
-            <widget class="librepcb::editor::UnsignedLengthEdit" name="edtDrcMinCopperWidth" native="true"/>
+           <item row="3" column="3">
+            <widget class="librepcb::editor::UnsignedLengthEdit" name="edtDrcClearanceCopperBoard" native="true"/>
            </item>
-           <item row="8" column="0">
-            <widget class="QLabel" name="label_18">
+           <item row="3" column="1">
+            <widget class="librepcb::editor::UnsignedLengthEdit" name="edtDrcClearanceCopperCopper" native="true"/>
+           </item>
+           <item row="11" column="1">
+            <widget class="librepcb::editor::UnsignedLengthEdit" name="edtDrcMinPthDrillDiameter" native="true"/>
+           </item>
+           <item row="4" column="2">
+            <widget class="QLabel" name="label_32">
              <property name="text">
-              <string>NPTH Drill Diameter:</string>
+              <string>Silkscreen ↔ Stopmask:</string>
              </property>
             </widget>
            </item>
-           <item row="1" column="2">
+           <item row="10" column="3">
+            <widget class="librepcb::editor::UnsignedLengthEdit" name="edtDrcMinNpthSlotWidth" native="true"/>
+           </item>
+           <item row="10" column="1">
+            <widget class="librepcb::editor::UnsignedLengthEdit" name="edtDrcMinNpthDrillDiameter" native="true"/>
+           </item>
+           <item row="16" column="2">
+            <widget class="QCheckBox" name="cbxBuriedViasAllowed">
+             <property name="toolTip">
+              <string>Allow vias which start and end on inner copper layers.</string>
+             </property>
+             <property name="text">
+              <string>Buried Vias</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="2">
             <widget class="QLabel" name="label_23">
              <property name="text">
               <string>Copper ↔ Board Edge:</string>
              </property>
             </widget>
            </item>
-           <item row="9" column="1">
-            <widget class="librepcb::editor::UnsignedLengthEdit" name="edtDrcMinPthDrillDiameter" native="true"/>
+           <item row="8" column="3">
+            <widget class="librepcb::editor::UnsignedLengthEdit" name="edtDrcMinPthAnnularRing" native="true"/>
            </item>
-           <item row="2" column="1">
+           <item row="4" column="1">
             <widget class="librepcb::editor::UnsignedLengthEdit" name="edtDrcClearanceCopperNpth" native="true"/>
            </item>
-           <item row="9" column="2">
+           <item row="10" column="2">
+            <widget class="QLabel" name="label_16">
+             <property name="text">
+              <string>NPTH Slot Width:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="12" column="0">
+            <widget class="QLabel" name="label_33">
+             <property name="text">
+              <string>Silkscreen Width:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="11" column="2">
             <widget class="QLabel" name="label_15">
              <property name="text">
               <string>PTH Slot Width:</string>
              </property>
             </widget>
            </item>
-           <item row="14" column="0">
-            <widget class="QLabel" name="label_2">
+           <item row="5" column="2">
+            <widget class="QLabel" name="label_27">
              <property name="text">
-              <string>Via Types:</string>
+              <string>Drill ↔ Board Edge:</string>
              </property>
             </widget>
            </item>
-           <item row="6" column="0">
+           <item row="17" column="3">
+            <widget class="QComboBox" name="cbxDrcAllowedPthSlots">
+             <property name="insertPolicy">
+              <enum>QComboBox::NoInsert</enum>
+             </property>
+            </widget>
+           </item>
+           <item row="8" column="0">
             <widget class="QLabel" name="label_20">
              <property name="text">
               <string>Copper Width:</string>
              </property>
             </widget>
            </item>
-           <item row="3" column="3">
-            <widget class="librepcb::editor::UnsignedLengthEdit" name="edtDrcClearanceDrillBoard" native="true"/>
+           <item row="11" column="3">
+            <widget class="librepcb::editor::UnsignedLengthEdit" name="edtDrcMinPthSlotWidth" native="true"/>
            </item>
-           <item row="8" column="3">
-            <widget class="librepcb::editor::UnsignedLengthEdit" name="edtDrcMinNpthSlotWidth" native="true"/>
+           <item row="12" column="1">
+            <widget class="librepcb::editor::UnsignedLengthEdit" name="edtDrcMinSilkscreenWidth" native="true"/>
            </item>
-           <item row="11" column="1">
-            <widget class="librepcb::editor::UnsignedLengthEdit" name="edtDrcMinOutlineToolDiameter" native="true"/>
+           <item row="13" column="0">
+            <widget class="QLabel" name="label_30">
+             <property name="toolTip">
+              <string>Minimum board outline milling tool diameter. Restricts the radius of inner board edges.</string>
+             </property>
+             <property name="text">
+              <string>Outline Tool Diameter:</string>
+             </property>
+            </widget>
            </item>
-           <item row="3" column="1">
-            <widget class="librepcb::editor::UnsignedLengthEdit" name="edtDrcClearanceDrillDrill" native="true"/>
+           <item row="4" column="0">
+            <widget class="QLabel" name="label_14">
+             <property name="text">
+              <string>Copper ↔ Holes:</string>
+             </property>
+            </widget>
            </item>
-           <item row="4" column="0" colspan="4">
-            <layout class="QHBoxLayout" name="horizontalLayout_4">
-             <item>
-              <widget class="QLabel" name="label_25">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="font">
-                <font>
-                 <weight>75</weight>
-                 <bold>true</bold>
-                </font>
-               </property>
-               <property name="text">
-                <string>Minimum Sizes</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="Line" name="line_2">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-              </widget>
-             </item>
-            </layout>
+           <item row="16" column="1">
+            <widget class="QCheckBox" name="cbxBlindViasAllowed">
+             <property name="toolTip">
+              <string>Allow vias whith either start or end on an inner copper layer.</string>
+             </property>
+             <property name="text">
+              <string>Blind Vias</string>
+             </property>
+            </widget>
            </item>
-           <item row="15" column="2">
+           <item row="17" column="2">
             <widget class="QLabel" name="label_17">
              <property name="text">
               <string>PTH Slots:</string>
              </property>
             </widget>
            </item>
-           <item row="1" column="3">
-            <widget class="librepcb::editor::UnsignedLengthEdit" name="edtDrcClearanceCopperBoard" native="true"/>
+           <item row="12" column="3">
+            <widget class="librepcb::editor::UnsignedLengthEdit" name="edtDrcMinSilkscreenTextHeight" native="true"/>
            </item>
-           <item row="12" column="0" colspan="4">
+           <item row="17" column="1">
+            <widget class="QComboBox" name="cbxDrcAllowedNpthSlots">
+             <property name="insertPolicy">
+              <enum>QComboBox::NoInsert</enum>
+             </property>
+            </widget>
+           </item>
+           <item row="8" column="2">
+            <widget class="QLabel" name="label_22">
+             <property name="text">
+              <string>PTH Annular Ring:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="14" column="0" colspan="4">
             <layout class="QHBoxLayout" name="horizontalLayout_5">
              <item>
               <widget class="QLabel" name="label_29">
@@ -717,87 +759,120 @@ QAbstractScrollArea {
              </item>
             </layout>
            </item>
-           <item row="1" column="0">
+           <item row="13" column="1">
+            <widget class="librepcb::editor::UnsignedLengthEdit" name="edtDrcMinOutlineToolDiameter" native="true"/>
+           </item>
+           <item row="3" column="0">
             <widget class="QLabel" name="label_19">
              <property name="text">
               <string>Copper ↔ Copper:</string>
              </property>
             </widget>
            </item>
-           <item row="15" column="0">
+           <item row="6" column="0" colspan="4">
+            <layout class="QHBoxLayout" name="horizontalLayout_4">
+             <item>
+              <widget class="QLabel" name="label_25">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="font">
+                <font>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="text">
+                <string>Minimum Sizes</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="Line" name="line_2">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item row="10" column="0">
+            <widget class="QLabel" name="label_18">
+             <property name="text">
+              <string>NPTH Drill Diameter:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="8" column="1">
+            <widget class="librepcb::editor::UnsignedLengthEdit" name="edtDrcMinCopperWidth" native="true"/>
+           </item>
+           <item row="5" column="0">
+            <widget class="QLabel" name="label_26">
+             <property name="text">
+              <string>Drill ↔ Drill:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="16" column="0">
+            <widget class="QLabel" name="label_2">
+             <property name="text">
+              <string>Via Types:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="17" column="0">
             <widget class="QLabel" name="label_21">
              <property name="text">
               <string>NPTH Slots:</string>
              </property>
             </widget>
            </item>
-           <item row="1" column="1">
-            <widget class="librepcb::editor::UnsignedLengthEdit" name="edtDrcClearanceCopperCopper" native="true"/>
+           <item row="5" column="1">
+            <widget class="librepcb::editor::UnsignedLengthEdit" name="edtDrcClearanceDrillDrill" native="true"/>
            </item>
-           <item row="8" column="2">
-            <widget class="QLabel" name="label_16">
-             <property name="text">
-              <string>NPTH Slot Width:</string>
+           <item row="19" column="0">
+            <spacer name="verticalSpacer">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
              </property>
-            </widget>
-           </item>
-           <item row="14" column="1">
-            <widget class="QCheckBox" name="cbxBlindViasAllowed">
-             <property name="toolTip">
-              <string>Allow vias whith either start or end on an inner copper layer.</string>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
              </property>
-             <property name="text">
-              <string>Blind Vias</string>
-             </property>
-            </widget>
-           </item>
-           <item row="6" column="3">
-            <widget class="librepcb::editor::UnsignedLengthEdit" name="edtDrcMinPthAnnularRing" native="true"/>
-           </item>
-           <item row="6" column="2">
-            <widget class="QLabel" name="label_22">
-             <property name="text">
-              <string>PTH Annular Ring:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="14" column="2">
-            <widget class="QCheckBox" name="cbxBuriedViasAllowed">
-             <property name="toolTip">
-              <string>Allow vias which start and end on inner copper layers.</string>
-             </property>
-             <property name="text">
-              <string>Buried Vias</string>
-             </property>
-            </widget>
-           </item>
-           <item row="10" column="1">
-            <widget class="librepcb::editor::UnsignedLengthEdit" name="edtDrcMinSilkscreenWidth" native="true"/>
-           </item>
-           <item row="9" column="3">
-            <widget class="librepcb::editor::UnsignedLengthEdit" name="edtDrcMinPthSlotWidth" native="true"/>
-           </item>
-           <item row="2" column="3">
-            <widget class="librepcb::editor::UnsignedLengthEdit" name="edtDrcClearanceSilkscreenStopmask" native="true"/>
+            </spacer>
            </item>
            <item row="11" column="0">
-            <widget class="QLabel" name="label_30">
-             <property name="toolTip">
-              <string>Minimum board outline milling tool diameter. Restricts the radius of inner board edges.</string>
-             </property>
+            <widget class="QLabel" name="label_24">
              <property name="text">
-              <string>Outline Tool Diameter:</string>
+              <string>PTH Drill Diameter:</string>
              </property>
             </widget>
            </item>
-           <item row="15" column="1">
-            <widget class="QComboBox" name="cbxDrcAllowedNpthSlots">
-             <property name="insertPolicy">
-              <enum>QComboBox::NoInsert</enum>
+           <item row="4" column="3">
+            <widget class="librepcb::editor::UnsignedLengthEdit" name="edtDrcClearanceSilkscreenStopmask" native="true"/>
+           </item>
+           <item row="12" column="2">
+            <widget class="QLabel" name="label_34">
+             <property name="text">
+              <string>Silkscreen Text Height:</string>
              </property>
             </widget>
            </item>
-           <item row="0" column="0" colspan="4">
+           <item row="5" column="3">
+            <widget class="librepcb::editor::UnsignedLengthEdit" name="edtDrcClearanceDrillBoard" native="true"/>
+           </item>
+           <item row="2" column="0" colspan="4">
             <layout class="QHBoxLayout" name="horizontalLayout">
              <item>
               <widget class="QLabel" name="label_28">
@@ -833,80 +908,54 @@ QAbstractScrollArea {
              </item>
             </layout>
            </item>
-           <item row="2" column="2">
-            <widget class="QLabel" name="label_32">
-             <property name="text">
-              <string>Silkscreen ↔ Stopmask:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="2">
-            <widget class="QLabel" name="label_27">
-             <property name="text">
-              <string>Drill ↔ Board Edge:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="0">
-            <widget class="QLabel" name="label_26">
-             <property name="text">
-              <string>Drill ↔ Drill:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="10" column="0">
-            <widget class="QLabel" name="label_33">
-             <property name="text">
-              <string>Silkscreen Width:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="8" column="1">
-            <widget class="librepcb::editor::UnsignedLengthEdit" name="edtDrcMinNpthDrillDiameter" native="true"/>
-           </item>
-           <item row="2" column="0">
-            <widget class="QLabel" name="label_14">
-             <property name="text">
-              <string>Copper ↔ Holes:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="9" column="0">
-            <widget class="QLabel" name="label_24">
-             <property name="text">
-              <string>PTH Drill Diameter:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="15" column="3">
-            <widget class="QComboBox" name="cbxDrcAllowedPthSlots">
-             <property name="insertPolicy">
-              <enum>QComboBox::NoInsert</enum>
-             </property>
-            </widget>
-           </item>
-           <item row="17" column="0">
-            <spacer name="verticalSpacer">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>40</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item row="10" column="3">
-            <widget class="librepcb::editor::UnsignedLengthEdit" name="edtDrcMinSilkscreenTextHeight" native="true"/>
-           </item>
-           <item row="10" column="2">
-            <widget class="QLabel" name="label_34">
-             <property name="text">
-              <string>Silkscreen Text Height:</string>
-             </property>
-            </widget>
+           <item row="1" column="0" colspan="4">
+            <layout class="QHBoxLayout" name="horizontalLayout_8" stretch="0,1,0,0">
+             <item>
+              <widget class="QLabel" name="label_37">
+               <property name="font">
+                <font>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="text">
+                <string>Configuration:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="lblDrcConfigName">
+               <property name="text">
+                <string>TextLabel</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QToolButton" name="toolButton_2">
+               <property name="toolTip">
+                <string>Reset to Defaults</string>
+               </property>
+               <property name="icon">
+                <iconset resource="../../../../../img/images.qrc">
+                 <normaloff>:/img/actions/undo.png</normaloff>:/img/actions/undo.png</iconset>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QToolButton" name="toolButton">
+               <property name="toolTip">
+                <string>Load Settings...</string>
+               </property>
+               <property name="text">
+                <string notr="true"/>
+               </property>
+               <property name="icon">
+                <iconset resource="../../../../../img/images.qrc">
+                 <normaloff>:/img/actions/open.png</normaloff>:/img/actions/open.png</iconset>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </item>
           </layout>
          </widget>
@@ -976,10 +1025,12 @@ QAbstractScrollArea {
   <tabstop>edtRulesViaAnnularRingMax</tabstop>
   <tabstop>buttonBox</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="../../../../../img/images.qrc"/>
+ </resources>
  <connections/>
  <buttongroups>
-  <buttongroup name="btnGroupRulesInnerPadShape"/>
   <buttongroup name="btnGroupRulesCmpSidePadShape"/>
+  <buttongroup name="btnGroupRulesInnerPadShape"/>
  </buttongroups>
 </ui>

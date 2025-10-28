@@ -61,6 +61,8 @@ class NetSignal;
 class PcbColor;
 class Project;
 class SceneData3D;
+class Corporate;
+class PcbManufacturerCapabilities;
 
 /*******************************************************************************
  *  Class Board
@@ -74,6 +76,12 @@ class Board final : public QObject {
   Q_OBJECT
 
 public:
+  // Types
+  struct Manufacturer {
+  const Corporate& corporate;
+  const PcbManufacturerCapabilities& product;
+  };
+
   // Constructors / Destructor
   Board() = delete;
   Board(const Board& other) = delete;
@@ -137,6 +145,9 @@ public:
   const QVector<const Layer*>& getSilkscreenLayersBot() const noexcept {
     return mSilkscreenLayersBot;
   }
+  const QVector<Manufacturer>& getManufacturers() const noexcept {
+    return mManufacturers;
+  }
   const QMap<QString, bool>& getLayersVisibility() const noexcept {
     return mLayersVisibility;
   }
@@ -165,6 +176,7 @@ public:
   }
   void setDesignRules(const BoardDesignRules& rules) noexcept;
   void setDrcSettings(const BoardDesignRuleCheckSettings& settings) noexcept;
+  void setManufacturers(const QVector<Manufacturer>& manufacturers) noexcept;
 
   // DRC Message Approval Methods
   const QSet<SExpression>& getDrcMessageApprovals() const noexcept {
@@ -297,6 +309,7 @@ private:
   const PcbColor* mSilkscreenColor;  ///< Must never be `nullptr`!
   QVector<const Layer*> mSilkscreenLayersTop;
   QVector<const Layer*> mSilkscreenLayersBot;
+  QVector<Manufacturer> mManufacturers;
 
   // User settings
   // Those are stored in settings.user.lp and usually not under version control.

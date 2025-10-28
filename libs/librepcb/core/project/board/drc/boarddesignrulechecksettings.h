@@ -24,7 +24,8 @@
  *  Includes
  ******************************************************************************/
 #include "../../../types/length.h"
-
+#include "../../../types/elementname.h"
+#include "../../../types/uuid.h"
 #include <QtCore>
 
 /*******************************************************************************
@@ -44,6 +45,11 @@ class SExpression;
 class BoardDesignRuleCheckSettings final {
 public:
   // Types
+  struct LoadedReference {
+    ElementName name;
+    Uuid corporate;
+    Uuid product;
+  };
   enum class AllowedSlots : int {
     None = 0,  ///< No slots are allowed at all.
     SingleSegmentStraight = 1,  ///< Straight single-segment slots are allowed.
@@ -59,6 +65,9 @@ public:
   ~BoardDesignRuleCheckSettings() noexcept;
 
   // Getters
+  const QVector<LoadedReference> getLoadedReferences() const noexcept {
+    return mLoadedReferences;
+  }
   const UnsignedLength& getMinCopperCopperClearance() const noexcept {
     return mMinCopperCopperClearance;
   }
@@ -184,6 +193,8 @@ public:
   }
 
 private:  // Data
+  QVector<LoadedReference> mLoadedReferences;
+
   // Clearances
   UnsignedLength mMinCopperCopperClearance;
   UnsignedLength mMinCopperBoardClearance;

@@ -10,13 +10,13 @@
  (country "CN")
  (fabs "CN")
  (shipping "worldwide")
- (pcb_capabilities f968bd9b-5731-4009-8585-7956789c145e
-  (name "Standard PCB")
+ (pcb_product f968bd9b-5731-4009-8585-7956789c145e
+  (name "Standard")
   (description "")
   (url "https://www.pcbway.com/capabilities.html")
   (min_pcb_size 3.0 3.0)
   (max_pcb_size (double_sided 600.0 1200.0) (multilayer 560.0 1150.0))
-  (pcb_thickness 1.6)
+  (pcb_thickness (min 0.2) (max 3.2) (values 0.6 1.6 3.2))
   (max_inner_layers 12)
   (solder_resist green black none)
   (silkscreen white black none)
@@ -32,6 +32,7 @@
   (min_pth_drill_diameter 0.3)
   (min_npth_slot_width 1.0)
   (min_pth_slot_width 0.7)
+  (max_tented_via_drill_diameter 0.3)
   (min_silkscreen_width 0.15)
   (min_silkscreen_text_height 0.8)
   (min_outline_tool_diameter 2.0)
@@ -39,6 +40,7 @@
   (buried_vias_allowed false)
   (allowed_npth_slots single_segment_straight)
   (allowed_pth_slots single_segment_straight)
+  (option foo "bar")
  )
  (pcb_export
   (gerber_excellon
