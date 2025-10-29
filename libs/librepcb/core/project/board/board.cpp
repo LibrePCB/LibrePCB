@@ -326,7 +326,8 @@ void Board::setDrcSettings(
   *mDrcSettings = settings;
 }
 
-void Board::setManufacturers(const QVector<Manufacturer>& manufacturers) noexcept {
+void Board::setManufacturers(
+    const QVector<Manufacturer>& manufacturers) noexcept {
   mManufacturers = manufacturers;
 }
 

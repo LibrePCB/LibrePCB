@@ -23,9 +23,10 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../../types/length.h"
 #include "../../../types/elementname.h"
+#include "../../../types/length.h"
 #include "../../../types/uuid.h"
+
 #include <QtCore>
 
 /*******************************************************************************
@@ -46,9 +47,8 @@ class BoardDesignRuleCheckSettings final {
 public:
   // Types
   struct LoadedReference {
-    ElementName name;
-    Uuid corporate;
-    Uuid product;
+    QString name;
+    std::optional<std::pair<Uuid, Uuid>> uuids; ///< Corporate & product
   };
   enum class AllowedSlots : int {
     None = 0,  ///< No slots are allowed at all.
@@ -121,6 +121,9 @@ public:
   AllowedSlots getAllowedPthSlots() const noexcept { return mAllowedPthSlots; }
 
   // Setters
+  void setLoadedReferences(const QVector<LoadedReference>& refs) noexcept {
+    mLoadedReferences = refs;
+  }
   void setMinCopperCopperClearance(const UnsignedLength& value) noexcept {
     mMinCopperCopperClearance = value;
   }

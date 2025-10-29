@@ -24,10 +24,11 @@
 
 #include "../fileio/transactionalfilesystem.h"
 #include "../library/cmp/component.h"
+#include "../library/corp/corporate.h"
 #include "../library/dev/device.h"
 #include "../library/pkg/package.h"
 #include "../library/sym/symbol.h"
-#include "../library/corp/corporate.h"
+
 #include <QtCore>
 
 /*******************************************************************************

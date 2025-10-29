@@ -30,6 +30,7 @@
 #include "../library/cat/componentcategory.h"
 #include "../library/cat/packagecategory.h"
 #include "../library/cmp/component.h"
+#include "../library/corp/corporate.h"
 #include "../library/dev/device.h"
 #include "../library/library.h"
 #include "../library/pkg/package.h"
@@ -277,6 +278,93 @@ QList<WorkspaceLibraryDb::Part> WorkspaceLibraryDb::getDeviceParts(
                       getPartAttributes(query.value(0).toInt())});
   }
   return Toolbox::sortedQSet(parts);
+}
+
+QList<WorkspaceLibraryDb::Corporate> WorkspaceLibraryDb::getAllLatestCorporates(
+    const QStringList& localeOrder) const {
+  SQLiteDatabase::TransactionScopeGuard sg(*mDb);  // Atomic products query!
+
+  QSqlQuery query = mDb->prepareQuery(
+      "SELECT id, filepath, uuid, version, icon_png, url, country, fabs, "
+      "shipping, sponsor, priority FROM corporates");
+  mDb->exec(query);
+
+  // Get all corporates.
+  QHash<Uuid, QVector<Corporate>> entries;
+  while (query.next()) {
+    QPixmap logo;
+    logo.loadFromData(query.value(4).toByteArray(), "png");
+    FilePath filepath(
+        FilePath::fromRelative(mLibrariesPath, query.value(1).toString()));
+    if (!filepath.isValid()) throw LogicError(__FILE__, __LINE__);
+
+    Corporate corp{
+        query.value(0).toInt(),  // ID
+        filepath,
+        Uuid::fromString(query.value(2).toString()),  // can throw
+        QString(),  // name (filled later)
+        QString(),  // description (filled later)
+        Version::fromString(query.value(3).toString()),  // can throw
+        logo,
+        QUrl(query.value(5).toString(), QUrl::StrictMode),  // url
+        query.value(6).toString(),  // country
+        query.value(7).toString().split(","),  // fabs
+        query.value(8).toString().split(","),  // shipping
+        query.value(9).toBool(),  // is_sponsor
+        query.value(10).toInt(),  // priority
+        {},  // PCB products
+    };
+    entries[corp.uuid].append(corp);
+  }
+
+  // Take only the newest version of each corporate.
+  QList<Corporate> result;
+  for (QVector<Corporate>& entry : entries) {
+    std::sort(entry.begin(), entry.end(),
+              [](const Corporate& a, const Corporate& b) {
+                if (a.version != b.version) {
+                  return a.version > b.version;  // Newer versions first
+                } else {
+                  return a.elemDir < b.elemDir;  // Local library elements first
+                }
+              });
+    result.append(entry.first());
+  }
+
+  // Fill in remaining data.
+  for (Corporate& obj : result) {
+    getTranslations<librepcb::Corporate>(obj.elemDir, localeOrder, &obj.name,
+                                         &obj.description,
+                                         nullptr);  // can throw
+    QSqlQuery query = mDb->prepareQuery(
+        "SELECT uuid, name, description, url, max_inner_layers "
+        "FROM pcb_products "
+        "WHERE corporate_id = :corporate_id");
+    query.bindValue(":corporate_id", obj.id);
+    mDb->exec(query);
+    while (query.next()) {
+      obj.pcbProducts.append(PcbProduct{
+          Uuid::fromString(query.value(0).toString()),  // can throw
+          query.value(1).toString(),  // name
+          query.value(2).toString(),  // description
+          QUrl(query.value(3).toString(), QUrl::StrictMode),  // url
+          query.value(4).toInt(),  // max_inner_layers
+      });
+    }
+  }
+
+  // Pre-sort results in a way suitable for most use-cases.
+  std::sort(result.begin(), result.end(),
+            [](const Corporate& a, const Corporate& b) {
+              if (a.priority != b.priority) {
+                return a.priority > b.priority;
+              } else if (a.isSponsor != b.isSponsor) {
+                return a.isSponsor;
+              } else {
+                return a.name < b.name;
+              }
+            });
+  return result;
 }
 
 /*******************************************************************************

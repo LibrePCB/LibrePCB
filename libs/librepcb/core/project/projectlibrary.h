@@ -36,12 +36,12 @@
 namespace librepcb {
 
 class Component;
+class Corporate;
 class Device;
 class LibraryBaseElement;
 class Package;
 class Project;
 class Symbol;
-class Corporate;
 
 /*******************************************************************************
  *  Class ProjectLibrary
@@ -72,7 +72,9 @@ public:
     return mComponents;
   }
   const QHash<Uuid, Device*>& getDevices() const noexcept { return mDevices; }
-  const QHash<Uuid, Corporate*>& getCorporates() const noexcept { return mCorporates; }
+  const QHash<Uuid, Corporate*>& getCorporates() const noexcept {
+    return mCorporates;
+  }
   Symbol* getSymbol(const Uuid& uuid) const noexcept {
     return mSymbols.value(uuid);
   }

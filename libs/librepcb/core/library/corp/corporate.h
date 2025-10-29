@@ -61,10 +61,14 @@ public:
   const QString& getCountry() const noexcept { return mCountry; }
   const QStringList& getFabs() const noexcept { return mFabs; }
   const QStringList& getShipping() const noexcept { return mShipping; }
+  bool isSponsor() const noexcept { return mIsSponsor; }
+  int getPriority() const noexcept { return mPriority; }
   const QVector<PcbManufacturerCapabilities>& getPcbCapabilities()
       const noexcept {
     return mPcbCapabilities;
   }
+  const PcbManufacturerCapabilities* findPcbCapabilities(
+      const Uuid& uuid) const noexcept;
 
   // Setters
   void setIcon(const QByteArray& png) noexcept { mIcon = png; }
@@ -101,6 +105,8 @@ private:  // Data
   QString mCountry;
   QStringList mFabs;
   QStringList mShipping;
+  bool mIsSponsor;
+  int mPriority;
   QVector<PcbManufacturerCapabilities> mPcbCapabilities;
 
   // Arbitrary options for forward compatibility in case we really need to

@@ -101,6 +101,29 @@ public:
       return false;
     }
   };
+  struct PcbProduct {
+    Uuid uuid;
+    QString name;
+    QString description;
+    QUrl url;
+    int maxLayerCount;
+  };
+  struct Corporate {
+    int id;
+    FilePath elemDir;
+    Uuid uuid;
+    QString name;
+    QString description;
+    Version version;
+    QPixmap logo;
+    QUrl url;
+    QString country;
+    QStringList fabs;
+    QStringList shipping;
+    bool isSponsor;
+    int priority;
+    QList<PcbProduct> pcbProducts;
+  };
 
   // Constructors / Destructor
   WorkspaceLibraryDb() = delete;
@@ -453,6 +476,15 @@ public:
    * @return All parts. Empty if the passed device doesn't exist.
    */
   QList<Part> getDeviceParts(const Uuid& device) const;
+
+  /**
+   * @brief Get all corporates (only the latest version of each)
+   *
+   * @param localeOrder   Locale order (highest priority first).
+   *
+   * @return List of all corporates and their products.
+   */
+  QList<Corporate> getAllLatestCorporates(const QStringList& localeOrder) const;
 
   // General Methods
 

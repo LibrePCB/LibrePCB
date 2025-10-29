@@ -42,7 +42,16 @@ Corporate::Corporate(const Uuid& uuid, const Version& version,
                      const QString& keywords_en_US)
   : LibraryBaseElement(getShortElementName(), getLongElementName(), uuid,
                        version, author, name_en_US, description_en_US,
-                       keywords_en_US) {
+                       keywords_en_US),
+    mIcon(),
+    mUrl(),
+    mCountry(),
+    mFabs(),
+    mShipping(),
+    mIsSponsor(false),
+    mPriority(0),
+    mPcbCapabilities(),
+    mOptions() {
 }
 
 Corporate::Corporate(std::unique_ptr<TransactionalDirectory> directory,
@@ -57,14 +66,16 @@ Corporate::Corporate(std::unique_ptr<TransactionalDirectory> directory,
     mCountry(root.getChild("country/@0").getValue()),
     mFabs(root.getChild("fabs/@0").getValue().split(",")),
     mShipping(root.getChild("shipping/@0").getValue().split(",")),
+    mIsSponsor(deserialize<bool>(root.getChild("sponsor/@0"))),
+    mPriority(deserialize<int>(root.getChild("priority/@0"))),
     mPcbCapabilities(),  // Initialized below.
     mOptions()  // Initialized below.
 {
   // Load image if available.
   mIcon = mDirectory->readIfExists("logo.png");  // can throw
 
-  if (const SExpression* node = root.tryGetChild("pcb_capabilities")) {
-    mPcbCapabilities.append(PcbManufacturerCapabilities(*node));  // can throw
+  foreach (const SExpression* child, root.getChildren("pcb_product")) {
+    mPcbCapabilities.append(PcbManufacturerCapabilities(*child));  // can throw
   }
   foreach (const SExpression* child, root.getChildren("option")) {
     mOptions[child->getChild("@0").getValue()].append(*child);
@@ -82,6 +93,16 @@ QPixmap Corporate::getIconAsPixmap() const noexcept {
   QPixmap p;
   p.loadFromData(mIcon, "png");
   return p;
+}
+
+const PcbManufacturerCapabilities* Corporate::findPcbCapabilities(
+    const Uuid& uuid) const noexcept {
+  for (const auto& obj : mPcbCapabilities) {
+    if (obj.getUuid() == uuid) {
+      return &obj;
+    }
+  }
+  return nullptr;
 }
 
 /*******************************************************************************
@@ -147,8 +168,12 @@ void Corporate::serialize(SExpression& root) const {
   root.ensureLineBreak();
   root.appendChild("shipping", mShipping.join(","));
   root.ensureLineBreak();
+  root.appendChild("sponsor", mIsSponsor);
+  root.ensureLineBreak();
+  root.appendChild("priority", mPriority);
+  root.ensureLineBreak();
   for (const PcbManufacturerCapabilities& caps : mPcbCapabilities) {
-    caps.serialize(root.appendList("pcb_capabilities"));
+    caps.serialize(root.appendList("pcb_product"));
     root.ensureLineBreak();
   }
   foreach (const auto& list, mOptions) {

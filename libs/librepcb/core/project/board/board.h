@@ -56,13 +56,13 @@ class BI_Zone;
 class BoardDesignRuleCheckSettings;
 class BoardDesignRules;
 class BoardFabricationOutputSettings;
+class Corporate;
 class Layer;
 class NetSignal;
 class PcbColor;
+class PcbManufacturerCapabilities;
 class Project;
 class SceneData3D;
-class Corporate;
-class PcbManufacturerCapabilities;
 
 /*******************************************************************************
  *  Class Board
@@ -78,8 +78,8 @@ class Board final : public QObject {
 public:
   // Types
   struct Manufacturer {
-  const Corporate& corporate;
-  const PcbManufacturerCapabilities& product;
+    const Corporate& corporate;
+    const PcbManufacturerCapabilities& product;
   };
 
   // Constructors / Destructor

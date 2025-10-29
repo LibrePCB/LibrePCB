@@ -205,14 +205,30 @@ public:
    * @param country       Country code (e.g. "DE").
    * @param fabs          Country codes of fabs (e.g. "DE").
    * @param shipping      Shipping options (e.g. "worldwide").
-   * @param pcbCaps       Number of available PCB capability sets.
+   * @param sponsor       Is LibrePCB sponsor or not.
+   * @param priority      Sort order priority.
    * @return ID of the added corporate.
    */
   int addCorporate(int libId, const FilePath& fp, const Uuid& uuid,
                    const Version& version, bool deprecated,
                    const QByteArray& iconPng, const QUrl& url,
                    const QString& country, const QStringList& fabs,
-                   const QStringList& shipping, int pcbCaps);
+                   const QStringList& shipping, bool isSponsor, int priority);
+
+  /**
+   * @brief Add a PCB product to a previously added corporate
+   *
+   * @param corpId         ID of the corporate containing this product.
+   * @param uuid           Product UUID.
+   * @param name           Product name.
+   * @param description    Product description.
+   * @param url            Product URL.
+   * @param maxInnerLayers Maximum number of inner layers.
+   * @return ID of the added product.
+   */
+  int addPcbProduct(int corpId, const Uuid& uuid, const QString& name,
+                    const QString& description, const QUrl& url,
+                    int maxInnerLayers);
 
   /**
    * @brief Remove a library element

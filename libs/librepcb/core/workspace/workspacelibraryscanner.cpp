@@ -382,7 +382,14 @@ int WorkspaceLibraryScanner::addElementToDb<Corporate>(
       libId, element.getDirectory().getAbsPath(), element.getUuid(),
       element.getVersion(), element.isDeprecated(), element.getIcon(),
       element.getUrl(), element.getCountry(), element.getFabs(),
-      element.getShipping(), element.getPcbCapabilities().count());
+      element.getShipping(), element.isSponsor(), element.getPriority());
+  for (const PcbManufacturerCapabilities& product :
+       element.getPcbCapabilities()) {
+    writer.addPcbProduct(id, product.getUuid(),
+                         *product.getNames().getDefaultValue(),
+                         product.getDescriptions().getDefaultValue(),
+                         product.getUrl(), product.getMaxInnerLayerCount());
+  }
   return id;
 }
 

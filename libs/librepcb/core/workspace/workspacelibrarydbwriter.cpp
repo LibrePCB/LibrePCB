@@ -328,7 +328,8 @@ void WorkspaceLibraryDbWriter::createAllTables() {
       "`country` TEXT NOT NULL, "
       "`fabs` TEXT NOT NULL, "
       "`shipping` TEXT NOT NULL, "
-      "`pcb_capabilities` INTEGER NOT NULL"
+      "`sponsor` BOOL NOT NULL, "
+      "`priority` INTEGER NOT NULL "
       ")");
   queries << QString(
       "CREATE TABLE IF NOT EXISTS corporates_tr ("
@@ -340,6 +341,19 @@ void WorkspaceLibraryDbWriter::createAllTables() {
       "`description` TEXT, "
       "`keywords` TEXT, "
       "UNIQUE(element_id, locale)"
+      ")");
+
+  // PCB products
+  queries << QString(
+      "CREATE TABLE IF NOT EXISTS pcb_products ("
+      "`id` INTEGER PRIMARY KEY NOT NULL, "
+      "`corporate_id` INTEGER REFERENCES corporates(id) "
+      "ON DELETE CASCADE NOT NULL, "
+      "`uuid` TEXT NOT NULL, "
+      "`name` TEXT NOT NULL, "
+      "`description` TEXT NOT NULL, "
+      "`url` TEXT, "
+      "`max_inner_layers` INTEGER NOT NULL "
       ")");
 
   // execute queries
@@ -448,13 +462,13 @@ int WorkspaceLibraryDbWriter::addCorporate(
     int libId, const FilePath& fp, const Uuid& uuid, const Version& version,
     bool deprecated, const QByteArray& iconPng, const QUrl& url,
     const QString& country, const QStringList& fabs,
-    const QStringList& shipping, int pcbCaps) {
+    const QStringList& shipping, bool isSponsor, int priority) {
   QSqlQuery query = mDb.prepareQuery(
       "INSERT INTO corporates "
       "(library_id, filepath, uuid, version, deprecated, icon_png, url, "
-      "country, fabs, shipping, pcb_capabilities) VALUES "
+      "country, fabs, shipping, sponsor, priority) VALUES "
       "(:library_id, :filepath, :uuid, :version, :deprecated, :icon_png, "
-      ":url, :country, :fabs, :shipping, :pcb_capabilities)");
+      ":url, :country, :fabs, :shipping, :sponsor, :priority)");
   query.bindValue(":library_id", libId);
   query.bindValue(":filepath", filePathToString(fp));
   query.bindValue(":uuid", uuid.toStr());
@@ -465,7 +479,26 @@ int WorkspaceLibraryDbWriter::addCorporate(
   query.bindValue(":country", nonNull(country));
   query.bindValue(":fabs", nonNull(fabs.join(",")));
   query.bindValue(":shipping", nonNull(shipping.join(",")));
-  query.bindValue(":pcb_capabilities", pcbCaps);
+  query.bindValue(":sponsor", isSponsor);
+  query.bindValue(":priority", priority);
+  return mDb.insert(query);
+}
+
+int WorkspaceLibraryDbWriter::addPcbProduct(int corpId, const Uuid& uuid,
+                                            const QString& name,
+                                            const QString& description,
+                                            const QUrl& url,
+                                            int maxInnerLayers) {
+  QSqlQuery query = mDb.prepareQuery(
+      "INSERT INTO pcb_products "
+      "(corporate_id, uuid, name, description, url, max_inner_layers) VALUES "
+      "(:corporate_id, :uuid, :name, :description, :url, :max_inner_layers)");
+  query.bindValue(":corporate_id", corpId);
+  query.bindValue(":uuid", uuid.toStr());
+  query.bindValue(":name", nonNull(name));
+  query.bindValue(":description", nonNull(description));
+  query.bindValue(":url", url);
+  query.bindValue(":max_inner_layers", maxInnerLayers);
   return mDb.insert(query);
 }
 
