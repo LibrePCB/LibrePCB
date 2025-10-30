@@ -71,11 +71,37 @@ inline BoardDesignRuleCheckSettings::AllowedSlots deserialize(
 }
 
 /*******************************************************************************
+ *  Class BoardDesignRuleCheckSettings::Source
+ ******************************************************************************/
+
+BoardDesignRuleCheckSettings::Source BoardDesignRuleCheckSettings::Source::load(
+    const SExpression& node) {
+  return Source{
+      deserialize<Uuid>(node.getChild("corporate/@0")),
+      deserialize<ElementName>(node.getChild("corporate/@1")),
+      deserialize<Uuid>(node.getChild("pcb_product/@0")),
+      deserialize<ElementName>(node.getChild("pcb_product/@1")),
+  };
+}
+
+void BoardDesignRuleCheckSettings::Source::serialize(SExpression& root) const {
+  SExpression& corporate = root.appendList("corporate");
+  corporate.appendChild(corporateUuid);
+  corporate.appendChild(corporateName);
+  root.ensureLineBreak();
+  SExpression& product = root.appendList("product");
+  product.appendChild(productUuid);
+  product.appendChild(productName);
+  root.ensureLineBreak();
+}
+
+/*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
 
 BoardDesignRuleCheckSettings::BoardDesignRuleCheckSettings() noexcept
-  : mMinCopperCopperClearance(200000),  // 200um
+  : mSources(),
+    mMinCopperCopperClearance(200000),  // 200um
     mMinCopperBoardClearance(300000),  // 300um
     mMinCopperNpthClearance(250000),  // 250um
     mMinDrillDrillClearance(350000),  // 350um
@@ -143,6 +169,9 @@ BoardDesignRuleCheckSettings::BoardDesignRuleCheckSettings(
         deserialize<AllowedSlots>(node.getChild("allowed_npth_slots/@0"))),
     mAllowedPthSlots(
         deserialize<AllowedSlots>(node.getChild("allowed_pth_slots/@0"))) {
+  for (const SExpression* child : node.getChildren("source")) {
+    mSources.append(Source::load(*child));
+  }
 }
 
 BoardDesignRuleCheckSettings::~BoardDesignRuleCheckSettings() noexcept {
@@ -153,6 +182,10 @@ BoardDesignRuleCheckSettings::~BoardDesignRuleCheckSettings() noexcept {
  ******************************************************************************/
 
 void BoardDesignRuleCheckSettings::serialize(SExpression& root) const {
+  for (const Source& src : mSources) {
+    root.ensureLineBreak();
+    src.serialize(root.appendList("source"));
+  }
   root.ensureLineBreak();
   root.appendChild("min_copper_copper_clearance", mMinCopperCopperClearance);
   root.ensureLineBreak();
@@ -201,6 +234,7 @@ void BoardDesignRuleCheckSettings::serialize(SExpression& root) const {
 
 BoardDesignRuleCheckSettings& BoardDesignRuleCheckSettings::operator=(
     const BoardDesignRuleCheckSettings& rhs) noexcept {
+  mSources = rhs.mSources;
   mMinCopperCopperClearance = rhs.mMinCopperCopperClearance;
   mMinCopperBoardClearance = rhs.mMinCopperBoardClearance;
   mMinCopperNpthClearance = rhs.mMinCopperNpthClearance;
@@ -225,6 +259,7 @@ BoardDesignRuleCheckSettings& BoardDesignRuleCheckSettings::operator=(
 
 bool BoardDesignRuleCheckSettings::operator==(
     const BoardDesignRuleCheckSettings& rhs) const noexcept {
+  if (mSources != rhs.mSources) return false;
   if (mMinCopperCopperClearance != rhs.mMinCopperCopperClearance) return false;
   if (mMinCopperBoardClearance != rhs.mMinCopperBoardClearance) return false;
   if (mMinCopperNpthClearance != rhs.mMinCopperNpthClearance) return false;

@@ -614,14 +614,14 @@ QAbstractScrollArea {
            <item row="1" column="0" colspan="4">
             <layout class="QHBoxLayout" name="horizontalLayout_8" stretch="0,1,0">
              <item>
-              <widget class="QLabel" name="label_37">
+              <widget class="QLabel" name="lblDrcConfigTitle">
                <property name="font">
                 <font>
                  <bold>true</bold>
                 </font>
                </property>
                <property name="text">
-                <string>Configuration:</string>
+                <string notr="true">Configuration:</string>
                </property>
               </widget>
              </item>
@@ -634,7 +634,7 @@ QAbstractScrollArea {
                 </sizepolicy>
                </property>
                <property name="text">
-                <string>TextLabel</string>
+                <string notr="true"/>
                </property>
               </widget>
              </item>

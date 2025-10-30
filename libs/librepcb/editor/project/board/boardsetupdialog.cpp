@@ -185,7 +185,16 @@ BoardSetupDialog::BoardSetupDialog(GuiApplication& app, Board& board,
 
   // Tab: DRC Settings
   connect(mUi->btnLoadDrcSettings, &QToolButton::clicked, this,
-          &BoardSetupDialog::loadDrcSettingsPreset);
+          [this]() { loadDrcSettingsPreset(); });
+  connect(mUi->lblDrcConfigName, &QLabel::linkActivated, this,
+          [this](const QString& url) {
+            try {
+              loadDrcSettingsPreset(Uuid::fromString(url.split(":").first()),
+                                    Uuid::fromString(url.split(":").last()));
+            } catch (const Exception& e) {
+              QMessageBox::critical(this, "Error", e.getMsg());
+            }
+          });
   mUi->edtDrcClearanceCopperCopper->configure(
       mBoard.getGridUnit(), LengthEditBase::Steps::generic(),
       sSettingsPrefix % "/clearance_copper_copper");
@@ -352,16 +361,48 @@ void BoardSetupDialog::load() noexcept {
   loadDrcSettings(mBoard.getDrcSettings());
 }
 
-void BoardSetupDialog::loadDrcSettings(const BoardDesignRuleCheckSettings& s) {
-  mDrcReferences = s.getLoadedReferences();
+void BoardSetupDialog::loadDrcSettings(
+    const BoardDesignRuleCheckSettings& s) noexcept {
+  mDrcSources = s.getSources();
   {
     QStringList loaded;
-    for (const BoardDesignRuleCheckSettings::LoadedReference& ref :
-         s.getLoadedReferences()) {
-      loaded.append(ref.name);
+    for (const BoardDesignRuleCheckSettings::Source& src : mDrcSources) {
+      loaded.append(
+          QString("%1 (%2)").arg(*src.corporateName).arg(*src.productName));
     }
-    if (!loaded.isEmpty()) {
-      loaded.first() = tr("Based on %1").arg(loaded.first());
+    mUi->lblDrcConfigTitle->setText(tr("Configuration Base:"));
+    if (loaded.isEmpty()) {
+      try {
+        QList<WorkspaceLibraryDb::Corporate> corporates =
+            mApp.getWorkspace().getLibraryDb().getAllLatestCorporates(
+                mApp.getWorkspace().getSettings().libraryLocaleOrder.get());
+        auto addProduct = [&](const WorkspaceLibraryDb::Corporate& corp,
+                              const WorkspaceLibraryDb::PcbProduct& prod) {
+          loaded.append(QString("<a href=\"%1:%2\">%3</a>")
+                            .arg(corp.uuid.toStr())
+                            .arg(prod.uuid.toStr())
+                            .arg(QString("%1 (%2)")
+                                     .arg(corp.name)
+                                     .arg(prod.name)
+                                     .toHtmlEscaped()));
+        };
+        for (const auto& corp : corporates) {
+          if (corp.isSponsor) {
+            if (corp.pcbProducts.count() > 1) {
+              for (const auto& product : corp.pcbProducts) {
+                addProduct(corp, product);
+              }
+            } else if (corp.pcbProducts.count() == 1) {
+              addProduct(corp, corp.pcbProducts.first());
+            }
+          }
+        }
+      } catch (const Exception& e) {
+        qCritical() << e.getMsg();
+      }
+      if (!loaded.isEmpty()) {
+        mUi->lblDrcConfigTitle->setText(tr("Load Preset:"));
+      }
     }
     mUi->lblDrcConfigName->setText(loaded.join(", "));
   }
@@ -422,37 +463,36 @@ void BoardSetupDialog::loadDrcSettingsPreset() noexcept {
                            QPoint(menu.sizeHint().width(), 0));
     auto it = map.find(a);
     if (it != map.end()) {
-      std::shared_ptr<const Corporate> corp =
-          mApp.getLibraryElementCache().getCorporate(it->first,
-                                                     true);  // can throw
-      const PcbManufacturerCapabilities* caps =
-          corp->findPcbCapabilities(it->second);
-      if (!caps) {
-        // Maybe the wrong corporate was loaded since the listed corporate
-        // may be from a local library, but the loaded corporate from remote?
-        throw LogicError(__FILE__, __LINE__);
-      }
-      auto node = SExpression::createList("rules");
-      caps->serialize(*node);
-      BoardDesignRuleCheckSettings s(*node);
-      s.setLoadedReferences({BoardDesignRuleCheckSettings::LoadedReference{
-          QString("%1 (%2)")
-              .arg(*corp->getNames().getDefaultValue())
-              .arg(*caps->getNames().getDefaultValue()),
-          std::make_pair(corp->getUuid(), caps->getUuid()),
-      }});
-      loadDrcSettings(s);
+      loadDrcSettingsPreset(it->first, it->second);  // can throw
     } else if (a == aDefaults) {
-      BoardDesignRuleCheckSettings s;
-      s.setLoadedReferences({BoardDesignRuleCheckSettings::LoadedReference{
-          tr("Built-In Default Settings"),
-          std::nullopt,
-      }});
-      loadDrcSettings(s);
+      loadDrcSettings(BoardDesignRuleCheckSettings());
     }
   } catch (const Exception& e) {
     QMessageBox::critical(this, "Error", e.getMsg());
   }
+}
+
+void BoardSetupDialog::loadDrcSettingsPreset(const Uuid& corpUuid,
+                                             const Uuid& prodUuid) {
+  std::shared_ptr<const Corporate> corp =
+      mApp.getLibraryElementCache().getCorporate(corpUuid,
+                                                 true);  // can throw
+  const PcbManufacturerCapabilities* caps = corp->findPcbCapabilities(prodUuid);
+  if (!caps) {
+    // Maybe the wrong corporate was loaded since the listed corporate
+    // may be from a local library, but the loaded corporate from remote?
+    throw LogicError(__FILE__, __LINE__);
+  }
+  auto node = SExpression::createList("rules");
+  caps->serialize(*node);
+  BoardDesignRuleCheckSettings s(*node);
+  s.setSources({BoardDesignRuleCheckSettings::Source{
+      corp->getUuid(),
+      corp->getNames().getDefaultValue(),
+      caps->getUuid(),
+      caps->getNames().getDefaultValue(),
+  }});
+  loadDrcSettings(s);
 }
 
 bool BoardSetupDialog::apply() noexcept {
@@ -504,7 +544,7 @@ bool BoardSetupDialog::apply() noexcept {
 
     // Tab: DRC Settings
     BoardDesignRuleCheckSettings s = mBoard.getDrcSettings();
-    s.setLoadedReferences(mDrcReferences);
+    s.setSources(mDrcSources);
     s.setMinCopperCopperClearance(mUi->edtDrcClearanceCopperCopper->getValue());
     s.setMinCopperBoardClearance(mUi->edtDrcClearanceCopperBoard->getValue());
     s.setMinCopperNpthClearance(mUi->edtDrcClearanceCopperNpth->getValue());

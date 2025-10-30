@@ -34,7 +34,6 @@
 namespace librepcb {
 
 class Board;
-class BoardDesignRuleCheckSettings;
 class Layer;
 
 namespace editor {
@@ -73,8 +72,9 @@ public:
 private:  // Methods
   void buttonBoxClicked(QAbstractButton* button);
   void load() noexcept;
-  void loadDrcSettings(const BoardDesignRuleCheckSettings& s);
+  void loadDrcSettings(const BoardDesignRuleCheckSettings& s) noexcept;
   void loadDrcSettingsPreset() noexcept;
+  void loadDrcSettingsPreset(const Uuid& corpUuid, const Uuid& prodUuid);
   bool apply() noexcept;
   QVector<const Layer*> getTopSilkscreenLayers() const noexcept;
   QVector<const Layer*> getBotSilkscreenLayers() const noexcept;
@@ -85,7 +85,7 @@ private:  // Date
   UndoStack& mUndoStack;
   QScopedPointer<Ui::BoardSetupDialog> mUi;
 
-  QVector<BoardDesignRuleCheckSettings::LoadedReference> mDrcReferences;
+  QVector<BoardDesignRuleCheckSettings::Source> mDrcSources;
 
   static const QString sSettingsPrefix;
 };

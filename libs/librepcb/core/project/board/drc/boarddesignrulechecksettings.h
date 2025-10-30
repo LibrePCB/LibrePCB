@@ -46,9 +46,15 @@ class SExpression;
 class BoardDesignRuleCheckSettings final {
 public:
   // Types
-  struct LoadedReference {
-    QString name;
-    std::optional<std::pair<Uuid, Uuid>> uuids;  ///< Corporate & product
+  struct Source {
+    Uuid corporateUuid;
+    ElementName corporateName;
+    Uuid productUuid;
+    ElementName productName;
+
+    static Source load(const SExpression& node);
+    void serialize(SExpression& root) const;
+    bool operator==(const Source& rhs) const noexcept = default;
   };
   enum class AllowedSlots : int {
     None = 0,  ///< No slots are allowed at all.
@@ -65,9 +71,7 @@ public:
   ~BoardDesignRuleCheckSettings() noexcept;
 
   // Getters
-  const QVector<LoadedReference> getLoadedReferences() const noexcept {
-    return mLoadedReferences;
-  }
+  const QVector<Source> getSources() const noexcept { return mSources; }
   const UnsignedLength& getMinCopperCopperClearance() const noexcept {
     return mMinCopperCopperClearance;
   }
@@ -121,9 +125,7 @@ public:
   AllowedSlots getAllowedPthSlots() const noexcept { return mAllowedPthSlots; }
 
   // Setters
-  void setLoadedReferences(const QVector<LoadedReference>& refs) noexcept {
-    mLoadedReferences = refs;
-  }
+  void setSources(const QVector<Source>& value) noexcept { mSources = value; }
   void setMinCopperCopperClearance(const UnsignedLength& value) noexcept {
     mMinCopperCopperClearance = value;
   }
@@ -196,7 +198,7 @@ public:
   }
 
 private:  // Data
-  QVector<LoadedReference> mLoadedReferences;
+  QVector<Source> mSources;
 
   // Clearances
   UnsignedLength mMinCopperCopperClearance;
