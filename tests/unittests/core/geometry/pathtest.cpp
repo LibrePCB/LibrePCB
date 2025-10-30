@@ -476,6 +476,72 @@ TEST_F(PathTest, testDonutInvalid) {
   EXPECT_EQ(str(expected), str(actual));
 }
 
+// If the line has zero length and angle, the filled area is zero, so no path
+// should be returned.
+TEST_F(PathTest, testFlatCapLineZeroLength) {
+  const std::optional<Path> actual = Path::flatCapLine(
+      Point(), Point(), Angle::deg0(), PositiveLength(1000000));
+
+  EXPECT_FALSE(actual.has_value());
+}
+
+// If the line has zero length but angle, we don't know the start- and end
+// angles, so there's nothing we can return.
+TEST_F(PathTest, testFlatCapLineZeroLengthArc) {
+  const std::optional<Path> actual = Path::flatCapLine(
+      Point(), Point(), Angle::deg90(), PositiveLength(1000000));
+
+  EXPECT_FALSE(actual.has_value());
+}
+
+TEST_F(PathTest, testFlatCapLineStraightHorizontal) {
+  Path expected = Path({
+      Vertex(Point(1000000, 2500000), Angle::deg0()),
+      Vertex(Point(3000000, 2500000), Angle::deg0()),
+      Vertex(Point(3000000, 1500000), Angle::deg0()),
+      Vertex(Point(1000000, 1500000), Angle::deg0()),
+      Vertex(Point(1000000, 2500000), Angle::deg0()),
+  });
+  const std::optional<Path> actual =
+      Path::flatCapLine(Point(1000000, 2000000), Point(3000000, 2000000),
+                        Angle::deg0(), PositiveLength(1000000));
+
+  ASSERT_TRUE(actual.has_value());
+  EXPECT_EQ(str(expected), str(*actual));
+}
+
+TEST_F(PathTest, testFlatCapLineStraightHorizontalReverse) {
+  Path expected = Path({
+      Vertex(Point(3000000, 1500000), Angle::deg0()),
+      Vertex(Point(1000000, 1500000), Angle::deg0()),
+      Vertex(Point(1000000, 2500000), Angle::deg0()),
+      Vertex(Point(3000000, 2500000), Angle::deg0()),
+      Vertex(Point(3000000, 1500000), Angle::deg0()),
+  });
+  const std::optional<Path> actual =
+      Path::flatCapLine(Point(3000000, 2000000), Point(1000000, 2000000),
+                        Angle::deg0(), PositiveLength(1000000));
+
+  ASSERT_TRUE(actual.has_value());
+  EXPECT_EQ(str(expected), str(*actual));
+}
+
+TEST_F(PathTest, testFlatCapLineArc90) {
+  Path expected = Path({
+      Vertex(Point(2000000, 1000000), Angle::deg90()),
+      Vertex(Point(1000000, 2000000), Angle::deg0()),
+      Vertex(Point(1000000, 4000000), -Angle::deg90()),
+      Vertex(Point(4000000, 1000000), Angle::deg0()),
+      Vertex(Point(2000000, 1000000), Angle::deg0()),
+  });
+  const std::optional<Path> actual =
+      Path::flatCapLine(Point(3000000, 1000000), Point(1000000, 3000000),
+                        Angle::deg90(), PositiveLength(2000000));
+
+  ASSERT_TRUE(actual.has_value());
+  EXPECT_EQ(str(expected), str(*actual));
+}
+
 TEST_F(PathTest, testCenteredRectRoundedCorners) {
   Path expected = Path({
       Vertex(Point(-30000, 75000), Angle::deg0()),
