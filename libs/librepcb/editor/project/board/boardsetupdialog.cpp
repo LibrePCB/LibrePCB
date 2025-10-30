@@ -25,6 +25,7 @@
 #include "../../guiapplication.h"
 #include "../../library/libraryelementcache.h"
 #include "../../undostack.h"
+#include "../../utils/editortoolbox.h"
 #include "../cmd/cmdboardedit.h"
 #include "ui_boardsetupdialog.h"
 
@@ -61,6 +62,8 @@ BoardSetupDialog::BoardSetupDialog(GuiApplication& app, Board& board,
     mUndoStack(undoStack),
     mUi(new Ui::BoardSetupDialog) {
   mUi->setupUi(this);
+  mUi->btnLoadDrcSettings->setIcon(
+      EditorToolbox::svgIcon(":/fa/solid/upload.svg"));
   connect(mUi->buttonBox, &QDialogButtonBox::clicked, this,
           &BoardSetupDialog::buttonBoxClicked);
 
@@ -396,7 +399,9 @@ void BoardSetupDialog::loadDrcSettingsPreset() noexcept {
 
     QMenu menu(this);
     QHash<QAction*, std::pair<Uuid, Uuid>> map;
-    QAction* aDefaults = menu.addAction(tr("Built-In Default Settings"));
+    QAction* aDefaults =
+        menu.addAction(EditorToolbox::svgIcon(":/fa/solid/rotate-left.svg"),
+                       tr("Reset to Default Settings"));
     menu.addSeparator();
     for (const auto& corp : corporates) {
       if (corp.pcbProducts.count() > 1) {

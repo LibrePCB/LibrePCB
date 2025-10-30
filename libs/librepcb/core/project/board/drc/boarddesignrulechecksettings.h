@@ -48,7 +48,7 @@ public:
   // Types
   struct LoadedReference {
     QString name;
-    std::optional<std::pair<Uuid, Uuid>> uuids; ///< Corporate & product
+    std::optional<std::pair<Uuid, Uuid>> uuids;  ///< Corporate & product
   };
   enum class AllowedSlots : int {
     None = 0,  ///< No slots are allowed at all.

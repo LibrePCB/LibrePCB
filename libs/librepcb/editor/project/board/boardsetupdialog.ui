@@ -646,10 +646,6 @@ QAbstractScrollArea {
                <property name="text">
                 <string notr="true"/>
                </property>
-               <property name="icon">
-                <iconset>
-                 <normaloff>:/img/actions/open.png</normaloff>:/img/actions/open.png</iconset>
-               </property>
               </widget>
              </item>
             </layout>
