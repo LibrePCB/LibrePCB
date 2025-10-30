@@ -85,7 +85,7 @@ private:  // Date
   UndoStack& mUndoStack;
   QScopedPointer<Ui::BoardSetupDialog> mUi;
 
-  QVector<BoardDesignRuleCheckSettings::Source> mDrcSources;
+  BoardDesignRuleCheckSettings::SourceSet mDrcSources;
 
   static const QString sSettingsPrefix;
 };

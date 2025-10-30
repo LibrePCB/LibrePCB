@@ -43,7 +43,7 @@ Corporate::Corporate(const Uuid& uuid, const Version& version,
   : LibraryBaseElement(getShortElementName(), getLongElementName(), uuid,
                        version, author, name_en_US, description_en_US,
                        keywords_en_US),
-    mIcon(),
+    mLogoPng(),
     mUrl(),
     mCountry(),
     mFabs(),
@@ -58,7 +58,7 @@ Corporate::Corporate(std::unique_ptr<TransactionalDirectory> directory,
                      const SExpression& root)
   : LibraryBaseElement(getShortElementName(), getLongElementName(), true,
                        std::move(directory), root),
-    mIcon(),  // Initialized below.
+    mLogoPng(),  // Initialized below.
     // Note: Don't use SExpression::getValueByPath<QUrl>() because it would
     // throw an exception if the URL is empty, which is actually legal in this
     // case.
@@ -72,7 +72,7 @@ Corporate::Corporate(std::unique_ptr<TransactionalDirectory> directory,
     mOptions()  // Initialized below.
 {
   // Load image if available.
-  mIcon = mDirectory->readIfExists("logo.png");  // can throw
+  mLogoPng = mDirectory->readIfExists("logo.png");  // can throw
 
   foreach (const SExpression* child, root.getChildren("pcb_product")) {
     mPcbCapabilities.append(PcbManufacturerCapabilities(*child));  // can throw
@@ -89,9 +89,9 @@ Corporate::~Corporate() noexcept {
  *  Getters
  ******************************************************************************/
 
-QPixmap Corporate::getIconAsPixmap() const noexcept {
+QPixmap Corporate::getLogoPixmap() const noexcept {
   QPixmap p;
-  p.loadFromData(mIcon, "png");
+  p.loadFromData(mLogoPng, "png");
   return p;
 }
 
@@ -118,10 +118,10 @@ void Corporate::save() {
   LibraryBaseElement::save();  // can throw
 
   // Save icon.
-  if (mIcon.isEmpty()) {
+  if (mLogoPng.isEmpty()) {
     mDirectory->removeFile("logo.png");  // can throw
-  } else if (!mIcon.isEmpty()) {
-    mDirectory->write("logo.png", mIcon);  // can throw
+  } else if (!mLogoPng.isEmpty()) {
+    mDirectory->write("logo.png", mLogoPng);  // can throw
   }
 }
 

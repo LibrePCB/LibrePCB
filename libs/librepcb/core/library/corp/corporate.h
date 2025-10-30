@@ -55,8 +55,8 @@ public:
   ~Corporate() noexcept;
 
   // Getters
-  const QByteArray& getIcon() const noexcept { return mIcon; }
-  QPixmap getIconAsPixmap() const noexcept;
+  const QByteArray& getLogoPng() const noexcept { return mLogoPng; }
+  QPixmap getLogoPixmap() const noexcept;
   const QUrl& getUrl() const noexcept { return mUrl; }
   const QString& getCountry() const noexcept { return mCountry; }
   const QStringList& getFabs() const noexcept { return mFabs; }
@@ -71,7 +71,7 @@ public:
       const Uuid& uuid) const noexcept;
 
   // Setters
-  void setIcon(const QByteArray& png) noexcept { mIcon = png; }
+  void setLogoPng(const QByteArray& png) noexcept { mLogoPng = png; }
   void setUrl(const QUrl& url) noexcept { mUrl = url; }
 
   // General Methods
@@ -100,7 +100,7 @@ private:  // Methods
             const SExpression& root);
 
 private:  // Data
-  QByteArray mIcon;
+  QByteArray mLogoPng;
   QUrl mUrl;
   QString mCountry;
   QStringList mFabs;

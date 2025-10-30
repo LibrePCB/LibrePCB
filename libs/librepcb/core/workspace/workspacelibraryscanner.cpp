@@ -380,7 +380,7 @@ int WorkspaceLibraryScanner::addElementToDb<Corporate>(
     WorkspaceLibraryDbWriter& writer, int libId, const Corporate& element) {
   const int id = writer.addCorporate(
       libId, element.getDirectory().getAbsPath(), element.getUuid(),
-      element.getVersion(), element.isDeprecated(), element.getIcon(),
+      element.getVersion(), element.isDeprecated(), element.getLogoPng(),
       element.getUrl(), element.getCountry(), element.getFabs(),
       element.getShipping(), element.isSponsor(), element.getPriority());
   for (const PcbManufacturerCapabilities& product :

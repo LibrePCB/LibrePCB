@@ -34,6 +34,7 @@
  ******************************************************************************/
 namespace librepcb {
 
+class PcbColor;
 class SExpression;
 
 /*******************************************************************************
@@ -56,6 +57,16 @@ public:
     void serialize(SExpression& root) const;
     bool operator==(const Source& rhs) const noexcept = default;
   };
+  struct SourceSetCmp {
+    std::size_t operator()(const Source& s) const noexcept {
+      return ::qHash(std::make_pair(s.corporateUuid, s.productUuid));
+    }
+    bool operator()(const Source& lhs, const Source& rhs) const noexcept {
+      return (lhs.corporateUuid == rhs.corporateUuid) &&
+          (lhs.productUuid == rhs.productUuid);
+    }
+  };
+  typedef std::unordered_set<Source, SourceSetCmp, SourceSetCmp> SourceSet;
   enum class AllowedSlots : int {
     None = 0,  ///< No slots are allowed at all.
     SingleSegmentStraight = 1,  ///< Straight single-segment slots are allowed.
@@ -71,7 +82,29 @@ public:
   ~BoardDesignRuleCheckSettings() noexcept;
 
   // Getters
-  const QVector<Source> getSources() const noexcept { return mSources; }
+  const SourceSet& getSources() const noexcept { return mSources; }
+  const std::pair<UnsignedLength, UnsignedLength>& getMinBoardSize()
+      const noexcept {
+    return mMinBoardSize;
+  }
+  const std::pair<UnsignedLength, UnsignedLength>& getMaxBoardSizeDoubleSided()
+      const noexcept {
+    return mMaxBoardSizeDoubleSided;
+  }
+  const std::pair<UnsignedLength, UnsignedLength>& getMaxBoardSizeMultiLayer()
+      const noexcept {
+    return mMaxBoardSizeMultiLayer;
+  }
+  const QSet<PositiveLength>& getPcbThickness() const noexcept {
+    return mPcbThickness;
+  }
+  uint getMaxInnerLayerCount() const noexcept { return mMaxInnerLayerCount; }
+  const QSet<const PcbColor*>& getSolderResist() const noexcept {
+    return mSolderResist;
+  }
+  const QSet<const PcbColor*>& getSilkscreen() const noexcept {
+    return mSilkscreen;
+  }
   const UnsignedLength& getMinCopperCopperClearance() const noexcept {
     return mMinCopperCopperClearance;
   }
@@ -125,7 +158,7 @@ public:
   AllowedSlots getAllowedPthSlots() const noexcept { return mAllowedPthSlots; }
 
   // Setters
-  void setSources(const QVector<Source>& value) noexcept { mSources = value; }
+  void setSources(const SourceSet& value) noexcept { mSources = value; }
   void setMinCopperCopperClearance(const UnsignedLength& value) noexcept {
     mMinCopperCopperClearance = value;
   }
@@ -198,7 +231,15 @@ public:
   }
 
 private:  // Data
-  QVector<Source> mSources;
+  // General
+  SourceSet mSources;
+  std::pair<UnsignedLength, UnsignedLength> mMinBoardSize;
+  std::pair<UnsignedLength, UnsignedLength> mMaxBoardSizeDoubleSided;
+  std::pair<UnsignedLength, UnsignedLength> mMaxBoardSizeMultiLayer;
+  QSet<PositiveLength> mPcbThickness;  ///< No restrictions if empty
+  uint mMaxInnerLayerCount;
+  QSet<const PcbColor*> mSolderResist;  ///< Empty = any/unknown. `nullptr`=none
+  QSet<const PcbColor*> mSilkscreen;  ///< Empty = any/unknown. `nullptr`=none
 
   // Clearances
   UnsignedLength mMinCopperCopperClearance;
@@ -224,6 +265,10 @@ private:  // Data
   bool mBuriedViasAllowed;
   AllowedSlots mAllowedNpthSlots;
   AllowedSlots mAllowedPthSlots;
+
+  // Arbitrary options for forward compatibility in case we really need to
+  // add new settings in a minor release.
+  QMap<QString, QList<SExpression>> mOptions;
 };
 
 /*******************************************************************************

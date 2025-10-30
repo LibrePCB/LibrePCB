@@ -224,6 +224,8 @@ void PcbManufacturerCapabilities::serialize(SExpression& root) const {
     }
   }
   root.ensureLineBreak();
+  root.appendChild("max_inner_layers", mMaxInnerLayerCount);
+  root.ensureLineBreak();
   {
     SExpression& child = root.appendList("solder_resist");
     for (const PcbColor* value : mSolderResist) {
