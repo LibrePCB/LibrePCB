@@ -382,7 +382,8 @@ int WorkspaceLibraryScanner::addElementToDb<Corporate>(
       libId, element.getDirectory().getAbsPath(), element.getUuid(),
       element.getVersion(), element.isDeprecated(), element.getLogoPng(),
       element.getUrl(), element.getCountry(), element.getFabs(),
-      element.getShipping(), element.isSponsor(), element.getPriority());
+      element.getShipping(), element.isSponsor(), element.getPriority(),
+      element.getGerberExcellonSettings().has_value());
   for (const CorporatePcbProduct& product : element.getPcbProducts()) {
     writer.addPcbProduct(
         id, product.getUuid(), *product.getNames().getDefaultValue(),

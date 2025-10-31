@@ -24,6 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include "../librarybaseelement.h"
+#include "corporategerberexcellonsettings.h"
 #include "corporatepcbproduct.h"
 
 #include <QtCore>
@@ -67,6 +68,10 @@ public:
     return mPcbProducts;
   }
   const CorporatePcbProduct* findPcbProduct(const Uuid& uuid) const noexcept;
+  const std::optional<CorporateGerberExcellonSettings>&
+      getGerberExcellonSettings() const noexcept {
+    return mGerberExcellonSettings;
+  }
 
   // Setters
   void setLogoPng(const QByteArray& png) noexcept { mLogoPng = png; }
@@ -115,6 +120,7 @@ private:  // Data
    */
   int mPriority;
   QVector<CorporatePcbProduct> mPcbProducts;
+  std::optional<CorporateGerberExcellonSettings> mGerberExcellonSettings;
 
   // Arbitrary options for forward compatibility in case we really need to
   // add new settings in a minor release.

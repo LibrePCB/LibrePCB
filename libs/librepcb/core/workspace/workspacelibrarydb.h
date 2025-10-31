@@ -123,6 +123,7 @@ public:
     bool isSponsor;
     int priority;
     QList<PcbProduct> pcbProducts;
+    bool hasGerberExcellonSettings;
   };
 
   // Constructors / Destructor

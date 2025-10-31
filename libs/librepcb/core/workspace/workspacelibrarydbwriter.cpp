@@ -329,7 +329,8 @@ void WorkspaceLibraryDbWriter::createAllTables() {
       "`fabs` TEXT NOT NULL, "
       "`shipping` TEXT NOT NULL, "
       "`sponsor` BOOL NOT NULL, "
-      "`priority` INTEGER NOT NULL "
+      "`priority` INTEGER NOT NULL, "
+      "`has_gerber_excellon_settings` BOOL NOT NULL "
       ")");
   queries << QString(
       "CREATE TABLE IF NOT EXISTS corporates_tr ("
@@ -462,13 +463,16 @@ int WorkspaceLibraryDbWriter::addCorporate(
     int libId, const FilePath& fp, const Uuid& uuid, const Version& version,
     bool deprecated, const QByteArray& logoPng, const QUrl& url,
     const QString& country, const QStringList& fabs,
-    const QStringList& shipping, bool isSponsor, int priority) {
+    const QStringList& shipping, bool isSponsor, int priority,
+    bool hasGerberExcellonSettings) {
   QSqlQuery query = mDb.prepareQuery(
       "INSERT INTO corporates "
       "(library_id, filepath, uuid, version, deprecated, logo_png, url, "
-      "country, fabs, shipping, sponsor, priority) VALUES "
+      "country, fabs, shipping, sponsor, priority, "
+      "has_gerber_excellon_settings) VALUES "
       "(:library_id, :filepath, :uuid, :version, :deprecated, :logo_png, "
-      ":url, :country, :fabs, :shipping, :sponsor, :priority)");
+      ":url, :country, :fabs, :shipping, :sponsor, :priority, "
+      ":has_gerber_excellon_settings)");
   query.bindValue(":library_id", libId);
   query.bindValue(":filepath", filePathToString(fp));
   query.bindValue(":uuid", uuid.toStr());
@@ -481,6 +485,7 @@ int WorkspaceLibraryDbWriter::addCorporate(
   query.bindValue(":shipping", nonNull(shipping.join(",")));
   query.bindValue(":sponsor", isSponsor);
   query.bindValue(":priority", priority);
+  query.bindValue(":has_gerber_excellon_settings", hasGerberExcellonSettings);
   return mDb.insert(query);
 }
 

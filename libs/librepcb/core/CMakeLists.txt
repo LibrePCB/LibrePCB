@@ -259,6 +259,8 @@ add_library(
   library/corp/corporatecheck.h
   library/corp/corporatecheckmessages.cpp
   library/corp/corporatecheckmessages.h
+  library/corp/corporategerberexcellonsettings.cpp
+  library/corp/corporategerberexcellonsettings.h
   library/corp/corporatepcbproduct.cpp
   library/corp/corporatepcbproduct.h
   library/dev/device.cpp

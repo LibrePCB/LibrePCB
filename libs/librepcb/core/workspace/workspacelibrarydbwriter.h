@@ -207,13 +207,15 @@ public:
    * @param shipping      Shipping options (e.g. "worldwide").
    * @param sponsor       Is LibrePCB sponsor or not.
    * @param priority      Sort order priority.
+   * @param hasGerberExcellonSettings If there are Gerber/Excellon settings.
    * @return ID of the added corporate.
    */
   int addCorporate(int libId, const FilePath& fp, const Uuid& uuid,
                    const Version& version, bool deprecated,
                    const QByteArray& logoPng, const QUrl& url,
                    const QString& country, const QStringList& fabs,
-                   const QStringList& shipping, bool isSponsor, int priority);
+                   const QStringList& shipping, bool isSponsor, int priority,
+                   bool hasGerberExcellonSettings);
 
   /**
    * @brief Add a PCB product to a previously added corporate

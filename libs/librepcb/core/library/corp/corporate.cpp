@@ -77,6 +77,10 @@ Corporate::Corporate(std::unique_ptr<TransactionalDirectory> directory,
   foreach (const SExpression* child, root.getChildren("pcb_product")) {
     mPcbProducts.append(CorporatePcbProduct(*child));  // can throw
   }
+  if (const SExpression* child = root.tryGetChild("gerber_excellon_settings")) {
+    mGerberExcellonSettings =
+        CorporateGerberExcellonSettings(*child);  // can throw
+  }
   foreach (const SExpression* child, root.getChildren("option")) {
     mOptions[child->getChild("@0").getValue()].append(*child);
   }
@@ -174,6 +178,11 @@ void Corporate::serialize(SExpression& root) const {
   root.ensureLineBreak();
   for (const CorporatePcbProduct& caps : mPcbProducts) {
     caps.serialize(root.appendList("pcb_product"));
+    root.ensureLineBreak();
+  }
+  if (mGerberExcellonSettings) {
+    mGerberExcellonSettings->serialize(
+        root.appendList("gerber_excellon_settings"));
     root.ensureLineBreak();
   }
   foreach (const auto& list, mOptions) {

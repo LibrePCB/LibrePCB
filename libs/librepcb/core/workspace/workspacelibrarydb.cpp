@@ -286,7 +286,8 @@ QList<WorkspaceLibraryDb::Corporate> WorkspaceLibraryDb::getAllLatestCorporates(
 
   QSqlQuery query = mDb->prepareQuery(
       "SELECT id, filepath, uuid, version, logo_png, url, country, fabs, "
-      "shipping, sponsor, priority FROM corporates");
+      "shipping, sponsor, priority, has_gerber_excellon_settings "
+      "FROM corporates");
   mDb->exec(query);
 
   // Get all corporates.
@@ -313,6 +314,7 @@ QList<WorkspaceLibraryDb::Corporate> WorkspaceLibraryDb::getAllLatestCorporates(
         query.value(9).toBool(),  // is_sponsor
         query.value(10).toInt(),  // priority
         {},  // PCB products
+        query.value(11).toBool(),  // has_gerber_excellon_settings
     };
     entries[corp.uuid].append(corp);
   }
