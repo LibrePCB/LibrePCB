@@ -510,6 +510,40 @@ Path Path::arcObround(const Point& p1, const Point& p2, const Angle& angle,
   }
 }
 
+std::optional<Path> Path::flatCapLine(const Point& p1, const Point& p2,
+                                      const Angle& angle,
+                                      const PositiveLength& width) noexcept {
+  // Handle arc.
+  if (auto center = Toolbox::arcCenter(p1, p2, angle)) {
+    const Angle a1 = Toolbox::angleBetweenPoints(*center, p1);
+    const Angle a2 = Toolbox::angleBetweenPoints(*center, p2);
+    const Point vector(width / 2, 0);
+    const Point p11 = p1 + vector.rotated(a1);
+    const Point p12 = p1 + vector.rotated(a1 + Angle::deg180());
+    const Point p21 = p2 + vector.rotated(a2);
+    const Point p22 = p2 + vector.rotated(a2 + Angle::deg180());
+    Path p;
+    p.addVertex(p12, angle);
+    p.addVertex(p22);
+    p.addVertex(p21, -angle);
+    p.addVertex(p11);
+    p.close();
+    p.clean();
+    return p;
+  }
+
+  // Handle straight line.
+  const UnsignedLength length = (p2 - p1).getLength();
+  if (length > 0) {
+    const Point center = (p1 + p2) / 2;
+    return centeredRect(PositiveLength(*length), width)
+        .translated(center)
+        .rotated(Toolbox::angleBetweenPoints(p1, p2), center);
+  }
+
+  return std::nullopt;
+}
+
 Path Path::rect(const Point& p1, const Point& p2) noexcept {
   Path p;
   p.addVertex(Point(p1.getX(), p1.getY()));

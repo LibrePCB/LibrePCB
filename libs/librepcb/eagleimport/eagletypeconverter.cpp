@@ -480,13 +480,42 @@ Path EagleTypeConverter::convertVertices(const QList<parseagle::Vertex>& v,
 QList<EagleTypeConverter::Geometry> EagleTypeConverter::convertAndJoinWires(
     const QList<parseagle::Wire>& wires, bool isGrabAreaIfClosed,
     MessageLogger& log) {
-  QMap<std::pair<int, double>, QList<parseagle::Wire>> joinableWires;
+  QList<Geometry> polygons;
+
+  QMap<std::pair<int, UnsignedLength>, QList<parseagle::Wire>> joinableWires;
   foreach (const parseagle::Wire& wire, wires) {
-    auto key = std::make_pair(wire.getLayer(), wire.getWidth());
-    joinableWires[key].append(wire);
+    try {
+      const UnsignedLength width =
+          convertLineWidth(wire.getWidth(), wire.getLayer());
+      if ((width > 0) && (wire.getWireCap() == parseagle::WireCap::Flat)) {
+        // Convert wires with flat cap to filled polygons. This is especially
+        // important for the MOUNT-HOLE symbol/footprints, see
+        // https://librepcb.discourse.group/t/import-of-an-eagle-sch-brd-glitch/967
+        if (auto path = Path::flatCapLine(
+                convertPoint(wire.getP1()), convertPoint(wire.getP2()),
+                convertAngle(wire.getCurve()), PositiveLength(*width))) {
+          polygons.append(Geometry{
+              wire.getLayer(),  // Layer
+              UnsignedLength(0),  // Line width (now zero because it's filled)
+              true,  // Filled
+              isGrabAreaIfClosed,  // Grab area
+              *path,  // Path
+              std::nullopt,  // Circle
+          });
+        } else {
+          throw RuntimeError(__FILE__, __LINE__,
+                             "Unsupported geometry with flat caps.");
+        }
+      } else {
+        // For any other wire, prepare them to be joined.
+        auto key = std::make_pair(wire.getLayer(), width);
+        joinableWires[key].append(wire);
+      }
+    } catch (const Exception& e) {
+      log.warning(QString("Failed to convert wires: %1").arg(e.getMsg()));
+    }
   }
 
-  QList<Geometry> polygons;
   bool timedOut = false;
   for (auto it = joinableWires.begin(); it != joinableWires.end(); it++) {
     try {
@@ -500,16 +529,11 @@ QList<EagleTypeConverter::Geometry> EagleTypeConverter::convertAndJoinWires(
               tr("Dashed/dotted line is not supported, converting to "
                  "continuous."));
         }
-        if (wire.getWireCap() != parseagle::WireCap::Round) {
-          log.warning(
-              tr("Flat line end is not supported, converting to round."));
-        }
       }
       foreach (const Path& p, TangentPathJoiner::join(paths, 5000, &timedOut)) {
         polygons.append(Geometry{
             it.value().first().getLayer(),  // Layer
-            convertLineWidth(it.value().first().getWidth(),
-                             it.value().first().getLayer()),  // Line width
+            it.key().second,  // Line width
             false,  // Filled
             isGrabAreaIfClosed && p.isClosed(),  // Grab area
             p,  // Path
