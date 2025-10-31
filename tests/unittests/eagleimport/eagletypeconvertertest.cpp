@@ -275,44 +275,62 @@ TEST_F(EagleTypeConverterTest, testConvertAndJoinWires) {
       parseagle::Wire(dom("<wire x1=\"1\" y1=\"2\" x2=\"3\" y2=\"4\" width=\"0.254\" layer=\"1\"/>")),
       parseagle::Wire(dom("<wire x1=\"3\" y1=\"4\" x2=\"5\" y2=\"6\" width=\"0.254\" layer=\"1\"/>")),
       parseagle::Wire(dom("<wire x1=\"5\" y1=\"6\" x2=\"7\" y2=\"8\" width=\"0.567\" layer=\"1\"/>")),
+      parseagle::Wire(dom("<wire x1=\"7\" y1=\"8\" x2=\"9\" y2=\"8\" width=\"0.567\" layer=\"1\" cap=\"flat\"/>")),
       parseagle::Wire(dom("<wire x1=\"7\" y1=\"8\" x2=\"9\" y2=\"9\" width=\"0.567\" layer=\"2\"/>")),
       parseagle::Wire(dom("<wire x1=\"7\" y1=\"8\" x2=\"9\" y2=\"9\" width=\"-1\" layer=\"2\"/>")),
       // clang-format on
   };
   auto out = C::convertAndJoinWires(wires, true, log);
-  ASSERT_EQ(3, out.count());
+  ASSERT_EQ(4, out.count());
   EXPECT_EQ(1, log.getMessages().count());
 
-  EXPECT_EQ(1, out.at(0).layerId);
-  EXPECT_EQ(UnsignedLength(254000), out.at(0).lineWidth);
-  EXPECT_EQ(false, out.at(0).filled);
-  EXPECT_EQ(false, out.at(0).grabArea);
+  const EagleTypeConverter::Geometry* geometry = &out.at(0);
+  EXPECT_EQ(1, geometry->layerId);
+  EXPECT_EQ(UnsignedLength(0), geometry->lineWidth);  // Converted to area
+  EXPECT_EQ(true, geometry->filled);
+  EXPECT_EQ(true, geometry->grabArea);
+  EXPECT_EQ(Path({
+                Vertex(Point(7000000, 8283500), Angle(0)),
+                Vertex(Point(9000000, 8283500), Angle(0)),
+                Vertex(Point(9000000, 7716500), Angle(0)),
+                Vertex(Point(7000000, 7716500), Angle(0)),
+                Vertex(Point(7000000, 8283500), Angle(0)),
+            }),
+            geometry->path);
+
+  geometry = &out.at(1);
+  EXPECT_EQ(1, geometry->layerId);
+  EXPECT_EQ(UnsignedLength(254000), geometry->lineWidth);
+  EXPECT_EQ(false, geometry->filled);
+  EXPECT_EQ(false, geometry->grabArea);
   EXPECT_EQ(Path({
                 Vertex(Point(1000000, 2000000), Angle(0)),
                 Vertex(Point(3000000, 4000000), Angle(0)),
                 Vertex(Point(5000000, 6000000), Angle(0)),
             }),
-            out.at(0).path);
+            geometry->path);
 
-  EXPECT_EQ(1, out.at(1).layerId);
-  EXPECT_EQ(UnsignedLength(567000), out.at(1).lineWidth);
-  EXPECT_EQ(false, out.at(1).filled);
-  EXPECT_EQ(false, out.at(1).grabArea);
+  geometry = &out.at(2);
+  EXPECT_EQ(1, geometry->layerId);
+  EXPECT_EQ(UnsignedLength(567000), geometry->lineWidth);
+  EXPECT_EQ(false, geometry->filled);
+  EXPECT_EQ(false, geometry->grabArea);
   EXPECT_EQ(Path({
                 Vertex(Point(5000000, 6000000), Angle(0)),
                 Vertex(Point(7000000, 8000000), Angle(0)),
             }),
-            out.at(1).path);
+            geometry->path);
 
-  EXPECT_EQ(2, out.at(2).layerId);
-  EXPECT_EQ(UnsignedLength(567000), out.at(2).lineWidth);
-  EXPECT_EQ(false, out.at(2).filled);
-  EXPECT_EQ(false, out.at(2).grabArea);
+  geometry = &out.at(3);
+  EXPECT_EQ(2, geometry->layerId);
+  EXPECT_EQ(UnsignedLength(567000), geometry->lineWidth);
+  EXPECT_EQ(false, geometry->filled);
+  EXPECT_EQ(false, geometry->grabArea);
   EXPECT_EQ(Path({
                 Vertex(Point(7000000, 8000000), Angle(0)),
                 Vertex(Point(9000000, 9000000), Angle(0)),
             }),
-            out.at(2).path);
+            geometry->path);
 }
 
 TEST_F(EagleTypeConverterTest, testConvertRectangle) {
