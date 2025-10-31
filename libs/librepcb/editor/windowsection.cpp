@@ -156,6 +156,7 @@ std::shared_ptr<WindowTab> WindowSection::removeTab(int index,
     if (index < currentIndex) {
       --currentIndex;
     }
+    tab->deactivate();  // setCurrentTab() doesn't do it because tab is removed.
     setCurrentTab(std::min(currentIndex, mTabs->count() - 1), forceUpdate);
     disconnect(tab.get(), &WindowTab::closeRequested, this,
                &WindowSection::tabCloseRequested);
@@ -174,7 +175,10 @@ std::shared_ptr<WindowTab> WindowSection::removeTab(int index,
 }
 
 void WindowSection::triggerTab(int index, ui::TabAction a) noexcept {
-  if (auto t = mTabs->value(index)) {
+  if (auto t = mTabs->value(index).get()) {
+    // Important: Do not hold a shared_ptr to the tab since it would delay
+    // the deletion of the tab if trigger() initiates the deletion. That
+    // would cause illegal memory access. Thus working with the raw pointer.
     t->trigger(a);
   }
 }
