@@ -477,7 +477,7 @@ void BoardSetupDialog::loadDrcSettingsPreset(const Uuid& corpUuid,
   std::shared_ptr<const Corporate> corp =
       mApp.getLibraryElementCache().getCorporate(corpUuid,
                                                  true);  // can throw
-  const PcbManufacturerCapabilities* caps = corp->findPcbCapabilities(prodUuid);
+  const CorporatePcbProduct* caps = corp->findPcbProduct(prodUuid);
   if (!caps) {
     // Maybe the wrong corporate was loaded since the listed corporate
     // may be from a local library, but the loaded corporate from remote?
@@ -487,6 +487,7 @@ void BoardSetupDialog::loadDrcSettingsPreset(const Uuid& corpUuid,
   s.setSources({BoardDesignRuleCheckSettings::Source{
       corp->getUuid(),
       corp->getNames().getDefaultValue(),
+      corp->getVersion(),
       caps->getUuid(),
       caps->getNames().getDefaultValue(),
   }});

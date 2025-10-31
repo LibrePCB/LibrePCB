@@ -323,7 +323,7 @@ void WorkspaceLibraryDbWriter::createAllTables() {
       "`uuid` TEXT NOT NULL, "
       "`version` TEXT NOT NULL, "
       "`deprecated` BOOLEAN NOT NULL, "
-      "`icon_png` BLOB, "
+      "`logo_png` BLOB, "
       "`url` TEXT, "
       "`country` TEXT NOT NULL, "
       "`fabs` TEXT NOT NULL, "
@@ -460,21 +460,21 @@ int WorkspaceLibraryDbWriter::addPartAttribute(int partId,
 
 int WorkspaceLibraryDbWriter::addCorporate(
     int libId, const FilePath& fp, const Uuid& uuid, const Version& version,
-    bool deprecated, const QByteArray& iconPng, const QUrl& url,
+    bool deprecated, const QByteArray& logoPng, const QUrl& url,
     const QString& country, const QStringList& fabs,
     const QStringList& shipping, bool isSponsor, int priority) {
   QSqlQuery query = mDb.prepareQuery(
       "INSERT INTO corporates "
-      "(library_id, filepath, uuid, version, deprecated, icon_png, url, "
+      "(library_id, filepath, uuid, version, deprecated, logo_png, url, "
       "country, fabs, shipping, sponsor, priority) VALUES "
-      "(:library_id, :filepath, :uuid, :version, :deprecated, :icon_png, "
+      "(:library_id, :filepath, :uuid, :version, :deprecated, :logo_png, "
       ":url, :country, :fabs, :shipping, :sponsor, :priority)");
   query.bindValue(":library_id", libId);
   query.bindValue(":filepath", filePathToString(fp));
   query.bindValue(":uuid", uuid.toStr());
   query.bindValue(":version", version.toStr());
   query.bindValue(":deprecated", deprecated);
-  query.bindValue(":icon_png", iconPng);
+  query.bindValue(":logo_png", logoPng);
   query.bindValue(":url", url);
   query.bindValue(":country", nonNull(country));
   query.bindValue(":fabs", nonNull(fabs.join(",")));

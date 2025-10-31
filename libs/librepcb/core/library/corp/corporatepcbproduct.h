@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CORE_PCBMANUFACTURERCAPABILITIES_H
-#define LIBREPCB_CORE_PCBMANUFACTURERCAPABILITIES_H
+#ifndef LIBREPCB_CORE_CORPORATEPCBPRODUCT_H
+#define LIBREPCB_CORE_CORPORATEPCBPRODUCT_H
 
 /*******************************************************************************
  *  Includes
@@ -34,20 +34,19 @@
 namespace librepcb {
 
 /*******************************************************************************
- *  Class PcbManufacturerCapabilities
+ *  Class CorporatePcbProduct
  ******************************************************************************/
 
 /**
- * @brief The PcbManufacturerCapabilities class
+ * @brief The CorporatePcbProduct class
  */
-class PcbManufacturerCapabilities final {
+class CorporatePcbProduct final {
 public:
   // Constructors / Destructor
-  PcbManufacturerCapabilities() noexcept = delete;
-  PcbManufacturerCapabilities(
-      const PcbManufacturerCapabilities& other) noexcept;
-  explicit PcbManufacturerCapabilities(const SExpression& node);
-  ~PcbManufacturerCapabilities() noexcept;
+  CorporatePcbProduct() noexcept = delete;
+  CorporatePcbProduct(const CorporatePcbProduct& other) noexcept;
+  explicit CorporatePcbProduct(const SExpression& node);
+  ~CorporatePcbProduct() noexcept;
 
   // Getters
   const Uuid& getUuid() const noexcept { return mUuid; }
@@ -56,9 +55,7 @@ public:
     return mDescriptions;
   }
   const QUrl& getUrl() const noexcept { return mUrl; }
-  const BoardDesignRuleCheckSettings& getDrcSettings() const noexcept {
-    return mDrcSettings;
-  }
+  BoardDesignRuleCheckSettings getDrcSettings() const noexcept;
 
   // Setters
   void setNames(const LocalizedNameMap& names) noexcept { mNames = names; }
@@ -79,8 +76,7 @@ public:
   void serialize(SExpression& root) const;
 
   // Operator Overloadings
-  PcbManufacturerCapabilities& operator=(
-      const PcbManufacturerCapabilities& rhs) noexcept;
+  CorporatePcbProduct& operator=(const CorporatePcbProduct& rhs) noexcept;
 
 private:  // Data
   // Attributes
@@ -89,6 +85,10 @@ private:  // Data
   LocalizedDescriptionMap mDescriptions;
   QUrl mUrl;
 
+  // This dependency from the "library" sources to "project" sources is actually
+  // violating our software architecture. It's not critical, but it would be
+  // better to move the BoardDesignRuleCheckSettings class into the common
+  // sources so both "library" and "project" sources can depend on it.
   BoardDesignRuleCheckSettings mDrcSettings;
 };
 

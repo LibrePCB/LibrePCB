@@ -57,10 +57,10 @@ class BoardDesignRuleCheckSettings;
 class BoardDesignRules;
 class BoardFabricationOutputSettings;
 class Corporate;
+class CorporatePcbProduct;
 class Layer;
 class NetSignal;
 class PcbColor;
-class PcbManufacturerCapabilities;
 class Project;
 class SceneData3D;
 
@@ -79,7 +79,7 @@ public:
   // Types
   struct Manufacturer {
     const Corporate& corporate;
-    const PcbManufacturerCapabilities& product;
+    const CorporatePcbProduct& product;
   };
 
   // Constructors / Destructor

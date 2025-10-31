@@ -20,7 +20,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "pcbmanufacturercapabilities.h"
+#include "corporatepcbproduct.h"
 
 #include "../../serialization/sexpression.h"
 
@@ -35,8 +35,8 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-PcbManufacturerCapabilities::PcbManufacturerCapabilities(
-    const PcbManufacturerCapabilities& other) noexcept
+CorporatePcbProduct::CorporatePcbProduct(
+    const CorporatePcbProduct& other) noexcept
   : mUuid(other.mUuid),
     mNames(other.mNames),
     mDescriptions(other.mDescriptions),
@@ -44,8 +44,7 @@ PcbManufacturerCapabilities::PcbManufacturerCapabilities(
     mDrcSettings(other.mDrcSettings) {
 }
 
-PcbManufacturerCapabilities::PcbManufacturerCapabilities(
-    const SExpression& node)
+CorporatePcbProduct::CorporatePcbProduct(const SExpression& node)
   : mUuid(deserialize<Uuid>(node.getChild("@0"))),
     mNames(node),
     mDescriptions(node),
@@ -57,14 +56,35 @@ PcbManufacturerCapabilities::PcbManufacturerCapabilities(
   mDrcSettings.setSources({});  // Not supported in this context.
 }
 
-PcbManufacturerCapabilities::~PcbManufacturerCapabilities() noexcept {
+CorporatePcbProduct::~CorporatePcbProduct() noexcept {
+}
+
+/*******************************************************************************
+ *  Getters
+ ******************************************************************************/
+
+BoardDesignRuleCheckSettings CorporatePcbProduct::getDrcSettings()
+    const noexcept {
+  // Discard options with the prefix "product_" since they are intended only
+  // for this class, not for BoardDesignRuleCheckSettings.
+  QMap<QString, QList<SExpression>> options;
+  for (auto it = mDrcSettings.getOptions().begin();
+       it != mDrcSettings.getOptions().end(); it++) {
+    if (!it.key().startsWith("product_")) {
+      options.insert(it.key(), it.value());
+    }
+  }
+
+  BoardDesignRuleCheckSettings s = mDrcSettings;
+  s.setOptions(options);
+  return s;
 }
 
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
 
-void PcbManufacturerCapabilities::serialize(SExpression& root) const {
+void CorporatePcbProduct::serialize(SExpression& root) const {
   root.appendChild(mUuid);
   root.ensureLineBreak();
   mNames.serialize(root);
@@ -81,8 +101,8 @@ void PcbManufacturerCapabilities::serialize(SExpression& root) const {
  *  Operator Overloadings
  ******************************************************************************/
 
-PcbManufacturerCapabilities& PcbManufacturerCapabilities::operator=(
-    const PcbManufacturerCapabilities& rhs) noexcept {
+CorporatePcbProduct& CorporatePcbProduct::operator=(
+    const CorporatePcbProduct& rhs) noexcept {
   mUuid = rhs.mUuid;
   mNames = rhs.mNames;
   mDescriptions = rhs.mDescriptions;

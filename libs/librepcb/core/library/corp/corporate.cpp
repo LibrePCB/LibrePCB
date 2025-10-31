@@ -50,7 +50,7 @@ Corporate::Corporate(const Uuid& uuid, const Version& version,
     mShipping(),
     mIsSponsor(false),
     mPriority(0),
-    mPcbCapabilities(),
+    mPcbProducts(),
     mOptions() {
 }
 
@@ -68,14 +68,14 @@ Corporate::Corporate(std::unique_ptr<TransactionalDirectory> directory,
     mShipping(root.getChild("shipping/@0").getValue().split(",")),
     mIsSponsor(deserialize<bool>(root.getChild("sponsor/@0"))),
     mPriority(deserialize<int>(root.getChild("priority/@0"))),
-    mPcbCapabilities(),  // Initialized below.
+    mPcbProducts(),  // Initialized below.
     mOptions()  // Initialized below.
 {
   // Load image if available.
   mLogoPng = mDirectory->readIfExists("logo.png");  // can throw
 
   foreach (const SExpression* child, root.getChildren("pcb_product")) {
-    mPcbCapabilities.append(PcbManufacturerCapabilities(*child));  // can throw
+    mPcbProducts.append(CorporatePcbProduct(*child));  // can throw
   }
   foreach (const SExpression* child, root.getChildren("option")) {
     mOptions[child->getChild("@0").getValue()].append(*child);
@@ -95,9 +95,9 @@ QPixmap Corporate::getLogoPixmap() const noexcept {
   return p;
 }
 
-const PcbManufacturerCapabilities* Corporate::findPcbCapabilities(
+const CorporatePcbProduct* Corporate::findPcbProduct(
     const Uuid& uuid) const noexcept {
-  for (const auto& obj : mPcbCapabilities) {
+  for (const auto& obj : mPcbProducts) {
     if (obj.getUuid() == uuid) {
       return &obj;
     }
@@ -172,7 +172,7 @@ void Corporate::serialize(SExpression& root) const {
   root.ensureLineBreak();
   root.appendChild("priority", mPriority);
   root.ensureLineBreak();
-  for (const PcbManufacturerCapabilities& caps : mPcbCapabilities) {
+  for (const CorporatePcbProduct& caps : mPcbProducts) {
     caps.serialize(root.appendList("pcb_product"));
     root.ensureLineBreak();
   }

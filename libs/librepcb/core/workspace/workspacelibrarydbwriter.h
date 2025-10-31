@@ -200,7 +200,7 @@ public:
    * @param uuid          UUID of the corporate.
    * @param version       Version of the corporate.
    * @param deprecated    Whether the corporate is deprecated or not.
-   * @param iconPng       Icon as a PNG.
+   * @param logoPng       Logo as a PNG.
    * @param url           Website URL.
    * @param country       Country code (e.g. "DE").
    * @param fabs          Country codes of fabs (e.g. "DE").
@@ -211,7 +211,7 @@ public:
    */
   int addCorporate(int libId, const FilePath& fp, const Uuid& uuid,
                    const Version& version, bool deprecated,
-                   const QByteArray& iconPng, const QUrl& url,
+                   const QByteArray& logoPng, const QUrl& url,
                    const QString& country, const QStringList& fabs,
                    const QStringList& shipping, bool isSponsor, int priority);
 

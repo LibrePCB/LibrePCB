@@ -383,8 +383,7 @@ int WorkspaceLibraryScanner::addElementToDb<Corporate>(
       element.getVersion(), element.isDeprecated(), element.getLogoPng(),
       element.getUrl(), element.getCountry(), element.getFabs(),
       element.getShipping(), element.isSponsor(), element.getPriority());
-  for (const PcbManufacturerCapabilities& product :
-       element.getPcbCapabilities()) {
+  for (const CorporatePcbProduct& product : element.getPcbProducts()) {
     writer.addPcbProduct(
         id, product.getUuid(), *product.getNames().getDefaultValue(),
         product.getDescriptions().getDefaultValue(), product.getUrl(),

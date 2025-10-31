@@ -259,8 +259,8 @@ add_library(
   library/corp/corporatecheck.h
   library/corp/corporatecheckmessages.cpp
   library/corp/corporatecheckmessages.h
-  library/corp/pcbmanufacturercapabilities.cpp
-  library/corp/pcbmanufacturercapabilities.h
+  library/corp/corporatepcbproduct.cpp
+  library/corp/corporatepcbproduct.h
   library/dev/device.cpp
   library/dev/device.h
   library/dev/devicecheck.cpp

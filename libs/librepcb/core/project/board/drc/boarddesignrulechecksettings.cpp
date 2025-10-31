@@ -80,17 +80,20 @@ BoardDesignRuleCheckSettings::Source BoardDesignRuleCheckSettings::Source::load(
   return Source{
       deserialize<Uuid>(node.getChild("corporate/@0")),
       deserialize<ElementName>(node.getChild("corporate/@1")),
+      deserialize<Version>(node.getChild("corporate/@2")),
       deserialize<Uuid>(node.getChild("pcb_product/@0")),
       deserialize<ElementName>(node.getChild("pcb_product/@1")),
   };
 }
 
 void BoardDesignRuleCheckSettings::Source::serialize(SExpression& root) const {
+  root.ensureLineBreak();
   SExpression& corporate = root.appendList("corporate");
   corporate.appendChild(corporateUuid);
   corporate.appendChild(corporateName);
+  corporate.appendChild(corporateVersion);
   root.ensureLineBreak();
-  SExpression& product = root.appendList("product");
+  SExpression& product = root.appendList("pcb_product");
   product.appendChild(productUuid);
   product.appendChild(productName);
   root.ensureLineBreak();

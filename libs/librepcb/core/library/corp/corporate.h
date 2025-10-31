@@ -24,7 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include "../librarybaseelement.h"
-#include "pcbmanufacturercapabilities.h"
+#include "corporatepcbproduct.h"
 
 #include <QtCore>
 
@@ -63,12 +63,10 @@ public:
   const QStringList& getShipping() const noexcept { return mShipping; }
   bool isSponsor() const noexcept { return mIsSponsor; }
   int getPriority() const noexcept { return mPriority; }
-  const QVector<PcbManufacturerCapabilities>& getPcbCapabilities()
-      const noexcept {
-    return mPcbCapabilities;
+  const QVector<CorporatePcbProduct>& getPcbProducts() const noexcept {
+    return mPcbProducts;
   }
-  const PcbManufacturerCapabilities* findPcbCapabilities(
-      const Uuid& uuid) const noexcept;
+  const CorporatePcbProduct* findPcbProduct(const Uuid& uuid) const noexcept;
 
   // Setters
   void setLogoPng(const QByteArray& png) noexcept { mLogoPng = png; }
@@ -106,8 +104,17 @@ private:  // Data
   QStringList mFabs;
   QStringList mShipping;
   bool mIsSponsor;
+  /**
+   * @brief Priority to influence the sort order of corporates
+   *
+   * Convention:
+   *  - `100` for LibrePCB Fab
+   *  - `50..99` for user-created corporates
+   *  - `1..49` for important corporates (e.g. LibrePCB sponsors)
+   *  - `0` for any other corporates (default value)
+   */
   int mPriority;
-  QVector<PcbManufacturerCapabilities> mPcbCapabilities;
+  QVector<CorporatePcbProduct> mPcbProducts;
 
   // Arbitrary options for forward compatibility in case we really need to
   // add new settings in a minor release.

@@ -285,7 +285,7 @@ QList<WorkspaceLibraryDb::Corporate> WorkspaceLibraryDb::getAllLatestCorporates(
   SQLiteDatabase::TransactionScopeGuard sg(*mDb);  // Atomic products query!
 
   QSqlQuery query = mDb->prepareQuery(
-      "SELECT id, filepath, uuid, version, icon_png, url, country, fabs, "
+      "SELECT id, filepath, uuid, version, logo_png, url, country, fabs, "
       "shipping, sponsor, priority FROM corporates");
   mDb->exec(query);
 
@@ -354,12 +354,14 @@ QList<WorkspaceLibraryDb::Corporate> WorkspaceLibraryDb::getAllLatestCorporates(
   }
 
   // Pre-sort results in a way suitable for most use-cases.
+  // Note: Do not take "isSponsor" into account as the priority should
+  // already take care of that. If we ever publish DRC settings for
+  // "LibrePCB Fab", we probably want it to appear as the first item, even
+  // though it wouldn't be marked as sponsor.
   std::sort(result.begin(), result.end(),
             [](const Corporate& a, const Corporate& b) {
               if (a.priority != b.priority) {
                 return a.priority > b.priority;
-              } else if (a.isSponsor != b.isSponsor) {
-                return a.isSponsor;
               } else {
                 return a.name < b.name;
               }

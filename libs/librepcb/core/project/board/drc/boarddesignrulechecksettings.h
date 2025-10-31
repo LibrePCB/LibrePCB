@@ -26,6 +26,7 @@
 #include "../../../types/elementname.h"
 #include "../../../types/length.h"
 #include "../../../types/uuid.h"
+#include "../../../types/version.h"
 
 #include <unordered_set>
 
@@ -52,6 +53,7 @@ public:
   struct Source {
     Uuid corporateUuid;
     ElementName corporateName;
+    Version corporateVersion;
     Uuid productUuid;
     ElementName productName;
 
@@ -158,6 +160,9 @@ public:
     return mAllowedNpthSlots;
   }
   AllowedSlots getAllowedPthSlots() const noexcept { return mAllowedPthSlots; }
+  const QMap<QString, QList<SExpression>>& getOptions() const noexcept {
+    return mOptions;
+  }
 
   // Setters
   void setSources(const SourceSet& value) noexcept { mSources = value; }
@@ -237,6 +242,9 @@ public:
   }
   void setAllowedPthSlots(AllowedSlots value) noexcept {
     mAllowedPthSlots = value;
+  }
+  void setOptions(const QMap<QString, QList<SExpression>>& value) noexcept {
+    mOptions = value;
   }
 
   // General Methods
