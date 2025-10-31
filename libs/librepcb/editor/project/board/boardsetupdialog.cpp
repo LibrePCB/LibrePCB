@@ -483,9 +483,7 @@ void BoardSetupDialog::loadDrcSettingsPreset(const Uuid& corpUuid,
     // may be from a local library, but the loaded corporate from remote?
     throw LogicError(__FILE__, __LINE__);
   }
-  auto node = SExpression::createList("rules");
-  caps->serialize(*node);
-  BoardDesignRuleCheckSettings s(*node);
+  BoardDesignRuleCheckSettings s = caps->getDrcSettings();
   s.setSources({BoardDesignRuleCheckSettings::Source{
       corp->getUuid(),
       corp->getNames().getDefaultValue(),

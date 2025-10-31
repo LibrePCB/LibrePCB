@@ -385,10 +385,10 @@ int WorkspaceLibraryScanner::addElementToDb<Corporate>(
       element.getShipping(), element.isSponsor(), element.getPriority());
   for (const PcbManufacturerCapabilities& product :
        element.getPcbCapabilities()) {
-    writer.addPcbProduct(id, product.getUuid(),
-                         *product.getNames().getDefaultValue(),
-                         product.getDescriptions().getDefaultValue(),
-                         product.getUrl(), product.getMaxInnerLayerCount());
+    writer.addPcbProduct(
+        id, product.getUuid(), *product.getNames().getDefaultValue(),
+        product.getDescriptions().getDefaultValue(), product.getUrl(),
+        product.getDrcSettings().getMaxInnerLayerCount());
   }
   return id;
 }

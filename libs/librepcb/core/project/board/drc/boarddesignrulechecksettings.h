@@ -27,6 +27,8 @@
 #include "../../../types/length.h"
 #include "../../../types/uuid.h"
 
+#include <unordered_set>
+
 #include <QtCore>
 
 /*******************************************************************************
@@ -159,6 +161,30 @@ public:
 
   // Setters
   void setSources(const SourceSet& value) noexcept { mSources = value; }
+  void setMinBoardSize(
+      const std::pair<UnsignedLength, UnsignedLength>& value) noexcept {
+    mMinBoardSize = value;
+  }
+  void setMaxBoardSizeDoubleSided(
+      const std::pair<UnsignedLength, UnsignedLength>& value) noexcept {
+    mMaxBoardSizeDoubleSided = value;
+  }
+  void setMaxBoardSizeMultiLayer(
+      const std::pair<UnsignedLength, UnsignedLength>& value) noexcept {
+    mMaxBoardSizeMultiLayer = value;
+  }
+  void setPcbThickness(const QSet<PositiveLength>& value) noexcept {
+    mPcbThickness = value;
+  }
+  void setMaxInnerLayerCount(uint value) noexcept {
+    mMaxInnerLayerCount = value;
+  }
+  void setSolderResist(const QSet<const PcbColor*>& value) noexcept {
+    mSolderResist = value;
+  }
+  void setSilkscreen(const QSet<const PcbColor*>& value) noexcept {
+    mSilkscreen = value;
+  }
   void setMinCopperCopperClearance(const UnsignedLength& value) noexcept {
     mMinCopperCopperClearance = value;
   }

@@ -765,6 +765,7 @@ template QString WorkspaceLibraryDb::getTable<Symbol>() noexcept;
 template QString WorkspaceLibraryDb::getTable<Package>() noexcept;
 template QString WorkspaceLibraryDb::getTable<Component>() noexcept;
 template QString WorkspaceLibraryDb::getTable<Device>() noexcept;
+template QString WorkspaceLibraryDb::getTable<Corporate>() noexcept;
 
 template <typename ElementType>
 QString WorkspaceLibraryDb::getCategoryTable() noexcept {

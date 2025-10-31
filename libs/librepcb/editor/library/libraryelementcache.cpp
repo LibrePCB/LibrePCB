@@ -85,6 +85,7 @@ void LibraryElementCache::reset() noexcept {
   clearAndCount(mPkg, count);
   clearAndCount(mCmp, count);
   clearAndCount(mDev, count);
+  clearAndCount(mCorp, count);
   qDebug() << "Discarded" << count << "cached library elements.";
 }
 
