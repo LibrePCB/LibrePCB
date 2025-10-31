@@ -436,7 +436,9 @@ void BoardSetupDialog::loadDrcSettingsPreset() noexcept {
   try {
     QList<WorkspaceLibraryDb::Corporate> corporates =
         mApp.getWorkspace().getLibraryDb().getAllLatestCorporates(
-            mApp.getWorkspace().getSettings().libraryLocaleOrder.get());
+            mApp.getWorkspace()
+                .getSettings()
+                .libraryLocaleOrder.get());  // can throw
 
     QMenu menu(this);
     QHash<QAction*, std::pair<Uuid, Uuid>> map;
@@ -477,19 +479,19 @@ void BoardSetupDialog::loadDrcSettingsPreset(const Uuid& corpUuid,
   std::shared_ptr<const Corporate> corp =
       mApp.getLibraryElementCache().getCorporate(corpUuid,
                                                  true);  // can throw
-  const CorporatePcbProduct* caps = corp->findPcbProduct(prodUuid);
-  if (!caps) {
+  const CorporatePcbProduct* prod = corp->findPcbProduct(prodUuid);
+  if (!prod) {
     // Maybe the wrong corporate was loaded since the listed corporate
     // may be from a local library, but the loaded corporate from remote?
     throw LogicError(__FILE__, __LINE__);
   }
-  BoardDesignRuleCheckSettings s = caps->getDrcSettings();
+  BoardDesignRuleCheckSettings s = prod->getDrcSettings();
   s.setSources({BoardDesignRuleCheckSettings::Source{
       corp->getUuid(),
       corp->getNames().getDefaultValue(),
       corp->getVersion(),
-      caps->getUuid(),
-      caps->getNames().getDefaultValue(),
+      prod->getUuid(),
+      prod->getNames().getDefaultValue(),
   }});
   loadDrcSettings(s);
 }

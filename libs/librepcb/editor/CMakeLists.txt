@@ -917,6 +917,8 @@ add_library(
   workspace/categorytreemodel.h
   workspace/categorytreemodellegacy.cpp
   workspace/categorytreemodellegacy.h
+  workspace/corporatesdbmodel.cpp
+  workspace/corporatesdbmodel.h
   workspace/desktopintegration.cpp
   workspace/desktopintegration.h
   workspace/desktopservices.cpp

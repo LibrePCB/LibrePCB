@@ -131,6 +131,9 @@ void FileFormatMigrationUnstable::upgradeBoard(SExpression& root) {
   drcNode.ensureLineBreak();
   drcNode.appendList("silkscreen");
   drcNode.ensureLineBreak();
+  drcNode.appendChild("max_tented_via_drill_diameter",
+                      SExpression::createToken("0.5"));
+  drcNode.ensureLineBreak();
 }
 
 /*******************************************************************************

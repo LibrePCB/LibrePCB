@@ -202,6 +202,7 @@ private:
   void loadLayersVisibility() noexcept;
   void storeLayersVisibility() noexcept;
   void updateMessages() noexcept;
+  void loadDesignRules(const QString& uiKey) noexcept;
   void highlightDrcMessage(const std::shared_ptr<const RuleCheckMessage>& msg,
                            bool zoomTo) noexcept;
   void clearDrcMarker() noexcept;

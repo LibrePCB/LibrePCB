@@ -42,6 +42,7 @@ class Workspace;
 
 namespace editor {
 
+class CorporatesDbModel;
 class GraphicsLayerList;
 class LibrariesModel;
 class LibraryEditor;
@@ -183,6 +184,9 @@ private:
   std::unique_ptr<ProjectLibraryUpdater> mProjectLibraryUpdater;
   QList<std::shared_ptr<MainWindow>> mWindows;
   QTimer mSaveOpenedWindowsCountdown;
+
+  // Cache
+  std::weak_ptr<CorporatesDbModel> mCorporatesWithPcbProducts;
 };
 
 /*******************************************************************************

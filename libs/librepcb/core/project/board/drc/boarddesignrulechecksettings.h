@@ -145,6 +145,9 @@ public:
   const UnsignedLength& getMinPthSlotWidth() const noexcept {
     return mMinPthSlotWidth;
   }
+  const UnsignedLength& getMaxTentedViaDrillDiameter() const noexcept {
+    return mMaxTentedViaDrillDiameter;
+  }
   const UnsignedLength& getMinSilkscreenWidth() const noexcept {
     return mMinSilkscreenWidth;
   }
@@ -226,6 +229,9 @@ public:
   void setMinPthSlotWidth(const UnsignedLength& value) noexcept {
     mMinPthSlotWidth = value;
   }
+  void setMaxTentedViaDrillDiameter(const UnsignedLength& value) noexcept {
+    mMaxTentedViaDrillDiameter = value;
+  }
   void setMinSilkscreenWidth(const UnsignedLength& value) noexcept {
     mMinSilkscreenWidth = value;
   }
@@ -283,13 +289,14 @@ private:  // Data
   UnsignedLength mMinDrillBoardClearance;
   UnsignedLength mMinSilkscreenStopmaskClearance;
 
-  // Minimum sizes
+  // Minimum/maximum sizes
   UnsignedLength mMinCopperWidth;
   UnsignedLength mMinPthAnnularRing;
   UnsignedLength mMinNpthDrillDiameter;
   UnsignedLength mMinPthDrillDiameter;
   UnsignedLength mMinNpthSlotWidth;
   UnsignedLength mMinPthSlotWidth;
+  UnsignedLength mMaxTentedViaDrillDiameter;
   UnsignedLength mMinSilkscreenWidth;
   UnsignedLength mMinSilkscreenTextHeight;
   UnsignedLength mMinOutlineToolDiameter;

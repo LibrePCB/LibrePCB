@@ -298,6 +298,22 @@ export struct RuleCheckData {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Workspace library database
+////////////////////////////////////////////////////////////////////////////////
+
+export struct CorporatePcbProductDbData {
+    uuid: string,
+    name: string,
+    url: string,
+}
+
+export struct CorporateDbData {
+    uuid: string,
+    name: string,
+    pcb-products: [CorporatePcbProductDbData],
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Editor tools
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -1227,6 +1243,9 @@ export struct Board2dTabData {
 
     scene-image-pos: Point,  // Absolute position of graphics scene
     frame: int,  // Frame index to trigger repainting
+
+    // Actions
+    set-design-rules: string,  // Set to "UUID:UUID" by UI, reset by backend
 }
 
 // Additional data for board 3D viewer tabs
