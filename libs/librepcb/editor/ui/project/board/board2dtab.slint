@@ -33,6 +33,25 @@ import {
     WindowSectionData,
 } from "../../api.slint";
 
+component LearnHowToCreateBoardLink inherits HorizontalLayout {
+    in property <color> text-color;
+    in property <color> hover-color;
+
+    alignment: start;
+
+    setup-design-rules-help-btn := LinkText {
+        text-color: text-color;
+        text-color-hovered: hover-color;
+        wrap: word-wrap;
+        text: "▸ " + @tr("Learn how to create boards");
+        status-tip: Constants.user-manual-create-board-url;
+
+        clicked => {
+            Backend.open-url(self.status-tip);
+        }
+    }
+}
+
 export component Board2dTab inherits Tab {
     in property <int> section-index;
     in-out property <WindowSectionData> section;
@@ -211,6 +230,96 @@ export component Board2dTab inherits Tab {
                 }
             }
 
+            if tabs[index].setup-design-rules-msg.visible: setup-design-rules-msg := MessageBox {
+                title: @tr("Set-Up Design Rules");
+                supports-dont-show-again: tabs[index].setup-design-rules-msg.supports-dont-show-again;
+
+                Text {
+                    wrap: word-wrap;
+                    color: parent.text-color;
+                    text: @tr("Before starting with the board design, it is highly recommended to set up the design rules to be used for this board. Just choose one of the presets below, or manually specify the rules.");
+                }
+
+                VerticalLayout {
+                    padding-left: 10px;
+                    spacing: 3px;
+
+                    HorizontalLayout {
+                        alignment: start;
+
+                        Text {
+                            color: setup-design-rules-msg.text-color;
+                            font-weight: 700;
+                            text: "• ";
+                        }
+
+                        LinkText {
+                            text-color: setup-design-rules-msg.text-color;
+                            text-color-hovered: setup-design-rules-msg.hover-color;
+                            font-weight: 700;
+                            text: "Default rules, suitable for most PCB manufacturers";
+                        }
+                    }
+
+                    HorizontalLayout {
+                        alignment: start;
+
+                        Text {
+                            color: setup-design-rules-msg.text-color;
+                            text: "• AISLER: ";
+                        }
+
+                        LinkText {
+                            text-color: setup-design-rules-msg.text-color;
+                            text-color-hovered: setup-design-rules-msg.hover-color;
+                            font-italic: true;
+                            text: "2 Layer 1.6mm";
+                        }
+
+                        Text {
+                            color: setup-design-rules-msg.text-color;
+                            text: " | ";
+                        }
+
+                        LinkText {
+                            text-color: setup-design-rules-msg.text-color;
+                            text-color-hovered: setup-design-rules-msg.hover-color;
+                            font-italic: true;
+                            text: "4 Layer 1.6mm";
+                        }
+                    }
+
+                    HorizontalLayout {
+                        alignment: start;
+
+                        Text {
+                            color: setup-design-rules-msg.text-color;
+                            font-weight: 700;
+                            text: "• ";
+                        }
+
+                        LinkText {
+                            text-color: setup-design-rules-msg.text-color;
+                            text-color-hovered: setup-design-rules-msg.hover-color;
+                            text: "Other Options / Manual Setup";
+
+                            clicked => {
+                                tabs[index].setup-design-rules-msg.action = DismissableMessageAction.dismiss;
+                                Backend.trigger-board(tabs[index].project-index, tabs[index].board-index, BoardAction.open-setup-dialog);
+                            }
+                        }
+                    }
+                }
+
+                dismiss-clicked => {
+                    tabs[index].setup-design-rules-msg.action = DismissableMessageAction.dismiss;
+                }
+
+                dont-show-again-clicked => {
+                    tabs[index].setup-design-rules-msg.action = DismissableMessageAction.dont-show-again;
+                }
+            }
+
             if tabs[index].place-devices-msg.visible: place-devices-msg := MessageBox {
                 title: @tr("Get Started");
                 supports-dont-show-again: tabs[index].place-devices-msg.supports-dont-show-again;
@@ -259,20 +368,9 @@ export component Board2dTab inherits Tab {
                     }
                 }
 
-                HorizontalLayout {
-                    alignment: start;
-
-                    place-devices-help-btn := LinkText {
-                        text-color: place-devices-msg.text-color;
-                        text-color-hovered: place-devices-msg.hover-color;
-                        wrap: word-wrap;
-                        text: "▸ " + @tr("Learn how to create boards");
-                        status-tip: Constants.user-manual-create-board-url;
-
-                        clicked => {
-                            Backend.open-url(self.status-tip);
-                        }
-                    }
+                LearnHowToCreateBoardLink {
+                    text-color: place-devices-msg.text-color;
+                    hover-color: place-devices-msg.hover-color;
                 }
 
                 dismiss-clicked => {

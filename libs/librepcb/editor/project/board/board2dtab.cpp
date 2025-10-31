@@ -82,7 +82,7 @@
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
 #include <librepcb/core/workspace/workspacesettings.h>
-
+#include <librepcb/core/project/board/boarddesignrules.h>
 #include <QtCore>
 #include <QtWidgets>
 
@@ -140,6 +140,7 @@ Board2dTab::Board2dTab(GuiApplication& app, BoardEditor& editor,
     mView(new SlintGraphicsView(SlintGraphicsView::defaultBoardSceneRect(),
                                 this)),
     mMsgEmptySchematics(app.getWorkspace(), "EMPTY_BOARD_NO_COMPONENTS"),
+    mMsgSetupDesignRules(app.getWorkspace(), "EMPTY_BOARD_SETUP_DESIGN_RULES"),
     mMsgPlaceDevices(app.getWorkspace(), "EMPTY_BOARD_PLACE_DEVICES"),
     mGridStyle(mApp.getWorkspace()
                    .getSettings()
@@ -239,6 +240,8 @@ Board2dTab::Board2dTab(GuiApplication& app, BoardEditor& editor,
   connect(&mBoard, &Board::deviceAdded, this, &Board2dTab::updateMessages);
   connect(&mBoard, &Board::deviceRemoved, this, &Board2dTab::updateMessages);
   connect(&mMsgEmptySchematics, &DismissableMessageContext::visibilityChanged,
+          this, [this]() { onDerivedUiDataChanged.notify(); });
+  connect(&mMsgSetupDesignRules, &DismissableMessageContext::visibilityChanged,
           this, [this]() { onDerivedUiDataChanged.notify(); });
   connect(&mMsgPlaceDevices, &DismissableMessageContext::visibilityChanged,
           this, [this]() { onDerivedUiDataChanged.notify(); });
@@ -356,6 +359,7 @@ ui::Board2dTabData Board2dTab::getDerivedUiData() const noexcept {
       mIgnorePlacementLocks,  // Ignore placement locks
       mBoardEditor.isRebuildingPlanes(),  // Refreshing
       mMsgEmptySchematics.getUiData(),  // Message "empty schematics"
+          mMsgSetupDesignRules.getUiData(), // Message "setup design rules"
       mMsgPlaceDevices.getUiData(),  // Message "place devices"
       mUnplacedComponentsModel,  // Unplaced components
       mUnplacedComponentIndex,  // Unplaced components index
@@ -439,6 +443,7 @@ void Board2dTab::setDerivedUiData(const ui::Board2dTabData& data) noexcept {
 
   // Messages
   mMsgEmptySchematics.setUiData(data.empty_schematics_msg);
+  mMsgSetupDesignRules.setUiData(data.setup_design_rules_msg);
   mMsgPlaceDevices.setUiData(data.place_devices_msg);
 
   // Unplaced component index
@@ -1806,6 +1811,7 @@ void Board2dTab::updateMessages() noexcept {
     }
   }
   mMsgEmptySchematics.setActive(emptySchematics);
+  mMsgSetupDesignRules.setActive(mBoard.getDeviceInstances().isEmpty() && (mBoard.getDesignRules() == BoardDesignRules()) && (mBoard.getDrcSettings() == BoardDesignRuleCheckSettings()));
   mMsgPlaceDevices.setActive((!emptySchematics) &&
                              mBoard.getDeviceInstances().isEmpty());
 }

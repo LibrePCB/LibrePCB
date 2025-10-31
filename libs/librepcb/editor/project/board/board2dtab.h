@@ -252,6 +252,7 @@ private:
 
   // Message handles
   DismissableMessageContext mMsgEmptySchematics;
+  DismissableMessageContext mMsgSetupDesignRules;
   DismissableMessageContext mMsgPlaceDevices;
 
   // State
