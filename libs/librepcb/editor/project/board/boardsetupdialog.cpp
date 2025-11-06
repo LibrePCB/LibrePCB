@@ -263,6 +263,12 @@ void BoardSetupDialog::openDrcSettingsTab() noexcept {
   mUi->tabWidget->setCurrentWidget(mUi->tabDrcSettings);
 }
 
+void BoardSetupDialog::hideOtherTabs() noexcept {
+  for (int i = 0; i < mUi->tabWidget->count(); ++i) {
+    mUi->tabWidget->setTabVisible(i, i == mUi->tabWidget->currentIndex());
+  }
+}
+
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/

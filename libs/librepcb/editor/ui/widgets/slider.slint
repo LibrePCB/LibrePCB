@@ -11,6 +11,7 @@ component Slider inherits Rectangle {
     value-changed(value) => {
         self.value = value;
     }
+    callback value-accepted();
 
     // Accessibility
     accessible-role: slider;
@@ -54,6 +55,9 @@ export component HorizontalSlider inherits Slider {
                 if ta.pressed {
                     root.value-changed(max(min((self.mouse-x - (root.handle-size / 2)) / (self.width - root.handle-size), 1), 0));
                 }
+                if (event.kind == PointerEventKind.up) && (root.has-focus) {
+                    root.value-accepted();
+                }
             }
         }
 
@@ -76,9 +80,11 @@ export component HorizontalSlider inherits Slider {
         key-pressed(event) => {
             if event.text == Key.LeftArrow {
                 root.value-changed(max(root.value - 0.05, 0));
+                root.value-accepted();
                 return accept;
             } else if event.text == Key.RightArrow {
                 root.value-changed(min(root.value + 0.05, 1));
+                root.value-accepted();
                 return accept;
             }
             reject

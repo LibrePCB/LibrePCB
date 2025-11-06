@@ -17,69 +17,78 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_BOARDSETUPDIALOG_H
-#define LIBREPCB_EDITOR_BOARDSETUPDIALOG_H
+#ifndef LIBREPCB_EDITOR_CORPORATEPCBPRODUCTMODEL_H
+#define LIBREPCB_EDITOR_CORPORATEPCBPRODUCTMODEL_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "appwindow.h"
+
+#include <librepcb/core/library/corp/corporatepcbproduct.h>
+
 #include <QtCore>
-#include <QtWidgets>
+
+#include <functional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 
-class Board;
-class Layer;
+class Corporate;
 
 namespace editor {
 
 class UndoStack;
 
-namespace Ui {
-class BoardSetupDialog;
-}
-
 /*******************************************************************************
- *  Class BoardSetupDialog
+ *  Class CorporatePcbProductModel
  ******************************************************************************/
 
 /**
- * @brief The BoardSetupDialog class
+ * @brief The CorporatePcbProductModel class
  */
-class BoardSetupDialog final : public QDialog {
+class CorporatePcbProductModel final
+  : public QObject,
+    public slint::Model<ui::CorporatePcbProductData> {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
-  BoardSetupDialog() = delete;
-  BoardSetupDialog(const BoardSetupDialog& other) = delete;
-  BoardSetupDialog(Board& board, UndoStack& undoStack,
-                   QWidget* parent = 0) noexcept;
-  ~BoardSetupDialog();
+  // CorporatePcbProductModel() = delete;
+  CorporatePcbProductModel(const CorporatePcbProductModel& other) = delete;
+  explicit CorporatePcbProductModel(QObject* parent = nullptr) noexcept;
+  ~CorporatePcbProductModel() noexcept;
 
   // General Methods
-  void openDrcSettingsTab() noexcept;
-  void hideOtherTabs() noexcept;
+  void setReferences(
+      Corporate* corporate, UndoStack* stack,
+      std::function<void(CorporatePcbProduct&)> editCallback) noexcept;
+  void addProduct() noexcept;
+
+  // Implementations
+  std::size_t row_count() const override;
+  std::optional<ui::CorporatePcbProductData> row_data(
+      std::size_t i) const override;
+  void set_row_data(std::size_t i,
+                    const ui::CorporatePcbProductData& data) noexcept override;
 
   // Operator Overloadings
-  BoardSetupDialog& operator=(const BoardSetupDialog& rhs) = delete;
+  CorporatePcbProductModel& operator=(const CorporatePcbProductModel& rhs) =
+      delete;
 
-private:  // Methods
-  void buttonBoxClicked(QAbstractButton* button);
-  void load() noexcept;
-  bool apply() noexcept;
-  QVector<const Layer*> getTopSilkscreenLayers() const noexcept;
-  QVector<const Layer*> getBotSilkscreenLayers() const noexcept;
+private:
+  void refresh() noexcept;
+  void trigger(int index, const Uuid& uuid,
+               ui::CorporatePcbProductAction a) noexcept;
+  void setList(const QVector<CorporatePcbProduct>& list);
+  QString askForName(const QString& defaultValue) const;
 
-private:  // Date
-  Board& mBoard;
-  UndoStack& mUndoStack;
-  QScopedPointer<Ui::BoardSetupDialog> mUi;
-
-  static const QString sSettingsPrefix;
+private:
+  QPointer<Corporate> mCorporate;
+  QPointer<UndoStack> mUndoStack;
+  std::function<void(CorporatePcbProduct&)> mEditCallback;
 };
 
 /*******************************************************************************

@@ -17,69 +17,79 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_BOARDSETUPDIALOG_H
-#define LIBREPCB_EDITOR_BOARDSETUPDIALOG_H
+#ifndef LIBREPCB_EDITOR_CMDCORPORATEEDIT_H
+#define LIBREPCB_EDITOR_CMDCORPORATEEDIT_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "cmdlibrarybaseelementedit.h"
+
+#include <librepcb/core/job/outputjob.h>
+#include <librepcb/core/library/corp/corporatepcbproduct.h>
+
 #include <QtCore>
-#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 
-class Board;
-class Layer;
+class Corporate;
 
 namespace editor {
 
-class UndoStack;
-
-namespace Ui {
-class BoardSetupDialog;
-}
-
 /*******************************************************************************
- *  Class BoardSetupDialog
+ *  Class CmdCorporateEdit
  ******************************************************************************/
 
 /**
- * @brief The BoardSetupDialog class
+ * @brief The CmdCorporateEdit class
  */
-class BoardSetupDialog final : public QDialog {
-  Q_OBJECT
-
+class CmdCorporateEdit final : public CmdLibraryBaseElementEdit {
 public:
   // Constructors / Destructor
-  BoardSetupDialog() = delete;
-  BoardSetupDialog(const BoardSetupDialog& other) = delete;
-  BoardSetupDialog(Board& board, UndoStack& undoStack,
-                   QWidget* parent = 0) noexcept;
-  ~BoardSetupDialog();
+  CmdCorporateEdit() = delete;
+  CmdCorporateEdit(const CmdCorporateEdit& other) = delete;
+  explicit CmdCorporateEdit(Corporate& corporate) noexcept;
+  ~CmdCorporateEdit() noexcept;
 
-  // General Methods
-  void openDrcSettingsTab() noexcept;
-  void hideOtherTabs() noexcept;
+  // Setters
+  void setLogoPng(const QByteArray& png) noexcept;
+  void setUrl(const QUrl& url) noexcept;
+  void setPriority(int priority) noexcept;
+  void setPcbProducts(const QVector<CorporatePcbProduct>& list) noexcept;
+  void setPcbOutputJobs(const OutputJobList& jobs) noexcept;
+  void setAssemblyOutputJobs(const OutputJobList& jobs) noexcept;
 
   // Operator Overloadings
-  BoardSetupDialog& operator=(const BoardSetupDialog& rhs) = delete;
+  CmdCorporateEdit& operator=(const CmdCorporateEdit& rhs) = delete;
 
 private:  // Methods
-  void buttonBoxClicked(QAbstractButton* button);
-  void load() noexcept;
-  bool apply() noexcept;
-  QVector<const Layer*> getTopSilkscreenLayers() const noexcept;
-  QVector<const Layer*> getBotSilkscreenLayers() const noexcept;
+  /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
+  bool performExecute() override;
 
-private:  // Date
-  Board& mBoard;
-  UndoStack& mUndoStack;
-  QScopedPointer<Ui::BoardSetupDialog> mUi;
+  /// @copydoc ::librepcb::editor::UndoCommand::performUndo()
+  void performUndo() override;
 
-  static const QString sSettingsPrefix;
+  /// @copydoc ::librepcb::editor::UndoCommand::performRedo()
+  void performRedo() override;
+
+private:  // Data
+  Corporate& mCorporate;
+
+  QByteArray mOldLogo;
+  QByteArray mNewLogo;
+  QUrl mOldUrl;
+  QUrl mNewUrl;
+  int mOldPriority;
+  int mNewPriority;
+  QVector<CorporatePcbProduct> mOldPcbProducts;
+  QVector<CorporatePcbProduct> mNewPcbProducts;
+  OutputJobList mOldPcbOutputJobs;
+  OutputJobList mNewPcbOutputJobs;
+  OutputJobList mOldAssemblyOutputJobs;
+  OutputJobList mNewAssemblyOutputJobs;
 };
 
 /*******************************************************************************

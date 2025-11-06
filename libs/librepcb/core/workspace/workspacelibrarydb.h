@@ -41,6 +41,7 @@ namespace librepcb {
 
 class Component;
 class ComponentCategory;
+class Corporate;
 class Device;
 class Package;
 class PackageCategory;
@@ -100,6 +101,41 @@ public:
       }
       return false;
     }
+  };
+  struct PcbProduct {
+    Uuid uuid;
+    QString name;
+    QString description;
+    QUrl url;
+    int maxLayerCount;
+  };
+  enum class OutputJobKind : int {
+    Pcb = 1,
+    Assembly = 2,
+    User = 99,
+  };
+  struct OutputJob {
+    OutputJobKind kind;
+    Uuid uuid;
+    QString type;
+    QString name;
+  };
+  struct Corporate {
+    int id;
+    FilePath elemDir;
+    Uuid uuid;
+    QString name;
+    QString description;
+    Version version;
+    QPixmap logo;
+    QUrl url;
+    QString country;
+    QStringList fabs;
+    QStringList shipping;
+    bool isSponsor;
+    int priority;
+    QList<PcbProduct> pcbProducts;
+    QList<OutputJob> outputJobs;
   };
 
   // Constructors / Destructor
@@ -454,6 +490,19 @@ public:
    */
   QList<Part> getDeviceParts(const Uuid& device) const;
 
+  /**
+   * @brief Get all corporates (only the latest version of each)
+   *
+   * @param localeOrder    Locale order (highest priority first).
+   * @param pcbProducts    If `true`, the PCB products will be populated.
+   * @param outputJobs     If `true`, the output jobs will be populated.
+   *
+   * @return List of all corporates and their products.
+   */
+  QList<Corporate> getAllLatestCorporates(const QStringList& localeOrder,
+                                          bool pcbProducts,
+                                          bool outputJobs) const;
+
   // General Methods
 
   /**
@@ -519,7 +568,7 @@ private:
   QScopedPointer<WorkspaceLibraryScanner> mLibraryScanner;
 
   // Constants
-  static const int sCurrentDbVersion = 7;
+  static const int sCurrentDbVersion = 8;
 };
 
 /*******************************************************************************

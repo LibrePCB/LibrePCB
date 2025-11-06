@@ -101,6 +101,8 @@ signals:
                                 bool copyFrom);
   void deviceEditorRequested(LibraryEditor& editor, const FilePath& fp,
                              bool copyFrom);
+  void corporateEditorRequested(LibraryEditor& editor, const FilePath& fp,
+                                bool copyFrom);
 
 protected:
   std::optional<std::pair<RuleCheckMessageList, QSet<SExpression>>>
@@ -131,6 +133,7 @@ private:
   void loadElements(ui::LibraryTreeViewItemType type,
                     ui::LibraryTreeViewItemType catType, TreeItem& root,
                     int& count);
+  void loadCorporates();
   void sortItemsRecursive(QVector<std::shared_ptr<TreeItem>>& items) noexcept;
   void addCategoriesToModel(ui::LibraryTreeViewItemType type, TreeItem& root,
                             int count) noexcept;
@@ -187,6 +190,8 @@ private:
   int mCmpCatElementCount;
   std::shared_ptr<TreeItem> mPkgCatRoot;
   int mPkgCatElementCount;
+  std::shared_ptr<TreeItem> mCorporatesRoot;
+  int mCorporatesElementCount;
   QHash<QString, std::shared_ptr<TreeItem>> mLibElementsMap;  // Key: user-data
   std::shared_ptr<slint::VectorModel<ui::LibraryTreeViewItemData>> mCategories;
   std::shared_ptr<slint::VectorModel<ui::LibraryTreeViewItemData>> mElements;
