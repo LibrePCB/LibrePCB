@@ -463,7 +463,8 @@ void CorporateTab::execOutputJobsDialog(
     Project& prj = getTmpProject();
     prj.getOutputJobs() = jobs;
     UndoStack undoStack;
-    OutputJobsDialog dlg(mApp.getWorkspace().getSettings(), prj, undoStack);
+    OutputJobsDialog dlg(mApp.getWorkspace(), mApp.getLibraryElementCache(),
+                         prj, undoStack);
     dlg.exec();
     std::unique_ptr<CmdCorporateEdit> cmd(new CmdCorporateEdit(*mCorporate));
     ((*cmd).*setter)(prj.getOutputJobs());

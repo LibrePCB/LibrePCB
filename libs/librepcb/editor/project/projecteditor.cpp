@@ -467,8 +467,8 @@ void ProjectEditor::execSetupDialog() noexcept {
 
 void ProjectEditor::execOutputJobsDialog(const QString& typeName) noexcept {
   abortBlockingToolsInOtherEditors(nullptr);  // Release undo stack.
-  OutputJobsDialog dlg(mWorkspace.getSettings(), *mProject, *mUndoStack,
-                       qApp->activeWindow());
+  OutputJobsDialog dlg(mWorkspace, mApp.getLibraryElementCache(), *mProject,
+                       *mUndoStack, qApp->activeWindow());
 
   // if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0): Remove lambda.
   QMetaObject::invokeMethod(

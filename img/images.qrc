@@ -50,6 +50,7 @@
         <file alias="/fa/solid/eye.svg">../libs/font-awesome/svgs/solid/eye.svg</file>
         <file alias="/fa/solid/file-circle-plus.svg">../libs/font-awesome/svgs/solid/file-circle-plus.svg</file>
         <file alias="/fa/solid/file-csv.svg">../libs/font-awesome/svgs/solid/file-csv.svg</file>
+        <file alias="/fa/solid/file-import.svg">../libs/font-awesome/svgs/solid/file-import.svg</file>
         <file alias="/fa/solid/file-pdf.svg">../libs/font-awesome/svgs/solid/file-pdf.svg</file>
         <file alias="/fa/solid/file-zipper.svg">../libs/font-awesome/svgs/solid/file-zipper.svg</file>
         <file alias="/fa/solid/folder-open.svg">../libs/font-awesome/svgs/solid/folder-open.svg</file>
