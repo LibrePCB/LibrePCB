@@ -37,6 +37,7 @@ namespace librepcb {
 
 class Component;
 class ComponentCategory;
+class Corporate;
 class Device;
 class Package;
 class PackageCategory;
@@ -77,6 +78,8 @@ public:
                                                 bool throwIfNotFound) const;
   std::shared_ptr<const Device> getDevice(const Uuid& uuid,
                                           bool throwIfNotFound) const;
+  std::shared_ptr<const Corporate> getCorporate(const Uuid& uuid,
+                                                bool throwIfNotFound) const;
 
   // Operator Overloadings
   LibraryElementCache& operator=(const LibraryElementCache& rhs) = delete;
@@ -99,6 +102,7 @@ private:  // Data
   mutable QHash<Uuid, std::shared_ptr<const Package>> mPkg;
   mutable QHash<Uuid, std::shared_ptr<const Component>> mCmp;
   mutable QHash<Uuid, std::shared_ptr<const Device>> mDev;
+  mutable QHash<Uuid, std::shared_ptr<const Corporate>> mCorp;
 };
 
 /*******************************************************************************

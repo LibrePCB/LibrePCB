@@ -84,7 +84,7 @@ CorporateTab::CorporateTab(LibraryEditor& editor,
         Project& prj = getTmpProject();
         if (Board* brd = prj.getBoardByIndex(0)) {
           brd->setDrcSettings(product.getDrcSettings(false));
-          BoardSetupDialog dlg(*brd, *mUndoStack);
+          BoardSetupDialog dlg(mApp, *brd, *mUndoStack);
           dlg.openDrcSettingsTab();
           dlg.hideOtherTabs();
           dlg.exec();
