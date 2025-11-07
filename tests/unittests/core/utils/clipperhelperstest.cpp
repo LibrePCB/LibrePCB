@@ -46,11 +46,11 @@ TEST_F(ClipperHelpersTest, testConvertPathWithApproximate) {
               Vertex(Point(26275000, 32385000), -Angle::deg180()),
               Vertex(Point(30875000, 32385000), Angle::deg0())});
   PositiveLength maxArcTolerance(1000000);
-  ClipperLib::Path output = ClipperHelpers::convert(input, maxArcTolerance);
+  Clipper2Lib::Path64 output = ClipperHelpers::convert(input, maxArcTolerance);
 
   QString outputStr;
   for (const auto& p : output) {
-    outputStr += QString("(%1, %2) ").arg(p.X).arg(p.Y);
+    outputStr += QString("(%1, %2) ").arg(p.x).arg(p.y);
   }
   EXPECT_EQ(
       "(30875000, 32385000) (29725000, 34376858) (27425000, 34376858) "

@@ -714,15 +714,16 @@ KiCadTypeConverter::PadReplacements KiCadTypeConverter::convertPad(
     actualShapeOutline = customShapeOutline;
   } else if (p.shape == KiCadPadShape::Custom) {
     // Custom outline.
-    ClipperLib::Paths paths;
+    Clipper2Lib::Paths64 paths;
     auto addToPaths = [&paths](const Path& path, const Length& width) {
-      ClipperLib::Paths tmp{ClipperHelpers::convert(path, maxArcTolerance())};
+      Clipper2Lib::Paths64 tmp{
+          ClipperHelpers::convert(path, maxArcTolerance())};
       if ((width / 2) > 0) {
         ClipperHelpers::offset(tmp, width / 2, maxArcTolerance(),
-                               ClipperLib::jtRound);
+                               Clipper2Lib::JoinType::Round);
       }
-      ClipperHelpers::unite(paths, tmp, ClipperLib::pftEvenOdd,
-                            ClipperLib::pftNonZero);
+      ClipperHelpers::unite(paths, tmp, Clipper2Lib::FillRule::EvenOdd,
+                            Clipper2Lib::FillRule::NonZero);
     };
     for (const KiCadGraphicalLine& line : p.graphicalLines) {
       const Point start = convertFootprintPoint(line.start);
@@ -788,8 +789,9 @@ KiCadTypeConverter::PadReplacements KiCadTypeConverter::convertPad(
         addToPaths(Path::obround(width, height), Length(0));
       }
     }
-    std::unique_ptr<ClipperLib::PolyTree> tree = ClipperHelpers::uniteToTree(
-        paths, {}, ClipperLib::pftEvenOdd, ClipperLib::pftEvenOdd);
+    std::unique_ptr<Clipper2Lib::PolyTree64> tree =
+        ClipperHelpers::uniteToTree(paths, {}, Clipper2Lib::FillRule::EvenOdd,
+                                    Clipper2Lib::FillRule::EvenOdd);
     paths = ClipperHelpers::flattenTree(*tree);
     if (!paths.empty()) {
       if (paths.size() > 1) {

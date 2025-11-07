@@ -132,16 +132,16 @@ void OpenGlSceneBuilder::run(std::shared_ptr<SceneData3D> data) noexcept {
     }
 
     // Convert holes to areas.
-    ClipperLib::Paths platedHoles =
+    Clipper2Lib::Paths64 platedHoles =
         getPaths(data, {Layer::boardPlatedCutouts().getId()});
-    ClipperLib::Paths nonPlatedHoles =
+    Clipper2Lib::Paths64 nonPlatedHoles =
         getPaths(data, {Layer::boardCutouts().getId()});
-    QHash<QString, ClipperLib::Paths> copperHoles;
+    QHash<QString, Clipper2Lib::Paths64> copperHoles;
     for (auto& hole : data->getHoles()) {
       const auto paths = ClipperHelpers::convert(
           hole.path->toOutlineStrokes(hole.diameter), mMaxArcTolerance);
       if (hole.copperLayer) {
-        ClipperLib::Paths& holes = copperHoles[hole.copperLayer->getId()];
+        Clipper2Lib::Paths64& holes = copperHoles[hole.copperLayer->getId()];
         holes.insert(holes.end(), paths.begin(), paths.end());
       } else if (hole.plated) {
         platedHoles.insert(platedHoles.end(), paths.begin(), paths.end());
@@ -149,22 +149,24 @@ void OpenGlSceneBuilder::run(std::shared_ptr<SceneData3D> data) noexcept {
         nonPlatedHoles.insert(nonPlatedHoles.end(), paths.begin(), paths.end());
       }
     }
-    ClipperLib::Paths allHoles = platedHoles;
-    ClipperHelpers::unite(allHoles, nonPlatedHoles, ClipperLib::pftNonZero,
-                          ClipperLib::pftNonZero);
+    Clipper2Lib::Paths64 allHoles = platedHoles;
+    ClipperHelpers::unite(allHoles, nonPlatedHoles,
+                          Clipper2Lib::FillRule::NonZero,
+                          Clipper2Lib::FillRule::NonZero);
     if (mAbort) return;
 
     // Board body.
     QStringList layers = {Layer::boardOutlines().getId()};
-    const ClipperLib::Paths boardOutlines = getPaths(data, layers);
-    std::unique_ptr<ClipperLib::PolyTree> tree = ClipperHelpers::subtractToTree(
-        boardOutlines, allHoles, ClipperLib::pftNonZero,
-        ClipperLib::pftNonZero);
-    const ClipperLib::Paths boardArea = ClipperHelpers::flattenTree(*tree);
-    tree = ClipperHelpers::subtractToTree(boardOutlines, allHoles,
-                                          ClipperLib::pftNonZero,
-                                          ClipperLib::pftNonZero, false);
-    const ClipperLib::Paths boardEdges = ClipperHelpers::treeToPaths(*tree);
+    const Clipper2Lib::Paths64 boardOutlines = getPaths(data, layers);
+    std::unique_ptr<Clipper2Lib::PolyTree64> tree =
+        ClipperHelpers::subtractToTree(boardOutlines, allHoles,
+                                       Clipper2Lib::FillRule::NonZero,
+                                       Clipper2Lib::FillRule::NonZero);
+    const Clipper2Lib::Paths64 boardArea = ClipperHelpers::flattenTree(*tree);
+    tree = ClipperHelpers::subtractToTree(
+        boardOutlines, allHoles, Clipper2Lib::FillRule::NonZero,
+        Clipper2Lib::FillRule::NonZero, false);
+    const Clipper2Lib::Paths64 boardEdges = ClipperHelpers::treeToPaths(*tree);
     publishTriangleData(
         Layer::boardOutlines().getId(), OpenGlObject::Type::Board,
         QColor(70, 80, 70),
@@ -173,9 +175,9 @@ void OpenGlSceneBuilder::run(std::shared_ptr<SceneData3D> data) noexcept {
     if (mAbort) return;
 
     // Plated holes.
-    tree = ClipperHelpers::intersectToTree(platedHoles, boardOutlines,
-                                           ClipperLib::pftNonZero,
-                                           ClipperLib::pftNonZero, false);
+    tree = ClipperHelpers::intersectToTree(
+        platedHoles, boardOutlines, Clipper2Lib::FillRule::NonZero,
+        Clipper2Lib::FillRule::NonZero, false);
     platedHoles = ClipperHelpers::treeToPaths(*tree);
     publishTriangleData(
         "pth", OpenGlObject::Type::Board, QColor(124, 104, 71),
@@ -183,9 +185,9 @@ void OpenGlSceneBuilder::run(std::shared_ptr<SceneData3D> data) noexcept {
     if (mAbort) return;
 
     // Non-plated holes.
-    tree = ClipperHelpers::intersectToTree(nonPlatedHoles, boardOutlines,
-                                           ClipperLib::pftNonZero,
-                                           ClipperLib::pftNonZero, false);
+    tree = ClipperHelpers::intersectToTree(
+        nonPlatedHoles, boardOutlines, Clipper2Lib::FillRule::NonZero,
+        Clipper2Lib::FillRule::NonZero, false);
     nonPlatedHoles = ClipperHelpers::treeToPaths(*tree);
     publishTriangleData(
         "npth", OpenGlObject::Type::Board, QColor(50, 50, 50),
@@ -198,16 +200,16 @@ void OpenGlSceneBuilder::run(std::shared_ptr<SceneData3D> data) noexcept {
 
       // Copper.
       layers = QStringList{transform.map(Layer::topCopper()).getId()};
-      ClipperLib::Paths copperArea = boardArea;
+      Clipper2Lib::Paths64 copperArea = boardArea;
       if (copperHoles.contains(layers.first())) {
         ClipperHelpers::subtract(copperArea, copperHoles[layers.first()],
-                                 ClipperLib::pftEvenOdd,
-                                 ClipperLib::pftNonZero);
+                                 Clipper2Lib::FillRule::EvenOdd,
+                                 Clipper2Lib::FillRule::NonZero);
       }
       tree = ClipperHelpers::intersectToTree(copperArea, getPaths(data, layers),
-                                             ClipperLib::pftEvenOdd,
-                                             ClipperLib::pftNonZero);
-      ClipperLib::Paths paths = ClipperHelpers::flattenTree(*tree);
+                                             Clipper2Lib::FillRule::EvenOdd,
+                                             Clipper2Lib::FillRule::NonZero);
+      Clipper2Lib::Paths64 paths = ClipperHelpers::flattenTree(*tree);
       publishTriangleData(
           layers.first(), OpenGlObject::Type::Copper, QColor(188, 156, 105),
           extrude(paths, (d - epsilon) * side, 0.035 * side, scaleFactor));
@@ -217,12 +219,12 @@ void OpenGlSceneBuilder::run(std::shared_ptr<SceneData3D> data) noexcept {
       layers = QStringList{transform.map(Layer::topStopMask()).getId(),
                            Layer::boardCutouts().getId(),
                            Layer::boardPlatedCutouts().getId()};
-      ClipperLib::Paths solderResist;
+      Clipper2Lib::Paths64 solderResist;
       if (const PcbColor* color = data->getSolderResist()) {
         solderResist = boardOutlines;
         ClipperHelpers::subtract(solderResist, getPaths(data, layers),
-                                 ClipperLib::pftEvenOdd,
-                                 ClipperLib::pftNonZero);
+                                 Clipper2Lib::FillRule::EvenOdd,
+                                 Clipper2Lib::FillRule::NonZero);
         // Shrink the solder resist very slightly to give copper the higher
         // priority if copper edges and solder resist edges are exactly
         // overlapping (also avoids ugly rendering due to faces within the same
@@ -243,8 +245,8 @@ void OpenGlSceneBuilder::run(std::shared_ptr<SceneData3D> data) noexcept {
       // Solder paste.
       layers = QStringList{transform.map(Layer::topSolderPaste()).getId()};
       tree = ClipperHelpers::intersectToTree(boardArea, getPaths(data, layers),
-                                             ClipperLib::pftEvenOdd,
-                                             ClipperLib::pftNonZero);
+                                             Clipper2Lib::FillRule::EvenOdd,
+                                             Clipper2Lib::FillRule::NonZero);
       paths = ClipperHelpers::flattenTree(*tree);
       publishTriangleData(
           layers.first(), OpenGlObject::Type::SolderPaste, Qt::darkGray,
@@ -260,8 +262,8 @@ void OpenGlSceneBuilder::run(std::shared_ptr<SceneData3D> data) noexcept {
       }
       if (const PcbColor* color = data->getSilkscreen()) {
         tree = ClipperHelpers::intersectToTree(
-            solderResist, getPaths(data, layers), ClipperLib::pftEvenOdd,
-            ClipperLib::pftNonZero);
+            solderResist, getPaths(data, layers),
+            Clipper2Lib::FillRule::EvenOdd, Clipper2Lib::FillRule::NonZero);
         paths = ClipperHelpers::flattenTree(*tree);
         publishTriangleData(
             transform.map(Layer::topLegend()).getId(),
@@ -301,9 +303,9 @@ void OpenGlSceneBuilder::run(std::shared_ptr<SceneData3D> data) noexcept {
   }
 }
 
-ClipperLib::Paths OpenGlSceneBuilder::getPaths(
+Clipper2Lib::Paths64 OpenGlSceneBuilder::getPaths(
     const std::shared_ptr<SceneData3D>& data, const QStringList layers) const {
-  ClipperLib::Paths paths;
+  Clipper2Lib::Paths64 paths;
   foreach (const auto& area, data->getAreas()) {
     if (layers.contains(area.layer->getId())) {
       paths.push_back(ClipperHelpers::convert(area.outline, mMaxArcTolerance));
@@ -312,15 +314,14 @@ ClipperLib::Paths OpenGlSceneBuilder::getPaths(
   return paths;
 }
 
-QVector<QVector3D> OpenGlSceneBuilder::extrude(const ClipperLib::Paths& paths,
-                                               qreal z, qreal height,
-                                               qreal scaleFactor, bool faces,
-                                               bool edges, bool closed) const {
+QVector<QVector3D> OpenGlSceneBuilder::extrude(
+    const Clipper2Lib::Paths64& paths, qreal z, qreal height, qreal scaleFactor,
+    bool faces, bool edges, bool closed) const {
   const qreal z0 = z * scaleFactor;
   const qreal z1 = (z + height) * scaleFactor;
 
   QVector<QVector3D> triangles;
-  for (const ClipperLib::Path& path : paths) {
+  for (const Clipper2Lib::Path64& path : paths) {
     if (faces) {
       const QVector<QVector3D> newTriangles = tesselate(path, z0, scaleFactor);
       triangles += newTriangles;
@@ -332,16 +333,16 @@ QVector<QVector3D> OpenGlSceneBuilder::extrude(const ClipperLib::Paths& paths,
     if (edges) {
       const std::size_t size = closed ? path.size() : (path.size() - 1);
       for (std::size_t i = 0; i < size; ++i) {
-        const ClipperLib::IntPoint pos0 = path.at(i);
-        const ClipperLib::IntPoint pos1 = path.at((i + 1) % path.size());
-        const QVector3D p0(pos0.X * scaleFactor * 1e-6,
-                           pos0.Y * scaleFactor * 1e-6, z0);
-        const QVector3D p1(pos0.X * scaleFactor * 1e-6,
-                           pos0.Y * scaleFactor * 1e-6, z1);
-        const QVector3D p2(pos1.X * scaleFactor * 1e-6,
-                           pos1.Y * scaleFactor * 1e-6, z1);
-        const QVector3D p3(pos1.X * scaleFactor * 1e-6,
-                           pos1.Y * scaleFactor * 1e-6, z0);
+        const Clipper2Lib::Point64 pos0 = path.at(i);
+        const Clipper2Lib::Point64 pos1 = path.at((i + 1) % path.size());
+        const QVector3D p0(pos0.x * scaleFactor * 1e-6,
+                           pos0.y * scaleFactor * 1e-6, z0);
+        const QVector3D p1(pos0.x * scaleFactor * 1e-6,
+                           pos0.y * scaleFactor * 1e-6, z1);
+        const QVector3D p2(pos1.x * scaleFactor * 1e-6,
+                           pos1.y * scaleFactor * 1e-6, z1);
+        const QVector3D p3(pos1.x * scaleFactor * 1e-6,
+                           pos1.y * scaleFactor * 1e-6, z0);
         triangles.append(p0);
         triangles.append(p1);
         triangles.append(p2);
@@ -371,14 +372,14 @@ static void CALLBACK tessEdgeFlagCallback(GLboolean) {
 
 #endif
 
-QVector<QVector3D> OpenGlSceneBuilder::tesselate(const ClipperLib::Path& path,
-                                                 qreal z, qreal scaleFactor) {
+QVector<QVector3D> OpenGlSceneBuilder::tesselate(
+    const Clipper2Lib::Path64& path, qreal z, qreal scaleFactor) {
   QVector<QVector3D> result;
 #if USE_GLU
   QVector<GLdouble> input;
-  for (const ClipperLib::IntPoint& point : path) {
-    input.push_back(point.X * scaleFactor * 1e-6);
-    input.push_back(point.Y * scaleFactor * 1e-6);
+  for (const Clipper2Lib::Point64& point : path) {
+    input.push_back(point.x * scaleFactor * 1e-6);
+    input.push_back(point.y * scaleFactor * 1e-6);
     input.push_back(z);
   }
   GLUtesselator* tess = gluNewTess();

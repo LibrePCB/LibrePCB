@@ -39,7 +39,7 @@
 #include "items/bi_via.h"
 #include "items/bi_zone.h"
 
-#include <polyclipping/clipper.hpp>
+#include <clipper2/clipper.h>
 
 #include <QtConcurrent>
 #include <QtCore>
@@ -354,12 +354,12 @@ BoardPlaneFragmentsBuilder::Result BoardPlaneFragmentsBuilder::run(
         boardCutouts.append(polygon.path);
       }
     }
-    data->boardArea = std::make_shared<ClipperLib::Paths>(
+    data->boardArea = std::make_shared<Clipper2Lib::Paths64>(
         ClipperHelpers::convert(boardOutlines, maxArcTolerance()));
     ClipperHelpers::subtract(
         *data->boardArea,
         ClipperHelpers::convert(boardCutouts, maxArcTolerance()),
-        ClipperLib::pftNonZero, ClipperLib::pftNonZero);
+        Clipper2Lib::FillRule::NonZero, Clipper2Lib::FillRule::NonZero);
 
     // Sort planes: First by priority, then by uuid to get a really unique
     // priority order over all existing planes. This way we can ensure that even
@@ -425,16 +425,16 @@ BoardPlaneFragmentsBuilder::LayerJobResult BoardPlaneFragmentsBuilder::runLayer(
     if (it->layer != layer) continue;
 
     try {
-      ClipperLib::Paths removedAreas;
-      ClipperLib::Paths connectedNetSignalAreas;
+      Clipper2Lib::Paths64 removedAreas;
+      Clipper2Lib::Paths64 connectedNetSignalAreas;
 
       // Start with board outline shrinked by the given clearance and clipped
       // to the plane outline.
       // Except if the board clearance is zero, in this case we don't clip the
       // plane to the board outlines.
-      const ClipperLib::Path planeOutline = ClipperHelpers::convert(
+      const Clipper2Lib::Path64 planeOutline = ClipperHelpers::convert(
           it->outline.toClosedPath(), maxArcTolerance());
-      ClipperLib::Paths fragments = *data->boardArea;
+      Clipper2Lib::Paths64 fragments = *data->boardArea;
       if (it->minClearanceToBoard) {
         fragments = *data->boardArea;
         if (*it->minClearanceToBoard != 0) {
@@ -442,12 +442,12 @@ BoardPlaneFragmentsBuilder::LayerJobResult BoardPlaneFragmentsBuilder::runLayer(
                                  maxArcTolerance());  // can throw
         }
         ClipperHelpers::intersect(fragments, {planeOutline},
-                                  ClipperLib::pftEvenOdd,
-                                  ClipperLib::pftEvenOdd);  // can throw
+                                  Clipper2Lib::FillRule::EvenOdd,
+                                  Clipper2Lib::FillRule::EvenOdd);  // can throw
       } else {
         fragments = {planeOutline};
       }
-      const ClipperLib::Paths fullPlaneArea = fragments;
+      const Clipper2Lib::Paths64 fullPlaneArea = fragments;
       if (mAbort) {
         break;
       }
@@ -458,7 +458,7 @@ BoardPlaneFragmentsBuilder::LayerJobResult BoardPlaneFragmentsBuilder::runLayer(
             (otherIt->netSignal != it->netSignal)) {
           const UnsignedLength clearance =
               std::max(it->minClearanceToCopper, otherIt->minClearanceToCopper);
-          ClipperLib::Paths clipperPaths = ClipperHelpers::convert(
+          Clipper2Lib::Paths64 clipperPaths = ClipperHelpers::convert(
               result.planes.value(otherIt->uuid), maxArcTolerance());
           ClipperHelpers::offset(clipperPaths, *clearance,
                                  maxArcTolerance());  // can throw
@@ -473,7 +473,7 @@ BoardPlaneFragmentsBuilder::LayerJobResult BoardPlaneFragmentsBuilder::runLayer(
       // Collect keepout zones.
       foreach (const KeepoutZoneData& zone, data->keepoutZones) {
         if (zone.boardLayers.contains(it->layer)) {
-          const ClipperLib::Path clipperPath =
+          const Clipper2Lib::Path64 clipperPath =
               ClipperHelpers::convert(zone.outline, maxArcTolerance());
           removedAreas.push_back(clipperPath);
         }
@@ -486,7 +486,7 @@ BoardPlaneFragmentsBuilder::LayerJobResult BoardPlaneFragmentsBuilder::runLayer(
                                         *(it->minClearanceToNpth) * 2);
           const QVector<Path> paths =
               std::get<2>(tuple)->toOutlineStrokes(diameter);
-          const ClipperLib::Paths clipperPaths =
+          const Clipper2Lib::Paths64 clipperPaths =
               ClipperHelpers::convert(paths, maxArcTolerance());
           removedAreas.insert(removedAreas.end(), clipperPaths.begin(),
                               clipperPaths.end());
@@ -518,7 +518,7 @@ BoardPlaneFragmentsBuilder::LayerJobResult BoardPlaneFragmentsBuilder::runLayer(
               Path::circle(
                   PositiveLength(via.diameter + it->minClearanceToCopper * 2))
                   .translated(via.position);
-          const ClipperLib::Path clipperPath =
+          const Clipper2Lib::Path64 clipperPath =
               ClipperHelpers::convert(path, maxArcTolerance());
           removedAreas.push_back(clipperPath);
         }
@@ -534,7 +534,7 @@ BoardPlaneFragmentsBuilder::LayerJobResult BoardPlaneFragmentsBuilder::runLayer(
             // Same net signal -> memorize as connected area.
             if (polygon.filled) {
               // Area.
-              const ClipperLib::Path clipperPath =
+              const Clipper2Lib::Path64 clipperPath =
                   ClipperHelpers::convert(polygon.path, maxArcTolerance());
               connectedNetSignalAreas.push_back(clipperPath);
             }
@@ -542,7 +542,7 @@ BoardPlaneFragmentsBuilder::LayerJobResult BoardPlaneFragmentsBuilder::runLayer(
               // Outline strokes.
               const QVector<Path> paths = polygon.path.toOutlineStrokes(
                   PositiveLength(std::max(*polygon.width, Length(1))));
-              const ClipperLib::Paths clipperPaths =
+              const Clipper2Lib::Paths64 clipperPaths =
                   ClipperHelpers::convert(paths, maxArcTolerance());
               connectedNetSignalAreas.insert(connectedNetSignalAreas.end(),
                                              clipperPaths.begin(),
@@ -552,7 +552,7 @@ BoardPlaneFragmentsBuilder::LayerJobResult BoardPlaneFragmentsBuilder::runLayer(
             // Different net signal -> subtract with clearance.
             if (polygon.filled) {
               // Area.
-              ClipperLib::Paths clipperPaths{
+              Clipper2Lib::Paths64 clipperPaths{
                   ClipperHelpers::convert(polygon.path, maxArcTolerance())};
               ClipperHelpers::offset(clipperPaths, *it->minClearanceToCopper,
                                      maxArcTolerance());  // can throw
@@ -565,7 +565,7 @@ BoardPlaneFragmentsBuilder::LayerJobResult BoardPlaneFragmentsBuilder::runLayer(
                   polygon.path.toOutlineStrokes(PositiveLength(
                       std::max(*polygon.width + it->minClearanceToCopper * 2,
                                Length(1))));
-              const ClipperLib::Paths clipperPaths =
+              const Clipper2Lib::Paths64 clipperPaths =
                   ClipperHelpers::convert(paths, maxArcTolerance());
               removedAreas.insert(removedAreas.end(), clipperPaths.begin(),
                                   clipperPaths.end());
@@ -578,9 +578,9 @@ BoardPlaneFragmentsBuilder::LayerJobResult BoardPlaneFragmentsBuilder::runLayer(
       }
 
       // Collect pads.
-      ClipperLib::Paths thermalPadAreas;
-      ClipperLib::Paths thermalPadAreasShrinked;
-      ClipperLib::Paths thermalPadClearanceAreas;
+      Clipper2Lib::Paths64 thermalPadAreas;
+      Clipper2Lib::Paths64 thermalPadAreasShrinked;
+      Clipper2Lib::Paths64 thermalPadClearanceAreas;
       foreach (const PadData& pad, data->pads) {
         const bool sameNet = it->netSignal && (pad.netSignal == it->netSignal);
         foreach (const PadGeometry& geometry, pad.geometries.value(it->layer)) {
@@ -588,7 +588,7 @@ BoardPlaneFragmentsBuilder::LayerJobResult BoardPlaneFragmentsBuilder::runLayer(
             // Same net signal -> memorize as connected area.
             const QVector<Path> paths =
                 pad.transform.map(geometry.toOutlines());
-            const ClipperLib::Paths clipperPaths =
+            const Clipper2Lib::Paths64 clipperPaths =
                 ClipperHelpers::convert(paths, maxArcTolerance());
             connectedNetSignalAreas.insert(connectedNetSignalAreas.end(),
                                            clipperPaths.begin(),
@@ -605,7 +605,7 @@ BoardPlaneFragmentsBuilder::LayerJobResult BoardPlaneFragmentsBuilder::runLayer(
                          *pad.clearance);
             QVector<Path> paths =
                 pad.transform.map(geometry.withOffset(clearance).toOutlines());
-            ClipperLib::Paths clipperPaths =
+            Clipper2Lib::Paths64 clipperPaths =
                 ClipperHelpers::convert(paths, maxArcTolerance());
 
             // For thermal relief connection, subtract the spokes from the
@@ -627,19 +627,20 @@ BoardPlaneFragmentsBuilder::LayerJobResult BoardPlaneFragmentsBuilder::runLayer(
                      spokeConfig.first)
                         .rotated(pad.transform.getRotation()) +
                     pad.transform.getPosition();
-                const ClipperLib::Paths spokePaths{ClipperHelpers::convert(
+                const Clipper2Lib::Paths64 spokePaths{ClipperHelpers::convert(
                     Path::obround(p1, p2, spokeWidth), maxArcTolerance())};
-                ClipperHelpers::subtract(clipperPaths, spokePaths,
-                                         ClipperLib::pftEvenOdd,
-                                         ClipperLib::pftNonZero);  // can throw
+                ClipperHelpers::subtract(
+                    clipperPaths, spokePaths, Clipper2Lib::FillRule::EvenOdd,
+                    Clipper2Lib::FillRule::NonZero);  // can throw
               }
               // Memorize copper area for later removal of unconnected
               // thermal spokes,
-              ClipperLib::Paths tmp = ClipperHelpers::convert(
+              Clipper2Lib::Paths64 tmp = ClipperHelpers::convert(
                   pad.transform.map(geometry.toOutlines()), maxArcTolerance());
               if (tmp.size() > 1) {
-                ClipperHelpers::unite(tmp,
-                                      ClipperLib::pftNonZero);  // can throw
+                ClipperHelpers::unite(
+                    tmp,
+                    Clipper2Lib::FillRule::NonZero);  // can throw
               }
               thermalPadAreas.insert(thermalPadAreas.end(), tmp.begin(),
                                      tmp.end());
@@ -650,8 +651,9 @@ BoardPlaneFragmentsBuilder::LayerJobResult BoardPlaneFragmentsBuilder::runLayer(
                   pad.transform.map(geometry.withOffset(offset).toOutlines()),
                   maxArcTolerance());
               if (tmp.size() > 1) {
-                ClipperHelpers::unite(tmp,
-                                      ClipperLib::pftNonZero);  // can throw
+                ClipperHelpers::unite(
+                    tmp,
+                    Clipper2Lib::FillRule::NonZero);  // can throw
               }
               thermalPadClearanceAreas.insert(thermalPadClearanceAreas.end(),
                                               tmp.begin(), tmp.end());
@@ -692,8 +694,9 @@ BoardPlaneFragmentsBuilder::LayerJobResult BoardPlaneFragmentsBuilder::runLayer(
       }
 
       // Subtract all the collected areas to remove.
-      ClipperHelpers::subtract(fragments, removedAreas, ClipperLib::pftEvenOdd,
-                               ClipperLib::pftNonZero);
+      ClipperHelpers::subtract(fragments, removedAreas,
+                               Clipper2Lib::FillRule::EvenOdd,
+                               Clipper2Lib::FillRule::NonZero);
       if (mAbort) {
         break;
       }
@@ -714,10 +717,11 @@ BoardPlaneFragmentsBuilder::LayerJobResult BoardPlaneFragmentsBuilder::runLayer(
 
       // Split thermal spokes and flatten result for detecting unconnected
       // thermal spokes.
-      std::unique_ptr<ClipperLib::PolyTree> tree =
-          ClipperHelpers::subtractToTree(fragments, thermalPadAreasShrinked,
-                                         ClipperLib::pftEvenOdd,
-                                         ClipperLib::pftNonZero);  // can throw
+      std::unique_ptr<Clipper2Lib::PolyTree64> tree =
+          ClipperHelpers::subtractToTree(
+              fragments, thermalPadAreasShrinked,
+              Clipper2Lib::FillRule::EvenOdd,
+              Clipper2Lib::FillRule::NonZero);  // can throw
       fragments = ClipperHelpers::flattenTree(*tree);  // can throw
       if (mAbort) {
         break;
@@ -729,7 +733,7 @@ BoardPlaneFragmentsBuilder::LayerJobResult BoardPlaneFragmentsBuilder::runLayer(
             __FILE__, __LINE__,
             "Thermal pads inconsistency, please open a bug report.");
       }
-      auto isUnconnectedSpoke = [&](const ClipperLib::Path& fragment) {
+      auto isUnconnectedSpoke = [&](const Clipper2Lib::Path64& fragment) {
         std::optional<std::size_t> padIndex;
         for (std::size_t i = 0; i < thermalPadAreas.size(); ++i) {
           if (ClipperHelpers::anyPointsInside(fragment,
@@ -754,11 +758,11 @@ BoardPlaneFragmentsBuilder::LayerJobResult BoardPlaneFragmentsBuilder::runLayer(
 
       // Fill thermal pads.
       ClipperHelpers::intersect(thermalPadAreas, fullPlaneArea,
-                                ClipperLib::pftNonZero,
-                                ClipperLib::pftEvenOdd);  // can throw
-      tree = ClipperHelpers::uniteToTree(fragments, thermalPadAreas,
-                                         ClipperLib::pftEvenOdd,
-                                         ClipperLib::pftNonZero);  // can throw
+                                Clipper2Lib::FillRule::NonZero,
+                                Clipper2Lib::FillRule::EvenOdd);  // can throw
+      tree = ClipperHelpers::uniteToTree(
+          fragments, thermalPadAreas, Clipper2Lib::FillRule::EvenOdd,
+          Clipper2Lib::FillRule::NonZero);  // can throw
       fragments = ClipperHelpers::flattenTree(*tree);  // can throw
       if (mAbort) {
         break;
@@ -766,11 +770,12 @@ BoardPlaneFragmentsBuilder::LayerJobResult BoardPlaneFragmentsBuilder::runLayer(
 
       // If requested, remove unconnected fragments (islands).
       if (it->netSignal && (!it->keepIslands)) {
-        auto isIsland = [&](const ClipperLib::Path& p) {
-          ClipperLib::Paths intersections{p};
-          ClipperHelpers::intersect(intersections, connectedNetSignalAreas,
-                                    ClipperLib::pftNonZero,
-                                    ClipperLib::pftNonZero);  // can throw
+        auto isIsland = [&](const Clipper2Lib::Path64& p) {
+          Clipper2Lib::Paths64 intersections{p};
+          ClipperHelpers::intersect(
+              intersections, connectedNetSignalAreas,
+              Clipper2Lib::FillRule::NonZero,
+              Clipper2Lib::FillRule::NonZero);  // can throw
           return intersections.empty();
         };
         fragments.erase(
@@ -783,19 +788,20 @@ BoardPlaneFragmentsBuilder::LayerJobResult BoardPlaneFragmentsBuilder::runLayer(
 
       // Make result canonical for a reproducible output by rotating and
       // sorting the fragments.
-      auto cmp = [](const ClipperLib::IntPoint& a,
-                    const ClipperLib::IntPoint& b) {
-        return (a.X < b.X) || ((a.X == b.X) && (a.Y < b.Y));
+      auto cmp = [](const Clipper2Lib::Point64& a,
+                    const Clipper2Lib::Point64& b) {
+        return (a.x < b.x) || ((a.x == b.x) && (a.y < b.y));
       };
-      for (ClipperLib::Path& path : fragments) {
+      for (Clipper2Lib::Path64& path : fragments) {
         Q_ASSERT(!path.empty());
         auto minIt = std::min_element(path.begin(), path.end(), cmp);
         std::rotate(path.begin(), minIt, path.end());
       }
-      std::sort(fragments.begin(), fragments.end(),
-                [&cmp](const ClipperLib::Path& a, const ClipperLib::Path& b) {
-                  return cmp(a.front(), b.front());
-                });
+      std::sort(
+          fragments.begin(), fragments.end(),
+          [&cmp](const Clipper2Lib::Path64& a, const Clipper2Lib::Path64& b) {
+            return cmp(a.front(), b.front());
+          });
       if (mAbort) {
         break;
       }

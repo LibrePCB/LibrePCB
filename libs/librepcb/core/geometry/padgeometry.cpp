@@ -105,11 +105,12 @@ QVector<Path> PadGeometry::toOutlines() const {
         if ((result.count() > 1) ||
             ((result.count() == 1) &&
              (mPath.getVertices().first().getAngle() != Angle::deg0()))) {
-          ClipperLib::Paths paths =
+          Clipper2Lib::Paths64 paths =
               ClipperHelpers::convert(result, maxArcTolerance());
-          std::unique_ptr<ClipperLib::PolyTree> tree =
-              ClipperHelpers::uniteToTree(paths,
-                                          ClipperLib::pftNonZero);  // can throw
+          std::unique_ptr<Clipper2Lib::PolyTree64> tree =
+              ClipperHelpers::uniteToTree(
+                  paths,
+                  Clipper2Lib::FillRule::NonZero);  // can throw
           paths = ClipperHelpers::flattenTree(*tree);  // can throw
           result = ClipperHelpers::convert(paths);
         }
@@ -123,9 +124,9 @@ QVector<Path> PadGeometry::toOutlines() const {
         // However, this operation ensures that invalid outlines (e.g.
         // overlaps or intersections) will be cleaned before any further
         // processing of the pad shape (e.g. Gerber export).
-        ClipperLib::Paths paths{
+        Clipper2Lib::Paths64 paths{
             ClipperHelpers::convert(outline, maxArcTolerance())};
-        std::unique_ptr<ClipperLib::PolyTree> tree =
+        std::unique_ptr<Clipper2Lib::PolyTree64> tree =
             ClipperHelpers::offsetToTree(paths, mOffset,
                                          maxArcTolerance());  // can throw
         paths = ClipperHelpers::flattenTree(*tree);  // can throw
@@ -225,7 +226,7 @@ PadGeometry PadGeometry::custom(const Path& outline, const PadHoleList& holes) {
 }
 
 bool PadGeometry::isValidCustomOutline(const Path& path) noexcept {
-  return std::abs(ClipperLib::Area(ClipperHelpers::convert(
+  return std::abs(Clipper2Lib::Area(ClipperHelpers::convert(
              path.toClosedPath(), maxArcTolerance()))) > 1;
 }
 

@@ -25,7 +25,7 @@
  ******************************************************************************/
 #include "../../export/graphicsexport.h"
 
-#include <polyclipping/clipper.hpp>
+#include <clipper2/clipper.h>
 
 #include <QtCore>
 #include <QtGui>
@@ -86,12 +86,12 @@ private:  // Data
 
   mutable QMutex mMutex;
   mutable bool mDataPreprocessed;
-  mutable std::optional<ClipperLib::Paths> mCachedHoles;
-  mutable std::optional<ClipperLib::Paths> mCachedCopperHoles;
-  mutable std::optional<ClipperLib::Paths> mCachedBoardOutlines;
-  mutable std::optional<ClipperLib::Paths> mCachedBoardArea;
-  mutable std::optional<ClipperLib::Paths> mCachedSolderResistTop;
-  mutable std::optional<ClipperLib::Paths> mCachedSolderResistBot;
+  mutable std::optional<Clipper2Lib::Paths64> mCachedHoles;
+  mutable std::optional<Clipper2Lib::Paths64> mCachedCopperHoles;
+  mutable std::optional<Clipper2Lib::Paths64> mCachedBoardOutlines;
+  mutable std::optional<Clipper2Lib::Paths64> mCachedBoardArea;
+  mutable std::optional<Clipper2Lib::Paths64> mCachedSolderResistTop;
+  mutable std::optional<Clipper2Lib::Paths64> mCachedSolderResistBot;
   mutable QHash<QString, QPainterPath> mCachedContentPerLayer;
 };
 

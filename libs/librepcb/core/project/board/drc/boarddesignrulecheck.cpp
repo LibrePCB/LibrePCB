@@ -30,7 +30,6 @@
 #include "../boardplanefragmentsbuilder.h"
 #include "boardclipperpathgenerator.h"
 #include "boarddesignrulecheckmessages.h"
-#include "polyclipping/clipper.hpp"
 
 #include <QtConcurrent>
 #include <QtCore>
@@ -387,8 +386,9 @@ RuleCheckMessageList BoardDesignRuleCheck::checkCopperCopperClearances(
     const Layer* endLayer;
     std::optional<Uuid> net;  // nullopt = no net
     Length clearance;  // Either from object, net class or DRC settings.
-    ClipperLib::Paths copperArea;  // Exact copper outlines
-    ClipperLib::Paths clearanceArea;  // Copper outlines + clearance - tolerance
+    Clipper2Lib::Paths64 copperArea;  // Exact copper outlines
+    Clipper2Lib::Paths64
+        clearanceArea;  // Copper outlines + clearance - tolerance
   };
   typedef QList<Item> Items;
   Items items;
@@ -636,10 +636,10 @@ RuleCheckMessageList BoardDesignRuleCheck::checkCopperCopperClearances(
   // Helper to check for intersections.
   auto checkForIntersections = [](Items::Iterator& it1, Items::Iterator& it2,
                                   QVector<Path>& locations) {
-    const std::unique_ptr<ClipperLib::PolyTree> intersections =
+    const std::unique_ptr<Clipper2Lib::PolyTree64> intersections =
         ClipperHelpers::intersectToTree(it1->copperArea, it2->clearanceArea,
-                                        ClipperLib::pftEvenOdd,
-                                        ClipperLib::pftEvenOdd);
+                                        Clipper2Lib::FillRule::EvenOdd,
+                                        Clipper2Lib::FillRule::EvenOdd);
     locations.append(
         ClipperHelpers::convert(ClipperHelpers::flattenTree(*intersections)));
   };
@@ -715,17 +715,17 @@ RuleCheckMessageList BoardDesignRuleCheck::checkCopperBoardClearances(
   emitStatus(tr("Check board clearances..."));
 
   // Determine restricted area around board outline.
-  const ClipperLib::Paths restrictedArea =
+  const Clipper2Lib::Paths64 restrictedArea =
       getBoardClearanceArea(data, clearance);
 
   // Helper for the actual check.
   QVector<Path> locations;
   auto intersects = [&restrictedArea,
-                     &locations](const ClipperLib::Paths& paths) {
-    std::unique_ptr<ClipperLib::PolyTree> intersections =
+                     &locations](const Clipper2Lib::Paths64& paths) {
+    std::unique_ptr<Clipper2Lib::PolyTree64> intersections =
         ClipperHelpers::intersectToTree(restrictedArea, paths,
-                                        ClipperLib::pftEvenOdd,
-                                        ClipperLib::pftEvenOdd);
+                                        Clipper2Lib::FillRule::EvenOdd,
+                                        Clipper2Lib::FillRule::EvenOdd);
     locations =
         ClipperHelpers::convert(ClipperHelpers::flattenTree(*intersections));
     return (!locations.isEmpty());
@@ -878,10 +878,11 @@ RuleCheckMessageList BoardDesignRuleCheck::checkCopperHoleClearances(
   emitStatus(tr("Check hole clearances..."));
 
   // Determine tha areas where copper is available on *any* layer.
-  ClipperLib::Paths copperPathsAnyLayer;
-  foreach (const ClipperLib::Paths& paths, calcData.copperPathsPerLayer) {
-    ClipperHelpers::unite(copperPathsAnyLayer, paths, ClipperLib::pftEvenOdd,
-                          ClipperLib::pftNonZero);
+  Clipper2Lib::Paths64 copperPathsAnyLayer;
+  foreach (const Clipper2Lib::Paths64& paths, calcData.copperPathsPerLayer) {
+    ClipperHelpers::unite(copperPathsAnyLayer, paths,
+                          Clipper2Lib::FillRule::EvenOdd,
+                          Clipper2Lib::FillRule::NonZero);
   }
 
   // Helper for the actual check.
@@ -892,10 +893,10 @@ RuleCheckMessageList BoardDesignRuleCheck::checkCopperHoleClearances(
     BoardClipperPathGenerator gen(maxArcTolerance());
     gen.addHole(diameter, path, transform,
                 clearance - *maxArcTolerance() - Length(1));
-    std::unique_ptr<ClipperLib::PolyTree> intersections =
+    std::unique_ptr<Clipper2Lib::PolyTree64> intersections =
         ClipperHelpers::intersectToTree(copperPathsAnyLayer, gen.getPaths(),
-                                        ClipperLib::pftEvenOdd,
-                                        ClipperLib::pftEvenOdd);
+                                        Clipper2Lib::FillRule::EvenOdd,
+                                        Clipper2Lib::FillRule::EvenOdd);
     locations =
         ClipperHelpers::convert(ClipperHelpers::flattenTree(*intersections));
     return (!locations.isEmpty());
@@ -941,7 +942,7 @@ RuleCheckMessageList BoardDesignRuleCheck::checkDrillDrillClearances(
   // Determine the area of each drill.
   struct Item {
     DrcHoleRef obj;
-    ClipperLib::Paths areas;
+    Clipper2Lib::Paths64 areas;
   };
   QVector<Item> items;
 
@@ -951,7 +952,7 @@ RuleCheckMessageList BoardDesignRuleCheck::checkDrillDrillClearances(
                                               const PositiveLength& diameter) {
     const QVector<Path> area =
         path->toOutlineStrokes(diameter + diameterExpansion);
-    const ClipperLib::Paths paths =
+    const Clipper2Lib::Paths64 paths =
         ClipperHelpers::convert(area, maxArcTolerance());
     items.append(Item{obj, paths});
   };
@@ -1000,11 +1001,11 @@ RuleCheckMessageList BoardDesignRuleCheck::checkDrillDrillClearances(
   auto lastItem = items.isEmpty() ? items.end() : std::prev(items.end());
   for (auto it1 = items.begin(); it1 != lastItem; it1++) {
     for (auto it2 = it1 + 1; it2 != items.end(); it2++) {
-      const std::unique_ptr<ClipperLib::PolyTree> intersections =
+      const std::unique_ptr<Clipper2Lib::PolyTree64> intersections =
           ClipperHelpers::intersectToTree(it1->areas, it2->areas,
-                                          ClipperLib::pftEvenOdd,
-                                          ClipperLib::pftEvenOdd);
-      const ClipperLib::Paths paths =
+                                          Clipper2Lib::FillRule::EvenOdd,
+                                          Clipper2Lib::FillRule::EvenOdd);
+      const Clipper2Lib::Paths64 paths =
           ClipperHelpers::flattenTree(*intersections);
       if (!paths.empty()) {
         const QVector<Path> locations = ClipperHelpers::convert(paths);
@@ -1029,7 +1030,7 @@ RuleCheckMessageList BoardDesignRuleCheck::checkDrillBoardClearances(
   emitStatus(tr("Check drill to board edge clearances..."));
 
   // Determine restricted area around board outline.
-  const ClipperLib::Paths restrictedArea =
+  const Clipper2Lib::Paths64 restrictedArea =
       getBoardClearanceArea(data, clearance);
 
   // Helper for the actual check.
@@ -1038,12 +1039,12 @@ RuleCheckMessageList BoardDesignRuleCheck::checkDrillBoardClearances(
                         const NonEmptyPath& path,
                         const PositiveLength& diameter) {
     const QVector<Path> area = path->toOutlineStrokes(diameter);
-    const ClipperLib::Paths paths =
+    const Clipper2Lib::Paths64 paths =
         ClipperHelpers::convert(area, maxArcTolerance());
-    std::unique_ptr<ClipperLib::PolyTree> intersections =
+    std::unique_ptr<Clipper2Lib::PolyTree64> intersections =
         ClipperHelpers::intersectToTree(restrictedArea, paths,
-                                        ClipperLib::pftEvenOdd,
-                                        ClipperLib::pftEvenOdd);
+                                        Clipper2Lib::FillRule::EvenOdd,
+                                        Clipper2Lib::FillRule::EvenOdd);
     locations =
         ClipperHelpers::convert(ClipperHelpers::flattenTree(*intersections));
     return (!locations.isEmpty());
@@ -1119,14 +1120,14 @@ RuleCheckMessageList BoardDesignRuleCheck::checkSilkscreenStopmaskClearances(
   emitStatus(tr("Check silkscreen to stopmask clearances..."));
 
   // Determine areas of stop mask openings.
-  ClipperLib::Paths boardArea = ClipperHelpers::convert(
+  Clipper2Lib::Paths64 boardArea = ClipperHelpers::convert(
       getBoardOutlines(data, {&Layer::boardOutlines()}), maxArcTolerance());
   ClipperHelpers::subtract(
       boardArea,
       ClipperHelpers::convert(getBoardOutlines(data, {&Layer::boardCutouts()}),
                               maxArcTolerance()),
-      ClipperLib::pftNonZero, ClipperLib::pftNonZero);
-  const ClipperLib::Paths boardClearance =
+      Clipper2Lib::FillRule::NonZero, Clipper2Lib::FillRule::NonZero);
+  const Clipper2Lib::Paths64 boardClearance =
       getBoardClearanceArea(data, clearance);
 
   // Run the checks on each board side.
@@ -1141,11 +1142,13 @@ RuleCheckMessageList BoardDesignRuleCheck::checkSilkscreenStopmaskClearances(
     // since warnings outside the board area are not really helpful.
     BoardClipperPathGenerator gen(maxArcTolerance());
     gen.addStopMaskOpenings(data, *config.second, *clearance);
-    ClipperLib::Paths clearanceArea = gen.getPaths();
-    ClipperHelpers::unite(clearanceArea, boardClearance, ClipperLib::pftEvenOdd,
-                          ClipperLib::pftNonZero);
-    ClipperHelpers::intersect(clearanceArea, boardArea, ClipperLib::pftEvenOdd,
-                              ClipperLib::pftEvenOdd);
+    Clipper2Lib::Paths64 clearanceArea = gen.getPaths();
+    ClipperHelpers::unite(clearanceArea, boardClearance,
+                          Clipper2Lib::FillRule::EvenOdd,
+                          Clipper2Lib::FillRule::NonZero);
+    ClipperHelpers::intersect(clearanceArea, boardArea,
+                              Clipper2Lib::FillRule::EvenOdd,
+                              Clipper2Lib::FillRule::EvenOdd);
 
     // Note: We check only stroke texts. For other objects like polygons,
     // usually there are dozens of clearance violations but most of the time
@@ -1155,11 +1158,11 @@ RuleCheckMessageList BoardDesignRuleCheck::checkSilkscreenStopmaskClearances(
     // Helper for the actual check.
     QVector<Path> locations;
     auto intersects = [&clearanceArea,
-                       &locations](const ClipperLib::Paths& paths) {
-      std::unique_ptr<ClipperLib::PolyTree> intersections =
+                       &locations](const Clipper2Lib::Paths64& paths) {
+      std::unique_ptr<Clipper2Lib::PolyTree64> intersections =
           ClipperHelpers::intersectToTree(clearanceArea, paths,
-                                          ClipperLib::pftEvenOdd,
-                                          ClipperLib::pftEvenOdd);
+                                          Clipper2Lib::FillRule::EvenOdd,
+                                          Clipper2Lib::FillRule::EvenOdd);
       locations =
           ClipperHelpers::convert(ClipperHelpers::flattenTree(*intersections));
       return (!locations.isEmpty());
@@ -1220,13 +1223,13 @@ RuleCheckMessageList BoardDesignRuleCheck::checkMinimumPthAnnularRing(
   emitStatus(tr("Check PTH annular rings..."));
 
   // Determine tha areas where copper is available on *all* layers.
-  QList<ClipperLib::Paths> thtCopperAreas;
+  QList<Clipper2Lib::Paths64> thtCopperAreas;
   foreach (const Layer* layer, data.copperLayers) {
     thtCopperAreas.append(calcData.copperPathsPerLayer.value(layer));
   }
-  std::unique_ptr<ClipperLib::PolyTree> thtCopperAreaIntersections =
+  std::unique_ptr<Clipper2Lib::PolyTree64> thtCopperAreaIntersections =
       ClipperHelpers::intersectToTree(thtCopperAreas);
-  const ClipperLib::Paths thtCopperAreaPaths =
+  const Clipper2Lib::Paths64 thtCopperAreaPaths =
       ClipperHelpers::treeToPaths(*thtCopperAreaIntersections);
 
   // Helper.
@@ -1234,7 +1237,7 @@ RuleCheckMessageList BoardDesignRuleCheck::checkMinimumPthAnnularRing(
   auto checkPad = [&](const Data::Pad& pad) {
     // Determine hole areas including minimum annular ring.
     const Transform transform(pad.position, pad.rotation, pad.mirror);
-    ClipperLib::Paths areas;
+    Clipper2Lib::Paths64 areas;
     for (const Data::Hole& hole : pad.holes) {
       const Length diameter = hole.diameter + (*annularWidth * 2) - 1;
       if (diameter <= 0) {
@@ -1245,15 +1248,15 @@ RuleCheckMessageList BoardDesignRuleCheck::checkMinimumPthAnnularRing(
           ClipperHelpers::convert(transform.map(hole.path->toOutlineStrokes(
                                       PositiveLength(diameter))),
                                   maxArcTolerance()),
-          ClipperLib::pftEvenOdd, ClipperLib::pftNonZero);
+          Clipper2Lib::FillRule::EvenOdd, Clipper2Lib::FillRule::NonZero);
     }
 
     // Check if there's not a 100% overlap.
-    const std::unique_ptr<ClipperLib::PolyTree> remainingAreasTree =
+    const std::unique_ptr<Clipper2Lib::PolyTree64> remainingAreasTree =
         ClipperHelpers::subtractToTree(areas, thtCopperAreaPaths,
-                                       ClipperLib::pftEvenOdd,
-                                       ClipperLib::pftEvenOdd);
-    const ClipperLib::Paths remainingAreas =
+                                       Clipper2Lib::FillRule::EvenOdd,
+                                       Clipper2Lib::FillRule::EvenOdd);
+    const Clipper2Lib::Paths64 remainingAreas =
         ClipperHelpers::flattenTree(*remainingAreasTree);
     if (!remainingAreas.empty()) {
       locations = ClipperHelpers::convert(remainingAreas);
@@ -1921,8 +1924,8 @@ RuleCheckMessageList BoardDesignRuleCheck::checkDeviceClearances(
        {std::make_pair(&Layer::topPackageOutlines(), &Layer::topCourtyard()),
         std::make_pair(&Layer::botPackageOutlines(), &Layer::botCourtyard())}) {
     // Determine device outlines and courtyards.
-    QMap<const Data::Device*, ClipperLib::Paths> deviceOutlines;
-    QMap<const Data::Device*, ClipperLib::Paths> deviceCourtyards;
+    QMap<const Data::Device*, Clipper2Lib::Paths64> deviceOutlines;
+    QMap<const Data::Device*, Clipper2Lib::Paths64> deviceCourtyards;
     for (const Data::Device& dev : data.devices) {
       deviceOutlines.insert(&dev, getDeviceOutlinePaths(dev, *layers.first));
       deviceCourtyards.insert(&dev, getDeviceOutlinePaths(dev, *layers.second));
@@ -1930,14 +1933,15 @@ RuleCheckMessageList BoardDesignRuleCheck::checkDeviceClearances(
 
     // Helper functions.
     QVector<Path> locations;
-    auto doesOverlap = [&](const ClipperLib::Paths& area1,
-                           const ClipperLib::Paths& area2) {
+    auto doesOverlap = [&](const Clipper2Lib::Paths64& area1,
+                           const Clipper2Lib::Paths64& area2) {
       if (area1.empty() || area2.empty()) {
         return false;
       }
-      const std::unique_ptr<ClipperLib::PolyTree> intersections =
-          ClipperHelpers::intersectToTree(area1, area2, ClipperLib::pftEvenOdd,
-                                          ClipperLib::pftEvenOdd);
+      const std::unique_ptr<Clipper2Lib::PolyTree64> intersections =
+          ClipperHelpers::intersectToTree(area1, area2,
+                                          Clipper2Lib::FillRule::EvenOdd,
+                                          Clipper2Lib::FillRule::EvenOdd);
       locations =
           ClipperHelpers::convert(ClipperHelpers::flattenTree(*intersections));
       return !locations.isEmpty();
@@ -2013,10 +2017,11 @@ RuleCheckMessageList BoardDesignRuleCheck::checkBoardOutline(const Data& data) {
 
   // Determine actually drawn board area.
   QVector<Path> allOutlines = getBoardOutlines(data, allOutlineLayers);
-  ClipperLib::Paths drawnBoardArea =
+  Clipper2Lib::Paths64 drawnBoardArea =
       ClipperHelpers::convert(allOutlines, maxArcTolerance());
-  const std::unique_ptr<ClipperLib::PolyTree> drawnBoardAreaTree =
-      ClipperHelpers::uniteToTree(drawnBoardArea, ClipperLib::pftEvenOdd);
+  const std::unique_ptr<Clipper2Lib::PolyTree64> drawnBoardAreaTree =
+      ClipperHelpers::uniteToTree(drawnBoardArea,
+                                  Clipper2Lib::FillRule::EvenOdd);
 
   // Check if the board outline can be manufactured with the smallest tool.
   const UnsignedLength minEdgeRadius(data.settings.getMinOutlineToolDiameter() /
@@ -2025,13 +2030,13 @@ RuleCheckMessageList BoardDesignRuleCheck::checkBoardOutline(const Data& data) {
     const Length offset1 = std::max(minEdgeRadius - Length(10000), Length(0));
     const Length offset2 = -minEdgeRadius;
     drawnBoardArea = ClipperHelpers::treeToPaths(*drawnBoardAreaTree);
-    ClipperLib::Paths nonManufacturableAreas = drawnBoardArea;
+    Clipper2Lib::Paths64 nonManufacturableAreas = drawnBoardArea;
     ClipperHelpers::offset(nonManufacturableAreas, offset1, maxArcTolerance());
     ClipperHelpers::offset(nonManufacturableAreas, offset2, maxArcTolerance());
-    const std::unique_ptr<ClipperLib::PolyTree> difference =
+    const std::unique_ptr<Clipper2Lib::PolyTree64> difference =
         ClipperHelpers::subtractToTree(nonManufacturableAreas, drawnBoardArea,
-                                       ClipperLib::pftEvenOdd,
-                                       ClipperLib::pftEvenOdd);
+                                       Clipper2Lib::FillRule::EvenOdd,
+                                       Clipper2Lib::FillRule::EvenOdd);
     nonManufacturableAreas = ClipperHelpers::flattenTree(*difference);
     if (!nonManufacturableAreas.empty()) {
       const QVector<Path> locations =
@@ -2058,7 +2063,7 @@ RuleCheckMessageList BoardDesignRuleCheck::checkBoardCutouts(
 
   // Helper to get the locations of path segemnts.
   QVector<Path> locations;
-  auto treeToLocations = [&](const ClipperLib::PolyTree& tree) {
+  auto treeToLocations = [&](const Clipper2Lib::PolyTree64& tree) {
     locations.clear();
     for (const Path& location :
          ClipperHelpers::convert(ClipperHelpers::treeToPaths(tree))) {
@@ -2068,7 +2073,7 @@ RuleCheckMessageList BoardDesignRuleCheck::checkBoardCutouts(
   };
 
   // Helpers to check non-plated cutouts for intersections with copper.
-  ClipperLib::Paths unitedCopperPaths;  // Top & bottom copper areas united.
+  Clipper2Lib::Paths64 unitedCopperPaths;  // Top & bottom copper areas united.
   auto getUnitedCopperPaths = [&]() {
     if (unitedCopperPaths.empty()) {
       unitedCopperPaths =
@@ -2076,7 +2081,7 @@ RuleCheckMessageList BoardDesignRuleCheck::checkBoardCutouts(
       ClipperHelpers::unite(
           unitedCopperPaths,
           calcData.copperPathsPerLayer.value(&Layer::botCopper()),
-          ClipperLib::pftEvenOdd, ClipperLib::pftNonZero);
+          Clipper2Lib::FillRule::EvenOdd, Clipper2Lib::FillRule::NonZero);
     }
     return unitedCopperPaths;
   };
@@ -2085,17 +2090,17 @@ RuleCheckMessageList BoardDesignRuleCheck::checkBoardCutouts(
     if ((layer != Layer::boardCutouts()) || (!outline.isClosed())) {
       return false;
     }
-    ClipperLib::Paths paths{
+    Clipper2Lib::Paths64 paths{
         ClipperHelpers::convert(outline, maxArcTolerance())};
-    std::unique_ptr<ClipperLib::PolyTree> intersections =
+    std::unique_ptr<Clipper2Lib::PolyTree64> intersections =
         ClipperHelpers::intersectToTree(paths, getUnitedCopperPaths(),
-                                        ClipperLib::pftEvenOdd,
-                                        ClipperLib::pftEvenOdd, false);
+                                        Clipper2Lib::FillRule::EvenOdd,
+                                        Clipper2Lib::FillRule::EvenOdd, false);
     return treeToLocations(*intersections);
   };
 
   // Helpers to check plated cutouts for missing copper along its outline.
-  ClipperLib::Paths intersectedCopperPaths;  // Top & bottom copper areas.
+  Clipper2Lib::Paths64 intersectedCopperPaths;  // Top & bottom copper areas.
   auto getIntersectedCopperPaths = [&]() {
     if (intersectedCopperPaths.empty()) {
       intersectedCopperPaths =
@@ -2103,7 +2108,7 @@ RuleCheckMessageList BoardDesignRuleCheck::checkBoardCutouts(
       ClipperHelpers::intersect(
           intersectedCopperPaths,
           calcData.copperPathsPerLayer.value(&Layer::botCopper()),
-          ClipperLib::pftEvenOdd, ClipperLib::pftNonZero);
+          Clipper2Lib::FillRule::EvenOdd, Clipper2Lib::FillRule::NonZero);
     }
     return intersectedCopperPaths;
   };
@@ -2112,12 +2117,12 @@ RuleCheckMessageList BoardDesignRuleCheck::checkBoardCutouts(
     if ((layer != Layer::boardPlatedCutouts()) || (!outline.isClosed())) {
       return false;
     }
-    ClipperLib::Paths paths{
+    Clipper2Lib::Paths64 paths{
         ClipperHelpers::convert(outline, maxArcTolerance())};
-    std::unique_ptr<ClipperLib::PolyTree> subtractions =
+    std::unique_ptr<Clipper2Lib::PolyTree64> subtractions =
         ClipperHelpers::subtractToTree(paths, getIntersectedCopperPaths(),
-                                       ClipperLib::pftEvenOdd,
-                                       ClipperLib::pftEvenOdd, false);
+                                       Clipper2Lib::FillRule::EvenOdd,
+                                       Clipper2Lib::FillRule::EvenOdd, false);
     return treeToLocations(*subtractions);
   };
 
@@ -2463,7 +2468,7 @@ bool BoardDesignRuleCheck::requiresHoleSlotWarning(
   }
 }
 
-ClipperLib::Paths BoardDesignRuleCheck::getBoardClearanceArea(
+Clipper2Lib::Paths64 BoardDesignRuleCheck::getBoardClearanceArea(
     const Data& data, const UnsignedLength& clearance) {
   const QVector<Path> outlines = getBoardOutlines(data,
                                                   {
@@ -2471,17 +2476,17 @@ ClipperLib::Paths BoardDesignRuleCheck::getBoardClearanceArea(
                                                       &Layer::boardCutouts(),
                                                   });
 
-  ClipperLib::Paths result;
+  Clipper2Lib::Paths64 result;
   // Larger tolerance is required to avoid false-positives, see
   // https://github.com/LibrePCB/LibrePCB/issues/1434.
   const PositiveLength clearanceWidth(
       std::max(clearance + clearance - maxArcTolerance() * 2, Length(1)));
   foreach (const Path& outline, outlines) {
-    const ClipperLib::Paths clipperPaths = ClipperHelpers::convert(
+    const Clipper2Lib::Paths64 clipperPaths = ClipperHelpers::convert(
         outline.toOutlineStrokes(clearanceWidth), maxArcTolerance());
     result.insert(result.end(), clipperPaths.begin(), clipperPaths.end());
   }
-  ClipperHelpers::unite(result, ClipperLib::pftNonZero);
+  ClipperHelpers::unite(result, Clipper2Lib::FillRule::NonZero);
   return result;
 }
 
@@ -2510,9 +2515,9 @@ QVector<Path> BoardDesignRuleCheck::getBoardOutlines(
   return outlines;
 }
 
-ClipperLib::Paths BoardDesignRuleCheck::getDeviceOutlinePaths(
+Clipper2Lib::Paths64 BoardDesignRuleCheck::getDeviceOutlinePaths(
     const Data::Device& device, const Layer& layer) {
-  ClipperLib::Paths paths;
+  Clipper2Lib::Paths64 paths;
   const Transform transform(device.position, device.rotation, device.mirror);
   for (const Data::Polygon& polygon : device.polygons) {
     const Layer& polygonLayer = transform.map(*polygon.layer);
@@ -2520,9 +2525,9 @@ ClipperLib::Paths BoardDesignRuleCheck::getDeviceOutlinePaths(
       continue;
     }
     const Path path = transform.map(polygon.path);
-    ClipperHelpers::unite(paths,
-                          {ClipperHelpers::convert(path, maxArcTolerance())},
-                          ClipperLib::pftNonZero, ClipperLib::pftNonZero);
+    ClipperHelpers::unite(
+        paths, {ClipperHelpers::convert(path, maxArcTolerance())},
+        Clipper2Lib::FillRule::NonZero, Clipper2Lib::FillRule::NonZero);
   }
   for (const Data::Circle& circle : device.circles) {
     const Layer& circleLayer = transform.map(*circle.layer);
@@ -2535,7 +2540,7 @@ ClipperLib::Paths BoardDesignRuleCheck::getDeviceOutlinePaths(
         {ClipperHelpers::convert(
             Path::circle(circle.diameter).translated(absolutePos),
             maxArcTolerance())},
-        ClipperLib::pftNonZero, ClipperLib::pftNonZero);
+        Clipper2Lib::FillRule::NonZero, Clipper2Lib::FillRule::NonZero);
   }
   return paths;
 }
@@ -2610,7 +2615,7 @@ bool BoardDesignRuleCheck::isViaUseless(const Data& data,
   }
 
   QSet<const Layer*> connectedLayers(via.connectedLayers);
-  const ClipperLib::IntPoint viaPosition =
+  const Clipper2Lib::Point64 viaPosition =
       ClipperHelpers::convert(via.position);
 
   // A via is considered to be connected to a plane if it contains
@@ -2625,9 +2630,10 @@ bool BoardDesignRuleCheck::isViaUseless(const Data& data,
       continue;
     }
 
-    const ClipperLib::Path clipperPlanePath =
+    const Clipper2Lib::Path64 clipperPlanePath =
         ClipperHelpers::convert(plane.outline, maxArcTolerance());
-    if (ClipperLib::PointInPolygon(viaPosition, clipperPlanePath)) {
+    if (Clipper2Lib::PointInPolygon(viaPosition, clipperPlanePath) !=
+        Clipper2Lib::PointInPolygonResult::IsOutside) {
       connectedLayers.insert(plane.layer);
       if (connectedLayers.count() >= 2) {
         return false;
@@ -2652,9 +2658,10 @@ bool BoardDesignRuleCheck::isViaUseless(const Data& data,
 
         for (const PadGeometry& geom : it.value()) {
           for (const Path& outline : geom.toOutlines()) {
-            const ClipperLib::Path clipperPadPath = ClipperHelpers::convert(
+            const Clipper2Lib::Path64 clipperPadPath = ClipperHelpers::convert(
                 transform.map(outline), maxArcTolerance());
-            if (ClipperLib::PointInPolygon(viaPosition, clipperPadPath)) {
+            if (Clipper2Lib::PointInPolygon(viaPosition, clipperPadPath) !=
+                Clipper2Lib::PointInPolygonResult::IsOutside) {
               connectedLayers.insert(it.key());
               if (connectedLayers.count() >= 2) {
                 return false;

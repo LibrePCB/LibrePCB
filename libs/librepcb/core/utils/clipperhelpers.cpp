@@ -33,11 +33,12 @@ namespace librepcb {
  *  General Methods
  ******************************************************************************/
 
-bool ClipperHelpers::allPointsInside(const ClipperLib::Path& points,
-                                     const ClipperLib::Path& path) {
+bool ClipperHelpers::allPointsInside(const Clipper2Lib::Path64& points,
+                                     const Clipper2Lib::Path64& path) {
   try {
-    for (const ClipperLib::IntPoint& p : points) {
-      if (ClipperLib::PointInPolygon(p, path) == 0) {
+    for (const Clipper2Lib::Point64& p : points) {
+      if (Clipper2Lib::PointInPolygon(p, path) ==
+          Clipper2Lib::PointInPolygonResult::IsOutside) {
         return false;
       }
     }
@@ -49,11 +50,12 @@ bool ClipperHelpers::allPointsInside(const ClipperLib::Path& points,
   }
 }
 
-bool ClipperHelpers::anyPointsInside(const ClipperLib::Path& points,
-                                     const ClipperLib::Path& path) {
+bool ClipperHelpers::anyPointsInside(const Clipper2Lib::Path64& points,
+                                     const Clipper2Lib::Path64& path) {
   try {
-    for (const ClipperLib::IntPoint& point : points) {
-      if (ClipperLib::PointInPolygon(point, path) > 0) {
+    for (const Clipper2Lib::Point64& point : points) {
+      if (Clipper2Lib::PointInPolygon(point, path) ==
+          Clipper2Lib::PointInPolygonResult::IsInside) {
         return true;
       }
     }
@@ -65,12 +67,13 @@ bool ClipperHelpers::anyPointsInside(const ClipperLib::Path& points,
   }
 }
 
-bool ClipperHelpers::anyPointsInside(const ClipperLib::Paths& points,
-                                     const ClipperLib::Path& path) {
+bool ClipperHelpers::anyPointsInside(const Clipper2Lib::Paths64& points,
+                                     const Clipper2Lib::Path64& path) {
   try {
-    for (const ClipperLib::Path& pointsPath : points) {
-      for (const ClipperLib::IntPoint& point : pointsPath) {
-        if (ClipperLib::PointInPolygon(point, path) > 0) {
+    for (const Clipper2Lib::Path64& pointsPath : points) {
+      for (const Clipper2Lib::Point64& point : pointsPath) {
+        if (Clipper2Lib::PointInPolygon(point, path) ==
+            Clipper2Lib::PointInPolygonResult::IsInside) {
           return true;
         }
       }
@@ -83,42 +86,44 @@ bool ClipperHelpers::anyPointsInside(const ClipperLib::Paths& points,
   }
 }
 
-void ClipperHelpers::unite(ClipperLib::Paths& paths,
-                           ClipperLib::PolyFillType fillType) {
+void ClipperHelpers::unite(Clipper2Lib::Paths64& paths,
+                           Clipper2Lib::FillRule fillType) {
   try {
-    ClipperLib::Clipper c;
-    c.AddPaths(paths, ClipperLib::ptSubject, true);
-    c.Execute(ClipperLib::ctUnion, paths, fillType, ClipperLib::pftEvenOdd);
+    Clipper2Lib::Clipper64 c;
+    c.AddSubject(paths);
+    c.Execute(Clipper2Lib::ClipType::Union, fillType, paths);
   } catch (const std::exception& e) {
     throw LogicError(__FILE__, __LINE__,
                      QString("Failed to unite paths: %1").arg(e.what()));
   }
 }
 
-void ClipperHelpers::unite(ClipperLib::Paths& subject,
-                           const ClipperLib::Paths& clip,
-                           ClipperLib::PolyFillType subjectFillType,
-                           ClipperLib::PolyFillType clipFillType) {
+void ClipperHelpers::unite(Clipper2Lib::Paths64& subject,
+                           const Clipper2Lib::Paths64& clip,
+                           Clipper2Lib::FillRule subjectFillType,
+                           Clipper2Lib::FillRule clipFillType) {
   try {
-    ClipperLib::Clipper c;
-    c.AddPaths(subject, ClipperLib::ptSubject, true);
-    c.AddPaths(clip, ClipperLib::ptClip, true);
-    c.Execute(ClipperLib::ctUnion, subject, subjectFillType, clipFillType);
+    Clipper2Lib::Clipper64 c;
+    c.AddSubject(subject);
+    c.AddClip(clip);
+    c.Execute(Clipper2Lib::ClipType::Union, clipFillType, subject);
   } catch (const std::exception& e) {
     throw LogicError(__FILE__, __LINE__,
                      QString("Failed to unite paths: %1").arg(e.what()));
   }
 }
 
-std::unique_ptr<ClipperLib::PolyTree> ClipperHelpers::uniteToTree(
-    const ClipperLib::Paths& paths, ClipperLib::PolyFillType fillType) {
+std::unique_ptr<Clipper2Lib::PolyTree64> ClipperHelpers::uniteToTree(
+    const Clipper2Lib::Paths64& paths, Clipper2Lib::FillRule fillType) {
   try {
     // Wrap the PolyTree object in a smart pointer since PolyTree cannot
     // safely be copied (i.e. returned by value), it would lead to a crash!!!
-    std::unique_ptr<ClipperLib::PolyTree> result(new ClipperLib::PolyTree());
-    ClipperLib::Clipper c;
-    c.AddPaths(paths, ClipperLib::ptSubject, true);
-    c.Execute(ClipperLib::ctUnion, *result, fillType, ClipperLib::pftEvenOdd);
+    std::unique_ptr<Clipper2Lib::PolyTree64> result(
+        new Clipper2Lib::PolyTree64());
+    Clipper2Lib::Clipper64 c;
+    c.AddSubject(paths);
+    c.Execute(Clipper2Lib::ClipType::Union, Clipper2Lib::FillRule::EvenOdd,
+              *result);
     return result;
   } catch (const std::exception& e) {
     throw LogicError(__FILE__, __LINE__,
@@ -126,18 +131,18 @@ std::unique_ptr<ClipperLib::PolyTree> ClipperHelpers::uniteToTree(
   }
 }
 
-std::unique_ptr<ClipperLib::PolyTree> ClipperHelpers::uniteToTree(
-    const ClipperLib::Paths& paths, const ClipperLib::Paths& clip,
-    ClipperLib::PolyFillType subjectFillType,
-    ClipperLib::PolyFillType clipFillType) {
+std::unique_ptr<Clipper2Lib::PolyTree64> ClipperHelpers::uniteToTree(
+    const Clipper2Lib::Paths64& paths, const Clipper2Lib::Paths64& clip,
+    Clipper2Lib::FillRule subjectFillType, Clipper2Lib::FillRule clipFillType) {
   try {
     // Wrap the PolyTree object in a smart pointer since PolyTree cannot
     // safely be copied (i.e. returned by value), it would lead to a crash!!!
-    std::unique_ptr<ClipperLib::PolyTree> result(new ClipperLib::PolyTree());
-    ClipperLib::Clipper c;
-    c.AddPaths(paths, ClipperLib::ptSubject, true);
-    c.AddPaths(clip, ClipperLib::ptClip, true);
-    c.Execute(ClipperLib::ctUnion, *result, subjectFillType, clipFillType);
+    std::unique_ptr<Clipper2Lib::PolyTree64> result(
+        new Clipper2Lib::PolyTree64());
+    Clipper2Lib::Clipper64 c;
+    c.AddSubject(paths);
+    c.AddClip(clip);
+    c.Execute(Clipper2Lib::ClipType::Union, clipFillType, *result);
     return result;
   } catch (const std::exception& e) {
     throw LogicError(__FILE__, __LINE__,
@@ -145,35 +150,38 @@ std::unique_ptr<ClipperLib::PolyTree> ClipperHelpers::uniteToTree(
   }
 }
 
-void ClipperHelpers::intersect(ClipperLib::Paths& subject,
-                               const ClipperLib::Paths& clip,
-                               ClipperLib::PolyFillType subjectFillType,
-                               ClipperLib::PolyFillType clipFillType) {
+void ClipperHelpers::intersect(Clipper2Lib::Paths64& subject,
+                               const Clipper2Lib::Paths64& clip,
+                               Clipper2Lib::FillRule subjectFillType,
+                               Clipper2Lib::FillRule clipFillType) {
   try {
-    ClipperLib::Clipper c;
-    c.AddPaths(subject, ClipperLib::ptSubject, true);
-    c.AddPaths(clip, ClipperLib::ptClip, true);
-    c.Execute(ClipperLib::ctIntersection, subject, subjectFillType,
-              clipFillType);
+    Clipper2Lib::Clipper64 c;
+    c.AddSubject(subject);
+    c.AddClip(clip);
+    c.Execute(Clipper2Lib::ClipType::Intersection, clipFillType, subject);
   } catch (const std::exception& e) {
     throw LogicError(__FILE__, __LINE__,
                      QString("Failed to intersect paths: %1").arg(e.what()));
   }
 }
 
-std::unique_ptr<ClipperLib::PolyTree> ClipperHelpers::intersectToTree(
-    const ClipperLib::Paths& subject, const ClipperLib::Paths& clip,
-    ClipperLib::PolyFillType subjectFillType,
-    ClipperLib::PolyFillType clipFillType, bool closed) {
+std::unique_ptr<Clipper2Lib::PolyTree64> ClipperHelpers::intersectToTree(
+    const Clipper2Lib::Paths64& subject, const Clipper2Lib::Paths64& clip,
+    Clipper2Lib::FillRule subjectFillType, Clipper2Lib::FillRule clipFillType,
+    bool closed) {
   try {
     // Wrap the PolyTree object in a smart pointer since PolyTree cannot
     // safely be copied (i.e. returned by value), it would lead to a crash!!!
-    std::unique_ptr<ClipperLib::PolyTree> result(new ClipperLib::PolyTree());
-    ClipperLib::Clipper c;
-    c.AddPaths(subject, ClipperLib::ptSubject, closed);
-    c.AddPaths(clip, ClipperLib::ptClip, true);
-    c.Execute(ClipperLib::ctIntersection, *result, subjectFillType,
-              clipFillType);
+    std::unique_ptr<Clipper2Lib::PolyTree64> result(
+        new Clipper2Lib::PolyTree64());
+    Clipper2Lib::Clipper64 c;
+    if (closed) {
+      c.AddSubject(subject);
+    } else {
+      c.AddOpenSubject(subject);
+    }
+    c.AddClip(clip);
+    c.Execute(Clipper2Lib::ClipType::Intersection, clipFillType, *result);
     return result;
   } catch (const std::exception& e) {
     throw LogicError(__FILE__, __LINE__,
@@ -181,8 +189,8 @@ std::unique_ptr<ClipperLib::PolyTree> ClipperHelpers::intersectToTree(
   }
 }
 
-std::unique_ptr<ClipperLib::PolyTree> ClipperHelpers::intersectToTree(
-    const QList<ClipperLib::Paths>& paths) {
+std::unique_ptr<Clipper2Lib::PolyTree64> ClipperHelpers::intersectToTree(
+    const QList<Clipper2Lib::Paths64>& paths) {
   try {
     // Intersection makes no sense with less than two areas (and thus method
     // wouldn't work in that case).
@@ -192,20 +200,21 @@ std::unique_ptr<ClipperLib::PolyTree> ClipperHelpers::intersectToTree(
 
     // Wrap the PolyTree object in a smart pointer since PolyTree cannot
     // safely be copied (i.e. returned by value), it would lead to a crash!!!
-    std::unique_ptr<ClipperLib::PolyTree> result(new ClipperLib::PolyTree());
-    ClipperLib::Clipper c;
-    ClipperLib::Paths intermediateSubject;
+    std::unique_ptr<Clipper2Lib::PolyTree64> result(
+        new Clipper2Lib::PolyTree64());
+    Clipper2Lib::Clipper64 c;
+    Clipper2Lib::Paths64 intermediateSubject;
     for (int i = 1; i < paths.count(); ++i) {
       c.Clear();
       if (i == 1) {
-        c.AddPaths(paths.first(), ClipperLib::ptSubject, true);
+        c.AddSubject(paths.first());
       } else {
-        ClipperLib::PolyTreeToPaths(*result, intermediateSubject);
-        c.AddPaths(intermediateSubject, ClipperLib::ptSubject, true);
+        intermediateSubject = Clipper2Lib::PolyTreeToPaths64(*result);
+        c.AddSubject(intermediateSubject);
       }
-      c.AddPaths(paths.at(i), ClipperLib::ptClip, true);
-      c.Execute(ClipperLib::ctIntersection, *result, ClipperLib::pftEvenOdd,
-                ClipperLib::pftEvenOdd);
+      c.AddClip(paths.at(i));
+      c.Execute(Clipper2Lib::ClipType::Intersection,
+                Clipper2Lib::FillRule::EvenOdd, *result);
     }
     return result;
   } catch (const std::exception& e) {
@@ -214,33 +223,38 @@ std::unique_ptr<ClipperLib::PolyTree> ClipperHelpers::intersectToTree(
   }
 }
 
-void ClipperHelpers::subtract(ClipperLib::Paths& subject,
-                              const ClipperLib::Paths& clip,
-                              ClipperLib::PolyFillType subjectFillType,
-                              ClipperLib::PolyFillType clipFillType) {
+void ClipperHelpers::subtract(Clipper2Lib::Paths64& subject,
+                              const Clipper2Lib::Paths64& clip,
+                              Clipper2Lib::FillRule subjectFillType,
+                              Clipper2Lib::FillRule clipFillType) {
   try {
-    ClipperLib::Clipper c;
-    c.AddPaths(subject, ClipperLib::ptSubject, true);
-    c.AddPaths(clip, ClipperLib::ptClip, true);
-    c.Execute(ClipperLib::ctDifference, subject, subjectFillType, clipFillType);
+    Clipper2Lib::Clipper64 c;
+    c.AddSubject(subject);
+    c.AddClip(clip);
+    c.Execute(Clipper2Lib::ClipType::Difference, clipFillType, subject);
   } catch (const std::exception& e) {
     throw LogicError(__FILE__, __LINE__,
                      QString("Failed to subtract paths: %1").arg(e.what()));
   }
 }
 
-std::unique_ptr<ClipperLib::PolyTree> ClipperHelpers::subtractToTree(
-    const ClipperLib::Paths& subject, const ClipperLib::Paths& clip,
-    ClipperLib::PolyFillType subjectFillType,
-    ClipperLib::PolyFillType clipFillType, bool closed) {
+std::unique_ptr<Clipper2Lib::PolyTree64> ClipperHelpers::subtractToTree(
+    const Clipper2Lib::Paths64& subject, const Clipper2Lib::Paths64& clip,
+    Clipper2Lib::FillRule subjectFillType, Clipper2Lib::FillRule clipFillType,
+    bool closed) {
   try {
     // Wrap the PolyTree object in a smart pointer since PolyTree cannot
     // safely be copied (i.e. returned by value), it would lead to a crash!!!
-    std::unique_ptr<ClipperLib::PolyTree> result(new ClipperLib::PolyTree());
-    ClipperLib::Clipper c;
-    c.AddPaths(subject, ClipperLib::ptSubject, closed);
-    c.AddPaths(clip, ClipperLib::ptClip, true);
-    c.Execute(ClipperLib::ctDifference, *result, subjectFillType, clipFillType);
+    std::unique_ptr<Clipper2Lib::PolyTree64> result(
+        new Clipper2Lib::PolyTree64());
+    Clipper2Lib::Clipper64 c;
+    if (closed) {
+      c.AddSubject(subject);
+    } else {
+      c.AddOpenSubject(subject);
+    }
+    c.AddClip(clip);
+    c.Execute(Clipper2Lib::ClipType::Difference, clipFillType, *result);
     return result;
   } catch (const std::exception& e) {
     throw LogicError(__FILE__, __LINE__,
@@ -248,29 +262,31 @@ std::unique_ptr<ClipperLib::PolyTree> ClipperHelpers::subtractToTree(
   }
 }
 
-void ClipperHelpers::offset(ClipperLib::Paths& paths, const Length& offset,
+void ClipperHelpers::offset(Clipper2Lib::Paths64& paths, const Length& offset,
                             const PositiveLength& maxArcTolerance,
-                            ClipperLib::JoinType joinType) {
+                            Clipper2Lib::JoinType joinType) {
   try {
-    ClipperLib::ClipperOffset o(2.0, maxArcTolerance->toNm());
-    o.AddPaths(paths, joinType, ClipperLib::etClosedPolygon);
-    o.Execute(paths, offset.toNm());
+    Clipper2Lib::ClipperOffset o(2.0, maxArcTolerance->toNm());
+    o.AddPaths(paths, joinType, Clipper2Lib::EndType::Polygon);
+    o.Execute(offset.toNm(), paths);
   } catch (const std::exception& e) {
     throw LogicError(__FILE__, __LINE__,
                      QString("Failed to offset a path: %1").arg(e.what()));
   }
 }
 
-std::unique_ptr<ClipperLib::PolyTree> ClipperHelpers::offsetToTree(
-    const ClipperLib::Paths& paths, const Length& offset,
+std::unique_ptr<Clipper2Lib::PolyTree64> ClipperHelpers::offsetToTree(
+    const Clipper2Lib::Paths64& paths, const Length& offset,
     const PositiveLength& maxArcTolerance) {
   try {
     // Wrap the PolyTree object in a smart pointer since PolyTree cannot
     // safely be copied (i.e. returned by value), it would lead to a crash!!!
-    std::unique_ptr<ClipperLib::PolyTree> result(new ClipperLib::PolyTree());
-    ClipperLib::ClipperOffset o(2.0, maxArcTolerance->toNm());
-    o.AddPaths(paths, ClipperLib::jtRound, ClipperLib::etClosedPolygon);
-    o.Execute(*result, offset.toNm());
+    std::unique_ptr<Clipper2Lib::PolyTree64> result(
+        new Clipper2Lib::PolyTree64());
+    Clipper2Lib::ClipperOffset o(2.0, maxArcTolerance->toNm());
+    o.AddPaths(paths, Clipper2Lib::JoinType::Round,
+               Clipper2Lib::EndType::Polygon);
+    o.Execute(offset.toNm(), *result);
     return result;
   } catch (const std::exception& e) {
     throw LogicError(__FILE__, __LINE__,
@@ -278,12 +294,10 @@ std::unique_ptr<ClipperLib::PolyTree> ClipperHelpers::offsetToTree(
   }
 }
 
-ClipperLib::Paths ClipperHelpers::treeToPaths(
-    const ClipperLib::PolyTree& tree) {
+Clipper2Lib::Paths64 ClipperHelpers::treeToPaths(
+    const Clipper2Lib::PolyTree64& tree) {
   try {
-    ClipperLib::Paths paths;
-    ClipperLib::PolyTreeToPaths(tree, paths);
-    return paths;
+    return Clipper2Lib::PolyTreeToPaths64(tree);
   } catch (const std::exception& e) {
     throw LogicError(
         __FILE__, __LINE__,
@@ -291,22 +305,22 @@ ClipperLib::Paths ClipperHelpers::treeToPaths(
   }
 }
 
-ClipperLib::Paths ClipperHelpers::flattenTree(
-    const ClipperLib::PolyNode& node) {
-  ClipperLib::Paths paths;
-  for (const ClipperLib::PolyNode* outlineChild : node.Childs) {
+Clipper2Lib::Paths64 ClipperHelpers::flattenTree(
+    const Clipper2Lib::PolyTree64& node) {
+  Clipper2Lib::Paths64 paths;
+  for (const auto& outlineChild : node) {
     Q_ASSERT(outlineChild);
     if (outlineChild->IsHole()) throw LogicError(__FILE__, __LINE__);
-    ClipperLib::Paths holes;
-    for (ClipperLib::PolyNode* holeChild : outlineChild->Childs) {
+    Clipper2Lib::Paths64 holes;
+    for (const auto& holeChild : *outlineChild) {
       Q_ASSERT(holeChild);
       if (!holeChild->IsHole()) throw LogicError(__FILE__, __LINE__);
-      holes.push_back(holeChild->Contour);
-      ClipperLib::Paths subpaths = flattenTree(*holeChild);  // can throw
+      holes.push_back(holeChild->Polygon());
+      Clipper2Lib::Paths64 subpaths = flattenTree(*holeChild);  // can throw
       paths.insert(paths.end(), subpaths.begin(), subpaths.end());
     }
     paths.push_back(
-        convertHolesToCutIns(outlineChild->Contour, holes));  // can throw
+        convertHolesToCutIns(outlineChild->Polygon(), holes));  // can throw
   }
   return paths;
 }
@@ -315,32 +329,33 @@ ClipperLib::Paths ClipperHelpers::flattenTree(
  *  Conversion Methods
  ******************************************************************************/
 
-QVector<Path> ClipperHelpers::convert(const ClipperLib::Paths& paths) noexcept {
+QVector<Path> ClipperHelpers::convert(
+    const Clipper2Lib::Paths64& paths) noexcept {
   QVector<Path> p;
   p.reserve(paths.size());
-  for (const ClipperLib::Path& path : paths) {
+  for (const Clipper2Lib::Path64& path : paths) {
     p.append(convert(path));
   }
   return p;
 }
 
-Path ClipperHelpers::convert(const ClipperLib::Path& path) noexcept {
+Path ClipperHelpers::convert(const Clipper2Lib::Path64& path) noexcept {
   Path p;
-  for (const ClipperLib::IntPoint& point : path) {
+  for (const Clipper2Lib::Point64& point : path) {
     p.addVertex(convert(point));
   }
   p.close();
   return p;
 }
 
-Point ClipperHelpers::convert(const ClipperLib::IntPoint& point) noexcept {
-  return Point(point.X, point.Y);
+Point ClipperHelpers::convert(const Clipper2Lib::Point64& point) noexcept {
+  return Point(point.x, point.y);
 }
 
-ClipperLib::Paths ClipperHelpers::convert(
+Clipper2Lib::Paths64 ClipperHelpers::convert(
     const QVector<Path>& paths,
     const PositiveLength& maxArcTolerance) noexcept {
-  ClipperLib::Paths p;
+  Clipper2Lib::Paths64 p;
   p.reserve(paths.size());
   foreach (const Path& path, paths) {
     p.push_back(convert(path, maxArcTolerance));
@@ -348,33 +363,33 @@ ClipperLib::Paths ClipperHelpers::convert(
   return p;
 }
 
-ClipperLib::Path ClipperHelpers::convert(
+Clipper2Lib::Path64 ClipperHelpers::convert(
     const Path& path, const PositiveLength& maxArcTolerance) noexcept {
-  ClipperLib::Path p;
+  Clipper2Lib::Path64 p;
   foreach (const Vertex& v, path.flattenedArcs(maxArcTolerance).getVertices()) {
     p.push_back(convert(v.getPos()));
   }
   // make sure all paths have the same orientation, otherwise we get strange
   // results
-  if (!ClipperLib::Orientation(p)) {
-    ClipperLib::ReversePath(p);
+  if (!Clipper2Lib::IsPositive(p)) {
+    std::reverse(p.begin(), p.end());
   }
   return p;
 }
 
-ClipperLib::IntPoint ClipperHelpers::convert(const Point& point) noexcept {
-  return ClipperLib::IntPoint(point.getX().toNm(), point.getY().toNm());
+Clipper2Lib::Point64 ClipperHelpers::convert(const Point& point) noexcept {
+  return Clipper2Lib::Point64(point.getX().toNm(), point.getY().toNm());
 }
 
 /*******************************************************************************
  *  Internal Helper Methods
  ******************************************************************************/
 
-ClipperLib::Path ClipperHelpers::convertHolesToCutIns(
-    const ClipperLib::Path& outline, const ClipperLib::Paths& holes) {
-  ClipperLib::Path path = outline;
-  ClipperLib::Paths preparedHoles = prepareHoles(holes);
-  for (const ClipperLib::Path& hole : preparedHoles) {
+Clipper2Lib::Path64 ClipperHelpers::convertHolesToCutIns(
+    const Clipper2Lib::Path64& outline, const Clipper2Lib::Paths64& holes) {
+  Clipper2Lib::Path64 path = outline;
+  Clipper2Lib::Paths64 preparedHoles = prepareHoles(holes);
+  for (const Clipper2Lib::Path64& hole : preparedHoles) {
     addCutInToPath(path, hole);  // can throw
   }
   // Remove duplicates which might have been created by cut-ins.
@@ -386,10 +401,10 @@ ClipperLib::Path ClipperHelpers::convertHolesToCutIns(
   return path;
 }
 
-ClipperLib::Paths ClipperHelpers::prepareHoles(
-    const ClipperLib::Paths& holes) noexcept {
-  ClipperLib::Paths preparedHoles;
-  for (const ClipperLib::Path& hole : holes) {
+Clipper2Lib::Paths64 ClipperHelpers::prepareHoles(
+    const Clipper2Lib::Paths64& holes) noexcept {
+  Clipper2Lib::Paths64 preparedHoles;
+  for (const Clipper2Lib::Path64& hole : holes) {
     if (hole.size() > 2) {
       preparedHoles.push_back(rotateCutInHole(hole));
     } else {
@@ -400,45 +415,45 @@ ClipperLib::Paths ClipperHelpers::prepareHoles(
   // important: sort holes by the y coordinate of their connection point
   // (to make sure no cut-ins are overlapping in the resulting plane)
   std::sort(preparedHoles.begin(), preparedHoles.end(),
-            [](const ClipperLib::Path& p1, const ClipperLib::Path& p2) {
-              return p1.front().Y < p2.front().Y;
+            [](const Clipper2Lib::Path64& p1, const Clipper2Lib::Path64& p2) {
+              return p1.front().y < p2.front().y;
             });
   return preparedHoles;
 }
 
-ClipperLib::Path ClipperHelpers::rotateCutInHole(
-    const ClipperLib::Path& hole) noexcept {
-  ClipperLib::Path p = hole;
+Clipper2Lib::Path64 ClipperHelpers::rotateCutInHole(
+    const Clipper2Lib::Path64& hole) noexcept {
+  Clipper2Lib::Path64 p = hole;
   if (p.back() == p.front()) {
     p.pop_back();
   }
   auto minIt = std::min_element(
       p.begin(), p.end(),
-      [](const ClipperLib::IntPoint& a, const ClipperLib::IntPoint& b) {
-        return (a.Y < b.Y) || ((a.Y == b.Y) && (a.X < b.X));
+      [](const Clipper2Lib::Point64& a, const Clipper2Lib::Point64& b) {
+        return (a.y < b.y) || ((a.y == b.y) && (a.x < b.x));
       });
   std::rotate(p.begin(), minIt, p.end());
   return p;
 }
 
-void ClipperHelpers::addCutInToPath(ClipperLib::Path& outline,
-                                    const ClipperLib::Path& hole) {
+void ClipperHelpers::addCutInToPath(Clipper2Lib::Path64& outline,
+                                    const Clipper2Lib::Path64& hole) {
   int index = insertConnectionPointToPath(outline, hole.front());  // can throw
   outline.insert(outline.begin() + index, hole.begin(), hole.end());
 }
 
-int ClipperHelpers::insertConnectionPointToPath(ClipperLib::Path& path,
-                                                const ClipperLib::IntPoint& p) {
+int ClipperHelpers::insertConnectionPointToPath(Clipper2Lib::Path64& path,
+                                                const Clipper2Lib::Point64& p) {
   int nearestIndex = -1;
-  ClipperLib::IntPoint nearestPoint;
+  Clipper2Lib::Point64 nearestPoint;
   for (size_t i = 0; i < path.size(); ++i) {
-    ClipperLib::cInt y;
-    if (calcIntersectionPos(path.at(i), path.at((i + 1) % path.size()), p.X,
+    int64_t y;
+    if (calcIntersectionPos(path.at(i), path.at((i + 1) % path.size()), p.x,
                             y)) {
-      if ((y <= p.Y) &&
-          ((nearestIndex < 0) || (p.Y - y < p.Y - nearestPoint.Y))) {
+      if ((y <= p.y) &&
+          ((nearestIndex < 0) || (p.y - y < p.y - nearestPoint.y))) {
         nearestIndex = i;
-        nearestPoint = ClipperLib::IntPoint(p.X, y);
+        nearestPoint = Clipper2Lib::Point64(p.x, y);
       }
     }
   }
@@ -454,14 +469,14 @@ int ClipperHelpers::insertConnectionPointToPath(ClipperLib::Path& path,
   }
 }
 
-bool ClipperHelpers::calcIntersectionPos(const ClipperLib::IntPoint& p1,
-                                         const ClipperLib::IntPoint& p2,
-                                         const ClipperLib::cInt& x,
-                                         ClipperLib::cInt& y) noexcept {
-  if (((p1.X <= x) && (p2.X > x)) || ((p1.X >= x) && (p2.X < x))) {
+bool ClipperHelpers::calcIntersectionPos(const Clipper2Lib::Point64& p1,
+                                         const Clipper2Lib::Point64& p2,
+                                         const int64_t& x,
+                                         int64_t& y) noexcept {
+  if (((p1.x <= x) && (p2.x > x)) || ((p1.x >= x) && (p2.x < x))) {
     qreal yCalc =
-        p1.Y + (qreal(x - p1.X) * qreal(p2.Y - p1.Y) / qreal(p2.X - p1.X));
-    y = qBound(qMin(p1.Y, p2.Y), ClipperLib::cInt(yCalc), qMax(p1.Y, p2.Y));
+        p1.y + (qreal(x - p1.x) * qreal(p2.y - p1.y) / qreal(p2.x - p1.x));
+    y = qBound(qMin(p1.y, p2.y), int64_t(yCalc), qMax(p1.y, p2.y));
     return true;
   } else {
     return false;

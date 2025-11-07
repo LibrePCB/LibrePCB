@@ -4,13 +4,13 @@
 set -euv -o pipefail
 
 # check if all files have Unix line endings (except 3rd-party libs)
-(git grep -Il $'\r' -- ':/' ':!/libs/polyclipping/') && exit 1
+(git grep -Il $'\r' -- ':/' ':!/libs/clipper2/') && exit 1
 
 # check if no file contains trailing spaces (with some exceptions)
 (git grep -Il ' $' -- ':/' ':!/share/librepcb/licenses/' ':!*.dia') && exit 1
 
 # check if no file contains tabulators (with some exceptions)
-(git grep -Il $'\t' -- ':/' ':!/LICENSES/' ':!/libs/polyclipping/' ':!/share/librepcb/licenses/' ':!*.ui') && exit 1
+(git grep -Il $'\t' -- ':/' ':!/LICENSES/' ':!/libs/clipper2/' ':!/share/librepcb/licenses/' ':!*.ui') && exit 1
 
 # check if no font weights are used that we don't bundle font files for
 (git grep -E 'font-weight: [0-9]+' -- '*.slint' | grep -vE 'font-weight: (300|400|700)') && exit 1
