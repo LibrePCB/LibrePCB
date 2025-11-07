@@ -156,6 +156,7 @@ if(QT_VERSION VERSION_GREATER_EQUAL 6.8 AND QT_VERSION VERSION_LESS 6.10)
 endif()
 
 # Find third party libraries
+find_package(Clipper2 REQUIRED)
 find_package(DelaunayTriangulation REQUIRED)
 find_package(Dxflib REQUIRED)
 find_package(FontoBeneQt REQUIRED)
