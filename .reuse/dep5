@@ -251,10 +251,6 @@ Files: libs/parseagle/*
 Copyright: 2012-2020, U. Bruhin
 License: MIT or Apache-2.0
 
-Files: libs/polyclipping/*
-Copyright: 2010-2017, Angus Johnson
-License: BSL-1.0
-
 Files: libs/type_safe/*
 Copyright: 2016-2019, Jonathan Müller
 License: MIT
