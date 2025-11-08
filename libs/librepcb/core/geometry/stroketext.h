@@ -66,6 +66,7 @@ public:
     AlignChanged,
     MirroredChanged,
     AutoRotateChanged,
+    LockedChanged,
   };
   Signal<StrokeText, Event> onEdited;
   typedef Slot<StrokeText, Event> OnEditedSlot;
@@ -79,7 +80,7 @@ public:
              const PositiveLength& height, const UnsignedLength& strokeWidth,
              const StrokeTextSpacing& letterSpacing,
              const StrokeTextSpacing& lineSpacing, const Alignment& align,
-             bool mirrored, bool autoRotate) noexcept;
+             bool mirrored, bool autoRotate, bool locked) noexcept;
   explicit StrokeText(const SExpression& node);
   ~StrokeText() noexcept;
 
@@ -99,6 +100,7 @@ public:
   const Alignment& getAlign() const noexcept { return mAlign; }
   bool getMirrored() const noexcept { return mMirrored; }
   bool getAutoRotate() const noexcept { return mAutoRotate; }
+  bool isLocked() const noexcept { return mLocked; }
   const QString& getText() const noexcept { return mText; }
   QVector<Path> generatePaths(const StrokeFont& font) const noexcept;
   QVector<Path> generatePaths(const StrokeFont& font,
@@ -116,6 +118,7 @@ public:
   bool setAlign(const Alignment& align) noexcept;
   bool setMirrored(bool mirrored) noexcept;
   bool setAutoRotate(bool autoRotate) noexcept;
+  bool setLocked(bool locked) noexcept;
 
   // General Methods
 
@@ -146,6 +149,7 @@ private:  // Data
   Alignment mAlign;
   bool mMirrored;
   bool mAutoRotate;
+  bool mLocked;
 };
 
 /*******************************************************************************

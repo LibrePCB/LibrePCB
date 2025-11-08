@@ -982,7 +982,7 @@ void EagleProjectImport::importBoard(Project& project,
   // Texts
   foreach (const parseagle::Text& eagleObj, mBoard->getTexts()) {
     try {
-      if (auto lpObj = C::tryConvertBoardText(eagleObj)) {
+      if (auto lpObj = C::tryConvertBoardText(eagleObj, false)) {
         BI_StrokeText* obj = new BI_StrokeText(
             *board,
             BoardStrokeTextData(

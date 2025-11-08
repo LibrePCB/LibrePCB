@@ -1211,7 +1211,8 @@ void MainWindow::openPackageTab(LibraryEditor& editor, const FilePath& fp,
                       text.getPosition(), text.getRotation(), text.getHeight(),
                       text.getStrokeWidth(), text.getLetterSpacing(),
                       text.getLineSpacing(), text.getAlign(),
-                      text.getMirrored(), text.getAutoRotate()));
+                      text.getMirrored(), text.getAutoRotate(),
+                      text.isLocked()));
             }
             // Copy zones but generate new UUIDs.
             for (const Zone& zone : footprint.getZones()) {

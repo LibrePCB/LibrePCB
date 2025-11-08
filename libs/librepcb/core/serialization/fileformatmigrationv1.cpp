@@ -100,6 +100,16 @@ void FileFormatMigrationV1::upgradePackage(TransactionalDirectory& dir) {
           padFunction.setValue("pressfit");
         }
       }
+
+      // Stroke texts.
+      for (SExpression* child : fptNode->getChildren("stroke_text")) {
+        const QSet<QString> unlockedLayers = {"top_names", "top_values",
+                                              "bot_names", "bot_values"};
+        const QString layer = child->getChild("layer/@0").getValue();
+        const bool lock = !unlockedLayers.contains(layer);
+        child->appendChild("lock",
+                           SExpression::createToken(lock ? "true" : "false"));
+      }
     }
 
     dir.write(fp, root->toByteArray());

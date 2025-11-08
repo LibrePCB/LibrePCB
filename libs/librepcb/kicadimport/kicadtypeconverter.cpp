@@ -577,13 +577,15 @@ std::shared_ptr<StrokeText> KiCadTypeConverter::convertFootprintText(
     rotation += Angle::deg180();
   }
 
+  // Note: These are probably pure graphical text (not NAME or VALUE) so it
+  // makes sense to lock them?
   const Layer& layer = convertFootprintGeometryLayer(t.layer);
   return std::make_shared<StrokeText>(
       Uuid::createRandom(), layer, t.text, convertFootprintPoint(t.position),
       rotation, PositiveLength(Length::fromMm(t.fontSize.height())),
       UnsignedLength(Length::fromMm(t.fontThickness)), StrokeTextSpacing(),
       StrokeTextSpacing(), Alignment::fromQt(t.alignment), t.mirror,
-      !t.unlocked);
+      !t.unlocked, true);
 }
 
 std::shared_ptr<StrokeText> KiCadTypeConverter::convertFootprintPropertyToText(
@@ -617,7 +619,7 @@ std::shared_ptr<StrokeText> KiCadTypeConverter::convertFootprintPropertyToText(
       rotation, PositiveLength(Length::fromMm(p.fontSize.height())),
       UnsignedLength(Length::fromMm(p.fontThickness)), StrokeTextSpacing(),
       StrokeTextSpacing(), Alignment::fromQt(p.alignment), p.mirror,
-      !p.unlocked);
+      !p.unlocked, false);
 }
 
 KiCadTypeConverter::PadReplacements KiCadTypeConverter::convertPad(

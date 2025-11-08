@@ -48,7 +48,8 @@ StrokeText::StrokeText(const StrokeText& other) noexcept
     mLineSpacing(other.mLineSpacing),
     mAlign(other.mAlign),
     mMirrored(other.mMirrored),
-    mAutoRotate(other.mAutoRotate) {
+    mAutoRotate(other.mAutoRotate),
+    mLocked(other.mLocked) {
 }
 
 StrokeText::StrokeText(const Uuid& uuid, const StrokeText& other) noexcept
@@ -62,8 +63,8 @@ StrokeText::StrokeText(const Uuid& uuid, const Layer& layer,
                        const UnsignedLength& strokeWidth,
                        const StrokeTextSpacing& letterSpacing,
                        const StrokeTextSpacing& lineSpacing,
-                       const Alignment& align, bool mirrored,
-                       bool autoRotate) noexcept
+                       const Alignment& align, bool mirrored, bool autoRotate,
+                       bool locked) noexcept
   : onEdited(*this),
     mUuid(uuid),
     mLayer(&layer),
@@ -76,7 +77,8 @@ StrokeText::StrokeText(const Uuid& uuid, const Layer& layer,
     mLineSpacing(lineSpacing),
     mAlign(align),
     mMirrored(mirrored),
-    mAutoRotate(autoRotate) {
+    mAutoRotate(autoRotate),
+    mLocked(locked) {
 }
 
 StrokeText::StrokeText(const SExpression& node)
@@ -94,7 +96,8 @@ StrokeText::StrokeText(const SExpression& node)
         deserialize<StrokeTextSpacing>(node.getChild("line_spacing/@0"))),
     mAlign(node.getChild("align")),
     mMirrored(deserialize<bool>(node.getChild("mirror/@0"))),
-    mAutoRotate(deserialize<bool>(node.getChild("auto_rotate/@0"))) {
+    mAutoRotate(deserialize<bool>(node.getChild("auto_rotate/@0"))),
+    mLocked(deserialize<bool>(node.getChild("lock/@0"))) {
 }
 
 StrokeText::~StrokeText() noexcept {
@@ -229,6 +232,16 @@ bool StrokeText::setAutoRotate(bool autoRotate) noexcept {
   return true;
 }
 
+bool StrokeText::setLocked(bool locked) noexcept {
+  if (locked == mLocked) {
+    return false;
+  }
+
+  mLocked = locked;
+  onEdited.notify(Event::LockedChanged);
+  return true;
+}
+
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
@@ -245,6 +258,7 @@ void StrokeText::serialize(SExpression& root) const {
   mAlign.serialize(root.appendList("align"));
   mPosition.serialize(root.appendList("position"));
   root.appendChild("rotation", mRotation);
+  root.appendChild("lock", mLocked);
   root.ensureLineBreak();
   root.appendChild("auto_rotate", mAutoRotate);
   root.appendChild("mirror", mMirrored);
@@ -269,6 +283,7 @@ bool StrokeText::operator==(const StrokeText& rhs) const noexcept {
   if (mAlign != rhs.mAlign) return false;
   if (mMirrored != rhs.mMirrored) return false;
   if (mAutoRotate != rhs.mAutoRotate) return false;
+  if (mLocked != rhs.mLocked) return false;
   return true;
 }
 
@@ -288,6 +303,7 @@ StrokeText& StrokeText::operator=(const StrokeText& rhs) noexcept {
   setAlign(rhs.mAlign);
   setMirrored(rhs.mMirrored);
   setAutoRotate(rhs.mAutoRotate);
+  setLocked(rhs.mLocked);
   return *this;
 }
 

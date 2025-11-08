@@ -272,7 +272,7 @@ std::unique_ptr<Package> EagleLibraryConverter::createPackage(
         log);
   }
   foreach (const auto& obj, eaglePackage.getTexts()) {
-    if (auto lpObj = C::tryConvertBoardText(obj)) {
+    if (auto lpObj = C::tryConvertBoardText(obj, true)) {
       footprint->getStrokeTexts().append(lpObj);
     } else {
       log.warning(tr("Skipped text on layer %1 (%2).")

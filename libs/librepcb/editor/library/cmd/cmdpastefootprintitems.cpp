@@ -160,7 +160,7 @@ bool CmdPasteFootprintItems::performExecute() {
         uuid, text.getLayer(), text.getText(), text.getPosition() + mPosOffset,
         text.getRotation(), text.getHeight(), text.getStrokeWidth(),
         text.getLetterSpacing(), text.getLineSpacing(), text.getAlign(),
-        text.getMirrored(), text.getAutoRotate());
+        text.getMirrored(), text.getAutoRotate(), text.isLocked());
     execNewChildCmd(new CmdStrokeTextInsert(mFootprint.getStrokeTexts(), copy));
     if (auto graphicsItem = mGraphicsItem.getGraphicsItem(copy)) {
       graphicsItem->setSelected(true);

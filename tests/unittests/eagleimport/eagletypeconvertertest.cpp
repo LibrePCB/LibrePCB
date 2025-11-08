@@ -505,7 +505,7 @@ TEST_F(EagleTypeConverterTest, testTryConvertBoardTextStrokeWidth) {
 
 TEST_F(EagleTypeConverterTest, testTryConvertBoardText) {
   QString xml = "<text x=\"1\" y=\"2\" size=\"3\" layer=\"1\">&gt;NAME</text>";
-  auto out = C::tryConvertBoardText(parseagle::Text(dom(xml)));
+  auto out = C::tryConvertBoardText(parseagle::Text(dom(xml)), true);
   ASSERT_TRUE(out);
   EXPECT_EQ(Layer::topCopper().getId().toStdString(),
             out->getLayer().getId().toStdString());
@@ -519,6 +519,7 @@ TEST_F(EagleTypeConverterTest, testTryConvertBoardText) {
   EXPECT_EQ(false, out->getMirrored());  // Default value.
   EXPECT_EQ(true, out->getAutoRotate());  // Default value.
   EXPECT_EQ("{{NAME}}", out->getText().toStdString());
+  EXPECT_EQ(true, out->isLocked());  // Because of the layer.
 }
 
 TEST_F(EagleTypeConverterTest, testConvertSymbolPin) {
