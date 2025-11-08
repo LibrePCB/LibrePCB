@@ -100,13 +100,12 @@ void ClipperHelpers::unite(Clipper2Lib::Paths64& paths,
 
 void ClipperHelpers::unite(Clipper2Lib::Paths64& subject,
                            const Clipper2Lib::Paths64& clip,
-                           Clipper2Lib::FillRule subjectFillType,
-                           Clipper2Lib::FillRule clipFillType) {
+                           Clipper2Lib::FillRule fillType) {
   try {
     Clipper2Lib::Clipper64 c;
     c.AddSubject(subject);
     c.AddClip(clip);
-    c.Execute(Clipper2Lib::ClipType::Union, clipFillType, subject);
+    c.Execute(Clipper2Lib::ClipType::Union, fillType, subject);
   } catch (const std::exception& e) {
     throw LogicError(__FILE__, __LINE__,
                      QString("Failed to unite paths: %1").arg(e.what()));
@@ -122,7 +121,7 @@ std::unique_ptr<Clipper2Lib::PolyTree64> ClipperHelpers::uniteToTree(
         new Clipper2Lib::PolyTree64());
     Clipper2Lib::Clipper64 c;
     c.AddSubject(paths);
-    c.Execute(Clipper2Lib::ClipType::Union, Clipper2Lib::FillRule::EvenOdd,
+    c.Execute(Clipper2Lib::ClipType::Union, fillType,
               *result);
     return result;
   } catch (const std::exception& e) {
@@ -133,7 +132,7 @@ std::unique_ptr<Clipper2Lib::PolyTree64> ClipperHelpers::uniteToTree(
 
 std::unique_ptr<Clipper2Lib::PolyTree64> ClipperHelpers::uniteToTree(
     const Clipper2Lib::Paths64& paths, const Clipper2Lib::Paths64& clip,
-    Clipper2Lib::FillRule subjectFillType, Clipper2Lib::FillRule clipFillType) {
+    Clipper2Lib::FillRule fillType) {
   try {
     // Wrap the PolyTree object in a smart pointer since PolyTree cannot
     // safely be copied (i.e. returned by value), it would lead to a crash!!!
@@ -142,7 +141,7 @@ std::unique_ptr<Clipper2Lib::PolyTree64> ClipperHelpers::uniteToTree(
     Clipper2Lib::Clipper64 c;
     c.AddSubject(paths);
     c.AddClip(clip);
-    c.Execute(Clipper2Lib::ClipType::Union, clipFillType, *result);
+    c.Execute(Clipper2Lib::ClipType::Union, fillType, *result);
     return result;
   } catch (const std::exception& e) {
     throw LogicError(__FILE__, __LINE__,
@@ -152,13 +151,12 @@ std::unique_ptr<Clipper2Lib::PolyTree64> ClipperHelpers::uniteToTree(
 
 void ClipperHelpers::intersect(Clipper2Lib::Paths64& subject,
                                const Clipper2Lib::Paths64& clip,
-                               Clipper2Lib::FillRule subjectFillType,
-                               Clipper2Lib::FillRule clipFillType) {
+                               Clipper2Lib::FillRule fillType) {
   try {
     Clipper2Lib::Clipper64 c;
     c.AddSubject(subject);
     c.AddClip(clip);
-    c.Execute(Clipper2Lib::ClipType::Intersection, clipFillType, subject);
+    c.Execute(Clipper2Lib::ClipType::Intersection, fillType, subject);
   } catch (const std::exception& e) {
     throw LogicError(__FILE__, __LINE__,
                      QString("Failed to intersect paths: %1").arg(e.what()));
@@ -167,7 +165,7 @@ void ClipperHelpers::intersect(Clipper2Lib::Paths64& subject,
 
 std::unique_ptr<Clipper2Lib::PolyTree64> ClipperHelpers::intersectToTree(
     const Clipper2Lib::Paths64& subject, const Clipper2Lib::Paths64& clip,
-    Clipper2Lib::FillRule subjectFillType, Clipper2Lib::FillRule clipFillType,
+    Clipper2Lib::FillRule fillType,
     bool closed) {
   try {
     // Wrap the PolyTree object in a smart pointer since PolyTree cannot
@@ -181,7 +179,7 @@ std::unique_ptr<Clipper2Lib::PolyTree64> ClipperHelpers::intersectToTree(
       c.AddOpenSubject(subject);
     }
     c.AddClip(clip);
-    c.Execute(Clipper2Lib::ClipType::Intersection, clipFillType, *result);
+    c.Execute(Clipper2Lib::ClipType::Intersection, fillType, *result);
     return result;
   } catch (const std::exception& e) {
     throw LogicError(__FILE__, __LINE__,
@@ -225,13 +223,12 @@ std::unique_ptr<Clipper2Lib::PolyTree64> ClipperHelpers::intersectToTree(
 
 void ClipperHelpers::subtract(Clipper2Lib::Paths64& subject,
                               const Clipper2Lib::Paths64& clip,
-                              Clipper2Lib::FillRule subjectFillType,
-                              Clipper2Lib::FillRule clipFillType) {
+                              Clipper2Lib::FillRule fillType) {
   try {
     Clipper2Lib::Clipper64 c;
     c.AddSubject(subject);
     c.AddClip(clip);
-    c.Execute(Clipper2Lib::ClipType::Difference, clipFillType, subject);
+    c.Execute(Clipper2Lib::ClipType::Difference, fillType, subject);
   } catch (const std::exception& e) {
     throw LogicError(__FILE__, __LINE__,
                      QString("Failed to subtract paths: %1").arg(e.what()));
@@ -240,7 +237,7 @@ void ClipperHelpers::subtract(Clipper2Lib::Paths64& subject,
 
 std::unique_ptr<Clipper2Lib::PolyTree64> ClipperHelpers::subtractToTree(
     const Clipper2Lib::Paths64& subject, const Clipper2Lib::Paths64& clip,
-    Clipper2Lib::FillRule subjectFillType, Clipper2Lib::FillRule clipFillType,
+    Clipper2Lib::FillRule fillType,
     bool closed) {
   try {
     // Wrap the PolyTree object in a smart pointer since PolyTree cannot
@@ -254,7 +251,7 @@ std::unique_ptr<Clipper2Lib::PolyTree64> ClipperHelpers::subtractToTree(
       c.AddOpenSubject(subject);
     }
     c.AddClip(clip);
-    c.Execute(Clipper2Lib::ClipType::Difference, clipFillType, *result);
+    c.Execute(Clipper2Lib::ClipType::Difference, fillType, *result);
     return result;
   } catch (const std::exception& e) {
     throw LogicError(__FILE__, __LINE__,

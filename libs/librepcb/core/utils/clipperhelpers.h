@@ -62,31 +62,27 @@ public:
                     Clipper2Lib::FillRule fillType);
   static void unite(Clipper2Lib::Paths64& subject,
                     const Clipper2Lib::Paths64& clip,
-                    Clipper2Lib::FillRule subjectFillType,
-                    Clipper2Lib::FillRule clipFillType);
+                    Clipper2Lib::FillRule fillType);
   static std::unique_ptr<Clipper2Lib::PolyTree64> uniteToTree(
       const Clipper2Lib::Paths64& paths, Clipper2Lib::FillRule fillType);
   static std::unique_ptr<Clipper2Lib::PolyTree64> uniteToTree(
       const Clipper2Lib::Paths64& paths, const Clipper2Lib::Paths64& clip,
-      Clipper2Lib::FillRule subjectFillType,
-      Clipper2Lib::FillRule clipFillType);
+      Clipper2Lib::FillRule fillType);
   static void intersect(Clipper2Lib::Paths64& subject,
                         const Clipper2Lib::Paths64& clip,
-                        Clipper2Lib::FillRule subjectFillType,
-                        Clipper2Lib::FillRule clipFillType);
+                        Clipper2Lib::FillRule fillType);
   static std::unique_ptr<Clipper2Lib::PolyTree64> intersectToTree(
       const Clipper2Lib::Paths64& subject, const Clipper2Lib::Paths64& clip,
-      Clipper2Lib::FillRule subjectFillType, Clipper2Lib::FillRule clipFillType,
+      Clipper2Lib::FillRule fillType,
       bool closed = true);
   static std::unique_ptr<Clipper2Lib::PolyTree64> intersectToTree(
       const QList<Clipper2Lib::Paths64>& paths);
   static void subtract(Clipper2Lib::Paths64& subject,
                        const Clipper2Lib::Paths64& clip,
-                       Clipper2Lib::FillRule subjectFillType,
-                       Clipper2Lib::FillRule clipFillType);
+                       Clipper2Lib::FillRule fillType);
   static std::unique_ptr<Clipper2Lib::PolyTree64> subtractToTree(
       const Clipper2Lib::Paths64& subject, const Clipper2Lib::Paths64& clip,
-      Clipper2Lib::FillRule subjectFillType, Clipper2Lib::FillRule clipFillType,
+      Clipper2Lib::FillRule fillType,
       bool closed = true);
   static void offset(
       Clipper2Lib::Paths64& paths, const Length& offset,

@@ -761,8 +761,7 @@ BoardPlaneFragmentsBuilder::LayerJobResult BoardPlaneFragmentsBuilder::runLayer(
                                 Clipper2Lib::FillRule::NonZero,
                                 Clipper2Lib::FillRule::EvenOdd);  // can throw
       tree = ClipperHelpers::uniteToTree(
-          fragments, thermalPadAreas, Clipper2Lib::FillRule::EvenOdd,
-          Clipper2Lib::FillRule::NonZero);  // can throw
+          fragments, thermalPadAreas, Clipper2Lib::FillRule::EvenOdd);  // can throw
       fragments = ClipperHelpers::flattenTree(*tree);  // can throw
       if (mAbort) {
         break;

@@ -151,7 +151,6 @@ void OpenGlSceneBuilder::run(std::shared_ptr<SceneData3D> data) noexcept {
     }
     Clipper2Lib::Paths64 allHoles = platedHoles;
     ClipperHelpers::unite(allHoles, nonPlatedHoles,
-                          Clipper2Lib::FillRule::NonZero,
                           Clipper2Lib::FillRule::NonZero);
     if (mAbort) return;
 

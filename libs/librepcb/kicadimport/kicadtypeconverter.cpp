@@ -722,7 +722,7 @@ KiCadTypeConverter::PadReplacements KiCadTypeConverter::convertPad(
         ClipperHelpers::offset(tmp, width / 2, maxArcTolerance(),
                                Clipper2Lib::JoinType::Round);
       }
-      ClipperHelpers::unite(paths, tmp, Clipper2Lib::FillRule::EvenOdd,
+      ClipperHelpers::unite(paths, tmp,
                             Clipper2Lib::FillRule::NonZero);
     };
     for (const KiCadGraphicalLine& line : p.graphicalLines) {
@@ -790,8 +790,7 @@ KiCadTypeConverter::PadReplacements KiCadTypeConverter::convertPad(
       }
     }
     std::unique_ptr<Clipper2Lib::PolyTree64> tree =
-        ClipperHelpers::uniteToTree(paths, {}, Clipper2Lib::FillRule::EvenOdd,
-                                    Clipper2Lib::FillRule::EvenOdd);
+        ClipperHelpers::uniteToTree(paths, {}, Clipper2Lib::FillRule::EvenOdd);
     paths = ClipperHelpers::flattenTree(*tree);
     if (!paths.empty()) {
       if (paths.size() > 1) {

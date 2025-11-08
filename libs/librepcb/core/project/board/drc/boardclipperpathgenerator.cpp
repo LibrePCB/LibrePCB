@@ -238,7 +238,7 @@ void BoardClipperPathGenerator::addStopMaskOpenings(const Data& data,
             mPaths,
             ClipperHelpers::convert(padTransform.map(geometry.toOutlines()),
                                     mMaxArcTolerance),
-            Clipper2Lib::FillRule::EvenOdd, Clipper2Lib::FillRule::NonZero);
+            Clipper2Lib::FillRule::EvenOdd);
       }
     }
   }
@@ -256,7 +256,7 @@ void BoardClipperPathGenerator::addStopMaskOpenings(const Data& data,
             mPaths,
             ClipperHelpers::convert(padTransform.map(geometry.toOutlines()),
                                     mMaxArcTolerance),
-            Clipper2Lib::FillRule::EvenOdd, Clipper2Lib::FillRule::NonZero);
+            Clipper2Lib::FillRule::EvenOdd);
       }
     }
 
@@ -280,7 +280,7 @@ void BoardClipperPathGenerator::addVia(const Data::Via& via,
         Path::circle(PositiveLength(size)).translated(via.position);
     ClipperHelpers::unite(
         mPaths, {ClipperHelpers::convert(sceneOutline, mMaxArcTolerance)},
-        Clipper2Lib::FillRule::EvenOdd, Clipper2Lib::FillRule::EvenOdd);
+        Clipper2Lib::FillRule::EvenOdd);
   }
 }
 
@@ -292,7 +292,7 @@ void BoardClipperPathGenerator::addTrace(const Data::Trace& trace,
         Path::obround(trace.p1, trace.p2, PositiveLength(width));
     ClipperHelpers::unite(
         mPaths, {ClipperHelpers::convert(sceneOutline, mMaxArcTolerance)},
-        Clipper2Lib::FillRule::EvenOdd, Clipper2Lib::FillRule::EvenOdd);
+        Clipper2Lib::FillRule::EvenOdd);
   }
 }
 
@@ -300,7 +300,7 @@ void BoardClipperPathGenerator::addPlane(const QVector<Path>& fragments) {
   foreach (const Path& p, fragments) {
     ClipperHelpers::unite(
         mPaths, {ClipperHelpers::convert(p, mMaxArcTolerance)},
-        Clipper2Lib::FillRule::EvenOdd, Clipper2Lib::FillRule::EvenOdd);
+        Clipper2Lib::FillRule::EvenOdd);
   }
 }
 
@@ -313,7 +313,7 @@ void BoardClipperPathGenerator::addPolygon(const Path& path,
     QVector<Path> paths = path.toOutlineStrokes(PositiveLength(totalWidth));
     ClipperHelpers::unite(
         mPaths, ClipperHelpers::convert(paths, mMaxArcTolerance),
-        Clipper2Lib::FillRule::EvenOdd, Clipper2Lib::FillRule::NonZero);
+         Clipper2Lib::FillRule::NonZero);
   }
 
   // Area (only fill closed paths, for consistency with the appearance in
@@ -324,8 +324,7 @@ void BoardClipperPathGenerator::addPolygon(const Path& path,
     if (offset != 0) {
       ClipperHelpers::offset(paths, offset, mMaxArcTolerance);
     }
-    ClipperHelpers::unite(mPaths, paths, Clipper2Lib::FillRule::EvenOdd,
-                          Clipper2Lib::FillRule::EvenOdd);
+    ClipperHelpers::unite(mPaths, paths, Clipper2Lib::FillRule::EvenOdd);
   }
 }
 
@@ -343,14 +342,14 @@ void BoardClipperPathGenerator::addCircle(const Data::Circle& circle,
         path.toOutlineStrokes(PositiveLength(*circle.lineWidth));
     ClipperHelpers::unite(
         mPaths, ClipperHelpers::convert(paths, mMaxArcTolerance),
-        Clipper2Lib::FillRule::EvenOdd, Clipper2Lib::FillRule::NonZero);
+         Clipper2Lib::FillRule::NonZero);
   }
 
   // Area.
   if (circle.filled) {
     ClipperHelpers::unite(
         mPaths, {ClipperHelpers::convert(path, mMaxArcTolerance)},
-        Clipper2Lib::FillRule::EvenOdd, Clipper2Lib::FillRule::EvenOdd);
+        Clipper2Lib::FillRule::EvenOdd);
   }
 }
 
@@ -364,7 +363,7 @@ void BoardClipperPathGenerator::addStrokeText(
     QVector<Path> paths = path.toOutlineStrokes(width);
     ClipperHelpers::unite(
         mPaths, ClipperHelpers::convert(paths, mMaxArcTolerance),
-        Clipper2Lib::FillRule::EvenOdd, Clipper2Lib::FillRule::NonZero);
+         Clipper2Lib::FillRule::NonZero);
   }
 }
 
@@ -377,7 +376,7 @@ void BoardClipperPathGenerator::addHole(const PositiveLength& diameter,
       mPaths,
       ClipperHelpers::convert(transform.map(*path).toOutlineStrokes(width),
                               mMaxArcTolerance),
-      Clipper2Lib::FillRule::EvenOdd, Clipper2Lib::FillRule::NonZero);
+       Clipper2Lib::FillRule::NonZero);
 }
 
 void BoardClipperPathGenerator::addPad(const Data::Pad& pad, const Layer& layer,
@@ -391,7 +390,7 @@ void BoardClipperPathGenerator::addPad(const Data::Pad& pad, const Layer& layer,
         mPaths,
         ClipperHelpers::convert(transform.map(geometry.toOutlines()),
                                 mMaxArcTolerance),
-        Clipper2Lib::FillRule::EvenOdd, Clipper2Lib::FillRule::NonZero);
+         Clipper2Lib::FillRule::NonZero);
 
     // Also add each hole to ensure correct copper areas even if
     // the pad outline is too small or invalid.
@@ -402,7 +401,7 @@ void BoardClipperPathGenerator::addPad(const Data::Pad& pad, const Layer& layer,
               transform.map(
                   hole.getPath()->toOutlineStrokes(hole.getDiameter())),
               mMaxArcTolerance),
-          Clipper2Lib::FillRule::EvenOdd, Clipper2Lib::FillRule::NonZero);
+           Clipper2Lib::FillRule::NonZero);
     }
   }
 }

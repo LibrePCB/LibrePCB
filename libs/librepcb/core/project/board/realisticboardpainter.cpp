@@ -121,8 +121,7 @@ QVector<std::pair<QColor, QPainterPath>> RealisticBoardPainter::getContent(
           mCachedHoles->insert(mCachedHoles->end(), paths.begin(), paths.end());
         }
       }
-      ClipperHelpers::unite(*mCachedHoles, {}, Clipper2Lib::FillRule::NonZero,
-                            Clipper2Lib::FillRule::NonZero);
+      ClipperHelpers::unite(*mCachedHoles, Clipper2Lib::FillRule::NonZero);
     }
 
     // Board outlines/area.
@@ -131,7 +130,6 @@ QVector<std::pair<QColor, QPainterPath>> RealisticBoardPainter::getContent(
       mCachedBoardOutlines = getPaths(layers);
       mCachedBoardArea = *mCachedBoardOutlines;
       ClipperHelpers::subtract(*mCachedBoardArea, *mCachedHoles,
-                               Clipper2Lib::FillRule::NonZero,
                                Clipper2Lib::FillRule::NonZero);
     }
 
@@ -145,7 +143,6 @@ QVector<std::pair<QColor, QPainterPath>> RealisticBoardPainter::getContent(
                              Layer::boardPlatedCutouts().getId()};
         paths = *mCachedBoardOutlines;
         ClipperHelpers::subtract(*paths, getPaths(layers),
-                                 Clipper2Lib::FillRule::EvenOdd,
                                  Clipper2Lib::FillRule::NonZero);
       }
       return *paths;
@@ -179,11 +176,9 @@ QVector<std::pair<QColor, QPainterPath>> RealisticBoardPainter::getContent(
           paths = *mCachedBoardArea;
           if (!mCachedCopperHoles->empty()) {
             ClipperHelpers::subtract(paths, *mCachedCopperHoles,
-                                     Clipper2Lib::FillRule::EvenOdd,
                                      Clipper2Lib::FillRule::NonZero);
           }
           ClipperHelpers::intersect(paths, getPaths(layers),
-                                    Clipper2Lib::FillRule::EvenOdd,
                                     Clipper2Lib::FillRule::NonZero);
           it = mCachedContentPerLayer.insert(themeColor, toPainterPath(paths));
         }
@@ -233,8 +228,7 @@ QVector<std::pair<QColor, QPainterPath>> RealisticBoardPainter::getContent(
           }
           paths = getPaths(layers);
           ClipperHelpers::intersect(paths, getSolderResistPaths(isBottom),
-                                    Clipper2Lib::FillRule::NonZero,
-                                    Clipper2Lib::FillRule::EvenOdd);
+                                    Clipper2Lib::FillRule::NonZero);
           it = mCachedContentPerLayer.insert(themeColor, toPainterPath(paths));
         }
         content.append(std::make_pair(color, *it));
@@ -254,8 +248,7 @@ QVector<std::pair<QColor, QPainterPath>> RealisticBoardPainter::getContent(
                               : Layer::botSolderPaste().getId()};
           paths = getPaths(layers);
           ClipperHelpers::intersect(paths, *mCachedBoardArea,
-                                    Clipper2Lib::FillRule::NonZero,
-                                    Clipper2Lib::FillRule::EvenOdd);
+                                    Clipper2Lib::FillRule::NonZero);
           it = mCachedContentPerLayer.insert(themeColor, toPainterPath(paths));
         }
         content.append(std::make_pair(settings.getColor(themeColor), *it));
