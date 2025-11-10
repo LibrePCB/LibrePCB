@@ -28,7 +28,7 @@
 #include "../../../utils/transform.h"
 #include "boarddesignrulecheckdata.h"
 
-#include <polyclipping/clipper.hpp>
+#include <clipper2/clipper.h>
 
 #include <QtCore>
 
@@ -54,8 +54,8 @@ public:
   ~BoardClipperPathGenerator() noexcept;
 
   // Getters
-  const ClipperLib::Paths& getPaths() const noexcept { return mPaths; }
-  void takePathsTo(ClipperLib::Paths& out) noexcept;
+  const Clipper2Lib::Paths64& getPaths() const noexcept { return mPaths; }
+  void takePathsTo(Clipper2Lib::Paths64& out) noexcept;
 
   // General Methods
   void addCopper(const Data& data, const Layer& layer,
@@ -80,7 +80,7 @@ public:
 
 private:  // Data
   PositiveLength mMaxArcTolerance;
-  ClipperLib::Paths mPaths;
+  Clipper2Lib::Paths64 mPaths;
 };
 
 /*******************************************************************************

@@ -963,9 +963,10 @@ QVector<Path> EagleTypeConverter::convertBoardZoneOutline(
     const Path& outline, const Length& lineWidth) {
   const PositiveLength maxArcTolerance(10000);
   if ((lineWidth / 2) > (*maxArcTolerance)) {
-    ClipperLib::Paths paths{ClipperHelpers::convert(outline, maxArcTolerance)};
+    Clipper2Lib::Paths64 paths{
+        ClipperHelpers::convert(outline, maxArcTolerance)};
     ClipperHelpers::offset(paths, lineWidth / 2, maxArcTolerance,
-                           ClipperLib::jtRound);
+                           Clipper2Lib::JoinType::Round);
     return ClipperHelpers::convert(paths);
   } else {
     return {outline};

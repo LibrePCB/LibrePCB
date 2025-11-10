@@ -563,7 +563,7 @@ target_link_libraries(
   PUBLIC # LibrePCB
          LibrePCB::RustCore
          # Third party
-         Polyclipping::Polyclipping
+         Clipper2::Clipper2
          TypeSafe::TypeSafe
          # Qt
          ${QT}::Concurrent
