@@ -2095,7 +2095,7 @@ RuleCheckMessageList BoardDesignRuleCheck::checkBoardCutouts(
       ClipperHelpers::intersect(
           intersectedCopperPaths,
           calcData.copperPathsPerLayer.value(&Layer::botCopper()),
-          Clipper2Lib::FillRule::EvenOdd, Clipper2Lib::FillRule::NonZero);
+          Clipper2Lib::FillRule::NonZero);
     }
     return intersectedCopperPaths;
   };

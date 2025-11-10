@@ -359,7 +359,7 @@ BoardPlaneFragmentsBuilder::Result BoardPlaneFragmentsBuilder::run(
     ClipperHelpers::subtract(
         *data->boardArea,
         ClipperHelpers::convert(boardCutouts, maxArcTolerance()),
-        Clipper2Lib::FillRule::NonZero, Clipper2Lib::FillRule::NonZero);
+         Clipper2Lib::FillRule::NonZero);
 
     // Sort planes: First by priority, then by uuid to get a really unique
     // priority order over all existing planes. This way we can ensure that even
@@ -442,7 +442,6 @@ BoardPlaneFragmentsBuilder::LayerJobResult BoardPlaneFragmentsBuilder::runLayer(
                                  maxArcTolerance());  // can throw
         }
         ClipperHelpers::intersect(fragments, {planeOutline},
-                                  Clipper2Lib::FillRule::EvenOdd,
                                   Clipper2Lib::FillRule::EvenOdd);  // can throw
       } else {
         fragments = {planeOutline};
@@ -630,8 +629,7 @@ BoardPlaneFragmentsBuilder::LayerJobResult BoardPlaneFragmentsBuilder::runLayer(
                 const Clipper2Lib::Paths64 spokePaths{ClipperHelpers::convert(
                     Path::obround(p1, p2, spokeWidth), maxArcTolerance())};
                 ClipperHelpers::subtract(
-                    clipperPaths, spokePaths, Clipper2Lib::FillRule::EvenOdd,
-                    Clipper2Lib::FillRule::NonZero);  // can throw
+                    clipperPaths, spokePaths, Clipper2Lib::FillRule::NonZero);  // can throw
               }
               // Memorize copper area for later removal of unconnected
               // thermal spokes,
@@ -695,7 +693,6 @@ BoardPlaneFragmentsBuilder::LayerJobResult BoardPlaneFragmentsBuilder::runLayer(
 
       // Subtract all the collected areas to remove.
       ClipperHelpers::subtract(fragments, removedAreas,
-                               Clipper2Lib::FillRule::EvenOdd,
                                Clipper2Lib::FillRule::NonZero);
       if (mAbort) {
         break;
@@ -720,7 +717,6 @@ BoardPlaneFragmentsBuilder::LayerJobResult BoardPlaneFragmentsBuilder::runLayer(
       std::unique_ptr<Clipper2Lib::PolyTree64> tree =
           ClipperHelpers::subtractToTree(
               fragments, thermalPadAreasShrinked,
-              Clipper2Lib::FillRule::EvenOdd,
               Clipper2Lib::FillRule::NonZero);  // can throw
       fragments = ClipperHelpers::flattenTree(*tree);  // can throw
       if (mAbort) {
@@ -758,8 +754,7 @@ BoardPlaneFragmentsBuilder::LayerJobResult BoardPlaneFragmentsBuilder::runLayer(
 
       // Fill thermal pads.
       ClipperHelpers::intersect(thermalPadAreas, fullPlaneArea,
-                                Clipper2Lib::FillRule::NonZero,
-                                Clipper2Lib::FillRule::EvenOdd);  // can throw
+                                Clipper2Lib::FillRule::NonZero);  // can throw
       tree = ClipperHelpers::uniteToTree(
           fragments, thermalPadAreas, Clipper2Lib::FillRule::EvenOdd);  // can throw
       fragments = ClipperHelpers::flattenTree(*tree);  // can throw
@@ -773,7 +768,6 @@ BoardPlaneFragmentsBuilder::LayerJobResult BoardPlaneFragmentsBuilder::runLayer(
           Clipper2Lib::Paths64 intersections{p};
           ClipperHelpers::intersect(
               intersections, connectedNetSignalAreas,
-              Clipper2Lib::FillRule::NonZero,
               Clipper2Lib::FillRule::NonZero);  // can throw
           return intersections.empty();
         };
