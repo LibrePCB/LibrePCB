@@ -57,7 +57,8 @@ PackageEditorState_DrawTextBase::PackageEditorState_DrawTextBase(
         StrokeTextSpacing(),  // Line spacing
         Alignment(HAlign::left(), VAlign::bottom()),  // Alignment
         false,  // Mirror
-        true  // Auto rotate
+        true,  // Auto rotate
+        false  // Locked
         ),
     mCurrentText(nullptr),
     mCurrentGraphicsItem(nullptr) {

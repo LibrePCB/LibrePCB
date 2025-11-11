@@ -73,7 +73,17 @@ void FileFormatMigrationUnstable::upgradePackage(TransactionalDirectory& dir) {
     const QString fp = "package.lp";
     std::unique_ptr<SExpression> root =
         SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
-    root->appendChild("min_copper_clearance", SExpression::createToken("0.2"));
+    for (SExpression* fptNode : root->getChildren("footprint")) {
+      // Stroke texts.
+      for (SExpression* child : fptNode->getChildren("stroke_text")) {
+        const QSet<QString> unlockedLayers = {"top_names", "top_values",
+                                              "bot_names", "bot_values"};
+        const QString layer = child->getChild("layer/@0").getValue();
+        const bool lock = !unlockedLayers.contains(layer);
+        child->appendChild("lock",
+                           SExpression::createToken(lock ? "true" : "false"));
+      }
+    }
     dir.write(fp, root->toByteArray());
   }
 }

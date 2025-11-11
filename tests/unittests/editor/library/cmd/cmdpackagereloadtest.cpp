@@ -87,7 +87,7 @@ TEST_F(CmdPackageReloadTest, test) {
   )
   (stroke_text 0dc2263b-d972-47f1-bdf1-742e632c24f5 (layer top_names)
    (height 1.0) (stroke_width 0.2) (letter_spacing auto) (line_spacing auto)
-   (align left bottom) (position -1.27 1.27) (rotation 0.0)
+   (align left bottom) (position -1.27 1.27) (rotation 0.0) (lock true)
    (auto_rotate true) (mirror false) (value "{{NAME}}")
   )
  )

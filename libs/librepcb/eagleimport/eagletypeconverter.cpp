@@ -733,10 +733,13 @@ UnsignedLength EagleTypeConverter::convertBoardTextStrokeWidth(int layerId,
 }
 
 std::shared_ptr<StrokeText> EagleTypeConverter::tryConvertBoardText(
-    const parseagle::Text& t) {
+    const parseagle::Text& t, bool allowLocked) {
   if (auto layer = tryConvertBoardLayer(t.getLayer())) {
     const bool mirror = t.getRotation().getMirror();
     const Angle rotation = convertAngle(t.getRotation().getAngle());
+    const bool locked = allowLocked && (*layer != Layer::topNames()) &&
+        (*layer != Layer::topValues()) && (*layer != Layer::botNames()) &&
+        (*layer != Layer::botValues());
     return std::make_shared<StrokeText>(
         Uuid::createRandom(),  // UUID
         *layer,  // Layer
@@ -750,7 +753,8 @@ std::shared_ptr<StrokeText> EagleTypeConverter::tryConvertBoardText(
         StrokeTextSpacing(),  // Line spacing
         convertAlignment(t.getAlignment()),  // Alignment
         mirror,  // Mirrored
-        !t.getRotation().getSpin()  // Auto rotate
+        !t.getRotation().getSpin(),  // Auto rotate
+        locked  // Locked
     );
   } else {
     return nullptr;
@@ -775,7 +779,8 @@ std::shared_ptr<StrokeText> EagleTypeConverter::tryConvertBoardAttribute(
         StrokeTextSpacing(),  // Line spacing
         convertAlignment(t.getAlignment()),  // Alignment
         mirror,  // Mirrored
-        !t.getRotation().getSpin()  // Auto rotate
+        !t.getRotation().getSpin(),  // Auto rotate
+        t.getConstant()  // Locked (not verified yet if getConstant() is good)
     );
   } else {
     return nullptr;

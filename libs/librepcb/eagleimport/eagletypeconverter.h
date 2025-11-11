@@ -508,12 +508,16 @@ public:
   /**
    * @brief Try to cnvert a board/footprint text
    *
-   * @param t   EAGLE text
+   * @param t           EAGLE text
+   * @param allowLocked The "lock" attribute of the returned text will be
+   *                    guessed from the text layer. But if this parameter is
+   *                    set to `false`, this detection is disabled and the text
+   *                    will always be unlocked.
    *
    * @return LibrePCB text if the layer is supported, otherwise `nullptr`
    */
   static std::shared_ptr<StrokeText> tryConvertBoardText(
-      const parseagle::Text& t);
+      const parseagle::Text& t, bool allowLocked);
 
   /**
    * @brief Try to convert a board/footprint attribute text

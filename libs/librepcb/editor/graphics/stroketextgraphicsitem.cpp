@@ -132,6 +132,8 @@ void StrokeTextGraphicsItem::strokeTextEdited(
       mPathGraphicsItem->setLineWidth(text.getStrokeWidth());
       updateText();  // Spacing might need to be re-calculated.
       break;
+    case StrokeText::Event::LockedChanged:
+      break;
     default:
       qWarning() << "Unhandled switch-case in "
                     "StrokeTextGraphicsItem::strokeTextEdited():"

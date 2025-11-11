@@ -119,13 +119,13 @@ TEST(FootprintClipboardDataTest, testToFromMimeDataPopulated) {
       Uuid::createRandom(), Layer::botCopper(), "text 1", Point(1, 2), Angle(3),
       PositiveLength(4), UnsignedLength(5), StrokeTextSpacing(),
       StrokeTextSpacing(Ratio(6)), Alignment(HAlign::left(), VAlign::top()),
-      false, true);
+      false, true, false);
 
   std::shared_ptr<StrokeText> strokeText2 = std::make_shared<StrokeText>(
       Uuid::createRandom(), Layer::topCopper(), "text 2", Point(10, 20),
       Angle(30), PositiveLength(40), UnsignedLength(0),
       StrokeTextSpacing(Ratio(6)), StrokeTextSpacing(),
-      Alignment(HAlign::center(), VAlign::bottom()), true, false);
+      Alignment(HAlign::center(), VAlign::bottom()), true, false, true);
 
   std::shared_ptr<Zone> zone1 = std::make_shared<Zone>(
       Uuid::createRandom(), Zone::Layer::Top, Zone::Rule::NoCopper,

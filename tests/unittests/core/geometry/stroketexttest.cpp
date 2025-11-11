@@ -47,7 +47,7 @@ TEST_F(StrokeTextTest, testConstructFromSExpression) {
       "(layer bot_names) (height 1.0) (stroke_width 0.2) "
       "(letter_spacing auto) (line_spacing auto) (align left bottom) "
       "(position 1.234 2.345) (rotation 45.0) (auto_rotate true) "
-      "(mirror true) (value \"Foo Bar\"))",
+      "(mirror true) (lock true) (value \"Foo Bar\"))",
       FilePath());
   StrokeText obj(*sexpr);
   EXPECT_EQ(Uuid::fromString("0a8d7180-68e1-4749-bf8c-538b0d88f08c"),
@@ -62,15 +62,16 @@ TEST_F(StrokeTextTest, testConstructFromSExpression) {
   EXPECT_EQ(Angle::deg45(), obj.getRotation());
   EXPECT_EQ(true, obj.getAutoRotate());
   EXPECT_EQ(true, obj.getMirrored());
+  EXPECT_EQ(true, obj.isLocked());
   EXPECT_EQ("Foo Bar", obj.getText());
 }
 
 TEST_F(StrokeTextTest, testSerializeAndDeserialize) {
-  StrokeText obj1(Uuid::createRandom(), Layer::botCopper(), "hello world",
-                  Point(12, 34), Angle(56), PositiveLength(123),
-                  UnsignedLength(456), StrokeTextSpacing(),
-                  StrokeTextSpacing(Ratio(1234)),
-                  Alignment(HAlign::right(), VAlign::center()), true, false);
+  StrokeText obj1(
+      Uuid::createRandom(), Layer::botCopper(), "hello world", Point(12, 34),
+      Angle(56), PositiveLength(123), UnsignedLength(456), StrokeTextSpacing(),
+      StrokeTextSpacing(Ratio(1234)),
+      Alignment(HAlign::right(), VAlign::center()), true, false, true);
   std::unique_ptr<SExpression> sexpr1 = SExpression::createList("obj");
   obj1.serialize(*sexpr1);
 
