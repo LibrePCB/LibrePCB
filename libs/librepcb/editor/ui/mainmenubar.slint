@@ -15,6 +15,7 @@ import {
     EditorCommandSet as Cmd,
     FeatureState,
     Helpers,
+    LibraryAction,
     LibraryData,
     LibraryElementAction,
     PanelPage,
@@ -799,6 +800,71 @@ export component MainMenuBar inherits Rectangle {
                         Backend.trigger-library-element(library.path, LibraryElementAction.import-kicad-library);
                     }
                 }
+
+                MenuSeparator { }
+
+                new-component-catewgory-item := MenuItem {
+                    text: @tr("Add Component Category");
+                    icon: @image-url("../../../font-awesome/svgs/solid/file-circle-plus.svg");
+
+                    clicked => {
+                        Backend.trigger-library(library.path, LibraryAction.new-component-category);
+                    }
+                }
+
+                new-package-category-item := MenuItem {
+                    text: @tr("Add Package Category");
+                    icon: @image-url("../../../font-awesome/svgs/solid/file-circle-plus.svg");
+
+                    clicked => {
+                        Backend.trigger-library(library.path, LibraryAction.new-package-category);
+                    }
+                }
+
+                new-symbol-item := MenuItem {
+                    text: @tr("Add Symbol");
+                    icon: @image-url("../../../font-awesome/svgs/solid/file-circle-plus.svg");
+
+                    clicked => {
+                        Backend.trigger-library(library.path, LibraryAction.new-symbol);
+                    }
+                }
+
+                new-package-item := MenuItem {
+                    text: @tr("Add Package");
+                    icon: @image-url("../../../font-awesome/svgs/solid/file-circle-plus.svg");
+
+                    clicked => {
+                        Backend.trigger-library(library.path, LibraryAction.new-package);
+                    }
+                }
+
+                new-component-item := MenuItem {
+                    text: @tr("Add Component");
+                    icon: @image-url("../../../font-awesome/svgs/solid/file-circle-plus.svg");
+
+                    clicked => {
+                        Backend.trigger-library(library.path, LibraryAction.new-component);
+                    }
+                }
+
+                new-device-item := MenuItem {
+                    text: @tr("Add Device");
+                    icon: @image-url("../../../font-awesome/svgs/solid/file-circle-plus.svg");
+
+                    clicked => {
+                        Backend.trigger-library(library.path, LibraryAction.new-device);
+                    }
+                }
+
+                new-corporate-item := MenuItem {
+                    text: @tr("Add Corporate");
+                    icon: @image-url("../../../font-awesome/svgs/solid/file-circle-plus.svg");
+
+                    clicked => {
+                        Backend.trigger-library(library.path, LibraryAction.new-corporate);
+                    }
+                }
             }
         }
 
@@ -1031,6 +1097,48 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Backend.trigger-library-element(Data.current-device-tab.path, LibraryElementAction.open-folder);
+                    }
+                }
+            }
+        }
+
+        corporate-menu-item := MainMenuItem {
+            text: @tr("Corporate");
+            visible: (Data.current-tab.type == TabType.corporate) && (!project-menu-item.visible);
+
+            clicked => {
+                corporate-menu-popup.show();
+            }
+
+            corporate-menu-popup := MenuPopup {
+                x: 0;
+                y: parent.height;
+
+                save-corporate-item := MenuItem {
+                    cmd: Cmd.save;
+                    text: @tr("Save Corporate");  // More specific.
+                    enabled: Data.current-tab.features.save == FeatureState.enabled;
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.save);
+                    }
+                }
+
+                close-corporate-item := MenuItem {
+                    text: @tr("Close Corporate");  // More specific.
+                    status-tip: @tr("Close the currently opened corporate");
+                    icon: @image-url("../../../font-awesome/svgs/solid/xmark.svg");
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.close);
+                    }
+                }
+
+                open-corporate-folder-item := MenuItem {
+                    cmd: Cmd.file-manager;
+
+                    clicked => {
+                        Backend.trigger-library-element(Data.current-corporate-tab.path, LibraryElementAction.open-folder);
                     }
                 }
             }

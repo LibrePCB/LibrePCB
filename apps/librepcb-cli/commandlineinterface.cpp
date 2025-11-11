@@ -36,6 +36,7 @@
 #include <librepcb/core/library/cat/componentcategory.h>
 #include <librepcb/core/library/cat/packagecategory.h>
 #include <librepcb/core/library/cmp/component.h>
+#include <librepcb/core/library/corp/corporate.h>
 #include <librepcb/core/library/dev/device.h>
 #include <librepcb/core/library/library.h>
 #include <librepcb/core/library/pkg/footprint.h>
@@ -1287,6 +1288,25 @@ bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
             TransactionalFileSystem::open(fp, save);  // can throw
         std::unique_ptr<Device> element =
             Device::open(std::unique_ptr<TransactionalDirectory>(
+                new TransactionalDirectory(fs)));  // can throw
+        processLibraryElement(libDir, *fs, *element, runCheck, minifyStepFiles,
+                              save, strict,
+                              success);  // can throw
+      }
+    }
+
+    // Open all corporates
+    if (all) {
+      QStringList elements = lib->searchForElements<Corporate>();
+      elements.sort();  // For deterministic console output.
+      print(tr("Process %1 corporates...").arg(elements.count()));
+      foreach (const QString& dir, elements) {
+        FilePath fp = libFp.getPathTo(dir);
+        qInfo().noquote() << tr("Open '%1'...").arg(prettyPath(fp, libDir));
+        std::shared_ptr<TransactionalFileSystem> fs =
+            TransactionalFileSystem::open(fp, save);  // can throw
+        std::unique_ptr<Corporate> element =
+            Corporate::open(std::unique_ptr<TransactionalDirectory>(
                 new TransactionalDirectory(fs)));  // can throw
         processLibraryElement(libDir, *fs, *element, runCheck, minifyStepFiles,
                               save, strict,

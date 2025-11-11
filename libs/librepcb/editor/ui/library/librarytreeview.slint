@@ -124,6 +124,8 @@ export component LibraryTreeView inherits FocusScope {
                             @image-url("../../../../../img/library/component.png")
                         } else if (item.type == LibraryTreeViewItemType.device) && (item.level > 0) {
                             @image-url("../../../../../img/library/device.png")
+                        } else if (item.type == LibraryTreeViewItemType.corporate) {
+                            @image-url("../../../../bootstrap-icons/icons/buildings.svg")
                         } else {
                             @image-url("")
                         }
@@ -136,6 +138,8 @@ export component LibraryTreeView inherits FocusScope {
                         source: icon;
                         colorize: {
                             if item.type == LibraryTreeViewItemType.all {
+                                Palette.foreground
+                            } else if item.type == LibraryTreeViewItemType.corporate {
                                 Palette.foreground
                             } else if item.type == LibraryTreeViewItemType.uncategorized {
                                 yellow
@@ -172,6 +176,8 @@ export component LibraryTreeView inherits FocusScope {
                                 @tr("Components")
                             } else if (item.type == LibraryTreeViewItemType.device) && (item.level == 0) {
                                 @tr("Devices")
+                            } else if (item.type == LibraryTreeViewItemType.corporate) && (item.level == 0) {
+                                @tr("Corporates")
                             } else {
                                 item.name
                             }

@@ -2,6 +2,7 @@ import {
     Action,
     AngleEditParseResult,
     BoardAction,
+    CorporateDbData,
     EditorTool,
     Int64,
     LengthEditParseResult,
@@ -241,6 +242,47 @@ export global Backend {
     request-project-preview(path, width) => {
         debug("Request project preview:", path, width);
         true
+    }
+
+    // Request the model of all corporates with provide board design rules
+    //
+    // ATTENTION: For now, this model contains only featured corporates,
+    // e.g. corporates that are LibrePCB sponsors.
+    pure callback get-corporates-with-design-rules() -> [CorporateDbData];
+    get-corporates-with-design-rules() => {
+        return [
+            {
+                name: "AISLER",
+                pcb-products: [
+                    {
+                        name: "2 Layer 1.6 mm HASL",
+                    },
+                    {
+                        name: "4 Layer 1.6 mm ENIG",
+                    },
+                    {
+                        name: "4 Layer 1.6 mm ENIG",
+                    },
+                    {
+                        name: "4 Layer 1.6 mm ENIG",
+                    },
+                    {
+                        name: "4 Layer 1.6 mm ENIG",
+                    },
+                    {
+                        name: "4 Layer 1.6 mm ENIG",
+                    },
+                ],
+            },
+            {
+                name: "PCBWay",
+                pcb-products: [
+                    {
+                        name: "Standard",
+                    },
+                ],
+            },
+        ];
     }
 
     // Format a Length value as a string

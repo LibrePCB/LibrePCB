@@ -146,6 +146,8 @@ add_library(
   library/cmd/cmdcomponentsymbolvariantedit.h
   library/cmd/cmdcomponentsymbolvariantitemedit.cpp
   library/cmd/cmdcomponentsymbolvariantitemedit.h
+  library/cmd/cmdcorporateedit.cpp
+  library/cmd/cmdcorporateedit.h
   library/cmd/cmddeviceedit.cpp
   library/cmd/cmddeviceedit.h
   library/cmd/cmddevicepadsignalmapitemedit.cpp
@@ -211,6 +213,10 @@ add_library(
   library/cmp/componentvarianteditor.h
   library/cmp/componentvariantlistmodel.cpp
   library/cmp/componentvariantlistmodel.h
+  library/corp/corporatepcbproductmodel.cpp
+  library/corp/corporatepcbproductmodel.h
+  library/corp/corporatetab.cpp
+  library/corp/corporatetab.h
   library/createlibrarytab.cpp
   library/createlibrarytab.h
   library/dev/devicepinoutbuilder.cpp
@@ -917,6 +923,8 @@ add_library(
   workspace/categorytreemodel.h
   workspace/categorytreemodellegacy.cpp
   workspace/categorytreemodellegacy.h
+  workspace/corporatesdbmodel.cpp
+  workspace/corporatesdbmodel.h
   workspace/desktopintegration.cpp
   workspace/desktopintegration.h
   workspace/desktopservices.cpp

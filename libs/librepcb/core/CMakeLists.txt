@@ -253,6 +253,12 @@ add_library(
   library/cmp/componentsymbolvariantitem.cpp
   library/cmp/componentsymbolvariantitem.h
   library/cmp/componentsymbolvariantitemsuffix.h
+  library/corp/corporate.cpp
+  library/corp/corporate.h
+  library/corp/corporatecheck.cpp
+  library/corp/corporatecheck.h
+  library/corp/corporatepcbproduct.cpp
+  library/corp/corporatepcbproduct.h
   library/dev/device.cpp
   library/dev/device.h
   library/dev/devicecheck.cpp

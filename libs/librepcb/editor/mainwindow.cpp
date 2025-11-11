@@ -28,6 +28,7 @@
 #include "library/cat/componentcategorytab.h"
 #include "library/cat/packagecategorytab.h"
 #include "library/cmp/componenttab.h"
+#include "library/corp/corporatetab.h"
 #include "library/createlibrarytab.h"
 #include "library/dev/devicetab.h"
 #include "library/downloadlibrarytab.h"
@@ -60,6 +61,7 @@
 #include <librepcb/core/library/cat/componentcategory.h>
 #include <librepcb/core/library/cat/packagecategory.h>
 #include <librepcb/core/library/cmp/component.h>
+#include <librepcb/core/library/corp/corporate.h>
 #include <librepcb/core/library/dev/device.h>
 #include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/library/sym/symbol.h>
@@ -728,6 +730,12 @@ void MainWindow::triggerLibrary(slint::SharedString path,
       }
       break;
     }
+    case ui::LibraryAction::NewCorporate: {
+      if (auto editor = mApp.getLibrary(fp)) {
+        openCorporateTab(*editor, FilePath(), false);
+      }
+      break;
+    }
     default: {
       qWarning() << "Unhandled action in triggerLibrary():"
                  << static_cast<int>(a);
@@ -938,6 +946,8 @@ void MainWindow::openLibraryTab(const FilePath& fp, bool wizardMode) noexcept {
               &MainWindow::openComponentTab);
       connect(tab.get(), &LibraryTab::deviceEditorRequested, this,
               &MainWindow::openDeviceTab);
+      connect(tab.get(), &LibraryTab::corporateEditorRequested, this,
+              &MainWindow::openCorporateTab);
       addTab(tab);
     }
   }
@@ -1364,6 +1374,54 @@ void MainWindow::openDeviceTab(LibraryEditor& editor, const FilePath& fp,
         }
       }
       addTab(std::make_shared<DeviceTab>(editor, std::move(dev), mode));
+    } catch (const Exception& e) {
+      QMessageBox::critical(mWidget, tr("Error"), e.getMsg());
+    }
+  }
+}
+
+void MainWindow::openCorporateTab(LibraryEditor& editor, const FilePath& fp,
+                                  bool copyFrom) noexcept {
+  if (copyFrom || (!switchToLibraryElementTab<CorporateTab>(fp))) {
+    try {
+      std::unique_ptr<Corporate> corp;
+      CorporateTab::Mode mode = CorporateTab::Mode::Open;
+      if (fp.isValid() && (!copyFrom)) {
+        auto fs = TransactionalFileSystem::open(
+            fp, editor.isWritable(), &askForRestoringBackup,
+            DirectoryLockHandlerDialog::createDirectoryLockCallback());
+        corp = Corporate::open(std::unique_ptr<TransactionalDirectory>(
+            new TransactionalDirectory(fs)));
+      } else {
+        mode = CorporateTab::Mode::New;
+        corp.reset(
+            new Corporate(Uuid::createRandom(), Version::fromString("0.1"),
+                          mApp.getWorkspace().getSettings().userName.get(),
+                          ElementName("New Corporate"), QString(), QString()));
+        if (copyFrom) {
+          mode = CorporateTab::Mode::Duplicate;
+          auto fs = TransactionalFileSystem::openRO(fp, &askForRestoringBackup);
+          std::unique_ptr<Corporate> src =
+              Corporate::open(std::unique_ptr<TransactionalDirectory>(
+                  new TransactionalDirectory(fs)));
+          corp->setNames(copyLibraryElementNames(src->getNames()));
+          corp->setDescriptions(src->getDescriptions());
+          corp->setKeywords(src->getKeywords());
+          corp->setMessageApprovals(src->getMessageApprovals());
+          corp->setLogoPng(src->getLogoPng());
+          corp->setUrl(src->getUrl());
+          corp->setCountry(src->getCountry());
+          corp->setFabs(src->getFabs());
+          corp->setShipping(src->getShipping());
+          corp->setIsSponsor(src->isSponsor());
+          corp->setPriority(src->getPriority());
+          corp->setPcbProducts(src->getPcbProducts());
+          corp->setPcbOutputJobs(src->getPcbOutputJobs());
+          corp->setAssemblyOutputJobs(src->getAssemblyOutputJobs());
+          corp->setUserOutputJobs(src->getUserOutputJobs());
+        }
+      }
+      addTab(std::make_shared<CorporateTab>(editor, std::move(corp), mode));
     } catch (const Exception& e) {
       QMessageBox::critical(mWidget, tr("Error"), e.getMsg());
     }
