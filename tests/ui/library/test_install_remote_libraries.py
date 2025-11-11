@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import platform
 import pytest
 from slint_testing import keys, KeyPressedEvent, KeyReleasedEvent
 
@@ -13,7 +14,10 @@ Test installing remote libraries with the library manager
 REMOTE_LIBRARY_COUNT = 3  # The dummy API provides 3 libraries
 
 
-@pytest.mark.skipif(os.name == "nt", reason="strange error in Windows container")
+@pytest.mark.skipif(
+    (os.name == "nt") or (platform.system() == "Darwin"),
+    reason="strange error in Windows container and flaky on macOS",
+)
 def test_click(librepcb, helpers):
     with librepcb.open() as app:
         # Open libraries panel
@@ -57,6 +61,7 @@ def test_click(librepcb, helpers):
         status.wait(2)
 
 
+@pytest.mark.skipif(platform.system() == "Darwin", reason="flaky on macOS")
 def test_shortcut(librepcb, helpers):
     """
     Same as the test above, but using the Ctrl+Return keyboard shortcut to

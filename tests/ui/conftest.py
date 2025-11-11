@@ -263,6 +263,10 @@ class ElementQuery:
 
         start = time.time()
         while True:
+            # In some cases, UI elements temporarily disappear (for example
+            # due to model resets). This would invalidate element handles,
+            # so we regularly have to re-evaluate the query.
+            self.refresh()
             actual_props = self.read(properties.keys())
             if all([_compare(v, properties[k]) for k, v in actual_props.items()]):
                 return
@@ -273,11 +277,6 @@ class ElementQuery:
                     + f"{self._query} -- Screenshot saved."
                 )
             time.sleep(0.01)
-            # In some cases, UI elements temporarily disappear (for example
-            # due to model resets). This would invalidate element handles,
-            # so we regularly have to re-evaluate the query.
-            self.refresh()
-        return self
 
     @property
     def valid(self):
