@@ -164,6 +164,23 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
         }
       });
 
+  // Show warning if the runtime resources were not found. Intended to catch
+  // deployment errors and to avoid bug reports if users didn't install the
+  // "share" directory.
+  bool runtimeResourcesValid = false;
+  const FilePath resourcesDir =
+      Application::getResourcesDir(&runtimeResourcesValid);
+  if (!runtimeResourcesValid) {
+    mNotifications->push(std::make_shared<Notification>(
+        ui::NotificationType::Critical, "Broken Installation Detected",
+        QString("The runtime resources from the 'share' folder were not found "
+                "at '%1', therefore the application will not work correctly. "
+                "Please make sure to install all files of LibrePCB as "
+                "explained in the installation instructions.")
+            .arg(resourcesDir.toNative()),
+        QString(), QString(), true));
+  }
+
   // Show warning if the workspace has already been opened with a higher
   // file format version.
   if (fileFormatIsOutdated) {

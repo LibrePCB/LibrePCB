@@ -131,9 +131,12 @@ public:
    *
    * @note This function is thread-safe.
    *
+   * @param valid   If not `nullptr`, the validity of the runtime resources
+   *                directory will be reported here (true = valid).
+   *
    * @return Guaranteed valid file path (e.g. "/usr/share/librepcb/")
    */
-  static const FilePath& getResourcesDir() noexcept;
+  static const FilePath& getResourcesDir(bool* valid = nullptr) noexcept;
 
   /**
    * @brief Get all available translation locales
