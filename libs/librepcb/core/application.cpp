@@ -124,14 +124,17 @@ FilePath Application::getCacheDir() noexcept {
   return value;
 }
 
-const FilePath& Application::getResourcesDir() noexcept {
+const FilePath& Application::getResourcesDir(bool* valid) noexcept {
   auto detect = []() {
+    // Use different resources directory if supplied by environment
+    // variable "LIBREPCB_SHARE_DIR" (useful for functional testing).
+    FilePath fp(qgetenv("LIBREPCB_SHARE_DIR"));
+
     // get the directory of the currently running executable
     const FilePath exeFilePath(qApp->applicationFilePath());
     Q_ASSERT(exeFilePath.isValid());
 
     // determine the path to the resources directory (e.g. /usr/share/librepcb)
-    FilePath fp;
 #if defined(LIBREPCB_BINARY_DIR) && defined(LIBREPCB_SHARE_SOURCE)
     // TODO: The following code checks for paths related to the application
     // binary, even though this code is located in the library source. This is a
@@ -139,7 +142,7 @@ const FilePath& Application::getResourcesDir() noexcept {
     FilePath buildOutputDirPath(LIBREPCB_BINARY_DIR);
     bool runningFromBuildOutput =
         exeFilePath.isLocatedInDir(buildOutputDirPath);
-    if (runningFromBuildOutput) {
+    if ((!fp.isValid()) && runningFromBuildOutput) {
       // The executable is located inside the build output directory, so we
       // assume this is a developer build and thus we use the "share" directory
       // from the repository root.
@@ -155,7 +158,8 @@ const FilePath& Application::getResourcesDir() noexcept {
     }
 
     // warn if runtime resource files are not found
-    if (!fp.getPathTo("README.md").isExistingFile()) {
+    const bool valid = fp.getPathTo("README.md").isExistingFile();
+    if (!valid) {
       qCritical()
           << "Could not find resource files! Probably packaging went wrong?!";
       qCritical() << "Expected resources location:" << fp.toNative();
@@ -170,11 +174,14 @@ const FilePath& Application::getResourcesDir() noexcept {
                   << QString(LIBREPCB_SHARE_SOURCE);
 #endif
     }
-    return fp;
+    return std::make_pair(fp, valid);
   };
 
-  static const FilePath value = detect();
-  return value;
+  static const auto value = detect();
+  if (valid) {
+    *valid = value.second;
+  }
+  return value.first;
 }
 
 QStringList Application::getTranslationLocales() noexcept {
