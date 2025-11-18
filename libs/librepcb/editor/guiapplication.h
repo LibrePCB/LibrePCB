@@ -49,6 +49,7 @@ class LibraryElementCache;
 class MainWindow;
 class Notification;
 class NotificationsModel;
+class OrganizationsDbModel;
 class ProjectEditor;
 class ProjectLibraryUpdater;
 class QuickAccessModel;
@@ -183,6 +184,9 @@ private:
   std::unique_ptr<ProjectLibraryUpdater> mProjectLibraryUpdater;
   QList<std::shared_ptr<MainWindow>> mWindows;
   QTimer mSaveOpenedWindowsCountdown;
+
+  // Cache
+  std::weak_ptr<OrganizationsDbModel> mOrganizationsWithPcbProducts;
 };
 
 /*******************************************************************************

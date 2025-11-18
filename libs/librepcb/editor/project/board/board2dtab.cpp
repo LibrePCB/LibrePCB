@@ -29,6 +29,7 @@
 #include "../../graphics/graphicslayersmodel.h"
 #include "../../graphics/slintgraphicsview.h"
 #include "../../guiapplication.h"
+#include "../../library/libraryelementcache.h"
 #include "../../library/pkg/footprintgraphicsitem.h"
 #include "../../undostack.h"
 #include "../../utils/editortoolbox.h"
@@ -36,6 +37,7 @@
 #include "../../utils/uihelpers.h"
 #include "../../workspace/desktopservices.h"
 #include "../cmd/cmdadddevicetoboard.h"
+#include "../cmd/cmdboardedit.h"
 #include "../cmd/cmdboardspecctraimport.h"
 #include "../projecteditor.h"
 #include "boardeditor.h"
@@ -60,9 +62,11 @@
 #include <librepcb/core/job/gerberexcellonoutputjob.h>
 #include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/library/dev/device.h>
+#include <librepcb/core/library/org/organization.h>
 #include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/boardd356netlistexport.h>
+#include <librepcb/core/project/board/boarddesignrules.h>
 #include <librepcb/core/project/board/boardpainter.h>
 #include <librepcb/core/project/board/boardplanefragmentsbuilder.h>
 #include <librepcb/core/project/board/boardspecctraexport.h>
@@ -140,6 +144,7 @@ Board2dTab::Board2dTab(GuiApplication& app, BoardEditor& editor,
     mView(new SlintGraphicsView(SlintGraphicsView::defaultBoardSceneRect(),
                                 this)),
     mMsgEmptySchematics(app.getWorkspace(), "EMPTY_BOARD_NO_COMPONENTS"),
+    mMsgSetupDesignRules(app.getWorkspace(), "EMPTY_BOARD_SETUP_DESIGN_RULES"),
     mMsgPlaceDevices(app.getWorkspace(), "EMPTY_BOARD_PLACE_DEVICES"),
     mGridStyle(mApp.getWorkspace()
                    .getSettings()
@@ -239,6 +244,8 @@ Board2dTab::Board2dTab(GuiApplication& app, BoardEditor& editor,
   connect(&mBoard, &Board::deviceAdded, this, &Board2dTab::updateMessages);
   connect(&mBoard, &Board::deviceRemoved, this, &Board2dTab::updateMessages);
   connect(&mMsgEmptySchematics, &DismissableMessageContext::visibilityChanged,
+          this, [this]() { onDerivedUiDataChanged.notify(); });
+  connect(&mMsgSetupDesignRules, &DismissableMessageContext::visibilityChanged,
           this, [this]() { onDerivedUiDataChanged.notify(); });
   connect(&mMsgPlaceDevices, &DismissableMessageContext::visibilityChanged,
           this, [this]() { onDerivedUiDataChanged.notify(); });
@@ -356,6 +363,7 @@ ui::Board2dTabData Board2dTab::getDerivedUiData() const noexcept {
       mIgnorePlacementLocks,  // Ignore placement locks
       mBoardEditor.isRebuildingPlanes(),  // Refreshing
       mMsgEmptySchematics.getUiData(),  // Message "empty schematics"
+      mMsgSetupDesignRules.getUiData(),  // Message "setup design rules"
       mMsgPlaceDevices.getUiData(),  // Message "place devices"
       mUnplacedComponentsModel,  // Unplaced components
       mUnplacedComponentIndex,  // Unplaced components index
@@ -412,6 +420,7 @@ ui::Board2dTabData Board2dTab::getDerivedUiData() const noexcept {
       mToolZoneRules.testFlag(Zone::Rule::NoDevices),  // Tool no devices
       q2s(mSceneImagePos),  // Scene image position
       mFrameIndex,  // Frame index
+      slint::SharedString(),  // Set design rules organization/rules
   };
 }
 
@@ -439,6 +448,7 @@ void Board2dTab::setDerivedUiData(const ui::Board2dTabData& data) noexcept {
 
   // Messages
   mMsgEmptySchematics.setUiData(data.empty_schematics_msg);
+  mMsgSetupDesignRules.setUiData(data.setup_design_rules_msg);
   mMsgPlaceDevices.setUiData(data.place_devices_msg);
 
   // Unplaced component index
@@ -526,6 +536,11 @@ void Board2dTab::setDerivedUiData(const ui::Board2dTabData& data) noexcept {
   emit zoneRuleRequested(Zone::Rule::NoPlanes, data.tool_no_planes);
   emit zoneRuleRequested(Zone::Rule::NoExposure, data.tool_no_exposures);
   emit zoneRuleRequested(Zone::Rule::NoDevices, data.tool_no_devices);
+
+  // Set design rules
+  if (!data.set_design_rules.empty()) {
+    loadDesignRules(s2q(data.set_design_rules));
+  }
 
   requestRepaint();
 }
@@ -1806,8 +1821,55 @@ void Board2dTab::updateMessages() noexcept {
     }
   }
   mMsgEmptySchematics.setActive(emptySchematics);
+  mMsgSetupDesignRules.setActive(
+      mBoard.getDeviceInstances().isEmpty() &&
+      (mBoard.getDesignRules() == BoardDesignRules()) &&
+      (mBoard.getDrcSettings() == BoardDesignRuleCheckSettings()));
   mMsgPlaceDevices.setActive((!emptySchematics) &&
                              mBoard.getDeviceInstances().isEmpty());
+}
+
+void Board2dTab::loadDesignRules(const QString& uiKey) noexcept {
+  try {
+    // Load DRC settings.
+    BoardDesignRuleCheckSettings drcSettings;
+    if (uiKey != "default") {
+      const Uuid orgUuid = Uuid::fromString(uiKey.split(":").first());
+      const Uuid druUuid = Uuid::fromString(uiKey.split(":").last());
+      std::shared_ptr<const Organization> org =
+          mApp.getLibraryElementCache().getOrganization(orgUuid,
+                                                        true);  // can throw
+      const OrganizationPcbDesignRules* dru = org->findPcbDesignRules(druUuid);
+      if (!dru) {
+        // Maybe the wrong organization was loaded since the listed organization
+        // may be from a local library, but the loaded organization from remote?
+        throw LogicError(__FILE__, __LINE__);
+      }
+      drcSettings = dru->getDrcSettings(true);
+      drcSettings.setSources({BoardDesignRuleCheckSettings::Source{
+          org->getUuid(),
+          org->getNames().getDefaultValue(),
+          org->getVersion(),
+          dru->getUuid(),
+          dru->getNames().getDefaultValue(),
+      }});
+    }
+
+    // Update design rules to conform with the DRC settings.
+    BoardDesignRules designRules = mBoard.getDesignRules();
+    designRules.adjustToDrcSettings(drcSettings);
+
+    // Apply changes to board.
+    std::unique_ptr<CmdBoardEdit> cmd(new CmdBoardEdit(mBoard));
+    cmd->setDesignRules(designRules);
+    cmd->setDrcSettings(drcSettings);
+    mProjectEditor.getUndoStack().execCmd(cmd.release());
+
+    // Make sure to hide the "setup design rules" message in the UI.
+    mMsgSetupDesignRules.dismiss();
+  } catch (const Exception& e) {
+    QMessageBox::critical(qApp->activeWindow(), "Error", e.getMsg());
+  }
 }
 
 void Board2dTab::highlightDrcMessage(

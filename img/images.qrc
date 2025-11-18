@@ -59,6 +59,7 @@
         <file alias="/fa/solid/highlighter.svg">../libs/font-awesome/svgs/solid/highlighter.svg</file>
         <file alias="/fa/solid/industry.svg">../libs/font-awesome/svgs/solid/industry.svg</file>
         <file alias="/fa/solid/keyboard.svg">../libs/font-awesome/svgs/solid/keyboard.svg</file>
+        <file alias="/fa/solid/link-slash.svg">../libs/font-awesome/svgs/solid/link-slash.svg</file>
         <file alias="/fa/solid/list-check.svg">../libs/font-awesome/svgs/solid/list-check.svg</file>
         <file alias="/fa/solid/lock-open.svg">../libs/font-awesome/svgs/solid/lock-open.svg</file>
         <file alias="/fa/solid/lock.svg">../libs/font-awesome/svgs/solid/lock.svg</file>
@@ -76,6 +77,7 @@
         <file alias="/fa/solid/tag.svg">../libs/font-awesome/svgs/solid/tag.svg</file>
         <file alias="/fa/solid/trash-can.svg">../libs/font-awesome/svgs/solid/trash-can.svg</file>
         <file alias="/fa/solid/triangle-exclamation.svg">../libs/font-awesome/svgs/solid/triangle-exclamation.svg</file>
+        <file alias="/fa/solid/upload.svg">../libs/font-awesome/svgs/solid/upload.svg</file>
         <file alias="/fa/solid/vector-square.svg">../libs/font-awesome/svgs/solid/vector-square.svg</file>
         <file alias="/fa/solid/wand-magic-sparkles.svg">../libs/font-awesome/svgs/solid/wand-magic-sparkles.svg</file>
         <file alias="/fa/solid/xmark.svg">../libs/font-awesome/svgs/solid/xmark.svg</file>

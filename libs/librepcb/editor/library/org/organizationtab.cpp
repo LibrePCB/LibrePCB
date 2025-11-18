@@ -85,7 +85,7 @@ OrganizationTab::OrganizationTab(LibraryEditor& editor,
         Project& prj = getTmpProject();
         if (Board* brd = prj.getBoardByIndex(0)) {
           brd->setDrcSettings(dru.getDrcSettings(false));
-          BoardSetupDialog dlg(*brd, *mUndoStack);
+          BoardSetupDialog dlg(mApp, *brd, *mUndoStack);
           dlg.setWindowTitle(tr("PCB Design Rules: %1")
                                  .arg(*dru.getNames().getDefaultValue()));
           dlg.openDrcSettingsTab();

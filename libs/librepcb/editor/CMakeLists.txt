@@ -946,6 +946,8 @@ add_library(
   workspace/initializeworkspacewizard/initializeworkspacewizard_welcome.ui
   workspace/initializeworkspacewizard/initializeworkspacewizardcontext.cpp
   workspace/initializeworkspacewizard/initializeworkspacewizardcontext.h
+  workspace/organizationsdbmodel.cpp
+  workspace/organizationsdbmodel.h
   workspace/projectlibraryupdater/projectlibraryupdater.cpp
   workspace/projectlibraryupdater/projectlibraryupdater.h
   workspace/projectlibraryupdater/projectlibraryupdater.ui

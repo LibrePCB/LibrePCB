@@ -39,6 +39,7 @@
 #include "workspace/desktopintegration.h"
 #include "workspace/desktopservices.h"
 #include "workspace/initializeworkspacewizard/initializeworkspacewizard.h"
+#include "workspace/organizationsdbmodel.h"
 #include "workspace/projectlibraryupdater/projectlibraryupdater.h"
 #include "workspace/quickaccessmodel.h"
 #include "workspace/workspacesettingsdialog.h"
@@ -715,6 +716,15 @@ void GuiApplication::createNewWindow(int id, int projectIndex) noexcept {
   b.on_copy_to_clipboard([](const slint::SharedString& s) {
     QApplication::clipboard()->setText(s2q(s));
     return true;
+  });
+  b.on_get_organizations_with_design_rules([this]() {
+    auto model = mOrganizationsWithPcbProducts.lock();
+    if (!model) {
+      model = std::make_shared<OrganizationsDbModel>(mWorkspace.getLibraryDb(),
+                                                     mWorkspace.getSettings());
+      mOrganizationsWithPcbProducts = model;
+    }
+    return model;
   });
   b.on_format_length([](const ui::Int64& value, ui::LengthUnit unit) {
     const LengthUnit lpUnit = s2l(unit);
