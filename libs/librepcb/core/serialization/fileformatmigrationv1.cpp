@@ -474,17 +474,52 @@ void FileFormatMigrationV1::upgradeBoard(SExpression& root) {
                           SExpression::createToken("0.3"));
   }
 
+  // DRC settings.
+  {
+    SExpression& drcNode = root.getChild("design_rule_check");
+    drcNode.ensureLineBreak();
+    {
+      SExpression& child = drcNode.appendList("min_pcb_size");
+      child.appendChild(SExpression::createToken("0.0"));
+      child.appendChild(SExpression::createToken("0.0"));
+    }
+    drcNode.ensureLineBreak();
+    {
+      SExpression& child = drcNode.appendList("max_pcb_size");
+      SExpression& doubleSided = child.appendList("double_sided");
+      doubleSided.appendChild(SExpression::createToken("0.0"));
+      doubleSided.appendChild(SExpression::createToken("0.0"));
+      SExpression& multilayer = child.appendList("multilayer");
+      multilayer.appendChild(SExpression::createToken("0.0"));
+      multilayer.appendChild(SExpression::createToken("0.0"));
+    }
+    drcNode.ensureLineBreak();
+    drcNode.appendList("pcb_thickness");
+    drcNode.ensureLineBreak();
+    drcNode.appendChild("max_layers", SExpression::createToken("0"));
+    drcNode.ensureLineBreak();
+    drcNode.appendList("solder_resist");
+    drcNode.ensureLineBreak();
+    drcNode.appendList("silkscreen");
+    drcNode.ensureLineBreak();
+    drcNode.appendChild("max_tented_via_drill_diameter",
+                        SExpression::createToken("0.5"));
+    drcNode.ensureLineBreak();
+  }
+
   // DRC approvals.
-  SExpression& drcNode = root.getChild("design_rule_check");
-  const QString approvalsVersion =
-      drcNode.getChild("approvals_version/@0").getValue();
-  for (SExpression* approvalNode : drcNode.getChildren("approved")) {
-    SExpression& approvalTypeNode = approvalNode->getChild("@0");
-    if ((approvalTypeNode.getValue() == "useless_via") &&
-        (approvalsVersion != "2")) {
-      approvalTypeNode.setValue("invalid_via");
-    } else if (approvalTypeNode.getValue() == "antennae_via") {
-      approvalTypeNode.setValue("useless_via");
+  {
+    SExpression& drcNode = root.getChild("design_rule_check");
+    const QString approvalsVersion =
+        drcNode.getChild("approvals_version/@0").getValue();
+    for (SExpression* approvalNode : drcNode.getChildren("approved")) {
+      SExpression& approvalTypeNode = approvalNode->getChild("@0");
+      if ((approvalTypeNode.getValue() == "useless_via") &&
+          (approvalsVersion != "2")) {
+        approvalTypeNode.setValue("invalid_via");
+      } else if (approvalTypeNode.getValue() == "antennae_via") {
+        approvalTypeNode.setValue("useless_via");
+      }
     }
   }
 

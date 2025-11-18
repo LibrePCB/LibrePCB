@@ -143,6 +143,12 @@ def test_with_custom_settings(cli, project):
     cli.add_project(project.dir, as_lppz=project.is_lppz)
     settings = """
       (design_rule_check
+       (min_pcb_size 0.0 0.0)
+       (max_pcb_size (double_sided 0.0 0.0) (multilayer 0.0 0.0))
+       (pcb_thickness)
+       (max_layers 0)
+       (solder_resist)
+       (silkscreen)
        (min_copper_copper_clearance 0.2)
        (min_copper_board_clearance 0.3)
        (min_copper_npth_clearance 0.2)
@@ -155,6 +161,7 @@ def test_with_custom_settings(cli, project):
        (min_pth_drill_diameter 0.25)
        (min_npth_slot_width 1.0)
        (min_pth_slot_width 0.7)
+       (max_tented_via_drill_diameter 0.5)
        (min_silkscreen_width 0.1)
        (min_silkscreen_text_height 0.8)
        (min_outline_tool_diameter 2.0)
