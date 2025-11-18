@@ -23,7 +23,9 @@
 #include "outputjobsdialog.h"
 
 #include "../../editorcommandset.h"
+#include "../../library/libraryelementcache.h"
 #include "../../undostack.h"
+#include "../../utils/editortoolbox.h"
 #include "../../workspace/desktopservices.h"
 #include "../cmd/cmdprojectedit.h"
 #include "archiveoutputjobwidget.h"
@@ -57,11 +59,14 @@
 #include <librepcb/core/job/netlistoutputjob.h>
 #include <librepcb/core/job/pickplaceoutputjob.h>
 #include <librepcb/core/job/projectjsonoutputjob.h>
+#include <librepcb/core/library/org/organization.h>
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/boardfabricationoutputsettings.h>
 #include <librepcb/core/project/outputjobrunner.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectattributelookup.h>
+#include <librepcb/core/workspace/workspace.h>
+#include <librepcb/core/workspace/workspacelibrarydb.h>
 #include <librepcb/core/workspace/workspacesettings.h>
 
 #include <QtCore>
@@ -106,11 +111,13 @@ static std::shared_ptr<GerberExcellonOutputJob> migratedBoardFabSettings(
  *  Constructors / Destructor
  ******************************************************************************/
 
-OutputJobsDialog::OutputJobsDialog(const WorkspaceSettings& settings,
+OutputJobsDialog::OutputJobsDialog(Workspace& ws,
+                                   const LibraryElementCache& libCache,
                                    Project& project, UndoStack& undoStack,
                                    QWidget* parent) noexcept
   : QDialog(parent),
-    mSettings(settings),
+    mWs(ws),
+    mLibCache(libCache),
     mProject(project),
     mUndoStack(undoStack),
     mJobs(mProject.getOutputJobs()),
@@ -216,7 +223,7 @@ OutputJobsDialog::OutputJobsDialog(const WorkspaceSettings& settings,
           });
   connect(mUi->txtLogMessages, &QTextBrowser::anchorClicked, this,
           [this](const QUrl& url) {
-            DesktopServices ds(mSettings);
+            DesktopServices ds(mWs.getSettings());
             ds.openLocalPath(FilePath(url.toLocalFile()));
           });
   mUi->btnShowMessages->setChecked(false);
@@ -304,6 +311,41 @@ void OutputJobsDialog::addClicked() noexcept {
     updateJobsList();
     mUi->lstJobs->setCurrentRow(index + 1);
   };
+  auto addOrganizationGerberExcellon =
+      [&](const Uuid& orgUuid, const WorkspaceLibraryDb::OutputJobKind kind,
+          const Uuid& jobUuid) {
+        try {
+          std::shared_ptr<const Organization> orf =
+              mLibCache.getOrganization(orgUuid, true);  // can throw
+          const OutputJobList* jobs = nullptr;
+          if (kind == WorkspaceLibraryDb::OutputJobKind::Pcb) {
+            jobs = &orf->getPcbOutputJobs();
+          } else if (kind == WorkspaceLibraryDb::OutputJobKind::Pcb) {
+            jobs = &orf->getAssemblyOutputJobs();
+          } else if (kind == WorkspaceLibraryDb::OutputJobKind::Pcb) {
+            jobs = &orf->getUserOutputJobs();
+          } else {
+            throw LogicError(__FILE__, __LINE__, "Unknown output job kind.");
+          }
+          for (const auto& job : *jobs) {
+            if (job.getUuid() == jobUuid) {
+              auto copy = job.cloneShared();
+              copy->setUuid(Uuid::createRandom());
+              add(copy);
+            }
+          }
+        } catch (const Exception& e) {
+          QMessageBox::critical(this, "Error", e.getMsg());
+        }
+      };
+
+  std::optional<QList<WorkspaceLibraryDb::Organization>> organizations;
+  try {
+    organizations = mWs.getLibraryDb().getAllLatestOrganizations(
+        mWs.getSettings().libraryLocaleOrder.get(), false, true);  // can throw
+  } catch (const Exception& e) {
+    qCritical() << e.getMsg();
+  }
 
   QMenu menu;
   menu.addSection(tr("Documentation"));
@@ -317,18 +359,45 @@ void OutputJobsDialog::addClicked() noexcept {
                  escape(tr("Board Rendering PDF/Image")),
                  [&]() { add(GraphicsOutputJob::boardRenderingPdf()); });
   menu.addSection(tr("Production Data"));
-  menu.addAction(QIcon(":/img/actions/export_gerber.png"),
-                 escape(GerberExcellonOutputJob::getTypeTrStatic()),
-                 [&]() { add(GerberExcellonOutputJob::defaultStyle()); });
-  menu.addAction(QIcon(":/img/actions/export_gerber.png"),
-                 escape(GerberExcellonOutputJob::getTypeTrStatic() % " (" %
-                        tr("Protel Style") % ")"),
-                 [&]() { add(GerberExcellonOutputJob::protelStyle()); });
-  if (auto job = migratedBoardFabSettings(mProject)) {
-    menu.addAction(QIcon(":/img/actions/export_gerber.png"),
-                   escape(GerberExcellonOutputJob::getTypeTrStatic() % " (" %
-                          tr("Import Old Settings") % ")"),
-                   [&, job]() { add(job); });
+  {
+    QMenu* sub =
+        menu.addMenu(QIcon(":/img/actions/export_gerber.png"),
+                     escape(GerberExcellonOutputJob::getTypeTrStatic()));
+    if (auto job = migratedBoardFabSettings(mProject)) {
+      sub->addAction(EditorToolbox::svgIcon(":/fa/solid/file-import.svg"),
+                     escape(tr("Import Old Settings")),
+                     [&, job]() { add(job); });
+    }
+    sub->addAction(QIcon(":/img/actions/export_gerber.png"),
+                   escape(tr("Generic Default Settings (*.gbr)")),
+                   [&]() { add(GerberExcellonOutputJob::defaultStyle()); });
+    sub->addAction(QIcon(":/img/actions/export_gerber.png"),
+                   escape(tr("Generic Default Settings (Protel Style)")),
+                   [&]() { add(GerberExcellonOutputJob::protelStyle()); });
+    if (organizations) {
+      bool separatorAdded = false;
+      for (const auto& org : *organizations) {
+        for (const auto& job : org.outputJobs) {
+          if (job.type == GerberExcellonOutputJob::getTypeName()) {
+            if (!separatorAdded) {
+              sub->addSeparator();
+              separatorAdded = true;
+            }
+            sub->addAction(org.logo, job.name, [&]() {
+              addOrganizationGerberExcellon(org.uuid, job.kind, job.uuid);
+            });
+          }
+        }
+        if (sub->actions().count() > 20) {
+          break;  // Not a nice way to limit count...
+        }
+      }
+    } else {
+      sub->addSeparator();
+      sub->addAction(
+          EditorToolbox::svgIcon(":/fa/solid/triangle-exclamation.svg"),
+          "Error loading presets from DB");
+    }
   }
   menu.addAction(QIcon(":/img/actions/export_pick_place_file.png"),
                  escape(PickPlaceOutputJob::getTypeTrStatic()),
@@ -423,7 +492,7 @@ void OutputJobsDialog::openOutputDirectory() noexcept {
   OutputJobRunner runner(mProject);
   QDir().mkpath(runner.getOutputDirectory().toStr());
 
-  DesktopServices ds(mSettings);
+  DesktopServices ds(mWs.getSettings());
   ds.openLocalPath(runner.getOutputDirectory());
 }
 
@@ -570,7 +639,7 @@ void OutputJobsDialog::runJob(std::shared_ptr<OutputJob> job,
         }
       }
       if (commonOutPath.isValid() && (!commonOutPath.isRoot())) {
-        DesktopServices ds(mSettings);
+        DesktopServices ds(mWs.getSettings());
         ds.openLocalPath(commonOutPath);
         if (messagesWereHidden) {
           mUi->btnShowMessages->setChecked(false);
@@ -607,14 +676,14 @@ void OutputJobsDialog::currentItemChanged(QListWidgetItem* current,
     if (job) {
       if (auto j = std::dynamic_pointer_cast<GraphicsOutputJob>(job)) {
         mUi->scrollArea->setWidget(new GraphicsOutputJobWidget(
-            mProject, j, mSettings.defaultLengthUnit.get(),
+            mProject, j, mWs.getSettings().defaultLengthUnit.get(),
             "output_jobs_dialog"));
       } else if (auto j =
                      std::dynamic_pointer_cast<GerberExcellonOutputJob>(job)) {
         auto widget = new GerberExcellonOutputJobWidget(mProject, j);
         connect(widget, &GerberExcellonOutputJobWidget::openUrlRequested, this,
                 [this](const QUrl& url) {
-                  DesktopServices ds(mSettings);
+                  DesktopServices ds(mWs.getSettings());
                   ds.openWebUrl(url);
                 });
         connect(widget, &GerberExcellonOutputJobWidget::orderPcbDialogTriggered,
@@ -657,7 +726,8 @@ void OutputJobsDialog::currentItemChanged(QListWidgetItem* current,
         mUi->scrollArea->setWidget(widget);
       }
     } else {
-      mUi->scrollArea->setWidget(new OutputJobHomeWidget(mSettings, mProject));
+      mUi->scrollArea->setWidget(
+          new OutputJobHomeWidget(mWs.getSettings(), mProject));
     }
     mUi->btnCopy->setEnabled(static_cast<bool>(job));
     mUi->btnUp->setEnabled(static_cast<bool>(job));

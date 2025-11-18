@@ -718,11 +718,11 @@ void GuiApplication::createNewWindow(int id, int projectIndex) noexcept {
     return true;
   });
   b.on_get_organizations_with_design_rules([this]() {
-    auto model = mOrganizationsWithPcbProducts.lock();
+    auto model = mOrganizationsWithPcbDesignRules.lock();
     if (!model) {
       model = std::make_shared<OrganizationsDbModel>(mWorkspace.getLibraryDb(),
                                                      mWorkspace.getSettings());
-      mOrganizationsWithPcbProducts = model;
+      mOrganizationsWithPcbDesignRules = model;
     }
     return model;
   });
