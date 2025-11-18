@@ -17,6 +17,7 @@ import {
     LibraryTreeViewItemType,
     NotificationData,
     NotificationType,
+    OrganizationTabData,
     PackageTabData,
     PanelPage,
     ProjectData,
@@ -358,6 +359,15 @@ export global Data {
                         redo: FeatureState.enabled,
                     },
                 },
+                {
+                    type: TabType.organization,
+                    title: "Organization",
+                    features: {
+                        save: FeatureState.enabled,
+                        undo: FeatureState.enabled,
+                        redo: FeatureState.enabled,
+                    },
+                },
             ],
             library-tabs: [
                 {
@@ -443,6 +453,9 @@ export global Data {
                             level: 2,
                             name: "Chip Capacitor",
                             is-external: true,
+                        },
+                        {
+                            type: LibraryTreeViewItemType.organization,
                         },
                     ],
                     filtered-elements: [
@@ -1058,7 +1071,41 @@ export global Data {
                     interactive-pinout-signal-index: 2,
                 },
             ],
-            current-tab-index: 6,
+            organization-tabs: [
+                { },
+                { },
+                { },
+                { },
+                { },
+                { },
+                { },
+                {
+                    library-index: 0,
+                    path: "corp1",
+                    name: "Organization",
+                    name-error: "Invalid",
+                    description: "Foo Bar\nMultiline\nBlabla",
+                    keywords: "Foo,Bar,Hello World",
+                    author: "Somebody",
+                    version: "0.1",
+                    version-error: "Invalid",
+                    deprecated: false,
+                    priority: 42,
+                    pcb-design-rules: [
+                        { name: "Standard" },
+                        { name: "Advanced" },
+                    ],
+                    pcb-output-jobs: 3,
+                    assembly-output-jobs: 0,
+                    checks: {
+                        type: RuleCheckType.organization-check,
+                        state: RuleCheckState.up-to-date,
+                        messages: [],
+                        unapproved: 0,
+                    },
+                },
+            ],
+            current-tab-index: 7,
         },
     ];
 
@@ -1486,6 +1533,7 @@ export global Data {
     out property <PackageTabData> current-package-tab: current-section.package-tabs[current-section.current-tab-index];
     out property <ComponentTabData> current-component-tab: current-section.component-tabs[current-section.current-tab-index];
     out property <DeviceTabData> current-device-tab: current-section.device-tabs[current-section.current-tab-index];
+    out property <OrganizationTabData> current-organization-tab: current-section.organization-tabs[current-section.current-tab-index];
     out property <SchematicTabData> current-schematic-tab: current-section.schematic-tabs[current-section.current-tab-index];
     out property <Board2dTabData> current-board-2d-tab: current-section.board-2d-tabs[current-section.current-tab-index];
     out property <Board3dTabData> current-board-3d-tab: current-section.board-3d-tabs[current-section.current-tab-index];
@@ -1512,6 +1560,8 @@ export global Data {
             current-component-tab.checks
         } else if current-tab.type == TabType.device {
             current-device-tab.checks
+        } else if current-tab.type == TabType.organization {
+            current-organization-tab.checks
         } else {
             projects[-1].erc  // Not nice, but avoids compiler warning
         }
@@ -1549,6 +1599,10 @@ export global Data {
             current-rule-check-board-index = -1;
             current-library-index = current-component-tab.library-index;
         } else if current-tab.type == TabType.device {
+            current-project-index = -1;
+            current-rule-check-project-index = -1;
+            current-rule-check-board-index = -1;
+        } else if current-tab.type == TabType.organization {
             current-project-index = -1;
             current-rule-check-project-index = -1;
             current-rule-check-board-index = -1;

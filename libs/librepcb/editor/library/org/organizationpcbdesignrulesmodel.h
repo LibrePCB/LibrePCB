@@ -17,69 +17,80 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_BOARDSETUPDIALOG_H
-#define LIBREPCB_EDITOR_BOARDSETUPDIALOG_H
+#ifndef LIBREPCB_EDITOR_ORGANIZATIONPCBDESIGNRULESMODEL_H
+#define LIBREPCB_EDITOR_ORGANIZATIONPCBDESIGNRULESMODEL_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "appwindow.h"
+
+#include <librepcb/core/library/org/organizationpcbdesignrules.h>
+
 #include <QtCore>
-#include <QtWidgets>
+
+#include <functional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 
-class Board;
-class Layer;
+class Organization;
 
 namespace editor {
 
 class UndoStack;
 
-namespace Ui {
-class BoardSetupDialog;
-}
-
 /*******************************************************************************
- *  Class BoardSetupDialog
+ *  Class OrganizationPcbDesignRulesModel
  ******************************************************************************/
 
 /**
- * @brief The BoardSetupDialog class
+ * @brief The OrganizationPcbDesignRulesModel class
  */
-class BoardSetupDialog final : public QDialog {
+class OrganizationPcbDesignRulesModel final
+  : public QObject,
+    public slint::Model<ui::OrganizationPcbDesignRulesData> {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
-  BoardSetupDialog() = delete;
-  BoardSetupDialog(const BoardSetupDialog& other) = delete;
-  BoardSetupDialog(Board& board, UndoStack& undoStack,
-                   QWidget* parent = 0) noexcept;
-  ~BoardSetupDialog();
+  // OrganizationPcbDesignRulesModel() = delete;
+  OrganizationPcbDesignRulesModel(
+      const OrganizationPcbDesignRulesModel& other) = delete;
+  explicit OrganizationPcbDesignRulesModel(QObject* parent = nullptr) noexcept;
+  ~OrganizationPcbDesignRulesModel() noexcept;
 
   // General Methods
-  void openDrcSettingsTab() noexcept;
-  void hideOtherTabs() noexcept;
+  void setReferences(
+      Organization* organization, UndoStack* stack,
+      std::function<void(OrganizationPcbDesignRules&)> editCallback) noexcept;
+  void addItem() noexcept;
+
+  // Implementations
+  std::size_t row_count() const override;
+  std::optional<ui::OrganizationPcbDesignRulesData> row_data(
+      std::size_t i) const override;
+  void set_row_data(
+      std::size_t i,
+      const ui::OrganizationPcbDesignRulesData& data) noexcept override;
 
   // Operator Overloadings
-  BoardSetupDialog& operator=(const BoardSetupDialog& rhs) = delete;
+  OrganizationPcbDesignRulesModel& operator=(
+      const OrganizationPcbDesignRulesModel& rhs) = delete;
 
-private:  // Methods
-  void buttonBoxClicked(QAbstractButton* button);
-  void load() noexcept;
-  bool apply() noexcept;
-  QVector<const Layer*> getTopSilkscreenLayers() const noexcept;
-  QVector<const Layer*> getBotSilkscreenLayers() const noexcept;
+private:
+  void refresh() noexcept;
+  void trigger(int index, const Uuid& uuid,
+               ui::OrganizationPcbDesignRulesAction a) noexcept;
+  void setList(const QVector<OrganizationPcbDesignRules>& list);
+  QString askForName(const QString& defaultValue) const;
 
-private:  // Date
-  Board& mBoard;
-  UndoStack& mUndoStack;
-  QScopedPointer<Ui::BoardSetupDialog> mUi;
-
-  static const QString sSettingsPrefix;
+private:
+  QPointer<Organization> mOrganization;
+  QPointer<UndoStack> mUndoStack;
+  std::function<void(OrganizationPcbDesignRules&)> mEditCallback;
 };
 
 /*******************************************************************************

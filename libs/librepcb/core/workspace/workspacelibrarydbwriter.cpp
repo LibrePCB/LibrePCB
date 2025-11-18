@@ -30,6 +30,7 @@
 #include "../library/cmp/component.h"
 #include "../library/dev/device.h"
 #include "../library/library.h"
+#include "../library/org/organization.h"
 #include "../library/pkg/package.h"
 #include "../library/sym/symbol.h"
 #include "../sqlitedatabase.h"
@@ -313,6 +314,56 @@ void WorkspaceLibraryDbWriter::createAllTables() {
       "`unit` TEXT"
       ")");
 
+  // organizations
+  queries << QString(
+      "CREATE TABLE IF NOT EXISTS organizations ("
+      "`id` INTEGER PRIMARY KEY NOT NULL, "
+      "`library_id` INTEGER NOT NULL, "
+      "`filepath` TEXT UNIQUE NOT NULL, "
+      "`uuid` TEXT NOT NULL, "
+      "`version` TEXT NOT NULL, "
+      "`deprecated` BOOLEAN NOT NULL, "
+      "`logo_png` BLOB, "
+      "`url` TEXT, "
+      "`country` TEXT NOT NULL, "
+      "`fabs` TEXT NOT NULL, "
+      "`shipping` TEXT NOT NULL, "
+      "`sponsor` BOOL NOT NULL, "
+      "`priority` INTEGER NOT NULL "
+      ")");
+  queries << QString(
+      "CREATE TABLE IF NOT EXISTS organizations_tr ("
+      "`id` INTEGER PRIMARY KEY NOT NULL, "
+      "`element_id` INTEGER "
+      "REFERENCES organizations(id) ON DELETE CASCADE NOT NULL, "
+      "`locale` TEXT NOT NULL, "
+      "`name` TEXT, "
+      "`description` TEXT, "
+      "`keywords` TEXT, "
+      "UNIQUE(element_id, locale)"
+      ")");
+  queries << QString(
+      "CREATE TABLE IF NOT EXISTS organization_pcb_design_rules ("
+      "`id` INTEGER PRIMARY KEY NOT NULL, "
+      "`organization_id` INTEGER REFERENCES organizations(id) "
+      "ON DELETE CASCADE NOT NULL, "
+      "`uuid` TEXT NOT NULL, "
+      "`name` TEXT NOT NULL, "
+      "`description` TEXT NOT NULL, "
+      "`url` TEXT, "
+      "`max_layers` INTEGER NOT NULL "
+      ")");
+  queries << QString(
+      "CREATE TABLE IF NOT EXISTS organization_output_jobs ("
+      "`id` INTEGER PRIMARY KEY NOT NULL, "
+      "`organization_id` INTEGER REFERENCES organizations(id) "
+      "ON DELETE CASCADE NOT NULL, "
+      "`kind` INTEGER NOT NULL, "
+      "`uuid` TEXT NOT NULL, "
+      "`type` TEXT NOT NULL, "
+      "`name` TEXT NOT NULL "
+      ")");
+
   // execute queries
   foreach (const QString& string, queries) {
     QSqlQuery query = mDb.prepareQuery(string);
@@ -415,6 +466,63 @@ int WorkspaceLibraryDbWriter::addPartAttribute(int partId,
   return mDb.insert(query);
 }
 
+int WorkspaceLibraryDbWriter::addOrganization(
+    int libId, const FilePath& fp, const Uuid& uuid, const Version& version,
+    bool deprecated, const QByteArray& logoPng, const QUrl& url,
+    const QString& country, const QStringList& fabs,
+    const QStringList& shipping, bool isSponsor, int priority) {
+  QSqlQuery query = mDb.prepareQuery(
+      "INSERT INTO organizations "
+      "(library_id, filepath, uuid, version, deprecated, logo_png, url, "
+      "country, fabs, shipping, sponsor, priority) VALUES "
+      "(:library_id, :filepath, :uuid, :version, :deprecated, :logo_png, "
+      ":url, :country, :fabs, :shipping, :sponsor, :priority)");
+  query.bindValue(":library_id", libId);
+  query.bindValue(":filepath", filePathToString(fp));
+  query.bindValue(":uuid", uuid.toStr());
+  query.bindValue(":version", version.toStr());
+  query.bindValue(":deprecated", deprecated);
+  query.bindValue(":logo_png", logoPng);
+  query.bindValue(":url", url);
+  query.bindValue(":country", nonNull(country));
+  query.bindValue(":fabs", nonNull(fabs.join(",")));
+  query.bindValue(":shipping", nonNull(shipping.join(",")));
+  query.bindValue(":sponsor", isSponsor);
+  query.bindValue(":priority", priority);
+  return mDb.insert(query);
+}
+
+int WorkspaceLibraryDbWriter::addOrganizationPcbDesignRules(
+    int orgId, const Uuid& uuid, const QString& name,
+    const QString& description, const QUrl& url, int maxLayers) {
+  QSqlQuery query = mDb.prepareQuery(
+      "INSERT INTO organization_pcb_design_rules "
+      "(organization_id, uuid, name, description, url, max_layers) VALUES "
+      "(:organization_id, :uuid, :name, :description, :url, :max_layers)");
+  query.bindValue(":organization_id", orgId);
+  query.bindValue(":uuid", uuid.toStr());
+  query.bindValue(":name", nonNull(name));
+  query.bindValue(":description", nonNull(description));
+  query.bindValue(":url", url);
+  query.bindValue(":max_layers", maxLayers);
+  return mDb.insert(query);
+}
+
+int WorkspaceLibraryDbWriter::addOrganizationOutputJob(
+    int orgId, WorkspaceLibraryDb::OutputJobKind kind, const Uuid& uuid,
+    const QString& type, const QString& name) {
+  QSqlQuery query = mDb.prepareQuery(
+      "INSERT INTO organization_output_jobs "
+      "(organization_id, kind, uuid, type, name) VALUES "
+      "(:organization_id, :kind, :uuid, :type, :name)");
+  query.bindValue(":organization_id", orgId);
+  query.bindValue(":kind", static_cast<int>(kind));
+  query.bindValue(":uuid", uuid.toStr());
+  query.bindValue(":type", nonNull(type));
+  query.bindValue(":name", nonNull(name));
+  return mDb.insert(query);
+}
+
 int WorkspaceLibraryDbWriter::addAlternativeName(
     int pkgId, const ElementName& name, const SimpleString& reference) {
   QSqlQuery query = mDb.prepareQuery(
@@ -465,6 +573,11 @@ QString WorkspaceLibraryDbWriter::getElementTable<Component>() noexcept {
 template <>
 QString WorkspaceLibraryDbWriter::getElementTable<Device>() noexcept {
   return "devices";
+}
+
+template <>
+QString WorkspaceLibraryDbWriter::getElementTable<Organization>() noexcept {
+  return "organizations";
 }
 
 template <>
