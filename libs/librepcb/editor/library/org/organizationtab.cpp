@@ -468,7 +468,8 @@ void OrganizationTab::execOutputJobsDialog(
     Project& prj = getTmpProject();
     prj.getOutputJobs() = jobs;
     UndoStack undoStack;
-    OutputJobsDialog dlg(mApp.getWorkspace().getSettings(), prj, undoStack);
+    OutputJobsDialog dlg(mApp.getWorkspace(), mApp.getLibraryElementCache(),
+                         prj, undoStack);
     dlg.exec();
     std::unique_ptr<CmdOrganizationEdit> cmd(
         new CmdOrganizationEdit(*mOrganization));

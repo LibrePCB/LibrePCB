@@ -186,7 +186,7 @@ private:
   QTimer mSaveOpenedWindowsCountdown;
 
   // Cache
-  std::weak_ptr<OrganizationsDbModel> mOrganizationsWithPcbProducts;
+  std::weak_ptr<OrganizationsDbModel> mOrganizationsWithPcbDesignRules;
 };
 
 /*******************************************************************************

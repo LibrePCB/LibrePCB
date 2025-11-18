@@ -34,10 +34,11 @@
 namespace librepcb {
 
 class Project;
-class WorkspaceSettings;
+class Workspace;
 
 namespace editor {
 
+class LibraryElementCache;
 class UndoStack;
 
 namespace Ui {
@@ -58,8 +59,8 @@ public:
   // Constructors / Destructor
   OutputJobsDialog() = delete;
   OutputJobsDialog(const OutputJobsDialog& other) = delete;
-  explicit OutputJobsDialog(const WorkspaceSettings& settings, Project& project,
-                            UndoStack& undoStack,
+  explicit OutputJobsDialog(Workspace& ws, const LibraryElementCache& libCache,
+                            Project& project, UndoStack& undoStack,
                             QWidget* parent = nullptr) noexcept;
   ~OutputJobsDialog() noexcept;
 
@@ -100,7 +101,8 @@ private:  // Methods
   void writeLogLine(const QString& line) noexcept;
 
 private:  // Data
-  const WorkspaceSettings& mSettings;
+  Workspace& mWs;
+  const LibraryElementCache& mLibCache;
   Project& mProject;
   UndoStack& mUndoStack;
   OutputJobList mJobs;
