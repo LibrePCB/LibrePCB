@@ -126,6 +126,11 @@ void FileFormatMigrationV1::upgradeDevice(TransactionalDirectory& dir) {
   upgradeVersionFile(dir, ".librepcb-dev");
 }
 
+void FileFormatMigrationV1::upgradeOrganization(TransactionalDirectory& dir) {
+  Q_UNUSED(dir);
+  // Didn't exist yet.
+}
+
 void FileFormatMigrationV1::upgradeLibrary(TransactionalDirectory& dir) {
   // Version File.
   upgradeVersionFile(dir, ".librepcb-lib");

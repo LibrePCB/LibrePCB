@@ -78,6 +78,7 @@ public:
   virtual void upgradePackage(TransactionalDirectory& dir) = 0;
   virtual void upgradeComponent(TransactionalDirectory& dir) = 0;
   virtual void upgradeDevice(TransactionalDirectory& dir) = 0;
+  virtual void upgradeOrganization(TransactionalDirectory& dir) = 0;
   virtual void upgradeLibrary(TransactionalDirectory& dir) = 0;
   virtual void upgradeProject(TransactionalDirectory& dir,
                               QList<Message>& messages) = 0;

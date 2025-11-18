@@ -66,6 +66,7 @@ public:
   virtual void upgradePackage(TransactionalDirectory& dir) override;
   virtual void upgradeComponent(TransactionalDirectory& dir) override;
   virtual void upgradeDevice(TransactionalDirectory& dir) override;
+  virtual void upgradeOrganization(TransactionalDirectory& dir) override;
   virtual void upgradeLibrary(TransactionalDirectory& dir) override;
   virtual void upgradeProject(TransactionalDirectory& dir,
                               QList<Message>& messages) override;

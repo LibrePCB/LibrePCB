@@ -277,6 +277,12 @@ add_library(
   library/libraryelementcheck.h
   library/libraryelementcheckmessages.cpp
   library/libraryelementcheckmessages.h
+  library/org/organization.cpp
+  library/org/organization.h
+  library/org/organizationcheck.cpp
+  library/org/organizationcheck.h
+  library/org/organizationpcbdesignrules.cpp
+  library/org/organizationpcbdesignrules.h
   library/pkg/footprint.cpp
   library/pkg/footprint.h
   library/pkg/footprintpad.cpp
