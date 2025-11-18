@@ -26,6 +26,7 @@
 #include "../fileio/filepath.h"
 #include "../types/elementname.h"
 #include "../types/simplestring.h"
+#include "workspacelibrarydb.h"
 
 #include <QtCore>
 
@@ -191,6 +192,61 @@ public:
    * @return ID of the added attribute.
    */
   int addPartAttribute(int partId, const Attribute& attribute);
+
+  /**
+   * @brief #addElement() specialized for organizations
+   *
+   * @param libId         ID of the library containing this organization.
+   * @param fp            Filepath of the organization.
+   * @param uuid          UUID of the organization.
+   * @param version       Version of the organization.
+   * @param deprecated    Whether the organization is deprecated or not.
+   * @param logoPng       Logo as a PNG.
+   * @param url           Website URL.
+   * @param country       Country code (e.g. "DE").
+   * @param fabs          Country codes of fabs (e.g. "DE").
+   * @param shipping      Shipping options (e.g. "worldwide").
+   * @param isSponsor     Is LibrePCB sponsor or not.
+   * @param priority      Sort order priority.
+   * @return ID of the added organization.
+   */
+  int addOrganization(int libId, const FilePath& fp, const Uuid& uuid,
+                      const Version& version, bool deprecated,
+                      const QByteArray& logoPng, const QUrl& url,
+                      const QString& country, const QStringList& fabs,
+                      const QStringList& shipping, bool isSponsor,
+                      int priority);
+
+  /**
+   * @brief Add PCB design rules to a previously added organization
+   *
+   * @param orgId          ID of the organization containing this design rules.
+   * @param uuid           Design rules UUID.
+   * @param name           Design rules name.
+   * @param description    Design rules description.
+   * @param url            Design rules URL.
+   * @param maxLayers      Maximum number of layers.
+   * @return ID of the added design rules.
+   */
+  int addOrganizationPcbDesignRules(int orgId, const Uuid& uuid,
+                                    const QString& name,
+                                    const QString& description, const QUrl& url,
+                                    int maxLayers);
+
+  /**
+   * @brief Add an output job to a previously added organization
+   *
+   * @param orgId          ID of the organization containing this output job.
+   * @param kind           Kind of output job.
+   * @param uuid           Job UUID.
+   * @param type           Job type (e.g. "gerber_excellon").
+   * @param name           Job name.
+   * @return ID of the added output job.
+   */
+  int addOrganizationOutputJob(int orgId,
+                               WorkspaceLibraryDb::OutputJobKind kind,
+                               const Uuid& uuid, const QString& type,
+                               const QString& name);
 
   /**
    * @brief Remove a library element

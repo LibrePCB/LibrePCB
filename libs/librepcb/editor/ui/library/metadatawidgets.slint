@@ -4,6 +4,7 @@ import {
     CategoryTreeLabel,
     IconButton,
     LineEdit,
+    LinkText,
     ListViewItemButton,
     OverlayDialog,
     Palette,
@@ -15,21 +16,27 @@ import {
     Data,
     LibraryDependency,
     LibraryElementCategoryData,
+    OrganizationPcbDesignRulesAction,
+    OrganizationPcbDesignRulesData,
     PanelPage,
     RuleCheckData,
     TabAction,
     TreeViewItemData,
 } from "../api.slint";
 
-export component IconRowHeader inherits Text {
+component RowHeaderText inherits Text {
     width: self.preferred-width;
     vertical-alignment: center;
-    text: @tr("Icon:");
     accessible-role: none;
+}
+
+export component IconRowHeader inherits RowHeaderText {
+    text: @tr("Icon:");
 }
 
 export component IconRowCell inherits HorizontalLayout {
     in property <image> icon;
+    in property <length> icon-height: 48px;
     in property <bool> read-only: false;
     property <bool> has-icon: icon.width > 0;
 
@@ -39,10 +46,10 @@ export component IconRowCell inherits HorizontalLayout {
     spacing: 8px;
 
     btn := IconButton {
-        height: 48px;
+        height: icon-height;
         style: hyperlink;
         colorize: !has-icon;
-        icon-size: has-icon ? 48px : 20px;
+        icon-size: has-icon ? icon-height : 20px;
         icon: {
             if has-icon {
                 root.icon
@@ -63,46 +70,28 @@ export component IconRowCell inherits HorizontalLayout {
     }
 }
 
-export component NameRowHeader inherits Text {
-    width: self.preferred-width;
-    vertical-alignment: center;
+export component NameRowHeader inherits RowHeaderText {
     text: @tr("Name:");
-    accessible-role: none;
 }
 
-export component DescriptionRowHeader inherits Text {
-    width: self.preferred-width;
-    vertical-alignment: center;
+export component DescriptionRowHeader inherits RowHeaderText {
     text: @tr("Description:");
-    accessible-role: none;
 }
 
-export component KeywordsRowHeader inherits Text {
-    width: self.preferred-width;
-    vertical-alignment: center;
+export component KeywordsRowHeader inherits RowHeaderText {
     text: @tr("Keywords:");
-    accessible-role: none;
 }
 
-export component AuthorRowHeader inherits Text {
-    width: self.preferred-width;
-    vertical-alignment: center;
+export component AuthorRowHeader inherits RowHeaderText {
     text: @tr("Author:");
-    accessible-role: none;
 }
 
-export component VersionRowHeader inherits Text {
-    width: self.preferred-width;
-    vertical-alignment: center;
+export component VersionRowHeader inherits RowHeaderText {
     text: @tr("Version:");
-    accessible-role: none;
 }
 
-export component DeprecatedRowHeader inherits Text {
-    width: self.preferred-width;
-    vertical-alignment: center;
+export component DeprecatedRowHeader inherits RowHeaderText {
     text: @tr("Deprecated:");
-    accessible-role: none;
 }
 
 export component DeprecatedRowCell inherits Switch {
@@ -111,11 +100,8 @@ export component DeprecatedRowCell inherits Switch {
     accessible-description: self.text;
 }
 
-export component UrlRowHeader inherits Text {
-    width: self.preferred-width;
-    vertical-alignment: center;
+export component UrlRowHeader inherits RowHeaderText {
     text: @tr("URL:");
-    accessible-role: none;
 }
 
 export component UrlRowCell inherits HorizontalLayout {
@@ -159,11 +145,8 @@ export component UrlRowCell inherits HorizontalLayout {
     }
 }
 
-export component DependenciesRowHeader inherits Text {
-    width: self.preferred-width;
-    vertical-alignment: center;
+export component DependenciesRowHeader inherits RowHeaderText {
     text: @tr("Dependencies:");
-    accessible-role: none;
 }
 
 export component DependenciesRowCell inherits VerticalLayout {
@@ -237,18 +220,12 @@ export component DependenciesRowCell inherits VerticalLayout {
     }
 }
 
-export component ManufacturerRowHeader inherits Text {
-    width: self.preferred-width;
-    vertical-alignment: center;
+export component ManufacturerRowHeader inherits RowHeaderText {
     text: @tr("Manufacturer:");
-    accessible-role: none;
 }
 
-export component ParentRowHeader inherits Text {
-    width: self.preferred-width;
-    vertical-alignment: center;
+export component ParentRowHeader inherits RowHeaderText {
     text: @tr("Parent:");
-    accessible-role: none;
 }
 
 export component ParentRowCell inherits HorizontalLayout {
@@ -289,11 +266,8 @@ export component ParentRowCell inherits HorizontalLayout {
     }
 }
 
-export component CategoriesRowHeader inherits Text {
-    width: self.preferred-width;
-    vertical-alignment: center;
+export component CategoriesRowHeader inherits RowHeaderText {
     text: @tr("Categories:");
-    accessible-role: none;
 }
 
 component CategoriesListViewRow inherits TouchArea {
@@ -423,50 +397,121 @@ export component CategoriesChooserDialog inherits OverlayDialog {
     }
 }
 
-export component AssemblyTypeRowHeader inherits Text {
-    width: self.preferred-width;
-    vertical-alignment: center;
+export component AssemblyTypeRowHeader inherits RowHeaderText {
     text: @tr("Assembly:");
-    accessible-role: none;
 }
 
-export component DatasheetRowHeader inherits Text {
-    width: self.preferred-width;
-    vertical-alignment: center;
+export component DatasheetRowHeader inherits RowHeaderText {
     text: @tr("Datasheet:");
-    accessible-role: none;
 }
 
 export component DatasheetRowCell inherits UrlRowCell {
     placeholder-text: @tr("URL to online datasheet (optional)");
 }
 
-export component SchematicOnlyRowHeader inherits Text {
-    width: self.preferred-width;
-    vertical-alignment: center;
+export component SchematicOnlyRowHeader inherits RowHeaderText {
     text: @tr("Schematic-Only:");
-    accessible-role: none;
 }
 
-export component PrefixRowHeader inherits Text {
-    width: self.preferred-width;
-    vertical-alignment: center;
+export component PrefixRowHeader inherits RowHeaderText {
     text: @tr("Prefix:");
-    accessible-role: none;
 }
 
-export component DefaultValueRowHeader inherits Text {
-    width: self.preferred-width;
-    vertical-alignment: center;
+export component DefaultValueRowHeader inherits RowHeaderText {
     text: @tr("Default Value:");
-    accessible-role: none;
 }
 
-export component AttributesRowHeader inherits Text {
-    width: self.preferred-width;
-    vertical-alignment: center;
+export component AttributesRowHeader inherits RowHeaderText {
     text: @tr("Attributes:");
-    accessible-role: none;
+}
+
+export component PriorityRowHeader inherits RowHeaderText {
+    text: @tr("Priority:");
+}
+
+export component PcbDesignRulesRowHeader inherits RowHeaderText {
+    text: @tr("PCB Design Rules:");
+}
+
+export component PcbDesignRulesRowCell inherits VerticalLayout {
+    in-out property <[OrganizationPcbDesignRulesData]> model;
+    in property <bool> read-only: false;
+
+    callback add-clicked;
+
+    for item[idx] in model: item-ta := TouchArea {
+        height: 20px;
+
+        HorizontalLayout {
+            alignment: start;
+
+            item-btn := LinkText {
+                vertical-alignment: center;
+                overflow: elide;
+                text: "• " + item.name;
+                accessible-description: "PCB design rules";
+
+                clicked => {
+                    model[idx].action = OrganizationPcbDesignRulesAction.edit;
+                }
+            }
+
+            Rectangle {
+                width: 5px;
+            }
+
+            if (!read-only) && item-ta.has-hover: rename-btn := ListViewItemButton {
+                icon: @image-url("../../../../font-awesome/svgs/solid/pen-to-square.svg");
+                icon-size: 12px;
+
+                clicked => {
+                    model[idx].action = OrganizationPcbDesignRulesAction.rename;
+                }
+            }
+
+            if (!read-only) && item-ta.has-hover: duplicate-btn := ListViewItemButton {
+                icon: @image-url("../../../../font-awesome/svgs/solid/copy.svg");
+                icon-size: 12px;
+
+                clicked => {
+                    model[idx].action = OrganizationPcbDesignRulesAction.duplicate;
+                }
+            }
+
+            if (!read-only) && item-ta.has-hover: delete-btn := ListViewItemButton {
+                icon: @image-url("../../../../font-awesome/svgs/solid/trash-can.svg");
+                icon-size: 12px;
+
+                clicked => {
+                    model[idx].action = OrganizationPcbDesignRulesAction.delete;
+                }
+            }
+        }
+    }
+
+    if !read-only: HorizontalLayout {
+        alignment: start;
+
+        new-btn := LinkText {
+            vertical-alignment: center;
+            overflow: elide;
+            text-color: #909090;
+            text-color-hovered: #c0c0c0;
+            text: "+ " + @tr("New Design Rules");
+
+            clicked => {
+                add-clicked();
+            }
+        }
+    }
+}
+
+export component PcbOutputJobsRowHeader inherits RowHeaderText {
+    text: @tr("PCB Service:");
+}
+
+export component AssemblyOutputJobsRowHeader inherits RowHeaderText {
+    text: @tr("Assembly Service:");
 }
 
 export component MetadataFooterRowCell inherits HorizontalLayout {

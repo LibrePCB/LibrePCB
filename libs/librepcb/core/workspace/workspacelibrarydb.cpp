@@ -32,6 +32,7 @@
 #include "../library/cmp/component.h"
 #include "../library/dev/device.h"
 #include "../library/library.h"
+#include "../library/org/organization.h"
 #include "../library/pkg/package.h"
 #include "../library/sym/symbol.h"
 #include "../serialization/sexpression.h"
@@ -277,6 +278,120 @@ QList<WorkspaceLibraryDb::Part> WorkspaceLibraryDb::getDeviceParts(
                       getPartAttributes(query.value(0).toInt())});
   }
   return Toolbox::sortedQSet(parts);
+}
+
+QList<WorkspaceLibraryDb::Organization>
+    WorkspaceLibraryDb::getAllLatestOrganizations(
+        const QStringList& localeOrder, bool pcbDesignRules,
+        bool outputJobs) const {
+  SQLiteDatabase::TransactionScopeGuard sg(*mDb);  // Atomic query!
+
+  QSqlQuery query = mDb->prepareQuery(
+      "SELECT id, filepath, uuid, version, logo_png, url, country, fabs, "
+      "shipping, sponsor, priority FROM organizations");
+  mDb->exec(query);
+
+  // Get all organizations.
+  QHash<Uuid, QVector<Organization>> entries;
+  while (query.next()) {
+    QPixmap logo;
+    logo.loadFromData(query.value(4).toByteArray(), "png");
+    FilePath filepath(
+        FilePath::fromRelative(mLibrariesPath, query.value(1).toString()));
+    if (!filepath.isValid()) throw LogicError(__FILE__, __LINE__);
+
+    Organization org{
+        query.value(0).toInt(),  // ID
+        filepath,
+        Uuid::fromString(query.value(2).toString()),  // can throw
+        QString(),  // name (filled later)
+        QString(),  // description (filled later)
+        Version::fromString(query.value(3).toString()),  // can throw
+        logo,
+        QUrl(query.value(5).toString(), QUrl::StrictMode),  // url
+        query.value(6).toString(),  // country
+        query.value(7).toString().split(","),  // fabs
+        query.value(8).toString().split(","),  // shipping
+        query.value(9).toBool(),  // is_sponsor
+        query.value(10).toInt(),  // priority
+        {},  // PCB design rules
+        {},  // PCB output jobs
+    };
+    entries[org.uuid].append(org);
+  }
+
+  // Take only the newest version of each organization.
+  QList<Organization> result;
+  for (QVector<Organization>& entry : entries) {
+    std::sort(entry.begin(), entry.end(),
+              [](const Organization& a, const Organization& b) {
+                if (a.version != b.version) {
+                  return a.version > b.version;  // Newer versions first
+                } else {
+                  return a.elemDir < b.elemDir;  // Local library elements first
+                }
+              });
+    result.append(entry.first());
+  }
+
+  // Fill in remaining data.
+  for (Organization& obj : result) {
+    // Translations.
+    getTranslations<librepcb::Organization>(obj.elemDir, localeOrder, &obj.name,
+                                            &obj.description,
+                                            nullptr);  // can throw
+
+    // PCB design rules.
+    if (pcbDesignRules) {
+      QSqlQuery query = mDb->prepareQuery(
+          "SELECT uuid, name, description, url, max_layers "
+          "FROM organization_pcb_design_rules "
+          "WHERE organization_id = :organization_id");
+      query.bindValue(":organization_id", obj.id);
+      mDb->exec(query);
+      while (query.next()) {
+        obj.pcbDesignRules.append(PcbDesignRules{
+            Uuid::fromString(query.value(0).toString()),  // can throw
+            query.value(1).toString(),  // name
+            query.value(2).toString(),  // description
+            QUrl(query.value(3).toString(), QUrl::StrictMode),  // url
+            query.value(4).toInt(),  // max_layers
+        });
+      }
+    }
+
+    // Output jobs.
+    if (outputJobs) {
+      QSqlQuery query = mDb->prepareQuery(
+          "SELECT kind, uuid, type, name FROM organization_output_jobs "
+          "WHERE organization_id = :organization_id");
+      query.bindValue(":organization_id", obj.id);
+      mDb->exec(query);
+      while (query.next()) {
+        obj.outputJobs.append(OutputJob{
+            static_cast<OutputJobKind>(query.value(0).toInt()),  // kind
+            Uuid::fromString(query.value(1).toString()),  // can throw
+            query.value(2).toString(),  // type
+            query.value(3).toString(),  // name
+        });
+      }
+    }
+  }
+
+  // Pre-sort results in a way suitable for most use-cases.
+  // Note: Do not take "isSponsor" into account as the priority should
+  // already take care of that. If we ever publish DRC settings for
+  // "LibrePCB Fab", we probably want it to appear as the first item, even
+  // though it wouldn't be marked as sponsor.
+  std::sort(result.begin(), result.end(),
+            [](const Organization& a, const Organization& b) {
+              if (a.priority != b.priority) {
+                return a.priority > b.priority;
+              } else {
+                return a.name < b.name;
+              }
+            });
+  return result;
 }
 
 /*******************************************************************************
@@ -677,6 +792,7 @@ template QString WorkspaceLibraryDb::getTable<Symbol>() noexcept;
 template QString WorkspaceLibraryDb::getTable<Package>() noexcept;
 template QString WorkspaceLibraryDb::getTable<Component>() noexcept;
 template QString WorkspaceLibraryDb::getTable<Device>() noexcept;
+template QString WorkspaceLibraryDb::getTable<Organization>() noexcept;
 
 template <typename ElementType>
 QString WorkspaceLibraryDb::getCategoryTable() noexcept {

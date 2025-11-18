@@ -42,6 +42,7 @@ namespace librepcb {
 class Component;
 class ComponentCategory;
 class Device;
+class Organization;
 class Package;
 class PackageCategory;
 class SQLiteDatabase;
@@ -100,6 +101,41 @@ public:
       }
       return false;
     }
+  };
+  struct PcbDesignRules {
+    Uuid uuid;
+    QString name;
+    QString description;
+    QUrl url;
+    int maxLayerCount;
+  };
+  enum class OutputJobKind : int {
+    Pcb = 1,
+    Assembly = 2,
+    User = 99,
+  };
+  struct OutputJob {
+    OutputJobKind kind;
+    Uuid uuid;
+    QString type;
+    QString name;
+  };
+  struct Organization {
+    int id;
+    FilePath elemDir;
+    Uuid uuid;
+    QString name;
+    QString description;
+    Version version;
+    QPixmap logo;
+    QUrl url;
+    QString country;
+    QStringList fabs;
+    QStringList shipping;
+    bool isSponsor;
+    int priority;
+    QList<PcbDesignRules> pcbDesignRules;
+    QList<OutputJob> outputJobs;
   };
 
   // Constructors / Destructor
@@ -454,6 +490,19 @@ public:
    */
   QList<Part> getDeviceParts(const Uuid& device) const;
 
+  /**
+   * @brief Get all organizations (only the latest version of each)
+   *
+   * @param localeOrder    Locale order (highest priority first).
+   * @param pcbDesignRules If `true`, the PCB design rules will be populated.
+   * @param outputJobs     If `true`, the output jobs will be populated.
+   *
+   * @return List of all organizations and their content.
+   */
+  QList<Organization> getAllLatestOrganizations(const QStringList& localeOrder,
+                                                bool pcbDesignRules,
+                                                bool outputJobs) const;
+
   // General Methods
 
   /**
@@ -519,7 +568,7 @@ private:
   QScopedPointer<WorkspaceLibraryScanner> mLibraryScanner;
 
   // Constants
-  static const int sCurrentDbVersion = 7;
+  static const int sCurrentDbVersion = 8;
 };
 
 /*******************************************************************************
