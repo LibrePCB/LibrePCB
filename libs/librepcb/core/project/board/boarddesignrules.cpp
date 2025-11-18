@@ -40,7 +40,7 @@ BoardDesignRules::BoardDesignRules() noexcept
     mDefaultTraceWidth(500000),  // 0.5mm
     mDefaultViaDrillDiameter(300000),  // 0.3mm
     // stop mask
-    mStopMaskMaxViaDrillDiameter(500000),  // 0.5mm
+    mStopMaskMaxViaDrillDiameter(300000),  // 0.3mm
     mStopMaskClearance(UnsignedRatio(Ratio::fromPercent(0)),  // 0%
                        UnsignedLength(100000),  // 0.1mm
                        UnsignedLength(100000)),  // 0.1mm
