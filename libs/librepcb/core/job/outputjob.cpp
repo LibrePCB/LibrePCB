@@ -49,37 +49,42 @@ namespace librepcb {
  ******************************************************************************/
 
 template <>
+std::shared_ptr<OutputJob> deserialize(const SExpression& node) {
+  const QString type = node.getChild("type/@0").getValue();  // can throw
+  if (type == GraphicsOutputJob::getTypeName()) {
+    return std::make_shared<GraphicsOutputJob>(node);
+  } else if (type == GerberExcellonOutputJob::getTypeName()) {
+    return std::make_shared<GerberExcellonOutputJob>(node);
+  } else if (type == PickPlaceOutputJob::getTypeName()) {
+    return std::make_shared<PickPlaceOutputJob>(node);
+  } else if (type == GerberX3OutputJob::getTypeName()) {
+    return std::make_shared<GerberX3OutputJob>(node);
+  } else if (type == NetlistOutputJob::getTypeName()) {
+    return std::make_shared<NetlistOutputJob>(node);
+  } else if (type == BomOutputJob::getTypeName()) {
+    return std::make_shared<BomOutputJob>(node);
+  } else if (type == InteractiveHtmlBomOutputJob::getTypeName()) {
+    return std::make_shared<InteractiveHtmlBomOutputJob>(node);
+  } else if (type == Board3DOutputJob::getTypeName()) {
+    return std::make_shared<Board3DOutputJob>(node);
+  } else if (type == ProjectJsonOutputJob::getTypeName()) {
+    return std::make_shared<ProjectJsonOutputJob>(node);
+  } else if (type == LppzOutputJob::getTypeName()) {
+    return std::make_shared<LppzOutputJob>(node);
+  } else if (type == CopyOutputJob::getTypeName()) {
+    return std::make_shared<CopyOutputJob>(node);
+  } else if (type == ArchiveOutputJob::getTypeName()) {
+    return std::make_shared<ArchiveOutputJob>(node);
+  } else {
+    return std::make_shared<UnknownOutputJob>(node);
+  }
+}
+
+template <>
 OutputJobList deserialize(const SExpression& node) {
   OutputJobList result;
   foreach (const SExpression* child, node.getChildren("job")) {
-    const QString type = child->getChild("type/@0").getValue();  // can throw
-    if (type == GraphicsOutputJob::getTypeName()) {
-      result.append(std::make_shared<GraphicsOutputJob>(*child));
-    } else if (type == GerberExcellonOutputJob::getTypeName()) {
-      result.append(std::make_shared<GerberExcellonOutputJob>(*child));
-    } else if (type == PickPlaceOutputJob::getTypeName()) {
-      result.append(std::make_shared<PickPlaceOutputJob>(*child));
-    } else if (type == GerberX3OutputJob::getTypeName()) {
-      result.append(std::make_shared<GerberX3OutputJob>(*child));
-    } else if (type == NetlistOutputJob::getTypeName()) {
-      result.append(std::make_shared<NetlistOutputJob>(*child));
-    } else if (type == BomOutputJob::getTypeName()) {
-      result.append(std::make_shared<BomOutputJob>(*child));
-    } else if (type == InteractiveHtmlBomOutputJob::getTypeName()) {
-      result.append(std::make_shared<InteractiveHtmlBomOutputJob>(*child));
-    } else if (type == Board3DOutputJob::getTypeName()) {
-      result.append(std::make_shared<Board3DOutputJob>(*child));
-    } else if (type == ProjectJsonOutputJob::getTypeName()) {
-      result.append(std::make_shared<ProjectJsonOutputJob>(*child));
-    } else if (type == LppzOutputJob::getTypeName()) {
-      result.append(std::make_shared<LppzOutputJob>(*child));
-    } else if (type == CopyOutputJob::getTypeName()) {
-      result.append(std::make_shared<CopyOutputJob>(*child));
-    } else if (type == ArchiveOutputJob::getTypeName()) {
-      result.append(std::make_shared<ArchiveOutputJob>(*child));
-    } else {
-      result.append(std::make_shared<UnknownOutputJob>(*child));
-    }
+    result.append(deserialize<std::shared_ptr<OutputJob>>(*child));
   }
   return result;
 }
