@@ -241,7 +241,7 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
       [this]() {
         std::shared_ptr<Notification> n = std::make_shared<Notification>(
             ui::NotificationType::Progress, tr("Scanning Libraries") % "...",
-            tr("The internal libraries database is beeing updated. This may "
+            tr("The internal libraries database is being updated. This may "
                "take a few minutes and in the mean time you might see outdated "
                "information about libraries."),
             QString(), QString(), false);
