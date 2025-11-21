@@ -29,6 +29,7 @@
 #include "../library/cmp/component.h"
 #include "../library/dev/device.h"
 #include "../library/library.h"
+#include "../library/org/organization.h"
 #include "../library/pkg/package.h"
 #include "../library/sym/symbol.h"
 #include "../sqlitedatabase.h"
@@ -139,10 +140,12 @@ void WorkspaceLibraryScanner::scan() noexcept {
     writer.removeAllElements<Package>();
     writer.removeAllElements<Component>();
     writer.removeAllElements<Device>();
+    writer.removeAllElements<Organization>();
 
     // scan all libraries
     int count = 0;
     qreal percent = 1;
+    const int fraction = libraries.count() * 7;
     foreach (const std::shared_ptr<Library>& lib, libraries) {
       FilePath fp = lib->getDirectory().getAbsPath();
       Q_ASSERT(libIds.contains(fp));
@@ -150,27 +153,31 @@ void WorkspaceLibraryScanner::scan() noexcept {
       if (mAbort || (mSemaphore.available() > 0)) break;
       count += addElementsToDb<ComponentCategory>(
           writer, fp, lib->searchForElements<ComponentCategory>(), libId);
-      emit scanProgressUpdate(percent += qreal(98) / (libraries.count() * 6));
+      emit scanProgressUpdate(percent += qreal(98) / fraction);
       if (mAbort || (mSemaphore.available() > 0)) break;
       count += addElementsToDb<PackageCategory>(
           writer, fp, lib->searchForElements<PackageCategory>(), libId);
-      emit scanProgressUpdate(percent += qreal(98) / (libraries.count() * 6));
+      emit scanProgressUpdate(percent += qreal(98) / fraction);
       if (mAbort || (mSemaphore.available() > 0)) break;
       count += addElementsToDb<Symbol>(writer, fp,
                                        lib->searchForElements<Symbol>(), libId);
-      emit scanProgressUpdate(percent += qreal(98) / (libraries.count() * 6));
+      emit scanProgressUpdate(percent += qreal(98) / fraction);
       if (mAbort || (mSemaphore.available() > 0)) break;
       count += addElementsToDb<Package>(
           writer, fp, lib->searchForElements<Package>(), libId);
-      emit scanProgressUpdate(percent += qreal(98) / (libraries.count() * 6));
+      emit scanProgressUpdate(percent += qreal(98) / fraction);
       if (mAbort || (mSemaphore.available() > 0)) break;
       count += addElementsToDb<Component>(
           writer, fp, lib->searchForElements<Component>(), libId);
-      emit scanProgressUpdate(percent += qreal(98) / (libraries.count() * 6));
+      emit scanProgressUpdate(percent += qreal(98) / fraction);
       if (mAbort || (mSemaphore.available() > 0)) break;
       count += addElementsToDb<Device>(writer, fp,
                                        lib->searchForElements<Device>(), libId);
-      emit scanProgressUpdate(percent += qreal(98) / (libraries.count() * 6));
+      emit scanProgressUpdate(percent += qreal(98) / fraction);
+      if (mAbort || (mSemaphore.available() > 0)) break;
+      count += addElementsToDb<Organization>(
+          writer, fp, lib->searchForElements<Organization>(), libId);
+      emit scanProgressUpdate(percent += qreal(98) / fraction);
     }
 
     // commit transaction
@@ -365,6 +372,40 @@ int WorkspaceLibraryScanner::addElementToDb<Device>(
       }
     }
   }
+  return id;
+}
+
+static void addOrganizationOutputJobs(WorkspaceLibraryDbWriter& writer,
+                                      int orgId,
+                                      WorkspaceLibraryDb::OutputJobKind kind,
+                                      const OutputJobList& jobs) {
+  for (const auto& job : jobs) {
+    writer.addOrganizationOutputJob(orgId, kind, job.getUuid(), job.getType(),
+                                    *job.getName());
+  }
+}
+
+template <>
+int WorkspaceLibraryScanner::addElementToDb<Organization>(
+    WorkspaceLibraryDbWriter& writer, int libId, const Organization& element) {
+  const int id = writer.addOrganization(
+      libId, element.getDirectory().getAbsPath(), element.getUuid(),
+      element.getVersion(), element.isDeprecated(), element.getLogoPng(),
+      element.getUrl(), element.getCountry(), element.getFabs(),
+      element.getShipping(), element.isSponsor(), element.getPriority());
+  for (const OrganizationPcbDesignRules& dru : element.getPcbDesignRules()) {
+    writer.addOrganizationPcbDesignRules(
+        id, dru.getUuid(), *dru.getNames().getDefaultValue(),
+        dru.getDescriptions().getDefaultValue(), dru.getUrl(),
+        dru.getDrcSettings(false).getMaxLayerCount());
+  }
+  addOrganizationOutputJobs(writer, id, WorkspaceLibraryDb::OutputJobKind::Pcb,
+                            element.getPcbOutputJobs());
+  addOrganizationOutputJobs(writer, id,
+                            WorkspaceLibraryDb::OutputJobKind::Assembly,
+                            element.getAssemblyOutputJobs());
+  addOrganizationOutputJobs(writer, id, WorkspaceLibraryDb::OutputJobKind::User,
+                            element.getUserOutputJobs());
   return id;
 }
 

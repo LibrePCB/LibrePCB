@@ -118,31 +118,41 @@ void FileFormatMigrationUnstable::upgradeOutputJobs(SExpression& root,
 
 void FileFormatMigrationUnstable::upgradeCircuit(SExpression& root,
                                                  QList<Message>& messages) {
+  Q_UNUSED(root);
   Q_UNUSED(messages);
-
-  // Net classes.
-  for (SExpression* classNode : root.getChildren("netclass")) {
-    classNode->appendChild("default_trace_width",
-                           SExpression::createToken("inherit"));
-    classNode->appendChild("default_via_drill_diameter",
-                           SExpression::createToken("inherit"));
-    classNode->appendChild("min_copper_copper_clearance",
-                           SExpression::createToken("0"));
-    classNode->appendChild("min_copper_width", SExpression::createToken("0"));
-    classNode->appendChild("min_via_drill_diameter",
-                           SExpression::createToken("0"));
-  }
 }
 
 void FileFormatMigrationUnstable::upgradeBoard(SExpression& root) {
-  // Design rules
+  // DRC settings.
+  SExpression& drcNode = root.getChild("design_rule_check");
+  drcNode.ensureLineBreak();
   {
-    SExpression& rulesNode = root.getChild("design_rules");
-    rulesNode.appendChild("default_trace_width",
-                          SExpression::createToken("0.5"));
-    rulesNode.appendChild("default_via_drill_diameter",
-                          SExpression::createToken("0.3"));
+    SExpression& child = drcNode.appendList("min_pcb_size");
+    child.appendChild(SExpression::createToken("0.0"));
+    child.appendChild(SExpression::createToken("0.0"));
   }
+  drcNode.ensureLineBreak();
+  {
+    SExpression& child = drcNode.appendList("max_pcb_size");
+    SExpression& doubleSided = child.appendList("double_sided");
+    doubleSided.appendChild(SExpression::createToken("0.0"));
+    doubleSided.appendChild(SExpression::createToken("0.0"));
+    SExpression& multilayer = child.appendList("multilayer");
+    multilayer.appendChild(SExpression::createToken("0.0"));
+    multilayer.appendChild(SExpression::createToken("0.0"));
+  }
+  drcNode.ensureLineBreak();
+  drcNode.appendList("pcb_thickness");
+  drcNode.ensureLineBreak();
+  drcNode.appendChild("max_layers", SExpression::createToken("0"));
+  drcNode.ensureLineBreak();
+  drcNode.appendList("solder_resist");
+  drcNode.ensureLineBreak();
+  drcNode.appendList("silkscreen");
+  drcNode.ensureLineBreak();
+  drcNode.appendChild("max_tented_via_drill_diameter",
+                      SExpression::createToken("0.5"));
+  drcNode.ensureLineBreak();
 }
 
 /*******************************************************************************

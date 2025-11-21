@@ -36,6 +36,7 @@
 #include "library/lib/librarytab.h"
 #include "library/librariesmodel.h"
 #include "library/libraryeditor.h"
+#include "library/org/organizationtab.h"
 #include "library/pkg/packagetab.h"
 #include "library/sym/symboltab.h"
 #include "mainwindowtestadapter.h"
@@ -61,6 +62,7 @@
 #include <librepcb/core/library/cat/packagecategory.h>
 #include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/library/dev/device.h>
+#include <librepcb/core/library/org/organization.h>
 #include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/library/sym/symbol.h>
 #include <librepcb/core/project/erc/electricalrulecheckmessages.h>
@@ -728,6 +730,12 @@ void MainWindow::triggerLibrary(slint::SharedString path,
       }
       break;
     }
+    case ui::LibraryAction::NewOrganization: {
+      if (auto editor = mApp.getLibrary(fp)) {
+        openOrganizationTab(*editor, FilePath(), false);
+      }
+      break;
+    }
     default: {
       qWarning() << "Unhandled action in triggerLibrary():"
                  << static_cast<int>(a);
@@ -938,6 +946,8 @@ void MainWindow::openLibraryTab(const FilePath& fp, bool wizardMode) noexcept {
               &MainWindow::openComponentTab);
       connect(tab.get(), &LibraryTab::deviceEditorRequested, this,
               &MainWindow::openDeviceTab);
+      connect(tab.get(), &LibraryTab::organizationEditorRequested, this,
+              &MainWindow::openOrganizationTab);
       addTab(tab);
     }
   }
@@ -1365,6 +1375,54 @@ void MainWindow::openDeviceTab(LibraryEditor& editor, const FilePath& fp,
         }
       }
       addTab(std::make_shared<DeviceTab>(editor, std::move(dev), mode));
+    } catch (const Exception& e) {
+      QMessageBox::critical(mWidget, tr("Error"), e.getMsg());
+    }
+  }
+}
+
+void MainWindow::openOrganizationTab(LibraryEditor& editor, const FilePath& fp,
+                                     bool copyFrom) noexcept {
+  if (copyFrom || (!switchToLibraryElementTab<OrganizationTab>(fp))) {
+    try {
+      std::unique_ptr<Organization> org;
+      OrganizationTab::Mode mode = OrganizationTab::Mode::Open;
+      if (fp.isValid() && (!copyFrom)) {
+        auto fs = TransactionalFileSystem::open(
+            fp, editor.isWritable(), &askForRestoringBackup,
+            DirectoryLockHandlerDialog::createDirectoryLockCallback());
+        org = Organization::open(std::unique_ptr<TransactionalDirectory>(
+            new TransactionalDirectory(fs)));
+      } else {
+        mode = OrganizationTab::Mode::New;
+        org.reset(new Organization(
+            Uuid::createRandom(), Version::fromString("0.1"),
+            mApp.getWorkspace().getSettings().userName.get(),
+            ElementName("New Organization"), QString(), QString()));
+        if (copyFrom) {
+          mode = OrganizationTab::Mode::Duplicate;
+          auto fs = TransactionalFileSystem::openRO(fp, &askForRestoringBackup);
+          std::unique_ptr<Organization> src =
+              Organization::open(std::unique_ptr<TransactionalDirectory>(
+                  new TransactionalDirectory(fs)));
+          org->setNames(copyLibraryElementNames(src->getNames()));
+          org->setDescriptions(src->getDescriptions());
+          org->setKeywords(src->getKeywords());
+          org->setMessageApprovals(src->getMessageApprovals());
+          org->setLogoPng(src->getLogoPng());
+          org->setUrl(src->getUrl());
+          org->setCountry(src->getCountry());
+          org->setFabs(src->getFabs());
+          org->setShipping(src->getShipping());
+          org->setIsSponsor(src->isSponsor());
+          org->setPriority(src->getPriority());
+          org->setPcbDesignRules(src->getPcbDesignRules());
+          org->setPcbOutputJobs(src->getPcbOutputJobs());
+          org->setAssemblyOutputJobs(src->getAssemblyOutputJobs());
+          org->setUserOutputJobs(src->getUserOutputJobs());
+        }
+      }
+      addTab(std::make_shared<OrganizationTab>(editor, std::move(org), mode));
     } catch (const Exception& e) {
       QMessageBox::critical(mWidget, tr("Error"), e.getMsg());
     }

@@ -6,7 +6,7 @@ import pytest
 
 
 class Library:
-    def __init__(self, dir, cmpcat, pkgcat, sym, pkg, cmp, dev):
+    def __init__(self, dir, cmpcat, pkgcat, sym, pkg, cmp, dev, org):
         self.dir = dir
         self.cmpcat = cmpcat
         self.pkgcat = pkgcat
@@ -14,12 +14,13 @@ class Library:
         self.pkg = pkg
         self.cmp = cmp
         self.dev = dev
+        self.org = org
 
 
-EMPTY_LIBRARY = Library("Empty Library.lplib", 0, 0, 0, 0, 0, 0)
+EMPTY_LIBRARY = Library("Empty Library.lplib", 0, 0, 0, 0, 0, 0, 0)
 EMPTY_LIBRARY_PARAM = pytest.param(EMPTY_LIBRARY, id="EmptyLibrary")
 
-POPULATED_LIBRARY = Library("Populated Library.lplib", 10, 4, 19, 8, 15, 8)
+POPULATED_LIBRARY = Library("Populated Library.lplib", 10, 4, 19, 8, 15, 8, 2)
 POPULATED_LIBRARY_PARAM = pytest.param(POPULATED_LIBRARY, id="PopulatedLibrary")
 
 

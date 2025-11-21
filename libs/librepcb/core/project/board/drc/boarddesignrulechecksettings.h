@@ -23,7 +23,12 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../../types/elementname.h"
 #include "../../../types/length.h"
+#include "../../../types/uuid.h"
+#include "../../../types/version.h"
+
+#include <unordered_set>
 
 #include <QtCore>
 
@@ -32,6 +37,7 @@
  ******************************************************************************/
 namespace librepcb {
 
+class PcbColor;
 class SExpression;
 
 /*******************************************************************************
@@ -44,6 +50,27 @@ class SExpression;
 class BoardDesignRuleCheckSettings final {
 public:
   // Types
+  struct Source {
+    Uuid organizationUuid;
+    ElementName organizationName;
+    Version organizationVersion;
+    Uuid pcbDesignRulesUuid;
+    ElementName pcbDesignRulesName;
+
+    static Source load(const SExpression& node);
+    void serialize(SExpression& root) const;
+    bool operator==(const Source& rhs) const noexcept = default;
+  };
+  struct SourceSetCmp {
+    std::size_t operator()(const Source& s) const noexcept {
+      return ::qHash(std::make_pair(s.organizationUuid, s.pcbDesignRulesUuid));
+    }
+    bool operator()(const Source& lhs, const Source& rhs) const noexcept {
+      return (lhs.organizationUuid == rhs.organizationUuid) &&
+          (lhs.pcbDesignRulesUuid == rhs.pcbDesignRulesUuid);
+    }
+  };
+  typedef std::unordered_set<Source, SourceSetCmp, SourceSetCmp> SourceSet;
   enum class AllowedSlots : int {
     None = 0,  ///< No slots are allowed at all.
     SingleSegmentStraight = 1,  ///< Straight single-segment slots are allowed.
@@ -59,6 +86,29 @@ public:
   ~BoardDesignRuleCheckSettings() noexcept;
 
   // Getters
+  const SourceSet& getSources() const noexcept { return mSources; }
+  const std::pair<UnsignedLength, UnsignedLength>& getMinBoardSize()
+      const noexcept {
+    return mMinBoardSize;
+  }
+  const std::pair<UnsignedLength, UnsignedLength>& getMaxBoardSizeDoubleSided()
+      const noexcept {
+    return mMaxBoardSizeDoubleSided;
+  }
+  const std::pair<UnsignedLength, UnsignedLength>& getMaxBoardSizeMultiLayer()
+      const noexcept {
+    return mMaxBoardSizeMultiLayer;
+  }
+  const QSet<PositiveLength>& getPcbThickness() const noexcept {
+    return mPcbThickness;
+  }
+  uint getMaxLayerCount() const noexcept { return mMaxLayerCount; }
+  const QSet<const PcbColor*>& getSolderResist() const noexcept {
+    return mSolderResist;
+  }
+  const QSet<const PcbColor*>& getSilkscreen() const noexcept {
+    return mSilkscreen;
+  }
   const UnsignedLength& getMinCopperCopperClearance() const noexcept {
     return mMinCopperCopperClearance;
   }
@@ -95,6 +145,9 @@ public:
   const UnsignedLength& getMinPthSlotWidth() const noexcept {
     return mMinPthSlotWidth;
   }
+  const UnsignedLength& getMaxTentedViaDrillDiameter() const noexcept {
+    return mMaxTentedViaDrillDiameter;
+  }
   const UnsignedLength& getMinSilkscreenWidth() const noexcept {
     return mMinSilkscreenWidth;
   }
@@ -110,8 +163,34 @@ public:
     return mAllowedNpthSlots;
   }
   AllowedSlots getAllowedPthSlots() const noexcept { return mAllowedPthSlots; }
+  const QMap<QString, QList<SExpression>>& getOptions() const noexcept {
+    return mOptions;
+  }
 
   // Setters
+  void setSources(const SourceSet& value) noexcept { mSources = value; }
+  void setMinBoardSize(
+      const std::pair<UnsignedLength, UnsignedLength>& value) noexcept {
+    mMinBoardSize = value;
+  }
+  void setMaxBoardSizeDoubleSided(
+      const std::pair<UnsignedLength, UnsignedLength>& value) noexcept {
+    mMaxBoardSizeDoubleSided = value;
+  }
+  void setMaxBoardSizeMultiLayer(
+      const std::pair<UnsignedLength, UnsignedLength>& value) noexcept {
+    mMaxBoardSizeMultiLayer = value;
+  }
+  void setPcbThickness(const QSet<PositiveLength>& value) noexcept {
+    mPcbThickness = value;
+  }
+  void setMaxLayerCount(uint value) noexcept { mMaxLayerCount = value; }
+  void setSolderResist(const QSet<const PcbColor*>& value) noexcept {
+    mSolderResist = value;
+  }
+  void setSilkscreen(const QSet<const PcbColor*>& value) noexcept {
+    mSilkscreen = value;
+  }
   void setMinCopperCopperClearance(const UnsignedLength& value) noexcept {
     mMinCopperCopperClearance = value;
   }
@@ -148,6 +227,9 @@ public:
   void setMinPthSlotWidth(const UnsignedLength& value) noexcept {
     mMinPthSlotWidth = value;
   }
+  void setMaxTentedViaDrillDiameter(const UnsignedLength& value) noexcept {
+    mMaxTentedViaDrillDiameter = value;
+  }
   void setMinSilkscreenWidth(const UnsignedLength& value) noexcept {
     mMinSilkscreenWidth = value;
   }
@@ -164,6 +246,9 @@ public:
   }
   void setAllowedPthSlots(AllowedSlots value) noexcept {
     mAllowedPthSlots = value;
+  }
+  void setOptions(const QMap<QString, QList<SExpression>>& value) noexcept {
+    mOptions = value;
   }
 
   // General Methods
@@ -184,6 +269,18 @@ public:
   }
 
 private:  // Data
+  // Internal data
+  SourceSet mSources;
+
+  // General PCB manufacturer capabilities
+  std::pair<UnsignedLength, UnsignedLength> mMinBoardSize;
+  std::pair<UnsignedLength, UnsignedLength> mMaxBoardSizeDoubleSided;
+  std::pair<UnsignedLength, UnsignedLength> mMaxBoardSizeMultiLayer;
+  QSet<PositiveLength> mPcbThickness;  ///< No restrictions if empty
+  uint mMaxLayerCount;  ///< 0 = Check disabled
+  QSet<const PcbColor*> mSolderResist;  ///< Empty=any/unknown. `nullptr`=none
+  QSet<const PcbColor*> mSilkscreen;  ///< Empty=any/unknown. `nullptr`=none
+
   // Clearances
   UnsignedLength mMinCopperCopperClearance;
   UnsignedLength mMinCopperBoardClearance;
@@ -192,13 +289,14 @@ private:  // Data
   UnsignedLength mMinDrillBoardClearance;
   UnsignedLength mMinSilkscreenStopmaskClearance;
 
-  // Minimum sizes
+  // Minimum/maximum sizes
   UnsignedLength mMinCopperWidth;
   UnsignedLength mMinPthAnnularRing;
   UnsignedLength mMinNpthDrillDiameter;
   UnsignedLength mMinPthDrillDiameter;
   UnsignedLength mMinNpthSlotWidth;
   UnsignedLength mMinPthSlotWidth;
+  UnsignedLength mMaxTentedViaDrillDiameter;
   UnsignedLength mMinSilkscreenWidth;
   UnsignedLength mMinSilkscreenTextHeight;
   UnsignedLength mMinOutlineToolDiameter;
@@ -208,6 +306,10 @@ private:  // Data
   bool mBuriedViasAllowed;
   AllowedSlots mAllowedNpthSlots;
   AllowedSlots mAllowedPthSlots;
+
+  // Arbitrary options for forward compatibility in case we really need to
+  // add new settings in a minor release.
+  QMap<QString, QList<SExpression>> mOptions;
 };
 
 /*******************************************************************************

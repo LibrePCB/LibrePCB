@@ -260,6 +260,7 @@ export enum RuleCheckType {
     package-check,
     component-check,
     device-check,
+    organization-check,
 }
 
 export enum RuleCheckState {
@@ -295,6 +296,25 @@ export struct RuleCheckData {
     errors: int,  // Messages of error severity, no matter if approved or not
     execution-error: string,  // Empty if no error
     read-only: bool,
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Workspace library database
+////////////////////////////////////////////////////////////////////////////////
+
+// Library database entry for organization PCB design rules
+export struct OrganizationPcbDesignRulesDbData {
+    uuid: string,
+    name: string,
+    url: string,
+}
+
+// Library database entry for organizations
+export struct OrganizationDbData {
+    uuid: string,
+    name: string,
+    priority: int,
+    pcb-design-rules: [OrganizationPcbDesignRulesDbData],
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -367,6 +387,7 @@ export enum LibraryTreeViewItemType {
     component,
     symbol,
     package,
+    organization,
 }
 
 // Library content tree view item data structure
@@ -556,6 +577,21 @@ export struct DeviceInteractivePinoutSignalData {
     used: bool,  // Whether any pad is already assigned to this signal
 }
 
+// Actions for OrganizationPcbDesignRulesData
+export enum OrganizationPcbDesignRulesAction {
+    none,
+    edit,
+    rename,
+    duplicate,
+    delete,
+}
+
+// Organization PCB design rules data structure
+export struct OrganizationPcbDesignRulesData {
+    name: string,
+    action: OrganizationPcbDesignRulesAction,  // Set by UI, reset by backend
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Tabs
 ////////////////////////////////////////////////////////////////////////////////
@@ -607,6 +643,7 @@ export enum TabType {
     package,
     component,
     device,
+    organization,
     schematic,
     board-2d,
     board-3d,
@@ -715,6 +752,11 @@ export enum TabAction {
     device-pinout-connect-auto,
     device-pinout-connect-interactively,
     device-pinout-load-from-file,
+
+    // Organization tab
+    organization-add-pcb-design-rules,
+    organization-edit-pcb-output-jobs,
+    organization-edit-assembly-output-jobs,
 
     // Board 2D tab
     board-place-component,
@@ -1137,6 +1179,33 @@ export struct DeviceTabData {
     new-category: string,  // Set to UUID by UI, reset by backend
 }
 
+// Additional data for organization editor tabs
+export struct OrganizationTabData {
+    // General
+    library-index: int,
+    path: string,
+
+    // Metadata
+    logo: image,
+    name: string,
+    name-error: string,
+    description: string,
+    keywords: string,
+    author: string,
+    version: string,
+    version-error: string,
+    deprecated: bool,
+    url: string,
+    url-error: string,
+    priority: int,
+    pcb-design-rules: [OrganizationPcbDesignRulesData],
+    pcb-output-jobs: int,
+    assembly-output-jobs: int,
+
+    // Checks
+    checks: RuleCheckData,
+}
+
 // Additional data for schematic editor tabs
 export struct SchematicTabData {
     project-index: int,
@@ -1189,6 +1258,7 @@ export struct Board2dTabData {
 
     // Messages
     empty-schematics-msg: DismissableMessageData,
+    setup-design-rules-msg: DismissableMessageData,
     place-devices-msg: DismissableMessageData,
 
     // Unplaced components.
@@ -1226,6 +1296,9 @@ export struct Board2dTabData {
 
     scene-image-pos: Point,  // Absolute position of graphics scene
     frame: int,  // Frame index to trigger repainting
+
+    // Actions
+    set-design-rules: string,  // Set to "UUID:UUID" by UI, reset by backend
 }
 
 // Additional data for board 3D viewer tabs
@@ -1266,6 +1339,7 @@ export struct WindowSectionData {
     package-tabs: [PackageTabData],  // Proxy view for `tabs`
     component-tabs: [ComponentTabData],  // Proxy view for `tabs`
     device-tabs: [DeviceTabData],  // Proxy view for `tabs`
+    organization-tabs: [OrganizationTabData],  // Proxy view for `tabs`.
     schematic-tabs: [SchematicTabData],  // Proxy view for `tabs`
     board-2d-tabs: [Board2dTabData],  // Proxy view for `tabs`
     board-3d-tabs: [Board3dTabData],  // Proxy view for `tabs`
@@ -1287,6 +1361,7 @@ export enum LibraryAction {
     new-package,
     new-component,
     new-device,
+    new-organization,
 }
 
 // Workspace library data structure

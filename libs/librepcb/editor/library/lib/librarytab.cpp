@@ -72,6 +72,7 @@ LibraryTab::LibraryTab(LibraryEditor& editor, bool wizardMode,
                                                mLibrary.getUuid())),
     mCmpCatElementCount(0),
     mPkgCatElementCount(0),
+    mOrganizationsElementCount(0),
     mCategories(new slint::VectorModel<ui::LibraryTreeViewItemData>()),
     mElements(new slint::VectorModel<ui::LibraryTreeViewItemData>()),
     mFilteredElements(new slint::FilterModel<ui::LibraryTreeViewItemData>(
@@ -324,7 +325,12 @@ void LibraryTab::trigger(ui::TabAction a) noexcept {
             emit deviceEditorRequested(mEditor, item->path, false);
             break;
           }
+          case ui::LibraryTreeViewItemType::Organization: {
+            emit organizationEditorRequested(mEditor, item->path, false);
+            break;
+          }
           default: {
+            qCritical() << "Action on unknown item type triggered.";
             break;
           }
         }
@@ -527,11 +533,14 @@ void LibraryTab::refreshLibElements() noexcept {
   mLibElementsMap.clear();
   mCmpCatElementCount = 0;
   mPkgCatElementCount = 0;
+  mOrganizationsElementCount = 0;
 
   mUncategorizedRoot =
       createRootItem(ui::LibraryTreeViewItemType::Uncategorized);
   mCmpCatRoot = createRootItem(ui::LibraryTreeViewItemType::ComponentCategory);
   mPkgCatRoot = createRootItem(ui::LibraryTreeViewItemType::PackageCategory);
+  mOrganizationsRoot =
+      createRootItem(ui::LibraryTreeViewItemType::Organization);
 
   loadCategories<ComponentCategory>(
       ui::LibraryTreeViewItemType::ComponentCategory, *mCmpCatRoot);
@@ -554,12 +563,15 @@ void LibraryTab::refreshLibElements() noexcept {
       ui::LibraryTreeViewItemType::Device,
       ui::LibraryTreeViewItemType::ComponentCategory, *mCmpCatRoot,
       mCmpCatElementCount);
+  loadOrganizations();
 
   sortItemsRecursive(mCmpCatRoot->childs);
   sortItemsRecursive(mPkgCatRoot->childs);
+  sortItemsRecursive(mOrganizationsRoot->childs);
 
   mCategories->clear();
-  const int count = mCmpCatElementCount + mPkgCatElementCount;
+  const int count =
+      mCmpCatElementCount + mPkgCatElementCount + mOrganizationsElementCount;
   mCategories->push_back(ui::LibraryTreeViewItemData{
       ui::LibraryTreeViewItemType::All,  // Type
       0,  // Level
@@ -578,6 +590,17 @@ void LibraryTab::refreshLibElements() noexcept {
                        *mCmpCatRoot, mCmpCatElementCount);
   addCategoriesToModel(ui::LibraryTreeViewItemType::PackageCategory,
                        *mPkgCatRoot, mPkgCatElementCount);
+  if (!mOrganizationsRoot->childs.isEmpty()) {
+    mCategories->push_back(ui::LibraryTreeViewItemData{
+        ui::LibraryTreeViewItemType::Organization,  // Type
+        0,  // Level
+        slint::SharedString(),  // Name (set in UI)
+        slint::SharedString(),  // Summary
+        mOrganizationsElementCount,  // Elements
+        false,  // Is external
+        q2s(mOrganizationsRoot->userData),  // User data
+    });
+  }
 
   qDebug() << "Finished category tree model update in" << t.elapsed() << "ms.";
 
@@ -693,6 +716,27 @@ void LibraryTab::loadElements(ui::LibraryTreeViewItemType type,
   }
 }
 
+void LibraryTab::loadOrganizations() {
+  try {
+    const QSet<FilePath> elements = Toolbox::toSet(
+        mDb.getAll<Organization>(mLibrary.getDirectory().getAbsPath()).keys());
+    mOrganizationsElementCount = elements.count();
+    for (const FilePath& fp : elements) {
+      auto item = std::make_shared<TreeItem>();
+      item->type = ui::LibraryTreeViewItemType::Organization;
+      item->path = fp;
+      item->userData = fp.toStr();
+      mDb.getTranslations<Organization>(fp, mLocaleOrder, &item->name,
+                                        &item->summary);
+      item->summary = item->summary.split("\n").first().left(200);
+      mOrganizationsRoot->childs.push_back(item);
+      mLibElementsMap.insert(fp.toStr(), item);
+    }
+  } catch (const Exception& e) {
+    qCritical() << "Failed to load elements:" << e.getMsg();
+  }
+}
+
 void LibraryTab::sortItemsRecursive(
     QVector<std::shared_ptr<TreeItem>>& items) noexcept {
   Toolbox::sortNumeric(
@@ -782,9 +826,10 @@ void LibraryTab::setSelectedCategory(
       ui::LibraryTreeViewItemType::Package,
       ui::LibraryTreeViewItemType::Component,
       ui::LibraryTreeViewItemType::Device,
+      ui::LibraryTreeViewItemType::Organization,
   };
   for (auto item : items) {
-    if (!types.contains(item->type)) {
+    if ((!item->childs.isEmpty()) || (!types.contains(item->type))) {
       continue;
     }
     if (item->type != type) {
@@ -878,7 +923,12 @@ void LibraryTab::duplicateElements(
       emit deviceEditorRequested(mEditor, item->path, true);
       break;
     }
+    case ui::LibraryTreeViewItemType::Organization: {
+      emit organizationEditorRequested(mEditor, item->path, true);
+      break;
+    }
     default: {
+      qCritical() << "Action on unknown item type triggered.";
       break;
     }
   }

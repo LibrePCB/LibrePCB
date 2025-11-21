@@ -27,6 +27,7 @@ import {
     DismissableMessageAction,
     EditorCommandSet as Cmd,
     EditorTool,
+    OrganizationDbData,
     PanelPage,
     ProjectData,
     TabAction,
@@ -208,6 +209,109 @@ export component Board2dTab inherits Tab {
 
                 dont-show-again-clicked => {
                     tabs[index].empty-schematics-msg.action = DismissableMessageAction.dont-show-again;
+                }
+            }
+
+            if tabs[index].setup-design-rules-msg.visible: setup-design-rules-msg := MessageBox {
+                title: @tr("Set Up Design Rules");
+                supports-dont-show-again: tabs[index].setup-design-rules-msg.supports-dont-show-again;
+
+                Text {
+                    wrap: word-wrap;
+                    color: parent.text-color;
+                    text: @tr("Before starting with the board design, it is highly recommended to set up the design rules to be used for this board. Just choose one of the presets below, or manually specify the rules.");
+                }
+
+                Rectangle {
+                    clip: true;  // The PCB design rules listed may be too long to show.
+
+                    VerticalLayout {
+                        padding-left: 10px;
+                        spacing: 3px;
+
+                        HorizontalLayout {
+                            alignment: start;
+
+                            Text {
+                                color: setup-design-rules-msg.text-color;
+                                font-weight: 700;
+                                text: "• ";
+                            }
+
+                            setup-design-rules-msg-default-btn := LinkText {
+                                text-color: setup-design-rules-msg.text-color;
+                                text-color-hovered: setup-design-rules-msg.hover-color;
+                                font-weight: 700;
+                                text: @tr("Default rules, suitable for most PCB manufacturers");
+
+                                clicked => {
+                                    tabs[index].set-design-rules = "default";
+                                }
+                            }
+                        }
+
+                        property <[OrganizationDbData]> organizations: Backend.get-organizations-with-design-rules();
+                        for i in min(organizations.length, 8): HorizontalLayout {
+                            property <OrganizationDbData> organization: organizations[i];
+
+                            alignment: start;
+
+                            Text {
+                                color: setup-design-rules-msg.text-color;
+                                font-weight: (organization.priority == 100) ? 700 : 400;
+                                text: "• \{organization.name}: ";
+                            }
+
+                            for rules[k] in organization.pcb-design-rules: HorizontalLayout {
+                                if k > 0: Text {
+                                    color: setup-design-rules-msg.text-color;
+                                    font-weight: (organization.priority == 100) ? 700 : 400;
+                                    text: " | ";
+                                }
+
+                                setup-design-rules-msg-item-btn := LinkText {
+                                    text-color: setup-design-rules-msg.text-color;
+                                    text-color-hovered: setup-design-rules-msg.hover-color;
+                                    font-weight: (organization.priority == 100) ? 700 : 400;
+                                    font-italic: true;
+                                    text: rules.name;
+
+                                    clicked => {
+                                        tabs[index].set-design-rules = organization.uuid + ":" + rules.uuid;
+                                    }
+                                }
+                            }
+                        }
+
+                        HorizontalLayout {
+                            alignment: start;
+
+                            Text {
+                                color: setup-design-rules-msg.text-color;
+                                font-weight: 700;
+                                text: "• ";
+                            }
+
+                            setup-design-rules-msg-manual-btn := LinkText {
+                                text-color: setup-design-rules-msg.text-color;
+                                text-color-hovered: setup-design-rules-msg.hover-color;
+                                text: "Other Options / Manual Setup";
+
+                                clicked => {
+                                    tabs[index].setup-design-rules-msg.action = DismissableMessageAction.dismiss;
+                                    Backend.trigger-board(tabs[index].project-index, tabs[index].board-index, BoardAction.open-setup-dialog);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                dismiss-clicked => {
+                    tabs[index].setup-design-rules-msg.action = DismissableMessageAction.dismiss;
+                }
+
+                dont-show-again-clicked => {
+                    tabs[index].setup-design-rules-msg.action = DismissableMessageAction.dont-show-again;
                 }
             }
 

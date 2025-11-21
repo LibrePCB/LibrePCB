@@ -29,6 +29,7 @@
 #include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/library/dev/device.h>
 #include <librepcb/core/library/library.h>
+#include <librepcb/core/library/org/organization.h>
 #include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/library/sym/symbol.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
@@ -84,6 +85,7 @@ void LibraryElementCache::reset() noexcept {
   clearAndCount(mPkg, count);
   clearAndCount(mCmp, count);
   clearAndCount(mDev, count);
+  clearAndCount(mOrg, count);
   qDebug() << "Discarded" << count << "cached library elements.";
 }
 
@@ -116,6 +118,11 @@ std::shared_ptr<const Component> LibraryElementCache::getComponent(
 std::shared_ptr<const Device> LibraryElementCache::getDevice(
     const Uuid& uuid, bool throwIfNotFound) const {
   return getElement(mDev, uuid, throwIfNotFound);
+}
+
+std::shared_ptr<const Organization> LibraryElementCache::getOrganization(
+    const Uuid& uuid, bool throwIfNotFound) const {
+  return getElement(mOrg, uuid, throwIfNotFound);
 }
 
 /*******************************************************************************

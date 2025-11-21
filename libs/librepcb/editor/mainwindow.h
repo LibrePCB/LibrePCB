@@ -118,6 +118,8 @@ private:
                         bool copyFrom) noexcept;
   void openDeviceTab(LibraryEditor& editor, const FilePath& fp,
                      bool copyFrom) noexcept;
+  void openOrganizationTab(LibraryEditor& editor, const FilePath& fp,
+                           bool copyFrom) noexcept;
   std::shared_ptr<SchematicTab> openSchematicTab(int projectIndex,
                                                  int index) noexcept;
   void openBoard2dTab(int projectIndex, int index) noexcept;

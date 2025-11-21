@@ -8,6 +8,7 @@ import {
     LengthUnit,
     LibraryAction,
     LibraryElementAction,
+    OrganizationDbData,
     ProjectAction,
     RatioEditParseResult,
     SchematicAction,
@@ -241,6 +242,59 @@ export global Backend {
     request-project-preview(path, width) => {
         debug("Request project preview:", path, width);
         true
+    }
+
+    // Request the model of all organizations with provide board design rules
+    //
+    // ATTENTION: For now, this model contains only featured organizations,
+    // e.g. organizations that are LibrePCB sponsors.
+    pure callback get-organizations-with-design-rules() -> [OrganizationDbData];
+    get-organizations-with-design-rules() => {
+        return [
+            {
+                name: "LibrePCB Fab",
+                priority: 100,
+                pcb-design-rules: [
+                    {
+                        name: "All Manufacturers",
+                    },
+                    {
+                        name: "AISLER",
+                    },
+                ],
+            },
+            {
+                name: "AISLER",
+                pcb-design-rules: [
+                    {
+                        name: "2 Layer 1.6 mm HASL",
+                    },
+                    {
+                        name: "4 Layer 1.6 mm ENIG",
+                    },
+                    {
+                        name: "4 Layer 1.6 mm ENIG",
+                    },
+                    {
+                        name: "4 Layer 1.6 mm ENIG",
+                    },
+                    {
+                        name: "4 Layer 1.6 mm ENIG",
+                    },
+                    {
+                        name: "4 Layer 1.6 mm ENIG",
+                    },
+                ],
+            },
+            {
+                name: "PCBWay",
+                pcb-design-rules: [
+                    {
+                        name: "Standard",
+                    },
+                ],
+            },
+        ];
     }
 
     // Format a Length value as a string
