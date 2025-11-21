@@ -40,6 +40,7 @@
  ******************************************************************************/
 namespace librepcb {
 
+class Bus;
 class Component;
 class ComponentInstance;
 class NetClass;
@@ -113,6 +114,14 @@ public:
   void setNetSignalName(NetSignal& netsignal, const CircuitIdentifier& newName,
                         bool isAutoName);
 
+  // Bus Methods
+  QString generateAutoBusName() const noexcept;
+  const QMap<Uuid, Bus*>& getBuses() const noexcept { return mBuses; }
+  Bus* getBusByName(const QString& name) const noexcept;
+  void addBus(Bus& bus);
+  void removeBus(Bus& bus);
+  void setBusName(Bus& bus, const CircuitIdentifier& newName, bool isAutoName);
+
   // ComponentInstance Methods
   QString generateAutoComponentInstanceName(
       const ComponentPrefix& cmpPrefix) const noexcept;
@@ -149,6 +158,8 @@ signals:
   void netClassRemoved(NetClass& netclass);
   void netSignalAdded(NetSignal& netsignal);
   void netSignalRemoved(NetSignal& netsignal);
+  void busAdded(Bus& bus);
+  void busRemoved(Bus& bus);
   void componentAdded(ComponentInstance& cmp);
   void componentRemoved(ComponentInstance& cmp);
   void netClassDesignRulesModified();
@@ -158,6 +169,7 @@ private:
   AssemblyVariantList mAssemblyVariants;
   QMap<Uuid, NetClass*> mNetClasses;
   QMap<Uuid, NetSignal*> mNetSignals;
+  QMap<Uuid, Bus*> mBuses;
   QMap<Uuid, ComponentInstance*> mComponentInstances;
 };
 

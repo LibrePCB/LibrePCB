@@ -71,7 +71,9 @@ bool CmdCombineSchematicNetSegments::performExecute() {
   if (&mOldSegment == &mNewSegment) throw LogicError(__FILE__, __LINE__);
   if (&mOldSegment.getSchematic() != &mNewSegment.getSchematic())
     throw LogicError(__FILE__, __LINE__);
-  if (&mOldSegment.getNetSignal() != &mNewSegment.getNetSignal())
+  if (mOldSegment.getNetSignal() != mNewSegment.getNetSignal())
+    throw LogicError(__FILE__, __LINE__);
+  if (mOldSegment.getBus() != mNewSegment.getBus())
     throw LogicError(__FILE__, __LINE__);
 
   // copy all required netpoints/netlines to the resulting netsegment

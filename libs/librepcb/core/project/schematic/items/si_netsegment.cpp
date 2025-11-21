@@ -24,6 +24,7 @@
 
 #include "../../../utils/scopeguardlist.h"
 #include "../../../utils/toolbox.h"
+#include "../../circuit/bus.h"
 #include "../../circuit/circuit.h"
 #include "../../circuit/componentsignalinstance.h"
 #include "../../circuit/netsignal.h"
@@ -48,7 +49,7 @@ namespace librepcb {
 
 SI_NetSegment::SI_NetSegment(Schematic& schematic, const Uuid& uuid,
                              NetSignal& signal)
-  : SI_Base(schematic), mUuid(uuid), mNetSignal(&signal) {
+  : SI_Base(schematic), mUuid(uuid), mNetSignal(&signal), mBus(nullptr) {
 }
 
 SI_NetSegment::~SI_NetSegment() noexcept {
@@ -64,6 +65,26 @@ SI_NetSegment::~SI_NetSegment() noexcept {
 /*******************************************************************************
  *  Getters
  ******************************************************************************/
+
+QString SI_NetSegment::getNetOrBusName() const noexcept {
+  if (mNetSignal) {
+    return *mNetSignal->getName();
+  } else if (mBus) {
+    return *mBus->getName();
+  } else {
+    return QString();
+  }
+}
+
+int SI_NetSegment::getSegmentCountOfNetOrBus() const noexcept {
+  if (mNetSignal) {
+    return mNetSignal->getSchematicNetSegments().count();
+    //} else if (mBus) {
+    //  return *mBus->getName();
+  } else {
+    return 0;
+  }
+}
 
 bool SI_NetSegment::isUsed() const noexcept {
   return ((!mNetPoints.isEmpty()) || (!mNetLines.isEmpty()) ||

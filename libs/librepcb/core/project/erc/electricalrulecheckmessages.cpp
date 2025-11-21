@@ -40,6 +40,14 @@
  ******************************************************************************/
 namespace librepcb {
 
+static QString getNetNameOfSegment(const SI_NetSegment& segment) noexcept {
+  if (auto net = segment.getNetSignal()) {
+    return *net->getName();
+  } else {
+    return QString();
+  }
+}
+
 /*******************************************************************************
  *  ErcMsgBase
  ******************************************************************************/
@@ -149,7 +157,7 @@ ErcMsgOpenWireInSegment::ErcMsgOpenWireInSegment(
     const SI_NetSegment& segment, const SI_NetLine& openWire) noexcept
   : ErcMsgBase(
         Severity::Warning,
-        tr("Open wire in net: '%1'").arg(*segment.getNetSignal().getName()),
+        tr("Open wire in net: '%1'").arg(getNetNameOfSegment(segment)),
         tr("The wire has an open (unconnected) end with no net "
            "label attached, thus is looks like a mistake. Check "
            "if a connection to another wire or pin is missing (denoted by a "
@@ -295,7 +303,7 @@ ErcMsgUnconnectedJunction::ErcMsgUnconnectedJunction(
   : ErcMsgBase(
         Severity::Hint,
         tr("Unconnected junction in net: '%1'")
-            .arg(*netPoint.getNetSignalOfNetSegment().getName()),
+            .arg(getNetNameOfSegment(netPoint.getNetSegment())),
         "There's an invisible junction in the schematic without any wire "
         "attached. This should not happen, please report it as a bug. But "
         "no worries, this issue is not harmful at all so you can safely "

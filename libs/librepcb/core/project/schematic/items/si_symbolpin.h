@@ -40,6 +40,7 @@ class Circuit;
 class ComponentPinSignalMapItem;
 class ComponentSignal;
 class ComponentSignalInstance;
+class NetSignal;
 class SymbolPin;
 
 /*******************************************************************************

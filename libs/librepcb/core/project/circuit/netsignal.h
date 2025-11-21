@@ -35,6 +35,7 @@ namespace librepcb {
 
 class BI_NetSegment;
 class BI_Plane;
+class Bus;
 class Circuit;
 class ComponentSignalInstance;
 class NetClass;
@@ -89,6 +90,8 @@ public:
   // General Methods
   void addToCircuit();
   void removeFromCircuit();
+  void registerBus(Bus& bus);
+  void unregisterBus(Bus& bus);
   void registerComponentSignal(ComponentSignalInstance& signal);
   void unregisterComponentSignal(ComponentSignalInstance& signal);
   void registerSchematicNetSegment(SI_NetSegment& netsegment);
@@ -130,6 +133,7 @@ private:
   NetClass& mNetClass;
 
   // Registered Elements of this NetSignal
+  QList<Bus*> mRegisteredBuses;
   QList<ComponentSignalInstance*> mRegisteredComponentSignals;
   QList<SI_NetSegment*> mRegisteredSchematicNetSegments;
   QList<BI_NetSegment*> mRegisteredBoardNetSegments;

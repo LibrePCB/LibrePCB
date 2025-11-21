@@ -27,6 +27,7 @@
 #include "../board/items/bi_netsegment.h"
 #include "../board/items/bi_plane.h"
 #include "../schematic/items/si_netsegment.h"
+#include "bus.h"
 #include "circuit.h"
 #include "componentinstance.h"
 #include "componentsignalinstance.h"
@@ -65,6 +66,7 @@ NetSignal::~NetSignal() noexcept {
 
 int NetSignal::getRegisteredElementsCount() const noexcept {
   int count = 0;
+  count += mRegisteredBuses.count();
   count += mRegisteredComponentSignals.count();
   count += mRegisteredSchematicNetSegments.count();
   count += mRegisteredBoardNetSegments.count();
@@ -123,6 +125,21 @@ void NetSignal::removeFromCircuit() {
   }
   mNetClass.unregisterNetSignal(*this);  // can throw
   mIsAddedToCircuit = false;
+}
+
+void NetSignal::registerBus(Bus& bus) {
+  if ((!mIsAddedToCircuit) || (mRegisteredBuses.contains(&bus)) ||
+      (bus.getCircuit() != mCircuit)) {
+    throw LogicError(__FILE__, __LINE__);
+  }
+  mRegisteredBuses.append(&bus);
+}
+
+void NetSignal::unregisterBus(Bus& bus) {
+  if ((!mIsAddedToCircuit) || (!mRegisteredBuses.contains(&bus))) {
+    throw LogicError(__FILE__, __LINE__);
+  }
+  mRegisteredBuses.removeOne(&bus);
 }
 
 void NetSignal::registerComponentSignal(ComponentSignalInstance& signal) {

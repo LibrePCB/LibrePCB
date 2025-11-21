@@ -175,8 +175,8 @@ void ElectricalRuleCheck::checkNetSegments(const Schematic& schematic,
     // If there are no net labels, check for any open wire. But only if there's
     // no "open net" warning on the net raised, since this would be quite a
     // duplicate warning.
-    if (netSegment->getNetLabels().isEmpty() &&
-        (!mOpenNetSignals.contains(&netSegment->getNetSignal()))) {
+    if (netSegment->getNetSignal() && netSegment->getNetLabels().isEmpty() &&
+        (!mOpenNetSignals.contains(netSegment->getNetSignal()))) {
       foreach (const SI_NetLine* netLine, netSegment->getNetLines()) {
         if (netLine->getP1().isOpen() || netLine->getP2().isOpen()) {
           msgs.append(

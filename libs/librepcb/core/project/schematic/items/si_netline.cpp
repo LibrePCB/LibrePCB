@@ -62,8 +62,10 @@ SI_NetLine::SI_NetLine(SI_NetSegment& segment, const Uuid& uuid,
                      "SI_NetLine: both endpoints are the same.");
   }
 
-  connect(&mNetSegment.getNetSignal(), &NetSignal::nameChanged, this,
-          [this]() { onEdited.notify(Event::NetSignalNameChanged); });
+  if (auto net = mNetSegment.getNetSignal()) {
+    connect(net, &NetSignal::nameChanged, this,
+            [this]() { onEdited.notify(Event::NetSignalNameChanged); });
+  }
 }
 
 SI_NetLine::~SI_NetLine() noexcept {
@@ -82,10 +84,6 @@ SI_NetLineAnchor* SI_NetLine::getOtherPoint(
   } else {
     return nullptr;
   }
-}
-
-NetSignal& SI_NetLine::getNetSignalOfNetSegment() const noexcept {
-  return getNetSegment().getNetSignal();
 }
 
 /*******************************************************************************

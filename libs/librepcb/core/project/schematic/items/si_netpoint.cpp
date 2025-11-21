@@ -42,8 +42,10 @@ SI_NetPoint::SI_NetPoint(SI_NetSegment& segment, const Uuid& uuid,
     onEdited(*this),
     mNetSegment(segment),
     mJunction(uuid, position) {
-  connect(&mNetSegment.getNetSignal(), &NetSignal::nameChanged, this,
-          [this]() { onEdited.notify(Event::NetSignalNameChanged); });
+  if (auto net = mNetSegment.getNetSignal()) {
+    connect(net, &NetSignal::nameChanged, this,
+            [this]() { onEdited.notify(Event::NetSignalNameChanged); });
+  }
 }
 
 SI_NetPoint::~SI_NetPoint() noexcept {
@@ -59,10 +61,6 @@ bool SI_NetPoint::isVisibleJunction() const noexcept {
 
 bool SI_NetPoint::isOpenLineEnd() const noexcept {
   return (mRegisteredNetLines.count() <= 1);
-}
-
-NetSignal& SI_NetPoint::getNetSignalOfNetSegment() const noexcept {
-  return mNetSegment.getNetSignal();
 }
 
 NetLineAnchor SI_NetPoint::toNetLineAnchor() const noexcept {

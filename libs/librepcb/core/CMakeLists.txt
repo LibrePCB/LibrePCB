@@ -394,6 +394,8 @@ add_library(
   project/bomgenerator.h
   project/circuit/assemblyvariant.cpp
   project/circuit/assemblyvariant.h
+  project/circuit/bus.cpp
+  project/circuit/bus.h
   project/circuit/circuit.cpp
   project/circuit/circuit.h
   project/circuit/componentassemblyoption.cpp

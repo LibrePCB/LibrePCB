@@ -40,7 +40,7 @@ CmdSchematicNetSegmentEdit::CmdSchematicNetSegmentEdit(
     SI_NetSegment& netsegment) noexcept
   : UndoCommand(tr("Edit net segment")),
     mNetSegment(netsegment),
-    mOldNetSignal(&netsegment.getNetSignal()),
+    mOldNetSignal(netsegment.getNetSignal()),
     mNewNetSignal(mOldNetSignal) {
 }
 

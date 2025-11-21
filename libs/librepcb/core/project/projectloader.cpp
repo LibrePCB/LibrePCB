@@ -47,6 +47,7 @@
 #include "board/items/bi_via.h"
 #include "board/items/bi_zone.h"
 #include "circuit/assemblyvariant.h"
+#include "circuit/bus.h"
 #include "circuit/circuit.h"
 #include "circuit/componentinstance.h"
 #include "circuit/componentsignalinstance.h"
@@ -451,6 +452,25 @@ void ProjectLoader::loadCircuit(Project& p) {
         deserialize<CircuitIdentifier>(node->getChild("name/@0")),
         deserialize<bool>(node->getChild("auto/@0")));
     p.getCircuit().addNetSignal(*netsignal);
+  }
+
+  // Load buses.
+  foreach (const SExpression* node, root->getChildren("bus")) {
+    Bus* bus =
+        new Bus(p.getCircuit(), deserialize<Uuid>(node->getChild("@0")),
+                deserialize<CircuitIdentifier>(node->getChild("name/@0")),
+                deserialize<bool>(node->getChild("auto/@0")));
+    foreach (const SExpression* child, node->getChildren("net")) {
+      const Uuid netUuid = deserialize<Uuid>(child->getChild("@0"));
+      NetSignal* net = p.getCircuit().getNetSignals().value(netUuid);
+      if (!net) {
+        throw RuntimeError(
+            __FILE__, __LINE__,
+            QString("Inexistent net signal: '%1'").arg(netUuid.toStr()));
+      }
+      bus->addNet(*net);
+    }
+    p.getCircuit().addBus(*bus);
   }
 
   // Load component instances.

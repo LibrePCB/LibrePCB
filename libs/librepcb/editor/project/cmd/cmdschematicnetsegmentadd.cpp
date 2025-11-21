@@ -49,7 +49,7 @@ CmdSchematicNetSegmentAdd::CmdSchematicNetSegmentAdd(
     Schematic& schematic, NetSignal& netsignal) noexcept
   : UndoCommand(tr("Add net segment")),
     mSchematic(schematic),
-    mNetSignal(netsignal),
+    mNetSignal(&netsignal),
     mNetSegment(nullptr) {
 }
 
@@ -64,7 +64,7 @@ bool CmdSchematicNetSegmentAdd::performExecute() {
   if (!mNetSegment) {
     // create new net segment
     mNetSegment = new SI_NetSegment(mSchematic, Uuid::createRandom(),
-                                    mNetSignal);  // can throw
+                                    *mNetSignal);  // can throw
   }
 
   performRedo();  // can throw

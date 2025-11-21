@@ -150,10 +150,10 @@ SchematicPainter::SchematicPainter(const Schematic& schematic,
   foreach (const SI_NetSegment* segment, schematic.getNetSegments()) {
     if (!thumbnail) {
       for (const SI_NetLabel* netlabel : segment->getNetLabels()) {
-        mNetLabels.append(
-            Label{netlabel->getPosition(), netlabel->getRotation(),
-                  netlabel->getMirrored(),
-                  *netlabel->getNetSignalOfNetSegment().getName()});
+        mNetLabels.append(Label{netlabel->getPosition(),
+                                netlabel->getRotation(),
+                                netlabel->getMirrored(),
+                                netlabel->getNetSegment().getNetOrBusName()});
       }
       for (const SI_NetPoint* netpoint : segment->getNetPoints()) {
         if (netpoint->isVisibleJunction()) {

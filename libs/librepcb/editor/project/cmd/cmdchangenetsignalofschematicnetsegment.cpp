@@ -68,12 +68,11 @@ bool CmdChangeNetSignalOfSchematicNetSegment::performExecute() {
   // if an error occurs, undo all already executed child commands
   auto undoScopeGuard = scopeGuard([&]() { performUndo(); });
 
-  if (mNewNetSignal == mNetSegment.getNetSignal()) {
+  if (&mNewNetSignal == mNetSegment.getNetSignal()) {
     // nothing to do, the netsignal is already correct
     undoScopeGuard.dismiss();
     return false;
-  } else if (mNetSegment.getNetSignal().getSchematicNetSegments().count() ==
-             1) {
+  } else if (mNetSegment.getSegmentCountOfNetOrBus() == 1) {
     // this netsegment is the only one in its netsignal,
     // we just need to combine both netsignals
     Circuit& circuit = mNetSegment.getCircuit();

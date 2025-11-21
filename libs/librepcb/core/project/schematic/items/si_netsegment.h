@@ -34,6 +34,7 @@
  ******************************************************************************/
 namespace librepcb {
 
+class Bus;
 class NetSignal;
 class SI_NetLabel;
 class SI_NetLine;
@@ -62,7 +63,10 @@ public:
 
   // Getters
   const Uuid& getUuid() const noexcept { return mUuid; }
-  NetSignal& getNetSignal() const noexcept { return *mNetSignal; }
+  NetSignal* getNetSignal() const noexcept { return mNetSignal; }
+  Bus* getBus() const noexcept { return mBus; }
+  QString getNetOrBusName() const noexcept;
+  int getSegmentCountOfNetOrBus() const noexcept;
   bool isUsed() const noexcept;
   QSet<QString> getForcedNetNames() const noexcept;
   QString getForcedNetName() const noexcept;
@@ -128,7 +132,10 @@ private:
 
   // Attributes
   Uuid mUuid;
+
+  // It's either part of a net signal, or of a bus
   NetSignal* mNetSignal;
+  Bus* mBus;
 
   // Items
   QMap<Uuid, SI_NetPoint*> mNetPoints;

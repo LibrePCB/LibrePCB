@@ -17,15 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CORE_SI_NETLABEL_H
-#define LIBREPCB_CORE_SI_NETLABEL_H
+#ifndef LIBREPCB_CORE_BUS_H
+#define LIBREPCB_CORE_BUS_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../../geometry/netlabel.h"
-#include "../../../utils/signalslot.h"
-#include "si_base.h"
+#include "../../types/circuitidentifier.h"
+#include "../../types/uuid.h"
 
 #include <QtCore>
 
@@ -35,69 +34,74 @@
 namespace librepcb {
 
 class Circuit;
-class SI_NetSegment;
-class Schematic;
+class NetSignal;
 
 /*******************************************************************************
- *  Class SI_NetLabel
+ *  Class Bus
  ******************************************************************************/
 
 /**
- * @brief The SI_NetLabel class
+ * @brief The Bus class
  */
-class SI_NetLabel final : public SI_Base {
+class Bus final : public QObject {
   Q_OBJECT
 
 public:
-  // Signals
-  enum class Event {
-    PositionChanged,
-    RotationChanged,
-    MirroredChanged,
-    NetNameChanged,
-    AnchorPositionChanged,
-  };
-  Signal<SI_NetLabel, Event> onEdited;
-  typedef Slot<SI_NetLabel, Event> OnEditedSlot;
-
   // Constructors / Destructor
-  SI_NetLabel() = delete;
-  SI_NetLabel(const SI_NetLabel& other) = delete;
-  explicit SI_NetLabel(SI_NetSegment& segment, const NetLabel& label);
-  ~SI_NetLabel() noexcept;
+  Bus() = delete;
+  Bus(const Bus& other) = delete;
+  explicit Bus(Circuit& circuit, const Uuid& uuid,
+               const CircuitIdentifier& name, bool autoName);
+  ~Bus() noexcept;
 
-  // Getters
-  const Uuid& getUuid() const noexcept { return mNetLabel.getUuid(); }
-  const Point& getPosition() const noexcept { return mNetLabel.getPosition(); }
-  const Angle& getRotation() const noexcept { return mNetLabel.getRotation(); }
-  bool getMirrored() const noexcept { return mNetLabel.getMirrored(); }
-  const Point& getAnchorPosition() const noexcept { return mAnchorPosition; }
-  const NetLabel& getNetLabel() const noexcept { return mNetLabel; }
-  SI_NetSegment& getNetSegment() const noexcept { return mNetSegment; }
+  // Getters: Attributes
+  const Uuid& getUuid() const noexcept { return mUuid; }
+  const CircuitIdentifier& getName() const noexcept { return mName; }
+  bool hasAutoName() const noexcept { return mHasAutoName; }
+
+  // Getters: General
+  Circuit& getCircuit() const noexcept { return mCircuit; }
+  int getRegisteredElementsCount() const noexcept;
+  bool isUsed() const noexcept;
+  bool isAddedToCircuit() const noexcept { return mIsAddedToCircuit; }
+  const QSet<NetSignal*>& getNets() noexcept { return mNetSignals; }
 
   // Setters
-  void setPosition(const Point& position) noexcept;
-  void setRotation(const Angle& rotation) noexcept;
-  void setMirrored(const bool mirrored) noexcept;
+  void setName(const CircuitIdentifier& name, bool isAutoName) noexcept;
 
   // General Methods
-  void addToSchematic() override;
-  void removeFromSchematic() override;
-  void updateAnchor() noexcept;
+  void addToCircuit();
+  void removeFromCircuit();
+  void addNet(NetSignal& net);
+  void removeNet(NetSignal& net);
+
+  /**
+   * @brief Serialize into ::librepcb::SExpression node
+   *
+   * @param root    Root node to serialize into.
+   */
+  void serialize(SExpression& root) const;
 
   // Operator Overloadings
-  SI_NetLabel& operator=(const SI_NetLabel& rhs) = delete;
+  Bus& operator=(const Bus& rhs) = delete;
+  bool operator==(const Bus& rhs) const noexcept { return (this == &rhs); }
+  bool operator!=(const Bus& rhs) const noexcept { return (this != &rhs); }
+
+signals:
+  void nameChanged(const CircuitIdentifier& newName);
 
 private:
   // General
-  QMetaObject::Connection mNameChangedConnection;
+  Circuit& mCircuit;
+  bool mIsAddedToCircuit;
 
   // Attributes
-  SI_NetSegment& mNetSegment;
-  NetLabel mNetLabel;
+  Uuid mUuid;
+  CircuitIdentifier mName;
+  bool mHasAutoName;
 
-  // Cached Attributes
-  Point mAnchorPosition;
+  // Contained net signals
+  QSet<NetSignal*> mNetSignals;
 };
 
 /*******************************************************************************

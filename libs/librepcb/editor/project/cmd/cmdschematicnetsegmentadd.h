@@ -71,7 +71,7 @@ private:
   // Private Member Variables
 
   Schematic& mSchematic;
-  NetSignal& mNetSignal;
+  NetSignal* mNetSignal;
   SI_NetSegment* mNetSegment;
 };
 
