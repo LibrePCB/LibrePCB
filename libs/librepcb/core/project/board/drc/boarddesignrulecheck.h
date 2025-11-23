@@ -27,7 +27,7 @@
 #include "../../../utils/transform.h"
 #include "boarddesignrulecheckdata.h"
 
-#include <polyclipping/clipper.hpp>
+#include <clipper2/clipper.h>
 
 #include <QtCore>
 
@@ -58,7 +58,7 @@ public:
 
     mutable QMutex mutex;  // To be used by stage 1 jobs.
 
-    QHash<const Layer*, ClipperLib::Paths> copperPathsPerLayer;
+    QHash<const Layer*, Clipper2Lib::Paths64> copperPathsPerLayer;
   };
 
   struct Result {
@@ -145,12 +145,12 @@ private:  // Methods
   static bool requiresHoleSlotWarning(
       const Data::Hole& hole,
       BoardDesignRuleCheckSettings::AllowedSlots allowed);
-  static ClipperLib::Paths getBoardClearanceArea(
+  static Clipper2Lib::Paths64 getBoardClearanceArea(
       const Data& data, const UnsignedLength& clearance);
   static QVector<Path> getBoardOutlines(
       const Data& data, const QSet<const Layer*>& layers) noexcept;
-  static ClipperLib::Paths getDeviceOutlinePaths(const Data::Device& device,
-                                                 const Layer& layer);
+  static Clipper2Lib::Paths64 getDeviceOutlinePaths(const Data::Device& device,
+                                                    const Layer& layer);
   static QVector<Path> getDeviceLocation(const Data::Device& device);
   static QVector<Path> getViaLocation(const Data::Via& via) noexcept;
   static bool isViaUseless(const Data& data, const Data::Segment& ns,
