@@ -33,6 +33,7 @@
  ******************************************************************************/
 namespace librepcb {
 
+class BoardDesignRuleCheckSettings;
 class SExpression;
 
 /*******************************************************************************
@@ -120,6 +121,7 @@ public:
 
   // General Methods
   void restoreDefaults() noexcept;
+  void adjustToDrcSettings(const BoardDesignRuleCheckSettings& s) noexcept;
 
   /**
    * @brief Serialize into ::librepcb::SExpression node

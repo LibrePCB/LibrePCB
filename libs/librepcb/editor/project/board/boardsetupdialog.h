@@ -23,6 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include <librepcb/core/project/board/drc/boarddesignrulechecksettings.h>
+
 #include <QtCore>
 #include <QtWidgets>
 
@@ -36,6 +38,7 @@ class Layer;
 
 namespace editor {
 
+class GuiApplication;
 class UndoStack;
 
 namespace Ui {
@@ -56,12 +59,13 @@ public:
   // Constructors / Destructor
   BoardSetupDialog() = delete;
   BoardSetupDialog(const BoardSetupDialog& other) = delete;
-  BoardSetupDialog(Board& board, UndoStack& undoStack,
+  BoardSetupDialog(GuiApplication& app, Board& board, UndoStack& undoStack,
                    QWidget* parent = 0) noexcept;
   ~BoardSetupDialog();
 
   // General Methods
   void openDrcSettingsTab() noexcept;
+  void hideOtherTabs() noexcept;
 
   // Operator Overloadings
   BoardSetupDialog& operator=(const BoardSetupDialog& rhs) = delete;
@@ -69,14 +73,22 @@ public:
 private:  // Methods
   void buttonBoxClicked(QAbstractButton* button);
   void load() noexcept;
+  void loadDrcSources(
+      const BoardDesignRuleCheckSettings::SourceSet& set) noexcept;
+  void loadDrcSettings(const BoardDesignRuleCheckSettings& s) noexcept;
+  void loadDrcSettingsPreset() noexcept;
+  void loadDrcSettingsPreset(const Uuid& orgUuid, const Uuid& druUuid) noexcept;
   bool apply() noexcept;
   QVector<const Layer*> getTopSilkscreenLayers() const noexcept;
   QVector<const Layer*> getBotSilkscreenLayers() const noexcept;
 
 private:  // Date
+  GuiApplication& mApp;
   Board& mBoard;
   UndoStack& mUndoStack;
   QScopedPointer<Ui::BoardSetupDialog> mUi;
+
+  BoardDesignRuleCheckSettings::SourceSet mDrcSources;
 
   static const QString sSettingsPrefix;
 };

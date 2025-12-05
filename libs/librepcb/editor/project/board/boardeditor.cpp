@@ -260,8 +260,8 @@ void BoardEditor::unregisterActiveTab(Board3dTab* tab) noexcept {
 
 void BoardEditor::execBoardSetupDialog(bool switchToDrcSettings) noexcept {
   mProjectEditor.abortBlockingToolsInOtherEditors(this);  // Release undo stack.
-  BoardSetupDialog dialog(mBoard, mProjectEditor.getUndoStack(),
-                          qApp->activeWindow());
+  BoardSetupDialog dialog(mProjectEditor.getApp(), mBoard,
+                          mProjectEditor.getUndoStack(), qApp->activeWindow());
   if (switchToDrcSettings) {
     dialog.openDrcSettingsTab();
   }

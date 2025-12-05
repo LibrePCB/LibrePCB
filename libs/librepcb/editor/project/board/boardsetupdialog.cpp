@@ -22,15 +22,22 @@
  ******************************************************************************/
 #include "boardsetupdialog.h"
 
+#include "../../guiapplication.h"
+#include "../../library/libraryelementcache.h"
 #include "../../undostack.h"
+#include "../../utils/editortoolbox.h"
 #include "../cmd/cmdboardedit.h"
 #include "ui_boardsetupdialog.h"
 
+#include <librepcb/core/library/org/organization.h>
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/boarddesignrules.h>
 #include <librepcb/core/project/board/drc/boarddesignrulechecksettings.h>
 #include <librepcb/core/types/layer.h>
 #include <librepcb/core/types/pcbcolor.h>
+#include <librepcb/core/workspace/workspace.h>
+#include <librepcb/core/workspace/workspacelibrarydb.h>
+#include <librepcb/core/workspace/workspacesettings.h>
 
 #include <QtCore>
 
@@ -46,13 +53,17 @@ const QString BoardSetupDialog::sSettingsPrefix = "board_setup_dialog";
  *  Constructors / Destructor
  ******************************************************************************/
 
-BoardSetupDialog::BoardSetupDialog(Board& board, UndoStack& undoStack,
+BoardSetupDialog::BoardSetupDialog(GuiApplication& app, Board& board,
+                                   UndoStack& undoStack,
                                    QWidget* parent) noexcept
   : QDialog(parent),
+    mApp(app),
     mBoard(board),
     mUndoStack(undoStack),
     mUi(new Ui::BoardSetupDialog) {
   mUi->setupUi(this);
+  mUi->btnLoadDrcSettings->setIcon(
+      EditorToolbox::svgIcon(":/fa/solid/upload.svg"));
   connect(mUi->buttonBox, &QDialogButtonBox::clicked, this,
           &BoardSetupDialog::buttonBoxClicked);
 
@@ -173,6 +184,17 @@ BoardSetupDialog::BoardSetupDialog(Board& board, UndoStack& undoStack,
           mUi->edtRulesViaAnnularRingMin, &UnsignedLengthEdit::clipToMaximum);
 
   // Tab: DRC Settings
+  connect(mUi->btnLoadDrcSettings, &QToolButton::clicked, this,
+          [this]() { loadDrcSettingsPreset(); });
+  connect(mUi->lblDrcConfigName, &QLabel::linkActivated, this,
+          [this](const QString& url) {
+            try {
+              loadDrcSettingsPreset(Uuid::fromString(url.split(":").first()),
+                                    Uuid::fromString(url.split(":").last()));
+            } catch (const Exception& e) {
+              QMessageBox::critical(this, "Error", e.getMsg());
+            }
+          });
   mUi->edtDrcClearanceCopperCopper->configure(
       mBoard.getGridUnit(), LengthEditBase::Steps::generic(),
       sSettingsPrefix % "/clearance_copper_copper");
@@ -263,6 +285,13 @@ void BoardSetupDialog::openDrcSettingsTab() noexcept {
   mUi->tabWidget->setCurrentWidget(mUi->tabDrcSettings);
 }
 
+void BoardSetupDialog::hideOtherTabs() noexcept {
+  for (int i = 0; i < mUi->tabWidget->count(); ++i) {
+    mUi->tabWidget->setTabVisible(i, i == mUi->tabWidget->currentIndex());
+  }
+  mUi->tabWidget->tabBar()->hide();
+}
+
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
@@ -336,46 +365,173 @@ void BoardSetupDialog::load() noexcept {
   mUi->edtRulesStopMaskMaxViaDia->setValue(r.getStopMaskMaxViaDiameter());
 
   // Tab: DRC Settings
-  mUi->edtDrcClearanceCopperCopper->setValue(
-      mBoard.getDrcSettings().getMinCopperCopperClearance());
-  mUi->edtDrcClearanceCopperBoard->setValue(
-      mBoard.getDrcSettings().getMinCopperBoardClearance());
-  mUi->edtDrcClearanceCopperNpth->setValue(
-      mBoard.getDrcSettings().getMinCopperNpthClearance());
-  mUi->edtDrcClearanceDrillDrill->setValue(
-      mBoard.getDrcSettings().getMinDrillDrillClearance());
-  mUi->edtDrcClearanceDrillBoard->setValue(
-      mBoard.getDrcSettings().getMinDrillBoardClearance());
+  loadDrcSources(mBoard.getDrcSettings().getSources());
+  loadDrcSettings(mBoard.getDrcSettings());
+}
+
+void BoardSetupDialog::loadDrcSources(
+    const BoardDesignRuleCheckSettings::SourceSet& set) noexcept {
+  mDrcSources = set;
+
+  QStringList loaded;
+  for (const BoardDesignRuleCheckSettings::Source& src : mDrcSources) {
+    loaded.append(QString("%1 (%2)")
+                      .arg(*src.organizationName)
+                      .arg(*src.pcbDesignRulesName));
+  }
+  mUi->lblDrcConfigTitle->setText(tr("Configuration Base:"));
+  if (loaded.isEmpty()) {
+    try {
+      QList<WorkspaceLibraryDb::Organization> organizations =
+          mApp.getWorkspace().getLibraryDb().getAllLatestOrganizations(
+              mApp.getWorkspace().getSettings().libraryLocaleOrder.get(), true,
+              false);
+      auto addDesignRules = [&](const WorkspaceLibraryDb::Organization& org,
+                                const WorkspaceLibraryDb::PcbDesignRules& dru) {
+        loaded.append(QString("<a href=\"%1:%2\">%3</a>")
+                          .arg(org.uuid.toStr())
+                          .arg(dru.uuid.toStr())
+                          .arg(QString("%1 (%2)")
+                                   .arg(org.name)
+                                   .arg(dru.name)
+                                   .toHtmlEscaped()));
+      };
+      for (const auto& org : organizations) {
+        if (org.isSponsor) {
+          if (org.pcbDesignRules.count() > 1) {
+            for (const auto& dru : org.pcbDesignRules) {
+              addDesignRules(org, dru);
+            }
+          } else if (org.pcbDesignRules.count() == 1) {
+            addDesignRules(org, org.pcbDesignRules.first());
+          }
+        }
+      }
+    } catch (const Exception& e) {
+      qCritical() << e.getMsg();
+    }
+    if (!loaded.isEmpty()) {
+      mUi->lblDrcConfigTitle->setText(tr("Load Preset:"));
+    }
+  }
+  mUi->lblDrcConfigName->setText(loaded.join(", "));
+}
+
+void BoardSetupDialog::loadDrcSettings(
+    const BoardDesignRuleCheckSettings& s) noexcept {
+  mUi->edtDrcClearanceCopperCopper->setValue(s.getMinCopperCopperClearance());
+  mUi->edtDrcClearanceCopperBoard->setValue(s.getMinCopperBoardClearance());
+  mUi->edtDrcClearanceCopperNpth->setValue(s.getMinCopperNpthClearance());
+  mUi->edtDrcClearanceDrillDrill->setValue(s.getMinDrillDrillClearance());
+  mUi->edtDrcClearanceDrillBoard->setValue(s.getMinDrillBoardClearance());
   mUi->edtDrcClearanceSilkscreenStopmask->setValue(
-      mBoard.getDrcSettings().getMinSilkscreenStopmaskClearance());
-  mUi->edtDrcMinCopperWidth->setValue(
-      mBoard.getDrcSettings().getMinCopperWidth());
-  mUi->edtDrcMinPthAnnularRing->setValue(
-      mBoard.getDrcSettings().getMinPthAnnularRing());
-  mUi->edtDrcMinNpthDrillDiameter->setValue(
-      mBoard.getDrcSettings().getMinNpthDrillDiameter());
-  mUi->edtDrcMinNpthSlotWidth->setValue(
-      mBoard.getDrcSettings().getMinNpthSlotWidth());
-  mUi->edtDrcMinPthDrillDiameter->setValue(
-      mBoard.getDrcSettings().getMinPthDrillDiameter());
-  mUi->edtDrcMinPthSlotWidth->setValue(
-      mBoard.getDrcSettings().getMinPthSlotWidth());
-  mUi->edtDrcMinSilkscreenWidth->setValue(
-      mBoard.getDrcSettings().getMinSilkscreenWidth());
-  mUi->edtDrcMinSilkscreenTextHeight->setValue(
-      mBoard.getDrcSettings().getMinSilkscreenTextHeight());
-  mUi->edtDrcMinOutlineToolDiameter->setValue(
-      mBoard.getDrcSettings().getMinOutlineToolDiameter());
-  mUi->cbxBlindViasAllowed->setChecked(
-      mBoard.getDrcSettings().getBlindViasAllowed());
-  mUi->cbxBuriedViasAllowed->setChecked(
-      mBoard.getDrcSettings().getBuriedViasAllowed());
+      s.getMinSilkscreenStopmaskClearance());
+  mUi->edtDrcMinCopperWidth->setValue(s.getMinCopperWidth());
+  mUi->edtDrcMinPthAnnularRing->setValue(s.getMinPthAnnularRing());
+  mUi->edtDrcMinNpthDrillDiameter->setValue(s.getMinNpthDrillDiameter());
+  mUi->edtDrcMinNpthSlotWidth->setValue(s.getMinNpthSlotWidth());
+  mUi->edtDrcMinPthDrillDiameter->setValue(s.getMinPthDrillDiameter());
+  mUi->edtDrcMinPthSlotWidth->setValue(s.getMinPthSlotWidth());
+  mUi->edtDrcMinSilkscreenWidth->setValue(s.getMinSilkscreenWidth());
+  mUi->edtDrcMinSilkscreenTextHeight->setValue(s.getMinSilkscreenTextHeight());
+  mUi->edtDrcMinOutlineToolDiameter->setValue(s.getMinOutlineToolDiameter());
+  mUi->cbxBlindViasAllowed->setChecked(s.getBlindViasAllowed());
+  mUi->cbxBuriedViasAllowed->setChecked(s.getBuriedViasAllowed());
   mUi->cbxDrcAllowedNpthSlots->setCurrentIndex(
       mUi->cbxDrcAllowedNpthSlots->findData(
-          QVariant::fromValue(mBoard.getDrcSettings().getAllowedNpthSlots())));
+          QVariant::fromValue(s.getAllowedNpthSlots())));
   mUi->cbxDrcAllowedPthSlots->setCurrentIndex(
       mUi->cbxDrcAllowedPthSlots->findData(
-          QVariant::fromValue(mBoard.getDrcSettings().getAllowedPthSlots())));
+          QVariant::fromValue(s.getAllowedPthSlots())));
+}
+
+void BoardSetupDialog::loadDrcSettingsPreset() noexcept {
+  std::optional<QList<WorkspaceLibraryDb::Organization>> organizations;
+  try {
+    organizations =
+        mApp.getWorkspace().getLibraryDb().getAllLatestOrganizations(
+            mApp.getWorkspace().getSettings().libraryLocaleOrder.get(), true,
+            false);  // can throw
+    organizations->erase(
+        std::remove_if(organizations->begin(), organizations->end(),
+                       [](const WorkspaceLibraryDb::Organization& c) {
+                         return c.pcbDesignRules.isEmpty();
+                       }),
+        organizations->end());
+    organizations =
+        organizations->mid(0, 20);  // Not a nice way to limit count...
+  } catch (const Exception& e) {
+    qCritical() << e.getMsg();
+  }
+
+  QMenu menu(this);
+  QHash<QAction*, std::pair<Uuid, Uuid>> map;
+  QAction* aDefaults =
+      menu.addAction(EditorToolbox::svgIcon(":/fa/solid/rotate-left.svg"),
+                     tr("Reset to Default Settings"));
+  QAction* aClearSources =
+      menu.addAction(EditorToolbox::svgIcon(":/fa/solid/link-slash.svg"),
+                     tr("Remove Link to Imported Settings"));
+  aClearSources->setEnabled(!mDrcSources.empty());
+  if ((!organizations) || (!organizations->isEmpty())) {
+    menu.addSeparator();
+  }
+  if (!organizations) {
+    menu.addAction(
+        EditorToolbox::svgIcon(":/fa/solid/triangle-exclamation.svg"),
+        "Error loading presets from DB");
+  }
+  for (const auto& org : *organizations) {
+    if (org.pcbDesignRules.count() > 1) {
+      QMenu* subMenu = menu.addMenu(org.logo, org.name);
+      for (const auto& dru : org.pcbDesignRules) {
+        QAction* a = subMenu->addAction(org.logo, dru.name);
+        map.insert(a, std::make_pair(org.uuid, dru.uuid));
+      }
+    } else {
+      QAction* a = menu.addAction(
+          org.logo, org.name + ": " + org.pcbDesignRules.first().name);
+      map.insert(a, std::make_pair(org.uuid, org.pcbDesignRules.first().uuid));
+    }
+  }
+  QAction* a = menu.exec(mUi->btnLoadDrcSettings->mapToGlobal(
+                             QPoint(mUi->btnLoadDrcSettings->width(),
+                                    mUi->btnLoadDrcSettings->height())) -
+                         QPoint(menu.sizeHint().width(), 0));
+  auto it = map.find(a);
+  if (it != map.end()) {
+    loadDrcSettingsPreset(it->first, it->second);
+  } else if (a == aDefaults) {
+    loadDrcSources({});
+    loadDrcSettings(BoardDesignRuleCheckSettings());
+  } else if (a == aClearSources) {
+    loadDrcSources({});
+  }
+}
+
+void BoardSetupDialog::loadDrcSettingsPreset(const Uuid& orgUuid,
+                                             const Uuid& druUuid) noexcept {
+  try {
+    std::shared_ptr<const Organization> org =
+        mApp.getLibraryElementCache().getOrganization(orgUuid,
+                                                      true);  // can throw
+    const OrganizationPcbDesignRules* dru = org->findPcbDesignRules(druUuid);
+    if (!dru) {
+      // Maybe the wrong organization was loaded since the listed organization
+      // may be from a local library, but the loaded organization from remote?
+      throw LogicError(__FILE__, __LINE__);
+    }
+    loadDrcSources({BoardDesignRuleCheckSettings::Source{
+        org->getUuid(),
+        org->getNames().getDefaultValue(),
+        org->getVersion(),
+        dru->getUuid(),
+        dru->getNames().getDefaultValue(),
+    }});
+    loadDrcSettings(dru->getDrcSettings(true));
+  } catch (const Exception& e) {
+    QMessageBox::critical(this, "Error", e.getMsg());
+  }
 }
 
 bool BoardSetupDialog::apply() noexcept {
@@ -427,6 +583,7 @@ bool BoardSetupDialog::apply() noexcept {
 
     // Tab: DRC Settings
     BoardDesignRuleCheckSettings s = mBoard.getDrcSettings();
+    s.setSources(mDrcSources);
     s.setMinCopperCopperClearance(mUi->edtDrcClearanceCopperCopper->getValue());
     s.setMinCopperBoardClearance(mUi->edtDrcClearanceCopperBoard->getValue());
     s.setMinCopperNpthClearance(mUi->edtDrcClearanceCopperNpth->getValue());

@@ -23,6 +23,7 @@
 #include "boarddesignrules.h"
 
 #include "../../serialization/sexpression.h"
+#include "drc/boarddesignrulechecksettings.h"
 
 #include <QtCore>
 
@@ -40,7 +41,7 @@ BoardDesignRules::BoardDesignRules() noexcept
     mDefaultTraceWidth(500000),  // 0.5mm
     mDefaultViaDrillDiameter(300000),  // 0.3mm
     // stop mask
-    mStopMaskMaxViaDrillDiameter(500000),  // 0.5mm
+    mStopMaskMaxViaDrillDiameter(300000),  // 0.3mm
     mStopMaskClearance(UnsignedRatio(Ratio::fromPercent(0)),  // 0%
                        UnsignedLength(100000),  // 0.1mm
                        UnsignedLength(100000)),  // 0.1mm
@@ -97,6 +98,31 @@ BoardDesignRules::~BoardDesignRules() noexcept {
 
 void BoardDesignRules::restoreDefaults() noexcept {
   *this = BoardDesignRules();
+}
+
+void BoardDesignRules::adjustToDrcSettings(
+    const BoardDesignRuleCheckSettings& s) noexcept {
+  const auto defaults = BoardDesignRules();
+
+  if (mDefaultTraceWidth < s.getMinCopperWidth()) {
+    mDefaultTraceWidth = PositiveLength(*s.getMinCopperWidth());
+  }
+  if (mDefaultViaDrillDiameter < s.getMinNpthDrillDiameter()) {
+    mDefaultViaDrillDiameter = PositiveLength(*s.getMinNpthDrillDiameter());
+  }
+  if (mStopMaskMaxViaDrillDiameter < s.getMaxTentedViaDrillDiameter()) {
+    mStopMaskMaxViaDrillDiameter = s.getMaxTentedViaDrillDiameter();
+  }
+  const UnsignedLength minPadAnnular = std::max(
+      defaults.getPadAnnularRing().getMinValue(), s.getMinPthAnnularRing());
+  mPadAnnularRing = BoundedUnsignedRatio(
+      mPadAnnularRing.getRatio(), minPadAnnular,
+      std::max(mPadAnnularRing.getMaxValue(), minPadAnnular));
+  const UnsignedLength minViaAnnular = std::max(
+      defaults.getPadAnnularRing().getMinValue(), s.getMinPthAnnularRing());
+  mViaAnnularRing = BoundedUnsignedRatio(
+      mViaAnnularRing.getRatio(), minViaAnnular,
+      std::max(mViaAnnularRing.getMaxValue(), minViaAnnular));
 }
 
 void BoardDesignRules::serialize(SExpression& root) const {

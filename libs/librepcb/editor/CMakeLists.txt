@@ -166,6 +166,8 @@ add_library(
   library/cmd/cmdlibraryedit.h
   library/cmd/cmdlibraryelementedit.cpp
   library/cmd/cmdlibraryelementedit.h
+  library/cmd/cmdorganizationedit.cpp
+  library/cmd/cmdorganizationedit.h
   library/cmd/cmdpackageedit.cpp
   library/cmd/cmdpackageedit.h
   library/cmd/cmdpackagemodeladd.cpp
@@ -284,6 +286,10 @@ add_library(
   library/libraryelementcache.h
   library/libraryelementcategoriesmodel.cpp
   library/libraryelementcategoriesmodel.h
+  library/org/organizationpcbdesignrulesmodel.cpp
+  library/org/organizationpcbdesignrulesmodel.h
+  library/org/organizationtab.cpp
+  library/org/organizationtab.h
   library/pkg/footprintclipboarddata.cpp
   library/pkg/footprintclipboarddata.h
   library/pkg/footprintgraphicsitem.cpp
@@ -940,6 +946,8 @@ add_library(
   workspace/initializeworkspacewizard/initializeworkspacewizard_welcome.ui
   workspace/initializeworkspacewizard/initializeworkspacewizardcontext.cpp
   workspace/initializeworkspacewizard/initializeworkspacewizardcontext.h
+  workspace/organizationsdbmodel.cpp
+  workspace/organizationsdbmodel.h
   workspace/projectlibraryupdater/projectlibraryupdater.cpp
   workspace/projectlibraryupdater/projectlibraryupdater.h
   workspace/projectlibraryupdater/projectlibraryupdater.ui
