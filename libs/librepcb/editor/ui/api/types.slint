@@ -299,6 +299,25 @@ export struct RuleCheckData {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Workspace library database
+////////////////////////////////////////////////////////////////////////////////
+
+// Library database entry for organization PCB design rules
+export struct OrganizationPcbDesignRulesDbData {
+    uuid: string,
+    name: string,
+    url: string,
+}
+
+// Library database entry for organizations
+export struct OrganizationDbData {
+    uuid: string,
+    name: string,
+    priority: int,
+    pcb-design-rules: [OrganizationPcbDesignRulesDbData],
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Editor tools
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -1239,6 +1258,7 @@ export struct Board2dTabData {
 
     // Messages
     empty-schematics-msg: DismissableMessageData,
+    setup-design-rules-msg: DismissableMessageData,
     place-devices-msg: DismissableMessageData,
 
     // Unplaced components.
@@ -1276,6 +1296,9 @@ export struct Board2dTabData {
 
     scene-image-pos: Point,  // Absolute position of graphics scene
     frame: int,  // Frame index to trigger repainting
+
+    // Actions
+    set-design-rules: string,  // Set to "UUID:UUID" by UI, reset by backend
 }
 
 // Additional data for board 3D viewer tabs

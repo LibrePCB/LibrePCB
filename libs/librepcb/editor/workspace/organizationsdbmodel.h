@@ -17,80 +17,62 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_BOARDSETUPDIALOG_H
-#define LIBREPCB_EDITOR_BOARDSETUPDIALOG_H
+#ifndef LIBREPCB_EDITOR_ORGANIZATIONSDBMODEL_H
+#define LIBREPCB_EDITOR_ORGANIZATIONSDBMODEL_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/core/project/board/drc/boarddesignrulechecksettings.h>
+#include "appwindow.h"
+
+#include <librepcb/core/types/uuid.h>
 
 #include <QtCore>
-#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 
-class Board;
-class Layer;
+class WorkspaceLibraryDb;
+class WorkspaceSettings;
 
 namespace editor {
 
-class GuiApplication;
-class UndoStack;
-
-namespace Ui {
-class BoardSetupDialog;
-}
-
 /*******************************************************************************
- *  Class BoardSetupDialog
+ *  Class OrganizationsDbModel
  ******************************************************************************/
 
 /**
- * @brief The BoardSetupDialog class
+ * @brief The OrganizationsDbModel class
  */
-class BoardSetupDialog final : public QDialog {
+class OrganizationsDbModel : public QObject,
+                             public slint::Model<ui::OrganizationDbData> {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
-  BoardSetupDialog() = delete;
-  BoardSetupDialog(const BoardSetupDialog& other) = delete;
-  BoardSetupDialog(GuiApplication& app, Board& board, UndoStack& undoStack,
-                   QWidget* parent = 0) noexcept;
-  ~BoardSetupDialog();
+  OrganizationsDbModel() = delete;
+  OrganizationsDbModel(const OrganizationsDbModel& other) = delete;
+  explicit OrganizationsDbModel(const WorkspaceLibraryDb& db,
+                                const WorkspaceSettings& ws,
+                                QObject* parent = nullptr) noexcept;
+  virtual ~OrganizationsDbModel() noexcept;
 
-  // General Methods
-  void openDrcSettingsTab() noexcept;
-  void hideOtherTabs() noexcept;
+  // Implementations
+  std::size_t row_count() const override;
+  std::optional<ui::OrganizationDbData> row_data(std::size_t i) const override;
 
   // Operator Overloadings
-  BoardSetupDialog& operator=(const BoardSetupDialog& rhs) = delete;
+  OrganizationsDbModel& operator=(const OrganizationsDbModel& rhs) = delete;
 
 private:  // Methods
-  void buttonBoxClicked(QAbstractButton* button);
-  void load() noexcept;
-  void loadDrcSources(
-      const BoardDesignRuleCheckSettings::SourceSet& set) noexcept;
-  void loadDrcSettings(const BoardDesignRuleCheckSettings& s) noexcept;
-  void loadDrcSettingsPreset() noexcept;
-  void loadDrcSettingsPreset(const Uuid& orgUuid, const Uuid& druUuid) noexcept;
-  bool apply() noexcept;
-  QVector<const Layer*> getTopSilkscreenLayers() const noexcept;
-  QVector<const Layer*> getBotSilkscreenLayers() const noexcept;
+  void refresh() noexcept;
 
-private:  // Date
-  GuiApplication& mApp;
-  Board& mBoard;
-  UndoStack& mUndoStack;
-  QScopedPointer<Ui::BoardSetupDialog> mUi;
-
-  BoardDesignRuleCheckSettings::SourceSet mDrcSources;
-
-  static const QString sSettingsPrefix;
+private:  // Data
+  const WorkspaceLibraryDb& mDb;
+  const WorkspaceSettings& mSettings;
+  std::vector<ui::OrganizationDbData> mItems;
 };
 
 /*******************************************************************************
