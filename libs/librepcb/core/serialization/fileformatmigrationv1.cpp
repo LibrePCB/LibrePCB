@@ -269,7 +269,8 @@ void FileFormatMigrationV1::upgradeProject(TransactionalDirectory& dir,
            "in favor of the more powerful output jobs, and the corresponding "
            "output settings will be removed from boards in an upcoming "
            "release. It is recommended to add a Gerber/Excellon output job "
-           "now, as this allows to migrate the old export settings."),
+           "now, as this allows to migrate the old export settings (choose "
+           "\"Import Old Settings\")."),
         1));
   }
 }
