@@ -30,6 +30,7 @@
 #include <librepcb/core/algorithm/netsegmentsimplifier.h>
 #include <librepcb/core/project/board/items/bi_pad.h>
 #include <librepcb/core/project/circuit/componentsignalinstance.h>
+#include <librepcb/core/project/schematic/items/si_netlabel.h>
 #include <librepcb/core/project/schematic/items/si_netline.h>
 #include <librepcb/core/project/schematic/items/si_netpoint.h>
 #include <librepcb/core/project/schematic/items/si_netsegment.h>
@@ -182,6 +183,11 @@ void CmdSimplifySchematicNetSegments::simplifySegment(SI_NetSegment& segment) {
   }
   if (!newLines.isEmpty()) {
     newSegment->addNetPointsAndNetLines(newPoints.values(), newLines);
+    for (SI_NetLabel* label : segment.getNetLabels()) {
+      SI_NetLabel* newLabel =
+          new SI_NetLabel(*newSegment, label->getNetLabel());
+      newSegment->addNetLabel(*newLabel);
+    }
     appendChild(new CmdSchematicNetSegmentAdd(*newSegment.release()));
   }
 }
