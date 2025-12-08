@@ -269,7 +269,7 @@ void SI_NetSegment::removeNetPointsAndNetLines(
  ******************************************************************************/
 
 void SI_NetSegment::addNetLabel(SI_NetLabel& netlabel) {
-  if ((!isAddedToSchematic()) || (mNetLabels.values().contains(&netlabel)) ||
+  if ((mNetLabels.values().contains(&netlabel)) ||
       (&netlabel.getNetSegment() != this)) {
     throw LogicError(__FILE__, __LINE__);
   }
@@ -279,17 +279,20 @@ void SI_NetSegment::addNetLabel(SI_NetLabel& netlabel) {
         QString("There is already a netlabel with the UUID \"%1\"!")
             .arg(netlabel.getUuid().toStr()));
   }
-  netlabel.addToSchematic();  // can throw
+  if (isAddedToSchematic()) {
+    netlabel.addToSchematic();  // can throw
+  }
   mNetLabels.insert(netlabel.getUuid(), &netlabel);
   emit netLabelAdded(netlabel);
 }
 
 void SI_NetSegment::removeNetLabel(SI_NetLabel& netlabel) {
-  if ((!isAddedToSchematic()) ||
-      (mNetLabels.value(netlabel.getUuid()) != &netlabel)) {
+  if (mNetLabels.value(netlabel.getUuid()) != &netlabel) {
     throw LogicError(__FILE__, __LINE__);
   }
-  netlabel.removeFromSchematic();  // can throw
+  if (isAddedToSchematic()) {
+    netlabel.removeFromSchematic();  // can throw
+  }
   mNetLabels.remove(netlabel.getUuid());
   emit netLabelRemoved(netlabel);
 }
