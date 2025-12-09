@@ -446,6 +446,7 @@ export enum FootprintAction {
 export struct FootprintData {
     id: string,
     name: string,
+    tags: [string],
     model-x: Int64,
     model-y: Int64,
     model-z: Int64,
@@ -453,6 +454,9 @@ export struct FootprintData {
     model-ry: int,
     model-rz: int,
     models: [bool],  // One flag for each 3D model
+
+    new-tag: string,  // Set by UI, reset in backend
+    remove-tag: string,  // Set by UI, reset in backend
     action: FootprintAction,  // Set by UI, handled in backend
 }
 

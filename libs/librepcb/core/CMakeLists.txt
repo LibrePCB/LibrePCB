@@ -511,6 +511,7 @@ add_library(
   types/simplestring.h
   types/stroketextspacing.cpp
   types/stroketextspacing.h
+  types/tag.h
   types/uuid.cpp
   types/uuid.h
   types/version.cpp

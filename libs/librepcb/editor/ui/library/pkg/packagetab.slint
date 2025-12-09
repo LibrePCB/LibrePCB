@@ -5,6 +5,7 @@ import { DrawFootprintPolygonToolBar } from "drawfootprintpolygontoolbar.slint";
 import { DrawFootprintZoneToolBar } from "drawfootprintzonetoolbar.slint";
 import { ReNumberPadsToolBar } from "renumberpadstoolbar.slint";
 import { PackagePadListView } from "packagepadlistview.slint";
+import { PackageEditorTagsPanel } from "packageeditortagspanel.slint";
 import { PackageEditorTransformPanel } from "packageeditortransformpanel.slint";
 import {
     PackageEditorFootprintsPanel,
@@ -951,6 +952,16 @@ component PackageEditorTab inherits TouchArea {
         index: index;
         models-editor: view-3d;
         read-only: read-only;
+    }
+
+    tags-panel := PackageEditorTagsPanel {
+        x: panels-vertical-layout ? 8px : (parent.width - self.width - 8px);
+        y: parent.height - self.height - 8px;
+        section-index: section-index;
+        tabs: tabs;
+        index: index;
+        read-only: read-only;
+        visible: (!view-3d) && footprint-selected;
     }
 
     transform-panel := PackageEditorTransformPanel {

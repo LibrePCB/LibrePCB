@@ -33,6 +33,8 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <algorithm>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -168,6 +170,21 @@ void FootprintListModel::set_row_data(std::size_t i,
         cmd->setModelRotation(std::make_tuple(s2angle(data.model_rx),
                                               s2angle(data.model_ry),
                                               s2angle(data.model_rz)));
+
+        QSet<Tag> tags = obj->getTags();
+        if (!data.new_tag.empty()) {
+          // Note: Discard anything after '(' to allow having descriptions
+          // (in parentheses) in the UI-suggested tags. Those descriptions
+          // need to be stripped.
+          tags.insert(Tag(cleanTag(s2q(data.new_tag).split("(").first())));
+        }
+        if (!data.remove_tag.empty()) {
+          if (auto tag = parseTag(s2q(data.remove_tag))) {
+            tags.remove(*tag);
+          }
+        }
+        cmd->setTags(tags);
+
         execCmd(cmd.release());
       } catch (const Exception& e) {
         qCritical() << e.getMsg();
@@ -185,6 +202,7 @@ ui::FootprintData FootprintListModel::createItem(
   ui::FootprintData data{
       q2s(obj.getUuid().toStr().left(8)),  // ID
       q2s(*obj.getNames().getDefaultValue()),  // Name
+      std::make_shared<slint::VectorModel<slint::SharedString>>(),  // Tags
       l2s(std::get<0>(obj.getModelPosition())),  // Model X
       l2s(std::get<1>(obj.getModelPosition())),  // Model Y
       l2s(std::get<2>(obj.getModelPosition())),  // Model Z
@@ -192,10 +210,27 @@ ui::FootprintData FootprintListModel::createItem(
       l2s(std::get<1>(obj.getModelRotation())),  // Model RY
       l2s(std::get<2>(obj.getModelRotation())),  // Model RZ
       std::make_shared<slint::VectorModel<bool>>(),  // Checked 3D models
+      slint::SharedString(),  // New tag
+      slint::SharedString(),  // Remove tag
       ui::FootprintAction::None,  // Action
   };
+  updateTags(obj, data);
   updateModels(obj, data);
   return data;
+}
+
+void FootprintListModel::updateTags(const Footprint& obj,
+                                    ui::FootprintData& item) noexcept {
+  if (auto tags =
+          std::dynamic_pointer_cast<slint::VectorModel<slint::SharedString>>(
+              item.tags)) {
+    std::vector<slint::SharedString> values;
+    for (const auto& tag : obj.getTags()) {
+      values.push_back(q2s(*tag));
+    }
+    std::sort(values.begin(), values.end());
+    tags->set_vector(values);
+  }
 }
 
 void FootprintListModel::updateModels(const Footprint& obj,
@@ -227,6 +262,7 @@ void FootprintListModel::trigger(int index, std::shared_ptr<Footprint> obj,
       std::shared_ptr<Footprint> copy(
           new Footprint(Uuid::createRandom(), newName, ""));  // can throw
       copy->getDescriptions() = obj->getDescriptions();
+      copy->setTags(obj->getTags());
       copy->setModelPosition(obj->getModelPosition());
       copy->setModelRotation(obj->getModelRotation());
       copy->setModels(obj->getModels());
