@@ -59,6 +59,7 @@ protected:  // Methods
   void checkAssemblyType(MsgList& msgs) const;
   void checkDuplicatePadNames(MsgList& msgs) const;
   void checkMissingFootprint(MsgList& msgs) const;
+  void checkAmbiguousFootprintTags(MsgList& msgs) const;
   void checkMissingTexts(MsgList& msgs) const;
   void checkWrongTextLayers(MsgList& msgs) const;
   void checkPackageOutlines(MsgList& msgs) const;

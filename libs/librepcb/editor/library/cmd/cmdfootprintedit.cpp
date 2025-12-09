@@ -39,6 +39,8 @@ CmdFootprintEdit::CmdFootprintEdit(Footprint& fpt) noexcept
     mFootprint(fpt),
     mOldName(fpt.getNames().getDefaultValue()),
     mNewName(mOldName),
+    mOldTags(fpt.getTags()),
+    mNewTags(mOldTags),
     mOldModelPosition(fpt.getModelPosition()),
     mNewModelPosition(mOldModelPosition),
     mOldModelRotation(fpt.getModelRotation()),
@@ -57,6 +59,11 @@ CmdFootprintEdit::~CmdFootprintEdit() noexcept {
 void CmdFootprintEdit::setName(const ElementName& name) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewName = name;
+}
+
+void CmdFootprintEdit::setTags(const QSet<Tag>& tags) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewTags = tags;
 }
 
 void CmdFootprintEdit::setModelPosition(const Point3D& pos) noexcept {
@@ -82,6 +89,7 @@ bool CmdFootprintEdit::performExecute() {
   performRedo();  // can throw
 
   if (mNewName != mOldName) return true;
+  if (mNewTags != mOldTags) return true;
   if (mNewModelPosition != mOldModelPosition) return true;
   if (mNewModelRotation != mOldModelRotation) return true;
   if (mNewModels != mOldModels) return true;
@@ -90,6 +98,7 @@ bool CmdFootprintEdit::performExecute() {
 
 void CmdFootprintEdit::performUndo() {
   mFootprint.getNames().setDefaultValue(mOldName);
+  mFootprint.setTags(mOldTags);
   mFootprint.setModelPosition(mOldModelPosition);
   mFootprint.setModelRotation(mOldModelRotation);
   mFootprint.setModels(mOldModels);
@@ -97,6 +106,7 @@ void CmdFootprintEdit::performUndo() {
 
 void CmdFootprintEdit::performRedo() {
   mFootprint.getNames().setDefaultValue(mNewName);
+  mFootprint.setTags(mNewTags);
   mFootprint.setModelPosition(mNewModelPosition);
   mFootprint.setModelRotation(mNewModelRotation);
   mFootprint.setModels(mNewModels);

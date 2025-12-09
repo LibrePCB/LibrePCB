@@ -91,6 +91,30 @@ void FileFormatMigrationV1::upgradePackage(TransactionalDirectory& dir) {
 
     // Footprints.
     for (SExpression* fptNode : root->getChildren("footprint")) {
+      // Add tags depending on name.
+      const QString name = fptNode->getChild("name/@0").getValue().toLower();
+      if (name.contains("density level a")) {
+        fptNode->appendChild("tag", QString("ipc-density-level-a"));
+      }
+      if (name.contains("density level b")) {
+        fptNode->appendChild("tag", QString("ipc-density-level-b"));
+      }
+      if (name.contains("density level c")) {
+        fptNode->appendChild("tag", QString("ipc-density-level-c"));
+      }
+      if (name.contains("hand")) {
+        fptNode->appendChild("tag", QString("hand-soldering"));
+      }
+      if (name.contains("reflow")) {
+        fptNode->appendChild("tag", QString("reflow-soldering"));
+      }
+      if (name.contains("wave")) {
+        fptNode->appendChild("tag", QString("wave-soldering"));
+      }
+      if (name.contains("large")) {
+        fptNode->appendChild("tag", QString("extra-large-pads"));
+      }
+
       // Pads.
       for (SExpression* padNode : fptNode->getChildren("pad")) {
         // Revert possibly made manual change as a workaround for bug, see

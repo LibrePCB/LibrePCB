@@ -55,6 +55,7 @@ RuleCheckMessageList PackageCheck::runChecks() const {
   checkAssemblyType(msgs);
   checkDuplicatePadNames(msgs);
   checkMissingFootprint(msgs);
+  checkAmbiguousFootprintTags(msgs);
   checkMissingTexts(msgs);
   checkWrongTextLayers(msgs);
   checkPackageOutlines(msgs);
@@ -110,6 +111,18 @@ void PackageCheck::checkDuplicatePadNames(MsgList& msgs) const {
 void PackageCheck::checkMissingFootprint(MsgList& msgs) const {
   if (mPackage.getFootprints().isEmpty()) {
     msgs.append(std::make_shared<MsgMissingFootprint>());
+  }
+}
+
+void PackageCheck::checkAmbiguousFootprintTags(MsgList& msgs) const {
+  QSet<QSet<Tag>> tagSets;
+  for (const Footprint& footprint : mPackage.getFootprints()) {
+    if (tagSets.contains(footprint.getTags())) {
+      msgs.append(std::make_shared<MsgAmbiguousFootprintTags>());
+      return;
+    } else {
+      tagSets.insert(footprint.getTags());
+    }
   }
 }
 
