@@ -799,9 +799,9 @@ export global EditorCommandSet {
         icon: @image-url("../../../../font-awesome/svgs/solid/caret-up.svg"),
         text: "Increase Grid Interval",
         status-tip: "Increase the grid interval",
-        shortcut: "Ctrl+Shift++",
-        modifiers: { alt: false, control: true, shift: true, meta: false },
-        key: "+",
+        shortcut: "Ctrl+*",
+        modifiers: { alt: false, control: true, shift: false, meta: false },
+        key: "*",
     };
 
     in property <EditorCommand> grid-decrease: {
@@ -809,9 +809,9 @@ export global EditorCommandSet {
         icon: @image-url("../../../../font-awesome/svgs/solid/caret-down.svg"),
         text: "Decrease Grid Interval",
         status-tip: "Decrease the grid interval",
-        shortcut: "Ctrl+Shift+-",
-        modifiers: { alt: false, control: true, shift: true, meta: false },
-        key: "-",
+        shortcut: "Ctrl+/",
+        modifiers: { alt: false, control: true, shift: false, meta: false },
+        key: "/",
     };
 
     in property <EditorCommand> show-pin-numbers: {
