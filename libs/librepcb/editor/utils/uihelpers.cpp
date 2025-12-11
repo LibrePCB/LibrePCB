@@ -295,10 +295,19 @@ static bool isKeySequence(const slint::private_api::KeyEvent& e,
     return false;
   }
 
-  // Compare the modifiers.
+  // Compare the modifiers. For special key characters, allow an additional
+  // SHIFT modifier as this migh be required on some keyboard layouts. See
+  // discussion in https://github.com/LibrePCB/LibrePCB/issues/1641.
+  static QString specialChars = "+-*/.,:;_[]=@#%&()?!{}<>|";
   const slint::private_api::KeyboardModifiers seqMod =
       q2s(seq[0].keyboardModifiers());
-  return (e.modifiers == seqMod);
+  return (e.modifiers == seqMod) ||
+      ((seqMod.shift == false) &&  //
+       (e.modifiers.shift == true) &&  //
+       (e.modifiers.alt == seqMod.alt) &&  //
+       (e.modifiers.control == seqMod.control) &&  //
+       (e.modifiers.meta == seqMod.meta) &&  //
+       (specialChars.contains(s2q(e.text))));
 }
 
 bool isShortcut(const slint::private_api::KeyEvent& e,
