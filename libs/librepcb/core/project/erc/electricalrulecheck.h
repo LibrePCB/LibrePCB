@@ -35,6 +35,7 @@ namespace librepcb {
 class ComponentInstance;
 class NetSignal;
 class Project;
+class SI_BusSegment;
 class SI_NetSegment;
 class SI_Symbol;
 class Schematic;
@@ -59,6 +60,7 @@ public:
 private:  // Methods
   void checkNetClasses(RuleCheckMessageList& msgs) const;
   void checkNetSignals(RuleCheckMessageList& msgs) const;
+  void checkBuses(RuleCheckMessageList& msgs) const;
   void checkComponents(RuleCheckMessageList& msgs) const;
   void checkComponentSignals(const ComponentInstance& cmp,
                              RuleCheckMessageList& msgs) const;
@@ -70,6 +72,10 @@ private:  // Methods
                         RuleCheckMessageList& msgs) const;
   void checkNetPoints(const SI_NetSegment& netSegment,
                       RuleCheckMessageList& msgs) const;
+  void checkBusSegments(const Schematic& schematic,
+                        RuleCheckMessageList& msgs) const;
+  void checkBusJunctions(const SI_BusSegment& segment,
+                         RuleCheckMessageList& msgs) const;
 
 private:  // Data
   const Project& mProject;
