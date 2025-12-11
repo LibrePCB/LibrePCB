@@ -22,7 +22,7 @@
  ******************************************************************************/
 #include "uihelpers.h"
 
-#include "../editorcommand.h"
+#include "../editorcommandset.h"
 #include "slinthelpers.h"
 
 #include <QtCore>
@@ -286,6 +286,45 @@ ui::EditorCommand l2s(const EditorCommand& cmd, ui::EditorCommand in) noexcept {
     in.key = slint::SharedString();
   }
   return in;
+}
+
+static bool isKeySequence(const slint::private_api::KeyEvent& e,
+                          const QKeySequence& seq) {
+  // Compare the pressed key (e.g. 'r').
+  if (e.text.to_lowercase() != q2s(seq[0].key())) {
+    return false;
+  }
+
+  // Compare the modifiers.
+  const slint::private_api::KeyboardModifiers seqMod =
+      q2s(seq[0].keyboardModifiers());
+  return (e.modifiers == seqMod);
+}
+
+bool isShortcut(const slint::private_api::KeyEvent& e,
+                const ui::EditorCommand& cmd) noexcept {
+  // On the first call, build a hash table of all commands for fast lookup.
+  auto hashCmd = []() {
+    QHash<slint::SharedString, const EditorCommand*> map;
+    EditorCommandSet& cmd = EditorCommandSet::instance();
+    foreach (const EditorCommandCategory* category, cmd.getCategories()) {
+      foreach (const EditorCommand* command, cmd.getCommands(category)) {
+        map.insert(q2s(command->getIdentifier()), command);
+      }
+    }
+    return map;
+  };
+  static const QHash<slint::SharedString, const EditorCommand*> map = hashCmd();
+
+  // Find the command with the corresponding keyboard shortcut.
+  if (const EditorCommand* c = map.value(cmd.id)) {
+    for (const QKeySequence& seq : c->getDefaultKeySequences()) {
+      if (isKeySequence(e, seq)) {
+        return true;
+      }
+    }
+  }
+  return false;
 }
 
 ui::FeatureState toFs(bool enabled) noexcept {
