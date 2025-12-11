@@ -442,7 +442,7 @@ bool SchematicEditorState_DrawWire::addNextNetPoint(
           if (!otherNetSegment) {
             mContext.undoStack.appendToCmdGroup(new CmdCompSigInstSetNetSignal(
                 pin->getPin().getComponentSignalInstance(),
-                &mPositioningNetPoint2->getNetSignalOfNetSegment()));
+                &mPositioningNetPoint2->getNetSegment().getNetSignal()));
             otherForcedNetName = pin->getPin()
                                      .getComponentSignalInstance()
                                      .getForcedNetSignalName();
@@ -488,7 +488,7 @@ bool SchematicEditorState_DrawWire::addNextNetPoint(
         } else {
           // change net signal if needed
           NetSignal* thisSignal =
-              &mPositioningNetPoint2->getNetSignalOfNetSegment();
+              &mPositioningNetPoint2->getNetSegment().getNetSignal();
           NetSignal* otherSignal = &otherNetSegment->getNetSignal();
           if (thisSignal != otherSignal) {
             NetSignal* resultingNetSignal = nullptr;
@@ -501,12 +501,12 @@ bool SchematicEditorState_DrawWire::addNextNetPoint(
                            .getForcedNetNames()
                            .count() > 0) {
               resultingNetSignal =
-                  &mPositioningNetPoint2->getNetSignalOfNetSegment();
+                  &mPositioningNetPoint2->getNetSegment().getNetSignal();
               netSegmentToChangeSignal = otherNetSegment;
             } else if (otherSignal->hasAutoName() &&
                        (!thisSignal->hasAutoName())) {
               resultingNetSignal =
-                  &mPositioningNetPoint2->getNetSignalOfNetSegment();
+                  &mPositioningNetPoint2->getNetSegment().getNetSignal();
               netSegmentToChangeSignal = otherNetSegment;
             } else {
               resultingNetSignal = &otherNetSegment->getNetSignal();
@@ -536,7 +536,8 @@ bool SchematicEditorState_DrawWire::addNextNetPoint(
                       mPositioningNetPoint2->getNetSegment(), *signal));
             } else {
               std::unique_ptr<CmdNetSignalEdit> cmd(new CmdNetSignalEdit(
-                  mCircuit, mPositioningNetPoint2->getNetSignalOfNetSegment()));
+                  mCircuit,
+                  mPositioningNetPoint2->getNetSegment().getNetSignal()));
               cmd->setName(name, false);
               mContext.undoStack.appendToCmdGroup(cmd.release());
             }

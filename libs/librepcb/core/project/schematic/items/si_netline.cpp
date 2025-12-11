@@ -84,10 +84,6 @@ SI_NetLineAnchor* SI_NetLine::getOtherPoint(
   }
 }
 
-NetSignal& SI_NetLine::getNetSignalOfNetSegment() const noexcept {
-  return getNetSegment().getNetSignal();
-}
-
 /*******************************************************************************
  *  Setters
  ******************************************************************************/

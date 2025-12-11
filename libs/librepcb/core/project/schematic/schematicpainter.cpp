@@ -153,7 +153,7 @@ SchematicPainter::SchematicPainter(const Schematic& schematic,
         mNetLabels.append(
             Label{netlabel->getPosition(), netlabel->getRotation(),
                   netlabel->getMirrored(),
-                  *netlabel->getNetSignalOfNetSegment().getName()});
+                  *netlabel->getNetSegment().getNetSignal().getName()});
       }
       for (const SI_NetPoint* netpoint : segment->getNetPoints()) {
         if (netpoint->isVisibleJunction()) {

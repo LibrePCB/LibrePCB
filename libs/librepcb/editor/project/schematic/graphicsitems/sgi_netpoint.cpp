@@ -28,6 +28,7 @@
 
 #include <librepcb/core/project/circuit/netsignal.h>
 #include <librepcb/core/project/schematic/items/si_netpoint.h>
+#include <librepcb/core/project/schematic/items/si_netsegment.h>
 #include <librepcb/core/workspace/theme.h>
 
 #include <QtCore>
@@ -82,7 +83,8 @@ void SGI_NetPoint::paint(QPainter* painter,
   Q_UNUSED(widget);
 
   const bool highlight = option->state.testFlag(QStyle::State_Selected) ||
-      mHighlightedNetSignals->contains(&mNetPoint.getNetSignalOfNetSegment());
+      mHighlightedNetSignals->contains(
+          &mNetPoint.getNetSegment().getNetSignal());
 
   if (mLayer->isVisible() && mIsVisibleJunction) {
     painter->setPen(Qt::NoPen);
@@ -137,7 +139,7 @@ void SGI_NetPoint::updateJunction() noexcept {
 }
 
 void SGI_NetPoint::updateNetName() noexcept {
-  setToolTip(*mNetPoint.getNetSignalOfNetSegment().getName());
+  setToolTip(*mNetPoint.getNetSegment().getNetSignal().getName());
 }
 
 /*******************************************************************************

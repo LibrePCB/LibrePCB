@@ -33,7 +33,6 @@
  ******************************************************************************/
 namespace librepcb {
 
-class NetSignal;
 class SI_NetLine;
 class SI_NetSegment;
 
@@ -92,7 +91,6 @@ public:
   SI_NetLineAnchor& getP2() const noexcept { return *mP2; }
   SI_NetLineAnchor* getOtherPoint(
       const SI_NetLineAnchor& firstPoint) const noexcept;
-  NetSignal& getNetSignalOfNetSegment() const noexcept;
 
   // Setters
   void setWidth(const UnsignedLength& width) noexcept;

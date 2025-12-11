@@ -295,7 +295,7 @@ ErcMsgUnconnectedJunction::ErcMsgUnconnectedJunction(
   : ErcMsgBase(
         Severity::Hint,
         tr("Unconnected junction in net: '%1'")
-            .arg(*netPoint.getNetSignalOfNetSegment().getName()),
+            .arg(*netPoint.getNetSegment().getNetSignal().getName()),
         "There's an invisible junction in the schematic without any wire "
         "attached. This should not happen, please report it as a bug. But "
         "no worries, this issue is not harmful at all so you can safely "

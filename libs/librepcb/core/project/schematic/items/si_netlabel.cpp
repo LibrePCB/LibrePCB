@@ -53,14 +53,6 @@ SI_NetLabel::~SI_NetLabel() noexcept {
 }
 
 /*******************************************************************************
- *  Getters
- ******************************************************************************/
-
-NetSignal& SI_NetLabel::getNetSignalOfNetSegment() const noexcept {
-  return mNetSegment.getNetSignal();
-}
-
-/*******************************************************************************
  *  Setters
  ******************************************************************************/
 
@@ -92,7 +84,7 @@ void SI_NetLabel::addToSchematic() {
     throw LogicError(__FILE__, __LINE__);
   }
   mNameChangedConnection =
-      connect(&getNetSignalOfNetSegment(), &NetSignal::nameChanged,
+      connect(&mNetSegment.getNetSignal(), &NetSignal::nameChanged,
               [this]() { onEdited.notify(Event::NetNameChanged); });
   SI_Base::addToSchematic();
 }

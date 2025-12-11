@@ -29,6 +29,7 @@
 #include <librepcb/core/project/circuit/netsignal.h>
 #include <librepcb/core/project/schematic/items/si_netline.h>
 #include <librepcb/core/project/schematic/items/si_netpoint.h>
+#include <librepcb/core/project/schematic/items/si_netsegment.h>
 #include <librepcb/core/utils/toolbox.h>
 #include <librepcb/core/workspace/theme.h>
 
@@ -79,7 +80,8 @@ void SGI_NetLine::paint(QPainter* painter,
   Q_UNUSED(widget);
 
   const bool highlight = option->state.testFlag(QStyle::State_Selected) ||
-      mHighlightedNetSignals->contains(&mNetLine.getNetSignalOfNetSegment());
+      mHighlightedNetSignals->contains(
+          &mNetLine.getNetSegment().getNetSignal());
 
   // draw line
   if (mLayer && mLayer->isVisible()) {
@@ -130,7 +132,7 @@ void SGI_NetLine::updatePositions() noexcept {
 }
 
 void SGI_NetLine::updateNetSignalName() noexcept {
-  setToolTip(*mNetLine.getNetSignalOfNetSegment().getName());
+  setToolTip(*mNetLine.getNetSegment().getNetSignal().getName());
 }
 
 /*******************************************************************************

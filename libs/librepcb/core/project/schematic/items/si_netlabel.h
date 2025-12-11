@@ -35,7 +35,6 @@
 namespace librepcb {
 
 class Circuit;
-class NetSignal;
 class SI_NetSegment;
 class Schematic;
 
@@ -75,7 +74,6 @@ public:
   const Point& getAnchorPosition() const noexcept { return mAnchorPosition; }
   const NetLabel& getNetLabel() const noexcept { return mNetLabel; }
   SI_NetSegment& getNetSegment() const noexcept { return mNetSegment; }
-  NetSignal& getNetSignalOfNetSegment() const noexcept;
 
   // Setters
   void setPosition(const Point& position) noexcept;

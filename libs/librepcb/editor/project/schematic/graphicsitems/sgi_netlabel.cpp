@@ -110,7 +110,8 @@ void SGI_NetLabel::paint(QPainter* painter,
   const qreal lod =
       option->levelOfDetailFromTransform(painter->worldTransform());
   const bool highlight = option->state.testFlag(QStyle::State_Selected) ||
-      mHighlightedNetSignals->contains(&mNetLabel.getNetSignalOfNetSegment());
+      mHighlightedNetSignals->contains(
+          &mNetLabel.getNetSegment().getNetSignal());
 
   if (mOriginCrossLayer && mOriginCrossLayer->isVisible() && (lod > 2)) {
     // draw origin cross
@@ -205,9 +206,9 @@ void SGI_NetLabel::updateText() noexcept {
 
   QString displayText;
   const QFontMetricsF fm(mFont);
-  OverlineMarkupParser::process(*mNetLabel.getNetSignalOfNetSegment().getName(),
-                                fm, flags, displayText, mOverlines,
-                                mBoundingRect);
+  OverlineMarkupParser::process(
+      *mNetLabel.getNetSegment().getNetSignal().getName(), fm, flags,
+      displayText, mOverlines, mBoundingRect);
 
   mStaticText.setText(displayText);
   mStaticText.prepare(QTransform(), mFont);
