@@ -138,7 +138,6 @@ std::unique_ptr<GraphicsLayerList> GraphicsLayerList::previewLayers(
   l->add(theme, Theme::Color::sSchematicValues);
   l->add(theme, Theme::Color::sSchematicWires);
   l->add(theme, Theme::Color::sSchematicNetLabels);
-  l->add(theme, Theme::Color::sSchematicNetLabelAnchors);
   l->add(theme, Theme::Color::sSchematicImageBorders);
   l->add(theme, Theme::Color::sSchematicDocumentation);
   l->add(theme, Theme::Color::sSchematicComments);
@@ -216,7 +215,6 @@ std::unique_ptr<GraphicsLayerList> GraphicsLayerList::libraryLayers(
   l->add(theme, Theme::Color::sSchematicValues);
   l->add(theme, Theme::Color::sSchematicWires);
   l->add(theme, Theme::Color::sSchematicNetLabels);
-  l->add(theme, Theme::Color::sSchematicNetLabelAnchors);
   l->add(theme, Theme::Color::sSchematicImageBorders);
   l->add(theme, Theme::Color::sSchematicDocumentation);
   l->add(theme, Theme::Color::sSchematicComments);
@@ -287,7 +285,6 @@ std::unique_ptr<GraphicsLayerList> GraphicsLayerList::schematicLayers(
   l->add(theme, Theme::Color::sSchematicValues);
   l->add(theme, Theme::Color::sSchematicWires);
   l->add(theme, Theme::Color::sSchematicNetLabels);
-  l->add(theme, Theme::Color::sSchematicNetLabelAnchors);
   l->add(theme, Theme::Color::sSchematicImageBorders);
   l->add(theme, Theme::Color::sSchematicDocumentation);
   l->add(theme, Theme::Color::sSchematicComments);

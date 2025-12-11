@@ -79,8 +79,8 @@ SGI_NetLabel::SGI_NetLabel(SI_NetLabel& netlabel,
   // create anchor graphics item
   mAnchorGraphicsItem.reset(new LineGraphicsItem());
   mAnchorGraphicsItem->setZValue(SchematicGraphicsScene::ZValue_NetLabels);
-  mAnchorGraphicsItem->setLayer(
-      layers.get(Theme::Color::sSchematicNetLabelAnchors));
+  mAnchorGraphicsItem->setLayer(layers.get(Theme::Color::sSchematicReferences));
+  mAnchorGraphicsItem->setSelected(isSelected());
 
   updatePosition();
   updateRotation();
@@ -148,6 +148,8 @@ QVariant SGI_NetLabel::itemChange(GraphicsItemChange change,
     if (QGraphicsScene* s = scene()) {
       s->addItem(mAnchorGraphicsItem.data());
     }
+  } else if ((change == ItemSelectedHasChanged) && mAnchorGraphicsItem) {
+    mAnchorGraphicsItem->setSelected(value.toBool());
   }
   return QGraphicsItem::itemChange(change, value);
 }
