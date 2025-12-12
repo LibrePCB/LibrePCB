@@ -54,10 +54,10 @@ export component AppWindow inherits Window {
         key-pressed(event) => {
             if Shortcuts.process(event) {
                 return accept;
-            } else if Shortcuts.is-shortcut(event, Cmd.find) && (Data.current-tab.features.find == FeatureState.enabled) {
+            } else if Backend.is-shortcut(event, Cmd.find) && (Data.current-tab.features.find == FeatureState.enabled) {
                 menubar.focus-search();
                 return accept;
-            } else if Shortcuts.is-shortcut(event, Cmd.grid-properties) && (Data.current-tab.features.grid == FeatureState.enabled) {
+            } else if Backend.is-shortcut(event, Cmd.grid-properties) && (Data.current-tab.features.grid == FeatureState.enabled) {
                 statusbar.focus-grid-interval();
                 return accept;
             }

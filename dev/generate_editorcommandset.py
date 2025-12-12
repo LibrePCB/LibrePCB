@@ -53,6 +53,7 @@ export global EditorCommandSet {
 """
 
 SLINT_COMMAND_PATTERN = """    in property <EditorCommand> {name}: {{
+        id: "{id}",
         icon: @image-url("{icon}"),
         text: "{text}",
         status-tip: "{statustip}",
@@ -125,6 +126,9 @@ class EditorCommand:
         s = s.replace('Plus', '+')
         s = s.replace('Minus', '-')
         s = s.replace('Comma', ',')
+        s = s.replace('Asterisk', '*')
+        s = s.replace('Slash', '/')
+        s = s.replace('Equal', '=')
         s = s.replace(' | ', '+')
         return s
 
@@ -149,6 +153,7 @@ class EditorCommand:
         key = key.replace('Minus', '-')
         key = key.replace('Asterisk', '*')
         key = key.replace('Slash', '/')
+        key = key.replace('Equal', '=')
         key = key.replace('Left', 'LeftArrow')
         key = key.replace('Right', 'RightArrow')
         key = key.replace('Up', 'UpArrow')
@@ -157,9 +162,12 @@ class EditorCommand:
         key = key.replace('PageDownArrow', 'PageDown')
         if len(key) > 1:
             key = 'Key.{}'.format(key)
+        elif 'SHIFT' in shortcut and 'CTRL' not in shortcut:
+            key = '"{}"'.format(key.upper())
         else:
-            key = '"{}"'.format(key.upper() if 'SHIFT' in shortcut else key.lower())
+            key = '"{}"'.format(key.lower())
         return SLINT_COMMAND_PATTERN.format(
+            id=self.key,
             icon=self.icon(),
             name=self.key.replace('_', '-'),
             text=self.text(),
@@ -179,6 +187,8 @@ class EditorCommand:
         s = s.split(',')[0]
         s = s.replace('QKeySequence(', '')
         s = s.replace(')', '')
+        s = s.replace('QKeySequence::ZoomIn', 'Qt::CTRL | Qt::Key_Plus')
+        s = s.replace('QKeySequence::ZoomOut', 'Qt::CTRL | Qt::Key_Minus')
         return s
 
 

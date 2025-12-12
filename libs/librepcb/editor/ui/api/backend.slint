@@ -2,6 +2,7 @@ import {
     Action,
     AngleEditParseResult,
     BoardAction,
+    EditorCommand,
     EditorTool,
     Int64,
     LengthEditParseResult,
@@ -19,6 +20,16 @@ import { Data } from "data.slint";
 // Note: The callback implementations are just for the live preview, they will
 // be overridden by the backend in the real use-case.
 export global Backend {
+    // Check if a key event belongs to an EditorCommand
+    //
+    // Note that a basic check is performed in Slint in preview mode only
+    // (no support for multiple shortcuts etc.). The real, more accurate
+    // check is done in the C++ backend by overriding this callback.
+    pure callback is-shortcut(event: KeyEvent, command: EditorCommand) -> bool;
+    is-shortcut(event, command) => {
+        (event.text == command.key) && (event.modifiers == command.modifiers)
+    }
+
     // Trigger some action
     //
     // Note: This callback is executed asynchronously in the backend to

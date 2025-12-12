@@ -697,6 +697,7 @@ void GuiApplication::createNewWindow(int id, int projectIndex) noexcept {
 
   // Register global callbacks.
   const ui::Backend& b = win->global<ui::Backend>();
+  b.on_is_shortcut(&isShortcut);
   b.on_drop_tab([this](const slint::SharedString& srcData,
                        const slint::SharedString& dstData,
                        bool forceSwitchToTab) {
