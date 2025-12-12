@@ -853,7 +853,10 @@ public:
       QT_TR_NOOP("Increase the zoom level"),
       ":/bi/zoom-in.svg",
       EditorCommand::Flags(),
-      {QKeySequence(Qt::CTRL | Qt::Key_Plus)},
+      {
+          QKeySequence(Qt::CTRL | Qt::Key_Plus),
+          QKeySequence(Qt::CTRL | Qt::Key_Equal),  // For English layout
+      },
       &categoryView,
   };
   EditorCommand zoomOut{
