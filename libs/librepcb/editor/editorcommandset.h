@@ -853,7 +853,10 @@ public:
       QT_TR_NOOP("Increase the zoom level"),
       ":/bi/zoom-in.svg",
       EditorCommand::Flags(),
-      {QKeySequence(Qt::CTRL | Qt::Key_Plus)},
+      {
+          QKeySequence(Qt::CTRL | Qt::Key_Plus),
+          QKeySequence(Qt::CTRL | Qt::Key_Equal),  // For English layout
+      },
       &categoryView,
   };
   EditorCommand zoomOut{
@@ -871,7 +874,12 @@ public:
       QT_TR_NOOP("Increase the grid interval"),
       ":/fa/solid/caret-up.svg",
       EditorCommand::Flags(),
-      {QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_Plus)},
+      {
+          // Do not use Ctrl+Shift++ to avoid conflict with Zoom In,
+          // see https://github.com/LibrePCB/LibrePCB/issues/1641.
+          QKeySequence(Qt::CTRL | Qt::Key_Asterisk),  // For numpad
+          QKeySequence(Qt::CTRL | Qt::Key_BracketRight),  // For English layout
+      },
       &categoryView,
   };
   EditorCommand gridDecrease{
@@ -880,7 +888,12 @@ public:
       QT_TR_NOOP("Decrease the grid interval"),
       ":/fa/solid/caret-down.svg",
       EditorCommand::Flags(),
-      {QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_Minus)},
+      {
+          // Do not use Ctrl+Shift+- to avoid conflict with Zoom Out,
+          // see https://github.com/LibrePCB/LibrePCB/issues/1641.
+          QKeySequence(Qt::CTRL | Qt::Key_Slash),  // For numpad
+          QKeySequence(Qt::CTRL | Qt::Key_BracketLeft),  // For English layout
+      },
       &categoryView,
   };
   EditorCommand showPinNumbers{

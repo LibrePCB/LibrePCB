@@ -90,6 +90,8 @@ ui::ComponentPinoutDisplayMode l2s(const CmpSigPinDisplayType& v) noexcept;
 const CmpSigPinDisplayType& s2l(ui::ComponentPinoutDisplayMode v) noexcept;
 
 ui::EditorCommand l2s(const EditorCommand& cmd, ui::EditorCommand in) noexcept;
+bool isShortcut(const slint::private_api::KeyEvent& e,
+                const ui::EditorCommand& cmd) noexcept;
 
 ui::FeatureState toFs(bool enabled) noexcept;
 

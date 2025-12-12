@@ -13,7 +13,6 @@ import {
     Constants,
     Data,
     EditorCommandSet as Cmd,
-    Shortcuts,
     TreeViewItemAction,
     TreeViewItemData,
 } from "api.slint";
@@ -105,7 +104,7 @@ component WorkspaceFolderTreeView inherits TreeView {
         if (event.text == Key.Space) && item.supports-pinning {
             root.model[index].pinned = !root.model[index].pinned;
             return accept;
-        } else if (!item.is-project-file-or-folder) && Shortcuts.is-shortcut(event, Cmd.project-new) {
+        } else if (!item.is-project-file-or-folder) && Backend.is-shortcut(event, Cmd.project-new) {
             root.model[index].action = TreeViewItemAction.new-project;
             return accept;
         }

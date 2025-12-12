@@ -5,6 +5,7 @@ import { EditorCommand } from "types.slint";
 
 export global EditorCommandSet {
     in property <EditorCommand> item-new: {
+        id: "item_new",
         icon: @image-url(""),
         text: "New...",
         status-tip: "Add a new item",
@@ -14,6 +15,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> item-open: {
+        id: "item_open",
         icon: @image-url("../../../../font-awesome/svgs/solid/folder-open.svg"),
         text: "Open",
         status-tip: "Open the selected item(s)",
@@ -23,6 +25,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> save: {
+        id: "save",
         icon: @image-url("../../../../bootstrap-icons/icons/floppy-fill.svg"),
         text: "Save",
         status-tip: "Save changes to filesystem",
@@ -32,6 +35,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> select-all: {
+        id: "select_all",
         icon: @image-url("../../../../font-awesome/svgs/solid/object-group.svg"),
         text: "Select All",
         status-tip: "Select all visible objects",
@@ -41,6 +45,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> find: {
+        id: "find",
         icon: @image-url(""),
         text: "Find...",
         status-tip: "Find or filter objects",
@@ -50,6 +55,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> find-next: {
+        id: "find_next",
         icon: @image-url(""),
         text: "Find Next",
         status-tip: "Go to the next found object",
@@ -59,6 +65,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> find-previous: {
+        id: "find_previous",
         icon: @image-url(""),
         text: "Find Previous",
         status-tip: "Go to the previous found object",
@@ -68,6 +75,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> file-manager: {
+        id: "file_manager",
         icon: @image-url("../../../../font-awesome/svgs/solid/arrow-up-right-from-square.svg"),
         text: "Show in File Manager",
         status-tip: "Open the directory in the file manager",
@@ -77,6 +85,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> workspace-switch: {
+        id: "workspace_switch",
         icon: @image-url(""),
         text: "Switch Workspace...",
         status-tip: "Choose another workspace to open",
@@ -86,6 +95,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> workspace-settings: {
+        id: "workspace_settings",
         icon: @image-url("../../../../font-awesome/svgs/solid/sliders.svg"),
         text: "Workspace Settings...",
         status-tip: "Open the workspace settings dialog",
@@ -95,6 +105,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> workspace-libraries-rescan: {
+        id: "workspace_libraries_rescan",
         icon: @image-url("../../../../font-awesome/svgs/solid/arrows-rotate.svg"),
         text: "Rescan Libraries",
         status-tip: "Scan all workspace libraries to update the cache",
@@ -104,6 +115,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> library-manager: {
+        id: "library_manager",
         icon: @image-url("../../../../bootstrap-icons/icons/database.svg"),
         text: "Libraries",
         status-tip: "Manage installed part libraries",
@@ -113,6 +125,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> library-element-duplicate: {
+        id: "library_element_duplicate",
         icon: @image-url("../../../../font-awesome/svgs/solid/clone.svg"),
         text: "Duplicate",
         status-tip: "Create a new element by duplicating this one",
@@ -122,6 +135,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> project-new: {
+        id: "project_new",
         icon: @image-url("../../../../font-awesome/svgs/solid/file-circle-plus.svg"),
         text: "New Project...",
         status-tip: "Create a new project",
@@ -131,6 +145,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> project-open: {
+        id: "project_open",
         icon: @image-url("../../../../font-awesome/svgs/solid/folder-open.svg"),
         text: "Open Project...",
         status-tip: "Open an existing project",
@@ -140,6 +155,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> project-setup: {
+        id: "project_setup",
         icon: @image-url("../../../../font-awesome/svgs/solid/sliders.svg"),
         text: "Project Setup...",
         status-tip: "View/modify the project setup",
@@ -149,6 +165,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> grid-properties: {
+        id: "grid_properties",
         icon: @image-url("../../../../bootstrap-icons/icons/grid-3x3.svg"),
         text: "Grid Properties...",
         status-tip: "View/modify the grid properties",
@@ -158,6 +175,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> board-setup: {
+        id: "board_setup",
         icon: @image-url("../../../../font-awesome/svgs/solid/sliders.svg"),
         text: "Board Setup...",
         status-tip: "View/modify the board setup",
@@ -167,6 +185,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> run-quick-check: {
+        id: "run_quick_check",
         icon: @image-url("../../../../bootstrap-icons/icons/lightning-fill.svg"),
         text: "Run Quick Check",
         status-tip: "Run only the most important copper checks from the DRC",
@@ -176,6 +195,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> run-design-rule-check: {
+        id: "run_design_rule_check",
         icon: @image-url("../../../../font-awesome/svgs/solid/list-check.svg"),
         text: "Run Design Rule Check",
         status-tip: "Run the design rule check (DRC)",
@@ -185,6 +205,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> project-library-update: {
+        id: "project_library_update",
         icon: @image-url("../../../../font-awesome/svgs/solid/arrows-rotate.svg"),
         text: "Update Project Library...",
         status-tip: "Update the project's library elements from workspace libraries",
@@ -194,6 +215,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> sheet-new: {
+        id: "sheet_new",
         icon: @image-url("../../../../font-awesome/svgs/solid/file-circle-plus.svg"),
         text: "New Sheet...",
         status-tip: "Add a new schematic sheet to the project",
@@ -203,6 +225,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> sheet-rename: {
+        id: "sheet_rename",
         icon: @image-url("../../../../font-awesome/svgs/solid/pen-to-square.svg"),
         text: "Rename Sheet...",
         status-tip: "Rename the current schematic sheet",
@@ -212,6 +235,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> sheet-remove: {
+        id: "sheet_remove",
         icon: @image-url("../../../../font-awesome/svgs/solid/trash-can.svg"),
         text: "Remove Sheet",
         status-tip: "Remove the current schematic sheet from the project",
@@ -221,6 +245,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> board-new: {
+        id: "board_new",
         icon: @image-url("../../../../font-awesome/svgs/solid/file-circle-plus.svg"),
         text: "New Board...",
         status-tip: "Add a new board to the project",
@@ -230,6 +255,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> board-copy: {
+        id: "board_copy",
         icon: @image-url("../../../../font-awesome/svgs/solid/clone.svg"),
         text: "Copy Board...",
         status-tip: "Add a copy of the current board to the project",
@@ -239,6 +265,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> board-remove: {
+        id: "board_remove",
         icon: @image-url("../../../../font-awesome/svgs/solid/trash-can.svg"),
         text: "Remove Board",
         status-tip: "Remove the current board from the project",
@@ -248,6 +275,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> plane-show-all: {
+        id: "plane_show_all",
         icon: @image-url("../../../../font-awesome/svgs/solid/eye.svg"),
         text: "Show All Planes",
         status-tip: "Make the filled areas of all planes visible",
@@ -257,6 +285,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> plane-hide-all: {
+        id: "plane_hide_all",
         icon: @image-url("../../../../font-awesome/svgs/solid/eye-slash.svg"),
         text: "Hide All Planes",
         status-tip: "Make the filled areas of all planes invisible",
@@ -266,15 +295,17 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> plane-rebuild-all: {
+        id: "plane_rebuild_all",
         icon: @image-url("../../../../font-awesome/svgs/solid/arrows-rotate.svg"),
         text: "Rebuild All Planes",
         status-tip: "Re-calculate the filled areas of all planes",
         shortcut: "Ctrl+Shift+R",
         modifiers: { alt: false, control: true, shift: true, meta: false },
-        key: "R",
+        key: "r",
     };
 
     in property <EditorCommand> input-browse: {
+        id: "input_browse",
         icon: @image-url(""),
         text: "Browse...",
         status-tip: "Open file or directory browser",
@@ -284,6 +315,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> input-unit-change: {
+        id: "input_unit_change",
         icon: @image-url("../../../../font-awesome/svgs/solid/ruler.svg"),
         text: "Change Unit...",
         status-tip: "Change the measurement unit of the text input",
@@ -293,6 +325,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> input-remove: {
+        id: "input_remove",
         icon: @image-url(""),
         text: "Remove",
         status-tip: "Remove this item",
@@ -302,6 +335,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> input-accept-add: {
+        id: "input_accept_add",
         icon: @image-url(""),
         text: "Add",
         status-tip: "Add this item",
@@ -311,6 +345,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> add-example-projects: {
+        id: "add_example_projects",
         icon: @image-url(""),
         text: "Add Example Projects...",
         status-tip: "Add some example projects to the workspace",
@@ -320,6 +355,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> import-dxf: {
+        id: "import_dxf",
         icon: @image-url(""),
         text: "Import DXF...",
         status-tip: "Import a 2D mechanical drawing",
@@ -329,6 +365,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> import-eagle-library: {
+        id: "import_eagle_library",
         icon: @image-url(""),
         text: "Import EAGLE Library...",
         status-tip: "Import library elements from an EAGLE *.lbr file",
@@ -338,6 +375,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> import-eagle-project: {
+        id: "import_eagle_project",
         icon: @image-url(""),
         text: "Import EAGLE Project...",
         status-tip: "Import schematic/board from EAGLE *.sch/*.brd files",
@@ -347,6 +385,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> import-kicad-library: {
+        id: "import_kicad_library",
         icon: @image-url(""),
         text: "Import KiCad Library...",
         status-tip: "Import symbols and footprints from KiCad libraries",
@@ -356,6 +395,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> import-specctra-ses: {
+        id: "import_specctra_ses",
         icon: @image-url(""),
         text: "Import Specctra SES...",
         status-tip: "Import a Specctra session, e.g. from external autorouters",
@@ -365,6 +405,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> export-lppz: {
+        id: "export_lppz",
         icon: @image-url("../../../../font-awesome/svgs/solid/file-zipper.svg"),
         text: "Export *.lppz Archive...",
         status-tip: "Export the project as a self-contained *.lppz archive",
@@ -374,24 +415,27 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> export-image: {
+        id: "export_image",
         icon: @image-url("../../../../bootstrap-icons/icons/image.svg"),
         text: "Export Image...",
         status-tip: "Export graphics as a pixmap",
         shortcut: "Ctrl+Shift+I",
         modifiers: { alt: false, control: true, shift: true, meta: false },
-        key: "I",
+        key: "i",
     };
 
     in property <EditorCommand> export-pdf: {
+        id: "export_pdf",
         icon: @image-url("../../../../font-awesome/svgs/solid/file-pdf.svg"),
         text: "Export PDF...",
         status-tip: "Export graphics as a PDF",
         shortcut: "Ctrl+Shift+P",
         modifiers: { alt: false, control: true, shift: true, meta: false },
-        key: "P",
+        key: "p",
     };
 
     in property <EditorCommand> export-specctra-dsn: {
+        id: "export_specctra_dsn",
         icon: @image-url(""),
         text: "Export Specctra DSN...",
         status-tip: "Export PCB to Specctra format for external autorouters etc.",
@@ -401,15 +445,17 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> export-step: {
+        id: "export_step",
         icon: @image-url("../../../../font-awesome/svgs/solid/cubes.svg"),
         text: "Export STEP Model...",
         status-tip: "Export PCB as a STEP file for loading it into MCAD software",
         shortcut: "Ctrl+Shift+T",
         modifiers: { alt: false, control: true, shift: true, meta: false },
-        key: "T",
+        key: "t",
     };
 
     in property <EditorCommand> print: {
+        id: "print",
         icon: @image-url("../../../../bootstrap-icons/icons/printer-fill.svg"),
         text: "Print...",
         status-tip: "Send graphics to a printer",
@@ -419,6 +465,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> bill-of-materials: {
+        id: "bill_of_materials",
         icon: @image-url("../../../../font-awesome/svgs/solid/file-csv.svg"),
         text: "Bill Of Materials...",
         status-tip: "Open the project's bill of materials (BOM) to see part availability, prices etc.",
@@ -428,6 +475,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> generate-fabrication-data: {
+        id: "generate_fabrication_data",
         icon: @image-url("../../../../font-awesome/svgs/solid/industry.svg"),
         text: "Generate Fabrication Data...",
         status-tip: "Generate Gerber/Excellon files for PCB fabrication",
@@ -437,6 +485,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> generate-pick-place: {
+        id: "generate_pick_place",
         icon: @image-url(""),
         text: "Generate Pick&Place Files...",
         status-tip: "Generate pick&place files for automated PCB assembly",
@@ -446,6 +495,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> generate-d356-netlist: {
+        id: "generate_d356_netlist",
         icon: @image-url(""),
         text: "Generate IPC-D-356A Netlist...",
         status-tip: "Generate netlist file for automated PCB testing",
@@ -455,6 +505,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> output-jobs: {
+        id: "output_jobs",
         icon: @image-url("../../../../font-awesome/svgs/solid/play.svg"),
         text: "Output Jobs...",
         status-tip: "Modify or run output jobs",
@@ -464,6 +515,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> order-pcb: {
+        id: "order_pcb",
         icon: @image-url("../../../../font-awesome/svgs/solid/cart-shopping.svg"),
         text: "Order PCB",
         status-tip: "Start ordering the PCB online",
@@ -473,6 +525,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> undo: {
+        id: "undo",
         icon: @image-url("../../../../font-awesome/svgs/solid/rotate-left.svg"),
         text: "Undo",
         status-tip: "Revert the last modification",
@@ -482,6 +535,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> redo: {
+        id: "redo",
         icon: @image-url("../../../../font-awesome/svgs/solid/rotate-right.svg"),
         text: "Redo",
         status-tip: "Re-apply the last reverted modification",
@@ -491,6 +545,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> clipboard-cut: {
+        id: "clipboard_cut",
         icon: @image-url(""),
         text: "Cut",
         status-tip: "Cut the selected object(s) to clipboard",
@@ -500,6 +555,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> clipboard-copy: {
+        id: "clipboard_copy",
         icon: @image-url(""),
         text: "Copy",
         status-tip: "Copy the selected object(s) to clipboard",
@@ -509,6 +565,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> clipboard-paste: {
+        id: "clipboard_paste",
         icon: @image-url(""),
         text: "Paste",
         status-tip: "Paste object(s) from the clipboard",
@@ -518,6 +575,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> move-left: {
+        id: "move_left",
         icon: @image-url(""),
         text: "Move Left",
         status-tip: "Move the selected object(s) to the left",
@@ -527,6 +585,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> move-right: {
+        id: "move_right",
         icon: @image-url(""),
         text: "Move Right",
         status-tip: "Move the selected object(s) to the right",
@@ -536,6 +595,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> move-up: {
+        id: "move_up",
         icon: @image-url(""),
         text: "Move Up",
         status-tip: "Move the selected object(s) up",
@@ -545,6 +605,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> move-down: {
+        id: "move_down",
         icon: @image-url(""),
         text: "Move Down",
         status-tip: "Move the selected object(s) down",
@@ -554,6 +615,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> rotate-ccw: {
+        id: "rotate_ccw",
         icon: @image-url(""),
         text: "Rotate Counterclockwise",
         status-tip: "Rotate the selected object(s) counterclockwise",
@@ -563,6 +625,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> rotate-cw: {
+        id: "rotate_cw",
         icon: @image-url(""),
         text: "Rotate Clockwise",
         status-tip: "Rotate the selected object(s) clockwise",
@@ -572,6 +635,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> mirror-horizontal: {
+        id: "mirror_horizontal",
         icon: @image-url(""),
         text: "Mirror Horizontally",
         status-tip: "Mirror the selected object(s) horizontally",
@@ -581,6 +645,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> mirror-vertical: {
+        id: "mirror_vertical",
         icon: @image-url(""),
         text: "Mirror Vertically",
         status-tip: "Mirror the selected object(s) vertically",
@@ -590,6 +655,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> flip-horizontal: {
+        id: "flip_horizontal",
         icon: @image-url("../../../../../img/arrow-right-left-across-line.svg"),
         text: "Flip Horizontally",
         status-tip: "Flip the selected object(s) horizontally to the other board side",
@@ -599,6 +665,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> flip-vertical: {
+        id: "flip_vertical",
         icon: @image-url("../../../../font-awesome/svgs/solid/arrow-down-up-across-line.svg"),
         text: "Flip Vertically",
         status-tip: "Flip the selected object(s) vertically to the other board side",
@@ -608,6 +675,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> move-align: {
+        id: "move_align",
         icon: @image-url(""),
         text: "Move/Align Objects",
         status-tip: "Move and/or align the selected object(s) vertically or horizontally",
@@ -617,6 +685,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> snap-to-grid: {
+        id: "snap_to_grid",
         icon: @image-url(""),
         text: "Snap to Grid",
         status-tip: "Move the selected object(s) to snap the grid",
@@ -626,6 +695,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> lock: {
+        id: "lock",
         icon: @image-url("../../../../font-awesome/svgs/solid/lock.svg"),
         text: "Lock Placement",
         status-tip: "Lock the placement of the selected object(s)",
@@ -635,6 +705,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> unlock: {
+        id: "unlock",
         icon: @image-url("../../../../font-awesome/svgs/solid/lock-open.svg"),
         text: "Unlock Placement",
         status-tip: "Unlock the placement of the selected object(s)",
@@ -644,6 +715,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> line-width-set: {
+        id: "line_width_set",
         icon: @image-url("../../../../font-awesome/svgs/solid/pen-to-square.svg"),
         text: "Set Line Width...",
         status-tip: "Change the line/trace/stroke width of the selected object(s)",
@@ -653,6 +725,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> device-reset-text-all: {
+        id: "device_reset_text_all",
         icon: @image-url("../../../../bootstrap-icons/icons/bootstrap-reboot.svg"),
         text: "Reset All Texts",
         status-tip: "Reset all texts of the footprint to their initial state",
@@ -662,6 +735,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> properties: {
+        id: "properties",
         icon: @image-url(""),
         text: "Properties...",
         status-tip: "View/modify the object properties",
@@ -671,6 +745,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> rename: {
+        id: "rename",
         icon: @image-url("../../../../font-awesome/svgs/solid/pen-to-square.svg"),
         text: "Rename",
         status-tip: "Rename the selected object",
@@ -680,6 +755,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> remove: {
+        id: "remove",
         icon: @image-url(""),
         text: "Remove",
         status-tip: "Delete the selected object(s)",
@@ -689,6 +765,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> zoom-fit-content: {
+        id: "zoom_fit_content",
         icon: @image-url("../../../../font-awesome/svgs/solid/expand.svg"),
         text: "Zoom to Fit Contents",
         status-tip: "Set the zoom level to fit the whole content",
@@ -698,6 +775,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> zoom-in: {
+        id: "zoom_in",
         icon: @image-url("../../../../bootstrap-icons/icons/zoom-in.svg"),
         text: "Zoom In",
         status-tip: "Increase the zoom level",
@@ -707,6 +785,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> zoom-out: {
+        id: "zoom_out",
         icon: @image-url("../../../../bootstrap-icons/icons/zoom-out.svg"),
         text: "Zoom Out",
         status-tip: "Decrease the zoom level",
@@ -716,24 +795,27 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> grid-increase: {
+        id: "grid_increase",
         icon: @image-url("../../../../font-awesome/svgs/solid/caret-up.svg"),
         text: "Increase Grid Interval",
         status-tip: "Increase the grid interval",
-        shortcut: "Ctrl+Shift++",
-        modifiers: { alt: false, control: true, shift: true, meta: false },
-        key: "+",
+        shortcut: "Ctrl+*",
+        modifiers: { alt: false, control: true, shift: false, meta: false },
+        key: "*",
     };
 
     in property <EditorCommand> grid-decrease: {
+        id: "grid_decrease",
         icon: @image-url("../../../../font-awesome/svgs/solid/caret-down.svg"),
         text: "Decrease Grid Interval",
         status-tip: "Decrease the grid interval",
-        shortcut: "Ctrl+Shift+-",
-        modifiers: { alt: false, control: true, shift: true, meta: false },
-        key: "-",
+        shortcut: "Ctrl+/",
+        modifiers: { alt: false, control: true, shift: false, meta: false },
+        key: "/",
     };
 
     in property <EditorCommand> show-pin-numbers: {
+        id: "show_pin_numbers",
         icon: @image-url("../../../../bootstrap-icons/icons/123.svg"),
         text: "Show Pin Numbers",
         status-tip: "Show or hide symbol pin numbers",
@@ -743,15 +825,17 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> ignore-locks: {
+        id: "ignore_locks",
         icon: @image-url("../../../../font-awesome/svgs/solid/lock-open.svg"),
         text: "Ignore Placement Locks",
         status-tip: "Allow dragging locked items",
         shortcut: "Ctrl+Shift+L",
         modifiers: { alt: false, control: true, shift: true, meta: false },
-        key: "L",
+        key: "l",
     };
 
     in property <EditorCommand> toggle-background-image: {
+        id: "toggle_background_image",
         icon: @image-url("../../../../bootstrap-icons/icons/image.svg"),
         text: "Set/Unset Background Image...",
         status-tip: "Use a datasheet drawing as the background for verification",
@@ -761,6 +845,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> toggle-3d: {
+        id: "toggle_3d",
         icon: @image-url("../../../../bootstrap-icons/icons/badge-3d.svg"),
         text: "Toggle 2D/3D Mode",
         status-tip: "Switch between 2D and 3D viewer mode",
@@ -770,6 +855,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> tool-select: {
+        id: "tool_select",
         icon: @image-url("../../../../font-awesome/svgs/solid/arrow-pointer.svg"),
         text: "Select",
         status-tip: "Select & modify existing objects",
@@ -779,6 +865,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> tool-line: {
+        id: "tool_line",
         icon: @image-url(""),
         text: "Draw Line",
         status-tip: "Draw graphical lines",
@@ -788,6 +875,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> tool-rect: {
+        id: "tool_rect",
         icon: @image-url("../../../../font-awesome/svgs/solid/vector-square.svg"),
         text: "Draw Rectangle",
         status-tip: "Draw graphical rectangles",
@@ -797,6 +885,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> tool-polygon: {
+        id: "tool_polygon",
         icon: @image-url("../../../../font-awesome/svgs/solid/draw-polygon.svg"),
         text: "Draw Polygon",
         status-tip: "Draw graphical polygons",
@@ -806,6 +895,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> tool-circle: {
+        id: "tool_circle",
         icon: @image-url("../../../../bootstrap-icons/icons/circle.svg"),
         text: "Draw Circle",
         status-tip: "Draw graphical circles",
@@ -815,6 +905,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> tool-arc: {
+        id: "tool_arc",
         icon: @image-url("../../../../font-awesome/svgs/solid/circle-notch.svg"),
         text: "Draw Arc",
         status-tip: "Draw graphical arcs",
@@ -824,6 +915,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> tool-text: {
+        id: "tool_text",
         icon: @image-url("../../../../font-awesome/svgs/solid/font.svg"),
         text: "Add Text",
         status-tip: "Add graphical text objects",
@@ -833,6 +925,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> tool-name: {
+        id: "tool_name",
         icon: @image-url(""),
         text: "Add Name",
         status-tip: "Add graphical text objects for '{{NAME}}'",
@@ -842,6 +935,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> tool-value: {
+        id: "tool_value",
         icon: @image-url(""),
         text: "Add Value",
         status-tip: "Add graphical text objects for '{{VALUE}}'",
@@ -851,6 +945,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> tool-image: {
+        id: "tool_image",
         icon: @image-url("../../../../bootstrap-icons/icons/image.svg"),
         text: "Add Image",
         status-tip: "Add graphical image objects (e.g. a logo)",
@@ -860,6 +955,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> tool-pin: {
+        id: "tool_pin",
         icon: @image-url(""),
         text: "Add Pin",
         status-tip: "Add symbol pins (electrical connections for schematics)",
@@ -869,6 +965,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> tool-pad-tht: {
+        id: "tool_pad_tht",
         icon: @image-url(""),
         text: "Add THT Pad",
         status-tip: "Add plated through-hole copper pads",
@@ -878,6 +975,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> tool-pad-smt: {
+        id: "tool_pad_smt",
         icon: @image-url(""),
         text: "Add SMT Pad",
         status-tip: "Add surface mounted (single layer) copper pads",
@@ -887,6 +985,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> tool-pad-thermal: {
+        id: "tool_pad_thermal",
         icon: @image-url(""),
         text: "Add Thermal Pad",
         status-tip: "Add special SMT pads used as heat sink",
@@ -896,6 +995,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> tool-pad-bga: {
+        id: "tool_pad_bga",
         icon: @image-url(""),
         text: "Add BGA Pad",
         status-tip: "Add special SMT pads used for ball grid arrays",
@@ -905,6 +1005,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> tool-pad-edge-connector: {
+        id: "tool_pad_edge_connector",
         icon: @image-url(""),
         text: "Add Edge Connector Pad",
         status-tip: "Add special SMT pads used as edge connector",
@@ -914,6 +1015,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> tool-pad-test-point: {
+        id: "tool_pad_test_point",
         icon: @image-url(""),
         text: "Add Test Pad",
         status-tip: "Add special SMT pads used as test points",
@@ -923,6 +1025,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> tool-pad-local-fiducial: {
+        id: "tool_pad_local_fiducial",
         icon: @image-url(""),
         text: "Add Local Fiducial Pad",
         status-tip: "Add special SMT pads used as local fiducials",
@@ -932,6 +1035,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> tool-pad-global-fiducial: {
+        id: "tool_pad_global_fiducial",
         icon: @image-url(""),
         text: "Add Global Fiducial Pad",
         status-tip: "Add special SMT pads used as global fiducials",
@@ -941,6 +1045,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> tool-zone: {
+        id: "tool_zone",
         icon: @image-url("../../../../bootstrap-icons/icons/sign-stop.svg"),
         text: "Draw Keepout Zone",
         status-tip: "Draw keep-out zones",
@@ -950,6 +1055,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> tool-hole: {
+        id: "tool_hole",
         icon: @image-url("../../../../font-awesome/svgs/solid/bore-hole.svg"),
         text: "Add Hole",
         status-tip: "Add non-plated holes (NPTH drills)",
@@ -959,6 +1065,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> tool-wire: {
+        id: "tool_wire",
         icon: @image-url(""),
         text: "Draw Wire",
         status-tip: "Draw wires to create electrical connections between symbol pins",
@@ -968,6 +1075,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> tool-netlabel: {
+        id: "tool_netlabel",
         icon: @image-url("../../../../font-awesome/svgs/solid/tag.svg"),
         text: "Add Net Label",
         status-tip: "Add net labels to explicitly specify the net of wires",
@@ -977,6 +1085,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> tool-component: {
+        id: "tool_component",
         icon: @image-url("../../../../font-awesome/svgs/solid/microchip.svg"),
         text: "Add Component...",
         status-tip: "Insert components from the workspace libraries",
@@ -986,6 +1095,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> tool-trace: {
+        id: "tool_trace",
         icon: @image-url(""),
         text: "Draw Trace",
         status-tip: "Draw copper traces to interconnect devices",
@@ -995,6 +1105,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> tool-via: {
+        id: "tool_via",
         icon: @image-url("../../../../bootstrap-icons/icons/record-circle-fill.svg"),
         text: "Add Via",
         status-tip: "Add plated through-hole vias",
@@ -1004,6 +1115,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> tool-plane: {
+        id: "tool_plane",
         icon: @image-url("../../../../bootstrap-icons/icons/paint-bucket.svg"),
         text: "Draw Plane",
         status-tip: "Draw auto-filled copper areas to interconnect pads and vias",
@@ -1013,6 +1125,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> tool-generate-outline: {
+        id: "tool_generate_outline",
         icon: @image-url("../../../../font-awesome/svgs/solid/wand-magic-sparkles.svg"),
         text: "Generate Outline",
         status-tip: "Automatically generate the outline polygon",
@@ -1022,6 +1135,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> tool-generate-courtyard: {
+        id: "tool_generate_courtyard",
         icon: @image-url("../../../../font-awesome/svgs/solid/wand-magic-sparkles.svg"),
         text: "Generate Courtyard...",
         status-tip: "Automatically generate the courtyard polygon",
@@ -1031,6 +1145,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> tool-renumber-pads: {
+        id: "tool_renumber_pads",
         icon: @image-url("../../../../font-awesome/svgs/solid/wand-magic-sparkles.svg"),
         text: "Re-Number Pads...",
         status-tip: "Helper tool to interactively change pad numbers",
@@ -1040,6 +1155,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> tool-measure: {
+        id: "tool_measure",
         icon: @image-url("../../../../font-awesome/svgs/solid/ruler.svg"),
         text: "Measure Distance",
         status-tip: "Measure the distance between two points",
@@ -1049,6 +1165,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> command-toolbar-focus: {
+        id: "command_toolbar_focus",
         icon: @image-url(""),
         text: "Go To Command Toolbar",
         status-tip: "Move the focus into the command toolbar",
@@ -1058,6 +1175,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> abort: {
+        id: "abort",
         icon: @image-url(""),
         text: "Abort Command",
         status-tip: "Abort the currently active command",
@@ -1067,6 +1185,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> layer-up: {
+        id: "layer_up",
         icon: @image-url(""),
         text: "Layer Up",
         status-tip: "Switch to the next higher layer (bottom->top)",
@@ -1076,6 +1195,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> layer-down: {
+        id: "layer_down",
         icon: @image-url(""),
         text: "Layer Down",
         status-tip: "Switch to the next lower layer (top->bottom)",
@@ -1085,6 +1205,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> line-width-increase: {
+        id: "line_width_increase",
         icon: @image-url("../../../../font-awesome/svgs/solid/caret-up.svg"),
         text: "Increase Line Width",
         status-tip: "Increase the line/trace/stroke/pad width",
@@ -1094,6 +1215,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> line-width-decrease: {
+        id: "line_width_decrease",
         icon: @image-url("../../../../font-awesome/svgs/solid/caret-down.svg"),
         text: "Decrease Line Width",
         status-tip: "Decrease the line/trace/stroke/pad width",
@@ -1103,24 +1225,27 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> size-increase: {
+        id: "size_increase",
         icon: @image-url(""),
         text: "Increase Size",
         status-tip: "Increase the via/pad/pin/text size",
-        shortcut: "Asterisk",
+        shortcut: "*",
         modifiers: { alt: false, control: false, shift: false, meta: false },
         key: "*",
     };
 
     in property <EditorCommand> size-decrease: {
+        id: "size_decrease",
         icon: @image-url(""),
         text: "Decrease Size",
         status-tip: "Decrease the via/pad/pin/text size",
-        shortcut: "Slash",
+        shortcut: "/",
         modifiers: { alt: false, control: false, shift: false, meta: false },
         key: "/",
     };
 
     in property <EditorCommand> drill-increase: {
+        id: "drill_increase",
         icon: @image-url(""),
         text: "Increase Drill",
         status-tip: "Increase the via/pad/hole drill diameter",
@@ -1130,6 +1255,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> drill-decrease: {
+        id: "drill_decrease",
         icon: @image-url(""),
         text: "Decrease Drill",
         status-tip: "Decrease the via/pad/hole drill diameter",
@@ -1139,6 +1265,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> width-auto-toggle: {
+        id: "width_auto_toggle",
         icon: @image-url(""),
         text: "Toggle Auto-Width",
         status-tip: "Toggle the auto-width property state",
@@ -1148,6 +1275,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> fill-toggle: {
+        id: "fill_toggle",
         icon: @image-url(""),
         text: "Toggle Fill",
         status-tip: "Toggle the fill property state",
@@ -1157,6 +1285,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> grab-area-toggle: {
+        id: "grab_area_toggle",
         icon: @image-url(""),
         text: "Toggle Grab Area",
         status-tip: "Toggle the grab area property state",
@@ -1166,6 +1295,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> align-horizontal-left: {
+        id: "align_horizontal_left",
         icon: @image-url("../../../../font-awesome/svgs/solid/align-left.svg"),
         text: "Align Left",
         status-tip: "Horizontal alignment: Left",
@@ -1175,6 +1305,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> align-horizontal-center: {
+        id: "align_horizontal_center",
         icon: @image-url("../../../../font-awesome/svgs/solid/align-center.svg"),
         text: "Align Center",
         status-tip: "Horizontal alignment: Center",
@@ -1184,6 +1315,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> align-horizontal-right: {
+        id: "align_horizontal_right",
         icon: @image-url("../../../../font-awesome/svgs/solid/align-right.svg"),
         text: "Align Right",
         status-tip: "Horizontal alignment: Right",
@@ -1193,6 +1325,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> align-vertical-bottom: {
+        id: "align_vertical_bottom",
         icon: @image-url("../../../../bootstrap-icons/icons/align-bottom.svg"),
         text: "Align Bottom",
         status-tip: "Vertical alignment: Bottom",
@@ -1202,6 +1335,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> align-vertical-center: {
+        id: "align_vertical_center",
         icon: @image-url("../../../../bootstrap-icons/icons/align-center.svg"),
         text: "Align Center",
         status-tip: "Vertical alignment: Center",
@@ -1211,6 +1345,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> align-vertical-top: {
+        id: "align_vertical_top",
         icon: @image-url("../../../../bootstrap-icons/icons/align-top.svg"),
         text: "Align Top",
         status-tip: "Vertical alignment: Top",
@@ -1220,6 +1355,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> wire-mode-h-v: {
+        id: "wire_mode_h_v",
         icon: @image-url(""),
         text: "Horizontal - Vertical",
         status-tip: "Wire mode: First segment horizontal, second segment vertical",
@@ -1229,6 +1365,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> wire-mode-v-h: {
+        id: "wire_mode_v_h",
         icon: @image-url(""),
         text: "Vertical - Horizontal",
         status-tip: "Wire mode: First segment vertical, second segment horizontal",
@@ -1238,6 +1375,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> wire-mode-90-45: {
+        id: "wire_mode_90_45",
         icon: @image-url(""),
         text: "90° - 45°",
         status-tip: "Wire mode: First segment 90°, second segment 45°",
@@ -1247,6 +1385,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> wire-mode-45-90: {
+        id: "wire_mode_45_90",
         icon: @image-url(""),
         text: "45° - 90°",
         status-tip: "Wire mode: First segment 45°, second segment 90°",
@@ -1256,6 +1395,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> wire-mode-straight: {
+        id: "wire_mode_straight",
         icon: @image-url(""),
         text: "Straight",
         status-tip: "Wire mode: Straight line",
@@ -1265,6 +1405,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> shape-round: {
+        id: "shape_round",
         icon: @image-url("../../../../font-awesome/svgs/solid/circle.svg"),
         text: "Round",
         status-tip: "Shape: Round",
@@ -1274,6 +1415,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> shape-rounded-rect: {
+        id: "shape_rounded_rect",
         icon: @image-url("../../../../font-awesome/svgs/solid/square.svg"),
         text: "Rounded Rectangle",
         status-tip: "Shape: Rounded Rectangle",
@@ -1283,6 +1425,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> shape-rect: {
+        id: "shape_rect",
         icon: @image-url("../../../../font-awesome/svgs/solid/square-full.svg"),
         text: "Rectangle",
         status-tip: "Shape: Rectangle",
@@ -1292,6 +1435,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> shape-octagon: {
+        id: "shape_octagon",
         icon: @image-url("../../../../bootstrap-icons/icons/octagon-fill.svg"),
         text: "Octagon",
         status-tip: "Shape: Octagon",
@@ -1301,6 +1445,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> component-resistor: {
+        id: "component_resistor",
         icon: @image-url("../../../../../img/resistor-eu.svg"),
         text: "Resistor",
         status-tip: "Add standard component: Resistor",
@@ -1310,6 +1455,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> component-inductor: {
+        id: "component_inductor",
         icon: @image-url("../../../../../img/inductor-eu.svg"),
         text: "Inductor",
         status-tip: "Add standard component: Inductor",
@@ -1319,6 +1465,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> component-capacitor-bipolar: {
+        id: "component_capacitor_bipolar",
         icon: @image-url("../../../../../img/capacitor-bipolar-eu.svg"),
         text: "Bipolar Capacitor",
         status-tip: "Add standard component: Bipolar capacitor",
@@ -1328,6 +1475,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> component-capacitor-unipolar: {
+        id: "component_capacitor_unipolar",
         icon: @image-url("../../../../../img/capacitor-unipolar-eu.svg"),
         text: "Unipolar Capacitor",
         status-tip: "Add standard component: Unipolar capacitor",
@@ -1337,6 +1485,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> component-gnd: {
+        id: "component_gnd",
         icon: @image-url("../../../../../img/gnd.svg"),
         text: "GND Supply",
         status-tip: "Add standard component: GND supply",
@@ -1346,6 +1495,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> component-vcc: {
+        id: "component_vcc",
         icon: @image-url("../../../../../img/vcc.svg"),
         text: "VCC Supply",
         status-tip: "Add standard component: VCC supply",
@@ -1355,6 +1505,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> dock-erc: {
+        id: "dock_erc",
         icon: @image-url("../../../../font-awesome/svgs/solid/list-check.svg"),
         text: "Electrical Rule Check (ERC)",
         status-tip: "Go to the ERC messages dock",
@@ -1364,6 +1515,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> dock-drc: {
+        id: "dock_drc",
         icon: @image-url("../../../../font-awesome/svgs/solid/list-check.svg"),
         text: "Design Rule Check (DRC)",
         status-tip: "Go to the DRC messages dock",
@@ -1373,6 +1525,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> dock-layers: {
+        id: "dock_layers",
         icon: @image-url("../../../../bootstrap-icons/icons/layers.svg"),
         text: "Layers",
         status-tip: "Go to the layers dock",
@@ -1382,6 +1535,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> dock-place-devices: {
+        id: "dock_place_devices",
         icon: @image-url("../../../../bootstrap-icons/icons/cpu.svg"),
         text: "Place Devices",
         status-tip: "Go to the dock for placing devices",
@@ -1391,15 +1545,17 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> window-new: {
+        id: "window_new",
         icon: @image-url("../../../../bootstrap-icons/icons/window-plus.svg"),
         text: "New Window",
         status-tip: "Open a new window",
         shortcut: "Ctrl+Shift+N",
         modifiers: { alt: false, control: true, shift: true, meta: false },
-        key: "N",
+        key: "n",
     };
 
     in property <EditorCommand> window-close: {
+        id: "window_close",
         icon: @image-url("../../../../bootstrap-icons/icons/window-x.svg"),
         text: "Close Window",
         status-tip: "Close this window",
@@ -1409,6 +1565,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> project-close: {
+        id: "project_close",
         icon: @image-url("../../../../font-awesome/svgs/solid/xmark.svg"),
         text: "Close Project",
         status-tip: "Close the currently opened project",
@@ -1418,6 +1575,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> application-quit: {
+        id: "application_quit",
         icon: @image-url("../../../../bootstrap-icons/icons/box-arrow-left.svg"),
         text: "Quit",
         status-tip: "Close the whole application",
@@ -1427,6 +1585,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> about-librepcb: {
+        id: "about_librepcb",
         icon: @image-url("../../../../bootstrap-icons/icons/question-circle.svg"),
         text: "About LibrePCB",
         status-tip: "Show information about the application",
@@ -1436,6 +1595,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> about-qt: {
+        id: "about_qt",
         icon: @image-url(""),
         text: "About Qt...",
         status-tip: "Show information about Qt",
@@ -1445,6 +1605,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> website: {
+        id: "website",
         icon: @image-url("../../../../font-awesome/svgs/solid/globe.svg"),
         text: "LibrePCB Website",
         status-tip: "Open the LibrePCB website in the web browser",
@@ -1454,6 +1615,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> documentation-online: {
+        id: "documentation_online",
         icon: @image-url("../../../../font-awesome/svgs/solid/book.svg"),
         text: "User Manual & Tutorials",
         status-tip: "Open the online user manual in the web browser",
@@ -1463,6 +1625,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> support: {
+        id: "support",
         icon: @image-url("../../../../font-awesome/svgs/regular/comments.svg"),
         text: "Give Feedback & Get Support",
         status-tip: "Open the support page in the web browser",
@@ -1472,6 +1635,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> donate: {
+        id: "donate",
         icon: @image-url("../../../../font-awesome/svgs/solid/heart.svg"),
         text: "Support the LibrePCB Project",
         status-tip: "Open the donation page in the web browser",
@@ -1481,6 +1645,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> keyboard-shortcuts-reference: {
+        id: "keyboard_shortcuts_reference",
         icon: @image-url("../../../../font-awesome/svgs/solid/keyboard.svg"),
         text: "Keyboard Shortcuts Reference",
         status-tip: "Open a quick reference about the keyboard shortcuts",
@@ -1490,6 +1655,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> vertex-add: {
+        id: "vertex_add",
         icon: @image-url(""),
         text: "Add Vertex",
         status-tip: "Insert a new vertex into the selected polygon edge",
@@ -1499,6 +1665,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> vertex-remove: {
+        id: "vertex_remove",
         icon: @image-url(""),
         text: "Remove Vertex",
         status-tip: "Remove the selected vertex from the polygon",
@@ -1508,6 +1675,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> trace-select-whole: {
+        id: "trace_select_whole",
         icon: @image-url("../../../../font-awesome/svgs/solid/highlighter.svg"),
         text: "Select Whole Trace",
         status-tip: "Select the whole trace",
@@ -1517,6 +1685,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> trace-measure-length: {
+        id: "trace_measure_length",
         icon: @image-url("../../../../font-awesome/svgs/solid/ruler.svg"),
         text: "Measure Selected Segments Length",
         status-tip: "Measure the total length of all selected trace segments",
@@ -1526,6 +1695,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> trace-remove-whole: {
+        id: "trace_remove_whole",
         icon: @image-url("../../../../font-awesome/svgs/solid/trash-can.svg"),
         text: "Remove Whole Trace",
         status-tip: "Remove the whole trace",
@@ -1535,6 +1705,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> locked: {
+        id: "locked",
         icon: @image-url("../../../../font-awesome/svgs/solid/lock.svg"),
         text: "Lock Placement",
         status-tip: "Toggle placement lock",
@@ -1544,6 +1715,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> visible: {
+        id: "visible",
         icon: @image-url("../../../../font-awesome/svgs/solid/eye.svg"),
         text: "Visible",
         status-tip: "Toggle visibility",
@@ -1553,6 +1725,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> copy-mpn-to-clipboard: {
+        id: "copy_mpn_to_clipboard",
         icon: @image-url("../../../../font-awesome/svgs/regular/copy.svg"),
         text: "Copy MPN to Clipboard",
         status-tip: "Copy this MPN into the clipboard",
@@ -1562,6 +1735,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> open-product-website: {
+        id: "open_product_website",
         icon: @image-url("../../../../font-awesome/svgs/solid/globe.svg"),
         text: "Open Product Website...",
         status-tip: "Open product details about this part in the web browser",
@@ -1571,6 +1745,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> open-pricing-website: {
+        id: "open_pricing_website",
         icon: @image-url("../../../../font-awesome/svgs/solid/cart-shopping.svg"),
         text: "Open Pricing Website...",
         status-tip: "Open pricing details about this part in the web browser",
