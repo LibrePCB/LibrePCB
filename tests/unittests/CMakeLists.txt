@@ -87,6 +87,7 @@ add_executable(
   core/systeminfotest.cpp
   core/types/alignmenttest.cpp
   core/types/angletest.cpp
+  core/types/busnametest.cpp
   core/types/circuitidentifiertest.cpp
   core/types/fileproofnametest.cpp
   core/types/lengthtest.cpp

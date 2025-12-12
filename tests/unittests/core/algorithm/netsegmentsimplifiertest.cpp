@@ -62,7 +62,7 @@ protected:
                    .arg(it->getX().toMmString())
                    .arg(it->getY().toMmString()));
     }
-    for (int id : Toolbox::sortedQSet(result.disconnectedPinsOrPads)) {
+    for (int id : Toolbox::sortedQSet(result.disconnectedFixedAnchors)) {
       s.append(QString("disconnected pin/pad id=%1").arg(id));
     }
     s.append(QString("modified=%1").arg(result.modified ? "true" : "false"));
@@ -175,8 +175,8 @@ TEST_F(NetSegmentSimplifierTest, testOneZeroLengthLineBetweenJunctions) {
 
 TEST_F(NetSegmentSimplifierTest, testKeepZeroLengthLineBetweenPins) {
   NetSegmentSimplifier obj;
-  obj.addAnchor(AnchorType::PinOrPad, Point(0, 0), nullptr, nullptr);
-  obj.addAnchor(AnchorType::PinOrPad, Point(0, 0), nullptr, nullptr);
+  obj.addAnchor(AnchorType::Fixed, Point(0, 0), nullptr, nullptr);
+  obj.addAnchor(AnchorType::Fixed, Point(0, 0), nullptr, nullptr);
   obj.addLine(0, 1, nullptr, Length(1));
   const Result actual = obj.simplify();
 
@@ -337,7 +337,7 @@ TEST_F(NetSegmentSimplifierTest, testSplitMultipleIntersectingLines) {
 TEST_F(NetSegmentSimplifierTest, testDisconnectedPinsOrPads) {
   NetSegmentSimplifier obj;
   obj.addAnchor(AnchorType::Junction, Point(0, 0), nullptr, nullptr);
-  obj.addAnchor(AnchorType::PinOrPad, Point(0, 0), nullptr, nullptr);
+  obj.addAnchor(AnchorType::Fixed, Point(0, 0), nullptr, nullptr);
   obj.addLine(0, 1, nullptr, Length(1));
   const Result actual = obj.simplify();
 

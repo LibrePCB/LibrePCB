@@ -33,7 +33,7 @@
 #include "../../cmd/cmdschematicnetsegmentadd.h"
 #include "../../cmd/cmdschematicnetsegmentaddelements.h"
 #include "../../cmd/cmdschematicnetsegmentremoveelements.h"
-#include "../../cmd/cmdsimplifyschematicnetsegments.h"
+#include "../../cmd/cmdsimplifyschematicsegments.h"
 #include "../graphicsitems/sgi_netline.h"
 #include "../graphicsitems/sgi_netpoint.h"
 #include "../graphicsitems/sgi_symbolpin.h"
@@ -608,8 +608,10 @@ bool SchematicEditorState_DrawWire::abortPositioning(
 
   if (segment) {
     try {
+      // Not sure if we also need to simplify affected bus segments, but I
+      // guess just attaching a wire to them should not require that.
       mContext.undoStack.execCmd(
-          new CmdSimplifySchematicNetSegments({segment}));
+          new CmdSimplifySchematicSegments({segment}, {}));
     } catch (const Exception& e) {
       qCritical() << "Failed to simplify net segments:" << e.getMsg();
     }

@@ -67,7 +67,6 @@ public:
   }
   const Junction& getJunction() const noexcept { return mJunction; }
   bool isVisibleJunction() const noexcept;
-  bool isOpenLineEnd() const noexcept;
   SI_NetSegment& getNetSegment() const noexcept { return mNetSegment; }
   bool isUsed() const noexcept { return (mRegisteredNetLines.count() > 0); }
   bool isOpen() const noexcept override {

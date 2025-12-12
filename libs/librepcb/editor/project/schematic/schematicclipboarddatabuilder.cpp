@@ -28,11 +28,15 @@
 #include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/library/sym/symbol.h>
+#include <librepcb/core/project/circuit/bus.h>
 #include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/circuit/componentinstance.h>
 #include <librepcb/core/project/circuit/componentsignalinstance.h>
 #include <librepcb/core/project/circuit/netsignal.h>
 #include <librepcb/core/project/project.h>
+#include <librepcb/core/project/schematic/items/si_busjunction.h>
+#include <librepcb/core/project/schematic/items/si_buslabel.h>
+#include <librepcb/core/project/schematic/items/si_bussegment.h>
 #include <librepcb/core/project/schematic/items/si_image.h>
 #include <librepcb/core/project/schematic/items/si_netlabel.h>
 #include <librepcb/core/project/schematic/items/si_netpoint.h>
@@ -78,11 +82,14 @@ std::unique_ptr<SchematicClipboardData> SchematicClipboardDataBuilder::generate(
   // Get all selected items
   SchematicSelectionQuery query(mScene);
   query.addSelectedSymbols();
+  query.addSelectedBusLines();
+  query.addSelectedBusLabels();
   query.addSelectedNetLines();
   query.addSelectedNetLabels();
   query.addSelectedPolygons();
   query.addSelectedSchematicTexts();
   query.addSelectedImages();
+  query.addJunctionsOfBusLines();
   query.addNetPointsOfNetLines();
 
   // Add components
@@ -129,6 +136,40 @@ std::unique_ptr<SchematicClipboardData> SchematicClipboardDataBuilder::generate(
             symbol->getRotation(), symbol->getMirrored(), texts));
   }
 
+  // Add (splitted) bus segments including junctions, lines and labels
+  QHash<SI_BusSegment*, SchematicSelectionQuery::BusSegmentItems>
+      busSegmentItems = query.getBusSegmentItems();
+  for (auto it = busSegmentItems.constBegin(); it != busSegmentItems.constEnd();
+       ++it) {
+    const Bus& bus = it.key()->getBus();
+    if (!data->getBuses().contains(bus.getUuid())) {
+      data->getBuses().append(std::make_shared<SchematicClipboardData::Bus>(
+          bus.getUuid(), bus.getName(), bus.getPrefixNetNames(),
+          bus.getMaxTraceLengthDifference()));
+    }
+
+    SchematicNetSegmentSplitter splitter;
+    foreach (SI_BusJunction* junction, it.value().junctions) {
+      splitter.addJunction(junction->getJunction());
+    }
+    foreach (SI_BusLine* line, it.value().lines) {
+      splitter.addNetLine(line->getNetLine());
+    }
+    foreach (SI_BusLabel* label, it.value().labels) {
+      splitter.addNetLabel(label->getNetLabel());
+    }
+    foreach (const SchematicNetSegmentSplitter::Segment& segment,
+             splitter.split()) {
+      std::shared_ptr<SchematicClipboardData::BusSegment> newSegment =
+          std::make_shared<SchematicClipboardData::BusSegment>(
+              it.key()->getUuid(), it.key()->getBus().getUuid());
+      newSegment->junctions = segment.junctions;
+      newSegment->lines = segment.netlines;
+      newSegment->labels = segment.netlabels;
+      data->getBusSegments().append(newSegment);
+    }
+  }
+
   // Add (splitted) net segments including netpoints, netlines and netlabels
   QHash<SI_NetSegment*, SchematicSelectionQuery::NetSegmentItems>
       netSegmentItems = query.getNetSegmentItems();
@@ -136,9 +177,14 @@ std::unique_ptr<SchematicClipboardData> SchematicClipboardDataBuilder::generate(
        ++it) {
     SchematicNetSegmentSplitter splitter;
     foreach (SI_SymbolPin* pin, it.key()->getAllConnectedPins()) {
-      bool replacePin = !query.getSymbols().contains(&pin->getSymbol());
-      splitter.addSymbolPin(pin->toNetLineAnchor(), pin->getPosition(),
-                            replacePin);
+      const bool replacePin = !query.getSymbols().contains(&pin->getSymbol());
+      splitter.addFixedAnchor(pin->toNetLineAnchor(), pin->getPosition(),
+                              replacePin);
+    }
+    foreach (SI_BusJunction* bj, it.key()->getAllConnectedBusJunctions()) {
+      const bool replaceJunction = !query.getBusJunctions().contains(bj);
+      splitter.addFixedAnchor(bj->toNetLineAnchor(), bj->getPosition(),
+                              replaceJunction);
     }
     foreach (SI_NetPoint* netpoint, it.value().netpoints) {
       splitter.addJunction(netpoint->getJunction());
@@ -149,7 +195,6 @@ std::unique_ptr<SchematicClipboardData> SchematicClipboardDataBuilder::generate(
     foreach (SI_NetLabel* netlabel, it.value().netlabels) {
       splitter.addNetLabel(netlabel->getNetLabel());
     }
-
     foreach (const SchematicNetSegmentSplitter::Segment& segment,
              splitter.split()) {
       std::shared_ptr<SchematicClipboardData::NetSegment> newSegment =

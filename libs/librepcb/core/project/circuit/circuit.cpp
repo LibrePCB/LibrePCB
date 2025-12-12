@@ -27,6 +27,7 @@
 #include "../../serialization/sexpression.h"
 #include "../project.h"
 #include "assemblyvariant.h"
+#include "bus.h"
 #include "componentinstance.h"
 #include "netclass.h"
 #include "netsignal.h"
@@ -50,6 +51,13 @@ Circuit::~Circuit() noexcept {
   foreach (ComponentInstance* compInstance, mComponentInstances) try {
       removeComponentInstance(*compInstance);
       delete compInstance;
+    } catch (...) {
+    }
+
+  // delete all buses (and catch all thrown exceptions)
+  foreach (Bus* bus, mBuses) try {
+      removeBus(*bus);
+      delete bus;
     } catch (...) {
     }
 
@@ -272,6 +280,71 @@ void Circuit::setNetSignalName(NetSignal& netsignal,
 }
 
 /*******************************************************************************
+ *  Bus Methods
+ ******************************************************************************/
+
+QString Circuit::generateAutoBusName() const noexcept {
+  QString name;
+  int i = 1;
+  do {
+    name = QString("B%1").arg(i++);
+  } while (getBusByName(name));
+  return name;
+}
+
+Bus* Circuit::getBusByName(const QString& name) const noexcept {
+  foreach (Bus* bus, mBuses) {
+    if (bus->getName() == name) {
+      return bus;
+    }
+  }
+  return nullptr;
+}
+
+void Circuit::addBus(Bus& bus) {
+  if ((mBuses.values().contains(&bus)) || (&bus.getCircuit() != this)) {
+    throw LogicError(__FILE__, __LINE__);
+  }
+  if (mBuses.contains(bus.getUuid())) {
+    throw RuntimeError(__FILE__, __LINE__,
+                       QString("There is already a bus with the UUID \"%1\"!")
+                           .arg(bus.getUuid().toStr()));
+  }
+  if (getBusByName(*bus.getName())) {
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        tr("There is already a bus with the name \"%1\"!").arg(*bus.getName()));
+  }
+  bus.addToCircuit();  // can throw
+  mBuses.insert(bus.getUuid(), &bus);
+  emit busAdded(bus);
+}
+
+void Circuit::removeBus(Bus& bus) {
+  if (mBuses.value(bus.getUuid()) != &bus) {
+    throw LogicError(__FILE__, __LINE__);
+  }
+  bus.removeFromCircuit();  // can throw
+  mBuses.remove(bus.getUuid());
+  emit busRemoved(bus);
+}
+
+void Circuit::setBusName(Bus& bus, const BusName& newName, bool isAutoName) {
+  // check if the bus was added to the circuit
+  if (mBuses.value(bus.getUuid()) != &bus) {
+    throw LogicError(__FILE__, __LINE__);
+  }
+  // check if there is no bus with the same name in the list
+  if (getBusByName(*newName)) {
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        tr("There is already a bus with the name \"%1\"!").arg(*newName));
+  }
+  // apply the new name
+  bus.setName(newName, isAutoName);  // can throw
+}
+
+/*******************************************************************************
  *  ComponentInstance Methods
  ******************************************************************************/
 
@@ -364,6 +437,10 @@ void Circuit::serialize(SExpression& root) const {
   for (const NetSignal* obj : mNetSignals) {
     root.ensureLineBreak();
     obj->serialize(root.appendList("net"));
+  }
+  for (const Bus* obj : mBuses) {
+    root.ensureLineBreak();
+    obj->serialize(root.appendList("bus"));
   }
   for (const ComponentInstance* obj : mComponentInstances) {
     root.ensureLineBreak();

@@ -95,7 +95,7 @@ void CmdSimplifyBoardNetSegments::simplifySegment(BI_NetSegment& segment) {
     if (auto pad = dynamic_cast<const BI_Pad*>(&anchor)) {
       const bool isTht = pad->getProperties().isTht();
       id = simplifier.addAnchor(
-          NetSegmentSimplifier::AnchorType::PinOrPad, pad->getPosition(),
+          NetSegmentSimplifier::AnchorType::Fixed, pad->getPosition(),
           isTht ? &Layer::topCopper() : &pad->getSolderLayer(),
           isTht ? &Layer::botCopper() : &pad->getSolderLayer());
     } else if (auto via = dynamic_cast<const BI_Via*>(&anchor)) {

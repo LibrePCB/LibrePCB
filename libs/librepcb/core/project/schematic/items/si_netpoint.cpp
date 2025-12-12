@@ -57,10 +57,6 @@ bool SI_NetPoint::isVisibleJunction() const noexcept {
   return (mRegisteredNetLines.count() > 2);
 }
 
-bool SI_NetPoint::isOpenLineEnd() const noexcept {
-  return (mRegisteredNetLines.count() <= 1);
-}
-
 NetLineAnchor SI_NetPoint::toNetLineAnchor() const noexcept {
   return NetLineAnchor::junction(mJunction.getUuid());
 }

@@ -27,7 +27,12 @@
 #include "../../export/graphicspainter.h"
 #include "../../library/sym/symbol.h"
 #include "../../workspace/theme.h"
+#include "../circuit/bus.h"
 #include "../circuit/netsignal.h"
+#include "items/si_busjunction.h"
+#include "items/si_buslabel.h"
+#include "items/si_busline.h"
+#include "items/si_bussegment.h"
 #include "items/si_image.h"
 #include "items/si_netlabel.h"
 #include "items/si_netline.h"
@@ -74,7 +79,7 @@ SchematicPainter::SchematicPainter(const Schematic& schematic,
           pin->getNumbersAlignment(),
       });
       if (pin->isVisibleJunction() && (!thumbnail)) {
-        mJunctions.append(pin->getPosition());
+        mNetJunctions.append(pin->getPosition());
       }
     }
     for (const Polygon& polygon : symbol->getLibSymbol().getPolygons()) {
@@ -147,17 +152,40 @@ SchematicPainter::SchematicPainter(const Schematic& schematic,
       }
     }
   }
+  foreach (const SI_BusSegment* segment, schematic.getBusSegments()) {
+    if (!thumbnail) {
+      for (const SI_BusLabel* l : segment->getLabels()) {
+        mBusLabels.append(Label{
+            l->getPosition(),
+            l->getRotation(),
+            l->getMirrored(),
+            *l->getBusSegment().getBus().getName(),
+        });
+      }
+      for (const SI_BusJunction* p : segment->getJunctions()) {
+        if (p->isVisibleJunction()) {
+          mBusJunctions.append(p->getPosition());
+        }
+      }
+    }
+    for (const SI_BusLine* l : segment->getLines()) {
+      mBusLines.append(Line{l->getP1().getPosition(), l->getP2().getPosition(),
+                            l->getWidth()});
+    }
+  }
   foreach (const SI_NetSegment* segment, schematic.getNetSegments()) {
     if (!thumbnail) {
       for (const SI_NetLabel* netlabel : segment->getNetLabels()) {
-        mNetLabels.append(
-            Label{netlabel->getPosition(), netlabel->getRotation(),
-                  netlabel->getMirrored(),
-                  *netlabel->getNetSegment().getNetSignal().getName()});
+        mNetLabels.append(Label{
+            netlabel->getPosition(),
+            netlabel->getRotation(),
+            netlabel->getMirrored(),
+            *netlabel->getNetSegment().getNetSignal().getName(),
+        });
       }
       for (const SI_NetPoint* netpoint : segment->getNetPoints()) {
         if (netpoint->isVisibleJunction()) {
-          mJunctions.append(netpoint->getPosition());
+          mNetJunctions.append(netpoint->getPosition());
         }
       }
     }
@@ -311,8 +339,8 @@ void SchematicPainter::paint(
                settings.getColor(Theme::Color::sSchematicWires));
   }
 
-  // Draw Junctions.
-  foreach (const Point& pos, mJunctions) {
+  // Draw Net Junctions.
+  foreach (const Point& pos, mNetJunctions) {
     p.drawNetJunction(pos, settings.getColor(Theme::Color::sSchematicWires));
   }
 
@@ -321,6 +349,24 @@ void SchematicPainter::paint(
     p.drawNetLabel(netlabel.position, netlabel.rotation, netlabel.mirrored,
                    netlabel.text, mNetLabelFont,
                    settings.getColor(Theme::Color::sSchematicNetLabels));
+  }
+
+  // Draw Bus Lines.
+  foreach (const Line& netline, mBusLines) {
+    p.drawLine(netline.startPosition, netline.endPosition, *netline.width,
+               settings.getColor(Theme::Color::sSchematicBuses));
+  }
+
+  // Draw Bus Junctions.
+  foreach (const Point& pos, mBusJunctions) {
+    p.drawNetJunction(pos, settings.getColor(Theme::Color::sSchematicBuses));
+  }
+
+  // Draw Bus Labels.
+  foreach (const Label& netlabel, mBusLabels) {
+    p.drawNetLabel(netlabel.position, netlabel.rotation, netlabel.mirrored,
+                   netlabel.text, mNetLabelFont,
+                   settings.getColor(Theme::Color::sSchematicBusLabels));
   }
 }
 

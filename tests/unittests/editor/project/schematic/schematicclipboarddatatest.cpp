@@ -61,7 +61,9 @@ TEST(SchematicClipboardDataTest, testToFromMimeDataEmpty) {
       SchematicClipboardData::fromMimeData(mime1.get());
   EXPECT_EQ(uuid, obj2->getSchematicUuid());
   EXPECT_EQ(pos, obj2->getCursorPos());
+  EXPECT_EQ(obj1.getBuses(), obj2->getBuses());
   EXPECT_EQ(obj1.getComponentInstances(), obj2->getComponentInstances());
+  EXPECT_EQ(obj1.getBusSegments(), obj2->getBusSegments());
   EXPECT_EQ(obj1.getNetSegments(), obj2->getNetSegments());
   EXPECT_EQ(obj1.getSymbolInstances(), obj2->getSymbolInstances());
   EXPECT_EQ(obj1.getPolygons(), obj2->getPolygons());
@@ -110,6 +112,14 @@ TEST(SchematicClipboardDataTest, testToFromMimeDataPopulated) {
       Angle(30), PositiveLength(40),
       Alignment(HAlign::center(), VAlign::bottom()), false);
 
+  std::shared_ptr<SchematicClipboardData::Bus> bus1 =
+      std::make_shared<SchematicClipboardData::Bus>(
+          Uuid::createRandom(), BusName("bus1"), false, std::nullopt);
+
+  std::shared_ptr<SchematicClipboardData::Bus> bus2 =
+      std::make_shared<SchematicClipboardData::Bus>(
+          Uuid::createRandom(), BusName("bus2"), true, UnsignedLength(1234));
+
   std::shared_ptr<SchematicClipboardData::ComponentInstance> component1 =
       std::make_shared<SchematicClipboardData::ComponentInstance>(
           Uuid::createRandom(), Uuid::createRandom(), Uuid::createRandom(),
@@ -133,6 +143,46 @@ TEST(SchematicClipboardDataTest, testToFromMimeDataPopulated) {
       std::make_shared<SchematicClipboardData::SymbolInstance>(
           Uuid::createRandom(), Uuid::createRandom(), Uuid::createRandom(),
           Point(321, 987), Angle(555), true, TextList{text1, text2});
+
+  std::shared_ptr<SchematicClipboardData::BusSegment> busSegment1 =
+      std::make_shared<SchematicClipboardData::BusSegment>(Uuid::createRandom(),
+                                                           bus1->uuid);
+  busSegment1->junctions.append(
+      std::make_shared<Junction>(Uuid::createRandom(), Point(1, 2)));
+  busSegment1->junctions.append(
+      std::make_shared<Junction>(Uuid::createRandom(), Point(3, 4)));
+  busSegment1->lines.append(std::make_shared<NetLine>(
+      Uuid::createRandom(), UnsignedLength(1),
+      NetLineAnchor::junction(Uuid::createRandom()),
+      NetLineAnchor::pin(Uuid::createRandom(), Uuid::createRandom())));
+  busSegment1->lines.append(std::make_shared<NetLine>(
+      Uuid::createRandom(), UnsignedLength(0),
+      NetLineAnchor::junction(Uuid::createRandom()),
+      NetLineAnchor::pin(Uuid::createRandom(), Uuid::createRandom())));
+  busSegment1->labels.append(std::make_shared<NetLabel>(
+      Uuid::createRandom(), Point(12, 34), Angle(56), false));
+  busSegment1->labels.append(std::make_shared<NetLabel>(
+      Uuid::createRandom(), Point(123, 456), Angle(789), false));
+
+  std::shared_ptr<SchematicClipboardData::BusSegment> busSegment2 =
+      std::make_shared<SchematicClipboardData::BusSegment>(Uuid::createRandom(),
+                                                           bus2->uuid);
+  busSegment2->junctions.append(
+      std::make_shared<Junction>(Uuid::createRandom(), Point(10, 20)));
+  busSegment2->junctions.append(
+      std::make_shared<Junction>(Uuid::createRandom(), Point(30, 40)));
+  busSegment2->lines.append(
+      std::make_shared<NetLine>(Uuid::createRandom(), UnsignedLength(10),
+                                NetLineAnchor::junction(Uuid::createRandom()),
+                                NetLineAnchor::junction(Uuid::createRandom())));
+  busSegment2->lines.append(std::make_shared<NetLine>(
+      Uuid::createRandom(), UnsignedLength(100),
+      NetLineAnchor::junction(Uuid::createRandom()),
+      NetLineAnchor::pin(Uuid::createRandom(), Uuid::createRandom())));
+  busSegment2->labels.append(std::make_shared<NetLabel>(
+      Uuid::createRandom(), Point(120, 340), Angle(560), false));
+  busSegment2->labels.append(std::make_shared<NetLabel>(
+      Uuid::createRandom(), Point(1230, 4560), Angle(7890), false));
 
   std::shared_ptr<SchematicClipboardData::NetSegment> netSegment1 =
       std::make_shared<SchematicClipboardData::NetSegment>(
@@ -161,10 +211,10 @@ TEST(SchematicClipboardDataTest, testToFromMimeDataPopulated) {
       std::make_shared<Junction>(Uuid::createRandom(), Point(10, 20)));
   netSegment2->junctions.append(
       std::make_shared<Junction>(Uuid::createRandom(), Point(30, 40)));
-  netSegment2->lines.append(
-      std::make_shared<NetLine>(Uuid::createRandom(), UnsignedLength(10),
-                                NetLineAnchor::junction(Uuid::createRandom()),
-                                NetLineAnchor::junction(Uuid::createRandom())));
+  netSegment2->lines.append(std::make_shared<NetLine>(
+      Uuid::createRandom(), UnsignedLength(10),
+      NetLineAnchor::junction(Uuid::createRandom()),
+      NetLineAnchor::busJunction(Uuid::createRandom(), Uuid::createRandom())));
   netSegment2->lines.append(std::make_shared<NetLine>(
       Uuid::createRandom(), UnsignedLength(100),
       NetLineAnchor::junction(Uuid::createRandom()),
@@ -187,8 +237,12 @@ TEST(SchematicClipboardDataTest, testToFromMimeDataPopulated) {
   SchematicClipboardData obj1(uuid, pos, {av1, av2});
   obj1.getComponentInstances().append(component1);
   obj1.getComponentInstances().append(component2);
+  obj1.getBuses().append(bus1);
+  obj1.getBuses().append(bus2);
   obj1.getSymbolInstances().append(symbol1);
   obj1.getSymbolInstances().append(symbol2);
+  obj1.getBusSegments().append(busSegment1);
+  obj1.getBusSegments().append(busSegment2);
   obj1.getNetSegments().append(netSegment1);
   obj1.getNetSegments().append(netSegment2);
   obj1.getPolygons().append(polygon1);
@@ -204,7 +258,9 @@ TEST(SchematicClipboardDataTest, testToFromMimeDataPopulated) {
       SchematicClipboardData::fromMimeData(mime1.get());
   EXPECT_EQ(uuid, obj2->getSchematicUuid());
   EXPECT_EQ(pos, obj2->getCursorPos());
+  EXPECT_EQ(obj1.getBuses(), obj2->getBuses());
   EXPECT_EQ(obj1.getComponentInstances(), obj2->getComponentInstances());
+  EXPECT_EQ(obj1.getBusSegments(), obj2->getBusSegments());
   EXPECT_EQ(obj1.getNetSegments(), obj2->getNetSegments());
   EXPECT_EQ(obj1.getSymbolInstances(), obj2->getSymbolInstances());
   EXPECT_EQ(obj1.getPolygons(), obj2->getPolygons());

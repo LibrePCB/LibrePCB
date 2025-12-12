@@ -575,7 +575,7 @@ void EagleProjectImport::importSchematic(Project& project,
           const NetLineAnchor pinAnchor =
               NetLineAnchor::pin(symbolPin->getSymbol().getUuid(),
                                  symbolPin->getLibPin().getUuid());
-          splitter.addSymbolPin(pinAnchor, symbolPin->getPosition());
+          splitter.addFixedAnchor(pinAnchor, symbolPin->getPosition());
           auto it = anchorMap.find(symbolPin->getPosition());
           if (it != anchorMap.end()) {
             // There's another pin on the same position -> add a netline to

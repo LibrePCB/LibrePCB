@@ -131,7 +131,7 @@ void SGI_NetPoint::updatePosition() noexcept {
 void SGI_NetPoint::updateJunction() noexcept {
   prepareGeometryChange();
   mIsVisibleJunction = mNetPoint.isVisibleJunction();
-  mIsOpenLineEnd = mNetPoint.isOpenLineEnd();
+  mIsOpenLineEnd = mNetPoint.isOpen();
   setZValue(mIsVisibleJunction
                 ? SchematicGraphicsScene::ZValue_VisibleNetPoints
                 : SchematicGraphicsScene::ZValue_HiddenNetPoints);

@@ -109,7 +109,10 @@ private:  // Data
   QFont mDefaultFont;
   QFont mNetLabelFont;
   QList<Symbol> mSymbols;
-  QList<Point> mJunctions;
+  QList<Point> mBusJunctions;
+  QList<Line> mBusLines;
+  QList<Label> mBusLabels;
+  QList<Point> mNetJunctions;
   QList<Line> mNetLines;
   QList<Label> mNetLabels;
   QList<Polygon> mPolygons;

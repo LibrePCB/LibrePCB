@@ -80,7 +80,9 @@ public:
   }
   int getRegisteredElementsCount() const noexcept;
   bool isUsed() const noexcept;
+  bool hasNetLabels() const noexcept;
   bool isNameForced() const noexcept;
+  bool isAnonymous() const noexcept;
   bool isAddedToCircuit() const noexcept { return mIsAddedToCircuit; }
 
   // Setters

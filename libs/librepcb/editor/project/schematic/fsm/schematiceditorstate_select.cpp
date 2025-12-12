@@ -37,7 +37,7 @@
 #include "../../cmd/cmddragselectedschematicitems.h"
 #include "../../cmd/cmdpasteschematicitems.h"
 #include "../../cmd/cmdremoveselectedschematicitems.h"
-#include "../../cmd/cmdsimplifyschematicnetsegments.h"
+#include "../../cmd/cmdsimplifyschematicsegments.h"
 #include "../graphicsitems/sgi_netlabel.h"
 #include "../graphicsitems/sgi_symbol.h"
 #include "../graphicsitems/sgi_text.h"
@@ -50,6 +50,8 @@
 #include <librepcb/core/attribute/attributesubstitutor.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectattributelookup.h>
+#include <librepcb/core/project/schematic/items/si_busjunction.h>
+#include <librepcb/core/project/schematic/items/si_buslabel.h>
 #include <librepcb/core/project/schematic/items/si_image.h>
 #include <librepcb/core/project/schematic/items/si_netlabel.h>
 #include <librepcb/core/project/schematic/items/si_netpoint.h>
@@ -863,8 +865,9 @@ bool SchematicEditorState_Select::removeSelectedItems() noexcept {
     CmdRemoveSelectedSchematicItems* cmd =
         new CmdRemoveSelectedSchematicItems(*scene);
     execCmd(cmd);  // can throw
-    execCmd(new CmdSimplifySchematicNetSegments(
-        cmd->getModifiedNetSegments()));  // can throw
+    execCmd(new CmdSimplifySchematicSegments(
+        cmd->getModifiedNetSegments(),
+        cmd->getModifiedBusSegments()));  // can throw
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
@@ -1118,6 +1121,29 @@ void SchematicEditorState_Select::scheduleUpdateAvailableFeatures() noexcept {
   if (mUpdateAvailableFeaturesTimer) mUpdateAvailableFeaturesTimer->start();
 }
 
+template <typename T>
+static bool isOffGrid(const T* ptr,
+                      const PositiveLength& gridInterval) noexcept {
+  return !ptr->getPosition().isOnGrid(gridInterval);
+}
+
+template <>
+bool isOffGrid<SI_Polygon>(const SI_Polygon* ptr,
+                           const PositiveLength& gridInterval) noexcept {
+  return !ptr->getPolygon().getPath().isOnGrid(gridInterval);
+}
+
+template <typename T>
+static bool isAnyOffGrid(const T& container,
+                         const PositiveLength& gridInterval) noexcept {
+  foreach (auto ptr, container) {
+    if (isOffGrid(ptr, gridInterval)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 void SchematicEditorState_Select::updateAvailableFeatures() noexcept {
   SchematicEditorFsmAdapter::Features features;
   if (mSubState == SubState::PASTING) {
@@ -1137,6 +1163,9 @@ void SchematicEditorState_Select::updateAvailableFeatures() noexcept {
     if (SchematicGraphicsScene* scene = getActiveSchematicScene()) {
       SchematicSelectionQuery query(*scene);
       query.addSelectedSymbols();
+      query.addSelectedBusLines();
+      query.addSelectedBusJunctions();
+      query.addSelectedBusLabels();
       query.addSelectedNetPoints();
       query.addSelectedNetLines();
       query.addSelectedNetLabels();
@@ -1144,7 +1173,14 @@ void SchematicEditorState_Select::updateAvailableFeatures() noexcept {
       query.addSelectedSchematicTexts();
       query.addSelectedSymbolTexts();
       query.addSelectedImages();
-      if (!query.isResultEmpty()) {
+      if ((!query.getSymbols().isEmpty()) ||  //
+          (!query.getBusLines().isEmpty()) ||  //
+          (!query.getBusLabels().isEmpty()) ||  //
+          (!query.getNetLines().isEmpty()) ||  //
+          (!query.getNetLabels().isEmpty()) ||  //
+          (!query.getPolygons().isEmpty()) ||  //
+          (!query.getTexts().isEmpty()) ||  //
+          (!query.getImages().isEmpty())) {
         features |= SchematicEditorFsmAdapter::Feature::Cut;
         features |= SchematicEditorFsmAdapter::Feature::Copy;
         features |= SchematicEditorFsmAdapter::Feature::Remove;
@@ -1154,58 +1190,22 @@ void SchematicEditorState_Select::updateAvailableFeatures() noexcept {
       if (!query.getSymbols().isEmpty()) {
         features |= SchematicEditorFsmAdapter::Feature::ResetTexts;
       }
-      if ((!query.getSymbols().isEmpty()) ||
-          (!query.getNetLabels().isEmpty()) ||
-          (!query.getPolygons().isEmpty()) || (!query.getTexts().isEmpty())) {
+      if (isAnyOffGrid(query.getSymbols(), getGridInterval()) ||
+          isAnyOffGrid(query.getBusJunctions(), getGridInterval()) ||
+          isAnyOffGrid(query.getBusLabels(), getGridInterval()) ||
+          isAnyOffGrid(query.getNetPoints(), getGridInterval()) ||
+          isAnyOffGrid(query.getNetLabels(), getGridInterval()) ||
+          isAnyOffGrid(query.getPolygons(), getGridInterval()) ||
+          isAnyOffGrid(query.getTexts(), getGridInterval()) ||
+          isAnyOffGrid(query.getImages(), getGridInterval())) {
+        features |= SchematicEditorFsmAdapter::Feature::SnapToGrid;
+      }
+      if ((!query.getSymbols().isEmpty()) ||  //
+          (!query.getBusLabels().isEmpty()) ||  //
+          (!query.getNetLabels().isEmpty()) ||  //
+          (!query.getPolygons().isEmpty()) ||  //
+          (!query.getTexts().isEmpty())) {
         features |= SchematicEditorFsmAdapter::Feature::Properties;
-      }
-      foreach (auto ptr, query.getSymbols()) {
-        if (features.testFlag(SchematicEditorFsmAdapter::Feature::SnapToGrid)) {
-          break;
-        }
-        if (!ptr->getPosition().isOnGrid(getGridInterval())) {
-          features |= SchematicEditorFsmAdapter::Feature::SnapToGrid;
-        }
-      }
-      foreach (auto ptr, query.getNetPoints()) {
-        if (features.testFlag(SchematicEditorFsmAdapter::Feature::SnapToGrid)) {
-          break;
-        }
-        if (!ptr->getPosition().isOnGrid(getGridInterval())) {
-          features |= SchematicEditorFsmAdapter::Feature::SnapToGrid;
-        }
-      }
-      foreach (auto ptr, query.getNetLabels()) {
-        if (features.testFlag(SchematicEditorFsmAdapter::Feature::SnapToGrid)) {
-          break;
-        }
-        if (!ptr->getPosition().isOnGrid(getGridInterval())) {
-          features |= SchematicEditorFsmAdapter::Feature::SnapToGrid;
-        }
-      }
-      foreach (auto ptr, query.getPolygons()) {
-        if (features.testFlag(SchematicEditorFsmAdapter::Feature::SnapToGrid)) {
-          break;
-        }
-        if (!ptr->getPolygon().getPath().isOnGrid(getGridInterval())) {
-          features |= SchematicEditorFsmAdapter::Feature::SnapToGrid;
-        }
-      }
-      foreach (auto ptr, query.getTexts()) {
-        if (features.testFlag(SchematicEditorFsmAdapter::Feature::SnapToGrid)) {
-          break;
-        }
-        if (!ptr->getPosition().isOnGrid(getGridInterval())) {
-          features |= SchematicEditorFsmAdapter::Feature::SnapToGrid;
-        }
-      }
-      foreach (auto ptr, query.getImages()) {
-        if (features.testFlag(SchematicEditorFsmAdapter::Feature::SnapToGrid)) {
-          break;
-        }
-        if (!ptr->getPosition().isOnGrid(getGridInterval())) {
-          features |= SchematicEditorFsmAdapter::Feature::SnapToGrid;
-        }
       }
     }
   } else {

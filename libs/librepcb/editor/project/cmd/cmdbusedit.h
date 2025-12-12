@@ -17,15 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_CMDSIMPLIFYSCHEMATICNETSEGMENTS_H
-#define LIBREPCB_EDITOR_CMDSIMPLIFYSCHEMATICNETSEGMENTS_H
+#ifndef LIBREPCB_EDITOR_CMDBUSEDIT_H
+#define LIBREPCB_EDITOR_CMDBUSEDIT_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../undocommandgroup.h"
+#include "../../undocommand.h"
 
-#include <librepcb/core/geometry/netline.h>
+#include <librepcb/core/types/busname.h>
 
 #include <QtCore>
 
@@ -34,42 +34,58 @@
  ******************************************************************************/
 namespace librepcb {
 
-class Point;
-class SI_NetLineAnchor;
-class SI_NetSegment;
+class Bus;
+class Circuit;
 
 namespace editor {
 
 /*******************************************************************************
- *  Class CmdSimplifySchematicNetSegments
+ *  Class CmdBusSetName
  ******************************************************************************/
 
 /**
- * @brief Undo command which runs ::librepcb::NetSegmentSimplifier on a
- *        ::librepcb::SI_NetSegment
+ * @brief The CmdBusSetName class
  */
-class CmdSimplifySchematicNetSegments final : public UndoCommandGroup {
+class CmdBusEdit final : public UndoCommand {
 public:
   // Constructors / Destructor
-  CmdSimplifySchematicNetSegments() = delete;
-  CmdSimplifySchematicNetSegments(
-      const CmdSimplifySchematicNetSegments& other) = delete;
-  explicit CmdSimplifySchematicNetSegments(
-      const QList<SI_NetSegment*>& segments) noexcept;
-  ~CmdSimplifySchematicNetSegments() noexcept;
+  CmdBusEdit() = delete;
+  explicit CmdBusEdit(Bus& bus) noexcept;
+  ~CmdBusEdit() noexcept;
 
-  // Operator Overloadings
-  CmdSimplifySchematicNetSegments& operator=(
-      const CmdSimplifySchematicNetSegments& rhs) = delete;
+  // Setters
+  void setName(const BusName& name, bool isAutoName) noexcept;
+  void setPrefixNetNames(bool prefix) noexcept;
+  void setMaxTraceLengthDifference(
+      const std::optional<UnsignedLength>& diff) noexcept;
 
-private:  // Methods
+private:
+  // Private Methods
+
   /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
   bool performExecute() override;
 
-  void simplifySegment(SI_NetSegment& segment);
+  /// @copydoc ::librepcb::editor::UndoCommand::performUndo()
+  void performUndo() override;
 
-private:  // Data
-  QList<SI_NetSegment*> mSegments;
+  /// @copydoc ::librepcb::editor::UndoCommand::performRedo()
+  void performRedo() override;
+
+  // Private Member Variables
+
+  // Attributes from the constructor
+  Circuit& mCircuit;
+  Bus& mBus;
+
+  // General Attributes
+  BusName mOldName;
+  BusName mNewName;
+  bool mOldIsAutoName;
+  bool mNewIsAutoName;
+  bool mOldPrefixNetNames;
+  bool mNewPrefixNetNames;
+  std::optional<UnsignedLength> mOldMaxTraceLengthDifference;
+  std::optional<UnsignedLength> mNewMaxTraceLengthDifference;
 };
 
 /*******************************************************************************

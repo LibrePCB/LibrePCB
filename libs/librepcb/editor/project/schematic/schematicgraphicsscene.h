@@ -36,6 +36,10 @@
 namespace librepcb {
 
 class NetSignal;
+class SI_BusJunction;
+class SI_BusLabel;
+class SI_BusLine;
+class SI_BusSegment;
 class SI_Image;
 class SI_NetLabel;
 class SI_NetLine;
@@ -52,6 +56,9 @@ namespace editor {
 class GraphicsLayerList;
 class ImageGraphicsItem;
 class PolygonGraphicsItem;
+class SGI_BusJunction;
+class SGI_BusLabel;
+class SGI_BusLine;
 class SGI_NetLabel;
 class SGI_NetLine;
 class SGI_NetPoint;
@@ -91,6 +98,12 @@ public:
     ZValue_NetLines,  ///< For ::librepcb::SI_NetLine items
     ZValue_HiddenNetPoints,  ///< Foror hidden ::librepcb::SI_NetPoint items
     ZValue_VisibleNetPoints,  ///< For visible ::librepcb::SI_NetPoint items
+    // Note: Buses should be on top of wires to make bus<->wire connections
+    // looking nicer.
+    ZValue_Buses,  ///< For ::librepcb::SI_BusLine items
+    ZValue_HiddenBusJunctions,  ///< For ::librepcb::SI_BusJunction items
+    ZValue_VisibleBusJunctions,  ///< For ::librepcb::SI_BusJunction items
+    ZValue_ErcLocation,  ///< ERC location highlighting
   };
 
   // Constructors / Destructor
@@ -110,6 +123,18 @@ public:
   const QHash<SI_SymbolPin*, std::shared_ptr<SGI_SymbolPin>>&
       getSymbolPins() noexcept {
     return mSymbolPins;
+  }
+  const QHash<SI_BusJunction*, std::shared_ptr<SGI_BusJunction>>&
+      getBusJunctions() noexcept {
+    return mBusJunctions;
+  }
+  const QHash<SI_BusLine*, std::shared_ptr<SGI_BusLine>>&
+      getBusLines() noexcept {
+    return mBusLines;
+  }
+  const QHash<SI_BusLabel*, std::shared_ptr<SGI_BusLabel>>&
+      getBusLabels() noexcept {
+    return mBusLabels;
   }
   const QHash<SI_NetPoint*, std::shared_ptr<SGI_NetPoint>>&
       getNetPoints() noexcept {
@@ -150,6 +175,18 @@ private:  // Methods
   void addSymbolPin(SI_SymbolPin& pin,
                     std::weak_ptr<SGI_Symbol> symbol) noexcept;
   void removeSymbolPin(SI_SymbolPin& pin) noexcept;
+  void addBusSegment(SI_BusSegment& segment) noexcept;
+  void removeBusSegment(SI_BusSegment& segment) noexcept;
+  void addBusJunctionsAndLines(const QList<SI_BusJunction*>& junctions,
+                               const QList<SI_BusLine*>& lines) noexcept;
+  void removeBusJunctionsAndLines(const QList<SI_BusJunction*>& junctions,
+                                  const QList<SI_BusLine*>& lines) noexcept;
+  void addBusJunction(SI_BusJunction& junction) noexcept;
+  void removeBusJunction(SI_BusJunction& junction) noexcept;
+  void addBusLine(SI_BusLine& line) noexcept;
+  void removeBusLine(SI_BusLine& line) noexcept;
+  void addBusLabel(SI_BusLabel& label) noexcept;
+  void removeBusLabel(SI_BusLabel& label) noexcept;
   void addNetSegment(SI_NetSegment& netSegment) noexcept;
   void removeNetSegment(SI_NetSegment& netSegment) noexcept;
   void addNetPointsAndNetLines(const QList<SI_NetPoint*>& netPoints,
@@ -176,6 +213,9 @@ private:  // Data
   const bool& mIgnorePlacementLocks;
   QHash<SI_Symbol*, std::shared_ptr<SGI_Symbol>> mSymbols;
   QHash<SI_SymbolPin*, std::shared_ptr<SGI_SymbolPin>> mSymbolPins;
+  QHash<SI_BusJunction*, std::shared_ptr<SGI_BusJunction>> mBusJunctions;
+  QHash<SI_BusLine*, std::shared_ptr<SGI_BusLine>> mBusLines;
+  QHash<SI_BusLabel*, std::shared_ptr<SGI_BusLabel>> mBusLabels;
   QHash<SI_NetPoint*, std::shared_ptr<SGI_NetPoint>> mNetPoints;
   QHash<SI_NetLine*, std::shared_ptr<SGI_NetLine>> mNetLines;
   QHash<SI_NetLabel*, std::shared_ptr<SGI_NetLabel>> mNetLabels;

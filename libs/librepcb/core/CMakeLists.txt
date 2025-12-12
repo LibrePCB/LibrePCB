@@ -400,6 +400,8 @@ add_library(
   project/bomgenerator.h
   project/circuit/assemblyvariant.cpp
   project/circuit/assemblyvariant.h
+  project/circuit/bus.cpp
+  project/circuit/bus.h
   project/circuit/circuit.cpp
   project/circuit/circuit.h
   project/circuit/componentassemblyoption.cpp
@@ -430,6 +432,14 @@ add_library(
   project/projectloader.h
   project/schematic/items/si_base.cpp
   project/schematic/items/si_base.h
+  project/schematic/items/si_busjunction.cpp
+  project/schematic/items/si_busjunction.h
+  project/schematic/items/si_buslabel.cpp
+  project/schematic/items/si_buslabel.h
+  project/schematic/items/si_busline.cpp
+  project/schematic/items/si_busline.h
+  project/schematic/items/si_bussegment.cpp
+  project/schematic/items/si_bussegment.h
   project/schematic/items/si_image.cpp
   project/schematic/items/si_image.h
   project/schematic/items/si_netlabel.cpp
@@ -478,6 +488,7 @@ add_library(
   types/angle.h
   types/boundedunsignedratio.cpp
   types/boundedunsignedratio.h
+  types/busname.h
   types/circuitidentifier.h
   types/elementname.h
   types/fileproofname.h

@@ -190,6 +190,8 @@ void GraphicsExportSettings::loadColorsFromTheme(const Theme& theme,
     addColor(Theme::Color::sSchematicValues, false);
     addColor(Theme::Color::sSchematicWires, false);
     addColor(Theme::Color::sSchematicNetLabels, false);
+    addColor(Theme::Color::sSchematicBuses, false);
+    addColor(Theme::Color::sSchematicBusLabels, false);
     addColor(Theme::Color::sSchematicImageBorders, false);
     addColor(Theme::Color::sSchematicDocumentation, false);
     addColor(Theme::Color::sSchematicComments, false);

@@ -112,8 +112,28 @@ void FileFormatMigrationUnstable::upgradeWorkspaceData(
 
 void FileFormatMigrationUnstable::upgradeOutputJobs(SExpression& root,
                                                     ProjectContext& context) {
-  Q_UNUSED(root);
   Q_UNUSED(context);
+  for (SExpression* jobNode : root.getChildren("job")) {
+    if (jobNode->getChild("type/@0").getValue() == "graphics") {
+      for (SExpression* contentNode : jobNode->getChildren("content")) {
+        SExpression& contentTypeNode = contentNode->getChild("type/@0");
+        if (contentTypeNode.getValue() == "schematic") {
+          // Add the new layer for buses.
+          SExpression& busesLayerNode = contentNode->appendList("layer");
+          busesLayerNode.appendChild(
+              SExpression::createToken("schematic_buses"));
+          busesLayerNode.appendChild("color",
+                                     SExpression::createString("#ff008eff"));
+          // Add the new layer for bus labels.
+          SExpression& busLabelsLayerNode = contentNode->appendList("layer");
+          busLabelsLayerNode.appendChild(
+              SExpression::createToken("schematic_bus_labels"));
+          busLabelsLayerNode.appendChild(
+              "color", SExpression::createString("#ff008eff"));
+        }
+      }
+    }
+  }
 }
 
 void FileFormatMigrationUnstable::upgradeCircuit(SExpression& root,

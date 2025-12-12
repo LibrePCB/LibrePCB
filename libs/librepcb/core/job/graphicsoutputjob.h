@@ -126,6 +126,8 @@ public:
             QString(Theme::Color::sSchematicFrames),
             QString(Theme::Color::sSchematicWires),
             QString(Theme::Color::sSchematicNetLabels),
+            QString(Theme::Color::sSchematicBuses),
+            QString(Theme::Color::sSchematicBusLabels),
             QString(Theme::Color::sSchematicImageBorders),
             QString(Theme::Color::sSchematicDocumentation),
             QString(Theme::Color::sSchematicComments),

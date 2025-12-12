@@ -29,6 +29,7 @@
 #include "../../circuit/netsignal.h"
 #include "../../project.h"
 #include "../schematic.h"
+#include "si_busjunction.h"
 #include "si_netlabel.h"
 #include "si_netline.h"
 #include "si_netpoint.h"
@@ -116,19 +117,46 @@ QSet<SI_SymbolPin*> SI_NetSegment::getAllConnectedPins() const noexcept {
   Q_ASSERT(isAddedToSchematic());
   QSet<SI_SymbolPin*> pins;
   foreach (const SI_NetLine* netline, mNetLines) {
-    SI_SymbolPin* p1 = dynamic_cast<SI_SymbolPin*>(&netline->getP1());
-    SI_SymbolPin* p2 = dynamic_cast<SI_SymbolPin*>(&netline->getP2());
-    if (p1) {
-      pins.insert(p1);
-      Q_ASSERT(p1->getCompSigInstNetSignal() == mNetSignal);
+    if (SI_SymbolPin* p = dynamic_cast<SI_SymbolPin*>(&netline->getP1())) {
+      pins.insert(p);
+      Q_ASSERT(p->getCompSigInstNetSignal() == mNetSignal);
     }
-    if (p2) {
-      pins.insert(p2);
-      Q_ASSERT(p2->getCompSigInstNetSignal() == mNetSignal);
+    if (SI_SymbolPin* p = dynamic_cast<SI_SymbolPin*>(&netline->getP2())) {
+      pins.insert(p);
+      Q_ASSERT(p->getCompSigInstNetSignal() == mNetSignal);
     }
   }
-
   return pins;
+}
+
+QSet<SI_BusJunction*> SI_NetSegment::getAllConnectedBusJunctions()
+    const noexcept {
+  Q_ASSERT(isAddedToSchematic());
+  QSet<SI_BusJunction*> junctions;
+  foreach (const SI_NetLine* netline, mNetLines) {
+    if (SI_BusJunction* j = dynamic_cast<SI_BusJunction*>(&netline->getP1())) {
+      junctions.insert(j);
+    }
+    if (SI_BusJunction* j = dynamic_cast<SI_BusJunction*>(&netline->getP2())) {
+      junctions.insert(j);
+    }
+  }
+  return junctions;
+}
+
+QSet<SI_BusSegment*> SI_NetSegment::getAllConnectedBusSegments()
+    const noexcept {
+  Q_ASSERT(isAddedToSchematic());
+  QSet<SI_BusSegment*> set;
+  foreach (const SI_NetLine* netline, mNetLines) {
+    if (SI_BusJunction* j = dynamic_cast<SI_BusJunction*>(&netline->getP1())) {
+      set.insert(&j->getBusSegment());
+    }
+    if (SI_BusJunction* j = dynamic_cast<SI_BusJunction*>(&netline->getP2())) {
+      set.insert(&j->getBusSegment());
+    }
+  }
+  return set;
 }
 
 /*******************************************************************************
@@ -404,42 +432,60 @@ bool SI_NetSegment::areAllNetPointsConnectedTogether() const noexcept {
   }
   Q_ASSERT(p);
   QSet<const SI_SymbolPin*> pins;
+  QSet<const SI_BusJunction*> buses;
   QSet<const SI_NetPoint*> points;
   QSet<const SI_NetLine*> lines;
-  findAllConnectedNetPoints(*p, pins, points, lines);
+  findAllConnectedNetPoints(*p, pins, buses, points, lines);
   return (points.count() == mNetPoints.count()) &&
       (lines.count() == mNetLines.count());
 }
 
 void SI_NetSegment::findAllConnectedNetPoints(
     const SI_NetLineAnchor& p, QSet<const SI_SymbolPin*>& pins,
-    QSet<const SI_NetPoint*>& points,
+    QSet<const SI_BusJunction*>& buses, QSet<const SI_NetPoint*>& points,
     QSet<const SI_NetLine*>& lines) const noexcept {
-  if (const SI_SymbolPin* pin = dynamic_cast<const SI_SymbolPin*>(&p)) {
+  // Check the condition with the highest probability first.
+  if (const SI_NetPoint* np = dynamic_cast<const SI_NetPoint*>(&p)) {
+    if (points.contains(np)) return;
+    if (&np->getNetSegment() != this) return;
+    points.insert(np);
+    foreach (const SI_NetLine* netline, mNetLines) {
+      if (&netline->getP1() == np) {
+        findAllConnectedNetPoints(netline->getP2(), pins, buses, points, lines);
+      }
+      if (&netline->getP2() == np) {
+        findAllConnectedNetPoints(netline->getP1(), pins, buses, points, lines);
+      }
+      if ((&netline->getP1() == np) || (&netline->getP2() == np)) {
+        lines.insert(netline);
+      }
+    }
+  } else if (const SI_SymbolPin* pin = dynamic_cast<const SI_SymbolPin*>(&p)) {
     if (pins.contains(pin)) return;
     pins.insert(pin);
     foreach (const SI_NetLine* netline, mNetLines) {
       if (&netline->getP1() == pin) {
-        findAllConnectedNetPoints(netline->getP2(), pins, points, lines);
+        findAllConnectedNetPoints(netline->getP2(), pins, buses, points, lines);
       }
       if (&netline->getP2() == pin) {
-        findAllConnectedNetPoints(netline->getP1(), pins, points, lines);
+        findAllConnectedNetPoints(netline->getP1(), pins, buses, points, lines);
       }
       if ((&netline->getP1() == pin) || (&netline->getP2() == pin)) {
         lines.insert(netline);
       }
     }
-  } else if (const SI_NetPoint* np = dynamic_cast<const SI_NetPoint*>(&p)) {
-    if (points.contains(np)) return;
-    points.insert(np);
+  } else if (const SI_BusJunction* bj =
+                 dynamic_cast<const SI_BusJunction*>(&p)) {
+    if (buses.contains(bj)) return;
+    buses.insert(bj);
     foreach (const SI_NetLine* netline, mNetLines) {
-      if (&netline->getP1() == np) {
-        findAllConnectedNetPoints(netline->getP2(), pins, points, lines);
+      if (&netline->getP1() == bj) {
+        findAllConnectedNetPoints(netline->getP2(), pins, buses, points, lines);
       }
-      if (&netline->getP2() == np) {
-        findAllConnectedNetPoints(netline->getP1(), pins, points, lines);
+      if (&netline->getP2() == bj) {
+        findAllConnectedNetPoints(netline->getP1(), pins, buses, points, lines);
       }
-      if ((&netline->getP1() == np) || (&netline->getP2() == np)) {
+      if ((&netline->getP1() == bj) || (&netline->getP2() == bj)) {
         lines.insert(netline);
       }
     }

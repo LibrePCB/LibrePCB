@@ -58,8 +58,8 @@ public:
   ~SchematicNetSegmentSplitter() noexcept;
 
   // General Methods
-  void addSymbolPin(const NetLineAnchor& anchor, const Point& pos,
-                    bool replaceByJunction = false) noexcept;
+  void addFixedAnchor(const NetLineAnchor& anchor, const Point& pos,
+                      bool replaceByJunction = false) noexcept;
   void addJunction(const Junction& junction) noexcept;
   void addNetLine(const NetLine& netline) noexcept;
   void addNetLabel(const NetLabel& netlabel) noexcept;
@@ -70,7 +70,7 @@ public:
       const SchematicNetSegmentSplitter& rhs) = delete;
 
 private:  // Methods
-  NetLineAnchor replacePinAnchor(const NetLineAnchor& anchor) noexcept;
+  NetLineAnchor replaceFixedAnchor(const NetLineAnchor& anchor) noexcept;
   void findConnectedLinesAndPoints(
       const NetLineAnchor& anchor,
       QList<std::shared_ptr<NetLine>>& availableNetLines, Segment& segment)
@@ -87,8 +87,8 @@ private:  // Data
   NetLineList mNetLines;
   NetLabelList mNetLabels;
 
-  QHash<NetLineAnchor, NetLineAnchor> mPinAnchorsToReplace;
-  QHash<NetLineAnchor, Point> mPinPositions;
+  QHash<NetLineAnchor, NetLineAnchor> mFixedAnchorsToReplace;
+  QHash<NetLineAnchor, Point> mFixedAnchorPositions;
 };
 
 /*******************************************************************************

@@ -405,7 +405,7 @@ void SchematicTab::highlightErcMessage(
     QPainterPath path = Path::toQPainterPathPx(msg->getLocations(), true);
     mErcLocationGraphicsItem.reset(new QGraphicsPathItem());
     mErcLocationGraphicsItem->setZValue(
-        SchematicGraphicsScene::ZValue_VisibleNetPoints);
+        SchematicGraphicsScene::ZValue_ErcLocation);
     mErcLocationGraphicsItem->setPen(QPen(color.getPrimaryColor(), 0));
     mErcLocationGraphicsItem->setBrush(color.getSecondaryColor());
     mErcLocationGraphicsItem->setPath(path);

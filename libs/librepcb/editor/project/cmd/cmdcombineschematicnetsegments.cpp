@@ -26,7 +26,7 @@
 #include "../../project/cmd/cmdschematicnetsegmentaddelements.h"
 #include "../../project/cmd/cmdschematicnetsegmentremove.h"
 #include "../../project/cmd/cmdschematicnetsegmentremoveelements.h"
-#include "cmdremoveunusednetsignals.h"
+#include "cmdremoveunusednetsignalsandbuses.h"
 
 #include <librepcb/core/project/schematic/items/si_netlabel.h>
 #include <librepcb/core/project/schematic/items/si_netline.h>
@@ -111,9 +111,9 @@ bool CmdCombineSchematicNetSegments::performExecute() {
     execNewChildCmd(cmd.release());  // can throw
   }
 
-  // remove netsignals which are no longer required
-  execNewChildCmd(
-      new CmdRemoveUnusedNetSignals(mNewSegment.getCircuit()));  // can throw
+  // remove nets and buses which are no longer required
+  execNewChildCmd(new CmdRemoveUnusedNetSignalsAndBuses(
+      mNewSegment.getCircuit()));  // can throw
 
   undoScopeGuard.dismiss();  // no undo required
   return true;

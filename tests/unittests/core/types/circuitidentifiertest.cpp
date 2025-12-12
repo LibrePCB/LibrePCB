@@ -135,6 +135,7 @@ INSTANTIATE_TEST_SUITE_P(CircuitIdentifierTest, CircuitIdentifierTest, ::testing
     CircuitIdentifierTestData({" ", false}), // space
     CircuitIdentifierTestData({"A B", false}), // space
     CircuitIdentifierTestData({";", false}), // invalid character
+    CircuitIdentifierTestData({"Bus[]", false}), // invalid character at end
     CircuitIdentifierTestData({":1234", false}), // invalid character at start
     CircuitIdentifierTestData({"AS:df", false}), // invalid character in the middle
     CircuitIdentifierTestData({"1234:", false}), // invalid character at end

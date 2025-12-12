@@ -88,6 +88,8 @@ Theme::Theme(const Uuid& uuid, const QString& name) noexcept
   addColor(Color::sSchematicFrames,            sch, QT_TR_NOOP("Frames"),               Qt::black,                  Qt::darkGray);
   addColor(Color::sSchematicWires,             sch, QT_TR_NOOP("Wires"),                Qt::darkGreen,              Qt::green);
   addColor(Color::sSchematicNetLabels,         sch, QT_TR_NOOP("Net Labels"),           Qt::darkGreen,              Qt::green);
+  addColor(Color::sSchematicBuses,             sch, QT_TR_NOOP("Buses"),                QColor(0, 142, 255, 255),   QColor(114, 192, 255, 255));
+  addColor(Color::sSchematicBusLabels,         sch, QT_TR_NOOP("Bus Labels"),           QColor(0, 142, 255, 255),   QColor(114, 192, 255, 255));
   addColor(Color::sSchematicImageBorders,      sch, QT_TR_NOOP("Image Borders"),        Qt::darkGray,               Qt::gray);
   addColor(Color::sSchematicDocumentation,     sch, QT_TR_NOOP("Documentation"),        Qt::darkGray,               Qt::gray);
   addColor(Color::sSchematicComments,          sch, QT_TR_NOOP("Comments"),             Qt::darkBlue,               Qt::blue);

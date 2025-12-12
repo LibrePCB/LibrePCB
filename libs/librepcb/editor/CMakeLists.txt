@@ -586,12 +586,24 @@ add_library(
   project/cmd/cmdboardzoneedit.h
   project/cmd/cmdboardzoneremove.cpp
   project/cmd/cmdboardzoneremove.h
+  project/cmd/cmdbusadd.cpp
+  project/cmd/cmdbusadd.h
+  project/cmd/cmdbusedit.cpp
+  project/cmd/cmdbusedit.h
+  project/cmd/cmdbusremove.cpp
+  project/cmd/cmdbusremove.h
+  project/cmd/cmdchangebusofschematicbussegment.cpp
+  project/cmd/cmdchangebusofschematicbussegment.h
   project/cmd/cmdchangenetsignalofschematicnetsegment.cpp
   project/cmd/cmdchangenetsignalofschematicnetsegment.h
   project/cmd/cmdcombineboardnetsegments.cpp
   project/cmd/cmdcombineboardnetsegments.h
+  project/cmd/cmdcombinebuses.cpp
+  project/cmd/cmdcombinebuses.h
   project/cmd/cmdcombinenetsignals.cpp
   project/cmd/cmdcombinenetsignals.h
+  project/cmd/cmdcombineschematicbussegments.cpp
+  project/cmd/cmdcombineschematicbussegments.h
   project/cmd/cmdcombineschematicnetsegments.cpp
   project/cmd/cmdcombineschematicnetsegments.h
   project/cmd/cmdcomponentinstanceadd.cpp
@@ -652,12 +664,28 @@ add_library(
   project/cmd/cmdremoveselectedschematicitems.h
   project/cmd/cmdremoveunusedlibraryelements.cpp
   project/cmd/cmdremoveunusedlibraryelements.h
-  project/cmd/cmdremoveunusednetsignals.cpp
-  project/cmd/cmdremoveunusednetsignals.h
+  project/cmd/cmdremoveunusednetsignalsandbuses.cpp
+  project/cmd/cmdremoveunusednetsignalsandbuses.h
   project/cmd/cmdreplacedevice.cpp
   project/cmd/cmdreplacedevice.h
   project/cmd/cmdschematicadd.cpp
   project/cmd/cmdschematicadd.h
+  project/cmd/cmdschematicbusjunctionedit.cpp
+  project/cmd/cmdschematicbusjunctionedit.h
+  project/cmd/cmdschematicbuslabeladd.cpp
+  project/cmd/cmdschematicbuslabeladd.h
+  project/cmd/cmdschematicbuslabeledit.cpp
+  project/cmd/cmdschematicbuslabeledit.h
+  project/cmd/cmdschematicbussegmentadd.cpp
+  project/cmd/cmdschematicbussegmentadd.h
+  project/cmd/cmdschematicbussegmentaddelements.cpp
+  project/cmd/cmdschematicbussegmentaddelements.h
+  project/cmd/cmdschematicbussegmentedit.cpp
+  project/cmd/cmdschematicbussegmentedit.h
+  project/cmd/cmdschematicbussegmentremove.cpp
+  project/cmd/cmdschematicbussegmentremove.h
+  project/cmd/cmdschematicbussegmentremoveelements.cpp
+  project/cmd/cmdschematicbussegmentremoveelements.h
   project/cmd/cmdschematicedit.cpp
   project/cmd/cmdschematicedit.h
   project/cmd/cmdschematicimageadd.cpp
@@ -692,8 +720,8 @@ add_library(
   project/cmd/cmdschematictextremove.h
   project/cmd/cmdsimplifyboardnetsegments.cpp
   project/cmd/cmdsimplifyboardnetsegments.h
-  project/cmd/cmdsimplifyschematicnetsegments.cpp
-  project/cmd/cmdsimplifyschematicnetsegments.h
+  project/cmd/cmdsimplifyschematicsegments.cpp
+  project/cmd/cmdsimplifyschematicsegments.h
   project/cmd/cmdsymbolinstanceadd.cpp
   project/cmd/cmdsymbolinstanceadd.h
   project/cmd/cmdsymbolinstanceedit.cpp
@@ -800,6 +828,12 @@ add_library(
   project/schematic/fsm/schematiceditorstate_measure.h
   project/schematic/fsm/schematiceditorstate_select.cpp
   project/schematic/fsm/schematiceditorstate_select.h
+  project/schematic/graphicsitems/sgi_busjunction.cpp
+  project/schematic/graphicsitems/sgi_busjunction.h
+  project/schematic/graphicsitems/sgi_buslabel.cpp
+  project/schematic/graphicsitems/sgi_buslabel.h
+  project/schematic/graphicsitems/sgi_busline.cpp
+  project/schematic/graphicsitems/sgi_busline.h
   project/schematic/graphicsitems/sgi_netlabel.cpp
   project/schematic/graphicsitems/sgi_netlabel.h
   project/schematic/graphicsitems/sgi_netline.cpp

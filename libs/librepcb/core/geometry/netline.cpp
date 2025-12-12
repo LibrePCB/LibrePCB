@@ -34,18 +34,27 @@ namespace librepcb {
  ******************************************************************************/
 
 NetLineAnchor::NetLineAnchor(const std::optional<Uuid>& junction,
+                             const std::optional<BusAnchor> bus,
                              const std::optional<PinAnchor>& pin) noexcept
-  : mJunction(junction), mPin(pin) {
-  Q_ASSERT(((junction) && (!pin)) || ((!junction) && (pin)));
+  : mJunction(junction), mBusJunction(bus), mPin(pin) {
+  Q_ASSERT(((junction) && (!bus) && (!pin)) || ((!junction) && bus && (!pin)) ||
+           ((!junction) && (!bus) && (pin)));
 }
 
 NetLineAnchor::NetLineAnchor(const NetLineAnchor& other) noexcept
-  : mJunction(other.mJunction), mPin(other.mPin) {
+  : mJunction(other.mJunction),
+    mBusJunction(other.mBusJunction),
+    mPin(other.mPin) {
 }
 
 NetLineAnchor::NetLineAnchor(const SExpression& node) {
-  if (const SExpression* junctionNode = node.tryGetChild("junction")) {
-    mJunction = deserialize<Uuid>(junctionNode->getChild("@0"));
+  if (const SExpression* junctionNode = node.tryGetChild("junction/@0")) {
+    if (const SExpression* busNode = node.tryGetChild("bus/@0")) {
+      mBusJunction = BusAnchor{deserialize<Uuid>(*busNode),
+                               deserialize<Uuid>(*junctionNode)};
+    } else {
+      mJunction = deserialize<Uuid>(*junctionNode);
+    }
   } else {
     mPin = PinAnchor{deserialize<Uuid>(node.getChild("symbol/@0")),
                      deserialize<Uuid>(node.getChild("pin/@0"))};
@@ -58,6 +67,9 @@ NetLineAnchor::~NetLineAnchor() noexcept {
 void NetLineAnchor::serialize(SExpression& root) const {
   if (mJunction) {
     root.appendChild("junction", *mJunction);
+  } else if (mBusJunction) {
+    root.appendChild("bus", mBusJunction->segment);
+    root.appendChild("junction", mBusJunction->junction);
   } else if (mPin) {
     root.appendChild("symbol", mPin->symbol);
     root.appendChild("pin", mPin->pin);
@@ -67,7 +79,8 @@ void NetLineAnchor::serialize(SExpression& root) const {
 }
 
 bool NetLineAnchor::operator==(const NetLineAnchor& rhs) const noexcept {
-  return (mJunction == rhs.mJunction) && (mPin == rhs.mPin);
+  return (mJunction == rhs.mJunction) && (mBusJunction == rhs.mBusJunction) &&
+      (mPin == rhs.mPin);
 }
 
 bool NetLineAnchor::operator<(const NetLineAnchor& rhs) const noexcept {
@@ -75,10 +88,18 @@ bool NetLineAnchor::operator<(const NetLineAnchor& rhs) const noexcept {
   // unless you know exactly what you're doing!
   if (mJunction.has_value() != rhs.mJunction.has_value()) {
     return rhs.mJunction.has_value();
+  } else if (mBusJunction.has_value() != rhs.mBusJunction.has_value()) {
+    return rhs.mBusJunction.has_value();
   } else if (mPin.has_value() != rhs.mPin.has_value()) {
     return rhs.mPin.has_value();
   } else if (mJunction) {
     return (*mJunction) < (*rhs.mJunction);
+  } else if (mBusJunction) {
+    if (mBusJunction->segment != rhs.mBusJunction->segment) {
+      return mBusJunction->segment < rhs.mBusJunction->segment;
+    } else {
+      return mBusJunction->junction < rhs.mBusJunction->junction;
+    }
   } else if (mPin) {
     if (mPin->symbol != rhs.mPin->symbol) {
       return mPin->symbol < rhs.mPin->symbol;
@@ -93,16 +114,23 @@ bool NetLineAnchor::operator<(const NetLineAnchor& rhs) const noexcept {
 
 NetLineAnchor& NetLineAnchor::operator=(const NetLineAnchor& rhs) noexcept {
   mJunction = rhs.mJunction;
+  mBusJunction = rhs.mBusJunction;
   mPin = rhs.mPin;
   return *this;
 }
 
 NetLineAnchor NetLineAnchor::junction(const Uuid& junction) noexcept {
-  return NetLineAnchor(junction, std::nullopt);
+  return NetLineAnchor(junction, std::nullopt, std::nullopt);
+}
+
+NetLineAnchor NetLineAnchor::busJunction(const Uuid& segment,
+                                         const Uuid& junction) noexcept {
+  return NetLineAnchor(std::nullopt, BusAnchor{segment, junction},
+                       std::nullopt);
 }
 
 NetLineAnchor NetLineAnchor::pin(const Uuid& symbol, const Uuid& pin) noexcept {
-  return NetLineAnchor(std::nullopt, PinAnchor{symbol, pin});
+  return NetLineAnchor(std::nullopt, std::nullopt, PinAnchor{symbol, pin});
 }
 
 /*******************************************************************************

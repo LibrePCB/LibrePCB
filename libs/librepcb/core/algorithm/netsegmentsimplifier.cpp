@@ -86,13 +86,13 @@ NetSegmentSimplifier::Result NetSegmentSimplifier::simplify() noexcept {
 
   // Get all IDs of pins or pads.
   for (const Anchor& anchor : mAnchors) {
-    if (anchor.type == AnchorType::PinOrPad) {
+    if (anchor.type == AnchorType::Fixed) {
       mPinsOrPads.insert(anchor.id);
     }
   }
 
   // Memorize which pins or pads are currently connected.
-  const QSet<int> connectedPinsOrPads = getConnectedPinsOrPads();
+  const QSet<int> connectedFixedAnchors = getConnectedFixedAnchors();
 
   // Add junctions where lines are intersecting each other. Those lines will
   // then be split in the next step to connect with the new anchors.
@@ -122,7 +122,7 @@ NetSegmentSimplifier::Result NetSegmentSimplifier::simplify() noexcept {
   Result result{
       mLines.values(),
       {},
-      connectedPinsOrPads - getConnectedPinsOrPads(),
+      connectedFixedAnchors - getConnectedFixedAnchors(),
       mModified,
   };
   for (const Anchor& anchor : mAnchors) {
@@ -139,7 +139,7 @@ NetSegmentSimplifier::Result NetSegmentSimplifier::simplify() noexcept {
  *  Private Methods
  ******************************************************************************/
 
-QSet<int> NetSegmentSimplifier::getConnectedPinsOrPads() const noexcept {
+QSet<int> NetSegmentSimplifier::getConnectedFixedAnchors() const noexcept {
   QSet<int> ids;
   for (const Line& line : mLines) {
     ids.insert(line.p1);

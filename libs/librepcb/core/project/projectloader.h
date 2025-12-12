@@ -99,6 +99,7 @@ private:  // Methods
   void loadSchematics(Project& p);
   void loadSchematic(Project& p, const QString& relativeFilePath);
   void loadSchematicSymbol(Schematic& s, const SExpression& node);
+  void loadSchematicBusSegment(Schematic& s, const SExpression& node);
   void loadSchematicNetSegment(Schematic& s, const SExpression& node);
   void loadSchematicUserSettings(Schematic& s);
   void loadBoards(Project& p);
