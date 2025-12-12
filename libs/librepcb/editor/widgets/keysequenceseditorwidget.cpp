@@ -102,19 +102,27 @@ void KeySequencesEditorWidget::updateWidgets() noexcept {
       setFocusProxy(edit);
     }
     connect(edit, &QKeySequenceEdit::editingFinished, edit, [this, edit, i]() {
+      bool modified = false;
       if (!mOverrides) {
+        modified = true;
         mOverrides = mDefault;
       }
       const bool exists = (i < mOverrides->count());
       const bool valid = !edit->keySequence().isEmpty();
       if (valid && exists) {
+        modified = modified || (mOverrides->value(i) != edit->keySequence());
         mOverrides->replace(i, edit->keySequence());
       } else if (exists) {
+        modified = true;
         mOverrides->removeAt(i);
       } else if (valid) {
+        modified = true;
         mOverrides->append(edit->keySequence());
       }
-      updateWidgets();
+      // To avoid focus issues, only refresh the list if it has been modified.
+      if (modified) {
+        scheduleUpdateWidgets();
+      }
     });
     hLayout->addWidget(edit);
 
@@ -127,7 +135,7 @@ void KeySequencesEditorWidget::updateWidgets() noexcept {
           mOverrides = mDefault;
         }
         mOverrides->removeAt(i);
-        updateWidgets();
+        scheduleUpdateWidgets();
       });
       hLayout->addWidget(btnClear);
     } else {
@@ -137,7 +145,7 @@ void KeySequencesEditorWidget::updateWidgets() noexcept {
       btnReset->setEnabled(mOverrides.has_value());
       connect(btnReset, &QToolButton::clicked, this, [this]() {
         mOverrides = std::nullopt;
-        updateWidgets();
+        scheduleUpdateWidgets();
       });
       hLayout->addWidget(btnReset);
     }
@@ -168,6 +176,14 @@ void KeySequencesEditorWidget::updateWidgets() noexcept {
 
   setFixedHeight(mRowHeight * (sequences.count() + 2));
   setRowHeight(mRowHeight);
+}
+
+void KeySequencesEditorWidget::scheduleUpdateWidgets() noexcept {
+  // Helper to call updateWidgets() without ending up in a recursion which
+  // causes widgets to be deleted in their signal handler. Fixes
+  // https://github.com/LibrePCB/LibrePCB/issues/1643.
+  QMetaObject::invokeMethod(this, &KeySequencesEditorWidget::updateWidgets,
+                            Qt::QueuedConnection);
 }
 
 /*******************************************************************************
