@@ -142,7 +142,8 @@ void ComponentVariantEditor::setUiData(
 slint::Image ComponentVariantEditor::renderScene(int gate, float width,
                                                  float height) noexcept {
   if (gate == static_cast<int>(mGates->row_count())) {
-    SlintGraphicsView view(SlintGraphicsView::defaultSymbolSceneRect());
+    SlintGraphicsView view(SlintGraphicsView::defaultSymbolSceneRect(),
+                           SlintGraphicsView::defaultMargins());
     view.setUseOpenGl(mWorkspace.getSettings().useOpenGl.get());
     return view.render(*mScene, width, height);
   } else {

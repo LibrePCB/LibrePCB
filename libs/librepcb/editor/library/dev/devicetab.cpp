@@ -492,11 +492,13 @@ void DeviceTab::trigger(ui::TabAction a) noexcept {
 slint::Image DeviceTab::renderScene(float width, float height,
                                     int scene) noexcept {
   if ((scene == 0) && mComponentScene) {
-    SlintGraphicsView view(SlintGraphicsView::defaultSymbolSceneRect());
+    SlintGraphicsView view(SlintGraphicsView::defaultSymbolSceneRect(),
+                           SlintGraphicsView::defaultMargins());
     view.setUseOpenGl(mApp.getWorkspace().getSettings().useOpenGl.get());
     return view.render(*mComponentScene, width, height);
   } else if ((scene == 1) && (mPackageScene)) {
-    SlintGraphicsView view(SlintGraphicsView::defaultFootprintSceneRect());
+    SlintGraphicsView view(SlintGraphicsView::defaultFootprintSceneRect(),
+                           SlintGraphicsView::defaultMargins());
     view.setUseOpenGl(mApp.getWorkspace().getSettings().useOpenGl.get());
     return view.render(*mPackageScene, width, height);
   } else {
