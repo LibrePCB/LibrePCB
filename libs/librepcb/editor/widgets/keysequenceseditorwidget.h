@@ -72,6 +72,7 @@ signals:
 
 private:  // Methods
   void updateWidgets() noexcept;
+  void scheduleUpdateWidgets() noexcept;
 
 private:  // Data
   QPointer<QVBoxLayout> mLayout;
