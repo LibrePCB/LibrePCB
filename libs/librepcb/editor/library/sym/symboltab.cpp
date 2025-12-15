@@ -84,6 +84,7 @@ SymbolTab::SymbolTab(LibraryEditor& editor, std::unique_ptr<Symbol> sym,
     mLayers(GraphicsLayerList::libraryLayers(
         &mEditor.getWorkspace().getSettings())),
     mView(new SlintGraphicsView(SlintGraphicsView::defaultSymbolSceneRect(),
+                                SlintGraphicsView::defaultEditorMargins(),
                                 this)),
     mIsNewElement(isPathOutsideLibDir()),
     mMsgImportPins(mApp.getWorkspace(), "EMPTY_SYMBOL_IMPORT_PINS"),

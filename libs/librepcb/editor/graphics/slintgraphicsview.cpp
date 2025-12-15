@@ -40,9 +40,11 @@ static const qreal sScrollFactor = 0.07;
  ******************************************************************************/
 
 SlintGraphicsView::SlintGraphicsView(const QRectF& defaultSceneRect,
+                                     const QMarginsF& defaultMargins,
                                      QObject* parent) noexcept
   : QObject(parent),
     mDefaultSceneRect(defaultSceneRect),
+    mDefaultMargins(defaultMargins),
     mEventHandler(nullptr),
     mAnimation(new QVariantAnimation(this)) {
   mAnimation->setDuration(500);
@@ -150,11 +152,12 @@ slint::Image SlintGraphicsView::render(GraphicsScene& scene, float width,
                            QPainter::SmoothPixmapTransform);
     const QRectF targetRect(QPoint(0, 0), size);
     if (mViewSize.isEmpty()) {
+      const QRectF target = targetRect.marginsRemoved(mDefaultMargins);
       const QRectF initialRect = validateSceneRect(scene.itemsBoundingRect());
-      mProjection.scale = std::min(targetRect.width() / initialRect.width(),
-                                   targetRect.height() / initialRect.height());
+      mProjection.scale = std::min(target.width() / initialRect.width(),
+                                   target.height() / initialRect.height());
       mProjection.offset =
-          initialRect.center() - targetRect.center() / mProjection.scale;
+          initialRect.center() - target.center() / mProjection.scale;
     }
     QRectF sceneRect(0, 0, size.width() / mProjection.scale,
                      size.height() / mProjection.scale);
@@ -335,7 +338,8 @@ void SlintGraphicsView::zoomOut() noexcept {
 
 void SlintGraphicsView::zoomToSceneRect(const QRectF& r) noexcept {
   const QRectF sourceRect = validateSceneRect(r);
-  const QRectF targetRect(QPointF(0, 0), mViewSize);
+  const QRectF targetRect =
+      QRectF(QPointF(0, 0), mViewSize).marginsRemoved(mDefaultMargins);
 
   if ((targetRect.width() < 2) || (targetRect.height() < 2)) {
     return;
@@ -372,6 +376,14 @@ QRectF SlintGraphicsView::defaultSchematicSceneRect() noexcept {
 
 QRectF SlintGraphicsView::defaultBoardSceneRect() noexcept {
   return createSceneRect(-20, -120, 140, 140);
+}
+
+QMarginsF SlintGraphicsView::defaultMargins() noexcept {
+  return QMarginsF(5, 5, 5, 5);
+}
+
+QMarginsF SlintGraphicsView::defaultEditorMargins() noexcept {
+  return QMarginsF(40, 35, 40, 25);
 }
 
 /*******************************************************************************

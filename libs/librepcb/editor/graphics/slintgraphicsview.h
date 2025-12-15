@@ -80,6 +80,7 @@ class SlintGraphicsView final : public QObject {
 public:
   // Constructors / Destructor
   explicit SlintGraphicsView(const QRectF& defaultSceneRect,
+                             const QMarginsF& defaultMargins,
                              QObject* parent = nullptr) noexcept;
   SlintGraphicsView(const SlintGraphicsView& other) = delete;
   virtual ~SlintGraphicsView() noexcept;
@@ -112,6 +113,8 @@ public:
   static QRectF defaultFootprintSceneRect() noexcept;
   static QRectF defaultSchematicSceneRect() noexcept;
   static QRectF defaultBoardSceneRect() noexcept;
+  static QMarginsF defaultMargins() noexcept;
+  static QMarginsF defaultEditorMargins() noexcept;
 
   // Operator Overloadings
   SlintGraphicsView& operator=(const SlintGraphicsView& rhs) = delete;
@@ -129,6 +132,7 @@ private:  // Methods
 
 private:  // Data
   const QRectF mDefaultSceneRect;
+  const QMarginsF mDefaultMargins;
   IF_GraphicsViewEventHandler* mEventHandler;
   std::unique_ptr<QOffscreenSurface> mGlSurface;
   std::unique_ptr<QOpenGLContext> mGlContext;

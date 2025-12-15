@@ -102,6 +102,7 @@ PackageTab::PackageTab(LibraryEditor& editor, std::unique_ptr<Package> pkg,
     mLayers(GraphicsLayerList::libraryLayers(
         &mEditor.getWorkspace().getSettings())),
     mView(new SlintGraphicsView(SlintGraphicsView::defaultFootprintSceneRect(),
+                                SlintGraphicsView::defaultEditorMargins(),
                                 this)),
     mOpenGlSceneRebuildScheduled(false),
     mIsNewElement(isPathOutsideLibDir()),
