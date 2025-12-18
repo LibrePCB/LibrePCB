@@ -203,40 +203,71 @@ void GraphicsScene::drawBackground(QPainter* painter,
   gridPen.setWidth((mGridStyle == Theme::GridStyle::Dots) ? 2 : 1);
   painter->setPen(gridPen);
   painter->setBrush(Qt::NoBrush);
-  const qreal gridIntervalPixels = mGridInterval->toPx();
   const qreal lod = QStyleOptionGraphicsItem::levelOfDetailFromTransform(
       painter->worldTransform());
-  if (gridIntervalPixels * lod >= 6) {
-    qreal left, right, top, bottom;
-    left = qFloor(rect.left() / gridIntervalPixels) * gridIntervalPixels;
-    right = rect.right();
-    top = rect.top();
-    bottom = qFloor(rect.bottom() / gridIntervalPixels) * gridIntervalPixels;
-    switch (mGridStyle) {
-      case Theme::GridStyle::Lines: {
-        QVarLengthArray<QLineF, 500> lines;
-        for (qreal x = left; x < right; x += gridIntervalPixels)
-          lines.append(QLineF(x, rect.top(), x, rect.bottom()));
-        for (qreal y = bottom; y > top; y -= gridIntervalPixels)
-          lines.append(QLineF(rect.left(), y, rect.right(), y));
-        painter->setOpacity(0.5);
-        painter->drawLines(lines.data(), lines.size());
-        painter->setOpacity(1);
-        break;
+  qreal gridIntervalPixels = mGridInterval->toPx();
+  while (gridIntervalPixels * lod < 7) {
+    gridIntervalPixels *= 10;
+  }
+  qreal left, right, top, bottom;
+  left = qFloor(rect.left() / gridIntervalPixels) * gridIntervalPixels;
+  right = rect.right();
+  top = rect.top();
+  bottom = qFloor(rect.bottom() / gridIntervalPixels) * gridIntervalPixels;
+  int xIndex = qFloor(rect.left() / gridIntervalPixels);
+  int yIndex = -qFloor(rect.bottom() / gridIntervalPixels);
+  switch (mGridStyle) {
+    case Theme::GridStyle::Lines: {
+      QVarLengthArray<QLineF, 450> minorLines;
+      QVarLengthArray<QLineF, 50> majorLines;
+      for (qreal x = left; x < right; x += gridIntervalPixels) {
+        if (xIndex % 10) {
+          minorLines.append(QLineF(x, rect.top(), x, rect.bottom()));
+        } else {
+          majorLines.append(QLineF(x, rect.top(), x, rect.bottom()));
+        }
+        ++xIndex;
       }
-
-      case Theme::GridStyle::Dots: {
-        QVarLengthArray<QPointF, 2000> dots;
-        for (qreal x = left; x < right; x += gridIntervalPixels)
-          for (qreal y = bottom; y > top; y -= gridIntervalPixels)
-            dots.append(QPointF(x, y));
-        painter->drawPoints(dots.data(), dots.size());
-        break;
+      for (qreal y = bottom; y > top; y -= gridIntervalPixels) {
+        if (yIndex % 10) {
+          minorLines.append(QLineF(rect.left(), y, rect.right(), y));
+        } else {
+          majorLines.append(QLineF(rect.left(), y, rect.right(), y));
+        }
+        ++yIndex;
       }
-
-      default:
-        break;
+      painter->setOpacity(0.4);
+      painter->drawLines(minorLines.data(), minorLines.size());
+      painter->setOpacity(0.7);
+      painter->drawLines(majorLines.data(), majorLines.size());
+      painter->setOpacity(1);
+      break;
     }
+
+    case Theme::GridStyle::Dots: {
+      QVarLengthArray<QPointF, 1800> minorDots;
+      QVarLengthArray<QPointF, 200> majorDots;
+      for (qreal x = left; x < right; x += gridIntervalPixels) {
+        yIndex = -qFloor(rect.bottom() / gridIntervalPixels);
+        for (qreal y = bottom; y > top; y -= gridIntervalPixels) {
+          if ((xIndex % 10) || (yIndex % 10)) {
+            minorDots.append(QPointF(x, y));
+          } else {
+            majorDots.append(QPointF(x, y));
+          }
+          ++yIndex;
+        }
+        ++xIndex;
+      }
+      painter->setOpacity(0.6);
+      painter->drawPoints(minorDots.data(), minorDots.size());
+      painter->setOpacity(1);
+      painter->drawPoints(majorDots.data(), majorDots.size());
+      break;
+    }
+
+    default:
+      break;
   }
 }
 
