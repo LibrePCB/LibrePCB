@@ -111,6 +111,21 @@ export struct AttributeData {
     action: AttributeAction,  // Set by UI, reset by backend
 }
 
+// SMT/THT selector
+export enum Technology {
+    none,
+    smt,
+    tht,
+}
+
+// Soldering technology selector
+export enum SolderTechnology {
+    none,
+    hand,
+    reflow,
+    wave,
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Widgets data
 ////////////////////////////////////////////////////////////////////////////////

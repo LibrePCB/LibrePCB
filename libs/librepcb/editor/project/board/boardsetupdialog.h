@@ -78,6 +78,8 @@ private:  // Methods
   void loadDrcSettings(const BoardDesignRuleCheckSettings& s) noexcept;
   void loadDrcSettingsPreset() noexcept;
   void loadDrcSettingsPreset(const Uuid& orgUuid, const Uuid& druUuid) noexcept;
+  void addLastTagListItem() noexcept;
+  void preferredTagsItemEdited(QListWidgetItem* item) noexcept;
   bool apply() noexcept;
   QVector<const Layer*> getTopSilkscreenLayers() const noexcept;
   QVector<const Layer*> getBotSilkscreenLayers() const noexcept;

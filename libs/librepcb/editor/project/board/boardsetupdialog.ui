@@ -950,6 +950,67 @@ QAbstractScrollArea {
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="tabTags">
+      <attribute name="title">
+       <string>Preferred Tags</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_4">
+       <item>
+        <widget class="QLabel" name="label_37">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Preferred tags are used to control the default behavior of the board editor. For example when adding a device to the board which provides multiple footprints, tag matching is used to determine which of the footprints will be added by default. Every item in the list is an AND-combination of tags the preferred footprint shall have. The first list item has highest priority.</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QListWidget" name="lstPreferredTags">
+         <property name="editTriggers">
+          <set>QAbstractItemView::AnyKeyPressed|QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed|QAbstractItemView::SelectedClicked</set>
+         </property>
+         <property name="dragDropMode">
+          <enum>QAbstractItemView::InternalMove</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_38">
+         <property name="font">
+          <font>
+           <pointsize>9</pointsize>
+           <italic>true</italic>
+          </font>
+         </property>
+         <property name="text">
+          <string>Built-in tags: #tht (through-hole devices), #smt (surface-mount devices)</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_39">
+         <property name="font">
+          <font>
+           <pointsize>9</pointsize>
+           <italic>true</italic>
+          </font>
+         </property>
+         <property name="text">
+          <string>Inversion with leading '!' character</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
    <item>
@@ -1015,7 +1076,7 @@ QAbstractScrollArea {
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="btnGroupRulesCmpSidePadShape"/>
   <buttongroup name="btnGroupRulesInnerPadShape"/>
+  <buttongroup name="btnGroupRulesCmpSidePadShape"/>
  </buttongroups>
 </ui>

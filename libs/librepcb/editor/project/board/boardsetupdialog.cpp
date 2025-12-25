@@ -258,6 +258,10 @@ BoardSetupDialog::BoardSetupDialog(GuiApplication& app, Board& board,
         QVariant::fromValue(BoardDesignRuleCheckSettings::AllowedSlots::Any));
   }
 
+  // Tab: Preferred Tags.
+  connect(mUi->lstPreferredTags, &QListWidget::itemChanged, this,
+          &BoardSetupDialog::preferredTagsItemEdited, Qt::QueuedConnection);
+
   // Load all settings.
   load();
 
@@ -367,6 +371,15 @@ void BoardSetupDialog::load() noexcept {
   // Tab: DRC Settings
   loadDrcSources(mBoard.getDrcSettings().getSources());
   loadDrcSettings(mBoard.getDrcSettings());
+
+  // Tab: Preferred tags.
+  mUi->lstPreferredTags->clear();
+  for (const TagConditional& cond : mBoard.getPreferredTags()) {
+    QListWidgetItem* item = new QListWidgetItem(cond.toString());
+    item->setFlags(item->flags() | Qt::ItemIsEditable);
+    mUi->lstPreferredTags->addItem(item);
+  }
+  addLastTagListItem();
 }
 
 void BoardSetupDialog::loadDrcSources(
@@ -534,6 +547,32 @@ void BoardSetupDialog::loadDrcSettingsPreset(const Uuid& orgUuid,
   }
 }
 
+void BoardSetupDialog::addLastTagListItem() noexcept {
+  QListWidgetItem* item =
+      new QListWidgetItem(tr("Click to add a new conditional"));
+  item->setFlags(item->flags() | Qt::ItemIsEditable);
+  QFont f = item->font();
+  f.setItalic(true);
+  item->setFont(f);
+  mUi->lstPreferredTags->addItem(item);
+}
+
+void BoardSetupDialog::preferredTagsItemEdited(QListWidgetItem* item) noexcept {
+  QString s = item->text();
+  s.remove(" ");
+  s.replace("&&", " && ");
+  if (item->font().italic()) {
+    QFont f = item->font();
+    f.setItalic(false);
+    item->setFont(f);
+    addLastTagListItem();
+  } else if (s.isEmpty()) {
+    delete item;
+  } else if (s != item->text()) {
+    item->setText(s);
+  }
+}
+
 bool BoardSetupDialog::apply() noexcept {
   try {
     std::unique_ptr<CmdBoardEdit> cmd(new CmdBoardEdit(mBoard));
@@ -610,6 +649,19 @@ bool BoardSetupDialog::apply() noexcept {
         mUi->cbxDrcAllowedPthSlots->currentData()
             .value<BoardDesignRuleCheckSettings::AllowedSlots>());
     cmd->setDrcSettings(s);
+
+    // Tab: Preferred Tags
+    QVector<TagConditional> tags;
+    for (int i = 0; i < mUi->lstPreferredTags->count(); ++i) {
+      const QListWidgetItem* item = mUi->lstPreferredTags->item(i);
+      if (item->font().italic()) continue;  // "Create new item" dummy
+      QVector<TagExpression> expressions;
+      for (const QString& s : item->text().split("&&", Qt::SkipEmptyParts)) {
+        expressions.append(TagExpression::fromString(s.trimmed()));
+      }
+      tags.append(TagConditional(expressions));
+    }
+    cmd->setPreferredTas(tags);
 
     mUndoStack.execCmd(cmd.release());  // can throw
     return true;

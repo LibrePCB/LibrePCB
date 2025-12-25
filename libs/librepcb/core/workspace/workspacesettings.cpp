@@ -88,6 +88,8 @@ WorkspaceSettings::WorkspaceSettings(QObject* parent)
     useOpenGl("use_opengl", false, this),
     libraryLocaleOrder("library_locale_order", "locale", QStringList(), this),
     libraryNormOrder("library_norm_order", "norm", QStringList(), this),
+    defaultPreferredBoardTags("default_preferred_board_tags", "preferred_tags",
+                              QVector<TagConditional>(), this),
     apiEndpoints("api_endpoints", "endpoint",
                  QList<ApiEndpoint>{
                      ApiEndpoint{

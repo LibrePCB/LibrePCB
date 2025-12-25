@@ -1,9 +1,14 @@
 import { ListView } from "std-widgets.slint";
 import {
+    NameRowHeader,
+} from "../library/metadatawidgets.slint";
+import {
     Button,
     ComboBox,
     IconButton,
     LinkText,
+    SolderTechnologySelector,
+    TechnologySelector,
     Palette,
     PanelHeader,
 } from "../widgets.slint";
@@ -12,6 +17,8 @@ import {
     Board2dTabData,
     Constants,
     Data,
+    SolderTechnology,
+    Technology,
     Helpers,
     NotificationType,
     PanelPage,
@@ -60,6 +67,7 @@ export component PlaceDevicesPanel inherits Rectangle {
     property <int> selected-index: tab.unplaced-components-index;
     property <bool> item-selected: (selected-index >= 0) && (selected-index < model.length);
     property <int> devices-count: tab.unplaced-components-devices.length;
+    property <bool> expanded: false;
 
     background: #2a2a2a;
 
@@ -91,6 +99,154 @@ export component PlaceDevicesPanel inherits Rectangle {
                 z: 10;  // For the tooltip.
                 title: @tr("Place Devices").to-uppercase();
                 highlight: fs.has-focus;
+
+                preferred-devices-btn := IconButton {
+                    width: self.height;
+                    icon: @image-url("../../../../../img/actions/add_tht_pad.png");
+                    //icon-scale: 0.7;
+                    //tooltip: @tr("Open web browser after upload");
+                    enabled: false;
+                }
+
+                preferred-footprints-btn := IconButton {
+                    width: self.height;
+                    icon: @image-url("../../../../font-awesome/svgs/solid/hand.svg");
+                    //icon-scale: 0.7;
+                    //tooltip: @tr("Open web browser after upload");
+                    enabled: false;
+                }
+
+                expand-collapse-btn := IconButton {
+                    width: self.height;
+                    icon: @image-url("../../../../font-awesome/svgs/solid/sliders.svg");
+                    //icon-scale: 0.7;
+                    //tooltip: @tr("Open web browser after upload");
+
+                    clicked => {
+                        expanded = !expanded;
+                    }
+                }
+            }
+
+            Rectangle {
+                height: expanded ? self.preferred-height : 0;
+                clip: true;
+
+                animate height { duration: 150ms; }
+
+                GridLayout {
+                    padding: 8px;
+                    spacing-horizontal: 8px;
+                    spacing-vertical: 2px;
+
+                    /*ow {
+                        Text {
+                            colspan: 2;
+                            font-size: 13px;
+                            text: @tr("Preferred Board Style:");
+                        }
+                    }*/
+
+                    Row {
+                        NameRowHeader {
+                            text: @tr("Devices:");
+                        }
+
+                        HorizontalLayout {
+                            spacing: 8px;
+
+                            technology-selector := TechnologySelector {
+                                height: self.preferred-height;
+                            }
+
+                            Text {
+                                font-size: 10.5px;
+                                font-italic: true;
+                                vertical-alignment: center;
+                                text: {
+                                    if technology-selector.value == Technology.smt {
+                                        @tr("Prefer surface-mount")
+                                    } else if technology-selector.value == Technology.tht {
+                                        @tr("Prefer through-hole")
+                                    } else {
+                                        @tr("No preference")
+                                    }
+                                };
+                            }
+                        }
+                    }
+
+                    Row {
+                        NameRowHeader {
+                            text: @tr("Footprints:");
+                        }
+
+                        HorizontalLayout {
+                            alignment: start;
+                            spacing: 8px;
+
+                            solder-technology-selector := SolderTechnologySelector {
+                                height: self.preferred-height;
+                            }
+
+                            Text {
+                                font-size: 10.5px;
+                                font-italic: true;
+                                vertical-alignment: center;
+                                text: {
+                                    if solder-technology-selector.value == SolderTechnology.hand {
+                                        @tr("Prefer hand-soldering")
+                                    } else if solder-technology-selector.value == SolderTechnology.reflow {
+                                        @tr("Prefer reflow-soldering")
+                                    } else if solder-technology-selector.value == SolderTechnology.wave {
+                                        @tr("Prefer wave-soldering")
+                                    } else {
+                                        @tr("No preference")
+                                    }
+                                };
+                            }
+                        }
+                    }
+
+                    Row {
+                        NameRowHeader {
+                            text: @tr("THT Pads:");
+                        }
+
+                        ComboBox {
+                            height: self.preferred-height;
+                            model: [
+                                "No preference",
+                                "Extra-large pads (easy hand-soldering)",
+                            ];
+                            current-index: 0;
+                        }
+                    }
+
+                    Row {
+                        NameRowHeader {
+                            text: @tr("SMT Pads:");
+                        }
+
+                        ComboBox {
+                            height: self.preferred-height;
+                            model: [
+                                "No preference",
+                                "IPC Density Level A (max protrusion)",
+                                "IPC Density Level B (median protrusion)",
+                                "IPC Density Level C (min protrusion)",
+                                "Extra-large pads (easy hand-soldering)",
+                            ];
+                            current-index: 0;
+                        }
+                    }
+                }
+
+                Rectangle {
+                    y: parent.height - self.height;
+                    height: 1px;
+                    background: #555555;
+                }
             }
 
             if model.length == 0: VerticalLayout {

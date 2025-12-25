@@ -187,7 +187,8 @@ component ProjectSection inherits Rectangle {
                     icon-scale: 60%;
 
                     clicked => {
-                        Backend.trigger-project(project-index, ProjectAction.new-board);
+                        Data.new-board-overlay-project-index = project-index;
+                        //Backend.trigger-project(project-index, ProjectAction.new-board);
                     }
                 }
 

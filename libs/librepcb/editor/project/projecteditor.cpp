@@ -647,6 +647,11 @@ std::shared_ptr<BoardEditor> ProjectEditor::execNewBoardDialog(
     CmdBoardAdd* cmd = new CmdBoardAdd(*mProject, dirName, ElementName(name),
                                        copyFrom);  // can throw
     mUndoStack->execCmd(cmd);
+    if (Board* board = cmd->getBoard(); board && (!copyFrom)) {
+      // Initialize new board with settings from workspace.
+      board->setPreferredTags(
+          mWorkspace.getSettings().defaultPreferredBoardTags.get());
+    }
     return mBoards->value(index);
   } catch (const Exception& e) {
     QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());

@@ -28,6 +28,7 @@
 #include "../../types/elementname.h"
 #include "../../types/length.h"
 #include "../../types/lengthunit.h"
+#include "../../types/tagexpression.h"
 #include "../../types/uuid.h"
 #include "../../types/version.h"
 
@@ -74,6 +75,12 @@ class Board final : public QObject {
   Q_OBJECT
 
 public:
+  enum class PreferredDevices {
+    None,
+    Smt,
+    Tht,
+  };
+
   // Constructors / Destructor
   Board() = delete;
   Board(const Board& other) = delete;
@@ -109,6 +116,9 @@ public:
   const ElementName& getName() const noexcept { return mName; }
   const QString& getDefaultFontName() const noexcept {
     return mDefaultFontFileName;
+  }
+  const QVector<TagConditional>& getPreferredTags() const noexcept {
+    return mPreferredTags;
   }
   const PositiveLength& getGridInterval() const noexcept {
     return mGridInterval;
@@ -146,6 +156,7 @@ public:
   void setDefaultFontName(const QString& name) noexcept {
     mDefaultFontFileName = name;
   }
+  void setPreferredTags(const QVector<TagConditional>& tags) noexcept;
   void setGridInterval(const PositiveLength& interval) noexcept {
     mGridInterval = interval;
   }
@@ -249,6 +260,7 @@ public:
 signals:
   void nameChanged(const ElementName& name);
   void attributesChanged();
+  void preferredTagsChanged();
   void designRulesModified();
   void innerLayerCountChanged();
 
@@ -286,6 +298,7 @@ private:
   Uuid mUuid;
   ElementName mName;
   QString mDefaultFontFileName;
+  QVector<TagConditional> mPreferredTags;
   PositiveLength mGridInterval;
   LengthUnit mGridUnit;
 

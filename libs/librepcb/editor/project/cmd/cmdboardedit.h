@@ -28,6 +28,7 @@
 #include <librepcb/core/project/board/boarddesignrules.h>
 #include <librepcb/core/project/board/drc/boarddesignrulechecksettings.h>
 #include <librepcb/core/types/elementname.h>
+#include <librepcb/core/types/tagexpression.h>
 
 #include <QtCore>
 
@@ -59,6 +60,7 @@ public:
 
   // Setters
   void setName(const ElementName& name) noexcept;
+  void setPreferredTas(const QVector<TagConditional>& tags) noexcept;
   void setInnerLayerCount(int count) noexcept;
   void setPcbThickness(const PositiveLength& thickness) noexcept;
   void setSolderResist(const PcbColor* c) noexcept;
@@ -83,6 +85,8 @@ private:  // Data
 
   ElementName mOldName;
   ElementName mNewName;
+  QVector<TagConditional> mOldTags;
+  QVector<TagConditional> mNewTags;
   int mOldInnerLayerCount;
   int mNewInnerLayerCount;
   PositiveLength mOldPcbThickness;

@@ -18,6 +18,7 @@ import { LibrariesPanel } from "library/librariespanel.slint";
 import { AboutPanel } from "aboutpanel.slint";
 import { WindowSection } from "windowsection.slint";
 import { StatusBar } from "statusbar.slint";
+import { NewBoardOverlayDialog } from "newboardoverlaydialog.slint";
 import {
     Backend,
     Data,
@@ -186,6 +187,14 @@ export component AppWindow inherits Window {
             focus-root => {
                 fs.focus();
             }
+        }
+
+        new-board-overlay-dialog := NewBoardOverlayDialog {
+            x: 0;
+            y: 0;
+            z: 9999;
+            width: parent.width;
+            height: parent.height;
         }
     }
 }

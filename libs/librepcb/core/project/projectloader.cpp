@@ -811,6 +811,13 @@ void ProjectLoader::loadBoard(Project& p, const QString& relativeFilePath) {
   Board* board = new Board(p, std::move(dir), fp.getParentDir().getFilename(),
                            deserialize<Uuid>(root->getChild("@0")),
                            deserialize<ElementName>(root->getChild("name/@0")));
+  {
+    QVector<TagConditional> tags;
+    foreach (const SExpression* child, root->getChildren("preferred_tags")) {
+      tags.append(TagConditional(*child));
+    }
+    board->setPreferredTags(tags);
+  }
   board->setGridInterval(
       deserialize<PositiveLength>(root->getChild("grid/interval/@0")));
   board->setGridUnit(deserialize<LengthUnit>(root->getChild("grid/unit/@0")));

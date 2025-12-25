@@ -1,0 +1,74 @@
+import { IconButton } from "iconbutton.slint";
+import { ToolBarWidget } from "toolbarwidget.slint";
+import {
+    Helpers,
+    SolderTechnology,
+} from "../api.slint";
+
+component Button inherits IconButton {
+    width: 18px;
+    style: checkable-hyperlink;
+    color-enabled: #606060;
+    color-checked: #c0c0c0;
+}
+
+export component SolderTechnologySelector inherits ToolBarWidget {
+    in-out property <SolderTechnology> value;
+
+    spacing: 5px;
+
+    callback value-clicked(SolderTechnology);
+    value-clicked(v) => {
+        value = v;
+    }
+
+    Button {
+        icon: @image-url("../../../../font-awesome/svgs/solid/hand.svg");
+        checked: value == SolderTechnology.hand;
+
+        clicked => {
+            value-clicked(self.checked ? SolderTechnology.none : SolderTechnology.hand);
+        }
+    }
+
+    Button {
+        icon: @image-url("../../../../font-awesome/svgs/solid/wind.svg");
+        icon-rotation: 90deg;
+        checked: value == SolderTechnology.reflow;
+
+        clicked => {
+            value-clicked(self.checked ? SolderTechnology.none : SolderTechnology.reflow);
+        }
+    }
+
+    Button {
+        icon: @image-url("../../../../font-awesome/svgs/solid/water.svg");
+        checked: value == SolderTechnology.wave;
+
+        clicked => {
+            value-clicked(self.checked ? SolderTechnology.none : SolderTechnology.wave);
+        }
+    }
+
+    key-pressed(event) => {
+        if event.text == Key.LeftArrow {
+            if value == SolderTechnology.wave {
+                value-clicked(SolderTechnology.reflow);
+            } else {
+                value-clicked(SolderTechnology.hand);
+            }
+            return accept;
+        } else if event.text == Key.RightArrow {
+            if value == SolderTechnology.hand {
+                value-clicked(SolderTechnology.reflow);
+            } else {
+                value-clicked(SolderTechnology.wave);
+            }
+            return accept;
+        } else if event.text == Key.Space {
+            value-clicked(SolderTechnology.none);
+            return accept;
+        }
+        reject
+    }
+}

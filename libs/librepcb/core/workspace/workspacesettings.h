@@ -25,6 +25,7 @@
  ******************************************************************************/
 #include "../exceptions.h"
 #include "../types/lengthunit.h"
+#include "../types/tagexpression.h"
 #include "workspacesettingsitem_genericvalue.h"
 #include "workspacesettingsitem_genericvaluelist.h"
 #include "workspacesettingsitem_keyboardshortcuts.h"
@@ -221,6 +222,16 @@ public:
    * Default: []
    */
   WorkspaceSettingsItem_GenericValueList<QStringList> libraryNormOrder;
+
+  /**
+   * @brief Preferred board tags to be applied to new boards
+   *
+   * See ::librepcb::Board::setPreferredBoardTags()
+   *
+   * Default: [], initialized during workspace setup wizard
+   */
+  WorkspaceSettingsItem_GenericValueList<QVector<TagConditional>, true>
+      defaultPreferredBoardTags;
 
   /**
    * @brief The list of API endpoint URLs in the right order

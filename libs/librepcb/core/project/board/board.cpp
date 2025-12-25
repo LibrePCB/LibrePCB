@@ -85,6 +85,7 @@ Board::Board(Project& project,
     mUuid(uuid),
     mName(name),
     mDefaultFontFileName(Application::getDefaultStrokeFontName()),
+    mPreferredTags(),
     mGridInterval(635000),
     mGridUnit(LengthUnit::millimeters()),
     mInnerLayerCount(-1),  // Force update of setter.
@@ -293,6 +294,13 @@ void Board::setName(const ElementName& name) noexcept {
     mName = name;
     emit nameChanged(mName);
     emit attributesChanged();
+  }
+}
+
+void Board::setPreferredTags(const QVector<TagConditional>& tags) noexcept {
+  if (tags != mPreferredTags) {
+    mPreferredTags = tags;
+    emit preferredTagsChanged();
   }
 }
 
@@ -732,6 +740,7 @@ void Board::addDefaultContent() {
 
 void Board::copyFrom(const Board& other) {
   mDefaultFontFileName = other.getDefaultFontName();
+  mPreferredTags = other.mPreferredTags;
   mGridInterval = other.getGridInterval();
   mGridUnit = other.getGridUnit();
   mInnerLayerCount = other.getInnerLayerCount();
@@ -931,6 +940,10 @@ void Board::save() {
     root->ensureLineBreak();
     root->appendChild("default_font", mDefaultFontFileName);
     root->ensureLineBreak();
+    for (const TagConditional& item : mPreferredTags) {
+      item.serialize(root->appendList("preferred_tags"));
+      root->ensureLineBreak();
+    }
     SExpression& gridNode = root->appendList("grid");
     gridNode.appendChild("interval", mGridInterval);
     gridNode.appendChild("unit", mGridUnit);
