@@ -191,6 +191,29 @@ public:
 };
 
 /*******************************************************************************
+ *  Class DrcMsgImpossibleConnection
+ ******************************************************************************/
+
+/**
+ * @brief The DrcMsgImpossibleConnection class
+ */
+class DrcMsgImpossibleConnection final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(DrcMsgImpossibleConnection)
+
+public:
+  using Data = BoardDesignRuleCheckData;
+
+  // Constructors / Destructor
+  DrcMsgImpossibleConnection() = delete;
+  DrcMsgImpossibleConnection(const Data::Device& device, const Uuid& signalUuid,
+                             const QString& signalName, const QString& netName,
+                             const QVector<Path>& locations);
+  DrcMsgImpossibleConnection(const DrcMsgImpossibleConnection& other) noexcept
+    : RuleCheckMessage(other) {}
+  virtual ~DrcMsgImpossibleConnection() noexcept {}
+};
+
+/*******************************************************************************
  *  Class DrcMsgMissingBoardOutline
  ******************************************************************************/
 

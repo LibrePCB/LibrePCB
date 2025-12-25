@@ -32,6 +32,7 @@
 #include "../../../utils/clipperhelpers.h"
 #include "../../circuit/circuit.h"
 #include "../../circuit/componentinstance.h"
+#include "../../circuit/componentsignalinstance.h"
 #include "../../circuit/netclass.h"
 #include "../../circuit/netsignal.h"
 #include "../../project.h"
@@ -204,6 +205,7 @@ BoardDesignRuleCheckData::BoardDesignRuleCheckData(
         {},
         {},
         {},
+        {},
     };
     foreach (const BI_Pad* pad, dev->getPads()) {
       dd.pads.insert(pad->getUuid(), convertPad(pad));
@@ -238,6 +240,25 @@ BoardDesignRuleCheckData::BoardDesignRuleCheckData(
                            zone.getLayers(),
                            zone.getRules(),
                            zone.getOutline()});
+    }
+    if (!quickCheck) {
+      // A bit unusual, but the actual check is already done here to avoid
+      // copying lots of data for such a lightweight check.
+      QSet<const ComponentSignalInstance*> padSignals;
+      for (const BI_Pad* pad : dev->getPads()) {
+        padSignals.insert(pad->getComponentSignalInstance());
+      }
+      for (const ComponentSignalInstance* sig :
+           dev->getComponentInstance().getSignals()) {
+        const NetSignal* net = sig->getNetSignal();
+        if (net && (!padSignals.contains(sig))) {
+          dd.impossibleSignalConnections.append(ImpossibleConnection{
+              sig->getCompSignal().getUuid(),
+              *sig->getCompSignal().getName(),
+              *net->getName(),
+          });
+        }
+      }
     }
     devices.insert(dev->getComponentInstanceUuid(), dd);
   }

@@ -137,6 +137,7 @@ private:  // Methods
   RuleCheckMessageList checkUsedLayers(const Data& data);
   RuleCheckMessageList checkForUnplacedComponents(const Data& data);
   RuleCheckMessageList checkForMissingConnections(const Data& data);
+  RuleCheckMessageList checkForImpossibleConnections(const Data& data);
   RuleCheckMessageList checkForStaleObjects(const Data& data);
   static void checkMinimumWidth(RuleCheckMessageList& messages,
                                 const Data& data,
