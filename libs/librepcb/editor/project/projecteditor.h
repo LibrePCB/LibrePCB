@@ -206,6 +206,7 @@ private:
   void scheduleErcRun() noexcept;
   void runErc() noexcept;
   void projectSettingsChanged() noexcept;
+  void refreshBuses() noexcept;
 
 private:
   GuiApplication& mApp;
@@ -214,6 +215,7 @@ private:
   int mUiIndex;
   bool mUseIeee315Symbols;
   std::optional<ProjectLoader::MigrationLog> mMigrationLog;
+  std::shared_ptr<slint::VectorModel<ui::BusData>> mBuses;  // Lazy initialized
   std::shared_ptr<UiObjectList<SchematicEditor, ui::SchematicData>> mSchematics;
   std::shared_ptr<UiObjectList<BoardEditor, ui::BoardData>> mBoards;
   std::unique_ptr<UndoStack> mUndoStack;

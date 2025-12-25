@@ -37,6 +37,7 @@
 #include "fsm/schematiceditorfsm.h"
 #include "fsm/schematiceditorstate_addcomponent.h"
 #include "fsm/schematiceditorstate_addtext.h"
+#include "fsm/schematiceditorstate_drawbus.h"
 #include "fsm/schematiceditorstate_drawpolygon.h"
 #include "graphicsitems/sgi_symbol.h"
 #include "schematiceditor.h"
@@ -341,6 +342,7 @@ ui::SchematicTabData SchematicTab::getDerivedUiData() const noexcept {
       },
       q2s(mSceneImagePos),  // Scene image position
       mFrameIndex,  // Frame index
+      slint::SharedString(),  // New bus UUID
   };
 }
 
@@ -390,6 +392,13 @@ void SchematicTab::setDerivedUiData(const ui::SchematicTabData& data) noexcept {
   emit attributeValueRequested(
       EditorToolbox::toMultiLine(s2q(data.tool_attribute_value.text)));
 
+  // Actions
+  if (!data.new_bus_uuid.empty()) {
+    if (auto uuid = Uuid::tryFromString(s2q(data.new_bus_uuid))) {
+      mFsm->processDrawBus(*uuid);
+    }
+  }
+
   requestRepaint();
 }
 
@@ -405,7 +414,7 @@ void SchematicTab::highlightErcMessage(
     QPainterPath path = Path::toQPainterPathPx(msg->getLocations(), true);
     mErcLocationGraphicsItem.reset(new QGraphicsPathItem());
     mErcLocationGraphicsItem->setZValue(
-        SchematicGraphicsScene::ZValue_VisibleNetPoints);
+        SchematicGraphicsScene::ZValue_ErcLocation);
     mErcLocationGraphicsItem->setPen(QPen(color.getPrimaryColor(), 0));
     mErcLocationGraphicsItem->setBrush(color.getSecondaryColor());
     mErcLocationGraphicsItem->setPath(path);
@@ -619,7 +628,11 @@ void SchematicTab::trigger(ui::TabAction a) noexcept {
       mFsm->processDrawWire();
       break;
     }
-    case ui::TabAction::ToolNetlabel: {
+    case ui::TabAction::ToolBus: {
+      mFsm->processDrawBus();
+      break;
+    }
+    case ui::TabAction::ToolLabel: {
       mFsm->processAddNetLabel();
       break;
     }
@@ -892,11 +905,29 @@ void SchematicTab::fsmToolEnter(SchematicEditorState_DrawWire& state) noexcept {
   onDerivedUiDataChanged.notify();
 }
 
-void SchematicTab::fsmToolEnter(
-    SchematicEditorState_AddNetLabel& state) noexcept {
+void SchematicTab::fsmToolEnter(SchematicEditorState_DrawBus& state) noexcept {
+  mTool = ui::EditorTool::Bus;
+
+  // Wire mode
+  auto setWireMode = [this](SchematicEditorState_DrawWire::WireMode m) {
+    mToolWireMode = m;
+    onDerivedUiDataChanged.notify();
+  };
+  setWireMode(state.getWireMode());
+  mFsmStateConnections.append(
+      connect(&state, &SchematicEditorState_DrawBus::wireModeChanged, this,
+              setWireMode));
+  mFsmStateConnections.append(
+      connect(this, &SchematicTab::wireModeRequested, &state,
+              &SchematicEditorState_DrawBus::setWireMode));
+
+  onDerivedUiDataChanged.notify();
+}
+
+void SchematicTab::fsmToolEnter(SchematicEditorState_AddLabel& state) noexcept {
   Q_UNUSED(state);
 
-  mTool = ui::EditorTool::Netlabel;
+  mTool = ui::EditorTool::Label;
   onDerivedUiDataChanged.notify();
 }
 

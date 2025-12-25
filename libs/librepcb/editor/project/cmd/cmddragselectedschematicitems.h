@@ -41,6 +41,8 @@ namespace editor {
 
 class CmdImageEdit;
 class CmdPolygonEdit;
+class CmdSchematicBusJunctionEdit;
+class CmdSchematicBusLabelEdit;
 class CmdSchematicNetLabelEdit;
 class CmdSchematicNetPointEdit;
 class CmdSymbolInstanceEdit;
@@ -92,6 +94,8 @@ private:
   // Move commands
   QList<CmdSymbolInstanceEdit*> mSymbolEditCmds;
   QList<CmdSymbolInstanceTextsReset*> mSymbolTextsResetCmds;
+  QList<CmdSchematicBusJunctionEdit*> mBusJunctionEditCmds;
+  QList<CmdSchematicBusLabelEdit*> mBusLabelEditCmds;
   QList<CmdSchematicNetPointEdit*> mNetPointEditCmds;
   QList<CmdSchematicNetLabelEdit*> mNetLabelEditCmds;
   QList<CmdPolygonEdit*> mPolygonEditCmds;

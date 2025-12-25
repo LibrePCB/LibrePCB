@@ -35,6 +35,8 @@
 namespace librepcb {
 
 class Circuit;
+class SI_BusJunction;
+class SI_NetLabel;
 class SI_NetLine;
 class SI_NetLineAnchor;
 class SI_NetPoint;
@@ -111,15 +113,20 @@ signals:
 
 private:  //  Methods
   bool startPositioning(SchematicGraphicsScene& scene, bool snap,
+                        bool interactive,
                         SI_NetPoint* fixedPoint = nullptr) noexcept;
-  bool addNextNetPoint(SchematicGraphicsScene& scene, bool snap) noexcept;
+  bool addNextNetPoint(SchematicGraphicsScene& scene, bool snap,
+                       bool interactive) noexcept;
   bool abortPositioning(bool showErrMsgBox, bool simplifySegment) noexcept;
   std::shared_ptr<QGraphicsItem> findItem(
       const Point& pos,
       const QVector<std::shared_ptr<QGraphicsItem>>& except = {}) noexcept;
   Point updateNetpointPositions(bool snap) noexcept;
+  void updateNetLabelPosition(const Point& pos, const Point& dirPos) noexcept;
   Point calcMiddlePointPos(const Point& p1, const Point p2,
                            WireMode mode) const noexcept;
+  std::optional<NetSignal*> determineNetForBusMember(
+      SI_BusJunction& junction) const noexcept;
 
 private:  // Data
   Circuit& mCircuit;
@@ -134,6 +141,7 @@ private:  // Data
   SI_NetPoint* mPositioningNetPoint1;  ///< the first netpoint to place
   SI_NetLine* mPositioningNetLine2;  ///< line between p1 and p2
   SI_NetPoint* mPositioningNetPoint2;  ///< the second netpoint to place
+  SI_NetLabel* mPositioningNetLabel;  ///< if net is forced, the label to place
 };
 
 /*******************************************************************************

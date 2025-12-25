@@ -30,6 +30,10 @@
  ******************************************************************************/
 namespace librepcb {
 
+class SI_BusJunction;
+class SI_BusLabel;
+class SI_BusLine;
+class SI_BusSegment;
 class SI_Image;
 class SI_NetLabel;
 class SI_NetLine;
@@ -57,6 +61,11 @@ class SchematicSelectionQuery final : public QObject {
 
 public:
   // Types
+  struct BusSegmentItems {
+    QSet<SI_BusJunction*> junctions;
+    QSet<SI_BusLine*> lines;
+    QSet<SI_BusLabel*> labels;
+  };
   struct NetSegmentItems {
     QSet<SI_NetPoint*> netpoints;
     QSet<SI_NetLine*> netlines;
@@ -72,6 +81,15 @@ public:
 
   // Getters
   const QSet<SI_Symbol*>& getSymbols() const noexcept { return mResultSymbols; }
+  const QSet<SI_BusJunction*>& getBusJunctions() const noexcept {
+    return mResultBusJunctions;
+  }
+  const QSet<SI_BusLine*>& getBusLines() const noexcept {
+    return mResultBusLines;
+  }
+  const QSet<SI_BusLabel*>& getBusLabels() const noexcept {
+    return mResultBusLabels;
+  }
   const QSet<SI_NetPoint*>& getNetPoints() const noexcept {
     return mResultNetPoints;
   }
@@ -88,6 +106,17 @@ public:
   const QSet<SI_Image*>& getImages() const noexcept { return mResultImages; }
 
   /**
+   * @brief Get bus junctions, lines and labels grouped by bus segment
+   *
+   * Same as #getBusJunctions(), #getBusLines() and #getBusLabels(), but grouped
+   * by their corresponding bus segments. Only bus segments containing selected
+   * items are returned.
+   *
+   * @return List of bus segments containing the selected items
+   */
+  QHash<SI_BusSegment*, BusSegmentItems> getBusSegmentItems() const noexcept;
+
+  /**
    * @brief Get net points, net lines and net labels grouped by net segment
    *
    * Same as #getNetPoints(), #getNetLines() and #getNetLabels(), but grouped
@@ -102,6 +131,9 @@ public:
 
   // General Methods
   void addSelectedSymbols() noexcept;
+  void addSelectedBusJunctions() noexcept;
+  void addSelectedBusLines() noexcept;
+  void addSelectedBusLabels() noexcept;
   void addSelectedNetPoints() noexcept;
   void addSelectedNetLines() noexcept;
   void addSelectedNetLabels() noexcept;
@@ -109,6 +141,16 @@ public:
   void addSelectedSchematicTexts() noexcept;
   void addSelectedSymbolTexts() noexcept;
   void addSelectedImages() noexcept;
+  /**
+   * @brief Add junctions of the selected bus lines
+   *
+   * @param onlyIfAllLinesSelected      If true, junctions are added only if
+   *                                    *all* connected lines are selected.
+   *                                    If false, junctions are added if at
+   *                                    least one of the connected lines
+   *                                    is selected.
+   */
+  void addJunctionsOfBusLines(bool onlyIfAllLinesSelected = false) noexcept;
   /**
    * @brief Add net points of the selected net lines
    *
@@ -130,6 +172,9 @@ private:  // Data
 
   // query result
   QSet<SI_Symbol*> mResultSymbols;
+  QSet<SI_BusJunction*> mResultBusJunctions;
+  QSet<SI_BusLine*> mResultBusLines;
+  QSet<SI_BusLabel*> mResultBusLabels;
   QSet<SI_NetPoint*> mResultNetPoints;
   QSet<SI_NetLine*> mResultNetLines;
   QSet<SI_NetLabel*> mResultNetLabels;

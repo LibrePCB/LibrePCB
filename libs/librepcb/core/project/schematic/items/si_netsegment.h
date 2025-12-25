@@ -35,6 +35,8 @@
 namespace librepcb {
 
 class NetSignal;
+class SI_BusJunction;
+class SI_BusSegment;
 class SI_NetLabel;
 class SI_NetLine;
 class SI_NetLineAnchor;
@@ -68,6 +70,8 @@ public:
   QString getForcedNetName() const noexcept;
   Point calcNearestPoint(const Point& p) const noexcept;
   QSet<SI_SymbolPin*> getAllConnectedPins() const noexcept;
+  QSet<SI_BusJunction*> getAllConnectedBusJunctions() const noexcept;
+  QSet<SI_BusSegment*> getAllConnectedBusSegments() const noexcept;
 
   // Setters
   void setNetSignal(NetSignal& netsignal);
@@ -123,6 +127,7 @@ private:
   bool areAllNetPointsConnectedTogether() const noexcept;
   void findAllConnectedNetPoints(const SI_NetLineAnchor& p,
                                  QSet<const SI_SymbolPin*>& pins,
+                                 QSet<const SI_BusJunction*>& buses,
                                  QSet<const SI_NetPoint*>& points,
                                  QSet<const SI_NetLine*>& lines) const noexcept;
 

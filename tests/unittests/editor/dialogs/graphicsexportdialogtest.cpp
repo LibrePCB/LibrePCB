@@ -961,6 +961,8 @@ TEST_F(GraphicsExportDialogTest, testLayerColors) {
       Theme::Color::sSchematicValues,
       Theme::Color::sSchematicWires,
       Theme::Color::sSchematicNetLabels,
+      Theme::Color::sSchematicBuses,
+      Theme::Color::sSchematicBusLabels,
       Theme::Color::sSchematicImageBorders,
       Theme::Color::sSchematicDocumentation,
       Theme::Color::sSchematicComments,

@@ -45,6 +45,14 @@ class NetLineAnchor final {
 
 public:
   // Types
+  struct BusAnchor {
+    Uuid segment;
+    Uuid junction;
+
+    bool operator==(const BusAnchor& rhs) const noexcept {
+      return (segment == rhs.segment) && (junction == rhs.junction);
+    }
+  };
   struct PinAnchor {
     Uuid symbol;
     Uuid pin;
@@ -63,6 +71,9 @@ public:
   // Getters
   const std::optional<Uuid>& tryGetJunction() const noexcept {
     return mJunction;
+  }
+  const std::optional<BusAnchor>& tryGetBusJunction() const noexcept {
+    return mBusJunction;
   }
   const std::optional<PinAnchor>& tryGetPin() const noexcept { return mPin; }
 
@@ -85,14 +96,18 @@ public:
 
   // Static Methods
   static NetLineAnchor junction(const Uuid& junction) noexcept;
+  static NetLineAnchor busJunction(const Uuid& segment,
+                                   const Uuid& junction) noexcept;
   static NetLineAnchor pin(const Uuid& symbol, const Uuid& pin) noexcept;
 
 private:  // Methods
   NetLineAnchor(const std::optional<Uuid>& junction,
+                const std::optional<BusAnchor> bus,
                 const std::optional<PinAnchor>& pin) noexcept;
 
 private:  // Data
   std::optional<Uuid> mJunction;
+  std::optional<BusAnchor> mBusJunction;
   std::optional<PinAnchor> mPin;
 };
 
@@ -187,6 +202,11 @@ inline std::size_t qHash(const NetLineAnchor& key,
   QString s;
   if (std::optional<Uuid> anchor = key.tryGetJunction()) {
     s += anchor->toStr();
+  }
+  if (std::optional<NetLineAnchor::BusAnchor> anchor =
+          key.tryGetBusJunction()) {
+    s += anchor->segment.toStr();
+    s += anchor->junction.toStr();
   }
   if (std::optional<NetLineAnchor::PinAnchor> anchor = key.tryGetPin()) {
     s += anchor->symbol.toStr();

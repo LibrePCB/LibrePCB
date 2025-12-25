@@ -25,6 +25,8 @@
  ******************************************************************************/
 #include "../../undocommandgroup.h"
 
+#include <librepcb/core/project/schematic/schematicnetsegmentsplitter.h>
+
 #include <QtCore>
 
 /*******************************************************************************
@@ -33,6 +35,11 @@
 namespace librepcb {
 
 class ComponentSignalInstance;
+class NetSignal;
+class SI_BusJunction;
+class SI_BusLabel;
+class SI_BusLine;
+class SI_BusSegment;
 class SI_NetLabel;
 class SI_NetLine;
 class SI_NetPoint;
@@ -51,6 +58,11 @@ class SchematicGraphicsScene;
  * @brief The CmdRemoveSelectedSchematicItems class
  */
 class CmdRemoveSelectedSchematicItems final : public UndoCommandGroup {
+  struct Segment {
+    NetSignal* net;
+    SchematicNetSegmentSplitter::Segment elements;
+  };
+
 public:
   // Constructors / Destructor
   explicit CmdRemoveSelectedSchematicItems(
@@ -58,7 +70,12 @@ public:
   ~CmdRemoveSelectedSchematicItems() noexcept;
 
   // Output
-  QList<SI_NetSegment*> getModifiedNetSegments() const noexcept;
+  const QSet<SI_NetSegment*>& getModifiedNetSegments() const noexcept {
+    return mModifiedNetSegments;
+  }
+  const QSet<SI_BusSegment*>& getModifiedBusSegments() const noexcept {
+    return mModifiedBusSegments;
+  }
 
 private:
   // Private Methods
@@ -69,7 +86,17 @@ private:
   void removeNetSegmentItems(SI_NetSegment& netsegment,
                              const QSet<SI_NetPoint*>& netpointsToRemove,
                              const QSet<SI_NetLine*>& netlinesToRemove,
-                             const QSet<SI_NetLabel*>& netlabelsToRemove);
+                             const QSet<SI_NetLabel*>& netlabelsToRemove,
+                             const QSet<SI_BusJunction*>& busJunctionsToReplace,
+                             QVector<Segment>& remainingNetSegments);
+  void removeBusSegmentItems(
+      SI_BusSegment& busSegment, const QSet<SI_BusJunction*>& junctionsToRemove,
+      const QSet<SI_BusLine*>& linesToRemove,
+      const QSet<SI_BusLabel*>& labelsToRemove,
+      QHash<NetLineAnchor, NetLineAnchor>& replacedBusJunctions);
+  void addRemainingNetSegmentItems(
+      const QVector<Segment>& remainingNetSegments,
+      const QHash<NetLineAnchor, NetLineAnchor>& replacedBusJunctions);
   void removeSymbol(SI_Symbol& symbol);
   void disconnectComponentSignalInstance(ComponentSignalInstance& signal);
 
@@ -77,7 +104,8 @@ private:
   SchematicGraphicsScene& mScene;
 
   // Output
-  QList<SI_NetSegment*> mModifiedNetSegments;
+  QSet<SI_NetSegment*> mModifiedNetSegments;
+  QSet<SI_BusSegment*> mModifiedBusSegments;
 };
 
 /*******************************************************************************

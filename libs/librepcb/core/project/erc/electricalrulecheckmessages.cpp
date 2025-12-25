@@ -25,10 +25,13 @@
 #include "../../library/cmp/componentsignal.h"
 #include "../../library/cmp/componentsymbolvariantitem.h"
 #include "../../library/sym/symbolpin.h"
+#include "../circuit/bus.h"
 #include "../circuit/componentinstance.h"
 #include "../circuit/componentsignalinstance.h"
 #include "../circuit/netclass.h"
 #include "../circuit/netsignal.h"
+#include "../schematic/items/si_busjunction.h"
+#include "../schematic/items/si_bussegment.h"
 #include "../schematic/items/si_netpoint.h"
 #include "../schematic/items/si_netsegment.h"
 #include "../schematic/items/si_symbol.h"
@@ -112,6 +115,12 @@ void ErcMsgBase::setLocation(const SI_NetLine& netLine) noexcept {
                                   PositiveLength(netLine.getWidth() + 1)));
 }
 
+void ErcMsgBase::setLocation(const SI_BusJunction& junction) noexcept {
+  mSchematic = junction.getSchematic().getUuid();
+  mLocations.append(
+      Path::circle(PositiveLength(2000000)).translated(junction.getPosition()));
+}
+
 /*******************************************************************************
  *  ErcMsgUnusedNetClass
  ******************************************************************************/
@@ -123,6 +132,20 @@ ErcMsgUnusedNetClass::ErcMsgUnusedNetClass(const NetClass& netClass) noexcept
                   "could remove it."),
                "unused_netclass") {
   mApproval->appendChild("netclass", netClass.getUuid());
+}
+
+/*******************************************************************************
+ *  ErcMsgUnusedBus
+ ******************************************************************************/
+
+ErcMsgUnusedBus::ErcMsgUnusedBus(const Bus& bus) noexcept
+  : ErcMsgBase(Severity::Hint, tr("Unused bus: '%1'").arg(*bus.getName()),
+               "There's a bus in the circuit without any schematics using it. "
+               "This should not happen, please report it as a bug. But "
+               "no worries, this issue is not harmful at all so you can safely "
+               "ignore this message.",
+               "unused_bus") {
+  mApproval->appendChild("bus", bus.getUuid());
 }
 
 /*******************************************************************************
@@ -139,6 +162,50 @@ ErcMsgOpenNet::ErcMsgOpenNet(const NetSignal& net) noexcept
   mApproval->appendChild("net", net.getUuid());
 
   setLocation(net);
+}
+
+/*******************************************************************************
+ *  ErcMsgOpenNetInBus
+ ******************************************************************************/
+
+ErcMsgOpenNetInBus::ErcMsgOpenNetInBus(const Bus& bus,
+                                       const SI_NetSegment& netSegment) noexcept
+  : ErcMsgBase(Severity::Hint,  // Not sure if a warning would be justified...
+               tr("Bus contains unused net: '%1:%2'")
+                   .arg(*bus.getName(), *netSegment.getNetSignal().getName()),
+               tr("The net is connected to the bus, but is not leaving the bus "
+                  "^anywhere. Check if you missed to make a connection."),
+               "open_net_in_bus") {
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("bus", bus.getUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("net", netSegment.getNetSignal().getUuid());
+  mApproval->ensureLineBreak();
+
+  setLocation(netSegment);
+}
+
+/*******************************************************************************
+ *  ErcMsgUnnamedNetInBus
+ ******************************************************************************/
+
+ErcMsgUnnamedNetInBus::ErcMsgUnnamedNetInBus(
+    const Bus& bus, const SI_NetSegment& netSegment) noexcept
+  : ErcMsgBase(
+        Severity::Warning,
+        tr("Bus contains unnamed net: '%1:%2'")
+            .arg(*bus.getName(), *netSegment.getNetSignal().getName()),
+        tr("A wire without a net label is connected to the bus, which makes it "
+           "impossible for this net to leave the bus somewhere else. Add a net "
+           "label to the wire to explicitly specify the net."),
+        "unnamed_net_in_bus") {
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("bus", bus.getUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("net", netSegment.getNetSignal().getUuid());
+  mApproval->ensureLineBreak();
+
+  setLocation(netSegment);
 }
 
 /*******************************************************************************
@@ -295,7 +362,7 @@ ErcMsgUnconnectedJunction::ErcMsgUnconnectedJunction(
   : ErcMsgBase(
         Severity::Hint,
         tr("Unconnected junction in net: '%1'")
-            .arg(*netPoint.getNetSignalOfNetSegment().getName()),
+            .arg(*netPoint.getNetSegment().getNetSignal().getName()),
         "There's an invisible junction in the schematic without any wire "
         "attached. This should not happen, please report it as a bug. But "
         "no worries, this issue is not harmful at all so you can safely "
@@ -310,6 +377,28 @@ ErcMsgUnconnectedJunction::ErcMsgUnconnectedJunction(
   mApproval->ensureLineBreak();
 
   setLocation(netPoint);
+}
+
+ErcMsgUnconnectedJunction::ErcMsgUnconnectedJunction(
+    const SI_BusJunction& junction) noexcept
+  : ErcMsgBase(
+        Severity::Hint,
+        tr("Unconnected junction in bus: '%1'")
+            .arg(*junction.getBusSegment().getBus().getName()),
+        "There's an invisible junction in the schematic without any line "
+        "attached. This should not happen, please report it as a bug. But "
+        "no worries, this issue is not harmful at all so you can safely "
+        "ignore this message.",
+        "unconnected_junction") {
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("schematic", junction.getSchematic().getUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("bussegment", junction.getBusSegment().getUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("junction", junction.getUuid());
+  mApproval->ensureLineBreak();
+
+  setLocation(junction);
 }
 
 /*******************************************************************************

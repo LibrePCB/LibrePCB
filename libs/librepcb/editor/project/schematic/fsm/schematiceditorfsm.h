@@ -24,8 +24,11 @@
  *  Includes
  ******************************************************************************/
 #include <librepcb/core/types/point.h>
+#include <librepcb/core/types/uuid.h>
 
 #include <QtCore>
+
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -75,8 +78,10 @@ public:
     SELECT,
     /// ::librepcb::editor::SchematicEditorState_DrawWire
     DRAW_WIRE,
-    /// ::librepcb::editor::SchematicEditorState_AddNetLabel
-    ADD_NETLABEL,
+    /// ::librepcb::editor::SchematicEditorState_DrawBus
+    DRAW_BUS,
+    /// ::librepcb::editor::SchematicEditorState_AddLabel
+    ADD_LABEL,
     /// ::librepcb::editor::SchematicEditorState_AddComponent
     ADD_COMPONENT,
     /// ::librepcb::editor::SchematicEditorState_DrawPolygon
@@ -107,6 +112,7 @@ public:
                        const QString& format = QString(),
                        const QString& basename = QString()) noexcept;
   bool processDrawWire() noexcept;
+  bool processDrawBus(std::optional<Uuid> busUuid = std::nullopt) noexcept;
   bool processMeasure() noexcept;
   bool processAbortCommand() noexcept;
   bool processSelectAll() noexcept;

@@ -20,16 +20,21 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "cmdsimplifyschematicnetsegments.h"
+#include "cmdsimplifyschematicsegments.h"
 
 #include "cmdcompsiginstsetnetsignal.h"
 #include "cmdremoveboarditems.h"
+#include "cmdschematicbussegmentadd.h"
+#include "cmdschematicbussegmentremove.h"
 #include "cmdschematicnetsegmentadd.h"
 #include "cmdschematicnetsegmentremove.h"
 
 #include <librepcb/core/algorithm/netsegmentsimplifier.h>
 #include <librepcb/core/project/board/items/bi_pad.h>
 #include <librepcb/core/project/circuit/componentsignalinstance.h>
+#include <librepcb/core/project/schematic/items/si_busjunction.h>
+#include <librepcb/core/project/schematic/items/si_buslabel.h>
+#include <librepcb/core/project/schematic/items/si_bussegment.h>
 #include <librepcb/core/project/schematic/items/si_netlabel.h>
 #include <librepcb/core/project/schematic/items/si_netline.h>
 #include <librepcb/core/project/schematic/items/si_netpoint.h>
@@ -49,21 +54,33 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-CmdSimplifySchematicNetSegments::CmdSimplifySchematicNetSegments(
-    const QList<SI_NetSegment*>& segments) noexcept
-  : UndoCommandGroup(tr("Simplify Schematic Net Segments")),
-    mSegments(segments) {
+CmdSimplifySchematicSegments::CmdSimplifySchematicSegments(
+    const QSet<SI_NetSegment*>& netSegments,
+    const QSet<SI_BusSegment*>& busSegments) noexcept
+  : UndoCommandGroup(tr("Simplify Schematic Net/Bus Segments")),
+    mNetSegments(netSegments),
+    mBusSegments(busSegments) {
 }
 
-CmdSimplifySchematicNetSegments::~CmdSimplifySchematicNetSegments() noexcept {
+CmdSimplifySchematicSegments::~CmdSimplifySchematicSegments() noexcept {
 }
 
 /*******************************************************************************
  *  Inherited from UndoCommand
  ******************************************************************************/
 
-bool CmdSimplifySchematicNetSegments::performExecute() {
-  for (SI_NetSegment* seg : mSegments) {
+bool CmdSimplifySchematicSegments::performExecute() {
+  // Simplify bus segments first, to make sure overlapping junctions with
+  // connected net lines will be merged. So the simplification of bus segments
+  // may make changes to net segments, but not the other way around (I hope).
+  // Note that the current concept is still not great and should be improved
+  // some day. I think we need to determine all bus- and net segment
+  // modifications first, and then apply them all so we can take into account
+  // the dependencies between net segments and bus segments.
+  for (SI_BusSegment* seg : mBusSegments) {
+    simplifySegment(*seg);
+  }
+  for (SI_NetSegment* seg : mNetSegments) {
     simplifySegment(*seg);
   }
   return UndoCommandGroup::performExecute();
@@ -73,10 +90,121 @@ bool CmdSimplifySchematicNetSegments::performExecute() {
  *  Private Methods
  ******************************************************************************/
 
-void CmdSimplifySchematicNetSegments::simplifySegment(SI_NetSegment& segment) {
+void CmdSimplifySchematicSegments::simplifySegment(SI_BusSegment& segment) {
+  // A segment which contains no lines can entirely be removed.
+  if (segment.getLines().isEmpty()) {
+    appendChild(new CmdSchematicBusSegmentRemove(segment));
+    return;
+  }
+
+  // Collect junctions & lines for the simplification.
+  NetSegmentSimplifier simplifier;
+  QHash<SI_BusJunction*, int> anchors;
+  QHash<const SI_BusLine*, int> lines;
+  auto addAnchor = [&](SI_BusJunction& anchor) {
+    auto it = anchors.find(&anchor);
+    if (it != anchors.end()) {
+      return *it;
+    }
+    std::optional<int> id;
+    if (!anchor.getNetLines().isEmpty()) {
+      // There are net lines attached, so the junction must not be removed.
+      // Note: This unfortunately avoids merging overlapping junctions. We
+      // should improve this to keep only one of those, and reconnecting the
+      // attached net lines to the remaining junction.
+      id = simplifier.addAnchor(NetSegmentSimplifier::AnchorType::Fixed,
+                                anchor.getPosition(), nullptr, nullptr);
+    } else {
+      // No net lines attached, junction i can be removed if needed.
+      id = simplifier.addAnchor(NetSegmentSimplifier::AnchorType::Junction,
+                                anchor.getPosition(), nullptr, nullptr);
+    }
+    anchors.insert(&anchor, *id);
+    return *id;
+  };
+  foreach (SI_BusLine* line, segment.getLines()) {
+    const int p1 = addAnchor(line->getP1());
+    const int p2 = addAnchor(line->getP2());
+    const int id = simplifier.addLine(p1, p2, nullptr, *line->getWidth());
+    lines.insert(line, id);
+  }
+
+  // Perform the simplification. If nothing was modified, abort here.
+  const NetSegmentSimplifier::Result result = simplifier.simplify();
+  if (!result.modified) {
+    return;
+  }
+
+  // Remove all attached net segments.
+  for (SI_NetSegment* ns : segment.getAttachedNetSegments()) {
+    if (!mTemporarilyRemovedNetSegments.contains(ns)) {
+      appendChild(new CmdSchematicNetSegmentRemove(*ns));
+      mTemporarilyRemovedNetSegments.insert(ns);
+      mNetSegments.insert(ns);
+    }
+  }
+
+  // Remove old segment.
+  appendChild(new CmdSchematicBusSegmentRemove(segment));
+
+  // TODO: Disconnect net lines which are no longer connected
+  // (i.e. their bus junction has been removed by the simplification).
+  // Not sure if this is really required, though.
+
+  // Add new segment, if there is anything to add.
+  std::unique_ptr<SI_BusSegment> newSegment(new SI_BusSegment(
+      segment.getSchematic(), segment.getUuid(), segment.getBus()));
+  QHash<int, SI_BusJunction*> newJunctios;
+  auto getOrCreateAnchor = [&](int anchorId) {
+    if (auto junction = newJunctios.value(anchorId)) {
+      return junction;
+    }
+    if (SI_BusJunction* oldAnchor = anchors.key(anchorId, nullptr)) {
+      SI_BusJunction* newJunction = new SI_BusJunction(
+          *newSegment, oldAnchor->getUuid(), oldAnchor->getPosition());
+      newJunctios.insert(anchorId, newJunction);
+      mReplacedBusJunctions.insert(oldAnchor, newJunction);
+      return newJunction;
+    } else if (result.newJunctions.contains(anchorId)) {
+      SI_BusJunction* newJunction =
+          new SI_BusJunction(*newSegment, Uuid::createRandom(),
+                             result.newJunctions.value(anchorId));
+      newJunctios.insert(anchorId, newJunction);
+      return newJunction;
+    }
+    return static_cast<SI_BusJunction*>(nullptr);
+  };
+  QList<SI_BusLine*> newLines;
+  for (const NetSegmentSimplifier::Line& line : result.lines) {
+    SI_BusJunction* p1 = getOrCreateAnchor(line.p1);
+    SI_BusJunction* p2 = getOrCreateAnchor(line.p2);
+    const SI_BusLine* oldLine = lines.key(line.id, nullptr);  // can be null
+    if ((!p1) || (!p2) || (line.width < 0)) {
+      throw LogicError(__FILE__, __LINE__);
+    }
+    const Uuid uuid = oldLine ? oldLine->getUuid() : Uuid::createRandom();
+    newLines.append(new SI_BusLine(*newSegment, uuid, *p1, *p2,
+                                   UnsignedLength(line.width)));
+  }
+  if (!newLines.isEmpty()) {
+    newSegment->addJunctionsAndLines(newJunctios.values(), newLines);
+    for (SI_BusLabel* label : segment.getLabels()) {
+      SI_BusLabel* newLabel =
+          new SI_BusLabel(*newSegment, label->getNetLabel());
+      newSegment->addLabel(*newLabel);
+    }
+    appendChild(new CmdSchematicBusSegmentAdd(*newSegment.release()));
+  }
+}
+
+void CmdSimplifySchematicSegments::simplifySegment(SI_NetSegment& segment) {
+  const bool alreadyRemoved = mTemporarilyRemovedNetSegments.contains(&segment);
+
   // A segment which contains no lines can entirely be removed.
   if (segment.getNetLines().isEmpty()) {
-    appendChild(new CmdSchematicNetSegmentRemove(segment));
+    if (!alreadyRemoved) {
+      appendChild(new CmdSchematicNetSegmentRemove(segment));
+    }
     return;
   }
 
@@ -91,8 +219,11 @@ void CmdSimplifySchematicNetSegments::simplifySegment(SI_NetSegment& segment) {
     }
     std::optional<int> id;
     if (auto pin = dynamic_cast<const SI_SymbolPin*>(&anchor)) {
-      id = simplifier.addAnchor(NetSegmentSimplifier::AnchorType::PinOrPad,
+      id = simplifier.addAnchor(NetSegmentSimplifier::AnchorType::Fixed,
                                 pin->getPosition(), nullptr, nullptr);
+    } else if (auto bj = dynamic_cast<const SI_BusJunction*>(&anchor)) {
+      id = simplifier.addAnchor(NetSegmentSimplifier::AnchorType::Fixed,
+                                bj->getPosition(), nullptr, nullptr);
     } else if (auto np = dynamic_cast<const SI_NetPoint*>(&anchor)) {
       id = simplifier.addAnchor(NetSegmentSimplifier::AnchorType::Junction,
                                 np->getPosition(), nullptr, nullptr);
@@ -112,16 +243,22 @@ void CmdSimplifySchematicNetSegments::simplifySegment(SI_NetSegment& segment) {
 
   // Perform the simplification. If nothing was modified, abort here.
   const NetSegmentSimplifier::Result result = simplifier.simplify();
-  if (!result.modified) {
+  if ((!result.modified) && (!alreadyRemoved)) {
+    // Note: We don't abort here if the net segment has been removed due to
+    // modifications in connected bus segments. This is required to enforce
+    // net points to be re-connected to the new bus junctions, even though
+    // there might be no simplification done in this net segment.
     return;
   }
 
   // Remove old segment.
-  appendChild(new CmdSchematicNetSegmentRemove(segment));
+  if (!alreadyRemoved) {
+    appendChild(new CmdSchematicNetSegmentRemove(segment));
+  }
 
   // Disconnect component signals of pins which are no longer connected
   // (i.e. their net line have been removed by the simplification).
-  for (auto id : result.disconnectedPinsOrPads) {
+  for (auto id : result.disconnectedFixedAnchors) {
     if (auto* pin = dynamic_cast<SI_SymbolPin*>(anchors.key(id, nullptr))) {
       ComponentSignalInstance& sig = pin->getComponentSignalInstance();
       if (sig.getRegisteredSymbolPins().count() <= 1) {
@@ -156,6 +293,9 @@ void CmdSimplifySchematicNetSegments::simplifySegment(SI_NetSegment& segment) {
     SI_NetLineAnchor* oldAnchor = anchors.key(anchorId, nullptr);  // can be 0
     if (auto pin = dynamic_cast<SI_SymbolPin*>(oldAnchor)) {
       return static_cast<SI_NetLineAnchor*>(pin);
+    } else if (auto bj = dynamic_cast<SI_BusJunction*>(oldAnchor)) {
+      return static_cast<SI_NetLineAnchor*>(
+          mReplacedBusJunctions.value(bj, bj));
     } else if (auto oldNp = dynamic_cast<SI_NetPoint*>(oldAnchor)) {
       SI_NetPoint* newNp =
           new SI_NetPoint(*newSegment, oldNp->getUuid(), oldNp->getPosition());

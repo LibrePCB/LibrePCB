@@ -827,6 +827,23 @@ export global Shortcuts {
                 Data.current-section.schematic-tabs[tab].tool-wire-mode = WireMode.straight;
                 return true;
             }
+        } else if Data.current-section.schematic-tabs[tab].tool == EditorTool.bus {
+            if Backend.is-shortcut(event, Cmd.wire-mode-h-v) {
+                Data.current-section.schematic-tabs[tab].tool-wire-mode = WireMode.h-v;
+                return true;
+            } else if Backend.is-shortcut(event, Cmd.wire-mode-v-h) {
+                Data.current-section.schematic-tabs[tab].tool-wire-mode = WireMode.v-h;
+                return true;
+            } else if Backend.is-shortcut(event, Cmd.wire-mode-90-45) {
+                Data.current-section.schematic-tabs[tab].tool-wire-mode = WireMode.deg90-45;
+                return true;
+            } else if Backend.is-shortcut(event, Cmd.wire-mode-45-90) {
+                Data.current-section.schematic-tabs[tab].tool-wire-mode = WireMode.deg45-90;
+                return true;
+            } else if Backend.is-shortcut(event, Cmd.wire-mode-straight) {
+                Data.current-section.schematic-tabs[tab].tool-wire-mode = WireMode.straight;
+                return true;
+            }
         } else if Data.current-section.schematic-tabs[tab].tool == EditorTool.polygon {
             if Backend.is-shortcut(event, Cmd.layer-up) && (Data.current-section.schematic-tabs[tab].tool-layer.current-index > 0) {
                 Data.current-section.schematic-tabs[tab].tool-layer.current-index -= 1;
@@ -876,8 +893,11 @@ export global Shortcuts {
         } else if Backend.is-shortcut(event, Cmd.tool-wire) {
             Backend.trigger-tab(section, tab, TabAction.tool-wire);
             return true;
-        } else if Backend.is-shortcut(event, Cmd.tool-netlabel) {
-            Backend.trigger-tab(section, tab, TabAction.tool-netlabel);
+        } else if Backend.is-shortcut(event, Cmd.tool-bus) {
+            Backend.trigger-tab(section, tab, TabAction.tool-bus);
+            return true;
+        } else if Backend.is-shortcut(event, Cmd.tool-label) {
+            Backend.trigger-tab(section, tab, TabAction.tool-label);
             return true;
         } else if Backend.is-shortcut(event, Cmd.tool-component) {
             Backend.trigger-tab(section, tab, TabAction.tool-component);

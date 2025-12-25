@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_SCHEMATICEDITORSTATE_ADDNETLABEL_H
-#define LIBREPCB_EDITOR_SCHEMATICEDITORSTATE_ADDNETLABEL_H
+#ifndef LIBREPCB_EDITOR_SCHEMATICEDITORSTATE_ADDLABEL_H
+#define LIBREPCB_EDITOR_SCHEMATICEDITORSTATE_ADDLABEL_H
 
 /*******************************************************************************
  *  Includes
@@ -33,30 +33,32 @@
 namespace librepcb {
 
 class Point;
+class SI_BusLabel;
 class SI_NetLabel;
 class Schematic;
 
 namespace editor {
 
+class CmdSchematicBusLabelEdit;
 class CmdSchematicNetLabelEdit;
 
 /*******************************************************************************
- *  Class SchematicEditorState_AddNetLabel
+ *  Class SchematicEditorState_AddLabel
  ******************************************************************************/
 
 /**
- * @brief The SchematicEditorState_AddNetLabel class
+ * @brief The SchematicEditorState_AddLabel class
  */
-class SchematicEditorState_AddNetLabel final : public SchematicEditorState {
+class SchematicEditorState_AddLabel final : public SchematicEditorState {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
-  SchematicEditorState_AddNetLabel() = delete;
-  SchematicEditorState_AddNetLabel(
-      const SchematicEditorState_AddNetLabel& other) = delete;
-  explicit SchematicEditorState_AddNetLabel(const Context& context) noexcept;
-  virtual ~SchematicEditorState_AddNetLabel() noexcept;
+  SchematicEditorState_AddLabel() = delete;
+  SchematicEditorState_AddLabel(const SchematicEditorState_AddLabel& other) =
+      delete;
+  explicit SchematicEditorState_AddLabel(const Context& context) noexcept;
+  virtual ~SchematicEditorState_AddLabel() noexcept;
 
   // General Methods
   virtual bool entry() noexcept override;
@@ -75,8 +77,8 @@ public:
       const GraphicsSceneMouseEvent& e) noexcept override;
 
   // Operator Overloadings
-  SchematicEditorState_AddNetLabel& operator=(
-      const SchematicEditorState_AddNetLabel& rhs) = delete;
+  SchematicEditorState_AddLabel& operator=(
+      const SchematicEditorState_AddLabel& rhs) = delete;
 
 private:  // Methods
   bool addLabel(const Point& pos) noexcept;
@@ -87,7 +89,9 @@ private:  // Methods
 private:  // Data
   bool mUndoCmdActive;
   SI_NetLabel* mCurrentNetLabel;
-  CmdSchematicNetLabelEdit* mEditCmd;
+  CmdSchematicNetLabelEdit* mNetLabelEditCmd;
+  SI_BusLabel* mCurrentBusLabel;
+  CmdSchematicBusLabelEdit* mBusLabelEditCmd;
 };
 
 /*******************************************************************************

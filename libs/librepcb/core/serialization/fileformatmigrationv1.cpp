@@ -371,6 +371,18 @@ void FileFormatMigrationV1::upgradeOutputJobs(SExpression& root,
               SExpression::createToken("schematic_image_borders"));
           imgBordersLayerNode.appendChild(
               "color", SExpression::createString("#ff808080"));
+          // Add the new layer for buses.
+          SExpression& busesLayerNode = contentNode->appendList("layer");
+          busesLayerNode.appendChild(
+              SExpression::createToken("schematic_buses"));
+          busesLayerNode.appendChild("color",
+                                     SExpression::createString("#ff008eff"));
+          // Add the new layer for bus labels.
+          SExpression& busLabelsLayerNode = contentNode->appendList("layer");
+          busLabelsLayerNode.appendChild(
+              SExpression::createToken("schematic_bus_labels"));
+          busLabelsLayerNode.appendChild(
+              "color", SExpression::createString("#ff008eff"));
         } else if (contentTypeNode.getValue() == "board") {
           // We don't need to check the option value since "realistic" was
           // the only supported option in v1.

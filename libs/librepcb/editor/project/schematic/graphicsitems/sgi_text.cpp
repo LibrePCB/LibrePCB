@@ -83,7 +83,6 @@ QVariant SGI_Text::itemChange(GraphicsItemChange change,
   if ((change == ItemSelectedHasChanged) && mTextGraphicsItem &&
       mAnchorGraphicsItem) {
     mTextGraphicsItem->setSelected(value.toBool());
-    mAnchorGraphicsItem->setSelected(value.toBool());
     updateAnchorLayer();
   } else if ((change == ItemSceneHasChanged) && mAnchorGraphicsItem) {
     if (QGraphicsScene* s = mAnchorGraphicsItem->scene()) {
@@ -107,7 +106,6 @@ void SGI_Text::textEdited(const SI_Text& obj, SI_Text::Event event) noexcept {
       updateAnchorLine();
       break;
     case SI_Text::Event::LayerNameChanged:
-      updateAnchorLayer();
       break;
     case SI_Text::Event::TextChanged:
       updateText();
@@ -148,9 +146,12 @@ void SGI_Text::updateText() noexcept {
 void SGI_Text::updateAnchorLayer() noexcept {
   Q_ASSERT(mAnchorGraphicsItem);
   if (mText.getSymbol() && (!mText.getTextObj().isLocked()) && isSelected()) {
-    mAnchorGraphicsItem->setLayer(mLayers.get(mText.getTextObj().getLayer()));
+    mAnchorGraphicsItem->setLayer(
+        mLayers.get(Theme::Color::sSchematicReferences));
+    mAnchorGraphicsItem->setSelected(true);
   } else {
     mAnchorGraphicsItem->setLayer(nullptr);
+    mAnchorGraphicsItem->setSelected(false);
   }
 
   mTextGraphicsItem->setOriginCrossVisible(!mText.getTextObj().isLocked());

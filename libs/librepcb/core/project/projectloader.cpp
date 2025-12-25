@@ -47,6 +47,7 @@
 #include "board/items/bi_via.h"
 #include "board/items/bi_zone.h"
 #include "circuit/assemblyvariant.h"
+#include "circuit/bus.h"
 #include "circuit/circuit.h"
 #include "circuit/componentinstance.h"
 #include "circuit/componentsignalinstance.h"
@@ -55,6 +56,10 @@
 #include "erc/electricalrulecheck.h"
 #include "project.h"
 #include "projectlibrary.h"
+#include "schematic/items/si_busjunction.h"
+#include "schematic/items/si_buslabel.h"
+#include "schematic/items/si_busline.h"
+#include "schematic/items/si_bussegment.h"
 #include "schematic/items/si_image.h"
 #include "schematic/items/si_netlabel.h"
 #include "schematic/items/si_netline.h"
@@ -453,6 +458,17 @@ void ProjectLoader::loadCircuit(Project& p) {
     p.getCircuit().addNetSignal(*netsignal);
   }
 
+  // Load buses.
+  foreach (const SExpression* node, root->getChildren("bus")) {
+    Bus* bus = new Bus(p.getCircuit(), deserialize<Uuid>(node->getChild("@0")),
+                       deserialize<BusName>(node->getChild("name/@0")),
+                       deserialize<bool>(node->getChild("auto/@0")),
+                       deserialize<bool>(node->getChild("prefix_nets/@0")),
+                       deserialize<std::optional<UnsignedLength>>(
+                           node->getChild("max_trace_length_difference/@0")));
+    p.getCircuit().addBus(*bus);
+  }
+
   // Load component instances.
   foreach (const SExpression* node, root->getChildren("component")) {
     const Uuid cmpUuid = deserialize<Uuid>(node->getChild("lib_component/@0"));
@@ -563,6 +579,9 @@ void ProjectLoader::loadSchematic(Project& p, const QString& relativeFilePath) {
   foreach (const SExpression* node, root->getChildren("symbol")) {
     loadSchematicSymbol(*schematic, *node);
   }
+  foreach (const SExpression* node, root->getChildren("bussegment")) {
+    loadSchematicBusSegment(*schematic, *node);
+  }
   foreach (const SExpression* node, root->getChildren("netsegment")) {
     loadSchematicNetSegment(*schematic, *node);
   }
@@ -605,6 +624,61 @@ void ProjectLoader::loadSchematicSymbol(Schematic& s, const SExpression& node) {
   s.addSymbol(*symbol);
 }
 
+void ProjectLoader::loadSchematicBusSegment(Schematic& s,
+                                            const SExpression& node) {
+  const Uuid busUuid = deserialize<Uuid>(node.getChild("bus/@0"));
+  Bus* bus = s.getProject().getCircuit().getBuses().value(busUuid);
+  if (!bus) {
+    throw RuntimeError(__FILE__, __LINE__,
+                       QString("Inexistent bus: '%1'").arg(busUuid.toStr()));
+  }
+  SI_BusSegment* segment =
+      new SI_BusSegment(s, deserialize<Uuid>(node.getChild("@0")), *bus);
+  s.addBusSegment(*segment);
+
+  // Load junctions.
+  QList<SI_BusJunction*> junctions;
+  foreach (const SExpression* child, node.getChildren("junction")) {
+    SI_BusJunction* j =
+        new SI_BusJunction(*segment, deserialize<Uuid>(child->getChild("@0")),
+                           Point(child->getChild("position")));
+    junctions.append(j);
+  }
+
+  // Load lines.
+  QList<SI_BusLine*> lines;
+  foreach (const SExpression* child, node.getChildren("line")) {
+    auto parseAnchor = [&](const SExpression& aNode) {
+      const Uuid junctionUuid =
+          deserialize<Uuid>(aNode.getChild("junction/@0"));
+      foreach (SI_BusJunction* j, junctions) {
+        if (j->getUuid() == junctionUuid) {
+          return j;
+        }
+      }
+      throw RuntimeError(
+          __FILE__, __LINE__,
+          QString("Bus junction '%1:%2' does not exist in schematic.")
+              .arg(segment->getUuid().toStr(), junctionUuid.toStr()));
+    };
+    SI_BusLine* line = new SI_BusLine(
+        *segment, deserialize<Uuid>(child->getChild("@0")),
+        *parseAnchor(child->getChild("from")),
+        *parseAnchor(child->getChild("to")),
+        deserialize<UnsignedLength>(child->getChild("width/@0")));
+    lines.append(line);
+  }
+
+  // Add junctions & lines.
+  segment->addJunctionsAndLines(junctions, lines);
+
+  // Load labels.
+  foreach (const SExpression* child, node.getChildren("label")) {
+    SI_BusLabel* l = new SI_BusLabel(*segment, NetLabel(*child));
+    segment->addLabel(*l);
+  }
+}
+
 void ProjectLoader::loadSchematicNetSegment(Schematic& s,
                                             const SExpression& node) {
   const Uuid netSignalUuid = deserialize<Uuid>(node.getChild("net/@0"));
@@ -631,41 +705,57 @@ void ProjectLoader::loadSchematicNetSegment(Schematic& s,
   // Load net lines.
   QList<SI_NetLine*> netLines;
   foreach (const SExpression* child, node.getChildren("line")) {
-    auto parseAnchor = [&s, &netPoints](const SExpression& aNode) {
-      SI_NetLineAnchor* anchor = nullptr;
-      if (const SExpression* junctionNode = aNode.tryGetChild("junction")) {
-        const Uuid netPointUuid =
-            deserialize<Uuid>(junctionNode->getChild("@0"));
+    auto parseAnchor = [&](const SExpression& aNode) {
+      const NetLineAnchor anchor(aNode);
+      if (const std::optional<Uuid>& obj = anchor.tryGetJunction()) {
         foreach (SI_NetPoint* netPoint, netPoints) {
-          if (netPoint->getUuid() == netPointUuid) {
-            anchor = netPoint;
-            break;
+          if (netPoint->getUuid() == *obj) {
+            return static_cast<SI_NetLineAnchor*>(netPoint);
           }
         }
+        throw RuntimeError(
+            __FILE__, __LINE__,
+            QString("Net point '%1' does not exist in schematic.")
+                .arg(obj->toStr()));
+      } else if (const std::optional<NetLineAnchor::BusAnchor>& obj =
+                     anchor.tryGetBusJunction()) {
+        SI_BusSegment* segment = s.getBusSegments().value(obj->segment);
+        if (!segment) {
+          throw RuntimeError(
+              __FILE__, __LINE__,
+              QString("Bus segment '%1' does not exist in schematic.")
+                  .arg(obj->segment.toStr()));
+        }
+        SI_NetLineAnchor* anchor = segment->getJunctions().value(obj->junction);
         if (!anchor) {
           throw RuntimeError(
               __FILE__, __LINE__,
-              QString("Net point '%1' does not exist in schematic.")
-                  .arg(netPointUuid.toStr()));
+              QString("Bus junction '%1:%2' does not exist in schematic.")
+                  .arg(obj->segment.toStr(), obj->junction.toStr()));
         }
-      } else {
-        const Uuid symbolUuid = deserialize<Uuid>(aNode.getChild("symbol/@0"));
-        SI_Symbol* symbol = s.getSymbols().value(symbolUuid);
+        return anchor;
+      } else if (const std::optional<NetLineAnchor::PinAnchor>& obj =
+                     anchor.tryGetPin()) {
+        SI_Symbol* symbol = s.getSymbols().value(obj->symbol);
         if (!symbol) {
           throw RuntimeError(__FILE__, __LINE__,
                              QString("Symbol '%1' does not exist in schematic.")
-                                 .arg(symbolUuid.toStr()));
+                                 .arg(obj->symbol.toStr()));
         }
-        const Uuid pinUuid = deserialize<Uuid>(aNode.getChild("pin/@0"));
-        anchor = symbol->getPin(pinUuid);
+        SI_NetLineAnchor* anchor = symbol->getPin(obj->pin);
         if (!anchor) {
           throw RuntimeError(
               __FILE__, __LINE__,
-              QString("Symbol pin '%1' does not exist in schematic.")
-                  .arg(pinUuid.toStr()));
+              QString("Symbol pin '%1:%2' does not exist in schematic.")
+                  .arg(obj->symbol.toStr(), obj->pin.toStr()));
         }
+        return anchor;
+      } else {
+        throw RuntimeError(
+            __FILE__, __LINE__,
+            QString("Unknown net line anchor in net segment '%1'.")
+                .arg(netSegment->getUuid().toStr()));
       }
-      return anchor;
     };
     SI_NetLine* netLine = new SI_NetLine(
         *netSegment, deserialize<Uuid>(child->getChild("@0")),
@@ -875,69 +965,59 @@ void ProjectLoader::loadBoardNetSegment(Board& b, const SExpression& node) {
   // Load net lines.
   QList<BI_NetLine*> netLines;
   foreach (const SExpression* child, node.getChildren("trace")) {
-    auto parseAnchor = [&b, &pads, &vias,
-                        &netPoints](const SExpression& aNode) {
-      BI_NetLineAnchor* anchor = nullptr;
-      if (const SExpression* junctionNode = aNode.tryGetChild("junction")) {
-        const Uuid netPointUuid =
-            deserialize<Uuid>(junctionNode->getChild("@0"));
+    auto parseAnchor = [&](const SExpression& aNode) {
+      const TraceAnchor anchor(aNode);
+      if (const std::optional<Uuid>& obj = anchor.tryGetJunction()) {
         foreach (BI_NetPoint* netPoint, netPoints) {
-          if (netPoint->getUuid() == netPointUuid) {
-            anchor = netPoint;
-            break;
+          if (netPoint->getUuid() == *obj) {
+            return static_cast<BI_NetLineAnchor*>(netPoint);
           }
         }
-        if (!anchor) {
-          throw RuntimeError(
-              __FILE__, __LINE__,
-              QString("Net point '%1' does not exist in schematic.")
-                  .arg(netPointUuid.toStr()));
-        }
-      } else if (const SExpression* viaNode = aNode.tryGetChild("via")) {
-        const Uuid viaUuid = deserialize<Uuid>(viaNode->getChild("@0"));
+        throw RuntimeError(
+            __FILE__, __LINE__,
+            QString("Net point '%1' does not exist in schematic.")
+                .arg(obj->toStr()));
+      } else if (const std::optional<Uuid>& obj = anchor.tryGetVia()) {
         foreach (BI_Via* via, vias) {
-          if (via->getUuid() == viaUuid) {
-            anchor = via;
-            break;
+          if (via->getUuid() == *obj) {
+            return static_cast<BI_NetLineAnchor*>(via);
           }
         }
-        if (!anchor) {
-          throw RuntimeError(__FILE__, __LINE__,
-                             QString("Via '%1' does not exist in board.")
-                                 .arg(viaUuid.toStr()));
-        }
-      } else if (const SExpression* devNode = aNode.tryGetChild("device")) {
-        const Uuid deviceUuid = deserialize<Uuid>(devNode->getChild("@0"));
-        BI_Device* device = b.getDeviceInstanceByComponentUuid(deviceUuid);
+        throw RuntimeError(
+            __FILE__, __LINE__,
+            QString("Via '%1' does not exist in board.").arg(obj->toStr()));
+      } else if (const std::optional<TraceAnchor::PadAnchor>& obj =
+                     anchor.tryGetFootprintPad()) {
+        BI_Device* device = b.getDeviceInstanceByComponentUuid(obj->device);
         if (!device) {
           throw RuntimeError(
               __FILE__, __LINE__,
               QString("Device instance '%1' does not exist in board.")
-                  .arg(deviceUuid.toStr()));
+                  .arg(obj->device.toStr()));
         }
-        const Uuid padUuid = deserialize<Uuid>(aNode.getChild("pad/@0"));
-        anchor = device->getPad(padUuid);
+        BI_NetLineAnchor* anchor = device->getPad(obj->pad);
         if (!anchor) {
           throw RuntimeError(
               __FILE__, __LINE__,
-              QString("Footprint pad '%1' does not exist in board.")
-                  .arg(padUuid.toStr()));
+              QString("Footprint pad '%1:%2' does not exist in board.")
+                  .arg(obj->device.toStr(), obj->pad.toStr()));
         }
-      } else {
-        const Uuid padUuid = deserialize<Uuid>(aNode.getChild("pad/@0"));
+        return anchor;
+      } else if (const std::optional<Uuid>& obj = anchor.tryGetPad()) {
         foreach (BI_Pad* pad, pads) {
-          if (pad->getUuid() == padUuid) {
-            anchor = pad;
-            break;
+          if (pad->getUuid() == *obj) {
+            return static_cast<BI_NetLineAnchor*>(pad);
           }
         }
-        if (!anchor) {
-          throw RuntimeError(__FILE__, __LINE__,
-                             QString("Pad '%1' does not exist in board.")
-                                 .arg(padUuid.toStr()));
-        }
+        throw RuntimeError(
+            __FILE__, __LINE__,
+            QString("Pad '%1' does not exist in board.").arg(obj->toStr()));
+      } else {
+        throw RuntimeError(
+            __FILE__, __LINE__,
+            QString("Unknown trace anchor in trace segment '%1'.")
+                .arg(netSegment->getUuid().toStr()));
       }
-      return anchor;
     };
     BI_NetLine* netLine = new BI_NetLine(
         *netSegment, deserialize<Uuid>(child->getChild("@0")),

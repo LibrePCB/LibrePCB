@@ -34,6 +34,9 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class NetSignal;
+
 namespace editor {
 
 class GraphicsLayer;

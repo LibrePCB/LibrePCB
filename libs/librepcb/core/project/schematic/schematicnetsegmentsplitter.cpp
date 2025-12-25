@@ -47,7 +47,7 @@ SchematicNetSegmentSplitter::~SchematicNetSegmentSplitter() noexcept {
  *  General Methods
  ******************************************************************************/
 
-void SchematicNetSegmentSplitter::addSymbolPin(
+void SchematicNetSegmentSplitter::addFixedAnchor(
     const NetLineAnchor& anchor, const Point& pos,
     bool replaceByJunction) noexcept {
   if (replaceByJunction) {
@@ -55,9 +55,9 @@ void SchematicNetSegmentSplitter::addSymbolPin(
         std::make_shared<Junction>(Uuid::createRandom(), pos);
     mJunctions.append(newJunction);
     NetLineAnchor newAnchor(NetLineAnchor::junction(newJunction->getUuid()));
-    mPinAnchorsToReplace.insert(anchor, newAnchor);
+    mFixedAnchorsToReplace.insert(anchor, newAnchor);
   } else {
-    mPinPositions[anchor] = pos;
+    mFixedAnchorPositions[anchor] = pos;
   }
 }
 
@@ -68,8 +68,8 @@ void SchematicNetSegmentSplitter::addJunction(
 
 void SchematicNetSegmentSplitter::addNetLine(const NetLine& netline) noexcept {
   std::shared_ptr<NetLine> copy = std::make_shared<NetLine>(netline);
-  copy->setAnchors(replacePinAnchor(copy->getP1()),
-                   replacePinAnchor(copy->getP2()));
+  copy->setAnchors(replaceFixedAnchor(copy->getP1()),
+                   replaceFixedAnchor(copy->getP2()));
   mNetLines.append(copy);
 }
 
@@ -106,9 +106,9 @@ QList<SchematicNetSegmentSplitter::Segment>
  *  Private Methods
  ******************************************************************************/
 
-NetLineAnchor SchematicNetSegmentSplitter::replacePinAnchor(
+NetLineAnchor SchematicNetSegmentSplitter::replaceFixedAnchor(
     const NetLineAnchor& anchor) noexcept {
-  return mPinAnchorsToReplace.value(anchor, anchor);
+  return mFixedAnchorsToReplace.value(anchor, anchor);
 }
 
 void SchematicNetSegmentSplitter::findConnectedLinesAndPoints(
@@ -171,8 +171,8 @@ Length SchematicNetSegmentSplitter::getDistanceBetweenNetLabelAndNetSegment(
 
 Point SchematicNetSegmentSplitter::getAnchorPosition(
     const NetLineAnchor& anchor) const noexcept {
-  if (mPinPositions.contains(anchor)) {
-    return mPinPositions[anchor];
+  if (mFixedAnchorPositions.contains(anchor)) {
+    return mFixedAnchorPositions[anchor];
   } else if (std::optional<Uuid> junctionUuid = anchor.tryGetJunction()) {
     if (mJunctions.contains(*junctionUuid)) {
       return mJunctions.get(*junctionUuid)->getPosition();

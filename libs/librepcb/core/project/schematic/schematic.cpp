@@ -29,6 +29,7 @@
 #include "../../serialization/sexpression.h"
 #include "../../utils/scopeguardlist.h"
 #include "../project.h"
+#include "items/si_bussegment.h"
 #include "items/si_image.h"
 #include "items/si_netlabel.h"
 #include "items/si_netline.h"
@@ -84,6 +85,8 @@ Schematic::~Schematic() noexcept {
   mPolygons.clear();
   qDeleteAll(mNetSegments);
   mNetSegments.clear();
+  qDeleteAll(mBusSegments);
+  mBusSegments.clear();
   qDeleteAll(mSymbols);
   mSymbols.clear();
 }
@@ -93,8 +96,9 @@ Schematic::~Schematic() noexcept {
  ******************************************************************************/
 
 bool Schematic::isEmpty() const noexcept {
-  return (mSymbols.isEmpty() && mNetSegments.isEmpty() && mPolygons.isEmpty() &&
-          mTexts.isEmpty() && mImages.isEmpty());
+  return (mSymbols.isEmpty() && mBusSegments.isEmpty() &&
+          mNetSegments.isEmpty() && mPolygons.isEmpty() && mTexts.isEmpty() &&
+          mImages.isEmpty());
 }
 
 /*******************************************************************************
@@ -136,6 +140,35 @@ void Schematic::removeSymbol(SI_Symbol& symbol) {
   symbol.removeFromSchematic();  // can throw
   mSymbols.remove(symbol.getUuid());
   emit symbolRemoved(symbol);
+}
+
+/*******************************************************************************
+ *  BusSegment Methods
+ ******************************************************************************/
+
+void Schematic::addBusSegment(SI_BusSegment& s) {
+  if ((!mIsAddedToProject) || (mBusSegments.values().contains(&s)) ||
+      (&s.getSchematic() != this)) {
+    throw LogicError(__FILE__, __LINE__);
+  }
+  if (mBusSegments.contains(s.getUuid())) {
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        QString("There is already a bus segment with the UUID \"%1\"!")
+            .arg(s.getUuid().toStr()));
+  }
+  s.addToSchematic();  // can throw
+  mBusSegments.insert(s.getUuid(), &s);
+  emit busSegmentAdded(s);
+}
+
+void Schematic::removeBusSegment(SI_BusSegment& s) {
+  if ((!mIsAddedToProject) || (mBusSegments.value(s.getUuid()) != &s)) {
+    throw LogicError(__FILE__, __LINE__);
+  }
+  s.removeFromSchematic();  // can throw
+  mBusSegments.remove(s.getUuid());
+  emit busSegmentRemoved(s);
 }
 
 /*******************************************************************************
@@ -270,11 +303,16 @@ void Schematic::addToProject() {
     throw LogicError(__FILE__, __LINE__);
   }
 
-  ScopeGuardList sgl(mSymbols.count() + mNetSegments.count() +
-                     mPolygons.count() + mTexts.count() + mImages.count());
+  ScopeGuardList sgl(mSymbols.count() + mBusSegments.count() +
+                     mNetSegments.count() + mPolygons.count() + mTexts.count() +
+                     mImages.count());
   foreach (SI_Symbol* symbol, mSymbols) {
     symbol->addToSchematic();  // can throw
     sgl.add([symbol]() { symbol->removeFromSchematic(); });
+  }
+  foreach (SI_BusSegment* segment, mBusSegments) {
+    segment->addToSchematic();  // can throw
+    sgl.add([segment]() { segment->removeFromSchematic(); });
   }
   foreach (SI_NetSegment* segment, mNetSegments) {
     segment->addToSchematic();  // can throw
@@ -309,8 +347,9 @@ void Schematic::removeFromProject() {
     throw LogicError(__FILE__, __LINE__);
   }
 
-  ScopeGuardList sgl(mSymbols.count() + mNetSegments.count() +
-                     mPolygons.count() + mTexts.count() + mImages.count());
+  ScopeGuardList sgl(mSymbols.count() + mBusSegments.count() +
+                     mNetSegments.count() + mPolygons.count() + mTexts.count() +
+                     mImages.count());
   foreach (SI_Image* image, mImages) {
     image->removeFromSchematic();  // can throw
     sgl.add([image]() { image->addToSchematic(); });
@@ -324,6 +363,10 @@ void Schematic::removeFromProject() {
     sgl.add([polygon]() { polygon->addToSchematic(); });
   }
   foreach (SI_NetSegment* segment, mNetSegments) {
+    segment->removeFromSchematic();  // can throw
+    sgl.add([segment]() { segment->addToSchematic(); });
+  }
+  foreach (SI_BusSegment* segment, mBusSegments) {
     segment->removeFromSchematic();  // can throw
     sgl.add([segment]() { segment->addToSchematic(); });
   }
@@ -358,6 +401,11 @@ void Schematic::save() {
       obj->serialize(root->appendList("symbol"));
     }
     root->ensureLineBreak();
+    for (const SI_BusSegment* obj : mBusSegments) {
+      root->ensureLineBreak();
+      obj->serialize(root->appendList("bussegment"));
+    }
+    root->ensureLineBreak();
     for (const SI_NetSegment* obj : mNetSegments) {
       root->ensureLineBreak();
       obj->serialize(root->appendList("netsegment"));
@@ -390,9 +438,12 @@ void Schematic::save() {
   }
 }
 
-void Schematic::updateAllNetLabelAnchors() noexcept {
-  foreach (SI_NetSegment* netsegment, mNetSegments) {
-    netsegment->updateAllNetLabelAnchors();
+void Schematic::updateAllLabelAnchors() noexcept {
+  foreach (SI_BusSegment* s, mBusSegments) {
+    s->updateAllLabelAnchors();
+  }
+  foreach (SI_NetSegment* s, mNetSegments) {
+    s->updateAllNetLabelAnchors();
   }
 }
 

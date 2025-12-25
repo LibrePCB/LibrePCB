@@ -17,60 +17,60 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef LIBREPCB_EDITOR_CMDBUSADD_H
+#define LIBREPCB_EDITOR_CMDBUSADD_H
+
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "cmdremoveunusednetsignals.h"
-
-#include "../../project/cmd/cmdboardnetsegmentremove.h"
-#include "../../project/cmd/cmdboardplaneremove.h"
-#include "../../project/cmd/cmdnetsignalremove.h"
-
-#include <librepcb/core/project/circuit/circuit.h>
-#include <librepcb/core/project/circuit/netsignal.h>
+#include "../../undocommand.h"
 
 #include <QtCore>
 
 /*******************************************************************************
- *  Namespace
+ *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class Bus;
+class Circuit;
+
 namespace editor {
 
 /*******************************************************************************
- *  Constructors / Destructor
+ *  Class CmdBusAdd
  ******************************************************************************/
 
-CmdRemoveUnusedNetSignals::CmdRemoveUnusedNetSignals(Circuit& circuit) noexcept
-  : UndoCommandGroup(tr("Remove Unused Net Signals")), mCircuit(circuit) {
-}
+/**
+ * @brief The CmdBusAdd class
+ */
+class CmdBusAdd final : public UndoCommand {
+public:
+  // Constructors / Destructor
+  explicit CmdBusAdd(Circuit& circuit) noexcept;
+  explicit CmdBusAdd(Bus& bus) noexcept;
+  ~CmdBusAdd() noexcept;
 
-CmdRemoveUnusedNetSignals::~CmdRemoveUnusedNetSignals() noexcept {
-}
+  // Getters
+  Bus* getBus() const noexcept { return mBus; }
 
-/*******************************************************************************
- *  Inherited from UndoCommand
- ******************************************************************************/
+private:
+  // Private Methods
 
-bool CmdRemoveUnusedNetSignals::performExecute() {
-  foreach (NetSignal* netsignal, mCircuit.getNetSignals()) {
-    bool noComponentSignals = netsignal->getComponentSignals().isEmpty();
-    bool noSchematicNetSegments =
-        netsignal->getSchematicNetSegments().isEmpty();
-    if (noComponentSignals && noSchematicNetSegments) {
-      foreach (BI_NetSegment* netsegment, netsignal->getBoardNetSegments()) {
-        appendChild(new CmdBoardNetSegmentRemove(*netsegment));
-      }
-      foreach (BI_Plane* plane, netsignal->getBoardPlanes()) {
-        appendChild(new CmdBoardPlaneRemove(*plane));
-      }
-      appendChild(new CmdNetSignalRemove(mCircuit, *netsignal));
-    }
-  }
+  /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
+  bool performExecute() override;
 
-  // execute all child commands
-  return UndoCommandGroup::performExecute();  // can throw
-}
+  /// @copydoc ::librepcb::editor::UndoCommand::performUndo()
+  void performUndo() override;
+
+  /// @copydoc ::librepcb::editor::UndoCommand::performRedo()
+  void performRedo() override;
+
+  // Private Member Variables
+
+  Circuit& mCircuit;
+  Bus* mBus;
+};
 
 /*******************************************************************************
  *  End of File
@@ -78,3 +78,5 @@ bool CmdRemoveUnusedNetSignals::performExecute() {
 
 }  // namespace editor
 }  // namespace librepcb
+
+#endif

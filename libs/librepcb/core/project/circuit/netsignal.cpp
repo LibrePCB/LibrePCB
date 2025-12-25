@@ -76,6 +76,15 @@ bool NetSignal::isUsed() const noexcept {
   return (getRegisteredElementsCount() > 0);
 }
 
+bool NetSignal::hasNetLabels() const noexcept {
+  for (SI_NetSegment* seg : mRegisteredSchematicNetSegments) {
+    if (!seg->getNetLabels().isEmpty()) {
+      return true;
+    }
+  }
+  return false;
+}
+
 bool NetSignal::isNameForced() const noexcept {
   foreach (const ComponentSignalInstance* cmp, mRegisteredComponentSignals) {
     if (cmp->isNetSignalNameForced()) {
@@ -83,6 +92,10 @@ bool NetSignal::isNameForced() const noexcept {
     }
   }
   return false;
+}
+
+bool NetSignal::isAnonymous() const noexcept {
+  return (!isNameForced()) && (!hasNetLabels());
 }
 
 /*******************************************************************************

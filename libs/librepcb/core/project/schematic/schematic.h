@@ -43,6 +43,7 @@ class NetSignal;
 class Point;
 class Project;
 class SI_Base;
+class SI_BusSegment;
 class SI_Image;
 class SI_NetLabel;
 class SI_NetLine;
@@ -62,6 +63,10 @@ class SI_Text;
  * always part of a circuit
  *
  * A schematic can contain following items:
+ *  - bussegment:       ::librepcb::SI_BusSegment
+ *      - busjunction   ::librepcb::SI_BusJunction
+ *      - busline:      ::librepcb::SI_BusLine
+ *      - buslabel:     ::librepcb::SI_BusLabel
  *  - netsegment:       ::librepcb::SI_NetSegment
  *      - netpoint:     ::librepcb::SI_NetPoint
  *      - netline:      ::librepcb::SI_NetLine
@@ -114,6 +119,13 @@ public:
   void addSymbol(SI_Symbol& symbol);
   void removeSymbol(SI_Symbol& symbol);
 
+  // BusSegment Methods
+  const QMap<Uuid, SI_BusSegment*>& getBusSegments() const noexcept {
+    return mBusSegments;
+  }
+  void addBusSegment(SI_BusSegment& s);
+  void removeBusSegment(SI_BusSegment& s);
+
   // NetSegment Methods
   const QMap<Uuid, SI_NetSegment*>& getNetSegments() const noexcept {
     return mNetSegments;
@@ -142,7 +154,7 @@ public:
   void addToProject();
   void removeFromProject();
   void save();
-  void updateAllNetLabelAnchors() noexcept;
+  void updateAllLabelAnchors() noexcept;
 
   // Operator Overloadings
   Schematic& operator=(const Schematic& rhs) = delete;
@@ -157,6 +169,8 @@ signals:
   void nameChanged(const ElementName& name);
   void symbolAdded(SI_Symbol& symbol);
   void symbolRemoved(SI_Symbol& symbol);
+  void busSegmentAdded(SI_BusSegment& s);
+  void busSegmentRemoved(SI_BusSegment& s);
   void netSegmentAdded(SI_NetSegment& netSegment);
   void netSegmentRemoved(SI_NetSegment& netSegment);
   void polygonAdded(SI_Polygon& polygon);
@@ -189,6 +203,7 @@ private:
 
   // Items
   QMap<Uuid, SI_Symbol*> mSymbols;
+  QMap<Uuid, SI_BusSegment*> mBusSegments;
   QMap<Uuid, SI_NetSegment*> mNetSegments;
   QMap<Uuid, SI_Polygon*> mPolygons;
   QMap<Uuid, SI_Text*> mTexts;

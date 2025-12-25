@@ -24,12 +24,16 @@
 
 #include "../../graphics/imagegraphicsitem.h"
 #include "../../graphics/polygongraphicsitem.h"
+#include "../../project/cmd/cmdbusadd.h"
 #include "../../project/cmd/cmdcomponentinstanceadd.h"
 #include "../../project/cmd/cmdcompsiginstsetnetsignal.h"
 #include "../../project/cmd/cmdnetclassadd.h"
 #include "../../project/cmd/cmdnetsignaladd.h"
 #include "../../project/cmd/cmdnetsignaledit.h"
 #include "../../project/cmd/cmdprojectlibraryaddelement.h"
+#include "../../project/cmd/cmdschematicbuslabeladd.h"
+#include "../../project/cmd/cmdschematicbussegmentadd.h"
+#include "../../project/cmd/cmdschematicbussegmentaddelements.h"
 #include "../../project/cmd/cmdschematicimageadd.h"
 #include "../../project/cmd/cmdschematicnetlabeladd.h"
 #include "../../project/cmd/cmdschematicnetsegmentadd.h"
@@ -38,6 +42,9 @@
 #include "../../project/cmd/cmdschematictextadd.h"
 #include "../../project/cmd/cmdsymbolinstanceadd.h"
 #include "../../utils/imagehelpers.h"
+#include "../schematic/graphicsitems/sgi_busjunction.h"
+#include "../schematic/graphicsitems/sgi_buslabel.h"
+#include "../schematic/graphicsitems/sgi_busline.h"
 #include "../schematic/graphicsitems/sgi_netlabel.h"
 #include "../schematic/graphicsitems/sgi_netline.h"
 #include "../schematic/graphicsitems/sgi_netpoint.h"
@@ -49,11 +56,16 @@
 
 #include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/library/sym/symbol.h>
+#include <librepcb/core/project/circuit/bus.h>
 #include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/circuit/componentinstance.h>
 #include <librepcb/core/project/circuit/componentsignalinstance.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectlibrary.h>
+#include <librepcb/core/project/schematic/items/si_busjunction.h>
+#include <librepcb/core/project/schematic/items/si_buslabel.h>
+#include <librepcb/core/project/schematic/items/si_busline.h>
+#include <librepcb/core/project/schematic/items/si_bussegment.h>
 #include <librepcb/core/project/schematic/items/si_image.h>
 #include <librepcb/core/project/schematic/items/si_netlabel.h>
 #include <librepcb/core/project/schematic/items/si_netline.h>
@@ -226,6 +238,92 @@ bool CmdPasteSchematicItems::performExecute() {
     }
   }
 
+  // Paste bus segments
+  QHash<Uuid, QHash<Uuid, SI_BusJunction*>> busJunctionsMap;
+  for (const SchematicClipboardData::BusSegment& seg :
+       mData->getBusSegments()) {
+    // If there is at least one label, we keep the bus name (reuse existing
+    // bus if it exists, or add a new one). Otherwise, create a new, auto-
+    // named bus.
+    std::shared_ptr<SchematicClipboardData::Bus> busObj =
+        mData->getBuses().get(seg.busUuid);  // can throw
+    Bus* bus = nullptr;
+    if (!seg.labels.isEmpty()) {
+      bus = mProject.getCircuit().getBusByName(*busObj->name);
+    }
+    if (!bus) {
+      if (!seg.labels.isEmpty()) {
+        bus = new Bus(mProject.getCircuit(), Uuid::createRandom(), busObj->name,
+                      false, busObj->prefixNetNames,
+                      busObj->maxTraceLengthDifference);
+      } else {
+        bus = new Bus(mProject.getCircuit(), Uuid::createRandom(),
+                      BusName(mProject.getCircuit().generateAutoBusName()),
+                      true, false, std::nullopt);
+      }
+      execNewChildCmd(new CmdBusAdd(*bus));
+    }
+    Q_ASSERT(bus);
+
+    // Add new segment
+    SI_BusSegment* copy =
+        new SI_BusSegment(mSchematic, Uuid::createRandom(), *bus);
+    execNewChildCmd(new CmdSchematicBusSegmentAdd(*copy));
+
+    // Add junctions and lines
+    std::unique_ptr<CmdSchematicBusSegmentAddElements> cmdAddElements(
+        new CmdSchematicBusSegmentAddElements(*copy));
+    QHash<Uuid, SI_BusJunction*> junctionsMap;
+    for (const Junction& junction : seg.junctions) {
+      SI_BusJunction* newJunction =
+          cmdAddElements->addJunction(junction.getPosition() + mPosOffset);
+      junctionsMap.insert(junction.getUuid(), newJunction);
+    }
+    for (const NetLine& nl : seg.lines) {
+      const std::optional<Uuid> uuid1 = nl.getP1().tryGetJunction();
+      const std::optional<Uuid> uuid2 = nl.getP2().tryGetJunction();
+      if ((!uuid1) || (!uuid2)) {
+        throw LogicError(__FILE__, __LINE__);
+      }
+      SI_BusJunction* p1 = junctionsMap[*uuid1];
+      SI_BusJunction* p2 = junctionsMap[*uuid2];
+      if ((!p1) || (!p2)) {
+        throw LogicError(__FILE__, __LINE__);
+      }
+      cmdAddElements->addLine(*p1, *p2);
+    }
+    execNewChildCmd(cmdAddElements.release());
+
+    // Add labels
+    for (const NetLabel& label : seg.labels) {
+      SI_BusLabel* newLabel = new SI_BusLabel(
+          *copy,
+          NetLabel(Uuid::createRandom(), label.getPosition() + mPosOffset,
+                   label.getRotation(), label.getMirrored()));
+      CmdSchematicBusLabelAdd* cmd = new CmdSchematicBusLabelAdd(*newLabel);
+      execNewChildCmd(cmd);
+    }
+
+    // Select pasted segment items.
+    foreach (SI_BusJunction* bj, copy->getJunctions()) {
+      if (auto item = mScene.getBusJunctions().value(bj)) {
+        item->setSelected(true);
+      }
+    }
+    foreach (SI_BusLine* line, copy->getLines()) {
+      if (auto item = mScene.getBusLines().value(line)) {
+        item->setSelected(true);
+      }
+    }
+    foreach (SI_BusLabel* label, copy->getLabels()) {
+      if (auto item = mScene.getBusLabels().value(label)) {
+        item->setSelected(true);
+      }
+    }
+
+    busJunctionsMap.insert(seg.uuid, junctionsMap);
+  }
+
   // Paste net segments
   for (const SchematicClipboardData::NetSegment& seg :
        mData->getNetSegments()) {
@@ -262,19 +360,18 @@ bool CmdPasteSchematicItems::performExecute() {
           cmdAddElements->addNetPoint(junction.getPosition() + mPosOffset);
       netPointMap.insert(junction.getUuid(), netpoint);
     }
-    for (const NetLine& nl : seg.lines) {
-      SI_NetLineAnchor* p1 = nullptr;
-      if (std::optional<Uuid> anchor = nl.getP1().tryGetJunction()) {
-        p1 = netPointMap[*anchor];
-        Q_ASSERT(p1);
-      } else if (std::optional<NetLineAnchor::PinAnchor> anchor =
-                     nl.getP1().tryGetPin()) {
+    auto getAnchor = [&](const NetLineAnchor& a) -> SI_NetLineAnchor* {
+      if (std::optional<Uuid> obj = a.tryGetJunction()) {
+        return netPointMap[*obj];
+      } else if (std::optional<NetLineAnchor::BusAnchor> obj =
+                     a.tryGetBusJunction()) {
+        return busJunctionsMap.value(obj->segment).value(obj->junction);
+      } else if (std::optional<NetLineAnchor::PinAnchor> obj = a.tryGetPin()) {
         SI_Symbol* symbol = mSchematic.getSymbols().value(
-            symbolMap.value(anchor->symbol, Uuid::createRandom()));
-        Q_ASSERT(symbol);
-        SI_SymbolPin* pin = symbol->getPin(anchor->pin);
-        Q_ASSERT(pin);
-        p1 = pin;
+            symbolMap.value(obj->symbol, Uuid::createRandom()));
+        if (!symbol) return nullptr;
+        SI_SymbolPin* pin = symbol->getPin(obj->pin);
+        if (!pin) return nullptr;
         ComponentSignalInstance& sigInst = pin->getComponentSignalInstance();
         if (sigInst.getNetSignal() != netSignal) {
           execNewChildCmd(new CmdCompSigInstSetNetSignal(sigInst, netSignal));
@@ -282,29 +379,15 @@ bool CmdPasteSchematicItems::performExecute() {
         if (sigInst.isNetSignalNameForced() && (!forcedNetName)) {
           forcedNetName = CircuitIdentifier(sigInst.getForcedNetSignalName());
         }
+        return pin;
       } else {
-        throw LogicError(__FILE__, __LINE__);
+        return nullptr;
       }
-      SI_NetLineAnchor* p2 = nullptr;
-      if (std::optional<Uuid> anchor = nl.getP2().tryGetJunction()) {
-        p2 = netPointMap[*anchor];
-        Q_ASSERT(p2);
-      } else if (std::optional<NetLineAnchor::PinAnchor> anchor =
-                     nl.getP2().tryGetPin()) {
-        SI_Symbol* symbol = mSchematic.getSymbols().value(
-            symbolMap.value(anchor->symbol, Uuid::createRandom()));
-        Q_ASSERT(symbol);
-        SI_SymbolPin* pin = symbol->getPin(anchor->pin);
-        Q_ASSERT(pin);
-        p2 = pin;
-        ComponentSignalInstance& sigInst = pin->getComponentSignalInstance();
-        if (sigInst.getNetSignal() != netSignal) {
-          execNewChildCmd(new CmdCompSigInstSetNetSignal(sigInst, netSignal));
-        }
-        if (sigInst.isNetSignalNameForced() && (!forcedNetName)) {
-          forcedNetName = CircuitIdentifier(sigInst.getForcedNetSignalName());
-        }
-      } else {
+    };
+    for (const NetLine& nl : seg.lines) {
+      SI_NetLineAnchor* p1 = getAnchor(nl.getP1());
+      SI_NetLineAnchor* p2 = getAnchor(nl.getP2());
+      if ((!p1) || (!p2)) {
         throw LogicError(__FILE__, __LINE__);
       }
       cmdAddElements->addNetLine(*p1, *p2);

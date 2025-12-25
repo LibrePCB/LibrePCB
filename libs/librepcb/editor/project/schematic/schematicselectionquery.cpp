@@ -24,6 +24,9 @@
 
 #include "../../graphics/imagegraphicsitem.h"
 #include "../../graphics/polygongraphicsitem.h"
+#include "graphicsitems/sgi_busjunction.h"
+#include "graphicsitems/sgi_buslabel.h"
+#include "graphicsitems/sgi_busline.h"
 #include "graphicsitems/sgi_netlabel.h"
 #include "graphicsitems/sgi_netline.h"
 #include "graphicsitems/sgi_netpoint.h"
@@ -32,6 +35,8 @@
 #include "graphicsitems/sgi_text.h"
 #include "schematicgraphicsscene.h"
 
+#include <librepcb/core/project/schematic/items/si_busjunction.h>
+#include <librepcb/core/project/schematic/items/si_buslabel.h>
 #include <librepcb/core/project/schematic/items/si_image.h>
 #include <librepcb/core/project/schematic/items/si_netlabel.h>
 #include <librepcb/core/project/schematic/items/si_netline.h>
@@ -67,6 +72,21 @@ SchematicSelectionQuery::~SchematicSelectionQuery() noexcept {
  *  Getters: General
  ******************************************************************************/
 
+QHash<SI_BusSegment*, SchematicSelectionQuery::BusSegmentItems>
+    SchematicSelectionQuery::getBusSegmentItems() const noexcept {
+  QHash<SI_BusSegment*, BusSegmentItems> result;
+  foreach (SI_BusJunction* junction, mResultBusJunctions) {
+    result[&junction->getBusSegment()].junctions.insert(junction);
+  }
+  foreach (SI_BusLine* line, mResultBusLines) {
+    result[&line->getBusSegment()].lines.insert(line);
+  }
+  foreach (SI_BusLabel* label, mResultBusLabels) {
+    result[&label->getBusSegment()].labels.insert(label);
+  }
+  return result;
+}
+
 QHash<SI_NetSegment*, SchematicSelectionQuery::NetSegmentItems>
     SchematicSelectionQuery::getNetSegmentItems() const noexcept {
   QHash<SI_NetSegment*, NetSegmentItems> result;
@@ -83,9 +103,11 @@ QHash<SI_NetSegment*, SchematicSelectionQuery::NetSegmentItems>
 }
 
 int SchematicSelectionQuery::getResultCount() const noexcept {
-  return mResultSymbols.count() + mResultNetPoints.count() +
-      mResultNetLines.count() + mResultNetLabels.count() +
-      mResultPolygons.count() + mResultTexts.count() + mResultImages.count();
+  return mResultSymbols.count() + mResultBusJunctions.count() +
+      mResultBusLines.count() + mResultBusLabels.count() +
+      mResultNetPoints.count() + mResultNetLines.count() +
+      mResultNetLabels.count() + mResultPolygons.count() +
+      mResultTexts.count() + mResultImages.count();
 }
 
 /*******************************************************************************
@@ -97,6 +119,33 @@ void SchematicSelectionQuery::addSelectedSymbols() noexcept {
        it++) {
     if (it.value()->isSelected()) {
       mResultSymbols.insert(it.key());
+    }
+  }
+}
+
+void SchematicSelectionQuery::addSelectedBusJunctions() noexcept {
+  for (auto it = mScene.getBusJunctions().begin();
+       it != mScene.getBusJunctions().end(); it++) {
+    if (it.value()->isSelected()) {
+      mResultBusJunctions.insert(it.key());
+    }
+  }
+}
+
+void SchematicSelectionQuery::addSelectedBusLines() noexcept {
+  for (auto it = mScene.getBusLines().begin(); it != mScene.getBusLines().end();
+       it++) {
+    if (it.value()->isSelected()) {
+      mResultBusLines.insert(it.key());
+    }
+  }
+}
+
+void SchematicSelectionQuery::addSelectedBusLabels() noexcept {
+  for (auto it = mScene.getBusLabels().begin();
+       it != mScene.getBusLabels().end(); it++) {
+    if (it.value()->isSelected()) {
+      mResultBusLabels.insert(it.key());
     }
   }
 }
@@ -160,6 +209,24 @@ void SchematicSelectionQuery::addSelectedImages() noexcept {
        it++) {
     if (it.value()->isSelected()) {
       mResultImages.insert(it.key());
+    }
+  }
+}
+
+void SchematicSelectionQuery::addJunctionsOfBusLines(
+    bool onlyIfAllLinesSelected) noexcept {
+  foreach (SI_BusLine* line, mResultBusLines) {
+    SI_BusJunction* p1 = dynamic_cast<SI_BusJunction*>(&line->getP1());
+    SI_BusJunction* p2 = dynamic_cast<SI_BusJunction*>(&line->getP2());
+    if (p1 &&
+        ((!onlyIfAllLinesSelected) ||
+         (mResultBusLines.contains(p1->getBusLines())))) {
+      mResultBusJunctions.insert(p1);
+    }
+    if (p2 &&
+        ((!onlyIfAllLinesSelected) ||
+         (mResultBusLines.contains(p2->getBusLines())))) {
+      mResultBusJunctions.insert(p2);
     }
   }
 }

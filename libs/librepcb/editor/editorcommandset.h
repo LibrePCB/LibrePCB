@@ -1134,10 +1134,19 @@ public:
       {QKeySequence(Qt::Key_W)},
       &categoryTools,
   };
-  EditorCommand toolNetLabel{
-      "tool_netlabel",  // clang-format break
-      QT_TR_NOOP("Add Net Label"),
-      QT_TR_NOOP("Add net labels to explicitly specify the net of wires"),
+  EditorCommand toolBus{
+      "tool_bus",  // clang-format break
+      QT_TR_NOOP("Draw Bus"),
+      QT_TR_NOOP("Draw buses to route several related nets with a single wire"),
+      ":/img/actions/draw_bus.png",
+      EditorCommand::Flags(),
+      {QKeySequence(Qt::Key_B)},
+      &categoryTools,
+  };
+  EditorCommand toolLabel{
+      "tool_label",  // clang-format break
+      QT_TR_NOOP("Add Label to Net or Bus"),
+      QT_TR_NOOP("Add labels to explicitly specify the net or bus of wires"),
       ":/fa/solid/tag.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_N)},

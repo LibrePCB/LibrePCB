@@ -24,8 +24,9 @@
 
 #include "schematiceditorstate_addcomponent.h"
 #include "schematiceditorstate_addimage.h"
-#include "schematiceditorstate_addnetlabel.h"
+#include "schematiceditorstate_addlabel.h"
 #include "schematiceditorstate_addtext.h"
+#include "schematiceditorstate_drawbus.h"
 #include "schematiceditorstate_drawpolygon.h"
 #include "schematiceditorstate_drawwire.h"
 #include "schematiceditorstate_measure.h"
@@ -51,8 +52,8 @@ SchematicEditorFsm::SchematicEditorFsm(const Context& context,
     mPreviousState(State::IDLE) {
   mStates.insert(State::SELECT, new SchematicEditorState_Select(context));
   mStates.insert(State::DRAW_WIRE, new SchematicEditorState_DrawWire(context));
-  mStates.insert(State::ADD_NETLABEL,
-                 new SchematicEditorState_AddNetLabel(context));
+  mStates.insert(State::DRAW_BUS, new SchematicEditorState_DrawBus(context));
+  mStates.insert(State::ADD_LABEL, new SchematicEditorState_AddLabel(context));
   mStates.insert(State::ADD_COMPONENT,
                  new SchematicEditorState_AddComponent(context));
   mStates.insert(State::DRAW_POLYGON,
@@ -125,7 +126,7 @@ bool SchematicEditorFsm::processAddComponent(const Uuid& cmp,
 }
 
 bool SchematicEditorFsm::processAddNetLabel() noexcept {
-  return setNextState(State::ADD_NETLABEL);
+  return setNextState(State::ADD_LABEL);
 }
 
 bool SchematicEditorFsm::processDrawPolygon() noexcept {
@@ -154,6 +155,18 @@ bool SchematicEditorFsm::processAddImage(const QByteArray& data,
 
 bool SchematicEditorFsm::processDrawWire() noexcept {
   return setNextState(State::DRAW_WIRE);
+}
+
+bool SchematicEditorFsm::processDrawBus(std::optional<Uuid> busUuid) noexcept {
+  if (setNextState(State::DRAW_BUS)) {
+    if (SchematicEditorState_DrawBus* s =
+            dynamic_cast<SchematicEditorState_DrawBus*>(
+                mStates.value(mCurrentState))) {
+      s->selectBus(busUuid);
+    }
+    return true;
+  }
+  return false;
 }
 
 bool SchematicEditorFsm::processMeasure() noexcept {

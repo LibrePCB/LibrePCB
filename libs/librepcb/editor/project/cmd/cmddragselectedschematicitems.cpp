@@ -25,6 +25,8 @@
 #include "../../cmd/cmdimageedit.h"
 #include "../../cmd/cmdpolygonedit.h"
 #include "../../cmd/cmdtextedit.h"
+#include "../../project/cmd/cmdschematicbusjunctionedit.h"
+#include "../../project/cmd/cmdschematicbuslabeledit.h"
 #include "../../project/cmd/cmdschematicnetlabeledit.h"
 #include "../../project/cmd/cmdschematicnetpointedit.h"
 #include "../../project/cmd/cmdsymbolinstanceedit.h"
@@ -33,6 +35,8 @@
 #include "../schematic/schematicselectionquery.h"
 
 #include <librepcb/core/project/project.h>
+#include <librepcb/core/project/schematic/items/si_busjunction.h>
+#include <librepcb/core/project/schematic/items/si_buslabel.h>
 #include <librepcb/core/project/schematic/items/si_image.h>
 #include <librepcb/core/project/schematic/items/si_netlabel.h>
 #include <librepcb/core/project/schematic/items/si_netline.h>
@@ -70,6 +74,9 @@ CmdDragSelectedSchematicItems::CmdDragSelectedSchematicItems(
   // get all selected items
   SchematicSelectionQuery query(scene);
   query.addSelectedSymbols();
+  query.addSelectedBusLines();
+  query.addSelectedBusJunctions();
+  query.addSelectedBusLabels();
   query.addSelectedNetPoints();
   query.addSelectedNetLines();
   query.addSelectedNetLabels();
@@ -77,6 +84,7 @@ CmdDragSelectedSchematicItems::CmdDragSelectedSchematicItems(
   query.addSelectedSchematicTexts();
   query.addSelectedSymbolTexts();
   query.addSelectedImages();
+  query.addJunctionsOfBusLines();
   query.addNetPointsOfNetLines();
 
   // Find the center of all elements and create undo commands.
@@ -86,6 +94,19 @@ CmdDragSelectedSchematicItems::CmdDragSelectedSchematicItems(
     CmdSymbolInstanceEdit* cmd = new CmdSymbolInstanceEdit(*symbol);
     mSymbolEditCmds.append(cmd);
     mSymbolTextsResetCmds.append(new CmdSymbolInstanceTextsReset(*symbol));
+  }
+  foreach (SI_BusJunction* junction, query.getBusJunctions()) {
+    mCenterPos += junction->getPosition();
+    ++mItemCount;
+    CmdSchematicBusJunctionEdit* cmd =
+        new CmdSchematicBusJunctionEdit(*junction);
+    mBusJunctionEditCmds.append(cmd);
+  }
+  foreach (SI_BusLabel* label, query.getBusLabels()) {
+    mCenterPos += label->getPosition();
+    ++mItemCount;
+    CmdSchematicBusLabelEdit* cmd = new CmdSchematicBusLabelEdit(*label);
+    mBusLabelEditCmds.append(cmd);
   }
   foreach (SI_NetPoint* netpoint, query.getNetPoints()) {
     mCenterPos += netpoint->getPosition();
@@ -145,6 +166,12 @@ void CmdDragSelectedSchematicItems::snapToGrid() noexcept {
   foreach (CmdSymbolInstanceEdit* cmd, mSymbolEditCmds) {
     cmd->snapToGrid(grid, true);
   }
+  foreach (CmdSchematicBusJunctionEdit* cmd, mBusJunctionEditCmds) {
+    cmd->snapToGrid(grid, true);
+  }
+  foreach (CmdSchematicBusLabelEdit* cmd, mBusLabelEditCmds) {
+    cmd->snapToGrid(grid, true);
+  }
   foreach (CmdSchematicNetPointEdit* cmd, mNetPointEditCmds) {
     cmd->snapToGrid(grid, true);
   }
@@ -177,6 +204,12 @@ void CmdDragSelectedSchematicItems::setCurrentPosition(
     foreach (CmdSymbolInstanceEdit* cmd, mSymbolEditCmds) {
       cmd->translate(delta - mDeltaPos, true);
     }
+    foreach (CmdSchematicBusJunctionEdit* cmd, mBusJunctionEditCmds) {
+      cmd->translate(delta - mDeltaPos, true);
+    }
+    foreach (CmdSchematicBusLabelEdit* cmd, mBusLabelEditCmds) {
+      cmd->translate(delta - mDeltaPos, true);
+    }
     foreach (CmdSchematicNetPointEdit* cmd, mNetPointEditCmds) {
       cmd->translate(delta - mDeltaPos, true);
     }
@@ -206,6 +239,12 @@ void CmdDragSelectedSchematicItems::rotate(
   foreach (CmdSymbolInstanceEdit* cmd, mSymbolEditCmds) {
     cmd->rotate(angle, center, true);
   }
+  foreach (CmdSchematicBusJunctionEdit* cmd, mBusJunctionEditCmds) {
+    cmd->rotate(angle, center, true);
+  }
+  foreach (CmdSchematicBusLabelEdit* cmd, mBusLabelEditCmds) {
+    cmd->rotate(angle, center, true);
+  }
   foreach (CmdSchematicNetPointEdit* cmd, mNetPointEditCmds) {
     cmd->rotate(angle, center, true);
   }
@@ -233,6 +272,12 @@ void CmdDragSelectedSchematicItems::mirror(
   // rotate selected elements
   foreach (CmdSymbolInstanceEdit* cmd, mSymbolEditCmds) {
     cmd->mirror(center, orientation, true);
+  }
+  foreach (CmdSchematicBusJunctionEdit* cmd, mBusJunctionEditCmds) {
+    cmd->mirror(orientation, center, true);
+  }
+  foreach (CmdSchematicBusLabelEdit* cmd, mBusLabelEditCmds) {
+    cmd->mirror(orientation, center, true);
   }
   foreach (CmdSchematicNetPointEdit* cmd, mNetPointEditCmds) {
     cmd->mirror(orientation, center, true);
@@ -264,6 +309,10 @@ bool CmdDragSelectedSchematicItems::performExecute() {
     mSymbolEditCmds.clear();
     qDeleteAll(mSymbolTextsResetCmds);
     mSymbolTextsResetCmds.clear();
+    qDeleteAll(mBusJunctionEditCmds);
+    mBusJunctionEditCmds.clear();
+    qDeleteAll(mBusLabelEditCmds);
+    mBusLabelEditCmds.clear();
     qDeleteAll(mNetPointEditCmds);
     mNetPointEditCmds.clear();
     qDeleteAll(mNetLabelEditCmds);
@@ -288,6 +337,12 @@ bool CmdDragSelectedSchematicItems::performExecute() {
   foreach (CmdSymbolInstanceTextsReset* cmd, mSymbolTextsResetCmds) {
     appendChild(cmd);  // can throw
   }
+  foreach (CmdSchematicBusJunctionEdit* cmd, mBusJunctionEditCmds) {
+    appendChild(cmd);  // can throw
+  }
+  foreach (CmdSchematicBusLabelEdit* cmd, mBusLabelEditCmds) {
+    appendChild(cmd);  // can throw
+  }
   foreach (CmdSchematicNetPointEdit* cmd, mNetPointEditCmds) {
     appendChild(cmd);  // can throw
   }
@@ -309,7 +364,7 @@ bool CmdDragSelectedSchematicItems::performExecute() {
 }
 
 void CmdDragSelectedSchematicItems::performPostExecution() noexcept {
-  mSchematic.updateAllNetLabelAnchors();
+  mSchematic.updateAllLabelAnchors();
 }
 
 /*******************************************************************************

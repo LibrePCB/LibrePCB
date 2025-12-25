@@ -31,6 +31,7 @@
 #include <librepcb/core/geometry/text.h>
 #include <librepcb/core/project/circuit/assemblyvariant.h>
 #include <librepcb/core/project/circuit/componentinstance.h>
+#include <librepcb/core/types/busname.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -186,6 +187,96 @@ public:
     }
   };
 
+  struct Bus {
+    static constexpr const char* tagname = "bus";
+
+    Uuid uuid;
+    BusName name;
+    bool prefixNetNames;
+    std::optional<UnsignedLength> maxTraceLengthDifference;
+    Signal<Bus> onEdited;  ///< Dummy event, not used
+
+    explicit Bus(const Uuid& uuid, const BusName& name, bool prefixNetNames,
+                 const std::optional<UnsignedLength>& maxTraceLengthDifference)
+      : uuid(uuid),
+        name(name),
+        prefixNetNames(prefixNetNames),
+        maxTraceLengthDifference(maxTraceLengthDifference),
+        onEdited(*this) {}
+
+    explicit Bus(const SExpression& node)
+      : uuid(deserialize<Uuid>(node.getChild("@0"))),
+        name(deserialize<BusName>(node.getChild("name/@0"))),
+        prefixNetNames(deserialize<bool>(node.getChild("prefix_nets/@0"))),
+        maxTraceLengthDifference(deserialize<std::optional<UnsignedLength>>(
+            node.getChild("max_trace_length_difference/@0"))),
+        onEdited(*this) {}
+
+    // For SerializableObjectList
+    const Uuid& getUuid() const noexcept { return uuid; }
+
+    void serialize(SExpression& root) const {
+      root.appendChild(uuid);
+      root.ensureLineBreak();
+      root.appendChild("name", name);
+      root.appendChild("prefix_nets", prefixNetNames);
+      root.appendChild("max_trace_length_difference", maxTraceLengthDifference);
+      root.ensureLineBreak();
+    }
+
+    bool operator!=(const Bus& rhs) noexcept {
+      return (uuid != rhs.uuid) || (name != rhs.name) ||
+          (prefixNetNames != rhs.prefixNetNames) ||
+          (maxTraceLengthDifference != rhs.maxTraceLengthDifference);
+    }
+  };
+
+  struct BusSegment {
+    static constexpr const char* tagname = "bussegment";
+
+    Uuid uuid;  ///< Required for references from net lines
+    Uuid busUuid;
+    JunctionList junctions;
+    NetLineList lines;
+    NetLabelList labels;
+    Signal<BusSegment> onEdited;  ///< Dummy event, not used
+
+    explicit BusSegment(const Uuid& uuid, const Uuid& busUuid)
+      : uuid(uuid),
+        busUuid(busUuid),
+        junctions(),
+        lines(),
+        labels(),
+        onEdited(*this) {}
+
+    explicit BusSegment(const SExpression& node)
+      : uuid(deserialize<Uuid>(node.getChild("@0"))),
+        busUuid(deserialize<Uuid>(node.getChild("bus/@0"))),
+        junctions(node),
+        lines(node),
+        labels(node),
+        onEdited(*this) {}
+
+    void serialize(SExpression& root) const {
+      root.appendChild(uuid);
+      root.ensureLineBreak();
+      root.appendChild("bus", busUuid);
+      root.ensureLineBreak();
+      junctions.serialize(root);
+      root.ensureLineBreak();
+      lines.serialize(root);
+      root.ensureLineBreak();
+      labels.serialize(root);
+      root.ensureLineBreak();
+    }
+
+    bool operator!=(const BusSegment& rhs) noexcept {
+      return (uuid != rhs.uuid) || (busUuid != rhs.busUuid) ||
+          (junctions != rhs.junctions) || (lines != rhs.lines) ||
+          (labels != rhs.labels);
+    }
+  };
+
   struct NetSegment {
     static constexpr const char* tagname = "netsegment";
 
@@ -239,6 +330,7 @@ public:
   const AssemblyVariantList& getAssemblyVariants() noexcept {
     return mAssemblyVariants;
   }
+  SerializableObjectList<Bus, Bus>& getBuses() noexcept { return mBuses; }
   SerializableObjectList<ComponentInstance, ComponentInstance>&
       getComponentInstances() noexcept {
     return mComponentInstances;
@@ -246,6 +338,9 @@ public:
   SerializableObjectList<SymbolInstance, SymbolInstance>&
       getSymbolInstances() noexcept {
     return mSymbolInstances;
+  }
+  SerializableObjectList<BusSegment, BusSegment>& getBusSegments() noexcept {
+    return mBusSegments;
   }
   SerializableObjectList<NetSegment, NetSegment>& getNetSegments() noexcept {
     return mNetSegments;
@@ -271,9 +366,11 @@ private:  // Data
   Uuid mSchematicUuid;
   Point mCursorPos;
   AssemblyVariantList mAssemblyVariants;
+  SerializableObjectList<Bus, Bus> mBuses;
   SerializableObjectList<ComponentInstance, ComponentInstance>
       mComponentInstances;
   SerializableObjectList<SymbolInstance, SymbolInstance> mSymbolInstances;
+  SerializableObjectList<BusSegment, BusSegment> mBusSegments;
   SerializableObjectList<NetSegment, NetSegment> mNetSegments;
   PolygonList mPolygons;
   TextList mTexts;

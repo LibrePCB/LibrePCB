@@ -20,13 +20,19 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "schematiceditorstate_addnetlabel.h"
+#include "schematiceditorstate_addlabel.h"
 
 #include "../../../undostack.h"
+#include "../../cmd/cmdschematicbuslabeladd.h"
+#include "../../cmd/cmdschematicbuslabeledit.h"
 #include "../../cmd/cmdschematicnetlabeladd.h"
 #include "../../cmd/cmdschematicnetlabeledit.h"
+#include "../graphicsitems/sgi_busline.h"
 #include "../graphicsitems/sgi_netline.h"
 
+#include <librepcb/core/project/schematic/items/si_buslabel.h>
+#include <librepcb/core/project/schematic/items/si_busline.h>
+#include <librepcb/core/project/schematic/items/si_bussegment.h>
 #include <librepcb/core/project/schematic/items/si_netlabel.h>
 #include <librepcb/core/project/schematic/items/si_netline.h>
 #include <librepcb/core/project/schematic/items/si_netsegment.h>
@@ -45,15 +51,17 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-SchematicEditorState_AddNetLabel::SchematicEditorState_AddNetLabel(
+SchematicEditorState_AddLabel::SchematicEditorState_AddLabel(
     const Context& context) noexcept
   : SchematicEditorState(context),
     mUndoCmdActive(false),
     mCurrentNetLabel(nullptr),
-    mEditCmd(nullptr) {
+    mNetLabelEditCmd(nullptr),
+    mCurrentBusLabel(nullptr),
+    mBusLabelEditCmd(nullptr) {
 }
 
-SchematicEditorState_AddNetLabel::~SchematicEditorState_AddNetLabel() noexcept {
+SchematicEditorState_AddLabel::~SchematicEditorState_AddLabel() noexcept {
   Q_ASSERT(mUndoCmdActive == false);
 }
 
@@ -61,7 +69,7 @@ SchematicEditorState_AddNetLabel::~SchematicEditorState_AddNetLabel() noexcept {
  *  General Methods
  ******************************************************************************/
 
-bool SchematicEditorState_AddNetLabel::entry() noexcept {
+bool SchematicEditorState_AddLabel::entry() noexcept {
   Q_ASSERT(mUndoCmdActive == false);
 
   mAdapter.fsmToolEnter(*this);
@@ -70,7 +78,7 @@ bool SchematicEditorState_AddNetLabel::entry() noexcept {
   return true;
 }
 
-bool SchematicEditorState_AddNetLabel::exit() noexcept {
+bool SchematicEditorState_AddLabel::exit() noexcept {
   if (!abortCommand(true)) {
     return false;
   }
@@ -85,34 +93,41 @@ bool SchematicEditorState_AddNetLabel::exit() noexcept {
  *  Event Handlers
  ******************************************************************************/
 
-bool SchematicEditorState_AddNetLabel::processRotate(
+bool SchematicEditorState_AddLabel::processRotate(
     const Angle& rotation) noexcept {
-  if (mUndoCmdActive && mCurrentNetLabel && mEditCmd) {
-    mEditCmd->rotate(rotation, mCurrentNetLabel->getPosition(), true);
+  if (mUndoCmdActive && mCurrentNetLabel && mNetLabelEditCmd) {
+    mNetLabelEditCmd->rotate(rotation, mCurrentNetLabel->getPosition(), true);
+    return true;
+  } else if (mUndoCmdActive && mCurrentBusLabel && mBusLabelEditCmd) {
+    mBusLabelEditCmd->rotate(rotation, mCurrentBusLabel->getPosition(), true);
     return true;
   }
 
   return false;
 }
 
-bool SchematicEditorState_AddNetLabel::processMirror(
+bool SchematicEditorState_AddLabel::processMirror(
     Qt::Orientation orientation) noexcept {
-  if (mUndoCmdActive && mCurrentNetLabel && mEditCmd) {
-    mEditCmd->mirror(orientation, mCurrentNetLabel->getPosition(), true);
+  if (mUndoCmdActive && mCurrentNetLabel && mNetLabelEditCmd) {
+    mNetLabelEditCmd->mirror(orientation, mCurrentNetLabel->getPosition(),
+                             true);
+    return true;
+  } else if (mUndoCmdActive && mCurrentBusLabel && mBusLabelEditCmd) {
+    mBusLabelEditCmd->mirror(orientation, mCurrentBusLabel->getPosition(),
+                             true);
     return true;
   }
 
   return false;
 }
 
-bool SchematicEditorState_AddNetLabel::processGraphicsSceneMouseMoved(
+bool SchematicEditorState_AddLabel::processGraphicsSceneMouseMoved(
     const GraphicsSceneMouseEvent& e) noexcept {
   return updateLabel(e.scenePos);
 }
 
-bool SchematicEditorState_AddNetLabel::
-    processGraphicsSceneLeftMouseButtonPressed(
-        const GraphicsSceneMouseEvent& e) noexcept {
+bool SchematicEditorState_AddLabel::processGraphicsSceneLeftMouseButtonPressed(
+    const GraphicsSceneMouseEvent& e) noexcept {
   if (mUndoCmdActive) {
     return fixLabel(e.scenePos);
   } else {
@@ -120,7 +135,7 @@ bool SchematicEditorState_AddNetLabel::
   }
 }
 
-bool SchematicEditorState_AddNetLabel::
+bool SchematicEditorState_AddLabel::
     processGraphicsSceneLeftMouseButtonDoubleClicked(
         const GraphicsSceneMouseEvent& e) noexcept {
   if (mUndoCmdActive) {
@@ -130,16 +145,20 @@ bool SchematicEditorState_AddNetLabel::
   }
 }
 
-bool SchematicEditorState_AddNetLabel::
+bool SchematicEditorState_AddLabel::
     processGraphicsSceneRightMouseButtonReleased(
         const GraphicsSceneMouseEvent& e) noexcept {
   Q_UNUSED(e);
 
-  if (mUndoCmdActive && mCurrentNetLabel && mEditCmd) {
-    mEditCmd->rotate(Angle::deg90(), mCurrentNetLabel->getPosition(), true);
-
-    // Always accept the event if we are placing a net label! When ignoring the
-    // event, the state machine will abort the tool by a right click!
+  // Note: Always accept the event if we are placing a net label! When ignoring
+  // the event, the state machine will abort the tool by a right click!
+  if (mUndoCmdActive && mCurrentNetLabel && mNetLabelEditCmd) {
+    mNetLabelEditCmd->rotate(Angle::deg90(), mCurrentNetLabel->getPosition(),
+                             true);
+    return true;
+  } else if (mUndoCmdActive && mCurrentBusLabel && mBusLabelEditCmd) {
+    mBusLabelEditCmd->rotate(Angle::deg90(), mCurrentBusLabel->getPosition(),
+                             true);
     return true;
   }
 
@@ -150,39 +169,52 @@ bool SchematicEditorState_AddNetLabel::
  *  Private Methods
  ******************************************************************************/
 
-bool SchematicEditorState_AddNetLabel::addLabel(const Point& pos) noexcept {
+bool SchematicEditorState_AddLabel::addLabel(const Point& pos) noexcept {
   // Discard any temporary changes and release undo stack.
   abortBlockingToolsInOtherEditors();
 
   Q_ASSERT(mUndoCmdActive == false);
 
   try {
-    std::shared_ptr<SGI_NetLine> netlineUnderCursor =
-        findItemAtPos<SGI_NetLine>(
-            pos, FindFlag::NetLines | FindFlag::AcceptNearestWithinGrid);
-    if (!netlineUnderCursor) return false;
-    SI_NetSegment& netsegment =
-        netlineUnderCursor->getNetLine().getNetSegment();
+    if (std::shared_ptr<SGI_BusLine> line = findItemAtPos<SGI_BusLine>(
+            pos, FindFlag::BusLines | FindFlag::AcceptNearestWithinGrid)) {
+      mContext.undoStack.beginCmdGroup(tr("Add Bus Label to Schematic"));
+      mUndoCmdActive = true;
 
-    mContext.undoStack.beginCmdGroup(tr("Add Net Label to Schematic"));
-    mUndoCmdActive = true;
-    SI_NetLabel* netLabel = new SI_NetLabel(
-        netsegment,
-        NetLabel(Uuid::createRandom(), pos.mappedToGrid(getGridInterval()),
-                 Angle::deg0(), false));
-    CmdSchematicNetLabelAdd* cmdAdd = new CmdSchematicNetLabelAdd(*netLabel);
-    mContext.undoStack.appendToCmdGroup(cmdAdd);
-    mCurrentNetLabel = netLabel;
-    mEditCmd = new CmdSchematicNetLabelEdit(*mCurrentNetLabel);
+      SI_BusLabel* busLabel = new SI_BusLabel(
+          line->getBusLine().getBusSegment(),
+          NetLabel(Uuid::createRandom(), pos.mappedToGrid(getGridInterval()),
+                   Angle::deg0(), false));
+      CmdSchematicBusLabelAdd* cmdAdd = new CmdSchematicBusLabelAdd(*busLabel);
+      mContext.undoStack.appendToCmdGroup(cmdAdd);
+      mCurrentBusLabel = busLabel;
+      mBusLabelEditCmd = new CmdSchematicBusLabelEdit(*mCurrentBusLabel);
+    } else if (std::shared_ptr<SGI_NetLine> line = findItemAtPos<SGI_NetLine>(
+                   pos,
+                   FindFlag::NetLines | FindFlag::AcceptNearestWithinGrid)) {
+      mContext.undoStack.beginCmdGroup(tr("Add Net Label to Schematic"));
+      mUndoCmdActive = true;
+
+      SI_NetLabel* netLabel = new SI_NetLabel(
+          line->getNetLine().getNetSegment(),
+          NetLabel(Uuid::createRandom(), pos.mappedToGrid(getGridInterval()),
+                   Angle::deg0(), false));
+      CmdSchematicNetLabelAdd* cmdAdd = new CmdSchematicNetLabelAdd(*netLabel);
+      mContext.undoStack.appendToCmdGroup(cmdAdd);
+      mCurrentNetLabel = netLabel;
+      mNetLabelEditCmd = new CmdSchematicNetLabelEdit(*mCurrentNetLabel);
+
+      // Highlight all elements of the current netsignal.
+      mAdapter.fsmSetHighlightedNetSignals(
+          {&line->getNetLine().getNetSegment().getNetSignal()});
+    } else {
+      return false;
+    }
 
     // Allow some actions.
     mAdapter.fsmSetFeatures(SchematicEditorFsmAdapter::Features(
         SchematicEditorFsmAdapter::Feature::Rotate |
         SchematicEditorFsmAdapter::Feature::Mirror));
-
-    // Highlight all elements of the current netsignal.
-    mAdapter.fsmSetHighlightedNetSignals({&netsegment.getNetSignal()});
-
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
@@ -191,23 +223,35 @@ bool SchematicEditorState_AddNetLabel::addLabel(const Point& pos) noexcept {
   }
 }
 
-bool SchematicEditorState_AddNetLabel::updateLabel(const Point& pos) noexcept {
-  if (mUndoCmdActive) {
-    mEditCmd->setPosition(pos.mappedToGrid(getGridInterval()), true);
+bool SchematicEditorState_AddLabel::updateLabel(const Point& pos) noexcept {
+  if (mUndoCmdActive && mNetLabelEditCmd) {
+    mNetLabelEditCmd->setPosition(pos.mappedToGrid(getGridInterval()), true);
+    return true;
+  } else if (mUndoCmdActive && mBusLabelEditCmd) {
+    mBusLabelEditCmd->setPosition(pos.mappedToGrid(getGridInterval()), true);
     return true;
   } else {
     return false;
   }
 }
 
-bool SchematicEditorState_AddNetLabel::fixLabel(const Point& pos) noexcept {
+bool SchematicEditorState_AddLabel::fixLabel(const Point& pos) noexcept {
   if (!mUndoCmdActive) return false;
 
   try {
-    mEditCmd->setPosition(pos.mappedToGrid(getGridInterval()), false);
-    mContext.undoStack.appendToCmdGroup(mEditCmd);
+    if (mNetLabelEditCmd) {
+      mNetLabelEditCmd->setPosition(pos.mappedToGrid(getGridInterval()), false);
+      mContext.undoStack.appendToCmdGroup(mNetLabelEditCmd);
+    } else if (mBusLabelEditCmd) {
+      mBusLabelEditCmd->setPosition(pos.mappedToGrid(getGridInterval()), false);
+      mContext.undoStack.appendToCmdGroup(mBusLabelEditCmd);
+    }
     mContext.undoStack.commitCmdGroup();
     mUndoCmdActive = false;
+    mCurrentNetLabel = nullptr;
+    mNetLabelEditCmd = nullptr;
+    mCurrentBusLabel = nullptr;
+    mBusLabelEditCmd = nullptr;
     mAdapter.fsmSetFeatures(SchematicEditorFsmAdapter::Features());
     mAdapter.fsmSetHighlightedNetSignals({});
     return true;
@@ -218,8 +262,7 @@ bool SchematicEditorState_AddNetLabel::fixLabel(const Point& pos) noexcept {
   }
 }
 
-bool SchematicEditorState_AddNetLabel::abortCommand(
-    bool showErrMsgBox) noexcept {
+bool SchematicEditorState_AddLabel::abortCommand(bool showErrMsgBox) noexcept {
   try {
     mAdapter.fsmSetFeatures(SchematicEditorFsmAdapter::Features());
     mAdapter.fsmSetHighlightedNetSignals({});
@@ -227,6 +270,10 @@ bool SchematicEditorState_AddNetLabel::abortCommand(
       mContext.undoStack.abortCmdGroup();  // can throw
       mUndoCmdActive = false;
     }
+    mCurrentNetLabel = nullptr;
+    mNetLabelEditCmd = nullptr;
+    mCurrentBusLabel = nullptr;
+    mBusLabelEditCmd = nullptr;
     return true;
   } catch (const Exception& e) {
     if (showErrMsgBox) {

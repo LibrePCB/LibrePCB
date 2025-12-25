@@ -24,12 +24,15 @@
 
 #include "../../library/cmp/component.h"
 #include "../../library/cmp/componentsignal.h"
+#include "../circuit/bus.h"
 #include "../circuit/circuit.h"
 #include "../circuit/componentinstance.h"
 #include "../circuit/componentsignalinstance.h"
 #include "../circuit/netclass.h"
 #include "../circuit/netsignal.h"
 #include "../project.h"
+#include "../schematic/items/si_busjunction.h"
+#include "../schematic/items/si_bussegment.h"
 #include "../schematic/items/si_netpoint.h"
 #include "../schematic/items/si_netsegment.h"
 #include "../schematic/items/si_symbol.h"
@@ -65,6 +68,7 @@ RuleCheckMessageList ElectricalRuleCheck::runChecks() const {
   RuleCheckMessageList msgs;
   checkNetClasses(msgs);
   checkNetSignals(msgs);
+  checkBuses(msgs);
   checkComponents(msgs);
   checkSchematics(msgs);
   return msgs;
@@ -110,6 +114,41 @@ void ElectricalRuleCheck::checkNetSignals(RuleCheckMessageList& msgs) const {
   }
 }
 
+void ElectricalRuleCheck::checkBuses(RuleCheckMessageList& msgs) const {
+  foreach (const Bus* bus, mProject.getCircuit().getBuses()) {
+    if (!bus->isUsed()) {
+      msgs.append(std::make_shared<ErcMsgUnusedBus>(*bus));
+    }
+
+    // Collect all connected net segments.
+    QHash<const NetSignal*, QVector<const SI_NetSegment*>> netSegments;
+    QSet<const NetSignal*> unnamedNets;
+    for (const SI_BusSegment* bs : bus->getSchematicBusSegments()) {
+      for (const SI_NetSegment* ns : bs->getAttachedNetSegments()) {
+        netSegments[&ns->getNetSignal()].append(ns);
+        if (ns->getNetLabels().isEmpty()) {
+          unnamedNets.insert(&ns->getNetSignal());
+        }
+      }
+    }
+
+    // Warn about net segments without net label.
+    for (const NetSignal* net : unnamedNets) {
+      const SI_NetSegment* ns = netSegments.value(net).value(0);
+      Q_ASSERT(ns);
+      msgs.append(std::make_shared<ErcMsgUnnamedNetInBus>(*bus, *ns));
+    }
+
+    // Warn about nets which are attached only once to the bus.
+    for (auto it = netSegments.begin(); it != netSegments.end(); it++) {
+      if ((it.value().count() == 1) && (!unnamedNets.contains(it.key()))) {
+        msgs.append(
+            std::make_shared<ErcMsgOpenNetInBus>(*bus, *it.value().first()));
+      }
+    }
+  }
+}
+
 void ElectricalRuleCheck::checkComponents(RuleCheckMessageList& msgs) const {
   foreach (const ComponentInstance* cmp,
            mProject.getCircuit().getComponentInstances()) {
@@ -148,6 +187,7 @@ void ElectricalRuleCheck::checkSchematics(RuleCheckMessageList& msgs) const {
   foreach (const Schematic* schematic, mProject.getSchematics()) {
     checkSymbols(*schematic, msgs);
     checkNetSegments(*schematic, msgs);
+    checkBusSegments(*schematic, msgs);
   }
 }
 
@@ -193,6 +233,22 @@ void ElectricalRuleCheck::checkNetPoints(const SI_NetSegment& netSegment,
   foreach (const SI_NetPoint* netPoint, netSegment.getNetPoints()) {
     if (netPoint->getNetLines().isEmpty()) {
       msgs.append(std::make_shared<ErcMsgUnconnectedJunction>(*netPoint));
+    }
+  }
+}
+
+void ElectricalRuleCheck::checkBusSegments(const Schematic& schematic,
+                                           RuleCheckMessageList& msgs) const {
+  foreach (const SI_BusSegment* segment, schematic.getBusSegments()) {
+    checkBusJunctions(*segment, msgs);
+  }
+}
+
+void ElectricalRuleCheck::checkBusJunctions(const SI_BusSegment& segment,
+                                            RuleCheckMessageList& msgs) const {
+  foreach (const SI_BusJunction* bj, segment.getJunctions()) {
+    if (bj->getBusLines().isEmpty()) {
+      msgs.append(std::make_shared<ErcMsgUnconnectedJunction>(*bj));
     }
   }
 }

@@ -35,11 +35,13 @@
  ******************************************************************************/
 namespace librepcb {
 
+class Bus;
 class ComponentInstance;
 class ComponentSignalInstance;
 class ComponentSymbolVariantItem;
 class NetClass;
 class NetSignal;
+class SI_BusJunction;
 class SI_NetLine;
 class SI_NetPoint;
 class SI_NetSegment;
@@ -86,6 +88,7 @@ protected:
   bool setLocation(const SI_NetSegment& segment) noexcept;
   void setLocation(const SI_NetPoint& netPoint) noexcept;
   void setLocation(const SI_NetLine& netLine) noexcept;
+  void setLocation(const SI_BusJunction& junction) noexcept;
 
   std::optional<Uuid> mSchematic;
 };
@@ -110,6 +113,24 @@ public:
 };
 
 /*******************************************************************************
+ *  Class ErcMsgUnusedBus
+ ******************************************************************************/
+
+/**
+ * @brief The ErcMsgUnusedBus class
+ */
+class ErcMsgUnusedBus final : public ErcMsgBase {
+  Q_DECLARE_TR_FUNCTIONS(ErcMsgUnusedBus)
+
+public:
+  // Constructors / Destructor
+  ErcMsgUnusedBus() = delete;
+  explicit ErcMsgUnusedBus(const Bus& bus) noexcept;
+  ErcMsgUnusedBus(const ErcMsgUnusedBus& other) noexcept : ErcMsgBase(other) {}
+  virtual ~ErcMsgUnusedBus() noexcept {}
+};
+
+/*******************************************************************************
  *  Class ErcMsgOpenNet
  ******************************************************************************/
 
@@ -125,6 +146,46 @@ public:
   explicit ErcMsgOpenNet(const NetSignal& net) noexcept;
   ErcMsgOpenNet(const ErcMsgOpenNet& other) noexcept : ErcMsgBase(other) {}
   virtual ~ErcMsgOpenNet() noexcept {}
+};
+
+/*******************************************************************************
+ *  Class ErcMsgOpenNetInBus
+ ******************************************************************************/
+
+/**
+ * @brief The ErcMsgOpenNetInBus class
+ */
+class ErcMsgOpenNetInBus final : public ErcMsgBase {
+  Q_DECLARE_TR_FUNCTIONS(ErcMsgOpenNetInBus)
+
+public:
+  // Constructors / Destructor
+  ErcMsgOpenNetInBus() = delete;
+  explicit ErcMsgOpenNetInBus(const Bus& bus,
+                              const SI_NetSegment& netSegment) noexcept;
+  ErcMsgOpenNetInBus(const ErcMsgOpenNetInBus& other) noexcept
+    : ErcMsgBase(other) {}
+  virtual ~ErcMsgOpenNetInBus() noexcept {}
+};
+
+/*******************************************************************************
+ *  Class ErcMsgUnnamedNetInBus
+ ******************************************************************************/
+
+/**
+ * @brief The ErcMsgUnnamedNetInBus class
+ */
+class ErcMsgUnnamedNetInBus final : public ErcMsgBase {
+  Q_DECLARE_TR_FUNCTIONS(ErcMsgUnnamedNetInBus)
+
+public:
+  // Constructors / Destructor
+  ErcMsgUnnamedNetInBus() = delete;
+  explicit ErcMsgUnnamedNetInBus(const Bus& bus,
+                                 const SI_NetSegment& netSegment) noexcept;
+  ErcMsgUnnamedNetInBus(const ErcMsgUnnamedNetInBus& other) noexcept
+    : ErcMsgBase(other) {}
+  virtual ~ErcMsgUnnamedNetInBus() noexcept {}
 };
 
 /*******************************************************************************
@@ -268,6 +329,7 @@ public:
   // Constructors / Destructor
   ErcMsgUnconnectedJunction() = delete;
   explicit ErcMsgUnconnectedJunction(const SI_NetPoint& netPoint) noexcept;
+  explicit ErcMsgUnconnectedJunction(const SI_BusJunction& junction) noexcept;
   ErcMsgUnconnectedJunction(const ErcMsgUnconnectedJunction& other) noexcept
     : ErcMsgBase(other) {}
   virtual ~ErcMsgUnconnectedJunction() noexcept {}

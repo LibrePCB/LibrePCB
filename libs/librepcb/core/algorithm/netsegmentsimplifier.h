@@ -60,7 +60,7 @@ public:
   enum class AnchorType : int {
     // Value is important for the sort algorithm, do not change!
     Via = 0,
-    PinOrPad = 1,
+    Fixed = 1,
     Junction = 2,
   };
   struct Line {
@@ -74,7 +74,7 @@ public:
   struct Result {
     QList<Line> lines;
     QMap<int, Point> newJunctions;
-    QSet<int> disconnectedPinsOrPads;
+    QSet<int> disconnectedFixedAnchors;
     bool modified = false;
   };
 
@@ -154,7 +154,7 @@ private:
   };
 
   // Methods
-  QSet<int> getConnectedPinsOrPads() const noexcept;
+  QSet<int> getConnectedFixedAnchors() const noexcept;
   void addJunctionsAtLineIntersections() noexcept;
   void splitLinesAtAnchors() noexcept;
   void removeDuplicateJunctions() noexcept;

@@ -79,8 +79,8 @@ SGI_NetLabel::SGI_NetLabel(SI_NetLabel& netlabel,
   // create anchor graphics item
   mAnchorGraphicsItem.reset(new LineGraphicsItem());
   mAnchorGraphicsItem->setZValue(SchematicGraphicsScene::ZValue_NetLabels);
-  mAnchorGraphicsItem->setLayer(
-      layers.get(Theme::Color::sSchematicNetLabelAnchors));
+  mAnchorGraphicsItem->setLayer(layers.get(Theme::Color::sSchematicReferences));
+  mAnchorGraphicsItem->setSelected(isSelected());
 
   updatePosition();
   updateRotation();
@@ -110,7 +110,8 @@ void SGI_NetLabel::paint(QPainter* painter,
   const qreal lod =
       option->levelOfDetailFromTransform(painter->worldTransform());
   const bool highlight = option->state.testFlag(QStyle::State_Selected) ||
-      mHighlightedNetSignals->contains(&mNetLabel.getNetSignalOfNetSegment());
+      mHighlightedNetSignals->contains(
+          &mNetLabel.getNetSegment().getNetSignal());
 
   if (mOriginCrossLayer && mOriginCrossLayer->isVisible() && (lod > 2)) {
     // draw origin cross
@@ -148,6 +149,8 @@ QVariant SGI_NetLabel::itemChange(GraphicsItemChange change,
     if (QGraphicsScene* s = scene()) {
       s->addItem(mAnchorGraphicsItem.data());
     }
+  } else if ((change == ItemSelectedHasChanged) && mAnchorGraphicsItem) {
+    mAnchorGraphicsItem->setSelected(value.toBool());
   }
   return QGraphicsItem::itemChange(change, value);
 }
@@ -203,9 +206,9 @@ void SGI_NetLabel::updateText() noexcept {
 
   QString displayText;
   const QFontMetricsF fm(mFont);
-  OverlineMarkupParser::process(*mNetLabel.getNetSignalOfNetSegment().getName(),
-                                fm, flags, displayText, mOverlines,
-                                mBoundingRect);
+  OverlineMarkupParser::process(
+      *mNetLabel.getNetSegment().getNetSignal().getName(), fm, flags,
+      displayText, mOverlines, mBoundingRect);
 
   mStaticText.setText(displayText);
   mStaticText.prepare(QTransform(), mFont);

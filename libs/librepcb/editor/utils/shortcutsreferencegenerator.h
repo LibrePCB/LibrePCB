@@ -105,8 +105,8 @@ private:  // Data
   static constexpr qreal sPageWidth = 270;
   static constexpr qreal sPageHeight = 190;
   static constexpr qreal sCategoryTextSize = 3;
-  static constexpr qreal sRowTextSize = 2.5;
-  static constexpr qreal sRowHeight = 3;
+  static constexpr qreal sRowTextSize = 2.4;
+  static constexpr qreal sRowHeight = 2.9;
   static constexpr qreal sCategorySpacing = 5;
   static constexpr qreal sColumnSpacing = 3.5;
   static constexpr qreal sColumnWidth = (sPageWidth - 3 * sColumnSpacing) / 4;

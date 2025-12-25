@@ -24,6 +24,9 @@
 
 #include "../../graphics/imagegraphicsitem.h"
 #include "../../graphics/polygongraphicsitem.h"
+#include "graphicsitems/sgi_busjunction.h"
+#include "graphicsitems/sgi_buslabel.h"
+#include "graphicsitems/sgi_busline.h"
 #include "graphicsitems/sgi_netlabel.h"
 #include "graphicsitems/sgi_netline.h"
 #include "graphicsitems/sgi_netpoint.h"
@@ -32,6 +35,10 @@
 #include "graphicsitems/sgi_text.h"
 
 #include <librepcb/core/project/project.h>
+#include <librepcb/core/project/schematic/items/si_busjunction.h>
+#include <librepcb/core/project/schematic/items/si_buslabel.h>
+#include <librepcb/core/project/schematic/items/si_busline.h>
+#include <librepcb/core/project/schematic/items/si_bussegment.h>
 #include <librepcb/core/project/schematic/items/si_image.h>
 #include <librepcb/core/project/schematic/items/si_netlabel.h>
 #include <librepcb/core/project/schematic/items/si_netline.h>
@@ -68,6 +75,9 @@ SchematicGraphicsScene::SchematicGraphicsScene(
   foreach (SI_Symbol* obj, mSchematic.getSymbols()) {
     addSymbol(*obj);
   }
+  foreach (SI_BusSegment* obj, mSchematic.getBusSegments()) {
+    addBusSegment(*obj);
+  }
   foreach (SI_NetSegment* obj, mSchematic.getNetSegments()) {
     addNetSegment(*obj);
   }
@@ -85,6 +95,10 @@ SchematicGraphicsScene::SchematicGraphicsScene(
           &SchematicGraphicsScene::addSymbol);
   connect(&mSchematic, &Schematic::symbolRemoved, this,
           &SchematicGraphicsScene::removeSymbol);
+  connect(&mSchematic, &Schematic::busSegmentAdded, this,
+          &SchematicGraphicsScene::addBusSegment);
+  connect(&mSchematic, &Schematic::busSegmentRemoved, this,
+          &SchematicGraphicsScene::removeBusSegment);
   connect(&mSchematic, &Schematic::netSegmentAdded, this,
           &SchematicGraphicsScene::addNetSegment);
   connect(&mSchematic, &Schematic::netSegmentRemoved, this,
@@ -118,6 +132,15 @@ SchematicGraphicsScene::~SchematicGraphicsScene() noexcept {
   foreach (SI_NetLine* obj, mNetLines.keys()) {
     removeNetLine(*obj);
   }
+  foreach (SI_BusLabel* obj, mBusLabels.keys()) {
+    removeBusLabel(*obj);
+  }
+  foreach (SI_BusLine* obj, mBusLines.keys()) {
+    removeBusLine(*obj);
+  }
+  foreach (SI_BusJunction* obj, mBusJunctions.keys()) {
+    removeBusJunction(*obj);
+  }
   foreach (SI_NetPoint* obj, mNetPoints.keys()) {
     removeNetPoint(*obj);
   }
@@ -141,6 +164,15 @@ void SchematicGraphicsScene::selectAll() noexcept {
     item->setSelected(true);
   }
   foreach (auto item, mSymbolPins) {
+    item->setSelected(true);
+  }
+  foreach (auto item, mBusJunctions) {
+    item->setSelected(true);
+  }
+  foreach (auto item, mBusLines) {
+    item->setSelected(true);
+  }
+  foreach (auto item, mBusLabels) {
     item->setSelected(true);
   }
   foreach (auto item, mNetPoints) {
@@ -192,6 +224,15 @@ void SchematicGraphicsScene::selectItemsInRect(const Point& p1,
     item->setSelected(symbolSelected ||
                       item->mapToScene(item->shape()).intersects(rectPx));
   }
+  foreach (auto item, mBusJunctions) {
+    item->setSelected(item->mapToScene(item->shape()).intersects(rectPx));
+  }
+  foreach (auto item, mBusLines) {
+    item->setSelected(item->mapToScene(item->shape()).intersects(rectPx));
+  }
+  foreach (auto item, mBusLabels) {
+    item->setSelected(item->mapToScene(item->shape()).intersects(rectPx));
+  }
   foreach (auto item, mNetPoints) {
     item->setSelected(item->mapToScene(item->shape()).intersects(rectPx));
   }
@@ -223,6 +264,15 @@ void SchematicGraphicsScene::clearSelection() noexcept {
     item->setSelected(false);
   }
   foreach (auto item, mSymbolPins) {
+    item->setSelected(false);
+  }
+  foreach (auto item, mBusJunctions) {
+    item->setSelected(false);
+  }
+  foreach (auto item, mBusLines) {
+    item->setSelected(false);
+  }
+  foreach (auto item, mBusLabels) {
     item->setSelected(false);
   }
   foreach (auto item, mNetPoints) {
@@ -315,6 +365,117 @@ void SchematicGraphicsScene::addSymbolPin(
 
 void SchematicGraphicsScene::removeSymbolPin(SI_SymbolPin& pin) noexcept {
   if (std::shared_ptr<SGI_SymbolPin> item = mSymbolPins.take(&pin)) {
+    removeItem(*item);
+  } else {
+    Q_ASSERT(false);
+  }
+}
+
+void SchematicGraphicsScene::addBusSegment(SI_BusSegment& segment) noexcept {
+  foreach (SI_BusJunction* obj, segment.getJunctions()) {
+    addBusJunction(*obj);
+  }
+  foreach (SI_BusLine* obj, segment.getLines()) {
+    addBusLine(*obj);
+  }
+  foreach (SI_BusLabel* obj, segment.getLabels()) {
+    addBusLabel(*obj);
+  }
+  connect(&segment, &SI_BusSegment::junctionsAndLinesAdded, this,
+          &SchematicGraphicsScene::addBusJunctionsAndLines);
+  connect(&segment, &SI_BusSegment::junctionsAndLinesRemoved, this,
+          &SchematicGraphicsScene::removeBusJunctionsAndLines);
+  connect(&segment, &SI_BusSegment::labelAdded, this,
+          &SchematicGraphicsScene::addBusLabel);
+  connect(&segment, &SI_BusSegment::labelRemoved, this,
+          &SchematicGraphicsScene::removeBusLabel);
+}
+
+void SchematicGraphicsScene::removeBusSegment(SI_BusSegment& segment) noexcept {
+  disconnect(&segment, &SI_BusSegment::junctionsAndLinesAdded, this,
+             &SchematicGraphicsScene::addBusJunctionsAndLines);
+  disconnect(&segment, &SI_BusSegment::junctionsAndLinesRemoved, this,
+             &SchematicGraphicsScene::removeBusJunctionsAndLines);
+  disconnect(&segment, &SI_BusSegment::labelAdded, this,
+             &SchematicGraphicsScene::addBusLabel);
+  disconnect(&segment, &SI_BusSegment::labelRemoved, this,
+             &SchematicGraphicsScene::removeBusLabel);
+  foreach (SI_BusJunction* obj, segment.getJunctions()) {
+    removeBusJunction(*obj);
+  }
+  foreach (SI_BusLine* obj, segment.getLines()) {
+    removeBusLine(*obj);
+  }
+  foreach (SI_BusLabel* obj, segment.getLabels()) {
+    removeBusLabel(*obj);
+  }
+}
+
+void SchematicGraphicsScene::addBusJunctionsAndLines(
+    const QList<SI_BusJunction*>& junctions,
+    const QList<SI_BusLine*>& lines) noexcept {
+  foreach (SI_BusJunction* obj, junctions) {
+    addBusJunction(*obj);
+  }
+  foreach (SI_BusLine* obj, lines) {
+    addBusLine(*obj);
+  }
+}
+
+void SchematicGraphicsScene::removeBusJunctionsAndLines(
+    const QList<SI_BusJunction*>& junctions,
+    const QList<SI_BusLine*>& lines) noexcept {
+  foreach (SI_BusJunction* obj, junctions) {
+    removeBusJunction(*obj);
+  }
+  foreach (SI_BusLine* obj, lines) {
+    removeBusLine(*obj);
+  }
+}
+
+void SchematicGraphicsScene::addBusJunction(SI_BusJunction& junction) noexcept {
+  Q_ASSERT(!mBusJunctions.contains(&junction));
+  std::shared_ptr<SGI_BusJunction> item =
+      std::make_shared<SGI_BusJunction>(junction, mLayers);
+  addItem(*item);
+  mBusJunctions.insert(&junction, item);
+}
+
+void SchematicGraphicsScene::removeBusJunction(
+    SI_BusJunction& junction) noexcept {
+  if (std::shared_ptr<SGI_BusJunction> item = mBusJunctions.take(&junction)) {
+    removeItem(*item);
+  } else {
+    Q_ASSERT(false);
+  }
+}
+
+void SchematicGraphicsScene::addBusLine(SI_BusLine& line) noexcept {
+  Q_ASSERT(!mBusLines.contains(&line));
+  std::shared_ptr<SGI_BusLine> item =
+      std::make_shared<SGI_BusLine>(line, mLayers);
+  addItem(*item);
+  mBusLines.insert(&line, item);
+}
+
+void SchematicGraphicsScene::removeBusLine(SI_BusLine& line) noexcept {
+  if (std::shared_ptr<SGI_BusLine> item = mBusLines.take(&line)) {
+    removeItem(*item);
+  } else {
+    Q_ASSERT(false);
+  }
+}
+
+void SchematicGraphicsScene::addBusLabel(SI_BusLabel& label) noexcept {
+  Q_ASSERT(!mBusLabels.contains(&label));
+  std::shared_ptr<SGI_BusLabel> item =
+      std::make_shared<SGI_BusLabel>(label, mLayers);
+  addItem(*item);
+  mBusLabels.insert(&label, item);
+}
+
+void SchematicGraphicsScene::removeBusLabel(SI_BusLabel& label) noexcept {
+  if (std::shared_ptr<SGI_BusLabel> item = mBusLabels.take(&label)) {
     removeItem(*item);
   } else {
     Q_ASSERT(false);

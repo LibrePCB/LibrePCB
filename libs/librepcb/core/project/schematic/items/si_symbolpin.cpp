@@ -31,6 +31,7 @@
 #include "../../circuit/componentsignalinstance.h"
 #include "../../circuit/netsignal.h"
 #include "../schematic.h"
+#include "si_netsegment.h"
 #include "si_symbol.h"
 
 #include <QtCore>
@@ -124,13 +125,14 @@ void SI_SymbolPin::registerNetLine(SI_NetLine& netline) {
       (netline.getSchematic() != mSchematic)) {
     throw LogicError(__FILE__, __LINE__);
   }
-  if (&netline.getNetSignalOfNetSegment() != getCompSigInstNetSignal()) {
+  NetSignal& net = netline.getNetSegment().getNetSignal();
+  if (&net != getCompSigInstNetSignal()) {
     throw RuntimeError(
         __FILE__, __LINE__,
         QString("Line of net \"%1\" is not allowed to be connected to "
                 "pin \"%2\" of component \"%3\" (%4) since it is connected "
                 "to the net \"%5\".")
-            .arg(*netline.getNetSignalOfNetSegment().getName(),
+            .arg(*net.getName(),
                  *mComponentSignalInstance.getCompSignal().getName(),
                  *mSymbol.getComponentInstance().getName(),
                  getLibraryComponentName(), getNetSignalName()));

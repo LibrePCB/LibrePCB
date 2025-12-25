@@ -26,6 +26,9 @@
 #include "../../../graphics/polygongraphicsitem.h"
 #include "../../../undostack.h"
 #include "../../../widgets/graphicsview.h"
+#include "../graphicsitems/sgi_busjunction.h"
+#include "../graphicsitems/sgi_buslabel.h"
+#include "../graphicsitems/sgi_busline.h"
 #include "../graphicsitems/sgi_netlabel.h"
 #include "../graphicsitems/sgi_netline.h"
 #include "../graphicsitems/sgi_netpoint.h"
@@ -37,6 +40,9 @@
 
 #include <librepcb/core/geometry/polygon.h>
 #include <librepcb/core/project/project.h>
+#include <librepcb/core/project/schematic/items/si_busjunction.h>
+#include <librepcb/core/project/schematic/items/si_buslabel.h>
+#include <librepcb/core/project/schematic/items/si_busline.h>
 #include <librepcb/core/project/schematic/items/si_image.h>
 #include <librepcb/core/project/schematic/items/si_netlabel.h>
 #include <librepcb/core/project/schematic/items/si_netline.h>
@@ -141,8 +147,11 @@ QList<std::shared_ptr<QGraphicsItem>> SchematicEditorState::findItemsAtPos(
   //
   //    0: visible netpoints
   //   10: hidden netpoints
+  //   15: bus junctions
   //   20: netlines
   //   30: netlabels
+  //   34: bus lines
+  //   36: bus labels
   //   40: pins
   //   50: symbols with origin close to cursor
   //   60: texts
@@ -221,6 +230,34 @@ QList<std::shared_ptr<QGraphicsItem>> SchematicEditorState::findItemsAtPos(
     }
     return false;
   };
+
+  if (flags.testFlag(FindFlag::BusJunctions)) {
+    for (auto it = scene->getBusJunctions().begin();
+         it != scene->getBusJunctions().end(); it++) {
+      processItem(it.value(), it.value(), it.key()->getPosition(), 15, false,
+                  std::nullopt);
+    }
+  }
+
+  if (flags.testFlag(FindFlag::BusLines)) {
+    for (auto it = scene->getBusLines().begin();
+         it != scene->getBusLines().end(); it++) {
+      processItem(
+          it.value(), it.value(),
+          Toolbox::nearestPointOnLine(pos.mappedToGrid(getGridInterval()),
+                                      it.key()->getP1().getPosition(),
+                                      it.key()->getP2().getPosition()),
+          34, true, std::nullopt);  // Large grab area, better usability!
+    }
+  }
+
+  if (flags.testFlag(FindFlag::BusLabels)) {
+    for (auto it = scene->getBusLabels().begin();
+         it != scene->getBusLabels().end(); it++) {
+      processItem(it.value(), it.value(), it.key()->getPosition(), 36, false,
+                  std::nullopt);
+    }
+  }
 
   if (flags.testFlag(FindFlag::NetPoints)) {
     for (auto it = scene->getNetPoints().begin();

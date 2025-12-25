@@ -47,8 +47,10 @@ SchematicClipboardData::SchematicClipboardData(
     mSchematicUuid(schematicUuid),
     mCursorPos(cursorPos),
     mAssemblyVariants(assemblyVariants),
+    mBuses(),
     mComponentInstances(),
     mSymbolInstances(),
+    mBusSegments(),
     mNetSegments(),
     mPolygons(),
     mTexts(),
@@ -64,8 +66,10 @@ SchematicClipboardData::SchematicClipboardData(const QByteArray& mimeData)
   mSchematicUuid = deserialize<Uuid>(root->getChild("schematic/@0"));
   mCursorPos = Point(root->getChild("cursor_position"));
   mAssemblyVariants.loadFromSExpression(*root);
+  mBuses.loadFromSExpression(*root);
   mComponentInstances.loadFromSExpression(*root);
   mSymbolInstances.loadFromSExpression(*root);
+  mBusSegments.loadFromSExpression(*root);
   mNetSegments.loadFromSExpression(*root);
   mPolygons.loadFromSExpression(*root);
   mTexts.loadFromSExpression(*root);
@@ -104,9 +108,13 @@ std::unique_ptr<QMimeData> SchematicClipboardData::toMimeData() const {
   root->ensureLineBreak();
   mAssemblyVariants.serialize(*root);
   root->ensureLineBreak();
+  mBuses.serialize(*root);
+  root->ensureLineBreak();
   mComponentInstances.serialize(*root);
   root->ensureLineBreak();
   mSymbolInstances.serialize(*root);
+  root->ensureLineBreak();
+  mBusSegments.serialize(*root);
   root->ensureLineBreak();
   mNetSegments.serialize(*root);
   root->ensureLineBreak();

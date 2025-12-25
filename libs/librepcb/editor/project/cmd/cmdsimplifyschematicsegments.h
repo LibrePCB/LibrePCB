@@ -17,13 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_CMDREMOVEUNUSEDNETSIGNALS_H
-#define LIBREPCB_EDITOR_CMDREMOVEUNUSEDNETSIGNALS_H
+#ifndef LIBREPCB_EDITOR_CMDSIMPLIFYSCHEMATICSEGMENTS_H
+#define LIBREPCB_EDITOR_CMDSIMPLIFYSCHEMATICSEGMENTS_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
 #include "../../undocommandgroup.h"
+
+#include <librepcb/core/geometry/netline.h>
 
 #include <QtCore>
 
@@ -32,36 +34,50 @@
  ******************************************************************************/
 namespace librepcb {
 
-class Circuit;
-class NetSignal;
+class Point;
+class SI_BusJunction;
+class SI_BusSegment;
+class SI_NetLineAnchor;
+class SI_NetSegment;
 
 namespace editor {
 
 /*******************************************************************************
- *  Class CmdRemoveUnusedNetSignals
+ *  Class CmdSimplifySchematicSegments
  ******************************************************************************/
 
 /**
- * @brief The CmdRemoveUnusedNetSignals class
+ * @brief Undo command which runs ::librepcb::NetSegmentSimplifier on several
+ *        ::librepcb::SI_NetSegment and ::librepcb::SI_BusSegment
  */
-class CmdRemoveUnusedNetSignals final : public UndoCommandGroup {
+class CmdSimplifySchematicSegments final : public UndoCommandGroup {
 public:
   // Constructors / Destructor
-  CmdRemoveUnusedNetSignals(Circuit& circuit) noexcept;
-  ~CmdRemoveUnusedNetSignals() noexcept;
+  CmdSimplifySchematicSegments() = delete;
+  CmdSimplifySchematicSegments(const CmdSimplifySchematicSegments& other) =
+      delete;
+  explicit CmdSimplifySchematicSegments(
+      const QSet<SI_NetSegment*>& netSegments,
+      const QSet<SI_BusSegment*>& busSegments) noexcept;
+  ~CmdSimplifySchematicSegments() noexcept;
 
-private:
-  // Private Methods
+  // Operator Overloadings
+  CmdSimplifySchematicSegments& operator=(
+      const CmdSimplifySchematicSegments& rhs) = delete;
 
+private:  // Methods
   /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
   bool performExecute() override;
 
-  bool buildAndExecuteChildCommands();
+  void simplifySegment(SI_BusSegment& segment);
+  void simplifySegment(SI_NetSegment& segment);
 
-  // Private Member Variables
+private:  // Data
+  QSet<SI_NetSegment*> mNetSegments;
+  QSet<SI_BusSegment*> mBusSegments;
 
-  // Attributes from the constructor
-  Circuit& mCircuit;
+  QSet<SI_NetSegment*> mTemporarilyRemovedNetSegments;
+  QHash<SI_BusJunction*, SI_BusJunction*> mReplacedBusJunctions;
 };
 
 /*******************************************************************************
