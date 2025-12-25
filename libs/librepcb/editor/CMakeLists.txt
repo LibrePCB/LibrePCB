@@ -816,10 +816,12 @@ add_library(
   project/schematic/fsm/schematiceditorstate_addcomponent.h
   project/schematic/fsm/schematiceditorstate_addimage.cpp
   project/schematic/fsm/schematiceditorstate_addimage.h
-  project/schematic/fsm/schematiceditorstate_addnetlabel.cpp
-  project/schematic/fsm/schematiceditorstate_addnetlabel.h
+  project/schematic/fsm/schematiceditorstate_addlabel.cpp
+  project/schematic/fsm/schematiceditorstate_addlabel.h
   project/schematic/fsm/schematiceditorstate_addtext.cpp
   project/schematic/fsm/schematiceditorstate_addtext.h
+  project/schematic/fsm/schematiceditorstate_drawbus.cpp
+  project/schematic/fsm/schematiceditorstate_drawbus.h
   project/schematic/fsm/schematiceditorstate_drawpolygon.cpp
   project/schematic/fsm/schematiceditorstate_drawpolygon.h
   project/schematic/fsm/schematiceditorstate_drawwire.cpp
@@ -846,6 +848,9 @@ add_library(
   project/schematic/graphicsitems/sgi_symbolpin.h
   project/schematic/graphicsitems/sgi_text.cpp
   project/schematic/graphicsitems/sgi_text.h
+  project/schematic/renamebussegmentdialog.cpp
+  project/schematic/renamebussegmentdialog.h
+  project/schematic/renamebussegmentdialog.ui
   project/schematic/renamenetsegmentdialog.cpp
   project/schematic/renamenetsegmentdialog.h
   project/schematic/renamenetsegmentdialog.ui

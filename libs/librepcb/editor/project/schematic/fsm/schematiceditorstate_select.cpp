@@ -38,9 +38,11 @@
 #include "../../cmd/cmdpasteschematicitems.h"
 #include "../../cmd/cmdremoveselectedschematicitems.h"
 #include "../../cmd/cmdsimplifyschematicsegments.h"
+#include "../graphicsitems/sgi_buslabel.h"
 #include "../graphicsitems/sgi_netlabel.h"
 #include "../graphicsitems/sgi_symbol.h"
 #include "../graphicsitems/sgi_text.h"
+#include "../renamebussegmentdialog.h"
 #include "../renamenetsegmentdialog.h"
 #include "../schematicclipboarddatabuilder.h"
 #include "../schematicgraphicsscene.h"
@@ -262,12 +264,17 @@ bool SchematicEditorState_Select::processEditProperties() noexcept {
 
   SchematicSelectionQuery query(*scene);
   query.addSelectedSymbols();
+  query.addSelectedBusLabels();
   query.addSelectedNetLabels();
   query.addSelectedPolygons();
   query.addSelectedSchematicTexts();
   query.addSelectedSymbolTexts();
   foreach (auto ptr, query.getSymbols()) {
     openSymbolPropertiesDialog(*ptr);
+    return true;
+  }
+  foreach (auto ptr, query.getBusLabels()) {
+    openBusLabelPropertiesDialog(*ptr);
     return true;
   }
   foreach (auto ptr, query.getNetLabels()) {
@@ -1071,6 +1078,9 @@ bool SchematicEditorState_Select::openPropertiesDialog(
   if (auto symbol = std::dynamic_pointer_cast<SGI_Symbol>(item)) {
     openSymbolPropertiesDialog(symbol->getSymbol());
     return true;
+  } else if (auto label = std::dynamic_pointer_cast<SGI_BusLabel>(item)) {
+    openBusLabelPropertiesDialog(label->getBusLabel());
+    return true;
   } else if (auto netLabel = std::dynamic_pointer_cast<SGI_NetLabel>(item)) {
     openNetLabelPropertiesDialog(netLabel->getNetLabel());
     return true;
@@ -1092,6 +1102,13 @@ void SchematicEditorState_Select::openSymbolPropertiesDialog(
       symbol, mContext.undoStack, getLengthUnit(),
       "schematic_editor/symbol_properties_dialog", parentWidget());
   dialog.exec();
+}
+
+void SchematicEditorState_Select::openBusLabelPropertiesDialog(
+    SI_BusLabel& label) noexcept {
+  RenameBusSegmentDialog dialog(mContext.undoStack, label.getBusSegment(),
+                                parentWidget());
+  dialog.exec();  // performs the rename, if needed
 }
 
 void SchematicEditorState_Select::openNetLabelPropertiesDialog(

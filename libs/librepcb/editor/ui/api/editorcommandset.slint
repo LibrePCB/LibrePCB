@@ -1074,11 +1074,21 @@ export global EditorCommandSet {
         key: "w",
     };
 
-    in property <EditorCommand> tool-netlabel: {
-        id: "tool_netlabel",
+    in property <EditorCommand> tool-bus: {
+        id: "tool_bus",
+        icon: @image-url(""),
+        text: "Draw Bus",
+        status-tip: "Draw buses to route several related nets with a single wire",
+        shortcut: "B",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "b",
+    };
+
+    in property <EditorCommand> tool-label: {
+        id: "tool_label",
         icon: @image-url("../../../../font-awesome/svgs/solid/tag.svg"),
-        text: "Add Net Label",
-        status-tip: "Add net labels to explicitly specify the net of wires",
+        text: "Add Label to Net or Bus",
+        status-tip: "Add labels to explicitly specify the net or bus of wires",
         shortcut: "N",
         modifiers: { alt: false, control: false, shift: false, meta: false },
         key: "n",

@@ -44,6 +44,7 @@ Files:
  img/actions/add_tht_pad.png
  img/actions/add_value.png
  img/actions/board_editor.png
+ img/actions/draw_bus.png
  img/actions/draw_wire.png
  img/actions/export_pick_place_file.png
  img/actions/grid.png

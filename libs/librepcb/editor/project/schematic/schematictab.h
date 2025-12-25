@@ -136,7 +136,8 @@ public:
   void fsmToolLeave() noexcept override;
   void fsmToolEnter(SchematicEditorState_Select& state) noexcept override;
   void fsmToolEnter(SchematicEditorState_DrawWire& state) noexcept override;
-  void fsmToolEnter(SchematicEditorState_AddNetLabel& state) noexcept override;
+  void fsmToolEnter(SchematicEditorState_DrawBus& state) noexcept override;
+  void fsmToolEnter(SchematicEditorState_AddLabel& state) noexcept override;
   void fsmToolEnter(SchematicEditorState_AddComponent& state) noexcept override;
   void fsmToolEnter(SchematicEditorState_DrawPolygon& state) noexcept override;
   void fsmToolEnter(SchematicEditorState_AddText& state) noexcept override;

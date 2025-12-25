@@ -38,6 +38,7 @@ namespace librepcb {
 
 class Angle;
 class Polygon;
+class SI_BusLabel;
 class SI_Image;
 class SI_NetLabel;
 class SI_Polygon;
@@ -123,6 +124,7 @@ private:  // Methods
   bool findImageHandleAtPosition(const Point& pos) noexcept;
   bool openPropertiesDialog(std::shared_ptr<QGraphicsItem> item) noexcept;
   void openSymbolPropertiesDialog(SI_Symbol& symbol) noexcept;
+  void openBusLabelPropertiesDialog(SI_BusLabel& label) noexcept;
   void openNetLabelPropertiesDialog(SI_NetLabel& netlabel) noexcept;
   void openPolygonPropertiesDialog(Polygon& polygon) noexcept;
   void openTextPropertiesDialog(Text& text) noexcept;

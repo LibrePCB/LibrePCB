@@ -6,6 +6,9 @@ import { Tab } from "../../tab.slint";
 import {
     Button,
     LinkText,
+    MenuItem,
+    MenuPopup,
+    MenuSeparator,
     MessageBox,
     SceneButton,
     ToolButton,
@@ -105,6 +108,11 @@ export component SchematicTab inherits Tab {
                 padding: 3px;
 
                 if tabs[index].tool == EditorTool.wire: wire-toolbar := DrawWireToolBar {
+                    section-index: section-index;
+                    section: section;
+                }
+
+                if tabs[index].tool == EditorTool.bus: bus-toolbar := DrawWireToolBar {
                     section-index: section-index;
                     section: section;
                 }
@@ -244,14 +252,45 @@ export component SchematicTab inherits Tab {
                 clicked => {
                     tool-triggered(TabAction.tool-wire);
                 }
-            }
 
-            tool-netlabel-btn := ToolButton {
-                cmd: Cmd.tool-netlabel;
-                checked: tabs[index].tool == EditorTool.netlabel;
+                tool-bus-btn := ToolButton {
+                    cmd: Cmd.tool-bus;
+                    icon: @image-url("../../../../../../img/actions/draw_bus.png");
+                    has-menu: project.buses.length > 0;
+                    checked: tabs[index].tool == EditorTool.bus;
 
-                clicked => {
-                    tool-triggered(TabAction.tool-netlabel);
+                    clicked => {
+                        tool-triggered(TabAction.tool-bus);
+                    }
+
+                    right-clicked => {
+                        if project.buses.length > 0 {
+                            buses-popup.show();
+                        }
+                    }
+
+                    buses-popup := MenuPopup {
+                        x: parent.width + 5px;
+                        y: 0;
+
+                        for bus in project.buses: tool-bus-existing-item := MenuItem {
+                            text: bus.name;
+                            icon: @image-url("../../../../../font-awesome/svgs/solid/angle-right.svg");
+
+                            clicked => {
+                                tabs[index].new-bus-uuid = bus.uuid;
+                            }
+                        }
+                    }
+                }
+
+                tool-label-btn := ToolButton {
+                    cmd: Cmd.tool-label;
+                    checked: tabs[index].tool == EditorTool.label;
+
+                    clicked => {
+                        tool-triggered(TabAction.tool-label);
+                    }
                 }
             }
 
@@ -262,23 +301,23 @@ export component SchematicTab inherits Tab {
                 clicked => {
                     tool-triggered(TabAction.tool-polygon);
                 }
-            }
 
-            tool-text-btn := ToolButton {
-                cmd: Cmd.tool-text;
-                checked: tabs[index].tool == EditorTool.text;
+                tool-text-btn := ToolButton {
+                    cmd: Cmd.tool-text;
+                    checked: tabs[index].tool == EditorTool.text;
 
-                clicked => {
-                    tool-triggered(TabAction.tool-text);
+                    clicked => {
+                        tool-triggered(TabAction.tool-text);
+                    }
                 }
-            }
 
-            tool-image-btn := ToolButton {
-                cmd: Cmd.tool-image;
-                checked: tabs[index].tool == EditorTool.image;
+                tool-image-btn := ToolButton {
+                    cmd: Cmd.tool-image;
+                    checked: tabs[index].tool == EditorTool.image;
 
-                clicked => {
-                    tool-triggered(TabAction.tool-image);
+                    clicked => {
+                        tool-triggered(TabAction.tool-image);
+                    }
                 }
             }
 

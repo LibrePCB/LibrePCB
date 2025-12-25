@@ -48,6 +48,8 @@
 #include <librepcb/core/fileio/fileutils.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/project/board/board.h>
+#include <librepcb/core/project/circuit/bus.h>
+#include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/erc/electricalrulecheck.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/schematic/schematic.h>
@@ -80,6 +82,7 @@ ProjectEditor::ProjectEditor(
     mUiIndex(uiIndex),
     mUseIeee315Symbols(false),
     mMigrationLog(migrationLog),
+    mBuses(new slint::VectorModel<ui::BusData>()),
     mSchematics(new UiObjectList<SchematicEditor, ui::SchematicData>()),
     mBoards(new UiObjectList<BoardEditor, ui::BoardData>()),
     mUndoStack(new UndoStack()),
@@ -90,6 +93,15 @@ ProjectEditor::ProjectEditor(
     mManualModificationsMade(false),
     mLastAutosaveStateId(mUndoStack->getUniqueStateId()),
     mAutoSaveTimer() {
+  // Update buses.
+  connect(&mProject->getCircuit(), &Circuit::busAdded, this,
+          &ProjectEditor::refreshBuses);
+  connect(&mProject->getCircuit(), &Circuit::busRemoved, this,
+          &ProjectEditor::refreshBuses);
+  connect(&mProject->getCircuit(), &Circuit::busRenamed, this,
+          &ProjectEditor::refreshBuses);
+  refreshBuses();
+
   // Populate schematics.
   auto updateSchematicIndices = [this]() {
     for (int i = 0; i < mSchematics->count(); ++i) {
@@ -256,6 +268,7 @@ ui::ProjectData ProjectEditor::getUiData() const noexcept {
       mProject->getDirectory().isWritable(),  // Writable
       mUseIeee315Symbols,  // Use IEEE315 symbols
       mManualModificationsMade || (!mUndoStack->isClean()),  // Unsaved changes
+      mBuses,
       ui::RuleCheckData{
           ui::RuleCheckType::Erc,  // Type
           mErcMessages ? ui::RuleCheckState::UpToDate
@@ -752,6 +765,24 @@ void ProjectEditor::projectSettingsChanged() noexcept {
     }
   }
   onUiDataChanged.notify();
+}
+
+void ProjectEditor::refreshBuses() noexcept {
+  // Note: At the moment we only show buses which have a manual name assigned
+  // because this is what we need in the schematic editor UI. Whenever we need
+  // to list all buses for another use-case, we have to implement a proper
+  // filter.
+  mBuses->clear();
+  QVector<Bus*> buses = mProject->getCircuit().getBuses().values();
+  Toolbox::sortNumeric(buses, [](const QCollator& comp, Bus* a, Bus* b) {
+    return comp(*a->getName(), *b->getName());
+  });
+  for (const Bus* bus : buses) {
+    if (!bus->hasAutoName()) {
+      mBuses->push_back(
+          ui::BusData{q2s(bus->getUuid().toStr()), q2s(*bus->getName())});
+    }
+  }
 }
 
 /*******************************************************************************

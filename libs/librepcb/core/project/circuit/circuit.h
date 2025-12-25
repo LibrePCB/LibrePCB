@@ -161,6 +161,7 @@ signals:
   void netSignalRemoved(NetSignal& netsignal);
   void busAdded(Bus& bus);
   void busRemoved(Bus& bus);
+  void busRenamed(Bus& bus);
   void componentAdded(ComponentInstance& cmp);
   void componentRemoved(ComponentInstance& cmp);
   void netClassDesignRulesModified();

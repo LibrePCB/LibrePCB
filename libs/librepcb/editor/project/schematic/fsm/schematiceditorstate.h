@@ -63,16 +63,19 @@ public:
 
   enum class FindFlag {
     // Item types
-    NetPoints = (1 << 0),
-    NetLines = (1 << 1),
-    NetLabels = (1 << 2),
-    Symbols = (1 << 3),
-    SymbolPins = (1 << 4),
-    Polygons = (1 << 5),
-    Texts = (1 << 6),
-    Images = (1 << 7),
-    All = NetPoints | NetLines | NetLabels | Symbols | SymbolPins | Polygons |
-        Texts | Images,
+    BusJunctions = (1 << 0),
+    BusLines = (1 << 1),
+    BusLabels = (1 << 2),
+    NetPoints = (1 << 3),
+    NetLines = (1 << 4),
+    NetLabels = (1 << 5),
+    Symbols = (1 << 6),
+    SymbolPins = (1 << 7),
+    Polygons = (1 << 8),
+    Texts = (1 << 9),
+    Images = (1 << 10),
+    All = BusJunctions | BusLines | BusLabels | NetPoints | NetLines |
+        NetLabels | Symbols | SymbolPins | Polygons | Texts | Images,
 
     // Match behavior
     AcceptNearMatch = (1 << 10),

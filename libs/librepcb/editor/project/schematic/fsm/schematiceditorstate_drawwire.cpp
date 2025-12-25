@@ -30,19 +30,28 @@
 #include "../../cmd/cmdnetclassadd.h"
 #include "../../cmd/cmdnetsignaladd.h"
 #include "../../cmd/cmdnetsignaledit.h"
+#include "../../cmd/cmdschematicbussegmentaddelements.h"
+#include "../../cmd/cmdschematicbussegmentremoveelements.h"
+#include "../../cmd/cmdschematicnetlabeladd.h"
 #include "../../cmd/cmdschematicnetsegmentadd.h"
 #include "../../cmd/cmdschematicnetsegmentaddelements.h"
 #include "../../cmd/cmdschematicnetsegmentremoveelements.h"
 #include "../../cmd/cmdsimplifyschematicsegments.h"
+#include "../graphicsitems/sgi_busjunction.h"
+#include "../graphicsitems/sgi_busline.h"
 #include "../graphicsitems/sgi_netline.h"
 #include "../graphicsitems/sgi_netpoint.h"
 #include "../graphicsitems/sgi_symbolpin.h"
 #include "../schematicgraphicsscene.h"
 
+#include <librepcb/core/project/circuit/bus.h>
 #include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/circuit/componentsignalinstance.h>
 #include <librepcb/core/project/circuit/netsignal.h>
 #include <librepcb/core/project/project.h>
+#include <librepcb/core/project/schematic/items/si_busjunction.h>
+#include <librepcb/core/project/schematic/items/si_bussegment.h>
+#include <librepcb/core/project/schematic/items/si_netlabel.h>
 #include <librepcb/core/project/schematic/items/si_netpoint.h>
 #include <librepcb/core/project/schematic/items/si_netsegment.h>
 #include <librepcb/core/project/schematic/items/si_symbolpin.h>
@@ -72,7 +81,8 @@ SchematicEditorState_DrawWire::SchematicEditorState_DrawWire(
     mPositioningNetLine1(nullptr),
     mPositioningNetPoint1(nullptr),
     mPositioningNetLine2(nullptr),
-    mPositioningNetPoint2(nullptr) {
+    mPositioningNetPoint2(nullptr),
+    mPositioningNetLabel(nullptr) {
 }
 
 SchematicEditorState_DrawWire::~SchematicEditorState_DrawWire() noexcept {
@@ -175,13 +185,14 @@ bool SchematicEditorState_DrawWire::processGraphicsSceneLeftMouseButtonPressed(
 
   mCursorPos = e.scenePos;
   const bool snap = !e.modifiers.testFlag(Qt::ShiftModifier);
+  const bool interactive = !e.modifiers.testFlag(Qt::ControlModifier);
 
   if (mSubState == SubState::IDLE) {
     // start adding netpoints/netlines
-    return startPositioning(*scene, snap);
+    return startPositioning(*scene, snap, interactive);
   } else if (mSubState == SubState::POSITIONING_NETPOINT) {
     // fix the current point and add a new point + line
-    return addNextNetPoint(*scene, snap);
+    return addNextNetPoint(*scene, snap, interactive);
   }
 
   return false;
@@ -195,10 +206,11 @@ bool SchematicEditorState_DrawWire::
 
   mCursorPos = e.scenePos;
   const bool snap = !e.modifiers.testFlag(Qt::ShiftModifier);
+  const bool interactive = !e.modifiers.testFlag(Qt::ControlModifier);
 
   if (mSubState == SubState::POSITIONING_NETPOINT) {
     // fix the current point and add a new point + line
-    return addNextNetPoint(*scene, snap);
+    return addNextNetPoint(*scene, snap, interactive);
   }
 
   return false;
@@ -241,13 +253,18 @@ void SchematicEditorState_DrawWire::setWireMode(WireMode mode) noexcept {
  ******************************************************************************/
 
 bool SchematicEditorState_DrawWire::startPositioning(
-    SchematicGraphicsScene& scene, bool snap,
+    SchematicGraphicsScene& scene, bool snap, bool interactive,
     SI_NetPoint* fixedPoint) noexcept {
   try {
     // start a new undo command
     Q_ASSERT(mSubState == SubState::IDLE);
     mContext.undoStack.beginCmdGroup(tr("Draw Wire"));
     mSubState = SubState::POSITIONING_NETPOINT;
+    mPositioningNetPoint1 = nullptr;
+    mPositioningNetLine1 = nullptr;
+    mPositioningNetPoint2 = nullptr;
+    mPositioningNetLine2 = nullptr;
+    mPositioningNetLabel = nullptr;
 
     // determine the fixed anchor (create one if it doesn't exist already)
     NetSignal* netsignal = nullptr;
@@ -260,6 +277,9 @@ bool SchematicEditorState_DrawWire::startPositioning(
         mFixedStartAnchor = fixedPoint;
         mCurrentNetSegment = &fixedPoint->getNetSegment();
         pos = fixedPoint->getPosition();
+      } else if (auto bj = std::dynamic_pointer_cast<SGI_BusJunction>(item)) {
+        mFixedStartAnchor = &bj->getBusJunction();
+        pos = bj->getBusJunction().getPosition();
       } else if (auto netpoint =
                      std::dynamic_pointer_cast<SGI_NetPoint>(item)) {
         mFixedStartAnchor = &netpoint->getNetPoint();
@@ -283,6 +303,22 @@ bool SchematicEditorState_DrawWire::startPositioning(
                  "not a valid net name.")
                   .arg(name));
         }
+      } else if (auto bl = std::dynamic_pointer_cast<SGI_BusLine>(item)) {
+        // split bus line
+        SI_BusSegment& segment = bl->getBusLine().getBusSegment();
+        std::unique_ptr<CmdSchematicBusSegmentAddElements> cmdAdd(
+            new CmdSchematicBusSegmentAddElements(segment));
+        SI_BusJunction* bj = cmdAdd->addJunction(Toolbox::nearestPointOnLine(
+            pos, bl->getBusLine().getP1().getPosition(),
+            bl->getBusLine().getP2().getPosition()));
+        cmdAdd->addLine(*bj, bl->getBusLine().getP1());
+        cmdAdd->addLine(*bj, bl->getBusLine().getP2());
+        mContext.undoStack.appendToCmdGroup(cmdAdd.release());  // can throw
+        std::unique_ptr<CmdSchematicBusSegmentRemoveElements> cmdRemove(
+            new CmdSchematicBusSegmentRemoveElements(segment));
+        cmdRemove->removeLine(bl->getBusLine());
+        mContext.undoStack.appendToCmdGroup(cmdRemove.release());  // can throw
+        mFixedStartAnchor = bj;
       } else if (auto netline = std::dynamic_pointer_cast<SGI_NetLine>(item)) {
         // split netline
         mCurrentNetSegment = &netline->getNetLine().getNetSegment();
@@ -304,6 +340,20 @@ bool SchematicEditorState_DrawWire::startPositioning(
     // find netsignal if name is given
     if (forcedNetName) {
       netsignal = mCircuit.getNetSignalByName(**forcedNetName);
+    }
+
+    // If clicking on a bus (without pressing CTRL), show a menu to choose
+    // the net signal to break out from the bus.
+    bool addNetLabel = false;
+    if (SI_BusJunction* bj = dynamic_cast<SI_BusJunction*>(mFixedStartAnchor)) {
+      if (interactive) {
+        if (auto ns = determineNetForBusMember(*bj)) {
+          netsignal = *ns;
+          addNetLabel = true;
+        } else {
+          throw UserCanceled(__FILE__, __LINE__);
+        }
+      }
     }
 
     // create new netsignal if none found
@@ -338,6 +388,15 @@ bool SchematicEditorState_DrawWire::startPositioning(
           new CmdSchematicNetSegmentAdd(scene.getSchematic(), *netsignal);
       mContext.undoStack.appendToCmdGroup(cmd);  // can throw
       mCurrentNetSegment = cmd->getNetSegment();
+      // Add net label, if required.
+      if (addNetLabel) {
+        mPositioningNetLabel = new SI_NetLabel(
+            *mCurrentNetSegment,
+            NetLabel(Uuid::createRandom(), pos, Angle::deg0(), false));
+        CmdSchematicNetLabelAdd* cmdLabel =
+            new CmdSchematicNetLabelAdd(*mPositioningNetLabel);
+        mContext.undoStack.appendToCmdGroup(cmdLabel);
+      }
     }
 
     // add netpoint if none found
@@ -350,21 +409,13 @@ bool SchematicEditorState_DrawWire::startPositioning(
     Q_ASSERT(mFixedStartAnchor);
 
     // add more netpoints & netlines
-    SI_NetPoint* p2 = cmd->addNetPoint(pos);
-    Q_ASSERT(p2);  // second netpoint
-    SI_NetLine* l1 = cmd->addNetLine(*mFixedStartAnchor, *p2);
-    Q_ASSERT(l1);  // first netline
-    SI_NetPoint* p3 = cmd->addNetPoint(pos);
-    Q_ASSERT(p3);  // third netpoint
-    SI_NetLine* l2 = cmd->addNetLine(*p2, *p3);
-    Q_ASSERT(l2);  // second netline
+    mPositioningNetPoint1 = cmd->addNetPoint(pos);
+    mPositioningNetLine1 =
+        cmd->addNetLine(*mFixedStartAnchor, *mPositioningNetPoint1);
+    mPositioningNetPoint2 = cmd->addNetPoint(pos);
+    mPositioningNetLine2 =
+        cmd->addNetLine(*mPositioningNetPoint1, *mPositioningNetPoint2);
     mContext.undoStack.appendToCmdGroup(cmd);  // can throw
-
-    // update members
-    mPositioningNetPoint1 = p2;
-    mPositioningNetLine1 = l1;
-    mPositioningNetPoint2 = p3;
-    mPositioningNetLine2 = l2;
 
     // properly place the new netpoints/netlines according the current wire mode
     updateNetpointPositions(snap);
@@ -373,17 +424,18 @@ bool SchematicEditorState_DrawWire::startPositioning(
     mAdapter.fsmSetHighlightedNetSignals({&mCurrentNetSegment->getNetSignal()});
 
     return true;
+  } catch (const UserCanceled& e) {
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
-    if (mSubState != SubState::IDLE) {
-      abortPositioning(false, false);
-    }
-    return false;
   }
+  if (mSubState != SubState::IDLE) {
+    abortPositioning(false, false);
+  }
+  return false;
 }
 
 bool SchematicEditorState_DrawWire::addNextNetPoint(
-    SchematicGraphicsScene& scene, bool snap) noexcept {
+    SchematicGraphicsScene& scene, bool snap, bool interactive) noexcept {
   Q_ASSERT(mSubState == SubState::POSITIONING_NETPOINT);
 
   // Snap to the item under the cursor and make sure the lines are up to date.
@@ -399,7 +451,7 @@ bool SchematicEditorState_DrawWire::addNextNetPoint(
     try {
       // create a new undo command group to make all changes atomic
       QScopedPointer<UndoCommandGroup> cmdGroup(
-          new UndoCommandGroup("Add schematic netline"));
+          new UndoCommandGroup("Draw Wire"));
 
       // remove p1 if p1 == p0 || p1 == p2
       if ((mPositioningNetPoint1->getPosition() ==
@@ -432,7 +484,10 @@ bool SchematicEditorState_DrawWire::addNextNetPoint(
                          scene.getNetPoints().value(mPositioningNetPoint2),
                          scene.getNetLines().value(mPositioningNetLine2),
                      });
-        if (auto netpoint = std::dynamic_pointer_cast<SGI_NetPoint>(item)) {
+        if (auto bj = std::dynamic_pointer_cast<SGI_BusJunction>(item)) {
+          otherAnchor = &bj->getBusJunction();
+        } else if (auto netpoint =
+                       std::dynamic_pointer_cast<SGI_NetPoint>(item)) {
           otherAnchor = &netpoint->getNetPoint();
           otherNetSegment = &netpoint->getNetPoint().getNetSegment();
         } else if (auto pin = std::dynamic_pointer_cast<SGI_SymbolPin>(item)) {
@@ -447,6 +502,21 @@ bool SchematicEditorState_DrawWire::addNextNetPoint(
                                      .getComponentSignalInstance()
                                      .getForcedNetSignalName();
           }
+        } else if (auto bl = std::dynamic_pointer_cast<SGI_BusLine>(item)) {
+          // split bus line
+          SI_BusSegment& segment = bl->getBusLine().getBusSegment();
+          std::unique_ptr<CmdSchematicBusSegmentAddElements> cmdAdd(
+              new CmdSchematicBusSegmentAddElements(segment));
+          SI_BusJunction* bj = cmdAdd->addJunction(pos);
+          cmdAdd->addLine(*bj, bl->getBusLine().getP1());
+          cmdAdd->addLine(*bj, bl->getBusLine().getP2());
+          mContext.undoStack.appendToCmdGroup(cmdAdd.release());  // can throw
+          std::unique_ptr<CmdSchematicBusSegmentRemoveElements> cmdRemove(
+              new CmdSchematicBusSegmentRemoveElements(segment));
+          cmdRemove->removeLine(bl->getBusLine());
+          mContext.undoStack.appendToCmdGroup(
+              cmdRemove.release());  // can throw
+          otherAnchor = bj;
         } else if (auto netline =
                        std::dynamic_pointer_cast<SGI_NetLine>(item)) {
           // split netline
@@ -462,6 +532,31 @@ bool SchematicEditorState_DrawWire::addNextNetPoint(
           cmdRemove->removeNetLine(netline->getNetLine());
           mContext.undoStack.appendToCmdGroup(
               cmdRemove.release());  // can throw
+        }
+      }
+
+      // If clicking on a bus (without pressing CTRL), show a menu to choose
+      // the net signal and add a net label to the current segment.
+      if (SI_BusJunction* bj = dynamic_cast<SI_BusJunction*>(otherAnchor)) {
+        SI_NetSegment& seg = mPositioningNetLine2->getNetSegment();
+        if (mFixedStartAnchor && mPositioningNetPoint1 &&
+            seg.getNetLabels().isEmpty()) {
+          if ((!seg.getNetSignal().isNameForced()) && interactive) {
+            if (auto opt = determineNetForBusMember(*bj)) {
+              if (NetSignal* ns = *opt) {
+                otherForcedNetName = *ns->getName();
+              }
+            } else {
+              throw UserCanceled(__FILE__, __LINE__);
+            }
+          }
+          mPositioningNetLabel = new SI_NetLabel(
+              seg, NetLabel(Uuid::createRandom(), pos, Angle::deg0(), false));
+          CmdSchematicNetLabelAdd* cmdLabel =
+              new CmdSchematicNetLabelAdd(*mPositioningNetLabel);
+          mContext.undoStack.appendToCmdGroup(cmdLabel);
+          updateNetLabelPosition(mFixedStartAnchor->getPosition(),
+                                 mPositioningNetPoint1->getPosition());
         }
       }
 
@@ -555,9 +650,13 @@ bool SchematicEditorState_DrawWire::addNextNetPoint(
         finishCommand = false;
       }
     } catch (const UserCanceled& e) {
+      // Discard any temporary changes, e.g. the splitting of bus lines
+      // or the merging of net segment lines.
+      abortPositioning(false, true);
       return false;
     } catch (const Exception& e) {
       QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
+      abortPositioning(false, true);  // Discard any temporary changes.
       return false;
     }
 
@@ -572,7 +671,7 @@ bool SchematicEditorState_DrawWire::addNextNetPoint(
         abortPositioning(true, true);
         return false;
       } else {
-        return startPositioning(scene, snap, mPositioningNetPoint2);
+        return startPositioning(scene, snap, true, mPositioningNetPoint2);
       }
     } catch (const Exception& e) {
       QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
@@ -599,6 +698,7 @@ bool SchematicEditorState_DrawWire::abortPositioning(
     mPositioningNetLine2 = nullptr;
     mPositioningNetPoint1 = nullptr;
     mPositioningNetPoint2 = nullptr;
+    mPositioningNetLabel = nullptr;
     mContext.undoStack.abortCmdGroup();  // can throw
     success = true;
   } catch (const Exception& e) {
@@ -624,11 +724,12 @@ std::shared_ptr<QGraphicsItem> SchematicEditorState_DrawWire::findItem(
     const Point& pos,
     const QVector<std::shared_ptr<QGraphicsItem>>& except) noexcept {
   // Only find pins which are connected to a component signal!
-  return findItemAtPos<QGraphicsItem>(pos,
-                                      FindFlag::NetPoints | FindFlag::NetLines |
-                                          FindFlag::SymbolPins |
-                                          FindFlag::AcceptNearestWithinGrid,
-                                      except);
+  return findItemAtPos<QGraphicsItem>(
+      pos,
+      FindFlag::BusJunctions | FindFlag::BusLines | FindFlag::NetPoints |
+          FindFlag::NetLines | FindFlag::SymbolPins |
+          FindFlag::AcceptNearestWithinGrid,
+      except);
 }
 
 Point SchematicEditorState_DrawWire::updateNetpointPositions(
@@ -636,6 +737,10 @@ Point SchematicEditorState_DrawWire::updateNetpointPositions(
   // Find anchor under cursor.
   Point pos = mCursorPos.mappedToGrid(getGridInterval());
   SchematicGraphicsScene* scene = getActiveSchematicScene();
+  WireMode wireMode = mCurrentWireMode;
+  if (dynamic_cast<SI_BusJunction*>(mFixedStartAnchor)) {
+    wireMode = WireMode::Deg4590;
+  }
   if (snap && scene) {
     std::shared_ptr<QGraphicsItem> item =
         findItem(mCursorPos,
@@ -645,7 +750,15 @@ Point SchematicEditorState_DrawWire::updateNetpointPositions(
                      scene->getNetLines().value(mPositioningNetLine1),
                      scene->getNetLines().value(mPositioningNetLine2),
                  });
-    if (auto netPoint = std::dynamic_pointer_cast<SGI_NetPoint>(item)) {
+    if (auto bj = std::dynamic_pointer_cast<SGI_BusJunction>(item)) {
+      pos = bj->getBusJunction().getPosition();
+      wireMode = WireMode::Deg9045;
+    } else if (auto bl = std::dynamic_pointer_cast<SGI_BusLine>(item)) {
+      pos = Toolbox::nearestPointOnLine(pos,
+                                        bl->getBusLine().getP1().getPosition(),
+                                        bl->getBusLine().getP2().getPosition());
+      wireMode = WireMode::Deg9045;
+    } else if (auto netPoint = std::dynamic_pointer_cast<SGI_NetPoint>(item)) {
       pos = netPoint->getNetPoint().getPosition();
     } else if (auto pin = std::dynamic_pointer_cast<SGI_SymbolPin>(item)) {
       pos = pin->getPin().getPosition();
@@ -658,10 +771,33 @@ Point SchematicEditorState_DrawWire::updateNetpointPositions(
     }
   }
 
-  mPositioningNetPoint1->setPosition(calcMiddlePointPos(
-      mFixedStartAnchor->getPosition(), pos, mCurrentWireMode));
-  mPositioningNetPoint2->setPosition(pos);
+  // All pointers should be valid, but let's be on the safe side.
+  Point middlePos = pos;
+  if (mFixedStartAnchor && mPositioningNetPoint1) {
+    middlePos =
+        calcMiddlePointPos(mFixedStartAnchor->getPosition(), pos, wireMode);
+    mPositioningNetPoint1->setPosition(middlePos);
+  }
+  if (mPositioningNetPoint2) {
+    mPositioningNetPoint2->setPosition(pos);
+  }
+  if (mFixedStartAnchor) {
+    const Point startPos = mFixedStartAnchor->getPosition();
+    updateNetLabelPosition(pos, (middlePos != pos) ? middlePos : startPos);
+  }
   return pos;
+}
+
+void SchematicEditorState_DrawWire::updateNetLabelPosition(
+    const Point& pos, const Point& dirPos) noexcept {
+  if (mPositioningNetLabel) {
+    const Angle dir =
+        Toolbox::angleBetweenPoints(pos, dirPos).rounded(Angle::deg90());
+    const bool mirror = dir.mappedTo0_360deg() >= Angle::deg180();
+    mPositioningNetLabel->setPosition(pos);
+    mPositioningNetLabel->setRotation(mirror ? (dir + Angle::deg180()) : dir);
+    mPositioningNetLabel->setMirrored(mirror);
+  }
 }
 
 Point SchematicEditorState_DrawWire::calcMiddlePointPos(
@@ -696,6 +832,42 @@ Point SchematicEditorState_DrawWire::calcMiddlePointPos(
       Q_ASSERT(false);
       return Point();
   }
+}
+
+std::optional<NetSignal*>
+    SchematicEditorState_DrawWire::determineNetForBusMember(
+        SI_BusJunction& junction) const noexcept {
+  const Bus& bus = junction.getBusSegment().getBus();
+  QVector<NetSignal*> nets = Toolbox::toVector(bus.getConnectedNetSignals());
+  Toolbox::sortNumeric(nets,
+                       [](const QCollator& comp, NetSignal* a, NetSignal* b) {
+                         if (a->isAnonymous() != b->isAnonymous()) {
+                           return b->isAnonymous();
+                         } else {
+                           return comp(*a->getName(), *b->getName());
+                         }
+                       });
+  QMenu menu;
+  menu.setDefaultAction(
+      menu.addAction(QIcon(":/img/actions/draw_wire.png"),
+                     tr("Add New Bus Member") +
+                         QString(" (%1)").arg(QCoreApplication::translate(
+                             "QShortcut", "Ctrl"))));
+  NetSignal* selectedNet = nullptr;
+  for (NetSignal* net : nets) {
+    QAction* a =
+        menu.addAction(QIcon(":/img/actions/draw_wire.png"), *net->getName(),
+                       [&selectedNet, net]() { selectedNet = net; });
+    a->setEnabled(!net->isAnonymous());
+  }
+  menu.addSeparator();
+  QAction* aCancel =
+      menu.addAction(QIcon(":/img/actions/cancel.png"), tr("Cancel"));
+  QAction* a = menu.exec(QCursor::pos());
+  if ((!a) || (a == aCancel)) {
+    return std::nullopt;
+  }
+  return selectedNet;
 }
 
 /*******************************************************************************

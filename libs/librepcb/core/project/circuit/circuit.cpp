@@ -342,6 +342,7 @@ void Circuit::setBusName(Bus& bus, const BusName& newName, bool isAutoName) {
   }
   // apply the new name
   bus.setName(newName, isAutoName);  // can throw
+  emit busRenamed(bus);
 }
 
 /*******************************************************************************
