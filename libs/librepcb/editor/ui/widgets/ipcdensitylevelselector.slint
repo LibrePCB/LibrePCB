@@ -1,0 +1,96 @@
+import { IconButton } from "iconbutton.slint";
+import { ToolBarWidget } from "toolbarwidget.slint";
+import {
+    Helpers,
+    IpcDensityLevel,
+} from "../api.slint";
+
+component Button inherits IconButton {
+    width: 18px;
+    style: checkable-hyperlink;
+    color-enabled: #606060;
+    color-checked: #c0c0c0;
+}
+
+export component IpcDensityLevelSelector inherits ToolBarWidget {
+    in-out property <IpcDensityLevel> value;
+    out property <image> icon: {
+        if value == IpcDensityLevel.a {
+            a-btn.icon
+        } else if value == IpcDensityLevel.b {
+            b-btn.icon
+        } else if value == IpcDensityLevel.c {
+            c-btn.icon
+        } else {
+            @image-url("")
+        }
+    };
+    out property <string> text: {
+        if value == IpcDensityLevel.a {
+            @tr("IPC Density Level A (max protrusion)")
+        } else if value == IpcDensityLevel.b {
+            @tr("IPC Density Level B (medium protrusion)")
+        } else if value == IpcDensityLevel.c {
+            @tr("IPC Density Level C (min protrusion)")
+        } else {
+            @tr("No preference")
+        }
+    };
+
+    spacing: 5px;
+
+    callback value-clicked(IpcDensityLevel);
+    value-clicked(v) => {
+        value = v;
+    }
+
+    a-btn := Button {
+        icon: @image-url("../../../../font-awesome/svgs/regular/circle.svg");
+        checked: value == IpcDensityLevel.a;
+
+        clicked => {
+            value-clicked(self.checked ? IpcDensityLevel.none : IpcDensityLevel.a);
+        }
+    }
+
+    b-btn := Button {
+        icon: @image-url("../../../../font-awesome/svgs/solid/circle-half-stroke.svg");
+        checked: value == IpcDensityLevel.b;
+
+        clicked => {
+            value-clicked(self.checked ? IpcDensityLevel.none : IpcDensityLevel.b);
+        }
+    }
+
+    c-btn := Button {
+        icon: @image-url("../../../../font-awesome/svgs/solid/circle.svg");
+        icon-rotation: 90deg;
+        checked: value == IpcDensityLevel.c;
+
+        clicked => {
+            value-clicked(self.checked ? IpcDensityLevel.none : IpcDensityLevel.c);
+        }
+    }
+
+    key-pressed(event) => {
+        /*if event.text == Key.LeftArrow {
+            if value == IpcDensityLevel.wave {
+                value-clicked(IpcDensityLevel.reflow);
+            } else {
+                value-clicked(IpcDensityLevel.hand);
+            }
+            return accept;
+        } else if event.text == Key.RightArrow {
+            if value == IpcDensityLevel.hand {
+                value-clicked(IpcDensityLevel.reflow);
+            } else {
+                value-clicked(IpcDensityLevel.wave);
+            }
+            return accept;
+        } else if event.text == Key.Space {
+            value-clicked(IpcDensityLevel.none);
+            return accept;
+        }*/
+        reject
+    }
+}

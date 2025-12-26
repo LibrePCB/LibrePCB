@@ -8,6 +8,7 @@ import {
     IconButton,
     LinkText,
     SolderTechnologySelector,
+    IpcDensityLevelSelector,
     TechnologySelector,
     Palette,
     PanelHeader,
@@ -67,7 +68,7 @@ export component PlaceDevicesPanel inherits Rectangle {
     property <int> selected-index: tab.unplaced-components-index;
     property <bool> item-selected: (selected-index >= 0) && (selected-index < model.length);
     property <int> devices-count: tab.unplaced-components-devices.length;
-    property <bool> expanded: false;
+    property <bool> expanded: true;
 
     background: #2a2a2a;
 
@@ -100,27 +101,34 @@ export component PlaceDevicesPanel inherits Rectangle {
                 title: @tr("Place Devices").to-uppercase();
                 highlight: fs.has-focus;
 
-                preferred-devices-btn := IconButton {
+                if tht-soldering-selector.icon.height > 0: tht-soldering-btn := IconButton {
                     width: self.height;
-                    icon: @image-url("../../../../../img/actions/add_tht_pad.png");
-                    //icon-scale: 0.7;
-                    //tooltip: @tr("Open web browser after upload");
+                    icon: tht-soldering-selector.icon;
+                    icon-scale: 0.6;
+                    tooltip: tht-soldering-selector.text;
                     enabled: false;
                 }
 
-                preferred-footprints-btn := IconButton {
+                if (smt-soldering-selector.icon.height > 0) && (smt-soldering-selector.icon != tht-soldering-selector.icon): smt-soldering-btn := IconButton {
                     width: self.height;
-                    icon: @image-url("../../../../font-awesome/svgs/solid/hand.svg");
-                    //icon-scale: 0.7;
-                    //tooltip: @tr("Open web browser after upload");
+                    icon: smt-soldering-selector.icon;
+                    icon-scale: 0.6;
+                    tooltip: smt-soldering-selector.text;
+                    enabled: false;
+                }
+
+                if ipc-dl-selector.icon.height > 0: ipc-dl-btn := IconButton {
+                    width: self.height;
+                    icon: ipc-dl-selector.icon;
+                    icon-scale: 0.6;
+                    tooltip: ipc-dl-selector.text;
                     enabled: false;
                 }
 
                 expand-collapse-btn := IconButton {
                     width: self.height;
                     icon: @image-url("../../../../font-awesome/svgs/solid/sliders.svg");
-                    //icon-scale: 0.7;
-                    //tooltip: @tr("Open web browser after upload");
+                    tooltip: @tr("Settings");
 
                     clicked => {
                         expanded = !expanded;
@@ -147,7 +155,7 @@ export component PlaceDevicesPanel inherits Rectangle {
                         }
                     }*/
 
-                    Row {
+                    /*Row {
                         NameRowHeader {
                             text: @tr("Devices:");
                         }
@@ -174,18 +182,18 @@ export component PlaceDevicesPanel inherits Rectangle {
                                 };
                             }
                         }
-                    }
+                    }*/
 
                     Row {
                         NameRowHeader {
-                            text: @tr("Footprints:");
+                            text: @tr("THT Pads:");
                         }
 
                         HorizontalLayout {
                             alignment: start;
                             spacing: 8px;
 
-                            solder-technology-selector := SolderTechnologySelector {
+                            tht-soldering-selector := SolderTechnologySelector {
                                 height: self.preferred-height;
                             }
 
@@ -193,33 +201,8 @@ export component PlaceDevicesPanel inherits Rectangle {
                                 font-size: 10.5px;
                                 font-italic: true;
                                 vertical-alignment: center;
-                                text: {
-                                    if solder-technology-selector.value == SolderTechnology.hand {
-                                        @tr("Prefer hand-soldering")
-                                    } else if solder-technology-selector.value == SolderTechnology.reflow {
-                                        @tr("Prefer reflow-soldering")
-                                    } else if solder-technology-selector.value == SolderTechnology.wave {
-                                        @tr("Prefer wave-soldering")
-                                    } else {
-                                        @tr("No preference")
-                                    }
-                                };
+                                text: tht-soldering-selector.text;
                             }
-                        }
-                    }
-
-                    Row {
-                        NameRowHeader {
-                            text: @tr("THT Pads:");
-                        }
-
-                        ComboBox {
-                            height: self.preferred-height;
-                            model: [
-                                "No preference",
-                                "Extra-large pads (easy hand-soldering)",
-                            ];
-                            current-index: 0;
                         }
                     }
 
@@ -228,16 +211,42 @@ export component PlaceDevicesPanel inherits Rectangle {
                             text: @tr("SMT Pads:");
                         }
 
-                        ComboBox {
-                            height: self.preferred-height;
-                            model: [
-                                "No preference",
-                                "IPC Density Level A (max protrusion)",
-                                "IPC Density Level B (median protrusion)",
-                                "IPC Density Level C (min protrusion)",
-                                "Extra-large pads (easy hand-soldering)",
-                            ];
-                            current-index: 0;
+                        HorizontalLayout {
+                            alignment: start;
+                            spacing: 8px;
+
+                            smt-soldering-selector := SolderTechnologySelector {
+                                height: self.preferred-height;
+                            }
+
+                            Text {
+                                font-size: 10.5px;
+                                font-italic: true;
+                                vertical-alignment: center;
+                                text: smt-soldering-selector.text;
+                            }
+                        }
+                    }
+
+                    Row {
+                        NameRowHeader {
+                            text: @tr("Density:");
+                        }
+
+                        HorizontalLayout {
+                            alignment: start;
+                            spacing: 8px;
+
+                            ipc-dl-selector := IpcDensityLevelSelector {
+                                height: self.preferred-height;
+                            }
+
+                            Text {
+                                font-size: 10.5px;
+                                font-italic: true;
+                                vertical-alignment: center;
+                                text: ipc-dl-selector.text;
+                            }
                         }
                     }
                 }
