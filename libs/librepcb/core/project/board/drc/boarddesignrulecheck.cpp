@@ -281,6 +281,7 @@ BoardDesignRuleCheck::Result BoardDesignRuleCheck::run(
     addSequential(&BoardDesignRuleCheck::checkUsedLayers);
     addSequential(&BoardDesignRuleCheck::checkForUnplacedComponents);
     addSequential(&BoardDesignRuleCheck::checkForMissingConnections);
+    addSequential(&BoardDesignRuleCheck::checkForImpossibleConnections);
     addSequential(&BoardDesignRuleCheck::checkForStaleObjects);
     addSequential(&BoardDesignRuleCheck::checkMinimumSilkscreenWidth);
     addSequential(&BoardDesignRuleCheck::checkMinimumSilkscreenTextHeight);
@@ -2291,6 +2292,23 @@ RuleCheckMessageList BoardDesignRuleCheck::checkForMissingConnections(
         Path::obround(aw.p1.position, aw.p2.position, PositiveLength(50000))};
     messages.append(std::make_shared<DrcMsgMissingConnection>(
         convertAnchor(aw.p1), convertAnchor(aw.p2), aw.netName, locations));
+  }
+  return messages;
+}
+
+RuleCheckMessageList BoardDesignRuleCheck::checkForImpossibleConnections(
+    const Data& data) {
+  emitStatus(tr("Check for impossible connections..."));
+
+  // See https://github.com/LibrePCB/LibrePCB/issues/1510.
+  RuleCheckMessageList messages;
+  for (const Data::Device& dev : data.devices) {
+    for (const Data::ImpossibleConnection& con :
+         dev.impossibleSignalConnections) {
+      messages.append(std::make_shared<DrcMsgImpossibleConnection>(
+          dev, con.signalUuid, con.signalName, con.netName,
+          getDeviceLocation(dev)));
+    }
   }
   return messages;
 }

@@ -163,6 +163,11 @@ struct BoardDesignRuleCheckData final {
     librepcb::Zone::Rules rules;
     Path outline;
   };
+  struct ImpossibleConnection {
+    Uuid signalUuid;
+    QString signalName;
+    QString netName;
+  };
   struct Device {
     Uuid uuid;
     QString cmpInstanceName;
@@ -175,6 +180,7 @@ struct BoardDesignRuleCheckData final {
     QList<StrokeText> strokeTexts;  // With absolute transform.
     QList<Hole> holes;  // From library footprint.
     QList<Zone> zones;  // From library footprint.
+    QList<ImpossibleConnection> impossibleSignalConnections;
   };
 
   // NOTE: We create a `const` copy of this structure for each thread to

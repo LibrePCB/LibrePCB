@@ -202,6 +202,32 @@ DrcMsgMissingConnection::DrcMsgMissingConnection(const Anchor& p1,
 }
 
 /*******************************************************************************
+ *  DrcMsgImpossibleConnection
+ ******************************************************************************/
+
+DrcMsgImpossibleConnection::DrcMsgImpossibleConnection(
+    const Data::Device& device, const Uuid& signalUuid,
+    const QString& signalName, const QString& netName,
+    const QVector<Path>& locations)
+  : RuleCheckMessage(
+        Severity::Error,
+        tr("Impossible connection in '%1': '%2:%3'",
+           "Placeholders: Net name, Component name, Signal name")
+            .arg(netName, device.cmpInstanceName, signalName),
+        tr("The pin of this device is connected to a net in the schematics, "
+           "but the footprint doesn't expose a pad for it. Therefore it is "
+           "impossible to make the electrical connection in the board. Check "
+           "if another footprint or another device exposes a corresponding "
+           "pad."),
+        "impossible_connection", locations) {
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("device", device.uuid);
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("signal", signalUuid);
+  mApproval->ensureLineBreak();
+}
+
+/*******************************************************************************
  *  DrcMsgMissingBoardOutline
  ******************************************************************************/
 
