@@ -829,7 +829,8 @@ void LibraryTab::setSelectedCategory(
       ui::LibraryTreeViewItemType::Organization,
   };
   for (auto item : items) {
-    if ((!item->childs.isEmpty()) || (!types.contains(item->type))) {
+    if ((!item->childs.isEmpty()) || (item->name.isEmpty()) ||
+        (!types.contains(item->type))) {
       continue;
     }
     if (item->type != type) {
