@@ -74,12 +74,7 @@ WorkspaceLibraryDb::WorkspaceLibraryDb(const FilePath& librariesPath)
   if (dbVersion != sCurrentDbVersion) {
     qWarning() << "Library database version" << dbVersion
                << "is outdated or not supported, reinitializing...";
-    mDb.reset();
-    QFile(mFilePath.toStr()).remove();
-    mDb.reset(new SQLiteDatabase(mFilePath));  // can throw
-    WorkspaceLibraryDbWriter writer(mLibrariesPath, *mDb);
-    writer.createAllTables();  // can throw
-    writer.addInternalData("version", sCurrentDbVersion);  // can throw
+    reset();  // can throw
   }
 
   // create library scanner object
@@ -398,6 +393,15 @@ QList<WorkspaceLibraryDb::Organization>
  *  General Methods
  ******************************************************************************/
 
+void WorkspaceLibraryDb::resetAndRescan() noexcept {
+  try {
+    reset();  // can throw
+    startLibraryRescan();
+  } catch (const Exception& e) {
+    qCritical() << e.getMsg();
+  }
+}
+
 void WorkspaceLibraryDb::startLibraryRescan() noexcept {
   mLibraryScanner->startScan();
 }
@@ -405,6 +409,15 @@ void WorkspaceLibraryDb::startLibraryRescan() noexcept {
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
+
+void WorkspaceLibraryDb::reset() {
+  mDb.reset();
+  QFile(mFilePath.toStr()).remove();
+  mDb.reset(new SQLiteDatabase(mFilePath));  // can throw
+  WorkspaceLibraryDbWriter writer(mLibrariesPath, *mDb);
+  writer.createAllTables();  // can throw
+  writer.addInternalData("version", sCurrentDbVersion);  // can throw
+}
 
 QMultiMap<Version, FilePath> WorkspaceLibraryDb::getAll(
     const QString& elementsTable, const std::optional<Uuid>& uuid,
