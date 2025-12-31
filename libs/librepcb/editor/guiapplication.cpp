@@ -258,7 +258,10 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
           [this](const QString& err) {
             std::shared_ptr<Notification> n = std::make_shared<Notification>(
                 ui::NotificationType::Critical, tr("Scanning Libraries Failed"),
-                err, QString(), QString(), true);
+                err, tr("Clear Cache"), QString(), true);
+            connect(n.get(), &Notification::buttonClicked,
+                    &mWorkspace.getLibraryDb(),
+                    &WorkspaceLibraryDb::resetAndRescan);
             connect(&mWorkspace.getLibraryDb(),
                     &WorkspaceLibraryDb::scanStarted, n.get(),
                     &Notification::dismiss);
