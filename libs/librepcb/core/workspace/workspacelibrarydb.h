@@ -506,6 +506,11 @@ public:
   // General Methods
 
   /**
+   * @brief Re-initialize database and start new rescan
+   */
+  void resetAndRescan() noexcept;
+
+  /**
    * @brief Rescan the whole library directory and update the SQLite database
    */
   void startLibraryRescan() noexcept;
@@ -524,6 +529,7 @@ signals:
 
 private:
   // Private Methods
+  void reset();
   QMultiMap<Version, FilePath> getAll(const QString& elementsTable,
                                       const std::optional<Uuid>& uuid,
                                       const FilePath& lib) const;
