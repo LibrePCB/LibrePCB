@@ -102,8 +102,12 @@ export component TreeView inherits FocusScope {
                             animate transform-rotation { duration: 100ms; }
                         }
 
-                        clicked => {
-                            item.expanded = !item.expanded;
+                        pointer-event(event) => {
+                            if (event.button == PointerEventButton.left) && (event.kind == PointerEventKind.down) {
+                                // Use mouse down event instead of clicked() to make the action
+                                // more responsive (https://github.com/LibrePCB/LibrePCB/issues/1652).
+                                item.expanded = !item.expanded;
+                            }
                         }
                     }
 
