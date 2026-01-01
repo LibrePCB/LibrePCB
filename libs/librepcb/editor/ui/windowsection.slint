@@ -57,7 +57,7 @@ component TabButton inherits Rectangle {
     in property <bool> is-current-section: false;
     in property <bool> is-current-tab: false;
 
-    callback clicked <=> ta.clicked;
+    callback clicked;
     callback close-clicked;
 
     preferred-width: l.preferred-width;
@@ -78,7 +78,11 @@ component TabButton inherits Rectangle {
 
         ta := TouchArea {
             pointer-event(event) => {
-                if (event.button == PointerEventButton.middle) && (event.kind == PointerEventKind.down) {
+                if (event.button == PointerEventButton.left) && (event.kind == PointerEventKind.down) {
+                    // Use mouse down event instead of clicked() to make tab switching
+                    // more responsive (https://github.com/LibrePCB/LibrePCB/issues/1652).
+                    clicked();
+                } else if (event.button == PointerEventButton.middle) && (event.kind == PointerEventKind.down) {
                     close-clicked();
                 }
             }
