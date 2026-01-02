@@ -3,6 +3,7 @@ import { Constants } from "../api.slint";
 
 export component OverlayDialog inherits Rectangle {
     in property <bool> ok-button: false;
+    in property <bool> cancel-button: false;
 
     background: #00000080;
     forward-focus: fs;
@@ -45,8 +46,19 @@ export component OverlayDialog inherits Rectangle {
 
                 @children
 
-                if ok-button: HorizontalLayout {
+                if ok-button || cancel-button: HorizontalLayout {
                     alignment: end;
+                    spacing: 8px;
+
+                    if cancel-button: cancel-btn := Button {
+                        width: max(self.preferred-width, 100px);
+                        text: @tr("Cancel");
+                        icon: @image-url("../../../../font-awesome/svgs/solid/xmark.svg");
+
+                        clicked => {
+                            rejected();
+                        }
+                    }
 
                     if ok-button: ok-btn := Button {
                         width: max(self.preferred-width, 100px);

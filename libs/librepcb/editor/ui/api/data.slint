@@ -46,6 +46,11 @@ export global Data {
     // Current side panel page
     in property <PanelPage> panel-page: PanelPage.home;
 
+    // Overlay "New Board"
+    in property <int> new-board-overlay-project-index: -1;
+    in property <bool> new-board-overlay-expanded: false;
+    //in property <string> new-board-overlay-name;
+
     // Window sections
     in-out property <[WindowSectionData]> sections: [
         {
@@ -1109,7 +1114,7 @@ export global Data {
                     },
                 },
             ],
-            current-tab-index: 7,
+            current-tab-index: 4,
         },
     ];
 

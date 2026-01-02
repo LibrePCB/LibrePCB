@@ -1,0 +1,199 @@
+import {
+    NameRowHeader,
+} from "library/metadatawidgets.slint";
+import {
+    ComboBox,
+    LineEdit,
+    LinkText,
+    OverlayDialog,
+    SolderTechnologySelector,
+    TechnologySelector,
+} from "widgets.slint";
+import {
+    Backend,
+    Data,
+    SolderTechnology,
+    Technology,
+} from "api.slint";
+
+export component NewBoardOverlayDialog inherits OverlayDialog {
+    property <bool> expanded: Data.new-board-overlay-expanded;
+
+    ok-button: true;
+    cancel-button: true;
+    // Actually we want to make the whole dialog's lifetime
+    // conditionally, but it leads to crashes when closing it from its
+    // callbacks. Thus only controlling its visibility.
+    visible: Data.new-board-overlay-project-index >= 0;
+    forward-focus: name-edt;
+
+    changed visible => {
+        if self.visible {
+            name-edt.text = "";
+            self.focus();
+        }
+    }
+
+    GridLayout {
+        spacing-horizontal: 8px;
+        spacing-vertical: 8px;
+
+        Row {
+            Text {
+                colspan: 2;
+                font-size: 13px;
+                text: @tr("Create a new board in '{}':", Data.projects[Data.new-board-overlay-project-index].name);
+            }
+        }
+
+        Row {
+            NameRowHeader {
+                text: @tr("Name:");
+            }
+
+            name-edt := LineEdit {
+                key-pressed(e) => {
+                    if e.text == Key.Return {
+                        root.accepted();
+                        return accept;
+                    }
+                    reject
+                }
+            }
+        }
+    }
+
+    HorizontalLayout {
+        padding-top: 5px;
+        spacing: 8px;
+
+        advanced-btn := LinkText {
+            text: (expanded ? "▼  " : "▶  ") + @tr("Advanced");
+            text-color: #909090;
+
+            clicked => {
+                Data.new-board-overlay-expanded = !expanded;
+            }
+        }
+
+        Rectangle {
+            Rectangle {
+                height: 1px;
+                background: advanced-btn.color;
+            }
+        }
+    }
+
+    Rectangle {
+        height: expanded ? self.preferred-height : 0;
+        clip: true;
+
+        animate height { duration: 150ms; }
+
+        GridLayout {
+            spacing-horizontal: 8px;
+            spacing-vertical: 8px;
+
+            Row {
+                NameRowHeader {
+                    text: @tr("Technology:");
+                }
+
+                HorizontalLayout {
+                    spacing: 8px;
+
+                    technology-selector := TechnologySelector { }
+
+                    Text {
+                        font-size: 10.5px;
+                        font-italic: true;
+                        vertical-alignment: center;
+                        text: {
+                            if technology-selector.value == Technology.none {
+                                @tr("No preference about through-hole vs. surface-mount devices")
+                            } else if technology-selector.value == Technology.smt {
+                                @tr("Prefer surface-mount over through-hole devices")
+                            } else if technology-selector.value == Technology.tht {
+                                @tr("Prefer through-hole over surface-mount devices")
+                            } else {
+                                ""
+                            }
+                        };
+                    }
+                }
+            }
+
+            Row {
+                NameRowHeader {
+                    text: @tr("Soldering:");
+                }
+
+                HorizontalLayout {
+                    alignment: start;
+                    spacing: 8px;
+
+                    solder-technology-selector := SolderTechnologySelector { }
+
+                    Text {
+                        font-size: 10.5px;
+                        font-italic: true;
+                        vertical-alignment: center;
+                        text: {
+                            if solder-technology-selector.value == SolderTechnology.none {
+                                @tr("No preference about soldering variant")
+                            } else if solder-technology-selector.value == SolderTechnology.hand {
+                                @tr("Prefer hand-soldering footprints")
+                            } else if solder-technology-selector.value == SolderTechnology.reflow {
+                                @tr("Prefer reflow-soldering footprints")
+                            } else if solder-technology-selector.value == SolderTechnology.wave {
+                                @tr("Prefer wave-soldering footprints")
+                            } else {
+                                ""
+                            }
+                        };
+                    }
+                }
+            }
+
+            Row {
+                NameRowHeader {
+                    text: @tr("THT Pads:");
+                }
+
+                ComboBox {
+                    model: [
+                        "No preference (default)",
+                        "Prefer large pads (for easy hand-soldering)",
+                    ];
+                    current-index: 0;
+                }
+            }
+
+            Row {
+                NameRowHeader {
+                    text: @tr("SMT Pads:");
+                }
+
+                ComboBox {
+                    model: [
+                        "No preference (default)",
+                        "Prefer IPC Density Level A (max protrusion)",
+                        "Prefer IPC Density Level B (median protrusion)",
+                        "Prefer IPC Density Level C (min protrusion)",
+                        "Prefer large pads (for easy hand-soldering)",
+                    ];
+                    current-index: 0;
+                }
+            }
+        }
+    }
+
+    accepted => {
+        //Backend.trigger-tab(section-index, index, TabAction.apply);
+        Data.new-board-overlay-project-index = -1;
+    }
+
+    rejected => {
+        Data.new-board-overlay-project-index = -1;
+    }
+}

@@ -1,0 +1,55 @@
+import { IconButton } from "iconbutton.slint";
+import { ToolBarWidget } from "toolbarwidget.slint";
+import {
+    Helpers,
+    Technology,
+} from "../api.slint";
+
+component Button inherits IconButton {
+    width: 18px;
+    style: checkable-hyperlink;
+    color-enabled: #606060;
+    color-checked: #c0c0c0;
+    colorize: !self.checked;
+}
+
+export component TechnologySelector inherits ToolBarWidget {
+    in-out property <Technology> value;
+
+    callback value-clicked(Technology);
+    value-clicked(v) => {
+        value = v;
+    }
+
+    Button {
+        icon: @image-url("../../../../../img/actions/add_tht_pad.png");
+        checked: value == Technology.tht;
+
+        clicked => {
+            value-clicked(self.checked ? Technology.none : Technology.tht);
+        }
+    }
+
+    Button {
+        icon: @image-url("../../../../../img/actions/add_smt_pad.png");
+        checked: value == Technology.smt;
+
+        clicked => {
+            value-clicked(self.checked ? Technology.none : Technology.smt);
+        }
+    }
+
+    key-pressed(event) => {
+        if event.text == Key.LeftArrow {
+            value-clicked(Technology.tht);
+            return accept;
+        } else if event.text == Key.RightArrow {
+            value-clicked(Technology.smt);
+            return accept;
+        } else if event.text == Key.Space {
+            value-clicked(Technology.none);
+            return accept;
+        }
+        reject
+    }
+}
