@@ -111,6 +111,23 @@ export struct AttributeData {
     action: AttributeAction,  // Set by UI, reset by backend
 }
 
+// Soldering technology selector
+export enum SolderTechnology {
+    none,
+    hand-large,
+    hand,
+    reflow,
+    wave,
+}
+
+// IPC density level selector
+export enum IpcDensityLevel {
+    none,
+    a,
+    b,
+    c,
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Widgets data
 ////////////////////////////////////////////////////////////////////////////////
@@ -1441,6 +1458,12 @@ export enum BoardAction {
 export struct BoardData {
     name: string,
     drc: RuleCheckData,
+
+    // Place Devices
+    has-preferred-footprint-tags: bool,
+    tht-soldering: SolderTechnology,
+    smt-soldering: SolderTechnology,
+    ipc-density-level: IpcDensityLevel,
 
     // Order PCB
     order-status: string,  // Either progress status or error message.

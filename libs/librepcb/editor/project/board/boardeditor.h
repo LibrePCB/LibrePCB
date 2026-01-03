@@ -112,6 +112,7 @@ signals:
   void aboutToBeDestroyed();
 
 private:
+  void updatePreferredFootprintTags() noexcept;
   void setDrcResult(const BoardDesignRuleCheck::Result& result) noexcept;
   void registeredTabsModified() noexcept;
   void planesRebuildTimerTimeout() noexcept;
@@ -132,6 +133,11 @@ private:
   Project& mProject;
   Board& mBoard;
   int mUiIndex;
+
+  // Place devices data / preferred footprint tags
+  ui::SolderTechnology mThtSolderTechnology;
+  ui::SolderTechnology mSmtSolderTechnology;
+  ui::IpcDensityLevel mIpcDensityLevel;
 
   // Plane fragments builder
   std::unique_ptr<BoardPlaneFragmentsBuilder> mPlanesBuilder;

@@ -811,10 +811,12 @@ void ProjectLoader::loadBoard(Project& p, const QString& relativeFilePath) {
   Board* board = new Board(p, std::move(dir), fp.getParentDir().getFilename(),
                            deserialize<Uuid>(root->getChild("@0")),
                            deserialize<ElementName>(root->getChild("name/@0")));
+  board->setDefaultFontName(root->getChild("default_font/@0").getValue());
   board->setGridInterval(
       deserialize<PositiveLength>(root->getChild("grid/interval/@0")));
   board->setGridUnit(deserialize<LengthUnit>(root->getChild("grid/unit/@0")));
-  board->setDefaultFontName(root->getChild("default_font/@0").getValue());
+  board->setPreferredFootprintTags(Board::PreferredFootprintTags(
+      root->getChild("preferred_footprint_tags")));
   board->setInnerLayerCount(
       deserialize<uint>(root->getChild("layers/inner/@0")));
   board->setPcbThickness(

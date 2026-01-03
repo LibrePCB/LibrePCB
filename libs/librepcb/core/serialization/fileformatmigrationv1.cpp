@@ -565,6 +565,22 @@ void FileFormatMigrationV1::upgradeBoard(SExpression& root) {
     }
   }
 
+  // Preferred footprint tags
+  {
+    SExpression& child = root.appendList("preferred_footprint_tags");
+    child.ensureLineBreak();
+    child.appendList("tht_top");
+    child.ensureLineBreak();
+    child.appendList("tht_bot");
+    child.ensureLineBreak();
+    child.appendList("smt_top");
+    child.ensureLineBreak();
+    child.appendList("smt_bot");
+    child.ensureLineBreak();
+    child.appendList("common");
+    child.ensureLineBreak();
+  }
+
   // Devices
   for (SExpression* devNode : root.getChildren("device")) {
     devNode->appendChild("glue", SExpression::createToken("true"));

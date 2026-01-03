@@ -187,6 +187,22 @@ void FileFormatMigrationUnstable::upgradeBoard(SExpression& root) {
   drcNode.appendChild("max_tented_via_drill_diameter",
                       SExpression::createToken("0.5"));
   drcNode.ensureLineBreak();
+
+  // Preferred footprint tags
+  {
+    SExpression& child = root.appendList("preferred_footprint_tags");
+    child.ensureLineBreak();
+    child.appendList("tht_top");
+    child.ensureLineBreak();
+    child.appendList("tht_bot");
+    child.ensureLineBreak();
+    child.appendList("smt_top");
+    child.ensureLineBreak();
+    child.appendList("smt_bot");
+    child.ensureLineBreak();
+    child.appendList("common");
+    child.ensureLineBreak();
+  }
 }
 
 /*******************************************************************************

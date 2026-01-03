@@ -529,6 +529,8 @@ add_library(
   utils/scopeguard.h
   utils/scopeguardlist.h
   utils/signalslot.h
+  utils/tagmatcher.cpp
+  utils/tagmatcher.h
   utils/tangentpathjoiner.cpp
   utils/tangentpathjoiner.h
   utils/toolbox.cpp
