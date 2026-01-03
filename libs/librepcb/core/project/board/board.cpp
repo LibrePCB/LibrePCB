@@ -67,6 +67,56 @@
 namespace librepcb {
 
 /*******************************************************************************
+ *  Struct PreferredFootprintTags
+ ******************************************************************************/
+
+static QVector<Tag> loadTags(const SExpression& node, const QString& name) {
+  QVector<Tag> tags;
+  foreach (const SExpression* child,
+           node.getChild(name).getChildren(SExpression::Type::String)) {
+    tags.append(Tag(child->getValue()));
+  }
+  return tags;
+}
+
+static void serializeTags(SExpression& node, const QVector<Tag>& tags) {
+  for (const Tag& tag : tags) {
+    node.appendChild(tag);
+  }
+}
+
+Board::PreferredFootprintTags::PreferredFootprintTags() noexcept
+  : thtTop(), thtBot(), smtTop(), smtBot(), common() {
+}
+
+Board::PreferredFootprintTags::PreferredFootprintTags(const SExpression& node)
+  : thtTop(loadTags(node, "tht_top")),
+    thtBot(loadTags(node, "tht_bot")),
+    smtTop(loadTags(node, "smt_top")),
+    smtBot(loadTags(node, "smt_bot")),
+    common(loadTags(node, "common")) {
+}
+
+bool Board::PreferredFootprintTags::isEmpty() const noexcept {
+  return thtTop.isEmpty() && thtBot.isEmpty() && smtTop.isEmpty() &&
+      smtBot.isEmpty() && common.isEmpty();
+}
+
+void Board::PreferredFootprintTags::serialize(SExpression& root) const {
+  root.ensureLineBreak();
+  serializeTags(root.appendList("tht_top"), thtTop);
+  root.ensureLineBreak();
+  serializeTags(root.appendList("tht_bot"), thtBot);
+  root.ensureLineBreak();
+  serializeTags(root.appendList("smt_top"), smtTop);
+  root.ensureLineBreak();
+  serializeTags(root.appendList("smt_bot"), smtBot);
+  root.ensureLineBreak();
+  serializeTags(root.appendList("common"), common);
+  root.ensureLineBreak();
+}
+
+/*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
 
@@ -87,6 +137,7 @@ Board::Board(Project& project,
     mDefaultFontFileName(Application::getDefaultStrokeFontName()),
     mGridInterval(635000),
     mGridUnit(LengthUnit::millimeters()),
+    mPreferredFootprintTags(),
     mInnerLayerCount(-1),  // Force update of setter.
     mCopperLayers(),
     mPcbThickness(1600000),  // 1.6mm
@@ -293,6 +344,14 @@ void Board::setName(const ElementName& name) noexcept {
     mName = name;
     emit nameChanged(mName);
     emit attributesChanged();
+  }
+}
+
+void Board::setPreferredFootprintTags(
+    const PreferredFootprintTags& tags) noexcept {
+  if (tags != mPreferredFootprintTags) {
+    mPreferredFootprintTags = tags;
+    emit preferredFootprintTagsChanged();
   }
 }
 
@@ -734,6 +793,7 @@ void Board::copyFrom(const Board& other) {
   mDefaultFontFileName = other.getDefaultFontName();
   mGridInterval = other.getGridInterval();
   mGridUnit = other.getGridUnit();
+  mPreferredFootprintTags = other.mPreferredFootprintTags;
   mInnerLayerCount = other.getInnerLayerCount();
   mCopperLayers = other.getCopperLayers();
   mPcbThickness = other.mPcbThickness;
@@ -976,6 +1036,9 @@ void Board::save() {
     root->ensureLineBreak();
     mFabricationOutputSettings->serialize(
         root->appendList("fabrication_output_settings"));
+    root->ensureLineBreak();
+    mPreferredFootprintTags.serialize(
+        root->appendList("preferred_footprint_tags"));
     root->ensureLineBreak();
     for (const BI_Device* obj : mDeviceInstances) {
       root->ensureLineBreak();

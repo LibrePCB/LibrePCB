@@ -30,6 +30,7 @@
 #include "../../geometry/zone.h"
 #include "../../serialization/serializablekeyvaluemap.h"
 #include "../../serialization/serializableobjectlist.h"
+#include "../../types/tag.h"
 #include "footprintpad.h"
 
 #include <QtCore>
@@ -61,6 +62,7 @@ public:
     UuidChanged,
     NamesEdited,
     DescriptionsEdited,
+    TagsEdited,
     ModelPositionChanged,
     ModelRotationChanged,
     ModelsChanged,
@@ -90,6 +92,7 @@ public:
   const LocalizedDescriptionMap& getDescriptions() const noexcept {
     return mDescriptions;
   }
+  const QSet<Tag>& getTags() const noexcept { return mTags; }
   const Point3D& getModelPosition() const noexcept { return mModelPosition; }
   const Angle3D& getModelRotation() const noexcept { return mModelRotation; }
   const QSet<Uuid>& getModels() const noexcept { return mModels; }
@@ -111,6 +114,7 @@ public:
       bool withCourtyard) const noexcept;
 
   // Setters: General
+  bool setTags(const QSet<Tag>& tags) noexcept;
   bool setModelPosition(const Point3D& position) noexcept;
   bool setModelRotation(const Angle3D& rotation) noexcept;
   bool setModels(const QSet<Uuid>& models) noexcept;
@@ -160,6 +164,7 @@ private:  // Data
   Uuid mUuid;
   LocalizedNameMap mNames;
   LocalizedDescriptionMap mDescriptions;
+  QSet<Tag> mTags;
   Point3D mModelPosition;
   Angle3D mModelRotation;
   QSet<Uuid> mModels;

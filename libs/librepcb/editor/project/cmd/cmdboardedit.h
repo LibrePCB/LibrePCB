@@ -25,6 +25,7 @@
  ******************************************************************************/
 #include "../../undocommand.h"
 
+#include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/boarddesignrules.h>
 #include <librepcb/core/project/board/drc/boarddesignrulechecksettings.h>
 #include <librepcb/core/types/elementname.h>
@@ -36,7 +37,6 @@
  ******************************************************************************/
 namespace librepcb {
 
-class Board;
 class Layer;
 class PcbColor;
 
@@ -59,6 +59,8 @@ public:
 
   // Setters
   void setName(const ElementName& name) noexcept;
+  void setPreferredFootprintTags(
+      const Board::PreferredFootprintTags& tags) noexcept;
   void setInnerLayerCount(int count) noexcept;
   void setPcbThickness(const PositiveLength& thickness) noexcept;
   void setSolderResist(const PcbColor* c) noexcept;
@@ -83,6 +85,8 @@ private:  // Data
 
   ElementName mOldName;
   ElementName mNewName;
+  Board::PreferredFootprintTags mOldPreferredFootprintTags;
+  Board::PreferredFootprintTags mNewPreferredFootprintTags;
   int mOldInnerLayerCount;
   int mNewInnerLayerCount;
   PositiveLength mOldPcbThickness;

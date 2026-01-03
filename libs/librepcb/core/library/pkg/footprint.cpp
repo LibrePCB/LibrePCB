@@ -40,6 +40,7 @@ Footprint::Footprint(const Footprint& other) noexcept
     mUuid(other.mUuid),
     mNames(other.mNames),
     mDescriptions(other.mDescriptions),
+    mTags(other.mTags),
     mModelPosition(other.mModelPosition),
     mModelRotation(other.mModelRotation),
     mModels(other.mModels),
@@ -73,6 +74,7 @@ Footprint::Footprint(const Uuid& uuid, const ElementName& name_en_US,
     mUuid(uuid),
     mNames(name_en_US),
     mDescriptions(description_en_US),
+    mTags(),
     mModelPosition(),
     mModelRotation(),
     mModels(),
@@ -122,6 +124,9 @@ Footprint::Footprint(const SExpression& node)
     mStrokeTextsEditedSlot(*this, &Footprint::strokeTextsEdited),
     mZonesEditedSlot(*this, &Footprint::zonesEdited),
     mHolesEditedSlot(*this, &Footprint::holesEdited) {
+  foreach (const SExpression* child, node.getChildren("tag")) {
+    mTags.insert(deserialize<Tag>(child->getChild("@0")));
+  }
   foreach (const SExpression* child, node.getChildren("3d_model")) {
     mModels.insert(deserialize<Uuid>(child->getChild("@0")));
   }
@@ -141,6 +146,16 @@ Footprint::~Footprint() noexcept {
 /*******************************************************************************
  *  Setters
  ******************************************************************************/
+
+bool Footprint::setTags(const QSet<Tag>& tags) noexcept {
+  if (tags == mTags) {
+    return false;
+  }
+
+  mTags = tags;
+  onEdited.notify(Event::TagsEdited);
+  return true;
+}
 
 bool Footprint::setModelPosition(const Point3D& position) noexcept {
   if (position == mModelPosition) {
@@ -183,6 +198,10 @@ void Footprint::serialize(SExpression& root) const {
   root.ensureLineBreak();
   mDescriptions.serialize(root);
   root.ensureLineBreak();
+  foreach (const Tag& tag, Toolbox::sortedQSet(mTags)) {
+    root.appendChild("tag", tag);
+    root.ensureLineBreak();
+  }
   {
     SExpression& child = root.appendList("3d_position");
     child.appendChild(std::get<0>(mModelPosition));
@@ -271,6 +290,7 @@ bool Footprint::operator==(const Footprint& rhs) const noexcept {
   if (mUuid != rhs.mUuid) return false;
   if (mNames != rhs.mNames) return false;
   if (mDescriptions != rhs.mDescriptions) return false;
+  if (mTags != rhs.mTags) return false;
   if (mModelPosition != rhs.mModelPosition) return false;
   if (mModelRotation != rhs.mModelRotation) return false;
   if (mModels != rhs.mModels) return false;
@@ -290,6 +310,7 @@ Footprint& Footprint::operator=(const Footprint& rhs) noexcept {
   }
   mNames = rhs.mNames;
   mDescriptions = rhs.mDescriptions;
+  setTags(rhs.mTags);
   setModelPosition(rhs.mModelPosition);
   setModelRotation(rhs.mModelRotation);
   setModels(rhs.mModels);

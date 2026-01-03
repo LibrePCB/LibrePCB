@@ -36,6 +36,21 @@ namespace librepcb {
  *  MsgDeprecatedAssemblyType
  ******************************************************************************/
 
+MsgAmbiguousFootprintTags::MsgAmbiguousFootprintTags() noexcept
+  : RuleCheckMessage(
+        Severity::Hint, tr("Ambiguous footprint tags"),
+        tr("The package provides multiple footprints, but they don't specify "
+           "(enough) tags to make them uniquely identifiable just by their "
+           "tags. This is not a problem at all, but adding unique tags to the "
+           "footprints would make the automatic footprint selection of the "
+           "board editor more sophisticated."),
+        "ambiguous_footprint_tags") {
+}
+
+/*******************************************************************************
+ *  MsgDeprecatedAssemblyType
+ ******************************************************************************/
+
 MsgDeprecatedAssemblyType::MsgDeprecatedAssemblyType() noexcept
   : RuleCheckMessage(Severity::Hint, tr("Non-recommended assembly type"),
                      tr("The assembly type 'Auto-detect' is not recommended as "

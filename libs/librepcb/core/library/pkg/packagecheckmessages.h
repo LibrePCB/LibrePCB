@@ -44,6 +44,24 @@ class StrokeText;
 class Zone;
 
 /*******************************************************************************
+ *  Class MsgAmbiguousFootprintTags
+ ******************************************************************************/
+
+/**
+ * @brief The MsgAmbiguousFootprintTags class
+ */
+class MsgAmbiguousFootprintTags final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(MsgAmbiguousFootprintTags)
+
+public:
+  // Constructors / Destructor
+  MsgAmbiguousFootprintTags() noexcept;
+  MsgAmbiguousFootprintTags(const MsgAmbiguousFootprintTags& other) noexcept
+    : RuleCheckMessage(other) {}
+  virtual ~MsgAmbiguousFootprintTags() noexcept {}
+};
+
+/*******************************************************************************
  *  Class MsgDeprecatedAssemblyType
  ******************************************************************************/
 

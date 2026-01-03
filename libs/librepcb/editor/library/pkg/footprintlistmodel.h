@@ -79,6 +79,7 @@ signals:
 
 private:
   ui::FootprintData createItem(const Footprint& obj) noexcept;
+  void updateTags(const Footprint& obj, ui::FootprintData& item) noexcept;
   void updateModels(const Footprint& obj, ui::FootprintData& item) noexcept;
   void trigger(int index, std::shared_ptr<Footprint> obj,
                ui::FootprintAction a) noexcept;

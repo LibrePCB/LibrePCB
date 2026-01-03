@@ -82,6 +82,7 @@
 #include <librepcb/core/types/layer.h>
 #include <librepcb/core/utils/messagelogger.h>
 #include <librepcb/core/utils/scopeguard.h>
+#include <librepcb/core/utils/tagmatcher.h>
 #include <librepcb/core/workspace/theme.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
@@ -188,6 +189,12 @@ Board2dTab::Board2dTab(GuiApplication& app, BoardEditor& editor,
   loadLayersVisibility();
   connect(&mProjectEditor, &ProjectEditor::projectAboutToBeSaved, this,
           &Board2dTab::storeLayersVisibility);
+
+  // Reset memorized footprint selections when preferred tags have changed.
+  connect(&mBoard, &Board::preferredFootprintTagsChanged, this, [this]() {
+    mLastFootprintOfPackage.clear();
+    setSelectedUnplacedComponentDevice(mUnplacedComponentDeviceIndex);
+  });
 
   // Setup graphics view.
   mView->setUseOpenGl(mApp.getWorkspace().getSettings().useOpenGl.get());
@@ -2061,8 +2068,8 @@ void Board2dTab::setSelectedUnplacedComponentDeviceAndPackage(
           q2s(*fpt.getNames().value(mProject.getLocaleOrder())));
     }
     // Select most relevant footprint.
-    if (auto uuid =
-            getSuggestedFootprint(mUnplacedComponentPackage->getUuid())) {
+    if (auto uuid = getSuggestedFootprint(mUnplacedComponentPackage->getUuid(),
+                                          package)) {
       fptIndex = std::max(package->getFootprints().indexOf(*uuid), 0);
     }
   }
@@ -2225,7 +2232,7 @@ std::pair<QList<Board2dTab::DeviceMetadata>, int>
 }
 
 std::optional<Uuid> Board2dTab::getSuggestedFootprint(
-    const Uuid& libPkgUuid) const noexcept {
+    const Uuid& libPkgUuid, const Package* pkg) const noexcept {
   // Prio 1: Use the footprint already used for the same device before.
   auto lastFootprintIterator = mLastFootprintOfPackage.find(libPkgUuid);
   if ((lastFootprintIterator != mLastFootprintOfPackage.end())) {
@@ -2248,7 +2255,28 @@ std::optional<Uuid> Board2dTab::getSuggestedFootprint(
     }
   }
 
-  // Prio 3: Fallback to the default footprint.
+  // Prio 3: Use the footprint which matches the preferred tags of the
+  // current board. Unfortunately this is only possible in the manual mode
+  // because in that case we have access to the whole package, not just the
+  // library database.
+  if (pkg && (!pkg->getFootprints().isEmpty())) {
+    const Board::PreferredFootprintTags& boardTags =
+        mBoard.getPreferredFootprintTags();
+    const Package::AssemblyType at = pkg->getAssemblyType(true);
+    const QVector<Tag> tags = ((at == Package::AssemblyType::Tht) ||
+                               (at == Package::AssemblyType::Mixed))
+        ? (boardTags.thtTop + boardTags.common)
+        : (boardTags.smtTop + boardTags.common);
+    TagMatcher matcher;
+    for (const Footprint& fpt : pkg->getFootprints()) {
+      matcher.addOption(fpt.getTags());
+    }
+    if (auto fpt = pkg->getFootprints().value(matcher.findFirstMatch(tags))) {
+      return fpt->getUuid();
+    }
+  }
+
+  // Prio 4: Fallback to the default footprint.
   return std::nullopt;
 }
 
@@ -2309,7 +2337,7 @@ void Board2dTab::addUnplacedComponentsToBoard(
       if ((devices.second >= 0) && (devices.second < devices.first.count())) {
         const DeviceMetadata& dev = devices.first.at(devices.second);
         const std::optional<Uuid> fptUuid =
-            getSuggestedFootprint(dev.packageUuid);
+            getSuggestedFootprint(dev.packageUuid, nullptr);
         cmd->appendChild(new CmdAddDeviceToBoard(
             mApp.getWorkspace(), mBoard, *cmp, dev.deviceUuid, fptUuid,
             std::nullopt, nextPos.mapToGrid(mBoard.getGridInterval())));

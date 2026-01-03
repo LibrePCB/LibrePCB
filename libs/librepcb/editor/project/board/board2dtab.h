@@ -225,8 +225,8 @@ private:
    */
   std::pair<QList<DeviceMetadata>, int> getAvailableDevices(
       ComponentInstance& cmp) const noexcept;
-  std::optional<Uuid> getSuggestedFootprint(
-      const Uuid& libPkgUuid) const noexcept;
+  std::optional<Uuid> getSuggestedFootprint(const Uuid& libPkgUuid,
+                                            const Package* pkg) const noexcept;
   void addUnplacedComponentsToBoard(PlaceComponentsMode mode) noexcept;
   void execGraphicsExportDialog(GraphicsExportDialog::Output output,
                                 const QString& settingsKey) noexcept;
@@ -308,8 +308,8 @@ private:
   int mUnplacedComponentFootprintIndex;
   std::unique_ptr<GraphicsScene> mUnplacedComponentGraphicsScene;
   std::unique_ptr<FootprintGraphicsItem> mUnplacedComponentGraphicsItem;
-  QHash<Uuid, Uuid> mLastDeviceOfComponent;
-  QHash<Uuid, Uuid> mLastFootprintOfPackage;
+  QHash<Uuid, Uuid> mLastDeviceOfComponent;  // Selection memory
+  QHash<Uuid, Uuid> mLastFootprintOfPackage;  // Selection memory
   std::unique_ptr<QTimer> mUnplacedComponentsUpdateTimer;
 
   // FSM

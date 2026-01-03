@@ -28,6 +28,7 @@
 #include "../../types/elementname.h"
 #include "../../types/length.h"
 #include "../../types/lengthunit.h"
+#include "../../types/tag.h"
 #include "../../types/uuid.h"
 #include "../../types/version.h"
 
@@ -74,6 +75,26 @@ class Board final : public QObject {
   Q_OBJECT
 
 public:
+  struct PreferredFootprintTags {
+    QVector<Tag> thtTop;
+    QVector<Tag> thtBot;
+    QVector<Tag> smtTop;
+    QVector<Tag> smtBot;
+    QVector<Tag> common;
+
+    PreferredFootprintTags() noexcept;
+    PreferredFootprintTags(const SExpression& node);
+    bool isEmpty() const noexcept;
+    bool operator==(const PreferredFootprintTags& rhs) const noexcept = default;
+    bool operator!=(const PreferredFootprintTags& rhs) const noexcept = default;
+    /**
+     * @brief Serialize into ::librepcb::SExpression node
+     *
+     * @param root    Root node to serialize into.
+     */
+    void serialize(SExpression& root) const;
+  };
+
   // Constructors / Destructor
   Board() = delete;
   Board(const Board& other) = delete;
@@ -114,6 +135,9 @@ public:
     return mGridInterval;
   }
   const LengthUnit& getGridUnit() const noexcept { return mGridUnit; }
+  const PreferredFootprintTags& getPreferredFootprintTags() const noexcept {
+    return mPreferredFootprintTags;
+  }
   int getInnerLayerCount() const noexcept { return mInnerLayerCount; }
   const QSet<const Layer*> getCopperLayers() const noexcept {
     return mCopperLayers;
@@ -146,6 +170,7 @@ public:
   void setDefaultFontName(const QString& name) noexcept {
     mDefaultFontFileName = name;
   }
+  void setPreferredFootprintTags(const PreferredFootprintTags& tags) noexcept;
   void setGridInterval(const PositiveLength& interval) noexcept {
     mGridInterval = interval;
   }
@@ -249,6 +274,7 @@ public:
 signals:
   void nameChanged(const ElementName& name);
   void attributesChanged();
+  void preferredFootprintTagsChanged();
   void designRulesModified();
   void innerLayerCountChanged();
 
@@ -288,6 +314,7 @@ private:
   QString mDefaultFontFileName;
   PositiveLength mGridInterval;
   LengthUnit mGridUnit;
+  PreferredFootprintTags mPreferredFootprintTags;
 
   // Board setup
   int mInnerLayerCount;

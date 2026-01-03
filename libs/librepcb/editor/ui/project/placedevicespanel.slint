@@ -1,20 +1,26 @@
 import { ListView } from "std-widgets.slint";
+import { NameRowHeader } from "../library/metadatawidgets.slint";
 import {
     Button,
     ComboBox,
     IconButton,
+    IpcDensityLevelSelector,
     LinkText,
     Palette,
     PanelHeader,
+    SolderTechnologySelector,
 } from "../widgets.slint";
 import {
     Backend,
     Board2dTabData,
+    BoardData,
     Constants,
     Data,
     Helpers,
+    IpcDensityLevel,
     NotificationType,
     PanelPage,
+    SolderTechnology,
     TabAction,
 } from "../api.slint";
 
@@ -57,9 +63,12 @@ export component PlaceDevicesPanel inherits Rectangle {
     property <length> item-height: 22px;
     property <Board2dTabData> tab: Data.current-section.board-2d-tabs[Data.current-section.current-tab-index];
     property <[string]> model: tab.unplaced-components;
+    property <[BoardData]> boards: Data.projects[tab.project-index].boards;
     property <int> selected-index: tab.unplaced-components-index;
     property <bool> item-selected: (selected-index >= 0) && (selected-index < model.length);
     property <int> devices-count: tab.unplaced-components-devices.length;
+    property <bool> settings-expanded: false;
+    property <bool> settings-texts-visible: self.width > 270px;
 
     background: #2a2a2a;
 
@@ -91,6 +100,156 @@ export component PlaceDevicesPanel inherits Rectangle {
                 z: 10;  // For the tooltip.
                 title: @tr("Place Devices").to-uppercase();
                 highlight: fs.has-focus;
+
+                if tht-soldering-selector.icon.height > 0: tht-soldering-btn := IconButton {
+                    width: self.height * 0.7;
+                    icon: tht-soldering-selector.icon;
+                    tooltip: tht-soldering-selector.text;
+                    enabled: false;
+                    accessible-role: none;
+                }
+
+                if (smt-soldering-selector.icon.height > 0) && (smt-soldering-selector.icon != tht-soldering-selector.icon): smt-soldering-btn := IconButton {
+                    width: self.height * 0.7;
+                    icon: smt-soldering-selector.icon;
+                    tooltip: smt-soldering-selector.text;
+                    enabled: false;
+                    accessible-role: none;
+                }
+
+                if density-level-selector.icon.height > 0: density-level-btn := IconButton {
+                    width: self.height * 0.7;
+                    icon: density-level-selector.icon;
+                    tooltip: density-level-selector.text;
+                    enabled: false;
+                    accessible-role: none;
+                }
+
+                settings-expand-btn := IconButton {
+                    width: self.height;
+                    icon: @image-url("../../../../font-awesome/svgs/solid/sliders.svg");
+                    tooltip: @tr("Settings");
+
+                    clicked => {
+                        settings-expanded = !settings-expanded;
+                    }
+
+                    if !boards[tab.board-index].has-preferred-footprint-tags: Rectangle {
+                        x: parent.width - self.width - 1px;
+                        y: parent.height - self.height - 1px;
+                        width: 6px;
+                        height: self.width;
+                        border-radius: self.width / 2;
+                        background: yellow;
+                    }
+                }
+            }
+
+            // Settings panel
+            Rectangle {
+                height: settings-expanded ? self.preferred-height : 0;
+                clip: true;
+
+                animate height { duration: 150ms; }
+
+                GridLayout {
+                    padding: 8px;
+                    spacing-horizontal: 8px;
+                    spacing-vertical: 2px;
+
+                    Row {
+                        NameRowHeader {
+                            text: @tr("THT Pads:");
+                        }
+
+                        HorizontalLayout {
+                            alignment: start;
+                            spacing: 8px;
+
+                            tht-soldering-selector := SolderTechnologySelector {
+                                height: self.preferred-height;
+                                value: boards[tab.board-index].tht-soldering;
+
+                                value-clicked(v) => {
+                                    boards[tab.board-index].tht-soldering = v;
+                                }
+                            }
+
+                            if settings-texts-visible: Text {
+                                color: #a0a0a0;
+                                font-size: 10px;
+                                font-italic: true;
+                                vertical-alignment: center;
+                                wrap: word-wrap;
+                                text: tht-soldering-selector.text;
+                            }
+                        }
+                    }
+
+                    Row {
+                        NameRowHeader {
+                            text: @tr("SMT Pads:");
+                        }
+
+                        HorizontalLayout {
+                            alignment: start;
+                            spacing: 8px;
+
+                            smt-soldering-selector := SolderTechnologySelector {
+                                height: self.preferred-height;
+                                value: boards[tab.board-index].smt-soldering;
+
+                                value-clicked(v) => {
+                                    boards[tab.board-index].smt-soldering = v;
+                                }
+                            }
+
+                            if settings-texts-visible: Text {
+                                color: #a0a0a0;
+                                font-size: 10px;
+                                font-italic: true;
+                                vertical-alignment: center;
+                                wrap: word-wrap;
+                                text: smt-soldering-selector.text;
+                            }
+                        }
+                    }
+
+                    Row {
+                        NameRowHeader {
+                            text: @tr("Density:");
+                        }
+
+                        HorizontalLayout {
+                            alignment: start;
+                            spacing: 8px;
+
+                            density-level-selector := IpcDensityLevelSelector {
+                                height: self.preferred-height;
+                                value: boards[tab.board-index].ipc-density-level;
+
+                                value-clicked(v) => {
+                                    boards[tab.board-index].ipc-density-level = v;
+                                }
+                            }
+
+                            if settings-texts-visible: Text {
+                                color: #a0a0a0;
+                                font-size: 10px;
+                                font-italic: true;
+                                vertical-alignment: center;
+                                wrap: word-wrap;
+                                text: density-level-selector.text;
+                            }
+                        }
+                    }
+                }
+
+                Rectangle {
+                    y: parent.height - self.height;
+                    height: 1px;
+                    background: #555555;
+                }
             }
 
             if model.length == 0: VerticalLayout {

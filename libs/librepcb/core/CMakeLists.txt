@@ -511,6 +511,7 @@ add_library(
   types/simplestring.h
   types/stroketextspacing.cpp
   types/stroketextspacing.h
+  types/tag.h
   types/uuid.cpp
   types/uuid.h
   types/version.cpp
@@ -528,6 +529,8 @@ add_library(
   utils/scopeguard.h
   utils/scopeguardlist.h
   utils/signalslot.h
+  utils/tagmatcher.cpp
+  utils/tagmatcher.h
   utils/tangentpathjoiner.cpp
   utils/tangentpathjoiner.h
   utils/toolbox.cpp

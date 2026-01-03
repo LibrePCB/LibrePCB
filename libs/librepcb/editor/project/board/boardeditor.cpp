@@ -30,6 +30,7 @@
 #include "../../undostack.h"
 #include "../../utils/slinthelpers.h"
 #include "../../workspace/desktopservices.h"
+#include "../cmd/cmdboardedit.h"
 #include "../cmd/cmdboardnetsegmentremove.h"
 #include "../projecteditor.h"
 #include "board2dtab.h"
@@ -69,6 +70,9 @@ BoardEditor::BoardEditor(ProjectEditor& prjEditor, Board& board, int uiIndex,
     mProject(mProjectEditor.getProject()),
     mBoard(board),
     mUiIndex(uiIndex),
+    mThtSolderTechnology(ui::SolderTechnology::None),
+    mSmtSolderTechnology(ui::SolderTechnology::None),
+    mIpcDensityLevel(ui::IpcDensityLevel::None),
     mTimestampOfLastPlaneRebuild(0),
     mDrc(new BoardDesignRuleCheck(this)),
     mDrcNotification(new Notification(ui::NotificationType::Progress, QString(),
@@ -79,6 +83,8 @@ BoardEditor::BoardEditor(ProjectEditor& prjEditor, Board& board, int uiIndex,
   // Connect board.
   connect(&mBoard, &Board::nameChanged, this,
           [this]() { onUiDataChanged.notify(); });
+  connect(&mBoard, &Board::preferredFootprintTagsChanged, this,
+          &BoardEditor::updatePreferredFootprintTags);
 
   // Connect project editor.
   connect(&mProjectEditor.getUndoStack(), &UndoStack::stateModified, this,
@@ -95,6 +101,8 @@ BoardEditor::BoardEditor(ProjectEditor& prjEditor, Board& board, int uiIndex,
           mDrcNotification.get(), &Notification::setDescription);
   connect(mDrc.get(), &BoardDesignRuleCheck::finished, this,
           &BoardEditor::setDrcResult);
+
+  updatePreferredFootprintTags();
 }
 
 BoardEditor::~BoardEditor() noexcept {
@@ -148,6 +156,10 @@ ui::BoardData BoardEditor::getUiData() const noexcept {
           q2s(mDrcExecutionError),  // Execution error
           !mProject.getDirectory().isWritable(),  // Read-only
       },
+      !mBoard.getPreferredFootprintTags().isEmpty(),  // Has preferred tags
+      mThtSolderTechnology,  // THT soldering
+      mSmtSolderTechnology,  // SMT soldering
+      mIpcDensityLevel,  // IPC density level
       q2s(mOrderStatus),  // Order status / error
       mOrderRequest ? q2s(mOrderRequest->getReceivedInfoUrl().toString())
                     : slint::SharedString(),  // Order info URL
@@ -158,7 +170,84 @@ ui::BoardData BoardEditor::getUiData() const noexcept {
 }
 
 void BoardEditor::setUiData(const ui::BoardData& data) noexcept {
-  Q_UNUSED(data);
+  static QHash<ui::SolderTechnology, QVector<Tag>> solderTechnologyTags = {
+      {ui::SolderTechnology::HandLarge,
+       {
+           Tag("hand-soldering"),
+           Tag("extra-large-pads"),
+           Tag("ipc-density-level-a"),
+           Tag("ipc-density-level-b"),
+       }},
+      {ui::SolderTechnology::Hand, {Tag("hand-soldering")}},
+      {ui::SolderTechnology::Reflow, {Tag("reflow-soldering")}},
+      {ui::SolderTechnology::Wave, {Tag("wave-soldering")}},
+  };
+  static QHash<ui::IpcDensityLevel, QVector<Tag>> ipcDensityLevelTags = {
+      {ui::IpcDensityLevel::A,
+       {
+           Tag("ipc-density-level-a"),
+           Tag("ipc-density-level-b"),
+       }},
+      {ui::IpcDensityLevel::B,
+       {
+           Tag("ipc-density-level-b"),
+       }},
+      {ui::IpcDensityLevel::C,
+       {
+           Tag("ipc-density-level-c"),
+           Tag("ipc-density-level-b"),
+       }},
+  };
+  auto editPreferredFootprintTags =
+      [](const std::initializer_list<QVector<Tag>*>& tagsList,
+         const QList<QVector<Tag>>& removeTags, const QVector<Tag>& prependTags,
+         const QVector<Tag>& appendTags) {
+        for (QVector<Tag>* tags : tagsList) {
+          for (const QVector<Tag>& tv : removeTags) {
+            for (const Tag& t : tv) {
+              tags->removeAll(t);
+            }
+          }
+          *tags = prependTags + (*tags) + appendTags;
+        }
+      };
+  auto setPreferredFootprintTags =
+      [this](std::function<void(Board::PreferredFootprintTags & tags)> cb) {
+        try {
+          Board::PreferredFootprintTags tags =
+              mBoard.getPreferredFootprintTags();
+          cb(tags);
+          std::unique_ptr<CmdBoardEdit> cmd(new CmdBoardEdit(mBoard));
+          cmd->setPreferredFootprintTags(tags);
+          mProjectEditor.getUndoStack().execCmd(cmd.release());
+        } catch (const Exception& e) {
+          qCritical() << e.getMsg();
+        }
+      };
+
+  if (data.tht_soldering != mThtSolderTechnology) {
+    setPreferredFootprintTags([&](Board::PreferredFootprintTags& tags) {
+      editPreferredFootprintTags(
+          {&tags.thtTop, &tags.thtBot},
+          solderTechnologyTags.values() + ipcDensityLevelTags.values(),
+          solderTechnologyTags.value(data.tht_soldering), QVector<Tag>{});
+    });
+  }
+  if (data.smt_soldering != mSmtSolderTechnology) {
+    setPreferredFootprintTags([&](Board::PreferredFootprintTags& tags) {
+      editPreferredFootprintTags(
+          {&tags.smtTop, &tags.smtBot},
+          solderTechnologyTags.values() + ipcDensityLevelTags.values(),
+          solderTechnologyTags.value(data.smt_soldering), QVector<Tag>{});
+    });
+  }
+  if (data.ipc_density_level != mIpcDensityLevel) {
+    setPreferredFootprintTags([&](Board::PreferredFootprintTags& tags) {
+      editPreferredFootprintTags(
+          {&tags.common}, ipcDensityLevelTags.values(), QVector<Tag>{},
+          ipcDensityLevelTags.value(data.ipc_density_level));
+    });
+  }
 }
 
 bool BoardEditor::isRebuildingPlanes() const noexcept {
@@ -447,6 +536,84 @@ void BoardEditor::startOrderPcbUpload(bool openBrowser) noexcept {
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
+
+static ui::SolderTechnology determineSolderTechnology(
+    const QVector<Tag>& tags) noexcept {
+  for (const Tag& tag : tags) {
+    if (tag == "hand-soldering") {
+      if (tags.contains(Tag("extra-large-pads"))) {
+        return ui::SolderTechnology::HandLarge;
+      } else {
+        return ui::SolderTechnology::Hand;
+      }
+    } else if (tag == "reflow-soldering") {
+      return ui::SolderTechnology::Reflow;
+    } else if (tag == "wave-soldering") {
+      return ui::SolderTechnology::Wave;
+    }
+  }
+  return ui::SolderTechnology::None;
+}
+
+static ui::IpcDensityLevel determineIpcDensityLevel(
+    const QVector<Tag>& tags) noexcept {
+  for (const Tag& tag : tags) {
+    if (tag == "ipc-density-level-a") {
+      return ui::IpcDensityLevel::A;
+    } else if (tag == "ipc-density-level-b") {
+      return ui::IpcDensityLevel::B;
+    } else if (tag == "ipc-density-level-c") {
+      return ui::IpcDensityLevel::C;
+    }
+  }
+  return ui::IpcDensityLevel::None;
+}
+
+template <typename T>
+static T extractTagValue(const std::initializer_list<QVector<Tag>>& tags,
+                         std::function<T(const QVector<Tag>&)> cb,
+                         T fallback) noexcept {
+  QSet<T> set;
+  for (const QVector<Tag>& t : tags) {
+    set.insert(cb(t));
+  }
+  return (set.count() == 1) ? *set.begin() : fallback;
+}
+
+template <typename T>
+static bool updateMember(T& member, const T& newValue) noexcept {
+  if (member != newValue) {
+    member = newValue;
+    return true;
+  }
+  return false;
+}
+
+void BoardEditor::updatePreferredFootprintTags() noexcept {
+  bool modified = false;
+
+  const Board::PreferredFootprintTags& tags =
+      mBoard.getPreferredFootprintTags();
+  if (updateMember(mThtSolderTechnology,
+                   extractTagValue<ui::SolderTechnology>(
+                       {tags.thtTop, tags.thtBot}, &determineSolderTechnology,
+                       ui::SolderTechnology::None))) {
+    modified = true;
+  }
+  if (updateMember(mSmtSolderTechnology,
+                   extractTagValue<ui::SolderTechnology>(
+                       {tags.smtTop, tags.smtBot}, &determineSolderTechnology,
+                       ui::SolderTechnology::None))) {
+    modified = true;
+  }
+  if (updateMember(mIpcDensityLevel, determineIpcDensityLevel(tags.common))) {
+    modified = true;
+  }
+
+  if (modified) {
+    onUiDataChanged.notify();
+  }
+}
 
 void BoardEditor::setDrcResult(
     const BoardDesignRuleCheck::Result& result) noexcept {
