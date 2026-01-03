@@ -94,12 +94,12 @@ ProjectEditor::ProjectEditor(
     mLastAutosaveStateId(mUndoStack->getUniqueStateId()),
     mAutoSaveTimer() {
   // Update buses.
-  connect(&mProject->getCircuit(), &Circuit::busAdded, this,
-          &ProjectEditor::refreshBuses);
-  connect(&mProject->getCircuit(), &Circuit::busRemoved, this,
-          &ProjectEditor::refreshBuses);
-  connect(&mProject->getCircuit(), &Circuit::busRenamed, this,
-          &ProjectEditor::refreshBuses);
+  mConnections.append(connect(&mProject->getCircuit(), &Circuit::busAdded, this,
+                              &ProjectEditor::refreshBuses));
+  mConnections.append(connect(&mProject->getCircuit(), &Circuit::busRemoved,
+                              this, &ProjectEditor::refreshBuses));
+  mConnections.append(connect(&mProject->getCircuit(), &Circuit::busRenamed,
+                              this, &ProjectEditor::refreshBuses));
   refreshBuses();
 
   // Populate schematics.
@@ -230,6 +230,11 @@ ProjectEditor::~ProjectEditor() noexcept {
   // other important objects are deleted, as undo command objects can hold
   // pointers/references to them!
   mUndoStack->clear();
+
+  // Disconnect signal/slots to avoid issues with recursions etc.
+  while (!mConnections.isEmpty()) {
+    disconnect(mConnections.takeLast());
+  }
 
   // Delete objects to avoid issues with still connected signal/slots.
   mHighlightedNetSignals->clear();

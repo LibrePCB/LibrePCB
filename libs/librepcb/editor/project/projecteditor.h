@@ -239,6 +239,10 @@ private:
   /// The timer for the periodically automatic saving
   /// functionality (see also @ref doc_project_save)
   QTimer mAutoSaveTimer;
+
+  /// Signal/slot connections which must be disconnected in the destructor for
+  /// a safe cleanup process (avoid recursions etc.)
+  QVector<QMetaObject::Connection> mConnections;
 };
 
 /*******************************************************************************
