@@ -15,7 +15,7 @@ set(OpenGL_GL_PREFERENCE LEGACY)
 #  - Unstable (development) versions: Suffix "-unstable", e.g. "1.0.0-unstable"
 #  - Release candidates: Suffix "-rc#", e.g. "1.0.0-rc3"
 #  - Releases: No suffix, e.g. "1.0.0"
-set(LIBREPCB_APP_VERSION "2.0.0-unstable")
+set(LIBREPCB_APP_VERSION "2.0.0-rc1")
 
 # File format version:
 #  - Must be equal to the major version of APP_VERSION!
@@ -28,7 +28,7 @@ set(LIBREPCB_FILE_FORMAT_VERSION "2")
 #  - On release branches: true
 # Note: Do not use a CMake boolean (ON / TRUE), use a C++ style boolean
 # string instead ("true" / "false").
-set(LIBREPCB_FILE_FORMAT_STABLE "false")
+set(LIBREPCB_FILE_FORMAT_STABLE "true")
 
 # Define project
 project(librepcb LANGUAGES CXX)
