@@ -95,7 +95,7 @@ ComponentAssemblyOptionListEditorWidget::
   layout->addLayout(buttonsLayout);
 
   mAddOptionButton.reset(new QToolButton(this));
-  mAddOptionButton->setIcon(QIcon(":/img/library/device.png"));
+  mAddOptionButton->setIcon(QIcon(":/img/device.png"));
   mAddOptionButton->setToolTip(tr("Add a new device assembly option"));
   connect(mAddOptionButton.data(), &QToolButton::clicked, this,
           &ComponentAssemblyOptionListEditorWidget::addOption);
@@ -462,7 +462,7 @@ void ComponentAssemblyOptionListEditorWidget::optionListEdited(
 
   auto fillOptionRow = [this, &bgRed](QTreeWidgetItem* item,
                                       const ComponentAssemblyOption& option) {
-    item->setIcon(COLUMN_DEVICE, QIcon(":/img/library/device.png"));
+    item->setIcon(COLUMN_DEVICE, QIcon(":/img/device.png"));
     QString devName;
     QString pkgName;
     try {

@@ -22,6 +22,8 @@
  ******************************************************************************/
 #include "menubuilder.h"
 
+#include "editortoolbox.h"
+
 #include <QtCore>
 #include <QtWidgets>
 
@@ -109,17 +111,17 @@ void MenuBuilder::addSeparator() noexcept {
 
 QMenu* MenuBuilder::createChangeDeviceMenu(QWidget* parent) noexcept {
   return createMenu("menuChangeDevice", tr("Change &Device"),
-                    QIcon(":/img/library/package.png"), parent);
+                    QIcon(":/img/device.png"), parent);
 }
 
 QMenu* MenuBuilder::createChangeFootprintMenu(QWidget* parent) noexcept {
   return createMenu("menuChangeFootprint", tr("Change &Footprint"),
-                    QIcon(":/img/library/footprint.png"), parent);
+                    QIcon(":/img/footprint.png"), parent);
 }
 
 QMenu* MenuBuilder::createChangeModelMenu(QWidget* parent) noexcept {
   return createMenu("menuChangeModel", tr("Change 3D &Model"),
-                    QIcon(":/img/library/3d_model.png"), parent);
+                    EditorToolbox::svgIcon(":/fa/solid/cubes.svg"), parent);
 }
 
 QMenu* MenuBuilder::createMoreResourcesMenu(QWidget* parent) noexcept {

@@ -522,7 +522,7 @@ void AddComponentDialog::searchComponents(
     for (auto cmpIt = result.components.begin();
          cmpIt != result.components.end(); ++cmpIt) {
       QTreeWidgetItem* cmpItem = new QTreeWidgetItem(mUi->treeComponents);
-      cmpItem->setIcon(0, QIcon(":/img/library/symbol.png"));
+      cmpItem->setIcon(0, QIcon(":/img/symbol.png"));
       cmpItem->setText(0, cmpIt.value().name);
       cmpItem->setForeground(
           0, cmpIt.value().deprecated ? QBrush(Qt::red) : QBrush());
@@ -530,7 +530,7 @@ void AddComponentDialog::searchComponents(
       for (auto devIt = cmpIt->devices.begin(); devIt != cmpIt->devices.end();
            ++devIt) {
         QTreeWidgetItem* devItem = new QTreeWidgetItem(cmpItem);
-        devItem->setIcon(0, QIcon(":/img/library/device.png"));
+        devItem->setIcon(0, QIcon(":/img/device.png"));
         devItem->setText(0, devIt.value().name);
         devItem->setForeground(
             0, devIt.value().deprecated ? QBrush(Qt::red) : QBrush());
@@ -729,7 +729,7 @@ void AddComponentDialog::setSelectedCategory(
     bool cmpDeprecated = false;
     mDb.getMetadata<Component>(cmpFp, nullptr, nullptr, &cmpDeprecated);
     QTreeWidgetItem* cmpItem = new QTreeWidgetItem(mUi->treeComponents);
-    cmpItem->setIcon(0, QIcon(":/img/library/symbol.png"));
+    cmpItem->setIcon(0, QIcon(":/img/symbol.png"));
     cmpItem->setText(0, cmpName);
     cmpItem->setForeground(0, cmpDeprecated ? QBrush(Qt::red) : QBrush());
     cmpItem->setData(0, Qt::UserRole, cmpFp.toStr());
@@ -744,7 +744,7 @@ void AddComponentDialog::setSelectedCategory(
         bool devDeprecated = false;
         mDb.getMetadata<Device>(devFp, nullptr, nullptr, &devDeprecated);
         QTreeWidgetItem* devItem = new QTreeWidgetItem(cmpItem);
-        devItem->setIcon(0, QIcon(":/img/library/device.png"));
+        devItem->setIcon(0, QIcon(":/img/device.png"));
         devItem->setText(0, devName);
         devItem->setForeground(0, devDeprecated ? QBrush(Qt::red) : QBrush());
         devItem->setData(0, Qt::UserRole, devFp.toStr());

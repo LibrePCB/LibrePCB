@@ -61,19 +61,20 @@ Files:
  img/command_toolbars/wire_h_v.png
  img/command_toolbars/wire_straight.png
  img/command_toolbars/wire_v_h.png
+ img/device.png
  img/empty.png
+ img/footprint.png
  img/gnd.svg
  img/grid-dots.svg
  img/grid-none.svg
  img/inductor-eu.svg
  img/inductor-us.svg
- img/library/footprint.png
- img/library/symbol.png
  img/norm/iec_60617.png
  img/norm/ieee_315.png
  img/README.md
  img/resistor-eu.svg
  img/resistor-us.svg
+ img/symbol.png
  img/vcc.svg
  img/video-tutorial.png
  img/wizards/watermark.jpg
@@ -141,16 +142,6 @@ Files:
 Copyright: Humanity Project and LibrePCB Developers
 License: GPL-2.0-only
 
-Files: img/library/package.png
-Copyright: Part-DB Developers and LibrePCB Developers
-License: GPL-2.0-only
-
-Files:
- img/library/3d_model.png
- img/library/device.png
-Copyright: Part-DB Developers
-License: GPL-2.0-only
-
 Files:
  img/actions/minus.png
  img/actions/undo.png
@@ -178,7 +169,6 @@ Files:
  img/actions/plus_2.png
  img/actions/search.png
  img/actions/settings.png
- img/library/component.png
  img/places/file.png
 Copyright: Open Icon Library
 License: LGPL-2.1-only

@@ -117,13 +117,13 @@ export component LibraryTreeView inherits FocusScope {
                         } else if item.type == LibraryTreeViewItemType.package-category {
                             @image-url("../../../../../img/places/folder_green.png")
                         } else if (item.type == LibraryTreeViewItemType.symbol) && (item.level > 0) {
-                            @image-url("../../../../../img/library/symbol.png")
+                            @image-url("../../../../../img/symbol.png")
                         } else if (item.type == LibraryTreeViewItemType.package) && (item.level > 0) {
-                            @image-url("../../../../../img/library/package.png")
+                            @image-url("../../../../../img/footprint.png")
                         } else if (item.type == LibraryTreeViewItemType.component) && (item.level > 0) {
-                            @image-url("../../../../../img/library/component.png")
+                            @image-url("../../../../bootstrap-icons/icons/cpu.svg")
                         } else if (item.type == LibraryTreeViewItemType.device) && (item.level > 0) {
-                            @image-url("../../../../../img/library/device.png")
+                            @image-url("../../../../../img/device.png")
                         } else {
                             @image-url("")
                         }
@@ -139,6 +139,8 @@ export component LibraryTreeView inherits FocusScope {
                                 Palette.foreground
                             } else if item.type == LibraryTreeViewItemType.uncategorized {
                                 yellow
+                            } else if item.type == LibraryTreeViewItemType.component {
+                                Palette.foreground
                             } else if item.is-external {
                                 Palette.foreground
                             } else {

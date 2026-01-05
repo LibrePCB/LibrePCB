@@ -147,15 +147,11 @@
         <file>command_toolbars/wire_h_v.png</file>
         <file>command_toolbars/wire_straight.png</file>
         <file>command_toolbars/wire_v_h.png</file>
+        <file>device.png</file>
         <file>empty.png</file>
+        <file>footprint.png</file>
         <file>gnd.svg</file>
         <file>inductor-eu.svg</file>
-        <file>library/3d_model.png</file>
-        <file>library/component.png</file>
-        <file>library/device.png</file>
-        <file>library/footprint.png</file>
-        <file>library/package.png</file>
-        <file>library/symbol.png</file>
         <file>logo/48x48.png</file>
         <file>logo/64x64.png</file>
         <file>norm/iec_60617.png</file>
@@ -168,6 +164,7 @@
         <file>status/dialog_error.png</file>
         <file>status/dialog_warning.png</file>
         <file>status/info.png</file>
+        <file>symbol.png</file>
         <file>vcc.svg</file>
         <file>wizards/eagle_watermark.png</file>
         <file>wizards/kicad_watermark.png</file>
