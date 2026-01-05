@@ -349,7 +349,7 @@ component LibrarySection inherits Rectangle {
                 if (!tab.path.is-empty) && (tab.library-index == library-index): DocumentsListItem {
                     type: ItemType.library;
                     text: section.tabs[idx].title;
-                    icon: @image-url("../../../../img/library/symbol.png");
+                    icon: @image-url("../../../../img/symbol.png");
                     selected: (Data.current-tab.type == TabType.symbol) && (Data.current-symbol-tab.library-index == library-index) && (Data.current-symbol-tab.path == tab.path);
                     scrollbar-width: scrollbar-width;
 
@@ -363,7 +363,7 @@ component LibrarySection inherits Rectangle {
                 if (!tab.path.is-empty) && (tab.library-index == library-index): DocumentsListItem {
                     type: ItemType.library;
                     text: section.tabs[idx].title;
-                    icon: @image-url("../../../../img/library/package.png");
+                    icon: @image-url("../../../../img/footprint.png");
                     selected: (Data.current-tab.type == TabType.package) && (Data.current-package-tab.library-index == library-index) && (Data.current-package-tab.path == tab.path);
                     scrollbar-width: scrollbar-width;
 
@@ -391,7 +391,7 @@ component LibrarySection inherits Rectangle {
                 if (!tab.path.is-empty) && (tab.library-index == library-index): DocumentsListItem {
                     type: ItemType.library;
                     text: section.tabs[idx].title;
-                    icon: @image-url("../../../../img/library/device.png");
+                    icon: @image-url("../../../bootstrap-icons/icons/cpu-fill.svg");
                     selected: (Data.current-tab.type == TabType.device) && (Data.current-device-tab.library-index == library-index) && (Data.current-device-tab.path == tab.path);
                     scrollbar-width: scrollbar-width;
 
