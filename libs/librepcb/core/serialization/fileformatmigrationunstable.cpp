@@ -74,14 +74,28 @@ void FileFormatMigrationUnstable::upgradePackage(TransactionalDirectory& dir) {
     std::unique_ptr<SExpression> root =
         SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
     for (SExpression* fptNode : root->getChildren("footprint")) {
-      // Stroke texts.
-      for (SExpression* child : fptNode->getChildren("stroke_text")) {
-        const QSet<QString> unlockedLayers = {"top_names", "top_values",
-                                              "bot_names", "bot_values"};
-        const QString layer = child->getChild("layer/@0").getValue();
-        const bool lock = !unlockedLayers.contains(layer);
-        child->appendChild("lock",
-                           SExpression::createToken(lock ? "true" : "false"));
+      // Add tags depending on name.
+      const QString name = fptNode->getChild("name/@0").getValue().toLower();
+      if (name.contains("density level a")) {
+        fptNode->appendChild("tag", QString("ipc-density-level-a"));
+      }
+      if (name.contains("density level b")) {
+        fptNode->appendChild("tag", QString("ipc-density-level-b"));
+      }
+      if (name.contains("density level c")) {
+        fptNode->appendChild("tag", QString("ipc-density-level-c"));
+      }
+      if (name.contains("hand")) {
+        fptNode->appendChild("tag", QString("hand-soldering"));
+      }
+      if (name.contains("reflow")) {
+        fptNode->appendChild("tag", QString("reflow-soldering"));
+      }
+      if (name.contains("wave")) {
+        fptNode->appendChild("tag", QString("wave-soldering"));
+      }
+      if (name.contains("large")) {
+        fptNode->appendChild("tag", QString("extra-large-pads"));
       }
     }
     dir.write(fp, root->toByteArray());
@@ -173,6 +187,22 @@ void FileFormatMigrationUnstable::upgradeBoard(SExpression& root) {
   drcNode.appendChild("max_tented_via_drill_diameter",
                       SExpression::createToken("0.5"));
   drcNode.ensureLineBreak();
+
+  // Preferred footprint tags
+  {
+    SExpression& child = root.appendList("preferred_footprint_tags");
+    child.ensureLineBreak();
+    child.appendList("tht_top");
+    child.ensureLineBreak();
+    child.appendList("tht_bot");
+    child.ensureLineBreak();
+    child.appendList("smt_top");
+    child.ensureLineBreak();
+    child.appendList("smt_bot");
+    child.ensureLineBreak();
+    child.appendList("common");
+    child.ensureLineBreak();
+  }
 }
 
 /*******************************************************************************

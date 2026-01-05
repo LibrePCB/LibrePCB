@@ -111,6 +111,23 @@ export struct AttributeData {
     action: AttributeAction,  // Set by UI, reset by backend
 }
 
+// Soldering technology selector
+export enum SolderTechnology {
+    none,
+    hand-large,
+    hand,
+    reflow,
+    wave,
+}
+
+// IPC density level selector
+export enum IpcDensityLevel {
+    none,
+    a,
+    b,
+    c,
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Widgets data
 ////////////////////////////////////////////////////////////////////////////////
@@ -446,6 +463,7 @@ export enum FootprintAction {
 export struct FootprintData {
     id: string,
     name: string,
+    tags: [string],
     model-x: Int64,
     model-y: Int64,
     model-z: Int64,
@@ -453,6 +471,9 @@ export struct FootprintData {
     model-ry: int,
     model-rz: int,
     models: [bool],  // One flag for each 3D model
+
+    new-tag: string,  // Set by UI, reset in backend
+    remove-tag: string,  // Set by UI, reset in backend
     action: FootprintAction,  // Set by UI, handled in backend
 }
 
@@ -1437,6 +1458,12 @@ export enum BoardAction {
 export struct BoardData {
     name: string,
     drc: RuleCheckData,
+
+    // Place Devices
+    has-preferred-footprint-tags: bool,
+    tht-soldering: SolderTechnology,
+    smt-soldering: SolderTechnology,
+    ipc-density-level: IpcDensityLevel,
 
     // Order PCB
     order-status: string,  // Either progress status or error message.

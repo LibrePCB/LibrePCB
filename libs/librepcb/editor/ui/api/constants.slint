@@ -8,6 +8,15 @@ export global Constants {
         @tr("None (excluded from BOM/PnP"),
         @tr("Auto-detect (not recommended)"),
     ];
+    out property <[string]> footprint-tags-suggestions: [
+        "hand-soldering",
+        "reflow-soldering",
+        "wave-soldering",
+        "extra-large-pads",
+        "ipc-density-level-a (max protrusion)",
+        "ipc-density-level-b (median protrusion)",
+        "ipc-density-level-c (min protrusion)",
+    ];
 
     out property <string> drag-tab-mime-type: "application/x-librepcb-clipboard.tab";
 

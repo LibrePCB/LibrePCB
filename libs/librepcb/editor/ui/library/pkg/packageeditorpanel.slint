@@ -2,6 +2,7 @@ import { Palette } from "std-widgets.slint";
 
 export component PackageEditorPanel inherits Rectangle {
     in property <bool> error-state;
+    out property <bool> has-hover: ta.has-hover;
 
     width: self.preferred-width;
     height: self.preferred-height;
@@ -9,7 +10,7 @@ export component PackageEditorPanel inherits Rectangle {
     border-color: error-state ? red : #505050;
     border-width: error-state ? 2px : 1px;
     border-radius: 8px;
-    opacity: ta.has-hover ? 1 : 0.8;
+    opacity: has-hover ? 1 : 0.8;
 
     animate opacity { duration: 100ms; }
 

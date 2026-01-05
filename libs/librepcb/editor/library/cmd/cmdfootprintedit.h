@@ -56,6 +56,7 @@ public:
 
   // Setters
   void setName(const ElementName& name) noexcept;
+  void setTags(const QSet<Tag>& tags) noexcept;
   void setModelPosition(const Point3D& pos) noexcept;
   void setModelRotation(const Angle3D& rot) noexcept;
   void setModels(const QSet<Uuid>& models) noexcept;
@@ -83,6 +84,8 @@ private:
   // General Attributes
   ElementName mOldName;
   ElementName mNewName;
+  QSet<Tag> mOldTags;
+  QSet<Tag> mNewTags;
   Point3D mOldModelPosition;
   Point3D mNewModelPosition;
   Angle3D mOldModelRotation;

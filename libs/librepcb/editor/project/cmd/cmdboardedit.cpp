@@ -41,6 +41,8 @@ CmdBoardEdit::CmdBoardEdit(Board& board) noexcept
     mBoard(board),
     mOldName(mBoard.getName()),
     mNewName(mOldName),
+    mOldPreferredFootprintTags(mBoard.getPreferredFootprintTags()),
+    mNewPreferredFootprintTags(mOldPreferredFootprintTags),
     mOldInnerLayerCount(mBoard.getInnerLayerCount()),
     mNewInnerLayerCount(mOldInnerLayerCount),
     mOldPcbThickness(mBoard.getPcbThickness()),
@@ -69,6 +71,12 @@ CmdBoardEdit::~CmdBoardEdit() noexcept {
 void CmdBoardEdit::setName(const ElementName& name) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewName = name;
+}
+
+void CmdBoardEdit::setPreferredFootprintTags(
+    const Board::PreferredFootprintTags& tags) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewPreferredFootprintTags = tags;
 }
 
 void CmdBoardEdit::setInnerLayerCount(int count) noexcept {
@@ -121,6 +129,7 @@ bool CmdBoardEdit::performExecute() {
   performRedo();  // can throw
 
   if (mNewName != mOldName) return true;
+  if (mNewPreferredFootprintTags != mOldPreferredFootprintTags) return true;
   if (mNewInnerLayerCount != mOldInnerLayerCount) return true;
   if (mNewPcbThickness != mOldPcbThickness) return true;
   if (mNewSolderResist != mOldSolderResist) return true;
@@ -134,6 +143,7 @@ bool CmdBoardEdit::performExecute() {
 
 void CmdBoardEdit::performUndo() {
   mBoard.setName(mOldName);
+  mBoard.setPreferredFootprintTags(mOldPreferredFootprintTags);
   mBoard.setInnerLayerCount(mOldInnerLayerCount);
   mBoard.setPcbThickness(mOldPcbThickness);
   mBoard.setSolderResist(mOldSolderResist);
@@ -146,6 +156,7 @@ void CmdBoardEdit::performUndo() {
 
 void CmdBoardEdit::performRedo() {
   mBoard.setName(mNewName);
+  mBoard.setPreferredFootprintTags(mNewPreferredFootprintTags);
   mBoard.setInnerLayerCount(mNewInnerLayerCount);
   mBoard.setPcbThickness(mNewPcbThickness);
   mBoard.setSolderResist(mNewSolderResist);
