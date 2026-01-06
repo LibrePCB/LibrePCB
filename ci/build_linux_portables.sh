@@ -9,8 +9,10 @@ export LANG="C.UTF-8"
 # Remove unneeded SQL plugins to fix deployment issue:
 # https://forum.qt.io/topic/151452/what-qt-specific-files-exactly-do-i-need-to-add-when-deploying
 # Also this removes the OpenSSL 1.x dependency which we don't want to deploy.
+rm -f $QTDIR/plugins/sqldrivers/libqsqlibase.so
 rm -f $QTDIR/plugins/sqldrivers/libqsqlmimer.so
 rm -f $QTDIR/plugins/sqldrivers/libqsqlmysql.so
+rm -f $QTDIR/plugins/sqldrivers/libqsqloci.so
 rm -f $QTDIR/plugins/sqldrivers/libqsqlodbc.so
 rm -f $QTDIR/plugins/sqldrivers/libqsqlpsql.so
 
