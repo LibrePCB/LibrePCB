@@ -12,13 +12,13 @@ jobs:
         IMAGE: librepcb/librepcb-dev:ubuntu-22.04-qt6.10-1
         DEPLOY: true
       Ubuntu_2204_Clang:
-        IMAGE: librepcb/librepcb-dev:ubuntu-22.04-5
+        IMAGE: librepcb/librepcb-dev:ubuntu-22.04-6
         CC: clang
         CXX: clang++
         CMAKE_OPTIONS: '-DCMAKE_CXX_FLAGS="-DQT_FORCE_ASSERTS=1"'
         LD_LIBRARY_PATH: $(Build.Repository.LocalPath)/build/install/lib
       Ubuntu_2404_Unbundled:
-        IMAGE: librepcb/librepcb-dev:ubuntu-24.04-3
+        IMAGE: librepcb/librepcb-dev:ubuntu-24.04-4
         UNBUNDLE_DXFLIB: true
         UNBUNDLE_GTEST: true
         UNBUNDLE_MUPARSER: true
