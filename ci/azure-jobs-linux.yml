@@ -8,8 +8,8 @@ jobs:
     ARCH: 'x86_64'
   strategy:
     matrix:
-      Ubuntu_2004_Qt_6_6_GCC:
-        IMAGE: librepcb/librepcb-dev:ubuntu-20.04-qt6.6-4
+      Ubuntu_2204_Qt_6_10_GCC:
+        IMAGE: librepcb/librepcb-dev:ubuntu-22.04-qt6.10-1
         DEPLOY: true
       Ubuntu_2204_Clang:
         IMAGE: librepcb/librepcb-dev:ubuntu-22.04-5
