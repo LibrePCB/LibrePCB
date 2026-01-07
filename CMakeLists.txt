@@ -155,6 +155,9 @@ if(QT_VERSION VERSION_GREATER_EQUAL 6.8 AND QT_VERSION VERSION_LESS 6.10)
   target_compile_options(common INTERFACE -Wno-array-bounds)
 endif()
 
+# Add corrosion first because Slint will use it too.
+add_subdirectory(libs/corrosion)
+
 # Find third party libraries
 find_package(DelaunayTriangulation REQUIRED)
 find_package(Dxflib REQUIRED)
@@ -170,7 +173,6 @@ if(BUILD_TESTS)
 endif()
 
 # Add libs
-add_subdirectory(libs/corrosion)
 add_subdirectory(libs/librepcb/core)
 add_subdirectory(libs/librepcb/editor)
 add_subdirectory(libs/librepcb/eagleimport)
