@@ -446,7 +446,7 @@ public:
       QString(),
       EditorCommand::Flag::OpensPopup,
       {},
-      nullptr,  // Exclude from shortcuts overview & configuration
+      &categoryImportExport,
   };
   EditorCommand importDxf{
       "import_dxf",  // clang-format break
