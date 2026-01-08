@@ -309,6 +309,7 @@ void FileFormatMigrationV1::upgradeWorkspaceData(TransactionalDirectory& dir) {
       "cache_v4",
       "cache_v5",
       "cache_v6",
+      "cache_v7",
   };
   TransactionalDirectory librariesDir(dir, "libraries");
   foreach (const QString fileName, librariesDir.getFiles()) {

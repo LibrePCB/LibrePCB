@@ -118,6 +118,23 @@ void FileFormatMigrationUnstable::upgradeLibrary(TransactionalDirectory& dir) {
 void FileFormatMigrationUnstable::upgradeWorkspaceData(
     TransactionalDirectory& dir) {
   Q_UNUSED(dir);
+
+  // Remove legacy files.
+  const QStringList filesToRemove = {
+      "cache_v3",
+      "cache_v4",
+      "cache_v5",
+      "cache_v6",
+      "cache_v7",
+  };
+  TransactionalDirectory librariesDir(dir, "libraries");
+  foreach (const QString fileName, librariesDir.getFiles()) {
+    if (filesToRemove.contains(fileName.split(".").first())) {
+      qInfo() << "Removing legacy file:"
+              << librariesDir.getAbsPath(fileName).toNative();
+      librariesDir.removeFile(fileName);
+    }
+  }
 }
 
 /*******************************************************************************
