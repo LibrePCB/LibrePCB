@@ -406,10 +406,13 @@ void SchematicEditorState_AddComponent::startAddingComponent(
         mAddComponentDialog->setLocaleOrder(mContext.project.getLocaleOrder());
         mAddComponentDialog->setNormOrder(mContext.project.getNormOrder());
       } else {
+        // Warning: Do not pass parentWidget() as the parent QWidget because
+        // it breaks the mouse cursor after closing the dialog (it stucks with
+        // the default pointer)!
         mAddComponentDialog.reset(new AddComponentDialog(
             mContext.workspace.getLibraryDb(), mContext.workspace.getSettings(),
-            mContext.project.getLocaleOrder(), mContext.project.getNormOrder(),
-            parentWidget()));
+            mContext.project.getLocaleOrder(),
+            mContext.project.getNormOrder()));
       }
       if (!searchTerm.isEmpty()) {
         mAddComponentDialog->selectComponentByKeyword(searchTerm);
