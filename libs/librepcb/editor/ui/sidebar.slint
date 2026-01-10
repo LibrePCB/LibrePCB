@@ -135,7 +135,7 @@ component SideBarButton inherits Rectangle {
             }
 
             x: (parent.width - self.width) / 2;
-            y: (parent.height - self.height) / 2;
+            y: (parent.height - self.height) / 2 + 1px;
             font-size: (root.width < 40px) ? 8px : 10px;
             font-weight: 700;
             color: (emblem == Emblem.running) ? gray : status-color;
