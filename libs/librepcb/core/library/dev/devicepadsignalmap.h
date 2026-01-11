@@ -45,6 +45,7 @@ public:
   enum class Event {
     PadUuidChanged,
     SignalUuidChanged,
+    IsOptionalChanged,
   };
   Signal<DevicePadSignalMapItem, Event> onEdited;
   typedef Slot<DevicePadSignalMapItem, Event> OnEditedSlot;
@@ -52,22 +53,24 @@ public:
   // Constructors / Destructor
   DevicePadSignalMapItem() = delete;
   DevicePadSignalMapItem(const DevicePadSignalMapItem& other) noexcept;
-  DevicePadSignalMapItem(const Uuid& pad,
-                         const std::optional<Uuid>& signal) noexcept;
+  DevicePadSignalMapItem(const Uuid& pad, const std::optional<Uuid>& signal,
+                         bool optional = false) noexcept;
   explicit DevicePadSignalMapItem(const SExpression& node);
   ~DevicePadSignalMapItem() noexcept;
 
   // Getters
-  const Uuid& getUuid() const noexcept {
+  const Uuid& getUuid() const noexcept {  // used for UuidObjectMap
     return mPadUuid;
-  }  // used for UuidObjectMap
+  }
   const Uuid& getPadUuid() const noexcept { return mPadUuid; }
   const std::optional<Uuid>& getSignalUuid() const noexcept {
     return mSignalUuid;
   }
+  bool isOptional() const noexcept { return mIsOptional; }
 
   // Setters
   bool setSignalUuid(const std::optional<Uuid>& uuid) noexcept;
+  bool setOptional(bool optional) noexcept;
 
   // General Methods
 
@@ -87,8 +90,8 @@ public:
 
 private:  // Data
   Uuid mPadUuid;  ///< must be valid
-  std::optional<Uuid>
-      mSignalUuid;  ///< std::nullopt if not connected to a signal
+  std::optional<Uuid> mSignalUuid;  ///< std::nullopt if not connected to signal
+  bool mIsOptional;  ///< set to true if another pad can be used instead
 };
 
 /*******************************************************************************

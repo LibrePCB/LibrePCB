@@ -148,6 +148,20 @@ void FileFormatMigrationV1::upgradeComponent(TransactionalDirectory& dir) {
 void FileFormatMigrationV1::upgradeDevice(TransactionalDirectory& dir) {
   // Version File.
   upgradeVersionFile(dir, ".librepcb-dev");
+
+  // Content File.
+  {
+    const QString fp = "device.lp";
+    std::unique_ptr<SExpression> root =
+        SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+
+    // Pinout.
+    for (SExpression* padNode : root->getChildren("pad")) {
+      padNode->appendChild("optional", SExpression::createToken("false"));
+    }
+
+    dir.write(fp, root->toByteArray());
+  }
 }
 
 void FileFormatMigrationV1::upgradeOrganization(TransactionalDirectory& dir) {
@@ -305,11 +319,11 @@ void FileFormatMigrationV1::upgradeWorkspaceData(TransactionalDirectory& dir) {
 
   // Remove legacy files.
   const QStringList filesToRemove = {
-      "cache_v3",
-      "cache_v4",
-      "cache_v5",
-      "cache_v6",
-      "cache_v7",
+      "cache_v3",  //
+      "cache_v4",  //
+      "cache_v5",  //
+      "cache_v6",  //
+      "cache_v7",  //
   };
   TransactionalDirectory librariesDir(dir, "libraries");
   foreach (const QString fileName, librariesDir.getFiles()) {
