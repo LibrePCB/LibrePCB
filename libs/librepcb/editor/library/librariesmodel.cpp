@@ -201,6 +201,11 @@ void LibrariesModel::toggleAll() noexcept {
 void LibrariesModel::applyChanges() noexcept {
   if (mMode != Mode::RemoteLibs) return;
 
+  // Abort any currently running library rescan since this can cause problems
+  // due to concurrent file access. The scan will be restarted automatically
+  // after all changes have been applied (i.e. libraries removed or installed).
+  const bool scanCanceled = mWorkspace.getLibraryDb().cancelLibraryRescan();
+
   // Show wait cursor since some operations can take a while.
   qApp->setOverrideCursor(Qt::WaitCursor);
   auto cursorSg = scopeGuard([]() { qApp->restoreOverrideCursor(); });
@@ -267,7 +272,7 @@ void LibrariesModel::applyChanges() noexcept {
     }
   }
 
-  if ((installed == 0) && (uninstalled > 0)) {
+  if ((installed == 0) && ((uninstalled > 0) || scanCanceled)) {
     mWorkspace.getLibraryDb().startLibraryRescan();
   }
 

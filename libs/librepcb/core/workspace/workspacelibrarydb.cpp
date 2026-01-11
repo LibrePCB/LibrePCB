@@ -406,6 +406,10 @@ void WorkspaceLibraryDb::startLibraryRescan() noexcept {
   mLibraryScanner->startScan();
 }
 
+bool WorkspaceLibraryDb::cancelLibraryRescan() noexcept {
+  return mLibraryScanner->cancelScan();
+}
+
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/

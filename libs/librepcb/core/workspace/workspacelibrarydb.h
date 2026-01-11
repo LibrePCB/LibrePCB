@@ -515,6 +515,14 @@ public:
    */
   void startLibraryRescan() noexcept;
 
+  /**
+   * @brief Abort the library rescan (if running)
+   *
+   * @retval true    If a scan was running and canceled
+   * @retval false   If no scan was running
+   */
+  bool cancelLibraryRescan() noexcept;
+
   // Operator Overloadings
   WorkspaceLibraryDb& operator=(const WorkspaceLibraryDb& rhs) = delete;
 
