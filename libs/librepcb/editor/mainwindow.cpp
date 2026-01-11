@@ -686,6 +686,9 @@ void MainWindow::triggerLibrary(slint::SharedString path,
     case ui::LibraryAction::Uninstall: {
       try {
         mApp.closeLibrary(fp);
+        // Abort any currently running library rescan since this can cause
+        // problems due to concurrent file access.
+        mApp.getWorkspace().getLibraryDb().cancelLibraryRescan();
         FileUtils::removeDirRecursively(fp);  // can throw
       } catch (const Exception& e) {
         // TODO: This should be implemented without message box some day...
