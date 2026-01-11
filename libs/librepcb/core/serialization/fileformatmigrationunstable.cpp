@@ -67,39 +67,6 @@ void FileFormatMigrationUnstable::upgradeSymbol(TransactionalDirectory& dir) {
 
 void FileFormatMigrationUnstable::upgradePackage(TransactionalDirectory& dir) {
   Q_UNUSED(dir);
-
-  // Content File.
-  {
-    const QString fp = "package.lp";
-    std::unique_ptr<SExpression> root =
-        SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
-    for (SExpression* fptNode : root->getChildren("footprint")) {
-      // Add tags depending on name.
-      const QString name = fptNode->getChild("name/@0").getValue().toLower();
-      if (name.contains("density level a")) {
-        fptNode->appendChild("tag", QString("ipc-density-level-a"));
-      }
-      if (name.contains("density level b")) {
-        fptNode->appendChild("tag", QString("ipc-density-level-b"));
-      }
-      if (name.contains("density level c")) {
-        fptNode->appendChild("tag", QString("ipc-density-level-c"));
-      }
-      if (name.contains("hand")) {
-        fptNode->appendChild("tag", QString("hand-soldering"));
-      }
-      if (name.contains("reflow")) {
-        fptNode->appendChild("tag", QString("reflow-soldering"));
-      }
-      if (name.contains("wave")) {
-        fptNode->appendChild("tag", QString("wave-soldering"));
-      }
-      if (name.contains("large")) {
-        fptNode->appendChild("tag", QString("extra-large-pads"));
-      }
-    }
-    dir.write(fp, root->toByteArray());
-  }
 }
 
 void FileFormatMigrationUnstable::upgradeComponent(
@@ -108,7 +75,19 @@ void FileFormatMigrationUnstable::upgradeComponent(
 }
 
 void FileFormatMigrationUnstable::upgradeDevice(TransactionalDirectory& dir) {
-  Q_UNUSED(dir);
+  // Content File.
+  {
+    const QString fp = "device.lp";
+    std::unique_ptr<SExpression> root =
+        SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+
+    // Pinout.
+    for (SExpression* padNode : root->getChildren("pad")) {
+      padNode->appendChild("optional", SExpression::createToken("false"));
+    }
+
+    dir.write(fp, root->toByteArray());
+  }
 }
 
 void FileFormatMigrationUnstable::upgradeLibrary(TransactionalDirectory& dir) {
@@ -118,23 +97,6 @@ void FileFormatMigrationUnstable::upgradeLibrary(TransactionalDirectory& dir) {
 void FileFormatMigrationUnstable::upgradeWorkspaceData(
     TransactionalDirectory& dir) {
   Q_UNUSED(dir);
-
-  // Remove legacy files.
-  const QStringList filesToRemove = {
-      "cache_v3",
-      "cache_v4",
-      "cache_v5",
-      "cache_v6",
-      "cache_v7",
-  };
-  TransactionalDirectory librariesDir(dir, "libraries");
-  foreach (const QString fileName, librariesDir.getFiles()) {
-    if (filesToRemove.contains(fileName.split(".").first())) {
-      qInfo() << "Removing legacy file:"
-              << librariesDir.getAbsPath(fileName).toNative();
-      librariesDir.removeFile(fileName);
-    }
-  }
 }
 
 /*******************************************************************************
@@ -143,28 +105,8 @@ void FileFormatMigrationUnstable::upgradeWorkspaceData(
 
 void FileFormatMigrationUnstable::upgradeOutputJobs(SExpression& root,
                                                     ProjectContext& context) {
+  Q_UNUSED(root);
   Q_UNUSED(context);
-  for (SExpression* jobNode : root.getChildren("job")) {
-    if (jobNode->getChild("type/@0").getValue() == "graphics") {
-      for (SExpression* contentNode : jobNode->getChildren("content")) {
-        SExpression& contentTypeNode = contentNode->getChild("type/@0");
-        if (contentTypeNode.getValue() == "schematic") {
-          // Add the new layer for buses.
-          SExpression& busesLayerNode = contentNode->appendList("layer");
-          busesLayerNode.appendChild(
-              SExpression::createToken("schematic_buses"));
-          busesLayerNode.appendChild("color",
-                                     SExpression::createString("#ff008eff"));
-          // Add the new layer for bus labels.
-          SExpression& busLabelsLayerNode = contentNode->appendList("layer");
-          busLabelsLayerNode.appendChild(
-              SExpression::createToken("schematic_bus_labels"));
-          busLabelsLayerNode.appendChild(
-              "color", SExpression::createString("#ff008eff"));
-        }
-      }
-    }
-  }
 }
 
 void FileFormatMigrationUnstable::upgradeCircuit(SExpression& root,
@@ -174,52 +116,7 @@ void FileFormatMigrationUnstable::upgradeCircuit(SExpression& root,
 }
 
 void FileFormatMigrationUnstable::upgradeBoard(SExpression& root) {
-  // DRC settings.
-  SExpression& drcNode = root.getChild("design_rule_check");
-  drcNode.ensureLineBreak();
-  {
-    SExpression& child = drcNode.appendList("min_pcb_size");
-    child.appendChild(SExpression::createToken("0.0"));
-    child.appendChild(SExpression::createToken("0.0"));
-  }
-  drcNode.ensureLineBreak();
-  {
-    SExpression& child = drcNode.appendList("max_pcb_size");
-    SExpression& doubleSided = child.appendList("double_sided");
-    doubleSided.appendChild(SExpression::createToken("0.0"));
-    doubleSided.appendChild(SExpression::createToken("0.0"));
-    SExpression& multilayer = child.appendList("multilayer");
-    multilayer.appendChild(SExpression::createToken("0.0"));
-    multilayer.appendChild(SExpression::createToken("0.0"));
-  }
-  drcNode.ensureLineBreak();
-  drcNode.appendList("pcb_thickness");
-  drcNode.ensureLineBreak();
-  drcNode.appendChild("max_layers", SExpression::createToken("0"));
-  drcNode.ensureLineBreak();
-  drcNode.appendList("solder_resist");
-  drcNode.ensureLineBreak();
-  drcNode.appendList("silkscreen");
-  drcNode.ensureLineBreak();
-  drcNode.appendChild("max_tented_via_drill_diameter",
-                      SExpression::createToken("0.5"));
-  drcNode.ensureLineBreak();
-
-  // Preferred footprint tags
-  {
-    SExpression& child = root.appendList("preferred_footprint_tags");
-    child.ensureLineBreak();
-    child.appendList("tht_top");
-    child.ensureLineBreak();
-    child.appendList("tht_bot");
-    child.ensureLineBreak();
-    child.appendList("smt_top");
-    child.ensureLineBreak();
-    child.appendList("smt_bot");
-    child.ensureLineBreak();
-    child.appendList("common");
-    child.ensureLineBreak();
-  }
+  Q_UNUSED(root);
 }
 
 /*******************************************************************************
