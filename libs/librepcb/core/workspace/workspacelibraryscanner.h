@@ -25,9 +25,12 @@
  ******************************************************************************/
 #include "../fileio/filepath.h"
 
+#include <condition_variable>
+
 #include <QtCore>
 
 #include <memory>
+#include <mutex>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -52,6 +55,14 @@ class WorkspaceLibraryDbWriter;
 class WorkspaceLibraryScanner final : public QThread {
   Q_OBJECT
 
+  enum class State {
+    Idle,
+    StartRequested,
+    Scanning,
+    CancelRequested,
+    ShutdownRequested,
+  };
+
 public:
   // Constructors / Destructor
   WorkspaceLibraryScanner(const FilePath& librariesPath,
@@ -64,6 +75,7 @@ public:
 
   // General Methods
   void startScan() noexcept;
+  bool cancelScan() noexcept;
 
   // Operator Overloadings
   WorkspaceLibraryScanner& operator=(const WorkspaceLibraryScanner& rhs) =
@@ -104,12 +116,14 @@ private:  // Methods
                         const ElementType& element);
   template <typename ElementType>
   std::unique_ptr<ElementType> openAndMigrate(const FilePath& fp);
+  bool abortRequested() const noexcept;
 
 private:  // Data
   const FilePath mLibrariesPath;  ///< Path to workspace libraries directory.
   const FilePath mDbFilePath;  ///< Path to the SQLite database file.
-  QSemaphore mSemaphore;
-  volatile bool mAbort;
+  mutable std::mutex mMutex;  ///< Mutex to protect #mState
+  State mState;  ///< Protected by #mMutex
+  std::condition_variable mStateCV;  ///< To notify about #mState changes
   int mLastProgressPercent;
 };
 
