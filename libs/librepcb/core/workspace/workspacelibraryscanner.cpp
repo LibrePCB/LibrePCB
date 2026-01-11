@@ -52,8 +52,7 @@ WorkspaceLibraryScanner::WorkspaceLibraryScanner(
   : QThread(nullptr),
     mLibrariesPath(librariesPath),
     mDbFilePath(dbFilePath),
-    mSemaphore(0),
-    mAbort(false),
+    mState(State::Idle),
     mLastProgressPercent(100) {
   connect(
       this, &WorkspaceLibraryScanner::scanProgressUpdate, this,
@@ -67,8 +66,14 @@ WorkspaceLibraryScanner::WorkspaceLibraryScanner(
 }
 
 WorkspaceLibraryScanner::~WorkspaceLibraryScanner() noexcept {
-  mAbort = true;
-  mSemaphore.release();
+  // Request shutdown.
+  {
+    std::lock_guard lk(mMutex);
+    mState = State::ShutdownRequested;
+  }
+  mStateCV.notify_all();
+
+  // Wait for thread exit.
   if (!wait(2000)) {
     qWarning() << "Failed to abort the library scanner worker thread, trying "
                   "to terminate it...";
@@ -84,7 +89,30 @@ WorkspaceLibraryScanner::~WorkspaceLibraryScanner() noexcept {
  ******************************************************************************/
 
 void WorkspaceLibraryScanner::startScan() noexcept {
-  mSemaphore.release();
+  {
+    std::lock_guard lk(mMutex);
+    if (mState != State::ShutdownRequested) {
+      mState = State::StartRequested;
+    }
+  }
+  mStateCV.notify_one();
+}
+
+bool WorkspaceLibraryScanner::cancelScan() noexcept {
+  {
+    std::lock_guard lk(mMutex);
+    if (mState == State::Idle) {
+      return false;
+    }
+    if (mState != State::ShutdownRequested) {
+      mState = State::CancelRequested;
+    }
+  }
+  mStateCV.notify_one();
+
+  std::unique_lock<std::mutex> lock(mMutex);
+  mStateCV.wait(lock, [this]() { return mState == State::Idle; });
+  return true;
 }
 
 /*******************************************************************************
@@ -95,11 +123,23 @@ void WorkspaceLibraryScanner::run() noexcept {
   qDebug() << "Workspace library scanner thread started.";
 
   while (true) {
-    mSemaphore.acquire();
-    if (mAbort) {
+    std::unique_lock<std::mutex> lock(mMutex);
+    mStateCV.wait(lock, [this]() { return mState != State::Idle; });
+
+    if (mState == State::ShutdownRequested) {
+      mState = State::Idle;
+      lock.unlock();
+      mStateCV.notify_all();
       break;
-    } else {
+    } else if (mState == State::StartRequested) {
+      mState = State::Scanning;
+      lock.unlock();
+      mStateCV.notify_all();
       scan();
+    } else {
+      mState = State::Idle;
+      lock.unlock();
+      mStateCV.notify_all();
     }
   }
 
@@ -150,38 +190,40 @@ void WorkspaceLibraryScanner::scan() noexcept {
       FilePath fp = lib->getDirectory().getAbsPath();
       Q_ASSERT(libIds.contains(fp));
       int libId = libIds[fp];
-      if (mAbort || (mSemaphore.available() > 0)) break;
+      if (abortRequested()) break;
       count += addElementsToDb<ComponentCategory>(
           writer, fp, lib->searchForElements<ComponentCategory>(), libId);
       emit scanProgressUpdate(percent += qreal(98) / fraction);
-      if (mAbort || (mSemaphore.available() > 0)) break;
+      if (abortRequested()) break;
       count += addElementsToDb<PackageCategory>(
           writer, fp, lib->searchForElements<PackageCategory>(), libId);
       emit scanProgressUpdate(percent += qreal(98) / fraction);
-      if (mAbort || (mSemaphore.available() > 0)) break;
+      if (abortRequested()) break;
       count += addElementsToDb<Symbol>(writer, fp,
                                        lib->searchForElements<Symbol>(), libId);
       emit scanProgressUpdate(percent += qreal(98) / fraction);
-      if (mAbort || (mSemaphore.available() > 0)) break;
+      if (abortRequested()) break;
       count += addElementsToDb<Package>(
           writer, fp, lib->searchForElements<Package>(), libId);
       emit scanProgressUpdate(percent += qreal(98) / fraction);
-      if (mAbort || (mSemaphore.available() > 0)) break;
+      if (abortRequested()) break;
       count += addElementsToDb<Component>(
           writer, fp, lib->searchForElements<Component>(), libId);
       emit scanProgressUpdate(percent += qreal(98) / fraction);
-      if (mAbort || (mSemaphore.available() > 0)) break;
+      if (abortRequested()) break;
       count += addElementsToDb<Device>(writer, fp,
                                        lib->searchForElements<Device>(), libId);
       emit scanProgressUpdate(percent += qreal(98) / fraction);
-      if (mAbort || (mSemaphore.available() > 0)) break;
+      if (abortRequested()) break;
       count += addElementsToDb<Organization>(
           writer, fp, lib->searchForElements<Organization>(), libId);
       emit scanProgressUpdate(percent += qreal(98) / fraction);
     }
 
     // commit transaction
-    if ((!mAbort) && (mSemaphore.available() == 0)) {
+    std::lock_guard lk(mMutex);
+    if (mState == State::Scanning) {
+      mState = State::Idle;
       transactionGuard.commit();  // can throw
       qDebug() << "Workspace library scan succeeded:" << count << "elements in"
                << timer.elapsed() << "ms.";
@@ -197,6 +239,7 @@ void WorkspaceLibraryScanner::scan() noexcept {
   emit scanProgressUpdate(100);
   emit scanInProgressChanged(false);
   emit scanFinished();
+  mStateCV.notify_all();
 }
 
 void WorkspaceLibraryScanner::getLibrariesOfDirectory(
@@ -284,7 +327,7 @@ int WorkspaceLibraryScanner::addElementsToDb(WorkspaceLibraryDbWriter& writer,
                                              int libId) {
   int count = 0;
   foreach (const QString& dirpath, dirs) {
-    if (mAbort || (mSemaphore.available() > 0)) break;
+    if (((count % 20) == 19) && abortRequested()) break;
     const FilePath fp = libPath.getPathTo(dirpath);
     try {
       std::unique_ptr<ElementType> element =
@@ -462,6 +505,11 @@ std::unique_ptr<ElementType> WorkspaceLibraryScanner::openAndMigrate(
     fs->releaseLock();  // can throw
   }
   return element;
+}
+
+bool WorkspaceLibraryScanner::abortRequested() const noexcept {
+  std::lock_guard lk(mMutex);
+  return mState != State::Scanning;
 }
 
 /*******************************************************************************
