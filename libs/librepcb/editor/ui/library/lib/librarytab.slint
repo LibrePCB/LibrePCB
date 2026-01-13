@@ -616,7 +616,7 @@ component LibraryContentTab inherits HorizontalLayout {
                 indeterminate: true;
             }
 
-            if !read-only: NewLibraryElementButton {
+            if !read-only: new-cmpcat-btn := NewLibraryElementButton {
                 x: parent.width - self.width - 20px;
                 y: parent.height - 2 * self.height - 26px;
                 icon: @image-url("../../../../../../img/places/folder.png");
@@ -628,7 +628,7 @@ component LibraryContentTab inherits HorizontalLayout {
                 }
             }
 
-            if !read-only: NewLibraryElementButton {
+            if !read-only: new-pkgcat-btn := NewLibraryElementButton {
                 x: parent.width - self.width - 20px;
                 y: parent.height - self.height - 16px;
                 icon: @image-url("../../../../../../img/places/folder_green.png");
@@ -735,7 +735,7 @@ component LibraryContentTab inherits HorizontalLayout {
                 indeterminate: true;
             }
 
-            if !read-only: NewLibraryElementButton {
+            if !read-only: new-dev-btn := NewLibraryElementButton {
                 x: parent.width - self.width - 20px;
                 y: parent.height - 4 * self.height - 46px;
                 icon: @image-url("../../../../../../img/device.png");
@@ -746,7 +746,7 @@ component LibraryContentTab inherits HorizontalLayout {
                 }
             }
 
-            if !read-only: NewLibraryElementButton {
+            if !read-only: new-cmp-btn := NewLibraryElementButton {
                 x: parent.width - self.width - 20px;
                 y: parent.height - 3 * self.height - 36px;
                 icon: @image-url("../../../../../bootstrap-icons/icons/cpu.svg");
@@ -758,7 +758,7 @@ component LibraryContentTab inherits HorizontalLayout {
                 }
             }
 
-            if !read-only: NewLibraryElementButton {
+            if !read-only: new-pkg-btn := NewLibraryElementButton {
                 x: parent.width - self.width - 20px;
                 y: parent.height - 2 * self.height - 26px;
                 icon: @image-url("../../../../../../img/footprint.png");
@@ -769,7 +769,7 @@ component LibraryContentTab inherits HorizontalLayout {
                 }
             }
 
-            if !read-only: NewLibraryElementButton {
+            if !read-only: new-sym-btn := NewLibraryElementButton {
                 x: parent.width - self.width - 20px;
                 y: parent.height - self.height - 16px;
                 icon: @image-url("../../../../../../img/symbol.png");

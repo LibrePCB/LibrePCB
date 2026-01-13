@@ -71,6 +71,7 @@ component TabButton inherits Rectangle {
     // Accessibility
     accessible-role: AccessibleRole.tab;
     accessible-label: (tab.type == TabType.home) ? "home" : tab.title;
+    accessible-checked: is-current-tab;
     accessible-action-default => {
         ta.clicked();
     }
