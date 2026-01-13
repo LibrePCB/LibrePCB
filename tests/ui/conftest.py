@@ -220,6 +220,21 @@ class ElementQuery:
                 )
             time.sleep(0.01)
 
+    def wait_for_item(self, test, timeout=10.0):
+        start = time.time()
+        while True:
+            self.refresh()
+            for result in self._results:
+                if test(result):
+                    return result
+            if time.time() - start > timeout:
+                self.save_screenshot()
+                raise TimeoutError(
+                    f"Waiting for item timed out: {self._query} "
+                    + "-- Screenshot saved."
+                )
+            time.sleep(0.01)
+
     def read(self, keys):
         """
         Read several element properties
@@ -414,6 +429,11 @@ class LibrePcbFixture(object):
         dest = self.get_workspace_libraries_path("local")
         dest = os.path.join(dest, os.path.basename(path))
         shutil.copytree(_long_path(path), _long_path(dest))
+
+    def add_project_to_workspace(self, project):
+        src = os.path.join(DATA_DIR, "projects", project)
+        dst = os.path.join(self.workspace_path, "projects", project)
+        shutil.copytree(_long_path(src), _long_path(dst))
 
     def open(self):
         self._create_application_config_file()
