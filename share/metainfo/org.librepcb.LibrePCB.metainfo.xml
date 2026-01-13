@@ -80,6 +80,21 @@
         - Remove development releases when stable release is ready!
         - For prereleases, use tilde instead of dash (e.g. "1.0.0~rc1")!
     -->
+    <release version="2.0.0~rc1" date="2026-01-13" type="development">
+      <description>
+        <p>Highlights:</p>
+        <ul>
+          <li>Completely new, tabbed, split-window UI</li>
+          <li>Schematic buses &amp; images</li>
+          <li>Individual pads in boards</li>
+          <li>Automatic via drills &amp; annular rings</li>
+          <li>Shared DRC settings &amp; output jobs</li>
+          <li>Many usability improvements</li>
+          <li>Various bugfixes</li>
+        </ul>
+      </description>
+      <url type="details">https://librepcb.org/blog/2026-01-13_release_2.0.0-rc1/</url>
+    </release>
     <release version="1.3.0" date="2025-03-24" type="stable">
       <description>
         <p>Highlights:</p>
