@@ -136,7 +136,8 @@ downloading translations from [Transifex].
 ### Preparations
 
 1. Only proceed if the file format is freezed and `FILE_FORMAT_STABLE`
-   is set to `1`!
+   is set to `1`! If this is the first release of a new file format, also
+   make sure to migrate the exmaple projects to the new file format.
 2. Make sure CI uses the latest Qt version. If necessary, update CI first and
    test the artifacts before proceeding with the release procedure.
 3. Make sure all submodules point to persistent commits (commits could be
@@ -184,8 +185,9 @@ downloading translations from [Transifex].
 1. Update website/documentation download links and publish blog post
    containing the changelog.
 2. Add tag description to [GitHub Releases], including a link to the blog post.
-3. Notify users through Patreon, Twitter, ...
+3. Notify users through Patreon, Mastodon, Twitter, ...
 4. Start updating distribution packages (Flatpak, Snap, Arch, NixOS, ...).
+5. For major releases: Update AISLER import first(!), then LibrePCB Fab.
 
 
 [semantic versioning]: https://semver.org/
