@@ -584,6 +584,14 @@ std::shared_ptr<ProjectEditor> GuiApplication::openProject(
     // Switch to documents tab.
     switchToProject(index);
 
+    // Open the first schematic page to get immediate feedback that the project
+    // had been opened. In future we should restore the tabs which were opened
+    // the last time, so this is just a temporary solution.
+    if (auto win = getCurrentWindow();
+        win && (!editor->getProject().getSchematics().isEmpty())) {
+      win->openSchematicTab(index, 0);
+    }
+
     // Delay updating the last opened project to avoid an issue when
     // double-clicking: https://github.com/LibrePCB/LibrePCB/issues/293
     QTimer::singleShot(
@@ -670,9 +678,9 @@ void GuiApplication::createNewWindow(int id, int projectIndex) noexcept {
   d.set_preview_mode(false);
   d.set_window_id(id);
   d.set_window_title(
-      QString("LibrePCB %1").arg(Application::getVersion()).toUtf8().data());
+      q2s(QString("LibrePCB %1").arg(Application::getVersion())));
   d.set_about_librepcb_details(q2s(Application::buildFullVersionDetails()));
-  d.set_workspace_path(mWorkspace.getPath().toNative().toUtf8().data());
+  d.set_workspace_path(q2s(mWorkspace.getPath().toNative()));
   d.set_notifications(mNotifications);
   d.set_quick_access_items(mQuickAccessModel);
   d.set_local_libraries(filteredLibs(mLocalLibraries));
