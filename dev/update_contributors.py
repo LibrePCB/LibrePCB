@@ -1,4 +1,11 @@
 #!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.12"
+# dependencies = [
+#     "pygithub~=2.5",
+# ]
+# ///
+
 # -*- coding: utf-8 -*-
 
 """
@@ -6,10 +13,6 @@ Simple script to update the list of contributors in AUTHORS.md
 by fetching contribution statistics from GitHub.
 
 Just call this script with no arguments provided.
-
-Requirements:
-
-    pip install PyGithub~=2.5
 """
 
 import os
