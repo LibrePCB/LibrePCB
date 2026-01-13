@@ -145,7 +145,7 @@ downloading translations from [Transifex].
    avoid garbage collection of these commits.
 4. Verify that translations are up-to-date, i.e. the auto-sync still works.
 5. Check that the code signing configuration is still up-to-date and set up
-   for all executables to be signed.
+   for all executables to be signed. Check also the [code signing CI].
 
 ### Release
 
@@ -165,20 +165,19 @@ downloading translations from [Transifex].
      * 3D viewer (check OpenGL and OpenCASCADE)
      * Translations
      * Desktop services (e.g. opening keyboard shortcuts reference PDF)
-     * Code signing (TODO: Can we make a test run of code signing?)
 8. If everything looks good, merge the branch into `master` (either by merging
    the PR or locally with merge commit [preferred] or fast-forward).
 9. Important: Only proceed with the following steps if you have a lot of time
    to do the rest of the release procedure in one chunk!
-10. Publish the artifacts at https://download.librepcb.org/releases/.
-11. Test the official releases again, this time including the installer.
-12. If everything works properly, Add and push a new tag with the name equal
-    to the value of `LIBREPCB_APP_VERSION` (e.g. "0.1.0-rc1"). Use the message
+10. Add and push a new tag with the name equal to the value of
+    `LIBREPCB_APP_VERSION` (e.g. "0.1.0-rc1"). Use the message
     "LibrePCB <LIBREPCB_APP_VERSION>". Keep in mind that the tag must be
     signed and the version number must always have three numbers (i.e. "0.1.0"
     instead of "0.1")!
-13. Bump the application patch version and the installer version on `master`
-    (e.g. to "1.2.3-unstable" after releasing "1.2.2"), commit and push.
+11. Trigger the [code signing CI].
+12. Publish the artifacts at https://download.librepcb.org/releases/.
+13. Bump the application patch version on `master` (e.g. to "1.2.3-unstable"
+    after releasing "1.2.2"), commit and push.
 
 ### After The Release
 
@@ -194,3 +193,4 @@ downloading translations from [Transifex].
 [Transifex]: https://transifex.com
 [resource]: https://docs.transifex.com/projects/introduction
 [GitHub Releases]: https://github.com/LibrePCB/LibrePCB/releases
+[code signing CI]: https://github.com/OSSign/LibrePCB--LibrePCB
