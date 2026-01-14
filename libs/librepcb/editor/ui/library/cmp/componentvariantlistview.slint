@@ -507,14 +507,17 @@ component ComponentVariantListItem inherits Rectangle {
             placement-l := HorizontalLayout {
                 height: expanded ? self.preferred-height : 0;
                 spacing: 10px;
-                visible: self.height > 0;
+
+                // To avoid unnecessary overhead, do not render during animation.
+                // https://github.com/LibrePCB/LibrePCB/issues/1652
+                visible: self.height == self.preferred-height;
 
                 animate height { duration: 150ms; }
 
                 Rectangle {
                     max-width: 500px;  // Only to ensure some alignment across gates on a large screen
                     min-height: 250px;  // Vertically aligned symbols require a lot of space
-                    background: white;  // For the preview
+                    background: Data.preview-mode ? white : transparent;  // For the preview
                     border-radius: 10px;
                     clip: true;  // For the rounded corners
 

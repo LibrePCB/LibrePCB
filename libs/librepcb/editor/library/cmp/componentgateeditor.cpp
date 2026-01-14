@@ -211,7 +211,18 @@ void ComponentGateEditor::reloadSymbol() noexcept {
 
   if (mSymbol) {
     mScene.reset(new GraphicsScene());
+    const Theme& theme = mWorkspace.getSettings().themes.getActive();
     mScene->setOriginCrossVisible(false);  // It's rather disruptive.
+    mScene->setBackgroundColors(
+        theme.getColor(Theme::Color::sSchematicBackground).getPrimaryColor(),
+        theme.getColor(Theme::Color::sSchematicBackground).getSecondaryColor());
+    mScene->setOverlayColors(
+        theme.getColor(Theme::Color::sSchematicOverlays).getPrimaryColor(),
+        theme.getColor(Theme::Color::sSchematicOverlays).getSecondaryColor());
+    mScene->setSelectionRectColors(
+        theme.getColor(Theme::Color::sSchematicSelection).getPrimaryColor(),
+        theme.getColor(Theme::Color::sSchematicSelection).getSecondaryColor());
+    mScene->setGridStyle(Theme::GridStyle::None);
     mGraphicsItem.reset(new SymbolGraphicsItem(
         const_cast<Symbol&>(*mSymbol), mLayers, mComponent, mGate,
         mWorkspace.getSettings().libraryLocaleOrder.get(), false));
