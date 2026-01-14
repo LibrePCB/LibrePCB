@@ -111,11 +111,11 @@ void InitializeWorkspaceWizardContext::installExampleProjects() const noexcept {
       // clang-format off
     {
       "can2usb",
-      "https://github.com/LibrePCB/librepcb-example-projects/raw/796c06a52ae431a623a822a60c54c3b1384abd7f/can2usb.lppz",
+      "https://github.com/LibrePCB/librepcb-example-projects/raw/3aad10dae67ecfea9535a2cac328497d67e4d142/can2usb.lppz",
     },
     {
       "d0-reader",
-      "https://github.com/LibrePCB/librepcb-example-projects/raw/796c06a52ae431a623a822a60c54c3b1384abd7f/d0-reader.lppz",
+      "https://github.com/LibrePCB/librepcb-example-projects/raw/3aad10dae67ecfea9535a2cac328497d67e4d142/d0-reader.lppz",
     },
       // clang-format on
   };
