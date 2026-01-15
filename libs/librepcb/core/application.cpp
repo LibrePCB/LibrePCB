@@ -55,7 +55,7 @@ QString Application::getGitRevision() noexcept {
 
 QDateTime Application::getGitCommitDate() noexcept {
   static const QDateTime value =
-#if GIT_COMMIT_TIMESTAMP
+#if defined(GIT_COMMIT_TIMESTAMP) && (GIT_COMMIT_TIMESTAMP > 0)
       QDateTime::fromSecsSinceEpoch(GIT_COMMIT_TIMESTAMP);
 #else
       QDateTime();
@@ -83,14 +83,16 @@ QString Application::buildFullVersionDetails() noexcept {
 
   QString revision = getGitRevision();
   const QDate date = getGitCommitDate().date();
-  if (date.isValid()) {
+  if ((!revision.isEmpty()) && date.isValid()) {
     revision += " (" + date.toString(Qt::ISODate) + ")";
   }
   QString qt = QString(qVersion()) + " (built against " + QT_VERSION_STR + ")";
 
   QStringList details;
   details << "LibrePCB Version: " + getVersion();
-  details << "Git Revision:     " + revision;
+  if (!revision.isEmpty()) {
+    details << "Git Revision:     " + revision;
+  }
   if (!getBuildAuthor().isEmpty()) {
     details << "Build Author:     " + getBuildAuthor();
   }
