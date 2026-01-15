@@ -165,6 +165,9 @@ export global Shortcuts {
         } else if Backend.is-shortcut(event, Cmd.flip-vertical) && (Data.current-tab.features.flip == FeatureState.enabled) {
             Backend.trigger-tab(section, tab, TabAction.flip-vertically);
             return true;
+        } else if Backend.is-shortcut(event, Cmd.move-align) && (Data.current-tab.features.move-align == FeatureState.enabled) {
+            Backend.trigger-tab(section, tab, TabAction.move-align);
+            return true;
         } else if Backend.is-shortcut(event, Cmd.snap-to-grid) && (Data.current-tab.features.snap-to-grid == FeatureState.enabled) {
             Backend.trigger-tab(section, tab, TabAction.snap-to-grid);
             return true;
