@@ -120,8 +120,8 @@ BoardDesignRuleCheckSettings::BoardDesignRuleCheckSettings() noexcept
     mMinSilkscreenStopmaskClearance(127000),  // 127um
     mMinCopperWidth(200000),  // 200um
     mMinPthAnnularRing(200000),  // 200um
-    mMinNpthDrillDiameter(300000),  // 300um
-    mMinPthDrillDiameter(300000),  // 300um
+    mMinNpthDrillDiameter(500000),  // 0.5mm
+    mMinPthDrillDiameter(300000),  // 0.3mm
     mMinNpthSlotWidth(1000000),  // 1mm
     mMinPthSlotWidth(700000),  // 0.7mm
     mMaxTentedViaDrillDiameter(3000000),  // 0.3mm
