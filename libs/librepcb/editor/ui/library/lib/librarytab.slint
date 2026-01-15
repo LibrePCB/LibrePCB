@@ -897,6 +897,7 @@ export component LibraryTab inherits Tab {
             { title: @tr("Library Content") },
         ];
         current-index: tabs[index].page-index;
+        duration: 0;  // Temporary, needs proper refactoring.
 
         LibraryMetadataTab {
             width: parent.width;

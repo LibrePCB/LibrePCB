@@ -4,6 +4,7 @@ export component SlideView inherits VerticalLayout {
     in property <[NavBarItemData]> pages;
     in-out property <int> current-index: 0;
     in-out property <int> current-navbar-index: current-index;
+    in property <duration> duration: 200ms;
 
     callback page-clicked(index: int);
     page-clicked(index) => {
@@ -29,7 +30,7 @@ export component SlideView inherits VerticalLayout {
     Rectangle {
         property <float> animated-index: max(min(current-index, pages.length - 1), 0);
 
-        animate animated-index { duration: 200ms; }
+        animate animated-index { duration: duration; }
 
         clip: true;
 

@@ -582,6 +582,7 @@ export component ComponentTab inherits Tab {
                 { title: @tr("Variants & Gates") },
             ];
             current-index: tabs[index].page-index;
+            duration: 0;  // Temporary, needs proper refactoring.
 
             metadata-tab-2 := ComponentMetadataTab {
                 width: parent.width;
