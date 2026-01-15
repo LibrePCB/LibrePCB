@@ -525,6 +525,7 @@ export component DeviceTab inherits Tab {
                 { title: @tr("Pinout & Parts") },
             ];
             current-index: tabs[index].page-index;
+            duration: 0;  // Temporary, needs proper refactoring.
 
             metadata-tab-2 := DeviceMetadataTab {
                 width: parent.width;

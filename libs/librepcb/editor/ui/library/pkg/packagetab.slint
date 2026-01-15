@@ -1,6 +1,8 @@
 import { AddFootprintHoleToolBar } from "addfootprintholetoolbar.slint";
 import { AddFootprintPadToolBar } from "addfootprintpadtoolbar.slint";
-import { AddFootprintStrokeTextToolBar } from "addfootprintstroketexttoolbar.slint";
+import {
+    AddFootprintStrokeTextToolBar,
+} from "addfootprintstroketexttoolbar.slint";
 import { DrawFootprintPolygonToolBar } from "drawfootprintpolygontoolbar.slint";
 import { DrawFootprintZoneToolBar } from "drawfootprintzonetoolbar.slint";
 import { ReNumberPadsToolBar } from "renumberpadstoolbar.slint";
@@ -1059,6 +1061,7 @@ export component PackageTab inherits Tab {
                     tabs[index].page-index
                 }
             };
+            duration: 0;  // Temporary, needs proper refactoring.
 
             metadata-tab-2 := PackageMetadataTab {
                 width: parent.width;
