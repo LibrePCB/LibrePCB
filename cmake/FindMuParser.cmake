@@ -27,7 +27,9 @@ if(EXISTS "${MUPARSER_SUBMODULE_BASEPATH}"
 
   # Suppress compiler warnings since they are not under our control.
   target_compile_options(muparser PRIVATE -Wno-deprecated-declarations)
-  target_compile_options(muparser PUBLIC -Wno-nested-anon-types)
+  if(CMAKE_CXX_COMPILER_ID MATCHES "Clang") # Options which are unknown by GCC
+    target_compile_options(muparser PUBLIC -Wno-nested-anon-types)
+  endif()
 
   # Alias lib to namespaced variant
   add_library(MuParser::MuParser ALIAS muparser)
