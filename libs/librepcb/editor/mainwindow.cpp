@@ -82,15 +82,15 @@ namespace editor {
 
 // Detect window size enforced by environment variable (required for testing).
 static std::optional<QSize> getOverrideWindowSize() noexcept {
-  static const QStringList numbers =
-      QString(qgetenv("LIBREPCB_WINDOW_SIZE")).split("x");
+  static const QString value =
+      qgetenv("LIBREPCB_WINDOW_SIZE").trimmed().toLower();
+  if (value.isEmpty()) {
+    return std::nullopt;  // Environment variable not set.
+  }
+  const QStringList numbers = value.split("x");
   const int width = numbers.value(0).toInt();
   const int height = numbers.value(1).toInt();
-  if ((width > 0) && (height > 0)) {
-    return QSize(width, height);
-  } else {
-    return std::nullopt;
-  }
+  return QSize(width, height);
 }
 
 static bool askForRestoringBackup(const FilePath&) {
@@ -313,16 +313,27 @@ MainWindow::MainWindow(GuiApplication& app,
 
   // Load window state.
   QSettings cs;
+  const QByteArray geometry =
+      cs.value(mSettingsPrefix % "/geometry").toByteArray();
   if (auto size = getOverrideWindowSize()) {
-    qInfo() << "Window size enforced to" << *size;
-    mWidget->resize(*size);
-  } else if (!mWidget->restoreGeometry(
-                 cs.value(mSettingsPrefix % "/geometry").toByteArray())) {
+    if (!size->isEmpty()) {
+      qInfo() << "Window size enforced to" << *size;
+      mWidget->resize(*size);
+    } else {
+      qInfo() << "Window resizing explicitly disabled by environment variable.";
+    }
+  } else if (geometry.isEmpty()) {
     // By default, open the window maximized as this is more intuitive than a
     // small window with hardcoded, screen-independent size in the Slint file
-    // (https://github.com/LibrePCB/LibrePCB/issues/355).
-    qInfo() << "Could not restore window geometry, thus maximizing.";
+    // (https://github.com/LibrePCB/LibrePCB/issues/355). However, do this only
+    // the very first time (if no geometry is stored yet) to avoid interfering
+    // with tiling window managers.
+    qInfo() << "No window geometry to restore, thus maximizing.";
     mWidget->setWindowState(Qt::WindowMaximized | Qt::WindowActive);
+  } else if (!mWidget->restoreGeometry(geometry)) {
+    // This can happen if a tiling window manager is used, which is fine
+    // since the user wants to control window geometry then.
+    qInfo() << "Failed to restore window geometry, e.g. due to window manager.";
   }
   d.set_erc_zoom_to_location(
       cs.value(mSettingsPrefix % "/erc_zoom_to_location", true).toBool());
