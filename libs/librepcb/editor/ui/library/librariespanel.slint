@@ -373,7 +373,12 @@ component LibrariesPanelSection inherits FocusScope {
             }
         }
 
-        if remote && (data.installed == 0) && (data.count > 0): HorizontalLayout {
+        // Show a recommendation to install remote libraries if none are
+        // installed. However, if several local libraries are installed, do not
+        // shot the recommendation as this is a sign that the user has installed
+        // all the libraries (even the official ones) with Git (the typical
+        // development setup for library contributors).
+        if remote && (data.installed == 0) && (data.count > 0) && (Data.local-libraries-data.count < 5): HorizontalLayout {
             padding: 8px;
 
             Rectangle {
