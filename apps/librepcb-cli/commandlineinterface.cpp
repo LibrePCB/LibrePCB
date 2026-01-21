@@ -1415,27 +1415,34 @@ void CommandLineInterface::processLibraryElement(
     }
   }
 
-  // Run library element check, if needed.
+  // Run library element check, if needed. We do not check deprecated elements
+  // since this would require people to keep maintenance for deprecated
+  // elements ongoing with every new LibrePCB release, which makes no sense.
   if (runCheck) {
-    // Gather messages
-    qInfo().noquote()
-        << tr("Run checks for '%1'...").arg(prettyPath(fs.getPath(), libDir));
-    CheckResult checkResult = gatherElementCheckMessages(element);
+    if (element.isDeprecated()) {
+      qInfo().noquote() << tr("Skip checks for '%1' (deprecated)")
+                               .arg(prettyPath(fs.getPath(), libDir));
+    } else {
+      // Gather messages
+      qInfo().noquote()
+          << tr("Run checks for '%1'...").arg(prettyPath(fs.getPath(), libDir));
+      CheckResult checkResult = gatherElementCheckMessages(element);
 
-    // Print summary to qInfo (stderr) for libraries
-    QStringList summaryMessages =
-        formatCheckSummary(checkResult.approvedMsgCount,
-                           checkResult.nonApprovedMessages.count(), "  ");
-    foreach (const QString& msg, summaryMessages) {
-      qInfo().noquote() << msg;
-    }
+      // Print summary to qInfo (stderr) for libraries
+      QStringList summaryMessages =
+          formatCheckSummary(checkResult.approvedMsgCount,
+                             checkResult.nonApprovedMessages.count(), "  ");
+      foreach (const QString& msg, summaryMessages) {
+        qInfo().noquote() << msg;
+      }
 
-    // If we have non-approved messages, print the header once, then all
-    // messages
-    foreach (const QString& msg, checkResult.nonApprovedMessages) {
-      printErrorHeaderOnce();
-      printErr("    - " % msg);
-      success = false;
+      // If we have non-approved messages, print the header once, then all
+      // messages
+      foreach (const QString& msg, checkResult.nonApprovedMessages) {
+        printErrorHeaderOnce();
+        printErr("    - " % msg);
+        success = false;
+      }
     }
   }
 
