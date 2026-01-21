@@ -100,16 +100,22 @@ BI_Device::BI_Device(Board& board, ComponentInstance& compInstance,
   mAttributes = mLibDevice->getAttributes();
 
   // Add initial stroke texts.
+  ScopeGuardList sgl;
+  sgl.add([this]() {
+    qDeleteAll(mStrokeTexts);
+    mStrokeTexts.clear();
+  });
   if (loadInitialStrokeTexts) {
     for (const StrokeText& text : getDefaultStrokeTexts()) {
-      addStrokeText(*new BI_StrokeText(
+      BI_StrokeText* t = new BI_StrokeText(
           mBoard,
           BoardStrokeTextData(text.getUuid(), text.getLayer(), text.getText(),
                               text.getPosition(), text.getRotation(),
                               text.getHeight(), text.getStrokeWidth(),
                               text.getLetterSpacing(), text.getLineSpacing(),
                               text.getAlign(), text.getMirrored(),
-                              text.getAutoRotate(), mLocked)));
+                              text.getAutoRotate(), mLocked));
+      addStrokeText(*t);
     }
   }
 
@@ -125,6 +131,10 @@ BI_Device::BI_Device(Board& board, ComponentInstance& compInstance,
   }
 
   // Load pads.
+  sgl.add([this]() {
+    qDeleteAll(mPads);
+    mPads.clear();
+  });
   for (const FootprintPad& libPad : getLibFootprint().getPads()) {
     if (mPads.contains(libPad.getUuid())) {
       throw RuntimeError(
@@ -167,6 +177,8 @@ BI_Device::BI_Device(Board& board, ComponentInstance& compInstance,
           &BI_Device::attributesChanged);
   connect(&mCompInstance, &ComponentInstance::attributesChanged, this,
           &BI_Device::attributesChanged);
+
+  sgl.dismiss();
 }
 
 BI_Device::~BI_Device() noexcept {
