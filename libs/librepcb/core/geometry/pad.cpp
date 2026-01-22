@@ -298,6 +298,16 @@ PadGeometry Pad::getGeometry() const noexcept {
   }
 }
 
+// Calculate solder paste offset the same way as in the board (bi_pad.cpp)
+// with default design rules.
+static Length calcAutoSolderPasteOffset(Pad::Shape shape,
+                                        const PositiveLength& width,
+                                        const PositiveLength& height) noexcept {
+  const Length size =
+      (shape == Pad::Shape::Custom) ? Length(0) : *std::min(width, height);
+  return qBound(Length(0), size.scaled(0.1), Length(1000000));
+}
+
 QHash<const Layer*, QList<PadGeometry>> Pad::buildPreviewGeometries()
     const noexcept {
   const PadGeometry geometry = getGeometry();
@@ -306,7 +316,7 @@ QHash<const Layer*, QList<PadGeometry>> Pad::buildPreviewGeometries()
       : Length(100000);
   const Length solderPasteOffset = getSolderPasteConfig().getOffset()
       ? *getSolderPasteConfig().getOffset()
-      : Length(100000);
+      : calcAutoSolderPasteOffset(mShape, mWidth, mHeight);
 
   QHash<const Layer*, QList<PadGeometry>> geometries;
   if (hasTopCopper()) {
