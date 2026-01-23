@@ -415,6 +415,7 @@ export struct LibraryTreeViewItemData {
     level: int,  // 0 = top level items
     name: string,
     summary: string,
+    deprecated: bool,  // Deprecated library element
     elements: int,  // Number of contained elements
     is-external: bool,  // External category, not from this library
     user-data: string,  // File path for internal elements, UUID for external

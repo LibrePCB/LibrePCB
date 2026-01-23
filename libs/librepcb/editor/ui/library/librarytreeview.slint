@@ -107,6 +107,7 @@ export component LibraryTreeView inherits FocusScope {
                         }
                     }
 
+                    property <color> color: item.deprecated ? #ff7070 : Palette.foreground;
                     property <image> icon: {
                         if item.type == LibraryTreeViewItemType.all {
                             @image-url("../../../../font-awesome/svgs/solid/list.svg")
@@ -138,15 +139,15 @@ export component LibraryTreeView inherits FocusScope {
                         source: icon;
                         colorize: {
                             if item.type == LibraryTreeViewItemType.all {
-                                Palette.foreground
+                                color
                             } else if item.type == LibraryTreeViewItemType.organization {
-                                Palette.foreground
+                                color
                             } else if item.type == LibraryTreeViewItemType.uncategorized {
                                 yellow
                             } else if item.type == LibraryTreeViewItemType.component {
-                                Palette.foreground
+                                color
                             } else if item.is-external {
-                                Palette.foreground
+                                color
                             } else {
                                 transparent
                             }
@@ -159,6 +160,7 @@ export component LibraryTreeView inherits FocusScope {
                         font-size: font-size;
                         font-weight: ((item.level == 0) || (item.elements > 0)) ? 800 : 400;
                         font-italic: item.is-external;
+                        color: color;
                         vertical-alignment: center;
                         overflow: elide;
                         text: {
@@ -187,15 +189,15 @@ export component LibraryTreeView inherits FocusScope {
                         accessible-role: none;
                     }
 
-                    if !item.summary.is-empty: item-summary-txt := Text {
+                    if item.deprecated || (!item.summary.is-empty): item-summary-txt := Text {
                         horizontal-stretch: 1;
-                        color: #909090;
+                        color: item.deprecated ? #bb5555 : #909090;
                         font-size: 10.5px;
                         font-weight: 300;
                         horizontal-alignment: left;
                         vertical-alignment: center;
                         overflow: elide;
-                        text: item.summary;
+                        text: item.deprecated ? @tr("Deprecated").to-uppercase() : item.summary;
                         accessible-role: none;
                     }
 
