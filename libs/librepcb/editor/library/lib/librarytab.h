@@ -61,6 +61,7 @@ class LibraryTab final : public LibraryEditorTab {
     FilePath path;  // Only when part of this library.
     QString name;
     QString summary;
+    bool isDeprecated = false;
     bool isExternal = false;
     QString userData;  // UUID for categories, filepath for elements
     QVector<std::shared_ptr<TreeItem>> childs;

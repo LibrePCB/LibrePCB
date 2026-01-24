@@ -577,6 +577,7 @@ void LibraryTab::refreshLibElements() noexcept {
       0,  // Level
       slint::SharedString(),  // Name (set in UI)
       slint::SharedString(),  // Summary
+      false,  // Deprecated
       count,  // Elements
       false,  // Is external
       slint::SharedString(),  // User data
@@ -596,6 +597,7 @@ void LibraryTab::refreshLibElements() noexcept {
         0,  // Level
         slint::SharedString(),  // Name (set in UI)
         slint::SharedString(),  // Summary
+        false,  // Deprecated
         mOrganizationsElementCount,  // Elements
         false,  // Is external
         q2s(mOrganizationsRoot->userData),  // User data
@@ -612,13 +614,14 @@ std::shared_ptr<LibraryTab::TreeItem> LibraryTab::createRootItem(
     ui::LibraryTreeViewItemType type) noexcept {
   Uuid uuid = Uuid::createRandom();
   std::shared_ptr<TreeItem> root(new TreeItem{
-      type,
-      FilePath(),
-      QString(),
-      QString(),
-      false,
-      uuid.toStr(),
-      {},
+      type,  // Type
+      FilePath(),  // Path
+      QString(),  // Name
+      QString(),  // Summary
+      false,  // Deprecated
+      false,  // External
+      uuid.toStr(),  // User data
+      {},  // Childs
   });
   mLibElementsMap.insert(uuid.toStr(), root);
   return root;
@@ -663,6 +666,9 @@ std::shared_ptr<LibraryTab::TreeItem> LibraryTab::getOrCreateCategory(
         (!mDb.getTranslations<CategoryType>(fp, mLocaleOrder, &item->name))) {
       item->name = tr("Unknown") % " (" % uuid.toStr() % ")";
     }
+    if (fp.isValid()) {
+      mDb.getMetadata<CategoryType>(fp, nullptr, nullptr, &item->isDeprecated);
+    }
     std::optional<Uuid> parentUuid;
     if (fp.isValid()) {
       mDb.getCategoryMetadata<CategoryType>(fp, &parentUuid);
@@ -696,6 +702,7 @@ void LibraryTab::loadElements(ui::LibraryTreeViewItemType type,
       item->userData = fp.toStr();
       mDb.getTranslations<ElementType>(fp, mLocaleOrder, &item->name,
                                        &item->summary);
+      mDb.getMetadata<ElementType>(fp, nullptr, nullptr, &item->isDeprecated);
       item->summary = item->summary.split("\n").first().left(200);
 
       bool addedToCategory = false;
@@ -728,6 +735,7 @@ void LibraryTab::loadOrganizations() {
       item->userData = fp.toStr();
       mDb.getTranslations<Organization>(fp, mLocaleOrder, &item->name,
                                         &item->summary);
+      mDb.getMetadata<Organization>(fp, nullptr, nullptr, &item->isDeprecated);
       item->summary = item->summary.split("\n").first().left(200);
       mOrganizationsRoot->childs.push_back(item);
       mLibElementsMap.insert(fp.toStr(), item);
@@ -762,6 +770,7 @@ void LibraryTab::addCategoriesToModel(ui::LibraryTreeViewItemType type,
       0,  // Level
       q2s(root.name),  // Name
       slint::SharedString(),  // Summary
+      false,  // Deprecated
       count,  // Elements
       false,  // Is external
       q2s(root.userData),  // User data
@@ -785,6 +794,7 @@ void LibraryTab::addCategoriesToModel(
           level,  // Level
           q2s(child->name),  // Name
           q2s(child->summary),  // Summary
+          child->isDeprecated,  // Deprecated
           count,  // Elements
           child->isExternal,  // Is external
           q2s(child->userData),  // User data
@@ -839,6 +849,7 @@ void LibraryTab::setSelectedCategory(
           0,  // Level
           slint::SharedString(),  // Name
           slint::SharedString(),  // Summary
+          false,  // Deprecated
           0,  // Elements
           false,  // Is external
           slint::SharedString(),  // User data
@@ -850,6 +861,7 @@ void LibraryTab::setSelectedCategory(
         1,  // Level
         q2s(item->name),  // Name
         q2s(item->summary),  // Summary
+        item->isDeprecated,  // Deprecated
         0,  // Elements
         false,  // Is external
         q2s(item->userData),  // User data
