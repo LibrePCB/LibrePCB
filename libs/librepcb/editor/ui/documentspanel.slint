@@ -8,14 +8,20 @@ import {
 import {
     Backend,
     BoardAction,
+    CategoryTabData,
+    ComponentTabData,
     Constants,
     Data,
+    DeviceTabData,
     EditorCommandSet as Cmd,
     LibraryData,
     LibraryElementAction,
+    OrganizationTabData,
+    PackageTabData,
     ProjectAction,
     ProjectData,
     SchematicAction,
+    SymbolTabData,
     TabType,
 } from "api.slint";
 
@@ -325,86 +331,107 @@ component LibrarySection inherits Rectangle {
         }
 
         for section in Data.sections: VerticalLayout {
-            for tab[idx] in section.component-category-tabs: VerticalLayout {
-                if (!tab.path.is-empty) && (tab.library-index == library-index): DocumentsListItem {
+            // Note: In the past, we had separate loops for each library type,
+            // to keep the documents sorted by type. However, this loop would
+            // iterate over invalid model items (std::nullopt), which causes
+            // the UI to freeze if assistive technologies are enabled. When
+            // going back to the old concept, make sure this freeze is fixed.
+            for tab[idx] in section.tabs: VerticalLayout {
+                if (tab.type == TabType.component-category) && (section.component-category-tabs[idx].library-index == library-index): DocumentsListItem {
+                    property <CategoryTabData> derived-tab: section.component-category-tabs[idx];
+
                     type: ItemType.library;
-                    text: section.tabs[idx].title;
+                    text: tab.title;
                     icon: @image-url("../../../bootstrap-icons/icons/folder.svg");
-                    selected: (Data.current-tab.type == TabType.component-category) && (Data.current-component-category-tab.library-index == library-index) && (Data.current-component-category-tab.path == tab.path);
+                    selected: (Data.current-tab.type == TabType.component-category) && (Data.current-component-category-tab.library-index == library-index) && (Data.current-component-category-tab.path == derived-tab.path);
                     scrollbar-width: scrollbar-width;
 
                     clicked => {
-                        Backend.trigger-library-element(tab.path, LibraryElementAction.open);
+                        Backend.trigger-library-element(derived-tab.path, LibraryElementAction.open);
                     }
                 }
-            }
 
-            for tab[idx] in section.package-category-tabs: VerticalLayout {
-                if (!tab.path.is-empty) && (tab.library-index == library-index): DocumentsListItem {
+                if (tab.type == TabType.package-category) && (section.package-category-tabs[idx].library-index == library-index): DocumentsListItem {
+                    property <CategoryTabData> derived-tab: section.package-category-tabs[idx];
+
                     type: ItemType.library;
                     text: section.tabs[idx].title;
                     icon: @image-url("../../../bootstrap-icons/icons/folder.svg");
-                    selected: (Data.current-tab.type == TabType.package-category) && (Data.current-package-category-tab.library-index == library-index) && (Data.current-package-category-tab.path == tab.path);
+                    selected: (Data.current-tab.type == TabType.package-category) && (Data.current-package-category-tab.library-index == library-index) && (Data.current-package-category-tab.path == derived-tab.path);
                     scrollbar-width: scrollbar-width;
 
                     clicked => {
-                        Backend.trigger-library-element(tab.path, LibraryElementAction.open);
+                        Backend.trigger-library-element(derived-tab.path, LibraryElementAction.open);
                     }
                 }
-            }
 
-            for tab[idx] in section.symbol-tabs: VerticalLayout {
-                if (!tab.path.is-empty) && (tab.library-index == library-index): DocumentsListItem {
+                if (tab.type == TabType.symbol) && (section.symbol-tabs[idx].library-index == library-index): DocumentsListItem {
+                    property <SymbolTabData> derived-tab: section.symbol-tabs[idx];
+
                     type: ItemType.library;
                     text: section.tabs[idx].title;
                     icon: @image-url("../../../../img/symbol.png");
-                    selected: (Data.current-tab.type == TabType.symbol) && (Data.current-symbol-tab.library-index == library-index) && (Data.current-symbol-tab.path == tab.path);
+                    selected: (Data.current-tab.type == TabType.symbol) && (Data.current-symbol-tab.library-index == library-index) && (Data.current-symbol-tab.path == derived-tab.path);
                     scrollbar-width: scrollbar-width;
 
                     clicked => {
-                        Backend.trigger-library-element(tab.path, LibraryElementAction.open);
+                        Backend.trigger-library-element(derived-tab.path, LibraryElementAction.open);
                     }
                 }
-            }
 
-            for tab[idx] in section.package-tabs: VerticalLayout {
-                if (!tab.path.is-empty) && (tab.library-index == library-index): DocumentsListItem {
+                if (tab.type == TabType.package) && (section.package-tabs[idx].library-index == library-index): DocumentsListItem {
+                    property <PackageTabData> derived-tab: section.package-tabs[idx];
+
                     type: ItemType.library;
                     text: section.tabs[idx].title;
                     icon: @image-url("../../../../img/footprint.png");
-                    selected: (Data.current-tab.type == TabType.package) && (Data.current-package-tab.library-index == library-index) && (Data.current-package-tab.path == tab.path);
+                    selected: (Data.current-tab.type == TabType.package) && (Data.current-package-tab.library-index == library-index) && (Data.current-package-tab.path == derived-tab.path);
                     scrollbar-width: scrollbar-width;
 
                     clicked => {
-                        Backend.trigger-library-element(tab.path, LibraryElementAction.open);
+                        Backend.trigger-library-element(derived-tab.path, LibraryElementAction.open);
                     }
                 }
-            }
 
-            for tab[idx] in section.component-tabs: VerticalLayout {
-                if (!tab.path.is-empty) && (tab.library-index == library-index): DocumentsListItem {
+                if (tab.type == TabType.component) && (section.component-tabs[idx].library-index == library-index): DocumentsListItem {
+                    property <ComponentTabData> derived-tab: section.component-tabs[idx];
+
                     type: ItemType.library;
                     text: section.tabs[idx].title;
                     icon: @image-url("../../../bootstrap-icons/icons/cpu.svg");
-                    selected: (Data.current-tab.type == TabType.component) && (Data.current-component-tab.library-index == library-index) && (Data.current-component-tab.path == tab.path);
+                    selected: (Data.current-tab.type == TabType.component) && (Data.current-component-tab.library-index == library-index) && (Data.current-component-tab.path == derived-tab.path);
                     scrollbar-width: scrollbar-width;
 
                     clicked => {
-                        Backend.trigger-library-element(tab.path, LibraryElementAction.open);
+                        Backend.trigger-library-element(derived-tab.path, LibraryElementAction.open);
                     }
                 }
-            }
 
-            for tab[idx] in section.device-tabs: VerticalLayout {
-                if (!tab.path.is-empty) && (tab.library-index == library-index): DocumentsListItem {
+                if (tab.type == TabType.device) && (section.device-tabs[idx].library-index == library-index): DocumentsListItem {
+                    property <DeviceTabData> derived-tab: section.device-tabs[idx];
+
                     type: ItemType.library;
                     text: section.tabs[idx].title;
                     icon: @image-url("../../../bootstrap-icons/icons/cpu-fill.svg");
-                    selected: (Data.current-tab.type == TabType.device) && (Data.current-device-tab.library-index == library-index) && (Data.current-device-tab.path == tab.path);
+                    selected: (Data.current-tab.type == TabType.device) && (Data.current-device-tab.library-index == library-index) && (Data.current-device-tab.path == derived-tab.path);
                     scrollbar-width: scrollbar-width;
 
                     clicked => {
-                        Backend.trigger-library-element(tab.path, LibraryElementAction.open);
+                        Backend.trigger-library-element(derived-tab.path, LibraryElementAction.open);
+                    }
+                }
+
+                if (tab.type == TabType.organization) && (section.organization-tabs[idx].library-index == library-index): DocumentsListItem {
+                    property <OrganizationTabData> derived-tab: section.organization-tabs[idx];
+
+                    type: ItemType.library;
+                    text: section.tabs[idx].title;
+                    icon: @image-url("../../../bootstrap-icons/icons/buildings.svg");
+                    selected: (Data.current-tab.type == TabType.organization) && (Data.current-organization-tab.library-index == library-index) && (Data.current-organization-tab.path == derived-tab.path);
+                    scrollbar-width: scrollbar-width;
+
+                    clicked => {
+                        Backend.trigger-library-element(derived-tab.path, LibraryElementAction.open);
                     }
                 }
             }
