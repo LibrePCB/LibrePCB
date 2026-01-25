@@ -141,3 +141,17 @@ export component MenuPopup inherits PopupWindow {
         }
     }
 }
+
+export component MenuOverlay inherits Rectangle {
+    width: self.preferred-width;
+    height: self.preferred-height;
+
+    // The touch area is important to intercept and ignore any clicks
+    // on disabled menu items or on menu separators, to avoid those
+    // clicks from propagating to the elements underneath the menu.
+    TouchArea {
+        VerticalLayout {
+            @children
+        }
+    }
+}

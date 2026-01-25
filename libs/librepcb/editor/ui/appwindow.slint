@@ -52,7 +52,10 @@ export component AppWindow inherits Window {
         focus-on-tab-navigation: false;
 
         key-pressed(event) => {
-            if Shortcuts.process(event) {
+            if menubar.menu-expanded && (event.text == Key.Escape) {
+                menubar.close-menu();
+                return accept;
+            } else if Shortcuts.process(event) {
                 return accept;
             } else if Backend.is-shortcut(event, Cmd.find) && (Data.current-tab.features.find == FeatureState.enabled) {
                 menubar.focus-search();
@@ -70,6 +73,7 @@ export component AppWindow inherits Window {
             z: 100; // For the tooltips.
             width: 100%;
             height: 26px;
+            window-height: root.height;
             sections-start-x: sidebar.width + actual-panel-width;
 
             focus-root => {
