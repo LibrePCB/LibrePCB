@@ -36,7 +36,7 @@
 #include "project/board/board2dtab.h"
 #include "project/board/board3dtab.h"
 #include "project/schematic/schematictab.h"
-#include "utils/deriveduiobjectlistview.h"
+#include "utils/deriveduiobjectlist.h"
 #include "windowtab.h"
 
 #include <QtCore>

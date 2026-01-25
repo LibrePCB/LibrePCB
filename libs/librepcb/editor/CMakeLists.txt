@@ -877,7 +877,7 @@ add_library(
   undocommandgroup.h
   undostack.cpp
   undostack.h
-  utils/deriveduiobjectlistview.h
+  utils/deriveduiobjectlist.h
   utils/dismissablemessagecontext.cpp
   utils/dismissablemessagecontext.h
   utils/editortoolbox.cpp

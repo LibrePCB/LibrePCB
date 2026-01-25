@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_DERIVEDUIOBJECTLISTVIEW_H
-#define LIBREPCB_EDITOR_DERIVEDUIOBJECTLISTVIEW_H
+#ifndef LIBREPCB_EDITOR_DERIVEDUIOBJECTLIST_H
+#define LIBREPCB_EDITOR_DERIVEDUIOBJECTLIST_H
 
 /*******************************************************************************
  *  Includes
