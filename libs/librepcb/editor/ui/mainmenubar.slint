@@ -3,7 +3,7 @@ import {
     IconButton,
     LineEdit,
     MenuItem,
-    MenuPopup,
+    MenuOverlay,
     MenuSeparator,
 } from "widgets.slint";
 import {
@@ -29,11 +29,13 @@ import {
 
 component MainMenuItem inherits Rectangle {
     in property <string> text;
+    in property <bool> active;
 
     callback clicked <=> ta.clicked;
+    callback hovered;
 
     width: self.visible ? (txt.preferred-width + 10px) : 0;
-    background: ta.has-hover ? #505050 : #252525;
+    background: (active || ta.has-hover) ? #404040 : #252525;
 
     // Accessibility
     accessible-role: button;
@@ -48,7 +50,13 @@ component MainMenuItem inherits Rectangle {
         text: text;
     }
 
-    ta := TouchArea { }
+    ta := TouchArea {
+        changed has-hover => {
+            if self.has-hover {
+                hovered();
+            }
+        }
+    }
 }
 
 component MenuBarButton inherits IconButton {
@@ -66,7 +74,9 @@ component MenuBarSeparator inherits Rectangle {
 }
 
 export component MainMenuBar inherits Rectangle {
+    in property <length> window-height;
     in property <length> sections-start-x;
+    out property <bool> menu-expanded: !current-menu-text.is-empty;
     property <string> undo-text: {
         if Data.current-tab.undo-text.is-empty {
             @tr("Undo")
@@ -81,6 +91,7 @@ export component MainMenuBar inherits Rectangle {
             @tr("Redo: {}", Data.current-tab.redo-text)
         }
     };
+    property <string> current-menu-text;
 
     callback focus-root;
     callback focus-grid-interval;
@@ -92,6 +103,36 @@ export component MainMenuBar inherits Rectangle {
         }
     }
 
+    public function close-menu() {
+        current-menu-text = "";
+    }
+
+    function menu-clicked(text: string) {
+        if current-menu-text == text {
+            close-menu();
+        } else {
+            current-menu-text = text;
+        }
+    }
+
+    function menu-hovered(text: string) {
+        if !current-menu-text.is-empty {
+            current-menu-text = text;
+        }
+    }
+
+    // Touch area to intercept clicks outside the menu.
+    if menu-expanded: TouchArea {
+        x: 0;
+        y: 0;
+        width: 100%;
+        height: window-height;
+
+        clicked => {
+            close-menu();
+        }
+    }
+
     background: #252525;
 
     HorizontalLayout {
@@ -99,12 +140,17 @@ export component MainMenuBar inherits Rectangle {
 
         file-menu-item := MainMenuItem {
             text: @tr("File");
+            active: current-menu-text == self.text;
 
             clicked => {
-                file-menu-popup.show();
+                menu-clicked(self.text);
             }
 
-            file-menu-popup := MenuPopup {
+            hovered => {
+                menu-hovered(self.text);
+            }
+
+            if self.active: file-menu-popup := MenuOverlay {
                 x: 0;
                 y: parent.height;
 
@@ -113,6 +159,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Backend.trigger(Action.project-new);
+                        close-menu();
                     }
                 }
 
@@ -121,6 +168,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Backend.trigger(Action.project-open);
+                        close-menu();
                     }
                 }
 
@@ -129,6 +177,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Backend.trigger(Action.project-import-eagle);
+                        close-menu();
                     }
                 }
 
@@ -137,6 +186,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Backend.trigger(Action.project-import-examples);
+                        close-menu();
                     }
                 }
 
@@ -149,6 +199,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Backend.trigger(Action.library-create);
+                        close-menu();
                     }
                 }
 
@@ -159,6 +210,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Backend.trigger(Action.library-download);
+                        close-menu();
                     }
                 }
 
@@ -167,6 +219,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Backend.trigger(Action.workspace-libraries-rescan);
+                        close-menu();
                     }
                 }
 
@@ -178,6 +231,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.print);
+                        close-menu();
                     }
                 }
 
@@ -187,6 +241,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.export-pdf);
+                        close-menu();
                     }
                 }
 
@@ -196,6 +251,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.export-image);
+                        close-menu();
                     }
                 }
 
@@ -209,6 +265,7 @@ export component MainMenuBar inherits Rectangle {
                         } else {
                             Backend.trigger-board(Data.current-board-3d-tab.project-index, Data.current-board-3d-tab.board-index, BoardAction.export-step);
                         }
+                        close-menu();
                     }
                 }
 
@@ -218,6 +275,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.export-fabrication-data);
+                        close-menu();
                     }
                 }
 
@@ -227,6 +285,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.export-pick-place);
+                        close-menu();
                     }
                 }
 
@@ -236,6 +295,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.export-d356-netlist);
+                        close-menu();
                     }
                 }
 
@@ -247,6 +307,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.export-specctra);
+                        close-menu();
                     }
                 }
 
@@ -256,6 +317,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.import-specctra);
+                        close-menu();
                     }
                 }
 
@@ -265,6 +327,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.import-dxf);
+                        close-menu();
                     }
                 }
 
@@ -275,6 +338,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Backend.trigger(Action.workspace-switch);
+                        close-menu();
                     }
                 }
 
@@ -285,6 +349,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Backend.trigger(Action.workspace-open-folder);
+                        close-menu();
                     }
                 }
 
@@ -293,6 +358,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Backend.trigger(Action.workspace-settings);
+                        close-menu();
                     }
                 }
 
@@ -303,6 +369,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Backend.trigger(Action.quit);
+                        close-menu();
                     }
                 }
             }
@@ -310,12 +377,17 @@ export component MainMenuBar inherits Rectangle {
 
         edit-menu-item := MainMenuItem {
             text: @tr("Edit");
+            active: current-menu-text == self.text;
 
             clicked => {
-                menu-edit.show();
+                menu-clicked(self.text);
             }
 
-            menu-edit := MenuPopup {
+            hovered => {
+                menu-hovered(self.text);
+            }
+
+            if self.active: menu-edit := MenuOverlay {
                 x: 0;
                 y: parent.height;
 
@@ -326,6 +398,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.undo);
+                        close-menu();
                     }
                 }
 
@@ -336,6 +409,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.redo);
+                        close-menu();
                     }
                 }
 
@@ -347,6 +421,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.select-all);
+                        close-menu();
                     }
                 }
 
@@ -359,6 +434,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.cut);
+                        close-menu();
                     }
                 }
 
@@ -371,6 +447,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.copy);
+                        close-menu();
                     }
                 }
 
@@ -383,6 +460,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.paste);
+                        close-menu();
                     }
                 }
 
@@ -393,6 +471,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.delete);
+                        close-menu();
                     }
                 }
 
@@ -403,6 +482,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.rotate-ccw);
+                        close-menu();
                     }
                 }
 
@@ -413,6 +493,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.rotate-cw);
+                        close-menu();
                     }
                 }
 
@@ -422,6 +503,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.flip-horizontally);
+                        close-menu();
                     }
                 }
 
@@ -431,6 +513,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.flip-vertically);
+                        close-menu();
                     }
                 }
 
@@ -441,6 +524,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.mirror-horizontally);
+                        close-menu();
                     }
                 }
 
@@ -451,6 +535,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.mirror-vertically);
+                        close-menu();
                     }
                 }
 
@@ -461,6 +546,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.snap-to-grid);
+                        close-menu();
                     }
                 }
 
@@ -470,6 +556,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.lock);
+                        close-menu();
                     }
                 }
 
@@ -479,6 +566,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.unlock);
+                        close-menu();
                     }
                 }
 
@@ -488,6 +576,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.reset-texts);
+                        close-menu();
                     }
                 }
 
@@ -500,6 +589,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.line-width-increase);
+                        close-menu();
                     }
                 }
 
@@ -510,6 +600,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.line-width-decrease);
+                        close-menu();
                     }
                 }
 
@@ -519,6 +610,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.line-width-set);
+                        close-menu();
                     }
                 }
 
@@ -531,6 +623,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         focus-search();
+                        close-menu();
                     }
                 }
 
@@ -540,6 +633,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.find-next);
+                        close-menu();
                     }
                 }
 
@@ -549,6 +643,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.find-previous);
+                        close-menu();
                     }
                 }
 
@@ -561,6 +656,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.edit-properties);
+                        close-menu();
                     }
                 }
             }
@@ -568,12 +664,17 @@ export component MainMenuBar inherits Rectangle {
 
         view-menu-item := MainMenuItem {
             text: @tr("View");
+            active: current-menu-text == self.text;
 
             clicked => {
-                view-menu-popup.show();
+                menu-clicked(self.text);
             }
 
-            view-menu-popup := MenuPopup {
+            hovered => {
+                menu-hovered(self.text);
+            }
+
+            if self.active: view-menu-popup := MenuOverlay {
                 x: 0;
                 y: parent.height;
 
@@ -582,6 +683,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Backend.trigger(Action.window-new);
+                        close-menu();
                     }
                 }
 
@@ -590,6 +692,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Backend.trigger(Action.window-close);
+                        close-menu();
                     }
                 }
 
@@ -600,6 +703,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Backend.trigger-section(Data.sections.length - 1, WindowSectionAction.split);
+                        close-menu();
                     }
                 }
 
@@ -611,6 +715,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.grid-interval-increase);
+                        close-menu();
                     }
                 }
 
@@ -620,6 +725,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.grid-interval-decrease);
+                        close-menu();
                     }
                 }
 
@@ -629,6 +735,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         focus-grid-interval();
+                        close-menu();
                     }
                 }
 
@@ -641,6 +748,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Data.current-section.schematic-tabs[Data.current-section.current-tab-index].show-pin-numbers = !Data.current-section.schematic-tabs[Data.current-section.current-tab-index].show-pin-numbers;
+                        close-menu();
                     }
                 }
 
@@ -650,6 +758,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.planes-hide);
+                        close-menu();
                     }
                 }
 
@@ -659,6 +768,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.planes-show);
+                        close-menu();
                     }
                 }
 
@@ -668,6 +778,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.planes-rebuild);
+                        close-menu();
                     }
                 }
 
@@ -681,6 +792,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Data.current-section.board-2d-tabs[Data.current-section.current-tab-index].ignore-placement-locks = !ignore;
+                        close-menu();
                     }
                 }
 
@@ -692,6 +804,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.toggle-background-image);
+                        close-menu();
                     }
                 }
 
@@ -707,6 +820,7 @@ export component MainMenuBar inherits Rectangle {
                         } else if Data.current-tab.type == TabType.package {
                             Data.current-section.package-tabs[Data.current-section.current-tab-index].view-3d = !Data.current-package-tab.view-3d;
                         }
+                        close-menu();
                     }
                 }
 
@@ -718,6 +832,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.zoom-in);
+                        close-menu();
                     }
                 }
 
@@ -727,6 +842,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.zoom-out);
+                        close-menu();
                     }
                 }
 
@@ -736,6 +852,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.zoom-fit);
+                        close-menu();
                     }
                 }
             }
@@ -746,12 +863,17 @@ export component MainMenuBar inherits Rectangle {
 
             text: @tr("Library");
             visible: (Data.current-tab.type == TabType.library) && (!project-menu-item.visible);
+            active: current-menu-text == self.text;
 
             clicked => {
-                library-menu-popup.show();
+                menu-clicked(self.text);
             }
 
-            library-menu-popup := MenuPopup {
+            hovered => {
+                menu-hovered(self.text);
+            }
+
+            if self.active: library-menu-popup := MenuOverlay {
                 x: 0;
                 y: parent.height;
 
@@ -762,6 +884,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.save);
+                        close-menu();
                     }
                 }
 
@@ -772,6 +895,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Backend.trigger-library-element(library.path, LibraryElementAction.close);
+                        close-menu();
                     }
                 }
 
@@ -780,6 +904,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Backend.trigger-library-element(library.path, LibraryElementAction.open-folder);
+                        close-menu();
                     }
                 }
 
@@ -790,6 +915,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Backend.trigger-library-element(library.path, LibraryElementAction.import-eagle-library);
+                        close-menu();
                     }
                 }
 
@@ -798,6 +924,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Backend.trigger-library-element(library.path, LibraryElementAction.import-kicad-library);
+                        close-menu();
                     }
                 }
 
@@ -809,6 +936,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Backend.trigger-library(library.path, LibraryAction.new-component-category);
+                        close-menu();
                     }
                 }
 
@@ -818,6 +946,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Backend.trigger-library(library.path, LibraryAction.new-package-category);
+                        close-menu();
                     }
                 }
 
@@ -827,6 +956,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Backend.trigger-library(library.path, LibraryAction.new-symbol);
+                        close-menu();
                     }
                 }
 
@@ -836,6 +966,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Backend.trigger-library(library.path, LibraryAction.new-package);
+                        close-menu();
                     }
                 }
 
@@ -845,6 +976,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Backend.trigger-library(library.path, LibraryAction.new-component);
+                        close-menu();
                     }
                 }
 
@@ -854,6 +986,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Backend.trigger-library(library.path, LibraryAction.new-device);
+                        close-menu();
                     }
                 }
 
@@ -863,6 +996,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Backend.trigger-library(library.path, LibraryAction.new-organization);
+                        close-menu();
                     }
                 }
             }
@@ -871,12 +1005,17 @@ export component MainMenuBar inherits Rectangle {
         category-menu-item := MainMenuItem {
             text: @tr("Category");
             visible: ((Data.current-tab.type == TabType.component-category) || (Data.current-tab.type == TabType.package-category)) && (!project-menu-item.visible);
+            active: current-menu-text == self.text;
 
             clicked => {
-                category-menu-popup.show();
+                menu-clicked(self.text);
             }
 
-            category-menu-popup := MenuPopup {
+            hovered => {
+                menu-hovered(self.text);
+            }
+
+            if self.active: category-menu-popup := MenuOverlay {
                 x: 0;
                 y: parent.height;
 
@@ -887,6 +1026,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.save);
+                        close-menu();
                     }
                 }
 
@@ -897,6 +1037,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.close);
+                        close-menu();
                     }
                 }
 
@@ -909,6 +1050,7 @@ export component MainMenuBar inherits Rectangle {
                         } else {
                             Backend.trigger-library-element(Data.current-package-category-tab.path, LibraryElementAction.open-folder);
                         }
+                        close-menu();
                     }
                 }
             }
@@ -917,12 +1059,17 @@ export component MainMenuBar inherits Rectangle {
         symbol-menu-item := MainMenuItem {
             text: @tr("Symbol");
             visible: (Data.current-tab.type == TabType.symbol) && (!project-menu-item.visible);
+            active: current-menu-text == self.text;
 
             clicked => {
-                symbol-menu-popup.show();
+                menu-clicked(self.text);
             }
 
-            symbol-menu-popup := MenuPopup {
+            hovered => {
+                menu-hovered(self.text);
+            }
+
+            if self.active: symbol-menu-popup := MenuOverlay {
                 x: 0;
                 y: parent.height;
 
@@ -933,6 +1080,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.save);
+                        close-menu();
                     }
                 }
 
@@ -943,6 +1091,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.close);
+                        close-menu();
                     }
                 }
 
@@ -953,6 +1102,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.reload-from-disk);
+                        close-menu();
                     }
                 }
 
@@ -961,6 +1111,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Backend.trigger-library-element(Data.current-symbol-tab.path, LibraryElementAction.open-folder);
+                        close-menu();
                     }
                 }
             }
@@ -969,12 +1120,17 @@ export component MainMenuBar inherits Rectangle {
         package-menu-item := MainMenuItem {
             text: @tr("Package");
             visible: (Data.current-tab.type == TabType.package) && (!project-menu-item.visible);
+            active: current-menu-text == self.text;
 
             clicked => {
-                package-menu-popup.show();
+                menu-clicked(self.text);
             }
 
-            package-menu-popup := MenuPopup {
+            hovered => {
+                menu-hovered(self.text);
+            }
+
+            if self.active: package-menu-popup := MenuOverlay {
                 x: 0;
                 y: parent.height;
 
@@ -985,6 +1141,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.save);
+                        close-menu();
                     }
                 }
 
@@ -995,6 +1152,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.close);
+                        close-menu();
                     }
                 }
 
@@ -1005,6 +1163,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.reload-from-disk);
+                        close-menu();
                     }
                 }
 
@@ -1013,6 +1172,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Backend.trigger-library-element(Data.current-package-tab.path, LibraryElementAction.open-folder);
+                        close-menu();
                     }
                 }
             }
@@ -1021,12 +1181,17 @@ export component MainMenuBar inherits Rectangle {
         component-menu-item := MainMenuItem {
             text: @tr("Component");
             visible: (Data.current-tab.type == TabType.component) && (!project-menu-item.visible);
+            active: current-menu-text == self.text;
 
             clicked => {
-                component-menu-popup.show();
+                menu-clicked(self.text);
             }
 
-            component-menu-popup := MenuPopup {
+            hovered => {
+                menu-hovered(self.text);
+            }
+
+            if self.active: component-menu-popup := MenuOverlay {
                 x: 0;
                 y: parent.height;
 
@@ -1037,6 +1202,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.save);
+                        close-menu();
                     }
                 }
 
@@ -1047,6 +1213,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.close);
+                        close-menu();
                     }
                 }
 
@@ -1055,6 +1222,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Backend.trigger-library-element(Data.current-component-tab.path, LibraryElementAction.open-folder);
+                        close-menu();
                     }
                 }
             }
@@ -1063,12 +1231,17 @@ export component MainMenuBar inherits Rectangle {
         device-menu-item := MainMenuItem {
             text: @tr("Device");
             visible: (Data.current-tab.type == TabType.device) && (!project-menu-item.visible);
+            active: current-menu-text == self.text;
 
             clicked => {
-                device-menu-popup.show();
+                menu-clicked(self.text);
             }
 
-            device-menu-popup := MenuPopup {
+            hovered => {
+                menu-hovered(self.text);
+            }
+
+            if self.active: device-menu-popup := MenuOverlay {
                 x: 0;
                 y: parent.height;
 
@@ -1079,6 +1252,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.save);
+                        close-menu();
                     }
                 }
 
@@ -1089,6 +1263,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.close);
+                        close-menu();
                     }
                 }
 
@@ -1097,6 +1272,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Backend.trigger-library-element(Data.current-device-tab.path, LibraryElementAction.open-folder);
+                        close-menu();
                     }
                 }
             }
@@ -1105,12 +1281,17 @@ export component MainMenuBar inherits Rectangle {
         organization-menu-item := MainMenuItem {
             text: @tr("Organization");
             visible: (Data.current-tab.type == TabType.organization) && (!project-menu-item.visible);
+            active: current-menu-text == self.text;
 
             clicked => {
-                organization-menu-popup.show();
+                menu-clicked(self.text);
             }
 
-            organization-menu-popup := MenuPopup {
+            hovered => {
+                menu-hovered(self.text);
+            }
+
+            if self.active: organization-menu-popup := MenuOverlay {
                 x: 0;
                 y: parent.height;
 
@@ -1121,6 +1302,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.save);
+                        close-menu();
                     }
                 }
 
@@ -1131,6 +1313,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.close);
+                        close-menu();
                     }
                 }
 
@@ -1139,6 +1322,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Backend.trigger-library-element(Data.current-organization-tab.path, LibraryElementAction.open-folder);
+                        close-menu();
                     }
                 }
             }
@@ -1147,12 +1331,17 @@ export component MainMenuBar inherits Rectangle {
         project-menu-item := MainMenuItem {
             text: @tr("Project");
             visible: Data.current-project.valid;
+            active: current-menu-text == self.text;
 
             clicked => {
-                project-menu-popup.show();
+                menu-clicked(self.text);
             }
 
-            project-menu-popup := MenuPopup {
+            hovered => {
+                menu-hovered(self.text);
+            }
+
+            if self.active: project-menu-popup := MenuOverlay {
                 x: 0;
                 y: parent.height;
 
@@ -1161,6 +1350,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-project-action(ProjectAction.open-setup-dialog);
+                        close-menu();
                     }
                 }
 
@@ -1169,6 +1359,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-project-action(ProjectAction.update-library);
+                        close-menu();
                     }
                 }
 
@@ -1181,6 +1372,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-project-action(ProjectAction.save);
+                        close-menu();
                     }
                 }
 
@@ -1189,6 +1381,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-project-action(ProjectAction.close);
+                        close-menu();
                     }
                 }
 
@@ -1197,6 +1390,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-project-action(ProjectAction.open-folder);
+                        close-menu();
                     }
                 }
 
@@ -1205,6 +1399,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-project-action(ProjectAction.export-lppz);
+                        close-menu();
                     }
                 }
 
@@ -1219,6 +1414,7 @@ export component MainMenuBar inherits Rectangle {
                         } else {
                             Backend.trigger-project(Data.current-schematic-tab.project-index, ProjectAction.bill-of-materials);
                         }
+                        close-menu();
                     }
                 }
 
@@ -1227,6 +1423,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-project-action(ProjectAction.open-output-jobs);
+                        close-menu();
                     }
                 }
 
@@ -1237,6 +1434,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-project-action(ProjectAction.new-sheet);
+                        close-menu();
                     }
                 }
 
@@ -1246,6 +1444,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-schematic-action(SchematicAction.rename);
+                        close-menu();
                     }
                 }
 
@@ -1255,6 +1454,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-schematic-action(SchematicAction.delete);
+                        close-menu();
                     }
                 }
 
@@ -1265,6 +1465,7 @@ export component MainMenuBar inherits Rectangle {
                     clicked => {
                         Data.current-rule-check-board-index = -1;
                         Data.panel-page = PanelPage.rule-check;
+                        close-menu();
                     }
                 }
 
@@ -1276,6 +1477,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-project-action(ProjectAction.new-board);
+                        close-menu();
                     }
                 }
 
@@ -1285,6 +1487,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-board-action(BoardAction.copy);
+                        close-menu();
                     }
                 }
 
@@ -1294,6 +1497,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-board-action(BoardAction.delete);
+                        close-menu();
                     }
                 }
 
@@ -1305,6 +1509,7 @@ export component MainMenuBar inherits Rectangle {
                         Helpers.trigger-current-board-action(BoardAction.run-quick-check);
                         Data.current-rule-check-board-index = Data.current-board-2d-tab.board-index;
                         Data.panel-page = PanelPage.rule-check;
+                        close-menu();
                     }
                 }
 
@@ -1316,6 +1521,7 @@ export component MainMenuBar inherits Rectangle {
                         Helpers.trigger-current-board-action(BoardAction.run-drc);
                         Data.current-rule-check-board-index = Data.current-board-2d-tab.board-index;
                         Data.panel-page = PanelPage.rule-check;
+                        close-menu();
                     }
                 }
 
@@ -1325,6 +1531,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-board-action(BoardAction.open-setup-dialog);
+                        close-menu();
                     }
                 }
             }
@@ -1332,12 +1539,17 @@ export component MainMenuBar inherits Rectangle {
 
         help-menu-item := MainMenuItem {
             text: @tr("Help");
+            active: current-menu-text == self.text;
 
             clicked => {
-                help-menu-popup.show();
+                menu-clicked(self.text);
             }
 
-            help-menu-popup := MenuPopup {
+            hovered => {
+                menu-hovered(self.text);
+            }
+
+            if self.active: help-menu-popup := MenuOverlay {
                 x: 0;
                 y: parent.height;
 
@@ -1346,6 +1558,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Backend.trigger(Action.keyboard-shortcuts-reference);
+                        close-menu();
                     }
                 }
 
@@ -1354,6 +1567,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Backend.open-url(Constants.user-manual-url);
+                        close-menu();
                     }
                 }
 
@@ -1363,6 +1577,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Backend.open-url(Constants.support-url);
+                        close-menu();
                     }
                 }
 
@@ -1371,6 +1586,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Backend.open-url(Constants.donate-url);
+                        close-menu();
                     }
                 }
 
@@ -1379,6 +1595,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Backend.open-url(Constants.website-url);
+                        close-menu();
                     }
                 }
 
@@ -1389,6 +1606,7 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Data.panel-page = PanelPage.about;
+                        close-menu();
                     }
                 }
             }
