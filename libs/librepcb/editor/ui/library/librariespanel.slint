@@ -69,7 +69,7 @@ component LibraryListViewItem inherits Rectangle {
     property <image> status-icon;
     states [
         outdated when lib.outdated: {
-            status-text: @tr("Outdated:") + " v" + lib.installed-version + " ⪪ v" + lib.online-version;
+            status-text: @tr("Outdated:") + " v" + lib.installed-version + " < v" + lib.online-version;
             status-color: red;
             status-icon: @image-url("../../../../font-awesome/svgs/solid/angles-up.svg");
         }
