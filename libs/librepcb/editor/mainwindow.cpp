@@ -771,6 +771,7 @@ void MainWindow::triggerLibraryElement(slint::SharedString path,
       if (switchToLibraryElementTab<PackageTab>(fp)) return;
       if (switchToLibraryElementTab<ComponentTab>(fp)) return;
       if (switchToLibraryElementTab<DeviceTab>(fp)) return;
+      if (switchToLibraryElementTab<OrganizationTab>(fp)) return;
       if (mApp.getLibrary(fp)) {
         openLibraryTab(fp, false);
       }
