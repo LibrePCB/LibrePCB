@@ -124,6 +124,7 @@ jobs:
       OCC_ROOT: '/Users/runner/occ'
       MACOSX_DEPLOYMENT_TARGET: '11'  # Picked up by CMake and Rust
       CMAKE_PREFIX_PATH: '/Users/runner/qt/lib/cmake/Qt6:/Users/runner/occ/lib/cmake/opencascade'
+      CMAKE_XCODE_ATTRIBUTE_ENABLE_HARDENED_RUNTIME: 'YES'  # Required for notarizing
     steps:
       - uses: actions/checkout@v4
         with:
