@@ -29,7 +29,7 @@ yourself by creating a pull request (see [CONTRIBUTING.md](CONTRIBUTING.md)).
 - Rob Weber ([@robbawebba](https://github.com/robbawebba))
 - Răzvan Cojocaru ([@rzvncj](https://github.com/rzvncj))
 - [@NiFa18](https://github.com/NiFa18)
-- Florian Bruhin ([@The-Compiler](https://github.com/The-Compiler))
+- [@The-Compiler](https://github.com/The-Compiler)
 - Christian Gwerder ([@chrisgwerder](https://github.com/chrisgwerder))
 - yuri@FreeBSD ([@yurivict](https://github.com/yurivict))
 - [@web-coder-of-rpi](https://github.com/web-coder-of-rpi)
