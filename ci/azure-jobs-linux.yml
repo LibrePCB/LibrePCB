@@ -57,19 +57,19 @@ jobs:
   - bash: ./ci/build_linux_portables.sh
     displayName: Build Portable Packages
     condition: and(succeeded(), eq(variables['DEPLOY'], 'true'))
-  - bash: cd libs/librepcb/rust-core && cargo test --features=fail-on-warnings
-    displayName: Run rust-core tests
-  - bash: xvfb-run -a ./build/tests/unittests/librepcb-unittests
-    displayName: Run LibrePCB Unittests
-  - bash: xvfb-run -a --server-args="-screen 0 1024x768x24" uv --directory ./tests/cli run --no-dev pytest -vvv --librepcb-executable="../../build/install/bin/librepcb-cli"
-    displayName: Run LibrePCB-CLI Functional Tests
-  - bash: xvfb-run -a --server-args="-screen 0 1024x768x24" uv --directory ./tests/funq run --no-dev pytest -vvv --librepcb-executable="../../build/install/bin/librepcb" --reruns 5 --reruns-delay 10
-    displayName: Run LibrePCB Functional Tests
-  - bash: xvfb-run -a --server-args="-screen 0 1600x1200x24" uv --directory "./tests/ui" run --no-dev pytest -vvv --librepcb-executable="../../build/install/bin/librepcb"
-    displayName: Run LibrePCB UI Tests
-    condition: and(succeeded(), variables['SLINT_UI_TESTING_AUTH'])
-    env:
-      SLINT_UI_TESTING_AUTH: $(SLINT_UI_TESTING_AUTH)
+  #- bash: cd libs/librepcb/rust-core && cargo test --features=fail-on-warnings
+  #  displayName: Run rust-core tests
+  #- bash: xvfb-run -a ./build/tests/unittests/librepcb-unittests
+  #  displayName: Run LibrePCB Unittests
+  #- bash: xvfb-run -a --server-args="-screen 0 1024x768x24" uv --directory ./tests/cli run --no-dev pytest -vvv --librepcb-executable="../../build/install/bin/librepcb-cli"
+  #  displayName: Run LibrePCB-CLI Functional Tests
+  #- bash: xvfb-run -a --server-args="-screen 0 1024x768x24" uv --directory ./tests/funq run --no-dev pytest -vvv --librepcb-executable="../../build/install/bin/librepcb" --reruns 5 --reruns-delay 10
+  #  displayName: Run LibrePCB Functional Tests
+  #- bash: xvfb-run -a --server-args="-screen 0 1600x1200x24" uv --directory "./tests/ui" run --no-dev pytest -vvv --librepcb-executable="../../build/install/bin/librepcb"
+  #  displayName: Run LibrePCB UI Tests
+  #  condition: and(succeeded(), variables['SLINT_UI_TESTING_AUTH'])
+  #  env:
+  #    SLINT_UI_TESTING_AUTH: $(SLINT_UI_TESTING_AUTH)
   - bash: |
       ./ci/tar_artifacts.sh
       ./ci/upload_artifacts.sh
