@@ -124,6 +124,7 @@ jobs:
       OCC_ROOT: '/Users/runner/occ'
       MACOSX_DEPLOYMENT_TARGET: '11'  # Picked up by CMake and Rust
       CMAKE_PREFIX_PATH: '/Users/runner/qt/lib/cmake/Qt6:/Users/runner/occ/lib/cmake/opencascade'
+      CMAKE_XCODE_ATTRIBUTE_ENABLE_HARDENED_RUNTIME: 'YES'  # Required for notarizing
     steps:
       - uses: actions/checkout@v4
         with:
@@ -173,6 +174,8 @@ jobs:
         run: ./ci/build_librepcb.sh
       - name: Build Bundle
         run: ./ci/build_mac_bundle.sh
+      - name: Build DMG
+        run: ./ci/build_mac_dmg.sh
       - name: Run rust-core tests
         run: cd libs/librepcb/rust-core && cargo test --features=fail-on-warnings
       - name: Run LibrePCB Unittests
