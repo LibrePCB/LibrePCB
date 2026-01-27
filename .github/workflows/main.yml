@@ -173,6 +173,8 @@ jobs:
         run: ./ci/build_librepcb.sh
       - name: Build Bundle
         run: ./ci/build_mac_bundle.sh
+      - name: Build DMG
+        run: ./ci/build_mac_dmg.sh
       - name: Run rust-core tests
         run: cd libs/librepcb/rust-core && cargo test --features=fail-on-warnings
       - name: Run LibrePCB Unittests
