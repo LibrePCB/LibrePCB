@@ -143,7 +143,7 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
   // It seems registering the callback *before* the first Slint window is
   // created, doesn't work for some reason so we do it here. Maybe the reason
   // is that that's not an official Slint feature but a hack from myself ;-)
-  slint::private_api::slint_translate_set_translate_callback(&slintTr);
+  // slint::private_api::slint_translate_set_translate_callback(&slintTr);
 
   // Setup quick access.
   connect(mQuickAccessModel.get(), &QuickAccessModel::openFileTriggered, this,
