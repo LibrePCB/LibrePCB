@@ -25,8 +25,8 @@ cp -v C:/OpenCascade/win64/gcc/bin/libTK*.dll ./build/install/bin/
 cp -v "`qmake -query QT_INSTALL_PREFIX`"/bin/lib*.dll ./build/install/bin/
 
 # Copy/move Slint DLL
-cp -v ./build/install/lib/librepcbslint.dll ./build/install/bin/
-cp -v ./build/install/lib/librepcbslint.dll ./build/tests/unittests/
+cp -v ./build/install/lib/slint_cpp.dll ./build/install/bin/
+cp -v ./build/install/lib/slint_cpp.dll ./build/tests/unittests/
 rm -rfv ./build/install/lib
 
 # Copy Qt DLLs

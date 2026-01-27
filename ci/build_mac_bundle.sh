@@ -34,7 +34,7 @@ pushd "./build/install/"  # Avoid having path in DMG name
 dylibbundler -ns -od -b \
   -x LibrePCB.app/Contents/MacOS/librepcb \
   -x LibrePCB.app/Contents/MacOS/librepcb-cli \
-  -x lib/liblibrepcbslint.dylib \
+  -x lib/libslint_cpp.dylib \
   -d LibrePCB.app/Contents/Frameworks/ \
   -p @executable_path/../Frameworks/ \
   -s "$QT_ROOT/lib" \
@@ -48,7 +48,7 @@ then
   macdeployqt "LibrePCB.app" -always-overwrite \
     -executable="./LibrePCB.app/Contents/MacOS/librepcb" \
     -executable="./LibrePCB.app/Contents/MacOS/librepcb-cli" \
-    -executable="./LibrePCB.app/Contents/Frameworks/liblibrepcbslint.dylib"
+    -executable="./LibrePCB.app/Contents/Frameworks/libslint_cpp.dylib"
   codesign --force --deep -s - ./LibrePCB.app/Contents/MacOS/librepcb
   codesign --force --deep -s - ./LibrePCB.app/Contents/MacOS/librepcb-cli
   # This is so crappy unstable, we have to try it several times :sob:
@@ -69,7 +69,7 @@ else
       macdeployqt "LibrePCB.app" -dmg -always-overwrite \
         -executable="./LibrePCB.app/Contents/MacOS/librepcb" \
         -executable="./LibrePCB.app/Contents/MacOS/librepcb-cli" \
-        -executable="./LibrePCB.app/Contents/Frameworks/liblibrepcbslint.dylib"
+        -executable="./LibrePCB.app/Contents/Frameworks/libslint_cpp.dylib"
       sleep 5
     fi
   done

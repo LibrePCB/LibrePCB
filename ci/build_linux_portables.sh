@@ -20,7 +20,7 @@ rm -f $QTDIR/plugins/sqldrivers/libqsqlpsql.so
 mkdir -p "./build/AppDir"
 mv "./build/install" "./build/AppDir/usr"
 
-# Expand LD_LIBRARY_PATH to allow linuxdeploy finding liblibrepcbslint.so.
+# Expand LD_LIBRARY_PATH to allow linuxdeploy finding libslint_cpp.so.
 export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:`pwd`/build/AppDir/usr/lib"
 
 # Build AppImage, which will also make the AppDir portable.
