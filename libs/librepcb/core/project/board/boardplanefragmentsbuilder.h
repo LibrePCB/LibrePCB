@@ -29,7 +29,7 @@
 #include "../../utils/transform.h"
 #include "items/bi_plane.h"
 
-#include <polyclipping/clipper.hpp>
+#include <clipper2/clipper.h>
 
 #include <QtCore>
 
@@ -201,7 +201,7 @@ private:  // Methods
   struct JobData {
     // NOTE: We create a `const` copy of this structure for each thread to
     // ensure thread-safety. For the implicitly shared Qt containers this is
-    // a lightweight operation, but for ClipperLib::Paths we share it with a
+    // a lightweight operation, but for Clipper2Lib::Paths64 we share it with a
     // shared_ptr to avoid deep copying the whole container. This is safe
     // because the underlying std::vector is thread-safe for read-only
     // operations.
@@ -214,7 +214,8 @@ private:  // Methods
     QList<PadData> pads;
     QList<std::tuple<Transform, PositiveLength, NonEmptyPath>> holes;
     QList<TraceData> traces;  // Converted to polygons after preprocessing.
-    std::shared_ptr<ClipperLib::Paths> boardArea;  // Populated in preprocessing
+    std::shared_ptr<Clipper2Lib::Paths64>
+        boardArea;  // Populated in preprocessing
   };
 
   struct LayerJobResult {

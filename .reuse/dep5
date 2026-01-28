@@ -213,6 +213,10 @@ Files:
 Copyright: Open Icon Library
 License: CC-BY-SA-3.0 or LGPL-2.1-only
 
+Files: libs/clipper2/*
+Copyright: 2010-2025, Angus Johnson
+License: BSL-1.0
+
 Files: libs/delaunay-triangulation/*
 Copyright: 2015, Simon Zeni
 License: MIT
@@ -237,10 +241,6 @@ License: BSD-2-Clause
 Files: libs/parseagle/*
 Copyright: 2012-2020, U. Bruhin
 License: MIT or Apache-2.0
-
-Files: libs/polyclipping/*
-Copyright: 2010-2017, Angus Johnson
-License: BSL-1.0
 
 Files: libs/type_safe/*
 Copyright: 2016-2019, Jonathan Müller
