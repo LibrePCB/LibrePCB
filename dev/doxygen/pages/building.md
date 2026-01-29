@@ -159,7 +159,7 @@ By default, all dependencies except Qt and OpenCascade will be linked
 statically using vendored git submodules. If you prefer to unbundle some
 libraries, set the `UNBUNDLE_xxx` variable:
 
-    cmake .. -DUNBUNDLE_FONTOBENE_QT=1 -DUNBUNDLE_POLYCLIPPING=1
+    cmake .. -DUNBUNDLE_FONTOBENE_QT=1 -DUNBUNDLE_CLIPPER2=1
 
 To unbundle all dependencies that support it, use `-DUNBUNDLE_ALL=1`.
 
@@ -171,10 +171,10 @@ Right now, the following libraries can be unbundled:
 | [fontobene-qt] | `UNBUNDLE_FONTOBENE_QT` | `pkg-config`, `find_path` |
 | [googletest] | `UNBUNDLE_GTEST` | `cmake`, `pkg-config` |
 | [muparser] | `UNBUNDLE_MUPARSER` | `cmake`, `pkg-config` |
-| [polyclipping] | `UNBUNDLE_POLYCLIPPING` | `pkg-config` |
+| [clipper2] | `UNBUNDLE_CLIPPER2` | `pkg-config` |
 
 [dxflib]: https://www.qcad.org/en/90-dxflib
 [fontobene-qt]: https://github.com/fontobene/fontobene-qt/
 [googletest]: https://github.com/google/googletest
 [muparser]: https://github.com/beltoforion/muparser
-[polyclipping]: https://sourceforge.net/projects/polyclipping/
+[clipper2]: https://github.com/AngusJohnson/Clipper2

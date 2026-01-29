@@ -22,7 +22,7 @@ jobs:
         UNBUNDLE_DXFLIB: true
         UNBUNDLE_GTEST: true
         UNBUNDLE_MUPARSER: true
-        UNBUNDLE_POLYCLIPPING: true
+        # UNBUNDLE_CLIPPER2: true  -> Docker image needs to be updated
         CMAKE_OPTIONS: '-DCMAKE_CXX_FLAGS="-DQT_FORCE_ASSERTS=1"'
         LD_LIBRARY_PATH: $(Build.Repository.LocalPath)/build/install/lib
   container:
@@ -49,9 +49,9 @@ jobs:
   - bash: rm -rf libs/muparser
     displayName: Remove bundled muparser lib
     condition: and(succeeded(), eq(variables['UNBUNDLE_MUPARSER'], 'true'))
-  - bash: rm -rf libs/polyclipping
-    displayName: Remove bundled polyclipping lib
-    condition: and(succeeded(), eq(variables['UNBUNDLE_POLYCLIPPING'], 'true'))
+  - bash: rm -rf libs/clipper2
+    displayName: Remove bundled clipper2 lib
+    condition: and(succeeded(), eq(variables['UNBUNDLE_CLIPPER2'], 'true'))
   - bash: ./ci/build_librepcb.sh
     displayName: Build LibrePCB
   - bash: ./ci/build_linux_portables.sh

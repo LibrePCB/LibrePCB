@@ -1433,10 +1433,10 @@ bool PackageEditorState_Select::generateCourtyard() noexcept {
     QList<std::pair<const Layer*, Path>> polygons;
     for (const Polygon& polygon : mContext.currentFootprint->getPolygons()) {
       if (polygon.getLayer().isPackageOutline()) {
-        ClipperLib::Paths paths{
+        Clipper2Lib::Paths64 paths{
             ClipperHelpers::convert(polygon.getPath(), maxArcTolerance)};
         ClipperHelpers::offset(paths, *getOffset(), maxArcTolerance,
-                               ClipperLib::jtMiter);
+                               Clipper2Lib::JoinType::Miter);
         foreach (const Path& path, ClipperHelpers::convert(paths)) {
           polygons.append(std::make_pair(polygon.getLayer().isTop()
                                              ? &Layer::topCourtyard()

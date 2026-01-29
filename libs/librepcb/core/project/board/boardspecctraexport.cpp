@@ -711,7 +711,7 @@ std::unique_ptr<SExpression> BoardSpecctraExport::toKeepout(
     const QSet<const Layer*>& layers) const {
   const Length offset =
       *mBoard.getDrcSettings().getMinCopperBoardClearance() + maxArcTolerance();
-  ClipperLib::Paths paths{ClipperHelpers::convert(path, maxArcTolerance())};
+  Clipper2Lib::Paths64 paths{ClipperHelpers::convert(path, maxArcTolerance())};
   ClipperHelpers::offset(paths, offset, maxArcTolerance());
   if (paths.size() != 1) throw LogicError(__FILE__, __LINE__);
 

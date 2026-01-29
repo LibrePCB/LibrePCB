@@ -25,8 +25,8 @@
  ******************************************************************************/
 #include "openglobject.h"
 
+#include <clipper2/clipper.h>
 #include <librepcb/core/3d/scenedata3d.h>
-#include <polyclipping/clipper.hpp>
 
 #include <QtCore>
 
@@ -97,12 +97,12 @@ signals:
 
 private:  // Methods
   void run(std::shared_ptr<SceneData3D> data) noexcept;
-  ClipperLib::Paths getPaths(const std::shared_ptr<SceneData3D>& data,
-                             const QStringList layers) const;
-  QVector<QVector3D> extrude(const ClipperLib::Paths& paths, qreal z,
+  Clipper2Lib::Paths64 getPaths(const std::shared_ptr<SceneData3D>& data,
+                                const QStringList layers) const;
+  QVector<QVector3D> extrude(const Clipper2Lib::Paths64& paths, qreal z,
                              qreal height, qreal scaleFactor, bool faces = true,
                              bool edges = true, bool closed = true) const;
-  static QVector<QVector3D> tesselate(const ClipperLib::Path& path, qreal z,
+  static QVector<QVector3D> tesselate(const Clipper2Lib::Path64& path, qreal z,
                                       qreal scaleFactor);
   void publishTriangleData(const QString& id, OpenGlObject::Type type,
                            const QColor& color,
