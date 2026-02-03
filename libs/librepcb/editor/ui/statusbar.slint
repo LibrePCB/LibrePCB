@@ -270,9 +270,11 @@ export component StatusBar inherits Rectangle {
             }
 
             if grid-interval-ta.has-hover: grid-interval-tt := ToolTip {
+                property <string> suffix: Cmd.grid-properties.shortcut.is-empty ? "" : " (\{Cmd.grid-properties.shortcut})";
+
                 x: (parent.width - self.width) / 2;
                 y: -self.height - 5px;
-                text: @tr("Grid Interval");
+                text: @tr("Grid Interval") + suffix + "\n(" + @tr("scroll up/down on hover") + ")";
             }
         }
 
