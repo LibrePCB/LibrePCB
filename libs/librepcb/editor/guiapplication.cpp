@@ -584,12 +584,18 @@ std::shared_ptr<ProjectEditor> GuiApplication::openProject(
     // Switch to documents tab.
     switchToProject(index);
 
-    // Open the first schematic page to get immediate feedback that the project
-    // had been opened. In future we should restore the tabs which were opened
-    // the last time, so this is just a temporary solution.
-    if (auto win = getCurrentWindow();
-        win && (!editor->getProject().getSchematics().isEmpty())) {
-      win->openSchematicTab(index, 0);
+    // Open the first schematic and board to get immediate feedback that the
+    // project has been opened. In future we should restore the tabs which were
+    // opened the last time, so this is just a temporary solution.
+    if (auto win = getCurrentWindow()) {
+      bool tabOpened = false;
+      if (!editor->getProject().getSchematics().isEmpty()) {
+        win->openSchematicTab(index, 0);
+        tabOpened = true;
+      }
+      if (!editor->getProject().getBoards().isEmpty()) {
+        win->openBoard2dTab(index, 0, !tabOpened);
+      }
     }
 
     // Delay updating the last opened project to avoid an issue when

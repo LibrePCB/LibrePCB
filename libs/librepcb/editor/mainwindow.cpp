@@ -1458,11 +1458,13 @@ std::shared_ptr<SchematicTab> MainWindow::openSchematicTab(int projectIndex,
   return nullptr;
 }
 
-void MainWindow::openBoard2dTab(int projectIndex, int index) noexcept {
+void MainWindow::openBoard2dTab(int projectIndex, int index,
+                                bool switchToTab) noexcept {
   if (!switchToProjectTab<Board2dTab>(projectIndex, index)) {
     if (auto prjEditor = mApp.getProjects().value(projectIndex)) {
       if (auto brdEditor = prjEditor->getBoards().value(index)) {
-        addTab(std::make_shared<Board2dTab>(mApp, *brdEditor));
+        addTab(std::make_shared<Board2dTab>(mApp, *brdEditor), -1, -1,
+               switchToTab, switchToTab);
       }
     }
   }
