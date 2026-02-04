@@ -8,7 +8,7 @@ import sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CXX_IN = 'libs/librepcb/editor/editorcommandset.h'
 CXX_OUT = 'libs/librepcb/editor/editorcommandsetupdater.h'
-SLINT = 'libs/librepcb/editor/ui/api/editorcommandset.slint'
+SLINT = 'libs/librepcb/ui/api/editorcommandset.slint'
 
 CXX_OUT_HEADER = """// GENERATED FILE! DO NOT MODIFY!
 // Run dev/generate_editorcommandset.py to re-generate.
@@ -104,9 +104,9 @@ class EditorCommand:
         s = self.image_raw.replace('QString()', '').replace('"', '')
         if not s.endswith('.svg'):
             return ''
-        s = s.replace(':/fa/', '../../../../font-awesome/svgs/')
-        s = s.replace(':/bi/', '../../../../bootstrap-icons/icons/')
-        s = s.replace(':/img/', '../../../../../img/')
+        s = s.replace(':/fa/', '../../../font-awesome/svgs/')
+        s = s.replace(':/bi/', '../../../bootstrap-icons/icons/')
+        s = s.replace(':/img/', '../../../../img/')
         return s
 
     def text(self):

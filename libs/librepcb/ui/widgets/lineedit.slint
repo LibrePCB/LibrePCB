@@ -1,0 +1,326 @@
+import { Palette, ScrollView } from "std-widgets.slint";
+import { Badge } from "badge.slint";
+import { DropDownPopup } from "dropdownpopup.slint";
+import { IconButton } from "iconbutton.slint";
+import { Constants } from "../api.slint";
+
+export component LineEdit inherits Rectangle {
+    in-out property <string> text;
+    in property <string> placeholder-text;
+    in property <string> validation-error: validate(edt.text);
+    in property <bool> has-error: !validation-error.is-empty;
+    in property <bool> show-clear-button: true;
+    in property <bool> enabled: true;
+    in property <bool> read-only: false;
+    in property <length> font-size: 13px;
+    in property <int> font-weight: 400;
+    in property <[string]> autocompletions;
+    in property <[string]> suggestions;
+    in property <bool> frameless: false;
+    out property <bool> has-focus <=> edt.has-focus;
+    property <bool> show-error-badge: enabled && has-error && (!validation-error.is-empty);
+    property <int> current-autocompletion-index: -1;
+    property <int> current-suggestion-index: -1;
+
+    pure callback validate(string) -> string;
+
+    callback text-edited(string);
+    text-edited(text) => {
+        self.text = text;
+    }
+
+    callback autocompletion-accepted(string);
+    autocompletion-accepted(text) => {
+        text-edited(text);
+    }
+
+    callback suggestion-accepted(string);
+    suggestion-accepted(text) => {
+        text-edited(text);
+    }
+
+    callback text-accepted(string);
+
+    callback clear-clicked;
+    clear-clicked => {
+        text-edited("");
+    }
+
+    callback key-pressed(KeyEvent) -> EventResult;
+
+    public function select-all() {
+        edt.select-all();
+    }
+
+    function select-suggestion(index: int) {
+        current-suggestion-index = max(min(index, suggestions.length - 1), -1);
+        text-edited(suggestions[current-suggestion-index]);
+    }
+
+    changed text => {
+        if text != edt.text {
+            edt.text = text;
+        }
+    }
+
+    changed has-focus => {
+        if has-focus {
+            current-autocompletion-index = -1;
+        } else {
+            text-accepted(edt.text);
+            edt.text = self.text;
+        }
+    }
+
+    preferred-width: max(l.preferred-width, placeholder-txt.preferred-width + l.preferred-width - view.preferred-width, 100px);
+    preferred-height: 28px;
+    horizontal-stretch: 1;
+    background: #202020;
+    border-color: {
+        if enabled && has-error {
+            edt.has-focus ? #ff0000 : #900000
+        } else if edt.has-focus {
+            Constants.librepcb-color
+        } else if enabled && (!read-only) {
+            #606060
+        } else {
+            transparent
+        }
+    }
+    border-width: frameless ? 0 : 1px;
+    border-radius: frameless ? 0 : 10px;
+    forward-focus: edt;
+
+    // Accessibility
+    accessible-role: text-input;
+    accessible-enabled: enabled;
+    accessible-expandable: suggestions.length > 0;
+    accessible-value: edt.text;
+    accessible-placeholder-text: placeholder-text;
+    accessible-read-only: read-only;
+    accessible-action-expand => {
+        if enabled && (!read-only) {
+            suggestions-popup.show();
+        }
+    }
+    accessible-action-set-value(t) => {
+        text-edited(t)
+    }
+
+    placeholder-txt := Text {
+        x: frameless ? 5px : 10px;
+        width: root.width - 2 * self.x;
+        font-size: font-size;
+        color: enabled ? #909090 : #707070;
+        text: placeholder-text;
+        wrap: no-wrap;
+        overflow: elide;
+        visible: edt.text.is-empty && (!placeholder-text.is-empty);
+        accessible-role: none;
+    }
+
+    ta := TouchArea {
+        enabled: enabled;
+
+        l := HorizontalLayout {
+            x: 0;
+            y: 0;
+            padding-left: placeholder-txt.x;
+            padding-right: 3px;
+
+            view := ScrollView {
+                min-width: 0;  // Required to avoid text overflow.
+                preferred-width: edt.preferred-width;
+                viewport-width: edt.width;
+                viewport-height: edt.height;
+
+                edt := TextInput {
+                    property <length> y-offset: (self.width > parent.width) ? 3px : 0;
+
+                    y: ((parent.height - self.height) / 2) - y-offset;
+                    width: max(self.preferred-width, view.width);
+                    height: self.preferred-height;
+                    font-size: font-size;
+                    font-weight: font-weight;
+                    color: enabled ? Palette.foreground : Palette.foreground.darker(0.5);
+                    selection-background-color: Constants.librepcb-color;
+                    selection-foreground-color: black;
+                    enabled: enabled;
+                    read-only: read-only;
+                    single-line: true;
+                    wrap: no-wrap;
+                    text: text;
+                    accessible-role: none;
+
+                    edited => {
+                        text-edited(self.text);
+                    }
+
+                    accepted => {
+                        text-accepted(self.text);
+                    }
+
+                    key-pressed(event) => {
+                        if (event.text == Key.UpArrow) && (autocompletions.length > 0) {
+                            current-autocompletion-index = max(current-autocompletion-index - 1, -1);
+                            return accept;
+                        } else if (event.text == Key.DownArrow) && (autocompletions.length > 0) {
+                            current-autocompletion-index = min(current-autocompletion-index + 1, autocompletions.length - 1);
+                            return accept;
+                        } else if (event.text == Key.Return) && (current-autocompletion-index >= 0) && (current-autocompletion-index < autocompletions.length) {
+                            autocompletion-accepted(autocompletions[current-autocompletion-index]);
+                            current-autocompletion-index = -1;
+                            return accept;
+                        } else if (event.text == Key.UpArrow) && (autocompletions.length > 0) {
+                            select-suggestion(current-suggestion-index - 1);
+                            return accept;
+                        } else if (event.text == Key.DownArrow) && (suggestions.length > 0) {
+                            select-suggestion(current-suggestion-index + 1);
+                            return accept;
+                        } else if (event.text == Key.Space) && event.modifiers.control && (suggestions.length > 0) && enabled && (!read-only) {
+                            suggestions-popup.show();
+                            return accept;
+                        } else if root.key-pressed(event) == accept {
+                            return accept;
+                        }
+                        reject
+                    }
+                }
+            }
+
+            Rectangle {
+                width: 5px;
+            }
+
+            if enabled && (!read-only) && show-clear-button: clear-btn := IconButton {
+                y: (parent.height - self.height) / 2;
+                height: 18px;
+                background-color: root.background;
+                border-radius: self.height / 2;
+                icon-scale: 0.7;
+                icon: @image-url("../../../font-awesome/svgs/solid/xmark.svg");
+                // If the error badge is shown inside the edit (=frameless), hide the button.
+                visible: ta.has-hover && (!edt.text.is-empty) && ((!show-error-badge) || (!frameless));
+                accessible-role: none;
+
+                clicked => {
+                    clear-clicked();
+                }
+            }
+
+            if enabled && (!read-only) && (suggestions.length > 0): expand-btn := IconButton {
+                y: (parent.height - self.height) / 2;
+                height: 18px;
+                background-color: root.background;
+                border-radius: self.height / 2;
+                icon-size: 13px;  // Same size as in ComboBox.
+                icon: @image-url("../../../font-awesome/svgs/solid/caret-down.svg");
+                accessible-role: none;
+
+                clicked => {
+                    suggestions-popup.show();
+                }
+            }
+        }
+    }
+
+    if show-error-badge: validation-error-badge := Badge {
+        property <length> expand-btn-width: (suggestions.length > 0) ? 18px : 0;
+
+        x: root.width - self.width - (frameless ? (expand-btn-width + 5px) : 20px);
+        y: frameless ? ((parent.height - self.height) / 2) : -8px;
+        width: min(self.preferred-width, root.width * (frameless ? 0.3 : 0.8));
+        background: #101010;
+        text-color: root.border-color;
+        font-size: 10px;
+        text: validation-error;
+        visible: (!frameless) || (self.width >= self.preferred-width) || (self.width >= 30px);
+        description: "validation error";  // Accessibility
+    }
+
+    if has-focus && (autocompletions.length > 0): autocompletions-r := Rectangle {
+        x: 0;
+        y: parent.height;
+        width: parent.width;
+        height: min(autocompletions-l.preferred-height, 300px);
+        background: black;
+
+        // Accessibility
+        accessible-role: list;
+        accessible-enabled: true;
+        accessible-item-count: autocompletions.length;
+
+        autocompletions-view := ScrollView {
+            width: root.width;
+            height: parent.height;
+            viewport-width: autocompletions-l.width;
+            viewport-height: autocompletions-l.height;
+
+            autocompletions-l := VerticalLayout {
+                width: root.width;
+                height: self.preferred-height;
+
+                for item[index] in autocompletions: autocompletion-item-ta := TouchArea {
+                    property <bool> is-selected: index == current-autocompletion-index;
+
+                    width: root.width;
+                    height: 22px;
+
+                    // Accessibility
+                    accessible-role: list-item;
+                    accessible-item-index: index;
+                    accessible-item-selectable: true;
+                    accessible-item-selected: is-selected;
+                    accessible-label: item;
+
+                    changed has-hover => {
+                        if self.has-hover {
+                            current-autocompletion-index = index;
+                        } else {
+                            current-autocompletion-index = -1;
+                        }
+                    }
+
+                    Rectangle {
+                        background: is-selected ? #505050 : transparent;
+
+                        autocompletion-item-txt := Text {
+                            x: 5px;
+                            width: parent.width - 2 * self.x;
+                            y: (parent.height - self.height) / 2;
+                            font-size: 12px;
+                            overflow: elide;
+                            vertical-alignment: center;
+                            color: Palette.foreground;
+                            text: item;
+                            accessible-role: none;
+                        }
+                    }
+
+                    clicked => {
+                        autocompletion-accepted(item);
+                    }
+                }
+            }
+        }
+    }
+
+    if frameless && (self.has-focus || self.has-error): Rectangle {
+        y: parent.height - self.height;
+        height: 1px;
+        background: parent.border-color;
+    }
+
+    suggestions-popup := DropDownPopup {
+        x: 0;
+        y: parent.height;
+        width: root.width;
+        model: suggestions;
+        current-text: root.text;
+        item-height: root.preferred-height;
+
+        accepted(index) => {
+            suggestion-accepted(suggestions[index]);
+        }
+    }
+}

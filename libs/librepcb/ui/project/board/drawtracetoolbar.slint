@@ -1,0 +1,199 @@
+import {
+    ComboBox,
+    LengthEdit,
+    MenuItem,
+    MenuPopup,
+    WireModeSelector,
+} from "../../widgets.slint";
+import {
+    Backend,
+    Board2dTabData,
+    TabAction,
+    WindowSectionData,
+    WireMode,
+} from "../../api.slint";
+
+export component DrawTraceToolBar inherits HorizontalLayout {
+    in property <int> section-index;
+    in-out property <WindowSectionData> section;
+    in property <bool> show-via-size: true;
+    property <[Board2dTabData]> tabs: section.board-2d-tabs;
+
+    spacing: 2px;
+
+    layer-cbx := ComboBox {
+        model: tabs[section.current-tab-index].tool-layer.items;
+        current-index: tabs[section.current-tab-index].tool-layer.current-index;
+
+        current-index-changed(index) => {
+            tabs[section.current-tab-index].tool-layer.current-index = index;
+        }
+    }
+
+    line-width-edt := LengthEdit {
+        data: tabs[section.current-tab-index].tool-line-width;
+        icon: @image-url("../../../../bootstrap-icons/icons/border-width.svg");
+        tooltip: @tr("Trace Width");
+        min-width-text: "1.234";
+        auto-supported: true;
+        auto-checked: tabs[section.current-tab-index].tool-filled;
+        has-dropdown: true;
+
+        value-changed(v) => {
+            tabs[section.current-tab-index].tool-filled = false;
+            tabs[section.current-tab-index].tool-line-width.value = v;
+        }
+
+        unit-changed(u) => {
+            tabs[section.current-tab-index].tool-line-width.unit = u;
+        }
+
+        increase-triggered => {
+            tabs[section.current-tab-index].tool-filled = false;
+            tabs[section.current-tab-index].tool-line-width.increase = true;
+        }
+
+        decrease-triggered => {
+            tabs[section.current-tab-index].tool-filled = false;
+            tabs[section.current-tab-index].tool-line-width.decrease = true;
+        }
+
+        auto-toggled(checked) => {
+            tabs[section.current-tab-index].tool-filled = checked;
+        }
+
+        dropdown-triggered => {
+            line-width-popup.show();
+        }
+
+        line-width-popup := MenuPopup {
+            x: 0;
+            y: parent.height;
+
+            line-width-save-in-board-item := MenuItem {
+                icon: @image-url("../../../../font-awesome/svgs/solid/download.svg");
+                text: @tr("Set as Default in Board");
+                status-tip: @tr("Saves the entered value in the board design rules as default value");
+
+                clicked => {
+                    Backend.trigger-tab(section-index, section.current-tab-index, TabAction.toolbar-trace-width-save-in-board);
+                }
+            }
+
+            line-width-save-in-netclass-item := MenuItem {
+                icon: @image-url("../../../../font-awesome/svgs/solid/download.svg");
+                text: @tr("Set as Default in Net Class '{}'", tabs[section.current-tab-index].tool-netclass-name);
+                status-tip: @tr("Saves the entered value as default value for the current net class");
+                enabled: !tabs[section.current-tab-index].tool-netclass-name.is-empty;
+
+                clicked => {
+                    Backend.trigger-tab(section-index, section.current-tab-index, TabAction.toolbar-trace-width-save-in-netclass);
+                }
+            }
+        }
+    }
+
+    via-drill-edt := LengthEdit {
+        data: tabs[section.current-tab-index].tool-drill;
+        icon: @image-url("../../../../font-awesome/svgs/solid/bore-hole.svg");
+        tooltip: @tr("Via Drill Diameter");
+        min-width-text: "1.234";
+        auto-supported: true;
+        auto-checked: tabs[section.current-tab-index].tool-pressfit;
+        has-dropdown: true;
+
+        value-changed(v) => {
+            tabs[section.current-tab-index].tool-pressfit = false;
+            tabs[section.current-tab-index].tool-drill.value = v;
+        }
+
+        unit-changed(u) => {
+            tabs[section.current-tab-index].tool-drill.unit = u;
+        }
+
+        increase-triggered => {
+            tabs[section.current-tab-index].tool-pressfit = false;
+            tabs[section.current-tab-index].tool-drill.increase = true;
+        }
+
+        decrease-triggered => {
+            tabs[section.current-tab-index].tool-pressfit = false;
+            tabs[section.current-tab-index].tool-drill.decrease = true;
+        }
+
+        auto-toggled(checked) => {
+            tabs[section.current-tab-index].tool-pressfit = checked;
+        }
+
+        dropdown-triggered => {
+            via-drill-popup.show();
+        }
+
+        via-drill-popup := MenuPopup {
+            x: 0;
+            y: parent.height;
+
+            via-drill-save-in-board-item := MenuItem {
+                icon: @image-url("../../../../font-awesome/svgs/solid/download.svg");
+                text: @tr("Set as Default in Board");
+                status-tip: @tr("Saves the entered value in the board design rules as default value");
+
+                clicked => {
+                    Backend.trigger-tab(section-index, section.current-tab-index, TabAction.toolbar-via-drill-save-in-board);
+                }
+            }
+
+            via-drill-save-in-netclass-item := MenuItem {
+                icon: @image-url("../../../../font-awesome/svgs/solid/download.svg");
+                text: @tr("Set as Default in Net Class '{}'", tabs[section.current-tab-index].tool-netclass-name);
+                status-tip: @tr("Saves the entered value as default value for the current net class");
+                enabled: !tabs[section.current-tab-index].tool-netclass-name.is-empty;
+
+                clicked => {
+                    Backend.trigger-tab(section-index, section.current-tab-index, TabAction.toolbar-via-drill-save-in-netclass);
+                }
+            }
+        }
+    }
+
+    if show-via-size: via-size-edt := LengthEdit {
+        data: tabs[section.current-tab-index].tool-size;
+        icon: @image-url("../../../../bootstrap-icons/icons/record-circle-fill.svg");
+        tooltip: @tr("Via Outer Diameter");
+        min-width-text: "1.234";
+        auto-supported: true;
+        auto-checked: tabs[section.current-tab-index].tool-mirrored;
+        enabled: !via-drill-edt.auto-checked;
+
+        value-changed(v) => {
+            tabs[section.current-tab-index].tool-mirrored = false;
+            tabs[section.current-tab-index].tool-size.value = v;
+        }
+
+        unit-changed(u) => {
+            tabs[section.current-tab-index].tool-size.unit = u;
+        }
+
+        increase-triggered => {
+            tabs[section.current-tab-index].tool-mirrored = false;
+            tabs[section.current-tab-index].tool-size.increase = true;
+        }
+
+        decrease-triggered => {
+            tabs[section.current-tab-index].tool-mirrored = false;
+            tabs[section.current-tab-index].tool-size.decrease = true;
+        }
+
+        auto-toggled(checked) => {
+            tabs[section.current-tab-index].tool-mirrored = checked;
+        }
+    }
+
+    wire-mode-selector := WireModeSelector {
+        wire-mode: tabs[section.current-tab-index].tool-wire-mode;
+
+        wire-mode-clicked(mode) => {
+            tabs[section.current-tab-index].tool-wire-mode = mode;
+        }
+    }
+}
