@@ -16,12 +16,14 @@ def test_file_tree_dclick(librepcb, helpers):
         items[0].dclick()
         items.wait_for_item(lambda x: x.label == "Empty Project.lpp").dclick()
 
-        # Verify that schematic tab has been opened
+        # Verify that schematic- and board tabs have been opened
         tabs = app.get("#TabButton *")
-        tabs.wait(2)
+        tabs.wait(3)
         assert tabs[1].label == "Main"
         assert tabs[1].checked
+        assert tabs[2].label == "default"
+        assert not tabs[2].checked
 
-        # Close project and wait until schematic tab has been closed
+        # Close project and wait until tabs have been closed
         app.get("#DocumentsPanel ProjectSection::close-btn").click()
         tabs.wait(1)
