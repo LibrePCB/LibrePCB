@@ -12,7 +12,10 @@ add_library(librepcb_ui STATIC)
 slint_target_sources(
   librepcb_ui appwindow.slint
   NAMESPACE ui
-  COMPILATION_UNITS 12
+  # Generate multiple cpp files to parallelize compilation, but not too many
+  # because of excessive RAM usage when compiling those (huge) files. A value
+  # of 12 already caused a compiler segfault on the macOS CI...
+  COMPILATION_UNITS 8
 )
 target_link_libraries(
   librepcb_ui
