@@ -410,19 +410,21 @@ public:  // Methods
    * In addition, the length of the filename will be limited to 120 characters.
    *
    * @param userInput An arbitrary string (may be directly from a user input
-   * field)
+   *                  field)
    * @param options   Some options to define how the filename should be escaped
+   * @param maxLength Maximum length the input will be truncated to
    *
-   * @return A string which is either empty or a valid filename (based on
-   * userInput)
+   * @return   A string which is either empty or a valid filename (based on
+   *           userInput)
    *
-   * @note    This function does exectly the same on all supported platforms,
-   * even if the set of allowed characters depends on the platform. This way we
-   *          can guarantee that all created files/directories are platform
-   *          independent.
+   * @note  This function does exectly the same on all supported platforms,
+   *        even if the set of allowed characters depends on the platform.
+   *        This way we can guarantee that all created files/directories are
+   *        platform independent.
    */
   static QString cleanFileName(const QString& userInput,
-                               CleanFileNameOptions options) noexcept;
+                               CleanFileNameOptions options,
+                               int maxLength = 120) noexcept;
 
   // Operator Overloadings
 

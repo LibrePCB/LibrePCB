@@ -237,7 +237,8 @@ FilePath FilePath::getRandomTempPath() noexcept {
 }
 
 QString FilePath::cleanFileName(const QString& userInput,
-                                CleanFileNameOptions options) noexcept {
+                                CleanFileNameOptions options,
+                                int maxLength) noexcept {
   // perform compatibility decomposition (NFKD)
   QString ret = userInput.normalized(QString::NormalizationForm_KD);
   // remove all invalid characters
@@ -251,7 +252,7 @@ QString FilePath::cleanFileName(const QString& userInput,
   if (options.testFlag(CleanFileNameOption::ToLowerCase)) ret = ret.toLower();
   if (options.testFlag(CleanFileNameOption::ToUpperCase)) ret = ret.toUpper();
   // limit length of string to a reasonable number of characters
-  ret.truncate(120);
+  ret.truncate(maxLength);
   return ret;
 }
 
