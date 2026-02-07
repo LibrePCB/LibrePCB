@@ -1,0 +1,416 @@
+import { ToolTip } from "widgets.slint";
+import {
+    Action,
+    Backend,
+    Board2dTabData,
+    Constants,
+    Data,
+    EditorCommandSet as Cmd,
+    Helpers,
+    PanelPage,
+    ProjectAction,
+    ProjectData,
+    RuleCheckData,
+    RuleCheckState,
+    RuleCheckType,
+    TabAction,
+    TabType,
+} from "api.slint";
+
+enum Emblem {
+    none,
+    ok,
+    warning,
+    running,
+}
+
+component SideBarButton inherits Rectangle {
+    in property <image> icon;
+    in property <float> icon-scale: 1.0;
+    in property <string> tooltip;
+    in property <string> shortcut;
+    in property <Emblem> emblem: Emblem.none;
+    in property <string> status;
+    in property <color> status-color;
+    in property <color> status-background;
+    in property <bool> enabled: true;
+    in property <bool> checked: false;
+
+    callback clicked <=> ta.clicked;
+
+    background: {
+        if self.checked {
+            #1c1c1c
+        } else if ta.pressed {
+            #555555
+        } else if ta.has-hover {
+            #424242
+        } else {
+            #353535
+        }
+    };
+    height: self.width;
+
+    // Accessibility
+    accessible-role: button;
+    accessible-enabled: enabled;
+    accessible-label: tooltip;
+    accessible-action-default => {
+        ta.clicked();
+    }
+
+    if checked: Rectangle {
+        x: 0px;
+        width: 3px;
+        background: Constants.librepcb-color;
+    }
+
+    ta := TouchArea {
+        enabled: enabled;
+    }
+
+    Image {
+        width: parent.width * icon-scale * 0.7;
+        height: self.width;
+        colorize: enabled ? white : gray;
+        image-fit: contain;
+        source: icon;
+        accessible-role: none;
+    }
+
+    if emblem == Emblem.ok: Rectangle {
+        x: parent.width - self.width - 3px;
+        y: parent.height - self.height - 3px;
+        width: 10px;
+        height: self.width;
+        background: root.background;
+        border-radius: self.height / 2;
+
+        Image {
+            width: 100%;
+            height: 100%;
+            image-fit: contain;
+            colorize: lime;
+            source: @image-url("../../font-awesome/svgs/solid/check.svg");
+        }
+    }
+
+    if emblem == Emblem.warning: Rectangle {
+        x: parent.width - self.width - 3px;
+        y: parent.height - self.height - 3px;
+        width: 40%;
+        height: self.width;
+
+        Path {
+            commands: "M 50 0 L 100 100 L 0 100 Z";
+            fill: root.background;
+        }
+
+        Image {
+            width: 100%;
+            height: 100%;
+            image-fit: contain;
+            colorize: yellow;
+            source: @image-url("../../font-awesome/svgs/solid/triangle-exclamation.svg");
+        }
+    }
+
+    if (emblem == Emblem.running) || ((emblem == Emblem.none) && (!status.is-empty)): Rectangle {
+        x: parent.width - self.width - 2px;
+        y: parent.height - self.height - 2px;
+        width: (emblem == Emblem.running) ? self.height : max(status-txt.preferred-width + 8px, self.height);
+        height: status-txt.preferred-height + 2px;
+        border-radius: self.height / 2;
+        background: (emblem == Emblem.running) ? yellow : status-background;
+
+        status-txt := Text {
+            function get-progress-dots() -> string {
+                if (mod(animation-tick(), 1000ms) >= 666ms) {
+                    return "•••";
+                } else if (mod(animation-tick(), 1000ms) >= 333ms) {
+                    return "••";
+                } else {
+                    return "•";
+                }
+            }
+
+            x: (parent.width - self.width) / 2;
+            y: (parent.height - self.height) / 2 + 1px;
+            font-size: (root.width < 40px) ? 8px : 10px;
+            font-weight: 700;
+            color: (emblem == Emblem.running) ? gray : status-color;
+            text: (emblem == Emblem.running) ? get-progress-dots() : status;
+            accessible-role: none;
+        }
+    }
+
+    if ta.has-hover && (!ta.pressed): tt := ToolTip {
+        x: root.width + 5px;
+        y: (root.height / 2) - (self.height / 2);
+        text: tooltip;
+        shortcut: shortcut;
+    }
+}
+
+export component SideBar inherits Rectangle {
+    background: #353535;
+
+    function button-clicked(page: PanelPage) {
+        if Data.panel-page == page {
+            Data.panel-page = PanelPage.none;
+        } else {
+            Data.panel-page = page;
+        }
+    }
+
+    VerticalLayout {
+        spacing: 0px;
+
+        home-btn := SideBarButton {
+            icon: @image-url("../../bootstrap-icons/icons/house-fill.svg");
+            tooltip: @tr("Home");
+            checked: Data.panel-page == PanelPage.home;
+
+            clicked => {
+                button-clicked(PanelPage.home);
+            }
+        }
+
+        documents-btn := SideBarButton {
+            icon: @image-url("../../bootstrap-icons/icons/files.svg");
+            tooltip: @tr("Open Documents");
+            enabled: (Data.projects.length + Data.libraries.length) > 0;
+            checked: Data.panel-page == PanelPage.documents;
+
+            clicked => {
+                button-clicked(PanelPage.documents);
+            }
+
+            changed enabled => {
+                if self.checked && (!self.enabled) {
+                    Data.panel-page = PanelPage.home;
+                }
+            }
+        }
+
+        layers-btn := SideBarButton {
+            icon: Cmd.dock-layers.icon;
+            tooltip: @tr("Layers");
+            shortcut: Cmd.dock-layers.shortcut;
+            enabled: Data.current-tab.layers.length > 0;
+            checked: Data.panel-page == PanelPage.layers;
+
+            clicked => {
+                button-clicked(PanelPage.layers);
+            }
+
+            changed enabled => {
+                if self.checked && (!self.enabled) {
+                    if documents-btn.enabled {
+                        Data.panel-page = PanelPage.documents;
+                    } else {
+                        Data.panel-page = PanelPage.home;
+                    }
+                }
+            }
+        }
+
+        place-devices-btn := SideBarButton {
+            property <Board2dTabData> tab: Data.current-board-2d-tab;
+
+            icon: Cmd.dock-place-devices.icon;
+            tooltip: @tr("Place Devices");
+            shortcut: Cmd.dock-place-devices.shortcut;
+            enabled: Data.current-tab.type == TabType.board-2d;
+            checked: Data.panel-page == PanelPage.place-devices;
+
+            states [
+                disabled when !self.enabled: {
+                    emblem: Emblem.none;
+                    status: "";
+                }
+                unplaced-components when tab.unplaced-components.length > 0: {
+                    emblem: Emblem.none;
+                    status: tab.unplaced-components.length;
+                    status-color: black;
+                    status-background: yellow;
+                }
+                up-to-date when tab.unplaced-components.length == 0: {
+                    emblem: Emblem.ok;
+                }
+            ]
+
+            clicked => {
+                button-clicked(PanelPage.place-devices);
+            }
+
+            changed enabled => {
+                if self.checked && (!self.enabled) {
+                    if documents-btn.enabled {
+                        Data.panel-page = PanelPage.documents;
+                    } else {
+                        Data.panel-page = PanelPage.home;
+                    }
+                }
+            }
+        }
+
+        rule-check-btn := SideBarButton {
+            property <RuleCheckData> check: Data.current-rule-check;
+            property <string> title: Helpers.get-rule-check-title-for-type(check.type);
+
+            icon: @image-url("../../bootstrap-icons/icons/list-check.svg");
+            tooltip: title;
+            shortcut: Helpers.get-rule-check-shortcut-for-type(check.type);
+            enabled: check.type != RuleCheckType.none;
+            checked: Data.panel-page == PanelPage.rule-check;
+
+            states [
+                not-available when check.type == RuleCheckType.none: {
+                    emblem: Emblem.none;
+                    status: "";
+                }
+                running when check.state == RuleCheckState.running: {
+                    emblem: Emblem.running;
+                }
+                failed when !check.execution-error.is-empty: {
+                    emblem: Emblem.warning;
+                }
+                not-run-yet when check.state == RuleCheckState.not-run-yet: {
+                    emblem: Emblem.none;
+                    status: "?";
+                    status-color: black;
+                    status-background: #d4d4d4;
+                }
+                outdated when check.state == RuleCheckState.outdated: {
+                    emblem: Emblem.none;
+                    status: check.unapproved;
+                    status-color: black;
+                    status-background: #d4d4d4;
+                }
+                up-to-date when (check.state == RuleCheckState.up-to-date) && (check.unapproved != 0): {
+                    emblem: Emblem.none;
+                    status: check.unapproved;
+                    status-color: black;
+                    status-background: #ff0000;
+                }
+                up-to-date when (check.state == RuleCheckState.up-to-date) && (check.unapproved == 0): {
+                    emblem: Emblem.ok;
+                }
+            ]
+
+            clicked => {
+                button-clicked(PanelPage.rule-check);
+            }
+
+            changed enabled => {
+                if self.checked && (!self.enabled) {
+                    if documents-btn.enabled {
+                        Data.panel-page = PanelPage.documents;
+                    } else {
+                        Data.panel-page = PanelPage.home;
+                    }
+                }
+            }
+        }
+
+        output-jobs-btn := SideBarButton {
+            icon: @image-url("../../bootstrap-icons/icons/play.svg");
+            tooltip: Cmd.output-jobs.text;
+            shortcut: Cmd.output-jobs.shortcut;
+            enabled: Data.current-project.valid;
+
+            clicked => {
+                Helpers.trigger-current-project-action(ProjectAction.open-output-jobs);
+            }
+        }
+
+        order-pcb-btn := SideBarButton {
+            icon: @image-url("../../bootstrap-icons/icons/cart3.svg");
+            tooltip: Cmd.order-pcb.text;
+            shortcut: Cmd.order-pcb.shortcut;
+            enabled: Data.current-project.valid;
+            checked: Data.panel-page == PanelPage.order;
+
+            clicked => {
+                button-clicked(PanelPage.order);
+            }
+
+            changed enabled => {
+                if self.checked && (!self.enabled) {
+                    Data.panel-page = PanelPage.home;
+                }
+            }
+        }
+
+        Rectangle {
+            vertical-stretch: 1;
+        }
+
+        libraries-btn := SideBarButton {
+            icon: @image-url("../../bootstrap-icons/icons/database.svg");
+            icon-scale: 1.2;
+            tooltip: @tr("Libraries");
+            shortcut: Cmd.library-manager.shortcut;
+            checked: Data.panel-page == PanelPage.libraries;
+
+            states [
+                // Note: Do not display the "refreshing" state as it is usually
+                // very short would would look like a flicker.
+                refreshing when Data.local-libraries-data.refreshing || Data.remote-libraries-data.refreshing: {
+                    // Just keep the previous state.
+                }
+                busy when Data.libraries-operation-in-progress: {
+                    emblem: Emblem.running;
+                }
+                local-error when !Data.local-libraries-data.refreshing-error.is-empty: {
+                    emblem: Emblem.warning;
+                }
+                remote-error when !Data.remote-libraries-data.refreshing-error.is-empty: {
+                    emblem: Emblem.warning;
+                }
+                outdated when Data.remote-libraries-data.outdated > 0: {
+                    emblem: Emblem.none;
+                    status: Data.remote-libraries-data.outdated;
+                    status-color: black;
+                    status-background: #d4d400;
+                }
+                no-libraries when (Data.local-libraries-data.count == 0) && (Data.remote-libraries-data.installed == 0): {
+                    emblem: Emblem.none;
+                    status: "0";
+                    status-color: black;
+                    status-background: #d4d400;
+                }
+                up-to-date when Data.remote-libraries-data.all-up-to-date: {
+                    emblem: Emblem.ok;
+                }
+            ]
+
+            clicked => {
+                button-clicked(PanelPage.libraries);
+            }
+        }
+
+        workspace-settings-btn := SideBarButton {
+            icon: @image-url("../../bootstrap-icons/icons/sliders.svg");
+            tooltip: Cmd.workspace-settings.text;
+            shortcut: Cmd.workspace-settings.shortcut;
+            checked: false;
+
+            clicked => {
+                Backend.trigger(Action.workspace-settings);
+            }
+        }
+
+        about-btn := SideBarButton {
+            icon: @image-url("../../bootstrap-icons/icons/question-circle.svg");
+            tooltip: @tr("Help / About");
+            shortcut: Cmd.about-librepcb.shortcut;
+            checked: Data.panel-page == PanelPage.about;
+
+            clicked => {
+                button-clicked(PanelPage.about);
+            }
+        }
+    }
+}

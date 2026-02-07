@@ -178,6 +178,7 @@ add_subdirectory(libs/librepcb/editor)
 add_subdirectory(libs/librepcb/eagleimport)
 add_subdirectory(libs/librepcb/kicadimport)
 add_subdirectory(libs/librepcb/rust-core)
+add_subdirectory(libs/librepcb/ui)
 add_subdirectory(libs/parseagle)
 
 # Add apps

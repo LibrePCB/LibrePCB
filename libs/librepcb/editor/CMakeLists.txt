@@ -996,13 +996,6 @@ add_library(
   workspace/workspacesettingsdialog.h
   workspace/workspacesettingsdialog.ui
 )
-# Maybe the explicit dependency fixes spurious race conditions on CI.
-add_dependencies(librepcb_editor Slint::Slint)
-slint_target_sources(
-  librepcb_editor ui/appwindow.slint
-  NAMESPACE ui
-  COMPILATION_UNITS 12
-)
 target_include_directories(
   librepcb_editor
   PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../.."
@@ -1020,6 +1013,7 @@ target_link_libraries(
   librepcb_editor
   PUBLIC # LibrePCB
          LibrePCB::Core
+         LibrePCB::Ui
          # Third party
          Slint::Slint
          TypeSafe::TypeSafe

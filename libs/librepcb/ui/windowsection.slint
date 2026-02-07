@@ -1,0 +1,380 @@
+import { IconButton } from "widgets.slint";
+import { Tab } from "tab.slint";
+import { HomeTab } from "hometab.slint";
+import { CreateLibraryTab } from "library/createlibrarytab.slint";
+import { DownloadLibraryTab } from "library/downloadlibrarytab.slint";
+import { LibraryTab } from "library/lib/librarytab.slint";
+import {
+    ComponentCategoryTab,
+    PackageCategoryTab,
+} from "library/cat/categorytab.slint";
+import { SymbolTab } from "library/sym/symboltab.slint";
+import { PackageTab } from "library/pkg/packagetab.slint";
+import { ComponentTab } from "library/cmp/componenttab.slint";
+import { DeviceTab } from "library/dev/devicetab.slint";
+import { OrganizationTab } from "library/org/organizationtab.slint";
+import { SchematicTab } from "project/schematic/schematictab.slint";
+import { Board2dTab } from "project/board/board2dtab.slint";
+import { Board3dTab } from "project/board/board3dtab.slint";
+import {
+    Backend,
+    Constants,
+    Data,
+    Helpers,
+    TabAction,
+    TabData,
+    TabType,
+    WindowSectionAction,
+    WindowSectionData,
+} from "api.slint";
+
+component TabDropArea inherits DropArea {
+    in property <string> id;
+    in property <bool> force-switch-to-tab: false;
+
+    can-drop(event) => {
+        (event.mime-type == Constants.drag-tab-mime-type) && (event.data != id)
+    }
+
+    dropped(event) => {
+        Backend.drop-tab(event.data, id, force-switch-to-tab);
+    }
+}
+
+component TabBarDropArea inherits TabDropArea {
+    if self.contains-drag: Rectangle {
+        x: max(-parent.x, 0);
+        width: 2px;
+        background: Constants.librepcb-color;
+    }
+}
+
+component TabPageDropArea inherits TabDropArea {
+    if self.contains-drag: Rectangle {
+        background: #80808050;
+    }
+}
+
+component TabButton inherits Rectangle {
+    in property <TabData> tab;
+    in property <string> drop-id;
+    in property <bool> is-current-section: false;
+    in property <bool> is-current-tab: false;
+
+    callback clicked;
+    callback close-clicked;
+
+    preferred-width: l.preferred-width;
+    max-width: max(l.preferred-width, tab.title.is-empty ? 0 : 200px);
+    background: is-current-tab ? #505050 : (ta.has-hover ? #454545 : #3a3a3a);
+
+    // Accessibility
+    accessible-role: AccessibleRole.tab;
+    accessible-label: (tab.type == TabType.home) ? "home" : tab.title;
+    accessible-checked: is-current-tab;
+    accessible-action-default => {
+        ta.clicked();
+    }
+
+    DragArea {
+        mime-type: Constants.drag-tab-mime-type;
+        data: drop-id;
+        enabled: !tab.title.is-empty;  // The home tab shall not be draggable
+
+        ta := TouchArea {
+            pointer-event(event) => {
+                if (event.button == PointerEventButton.left) && (event.kind == PointerEventKind.down) {
+                    // Use mouse down event instead of clicked() to make tab switching
+                    // more responsive (https://github.com/LibrePCB/LibrePCB/issues/1652).
+                    clicked();
+                } else if (event.button == PointerEventButton.middle) && (event.kind == PointerEventKind.down) {
+                    close-clicked();
+                }
+            }
+        }
+    }
+
+    if !tab.title.is-empty: TabBarDropArea {
+        x: -10px;
+        width: 10px + parent.width / 2;
+        id: drop-id;
+    }
+
+    l := HorizontalLayout {
+        padding-left: 4px;
+        padding-right: 2px;
+        spacing: 3px;
+
+        Image {
+            width: 16px;
+            source: Helpers.get-icon-for-tab-type(tab.type);
+            colorize: txt.color;
+            accessible-role: none;
+        }
+
+        txt := Text {
+            min-width: 0;
+            vertical-alignment: center;
+            color: is-current-tab ? white : #a0a0a0;
+            text: tab.title;
+            overflow: elide;
+            accessible-role: none;
+        }
+
+        if tab.type != TabType.home: close-btn := IconButton {
+            property <bool> circle: tab.unsaved-changes && (!self.has-hover);
+
+            y: (parent.height - self.height) / 2;
+            height: parent.height * 0.6;
+            icon-scale: circle ? 0.5 : 0.7;
+            color-enabled: txt.color;
+            border-radius: 3px;
+            icon: {
+                if circle {
+                    @image-url("../../font-awesome/svgs/solid/circle.svg")
+                } else {
+                    @image-url("../../font-awesome/svgs/solid/xmark.svg")
+                }
+            };
+            accessible-label: "close tab";
+
+            clicked => {
+                close-clicked();
+            }
+        }
+    }
+
+    if is-current-section && is-current-tab: Rectangle {
+        x: 0;
+        y: 0;
+        width: 100%;
+        height: 1px;
+        background: #29d682;
+    }
+}
+
+export component WindowSection inherits Rectangle {
+    in property <int> section-index;
+    in-out property <WindowSectionData> section;
+    property <bool> is-current-section: (section-index == Data.current-section-index);
+    property <bool> tab-open: (section.current-tab-index >= 0) && (section.current-tab-index < section.tabs.length);
+    property <TabType> tab-type: section.tabs[section.current-tab-index].type;
+
+    pure function create-drop-id(section-index: int, tab-index: int) -> string {
+        Data.window-id + "," + section-index + "," + tab-index
+    }
+
+    ta := TouchArea {
+        tab-bar := Rectangle {
+            x: 0;
+            y: 0;
+            z: 100;  // For the tooltips
+            height: 30px;
+            background: #2c2c2c;
+
+            // Accessibility
+            accessible-role: tab-list;
+
+            HorizontalLayout {
+                for tab[index] in section.tabs: tab-btn := TabButton {
+                    tab: tab;
+                    drop-id: create-drop-id(section-index, index);
+                    is-current-section: is-current-section;
+                    is-current-tab: index == section.current-tab-index;
+
+                    clicked => {
+                        Data.set-current-tab(section-index, index);
+                    }
+
+                    close-clicked => {
+                        Backend.trigger-tab(section-index, index, TabAction.close);
+                    }
+                }
+
+                da := TabBarDropArea {
+                    id: create-drop-id(section-index, section.tabs.length);
+
+                    controls-l := HorizontalLayout {
+                        alignment: end;
+                        padding: 3px;
+
+                        split-btn := IconButton {
+                            width: self.height;
+                            icon-scale: 0.6;
+                            icon: @image-url("../../bootstrap-icons/icons/layout-split.svg");
+                            tooltip: @tr("Split Section");
+                            tooltip-position: bottom-left;
+
+                            clicked => {
+                                Backend.trigger-section(section-index, WindowSectionAction.split);
+                            }
+                        }
+
+                        property <bool> can-close: (Data.sections.length > 1) && ((section.tabs.length == 0) || ((section.tabs.length == 1) && (section.tabs[0].type == TabType.home)));
+                        if can-close: close-btn := IconButton {
+                            width: self.height;
+                            icon-scale: 0.6;
+                            icon: @image-url("../../font-awesome/svgs/solid/xmark.svg");
+                            tooltip: @tr("Close Section");
+                            tooltip-position: bottom-left;
+
+                            clicked => {
+                                Backend.trigger-section(section-index, WindowSectionAction.close);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        Rectangle {
+            x: 0;
+            y: tab-bar.height;
+            width: root.width;
+            height: parent.height - self.y;
+
+            // Accessibility
+            accessible-role: tab-panel;
+
+            if !tab-open: empty-tab := Tab {
+                show-watermark: true;
+            }
+
+            if tab-open && (tab-type == TabType.home): home-tab := HomeTab {
+                width: 100%;
+                height: 100%;
+                section-index: section-index;
+            }
+
+            if tab-open && (tab-type == TabType.create-library): create-library-tab := CreateLibraryTab {
+                width: 100%;
+                height: 100%;
+                section-index: section-index;
+                section: section;
+            }
+
+            if tab-open && (tab-type == TabType.download-library): download-library-tab := DownloadLibraryTab {
+                width: 100%;
+                height: 100%;
+                section-index: section-index;
+                section: section;
+            }
+
+            if tab-open && (tab-type == TabType.library): library-tab := LibraryTab {
+                width: 100%;
+                height: 100%;
+                section-index: section-index;
+                section: section;
+            }
+
+            if tab-open && (tab-type == TabType.component-category): component-category-tab := ComponentCategoryTab {
+                width: 100%;
+                height: 100%;
+                section-index: section-index;
+                section: section;
+            }
+
+            if tab-open && (tab-type == TabType.package-category): package-category-tab := PackageCategoryTab {
+                width: 100%;
+                height: 100%;
+                section-index: section-index;
+                section: section;
+            }
+
+            if tab-open && (tab-type == TabType.symbol): symbol-tab := SymbolTab {
+                width: 100%;
+                height: 100%;
+                section-index: section-index;
+                section: section;
+            }
+
+            if tab-open && (tab-type == TabType.package): package-tab := PackageTab {
+                width: 100%;
+                height: 100%;
+                section-index: section-index;
+                section: section;
+            }
+
+            if tab-open && (tab-type == TabType.component): component-tab := ComponentTab {
+                width: 100%;
+                height: 100%;
+                section-index: section-index;
+                section: section;
+            }
+
+            if tab-open && (tab-type == TabType.device): device-tab := DeviceTab {
+                width: 100%;
+                height: 100%;
+                section-index: section-index;
+                section: section;
+            }
+
+            if tab-open && (tab-type == TabType.organization): organization-tab := OrganizationTab {
+                width: 100%;
+                height: 100%;
+                section-index: section-index;
+                section: section;
+            }
+
+            if tab-open && (tab-type == TabType.schematic): schematic-tab := SchematicTab {
+                width: 100%;
+                height: 100%;
+                section-index: section-index;
+                section: section;
+            }
+
+            if tab-open && (tab-type == TabType.board-2d): board-2d-tab := Board2dTab {
+                width: 100%;
+                height: 100%;
+                section-index: section-index;
+                section: section;
+            }
+
+            if tab-open && (tab-type == TabType.board-3d): board-3d-tab := Board3dTab {
+                width: 100%;
+                height: 100%;
+                section-index: section-index;
+                section: section;
+            }
+
+            // Tab drop area left (overlaps with previous section)
+            TabPageDropArea {
+                x: (section-index == 0) ? 0 : -(parent.width / 8);
+                width: (section-index == 0) ? (parent.width / 8) : (parent.width / 4);
+                id: create-drop-id(section-index, -1);
+                force-switch-to-tab: true;
+            }
+
+            // Tab drop area center
+            TabPageDropArea {
+                x: parent.width / 8;
+                width: parent.width * 6 / 8;
+                id: create-drop-id(section-index, section.tabs.length);
+                force-switch-to-tab: true;
+            }
+
+            // Tab drop area right (only last section)
+            if section-index == (Data.sections.length - 1): TabPageDropArea {
+                x: parent.width * 7 / 8;
+                width: parent.width / 8;
+                id: create-drop-id(section-index + 1, -1);
+                force-switch-to-tab: true;
+            }
+
+            // Highlight rectangle
+            property <float> highlight-percentage: section.highlight ? 1.2 : 0;
+            animate highlight-percentage { duration: 700ms; }
+            if highlight-percentage > 0: Rectangle {
+                border-color: #29d682;
+                border-width: 3px;
+                opacity: section.highlight ? (1.2 - highlight-percentage) : 0;
+            }
+        }
+
+        pointer-event(event) => {
+            if event.kind == PointerEventKind.down {
+                Data.set-current-tab(section-index, section.current-tab-index);
+            }
+        }
+    }
+}

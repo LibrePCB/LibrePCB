@@ -1,0 +1,129 @@
+import { PackageEditorPanel } from "packageeditorpanel.slint";
+import {
+    AngleEdit,
+    IconButton,
+    LengthEdit,
+    LineEdit,
+    LinkText,
+    Palette,
+} from "../../widgets.slint";
+import {
+    Constants,
+    PackageTabData,
+    WindowSectionData,
+} from "../../api.slint";
+
+export component PackageEditorTagsPanel inherits PackageEditorPanel {
+    in property <int> section-index;
+    in-out property <WindowSectionData> section;
+    in-out property <[PackageTabData]> tabs;
+    in property <int> index;
+    in property <int> footprint-index: tabs[index].footprint-index;
+    property <[string]> tags: tabs[index].footprints[footprint-index].tags;
+    in property <bool> read-only;
+    property <bool> activated: (root.has-hover || new-tag-edt.has-focus);
+    property <length> badge-height: 20px;
+
+    background: new-tag-edt.has-focus ? Palette.background : transparent;
+    border-width: 0;
+    opacity: activated ? 1 : 0.5;
+
+    VerticalLayout {
+        spacing: 5px;
+
+        for tag[tag-index] in tags: HorizontalLayout {
+            alignment: end;
+
+            Rectangle {
+                width: self.preferred-width;
+                height: badge-height;
+                background: yellow;
+                border-radius: badge-height / 2;
+
+                animate opacity { duration: 100ms; }
+
+                tag-ta := TouchArea {
+                    HorizontalLayout {
+                        padding-left: badge-height / 2;
+                        padding-right: 3px;
+                        spacing: 3px;
+
+                        name-txt := Text {
+                            text: tag;
+                            color: black;
+                            vertical-alignment: center;
+                        }
+
+                        delete-btn := IconButton {
+                            height: badge-height;
+                            style: hyperlink;
+                            icon-size: 13px;
+                            icon: {
+                                if tag-ta.has-hover {
+                                    @image-url("../../../../font-awesome/svgs/solid/xmark.svg")
+                                } else {
+                                    @image-url("../../../../font-awesome/svgs/solid/tag.svg")
+                                }
+                            }
+                            color-disabled: #404040;
+                            color-enabled: #303030;
+                            color-hovered: #202020;
+                            enabled: !read-only;
+                            accessible-label: "delete";
+
+                            clicked => {
+                                tabs[index].footprints[footprint-index].remove-tag = tag;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if new-tag-edt.has-focus: Text {
+            text: @tr("Suggested Tags:");
+        }
+
+        suggestions-l := VerticalLayout {
+            padding-left: 8px;
+            visible: self.preferred-height > 0;
+
+            for tag in Constants.footprint-tags-suggestions: LinkText {
+                height: new-tag-edt.has-focus ? self.preferred-height : 0;
+                text: tag;
+
+                animate height { duration: 150ms; }
+
+                clicked => {
+                    tabs[index].footprints[footprint-index].new-tag = tag;
+                }
+            }
+        }
+
+        HorizontalLayout {
+            alignment: end;
+            spacing: 7px;
+
+            new-tag-edt := LineEdit {
+                width: activated ? max(self.preferred-width, suggestions-l.min-width) : 0;
+                placeholder-text: @tr("Type to add a new tag...");
+
+                animate width { duration: 150ms; }
+
+                text-accepted(s) => {
+                    tabs[index].footprints[footprint-index].new-tag = s;
+                    self.text = "";
+                }
+            }
+
+            Image {
+                width: 25px;
+                height: self.width;
+                colorize: Palette.foreground;
+                image-fit: contain;
+                source: @image-url("../../../../font-awesome/svgs/solid/tags.svg");
+                accessible-role: none;
+            }
+        }
+    }
+}
