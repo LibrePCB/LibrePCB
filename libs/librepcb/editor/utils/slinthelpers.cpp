@@ -325,23 +325,28 @@ std::optional<Version> validateVersion(const QString& input,
   }
 }
 
-std::optional<FileProofName> validateFileProofName(
+std::optional<QString> validateFileName(
     const QString& input, slint::SharedString& error,
+    FilePath::CleanFileNameOptions options, int maxLength,
     const QString& requiredSuffix) noexcept {
-  if (auto val = parseFileProofName(cleanFileProofName(input))) {
-    if (requiredSuffix.isEmpty() || input.trimmed().endsWith(requiredSuffix)) {
-      error = slint::SharedString();
-      return val;
-    } else {
-      error = q2s(
-          QCoreApplication::translate("FileProofName", "Suffix '%1' missing")
-              .arg(requiredSuffix));
-      return std::nullopt;
-    }
-  } else {
+  QString s = input.trimmed();
+  if ((!requiredSuffix.isEmpty()) && (!s.endsWith(requiredSuffix))) {
+    error =
+        q2s(QCoreApplication::translate("SlintHelpers", "Suffix '%1' missing")
+                .arg(requiredSuffix));
+    return std::nullopt;
+  }
+  // IMPORTANT: Remove suffix before truncating, because the suffix must be
+  // retained even if the filename gets truncated!
+  s.chop(requiredSuffix.length());
+  s = FilePath::cleanFileName(s, options, maxLength - requiredSuffix.length());
+  if (s.isEmpty()) {
     error = getInputError(input);
     return std::nullopt;
   }
+  s.append(requiredSuffix);
+  error = slint::SharedString();
+  return s;
 }
 
 std::optional<AttributeKey> validateAttributeKey(const QString& input,

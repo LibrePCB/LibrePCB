@@ -27,7 +27,6 @@
 #include <librepcb/core/library/cmp/componentprefix.h>
 #include <librepcb/core/types/circuitidentifier.h>
 #include <librepcb/core/types/elementname.h>
-#include <librepcb/core/types/fileproofname.h>
 #include <librepcb/core/types/version.h>
 
 #include <QtCore>
@@ -116,8 +115,9 @@ std::optional<ElementName> validateElementName(
 std::optional<Version> validateVersion(const QString& input,
                                        slint::SharedString& error) noexcept;
 
-std::optional<FileProofName> validateFileProofName(
+std::optional<QString> validateFileName(
     const QString& input, slint::SharedString& error,
+    FilePath::CleanFileNameOptions options, int maxLength,
     const QString& requiredSuffix = QString()) noexcept;
 
 std::optional<AttributeKey> validateAttributeKey(const QString& input,

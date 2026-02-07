@@ -106,7 +106,9 @@ void CreateLibraryTab::trigger(ui::TabAction a) noexcept {
 
     case ui::TabAction::Accept: {
       try {
-        if ((!mName) || (!mVersion) || (!mDirectory.isValid())) {
+        if ((!mName) || (!mVersion) || (!mDirectory.isValid()) ||
+            (mDirectory.isExistingDir()) || mDirectory.isExistingFile() ||
+            (mDirectory.getSuffix() != "lplib")) {
           throw LogicError(__FILE__, __LINE__);
         }
 
@@ -195,7 +197,13 @@ void CreateLibraryTab::trigger(ui::TabAction a) noexcept {
  ******************************************************************************/
 
 void CreateLibraryTab::validate() noexcept {
-  const QString nameStr = s2q(mUiData.name).remove(".lplib");
+  const QString SUFFIX = ".lplib";
+  const FilePath::CleanFileNameOptions CLEAN_OPTIONS =
+      FilePath::CleanFileNameOption::ReplaceSpaces |
+      FilePath::CleanFileNameOption::KeepCase;
+  const int MAX_DIRNAME_LENGTH = 50;  // Just some sane maximum dirname length.
+
+  const QString nameStr = s2q(mUiData.name).remove(SUFFIX);
   mName = validateElementName(nameStr, mUiData.name_error);
 
   QString versionStr = s2q(mUiData.version).trimmed();
@@ -207,9 +215,9 @@ void CreateLibraryTab::validate() noexcept {
   mUrl = validateUrl(s2q(mUiData.url), mUiData.url_error, true);
 
   QString dirDefault = FilePath::cleanFileName(
-      nameStr, FilePath::ReplaceSpaces | FilePath::KeepCase);
+      nameStr, CLEAN_OPTIONS, MAX_DIRNAME_LENGTH - SUFFIX.length());
   if (!dirDefault.isEmpty()) {
-    dirDefault.append(".lplib");
+    dirDefault.append(SUFFIX);
   }
   mUiData.directory_default = q2s(dirDefault);
 
@@ -217,8 +225,9 @@ void CreateLibraryTab::validate() noexcept {
   if (dirStr.isEmpty()) {
     dirStr = s2q(mUiData.directory_default);
   }
-  const std::optional<FileProofName> dirName =
-      validateFileProofName(dirStr, mUiData.directory_error, ".lplib");
+  const std::optional<QString> dirName =
+      validateFileName(dirStr, mUiData.directory_error, CLEAN_OPTIONS,
+                       MAX_DIRNAME_LENGTH, SUFFIX);
   mDirectory = dirName
       ? mApp.getWorkspace().getLibrariesPath().getPathTo("local/" % *dirName)
       : FilePath();

@@ -106,7 +106,9 @@ void DownloadLibraryTab::trigger(ui::TabAction a) noexcept {
 
     case ui::TabAction::Accept: {
       try {
-        if ((!mUrl) || (!mDirectory.isValid()) || mDownload) {
+        if ((!mUrl) || (!mDirectory.isValid()) ||
+            (mDirectory.isExistingDir()) || mDirectory.isExistingFile() ||
+            (mDirectory.getSuffix() != "lplib") || mDownload) {
           throw LogicError(__FILE__, __LINE__);
         }
 
@@ -147,6 +149,12 @@ void DownloadLibraryTab::trigger(ui::TabAction a) noexcept {
  ******************************************************************************/
 
 void DownloadLibraryTab::validate() noexcept {
+  const QString SUFFIX = ".lplib";
+  const FilePath::CleanFileNameOptions CLEAN_OPTIONS =
+      FilePath::CleanFileNameOption::ReplaceSpaces |
+      FilePath::CleanFileNameOption::KeepCase;
+  const int MAX_DIRNAME_LENGTH = 50;  // Just some sane maximum dirname length.
+
   const QString urlStr = s2q(mUiData.url);
   mUrl = validateUrl(urlStr, mUiData.url_error, false);
 
@@ -170,20 +178,19 @@ void DownloadLibraryTab::validate() noexcept {
     mUiData.url_suggestion = q2s(QUrl(suggestion).toString());
   }
 
-  QString left = urlStr.left(urlStr.indexOf(".lplib", Qt::CaseInsensitive));
+  QString left = urlStr.left(urlStr.indexOf(SUFFIX, Qt::CaseInsensitive));
   QString libName = left.right(left.length() - left.lastIndexOf("/"));
   if (libName == urlStr) {
     libName = mUrl ? mUrl->fileName() : QString();
   }
   libName.remove("-master");
   libName.remove("-main");
+  libName.remove(".zip");
+  libName.remove(".lplib");
   QString dirDefault = FilePath::cleanFileName(
-      libName, FilePath::ReplaceSpaces | FilePath::KeepCase);
-  if (dirDefault.contains(".zip")) {
-    dirDefault.remove(".zip");
-  }
+      libName, CLEAN_OPTIONS, MAX_DIRNAME_LENGTH - SUFFIX.length());
   if (!dirDefault.isEmpty()) {
-    dirDefault.append(".lplib");
+    dirDefault.append(SUFFIX);
   }
   mUiData.directory_default = q2s(dirDefault);
 
@@ -191,8 +198,9 @@ void DownloadLibraryTab::validate() noexcept {
   if (dirStr.isEmpty()) {
     dirStr = s2q(mUiData.directory_default);
   }
-  const std::optional<FileProofName> dirName =
-      validateFileProofName(dirStr, mUiData.directory_error, ".lplib");
+  const std::optional<QString> dirName =
+      validateFileName(dirStr, mUiData.directory_error, CLEAN_OPTIONS,
+                       MAX_DIRNAME_LENGTH, SUFFIX);
   mDirectory = dirName
       ? mApp.getWorkspace().getLibrariesPath().getPathTo("local/" % *dirName)
       : FilePath();
