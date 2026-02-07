@@ -127,6 +127,7 @@ private:  // Methods
   RuleCheckMessageList checkMinimumSilkscreenTextHeight(const Data& data);
   RuleCheckMessageList checkZones(const Data& data);
   RuleCheckMessageList checkVias(const Data& data);
+  RuleCheckMessageList checkPlanes(const Data& data);
   RuleCheckMessageList checkAllowedNpthSlots(const Data& data);
   RuleCheckMessageList checkAllowedPthSlots(const Data& data);
   RuleCheckMessageList checkInvalidPadConnections(const Data& data);
@@ -157,6 +158,7 @@ private:  // Methods
   static bool isViaUseless(const Data& data, const Data::Segment& ns,
                            const Data::Via& via) noexcept;
   static QVector<Path> getTraceLocation(const Data::Trace& trace) noexcept;
+  static QVector<Path> getPlaneLocation(const Data::Plane& plane) noexcept;
   static QVector<Path> getHoleLocation(
       const Data::Hole& hole,
       const Transform& transform = Transform()) noexcept;

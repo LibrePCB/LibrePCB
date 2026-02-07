@@ -165,6 +165,7 @@ BoardDesignRuleCheckData::BoardDesignRuleCheckData(
         net ? net->getNetClass().getUuid() : std::optional<Uuid>(),
         &plane->getLayer(),
         plane->getMinWidth(),
+        plane->getThermalSpokeWidth(),
         plane->getOutline(),
         plane->getFragments(),
     });

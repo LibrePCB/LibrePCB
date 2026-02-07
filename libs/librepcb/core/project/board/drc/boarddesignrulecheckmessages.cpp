@@ -1808,6 +1808,32 @@ DrcMsgInvalidVia::DrcMsgInvalidVia(const BoardDesignRuleCheckData::Segment& ns,
 }
 
 /*******************************************************************************
+ *  Class DrcMsgPlaneThermalSpokeWidthIgnored
+ ******************************************************************************/
+
+DrcMsgPlaneThermalSpokeWidthIgnored::DrcMsgPlaneThermalSpokeWidthIgnored(
+    const BoardDesignRuleCheckData::Plane& plane,
+    const QVector<Path>& locations) noexcept
+  : RuleCheckMessage(
+        Severity::Warning,
+        tr("Ignored thermal spoke width of plane in '%1'",
+           "Placeholders: Net name")
+            .arg(netNameWithFallback(plane.netName)),
+        tr("The thermal spoke width of the plane is set to a value smaller "
+           "than the planes minimum width, which is not allowed. Therefore the "
+           "plane filling algorithm ignores the specified spoke width and uses "
+           "the specified minimum width instead.") %
+            "\n\n" %
+            tr("It is recommended to explicitly set the thermal spoke width "
+               "equal to or higher than the minimum width of the plane."),
+        "plane_thermal_spoke_width_ignored", locations),
+    mPlaneUuid(plane.uuid) {
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("plane", plane.uuid);
+  mApproval->ensureLineBreak();
+}
+
+/*******************************************************************************
  *  Class DrcMsgSilkscreenClearanceViolation
  ******************************************************************************/
 
