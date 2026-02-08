@@ -32,6 +32,7 @@
 #include "../../workspace/desktopservices.h"
 #include "../cmd/cmdboardedit.h"
 #include "../cmd/cmdboardnetsegmentremove.h"
+#include "../cmd/cmdboardplaneedit.h"
 #include "../projecteditor.h"
 #include "board2dtab.h"
 #include "board3dtab.h"
@@ -691,6 +692,8 @@ bool BoardEditor::autoFixHandler(
 bool BoardEditor::autoFixImpl(
     const std::shared_ptr<const RuleCheckMessage>& msg, bool checkOnly) {
   if (autoFixHelper<DrcMsgEmptyNetSegment>(msg, checkOnly)) return true;
+  if (autoFixHelper<DrcMsgPlaneThermalSpokeWidthIgnored>(msg, checkOnly))
+    return true;
   return false;
 }
 
@@ -713,6 +716,17 @@ template <>
 bool BoardEditor::autoFix(const DrcMsgEmptyNetSegment& msg) {
   if (auto ns = mBoard.getNetSegments().value(msg.getUuid())) {
     mProjectEditor.getUndoStack().execCmd(new CmdBoardNetSegmentRemove(*ns));
+    return true;
+  }
+  return false;
+}
+
+template <>
+bool BoardEditor::autoFix(const DrcMsgPlaneThermalSpokeWidthIgnored& msg) {
+  if (auto plane = mBoard.getPlanes().value(msg.getUuid())) {
+    std::unique_ptr<CmdBoardPlaneEdit> cmd(new CmdBoardPlaneEdit(*plane));
+    cmd->setThermalSpokeWidth(PositiveLength(*plane->getMinWidth()));
+    mProjectEditor.getUndoStack().execCmd(cmd.release());
     return true;
   }
   return false;

@@ -1120,6 +1120,34 @@ public:
 };
 
 /*******************************************************************************
+ *  Class DrcMsgPlaneThermalSpokeWidthIgnored
+ ******************************************************************************/
+
+/**
+ * @brief The DrcMsgPlaneThermalSpokeWidthIgnored class
+ */
+class DrcMsgPlaneThermalSpokeWidthIgnored final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(DrcMsgPlaneThermalSpokeWidthIgnored)
+
+public:
+  using Data = BoardDesignRuleCheckData;
+
+  // Constructors / Destructor
+  DrcMsgPlaneThermalSpokeWidthIgnored() = delete;
+  DrcMsgPlaneThermalSpokeWidthIgnored(const Data::Plane& plane,
+                                      const QVector<Path>& locations) noexcept;
+  DrcMsgPlaneThermalSpokeWidthIgnored(
+      const DrcMsgPlaneThermalSpokeWidthIgnored& other) noexcept
+    : RuleCheckMessage(other), mPlaneUuid(other.mPlaneUuid) {}
+  virtual ~DrcMsgPlaneThermalSpokeWidthIgnored() noexcept {}
+
+  const Uuid& getUuid() const noexcept { return mPlaneUuid; }
+
+private:
+  const Uuid mPlaneUuid;
+};
+
+/*******************************************************************************
  *  Class DrcMsgSilkscreenClearanceViolation
  ******************************************************************************/
 

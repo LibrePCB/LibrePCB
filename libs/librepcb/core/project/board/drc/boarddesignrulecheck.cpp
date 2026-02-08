@@ -276,6 +276,7 @@ BoardDesignRuleCheck::Result BoardDesignRuleCheck::run(
   }
   addSequential(&BoardDesignRuleCheck::checkMinimumCopperWidth);
   if (!data->quick) {
+    addSequential(&BoardDesignRuleCheck::checkPlanes);
     addSequential(&BoardDesignRuleCheck::checkAllowedNpthSlots);
     addSequential(&BoardDesignRuleCheck::checkAllowedPthSlots);
     addSequential(&BoardDesignRuleCheck::checkUsedLayers);
@@ -1795,6 +1796,20 @@ RuleCheckMessageList BoardDesignRuleCheck::checkVias(const Data& data) {
   return messages;
 }
 
+RuleCheckMessageList BoardDesignRuleCheck::checkPlanes(const Data& data) {
+  RuleCheckMessageList messages;
+  emitStatus(tr("Check for invalid planes..."));
+
+  for (const Data::Plane& plane : data.planes) {
+    if (plane.minWidth > plane.thermalSpokeWidth) {
+      messages.append(std::make_shared<DrcMsgPlaneThermalSpokeWidthIgnored>(
+          plane, getPlaneLocation(plane)));
+    }
+  }
+
+  return messages;
+}
+
 RuleCheckMessageList BoardDesignRuleCheck::checkAllowedNpthSlots(
     const Data& data) {
   RuleCheckMessageList messages;
@@ -2385,10 +2400,8 @@ void BoardDesignRuleCheck::checkMinimumWidth(
     const UnsignedLength minNetWidth =
         std::max(minWidth, data.getMinCopperWidth(plane.netClass));
     if (plane.minWidth < minNetWidth) {
-      const QVector<Path> locations =
-          plane.outline.toClosedPath().toOutlineStrokes(PositiveLength(200000));
       messages.append(std::make_shared<DrcMsgMinimumWidthViolation>(
-          plane, minNetWidth, locations));
+          plane, minNetWidth, getPlaneLocation(plane)));
     }
   }
 
@@ -2692,6 +2705,11 @@ bool BoardDesignRuleCheck::isViaUseless(const Data& data,
 QVector<Path> BoardDesignRuleCheck::getTraceLocation(
     const Data::Trace& trace) noexcept {
   return {Path::obround(trace.p1, trace.p2, trace.width)};
+}
+
+QVector<Path> BoardDesignRuleCheck::getPlaneLocation(
+    const Data::Plane& plane) noexcept {
+  return plane.outline.toClosedPath().toOutlineStrokes(PositiveLength(200000));
 }
 
 QVector<Path> BoardDesignRuleCheck::getHoleLocation(

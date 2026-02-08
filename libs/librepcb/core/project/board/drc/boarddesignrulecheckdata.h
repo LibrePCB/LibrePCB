@@ -128,6 +128,7 @@ struct BoardDesignRuleCheckData final {
     std::optional<Uuid> netClass;
     const Layer* layer;
     UnsignedLength minWidth;
+    PositiveLength thermalSpokeWidth;
     Path outline;
     QVector<Path> fragments;
   };

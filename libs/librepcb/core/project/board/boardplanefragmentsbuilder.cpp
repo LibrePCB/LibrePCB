@@ -615,7 +615,11 @@ BoardPlaneFragmentsBuilder::LayerJobResult BoardPlaneFragmentsBuilder::runLayer(
                 ClipperHelpers::anyPointsInside(clipperPaths, planeOutline)) {
               // Note: Make spokes *slightly* thicker to avoid them to be
               // removed due to numerical inaccuary of minimum width procedure.
-              const PositiveLength spokeWidth(it->thermalSpokeWidth + 10);
+              // Note 2: Do not accept a spoke width smaller than the minimum
+              // copper width because this will effectively break all thermal
+              // pads, see https://github.com/LibrePCB/LibrePCB/issues/1682.
+              const PositiveLength spokeWidth(
+                  std::max(*it->thermalSpokeWidth, *it->minWidth) + 10);
               const Length spokeLength(100000000);  // Maximum spoke length.
               foreach (const auto& spokeConfig,
                        determineThermalSpokes(geometry)) {
