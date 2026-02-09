@@ -287,10 +287,25 @@ void BoardEditorState_DrawPlane::updatePlaneSettings() noexcept {
   if (mCurrentPlaneEditCmd) {
     const NetClass* nc =
         mCurrentNetSignal ? &mCurrentNetSignal->getNetClass() : nullptr;
-    mCurrentPlaneEditCmd->setMinWidth(positiveToUnsigned(
+    // Determine a reasonable minimum width for the plane:
+    // 1. Use the default trace width (from netclass or board settings) so
+    //    by default the traces and planes have the same width.
+    // 2. If the value is larger than 0.2mm, use 0.2mm instead because planes
+    //    are not very useful with a large minimum width (not filling areas).
+    // 3. If the value is smaller than the minimum copper width in the DRC
+    //    settings, use that value instead to avoid DRC errors.
+    UnsignedLength minWidth = positiveToUnsigned(
         (nc && nc->getDefaultTraceWidth())
             ? *nc->getDefaultTraceWidth()
-            : mContext.board.getDesignRules().getDefaultTraceWidth()));
+            : mContext.board.getDesignRules().getDefaultTraceWidth());
+    minWidth = std::min(minWidth, UnsignedLength(200000));
+    minWidth =
+        std::max(minWidth, mContext.board.getDrcSettings().getMinCopperWidth());
+    mCurrentPlaneEditCmd->setMinWidth(minWidth);
+    // Important: Set thermal spoke width equal to or higher than the minimum
+    // copper width, otherwise the plane is invalid and raising a DRC error.
+    mCurrentPlaneEditCmd->setThermalSpokeWidth(
+        (minWidth > 0) ? PositiveLength(*minWidth) : PositiveLength(200000));
     mCurrentPlaneEditCmd->setMinClearanceToCopper(getClearanceValue(
         nc ? nc->getMinCopperCopperClearance() : UnsignedLength(0),
         mContext.board.getDrcSettings().getMinCopperCopperClearance(),
