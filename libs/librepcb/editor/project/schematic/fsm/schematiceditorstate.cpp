@@ -118,7 +118,7 @@ bool SchematicEditorState::execCmd(UndoCommand* cmd) {
 }
 
 QWidget* SchematicEditorState::parentWidget() noexcept {
-  return qApp->activeWindow();
+  return mAdapter.fsmGetParentWidget();
 }
 
 QList<std::shared_ptr<QGraphicsItem>> SchematicEditorState::findItemsAtPos(

@@ -40,6 +40,7 @@ class Point;
 namespace editor {
 
 class GuiApplication;
+class MainWindow;
 
 /*******************************************************************************
  *  Class WindowTab
@@ -62,6 +63,7 @@ public:
   virtual ~WindowTab() noexcept;
 
   // General Methods
+  virtual void setWindow(MainWindow* w) noexcept { mWindow = w; }
   virtual ui::TabData getUiData() const noexcept = 0;
   virtual void setUiData(const ui::TabData& data) noexcept;
   virtual void activate() noexcept {}
@@ -101,7 +103,11 @@ signals:
   void cursorCoordinatesChanged(const Point& pos, const LengthUnit& unit);
 
 protected:
+  QWidget* getWindow() const noexcept;
+
+protected:
   GuiApplication& mApp;
+  MainWindow* mWindow;
 };
 
 /*******************************************************************************

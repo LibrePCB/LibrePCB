@@ -225,7 +225,7 @@ void OrganizationTab::trigger(ui::TabAction a) noexcept {
         commitUiData();
         mUndoStack->undo();
       } catch (const Exception& e) {
-        QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
+        QMessageBox::critical(getWindow(), tr("Error"), e.getMsg());
       }
       break;
     }
@@ -234,7 +234,7 @@ void OrganizationTab::trigger(ui::TabAction a) noexcept {
         commitUiData();
         mUndoStack->redo();
       } catch (const Exception& e) {
-        QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
+        QMessageBox::critical(getWindow(), tr("Error"), e.getMsg());
       }
       break;
     }
@@ -246,14 +246,14 @@ void OrganizationTab::trigger(ui::TabAction a) noexcept {
     }
     case ui::TabAction::LibraryChooseIcon: {
       const QString fp = FileDialog::getOpenFileName(
-          qApp->activeWindow(), tr("Choose Organization Logo"), QString(),
+          getWindow(), tr("Choose Organization Logo"), QString(),
           tr("Portable Network Graphics (*.png)"));
       if (!fp.isEmpty()) {
         try {
           mLogo = FileUtils::readFile(FilePath(fp));  // can throw
           commitUiData();
         } catch (const Exception& e) {
-          QMessageBox::critical(qApp->activeWindow(), tr("Could not open file"),
+          QMessageBox::critical(getWindow(), tr("Could not open file"),
                                 e.getMsg());
         }
       }
@@ -288,7 +288,7 @@ bool OrganizationTab::requestClose() noexcept {
   }
 
   const QMessageBox::StandardButton choice = QMessageBox::question(
-      qApp->activeWindow(), tr("Save Changes?"),
+      getWindow(), tr("Save Changes?"),
       tr("The organization '%1' contains unsaved changes.\n"
          "Do you want to save them before closing it?")
           .arg(*mOrganization->getNames().getDefaultValue()),
@@ -423,7 +423,7 @@ void OrganizationTab::commitUiData() noexcept {
     cmd->setPriority(mPriority);
     mUndoStack->execCmd(cmd.release());
   } catch (const Exception& e) {
-    QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
+    QMessageBox::critical(getWindow(), tr("Error"), e.getMsg());
   }
 }
 
@@ -455,7 +455,7 @@ bool OrganizationTab::save() noexcept {
     refreshUiData();
     return true;
   } catch (const Exception& e) {
-    QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
+    QMessageBox::critical(getWindow(), tr("Error"), e.getMsg());
     refreshUiData();
     return false;
   }
@@ -476,7 +476,7 @@ void OrganizationTab::execOutputJobsDialog(
     ((*cmd).*setter)(prj.getOutputJobs());
     mUndoStack->execCmd(cmd.release());
   } catch (const Exception& e) {
-    QMessageBox::critical(qApp->activeWindow(), "Error", e.getMsg());
+    QMessageBox::critical(getWindow(), "Error", e.getMsg());
   }
 }
 

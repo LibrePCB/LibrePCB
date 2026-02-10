@@ -143,6 +143,7 @@ public:
       const GraphicsSceneMouseEvent& e) noexcept override;
 
   // BoardEditorFsmAdapter
+  QWidget* fsmGetParentWidget() noexcept override;
   BoardGraphicsScene* fsmGetGraphicsScene() noexcept override;
   bool fsmGetIgnoreLocks() const noexcept override;
   void fsmSetViewCursor(

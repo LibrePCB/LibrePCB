@@ -426,7 +426,7 @@ void DeviceTab::trigger(ui::TabAction a) noexcept {
         commitUiData();
         mUndoStack->undo();
       } catch (const Exception& e) {
-        QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
+        QMessageBox::critical(getWindow(), tr("Error"), e.getMsg());
       }
       break;
     }
@@ -435,7 +435,7 @@ void DeviceTab::trigger(ui::TabAction a) noexcept {
         commitUiData();
         mUndoStack->redo();
       } catch (const Exception& e) {
-        QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
+        QMessageBox::critical(getWindow(), tr("Error"), e.getMsg());
       }
       break;
     }
@@ -450,7 +450,7 @@ void DeviceTab::trigger(ui::TabAction a) noexcept {
       if (auto dbRes = mDevice->getResources().value(0)) {
         DesktopServices::downloadAndOpenResourceAsync(
             mApp.getWorkspace().getSettings(), *dbRes->getName(),
-            dbRes->getMediaType(), dbRes->getUrl(), qApp->activeWindow());
+            dbRes->getMediaType(), dbRes->getUrl(), getWindow());
       }
       break;
     }
@@ -514,7 +514,7 @@ bool DeviceTab::requestClose() noexcept {
   }
 
   const QMessageBox::StandardButton choice = QMessageBox::question(
-      qApp->activeWindow(), tr("Save Changes?"),
+      getWindow(), tr("Save Changes?"),
       tr("The device '%1' contains unsaved changes.\n"
          "Do you want to save them before closing it?")
           .arg(*mDevice->getNames().getDefaultValue()),
@@ -782,7 +782,7 @@ void DeviceTab::commitUiData() noexcept {
     mAttributes->apply();
     mParts->apply();
   } catch (const Exception& e) {
-    QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
+    QMessageBox::critical(getWindow(), tr("Error"), e.getMsg());
   }
 }
 
@@ -817,7 +817,7 @@ bool DeviceTab::save() noexcept {
     refreshUiData();
     return true;
   } catch (const Exception& e) {
-    QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
+    QMessageBox::critical(getWindow(), tr("Error"), e.getMsg());
     refreshUiData();
     return false;
   }
@@ -825,7 +825,7 @@ bool DeviceTab::save() noexcept {
 
 void DeviceTab::selectComponent() noexcept {
   ComponentChooserDialog dialog(mApp.getWorkspace(), &mApp.getPreviewLayers(),
-                                qApp->activeWindow());
+                                getWindow());
   if (dialog.exec() != QDialog::Accepted) return;
 
   std::optional<Uuid> cmpUuid = dialog.getSelectedComponentUuid();
@@ -854,14 +854,14 @@ void DeviceTab::selectComponent() noexcept {
       }
       mUndoStack->execCmd(cmdGroup.release());
     } catch (const Exception& e) {
-      QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
+      QMessageBox::critical(getWindow(), tr("Error"), e.getMsg());
     }
   }
 }
 
 void DeviceTab::selectPackage() noexcept {
   PackageChooserDialog dialog(mApp.getWorkspace(), &mApp.getPreviewLayers(),
-                              qApp->activeWindow());
+                              getWindow());
   if (dialog.exec() != QDialog::Accepted) return;
 
   std::optional<Uuid> pkgUuid = dialog.getSelectedPackageUuid();
@@ -895,7 +895,7 @@ void DeviceTab::selectPackage() noexcept {
       mUndoStack->execCmd(cmdGroup.release());
       Q_ASSERT(mDevice->getPadSignalMap().getUuidSet() == pads);
     } catch (const Exception& e) {
-      QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
+      QMessageBox::critical(getWindow(), tr("Error"), e.getMsg());
     }
   }
 }

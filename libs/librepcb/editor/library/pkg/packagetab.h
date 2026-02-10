@@ -129,6 +129,7 @@ public:
       const GraphicsSceneMouseEvent& e) noexcept override;
 
   // PackageEditorFsmAdapter
+  QWidget* fsmGetParentWidget() noexcept override;
   GraphicsScene* fsmGetGraphicsScene() noexcept override;
   PositiveLength fsmGetGridInterval() const noexcept override;
   void fsmSetViewCursor(

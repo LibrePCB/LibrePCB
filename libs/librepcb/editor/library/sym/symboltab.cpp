@@ -431,7 +431,7 @@ void SymbolTab::trigger(ui::TabAction a) noexcept {
       try {
         reloadFromDisk();
       } catch (const Exception& e) {
-        QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
+        QMessageBox::critical(getWindow(), tr("Error"), e.getMsg());
       }
       break;
     }
@@ -440,7 +440,7 @@ void SymbolTab::trigger(ui::TabAction a) noexcept {
         commitUiData();
         mUndoStack->undo();
       } catch (const Exception& e) {
-        QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
+        QMessageBox::critical(getWindow(), tr("Error"), e.getMsg());
       }
       break;
     }
@@ -449,7 +449,7 @@ void SymbolTab::trigger(ui::TabAction a) noexcept {
         commitUiData();
         mUndoStack->redo();
       } catch (const Exception& e) {
-        QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
+        QMessageBox::critical(getWindow(), tr("Error"), e.getMsg());
       }
       break;
     }
@@ -668,7 +668,7 @@ bool SymbolTab::requestClose() noexcept {
   }
 
   const QMessageBox::StandardButton choice = QMessageBox::question(
-      qApp->activeWindow(), tr("Save Changes?"),
+      getWindow(), tr("Save Changes?"),
       tr("The symbol '%1' contains unsaved changes.\n"
          "Do you want to save them before closing it?")
           .arg(*mSymbol->getNames().getDefaultValue()),
@@ -726,6 +726,10 @@ bool SymbolTab::graphicsSceneRightMouseButtonReleased(
 /*******************************************************************************
  *  SymbolEditorFsmAdapter
  ******************************************************************************/
+
+QWidget* SymbolTab::fsmGetParentWidget() noexcept {
+  return getWindow();
+}
 
 GraphicsScene* SymbolTab::fsmGetGraphicsScene() noexcept {
   return mScene.get();
@@ -788,7 +792,7 @@ QPainterPath SymbolTab::fsmCalcPosWithTolerance(
 }
 
 Point SymbolTab::fsmMapGlobalPosToScenePos(const QPoint& pos) const noexcept {
-  if (QWidget* win = qApp->activeWindow()) {
+  if (QWidget* win = getWindow()) {
     return mView->mapToScenePos(win->mapFromGlobal(pos) - mSceneImagePos);
   } else {
     qWarning() << "Failed to map global position to scene position.";
@@ -1517,7 +1521,7 @@ void SymbolTab::commitUiData() noexcept {
     cmd->setCategories(mCategories->getCategories());
     mUndoStack->execCmd(cmd.release());
   } catch (const Exception& e) {
-    QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
+    QMessageBox::critical(getWindow(), tr("Error"), e.getMsg());
   }
 }
 
@@ -1556,7 +1560,7 @@ bool SymbolTab::save() noexcept {
     refreshUiData();
     return true;
   } catch (const Exception& e) {
-    QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
+    QMessageBox::critical(getWindow(), tr("Error"), e.getMsg());
     refreshUiData();
     return false;
   }
@@ -1606,7 +1610,7 @@ bool SymbolTab::execGraphicsExportDialog(GraphicsExportDialog::Output output,
         GraphicsExportDialog::Mode::Schematic, output, pages, 0,
         *mSymbol->getNames().getDefaultValue(), 0, defaultFilePath, mUnit,
         mApp.getWorkspace().getSettings().themes.getActive(),
-        "symbol_editor/" % settingsKey, qApp->activeWindow());
+        "symbol_editor/" % settingsKey, getWindow());
     connect(&dialog, &GraphicsExportDialog::requestOpenFile, this,
             [this](const FilePath& fp) {
               DesktopServices ds(mApp.getWorkspace().getSettings());
@@ -1614,7 +1618,7 @@ bool SymbolTab::execGraphicsExportDialog(GraphicsExportDialog::Output output,
             });
     dialog.exec();
   } catch (const Exception& e) {
-    QMessageBox::warning(qApp->activeWindow(), tr("Error"), e.getMsg());
+    QMessageBox::warning(getWindow(), tr("Error"), e.getMsg());
   }
   return true;
 }

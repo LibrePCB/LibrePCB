@@ -342,7 +342,7 @@ void LibraryTab::trigger(ui::TabAction a) noexcept {
         commitUiData();
         mEditor.getUndoStack().undo();
       } catch (const Exception& e) {
-        QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
+        QMessageBox::critical(getWindow(), tr("Error"), e.getMsg());
       }
       break;
     }
@@ -351,13 +351,13 @@ void LibraryTab::trigger(ui::TabAction a) noexcept {
         commitUiData();
         mEditor.getUndoStack().redo();
       } catch (const Exception& e) {
-        QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
+        QMessageBox::critical(getWindow(), tr("Error"), e.getMsg());
       }
       break;
     }
     case ui::TabAction::LibraryChooseIcon: {
       const QString fp = FileDialog::getOpenFileName(
-          qApp->activeWindow(), tr("Choose Library Icon"),
+          getWindow(), tr("Choose Library Icon"),
           mLibrary.getDirectory().getAbsPath().toNative(),
           tr("Portable Network Graphics (*.png)"));
       if (!fp.isEmpty()) {
@@ -365,7 +365,7 @@ void LibraryTab::trigger(ui::TabAction a) noexcept {
           mIcon = FileUtils::readFile(FilePath(fp));  // can throw
           commitUiData();
         } catch (const Exception& e) {
-          QMessageBox::critical(qApp->activeWindow(), tr("Could not open file"),
+          QMessageBox::critical(getWindow(), tr("Could not open file"),
                                 e.getMsg());
         }
       }
@@ -515,7 +515,7 @@ void LibraryTab::commitUiData() noexcept {
     }
     mEditor.getUndoStack().execCmd(cmd.release());
   } catch (const Exception& e) {
-    QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
+    QMessageBox::critical(getWindow(), tr("Error"), e.getMsg());
   }
 }
 
@@ -1019,7 +1019,7 @@ void LibraryTab::moveOrCopyElementsTo(
 
   // Show confirmation dialog.
   const int ret = QMessageBox::warning(
-      qApp->activeWindow(), tr("Move %1 Elements").arg(items.count()), msg,
+      getWindow(), tr("Move %1 Elements").arg(items.count()), msg,
       QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Cancel);
   if (ret != QMessageBox::Yes) {
     return;
@@ -1044,7 +1044,7 @@ void LibraryTab::moveOrCopyElementsTo(
         FileUtils::copyDirRecursively(fp, destination);
       }
     } catch (const Exception& e) {
-      QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
+      QMessageBox::critical(getWindow(), tr("Error"), e.getMsg());
     }
   }
 
@@ -1086,7 +1086,7 @@ void LibraryTab::deleteElements(
 
   // Show message box
   const int ret = QMessageBox::warning(
-      qApp->activeWindow(), tr("Remove %1 Elements").arg(items.count()), msg,
+      getWindow(), tr("Remove %1 Elements").arg(items.count()), msg,
       QMessageBox::Yes, QMessageBox::Cancel);
   if (ret == QMessageBox::Yes) {
     // Close opened tabs of elements to be deleted.
@@ -1095,7 +1095,7 @@ void LibraryTab::deleteElements(
       try {
         FileUtils::removeDirRecursively(fp);
       } catch (const Exception& e) {
-        QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
+        QMessageBox::critical(getWindow(), tr("Error"), e.getMsg());
       }
     }
     mEditor.getWorkspace().getLibraryDb().startLibraryRescan();

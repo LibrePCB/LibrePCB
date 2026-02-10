@@ -203,7 +203,7 @@ void PackageCategoryTab::trigger(ui::TabAction a) noexcept {
         commitUiData();
         mUndoStack->undo();
       } catch (const Exception& e) {
-        QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
+        QMessageBox::critical(getWindow(), tr("Error"), e.getMsg());
       }
       break;
     }
@@ -212,7 +212,7 @@ void PackageCategoryTab::trigger(ui::TabAction a) noexcept {
         commitUiData();
         mUndoStack->redo();
       } catch (const Exception& e) {
-        QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
+        QMessageBox::critical(getWindow(), tr("Error"), e.getMsg());
       }
       break;
     }
@@ -237,7 +237,7 @@ bool PackageCategoryTab::requestClose() noexcept {
   }
 
   const QMessageBox::StandardButton choice = QMessageBox::question(
-      qApp->activeWindow(), tr("Save Changes?"),
+      getWindow(), tr("Save Changes?"),
       tr("The package category '%1' contains unsaved changes.\n"
          "Do you want to save them before closing it?")
           .arg(*mCategory->getNames().getDefaultValue()),
@@ -377,7 +377,7 @@ void PackageCategoryTab::commitUiData() noexcept {
     cmd->setParentUuid(mParent);
     mUndoStack->execCmd(cmd.release());
   } catch (const Exception& e) {
-    QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
+    QMessageBox::critical(getWindow(), tr("Error"), e.getMsg());
   }
 }
 
@@ -409,7 +409,7 @@ bool PackageCategoryTab::save() noexcept {
     refreshUiData();
     return true;
   } catch (const Exception& e) {
-    QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
+    QMessageBox::critical(getWindow(), tr("Error"), e.getMsg());
     refreshUiData();
     return false;
   }

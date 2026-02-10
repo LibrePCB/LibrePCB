@@ -51,10 +51,12 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-WindowSection::WindowSection(GuiApplication& app, QObject* parent) noexcept
+WindowSection::WindowSection(GuiApplication& app, MainWindow& win,
+                             QObject* parent) noexcept
   : QObject(parent),
     onUiDataChanged(*this),
     mApp(app),
+    mWindow(win),
     mTabs(new UiObjectList<WindowTab, ui::TabData>()),
     mUiData{
         mTabs,  // Tabs
@@ -143,6 +145,7 @@ void WindowSection::addTab(std::shared_ptr<WindowTab> tab, int index,
   if ((!mTabs->isEmpty()) && (index <= currentIndex)) {
     ++currentIndex;
   }
+  tab->setWindow(&mWindow);
   mTabs->insert(index, tab);
   setCurrentTab(switchToTab ? index : currentIndex, forceUpdate);
 }
@@ -160,6 +163,7 @@ std::shared_ptr<WindowTab> WindowSection::removeTab(int index,
       --currentIndex;
     }
     tab->deactivate();  // setCurrentTab() doesn't do it because tab is removed.
+    tab->setWindow(nullptr);
     setCurrentTab(std::min(currentIndex, mTabs->count() - 1), forceUpdate);
     disconnect(tab.get(), &WindowTab::closeRequested, this,
                &WindowSection::tabCloseRequested);

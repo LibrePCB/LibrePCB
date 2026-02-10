@@ -679,7 +679,7 @@ void PackageTab::trigger(ui::TabAction a) noexcept {
       try {
         reloadFromDisk();
       } catch (const Exception& e) {
-        QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
+        QMessageBox::critical(getWindow(), tr("Error"), e.getMsg());
       }
       break;
     }
@@ -688,7 +688,7 @@ void PackageTab::trigger(ui::TabAction a) noexcept {
         commitUiData();
         mUndoStack->undo();
       } catch (const Exception& e) {
-        QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
+        QMessageBox::critical(getWindow(), tr("Error"), e.getMsg());
       }
       break;
     }
@@ -697,7 +697,7 @@ void PackageTab::trigger(ui::TabAction a) noexcept {
         commitUiData();
         mUndoStack->redo();
       } catch (const Exception& e) {
-        QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
+        QMessageBox::critical(getWindow(), tr("Error"), e.getMsg());
       }
       break;
     }
@@ -1001,7 +1001,7 @@ bool PackageTab::requestClose() noexcept {
   }
 
   const QMessageBox::StandardButton choice = QMessageBox::question(
-      qApp->activeWindow(), tr("Save Changes?"),
+      getWindow(), tr("Save Changes?"),
       tr("The package '%1' contains unsaved changes.\n"
          "Do you want to save them before closing it?")
           .arg(*mPackage->getNames().getDefaultValue()),
@@ -1060,6 +1060,10 @@ bool PackageTab::graphicsSceneRightMouseButtonReleased(
  *  PackageEditorFsmAdapter
  ******************************************************************************/
 
+QWidget* PackageTab::fsmGetParentWidget() noexcept {
+  return getWindow();
+}
+
 GraphicsScene* PackageTab::fsmGetGraphicsScene() noexcept {
   return mScene.get();
 }
@@ -1117,7 +1121,7 @@ QPainterPath PackageTab::fsmCalcPosWithTolerance(
 }
 
 Point PackageTab::fsmMapGlobalPosToScenePos(const QPoint& pos) const noexcept {
-  if (QWidget* win = qApp->activeWindow()) {
+  if (QWidget* win = getWindow()) {
     return mView->mapToScenePos(win->mapFromGlobal(pos) - mSceneImagePos);
   } else {
     qWarning() << "Failed to map global position to scene position.";
@@ -2054,7 +2058,7 @@ bool PackageTab::autoFix(const MsgMinimumWidthViolation& msg) {
       mPackage->getFootprints().get(msg.getFootprint().get());
   setCurrentFootprintIndex(mPackage->getFootprints().indexOf(footprint.get()));
 
-  QDialog dlg(qApp->activeWindow());
+  QDialog dlg(getWindow());
   dlg.setWindowTitle(tr("New Line Width"));
   QVBoxLayout* vLayout = new QVBoxLayout(&dlg);
   UnsignedLengthEdit* edtWidth = new UnsignedLengthEdit(&dlg);
@@ -2277,7 +2281,7 @@ bool PackageTab::autoFix(const MsgSuspiciousPadFunction& msg) {
 
 template <typename MessageType>
 bool PackageTab::fixPadFunction(const MessageType& msg) {
-  QMenu menu(qApp->activeWindow());
+  QMenu menu(getWindow());
   QAction* aAll = menu.addAction(tr("Apply to all unspecified pads"));
   aAll->setCheckable(true);
   menu.addSeparator();
@@ -2476,7 +2480,7 @@ void PackageTab::commitUiData() noexcept {
     mPads->apply();  // can throw
     mFootprints->apply();  // can throw
   } catch (const Exception& e) {
-    QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
+    QMessageBox::critical(getWindow(), tr("Error"), e.getMsg());
   }
 }
 
@@ -2514,7 +2518,7 @@ bool PackageTab::save() noexcept {
     refreshUiData();
     return true;
   } catch (const Exception& e) {
-    QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
+    QMessageBox::critical(getWindow(), tr("Error"), e.getMsg());
     refreshUiData();
     return false;
   }
@@ -2573,7 +2577,7 @@ bool PackageTab::execGraphicsExportDialog(GraphicsExportDialog::Output output,
         GraphicsExportDialog::Mode::Board, output, pages, 0,
         *mPackage->getNames().getDefaultValue(), 0, defaultFilePath, mUnit,
         mApp.getWorkspace().getSettings().themes.getActive(),
-        "package_editor/" % settingsKey, qApp->activeWindow());
+        "package_editor/" % settingsKey, getWindow());
     connect(&dialog, &GraphicsExportDialog::requestOpenFile, this,
             [this](const FilePath& fp) {
               DesktopServices ds(mApp.getWorkspace().getSettings());
@@ -2581,7 +2585,7 @@ bool PackageTab::execGraphicsExportDialog(GraphicsExportDialog::Output output,
             });
     dialog.exec();
   } catch (const Exception& e) {
-    QMessageBox::warning(qApp->activeWindow(), tr("Error"), e.getMsg());
+    QMessageBox::warning(getWindow(), tr("Error"), e.getMsg());
   }
   return true;
 }
@@ -2670,7 +2674,7 @@ bool PackageTab::toggleBackgroundImage() noexcept {
     mBackgroundImageSettings.enabled = false;
   } else {
     // Show dialog.
-    BackgroundImageSetupDialog dlg("package_editor", qApp->activeWindow());
+    BackgroundImageSetupDialog dlg("package_editor", getWindow());
     if (!mBackgroundImageSettings.image.isNull()) {
       dlg.setData(mBackgroundImageSettings.image,
                   mBackgroundImageSettings.rotation,

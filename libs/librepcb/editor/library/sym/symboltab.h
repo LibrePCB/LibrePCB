@@ -119,6 +119,7 @@ public:
       const GraphicsSceneMouseEvent& e) noexcept override;
 
   // SymbolEditorFsmAdapter
+  QWidget* fsmGetParentWidget() noexcept override;
   GraphicsScene* fsmGetGraphicsScene() noexcept override;
   SymbolGraphicsItem* fsmGetGraphicsItem() noexcept override;
   PositiveLength fsmGetGridInterval() const noexcept override;

@@ -176,7 +176,7 @@ QString LibraryEditorTab::getWorkspaceSettingsUserName() const noexcept {
   QString u = mEditor.getWorkspace().getSettings().userName.get();
   if (u.isEmpty()) {
     QMessageBox::warning(
-        qApp->activeWindow(), tr("User name not set"),
+        getWindow(), tr("User name not set"),
         tr("No user name is defined in the workspace settings. Please open "
            "the workspace settings to set a default user name."));
   }
@@ -194,7 +194,7 @@ bool LibraryEditorTab::autoFixHandler(
     return autoFixImpl(msg, checkOnly);  // can throw
   } catch (const Exception& e) {
     if (!checkOnly) {
-      QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
+      QMessageBox::critical(getWindow(), tr("Error"), e.getMsg());
     }
   }
   return false;
