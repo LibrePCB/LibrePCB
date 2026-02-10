@@ -427,7 +427,19 @@ void AddComponentDialog::treeComponents_itemDoubleClicked(QTreeWidgetItem* item,
       ds.openWebUrl(data.info->pricingUrl);
     }
   } else if (item) {
+    // On macOS, the main window looses focus and we don't get mouse move
+    // events anymore for some reason. Working around this issue by delaying
+    // the accept() signal. A delay of 100ms works mostly but not always, so
+    // we use 200ms.
+#if defined(Q_OS_MACOS)
+    setEnabled(false);
+    QTimer::singleShot(200, this, [this]() {
+      setEnabled(true);
+      accept();
+    });
+#else
     accept();
+#endif
   }
 }
 
