@@ -50,8 +50,6 @@ component ComponentGateListItem {
                 y: 0;
                 width: 100%;
                 height: 100%;
-                image-fit: preserve;
-                image-rendering: pixelated;
                 source: render-scene(parent.width, parent.height, model[index].frame-index);
                 accessible-role: none;
             }
@@ -526,8 +524,6 @@ component ComponentVariantListItem inherits Rectangle {
                         y: 0;
                         width: 100%;
                         height: 100%;
-                        image-fit: preserve;
-                        image-rendering: pixelated;
                         source: render-scene(model[index].gates.length, parent.width, parent.height, model[index].frame-index);
                         visible: placement-l.height == placement-l.preferred-height;  // Avoid rendering during animation
                         accessible-role: none;

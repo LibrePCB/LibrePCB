@@ -255,7 +255,8 @@ MainWindow::MainWindow(GuiApplication& app,
                            int scene, int frameIndex) {
     Q_UNUSED(frameIndex);
     if (auto section = mSections->value(sectionIndex)) {
-      return section->renderScene(width, height, scene);
+      const qreal scale = mWidget->devicePixelRatioF();
+      return section->renderScene(width * scale, height * scale, scene);
     } else {
       return slint::Image();
     }
@@ -263,14 +264,16 @@ MainWindow::MainWindow(GuiApplication& app,
   b.on_scene_pointer_event([this](int sectionIndex, float x, float y,
                                   slint::private_api::PointerEvent e) {
     if (auto section = mSections->value(sectionIndex)) {
-      section->processScenePointerEvent(QPointF(x, y), e);
+      const qreal scale = mWidget->devicePixelRatioF();
+      section->processScenePointerEvent(QPointF(x * scale, y * scale), e);
     }
   });
   b.on_scene_scrolled([this](int sectionIndex, float x, float y,
                              slint::private_api::PointerScrollEvent e) {
     bool handled = false;
     if (auto section = mSections->value(sectionIndex)) {
-      handled = section->processSceneScrolled(QPointF(x, y), e);
+      const qreal scale = mWidget->devicePixelRatioF();
+      handled = section->processSceneScrolled(QPointF(x * scale, y * scale), e);
     }
     return handled;
   });
@@ -284,8 +287,9 @@ MainWindow::MainWindow(GuiApplication& app,
       });
   b.on_request_project_preview(
       [this](const slint::SharedString& fp, float width) {
+        const qreal scale = mWidget->devicePixelRatioF();
         mProjectPreviewRenderer->request(FilePath(s2q(fp)),
-                                         static_cast<int>(width));
+                                         static_cast<int>(width * scale));
         return true;
       });
 

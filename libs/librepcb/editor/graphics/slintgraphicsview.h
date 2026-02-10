@@ -89,7 +89,8 @@ public:
   bool isPanning() const noexcept { return mPanning; }
   QPainterPath calcPosWithTolerance(const Point& pos,
                                     qreal multiplier) const noexcept;
-  Point mapToScenePos(const QPointF& pos) const noexcept;
+  Point mapToScenePos(const QPointF& pos,
+                      qreal devicePixelRatio) const noexcept;
 
   // General Methods
   void setUseOpenGl(bool use) noexcept;

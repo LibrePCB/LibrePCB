@@ -1149,7 +1149,8 @@ QPainterPath Board2dTab::fsmCalcPosWithTolerance(
 
 Point Board2dTab::fsmMapGlobalPosToScenePos(const QPoint& pos) const noexcept {
   if (QWidget* win = getWindow()) {
-    return mView->mapToScenePos(win->mapFromGlobal(pos) - mSceneImagePos);
+    return mView->mapToScenePos(win->mapFromGlobal(pos) - mSceneImagePos,
+                                win->devicePixelRatioF());
   } else {
     qWarning() << "Failed to map global position to scene position.";
     return Point();

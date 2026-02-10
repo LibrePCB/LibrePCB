@@ -73,11 +73,12 @@ QPainterPath SlintGraphicsView::calcPosWithTolerance(
   return path;
 }
 
-Point SlintGraphicsView::mapToScenePos(const QPointF& pos) const noexcept {
+Point SlintGraphicsView::mapToScenePos(const QPointF& pos,
+                                       qreal devicePixelRatio) const noexcept {
   QTransform tf;
   tf.translate(mProjection.offset.x(), mProjection.offset.y());
   tf.scale(1 / mProjection.scale, 1 / mProjection.scale);
-  return Point::fromPx(tf.map(pos));
+  return Point::fromPx(tf.map(pos * devicePixelRatio));
 }
 
 /*******************************************************************************
