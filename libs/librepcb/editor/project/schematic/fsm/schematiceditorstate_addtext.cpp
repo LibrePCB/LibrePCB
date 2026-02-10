@@ -54,7 +54,7 @@ SchematicEditorState_AddText::SchematicEditorState_AddText(
         "{{PROJECT}}",  // Text
         Point(),  // Position is not relevant here
         Angle::deg0(),  // Rotation
-        PositiveLength(1500000),  // Height
+        PositiveLength(2500000),  // Height
         Alignment(HAlign::left(), VAlign::bottom()),  // Alignment
         false  // Locked
         ),
