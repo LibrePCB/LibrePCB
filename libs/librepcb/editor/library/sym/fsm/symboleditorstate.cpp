@@ -82,7 +82,7 @@ const LengthUnit& SymbolEditorState::getLengthUnit() const noexcept {
 }
 
 QWidget* SymbolEditorState::parentWidget() noexcept {
-  return qApp->activeWindow();
+  return mAdapter.fsmGetParentWidget();
 }
 
 const QSet<const Layer*>& SymbolEditorState::getAllowedTextLayers() noexcept {

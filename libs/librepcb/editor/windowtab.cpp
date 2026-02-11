@@ -22,6 +22,8 @@
  ******************************************************************************/
 #include "windowtab.h"
 
+#include "mainwindow.h"
+
 #include <QtCore>
 
 /*******************************************************************************
@@ -35,7 +37,7 @@ namespace editor {
  ******************************************************************************/
 
 WindowTab::WindowTab(GuiApplication& app, QObject* parent) noexcept
-  : QObject(parent), onUiDataChanged(*this), mApp(app) {
+  : QObject(parent), onUiDataChanged(*this), mApp(app), mWindow(nullptr) {
 }
 
 WindowTab::~WindowTab() noexcept {
@@ -89,6 +91,14 @@ bool WindowTab::processSceneKeyEvent(
     const slint::private_api::KeyEvent& e) noexcept {
   Q_UNUSED(e);
   return false;
+}
+
+/*******************************************************************************
+ *  Protected Methods
+ ******************************************************************************/
+
+QWidget* WindowTab::getWindow() const noexcept {
+  return mWindow ? &mWindow->getWidget() : nullptr;
 }
 
 /*******************************************************************************

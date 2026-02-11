@@ -113,6 +113,7 @@ public:
       const GraphicsSceneMouseEvent& e) noexcept override;
 
   // SchematicEditorFsmAdapter
+  QWidget* fsmGetParentWidget() noexcept override;
   SchematicGraphicsScene* fsmGetGraphicsScene() noexcept override;
   bool fsmGetIgnoreLocks() const noexcept override;
   void fsmSetViewCursor(

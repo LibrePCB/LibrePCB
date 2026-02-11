@@ -779,6 +779,10 @@ bool SchematicTab::graphicsSceneRightMouseButtonReleased(
  *  SchematicEditorFsmAdapter Methods
  ******************************************************************************/
 
+QWidget* SchematicTab::fsmGetParentWidget() noexcept {
+  return getWindow();
+}
+
 SchematicGraphicsScene* SchematicTab::fsmGetGraphicsScene() noexcept {
   return mScene.get();
 }
@@ -837,7 +841,7 @@ QPainterPath SchematicTab::fsmCalcPosWithTolerance(
 
 Point SchematicTab::fsmMapGlobalPosToScenePos(
     const QPoint& pos) const noexcept {
-  if (QWidget* win = qApp->activeWindow()) {
+  if (QWidget* win = getWindow()) {
     return mView->mapToScenePos(win->mapFromGlobal(pos) - mSceneImagePos);
   } else {
     qWarning() << "Failed to map global position to scene position.";
@@ -1178,7 +1182,7 @@ void SchematicTab::execGraphicsExportDialog(
     // Copy all schematic pages to allow processing them in worker threads.
     const int count = mProject.getSchematics().count();
     QProgressDialog progress(tr("Preparing schematics..."), tr("Cancel"), 0,
-                             count, qApp->activeWindow());
+                             count, getWindow());
     progress.setWindowModality(Qt::WindowModal);
     progress.setMinimumDuration(100);
     QList<std::shared_ptr<GraphicsPagePainter>> pages;
@@ -1198,7 +1202,7 @@ void SchematicTab::execGraphicsExportDialog(
         defaultFilePath,
         mApp.getWorkspace().getSettings().defaultLengthUnit.get(),
         mApp.getWorkspace().getSettings().themes.getActive(),
-        "schematic_editor/" % settingsKey, qApp->activeWindow());
+        "schematic_editor/" % settingsKey, getWindow());
     connect(&dialog, &GraphicsExportDialog::requestOpenFile, this,
             [this](const FilePath& fp) {
               DesktopServices ds(mApp.getWorkspace().getSettings());
@@ -1206,7 +1210,7 @@ void SchematicTab::execGraphicsExportDialog(
             });
     dialog.exec();
   } catch (const Exception& e) {
-    QMessageBox::warning(qApp->activeWindow(), tr("Error"), e.getMsg());
+    QMessageBox::warning(getWindow(), tr("Error"), e.getMsg());
   }
 }
 

@@ -72,6 +72,7 @@ public:
   int getId() const noexcept { return mId; }
   bool isCurrentWindow() const noexcept;
   void makeCurrentWindow() noexcept;
+  QWidget& getWidget() noexcept { return *mWidget; }
   void addSection(int newIndex, bool makeCurrent) noexcept;
   void addTab(std::shared_ptr<WindowTab> tab, int section = -1, int index = -1,
               bool switchToTab = true, bool switchToSection = true) noexcept;

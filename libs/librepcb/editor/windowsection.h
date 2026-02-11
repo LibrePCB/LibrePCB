@@ -44,6 +44,7 @@ class Point;
 namespace editor {
 
 class GuiApplication;
+class MainWindow;
 class WindowTab;
 
 /*******************************************************************************
@@ -63,7 +64,7 @@ public:
   // Constructors / Destructor
   WindowSection() = delete;
   WindowSection(const WindowSection& other) = delete;
-  explicit WindowSection(GuiApplication& app,
+  explicit WindowSection(GuiApplication& app, MainWindow& win,
                          QObject* parent = nullptr) noexcept;
   ~WindowSection() noexcept;
 
@@ -157,6 +158,7 @@ private:
   typedef UiObjectList<WindowTab, ui::TabData> TabList;
 
   GuiApplication& mApp;
+  MainWindow& mWindow;
   std::shared_ptr<TabList> mTabs;
   ui::WindowSectionData mUiData;
 };

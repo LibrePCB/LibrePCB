@@ -374,7 +374,8 @@ void MainWindow::makeCurrentWindow() noexcept {
 
 void MainWindow::addSection(int newIndex, bool makeCurrent) noexcept {
   newIndex = qBound(0, newIndex, mSections->count());
-  std::shared_ptr<WindowSection> s = std::make_shared<WindowSection>(mApp);
+  std::shared_ptr<WindowSection> s =
+      std::make_shared<WindowSection>(mApp, *this);
   connect(s.get(), &WindowSection::currentTabChanged, this, [this]() {
     const ui::Data& d = mWindow->global<ui::Data>();
     d.fn_current_tab_changed();
@@ -792,16 +793,14 @@ void MainWindow::triggerLibraryElement(slint::SharedString path,
     }
     case ui::LibraryElementAction::ImportEagleLibrary: {
       if (mApp.getLibrary(fp)) {
-        EagleLibraryImportWizard wiz(mApp.getWorkspace(), fp,
-                                     qApp->activeWindow());
+        EagleLibraryImportWizard wiz(mApp.getWorkspace(), fp, mWidget);
         wiz.exec();
       }
       break;
     }
     case ui::LibraryElementAction::ImportKicadLibrary: {
       if (mApp.getLibrary(fp)) {
-        KiCadLibraryImportWizard wiz(mApp.getWorkspace(), fp,
-                                     qApp->activeWindow());
+        KiCadLibraryImportWizard wiz(mApp.getWorkspace(), fp, mWidget);
         wiz.exec();
       }
       break;

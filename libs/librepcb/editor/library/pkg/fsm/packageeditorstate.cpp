@@ -60,7 +60,7 @@ const LengthUnit& PackageEditorState::getLengthUnit() const noexcept {
 }
 
 QWidget* PackageEditorState::parentWidget() noexcept {
-  return qApp->activeWindow();
+  return mAdapter.fsmGetParentWidget();
 }
 
 const QSet<const Layer*>& PackageEditorState::getAllowedTextLayers() noexcept {

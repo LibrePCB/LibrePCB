@@ -1087,6 +1087,10 @@ bool Board2dTab::graphicsSceneRightMouseButtonReleased(
  *  BoardEditorFsmAdapter Methods
  ******************************************************************************/
 
+QWidget* Board2dTab::fsmGetParentWidget() noexcept {
+  return getWindow();
+}
+
 BoardGraphicsScene* Board2dTab::fsmGetGraphicsScene() noexcept {
   return mScene.get();
 }
@@ -1144,7 +1148,7 @@ QPainterPath Board2dTab::fsmCalcPosWithTolerance(
 }
 
 Point Board2dTab::fsmMapGlobalPosToScenePos(const QPoint& pos) const noexcept {
-  if (QWidget* win = qApp->activeWindow()) {
+  if (QWidget* win = getWindow()) {
     return mView->mapToScenePos(win->mapFromGlobal(pos) - mSceneImagePos);
   } else {
     qWarning() << "Failed to map global position to scene position.";
@@ -1877,7 +1881,7 @@ void Board2dTab::loadDesignRules(const QString& uiKey) noexcept {
     // Make sure to hide the "setup design rules" message in the UI.
     mMsgSetupDesignRules.dismiss();
   } catch (const Exception& e) {
-    QMessageBox::critical(qApp->activeWindow(), "Error", e.getMsg());
+    QMessageBox::critical(getWindow(), "Error", e.getMsg());
   }
 }
 
@@ -2352,7 +2356,7 @@ void Board2dTab::addUnplacedComponentsToBoard(
   try {
     mProjectEditor.getUndoStack().execCmd(cmd.release());
   } catch (const Exception& e) {
-    QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
+    QMessageBox::critical(getWindow(), tr("Error"), e.getMsg());
   }
 }
 
@@ -2371,7 +2375,7 @@ void Board2dTab::execGraphicsExportDialog(GraphicsExportDialog::Output output,
     // Copy board to allow processing it in worker threads.
     // Also rebuild outdated planes to avoid exporting wrong data.
     QProgressDialog progress(tr("Preparing board..."), tr("Cancel"), 0, 1,
-                             qApp->activeWindow());
+                             getWindow());
     progress.setWindowModality(Qt::WindowModal);
     progress.setMinimumDuration(100);
     const auto layers = mBoard.getCopperLayers();
@@ -2396,7 +2400,7 @@ void Board2dTab::execGraphicsExportDialog(GraphicsExportDialog::Output output,
         *mProject.getName(), mBoard.getInnerLayerCount(), defaultFilePath,
         mApp.getWorkspace().getSettings().defaultLengthUnit.get(),
         mApp.getWorkspace().getSettings().themes.getActive(),
-        "board_editor/" % settingsKey, qApp->activeWindow());
+        "board_editor/" % settingsKey, getWindow());
     connect(&dialog, &GraphicsExportDialog::requestOpenFile, this,
             [this](const FilePath& fp) {
               DesktopServices ds(mApp.getWorkspace().getSettings());
@@ -2404,7 +2408,7 @@ void Board2dTab::execGraphicsExportDialog(GraphicsExportDialog::Output output,
             });
     dialog.exec();
   } catch (const Exception& e) {
-    QMessageBox::warning(qApp->activeWindow(), tr("Error"), e.getMsg());
+    QMessageBox::warning(getWindow(), tr("Error"), e.getMsg());
   }
 }
 
@@ -2423,7 +2427,7 @@ void Board2dTab::execD356NetlistExportDialog() noexcept {
               str, FilePath::ReplaceSpaces | FilePath::KeepCase);
         });
     path = FileDialog::getSaveFileName(
-        qApp->activeWindow(), tr("Export IPC D-356A Netlist"),
+        getWindow(), tr("Export IPC D-356A Netlist"),
         mProject.getPath().getPathTo(path).toStr(), "*.d356");
     if (path.isEmpty()) return;
     if (!path.contains(".")) path.append(".d356");
@@ -2435,7 +2439,7 @@ void Board2dTab::execD356NetlistExportDialog() noexcept {
     FileUtils::writeFile(fp, exp.generate());  // can throw
     qDebug() << "Successfully exported netlist.";
   } catch (const Exception& e) {
-    QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
+    QMessageBox::critical(getWindow(), tr("Error"), e.getMsg());
   }
 }
 
@@ -2469,7 +2473,7 @@ void Board2dTab::execSpecctraExportDialog() noexcept {
 
     // Choose file path.
     path = FileDialog::getSaveFileName(
-        qApp->activeWindow(),
+        getWindow(),
         EditorCommandSet::instance().exportSpecctraDsn.getDisplayText(), path,
         "*.dsn");
     if (path.isEmpty()) return;
@@ -2489,7 +2493,7 @@ void Board2dTab::execSpecctraExportDialog() noexcept {
     qDebug() << "Successfully exported Specctra DSN.";
     emit statusBarMessageChanged(tr("Success!"), 3000);
   } catch (const Exception& e) {
-    QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
+    QMessageBox::critical(getWindow(), tr("Error"), e.getMsg());
   }
 }
 
@@ -2518,7 +2522,7 @@ void Board2dTab::execSpecctraImportDialog() noexcept {
 
     // Choose file path.
     path = FileDialog::getOpenFileName(
-        qApp->activeWindow(),
+        getWindow(),
         EditorCommandSet::instance().importSpecctraSes.getDisplayText(), path,
         "*.ses;;*");
     if (path.isEmpty()) return;
@@ -2547,7 +2551,7 @@ void Board2dTab::execSpecctraImportDialog() noexcept {
   }
 
   // Display messages.
-  QDialog dlg(qApp->activeWindow());
+  QDialog dlg(getWindow());
   dlg.setWindowTitle(tr("Specctra SES Import"));
   dlg.setMinimumSize(600, 400);
   QVBoxLayout* layout = new QVBoxLayout(&dlg);
@@ -2610,7 +2614,7 @@ bool Board2dTab::toggleBackgroundImage() noexcept {
     mBackgroundImageSettings.enabled = false;
   } else {
     // Show dialog.
-    BackgroundImageSetupDialog dlg("board_editor", qApp->activeWindow());
+    BackgroundImageSetupDialog dlg("board_editor", getWindow());
     if (!mBackgroundImageSettings.image.isNull()) {
       dlg.setData(mBackgroundImageSettings.image,
                   mBackgroundImageSettings.rotation,

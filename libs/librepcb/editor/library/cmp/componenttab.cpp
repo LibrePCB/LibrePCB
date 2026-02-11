@@ -315,7 +315,7 @@ void ComponentTab::trigger(ui::TabAction a) noexcept {
         commitUiData();
         mUndoStack->undo();
       } catch (const Exception& e) {
-        QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
+        QMessageBox::critical(getWindow(), tr("Error"), e.getMsg());
       }
       break;
     }
@@ -324,7 +324,7 @@ void ComponentTab::trigger(ui::TabAction a) noexcept {
         commitUiData();
         mUndoStack->redo();
       } catch (const Exception& e) {
-        QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
+        QMessageBox::critical(getWindow(), tr("Error"), e.getMsg());
       }
       break;
     }
@@ -339,7 +339,7 @@ void ComponentTab::trigger(ui::TabAction a) noexcept {
       if (auto dbRes = mComponent->getResources().value(0)) {
         DesktopServices::downloadAndOpenResourceAsync(
             mApp.getWorkspace().getSettings(), *dbRes->getName(),
-            dbRes->getMediaType(), dbRes->getUrl(), qApp->activeWindow());
+            dbRes->getMediaType(), dbRes->getUrl(), getWindow());
       }
       break;
     }
@@ -377,7 +377,7 @@ bool ComponentTab::requestClose() noexcept {
   }
 
   const QMessageBox::StandardButton choice = QMessageBox::question(
-      qApp->activeWindow(), tr("Save Changes?"),
+      getWindow(), tr("Save Changes?"),
       tr("The component '%1' contains unsaved changes.\n"
          "Do you want to save them before closing it?")
           .arg(*mComponent->getNames().getDefaultValue()),
@@ -492,7 +492,7 @@ bool ComponentTab::autoFix(const MsgMissingComponentDefaultValue& msg) {
       tr("Is this rather a (manufacturer-)specific component than a generic "
          "component?");
   const int answer = QMessageBox::question(
-      qApp->activeWindow(), title, question,
+      getWindow(), title, question,
       QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No |
           QMessageBox::StandardButton::Cancel,
       QMessageBox::StandardButton::Cancel);
@@ -679,7 +679,7 @@ void ComponentTab::commitUiData() noexcept {
     mAttributes->apply();
     mSignals->apply();
   } catch (const Exception& e) {
-    QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
+    QMessageBox::critical(getWindow(), tr("Error"), e.getMsg());
   }
 }
 
@@ -718,7 +718,7 @@ bool ComponentTab::save() noexcept {
     refreshUiData();
     return true;
   } catch (const Exception& e) {
-    QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
+    QMessageBox::critical(getWindow(), tr("Error"), e.getMsg());
     refreshUiData();
     return false;
   }
