@@ -287,6 +287,116 @@ slint::SharedString q2s(Qt::Key k) noexcept {
   }
 }
 
+Qt::Key s2key(const slint::SharedString& k) noexcept {
+  if (k == slint::platform::key_codes::Backspace) {
+    return Qt::Key::Key_Backspace;
+  } else if (k == slint::platform::key_codes::Tab) {
+    return Qt::Key::Key_Tab;
+  } else if (k == slint::platform::key_codes::Return) {
+    return Qt::Key::Key_Return;  // Could also be Key_Enter?
+  } else if (k == slint::platform::key_codes::Escape) {
+    return Qt::Key::Key_Escape;
+  } else if (k == slint::platform::key_codes::Backtab) {
+    return Qt::Key::Key_Backtab;
+  } else if (k == slint::platform::key_codes::Delete) {
+    return Qt::Key::Key_Delete;
+  } else if (k == slint::platform::key_codes::Shift) {
+    return Qt::Key::Key_Shift;
+  } else if (k == slint::platform::key_codes::Control) {
+    return Qt::Key::Key_Control;
+  } else if (k == slint::platform::key_codes::Alt) {
+    return Qt::Key::Key_Alt;
+  } else if (k == slint::platform::key_codes::AltGr) {
+    return Qt::Key::Key_AltGr;
+  } else if (k == slint::platform::key_codes::CapsLock) {
+    return Qt::Key::Key_CapsLock;
+  } else if (k == slint::platform::key_codes::Meta) {
+    return Qt::Key::Key_Meta;
+  } else if (k == slint::platform::key_codes::UpArrow) {
+    return Qt::Key::Key_Up;
+  } else if (k == slint::platform::key_codes::DownArrow) {
+    return Qt::Key::Key_Down;
+  } else if (k == slint::platform::key_codes::LeftArrow) {
+    return Qt::Key::Key_Left;
+  } else if (k == slint::platform::key_codes::RightArrow) {
+    return Qt::Key::Key_Right;
+  } else if (k == slint::platform::key_codes::F1) {
+    return Qt::Key::Key_F1;
+  } else if (k == slint::platform::key_codes::F2) {
+    return Qt::Key::Key_F2;
+  } else if (k == slint::platform::key_codes::F3) {
+    return Qt::Key::Key_F3;
+  } else if (k == slint::platform::key_codes::F4) {
+    return Qt::Key::Key_F4;
+  } else if (k == slint::platform::key_codes::F5) {
+    return Qt::Key::Key_F5;
+  } else if (k == slint::platform::key_codes::F6) {
+    return Qt::Key::Key_F6;
+  } else if (k == slint::platform::key_codes::F7) {
+    return Qt::Key::Key_F7;
+  } else if (k == slint::platform::key_codes::F8) {
+    return Qt::Key::Key_F8;
+  } else if (k == slint::platform::key_codes::F9) {
+    return Qt::Key::Key_F9;
+  } else if (k == slint::platform::key_codes::F10) {
+    return Qt::Key::Key_F10;
+  } else if (k == slint::platform::key_codes::F11) {
+    return Qt::Key::Key_F11;
+  } else if (k == slint::platform::key_codes::F12) {
+    return Qt::Key::Key_F12;
+  } else if (k == slint::platform::key_codes::F13) {
+    return Qt::Key::Key_F13;
+  } else if (k == slint::platform::key_codes::F14) {
+    return Qt::Key::Key_F14;
+  } else if (k == slint::platform::key_codes::F15) {
+    return Qt::Key::Key_F15;
+  } else if (k == slint::platform::key_codes::F16) {
+    return Qt::Key::Key_F16;
+  } else if (k == slint::platform::key_codes::F17) {
+    return Qt::Key::Key_F17;
+  } else if (k == slint::platform::key_codes::F18) {
+    return Qt::Key::Key_F18;
+  } else if (k == slint::platform::key_codes::F19) {
+    return Qt::Key::Key_F19;
+  } else if (k == slint::platform::key_codes::F20) {
+    return Qt::Key::Key_F20;
+  } else if (k == slint::platform::key_codes::F21) {
+    return Qt::Key::Key_F21;
+  } else if (k == slint::platform::key_codes::F22) {
+    return Qt::Key::Key_F22;
+  } else if (k == slint::platform::key_codes::F23) {
+    return Qt::Key::Key_F23;
+  } else if (k == slint::platform::key_codes::F24) {
+    return Qt::Key::Key_F24;
+  } else if (k == slint::platform::key_codes::Insert) {
+    return Qt::Key::Key_Insert;
+  } else if (k == slint::platform::key_codes::Home) {
+    return Qt::Key::Key_Home;
+  } else if (k == slint::platform::key_codes::End) {
+    return Qt::Key::Key_End;
+  } else if (k == slint::platform::key_codes::PageUp) {
+    return Qt::Key::Key_PageUp;
+  } else if (k == slint::platform::key_codes::PageDown) {
+    return Qt::Key::Key_PageDown;
+  } else if (k == slint::platform::key_codes::ScrollLock) {
+    return Qt::Key::Key_ScrollLock;
+  } else if (k == slint::platform::key_codes::Pause) {
+    return Qt::Key::Key_Pause;
+  } else if (k == slint::platform::key_codes::SysReq) {
+    return Qt::Key::Key_SysReq;
+  } else if (k == slint::platform::key_codes::Stop) {
+    return Qt::Key::Key_Stop;
+  } else if (k == slint::platform::key_codes::Menu) {
+    return Qt::Key::Key_Menu;
+  } else if (k.size() == 1) {
+    const QKeySequence seq(s2q(k));
+    return seq[0].key();
+  } else {
+    qWarning() << "Unknown Slint key:" << s2q(k);
+    return Qt::Key(0);
+  }
+}
+
 static slint::SharedString getInputError(const QString& input) {
   if (input.trimmed().isEmpty()) {
     return q2s(QCoreApplication::translate("SlintHelpers", "Required"));

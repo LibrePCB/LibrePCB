@@ -81,6 +81,7 @@ Qt::KeyboardModifiers s2q(
     const slint::private_api::KeyboardModifiers& m) noexcept;
 
 slint::SharedString q2s(Qt::Key k) noexcept;
+Qt::Key s2key(const slint::SharedString& k) noexcept;
 
 // Bind property without type conversion
 template <typename TTarget, typename TClass, typename T>
