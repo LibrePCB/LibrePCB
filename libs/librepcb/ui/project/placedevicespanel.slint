@@ -374,8 +374,6 @@ export component PlaceDevicesPanel inherits Rectangle {
             if (model.length > 0) && (devices-count > 0): preview-img := Image {
                 width: 100%;
                 height: parent.height * 0.3;
-                image-fit: preserve;
-                image-rendering: pixelated;
                 source: Backend.render-scene(Data.current-section-index, self.width, self.height, 1, tab.frame);
                 accessible-role: none;
 

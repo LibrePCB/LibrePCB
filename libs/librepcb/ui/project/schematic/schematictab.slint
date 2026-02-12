@@ -63,8 +63,8 @@ export component SchematicTab inherits Tab {
     }
 
     img := Image {
-        image-fit: preserve;
-        image-rendering: pixelated;
+        width: 100%;
+        height: 100%;
         source: Backend.render-scene(section-index, root.width, root.height, 0, tabs[index].frame);
         accessible-role: none;
     }

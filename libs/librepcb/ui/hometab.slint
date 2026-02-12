@@ -144,9 +144,11 @@ export component HomeTab inherits Tab {
             interactive: project-preview-img.source.width > 0;
 
             project-preview-img := Image {
-                image-fit: ImageFit.preserve;
+                width: 100%;
+                height: self.width * self.source.height / max(self.source.width, 1);
                 horizontal-alignment: left;
                 vertical-alignment: top;
+                image-fit: contain;
                 source: Data.project-preview-image;
                 visible: Backend.request-project-preview(Data.project-preview-path, parent.width);
                 opacity: Data.project-preview-rendering ? 0.5 : 1;
