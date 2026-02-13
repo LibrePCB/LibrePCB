@@ -96,10 +96,10 @@ int main(int argc, char* argv[]) {
   // similar to the new Slint UI. Can be removed as soon as no Qt widgets are
   // used anymore.
   {
-    QPalette palette;
+    QPalette palette(QColor("#202020"), QColor("#2a2a2a"));
     palette.setColor(QPalette::Window, "#2a2a2a");
     palette.setColor(QPalette::WindowText, "#c4c4c4");
-    palette.setColor(QPalette::Base, "#262626");
+    palette.setColor(QPalette::Base, "#353535");
     palette.setColor(QPalette::AlternateBase, "#2e2e2e");
     palette.setColor(QPalette::ToolTipBase, "#2e2e2e");
     palette.setColor(QPalette::ToolTipText, "#dedede");
