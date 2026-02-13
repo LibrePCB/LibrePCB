@@ -50,7 +50,7 @@ struct GraphicsSceneMouseEvent {
 };
 
 struct GraphicsSceneKeyEvent {
-  int key = 0;
+  Qt::Key key = Qt::Key(0);
   Qt::KeyboardModifiers modifiers = Qt::KeyboardModifiers();
 };
 

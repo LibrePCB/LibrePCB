@@ -174,6 +174,9 @@ bool BoardEditorState_DrawTrace::processKeyReleased(
 bool BoardEditorState_DrawTrace::processGraphicsSceneMouseMoved(
     const GraphicsSceneMouseEvent& e) noexcept {
   if (mSubState == SubState_PositioningNetPoint) {
+    // Update snap, in case we missed the key pressed/released events for some
+    // reason (e.g. focus issue).
+    mCurrentSnapActive = !e.modifiers.testFlag(Qt::ShiftModifier);
     mCursorPos = e.scenePos;
     updateNetpointPositions();
     return true;

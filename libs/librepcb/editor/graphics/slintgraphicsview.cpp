@@ -300,14 +300,13 @@ bool SlintGraphicsView::keyEvent(
     const slint::private_api::KeyEvent& e) noexcept {
   if (!mEventHandler) return false;
 
-  const QKeySequence seq(s2q(e.text));
-  if (seq.count() == 1) {
+  if (const Qt::Key key = s2key(e.text)) {
     if (e.event_type == slint::private_api::KeyEventType::KeyPressed) {
       return mEventHandler->graphicsSceneKeyPressed(
-          GraphicsSceneKeyEvent{seq[0].key(), s2q(e.modifiers)});
+          GraphicsSceneKeyEvent{key, s2q(e.modifiers)});
     } else if (e.event_type == slint::private_api::KeyEventType::KeyReleased) {
       return mEventHandler->graphicsSceneKeyReleased(
-          GraphicsSceneKeyEvent{seq[0].key(), s2q(e.modifiers)});
+          GraphicsSceneKeyEvent{key, s2q(e.modifiers)});
     }
   }
   return false;

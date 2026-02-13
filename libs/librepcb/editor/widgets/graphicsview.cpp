@@ -388,7 +388,7 @@ bool GraphicsView::eventFilter(QObject* obj, QEvent* event) {
         QKeyEvent* e = dynamic_cast<QKeyEvent*>(event);
         Q_ASSERT(e);
         const GraphicsSceneKeyEvent gske{
-            e->key(),
+            Qt::Key(e->key()),
             e->modifiers(),
         };
         return mEventHandlerObject->graphicsSceneKeyPressed(gske);
@@ -400,7 +400,7 @@ bool GraphicsView::eventFilter(QObject* obj, QEvent* event) {
         QKeyEvent* e = dynamic_cast<QKeyEvent*>(event);
         Q_ASSERT(e);
         const GraphicsSceneKeyEvent gske{
-            e->key(),
+            Qt::Key(e->key()),
             e->modifiers(),
         };
         return mEventHandlerObject->graphicsSceneKeyReleased(gske);
