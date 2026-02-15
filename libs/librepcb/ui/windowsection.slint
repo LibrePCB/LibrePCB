@@ -156,6 +156,7 @@ component TabButton inherits Rectangle {
 export component WindowSection inherits Rectangle {
     in property <int> section-index;
     in-out property <WindowSectionData> section;
+    in property <length> window-height;
     property <bool> is-current-section: (section-index == Data.current-section-index);
     property <bool> tab-open: (section.current-tab-index >= 0) && (section.current-tab-index < section.tabs.length);
     property <TabType> tab-type: section.tabs[section.current-tab-index].type;
@@ -291,6 +292,7 @@ export component WindowSection inherits Rectangle {
             if tab-open && (tab-type == TabType.package): package-tab := PackageTab {
                 width: 100%;
                 height: 100%;
+                window-height: window-height;
                 section-index: section-index;
                 section: section;
             }
@@ -298,6 +300,7 @@ export component WindowSection inherits Rectangle {
             if tab-open && (tab-type == TabType.component): component-tab := ComponentTab {
                 width: 100%;
                 height: 100%;
+                window-height: window-height;
                 section-index: section-index;
                 section: section;
             }
@@ -305,6 +308,7 @@ export component WindowSection inherits Rectangle {
             if tab-open && (tab-type == TabType.device): device-tab := DeviceTab {
                 width: 100%;
                 height: 100%;
+                window-height: window-height;
                 section-index: section-index;
                 section: section;
             }

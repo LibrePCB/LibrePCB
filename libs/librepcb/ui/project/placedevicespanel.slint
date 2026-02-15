@@ -60,6 +60,7 @@ component UnplacedDeviceItem inherits Rectangle {
 }
 
 export component PlaceDevicesPanel inherits Rectangle {
+    in property <length> window-height;
     property <length> item-height: 22px;
     property <Board2dTabData> tab: Data.current-section.board-2d-tabs[Data.current-section.current-tab-index];
     property <[string]> model: tab.unplaced-components;
@@ -353,6 +354,7 @@ export component PlaceDevicesPanel inherits Rectangle {
                     model: tab.unplaced-components-devices;
                     current-index: tab.unplaced-components-devices-index;
                     enabled: self.model.length > 1;
+                    window-height: window-height;
 
                     current-index-changed(index) => {
                         Data.current-section.board-2d-tabs[Data.current-section.current-tab-index].unplaced-components-devices-index = index;
@@ -364,6 +366,7 @@ export component PlaceDevicesPanel inherits Rectangle {
                     current-index: tab.unplaced-components-footprints-index;
                     default-index: 0;
                     enabled: self.model.length > 1;
+                    window-height: window-height;
 
                     current-index-changed(index) => {
                         Data.current-section.board-2d-tabs[Data.current-section.current-tab-index].unplaced-components-footprints-index = index;

@@ -21,10 +21,8 @@ export component DropDownPopup inherits PopupWindow {
         selected-index = index;
     }
 
-    x: 0;
-    y: root.height + 2px;
     width: self.preferred-width;
-    preferred-height: l.preferred-height;
+    preferred-height: l.preferred-height + 1px;  // Workaround for unnecessary scrollbar.
     max-height: 20 * item-height;  // Should be a multiple of item height.
     forward-focus: fs;
 

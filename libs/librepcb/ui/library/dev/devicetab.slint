@@ -104,6 +104,7 @@ component DeviceMetadataTab inherits GridLayout {
     in-out property <[DeviceTabData]> tabs;
     in property <int> index;
     in property <bool> read-only;
+    in property <length> window-height;
 
     padding: 8px;
     padding-top: tabs[index].wizard-mode ? 8px : 0;
@@ -281,6 +282,7 @@ component DeviceMetadataTab inherits GridLayout {
         attributes-view := AttributeListView {
             model: tabs[index].attributes;
             read-only: read-only;
+            window-height: window-height;
 
             edited => {
                 Backend.trigger-tab(section-index, index, TabAction.apply);
@@ -313,6 +315,7 @@ component DeviceContentTab {
     in property <int> index;
     in property <bool> read-only;
     in property <length> page-height;
+    in property <length> window-height;
     property <bool> horizontal-layout: self.width > 1000px;
     property <bool> interactive: tabs[index].interactive-pinout-number > 0;
     property <int> attributes-editor-part-index: -1;  // -1 = hide popup
@@ -371,6 +374,7 @@ component DeviceContentTab {
                 index: index;
                 read-only: read-only;
                 interactive: interactive;
+                window-height: window-height;
             }
 
             if horizontal-layout: component-card-2 := ComponentCard {
@@ -460,6 +464,7 @@ component DeviceContentTab {
         attributes-overlay-view := AttributeListView {
             model: tabs[index].parts[attributes-editor-part-index].attributes;
             read-only: read-only;
+            window-height: window-height;
 
             edited => {
                 Backend.trigger-tab(section-index, index, TabAction.apply);
@@ -480,6 +485,7 @@ component DeviceContentTab {
 export component DeviceTab inherits Tab {
     in property <int> section-index;
     in-out property <WindowSectionData> section;
+    in property <length> window-height;
     property <[DeviceTabData]> tabs: section.device-tabs;
     property <int> index: section.current-tab-index;
     property <bool> read-only: section.tabs[index].features.save != FeatureState.enabled;
@@ -508,6 +514,7 @@ export component DeviceTab inherits Tab {
             tabs: tabs;
             index: index;
             read-only: read-only;
+            window-height: window-height;
         }
         if tabs[index].wizard-mode && (tabs[index].page-index >= 2): content-tab-1 := DeviceContentTab {
             width: parent.width;
@@ -516,6 +523,7 @@ export component DeviceTab inherits Tab {
             index: index;
             read-only: read-only;
             page-height: root.height;
+            window-height: window-height;
         }
 
         // Normal mode: Slide between metadata and content.
@@ -533,6 +541,7 @@ export component DeviceTab inherits Tab {
                 tabs: tabs;
                 index: index;
                 read-only: read-only;
+                window-height: window-height;
             }
 
             content-tab-2 := DeviceContentTab {
@@ -542,6 +551,7 @@ export component DeviceTab inherits Tab {
                 index: index;
                 read-only: read-only;
                 page-height: root.height;
+                window-height: window-height;
             }
 
             page-clicked(idx) => {
