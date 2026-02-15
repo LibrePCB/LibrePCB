@@ -1,0 +1,16 @@
+name: OSSign Dispatch
+
+on:
+  workflow_dispatch:
+
+jobs:
+  ossign-dispatch:
+    name: OSSign Dispatch
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Dispatch to OSSign
+        uses: ossign/actions/workflow/dispatch@main
+        with:
+          username: ${{ secrets.OSSIGN_USER }}
+          token: ${{ secrets.OSSIGN_TOKEN }}
+          dispatch_only: true
