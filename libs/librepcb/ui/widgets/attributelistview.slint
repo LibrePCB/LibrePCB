@@ -17,6 +17,7 @@ component VerticalLine inherits Rectangle {
 export component AttributeListView inherits ScrollView {
     in-out property <[AttributeData]> model;  // Last item is "new attribute" row!
     in property <bool> read-only;
+    in property <length> window-height;
     property <length> row-height: 25px;
 
     callback edited;
@@ -88,6 +89,7 @@ export component AttributeListView inherits ScrollView {
             for item[index] in model: VerticalLayout {
                 type-cbx := ComboBox {
                     height: is-visible-row(index) ? row-height : 0;
+                    window-height: window-height;
                     model: Data.attribute-types;
                     current-index: item.type;
                     enabled: (!read-only) && (!is-last-row(index));
@@ -148,6 +150,7 @@ export component AttributeListView inherits ScrollView {
             for item[index] in model: VerticalLayout {
                 unit-cbx := ComboBox {
                     height: is-visible-row(index) ? row-height : 0;
+                    window-height: window-height;
                     model: Data.attribute-units[item.type];
                     current-index: item.unit;
                     enabled: (!read-only) && (!is-last-row(index)) && (self.model.length > 1);

@@ -171,6 +171,7 @@ export component DevicePinoutPanel inherits Rectangle {
     in property <int> index;
     in property <bool> read-only;
     in property <bool> interactive;
+    in property <length> window-height;
 
     background: #404040;
     border-color: interactive ? Constants.librepcb-color : self.background;
@@ -345,6 +346,7 @@ export component DevicePinoutPanel inherits Rectangle {
 
                 pinout-view := DevicePinoutListView {
                     max-height: interactive ? 0 : 9999px;
+                    window-height: window-height;
                     model: tabs[index].pinout;
                     signal-names: tabs[index].signal-names;
                     visible: !interactive;

@@ -52,6 +52,7 @@ component ComponentMetadataTab inherits GridLayout {
     in-out property <[ComponentTabData]> tabs;
     in property <int> index;
     in property <bool> read-only;
+    in property <length> window-height;
 
     padding: 8px;
     spacing: 8px;
@@ -343,6 +344,7 @@ component ComponentMetadataTab inherits GridLayout {
         attributes-view := AttributeListView {
             model: tabs[index].attributes;
             read-only: read-only;
+            window-height: window-height;
 
             edited => {
                 Backend.trigger-tab(section-index, index, TabAction.apply);
@@ -374,6 +376,7 @@ component ComponentAddGatesTab inherits VerticalLayout {
     in-out property <[ComponentTabData]> tabs;
     in property <int> index;
     in property <bool> read-only;
+    in property <length> window-height;
 
     alignment: start;
 
@@ -383,6 +386,7 @@ component ComponentAddGatesTab inherits VerticalLayout {
         unit: tabs[index].unit;
         wizard-mode: true;
         read-only: read-only;
+        window-height: window-height;
 
         render-scene(variant, gate, width, height, frame-dummy) => {
             Backend.render-scene(section-index, width, height, variant * 1000 + gate, frame-dummy)
@@ -535,6 +539,7 @@ component ComponentSignalsEditorTab inherits VerticalLayout {
 export component ComponentTab inherits Tab {
     in property <int> section-index;
     in-out property <WindowSectionData> section;
+    in property <length> window-height;
     property <[ComponentTabData]> tabs: section.component-tabs;
     property <int> index: section.current-tab-index;
     property <bool> read-only: section.tabs[index].features.save != FeatureState.enabled;
@@ -556,11 +561,13 @@ export component ComponentTab inherits Tab {
             tabs: tabs;
             index: index;
             read-only: read-only;
+            window-height: window-height;
         }
         if tabs[index].wizard-mode && (tabs[index].page-index == 1): add-gates-tab := ComponentAddGatesTab {
             section-index: section-index;
             tabs: tabs;
             index: index;
+            window-height: window-height;
         }
         if tabs[index].wizard-mode && (tabs[index].page-index >= 2): signals-tab-1 := ComponentSignalsEditorTab {
             section-index: section-index;
@@ -586,6 +593,7 @@ export component ComponentTab inherits Tab {
 
             metadata-tab-2 := ComponentMetadataTab {
                 width: parent.width;
+                window-height: window-height;
                 section-index: section-index;
                 tabs: tabs;
                 index: index;
@@ -606,6 +614,7 @@ export component ComponentTab inherits Tab {
 
             variants-tab := ComponentVariantListView {
                 width: parent.width;
+                window-height: window-height;
                 model: tabs[index].variants;
                 signal-names: tabs[index].signal-names;
                 unit: tabs[index].unit;

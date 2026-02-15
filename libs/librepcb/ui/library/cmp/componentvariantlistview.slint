@@ -28,6 +28,7 @@ component ComponentGateListItem {
     in-out property <[string]> signal-names;
     in property <bool> wizard-mode;
     in property <bool> read-only;
+    in property <length> window-height;
     property <length> pinout-row-height: 25px;
 
     pure callback render-scene(width: length, height: length, frame-dummy: int) -> image;
@@ -110,6 +111,7 @@ component ComponentGateListItem {
 
                 if !wizard-mode: signal-cbx := ComboBox {
                     height: pinout-row-height;
+                    window-height: window-height;
                     model: signal-names;
                     current-index: pinout.signal-index;
                     editable-only-when-focused: true;
@@ -331,6 +333,7 @@ component ComponentVariantListItem inherits Rectangle {
     in property <LengthUnit> unit;
     in property <bool> wizard-mode: false;
     in property <bool> read-only: false;
+    in property <length> window-height;
     property <bool> light-background: wizard-mode && (model[index].gates.length == 0);
 
     pure callback render-scene(gate: int, width: length, height: length, frame-dummy: int) -> image;
@@ -475,6 +478,7 @@ component ComponentVariantListItem inherits Rectangle {
             signal-names: signal-names;
             wizard-mode: wizard-mode;
             read-only: read-only;
+            window-height: window-height;
 
             render-scene(width, height, frame-dummy) => {
                 root.render-scene(gate-index, width, height, frame-dummy)
@@ -715,6 +719,7 @@ export component ComponentVariantListView inherits ScrollView {
     in property <LengthUnit> unit;
     in property <bool> wizard-mode: false;
     in property <bool> read-only: false;
+    in property <length> window-height;
 
     pure callback render-scene(variant: int, gate: int, width: length, height: length, frame-dummy: int) -> image;
     callback add-variant-clicked;
@@ -734,6 +739,7 @@ export component ComponentVariantListView inherits ScrollView {
             unit: unit;
             wizard-mode: wizard-mode;
             read-only: read-only;
+            window-height: window-height;
 
             render-scene(gate, width, height, frame-dummy) => {
                 root.render-scene(index, gate, width, height, frame-dummy)

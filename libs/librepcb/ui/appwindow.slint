@@ -123,6 +123,7 @@ export component AppWindow inherits Window {
             z: 80; // For the tooltips.
             width: panel-width;
             height: sidebar.height;
+            window-height: root.height;
         }
 
         if Data.panel-page == PanelPage.rule-check: RuleCheckPanel {
@@ -172,6 +173,7 @@ export component AppWindow inherits Window {
                 window-section := WindowSection {
                     section-index: i;
                     section: section;
+                    window-height: root.height;
                 }
 
                 if i < (Data.sections.length - 1): Rectangle {

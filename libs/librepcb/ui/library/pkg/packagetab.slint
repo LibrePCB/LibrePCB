@@ -64,6 +64,7 @@ component PackageMetadataTab inherits GridLayout {
     in-out property <[PackageTabData]> tabs;
     in property <int> index;
     in property <bool> read-only;
+    in property <length> window-height;
 
     padding: 8px;
     spacing: 8px;
@@ -208,6 +209,7 @@ component PackageMetadataTab inherits GridLayout {
             model: Constants.package-assembly-types;
             current-index: tabs[index].assembly-type;
             enabled: !read-only;
+            window-height: window-height;
             accessible-label: assembly-type-txt.text;
 
             current-index-changed(idx) => {
@@ -990,6 +992,7 @@ component PackageEditorTab inherits TouchArea {
 export component PackageTab inherits Tab {
     in property <int> section-index;
     in-out property <WindowSectionData> section;
+    in property <length> window-height;
     property <[PackageTabData]> tabs: section.package-tabs;
     property <int> index: section.current-tab-index;
     property <bool> read-only: section.tabs[index].features.save != FeatureState.enabled;
@@ -1034,6 +1037,7 @@ export component PackageTab inherits Tab {
             tabs: tabs;
             index: index;
             read-only: read-only;
+            window-height: window-height;
         }
         if tabs[index].wizard-mode && (tabs[index].page-index == 1): pads-tab-1 := PackagePadsEditorTab {
             width: parent.width;
@@ -1067,6 +1071,7 @@ export component PackageTab inherits Tab {
                 tabs: tabs;
                 index: index;
                 read-only: read-only;
+                window-height: window-height;
             }
 
             pads-tab-2 := PackagePadsEditorTab {

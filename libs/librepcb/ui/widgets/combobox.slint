@@ -7,6 +7,7 @@ export component ComboBox inherits Rectangle {
     in property <bool> enabled: true;
     in property <bool> editable-only-when-focused: false;
     in property <bool> frameless: false;
+    in property <length> window-height;
     in-out property <int> current-index: -1;
     in-out property <int> default-index: -1;
     out property has-focus <=> fs.has-focus;
@@ -155,9 +156,32 @@ export component ComboBox inherits Rectangle {
     }
 
     popup := DropDownPopup {
+        property <length> actual-height: min(self.preferred-height, self.max-height);
+
         x: 0;
-        y: root.height + 2px;
+        y: {
+            if window-height == 0 {
+                // Open dropdown to the bottom.
+                root.height + 2px;
+            } else if root.absolute-position.y + root.height + 2px + actual-height < window-height {
+                // Open dropdown to the bottom.
+                root.height + 2px;
+            } else if actual-height + 2px < root.absolute-position.y {
+                // Open dropdown to the top.
+                -actual-height - 2px;
+            } else {
+                // Open dropdown vertically centered in the window.
+                ((window-height - actual-height) / 2) - root.absolute-position.y
+            }
+        }
         width: root.width;
+        max-height: {
+            if window-height > self.item-height {
+                min(floor(window-height / self.item-height), 20) * self.item-height;
+            } else {
+                20 * self.item-height
+            }
+        }
         model: root.model;
         current-index: current-index;
         default-index: default-index;

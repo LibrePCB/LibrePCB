@@ -5,6 +5,7 @@ import { DevicePinoutData } from "../../api.slint";
 export component DevicePinoutListView inherits ScrollView {
     in-out property <[DevicePinoutData]> model;
     in-out property <[string]> signal-names;
+    in property <length> window-height;
     property <length> row-height: 25px;
 
     preferred-width: l.preferred-width;
@@ -39,6 +40,7 @@ export component DevicePinoutListView inherits ScrollView {
 
                 signal-cbx := ComboBox {
                     height: row-height;
+                    window-height: window-height;
                     model: signal-names;
                     current-index: item.signal-index;
                     editable-only-when-focused: true;
