@@ -281,16 +281,20 @@ bool SlintGraphicsView::pointerEvent(
 
 bool SlintGraphicsView::scrollEvent(
     const QPointF& pos, slint::private_api::PointerScrollEvent e) noexcept {
-  if (e.modifiers.shift && (e.delta_y != 0)) {
-    scroll(QPointF(-e.delta_y / mProjection.scale, 0));
-    return true;
-  } else if (e.modifiers.control && (e.delta_y != 0)) {
-    scroll(QPointF(0, -e.delta_y / mProjection.scale));
-    return true;
-  } else if (e.delta_x != 0) {
+  if (std::abs(e.delta_x) > std::abs(e.delta_y)) {
+    // Horizontal scrolling.
     scroll(QPointF(-e.delta_x / mProjection.scale, 0));
     return true;
+  } else if (e.modifiers.shift) {
+    // Vertical scrolling with SHIFT -> scroll horizontally.
+    scroll(QPointF(-e.delta_y / mProjection.scale, 0));
+    return true;
+  } else if (e.modifiers.control) {
+    // Vertical scrolling with CTRL -> scroll vertically.
+    scroll(QPointF(0, -e.delta_y / mProjection.scale));
+    return true;
   } else {
+    // Vertical scrolling -> zoom in/out.
     zoom(pos, qPow(1.3, e.delta_y / qreal(120)));
     return true;
   }
