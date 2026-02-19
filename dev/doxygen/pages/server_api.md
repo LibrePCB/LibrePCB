@@ -3,10 +3,8 @@ Server API Specification {#doc_server_api}
 
 [TOC]
 
-LibrePCB provides an API at [api.librepcb.org](https://api.librepcb.org) which
-is used by the LibrePCB application, for example to fetch the latest libraries.
-
-The API uses JSON for responses.
+LibrePCB uses an JSON REST API to interact with online resources, for example
+to fetch the latest libraries.
 
 
 # URL {#doc_server_api_url}
@@ -15,14 +13,10 @@ An API URL consists of following parts:
 
 | Part          | Description                    | Example                  |
 |---------------|--------------------------------|--------------------------|
-| `<BASE>`      | Base URL of API server         | https://api.librepcb.org |
+| `<BASE>`      | Base URL of API server         | https://api.example.com  |
 | `/api`        | Base path of API               | `/api`                   |
 | `/<VERSION>`  | API version number             | `/v1`                    |
 | `/<RESOURCE>` | Path to the requested resource | `/libraries/v0.1`        |
-
-The base URL of the official API server is https://api.librepcb.org/, but for
-your own API server you can use any other base URL. This is the URL which must
-be specified in the workspace settings of LibrePCB.
 
 Currently the only available API version is `v1`, but in future there might
 be newer API specifications available with higher version numbers. Because the
@@ -34,7 +28,7 @@ at the same time.
 **Request the list of libraries:**
 
 ~~~{.sh}
-curl 'https://api.librepcb.org/api/v1/libraries/v0.1'
+curl 'https://api.example.com/api/v1/libraries/v0.1'
 ~~~
 
 
@@ -65,7 +59,7 @@ Here an example how a paginated response looks like:
 **Request:**
 
 ~~~{.sh}
-curl 'https://api.librepcb.org/api/v1/libraries/v0.1'
+curl 'https://api.example.com/api/v1/libraries/v0.1'
 ~~~
 
 **Response:**
@@ -73,7 +67,7 @@ curl 'https://api.librepcb.org/api/v1/libraries/v0.1'
 ~~~{.json}
 {
   "count": 42,
-  "next": "https://api.librepcb.org/api/v1/libraries/v0.1?page=2",
+  "next": "https://api.example.com/api/v1/libraries/v0.1?page=2",
   "previous": null,
   "results": [
     ...
@@ -138,7 +132,7 @@ The response is a list of objects with following properties:
 **Request:**
 
 ~~~{.sh}
-curl 'https://api.librepcb.org/api/v1/libraries/v0.1'
+curl 'https://api.example.com/api/v1/libraries/v0.1'
 ~~~
 
 **Response (without pagination):**
@@ -227,15 +221,15 @@ The response is a JSON object with the following data (no pagination used):
 
 ~~~{.sh}
 curl -H "Content-Type: application/json" \
-     'https://api.librepcb.org/api/v1/order'
+     'https://api.example.com/api/v1/order'
 ~~~
 
 **Initial Response:**
 
 ~~~{.json}
 {
-  "info_url": "https://fab.librepcb.org/about",
-  "upload_url": "https://fab.librepcb.org/upload",
+  "info_url": "https://fab.example.com/about",
+  "upload_url": "https://fab.example.com/upload",
   "max_size": 100000000
 }
 ~~~
@@ -245,14 +239,14 @@ curl -H "Content-Type: application/json" \
 ~~~{.sh}
 curl -X POST -H "Content-Type: application/json" \
      -d '{"project": "...", "board": "boards/default/board.lp"}' \
-     'https://fab.librepcb.org/upload'
+     'https://fab.example.com/upload'
 ~~~
 
 **Upload Response:**
 
 ~~~{.json}
 {
-  "redirect_url": "https://fab.librepcb.org/nnwyw55pA0Z0sw/"
+  "redirect_url": "https://fab.example.com/nnwyw55pA0Z0sw/"
 }
 ~~~
 
@@ -376,7 +370,7 @@ following properties:
 
 ~~~{.sh}
 curl -H "Content-Type: application/json" \
-     'https://api.librepcb.org/api/v1/parts'
+     'https://api.example.com/api/v1/parts'
 ~~~
 
 **Initial Response:**
@@ -386,8 +380,8 @@ curl -H "Content-Type: application/json" \
   "provider_name": "LibrePCB Data Provider",
   "provider_url": "https://librepcb-data-provider.com",
   "provider_logo_url": "https://librepcb-data-provider.com/logo.png",
-  "info_url": "https://api.librepcb.org",
-  "query_url": "https://api.librepcb.org/api/v1/parts/query",
+  "info_url": "https://api.example.com",
+  "query_url": "https://api.example.com/api/v1/parts/query",
   "max_parts": 10
 }
 ~~~
@@ -407,7 +401,7 @@ curl -H "Content-Type: application/json" \
 
 ~~~{.sh}
 curl -X POST -H "Content-Type: application/json" -d @request.json \
-     'https://api.librepcb.org/api/v1/parts/query'
+     'https://api.example.com/api/v1/parts/query'
 ~~~
 
 **Query Response:**
