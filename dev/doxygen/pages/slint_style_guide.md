@@ -16,7 +16,7 @@ otherwise important for tests (e.g. a conditional `Image`, in contrast to
 a static `Image`). Typical non-functional elements are `Rectangle`,
 `VerticalLayout` etc, though sometimes you might give them an ID anyway.
 
-IDs shall be `snake-case` and must be unique within a Slint component.
+IDs shall be `kebab-case` and must be unique within a Slint component.
 They shall start with the most generic term, then more specific terms, and
 the last segment shall be a type specification of the element. Examples:
 
