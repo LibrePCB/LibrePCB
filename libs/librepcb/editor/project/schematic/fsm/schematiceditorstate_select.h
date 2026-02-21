@@ -52,6 +52,7 @@ namespace editor {
 class CmdDragSelectedSchematicItems;
 class CmdImageEdit;
 class CmdPolygonEdit;
+class SchematicSelectionQuery;
 
 /*******************************************************************************
  *  Class SchematicEditorState_Select
@@ -130,6 +131,7 @@ private:  // Methods
   void openTextPropertiesDialog(Text& text) noexcept;
   void scheduleUpdateAvailableFeatures() noexcept;
   void updateAvailableFeatures() noexcept;
+  QString buildInfoBoxText(const SchematicSelectionQuery& query) const noexcept;
 
 private:  // Data
   /// enum for all possible substates
