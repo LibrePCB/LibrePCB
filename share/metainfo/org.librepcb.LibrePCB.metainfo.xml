@@ -80,6 +80,17 @@
         - Remove development releases when stable release is ready!
         - For prereleases, use tilde instead of dash (e.g. "1.0.0~rc1")!
     -->
+    <release version="2.0.1" date="2026-02-22" type="stable">
+      <description>
+        <p>Highlights:</p>
+        <ul>
+          <li>Display properties of selected schematic- &amp; board objects</li>
+          <li>Auto-open board when opening a project</li>
+          <li>Various bugfixes</li>
+        </ul>
+      </description>
+      <url type="details">https://librepcb.org/release-notes/2.0.1/</url>
+    </release>
     <release version="2.0.0" date="2026-01-28" type="stable">
       <description>
         <p>Highlights:</p>
