@@ -71,7 +71,8 @@ SGI_SymbolPin::SGI_SymbolPin(SI_SymbolPin& pin,
   setToolTip(*mPin.getLibPin().getName());
 
   // Setup circle.
-  mCircleGraphicsItem->setDiameter(UnsignedLength(1200000));
+  const UnsignedLength circleDiameter(1200000);
+  mCircleGraphicsItem->setDiameter(circleDiameter);
   mCircleGraphicsItem->setShapeMode(
       PrimitiveCircleGraphicsItem::ShapeMode::FilledOutline);
   mCircleGraphicsItem->setFlag(QGraphicsItem::ItemIsSelectable, true);
@@ -110,6 +111,10 @@ SGI_SymbolPin::SGI_SymbolPin(SI_SymbolPin& pin,
   updateToolTip();
   updateHighlightedState();
 
+  // Shape is always a circle.
+  mShape.addEllipse(
+      Toolbox::boundingRectFromRadius(circleDiameter->toPx() / 2));
+
   mPin.onEdited.attach(mOnPinEditedSlot);
   if (auto ptr = mSymbolGraphicsItem.lock()) {
     ptr->onEdited.attach(mOnSymbolEditedSlot);
@@ -135,11 +140,6 @@ void SGI_SymbolPin::updateHighlightedState() noexcept {
 /*******************************************************************************
  *  Inherited from QGraphicsItem
  ******************************************************************************/
-
-QPainterPath SGI_SymbolPin::shape() const noexcept {
-  Q_ASSERT(mCircleGraphicsItem);
-  return mCircleGraphicsItem->shape();
-}
 
 QVariant SGI_SymbolPin::itemChange(GraphicsItemChange change,
                                    const QVariant& value) noexcept {

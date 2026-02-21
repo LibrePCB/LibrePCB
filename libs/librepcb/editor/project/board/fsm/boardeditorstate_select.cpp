@@ -65,6 +65,7 @@
 #include "../graphicsitems/bgi_via.h"
 #include "../graphicsitems/bgi_zone.h"
 
+#include <librepcb/core/attribute/attributesubstitutor.h>
 #include <librepcb/core/import/dxfreader.h>
 #include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/library/dev/device.h>
@@ -83,7 +84,10 @@
 #include <librepcb/core/project/board/items/bi_via.h>
 #include <librepcb/core/project/board/items/bi_zone.h>
 #include <librepcb/core/project/circuit/componentinstance.h>
+#include <librepcb/core/project/circuit/netclass.h>
+#include <librepcb/core/project/circuit/netsignal.h>
 #include <librepcb/core/project/project.h>
+#include <librepcb/core/project/projectattributelookup.h>
 #include <librepcb/core/utils/scopeguard.h>
 #include <librepcb/core/utils/tangentpathjoiner.h>
 #include <librepcb/core/utils/toolbox.h>
@@ -167,6 +171,7 @@ bool BoardEditorState_Select::exit() noexcept {
     disconnect(mConnections.takeLast());
   }
 
+  mAdapter.fsmSetViewInfoBoxText(QString());
   mAdapter.fsmSetFeatures(BoardEditorFsmAdapter::Features());
   mAdapter.fsmToolLeave();
   return true;
@@ -1969,16 +1974,19 @@ void BoardEditorState_Select::updateAvailableFeatures() noexcept {
   BoardGraphicsScene* scene = getActiveBoardScene();
   if (!scene) return;
 
-  BoardEditorFsmAdapter::Features features;
+  std::optional<BoardEditorFsmAdapter::Features> features;
+  QString infoText;
   if ((!mCmdPolygonEdit) && (!mCmdPlaneEdit) && (!mCmdZoneEdit)) {
+    features = BoardEditorFsmAdapter::Features();
+
     if (!mSelectedItemsDragCommand) {
-      features |= BoardEditorFsmAdapter::Feature::Select;
-      features |= BoardEditorFsmAdapter::Feature::ImportGraphics;
+      *features |= BoardEditorFsmAdapter::Feature::Select;
+      *features |= BoardEditorFsmAdapter::Feature::ImportGraphics;
     }
 
     if (BoardClipboardData::isValid(qApp->clipboard()->mimeData()) ||
         FootprintClipboardData::isValid(qApp->clipboard()->mimeData())) {
-      features |= BoardEditorFsmAdapter::Feature::Paste;
+      *features |= BoardEditorFsmAdapter::Feature::Paste;
     }
 
     BoardSelectionQuery query(*scene, true);
@@ -1994,141 +2002,238 @@ void BoardEditorState_Select::updateAvailableFeatures() noexcept {
     query.addSelectedFootprintStrokeTexts();
     query.addSelectedHoles();
     if (!query.isResultEmpty()) {
-      features |= BoardEditorFsmAdapter::Feature::Cut;
-      features |= BoardEditorFsmAdapter::Feature::Copy;
-      features |= BoardEditorFsmAdapter::Feature::Remove;
-      features |= BoardEditorFsmAdapter::Feature::Rotate;
-      features |= BoardEditorFsmAdapter::Feature::Flip;
+      *features |= BoardEditorFsmAdapter::Feature::Cut;
+      *features |= BoardEditorFsmAdapter::Feature::Copy;
+      *features |= BoardEditorFsmAdapter::Feature::Remove;
+      *features |= BoardEditorFsmAdapter::Feature::Rotate;
+      *features |= BoardEditorFsmAdapter::Feature::Flip;
     }
     if (!query.getDeviceInstances().isEmpty()) {
-      features |= BoardEditorFsmAdapter::Feature::ResetTexts;
+      *features |= BoardEditorFsmAdapter::Feature::ResetTexts;
     }
     if ((!query.getDeviceInstances().isEmpty()) ||
         (!query.getPads().isEmpty()) || (!query.getVias().isEmpty()) ||
         (!query.getPlanes().isEmpty()) || (!query.getZones().isEmpty()) ||
         (!query.getPolygons().isEmpty()) ||
         (!query.getStrokeTexts().isEmpty()) || (!query.getHoles().isEmpty())) {
-      features |= BoardEditorFsmAdapter::Feature::Properties;
+      *features |= BoardEditorFsmAdapter::Feature::Properties;
     }
     if (!query.getNetLines().isEmpty()) {
-      features |= BoardEditorFsmAdapter::Feature::ModifyLineWidth;
+      *features |= BoardEditorFsmAdapter::Feature::ModifyLineWidth;
     }
     const BoardEditorFsmAdapter::Features conditionalFeatures =
         BoardEditorFsmAdapter::Feature::SnapToGrid |
         BoardEditorFsmAdapter::Feature::Lock |
         BoardEditorFsmAdapter::Feature::Unlock;
     foreach (auto ptr, query.getDeviceInstances()) {
-      if (features.testFlags(conditionalFeatures)) {
+      if (features->testFlags(conditionalFeatures)) {
         break;
       }
       if (!ptr->getPosition().isOnGrid(getGridInterval())) {
-        features |= BoardEditorFsmAdapter::Feature::SnapToGrid;
+        *features |= BoardEditorFsmAdapter::Feature::SnapToGrid;
       }
       if (ptr->isLocked()) {
-        features |= BoardEditorFsmAdapter::Feature::Unlock;
+        *features |= BoardEditorFsmAdapter::Feature::Unlock;
       } else {
-        features |= BoardEditorFsmAdapter::Feature::Lock;
+        *features |= BoardEditorFsmAdapter::Feature::Lock;
       }
     }
     foreach (auto ptr, query.getPads()) {
-      if (features.testFlag(BoardEditorFsmAdapter::Feature::SnapToGrid)) {
+      if (features->testFlag(BoardEditorFsmAdapter::Feature::SnapToGrid)) {
         break;
       }
       if (!ptr->getPosition().isOnGrid(getGridInterval())) {
-        features |= BoardEditorFsmAdapter::Feature::SnapToGrid;
+        *features |= BoardEditorFsmAdapter::Feature::SnapToGrid;
       }
       if (ptr->getProperties().isLocked()) {
-        features |= BoardEditorFsmAdapter::Feature::Unlock;
+        *features |= BoardEditorFsmAdapter::Feature::Unlock;
       } else {
-        features |= BoardEditorFsmAdapter::Feature::Lock;
+        *features |= BoardEditorFsmAdapter::Feature::Lock;
       }
     }
     foreach (auto ptr, query.getVias()) {
-      if (features.testFlag(BoardEditorFsmAdapter::Feature::SnapToGrid)) {
+      if (features->testFlag(BoardEditorFsmAdapter::Feature::SnapToGrid)) {
         break;
       }
       if (!ptr->getPosition().isOnGrid(getGridInterval())) {
-        features |= BoardEditorFsmAdapter::Feature::SnapToGrid;
+        *features |= BoardEditorFsmAdapter::Feature::SnapToGrid;
       }
     }
     foreach (auto ptr, query.getNetPoints()) {
-      if (features.testFlag(BoardEditorFsmAdapter::Feature::SnapToGrid)) {
+      if (features->testFlag(BoardEditorFsmAdapter::Feature::SnapToGrid)) {
         break;
       }
       if (!ptr->getPosition().isOnGrid(getGridInterval())) {
-        features |= BoardEditorFsmAdapter::Feature::SnapToGrid;
+        *features |= BoardEditorFsmAdapter::Feature::SnapToGrid;
       }
     }
     foreach (auto ptr, query.getPlanes()) {
-      if (features.testFlags(conditionalFeatures)) {
+      if (features->testFlags(conditionalFeatures)) {
         break;
       }
       if (!ptr->getOutline().isOnGrid(getGridInterval())) {
-        features |= BoardEditorFsmAdapter::Feature::SnapToGrid;
+        *features |= BoardEditorFsmAdapter::Feature::SnapToGrid;
       }
       if (ptr->isLocked()) {
-        features |= BoardEditorFsmAdapter::Feature::Unlock;
+        *features |= BoardEditorFsmAdapter::Feature::Unlock;
       } else {
-        features |= BoardEditorFsmAdapter::Feature::Lock;
+        *features |= BoardEditorFsmAdapter::Feature::Lock;
       }
     }
     foreach (auto ptr, query.getZones()) {
-      if (features.testFlags(conditionalFeatures)) {
+      if (features->testFlags(conditionalFeatures)) {
         break;
       }
       if (!ptr->getData().getOutline().isOnGrid(getGridInterval())) {
-        features |= BoardEditorFsmAdapter::Feature::SnapToGrid;
+        *features |= BoardEditorFsmAdapter::Feature::SnapToGrid;
       }
       if (ptr->getData().isLocked()) {
-        features |= BoardEditorFsmAdapter::Feature::Unlock;
+        *features |= BoardEditorFsmAdapter::Feature::Unlock;
       } else {
-        features |= BoardEditorFsmAdapter::Feature::Lock;
+        *features |= BoardEditorFsmAdapter::Feature::Lock;
       }
     }
     foreach (auto ptr, query.getPolygons()) {
-      if (features.testFlags(conditionalFeatures)) {
+      if (features->testFlags(conditionalFeatures)) {
         break;
       }
       if (!ptr->getData().getPath().isOnGrid(getGridInterval())) {
-        features |= BoardEditorFsmAdapter::Feature::SnapToGrid;
+        *features |= BoardEditorFsmAdapter::Feature::SnapToGrid;
       }
       if (ptr->getData().isLocked()) {
-        features |= BoardEditorFsmAdapter::Feature::Unlock;
+        *features |= BoardEditorFsmAdapter::Feature::Unlock;
       } else {
-        features |= BoardEditorFsmAdapter::Feature::Lock;
+        *features |= BoardEditorFsmAdapter::Feature::Lock;
       }
     }
     foreach (auto ptr, query.getStrokeTexts()) {
-      if (features.testFlags(conditionalFeatures)) {
+      if (features->testFlags(conditionalFeatures)) {
         break;
       }
       if (!ptr->getData().getPosition().isOnGrid(getGridInterval())) {
-        features |= BoardEditorFsmAdapter::Feature::SnapToGrid;
+        *features |= BoardEditorFsmAdapter::Feature::SnapToGrid;
       }
       if (ptr->getData().isLocked()) {
-        features |= BoardEditorFsmAdapter::Feature::Unlock;
+        *features |= BoardEditorFsmAdapter::Feature::Unlock;
       } else {
-        features |= BoardEditorFsmAdapter::Feature::Lock;
+        *features |= BoardEditorFsmAdapter::Feature::Lock;
       }
     }
     foreach (auto ptr, query.getHoles()) {
-      if (features.testFlags(conditionalFeatures)) {
+      if (features->testFlags(conditionalFeatures)) {
         break;
       }
       if (!ptr->getData().getPath()->getVertices().first().getPos().isOnGrid(
               getGridInterval())) {
-        features |= BoardEditorFsmAdapter::Feature::SnapToGrid;
+        *features |= BoardEditorFsmAdapter::Feature::SnapToGrid;
       }
       if (ptr->getData().isLocked()) {
-        features |= BoardEditorFsmAdapter::Feature::Unlock;
+        *features |= BoardEditorFsmAdapter::Feature::Unlock;
       } else {
-        features |= BoardEditorFsmAdapter::Feature::Lock;
+        *features |= BoardEditorFsmAdapter::Feature::Lock;
       }
     }
+    infoText = buildInfoBoxText(query);
   } else {
-    return;  // Do not update features in other states.
+    // Do not update features in other states.
   }
-  mAdapter.fsmSetFeatures(features);
+  if (features) {
+    mAdapter.fsmSetFeatures(*features);
+  }
+  mAdapter.fsmSetViewInfoBoxText(infoText);
+}
+
+QString BoardEditorState_Select::buildInfoBoxText(
+    const BoardSelectionQuery& query) const noexcept {
+  const int count = query.getDeviceInstances().count() +
+      query.getVias().count() + query.getPads().count() +
+      query.getNetLines().count() + query.getPlanes().count();
+  if ((count == 0) || (count > 50)) {
+    return QString();
+  }
+
+  struct AttributeSet {
+    QString name;
+    QSet<QString> values;
+  };
+  AttributeSet nets{tr("Net"), {}};
+  AttributeSet netClasses{tr("Class"), {}};
+  AttributeSet layers{tr("Layer"), {}};
+  AttributeSet names{tr("Name"), {}};
+  AttributeSet values{tr("Value"), {}};
+  AttributeSet packages{tr("Package"), {}};
+  for (const BI_Pad* pad : query.getPads()) {
+    const BI_NetSegment* ns = pad->getNetSegment();
+    if (!ns) continue;
+    if (const NetSignal* net = ns->getNetSignal()) {
+      nets.values.insert(*net->getName());
+      netClasses.values.insert(*net->getNetClass().getName());
+    } else {
+      nets.values.insert("✖");
+      netClasses.values.insert("✖");
+    }
+    if (!pad->getProperties().isTht()) {
+      layers.values.insert(pad->getSolderLayer().getNameTr());
+    }
+  }
+  for (const BI_Via* via : query.getVias()) {
+    if (const NetSignal* net = via->getNetSegment().getNetSignal()) {
+      nets.values.insert(*net->getName());
+      netClasses.values.insert(*net->getNetClass().getName());
+    } else {
+      nets.values.insert("✖");
+      netClasses.values.insert("✖");
+    }
+  }
+  for (const BI_NetLine* nl : query.getNetLines()) {
+    if (const NetSignal* net = nl->getNetSegment().getNetSignal()) {
+      nets.values.insert(*net->getName());
+      netClasses.values.insert(*net->getNetClass().getName());
+    } else {
+      nets.values.insert("✖");
+      netClasses.values.insert("✖");
+    }
+    layers.values.insert(nl->getLayer().getNameTr());
+  }
+  for (const BI_Plane* plane : query.getPlanes()) {
+    if (const NetSignal* net = plane->getNetSignal()) {
+      nets.values.insert(*net->getName());
+      netClasses.values.insert(*net->getNetClass().getName());
+    } else {
+      nets.values.insert("✖");
+      netClasses.values.insert("✖");
+    }
+    layers.values.insert(plane->getLayer().getNameTr());
+  }
+  for (const BI_Device* dev : query.getDeviceInstances()) {
+    names.values.insert(*dev->getComponentInstance().getName());
+    values.values.insert(
+        AttributeSubstitutor::substitute(
+            dev->getComponentInstance().getValue(),
+            ProjectAttributeLookup(*dev, dev->getParts(std::nullopt).value(0)))
+            .replace("\n", " "));
+    packages.values.insert(*dev->getLibPackage().getNames().getDefaultValue());
+  }
+
+  // Determine maximum name length.
+  qsizetype maxNameLen = 0U;
+  QVector<const AttributeSet*> attributes;
+  for (const AttributeSet* set :
+       {&nets, &netClasses, &layers, &names, &values, &packages}) {
+    if (set->values.count() == 1) {
+      attributes.append(set);
+      maxNameLen = std::max(maxNameLen, set->name.length());
+    }
+  }
+
+  // Build string.
+  QStringList lines;
+  for (const AttributeSet* set : attributes) {
+    lines.append(set->name % ": " %
+                 QString(" ").repeated(maxNameLen - set->name.length()) %
+                 *set->values.begin());
+  }
+  return lines.join("\n");
 }
 
 /*******************************************************************************

@@ -81,6 +81,7 @@ public:
 
   // Getters
   const QSet<SI_Symbol*>& getSymbols() const noexcept { return mResultSymbols; }
+  const QSet<SI_SymbolPin*>& getPins() const noexcept { return mResultPins; }
   const QSet<SI_BusJunction*>& getBusJunctions() const noexcept {
     return mResultBusJunctions;
   }
@@ -131,6 +132,7 @@ public:
 
   // General Methods
   void addSelectedSymbols() noexcept;
+  void addSelectedPins() noexcept;
   void addSelectedBusJunctions() noexcept;
   void addSelectedBusLines() noexcept;
   void addSelectedBusLabels() noexcept;
@@ -172,6 +174,7 @@ private:  // Data
 
   // query result
   QSet<SI_Symbol*> mResultSymbols;
+  QSet<SI_SymbolPin*> mResultPins;
   QSet<SI_BusJunction*> mResultBusJunctions;
   QSet<SI_BusLine*> mResultBusLines;
   QSet<SI_BusLabel*> mResultBusLabels;

@@ -103,11 +103,11 @@ QHash<SI_NetSegment*, SchematicSelectionQuery::NetSegmentItems>
 }
 
 int SchematicSelectionQuery::getResultCount() const noexcept {
-  return mResultSymbols.count() + mResultBusJunctions.count() +
-      mResultBusLines.count() + mResultBusLabels.count() +
-      mResultNetPoints.count() + mResultNetLines.count() +
-      mResultNetLabels.count() + mResultPolygons.count() +
-      mResultTexts.count() + mResultImages.count();
+  return mResultSymbols.count() + mResultPins.count() +
+      mResultBusJunctions.count() + mResultBusLines.count() +
+      mResultBusLabels.count() + mResultNetPoints.count() +
+      mResultNetLines.count() + mResultNetLabels.count() +
+      mResultPolygons.count() + mResultTexts.count() + mResultImages.count();
 }
 
 /*******************************************************************************
@@ -119,6 +119,15 @@ void SchematicSelectionQuery::addSelectedSymbols() noexcept {
        it++) {
     if (it.value()->isSelected()) {
       mResultSymbols.insert(it.key());
+    }
+  }
+}
+
+void SchematicSelectionQuery::addSelectedPins() noexcept {
+  for (auto it = mScene.getSymbolPins().begin();
+       it != mScene.getSymbolPins().end(); it++) {
+    if (it.value()->isSelected()) {
+      mResultPins.insert(it.key());
     }
   }
 }

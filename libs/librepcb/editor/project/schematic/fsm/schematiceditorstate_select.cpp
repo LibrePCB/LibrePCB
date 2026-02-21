@@ -50,15 +50,23 @@
 #include "../symbolinstancepropertiesdialog.h"
 
 #include <librepcb/core/attribute/attributesubstitutor.h>
+#include <librepcb/core/library/cmp/componentsignal.h>
+#include <librepcb/core/project/circuit/bus.h>
+#include <librepcb/core/project/circuit/componentsignalinstance.h>
+#include <librepcb/core/project/circuit/netclass.h>
+#include <librepcb/core/project/circuit/netsignal.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectattributelookup.h>
 #include <librepcb/core/project/schematic/items/si_busjunction.h>
 #include <librepcb/core/project/schematic/items/si_buslabel.h>
+#include <librepcb/core/project/schematic/items/si_bussegment.h>
 #include <librepcb/core/project/schematic/items/si_image.h>
 #include <librepcb/core/project/schematic/items/si_netlabel.h>
 #include <librepcb/core/project/schematic/items/si_netpoint.h>
+#include <librepcb/core/project/schematic/items/si_netsegment.h>
 #include <librepcb/core/project/schematic/items/si_polygon.h>
 #include <librepcb/core/project/schematic/items/si_symbol.h>
+#include <librepcb/core/project/schematic/items/si_symbolpin.h>
 #include <librepcb/core/project/schematic/items/si_text.h>
 #include <librepcb/core/project/schematic/schematic.h>
 
@@ -140,6 +148,7 @@ bool SchematicEditorState_Select::exit() noexcept {
     disconnect(mConnections.takeLast());
   }
 
+  mAdapter.fsmSetViewInfoBoxText(QString());
   mAdapter.fsmSetFeatures(SchematicEditorFsmAdapter::Features());
   mAdapter.fsmToolLeave();
   return true;
@@ -1162,17 +1171,20 @@ static bool isAnyOffGrid(const T& container,
 }
 
 void SchematicEditorState_Select::updateAvailableFeatures() noexcept {
-  SchematicEditorFsmAdapter::Features features;
+  std::optional<SchematicEditorFsmAdapter::Features> features;
+  QString infoText;
   if (mSubState == SubState::PASTING) {
-    features |= SchematicEditorFsmAdapter::Feature::Rotate;
-    features |= SchematicEditorFsmAdapter::Feature::Mirror;
+    features = SchematicEditorFsmAdapter::Features();
+    *features |= SchematicEditorFsmAdapter::Feature::Rotate;
+    *features |= SchematicEditorFsmAdapter::Feature::Mirror;
   } else if ((mSubState == SubState::IDLE) || (mSubState == SubState::MOVING)) {
-    features |= SchematicEditorFsmAdapter::Feature::Select;
+    features = SchematicEditorFsmAdapter::Features();
+    *features |= SchematicEditorFsmAdapter::Feature::Select;
 
     if (SchematicClipboardData::isValid(qApp->clipboard()->mimeData()) ||
         SymbolClipboardData::isValid(qApp->clipboard()->mimeData()) ||
         ImageHelpers::isImageInClipboard()) {
-      features |= SchematicEditorFsmAdapter::Feature::Paste;
+      *features |= SchematicEditorFsmAdapter::Feature::Paste;
     }
 
     // Note: Also update features if the tab is not opened currently, as
@@ -1180,6 +1192,7 @@ void SchematicEditorState_Select::updateAvailableFeatures() noexcept {
     if (SchematicGraphicsScene* scene = getActiveSchematicScene()) {
       SchematicSelectionQuery query(*scene);
       query.addSelectedSymbols();
+      query.addSelectedPins();  // Just for the info box
       query.addSelectedBusLines();
       query.addSelectedBusJunctions();
       query.addSelectedBusLabels();
@@ -1198,14 +1211,14 @@ void SchematicEditorState_Select::updateAvailableFeatures() noexcept {
           (!query.getPolygons().isEmpty()) ||  //
           (!query.getTexts().isEmpty()) ||  //
           (!query.getImages().isEmpty())) {
-        features |= SchematicEditorFsmAdapter::Feature::Cut;
-        features |= SchematicEditorFsmAdapter::Feature::Copy;
-        features |= SchematicEditorFsmAdapter::Feature::Remove;
-        features |= SchematicEditorFsmAdapter::Feature::Rotate;
-        features |= SchematicEditorFsmAdapter::Feature::Mirror;
+        *features |= SchematicEditorFsmAdapter::Feature::Cut;
+        *features |= SchematicEditorFsmAdapter::Feature::Copy;
+        *features |= SchematicEditorFsmAdapter::Feature::Remove;
+        *features |= SchematicEditorFsmAdapter::Feature::Rotate;
+        *features |= SchematicEditorFsmAdapter::Feature::Mirror;
       }
       if (!query.getSymbols().isEmpty()) {
-        features |= SchematicEditorFsmAdapter::Feature::ResetTexts;
+        *features |= SchematicEditorFsmAdapter::Feature::ResetTexts;
       }
       if (isAnyOffGrid(query.getSymbols(), getGridInterval()) ||
           isAnyOffGrid(query.getBusJunctions(), getGridInterval()) ||
@@ -1215,20 +1228,83 @@ void SchematicEditorState_Select::updateAvailableFeatures() noexcept {
           isAnyOffGrid(query.getPolygons(), getGridInterval()) ||
           isAnyOffGrid(query.getTexts(), getGridInterval()) ||
           isAnyOffGrid(query.getImages(), getGridInterval())) {
-        features |= SchematicEditorFsmAdapter::Feature::SnapToGrid;
+        *features |= SchematicEditorFsmAdapter::Feature::SnapToGrid;
       }
       if ((!query.getSymbols().isEmpty()) ||  //
           (!query.getBusLabels().isEmpty()) ||  //
           (!query.getNetLabels().isEmpty()) ||  //
           (!query.getPolygons().isEmpty()) ||  //
           (!query.getTexts().isEmpty())) {
-        features |= SchematicEditorFsmAdapter::Feature::Properties;
+        *features |= SchematicEditorFsmAdapter::Feature::Properties;
       }
+      infoText = buildInfoBoxText(query);
     }
   } else {
-    return;  // Do not update features in other states.
+    // Do not update features in other states.
   }
-  mAdapter.fsmSetFeatures(features);
+  if (features) {
+    mAdapter.fsmSetFeatures(*features);
+  }
+  mAdapter.fsmSetViewInfoBoxText(infoText);
+}
+
+QString SchematicEditorState_Select::buildInfoBoxText(
+    const SchematicSelectionQuery& query) const noexcept {
+  const int count = query.getPins().count() + query.getNetLines().count() +
+      query.getBusLines().count();
+  if ((count == 0) || (count > 50)) {
+    return QString();
+  }
+
+  struct AttributeSet {
+    QString name;
+    QSet<QString> values;
+  };
+  AttributeSet cmpSignals{tr("Signal"), {}};
+  AttributeSet nets{tr("Net"), {}};
+  AttributeSet netClasses{tr("Class"), {}};
+  AttributeSet buses{tr("Bus"), {}};
+  AttributeSet pins{tr("Pin"), {}};
+  AttributeSet pads{tr("Pad(s)"), {}};
+  for (const SI_NetLine* nl : query.getNetLines()) {
+    nets.values.insert(*nl->getNetSegment().getNetSignal().getName());
+    netClasses.values.insert(
+        *nl->getNetSegment().getNetSignal().getNetClass().getName());
+  }
+  for (const SI_BusLine* bl : query.getBusLines()) {
+    buses.values.insert(*bl->getBusSegment().getBus().getName());
+  }
+  for (const SI_SymbolPin* pin : query.getPins()) {
+    cmpSignals.values.insert(
+        *pin->getComponentSignalInstance().getCompSignal().getName());
+    if (const NetSignal* net = pin->getCompSigInstNetSignal()) {
+      nets.values.insert(*net->getName());
+    } else {
+      nets.values.insert("✖");
+    }
+    pins.values.insert(*pin->getLibPin().getName());
+    pads.values.insert(pin->getNumbers().join(","));
+  }
+
+  // Determine maximum name length.
+  qsizetype maxNameLen = 0U;
+  QVector<const AttributeSet*> attributes;
+  for (const AttributeSet* set :
+       {&cmpSignals, &nets, &netClasses, &buses, &pins, &pads}) {
+    if (set->values.count() == 1) {
+      attributes.append(set);
+      maxNameLen = std::max(maxNameLen, set->name.length());
+    }
+  }
+
+  // Build string.
+  QStringList lines;
+  for (const AttributeSet* set : attributes) {
+    lines.append(set->name % ": " %
+                 QString(" ").repeated(maxNameLen - set->name.length()) %
+                 *set->values.begin());
+  }
+  return lines.join("\n");
 }
 
 /*******************************************************************************

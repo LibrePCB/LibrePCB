@@ -71,7 +71,7 @@ public:
   void updateHighlightedState() noexcept;
 
   // Inherited from QGraphicsItem
-  QPainterPath shape() const noexcept override;
+  QPainterPath shape() const noexcept override { return mShape; }
 
   // Operator Overloadings
   SGI_SymbolPin& operator=(const SGI_SymbolPin& rhs) = delete;
@@ -100,6 +100,9 @@ private:  // Data
   QScopedPointer<LineGraphicsItem> mLineGraphicsItem;
   QScopedPointer<PrimitiveTextGraphicsItem> mNameGraphicsItem;
   QScopedPointer<PrimitiveTextGraphicsItem> mNumbersGraphicsItem;
+
+  // Cache
+  QPainterPath mShape;
 
   // Slots
   SI_SymbolPin::OnEditedSlot mOnPinEditedSlot;
