@@ -29,6 +29,7 @@
 #include "../../cmd/cmdsymbolinstanceeditall.h"
 #include "../schematicgraphicsscene.h"
 
+#include <librepcb/core/attribute/attributesubstitutor.h>
 #include <librepcb/core/attribute/attributetype.h>
 #include <librepcb/core/attribute/attributeunit.h>
 #include <librepcb/core/library/cmp/component.h>
@@ -326,14 +327,17 @@ void SchematicEditorState_AddComponent::setValue(
   const AttributeUnit* oldAttrUnit = getValueAttributeUnit();
   mCurrentValueAttribute = std::nullopt;
   if (mCurrentComponent) {
-    // Only take the first line into account to avoid the problem described at
-    // https://github.com/LibrePCB-Libraries/LibrePCB_Base.lplib/pull/138.
-    const QString value = mCurrentValue.split("\n").value(0);
-    const QString key = QString(value).remove("{{").remove("}}").trimmed();
-    auto attr = mCurrentComponent->getAttributes().find(key);
-    if (attr && value.startsWith("{{") && value.endsWith("}}")) {
-      mCurrentValueAttribute = *attr;
-    }
+    // Only take the first attribute into account to avoid the problem described
+    // at https://github.com/LibrePCB-Libraries/LibrePCB_Base.lplib/pull/138.
+    auto callback = [this](const QString& key) {
+      if (!mCurrentValueAttribute) {
+        if (auto attr = mCurrentComponent->getAttributes().find(key)) {
+          mCurrentValueAttribute = *attr;
+        }
+      }
+      return QString();
+    };
+    AttributeSubstitutor::substitute(mCurrentValue, callback);
   }
   if (getValueAttributeKey() != oldAttrKey) {
     emit valueAttributeKeyChanged(getValueAttributeKey());
