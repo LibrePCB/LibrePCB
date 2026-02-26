@@ -52,15 +52,14 @@ productive use, please install an official release as described in the
 To compile and run LibrePCB, you need the following software components:
 
 - C++ compiler: g++, MinGW or Clang (any version with C++20 support should work)
-- [Rust](https://www.rust-lang.org/) toolchain (GNU, not MSVC)
+- [Rust](https://www.rust-lang.org/) toolchain >= 1.85 (GNU, not MSVC)
 - [Qt](http://www.qt.io/download-open-source/) >= 6.2 (make
   sure the [imageformats](https://doc.qt.io/qt-6/qtimageformats-index.html)
-  plugin is installed too as it will be needed at runtime!).
+  plugin is installed too as it will be needed at runtime!)
 - [OpenCASCADE](https://www.opencascade.com/) OCCT or OCE (optional,
   OCCT highly preferred)
 - [OpenGL Utility Library](https://en.wikipedia.org/wiki/OpenGL_Utility_Library)
   GLU (optional)
-- [zlib](http://www.zlib.net/)
 - [OpenSSL](https://www.openssl.org/)
 - [CMake](https://cmake.org/) 3.22 or newer
 
@@ -77,37 +76,32 @@ actually used for CI, but are also useful to build LibrePCB locally.
 ##### Ubuntu >= 22.04
 
 ```bash
-sudo apt-get install build-essential git cmake openssl zlib1g zlib1g-dev \
+sudo apt-get install build-essential rustup git cmake openssl \
      qt6-base-dev qt6-tools-dev qt6-tools-dev-tools qt6-l10n-tools \
      libqt6opengl6-dev libqt6svg6-dev qt6-image-formats-plugins \
-     libglu1-mesa-dev libtbb-dev libxi-dev occt-misc libocct-*-dev rustc cargo
+     libglu1-mesa-dev libtbb-dev libxi-dev occt-misc libocct-*-dev
 sudo apt-get install qtcreator # optional
+rustup install stable
 ```
 
 ##### Ubuntu 20.04
 
 ```bash
-sudo apt-get install build-essential git cmake openssl zlib1g zlib1g-dev \
+sudo apt-get install build-essential rustup git cmake openssl \
      qt5-default qttools5-dev-tools qttools5-dev libqt5opengl5-dev \
-     libqt5svg5-dev qt5-image-formats-plugins libglu1-mesa-dev \
-     liboce-*-dev rustc cargo
+     libqt5svg5-dev qt5-image-formats-plugins libglu1-mesa-dev liboce-*-dev
 sudo apt-get install qt5-doc qtcreator # optional
+rustup install stable
 ```
 
 #### Installation on Arch Linux
 
 ```bash
-sudo pacman -S base-devel git cmake openssl zlib desktop-file-utils \
+sudo pacman -S base-devel git cmake openssl desktop-file-utils \
      shared-mime-info qt6-base qt6-svg qt6-tools \
      qt6-imageformats opencascade rust
 sudo pacman -S qt6-doc qtcreator # optional
 ```
-
-*Note: Instead of installing the dependencies and building LibrePCB manually,
-you could install the package
-[librepcb-git](https://aur.archlinux.org/packages/librepcb-git/) from the AUR.
-The package clones and builds the latest version of the `master` branch from
-GitHub.*
 
 #### Installation on Mac OS X
 
