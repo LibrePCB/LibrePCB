@@ -140,13 +140,16 @@ MainWindow::MainWindow(GuiApplication& app,
     mSettingsPrefix(QString("window_%1").arg(mId)),
     mApp(app),
     mWindow(win),
-    mWidget(static_cast<QWidget*>(slint::cbindgen_private::slint_qt_get_widget(
-        &mWindow->window().window_handle()))),
+    mWidget(nullptr),
     mSections(new UiObjectList<WindowSection, ui::WindowSectionData>()),
     mProjectPreviewRenderer(new ProjectReadmeRenderer(this)),
     mTestAdapter() {
-  Q_ASSERT(mWidget);
-  mWidget->setObjectName("mainWindow");
+  qDebug() << &win->window().window_handle().handle()
+           << win->window().window_handle().handle()._0
+           << win->window().window_handle().handle()._1;
+
+  // Q_ASSERT(mWidget);
+  // mWidget->setObjectName("mainWindow");
 
   // Register Slint callbacks.
   mWindow->window().on_close_requested(
@@ -255,7 +258,7 @@ MainWindow::MainWindow(GuiApplication& app,
                            int scene, int frameIndex) {
     Q_UNUSED(frameIndex);
     if (auto section = mSections->value(sectionIndex)) {
-      const qreal scale = mWidget->devicePixelRatioF();
+      const qreal scale = 1;  // mWidget->devicePixelRatioF();
       return section->renderScene(width * scale, height * scale, scene);
     } else {
       return slint::Image();
@@ -264,7 +267,7 @@ MainWindow::MainWindow(GuiApplication& app,
   b.on_scene_pointer_event([this](int sectionIndex, float x, float y,
                                   slint::private_api::PointerEvent e) {
     if (auto section = mSections->value(sectionIndex)) {
-      const qreal scale = mWidget->devicePixelRatioF();
+      const qreal scale = 1;  // mWidget->devicePixelRatioF();
       section->processScenePointerEvent(QPointF(x * scale, y * scale), e);
     }
   });
@@ -272,7 +275,7 @@ MainWindow::MainWindow(GuiApplication& app,
                              slint::private_api::PointerScrollEvent e) {
     bool handled = false;
     if (auto section = mSections->value(sectionIndex)) {
-      const qreal scale = mWidget->devicePixelRatioF();
+      const qreal scale = 1;  // mWidget->devicePixelRatioF();
       handled = section->processSceneScrolled(QPointF(x * scale, y * scale), e);
     }
     return handled;
@@ -287,7 +290,7 @@ MainWindow::MainWindow(GuiApplication& app,
       });
   b.on_request_project_preview(
       [this](const slint::SharedString& fp, float width) {
-        const qreal scale = mWidget->devicePixelRatioF();
+        const qreal scale = 1;  // mWidget->devicePixelRatioF();
         mProjectPreviewRenderer->request(FilePath(s2q(fp)),
                                          static_cast<int>(width * scale));
         return true;
@@ -319,10 +322,10 @@ MainWindow::MainWindow(GuiApplication& app,
   QSettings cs;
   const QByteArray geometry =
       cs.value(mSettingsPrefix % "/geometry").toByteArray();
-  if (auto size = getOverrideWindowSize()) {
+  /*if (auto size = getOverrideWindowSize()) {
     if (!size->isEmpty()) {
       qInfo() << "Window size enforced to" << *size;
-      mWidget->resize(*size);
+      //mWidget->resize(*size);
     } else {
       qInfo() << "Window resizing explicitly disabled by environment variable.";
     }
@@ -333,12 +336,12 @@ MainWindow::MainWindow(GuiApplication& app,
     // the very first time (if no geometry is stored yet) to avoid interfering
     // with tiling window managers.
     qInfo() << "No window geometry to restore, thus maximizing.";
-    mWidget->setWindowState(Qt::WindowMaximized | Qt::WindowActive);
+   // mWidget->setWindowState(Qt::WindowMaximized | Qt::WindowActive);
   } else if (!mWidget->restoreGeometry(geometry)) {
     // This can happen if a tiling window manager is used, which is fine
     // since the user wants to control window geometry then.
     qInfo() << "Failed to restore window geometry, e.g. due to window manager.";
-  }
+  }*/
   d.set_erc_zoom_to_location(
       cs.value(mSettingsPrefix % "/erc_zoom_to_location", true).toBool());
   d.set_drc_zoom_to_location(
@@ -367,13 +370,13 @@ MainWindow::~MainWindow() noexcept {
  ******************************************************************************/
 
 bool MainWindow::isCurrentWindow() const noexcept {
-  return mWidget->isActiveWindow();
+  return true;  // mWidget->isActiveWindow();
 }
 
 void MainWindow::makeCurrentWindow() noexcept {
-  mWidget->show();
-  mWidget->raise();
-  mWidget->activateWindow();
+  // mWidget->show();
+  // mWidget->raise();
+  // mWidget->activateWindow();
 }
 
 void MainWindow::addSection(int newIndex, bool makeCurrent) noexcept {
@@ -524,17 +527,17 @@ slint::CloseRequestResponse MainWindow::closeRequested() noexcept {
   }
 
   // Save window state.
-  QSettings cs;
-  const ui::Data& d = mWindow->global<ui::Data>();
-  cs.setValue(mSettingsPrefix % "/geometry", mWidget->saveGeometry());
-  cs.setValue(mSettingsPrefix % "/erc_zoom_to_location",
-              d.get_erc_zoom_to_location());
-  cs.setValue(mSettingsPrefix % "/drc_zoom_to_location",
-              d.get_drc_zoom_to_location());
-  cs.setValue(mSettingsPrefix % "/order_open_web_browser",
-              d.get_order_pcb_open_web_browser());
-  cs.beginWriteArray(mSettingsPrefix % "/sections", mSections->count());
-  cs.endArray();
+  /* QSettings cs;
+   const ui::Data& d = mWindow->global<ui::Data>();
+   cs.setValue(mSettingsPrefix % "/geometry", mWidget->saveGeometry());
+   cs.setValue(mSettingsPrefix % "/erc_zoom_to_location",
+               d.get_erc_zoom_to_location());
+   cs.setValue(mSettingsPrefix % "/drc_zoom_to_location",
+               d.get_drc_zoom_to_location());
+   cs.setValue(mSettingsPrefix % "/order_open_web_browser",
+               d.get_order_pcb_open_web_browser());
+   cs.beginWriteArray(mSettingsPrefix % "/sections", mSections->count());
+   cs.endArray();*/
 
   emit aboutToClose();
   return slint::CloseRequestResponse::HideWindow;

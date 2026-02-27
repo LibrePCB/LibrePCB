@@ -44,6 +44,7 @@
 #include "workspace/quickaccessmodel.h"
 #include "workspace/workspacesettingsdialog.h"
 
+#include </usr/include/qt6/QtGui/6.10.1/QtGui/qpa/qplatformnativeinterface.h>
 #include <librepcb/core/application.h>
 #include <librepcb/core/attribute/attributetype.h>
 #include <librepcb/core/attribute/attributeunit.h>
@@ -57,56 +58,14 @@
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
 #include <slint-platform.h>
+#include <xcb/xcb.h>
 
+#include <QGuiApplication>
+#include <QWindow>
 #include <QtCore>
+#include <QtPrivate>
 
 #include <algorithm>
-
-QT_BEGIN_NAMESPACE
-
-class QOpenGLContext;
-class QWindow;
-class QPlatformWindow;
-class QBackingStore;
-
-class Q_GUI_EXPORT QPlatformNativeInterface : public QObject {
-public:
-  virtual void* nativeResourceForIntegration(const QByteArray& resource);
-  virtual void* nativeResourceForContext(const QByteArray& resource,
-                                         QOpenGLContext* context);
-  virtual void* nativeResourceForWindow(const QByteArray& resource,
-                                        QWindow* window);
-  virtual void* nativeResourceForBackingStore(const QByteArray& resource,
-                                              QBackingStore* backingStore);
-
-  typedef void* (*NativeResourceForIntegrationFunction)();
-  typedef void* (*NativeResourceForContextFunction)(QOpenGLContext* context);
-  typedef void* (*NativeResourceForWindowFunction)(QWindow* window);
-  typedef void* (*NativeResourceForBackingStoreFunction)(
-      QBackingStore* backingStore);
-  virtual NativeResourceForIntegrationFunction
-      nativeResourceFunctionForIntegration(const QByteArray& resource);
-  virtual NativeResourceForContextFunction nativeResourceFunctionForContext(
-      const QByteArray& resource);
-  virtual NativeResourceForWindowFunction nativeResourceFunctionForWindow(
-      const QByteArray& resource);
-  virtual NativeResourceForBackingStoreFunction
-      nativeResourceFunctionForBackingStore(const QByteArray& resource);
-
-  virtual QVariantMap windowProperties(QPlatformWindow* window) const;
-  virtual QVariant windowProperty(QPlatformWindow* window,
-                                  const QString& name) const;
-  virtual QVariant windowProperty(QPlatformWindow* window, const QString& name,
-                                  const QVariant& defaultValue) const;
-  virtual void setWindowProperty(QPlatformWindow* window, const QString& name,
-                                 const QVariant& value);
-
-Q_SIGNALS:
-  void windowPropertyChanged(QPlatformWindow* window,
-                             const QString& propertyName);
-};
-
-QT_END_NAMESPACE
 
 /*******************************************************************************
  *  Namespace
@@ -1303,7 +1262,7 @@ void GuiApplication::stopWindowStateAutosaveTimer() noexcept {
  ******************************************************************************/
 
 void GuiApplication::exec() {
-  slint::run_event_loop();
+  qApp->exec();
 }
 
 void GuiApplication::quit(QPointer<QWidget> parent) noexcept {
