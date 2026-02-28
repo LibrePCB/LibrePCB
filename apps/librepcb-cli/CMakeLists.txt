@@ -12,6 +12,19 @@ target_include_directories(
   librepcb_cli
   PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../../libs"
 )
+
+# The following libraries are available under
+# OpenBSD as static libraries that are part
+# of the X11 related base install sets.
+# The sets are parts of the install media
+# and are differents from the additional
+# packages.
+if(CMAKE_SYSTEM_NAME STREQUAL OpenBSD)
+  add_library(fontconfig STATIC)
+  add_library(X11 STATIC)
+  add_library(GL STATIC)
+endif(CMAKE_SYSTEM_NAME STREQUAL OpenBSD)
+
 target_link_libraries(
   librepcb_cli
   PRIVATE common
