@@ -2,12 +2,13 @@ import { Data, EditorCommand } from "../api.slint";
 
 export component MenuSeparator inherits Rectangle {
     height: 10px;
-    background: #404040;
+    background: Data.theme.palette.bg;
 
     Rectangle {
         y: parent.height / 2;
+        width: parent.width - 70px;
         height: 1px;
-        background: #707070;
+        background: Data.theme.palette.bg2;
     }
 }
 
@@ -25,12 +26,12 @@ export component MenuItem inherits Rectangle {
     in property <bool> checkable: false;
     in property <bool> checked: false;
     in property <bool> default: false;
-    property <color> text-color: enabled ? #d0d0d0 : #808080;
+    property <color> text-color: enabled ? Data.theme.palette.fg : Data.theme.palette.fg-disabled;
 
     callback clicked;
 
     height: 30px;
-    background: ta.has-hover ? #505050 : #404040;
+    background: ta.has-hover ? Data.theme.palette.bg2-hovered : Data.theme.palette.bg;
 
     // Accessibility
     accessible-role: button;
@@ -98,7 +99,8 @@ export component MenuItem inherits Rectangle {
             horizontal-alignment: right;
             vertical-alignment: center;
             font-size: 13px;
-            color: enabled ? #b0b0b0 : #707070;
+            font-weight: 300;
+            color: text-color;
             text: shortcuts;
             accessible-role: none;
         }
@@ -143,13 +145,20 @@ export component MenuPopup inherits PopupWindow {
 }
 
 export component MenuOverlay inherits Rectangle {
-    width: self.preferred-width;
-    height: self.preferred-height;
+    width: ta.width + 2px;
+    height: ta.height + 1px;
+    border-width: 1px;
+    border-color: Data.theme.palette.bg2;
 
     // The touch area is important to intercept and ignore any clicks
     // on disabled menu items or on menu separators, to avoid those
     // clicks from propagating to the elements underneath the menu.
-    TouchArea {
+    ta := TouchArea {
+        x: 1px;
+        y: 0;
+        width: self.preferred-width;
+        height: self.preferred-height;
+
         VerticalLayout {
             @children
         }

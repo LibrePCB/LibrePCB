@@ -39,14 +39,12 @@ component SideBarButton inherits Rectangle {
     callback clicked <=> ta.clicked;
 
     background: {
-        if self.checked {
-            #1c1c1c
-        } else if ta.pressed {
-            #555555
+        if self.checked || ta.pressed {
+            Data.theme.palette.bg3
         } else if ta.has-hover {
-            #424242
+            Data.theme.palette.bg2-hovered
         } else {
-            #353535
+            transparent
         }
     };
     height: self.width;
@@ -72,7 +70,7 @@ component SideBarButton inherits Rectangle {
     Image {
         width: parent.width * icon-scale * 0.7;
         height: self.width;
-        colorize: enabled ? white : gray;
+        colorize: enabled ? Data.theme.palette.fg : Data.theme.palette.fg-disabled;
         image-fit: contain;
         source: icon;
         accessible-role: none;
@@ -110,7 +108,7 @@ component SideBarButton inherits Rectangle {
             width: 100%;
             height: 100%;
             image-fit: contain;
-            colorize: yellow;
+            colorize: Data.theme.palette.fg-warning;
             source: @image-url("../../font-awesome/svgs/solid/triangle-exclamation.svg");
         }
     }
@@ -153,7 +151,7 @@ component SideBarButton inherits Rectangle {
 }
 
 export component SideBar inherits Rectangle {
-    background: #353535;
+    background: Data.theme.palette.bg2;
 
     function button-clicked(page: PanelPage) {
         if Data.panel-page == page {

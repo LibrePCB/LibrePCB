@@ -16,9 +16,9 @@ export component Button inherits Rectangle {
         } else if ta.pressed {
             #909090
         } else if !enabled {
-            Palette.foreground.darker(0.5)
+            Data.theme.palette.fg-disabled
         } else {
-            Palette.foreground
+            Data.theme.palette.fg
         }
     };
 
@@ -38,9 +38,9 @@ export component Button inherits Rectangle {
                 Constants.librepcb-color
             }
         } else if ta.has-hover {
-            #404040
+            Data.theme.palette.bg2-hovered
         } else {
-            #202020
+            Data.theme.palette.bg3
         }
     }
     border-color: Constants.librepcb-color;

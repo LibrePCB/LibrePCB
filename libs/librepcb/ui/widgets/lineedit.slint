@@ -2,7 +2,7 @@ import { Palette, ScrollView } from "std-widgets.slint";
 import { Badge } from "badge.slint";
 import { DropDownPopup } from "dropdownpopup.slint";
 import { IconButton } from "iconbutton.slint";
-import { Constants } from "../api.slint";
+import { Constants, Data } from "../api.slint";
 
 export component LineEdit inherits Rectangle {
     in-out property <string> text;
@@ -75,14 +75,14 @@ export component LineEdit inherits Rectangle {
     preferred-width: max(l.preferred-width, placeholder-txt.preferred-width + l.preferred-width - view.preferred-width, 100px);
     preferred-height: 28px;
     horizontal-stretch: 1;
-    background: #202020;
+    background: Data.theme.palette.bg3;
     border-color: {
         if enabled && has-error {
             edt.has-focus ? #ff0000 : #900000
         } else if edt.has-focus {
             Constants.librepcb-color
         } else if enabled && (!read-only) {
-            #606060
+            Data.theme.palette.fg-disabled
         } else {
             transparent
         }
@@ -111,7 +111,7 @@ export component LineEdit inherits Rectangle {
         x: frameless ? 5px : 10px;
         width: root.width - 2 * self.x;
         font-size: font-size;
-        color: enabled ? #909090 : #707070;
+        color: enabled ? Data.theme.palette.fg-placeholder : Data.theme.palette.fg-disabled;
         text: placeholder-text;
         wrap: no-wrap;
         overflow: elide;
@@ -142,7 +142,7 @@ export component LineEdit inherits Rectangle {
                     height: self.preferred-height;
                     font-size: font-size;
                     font-weight: font-weight;
-                    color: enabled ? Palette.foreground : Palette.foreground.darker(0.5);
+                    color: enabled ? Data.theme.palette.fg : Data.theme.palette.fg-disabled;
                     selection-background-color: Constants.librepcb-color;
                     selection-foreground-color: black;
                     enabled: enabled;

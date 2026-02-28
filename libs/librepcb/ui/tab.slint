@@ -1,3 +1,5 @@
+import { Data } from "api.slint";
+
 export component Tab inherits FocusScope {
     in property <bool> show-watermark: false;
 
@@ -17,7 +19,7 @@ export component Tab inherits FocusScope {
         width: min(root.width * 0.25, 200px);
         height: self.width;
         image-fit: contain;
-        colorize: #353535;
+        colorize: Data.theme.palette.bg.mix(Data.theme.palette.bg2, 0.4);
         source: @image-url("../../../img/app/librepcb-monochrome.svg");
     }
 
