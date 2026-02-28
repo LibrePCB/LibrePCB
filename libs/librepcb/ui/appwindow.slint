@@ -35,7 +35,7 @@ export component AppWindow inherits Window {
     property <length> actual-panel-width: (Data.panel-page != PanelPage.none) ? panel-width : 0;
 
     title: Data.window-title;
-    background: #2a2a2a;
+    background: Data.theme.palette.bg3;
     icon: @image-url("../../../img/app/librepcb.svg");
     default-font-family: "Noto Sans";
     preferred-width: 1024px;
@@ -90,7 +90,7 @@ export component AppWindow inherits Window {
             y: menubar.height;
             z: 90; // For the tooltips.
             width: ((root.width <= 1200px) || (root.height <= 600px)) ? 35px : 45px;
-            height: parent.height - self.y - statusbar.height - 1px;
+            height: parent.height - self.y - statusbar.height;
         }
 
         Rectangle {
@@ -121,12 +121,12 @@ export component AppWindow inherits Window {
 
         HorizontalLayout {
             x: sidebar.width + actual-panel-width;
-            y: sidebar.y + 1px;
+            y: sidebar.y;
             width: parent.width - self.x;
-            height: sidebar.height - 1px;
+            height: sidebar.height;
 
             if actual-panel-width > 0: Rectangle {
-                background: #555555;
+                background: Data.theme.palette.bg2;
                 width: 1px;
             }
 

@@ -1,5 +1,4 @@
-import { Palette } from "std-widgets.slint";
-import { Constants } from "../api.slint";
+import { Constants, Data } from "../api.slint";
 
 export component ProgressBar inherits Rectangle {
     in property <float> progress: 0;
@@ -7,7 +6,7 @@ export component ProgressBar inherits Rectangle {
     height: 5px;
     min-width: 50px;
     border-radius: self.height / 2;
-    background: #505050;
+    background: Data.theme.palette.bg;
 
     // Accessibility
     accessible-role: progress-indicator;

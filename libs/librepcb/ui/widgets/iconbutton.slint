@@ -25,13 +25,13 @@ export component IconButton inherits Rectangle {
     in property <length> icon-offset-y: 0;
     in property <angle> icon-rotation: 0deg;
     in property <bool> colorize: true;
-    in property <color> color-disabled: #707070;
-    in property <color> color-enabled: (style == IconButtonStyle.checkable-hyperlink) ? #909090 : Palette.foreground;
+    in property <color> color-disabled: Data.theme.palette.fg-disabled;
+    in property <color> color-enabled: (style == IconButtonStyle.checkable-hyperlink) ? #909090 : Data.theme.palette.fg;
     in property <color> color-checked: (style == IconButtonStyle.checkable-hyperlink) ? #e0e0e0 : color-enabled;
-    in property <color> color-hovered: (style == IconButtonStyle.checkable-hyperlink) ? self.color-checked : white;
+    in property <color> color-hovered: (style == IconButtonStyle.checkable-hyperlink) ? self.color-checked : Data.theme.palette.fg-hovered;
     in property <color> background-color: transparent;
-    in property <color> background-color-hovered: (style == IconButtonStyle.standard) ? #454545 : background-color;
-    in property <color> background-color-checked: ((style == IconButtonStyle.standard) || (style == IconButtonStyle.read-only)) ? #101010 : background-color;
+    in property <color> background-color-hovered: (style == IconButtonStyle.standard) ? Data.theme.palette.bg2-hovered : background-color;
+    in property <color> background-color-checked: ((style == IconButtonStyle.standard) || (style == IconButtonStyle.read-only)) ? Data.theme.palette.bg2-checked : background-color;
     in property <string> tooltip: cmd.text;
     in property <bool> tooltip-delayed: style != IconButtonStyle.read-only;
     in property <ToolTipPosition> tooltip-position: bottom;
