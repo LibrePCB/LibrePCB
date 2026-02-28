@@ -93,69 +93,30 @@ export component AppWindow inherits Window {
             height: parent.height - self.y - statusbar.height - 1px;
         }
 
-        if Data.panel-page == PanelPage.home: home-panel := HomePanel {
+        Rectangle {
             x: sidebar.width;
             y: sidebar.y;
             z: 80; // For the tooltips.
             width: panel-width;
             height: sidebar.height;
-        }
 
-        if Data.panel-page == PanelPage.documents: documents-panel := DocumentsPanel {
-            x: sidebar.width;
-            y: sidebar.y;
-            z: 80; // For the tooltips.
-            width: panel-width;
-            height: sidebar.height;
-        }
+            if Data.panel-page == PanelPage.home: home-panel := HomePanel { }
 
-        if Data.panel-page == PanelPage.layers: GraphicsLayersPanel {
-            x: sidebar.width;
-            y: sidebar.y;
-            z: 80; // For the tooltips.
-            width: panel-width;
-            height: sidebar.height;
-        }
+            if Data.panel-page == PanelPage.documents: documents-panel := DocumentsPanel { }
 
-        if Data.panel-page == PanelPage.place-devices: PlaceDevicesPanel {
-            x: sidebar.width;
-            y: sidebar.y;
-            z: 80; // For the tooltips.
-            width: panel-width;
-            height: sidebar.height;
-            window-height: root.height;
-        }
+            if Data.panel-page == PanelPage.layers: GraphicsLayersPanel { }
 
-        if Data.panel-page == PanelPage.rule-check: RuleCheckPanel {
-            x: sidebar.width;
-            y: sidebar.y;
-            z: 80; // For the tooltips.
-            width: panel-width;
-            height: sidebar.height;
-        }
+            if Data.panel-page == PanelPage.place-devices: PlaceDevicesPanel {
+                window-height: root.height;
+            }
 
-        if Data.panel-page == PanelPage.order: OrderPanel {
-            x: sidebar.width;
-            y: sidebar.y;
-            z: 80; // For the tooltips.
-            width: panel-width;
-            height: sidebar.height;
-        }
+            if Data.panel-page == PanelPage.rule-check: RuleCheckPanel { }
 
-        if Data.panel-page == PanelPage.libraries: LibrariesPanel {
-            x: sidebar.width;
-            y: sidebar.y;
-            z: 80; // For the tooltips.
-            width: panel-width;
-            height: sidebar.height;
-        }
+            if Data.panel-page == PanelPage.order: OrderPanel { }
 
-        if Data.panel-page == PanelPage.about: AboutPanel {
-            x: sidebar.width;
-            y: sidebar.y;
-            z: 80; // For the tooltips.
-            width: panel-width;
-            height: sidebar.height;
+            if Data.panel-page == PanelPage.libraries: LibrariesPanel { }
+
+            if Data.panel-page == PanelPage.about: AboutPanel { }
         }
 
         HorizontalLayout {
