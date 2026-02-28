@@ -1,9 +1,8 @@
-import { Palette } from "std-widgets.slint";
-import { Constants } from "../api.slint";
+import { Data } from "../api.slint";
 
 export component Spinner inherits Rectangle {
     in property <bool> indeterminate: false;  // Actually not supported yet.
-    in property <color> foreground-color: Palette.foreground.brighter(2);
+    in property <color> foreground-color: Data.theme.palette.fg-disabled;
     property <length> size: min(self.width, self.height);
     property <length> dot-size: size * 0.22;
     property <[angle]> angles: [

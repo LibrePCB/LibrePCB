@@ -35,7 +35,7 @@ component MainMenuItem inherits Rectangle {
     callback hovered;
 
     width: self.visible ? (txt.preferred-width + 10px) : 0;
-    background: (active || ta.has-hover) ? #404040 : #252525;
+    background: (active || ta.has-hover) ? Data.theme.palette.bg : transparent;
 
     // Accessibility
     accessible-role: button;
@@ -47,6 +47,7 @@ component MainMenuItem inherits Rectangle {
     txt := Text {
         x: 5px;
         font-size: 15px;
+        color: Data.theme.palette.fg;
         text: text;
     }
 
@@ -69,7 +70,7 @@ component MenuBarSeparator inherits Rectangle {
     Rectangle {
         width: 1px;
         height: 15px;
-        background: #606060;
+        background: Data.theme.palette.fg-disabled;
     }
 }
 
@@ -133,7 +134,7 @@ export component MainMenuBar inherits Rectangle {
         }
     }
 
-    background: #252525;
+    background: Data.theme.palette.bg2;
 
     HorizontalLayout {
         padding-right: 4px;
@@ -151,7 +152,7 @@ export component MainMenuBar inherits Rectangle {
             }
 
             if self.active: file-menu-popup := MenuOverlay {
-                x: 0;
+                x: -1px;
                 y: parent.height;
 
                 new-project-item := MenuItem {
@@ -388,7 +389,7 @@ export component MainMenuBar inherits Rectangle {
             }
 
             if self.active: menu-edit := MenuOverlay {
-                x: 0;
+                x: -1px;
                 y: parent.height;
 
                 undo-item := MenuItem {
@@ -675,7 +676,7 @@ export component MainMenuBar inherits Rectangle {
             }
 
             if self.active: view-menu-popup := MenuOverlay {
-                x: 0;
+                x: -1px;
                 y: parent.height;
 
                 new-window-item := MenuItem {
@@ -874,7 +875,7 @@ export component MainMenuBar inherits Rectangle {
             }
 
             if self.active: library-menu-popup := MenuOverlay {
-                x: 0;
+                x: -1px;
                 y: parent.height;
 
                 save-library-item := MenuItem {
@@ -1016,7 +1017,7 @@ export component MainMenuBar inherits Rectangle {
             }
 
             if self.active: category-menu-popup := MenuOverlay {
-                x: 0;
+                x: -1px;
                 y: parent.height;
 
                 save-category-item := MenuItem {
@@ -1070,7 +1071,7 @@ export component MainMenuBar inherits Rectangle {
             }
 
             if self.active: symbol-menu-popup := MenuOverlay {
-                x: 0;
+                x: -1px;
                 y: parent.height;
 
                 save-symbol-item := MenuItem {
@@ -1131,7 +1132,7 @@ export component MainMenuBar inherits Rectangle {
             }
 
             if self.active: package-menu-popup := MenuOverlay {
-                x: 0;
+                x: -1px;
                 y: parent.height;
 
                 save-package-item := MenuItem {
@@ -1192,7 +1193,7 @@ export component MainMenuBar inherits Rectangle {
             }
 
             if self.active: component-menu-popup := MenuOverlay {
-                x: 0;
+                x: -1px;
                 y: parent.height;
 
                 save-component-item := MenuItem {
@@ -1242,7 +1243,7 @@ export component MainMenuBar inherits Rectangle {
             }
 
             if self.active: device-menu-popup := MenuOverlay {
-                x: 0;
+                x: -1px;
                 y: parent.height;
 
                 save-device-item := MenuItem {
@@ -1292,7 +1293,7 @@ export component MainMenuBar inherits Rectangle {
             }
 
             if self.active: organization-menu-popup := MenuOverlay {
-                x: 0;
+                x: -1px;
                 y: parent.height;
 
                 save-organization-item := MenuItem {
@@ -1342,7 +1343,7 @@ export component MainMenuBar inherits Rectangle {
             }
 
             if self.active: project-menu-popup := MenuOverlay {
-                x: 0;
+                x: -1px;
                 y: parent.height;
 
                 project-setup-item := MenuItem {
@@ -1550,7 +1551,7 @@ export component MainMenuBar inherits Rectangle {
             }
 
             if self.active: help-menu-popup := MenuOverlay {
-                x: 0;
+                x: -1px;
                 y: parent.height;
 
                 shortcuts-reference-item := MenuItem {
@@ -1659,7 +1660,7 @@ export component MainMenuBar inherits Rectangle {
 
                 read-only-badge := Badge {
                     width: self.preferred-width;
-                    text-color: yellow;
+                    text-color: Data.theme.palette.fg-warning;
                     text: @tr("read-only").to-lowercase();
                 }
             }

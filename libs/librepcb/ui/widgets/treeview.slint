@@ -3,6 +3,7 @@ import { ListViewItemButton } from "listviewitembutton.slint";
 import {
     Backend,
     Constants,
+    Data,
     EditorCommandSet as Cmd,
     Helpers,
     TreeViewItemAction,
@@ -75,7 +76,7 @@ export component TreeView inherits FocusScope {
             }
 
             Rectangle {
-                background: (current-index == index) ? #454545 : (parent.has-hover ? #383838 : transparent);
+                background: (current-index == index) ? Data.theme.palette.bg2-checked : (parent.has-hover ? Data.theme.palette.bg2-hovered : transparent);
 
                 HorizontalLayout {
                     spacing: 5px;
@@ -94,7 +95,7 @@ export component TreeView inherits FocusScope {
                             height: parent.height - 2 * self.y;
                             image-fit: contain;
                             source: @image-url("../../../font-awesome/svgs/solid/angle-right.svg");
-                            colorize: Palette.foreground;
+                            colorize: Data.theme.palette.fg;
                             transform-rotation: item.expanded ? 90deg : 0;
                             visible: item.has-children;
                             accessible-role: none;
@@ -123,7 +124,7 @@ export component TreeView inherits FocusScope {
 
                     item-text-txt := Text {
                         horizontal-stretch: 1;
-                        color: is-enabled ? #dddddd : #a0a0a0;
+                        color: is-enabled ? Data.theme.palette.fg : Data.theme.palette.fg-disabled;
                         font-size: font-size;
                         overflow: TextOverflow.elide;
                         vertical-alignment: center;

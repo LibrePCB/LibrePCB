@@ -33,6 +33,7 @@ export component HomeTab inherits Tab {
             font-size: 20px;
             font-weight: 700;
             wrap: word-wrap;
+            color: Data.theme.palette.fg;
             text: @tr("Get Started With LibrePCB");
         }
 
@@ -111,10 +112,8 @@ export component HomeTab inherits Tab {
         if compact-layout: donate-btn-1 := DonateButton { }
 
         if !compact-layout: Rectangle {
-            border-color: Palette.foreground;
-            border-width: 1px;
             border-radius: 10px;
-            background: #2a2a2ac0;
+            background: Data.theme.palette.bg3;
 
             HorizontalLayout {
                 padding: 8px;
@@ -125,6 +124,7 @@ export component HomeTab inherits Tab {
                     font-size: 14px;
                     font-italic: true;
                     wrap: word-wrap;
+                    color: Data.theme.palette.fg;
                     text: @tr("Support the LibrePCB project with a donation to keep the development and maintenance ongoing ‒ Thank you!");
                 }
 

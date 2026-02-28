@@ -105,7 +105,7 @@ export component StatusBar inherits Rectangle {
     callback focus-root;
 
     height: 25px;
-    background: #353535;
+    background: Data.theme.palette.bg2;
 
     HorizontalLayout {
         padding-left: 10px;
@@ -117,6 +117,7 @@ export component StatusBar inherits Rectangle {
                 width: 100%;
                 height: 100%;
                 vertical-alignment: center;
+                color: Data.theme.palette.fg;
                 accessible-description: "status text";
 
                 states [
@@ -143,7 +144,7 @@ export component StatusBar inherits Rectangle {
             vertical-alignment: center;
             font-family: "Noto Sans Mono";
             font-size: 11px;
-            color: white;
+            color: Data.theme.palette.fg;
             text: Data.cursor-coordinates;
             visible: Data.current-tab.features.grid != FeatureState.not-supported;
             accessible-role: none;
@@ -213,7 +214,7 @@ export component StatusBar inherits Rectangle {
                     wrap: no-wrap;
                     single-line: true;
                     vertical-alignment: center;
-                    color: (!parent.enabled) ? #707070 : white;
+                    color: parent.enabled ? Data.theme.palette.fg : Data.theme.palette.fg-disabled;
                     selection-background-color: Constants.librepcb-color;
                     selection-foreground-color: black;
                     text: data-text;
@@ -287,7 +288,6 @@ export component StatusBar inherits Rectangle {
                 icon: @image-url("../../font-awesome/svgs/solid/caret-up.svg");
                 icon-scale: 1.0;
                 icon-offset-y: 2px;
-                color-enabled: white;
                 enabled: Data.current-tab.features.grid == FeatureState.enabled;
 
                 clicked => {
@@ -301,7 +301,6 @@ export component StatusBar inherits Rectangle {
                 icon: @image-url("../../font-awesome/svgs/solid/caret-down.svg");
                 icon-scale: 1.0;
                 icon-offset-y: -2px;
-                color-enabled: white;
                 enabled: Data.current-tab.features.grid == FeatureState.enabled;
 
                 clicked => {
@@ -323,7 +322,6 @@ export component StatusBar inherits Rectangle {
                 }
             };
             icon-scale: 0.7;
-            color-enabled: white;
             enabled: Data.current-tab.features.grid == FeatureState.enabled;
 
             clicked => {
@@ -349,7 +347,6 @@ export component StatusBar inherits Rectangle {
                 }
             };
             icon-scale: 0.6;
-            color-enabled: white;
             checked: {
                 if Data.current-tab.type == TabType.schematic {
                     Data.current-schematic-tab.ignore-placement-locks
@@ -400,7 +397,6 @@ export component StatusBar inherits Rectangle {
                     @image-url("../../font-awesome/svgs/regular/bell.svg")
                 }
             };
-            color-enabled: white;
             border-width: (Data.notifications-unread > 0) ? 1px : 0px;
             border-color: Constants.librepcb-color;
             enabled: Data.notifications.length > 0;

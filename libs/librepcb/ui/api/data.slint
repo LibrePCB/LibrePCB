@@ -31,10 +31,14 @@ import {
     TreeViewItemData,
     WindowSectionData,
 } from "types.slint";
+import { Theme, Themes } from "themes.slint";
 
 export global Data {
     // Preview mode: True for preview, set to false by the backend
     in property <bool> preview-mode: true;
+
+    // Theme
+    in property <Theme> theme: Themes.light;
 
     // Window data
     in property <int> window-id: 1;
@@ -294,7 +298,7 @@ export global Data {
                     error: "Some error message here...",
                 }
             ],
-            current-tab-index: 3,
+            current-tab-index: 0,
         },
         {
             tabs: [

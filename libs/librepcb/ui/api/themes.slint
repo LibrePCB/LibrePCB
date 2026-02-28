@@ -1,0 +1,80 @@
+export struct Palette {
+    bg: color, // window
+    bg2: color, // menu bar, side bar, status bar
+    bg3: color, // controls
+    bg2-hovered: color,
+    bg2-checked: color,
+
+
+    fg: color, // text/icons on bg
+    fg-placeholder: color,
+    fg-disabled: color, // text/icons on bg
+    fg-hovered: color,
+
+    fg-warning: color, // text/icons on bg
+
+    //background: color,
+    //background-hovered: color,
+    //background-selected: color,
+    //background-alternate: color,
+    //background-alternate-selected: color,
+    //background-alternate-hovered: color,
+    //foreground: color,
+    //foreground-disabled: color,
+    //sidebar-background: color,
+    //sidepanel-background: color,
+}
+
+export struct Theme {
+    palette: Palette,
+}
+
+export global Themes {
+    out property <Theme> dark: {
+        //background: #2a2a2a,
+        //background-hovered: #2a2a2a,
+        //background-selected: #404040,
+        //background-alternate: #353535,
+        //background-alternate-hovered: #505050,
+        //background-alternate-selected: #2a2a2a,
+        //foreground: #c4c4c4,
+        //foreground-disabled: #707070,
+        //sidebar-background: #353535,
+        //sidepanel-background: #2a2a2a,
+        palette: {
+            bg: #2a2a2a,
+            bg2: #353535,
+            bg3: #202020,
+            bg2-hovered: #424242,
+            bg2-checked: #2a2a2a,
+            fg: #c4c4c4,
+            fg-placeholder: #909090,
+            fg-disabled: #707070,
+            fg-hovered: #ff0000,
+            fg-warning: Colors.yellow,
+        },
+    };
+
+    out property <Theme> light: {
+        //background: #d7d7d7,
+            //background-selected: #c0c0c0,
+            //background-alternate: #ffffff,
+            //background-alternate-hovered: #c0c0c0,
+            //foreground: #292929,
+            //foreground-disabled: #b1b1b1,
+            //sidebar-background: #ffffff,
+            //sidepanel-background: #d6d6d6,
+        palette: {
+            bg: #ffffff,
+            bg2: #d0d0d0,
+            bg3: #f5f5f5,
+            bg2-hovered: #f0f0f0,
+            bg2-checked: #bbbbbb,
+            fg: #292929,
+            fg-placeholder: #808080,
+            fg-disabled: #b0b0b0,
+            fg-hovered: #606060,
+            fg-warning: #d6c800,
+        },
+    };
+}
