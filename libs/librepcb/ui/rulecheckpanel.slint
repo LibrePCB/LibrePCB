@@ -115,7 +115,7 @@ component RuleCheckListItem inherits Rectangle {
     }
 }
 
-export component RuleCheckPanel inherits Rectangle {
+export component RuleCheckPanel inherits FocusScope {
     property <RuleCheckData> check: Data.current-rule-check;
     property <string> title: Helpers.get-rule-check-title-for-type(check.type);
     property <[RuleCheckMessageData]> model: check.messages;
@@ -147,267 +147,263 @@ export component RuleCheckPanel inherits Rectangle {
         }
     }
 
-    background: #2a2a2a;
-
     // Set focus when panel is shown. Not sure if it's always desired(?).
     init => {
-        fs.focus();
+        root.focus();
     }
 
-    fs := FocusScope {
-        VerticalLayout {
-            header := PanelHeader {
-                z: 10;  // For the tooltip.
-                title: title.to-uppercase();
-                show-spinner: check.state == RuleCheckState.running;
-                highlight: fs.has-focus;
+    VerticalLayout {
+        header := PanelHeader {
+            z: 10;  // For the tooltip.
+            title: title.to-uppercase();
+            show-spinner: check.state == RuleCheckState.running;
+            highlight: root.has-focus;
 
-                if !check.execution-error.is-empty: error-btn := IconButton {
-                    width: self.height;
-                    style: read-only;
-                    icon: @image-url("../../font-awesome/svgs/solid/circle-xmark.svg");
-                    icon-scale: 0.7;
-                    tooltip: check.execution-error;
-                    color-enabled: red;
+            if !check.execution-error.is-empty: error-btn := IconButton {
+                width: self.height;
+                style: read-only;
+                icon: @image-url("../../font-awesome/svgs/solid/circle-xmark.svg");
+                icon-scale: 0.7;
+                tooltip: check.execution-error;
+                color-enabled: red;
+            }
+
+            if check.state == RuleCheckState.outdated: outdated-btn := IconButton {
+                width: self.height;
+                style: read-only;
+                icon: @image-url("../../font-awesome/svgs/solid/triangle-exclamation.svg");
+                icon-scale: 0.7;
+                tooltip: @tr("Possibly Outdated Data") + "\n\n" + @tr("Trigger the checks again to refresh the messages.");
+                color-enabled: yellow;
+            }
+
+            if check.type == RuleCheckType.drc: quick-check-btn := IconButton {
+                width: self.height;
+                cmd: Cmd.run-quick-check;
+                icon-scale: 0.7;
+                enabled: check.state != RuleCheckState.running;
+
+                clicked => {
+                    Helpers.trigger-current-board-action(BoardAction.run-quick-check);
                 }
+            }
 
-                if check.state == RuleCheckState.outdated: outdated-btn := IconButton {
-                    width: self.height;
-                    style: read-only;
-                    icon: @image-url("../../font-awesome/svgs/solid/triangle-exclamation.svg");
-                    icon-scale: 0.7;
-                    tooltip: @tr("Possibly Outdated Data") + "\n\n" + @tr("Trigger the checks again to refresh the messages.");
-                    color-enabled: yellow;
+            if check.type == RuleCheckType.drc: drc-btn := IconButton {
+                width: self.height;
+                cmd: Cmd.run-design-rule-check;
+                icon: @image-url("../../font-awesome/svgs/solid/arrows-rotate.svg");
+                icon-scale: 0.7;
+                enabled: check.state != RuleCheckState.running;
+
+                clicked => {
+                    Helpers.trigger-current-board-action(BoardAction.run-drc);
                 }
+            }
 
-                if check.type == RuleCheckType.drc: quick-check-btn := IconButton {
-                    width: self.height;
-                    cmd: Cmd.run-quick-check;
-                    icon-scale: 0.7;
-                    enabled: check.state != RuleCheckState.running;
+            if check.type == RuleCheckType.drc: drc-setup-btn := IconButton {
+                width: self.height;
+                icon: @image-url("../../font-awesome/svgs/solid/sliders.svg");
+                icon-scale: 0.7;
+                tooltip: @tr("DRC Settings");
+                enabled: check.state != RuleCheckState.running;
 
-                    clicked => {
-                        Helpers.trigger-current-board-action(BoardAction.run-quick-check);
+                clicked => {
+                    Helpers.trigger-current-board-action(BoardAction.open-drc-setup-dialog);
+                }
+            }
+
+            if check.type == RuleCheckType.package-check: settings-btn := IconButton {
+                width: self.height;
+                icon: @image-url("../../font-awesome/svgs/solid/sliders.svg");
+                icon-scale: 0.7;
+                tooltip: @tr("Settings");
+                enabled: check.state != RuleCheckState.running;
+
+                clicked => {
+                    settings-expanded = !settings-expanded;
+                }
+            }
+
+            if (check.type == RuleCheckType.erc) || (check.type == RuleCheckType.drc): zoom-to-location-btn := IconButton {
+                width: self.height;
+                icon: @image-url("../../font-awesome/svgs/solid/location-crosshairs.svg");
+                icon-scale: 0.7;
+                tooltip: @tr("Zoom to Location");
+                checked: zoom-to-location;
+                enabled: check.state != RuleCheckState.running;
+
+                clicked => {
+                    if check.type == RuleCheckType.drc {
+                        Data.drc-zoom-to-location = !Data.drc-zoom-to-location;
+                    } else {
+                        Data.erc-zoom-to-location = !Data.erc-zoom-to-location;
+                    }
+                }
+            }
+        }
+
+        if (check.type == RuleCheckType.package-check) && settings-expanded: Rectangle {
+            property <int> section-index: Data.current-section-index;
+            property <[PackageTabData]> tabs: Data.current-section.package-tabs;
+            property <int> index: Data.current-section.current-tab-index;
+            property <bool> read-only: Data.current-section.tabs[index].features.save != FeatureState.enabled;
+
+            Rectangle {
+                y: parent.height - self.height;
+                height: 1px;
+                background: #555555;
+            }
+
+            GridLayout {
+                padding: 5px;
+                spacing: 5px;
+
+                Row {
+                    Text {
+                        colspan: 2;
+                        text: @tr("These settings are stored in the currently opened package and don't affect other packages.");
+                        font-size: 11px;
+                        font-italic: true;
+                        wrap: word-wrap;
                     }
                 }
 
-                if check.type == RuleCheckType.drc: drc-btn := IconButton {
-                    width: self.height;
-                    cmd: Cmd.run-design-rule-check;
-                    icon: @image-url("../../font-awesome/svgs/solid/arrows-rotate.svg");
-                    icon-scale: 0.7;
-                    enabled: check.state != RuleCheckState.running;
+                Row {
+                    min-copper-clearance-txt := Text {
+                        width: self.preferred-width;
+                        text: @tr("Min. Copper Clearance:");
+                        vertical-alignment: center;
+                        accessible-role: none;
+                    }
 
-                    clicked => {
-                        Helpers.trigger-current-board-action(BoardAction.run-drc);
+                    LengthEdit {
+                        z: 100;
+                        height: self.preferred-height;
+                        data: tabs[index].min-copper-clearance;
+                        enabled: !read-only;
+                        tooltip: @tr("Recommended: {} (default)", "200μm") + "\n" + @tr("Reduce it for packages with very small pitch");
+                        accessible-label: min-copper-clearance-txt.text;
+
+                        value-changed(value) => {
+                            tabs[index].min-copper-clearance.value = value;
+                        }
+
+                        unit-changed(unit) => {
+                            tabs[index].min-copper-clearance.unit = unit;
+                        }
+
+                        increase-triggered() => {
+                            tabs[index].min-copper-clearance.increase = true;
+                        }
+
+                        decrease-triggered() => {
+                            tabs[index].min-copper-clearance.decrease = true;
+                        }
                     }
                 }
 
-                if check.type == RuleCheckType.drc: drc-setup-btn := IconButton {
-                    width: self.height;
-                    icon: @image-url("../../font-awesome/svgs/solid/sliders.svg");
-                    icon-scale: 0.7;
-                    tooltip: @tr("DRC Settings");
-                    enabled: check.state != RuleCheckState.running;
+                Row {
+                    settings-apply-btn := Button {
+                        colspan: 2;
+                        text: @tr("Apply");
+                        primary: true;
 
-                    clicked => {
-                        Helpers.trigger-current-board-action(BoardAction.open-drc-setup-dialog);
-                    }
-                }
-
-                if check.type == RuleCheckType.package-check: settings-btn := IconButton {
-                    width: self.height;
-                    icon: @image-url("../../font-awesome/svgs/solid/sliders.svg");
-                    icon-scale: 0.7;
-                    tooltip: @tr("Settings");
-                    enabled: check.state != RuleCheckState.running;
-
-                    clicked => {
-                        settings-expanded = !settings-expanded;
-                    }
-                }
-
-                if (check.type == RuleCheckType.erc) || (check.type == RuleCheckType.drc): zoom-to-location-btn := IconButton {
-                    width: self.height;
-                    icon: @image-url("../../font-awesome/svgs/solid/location-crosshairs.svg");
-                    icon-scale: 0.7;
-                    tooltip: @tr("Zoom to Location");
-                    checked: zoom-to-location;
-                    enabled: check.state != RuleCheckState.running;
-
-                    clicked => {
-                        if check.type == RuleCheckType.drc {
-                            Data.drc-zoom-to-location = !Data.drc-zoom-to-location;
-                        } else {
-                            Data.erc-zoom-to-location = !Data.erc-zoom-to-location;
+                        clicked => {
+                            Backend.trigger-tab(section-index, index, TabAction.apply);
                         }
                     }
                 }
             }
+        }
 
-            if (check.type == RuleCheckType.package-check) && settings-expanded: Rectangle {
-                property <int> section-index: Data.current-section-index;
-                property <[PackageTabData]> tabs: Data.current-section.package-tabs;
-                property <int> index: Data.current-section.current-tab-index;
-                property <bool> read-only: Data.current-section.tabs[index].features.save != FeatureState.enabled;
+        if model.length == 0: VerticalLayout {
+            padding: 8px;
 
-                Rectangle {
-                    y: parent.height - self.height;
-                    height: 1px;
-                    background: #555555;
-                }
-
-                GridLayout {
-                    padding: 5px;
-                    spacing: 5px;
-
-                    Row {
-                        Text {
-                            colspan: 2;
-                            text: @tr("These settings are stored in the currently opened package and don't affect other packages.");
-                            font-size: 11px;
-                            font-italic: true;
-                            wrap: word-wrap;
-                        }
-                    }
-
-                    Row {
-                        min-copper-clearance-txt := Text {
-                            width: self.preferred-width;
-                            text: @tr("Min. Copper Clearance:");
-                            vertical-alignment: center;
-                            accessible-role: none;
-                        }
-
-                        LengthEdit {
-                            z: 100;
-                            height: self.preferred-height;
-                            data: tabs[index].min-copper-clearance;
-                            enabled: !read-only;
-                            tooltip: @tr("Recommended: {} (default)", "200μm") + "\n" + @tr("Reduce it for packages with very small pitch");
-                            accessible-label: min-copper-clearance-txt.text;
-
-                            value-changed(value) => {
-                                tabs[index].min-copper-clearance.value = value;
-                            }
-
-                            unit-changed(unit) => {
-                                tabs[index].min-copper-clearance.unit = unit;
-                            }
-
-                            increase-triggered() => {
-                                tabs[index].min-copper-clearance.increase = true;
-                            }
-
-                            decrease-triggered() => {
-                                tabs[index].min-copper-clearance.decrease = true;
-                            }
-                        }
-                    }
-
-                    Row {
-                        settings-apply-btn := Button {
-                            colspan: 2;
-                            text: @tr("Apply");
-                            primary: true;
-
-                            clicked => {
-                                Backend.trigger-tab(section-index, index, TabAction.apply);
-                            }
-                        }
+            Text {
+                width: 100%;
+                font-size: 12px;
+                font-italic: true;
+                wrap: word-wrap;
+                text: {
+                    if check.state == RuleCheckState.not-run-yet {
+                        return @tr("No checks run yet. Trigger them with one of the buttons above.");
+                    } else if check.state == RuleCheckState.running {
+                        return @tr("Running, hang on...");
+                    } else {
+                        return @tr("No messages.");
                     }
                 }
             }
+        }
 
-            if model.length == 0: VerticalLayout {
+        view := ListView {
+            property <length> scrollbar-width: (self.height < self.viewport-height) ? 7px : 0;
+
+            vertical-stretch: 1;
+            visible: model.length > 0;
+
+            for msg[index] in model: item := RuleCheckListItem {
+                height: item-height;
+                model: model;
+                index: index;
+                read-only: check.read-only;
+                enabled: check.execution-error.is-empty && (check.state != RuleCheckState.running);
+                selected: (index == selected-index);
+                scrollbar-width: scrollbar-width;
+
+                clicked => {
+                    set-current-index(index, false);
+                    root.focus();
+                }
+
+                double-clicked => {
+                    set-current-index(index, true);
+                    root.focus();
+                }
+            }
+        }
+
+        if item-selected: selected-msg-header := PanelHeader {
+            title: selected-item.message;
+        }
+
+        if item-selected: Rectangle {
+            background: #202020;
+
+            VerticalLayout {
                 padding: 8px;
 
-                Text {
+                selected-msg-txt := Text {
+                    // Only the DRC is not run automatically, thus the
+                    // autofix state persists until it is run again.
+                    property <bool> autofixed: selected-item.autofixed && (check.type == RuleCheckType.drc);
+
                     width: 100%;
                     font-size: 12px;
-                    font-italic: true;
+                    font-italic: autofixed;
                     wrap: word-wrap;
-                    text: {
-                        if check.state == RuleCheckState.not-run-yet {
-                            return @tr("No checks run yet. Trigger them with one of the buttons above.");
-                        } else if check.state == RuleCheckState.running {
-                            return @tr("Running, hang on...");
-                        } else {
-                            return @tr("No messages.");
-                        }
-                    }
-                }
-            }
-
-            view := ListView {
-                property <length> scrollbar-width: (self.height < self.viewport-height) ? 7px : 0;
-
-                vertical-stretch: 1;
-                visible: model.length > 0;
-
-                for msg[index] in model: item := RuleCheckListItem {
-                    height: item-height;
-                    model: model;
-                    index: index;
-                    read-only: check.read-only;
-                    enabled: check.execution-error.is-empty && (check.state != RuleCheckState.running);
-                    selected: (index == selected-index);
-                    scrollbar-width: scrollbar-width;
-
-                    clicked => {
-                        set-current-index(index, false);
-                        fs.focus();
-                    }
-
-                    double-clicked => {
-                        set-current-index(index, true);
-                        fs.focus();
-                    }
-                }
-            }
-
-            if item-selected: selected-msg-header := PanelHeader {
-                title: selected-item.message;
-            }
-
-            if item-selected: Rectangle {
-                background: #202020;
-
-                VerticalLayout {
-                    padding: 8px;
-
-                    selected-msg-txt := Text {
-                        // Only the DRC is not run automatically, thus the
-                        // autofix state persists until it is run again.
-                        property <bool> autofixed: selected-item.autofixed && (check.type == RuleCheckType.drc);
-
-                        width: 100%;
-                        font-size: 12px;
-                        font-italic: autofixed;
-                        wrap: word-wrap;
-                        text: autofixed ? @tr("This message is marked as fixed. Run the checks again to verify the message is really resolved and disappears.") : selected-item.description;
-                    }
+                    text: autofixed ? @tr("This message is marked as fixed. Run the checks again to verify the message is really resolved and disappears.") : selected-item.description;
                 }
             }
         }
+    }
 
-        key-pressed(event) => {
-            if (event.text == Key.DownArrow) && (selected-index < model.length - 1) {
-                set-current-index(selected-index + 1, false);
+    key-pressed(event) => {
+        if (event.text == Key.DownArrow) && (selected-index < model.length - 1) {
+            set-current-index(selected-index + 1, false);
+            return accept;
+        } else if (event.text == Key.UpArrow) && (selected-index > 0) {
+            set-current-index(selected-index - 1, false);
+            return accept;
+        } else if item-selected {
+            if event.text == Key.Return {
+                model[selected-index].action = RuleCheckMessageAction.highlight-and-zoom-to;
                 return accept;
-            } else if (event.text == Key.UpArrow) && (selected-index > 0) {
-                set-current-index(selected-index - 1, false);
+            } else if event.text == Key.Space {
+                model[selected-index].approved = !model[selected-index].approved;
                 return accept;
-            } else if item-selected {
-                if event.text == Key.Return {
-                    model[selected-index].action = RuleCheckMessageAction.highlight-and-zoom-to;
-                    return accept;
-                } else if event.text == Key.Space {
-                    model[selected-index].approved = !model[selected-index].approved;
-                    return accept;
-                }
             }
-            reject
         }
+        reject
     }
 }

@@ -3,7 +3,6 @@ import {
     ListViewItemButton,
     MenuItem,
     MenuPopup,
-    Palette,
     PanelHeader,
     TreeView,
 } from "widgets.slint";
@@ -213,43 +212,39 @@ component OpenProjectButton inherits IconButton {
     }
 }
 
-export component HomePanel inherits Rectangle {
-    background: #2a2a2a;
-
-    VerticalLayout {
-        if Data.quick-access-items.length > 0: VerticalLayout {
-            vertical-stretch: 0;
-
-            PanelHeader {
-                title: @tr("Quick Access").to-uppercase();
-                highlight: quick-access-view.has-focus;
-                z: 100; // For the tooltips.
-
-                new-project-btn-1 := NewProjectButton { }
-
-                open-project-btn-1 := OpenProjectButton { }
-            }
-
-            quick-access-view := QuickAccessListView {
-                vertical-stretch: 0;
-                max-height: root.height / 3;
-            }
-
-            Rectangle {
-                height: 15px;
-            }
-        }
+export component HomePanel inherits VerticalLayout {
+    if Data.quick-access-items.length > 0: VerticalLayout {
+        vertical-stretch: 0;
 
         PanelHeader {
-            title: @tr("Workspace Projects").to-uppercase();
-            highlight: workspace-projects-view.has-focus;
+            title: @tr("Quick Access").to-uppercase();
+            highlight: quick-access-view.has-focus;
             z: 100; // For the tooltips.
 
-            if Data.quick-access-items.length == 0: new-project-btn-2 := NewProjectButton { }
+            new-project-btn-1 := NewProjectButton { }
 
-            if Data.quick-access-items.length == 0: open-project-btn-2 := OpenProjectButton { }
+            open-project-btn-1 := OpenProjectButton { }
         }
 
-        workspace-projects-view := WorkspaceFolderTreeView { }
+        quick-access-view := QuickAccessListView {
+            vertical-stretch: 0;
+            max-height: root.height / 3;
+        }
+
+        Rectangle {
+            height: 15px;
+        }
     }
+
+    PanelHeader {
+        title: @tr("Workspace Projects").to-uppercase();
+        highlight: workspace-projects-view.has-focus;
+        z: 100; // For the tooltips.
+
+        if Data.quick-access-items.length == 0: new-project-btn-2 := NewProjectButton { }
+
+        if Data.quick-access-items.length == 0: open-project-btn-2 := OpenProjectButton { }
+    }
+
+    workspace-projects-view := WorkspaceFolderTreeView { }
 }
