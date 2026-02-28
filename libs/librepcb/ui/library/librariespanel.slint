@@ -502,8 +502,7 @@ component LibrariesPanelSection inherits FocusScope {
     }
 }
 
-export component LibrariesPanel inherits Rectangle {
-    background: #2a2a2a;
+export component LibrariesPanel inherits VerticalLayout {
     forward-focus: local-libs;
 
     init => {
@@ -511,158 +510,156 @@ export component LibrariesPanel inherits Rectangle {
         local-libs.focus();
     }
 
-    VerticalLayout {
-        local-libs := LibrariesPanelSection {
-            property <length> max-height-impl: (root.height * self.preferred-height) / (self.preferred-height + remote-libs.preferred-height);
+    local-libs := LibrariesPanelSection {
+        property <length> max-height-impl: (root.height * self.preferred-height) / (self.preferred-height + remote-libs.preferred-height);
 
-            vertical-stretch: 0;
-            max-height: (self.preferred-height > max-height-impl) ? max-height-impl : self.preferred-height;
-            title: @tr("Local Libraries").to-uppercase();
-            title-count: Data.local-libraries-data.count;
-            libraries: Data.local-libraries;
-            data: Data.local-libraries-data;
-            remote: false;
-            min-items-height: (root.height >= 500px) ? 3 : 1;
-            enabled: !Data.libraries-operation-in-progress;
-        }
+        vertical-stretch: 0;
+        max-height: (self.preferred-height > max-height-impl) ? max-height-impl : self.preferred-height;
+        title: @tr("Local Libraries").to-uppercase();
+        title-count: Data.local-libraries-data.count;
+        libraries: Data.local-libraries;
+        data: Data.local-libraries-data;
+        remote: false;
+        min-items-height: (root.height >= 500px) ? 3 : 1;
+        enabled: !Data.libraries-operation-in-progress;
+    }
 
-        Rectangle {
-            height: 20px;
-        }
+    Rectangle {
+        height: 20px;
+    }
 
-        remote-libs := LibrariesPanelSection {
-            vertical-stretch: 1;
-            title: @tr("Remote Libraries").to-uppercase();
-            title-count: Data.remote-libraries-data.installed + "/" + Data.remote-libraries-data.count;
-            libraries: Data.remote-libraries;
-            data: Data.remote-libraries-data;
-            remote: true;
-            enabled: (!Data.libraries-operation-in-progress) && (!Data.remote-libraries-data.refreshing);
-        }
+    remote-libs := LibrariesPanelSection {
+        vertical-stretch: 1;
+        title: @tr("Remote Libraries").to-uppercase();
+        title-count: Data.remote-libraries-data.installed + "/" + Data.remote-libraries-data.count;
+        libraries: Data.remote-libraries;
+        data: Data.remote-libraries-data;
+        remote: true;
+        enabled: (!Data.libraries-operation-in-progress) && (!Data.remote-libraries-data.refreshing);
+    }
 
-        Rectangle {
-            property <bool> show: Data.preview-mode ? Data.remote-libraries[0].checked : (Data.remote-libraries-pending-operations > 0);
+    Rectangle {
+        property <bool> show: Data.preview-mode ? Data.remote-libraries[0].checked : (Data.remote-libraries-pending-operations > 0);
 
-            height: show ? self.preferred-height : 0;
-            background: black;
-            border-color: Constants.librepcb-color;
-            border-width: 1px;
+        height: show ? self.preferred-height : 0;
+        background: black;
+        border-color: Constants.librepcb-color;
+        border-width: 1px;
 
-            // Clip for the slide-in/out effect, but do not clip in steady
-            // state for the tooltips.
-            clip: self.height != self.preferred-height;
+        // Clip for the slide-in/out effect, but do not clip in steady
+        // state for the tooltips.
+        clip: self.height != self.preferred-height;
 
-            animate height { duration: 150ms; }
+        animate height { duration: 150ms; }
 
-            VerticalLayout {
-                spacing: 8px;
-                padding-bottom: 8px;
+        VerticalLayout {
+            spacing: 8px;
+            padding-bottom: 8px;
 
-                PanelHeader {
-                    z: 10;  // For the tooltips.
+            PanelHeader {
+                z: 10;  // For the tooltips.
                     title: @tr("Pending Operations").to-uppercase();
 
-                    HorizontalLayout {
-                        padding-top: 5px;
-                        padding-right: 3px;
-                        spacing: 3px;
+                HorizontalLayout {
+                    padding-top: 5px;
+                    padding-right: 3px;
+                    spacing: 3px;
 
-                        if Data.remote-libraries-data.pending-installs > 0: pending-installs-badge := Badge {
-                            font-weight: 700;
-                            font-size: 12px;
-                            border-width: 1.3px;
-                            text-color: (Data.remote-libraries-data.pending-installs > 0) ? lime : #707070;
-                            text: "+" + Data.remote-libraries-data.pending-installs;
-                        }
+                    if Data.remote-libraries-data.pending-installs > 0: pending-installs-badge := Badge {
+                        font-weight: 700;
+                        font-size: 12px;
+                        border-width: 1.3px;
+                        text-color: (Data.remote-libraries-data.pending-installs > 0) ? lime : #707070;
+                        text: "+" + Data.remote-libraries-data.pending-installs;
+                    }
 
-                        if Data.remote-libraries-data.pending-updates > 0: pending-updates-badge := Badge {
-                            font-weight: 700;
-                            font-size: 12px;
-                            border-width: 1.3px;
-                            text-color: (Data.remote-libraries-data.pending-updates > 0) ? yellow : #707070;
-                            text: "↑" + Data.remote-libraries-data.pending-updates;
-                        }
+                    if Data.remote-libraries-data.pending-updates > 0: pending-updates-badge := Badge {
+                        font-weight: 700;
+                        font-size: 12px;
+                        border-width: 1.3px;
+                        text-color: (Data.remote-libraries-data.pending-updates > 0) ? yellow : #707070;
+                        text: "↑" + Data.remote-libraries-data.pending-updates;
+                    }
 
-                        if Data.remote-libraries-data.pending-uninstalls > 0: pending-uninstalls-badge := Badge {
-                            font-weight: 700;
-                            font-size: 12px;
-                            border-width: 1.3px;
-                            text-color: (Data.remote-libraries-data.pending-uninstalls > 0) ? red : #707070;
-                            text: "–" + Data.remote-libraries-data.pending-uninstalls;
-                        }
+                    if Data.remote-libraries-data.pending-uninstalls > 0: pending-uninstalls-badge := Badge {
+                        font-weight: 700;
+                        font-size: 12px;
+                        border-width: 1.3px;
+                        text-color: (Data.remote-libraries-data.pending-uninstalls > 0) ? red : #707070;
+                        text: "–" + Data.remote-libraries-data.pending-uninstalls;
+                    }
+                }
+            }
+
+            VerticalLayout {
+                padding-left: 8px;
+                padding-right: 8px;
+                spacing: 8px;
+
+                if Data.remote-libraries-data.pending-oneway-uninstalls > 0: Rectangle {
+                    height: nonreversible-warning-txt.preferred-height + 8px;
+                    border-color: red;
+                    border-width: 1px;
+                    border-radius: 5px;
+                    background: black;
+
+                    nonreversible-warning-txt := Text {
+                        width: parent.width - 8px;
+                        color: parent.border-color;
+                        font-weight: 700;
+                        horizontal-alignment: left;
+                        wrap: word-wrap;
+                        text: @tr("Warning").to-uppercase() + ": " + @tr("Some libraries marked for uninstallation are currently not available for installation, thus their deletion will be non-reversible!");
                     }
                 }
 
-                VerticalLayout {
-                    padding-left: 8px;
-                    padding-right: 8px;
-                    spacing: 8px;
+                HorizontalLayout {
+                    spacing: 6px;
 
-                    if Data.remote-libraries-data.pending-oneway-uninstalls > 0: Rectangle {
-                        height: nonreversible-warning-txt.preferred-height + 8px;
-                        border-color: red;
-                        border-width: 1px;
-                        border-radius: 5px;
-                        background: black;
+                    apply-btn := Button {
+                        horizontal-stretch: 1;
+                        icon: {
+                            if Data.remote-libraries-data.pending-oneway-uninstalls > 0 {
+                                @image-url("../../../font-awesome/svgs/solid/triangle-exclamation.svg");
+                            } else {
+                                @image-url("../../../font-awesome/svgs/solid/check.svg");
+                            }
+                        };
+                        text: (root.width > 300px) ? @tr("" | "Apply {n} Modification(s)" % Data.remote-libraries-pending-operations) : @tr("Apply");
+                        primary: Data.remote-libraries-data.pending-oneway-uninstalls == 0;
+                        border-color: (self.has-focus ? Constants.librepcb-color : red).darker(self.enabled ? 0 : 0.5);
+                        border-width: (self.has-focus || (Data.remote-libraries-data.pending-oneway-uninstalls > 0)) ? 1px : 0;
+                        enabled: !Data.libraries-operation-in-progress;
 
-                        nonreversible-warning-txt := Text {
-                            width: parent.width - 8px;
-                            color: parent.border-color;
-                            font-weight: 700;
-                            horizontal-alignment: left;
-                            wrap: word-wrap;
-                            text: @tr("Warning").to-uppercase() + ": " + @tr("Some libraries marked for uninstallation are currently not available for installation, thus their deletion will be non-reversible!");
+                        clicked => {
+                            Backend.trigger(Action.library-panel-apply);
                         }
                     }
 
-                    HorizontalLayout {
-                        spacing: 6px;
+                    cancel-btn := Button {
+                        horizontal-stretch: 0;
+                        text: @tr("Cancel");
 
-                        apply-btn := Button {
-                            horizontal-stretch: 1;
-                            icon: {
-                                if Data.remote-libraries-data.pending-oneway-uninstalls > 0 {
-                                    @image-url("../../../font-awesome/svgs/solid/triangle-exclamation.svg");
-                                } else {
-                                    @image-url("../../../font-awesome/svgs/solid/check.svg");
-                                }
-                            };
-                            text: (root.width > 300px) ? @tr("" | "Apply {n} Modification(s)" % Data.remote-libraries-pending-operations) : @tr("Apply");
-                            primary: Data.remote-libraries-data.pending-oneway-uninstalls == 0;
-                            border-color: (self.has-focus ? Constants.librepcb-color : red).darker(self.enabled ? 0 : 0.5);
-                            border-width: (self.has-focus || (Data.remote-libraries-data.pending-oneway-uninstalls > 0)) ? 1px : 0;
-                            enabled: !Data.libraries-operation-in-progress;
-
-                            clicked => {
-                                Backend.trigger(Action.library-panel-apply);
-                            }
-                        }
-
-                        cancel-btn := Button {
-                            horizontal-stretch: 0;
-                            text: @tr("Cancel");
-
-                            clicked => {
-                                Backend.trigger(Action.library-panel-cancel);
-                            }
+                        clicked => {
+                            Backend.trigger(Action.library-panel-cancel);
                         }
                     }
                 }
             }
         }
+    }
 
-        HorizontalLayout {
-            padding: min(5px, filter-edt.height);
+    HorizontalLayout {
+        padding: min(5px, filter-edt.height);
 
-            filter-edt := FilterTermEdit {
-                height: Data.libraries-panel-filter.is-empty ? 0 : self.preferred-height;
-                term: Data.libraries-panel-filter;
+        filter-edt := FilterTermEdit {
+            height: Data.libraries-panel-filter.is-empty ? 0 : self.preferred-height;
+            term: Data.libraries-panel-filter;
 
-                animate height { duration: 100ms; }
+            animate height { duration: 100ms; }
 
-                clear-clicked => {
-                    Backend.libraries-key-event({ text: Key.Escape })
-                }
+            clear-clicked => {
+                Backend.libraries-key-event({ text: Key.Escape })
             }
         }
     }

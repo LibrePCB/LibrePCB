@@ -83,7 +83,7 @@ component GraphicsLayerListItem inherits Rectangle {
     }
 }
 
-export component GraphicsLayersPanel inherits Rectangle {
+export component GraphicsLayersPanel inherits FocusScope {
     property <length> item-height: 22px;
     in-out property <[GraphicsLayerData]> model: Data.current-tab.layers;
     property <int> selected-index: -1;
@@ -98,119 +98,115 @@ export component GraphicsLayersPanel inherits Rectangle {
         selected-index = index;
     }
 
-    background: #2a2a2a;
-
     // Set focus when panel is shown. Not sure if it's always desired(?).
     init => {
-        fs.focus();
+        root.focus();
     }
 
-    fs := FocusScope {
-        VerticalLayout {
-            header := PanelHeader {
-                z: 10;  // For the tooltip.
-                title: @tr("Layers").to-uppercase();
-                highlight: fs.has-focus;
+    VerticalLayout {
+        header := PanelHeader {
+            z: 10;  // For the tooltip.
+            title: @tr("Layers").to-uppercase();
+            highlight: root.has-focus;
 
-                top-btn := IconButton {
-                    width: self.height;
-                    icon: @image-url("../../bootstrap-icons/icons/front.svg");
-                    icon-scale: 0.6;
-                    tooltip: @tr("Top Layers");
+            top-btn := IconButton {
+                width: self.height;
+                icon: @image-url("../../bootstrap-icons/icons/front.svg");
+                icon-scale: 0.6;
+                tooltip: @tr("Top Layers");
 
-                    clicked => {
-                        Helpers.trigger-current-tab-action(TabAction.layers-top);
-                    }
-                }
-
-                bot-btn := IconButton {
-                    width: self.height;
-                    icon: @image-url("../../bootstrap-icons/icons/back.svg");
-                    icon-scale: 0.6;
-                    tooltip: @tr("Bottom Layers");
-
-                    clicked => {
-                        Helpers.trigger-current-tab-action(TabAction.layers-bottom);
-                    }
-                }
-
-                top-bot-btn := IconButton {
-                    width: self.height;
-                    icon: @image-url("../../bootstrap-icons/icons/union.svg");
-                    icon-scale: 0.6;
-                    tooltip: @tr("Top + Bottom Layers");
-
-                    clicked => {
-                        Helpers.trigger-current-tab-action(TabAction.layers-top-bottom);
-                    }
-                }
-
-                show-all-btn := IconButton {
-                    width: self.height;
-                    icon: @image-url("../../bootstrap-icons/icons/eye-fill.svg");
-                    icon-scale: 0.7;
-                    tooltip: @tr("Show All");
-
-                    clicked => {
-                        Helpers.trigger-current-tab-action(TabAction.layers-all);
-                    }
-                }
-
-                hide-all-btn := IconButton {
-                    width: self.height;
-                    icon: @image-url("../../bootstrap-icons/icons/eye-slash-fill.svg");
-                    icon-scale: 0.7;
-                    tooltip: @tr("Hide All");
-
-                    clicked => {
-                        Helpers.trigger-current-tab-action(TabAction.layers-none);
-                    }
-                }
-
-                layer-setup-btn := IconButton {
-                    width: self.height;
-                    icon: @image-url("../../font-awesome/svgs/solid/sliders.svg");
-                    icon-scale: 0.7;
-                    tooltip: @tr("Layer Setup");
-
-                    clicked => {
-                        Helpers.trigger-current-board-action(BoardAction.open-setup-dialog);
-                    }
+                clicked => {
+                    Helpers.trigger-current-tab-action(TabAction.layers-top);
                 }
             }
 
-            view := ListView {
-                vertical-stretch: 1;
-                visible: model.length > 0;
+            bot-btn := IconButton {
+                width: self.height;
+                icon: @image-url("../../bootstrap-icons/icons/back.svg");
+                icon-scale: 0.6;
+                tooltip: @tr("Bottom Layers");
 
-                for layer[index] in model: item := GraphicsLayerListItem {
-                    height: item-height;
-                    model: model;
-                    index: index;
-                    selected: (index == selected-index);
+                clicked => {
+                    Helpers.trigger-current-tab-action(TabAction.layers-bottom);
+                }
+            }
 
-                    clicked => {
-                        set-current-index(index);
-                        fs.focus();
-                    }
+            top-bot-btn := IconButton {
+                width: self.height;
+                icon: @image-url("../../bootstrap-icons/icons/union.svg");
+                icon-scale: 0.6;
+                tooltip: @tr("Top + Bottom Layers");
+
+                clicked => {
+                    Helpers.trigger-current-tab-action(TabAction.layers-top-bottom);
+                }
+            }
+
+            show-all-btn := IconButton {
+                width: self.height;
+                icon: @image-url("../../bootstrap-icons/icons/eye-fill.svg");
+                icon-scale: 0.7;
+                tooltip: @tr("Show All");
+
+                clicked => {
+                    Helpers.trigger-current-tab-action(TabAction.layers-all);
+                }
+            }
+
+            hide-all-btn := IconButton {
+                width: self.height;
+                icon: @image-url("../../bootstrap-icons/icons/eye-slash-fill.svg");
+                icon-scale: 0.7;
+                tooltip: @tr("Hide All");
+
+                clicked => {
+                    Helpers.trigger-current-tab-action(TabAction.layers-none);
+                }
+            }
+
+            layer-setup-btn := IconButton {
+                width: self.height;
+                icon: @image-url("../../font-awesome/svgs/solid/sliders.svg");
+                icon-scale: 0.7;
+                tooltip: @tr("Layer Setup");
+
+                clicked => {
+                    Helpers.trigger-current-board-action(BoardAction.open-setup-dialog);
                 }
             }
         }
 
-        key-pressed(event) => {
-            if (event.text == Key.DownArrow) && (selected-index < model.length - 1) {
-                set-current-index(selected-index + 1);
-                return accept;
-            } else if (event.text == Key.UpArrow) && (selected-index > 0) {
-                set-current-index(selected-index - 1);
-                return accept;
-            } else if item-selected {
-                if event.text == Key.Space {
-                    model[selected-index].visible = !model[selected-index].visible;
-                    return accept;
+        view := ListView {
+            vertical-stretch: 1;
+            visible: model.length > 0;
+
+            for layer[index] in model: item := GraphicsLayerListItem {
+                height: item-height;
+                model: model;
+                index: index;
+                selected: (index == selected-index);
+
+                clicked => {
+                    set-current-index(index);
+                    root.focus();
                 }
             }
-            reject
         }
+    }
+
+    key-pressed(event) => {
+        if (event.text == Key.DownArrow) && (selected-index < model.length - 1) {
+            set-current-index(selected-index + 1);
+            return accept;
+        } else if (event.text == Key.UpArrow) && (selected-index > 0) {
+            set-current-index(selected-index - 1);
+            return accept;
+        } else if item-selected {
+            if event.text == Key.Space {
+                model[selected-index].visible = !model[selected-index].visible;
+                return accept;
+            }
+        }
+        reject
     }
 }
