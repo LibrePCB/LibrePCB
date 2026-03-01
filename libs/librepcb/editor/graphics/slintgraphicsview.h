@@ -95,6 +95,7 @@ public:
   // General Methods
   void setUseOpenGl(bool use) noexcept;
   void setEventHandler(IF_GraphicsViewEventHandler* obj) noexcept;
+  void setMirror(bool mirror) noexcept;
   slint::Image render(GraphicsScene& scene, float width, float height) noexcept;
   bool pointerEvent(const QPointF& pos,
                     slint::private_api::PointerEvent e) noexcept;
@@ -141,6 +142,7 @@ private:  // Data
   QString mGlError;
   Projection mProjection;
   QSizeF mViewSize;
+  bool mMirror;
 
   GraphicsSceneMouseEvent mMouseEvent;
   QDeadlineTimer mLeftMouseButtonDoubleClickTimer;

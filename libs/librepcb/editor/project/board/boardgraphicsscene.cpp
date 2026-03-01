@@ -164,6 +164,10 @@ BoardGraphicsScene::~BoardGraphicsScene() noexcept {
  *  General Methods
  ******************************************************************************/
 
+void BoardGraphicsScene::setMirrored(bool mirrored) noexcept {
+
+}
+
 void BoardGraphicsScene::selectAll() noexcept {
   foreach (auto item, mDevices) {
     item->setSelected(true);

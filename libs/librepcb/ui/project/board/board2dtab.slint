@@ -606,8 +606,21 @@ export component Board2dTab inherits Tab {
                 }
             }
 
+            flip-btn := SceneButton {
+                style: self.checked ? checkbox : button;
+                icon-scale: self.checked ? 0.8 : 0.9;
+                icon: Cmd.view-from-bottom.icon;
+                tooltip: Cmd.view-from-bottom.text;
+                bg-color: tabs[index].background-color;
+                fg-color: tabs[index].foreground-color;
+                checked: tabs[index].view-from-bottom;
+
+                clicked => {
+                    tabs[index].view-from-bottom = !tabs[index].view-from-bottom;
+                }
+            }
+
             toggle-background-image-btn := SceneButton {
-                x: parent.width - self.width;
                 style: self.checked ? checkbox : button;
                 icon-scale: self.checked ? 0.8 : 0.9;
                 icon: Cmd.toggle-background-image.icon;

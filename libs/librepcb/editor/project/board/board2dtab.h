@@ -261,6 +261,7 @@ private:
   SearchContext mSearchContext;
   Theme::GridStyle mGridStyle;
   QPointF mSceneImagePos;
+  bool mViewFromBottom;
   bool mIgnorePlacementLocks;
   int mFrameIndex;
 

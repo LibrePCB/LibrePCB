@@ -794,6 +794,16 @@ export global EditorCommandSet {
         key: "-",
     };
 
+    in property <EditorCommand> view-from-bottom: {
+        id: "view_from_bottom",
+        icon: @image-url("../../../font-awesome/svgs/solid/arrows-up-to-line.svg"),
+        text: "View From Bottom",
+        status-tip: "Flip board to view it from its bottom side",
+        shortcut: "Ctrl+2",
+        modifiers: { alt: false, control: true, shift: false, meta: false },
+        key: "2",
+    };
+
     in property <EditorCommand> grid-increase: {
         id: "grid_increase",
         icon: @image-url("../../../font-awesome/svgs/solid/caret-up.svg"),

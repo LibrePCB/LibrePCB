@@ -82,6 +82,7 @@
         <file alias="/fa/solid/vector-square.svg">../libs/font-awesome/svgs/solid/vector-square.svg</file>
         <file alias="/fa/solid/wand-magic-sparkles.svg">../libs/font-awesome/svgs/solid/wand-magic-sparkles.svg</file>
         <file alias="/fa/solid/xmark.svg">../libs/font-awesome/svgs/solid/xmark.svg</file>
+        <file alias="/fa/solid/arrows-up-to-line.svg">../libs/font-awesome/svgs/solid/arrows-up-to-line.svg</file>
     </qresource>
     <qresource prefix="/img">
         <file>actions/add.png</file>

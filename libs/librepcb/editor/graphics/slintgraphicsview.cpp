@@ -46,6 +46,7 @@ SlintGraphicsView::SlintGraphicsView(const QRectF& defaultSceneRect,
     mDefaultSceneRect(defaultSceneRect),
     mDefaultMargins(defaultMargins),
     mEventHandler(nullptr),
+    mMirror(false),
     mAnimation(new QVariantAnimation(this)) {
   mAnimation->setDuration(500);
   mAnimation->setEasingCurve(QEasingCurve::InOutCubic);
@@ -116,6 +117,13 @@ void SlintGraphicsView::setEventHandler(
   mEventHandler = obj;
 }
 
+void SlintGraphicsView::setMirror(bool mirror) noexcept {
+  if (mirror != mMirror) {
+    mMirror = mirror;
+    emit transformChanged();
+  }
+}
+
 slint::Image SlintGraphicsView::render(GraphicsScene& scene, float width,
                                        float height) noexcept {
   const QSize size(qCeil(width), qCeil(height));
@@ -165,6 +173,7 @@ slint::Image SlintGraphicsView::render(GraphicsScene& scene, float width,
     sceneRect.translate(mProjection.offset);
     scene.render(&painter, targetRect, sceneRect);
 
+
     // If there was an OpenGL error, print it at the bottom right.
     if (!openGlError.isEmpty()) {
       painter.setPen(Qt::red);
@@ -174,6 +183,10 @@ slint::Image SlintGraphicsView::render(GraphicsScene& scene, float width,
     }
 
     mViewSize = targetRect.size();
+  }
+
+  if (mMirror) {
+    pixmap = QPixmap::fromImage(pixmap.toImage().mirrored(true, false));
   }
 
   // OpenGl mode: Release FBO and fetch framebuffer content.

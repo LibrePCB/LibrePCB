@@ -152,6 +152,7 @@ Board2dTab::Board2dTab(GuiApplication& app, BoardEditor& editor,
                    .getSettings()
                    .themes.getActive()
                    .getBoardGridStyle()),
+    mViewFromBottom(false),
     mIgnorePlacementLocks(false),
     mFrameIndex(0),
     mToolFeatures(),
@@ -367,6 +368,7 @@ ui::Board2dTabData Board2dTab::getDerivedUiData() const noexcept {
       l2s(mGridStyle),  // Grid style
       l2s(*mBoard.getGridInterval()),  // Grid interval
       l2s(mBoard.getGridUnit()),  // Length unit
+          mViewFromBottom, // View from bottom
       mBackgroundImageGraphicsItem->isVisible(),  // Background image set
       mIgnorePlacementLocks,  // Ignore placement locks
       mBoardEditor.isRebuildingPlanes(),  // Refreshing
@@ -450,6 +452,10 @@ void Board2dTab::setDerivedUiData(const ui::Board2dTabData& data) noexcept {
     mBoard.setGridUnit(unit);
     mProjectEditor.setManualModificationsMade();
   }
+
+  // View from bottom
+  mViewFromBottom = data.view_from_bottom;
+  mView->setMirror(mViewFromBottom);
 
   // Placement locks
   mIgnorePlacementLocks = data.ignore_placement_locks;

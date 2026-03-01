@@ -89,7 +89,7 @@ public:
    * Low number = background, high number = foreground
    */
   enum ItemZValue {
-    ZValue_Default = 0,  ///< this is the default value (behind all other items)
+    ZValue_Default = 100,  ///< default value, behind all other items
     ZValue_TextsBottom,  ///< For ::librepcb::BI_StrokeText items
     ZValue_PolygonsBottom,  ///< For ::librepcb::BI_Polygon items
     ZValue_DevicesBottom,  ///< For ::librepcb::BI_Device items
@@ -163,6 +163,7 @@ public:
   }
 
   // General Methods
+  void setMirrored(bool mirrored) noexcept;
   void selectAll() noexcept;
   void selectItemsInRect(const Point& p1, const Point& p2) noexcept;
   void selectNetSegment(BI_NetSegment& netSegment) noexcept;

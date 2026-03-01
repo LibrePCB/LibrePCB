@@ -868,6 +868,15 @@ public:
       {QKeySequence(Qt::CTRL | Qt::Key_Minus)},
       &categoryView,
   };
+  EditorCommand viewFromBottom{
+      "view_from_bottom",  // clang-format break
+      QT_TR_NOOP("View From Bottom"),
+      QT_TR_NOOP("Flip board to view it from its bottom side"),
+      ":/fa/solid/arrows-up-to-line.svg",
+      EditorCommand::Flags(),
+      {QKeySequence(Qt::CTRL | Qt::Key_2)},
+      &categoryView,
+  };
   EditorCommand gridIncrease{
       "grid_increase",  // clang-format break
       QT_TR_NOOP("Increase Grid Interval"),

@@ -95,6 +95,7 @@ public:
     out.set_zoom_fit_content(l2s(cmd.zoomFitContent, out.get_zoom_fit_content()));
     out.set_zoom_in(l2s(cmd.zoomIn, out.get_zoom_in()));
     out.set_zoom_out(l2s(cmd.zoomOut, out.get_zoom_out()));
+    out.set_view_from_bottom(l2s(cmd.viewFromBottom, out.get_view_from_bottom()));
     out.set_grid_increase(l2s(cmd.gridIncrease, out.get_grid_increase()));
     out.set_grid_decrease(l2s(cmd.gridDecrease, out.get_grid_decrease()));
     out.set_show_pin_numbers(l2s(cmd.showPinNumbers, out.get_show_pin_numbers()));
