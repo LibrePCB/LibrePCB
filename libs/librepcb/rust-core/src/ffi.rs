@@ -2,6 +2,7 @@
 
 mod cpp_ffi;
 mod ibom_ffi;
+mod stepreduce_ffi;
 mod toolbox_ffi;
 mod zip_archive_ffi;
 mod zip_writer_ffi;

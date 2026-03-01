@@ -79,7 +79,7 @@ public:
                                                const PositiveLength& thickness,
                                                const QColor& color);
   static std::unique_ptr<OccModel> loadStep(const QByteArray content);
-  static QByteArray minifyStep(const QByteArray& content);
+  static QByteArray minifyStep(QByteArray content);
 
   // Operator Overloadings
   OccModel& operator=(const OccModel& rhs) = delete;

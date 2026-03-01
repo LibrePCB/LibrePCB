@@ -14,6 +14,7 @@ cbindgen = "0.27"
 
 [dependencies]
 interactive-html-bom = "0.2.0"
+stepreduce-rs = { git = "https://github.com/dbrgn/stepreduce-rs.git", rev = "f11d3bd" }
 
 [dependencies.regex]
 version = "1.11"

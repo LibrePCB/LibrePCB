@@ -14,6 +14,7 @@ extern "C" {
   fn ffi_qbytearray_data(obj: &QByteArray) -> *const u8;
   fn ffi_qbytearray_data_mut(obj: &mut QByteArray) -> *mut u8;
   fn ffi_qbytearray_resize(obj: &mut QByteArray, len: usize, value: u8);
+  fn ffi_qbytearray_set(obj: &mut QByteArray, data: *const u8, len: usize);
 }
 
 /// Convert `QByteArray` to [`Vec<u8>`]
@@ -38,6 +39,14 @@ pub fn qbytearray_len(obj: &mut QByteArray) -> usize {
 pub fn qbytearray_resize(obj: &mut QByteArray, len: usize, value: u8) {
   unsafe {
     ffi_qbytearray_resize(obj, len, value);
+  }
+}
+
+/// Set the content of a `QByteArray`
+#[allow(dead_code)]
+pub fn qbytearray_set(obj: &mut QByteArray, data: &[u8]) {
+  unsafe {
+    ffi_qbytearray_set(obj, data.as_ptr(), data.len());
   }
 }
 

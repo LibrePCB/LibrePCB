@@ -28,6 +28,7 @@
 #include "../utils/toolbox.h"
 #include "../utils/transform.h"
 #include "librepcb_build_env.h"
+#include <librepcb/rust-core/ffi.h>
 
 // clang-format off
 #if USE_OPENCASCADE
@@ -679,132 +680,143 @@ std::unique_ptr<OccModel> OccModel::loadStep(const QByteArray content) {
   return result;
 }
 
-QByteArray OccModel::minifyStep(const QByteArray& content) {
-  QElapsedTimer timer;
+QByteArray OccModel::minifyStep(QByteArray content) {
+  /*QElapsedTimer timer;
   timer.start();
 
   // Split linhes and clean whitespaces.
-  QStringList lines;
-  foreach (QString line, content.split('\n')) {
-    const QString trimmed = line.trimmed();
-    if (!trimmed.startsWith('*')) {
-      line = trimmed;
+    QStringList lines;
+    foreach (QString line, content.split('\n')) {
+      const QString trimmed = line.trimmed();
+      if (!trimmed.startsWith('*')) {
+        line = trimmed;
+      }
+      line.replace("\r", "");
+      while (line.endsWith(" ;")) {
+        line.chop(2);
+        line.append(';');
+      }
+      if (!line.isEmpty()) {
+        lines.append(line);
+      }
     }
-    line.replace("\r", "");
-    while (line.endsWith(" ;")) {
-      line.chop(2);
-      line.append(';');
-    }
-    if (!line.isEmpty()) {
-      lines.append(line);
-    }
-  }
 
-  // Split header, data and footer.
-  const int dataStart = lines.indexOf("DATA;");
-  if (dataStart < 0) {
-    throw RuntimeError(__FILE__, __LINE__, "STEP data section not found.");
-  }
-  const int dataEnd = lines.indexOf("ENDSEC;", dataStart + 1);
-  if (dataEnd < 0) {
-    throw RuntimeError(__FILE__, __LINE__, "STEP data section end not found.");
-  }
-  const QStringList headerLines = lines.mid(0, dataStart + 1);
-  const QStringList footerLines = lines.mid(dataEnd);
-
-  // Unwrap multi-line data items and replace "-0." by "0." to allow
-  // eliminating more duplicates.
-  QRegularExpression re("\\-0\\.([^0-9])");
-  const QStringList dataLines =
-      lines.mid(dataStart + 1, dataEnd - dataStart - 1)
-          .join("")
-          .replace(re, "0.\\1")
-          .split(';', Qt::SkipEmptyParts);
-
-  // Parse data into key-value structure.
-  // Note: The last item of the QList<int> is not part of the data, but only
-  // used internally to make particular entries unique.
-  typedef std::pair<QStringList, QList<int>> Value;
-  QMap<int, Value> data;
-  re = QRegularExpression("#([0-9]+)");
-  foreach (const QString& line, dataLines) {
-    const int equalPos = line.indexOf("=");
-    bool ok = false;
-    const int id = line.mid(1, equalPos - 1).trimmed().toInt(&ok);
-    if (!ok) {
-      throw RuntimeError(__FILE__, __LINE__,
-                         "Failed to parse data section of STEP file.");
+    // Split header, data and footer.
+    const int dataStart = lines.indexOf("DATA;");
+    if (dataStart < 0) {
+      throw RuntimeError(__FILE__, __LINE__, "STEP data section not found.");
     }
-    const QString valueStr = line.mid(equalPos + 1).trimmed();
-    Value value;
-    int consumed = 0;
-    auto it = re.globalMatch(valueStr);
-    while (it.hasNext()) {
-      auto match = it.next();
-      value.first.append(
-          valueStr.mid(consumed, match.capturedStart(1) - consumed));
-      value.second.append(match.captured(1).toInt());
-      consumed = match.capturedEnd(1);
+    const int dataEnd = lines.indexOf("ENDSEC;", dataStart + 1);
+    if (dataEnd < 0) {
+      throw RuntimeError(__FILE__, __LINE__, "STEP data section end not found.");
     }
-    value.first.append(valueStr.mid(consumed));
-    // Important: It seems some entries must not be merged even if they are
-    // identical. When merged, the STEP model won't be rendered anymore
-    // and FreeCAD displays a wrong shape object tree. We add a unique
-    // number to these entries to ensure they are left untouched.
-    // See also https://github.com/LibrePCB/LibrePCB/issues/1286.
-    if (valueStr.contains("PRODUCT_DEFINITION") ||
-        valueStr.contains("REPRESENTATION")) {
-      value.second.append(data.count() + 1);
-    } else {
-      value.second.append(0);
-    }
-    data.insert(id, value);
-  }
+    const QStringList headerLines = lines.mid(0, dataStart + 1);
+    const QStringList footerLines = lines.mid(dataEnd);
 
-  // Eliminate duplicate data items.
-  QHash<Value, int> uniqueData;
-  QHash<int, int> idMap;
-  while (true) {
-    uniqueData.clear();
-    idMap.clear();
+    // Unwrap multi-line data items and replace "-0." by "0." to allow
+    // eliminating more duplicates.
+    QRegularExpression re("\\-0\\.([^0-9])");
+    const QStringList dataLines =
+        lines.mid(dataStart + 1, dataEnd - dataStart - 1)
+            .join("")
+            .replace(re, "0.\\1")
+            .split(';', Qt::SkipEmptyParts);
+
+    // Parse data into key-value structure.
+    // Note: The last item of the QList<int> is not part of the data, but only
+    // used internally to make particular entries unique.
+    typedef std::pair<QStringList, QList<int>> Value;
+    QMap<int, Value> data;
+    re = QRegularExpression("#([0-9]+)");
+    foreach (const QString& line, dataLines) {
+      const int equalPos = line.indexOf("=");
+      bool ok = false;
+      const int id = line.mid(1, equalPos - 1).trimmed().toInt(&ok);
+      if (!ok) {
+        throw RuntimeError(__FILE__, __LINE__,
+                           "Failed to parse data section of STEP file.");
+      }
+      const QString valueStr = line.mid(equalPos + 1).trimmed();
+      Value value;
+      int consumed = 0;
+      auto it = re.globalMatch(valueStr);
+      while (it.hasNext()) {
+        auto match = it.next();
+        value.first.append(
+            valueStr.mid(consumed, match.capturedStart(1) - consumed));
+        value.second.append(match.captured(1).toInt());
+        consumed = match.capturedEnd(1);
+      }
+      value.first.append(valueStr.mid(consumed));
+      // Important: It seems some entries must not be merged even if they are
+      // identical. When merged, the STEP model won't be rendered anymore
+      // and FreeCAD displays a wrong shape object tree. We add a unique
+      // number to these entries to ensure they are left untouched.
+      // See also https://github.com/LibrePCB/LibrePCB/issues/1286.
+      if (valueStr.contains("PRODUCT_DEFINITION") ||
+          valueStr.contains("REPRESENTATION")) {
+        value.second.append(data.count() + 1);
+      } else {
+        value.second.append(0);
+      }
+      data.insert(id, value);
+    }
+
+    // Eliminate duplicate data items.
+    QHash<Value, int> uniqueData;
+    QHash<int, int> idMap;
+    while (true) {
+      uniqueData.clear();
+      idMap.clear();
+      for (auto it = data.begin(); it != data.end(); it++) {
+        auto newIt = uniqueData.find(it.value());
+        if (newIt == uniqueData.end()) {
+          newIt = uniqueData.insert(it.value(), uniqueData.count() + 1);
+        }
+        idMap.insert(it.key(), newIt.value());
+      }
+      if (uniqueData.count() == data.count()) {
+        break;
+      }
+      data.clear();
+      for (auto it = uniqueData.begin(); it != uniqueData.end(); it++) {
+        data.insert(it.value(), it.key());
+      }
+      for (auto& value : data) {
+        for (auto& id : value.second) {
+          id = idMap.value(id, id);
+        }
+      }
+    }
+
+    // Build new STEP file.
+    QByteArray output;
+    output += headerLines.join('\n').toUtf8() + '\n';
     for (auto it = data.begin(); it != data.end(); it++) {
-      auto newIt = uniqueData.find(it.value());
-      if (newIt == uniqueData.end()) {
-        newIt = uniqueData.insert(it.value(), uniqueData.count() + 1);
+      output += QString("#%1=").arg(it.key()).toUtf8();
+      for (int i = 0; i < it.value().first.count(); ++i) {
+        output += it.value().first.at(i).toUtf8();
+        if (i < (it.value().second.count() - 1)) {  // Ignore unique ID.
+          output += QString::number(it.value().second.at(i)).toUtf8();
+        }
       }
-      idMap.insert(it.key(), newIt.value());
+      output += ";\n";
     }
-    if (uniqueData.count() == data.count()) {
-      break;
-    }
-    data.clear();
-    for (auto it = uniqueData.begin(); it != uniqueData.end(); it++) {
-      data.insert(it.value(), it.key());
-    }
-    for (auto& value : data) {
-      for (auto& id : value.second) {
-        id = idMap.value(id, id);
-      }
-    }
-  }
+    output += footerLines.join('\n').toUtf8() + '\n';
+    qDebug() << "Minified STEP file from" << (content.size() / 1024.0) << "kB to"
+             << (output.size() / 1024.0) << "kB in" << timer.elapsed() << "ms.";
+    return output;*/
 
-  // Build new STEP file.
-  QByteArray output;
-  output += headerLines.join('\n').toUtf8() + '\n';
-  for (auto it = data.begin(); it != data.end(); it++) {
-    output += QString("#%1=").arg(it.key()).toUtf8();
-    for (int i = 0; i < it.value().first.count(); ++i) {
-      output += it.value().first.at(i).toUtf8();
-      if (i < (it.value().second.count() - 1)) {  // Ignore unique ID.
-        output += QString::number(it.value().second.at(i)).toUtf8();
-      }
-    }
-    output += ";\n";
-  }
-  output += footerLines.join('\n').toUtf8() + '\n';
-  qDebug() << "Minified STEP file from" << (content.size() / 1024.0) << "kB to"
-           << (output.size() / 1024.0) << "kB in" << timer.elapsed() << "ms.";
-  return output;
+
+  QElapsedTimer timer;
+  timer.start();
+
+  const auto oldSize = content.size();
+  rs::ffi_stepreduce(&content);
+
+  qDebug() << "Minified STEP file from" << (oldSize / 1024.0) << "kB to"
+           << (content.size() / 1024.0) << "kB in" << timer.elapsed() << "ms.";
+  return content;
 }
 
 /*******************************************************************************

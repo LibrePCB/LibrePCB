@@ -57,6 +57,11 @@ extern "C" void ffi_qbytearray_resize(QByteArray* obj, std::size_t len,
 #endif
 }
 
+extern "C" void ffi_qbytearray_set(QByteArray* obj, const uint8_t* data, std::size_t len) {
+  obj->clear();
+  obj->append(reinterpret_cast<const char*>(data), len);
+}
+
 extern "C" std::size_t ffi_qstring_len(const QString* obj) {
   return static_cast<std::size_t>(obj->size());
 }

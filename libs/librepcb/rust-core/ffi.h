@@ -289,6 +289,10 @@ extern void ffi_qbytearray_resize(QByteArray * NONNULL obj,
                                   size_t len,
                                   uint8_t value);
 
+extern void ffi_qbytearray_set(QByteArray * NONNULL obj,
+                               const uint8_t *data,
+                               size_t len);
+
 extern size_t ffi_qstring_len(const QString * NONNULL obj);
 
 extern const uint16_t *ffi_qstring_utf16(const QString * NONNULL obj);
@@ -435,6 +439,11 @@ void ffi_ibom_add_zone(InteractiveHtmlBom * NONNULL obj,
 bool ffi_ibom_generate_html(const InteractiveHtmlBom * NONNULL obj,
                             QString * NONNULL out,
                             QString * NONNULL err);
+
+/**
+ * Wrapper for [increment_number_in_string]
+ */
+void ffi_stepreduce(QByteArray * NONNULL input);
 
 /**
  * Wrapper for [increment_number_in_string]
