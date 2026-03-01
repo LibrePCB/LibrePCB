@@ -24,6 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include "../../../graphics/graphicslayer.h"
+#include "../boardgraphicsscene.h"
 
 #include <librepcb/core/project/board/items/bi_netpoint.h>
 
@@ -50,11 +51,14 @@ public:
   // Constructors / Destructor
   BGI_NetPoint() = delete;
   BGI_NetPoint(const BGI_NetPoint& other) = delete;
-  BGI_NetPoint(BI_NetPoint& netpoint, const GraphicsLayerList& layers) noexcept;
+  BGI_NetPoint(
+      BI_NetPoint& netpoint, const GraphicsLayerList& layers,
+      std::shared_ptr<const BoardGraphicsScene::Context> context) noexcept;
   virtual ~BGI_NetPoint() noexcept;
 
   // General Methods
   BI_NetPoint& getNetPoint() noexcept { return mNetPoint; }
+  void updateContext() noexcept { updateLayer(); }
 
   // Inherited from QGraphicsItem
   QRectF boundingRect() const noexcept override { return mBoundingRect; }
@@ -80,6 +84,7 @@ private:  // Data
   // General Attributes
   BI_NetPoint& mNetPoint;
   const GraphicsLayerList& mLayers;
+  std::shared_ptr<const BoardGraphicsScene::Context> mContext;
   std::shared_ptr<const GraphicsLayer> mLayer;
 
   // Cached Attributes

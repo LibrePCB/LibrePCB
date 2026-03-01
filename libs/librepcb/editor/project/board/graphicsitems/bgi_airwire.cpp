@@ -43,12 +43,12 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BGI_AirWire::BGI_AirWire(BI_AirWire& airwire, const GraphicsLayerList& layers,
-                         std::shared_ptr<const QSet<const NetSignal*>>
-                             highlightedNetSignals) noexcept
+BGI_AirWire::BGI_AirWire(
+    BI_AirWire& airwire, const GraphicsLayerList& layers,
+    std::shared_ptr<const BoardGraphicsScene::Context> context) noexcept
   : QGraphicsItem(),
     mAirWire(airwire),
-    mHighlightedNetSignals(highlightedNetSignals),
+    mContext(context),
     mLayer(layers.get(Theme::Color::sBoardAirWires)),
     mOnLayerEditedSlot(*this, &BGI_AirWire::layerEdited) {
   setZValue(BoardGraphicsScene::ZValue_AirWires);
@@ -90,7 +90,7 @@ void BGI_AirWire::paint(QPainter* painter,
   Q_UNUSED(widget);
 
   const bool highlight = option->state.testFlag(QStyle::State_Selected) ||
-      mHighlightedNetSignals->contains(&mAirWire.getNetSignal());
+      mContext->highlightedNets->contains(&mAirWire.getNetSignal());
   const qreal lod =
       option->levelOfDetailFromTransform(painter->worldTransform());
 

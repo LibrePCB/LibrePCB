@@ -119,6 +119,11 @@ void PrimitiveFootprintPadGraphicsItem::setText(const QString& text) noexcept {
   updateTextHeight();
 }
 
+void PrimitiveFootprintPadGraphicsItem::setTextMirrored(
+    bool mirrored) noexcept {
+  mTextGraphicsItem->setMirrored(mirrored);
+}
+
 void PrimitiveFootprintPadGraphicsItem::setToolTipText(
     const QString& text) noexcept {
   setToolTip(text);

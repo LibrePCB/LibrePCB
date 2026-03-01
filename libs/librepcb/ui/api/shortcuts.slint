@@ -1132,6 +1132,9 @@ export global Shortcuts {
         } else if Backend.is-shortcut(event, Cmd.ignore-locks) {
             Data.current-section.board-2d-tabs[tab].ignore-placement-locks = !Data.current-section.board-2d-tabs[tab].ignore-placement-locks;
             return true;
+        } else if Backend.is-shortcut(event, Cmd.view-from-bottom) {
+            Data.current-section.board-2d-tabs[tab].view-from-bottom = !Data.current-section.board-2d-tabs[tab].view-from-bottom;
+            return true;
         } else if Backend.is-shortcut(event, Cmd.toggle-3d) {
             Backend.trigger-board(Data.current-section.board-2d-tabs[tab].project-index, Data.current-section.board-2d-tabs[tab].board-index, BoardAction.open-3d);
             return true;

@@ -51,13 +51,13 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BGI_Via::BGI_Via(BI_Via& via, const GraphicsLayerList& layers,
-                 std::shared_ptr<const QSet<const NetSignal*>>
-                     highlightedNetSignals) noexcept
+BGI_Via::BGI_Via(
+    BI_Via& via, const GraphicsLayerList& layers,
+    std::shared_ptr<const BoardGraphicsScene::Context> context) noexcept
   : QGraphicsItem(),
     mVia(via),
     mLayers(layers),
-    mHighlightedNetSignals(highlightedNetSignals),
+    mContext(context),
     mViaLayer(layers.get(Theme::Color::sBoardVias)),
     mTopStopMaskLayer(layers.get(Theme::Color::sBoardStopMaskTop)),
     mBottomStopMaskLayer(layers.get(Theme::Color::sBoardStopMaskBot)),
@@ -94,6 +94,15 @@ BGI_Via::~BGI_Via() noexcept {
 }
 
 /*******************************************************************************
+ *  General Methods
+ ******************************************************************************/
+
+void BGI_Via::updateContext() noexcept {
+  mTextGraphicsItem->setMirrored(mContext->mirror);
+  update();
+}
+
+/*******************************************************************************
  *  Inherited from QGraphicsItem
  ******************************************************************************/
 
@@ -107,7 +116,7 @@ void BGI_Via::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
 
   const NetSignal* netsignal = mVia.getNetSegment().getNetSignal();
   const bool highlight = option->state.testFlag(QStyle::State_Selected) ||
-      mHighlightedNetSignals->contains(netsignal);
+      mContext->highlightedNets->contains(netsignal);
 
   if (mBottomStopMaskLayer && mBottomStopMaskLayer->isVisible() &&
       (!mStopMaskBottom.isEmpty())) {

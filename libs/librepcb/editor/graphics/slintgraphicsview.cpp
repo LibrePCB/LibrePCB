@@ -76,10 +76,18 @@ QPainterPath SlintGraphicsView::calcPosWithTolerance(
 
 Point SlintGraphicsView::mapToScenePos(const QPointF& pos,
                                        qreal devicePixelRatio) const noexcept {
+  return Point::fromPx(mapToScenePosPx(pos, devicePixelRatio));
+}
+
+QPointF SlintGraphicsView::mapToScenePosPx(
+    QPointF pos, qreal devicePixelRatio) const noexcept {
+  if (mMirror && (mViewSize.width() > 0)) {
+    pos.setX(mViewSize.width() - pos.x());
+  }
   QTransform tf;
   tf.translate(mProjection.offset.x(), mProjection.offset.y());
   tf.scale(1 / mProjection.scale, 1 / mProjection.scale);
-  return Point::fromPx(tf.map(pos * devicePixelRatio));
+  return tf.map(pos * devicePixelRatio);
 }
 
 /*******************************************************************************
@@ -173,7 +181,6 @@ slint::Image SlintGraphicsView::render(GraphicsScene& scene, float width,
     sceneRect.translate(mProjection.offset);
     scene.render(&painter, targetRect, sceneRect);
 
-
     // If there was an OpenGL error, print it at the bottom right.
     if (!openGlError.isEmpty()) {
       painter.setPen(Qt::red);
@@ -203,10 +210,7 @@ bool SlintGraphicsView::pointerEvent(
   using slint::private_api::PointerEventButton;
   using slint::private_api::PointerEventKind;
 
-  QTransform tf;
-  tf.translate(mProjection.offset.x(), mProjection.offset.y());
-  tf.scale(1 / mProjection.scale, 1 / mProjection.scale);
-  const QPointF scenePosPx = tf.map(pos);
+  const QPointF scenePosPx = mapToScenePosPx(pos, 1);
   mMouseEvent.scenePos = Point::fromPx(scenePosPx);
   mMouseEvent.modifiers = s2q(e.modifiers);
 
@@ -413,7 +417,11 @@ void SlintGraphicsView::scroll(const QPointF& delta) noexcept {
   applyProjection(projection);
 }
 
-void SlintGraphicsView::zoom(const QPointF& center, qreal factor) noexcept {
+void SlintGraphicsView::zoom(QPointF center, qreal factor) noexcept {
+  if (mMirror && (mViewSize.width() > 0)) {
+    center.setX(mViewSize.width() - center.x());
+  }
+
   Projection projection = mProjection;
 
   QTransform tf;

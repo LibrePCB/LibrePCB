@@ -41,9 +41,12 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BGI_Zone::BGI_Zone(BI_Zone& zone, const GraphicsLayerList& layers) noexcept
+BGI_Zone::BGI_Zone(
+    BI_Zone& zone, const GraphicsLayerList& layers,
+    std::shared_ptr<const BoardGraphicsScene::Context> context) noexcept
   : QGraphicsItemGroup(),
     mZone(zone),
+    mContext(context),
     mGraphicsItem(new PrimitiveZoneGraphicsItem(layers, this)),
     mOnEditedSlot(*this, &BGI_Zone::zoneEdited) {
   setFlag(QGraphicsItem::ItemHasNoContents, true);
@@ -121,7 +124,8 @@ void BGI_Zone::zoneEdited(const BI_Zone& obj, BI_Zone::Event event) noexcept {
 void BGI_Zone::updateZValue() noexcept {
   auto layers = Layer::sorted(mZone.getData().getLayers());
   if (!layers.isEmpty()) {
-    setZValue(BoardGraphicsScene::getZValueOfCopperLayer(*layers.first()));
+    setZValue(BoardGraphicsScene::getZValueOfCopperLayer(*layers.first(),
+                                                         mContext->mirror));
   }
 }
 

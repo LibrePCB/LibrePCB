@@ -24,6 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include "../../../graphics/graphicslayer.h"
+#include "../boardgraphicsscene.h"
 
 #include <librepcb/core/project/board/items/bi_plane.h>
 #include <librepcb/core/types/point.h>
@@ -58,9 +59,9 @@ public:
   // Constructors / Destructor
   BGI_Plane() = delete;
   BGI_Plane(const BGI_Plane& other) = delete;
-  BGI_Plane(BI_Plane& plane, const GraphicsLayerList& layers,
-            std::shared_ptr<const QSet<const NetSignal*>>
-                highlightedNetSignals) noexcept;
+  BGI_Plane(
+      BI_Plane& plane, const GraphicsLayerList& layers,
+      std::shared_ptr<const BoardGraphicsScene::Context> context) noexcept;
   virtual ~BGI_Plane() noexcept;
 
   // Getters
@@ -82,6 +83,10 @@ public:
 
   // General Methods
   BI_Plane& getPlane() noexcept { return mPlane; }
+  void updateContext() noexcept {
+    updateLayer();
+    update();
+  }
 
   // Inherited from QGraphicsItem
   QVariant itemChange(GraphicsItemChange change,
@@ -111,7 +116,7 @@ private:  // Data
   // General Attributes
   BI_Plane& mPlane;
   const GraphicsLayerList& mLayers;
-  std::shared_ptr<const QSet<const NetSignal*>> mHighlightedNetSignals;
+  std::shared_ptr<const BoardGraphicsScene::Context> mContext;
 
   // Cached Attributes
   std::shared_ptr<const GraphicsLayer> mLayer;

@@ -38,13 +38,15 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BGI_Polygon::BGI_Polygon(BI_Polygon& polygon,
-                         const GraphicsLayerList& layers) noexcept
+BGI_Polygon::BGI_Polygon(
+    BI_Polygon& polygon, const GraphicsLayerList& layers,
+    std::shared_ptr<const BoardGraphicsScene::Context> context) noexcept
   : QGraphicsItemGroup(),
     mPolygon(polygon),
     mPolygonObj(polygon.getData().getUuid(), polygon.getData().getLayer(),
                 polygon.getData().getLineWidth(), polygon.getData().isFilled(),
                 polygon.getData().isGrabArea(), polygon.getData().getPath()),
+    mContext(context),
     mGraphicsItem(new PolygonGraphicsItem(mPolygonObj, layers, this)),
     mOnEditedSlot(*this, &BGI_Polygon::polygonEdited) {
   setFlag(QGraphicsItem::ItemHasNoContents, true);
@@ -109,9 +111,11 @@ void BGI_Polygon::polygonEdited(const BI_Polygon& obj,
 }
 
 void BGI_Polygon::updateZValue() noexcept {
-  setZValue(mPolygon.getData().getLayer().isBottom()
-                ? BoardGraphicsScene::ZValue_PolygonsBottom
-                : BoardGraphicsScene::ZValue_PolygonsTop);
+  setZValue(BoardGraphicsScene::getMirroredZValue(
+      mPolygon.getData().getLayer().isBottom()
+          ? BoardGraphicsScene::ZValue_PolygonsBottom
+          : BoardGraphicsScene::ZValue_PolygonsTop,
+      mContext->mirror));
 }
 
 void BGI_Polygon::updateEditable() noexcept {

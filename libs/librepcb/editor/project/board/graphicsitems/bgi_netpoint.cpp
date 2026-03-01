@@ -42,11 +42,13 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BGI_NetPoint::BGI_NetPoint(BI_NetPoint& netpoint,
-                           const GraphicsLayerList& layers) noexcept
+BGI_NetPoint::BGI_NetPoint(
+    BI_NetPoint& netpoint, const GraphicsLayerList& layers,
+    std::shared_ptr<const BoardGraphicsScene::Context> context) noexcept
   : QGraphicsItem(),
     mNetPoint(netpoint),
     mLayers(layers),
+    mContext(context),
     mLayer(nullptr),
     mOnEditedSlot(*this, &BGI_NetPoint::netPointEdited),
     mOnLayerEditedSlot(*this, &BGI_NetPoint::layerEdited) {
@@ -130,7 +132,8 @@ void BGI_NetPoint::layerEdited(const GraphicsLayer& layer,
 void BGI_NetPoint::updateLayer() noexcept {
   // Set Z value.
   const Layer* layer = mNetPoint.getLayerOfTraces();
-  setZValue(layer ? BoardGraphicsScene::getZValueOfCopperLayer(*layer)
+  setZValue(layer ? BoardGraphicsScene::getZValueOfCopperLayer(*layer,
+                                                               mContext->mirror)
                   : static_cast<qreal>(BoardGraphicsScene::ZValue_Default));
 
   // Set layer.

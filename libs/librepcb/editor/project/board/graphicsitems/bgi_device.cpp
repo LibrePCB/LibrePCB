@@ -51,12 +51,14 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BGI_Device::BGI_Device(BI_Device& device,
-                       const GraphicsLayerList& layers) noexcept
+BGI_Device::BGI_Device(
+    BI_Device& device, const GraphicsLayerList& layers,
+    std::shared_ptr<const BoardGraphicsScene::Context> context) noexcept
   : QGraphicsItemGroup(),
     onEdited(*this),
     mDevice(device),
     mLayers(layers),
+    mContext(context),
     mGrabAreaLayer(nullptr),
     mOnEditedSlot(*this, &BGI_Device::deviceEdited),
     mOnLayerEditedSlot(*this, &BGI_Device::layerEdited) {
@@ -217,9 +219,11 @@ void BGI_Device::updateBoardSide() noexcept {
   // Update Z value.
   const bool top = !mDevice.getMirrored();
   if (top) {
-    setZValue(BoardGraphicsScene::ZValue_DevicesTop);
+    setZValue(BoardGraphicsScene::getMirroredZValue(
+        BoardGraphicsScene::ZValue_DevicesTop, mContext->mirror));
   } else {
-    setZValue(BoardGraphicsScene::ZValue_DevicesBottom);
+    setZValue(BoardGraphicsScene::getMirroredZValue(
+        BoardGraphicsScene::ZValue_DevicesBottom, mContext->mirror));
   }
 
   // Update grab area layer.

@@ -221,13 +221,13 @@ QList<std::shared_ptr<QGraphicsItem>> BoardEditorState::findItemsAtPos(
     return flags.testFlag(FindFlag::SkipLowerPriorityMatches) &&
         lowestPriority && (prio > (*lowestPriority));
   };
-  auto priorityFromLayer = [](const Layer& layer) {
+  auto priorityFromLayer = [scene](const Layer& layer) {
     if (layer.isTop()) {
-      return 100;
+      return scene->isMirrored() ? 300 : 100;
     } else if (layer.isInner()) {
       return 200;
     } else if (layer.isBottom()) {
-      return 300;
+      return scene->isMirrored() ? 100 : 300;
     } else {
       return 0;
     }

@@ -23,6 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../boardgraphicsscene.h"
+
 #include <librepcb/core/geometry/zone.h>
 #include <librepcb/core/project/board/items/bi_zone.h>
 
@@ -50,7 +52,8 @@ public:
   // Constructors / Destructor
   BGI_Zone() = delete;
   BGI_Zone(const BGI_Zone& other) = delete;
-  BGI_Zone(BI_Zone& zone, const GraphicsLayerList& layers) noexcept;
+  BGI_Zone(BI_Zone& zone, const GraphicsLayerList& layers,
+           std::shared_ptr<const BoardGraphicsScene::Context> context) noexcept;
   virtual ~BGI_Zone() noexcept;
 
   // General Methods
@@ -74,6 +77,8 @@ public:
   /// @return       All indices of the vertices at the specified position.
   QVector<int> getVertexIndicesAtPosition(const Point& pos) const noexcept;
 
+  void updateContext() noexcept { updateZValue(); }
+
   // Inherited from QGraphicsItem
   QPainterPath shape() const noexcept override;
 
@@ -89,6 +94,7 @@ private:  // Methods
 
 private:  // Data
   BI_Zone& mZone;
+  std::shared_ptr<const BoardGraphicsScene::Context> mContext;
   QScopedPointer<PrimitiveZoneGraphicsItem> mGraphicsItem;
 
   // Slots

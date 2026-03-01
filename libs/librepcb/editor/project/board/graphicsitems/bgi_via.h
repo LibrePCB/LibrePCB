@@ -24,6 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include "../../../graphics/graphicslayer.h"
+#include "../boardgraphicsscene.h"
 
 #include <librepcb/core/project/board/items/bi_via.h>
 
@@ -59,12 +60,12 @@ public:
   BGI_Via() = delete;
   BGI_Via(const BGI_Via& other) = delete;
   BGI_Via(BI_Via& via, const GraphicsLayerList& layers,
-          std::shared_ptr<const QSet<const NetSignal*>>
-              highlightedNetSignals) noexcept;
+          std::shared_ptr<const BoardGraphicsScene::Context> context) noexcept;
   virtual ~BGI_Via() noexcept;
 
   // General Methods
   BI_Via& getVia() noexcept { return mVia; }
+  void updateContext() noexcept;
 
   // Inherited from QGraphicsItem
   QRectF boundingRect() const noexcept override { return mBoundingRect; }
@@ -93,7 +94,7 @@ private:  // Data
   // General Attributes
   BI_Via& mVia;
   const GraphicsLayerList& mLayers;
-  std::shared_ptr<const QSet<const NetSignal*>> mHighlightedNetSignals;
+  std::shared_ptr<const BoardGraphicsScene::Context> mContext;
   std::shared_ptr<const GraphicsLayer> mViaLayer;
   std::shared_ptr<const GraphicsLayer> mTopStopMaskLayer;
   std::shared_ptr<const GraphicsLayer> mBottomStopMaskLayer;

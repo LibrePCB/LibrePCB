@@ -24,6 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include "../../../graphics/graphicslayer.h"
+#include "../boardgraphicsscene.h"
 
 #include <librepcb/core/project/board/items/bi_device.h>
 
@@ -68,11 +69,14 @@ public:
   // Constructors / Destructor
   BGI_Device() = delete;
   BGI_Device(const BGI_Device& other) = delete;
-  BGI_Device(BI_Device& device, const GraphicsLayerList& layers) noexcept;
+  BGI_Device(
+      BI_Device& device, const GraphicsLayerList& layers,
+      std::shared_ptr<const BoardGraphicsScene::Context> context) noexcept;
   virtual ~BGI_Device() noexcept;
 
   // General Methods
   BI_Device& getDevice() noexcept { return mDevice; }
+  void updateContext() noexcept { updateBoardSide(); }
 
   // Inherited from QGraphicsItem
   QPainterPath shape() const noexcept override;
@@ -97,6 +101,7 @@ private:  // Methods
 private:  // Data
   BI_Device& mDevice;
   const GraphicsLayerList& mLayers;
+  std::shared_ptr<const BoardGraphicsScene::Context> mContext;
   std::shared_ptr<const GraphicsLayer> mGrabAreaLayer;
   std::shared_ptr<OriginCrossGraphicsItem> mOriginCrossGraphicsItem;
   QVector<std::shared_ptr<PrimitiveCircleGraphicsItem>> mCircleGraphicsItems;

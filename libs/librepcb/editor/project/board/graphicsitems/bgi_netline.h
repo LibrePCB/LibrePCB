@@ -24,6 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include "../../../graphics/graphicslayer.h"
+#include "../boardgraphicsscene.h"
 
 #include <librepcb/core/project/board/items/bi_netline.h>
 
@@ -55,13 +56,17 @@ public:
   // Constructors / Destructor
   BGI_NetLine() = delete;
   BGI_NetLine(const BGI_NetLine& other) = delete;
-  BGI_NetLine(BI_NetLine& netline, const GraphicsLayerList& layers,
-              std::shared_ptr<const QSet<const NetSignal*>>
-                  highlightedNetSignals) noexcept;
+  BGI_NetLine(
+      BI_NetLine& netline, const GraphicsLayerList& layers,
+      std::shared_ptr<const BoardGraphicsScene::Context> context) noexcept;
   virtual ~BGI_NetLine() noexcept;
 
   // General Methods
   BI_NetLine& getNetLine() noexcept { return mNetLine; }
+  void updateContext() noexcept {
+    updateLayer();
+    update();
+  }
 
   // Inherited from QGraphicsItem
   QRectF boundingRect() const noexcept override { return mBoundingRect; }
@@ -85,7 +90,7 @@ private:  // Data
   // Attributes
   BI_NetLine& mNetLine;
   const GraphicsLayerList& mLayers;
-  std::shared_ptr<const QSet<const NetSignal*>> mHighlightedNetSignals;
+  std::shared_ptr<const BoardGraphicsScene::Context> mContext;
   std::shared_ptr<const GraphicsLayer> mLayer;
 
   // Cached Attributes

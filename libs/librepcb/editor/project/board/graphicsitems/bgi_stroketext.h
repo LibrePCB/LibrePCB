@@ -23,6 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../boardgraphicsscene.h"
 #include "bgi_device.h"
 
 #include <librepcb/core/project/board/items/bi_stroketext.h>
@@ -53,8 +54,10 @@ public:
   // Constructors / Destructor
   BGI_StrokeText() = delete;
   BGI_StrokeText(const BGI_StrokeText& other) = delete;
-  BGI_StrokeText(BI_StrokeText& text, std::weak_ptr<BGI_Device> deviceItem,
-                 const GraphicsLayerList& layers) noexcept;
+  BGI_StrokeText(
+      BI_StrokeText& text, std::weak_ptr<BGI_Device> deviceItem,
+      const GraphicsLayerList& layers,
+      std::shared_ptr<const BoardGraphicsScene::Context> context) noexcept;
   virtual ~BGI_StrokeText() noexcept;
 
   // General Methods
@@ -62,6 +65,7 @@ public:
   const std::weak_ptr<BGI_Device>& getDeviceGraphicsItem() noexcept {
     return mDeviceGraphicsItem;
   }
+  void updateContext() noexcept { updateLayer(); }
 
   // Inherited from QGraphicsItem
   virtual QPainterPath shape() const noexcept override;
@@ -88,6 +92,7 @@ private:  // Data
   BI_StrokeText& mText;
   std::weak_ptr<BGI_Device> mDeviceGraphicsItem;
   const GraphicsLayerList& mLayers;
+  std::shared_ptr<const BoardGraphicsScene::Context> mContext;
   QScopedPointer<PrimitivePathGraphicsItem> mPathGraphicsItem;
   QScopedPointer<OriginCrossGraphicsItem> mOriginCrossGraphicsItem;
   QScopedPointer<LineGraphicsItem> mAnchorGraphicsItem;

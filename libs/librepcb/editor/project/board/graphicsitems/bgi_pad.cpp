@@ -48,14 +48,14 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BGI_Pad::BGI_Pad(BI_Pad& pad, std::weak_ptr<BGI_Device> deviceItem,
-                 const GraphicsLayerList& layers,
-                 std::shared_ptr<const QSet<const NetSignal*>>
-                     highlightedNetSignals) noexcept
+BGI_Pad::BGI_Pad(
+    BI_Pad& pad, std::weak_ptr<BGI_Device> deviceItem,
+    const GraphicsLayerList& layers,
+    std::shared_ptr<const BoardGraphicsScene::Context> context) noexcept
   : QGraphicsItemGroup(),
     mPad(pad),
     mDeviceGraphicsItem(deviceItem),
-    mHighlightedNetSignals(highlightedNetSignals),
+    mContext(context),
     mGraphicsItem(new PrimitiveFootprintPadGraphicsItem(layers, false, this)),
     mOnPadEditedSlot(*this, &BGI_Pad::padEdited),
     mOnDeviceEditedSlot(*this, &BGI_Pad::deviceGraphicsItemEdited) {
@@ -84,8 +84,9 @@ BGI_Pad::~BGI_Pad() noexcept {
  *  General Methods
  ******************************************************************************/
 
-void BGI_Pad::updateHighlightedNetSignals() noexcept {
+void BGI_Pad::updateContext() noexcept {
   updateHightlighted(isSelected());
+  mGraphicsItem->setTextMirrored(mContext->mirror);
 }
 
 /*******************************************************************************
@@ -165,10 +166,12 @@ void BGI_Pad::updateLayer() noexcept {
     setZValue(BoardGraphicsScene::ZValue_PadsTop);
     mGraphicsItem->setLayer(Theme::Color::sBoardPads);
   } else if (mPad.getSolderLayer() == Layer::topCopper()) {
-    setZValue(BoardGraphicsScene::ZValue_PadsTop);
+    setZValue(BoardGraphicsScene::getMirroredZValue(
+        BoardGraphicsScene::ZValue_PadsTop, mContext->mirror));
     mGraphicsItem->setLayer(Theme::Color::sBoardCopperTop);
   } else {
-    setZValue(BoardGraphicsScene::ZValue_PadsBottom);
+    setZValue(BoardGraphicsScene::getMirroredZValue(
+        BoardGraphicsScene::ZValue_PadsBottom, mContext->mirror));
     mGraphicsItem->setLayer(Theme::Color::sBoardCopperBot);
   }
 }
@@ -199,7 +202,7 @@ void BGI_Pad::updateToolTip() noexcept {
 
 void BGI_Pad::updateHightlighted(bool selected) noexcept {
   mGraphicsItem->setSelected(
-      selected || mHighlightedNetSignals->contains(mPad.getNetSignal()));
+      selected || mContext->highlightedNets->contains(mPad.getNetSignal()));
 }
 
 /*******************************************************************************

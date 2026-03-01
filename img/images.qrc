@@ -4,6 +4,7 @@
         <file alias="/bi/align-bottom.svg">../libs/bootstrap-icons/icons/align-bottom.svg</file>
         <file alias="/bi/align-center.svg">../libs/bootstrap-icons/icons/align-center.svg</file>
         <file alias="/bi/align-top.svg">../libs/bootstrap-icons/icons/align-top.svg</file>
+        <file alias="/bi/arrow-repeat.svg">../libs/bootstrap-icons/icons/arrow-repeat.svg</file>
         <file alias="/bi/badge-3d.svg">../libs/bootstrap-icons/icons/badge-3d.svg</file>
         <file alias="/bi/bootstrap-reboot.svg">../libs/bootstrap-icons/icons/bootstrap-reboot.svg</file>
         <file alias="/bi/box-arrow-left.svg">../libs/bootstrap-icons/icons/box-arrow-left.svg</file>
@@ -35,6 +36,7 @@
         <file alias="/fa/solid/arrow-pointer.svg">../libs/font-awesome/svgs/solid/arrow-pointer.svg</file>
         <file alias="/fa/solid/arrow-up-right-from-square.svg">../libs/font-awesome/svgs/solid/arrow-up-right-from-square.svg</file>
         <file alias="/fa/solid/arrows-rotate.svg">../libs/font-awesome/svgs/solid/arrows-rotate.svg</file>
+        <file alias="/fa/solid/arrows-up-to-line.svg">../libs/font-awesome/svgs/solid/arrows-up-to-line.svg</file>
         <file alias="/fa/solid/book.svg">../libs/font-awesome/svgs/solid/book.svg</file>
         <file alias="/fa/solid/bore-hole.svg">../libs/font-awesome/svgs/solid/bore-hole.svg</file>
         <file alias="/fa/solid/caret-down.svg">../libs/font-awesome/svgs/solid/caret-down.svg</file>
@@ -82,7 +84,6 @@
         <file alias="/fa/solid/vector-square.svg">../libs/font-awesome/svgs/solid/vector-square.svg</file>
         <file alias="/fa/solid/wand-magic-sparkles.svg">../libs/font-awesome/svgs/solid/wand-magic-sparkles.svg</file>
         <file alias="/fa/solid/xmark.svg">../libs/font-awesome/svgs/solid/xmark.svg</file>
-        <file alias="/fa/solid/arrows-up-to-line.svg">../libs/font-awesome/svgs/solid/arrows-up-to-line.svg</file>
     </qresource>
     <qresource prefix="/img">
         <file>actions/add.png</file>

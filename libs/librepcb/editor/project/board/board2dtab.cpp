@@ -368,7 +368,7 @@ ui::Board2dTabData Board2dTab::getDerivedUiData() const noexcept {
       l2s(mGridStyle),  // Grid style
       l2s(*mBoard.getGridInterval()),  // Grid interval
       l2s(mBoard.getGridUnit()),  // Length unit
-          mViewFromBottom, // View from bottom
+      mViewFromBottom,  // View from bottom
       mBackgroundImageGraphicsItem->isVisible(),  // Background image set
       mIgnorePlacementLocks,  // Ignore placement locks
       mBoardEditor.isRebuildingPlanes(),  // Refreshing
@@ -455,6 +455,7 @@ void Board2dTab::setDerivedUiData(const ui::Board2dTabData& data) noexcept {
 
   // View from bottom
   mViewFromBottom = data.view_from_bottom;
+  mScene->setMirrored(mViewFromBottom);
   mView->setMirror(mViewFromBottom);
 
   // Placement locks
@@ -565,10 +566,16 @@ void Board2dTab::activate() noexcept {
           &mBoardEditor, &BoardEditor::schedulePlanesRebuild);
 
   mScene.reset(new BoardGraphicsScene(
-      mBoard, *mLayers, mProjectEditor.getHighlightedNetSignals(), this));
+      mBoard, *mLayers,
+      std::shared_ptr<BoardGraphicsScene::Context>(
+          new BoardGraphicsScene::Context{
+              mProjectEditor.getHighlightedNetSignals(),  // highlighted nets
+              false,  // mirror
+          }),
+      this));
   mScene->setGridInterval(mBoard.getGridInterval());
   connect(&mProjectEditor, &ProjectEditor::highlightedNetSignalsChanged,
-          mScene.get(), &BoardGraphicsScene::updateHighlightedNetSignals);
+          mScene.get(), &BoardGraphicsScene::updateContext);
   connect(mScene.get(), &GraphicsScene::changed, this,
           &Board2dTab::requestRepaint);
 

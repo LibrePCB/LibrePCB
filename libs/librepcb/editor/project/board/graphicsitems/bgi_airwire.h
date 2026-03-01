@@ -24,6 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include "../../../graphics/graphicslayer.h"
+#include "../boardgraphicsscene.h"
 
 #include <QtCore>
 #include <QtWidgets>
@@ -55,9 +56,9 @@ public:
   // Constructors / Destructor
   BGI_AirWire() = delete;
   BGI_AirWire(const BGI_AirWire& other) = delete;
-  BGI_AirWire(BI_AirWire& airwire, const GraphicsLayerList& layers,
-              std::shared_ptr<const QSet<const NetSignal*>>
-                  highlightedNetSignals) noexcept;
+  BGI_AirWire(
+      BI_AirWire& airwire, const GraphicsLayerList& layers,
+      std::shared_ptr<const BoardGraphicsScene::Context> context) noexcept;
   virtual ~BGI_AirWire() noexcept;
 
   // General Methods
@@ -77,7 +78,7 @@ private:  // Methods
 
 private:  // Data
   BI_AirWire& mAirWire;
-  std::shared_ptr<const QSet<const NetSignal*>> mHighlightedNetSignals;
+  std::shared_ptr<const BoardGraphicsScene::Context> mContext;
   std::shared_ptr<const GraphicsLayer> mLayer;
 
   // Cached Attributes

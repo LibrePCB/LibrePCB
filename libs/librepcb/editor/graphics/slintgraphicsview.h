@@ -91,6 +91,7 @@ public:
                                     qreal multiplier) const noexcept;
   Point mapToScenePos(const QPointF& pos,
                       qreal devicePixelRatio) const noexcept;
+  QPointF mapToScenePosPx(QPointF pos, qreal devicePixelRatio) const noexcept;
 
   // General Methods
   void setUseOpenGl(bool use) noexcept;
@@ -127,7 +128,7 @@ signals:
 
 private:  // Methods
   void scroll(const QPointF& delta) noexcept;
-  void zoom(const QPointF& center, qreal factor) noexcept;
+  void zoom(QPointF center, qreal factor) noexcept;
   void smoothTo(const Projection& projection) noexcept;
   bool applyProjection(const Projection& projection) noexcept;
   QRectF validateSceneRect(const QRectF& r) const noexcept;

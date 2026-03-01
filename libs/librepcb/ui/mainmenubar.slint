@@ -798,6 +798,20 @@ export component MainMenuBar inherits Rectangle {
 
                 MenuSeparator { }
 
+                view-from-bottom-item := MenuItem {
+                    property <bool> bottom: Data.current-section.board-2d-tabs[Data.current-section.current-tab-index].view-from-bottom;
+
+                    cmd: Cmd.view-from-bottom;
+                    enabled: Data.current-tab.type == TabType.board-2d;
+                    checkable: true;
+                    checked: bottom;
+
+                    clicked => {
+                        Data.current-section.board-2d-tabs[Data.current-section.current-tab-index].view-from-bottom = !bottom;
+                        close-menu();
+                    }
+                }
+
                 toggle-background-image-item := MenuItem {
                     cmd: Cmd.toggle-background-image;
                     enabled: Data.current-tab.features.background-image == FeatureState.enabled;

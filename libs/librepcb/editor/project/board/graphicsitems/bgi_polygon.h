@@ -23,6 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../boardgraphicsscene.h"
+
 #include <librepcb/core/geometry/polygon.h>
 #include <librepcb/core/project/board/items/bi_polygon.h>
 
@@ -50,7 +52,9 @@ public:
   // Constructors / Destructor
   BGI_Polygon() = delete;
   BGI_Polygon(const BGI_Polygon& other) = delete;
-  BGI_Polygon(BI_Polygon& polygon, const GraphicsLayerList& layers) noexcept;
+  BGI_Polygon(
+      BI_Polygon& polygon, const GraphicsLayerList& layers,
+      std::shared_ptr<const BoardGraphicsScene::Context> context) noexcept;
   virtual ~BGI_Polygon() noexcept;
 
   // General Methods
@@ -58,6 +62,7 @@ public:
   const PolygonGraphicsItem& getGraphicsItem() const noexcept {
     return *mGraphicsItem;
   }
+  void updateContext() noexcept { updateZValue(); }
 
   // Inherited from QGraphicsItem
   QPainterPath shape() const noexcept override;
@@ -75,6 +80,7 @@ private:  // Methods
 private:  // Data
   BI_Polygon& mPolygon;
   Polygon mPolygonObj;
+  std::shared_ptr<const BoardGraphicsScene::Context> mContext;
   QScopedPointer<PolygonGraphicsItem> mGraphicsItem;
 
   // Slots
