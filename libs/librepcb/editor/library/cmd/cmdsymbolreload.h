@@ -72,6 +72,8 @@ private:  // Data
 
   TransactionalFileSystem::State mOldFiles;
   TransactionalFileSystem::State mNewFiles;
+  QSet<SExpression> mOldApprovals;
+  QSet<SExpression> mNewApprovals;
 
   PositiveLength mOldGridInterval;
   PositiveLength mNewGridInterval;

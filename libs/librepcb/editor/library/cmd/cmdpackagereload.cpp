@@ -42,6 +42,8 @@ CmdPackageReload::CmdPackageReload(Package& element) noexcept
     mElement(element),
     mOldFiles(mElement.getDirectory().getFileSystem()->saveState()),
     mNewFiles(),
+    mOldApprovals(element.getMessageApprovals()),
+    mNewApprovals(mOldApprovals),
     mOldGridInterval(mElement.getGridInterval()),
     mNewGridInterval(mOldGridInterval),
     mOldPads(mElement.getPads()),
@@ -87,6 +89,7 @@ bool CmdPackageReload::performExecute() {
   setResources(newElement->getResources());
   setAlternativeNames(newElement->getAlternativeNames());
   setAssemblyType(newElement->getAssemblyType(false));
+  mNewApprovals = newElement->getMessageApprovals();
   mNewGridInterval = newElement->getGridInterval();
   setMinCopperClearance(newElement->getMinCopperClearance());
   mNewPads = newElement->getPads();
@@ -95,6 +98,7 @@ bool CmdPackageReload::performExecute() {
 
   // And apply the modifications.
   if (CmdPackageEdit::performExecute()) return true;  // can throw
+  if (mNewApprovals != mOldApprovals) return true;
   if (mNewGridInterval != mOldGridInterval) return true;
   if (mNewPads != mOldPads) return true;
   if (mNewModels != mOldModels) return true;
@@ -105,6 +109,7 @@ bool CmdPackageReload::performExecute() {
 void CmdPackageReload::performUndo() {
   CmdPackageEdit::performUndo();  // can throw
   mElement.getDirectory().getFileSystem()->restoreState(mOldFiles);
+  mElement.setMessageApprovals(mOldApprovals);
   mElement.setGridInterval(mOldGridInterval);
   mElement.getPads() = mOldPads;
   mElement.getModels() = mOldModels;
@@ -114,6 +119,7 @@ void CmdPackageReload::performUndo() {
 void CmdPackageReload::performRedo() {
   CmdPackageEdit::performRedo();  // can throw
   mElement.getDirectory().getFileSystem()->restoreState(mNewFiles);
+  mElement.setMessageApprovals(mNewApprovals);
   mElement.setGridInterval(mNewGridInterval);
   mElement.getPads() = mNewPads;
   mElement.getModels() = mNewModels;

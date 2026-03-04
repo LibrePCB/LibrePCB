@@ -42,6 +42,8 @@ CmdSymbolReload::CmdSymbolReload(Symbol& element) noexcept
     mElement(element),
     mOldFiles(mElement.getDirectory().getFileSystem()->saveState()),
     mNewFiles(),
+    mOldApprovals(element.getMessageApprovals()),
+    mNewApprovals(mOldApprovals),
     mOldGridInterval(mElement.getGridInterval()),
     mNewGridInterval(mOldGridInterval),
     mOldPins(mElement.getPins()),
@@ -88,6 +90,7 @@ bool CmdSymbolReload::performExecute() {
   setGeneratedBy(newElement->getGeneratedBy());
   setCategories(newElement->getCategories());
   setResources(newElement->getResources());
+  mNewApprovals = newElement->getMessageApprovals();
   mNewGridInterval = newElement->getGridInterval();
   mNewPins = newElement->getPins();
   mNewPolygons = newElement->getPolygons();
@@ -97,6 +100,7 @@ bool CmdSymbolReload::performExecute() {
 
   // And apply the modifications.
   if (CmdLibraryElementEdit::performExecute()) return true;  // can throw
+  if (mNewApprovals != mOldApprovals) return true;
   if (mNewGridInterval != mOldGridInterval) return true;
   if (mNewPins != mOldPins) return true;
   if (mNewPolygons != mOldPolygons) return true;
@@ -109,6 +113,7 @@ bool CmdSymbolReload::performExecute() {
 void CmdSymbolReload::performUndo() {
   CmdLibraryElementEdit::performUndo();  // can throw
   mElement.getDirectory().getFileSystem()->restoreState(mOldFiles);
+  mElement.setMessageApprovals(mOldApprovals);
   mElement.setGridInterval(mOldGridInterval);
   mElement.getPins() = mOldPins;
   mElement.getPolygons() = mOldPolygons;
@@ -120,6 +125,7 @@ void CmdSymbolReload::performUndo() {
 void CmdSymbolReload::performRedo() {
   CmdLibraryElementEdit::performRedo();  // can throw
   mElement.getDirectory().getFileSystem()->restoreState(mNewFiles);
+  mElement.setMessageApprovals(mNewApprovals);
   mElement.setGridInterval(mNewGridInterval);
   mElement.getPins() = mNewPins;
   mElement.getPolygons() = mNewPolygons;
