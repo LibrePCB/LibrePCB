@@ -85,6 +85,7 @@ TEST_F(CmdSymbolReloadTest, test) {
   (position 1.1 2.2) (rotation 1.0) (width 10.0) (height 11.0)
   (border 0.5)
  )
+ (approved missing_value_text)
 )
 )";
 

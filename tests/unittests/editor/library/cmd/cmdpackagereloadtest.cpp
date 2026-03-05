@@ -91,6 +91,7 @@ TEST_F(CmdPackageReloadTest, test) {
    (auto_rotate true) (mirror false) (value "{{NAME}}")
   )
  )
+ (approved ambiguous_footprint_tags)
 )
 )";
 
