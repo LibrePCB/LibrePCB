@@ -9,6 +9,13 @@ if(NOT USE_OPENCASCADE)
   return()
 endif()
 
+# The following test fixes librepcb and librepcb-cli builds
+# that have linking issues against 'fontconfig', 'GL' and
+# 'X11' under OpenBSD.
+if(CMAKE_SYSTEM_NAME STREQUAL OpenBSD)
+  target_link_directories(open_cascade INTERFACE /usr/X11R6/lib)
+endif(CMAKE_SYSTEM_NAME STREQUAL OpenBSD)
+
 # Try to find OCCT shared library on the system
 find_package(OpenCASCADE CONFIG QUIET)
 if(OpenCASCADE_FOUND)
