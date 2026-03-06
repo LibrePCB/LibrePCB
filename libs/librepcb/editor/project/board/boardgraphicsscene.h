@@ -112,13 +112,16 @@ public:
     ZValue_AirWires,  ///< For ::librepcb::BI_AirWire items
   };
 
+  struct Context {
+    std::shared_ptr<const QSet<const NetSignal*>> highlightedNets;
+  };
+
   // Constructors / Destructor
   BoardGraphicsScene() = delete;
   BoardGraphicsScene(const BoardGraphicsScene& other) = delete;
-  explicit BoardGraphicsScene(
-      Board& board, const GraphicsLayerList& layers,
-      std::shared_ptr<const QSet<const NetSignal*>> highlightedNetSignals,
-      QObject* parent = nullptr) noexcept;
+  explicit BoardGraphicsScene(Board& board, const GraphicsLayerList& layers,
+                              std::shared_ptr<Context> context,
+                              QObject* parent = nullptr) noexcept;
   virtual ~BoardGraphicsScene() noexcept;
 
   // Getters
@@ -167,7 +170,7 @@ public:
   void selectItemsInRect(const Point& p1, const Point& p2) noexcept;
   void selectNetSegment(BI_NetSegment& netSegment) noexcept;
   void clearSelection() noexcept;
-  void updateHighlightedNetSignals() noexcept;
+  void updateContext() noexcept;
   static qreal getZValueOfCopperLayer(const Layer& layer) noexcept;
 
   // Operator Overloadings
@@ -210,7 +213,7 @@ private:  // Methods
 private:  // Data
   Board& mBoard;
   const GraphicsLayerList& mLayers;
-  std::shared_ptr<const QSet<const NetSignal*>> mHighlightedNetSignals;
+  std::shared_ptr<Context> mContext;
   QHash<BI_Device*, std::shared_ptr<BGI_Device>> mDevices;
   QHash<BI_Pad*, std::shared_ptr<BGI_Pad>> mPads;
   QHash<BI_Via*, std::shared_ptr<BGI_Via>> mVias;

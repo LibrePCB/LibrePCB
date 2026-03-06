@@ -48,14 +48,14 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BGI_Pad::BGI_Pad(BI_Pad& pad, std::weak_ptr<BGI_Device> deviceItem,
-                 const GraphicsLayerList& layers,
-                 std::shared_ptr<const QSet<const NetSignal*>>
-                     highlightedNetSignals) noexcept
+BGI_Pad::BGI_Pad(
+    BI_Pad& pad, std::weak_ptr<BGI_Device> deviceItem,
+    const GraphicsLayerList& layers,
+    std::shared_ptr<const BoardGraphicsScene::Context> context) noexcept
   : QGraphicsItemGroup(),
     mPad(pad),
     mDeviceGraphicsItem(deviceItem),
-    mHighlightedNetSignals(highlightedNetSignals),
+    mContext(context),
     mGraphicsItem(new PrimitiveFootprintPadGraphicsItem(layers, false, this)),
     mOnPadEditedSlot(*this, &BGI_Pad::padEdited),
     mOnDeviceEditedSlot(*this, &BGI_Pad::deviceGraphicsItemEdited) {
@@ -84,7 +84,7 @@ BGI_Pad::~BGI_Pad() noexcept {
  *  General Methods
  ******************************************************************************/
 
-void BGI_Pad::updateHighlightedNetSignals() noexcept {
+void BGI_Pad::updateContext() noexcept {
   updateHightlighted(isSelected());
 }
 
@@ -199,7 +199,7 @@ void BGI_Pad::updateToolTip() noexcept {
 
 void BGI_Pad::updateHightlighted(bool selected) noexcept {
   mGraphicsItem->setSelected(
-      selected || mHighlightedNetSignals->contains(mPad.getNetSignal()));
+      selected || mContext->highlightedNets->contains(mPad.getNetSignal()));
 }
 
 /*******************************************************************************

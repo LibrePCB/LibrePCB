@@ -563,10 +563,15 @@ void Board2dTab::activate() noexcept {
           &mBoardEditor, &BoardEditor::schedulePlanesRebuild);
 
   mScene.reset(new BoardGraphicsScene(
-      mBoard, *mLayers, mProjectEditor.getHighlightedNetSignals(), this));
+      mBoard, *mLayers,
+      std::shared_ptr<BoardGraphicsScene::Context>(
+          new BoardGraphicsScene::Context{
+              mProjectEditor.getHighlightedNetSignals(),  // highlighted nets
+          }),
+      this));
   mScene->setGridInterval(mBoard.getGridInterval());
   connect(&mProjectEditor, &ProjectEditor::highlightedNetSignalsChanged,
-          mScene.get(), &BoardGraphicsScene::updateHighlightedNetSignals);
+          mScene.get(), &BoardGraphicsScene::updateContext);
   connect(mScene.get(), &GraphicsScene::changed, this,
           &Board2dTab::requestRepaint);
 
