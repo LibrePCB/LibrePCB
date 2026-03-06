@@ -35,6 +35,12 @@ namespace editor {
 
 static const qreal sScrollFactor = 0.07;
 
+static qreal boundedScaleFactor(qreal scale) noexcept {
+  // Limit zoom factor to avoid crashes due to numerical issues when zooming
+  // extensively (e.g. possible with free running scroll wheels).
+  return qBound(qreal(0.001), scale, qreal(5000));
+}
+
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
@@ -155,8 +161,9 @@ slint::Image SlintGraphicsView::render(GraphicsScene& scene, float width,
     if (mViewSize.isEmpty()) {
       const QRectF target = targetRect.marginsRemoved(mDefaultMargins);
       const QRectF initialRect = validateSceneRect(scene.itemsBoundingRect());
-      mProjection.scale = std::min(target.width() / initialRect.width(),
-                                   target.height() / initialRect.height());
+      mProjection.scale =
+          boundedScaleFactor(std::min(target.width() / initialRect.width(),
+                                      target.height() / initialRect.height()));
       mProjection.offset =
           initialRect.center() - target.center() / mProjection.scale;
     }
@@ -350,8 +357,9 @@ void SlintGraphicsView::zoomToSceneRect(const QRectF& r) noexcept {
   }
 
   Projection projection;
-  projection.scale = std::min(targetRect.width() / sourceRect.width(),
-                              targetRect.height() / sourceRect.height());
+  projection.scale =
+      boundedScaleFactor(std::min(targetRect.width() / sourceRect.width(),
+                                  targetRect.height() / sourceRect.height()));
   projection.offset =
       sourceRect.center() - (targetRect.center() / projection.scale);
   smoothTo(projection);
@@ -407,7 +415,7 @@ void SlintGraphicsView::zoom(const QPointF& center, qreal factor) noexcept {
   tf.translate(projection.offset.x(), projection.offset.y());
   tf.scale(1 / projection.scale, 1 / projection.scale);
   const QPointF scenePos0 = tf.map(center);
-  projection.scale *= factor;
+  projection.scale = boundedScaleFactor(projection.scale * factor);
 
   QTransform tf2;
   tf2.translate(projection.offset.x(), projection.offset.y());
