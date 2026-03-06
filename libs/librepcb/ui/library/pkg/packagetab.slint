@@ -836,19 +836,24 @@ component PackageEditorTab inherits TouchArea {
             }
         }
 
-        if !view-3d: toggle-background-image-btn := SceneButton {
+        if !view-3d: background-image-btn := SliderSceneButton {
             x: parent.width - self.width;
-            style: self.checked ? checkbox : button;
-            icon-scale: self.checked ? 0.8 : 0.9;
+            style: self.slider-enabled ? checkbox : button;
+            icon-scale: self.slider-enabled ? 0.8 : 0.9;
             icon: Cmd.toggle-background-image.icon;
-            tooltip: Cmd.toggle-background-image.text;
+            tooltip: self.slider-enabled ? @tr("Background Image") : Cmd.toggle-background-image.text;
             bg-color: tabs[index].background-color;
             fg-color: tabs[index].foreground-color;
-            checked: tabs[index].background-image-set;
+            value: tabs[index].background-image-alpha;
+            slider-enabled: tabs[index].background-image-set;
             enabled: footprint-selected;
 
-            clicked => {
+            button-clicked => {
                 Backend.trigger-tab(section-index, index, TabAction.toggle-background-image);
+            }
+
+            value-changed(value) => {
+                tabs[index].background-image-alpha = value;
             }
         }
 

@@ -14,6 +14,7 @@ import {
     MenuPopup,
     MessageBox,
     SceneButton,
+    SliderSceneButton,
     Spinner,
     ToolButton,
 } from "../../widgets.slint";
@@ -576,6 +577,7 @@ export component Board2dTab inherits Tab {
             width: self.preferred-width;
 
             zoom-fit-btn := SceneButton {
+                x: parent.width - self.width;
                 icon: @image-url("../../../../font-awesome/svgs/solid/expand.svg");
                 icon-scale: 0.9;
                 bg-color: tabs[index].background-color;
@@ -587,6 +589,7 @@ export component Board2dTab inherits Tab {
             }
 
             zoom-in-btn := SceneButton {
+                x: parent.width - self.width;
                 icon: @image-url("../../../../bootstrap-icons/icons/zoom-in.svg");
                 bg-color: tabs[index].background-color;
                 fg-color: tabs[index].foreground-color;
@@ -597,6 +600,7 @@ export component Board2dTab inherits Tab {
             }
 
             zoom-out-btn := SceneButton {
+                x: parent.width - self.width;
                 icon: @image-url("../../../../bootstrap-icons/icons/zoom-out.svg");
                 bg-color: tabs[index].background-color;
                 fg-color: tabs[index].foreground-color;
@@ -606,22 +610,28 @@ export component Board2dTab inherits Tab {
                 }
             }
 
-            toggle-background-image-btn := SceneButton {
+            background-image-btn := SliderSceneButton {
                 x: parent.width - self.width;
-                style: self.checked ? checkbox : button;
-                icon-scale: self.checked ? 0.8 : 0.9;
+                style: self.slider-enabled ? checkbox : button;
+                icon-scale: self.slider-enabled ? 0.8 : 0.9;
                 icon: Cmd.toggle-background-image.icon;
-                tooltip: Cmd.toggle-background-image.text;
+                tooltip: self.slider-enabled ? @tr("Background Image") : Cmd.toggle-background-image.text;
                 bg-color: tabs[index].background-color;
                 fg-color: tabs[index].foreground-color;
-                checked: tabs[index].background-image-set;
+                value: tabs[index].background-image-alpha;
+                slider-enabled: tabs[index].background-image-set;
 
-                clicked => {
+                button-clicked => {
                     Backend.trigger-tab(section-index, index, TabAction.toggle-background-image);
+                }
+
+                value-changed(value) => {
+                    tabs[index].background-image-alpha = value;
                 }
             }
 
             toggle-3d-btn := SceneButton {
+                x: parent.width - self.width;
                 text: "3D";
                 bg-color: tabs[index].background-color;
                 fg-color: tabs[index].foreground-color;

@@ -367,6 +367,7 @@ ui::PackageTabData PackageTab::getDerivedUiData() const noexcept {
       l2s(*mPackage->getGridInterval()),  // Grid interval
       l2s(mUnit),  // Unit
       mBackgroundImageGraphicsItem->isVisible(),  // Background image set
+      static_cast<float>(mBackgroundImageGraphicsItem->opacity()),  // BG alpha
       mAlpha.value(OpenGlObject::Type::SolderResist, 1),  // Solder resist alpha
       mAlpha.value(OpenGlObject::Type::Silkscreen, 1),  // Silkscreen alpha
       mAlpha.value(OpenGlObject::Type::SolderPaste, 1),  // Solder paste alpha
@@ -514,6 +515,7 @@ void PackageTab::setDerivedUiData(const ui::PackageTabData& data) noexcept {
   if (unit != mUnit) {
     mUnit = unit;
   }
+  mBackgroundImageGraphicsItem->setOpacity(data.background_image_alpha);
   mAlpha[OpenGlObject::Type::SolderResist] =
       qBound(0.0f, data.solderresist_alpha, 1.0f);
   mAlpha[OpenGlObject::Type::Silkscreen] =
@@ -2691,11 +2693,18 @@ bool PackageTab::toggleBackgroundImage() noexcept {
     mBackgroundImageSettings.enabled =
         (!mBackgroundImageSettings.image.isNull()) &&
         (mBackgroundImageSettings.references.count() >= 2);
+
+    // Make sure the loaded image is actually visible.
+    if (mBackgroundImageSettings.enabled &&
+        (mBackgroundImageGraphicsItem->opacity() < 0.1)) {
+      mBackgroundImageGraphicsItem->setOpacity(0.8);
+    }
   }
 
   // Store & apply new settings.
   mBackgroundImageSettings.saveToDir(getBackgroundImageCacheDir());
   applyBackgroundImageSettings();
+  onDerivedUiDataChanged.notify();
   return mBackgroundImageGraphicsItem->isVisible();
 }
 

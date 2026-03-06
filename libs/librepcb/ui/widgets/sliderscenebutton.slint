@@ -1,60 +1,80 @@
-import { SceneButton } from "scenebutton.slint";
+import { SceneButton, SceneButtonStyle } from "scenebutton.slint";
 import { HorizontalSlider } from "slider.slint";
 
-export component SliderSceneButton inherits TouchArea {
+export component SliderSceneButton {
     in property <image> icon;
     in property <string> tooltip;
     in property <float> value;
     in property <brush> bg-color;
     in property <brush> fg-color;
+    in property <bool> enabled: true;
+    in property <bool> slider-enabled: true;
+    in property <SceneButtonStyle> style: uncheckbox;
+    in property <float> icon-scale: 0.9;
 
+    callback button-clicked();
     callback value-changed(value: float);
 
-    HorizontalLayout {
-        alignment: end;
+    button-clicked => {
+        value-changed(btn.checked ? 1 : 0);
+    }
 
-        if root.has-hover: VerticalLayout {
-            spacing: 5px;
+    ta := TouchArea {
+        enabled: enabled && slider-enabled;
 
-            Rectangle {
-                x: (parent.width - self.width) / 2;
-                width: self.preferred-width + 6px;
-                height: self.preferred-height + 2px;
-                background: bg-color;
-                border-radius: 5px;
+        HorizontalLayout {
+            alignment: end;
 
-                Text {
-                    color: fg-color;
-                    horizontal-alignment: center;
-                    font-size: 10px;
-                    text: tooltip;
-                    accessible-role: none;
+            if ta.enabled && ta.has-hover: VerticalLayout {
+                spacing: 5px;
+
+                Rectangle {
+                    x: (parent.width - self.width) / 2;
+                    width: self.preferred-width + 6px;
+                    height: self.preferred-height + 2px;
+                    background: bg-color;
+                    border-radius: 5px;
+
+                    Text {
+                        color: fg-color;
+                        horizontal-alignment: center;
+                        font-size: 10px;
+                        text: tooltip;
+                        accessible-role: none;
+                    }
+                }
+
+                slider := HorizontalSlider {
+                    min-width: 80px;
+                    value: value;
+                    focusable: false;
+                    accessible-label: tooltip;
+
+                    value-changed(value) => {
+                        value-changed(value);
+                    }
                 }
             }
 
-            slider := HorizontalSlider {
-                min-width: 80px;
-                value: value;
-                focusable: false;
+            btn := SceneButton {
+                icon: icon;
+                icon-scale: icon-scale;
+                bg-color: bg-color;
+                fg-color: fg-color;
+                style: style;
+                checked: {
+                    if style == SceneButtonStyle.uncheckbox {
+                        slider-enabled && (value < 0.2)
+                    } else {
+                        slider-enabled
+                    }
+                };
+                enabled: enabled;
                 accessible-label: tooltip;
 
-                value-changed(value) => {
-                    value-changed(value);
+                clicked => {
+                    root.button-clicked();
                 }
-            }
-        }
-
-        btn := SceneButton {
-            icon: icon;
-            icon-scale: 0.9;
-            bg-color: bg-color;
-            fg-color: fg-color;
-            style: uncheckbox;
-            checked: value < 0.2;
-            accessible-label: tooltip;
-
-            clicked => {
-                value-changed(self.checked ? 1 : 0);
             }
         }
     }
