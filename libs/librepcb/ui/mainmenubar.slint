@@ -855,6 +855,18 @@ export component MainMenuBar inherits Rectangle {
                         close-menu();
                     }
                 }
+
+                flip-view-item := MenuItem {
+                    property <bool> flip: Data.current-section.board-2d-tabs[Data.current-section.current-tab-index].flip-view;
+
+                    cmd: Cmd.flip-view;
+                    enabled: Data.current-tab.type == TabType.board-2d;
+
+                    clicked => {
+                        Data.current-section.board-2d-tabs[Data.current-section.current-tab-index].flip-view = !flip;
+                        close-menu();
+                    }
+                }
             }
         }
 

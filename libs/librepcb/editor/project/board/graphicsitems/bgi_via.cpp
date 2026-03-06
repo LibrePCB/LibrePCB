@@ -72,6 +72,7 @@ BGI_Via::BGI_Via(
   mTextGraphicsItem->setLineWidth(UnsignedLength(100000));
   mTextGraphicsItem->setLighterColors(true);  // More contrast for readability.
   mTextGraphicsItem->setShapeMode(PrimitivePathGraphicsItem::ShapeMode::None);
+  mTextGraphicsItem->setMirrored(mContext->flipView);
   mTextGraphicsItem->setZValue(500);
 
   updatePosition();
@@ -98,6 +99,7 @@ BGI_Via::~BGI_Via() noexcept {
  ******************************************************************************/
 
 void BGI_Via::updateContext() noexcept {
+  mTextGraphicsItem->setMirrored(mContext->flipView);
   update();
 }
 

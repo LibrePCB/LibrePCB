@@ -66,6 +66,7 @@ BGI_Pad::BGI_Pad(
   mGraphicsItem->setRotation(mPad.getRotation());
   mGraphicsItem->setMirrored(mPad.getMirrored());
   mGraphicsItem->setText(mPad.getText());
+  mGraphicsItem->setTextMirrored(mContext->flipView);
   mGraphicsItem->setGeometries(mPad.getGeometries(),
                                *mPad.getProperties().getCopperClearance());
   updateLayer();
@@ -86,6 +87,7 @@ BGI_Pad::~BGI_Pad() noexcept {
 
 void BGI_Pad::updateContext() noexcept {
   updateHightlighted(isSelected());
+  mGraphicsItem->setTextMirrored(mContext->flipView);
 }
 
 /*******************************************************************************
@@ -165,10 +167,12 @@ void BGI_Pad::updateLayer() noexcept {
     setZValue(BoardGraphicsScene::ZValue_PadsTop);
     mGraphicsItem->setLayer(Theme::Color::sBoardPads);
   } else if (mPad.getSolderLayer() == Layer::topCopper()) {
-    setZValue(BoardGraphicsScene::ZValue_PadsTop);
+    setZValue(BoardGraphicsScene::getFlippedZValue(
+        BoardGraphicsScene::ZValue_PadsTop, mContext->flipView));
     mGraphicsItem->setLayer(Theme::Color::sBoardCopperTop);
   } else {
-    setZValue(BoardGraphicsScene::ZValue_PadsBottom);
+    setZValue(BoardGraphicsScene::getFlippedZValue(
+        BoardGraphicsScene::ZValue_PadsBottom, mContext->flipView));
     mGraphicsItem->setLayer(Theme::Color::sBoardCopperBot);
   }
 }

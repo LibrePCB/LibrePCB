@@ -71,6 +71,7 @@ BGI_NetLine::~BGI_NetLine() noexcept {
  ******************************************************************************/
 
 void BGI_NetLine::updateContext() noexcept {
+  updateLayer();
   update();
 }
 
@@ -168,7 +169,8 @@ void BGI_NetLine::updateLine() noexcept {
 
 void BGI_NetLine::updateLayer() noexcept {
   // set Z value
-  setZValue(BoardGraphicsScene::getZValueOfCopperLayer(mNetLine.getLayer()));
+  setZValue(BoardGraphicsScene::getZValueOfCopperLayer(mNetLine.getLayer(),
+                                                       mContext->flipView));
 
   // set layer
   if (mLayer) {

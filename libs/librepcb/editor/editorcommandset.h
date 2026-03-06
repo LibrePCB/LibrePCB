@@ -868,6 +868,15 @@ public:
       {QKeySequence(Qt::CTRL | Qt::Key_Minus)},
       &categoryView,
   };
+  EditorCommand flipView{
+      "flip_view",  // clang-format break
+      QT_TR_NOOP("Flip View"),
+      QT_TR_NOOP("Switch between top view and bottom view"),
+      ":/bi/arrow-repeat.svg",
+      EditorCommand::Flags(),
+      {QKeySequence(Qt::CTRL | Qt::Key_2)},
+      &categoryView,
+  };
   EditorCommand gridIncrease{
       "grid_increase",  // clang-format break
       QT_TR_NOOP("Increase Grid Interval"),

@@ -161,6 +161,13 @@ BoardGraphicsScene::~BoardGraphicsScene() noexcept {
  *  General Methods
  ******************************************************************************/
 
+void BoardGraphicsScene::setFlipped(bool flip) noexcept {
+  if (flip != mContext->flipView) {
+    mContext->flipView = flip;
+    updateContext();
+  }
+}
+
 void BoardGraphicsScene::selectAll() noexcept {
   foreach (auto item, mDevices) {
     item->setSelected(true);
@@ -307,6 +314,9 @@ void BoardGraphicsScene::clearSelection() noexcept {
 }
 
 void BoardGraphicsScene::updateContext() noexcept {
+  foreach (auto item, mDevices) {
+    item->updateContext();
+  }
   foreach (auto item, mPads) {
     item->updateContext();
   }
@@ -316,29 +326,52 @@ void BoardGraphicsScene::updateContext() noexcept {
   foreach (auto item, mPads) {
     item->updateContext();
   }
+  foreach (auto item, mNetPoints) {
+    item->updateContext();
+  }
   foreach (auto item, mNetLines) {
     item->updateContext();
   }
   foreach (auto item, mPlanes) {
     item->updateContext();
   }
+  foreach (auto item, mZones) {
+    item->updateContext();
+  }
   foreach (auto item, mAirWires) {
+    item->updateContext();
+  }
+  foreach (auto item, mPolygons) {
+    item->updateContext();
+  }
+  foreach (auto item, mStrokeTexts) {
     item->updateContext();
   }
 }
 
-qreal BoardGraphicsScene::getZValueOfCopperLayer(const Layer& layer) noexcept {
+qreal BoardGraphicsScene::getZValueOfCopperLayer(const Layer& layer,
+                                                 bool flip) noexcept {
   if (layer.isTop()) {
-    return ZValue_CopperTop;
+    return getFlippedZValue(ZValue_CopperTop, flip);
   } else if (layer.isBottom()) {
-    return ZValue_CopperBottom;
+    return getFlippedZValue(ZValue_CopperBottom, flip);
   } else if (layer.isInner()) {
     // 0.0 => TOP
     // 1.0 => BOTTOM
     const qreal delta = static_cast<qreal>(layer.getCopperNumber()) / 100.0;
-    return (static_cast<int>(ZValue_InnerTop) - delta);
+    return flip ? (static_cast<int>(ZValue_InnerBottom) + delta)
+                : (static_cast<int>(ZValue_InnerTop) - delta);
   } else {
     return ZValue_Default;
+  }
+}
+
+qreal BoardGraphicsScene::getFlippedZValue(ItemZValue value,
+                                           bool flip) noexcept {
+  if (flip && (value >= ZValue_Bottom) && (value <= ZValue_Top)) {
+    return static_cast<qreal>(ZValue_Top + ZValue_Bottom - value);
+  } else {
+    return static_cast<qreal>(value);
   }
 }
 
@@ -349,7 +382,7 @@ qreal BoardGraphicsScene::getZValueOfCopperLayer(const Layer& layer) noexcept {
 void BoardGraphicsScene::addDevice(BI_Device& device) noexcept {
   Q_ASSERT(!mDevices.contains(&device));
   std::shared_ptr<BGI_Device> item =
-      std::make_shared<BGI_Device>(device, mLayers);
+      std::make_shared<BGI_Device>(device, mLayers, mContext);
   addItem(*item);
   mDevices.insert(&device, item);
 
@@ -496,7 +529,7 @@ void BoardGraphicsScene::removeVia(BI_Via& via) noexcept {
 void BoardGraphicsScene::addNetPoint(BI_NetPoint& netPoint) noexcept {
   Q_ASSERT(!mNetPoints.contains(&netPoint));
   std::shared_ptr<BGI_NetPoint> item =
-      std::make_shared<BGI_NetPoint>(netPoint, mLayers);
+      std::make_shared<BGI_NetPoint>(netPoint, mLayers, mContext);
   addItem(*item);
   mNetPoints.insert(&netPoint, item);
 }
@@ -543,7 +576,8 @@ void BoardGraphicsScene::removePlane(BI_Plane& plane) noexcept {
 
 void BoardGraphicsScene::addZone(BI_Zone& zone) noexcept {
   Q_ASSERT(!mZones.contains(&zone));
-  std::shared_ptr<BGI_Zone> item = std::make_shared<BGI_Zone>(zone, mLayers);
+  std::shared_ptr<BGI_Zone> item =
+      std::make_shared<BGI_Zone>(zone, mLayers, mContext);
   addItem(*item);
   mZones.insert(&zone, item);
 }
@@ -559,7 +593,7 @@ void BoardGraphicsScene::removeZone(BI_Zone& zone) noexcept {
 void BoardGraphicsScene::addPolygon(BI_Polygon& polygon) noexcept {
   Q_ASSERT(!mPolygons.contains(&polygon));
   std::shared_ptr<BGI_Polygon> item =
-      std::make_shared<BGI_Polygon>(polygon, mLayers);
+      std::make_shared<BGI_Polygon>(polygon, mLayers, mContext);
   addItem(*item);
   mPolygons.insert(&polygon, item);
 }
@@ -575,7 +609,7 @@ void BoardGraphicsScene::removePolygon(BI_Polygon& polygon) noexcept {
 void BoardGraphicsScene::addStrokeText(BI_StrokeText& text) noexcept {
   Q_ASSERT(!mStrokeTexts.contains(&text));
   std::shared_ptr<BGI_StrokeText> item = std::make_shared<BGI_StrokeText>(
-      text, mDevices.value(text.getDevice()), mLayers);
+      text, mDevices.value(text.getDevice()), mLayers, mContext);
   addItem(*item);
   mStrokeTexts.insert(&text, item);
 }

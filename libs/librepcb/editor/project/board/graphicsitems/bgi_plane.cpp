@@ -118,6 +118,7 @@ QVector<int> BGI_Plane::getVertexIndicesAtPosition(
  ******************************************************************************/
 
 void BGI_Plane::updateContext() noexcept {
+  updateLayer();
   update();
 }
 
@@ -282,13 +283,8 @@ void BGI_Plane::updateOutlineAndFragments() noexcept {
 }
 
 void BGI_Plane::updateLayer() noexcept {
-  if (mPlane.getLayer() == Layer::topCopper()) {
-    setZValue(BoardGraphicsScene::ZValue_PlanesTop);
-  } else if (mPlane.getLayer() == Layer::botCopper()) {
-    setZValue(BoardGraphicsScene::ZValue_PlanesBottom);
-  } else {
-    setZValue(BoardGraphicsScene::getZValueOfCopperLayer(mPlane.getLayer()));
-  }
+  setZValue(BoardGraphicsScene::getZValueOfCopperLayer(mPlane.getLayer(),
+                                                       mContext->flipView));
 
   if (mLayer) {
     mLayer->onEdited.detach(mOnLayerEditedSlot);
