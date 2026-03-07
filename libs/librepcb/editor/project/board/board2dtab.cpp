@@ -368,6 +368,7 @@ ui::Board2dTabData Board2dTab::getDerivedUiData() const noexcept {
       l2s(*mBoard.getGridInterval()),  // Grid interval
       l2s(mBoard.getGridUnit()),  // Length unit
       mBackgroundImageGraphicsItem->isVisible(),  // Background image set
+      static_cast<float>(mBackgroundImageGraphicsItem->opacity()),  // BG alpha
       mIgnorePlacementLocks,  // Ignore placement locks
       mBoardEditor.isRebuildingPlanes(),  // Refreshing
       mMsgEmptySchematics.getUiData(),  // Message "empty schematics"
@@ -450,6 +451,9 @@ void Board2dTab::setDerivedUiData(const ui::Board2dTabData& data) noexcept {
     mBoard.setGridUnit(unit);
     mProjectEditor.setManualModificationsMade();
   }
+
+  // Background image
+  mBackgroundImageGraphicsItem->setOpacity(data.background_image_alpha);
 
   // Placement locks
   mIgnorePlacementLocks = data.ignore_placement_locks;
@@ -2631,11 +2635,18 @@ bool Board2dTab::toggleBackgroundImage() noexcept {
     mBackgroundImageSettings.enabled =
         (!mBackgroundImageSettings.image.isNull()) &&
         (mBackgroundImageSettings.references.count() >= 2);
+
+    // Make sure the loaded image is actually visible.
+    if (mBackgroundImageSettings.enabled &&
+        (mBackgroundImageGraphicsItem->opacity() < 0.1)) {
+      mBackgroundImageGraphicsItem->setOpacity(0.8);
+    }
   }
 
   // Store & apply new settings.
   mBackgroundImageSettings.saveToDir(getBackgroundImageCacheDir());
   applyBackgroundImageSettings();
+  onDerivedUiDataChanged.notify();
   return mBackgroundImageGraphicsItem->isVisible();
 }
 
