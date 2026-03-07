@@ -52,6 +52,7 @@ SlintGraphicsView::SlintGraphicsView(const QRectF& defaultSceneRect,
     mDefaultSceneRect(defaultSceneRect),
     mDefaultMargins(defaultMargins),
     mEventHandler(nullptr),
+    mMirror(false),
     mAnimation(new QVariantAnimation(this)) {
   mAnimation->setDuration(500);
   mAnimation->setEasingCurve(QEasingCurve::InOutCubic);
@@ -81,10 +82,18 @@ QPainterPath SlintGraphicsView::calcPosWithTolerance(
 
 Point SlintGraphicsView::mapToScenePos(const QPointF& pos,
                                        qreal devicePixelRatio) const noexcept {
+  return Point::fromPx(mapToScenePosPx(pos, devicePixelRatio));
+}
+
+QPointF SlintGraphicsView::mapToScenePosPx(
+    QPointF pos, qreal devicePixelRatio) const noexcept {
+  if (mMirror && (mViewSize.width() > 0)) {
+    pos.setX(mViewSize.width() - pos.x());
+  }
   QTransform tf;
   tf.translate(mProjection.offset.x(), mProjection.offset.y());
   tf.scale(1 / mProjection.scale, 1 / mProjection.scale);
-  return Point::fromPx(tf.map(pos * devicePixelRatio));
+  return tf.map(pos * devicePixelRatio);
 }
 
 /*******************************************************************************
@@ -120,6 +129,13 @@ void SlintGraphicsView::setUseOpenGl(bool use) noexcept {
 void SlintGraphicsView::setEventHandler(
     IF_GraphicsViewEventHandler* obj) noexcept {
   mEventHandler = obj;
+}
+
+void SlintGraphicsView::setMirror(bool mirror) noexcept {
+  if (mirror != mMirror) {
+    mMirror = mirror;
+    emit transformChanged();
+  }
 }
 
 slint::Image SlintGraphicsView::render(GraphicsScene& scene, float width,
@@ -170,7 +186,17 @@ slint::Image SlintGraphicsView::render(GraphicsScene& scene, float width,
     QRectF sceneRect(0, 0, size.width() / mProjection.scale,
                      size.height() / mProjection.scale);
     sceneRect.translate(mProjection.offset);
+
+    // Render the scene, either mirrored or not.
+    if (mMirror) {
+      painter.save();
+      painter.translate(size.width(), 0);
+      painter.scale(-1, 1);
+    }
     scene.render(&painter, targetRect, sceneRect);
+    if (mMirror) {
+      painter.restore();
+    }
 
     // If there was an OpenGL error, print it at the bottom right.
     if (!openGlError.isEmpty()) {
@@ -197,10 +223,7 @@ bool SlintGraphicsView::pointerEvent(
   using slint::private_api::PointerEventButton;
   using slint::private_api::PointerEventKind;
 
-  QTransform tf;
-  tf.translate(mProjection.offset.x(), mProjection.offset.y());
-  tf.scale(1 / mProjection.scale, 1 / mProjection.scale);
-  const QPointF scenePosPx = tf.map(pos);
+  const QPointF scenePosPx = mapToScenePosPx(pos, 1);
   mMouseEvent.scenePos = Point::fromPx(scenePosPx);
   mMouseEvent.modifiers = s2q(e.modifiers);
 
@@ -408,7 +431,11 @@ void SlintGraphicsView::scroll(const QPointF& delta) noexcept {
   applyProjection(projection);
 }
 
-void SlintGraphicsView::zoom(const QPointF& center, qreal factor) noexcept {
+void SlintGraphicsView::zoom(QPointF center, qreal factor) noexcept {
+  if (mMirror && (mViewSize.width() > 0)) {
+    center.setX(mViewSize.width() - center.x());
+  }
+
   Projection projection = mProjection;
 
   QTransform tf;

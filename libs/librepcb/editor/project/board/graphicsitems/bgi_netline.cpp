@@ -43,13 +43,13 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BGI_NetLine::BGI_NetLine(BI_NetLine& netline, const GraphicsLayerList& layers,
-                         std::shared_ptr<const QSet<const NetSignal*>>
-                             highlightedNetSignals) noexcept
+BGI_NetLine::BGI_NetLine(
+    BI_NetLine& netline, const GraphicsLayerList& layers,
+    std::shared_ptr<const BoardGraphicsScene::Context> context) noexcept
   : QGraphicsItem(),
     mNetLine(netline),
     mLayers(layers),
-    mHighlightedNetSignals(highlightedNetSignals),
+    mContext(context),
     mLayer(nullptr),
     mOnNetLineEditedSlot(*this, &BGI_NetLine::netLineEdited),
     mOnLayerEditedSlot(*this, &BGI_NetLine::layerEdited) {
@@ -67,6 +67,15 @@ BGI_NetLine::~BGI_NetLine() noexcept {
 }
 
 /*******************************************************************************
+ *  General Methods
+ ******************************************************************************/
+
+void BGI_NetLine::updateContext() noexcept {
+  updateLayer();
+  update();
+}
+
+/*******************************************************************************
  *  Inherited from QGraphicsItem
  ******************************************************************************/
 
@@ -81,7 +90,7 @@ void BGI_NetLine::paint(QPainter* painter,
 
   const NetSignal* netsignal = mNetLine.getNetSegment().getNetSignal();
   const bool highlight = option->state.testFlag(QStyle::State_Selected) ||
-      mHighlightedNetSignals->contains(netsignal);
+      mContext->highlightedNets->contains(netsignal);
 
   // draw line
   if (mLayer->isVisible()) {
@@ -160,7 +169,8 @@ void BGI_NetLine::updateLine() noexcept {
 
 void BGI_NetLine::updateLayer() noexcept {
   // set Z value
-  setZValue(BoardGraphicsScene::getZValueOfCopperLayer(mNetLine.getLayer()));
+  setZValue(BoardGraphicsScene::getZValueOfCopperLayer(mNetLine.getLayer(),
+                                                       mContext->flipView));
 
   // set layer
   if (mLayer) {

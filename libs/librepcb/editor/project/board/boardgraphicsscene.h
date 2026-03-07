@@ -90,6 +90,7 @@ public:
    */
   enum ItemZValue {
     ZValue_Default = 0,  ///< this is the default value (behind all other items)
+    ZValue_Bottom,  ///< For automatic flipping, see #getFlippedZValue()
     ZValue_TextsBottom,  ///< For ::librepcb::BI_StrokeText items
     ZValue_PolygonsBottom,  ///< For ::librepcb::BI_Polygon items
     ZValue_DevicesBottom,  ///< For ::librepcb::BI_Device items
@@ -106,19 +107,24 @@ public:
     ZValue_DevicesTop,  ///< For ::librepcb::BI_Device items
     ZValue_PolygonsTop,  ///< For ::librepcb::BI_Polygon items
     ZValue_TextsTop,  ///< For ::librepcb::BI_StrokeText items
+    ZValue_Top,  ///< For automatic flipping, see #getFlippedZValue()
     ZValue_Holes,  ///< For ::librepcb::BI_Hole items
     ZValue_Vias,  ///< For ::librepcb::BI_Via items
     ZValue_Texts,  ///< For ::librepcb::BI_StrokeText items
     ZValue_AirWires,  ///< For ::librepcb::BI_AirWire items
   };
 
+  struct Context {
+    std::shared_ptr<const QSet<const NetSignal*>> highlightedNets;
+    bool flipView = false;
+  };
+
   // Constructors / Destructor
   BoardGraphicsScene() = delete;
   BoardGraphicsScene(const BoardGraphicsScene& other) = delete;
-  explicit BoardGraphicsScene(
-      Board& board, const GraphicsLayerList& layers,
-      std::shared_ptr<const QSet<const NetSignal*>> highlightedNetSignals,
-      QObject* parent = nullptr) noexcept;
+  explicit BoardGraphicsScene(Board& board, const GraphicsLayerList& layers,
+                              std::shared_ptr<Context> context,
+                              QObject* parent = nullptr) noexcept;
   virtual ~BoardGraphicsScene() noexcept;
 
   // Getters
@@ -163,12 +169,15 @@ public:
   }
 
   // General Methods
+  void setFlipped(bool flip) noexcept;
+  bool isFlipped() const noexcept { return mContext->flipView; }
   void selectAll() noexcept;
   void selectItemsInRect(const Point& p1, const Point& p2) noexcept;
   void selectNetSegment(BI_NetSegment& netSegment) noexcept;
   void clearSelection() noexcept;
-  void updateHighlightedNetSignals() noexcept;
-  static qreal getZValueOfCopperLayer(const Layer& layer) noexcept;
+  void updateContext() noexcept;
+  static qreal getZValueOfCopperLayer(const Layer& layer, bool flip) noexcept;
+  static qreal getFlippedZValue(ItemZValue value, bool flip) noexcept;
 
   // Operator Overloadings
   BoardGraphicsScene& operator=(const BoardGraphicsScene& rhs) = delete;
@@ -210,7 +219,7 @@ private:  // Methods
 private:  // Data
   Board& mBoard;
   const GraphicsLayerList& mLayers;
-  std::shared_ptr<const QSet<const NetSignal*>> mHighlightedNetSignals;
+  std::shared_ptr<Context> mContext;
   QHash<BI_Device*, std::shared_ptr<BGI_Device>> mDevices;
   QHash<BI_Pad*, std::shared_ptr<BGI_Pad>> mPads;
   QHash<BI_Via*, std::shared_ptr<BGI_Via>> mVias;

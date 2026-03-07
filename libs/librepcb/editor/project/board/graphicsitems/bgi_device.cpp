@@ -51,12 +51,14 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BGI_Device::BGI_Device(BI_Device& device,
-                       const GraphicsLayerList& layers) noexcept
+BGI_Device::BGI_Device(
+    BI_Device& device, const GraphicsLayerList& layers,
+    std::shared_ptr<const BoardGraphicsScene::Context> context) noexcept
   : QGraphicsItemGroup(),
     onEdited(*this),
     mDevice(device),
     mLayers(layers),
+    mContext(context),
     mGrabAreaLayer(nullptr),
     mOnEditedSlot(*this, &BGI_Device::deviceEdited),
     mOnLayerEditedSlot(*this, &BGI_Device::layerEdited) {
@@ -117,6 +119,14 @@ BGI_Device::BGI_Device(BI_Device& device,
 }
 
 BGI_Device::~BGI_Device() noexcept {
+}
+
+/*******************************************************************************
+ *  General Methods
+ ******************************************************************************/
+
+void BGI_Device::updateContext() noexcept {
+  updateBoardSide();
 }
 
 /*******************************************************************************
@@ -217,9 +227,11 @@ void BGI_Device::updateBoardSide() noexcept {
   // Update Z value.
   const bool top = !mDevice.getMirrored();
   if (top) {
-    setZValue(BoardGraphicsScene::ZValue_DevicesTop);
+    setZValue(BoardGraphicsScene::getFlippedZValue(
+        BoardGraphicsScene::ZValue_DevicesTop, mContext->flipView));
   } else {
-    setZValue(BoardGraphicsScene::ZValue_DevicesBottom);
+    setZValue(BoardGraphicsScene::getFlippedZValue(
+        BoardGraphicsScene::ZValue_DevicesBottom, mContext->flipView));
   }
 
   // Update grab area layer.

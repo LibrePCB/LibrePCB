@@ -44,13 +44,13 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BGI_Plane::BGI_Plane(BI_Plane& plane, const GraphicsLayerList& layers,
-                     std::shared_ptr<const QSet<const NetSignal*>>
-                         highlightedNetSignals) noexcept
+BGI_Plane::BGI_Plane(
+    BI_Plane& plane, const GraphicsLayerList& layers,
+    std::shared_ptr<const BoardGraphicsScene::Context> context) noexcept
   : QGraphicsItem(),
     mPlane(plane),
     mLayers(layers),
-    mHighlightedNetSignals(highlightedNetSignals),
+    mContext(context),
     mLayer(nullptr),
     mBoundingRectMarginPx(0),
     mLineWidthPx(0),
@@ -114,6 +114,15 @@ QVector<int> BGI_Plane::getVertexIndicesAtPosition(
 }
 
 /*******************************************************************************
+ *  General Methods
+ ******************************************************************************/
+
+void BGI_Plane::updateContext() noexcept {
+  updateLayer();
+  update();
+}
+
+/*******************************************************************************
  *  Inherited from QGraphicsItem
  ******************************************************************************/
 
@@ -146,7 +155,7 @@ void BGI_Plane::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
 
   const bool selected = option->state.testFlag(QStyle::State_Selected);
   const bool highlight =
-      selected || mHighlightedNetSignals->contains(mPlane.getNetSignal());
+      selected || mContext->highlightedNets->contains(mPlane.getNetSignal());
   const qreal lod =
       option->levelOfDetailFromTransform(painter->worldTransform());
 
@@ -274,13 +283,8 @@ void BGI_Plane::updateOutlineAndFragments() noexcept {
 }
 
 void BGI_Plane::updateLayer() noexcept {
-  if (mPlane.getLayer() == Layer::topCopper()) {
-    setZValue(BoardGraphicsScene::ZValue_PlanesTop);
-  } else if (mPlane.getLayer() == Layer::botCopper()) {
-    setZValue(BoardGraphicsScene::ZValue_PlanesBottom);
-  } else {
-    setZValue(BoardGraphicsScene::getZValueOfCopperLayer(mPlane.getLayer()));
-  }
+  setZValue(BoardGraphicsScene::getZValueOfCopperLayer(mPlane.getLayer(),
+                                                       mContext->flipView));
 
   if (mLayer) {
     mLayer->onEdited.detach(mOnLayerEditedSlot);

@@ -610,6 +610,21 @@ export component Board2dTab inherits Tab {
                 }
             }
 
+            flip-btn := SceneButton {
+                x: parent.width - self.width;
+                style: self.checked ? checkbox : button;
+                icon-scale: self.checked ? 1.0 : 1.1;
+                icon: Cmd.flip-view.icon;
+                tooltip: Cmd.flip-view.text;
+                bg-color: tabs[index].background-color;
+                fg-color: tabs[index].foreground-color;
+                checked: tabs[index].flip-view;
+
+                clicked => {
+                    tabs[index].flip-view = !tabs[index].flip-view;
+                }
+            }
+
             background-image-btn := SliderSceneButton {
                 x: parent.width - self.width;
                 style: self.slider-enabled ? checkbox : button;
