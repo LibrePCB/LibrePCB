@@ -23,6 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../boardgraphicsscene.h"
 #include "bgi_device.h"
 
 #include <librepcb/core/project/board/items/bi_pad.h>
@@ -60,8 +61,7 @@ public:
   BGI_Pad(const BGI_Pad& other) = delete;
   BGI_Pad(BI_Pad& pad, std::weak_ptr<BGI_Device> deviceItem,
           const GraphicsLayerList& layers,
-          std::shared_ptr<const QSet<const NetSignal*>>
-              highlightedNetSignals) noexcept;
+          std::shared_ptr<const BoardGraphicsScene::Context> context) noexcept;
   virtual ~BGI_Pad() noexcept;
 
   // General Methods
@@ -69,7 +69,7 @@ public:
   const std::weak_ptr<BGI_Device>& getDeviceGraphicsItem() noexcept {
     return mDeviceGraphicsItem;
   }
-  void updateHighlightedNetSignals() noexcept;
+  void updateContext() noexcept;
 
   // Inherited from QGraphicsItem
   QPainterPath shape() const noexcept override;
@@ -90,7 +90,7 @@ private:  // Methods
 private:  // Data
   BI_Pad& mPad;
   std::weak_ptr<BGI_Device> mDeviceGraphicsItem;
-  std::shared_ptr<const QSet<const NetSignal*>> mHighlightedNetSignals;
+  std::shared_ptr<const BoardGraphicsScene::Context> mContext;
   QScopedPointer<PrimitiveFootprintPadGraphicsItem> mGraphicsItem;
 
   // Slots

@@ -794,6 +794,16 @@ export global EditorCommandSet {
         key: "-",
     };
 
+    in property <EditorCommand> flip-view: {
+        id: "flip_view",
+        icon: @image-url("../../../bootstrap-icons/icons/arrow-repeat.svg"),
+        text: "Flip View",
+        status-tip: "Switch between top view and bottom view",
+        shortcut: "Ctrl+2",
+        modifiers: { alt: false, control: true, shift: false, meta: false },
+        key: "2",
+    };
+
     in property <EditorCommand> grid-increase: {
         id: "grid_increase",
         icon: @image-url("../../../font-awesome/svgs/solid/caret-up.svg"),

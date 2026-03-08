@@ -44,13 +44,15 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BGI_StrokeText::BGI_StrokeText(BI_StrokeText& text,
-                               std::weak_ptr<BGI_Device> deviceItem,
-                               const GraphicsLayerList& layers) noexcept
+BGI_StrokeText::BGI_StrokeText(
+    BI_StrokeText& text, std::weak_ptr<BGI_Device> deviceItem,
+    const GraphicsLayerList& layers,
+    std::shared_ptr<const BoardGraphicsScene::Context> context) noexcept
   : QGraphicsItemGroup(),
     mText(text),
     mDeviceGraphicsItem(deviceItem),
     mLayers(layers),
+    mContext(context),
     mPathGraphicsItem(new PrimitivePathGraphicsItem(this)),
     mOriginCrossGraphicsItem(new OriginCrossGraphicsItem(this)),
     mAnchorGraphicsItem(new LineGraphicsItem()),
@@ -76,6 +78,14 @@ BGI_StrokeText::BGI_StrokeText(BI_StrokeText& text,
 }
 
 BGI_StrokeText::~BGI_StrokeText() noexcept {
+}
+
+/*******************************************************************************
+ *  General Methods
+ ******************************************************************************/
+
+void BGI_StrokeText::updateContext() noexcept {
+  updateLayer();
 }
 
 /*******************************************************************************
@@ -180,7 +190,7 @@ void BGI_StrokeText::updateLayer() noexcept {
   } else if (mText.getData().getLayer().isBottom()) {
     zValue = BoardGraphicsScene::ZValue_TextsBottom;
   }
-  setZValue(static_cast<qreal>(zValue));
+  setZValue(BoardGraphicsScene::getFlippedZValue(zValue, mContext->flipView));
   mAnchorGraphicsItem->setZValue(static_cast<qreal>(zValue));
 
   std::shared_ptr<const GraphicsLayer> layer =
