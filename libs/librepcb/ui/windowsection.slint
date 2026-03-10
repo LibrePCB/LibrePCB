@@ -67,7 +67,15 @@ component TabButton inherits Rectangle {
     preferred-width: l.preferred-width;
     min-width: self.height;
     max-width: max(l.preferred-width, tab.title.is-empty ? 0 : 200px);
-    background: is-current-tab ? Data.theme.palette.bg : (ta.has-hover ? Data.theme.palette.bg2-hovered : transparent);
+    background: {
+        if is-current-tab {
+            Data.theme.palette.bg
+        } else if ta.has-hover {
+            Data.theme.palette.bg2-hovered
+        } else {
+            Data.theme.palette.bg3
+        }
+    };
 
     // Accessibility
     accessible-role: AccessibleRole.tab;

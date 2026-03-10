@@ -44,7 +44,15 @@ component DocumentsListItem inherits Rectangle {
     callback board-action-triggered(a: BoardAction);
 
     height: 27px;
-    background: (ta.has-hover || selected) ? #454545 : transparent;
+    background: {
+        if selected {
+            Data.theme.palette.bg2-checked
+        } else if ta.has-hover {
+            Data.theme.palette.bg2-hovered
+        } else {
+            transparent
+        }
+    };
 
     if selected: Rectangle {
         x: 0;
@@ -80,6 +88,7 @@ component DocumentsListItem inherits Rectangle {
                 vertical-alignment: center;
                 overflow: elide;
                 text: text;
+                color: Data.theme.palette.fg;
             }
 
             if (ta.has-hover || selected) && (type == ItemType.schematic) && can-rename: rename-btn := ListViewItemButton {
@@ -171,7 +180,7 @@ component ProjectSection inherits Rectangle {
                 if project.unsaved-changes && project.writable: save-badge := Badge {
                     y: (parent.height - self.height) / 2;
                     text: @tr("save").to-lowercase();
-                    text-color: #dddd00;
+                    text-color: Data.theme.palette.fg-warning;
                     clickable: true;
 
                     clicked => {

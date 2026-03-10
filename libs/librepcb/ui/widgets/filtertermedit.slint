@@ -1,10 +1,11 @@
 import { IconButton } from "iconbutton.slint";
+import { Data } from "../api.slint";
 
 export component FilterTermEdit inherits Rectangle {
     in property <string> term;
 
     preferred-height: 28px;
-    background: #505050;
+    background: Data.theme.palette.bg2;
     border-radius: self.height / 2;
 
     callback clear-clicked <=> clear-btn.clicked;
@@ -17,13 +18,14 @@ export component FilterTermEdit inherits Rectangle {
         Text {
             vertical-alignment: center;
             font-size: 13px;
+            color: Data.theme.palette.fg-disabled;
             text: @tr("Filter:");
         }
 
         Text {
             vertical-alignment: center;
             font-size: 13px;
-            color: white;
+            color: Data.theme.palette.fg;
             text: term;
         }
 

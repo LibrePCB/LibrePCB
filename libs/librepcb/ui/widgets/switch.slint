@@ -14,7 +14,7 @@ export component Switch inherits Rectangle {
     in property <length> font-size: 12px;
     in property <string> status-tip;
     in property <color> checked-color: Constants.librepcb-color;
-    in property <color> unchecked-color: #606060;
+    in property <color> unchecked-color: Data.theme.palette.fg-disabled;
     in property <bool> focusable: true;
     out property has-focus <=> fs.has-focus;
 
@@ -58,6 +58,7 @@ export component Switch inherits Rectangle {
 
         if (!text.is-empty) && (text-side == TextSide.left): Text {
             text: text;
+            color: Data.theme.palette.fg;
             wrap: word-wrap;
             horizontal-alignment: right;
             vertical-alignment: center;
@@ -81,7 +82,7 @@ export component Switch inherits Rectangle {
             height: size;
             background: (checked ? checked-color : unchecked-color).darker(darkness);
             border-radius: self.height / 2;
-            border-color: checked ? white : Constants.librepcb-color;
+            border-color: checked ? Data.theme.palette.bg : Constants.librepcb-color;
             border-width: has-focus ? 1px : 0;
 
             Rectangle {
@@ -100,6 +101,7 @@ export component Switch inherits Rectangle {
             wrap: word-wrap;
             vertical-alignment: center;
             font-size: font-size;
+            color: Data.theme.palette.fg;
             accessible-role: none;
         }
     }

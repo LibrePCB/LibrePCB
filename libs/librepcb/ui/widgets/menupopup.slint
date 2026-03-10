@@ -132,13 +132,19 @@ export component MenuItem inherits Rectangle {
 }
 
 export component MenuPopup inherits PopupWindow {
-    width: self.preferred-width;
-    height: self.preferred-height;
+    width: l.preferred-width + 2px;
+    height: l.preferred-height + 2px;
 
     Rectangle {
-        background: #353535;
+        border-width: 1px;
+        border-color: Data.theme.palette.bg2;
 
-        VerticalLayout {
+        l := VerticalLayout {
+            x: 1px;
+            y: 1px;
+            width: self.preferred-width;
+            height: self.preferred-height;
+
             @children
         }
     }
