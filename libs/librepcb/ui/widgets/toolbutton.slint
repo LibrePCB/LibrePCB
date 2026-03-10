@@ -4,7 +4,7 @@ import { Data, EditorCommand } from "../api.slint";
 export component ToolButton inherits Rectangle {
     in property <EditorCommand> cmd;
     in property <image> icon: cmd.icon;
-    in property <color> colorize: white;
+    in property <color> colorize: Data.theme.palette.fg;
     in property <string> tooltip: cmd.text;
     in property <string> status-tip: cmd.status-tip;
     in property <string> shortcut: cmd.shortcut;
@@ -18,7 +18,15 @@ export component ToolButton inherits Rectangle {
 
     width: 30px;
     height: self.preferred-height;
-    background: (checked || ta.pressed) ? blue : (ta.has-hover ? #606060 : #303030);
+    background: {
+        if (checked || ta.pressed) {
+            blue
+        } else if ta.has-hover {
+            Data.theme.palette.bg2-hovered;
+        } else {
+            Data.theme.palette.bg2;
+        }
+    };
     border-radius: 3px;
 
     // Accessibility
@@ -36,11 +44,19 @@ export component ToolButton inherits Rectangle {
             height: self.width;
             enabled: enabled;
 
-            Image {
+            img := Image {
                 width: parent.width * 0.7;
                 height: self.width;
                 image-fit: contain;
-                colorize: enabled ? colorize : #b0b0b0;
+                colorize: {
+                    if (checked || ta.pressed) {
+                        white
+                    } else if enabled {
+                        colorize
+                    } else {
+                        Data.theme.palette.fg-disabled
+                    }
+                };
                 source: icon;
                 accessible-role: none;
             }
@@ -53,7 +69,7 @@ export component ToolButton inherits Rectangle {
 
                 Path {
                     commands: "M 100 0 L 100 100 L 0 100 Z";
-                    fill: enabled ? white : #b0b0b0;
+                    fill: img.colorize;
                 }
             }
 

@@ -84,9 +84,13 @@ component LibraryListViewItem inherits Rectangle {
         if !enabled {
             transparent
         } else if remote && lib.installed-version.is-empty {
-            is-current ? #222222 : (ta.has-hover ? #111111 : #000000)
+            Data.theme.palette.bg2;
+        } else if is-current {
+            Data.theme.palette.bg2-checked
+        } else if ta.has-hover {
+            Data.theme.palette.bg2-hovered
         } else {
-            is-current ? #454545 : (ta.has-hover ? #383838 : transparent)
+            transparent
         }
     };
     border-color: Constants.librepcb-color;
@@ -142,7 +146,13 @@ component LibraryListViewItem inherits Rectangle {
 
                     name-txt := Text {
                         horizontal-stretch: 0;
-                        color: ((!enabled) || lib.installed-version.is-empty) ? #909090 : #dddddd;
+                        color: {
+                            if ((!enabled) || lib.installed-version.is-empty) {
+                                Data.theme.palette.fg-disabled
+                            } else {
+                                Data.theme.palette.fg
+                            }
+                        };
                         font-size: 13px;
                         font-weight: 700;
                         vertical-alignment: bottom;
@@ -199,8 +209,8 @@ component LibraryListViewItem inherits Rectangle {
                 icon: @image-url("../../../font-awesome/svgs/solid/star.svg");
                 tooltip: @tr("Recommended");
                 tooltip-position: left;
-                color-disabled: yellow.darker(0.5);
-                color-enabled: yellow;
+                color-disabled: self.color-enabled.darker(0.5);
+                color-enabled: Data.theme.palette.fg-warning;
                 enabled: enabled;
                 accessible-role: none;
             }
@@ -238,7 +248,7 @@ component LibraryListViewItem inherits Rectangle {
                         checked-color: lime;
                     }
                     update when (!lib.installed-version.is-empty) && lib.outdated && lib.checked: {
-                        checked-color: yellow;
+                        checked-color: Data.theme.palette.fg-warning;
                         unchecked-color: red;
                     }
                     uninstall when (!lib.installed-version.is-empty) && (!lib.checked): {
@@ -318,8 +328,8 @@ component LibrariesPanelSection inherits FocusScope {
                 style: read-only;
                 icon: @image-url("../../../font-awesome/svgs/solid/triangle-exclamation.svg");
                 icon-scale: 0.7;
-                color-disabled: yellow.darker(1);
-                color-enabled: yellow;
+                color-disabled: self.color-enabled.darker(1);
+                color-enabled: Data.theme.palette.fg-warning;
                 tooltip: data.refreshing-error;
                 enabled: root.enabled;
             }
@@ -383,7 +393,7 @@ component LibrariesPanelSection inherits FocusScope {
 
             Rectangle {
                 height: no-remote-libs-installed-txt.height;
-                border-color: yellow;
+                border-color: Data.theme.palette.fg-warning;
                 border-width: 1px;
                 border-radius: 8px;
 
@@ -542,7 +552,7 @@ export component LibrariesPanel inherits VerticalLayout {
         property <bool> show: Data.preview-mode ? Data.remote-libraries[0].checked : (Data.remote-libraries-pending-operations > 0);
 
         height: show ? self.preferred-height : 0;
-        background: black;
+        background: Data.theme.palette.bg2;
         border-color: Constants.librepcb-color;
         border-width: 1px;
 
@@ -569,7 +579,7 @@ export component LibrariesPanel inherits VerticalLayout {
                         font-weight: 700;
                         font-size: 12px;
                         border-width: 1.3px;
-                        text-color: (Data.remote-libraries-data.pending-installs > 0) ? lime : #707070;
+                        text-color: (Data.remote-libraries-data.pending-installs > 0) ? lime : Data.theme.palette.fg-disabled;
                         text: "+" + Data.remote-libraries-data.pending-installs;
                     }
 
@@ -577,7 +587,7 @@ export component LibrariesPanel inherits VerticalLayout {
                         font-weight: 700;
                         font-size: 12px;
                         border-width: 1.3px;
-                        text-color: (Data.remote-libraries-data.pending-updates > 0) ? yellow : #707070;
+                        text-color: (Data.remote-libraries-data.pending-updates > 0) ? Data.theme.palette.fg-warning : Data.theme.palette.fg-disabled;
                         text: "↑" + Data.remote-libraries-data.pending-updates;
                     }
 
@@ -585,7 +595,7 @@ export component LibrariesPanel inherits VerticalLayout {
                         font-weight: 700;
                         font-size: 12px;
                         border-width: 1.3px;
-                        text-color: (Data.remote-libraries-data.pending-uninstalls > 0) ? red : #707070;
+                        text-color: (Data.remote-libraries-data.pending-uninstalls > 0) ? red : Data.theme.palette.fg-disabled;
                         text: "–" + Data.remote-libraries-data.pending-uninstalls;
                     }
                 }
@@ -601,7 +611,7 @@ export component LibrariesPanel inherits VerticalLayout {
                     border-color: red;
                     border-width: 1px;
                     border-radius: 5px;
-                    background: black;
+                    background: Data.theme.palette.bg;
 
                     nonreversible-warning-txt := Text {
                         width: parent.width - 8px;

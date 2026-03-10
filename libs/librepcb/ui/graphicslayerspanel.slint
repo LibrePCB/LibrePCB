@@ -23,7 +23,15 @@ component GraphicsLayerListItem inherits Rectangle {
     callback clicked <=> ta.clicked;
     callback double-clicked <=> ta.double-clicked;
 
-    background: ta.has-hover ? #404040 : (selected ? #353535 : transparent);
+    background: {
+        if ta.has-hover {
+            Data.theme.palette.bg2-hovered
+        } else if selected {
+            Data.theme.palette.bg2-checked
+        } else {
+            transparent
+        }
+    };
 
     // Accessibility
     accessible-role: list-item;
@@ -76,7 +84,7 @@ component GraphicsLayerListItem inherits Rectangle {
                 vertical-alignment: center;
                 font-size: 12px;
                 overflow: elide;
-                color: (root.enabled && item.visible) ? Palette.foreground : #707070;
+                color: (root.enabled && item.visible) ? Data.theme.palette.fg : Data.theme.palette.fg-disabled;
                 text: item.name;
             }
         }

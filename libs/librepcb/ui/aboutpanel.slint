@@ -37,6 +37,7 @@ export component AboutPanel inherits VerticalLayout {
             font-weight: 700;
             vertical-alignment: center;
             overflow: elide;
+            color: Data.theme.palette.fg;
             text: Data.window-title;
         }
     }
@@ -56,9 +57,9 @@ export component AboutPanel inherits VerticalLayout {
 
             if available-space > 390px: Rectangle {
                 height: description-txt.preferred-height + 2 * description-txt.y;
-                background: #404040;
+                background: Data.theme.palette.bg2;
                 border-width: 1px;
-                border-color: #c0c0c0;
+                border-color: Data.theme.palette.fg-disabled;
                 border-radius: 8px;
 
                 description-txt := Text {
@@ -69,7 +70,7 @@ export component AboutPanel inherits VerticalLayout {
                     y: self.x;
                     width: parent.width - 2 * self.x;
                     wrap: word-wrap;
-                    color: #e0e0e0;
+                    color: Data.theme.palette.fg;
                     font-size: 11.5px;
                     text: text1 + " " + text2;
                 }
@@ -176,6 +177,9 @@ export component AboutPanel inherits VerticalLayout {
                 read-only: true;
                 single-line: false;
                 wrap: no-wrap;
+                color: Data.theme.palette.fg;
+                selection-background-color: Constants.librepcb-color;
+                selection-foreground-color: black;
                 text: Data.about-librepcb-details;
             }
         }
@@ -196,6 +200,7 @@ export component AboutPanel inherits VerticalLayout {
             wrap: word-wrap;
             font-italic: true;
             font-size: 11px;
+            color: Data.theme.palette.fg;
             text: text1 + " " + text2 + " ♥";
         }
 
@@ -203,6 +208,7 @@ export component AboutPanel inherits VerticalLayout {
             wrap: word-wrap;
             font-italic: true;
             font-size: 11px;
+            color: Data.theme.palette.fg;
             text: @tr("For the list of current sponsors, see {}.", "librepcb.org/sponsors");
         }
 
@@ -223,6 +229,7 @@ export component AboutPanel inherits VerticalLayout {
                 width: 50%;
                 height: self.width * self.source.height / self.source.width;
                 source: @image-url("../../../img/ngi0-commons.svg");
+                colorize: Data.theme.palette.fg-disabled;
                 accessible-role: none;
             }
         }
@@ -231,6 +238,7 @@ export component AboutPanel inherits VerticalLayout {
             wrap: word-wrap;
             font-italic: true;
             font-size: 11px;
+            color: Data.theme.palette.fg;
             text: "This project is funded through the NGI0 Commons Fund, a fund established by NLnet with financial support from the European Commission’s Next Generation Internet programme, under the aegis of DG Communications Networks, Content and Technology under grant agreement No 101135429.";
         }
     }
@@ -247,6 +255,7 @@ export component AboutPanel inherits VerticalLayout {
             wrap: word-wrap;
             font-italic: true;
             font-size: 11px;
+            color: Data.theme.palette.fg;
             text: @tr("This is free software, released under the GNU General Public License (GPL) version 3 or later. You can find the full license text in our source code.");
         }
     }
