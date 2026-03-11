@@ -4,13 +4,14 @@ version = "0.1.0"
 edition = "2021"
 
 [lib]
-crate-type = ["staticlib"]
+crate-type = ["lib", "staticlib"]
 
 [features]
 fail-on-warnings = []
+ffi = ["dep:cbindgen"]
 
 [build-dependencies]
-cbindgen = "0.27"
+cbindgen = { version = "0.27", optional = true }
 
 [dependencies]
 interactive-html-bom = "0.2.0"

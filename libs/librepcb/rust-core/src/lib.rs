@@ -5,13 +5,14 @@
 #![warn(missing_docs)]
 #![warn(clippy::missing_docs_in_private_items)]
 
-// Disable FFI functions for tests since it would lead to unresolved symbol
-// linker errors.
-#[cfg(not(test))]
+// Build FFI only if explicitly enabled. This allows to use the crate also
+// outside of LibrePCB (i.e. without C++ integration), and fixes unresolved
+// symbol linker errors when building the tests.
+#[cfg(feature = "ffi")]
 mod ffi;
 
 // Modules
-mod toolbox;
+pub mod toolbox;
 
 // Allow using the create! macro to create parametrized tests in test modules
 // without explicitly importing the parameterized_test crate every time.

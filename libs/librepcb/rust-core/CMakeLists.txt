@@ -5,6 +5,7 @@ set(CMAKE_AUTORCC OFF)
 
 # Determine Cargo features
 set(CARGO_FEATURES)
+list(APPEND CARGO_FEATURES ffi)
 if(BUILD_DISALLOW_WARNINGS)
   list(APPEND CARGO_FEATURES fail-on-warnings)
 endif()
