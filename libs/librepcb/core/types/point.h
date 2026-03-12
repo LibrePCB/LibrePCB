@@ -147,7 +147,7 @@ public:
   /// @see Length::setLengthNm()
   /// @warning Be careful with this method! Maybe you should call mapToGrid()
   /// afterwards!
-  void setPointNm(LengthBase_t nmX, LengthBase_t nmY) noexcept {
+  void setPointNm(int64_t nmX, int64_t nmY) noexcept {
     mX.setLengthNm(nmX);
     mY.setLengthNm(nmY);
   }
@@ -209,8 +209,7 @@ public:
    * @return The length of this vector (as a Length object)
    */
   UnsignedLength getLength() const noexcept {
-    LengthBase_t length =
-        static_cast<LengthBase_t>(std::hypot(mX.toNm(), mY.toNm()));
+    int64_t length = static_cast<int64_t>(std::hypot(mX.toNm(), mY.toNm()));
     Q_ASSERT(length >= 0);
     return UnsignedLength(length);
   }
@@ -444,7 +443,7 @@ public:
     mY *= rhs.mY;
     return *this;
   }
-  Point& operator*=(LengthBase_t rhs) {
+  Point& operator*=(int64_t rhs) {
     mX *= rhs;
     mY *= rhs;
     return *this;
@@ -454,7 +453,7 @@ public:
     mY /= rhs.mY;
     return *this;
   }
-  Point& operator/=(LengthBase_t rhs) {
+  Point& operator/=(int64_t rhs) {
     mX /= rhs;
     mY /= rhs;
     return *this;
@@ -467,9 +466,9 @@ public:
     return Point(mX - rhs.mX, mY - rhs.mY);
   }
   Point operator*(const Length& rhs) const { return Point(mX * rhs, mY * rhs); }
-  Point operator*(LengthBase_t rhs) const { return Point(mX * rhs, mY * rhs); }
+  Point operator*(int64_t rhs) const { return Point(mX * rhs, mY * rhs); }
   Point operator/(const Length& rhs) const { return Point(mX / rhs, mY / rhs); }
-  Point operator/(LengthBase_t rhs) const { return Point(mX / rhs, mY / rhs); }
+  Point operator/(int64_t rhs) const { return Point(mX / rhs, mY / rhs); }
   Point operator%(const Length& rhs) const { return Point(mX % rhs, mY % rhs); }
   bool operator==(const Point& rhs) const {
     return (mX == rhs.mX) && (mY == rhs.mY);

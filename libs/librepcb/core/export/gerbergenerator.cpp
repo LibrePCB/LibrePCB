@@ -541,7 +541,7 @@ void GerberGenerator::printHeader() noexcept {
   // coordinate format specification:
   //  - leading zeros omitted
   //  - absolute coordinates
-  //  - coordiante format "6.6" --> allows us to directly use LengthBase_t
+  //  - coordiante format "6.6" --> allows us to directly use int64_t
   //  (nanometers)!
   mOutput.append("%FSLAX66Y66*%\n");
 

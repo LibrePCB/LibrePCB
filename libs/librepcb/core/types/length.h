@@ -35,33 +35,6 @@
 namespace librepcb {
 
 /*******************************************************************************
- *  Typedefs
- ******************************************************************************/
-
-/**
- * @brief This type is the ONLY base type to store all lengths (always in
- * nanometers)!
- *
- * This is the base type of the class ::librepcb::Length.
- *
- * This type is normally a 64bit signed integer. 32bit integers could handle
- * these values also, but is limited to +/-2.147 meters. Maybe this is not
- * enough for large PCBs or schematics, so it's better to use 64bit variables
- * ;-)
- *
- * @note Set the define USE_32BIT_LENGTH_UNITS in the *.pro file if you want to
- * use 32bit integers instead of 64bit integers for all length units (maybe your
- * platform cannot handle 64bit as efficient as 32bit integers).
- *
- * @see ::librepcb::Length
- */
-#ifdef USE_32BIT_LENGTH_UNITS
-typedef qint32 LengthBase_t;
-#else
-typedef qint64 LengthBase_t;
-#endif
-
-/*******************************************************************************
  *  Class Length
  ******************************************************************************/
 
@@ -74,10 +47,9 @@ typedef qint64 LengthBase_t;
  * integer or float! It's very important to have a consistent length type over
  * the whole project.
  *
- * All lengths are stored in the integer base type ::librepcb::LengthBase_t. The
+ * All lengths are stored in the integer base type int64_t. The
  * internal unit is always nanometers, but this class provides also some
- * converting methods to other units. Read the documentation of
- * ::librepcb::LengthBase_t for more details.
+ * converting methods to other units.
  */
 class Length {
   Q_DECLARE_TR_FUNCTIONS(Length)
@@ -105,8 +77,7 @@ public:
    *
    * @param nanometers    The length in nanometers
    */
-  constexpr Length(LengthBase_t nanometers) noexcept
-    : mNanometers(nanometers) {}
+  constexpr Length(int64_t nanometers) noexcept : mNanometers(nanometers) {}
 
   /**
    * @brief Destructor
@@ -120,9 +91,7 @@ public:
    *
    * @param nanometers    The length in nanometers
    */
-  void setLengthNm(LengthBase_t nanometers) noexcept {
-    mNanometers = nanometers;
-  }
+  void setLengthNm(int64_t nanometers) noexcept { mNanometers = nanometers; }
 
   /**
    * @brief Set the length in millimeters
@@ -210,7 +179,7 @@ public:
    *
    * @return The length in nanometers
    */
-  LengthBase_t toNm() const noexcept { return mNanometers; }
+  int64_t toNm() const noexcept { return mNanometers; }
 
   /**
    * @brief Get the length in nanometers as a QString
@@ -363,9 +332,7 @@ public:
    * @retval true   Value is valid, can construct a #Length from it.
    * @retval false  Value is invalid, constructing a #Length would throw.
    */
-  static bool isValidMm(qreal millimeters) noexcept {
-    return checkRange(millimeters * 1e6);
-  }
+  static bool isValidMm(qreal millimeters) noexcept;
 
   /**
    * @brief Get a Length object with a specific length and map it to a specific
@@ -510,7 +477,7 @@ public:
     mNanometers *= rhs.mNanometers;
     return *this;
   }
-  Length& operator*=(LengthBase_t rhs) {
+  Length& operator*=(int64_t rhs) {
     mNanometers *= rhs;
     return *this;
   }
@@ -518,7 +485,7 @@ public:
     mNanometers /= rhs.mNanometers;
     return *this;
   }
-  Length& operator/=(LengthBase_t rhs) {
+  Length& operator/=(int64_t rhs) {
     mNanometers /= rhs;
     return *this;
   }
@@ -532,46 +499,38 @@ public:
   Length operator*(const Length& rhs) const {
     return Length(mNanometers * rhs.mNanometers);
   }
-  Length operator*(LengthBase_t rhs) const { return Length(mNanometers * rhs); }
+  Length operator*(int64_t rhs) const { return Length(mNanometers * rhs); }
   Length operator/(const Length& rhs) const {
     return Length(mNanometers / rhs.mNanometers);
   }
-  Length operator/(LengthBase_t rhs) const { return Length(mNanometers / rhs); }
+  Length operator/(int64_t rhs) const { return Length(mNanometers / rhs); }
   Length operator%(const Length& rhs) const {
     return Length(mNanometers % rhs.mNanometers);
   }
   constexpr bool operator>(const Length& rhs) const {
     return mNanometers > rhs.mNanometers;
   }
-  constexpr bool operator>(LengthBase_t rhs) const { return mNanometers > rhs; }
+  constexpr bool operator>(int64_t rhs) const { return mNanometers > rhs; }
   constexpr bool operator<(const Length& rhs) const {
     return mNanometers < rhs.mNanometers;
   }
-  constexpr bool operator<(LengthBase_t rhs) const { return mNanometers < rhs; }
+  constexpr bool operator<(int64_t rhs) const { return mNanometers < rhs; }
   constexpr bool operator>=(const Length& rhs) const {
     return mNanometers >= rhs.mNanometers;
   }
-  constexpr bool operator>=(LengthBase_t rhs) const {
-    return mNanometers >= rhs;
-  }
+  constexpr bool operator>=(int64_t rhs) const { return mNanometers >= rhs; }
   constexpr bool operator<=(const Length& rhs) const {
     return mNanometers <= rhs.mNanometers;
   }
-  constexpr bool operator<=(LengthBase_t rhs) const {
-    return mNanometers <= rhs;
-  }
+  constexpr bool operator<=(int64_t rhs) const { return mNanometers <= rhs; }
   constexpr bool operator==(const Length& rhs) const {
     return mNanometers == rhs.mNanometers;
   }
-  constexpr bool operator==(LengthBase_t rhs) const {
-    return mNanometers == rhs;
-  }
+  constexpr bool operator==(int64_t rhs) const { return mNanometers == rhs; }
   constexpr bool operator!=(const Length& rhs) const {
     return mNanometers != rhs.mNanometers;
   }
-  constexpr bool operator!=(LengthBase_t rhs) const {
-    return mNanometers != rhs;
-  }
+  constexpr bool operator!=(int64_t rhs) const { return mNanometers != rhs; }
 
 private:
   // Private Functions
@@ -594,32 +553,6 @@ private:
   // Private Static Functions
 
   /**
-   * @brief Check if a float value in nanometers is in the allowed range
-   *
-   * @param nanometers    The value to check
-   * @param doThrow       If true, throw a ::librepcb::RangeError if out of
-   *                      range instead of returning the result
-   *
-   * @retval true   Value is valid, can construct a #Length from it.
-   * @retval false  Value is invalid, constructing a #Length would throw.
-   */
-  static bool checkRange(qreal nanometers, bool doThrow = false);
-
-  /**
-   * @brief Map a length in nanometers to a grid interval in nanometers
-   *
-   * This is a helper function for mapToGrid().
-   *
-   * @param nanometers    The length we want to map to the grid
-   * @param gridInterval  The grid interval
-   *
-   * @return  The length which is mapped to the grid (always a multiple of
-   * gridInterval)
-   */
-  static LengthBase_t mapNmToGrid(LengthBase_t nanometers,
-                                  const Length& gridInterval) noexcept;
-
-  /**
    * @brief Convert a length from a QString (in millimeters) to an integer (in
    * nanometers)
    *
@@ -631,15 +564,15 @@ private:
    *
    * @return The length in nanometers
    */
-  static LengthBase_t mmStringToNm(const QString& millimeters);
+  static int64_t mmStringToNm(const QString& millimeters);
 
   // Private Member Variables
-  LengthBase_t mNanometers;  ///< the length in nanometers
+  int64_t mNanometers;  ///< the length in nanometers
 
   // Static Length Converting Constants
-  static constexpr LengthBase_t sNmPerInch = 25400000;  ///< 1 inch = 25.4mm
-  static constexpr LengthBase_t sNmPerMil = 25400;  ///< 1 inch = 25.4mm
-  static constexpr LengthBase_t sPixelsPerInch =
+  static constexpr int64_t sNmPerInch = 25400000;  ///< 1 inch = 25.4mm
+  static constexpr int64_t sNmPerMil = 25400;  ///< 1 inch = 25.4mm
+  static constexpr int64_t sPixelsPerInch =
       72;  ///< 72 dpi for the QGraphics* objects
   static constexpr qreal sNmPerPixel = (qreal)sNmPerInch / sPixelsPerInch;
   static constexpr qreal sPixelsPerNm = (qreal)sPixelsPerInch / sNmPerInch;
@@ -705,10 +638,10 @@ inline UnsignedLength& operator+=(UnsignedLength& lhs,
   return lhs;
 }
 
-inline Length operator*(const UnsignedLength& lhs, LengthBase_t rhs) noexcept {
+inline Length operator*(const UnsignedLength& lhs, int64_t rhs) noexcept {
   return (*lhs) * rhs;
 }
-inline Length operator/(const UnsignedLength& lhs, LengthBase_t rhs) noexcept {
+inline Length operator/(const UnsignedLength& lhs, int64_t rhs) noexcept {
   return (*lhs) / rhs;
 }
 inline Length operator+(const Length& lhs, const UnsignedLength& rhs) noexcept {
@@ -729,37 +662,37 @@ inline Length operator-(const UnsignedLength& lhs) noexcept {
 inline bool operator>(const UnsignedLength& lhs, const Length& rhs) noexcept {
   return (*lhs) > rhs;
 }
-inline bool operator>(const UnsignedLength& lhs, LengthBase_t rhs) noexcept {
+inline bool operator>(const UnsignedLength& lhs, int64_t rhs) noexcept {
   return (*lhs) > rhs;
 }
 inline bool operator>=(const UnsignedLength& lhs, const Length& rhs) noexcept {
   return (*lhs) >= rhs;
 }
-inline bool operator>=(const UnsignedLength& lhs, LengthBase_t rhs) noexcept {
+inline bool operator>=(const UnsignedLength& lhs, int64_t rhs) noexcept {
   return (*lhs) >= rhs;
 }
 inline bool operator<(const UnsignedLength& lhs, const Length& rhs) noexcept {
   return (*lhs) < rhs;
 }
-inline bool operator<(const UnsignedLength& lhs, LengthBase_t rhs) noexcept {
+inline bool operator<(const UnsignedLength& lhs, int64_t rhs) noexcept {
   return (*lhs) < rhs;
 }
 inline bool operator<=(const UnsignedLength& lhs, const Length& rhs) noexcept {
   return (*lhs) <= rhs;
 }
-inline bool operator<=(const UnsignedLength& lhs, LengthBase_t rhs) noexcept {
+inline bool operator<=(const UnsignedLength& lhs, int64_t rhs) noexcept {
   return (*lhs) <= rhs;
 }
 inline bool operator==(const UnsignedLength& lhs, const Length& rhs) noexcept {
   return (*lhs) == rhs;
 }
-inline bool operator==(const UnsignedLength& lhs, LengthBase_t rhs) noexcept {
+inline bool operator==(const UnsignedLength& lhs, int64_t rhs) noexcept {
   return (*lhs) == rhs;
 }
 inline bool operator!=(const UnsignedLength& lhs, const Length& rhs) noexcept {
   return (*lhs) != rhs;
 }
-inline bool operator!=(const UnsignedLength& lhs, LengthBase_t rhs) noexcept {
+inline bool operator!=(const UnsignedLength& lhs, int64_t rhs) noexcept {
   return (*lhs) != rhs;
 }
 
@@ -850,10 +783,10 @@ inline UnsignedLength& operator+=(UnsignedLength& lhs,
   return lhs;
 }
 
-inline Length operator*(const PositiveLength& lhs, LengthBase_t rhs) noexcept {
+inline Length operator*(const PositiveLength& lhs, int64_t rhs) noexcept {
   return (*lhs) * rhs;
 }
-inline Length operator/(const PositiveLength& lhs, LengthBase_t rhs) noexcept {
+inline Length operator/(const PositiveLength& lhs, int64_t rhs) noexcept {
   return (*lhs) / rhs;
 }
 inline Length operator+(const Length& lhs, const PositiveLength& rhs) noexcept {
@@ -890,7 +823,7 @@ inline bool operator>(const PositiveLength& lhs,
 inline bool operator>(const PositiveLength& lhs, const Length& rhs) noexcept {
   return (*lhs) > rhs;
 }
-inline bool operator>(const PositiveLength& lhs, LengthBase_t rhs) noexcept {
+inline bool operator>(const PositiveLength& lhs, int64_t rhs) noexcept {
   return (*lhs) > rhs;
 }
 inline bool operator>=(const UnsignedLength& lhs,
@@ -904,7 +837,7 @@ inline bool operator>=(const PositiveLength& lhs,
 inline bool operator>=(const PositiveLength& lhs, const Length& rhs) noexcept {
   return (*lhs) >= rhs;
 }
-inline bool operator>=(const PositiveLength& lhs, LengthBase_t rhs) noexcept {
+inline bool operator>=(const PositiveLength& lhs, int64_t rhs) noexcept {
   return (*lhs) >= rhs;
 }
 inline bool operator<(const UnsignedLength& lhs,
@@ -918,7 +851,7 @@ inline bool operator<(const PositiveLength& lhs,
 inline bool operator<(const PositiveLength& lhs, const Length& rhs) noexcept {
   return (*lhs) < rhs;
 }
-inline bool operator<(const PositiveLength& lhs, LengthBase_t rhs) noexcept {
+inline bool operator<(const PositiveLength& lhs, int64_t rhs) noexcept {
   return (*lhs) < rhs;
 }
 inline bool operator<=(const UnsignedLength& lhs,
@@ -932,7 +865,7 @@ inline bool operator<=(const PositiveLength& lhs,
 inline bool operator<=(const PositiveLength& lhs, const Length& rhs) noexcept {
   return (*lhs) <= rhs;
 }
-inline bool operator<=(const PositiveLength& lhs, LengthBase_t rhs) noexcept {
+inline bool operator<=(const PositiveLength& lhs, int64_t rhs) noexcept {
   return (*lhs) <= rhs;
 }
 inline bool operator==(const UnsignedLength& lhs,
@@ -946,7 +879,7 @@ inline bool operator==(const PositiveLength& lhs,
 inline bool operator==(const PositiveLength& lhs, const Length& rhs) noexcept {
   return (*lhs) == rhs;
 }
-inline bool operator==(const PositiveLength& lhs, LengthBase_t rhs) noexcept {
+inline bool operator==(const PositiveLength& lhs, int64_t rhs) noexcept {
   return (*lhs) == rhs;
 }
 inline bool operator!=(const UnsignedLength& lhs,
@@ -960,7 +893,7 @@ inline bool operator!=(const PositiveLength& lhs,
 inline bool operator!=(const PositiveLength& lhs, const Length& rhs) noexcept {
   return (*lhs) != rhs;
 }
-inline bool operator!=(const PositiveLength& lhs, LengthBase_t rhs) noexcept {
+inline bool operator!=(const PositiveLength& lhs, int64_t rhs) noexcept {
   return (*lhs) != rhs;
 }
 

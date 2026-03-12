@@ -52,7 +52,7 @@ class EditorCommand;
  ******************************************************************************/
 
 static_assert(sizeof(ui::Int64) == 8);
-static_assert(sizeof(LengthBase_t) == 8);
+static_assert(sizeof(int64_t) == 8);
 static_assert(sizeof(Angle) == sizeof(int));
 static_assert(sizeof(Ratio) == sizeof(int));
 

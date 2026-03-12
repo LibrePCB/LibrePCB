@@ -13,6 +13,10 @@ mod ffi;
 
 // Modules
 pub mod toolbox;
+mod types;
+
+// Re-Exports
+pub use types::length::Length;
 
 // Allow using the create! macro to create parametrized tests in test modules
 // without explicitly importing the parameterized_test crate every time.
