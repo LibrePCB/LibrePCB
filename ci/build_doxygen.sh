@@ -11,7 +11,7 @@ popd
 # Build Rust documentation
 for f in $(git ls-files -- '**Cargo.toml'); do
   cargo doc --manifest-path="$f" --target-dir="./dev/doxygen/output/rust/" \
-    --no-deps --document-private-items --features="fail-on-warnings"
+    --no-deps --document-private-items --features="fail-on-warnings,ffi"
   cp -rf ./dev/doxygen/output/rust/doc/* ./dev/doxygen/output/html/
   rm -rf ./dev/doxygen/output/rust
 done
