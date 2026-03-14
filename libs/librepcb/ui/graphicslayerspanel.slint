@@ -7,6 +7,7 @@ import {
 import {
     BoardAction,
     Data,
+    TabType,
     GraphicsLayerData,
     Helpers,
     TabAction,
@@ -17,6 +18,7 @@ component GraphicsLayerListItem inherits Rectangle {
     in property <int> index;
     in property <bool> enabled: true;
     in property <bool> selected: false;
+    in property <color> background-color;
     property <GraphicsLayerData> item: model[index];
 
     callback clicked <=> ta.clicked;
@@ -49,7 +51,11 @@ component GraphicsLayerListItem inherits Rectangle {
         y: 0;
         width: self.height;
         height: 100%;
-        background: item.color;
+        background: background-color;
+
+        Rectangle {
+            background: item.color;
+        }
     }
 
     ta := TouchArea {
@@ -83,7 +89,7 @@ component GraphicsLayerListItem inherits Rectangle {
                 vertical-alignment: center;
                 font-size: 12px;
                 overflow: elide;
-                color: (root.enabled && item.visible) ? Data.theme.palette.fg : Data.theme.palette.fg-disabled;
+                color: (root.enabled && item.visible) ? Data.theme.palette.fg : Data.theme.palette.fg-placeholder;
                 text: item.name;
             }
         }
@@ -95,6 +101,15 @@ export component GraphicsLayersPanel inherits FocusScope {
     in-out property <[GraphicsLayerData]> model: Data.current-tab.layers;
     property <int> selected-index: -1;
     property <bool> item-selected: (selected-index >= 0) && (selected-index < model.length);
+    property <color> background-color: {
+        if Data.current-tab.type == TabType.board-2d {
+            Data.current-board-2d-tab.background-color
+        } else if Data.current-tab.type == TabType.package {
+            Data.current-package-tab.background-color
+        } else {
+            Data.theme.palette.bg;
+        }
+    };
 
     function set-current-index(index: int) {
         if ((index + 1) * item-height) > (view.height - view.viewport-y) {
@@ -192,6 +207,7 @@ export component GraphicsLayersPanel inherits FocusScope {
                 model: model;
                 index: index;
                 selected: (index == selected-index);
+                background-color: background-color;
 
                 clicked => {
                     set-current-index(index);

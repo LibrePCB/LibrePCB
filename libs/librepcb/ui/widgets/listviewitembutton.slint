@@ -37,7 +37,7 @@ export component ListViewItemButton inherits TouchArea {
             } else if root.has-hover {
                 Data.theme.palette.fg-hovered
             } else if root.enabled {
-                Data.theme.palette.fg-placeholder
+                Data.theme.palette.fg.mix(Data.theme.palette.fg-placeholder, 0.5)
             } else {
                 Data.theme.palette.fg-disabled
             }
