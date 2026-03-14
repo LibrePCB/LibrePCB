@@ -2,10 +2,10 @@ import {
     Button,
     IconButton,
     LengthEdit,
-    ListViewItemButton,
     ListView,
-    Text,
+    ListViewItemButton,
     PanelHeader,
+    Text,
 } from "widgets.slint";
 import {
     Backend,
@@ -34,7 +34,15 @@ component RuleCheckListItem inherits Rectangle {
     callback clicked <=> ta.clicked;
     callback double-clicked <=> ta.double-clicked;
 
-    background: ta.has-hover ? #404040 : (selected ? #353535 : transparent);
+    background: {
+        if self.selected {
+            Data.theme.palette.bg2-checked
+        } else if ta.has-hover {
+            Data.theme.palette.bg2-hovered
+        } else {
+            transparent
+        }
+    };
 
     // Accessibility
     accessible-role: list-item;
@@ -164,7 +172,7 @@ export component RuleCheckPanel inherits FocusScope {
                 icon: @image-url("../../font-awesome/svgs/solid/circle-xmark.svg");
                 icon-scale: 0.7;
                 tooltip: check.execution-error;
-                color-enabled: red;
+                color-enabled: Data.theme.palette.fg-error;
             }
 
             if check.state == RuleCheckState.outdated: outdated-btn := IconButton {
@@ -173,7 +181,7 @@ export component RuleCheckPanel inherits FocusScope {
                 icon: @image-url("../../font-awesome/svgs/solid/triangle-exclamation.svg");
                 icon-scale: 0.7;
                 tooltip: @tr("Possibly Outdated Data") + "\n\n" + @tr("Trigger the checks again to refresh the messages.");
-                color-enabled: yellow;
+                color-enabled: Data.theme.palette.fg-warning;
             }
 
             if check.type == RuleCheckType.drc: quick-check-btn := IconButton {
@@ -250,7 +258,7 @@ export component RuleCheckPanel inherits FocusScope {
             Rectangle {
                 y: parent.height - self.height;
                 height: 1px;
-                background: #555555;
+                background: Data.theme.palette.bg-border;
             }
 
             GridLayout {

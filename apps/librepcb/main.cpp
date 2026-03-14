@@ -95,7 +95,7 @@ int main(int argc, char* argv[]) {
   // Use Fusion style with custom palette to make the legacy Qt dialogs looking
   // similar to the new Slint UI. Can be removed as soon as no Qt widgets are
   // used anymore.
-  {
+  /*{
     QPalette palette(QColor("#202020"), QColor("#2a2a2a"));
     palette.setColor(QPalette::Window, "#2a2a2a");
     palette.setColor(QPalette::WindowText, "#c4c4c4");
@@ -118,7 +118,7 @@ int main(int argc, char* argv[]) {
     palette.setColor(QPalette::Disabled, QPalette::Light, "#707070");
     app.setStyle("fusion");
     app.setPalette(palette);
-  }
+  }*/
 
   // Start network access manager thread with HTTP cache to avoid extensive
   // requests (e.g. downloading library pictures each time opening the manager).

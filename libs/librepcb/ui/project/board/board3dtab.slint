@@ -21,8 +21,11 @@ export component Board3dTab inherits Tab {
 
     enabled: true;
 
-    if Data.preview-mode: Rectangle {
-        background: tabs[index].background-color;
+    // Stangely the 3D scene colors look different (wrong) when using the
+    // light theme, compared to the dark theme. This doesn't happen when
+    // we draw a black background first.
+    Rectangle {
+        background: Data.preview-mode ? tabs[index].background-color : black;
     }
 
     img := Image {
