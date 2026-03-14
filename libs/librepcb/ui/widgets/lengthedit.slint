@@ -126,18 +126,23 @@ export component LengthEdit inherits Rectangle {
         enabled: enabled;
 
         l := HorizontalLayout {
-            padding-left: 8px;
+            padding-left: 5px;
             padding-right: 1px;
             padding-top: self.padding-right;
             padding-bottom: self.padding-top;
             spacing: 5px;
 
-            if icon.width > 0: Image {
+            if icon.width > 0: Rectangle {
                 width: 12px;
-                image-fit: contain;
-                colorize: enabled ? Data.theme.palette.fg : Data.theme.palette.fg-disabled;
-                source: icon;
-                accessible-role: none;
+
+                Image {
+                    width: 100%;
+                    height: self.width;
+                    image-fit: contain;
+                    colorize: enabled ? Data.theme.palette.fg : Data.theme.palette.fg-disabled;
+                    source: icon;
+                    accessible-role: none;
+                }
 
                 if has-dropdown: Rectangle {
                     x: (parent.width - self.width) / 2;
@@ -233,125 +238,121 @@ export component LengthEdit inherits Rectangle {
                 }
             }
 
-            Rectangle {
-                //background: Data.theme.palette.bg-border;
+            HorizontalLayout {
+                if can-increase || can-decrease: VerticalLayout {
+                    up-btn := IconButton {
+                        width: 15px;
+                        enabled: enabled && can-increase;
+                        icon: @image-url("../../../font-awesome/svgs/solid/caret-up.svg");
+                        icon-offset-y: 1px;
+                        accessible-label: "increase";
 
-                HorizontalLayout {
-                    if can-increase || can-decrease: VerticalLayout {
-                        up-btn := IconButton {
-                            width: 15px;
-                            enabled: enabled && can-increase;
-                            icon: @image-url("../../../font-awesome/svgs/solid/caret-up.svg");
-                            icon-offset-y: 1px;
-                            accessible-label: "increase";
-
-                            clicked => {
-                                disable-update = false;
-                                increase-triggered();
-                            }
-                        }
-
-                        down-btn := IconButton {
-                            width: 15px;
-                            enabled: enabled && can-decrease;
-                            icon: @image-url("../../../font-awesome/svgs/solid/caret-down.svg");
-                            icon-offset-y: -1px;
-                            accessible-label: "decrease";
-
-                            clicked => {
-                                disable-update = false;
-                                decrease-triggered();
-                            }
+                        clicked => {
+                            disable-update = false;
+                            increase-triggered();
                         }
                     }
 
-                    if can-increase || can-decrease: Rectangle {
+                    down-btn := IconButton {
+                        width: 15px;
+                        enabled: enabled && can-decrease;
+                        icon: @image-url("../../../font-awesome/svgs/solid/caret-down.svg");
+                        icon-offset-y: -1px;
+                        accessible-label: "decrease";
+
+                        clicked => {
+                            disable-update = false;
+                            decrease-triggered();
+                        }
+                    }
+                }
+
+                if can-increase || can-decrease: Rectangle {
+                    y: (parent.height - self.height) / 2;
+                    width: 1px;
+                    height: 15px;
+                    background: Data.theme.palette.fg-disabled;
+                }
+
+                unit-btn := LinkText {
+                    y: ((parent.height - self.height) / 2) - 1px;
+                    width: self.preferred-width + 10px;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                    text-color: Data.theme.palette.fg;
+                    text-color-disabled: Data.theme.palette.fg-placeholder;
+                    text: Helpers.get-unit-short-str(root.unit);
+                    enabled: can-change-unit;
+
+                    // Accessibility
+                    accessible-description: "unit";
+                    accessible-label: Helpers.get-unit-accessibility-label(unit);
+                    accessible-expandable: true;
+                    accessible-action-expand => {
+                        unit-btn.clicked();
+                    }
+
+                    clicked => {
+                        unit-popup.show();
+                    }
+
+                    unit-popup := PopupWindow {
+                        x: (parent.width - self.preferred-width) / 2;
+                        y: parent.height;
+
+                        Rectangle {
+                            background: Data.theme.palette.bg;
+                            border-color: Data.theme.palette.bg-border;
+                            border-width: 1px;
+
+                            VerticalLayout {
+                                padding: 5px;
+                                spacing: 5px;
+
+                                for unit in Helpers.all-length-units: unit-item-btn := LinkText {
+                                    text: Helpers.get-unit-short-str(unit);
+                                    text-color: Data.theme.palette.fg;
+                                    font-weight: (unit == root.unit) ? 600 : 400;
+                                    horizontal-alignment: center;
+                                    accessible-label: Helpers.get-unit-accessibility-label(unit);
+
+                                    clicked => {
+                                        unit-changed(unit);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if auto-supported: HorizontalLayout {
+                    Rectangle {
                         y: (parent.height - self.height) / 2;
                         width: 1px;
                         height: 15px;
                         background: Data.theme.palette.fg-disabled;
                     }
 
-                    unit-btn := LinkText {
-                        y: ((parent.height - self.height) / 2) - 1px;
-                        width: self.preferred-width + 10px;
+                    auto-btn := LinkText {
+                        width: size-dummy-btn.preferred-width;
                         horizontal-alignment: center;
                         vertical-alignment: center;
-                        text-color: Data.theme.palette.fg;
-                        text-color-disabled: Data.theme.palette.fg-placeholder;
-                        text: Helpers.get-unit-short-str(root.unit);
-                        enabled: can-change-unit;
-
-                        // Accessibility
-                        accessible-description: "unit";
-                        accessible-label: Helpers.get-unit-accessibility-label(unit);
-                        accessible-expandable: true;
-                        accessible-action-expand => {
-                            unit-btn.clicked();
-                        }
+                        font-size: 10.5px;
+                        font-weight: auto-checked ? 600 : 400;
+                        text-color: auto-checked ? Data.theme.palette.fg : Data.theme.palette.fg-placeholder;
+                        text-color-disabled: auto-checked ? Data.theme.palette.fg-placeholder : Data.theme.palette.fg-disabled;
+                        text: "AUTO";
+                        enabled: enabled;
 
                         clicked => {
-                            unit-popup.show();
+                            root.auto-toggled(!auto-checked);
                         }
 
-                        unit-popup := PopupWindow {
-                            x: (parent.width - self.preferred-width) / 2;
-                            y: parent.height;
-
-                            Rectangle {
-                                background: Data.theme.palette.bg;
-                                border-color: Data.theme.palette.bg-border;
-                                border-width: 1px;
-
-                                VerticalLayout {
-                                    padding: 5px;
-                                    spacing: 5px;
-
-                                    for unit in Helpers.all-length-units: unit-item-btn := LinkText {
-                                        text: Helpers.get-unit-short-str(unit);
-                                        text-color: Data.theme.palette.fg;
-                                        font-weight: (unit == root.unit) ? 600 : 400;
-                                        horizontal-alignment: center;
-                                        accessible-label: Helpers.get-unit-accessibility-label(unit);
-
-                                        clicked => {
-                                            unit-changed(unit);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    if auto-supported: HorizontalLayout {
-                        Rectangle {
-                            y: (parent.height - self.height) / 2;
-                            width: 1px;
-                            height: 15px;
-                            background: Data.theme.palette.fg-disabled;
-                        }
-
-                        auto-btn := LinkText {
-                            width: size-dummy-btn.preferred-width;
-                            horizontal-alignment: center;
-                            vertical-alignment: center;
-                            font-size: 10.5px;
-                            font-weight: auto-checked ? 600 : 400;
-                            text-color: auto-checked ? Data.theme.palette.fg : Data.theme.palette.fg-placeholder;
-                            text-color-disabled: auto-checked ? Data.theme.palette.fg-placeholder : Data.theme.palette.fg-disabled;
-                            text: "AUTO";
-                            enabled: enabled;
-
-                            clicked => {
-                                root.auto-toggled(!auto-checked);
-                            }
-
-                            size-dummy-btn := LinkText {
-                                width: self.preferred-width + 10px;
-                                font-weight: 600;
-                                text: auto-btn.text;
-                                visible: false;
-                            }
+                        size-dummy-btn := LinkText {
+                            width: self.preferred-width + 10px;
+                            font-weight: 600;
+                            text: auto-btn.text;
+                            visible: false;
                         }
                     }
                 }

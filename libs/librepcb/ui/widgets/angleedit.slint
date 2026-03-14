@@ -101,7 +101,7 @@ export component AngleEdit inherits Rectangle {
             if icon.width > 0: Image {
                 width: 12px;
                 image-fit: contain;
-                colorize: edt.color;
+                colorize: enabled ? Data.theme.palette.fg : Data.theme.palette.fg-disabled;
                 source: icon;
                 accessible-role: none;
             }
