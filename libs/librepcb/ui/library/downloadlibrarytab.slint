@@ -1,6 +1,8 @@
 import {
     Button,
+    Text,
     LineEdit,
+    TextInput,
     LinkText,
     ProgressBar,
 } from "../widgets.slint";
@@ -9,6 +11,7 @@ import {
     Backend,
     DownloadLibraryTabData,
     TabAction,
+    Data,
     WindowSectionData,
 } from "../api.slint";
 
@@ -64,10 +67,14 @@ export component DownloadLibraryTab inherits Tab {
         }
 
         Row {
-            Rectangle {
+            VerticalLayout {
                 colspan: 2;
-                height: 1px;
-                background: gray;
+                padding-bottom: 5px;
+
+                Rectangle {
+                    height: 1px;
+                    background: Data.theme.palette.bg-border;
+                }
             }
         }
 
@@ -202,7 +209,7 @@ export component DownloadLibraryTab inherits Tab {
             creation-status-edt := TextInput {
                 horizontal-stretch: 1;
                 height: self.visible ? self.preferred-height : 0;
-                color: downloading ? yellow : red;
+                color: downloading ? Data.theme.palette.fg-warning : red;
                 read-only: true;
                 wrap: word-wrap;
                 text: tabs[section.current-tab-index].download-status;

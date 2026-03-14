@@ -1,5 +1,4 @@
-import { Palette } from "std-widgets.slint";
-import { Constants } from "../api.slint";
+import { Constants, Data } from "../api.slint";
 
 component Slider inherits Rectangle {
     in-out property <float> value;
@@ -41,11 +40,11 @@ export component HorizontalSlider inherits Slider {
             Rectangle {
                 x: root.handle-size / 2;
                 width: parent.width - root.handle-size;
-                height: 4px;
-                background: Palette.foreground;
+                height: 5px;
+                background: Data.theme.palette.bg3;
                 border-radius: self.height / 2;
-                border-color: #909090;
-                border-width: 0.5px;
+                border-color: Data.theme.palette.bg-border;
+                border-width: 1px;
             }
 
             pointer-event(event) => {
@@ -108,12 +107,12 @@ export component VerticalSlider inherits Slider {
 
             Rectangle {
                 y: root.handle-size / 2;
-                width: 4px;
+                width: 5px;
                 height: parent.height - root.handle-size;
-                background: Palette.foreground;
+                background: Data.theme.palette.bg3;
                 border-radius: self.width / 2;
-                border-color: #909090;
-                border-width: 0.5px;
+                border-color: Data.theme.palette.bg-border;
+                border-width: 1px;
             }
 
             pointer-event(event) => {

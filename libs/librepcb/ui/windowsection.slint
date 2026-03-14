@@ -71,7 +71,7 @@ component TabButton inherits Rectangle {
         if is-current-tab {
             Data.theme.palette.bg
         } else if ta.has-hover {
-            Data.theme.palette.bg2-hovered
+            Data.theme.palette.bg.mix(Data.theme.palette.bg3, 0.5)
         } else {
             Data.theme.palette.bg3
         }
@@ -118,14 +118,14 @@ component TabButton inherits Rectangle {
         Image {
             width: 16px;
             source: Helpers.get-icon-for-tab-type(tab.type);
-            colorize: Data.theme.palette.fg;
+            colorize: is-current-tab ? Data.theme.palette.fg : Data.theme.palette.fg-placeholder;
             accessible-role: none;
         }
 
         if !tab.title.is-empty: txt := Text {
             min-width: 0;
             vertical-alignment: center;
-            color: Data.theme.palette.fg;
+            color: is-current-tab ? Data.theme.palette.fg : Data.theme.palette.fg-placeholder;
             text: tab.title;
             overflow: elide;
             accessible-role: none;
@@ -153,6 +153,34 @@ component TabButton inherits Rectangle {
             }
         }
     }
+
+    Rectangle {
+        x: 0;
+        y: 0;
+        width: 100%;
+        height: 1px;
+        background: {
+            if is-current-section && is-current-tab {
+                #29d682
+            } else if is-current-tab {
+                Data.theme.palette.fg-disabled;
+            } else {
+                Data.theme.palette.bg-border;
+            }
+        };
+    }
+
+    Rectangle {
+        x: parent.width - 1px;
+        width: 1px;
+        background: Data.theme.palette.bg-border;
+    }
+
+    if !is-current-tab: Rectangle {
+        y: parent.height - 1px;
+        height: 1px;
+        background: Data.theme.palette.bg-border;
+    }
 }
 
 export component WindowSection inherits Rectangle {
@@ -179,6 +207,12 @@ export component WindowSection inherits Rectangle {
 
             // Accessibility
             accessible-role: tab-list;
+
+            Rectangle {
+                y: parent.height - 1px;
+                height: 1px;
+                background: Data.theme.palette.bg-border;
+            }
 
             HorizontalLayout {
                 for tab[index] in section.tabs: tab-btn := TabButton {

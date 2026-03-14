@@ -1,0 +1,7 @@
+import { Data } from "../api.slint";
+
+export component Text inherits Text {
+    in property <bool> enabled: true;
+
+    color: enabled ? Data.theme.palette.fg : Data.theme.palette.fg-disabled;
+}

@@ -1,6 +1,7 @@
 import { Palette } from "std-widgets.slint";
 import { IconButton } from "iconbutton.slint";
 import { LinkText } from "linktext.slint";
+import { TextInput } from "textinput.slint";
 import { ToolTip } from "tooltip.slint";
 import {
     Backend,
@@ -94,21 +95,20 @@ export component LengthEdit inherits Rectangle {
         }
     }
 
-    preferred-height: 28px;
-    background: #202020;
+    preferred-height: 25px;
+    background: Data.theme.palette.bg3;
     border-color: {
         if enabled && (!parse-result.valid) {
             edt.has-focus ? #ff0000 : #900000
         } else if edt.has-focus {
             Constants.librepcb-color
         } else if enabled {
-            #606060
+            Data.theme.palette.bg-border
         } else {
             transparent
         }
     }
     border-width: 1px;
-    border-radius: 10px;
     forward-focus: edt;
 
     // A bit ugly: Ensure enough space for numbers in the typical range.
@@ -128,7 +128,7 @@ export component LengthEdit inherits Rectangle {
 
         l := HorizontalLayout {
             padding-left: 8px;
-            padding-right: 2px;
+            padding-right: 1px;
             padding-top: self.padding-right;
             padding-bottom: self.padding-top;
             spacing: 5px;
@@ -161,15 +161,13 @@ export component LengthEdit inherits Rectangle {
                 vertical-alignment: center;
                 color: {
                     if !enabled {
-                        #909090
+                        Data.theme.palette.fg-disabled
                     } else if auto-supported && auto-checked {
-                        #a0a0a0
+                        Data.theme.palette.fg-placeholder
                     } else {
-                        Palette.foreground
+                        Data.theme.palette.fg
                     }
                 };
-                selection-background-color: Constants.librepcb-color;
-                selection-foreground-color: black;
                 enabled: enabled;
                 accessible-role: none;
 
@@ -237,17 +235,13 @@ export component LengthEdit inherits Rectangle {
             }
 
             Rectangle {
-                background: black;
-                border-top-right-radius: root.border-radius;
-                border-bottom-right-radius: root.border-radius;
-                clip: true;
+                background: Data.theme.palette.bg-border;
 
                 HorizontalLayout {
                     if can-increase || can-decrease: VerticalLayout {
                         up-btn := IconButton {
                             width: 15px;
                             enabled: enabled && can-increase;
-                            background-color: black;
                             icon: @image-url("../../../font-awesome/svgs/solid/caret-up.svg");
                             icon-offset-y: 1px;
                             accessible-label: "increase";
@@ -261,7 +255,6 @@ export component LengthEdit inherits Rectangle {
                         down-btn := IconButton {
                             width: 15px;
                             enabled: enabled && can-decrease;
-                            background-color: black;
                             icon: @image-url("../../../font-awesome/svgs/solid/caret-down.svg");
                             icon-offset-y: -1px;
                             accessible-label: "decrease";
@@ -273,13 +266,13 @@ export component LengthEdit inherits Rectangle {
                         }
                     }
 
-                    Rectangle {
+                    if can-increase || can-decrease: Rectangle {
                         width: 1px;
 
                         Rectangle {
                             y: (parent.height - self.height) / 2;
                             height: 15px;
-                            background: gray;
+                            background: Data.theme.palette.fg-disabled;
                         }
                     }
 
@@ -288,8 +281,8 @@ export component LengthEdit inherits Rectangle {
                         width: self.preferred-width + 10px;
                         horizontal-alignment: center;
                         vertical-alignment: center;
-                        text-color: Palette.foreground;
-                        text-color-disabled: #909090;
+                        text-color: Data.theme.palette.fg;
+                        text-color-disabled: Data.theme.palette.fg-placeholder;
                         text: Helpers.get-unit-short-str(root.unit);
                         enabled: can-change-unit;
 
@@ -307,11 +300,12 @@ export component LengthEdit inherits Rectangle {
 
                         unit-popup := PopupWindow {
                             x: (parent.width - self.preferred-width) / 2;
-                            y: parent.height + 2px;
+                            y: parent.height - 1px;
 
                             Rectangle {
-                                background: black;
-                                border-radius: 5px;
+                                background: Data.theme.palette.bg;
+                                border-color: Data.theme.palette.bg-border;
+                                border-width: 1px;
 
                                 VerticalLayout {
                                     padding: 5px;
@@ -319,7 +313,8 @@ export component LengthEdit inherits Rectangle {
 
                                     for unit in Helpers.all-length-units: unit-item-btn := LinkText {
                                         text: Helpers.get-unit-short-str(unit);
-                                        text-color: (unit == root.unit) ? Constants.librepcb-color : unit-btn.text-color;
+                                        text-color: Data.theme.palette.fg;
+                                        font-weight: (unit == root.unit) ? 600 : 400;
                                         horizontal-alignment: center;
                                         accessible-label: Helpers.get-unit-accessibility-label(unit);
 

@@ -1,15 +1,15 @@
 import { ScrollView } from "std-widgets.slint";
-import { IconButton, LineEdit } from "../../widgets.slint";
-import { PackagePadData } from "../../api.slint";
+import { IconButton, LineEdit, Text } from "../../widgets.slint";
+import { Data, PackagePadData } from "../../api.slint";
 
 component HorizontalLine inherits Rectangle {
     height: 1px;
-    background: #505050;
+    background: Data.theme.palette.bg-border;
 }
 
 component VerticalLine inherits Rectangle {
     width: 1px;
-    background: #505050;
+    background: Data.theme.palette.bg-border;
 }
 
 component PackagePadListViewTextCell inherits Rectangle {
@@ -19,13 +19,13 @@ component PackagePadListViewTextCell inherits Rectangle {
     in property <TextHorizontalAlignment> horizontal-alignment: left;
 
     preferred-width: txt.preferred-width + 10px;
+    background: Data.theme.palette.bg2;
 
     txt := Text {
         x: 5px;
         width: parent.width - 10px;
         horizontal-alignment: horizontal-alignment;
         vertical-alignment: center;
-        color: #909090;
         font-family: font-family;
         font-size: font-size;
         text: text;
@@ -68,7 +68,7 @@ export component PackagePadListView inherits ScrollView {
 
                     number-cell := PackagePadListViewTextCell {
                         height: row-height;
-                        background: #202020;
+                        background: Data.theme.palette.bg3;
                         horizontal-alignment: right;
                         font-size: 10px;
                         text: index + 1;
@@ -93,7 +93,7 @@ export component PackagePadListView inherits ScrollView {
 
                     id-cell := PackagePadListViewTextCell {
                         height: row-height;
-                        background: #202020;
+                        background: Data.theme.palette.bg3;
                         horizontal-alignment: right;
                         font-family: "Noto Sans Mono";
                         font-size: 10px;
@@ -151,7 +151,7 @@ export component PackagePadListView inherits ScrollView {
 
                     delete-btn := IconButton {
                         height: row-height;
-                        background-color: #202020;
+                        background: Data.theme.palette.bg3;
                         icon-scale: 0.6;
                         icon: @image-url("../../../../font-awesome/svgs/solid/trash-can.svg");
 

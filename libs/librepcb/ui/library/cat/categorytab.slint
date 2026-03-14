@@ -146,7 +146,7 @@ component CategoryTab inherits Tab {
 
             deprecated-sw := DeprecatedRowCell {
                 checked: tabs[index].deprecated;
-                enabled: !read-only;
+                read-only: read-only;
                 accessible-label: deprecated-txt.text;
 
                 toggled(checked) => {

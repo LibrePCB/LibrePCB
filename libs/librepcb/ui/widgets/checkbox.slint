@@ -1,42 +1,38 @@
+import { Text } from "text.slint";
 import { Constants, Data } from "../api.slint";
 
-export enum TextSide {
-    left,
-    right,
-}
-
-export component Switch inherits Rectangle {
+export component CheckBox inherits Rectangle {
     in-out property <bool> checked: false;
     in property <bool> enabled: true;
+    in property <bool> read-only: false;
     in property <string> text;
-    in property <TextSide> text-side: right;
-    in property <length> size: 25px;
     in property <length> font-size: 12px;
     in property <string> status-tip;
-    in property <color> checked-color: Constants.librepcb-color;
-    in property <color> unchecked-color: Data.theme.palette.bg3;
     in property <bool> focusable: true;
+    in property <color> text-color: {
+        if !enabled {
+            Data.theme.palette.fg-disabled
+        } else if read-only {
+            Data.theme.palette.fg-placeholder
+        } else {
+            Data.theme.palette.fg
+        }
+    };
     out property has-focus <=> fs.has-focus;
 
     preferred-width: l.preferred-width;
     preferred-height: l.preferred-height;
     max-width: text.is-empty ? l.preferred-width : l.max-width;
-    border-color: {
-        if has-focus {
-            root.checked ? Data.theme.palette.fg : Constants.librepcb-color
-        } else {
-            Data.theme.palette.bg-border
-        }
-    };
     forward-focus: fs;
 
     // Accessibility
-    accessible-role: switch;
+    accessible-role: checkbox;
     accessible-description: status-tip;
     accessible-checkable: true;
     accessible-checked: checked;
     accessible-enabled: enabled;
     accessible-label: text;
+    accessible-read-only: read-only;
     accessible-action-default => {
         ta.clicked();
     }
@@ -52,7 +48,7 @@ export component Switch inherits Rectangle {
         key-pressed(event) => {
             // Only consume Space, but not Return as the Return key is often
             // used to confirm a dialog or something like that.
-            if event.text == Key.Space {
+            if enabled && (!read-only) && (event.text == Key.Space) {
                 toggled(!checked);
                 return accept;
             }
@@ -61,60 +57,38 @@ export component Switch inherits Rectangle {
     }
 
     l := HorizontalLayout {
-        spacing: 8px;
-
-        if (!text.is-empty) && (text-side == TextSide.left): Text {
-            text: text;
-            color: Data.theme.palette.fg;
-            wrap: word-wrap;
-            horizontal-alignment: right;
-            vertical-alignment: center;
-            font-size: font-size;
-            accessible-role: none;
-        }
+        spacing: 5px;
 
         Rectangle {
-            property <float> darkness: {
-                if !enabled {
-                    0.5
-                } else if ta.pressed {
-                    0.3
-                } else {
-                    0
-                }
-            };
-
             y: (parent.height - self.height) / 2;
-            width: size * 1.8;
-            height: size;
-            background: (checked ? checked-color : unchecked-color).darker(darkness);
-            border-radius: self.height / 2;
-            border-color: root.border-color;
+            width: 16px;
+            height: self.width;
+            background: Data.theme.palette.bg3;
+            border-color: has-focus ? Constants.librepcb-color : Data.theme.palette.bg-border;
             border-width: 1px;
 
-            Rectangle {
-                x: checked ? (parent.width - self.width - 3px) : 3px;
-                width: self.height;
-                height: parent.height - 6px;
-                background: ta.has-hover ? Data.theme.palette.bg2-hovered : Data.theme.palette.bg;
-                border-radius: self.height / 2;
-
-                animate x { duration: 50ms; }
+            if checked: Image {
+                width: 80%;
+                height: self.width;
+                colorize: text-color;
+                source: @image-url("../../../font-awesome/svgs/solid/check.svg");
+                image-fit: contain;
             }
         }
 
-        if (!text.is-empty) && (text-side == TextSide.right): Text {
+        if !text.is-empty: Text {
             text: text;
             wrap: word-wrap;
             vertical-alignment: center;
             font-size: font-size;
-            color: Data.theme.palette.fg;
+            color: text-color;
+            enabled: enabled;
             accessible-role: none;
         }
     }
 
     ta := TouchArea {
-        enabled: enabled;
+        enabled: enabled && !read-only;
 
         changed has-hover => {
             if !root.status-tip.is-empty {

@@ -36,9 +36,11 @@ import {
 import {
     Button,
     ComboBox,
+    Text,
     IconButton,
     LineEdit,
     MenuItem,
+    ToolButtonGroup,
     MenuPopup,
     SceneButton,
     SlideView,
@@ -178,7 +180,7 @@ component PackageMetadataTab inherits GridLayout {
 
         deprecated-sw := DeprecatedRowCell {
             checked: tabs[index].deprecated;
-            enabled: !read-only;
+            read-only: read-only;
             accessible-label: deprecated-txt.text;
 
             toggled(checked) => {
@@ -208,7 +210,7 @@ component PackageMetadataTab inherits GridLayout {
         assembly-type-cbx := ComboBox {
             model: Constants.package-assembly-types;
             current-index: tabs[index].assembly-type;
-            enabled: !read-only;
+            read-only: read-only;
             window-height: window-height;
             accessible-label: assembly-type-txt.text;
 
@@ -253,8 +255,10 @@ component PackagePadsEditorTab inherits VerticalLayout {
     if !read-only: Rectangle {
         width: parent.width - 2 * parent.padding-left;
         height: self.preferred-height + 16px;
-        background: #454545;
-        border-radius: 10px;
+        background: Data.theme.palette.bg2;
+        border-color: Data.theme.palette.bg-border;
+        border-width: 1px;
+        border-radius: 8px;
 
         Text {
             property <string> s1: @tr("Add all (potentially solderable) package pads which are electrically independent, no matter if they actually have an electrical function in a particular part.");
@@ -547,14 +551,16 @@ component PackageEditorTab inherits TouchArea {
             }
         }
 
-        tool-line-btn := ToolButton {
-            cmd: Cmd.tool-line;
-            icon: @image-url("../../../../../img/actions/draw_wire.png");
-            checked: tabs[index].tool == EditorTool.line;
-            enabled: footprint-selected && (!read-only);
+        ToolButtonGroup {
+            tool-line-btn := ToolButton {
+                cmd: Cmd.tool-line;
+                icon: @image-url("../../../../../img/actions/draw_wire.png");
+                checked: tabs[index].tool == EditorTool.line;
+                enabled: footprint-selected && (!read-only);
 
-            clicked => {
-                tool-triggered(TabAction.tool-line);
+                clicked => {
+                    tool-triggered(TabAction.tool-line);
+                }
             }
 
             tool-rect-btn := ToolButton {
@@ -598,13 +604,15 @@ component PackageEditorTab inherits TouchArea {
             }
         }
 
-        tool-text-btn := ToolButton {
-            cmd: Cmd.tool-text;
-            checked: tabs[index].tool == EditorTool.text;
-            enabled: footprint-selected && (!read-only);
+        ToolButtonGroup {
+            tool-text-btn := ToolButton {
+                cmd: Cmd.tool-text;
+                checked: tabs[index].tool == EditorTool.text;
+                enabled: footprint-selected && (!read-only);
 
-            clicked => {
-                tool-triggered(TabAction.tool-text);
+                clicked => {
+                    tool-triggered(TabAction.tool-text);
+                }
             }
 
             tool-name-btn := ToolButton {
@@ -630,15 +638,17 @@ component PackageEditorTab inherits TouchArea {
             }
         }
 
-        tool-pad-tht-btn := ToolButton {
-            cmd: Cmd.tool-pad-tht;
-            icon: @image-url("../../../../../img/actions/add_tht_pad.png");
-            colorize: transparent;
-            checked: tabs[index].tool == EditorTool.pad-tht;
-            enabled: footprint-selected && (!read-only);
+        ToolButtonGroup {
+            tool-pad-tht-btn := ToolButton {
+                cmd: Cmd.tool-pad-tht;
+                icon: @image-url("../../../../../img/actions/add_tht_pad.png");
+                colorize: transparent;
+                checked: tabs[index].tool == EditorTool.pad-tht;
+                enabled: footprint-selected && (!read-only);
 
-            clicked => {
-                tool-triggered(TabAction.tool-pad-tht);
+                clicked => {
+                    tool-triggered(TabAction.tool-pad-tht);
+                }
             }
 
             tool-pad-smt-btn := ToolButton {

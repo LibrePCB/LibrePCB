@@ -6,9 +6,10 @@ import {
     LineEdit,
     LinkText,
     ListViewItemButton,
+    Text,
     OverlayDialog,
+    CheckBox,
     Palette,
-    Switch,
     TreeView,
 } from "../widgets.slint";
 import {
@@ -61,7 +62,7 @@ export component IconRowCell inherits HorizontalLayout {
     }
 
     if btn.has-hover: Text {
-        color: #a0a0a0;
+        color: Data.theme.palette.fg-placeholder;
         font-size: 11px;
         vertical-alignment: center;
         overflow: elide;
@@ -94,8 +95,9 @@ export component DeprecatedRowHeader inherits RowHeaderText {
     text: @tr("Deprecated:");
 }
 
-export component DeprecatedRowCell inherits Switch {
+export component DeprecatedRowCell inherits CheckBox {
     font-size: 10px;
+    focusable: true;
     text: @tr("Check this if this library element should no longer be used.");
     accessible-description: self.text;
 }
@@ -248,7 +250,7 @@ export component ParentRowCell inherits HorizontalLayout {
 
     if !read-only: Rectangle {
         width: 1px;
-        background: #707070;
+        background: Data.theme.palette.bg-border;
     }
 
     if !read-only: select-btn := IconButton {
@@ -273,8 +275,9 @@ export component CategoriesRowHeader inherits RowHeaderText {
 component CategoriesListViewRow inherits TouchArea {
     Rectangle {
         height: self.preferred-height;
-        background: #393939;
-        border-radius: 2px;
+        background: Data.theme.palette.bg3;
+        border-color: Data.theme.palette.bg-border;
+        border-width: 1px;
 
         HorizontalLayout {
             padding: 2px;
@@ -325,7 +328,7 @@ export component CategoriesRowCell inherits HorizontalLayout {
 
             if !read-only: Rectangle {
                 width: 1px;
-                background: #707070;
+                background: Data.theme.palette.bg-border;
                 visible: item-ta.has-hover;
             }
 
@@ -361,7 +364,7 @@ export component CategoriesRowCell inherits HorizontalLayout {
             }
 
             add-txt := Text {
-                color: parent.has-hover ? white : Palette.foreground;
+                color: parent.has-hover ? Data.theme.palette.fg-hovered : Data.theme.palette.fg;
                 vertical-alignment: center;
                 overflow: elide;
                 text: @tr("Add Category");
@@ -385,7 +388,7 @@ export component CategoriesChooserDialog inherits OverlayDialog {
     view := TreeView {
         model: model;
         supports-expand: false;
-        icons-color: Palette.foreground;
+        icons-color: Data.theme.palette.fg;
 
         item-selected(idx, item) => {
             item-picked(idx, item);
@@ -495,8 +498,8 @@ export component PcbDesignRulesRowCell inherits VerticalLayout {
         new-btn := LinkText {
             vertical-alignment: center;
             overflow: elide;
-            text-color: #909090;
-            text-color-hovered: #c0c0c0;
+            text-color: Data.theme.palette.fg-placeholder;
+            text-color-hovered: Data.theme.palette.fg;
             text: "+ " + @tr("New Design Rules");
 
             clicked => {
@@ -524,7 +527,7 @@ export component MetadataFooterRowCell inherits HorizontalLayout {
     in property <bool> read-only: false;
 
     alignment: start;
-    spacing: 5px;
+    spacing: 8px;
 
     if !read-only: save-btn := Button {
         width: max(self.preferred-width, 100px);

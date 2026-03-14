@@ -2,6 +2,8 @@ import { Palette, ScrollView } from "std-widgets.slint";
 import { Badge } from "badge.slint";
 import { DropDownPopup } from "dropdownpopup.slint";
 import { IconButton } from "iconbutton.slint";
+import { Text } from "text.slint";
+import { TextInput } from "textinput.slint";
 import { Constants, Data } from "../api.slint";
 
 export component LineEdit inherits Rectangle {
@@ -73,7 +75,7 @@ export component LineEdit inherits Rectangle {
     }
 
     preferred-width: max(l.preferred-width, placeholder-txt.preferred-width + l.preferred-width - view.preferred-width, 100px);
-    preferred-height: 28px;
+    preferred-height: 25px;
     horizontal-stretch: 1;
     background: Data.theme.palette.bg3;
     border-color: {
@@ -82,13 +84,12 @@ export component LineEdit inherits Rectangle {
         } else if edt.has-focus {
             Constants.librepcb-color
         } else if enabled && (!read-only) {
-            Data.theme.palette.fg-disabled
+            Data.theme.palette.bg-border
         } else {
             transparent
         }
     }
     border-width: frameless ? 0 : 1px;
-    border-radius: frameless ? 0 : 10px;
     forward-focus: edt;
 
     // Accessibility
@@ -108,7 +109,7 @@ export component LineEdit inherits Rectangle {
     }
 
     placeholder-txt := Text {
-        x: frameless ? 5px : 10px;
+        x: 5px;
         width: root.width - 2 * self.x;
         font-size: font-size;
         color: enabled ? Data.theme.palette.fg-placeholder : Data.theme.palette.fg-disabled;
@@ -142,9 +143,6 @@ export component LineEdit inherits Rectangle {
                     height: self.preferred-height;
                     font-size: font-size;
                     font-weight: font-weight;
-                    color: enabled ? Data.theme.palette.fg : Data.theme.palette.fg-disabled;
-                    selection-background-color: Constants.librepcb-color;
-                    selection-foreground-color: black;
                     enabled: enabled;
                     read-only: read-only;
                     single-line: true;
@@ -230,7 +228,7 @@ export component LineEdit inherits Rectangle {
         x: root.width - self.width - (frameless ? (expand-btn-width + 5px) : 20px);
         y: frameless ? ((parent.height - self.height) / 2) : -8px;
         width: min(self.preferred-width, root.width * (frameless ? 0.3 : 0.8));
-        background: #101010;
+        background: parent.background;
         text-color: root.border-color;
         font-size: 10px;
         text: validation-error;
@@ -243,7 +241,7 @@ export component LineEdit inherits Rectangle {
         y: parent.height;
         width: parent.width;
         height: min(autocompletions-l.preferred-height, 300px);
-        background: black;
+        background: Data.theme.palette.bg3;
 
         // Accessibility
         accessible-role: list;
@@ -282,7 +280,7 @@ export component LineEdit inherits Rectangle {
                     }
 
                     Rectangle {
-                        background: is-selected ? #505050 : transparent;
+                        background: is-selected ? Data.theme.palette.bg2-checked : transparent;
 
                         autocompletion-item-txt := Text {
                             x: 5px;
@@ -291,7 +289,6 @@ export component LineEdit inherits Rectangle {
                             font-size: 12px;
                             overflow: elide;
                             vertical-alignment: center;
-                            color: Palette.foreground;
                             text: item;
                             accessible-role: none;
                         }

@@ -23,6 +23,7 @@ import {
     IconButton,
     LineEdit,
     SlideView,
+    Text,
     Spinner,
     TextEdit,
 } from "../../widgets.slint";
@@ -294,7 +295,7 @@ component LibraryMetadataTab inherits GridLayout {
         deprecated-sw := DeprecatedRowCell {
             text: @tr("Check this if this library should no longer be used.");
             checked: tabs[index].deprecated;
-            enabled: !read-only;
+            read-only: read-only;
             accessible-label: deprecated-txt.text;
 
             toggled(checked) => {
@@ -400,8 +401,16 @@ component LibraryImportButton inherits TouchArea {
 
     Rectangle {
         height: self.preferred-height;
-        background: parent.pressed ? #303030 : (parent.has-hover ? #2a2a2a : #252525);
-        border-color: #808080;
+        background: {
+            if parent.pressed {
+                Data.theme.palette.bg2-checked;
+            } else if parent.has-hover {
+                Data.theme.palette.bg2-hovered;
+            } else {
+                Data.theme.palette.bg3;
+            }
+        };
+        border-color: Data.theme.palette.bg-border;
         border-width: 1px;
 
         HorizontalLayout {
@@ -436,7 +445,7 @@ component LibraryImportButton inherits TouchArea {
 
                 description-txt := Text {
                     font-size: 14px;
-                    color: #909090;
+                    color: Data.theme.palette.fg-placeholder;
                     horizontal-alignment: center;
                     wrap: word-wrap;
                     text: @tr("Start populating this library by importing {} library elements.", name);
@@ -511,7 +520,9 @@ component NewLibraryElementButton inherits IconButton {
     height: 35px;
     border-radius: self.height / 2;
     colorize: false;
-    background-color: #101010;
+    background-color: Data.theme.palette.bg3;
+    border-color: Data.theme.palette.bg-border;
+    border-width: 1px;
     icon-scale: 0.6;
     tooltip-position: left;
     tooltip-delayed: false;
@@ -707,7 +718,7 @@ component LibraryContentTab inherits HorizontalLayout {
 
     Rectangle {
         width: 1px;
-        background: #555555;
+        background: Data.theme.palette.bg-border;
     }
 
     VerticalLayout {
@@ -876,7 +887,7 @@ export component LibraryTab inherits Tab {
 
         Rectangle {
             width: 1px;
-            background: #555555;
+            background: Data.theme.palette.bg-border;
         }
 
         LibraryMetadataTab {

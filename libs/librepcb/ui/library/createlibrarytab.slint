@@ -3,13 +3,15 @@ import {
     IconButton,
     LineEdit,
     LinkText,
-    Switch,
+    Text,
+    CheckBox,
 } from "../widgets.slint";
 import { Tab } from "../tab.slint";
 import {
     Backend,
     CreateLibraryTabData,
     TabAction,
+    Data,
     WindowSectionData,
 } from "../api.slint";
 
@@ -65,10 +67,14 @@ export component CreateLibraryTab inherits Tab {
         }
 
         Row {
-            Rectangle {
+            VerticalLayout {
                 colspan: 2;
-                height: 1px;
-                background: gray;
+                padding-bottom: 5px;
+
+                Rectangle {
+                    height: 1px;
+                    background: Data.theme.palette.bg-border;
+                }
             }
         }
 
@@ -226,7 +232,7 @@ export component CreateLibraryTab inherits Tab {
             HorizontalLayout {
                 spacing: 8px;
 
-                cc0-sw := Switch {
+                cc0-sw := CheckBox {
                     horizontal-stretch: 1;
                     text: @tr("Put library under the Public Domain License CC0-1.0\n(mandatory to publish it on librepcb.org)");
                     checked: tabs[section.current-tab-index].cc0;

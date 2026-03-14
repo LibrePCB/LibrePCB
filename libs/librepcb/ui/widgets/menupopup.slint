@@ -6,9 +6,9 @@ export component MenuSeparator inherits Rectangle {
 
     Rectangle {
         y: parent.height / 2;
-        width: parent.width - 70px;
+        width: parent.width - 14px;
         height: 1px;
-        background: Data.theme.palette.bg2;
+        background: Data.theme.palette.bg-border;
     }
 }
 
@@ -30,7 +30,7 @@ export component MenuItem inherits Rectangle {
 
     callback clicked;
 
-    height: 30px;
+    height: 25px;
     background: ta.has-hover ? Data.theme.palette.bg2-hovered : Data.theme.palette.bg;
 
     // Accessibility
@@ -46,7 +46,7 @@ export component MenuItem inherits Rectangle {
 
     HorizontalLayout {
         padding-left: 5px;
-        padding-right: 10px;
+        padding-right: 8px;
         padding-top: 2px;
         padding-bottom: 2px;
         spacing: 3px;
@@ -61,9 +61,7 @@ export component MenuItem inherits Rectangle {
             border-color: #909090;
 
             Image {
-                x: 4px;
-                y: self.x;
-                width: parent.width - 2 * self.x;
+                width: 80%;
                 height: self.width;
                 colorize: icon-color;
                 image-fit: contain;
@@ -87,7 +85,7 @@ export component MenuItem inherits Rectangle {
 
         text-txt := Text {
             vertical-alignment: center;
-            font-size: 15px;
+            font-size: 13px;
             font-weight: default ? 600 : 400;
             color: text-color;
             text: text;
@@ -98,7 +96,7 @@ export component MenuItem inherits Rectangle {
             width: max(self.preferred-width, 80px);
             horizontal-alignment: right;
             vertical-alignment: center;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 300;
             color: text-color;
             text: shortcuts;

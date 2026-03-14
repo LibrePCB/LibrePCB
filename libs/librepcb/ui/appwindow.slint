@@ -95,10 +95,23 @@ export component AppWindow inherits Window {
 
         Rectangle {
             x: sidebar.width;
+            width: 1px;
+            background: Data.theme.palette.bg-border;
+        }
+
+        panel := Rectangle {
+            x: sidebar.width + 1px;
             y: sidebar.y;
             z: 80; // For the tooltips.
             width: panel-width;
-            height: sidebar.height;
+            height: sidebar.height - 1px;
+            visible: Data.panel-page != PanelPage.none;
+
+            Rectangle {
+                y: 0;
+                height: 1px;
+                background: Data.theme.palette.bg-border;
+            }
 
             if Data.panel-page == PanelPage.home: home-panel := HomePanel { }
 
@@ -120,13 +133,13 @@ export component AppWindow inherits Window {
         }
 
         HorizontalLayout {
-            x: sidebar.width + actual-panel-width;
+            x: panel.x + actual-panel-width;
             y: sidebar.y;
             width: parent.width - self.x;
             height: sidebar.height;
 
             if actual-panel-width > 0: Rectangle {
-                background: Data.theme.palette.bg2;
+                background: Data.theme.palette.bg-border;
                 width: 1px;
             }
 
@@ -140,7 +153,7 @@ export component AppWindow inherits Window {
                 if i < (Data.sections.length - 1): Rectangle {
                     width: 1px;
                     horizontal-stretch: 0;
-                    background: #555555;
+                    background: Data.theme.palette.bg-border;
                 }
             }
         }
@@ -153,6 +166,13 @@ export component AppWindow inherits Window {
             focus-root => {
                 fs.focus();
             }
+        }
+
+        Rectangle {
+            x: sidebar.width;
+            y: statusbar.y - 1px;
+            height: 1px;
+            background: Data.theme.palette.bg-border;
         }
     }
 }
