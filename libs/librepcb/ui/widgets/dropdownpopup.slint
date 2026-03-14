@@ -1,4 +1,4 @@
-import { ScrollView } from "std-widgets.slint";
+import { ScrollView } from "scrollview.slint";
 import { Text } from "text.slint";
 import { Data } from "../api.slint";
 
@@ -66,6 +66,7 @@ export component DropDownPopup inherits PopupWindow {
             height: root.height - 2px;
             viewport-width: l.width;
             viewport-height: l.height;
+            mouse-drag-pan-enabled: true;
 
             l := VerticalLayout {
                 width: root.width - 2px;

@@ -1,4 +1,3 @@
-import { ListView } from "std-widgets.slint";
 import { NameRowHeader } from "../library/metadatawidgets.slint";
 import {
     Button,
@@ -6,7 +5,8 @@ import {
     IconButton,
     IpcDensityLevelSelector,
     LinkText,
-    Palette,
+    ListView,
+    Text,
     PanelHeader,
     SolderTechnologySelector,
 } from "../widgets.slint";
@@ -52,8 +52,8 @@ component UnplacedDeviceItem inherits Rectangle {
                 vertical-alignment: center;
                 font-size: 12px;
                 overflow: elide;
-                color: root.enabled ? Palette.foreground : #707070;
                 text: name;
+                enabled: enabled;
             }
         }
     }

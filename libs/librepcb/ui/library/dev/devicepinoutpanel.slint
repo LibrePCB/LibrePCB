@@ -1,15 +1,15 @@
-import { ScrollView } from "std-widgets.slint";
 import { DevicePinoutListView } from "devicepinoutlistview.slint";
 import {
     Badge,
     Button,
     IconButton,
+    ScrollView,
     LineEdit,
-    Palette,
 } from "../../widgets.slint";
 import {
     Backend,
     Constants,
+    Data,
     DeviceInteractivePinoutSignalData,
     DeviceTabData,
     TabAction,
@@ -113,7 +113,7 @@ component DeviceInteractiveSignalListView inherits ScrollView {
                     if is-current {
                         item-ta.has-hover ? #404040 : black
                     } else {
-                        item-ta.has-hover ? white : Palette.foreground
+                        item-ta.has-hover ? white : Data.theme.palette.fg
                     }
                 };
 

@@ -1,4 +1,4 @@
-import { Constants } from "../api.slint";
+import { Constants, Data } from "../api.slint";
 
 export component ToolBarWidget inherits FocusScope {
     in property <length> content-padding-left: 5px;
@@ -8,21 +8,20 @@ export component ToolBarWidget inherits FocusScope {
     in property <length> spacing: 3px;
 
     width: self.preferred-width;
-    preferred-height: 28px;
+    preferred-height: 25px;
 
     Rectangle {
-        background: #202020;
+        background: Data.theme.palette.bg3;
         border-color: {
             if root.has-focus {
                 Constants.librepcb-color
             } else if root.enabled {
-                #606060
+                Data.theme.palette.bg-border
             } else {
                 transparent
             }
         }
         border-width: 1px;
-        border-radius: 10px;
 
         HorizontalLayout {
             padding-left: content-padding-left;

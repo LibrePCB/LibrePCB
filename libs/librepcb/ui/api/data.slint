@@ -38,7 +38,7 @@ export global Data {
     in property <bool> preview-mode: true;
 
     // Theme
-    in property <Theme> theme: Themes.light;
+    in property <Theme> theme: Themes.dark;
 
     // Window data
     in property <int> window-id: 1;
@@ -204,7 +204,7 @@ export global Data {
                         visible: true,
                         supports-dont-show-again: true,
                     },
-                    tool: EditorTool.select,
+                    tool: EditorTool.polygon,
                     tool-overlay-text: "X0:   123.4567 mm\nY0:   123.4567 mm\nX1:   123.4567 mm\nY1:   123.4567 mm\n\ndX:   123.4567 mm\ndY:   123.4567 mm\n\nL:    123.4567 mm\na:     90.0000 °",
                     tool-layer: {
                         items: ["Layer 1", "Layer 2", "Layer with long name"],
@@ -261,7 +261,7 @@ export global Data {
                     unplaced-components-devices-index: 0,
                     unplaced-components-footprints: ["Density Level A", "Density Level B"],
                     unplaced-components-footprints-index: 0,
-                    tool: EditorTool.select,
+                    tool: EditorTool.wire,
                     tool-overlay-text: "X0:   123.4567 mm\nY0:   123.4567 mm\nX1:   123.4567 mm\nY1:   123.4567 mm\n\ndX:   123.4567 mm\ndY:   123.4567 mm\n\nL:    123.4567 mm\na:     90.0000 °",
                     tool-net: {
                         items: ["Net 1", "Net 2", "Net 3"],

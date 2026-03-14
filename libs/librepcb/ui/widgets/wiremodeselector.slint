@@ -3,13 +3,14 @@ import { ToolBarWidget } from "toolbarwidget.slint";
 import {
     Helpers,
     WireMode,
+    Data,
 } from "../api.slint";
 
 component WireModeButton inherits IconButton {
     width: 18px;
     style: checkable-hyperlink;
-    color-enabled: #606060;
-    color-checked: #c0c0c0;
+    color-enabled: Data.theme.palette.fg-disabled;
+    color-checked: Data.theme.palette.fg;
 }
 
 export component WireModeSelector inherits ToolBarWidget {

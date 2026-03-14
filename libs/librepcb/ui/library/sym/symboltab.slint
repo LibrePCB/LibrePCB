@@ -27,6 +27,7 @@ import {
     MessageBanner,
     MessageBox,
     SceneButton,
+    ToolBar,
     ToolButtonGroup,
     SlideView,
     TextEdit,
@@ -278,84 +279,75 @@ component SymbolEditorTab inherits TouchArea {
         }
     }
 
-    toolbar-r := Rectangle {
-        y: 0;
+    toolbar-r := ToolBar {
+        y: -1px;
         width: min(self.preferred-width, root.width - 10px);
-        height: 34px;
-        background: #505050;
-        border-bottom-left-radius: 11px;
-        border-bottom-right-radius: 11px;
         visible: self.width > 30px;
 
-        HorizontalLayout {
-            alignment: center;
-            padding: 3px;
+        if tabs[index].tool == EditorTool.line: line-toolbar := DrawSymbolPolygonToolBar {
+            section-index: section-index;
+            section: section;
+            show-angle-edt: true;
+            show-fill-sw: false;
+            show-grab-area-sw: false;
+        }
 
-            if tabs[index].tool == EditorTool.line: line-toolbar := DrawSymbolPolygonToolBar {
-                section-index: section-index;
-                section: section;
-                show-angle-edt: true;
-                show-fill-sw: false;
-                show-grab-area-sw: false;
-            }
+        if tabs[index].tool == EditorTool.rect: rect-toolbar := DrawSymbolPolygonToolBar {
+            section-index: section-index;
+            section: section;
+            show-angle-edt: false;
+            show-fill-sw: true;
+            show-grab-area-sw: true;
+        }
 
-            if tabs[index].tool == EditorTool.rect: rect-toolbar := DrawSymbolPolygonToolBar {
-                section-index: section-index;
-                section: section;
-                show-angle-edt: false;
-                show-fill-sw: true;
-                show-grab-area-sw: true;
-            }
+        if tabs[index].tool == EditorTool.polygon: polygon-toolbar := DrawSymbolPolygonToolBar {
+            section-index: section-index;
+            section: section;
+            show-angle-edt: true;
+            show-fill-sw: true;
+            show-grab-area-sw: true;
+        }
 
-            if tabs[index].tool == EditorTool.polygon: polygon-toolbar := DrawSymbolPolygonToolBar {
-                section-index: section-index;
-                section: section;
-                show-angle-edt: true;
-                show-fill-sw: true;
-                show-grab-area-sw: true;
-            }
+        if tabs[index].tool == EditorTool.circle: circle-toolbar := DrawSymbolPolygonToolBar {
+            section-index: section-index;
+            section: section;
+            show-angle-edt: false;
+            show-fill-sw: true;
+            show-grab-area-sw: true;
+        }
 
-            if tabs[index].tool == EditorTool.circle: circle-toolbar := DrawSymbolPolygonToolBar {
-                section-index: section-index;
-                section: section;
-                show-angle-edt: false;
-                show-fill-sw: true;
-                show-grab-area-sw: true;
-            }
+        if tabs[index].tool == EditorTool.arc: arc-toolbar := DrawSymbolPolygonToolBar {
+            section-index: section-index;
+            section: section;
+            show-angle-edt: false;
+            show-fill-sw: false;
+            show-grab-area-sw: false;
+        }
 
-            if tabs[index].tool == EditorTool.arc: arc-toolbar := DrawSymbolPolygonToolBar {
-                section-index: section-index;
-                section: section;
-                show-angle-edt: false;
-                show-fill-sw: false;
-                show-grab-area-sw: false;
-            }
+        if tabs[index].tool == EditorTool.name: name-toolbar := AddSymbolTextToolBar {
+            section-index: section-index;
+            section: section;
+            show-layer-cbx: false;
+            show-text-edt: false;
+        }
 
-            if tabs[index].tool == EditorTool.name: name-toolbar := AddSymbolTextToolBar {
-                section-index: section-index;
-                section: section;
-                show-layer-cbx: false;
-                show-text-edt: false;
-            }
+        if tabs[index].tool == EditorTool.value: value-toolbar := AddSymbolTextToolBar {
+            section-index: section-index;
+            section: section;
+            show-layer-cbx: false;
+            show-text-edt: false;
+        }
 
-            if tabs[index].tool == EditorTool.value: value-toolbar := AddSymbolTextToolBar {
-                section-index: section-index;
-                section: section;
-                show-layer-cbx: false;
-                show-text-edt: false;
-            }
+        if tabs[index].tool == EditorTool.text: text-toolbar := AddSymbolTextToolBar {
+            section-index: section-index;
+            section: section;
+            show-layer-cbx: true;
+            show-text-edt: true;
+        }
 
-            if tabs[index].tool == EditorTool.text: text-toolbar := AddSymbolTextToolBar {
-                section-index: section-index;
-                section: section;
-                show-layer-cbx: true;
-                show-text-edt: true;
-            }
-
-            if tabs[index].tool == EditorTool.pin: pin-toolbar := AddSymbolPinToolBar {
-                section-index: section-index;
-                section: section;
-            }
+        if tabs[index].tool == EditorTool.pin: pin-toolbar := AddSymbolPinToolBar {
+            section-index: section-index;
+            section: section;
         }
     }
 

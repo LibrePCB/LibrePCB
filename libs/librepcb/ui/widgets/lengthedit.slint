@@ -1,4 +1,3 @@
-import { Palette } from "std-widgets.slint";
 import { IconButton } from "iconbutton.slint";
 import { LinkText } from "linktext.slint";
 import { TextInput } from "textinput.slint";
@@ -136,7 +135,7 @@ export component LengthEdit inherits Rectangle {
             if icon.width > 0: Image {
                 width: 12px;
                 image-fit: contain;
-                colorize: enabled ? Palette.foreground : #909090;
+                colorize: enabled ? Data.theme.palette.fg : Data.theme.palette.fg-disabled;
                 source: icon;
                 accessible-role: none;
 
@@ -148,7 +147,7 @@ export component LengthEdit inherits Rectangle {
 
                     Path {
                         commands: "M 100 0 L 50 40 L 0 0 Z";
-                        fill: enabled ? Palette.foreground : #909090;
+                        fill: enabled ? Data.theme.palette.fg : Data.theme.palette.fg-disabled;
                     }
                 }
             }
@@ -235,7 +234,7 @@ export component LengthEdit inherits Rectangle {
             }
 
             Rectangle {
-                background: Data.theme.palette.bg-border;
+                //background: Data.theme.palette.bg-border;
 
                 HorizontalLayout {
                     if can-increase || can-decrease: VerticalLayout {
@@ -267,13 +266,10 @@ export component LengthEdit inherits Rectangle {
                     }
 
                     if can-increase || can-decrease: Rectangle {
+                        y: (parent.height - self.height) / 2;
                         width: 1px;
-
-                        Rectangle {
-                            y: (parent.height - self.height) / 2;
-                            height: 15px;
-                            background: Data.theme.palette.fg-disabled;
-                        }
+                        height: 15px;
+                        background: Data.theme.palette.fg-disabled;
                     }
 
                     unit-btn := LinkText {
@@ -300,7 +296,7 @@ export component LengthEdit inherits Rectangle {
 
                         unit-popup := PopupWindow {
                             x: (parent.width - self.preferred-width) / 2;
-                            y: parent.height - 1px;
+                            y: parent.height;
 
                             Rectangle {
                                 background: Data.theme.palette.bg;
@@ -332,21 +328,29 @@ export component LengthEdit inherits Rectangle {
                             y: (parent.height - self.height) / 2;
                             width: 1px;
                             height: 15px;
-                            background: gray;
+                            background: Data.theme.palette.fg-disabled;
                         }
 
                         auto-btn := LinkText {
-                            width: self.preferred-width + 10px;
+                            width: size-dummy-btn.preferred-width;
                             horizontal-alignment: center;
                             vertical-alignment: center;
                             font-size: 10.5px;
-                            text-color: auto-checked ? white : #909090;
-                            text-color-disabled: auto-checked ? #d0d0d0 : #707070;
+                            font-weight: auto-checked ? 600 : 400;
+                            text-color: auto-checked ? Data.theme.palette.fg : Data.theme.palette.fg-placeholder;
+                            text-color-disabled: auto-checked ? Data.theme.palette.fg-placeholder : Data.theme.palette.fg-disabled;
                             text: "AUTO";
                             enabled: enabled;
 
                             clicked => {
                                 root.auto-toggled(!auto-checked);
+                            }
+
+                            size-dummy-btn := LinkText {
+                                width: self.preferred-width + 10px;
+                                font-weight: 600;
+                                text: auto-btn.text;
+                                visible: false;
                             }
                         }
                     }

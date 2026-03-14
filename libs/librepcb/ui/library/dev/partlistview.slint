@@ -1,8 +1,7 @@
-import { ScrollView } from "std-widgets.slint";
 import {
     IconButton,
     LineEdit,
-    Palette,
+    ScrollView,
 } from "../../widgets.slint";
 import {
     Data,
@@ -92,7 +91,7 @@ export component PartListView inherits ScrollView {
                             width: 70%;
                             height: self.width;
                             image-fit: contain;
-                            colorize: Palette.foreground;
+                            colorize: Data.theme.palette.fg;
                             source: @image-url("../../../../bootstrap-icons/icons/cart3.svg");
                             accessible-role: none;
                         }
@@ -218,7 +217,7 @@ export component PartListView inherits ScrollView {
                                 property <string> separator: (attr-index < (item.attributes.length - 2)) ? ", " : "";
 
                                 vertical-alignment: center;
-                                color: attributes-ta.has-hover ? white : Palette.foreground;
+                                color: attributes-ta.has-hover ? Data.theme.palette.fg-hovered : Data.theme.palette.fg;
                                 text: (attribute.value.is-empty ? attribute.key : (attribute.value + unit)) + separator;
                                 accessible-role: none;
                             }

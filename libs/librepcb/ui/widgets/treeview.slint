@@ -1,4 +1,4 @@
-import { ListView, Palette } from "std-widgets.slint";
+import { ListView } from "listview.slint";
 import { ListViewItemButton } from "listviewitembutton.slint";
 import {
     Backend,
@@ -19,7 +19,6 @@ export component TreeView inherits FocusScope {
     in property <length> icon-size: font-size + 4px;  // 18px
     property <length> pin-size: 14px;
     property <int> current-index: -1;
-    property <length> scrollbar-width: (self.height < self.preferred-height) ? 7px : 0;
 
     callback item-key-pressed(index: int, item: TreeViewItemData, event: KeyEvent) -> EventResult;
     callback item-hovered(index: int, item: TreeViewItemData);
@@ -81,7 +80,7 @@ export component TreeView inherits FocusScope {
                 HorizontalLayout {
                     spacing: 5px;
                     padding-left: 5px + (supports-expand ? 0 : item.level * 10px);
-                    padding-right: 5px + scrollbar-width;
+                    padding-right: 5px;
 
                     if supports-expand: expand-ta := TouchArea {
                         mouse-cursor: pointer;
