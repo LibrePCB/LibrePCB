@@ -3,13 +3,14 @@ import { ToolBarWidget } from "toolbarwidget.slint";
 import {
     Helpers,
     SolderTechnology,
+    Data,
 } from "../api.slint";
 
 component Button inherits IconButton {
     width: 18px;
     style: checkable-hyperlink;
-    color-enabled: #606060;
-    color-checked: #c0c0c0;
+    color-enabled: Data.theme.palette.fg-placeholder;
+    color-checked: Data.theme.palette.fg-hovered;
 }
 
 export component SolderTechnologySelector inherits ToolBarWidget {
