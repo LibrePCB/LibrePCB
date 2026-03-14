@@ -38,7 +38,7 @@ export global Data {
     in property <bool> preview-mode: true;
 
     // Theme
-    in property <Theme> theme: Themes.dark;
+    in property <Theme> theme: Themes.light;
 
     // Window data
     in property <int> window-id: 1;
@@ -261,7 +261,7 @@ export global Data {
                     unplaced-components-devices-index: 0,
                     unplaced-components-footprints: ["Density Level A", "Density Level B"],
                     unplaced-components-footprints-index: 0,
-                    tool: EditorTool.wire,
+                    tool: EditorTool.pad-smt,
                     tool-overlay-text: "X0:   123.4567 mm\nY0:   123.4567 mm\nX1:   123.4567 mm\nY1:   123.4567 mm\n\ndX:   123.4567 mm\ndY:   123.4567 mm\n\nL:    123.4567 mm\na:     90.0000 °",
                     tool-net: {
                         items: ["Net 1", "Net 2", "Net 3"],
@@ -714,7 +714,7 @@ export global Data {
                     path: "package1",
                     wizard-mode: false,
                     page-index: 2,
-                    view-3d: true,
+                    view-3d: false,
                     name: "Package",
                     description: "Foo Bar\nMultiline\nBlabla",
                     keywords: "Foo,Bar,Hello World",

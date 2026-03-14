@@ -1,11 +1,13 @@
 import { IconButton } from "iconbutton.slint";
 import { ToolBarWidget } from "toolbarwidget.slint";
+import { Data } from "../api.slint";
 
 component AlignmentButton inherits IconButton {
     width: 18px;
     style: checkable-hyperlink;
-    color-enabled: #606060;
-    color-checked: #c0c0c0;
+    color-enabled: Data.theme.palette.fg-placeholder;
+    color-hovered: Data.theme.palette.fg;
+    color-checked: Data.theme.palette.fg-hovered;
 }
 
 component AlignmentSelector inherits ToolBarWidget {
