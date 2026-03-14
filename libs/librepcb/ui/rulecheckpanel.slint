@@ -1,10 +1,10 @@
-import { ListView } from "std-widgets.slint";
 import {
     Button,
     IconButton,
     LengthEdit,
     ListViewItemButton,
-    Palette,
+    ListView,
+    Text,
     PanelHeader,
 } from "widgets.slint";
 import {
@@ -29,7 +29,6 @@ component RuleCheckListItem inherits Rectangle {
     in property <bool> read-only: false;
     in property <bool> enabled: true;
     in property <bool> selected: false;
-    in property <length> scrollbar-width;
     property <RuleCheckMessageData> item: model[index];
 
     callback clicked <=> ta.clicked;
@@ -55,7 +54,7 @@ component RuleCheckListItem inherits Rectangle {
         HorizontalLayout {
             padding: 3px;
             padding-left: 5px;
-            padding-right: 5px + scrollbar-width;
+            padding-right: 5px;
             spacing: 5px;
 
             Rectangle {
@@ -77,8 +76,8 @@ component RuleCheckListItem inherits Rectangle {
                 font-size: 12px;
                 font-italic: item.approved;
                 overflow: elide;
-                color: (root.enabled && (!item.autofixed)) ? Palette.foreground : #707070;
                 text: item.message;
+                enabled: root.enabled && (!item.autofixed);
                 accessible-role: none;
             }
 
@@ -337,8 +336,6 @@ export component RuleCheckPanel inherits FocusScope {
         }
 
         view := ListView {
-            property <length> scrollbar-width: (self.height < self.viewport-height) ? 7px : 0;
-
             vertical-stretch: 1;
             visible: model.length > 0;
 
@@ -349,7 +346,6 @@ export component RuleCheckPanel inherits FocusScope {
                 read-only: check.read-only;
                 enabled: check.execution-error.is-empty && (check.state != RuleCheckState.running);
                 selected: (index == selected-index);
-                scrollbar-width: scrollbar-width;
 
                 clicked => {
                     set-current-index(index, false);

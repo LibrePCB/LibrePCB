@@ -1,4 +1,3 @@
-import { ListView } from "std-widgets.slint";
 import {
     Badge,
     Button,
@@ -6,6 +5,7 @@ import {
     IconButton,
     LinkText,
     MessagePopup,
+    ListView,
     PanelHeader,
     ProgressBar,
     Switch,
@@ -63,7 +63,6 @@ component LibraryListViewItem inherits Rectangle {
     in property <bool> remote: false;
     in property <bool> is-current: false;
     in property <bool> enabled: true;
-    in property <length> scrollbar-width: 0;
     property <LibraryInfoData> lib: model[index];
     property <bool> has-switch: remote && (!lib.uuid.is-empty);
     property <bool> version-as-badge: (!lib.installed-version.is-empty) && (remote || (!lib.online-version.is-empty));
@@ -128,7 +127,7 @@ component LibraryListViewItem inherits Rectangle {
         HorizontalLayout {
             padding: 2px;
             padding-left: 4px;
-            padding-right: scrollbar-width + 6px;
+            padding-right: 6px;
             spacing: 3px;
 
             img := Image {
@@ -449,11 +448,10 @@ component LibrariesPanelSection inherits FocusScope {
 
         view := ListView {
             property <int> item-count: libraries.length;
-            property <length> scrollbar-width: (view.height < view.preferred-height) ? 8px : 0;
 
             vertical-stretch: 0;
             preferred-height: libraries.length * item-height;
-            enabled: root.enabled;
+            //enabled: root.enabled; TODO
 
             // Accessibility
             accessible-role: list;
@@ -472,7 +470,6 @@ component LibrariesPanelSection inherits FocusScope {
                 model: libraries;
                 index: index;
                 remote: remote;
-                scrollbar-width: scrollbar-width;
                 is-current: index == current-index;
                 enabled: root.enabled;
 

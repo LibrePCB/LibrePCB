@@ -6,6 +6,7 @@ import {
 import {
     Board2dTabData,
     WindowSectionData,
+    Data,
 } from "../../api.slint";
 
 export component DrawPolygonToolBar inherits HorizontalLayout {
@@ -51,13 +52,14 @@ export component DrawPolygonToolBar inherits HorizontalLayout {
         icon: @image-url("../../../../font-awesome/svgs/solid/fill-drip.svg");
         icon-scale: 0.6;
         tooltip: @tr("Fill Area");
-        background-color: #202020;
-        background-color-hovered: #404040;
-        background-color-checked: black;
-        color-enabled: #606060;
-        color-hovered: #e0e0e0;
-        color-checked: #e0e0e0;
-        border-radius: 10px;
+        background-color: Data.theme.palette.bg3;
+        background-color-hovered: Data.theme.palette.bg2-hovered;
+        background-color-checked: Data.theme.palette.bg2-checked;
+        border-color: Data.theme.palette.bg-border;
+        border-width: 1px;
+        color-enabled: Data.theme.palette.fg-placeholder;
+        color-hovered: Data.theme.palette.fg-hovered;
+        color-checked: Data.theme.palette.fg;
         checked: tabs[section.current-tab-index].tool-filled;
 
         clicked => {

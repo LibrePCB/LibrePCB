@@ -3,7 +3,6 @@ import {
     CopyToClipboardIconButton,
     IconButton,
     LinkText,
-    Palette,
     PanelHeader,
     ProgressBar,
     Spinner,
@@ -27,7 +26,7 @@ component OrderPreCheckRow inherits HorizontalLayout {
     property <length> icon-size: 14px;
     property <color> color: {
         if check.state == RuleCheckState.running {
-            Palette.foreground
+            Data.theme.palette.fg
         } else if check.state == RuleCheckState.up-to-date {
             (check.unapproved == 0) ? #00d900 : #d93030
         } else if check.type != RuleCheckType.none {

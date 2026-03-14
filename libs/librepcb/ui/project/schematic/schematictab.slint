@@ -10,6 +10,7 @@ import {
     Text,
     MenuPopup,
     MenuSeparator,
+    ToolBar,
     MessageBox,
     SceneButton,
     ToolButtonGroup,
@@ -96,43 +97,34 @@ export component SchematicTab inherits Tab {
     ta := TouchArea {
         mouse-cursor: tabs[index].tool-cursor;
 
-        toolbar-r := Rectangle {
-            y: 0;
+        toolbar-r := ToolBar {
+            y: -1px;
             width: min(self.preferred-width, root.width - 10px);
-            height: 34px;
-            background: #505050;
-            border-bottom-left-radius: 11px;
-            border-bottom-right-radius: 11px;
             visible: self.width > 30px;
 
-            HorizontalLayout {
-                alignment: center;
-                padding: 3px;
+            if tabs[index].tool == EditorTool.wire: wire-toolbar := DrawWireToolBar {
+                section-index: section-index;
+                section: section;
+            }
 
-                if tabs[index].tool == EditorTool.wire: wire-toolbar := DrawWireToolBar {
-                    section-index: section-index;
-                    section: section;
-                }
+            if tabs[index].tool == EditorTool.bus: bus-toolbar := DrawWireToolBar {
+                section-index: section-index;
+                section: section;
+            }
 
-                if tabs[index].tool == EditorTool.bus: bus-toolbar := DrawWireToolBar {
-                    section-index: section-index;
-                    section: section;
-                }
+            if tabs[index].tool == EditorTool.polygon: polygon-toolbar := DrawPolygonToolBar {
+                section-index: section-index;
+                section: section;
+            }
 
-                if tabs[index].tool == EditorTool.polygon: polygon-toolbar := DrawPolygonToolBar {
-                    section-index: section-index;
-                    section: section;
-                }
+            if tabs[index].tool == EditorTool.text: text-toolbar := AddTextToolBar {
+                section-index: section-index;
+                section: section;
+            }
 
-                if tabs[index].tool == EditorTool.text: text-toolbar := AddTextToolBar {
-                    section-index: section-index;
-                    section: section;
-                }
-
-                if tabs[index].tool == EditorTool.component: component-toolbar := AddComponentToolBar {
-                    section-index: section-index;
-                    section: section;
-                }
+            if tabs[index].tool == EditorTool.component: component-toolbar := AddComponentToolBar {
+                section-index: section-index;
+                section: section;
             }
         }
 

@@ -3,7 +3,6 @@ import {
     IconButton,
     LengthEdit,
     PadShapeSelector,
-    Palette,
     RatioEdit,
     TextFlagsBox,
     ToolBarWidget,
@@ -12,6 +11,7 @@ import {
     Board2dTabData,
     PadShape,
     WindowSectionData,
+    Data,
 } from "../../api.slint";
 
 component BoardSideSelector inherits ToolBarWidget {
@@ -33,7 +33,7 @@ component BoardSideSelector inherits ToolBarWidget {
     btn := IconButton {
         width: 18px;
         style: checkable-hyperlink;
-        color-enabled: Palette.foreground;
+        color-enabled: Data.theme.palette.fg;
         icon: {
             if bottom {
                 @image-url("../../../../bootstrap-icons/icons/back.svg")

@@ -15,6 +15,7 @@ import {
     MessageBox,
     Text,
     SceneButton,
+    ToolBar,
     SliderSceneButton,
     Spinner,
     ToolButton,
@@ -104,73 +105,64 @@ export component Board2dTab inherits Tab {
     ta := TouchArea {
         mouse-cursor: tabs[index].tool-cursor;
 
-        toolbar-r := Rectangle {
-            y: 0;
+        toolbar-r := ToolBar {
+            y: -1px;
             width: min(self.preferred-width, root.width - 10px);
-            height: 34px;
-            background: #505050;
-            border-bottom-left-radius: 11px;
-            border-bottom-right-radius: 11px;
             visible: self.width > 30px;
 
-            HorizontalLayout {
-                alignment: center;
-                padding: 3px;
+            if tabs[index].tool == EditorTool.wire: trace-toolbar := DrawTraceToolBar {
+                section-index: section-index;
+                section: section;
+                show-via-size: root.width > 755px;
+            }
 
-                if tabs[index].tool == EditorTool.wire: trace-toolbar := DrawTraceToolBar {
-                    section-index: section-index;
-                    section: section;
-                    show-via-size: root.width > 755px;
-                }
+            if tabs[index].tool == EditorTool.via: via-toolbar := AddViaToolBar {
+                section-index: section-index;
+                section: section;
+            }
 
-                if tabs[index].tool == EditorTool.via: via-toolbar := AddViaToolBar {
-                    section-index: section-index;
-                    section: section;
-                }
+            if tabs[index].tool == EditorTool.pad-tht: pad-tht-toolbar := AddPadToolBar {
+                section-index: section-index;
+                section: section;
+                show-side-selector: false;
+                show-drill-edt: true;
+                show-ratio-sw: root.width > 850px;
+                show-pressfit-sw: root.width > 900px;
+                fiducial-mode: tabs[index].tool-fiducial;
+            }
 
-                if tabs[index].tool == EditorTool.pad-tht: pad-tht-toolbar := AddPadToolBar {
-                    section-index: section-index;
-                    section: section;
-                    show-side-selector: false;
-                    show-drill-edt: true;
-                    show-ratio-sw: root.width > 850px;
-                    show-pressfit-sw: root.width > 900px;
-                    fiducial-mode: tabs[index].tool-fiducial;
-                }
+            if tabs[index].tool == EditorTool.pad-smt: pad-smt-toolbar := AddPadToolBar {
+                section-index: section-index;
+                section: section;
+                show-side-selector: true;
+                show-drill-edt: false;
+                show-pressfit-sw: false;
+                fiducial-mode: tabs[index].tool-fiducial;
+            }
 
-                if tabs[index].tool == EditorTool.pad-smt: pad-smt-toolbar := AddPadToolBar {
-                    section-index: section-index;
-                    section: section;
-                    show-side-selector: true;
-                    show-drill-edt: false;
-                    show-pressfit-sw: false;
-                    fiducial-mode: tabs[index].tool-fiducial;
-                }
+            if tabs[index].tool == EditorTool.polygon: polygon-toolbar := DrawPolygonToolBar {
+                section-index: section-index;
+                section: section;
+            }
 
-                if tabs[index].tool == EditorTool.polygon: polygon-toolbar := DrawPolygonToolBar {
-                    section-index: section-index;
-                    section: section;
-                }
+            if tabs[index].tool == EditorTool.text: text-toolbar := AddStrokeTextToolBar {
+                section-index: section-index;
+                section: section;
+            }
 
-                if tabs[index].tool == EditorTool.text: text-toolbar := AddStrokeTextToolBar {
-                    section-index: section-index;
-                    section: section;
-                }
+            if tabs[index].tool == EditorTool.plane: plane-toolbar := DrawPlaneToolBar {
+                section-index: section-index;
+                section: section;
+            }
 
-                if tabs[index].tool == EditorTool.plane: plane-toolbar := DrawPlaneToolBar {
-                    section-index: section-index;
-                    section: section;
-                }
+            if tabs[index].tool == EditorTool.zone: zone-toolbar := DrawZoneToolBar {
+                section-index: section-index;
+                section: section;
+            }
 
-                if tabs[index].tool == EditorTool.zone: zone-toolbar := DrawZoneToolBar {
-                    section-index: section-index;
-                    section: section;
-                }
-
-                if tabs[index].tool == EditorTool.hole: hole-toolbar := AddHoleToolBar {
-                    section-index: section-index;
-                    section: section;
-                }
+            if tabs[index].tool == EditorTool.hole: hole-toolbar := AddHoleToolBar {
+                section-index: section-index;
+                section: section;
             }
         }
 

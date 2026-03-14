@@ -1,4 +1,4 @@
-import { Button, IconButton, Palette, ProgressBar } from "widgets.slint";
+import { Button, IconButton, ProgressBar } from "widgets.slint";
 import {
     Constants,
     Data,
@@ -67,7 +67,7 @@ component NotificationItem inherits Rectangle {
                 title-txt := Text {
                     font-size: 13px;
                     font-weight: notification.unread ? 700 : 500;
-                    color: notification.unread ? white : Palette.foreground;
+                    color: notification.unread ? Data.theme.palette.fg-hovered : Data.theme.palette.fg;
                     text: notification.title;
                     accessible-role: none;
 
@@ -76,7 +76,7 @@ component NotificationItem inherits Rectangle {
 
                 description-txt := Text {
                     font-size: 11px;
-                    color: notification.unread ? white : Palette.foreground;
+                    color: title-txt.color;
                     wrap: word-wrap;
                     text: notification.description;
                     accessible-role: none;
@@ -205,7 +205,7 @@ export component NotificationsPopup inherits Rectangle {
         if Data.preview-mode || (hidden-items > 0): Rectangle {
             width: 100%;
             height: hidden-messages-txt.preferred-height + 2 * hidden-messages-txt.y;
-            background: Palette.background;
+            background: Data.theme.palette.bg;
 
             hidden-messages-txt := Text {
                 x: 8px;

@@ -6,6 +6,7 @@ import {
 } from "../../widgets.slint";
 import {
     Board2dTabData,
+    Data,
     WindowSectionData,
 } from "../../api.slint";
 
@@ -63,13 +64,14 @@ export component AddStrokeTextToolBar inherits HorizontalLayout {
         icon: @image-url("../../../../bootstrap-icons/icons/symmetry-vertical.svg");
         icon-scale: 0.6;
         tooltip: @tr("Mirror Text");
-        background-color: #202020;
-        background-color-hovered: #404040;
-        background-color-checked: black;
-        color-enabled: #606060;
-        color-hovered: #e0e0e0;
-        color-checked: #e0e0e0;
-        border-radius: 10px;
+        background-color: Data.theme.palette.bg3;
+        background-color-hovered: Data.theme.palette.bg2-hovered;
+        background-color-checked: Data.theme.palette.bg2-checked;
+        border-color: Data.theme.palette.bg-border;
+        border-width: 1px;
+        color-enabled: Data.theme.palette.fg-placeholder;
+        color-hovered: Data.theme.palette.fg-hovered;
+        color-checked: Data.theme.palette.fg;
         checked: tabs[section.current-tab-index].tool-mirrored;
 
         clicked => {

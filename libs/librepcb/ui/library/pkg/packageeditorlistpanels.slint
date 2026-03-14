@@ -97,7 +97,7 @@ component PackageEditorPanelListItem inherits TouchArea {
                 horizontal-alignment: left;
                 vertical-alignment: center;
                 // Hack to avoid layout change on highlight change.
-                font-weight: allow-rename ? 400 : 600;
+                font-weight: (allow-rename || edit-mode) ? 400 : 600;
                 text: allow-rename ? @tr("Enter name & press Return") : name;
                 visible: edit-mode && parent.text.is-empty;
                 accessible-role: none;
