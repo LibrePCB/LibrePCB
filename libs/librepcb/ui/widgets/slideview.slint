@@ -1,4 +1,5 @@
 import { NavBar, NavBarItemData } from "navbar.slint";
+import { Data } from "../api.slint";
 
 export component SlideView inherits VerticalLayout {
     in property <[NavBarItemData]> pages;
@@ -22,7 +23,7 @@ export component SlideView inherits VerticalLayout {
 
     Rectangle {
         height: 1px;
-        background: #555555;
+        background: Data.theme.palette.bg-border;
     }
 
     // Using a Rectangle instead of a Flickable, see explanation in

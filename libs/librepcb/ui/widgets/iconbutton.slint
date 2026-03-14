@@ -75,7 +75,9 @@ export component IconButton inherits Rectangle {
 
         Image {
             y: ((parent.height - self.height) / 2) + icon-offset-y;
-            width: icon-size * (((!read-only) && ta.pressed) ? 0.85 : 1.0);
+            // Note: Do not scale pressed size with a factor, as it sometimes leads
+            // to non-centered images. Thus using an fixed, even number of pixels.
+            width: icon-size - (((!read-only) && ta.pressed) ? 2px : 0);
             height: self.width;
             image-fit: contain;
             colorize: colorize ? (((!read-only) && ta.has-hover) ? color-hovered : (checked ? color-checked : (enabled ? color-enabled : color-disabled))) : transparent;
@@ -142,8 +144,8 @@ export component CopyToClipboardIconButton inherits IconButton {
         }
     };
     icon-scale: (self.style == IconButtonStyle.standard) ? 0.5 : 1;
-    color-enabled: timer.running ? lime : Palette.foreground;
-    color-hovered: timer.running ? lime : white;
+    color-enabled: timer.running ? Data.theme.palette.fg-success : Data.theme.palette.fg;
+    color-hovered: timer.running ? Data.theme.palette.fg-success : Data.theme.palette.fg-hovered;
     tooltip: timer.running ? @tr("Copied!") : @tr("Copy to Clipboard");
     tooltip-delayed: false;
 

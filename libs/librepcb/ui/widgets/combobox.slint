@@ -1,10 +1,12 @@
-import { Palette, ScrollView } from "std-widgets.slint";
+import { ScrollView } from "std-widgets.slint";
 import { DropDownPopup } from "dropdownpopup.slint";
-import { Constants } from "../api.slint";
+import { Text } from "text.slint";
+import { Constants, Data } from "../api.slint";
 
 export component ComboBox inherits Rectangle {
     in property <[string]> model;
     in property <bool> enabled: true;
+    in property <bool> read-only: false;
     in property <bool> editable-only-when-focused: false;
     in property <bool> frameless: false;
     in property <length> window-height;
@@ -18,31 +20,30 @@ export component ComboBox inherits Rectangle {
     }
 
     function increment() {
-        if current-index < (model.length - 1) {
+        if enabled && (!read-only) && (current-index < (model.length - 1)) {
             current-index-changed(current-index + 1);
         }
     }
 
     function decrement() {
-        if current-index > 0 {
+        if enabled && (!read-only) && (current-index > 0) {
             current-index-changed(current-index - 1);
         }
     }
 
     preferred-width: ta.preferred-width;
-    preferred-height: ta.preferred-height;
-    background: ta.has-hover ? #303030 : #202020;
+    preferred-height: 25px;
+    background: ta.has-hover ? Data.theme.palette.bg2-hovered : Data.theme.palette.bg3;
     border-color: {
-        if !enabled {
-            transparent
-        } else if has-focus {
+        if has-focus {
             Constants.librepcb-color
+        } else if enabled && (!read-only) {
+            Data.theme.palette.bg-border
         } else {
-            #505050
+            transparent
         }
     }
     border-width: frameless ? 0 : 1px;
-    border-radius: frameless ? 0 : 10px;
     forward-focus: fs;
 
     // Accessibility
@@ -50,6 +51,7 @@ export component ComboBox inherits Rectangle {
     accessible-enabled: enabled;
     accessible-expandable: true;
     accessible-value: txt.text;
+    accessible-read-only: read-only;
     accessible-action-default => {
         ta.clicked();
     }
@@ -75,7 +77,7 @@ export component ComboBox inherits Rectangle {
                 return accept;
             // Note: Do not handle the Return key as in some context it is used
             // to confirm something. Space is enough for expanding a combobox.
-            } else if event.text == Key.Space {
+            } else if enabled && (!read-only) && (event.text == Key.Space) {
                 popup.show();
                 return accept;
             }
@@ -84,21 +86,27 @@ export component ComboBox inherits Rectangle {
     }
 
     ta := TouchArea {
-        enabled: enabled;
+        enabled: enabled && (!read-only);
 
         HorizontalLayout {
-            padding-top: 4px;
-            padding-bottom: self.padding-top;
-            padding-left: 8px;
+            padding-left: 5px;
             padding-right: 5px;
             spacing: 5px;
 
             VerticalLayout {
                 txt := Text {
-                    color: enabled ? Palette.foreground : #909090;
                     font-size: 13px;
                     overflow: elide;
                     vertical-alignment: center;
+                    color: {
+                        if !enabled {
+                            Data.theme.palette.fg-disabled
+                        } else if read-only {
+                            Data.theme.palette.fg-placeholder
+                        } else {
+                            Data.theme.palette.fg
+                        }
+                    };
                     text: model[current-index];
                     accessible-role: none;
                 }
@@ -121,7 +129,7 @@ export component ComboBox inherits Rectangle {
                     width: parent.width;
                     height: self.width;
                     image-fit: contain;
-                    colorize: enabled ? Palette.foreground : #707070;
+                    colorize: txt.color;
                     source: @image-url("../../../font-awesome/svgs/solid/caret-down.svg");
                     accessible-role: none;
                 }
@@ -162,13 +170,13 @@ export component ComboBox inherits Rectangle {
         y: {
             if window-height == 0 {
                 // Open dropdown to the bottom.
-                root.height + 2px;
-            } else if root.absolute-position.y + root.height + 2px + actual-height < window-height {
+                root.height - 1px;
+            } else if root.absolute-position.y + root.height + actual-height < window-height {
                 // Open dropdown to the bottom.
-                root.height + 2px;
-            } else if actual-height + 2px < root.absolute-position.y {
+                root.height - 1px;
+            } else if actual-height < root.absolute-position.y {
                 // Open dropdown to the top.
-                -actual-height - 2px;
+                1px - actual-height;
             } else {
                 // Open dropdown vertically centered in the window.
                 ((window-height - actual-height) / 2) - root.absolute-position.y
@@ -186,7 +194,6 @@ export component ComboBox inherits Rectangle {
         current-index: current-index;
         default-index: default-index;
         item-height: root.preferred-height;
-        rounded-corners: root.border-radius > 0;
 
         accepted(index) => {
             current-index-changed(index);

@@ -54,14 +54,6 @@ component DocumentsListItem inherits Rectangle {
         }
     };
 
-    if selected: Rectangle {
-        x: 0;
-        y: 0;
-        width: 2px;
-        height: root.height;
-        background: Constants.librepcb-color;
-    }
-
     ta := TouchArea {
         HorizontalLayout {
             padding: 3px;
@@ -87,8 +79,9 @@ component DocumentsListItem inherits Rectangle {
             txt := Text {
                 vertical-alignment: center;
                 overflow: elide;
-                text: text;
                 color: Data.theme.palette.fg;
+                font-weight: selected ? 700 : 400;
+                text: text;
             }
 
             if (ta.has-hover || selected) && (type == ItemType.schematic) && can-rename: rename-btn := ListViewItemButton {
@@ -176,6 +169,7 @@ component ProjectSection inherits Rectangle {
 
             header := PanelHeader {
                 title: project.name.to-uppercase();
+                highlight: project-index == Data.current-project-index;
 
                 if project.unsaved-changes && project.writable: save-badge := Badge {
                     y: (parent.height - self.height) / 2;
@@ -283,14 +277,6 @@ component ProjectSection inherits Rectangle {
             }
         }
     }
-
-    if project-index == Data.current-project-index: Rectangle {
-        x: 0;
-        y: 8px;
-        width: 1px;
-        height: parent.height - self.y - 4px;
-        background: #29d682;
-    }
 }
 
 component LibrarySection inherits Rectangle {
@@ -304,6 +290,7 @@ component LibrarySection inherits Rectangle {
 
             header := PanelHeader {
                 title: library.name.to-uppercase();
+                highlight: library-index == Data.current-library-index;
 
                 close-btn := IconButton {
                     tooltip: @tr("Close Library");
@@ -445,14 +432,6 @@ component LibrarySection inherits Rectangle {
                 }
             }
         }
-    }
-
-    if library-index == Data.current-library-index: Rectangle {
-        x: 0;
-        y: 8px;
-        width: 1px;
-        height: parent.height - self.y - 4px;
-        background: #29d682;
     }
 }
 

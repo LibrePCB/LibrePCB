@@ -1,7 +1,14 @@
 import { ToolTip } from "tooltip.slint";
 import { Data, EditorCommand } from "../api.slint";
 
-export component ToolButton inherits Rectangle {
+component ToolButtonBase inherits Rectangle {
+    background: Data.theme.palette.bg2;
+    border-color: Data.theme.palette.bg-border;
+    border-width: 1px;
+    border-radius: 3px;
+}
+
+export component ToolButton inherits ToolButtonBase {
     in property <EditorCommand> cmd;
     in property <image> icon: cmd.icon;
     in property <color> colorize: Data.theme.palette.fg;
@@ -17,7 +24,7 @@ export component ToolButton inherits Rectangle {
     callback right-clicked;
 
     width: 30px;
-    height: self.preferred-height;
+    height: self.width;
     background: {
         if (checked || ta.pressed) {
             blue
@@ -27,7 +34,7 @@ export component ToolButton inherits Rectangle {
             Data.theme.palette.bg2;
         }
     };
-    border-radius: 3px;
+    border-width: (checked || ta.pressed) ? 0 : 1px;
 
     // Accessibility
     accessible-role: button;
@@ -38,64 +45,66 @@ export component ToolButton inherits Rectangle {
         ta.clicked();
     }
 
-    VerticalLayout {
-        ta := TouchArea {
-            width: parent.width;
+    ta := TouchArea {
+        width: parent.width;
+        height: self.width;
+        enabled: enabled;
+
+        img := Image {
+            width: parent.width * 0.7;
             height: self.width;
-            enabled: enabled;
-
-            img := Image {
-                width: parent.width * 0.7;
-                height: self.width;
-                image-fit: contain;
-                colorize: {
-                    if (checked || ta.pressed) {
-                        white
-                    } else if enabled {
-                        colorize
-                    } else {
-                        Data.theme.palette.fg-disabled
-                    }
-                };
-                source: icon;
-                accessible-role: none;
-            }
-
-            if has-menu: Rectangle {
-                x: parent.width - self.width;
-                y: parent.height - self.height;
-                width: 7px;
-                height: self.width;
-
-                Path {
-                    commands: "M 100 0 L 100 100 L 0 100 Z";
-                    fill: img.colorize;
+            image-fit: contain;
+            colorize: {
+                if (checked || ta.pressed) {
+                    white
+                } else if enabled {
+                    colorize
+                } else {
+                    Data.theme.palette.fg-disabled
                 }
-            }
+            };
+            source: icon;
+            accessible-role: none;
+        }
 
-            if ta.has-hover && (!ta.pressed): tt := ToolTip {
-                x: parent.width + 5px;
-                y: (parent.height - self.height) / 2;
-                text: (shortcut.is-empty ? tooltip : (tooltip + " (" + shortcut + ")")) + (has-menu ? ("\n(" + @tr("right-click for menu") + ")") : "");
-            }
+        if has-menu: Rectangle {
+            x: parent.width - self.width;
+            y: parent.height - self.height;
+            width: 7px;
+            height: self.width;
 
-            changed has-hover => {
-                if !root.status-tip.is-empty {
-                    if self.has-hover {
-                        Data.status-tip = root.status-tip;
-                    } else {
-                        Data.status-tip = "";
-                    }
-                }
+            Path {
+                commands: "M 100 0 L 100 100 L 0 100 Z";
+                fill: img.colorize;
             }
+        }
 
-            pointer-event(event) => {
-                if (event.button == PointerEventButton.right) && (event.kind == PointerEventKind.down) {
-                    right-clicked();
+        if ta.has-hover && (!ta.pressed): tt := ToolTip {
+            x: parent.width + 5px;
+            y: (parent.height - self.height) / 2;
+            text: (shortcut.is-empty ? tooltip : (tooltip + " (" + shortcut + ")")) + (has-menu ? ("\n(" + @tr("right-click for menu") + ")") : "");
+        }
+
+        changed has-hover => {
+            if !root.status-tip.is-empty {
+                if self.has-hover {
+                    Data.status-tip = root.status-tip;
+                } else {
+                    Data.status-tip = "";
                 }
             }
         }
 
+        pointer-event(event) => {
+            if (event.button == PointerEventButton.right) && (event.kind == PointerEventKind.down) {
+                right-clicked();
+            }
+        }
+    }
+}
+
+export component ToolButtonGroup inherits ToolButtonBase {
+    VerticalLayout {
         @children
     }
 }

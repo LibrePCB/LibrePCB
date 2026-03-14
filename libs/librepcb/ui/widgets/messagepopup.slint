@@ -1,5 +1,5 @@
-import { Palette } from "std-widgets.slint";
 import { Button } from "button.slint";
+import { Data } from "../api.slint";
 
 export enum Arrow {
     none,
@@ -12,8 +12,9 @@ export component MessagePopup inherits PopupWindow {
     in property <bool> has-yes: false;
     in property <bool> has-cancel: true;
     in property <Arrow> arrow: none;
-    in property <color> background: Palette.background;
-    in property <color> border-color: Palette.foreground;
+    in property <color> background: Data.theme.palette.bg;
+    in property <color> border-color: Data.theme.palette.bg-border;
+    in property <color> text-color: Data.theme.palette.fg;
     property <length> border-radius: 15px;
     property <length> arrow-size: 12px;
 
@@ -47,6 +48,7 @@ export component MessagePopup inherits PopupWindow {
                         vertical-alignment: center;
                         font-weight: 700;
                         font-size: 13px;
+                        color: text-color;
                         text: title;
                     }
                 }
@@ -71,6 +73,7 @@ export component MessagePopup inherits PopupWindow {
                         }
 
                         if has-yes: Button {
+                            border-radius: self.height / 2;
                             text: @tr("Yes");
                             primary: true;
 
@@ -80,6 +83,7 @@ export component MessagePopup inherits PopupWindow {
                         }
 
                         Button {
+                            border-radius: self.height / 2;
                             text: @tr("Cancel");
 
                             clicked => {

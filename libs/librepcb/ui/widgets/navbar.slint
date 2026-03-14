@@ -1,4 +1,5 @@
 import { LinkText } from "linktext.slint";
+import { Constants, Data } from "../api.slint";
 
 export struct NavBarItemData {
     title: string,
@@ -24,18 +25,26 @@ export component NavBar inherits HorizontalLayout {
             vertical-alignment: center;
             horizontal-alignment: center;
             text: item.title;
-            text-color: (index == current-index) ? #e0e0e0 : #909090;
-            text-color-hovered: (index == current-index) ? #ffffff : #a0a0a0;
+            text-color: (index == current-index) ? Data.theme.palette.fg : Data.theme.palette.fg-placeholder;
+            text-color-hovered: (index == current-index) ? Data.theme.palette.fg-hovered : Data.theme.palette.fg-placeholder;
             enabled: !item.disabled;
 
             clicked => {
                 page-clicked(index);
             }
+
+            if index == current-index: Rectangle {
+                x: (parent.width - parent.preferred-width) / 2;
+                y: parent.height - (parent.height - parent.preferred-height) / 2 - 2px;
+                width: parent.preferred-width;
+                height: 1px;
+                background: Constants.librepcb-color;
+            }
         }
 
         if (index + 1) < items.length: Text {
             text: "•";
-            color: #909090;
+            color: Data.theme.palette.fg-disabled;
             vertical-alignment: center;
             accessible-role: none;
         }

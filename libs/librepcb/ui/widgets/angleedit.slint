@@ -1,9 +1,11 @@
 import { IconButton } from "iconbutton.slint";
 import { ToolTip } from "tooltip.slint";
+import { TextInput } from "textinput.slint";
 import {
     AngleEditData,
     AngleEditParseResult,
     Backend,
+    Data,
     Constants,
 } from "../api.slint";
 
@@ -58,21 +60,20 @@ export component AngleEdit inherits Rectangle {
         }
     }
 
-    preferred-height: 28px;
-    background: #202020;
+    preferred-height: 25px;
+    background: Data.theme.palette.bg3;
     border-color: {
         if enabled && (!parse-result.valid) {
             edt.has-focus ? #ff0000 : #900000
         } else if edt.has-focus {
             Constants.librepcb-color
         } else if enabled {
-            #606060
+            Data.theme.palette.bg-border
         } else {
             transparent
         }
-    }
+    };
     border-width: 1px;
-    border-radius: 10px;
     forward-focus: edt;
 
     // A bit ugly: Ensure enough space for numbers in the typical range.
@@ -92,7 +93,7 @@ export component AngleEdit inherits Rectangle {
 
         l := HorizontalLayout {
             padding-left: 8px;
-            padding-right: 2px;
+            padding-right: 1px;
             padding-top: self.padding-right;
             padding-bottom: self.padding-top;
             spacing: 5px;
@@ -111,8 +112,6 @@ export component AngleEdit inherits Rectangle {
                 single-line: true;
                 horizontal-alignment: right;
                 vertical-alignment: center;
-                selection-background-color: Constants.librepcb-color;
-                selection-foreground-color: black;
                 enabled: enabled;
                 accessible-role: none;
 
@@ -161,39 +160,32 @@ export component AngleEdit inherits Rectangle {
                 }
             }
 
-            Rectangle {
-                background: black;
-                border-top-right-radius: root.border-radius;
-                border-bottom-right-radius: root.border-radius;
-                clip: true;
+            VerticalLayout {
+                up-btn := IconButton {
+                    width: 15px;
+                    enabled: enabled;
+                    background-color: Data.theme.palette.bg-border;
+                    icon: @image-url("../../../font-awesome/svgs/solid/caret-up.svg");
+                    icon-offset-y: 1px;
+                    accessible-label: "increase";
 
-                VerticalLayout {
-                    up-btn := IconButton {
-                        width: 15px;
-                        enabled: enabled;
-                        background-color: black;
-                        icon: @image-url("../../../font-awesome/svgs/solid/caret-up.svg");
-                        icon-offset-y: 1px;
-                        accessible-label: "increase";
-
-                        clicked => {
-                            disable-update = false;
-                            increase-triggered();
-                        }
+                    clicked => {
+                        disable-update = false;
+                        increase-triggered();
                     }
+                }
 
-                    down-btn := IconButton {
-                        width: 15px;
-                        enabled: enabled;
-                        background-color: black;
-                        icon: @image-url("../../../font-awesome/svgs/solid/caret-down.svg");
-                        icon-offset-y: -1px;
-                        accessible-label: "decrease";
+                down-btn := IconButton {
+                    width: 15px;
+                    enabled: enabled;
+                    background-color: Data.theme.palette.bg-border;
+                    icon: @image-url("../../../font-awesome/svgs/solid/caret-down.svg");
+                    icon-offset-y: -1px;
+                    accessible-label: "decrease";
 
-                        clicked => {
-                            disable-update = false;
-                            decrease-triggered();
-                        }
+                    clicked => {
+                        disable-update = false;
+                        decrease-triggered();
                     }
                 }
             }

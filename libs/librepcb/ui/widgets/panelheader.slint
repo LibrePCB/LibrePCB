@@ -63,9 +63,9 @@ export component PanelHeader inherits Rectangle {
             height: 1px;
             background: {
                 if highlight {
-                    @linear-gradient(90deg, Constants.librepcb-color 0%, #555555 100%)
+                    @linear-gradient(90deg, Constants.librepcb-color 0%, Data.theme.palette.bg-border 100%)
                 } else {
-                    Data.theme.palette.fg-disabled
+                    Data.theme.palette.bg-border
                 }
             };
         }

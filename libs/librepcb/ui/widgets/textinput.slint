@@ -1,0 +1,15 @@
+import { Constants, Data } from "../api.slint";
+
+export component TextInput inherits TextInput {
+    color: {
+        if !self.enabled {
+            Data.theme.palette.fg-disabled
+        } else if self.read-only {
+            Data.theme.palette.fg-placeholder
+        } else {
+            Data.theme.palette.fg
+        }
+    };
+    selection-background-color: Constants.librepcb-color;
+    selection-foreground-color: black;
+}

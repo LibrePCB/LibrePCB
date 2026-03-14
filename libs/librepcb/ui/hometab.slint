@@ -1,4 +1,4 @@
-import { Button, Palette, Spinner } from "widgets.slint";
+import { Button, Spinner, Text } from "widgets.slint";
 import { Tab } from "tab.slint";
 import {
     Action,
@@ -12,6 +12,7 @@ component DonateButton inherits Button {
     text: @tr("Donate");
     status-tip: Cmd.donate.status-tip;
     icon: @image-url("../../font-awesome/svgs/solid/heart.svg");
+    border-radius: self.height / 2;
     primary: true;
 
     clicked => {
@@ -33,7 +34,6 @@ export component HomeTab inherits Tab {
             font-size: 20px;
             font-weight: 700;
             wrap: word-wrap;
-            color: Data.theme.palette.fg;
             text: @tr("Get Started With LibrePCB");
         }
 
@@ -68,6 +68,7 @@ export component HomeTab inherits Tab {
                     text: @tr("Video Tutorials");
                     status-tip: @tr("Open video tutorials in the web browser");
                     icon: @image-url("../../font-awesome/svgs/brands/youtube.svg");
+                    border-radius: self.height / 2;
 
                     clicked => {
                         Backend.open-url(Constants.video-tutorials-url);
@@ -79,6 +80,7 @@ export component HomeTab inherits Tab {
                     text: @tr("User Manual & Getting Started Guide");
                     status-tip: Cmd.documentation-online.status-tip;
                     icon: @image-url("../../font-awesome/svgs/solid/book.svg");
+                    border-radius: self.height / 2;
 
                     clicked => {
                         Backend.open-url(Constants.user-manual-url);
@@ -90,6 +92,7 @@ export component HomeTab inherits Tab {
                     text: Cmd.support.text;
                     status-tip: Cmd.support.status-tip;
                     icon: @image-url("../../font-awesome/svgs/regular/comments.svg");
+                    border-radius: self.height / 2;
 
                     clicked => {
                         Backend.open-url(Constants.support-url);
@@ -101,6 +104,7 @@ export component HomeTab inherits Tab {
                     text: Cmd.keyboard-shortcuts-reference.text;
                     status-tip: Cmd.keyboard-shortcuts-reference.status-tip;
                     icon: @image-url("../../font-awesome/svgs/solid/keyboard.svg");
+                    border-radius: self.height / 2;
 
                     clicked => {
                         Backend.trigger(Action.keyboard-shortcuts-reference);
@@ -112,8 +116,10 @@ export component HomeTab inherits Tab {
         if compact-layout: donate-btn-1 := DonateButton { }
 
         if !compact-layout: Rectangle {
-            border-radius: 10px;
             background: Data.theme.palette.bg3;
+            border-color: Data.theme.palette.bg-border;
+            border-width: 1px;
+            border-radius: 10px;
 
             HorizontalLayout {
                 padding: 8px;

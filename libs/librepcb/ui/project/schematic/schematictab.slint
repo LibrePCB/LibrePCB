@@ -7,10 +7,12 @@ import {
     Button,
     LinkText,
     MenuItem,
+    Text,
     MenuPopup,
     MenuSeparator,
     MessageBox,
     SceneButton,
+    ToolButtonGroup,
     ToolButton,
 } from "../../widgets.slint";
 import {
@@ -150,6 +152,7 @@ export component SchematicTab inherits Tab {
                 }
 
                 install-libraries-btn := Button {
+                    border-radius: self.height / 2;
                     primary: true;
                     text: @tr("Install Libraries");
 
@@ -194,6 +197,7 @@ export component SchematicTab inherits Tab {
                 }
 
                 add-drawing-frame-btn := Button {
+                    border-radius: self.height / 2;
                     primary: true;
                     text: @tr("Add Drawing Frame");
 
@@ -244,13 +248,15 @@ export component SchematicTab inherits Tab {
                 }
             }
 
-            tool-wire-btn := ToolButton {
-                cmd: Cmd.tool-wire;
-                icon: @image-url("../../../../../img/actions/draw_wire.png");
-                checked: tabs[index].tool == EditorTool.wire;
+            ToolButtonGroup {
+                tool-wire-btn := ToolButton {
+                    cmd: Cmd.tool-wire;
+                    icon: @image-url("../../../../../img/actions/draw_wire.png");
+                    checked: tabs[index].tool == EditorTool.wire;
 
-                clicked => {
-                    tool-triggered(TabAction.tool-wire);
+                    clicked => {
+                        tool-triggered(TabAction.tool-wire);
+                    }
                 }
 
                 tool-bus-btn := ToolButton {
@@ -294,12 +300,14 @@ export component SchematicTab inherits Tab {
                 }
             }
 
-            tool-polygon-btn := ToolButton {
-                cmd: Cmd.tool-polygon;
-                checked: tabs[index].tool == EditorTool.polygon;
+            ToolButtonGroup {
+                tool-polygon-btn := ToolButton {
+                    cmd: Cmd.tool-polygon;
+                    checked: tabs[index].tool == EditorTool.polygon;
 
-                clicked => {
-                    tool-triggered(TabAction.tool-polygon);
+                    clicked => {
+                        tool-triggered(TabAction.tool-polygon);
+                    }
                 }
 
                 tool-text-btn := ToolButton {
@@ -321,12 +329,14 @@ export component SchematicTab inherits Tab {
                 }
             }
 
-            tool-component-btn := ToolButton {
-                cmd: Cmd.tool-component;
-                checked: tabs[index].tool == EditorTool.component;
+            ToolButtonGroup {
+                tool-component-btn := ToolButton {
+                    cmd: Cmd.tool-component;
+                    checked: tabs[index].tool == EditorTool.component;
 
-                clicked => {
-                    tool-triggered(TabAction.tool-component);
+                    clicked => {
+                        tool-triggered(TabAction.tool-component);
+                    }
                 }
 
                 if Data.workspace-contains-standard-components: VerticalLayout {

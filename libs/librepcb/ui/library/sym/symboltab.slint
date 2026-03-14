@@ -27,6 +27,7 @@ import {
     MessageBanner,
     MessageBox,
     SceneButton,
+    ToolButtonGroup,
     SlideView,
     TextEdit,
     ToolButton,
@@ -163,7 +164,7 @@ component SymbolMetadataTab {
 
             deprecated-sw := DeprecatedRowCell {
                 checked: tabs[index].deprecated;
-                enabled: !read-only;
+                read-only: read-only;
                 accessible-label: deprecated-txt.text;
 
                 toggled(checked) => {
@@ -374,6 +375,7 @@ component SymbolEditorTab inherits TouchArea {
             }
 
             import-pins-btn := Button {
+                border-radius: self.height / 2;
                 primary: true;
                 text: @tr("Import Pins");
 
@@ -424,14 +426,16 @@ component SymbolEditorTab inherits TouchArea {
             }
         }
 
-        tool-line-btn := ToolButton {
-            cmd: Cmd.tool-line;
-            icon: @image-url("../../../../../img/actions/draw_wire.png");
-            checked: tabs[index].tool == EditorTool.line;
-            enabled: !read-only;
+        ToolButtonGroup {
+            tool-line-btn := ToolButton {
+                cmd: Cmd.tool-line;
+                icon: @image-url("../../../../../img/actions/draw_wire.png");
+                checked: tabs[index].tool == EditorTool.line;
+                enabled: !read-only;
 
-            clicked => {
-                tool-triggered(TabAction.tool-line);
+                clicked => {
+                    tool-triggered(TabAction.tool-line);
+                }
             }
 
             tool-rect-btn := ToolButton {
@@ -475,13 +479,15 @@ component SymbolEditorTab inherits TouchArea {
             }
         }
 
-        tool-text-btn := ToolButton {
-            cmd: Cmd.tool-text;
-            checked: tabs[index].tool == EditorTool.text;
-            enabled: !read-only;
+        ToolButtonGroup {
+            tool-text-btn := ToolButton {
+                cmd: Cmd.tool-text;
+                checked: tabs[index].tool == EditorTool.text;
+                enabled: !read-only;
 
-            clicked => {
-                tool-triggered(TabAction.tool-text);
+                clicked => {
+                    tool-triggered(TabAction.tool-text);
+                }
             }
 
             tool-name-btn := ToolButton {
@@ -662,7 +668,7 @@ export component SymbolTab inherits Tab {
 
             Rectangle {
                 width: 1px;
-                background: #555555;
+                background: Data.theme.palette.bg-border;
             }
 
             SymbolMetadataTab {

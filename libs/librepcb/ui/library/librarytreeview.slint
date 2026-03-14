@@ -1,7 +1,8 @@
-import { ListView, Palette } from "std-widgets.slint";
+import { ListView } from "std-widgets.slint";
 import {
     LibraryTreeViewItemData,
     LibraryTreeViewItemType,
+    Data,
 } from "../api.slint";
 
 // Very similar to the TreeView component, but with some special features for
@@ -80,7 +81,15 @@ export component LibraryTreeView inherits FocusScope {
             }
 
             Rectangle {
-                background: (current-index == index) ? #454545 : (parent.has-hover ? #383838 : transparent);
+                background: {
+                    if current-index == index {
+                        Data.theme.palette.bg2-checked
+                    } else if parent.has-hover {
+                        Data.theme.palette.bg2-hovered
+                    } else {
+                        transparent
+                    }
+                };
 
                 HorizontalLayout {
                     spacing: 5px;
@@ -95,19 +104,18 @@ export component LibraryTreeView inherits FocusScope {
                                 y: 0;
                                 width: 1px;
                                 height: ((i < item.level) || (((index + 1) < model.length) && (model[index + 1].level >= item.level))) ? parent.height : (parent.height / 2);
-                                background: #707070;
+                                background: Data.theme.palette.fg-disabled;
                             }
 
                             if i == item.level: Rectangle {
                                 x: parent.width - 8px;
                                 width: parent.width - self.x;
                                 height: 1px;
-                                background: #707070;
+                                background: Data.theme.palette.fg-disabled;
                             }
                         }
                     }
 
-                    property <color> color: item.deprecated ? #ff7070 : Palette.foreground;
                     property <image> icon: {
                         if item.type == LibraryTreeViewItemType.all {
                             @image-url("../../../font-awesome/svgs/solid/list.svg")
@@ -139,15 +147,15 @@ export component LibraryTreeView inherits FocusScope {
                         source: icon;
                         colorize: {
                             if item.type == LibraryTreeViewItemType.all {
-                                color
+                                Data.theme.palette.fg-placeholder
                             } else if item.type == LibraryTreeViewItemType.organization {
-                                color
+                                item.deprecated ? Data.theme.palette.fg-error : Data.theme.palette.fg-placeholder
                             } else if item.type == LibraryTreeViewItemType.uncategorized {
                                 yellow
                             } else if item.type == LibraryTreeViewItemType.component {
-                                color
+                                item.deprecated ? Data.theme.palette.fg-error : Data.theme.palette.fg-placeholder
                             } else if item.is-external {
-                                color
+                                Data.theme.palette.fg-placeholder
                             } else {
                                 transparent
                             }
@@ -160,7 +168,7 @@ export component LibraryTreeView inherits FocusScope {
                         font-size: font-size;
                         font-weight: ((item.level == 0) || (item.elements > 0)) ? 800 : 400;
                         font-italic: item.is-external;
-                        color: color;
+                        color: item.deprecated ? Data.theme.palette.fg-error : Data.theme.palette.fg;
                         vertical-alignment: center;
                         overflow: elide;
                         text: {
@@ -191,7 +199,7 @@ export component LibraryTreeView inherits FocusScope {
 
                     if item.deprecated || (!item.summary.is-empty): item-summary-txt := Text {
                         horizontal-stretch: 1;
-                        color: item.deprecated ? #bb5555 : #909090;
+                        color: item.deprecated ? #bb5555 : Data.theme.palette.fg-placeholder;
                         font-size: 10.5px;
                         font-weight: 300;
                         horizontal-alignment: left;
@@ -203,7 +211,7 @@ export component LibraryTreeView inherits FocusScope {
 
                     if item.elements > 0: item-count-txt := Text {
                         width: self.preferred-width;
-                        color: #a0a0a0;
+                        color: Data.theme.palette.fg-placeholder;
                         font-size: 11px;
                         font-weight: 300;
                         vertical-alignment: center;

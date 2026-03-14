@@ -12,9 +12,15 @@ export component Button inherits Rectangle {
     out property pressed <=> ta.pressed;
     property <color> text-color: {
         if root.primary {
-            fs.has-focus ? white : #202020
+            if fs.has-focus {
+                white
+            } else if enabled {
+                #202020
+            } else {
+                root.background.darker(0.8)
+            }
         } else if ta.pressed {
-            #909090
+            Data.theme.palette.fg-hovered
         } else if !enabled {
             Data.theme.palette.fg-disabled
         } else {
@@ -29,23 +35,24 @@ export component Button inherits Rectangle {
     background: {
         if root.primary {
             if ta.pressed {
-                Constants.librepcb-color.darker(0.5)
+                Constants.librepcb-color.darker(0.3)
             } else if ta.has-hover {
-                Constants.librepcb-color.darker(0.2)
+                Constants.librepcb-color.darker(0.1)
             } else if !enabled {
-                Constants.librepcb-color.darker(1)
+                Constants.librepcb-color.mix(Data.theme.palette.bg, 0.5)
             } else {
                 Constants.librepcb-color
             }
+        } else if ta.pressed {
+            Data.theme.palette.bg2-checked
         } else if ta.has-hover {
             Data.theme.palette.bg2-hovered
         } else {
             Data.theme.palette.bg3
         }
     }
-    border-color: Constants.librepcb-color;
-    border-width: fs.has-focus ? 1px : 0;
-    border-radius: self.height / 2;
+    border-color: fs.has-focus ? Constants.librepcb-color : Data.theme.palette.bg-border;
+    border-width: primary ? 0 : 1px;
     forward-focus: fs;
 
     // Accessibility

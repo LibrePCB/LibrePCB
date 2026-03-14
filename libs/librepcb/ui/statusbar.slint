@@ -1,6 +1,7 @@
 import {
     IconButton,
     ProgressBar,
+    TextInput,
     ToolTip,
 } from "widgets.slint";
 import { NotificationsPopup } from "notificationspopup.slint";
@@ -214,9 +215,6 @@ export component StatusBar inherits Rectangle {
                     wrap: no-wrap;
                     single-line: true;
                     vertical-alignment: center;
-                    color: parent.enabled ? Data.theme.palette.fg : Data.theme.palette.fg-disabled;
-                    selection-background-color: Constants.librepcb-color;
-                    selection-foreground-color: black;
                     text: data-text;
                     enabled: false;
 

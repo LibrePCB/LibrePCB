@@ -13,6 +13,7 @@ import {
     MenuItem,
     MenuPopup,
     MessageBox,
+    Text,
     SceneButton,
     SliderSceneButton,
     Spinner,
@@ -356,6 +357,7 @@ export component Board2dTab inherits Tab {
                 }
 
                 if Data.panel-page != PanelPage.place-devices: place-devices-btn := Button {
+                    border-radius: self.height / 2;
                     primary: true;
                     text: @tr("Place Devices");
 

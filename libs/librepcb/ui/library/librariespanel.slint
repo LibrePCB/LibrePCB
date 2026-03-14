@@ -26,6 +26,8 @@ component LibraryUninstallPopup inherits MessagePopup {
 
     title: @tr("Uninstall {}", model[index].name);
     background: #700000;
+    border-color: #d8d8d8;
+    text-color: #d8d8d8;
     arrow: left;
     has-ok: false;
     has-yes: true;
@@ -33,16 +35,19 @@ component LibraryUninstallPopup inherits MessagePopup {
 
     Text {
         font-weight: 700;
+        color: root.text-color;
         text: @tr("Attention").to-uppercase() + ": " + @tr("This will remove the whole library directory and is not reversible:");
     }
 
     Text {
         font-family: "monospace";
+        color: root.text-color;
         wrap: word-wrap;
         text: model[index].path;
     }
 
     Text {
+        color: root.text-color;
         text: @tr("Are you really sure to remove '{}'?", model[index].name);
     }
 
@@ -70,12 +75,12 @@ component LibraryListViewItem inherits Rectangle {
     states [
         outdated when lib.outdated: {
             status-text: @tr("Outdated:") + " v" + lib.installed-version + " < v" + lib.online-version;
-            status-color: red;
+            status-color: Data.theme.palette.fg-error;
             status-icon: @image-url("../../../font-awesome/svgs/solid/angles-up.svg");
         }
         up-to-date when (!lib.installed-version.is-empty) && (!lib.online-version.is-empty): {
             status-text: @tr("Up-to-date:") + " v" + lib.installed-version;
-            status-color: lime;
+            status-color: Data.theme.palette.fg-success;
             status-icon: @image-url("../../../font-awesome/svgs/solid/check.svg");
         }
     ]
@@ -84,13 +89,13 @@ component LibraryListViewItem inherits Rectangle {
         if !enabled {
             transparent
         } else if remote && lib.installed-version.is-empty {
-            Data.theme.palette.bg2;
+            Data.theme.palette.bg3
         } else if is-current {
             Data.theme.palette.bg2-checked
         } else if ta.has-hover {
             Data.theme.palette.bg2-hovered
         } else {
-            transparent
+            Data.theme.palette.bg
         }
     };
     border-color: Constants.librepcb-color;
@@ -122,6 +127,7 @@ component LibraryListViewItem inherits Rectangle {
 
         HorizontalLayout {
             padding: 2px;
+            padding-left: 4px;
             padding-right: scrollbar-width + 6px;
             spacing: 3px;
 
@@ -130,6 +136,7 @@ component LibraryListViewItem inherits Rectangle {
                 height: root.height - 6px;
                 image-fit: contain;
                 source: lib.icon;
+                opacity: lib.installed-version.is-empty ? 0.6 : 1;
                 accessible-role: none;
             }
 
@@ -148,7 +155,7 @@ component LibraryListViewItem inherits Rectangle {
                         horizontal-stretch: 0;
                         color: {
                             if ((!enabled) || lib.installed-version.is-empty) {
-                                Data.theme.palette.fg-disabled
+                                Data.theme.palette.fg-placeholder
                             } else {
                                 Data.theme.palette.fg
                             }
@@ -162,7 +169,7 @@ component LibraryListViewItem inherits Rectangle {
                     }
 
                     if !status-text.is-empty: status-btn := IconButton {
-                        height: 14px;
+                        height: 13px;
                         width: self.height;
                         style: read-only;
                         icon: status-icon;
@@ -196,6 +203,8 @@ component LibraryListViewItem inherits Rectangle {
 
                 if lib.progress > 0: Rectangle {
                     progress-bar := ProgressBar {
+                        height: 5px;
+                        background: Data.theme.palette.bg;
                         progress: lib.progress / 100;
                         accessible-role: none;
                     }
@@ -245,14 +254,21 @@ component LibraryListViewItem inherits Rectangle {
 
                 states [
                     install when lib.installed-version.is-empty && lib.checked: {
-                        checked-color: lime;
+                        border-color: Data.theme.palette.fg-success;
+                        checked-color: Data.theme.palette.fg-success;
                     }
                     update when (!lib.installed-version.is-empty) && lib.outdated && lib.checked: {
+                        border-color: Data.theme.palette.fg-warning;
                         checked-color: Data.theme.palette.fg-warning;
-                        unchecked-color: red;
                     }
                     uninstall when (!lib.installed-version.is-empty) && (!lib.checked): {
-                        unchecked-color: red;
+                        border-color: Data.theme.palette.fg-error;
+                        unchecked-color: Data.theme.palette.fg-error;
+                    }
+                    unchanged when (!lib.outdated) && (lib.installed-version.is-empty != lib.checked): {
+                        border-color: self.checked ? self.checked-color : self.unchecked-color;
+                        checked-color: Constants.librepcb-color;
+                        unchecked-color: Data.theme.palette.fg-placeholder;
                     }
                 ]
 
@@ -310,7 +326,7 @@ component LibrariesPanelSection inherits FocusScope {
                 horizontal-alignment: left;
                 vertical-alignment: center;
                 font-size: 10px;
-                text-color: #c0c0c0;
+                text-color: Data.theme.palette.fg-placeholder;
                 text: @tr("Toggle All");
                 enabled: root.enabled;
 
@@ -349,6 +365,7 @@ component LibrariesPanelSection inherits FocusScope {
             if !remote: create-btn := IconButton {
                 width: self.height;
                 icon: @image-url("../../../font-awesome/svgs/solid/plus.svg");
+                icon-scale: 0.7;
                 tooltip: @tr("Create a New Library") + "...";
                 enabled: root.enabled;
 
@@ -361,7 +378,7 @@ component LibrariesPanelSection inherits FocusScope {
             if remote && (!data.refreshing): check-for-updates-btn := IconButton {
                 width: self.height;
                 icon: @image-url("../../../font-awesome/svgs/solid/rotate.svg");
-                icon-scale: 0.7;
+                icon-scale: 0.65;
                 tooltip: @tr("Check For Updates");
                 enabled: root.enabled && check-for-updates-enabled;
 
@@ -553,8 +570,6 @@ export component LibrariesPanel inherits VerticalLayout {
 
         height: show ? self.preferred-height : 0;
         background: Data.theme.palette.bg2;
-        border-color: Constants.librepcb-color;
-        border-width: 1px;
 
         // Clip for the slide-in/out effect, but do not clip in steady
         // state for the tooltips.
@@ -562,42 +577,58 @@ export component LibrariesPanel inherits VerticalLayout {
 
         animate height { duration: 150ms; }
 
+        Rectangle {
+            y: 0;
+            height: 1px;
+            background: Data.theme.palette.bg-border;
+        }
+
         VerticalLayout {
             spacing: 8px;
             padding-bottom: 8px;
 
-            PanelHeader {
+            HorizontalLayout {
+                padding-top: 5px;
+                padding-left: 8px;
+                padding-right: 3px;
+                spacing: 3px;
                 z: 10;  // For the tooltips.
-                    title: @tr("Pending Operations").to-uppercase();
 
-                HorizontalLayout {
-                    padding-top: 5px;
-                    padding-right: 3px;
-                    spacing: 3px;
-
-                    if Data.remote-libraries-data.pending-installs > 0: pending-installs-badge := Badge {
+                Rectangle {
+                    Text {
+                        x: 0;
+                        y: (parent.height - self.height) / 2 + 1px;
                         font-weight: 700;
-                        font-size: 12px;
-                        border-width: 1.3px;
-                        text-color: (Data.remote-libraries-data.pending-installs > 0) ? lime : Data.theme.palette.fg-disabled;
-                        text: "+" + Data.remote-libraries-data.pending-installs;
+                        overflow: elide;
+                        vertical-alignment: center;
+                        color: Data.theme.palette.fg;
+                        text: @tr("Pending Operations").to-uppercase();
+                        accessible-role: none;
                     }
+                }
 
-                    if Data.remote-libraries-data.pending-updates > 0: pending-updates-badge := Badge {
-                        font-weight: 700;
-                        font-size: 12px;
-                        border-width: 1.3px;
-                        text-color: (Data.remote-libraries-data.pending-updates > 0) ? Data.theme.palette.fg-warning : Data.theme.palette.fg-disabled;
-                        text: "↑" + Data.remote-libraries-data.pending-updates;
-                    }
+                if Data.remote-libraries-data.pending-installs > 0: pending-installs-badge := Badge {
+                    font-weight: 700;
+                    font-size: 12px;
+                    border-width: 1.3px;
+                    text-color: Data.theme.palette.fg-success;
+                    text: "+" + Data.remote-libraries-data.pending-installs;
+                }
 
-                    if Data.remote-libraries-data.pending-uninstalls > 0: pending-uninstalls-badge := Badge {
-                        font-weight: 700;
-                        font-size: 12px;
-                        border-width: 1.3px;
-                        text-color: (Data.remote-libraries-data.pending-uninstalls > 0) ? red : Data.theme.palette.fg-disabled;
-                        text: "–" + Data.remote-libraries-data.pending-uninstalls;
-                    }
+                if Data.remote-libraries-data.pending-updates > 0: pending-updates-badge := Badge {
+                    font-weight: 700;
+                    font-size: 12px;
+                    border-width: 1.3px;
+                    text-color: Data.theme.palette.fg-warning;
+                    text: "↑" + Data.remote-libraries-data.pending-updates;
+                }
+
+                if Data.remote-libraries-data.pending-uninstalls > 0: pending-uninstalls-badge := Badge {
+                    font-weight: 700;
+                    font-size: 12px;
+                    border-width: 1.3px;
+                    text-color: Data.theme.palette.fg-error;
+                    text: "–" + Data.remote-libraries-data.pending-uninstalls;
                 }
             }
 
@@ -608,14 +639,12 @@ export component LibrariesPanel inherits VerticalLayout {
 
                 if Data.remote-libraries-data.pending-oneway-uninstalls > 0: Rectangle {
                     height: nonreversible-warning-txt.preferred-height + 8px;
-                    border-color: red;
-                    border-width: 1px;
                     border-radius: 5px;
-                    background: Data.theme.palette.bg;
+                    background: Data.theme.palette.fg-error;
 
                     nonreversible-warning-txt := Text {
                         width: parent.width - 8px;
-                        color: parent.border-color;
+                        color: Data.theme.palette.bg;
                         font-weight: 700;
                         horizontal-alignment: left;
                         wrap: word-wrap;
@@ -637,7 +666,7 @@ export component LibrariesPanel inherits VerticalLayout {
                         };
                         text: (root.width > 300px) ? @tr("" | "Apply {n} Modification(s)" % Data.remote-libraries-pending-operations) : @tr("Apply");
                         primary: Data.remote-libraries-data.pending-oneway-uninstalls == 0;
-                        border-color: (self.has-focus ? Constants.librepcb-color : red).darker(self.enabled ? 0 : 0.5);
+                        border-color: (self.has-focus ? Constants.librepcb-color : Data.theme.palette.fg-error).darker(self.enabled ? 0 : 0.5);
                         border-width: (self.has-focus || (Data.remote-libraries-data.pending-oneway-uninstalls > 0)) ? 1px : 0;
                         enabled: !Data.libraries-operation-in-progress;
 
@@ -659,17 +688,27 @@ export component LibrariesPanel inherits VerticalLayout {
         }
     }
 
-    HorizontalLayout {
-        padding: min(5px, filter-edt.height);
+    if !Data.libraries-panel-filter.is-empty: Rectangle {
+        background: Data.theme.palette.bg2;
 
-        filter-edt := FilterTermEdit {
-            height: Data.libraries-panel-filter.is-empty ? 0 : self.preferred-height;
-            term: Data.libraries-panel-filter;
+        Rectangle {
+            y: 0;
+            height: 1px;
+            background: Data.theme.palette.bg-border;
+        }
 
-            animate height { duration: 100ms; }
+        filter-l := HorizontalLayout {
+            padding: 5px;
 
-            clear-clicked => {
-                Backend.libraries-key-event({ text: Key.Escape })
+            filter-edt := FilterTermEdit {
+                height: self.preferred-height;
+                term: Data.libraries-panel-filter;
+
+                animate height { duration: 100ms; }
+
+                clear-clicked => {
+                    Backend.libraries-key-event({ text: Key.Escape })
+                }
             }
         }
     }
