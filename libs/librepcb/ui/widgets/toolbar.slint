@@ -1,9 +1,10 @@
+import { IconButton } from "iconbutton.slint";
 import { Data } from "../api.slint";
 
 export component ToolBar inherits Rectangle {
     height: 34px;
-    background: Data.theme.palette.bg2;
-    border-color: Data.theme.palette.bg-border;
+    background: Data.theme.palette.window;
+    border-color: Data.theme.palette.base-border;
     border-width: 1px;
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: self.border-bottom-left-radius;
@@ -14,4 +15,47 @@ export component ToolBar inherits Rectangle {
 
         @children
     }
+}
+
+export component ToolBarWidget inherits FocusScope {
+    in property <length> content-padding-left: 5px;
+    in property <length> content-padding-right: 5px;
+    in property <length> content-padding-top: 5px;
+    in property <length> content-padding-bottom: 5px;
+    in property <length> spacing: 3px;
+
+    width: self.preferred-width;
+    preferred-height: 25px;
+
+    Rectangle {
+        background: Data.theme.palette.control;
+        border-color: {
+            if root.has-focus {
+                Data.theme.palette.accent
+            } else if root.enabled {
+                Data.theme.palette.base-border
+            } else {
+                transparent
+            }
+        }
+        border-width: 1px;
+
+        HorizontalLayout {
+            padding-left: content-padding-left;
+            padding-right: content-padding-right;
+            padding-top: content-padding-top;
+            padding-bottom: content-padding-bottom;
+            spacing: spacing;
+
+            @children
+        }
+    }
+}
+
+export component ToolBarSelectorButton inherits IconButton {
+    width: 18px;
+    style: checkable-hyperlink;
+    color-enabled: Data.theme.palette.control-text-disabled;
+    color-hovered: Data.theme.palette.control-text-muted;
+    color-checked: Data.theme.palette.control-text;
 }

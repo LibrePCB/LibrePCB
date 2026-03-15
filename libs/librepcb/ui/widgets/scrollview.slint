@@ -19,7 +19,7 @@ export component ScrollBar {
     visible: (self.policy == ScrollBarPolicy.always-on) || (self.policy == ScrollBarPolicy.as-needed && self.maximum > 0);
 
     Rectangle {
-        background: Data.theme.palette.bg2;
+        background: Data.theme.palette.window;
         clip: true;
 
         thumb := Rectangle {
@@ -29,11 +29,11 @@ export component ScrollBar {
             y: root.horizontal ? (parent.height - self.height) / 2 : root.offset + (root.track-size - thumb.height) * (-root.value / root.maximum);
             background: {
                 if touch-area.pressed {
-                    Data.theme.palette.fg
+                    Data.theme.palette.base-text
                 } else if touch-area.has-hover {
-                    Data.theme.palette.fg-placeholder
+                    Data.theme.palette.control-text-muted
                 } else {
-                    Data.theme.palette.fg-disabled
+                    Data.theme.palette.control-text-disabled
                 }
             };
             border-radius: min(self.width, self.height) / 2;

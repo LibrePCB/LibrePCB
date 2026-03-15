@@ -459,13 +459,13 @@ export component Board2dTab inherits Tab {
                     }
 
                     // BGA pads probably really make no sense in a board(?).
-                    // tool-pad-bga-item := MenuItem {
-                    //     cmd: Cmd.tool-pad-bga;
+                    // tool-pad-basea-item := MenuItem {
+                    //     cmd: Cmd.tool-pad-basea;
                     //     icon: @image-url("../../../../../img/actions/add_smt_pad.png");
                     //     icon-color: transparent;  // Do not colorize.
                     //
                     //     clicked => {
-                    //         Backend.trigger-tab(section-index, index, TabAction.tool-pad-bga);
+                    //         Backend.trigger-tab(section-index, index, TabAction.tool-pad-basea);
                     //     }
                     // }
 
@@ -575,8 +575,8 @@ export component Board2dTab inherits Tab {
                 x: parent.width - self.width;
                 icon: @image-url("../../../../font-awesome/svgs/solid/expand.svg");
                 icon-scale: 0.9;
-                bg-color: tabs[index].background-color;
-                fg-color: tabs[index].foreground-color;
+                base-color: tabs[index].background-color;
+                base-text-color: tabs[index].foreground-color;
 
                 clicked => {
                     Backend.trigger-tab(section-index, index, TabAction.zoom-fit);
@@ -586,8 +586,8 @@ export component Board2dTab inherits Tab {
             zoom-in-btn := SceneButton {
                 x: parent.width - self.width;
                 icon: @image-url("../../../../bootstrap-icons/icons/zoom-in.svg");
-                bg-color: tabs[index].background-color;
-                fg-color: tabs[index].foreground-color;
+                base-color: tabs[index].background-color;
+                base-text-color: tabs[index].foreground-color;
 
                 clicked => {
                     Backend.trigger-tab(section-index, index, TabAction.zoom-in);
@@ -597,8 +597,8 @@ export component Board2dTab inherits Tab {
             zoom-out-btn := SceneButton {
                 x: parent.width - self.width;
                 icon: @image-url("../../../../bootstrap-icons/icons/zoom-out.svg");
-                bg-color: tabs[index].background-color;
-                fg-color: tabs[index].foreground-color;
+                base-color: tabs[index].background-color;
+                base-text-color: tabs[index].foreground-color;
 
                 clicked => {
                     Backend.trigger-tab(section-index, index, TabAction.zoom-out);
@@ -611,8 +611,8 @@ export component Board2dTab inherits Tab {
                 icon-scale: self.checked ? 1.0 : 1.1;
                 icon: Cmd.flip-view.icon;
                 tooltip: Cmd.flip-view.text;
-                bg-color: tabs[index].background-color;
-                fg-color: tabs[index].foreground-color;
+                base-color: tabs[index].background-color;
+                base-text-color: tabs[index].foreground-color;
                 checked: tabs[index].flip-view;
 
                 clicked => {
@@ -626,8 +626,8 @@ export component Board2dTab inherits Tab {
                 icon-scale: self.slider-enabled ? 0.8 : 0.9;
                 icon: Cmd.toggle-background-image.icon;
                 tooltip: self.slider-enabled ? @tr("Background Image") : Cmd.toggle-background-image.text;
-                bg-color: tabs[index].background-color;
-                fg-color: tabs[index].foreground-color;
+                base-color: tabs[index].background-color;
+                base-text-color: tabs[index].foreground-color;
                 value: tabs[index].background-image-alpha;
                 slider-enabled: tabs[index].background-image-set;
 
@@ -643,8 +643,8 @@ export component Board2dTab inherits Tab {
             toggle-3d-btn := SceneButton {
                 x: parent.width - self.width;
                 text: "3D";
-                bg-color: tabs[index].background-color;
-                fg-color: tabs[index].foreground-color;
+                base-color: tabs[index].background-color;
+                base-text-color: tabs[index].foreground-color;
 
                 clicked => {
                     Backend.trigger-board(tabs[index].project-index, tabs[index].board-index, BoardAction.open-3d);

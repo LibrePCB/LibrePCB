@@ -61,7 +61,7 @@ export component IconRowCell inherits HorizontalLayout {
     }
 
     if btn.has-hover: Text {
-        color: Data.theme.palette.fg-placeholder;
+        color: Data.theme.palette.control-text-muted;
         font-size: 11px;
         vertical-alignment: center;
         overflow: elide;
@@ -249,7 +249,7 @@ export component ParentRowCell inherits HorizontalLayout {
 
     if !read-only: Rectangle {
         width: 1px;
-        background: Data.theme.palette.bg-border;
+        background: Data.theme.palette.base-border;
     }
 
     if !read-only: select-btn := IconButton {
@@ -274,8 +274,8 @@ export component CategoriesRowHeader inherits RowHeaderText {
 component CategoriesListViewRow inherits TouchArea {
     Rectangle {
         height: self.preferred-height;
-        background: Data.theme.palette.bg3;
-        border-color: Data.theme.palette.bg-border;
+        background: Data.theme.palette.control;
+        border-color: Data.theme.palette.base-border;
         border-width: 1px;
 
         HorizontalLayout {
@@ -327,7 +327,7 @@ export component CategoriesRowCell inherits HorizontalLayout {
 
             if !read-only: Rectangle {
                 width: 1px;
-                background: Data.theme.palette.bg-border;
+                background: Data.theme.palette.base-border;
                 visible: item-ta.has-hover;
             }
 
@@ -363,7 +363,7 @@ export component CategoriesRowCell inherits HorizontalLayout {
             }
 
             add-txt := Text {
-                color: parent.has-hover ? Data.theme.palette.fg-hovered : Data.theme.palette.fg;
+                color: parent.has-hover ? Data.theme.palette.base-text-hovered : Data.theme.palette.base-text;
                 vertical-alignment: center;
                 overflow: elide;
                 text: @tr("Add Category");
@@ -387,7 +387,7 @@ export component CategoriesChooserDialog inherits OverlayDialog {
     view := TreeView {
         model: model;
         supports-expand: false;
-        icons-color: Data.theme.palette.fg;
+        icons-color: Data.theme.palette.base-text;
 
         item-selected(idx, item) => {
             item-picked(idx, item);
@@ -497,8 +497,8 @@ export component PcbDesignRulesRowCell inherits VerticalLayout {
         new-btn := LinkText {
             vertical-alignment: center;
             overflow: elide;
-            text-color: Data.theme.palette.fg-placeholder;
-            text-color-hovered: Data.theme.palette.fg;
+            text-color: Data.theme.palette.control-text-muted;
+            text-color-hovered: Data.theme.palette.base-text;
             text: "+ " + @tr("New Design Rules");
 
             clicked => {

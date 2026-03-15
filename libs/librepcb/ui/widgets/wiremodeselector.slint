@@ -1,17 +1,9 @@
-import { IconButton } from "iconbutton.slint";
-import { ToolBarWidget } from "toolbarwidget.slint";
+import { ToolBarWidget, ToolBarSelectorButton } from "toolbar.slint";
 import {
     Data,
     Helpers,
     WireMode,
 } from "../api.slint";
-
-component WireModeButton inherits IconButton {
-    width: 18px;
-    style: checkable-hyperlink;
-    color-enabled: Data.theme.palette.fg-disabled;
-    color-checked: Data.theme.palette.fg;
-}
 
 export component WireModeSelector inherits ToolBarWidget {
     in-out property <WireMode> wire-mode;
@@ -21,7 +13,7 @@ export component WireModeSelector inherits ToolBarWidget {
         wire-mode = mode;
     }
 
-    WireModeButton {
+    ToolBarSelectorButton {
         icon: @image-url("../../../../img/command_toolbars/wire_h_v.png");
         checked: wire-mode == WireMode.h-v;
 
@@ -30,7 +22,7 @@ export component WireModeSelector inherits ToolBarWidget {
         }
     }
 
-    WireModeButton {
+    ToolBarSelectorButton {
         icon: @image-url("../../../../img/command_toolbars/wire_v_h.png");
         checked: wire-mode == WireMode.v-h;
 
@@ -39,7 +31,7 @@ export component WireModeSelector inherits ToolBarWidget {
         }
     }
 
-    WireModeButton {
+    ToolBarSelectorButton {
         icon: @image-url("../../../../img/command_toolbars/wire_90_45.png");
         checked: wire-mode == WireMode.deg90-45;
 
@@ -48,7 +40,7 @@ export component WireModeSelector inherits ToolBarWidget {
         }
     }
 
-    WireModeButton {
+    ToolBarSelectorButton {
         icon: @image-url("../../../../img/command_toolbars/wire_45_90.png");
         checked: wire-mode == WireMode.deg45-90;
 
@@ -57,7 +49,7 @@ export component WireModeSelector inherits ToolBarWidget {
         }
     }
 
-    WireModeButton {
+    ToolBarSelectorButton {
         icon: @image-url("../../../../img/command_toolbars/wire_straight.png");
         checked: wire-mode == WireMode.straight;
 

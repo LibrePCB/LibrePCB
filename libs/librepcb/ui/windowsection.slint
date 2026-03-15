@@ -69,11 +69,11 @@ component TabButton inherits Rectangle {
     max-width: max(l.preferred-width, tab.title.is-empty ? 0 : 200px);
     background: {
         if is-current-tab {
-            Data.theme.palette.bg
+            Data.theme.palette.base
         } else if ta.has-hover {
-            Data.theme.palette.bg3
+            Data.theme.palette.control
         } else {
-            Data.theme.palette.bg2
+            Data.theme.palette.window
         }
     };
 
@@ -118,14 +118,14 @@ component TabButton inherits Rectangle {
         Image {
             width: 16px;
             source: Helpers.get-icon-for-tab-type(tab.type);
-            colorize: Data.theme.palette.fg;
+            colorize: Data.theme.palette.base-text;
             accessible-role: none;
         }
 
         if !tab.title.is-empty: txt := Text {
             min-width: 0;
             vertical-alignment: center;
-            color: Data.theme.palette.fg;
+            color: Data.theme.palette.base-text;
             text: tab.title;
             overflow: elide;
             accessible-role: none;
@@ -137,7 +137,7 @@ component TabButton inherits Rectangle {
             y: (parent.height - self.height) / 2;
             height: parent.height * 0.6;
             icon-scale: circle ? 0.5 : 0.7;
-            color-enabled: Data.theme.palette.fg;
+            color-enabled: Data.theme.palette.base-text;
             border-radius: 3px;
             icon: {
                 if circle {
@@ -163,9 +163,9 @@ component TabButton inherits Rectangle {
             if is-current-section && is-current-tab {
                 #29d682
             } else if is-current-tab {
-                Data.theme.palette.fg-disabled;
+                Data.theme.palette.control-text-disabled;
             } else {
-                Data.theme.palette.bg-border;
+                Data.theme.palette.base-border;
             }
         };
     }
@@ -173,13 +173,13 @@ component TabButton inherits Rectangle {
     Rectangle {
         x: parent.width - 1px;
         width: 1px;
-        background: Data.theme.palette.bg-border;
+        background: Data.theme.palette.base-border;
     }
 
     if !is-current-tab: Rectangle {
         y: parent.height - 1px;
         height: 1px;
-        background: Data.theme.palette.bg-border;
+        background: Data.theme.palette.base-border;
     }
 }
 
@@ -195,7 +195,7 @@ export component WindowSection inherits Rectangle {
         Data.window-id + "," + section-index + "," + tab-index
     }
 
-    background: Data.theme.palette.bg;
+    background: Data.theme.palette.base;
 
     ta := TouchArea {
         tab-bar := Rectangle {
@@ -203,7 +203,7 @@ export component WindowSection inherits Rectangle {
             y: 0;
             z: 100;  // For the tooltips
             height: 26px;
-            background: Data.theme.palette.bg2;
+            background: Data.theme.palette.window;
 
             // Accessibility
             accessible-role: tab-list;
@@ -211,7 +211,7 @@ export component WindowSection inherits Rectangle {
             Rectangle {
                 y: parent.height - 1px;
                 height: 1px;
-                background: Data.theme.palette.bg-border;
+                background: Data.theme.palette.base-border;
             }
 
             HorizontalLayout {

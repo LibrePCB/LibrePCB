@@ -11,7 +11,7 @@ export component PanelHeader inherits Rectangle {
     property <length> content-height: 24px;
 
     height: spacing-top + content-height + 2px;
-    background: Data.theme.palette.bg2;
+    background: Data.theme.palette.window;
 
     // Accessibility
     accessible-role: text;
@@ -22,7 +22,7 @@ export component PanelHeader inherits Rectangle {
 
         Rectangle {
             height: 1px;
-            background: Data.theme.palette.bg-border;
+            background: Data.theme.palette.base-border;
         }
 
         HorizontalLayout {
@@ -36,7 +36,7 @@ export component PanelHeader inherits Rectangle {
                 font-weight: 700;
                 overflow: elide;
                 vertical-alignment: center;
-                color: Data.theme.palette.fg;
+                color: Data.theme.palette.base-text;
                 text: title;
                 accessible-role: none;
             }
@@ -48,7 +48,7 @@ export component PanelHeader inherits Rectangle {
                 font-italic: true;
                 vertical-alignment: center;
                 overflow: elide;
-                color: Data.theme.palette.fg;
+                color: Data.theme.palette.base-text;
                 text: note;
             }
 
@@ -67,9 +67,9 @@ export component PanelHeader inherits Rectangle {
             height: 1px;
             background: {
                 if highlight {
-                    @linear-gradient(90deg, Constants.librepcb-color 0%, Data.theme.palette.bg-border 100%)
+                    @linear-gradient(90deg, Constants.librepcb-color 0%, Data.theme.palette.base-border 100%)
                 } else {
-                    Data.theme.palette.bg-border
+                    Data.theme.palette.base-border
                 }
             };
         }

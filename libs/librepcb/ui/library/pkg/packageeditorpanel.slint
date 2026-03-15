@@ -6,8 +6,8 @@ export component PackageEditorPanel inherits Rectangle {
 
     width: self.preferred-width;
     height: self.preferred-height;
-    background: Data.theme.palette.bg;
-    border-color: error-state ? Data.theme.palette.fg-error : Data.theme.palette.bg-border;
+    background: Data.theme.palette.base;
+    border-color: error-state ? Data.theme.palette.base-text-error : Data.theme.palette.base-border;
     border-width: error-state ? 2px : 1px;
     border-radius: 8px;
     opacity: has-hover ? 1 : 0.8;

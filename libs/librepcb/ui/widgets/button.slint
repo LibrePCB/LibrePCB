@@ -19,11 +19,11 @@ export component Button inherits Rectangle {
                 root.background.darker(0.8)
             }
         } else if ta.pressed {
-            Data.theme.palette.fg-hovered
+            Data.theme.palette.base-text-hovered
         } else if !enabled {
-            Data.theme.palette.fg-disabled
+            Data.theme.palette.control-text-disabled
         } else {
-            Data.theme.palette.fg
+            Data.theme.palette.base-text
         }
     };
 
@@ -38,19 +38,19 @@ export component Button inherits Rectangle {
             } else if ta.has-hover {
                 Constants.librepcb-color.darker(0.1)
             } else if !enabled {
-                Constants.librepcb-color.mix(Data.theme.palette.bg, 0.5)
+                Constants.librepcb-color.mix(Data.theme.palette.base, 0.5)
             } else {
                 Constants.librepcb-color
             }
         } else if ta.pressed {
-            Data.theme.palette.bg2-checked
+            Data.theme.palette.control-checked
         } else if ta.has-hover {
-            Data.theme.palette.bg2-hovered
+            Data.theme.palette.control-hovered
         } else {
-            Data.theme.palette.bg3
+            Data.theme.palette.control
         }
     }
-    border-color: fs.has-focus ? Constants.librepcb-color : Data.theme.palette.bg-border;
+    border-color: fs.has-focus ? Constants.librepcb-color : Data.theme.palette.base-border;
     border-width: primary ? 0 : 1px;
     forward-focus: fs;
 

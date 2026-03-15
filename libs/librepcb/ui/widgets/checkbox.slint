@@ -11,11 +11,11 @@ export component CheckBox inherits Rectangle {
     in property <bool> focusable: true;
     in property <color> text-color: {
         if !enabled {
-            Data.theme.palette.fg-disabled
+            Data.theme.palette.control-text-disabled
         } else if read-only {
-            Data.theme.palette.fg-placeholder
+            Data.theme.palette.control-text-muted
         } else {
-            Data.theme.palette.fg
+            Data.theme.palette.base-text
         }
     };
     out property has-focus <=> fs.has-focus;
@@ -63,8 +63,8 @@ export component CheckBox inherits Rectangle {
             y: (parent.height - self.height) / 2;
             width: 16px;
             height: self.width;
-            background: Data.theme.palette.bg3;
-            border-color: has-focus ? Constants.librepcb-color : Data.theme.palette.bg-border;
+            background: Data.theme.palette.control;
+            border-color: has-focus ? Constants.librepcb-color : Data.theme.palette.base-border;
             border-width: 1px;
 
             if checked: Image {

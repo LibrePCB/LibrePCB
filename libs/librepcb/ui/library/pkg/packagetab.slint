@@ -256,8 +256,8 @@ component PackagePadsEditorTab inherits VerticalLayout {
     if !read-only: Rectangle {
         width: parent.width - 2 * parent.padding-left;
         height: self.preferred-height + 16px;
-        background: Data.theme.palette.bg2;
-        border-color: Data.theme.palette.bg-border;
+        background: Data.theme.palette.window;
+        border-color: Data.theme.palette.base-border;
         border-width: 1px;
         border-radius: 8px;
 
@@ -687,12 +687,12 @@ component PackageEditorTab inherits TouchArea {
                         }
                     }
 
-                    tool-pad-bga-item := MenuItem {
-                        cmd: Cmd.tool-pad-bga;
+                    tool-pad-basea-item := MenuItem {
+                        cmd: Cmd.tool-pad-basea;
                         icon: tool-pad-smt-btn.icon;
 
                         clicked => {
-                            Backend.trigger-tab(section-index, index, TabAction.tool-pad-bga);
+                            Backend.trigger-tab(section-index, index, TabAction.tool-pad-basea);
                         }
                     }
 
@@ -820,8 +820,8 @@ component PackageEditorTab inherits TouchArea {
             x: parent.width - self.width;
             icon: @image-url("../../../../font-awesome/svgs/solid/expand.svg");
             icon-scale: 0.9;
-            bg-color: tabs[index].background-color;
-            fg-color: tabs[index].foreground-color;
+            base-color: tabs[index].background-color;
+            base-text-color: tabs[index].foreground-color;
             enabled: footprint-selected;
 
             clicked => {
@@ -832,8 +832,8 @@ component PackageEditorTab inherits TouchArea {
         zoom-in-btn := SceneButton {
             x: parent.width - self.width;
             icon: @image-url("../../../../bootstrap-icons/icons/zoom-in.svg");
-            bg-color: tabs[index].background-color;
-            fg-color: tabs[index].foreground-color;
+            base-color: tabs[index].background-color;
+            base-text-color: tabs[index].foreground-color;
             enabled: footprint-selected;
 
             clicked => {
@@ -844,8 +844,8 @@ component PackageEditorTab inherits TouchArea {
         zoom-out-btn := SceneButton {
             x: parent.width - self.width;
             icon: @image-url("../../../../bootstrap-icons/icons/zoom-out.svg");
-            bg-color: tabs[index].background-color;
-            fg-color: tabs[index].foreground-color;
+            base-color: tabs[index].background-color;
+            base-text-color: tabs[index].foreground-color;
             enabled: footprint-selected;
 
             clicked => {
@@ -859,8 +859,8 @@ component PackageEditorTab inherits TouchArea {
             icon-scale: self.slider-enabled ? 0.8 : 0.9;
             icon: Cmd.toggle-background-image.icon;
             tooltip: self.slider-enabled ? @tr("Background Image") : Cmd.toggle-background-image.text;
-            bg-color: tabs[index].background-color;
-            fg-color: tabs[index].foreground-color;
+            base-color: tabs[index].background-color;
+            base-text-color: tabs[index].foreground-color;
             value: tabs[index].background-image-alpha;
             slider-enabled: tabs[index].background-image-set;
             enabled: footprint-selected;
@@ -879,8 +879,8 @@ component PackageEditorTab inherits TouchArea {
             icon: @image-url("../../../../bootstrap-icons/icons/cpu.svg");
             tooltip: @tr("Devices");
             value: tabs[index].devices-alpha;
-            bg-color: tabs[index].background-color;
-            fg-color: tabs[index].foreground-color;
+            base-color: tabs[index].background-color;
+            base-text-color: tabs[index].foreground-color;
 
             value-changed(value) => {
                 tabs[index].devices-alpha = value;
@@ -892,8 +892,8 @@ component PackageEditorTab inherits TouchArea {
             icon: @image-url("../../../../font-awesome/svgs/solid/highlighter.svg");
             tooltip: @tr("Solder Paste");
             value: tabs[index].solderpaste-alpha;
-            bg-color: tabs[index].background-color;
-            fg-color: tabs[index].foreground-color;
+            base-color: tabs[index].background-color;
+            base-text-color: tabs[index].foreground-color;
 
             value-changed(value) => {
                 tabs[index].solderpaste-alpha = value;
@@ -905,8 +905,8 @@ component PackageEditorTab inherits TouchArea {
             icon: @image-url("../../../../font-awesome/svgs/solid/font.svg");
             tooltip: @tr("Silkscreen");
             value: tabs[index].silkscreen-alpha;
-            bg-color: tabs[index].background-color;
-            fg-color: tabs[index].foreground-color;
+            base-color: tabs[index].background-color;
+            base-text-color: tabs[index].foreground-color;
 
             value-changed(value) => {
                 tabs[index].silkscreen-alpha = value;
@@ -918,8 +918,8 @@ component PackageEditorTab inherits TouchArea {
             icon: @image-url("../../../../font-awesome/svgs/solid/fill.svg");
             tooltip: @tr("Solder Resist");
             value: tabs[index].solderresist-alpha;
-            bg-color: tabs[index].background-color;
-            fg-color: tabs[index].foreground-color;
+            base-color: tabs[index].background-color;
+            base-text-color: tabs[index].foreground-color;
 
             value-changed(value) => {
                 tabs[index].solderresist-alpha = value;
@@ -929,8 +929,8 @@ component PackageEditorTab inherits TouchArea {
         toggle-3d-btn := SceneButton {
             x: parent.width - self.width;
             text: view-3d ? "2D" : "3D";
-            bg-color: tabs[index].background-color;
-            fg-color: tabs[index].foreground-color;
+            base-color: tabs[index].background-color;
+            base-text-color: tabs[index].foreground-color;
             enabled: footprint-selected;
 
             clicked => {

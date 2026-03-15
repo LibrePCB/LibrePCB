@@ -35,11 +35,11 @@ export component ListViewItemButton inherits TouchArea {
             if colorize != transparent {
                 colorize
             } else if root.has-hover {
-                Data.theme.palette.fg-hovered
+                Data.theme.palette.base-text-hovered
             } else if root.enabled {
-                Data.theme.palette.fg.mix(Data.theme.palette.fg-placeholder, 0.5)
+                Data.theme.palette.base-text.mix(Data.theme.palette.control-text-muted, 0.5)
             } else {
-                Data.theme.palette.fg-disabled
+                Data.theme.palette.control-text-disabled
             }
         };
         accessible-role: none;

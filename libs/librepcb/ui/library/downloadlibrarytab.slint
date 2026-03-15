@@ -73,7 +73,7 @@ export component DownloadLibraryTab inherits Tab {
 
                 Rectangle {
                     height: 1px;
-                    background: Data.theme.palette.bg-border;
+                    background: Data.theme.palette.base-border;
                 }
             }
         }
@@ -209,7 +209,7 @@ export component DownloadLibraryTab inherits Tab {
             creation-status-edt := TextInput {
                 horizontal-stretch: 1;
                 height: self.visible ? self.preferred-height : 0;
-                color: downloading ? Data.theme.palette.fg-warning : red;
+                color: downloading ? Data.theme.palette.base-text-warning : red;
                 read-only: true;
                 wrap: word-wrap;
                 text: tabs[section.current-tab-index].download-status;

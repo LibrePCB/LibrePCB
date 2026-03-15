@@ -46,14 +46,14 @@ export component TextEdit inherits Rectangle {
     preferred-width: max(placeholder-txt.preferred-width, edt.preferred-width) + (2 * edt.x);
     preferred-height: max(placeholder-txt.preferred-height, edt.preferred-height) + (2 * edt.y);
     horizontal-stretch: 1;
-    background: Data.theme.palette.bg3;
+    background: Data.theme.palette.control;
     border-color: {
         if enabled && has-error {
             edt.has-focus ? #ff0000 : #900000
         } else if edt.has-focus {
             Constants.librepcb-color
         } else if enabled && (!read-only) {
-            Data.theme.palette.bg-border
+            Data.theme.palette.base-border
         } else {
             transparent
         }
@@ -77,7 +77,7 @@ export component TextEdit inherits Rectangle {
         width: root.width - (2 * self.x);
         height: parent.height - (2 * self.y);
         font-size: font-size;
-        color: enabled ? Data.theme.palette.fg-placeholder : Data.theme.palette.fg-disabled;
+        color: enabled ? Data.theme.palette.control-text-muted : Data.theme.palette.control-text-disabled;
         text: placeholder-text;
         wrap: word-wrap;
         overflow: elide;

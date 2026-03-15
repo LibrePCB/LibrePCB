@@ -1,5 +1,4 @@
-import { IconButton } from "iconbutton.slint";
-import { ToolBarWidget } from "toolbarwidget.slint";
+import { ToolBarWidget, ToolBarSelectorButton } from "toolbar.slint";
 import { Data, PadShape } from "../api.slint";
 
 struct ShapeData {
@@ -67,12 +66,7 @@ export component PadShapeSelector inherits ToolBarWidget {
         reject
     }
 
-    for data in shapes: btn := IconButton {
-        width: 18px;
-        style: checkable-hyperlink;
-        color-enabled: Data.theme.palette.fg-placeholder;
-        color-checked: Data.theme.palette.fg-hovered;
-        color-hovered: Data.theme.palette.fg;
+    for data in shapes: btn := ToolBarSelectorButton {
         icon: data.icon;
         icon-scale: data.scale;
         tooltip: @tr("Shape") + ": " + data.tooltip;

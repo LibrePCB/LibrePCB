@@ -1,23 +1,46 @@
 export struct Palette {
-    bg: color, // window
-    bg2: color, // menu bar, side bar, status bar
-    bg3: color, // controls
-    bg2-hovered: color,
-    bg2-checked: color,
-    bg-border: color,
+    // menu bar, side bar, status bar
+    window: color,
 
-    tooltip-bg: color,
-    tooltip-fg: color,
+    // tab content
+    base: color,
+    base-border: color,
+    base-text: color,
+    base-text-disabled: color,
+    base-text-muted: color,
+    base-text-hovered: color,
+    base-text-success: color,
+    base-text-warning: color,
+    base-text-error: color,
+
+    // buttons, text edits, combo boxes, list items, ...
+    control: color,
+    control-disabled: color,
+    control-checked: color,
+    control-hovered: color,
+    control-border: color,
+    control-border-disabled: color,
+    control-text: color,
+    control-text-disabled: color,
+    control-text-muted: color,  // for placeholders
+
+    // selected text
+    selection: color,
+    selection-text: color,
+
+    // tooltips
+    tooltip-base: color,
     tooltip-border: color,
+    tooltip-text: color,
 
-
-    fg: color, // text/icons on bg
-    fg-placeholder: color,
-    fg-disabled: color, // text/icons on bg
-    fg-hovered: color,
-    fg-success: color, // text/icons on bg
-    fg-warning: color, // text/icons on bg
-    fg-error: color, // text/icons on bg
+    // various
+    accent: color,
+    info: color,
+    info-text: color,
+    warning: color,
+    warning-text: color,
+    error: color,
+    error-text: color,
 }
 
 export struct Theme {
@@ -27,43 +50,73 @@ export struct Theme {
 export global Themes {
     out property <Theme> light: {
         palette: {
-            bg: #ffffff,
-            bg2: #f0f0f0,
-            bg3: #fafafa,
-            bg2-hovered: #e8e8e8,
-            bg2-checked: #d0d0d0,
-            bg-border: #d0d0d0,
-            tooltip-bg: #fffbc5,
-            tooltip-fg: #3a3a3a,
+            window: #f0f0f0,
+            base: #ffffff,
+            base-border: #d0d0d0,
+            base-text: #292929,
+            base-text-disabled: #ff0000, // TODO
+            base-text-muted: #585858,
+            base-text-hovered: #000000,
+            base-text-success: #00d800,
+            base-text-warning: #d6c800,
+            base-text-error: #ff0000,
+            control: #fafafa,
+            control-disabled: #ff0000, // TODO
+            control-checked: #d0d0d0,
+            control-hovered: #e8e8e8,
+            control-border: #d0d0d0,
+            control-border-disabled: #ff0000, // TODO
+            control-text: #000000,
+            control-text-disabled: #b0b0b0,
+            control-text-muted: #808080,
+            selection: #29d682,
+            selection-text: #000000,
+            tooltip-base: #fffbc5,
             tooltip-border: #b9b9b9,
-            fg: #292929,
-            fg-placeholder: #808080,
-            fg-disabled: #b0b0b0,
-            fg-hovered: #000000,
-            fg-success: #00d800,
-            fg-warning: #d6c800,
-            fg-error: Colors.red,
+            tooltip-text: #3a3a3a,
+            accent: #29d682,
+            info: #ff0000, // TODO
+            info-text: #ff0000, // TODO
+            warning: #ff0000, // TODO
+            warning-text: #ff0000, // TODO
+            error: #ff0000, // TODO
+            error-text: #ff0000,
         },
     };
 
     out property <Theme> dark: {
         palette: {
-            bg: #2a2a2a,
-            bg2: #353535,
-            bg3: #303030,
-            bg2-hovered: #424242,
-            bg2-checked: #2a2a2a,
-            bg-border: #404040,
-            tooltip-bg: #1a1a1a,
-            tooltip-fg: #d8d8d8,
+            window: #353535,
+            base: #2a2a2a,
+            base-border: #404040,
+            base-text: #c4c4c4,
+            base-text-disabled: #ff0000, // TODO
+            base-text-muted: #adadad,
+            base-text-hovered: #e0e0e0,
+            base-text-success: #00ff00,
+            base-text-warning: #ffff00,
+            base-text-error: #ff7070,
+            control: #303030,
+            control-disabled: #ff0000, // TODO
+            control-checked: #2a2a2a,
+            control-hovered: #424242,
+            control-border: #535353,
+            control-border-disabled: #ff0000, // TODO
+            control-text: #ffffff,
+            control-text-disabled: #707070,
+            control-text-muted: #909090,
+            selection: #29d682,
+            selection-text: #000000,
+            tooltip-base: #1a1a1a,
             tooltip-border: #909090,
-            fg: #c4c4c4,
-            fg-placeholder: #909090,
-            fg-disabled: #707070,
-            fg-hovered: #e0e0e0,
-            fg-success: Colors.lime,
-            fg-warning: Colors.yellow,
-            fg-error: #ff7070,
+            tooltip-text: #d8d8d8,
+            accent: #29d682,
+            info: #ff0000, // TODO
+            info-text: #ff0000, // TODO
+            warning: #ff0000, // TODO
+            warning-text: #ff0000, // TODO
+            error: #ff0000, // TODO
+            error-text: #ff0000,
         },
     };
 }

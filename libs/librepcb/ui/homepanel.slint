@@ -31,7 +31,7 @@ component QuickAccessListView inherits TreeView {
         reject
     }
 
-    item-hovered(index, item) => {
+    control-hovered(index, item) => {
         Data.status-tip = item.hint;
     }
 

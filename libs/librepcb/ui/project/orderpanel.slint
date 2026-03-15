@@ -27,7 +27,7 @@ component OrderPreCheckRow inherits HorizontalLayout {
     property <length> icon-size: 14px;
     property <color> color: {
         if check.state == RuleCheckState.running {
-            Data.theme.palette.fg
+            Data.theme.palette.base-text
         } else if check.state == RuleCheckState.up-to-date {
             (check.unapproved == 0) ? #00d900 : #d93030
         } else if check.type != RuleCheckType.none {

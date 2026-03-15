@@ -91,7 +91,7 @@ export component PartListView inherits ScrollView {
                             width: 70%;
                             height: self.width;
                             image-fit: contain;
-                            colorize: Data.theme.palette.fg;
+                            colorize: Data.theme.palette.base-text;
                             source: @image-url("../../../../bootstrap-icons/icons/cart3.svg");
                             accessible-role: none;
                         }
@@ -217,7 +217,7 @@ export component PartListView inherits ScrollView {
                                 property <string> separator: (attr-index < (item.attributes.length - 2)) ? ", " : "";
 
                                 vertical-alignment: center;
-                                color: attributes-ta.has-hover ? Data.theme.palette.fg-hovered : Data.theme.palette.fg;
+                                color: attributes-ta.has-hover ? Data.theme.palette.base-text-hovered : Data.theme.palette.base-text;
                                 text: (attribute.value.is-empty ? attribute.key : (attribute.value + unit)) + separator;
                                 accessible-role: none;
                             }

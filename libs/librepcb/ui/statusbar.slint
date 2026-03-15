@@ -123,15 +123,15 @@ export component StatusBar {
                 states [
                     status-tip when !Data.status-tip.is-empty: {
                         text: Data.status-tip;
-                        color: Data.theme.palette.fg;
+                        color: Data.theme.palette.base-text;
                     }
                     message when !Data.status-bar-message.is-empty: {
                         text: Data.status-bar-message;
-                        color: Data.theme.palette.fg;
+                        color: Data.theme.palette.base-text;
                     }
                     default when true: {
                         text: Data.workspace-path;
-                        color: Data.theme.palette.fg-placeholder;
+                        color: Data.theme.palette.control-text-muted;
                     }
                 ]
             }
@@ -152,7 +152,7 @@ export component StatusBar {
 
         Rectangle {
             width: max(unit-ta.preferred-width + self.height - unit-ta.preferred-height, 38px);
-            background: unit-ta.has-hover ? Data.theme.palette.bg2-checked : transparent;
+            background: unit-ta.has-hover ? Data.theme.palette.control-checked : transparent;
 
             unit-ta := TouchArea {
                 enabled: Data.current-tab.features.grid == FeatureState.enabled;
@@ -174,8 +174,8 @@ export component StatusBar {
                 y: -self.preferred-height;
 
                 Rectangle {
-                    background: Data.theme.palette.bg2;
-                    border-color: Data.theme.palette.bg-border;
+                    background: Data.theme.palette.window;
+                    border-color: Data.theme.palette.base-border;
                     border-width: 1px;
 
                     VerticalLayout {
@@ -185,7 +185,7 @@ export component StatusBar {
                             Rectangle {
                                 preferred-width: unit-item-txt.preferred-width + 8px;
                                 preferred-height: unit-item-txt.preferred-height + 8px;
-                                background: parent.has-hover ? Data.theme.palette.bg2-hovered : transparent;
+                                background: parent.has-hover ? Data.theme.palette.control-hovered : transparent;
 
                                 unit-item-txt := Text {
                                     horizontal-alignment: center;
@@ -207,7 +207,7 @@ export component StatusBar {
 
         Rectangle {
             width: max(grid-interval-edt.min-width, grid-interval-edt.preferred-width) + 2 * grid-interval-edt.x;
-            background: grid-interval-ta.has-hover ? Data.theme.palette.bg2-checked : transparent;
+            background: grid-interval-ta.has-hover ? Data.theme.palette.control-checked : transparent;
 
             grid-interval-ta := TouchArea {
                 enabled: Data.current-tab.features.grid == FeatureState.enabled;
@@ -222,7 +222,7 @@ export component StatusBar {
                     wrap: no-wrap;
                     single-line: true;
                     vertical-alignment: center;
-                    color: Data.theme.palette.fg;
+                    color: Data.theme.palette.base-text;
                     text: data-text;
                     enabled: false;
 
@@ -344,9 +344,9 @@ export component StatusBar {
         ignore-locks-btn := IconButton {
             tooltip: Cmd.ignore-locks.text;
             tooltip-position: top;
-            background-color-checked: Data.theme.palette.fg-error.with-alpha(0.8);
-            color-checked: Data.theme.palette.bg;
-            color-hovered: self.checked ? Data.theme.palette.bg : self.color-enabled;
+            background-color-checked: Data.theme.palette.base-text-error.with-alpha(0.8);
+            color-checked: Data.theme.palette.base;
+            color-hovered: self.checked ? Data.theme.palette.base : self.color-enabled;
             icon: {
                 if self.checked {
                     @image-url("../../font-awesome/svgs/solid/lock-open.svg")
@@ -425,7 +425,7 @@ export component StatusBar {
 
             if Data.notifications-unread > 0: notifications-unread-txt := Text {
                 y: (parent.height - self.height) / 2;
-                color: Data.theme.palette.bg2;
+                color: Data.theme.palette.window;
                 horizontal-alignment: center;
                 font-size: 12px;
                 font-weight: 700;

@@ -37,8 +37,8 @@ component MainMenuItem inherits Rectangle {
     callback hovered;
 
     width: self.visible ? (txt.preferred-width + 10px) : 0;
-    background: (active || ta.has-hover) ? Data.theme.palette.bg : transparent;
-    border-color: Data.theme.palette.bg-border;
+    background: (active || ta.has-hover) ? Data.theme.palette.control : transparent;
+    border-color: Data.theme.palette.control-border;
     border-width: active ? 1px : 0;
 
     // Accessibility
@@ -73,7 +73,7 @@ component MenuBarSeparator inherits Rectangle {
     Rectangle {
         width: 1px;
         height: 15px;
-        background: Data.theme.palette.fg-disabled;
+        background: Data.theme.palette.control-text-disabled;
     }
 }
 
@@ -1681,7 +1681,7 @@ export component MainMenuBar {
 
                 read-only-badge := Badge {
                     width: self.preferred-width;
-                    text-color: Data.theme.palette.fg-warning;
+                    text-color: Data.theme.palette.base-text-warning;
                     text: @tr("read-only").to-lowercase();
                 }
             }

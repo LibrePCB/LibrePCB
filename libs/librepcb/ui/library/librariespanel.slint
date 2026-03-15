@@ -74,12 +74,12 @@ component LibraryListViewItem inherits Rectangle {
     states [
         outdated when lib.outdated: {
             status-text: @tr("Outdated:") + " v" + lib.installed-version + " < v" + lib.online-version;
-            status-color: Data.theme.palette.fg-error;
+            status-color: Data.theme.palette.base-text-error;
             status-icon: @image-url("../../../font-awesome/svgs/solid/angles-up.svg");
         }
         up-to-date when (!lib.installed-version.is-empty) && (!lib.online-version.is-empty): {
             status-text: @tr("Up-to-date:") + " v" + lib.installed-version;
-            status-color: Data.theme.palette.fg-success;
+            status-color: Data.theme.palette.base-text-success;
             status-icon: @image-url("../../../font-awesome/svgs/solid/check.svg");
         }
     ]
@@ -88,13 +88,13 @@ component LibraryListViewItem inherits Rectangle {
         if !enabled {
             transparent
         } else if remote && lib.installed-version.is-empty {
-            Data.theme.palette.bg3
+            Data.theme.palette.control
         } else if is-current {
-            Data.theme.palette.bg2-checked
+            Data.theme.palette.control-checked
         } else if ta.has-hover {
-            Data.theme.palette.bg2-hovered
+            Data.theme.palette.control-hovered
         } else {
-            Data.theme.palette.bg
+            Data.theme.palette.base
         }
     };
     border-color: Constants.librepcb-color;
@@ -154,9 +154,9 @@ component LibraryListViewItem inherits Rectangle {
                         horizontal-stretch: 0;
                         color: {
                             if ((!enabled) || lib.installed-version.is-empty) {
-                                Data.theme.palette.fg-placeholder
+                                Data.theme.palette.control-text-muted
                             } else {
-                                Data.theme.palette.fg
+                                Data.theme.palette.base-text
                             }
                         };
                         font-size: 13px;
@@ -203,7 +203,7 @@ component LibraryListViewItem inherits Rectangle {
                 if lib.progress > 0: Rectangle {
                     progress-bar := ProgressBar {
                         height: 5px;
-                        background: Data.theme.palette.bg;
+                        background: Data.theme.palette.base;
                         progress: lib.progress / 100;
                         accessible-role: none;
                     }
@@ -218,7 +218,7 @@ component LibraryListViewItem inherits Rectangle {
                 tooltip: @tr("Recommended");
                 tooltip-position: left;
                 color-disabled: self.color-enabled.darker(0.5);
-                color-enabled: Data.theme.palette.fg-warning;
+                color-enabled: Data.theme.palette.base-text-warning;
                 enabled: enabled;
                 accessible-role: none;
             }
@@ -253,21 +253,21 @@ component LibraryListViewItem inherits Rectangle {
 
                 states [
                     install when lib.installed-version.is-empty && lib.checked: {
-                        border-color: Data.theme.palette.fg-success;
-                        checked-color: Data.theme.palette.fg-success;
+                        border-color: Data.theme.palette.base-text-success;
+                        checked-color: Data.theme.palette.base-text-success;
                     }
                     update when (!lib.installed-version.is-empty) && lib.outdated && lib.checked: {
-                        border-color: Data.theme.palette.fg-warning;
-                        checked-color: Data.theme.palette.fg-warning;
+                        border-color: Data.theme.palette.base-text-warning;
+                        checked-color: Data.theme.palette.base-text-warning;
                     }
                     uninstall when (!lib.installed-version.is-empty) && (!lib.checked): {
-                        border-color: Data.theme.palette.fg-error;
-                        unchecked-color: Data.theme.palette.fg-error;
+                        border-color: Data.theme.palette.base-text-error;
+                        unchecked-color: Data.theme.palette.base-text-error;
                     }
                     unchanged when (!lib.outdated) && (lib.installed-version.is-empty != lib.checked): {
                         border-color: self.checked ? self.checked-color : self.unchecked-color;
                         checked-color: Constants.librepcb-color;
-                        unchecked-color: Data.theme.palette.fg-placeholder;
+                        unchecked-color: Data.theme.palette.control-text-muted;
                     }
                 ]
 
@@ -325,7 +325,7 @@ component LibrariesPanelSection inherits FocusScope {
                 horizontal-alignment: left;
                 vertical-alignment: center;
                 font-size: 10px;
-                text-color: Data.theme.palette.fg-placeholder;
+                text-color: Data.theme.palette.control-text-muted;
                 text: @tr("Toggle All");
                 enabled: root.enabled;
 
@@ -344,7 +344,7 @@ component LibrariesPanelSection inherits FocusScope {
                 icon: @image-url("../../../font-awesome/svgs/solid/triangle-exclamation.svg");
                 icon-scale: 0.7;
                 color-disabled: self.color-enabled.darker(1);
-                color-enabled: Data.theme.palette.fg-warning;
+                color-enabled: Data.theme.palette.base-text-warning;
                 tooltip: data.refreshing-error;
                 enabled: root.enabled;
             }
@@ -409,7 +409,7 @@ component LibrariesPanelSection inherits FocusScope {
 
             Rectangle {
                 height: no-remote-libs-installed-txt.height;
-                border-color: Data.theme.palette.fg-warning;
+                border-color: Data.theme.palette.base-text-warning;
                 border-width: 1px;
                 border-radius: 8px;
 
@@ -566,7 +566,7 @@ export component LibrariesPanel inherits VerticalLayout {
         property <bool> show: Data.preview-mode ? Data.remote-libraries[0].checked : (Data.remote-libraries-pending-operations > 0);
 
         height: show ? self.preferred-height : 0;
-        background: Data.theme.palette.bg2;
+        background: Data.theme.palette.window;
 
         // Clip for the slide-in/out effect, but do not clip in steady
         // state for the tooltips.
@@ -577,7 +577,7 @@ export component LibrariesPanel inherits VerticalLayout {
         Rectangle {
             y: 0;
             height: 1px;
-            background: Data.theme.palette.bg-border;
+            background: Data.theme.palette.base-border;
         }
 
         VerticalLayout {
@@ -598,7 +598,7 @@ export component LibrariesPanel inherits VerticalLayout {
                         font-weight: 700;
                         overflow: elide;
                         vertical-alignment: center;
-                        color: Data.theme.palette.fg;
+                        color: Data.theme.palette.base-text;
                         text: @tr("Pending Operations").to-uppercase();
                         accessible-role: none;
                     }
@@ -608,7 +608,7 @@ export component LibrariesPanel inherits VerticalLayout {
                     font-weight: 700;
                     font-size: 12px;
                     border-width: 1.3px;
-                    text-color: Data.theme.palette.fg-success;
+                    text-color: Data.theme.palette.base-text-success;
                     text: "+" + Data.remote-libraries-data.pending-installs;
                 }
 
@@ -616,7 +616,7 @@ export component LibrariesPanel inherits VerticalLayout {
                     font-weight: 700;
                     font-size: 12px;
                     border-width: 1.3px;
-                    text-color: Data.theme.palette.fg-warning;
+                    text-color: Data.theme.palette.base-text-warning;
                     text: "↑" + Data.remote-libraries-data.pending-updates;
                 }
 
@@ -624,7 +624,7 @@ export component LibrariesPanel inherits VerticalLayout {
                     font-weight: 700;
                     font-size: 12px;
                     border-width: 1.3px;
-                    text-color: Data.theme.palette.fg-error;
+                    text-color: Data.theme.palette.base-text-error;
                     text: "–" + Data.remote-libraries-data.pending-uninstalls;
                 }
             }
@@ -637,11 +637,11 @@ export component LibrariesPanel inherits VerticalLayout {
                 if Data.remote-libraries-data.pending-oneway-uninstalls > 0: Rectangle {
                     height: nonreversible-warning-txt.preferred-height + 8px;
                     border-radius: 5px;
-                    background: Data.theme.palette.fg-error;
+                    background: Data.theme.palette.base-text-error;
 
                     nonreversible-warning-txt := Text {
                         width: parent.width - 8px;
-                        color: Data.theme.palette.bg;
+                        color: Data.theme.palette.base;
                         font-weight: 700;
                         horizontal-alignment: left;
                         wrap: word-wrap;
@@ -663,7 +663,7 @@ export component LibrariesPanel inherits VerticalLayout {
                         };
                         text: (root.width > 300px) ? @tr("" | "Apply {n} Modification(s)" % Data.remote-libraries-pending-operations) : @tr("Apply");
                         primary: Data.remote-libraries-data.pending-oneway-uninstalls == 0;
-                        border-color: (self.has-focus ? Constants.librepcb-color : Data.theme.palette.fg-error).darker(self.enabled ? 0 : 0.5);
+                        border-color: (self.has-focus ? Constants.librepcb-color : Data.theme.palette.base-text-error).darker(self.enabled ? 0 : 0.5);
                         border-width: (self.has-focus || (Data.remote-libraries-data.pending-oneway-uninstalls > 0)) ? 1px : 0;
                         enabled: !Data.libraries-operation-in-progress;
 
@@ -686,12 +686,12 @@ export component LibrariesPanel inherits VerticalLayout {
     }
 
     if !Data.libraries-panel-filter.is-empty: Rectangle {
-        background: Data.theme.palette.bg2;
+        background: Data.theme.palette.window;
 
         Rectangle {
             y: 0;
             height: 1px;
-            background: Data.theme.palette.bg-border;
+            background: Data.theme.palette.base-border;
         }
 
         filter-l := HorizontalLayout {

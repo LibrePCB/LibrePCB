@@ -2,7 +2,7 @@ import { Data } from "../api.slint";
 
 export component Spinner inherits Rectangle {
     in property <bool> indeterminate: false;  // Actually not supported yet.
-    in property <color> foreground-color: Data.theme.palette.fg-disabled;
+    in property <color> foreground-color: Data.theme.palette.control-text-disabled;
     property <length> size: min(self.width, self.height);
     property <length> dot-size: size * 0.22;
     property <[angle]> angles: [

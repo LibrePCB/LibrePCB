@@ -2,13 +2,12 @@ import { Data, EditorCommand } from "../api.slint";
 
 export component MenuSeparator inherits Rectangle {
     height: 10px;
-    background: Data.theme.palette.bg;
 
     Rectangle {
         y: parent.height / 2;
         width: parent.width - 14px;
         height: 1px;
-        background: Data.theme.palette.bg-border;
+        background: Data.theme.palette.base-border;
     }
 }
 
@@ -26,16 +25,16 @@ export component MenuItem inherits Rectangle {
     in property <bool> checkable: false;
     in property <bool> checked: false;
     in property <bool> default: false;
-    property <color> text-color: enabled ? Data.theme.palette.fg : Data.theme.palette.fg-disabled;
+    property <color> text-color: enabled ? Data.theme.palette.base-text : Data.theme.palette.control-text-disabled;
 
     callback clicked;
 
     height: 25px;
     background: {
         if ta.has-hover {
-            Data.theme.palette.bg2-hovered
+            Data.theme.palette.control-hovered
         } else {
-            Data.theme.palette.bg
+            transparent
         }
     };
 
@@ -136,18 +135,16 @@ export component MenuItem inherits Rectangle {
 }
 
 export component MenuPopup inherits PopupWindow {
-    width: l.preferred-width + 2px;
-    height: l.preferred-height + 2px;
+    width: self.preferred-width;
+    height: self.preferred-height;
 
     Rectangle {
+        background: Data.theme.palette.control;
+        border-color: Data.theme.palette.control-border;
         border-width: 1px;
-        border-color: Data.theme.palette.bg2;
 
-        l := VerticalLayout {
-            x: 1px;
-            y: 1px;
-            width: self.preferred-width;
-            height: self.preferred-height;
+        VerticalLayout {
+            padding: 1px;
 
             @children
         }
@@ -157,21 +154,19 @@ export component MenuPopup inherits PopupWindow {
 export component MenuOverlay inherits Rectangle {
     in property <length> opening-width: 0;
 
-    width: ta.width + 2px;
-    height: ta.height + 2px;
+    width: self.preferred-width;
+    height: self.preferred-height;
+    background: Data.theme.palette.control;
+    border-color: Data.theme.palette.control-border;
     border-width: 1px;
-    border-color: Data.theme.palette.bg-border;
 
     // The touch area is important to intercept and ignore any clicks
     // on disabled menu items or on menu separators, to avoid those
     // clicks from propagating to the elements underneath the menu.
     ta := TouchArea {
-        x: 1px;
-        y: 1px;
-        width: self.preferred-width;
-        height: self.preferred-height;
-
         VerticalLayout {
+            padding: 1px;
+
             @children
         }
     }
@@ -185,6 +180,6 @@ export component MenuOverlay inherits Rectangle {
         y: -1px;
         width: opening-width - 2px;
         height: 2px;
-        background: Data.theme.palette.bg;
+        background: Data.theme.palette.base;
     }
 }

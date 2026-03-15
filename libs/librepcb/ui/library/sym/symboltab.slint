@@ -557,8 +557,8 @@ component SymbolEditorTab inherits TouchArea {
         zoom-fit-btn := SceneButton {
             icon: @image-url("../../../../font-awesome/svgs/solid/expand.svg");
             icon-scale: 0.9;
-            bg-color: tabs[index].background-color;
-            fg-color: tabs[index].foreground-color;
+            base-color: tabs[index].background-color;
+            base-text-color: tabs[index].foreground-color;
 
             clicked => {
                 Backend.trigger-tab(section-index, index, TabAction.zoom-fit);
@@ -567,8 +567,8 @@ component SymbolEditorTab inherits TouchArea {
 
         zoom-in-btn := SceneButton {
             icon: @image-url("../../../../bootstrap-icons/icons/zoom-in.svg");
-            bg-color: tabs[index].background-color;
-            fg-color: tabs[index].foreground-color;
+            base-color: tabs[index].background-color;
+            base-text-color: tabs[index].foreground-color;
 
             clicked => {
                 Backend.trigger-tab(section-index, index, TabAction.zoom-in);
@@ -577,8 +577,8 @@ component SymbolEditorTab inherits TouchArea {
 
         zoom-out-btn := SceneButton {
             icon: @image-url("../../../../bootstrap-icons/icons/zoom-out.svg");
-            bg-color: tabs[index].background-color;
-            fg-color: tabs[index].foreground-color;
+            base-color: tabs[index].background-color;
+            base-text-color: tabs[index].foreground-color;
 
             clicked => {
                 Backend.trigger-tab(section-index, index, TabAction.zoom-out);
@@ -673,7 +673,7 @@ export component SymbolTab inherits Tab {
 
             Rectangle {
                 width: 1px;
-                background: Data.theme.palette.bg-border;
+                background: Data.theme.palette.base-border;
             }
 
             SymbolMetadataTab {

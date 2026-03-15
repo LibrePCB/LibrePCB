@@ -32,12 +32,12 @@ export component ComboBox inherits Rectangle {
 
     preferred-width: ta.preferred-width;
     preferred-height: 25px;
-    background: ta.has-hover ? Data.theme.palette.bg2-hovered : Data.theme.palette.bg3;
+    background: ta.has-hover ? Data.theme.palette.control-hovered : Data.theme.palette.control;
     border-color: {
         if has-focus {
             Constants.librepcb-color
         } else if enabled && (!read-only) {
-            Data.theme.palette.bg-border
+            Data.theme.palette.base-border
         } else {
             transparent
         }
@@ -99,11 +99,11 @@ export component ComboBox inherits Rectangle {
                     vertical-alignment: center;
                     color: {
                         if !enabled {
-                            Data.theme.palette.fg-disabled
+                            Data.theme.palette.control-text-disabled
                         } else if read-only {
-                            Data.theme.palette.fg-placeholder
+                            Data.theme.palette.control-text-muted
                         } else {
-                            Data.theme.palette.fg
+                            Data.theme.palette.base-text
                         }
                     };
                     text: model[current-index];

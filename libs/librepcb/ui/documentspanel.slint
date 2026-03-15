@@ -45,9 +45,9 @@ component DocumentsListItem inherits Rectangle {
     height: 27px;
     background: {
         if selected {
-            Data.theme.palette.bg2-checked
+            Data.theme.palette.control-checked
         } else if ta.has-hover {
-            Data.theme.palette.bg2-hovered
+            Data.theme.palette.control-hovered
         } else {
             transparent
         }
@@ -78,7 +78,7 @@ component DocumentsListItem inherits Rectangle {
             txt := Text {
                 vertical-alignment: center;
                 overflow: elide;
-                color: Data.theme.palette.fg;
+                color: Data.theme.palette.base-text;
                 font-weight: selected ? 700 : 400;
                 text: text;
             }
@@ -167,7 +167,7 @@ component ProjectSection inherits Rectangle {
                 if project.unsaved-changes && project.writable: save-badge := Badge {
                     y: (parent.height - self.height) / 2;
                     text: @tr("save").to-lowercase();
-                    text-color: Data.theme.palette.fg-warning;
+                    text-color: Data.theme.palette.base-text-warning;
                     clickable: true;
 
                     clicked => {

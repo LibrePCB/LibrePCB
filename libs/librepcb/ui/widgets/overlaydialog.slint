@@ -4,7 +4,7 @@ import { Constants, Data } from "../api.slint";
 export component OverlayDialog inherits Rectangle {
     in property <bool> ok-button: false;
 
-    background: black.with-alpha(0.3 - Data.theme.palette.bg.to-hsv().value * 0.2);
+    background: black.with-alpha(0.3 - Data.theme.palette.base.to-hsv().value * 0.2);
     forward-focus: fs;
 
     callback accepted;
@@ -30,7 +30,7 @@ export component OverlayDialog inherits Rectangle {
         Rectangle {
             width: min(0.8 * root.width, max(self.preferred-width, 500px));
             height: min(0.8 * root.height, max(self.preferred-height, 50px));
-            background: Data.theme.palette.bg;
+            background: Data.theme.palette.base;
             border-radius: 15px;
             border-width: 1px;
             border-color: Constants.librepcb-color;

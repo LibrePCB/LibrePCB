@@ -5,17 +5,17 @@ import { Data } from "../api.slint";
 export component MessageBox inherits Rectangle {
     in property <string> title;
     in property <bool> supports-dont-show-again: false;
-    out property <color> text-color: Data.theme.palette.fg;
-    out property <color> hover-color: Data.theme.palette.fg-hovered;
+    out property <color> text-color: Data.theme.palette.base-text;
+    out property <color> hover-color: Data.theme.palette.base-text-hovered;
 
     callback dismiss-clicked;
     callback dont-show-again-clicked;
 
     height: self.preferred-height;
     border-radius: 10px;
-    border-color: Data.theme.palette.bg-border;
+    border-color: Data.theme.palette.base-border;
     border-width: 1px;
-    background: Data.theme.palette.bg;
+    background: Data.theme.palette.base;
 
     ta := TouchArea {
         VerticalLayout {
@@ -35,7 +35,7 @@ export component MessageBox inherits Rectangle {
                 if supports-dont-show-again && ta.has-hover: dont-show-again-btn := LinkText {
                     width: self.preferred-width;
                     vertical-alignment: center;
-                    text-color: Data.theme.palette.fg-placeholder;
+                    text-color: Data.theme.palette.control-text-muted;
                     font-size: 10px;
                     text: @tr("Don't show again");
                     accessible-role: none;
@@ -48,7 +48,7 @@ export component MessageBox inherits Rectangle {
                 dismiss-btn := IconButton {
                     width: 12px;
                     height: title-txt.preferred-height;
-                    color-enabled: Data.theme.palette.fg-placeholder;
+                    color-enabled: Data.theme.palette.control-text-muted;
                     style: hyperlink;
                     icon: @image-url("../../../font-awesome/svgs/solid/xmark.svg");
                     accessible-role: none;

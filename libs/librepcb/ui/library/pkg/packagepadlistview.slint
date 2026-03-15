@@ -3,12 +3,12 @@ import { Data, PackagePadData } from "../../api.slint";
 
 component HorizontalLine inherits Rectangle {
     height: 1px;
-    background: Data.theme.palette.bg-border;
+    background: Data.theme.palette.base-border;
 }
 
 component VerticalLine inherits Rectangle {
     width: 1px;
-    background: Data.theme.palette.bg-border;
+    background: Data.theme.palette.base-border;
 }
 
 component PackagePadListViewTextCell inherits Rectangle {
@@ -18,7 +18,7 @@ component PackagePadListViewTextCell inherits Rectangle {
     in property <TextHorizontalAlignment> horizontal-alignment: left;
 
     preferred-width: txt.preferred-width + 10px;
-    background: Data.theme.palette.bg2;
+    background: Data.theme.palette.window;
 
     txt := Text {
         x: 5px;
@@ -67,7 +67,7 @@ export component PackagePadListView inherits ScrollView {
 
                     number-cell := PackagePadListViewTextCell {
                         height: row-height;
-                        background: Data.theme.palette.bg3;
+                        background: Data.theme.palette.control;
                         horizontal-alignment: right;
                         font-size: 10px;
                         text: index + 1;
@@ -92,7 +92,7 @@ export component PackagePadListView inherits ScrollView {
 
                     id-cell := PackagePadListViewTextCell {
                         height: row-height;
-                        background: Data.theme.palette.bg3;
+                        background: Data.theme.palette.control;
                         horizontal-alignment: right;
                         font-family: "Noto Sans Mono";
                         font-size: 10px;
@@ -150,7 +150,7 @@ export component PackagePadListView inherits ScrollView {
 
                     delete-btn := IconButton {
                         height: row-height;
-                        background: Data.theme.palette.bg3;
+                        background: Data.theme.palette.control;
                         icon-scale: 0.6;
                         icon: @image-url("../../../../font-awesome/svgs/solid/trash-can.svg");
 

@@ -67,7 +67,7 @@ component NotificationItem inherits Rectangle {
                 title-txt := Text {
                     font-size: 13px;
                     font-weight: notification.unread ? 700 : 500;
-                    color: notification.unread ? Data.theme.palette.fg-hovered : Data.theme.palette.fg;
+                    color: notification.unread ? Data.theme.palette.base-text-hovered : Data.theme.palette.base-text;
                     text: notification.title;
                     accessible-role: none;
 
@@ -205,7 +205,7 @@ export component NotificationsPopup inherits Rectangle {
         if Data.preview-mode || (hidden-items > 0): Rectangle {
             width: 100%;
             height: hidden-messages-txt.preferred-height + 2 * hidden-messages-txt.y;
-            background: Data.theme.palette.bg;
+            background: Data.theme.palette.base;
 
             hidden-messages-txt := Text {
                 x: 8px;

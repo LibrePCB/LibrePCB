@@ -25,7 +25,7 @@ export component PackageEditorTagsPanel inherits PackageEditorPanel {
     property <bool> activated: (root.has-hover || new-tag-edt.has-focus);
     property <length> badge-height: 20px;
 
-    background: new-tag-edt.has-focus ? Data.theme.palette.bg : transparent;
+    background: new-tag-edt.has-focus ? Data.theme.palette.base : transparent;
     border-width: 0;
     opacity: activated ? 1 : 0.5;
 
@@ -122,7 +122,7 @@ export component PackageEditorTagsPanel inherits PackageEditorPanel {
             Image {
                 width: 25px;
                 height: self.width;
-                colorize: new-tag-edt.has-focus ? Data.theme.palette.fg : tabs[index].foreground-color;
+                colorize: new-tag-edt.has-focus ? Data.theme.palette.base-text : tabs[index].foreground-color;
                 image-fit: contain;
                 source: @image-url("../../../../font-awesome/svgs/solid/tags.svg");
                 accessible-role: none;

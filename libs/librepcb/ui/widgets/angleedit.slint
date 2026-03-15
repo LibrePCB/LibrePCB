@@ -61,14 +61,14 @@ export component AngleEdit inherits Rectangle {
     }
 
     preferred-height: 25px;
-    background: Data.theme.palette.bg3;
+    background: Data.theme.palette.control;
     border-color: {
         if enabled && (!parse-result.valid) {
             edt.has-focus ? #ff0000 : #900000
         } else if edt.has-focus {
             Constants.librepcb-color
         } else if enabled {
-            Data.theme.palette.bg-border
+            Data.theme.palette.base-border
         } else {
             transparent
         }
@@ -101,7 +101,7 @@ export component AngleEdit inherits Rectangle {
             if icon.width > 0: Image {
                 width: 12px;
                 image-fit: contain;
-                colorize: enabled ? Data.theme.palette.fg : Data.theme.palette.fg-disabled;
+                colorize: enabled ? Data.theme.palette.base-text : Data.theme.palette.control-text-disabled;
                 source: icon;
                 accessible-role: none;
             }

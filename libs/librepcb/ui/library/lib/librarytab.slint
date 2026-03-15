@@ -403,14 +403,14 @@ component LibraryImportButton inherits TouchArea {
         height: self.preferred-height;
         background: {
             if parent.pressed {
-                Data.theme.palette.bg2-checked;
+                Data.theme.palette.control-checked;
             } else if parent.has-hover {
-                Data.theme.palette.bg2-hovered;
+                Data.theme.palette.control-hovered;
             } else {
-                Data.theme.palette.bg3;
+                Data.theme.palette.control;
             }
         };
-        border-color: Data.theme.palette.bg-border;
+        border-color: Data.theme.palette.base-border;
         border-width: 1px;
 
         HorizontalLayout {
@@ -445,7 +445,7 @@ component LibraryImportButton inherits TouchArea {
 
                 description-txt := Text {
                     font-size: 14px;
-                    color: Data.theme.palette.fg-placeholder;
+                    color: Data.theme.palette.control-text-muted;
                     horizontal-alignment: center;
                     wrap: word-wrap;
                     text: @tr("Start populating this library by importing {} library elements.", name);
@@ -520,8 +520,8 @@ component NewLibraryElementButton inherits IconButton {
     height: 35px;
     border-radius: self.height / 2;
     colorize: false;
-    background-color: Data.theme.palette.bg3;
-    border-color: Data.theme.palette.bg-border;
+    background-color: Data.theme.palette.control;
+    border-color: Data.theme.palette.base-border;
     border-width: 1px;
     icon-scale: 0.6;
     tooltip-position: left;
@@ -718,7 +718,7 @@ component LibraryContentTab inherits HorizontalLayout {
 
     Rectangle {
         width: 1px;
-        background: Data.theme.palette.bg-border;
+        background: Data.theme.palette.base-border;
     }
 
     VerticalLayout {
@@ -887,7 +887,7 @@ export component LibraryTab inherits Tab {
 
         Rectangle {
             width: 1px;
-            background: Data.theme.palette.bg-border;
+            background: Data.theme.palette.base-border;
         }
 
         LibraryMetadataTab {

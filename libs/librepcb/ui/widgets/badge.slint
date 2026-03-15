@@ -2,7 +2,7 @@ import { Data } from "../api.slint";
 
 export component Badge inherits Rectangle {
     in property <string> text;
-    in property <color> text-color: Data.theme.palette.fg;
+    in property <color> text-color: Data.theme.palette.base-text;
     in property <color> text-color-hover: text-color.brighter(0.5);
     in property <length> font-size: 10px;
     in property <int> font-weight: 400;

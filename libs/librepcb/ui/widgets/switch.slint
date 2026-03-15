@@ -14,7 +14,7 @@ export component Switch inherits Rectangle {
     in property <length> font-size: 12px;
     in property <string> status-tip;
     in property <color> checked-color: Constants.librepcb-color;
-    in property <color> unchecked-color: Data.theme.palette.bg3;
+    in property <color> unchecked-color: Data.theme.palette.control;
     in property <bool> focusable: true;
     out property has-focus <=> fs.has-focus;
 
@@ -23,9 +23,9 @@ export component Switch inherits Rectangle {
     max-width: text.is-empty ? l.preferred-width : l.max-width;
     border-color: {
         if has-focus {
-            root.checked ? Data.theme.palette.fg : Constants.librepcb-color
+            root.checked ? Data.theme.palette.base-text : Constants.librepcb-color
         } else {
-            Data.theme.palette.bg-border
+            Data.theme.palette.base-border
         }
     };
     forward-focus: fs;
@@ -65,7 +65,7 @@ export component Switch inherits Rectangle {
 
         if (!text.is-empty) && (text-side == TextSide.left): Text {
             text: text;
-            color: Data.theme.palette.fg;
+            color: Data.theme.palette.base-text;
             wrap: word-wrap;
             horizontal-alignment: right;
             vertical-alignment: center;
@@ -96,7 +96,7 @@ export component Switch inherits Rectangle {
                 x: checked ? (parent.width - self.width - 3px) : 3px;
                 width: self.height;
                 height: parent.height - 6px;
-                background: ta.has-hover ? Data.theme.palette.bg2-hovered : Data.theme.palette.bg;
+                background: ta.has-hover ? Data.theme.palette.control-hovered : Data.theme.palette.base;
                 border-radius: self.height / 2;
 
                 animate x { duration: 50ms; }
@@ -108,7 +108,7 @@ export component Switch inherits Rectangle {
             wrap: word-wrap;
             vertical-alignment: center;
             font-size: font-size;
-            color: Data.theme.palette.fg;
+            color: Data.theme.palette.base-text;
             accessible-role: none;
         }
     }

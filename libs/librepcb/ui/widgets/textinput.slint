@@ -3,11 +3,11 @@ import { Constants, Data } from "../api.slint";
 export component TextInput inherits TextInput {
     color: {
         if !self.enabled {
-            Data.theme.palette.fg-disabled
+            Data.theme.palette.control-text-disabled
         } else if self.read-only {
-            Data.theme.palette.fg-placeholder
+            Data.theme.palette.control-text-muted
         } else {
-            Data.theme.palette.fg
+            Data.theme.palette.base-text
         }
     };
     selection-background-color: Constants.librepcb-color;

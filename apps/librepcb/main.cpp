@@ -310,6 +310,8 @@ static int openWorkspace(FilePath& path) {
     palette.setColor(QPalette::LinkVisited, "#29d682");
     palette.setColor(QPalette::Highlight, "#29d682");
     palette.setColor(QPalette::HighlightedText, "#161616");
+    palette.setColor(QPalette::Light, "#e0e0e0");
+    palette.setColor(QPalette::Dark, "#c0c0c0");
     palette.setColor(QPalette::Disabled, QPalette::Button, "#d0d0d0");
     palette.setColor(QPalette::Disabled, QPalette::ButtonText, "#b0b0b0");
     palette.setColor(QPalette::Disabled, QPalette::WindowText, "#b0b0b0");
@@ -333,6 +335,8 @@ static int openWorkspace(FilePath& path) {
     palette.setColor(QPalette::LinkVisited, "#29d682");
     palette.setColor(QPalette::Highlight, "#29d682");
     palette.setColor(QPalette::HighlightedText, "#161616");
+    palette.setColor(QPalette::Light, "#505050");
+    palette.setColor(QPalette::Dark, "#000000");
     palette.setColor(QPalette::Disabled, QPalette::Button, "#1a1a1a");
     palette.setColor(QPalette::Disabled, QPalette::ButtonText, "#707070");
     palette.setColor(QPalette::Disabled, QPalette::WindowText, "#707070");

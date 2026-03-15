@@ -17,7 +17,7 @@ export component LibraryTreeView inherits FocusScope {
     property <bool> initial-scroll-position-restored: false;
 
     callback item-key-pressed(index: int, item: LibraryTreeViewItemData, event: KeyEvent) -> EventResult;
-    callback item-hovered(index: int, item: LibraryTreeViewItemData);
+    callback control-hovered(index: int, item: LibraryTreeViewItemData);
     callback item-selected(index: int, item: LibraryTreeViewItemData);
     item-selected(index, item) => {
         current-index = index;
@@ -73,18 +73,18 @@ export component LibraryTreeView inherits FocusScope {
 
             changed has-hover => {
                 if self.has-hover {
-                    item-hovered(index, item);
+                    control-hovered(index, item);
                 } else {
-                    item-hovered(-1, { });
+                    control-hovered(-1, { });
                 }
             }
 
             Rectangle {
                 background: {
                     if current-index == index {
-                        Data.theme.palette.bg2-checked
+                        Data.theme.palette.control-checked
                     } else if parent.has-hover {
-                        Data.theme.palette.bg2-hovered
+                        Data.theme.palette.control-hovered
                     } else {
                         transparent
                     }
@@ -103,14 +103,14 @@ export component LibraryTreeView inherits FocusScope {
                                 y: 0;
                                 width: 1px;
                                 height: ((i < item.level) || (((index + 1) < model.length) && (model[index + 1].level >= item.level))) ? parent.height : (parent.height / 2);
-                                background: Data.theme.palette.fg-disabled;
+                                background: Data.theme.palette.control-text-disabled;
                             }
 
                             if i == item.level: Rectangle {
                                 x: parent.width - 8px;
                                 width: parent.width - self.x;
                                 height: 1px;
-                                background: Data.theme.palette.fg-disabled;
+                                background: Data.theme.palette.control-text-disabled;
                             }
                         }
                     }
@@ -146,15 +146,15 @@ export component LibraryTreeView inherits FocusScope {
                         source: icon;
                         colorize: {
                             if item.type == LibraryTreeViewItemType.all {
-                                Data.theme.palette.fg-placeholder
+                                Data.theme.palette.control-text-muted
                             } else if item.type == LibraryTreeViewItemType.organization {
-                                item.deprecated ? Data.theme.palette.fg-error : Data.theme.palette.fg-placeholder
+                                item.deprecated ? Data.theme.palette.base-text-error : Data.theme.palette.control-text-muted
                             } else if item.type == LibraryTreeViewItemType.uncategorized {
                                 yellow
                             } else if item.type == LibraryTreeViewItemType.component {
-                                item.deprecated ? Data.theme.palette.fg-error : Data.theme.palette.fg-placeholder
+                                item.deprecated ? Data.theme.palette.base-text-error : Data.theme.palette.control-text-muted
                             } else if item.is-external {
-                                Data.theme.palette.fg-placeholder
+                                Data.theme.palette.control-text-muted
                             } else {
                                 transparent
                             }
@@ -167,7 +167,7 @@ export component LibraryTreeView inherits FocusScope {
                         font-size: font-size;
                         font-weight: ((item.level == 0) || (item.elements > 0)) ? 800 : 400;
                         font-italic: item.is-external;
-                        color: item.deprecated ? Data.theme.palette.fg-error : Data.theme.palette.fg;
+                        color: item.deprecated ? Data.theme.palette.base-text-error : Data.theme.palette.base-text;
                         vertical-alignment: center;
                         overflow: elide;
                         text: {
@@ -198,7 +198,7 @@ export component LibraryTreeView inherits FocusScope {
 
                     if item.deprecated || (!item.summary.is-empty): item-summary-txt := Text {
                         horizontal-stretch: 1;
-                        color: item.deprecated ? #bb5555 : Data.theme.palette.fg-placeholder;
+                        color: item.deprecated ? #bb5555 : Data.theme.palette.control-text-muted;
                         font-size: 10.5px;
                         font-weight: 300;
                         horizontal-alignment: left;
@@ -210,7 +210,7 @@ export component LibraryTreeView inherits FocusScope {
 
                     if item.elements > 0: item-count-txt := Text {
                         width: self.preferred-width;
-                        color: Data.theme.palette.fg-placeholder;
+                        color: Data.theme.palette.control-text-muted;
                         font-size: 11px;
                         font-weight: 300;
                         vertical-alignment: center;

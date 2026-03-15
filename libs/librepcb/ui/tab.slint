@@ -19,7 +19,7 @@ export component Tab inherits FocusScope {
         width: min(root.width * 0.25, 200px);
         height: self.width;
         image-fit: contain;
-        colorize: Data.theme.palette.bg.mix(Data.theme.palette.bg2, 0.4);
+        colorize: Data.theme.palette.base.mix(Data.theme.palette.window, 0.4);
         source: @image-url("../../../img/app/librepcb-monochrome.svg");
     }
 

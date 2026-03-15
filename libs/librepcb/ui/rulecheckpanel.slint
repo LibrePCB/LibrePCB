@@ -36,9 +36,9 @@ component RuleCheckListItem inherits Rectangle {
 
     background: {
         if self.selected {
-            Data.theme.palette.bg2-checked
+            Data.theme.palette.control-checked
         } else if ta.has-hover {
-            Data.theme.palette.bg2-hovered
+            Data.theme.palette.control-hovered
         } else {
             transparent
         }
@@ -172,7 +172,7 @@ export component RuleCheckPanel inherits FocusScope {
                 icon: @image-url("../../font-awesome/svgs/solid/circle-xmark.svg");
                 icon-scale: 0.7;
                 tooltip: check.execution-error;
-                color-enabled: Data.theme.palette.fg-error;
+                color-enabled: Data.theme.palette.base-text-error;
             }
 
             if check.state == RuleCheckState.outdated: outdated-btn := IconButton {
@@ -181,7 +181,7 @@ export component RuleCheckPanel inherits FocusScope {
                 icon: @image-url("../../font-awesome/svgs/solid/triangle-exclamation.svg");
                 icon-scale: 0.7;
                 tooltip: @tr("Possibly Outdated Data") + "\n\n" + @tr("Trigger the checks again to refresh the messages.");
-                color-enabled: Data.theme.palette.fg-warning;
+                color-enabled: Data.theme.palette.base-text-warning;
             }
 
             if check.type == RuleCheckType.drc: quick-check-btn := IconButton {
@@ -258,7 +258,7 @@ export component RuleCheckPanel inherits FocusScope {
             Rectangle {
                 y: parent.height - self.height;
                 height: 1px;
-                background: Data.theme.palette.bg-border;
+                background: Data.theme.palette.base-border;
             }
 
             GridLayout {

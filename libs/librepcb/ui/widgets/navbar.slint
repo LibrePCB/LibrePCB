@@ -25,8 +25,8 @@ export component NavBar inherits HorizontalLayout {
             vertical-alignment: center;
             horizontal-alignment: center;
             text: item.title;
-            text-color: (index == current-index) ? Data.theme.palette.fg : Data.theme.palette.fg-placeholder;
-            text-color-hovered: (index == current-index) ? Data.theme.palette.fg-hovered : Data.theme.palette.fg-placeholder;
+            text-color: (index == current-index) ? Data.theme.palette.base-text : Data.theme.palette.control-text-muted;
+            text-color-hovered: (index == current-index) ? Data.theme.palette.base-text-hovered : Data.theme.palette.control-text-muted;
             enabled: !item.disabled;
 
             clicked => {
@@ -44,7 +44,7 @@ export component NavBar inherits HorizontalLayout {
 
         if (index + 1) < items.length: Text {
             text: "•";
-            color: Data.theme.palette.fg-disabled;
+            color: Data.theme.palette.control-text-disabled;
             vertical-alignment: center;
             accessible-role: none;
         }

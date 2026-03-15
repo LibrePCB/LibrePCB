@@ -24,13 +24,13 @@ export component IconButton inherits Rectangle {
     in property <length> icon-offset-y: 0;
     in property <angle> icon-rotation: 0deg;
     in property <bool> colorize: true;
-    in property <color> color-disabled: Data.theme.palette.fg-disabled;
-    in property <color> color-enabled: (style == IconButtonStyle.checkable-hyperlink) ? Data.theme.palette.fg-placeholder : Data.theme.palette.fg.mix(Data.theme.palette.fg-placeholder, 0.7);
-    in property <color> color-checked: (style == IconButtonStyle.checkable-hyperlink) ? Data.theme.palette.fg : color-enabled;
-    in property <color> color-hovered: (style == IconButtonStyle.checkable-hyperlink) ? self.color-checked : Data.theme.palette.fg-hovered;
+    in property <color> color-disabled: Data.theme.palette.control-text-disabled;
+    in property <color> color-enabled: (style == IconButtonStyle.checkable-hyperlink) ? Data.theme.palette.base-text-muted : Data.theme.palette.base-text-muted;
+    in property <color> color-checked: (style == IconButtonStyle.checkable-hyperlink) ? Data.theme.palette.base-text : Data.theme.palette.control-text;
+    in property <color> color-hovered: (style == IconButtonStyle.checkable-hyperlink) ? self.color-checked : Data.theme.palette.base-text-hovered;
     in property <color> background-color: transparent;
-    in property <color> background-color-hovered: (style == IconButtonStyle.standard) ? Data.theme.palette.bg2-hovered : background-color;
-    in property <color> background-color-checked: ((style == IconButtonStyle.standard) || (style == IconButtonStyle.read-only)) ? Data.theme.palette.bg2-checked : background-color;
+    in property <color> background-color-hovered: (style == IconButtonStyle.standard) ? Data.theme.palette.control-hovered : background-color;
+    in property <color> background-color-checked: ((style == IconButtonStyle.standard) || (style == IconButtonStyle.read-only)) ? Data.theme.palette.control-checked : background-color;
     in property <string> tooltip: cmd.text;
     in property <bool> tooltip-delayed: style != IconButtonStyle.read-only;
     in property <ToolTipPosition> tooltip-position: bottom;
@@ -79,7 +79,19 @@ export component IconButton inherits Rectangle {
             width: icon-size - (((!read-only) && ta.pressed) ? 2px : 0);
             height: self.width;
             image-fit: contain;
-            colorize: colorize ? (((!read-only) && ta.has-hover) ? color-hovered : (checked ? color-checked : (enabled ? color-enabled : color-disabled))) : transparent;
+            colorize: {
+                if !colorize {
+                    transparent
+                } else if checked {
+                    color-checked
+                } else if !enabled {
+                    color-disabled
+                } else if (!read-only) && ta.has-hover {
+                    color-hovered
+                } else {
+                    color-enabled
+                }
+            };
             transform-rotation: icon-rotation;
             source: icon;
             accessible-role: none;
@@ -143,8 +155,8 @@ export component CopyToClipboardIconButton inherits IconButton {
         }
     };
     icon-scale: (self.style == IconButtonStyle.standard) ? 0.5 : 1;
-    color-enabled: timer.running ? Data.theme.palette.fg-success : Data.theme.palette.fg;
-    color-hovered: timer.running ? Data.theme.palette.fg-success : Data.theme.palette.fg-hovered;
+    color-enabled: timer.running ? Data.theme.palette.base-text-success : Data.theme.palette.base-text;
+    color-hovered: timer.running ? Data.theme.palette.base-text-success : Data.theme.palette.base-text-hovered;
     tooltip: timer.running ? @tr("Copied!") : @tr("Copy to Clipboard");
     tooltip-delayed: false;
 

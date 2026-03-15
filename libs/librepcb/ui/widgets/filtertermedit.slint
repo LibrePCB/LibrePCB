@@ -5,8 +5,8 @@ export component FilterTermEdit inherits Rectangle {
     in property <string> term;
 
     preferred-height: 28px;
-    background: Data.theme.palette.bg3;
-    border-color: Data.theme.palette.bg-border;
+    background: Data.theme.palette.control;
+    border-color: Data.theme.palette.base-border;
     border-width: 1px;
     border-radius: self.height / 2;
 
@@ -19,14 +19,14 @@ export component FilterTermEdit inherits Rectangle {
 
         Text {
             vertical-alignment: center;
-            color: Data.theme.palette.fg-disabled;
+            color: Data.theme.palette.control-text-disabled;
             font-size: 13px;
             text: @tr("Filter:");
         }
 
         Text {
             vertical-alignment: center;
-            color: Data.theme.palette.fg;
+            color: Data.theme.palette.base-text;
             font-size: 13px;
             text: term;
         }
@@ -39,7 +39,7 @@ export component FilterTermEdit inherits Rectangle {
             height: min(16px, parent.height);
             style: hyperlink;
             icon: @image-url("../../../font-awesome/svgs/solid/xmark.svg");
-            color-enabled: Data.theme.palette.fg-placeholder;
+            color-enabled: Data.theme.palette.control-text-muted;
             accessible-label: "clear filter term";
         }
     }

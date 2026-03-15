@@ -57,8 +57,8 @@ export component DropDownPopup inherits PopupWindow {
     }
 
     Rectangle {
-        background: Data.theme.palette.bg;
-        border-color: Data.theme.palette.bg-border;
+        background: Data.theme.palette.base;
+        border-color: Data.theme.palette.base-border;
         border-width: 1px;
 
         view := ScrollView {
@@ -93,9 +93,9 @@ export component DropDownPopup inherits PopupWindow {
                     Rectangle {
                         background: {
                             if is-current {
-                                Data.theme.palette.bg2-checked
+                                Data.theme.palette.control-checked
                             } else if index == selected-index {
-                                Data.theme.palette.bg2-hovered
+                                Data.theme.palette.control-hovered
                             } else {
                                 transparent
                             }

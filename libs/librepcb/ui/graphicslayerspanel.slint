@@ -26,9 +26,9 @@ component GraphicsLayerListItem inherits Rectangle {
 
     background: {
         if ta.has-hover {
-            Data.theme.palette.bg2-hovered
+            Data.theme.palette.control-hovered
         } else if selected {
-            Data.theme.palette.bg2-checked
+            Data.theme.palette.control-checked
         } else {
             transparent
         }
@@ -89,7 +89,7 @@ component GraphicsLayerListItem inherits Rectangle {
                 vertical-alignment: center;
                 font-size: 12px;
                 overflow: elide;
-                color: (root.enabled && item.visible) ? Data.theme.palette.fg : Data.theme.palette.fg-placeholder;
+                color: (root.enabled && item.visible) ? Data.theme.palette.base-text : Data.theme.palette.control-text-muted;
                 text: item.name;
             }
         }
@@ -107,7 +107,7 @@ export component GraphicsLayersPanel inherits FocusScope {
         } else if Data.current-tab.type == TabType.package {
             Data.current-package-tab.background-color
         } else {
-            Data.theme.palette.bg;
+            Data.theme.palette.base;
         }
     };
 

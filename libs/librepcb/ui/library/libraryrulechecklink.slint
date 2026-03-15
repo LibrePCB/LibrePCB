@@ -29,14 +29,14 @@ export component LibraryRuleCheckLink inherits HorizontalLayout {
         y: (parent.height - self.height) / 2;
         background: {
             if data.unapproved > 0 {
-                Data.theme.palette.fg-error
+                Data.theme.palette.base-text-error
             } else {
-                Data.theme.palette.fg-success
+                Data.theme.palette.base-text-success
             }
         };
         border-color: self.background;
-        text-color: Data.theme.palette.bg.with-alpha(0.9);
-        text-color-hover: Data.theme.palette.bg;
+        text-color: Data.theme.palette.base.with-alpha(0.9);
+        text-color-hover: Data.theme.palette.base;
         font-size: 12px;
         text: text;
         clickable: true;
@@ -48,8 +48,8 @@ export component LibraryRuleCheckLink inherits HorizontalLayout {
     }
 
     if !has-messages: link-btn := LinkText {
-        text-color: Data.theme.palette.fg-success.with-alpha(0.8);
-        text-color-hovered: Data.theme.palette.fg-success;
+        text-color: Data.theme.palette.base-text-success.with-alpha(0.8);
+        text-color-hovered: Data.theme.palette.base-text-success;
         vertical-alignment: center;
         text: text;
         overflow: elide;

@@ -76,14 +76,14 @@ export component DrawFootprintPolygonToolBar inherits HorizontalLayout {
         icon-scale: 0.6;
         tooltip: @tr("Fill Area");
         status-tip: @tr("Fill the polygon with its outline color (only when closed)");
-        background-color: Data.theme.palette.bg3;
-        background-color-hovered: Data.theme.palette.bg2-hovered;
-        background-color-checked: Data.theme.palette.bg2-checked;
-        border-color: Data.theme.palette.bg-border;
+        background-color: Data.theme.palette.control;
+        background-color-hovered: Data.theme.palette.control-hovered;
+        background-color-checked: Data.theme.palette.control-checked;
+        border-color: Data.theme.palette.base-border;
         border-width: 1px;
-        color-enabled: Data.theme.palette.fg-placeholder;
-        color-hovered: Data.theme.palette.fg-hovered;
-        color-checked: Data.theme.palette.fg;
+        color-enabled: Data.theme.palette.control-text-muted;
+        color-hovered: Data.theme.palette.base-text-hovered;
+        color-checked: Data.theme.palette.base-text;
         checked: tabs[section.current-tab-index].tool-filled;
 
         clicked => {
@@ -96,14 +96,14 @@ export component DrawFootprintPolygonToolBar inherits HorizontalLayout {
         icon-scale: 0.6;
         tooltip: @tr("Grab Area");
         status-tip: @tr("Allow grabbing the footprint within the polygon's area");
-        background-color: Data.theme.palette.bg3;
-        background-color-hovered: Data.theme.palette.bg2-hovered;
-        background-color-checked: Data.theme.palette.bg2-checked;
-        border-color: Data.theme.palette.bg-border;
+        background-color: Data.theme.palette.control;
+        background-color-hovered: Data.theme.palette.control-hovered;
+        background-color-checked: Data.theme.palette.control-checked;
+        border-color: Data.theme.palette.base-border;
         border-width: 1px;
-        color-enabled: Data.theme.palette.fg-placeholder;
-        color-hovered: Data.theme.palette.fg-hovered;
-        color-checked: Data.theme.palette.fg;
+        color-enabled: Data.theme.palette.control-text-muted;
+        color-hovered: Data.theme.palette.base-text-hovered;
+        color-checked: Data.theme.palette.base-text;
         checked: tabs[section.current-tab-index].tool-grab-area;
 
         clicked => {

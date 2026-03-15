@@ -34,9 +34,9 @@ component UnplacedDeviceItem inherits Rectangle {
 
     background: {
         if selected {
-            Data.theme.palette.bg2-checked
+            Data.theme.palette.control-checked
         } else if ta.has-hover {
-            Data.theme.palette.bg2-hovered
+            Data.theme.palette.control-hovered
         } else {
             transparent
         }
@@ -182,7 +182,7 @@ export component PlaceDevicesPanel inherits FocusScope {
                         }
 
                         if settings-texts-visible: Text {
-                            color: Data.theme.palette.fg-placeholder;
+                            color: Data.theme.palette.control-text-muted;
                             font-size: 10px;
                             font-italic: true;
                             vertical-alignment: center;
@@ -254,7 +254,7 @@ export component PlaceDevicesPanel inherits FocusScope {
             Rectangle {
                 y: parent.height - self.height;
                 height: 1px;
-                background: Data.theme.palette.bg-border;
+                background: Data.theme.palette.base-border;
             }
         }
 
@@ -300,12 +300,12 @@ export component PlaceDevicesPanel inherits FocusScope {
                 style: read-only;
                 icon: Helpers.get-icon-for-notification-type(NotificationType.warning);
                 tooltip: @tr("No device or package found");
-                color-enabled: Data.theme.palette.fg-warning;
+                color-enabled: Data.theme.palette.base-text-warning;
             }
         }
 
         if item-selected && (devices-count == 0): Rectangle {
-            background: Data.theme.palette.fg-error;
+            background: Data.theme.palette.base-text-error;
 
             VerticalLayout {
                 padding: 8px;
@@ -313,7 +313,7 @@ export component PlaceDevicesPanel inherits FocusScope {
 
                 Text {
                     wrap: word-wrap;
-                    color: Data.theme.palette.bg;
+                    color: Data.theme.palette.base;
                     text: @tr("No compatible device was found for the selected component. Please install a library providing a suitable device or create a new device on your own in a local library.");
                 }
 
@@ -321,8 +321,8 @@ export component PlaceDevicesPanel inherits FocusScope {
                     font-size: 13px;
                     wrap: word-wrap;
                     horizontal-alignment: center;
-                    text-color: Data.theme.palette.bg;
-                    text-color-hovered: Data.theme.palette.bg2;
+                    text-color: Data.theme.palette.base;
+                    text-color-hovered: Data.theme.palette.window;
                     text: "▸ " + @tr("More information & device creation guide");
                     status-tip: Constants.no-device-found-url;
 
@@ -335,8 +335,8 @@ export component PlaceDevicesPanel inherits FocusScope {
                     font-size: 13px;
                     wrap: word-wrap;
                     horizontal-alignment: center;
-                    text-color: Data.theme.palette.bg;
-                    text-color-hovered: Data.theme.palette.bg2;
+                    text-color: Data.theme.palette.base;
+                    text-color-hovered: Data.theme.palette.window;
                     text: "▸ " + @tr("I installed all libraries, why I still get this error?");
                     status-tip: Constants.where-is-library-element-url;
 

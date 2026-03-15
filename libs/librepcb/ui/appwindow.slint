@@ -36,7 +36,7 @@ export component AppWindow inherits Window {
     property <length> actual-panel-width: (Data.panel-page != PanelPage.none) ? panel-width : 0;
 
     title: Data.window-title;
-    background: Data.theme.palette.bg2;
+    background: Data.theme.palette.window;
     icon: @image-url("../../../img/app/librepcb.svg");
     default-font-family: "Noto Sans";
     preferred-width: 1024px;
@@ -91,7 +91,7 @@ export component AppWindow inherits Window {
             y: menubar.height;
             width: sidebar.width;
             height: 1px;
-            background: Data.theme.palette.bg-border;
+            background: Data.theme.palette.base-border;
         }
 
         sidebar := SideBar {
@@ -107,7 +107,7 @@ export component AppWindow inherits Window {
             y: sidebar.y;
             width: 1px;
             height: sidebar.height;
-            background: Data.theme.palette.bg-border;
+            background: Data.theme.palette.base-border;
         }
 
         panel := Rectangle {
@@ -116,7 +116,7 @@ export component AppWindow inherits Window {
             z: 80; // For the tooltips.
             width: panel-width;
             height: sidebar.height;
-            background: Data.theme.palette.bg3;
+            background: Data.theme.palette.control;
             visible: Data.panel-page != PanelPage.none;
 
             if Data.panel-page == PanelPage.home: home-panel := HomePanel { }
@@ -145,7 +145,7 @@ export component AppWindow inherits Window {
             height: sidebar.height;
 
             if actual-panel-width > 0: Rectangle {
-                background: Data.theme.palette.bg-border;
+                background: Data.theme.palette.base-border;
                 width: 1px;
             }
 
@@ -159,7 +159,7 @@ export component AppWindow inherits Window {
                 if i < (Data.sections.length - 1): Rectangle {
                     width: 1px;
                     horizontal-stretch: 0;
-                    background: Data.theme.palette.bg-border;
+                    background: Data.theme.palette.base-border;
                 }
             }
         }
@@ -167,7 +167,7 @@ export component AppWindow inherits Window {
         Rectangle {
             y: statusbar.y - 1px;
             height: 1px;
-            background: Data.theme.palette.bg-border;
+            background: Data.theme.palette.base-border;
         }
 
         statusbar := StatusBar {

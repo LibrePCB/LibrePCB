@@ -23,8 +23,8 @@ component PackageEditorPanelListItem inherits TouchArea {
     in property <[bool]> checked-numbers;
     in property <bool> highlight: false;
     in property <bool> read-only: false;
-    property <color> base-color: highlight ? Data.theme.palette.fg : Data.theme.palette.fg-placeholder;
-    property <color> color: root.has-hover ? Data.theme.palette.fg-hovered : base-color;
+    property <color> base-color: highlight ? Data.theme.palette.base-text : Data.theme.palette.control-text-muted;
+    property <color> color: root.has-hover ? Data.theme.palette.base-text-hovered : base-color;
     property <bool> edit-mode: false;
 
     callback name-changed(string);
@@ -61,7 +61,7 @@ component PackageEditorPanelListItem inherits TouchArea {
         if show-number: number-badge := Badge {
             y: (parent.height - self.height) / 2;
             background: color;
-            text-color: Data.theme.palette.bg;
+            text-color: Data.theme.palette.base;
             border-color: color;
             text: index + 1;
             visible: index >= 0;
@@ -93,7 +93,7 @@ component PackageEditorPanelListItem inherits TouchArea {
                 y: 0;
                 width: 100%;
                 height: 100%;
-                color: Data.theme.palette.fg-placeholder;
+                color: Data.theme.palette.control-text-muted;
                 horizontal-alignment: left;
                 vertical-alignment: center;
                 // Hack to avoid layout change on highlight change.
@@ -124,7 +124,7 @@ component PackageEditorPanelListItem inherits TouchArea {
             for checked[idx] in checked-numbers: checked-numbers-btn := Badge {
                 y: (parent.height - self.height) / 2;
                 background: checked ? color.brighter(self.has-hover ? 0.2 : 0) : transparent;
-                text-color: checked ? Data.theme.palette.bg : color;
+                text-color: checked ? Data.theme.palette.base : color;
                 border-color: checked ? self.background : (self.has-hover ? self.text-color-hover : self.text-color);
                 text: idx + 1;
                 clickable: !read-only;

@@ -116,8 +116,8 @@ export component HomeTab inherits Tab {
         if compact-layout: donate-btn-1 := DonateButton { }
 
         if !compact-layout: Rectangle {
-            background: Data.theme.palette.bg3;
-            border-color: Data.theme.palette.bg-border;
+            background: Data.theme.palette.control;
+            border-color: Data.theme.palette.base-border;
             border-width: 1px;
             border-radius: 10px;
 
@@ -130,7 +130,7 @@ export component HomeTab inherits Tab {
                     font-size: 14px;
                     font-italic: true;
                     wrap: word-wrap;
-                    color: Data.theme.palette.fg;
+                    color: Data.theme.palette.base-text;
                     text: @tr("Support the LibrePCB project with a donation to keep the development and maintenance ongoing ‒ Thank you!");
                 }
 

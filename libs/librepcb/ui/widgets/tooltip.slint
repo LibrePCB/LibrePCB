@@ -9,7 +9,7 @@ export component ToolTip inherits Rectangle {
 
     width: min(text-txt.preferred-width + (font-size / 2), 800px);
     height: text-txt.height + (font-size / 2);
-    background: Data.theme.palette.tooltip-bg;
+    background: Data.theme.palette.tooltip-base;
     border-color: Data.theme.palette.tooltip-border;
     border-width: 1px;
     border-radius: 5px;
@@ -28,7 +28,7 @@ export component ToolTip inherits Rectangle {
         vertical-alignment: center;
         wrap: word-wrap;
         font-size: font-size;
-        color: Data.theme.palette.tooltip-fg;
+        color: Data.theme.palette.tooltip-text;
         text: {
             shortcut.is-empty ? text : (text + " (" + shortcut + ")")
         };
