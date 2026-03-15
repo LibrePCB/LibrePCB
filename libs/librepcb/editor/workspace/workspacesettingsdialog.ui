@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>704</width>
-    <height>450</height>
+    <height>478</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -26,7 +26,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="generalTab">
       <attribute name="title">
@@ -39,7 +39,7 @@
        <item row="1" column="0">
         <widget class="QLabel" name="label_5">
          <property name="text">
-          <string>Application Language:</string>
+          <string>Language:</string>
          </property>
         </widget>
        </item>
@@ -69,6 +69,7 @@
            <property name="font">
             <font>
              <pointsize>8</pointsize>
+             <italic>true</italic>
             </font>
            </property>
            <property name="text">
@@ -84,7 +85,7 @@
        <item row="2" column="0">
         <widget class="QLabel" name="label_4">
          <property name="text">
-          <string>Default Length Unit:</string>
+          <string>Length Unit:</string>
          </property>
         </widget>
        </item>
@@ -137,6 +138,7 @@
            <property name="font">
             <font>
              <pointsize>8</pointsize>
+             <italic>true</italic>
             </font>
            </property>
            <property name="text">
@@ -177,7 +179,7 @@
          </item>
         </layout>
        </item>
-       <item row="5" column="1">
+       <item row="6" column="1">
         <layout class="QVBoxLayout" name="verticalLayout_8">
          <property name="spacing">
           <number>3</number>
@@ -221,6 +223,7 @@
            <property name="font">
             <font>
              <pointsize>8</pointsize>
+             <italic>true</italic>
             </font>
            </property>
            <property name="text">
@@ -233,7 +236,7 @@
          </item>
         </layout>
        </item>
-       <item row="5" column="0">
+       <item row="6" column="0">
         <widget class="QLabel" name="lblDesktopIntegration">
          <property name="text">
           <string>Desktop Integration:</string>
@@ -243,31 +246,21 @@
        <item row="0" column="0">
         <widget class="QLabel" name="label_16">
          <property name="text">
-          <string>UI Theme:</string>
+          <string>Theme:</string>
          </property>
         </widget>
        </item>
        <item row="0" column="1">
         <widget class="QComboBox" name="cbxUiTheme"/>
        </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="appearanceTab">
-      <attribute name="title">
-       <string>Appearance</string>
-      </attribute>
-      <layout class="QFormLayout" name="formLayout_2">
-       <property name="fieldGrowthPolicy">
-        <enum>QFormLayout::FieldGrowthPolicy::AllNonFixedFieldsGrow</enum>
-       </property>
-       <item row="0" column="0">
+       <item row="5" column="0">
         <widget class="QLabel" name="label_10">
          <property name="text">
           <string>Rendering Method:</string>
          </property>
         </widget>
        </item>
-       <item row="0" column="1">
+       <item row="5" column="1">
         <layout class="QVBoxLayout" name="verticalLayout_4">
          <property name="spacing">
           <number>3</number>
@@ -290,6 +283,12 @@
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
+           <property name="font">
+            <font>
+             <pointsize>8</pointsize>
+             <italic>true</italic>
+            </font>
+           </property>
            <property name="text">
             <string>This setting will be applied only to newly opened windows.</string>
            </property>
@@ -300,14 +299,14 @@
          </item>
         </layout>
        </item>
-       <item row="1" column="0">
+       <item row="7" column="0">
         <widget class="QLabel" name="label">
          <property name="text">
           <string>Dismissed Messages:</string>
          </property>
         </widget>
        </item>
-       <item row="1" column="1">
+       <item row="7" column="1">
         <widget class="QPushButton" name="btnResetDismissedMessages">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -553,7 +552,7 @@
      </widget>
      <widget class="QWidget" name="themesTab">
       <attribute name="title">
-       <string>Themes</string>
+       <string>Color Schemes</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_9">
        <item>
@@ -570,7 +569,7 @@
             </sizepolicy>
            </property>
            <property name="text">
-            <string>Current Theme:</string>
+            <string>Current Color Scheme:</string>
            </property>
           </widget>
          </item>

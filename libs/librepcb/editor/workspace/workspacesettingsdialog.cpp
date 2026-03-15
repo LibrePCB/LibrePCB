@@ -69,7 +69,7 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
   const EditorCommandSet& cmd = EditorCommandSet::instance();
 
   // Initialize UI theme widgets
-  mUi->cbxUiTheme->addItem(tr("Auto"), QString(""));
+  mUi->cbxUiTheme->addItem(tr("Default"), QString(""));
   mUi->cbxUiTheme->addItem(tr("Light"), QString("light"));
   mUi->cbxUiTheme->addItem(tr("Dark"), QString("dark"));
 
