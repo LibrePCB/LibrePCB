@@ -68,6 +68,11 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
 
   const EditorCommandSet& cmd = EditorCommandSet::instance();
 
+  // Initialize UI theme widgets
+  mUi->cbxUiTheme->addItem(tr("Auto"), QString(""));
+  mUi->cbxUiTheme->addItem(tr("Light"), QString("light"));
+  mUi->cbxUiTheme->addItem(tr("Dark"), QString("dark"));
+
   // Initialize application locale widgets
   {
     mUi->cbxAppLocale->addItem(tr("System Language"), QString(""));
@@ -398,6 +403,14 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
   // Connect event handlers
   connect(mUi->buttonBox, &QDialogButtonBox::clicked, this,
           &WorkspaceSettingsDialog::buttonBoxClicked);
+  // Note: UI Theme is the only setting that gets applied immediately on
+  // every change, to have an immediate preview of the selected UI theme.
+  connect(mUi->cbxUiTheme, &QComboBox::currentIndexChanged, this,
+          [this](int i) {
+            if (i >= 0) {
+              mSettings.uiTheme.set(mUi->cbxUiTheme->itemData(i).toString());
+            }
+          });
 }
 
 WorkspaceSettingsDialog::~WorkspaceSettingsDialog() {
@@ -640,8 +653,9 @@ void WorkspaceSettingsDialog::updateDesktopIntegrationStatus() noexcept {
 }
 
 void WorkspaceSettingsDialog::loadSettings() noexcept {
-  // User Name
-  mUi->edtUserName->setText(mSettings.userName.get());
+  // UI Theme
+  mUi->cbxUiTheme->setCurrentIndex(
+      mUi->cbxUiTheme->findData(mSettings.uiTheme.get()));
 
   // Application Locale
   mUi->cbxAppLocale->setCurrentIndex(
@@ -661,6 +675,9 @@ void WorkspaceSettingsDialog::loadSettings() noexcept {
 
   // Use OpenGL
   mUi->cbxUseOpenGl->setChecked(mSettings.useOpenGl.get());
+
+  // User Name
+  mUi->edtUserName->setText(mSettings.userName.get());
 
   // Library Locale Order
   mLibLocaleOrderModel->setValues(mSettings.libraryLocaleOrder.get());
@@ -693,8 +710,7 @@ void WorkspaceSettingsDialog::loadSettings() noexcept {
 
 void WorkspaceSettingsDialog::saveSettings() noexcept {
   try {
-    // User Name
-    mSettings.userName.set(mUi->edtUserName->text().trimmed());
+    // UI Theme is applied immediately, no need to save it again.
 
     // Application Locale
     if (mUi->cbxAppLocale->currentIndex() >= 0) {
@@ -714,6 +730,9 @@ void WorkspaceSettingsDialog::saveSettings() noexcept {
 
     // Use OpenGL
     mSettings.useOpenGl.set(mUi->cbxUseOpenGl->isChecked());
+
+    // User Name
+    mSettings.userName.set(mUi->edtUserName->text().trimmed());
 
     // Library Locale Order
     mSettings.libraryLocaleOrder.set(mLibLocaleOrderModel->getValues());

@@ -229,6 +229,7 @@ export component SchematicTab inherits Tab {
             y: 7px + toolbutton-offset-y;
             width: self.preferred-width;
             height: parent.height - 2 * self.y;
+            alignment: start;
             spacing: 5px;
 
             tool-select-btn := ToolButton {
@@ -245,6 +246,7 @@ export component SchematicTab inherits Tab {
                     cmd: Cmd.tool-wire;
                     icon: @image-url("../../../../../img/actions/draw_wire.png");
                     checked: tabs[index].tool == EditorTool.wire;
+                    is-last: false;
 
                     clicked => {
                         tool-triggered(TabAction.tool-wire);
@@ -256,6 +258,8 @@ export component SchematicTab inherits Tab {
                     icon: @image-url("../../../../../img/actions/draw_bus.png");
                     has-menu: project.buses.length > 0;
                     checked: tabs[index].tool == EditorTool.bus;
+                    is-first: false;
+                    is-last: false;
 
                     clicked => {
                         tool-triggered(TabAction.tool-bus);
@@ -285,6 +289,7 @@ export component SchematicTab inherits Tab {
                 tool-label-btn := ToolButton {
                     cmd: Cmd.tool-label;
                     checked: tabs[index].tool == EditorTool.label;
+                    is-first: false;
 
                     clicked => {
                         tool-triggered(TabAction.tool-label);
@@ -296,6 +301,7 @@ export component SchematicTab inherits Tab {
                 tool-polygon-btn := ToolButton {
                     cmd: Cmd.tool-polygon;
                     checked: tabs[index].tool == EditorTool.polygon;
+                    is-last: false;
 
                     clicked => {
                         tool-triggered(TabAction.tool-polygon);
@@ -305,6 +311,8 @@ export component SchematicTab inherits Tab {
                 tool-text-btn := ToolButton {
                     cmd: Cmd.tool-text;
                     checked: tabs[index].tool == EditorTool.text;
+                    is-first: false;
+                    is-last: false;
 
                     clicked => {
                         tool-triggered(TabAction.tool-text);
@@ -314,6 +322,7 @@ export component SchematicTab inherits Tab {
                 tool-image-btn := ToolButton {
                     cmd: Cmd.tool-image;
                     checked: tabs[index].tool == EditorTool.image;
+                    is-first: false;
 
                     clicked => {
                         tool-triggered(TabAction.tool-image);
@@ -325,6 +334,7 @@ export component SchematicTab inherits Tab {
                 tool-component-btn := ToolButton {
                     cmd: Cmd.tool-component;
                     checked: tabs[index].tool == EditorTool.component;
+                    is-last: !Data.workspace-contains-standard-components;
 
                     clicked => {
                         tool-triggered(TabAction.tool-component);
@@ -341,6 +351,9 @@ export component SchematicTab inherits Tab {
                                 @image-url("../../../../../img/resistor-eu.svg")
                             }
                         }
+                        is-first: false;
+                        is-last: false;
+
                         clicked => {
                             tool-triggered(TabAction.tool-component-resistor);
                         }
@@ -355,6 +368,9 @@ export component SchematicTab inherits Tab {
                                 @image-url("../../../../../img/inductor-eu.svg")
                             }
                         }
+                        is-first: false;
+                        is-last: false;
+
                         clicked => {
                             tool-triggered(TabAction.tool-component-inductor);
                         }
@@ -369,6 +385,9 @@ export component SchematicTab inherits Tab {
                                 @image-url("../../../../../img/capacitor-bipolar-eu.svg")
                             }
                         }
+                        is-first: false;
+                        is-last: false;
+
                         clicked => {
                             tool-triggered(TabAction.tool-component-capacitor-bipolar);
                         }
@@ -383,6 +402,9 @@ export component SchematicTab inherits Tab {
                                 @image-url("../../../../../img/capacitor-unipolar-eu.svg")
                             }
                         }
+                        is-first: false;
+                        is-last: false;
+
                         clicked => {
                             tool-triggered(TabAction.tool-component-capacitor-unipolar);
                         }
@@ -391,6 +413,8 @@ export component SchematicTab inherits Tab {
                     tool-vcc-btn := ToolButton {
                         cmd: Cmd.component-vcc;
                         icon: @image-url("../../../../../img/vcc.svg");
+                        is-first: false;
+                        is-last: false;
 
                         clicked => {
                             tool-triggered(TabAction.tool-component-vcc);
@@ -400,6 +424,7 @@ export component SchematicTab inherits Tab {
                     tool-gnd-btn := ToolButton {
                         cmd: Cmd.component-gnd;
                         icon: @image-url("../../../../../img/gnd.svg");
+                        is-first: false;
 
                         clicked => {
                             tool-triggered(TabAction.tool-component-gnd);

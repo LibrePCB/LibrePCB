@@ -8,10 +8,10 @@ export component PanelHeader inherits Rectangle {
     in property <string> note;
     in property <bool> show-spinner: false;
     in property <bool> highlight: false;
-    property <length> content-height: 25px;
+    property <length> content-height: 24px;
 
-    height: spacing-top + content-height + 1px;
-    //background: Data.theme.palette.bg2;
+    height: spacing-top + content-height + 2px;
+    background: Data.theme.palette.bg2;
 
     // Accessibility
     accessible-role: text;
@@ -19,6 +19,11 @@ export component PanelHeader inherits Rectangle {
 
     VerticalLayout {
         padding-top: spacing-top;
+
+        Rectangle {
+            height: 1px;
+            background: Data.theme.palette.bg-border;
+        }
 
         HorizontalLayout {
             height: content-height;

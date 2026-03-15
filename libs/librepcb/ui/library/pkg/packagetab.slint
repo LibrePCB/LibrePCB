@@ -530,6 +530,7 @@ component PackageEditorTab inherits TouchArea {
         y: 7px + toolbutton-offset-y;
         width: self.preferred-width;
         height: self.preferred-height;
+        alignment: start;
         spacing: 5px;
         visible: !view-3d;
 
@@ -549,6 +550,7 @@ component PackageEditorTab inherits TouchArea {
                 icon: @image-url("../../../../../img/actions/draw_wire.png");
                 checked: tabs[index].tool == EditorTool.line;
                 enabled: footprint-selected && (!read-only);
+                is-last: false;
 
                 clicked => {
                     tool-triggered(TabAction.tool-line);
@@ -559,6 +561,8 @@ component PackageEditorTab inherits TouchArea {
                 cmd: Cmd.tool-rect;
                 checked: tabs[index].tool == EditorTool.rect;
                 enabled: footprint-selected && (!read-only);
+                is-first: false;
+                is-last: false;
 
                 clicked => {
                     tool-triggered(TabAction.tool-rect);
@@ -569,6 +573,8 @@ component PackageEditorTab inherits TouchArea {
                 cmd: Cmd.tool-polygon;
                 checked: tabs[index].tool == EditorTool.polygon;
                 enabled: footprint-selected && (!read-only);
+                is-first: false;
+                is-last: false;
 
                 clicked => {
                     tool-triggered(TabAction.tool-polygon);
@@ -579,6 +585,8 @@ component PackageEditorTab inherits TouchArea {
                 cmd: Cmd.tool-circle;
                 checked: tabs[index].tool == EditorTool.circle;
                 enabled: footprint-selected && (!read-only);
+                is-first: false;
+                is-last: false;
 
                 clicked => {
                     tool-triggered(TabAction.tool-circle);
@@ -589,6 +597,7 @@ component PackageEditorTab inherits TouchArea {
                 cmd: Cmd.tool-arc;
                 checked: tabs[index].tool == EditorTool.arc;
                 enabled: footprint-selected && (!read-only);
+                is-first: false;
 
                 clicked => {
                     tool-triggered(TabAction.tool-arc);
@@ -601,6 +610,7 @@ component PackageEditorTab inherits TouchArea {
                 cmd: Cmd.tool-text;
                 checked: tabs[index].tool == EditorTool.text;
                 enabled: footprint-selected && (!read-only);
+                is-last: false;
 
                 clicked => {
                     tool-triggered(TabAction.tool-text);
@@ -612,6 +622,8 @@ component PackageEditorTab inherits TouchArea {
                 icon: @image-url("../../../../../img/actions/add_name.png");
                 checked: tabs[index].tool == EditorTool.name;
                 enabled: footprint-selected && (!read-only);
+                is-first: false;
+                is-last: false;
 
                 clicked => {
                     tool-triggered(TabAction.tool-name);
@@ -623,6 +635,7 @@ component PackageEditorTab inherits TouchArea {
                 icon: @image-url("../../../../../img/actions/add_value.png");
                 checked: tabs[index].tool == EditorTool.value;
                 enabled: footprint-selected && (!read-only);
+                is-first: false;
 
                 clicked => {
                     tool-triggered(TabAction.tool-value);
@@ -637,6 +650,7 @@ component PackageEditorTab inherits TouchArea {
                 colorize: transparent;
                 checked: tabs[index].tool == EditorTool.pad-tht;
                 enabled: footprint-selected && (!read-only);
+                is-last: false;
 
                 clicked => {
                     tool-triggered(TabAction.tool-pad-tht);
@@ -650,6 +664,7 @@ component PackageEditorTab inherits TouchArea {
                 has-menu: true;
                 checked: tabs[index].tool == EditorTool.pad-smt;
                 enabled: footprint-selected && (!read-only);
+                is-first: false;
 
                 clicked => {
                     tool-triggered(TabAction.tool-pad-smt);

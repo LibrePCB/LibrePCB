@@ -48,6 +48,7 @@
 #include "project/projectreadmerenderer.h"
 #include "project/schematic/schematiceditor.h"
 #include "project/schematic/schematictab.h"
+#include "utils/editortoolbox.h"
 #include "utils/slinthelpers.h"
 #include "utils/standardeditorcommandhandler.h"
 #include "windowsection.h"
@@ -295,6 +296,25 @@ MainWindow::MainWindow(GuiApplication& app,
 
   // Update UI state.
   d.fn_current_tab_changed();
+
+  // Load UI theme.
+  auto loadTheme = [this]() {
+    const QString name = mApp.getWorkspace().getSettings().uiTheme.get();
+    const ui::Themes& themes = mWindow->global<ui::Themes>();
+    const ui::Data& d = mWindow->global<ui::Data>();
+    if (name == "light") {
+      d.set_theme(themes.get_light());
+    } else if (name == "dark") {
+      d.set_theme(themes.get_dark());
+    } else {
+      d.set_theme(EditorToolbox::isWindowBackgroundDark() ? themes.get_dark()
+                                                          : themes.get_light());
+    }
+  };
+  loadTheme();
+  connect(&mApp.getWorkspace().getSettings().uiTheme,
+          &WorkspaceSettingsItem::edited, this, loadTheme,
+          Qt::QueuedConnection);
 
   // Update editor command translations & keyboard shortcuts.
   EditorCommandSetUpdater::update(mWindow->global<ui::EditorCommandSet>());

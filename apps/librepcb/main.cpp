@@ -30,6 +30,7 @@
 #include <librepcb/editor/editorcommandset.h>
 #include <librepcb/editor/guiapplication.h>
 #include <librepcb/editor/project/partinformationprovider.h>
+#include <librepcb/editor/utils/editortoolbox.h>
 #include <librepcb/editor/workspace/initializeworkspacewizard/initializeworkspacewizard.h>
 
 #include <QtConcurrent>
@@ -83,6 +84,7 @@ int main(int argc, char* argv[]) {
   // shown.
   Application::loadBundledFonts();
   Application::setTranslationLocale(QLocale::system());
+  std::ignore = EditorToolbox::isWindowBackgroundDark();
 
   // Clean up old temporary files since at least on Windows this is not done
   // automatically. Let's do it in a thread to avoid delaying application start.
@@ -94,31 +96,8 @@ int main(int argc, char* argv[]) {
 
   // Use Fusion style with custom palette to make the legacy Qt dialogs looking
   // similar to the new Slint UI. Can be removed as soon as no Qt widgets are
-  // used anymore.
-  /*{
-    QPalette palette(QColor("#202020"), QColor("#2a2a2a"));
-    palette.setColor(QPalette::Window, "#2a2a2a");
-    palette.setColor(QPalette::WindowText, "#c4c4c4");
-    palette.setColor(QPalette::Base, "#353535");
-    palette.setColor(QPalette::AlternateBase, "#2e2e2e");
-    palette.setColor(QPalette::ToolTipBase, "#2e2e2e");
-    palette.setColor(QPalette::ToolTipText, "#dedede");
-    palette.setColor(QPalette::Text, "#c4c4c4");
-    palette.setColor(QPalette::PlaceholderText, "#959595");
-    palette.setColor(QPalette::Button, "#202020");
-    palette.setColor(QPalette::ButtonText, "#c4c4c4");
-    palette.setColor(QPalette::Link, "#29d682");
-    palette.setColor(QPalette::LinkVisited, "#29d682");
-    palette.setColor(QPalette::Highlight, "#29d682");
-    palette.setColor(QPalette::HighlightedText, "#161616");
-    palette.setColor(QPalette::Disabled, QPalette::Button, "#1a1a1a");
-    palette.setColor(QPalette::Disabled, QPalette::ButtonText, "#707070");
-    palette.setColor(QPalette::Disabled, QPalette::WindowText, "#707070");
-    palette.setColor(QPalette::Disabled, QPalette::Text, "#707070");
-    palette.setColor(QPalette::Disabled, QPalette::Light, "#707070");
-    app.setStyle("fusion");
-    app.setPalette(palette);
-  }*/
+  // used anymore. The actual palette will be set later.
+  app.setStyle("fusion");
 
   // Start network access manager thread with HTTP cache to avoid extensive
   // requests (e.g. downloading library pictures each time opening the manager).
@@ -310,6 +289,79 @@ static int openWorkspace(FilePath& path) {
   const bool wsContainsNewerFileFormats =
       wizard->getWorkspaceContainsNewerFileFormats();
   wizard.reset();
+
+  // Apply UI theme from workspace settings.
+  // Use Fusion style with custom palette to make the legacy Qt dialogs looking
+  // similar to the new Slint UI. Can be removed as soon as no Qt widgets are
+  // used anymore.
+  auto applyLightTheme = []() {
+    QPalette palette(QColor("#fafafa"), QColor("#ffffff"));
+    palette.setColor(QPalette::Window, "#ffffff");
+    palette.setColor(QPalette::WindowText, "#292929");
+    palette.setColor(QPalette::Base, "#e0e0e0");
+    palette.setColor(QPalette::AlternateBase, "#f0f0f0");
+    palette.setColor(QPalette::ToolTipBase, "#fffbc5");
+    palette.setColor(QPalette::ToolTipText, "#3a3a3a");
+    palette.setColor(QPalette::Text, "#292929");
+    palette.setColor(QPalette::PlaceholderText, "#808080");
+    palette.setColor(QPalette::Button, "#fafafa");
+    palette.setColor(QPalette::ButtonText, "#292929");
+    palette.setColor(QPalette::Link, "#29d682");
+    palette.setColor(QPalette::LinkVisited, "#29d682");
+    palette.setColor(QPalette::Highlight, "#29d682");
+    palette.setColor(QPalette::HighlightedText, "#161616");
+    palette.setColor(QPalette::Disabled, QPalette::Button, "#d0d0d0");
+    palette.setColor(QPalette::Disabled, QPalette::ButtonText, "#b0b0b0");
+    palette.setColor(QPalette::Disabled, QPalette::WindowText, "#b0b0b0");
+    palette.setColor(QPalette::Disabled, QPalette::Text, "#b0b0b0");
+    palette.setColor(QPalette::Disabled, QPalette::Light, "#b0b0b0");
+    qApp->setPalette(palette);
+  };
+  auto applyDarkTheme = []() {
+    QPalette palette(QColor("#202020"), QColor("#2a2a2a"));
+    palette.setColor(QPalette::Window, "#2a2a2a");
+    palette.setColor(QPalette::WindowText, "#c4c4c4");
+    palette.setColor(QPalette::Base, "#353535");
+    palette.setColor(QPalette::AlternateBase, "#2e2e2e");
+    palette.setColor(QPalette::ToolTipBase, "#1a1a1a");
+    palette.setColor(QPalette::ToolTipText, "#d8d8d8");
+    palette.setColor(QPalette::Text, "#c4c4c4");
+    palette.setColor(QPalette::PlaceholderText, "#909090");
+    palette.setColor(QPalette::Button, "#202020");
+    palette.setColor(QPalette::ButtonText, "#c4c4c4");
+    palette.setColor(QPalette::Link, "#29d682");
+    palette.setColor(QPalette::LinkVisited, "#29d682");
+    palette.setColor(QPalette::Highlight, "#29d682");
+    palette.setColor(QPalette::HighlightedText, "#161616");
+    palette.setColor(QPalette::Disabled, QPalette::Button, "#1a1a1a");
+    palette.setColor(QPalette::Disabled, QPalette::ButtonText, "#707070");
+    palette.setColor(QPalette::Disabled, QPalette::WindowText, "#707070");
+    palette.setColor(QPalette::Disabled, QPalette::Text, "#707070");
+    palette.setColor(QPalette::Disabled, QPalette::Light, "#707070");
+    qApp->setPalette(palette);
+  };
+  auto applyUiTheme = [&]() {
+    const QString name = ws.getSettings().uiTheme.get();
+    if (name == "dark") {
+      applyDarkTheme();
+    } else if (name == "light") {
+      applyLightTheme();
+    } else {
+      EditorToolbox::isWindowBackgroundDark() ? applyDarkTheme()
+                                              : applyLightTheme();
+    }
+    QPixmapCache::clear();
+
+    // Force all widgets to update their palette
+    for (QWidget* widget : qApp->allWidgets()) {
+      qApp->style()->unpolish(widget);
+      qApp->style()->polish(widget);
+      widget->update();
+    }
+  };
+  applyUiTheme();
+  QObject::connect(&ws.getSettings().uiTheme, &WorkspaceSettingsItem::edited,
+                   &ws.getSettings().uiTheme, applyUiTheme);
 
   // Now since workspace settings are loaded, switch to the locale defined
   // there (until now, the system locale was used).

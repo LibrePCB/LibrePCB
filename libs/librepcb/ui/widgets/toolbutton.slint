@@ -1,14 +1,7 @@
 import { ToolTip } from "tooltip.slint";
 import { Data, EditorCommand } from "../api.slint";
 
-component ToolButtonBase inherits Rectangle {
-    background: Data.theme.palette.bg2;
-    border-color: Data.theme.palette.bg-border;
-    border-width: 1px;
-    border-radius: 3px;
-}
-
-export component ToolButton inherits ToolButtonBase {
+export component ToolButton inherits Rectangle {
     in property <EditorCommand> cmd;
     in property <image> icon: cmd.icon;
     in property <color> colorize: Data.theme.palette.fg;
@@ -18,6 +11,8 @@ export component ToolButton inherits ToolButtonBase {
     in property <bool> has-menu: false;
     in property <bool> enabled: true;
     in property <bool> checked: false;
+    in property <bool> is-first: true;
+    in property <bool> is-last: true;
     out property <bool> pressed <=> ta.pressed;
 
     callback clicked <=> ta.clicked;
@@ -34,7 +29,12 @@ export component ToolButton inherits ToolButtonBase {
             Data.theme.palette.bg3;
         }
     };
+    border-color: Data.theme.palette.bg-border;
     border-width: (checked || ta.pressed) ? 0 : 1px;
+    border-top-left-radius: is-first ? 3px : 0;
+    border-top-right-radius: self.border-top-left-radius;
+    border-bottom-left-radius: is-last ? 3px : 0;
+    border-bottom-right-radius: has-menu ? 0 : self.border-bottom-left-radius;
 
     // Accessibility
     accessible-role: button;
@@ -68,8 +68,8 @@ export component ToolButton inherits ToolButtonBase {
         }
 
         if has-menu: Rectangle {
-            x: parent.width - self.width;
-            y: parent.height - self.height;
+            x: parent.width - self.width - 1px;
+            y: parent.height - self.height - 1px;
             width: 7px;
             height: self.width;
 
@@ -103,8 +103,8 @@ export component ToolButton inherits ToolButtonBase {
     }
 }
 
-export component ToolButtonGroup inherits ToolButtonBase {
-    VerticalLayout {
-        @children
-    }
+export component ToolButtonGroup inherits VerticalLayout {
+    spacing: -1px;
+
+    @children
 }

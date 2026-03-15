@@ -25,6 +25,27 @@ export struct Theme {
 }
 
 export global Themes {
+    out property <Theme> light: {
+        palette: {
+            bg: #ffffff,
+            bg2: #f0f0f0,
+            bg3: #fafafa,
+            bg2-hovered: #e8e8e8,
+            bg2-checked: #d0d0d0,
+            bg-border: #d0d0d0,
+            tooltip-bg: #fffbc5,
+            tooltip-fg: #3a3a3a,
+            tooltip-border: #b9b9b9,
+            fg: #292929,
+            fg-placeholder: #808080,
+            fg-disabled: #b0b0b0,
+            fg-hovered: #000000,
+            fg-success: #00d800,
+            fg-warning: #d6c800,
+            fg-error: Colors.red,
+        },
+    };
+
     out property <Theme> dark: {
         palette: {
             bg: #2a2a2a,
@@ -43,27 +64,6 @@ export global Themes {
             fg-success: Colors.lime,
             fg-warning: Colors.yellow,
             fg-error: #ff7070,
-        },
-    };
-
-    out property <Theme> light: {
-        palette: {
-            bg: #ffffff,
-            bg2: #e0e0e0,
-            bg3: #f5f5f5,
-            bg2-hovered: #e8e8e8,
-            bg2-checked: #d0d0d0,
-            bg-border: #d0d0d0,
-            tooltip-bg: #fffbc5,
-            tooltip-fg: #3a3a3a,
-            tooltip-border: #b9b9b9,
-            fg: #292929,
-            fg-placeholder: #808080,
-            fg-disabled: #b0b0b0,
-            fg-hovered: #000000,
-            fg-success: #00d800,
-            fg-warning: #d6c800,
-            fg-error: Colors.red,
         },
     };
 }

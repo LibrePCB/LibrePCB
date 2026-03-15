@@ -150,9 +150,7 @@ component SideBarButton inherits Rectangle {
     }
 }
 
-export component SideBar inherits Rectangle {
-    background: Data.theme.palette.bg2;
-
+export component SideBar {
     function button-clicked(page: PanelPage) {
         if Data.panel-page == page {
             Data.panel-page = PanelPage.none;

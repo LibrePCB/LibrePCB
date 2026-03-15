@@ -18,6 +18,7 @@ import { LibrariesPanel } from "library/librariespanel.slint";
 import { AboutPanel } from "aboutpanel.slint";
 import { WindowSection } from "windowsection.slint";
 import { StatusBar } from "statusbar.slint";
+import { Themes } from "api/themes.slint";
 import {
     Backend,
     Data,
@@ -27,7 +28,7 @@ import {
     Shortcuts,
 } from "api.slint";
 
-export { Backend, Data, Cmd as EditorCommandSet }
+export { Backend, Data, Cmd as EditorCommandSet, Themes }
 
 export component AppWindow inherits Window {
     property <float> panel-width-factor: (Data.sections.length > 1) ? 0.25 : 0.3;
@@ -35,7 +36,7 @@ export component AppWindow inherits Window {
     property <length> actual-panel-width: (Data.panel-page != PanelPage.none) ? panel-width : 0;
 
     title: Data.window-title;
-    background: Data.theme.palette.bg3;
+    background: Data.theme.palette.bg2;
     icon: @image-url("../../../img/app/librepcb.svg");
     default-font-family: "Noto Sans";
     preferred-width: 1024px;
@@ -70,7 +71,7 @@ export component AppWindow inherits Window {
         menubar := MainMenuBar {
             x: 0;
             y: 0;
-            z: 100; // For the tooltips.
+            z: 200; // For the tooltips.
             width: 100%;
             height: 26px;
             window-height: root.height;
@@ -85,9 +86,17 @@ export component AppWindow inherits Window {
             }
         }
 
+        Rectangle {
+            x: 0;
+            y: menubar.height;
+            width: sidebar.width;
+            height: 1px;
+            background: Data.theme.palette.bg-border;
+        }
+
         sidebar := SideBar {
             x: 0px;
-            y: menubar.height;
+            y: menubar.height + 1px;
             z: 90; // For the tooltips.
             width: ((root.width <= 1200px) || (root.height <= 600px)) ? 35px : 45px;
             height: parent.height - self.y - statusbar.height;
@@ -95,23 +104,20 @@ export component AppWindow inherits Window {
 
         Rectangle {
             x: sidebar.width;
+            y: sidebar.y;
             width: 1px;
+            height: sidebar.height;
             background: Data.theme.palette.bg-border;
         }
 
         panel := Rectangle {
             x: sidebar.width + 1px;
-            y: sidebar.y;
+            y: sidebar.y - 1px;
             z: 80; // For the tooltips.
             width: panel-width;
-            height: sidebar.height - 1px;
+            height: sidebar.height;
+            background: Data.theme.palette.bg3;
             visible: Data.panel-page != PanelPage.none;
-
-            Rectangle {
-                y: 0;
-                height: 1px;
-                background: Data.theme.palette.bg-border;
-            }
 
             if Data.panel-page == PanelPage.home: home-panel := HomePanel { }
 
@@ -134,7 +140,7 @@ export component AppWindow inherits Window {
 
         HorizontalLayout {
             x: panel.x + actual-panel-width;
-            y: sidebar.y;
+            y: sidebar.y - 1px;
             width: parent.width - self.x;
             height: sidebar.height;
 
@@ -158,6 +164,12 @@ export component AppWindow inherits Window {
             }
         }
 
+        Rectangle {
+            y: statusbar.y - 1px;
+            height: 1px;
+            background: Data.theme.palette.bg-border;
+        }
+
         statusbar := StatusBar {
             x: 0;
             y: parent.height - self.height;
@@ -166,13 +178,6 @@ export component AppWindow inherits Window {
             focus-root => {
                 fs.focus();
             }
-        }
-
-        Rectangle {
-            x: sidebar.width;
-            y: statusbar.y - 1px;
-            height: 1px;
-            background: Data.theme.palette.bg-border;
         }
     }
 }

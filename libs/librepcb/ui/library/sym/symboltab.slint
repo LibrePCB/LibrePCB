@@ -407,6 +407,7 @@ component SymbolEditorTab inherits TouchArea {
         y: 7px + toolbutton-offset-y;
         width: self.preferred-width;
         height: parent.height - 2 * self.y;
+        alignment: start;
         spacing: 5px;
 
         tool-select-btn := ToolButton {
@@ -424,6 +425,7 @@ component SymbolEditorTab inherits TouchArea {
                 icon: @image-url("../../../../../img/actions/draw_wire.png");
                 checked: tabs[index].tool == EditorTool.line;
                 enabled: !read-only;
+                is-last: false;
 
                 clicked => {
                     tool-triggered(TabAction.tool-line);
@@ -434,6 +436,8 @@ component SymbolEditorTab inherits TouchArea {
                 cmd: Cmd.tool-rect;
                 checked: tabs[index].tool == EditorTool.rect;
                 enabled: !read-only;
+                is-first: false;
+                is-last: false;
 
                 clicked => {
                     tool-triggered(TabAction.tool-rect);
@@ -444,6 +448,8 @@ component SymbolEditorTab inherits TouchArea {
                 cmd: Cmd.tool-polygon;
                 checked: tabs[index].tool == EditorTool.polygon;
                 enabled: !read-only;
+                is-first: false;
+                is-last: false;
 
                 clicked => {
                     tool-triggered(TabAction.tool-polygon);
@@ -454,6 +460,8 @@ component SymbolEditorTab inherits TouchArea {
                 cmd: Cmd.tool-circle;
                 checked: tabs[index].tool == EditorTool.circle;
                 enabled: !read-only;
+                is-first: false;
+                is-last: false;
 
                 clicked => {
                     tool-triggered(TabAction.tool-circle);
@@ -464,6 +472,7 @@ component SymbolEditorTab inherits TouchArea {
                 cmd: Cmd.tool-arc;
                 checked: tabs[index].tool == EditorTool.arc;
                 enabled: !read-only;
+                is-first: false;
 
                 clicked => {
                     tool-triggered(TabAction.tool-arc);
@@ -476,6 +485,7 @@ component SymbolEditorTab inherits TouchArea {
                 cmd: Cmd.tool-text;
                 checked: tabs[index].tool == EditorTool.text;
                 enabled: !read-only;
+                is-last: false;
 
                 clicked => {
                     tool-triggered(TabAction.tool-text);
@@ -487,6 +497,8 @@ component SymbolEditorTab inherits TouchArea {
                 icon: @image-url("../../../../../img/actions/add_name.png");
                 checked: tabs[index].tool == EditorTool.name;
                 enabled: !read-only;
+                is-first: false;
+                is-last: false;
 
                 clicked => {
                     tool-triggered(TabAction.tool-name);
@@ -498,6 +510,7 @@ component SymbolEditorTab inherits TouchArea {
                 icon: @image-url("../../../../../img/actions/add_value.png");
                 checked: tabs[index].tool == EditorTool.value;
                 enabled: !read-only;
+                is-first: false;
 
                 clicked => {
                     tool-triggered(TabAction.tool-value);
