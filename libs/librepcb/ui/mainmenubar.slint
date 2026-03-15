@@ -1934,7 +1934,7 @@ export component MainMenuBar {
 
         // In preview mode, provide a button to switch theme. This is handy
         // during development, to quickly review the UI in both themes.
-        if Data.preview-mode: MenuBarButton {
+        /*if Data.preview-mode:*/ MenuBarButton {
             property <bool> is-dark: Data.theme == Themes.dark;
 
             y: (parent.height - self.height) / 2;

@@ -70,18 +70,22 @@ public:
       QFile file(mFilePath);
       if (file.open(QFile::ReadOnly)) {
         mSvgContent = file.readAll();
-        mSvgContent.replace("fill=\"currentColor\"", "");  // Bootstrap Icons
-        mSvgContent.replace("<svg ", "<svg fill=\"#C4C4C4\" ");  // Font Awesome
+        //mSvgContent.replace("fill=\"currentColor\"", "");  // Bootstrap Icons
+        mSvgContent.replace("<svg ", "<svg fill=\"currentColor\" ");  // Font Awesome
       }
       mFilePath.clear();
     }
 
-    QByteArray content = mSvgContent;
+    const QPalette palette = qApp->palette();
+    QColor color = palette.color(QPalette::Text);
     if ((mode == QIcon::Mode::Active) || (mode == QIcon::Mode::Selected)) {
-      content.replace("<svg fill=\"#C4C4C4\" ", "<svg fill=\"#303030\" ");
+      color = palette.color(QPalette::HighlightedText);
     } else if (mode == QIcon::Mode::Disabled) {
-      content.replace("<svg fill=\"#C4C4C4\" ", "<svg fill=\"#707070\" ");
+      color = palette.color(QPalette::Disabled, QPalette::Text);
     }
+
+    QByteArray content = mSvgContent;
+    content.replace("<svg fill=\"currentColor\" ", QString("<svg fill=\"%1\" ").arg(color.name()).toUtf8());
 
     QSvgRenderer renderer(content);
     const QSize svgSize = renderer.defaultSize().scaled(

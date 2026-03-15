@@ -119,7 +119,7 @@ component SideBarButton inherits Rectangle {
         width: (emblem == Emblem.running) ? self.height : max(status-txt.preferred-width + 8px, self.height);
         height: status-txt.preferred-height + 2px;
         border-radius: self.height / 2;
-        background: (emblem == Emblem.running) ? yellow : status-background;
+        background: (emblem == Emblem.running) ? Data.theme.palette.fg-warning : status-background;
 
         status-txt := Text {
             function get-progress-dots() -> string {
@@ -136,7 +136,7 @@ component SideBarButton inherits Rectangle {
             y: (parent.height - self.height) / 2 + 1px;
             font-size: (root.width < 40px) ? 8px : 10px;
             font-weight: 700;
-            color: (emblem == Emblem.running) ? gray : status-color;
+            color: (emblem == Emblem.running) ? Data.theme.palette.bg : status-color;
             text: (emblem == Emblem.running) ? get-progress-dots() : status;
             accessible-role: none;
         }
@@ -228,8 +228,8 @@ export component SideBar {
                 unplaced-components when tab.unplaced-components.length > 0: {
                     emblem: Emblem.none;
                     status: tab.unplaced-components.length;
-                    status-color: black;
-                    status-background: yellow;
+                    status-color: Data.theme.palette.bg;
+                    status-background: Data.theme.palette.fg-warning;
                 }
                 up-to-date when tab.unplaced-components.length == 0: {
                     emblem: Emblem.ok;
@@ -275,20 +275,20 @@ export component SideBar {
                 not-run-yet when check.state == RuleCheckState.not-run-yet: {
                     emblem: Emblem.none;
                     status: "?";
-                    status-color: black;
-                    status-background: #d4d4d4;
+                    status-color: Data.theme.palette.fg;
+                    status-background: Data.theme.palette.bg.mix(Data.theme.palette.fg, 0.6);
                 }
                 outdated when check.state == RuleCheckState.outdated: {
                     emblem: Emblem.none;
                     status: check.unapproved;
-                    status-color: black;
-                    status-background: #d4d4d4;
+                    status-color: Data.theme.palette.fg;
+                    status-background: Data.theme.palette.bg.mix(Data.theme.palette.fg, 0.6);
                 }
                 up-to-date when (check.state == RuleCheckState.up-to-date) && (check.unapproved != 0): {
                     emblem: Emblem.none;
                     status: check.unapproved;
-                    status-color: black;
-                    status-background: #ff0000;
+                    status-color: Data.theme.palette.bg;
+                    status-background: Data.theme.palette.fg-error;
                 }
                 up-to-date when (check.state == RuleCheckState.up-to-date) && (check.unapproved == 0): {
                     emblem: Emblem.ok;
@@ -368,14 +368,14 @@ export component SideBar {
                 outdated when Data.remote-libraries-data.outdated > 0: {
                     emblem: Emblem.none;
                     status: Data.remote-libraries-data.outdated;
-                    status-color: black;
-                    status-background: #d4d400;
+                    status-color: Data.theme.palette.bg;
+                    status-background: Data.theme.palette.fg-warning;
                 }
                 no-libraries when (Data.local-libraries-data.count == 0) && (Data.remote-libraries-data.installed == 0): {
                     emblem: Emblem.none;
                     status: "0";
-                    status-color: black;
-                    status-background: #d4d400;
+                    status-color: Data.theme.palette.bg;
+                    status-background: Data.theme.palette.fg-warning;
                 }
                 up-to-date when Data.remote-libraries-data.all-up-to-date: {
                     emblem: Emblem.ok;

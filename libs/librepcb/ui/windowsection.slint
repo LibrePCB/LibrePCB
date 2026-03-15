@@ -71,9 +71,9 @@ component TabButton inherits Rectangle {
         if is-current-tab {
             Data.theme.palette.bg
         } else if ta.has-hover {
-            Data.theme.palette.bg.mix(Data.theme.palette.bg3, 0.5)
-        } else {
             Data.theme.palette.bg3
+        } else {
+            Data.theme.palette.bg2
         }
     };
 
@@ -118,14 +118,14 @@ component TabButton inherits Rectangle {
         Image {
             width: 16px;
             source: Helpers.get-icon-for-tab-type(tab.type);
-            colorize: is-current-tab ? Data.theme.palette.fg : Data.theme.palette.fg-placeholder;
+            colorize: Data.theme.palette.fg;
             accessible-role: none;
         }
 
         if !tab.title.is-empty: txt := Text {
             min-width: 0;
             vertical-alignment: center;
-            color: is-current-tab ? Data.theme.palette.fg : Data.theme.palette.fg-placeholder;
+            color: Data.theme.palette.fg;
             text: tab.title;
             overflow: elide;
             accessible-role: none;

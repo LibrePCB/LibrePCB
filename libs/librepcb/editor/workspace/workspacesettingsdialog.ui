@@ -26,7 +26,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="generalTab">
       <attribute name="title">
@@ -65,6 +65,11 @@
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>8</pointsize>
+            </font>
            </property>
            <property name="text">
             <string>Changing the language requires to restart the application.</string>
@@ -128,6 +133,11 @@
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>8</pointsize>
+            </font>
            </property>
            <property name="text">
             <string>This name will be used as author when creating new projects or libraries.</string>
@@ -208,6 +218,11 @@
          </item>
          <item>
           <widget class="QLabel" name="label_20">
+           <property name="font">
+            <font>
+             <pointsize>8</pointsize>
+            </font>
+           </property>
            <property name="text">
             <string>Adds LibrePCB to the start menu and registers the *.lpp file extension.</string>
            </property>

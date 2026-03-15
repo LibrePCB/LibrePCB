@@ -109,7 +109,7 @@ export component LineEdit inherits Rectangle {
     }
 
     placeholder-txt := Text {
-        x: 5px;
+        x: 5px + (root.border-radius / 2);
         width: root.width - 2 * self.x;
         font-size: font-size;
         color: enabled ? Data.theme.palette.fg-placeholder : Data.theme.palette.fg-disabled;

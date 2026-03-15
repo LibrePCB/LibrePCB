@@ -296,15 +296,15 @@ static int openWorkspace(FilePath& path) {
   // used anymore.
   auto applyLightTheme = []() {
     QPalette palette(QColor("#fafafa"), QColor("#ffffff"));
-    palette.setColor(QPalette::Window, "#ffffff");
+    palette.setColor(QPalette::Window, "#e0e0e0");
     palette.setColor(QPalette::WindowText, "#292929");
-    palette.setColor(QPalette::Base, "#e0e0e0");
+    palette.setColor(QPalette::Base, "#f0f0f0");
     palette.setColor(QPalette::AlternateBase, "#f0f0f0");
     palette.setColor(QPalette::ToolTipBase, "#fffbc5");
     palette.setColor(QPalette::ToolTipText, "#3a3a3a");
     palette.setColor(QPalette::Text, "#292929");
     palette.setColor(QPalette::PlaceholderText, "#808080");
-    palette.setColor(QPalette::Button, "#fafafa");
+    palette.setColor(QPalette::Button, "#ffffff");
     palette.setColor(QPalette::ButtonText, "#292929");
     palette.setColor(QPalette::Link, "#29d682");
     palette.setColor(QPalette::LinkVisited, "#29d682");
