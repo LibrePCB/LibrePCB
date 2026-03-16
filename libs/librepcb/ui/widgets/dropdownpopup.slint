@@ -1,5 +1,4 @@
 import { ScrollView } from "scrollview.slint";
-import { Text } from "text.slint";
 import { Data } from "../api.slint";
 
 export component DropDownPopup inherits PopupWindow {
@@ -57,8 +56,8 @@ export component DropDownPopup inherits PopupWindow {
     }
 
     Rectangle {
-        background: Data.theme.palette.base;
-        border-color: Data.theme.palette.base-border;
+        background: Data.theme.palette.control;
+        border-color: Data.theme.palette.control-border;
         border-width: 1px;
 
         view := ScrollView {
@@ -109,6 +108,7 @@ export component DropDownPopup inherits PopupWindow {
                             item-txt := Text {
                                 font-size: 13px;
                                 font-weight: is-current ? 700 : 400;
+                                color: Data.theme.palette.base-text;
                                 overflow: elide;
                                 vertical-alignment: center;
                                 text: item;
@@ -118,7 +118,7 @@ export component DropDownPopup inherits PopupWindow {
                             if index == default-index: Text {
                                 width: self.preferred-width;
                                 font-size: 10px;
-                                color: item-txt.color;
+                                color: Data.theme.palette.base-text-disabled;
                                 vertical-alignment: center;
                                 text: @tr("default").to-lowercase();
                             }

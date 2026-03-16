@@ -1,0 +1,568 @@
+import {
+    Button,
+    CheckBox,
+    IconButton,
+    LineEdit,
+    AngleEdit,
+    Switch,
+    ComboBox,
+    LinkText,
+    LengthEdit,
+    ProgressBar,
+    Text,
+} from "widgets.slint";
+import { Tab } from "tab.slint";
+import { Data } from "api.slint";
+
+component TextGallery inherits Rectangle {
+    border-color: Data.theme.palette.base-border;
+    border-width: 1px;
+
+    VerticalLayout {
+        alignment: start;
+        padding: 5px;
+
+        Text {
+            text: "base-text-disabled";
+            color: Data.theme.palette.base-text-disabled;
+        }
+
+        Text {
+            text: "base-text-muted";
+            color: Data.theme.palette.base-text-muted;
+        }
+
+        Text {
+            text: "base-text";
+            color: Data.theme.palette.base-text;
+        }
+
+        Text {
+            text: "base-text-hovered";
+            color: Data.theme.palette.base-text-hovered;
+        }
+
+        Text {
+            text: "base-text-success";
+            color: Data.theme.palette.base-text-success;
+        }
+
+        Text {
+            text: "base-text-warning";
+            color: Data.theme.palette.base-text-warning;
+        }
+
+        Text {
+            text: "base-text-error";
+            color: Data.theme.palette.base-text-error;
+        }
+    }
+}
+
+component GalleryControl inherits Rectangle {
+    in property <string> text;
+    in property <color> text-color: Data.theme.palette.control-text;
+    in property <bool> show-selected: false;
+
+    background: Data.theme.palette.control;
+    border-color: Data.theme.palette.control-border;
+    border-width: 1px;
+
+    HorizontalLayout {
+        alignment: start;
+        padding: 5px;
+        spacing: 5px;
+
+        Text {
+            text: text;
+            color: text-color;
+        }
+
+        if show-selected: Rectangle {
+            preferred-width: t.preferred-width + 6px;
+            background: Data.theme.palette.selection;
+
+            t := Text {
+                text: "Selected";
+                color: Data.theme.palette.selection-text;
+            }
+        }
+    }
+}
+
+component ControlGallery inherits Rectangle {
+    VerticalLayout {
+        alignment: start;
+        spacing: 5px;
+
+        GalleryControl {
+            text: "control-disabled";
+            text-color: Data.theme.palette.control-text-disabled;
+            background: Data.theme.palette.control-disabled;
+            border-color: Data.theme.palette.control-border-disabled;
+        }
+
+        GalleryControl {
+            text: "control-muted";
+            text-color: Data.theme.palette.control-text-muted;
+            background: Data.theme.palette.control;
+            border-color: Data.theme.palette.control-border;
+        }
+
+        GalleryControl {
+            text: "control";
+            text-color: Data.theme.palette.control-text;
+            background: Data.theme.palette.control;
+            border-color: Data.theme.palette.control-border;
+            show-selected: true;
+        }
+
+        GalleryControl {
+            text: "control-focused";
+            text-color: Data.theme.palette.control-text;
+            background: Data.theme.palette.control;
+            border-color: Data.theme.palette.accent;
+        }
+
+        GalleryControl {
+            text: "control-error";
+            text-color: Data.theme.palette.control-text;
+            background: Data.theme.palette.control;
+            border-color: Data.theme.palette.base-text-error;
+        }
+
+        GalleryControl {
+            text: "control-hovered";
+            text-color: Data.theme.palette.control-text;
+            background: Data.theme.palette.control-hovered;
+            border-color: Data.theme.palette.control-border;
+        }
+
+        GalleryControl {
+            text: "control-checked";
+            text-color: Data.theme.palette.control-text;
+            background: Data.theme.palette.control-checked;
+            border-color: Data.theme.palette.control-border;
+        }
+
+        GalleryControl {
+            text: "accent";
+            text-color: Data.theme.palette.accent-text;
+            background: Data.theme.palette.accent;
+            border-color: Data.theme.palette.control-border;
+        }
+
+        GalleryControl {
+            text: "info";
+            text-color: Data.theme.palette.info-text;
+            background: Data.theme.palette.info;
+            border-color: Data.theme.palette.base-border;
+        }
+
+        GalleryControl {
+            text: "warning";
+            text-color: Data.theme.palette.warning-text;
+            background: Data.theme.palette.warning;
+            border-color: Data.theme.palette.base-border;
+        }
+
+        GalleryControl {
+            text: "error";
+            text-color: Data.theme.palette.error-text;
+            background: Data.theme.palette.error;
+            border-color: Data.theme.palette.base-border;
+        }
+    }
+}
+
+component ToolTipGallery inherits Rectangle {
+    background: Data.theme.palette.tooltip;
+    border-color: Data.theme.palette.tooltip-border;
+    border-width: 1px;
+    border-radius: 5px;
+
+    HorizontalLayout {
+        padding: 5px;
+
+        Text {
+            text: "ToolTip";
+            color: Data.theme.palette.tooltip-text;
+        }
+    }
+}
+
+component ButtonGallery inherits VerticalLayout {
+    spacing: 5px;
+
+    Button {
+        text: "disabled";
+        icon: @image-url("../../font-awesome/svgs/regular/face-smile.svg");
+        enabled: false;
+        primary: false;
+    }
+
+    Button {
+        text: "disabled primary";
+        icon: @image-url("../../font-awesome/svgs/regular/face-smile.svg");
+        enabled: false;
+        primary: true;
+    }
+
+    Button {
+        text: "normal";
+        icon: @image-url("../../font-awesome/svgs/regular/face-smile.svg");
+        enabled: true;
+        primary: false;
+    }
+
+    Button {
+        text: "only text";
+        enabled: true;
+        primary: false;
+    }
+
+    Button {
+        text: "primary";
+        icon: @image-url("../../font-awesome/svgs/regular/face-smile.svg");
+        enabled: true;
+        primary: true;
+    }
+}
+
+component LineEditGallery inherits VerticalLayout {
+    spacing: 5px;
+
+    LineEdit {
+        z: 100;
+        text: "disabled";
+        placeholder-text: "placeholder";
+        validation-error: "";
+        enabled: false;
+        read-only: false;
+        show-clear-button: true;
+        autocompletions: ["Autocompletion 1", "Autocompletion 2"];
+        suggestions: ["Suggestion 1", "Suggestion 2"];
+    }
+
+    LineEdit {
+        z: 95;
+        text: "disabled validation error";
+        placeholder-text: "placeholder";
+        validation-error: "validation error";
+        enabled: false;
+        read-only: false;
+        show-clear-button: true;
+        autocompletions: ["Autocompletion 1", "Autocompletion 2"];
+        suggestions: ["Suggestion 1", "Suggestion 2"];
+    }
+
+    LineEdit {
+        z: 90;
+        text: "read-only";
+        placeholder-text: "placeholder";
+        validation-error: "";
+        enabled: true;
+        read-only: true;
+        show-clear-button: true;
+        autocompletions: ["Autocompletion 1", "Autocompletion 2"];
+        suggestions: ["Suggestion 1", "Suggestion 2"];
+    }
+
+    LineEdit {
+        z: 85;
+        text: "read-only validation error";
+        placeholder-text: "placeholder";
+        validation-error: "validation error";
+        enabled: true;
+        read-only: true;
+        show-clear-button: true;
+        autocompletions: ["Autocompletion 1", "Autocompletion 2"];
+        suggestions: ["Suggestion 1", "Suggestion 2"];
+    }
+
+    LineEdit {
+        z: 80;
+        text: "";
+        placeholder-text: "placeholder";
+        validation-error: "";
+        enabled: true;
+        read-only: false;
+        show-clear-button: true;
+        autocompletions: ["Autocompletion 1", "Autocompletion 2"];
+        suggestions: ["Suggestion 1", "Suggestion 2"];
+    }
+
+    LineEdit {
+        z: 75;
+        text: "normal";
+        placeholder-text: "";
+        validation-error: "";
+        enabled: true;
+        read-only: false;
+        show-clear-button: false;
+        autocompletions: [];
+        suggestions: [];
+    }
+
+    LineEdit {
+        z: 70;
+        text: "all features";
+        placeholder-text: "placeholder";
+        validation-error: "";
+        enabled: true;
+        read-only: false;
+        show-clear-button: true;
+        autocompletions: ["Autocompletion 1", "Autocompletion 2"];
+        suggestions: ["Suggestion 1", "Suggestion 2"];
+    }
+
+    LineEdit {
+        z: 65;
+        text: "validation error";
+        placeholder-text: "placeholder";
+        validation-error: "validation error";
+        enabled: true;
+        read-only: false;
+        show-clear-button: true;
+        autocompletions: ["Autocompletion 1", "Autocompletion 2"];
+        suggestions: ["Suggestion 1", "Suggestion 2"];
+    }
+
+    LineEdit {
+        z: 60;
+        text: "has-error";
+        placeholder-text: "placeholder";
+        validation-error: "";
+        enabled: true;
+        read-only: false;
+        show-clear-button: true;
+        has-error: true;
+        autocompletions: ["Autocompletion 1", "Autocompletion 2"];
+        suggestions: ["Suggestion 1", "Suggestion 2"];
+    }
+
+    AngleEdit {
+        height: self.preferred-height;
+        enabled: false;
+    }
+
+    AngleEdit {
+        height: self.preferred-height;
+        enabled: true;
+    }
+
+    LengthEdit {
+        height: self.preferred-height;
+        icon: @image-url("../../font-awesome/svgs/regular/face-smile.svg");
+        enabled: false;
+        can-increase: false;
+        can-decrease: false;
+        can-change-unit: false;
+        auto-supported: false;
+        auto-checked: false;
+        has-dropdown: false;
+    }
+
+    LengthEdit {
+        height: self.preferred-height;
+        icon: @image-url("../../font-awesome/svgs/regular/face-smile.svg");
+        enabled: false;
+        can-increase: true;
+        can-decrease: false;
+        can-change-unit: true;
+        auto-supported: true;
+        auto-checked: true;
+        has-dropdown: true;
+    }
+
+    LengthEdit {
+        height: self.preferred-height;
+        icon: @image-url("../../font-awesome/svgs/regular/face-smile.svg");
+        enabled: true;
+        can-increase: true;
+        can-decrease: false;
+        can-change-unit: false;
+        auto-supported: false;
+        auto-checked: false;
+        has-dropdown: false;
+    }
+
+    LengthEdit {
+        height: self.preferred-height;
+        icon: @image-url("../../font-awesome/svgs/regular/face-smile.svg");
+        enabled: true;
+        can-increase: false;
+        can-decrease: false;
+        can-change-unit: true;
+        auto-supported: true;
+        auto-checked: false;
+        has-dropdown: false;
+    }
+
+    LengthEdit {
+        height: self.preferred-height;
+        icon: @image-url("../../font-awesome/svgs/regular/face-smile.svg");
+        enabled: true;
+        can-increase: true;
+        can-decrease: false;
+        can-change-unit: true;
+        auto-supported: true;
+        auto-checked: true;
+        has-dropdown: true;
+    }
+}
+
+component Gallery inherits Rectangle {
+    in property <string> title;
+
+    border-color: Data.theme.palette.base-border;
+    border-width: 1px;
+
+    VerticalLayout {
+        alignment: start;
+        padding: 5px;
+
+        Text {
+            text: title;
+            color: Data.theme.palette.base-text;
+            horizontal-alignment: center;
+        }
+
+        HorizontalLayout {
+            alignment: start;
+            spacing: 5px;
+
+            VerticalLayout {
+                alignment: start;
+                spacing: 5px;
+
+                TextGallery { }
+
+                ControlGallery { }
+
+                ToolTipGallery { }
+            }
+
+            VerticalLayout {
+                alignment: start;
+                spacing: 5px;
+
+                ButtonGallery { }
+
+                LineEditGallery { }
+
+                ComboBox {
+                    model: ["Foo", "Bar"];
+                    current-index: 0;
+                    default-index: 1;
+                    enabled: false;
+                    read-only: false;
+                }
+
+                ComboBox {
+                    model: ["Foo", "Bar"];
+                    current-index: 0;
+                    default-index: 1;
+                    enabled: true;
+                    read-only: true;
+                }
+
+                ComboBox {
+                    model: ["Foo", "Bar"];
+                    current-index: 0;
+                    default-index: 1;
+                    enabled: true;
+                    read-only: false;
+                }
+
+                ProgressBar {
+                    progress: 0.3;
+                }
+
+                CheckBox {
+                    text: "disabled";
+                    enabled: false;
+                    read-only: false;
+                    checked: false;
+                }
+
+                CheckBox {
+                    text: "disabled checked";
+                    enabled: false;
+                    read-only: false;
+                    checked: true;
+                }
+
+                CheckBox {
+                    text: "read-only";
+                    enabled: true;
+                    read-only: true;
+                    checked: false;
+                }
+
+                CheckBox {
+                    text: "read-only checked";
+                    enabled: true;
+                    read-only: true;
+                    checked: true;
+                }
+
+                CheckBox {
+                    text: "enabled";
+                    enabled: true;
+                    read-only: false;
+                    checked: false;
+                }
+
+                CheckBox {
+                    text: "enabled checked";
+                    enabled: true;
+                    read-only: false;
+                    checked: true;
+                }
+
+                Switch {
+                    text: "disabled";
+                    enabled: false;
+                    checked: false;
+                }
+
+                Switch {
+                    text: "disabled checked";
+                    enabled: false;
+                    checked: true;
+                }
+
+                Switch {
+                    text: "enabled";
+                    enabled: true;
+                    checked: false;
+                }
+
+                Switch {
+                    text: "enabled checked";
+                    enabled: true;
+                    checked: true;
+                }
+            }
+        }
+    }
+}
+
+export component ControlsGalleryTab inherits Tab {
+    HorizontalLayout {
+        alignment: start;
+        padding: 8px;
+        spacing: 5px;
+
+        Gallery {
+            title: "WINDOW";
+            background: Data.theme.palette.window;
+        }
+
+        Gallery {
+            title: "BASE";
+            background: Data.theme.palette.base;
+        }
+    }
+}

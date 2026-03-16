@@ -1,4 +1,4 @@
-import { IconButton } from "iconbutton.slint";
+import { ControlIconButton } from "iconbutton.slint";
 import { ToolTip } from "tooltip.slint";
 import { TextInput } from "textinput.slint";
 import {
@@ -60,7 +60,7 @@ export component AngleEdit inherits Rectangle {
     }
 
     preferred-height: 25px;
-    background: Data.theme.palette.control;
+    background: enabled ? Data.theme.palette.control : Data.theme.palette.control-disabled;
     border-color: {
         if !enabled {
             Data.theme.palette.control-border-disabled
@@ -71,7 +71,7 @@ export component AngleEdit inherits Rectangle {
                 Data.theme.palette.accent
             }
         } else if !parse-result.valid {
-            Data.theme.palette.control-border.mix(Data.theme.palette.base-text-error, 0.7)
+            Data.theme.palette.control-border.mix(Data.theme.palette.base-text-error, 0.6)
         } else {
             Data.theme.palette.control-border
         }
@@ -104,7 +104,7 @@ export component AngleEdit inherits Rectangle {
             if icon.width > 0: Image {
                 width: 12px;
                 image-fit: contain;
-                colorize: enabled ? Data.theme.palette.control-text : Data.theme.palette.control-text-disabled;
+                colorize: edt.color;
                 source: icon;
                 accessible-role: none;
             }
@@ -164,7 +164,7 @@ export component AngleEdit inherits Rectangle {
             }
 
             VerticalLayout {
-                up-btn := IconButton {
+                up-btn := ControlIconButton {
                     width: 15px;
                     enabled: enabled;
                     icon: @image-url("../../../font-awesome/svgs/solid/caret-up.svg");
@@ -177,7 +177,7 @@ export component AngleEdit inherits Rectangle {
                     }
                 }
 
-                down-btn := IconButton {
+                down-btn := ControlIconButton {
                     width: 15px;
                     enabled: enabled;
                     icon: @image-url("../../../font-awesome/svgs/solid/caret-down.svg");

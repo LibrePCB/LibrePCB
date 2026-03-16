@@ -252,21 +252,24 @@ component LibraryListViewItem inherits Rectangle {
 
                 states [
                     install when lib.installed-version.is-empty && lib.checked: {
-                        border-color: Data.theme.palette.base-text-success;
-                        checked-color: Data.theme.palette.base-text-success;
+                        border-color: Data.theme.palette.accent;
+                        checked-color: Data.theme.palette.accent;
+                        checked-knob-color: Data.theme.palette.accent-text;
                     }
                     update when (!lib.installed-version.is-empty) && lib.outdated && lib.checked: {
-                        border-color: Data.theme.palette.base-text-warning;
-                        checked-color: Data.theme.palette.base-text-warning;
+                        border-color: Data.theme.palette.info;
+                        checked-color: Data.theme.palette.info;
+                        checked-knob-color: Data.theme.palette.info-text;
                     }
                     uninstall when (!lib.installed-version.is-empty) && (!lib.checked): {
-                        border-color: Data.theme.palette.base-text-error;
-                        unchecked-color: Data.theme.palette.base-text-error;
+                        border-color: Data.theme.palette.error;
+                        unchecked-color: Data.theme.palette.error;
+                        unchecked-knob-color: Data.theme.palette.error-text;
                     }
                     unchanged when (!lib.outdated) && (lib.installed-version.is-empty != lib.checked): {
-                        border-color: self.checked ? self.checked-color : self.unchecked-color;
+                        border-color: self.checked ? self.checked-color : Data.theme.palette.control-border;
                         checked-color: Data.theme.palette.accent;
-                        unchecked-color: Data.theme.palette.control-text-muted;
+                        unchecked-color: Data.theme.palette.control-checked;
                     }
                 ]
 
@@ -606,24 +609,27 @@ export component LibrariesPanel inherits VerticalLayout {
                 if Data.remote-libraries-data.pending-installs > 0: pending-installs-badge := Badge {
                     font-weight: 700;
                     font-size: 12px;
-                    border-width: 1.3px;
-                    text-color: Data.theme.palette.base-text-success;
+                    border-width: 0;
+                    background: Data.theme.palette.accent;
+                    text-color: Data.theme.palette.accent-text;
                     text: "+" + Data.remote-libraries-data.pending-installs;
                 }
 
                 if Data.remote-libraries-data.pending-updates > 0: pending-updates-badge := Badge {
                     font-weight: 700;
                     font-size: 12px;
-                    border-width: 1.3px;
-                    text-color: Data.theme.palette.base-text-warning;
+                    border-width: 0;
+                    background: Data.theme.palette.info;
+                    text-color: Data.theme.palette.info-text;
                     text: "↑" + Data.remote-libraries-data.pending-updates;
                 }
 
                 if Data.remote-libraries-data.pending-uninstalls > 0: pending-uninstalls-badge := Badge {
                     font-weight: 700;
                     font-size: 12px;
-                    border-width: 1.3px;
-                    text-color: Data.theme.palette.base-text-error;
+                    border-width: 0;
+                    background: Data.theme.palette.error;
+                    text-color: Data.theme.palette.error-text;
                     text: "–" + Data.remote-libraries-data.pending-uninstalls;
                 }
             }

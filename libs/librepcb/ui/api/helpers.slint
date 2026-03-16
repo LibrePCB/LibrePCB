@@ -169,7 +169,9 @@ export global Helpers {
     }
 
     pure public function get-icon-for-tab-type(t: TabType) -> image {
-        if (t == TabType.home) {
+        if (t == TabType.controls-gallery) {
+            @image-url("../../../bootstrap-icons/icons/sliders.svg")
+        } else if (t == TabType.home) {
             @image-url("../../../bootstrap-icons/icons/house-fill.svg")
         } else if (t == TabType.create-library) {
             @image-url("../../../bootstrap-icons/icons/database-add.svg")

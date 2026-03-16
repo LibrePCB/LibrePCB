@@ -1,5 +1,6 @@
 import { IconButton } from "widgets.slint";
 import { Tab } from "tab.slint";
+import { ControlsGalleryTab } from "controlsgallerytab.slint";
 import { HomeTab } from "hometab.slint";
 import { CreateLibraryTab } from "library/createlibrarytab.slint";
 import { DownloadLibraryTab } from "library/downloadlibrarytab.slint";
@@ -277,6 +278,11 @@ export component WindowSection inherits Rectangle {
 
             if !tab-open: empty-tab := Tab {
                 show-watermark: true;
+            }
+
+            if tab-open && (tab-type == TabType.controls-gallery): ControlsGalleryTab {
+                width: 100%;
+                height: 100%;
             }
 
             if tab-open && (tab-type == TabType.home): home-tab := HomeTab {

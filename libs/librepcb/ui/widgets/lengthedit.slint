@@ -1,4 +1,4 @@
-import { IconButton } from "iconbutton.slint";
+import { ControlIconButton } from "iconbutton.slint";
 import { LinkText } from "linktext.slint";
 import { TextInput } from "textinput.slint";
 import { ToolTip } from "tooltip.slint";
@@ -94,18 +94,22 @@ export component LengthEdit inherits Rectangle {
     }
 
     preferred-height: 25px;
-    background: Data.theme.palette.control;
+    background: enabled ? Data.theme.palette.control : Data.theme.palette.control-disabled;
     border-color: {
-        if enabled && (!parse-result.valid) {
-            edt.has-focus ? #ff0000 : #900000
+        if !enabled {
+            Data.theme.palette.control-border-disabled
         } else if edt.has-focus {
-            Data.theme.palette.accent
-        } else if enabled {
-            Data.theme.palette.base-border
+            if !parse-result.valid {
+                Data.theme.palette.base-text-error
+            } else {
+                Data.theme.palette.accent
+            }
+        } else if !parse-result.valid {
+            Data.theme.palette.control-border.mix(Data.theme.palette.base-text-error, 0.6)
         } else {
-            transparent
+            Data.theme.palette.control-border
         }
-    }
+    };
     border-width: 1px;
     forward-focus: edt;
 
@@ -138,7 +142,7 @@ export component LengthEdit inherits Rectangle {
                     width: 100%;
                     height: self.width;
                     image-fit: contain;
-                    colorize: enabled ? Data.theme.palette.base-text : Data.theme.palette.control-text-disabled;
+                    colorize: enabled ? Data.theme.palette.control-text : Data.theme.palette.control-text-disabled;
                     source: icon;
                     accessible-role: none;
                 }
@@ -151,7 +155,7 @@ export component LengthEdit inherits Rectangle {
 
                     Path {
                         commands: "M 100 0 L 50 40 L 0 0 Z";
-                        fill: enabled ? Data.theme.palette.base-text : Data.theme.palette.control-text-disabled;
+                        fill: enabled ? Data.theme.palette.control-text : Data.theme.palette.control-text-disabled;
                     }
                 }
             }
@@ -168,7 +172,7 @@ export component LengthEdit inherits Rectangle {
                     } else if auto-supported && auto-checked {
                         Data.theme.palette.control-text-muted
                     } else {
-                        Data.theme.palette.base-text
+                        Data.theme.palette.control-text
                     }
                 };
                 enabled: enabled;
@@ -217,11 +221,11 @@ export component LengthEdit inherits Rectangle {
                             decrease-triggered();
                         }
                         return accept;
-                    } else if (event.text == Key.PageUp) && can-change-unit {
+                    } else if (event.text == Key.PageUp) && enabled && can-change-unit {
                         disable-update = false;
                         unit-changed(Helpers.get-previous-unit(unit));
                         return accept;
-                    } else if (event.text == Key.PageDown) && can-change-unit {
+                    } else if (event.text == Key.PageDown) && enabled && can-change-unit {
                         disable-update = false;
                         unit-changed(Helpers.get-next-unit(unit));
                         return accept;
@@ -239,7 +243,7 @@ export component LengthEdit inherits Rectangle {
 
             HorizontalLayout {
                 if can-increase || can-decrease: VerticalLayout {
-                    up-btn := IconButton {
+                    up-btn := ControlIconButton {
                         width: 15px;
                         enabled: enabled && can-increase;
                         icon: @image-url("../../../font-awesome/svgs/solid/caret-up.svg");
@@ -252,7 +256,7 @@ export component LengthEdit inherits Rectangle {
                         }
                     }
 
-                    down-btn := IconButton {
+                    down-btn := ControlIconButton {
                         width: 15px;
                         enabled: enabled && can-decrease;
                         icon: @image-url("../../../font-awesome/svgs/solid/caret-down.svg");
@@ -270,7 +274,7 @@ export component LengthEdit inherits Rectangle {
                     y: (parent.height - self.height) / 2;
                     width: 1px;
                     height: 15px;
-                    background: Data.theme.palette.control-text-disabled;
+                    background: root.border-color;
                 }
 
                 unit-btn := LinkText {
@@ -278,10 +282,11 @@ export component LengthEdit inherits Rectangle {
                     width: self.preferred-width + 10px;
                     horizontal-alignment: center;
                     vertical-alignment: center;
-                    text-color: Data.theme.palette.base-text;
-                    text-color-disabled: Data.theme.palette.control-text-muted;
+                    text-color: Data.theme.palette.control-text.mix(Data.theme.palette.control-text-muted, 0.5);
+                    text-color-disabled: enabled ? Data.theme.palette.control-text-muted : Data.theme.palette.control-text-disabled;
+                    text-color-hovered: Data.theme.palette.control-text;
                     text: Helpers.get-unit-short-str(root.unit);
-                    enabled: can-change-unit;
+                    enabled: enabled && can-change-unit;
 
                     // Accessibility
                     accessible-description: "unit";
@@ -300,8 +305,8 @@ export component LengthEdit inherits Rectangle {
                         y: parent.height;
 
                         Rectangle {
-                            background: Data.theme.palette.base;
-                            border-color: Data.theme.palette.base-border;
+                            background: Data.theme.palette.control;
+                            border-color: Data.theme.palette.control-border;
                             border-width: 1px;
 
                             VerticalLayout {
@@ -310,7 +315,8 @@ export component LengthEdit inherits Rectangle {
 
                                 for unit in Helpers.all-length-units: unit-item-btn := LinkText {
                                     text: Helpers.get-unit-short-str(unit);
-                                    text-color: Data.theme.palette.base-text;
+                                    text-color: Data.theme.palette.control-text-muted;
+                                    text-color-hovered: Data.theme.palette.control-text;
                                     font-weight: (unit == root.unit) ? 600 : 400;
                                     horizontal-alignment: center;
                                     accessible-label: Helpers.get-unit-accessibility-label(unit);
@@ -329,17 +335,18 @@ export component LengthEdit inherits Rectangle {
                         y: (parent.height - self.height) / 2;
                         width: 1px;
                         height: 15px;
-                        background: Data.theme.palette.control-text-disabled;
+                        background: root.border-color;
                     }
 
                     auto-btn := LinkText {
-                        width: size-dummy-btn.preferred-width;
+                        width: size-dummy-btn.preferred-width + 4px;
                         horizontal-alignment: center;
                         vertical-alignment: center;
                         font-size: 10.5px;
                         font-weight: auto-checked ? 600 : 400;
-                        text-color: auto-checked ? Data.theme.palette.base-text : Data.theme.palette.control-text-muted;
+                        text-color: auto-checked ? Data.theme.palette.control-text : Data.theme.palette.control-text-muted;
                         text-color-disabled: auto-checked ? Data.theme.palette.control-text-muted : Data.theme.palette.control-text-disabled;
+                        text-color-hovered: Data.theme.palette.control-text;
                         text: "AUTO";
                         enabled: enabled;
 
@@ -348,7 +355,6 @@ export component LengthEdit inherits Rectangle {
                         }
 
                         size-dummy-btn := LinkText {
-                            width: self.preferred-width + 10px;
                             font-weight: 600;
                             text: auto-btn.text;
                             visible: false;

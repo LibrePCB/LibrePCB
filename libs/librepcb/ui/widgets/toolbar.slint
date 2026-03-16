@@ -1,17 +1,19 @@
 import { IconButton } from "iconbutton.slint";
 import { Data } from "../api.slint";
 
+//TODO
+
 export component ToolBar inherits Rectangle {
     height: 34px;
     background: Data.theme.palette.window;
     border-color: Data.theme.palette.base-border;
     border-width: 1px;
-    border-bottom-left-radius: 5px;
+    border-bottom-left-radius: 4px;
     border-bottom-right-radius: self.border-bottom-left-radius;
 
     HorizontalLayout {
         alignment: center;
-        padding: 3px;
+        padding: 4px;
 
         @children
     }

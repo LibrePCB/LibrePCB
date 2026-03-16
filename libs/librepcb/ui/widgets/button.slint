@@ -41,9 +41,17 @@ export component Button inherits Rectangle {
         } else {
             Data.theme.palette.control
         }
-    }
-    border-color: fs.has-focus ? Data.theme.palette.accent : Data.theme.palette.control-border;
-    border-width: primary ? 0 : 1px;
+    };
+    border-color: {
+        if !enabled {
+            Data.theme.palette.control-border-disabled
+        } else if has-focus {
+            Data.theme.palette.accent
+        } else {
+            Data.theme.palette.control-border
+        }
+    };
+    border-width: (primary && enabled) ? 0 : 1px;
     forward-focus: fs;
 
     // Accessibility

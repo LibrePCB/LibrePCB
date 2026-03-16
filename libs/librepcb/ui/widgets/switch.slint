@@ -1,4 +1,7 @@
+import { Text } from "text.slint";
 import { Data } from "../api.slint";
+
+//TODO
 
 export enum TextSide {
     left,
@@ -15,6 +18,8 @@ export component Switch inherits Rectangle {
     in property <string> status-tip;
     in property <color> checked-color: Data.theme.palette.accent;
     in property <color> unchecked-color: Data.theme.palette.control;
+    in property <color> checked-knob-color: Data.theme.palette.base;
+    in property <color> unchecked-knob-color: Data.theme.palette.control-text-muted;
     in property <bool> focusable: true;
     out property has-focus <=> fs.has-focus;
 
@@ -22,10 +27,12 @@ export component Switch inherits Rectangle {
     preferred-height: l.preferred-height;
     max-width: text.is-empty ? l.preferred-width : l.max-width;
     border-color: {
-        if has-focus {
-            root.checked ? Data.theme.palette.base-text : Data.theme.palette.accent
+        if !enabled {
+            Data.theme.palette.control-border-disabled
+        } else if has-focus {
+            root.checked ? Data.theme.palette.control-text : Data.theme.palette.accent
         } else {
-            Data.theme.palette.base-border
+            Data.theme.palette.control-border
         }
     };
     forward-focus: fs;
@@ -75,9 +82,7 @@ export component Switch inherits Rectangle {
 
         Rectangle {
             property <float> darkness: {
-                if !enabled {
-                    0.5
-                } else if ta.pressed {
+                if ta.pressed {
                     0.3
                 } else {
                     0
@@ -87,16 +92,25 @@ export component Switch inherits Rectangle {
             y: (parent.height - self.height) / 2;
             width: size * 1.8;
             height: size;
-            background: (checked ? checked-color : unchecked-color).darker(darkness);
+            background: {
+                if !enabled {
+                    Data.theme.palette.control-disabled
+                } else if checked {
+                    checked-color.darker(darkness)
+                } else {
+                    unchecked-color.darker(darkness)
+                }
+            };
             border-radius: self.height / 2;
             border-color: root.border-color;
             border-width: 1px;
 
+            // Knob
             Rectangle {
                 x: checked ? (parent.width - self.width - 3px) : 3px;
                 width: self.height;
                 height: parent.height - 6px;
-                background: ta.has-hover ? Data.theme.palette.control-hovered : Data.theme.palette.base;
+                background: checked ? checked-knob-color : unchecked-knob-color;
                 border-radius: self.height / 2;
 
                 animate x { duration: 50ms; }
@@ -108,7 +122,7 @@ export component Switch inherits Rectangle {
             wrap: word-wrap;
             vertical-alignment: center;
             font-size: font-size;
-            color: Data.theme.palette.base-text;
+            enabled: enabled;
             accessible-role: none;
         }
     }

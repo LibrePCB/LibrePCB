@@ -1,5 +1,7 @@
 import { Data } from "../api.slint";
 
+//TODO
+
 export component TextInput inherits TextInput {
     color: {
         if !self.enabled {
@@ -7,9 +9,9 @@ export component TextInput inherits TextInput {
         } else if self.read-only {
             Data.theme.palette.control-text-muted
         } else {
-            Data.theme.palette.base-text
+            Data.theme.palette.control-text
         }
     };
-    selection-background-color: Data.theme.palette.accent;
-    selection-foreground-color: black;
+    selection-background-color: Data.theme.palette.selection;
+    selection-foreground-color: Data.theme.palette.selection-text;
 }

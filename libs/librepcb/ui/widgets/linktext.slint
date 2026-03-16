@@ -2,8 +2,8 @@ import { Data } from "../api.slint";
 
 export component LinkText inherits Text {
     in property <string> status-tip;
-    in property <color> text-color: Data.theme.palette.base-text.mix(Data.theme.palette.control-text-muted, 0.5);
-    in property <color> text-color-disabled: Data.theme.palette.control-text-disabled;
+    in property <color> text-color: Data.theme.palette.base-text.mix(Data.theme.palette.base-text-muted, 0.5);
+    in property <color> text-color-disabled: Data.theme.palette.base-text-disabled;
     in property <color> text-color-hovered: Data.theme.palette.base-text-hovered;
     in property <bool> enabled: true;
 

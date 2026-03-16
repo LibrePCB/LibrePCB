@@ -1,6 +1,8 @@
 import { ToolTip } from "tooltip.slint";
 import { Backend, Data, EditorCommand } from "../api.slint";
 
+//TODO
+
 export enum IconButtonStyle {
     standard,  // Background filled, arrow cursor, smaller icon
     hyperlink,  // Background transparent, hand pointer
@@ -24,9 +26,9 @@ export component IconButton inherits Rectangle {
     in property <length> icon-offset-y: 0;
     in property <angle> icon-rotation: 0deg;
     in property <bool> colorize: true;
-    in property <color> color-disabled: Data.theme.palette.control-text-disabled;
+    in property <color> color-disabled: Data.theme.palette.base-text-disabled;
     in property <color> color-enabled: (style == IconButtonStyle.checkable-hyperlink) ? Data.theme.palette.base-text-muted : Data.theme.palette.base-text-muted;
-    in property <color> color-checked: (style == IconButtonStyle.checkable-hyperlink) ? Data.theme.palette.base-text : Data.theme.palette.control-text;
+    in property <color> color-checked: Data.theme.palette.base-text;
     in property <color> color-hovered: (style == IconButtonStyle.checkable-hyperlink) ? self.color-checked : Data.theme.palette.base-text-hovered;
     in property <color> background-color: transparent;
     in property <color> background-color-hovered: (style == IconButtonStyle.standard) ? Data.theme.palette.control-hovered : background-color;
@@ -142,6 +144,17 @@ export component IconButton inherits Rectangle {
             root.clicked();
         }
     }
+}
+
+// IconButton with colors preconfigured for use within controls (e.g. LineEdit).
+export component ControlIconButton inherits IconButton {
+    color-disabled: Data.theme.palette.control-text-disabled;
+    color-enabled: (self.style == IconButtonStyle.checkable-hyperlink) ? Data.theme.palette.control-text-disabled : Data.theme.palette.control-text-muted;
+    color-checked: Data.theme.palette.control-text;
+    color-hovered: Data.theme.palette.control-text;
+    background-color: transparent;
+    background-color-hovered: (self.style == IconButtonStyle.standard) ? Data.theme.palette.control-hovered : self.background-color;
+    background-color-checked: ((self.style == IconButtonStyle.standard) || (self.style == IconButtonStyle.read-only)) ? Data.theme.palette.control-checked : self.background-color;
 }
 
 export component CopyToClipboardIconButton inherits IconButton {

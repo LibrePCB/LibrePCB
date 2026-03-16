@@ -1,6 +1,8 @@
 import { Text } from "text.slint";
 import { Data } from "../api.slint";
 
+//TODO
+
 export component ToolTip inherits Rectangle {
     in property <string> text;
     in property <string> shortcut;
@@ -9,7 +11,7 @@ export component ToolTip inherits Rectangle {
 
     width: min(text-txt.preferred-width + (font-size / 2), 800px);
     height: text-txt.height + (font-size / 2);
-    background: Data.theme.palette.tooltip-base;
+    background: Data.theme.palette.tooltip;
     border-color: Data.theme.palette.tooltip-border;
     border-width: 1px;
     border-radius: 5px;
