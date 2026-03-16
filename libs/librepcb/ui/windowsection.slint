@@ -116,17 +116,25 @@ component TabButton inherits Rectangle {
         spacing: 3px;
         alignment: tab.title.is-empty ? center : stretch;
 
+        property <color> color: {
+            if is-current-tab {
+                Data.theme.palette.base-text-hovered
+            } else {
+                Data.theme.palette.base-text.mix(Data.theme.palette.base-text-muted, 0.5)
+            }
+        };
+
         Image {
             width: 16px;
             source: Helpers.get-icon-for-tab-type(tab.type);
-            colorize: Data.theme.palette.base-text;
+            colorize: color;
             accessible-role: none;
         }
 
         if !tab.title.is-empty: txt := Text {
             min-width: 0;
             vertical-alignment: center;
-            color: Data.theme.palette.base-text;
+            color: color;
             text: tab.title;
             overflow: elide;
             accessible-role: none;

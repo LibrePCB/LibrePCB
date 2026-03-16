@@ -126,7 +126,7 @@ component LibraryListViewItem inherits Rectangle {
         HorizontalLayout {
             padding: 2px;
             padding-left: 4px;
-            padding-right: 6px;
+            padding-right: 9px;
             spacing: 3px;
 
             img := Image {
@@ -252,22 +252,18 @@ component LibraryListViewItem inherits Rectangle {
 
                 states [
                     install when lib.installed-version.is-empty && lib.checked: {
-                        border-color: Data.theme.palette.accent;
                         checked-color: Data.theme.palette.accent;
                         checked-knob-color: Data.theme.palette.accent-text;
                     }
                     update when (!lib.installed-version.is-empty) && lib.outdated && lib.checked: {
-                        border-color: Data.theme.palette.info;
                         checked-color: Data.theme.palette.info;
                         checked-knob-color: Data.theme.palette.info-text;
                     }
                     uninstall when (!lib.installed-version.is-empty) && (!lib.checked): {
-                        border-color: Data.theme.palette.error;
                         unchecked-color: Data.theme.palette.error;
                         unchecked-knob-color: Data.theme.palette.error-text;
                     }
                     unchanged when (!lib.outdated) && (lib.installed-version.is-empty != lib.checked): {
-                        border-color: self.checked ? self.checked-color : Data.theme.palette.control-border;
                         checked-color: Data.theme.palette.accent;
                         unchecked-color: Data.theme.palette.control-checked;
                     }

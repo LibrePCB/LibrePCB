@@ -107,7 +107,6 @@ export component DropDownPopup inherits PopupWindow {
 
                             item-txt := Text {
                                 font-size: 13px;
-                                font-weight: is-current ? 700 : 400;
                                 color: Data.theme.palette.base-text;
                                 overflow: elide;
                                 vertical-alignment: center;
@@ -117,7 +116,7 @@ export component DropDownPopup inherits PopupWindow {
 
                             if index == default-index: Text {
                                 width: self.preferred-width;
-                                font-size: 10px;
+                                font-size: 11px;
                                 color: Data.theme.palette.base-text-disabled;
                                 vertical-alignment: center;
                                 text: @tr("default").to-lowercase();

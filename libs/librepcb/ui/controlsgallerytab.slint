@@ -316,6 +316,10 @@ component LineEditGallery inherits VerticalLayout {
         suggestions: ["Suggestion 1", "Suggestion 2"];
     }
 
+    Rectangle {
+        height: 0px;
+    }
+
     LineEdit {
         z: 65;
         text: "validation error";
@@ -441,43 +445,6 @@ component Gallery inherits Rectangle {
                 ControlGallery { }
 
                 ToolTipGallery { }
-            }
-
-            VerticalLayout {
-                alignment: start;
-                spacing: 5px;
-
-                ButtonGallery { }
-
-                LineEditGallery { }
-
-                ComboBox {
-                    model: ["Foo", "Bar"];
-                    current-index: 0;
-                    default-index: 1;
-                    enabled: false;
-                    read-only: false;
-                }
-
-                ComboBox {
-                    model: ["Foo", "Bar"];
-                    current-index: 0;
-                    default-index: 1;
-                    enabled: true;
-                    read-only: true;
-                }
-
-                ComboBox {
-                    model: ["Foo", "Bar"];
-                    current-index: 0;
-                    default-index: 1;
-                    enabled: true;
-                    read-only: false;
-                }
-
-                ProgressBar {
-                    progress: 0.3;
-                }
 
                 CheckBox {
                     text: "disabled";
@@ -543,6 +510,43 @@ component Gallery inherits Rectangle {
                     text: "enabled checked";
                     enabled: true;
                     checked: true;
+                }
+            }
+
+            VerticalLayout {
+                alignment: start;
+                spacing: 5px;
+
+                ButtonGallery { }
+
+                LineEditGallery { }
+
+                ComboBox {
+                    model: ["Foo", "Bar"];
+                    current-index: 0;
+                    default-index: 1;
+                    enabled: false;
+                    read-only: false;
+                }
+
+                ComboBox {
+                    model: ["Foo", "Bar"];
+                    current-index: 0;
+                    default-index: 1;
+                    enabled: true;
+                    read-only: true;
+                }
+
+                ComboBox {
+                    model: ["Foo", "Bar"];
+                    current-index: 0;
+                    default-index: 1;
+                    enabled: true;
+                    read-only: false;
+                }
+
+                ProgressBar {
+                    progress: 0.3;
                 }
             }
         }

@@ -81,11 +81,13 @@ export component Switch inherits Rectangle {
         }
 
         Rectangle {
-            property <float> darkness: {
+            property <float> mix-factor: {
                 if ta.pressed {
-                    0.3
+                    0.8
+                } else if ta.has-hover {
+                    0.9
                 } else {
-                    0
+                    1
                 }
             };
 
@@ -96,9 +98,9 @@ export component Switch inherits Rectangle {
                 if !enabled {
                     Data.theme.palette.control-disabled
                 } else if checked {
-                    checked-color.darker(darkness)
+                    checked-color.mix(checked-knob-color, mix-factor)
                 } else {
-                    unchecked-color.darker(darkness)
+                    unchecked-color.mix(unchecked-knob-color, mix-factor)
                 }
             };
             border-radius: self.height / 2;

@@ -27,7 +27,7 @@ export component IconButton inherits Rectangle {
     in property <angle> icon-rotation: 0deg;
     in property <bool> colorize: true;
     in property <color> color-disabled: Data.theme.palette.base-text-disabled;
-    in property <color> color-enabled: (style == IconButtonStyle.checkable-hyperlink) ? Data.theme.palette.base-text-muted : Data.theme.palette.base-text-muted;
+    in property <color> color-enabled: (style == IconButtonStyle.checkable-hyperlink) ? Data.theme.palette.base-text-muted : Data.theme.palette.base-text-muted.mix(Data.theme.palette.base-text, 0.5);
     in property <color> color-checked: Data.theme.palette.base-text;
     in property <color> color-hovered: (style == IconButtonStyle.checkable-hyperlink) ? self.color-checked : Data.theme.palette.base-text-hovered;
     in property <color> background-color: transparent;

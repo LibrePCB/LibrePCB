@@ -53,7 +53,15 @@ export component CheckBox inherits Rectangle {
             y: (parent.height - self.height) / 2;
             width: 16px;
             height: self.width;
-            background: Data.theme.palette.control;
+            background: {
+                if !enabled {
+                    Data.theme.palette.control-disabled
+                } else if ta.has-hover {
+                    Data.theme.palette.control.mix(Data.theme.palette.control-hovered, 0.5)
+                } else {
+                    Data.theme.palette.control
+                }
+            };
             border-color: {
                 if (!enabled) || read-only {
                     Data.theme.palette.control-border-disabled
