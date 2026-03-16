@@ -1,6 +1,5 @@
 import { Button, IconButton, ProgressBar } from "widgets.slint";
 import {
-    Constants,
     Data,
     Helpers,
     NotificationData,
@@ -15,7 +14,7 @@ component NotificationItem inherits Rectangle {
     callback button-clicked();
 
     background: ta.has-hover ? #272727 : #202020;
-    border-color: notification.unread ? Constants.librepcb-color : transparent;
+    border-color: notification.unread ? Data.theme.palette.accent : transparent;
     border-width: 1px;
 
     animate border-color { duration: 100ms; }

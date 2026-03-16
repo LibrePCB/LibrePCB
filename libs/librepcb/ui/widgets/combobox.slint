@@ -1,6 +1,6 @@
 import { DropDownPopup } from "dropdownpopup.slint";
 import { Text } from "text.slint";
-import { Constants, Data } from "../api.slint";
+import { Data } from "../api.slint";
 
 export component ComboBox inherits Rectangle {
     in property <[string]> model;
@@ -35,7 +35,7 @@ export component ComboBox inherits Rectangle {
     background: ta.has-hover ? Data.theme.palette.control-hovered : Data.theme.palette.control;
     border-color: {
         if has-focus {
-            Constants.librepcb-color
+            Data.theme.palette.accent
         } else if enabled && (!read-only) {
             Data.theme.palette.base-border
         } else {
@@ -159,7 +159,7 @@ export component ComboBox inherits Rectangle {
     if frameless && self.has-focus: Rectangle {
         y: parent.height - self.height;
         height: 1px;
-        background: Constants.librepcb-color;
+        background: Data.theme.palette.accent;
     }
 
     popup := DropDownPopup {

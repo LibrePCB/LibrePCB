@@ -687,12 +687,12 @@ component PackageEditorTab inherits TouchArea {
                         }
                     }
 
-                    tool-pad-basea-item := MenuItem {
-                        cmd: Cmd.tool-pad-basea;
+                    tool-pad-bga-item := MenuItem {
+                        cmd: Cmd.tool-pad-bga;
                         icon: tool-pad-smt-btn.icon;
 
                         clicked => {
-                            Backend.trigger-tab(section-index, index, TabAction.tool-pad-basea);
+                            Backend.trigger-tab(section-index, index, TabAction.tool-pad-bga);
                         }
                     }
 

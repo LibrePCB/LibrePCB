@@ -3,7 +3,6 @@ import { TextInput } from "textinput.slint";
 import { ToolTip } from "tooltip.slint";
 import {
     Backend,
-    Constants,
     Data,
     RatioEditData,
     RatioEditParseResult,
@@ -69,7 +68,7 @@ export component RatioEdit inherits Rectangle {
         if enabled && (!parse-result.valid) {
             edt.has-focus ? #ff0000 : #900000
         } else if edt.has-focus {
-            Constants.librepcb-color
+            Data.theme.palette.accent
         } else if enabled {
             Data.theme.palette.base-border
         } else {

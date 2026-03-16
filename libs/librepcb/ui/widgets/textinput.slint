@@ -1,4 +1,4 @@
-import { Constants, Data } from "../api.slint";
+import { Data } from "../api.slint";
 
 export component TextInput inherits TextInput {
     color: {
@@ -10,6 +10,6 @@ export component TextInput inherits TextInput {
             Data.theme.palette.base-text
         }
     };
-    selection-background-color: Constants.librepcb-color;
+    selection-background-color: Data.theme.palette.accent;
     selection-foreground-color: black;
 }

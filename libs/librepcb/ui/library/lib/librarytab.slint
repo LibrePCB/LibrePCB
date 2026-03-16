@@ -29,7 +29,6 @@ import {
 } from "../../widgets.slint";
 import {
     Backend,
-    Constants,
     Data,
     EditorCommandSet as Cmd,
     FeatureState,
@@ -96,7 +95,7 @@ component AddLibraryDependencyPopup inherits PopupWindow {
             background: #000000;
             border-radius: 15px;
             border-width: 1px;
-            border-color: Constants.librepcb-color;
+            border-color: Data.theme.palette.accent;
 
             VerticalLayout {
                 padding: 15px;
@@ -137,7 +136,7 @@ component ChooseLocalLibraryPopup inherits PopupWindow {
             background: #000000;
             border-radius: 15px;
             border-width: 1px;
-            border-color: Constants.librepcb-color;
+            border-color: Data.theme.palette.accent;
 
             VerticalLayout {
                 padding: 15px;

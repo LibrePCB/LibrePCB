@@ -1,6 +1,6 @@
 import { Spinner } from "spinner.slint";
 import { ToolTip } from "tooltip.slint";
-import { Constants, Data } from "../api.slint";
+import { Data } from "../api.slint";
 
 export component PanelHeader inherits Rectangle {
     in property <length> spacing-top;
@@ -67,7 +67,7 @@ export component PanelHeader inherits Rectangle {
             height: 1px;
             background: {
                 if highlight {
-                    @linear-gradient(90deg, Constants.librepcb-color 0%, Data.theme.palette.base-border 100%)
+                    @linear-gradient(90deg, Data.theme.palette.accent 0%, Data.theme.palette.base-border 100%)
                 } else {
                     Data.theme.palette.base-border
                 }

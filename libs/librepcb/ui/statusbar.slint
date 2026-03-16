@@ -8,7 +8,6 @@ import {
 import { NotificationsPopup } from "notificationspopup.slint";
 import {
     Backend,
-    Constants,
     Data,
     EditorCommandSet as Cmd,
     FeatureState,
@@ -406,7 +405,7 @@ export component StatusBar {
                 }
             };
             border-width: (Data.notifications-unread > 0) ? 1px : 0px;
-            border-color: Constants.librepcb-color;
+            border-color: Data.theme.palette.accent;
             enabled: Data.notifications.length > 0;
 
             // Accessibility

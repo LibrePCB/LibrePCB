@@ -1,4 +1,4 @@
-import { Constants, Data } from "../api.slint";
+import { Data } from "../api.slint";
 
 export component ProgressBar inherits Rectangle {
     in property <float> progress: 0;
@@ -20,6 +20,6 @@ export component ProgressBar inherits Rectangle {
         width: root.width * progress;
         height: 100%;
         border-radius: self.height / 2;
-        background: Constants.librepcb-color;
+        background: Data.theme.palette.accent;
     }
 }

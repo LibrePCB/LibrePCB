@@ -8,7 +8,6 @@ import {
 } from "../../widgets.slint";
 import {
     Backend,
-    Constants,
     Data,
     DeviceInteractivePinoutSignalData,
     DeviceTabData,
@@ -119,7 +118,7 @@ component DeviceInteractiveSignalListView inherits ScrollView {
 
                 background: {
                     if is-current {
-                        item-ta.has-hover ? #00ff84 : Constants.librepcb-color
+                        item-ta.has-hover ? #00ff84 : Data.theme.palette.accent
                     } else {
                         item-ta.has-hover ? #404040 : transparent
                     }
@@ -174,7 +173,7 @@ export component DevicePinoutPanel inherits Rectangle {
     in property <length> window-height;
 
     background: #404040;
-    border-color: interactive ? Constants.librepcb-color : self.background;
+    border-color: interactive ? Data.theme.palette.accent : self.background;
     border-width: 2px;
     border-radius: 10px;
     clip: true;
@@ -197,7 +196,7 @@ export component DevicePinoutPanel inherits Rectangle {
             }
 
             if interactive: Badge {
-                text-color: Constants.librepcb-color;
+                text-color: Data.theme.palette.accent;
                 font-size: 11px;
                 text: @tr("Pad {}/{}", tabs[index].interactive-pinout-number, tabs[index].pinout.length);
             }
@@ -235,7 +234,7 @@ export component DevicePinoutPanel inherits Rectangle {
             if interactive: exit-btn := IconButton {
                 height: 18px;
                 style: hyperlink;
-                color-enabled: Constants.librepcb-color;
+                color-enabled: Data.theme.palette.accent;
                 icon: @image-url("../../../../font-awesome/svgs/solid/circle-xmark.svg");
                 tooltip: @tr("Exit Interactive Mode") + " (Esc)";
                 tooltip-position: left;
@@ -252,7 +251,7 @@ export component DevicePinoutPanel inherits Rectangle {
 
             Rectangle {
                 background: #202020;
-                border-color: interactive-filter-edt.has-focus ? Constants.librepcb-color : #606060;
+                border-color: interactive-filter-edt.has-focus ? Data.theme.palette.accent : #606060;
                 border-width: 1px;
                 border-radius: 10px;
 

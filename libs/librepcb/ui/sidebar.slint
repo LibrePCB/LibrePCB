@@ -3,7 +3,6 @@ import {
     Action,
     Backend,
     Board2dTabData,
-    Constants,
     Data,
     EditorCommandSet as Cmd,
     Helpers,
@@ -60,7 +59,7 @@ component SideBarButton inherits Rectangle {
     if checked: Rectangle {
         x: 0px;
         width: 3px;
-        background: Constants.librepcb-color;
+        background: Data.theme.palette.accent;
     }
 
     ta := TouchArea {

@@ -1,4 +1,4 @@
-import { Constants, Data } from "../api.slint";
+import { Data } from "../api.slint";
 
 export enum TextSide {
     left,
@@ -13,7 +13,7 @@ export component Switch inherits Rectangle {
     in property <length> size: 25px;
     in property <length> font-size: 12px;
     in property <string> status-tip;
-    in property <color> checked-color: Constants.librepcb-color;
+    in property <color> checked-color: Data.theme.palette.accent;
     in property <color> unchecked-color: Data.theme.palette.control;
     in property <bool> focusable: true;
     out property has-focus <=> fs.has-focus;
@@ -23,7 +23,7 @@ export component Switch inherits Rectangle {
     max-width: text.is-empty ? l.preferred-width : l.max-width;
     border-color: {
         if has-focus {
-            root.checked ? Data.theme.palette.base-text : Constants.librepcb-color
+            root.checked ? Data.theme.palette.base-text : Data.theme.palette.accent
         } else {
             Data.theme.palette.base-border
         }

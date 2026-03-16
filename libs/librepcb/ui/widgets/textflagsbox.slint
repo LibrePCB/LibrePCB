@@ -1,7 +1,7 @@
 import { LinkText } from "linktext.slint";
 import { Text } from "text.slint";
 import { ToolBarWidget } from "toolbar.slint";
-import { Constants, Data } from "../api.slint";
+import { Data } from "../api.slint";
 
 export struct TextFlagsBoxItemData {
     text: string,
@@ -42,7 +42,7 @@ export component TextFlagsBox inherits ToolBarWidget {
         if root.has-focus && (index == current-index): Rectangle {
             y: parent.height + 2px;  // 2px above border!
             height: 2px;
-            background: Constants.librepcb-color;
+            background: Data.theme.palette.accent;
         }
 
         clicked => {

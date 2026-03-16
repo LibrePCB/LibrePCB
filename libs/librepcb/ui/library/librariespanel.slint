@@ -13,7 +13,6 @@ import {
 import {
     Action,
     Backend,
-    Constants,
     Data,
     LibraryAction,
     LibraryInfoData,
@@ -97,7 +96,7 @@ component LibraryListViewItem inherits Rectangle {
             Data.theme.palette.base
         }
     };
-    border-color: Constants.librepcb-color;
+    border-color: Data.theme.palette.accent;
     border-width: lib.highlight ? 1px : 0;
 
     // Accessibility
@@ -266,7 +265,7 @@ component LibraryListViewItem inherits Rectangle {
                     }
                     unchanged when (!lib.outdated) && (lib.installed-version.is-empty != lib.checked): {
                         border-color: self.checked ? self.checked-color : self.unchecked-color;
-                        checked-color: Constants.librepcb-color;
+                        checked-color: Data.theme.palette.accent;
                         unchecked-color: Data.theme.palette.control-text-muted;
                     }
                 ]
@@ -663,7 +662,7 @@ export component LibrariesPanel inherits VerticalLayout {
                         };
                         text: (root.width > 300px) ? @tr("" | "Apply {n} Modification(s)" % Data.remote-libraries-pending-operations) : @tr("Apply");
                         primary: Data.remote-libraries-data.pending-oneway-uninstalls == 0;
-                        border-color: (self.has-focus ? Constants.librepcb-color : Data.theme.palette.base-text-error).darker(self.enabled ? 0 : 0.5);
+                        border-color: (self.has-focus ? Data.theme.palette.accent : Data.theme.palette.base-text-error).darker(self.enabled ? 0 : 0.5);
                         border-width: (self.has-focus || (Data.remote-libraries-data.pending-oneway-uninstalls > 0)) ? 1px : 0;
                         enabled: !Data.libraries-operation-in-progress;
 

@@ -1,5 +1,5 @@
 import { LinkText } from "linktext.slint";
-import { Constants, Data } from "../api.slint";
+import { Data } from "../api.slint";
 
 export struct NavBarItemData {
     title: string,
@@ -38,7 +38,7 @@ export component NavBar inherits HorizontalLayout {
                 y: parent.height - (parent.height - parent.preferred-height) / 2 - 2px;
                 width: parent.preferred-width;
                 height: 1px;
-                background: Constants.librepcb-color;
+                background: Data.theme.palette.accent;
             }
         }
 

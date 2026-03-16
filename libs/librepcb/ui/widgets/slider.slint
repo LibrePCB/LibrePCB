@@ -1,4 +1,4 @@
-import { Constants, Data } from "../api.slint";
+import { Data } from "../api.slint";
 
 component Slider inherits Rectangle {
     in-out property <float> value;
@@ -64,14 +64,14 @@ export component HorizontalSlider inherits Slider {
             x: (parent.width - self.width) * root.value;
             width: root.handle-size;
             height: root.handle-size;
-            border-color: Constants.librepcb-color;
+            border-color: Data.theme.palette.accent;
             border-width: root.has-focus ? 1px : 0;
             border-radius: self.width / 2;
 
             Rectangle {
                 width: 70%;
                 height: self.width;
-                background: Constants.librepcb-color;
+                background: Data.theme.palette.accent;
                 border-radius: self.width / 2;
             }
         }
@@ -129,14 +129,14 @@ export component VerticalSlider inherits Slider {
             y: (parent.height - self.height) * (1 - root.value);
             width: root.handle-size;
             height: root.handle-size;
-            border-color: Constants.librepcb-color;
+            border-color: Data.theme.palette.accent;
             border-width: root.has-focus ? 1px : 0;
             border-radius: self.width / 2;
 
             Rectangle {
                 width: 70%;
                 height: self.width;
-                background: Constants.librepcb-color;
+                background: Data.theme.palette.accent;
                 border-radius: self.width / 2;
             }
         }

@@ -1,4 +1,4 @@
-import { Data, Constants } from "../api.slint";
+import { Data } from "../api.slint";
 
 export component Button inherits Rectangle {
     in property <string> text;
@@ -10,20 +10,12 @@ export component Button inherits Rectangle {
     out property has-hover <=> ta.has-hover;
     out property pressed <=> ta.pressed;
     property <color> text-color: {
-        if root.primary {
-            if fs.has-focus {
-                white
-            } else if enabled {
-                #202020
-            } else {
-                root.background.darker(0.8)
-            }
-        } else if ta.pressed {
-            Data.theme.palette.base-text-hovered
-        } else if !enabled {
+        if !enabled {
             Data.theme.palette.control-text-disabled
+        } else if primary {
+            Data.theme.palette.accent-text
         } else {
-            Data.theme.palette.base-text
+            Data.theme.palette.control-text
         }
     };
 
@@ -32,15 +24,15 @@ export component Button inherits Rectangle {
     height: self.preferred-height;
     min-width: fs.min-width;
     background: {
-        if root.primary {
+        if !enabled {
+            Data.theme.palette.control-disabled
+        } else if primary {
             if ta.pressed {
-                Constants.librepcb-color.darker(0.3)
+                Data.theme.palette.accent.mix(Data.theme.palette.accent-text, 0.8)
             } else if ta.has-hover {
-                Constants.librepcb-color.darker(0.1)
-            } else if !enabled {
-                Constants.librepcb-color.mix(Data.theme.palette.base, 0.5)
+                Data.theme.palette.accent.mix(Data.theme.palette.accent-text, 0.9)
             } else {
-                Constants.librepcb-color
+                Data.theme.palette.accent
             }
         } else if ta.pressed {
             Data.theme.palette.control-checked
@@ -50,7 +42,7 @@ export component Button inherits Rectangle {
             Data.theme.palette.control
         }
     }
-    border-color: fs.has-focus ? Constants.librepcb-color : Data.theme.palette.base-border;
+    border-color: fs.has-focus ? Data.theme.palette.accent : Data.theme.palette.control-border;
     border-width: primary ? 0 : 1px;
     forward-focus: fs;
 
@@ -61,6 +53,19 @@ export component Button inherits Rectangle {
     accessible-label: text;
     accessible-action-default => {
         ta.clicked();
+    }
+
+    // Focus rectangle for primary button.
+    if enabled && primary && has-focus: Rectangle {
+        width: parent.width - 4px;
+        height: parent.height - 4px;
+        background: Data.theme.palette.accent-text;
+
+        Rectangle {
+            width: parent.width - 2px;
+            height: parent.height - 2px;
+            background: Data.theme.palette.accent;
+        }
     }
 
     fs := FocusScope {

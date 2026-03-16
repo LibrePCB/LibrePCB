@@ -2,7 +2,7 @@ import { Badge } from "badge.slint";
 import { ScrollView } from "scrollview.slint";
 import { Text } from "text.slint";
 import { TextInput } from "textinput.slint";
-import { Constants, Data } from "../api.slint";
+import { Data } from "../api.slint";
 
 export component TextEdit inherits Rectangle {
     in-out property <string> text;
@@ -51,7 +51,7 @@ export component TextEdit inherits Rectangle {
         if enabled && has-error {
             edt.has-focus ? #ff0000 : #900000
         } else if edt.has-focus {
-            Constants.librepcb-color
+            Data.theme.palette.accent
         } else if enabled && (!read-only) {
             Data.theme.palette.base-border
         } else {

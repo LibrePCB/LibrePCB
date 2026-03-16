@@ -4,7 +4,7 @@ import { IconButton } from "iconbutton.slint";
 import { ScrollView } from "scrollview.slint";
 import { Text } from "text.slint";
 import { TextInput } from "textinput.slint";
-import { Constants, Data } from "../api.slint";
+import { Data } from "../api.slint";
 
 export component LineEdit inherits Rectangle {
     in-out property <string> text;
@@ -79,14 +79,18 @@ export component LineEdit inherits Rectangle {
     horizontal-stretch: 1;
     background: Data.theme.palette.control;
     border-color: {
-        if enabled && has-error {
-            edt.has-focus ? #ff0000 : #900000
+        if (!enabled) || read-only {
+            Data.theme.palette.control-border-disabled
         } else if edt.has-focus {
-            Constants.librepcb-color
-        } else if enabled && (!read-only) {
-            Data.theme.palette.base-border
+            if has-error {
+                Data.theme.palette.base-text-error
+            } else {
+                Data.theme.palette.accent
+            }
+        } else if has-error {
+            Data.theme.palette.control-border.mix(Data.theme.palette.base-text-error, 0.7)
         } else {
-            transparent
+            Data.theme.palette.control-border
         }
     }
     border-width: frameless ? 0 : 1px;

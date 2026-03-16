@@ -5,7 +5,6 @@ import {
     AngleEditData,
     AngleEditParseResult,
     Backend,
-    Constants,
     Data,
 } from "../api.slint";
 
@@ -63,14 +62,18 @@ export component AngleEdit inherits Rectangle {
     preferred-height: 25px;
     background: Data.theme.palette.control;
     border-color: {
-        if enabled && (!parse-result.valid) {
-            edt.has-focus ? #ff0000 : #900000
+        if !enabled {
+            Data.theme.palette.control-border-disabled
         } else if edt.has-focus {
-            Constants.librepcb-color
-        } else if enabled {
-            Data.theme.palette.base-border
+            if !parse-result.valid {
+                Data.theme.palette.base-text-error
+            } else {
+                Data.theme.palette.accent
+            }
+        } else if !parse-result.valid {
+            Data.theme.palette.control-border.mix(Data.theme.palette.base-text-error, 0.7)
         } else {
-            transparent
+            Data.theme.palette.control-border
         }
     };
     border-width: 1px;
@@ -101,7 +104,7 @@ export component AngleEdit inherits Rectangle {
             if icon.width > 0: Image {
                 width: 12px;
                 image-fit: contain;
-                colorize: enabled ? Data.theme.palette.base-text : Data.theme.palette.control-text-disabled;
+                colorize: enabled ? Data.theme.palette.control-text : Data.theme.palette.control-text-disabled;
                 source: icon;
                 accessible-role: none;
             }

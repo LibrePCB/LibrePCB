@@ -1,5 +1,5 @@
 import { Text } from "text.slint";
-import { Constants, Data } from "../api.slint";
+import { Data } from "../api.slint";
 
 export component CheckBox inherits Rectangle {
     in-out property <bool> checked: false;
@@ -64,7 +64,7 @@ export component CheckBox inherits Rectangle {
             width: 16px;
             height: self.width;
             background: Data.theme.palette.control;
-            border-color: has-focus ? Constants.librepcb-color : Data.theme.palette.base-border;
+            border-color: has-focus ? Data.theme.palette.accent : Data.theme.palette.base-border;
             border-width: 1px;
 
             if checked: Image {
