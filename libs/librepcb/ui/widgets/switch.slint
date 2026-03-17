@@ -124,7 +124,7 @@ export component Switch inherits Rectangle {
             wrap: word-wrap;
             vertical-alignment: center;
             font-size: font-size;
-            enabled: enabled;
+            color: enabled ? Data.theme.palette.base-text : Data.theme.palette.base-text-disabled;
             accessible-role: none;
         }
     }

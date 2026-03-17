@@ -160,6 +160,54 @@ export component LengthEdit inherits Rectangle {
                 }
             }
 
+            if auto-supported: VerticalLayout {
+                alignment: center;
+
+                Rectangle {
+                    width: auto-btn.preferred-width + 4px;
+                    height: auto-btn.preferred-height + 2px;
+                    background: {
+                        if auto-checked && (!enabled) {
+                            Data.theme.palette.control-disabled.mix(Data.theme.palette.control-checked, 0.5)
+                        } else if auto-checked {
+                            Data.theme.palette.control-checked
+                        } else {
+                            transparent
+                        }
+                    };
+                    border-color: {
+                        if !enabled {
+                            Data.theme.palette.control-border-disabled
+                        } else {
+                            Data.theme.palette.control-border
+                        }
+                    };
+                    border-width: 1px;
+                    border-radius: 5px;
+
+                    auto-btn := LinkText {
+                        horizontal-alignment: center;
+                        vertical-alignment: center;
+                        font-size: 10.5px;
+                        text-color: {
+                            if auto-checked {
+                                Data.theme.palette.control-text
+                            } else {
+                                Data.theme.palette.control-text-muted
+                            }
+                        };
+                        text-color-disabled: Data.theme.palette.control-text-disabled;
+                        text-color-hovered: Data.theme.palette.control-text;
+                        text: "AUTO";
+                        enabled: enabled;
+
+                        clicked => {
+                            root.auto-toggled(!auto-checked);
+                        }
+                    }
+                }
+            }
+
             edt := TextInput {
                 min-width: max(self.preferred-width, metrics-edt.preferred-width);
                 font-size: 13px;
@@ -270,7 +318,7 @@ export component LengthEdit inherits Rectangle {
                     }
                 }
 
-                if can-increase || can-decrease: Rectangle {
+                Rectangle {
                     y: (parent.height - self.height) / 2;
                     width: 1px;
                     height: 15px;
@@ -278,8 +326,7 @@ export component LengthEdit inherits Rectangle {
                 }
 
                 unit-btn := LinkText {
-                    y: ((parent.height - self.height) / 2) - 1px;
-                    width: self.preferred-width + 10px;
+                    width: self.preferred-width + 8px;
                     horizontal-alignment: center;
                     vertical-alignment: center;
                     text-color: Data.theme.palette.control-text.mix(Data.theme.palette.control-text-muted, 0.5);
@@ -326,38 +373,6 @@ export component LengthEdit inherits Rectangle {
                                     }
                                 }
                             }
-                        }
-                    }
-                }
-
-                if auto-supported: HorizontalLayout {
-                    Rectangle {
-                        y: (parent.height - self.height) / 2;
-                        width: 1px;
-                        height: 15px;
-                        background: root.border-color;
-                    }
-
-                    auto-btn := LinkText {
-                        width: size-dummy-btn.preferred-width + 4px;
-                        horizontal-alignment: center;
-                        vertical-alignment: center;
-                        font-size: 10.5px;
-                        font-weight: auto-checked ? 600 : 400;
-                        text-color: auto-checked ? Data.theme.palette.control-text : Data.theme.palette.control-text-muted;
-                        text-color-disabled: auto-checked ? Data.theme.palette.control-text-muted : Data.theme.palette.control-text-disabled;
-                        text-color-hovered: Data.theme.palette.control-text;
-                        text: "AUTO";
-                        enabled: enabled;
-
-                        clicked => {
-                            root.auto-toggled(!auto-checked);
-                        }
-
-                        size-dummy-btn := LinkText {
-                            font-weight: 600;
-                            text: auto-btn.text;
-                            visible: false;
                         }
                     }
                 }

@@ -286,8 +286,8 @@ export component SideBar {
                 up-to-date when (check.state == RuleCheckState.up-to-date) && (check.unapproved != 0): {
                     emblem: Emblem.none;
                     status: check.unapproved;
-                    status-color: Data.theme.palette.base;
-                    status-background: Data.theme.palette.base-text-error;
+                    status-color: Data.theme.palette.error-text;
+                    status-background: Data.theme.palette.error;
                 }
                 up-to-date when (check.state == RuleCheckState.up-to-date) && (check.unapproved == 0): {
                     emblem: Emblem.ok;

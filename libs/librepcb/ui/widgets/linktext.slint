@@ -6,6 +6,7 @@ export component LinkText inherits Text {
     in property <color> text-color-disabled: Data.theme.palette.base-text-disabled;
     in property <color> text-color-hovered: Data.theme.palette.base-text-hovered;
     in property <bool> enabled: true;
+    out property <bool> has-hover <=> ta.has-hover;
 
     color: ta.has-hover ? text-color-hovered : (enabled ? text-color : text-color-disabled);
 

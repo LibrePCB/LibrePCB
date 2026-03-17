@@ -160,7 +160,7 @@ export component StatusBar {
                     vertical-alignment: center;
                     font-size: 11px;
                     text: Helpers.get-unit-short-str(current-unit);
-                    enabled: parent.enabled;
+                    color: parent.enabled ? Data.theme.palette.base-text : Data.theme.palette.base-text-disabled;
                 }
 
                 clicked => {

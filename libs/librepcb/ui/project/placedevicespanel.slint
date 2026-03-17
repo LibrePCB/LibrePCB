@@ -60,8 +60,8 @@ component UnplacedDeviceItem inherits Rectangle {
                 vertical-alignment: center;
                 font-size: 12px;
                 overflow: elide;
+                color: enabled ? Data.theme.palette.control-text : Data.theme.palette.control-text-disabled;
                 text: name;
-                enabled: enabled;
             }
         }
     }

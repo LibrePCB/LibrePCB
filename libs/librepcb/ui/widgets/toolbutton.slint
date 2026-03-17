@@ -23,12 +23,16 @@ export component ToolButton inherits Rectangle {
     width: 30px;
     height: self.width;
     background: {
-        if (checked || ta.pressed) {
-            blue
+        if !enabled {
+            Data.theme.palette.control-disabled
+        } else if checked {
+            Data.theme.palette.accent
+        } else if ta.pressed {
+            Data.theme.palette.control-checked
         } else if ta.has-hover {
-            Data.theme.palette.control-hovered;
+            Data.theme.palette.control-hovered
         } else {
-            Data.theme.palette.control;
+            Data.theme.palette.control
         }
     };
     border-color: Data.theme.palette.base-border;
@@ -57,12 +61,12 @@ export component ToolButton inherits Rectangle {
             height: self.width;
             image-fit: contain;
             colorize: {
-                if (checked || ta.pressed) {
-                    white
-                } else if enabled {
-                    colorize
-                } else {
+                if !enabled {
                     Data.theme.palette.control-text-disabled
+                } else if checked || ta.pressed {
+                    Data.theme.palette.accent-text
+                } else {
+                    colorize
                 }
             };
             source: icon;

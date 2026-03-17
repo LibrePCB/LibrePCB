@@ -2,7 +2,7 @@ import { Data } from "../api.slint";
 
 //TODO
 
-export component ScrollBar {
+export component ScrollBar inherits Rectangle {
     in property <bool> enabled;
     out property <bool> has-hover: touch-area.has-hover;
     in-out property <bool> horizontal;
@@ -19,34 +19,32 @@ export component ScrollBar {
 
     opacity: 0.7;
     visible: (self.policy == ScrollBarPolicy.always-on) || (self.policy == ScrollBarPolicy.as-needed && self.maximum > 0);
+    background: has-hover ? Data.theme.palette.control-hovered : transparent;
 
-    Rectangle {
-        background: Data.theme.palette.window;
-        clip: true;
-
-        thumb := Rectangle {
-            width: !root.horizontal ? parent.width - 2px : root.maximum <= 0phx ? 0phx : max(min(32px, root.width), root.track-size * root.page-size / (root.maximum + root.page-size));
-            height: root.horizontal ? parent.height - 2px : root.maximum <= 0phx ? 0phx : max(min(32px, root.height), root.track-size * (root.page-size / (root.maximum + root.page-size)));
-            x: !root.horizontal ? (parent.width - self.width) / 2 : root.offset + (root.track-size - thumb.width) * (-root.value / root.maximum);
-            y: root.horizontal ? (parent.height - self.height) / 2 : root.offset + (root.track-size - thumb.height) * (-root.value / root.maximum);
-            background: {
-                if touch-area.pressed {
-                    Data.theme.palette.base-text
-                } else if touch-area.has-hover {
-                    Data.theme.palette.control-text-muted
-                } else {
-                    Data.theme.palette.control-text-disabled
-                }
-            };
-            border-radius: min(self.width, self.height) / 2;
-        }
+    thumb := Rectangle {
+        width: !root.horizontal ? parent.width - 2px : root.maximum <= 0phx ? 0phx : max(min(32px, root.width), root.track-size * root.page-size / (root.maximum + root.page-size));
+        height: root.horizontal ? parent.height - 2px : root.maximum <= 0phx ? 0phx : max(min(32px, root.height), root.track-size * (root.page-size / (root.maximum + root.page-size)));
+        x: !root.horizontal ? (parent.width - self.width) / 2 : root.offset + (root.track-size - thumb.width) * (-root.value / root.maximum);
+        y: root.horizontal ? (parent.height - self.height) / 2 : root.offset + (root.track-size - thumb.height) * (-root.value / root.maximum);
+        background: {
+            if touch-area.pressed {
+                Data.theme.palette.control-text.mix(Data.theme.palette.control-text-muted, 0.5)
+            } else if touch-area.has-hover {
+                Data.theme.palette.control-text-muted
+            } else {
+                Data.theme.palette.control-text-disabled
+            }
+        };
+        border-radius: min(self.width, self.height) / 2;
     }
 
     touch-area := TouchArea {
         property <{pressed-value: length, maximum: length, x:length, y: length}> saved-values;
 
-        width: parent.width;
-        height: parent.height;
+        x: root.horizontal ? 0 : parent.width - self.width + 4px;
+        y: (!root.horizontal) ? 0 : parent.height - self.height + 4px;
+        width: (!root.horizontal) ? parent.width + 4px : parent.width;
+        height: root.horizontal ? parent.height + 4px : parent.height;
 
         function update-saved-values() {
             self.saved-values = { pressed-value: -root.value, maximum: root.maximum, x: self.mouse-x, y: self.mouse-y };
@@ -125,20 +123,20 @@ export component ScrollView {
         vertical-bar := ScrollBar {
             x: parent.width - self.width;
             y: 0;
-            width: self.has-hover ? 10px : 6px;
+            width: self.has-hover ? 8px : 6px;
             height: horizontal-bar.visible ? parent.height - horizontal-bar.height : parent.height;
             horizontal: false;
             maximum: flickable.viewport-height - flickable.height;
             page-size: flickable.height;
-            opacity: ta.has-hover ? 0.7 : 0;
+            opacity: (ta.has-hover || self.has-hover) ? 0.7 : 0;
 
             animate width {
-                delay: 100ms;
-                duration: 50ms;
+                delay: 50ms;
+                duration: 30ms;
             }
 
             animate opacity {
-                delay: 300ms;
+                delay: 100ms;
                 duration: 100ms;
             }
 
@@ -155,10 +153,10 @@ export component ScrollView {
             horizontal: true;
             maximum: flickable.viewport-width - flickable.width;
             page-size: flickable.width;
-            opacity: ta.has-hover ? 0.7 : 0;
+            opacity: (ta.has-hover || self.has-hover) ? 0.7 : 0;
 
             animate opacity {
-                delay: 300ms;
+                delay: 100ms;
                 duration: 100ms;
             }
 

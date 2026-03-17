@@ -85,7 +85,7 @@ component RuleCheckListItem inherits Rectangle {
                 font-italic: item.approved;
                 overflow: elide;
                 text: item.message;
-                enabled: root.enabled && (!item.autofixed);
+                color: (root.enabled && (!item.autofixed)) ? Data.theme.palette.control-text : Data.theme.palette.control-text-disabled;
                 accessible-role: none;
             }
 
