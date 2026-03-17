@@ -9,7 +9,6 @@ export component ScrollBar inherits Rectangle {
     in-out property <length> maximum;
     in-out property <length> page-size;
     in-out property <length> value;
-    in property <ScrollBarPolicy> policy: ScrollBarPolicy.as-needed;
 
     callback scrolled();
 
@@ -18,7 +17,7 @@ export component ScrollBar inherits Rectangle {
     private property <length> offset: 2px;
 
     opacity: 0.7;
-    visible: (self.policy == ScrollBarPolicy.always-on) || (self.policy == ScrollBarPolicy.as-needed && self.maximum > 0);
+    visible: self.maximum > 0;
     background: has-hover ? Data.theme.palette.control-hovered : transparent;
 
     thumb := Rectangle {
@@ -39,7 +38,7 @@ export component ScrollBar inherits Rectangle {
     }
 
     touch-area := TouchArea {
-        property <{pressed-value: length, maximum: length, x:length, y: length}> saved-values;
+        property <{ pressed-value: length, maximum: length, x: length, y: length}> saved-values;
 
         x: root.horizontal ? 0 : parent.width - self.width + 4px;
         y: (!root.horizontal) ? 0 : parent.height - self.height + 4px;
@@ -84,18 +83,16 @@ export component ScrollBar inherits Rectangle {
 }
 
 export component ScrollView {
-    out property <length> visible-width <=> flickable.width;
-    out property <length> visible-height <=> flickable.height;
-    in-out property <length> viewport-width <=> flickable.viewport-width;
-    in-out property <length> viewport-height <=> flickable.viewport-height;
+    in property <bool> thin-scrollbars: false;
+    in property <bool> mouse-drag-pan-enabled <=> flickable.interactive;
     in-out property <length> viewport-x <=> flickable.viewport-x;
     in-out property <length> viewport-y <=> flickable.viewport-y;
-    in property <ScrollBarPolicy> vertical-scrollbar-policy <=> vertical-bar.policy;
-    in property <ScrollBarPolicy> horizontal-scrollbar-policy <=> horizontal-bar.policy;
-    in property <bool> mouse-drag-pan-enabled <=> flickable.interactive;
+    in-out property <length> viewport-width <=> flickable.viewport-width;
+    in-out property <length> viewport-height <=> flickable.viewport-height;
 
-    // FIXME: remove. This property is currently set by the ListView and is used by the native style to draw the scrollbar differently when it has focus
-    in-out property <bool> has-focus;
+    // Workaround for crashing slint-lsp if those properties don't exist.
+    property <length> visible-width;
+    property <length> visible-height;
 
     callback scrolled <=> flickable.flicked;
 
@@ -107,15 +104,10 @@ export component ScrollView {
     preferred-width: 100%;
 
     ta := TouchArea {
-        width: 100%;
-        height: 100%;
-
         flickable := Flickable {
-            interactive: false;
-            viewport-y <=> vertical-bar.value;
             viewport-x <=> horizontal-bar.value;
-            width: 100%;
-            height: 100%;
+            viewport-y <=> vertical-bar.value;
+            interactive: false;
 
             @children
         }
@@ -123,7 +115,7 @@ export component ScrollView {
         vertical-bar := ScrollBar {
             x: parent.width - self.width;
             y: 0;
-            width: self.has-hover ? 8px : 6px;
+            width: (self.has-hover && (!thin-scrollbars)) ? 8px : 6px;
             height: horizontal-bar.visible ? parent.height - horizontal-bar.height : parent.height;
             horizontal: false;
             maximum: flickable.viewport-height - flickable.height;
@@ -147,13 +139,18 @@ export component ScrollView {
 
         horizontal-bar := ScrollBar {
             width: vertical-bar.visible ? parent.width - vertical-bar.width : parent.width;
-            height: 6px;
+            height: (self.has-hover && (!thin-scrollbars)) ? 8px : 6px;
             y: parent.height - self.height;
             x: 0;
             horizontal: true;
             maximum: flickable.viewport-width - flickable.width;
             page-size: flickable.width;
             opacity: (ta.has-hover || self.has-hover) ? 0.7 : 0;
+
+            animate height {
+                delay: 50ms;
+                duration: 30ms;
+            }
 
             animate opacity {
                 delay: 100ms;

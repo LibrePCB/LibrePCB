@@ -294,6 +294,7 @@ export component LengthEdit inherits Rectangle {
                     up-btn := ControlIconButton {
                         width: 15px;
                         enabled: enabled && can-increase;
+                        background-color: transparent;
                         icon: @image-url("../../../font-awesome/svgs/solid/caret-up.svg");
                         icon-offset-y: 1px;
                         accessible-label: "increase";
@@ -307,6 +308,7 @@ export component LengthEdit inherits Rectangle {
                     down-btn := ControlIconButton {
                         width: 15px;
                         enabled: enabled && can-decrease;
+                        background-color: transparent;
                         icon: @image-url("../../../font-awesome/svgs/solid/caret-down.svg");
                         icon-offset-y: -1px;
                         accessible-label: "decrease";

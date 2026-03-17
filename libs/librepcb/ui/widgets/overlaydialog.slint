@@ -1,8 +1,6 @@
 import { Button } from "button.slint";
 import { Data } from "../api.slint";
 
-//TODO
-
 export component OverlayDialog inherits Rectangle {
     in property <bool> ok-button: false;
 
@@ -33,7 +31,7 @@ export component OverlayDialog inherits Rectangle {
             width: min(0.8 * root.width, max(self.preferred-width, 500px));
             height: min(0.8 * root.height, max(self.preferred-height, 50px));
             background: Data.theme.palette.base;
-            border-radius: 15px;
+            border-radius: 10px;
             border-width: 1px;
             border-color: Data.theme.palette.accent;
 

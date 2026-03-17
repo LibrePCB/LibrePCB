@@ -5,7 +5,8 @@ export struct NavBarItemData {
     title: string,
     disabled: bool,
 }
-export component NavBar inherits HorizontalLayout {
+
+export component NavBar inherits VerticalLayout {
     in property <[NavBarItemData]> items;
     in-out property <int> current-index: 0;
 
@@ -15,37 +16,59 @@ export component NavBar inherits HorizontalLayout {
     }
 
     height: self.preferred-height;
-    alignment: start;
 
-    for item[index] in items: item-l := HorizontalLayout {
-        item-btn := LinkText {
-            width: self.preferred-width + 16px;
-            height: self.preferred-height + 16px;
-            vertical-alignment: center;
-            horizontal-alignment: center;
-            text: item.title;
-            text-color: (index == current-index) ? Data.theme.palette.base-text : Data.theme.palette.control-text-muted;
-            text-color-hovered: (index == current-index) ? Data.theme.palette.base-text-hovered : Data.theme.palette.control-text-muted;
-            enabled: !item.disabled;
+    HorizontalLayout {
+        z: 1; // Lift over the bottom border, for the accent bar.
+        alignment: start;
+        padding-top: 4px;
 
-            clicked => {
-                page-clicked(index);
+        for item[index] in items: item-l := HorizontalLayout {
+            item-btn := LinkText {
+                width: self.preferred-width + 16px;
+                height: self.preferred-height + 6px;
+                vertical-alignment: center;
+                horizontal-alignment: center;
+                text: item.title;
+                text-color: {
+                    if index == current-index {
+                        Data.theme.palette.base-text-hovered
+                    } else {
+                        Data.theme.palette.base-text.mix(Data.theme.palette.base-text-muted, 0.5)
+                    }
+                };
+                text-color-hovered: {
+                    if index == current-index {
+                        Data.theme.palette.base-text-hovered
+                    } else {
+                        Data.theme.palette.base-text
+                    }
+                };
+                enabled: !item.disabled;
+
+                clicked => {
+                    page-clicked(index);
+                }
+
+                if index == current-index: Rectangle {
+                    x: (parent.width - parent.preferred-width) / 2;
+                    y: parent.height - self.height;
+                    width: parent.preferred-width;
+                    height: 2px;
+                    background: Data.theme.palette.accent;
+                }
             }
 
-            if index == current-index: Rectangle {
-                x: (parent.width - parent.preferred-width) / 2;
-                y: parent.height - (parent.height - parent.preferred-height) / 2 - 2px;
-                width: parent.preferred-width;
-                height: 1px;
-                background: Data.theme.palette.accent;
+            if (index + 1) < items.length: Text {
+                text: "•";
+                color: Data.theme.palette.base-text-disabled;
+                vertical-alignment: center;
+                accessible-role: none;
             }
         }
+    }
 
-        if (index + 1) < items.length: Text {
-            text: "•";
-            color: Data.theme.palette.control-text-disabled;
-            vertical-alignment: center;
-            accessible-role: none;
-        }
+    Rectangle {
+        height: 1px;
+        background: Data.theme.palette.base-border;
     }
 }

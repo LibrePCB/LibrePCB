@@ -1,14 +1,12 @@
 import { Data } from "../api.slint";
 
-//TODO
-
 export component ProgressBar inherits Rectangle {
     in property <float> progress: 0;
 
     height: 7px;
     min-width: 50px;
     border-radius: self.height / 2;
-    background: Data.theme.palette.control;
+    background: Data.theme.palette.control-checked;
 
     // Accessibility
     accessible-role: progress-indicator;

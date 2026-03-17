@@ -1,6 +1,6 @@
 import { ControlIconButton } from "iconbutton.slint";
-import { ToolTip } from "tooltip.slint";
 import { TextInput } from "textinput.slint";
+import { ToolTip } from "tooltip.slint";
 import {
     AngleEditData,
     AngleEditParseResult,
@@ -95,18 +95,23 @@ export component AngleEdit inherits Rectangle {
         enabled: enabled;
 
         l := HorizontalLayout {
-            padding-left: 8px;
+            padding-left: 5px;
             padding-right: 1px;
             padding-top: self.padding-right;
             padding-bottom: self.padding-top;
             spacing: 5px;
 
-            if icon.width > 0: Image {
+            if icon.width > 0: Rectangle {
                 width: 12px;
-                image-fit: contain;
-                colorize: edt.color;
-                source: icon;
-                accessible-role: none;
+
+                Image {
+                    width: 100%;
+                    height: self.width;
+                    image-fit: contain;
+                    colorize: edt.color;
+                    source: icon;
+                    accessible-role: none;
+                }
             }
 
             edt := TextInput {
@@ -167,6 +172,7 @@ export component AngleEdit inherits Rectangle {
                 up-btn := ControlIconButton {
                     width: 15px;
                     enabled: enabled;
+                    background-color: transparent;
                     icon: @image-url("../../../font-awesome/svgs/solid/caret-up.svg");
                     icon-offset-y: 1px;
                     accessible-label: "increase";
@@ -180,6 +186,7 @@ export component AngleEdit inherits Rectangle {
                 down-btn := ControlIconButton {
                     width: 15px;
                     enabled: enabled;
+                    background-color: transparent;
                     icon: @image-url("../../../font-awesome/svgs/solid/caret-down.svg");
                     icon-offset-y: -1px;
                     accessible-label: "decrease";

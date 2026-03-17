@@ -1,10 +1,8 @@
 import { Data } from "../api.slint";
 
-//TODO
-
 export component Spinner inherits Rectangle {
     in property <bool> indeterminate: false;  // Actually not supported yet.
-    in property <color> foreground-color: Data.theme.palette.control-text-disabled;
+    in property <color> foreground-color: Data.theme.palette.base-text-muted;
     property <length> size: min(self.width, self.height);
     property <length> dot-size: size * 0.22;
     property <[angle]> angles: [

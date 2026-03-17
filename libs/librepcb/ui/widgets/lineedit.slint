@@ -139,6 +139,8 @@ export component LineEdit inherits Rectangle {
         l := HorizontalLayout {
             x: 0;
             y: 0;
+            padding-top: 1px;
+            padding-bottom: 1px;
             padding-left: placeholder-txt.x;
             padding-right: 3px;
 
@@ -147,11 +149,10 @@ export component LineEdit inherits Rectangle {
                 preferred-width: edt.preferred-width;
                 viewport-width: edt.width;
                 viewport-height: edt.height;
+                thin-scrollbars: true;
 
                 edt := TextInput {
-                    property <length> y-offset: (self.width > parent.width) ? 3px : 0;
-
-                    y: ((parent.height - self.height) / 2) - y-offset;
+                    y: ((parent.height - self.height) / 2);
                     width: max(self.preferred-width, view.width);
                     height: self.preferred-height;
                     font-size: font-size;

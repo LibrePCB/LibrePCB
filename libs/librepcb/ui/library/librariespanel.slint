@@ -24,9 +24,9 @@ component LibraryUninstallPopup inherits MessagePopup {
     in property <int> index;
 
     title: @tr("Uninstall {}", model[index].name);
-    background: #700000;
-    border-color: #d8d8d8;
-    text-color: #d8d8d8;
+    //background: #700000;
+    //border-color: #d8d8d8;
+    //text-color: #d8d8d8;
     arrow: left;
     has-ok: false;
     has-yes: true;
@@ -134,7 +134,7 @@ component LibraryListViewItem inherits Rectangle {
                 height: root.height - 6px;
                 image-fit: contain;
                 source: lib.icon;
-                opacity: lib.installed-version.is-empty ? 0.6 : 1;
+                opacity: lib.installed-version.is-empty ? 0.7 : 1;
                 accessible-role: none;
             }
 
@@ -202,7 +202,6 @@ component LibraryListViewItem inherits Rectangle {
                 if lib.progress > 0: Rectangle {
                     progress-bar := ProgressBar {
                         height: 5px;
-                        background: Data.theme.palette.base;
                         progress: lib.progress / 100;
                         accessible-role: none;
                     }

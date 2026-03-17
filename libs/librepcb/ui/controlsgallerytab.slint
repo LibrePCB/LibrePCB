@@ -1,14 +1,16 @@
 import {
+    AngleEdit,
     Button,
     CheckBox,
-    IconButton,
-    LineEdit,
-    AngleEdit,
-    Switch,
     ComboBox,
-    LinkText,
+    IconButton,
+    ScrollView,
     LengthEdit,
+    LineEdit,
+    LinkText,
     ProgressBar,
+    RatioEdit,
+    Switch,
     Text,
 } from "widgets.slint";
 import { Tab } from "tab.slint";
@@ -345,6 +347,25 @@ component LineEditGallery inherits VerticalLayout {
         suggestions: ["Suggestion 1", "Suggestion 2"];
     }
 
+    RatioEdit {
+        height: self.preferred-height;
+        enabled: false;
+    }
+
+    RatioEdit {
+        height: self.preferred-height;
+        enabled: false;
+        can-increase: true;
+        can-decrease: false;
+    }
+
+    RatioEdit {
+        height: self.preferred-height;
+        enabled: true;
+        can-increase: true;
+        can-decrease: false;
+    }
+
     AngleEdit {
         height: self.preferred-height;
         enabled: false;
@@ -554,19 +575,23 @@ component Gallery inherits Rectangle {
 }
 
 export component ControlsGalleryTab inherits Tab {
-    HorizontalLayout {
-        alignment: start;
-        padding: 8px;
-        spacing: 5px;
+    ScrollView {
+        HorizontalLayout {
+            min-width: 1400px;
+            min-height: 1400px;
+            alignment: start;
+            padding: 8px;
+            spacing: 5px;
 
-        Gallery {
-            title: "WINDOW";
-            background: Data.theme.palette.window;
-        }
+            Gallery {
+                title: "WINDOW";
+                background: Data.theme.palette.window;
+            }
 
-        Gallery {
-            title: "BASE";
-            background: Data.theme.palette.base;
+            Gallery {
+                title: "BASE";
+                background: Data.theme.palette.base;
+            }
         }
     }
 }
