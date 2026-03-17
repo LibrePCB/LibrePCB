@@ -4,16 +4,30 @@ import { LineEdit } from "lineedit.slint";
 import { ScrollView } from "scrollview.slint";
 import { AttributeAction, AttributeData, Data } from "../api.slint";
 
-//TODO
-
 component HorizontalLine inherits Rectangle {
+    in property <bool> read-only: false;
+
     height: 1px;
-    background: #505050;
+    background: {
+        if read-only {
+            Data.theme.palette.control-border-disabled
+        } else {
+            Data.theme.palette.control-border-disabled
+        }
+    };
 }
 
 component VerticalLine inherits Rectangle {
+    in property <bool> read-only: false;
+
     width: 1px;
-    background: #505050;
+    background: {
+        if read-only {
+            Data.theme.palette.control-border-disabled
+        } else {
+            Data.theme.palette.control-border-disabled
+        }
+    };
 }
 
 export component AttributeListView inherits ScrollView {
@@ -42,10 +56,14 @@ export component AttributeListView inherits ScrollView {
     }
 
     l := HorizontalLayout {
-        VerticalLine { }
+        VerticalLine {
+            read-only: read-only;
+        }
 
         VerticalLayout {
-            HorizontalLine { }
+            HorizontalLine {
+                read-only: read-only;
+            }
 
             for item[index] in model: VerticalLayout {
                 key-edt := LineEdit {
@@ -78,15 +96,20 @@ export component AttributeListView inherits ScrollView {
                 }
 
                 HorizontalLine {
+                    read-only: read-only;
                     visible: is-visible-row(index);
                 }
             }
         }
 
-        VerticalLine { }
+        VerticalLine {
+            read-only: read-only;
+        }
 
         VerticalLayout {
-            HorizontalLine { }
+            HorizontalLine {
+                read-only: read-only;
+            }
 
             for item[index] in model: VerticalLayout {
                 type-cbx := ComboBox {
@@ -106,15 +129,20 @@ export component AttributeListView inherits ScrollView {
                 }
 
                 HorizontalLine {
+                    read-only: read-only;
                     visible: is-visible-row(index);
                 }
             }
         }
 
-        VerticalLine { }
+        VerticalLine {
+            read-only: read-only;
+        }
 
         VerticalLayout {
-            HorizontalLine { }
+            HorizontalLine {
+                read-only: read-only;
+            }
 
             for item[index] in model: VerticalLayout {
                 value-edt := LineEdit {
@@ -139,15 +167,20 @@ export component AttributeListView inherits ScrollView {
                 }
 
                 HorizontalLine {
+                    read-only: read-only;
                     visible: is-visible-row(index);
                 }
             }
         }
 
-        VerticalLine { }
+        VerticalLine {
+            read-only: read-only;
+        }
 
         VerticalLayout {
-            HorizontalLine { }
+            HorizontalLine {
+                read-only: read-only;
+            }
 
             for item[index] in model: VerticalLayout {
                 unit-cbx := ComboBox {
@@ -167,20 +200,29 @@ export component AttributeListView inherits ScrollView {
                 }
 
                 HorizontalLine {
+                    read-only: read-only;
                     visible: is-visible-row(index);
                 }
             }
         }
 
-        VerticalLine { }
+        VerticalLine {
+            read-only: read-only;
+        }
 
         if (!read-only) && (model.length > 2): VerticalLayout {
-            HorizontalLine { }
+            HorizontalLine {
+                read-only: read-only;
+            }
 
             for item[index] in model: VerticalLayout {
                 move-up-btn := IconButton {
                     height: row-height;
-                    background-color: #202020;
+                    color-disabled: Data.theme.palette.control-text-disabled;
+                    color-enabled: Data.theme.palette.control-text;
+                    color-hovered: Data.theme.palette.control-text;
+                    background-color: self.enabled ? Data.theme.palette.control : Data.theme.palette.control-disabled;
+                    background-color-hovered: Data.theme.palette.control-hovered;
                     icon-size: 14px;
                     icon: @image-url("../../../font-awesome/svgs/solid/arrow-up.svg");
                     enabled: (index > 0) && (!is-last-row(index));
@@ -191,19 +233,29 @@ export component AttributeListView inherits ScrollView {
                     }
                 }
 
-                HorizontalLine { }
+                HorizontalLine {
+                    read-only: read-only;
+                }
             }
         }
 
-        if (!read-only) && (model.length > 2): VerticalLine { }
+        if (!read-only) && (model.length > 2): VerticalLine {
+            read-only: read-only;
+        }
 
         if !read-only: VerticalLayout {
-            HorizontalLine { }
+            HorizontalLine {
+                read-only: read-only;
+            }
 
             for item[index] in model: VerticalLayout {
                 add-delete-btn := IconButton {
                     height: row-height;
-                    background-color: #202020;
+                    color-disabled: Data.theme.palette.control-text-disabled;
+                    color-enabled: Data.theme.palette.control-text;
+                    color-hovered: Data.theme.palette.control-text;
+                    background-color: self.enabled ? Data.theme.palette.control : Data.theme.palette.control-disabled;
+                    background-color-hovered: Data.theme.palette.control-hovered;
                     icon-size: 13px;
                     icon: {
                         if is-last-row(index) {
@@ -224,10 +276,14 @@ export component AttributeListView inherits ScrollView {
                     }
                 }
 
-                HorizontalLine { }
+                HorizontalLine {
+                    read-only: read-only;
+                }
             }
         }
 
-        if !read-only: VerticalLine { }
+        if !read-only: VerticalLine {
+            read-only: read-only;
+        }
     }
 }

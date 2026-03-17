@@ -318,7 +318,7 @@ export component LineEdit inherits Rectangle {
         }
     }
 
-    if frameless && (self.has-focus || self.has-error): Rectangle {
+    if frameless && enabled && (!read-only) && (self.has-focus || self.has-error): Rectangle {
         y: parent.height - self.height;
         height: 1px;
         background: parent.border-color;
