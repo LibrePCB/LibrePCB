@@ -1,22 +1,19 @@
-import { IconButton } from "iconbutton.slint";
+import { ControlIconButton } from "iconbutton.slint";
 import { Data } from "../api.slint";
-
-//TODO
 
 export component FilterTermEdit inherits Rectangle {
     in property <string> term;
 
-    preferred-height: 28px;
+    preferred-height: 25px;
     background: Data.theme.palette.control;
-    border-color: Data.theme.palette.base-border;
+    border-color: Data.theme.palette.control-border;
     border-width: 1px;
-    border-radius: self.height / 2;
 
     callback clear-clicked <=> clear-btn.clicked;
 
     HorizontalLayout {
-        padding-left: 10px;
-        padding-right: 7px;
+        padding-left: 6px;
+        padding-right: 4px;
         spacing: 5px;
 
         Text {
@@ -28,20 +25,19 @@ export component FilterTermEdit inherits Rectangle {
 
         Text {
             vertical-alignment: center;
-            color: Data.theme.palette.base-text;
+            color: Data.theme.palette.control-text;
             font-size: 13px;
             text: term;
         }
 
         Rectangle { }
 
-        clear-btn := IconButton {
+        clear-btn := ControlIconButton {
             y: (parent.height - self.height) / 2;
             width: self.height;
             height: min(16px, parent.height);
             style: hyperlink;
             icon: @image-url("../../../font-awesome/svgs/solid/xmark.svg");
-            color-enabled: Data.theme.palette.control-text-muted;
             accessible-label: "clear filter term";
         }
     }

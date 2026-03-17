@@ -162,11 +162,10 @@ component ProjectSection inherits Rectangle {
                 title: project.name.to-uppercase();
                 highlight: project-index == Data.current-project-index;
 
-                if project.unsaved-changes && project.writable: save-badge := Badge {
-                    y: (parent.height - self.height) / 2;
-                    text: @tr("save").to-lowercase();
-                    text-color: Data.theme.palette.base-text-warning;
-                    clickable: true;
+                if project.unsaved-changes && project.writable: save-btn := IconButton {
+                    cmd: Cmd.save;
+                    icon-scale: 60%;
+                    color-enabled: Data.theme.palette.base-text-warning;
 
                     clicked => {
                         Backend.trigger-project(project-index, ProjectAction.save);

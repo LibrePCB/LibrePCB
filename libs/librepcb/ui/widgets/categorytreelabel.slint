@@ -1,9 +1,8 @@
-import { Text } from "text.slint";
-
-//TODO
+import { Data } from "../api.slint";
 
 export component CategoryTreeLabel inherits VerticalLayout {
     in property <[string]> names;
+    in property <color> color: Data.theme.palette.base-text;
 
     // Accessibility
     accessible-role: text;
@@ -14,7 +13,9 @@ export component CategoryTreeLabel inherits VerticalLayout {
         padding-left: index * 8px;
 
         row-txt := Text {
+            color: color;
             font-weight: (index == (names.length - 1)) ? 600 : 400;
+            vertical-alignment: center;
             overflow: elide;
             text: ((index > 0) ? "⤷ " : "") + name;
             accessible-role: none;

@@ -165,7 +165,7 @@ export component ComboBox inherits Rectangle {
         }
     }
 
-    if frameless && self.has-focus: Rectangle {
+    if frameless && enabled && (!read-only) && self.has-focus: Rectangle {
         y: parent.height - self.height;
         height: 1px;
         background: Data.theme.palette.accent;

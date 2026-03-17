@@ -1,13 +1,10 @@
 import { LinkText } from "linktext.slint";
 import { Data } from "../api.slint";
 
-//TODO
-
 export struct NavBarItemData {
     title: string,
     disabled: bool,
 }
-
 export component NavBar inherits HorizontalLayout {
     in property <[NavBarItemData]> items;
     in-out property <int> current-index: 0;

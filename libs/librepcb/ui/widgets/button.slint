@@ -21,7 +21,7 @@ export component Button inherits Rectangle {
 
     callback clicked;
 
-    height: self.preferred-height;
+    min-height: 25px;
     min-width: fs.min-width;
     background: {
         if !enabled {
@@ -83,21 +83,19 @@ export component Button inherits Rectangle {
             enabled: enabled;
 
             HorizontalLayout {
-                padding-top: 4px;
-                padding-bottom: 4px;
+                padding-top: 2px;
+                padding-bottom: 2px;
                 padding-left: 10px;
                 padding-right: self.padding-left;
                 spacing: 7px;
                 alignment: center;
 
                 if icon.width > 0: Rectangle {
-                    y: (parent.height - self.height) / 2;
-                    width: self.height;
-                    height: 20px;
+                    width: 17px;
 
                     Image {
                         width: 100%;
-                        height: 100%;
+                        height: self.width;
                         image-fit: contain;
                         colorize: text-color;
                         source: icon;

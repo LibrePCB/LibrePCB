@@ -1,7 +1,5 @@
 import { Data, EditorCommand } from "../api.slint";
 
-//TODO
-
 export component MenuSeparator inherits Rectangle {
     height: 10px;
 
@@ -27,7 +25,7 @@ export component MenuItem inherits Rectangle {
     in property <bool> checkable: false;
     in property <bool> checked: false;
     in property <bool> default: false;
-    property <color> text-color: enabled ? Data.theme.palette.base-text : Data.theme.palette.control-text-disabled;
+    property <color> text-color: enabled ? Data.theme.palette.control-text : Data.theme.palette.control-text-disabled;
 
     callback clicked;
 
@@ -62,10 +60,10 @@ export component MenuItem inherits Rectangle {
             property <bool> checkable-custom-icon: checkable && (icon.width > 0);
 
             width: self.height;
-            background: checkable-custom-icon ? #303030 : transparent;
+            background: checkable-custom-icon ? Data.theme.palette.control-checked : transparent;
             border-radius: 5px;
             border-width: checkable-custom-icon ? 1px : 0;
-            border-color: #909090;
+            border-color: Data.theme.palette.control-border;
 
             Image {
                 width: 80%;
@@ -78,10 +76,8 @@ export component MenuItem inherits Rectangle {
                 source: {
                     if icon.width > 0 {
                         icon
-                    } else if checked {
-                        icon-checked
                     } else if checkable {
-                        icon-unchecked
+                        checked ? icon-checked : icon-unchecked
                     } else {
                         @image-url("")
                     }
@@ -182,6 +178,6 @@ export component MenuOverlay inherits Rectangle {
         y: -1px;
         width: opening-width - 2px;
         height: 2px;
-        background: Data.theme.palette.base;
+        background: root.background;
     }
 }

@@ -1,5 +1,5 @@
 import { ComboBox } from "combobox.slint";
-import { IconButton } from "iconbutton.slint";
+import { ControlIconButton } from "iconbutton.slint";
 import { LineEdit } from "lineedit.slint";
 import { ScrollView } from "scrollview.slint";
 import { AttributeAction, AttributeData, Data } from "../api.slint";
@@ -216,13 +216,8 @@ export component AttributeListView inherits ScrollView {
             }
 
             for item[index] in model: VerticalLayout {
-                move-up-btn := IconButton {
+                move-up-btn := ControlIconButton {
                     height: row-height;
-                    color-disabled: Data.theme.palette.control-text-disabled;
-                    color-enabled: Data.theme.palette.control-text;
-                    color-hovered: Data.theme.palette.control-text;
-                    background-color: self.enabled ? Data.theme.palette.control : Data.theme.palette.control-disabled;
-                    background-color-hovered: Data.theme.palette.control-hovered;
                     icon-size: 14px;
                     icon: @image-url("../../../font-awesome/svgs/solid/arrow-up.svg");
                     enabled: (index > 0) && (!is-last-row(index));
@@ -249,13 +244,8 @@ export component AttributeListView inherits ScrollView {
             }
 
             for item[index] in model: VerticalLayout {
-                add-delete-btn := IconButton {
+                add-delete-btn := ControlIconButton {
                     height: row-height;
-                    color-disabled: Data.theme.palette.control-text-disabled;
-                    color-enabled: Data.theme.palette.control-text;
-                    color-hovered: Data.theme.palette.control-text;
-                    background-color: self.enabled ? Data.theme.palette.control : Data.theme.palette.control-disabled;
-                    background-color-hovered: Data.theme.palette.control-hovered;
                     icon-size: 13px;
                     icon: {
                         if is-last-row(index) {

@@ -206,7 +206,7 @@ export component LineEdit inherits Rectangle {
             if enabled && (!read-only) && show-clear-button: clear-btn := ControlIconButton {
                 y: (parent.height - self.height) / 2;
                 height: 18px;
-                background-color: root.background;
+                style: hyperlink;
                 border-radius: self.height / 2;
                 icon-scale: 0.7;
                 icon: @image-url("../../../font-awesome/svgs/solid/xmark.svg");
@@ -222,7 +222,7 @@ export component LineEdit inherits Rectangle {
             if enabled && (!read-only) && (suggestions.length > 0): expand-btn := ControlIconButton {
                 y: (parent.height - self.height) / 2;
                 height: 18px;
-                background-color: root.background;
+                style: hyperlink;
                 border-radius: self.height / 2;
                 icon-size: 13px;  // Same size as in ComboBox.
                 icon: @image-url("../../../font-awesome/svgs/solid/caret-down.svg");

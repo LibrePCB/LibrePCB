@@ -1,8 +1,6 @@
 import { ToolTip } from "tooltip.slint";
 import { Backend, Data, EditorCommand } from "../api.slint";
 
-//TODO
-
 export enum IconButtonStyle {
     standard,  // Background filled, arrow cursor, smaller icon
     hyperlink,  // Background transparent, hand pointer
@@ -146,15 +144,34 @@ export component IconButton inherits Rectangle {
     }
 }
 
-// IconButton with colors preconfigured for use within controls (e.g. LineEdit).
+// IconButton with colors preconfigured for use as controls, or as hyperlinks
+// within other controls (e.g. LineEdit).
 export component ControlIconButton inherits IconButton {
     color-disabled: Data.theme.palette.control-text-disabled;
     color-enabled: (self.style == IconButtonStyle.checkable-hyperlink) ? Data.theme.palette.control-text-disabled : Data.theme.palette.control-text-muted;
     color-checked: Data.theme.palette.control-text;
     color-hovered: Data.theme.palette.control-text;
-    background-color: transparent;
-    background-color-hovered: (self.style == IconButtonStyle.standard) ? Data.theme.palette.control-hovered : self.background-color;
-    background-color-checked: ((self.style == IconButtonStyle.standard) || (self.style == IconButtonStyle.read-only)) ? Data.theme.palette.control-checked : self.background-color;
+    background-color: {
+        if self.style == IconButtonStyle.standard {
+            self.enabled ? Data.theme.palette.control : Data.theme.palette.control-disabled
+        } else {
+            transparent
+        }
+    };
+    background-color-hovered: {
+        if self.style == IconButtonStyle.standard {
+            Data.theme.palette.control-hovered
+        } else {
+            self.background-color
+        }
+    };
+    background-color-checked: {
+        if (self.style == IconButtonStyle.standard) || (self.style == IconButtonStyle.read-only) {
+            Data.theme.palette.control-checked
+        } else {
+            self.background-color
+        }
+    };
 }
 
 export component CopyToClipboardIconButton inherits IconButton {

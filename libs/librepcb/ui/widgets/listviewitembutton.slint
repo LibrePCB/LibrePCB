@@ -1,8 +1,6 @@
 import { ToolTip } from "tooltip.slint";
 import { Data } from "../api.slint";
 
-//TODO
-
 export enum ToolTipSide {
     left,
     right,
@@ -36,12 +34,12 @@ export component ListViewItemButton inherits TouchArea {
         colorize: {
             if colorize != transparent {
                 colorize
-            } else if root.has-hover {
-                Data.theme.palette.base-text-hovered
-            } else if root.enabled {
-                Data.theme.palette.base-text.mix(Data.theme.palette.control-text-muted, 0.5)
-            } else {
+            } else if !root.enabled {
                 Data.theme.palette.control-text-disabled
+            } else if root.has-hover {
+                Data.theme.palette.control-text
+            } else {
+                Data.theme.palette.control-text.mix(Data.theme.palette.control-text-muted, 0.3)
             }
         };
         accessible-role: none;

@@ -29,14 +29,20 @@ export component LibraryRuleCheckLink inherits HorizontalLayout {
         y: (parent.height - self.height) / 2;
         background: {
             if data.unapproved > 0 {
-                Data.theme.palette.base-text-error
+                Data.theme.palette.error.with-alpha(self.has-hover ? 1 : 0.7)
             } else {
-                Data.theme.palette.base-text-success
+                Data.theme.palette.info.with-alpha(self.has-hover ? 1 : 0.7)
             }
         };
         border-color: self.background;
-        text-color: Data.theme.palette.base.with-alpha(0.9);
-        text-color-hover: Data.theme.palette.base;
+        text-color: {
+            if data.unapproved > 0 {
+                Data.theme.palette.error-text
+            } else {
+                Data.theme.palette.info-text
+            }
+        };
+        text-color-hover: self.text-color;
         font-size: 12px;
         text: text;
         clickable: true;
