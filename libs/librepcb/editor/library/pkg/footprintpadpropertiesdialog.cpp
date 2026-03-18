@@ -76,6 +76,13 @@ FootprintPadPropertiesDialog::FootprintPadPropertiesDialog(
   mUi->customShapePathEditor->setLengthUnit(lengthUnit);
   mUi->holeEditorWidget->configureClientSettings(
       lengthUnit, settingsPrefix % "/hole_editor");
+  connect(mUi->edtHoleDiameter, &PositiveLengthEdit::valueChanged, this,
+          [this](const PositiveLength& value) {
+            if (const std::shared_ptr<PadHole> holePtr = mHoles.value(0)) {
+              holePtr->setDiameter(value);
+              mUi->holeEditorWidget->setDiameter(value);
+            }
+          });
   connect(mUi->lblHoleDetails, &QLabel::linkActivated, this,
           [this]() { mUi->tabWidget->setCurrentWidget(mUi->tabHoles); });
   connect(mUi->btnConvertToSmt, &QToolButton::clicked, this,
@@ -107,7 +114,7 @@ FootprintPadPropertiesDialog::FootprintPadPropertiesDialog(
   connect(mUi->btnAddHole, &QToolButton::clicked, this,
           &FootprintPadPropertiesDialog::addHole);
   connect(mUi->buttonBox, &QDialogButtonBox::clicked, this,
-          &FootprintPadPropertiesDialog::on_buttonBox_clicked);
+          &FootprintPadPropertiesDialog::buttonBoxClicked);
 
   // Disable some widgets if not applicable for the selected shape.
   connect(mUi->btnShapeRound, &QRadioButton::toggled, this,
@@ -149,34 +156,6 @@ FootprintPadPropertiesDialog::FootprintPadPropertiesDialog(
           &FootprintPadPropertiesDialog::updateAbsoluteRadius);
   connect(mUi->edtHeight, &PositiveLengthEdit::valueChanged, this,
           &FootprintPadPropertiesDialog::updateAbsoluteRadius);
-
-  // Avoid creating pads with a drill diameter larger than its size!
-  // See https://github.com/LibrePCB/LibrePCB/issues/946.
-  connect(mUi->edtWidth, &PositiveLengthEdit::valueChanged, this,
-          [this](const PositiveLength& value) {
-            if (value < mUi->edtHoleDiameter->getValue()) {
-              mUi->edtHoleDiameter->setValue(value);
-            }
-          });
-  connect(mUi->edtHeight, &PositiveLengthEdit::valueChanged, this,
-          [this](const PositiveLength& value) {
-            if (value < mUi->edtHoleDiameter->getValue()) {
-              mUi->edtHoleDiameter->setValue(value);
-            }
-          });
-  connect(mUi->edtHoleDiameter, &PositiveLengthEdit::valueChanged, this,
-          [this](const PositiveLength& value) {
-            if (value > mUi->edtWidth->getValue()) {
-              mUi->edtWidth->setValue(value);
-            }
-            if (value > mUi->edtHeight->getValue()) {
-              mUi->edtHeight->setValue(value);
-            }
-            if (const std::shared_ptr<PadHole> holePtr = mHoles.value(0)) {
-              holePtr->setDiameter(value);
-              mUi->holeEditorWidget->setDiameter(value);
-            }
-          });
 
   // Enable custom mask offset only when allowed.
   connect(mUi->rbtnStopMaskManual, &QRadioButton::toggled,
@@ -442,8 +421,7 @@ void FootprintPadPropertiesDialog::applyTypicalSmtProperties() noexcept {
   mUi->rbtnSolderPasteAuto->setChecked(true);
 }
 
-void FootprintPadPropertiesDialog::on_buttonBox_clicked(
-    QAbstractButton* button) {
+void FootprintPadPropertiesDialog::buttonBoxClicked(QAbstractButton* button) {
   switch (mUi->buttonBox->buttonRole(button)) {
     case QDialogButtonBox::ApplyRole:
       applyChanges();
@@ -462,16 +440,39 @@ void FootprintPadPropertiesDialog::on_buttonBox_clicked(
   }
 }
 
+void FootprintPadPropertiesDialog::accept() noexcept {
+  if (applyChanges()) {
+    QDialog::accept();
+  }
+}
+
 bool FootprintPadPropertiesDialog::applyChanges() noexcept {
+  QStringList errors;
+
+  // Check if drill diameter <= pad size.
+  if ((!mHoles.isEmpty()) && (!mUi->btnShapeCustom->isChecked()) &&
+      (mUi->edtHoleDiameter->getValue() >
+       std::min(mUi->edtWidth->getValue(), mUi->edtHeight->getValue()))) {
+    errors.append(
+        tr("The drill diameter is exceeding the pad width or height. Reduce "
+           "the drill diameter or increase the pad width and/or height."));
+  }
+
   // Clean and validate custom outline path.
   const Path customOutlinePath =
       mUi->customShapePathEditor->getPath().cleaned().toOpenPath();
   mUi->customShapePathEditor->setPath(customOutlinePath);
   if (mUi->btnShapeCustom->isChecked() &&
       (!PadGeometry::isValidCustomOutline(customOutlinePath))) {
-    QMessageBox::critical(
-        this, tr("Invalid outline"),
+    errors.append(
         tr("The custom pad outline does not represent a valid area."));
+  }
+
+  // Deny creating invalid pads.
+  // See https://github.com/LibrePCB/LibrePCB/issues/946 and
+  // see https://github.com/LibrePCB/LibrePCB/issues/1715.
+  if (!errors.isEmpty()) {
+    QMessageBox::critical(this, tr("Invalid Properties"), errors.join("\n\n"));
     return false;
   }
 

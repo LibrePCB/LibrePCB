@@ -87,7 +87,8 @@ private:  // Methods
   void setSelectedHole(int index) noexcept;
   void applyTypicalThtProperties() noexcept;
   void applyTypicalSmtProperties() noexcept;
-  void on_buttonBox_clicked(QAbstractButton* button);
+  void buttonBoxClicked(QAbstractButton* button);
+  void accept() noexcept override;
   bool applyChanges() noexcept;
 
 private:  // Data
