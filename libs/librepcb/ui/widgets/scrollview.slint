@@ -1,34 +1,29 @@
 import { Data } from "../api.slint";
 
-//TODO
-
 export component ScrollBar inherits Rectangle {
+    in property <bool> horizontal;
+    in property <length> page-size;
+    in property <length> maximum;
     in property <bool> enabled;
-    out property <bool> has-hover: touch-area.has-hover;
-    in-out property <bool> horizontal;
-    in-out property <length> maximum;
-    in-out property <length> page-size;
     in-out property <length> value;
+    out property <bool> has-hover: ta.has-hover;
+    property <length> track-size: horizontal ? (root.width - 2 * offset) : (root.height - 2 * offset);
+    property <length> offset: 2px;
 
     callback scrolled();
 
-    private property <length> track-size: root.horizontal ? root.width - 2 * root.offset : root.height - 2 * offset;
-    private property <length> step-size: 10px;
-    private property <length> offset: 2px;
-
-    opacity: 0.7;
-    visible: self.maximum > 0;
     background: has-hover ? Data.theme.palette.control-hovered : transparent;
+    visible: maximum > 0;
 
-    thumb := Rectangle {
-        width: !root.horizontal ? parent.width - 2px : root.maximum <= 0phx ? 0phx : max(min(32px, root.width), root.track-size * root.page-size / (root.maximum + root.page-size));
-        height: root.horizontal ? parent.height - 2px : root.maximum <= 0phx ? 0phx : max(min(32px, root.height), root.track-size * (root.page-size / (root.maximum + root.page-size)));
-        x: !root.horizontal ? (parent.width - self.width) / 2 : root.offset + (root.track-size - thumb.width) * (-root.value / root.maximum);
-        y: root.horizontal ? (parent.height - self.height) / 2 : root.offset + (root.track-size - thumb.height) * (-root.value / root.maximum);
+    handle := Rectangle {
+        width: !horizontal ? parent.width - 2px : maximum <= 0phx ? 0phx : max(min(32px, root.width), track-size * root.page-size / (maximum + root.page-size));
+        height: horizontal ? parent.height - 2px : maximum <= 0phx ? 0phx : max(min(32px, root.height), track-size * (root.page-size / (maximum + root.page-size)));
+        x: !horizontal ? (parent.width - self.width) / 2 : offset + (track-size - self.width) * (-value / maximum);
+        y: horizontal ? (parent.height - self.height) / 2 : offset + (track-size - self.height) * (-value / maximum);
         background: {
-            if touch-area.pressed {
+            if ta.pressed {
                 Data.theme.palette.control-text.mix(Data.theme.palette.control-text-muted, 0.5)
-            } else if touch-area.has-hover {
+            } else if ta.has-hover {
                 Data.theme.palette.control-text-muted
             } else {
                 Data.theme.palette.control-text-disabled
@@ -37,44 +32,40 @@ export component ScrollBar inherits Rectangle {
         border-radius: min(self.width, self.height) / 2;
     }
 
-    touch-area := TouchArea {
+    ta := TouchArea {
         property <{ pressed-value: length, maximum: length, x: length, y: length}> saved-values;
 
-        x: root.horizontal ? 0 : parent.width - self.width + 4px;
-        y: (!root.horizontal) ? 0 : parent.height - self.height + 4px;
-        width: (!root.horizontal) ? parent.width + 4px : parent.width;
-        height: root.horizontal ? parent.height + 4px : parent.height;
+        x: horizontal ? 0 : parent.width - self.width + 4px;
+        y: (!horizontal) ? 0 : parent.height - self.height + 4px;
+        width: (!horizontal) ? parent.width + 4px : parent.width;
+        height: horizontal ? parent.height + 4px : parent.height;
 
         function update-saved-values() {
-            self.saved-values = { pressed-value: -root.value, maximum: root.maximum, x: self.mouse-x, y: self.mouse-y };
+            saved-values = { pressed-value: -value, maximum: maximum, x: self.mouse-x, y: self.mouse-y };
         }
 
         pointer-event(event) => {
-            if (event.button == PointerEventButton.left && event.kind == PointerEventKind.down) {
+            if (event.button == PointerEventButton.left) && (event.kind == PointerEventKind.down) {
                 self.update-saved-values();
             }
         }
 
         moved => {
-            if (self.enabled && self.pressed) {
-                // Update reference points when the size of the viewport changes to
-                // avoid 'jumping' during scrolling.
-                // This happens when height estimate of a ListView changes after
-                // new items are loaded.
-                if (self.saved-values.maximum != root.maximum) {
+            if self.enabled && self.pressed {
+                if saved-values.maximum != maximum {
                     self.update-saved-values();
                 }
-                root.value = -max(0px, min(root.maximum, self.saved-values.pressed-value + (root.horizontal ? (self.mouse-x - self.saved-values.x) * (root.maximum / (root.track-size - thumb.width)) : (self.mouse-y - self.saved-values.y) * (root.maximum / (root.track-size - thumb.height)))));
+                value = -max(0px, min(maximum, saved-values.pressed-value + (horizontal ? (self.mouse-x - saved-values.x) * (maximum / (track-size - handle.width)) : (self.mouse-y - saved-values.y) * (maximum / (track-size - handle.height)))));
                 root.scrolled();
             }
         }
 
         scroll-event(event) => {
-            if (root.horizontal && event.delta-x != 0) {
-                root.value = max(-root.maximum, min(0px, root.value + event.delta-x));
+            if horizontal && (event.delta-x != 0) {
+                value = max(-maximum, min(0px, value + event.delta-x));
                 return accept;
-            } else if (!root.horizontal && event.delta-y != 0) {
-                root.value = max(-root.maximum, min(0px, root.value + event.delta-y));
+            } else if (!horizontal) && (event.delta-y != 0) {
+                value = max(-maximum, min(0px, value + event.delta-y));
                 return accept;
             }
             reject
@@ -91,17 +82,15 @@ export component ScrollView {
     in-out property <length> viewport-height <=> flickable.viewport-height;
 
     // Workaround for crashing slint-lsp if those properties don't exist.
-    property <length> visible-width;
-    property <length> visible-height;
+    property <length> visible-width <=> flickable.width;
+    property <length> visible-height <=> flickable.height;
 
     callback scrolled <=> flickable.flicked;
 
-    min-height: 50px;
-    min-width: 50px;
+    preferred-width: 100%;
+    preferred-height: 100%;
     horizontal-stretch: 1;
     vertical-stretch: 1;
-    preferred-height: 100%;
-    preferred-width: 100%;
 
     ta := TouchArea {
         flickable := Flickable {
@@ -118,8 +107,8 @@ export component ScrollView {
             width: (self.has-hover && (!thin-scrollbars)) ? 8px : 6px;
             height: horizontal-bar.visible ? parent.height - horizontal-bar.height : parent.height;
             horizontal: false;
-            maximum: flickable.viewport-height - flickable.height;
             page-size: flickable.height;
+            maximum: flickable.viewport-height - flickable.height;
             opacity: (ta.has-hover || self.has-hover) ? 0.7 : 0;
 
             animate width {
@@ -138,13 +127,13 @@ export component ScrollView {
         }
 
         horizontal-bar := ScrollBar {
+            x: 0;
+            y: parent.height - self.height;
             width: vertical-bar.visible ? parent.width - vertical-bar.width : parent.width;
             height: (self.has-hover && (!thin-scrollbars)) ? 8px : 6px;
-            y: parent.height - self.height;
-            x: 0;
             horizontal: true;
-            maximum: flickable.viewport-width - flickable.width;
             page-size: flickable.width;
+            maximum: flickable.viewport-width - flickable.width;
             opacity: (ta.has-hover || self.has-hover) ? 0.7 : 0;
 
             animate height {

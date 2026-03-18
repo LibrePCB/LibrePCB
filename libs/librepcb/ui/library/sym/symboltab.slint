@@ -27,7 +27,7 @@ import {
     MessageBanner,
     MessageBox,
     SceneButton,
-    SlideView,
+    NavBar,
     TextEdit,
     ToolBar,
     ToolButton,
@@ -646,17 +646,30 @@ export component SymbolTab inherits Tab {
             shown: tabs[index].checks.errors > 0;
         }
 
-        // Wizard mode: Only one page at a time.
-        if tabs[index].wizard-mode && (tabs[index].page-index <= 0): SymbolMetadataTab {
-            section-index: section-index;
-            tabs: tabs;
-            index: index;
-            read-only: read-only;
+        // Pages in wizard mode:
+        //  [0] Metadata tab: Set metadata
+        //
+        // Pages in normal mode:
+        //  [0] Metadata tab
+        //  [1] Editor tab
+
+        if !tabs[index].wizard-mode && compact-layout: navbar := NavBar {
+            pages: [
+                { id: 0, title: @tr("Metadata") },
+                { id: 1, title: @tr("Graphics") },
+            ];
+            current-id: tabs[index].page-index;
+
+            page-clicked(id) => {
+                Data.set-current-tab(section-index, index);
+                tabs[index].page-index = id;
+            }
         }
 
-        // Normal mode: Editor left, metadata right.
-        if (!tabs[index].wizard-mode) && (!compact-layout): HorizontalLayout {
-            SymbolEditorTab {
+        HorizontalLayout {
+            property <bool> side-by-side: (!tabs[index].wizard-mode) && (!compact-layout);
+
+            if side-by-side || (tabs[index].page-index >= 1): editor-tab := SymbolEditorTab {
                 horizontal-stretch: 1;
                 section-index: section-index;
                 section: section;
@@ -671,55 +684,18 @@ export component SymbolTab inherits Tab {
                 }
             }
 
-            Rectangle {
+            if side-by-side: Rectangle {
                 width: 1px;
                 background: Data.theme.palette.base-border;
             }
 
-            SymbolMetadataTab {
+            if side-by-side || (tabs[index].page-index <= 0): metadata-tab := SymbolMetadataTab {
                 horizontal-stretch: 1;
-                max-width: min(500px, parent.width * 0.4);
+                max-width: side-by-side ? min(500px, parent.width * 0.4) : root.width;
                 section-index: section-index;
                 tabs: tabs;
                 index: index;
                 read-only: read-only;
-            }
-        }
-
-        // Compact mode: Slide between metadata and content.
-        if (!tabs[index].wizard-mode) && compact-layout: SlideView {
-            pages: [
-                { title: @tr("Metadata") },
-                { title: @tr("Graphics") },
-            ];
-            current-index: tabs[index].page-index;
-            duration: 0;  // Temporary, needs proper refactoring.
-
-            SymbolMetadataTab {
-                width: parent.width;
-                section-index: section-index;
-                tabs: tabs;
-                index: index;
-                read-only: read-only;
-            }
-
-            SymbolEditorTab {
-                width: parent.width;
-                section-index: section-index;
-                section: section;
-                tabs: tabs;
-                index: index;
-                read-only: read-only;
-
-                focus-requested => {
-                    if !root.has-focus {
-                        root.focus();
-                    }
-                }
-            }
-
-            page-clicked(idx) => {
-                tabs[index].page-index = idx;
             }
         }
     }

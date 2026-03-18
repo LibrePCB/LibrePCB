@@ -1,12 +1,10 @@
 import { ToolTip } from "tooltip.slint";
 import { Data, EditorCommand } from "../api.slint";
 
-//TODO
-
 export component ToolButton inherits Rectangle {
     in property <EditorCommand> cmd;
     in property <image> icon: cmd.icon;
-    in property <color> colorize: Data.theme.palette.base-text;
+    in property <color> colorize: Data.theme.palette.control-text;
     in property <string> tooltip: cmd.text;
     in property <string> status-tip: cmd.status-tip;
     in property <string> shortcut: cmd.shortcut;
@@ -35,8 +33,14 @@ export component ToolButton inherits Rectangle {
             Data.theme.palette.control
         }
     };
-    border-color: Data.theme.palette.base-border;
-    border-width: (checked || ta.pressed) ? 0 : 1px;
+    border-color: {
+        if !enabled {
+            Data.theme.palette.control-border-disabled
+        } else {
+            Data.theme.palette.control-border
+        }
+    };
+    border-width: checked ? 0 : 1px;
     border-top-left-radius: is-first ? 3px : 0;
     border-top-right-radius: self.border-top-left-radius;
     border-bottom-left-radius: is-last ? 3px : 0;
@@ -63,7 +67,7 @@ export component ToolButton inherits Rectangle {
             colorize: {
                 if !enabled {
                     Data.theme.palette.control-text-disabled
-                } else if checked || ta.pressed {
+                } else if checked {
                     Data.theme.palette.accent-text
                 } else {
                     colorize
@@ -81,7 +85,15 @@ export component ToolButton inherits Rectangle {
 
             Path {
                 commands: "M 100 0 L 100 100 L 0 100 Z";
-                fill: img.colorize;
+                fill: {
+                    if !enabled {
+                        Data.theme.palette.control-text-disabled
+                    } else if checked {
+                        Data.theme.palette.accent-text
+                    } else {
+                        Data.theme.palette.control-text
+                    }
+                };
             }
         }
 

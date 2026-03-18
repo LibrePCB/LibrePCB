@@ -1,18 +1,18 @@
 import { LinkText } from "linktext.slint";
 import { Data } from "../api.slint";
 
-export struct NavBarItemData {
+export struct NavBarPageData {
+    id: int,
     title: string,
     disabled: bool,
 }
-
 export component NavBar inherits VerticalLayout {
-    in property <[NavBarItemData]> items;
-    in-out property <int> current-index: 0;
+    in property <[NavBarPageData]> pages;
+    in-out property <int> current-id: 0;
 
-    callback page-clicked(index: int);
-    page-clicked(index) => {
-        current-index = index;
+    callback page-clicked(id: int);
+    page-clicked(id) => {
+        current-id = id;
     }
 
     height: self.preferred-height;
@@ -22,34 +22,34 @@ export component NavBar inherits VerticalLayout {
         alignment: start;
         padding-top: 4px;
 
-        for item[index] in items: item-l := HorizontalLayout {
+        for page[index] in pages: item-l := HorizontalLayout {
             item-btn := LinkText {
                 width: self.preferred-width + 16px;
                 height: self.preferred-height + 6px;
                 vertical-alignment: center;
                 horizontal-alignment: center;
-                text: item.title;
+                text: page.title;
                 text-color: {
-                    if index == current-index {
+                    if page.id == current-id {
                         Data.theme.palette.base-text-hovered
                     } else {
                         Data.theme.palette.base-text.mix(Data.theme.palette.base-text-muted, 0.5)
                     }
                 };
                 text-color-hovered: {
-                    if index == current-index {
+                    if page.id == current-id {
                         Data.theme.palette.base-text-hovered
                     } else {
                         Data.theme.palette.base-text
                     }
                 };
-                enabled: !item.disabled;
+                enabled: !page.disabled;
 
                 clicked => {
-                    page-clicked(index);
+                    page-clicked(page.id);
                 }
 
-                if index == current-index: Rectangle {
+                if page.id == current-id: Rectangle {
                     x: (parent.width - parent.preferred-width) / 2;
                     y: parent.height - self.height;
                     width: parent.preferred-width;
@@ -58,7 +58,7 @@ export component NavBar inherits VerticalLayout {
                 }
             }
 
-            if (index + 1) < items.length: Text {
+            if (index + 1) < pages.length: Text {
                 text: "•";
                 color: Data.theme.palette.base-text-disabled;
                 vertical-alignment: center;

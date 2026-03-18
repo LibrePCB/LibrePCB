@@ -1,11 +1,9 @@
 import { Data } from "../api.slint";
 
-//TODO
-
 component Slider inherits Rectangle {
     in-out property <float> value;
     in property <bool> enabled: true;
-    in property <length> handle-size: 20px;
+    in property <length> handle-size: 18px;
     in property <bool> focusable: true;
 
     callback value-changed(value: float);
@@ -29,6 +27,7 @@ export component HorizontalSlider inherits Slider {
     out property has-focus <=> fs.has-focus;
 
     preferred-width: 100px;
+    preferred-height: self.handle-size;
     forward-focus: fs;
 
     fs := FocusScope {
@@ -43,20 +42,20 @@ export component HorizontalSlider inherits Slider {
                 x: root.handle-size / 2;
                 width: parent.width - root.handle-size;
                 height: 5px;
-                background: Data.theme.palette.control;
+                background: Data.theme.palette.control-checked;
                 border-radius: self.height / 2;
-                border-color: Data.theme.palette.base-border;
+                border-color: root.enabled ? Data.theme.palette.control-border : Data.theme.palette.control-border-disabled;
                 border-width: 1px;
             }
 
             pointer-event(event) => {
-                if (event.kind == PointerEventKind.down) && (root.focusable) {
+                if (event.kind == PointerEventKind.down) && root.focusable {
                     fs.focus();
                 }
                 if ta.pressed {
                     root.value-changed(max(min((self.mouse-x - (root.handle-size / 2)) / (self.width - root.handle-size), 1), 0));
                 }
-                if (event.kind == PointerEventKind.up) && (root.has-focus) {
+                if (event.kind == PointerEventKind.up) && root.has-focus {
                     root.value-accepted();
                 }
             }
@@ -67,13 +66,13 @@ export component HorizontalSlider inherits Slider {
             width: root.handle-size;
             height: root.handle-size;
             border-color: Data.theme.palette.accent;
-            border-width: root.has-focus ? 1px : 0;
+            border-width: (root.enabled && root.has-focus) ? 1px : 0;
             border-radius: self.width / 2;
 
             Rectangle {
-                width: 70%;
+                width: 75%;
                 height: self.width;
-                background: Data.theme.palette.accent;
+                background: root.enabled ? Data.theme.palette.accent : Data.theme.palette.control-text-disabled;
                 border-radius: self.width / 2;
             }
         }
@@ -96,6 +95,7 @@ export component HorizontalSlider inherits Slider {
 export component VerticalSlider inherits Slider {
     out property has-focus <=> fs.has-focus;
 
+    preferred-width: self.handle-size;
     preferred-height: 100px;
     forward-focus: fs;
 
@@ -111,18 +111,21 @@ export component VerticalSlider inherits Slider {
                 y: root.handle-size / 2;
                 width: 5px;
                 height: parent.height - root.handle-size;
-                background: Data.theme.palette.control;
-                border-radius: self.width / 2;
-                border-color: Data.theme.palette.base-border;
+                background: Data.theme.palette.control-checked;
+                border-radius: self.height / 2;
+                border-color: root.enabled ? Data.theme.palette.control-border : Data.theme.palette.control-border-disabled;
                 border-width: 1px;
             }
 
             pointer-event(event) => {
-                if (event.kind == PointerEventKind.down) && (root.focusable) {
+                if (event.kind == PointerEventKind.down) && root.focusable {
                     fs.focus();
                 }
                 if ta.pressed {
                     root.value-changed(max(min(1 - ((self.mouse-y - (root.handle-size / 2)) / (self.height - root.handle-size)), 1), 0));
+                }
+                if (event.kind == PointerEventKind.up) && root.has-focus {
+                    root.value-accepted();
                 }
             }
         }
@@ -132,13 +135,13 @@ export component VerticalSlider inherits Slider {
             width: root.handle-size;
             height: root.handle-size;
             border-color: Data.theme.palette.accent;
-            border-width: root.has-focus ? 1px : 0;
+            border-width: (root.enabled && root.has-focus) ? 1px : 0;
             border-radius: self.width / 2;
 
             Rectangle {
-                width: 70%;
+                width: 75%;
                 height: self.width;
-                background: Data.theme.palette.accent;
+                background: root.enabled ? Data.theme.palette.accent : Data.theme.palette.control-text-disabled;
                 border-radius: self.width / 2;
             }
         }

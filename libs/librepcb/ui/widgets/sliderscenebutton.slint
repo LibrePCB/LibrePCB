@@ -1,14 +1,12 @@
 import { SceneButton, SceneButtonStyle } from "scenebutton.slint";
 import { HorizontalSlider } from "slider.slint";
 
-//TODO
-
 export component SliderSceneButton {
     in property <image> icon;
     in property <string> tooltip;
     in property <float> value;
-    in property <brush> base-color;
-    in property <brush> base-text-color;
+    in property <color> base-color;
+    in property <color> base-text-color;
     in property <bool> enabled: true;
     in property <bool> slider-enabled: true;
     in property <SceneButtonStyle> style: uncheckbox;

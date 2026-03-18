@@ -1,10 +1,8 @@
 import { IconButton } from "iconbutton.slint";
 import { Data } from "../api.slint";
 
-//TODO
-
 export component ToolBar inherits Rectangle {
-    height: 34px;
+    height: 33px;
     background: Data.theme.palette.window;
     border-color: Data.theme.palette.base-border;
     border-width: 1px;
@@ -30,14 +28,20 @@ export component ToolBarWidget inherits FocusScope {
     preferred-height: 25px;
 
     Rectangle {
-        background: Data.theme.palette.control;
+        background: {
+            if root.enabled {
+                Data.theme.palette.control
+            } else {
+                Data.theme.palette.control-disabled
+            }
+        };
         border-color: {
             if root.has-focus {
                 Data.theme.palette.accent
             } else if root.enabled {
-                Data.theme.palette.base-border
+                Data.theme.palette.control-border
             } else {
-                transparent
+                Data.theme.palette.control-border-disabled
             }
         }
         border-width: 1px;

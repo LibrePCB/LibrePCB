@@ -41,7 +41,7 @@ import {
     MenuItem,
     MenuPopup,
     SceneButton,
-    SlideView,
+    NavBar,
     SliderSceneButton,
     Spinner,
     Text,
@@ -360,7 +360,7 @@ component PackageEditorTab inherits TouchArea {
     property <bool> view-3d: tabs[index].view-3d;
     property <bool> footprint-selected: (tabs[index].footprint-index >= 0) && (tabs[index].footprint-index < tabs[index].footprints.length);
     property <length> toolbar-space: view-buttons-l.x - toolbuttons-l.x - toolbuttons-l.width - 10px;
-    property <length> toolbutton-offset-y: (toolbar-r.width > toolbar-space) ? toolbar-r.height : 0;
+    property <length> toolbutton-offset-y: ((!view-3d) && (toolbar-r.width > toolbar-space)) ? toolbar-r.height : 0;
 
     function tool-triggered(action: TabAction) {
         Data.set-current-tab(section-index, index);
@@ -427,7 +427,7 @@ component PackageEditorTab inherits TouchArea {
     toolbar-r := ToolBar {
         y: -1px;
         width: min(self.preferred-width, root.width - 10px);
-        visible: self.width > 30px;
+        visible: (!view-3d) && (self.width > 30px);
 
         if tabs[index].tool == EditorTool.line: line-toolbar := DrawFootprintPolygonToolBar {
             section-index: section-index;
@@ -1053,74 +1053,35 @@ export component PackageTab inherits Tab {
             shown: tabs[index].checks.errors > 0;
         }
 
-        // Wizard mode: Only one page at a time.
-        if tabs[index].wizard-mode && (tabs[index].page-index <= 0): metadata-tab-1 := PackageMetadataTab {
-            section-index: section-index;
-            tabs: tabs;
-            index: index;
-            read-only: read-only;
-            window-height: window-height;
-        }
-        if tabs[index].wizard-mode && (tabs[index].page-index == 1): pads-tab-1 := PackagePadsEditorTab {
-            width: parent.width;
-            section-index: section-index;
-            tabs: tabs;
-            index: index;
-            read-only: read-only;
-        }
+        // Pages in wizard mode:
+        //  [0] Metadata tab: Set metadata
+        //  [1] Package pads tab: Add pads
+        //
+        // Pages in normal mode:
+        //  [0] Metadata tab
+        //  [1] Package pads tab
+        //  [2] Editor tab (footprints)
+        //  [3] Editor tab (3D models)
 
-        // Normal mode: Slide between metadata and content.
-        if !tabs[index].wizard-mode: SlideView {
+        if !tabs[index].wizard-mode: navbar := NavBar {
             pages: [
-                { title: @tr("Metadata") },
-                { title: @tr("Pads") },
-                { title: @tr("Footprints") },
-                { title: @tr("3D Models") },
+                { id: 0, title: @tr("Metadata") },
+                { id: 1, title: @tr("Pads") },
+                { id: 2, title: @tr("Footprints") },
+                { id: 3, title: @tr("3D Models") },
             ];
-            current-index: tabs[index].page-index;
-            current-navbar-index: {
+            current-id: {
                 if ((tabs[index].page-index == 2) && (tabs[index].view-3d)) {
                     3
                 } else {
                     tabs[index].page-index
                 }
             };
-            duration: 0;  // Temporary, needs proper refactoring.
 
-            metadata-tab-2 := PackageMetadataTab {
-                width: parent.width;
-                section-index: section-index;
-                tabs: tabs;
-                index: index;
-                read-only: read-only;
-                window-height: window-height;
-            }
+            page-clicked(id) => {
+                Data.set-current-tab(section-index, index);
 
-            pads-tab-2 := PackagePadsEditorTab {
-                width: parent.width;
-                section-index: section-index;
-                tabs: tabs;
-                index: index;
-                read-only: read-only;
-            }
-
-            editor-tab := PackageEditorTab {
-                width: parent.width;
-                section-index: section-index;
-                section: section;
-                tabs: tabs;
-                index: index;
-                read-only: read-only;
-
-                focus-requested => {
-                    if !root.has-focus {
-                        root.focus();
-                    }
-                }
-            }
-
-            page-clicked(idx) => {
-                if idx == 3 {
+                if id == 3 {
                     tabs[index].page-index = 2;
                     tabs[index].view-3d = true;
                     // When switching to 3D this way (rather than via "3D" btn),
@@ -1128,11 +1089,40 @@ export component PackageTab inherits Tab {
                     if tabs[index].devices-alpha == 0 {
                         tabs[index].devices-alpha = 1;
                     }
-                } else if idx == 2 {
+                } else if id == 2 {
                     tabs[index].page-index = 2;
                     tabs[index].view-3d = false;
                 } else {
-                    tabs[index].page-index = idx;
+                    tabs[index].page-index = id;
+                }
+            }
+        }
+
+        if tabs[index].page-index <= 0: metadata-tab := PackageMetadataTab {
+            section-index: section-index;
+            tabs: tabs;
+            index: index;
+            read-only: read-only;
+            window-height: window-height;
+        }
+
+        if tabs[index].page-index == 1: pads-tab := PackagePadsEditorTab {
+            section-index: section-index;
+            tabs: tabs;
+            index: index;
+            read-only: read-only;
+        }
+
+        if tabs[index].page-index >= 2: editor-tab := PackageEditorTab {
+            section-index: section-index;
+            section: section;
+            tabs: tabs;
+            index: index;
+            read-only: read-only;
+
+            focus-requested => {
+                if !root.has-focus {
+                    root.focus();
                 }
             }
         }

@@ -1,10 +1,7 @@
 import { Badge } from "badge.slint";
 import { ScrollView } from "scrollview.slint";
-import { Text } from "text.slint";
 import { TextInput } from "textinput.slint";
 import { Data } from "../api.slint";
-
-//TODO
 
 export component TextEdit inherits Rectangle {
     in-out property <string> text;
@@ -15,7 +12,7 @@ export component TextEdit inherits Rectangle {
     in property <bool> read-only: false;
     in property <length> font-size: 13px;
     out property <bool> has-focus <=> edt.has-focus;
-    property <bool> show-error-badge: enabled && has-error && (!validation-error.is-empty);
+    property <bool> show-error-badge: enabled && (!read-only) && has-error && (!validation-error.is-empty);
 
     pure callback validate(string) -> string;
 
@@ -45,21 +42,32 @@ export component TextEdit inherits Rectangle {
         }
     }
 
-    preferred-width: max(placeholder-txt.preferred-width, edt.preferred-width) + (2 * edt.x);
-    preferred-height: max(placeholder-txt.preferred-height, edt.preferred-height) + (2 * edt.y);
+    min-height: 25px;
+    preferred-width: max(placeholder-txt.preferred-width, edt.preferred-width) + (2 * view.x);
+    preferred-height: max(placeholder-txt.preferred-height, edt.preferred-height) + (2 * view.y);
     horizontal-stretch: 1;
-    background: Data.theme.palette.control;
-    border-color: {
-        if enabled && has-error {
-            edt.has-focus ? #ff0000 : #900000
-        } else if edt.has-focus {
-            Data.theme.palette.accent
-        } else if enabled && (!read-only) {
-            Data.theme.palette.base-border
+    background: {
+        if !enabled {
+            Data.theme.palette.control-disabled
         } else {
-            transparent
+            Data.theme.palette.control
         }
-    }
+    };
+    border-color: {
+        if (!enabled) || read-only {
+            Data.theme.palette.control-border-disabled
+        } else if edt.has-focus {
+            if has-error {
+                Data.theme.palette.base-text-error
+            } else {
+                Data.theme.palette.accent
+            }
+        } else if has-error {
+            Data.theme.palette.control-border.mix(Data.theme.palette.base-text-error, 0.7)
+        } else {
+            Data.theme.palette.control-border
+        }
+    };
     border-width: 1px;
     forward-focus: edt;
 
@@ -79,6 +87,7 @@ export component TextEdit inherits Rectangle {
         width: root.width - (2 * self.x);
         height: parent.height - (2 * self.y);
         font-size: font-size;
+        font-italic: true;
         color: enabled ? Data.theme.palette.control-text-muted : Data.theme.palette.control-text-disabled;
         text: placeholder-text;
         wrap: word-wrap;
@@ -94,6 +103,7 @@ export component TextEdit inherits Rectangle {
         height: parent.height - (2 * self.y);
         viewport-width: self.width;
         viewport-height: edt.preferred-height;
+        thin-scrollbars: true;
 
         edt := TextInput {
             x: 0;
@@ -130,7 +140,7 @@ export component TextEdit inherits Rectangle {
         x: root.width - self.width - 20px;
         y: -8px;
         width: min(self.preferred-width, root.width * 0.8);
-        background: #101010;
+        background: parent.background;
         text-color: root.border-color;
         font-size: 10px;
         text: validation-error;

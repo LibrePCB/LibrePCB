@@ -1,15 +1,10 @@
 import { ListView } from "listview.slint";
 import { ListViewItemButton } from "listviewitembutton.slint";
 import {
-    Backend,
     Data,
-    EditorCommandSet as Cmd,
-    Helpers,
     TreeViewItemAction,
     TreeViewItemData,
 } from "../api.slint";
-
-//TODO
 
 export component TreeView inherits FocusScope {
     in-out property <[TreeViewItemData]> model;
@@ -76,7 +71,15 @@ export component TreeView inherits FocusScope {
             }
 
             Rectangle {
-                background: (current-index == index) ? Data.theme.palette.control-checked : (parent.has-hover ? Data.theme.palette.control-hovered : transparent);
+                background: {
+                    if current-index == index {
+                        Data.theme.palette.control-checked
+                    } else if parent.has-hover {
+                        Data.theme.palette.control-hovered
+                    } else {
+                        transparent
+                    }
+                };
 
                 HorizontalLayout {
                     spacing: 5px;
@@ -95,7 +98,7 @@ export component TreeView inherits FocusScope {
                             height: parent.height - 2 * self.y;
                             image-fit: contain;
                             source: @image-url("../../../font-awesome/svgs/solid/angle-right.svg");
-                            colorize: Data.theme.palette.base-text;
+                            colorize: Data.theme.palette.control-text;
                             transform-rotation: item.expanded ? 90deg : 0;
                             visible: item.has-children;
                             accessible-role: none;
@@ -124,7 +127,13 @@ export component TreeView inherits FocusScope {
 
                     item-text-txt := Text {
                         horizontal-stretch: 1;
-                        color: is-enabled ? Data.theme.palette.base-text : Data.theme.palette.control-text-disabled;
+                        color: {
+                            if is-enabled {
+                                Data.theme.palette.control-text
+                            } else {
+                                Data.theme.palette.control-text-disabled
+                            }
+                        };
                         font-size: font-size;
                         overflow: TextOverflow.elide;
                         vertical-alignment: center;

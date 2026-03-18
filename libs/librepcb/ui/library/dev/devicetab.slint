@@ -28,7 +28,7 @@ import {
     Button,
     LineEdit,
     OverlayDialog,
-    SlideView,
+    NavBar,
     TextEdit,
 } from "../../widgets.slint";
 import {
@@ -107,17 +107,16 @@ component DeviceMetadataTab inherits GridLayout {
     in property <length> window-height;
 
     padding: 8px;
-    padding-top: tabs[index].wizard-mode ? 8px : 0;
     spacing: 8px;
 
-    Row {
+    /*Row {
         WizardHeader {
             colspan: 2;
             height: tabs[index].wizard-mode ? self.preferred-height : 0;
             text: @tr("Specify the metadata of the device. Some values have already been initialized from the selected package & component, you may need to adjust it accordingly.");
             visible: self.height > 0;
         }
-    }
+    }*/
 
     Row {
         name-txt := NameRowHeader { }
@@ -447,8 +446,10 @@ component DeviceContentTab {
     }
 
     attributes-overlay := OverlayDialog {
-        width: parent.width;
-        height: parent.height;
+        x: 0;
+        y: 0;
+        width: 100%;
+        height: 100%;
         ok-button: true;
         // Actually we want to make the whole dialog's lifetime conditionally,
         // but it leads to crashes when closing it from its callbacks. Thus
@@ -501,62 +502,51 @@ export component DeviceTab inherits Tab {
             shown: tabs[index].checks.errors > 0;
         }
 
-        // Wizard mode: Only one page at a time.
+        // Pages in wizard mode:
+        //  [0] Init tab: Select package & component
+        //  [1] Metadata tab: Set metadata
+        //  [2] Content tab: Set pinout
+        //  [3] Content tab: Add parts
+        //
+        // Pages in normal mode:
+        //  [0] Metadata tab
+        //  [1] Content tab
+
+        if !tabs[index].wizard-mode: navbar := NavBar {
+            pages: [
+                { id: 0, title: @tr("Metadata") },
+                { id: 1, title: @tr("Pinout & Parts") },
+            ];
+            current-id: tabs[index].page-index;
+
+            page-clicked(id) => {
+                Data.set-current-tab(section-index, index);
+                tabs[index].page-index = id;
+            }
+        }
+
         if tabs[index].wizard-mode && (tabs[index].page-index <= 0): init-tab := DeviceInitTab {
-            width: parent.width;
             section-index: section-index;
             tabs: tabs;
             index: index;
             read-only: read-only;
         }
-        if tabs[index].wizard-mode && (tabs[index].page-index == 1): metadata-tab-1 := DeviceMetadataTab {
+
+        if tabs[index].page-index == (tabs[index].wizard-mode ? 1 : 0): metadata-tab := DeviceMetadataTab {
             section-index: section-index;
             tabs: tabs;
             index: index;
             read-only: read-only;
             window-height: window-height;
         }
-        if tabs[index].wizard-mode && (tabs[index].page-index >= 2): content-tab-1 := DeviceContentTab {
-            width: parent.width;
+
+        if tabs[index].page-index >= (tabs[index].wizard-mode ? 2 : 1): content-tab := DeviceContentTab {
             section-index: section-index;
             tabs: tabs;
             index: index;
             read-only: read-only;
             page-height: root.height;
             window-height: window-height;
-        }
-
-        // Normal mode: Slide between metadata and content.
-        if !tabs[index].wizard-mode: SlideView {
-            pages: [
-                { title: @tr("Metadata") },
-                { title: @tr("Pinout & Parts") },
-            ];
-            current-index: tabs[index].page-index;
-            duration: 0;  // Temporary, needs proper refactoring.
-
-            metadata-tab-2 := DeviceMetadataTab {
-                width: parent.width;
-                section-index: section-index;
-                tabs: tabs;
-                index: index;
-                read-only: read-only;
-                window-height: window-height;
-            }
-
-            content-tab-2 := DeviceContentTab {
-                width: parent.width;
-                section-index: section-index;
-                tabs: tabs;
-                index: index;
-                read-only: read-only;
-                page-height: root.height;
-                window-height: window-height;
-            }
-
-            page-clicked(idx) => {
-                tabs[index].page-index = idx;
-            }
         }
     }
 

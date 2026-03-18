@@ -1,9 +1,6 @@
 import { LinkText } from "linktext.slint";
-import { Text } from "text.slint";
 import { ToolBarWidget } from "toolbar.slint";
 import { Data } from "../api.slint";
-
-//TODO
 
 export struct TextFlagsBoxItemData {
     text: string,
@@ -26,6 +23,7 @@ export component TextFlagsBox inherits ToolBarWidget {
     spacing: 6px;
 
     if !title.is-empty: Text {
+        color: Data.theme.palette.control-text;
         vertical-alignment: center;
         wrap: no-wrap;
         text: title + ":";
@@ -33,9 +31,10 @@ export component TextFlagsBox inherits ToolBarWidget {
     }
 
     for item[index] in model: item-btn := LinkText {
-        font-size: 10px;
+        font-size: 11px;
         vertical-alignment: center;
-        text-color: item.checked ? Data.theme.palette.base-text : Data.theme.palette.control-text-disabled;
+        text-color: item.checked ? Data.theme.palette.control-text : Data.theme.palette.control-text-disabled;
+        text-color-hovered: item.checked ? Data.theme.palette.control-text : Data.theme.palette.control-text-muted;
         text: item.text.to-uppercase();
         accessible-label: title + " " + item.text;
         accessible-checkable: true;

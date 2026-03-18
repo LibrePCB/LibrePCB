@@ -22,7 +22,7 @@ import {
     IconButton,
     LineEdit,
     ScrollView,
-    SlideView,
+    NavBar,
     Spinner,
     Text,
     TextEdit,
@@ -861,80 +861,60 @@ export component LibraryTab inherits Tab {
     property <bool> read-only: section.tabs[index].features.save != FeatureState.enabled;
     property <bool> compact-layout: self.width < 1024px;
 
-    // Wizard mode: Only one page at a time.
-    if tabs[index].wizard-mode && (tabs[index].page-index <= 0): LibraryMetadataTab {
-        section-index: section-index;
-        tabs: tabs;
-        index: index;
-        read-only: read-only;
-    }
-    if tabs[index].wizard-mode && (tabs[index].page-index >= 1): LibraryImportTab {
-        section-index: section-index;
-        tabs: tabs;
-        index: index;
-    }
+    VerticalLayout {
+        // Pages in wizard mode:
+        //  [0] Metadata tab: Set metadata
+        //  [1] Import tab: Import library elements
+        //
+        // Pages in normal mode:
+        //  [0] Metadata tab
+        //  [1] Import tab
+        //  [2] Content tab
 
-    // Normal mode: Content left, metadata right.
-    if (!tabs[index].wizard-mode) && (!compact-layout): HorizontalLayout {
-        LibraryContentTab {
-            horizontal-stretch: 1;
-            section-index: section-index;
-            tabs: tabs;
-            index: index;
-            read-only: read-only;
+        if !tabs[index].wizard-mode && compact-layout: navbar := NavBar {
+            pages: [
+                { id: 0, title: @tr("Metadata") },
+                { id: 1, title: @tr("Import"), disabled: read-only },
+                { id: 2, title: @tr("Library Content") },
+            ];
+            current-id: tabs[index].page-index;
+
+            page-clicked(id) => {
+                Data.set-current-tab(section-index, index);
+                tabs[index].page-index = id;
+            }
         }
 
-        Rectangle {
-            width: 1px;
-            background: Data.theme.palette.base-border;
-        }
+        HorizontalLayout {
+            property <bool> side-by-side: (!tabs[index].wizard-mode) && (!compact-layout);
 
-        LibraryMetadataTab {
-            horizontal-stretch: 1;
-            max-width: min(500px, parent.width * 0.4);
-            section-index: section-index;
-            tabs: tabs;
-            index: index;
-            read-only: read-only;
-        }
-    }
+            if side-by-side || (tabs[index].page-index >= 2): content-tab := LibraryContentTab {
+                horizontal-stretch: 1;
+                section-index: section-index;
+                tabs: tabs;
+                index: index;
+                read-only: read-only;
+            }
 
-    // Compact mode: Slide between metadata, import and content.
-    if (!tabs[index].wizard-mode) && compact-layout: SlideView {
-        pages: [
-            { title: @tr("Metadata") },
-            { title: @tr("Import"), disabled: read-only },
-            { title: @tr("Library Content") },
-        ];
-        current-index: tabs[index].page-index;
-        duration: 0;  // Temporary, needs proper refactoring.
+            if tabs[index].page-index == 1: import-tab := LibraryImportTab {
+                section-index: section-index;
+                tabs: tabs;
+                index: index;
+            }
 
-        LibraryMetadataTab {
-            width: parent.width;
-            section-index: section-index;
-            tabs: tabs;
-            index: index;
-            read-only: read-only;
-        }
+            if side-by-side: Rectangle {
+                width: 1px;
+                background: Data.theme.palette.base-border;
+            }
 
-        LibraryImportTab {
-            width: parent.width;
-            section-index: section-index;
-            tabs: tabs;
-            index: index;
-        }
-
-        LibraryContentTab {
-            width: parent.width;
-            section-index: section-index;
-            tabs: tabs;
-            index: index;
-            read-only: read-only;
-        }
-
-        page-clicked(idx) => {
-            Data.set-current-tab(section-index, index);
-            tabs[index].page-index = idx;
+            if side-by-side || (tabs[index].page-index <= 0): metadata-tab := LibraryMetadataTab {
+                horizontal-stretch: 1;
+                max-width: side-by-side ? min(500px, parent.width * 0.4) : root.width;
+                section-index: section-index;
+                tabs: tabs;
+                index: index;
+                read-only: read-only;
+            }
         }
     }
 }

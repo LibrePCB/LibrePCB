@@ -1,11 +1,5 @@
 import { ToolBarWidget, ToolBarSelectorButton } from "toolbar.slint";
-import {
-    Data,
-    Helpers,
-    SolderTechnology,
-} from "../api.slint";
-
-//TODO
+import { SolderTechnology } from "../api.slint";
 
 export component SolderTechnologySelector inherits ToolBarWidget {
     in-out property <SolderTechnology> value;

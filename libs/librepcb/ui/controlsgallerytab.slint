@@ -8,6 +8,8 @@ import {
     LengthEdit,
     LineEdit,
     LinkText,
+    HorizontalSlider,
+    TextEdit,
     ProgressBar,
     RatioEdit,
     Switch,
@@ -532,6 +534,25 @@ component Gallery inherits Rectangle {
                     enabled: true;
                     checked: true;
                 }
+
+                TextEdit {
+                    text: "disabled";
+                    enabled: false;
+                    read-only: false;
+                }
+
+                TextEdit {
+                    text: "read-only";
+                    enabled: true;
+                    read-only: true;
+                }
+
+                TextEdit {
+                    max-height: 55px;
+                    text: "enabled, scrollable\nmultiline text edit\nfoo bar\nhello world";
+                    enabled: true;
+                    read-only: false;
+                }
             }
 
             VerticalLayout {
@@ -568,6 +589,16 @@ component Gallery inherits Rectangle {
 
                 ProgressBar {
                     progress: 0.3;
+                }
+
+                HorizontalSlider {
+                    value: 0.5;
+                    enabled: false;
+                }
+
+                HorizontalSlider {
+                    value: 0.5;
+                    enabled: true;
                 }
             }
         }
