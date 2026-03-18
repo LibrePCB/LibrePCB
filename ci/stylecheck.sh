@@ -15,21 +15,21 @@ set -euv -o pipefail
 # check if no font weights are used that we don't bundle font files for
 (git grep -E 'font-weight: [0-9]+' -- '*.slint' | grep -vE 'font-weight: (300|400|700)') && exit 1
 
-# check rust code formatting
-for f in $(git ls-files -- '*.rs'); do
-  (rustfmt --check "$f") || exit 1
-done
+# run all checks from format_code.sh
+#  - checks c++ files with clang-format
+#  - checks *.rs files with rustfmt
+#  - checks *.slint files with slint-lsp
+#  - checks *.ui files with python
+#  - checks *.qrc files with xmlsort
+#  - checks cmake files with cmake-format
+#  - checks .reuse/dep5 with debian-copyright-sorter
+(./dev/format_code.sh --all --check) || exit 1
 
 # lint rust crates
-for f in $(git ls-files -- '**Cargo.toml'); do
+cargo_toml_files=$(git ls-files -- '**Cargo.toml')
+for f in $cargo_toml_files; do
   (cargo clippy --manifest-path="$f" --features="fail-on-warnings") || exit 1
 done
-
-# check slint code formatting
-for f in $(git ls-files -- '*.slint'); do
-  slint-lsp format -i "$f"
-done
-(git diff --exit-code -- "*.slint") || exit 1
 
 # run python style checks
 (uv --directory tests/cli run --only-dev ruff format --check) || exit 1
@@ -44,10 +44,6 @@ done
 
 # run reuse checks
 (reuse --suppress-deprecation lint) || exit 1
-
-# check formatting of .reuse/dep5
-(debian-copyright-sorter --iml -s casefold -o ".reuse/dep5" ".reuse/dep5") || exit 1
-(git diff --exit-code -- ".reuse/dep5") || exit 1
 
 # validate AppStream files
 appstream-util validate share/metainfo/org.librepcb.LibrePCB.metainfo.xml
