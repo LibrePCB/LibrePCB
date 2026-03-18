@@ -139,7 +139,7 @@ clang_format_failed() {
 echo "Formatting sources with $CLANGFORMAT and Python..."
 for dir in apps/ libs/librepcb/ tests/unittests/ share/; do
   for file in $(search_files "${dir}**.cpp" "${dir}**.hpp" "${dir}**.h" "${dir}**.js"); do
-    $CLANGFORMAT -style=file "$file" | "$REPO_ROOT/dev/format_code_helper.py" "$file" | update_file "$file" || clang_format_failed
+    update_file "$file" < <($CLANGFORMAT -style=file "$file" | "$REPO_ROOT/dev/format_code_helper.py" "$file" || clang_format_failed)
   done
 done
 
@@ -178,7 +178,7 @@ slintlsp_failed() {
 echo "Formatting Slint sources with slint-lsp..."
 for dir in apps/ libs/librepcb/; do
   for file in $(search_files "${dir}**.slint"); do
-    slint-lsp format "$file" | "$REPO_ROOT/dev/format_code_helper.py" "$file" | update_file "$file" || slintlsp_failed
+    update_file "$file" < <(slint-lsp format "$file" | "$REPO_ROOT/dev/format_code_helper.py" "$file" || slintlsp_failed)
   done
 done
 
@@ -194,7 +194,7 @@ ui_format_failed() {
 echo "Formatting UI files with Python..."
 for dir in apps/ libs/librepcb/ tests/unittests/; do
   for file in $(search_files "${dir}**.ui"); do
-    cat "$file" | "$REPO_ROOT/dev/format_code_helper.py" "$file" | update_file "$file" || ui_format_failed
+    update_file "$file" < <(cat "$file" | "$REPO_ROOT/dev/format_code_helper.py" "$file" || ui_format_failed)
   done
 done
 
@@ -209,7 +209,7 @@ cmake_format_failed() {
 }
 echo "Formatting CMake files with cmake-format..."
 for file in $(search_files "**CMakeLists.txt" "*.cmake"); do
-  cmake-format "$file" | update_file "$file" || cmake_format_failed
+  update_file "$file" < <(cmake-format "$file" || cmake_format_failed)
 done
 
 # Format *.qrc files with xmlsort.
@@ -223,7 +223,7 @@ xmlsort_failed() {
 }
 echo "Formatting resource files with xmlsort..."
 for file in $(search_files "**.qrc"); do
-  xmlsort -r "RCC/qresource/file" -i -s "$file" | tr "'" '"' | update_file "$file" || xmlsort_failed
+  update_file "$file" < <(xmlsort -r "RCC/qresource/file" -i -s "$file" | tr "'" '"' || xmlsort_failed)
 done
 
 # Format .reuse/dep5 files with debian-copyright-sorter.
@@ -237,7 +237,7 @@ dcs_failed() {
 if command -v debian-copyright-sorter 2>&1 >/dev/null; then
   echo "Formatting license files with debian-copyright-sorter..."
   for file in $(search_files "**/dep5"); do
-    debian-copyright-sorter --iml -s casefold "$file" | update_file "$file" || dcs_failed
+    update_file "$file" < <(debian-copyright-sorter --iml -s casefold "$file" || dcs_failed)
   done
 else
   echo "Formatting license files with debian-copyright-sorter DISABLED ..."

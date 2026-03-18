@@ -9,7 +9,8 @@ pushd ./dev/doxygen
 popd
 
 # Build Rust documentation
-for f in $(git ls-files -- '**Cargo.toml'); do
+files=$(git ls-files -- '**Cargo.toml')
+for f in $files; do
   cargo doc --manifest-path="$f" --target-dir="./dev/doxygen/output/rust/" \
     --no-deps --document-private-items --features="fail-on-warnings,ffi"
   cp -rf ./dev/doxygen/output/rust/doc/* ./dev/doxygen/output/html/

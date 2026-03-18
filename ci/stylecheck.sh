@@ -26,7 +26,8 @@ set -euv -o pipefail
 (./dev/format_code.sh --all --check) || exit 1
 
 # lint rust crates
-for f in $(git ls-files -- '**Cargo.toml'); do
+cargo_toml_files=$(git ls-files -- '**Cargo.toml')
+for f in $cargo_toml_files; do
   (cargo clippy --manifest-path="$f" --features="fail-on-warnings") || exit 1
 done
 
