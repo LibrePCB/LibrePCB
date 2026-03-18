@@ -173,6 +173,7 @@ export component AppWindow inherits Window {
         statusbar := StatusBar {
             x: 0;
             y: parent.height - self.height;
+            z: 100; // Avoid sidebar to be painted on statusbar if window is small.
             width: parent.width;
 
             focus-root => {

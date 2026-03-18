@@ -21,7 +21,7 @@ import {
     TabType,
 } from "api.slint";
 
-export component StatusBar {
+export component StatusBar inherits Rectangle {
     property <GridStyle> current-grid-style: {
         if Data.current-tab.type == TabType.symbol {
             Data.current-symbol-tab.grid-style
@@ -106,6 +106,7 @@ export component StatusBar {
     callback focus-root;
 
     height: 25px;
+    background: Data.theme.palette.window;
 
     HorizontalLayout {
         padding-left: 10px;
