@@ -139,7 +139,7 @@ QStringList LengthUnit::getUserInputSuffixes() const noexcept {
     case LengthUnit_t::Inches:
       return QStringList{"″", "\"", "in", "inch", "inches"};
     case LengthUnit_t::Mils:
-      return QStringList{"mils"};
+      return QStringList{"mil", "mils"};
     default:
       qCritical()
           << "Unhandled switch-case in LengthUnit::getUserInputSuffixes():"
