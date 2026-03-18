@@ -68,7 +68,7 @@ public:
 private:
   // Private Methods
   void buttonBoxClicked(QAbstractButton* button) noexcept;
-  void accept();
+  void accept() noexcept override;
   bool applyChanges() noexcept;
 
   // General

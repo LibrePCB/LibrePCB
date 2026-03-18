@@ -87,7 +87,7 @@ BoardViaPropertiesDialog::BoardViaPropertiesDialog(
         mVia.getBoard().getDesignRules().getViaAnnularRing()));
   };
 
-  // Set up automatic/manual drill/size toggle switch.
+  // Set up automatic/manual drill/size.
   connect(mUi->cbxDrillDiameterFromDesignRules, &QCheckBox::toggled, this,
           [this, applyDrillFromDesignRules](bool checked) {
             mUi->edtDrillDiameter->setEnabled(!checked);
@@ -105,22 +105,10 @@ BoardViaPropertiesDialog::BoardViaPropertiesDialog(
               mUi->cbxDrillDiameterFromDesignRules->setChecked(false);
             }
           });
-
-  // Avoid creating vias with a drill diameter larger than its size!
-  // See https://github.com/LibrePCB/LibrePCB/issues/946.
-  connect(mUi->edtSize, &PositiveLengthEdit::valueChanged, this,
-          [this](const PositiveLength& value) {
-            if ((!mUi->cbxDrillDiameterFromDesignRules->isChecked()) &&
-                (value < mUi->edtDrillDiameter->getValue())) {
-              mUi->edtDrillDiameter->setValue(value);
-            }
-          });
   connect(mUi->edtDrillDiameter, &PositiveLengthEdit::valueChanged, this,
-          [this, applySizeFromDesignRules](const PositiveLength& value) {
+          [this, applySizeFromDesignRules]() {
             if (mUi->cbxSizeFromDesignRules->isChecked()) {
               applySizeFromDesignRules();
-            } else if (value > mUi->edtSize->getValue()) {
-              mUi->edtSize->setValue(value);
             }
           });
 
@@ -191,13 +179,30 @@ void BoardViaPropertiesDialog::buttonBoxClicked(
   }
 }
 
-void BoardViaPropertiesDialog::accept() {
+void BoardViaPropertiesDialog::accept() noexcept {
   if (applyChanges()) {
     QDialog::accept();
   }
 }
 
 bool BoardViaPropertiesDialog::applyChanges() noexcept {
+  QStringList errors;
+
+  // Check if drill diameter <= via size.
+  if (mUi->edtDrillDiameter->getValue() > mUi->edtSize->getValue()) {
+    errors.append(
+        tr("The drill diameter is exceeding the outer via size. Reduce "
+           "the drill diameter or increase the via size."));
+  }
+
+  // Deny creating invalid pads.
+  // See https://github.com/LibrePCB/LibrePCB/issues/946 and
+  // see https://github.com/LibrePCB/LibrePCB/issues/1715.
+  if (!errors.isEmpty()) {
+    QMessageBox::critical(this, tr("Invalid Properties"), errors.join("\n\n"));
+    return false;
+  }
+
   try {
     std::unique_ptr<CmdBoardViaEdit> cmd(new CmdBoardViaEdit(mVia));
     cmd->setPosition(Point(mUi->edtPosX->getValue(), mUi->edtPosY->getValue()),
