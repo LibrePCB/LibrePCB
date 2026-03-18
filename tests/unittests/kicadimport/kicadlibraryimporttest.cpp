@@ -55,15 +55,16 @@ protected:
 
   int getTotalSymbolsCount(const KiCadLibraryImport::Result& result) const {
     int count = 0;
-    for (const KiCadLibraryImport::SymbolLibrary& lib : result.symbolLibs) {
+    for (const auto& lib : result.symbolLibs) {
       count += lib.symbols.count();
     }
     return count;
   }
 
-  int getTotalFootprintFilesCount(const KiCadLibraryImport::Result& result) const {
+  int getTotalFootprintFilesCount(
+      const KiCadLibraryImport::Result& result) const {
     int count = 0;
-    for (const KiCadLibraryImport::FootprintLibrary& lib : result.footprintLibs) {
+    for (const auto& lib : result.footprintLibs) {
       count += lib.files.count();
     }
     return count;
@@ -71,7 +72,7 @@ protected:
 
   int getTotalFootprintsCount(const KiCadLibraryImport::Result& result) const {
     int count = 0;
-    for (const KiCadLibraryImport::FootprintLibrary& lib : result.footprintLibs) {
+    for (const auto& lib : result.footprintLibs) {
       count += lib.footprints.count();
     }
     return count;
