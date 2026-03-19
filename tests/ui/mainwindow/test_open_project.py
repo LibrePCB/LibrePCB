@@ -6,7 +6,7 @@ Test opening projects
 """
 
 
-def test_file_tree_dclick(librepcb, helpers):
+def test_file_tree_dclick(librepcb):
     librepcb.add_project_to_workspace("Empty Project")
 
     with librepcb.open() as app:

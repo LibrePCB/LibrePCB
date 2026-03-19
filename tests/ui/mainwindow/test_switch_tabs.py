@@ -6,7 +6,7 @@ Test switching tabs
 """
 
 
-def test_new_library_element_tabs(librepcb, helpers):
+def test_new_library_element_tabs(librepcb):
     """
     This is a reproducer of a real bug. The application crashed with
     std::bad_optional_access when switching from a "New Component" tab back
@@ -47,7 +47,7 @@ def test_new_library_element_tabs(librepcb, helpers):
             assert tabs[i].checked
 
 
-def test_existing_library_element_tabs(librepcb, helpers):
+def test_existing_library_element_tabs(librepcb):
     librepcb.add_local_library_to_workspace("libraries/Populated Library.lplib")
     elements = [
         dict(
