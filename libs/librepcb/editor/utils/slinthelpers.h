@@ -41,12 +41,40 @@
 namespace librepcb {
 namespace editor {
 
-// q2s(): Qt to Slint conversion (only built-in types, not LibrePCB specific)
-// s2q(): Slint to Qt conversion (only built-in types, not LibrePCB specific)
+/*******************************************************************************
+ *  Class SlintTranslator
+ ******************************************************************************/
+
+/**
+ * @brief Translator for Slint, using the Qt translation framework
+ */
+class SlintTranslator : public slint::Translator {
+public:
+  slint::SharedString translate(std::string_view string,
+                                std::string_view context) const override;
+  slint::SharedString ntranslate(uint64_t n, std::string_view singular,
+                                 std::string_view plural,
+                                 std::string_view context) const override;
+
+private:
+  void setContext(std::string_view context) const noexcept;
+  void setString(std::string_view string) const noexcept;
+  slint::SharedString convertStringToSlint() const noexcept;
+  static QByteArray buildSlintPlaceholder(int i) noexcept;
+  static QByteArray buildQtPlaceholder(int i) noexcept;
+
+  // Buffers/caches to reduce the number of memory allocations.
+  mutable std::string mContextBuffer;
+  mutable QByteArray mStringBuffer;
+  mutable QByteArray mPlaceholderBuffer;
+};
 
 /*******************************************************************************
  *  Non-Member Functions
  ******************************************************************************/
+
+// q2s(): Qt to Slint conversion (only built-in types, not LibrePCB specific)
+// s2q(): Slint to Qt conversion (only built-in types, not LibrePCB specific)
 
 slint::LogicalPosition q2s(const QPointF& p) noexcept;
 QPointF s2q(const slint::LogicalPosition& p) noexcept;

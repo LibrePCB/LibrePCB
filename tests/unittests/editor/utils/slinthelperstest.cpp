@@ -21,7 +21,7 @@
  *  Includes
  ******************************************************************************/
 #include <gtest/gtest.h>
-#include <librepcb/editor/guiapplication.h>
+#include <librepcb/editor/utils/slinthelpers.h>
 
 #include <QtTest>
 
@@ -36,17 +36,17 @@ namespace tests {
  *  Test Class
  ******************************************************************************/
 
-class GuiApplicationTest : public ::testing::Test {
-  Q_DECLARE_TR_FUNCTIONS(ui::GuiApplicationTest)
+class SlintHelpersTest : public ::testing::Test {
+  Q_DECLARE_TR_FUNCTIONS(ui::SlintHelpersTest)
 
 protected:
-  QTranslator* mTranslator = nullptr;
+  std::unique_ptr<QTranslator> mTranslator;
 
-  GuiApplicationTest() : mTranslator(new QTranslator(qApp)) {
+  SlintHelpersTest() : mTranslator(new QTranslator(qApp)) {
     if (!mTranslator->load(TEST_DATA_DIR "/i18n/unittests_de.qm")) {
       throw std::runtime_error("Failed to load unittests_de.qm");
     }
-    qApp->installTranslator(mTranslator);
+    qApp->installTranslator(mTranslator.get());
 
     // Declare translated strings to be picked up by lupdate. The alias notr()
     // is defined for the test translation process, but it's not picked up for
@@ -55,20 +55,20 @@ protected:
     notr("Translated String");
     notr("Translated String ‒ With Unicode ☺");
     notr("Translated String %1 of %2");
-    notr("Translated %n String(s)");
+    notr("Translated %n String(s)", nullptr, 5);
   }
 
-  ~GuiApplicationTest() {
-    if (!qApp->removeTranslator(mTranslator)) {
+  ~SlintHelpersTest() {
+    if (!qApp->removeTranslator(mTranslator.get())) {
       qWarning() << "Failed to remove translator.";
     }
   }
 
-  static const char* notr(const char* s) noexcept { return s; }
-
-  static slint::private_api::Slice<uint8_t> toSlice(const char* s) noexcept {
-    return slint::private_api::Slice<uint8_t>{
-        reinterpret_cast<uint8_t*>(const_cast<char*>(s)), std::strlen(s)};
+  static const char* notr(const char* s, const char* c = nullptr,
+                          int n = 0) noexcept {
+    Q_UNUSED(c);
+    Q_UNUSED(n);
+    return s;
   }
 };
 
@@ -76,63 +76,62 @@ protected:
  *  Test Methods
  ******************************************************************************/
 
-TEST_F(GuiApplicationTest, testTranslationQt) {
+TEST_F(SlintHelpersTest, testTranslationQt) {
   // Sanity check that the translation has been successfully loaded.
   // Important: Use variables to avoid these string picked up in the production
   // translation process.
-  const char* context = "ui::GuiApplicationTest";
+  const char* context = "ui::SlintHelpersTest";
   const char* key = "Translated String";
   const QString out = QCoreApplication::translate(context, key);
   EXPECT_EQ("Übersetzter Text", out.toStdString());
 }
 
-TEST_F(GuiApplicationTest, testTranslationUntranslated) {
-  slint::SharedString out;
-  slintTr(toSlice("Untranslated String"), toSlice("GuiApplicationTest"),
-          toSlice("Domain"), 0, toSlice(""), &out);
+TEST_F(SlintHelpersTest, testTranslationUntranslated) {
+  SlintTranslator tr;
+  slint::SharedString out =
+      tr.translate("Untranslated String", "SlintHelpersTest");
   EXPECT_EQ("Untranslated String", static_cast<std::string_view>(out));
 }
 
-TEST_F(GuiApplicationTest, testTranslationSingular) {
-  slint::SharedString out;
-  slintTr(toSlice("Translated String"), toSlice("GuiApplicationTest"),
-          toSlice("Domain"), 0, toSlice(""), &out);
+TEST_F(SlintHelpersTest, testTranslationSingular) {
+  SlintTranslator tr;
+  slint::SharedString out =
+      tr.translate("Translated String", "SlintHelpersTest");
   EXPECT_EQ("Übersetzter Text", static_cast<std::string_view>(out));
 }
 
-TEST_F(GuiApplicationTest, testTranslationPluralZero) {
-  slint::SharedString out;
-  slintTr(toSlice("Translated %n String(s)"), toSlice("GuiApplicationTest"),
-          toSlice("Domain"), 0, toSlice("Translated %n String(s)"), &out);
+TEST_F(SlintHelpersTest, testTranslationPluralZero) {
+  SlintTranslator tr;
+  slint::SharedString out =
+      tr.ntranslate(0, "", "Translated %n String(s)", "SlintHelpersTest");
   EXPECT_EQ("Übersetzte 0 Texte", static_cast<std::string_view>(out));
 }
 
-TEST_F(GuiApplicationTest, testTranslationPluralOne) {
-  slint::SharedString out;
-  slintTr(toSlice("Translated %n String(s)"), toSlice("GuiApplicationTest"),
-          toSlice("Domain"), 1, toSlice("Translated %n String(s)"), &out);
+TEST_F(SlintHelpersTest, testTranslationPluralOne) {
+  SlintTranslator tr;
+  slint::SharedString out =
+      tr.ntranslate(1, "", "Translated %n String(s)", "SlintHelpersTest");
   EXPECT_EQ("Übersetzter 1 Text", static_cast<std::string_view>(out));
 }
 
-TEST_F(GuiApplicationTest, testTranslationPluralFive) {
-  slint::SharedString out;
-  slintTr(toSlice("Translated %n String(s)"), toSlice("GuiApplicationTest"),
-          toSlice("Domain"), 5, toSlice("Translated %n String(s)"), &out);
+TEST_F(SlintHelpersTest, testTranslationPluralFive) {
+  SlintTranslator tr;
+  slint::SharedString out =
+      tr.ntranslate(5, "", "Translated %n String(s)", "SlintHelpersTest");
   EXPECT_EQ("Übersetzte 5 Texte", static_cast<std::string_view>(out));
 }
 
-TEST_F(GuiApplicationTest, testTranslationPlaceholders) {
-  slint::SharedString out;
-  slintTr(toSlice("Translated String %1 of %2"), toSlice("GuiApplicationTest"),
-          toSlice("Domain"), 0, toSlice(""), &out);
+TEST_F(SlintHelpersTest, testTranslationPlaceholders) {
+  SlintTranslator tr;
+  slint::SharedString out =
+      tr.translate("Translated String %1 of %2", "SlintHelpersTest");
   EXPECT_EQ("Übersetzter Text {0} von {1}", static_cast<std::string_view>(out));
 }
 
-TEST_F(GuiApplicationTest, testTranslationWithUnicode) {
-  slint::SharedString out;
-  slintTr(toSlice("Translated String ‒ With Unicode ☺"),
-          toSlice("GuiApplicationTest"), toSlice("Domain"), 0, toSlice(""),
-          &out);
+TEST_F(SlintHelpersTest, testTranslationWithUnicode) {
+  SlintTranslator tr;
+  slint::SharedString out =
+      tr.translate("Translated String ‒ With Unicode ☺", "SlintHelpersTest");
   EXPECT_EQ("Übersetzter Text ‒ Mit Unicode ☺",
             static_cast<std::string_view>(out));
 }

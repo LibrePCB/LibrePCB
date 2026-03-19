@@ -32,6 +32,75 @@ namespace librepcb {
 namespace editor {
 
 /*******************************************************************************
+ *  Class SlintTranslator
+ ******************************************************************************/
+
+// This is quite ugly, but it seems to work o_o
+
+slint::SharedString SlintTranslator::translate(std::string_view string,
+                                               std::string_view context) const {
+  setContext(context);
+  setString(string);
+  mStringBuffer =
+      QCoreApplication::translate(mContextBuffer.c_str(), mStringBuffer.data())
+          .toUtf8();
+  return convertStringToSlint();
+}
+
+slint::SharedString SlintTranslator::ntranslate(
+    uint64_t n, std::string_view singular, std::string_view plural,
+    std::string_view context) const {
+  Q_UNUSED(singular);
+  setContext(context);
+  setString(plural);
+  mStringBuffer.replace("{n}", "%n");
+  mStringBuffer = QCoreApplication::translate(mContextBuffer.c_str(),
+                                              mStringBuffer.data(), nullptr, n)
+                      .toUtf8();
+  mStringBuffer.replace("%n", "{n}");
+  return convertStringToSlint();
+}
+
+void SlintTranslator::setContext(std::string_view context) const noexcept {
+  mContextBuffer = "ui::";
+  mContextBuffer.append(context);
+}
+
+void SlintTranslator::setString(std::string_view string) const noexcept {
+  mStringBuffer.setRawData(string.data(), string.size());
+  auto buildPlaceholder = [this](int i) -> const QByteArray& {
+    mPlaceholderBuffer = buildSlintPlaceholder(i);
+    return mPlaceholderBuffer;
+  };
+  for (int i = 0; mStringBuffer.contains(buildPlaceholder(i)); ++i) {
+    mStringBuffer.replace(mPlaceholderBuffer, buildQtPlaceholder(i + 1));
+  }
+  for (int i = 1; mStringBuffer.contains("{}"); ++i) {
+    mStringBuffer.replace(mStringBuffer.indexOf("{}"), 2,
+                          "%" + QByteArray::number(i));
+  }
+}
+
+slint::SharedString SlintTranslator::convertStringToSlint() const noexcept {
+  auto buildPlaceholder = [this](int i) -> const QByteArray& {
+    mPlaceholderBuffer = buildQtPlaceholder(i);
+    return mPlaceholderBuffer;
+  };
+  for (int i = 1; mStringBuffer.contains(buildPlaceholder(i)); ++i) {
+    mStringBuffer.replace(mPlaceholderBuffer, buildSlintPlaceholder(i - 1));
+  }
+  return slint::SharedString(std::string_view(mStringBuffer));
+}
+
+QByteArray SlintTranslator::buildSlintPlaceholder(int i) noexcept {
+  return "{" + QByteArray::number(i) + "}";
+}
+
+QByteArray SlintTranslator::buildQtPlaceholder(int i) noexcept {
+  return "%" + QByteArray::number(i);
+}
+
+/*******************************************************************************
  *  Non-Member Functions
  ******************************************************************************/
 
