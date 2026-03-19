@@ -317,12 +317,18 @@ static int openWorkspace(FilePath& path) {
 
   // Now since workspace settings are loaded, switch to the locale defined
   // there (until now, the system locale was used).
-  if (!ws.getSettings().applicationLocale.get().isEmpty()) {
-    QLocale locale(ws.getSettings().applicationLocale.get());
+  auto applyApplicationLocale = [&ws]() {
+    const QString name = ws.getSettings().applicationLocale.get();
+    const QLocale locale = name.isEmpty() ? QLocale::system() : QLocale(name);
     QLocale::setDefault(locale);
     Application::setTranslationLocale(locale);
     EditorCommandSet::instance().updateTranslations();
-  }
+    slint::update_all_translations();
+  };
+  applyApplicationLocale();
+  QObject::connect(&ws.getSettings().applicationLocale,
+                   &WorkspaceSettingsItem::edited,
+                   &ws.getSettings().applicationLocale, applyApplicationLocale);
 
   // Setup global parts information provider (with cache).
   PartInformationProvider::instance().setCacheDir(Application::getCacheDir());

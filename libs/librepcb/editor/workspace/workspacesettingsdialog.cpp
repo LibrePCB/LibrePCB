@@ -66,6 +66,8 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
     mUi(new Ui::WorkspaceSettingsDialog) {
   mUi->setupUi(this);
 
+  discardTemporaryModifications();
+
   const EditorCommandSet& cmd = EditorCommandSet::instance();
 
   // Initialize application locale widgets
@@ -80,6 +82,14 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
       mUi->cbxAppLocale->addItem(i.key(), i.value());
       ++i;
     }
+    // Apply this setting immediately.
+    connect(mUi->cbxAppLocale, &QComboBox::currentIndexChanged,
+            [this](int index) {
+              if (index >= 0) {
+                mSettings.applicationLocale.set(
+                    mUi->cbxAppLocale->itemData(index).toString());
+              }
+            });
   }
 
   // Initialize "reset dismissed messages" button
@@ -460,6 +470,18 @@ void WorkspaceSettingsDialog::keyPressEvent(QKeyEvent* event) noexcept {
   QDialog::keyPressEvent(event);
 }
 
+void WorkspaceSettingsDialog::changeEvent(QEvent* event) noexcept {
+  if (event->type() == QEvent::LanguageChange) {
+    mUi->retranslateUi(this);
+  }
+  QDialog::changeEvent(event);
+}
+
+void WorkspaceSettingsDialog::reject() noexcept {
+  revertTemporaryModifications();
+  QDialog::reject();
+}
+
 void WorkspaceSettingsDialog::externalApplicationListIndexChanged(
     int index) noexcept {
   if ((index < 0) || (index >= mExternalApplications.count())) {
@@ -640,12 +662,17 @@ void WorkspaceSettingsDialog::updateDesktopIntegrationStatus() noexcept {
 }
 
 void WorkspaceSettingsDialog::loadSettings() noexcept {
+  discardTemporaryModifications();
+
   // User Name
   mUi->edtUserName->setText(mSettings.userName.get());
 
   // Application Locale
-  mUi->cbxAppLocale->setCurrentIndex(
-      mUi->cbxAppLocale->findData(mSettings.applicationLocale.get()));
+  {
+    QSignalBlocker blocker(mUi->cbxAppLocale);
+    mUi->cbxAppLocale->setCurrentIndex(
+        mUi->cbxAppLocale->findData(mSettings.applicationLocale.get()));
+  }
 
   // Default Length Unit
   mUi->cbxDefaultLengthUnit->clear();
@@ -692,15 +719,13 @@ void WorkspaceSettingsDialog::loadSettings() noexcept {
 }
 
 void WorkspaceSettingsDialog::saveSettings() noexcept {
+  discardTemporaryModifications();
+
   try {
     // User Name
     mSettings.userName.set(mUi->edtUserName->text().trimmed());
 
-    // Application Locale
-    if (mUi->cbxAppLocale->currentIndex() >= 0) {
-      mSettings.applicationLocale.set(
-          mUi->cbxAppLocale->currentData().toString());
-    }
+    // Application Locale was applied immediately.
 
     // Default Length Unit
     if (mUi->cbxDefaultLengthUnit->currentIndex() >= 0) {
@@ -753,6 +778,14 @@ void WorkspaceSettingsDialog::saveSettings() noexcept {
   } catch (const Exception& e) {
     QMessageBox::critical(this, tr("Error"), e.getMsg());
   }
+}
+
+void WorkspaceSettingsDialog::discardTemporaryModifications() noexcept {
+  mOldApplicationLocale = mSettings.applicationLocale.get();
+}
+
+void WorkspaceSettingsDialog::revertTemporaryModifications() noexcept {
+  mSettings.applicationLocale.set(mOldApplicationLocale);
 }
 
 /*******************************************************************************
