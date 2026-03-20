@@ -11,6 +11,14 @@ then
   while pgrep XProtect; do sleep 3; done;
 fi
 
+# Sanity check that the app doesn't link to libunwind, since this seems to
+# cause incompatibility with macOS 10.14.
+BINARY="./build/install/bin/librepcb.app/Contents/MacOS/librepcb"
+if otool -L "$BINARY" | grep -q "libunwind"; then
+  echo "Error: $BINARY links to libunwind" >&2
+  exit 1
+fi
+
 # Merge GUI application and CLI (https://github.com/LibrePCB/LibrePCB/issues/1358)
 cp "./build/install/bin/librepcb-cli.app/Contents/MacOS/librepcb-cli" \
    "./build/install/bin/librepcb.app/Contents/MacOS/"

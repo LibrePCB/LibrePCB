@@ -7,6 +7,13 @@ set -euv -o pipefail
 if [ -z "${CC-}" ]; then CC="gcc"; fi
 if [ -z "${CXX-}" ]; then CXX="g++"; fi
 
+# Sanity check that we don't use clang from homebrew since it causes troubles.
+# See https://github.com/actions/runner-images/issues/13827.
+if $CC --version | grep -i -q "homebrew"; then
+  echo "Error: Compiler seems to be coming from homebrew" >&2
+  exit 1
+fi
+
 # download latest translation files (just pull the i18n submodule)
 if [ "$OS" = "windows" ]; then  # Workaround for permission error
   git config --global --add safe.directory '*'

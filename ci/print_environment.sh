@@ -29,6 +29,10 @@ echo "=== Clang ==="
 clang --version
 echo
 
+echo "=== Rustup ==="
+rustup toolchain list
+echo
+
 echo "=== Cargo ==="
 cargo --version
 echo "CARGO_HOME=$CARGO_HOME"
