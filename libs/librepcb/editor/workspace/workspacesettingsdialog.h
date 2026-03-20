@@ -90,6 +90,8 @@ signals:
 private:
   void buttonBoxClicked(QAbstractButton* button) noexcept;
   void keyPressEvent(QKeyEvent* event) noexcept override;
+  void changeEvent(QEvent* event) noexcept override;
+  void reject() noexcept override;
   void externalApplicationListIndexChanged(int index) noexcept;
   void updateThemesList(const Uuid& selectedTheme) noexcept;
   void themeIndexChanged(int index) noexcept;
@@ -100,6 +102,8 @@ private:
   void updateDesktopIntegrationStatus() noexcept;
   void loadSettings() noexcept;
   void saveSettings() noexcept;
+  void discardTemporaryModifications() noexcept;
+  void revertTemporaryModifications() noexcept;
 
 private:
   Workspace& mWorkspace;  /// Reference to the Workspace object
@@ -114,6 +118,9 @@ private:
   // Cached settings
   QVector<ExternalApplication> mExternalApplications;
   QMap<Uuid, Theme> mThemes;
+
+  // Original values of temporarily changed settings
+  QString mOldApplicationLocale;
 };
 
 /*******************************************************************************

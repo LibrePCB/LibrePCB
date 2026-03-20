@@ -276,6 +276,14 @@ void Application::loadBundledFonts() noexcept {
 void Application::setTranslationLocale(const QLocale& locale) noexcept {
   static QVector<QTranslator*> installedTranslators;
 
+  // Do nothing if locale has not changed.
+  static std::optional<QLocale> currentLocale;
+  if (currentLocale == locale) {
+    return;
+  } else {
+    currentLocale = locale;
+  }
+
   // First, remove all currently installed translations to avoid falling back to
   // wrong languages. The fallback language must always be en_US, i.e.
   // untranslated strings. See https://github.com/LibrePCB/LibrePCB/issues/611

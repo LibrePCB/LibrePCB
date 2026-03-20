@@ -67,50 +67,6 @@
 namespace librepcb {
 namespace editor {
 
-// Translation callback for Slint. Needs to convert gettext placeholders
-// to Qt placeholders ("{1}" -> "%1"). Not very elegant for now, could
-// probably be improved a lot...
-void slintTr(slint::private_api::Slice<uint8_t> string,
-             slint::private_api::Slice<uint8_t> ctx,
-             slint::private_api::Slice<uint8_t> domain, int32_t n,
-             slint::private_api::Slice<uint8_t> plural,
-             slint::SharedString* out) noexcept {
-  Q_UNUSED(domain);
-  const QByteArray context =
-      "ui::" + QByteArray(reinterpret_cast<const char*>(ctx.ptr), ctx.len);
-  QByteArray str =
-      (plural.len
-           ? QByteArray(reinterpret_cast<const char*>(plural.ptr), plural.len)
-           : QByteArray(reinterpret_cast<const char*>(string.ptr), string.len));
-
-  // Helpers to build pattern strings "{n}" and "%n".
-  QByteArray pattern;
-  auto buildSlintPattern = [&pattern](int i) -> const QByteArray& {
-    pattern = "{" + QByteArray::number(i) + "}";
-    return pattern;
-  };
-  auto buildQtPattern = [&pattern](int i) -> const QByteArray& {
-    pattern = "%" + QByteArray::number(i);
-    return pattern;
-  };
-
-  str.replace("{n}", "%n");
-  for (int i = 0; str.contains(buildSlintPattern(i)); ++i) {
-    str.replace(pattern, "%" + QByteArray::number(i + 1));
-  }
-  for (int i = 1; str.contains("{}"); ++i) {
-    str.replace(str.indexOf("{}"), 2, "%" + QByteArray::number(i));
-  }
-  str = QCoreApplication::translate(context.data(), str.data(), nullptr,
-                                    plural.len ? n : -1)
-            .toUtf8();
-  str.replace("%n", "{n}");
-  for (int i = 1; str.contains(buildQtPattern(i)); ++i) {
-    str.replace(pattern, "{" + QByteArray::number(i - 1) + "}");
-  }
-  *out = std::string_view(str.data(), str.size());
-}
-
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
@@ -139,11 +95,6 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
   if (mWindows.isEmpty()) {
     createNewWindow();
   }
-
-  // It seems registering the callback *before* the first Slint window is
-  // created, doesn't work for some reason so we do it here. Maybe the reason
-  // is that that's not an official Slint feature but a hack from myself ;-)
-  slint::private_api::slint_translate_set_translate_callback(&slintTr);
 
   // Setup quick access.
   connect(mQuickAccessModel.get(), &QuickAccessModel::openFileTriggered, this,

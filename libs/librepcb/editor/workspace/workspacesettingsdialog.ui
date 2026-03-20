@@ -44,37 +44,11 @@
         </widget>
        </item>
        <item row="0" column="1">
-        <layout class="QVBoxLayout" name="verticalLayout_3">
-         <property name="spacing">
-          <number>3</number>
+        <widget class="QComboBox" name="cbxAppLocale">
+         <property name="insertPolicy">
+          <enum>QComboBox::NoInsert</enum>
          </property>
-         <property name="sizeConstraint">
-          <enum>QLayout::SetMinimumSize</enum>
-         </property>
-         <item>
-          <widget class="QComboBox" name="cbxAppLocale">
-           <property name="insertPolicy">
-            <enum>QComboBox::NoInsert</enum>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_8">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string>Changing the language requires to restart the application.</string>
-           </property>
-           <property name="wordWrap">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-        </layout>
+        </widget>
        </item>
        <item row="1" column="0">
         <widget class="QLabel" name="label_4">
@@ -167,6 +141,13 @@
          </item>
         </layout>
        </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="lblDesktopIntegration">
+         <property name="text">
+          <string>Desktop Integration:</string>
+         </property>
+        </widget>
+       </item>
        <item row="4" column="1">
         <layout class="QVBoxLayout" name="verticalLayout_8">
          <property name="spacing">
@@ -217,13 +198,6 @@
           </widget>
          </item>
         </layout>
-       </item>
-       <item row="4" column="0">
-        <widget class="QLabel" name="lblDesktopIntegration">
-         <property name="text">
-          <string>Desktop Integration:</string>
-         </property>
-        </widget>
        </item>
       </layout>
      </widget>

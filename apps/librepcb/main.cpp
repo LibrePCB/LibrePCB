@@ -30,6 +30,7 @@
 #include <librepcb/editor/editorcommandset.h>
 #include <librepcb/editor/guiapplication.h>
 #include <librepcb/editor/project/partinformationprovider.h>
+#include <librepcb/editor/utils/slinthelpers.h>
 #include <librepcb/editor/workspace/initializeworkspacewizard/initializeworkspacewizard.h>
 
 #include <QtConcurrent>
@@ -119,6 +120,9 @@ int main(int argc, char* argv[]) {
     app.setStyle("fusion");
     app.setPalette(palette);
   }
+
+  // Register our custom translator to Slint.
+  slint::set_translator(std::make_unique<SlintTranslator>());
 
   // Start network access manager thread with HTTP cache to avoid extensive
   // requests (e.g. downloading library pictures each time opening the manager).
@@ -313,12 +317,18 @@ static int openWorkspace(FilePath& path) {
 
   // Now since workspace settings are loaded, switch to the locale defined
   // there (until now, the system locale was used).
-  if (!ws.getSettings().applicationLocale.get().isEmpty()) {
-    QLocale locale(ws.getSettings().applicationLocale.get());
+  auto applyApplicationLocale = [&ws]() {
+    const QString name = ws.getSettings().applicationLocale.get();
+    const QLocale locale = name.isEmpty() ? QLocale::system() : QLocale(name);
     QLocale::setDefault(locale);
     Application::setTranslationLocale(locale);
     EditorCommandSet::instance().updateTranslations();
-  }
+    slint::update_all_translations();
+  };
+  applyApplicationLocale();
+  QObject::connect(&ws.getSettings().applicationLocale,
+                   &WorkspaceSettingsItem::edited,
+                   &ws.getSettings().applicationLocale, applyApplicationLocale);
 
   // Setup global parts information provider (with cache).
   PartInformationProvider::instance().setCacheDir(Application::getCacheDir());

@@ -38,27 +38,36 @@ namespace tests {
  *  Test Class
  ******************************************************************************/
 
-class ApplicationTest : public ::testing::Test {};
+class ApplicationTest : public ::testing::Test {
+protected:
+  ApplicationTest() {}
+
+  ~ApplicationTest() { Application::setTranslationLocale(QLocale()); }
+
+  std::string getTranslatedString() {
+    return QCoreApplication::translate("ui::MainMenuBar", "File").toStdString();
+  }
+};
 
 /*******************************************************************************
  *  Test Methods
  ******************************************************************************/
 
-TEST(ApplicationTest, testGetVersion) {
+TEST_F(ApplicationTest, testGetVersion) {
   EXPECT_FALSE(Application::getVersion().isEmpty());
 }
 
-TEST(ApplicationTest, testGetFileFormatVersion) {
+TEST_F(ApplicationTest, testGetFileFormatVersion) {
   EXPECT_GE(Application::getFileFormatVersion(), Version::fromString("0.1"));
 }
 
-TEST(ApplicationTest, testBuildFullVersionDetails) {
+TEST_F(ApplicationTest, testBuildFullVersionDetails) {
   const QString s = Application::buildFullVersionDetails();
   EXPECT_FALSE(s.trimmed().isEmpty());
   EXPECT_GE(s.split("\n").count(), 5);
 }
 
-TEST(ApplicationTest, testGetCacheDir) {
+TEST_F(ApplicationTest, testGetCacheDir) {
   // Check if the resources directory is valid and writable.
   EXPECT_TRUE(Application::getCacheDir().isValid());
   const FilePath tmpFp = Application::getCacheDir().getPathTo("test.txt");
@@ -67,7 +76,7 @@ TEST(ApplicationTest, testGetCacheDir) {
   FileUtils::removeFile(tmpFp);
 }
 
-TEST(ApplicationTest, testGetResourcesDir) {
+TEST_F(ApplicationTest, testGetResourcesDir) {
   // check if the resources directory is valid, exists and is not empty
   EXPECT_TRUE(Application::getResourcesDir().isValid());
   EXPECT_TRUE(Application::getResourcesDir().isExistingDir());
@@ -81,10 +90,35 @@ TEST(ApplicationTest, testGetResourcesDir) {
   EXPECT_TRUE(repoRoot.getPathTo("CMakeLists.txt").isExistingFile());
 }
 
-TEST(ApplicationTest, testExistenceOfResourceFiles) {
+TEST_F(ApplicationTest, testExistenceOfResourceFiles) {
   EXPECT_TRUE(Application::getResourcesDir().isExistingDir());
   EXPECT_TRUE(
       Application::getResourcesDir().getPathTo("README.md").isExistingFile());
+}
+
+TEST_F(ApplicationTest, testSetTranslationLocale_en) {
+  Application::setTranslationLocale(QLocale("en"));
+  EXPECT_EQ("File", getTranslatedString());
+}
+
+TEST_F(ApplicationTest, testSetTranslationLocale_en_US) {
+  Application::setTranslationLocale(QLocale("en_US"));
+  EXPECT_EQ("File", getTranslatedString());
+}
+
+TEST_F(ApplicationTest, testSetTranslationLocale_de) {
+  Application::setTranslationLocale(QLocale("de"));
+  EXPECT_EQ("Datei", getTranslatedString());
+}
+
+TEST_F(ApplicationTest, testSetTranslationLocale_de_DE) {
+  Application::setTranslationLocale(QLocale("de_DE"));
+  EXPECT_EQ("Datei", getTranslatedString());
+}
+
+TEST_F(ApplicationTest, testSetTranslationLocale_de_CH) {
+  Application::setTranslationLocale(QLocale("de_CH"));
+  EXPECT_EQ("Datei", getTranslatedString());
 }
 
 /*******************************************************************************
