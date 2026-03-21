@@ -420,6 +420,9 @@ class LibrePcbFixture(object):
             path = self.abspath(path)
         self.project_path = path
 
+    def get_workspace_path(self, relpath):
+        return os.path.join(self.workspace_path, relpath)
+
     def get_workspace_libraries_path(self, subdir=""):
         return os.path.join(self.workspace_path, "data", "libraries", subdir)
 
