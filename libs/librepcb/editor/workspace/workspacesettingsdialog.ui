@@ -3,7 +3,7 @@
  <class>librepcb::editor::WorkspaceSettingsDialog</class>
  <widget class="QDialog" name="librepcb::editor::WorkspaceSettingsDialog">
   <property name="windowModality">
-   <enum>Qt::ApplicationModal</enum>
+   <enum>Qt::WindowModality::ApplicationModal</enum>
   </property>
   <property name="geometry">
    <rect>
@@ -34,7 +34,7 @@
       </attribute>
       <layout class="QFormLayout" name="formLayout">
        <property name="fieldGrowthPolicy">
-        <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+        <enum>QFormLayout::FieldGrowthPolicy::AllNonFixedFieldsGrow</enum>
        </property>
        <item row="0" column="0">
         <widget class="QLabel" name="label_5">
@@ -46,7 +46,7 @@
        <item row="0" column="1">
         <widget class="QComboBox" name="cbxAppLocale">
          <property name="insertPolicy">
-          <enum>QComboBox::NoInsert</enum>
+          <enum>QComboBox::InsertPolicy::NoInsert</enum>
          </property>
         </widget>
        </item>
@@ -60,7 +60,7 @@
        <item row="1" column="1">
         <widget class="QComboBox" name="cbxDefaultLengthUnit">
          <property name="insertPolicy">
-          <enum>QComboBox::NoInsert</enum>
+          <enum>QComboBox::InsertPolicy::NoInsert</enum>
          </property>
         </widget>
        </item>
@@ -77,7 +77,7 @@
           <number>3</number>
          </property>
          <property name="sizeConstraint">
-          <enum>QLayout::SetMinimumSize</enum>
+          <enum>QLayout::SizeConstraint::SetMinimumSize</enum>
          </property>
          <item>
           <widget class="QLineEdit" name="edtUserName">
@@ -102,6 +102,12 @@
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>9</pointsize>
+             <italic>true</italic>
+            </font>
            </property>
            <property name="text">
             <string>This name will be used as author when creating new projects or libraries.</string>
@@ -142,13 +148,27 @@
         </layout>
        </item>
        <item row="4" column="0">
+        <widget class="QLabel" name="label_10">
+         <property name="text">
+          <string>Rendering Method:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <widget class="QCheckBox" name="cbxUseOpenGl">
+         <property name="text">
+          <string>Use OpenGL Hardware Acceleration</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
         <widget class="QLabel" name="lblDesktopIntegration">
          <property name="text">
           <string>Desktop Integration:</string>
          </property>
         </widget>
        </item>
-       <item row="4" column="1">
+       <item row="5" column="1">
         <layout class="QVBoxLayout" name="verticalLayout_8">
          <property name="spacing">
           <number>3</number>
@@ -199,64 +219,14 @@
          </item>
         </layout>
        </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="appearanceTab">
-      <attribute name="title">
-       <string>Appearance</string>
-      </attribute>
-      <layout class="QFormLayout" name="formLayout_2">
-       <property name="fieldGrowthPolicy">
-        <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-       </property>
-       <item row="0" column="0">
-        <widget class="QLabel" name="label_10">
-         <property name="text">
-          <string>Rendering Method:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <layout class="QVBoxLayout" name="verticalLayout_4">
-         <property name="spacing">
-          <number>3</number>
-         </property>
-         <property name="sizeConstraint">
-          <enum>QLayout::SetMinimumSize</enum>
-         </property>
-         <item>
-          <widget class="QCheckBox" name="cbxUseOpenGl">
-           <property name="text">
-            <string>Use OpenGL Hardware Acceleration</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_9">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string>This setting will be applied only to newly opened windows.</string>
-           </property>
-           <property name="wordWrap">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item row="1" column="0">
+       <item row="6" column="0">
         <widget class="QLabel" name="label">
          <property name="text">
           <string>Dismissed Messages:</string>
          </property>
         </widget>
        </item>
-       <item row="1" column="1">
+       <item row="6" column="1">
         <widget class="QPushButton" name="btnResetDismissedMessages">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -277,7 +247,7 @@
       </attribute>
       <layout class="QFormLayout" name="formLayout_3">
        <property name="fieldGrowthPolicy">
-        <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+        <enum>QFormLayout::FieldGrowthPolicy::AllNonFixedFieldsGrow</enum>
        </property>
        <item row="0" column="0">
         <widget class="QLabel" name="label_11">
@@ -298,7 +268,7 @@
        <item row="0" column="1">
         <widget class="librepcb::editor::EditableTableWidget" name="tblLibLocaleOrder">
          <property name="editTriggers">
-          <set>QAbstractItemView::AllEditTriggers</set>
+          <set>QAbstractItemView::EditTrigger::AllEditTriggers</set>
          </property>
          <attribute name="horizontalHeaderVisible">
           <bool>false</bool>
@@ -311,7 +281,7 @@
        <item row="1" column="1">
         <widget class="librepcb::editor::EditableTableWidget" name="tblLibNormOrder">
          <property name="editTriggers">
-          <set>QAbstractItemView::AllEditTriggers</set>
+          <set>QAbstractItemView::EditTrigger::AllEditTriggers</set>
          </property>
          <attribute name="horizontalHeaderVisible">
           <bool>false</bool>
@@ -343,13 +313,13 @@
        <item>
         <widget class="QListWidget" name="lstExternalApplications">
          <property name="frameShape">
-          <enum>QFrame::NoFrame</enum>
+          <enum>QFrame::Shape::NoFrame</enum>
          </property>
          <property name="horizontalScrollBarPolicy">
-          <enum>Qt::ScrollBarAlwaysOff</enum>
+          <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
          </property>
          <property name="editTriggers">
-          <set>QAbstractItemView::NoEditTriggers</set>
+          <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
          </property>
          <property name="tabKeyNavigation">
           <bool>true</bool>
@@ -413,7 +383,7 @@
             <string>You can add multiple commands to make the same settings working on multiple computers. LibrePCB will iterate through the list of commands until one of them succeeds. If none succeeds, the system's default application will be used.</string>
            </property>
            <property name="alignment">
-            <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+            <set>Qt::AlignmentFlag::AlignBottom|Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft</set>
            </property>
            <property name="wordWrap">
             <bool>true</bool>
@@ -447,10 +417,10 @@
        <item>
         <widget class="QTreeView" name="treeKeyboardShortcuts">
          <property name="frameShape">
-          <enum>QFrame::NoFrame</enum>
+          <enum>QFrame::Shape::NoFrame</enum>
          </property>
          <property name="horizontalScrollBarPolicy">
-          <enum>Qt::ScrollBarAlwaysOff</enum>
+          <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
          </property>
          <property name="showDropIndicator" stdset="0">
           <bool>false</bool>
@@ -475,7 +445,7 @@
        <item>
         <widget class="Line" name="line">
          <property name="orientation">
-          <enum>Qt::Horizontal</enum>
+          <enum>Qt::Orientation::Horizontal</enum>
          </property>
         </widget>
        </item>
@@ -526,10 +496,10 @@
          <item>
           <spacer name="horizontalSpacer">
            <property name="orientation">
-            <enum>Qt::Horizontal</enum>
+            <enum>Qt::Orientation::Horizontal</enum>
            </property>
            <property name="sizeType">
-            <enum>QSizePolicy::Fixed</enum>
+            <enum>QSizePolicy::Policy::Fixed</enum>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
@@ -545,7 +515,7 @@
             <number>15</number>
            </property>
            <property name="insertPolicy">
-            <enum>QComboBox::NoInsert</enum>
+            <enum>QComboBox::InsertPolicy::NoInsert</enum>
            </property>
           </widget>
          </item>
@@ -624,7 +594,7 @@
        <item>
         <widget class="Line" name="line_2">
          <property name="orientation">
-          <enum>Qt::Horizontal</enum>
+          <enum>Qt::Orientation::Horizontal</enum>
          </property>
         </widget>
        </item>
@@ -633,13 +603,13 @@
          <item>
           <widget class="QTreeWidget" name="treeThemeColors">
            <property name="editTriggers">
-            <set>QAbstractItemView::NoEditTriggers</set>
+            <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
            </property>
            <property name="showDropIndicator" stdset="0">
             <bool>false</bool>
            </property>
            <property name="selectionMode">
-            <enum>QAbstractItemView::NoSelection</enum>
+            <enum>QAbstractItemView::SelectionMode::NoSelection</enum>
            </property>
            <property name="rootIsDecorated">
             <bool>false</bool>
@@ -684,7 +654,7 @@
          <item>
           <layout class="QFormLayout" name="formLayout_4">
            <property name="fieldGrowthPolicy">
-            <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+            <enum>QFormLayout::FieldGrowthPolicy::AllNonFixedFieldsGrow</enum>
            </property>
            <item row="0" column="0">
             <widget class="QLabel" name="label_17">
@@ -734,7 +704,7 @@ To completely disable Internet access, just remove all entries.&lt;/p&gt;
        <item>
         <widget class="librepcb::editor::EditableTableWidget" name="edtApiEndpoints">
          <property name="editTriggers">
-          <set>QAbstractItemView::AllEditTriggers</set>
+          <set>QAbstractItemView::EditTrigger::AllEditTriggers</set>
          </property>
          <attribute name="verticalHeaderVisible">
           <bool>false</bool>
@@ -758,10 +728,10 @@ To completely disable Internet access, just remove all entries.&lt;/p&gt;
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
-      <enum>Qt::Horizontal</enum>
+      <enum>Qt::Orientation::Horizontal</enum>
      </property>
      <property name="standardButtons">
-      <set>QDialogButtonBox::Apply|QDialogButtonBox::Cancel|QDialogButtonBox::Ok|QDialogButtonBox::RestoreDefaults</set>
+      <set>QDialogButtonBox::StandardButton::Apply|QDialogButtonBox::StandardButton::Cancel|QDialogButtonBox::StandardButton::Ok|QDialogButtonBox::StandardButton::RestoreDefaults</set>
      </property>
     </widget>
    </item>
