@@ -92,19 +92,6 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
             });
   }
 
-  // Initialize "reset dismissed messages" button
-  updateDismissedMessagesCount();
-  connect(mUi->btnResetDismissedMessages, &QPushButton::clicked, this,
-          [this]() {
-            try {
-              mSettings.dismissedMessages.restoreDefault();
-              mWorkspace.saveSettings();  // can throw
-            } catch (const Exception& e) {
-              QMessageBox::critical(this, tr("Error"), e.getMsg());
-            }
-            updateDismissedMessagesCount();
-          });
-
   // Initialize desktop integration widgets
   if (DesktopIntegration::isSupported()) {
     connect(mUi->btnInstallApp, &QPushButton::clicked, this, [this]() {
@@ -121,6 +108,19 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
   } else {
     EditorToolbox::removeFormLayoutRow(*mUi->lblDesktopIntegration);
   }
+
+  // Initialize "reset dismissed messages" button
+  updateDismissedMessagesCount();
+  connect(mUi->btnResetDismissedMessages, &QPushButton::clicked, this,
+          [this]() {
+            try {
+              mSettings.dismissedMessages.restoreDefault();
+              mWorkspace.saveSettings();  // can throw
+            } catch (const Exception& e) {
+              QMessageBox::critical(this, tr("Error"), e.getMsg());
+            }
+            updateDismissedMessagesCount();
+          });
 
   // Initialize library locale order widgets
   {

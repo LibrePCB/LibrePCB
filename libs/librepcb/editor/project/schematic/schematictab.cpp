@@ -140,11 +140,11 @@ SchematicTab::SchematicTab(GuiApplication& app, SchematicEditor& editor,
   Q_ASSERT(&mSchematic.getProject() == &mProject);
 
   // Setup graphics view.
-  mView->setUseOpenGl(mApp.getWorkspace().getSettings().useOpenGl.get());
   mView->setEventHandler(this);
+  mView->setUseOpenGl(mApp.getWorkspace().getSettings().useOpenGl.get());
   connect(
       &mApp.getWorkspace().getSettings().useOpenGl,
-      &WorkspaceSettingsItem_GenericValue<bool>::edited, this, [this]() {
+      &WorkspaceSettingsItem::edited, this, [this]() {
         mView->setUseOpenGl(mApp.getWorkspace().getSettings().useOpenGl.get());
       });
   connect(mView.get(), &SlintGraphicsView::transformChanged, this,
