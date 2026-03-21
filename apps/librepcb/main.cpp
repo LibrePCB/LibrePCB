@@ -315,12 +315,15 @@ static int openWorkspace(FilePath& path) {
       wizard->getWorkspaceContainsNewerFileFormats();
   wizard.reset();
 
-  // Now since workspace settings are loaded, switch to the locale defined
-  // there (until now, the system locale was used).
+  // Now since workspace settings are loaded, switch to the language defined
+  // there (until now, the system language was used).
+  // Note: Until LibrePCB 2.0.1 we also set QLocale::setDefault(locale), but
+  // this is probably wrong as the setting is intended to change only the
+  // language, not the locale. Most translation locales have no country set
+  // anyway (e.g. only "de", not "de_CH"), so we don't know the user's country.
   auto applyApplicationLocale = [&ws]() {
     const QString name = ws.getSettings().applicationLocale.get();
     const QLocale locale = name.isEmpty() ? QLocale::system() : QLocale(name);
-    QLocale::setDefault(locale);
     Application::setTranslationLocale(locale);
     EditorCommandSet::instance().updateTranslations();
     slint::update_all_translations();
