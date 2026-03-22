@@ -897,12 +897,15 @@ void GuiApplication::openProjectLibraryUpdater(
   mProjectLibraryUpdater.reset(new ProjectLibraryUpdater(
       mWorkspace, project, [this](const FilePath& fp) {
         for (int i = 0; i < mProjects->count(); ++i) {
-          if (mProjects->at(i)->getProject().getFilepath() == fp) {
-            closeProject(i);
-            break;
+          auto prjEditor = mProjects->at(i);
+          if (prjEditor->getProject().getFilepath() == fp) {
+            if (prjEditor->requestClose()) {
+              closeProject(i);
+              return true;
+            }
           }
         }
-        return true;
+        return false;
       }));
   if (wasOpen) {
     connect(
