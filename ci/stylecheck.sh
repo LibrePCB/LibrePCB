@@ -15,6 +15,9 @@ set -euv -o pipefail
 # check if no font weights are used that we don't bundle font files for
 (git grep -E 'font-weight: [0-9]+' -- '*.slint' | grep -vE 'font-weight: (300|400|700)') && exit 1
 
+# check that std-widgets.slint is not used anywhere as we have our own elements
+(git grep -Il 'std-widgets.slint' -- '*.slint') && exit 1
+
 # run all checks from format_code.sh
 #  - checks c++ files with clang-format
 #  - checks *.rs files with rustfmt
