@@ -859,6 +859,15 @@ void PackageTab::trigger(ui::TabAction a) noexcept {
     case ui::TabAction::PackageAddModel: {
       if (auto index = mModels->add()) {
         setCurrentModelIndex(*index);
+
+        // Make sure the new model is visible, especially if the user opened
+        // the 3D view through the "3D" scene button which hides 3D models.
+        if (mAlpha.value(OpenGlObject::Type::Device, 1.0f) < 0.1f) {
+          mAlpha[OpenGlObject::Type::Device] = 1.0f;
+          if (mOpenGlView) {
+            mOpenGlView->setAlpha(mAlpha);
+          }
+        }
       }
       break;
     }
