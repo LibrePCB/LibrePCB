@@ -87,6 +87,13 @@ QString Application::buildFullVersionDetails() noexcept {
     revision += " (" + date.toString(Qt::ISODate) + ")";
   }
   QString qt = QString(qVersion()) + " (built against " + QT_VERSION_STR + ")";
+  const QString operatingSystem = QSysInfo::prettyProductName() + " (" +
+      QSysInfo::currentCpuArchitecture() + ")";
+  QString locale = QLocale::system().name();
+  if (!QLocale::system().uiLanguages().isEmpty()) {
+    // Only list the first two languages to avoid very long output.
+    locale += " (" + QLocale::system().uiLanguages().mid(0, 2).join(", ") + ")";
+  }
 
   QStringList details;
   details << "LibrePCB Version: " + getVersion();
@@ -97,8 +104,8 @@ QString Application::buildFullVersionDetails() noexcept {
     details << "Build Author:     " + getBuildAuthor();
   }
   details << "Qt Version:       " + qt;
-  details << "CPU Architecture: " + QSysInfo::currentCpuArchitecture();
-  details << "Operating System: " + QSysInfo::prettyProductName();
+  details << "Operating System: " + operatingSystem;
+  details << "System Locale:    " + locale;
   details << "Platform Plugin:  " + qApp->platformName();
   details << "TLS Library:      " + QSslSocket::sslLibraryVersionString();
   details << "OCC Library:      " + OccModel::getOccVersionString();
