@@ -53,18 +53,32 @@ export component Board2dTab inherits Tab {
 
     enabled: true;
 
+    function update-tab-data() {
+        tabs[index].scene-image-pos = self.absolute-position;
+    }
+
+    init => {
+        update-tab-data();
+    }
+
+    // Needed for https://github.com/LibrePCB/LibrePCB/issues/1725.
+    changed section-index => {
+        update-tab-data();
+    }
+
+    // Needed for https://github.com/LibrePCB/LibrePCB/issues/1725.
+    changed index => {
+        update-tab-data();
+    }
+
     changed absolute-position => {
-        section.board-2d-tabs[index].scene-image-pos = self.absolute-position;
+        update-tab-data();
     }
 
     // When the tool changes, move focus to scene to make tabulator & escape
     // working correctly.
     changed tool => {
         root.focus();
-    }
-
-    init => {
-        section.board-2d-tabs[index].scene-image-pos = self.absolute-position;
     }
 
     if Data.preview-mode: Rectangle {
