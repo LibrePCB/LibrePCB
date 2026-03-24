@@ -633,6 +633,8 @@ void BoardEditor::setDrcResult(
                                               std::placeholders::_2));
     connect(mDrcMessages.get(), &RuleCheckMessagesModel::unapprovedCountChanged,
             this, [this]() { onUiDataChanged.notify(); });
+    connect(mDrcMessages.get(), &RuleCheckMessagesModel::errorCountChanged,
+            this, [this]() { onUiDataChanged.notify(); });
     connect(mDrcMessages.get(), &RuleCheckMessagesModel::approvalChanged,
             &mBoard, &Board::setDrcMessageApproved);
     connect(mDrcMessages.get(), &RuleCheckMessagesModel::approvalChanged,

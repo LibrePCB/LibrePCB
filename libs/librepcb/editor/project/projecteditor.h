@@ -175,7 +175,6 @@ signals:
   void manualModificationsMade();
   void projectAboutToBeSaved();
   void projectSavedToDisk();
-  void ercUnapprovedCountChanged();
   void ercMessageHighlightRequested(std::shared_ptr<const RuleCheckMessage> msg,
                                     bool zoomTo, int windowId);
   void ercMarkersInvalidated();
