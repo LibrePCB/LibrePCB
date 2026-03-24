@@ -63,6 +63,8 @@ SGI_Symbol::SGI_Symbol(SI_Symbol& symbol,
   mOriginCrossGraphicsItem->setSize(UnsignedLength(1400000));
   mOriginCrossGraphicsItem->setLayer(
       layers.get(Theme::Color::sSchematicReferences));
+  // https://github.com/LibrePCB/LibrePCB/issues/1725
+  mOriginCrossGraphicsItem->setVisible(isSelected());
   mShape.addRect(mOriginCrossGraphicsItem->boundingRect());
 
   for (const auto& obj : mSymbol.getLibSymbol().getCircles()) {
@@ -148,6 +150,8 @@ QVariant SGI_Symbol::itemChange(GraphicsItemChange change,
                                 const QVariant& value) noexcept {
   if ((change == ItemSelectedHasChanged) && mOriginCrossGraphicsItem) {
     mOriginCrossGraphicsItem->setSelected(value.toBool());
+    // https://github.com/LibrePCB/LibrePCB/issues/1725
+    mOriginCrossGraphicsItem->setVisible(value.toBool());
     foreach (const auto& i, mCircleGraphicsItems) {
       i->setSelected(value.toBool());
     }
