@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "initializeworkspacewizard_choosesettings.h"
 
+#include "../../utils/editortoolbox.h"
 #include "ui_initializeworkspacewizard_choosesettings.h"
 
 #include <librepcb/core/application.h>
@@ -70,7 +71,8 @@ InitializeWorkspaceWizard_ChooseSettings::
     mUi->cbxLibraryNorm->setIconSize(iconSize);
     mUi->cbxLibraryNorm->addItem(QIcon(), tr("None"), QVariant());
     foreach (const QString& norm, getAvailableNorms()) {
-      mUi->cbxLibraryNorm->addItem(getNormIcon(norm), norm, norm);
+      mUi->cbxLibraryNorm->addItem(
+          EditorToolbox::svgIcon(getNormIconPath(norm)), norm, norm);
     }
     mUi->cbxLibraryNorm->setCurrentIndex(0);
   }

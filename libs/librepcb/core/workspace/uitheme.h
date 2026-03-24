@@ -17,69 +17,91 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_EAGLELIBRARYIMPORTWIZARD_H
-#define LIBREPCB_EDITOR_EAGLELIBRARYIMPORTWIZARD_H
+#ifndef LIBREPCB_CORE_UITHEME_H
+#define LIBREPCB_CORE_UITHEME_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
 #include <QtCore>
-#include <QtWidgets>
-
-#include <memory>
+#include <QtGui>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 
-class FilePath;
-class Workspace;
-struct UiTheme;
-
-namespace editor {
-
-class EagleLibraryImportWizardContext;
-
-namespace Ui {
-class EagleLibraryImportWizard;
-}
-
 /*******************************************************************************
- *  Class EagleLibraryImportWizard
+ *  Struct UiTheme
  ******************************************************************************/
 
 /**
- * @brief The EagleLibraryImportWizard class
+ * @brief Theme settings (e.g. colors) for the UI
  */
-class EagleLibraryImportWizard final : public QWizard {
-  Q_OBJECT
+struct UiTheme {
+  QString id;  ///< Constant, unique identifier (DO NOT CHANGE!!!)
+  const char* name;  ///< Name (en_US, untranslated)
+  QPalette qpalette;  ///< Colors for (legacy) Qt widgets
 
-public:
-  // Constructors / Destructor
-  EagleLibraryImportWizard(const EagleLibraryImportWizard& other) = delete;
-  EagleLibraryImportWizard(const UiTheme& theme, Workspace& workspace,
-                           const FilePath& dstLibFp,
-                           QWidget* parent = nullptr) noexcept;
-  ~EagleLibraryImportWizard() noexcept;
+  // Menu bar, side bar, status bar
+  QColor window;
 
-  // General Methods
-  void reject() noexcept override;
+  // Tab content
+  QColor base;
+  QColor baseBorder;
+  QColor baseTextDisabled;
+  QColor baseTextMuted;
+  QColor baseText;
+  QColor baseTextHovered;
+  QColor baseTextInfo;
+  QColor baseTextSuccess;
+  QColor baseTextWarning;
+  QColor baseTextError;
 
-  // Operator Overloadings
-  EagleLibraryImportWizard& operator=(const EagleLibraryImportWizard& rhs) =
-      delete;
+  // Buttons, text edits, dropdowns, lists, ...
+  QColor control;
+  QColor controlDisabled;
+  QColor controlHovered;
+  QColor controlChecked;
+  QColor controlBorder;
+  QColor controlBorderDisabled;
+  QColor controlTextDisabled;
+  QColor controlTextMuted;
+  QColor controlText;
 
-private:  // Data
-  QScopedPointer<Ui::EagleLibraryImportWizard> mUi;
-  std::shared_ptr<EagleLibraryImportWizardContext> mContext;
+  // Selected text
+  QColor selection;
+  QColor selectionText;
+
+  // Tooltips
+  QColor tooltip;
+  QColor tooltipBorder;
+  QColor tooltipText;
+
+  // Various
+  QColor accent;
+  QColor accentText;
+  QColor info;
+  QColor infoText;
+  QColor warning;
+  QColor warningText;
+  QColor error;
+  QColor errorText;
+
+  // Methods
+  QString getNameTr() const noexcept;
+
+  // Themes
+  static const UiTheme& light() noexcept;
+  static const UiTheme& dark() noexcept;
+  static const UiTheme* find(const QString& id) noexcept;
+  static QVector<const UiTheme*> all() noexcept;
 };
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
-}  // namespace editor
 }  // namespace librepcb
 
 #endif

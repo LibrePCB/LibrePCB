@@ -112,7 +112,7 @@ public:
       "save_all",  // clang-format break
       QT_TR_NOOP("Save All"),
       QT_TR_NOOP("Save all elements to filesystem"),
-      QString(),
+      nullptr,
       EditorCommand::Flags(),
       {QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_S)},
       &categoryEditor,
@@ -139,7 +139,7 @@ public:
       "find_next",  // clang-format break
       QT_TR_NOOP("Find Next"),
       QT_TR_NOOP("Go to the next found object"),
-      QString(),
+      nullptr,
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_F3)},
       &categoryEditor,
@@ -148,7 +148,7 @@ public:
       "find_previous",  // clang-format break
       QT_TR_NOOP("Find Previous"),
       QT_TR_NOOP("Go to the previous found object"),
-      QString(),
+      nullptr,
       EditorCommand::Flags(),
       {QKeySequence(Qt::SHIFT | Qt::Key_F3)},
       &categoryEditor,
@@ -166,7 +166,7 @@ public:
       "workspace_switch",  // clang-format break
       QT_TR_NOOP("Switch Workspace"),
       QT_TR_NOOP("Choose another workspace to open"),
-      QString(),
+      nullptr,
       EditorCommand::Flag::OpensPopup,
       {},
       &categoryEditor,
@@ -443,7 +443,7 @@ public:
       "add_example_projects",  // clang-format break
       QT_TR_NOOP("Add Example Projects"),
       QT_TR_NOOP("Add some example projects to the workspace"),
-      QString(),
+      nullptr,
       EditorCommand::Flag::OpensPopup,
       {},
       &categoryImportExport,
@@ -452,7 +452,7 @@ public:
       "import_dxf",  // clang-format break
       QT_TR_NOOP("Import DXF"),
       QT_TR_NOOP("Import a 2D mechanical drawing"),
-      QString(),
+      nullptr,
       EditorCommand::Flag::OpensPopup,
       {},
       &categoryImportExport,
@@ -461,7 +461,7 @@ public:
       "import_eagle_library",  // clang-format break
       QT_TR_NOOP("Import EAGLE Library"),
       QT_TR_NOOP("Import library elements from an EAGLE *.lbr file"),
-      QString(),
+      nullptr,
       EditorCommand::Flag::OpensPopup,
       {},
       &categoryImportExport,
@@ -470,7 +470,7 @@ public:
       "import_eagle_project",  // clang-format break
       QT_TR_NOOP("Import EAGLE Project"),
       QT_TR_NOOP("Import schematic/board from EAGLE *.sch/*.brd files"),
-      QString(),
+      nullptr,
       EditorCommand::Flag::OpensPopup,
       {},
       &categoryImportExport,
@@ -479,7 +479,7 @@ public:
       "import_kicad_library",  // clang-format break
       QT_TR_NOOP("Import KiCad Library"),
       QT_TR_NOOP("Import symbols and footprints from KiCad libraries"),
-      QString(),
+      nullptr,
       EditorCommand::Flag::OpensPopup,
       {},
       &categoryImportExport,
@@ -488,7 +488,7 @@ public:
       "import_specctra_ses",  // clang-format break
       QT_TR_NOOP("Import Specctra SES"),
       QT_TR_NOOP("Import a Specctra session, e.g. from external autorouters"),
-      QString(),
+      nullptr,
       EditorCommand::Flag::OpensPopup,
       {},
       &categoryImportExport,
@@ -524,7 +524,7 @@ public:
       "export_specctra_dsn",  // clang-format break
       QT_TR_NOOP("Export Specctra DSN"),
       QT_TR_NOOP("Export PCB to Specctra format for external autorouters etc."),
-      QString(),
+      nullptr,
       EditorCommand::Flag::OpensPopup,
       {},
       &categoryImportExport,
@@ -579,7 +579,7 @@ public:
       "generate_pick_place",  // clang-format break
       QT_TR_NOOP("Generate Pick&&Place Files"),
       QT_TR_NOOP("Generate pick&place files for automated PCB assembly"),
-      QString(),
+      nullptr,
       EditorCommand::Flag::OpensPopup,
       {},  // Was F11 until v0.1.7
       &categoryImportExport,
@@ -588,7 +588,7 @@ public:
       "generate_d356_netlist",  // clang-format break
       QT_TR_NOOP("Generate IPC-D-356A Netlist"),
       QT_TR_NOOP("Generate netlist file for automated PCB testing"),
-      QString(),
+      nullptr,
       EditorCommand::Flag::OpensPopup,
       {},
       &categoryImportExport,
@@ -664,7 +664,7 @@ public:
       "move_left",  // clang-format break
       QT_TR_NOOP("Move Left"),
       QT_TR_NOOP("Move the selected object(s) to the left"),
-      QString(),
+      nullptr,
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_Left)},
       &categoryModify,
@@ -673,7 +673,7 @@ public:
       "move_right",  // clang-format break
       QT_TR_NOOP("Move Right"),
       QT_TR_NOOP("Move the selected object(s) to the right"),
-      QString(),
+      nullptr,
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_Right)},
       &categoryModify,
@@ -682,7 +682,7 @@ public:
       "move_up",  // clang-format break
       QT_TR_NOOP("Move Up"),
       QT_TR_NOOP("Move the selected object(s) up"),
-      QString(),
+      nullptr,
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_Up)},
       &categoryModify,
@@ -691,7 +691,7 @@ public:
       "move_down",  // clang-format break
       QT_TR_NOOP("Move Down"),
       QT_TR_NOOP("Move the selected object(s) down"),
-      QString(),
+      nullptr,
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_Down)},
       &categoryModify,
@@ -766,7 +766,7 @@ public:
       "snap_to_grid",  // clang-format break
       QT_TR_NOOP("Snap to Grid"),
       QT_TR_NOOP("Move the selected object(s) to snap the grid"),
-      ":/img/actions/grid.png",
+      ":/img/grid-dots.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_S)},
       &categoryModify,
@@ -1065,7 +1065,7 @@ public:
       "tool_pad_thermal",  // clang-format break
       QT_TR_NOOP("Add Thermal Pad"),
       QT_TR_NOOP("Add special SMT pads used as heat sink"),
-      QString(),
+      nullptr,
       EditorCommand::Flags(),
       {},
       &categoryTools,
@@ -1074,7 +1074,7 @@ public:
       "tool_pad_bga",  // clang-format break
       QT_TR_NOOP("Add BGA Pad"),
       QT_TR_NOOP("Add special SMT pads used for ball grid arrays"),
-      QString(),
+      nullptr,
       EditorCommand::Flags(),
       {},
       &categoryTools,
@@ -1083,7 +1083,7 @@ public:
       "tool_pad_edge_connector",  // clang-format break
       QT_TR_NOOP("Add Edge Connector Pad"),
       QT_TR_NOOP("Add special SMT pads used as edge connector"),
-      QString(),
+      nullptr,
       EditorCommand::Flags(),
       {},
       &categoryTools,
@@ -1092,7 +1092,7 @@ public:
       "tool_pad_test_point",  // clang-format break
       QT_TR_NOOP("Add Test Pad"),
       QT_TR_NOOP("Add special SMT pads used as test points"),
-      QString(),
+      nullptr,
       EditorCommand::Flags(),
       {},
       &categoryTools,
@@ -1101,7 +1101,7 @@ public:
       "tool_pad_local_fiducial",  // clang-format break
       QT_TR_NOOP("Add Local Fiducial Pad"),
       QT_TR_NOOP("Add special SMT pads used as local fiducials"),
-      QString(),
+      nullptr,
       EditorCommand::Flags(),
       {},
       &categoryTools,
@@ -1110,7 +1110,7 @@ public:
       "tool_pad_global_fiducial",  // clang-format break
       QT_TR_NOOP("Add Global Fiducial Pad"),
       QT_TR_NOOP("Add special SMT pads used as global fiducials"),
-      QString(),
+      nullptr,
       EditorCommand::Flags(),
       {},
       &categoryTools,
@@ -1240,7 +1240,7 @@ public:
       "command_toolbar_focus",  // clang-format break
       QT_TR_NOOP("Go To Command Toolbar"),
       QT_TR_NOOP("Move the focus into the command toolbar"),
-      QString(),
+      nullptr,
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_Tab)},
       &categoryCommands,
@@ -1249,7 +1249,7 @@ public:
       "abort",  // clang-format break
       QT_TR_NOOP("Abort Command"),
       QT_TR_NOOP("Abort the currently active command"),
-      QString(),
+      nullptr,
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_Escape)},
       &categoryCommands,
@@ -1258,7 +1258,7 @@ public:
       "layer_up",  // clang-format break
       QT_TR_NOOP("Layer Up"),
       QT_TR_NOOP("Switch to the next higher layer (bottom->top)"),
-      QString(),
+      nullptr,
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_PageUp)},
       &categoryCommands,
@@ -1267,7 +1267,7 @@ public:
       "layer_down",  // clang-format break
       QT_TR_NOOP("Layer Down"),
       QT_TR_NOOP("Switch to the next lower layer (top->bottom)"),
-      QString(),
+      nullptr,
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_PageDown)},
       &categoryCommands,
@@ -1294,7 +1294,7 @@ public:
       "size_increase",  // clang-format break
       QT_TR_NOOP("Increase Size"),
       QT_TR_NOOP("Increase the via/pad/pin/text size"),
-      QString(),
+      nullptr,
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_Asterisk)},
       &categoryCommands,
@@ -1303,7 +1303,7 @@ public:
       "size_decrease",  // clang-format break
       QT_TR_NOOP("Decrease Size"),
       QT_TR_NOOP("Decrease the via/pad/pin/text size"),
-      QString(),
+      nullptr,
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_Slash)},
       &categoryCommands,
@@ -1312,7 +1312,7 @@ public:
       "drill_increase",  // clang-format break
       QT_TR_NOOP("Increase Drill"),
       QT_TR_NOOP("Increase the via/pad/hole drill diameter"),
-      QString(),
+      nullptr,
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_Home)},
       &categoryCommands,
@@ -1321,7 +1321,7 @@ public:
       "drill_decrease",  // clang-format break
       QT_TR_NOOP("Decrease Drill"),
       QT_TR_NOOP("Decrease the via/pad/hole drill diameter"),
-      QString(),
+      nullptr,
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_End)},
       &categoryCommands,
@@ -1330,7 +1330,7 @@ public:
       "width_auto_toggle",  // clang-format break
       QT_TR_NOOP("Toggle Auto-Width"),
       QT_TR_NOOP("Toggle the auto-width property state"),
-      QString(),
+      nullptr,
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_Period)},
       &categoryCommands,
@@ -1339,7 +1339,7 @@ public:
       "fill_toggle",  // clang-format break
       QT_TR_NOOP("Toggle Fill"),
       QT_TR_NOOP("Toggle the fill property state"),
-      QString(),
+      nullptr,
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_F)},
       &categoryCommands,
@@ -1348,7 +1348,7 @@ public:
       "grab_area_toggle",  // clang-format break
       QT_TR_NOOP("Toggle Grab Area"),
       QT_TR_NOOP("Toggle the grab area property state"),
-      QString(),
+      nullptr,
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_Comma)},
       &categoryCommands,
@@ -1603,7 +1603,7 @@ public:
       "page_next",  // clang-format break
       QT_TR_NOOP("Next Tab/Page"),
       QT_TR_NOOP("Navigate to the next tab or page"),
-      QString(),
+      nullptr,
       EditorCommand::Flags(),
       {QKeySequence(Qt::CTRL | Qt::Key_Tab)},
       &categoryWindowManagement,
@@ -1612,7 +1612,7 @@ public:
       "page_previous",  // clang-format break
       QT_TR_NOOP("Previous Tab/Page"),
       QT_TR_NOOP("Navigate to the previous tab or page"),
-      QString(),
+      nullptr,
       EditorCommand::Flags(),
       {QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_Tab)},
       &categoryWindowManagement,
@@ -1621,7 +1621,7 @@ public:
       "tab_close",  // clang-format break
       QT_TR_NOOP("Close Tab"),
       QT_TR_NOOP("Close the currently opened tab"),
-      QString(),
+      nullptr,
       EditorCommand::Flags(),
       {QKeySequence(Qt::CTRL | Qt::Key_W)},
       &categoryWindowManagement,
@@ -1630,7 +1630,7 @@ public:
       "tab_close_all",  // clang-format break
       QT_TR_NOOP("Close All Tabs"),
       QT_TR_NOOP("Close all currently opened tabs"),
-      QString(),
+      nullptr,
       EditorCommand::Flags(),
       {QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_W)},
       &categoryWindowManagement,
@@ -1667,7 +1667,7 @@ public:
       "project_close_all",  // clang-format break
       QT_TR_NOOP("Close All Projects"),
       QT_TR_NOOP("Close all currently opened projects"),
-      QString(),
+      nullptr,
       EditorCommand::Flags(),
       {QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_F4)},
       nullptr,  // &categoryWindowManagement,
@@ -1697,7 +1697,7 @@ public:
       "about_qt",  // clang-format break
       QT_TR_NOOP("About Qt"),
       QT_TR_NOOP("Show information about Qt"),
-      QString(),
+      nullptr,
       EditorCommand::Flag::OpensPopup | EditorCommand::Flag::AboutQtRole,
       {},
       &categoryHelp,

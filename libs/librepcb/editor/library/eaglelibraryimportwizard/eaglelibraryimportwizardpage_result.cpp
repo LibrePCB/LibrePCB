@@ -110,7 +110,7 @@ void EagleLibraryImportWizardPage_Result::importFinished() noexcept {
               &QProgressBar::setValue, Qt::QueuedConnection));
 
   const auto log = mContext->getImport().getLogger();
-  mUi->lblMessages->setText(log->getMessagesRichText());
+  mUi->lblMessages->setText(log->getMessagesRichText(&mContext->getTheme()));
   mUi->prgImport->setFormat(tr("Scanning libraries") % " (%p%)");
   mUi->gbxErrors->setVisible(!log->getMessages().isEmpty());
   if (QWizard* wiz = wizard()) {

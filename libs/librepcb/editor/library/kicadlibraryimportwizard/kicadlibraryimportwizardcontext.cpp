@@ -43,8 +43,10 @@ using kicadimport::KiCadLibraryImport;
  ******************************************************************************/
 
 KiCadLibraryImportWizardContext::KiCadLibraryImportWizardContext(
-    Workspace& workspace, const FilePath& dstLibFp, QObject* parent) noexcept
+    const UiTheme& theme, Workspace& workspace, const FilePath& dstLibFp,
+    QObject* parent) noexcept
   : QObject(parent),
+    mTheme(theme),
     mWorkspace(workspace),
     mLibsPath(),
     mAddNamePrefix(false),

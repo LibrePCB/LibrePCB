@@ -35,6 +35,7 @@ namespace eagleimport {
 class EagleProjectImport;
 }
 
+struct UiTheme;
 class Project;
 class FilePath;
 class Workspace;
@@ -64,7 +65,8 @@ class NewProjectWizardPage_EagleImport final : public QWizardPage {
 
 public:
   // Constructors / Destructor
-  explicit NewProjectWizardPage_EagleImport(const Workspace& ws,
+  explicit NewProjectWizardPage_EagleImport(const UiTheme& theme,
+                                            const Workspace& ws,
                                             QWidget* parent = nullptr) noexcept;
   NewProjectWizardPage_EagleImport(
       const NewProjectWizardPage_EagleImport& other) = delete;
@@ -88,6 +90,7 @@ private:  // Methods
   bool isComplete() const noexcept override;
 
 private:  // Data
+  const UiTheme& mTheme;
   const Workspace& mWorkspace;
   QScopedPointer<Ui::NewProjectWizardPage_EagleImport> mUi;
   QScopedPointer<WaitingSpinnerWidget> mWaitingSpinner;

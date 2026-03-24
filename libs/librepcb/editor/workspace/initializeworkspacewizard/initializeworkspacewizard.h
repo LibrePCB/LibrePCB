@@ -50,7 +50,7 @@ class InitializeWorkspaceWizard final : public QWizard {
 
 public:
   // Constructors / Destructor
-  explicit InitializeWorkspaceWizard(bool forceChoosePath,
+  explicit InitializeWorkspaceWizard(const UiTheme& theme, bool forceChoosePath,
                                      QWidget* parent = nullptr) noexcept;
   InitializeWorkspaceWizard(const InitializeWorkspaceWizard& other) = delete;
   ~InitializeWorkspaceWizard() noexcept;

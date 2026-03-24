@@ -72,9 +72,11 @@ namespace editor {
  ******************************************************************************/
 
 GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
+                               const UiTheme* const& theme,
                                QObject* parent) noexcept
   : QObject(parent),
     mWorkspace(ws),
+    mTheme(theme),
     mLibrariesContainStandardComponents(false),
     mPreviewLayers(GraphicsLayerList::previewLayers(&ws.getSettings())),
     mLibraryElementCache(new LibraryElementCache(ws.getLibraryDb())),
@@ -275,7 +277,7 @@ void GuiApplication::openFile(const FilePath& fp, QWidget* parent) noexcept {
 }
 
 void GuiApplication::switchWorkspace(QWidget* parent) noexcept {
-  InitializeWorkspaceWizard wizard(true, parent);
+  InitializeWorkspaceWizard wizard(*mTheme, true, parent);
   wizard.setWindowModality(Qt::WindowModal);
   try {
     wizard.setWorkspacePath(mWorkspace.getPath());
@@ -310,7 +312,7 @@ void GuiApplication::addExampleProjects(QWidget* parent) noexcept {
       QMessageBox::information(parent, tr("Add Example Projects"), msg,
                                QMessageBox::Ok | QMessageBox::Cancel);
   if (ret == QMessageBox::Ok) {
-    InitializeWorkspaceWizardContext ctx(parent);
+    InitializeWorkspaceWizardContext ctx(*mTheme, parent);
     ctx.setWorkspacePath(mWorkspace.getPath());
     ctx.installExampleProjects();
   }
@@ -419,7 +421,7 @@ void GuiApplication::createProject(const FilePath& parentDir, bool eagleImport,
   const NewProjectWizard::Mode mode = eagleImport
       ? NewProjectWizard::Mode::EagleImport
       : NewProjectWizard::Mode::NewProject;
-  NewProjectWizard wizard(mWorkspace, mode, parent);
+  NewProjectWizard wizard(*mTheme, mWorkspace, mode, parent);
   wizard.setWindowModality(Qt::WindowModal);
   if (parentDir.isValid()) {
     wizard.setLocationOverride(parentDir);
@@ -777,6 +779,11 @@ void GuiApplication::createNewWindow(int id, int projectIndex) noexcept {
         }
         return res;
       });
+  b.on_toggle_theme([this]() {
+    const auto& themes = UiTheme::all();
+    const int index = (themes.indexOf(mTheme) + 1) % themes.count();
+    mWorkspace.getSettings().uiTheme.set(themes.at(index)->id);
+  });
 
   // Build wrapper.
   auto mw = std::make_shared<MainWindow>(*this, win, id);

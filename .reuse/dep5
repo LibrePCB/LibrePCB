@@ -47,7 +47,6 @@ Files:
  img/actions/draw_bus.png
  img/actions/draw_wire.png
  img/actions/export_pick_place_file.png
- img/actions/grid.png
  img/actions/schematic.png
  img/capacitor-bipolar-eu.svg
  img/capacitor-bipolar-us.svg
@@ -70,8 +69,8 @@ Files:
  img/grid-none.svg
  img/inductor-eu.svg
  img/inductor-us.svg
- img/norm/iec_60617.png
- img/norm/ieee_315.png
+ img/norm/iec_60617.svg
+ img/norm/ieee_315.svg
  img/README.md
  img/resistor-eu.svg
  img/resistor-us.svg

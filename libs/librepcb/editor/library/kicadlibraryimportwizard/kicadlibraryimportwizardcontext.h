@@ -37,6 +37,7 @@ namespace librepcb {
 
 class MessageLogger;
 class Workspace;
+struct UiTheme;
 
 namespace kicadimport {
 class KiCadLibraryImport;
@@ -61,12 +62,13 @@ public:
   KiCadLibraryImportWizardContext() = delete;
   KiCadLibraryImportWizardContext(
       const KiCadLibraryImportWizardContext& other) = delete;
-  KiCadLibraryImportWizardContext(Workspace& workspace,
+  KiCadLibraryImportWizardContext(const UiTheme& theme, Workspace& workspace,
                                   const FilePath& dstLibFp,
                                   QObject* parent = nullptr) noexcept;
   ~KiCadLibraryImportWizardContext() noexcept;
 
   // Getters
+  const UiTheme& getTheme() const noexcept { return mTheme; }
   Workspace& getWorkspace() const noexcept { return mWorkspace; }
   const FilePath& getLibsPath() const noexcept { return mLibsPath; }
   const FilePath& getShapes3dPath() const noexcept { return mShapes3dPath; }
@@ -96,6 +98,7 @@ signals:
   void scanFinished();
 
 private:  // Data
+  const UiTheme& mTheme;
   Workspace& mWorkspace;
   FilePath mLibsPath;
   FilePath mShapes3dPath;

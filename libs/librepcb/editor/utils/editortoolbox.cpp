@@ -70,18 +70,25 @@ public:
       QFile file(mFilePath);
       if (file.open(QFile::ReadOnly)) {
         mSvgContent = file.readAll();
-        mSvgContent.replace("fill=\"currentColor\"", "");  // Bootstrap Icons
-        mSvgContent.replace("<svg ", "<svg fill=\"#C4C4C4\" ");  // Font Awesome
+        // Font Awesome icons have no "fill" attribute, so we add it now.
+        if (!mSvgContent.contains("fill=\"currentColor\"")) {
+          mSvgContent.replace("<svg", "<svg fill=\"currentColor\"");
+        }
       }
       mFilePath.clear();
     }
 
-    QByteArray content = mSvgContent;
+    const QPalette palette = qApp->palette();
+    QColor color = palette.color(QPalette::Text);
     if ((mode == QIcon::Mode::Active) || (mode == QIcon::Mode::Selected)) {
-      content.replace("<svg fill=\"#C4C4C4\" ", "<svg fill=\"#303030\" ");
+      color = palette.color(QPalette::HighlightedText);
     } else if (mode == QIcon::Mode::Disabled) {
-      content.replace("<svg fill=\"#C4C4C4\" ", "<svg fill=\"#707070\" ");
+      color = palette.color(QPalette::Disabled, QPalette::Text);
     }
+
+    QByteArray content = mSvgContent;
+    content.replace("fill=\"currentColor\"",
+                    QString("fill=\"%1\"").arg(color.name()).toUtf8());
 
     QSvgRenderer renderer(content);
     const QSize svgSize = renderer.defaultSize().scaled(
@@ -112,6 +119,36 @@ public:
 /*******************************************************************************
  *  Static Methods
  ******************************************************************************/
+
+bool EditorToolbox::isSystemThemeDark() noexcept {
+  auto detect = []() {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+    switch (qApp->styleHints()->colorScheme()) {
+      case Qt::ColorScheme::Dark:
+        return true;
+      case Qt::ColorScheme::Light:
+        return false;
+      default:
+        qWarning() << "Failed to detect system theme, assuming light.";
+        return false;
+    }
+#else
+    QImage image(10, 10, QImage::Format_ARGB32);
+    image.fill(qApp->palette().color(QPalette::Window));  // Fallback
+    QWidget widget;
+    widget.resize(image.size());
+    widget.render(&image);
+    const QColor bgColor = image.pixelColor(image.rect().center());
+    const bool dark = (bgColor.alphaF() > 0.2) && (bgColor.blackF() > 0.5);
+    qDebug().nospace().noquote()
+        << "Detected " << (dark ? "dark" : "light")
+        << " theme based on window background color " << bgColor.name() << ".";
+    return dark;
+#endif
+  };
+  static bool value = detect();
+  return value;
+}
 
 QString EditorToolbox::toSingleLine(const QString& s) noexcept {
   return QString(s).replace("\n", "\\n");

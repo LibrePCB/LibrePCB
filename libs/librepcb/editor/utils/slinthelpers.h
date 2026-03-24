@@ -97,6 +97,8 @@ std::shared_ptr<slint::VectorModel<slint::SharedString>> q2s(
 QStringList s2q(const slint::Model<slint::SharedString>& s) noexcept;
 
 slint::Image q2s(const QPixmap& p) noexcept;
+slint::Image q2s(QImage img) noexcept;
+QImage s2image(const slint::Image& img) noexcept;
 
 slint::Color q2s(const QColor& c) noexcept;
 

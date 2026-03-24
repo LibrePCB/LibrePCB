@@ -112,7 +112,6 @@
         <file>actions/export_zip.png</file>
         <file>actions/generate_bom.png</file>
         <file>actions/generate_ibom.png</file>
-        <file>actions/grid.png</file>
         <file>actions/minus.png</file>
         <file>actions/mirror_horizontal.png</file>
         <file>actions/mirror_vertical.png</file>
@@ -157,11 +156,12 @@
         <file>footprint.png</file>
         <file>glue.png</file>
         <file>gnd.svg</file>
+        <file>grid-dots.svg</file>
         <file>inductor-eu.svg</file>
         <file>logo/48x48.png</file>
         <file>logo/64x64.png</file>
-        <file>norm/iec_60617.png</file>
-        <file>norm/ieee_315.png</file>
+        <file>norm/iec_60617.svg</file>
+        <file>norm/ieee_315.svg</file>
         <file>places/file.png</file>
         <file>places/folder.png</file>
         <file>places/folder_green.png</file>

@@ -162,13 +162,15 @@ public:
   //       them directly.
 
   /**
-   * @brief User name
+   * @brief UI theme ID
    *
-   * Used when creating new library elements or projects.
+   * Supported values:
+   *  - "": Auto-detecting dark or light theme from system settings
+   *  - Any value of ::librepcb::UiTheme::id from ::librepcb::UiTheme::all()
    *
-   * Default: "" (but gets initialized when creating a new workspace)
+   * Default: ""
    */
-  WorkspaceSettingsItem_GenericValue<QString> userName;
+  WorkspaceSettingsItem_GenericValue<QString> uiTheme;
 
   /**
    * @brief The application's locale (e.g. "en_US")
@@ -199,6 +201,15 @@ public:
    * Default: False
    */
   WorkspaceSettingsItem_GenericValue<bool> useOpenGl;
+
+  /**
+   * @brief User name
+   *
+   * Used when creating new library elements or projects.
+   *
+   * Default: "" (but gets initialized when creating a new workspace)
+   */
+  WorkspaceSettingsItem_GenericValue<QString> userName;
 
   /**
    * @brief Preferred library locales (like "de_CH") in the right order

@@ -79,6 +79,44 @@ Ratio s2ratio(int v) noexcept {
   return Ratio(v);
 }
 
+ui::Theme l2s(const UiTheme& v) noexcept {
+  return ui::Theme{
+      q2s(v.window),
+      q2s(v.base),
+      q2s(v.baseBorder),
+      q2s(v.baseTextDisabled),
+      q2s(v.baseTextMuted),
+      q2s(v.baseText),
+      q2s(v.baseTextHovered),
+      q2s(v.baseTextInfo),
+      q2s(v.baseTextSuccess),
+      q2s(v.baseTextWarning),
+      q2s(v.baseTextError),
+      q2s(v.control),
+      q2s(v.controlDisabled),
+      q2s(v.controlHovered),
+      q2s(v.controlChecked),
+      q2s(v.controlBorder),
+      q2s(v.controlBorderDisabled),
+      q2s(v.controlTextDisabled),
+      q2s(v.controlTextMuted),
+      q2s(v.controlText),
+      q2s(v.selection),
+      q2s(v.selectionText),
+      q2s(v.tooltip),
+      q2s(v.tooltipBorder),
+      q2s(v.tooltipText),
+      q2s(v.accent),
+      q2s(v.accentText),
+      q2s(v.info),
+      q2s(v.infoText),
+      q2s(v.warning),
+      q2s(v.warningText),
+      q2s(v.error),
+      q2s(v.errorText),
+  };
+}
+
 ui::GridStyle l2s(Theme::GridStyle v) noexcept {
   switch (v) {
     case Theme::GridStyle::Lines:

@@ -15,8 +15,8 @@ REPO_DIR = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 
 WHITELIST = [
     'img/app/librepcb.svg',
-    'img/norm/iec_60617.png',
-    'img/norm/ieee_315.png',
+    'img/norm/iec_60617.svg',
+    'img/norm/ieee_315.svg',
     'libs/librepcb/core/serialization/fileformatmigrationv1.h',
     'libs/librepcb/core/workspace/workspacesettingsitem_genericvalue.h',
     'libs/librepcb/editor/editorcommandcategory.h',

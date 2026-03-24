@@ -48,6 +48,7 @@
 #include "project/projectreadmerenderer.h"
 #include "project/schematic/schematiceditor.h"
 #include "project/schematic/schematictab.h"
+#include "utils/editortoolbox.h"
 #include "utils/slinthelpers.h"
 #include "utils/standardeditorcommandhandler.h"
 #include "windowsection.h"
@@ -297,6 +298,16 @@ MainWindow::MainWindow(GuiApplication& app,
 
   // Update UI state.
   d.fn_current_tab_changed();
+
+  // Apply UI theme.
+  auto applyTheme = [this]() {
+    mWindow->global<ui::Data>().set_theme(l2s(mApp.getTheme()));
+    mWindow->window().request_redraw();  // Workaround for spurious wrong colors
+  };
+  applyTheme();
+  connect(&mApp.getWorkspace().getSettings().uiTheme,
+          &WorkspaceSettingsItem::edited, this, applyTheme,
+          Qt::QueuedConnection);
 
   // Update editor command translations & keyboard shortcuts.
   EditorCommandSetUpdater::update(mWindow->global<ui::EditorCommandSet>());
@@ -799,14 +810,16 @@ void MainWindow::triggerLibraryElement(slint::SharedString path,
     }
     case ui::LibraryElementAction::ImportEagleLibrary: {
       if (mApp.getLibrary(fp)) {
-        EagleLibraryImportWizard wiz(mApp.getWorkspace(), fp, mWidget);
+        EagleLibraryImportWizard wiz(mApp.getTheme(), mApp.getWorkspace(), fp,
+                                     mWidget);
         wiz.exec();
       }
       break;
     }
     case ui::LibraryElementAction::ImportKicadLibrary: {
       if (mApp.getLibrary(fp)) {
-        KiCadLibraryImportWizard wiz(mApp.getWorkspace(), fp, mWidget);
+        KiCadLibraryImportWizard wiz(mApp.getTheme(), mApp.getWorkspace(), fp,
+                                     mWidget);
         wiz.exec();
       }
       break;

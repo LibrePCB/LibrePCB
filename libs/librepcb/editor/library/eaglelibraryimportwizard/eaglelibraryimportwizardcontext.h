@@ -36,6 +36,7 @@
 namespace librepcb {
 
 class Workspace;
+struct UiTheme;
 
 namespace eagleimport {
 class EagleLibraryImport;
@@ -60,12 +61,13 @@ public:
   EagleLibraryImportWizardContext() = delete;
   EagleLibraryImportWizardContext(
       const EagleLibraryImportWizardContext& other) = delete;
-  EagleLibraryImportWizardContext(Workspace& workspace,
+  EagleLibraryImportWizardContext(const UiTheme& theme, Workspace& workspace,
                                   const FilePath& dstLibFp,
                                   QObject* parent = nullptr) noexcept;
   ~EagleLibraryImportWizardContext() noexcept;
 
   // Getters
+  const UiTheme& getTheme() const noexcept { return mTheme; }
   Workspace& getWorkspace() const noexcept { return mWorkspace; }
   eagleimport::EagleLibraryImport& getImport() noexcept { return *mImport; }
   const FilePath& getLbrFilePath() const noexcept { return mLbrFilePath; }
@@ -91,6 +93,7 @@ signals:
   void parseCompleted(const QString& messages);
 
 private:  // Data
+  const UiTheme& mTheme;
   Workspace& mWorkspace;
   QScopedPointer<eagleimport::EagleLibraryImport> mImport;
   FilePath mLbrFilePath;

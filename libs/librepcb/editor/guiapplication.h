@@ -39,6 +39,7 @@ namespace librepcb {
 
 class RuleCheckMessage;
 class Workspace;
+struct UiTheme;
 
 namespace editor {
 
@@ -70,6 +71,7 @@ public:
   GuiApplication() = delete;
   GuiApplication(const GuiApplication& other) = delete;
   explicit GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
+                          const UiTheme* const& theme,
                           QObject* parent = nullptr) noexcept;
   ~GuiApplication() noexcept;
 
@@ -82,6 +84,7 @@ public:
   void addExampleProjects(QWidget* parent) noexcept;
 
   // General
+  const UiTheme& getTheme() const noexcept { return *mTheme; }
   const GraphicsLayerList& getPreviewLayers() const noexcept {
     return *mPreviewLayers;
   }
@@ -159,6 +162,7 @@ private:
   std::shared_ptr<MainWindow> getWindowById(int id) noexcept;
 
   Workspace& mWorkspace;
+  const UiTheme* const& mTheme;
   bool mLibrariesContainStandardComponents;
   std::unique_ptr<GraphicsLayerList> mPreviewLayers;
   std::shared_ptr<LibraryElementCache> mLibraryElementCache;

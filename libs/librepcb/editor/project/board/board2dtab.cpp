@@ -2574,7 +2574,7 @@ void Board2dTab::execSpecctraImportDialog() noexcept {
   QTextBrowser* txtBrowser = new QTextBrowser(&dlg);
   txtBrowser->setReadOnly(true);
   txtBrowser->setWordWrapMode(QTextOption::WordWrap);
-  txtBrowser->setText(logger->getMessagesRichText());
+  txtBrowser->setText(logger->getMessagesRichText(&mApp.getTheme()));
   txtBrowser->verticalScrollBar()->setValue(
       txtBrowser->verticalScrollBar()->maximum());
   layout->addWidget(txtBrowser);

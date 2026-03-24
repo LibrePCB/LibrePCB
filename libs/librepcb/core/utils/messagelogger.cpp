@@ -22,6 +22,8 @@
  ******************************************************************************/
 #include "messagelogger.h"
 
+#include "../workspace/uitheme.h"
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -31,24 +33,37 @@ namespace librepcb {
  *  Class MessageLogger::Message
  ******************************************************************************/
 
-QString MessageLogger::Message::toRichText(bool colorized,
-                                           bool bulletPoint) const noexcept {
-  static const QHash<QtMsgType, QString> colorMap = {
-      {QtDebugMsg, "gray"},
-      {QtInfoMsg, "white"},
-      {QtWarningMsg, "yellow"},
-      {QtCriticalMsg, "red"},
-  };
+static std::optional<QString> colorForMsgType(const UiTheme* theme,
+                                              QtMsgType type) noexcept {
+  if (theme) {
+    switch (type) {
+      case QtDebugMsg:
+        return theme->baseTextMuted.name();
+      case QtInfoMsg:
+        return theme->baseTextInfo.name();
+      case QtWarningMsg:
+        return theme->baseTextWarning.name();
+      case QtCriticalMsg:
+        return theme->baseTextError.name();
+      default:
+        break;
+    }
+  }
+  return std::nullopt;
+}
 
+QString MessageLogger::Message::toRichText(const UiTheme* theme,
+                                           bool bulletPoint) const noexcept {
   QString s;
-  if (colorized && colorMap.contains(type)) {
-    s += QString("<font color=\"%1\">").arg(colorMap[type]);
+  const auto color = colorForMsgType(theme, type);
+  if (color) {
+    s += QString("<font color=\"%1\">").arg(*color);
   }
   if (bulletPoint) {
     s += "&#x2022; ";
   }
   s += QString(message).replace("\n", "<br>");
-  if (colorized && colorMap.contains(type)) {
+  if (color) {
     s += "</font>";
   }
   return s;
@@ -99,10 +114,11 @@ QStringList MessageLogger::getMessagesPlain() const noexcept {
   return l;
 }
 
-QString MessageLogger::getMessagesRichText(bool colorized) const noexcept {
+QString MessageLogger::getMessagesRichText(
+    const UiTheme* theme) const noexcept {
   QStringList l;
   foreach (const Message& msg, getMessages()) {
-    l.append(msg.toRichText(colorized));
+    l.append(msg.toRichText(theme));
   }
   return l.join("<br>");
 }

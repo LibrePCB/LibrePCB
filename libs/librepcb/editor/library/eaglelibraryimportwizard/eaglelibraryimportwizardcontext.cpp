@@ -41,8 +41,10 @@ using eagleimport::EagleLibraryImport;
  ******************************************************************************/
 
 EagleLibraryImportWizardContext::EagleLibraryImportWizardContext(
-    Workspace& workspace, const FilePath& dstLibFp, QObject* parent) noexcept
+    const UiTheme& theme, Workspace& workspace, const FilePath& dstLibFp,
+    QObject* parent) noexcept
   : QObject(parent),
+    mTheme(theme),
     mWorkspace(workspace),
     mImport(new EagleLibraryImport(dstLibFp, parent)),
     mLbrFilePath(),
