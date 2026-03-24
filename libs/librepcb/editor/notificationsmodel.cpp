@@ -75,10 +75,20 @@ void NotificationsModel::push(
           &NotificationsModel::itemChanged);
   mItems.insert(mItems.begin(), notification);
 
+  // Show the most important messages at the top.
+  std::sort(mItems.begin(), mItems.end(),
+            [](const std::shared_ptr<Notification>& a,
+               const std::shared_ptr<Notification>& b) {
+              if (a->getUiData().unread != b->getUiData().unread) {
+                return a->getUiData().unread;
+              }
+              return a->getUiData().type > b->getUiData().type;
+            });
+
   const QString dismissKey = notification->getDismissKey();
   if (dismissKey.isEmpty() ||
       (!mWorkspace.getSettings().dismissedMessages.contains(dismissKey))) {
-    notify_row_added(0, 1);
+    notify_reset();
     updateUnreadNotificationsCount();
     updateCurrentProgressIndex();
     if (notification->getAutoPopUp()) {
