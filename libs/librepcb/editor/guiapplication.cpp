@@ -33,6 +33,7 @@
 #include "notificationsmodel.h"
 #include "project/newprojectwizard/newprojectwizard.h"
 #include "project/projecteditor.h"
+#include "utils/editortoolbox.h"
 #include "utils/slinthelpers.h"
 #include "utils/slintkeyeventtextbuilder.h"
 #include "utils/uihelpers.h"
@@ -87,8 +88,32 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
     mLibrariesFilter(new SlintKeyEventTextBuilder()),
     mProjects(new UiObjectList<ProjectEditor, ui::ProjectData>()),
     mLibraries(new UiObjectList<LibraryEditor, ui::LibraryData>()) {
-  // Open windows.
   QSettings cs;
+
+  // Check if this is the first run with this application version. This can
+  // be used to perform migration steps or to show notifications.
+  QStringList usedAppVersions;
+  {
+    const int size = cs.beginReadArray("used_app_versions");
+    for (int i = 0; i < size; ++i) {
+      cs.setArrayIndex(i);
+      usedAppVersions.append(cs.value("version").toString());
+    }
+    cs.endArray();
+  }
+  const bool appVersionAlreadyRunBefore =
+      usedAppVersions.contains(Application::getVersion());
+  if (!appVersionAlreadyRunBefore) {
+    usedAppVersions.append(Application::getVersion());
+    cs.beginWriteArray("used_app_versions", usedAppVersions.count());
+    for (int i = 0; i < usedAppVersions.count(); ++i) {
+      cs.setArrayIndex(i);
+      cs.setValue("version", usedAppVersions.at(i));
+    }
+    cs.endArray();
+  }
+
+  // Open windows.
   for (const QString& idStr : cs.value("global/windows").toStringList()) {
     if (int id = idStr.toInt()) {
       createNewWindow(id);
@@ -188,6 +213,32 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
             updateDesktopIntegrationNotification();
           });
   updateDesktopIntegrationNotification();
+
+  // Offer to re-enable dark theme for existing users if their theme
+  // has suddenly switched to light due to their system theme. We detect
+  // existing users by checking if there are any libraries installed or not.
+  // QT_VERSION_CHECK: Remove this after LibrePCB 2.1.x.
+  if ((!appVersionAlreadyRunBefore) &&
+      (!cs.value("global/windows").toStringList().isEmpty()) &&
+      (Application::getVersion().startsWith("2.0.") ||
+       Application::getVersion().startsWith("2.1.")) &&
+      mWorkspace.getSettings().uiTheme.get().isEmpty() &&
+      (!EditorToolbox::isSystemThemeDark()) &&
+      ((!mWorkspace.getLocalLibrariesPath().isEmptyDir()) ||
+       (!mWorkspace.getRemoteLibrariesPath().isEmptyDir()))) {
+    auto notification = std::make_shared<Notification>(
+        ui::NotificationType::Info, tr("Light System Theme Detected"),
+        tr("LibrePCB now provides a light theme in addition to the dark theme. "
+           "It has been activated automatically due to your operating system "
+           "settings. If you like, you can switch back to the dark theme."),
+        tr("Use Dark Theme"), QString(), true);
+    connect(notification.get(), &Notification::buttonClicked, this, [this]() {
+      mWorkspace.getSettings().uiTheme.set(UiTheme::dark().id);
+    });
+    connect(&mWorkspace.getSettings().uiTheme, &WorkspaceSettingsItem::edited,
+            notification.get(), &Notification::dismiss, Qt::QueuedConnection);
+    mNotifications->push(notification);
+  }
 
   // Show a notification during workspace libraries rescan.
   connect(
