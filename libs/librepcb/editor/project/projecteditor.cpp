@@ -737,6 +737,11 @@ void ProjectEditor::runErc() noexcept {
     // Update UI.
     if (!mErcMessages) {
       mErcMessages.reset(new RuleCheckMessagesModel());
+      connect(mErcMessages.get(),
+              &RuleCheckMessagesModel::unapprovedCountChanged, this,
+              [this]() { onUiDataChanged.notify(); });
+      connect(mErcMessages.get(), &RuleCheckMessagesModel::errorCountChanged,
+              this, [this]() { onUiDataChanged.notify(); });
       connect(mErcMessages.get(), &RuleCheckMessagesModel::approvalChanged,
               mProject.get(), &Project::setErcMessageApproved);
       connect(mErcMessages.get(), &RuleCheckMessagesModel::approvalChanged,
