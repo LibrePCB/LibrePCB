@@ -599,23 +599,37 @@ export component SymbolTab inherits Tab {
 
     enabled: true;
 
-    changed compact-layout => {
+    function update-tab-data() {
         tabs[index].compact-layout = self.compact-layout;
+        tabs[index].scene-image-pos = self.absolute-position;
+    }
+
+    init => {
+        update-tab-data();
+    }
+
+    // Needed for https://github.com/LibrePCB/LibrePCB/issues/1725.
+    changed section-index => {
+        update-tab-data();
+    }
+
+    // Needed for https://github.com/LibrePCB/LibrePCB/issues/1725.
+    changed index => {
+        update-tab-data();
+    }
+
+    changed compact-layout => {
+        update-tab-data();
     }
 
     changed absolute-position => {
-        tabs[index].scene-image-pos = self.absolute-position;
+        update-tab-data();
     }
 
     // When the tool changes, move focus to scene to make tabulator & escape
     // working correctly.
     changed tool => {
         root.focus();
-    }
-
-    init => {
-        tabs[index].compact-layout = self.compact-layout;
-        tabs[index].scene-image-pos = self.absolute-position;
     }
 
     VerticalLayout {
