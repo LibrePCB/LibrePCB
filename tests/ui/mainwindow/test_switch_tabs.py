@@ -59,7 +59,7 @@ def test_existing_library_element_tabs(librepcb):
         dict(
             items="LibraryContentTab::categories-view LibraryTreeView::item-ta *",
             category=0,
-            index=18,
+            index=19,
             name="R-SMT",  # Package category
         ),
         dict(
@@ -82,13 +82,13 @@ def test_existing_library_element_tabs(librepcb):
         ),
         dict(
             items="LibraryContentTab::elements-view LibraryTreeView::item-ta *",
-            category=18,  # R-SMT
+            category=19,  # R-SMT
             index=2,
             name="R-0603",  # Package
         ),
         dict(
             items="LibraryContentTab::elements-view LibraryTreeView::item-ta *",
-            category=21,  # Organizations
+            category=22,  # Organizations
             index=1,
             name="AISLER",  # Organization
         ),

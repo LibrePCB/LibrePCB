@@ -129,7 +129,8 @@ private:
   void loadCategories(ui::LibraryTreeViewItemType type, TreeItem& root);
   template <typename CategoryType>
   std::shared_ptr<TreeItem> getOrCreateCategory(
-      ui::LibraryTreeViewItemType type, const Uuid& uuid, TreeItem& root);
+      ui::LibraryTreeViewItemType type, const Uuid& uuid, TreeItem& root,
+      QSet<Uuid>& processedItems);
   template <typename ElementType, typename CategoryType>
   void loadElements(ui::LibraryTreeViewItemType type,
                     ui::LibraryTreeViewItemType catType, TreeItem& root,

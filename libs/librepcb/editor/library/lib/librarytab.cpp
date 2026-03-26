@@ -635,7 +635,8 @@ void LibraryTab::loadCategories(ui::LibraryTreeViewItemType type,
         mDb.getAll<CategoryType>(mLibrary.getDirectory().getAbsPath());
     mLibCategories.insert(categories);
     for (auto it = categories.begin(); it != categories.end(); it++) {
-      getOrCreateCategory<CategoryType>(type, *it, root);
+      QSet<Uuid> processedItems;
+      getOrCreateCategory<CategoryType>(type, *it, root, processedItems);
     }
   } catch (const Exception& e) {
     qCritical() << "Failed to load categories:" << e.getMsg();
@@ -644,11 +645,18 @@ void LibraryTab::loadCategories(ui::LibraryTreeViewItemType type,
 
 template <typename CategoryType>
 std::shared_ptr<LibraryTab::TreeItem> LibraryTab::getOrCreateCategory(
-    ui::LibraryTreeViewItemType type, const Uuid& uuid, TreeItem& root) {
+    ui::LibraryTreeViewItemType type, const Uuid& uuid, TreeItem& root,
+    QSet<Uuid>& processedItems) {
   auto it = mLibElementsMap.find(uuid.toStr());
   if (it != mLibElementsMap.end()) {
     return *it;
   }
+
+  // Catch endless loops in category parent<->child relations.
+  if (processedItems.contains(uuid)) {
+    return nullptr;
+  }
+  processedItems.insert(uuid);
 
   auto item = std::make_shared<TreeItem>();
   item->type = type;
@@ -675,8 +683,11 @@ std::shared_ptr<LibraryTab::TreeItem> LibraryTab::getOrCreateCategory(
     }
     auto parent = &root;
     if (parentUuid) {
-      if (auto p = getOrCreateCategory<CategoryType>(type, *parentUuid, root)) {
+      if (auto p = getOrCreateCategory<CategoryType>(type, *parentUuid, root,
+                                                     processedItems)) {
         parent = p.get();
+      } else {
+        item->summary = tr("Invalid Parent").toUpper();
       }
     }
     parent->childs.append(item);
@@ -707,8 +718,9 @@ void LibraryTab::loadElements(ui::LibraryTreeViewItemType type,
 
       bool addedToCategory = false;
       for (const Uuid& catUuid : mDb.getCategoriesOf<ElementType>(fp)) {
-        if (auto cat =
-                getOrCreateCategory<CategoryType>(catType, catUuid, root)) {
+        QSet<Uuid> processedItems;
+        if (auto cat = getOrCreateCategory<CategoryType>(catType, catUuid, root,
+                                                         processedItems)) {
           cat->childs.push_back(item);
           addedToCategory = true;
         }
