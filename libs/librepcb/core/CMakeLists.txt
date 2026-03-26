@@ -233,6 +233,10 @@ add_library(
   library/cat/componentcategory.h
   library/cat/librarycategory.cpp
   library/cat/librarycategory.h
+  library/cat/librarycategorycheck.cpp
+  library/cat/librarycategorycheck.h
+  library/cat/librarycategorycheckmessages.cpp
+  library/cat/librarycategorycheckmessages.h
   library/cat/packagecategory.cpp
   library/cat/packagecategory.h
   library/cmp/cmpsigpindisplaytype.cpp

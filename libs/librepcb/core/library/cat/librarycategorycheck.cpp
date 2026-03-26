@@ -20,9 +20,10 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "librarycategory.h"
-
 #include "librarycategorycheck.h"
+
+#include "librarycategory.h"
+#include "librarycategorycheckmessages.h"
 
 #include <QtCore>
 
@@ -35,48 +36,32 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-LibraryCategory::LibraryCategory(const QString& shortElementName,
-                                 const QString& longElementName,
-                                 const Uuid& uuid, const Version& version,
-                                 const QString& author,
-                                 const ElementName& name_en_US,
-                                 const QString& description_en_US,
-                                 const QString& keywords_en_US)
-  : LibraryBaseElement(shortElementName, longElementName, uuid, version, author,
-                       name_en_US, description_en_US, keywords_en_US) {
+LibraryCategoryCheck::LibraryCategoryCheck(
+    const LibraryCategory& category) noexcept
+  : LibraryBaseElementCheck(category), mCategory(category) {
 }
 
-LibraryCategory::LibraryCategory(
-    const QString& shortElementName, const QString& longElementName,
-    std::unique_ptr<TransactionalDirectory> directory, const SExpression& root)
-  : LibraryBaseElement(shortElementName, longElementName, true,
-                       std::move(directory), root),
-    mParentUuid(deserialize<std::optional<Uuid>>(root.getChild("parent/@0"))) {
-}
-
-LibraryCategory::~LibraryCategory() noexcept {
+LibraryCategoryCheck::~LibraryCategoryCheck() noexcept {
 }
 
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
 
-RuleCheckMessageList LibraryCategory::runChecks() const {
-  LibraryCategoryCheck check(*this);
-  return check.runChecks();  // can throw
+RuleCheckMessageList LibraryCategoryCheck::runChecks() const {
+  RuleCheckMessageList msgs = LibraryBaseElementCheck::runChecks();
+  checkParent(msgs);
+  return msgs;
 }
 
 /*******************************************************************************
  *  Protected Methods
  ******************************************************************************/
 
-void LibraryCategory::serialize(SExpression& root) const {
-  LibraryBaseElement::serialize(root);
-  root.ensureLineBreak();
-  root.appendChild("parent", mParentUuid);
-  root.ensureLineBreak();
-  serializeMessageApprovals(root);
-  root.ensureLineBreak();
+void LibraryCategoryCheck::checkParent(MsgList& msgs) const {
+  if (mCategory.getParentUuid() == mCategory.getUuid()) {
+    msgs.append(std::make_shared<MsgInvalidParent>());
+  }
 }
 
 /*******************************************************************************

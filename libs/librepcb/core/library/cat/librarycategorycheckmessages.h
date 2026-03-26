@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CORE_LIBRARYCATEGORY_H
-#define LIBREPCB_CORE_LIBRARYCATEGORY_H
+#ifndef LIBREPCB_CORE_LIBRARYCATEGORYCHECKMESSAGES_H
+#define LIBREPCB_CORE_LIBRARYCATEGORYCHECKMESSAGES_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../librarybaseelement.h"
+#include "../../rulecheck/rulecheckmessage.h"
 
 #include <QtCore>
 
@@ -33,52 +33,21 @@
 namespace librepcb {
 
 /*******************************************************************************
- *  Class LibraryCategory
+ *  Class MsgInvalidParent
  ******************************************************************************/
 
 /**
- * @brief The LibraryCategory class extends the LibraryBaseElement class with
- * some attributes and methods which are used for all library category classes.
+ * @brief The MsgInvalidParent class
  */
-class LibraryCategory : public LibraryBaseElement {
-  Q_OBJECT
+class MsgInvalidParent final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(MsgInvalidParent)
 
 public:
   // Constructors / Destructor
-  LibraryCategory() = delete;
-  LibraryCategory(const LibraryCategory& other) = delete;
-  LibraryCategory(const QString& shortElementName,
-                  const QString& longElementName, const Uuid& uuid,
-                  const Version& version, const QString& author,
-                  const ElementName& name_en_US,
-                  const QString& description_en_US,
-                  const QString& keywords_en_US);
-  LibraryCategory(const QString& shortElementName,
-                  const QString& longElementName,
-                  std::unique_ptr<TransactionalDirectory> directory,
-                  const SExpression& root);
-  virtual ~LibraryCategory() noexcept;
-
-  // Getters: Attributes
-  const std::optional<Uuid>& getParentUuid() const noexcept {
-    return mParentUuid;
-  }
-
-  // Setters: Attributes
-  void setParentUuid(const std::optional<Uuid>& parentUuid) noexcept {
-    mParentUuid = parentUuid;
-  }
-
-  // General Methods
-  virtual RuleCheckMessageList runChecks() const override;
-
-  // Operator Overloadings
-  LibraryCategory& operator=(const LibraryCategory& rhs) = delete;
-
-protected:
-  virtual void serialize(SExpression& root) const override;
-
-  std::optional<Uuid> mParentUuid;
+  MsgInvalidParent() noexcept;
+  MsgInvalidParent(const MsgInvalidParent& other) noexcept
+    : RuleCheckMessage(other) {}
+  virtual ~MsgInvalidParent() noexcept {}
 };
 
 /*******************************************************************************
