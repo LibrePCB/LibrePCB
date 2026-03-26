@@ -168,10 +168,12 @@ set_target_properties(
 
 # Additional executable that's used for process tests
 add_executable(
-  dummy_binary
+  librepcb_unittests_dummy_binary
   dummy.cpp
 )
-set_target_properties(dummy_binary PROPERTIES OUTPUT_NAME dummy-binary)
+set_target_properties(
+  librepcb_unittests_dummy_binary PROPERTIES OUTPUT_NAME dummy-binary
+)
 
 # Generate translation file target
 set(UNITTESTS_I18N_FILES_DIR "${CMAKE_SOURCE_DIR}/tests/data/i18n")
