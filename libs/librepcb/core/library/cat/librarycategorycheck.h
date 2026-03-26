@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CORE_LIBRARYCATEGORY_H
-#define LIBREPCB_CORE_LIBRARYCATEGORY_H
+#ifndef LIBREPCB_CORE_LIBRARYCATEGORYCHECK_H
+#define LIBREPCB_CORE_LIBRARYCATEGORYCHECK_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../librarybaseelement.h"
+#include "../librarybaseelementcheck.h"
 
 #include <QtCore>
 
@@ -32,53 +32,34 @@
  ******************************************************************************/
 namespace librepcb {
 
+class LibraryCategory;
+
 /*******************************************************************************
- *  Class LibraryCategory
+ *  Class LibraryCategoryCheck
  ******************************************************************************/
 
 /**
- * @brief The LibraryCategory class extends the LibraryBaseElement class with
- * some attributes and methods which are used for all library category classes.
+ * @brief The LibraryCategoryCheck class
  */
-class LibraryCategory : public LibraryBaseElement {
-  Q_OBJECT
-
+class LibraryCategoryCheck : public LibraryBaseElementCheck {
 public:
   // Constructors / Destructor
-  LibraryCategory() = delete;
-  LibraryCategory(const LibraryCategory& other) = delete;
-  LibraryCategory(const QString& shortElementName,
-                  const QString& longElementName, const Uuid& uuid,
-                  const Version& version, const QString& author,
-                  const ElementName& name_en_US,
-                  const QString& description_en_US,
-                  const QString& keywords_en_US);
-  LibraryCategory(const QString& shortElementName,
-                  const QString& longElementName,
-                  std::unique_ptr<TransactionalDirectory> directory,
-                  const SExpression& root);
-  virtual ~LibraryCategory() noexcept;
-
-  // Getters: Attributes
-  const std::optional<Uuid>& getParentUuid() const noexcept {
-    return mParentUuid;
-  }
-
-  // Setters: Attributes
-  void setParentUuid(const std::optional<Uuid>& parentUuid) noexcept {
-    mParentUuid = parentUuid;
-  }
+  LibraryCategoryCheck() = delete;
+  LibraryCategoryCheck(const LibraryCategoryCheck& other) = delete;
+  explicit LibraryCategoryCheck(const LibraryCategory& category) noexcept;
+  virtual ~LibraryCategoryCheck() noexcept;
 
   // General Methods
   virtual RuleCheckMessageList runChecks() const override;
 
   // Operator Overloadings
-  LibraryCategory& operator=(const LibraryCategory& rhs) = delete;
+  LibraryCategoryCheck& operator=(const LibraryCategoryCheck& rhs) = delete;
 
-protected:
-  virtual void serialize(SExpression& root) const override;
+protected:  // Methods
+  void checkParent(MsgList& msgs) const;
 
-  std::optional<Uuid> mParentUuid;
+private:  // Data
+  const LibraryCategory& mCategory;
 };
 
 /*******************************************************************************
