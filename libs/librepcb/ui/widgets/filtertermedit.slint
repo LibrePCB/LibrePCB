@@ -1,35 +1,38 @@
-import { IconButton } from "iconbutton.slint";
+import { ControlIconButton } from "iconbutton.slint";
+import { Data } from "../api.slint";
 
 export component FilterTermEdit inherits Rectangle {
     in property <string> term;
 
-    preferred-height: 28px;
-    background: #505050;
-    border-radius: self.height / 2;
+    preferred-height: 25px;
+    background: Data.theme.control;
+    border-color: Data.theme.control-border;
+    border-width: 1px;
 
     callback clear-clicked <=> clear-btn.clicked;
 
     HorizontalLayout {
-        padding-left: 10px;
-        padding-right: 7px;
+        padding-left: 6px;
+        padding-right: 4px;
         spacing: 5px;
 
         Text {
             vertical-alignment: center;
+            color: Data.theme.control-text-disabled;
             font-size: 13px;
             text: @tr("Filter:");
         }
 
         Text {
             vertical-alignment: center;
+            color: Data.theme.control-text;
             font-size: 13px;
-            color: white;
             text: term;
         }
 
         Rectangle { }
 
-        clear-btn := IconButton {
+        clear-btn := ControlIconButton {
             y: (parent.height - self.height) / 2;
             width: self.height;
             height: min(16px, parent.height);

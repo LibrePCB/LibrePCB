@@ -3,10 +3,12 @@ import {
     LineEdit,
     LinkText,
     ProgressBar,
+    TextInput,
 } from "../widgets.slint";
 import { Tab } from "../tab.slint";
 import {
     Backend,
+    Data,
     DownloadLibraryTabData,
     TabAction,
     WindowSectionData,
@@ -49,6 +51,7 @@ export component DownloadLibraryTab inherits Tab {
                 height: self.preferred-height + 10px;
                 font-size: 14px;
                 font-weight: 700;
+                color: Data.theme.base-text;
                 wrap: TextWrap.word-wrap;
                 text: @tr("Download & install a library by URL");
             }
@@ -59,15 +62,20 @@ export component DownloadLibraryTab inherits Tab {
                 colspan: 2;
                 height: self.preferred-height;
                 wrap: TextWrap.word-wrap;
+                color: Data.theme.base-text;
                 text: @tr("Please note that this is not the preferred way to install libraries as they won't be kept up to date. For our official libraries, it's recommended to install them from the libraries panel instead, which allows to keep libraries up to date.");
             }
         }
 
         Row {
-            Rectangle {
+            VerticalLayout {
                 colspan: 2;
-                height: 1px;
-                background: gray;
+                padding-bottom: 5px;
+
+                Rectangle {
+                    height: 1px;
+                    background: Data.theme.base-border;
+                }
             }
         }
 
@@ -75,6 +83,7 @@ export component DownloadLibraryTab inherits Tab {
             url-txt := Text {
                 text: @tr("URL:");
                 vertical-alignment: center;
+                color: Data.theme.base-text;
                 accessible-role: none;
             }
 
@@ -108,11 +117,12 @@ export component DownloadLibraryTab inherits Tab {
                 horizontal-stretch: 1;
 
                 VerticalLayout {
-                    spacing: 5px;
+                    spacing: 3px;
 
                     Text {
                         horizontal-stretch: 0;
                         font-size: 11px;
+                        color: downloading ? Data.theme.base-text-muted : Data.theme.base-text;
                         wrap: word-wrap;
                         text: @tr("URL does not seem to point to a ZIP file. Consider using this URL instead:");
                     }
@@ -120,7 +130,7 @@ export component DownloadLibraryTab inherits Tab {
                     url-suggestion-txt := LinkText {
                         horizontal-stretch: 0;
                         overflow: elide;
-                        font-size: 10px;
+                        font-size: 11px;
                         text: tabs[section.current-tab-index].url-suggestion;
                         enabled: !downloading;
 
@@ -136,6 +146,7 @@ export component DownloadLibraryTab inherits Tab {
             directory-txt := Text {
                 text: @tr("Directory:");
                 vertical-alignment: center;
+                color: Data.theme.base-text;
                 accessible-role: none;
             }
 
@@ -193,22 +204,17 @@ export component DownloadLibraryTab inherits Tab {
                         Backend.trigger-tab(section-index, section.current-tab-index, TabAction.cancel);
                     }
                 }
-            }
-        }
 
-        Row {
-            Rectangle { }
-
-            creation-status-edt := TextInput {
-                horizontal-stretch: 1;
-                height: self.visible ? self.preferred-height : 0;
-                color: downloading ? yellow : red;
-                read-only: true;
-                wrap: word-wrap;
-                text: tabs[section.current-tab-index].download-status;
-                visible: !self.text.is-empty;
-                accessible-label: "status message";
-                accessible-description: self.text;
+                property <string> download-status: tabs[section.current-tab-index].download-status;
+                if !download-status.is-empty: creation-status-edt := TextInput {
+                    color: downloading ? Data.theme.base-text : Data.theme.base-text-error;
+                    read-only: true;
+                    wrap: word-wrap;
+                    vertical-alignment: center;
+                    text: download-status;
+                    accessible-label: "status message";
+                    accessible-description: self.text;
+                }
             }
         }
 

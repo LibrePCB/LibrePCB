@@ -16,6 +16,7 @@ import {
     SceneButton,
     SliderSceneButton,
     Spinner,
+    ToolBar,
     ToolButton,
 } from "../../widgets.slint";
 import {
@@ -98,18 +99,18 @@ export component Board2dTab inherits Tab {
         y: toolbuttons-l.y;
         width: overlay-txt.preferred-width + 2 * overlay-txt.x;
         height: overlay-txt.preferred-height + 2 * overlay-txt.y;
-        background: tabs[index].overlay-color;
-        border-radius: 10px;
+        background: Data.theme.control;
+        border-radius: 3px;
         border-width: 1px;
-        border-color: tabs[index].overlay-text-color;
+        border-color: Data.theme.control-border;
 
         overlay-txt := Text {
-            x: 8px;
-            y: 8px;
+            x: 6px;
+            y: 6px;
             horizontal-alignment: left;
             vertical-alignment: top;
             font-family: "Noto Sans Mono";
-            color: tabs[index].overlay-text-color;
+            color: Data.theme.control-text;
             text: tabs[index].tool-overlay-text;
         }
     }
@@ -117,73 +118,64 @@ export component Board2dTab inherits Tab {
     ta := TouchArea {
         mouse-cursor: tabs[index].tool-cursor;
 
-        toolbar-r := Rectangle {
-            y: 0;
+        toolbar-r := ToolBar {
+            y: -1px;
             width: min(self.preferred-width, root.width - 10px);
-            height: 34px;
-            background: #505050;
-            border-bottom-left-radius: 11px;
-            border-bottom-right-radius: 11px;
             visible: self.width > 30px;
 
-            HorizontalLayout {
-                alignment: center;
-                padding: 3px;
+            if tabs[index].tool == EditorTool.wire: trace-toolbar := DrawTraceToolBar {
+                section-index: section-index;
+                section: section;
+                show-via-size: root.width > 755px;
+            }
 
-                if tabs[index].tool == EditorTool.wire: trace-toolbar := DrawTraceToolBar {
-                    section-index: section-index;
-                    section: section;
-                    show-via-size: root.width > 755px;
-                }
+            if tabs[index].tool == EditorTool.via: via-toolbar := AddViaToolBar {
+                section-index: section-index;
+                section: section;
+            }
 
-                if tabs[index].tool == EditorTool.via: via-toolbar := AddViaToolBar {
-                    section-index: section-index;
-                    section: section;
-                }
+            if tabs[index].tool == EditorTool.pad-tht: pad-tht-toolbar := AddPadToolBar {
+                section-index: section-index;
+                section: section;
+                show-side-selector: false;
+                show-drill-edt: true;
+                show-ratio-sw: root.width > 850px;
+                show-pressfit-sw: root.width > 900px;
+                fiducial-mode: tabs[index].tool-fiducial;
+            }
 
-                if tabs[index].tool == EditorTool.pad-tht: pad-tht-toolbar := AddPadToolBar {
-                    section-index: section-index;
-                    section: section;
-                    show-side-selector: false;
-                    show-drill-edt: true;
-                    show-ratio-sw: root.width > 850px;
-                    show-pressfit-sw: root.width > 900px;
-                    fiducial-mode: tabs[index].tool-fiducial;
-                }
+            if tabs[index].tool == EditorTool.pad-smt: pad-smt-toolbar := AddPadToolBar {
+                section-index: section-index;
+                section: section;
+                show-side-selector: true;
+                show-drill-edt: false;
+                show-pressfit-sw: false;
+                fiducial-mode: tabs[index].tool-fiducial;
+            }
 
-                if tabs[index].tool == EditorTool.pad-smt: pad-smt-toolbar := AddPadToolBar {
-                    section-index: section-index;
-                    section: section;
-                    show-side-selector: true;
-                    show-drill-edt: false;
-                    show-pressfit-sw: false;
-                    fiducial-mode: tabs[index].tool-fiducial;
-                }
+            if tabs[index].tool == EditorTool.polygon: polygon-toolbar := DrawPolygonToolBar {
+                section-index: section-index;
+                section: section;
+            }
 
-                if tabs[index].tool == EditorTool.polygon: polygon-toolbar := DrawPolygonToolBar {
-                    section-index: section-index;
-                    section: section;
-                }
+            if tabs[index].tool == EditorTool.text: text-toolbar := AddStrokeTextToolBar {
+                section-index: section-index;
+                section: section;
+            }
 
-                if tabs[index].tool == EditorTool.text: text-toolbar := AddStrokeTextToolBar {
-                    section-index: section-index;
-                    section: section;
-                }
+            if tabs[index].tool == EditorTool.plane: plane-toolbar := DrawPlaneToolBar {
+                section-index: section-index;
+                section: section;
+            }
 
-                if tabs[index].tool == EditorTool.plane: plane-toolbar := DrawPlaneToolBar {
-                    section-index: section-index;
-                    section: section;
-                }
+            if tabs[index].tool == EditorTool.zone: zone-toolbar := DrawZoneToolBar {
+                section-index: section-index;
+                section: section;
+            }
 
-                if tabs[index].tool == EditorTool.zone: zone-toolbar := DrawZoneToolBar {
-                    section-index: section-index;
-                    section: section;
-                }
-
-                if tabs[index].tool == EditorTool.hole: hole-toolbar := AddHoleToolBar {
-                    section-index: section-index;
-                    section: section;
-                }
+            if tabs[index].tool == EditorTool.hole: hole-toolbar := AddHoleToolBar {
+                section-index: section-index;
+                section: section;
             }
         }
 
@@ -370,6 +362,7 @@ export component Board2dTab inherits Tab {
                 }
 
                 if Data.panel-page != PanelPage.place-devices: place-devices-btn := Button {
+                    border-radius: self.height / 2;
                     primary: true;
                     text: @tr("Place Devices");
 
@@ -409,6 +402,7 @@ export component Board2dTab inherits Tab {
             y: 7px + toolbutton-offset-y;
             width: self.preferred-width;
             height: parent.height - 2 * self.y;
+            alignment: start;
             spacing: 5px;
 
             tool-select-btn := ToolButton {
@@ -594,8 +588,8 @@ export component Board2dTab inherits Tab {
                 x: parent.width - self.width;
                 icon: @image-url("../../../../font-awesome/svgs/solid/expand.svg");
                 icon-scale: 0.9;
-                bg-color: tabs[index].background-color;
-                fg-color: tabs[index].foreground-color;
+                base-color: tabs[index].background-color;
+                base-text-color: tabs[index].foreground-color;
 
                 clicked => {
                     Backend.trigger-tab(section-index, index, TabAction.zoom-fit);
@@ -605,8 +599,8 @@ export component Board2dTab inherits Tab {
             zoom-in-btn := SceneButton {
                 x: parent.width - self.width;
                 icon: @image-url("../../../../bootstrap-icons/icons/zoom-in.svg");
-                bg-color: tabs[index].background-color;
-                fg-color: tabs[index].foreground-color;
+                base-color: tabs[index].background-color;
+                base-text-color: tabs[index].foreground-color;
 
                 clicked => {
                     Backend.trigger-tab(section-index, index, TabAction.zoom-in);
@@ -616,8 +610,8 @@ export component Board2dTab inherits Tab {
             zoom-out-btn := SceneButton {
                 x: parent.width - self.width;
                 icon: @image-url("../../../../bootstrap-icons/icons/zoom-out.svg");
-                bg-color: tabs[index].background-color;
-                fg-color: tabs[index].foreground-color;
+                base-color: tabs[index].background-color;
+                base-text-color: tabs[index].foreground-color;
 
                 clicked => {
                     Backend.trigger-tab(section-index, index, TabAction.zoom-out);
@@ -630,8 +624,8 @@ export component Board2dTab inherits Tab {
                 icon-scale: self.checked ? 1.0 : 1.1;
                 icon: Cmd.flip-view.icon;
                 tooltip: Cmd.flip-view.text;
-                bg-color: tabs[index].background-color;
-                fg-color: tabs[index].foreground-color;
+                base-color: tabs[index].background-color;
+                base-text-color: tabs[index].foreground-color;
                 checked: tabs[index].flip-view;
 
                 clicked => {
@@ -645,8 +639,8 @@ export component Board2dTab inherits Tab {
                 icon-scale: self.slider-enabled ? 0.8 : 0.9;
                 icon: Cmd.toggle-background-image.icon;
                 tooltip: self.slider-enabled ? @tr("Background Image") : Cmd.toggle-background-image.text;
-                bg-color: tabs[index].background-color;
-                fg-color: tabs[index].foreground-color;
+                base-color: tabs[index].background-color;
+                base-text-color: tabs[index].foreground-color;
                 value: tabs[index].background-image-alpha;
                 slider-enabled: tabs[index].background-image-set;
 
@@ -662,8 +656,8 @@ export component Board2dTab inherits Tab {
             toggle-3d-btn := SceneButton {
                 x: parent.width - self.width;
                 text: "3D";
-                bg-color: tabs[index].background-color;
-                fg-color: tabs[index].foreground-color;
+                base-color: tabs[index].background-color;
+                base-text-color: tabs[index].foreground-color;
 
                 clicked => {
                     Backend.trigger-board(tabs[index].project-index, tabs[index].board-index, BoardAction.open-3d);
@@ -675,7 +669,7 @@ export component Board2dTab inherits Tab {
             }
 
             if tabs[index].refreshing: spinner := Spinner {
-                x: (parent.width - self.width) / 2;
+                x: toggle-3d-btn.x + (toggle-3d-btn.width - self.width) / 2;
                 width: 20px;
                 height: self.width;
                 foreground-color: tabs[index].foreground-color;

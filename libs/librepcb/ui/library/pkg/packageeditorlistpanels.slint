@@ -1,8 +1,8 @@
 import { PackageEditorPanel } from "packageeditorpanel.slint";
-import { Badge, IconButton } from "../../widgets.slint";
+import { Badge, ControlIconButton, TextInput } from "../../widgets.slint";
 import {
     Backend,
-    Constants,
+    Data,
     FootprintAction,
     PackageModelAction,
     PackageTabData,
@@ -22,8 +22,8 @@ component PackageEditorPanelListItem inherits TouchArea {
     in property <[bool]> checked-numbers;
     in property <bool> highlight: false;
     in property <bool> read-only: false;
-    property <color> base-color: highlight ? #e0e0e0 : #909090;
-    property <color> color: root.has-hover ? base-color.brighter(0.2) : base-color;
+    property <color> base-color: highlight ? Data.theme.control-text : Data.theme.control-text-muted;
+    property <color> color: (edit-mode || root.has-hover) ? Data.theme.control-text : base-color;
     property <bool> edit-mode: false;
 
     callback name-changed(string);
@@ -60,7 +60,7 @@ component PackageEditorPanelListItem inherits TouchArea {
         if show-number: number-badge := Badge {
             y: (parent.height - self.height) / 2;
             background: color;
-            text-color: black;
+            text-color: Data.theme.control;
             border-color: color;
             text: index + 1;
             visible: index >= 0;
@@ -75,8 +75,7 @@ component PackageEditorPanelListItem inherits TouchArea {
             min-width: placeholder-txt.preferred-width;
             vertical-alignment: center;
             color: color;
-            selection-background-color: Constants.librepcb-color;
-            selection-foreground-color: black;
+            font-weight: highlight ? 600 : 400;
             single-line: true;
             wrap: no-wrap;
             text: name;
@@ -93,10 +92,12 @@ component PackageEditorPanelListItem inherits TouchArea {
                 y: 0;
                 width: 100%;
                 height: 100%;
-                color: #707070;
+                color: Data.theme.control-text-muted;
                 horizontal-alignment: left;
                 vertical-alignment: center;
-                text: allow-rename ? @tr("Enter name & press Return") : "";
+                // Hack to avoid layout change on highlight change.
+                font-weight: (allow-rename || edit-mode) ? 400 : 600;
+                text: (allow-rename || edit-mode) ? @tr("Enter name & press Return") : name;
                 visible: edit-mode && parent.text.is-empty;
                 accessible-role: none;
             }
@@ -121,9 +122,18 @@ component PackageEditorPanelListItem inherits TouchArea {
 
             for checked[idx] in checked-numbers: checked-numbers-btn := Badge {
                 y: (parent.height - self.height) / 2;
-                background: checked ? color.brighter(self.has-hover ? 0.2 : 0) : transparent;
-                text-color: checked ? black : color;
-                border-color: checked ? self.background : (self.has-hover ? self.text-color-hover : self.text-color);
+                background: {
+                    if checked {
+                        color.with-alpha(self.has-hover ? 1 : 0.7)
+                    } else if self.has-hover {
+                        Data.theme.control-hovered
+                    } else {
+                        transparent
+                    }
+                };
+                border-color: checked ? self.background : self.text-color;
+                text-color: checked ? Data.theme.control : color;
+                text-color-hover: checked ? Data.theme.control : color;
                 text: idx + 1;
                 clickable: !read-only;
 
@@ -133,10 +143,9 @@ component PackageEditorPanelListItem inherits TouchArea {
             }
         }
 
-        if show-move-button: move-up-btn := IconButton {
+        if show-move-button: move-up-btn := ControlIconButton {
             height: root.height;
             style: hyperlink;
-            color-enabled: #909090;
             icon-scale: 0.7;
             icon: @image-url("../../../../font-awesome/svgs/solid/arrow-up.svg");
             tooltip: @tr("Move Up");
@@ -149,10 +158,9 @@ component PackageEditorPanelListItem inherits TouchArea {
             }
         }
 
-        if allow-rename: rename-btn := IconButton {
+        if allow-rename: rename-btn := ControlIconButton {
             height: root.height;
             style: hyperlink;
-            color-enabled: #909090;
             icon-scale: 0.7;
             icon: @image-url("../../../../font-awesome/svgs/solid/pen-to-square.svg");
             tooltip: @tr("Rename");
@@ -165,10 +173,9 @@ component PackageEditorPanelListItem inherits TouchArea {
             }
         }
 
-        if show-duplicate-button: duplicate-btn := IconButton {
+        if show-duplicate-button: duplicate-btn := ControlIconButton {
             height: root.height;
             style: hyperlink;
-            color-enabled: #909090;
             icon-scale: 0.7;
             icon: @image-url("../../../../font-awesome/svgs/solid/copy.svg");
             tooltip: @tr("Duplicate");
@@ -181,10 +188,9 @@ component PackageEditorPanelListItem inherits TouchArea {
             }
         }
 
-        if show-browse-button: browse-btn := IconButton {
+        if show-browse-button: browse-btn := ControlIconButton {
             height: root.height;
             style: hyperlink;
-            color-enabled: #909090;
             icon-scale: 0.7;
             icon: @image-url("../../../../font-awesome/svgs/solid/folder-open.svg");
             tooltip: @tr("Load From File") + "...";
@@ -197,10 +203,9 @@ component PackageEditorPanelListItem inherits TouchArea {
             }
         }
 
-        if show-delete-button: delete-btn := IconButton {
+        if show-delete-button: delete-btn := ControlIconButton {
             height: root.height;
             style: hyperlink;
-            color-enabled: #909090;
             icon-scale: 0.7;
             icon: @image-url("../../../../font-awesome/svgs/solid/trash-can.svg");
             tooltip: @tr("Remove");
@@ -213,7 +218,7 @@ component PackageEditorPanelListItem inherits TouchArea {
             }
         }
 
-        if index == -1: IconButton {
+        if index == -1: ControlIconButton {
             height: root.height;
             style: hyperlink;
             color-disabled: color;

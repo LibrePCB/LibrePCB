@@ -26,6 +26,7 @@ import {
     TabType,
     WindowSectionAction,
 } from "api.slint";
+import { Themes } from "api/themes.slint";
 
 component MainMenuItem inherits Rectangle {
     in property <string> text;
@@ -35,7 +36,9 @@ component MainMenuItem inherits Rectangle {
     callback hovered;
 
     width: self.visible ? (txt.preferred-width + 10px) : 0;
-    background: (active || ta.has-hover) ? #404040 : #252525;
+    background: (active || ta.has-hover) ? Data.theme.control : transparent;
+    border-color: Data.theme.control-border;
+    border-width: active ? 1px : 0;
 
     // Accessibility
     accessible-role: button;
@@ -46,7 +49,8 @@ component MainMenuItem inherits Rectangle {
 
     txt := Text {
         x: 5px;
-        font-size: 15px;
+        font-size: 13px;
+        color: (active || ta.has-hover) ? Data.theme.control-text : Data.theme.base-text;
         text: text;
     }
 
@@ -69,11 +73,11 @@ component MenuBarSeparator inherits Rectangle {
     Rectangle {
         width: 1px;
         height: 15px;
-        background: #606060;
+        background: Data.theme.control-text-disabled;
     }
 }
 
-export component MainMenuBar inherits Rectangle {
+export component MainMenuBar {
     in property <length> window-height;
     in property <length> sections-start-x;
     out property <bool> menu-expanded: !current-menu-text.is-empty;
@@ -133,8 +137,6 @@ export component MainMenuBar inherits Rectangle {
         }
     }
 
-    background: #252525;
-
     HorizontalLayout {
         padding-right: 4px;
 
@@ -153,6 +155,7 @@ export component MainMenuBar inherits Rectangle {
             if self.active: file-menu-popup := MenuOverlay {
                 x: 0;
                 y: parent.height;
+                opening-width: parent.width;
 
                 new-project-item := MenuItem {
                     cmd: Cmd.project-new;
@@ -390,6 +393,7 @@ export component MainMenuBar inherits Rectangle {
             if self.active: menu-edit := MenuOverlay {
                 x: 0;
                 y: parent.height;
+                opening-width: parent.width;
 
                 undo-item := MenuItem {
                     cmd: Cmd.undo;
@@ -541,7 +545,6 @@ export component MainMenuBar inherits Rectangle {
 
                 snap-to-grid-item := MenuItem {
                     cmd: Cmd.snap-to-grid;
-                    icon: @image-url("../../../img/grid-dots.svg");
                     enabled: Data.current-tab.features.snap-to-grid == FeatureState.enabled;
 
                     clicked => {
@@ -677,6 +680,7 @@ export component MainMenuBar inherits Rectangle {
             if self.active: view-menu-popup := MenuOverlay {
                 x: 0;
                 y: parent.height;
+                opening-width: parent.width;
 
                 new-window-item := MenuItem {
                     cmd: Cmd.window-new;
@@ -888,6 +892,7 @@ export component MainMenuBar inherits Rectangle {
             if self.active: library-menu-popup := MenuOverlay {
                 x: 0;
                 y: parent.height;
+                opening-width: parent.width;
 
                 save-library-item := MenuItem {
                     cmd: Cmd.save;
@@ -1030,6 +1035,7 @@ export component MainMenuBar inherits Rectangle {
             if self.active: category-menu-popup := MenuOverlay {
                 x: 0;
                 y: parent.height;
+                opening-width: parent.width;
 
                 save-category-item := MenuItem {
                     cmd: Cmd.save;
@@ -1084,6 +1090,7 @@ export component MainMenuBar inherits Rectangle {
             if self.active: symbol-menu-popup := MenuOverlay {
                 x: 0;
                 y: parent.height;
+                opening-width: parent.width;
 
                 save-symbol-item := MenuItem {
                     cmd: Cmd.save;
@@ -1145,6 +1152,7 @@ export component MainMenuBar inherits Rectangle {
             if self.active: package-menu-popup := MenuOverlay {
                 x: 0;
                 y: parent.height;
+                opening-width: parent.width;
 
                 save-package-item := MenuItem {
                     cmd: Cmd.save;
@@ -1206,6 +1214,7 @@ export component MainMenuBar inherits Rectangle {
             if self.active: component-menu-popup := MenuOverlay {
                 x: 0;
                 y: parent.height;
+                opening-width: parent.width;
 
                 save-component-item := MenuItem {
                     cmd: Cmd.save;
@@ -1256,6 +1265,7 @@ export component MainMenuBar inherits Rectangle {
             if self.active: device-menu-popup := MenuOverlay {
                 x: 0;
                 y: parent.height;
+                opening-width: parent.width;
 
                 save-device-item := MenuItem {
                     cmd: Cmd.save;
@@ -1306,6 +1316,7 @@ export component MainMenuBar inherits Rectangle {
             if self.active: organization-menu-popup := MenuOverlay {
                 x: 0;
                 y: parent.height;
+                opening-width: parent.width;
 
                 save-organization-item := MenuItem {
                     cmd: Cmd.save;
@@ -1356,6 +1367,7 @@ export component MainMenuBar inherits Rectangle {
             if self.active: project-menu-popup := MenuOverlay {
                 x: 0;
                 y: parent.height;
+                opening-width: parent.width;
 
                 project-setup-item := MenuItem {
                     cmd: Cmd.project-setup;
@@ -1564,6 +1576,7 @@ export component MainMenuBar inherits Rectangle {
             if self.active: help-menu-popup := MenuOverlay {
                 x: 0;
                 y: parent.height;
+                opening-width: parent.width;
 
                 shortcuts-reference-item := MenuItem {
                     cmd: Cmd.keyboard-shortcuts-reference;
@@ -1624,10 +1637,6 @@ export component MainMenuBar inherits Rectangle {
             }
         }
 
-        Rectangle {
-            width: 3px;
-        }
-
         if global-buttons-l.preferred-width > global-buttons-l.padding-left: MenuBarSeparator { }
 
         global-buttons-l := HorizontalLayout {
@@ -1671,7 +1680,9 @@ export component MainMenuBar inherits Rectangle {
 
                 read-only-badge := Badge {
                     width: self.preferred-width;
-                    text-color: yellow;
+                    background: Data.theme.warning;
+                    text-color: Data.theme.warning-text;
+                    border-color: self.background;
                     text: @tr("read-only").to-lowercase();
                 }
             }
@@ -1829,7 +1840,6 @@ export component MainMenuBar inherits Rectangle {
 
                     if Data.current-tab.features.snap-to-grid != FeatureState.not-supported: snap-to-grid-btn := MenuBarButton {
                         cmd: Cmd.snap-to-grid;
-                        icon: @image-url("../../../img/grid-dots.svg");
                         enabled: Data.current-tab.features.snap-to-grid == FeatureState.enabled;
 
                         clicked => {
@@ -1858,8 +1868,7 @@ export component MainMenuBar inherits Rectangle {
                     if Data.current-tab.features.unlock != FeatureState.not-supported: unlock-btn := MenuBarButton {
                         cmd: Cmd.unlock;
                         enabled: Data.current-tab.features.unlock == FeatureState.enabled;
-                        color-enabled: #d00000;
-                        color-hovered: #ff0000;
+                        color-enabled: Data.theme.base-text-error;
 
                         clicked => {
                             Helpers.trigger-current-tab-action(TabAction.unlock);
@@ -1919,6 +1928,30 @@ export component MainMenuBar inherits Rectangle {
                     return accept;
                 }
                 reject
+            }
+        }
+
+        // In preview mode, provide a button to switch theme. This is handy
+        // during development, to quickly review the UI in both themes.
+        if Data.preview-mode: MenuBarButton {
+            property <bool> is-dark: Data.theme == Themes.dark;
+
+            y: (parent.height - self.height) / 2;
+            height: 15px;
+            icon: {
+                if is-dark {
+                    @image-url("../../bootstrap-icons/icons/sun-fill.svg")
+                } else {
+                    @image-url("../../bootstrap-icons/icons/sun.svg")
+                }
+            };
+
+            clicked => {
+                if Data.preview-mode {
+                    Data.theme = is-dark ? Themes.light : Themes.dark;
+                } else {
+                    Backend.toggle-theme()
+                }
             }
         }
     }

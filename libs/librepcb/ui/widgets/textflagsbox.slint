@@ -1,6 +1,6 @@
 import { LinkText } from "linktext.slint";
-import { ToolBarWidget } from "toolbarwidget.slint";
-import { Constants } from "../api.slint";
+import { ToolBarWidget } from "toolbar.slint";
+import { Data } from "../api.slint";
 
 export struct TextFlagsBoxItemData {
     text: string,
@@ -23,6 +23,7 @@ export component TextFlagsBox inherits ToolBarWidget {
     spacing: 6px;
 
     if !title.is-empty: Text {
+        color: Data.theme.control-text;
         vertical-alignment: center;
         wrap: no-wrap;
         text: title + ":";
@@ -30,9 +31,10 @@ export component TextFlagsBox inherits ToolBarWidget {
     }
 
     for item[index] in model: item-btn := LinkText {
-        font-size: 10px;
+        font-size: 11px;
         vertical-alignment: center;
-        text-color: item.checked ? #c0c0c0 : #606060;
+        text-color: item.checked ? Data.theme.control-text : Data.theme.control-text-disabled;
+        text-color-hovered: item.checked ? Data.theme.control-text : Data.theme.control-text-muted;
         text: item.text.to-uppercase();
         accessible-label: title + " " + item.text;
         accessible-checkable: true;
@@ -41,7 +43,7 @@ export component TextFlagsBox inherits ToolBarWidget {
         if root.has-focus && (index == current-index): Rectangle {
             y: parent.height + 2px;  // 2px above border!
             height: 2px;
-            background: Constants.librepcb-color;
+            background: Data.theme.accent;
         }
 
         clicked => {

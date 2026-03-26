@@ -1,16 +1,15 @@
-import { ScrollView } from "std-widgets.slint";
 import {
     Badge,
     IconButton,
     ListViewItemButton,
     PanelHeader,
+    ScrollView,
 } from "widgets.slint";
 import {
     Backend,
     BoardAction,
     CategoryTabData,
     ComponentTabData,
-    Constants,
     Data,
     DeviceTabData,
     EditorCommandSet as Cmd,
@@ -37,22 +36,21 @@ component DocumentsListItem inherits Rectangle {
     in property <image> icon;
     in property <bool> selected: false;
     in property <bool> can-rename: true;
-    in property <length> scrollbar-width;
 
     callback clicked <=> ta.clicked;
     callback schematic-action-triggered(a: SchematicAction);
     callback board-action-triggered(a: BoardAction);
 
     height: 27px;
-    background: (ta.has-hover || selected) ? #454545 : transparent;
-
-    if selected: Rectangle {
-        x: 0;
-        y: 0;
-        width: 2px;
-        height: root.height;
-        background: Constants.librepcb-color;
-    }
+    background: {
+        if selected {
+            Data.theme.control-checked
+        } else if ta.has-hover {
+            Data.theme.control-hovered
+        } else {
+            transparent
+        }
+    };
 
     ta := TouchArea {
         HorizontalLayout {
@@ -79,6 +77,7 @@ component DocumentsListItem inherits Rectangle {
             txt := Text {
                 vertical-alignment: center;
                 overflow: elide;
+                color: Data.theme.base-text;
                 text: text;
             }
 
@@ -147,11 +146,6 @@ component DocumentsListItem inherits Rectangle {
                     board-action-triggered(BoardAction.delete);
                 }
             }
-
-            // Reserve space for scrollbar.
-            Rectangle {
-                width: scrollbar-width;
-            }
         }
     }
 }
@@ -159,7 +153,6 @@ component DocumentsListItem inherits Rectangle {
 component ProjectSection inherits Rectangle {
     in property <ProjectData> project;
     in property <int> project-index;
-    in property <length> scrollbar-width;
 
     VerticalLayout {
         header-ta := TouchArea {
@@ -167,12 +160,12 @@ component ProjectSection inherits Rectangle {
 
             header := PanelHeader {
                 title: project.name.to-uppercase();
+                highlight: project-index == Data.current-project-index;
 
-                if project.unsaved-changes && project.writable: save-badge := Badge {
-                    y: (parent.height - self.height) / 2;
-                    text: @tr("save").to-lowercase();
-                    text-color: #dddd00;
-                    clickable: true;
+                if project.unsaved-changes && project.writable: save-btn := IconButton {
+                    cmd: Cmd.save;
+                    icon-scale: 60%;
+                    color-enabled: Data.theme.base-text-warning;
 
                     clicked => {
                         Backend.trigger-project(project-index, ProjectAction.save);
@@ -215,11 +208,6 @@ component ProjectSection inherits Rectangle {
                         Backend.trigger-project(project-index, ProjectAction.close);
                     }
                 }
-
-                // Reserve space for scrollbar.
-                Rectangle {
-                    width: scrollbar-width;
-                }
             }
 
             clicked => {
@@ -236,7 +224,6 @@ component ProjectSection inherits Rectangle {
             can-rename: project.schematics.length > 1;  // Because default name is hidden.
             icon: @image-url("../../font-awesome/svgs/regular/image.svg");
             selected: (Data.current-tab.type == TabType.schematic) && (Data.current-schematic-tab.project-index == project-index) && (Data.current-schematic-tab.schematic-index == index);
-            scrollbar-width: scrollbar-width;
 
             clicked => {
                 Backend.trigger-schematic(project-index, index, SchematicAction.open);
@@ -263,7 +250,6 @@ component ProjectSection inherits Rectangle {
                     false
                 }
             };
-            scrollbar-width: scrollbar-width;
 
             clicked => {
                 Backend.trigger-board(project-index, index, BoardAction.open-2d);
@@ -274,20 +260,11 @@ component ProjectSection inherits Rectangle {
             }
         }
     }
-
-    if project-index == Data.current-project-index: Rectangle {
-        x: 0;
-        y: 8px;
-        width: 1px;
-        height: parent.height - self.y - 4px;
-        background: #29d682;
-    }
 }
 
 component LibrarySection inherits Rectangle {
     in property <LibraryData> library;
     in property <int> library-index;
-    in property <length> scrollbar-width;
 
     VerticalLayout {
         header-ta := TouchArea {
@@ -295,6 +272,7 @@ component LibrarySection inherits Rectangle {
 
             header := PanelHeader {
                 title: library.name.to-uppercase();
+                highlight: library-index == Data.current-library-index;
 
                 close-btn := IconButton {
                     tooltip: @tr("Close Library");
@@ -305,11 +283,6 @@ component LibrarySection inherits Rectangle {
                     clicked => {
                         Backend.trigger-library-element(library.path, LibraryElementAction.close);
                     }
-                }
-
-                // Reserve space for scrollbar.
-                Rectangle {
-                    width: scrollbar-width;
                 }
             }
 
@@ -323,7 +296,6 @@ component LibrarySection inherits Rectangle {
             text: @tr("Library Overview");
             icon: @image-url("../../bootstrap-icons/icons/database.svg");
             selected: (Data.current-tab.type == TabType.library) && (Data.current-library-tab.library-index == library-index);
-            scrollbar-width: scrollbar-width;
 
             clicked => {
                 Backend.trigger-library-element(library.path, LibraryElementAction.open);
@@ -344,7 +316,6 @@ component LibrarySection inherits Rectangle {
                     text: tab.title;
                     icon: @image-url("../../bootstrap-icons/icons/folder.svg");
                     selected: (Data.current-tab.type == TabType.component-category) && (Data.current-component-category-tab.library-index == library-index) && (Data.current-component-category-tab.path == derived-tab.path);
-                    scrollbar-width: scrollbar-width;
 
                     clicked => {
                         Backend.trigger-library-element(derived-tab.path, LibraryElementAction.open);
@@ -358,7 +329,6 @@ component LibrarySection inherits Rectangle {
                     text: section.tabs[idx].title;
                     icon: @image-url("../../bootstrap-icons/icons/folder.svg");
                     selected: (Data.current-tab.type == TabType.package-category) && (Data.current-package-category-tab.library-index == library-index) && (Data.current-package-category-tab.path == derived-tab.path);
-                    scrollbar-width: scrollbar-width;
 
                     clicked => {
                         Backend.trigger-library-element(derived-tab.path, LibraryElementAction.open);
@@ -372,7 +342,6 @@ component LibrarySection inherits Rectangle {
                     text: section.tabs[idx].title;
                     icon: @image-url("../../../img/symbol.png");
                     selected: (Data.current-tab.type == TabType.symbol) && (Data.current-symbol-tab.library-index == library-index) && (Data.current-symbol-tab.path == derived-tab.path);
-                    scrollbar-width: scrollbar-width;
 
                     clicked => {
                         Backend.trigger-library-element(derived-tab.path, LibraryElementAction.open);
@@ -386,7 +355,6 @@ component LibrarySection inherits Rectangle {
                     text: section.tabs[idx].title;
                     icon: @image-url("../../../img/footprint.png");
                     selected: (Data.current-tab.type == TabType.package) && (Data.current-package-tab.library-index == library-index) && (Data.current-package-tab.path == derived-tab.path);
-                    scrollbar-width: scrollbar-width;
 
                     clicked => {
                         Backend.trigger-library-element(derived-tab.path, LibraryElementAction.open);
@@ -400,7 +368,6 @@ component LibrarySection inherits Rectangle {
                     text: section.tabs[idx].title;
                     icon: @image-url("../../bootstrap-icons/icons/cpu.svg");
                     selected: (Data.current-tab.type == TabType.component) && (Data.current-component-tab.library-index == library-index) && (Data.current-component-tab.path == derived-tab.path);
-                    scrollbar-width: scrollbar-width;
 
                     clicked => {
                         Backend.trigger-library-element(derived-tab.path, LibraryElementAction.open);
@@ -414,7 +381,6 @@ component LibrarySection inherits Rectangle {
                     text: section.tabs[idx].title;
                     icon: @image-url("../../bootstrap-icons/icons/cpu-fill.svg");
                     selected: (Data.current-tab.type == TabType.device) && (Data.current-device-tab.library-index == library-index) && (Data.current-device-tab.path == derived-tab.path);
-                    scrollbar-width: scrollbar-width;
 
                     clicked => {
                         Backend.trigger-library-element(derived-tab.path, LibraryElementAction.open);
@@ -428,7 +394,6 @@ component LibrarySection inherits Rectangle {
                     text: section.tabs[idx].title;
                     icon: @image-url("../../bootstrap-icons/icons/buildings.svg");
                     selected: (Data.current-tab.type == TabType.organization) && (Data.current-organization-tab.library-index == library-index) && (Data.current-organization-tab.path == derived-tab.path);
-                    scrollbar-width: scrollbar-width;
 
                     clicked => {
                         Backend.trigger-library-element(derived-tab.path, LibraryElementAction.open);
@@ -437,36 +402,22 @@ component LibrarySection inherits Rectangle {
             }
         }
     }
-
-    if library-index == Data.current-library-index: Rectangle {
-        x: 0;
-        y: 8px;
-        width: 1px;
-        height: parent.height - self.y - 4px;
-        background: #29d682;
-    }
 }
 
-export component DocumentsPanel inherits Rectangle {
-    background: #2a2a2a;
+export component DocumentsPanel inherits ScrollView {
+    mouse-drag-pan-enabled: true;
 
-    ScrollView {
-        property <length> scrollbar-width: (self.height < self.viewport-height) ? 7px : 0;
+    VerticalLayout {
+        alignment: start;
 
-        VerticalLayout {
-            alignment: start;
+        for project[project-index] in Data.projects: project-item := ProjectSection {
+            project: project;
+            project-index: project-index;
+        }
 
-            for project[project-index] in Data.projects: project-item := ProjectSection {
-                project: project;
-                project-index: project-index;
-                scrollbar-width: scrollbar-width;
-            }
-
-            for library[library-index] in Data.libraries: library-item := LibrarySection {
-                library: library;
-                library-index: library-index;
-                scrollbar-width: scrollbar-width;
-            }
+        for library[library-index] in Data.libraries: library-item := LibrarySection {
+            library: library;
+            library-index: library-index;
         }
     }
 }

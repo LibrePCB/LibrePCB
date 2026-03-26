@@ -3,14 +3,12 @@ import {
     ListViewItemButton,
     MenuItem,
     MenuPopup,
-    Palette,
     PanelHeader,
     TreeView,
 } from "widgets.slint";
 import {
     Action,
     Backend,
-    Constants,
     Data,
     EditorCommandSet as Cmd,
     TreeViewItemAction,
@@ -32,7 +30,7 @@ component QuickAccessListView inherits TreeView {
         reject
     }
 
-    item-hovered(index, item) => {
+    control-hovered(index, item) => {
         Data.status-tip = item.hint;
     }
 
@@ -69,8 +67,13 @@ component QuickAccessListView inherits TreeView {
 
         pinned-item := MenuItem {
             text: context-menu-item.pinned ? @tr("Unpin from Quick Access") : @tr("Pin to Quick Access");
-            icon-checked: @image-url("../../bootstrap-icons/icons/pin-angle-fill.svg");
-            icon-unchecked: @image-url("../../bootstrap-icons/icons/pin-angle.svg");
+            icon: {
+                if self.checked {
+                    @image-url("../../bootstrap-icons/icons/pin-angle-fill.svg")
+                } else {
+                    @image-url("../../bootstrap-icons/icons/pin-angle.svg")
+                }
+            };
             status-tip: @tr("Pin/unpin the project to the quick access");
             shortcuts: "␣";  // Hardcoded in the UI.
             checkable: true;
@@ -168,8 +171,13 @@ component WorkspaceFolderTreeView inherits TreeView {
         // re-evaluated.
         if context-menu-item.supports-pinning: pinned-item := MenuItem {
             text: context-menu-item.pinned ? @tr("Unpin from Quick Access") : @tr("Pin to Quick Access");
-            icon-checked: @image-url("../../bootstrap-icons/icons/pin-angle-fill.svg");
-            icon-unchecked: @image-url("../../bootstrap-icons/icons/pin-angle.svg");
+            icon: {
+                if self.checked {
+                    @image-url("../../bootstrap-icons/icons/pin-angle-fill.svg")
+                } else {
+                    @image-url("../../bootstrap-icons/icons/pin-angle.svg")
+                }
+            };
             status-tip: @tr("Pin/unpin the project to the quick access");
             shortcuts: "␣";  // Hardcoded in the UI.
             checkable: true;
@@ -213,43 +221,39 @@ component OpenProjectButton inherits IconButton {
     }
 }
 
-export component HomePanel inherits Rectangle {
-    background: #2a2a2a;
-
-    VerticalLayout {
-        if Data.quick-access-items.length > 0: VerticalLayout {
-            vertical-stretch: 0;
-
-            PanelHeader {
-                title: @tr("Quick Access").to-uppercase();
-                highlight: quick-access-view.has-focus;
-                z: 100; // For the tooltips.
-
-                new-project-btn-1 := NewProjectButton { }
-
-                open-project-btn-1 := OpenProjectButton { }
-            }
-
-            quick-access-view := QuickAccessListView {
-                vertical-stretch: 0;
-                max-height: root.height / 3;
-            }
-
-            Rectangle {
-                height: 15px;
-            }
-        }
+export component HomePanel inherits VerticalLayout {
+    if Data.quick-access-items.length > 0: VerticalLayout {
+        vertical-stretch: 0;
 
         PanelHeader {
-            title: @tr("Workspace Projects").to-uppercase();
-            highlight: workspace-projects-view.has-focus;
+            title: @tr("Quick Access").to-uppercase();
+            highlight: quick-access-view.has-focus;
             z: 100; // For the tooltips.
 
-            if Data.quick-access-items.length == 0: new-project-btn-2 := NewProjectButton { }
+            new-project-btn-1 := NewProjectButton { }
 
-            if Data.quick-access-items.length == 0: open-project-btn-2 := OpenProjectButton { }
+            open-project-btn-1 := OpenProjectButton { }
         }
 
-        workspace-projects-view := WorkspaceFolderTreeView { }
+        quick-access-view := QuickAccessListView {
+            vertical-stretch: 0;
+            max-height: root.height / 3;
+        }
+
+        Rectangle {
+            height: 15px;
+        }
     }
+
+    PanelHeader {
+        title: @tr("Workspace Projects").to-uppercase();
+        highlight: workspace-projects-view.has-focus;
+        z: 100; // For the tooltips.
+
+        if Data.quick-access-items.length == 0: new-project-btn-2 := NewProjectButton { }
+
+        if Data.quick-access-items.length == 0: open-project-btn-2 := OpenProjectButton { }
+    }
+
+    workspace-projects-view := WorkspaceFolderTreeView { }
 }

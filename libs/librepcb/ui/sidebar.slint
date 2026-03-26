@@ -3,23 +3,21 @@ import {
     Action,
     Backend,
     Board2dTabData,
-    Constants,
     Data,
     EditorCommandSet as Cmd,
     Helpers,
     PanelPage,
     ProjectAction,
-    ProjectData,
     RuleCheckData,
     RuleCheckState,
     RuleCheckType,
-    TabAction,
     TabType,
 } from "api.slint";
 
 enum Emblem {
     none,
     ok,
+    approved,
     warning,
     running,
 }
@@ -39,14 +37,12 @@ component SideBarButton inherits Rectangle {
     callback clicked <=> ta.clicked;
 
     background: {
-        if self.checked {
-            #1c1c1c
-        } else if ta.pressed {
-            #555555
+        if self.checked || ta.pressed {
+            Data.theme.control-checked
         } else if ta.has-hover {
-            #424242
+            Data.theme.control-hovered
         } else {
-            #353535
+            Data.theme.window  // Not transparent because of the emblem color.
         }
     };
     height: self.width;
@@ -62,7 +58,7 @@ component SideBarButton inherits Rectangle {
     if checked: Rectangle {
         x: 0px;
         width: 3px;
-        background: Constants.librepcb-color;
+        background: Data.theme.accent;
     }
 
     ta := TouchArea {
@@ -72,13 +68,13 @@ component SideBarButton inherits Rectangle {
     Image {
         width: parent.width * icon-scale * 0.7;
         height: self.width;
-        colorize: enabled ? white : gray;
+        colorize: enabled ? Data.theme.control-text : Data.theme.control-text-disabled;
         image-fit: contain;
         source: icon;
         accessible-role: none;
     }
 
-    if emblem == Emblem.ok: Rectangle {
+    if (emblem == Emblem.ok) || emblem == Emblem.approved: Rectangle {
         x: parent.width - self.width - 3px;
         y: parent.height - self.height - 3px;
         width: 10px;
@@ -90,28 +86,28 @@ component SideBarButton inherits Rectangle {
             width: 100%;
             height: 100%;
             image-fit: contain;
-            colorize: lime;
+            colorize: {
+                if emblem == Emblem.ok {
+                    Data.theme.base-text-success
+                } else {
+                    Data.theme.base-text-info
+                }
+            };
             source: @image-url("../../font-awesome/svgs/solid/check.svg");
         }
     }
 
     if emblem == Emblem.warning: Rectangle {
-        x: parent.width - self.width - 3px;
-        y: parent.height - self.height - 3px;
+        x: parent.width - self.width - 1px;
+        y: parent.height - self.height - 1px;
         width: 40%;
         height: self.width;
-
-        Path {
-            commands: "M 50 0 L 100 100 L 0 100 Z";
-            fill: root.background;
-        }
 
         Image {
             width: 100%;
             height: 100%;
             image-fit: contain;
-            colorize: yellow;
-            source: @image-url("../../font-awesome/svgs/solid/triangle-exclamation.svg");
+            source: @image-url("../../../img/status/dialog_warning.png");
         }
     }
 
@@ -121,7 +117,7 @@ component SideBarButton inherits Rectangle {
         width: (emblem == Emblem.running) ? self.height : max(status-txt.preferred-width + 8px, self.height);
         height: status-txt.preferred-height + 2px;
         border-radius: self.height / 2;
-        background: (emblem == Emblem.running) ? yellow : status-background;
+        background: (emblem == Emblem.running) ? Data.theme.warning : status-background;
 
         status-txt := Text {
             function get-progress-dots() -> string {
@@ -138,7 +134,7 @@ component SideBarButton inherits Rectangle {
             y: (parent.height - self.height) / 2 + 1px;
             font-size: (root.width < 40px) ? 8px : 10px;
             font-weight: 700;
-            color: (emblem == Emblem.running) ? gray : status-color;
+            color: (emblem == Emblem.running) ? Data.theme.warning-text : status-color;
             text: (emblem == Emblem.running) ? get-progress-dots() : status;
             accessible-role: none;
         }
@@ -152,9 +148,7 @@ component SideBarButton inherits Rectangle {
     }
 }
 
-export component SideBar inherits Rectangle {
-    background: #353535;
-
+export component SideBar {
     function button-clicked(page: PanelPage) {
         if Data.panel-page == page {
             Data.panel-page = PanelPage.none;
@@ -232,8 +226,8 @@ export component SideBar inherits Rectangle {
                 unplaced-components when tab.unplaced-components.length > 0: {
                     emblem: Emblem.none;
                     status: tab.unplaced-components.length;
-                    status-color: black;
-                    status-background: yellow;
+                    status-background: Data.theme.warning;
+                    status-color: Data.theme.warning-text;
                 }
                 up-to-date when tab.unplaced-components.length == 0: {
                     emblem: Emblem.ok;
@@ -279,22 +273,25 @@ export component SideBar inherits Rectangle {
                 not-run-yet when check.state == RuleCheckState.not-run-yet: {
                     emblem: Emblem.none;
                     status: "?";
-                    status-color: black;
-                    status-background: #d4d4d4;
+                    status-background: Data.theme.base.mix(Data.theme.base-text, 0.65);
+                    status-color: Data.theme.base-text;
                 }
                 outdated when check.state == RuleCheckState.outdated: {
                     emblem: Emblem.none;
                     status: check.unapproved;
-                    status-color: black;
-                    status-background: #d4d4d4;
+                    status-background: Data.theme.base.mix(Data.theme.base-text, 0.65);
+                    status-color: Data.theme.base-text;
                 }
-                up-to-date when (check.state == RuleCheckState.up-to-date) && (check.unapproved != 0): {
+                up-to-date-error when (check.state == RuleCheckState.up-to-date) && (check.unapproved != 0): {
                     emblem: Emblem.none;
                     status: check.unapproved;
-                    status-color: black;
-                    status-background: #ff0000;
+                    status-background: Data.theme.error;
+                    status-color: Data.theme.error-text;
                 }
-                up-to-date when (check.state == RuleCheckState.up-to-date) && (check.unapproved == 0): {
+                up-to-date-approved when (check.state == RuleCheckState.up-to-date) && (check.messages.length != 0): {
+                    emblem: Emblem.approved;
+                }
+                up-to-date-success when (check.state == RuleCheckState.up-to-date) && (check.messages.length == 0): {
                     emblem: Emblem.ok;
                 }
             ]
@@ -372,14 +369,14 @@ export component SideBar inherits Rectangle {
                 outdated when Data.remote-libraries-data.outdated > 0: {
                     emblem: Emblem.none;
                     status: Data.remote-libraries-data.outdated;
-                    status-color: black;
-                    status-background: #d4d400;
+                    status-background: Data.theme.info;
+                    status-color: Data.theme.info-text;
                 }
                 no-libraries when (Data.local-libraries-data.count == 0) && (Data.remote-libraries-data.installed == 0): {
                     emblem: Emblem.none;
                     status: "0";
-                    status-color: black;
-                    status-background: #d4d400;
+                    status-background: Data.theme.error;
+                    status-color: Data.theme.error-text;
                 }
                 up-to-date when Data.remote-libraries-data.all-up-to-date: {
                     emblem: Emblem.ok;

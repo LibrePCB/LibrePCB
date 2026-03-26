@@ -35,7 +35,7 @@ export component AppWindow inherits Window {
     property <length> actual-panel-width: (Data.panel-page != PanelPage.none) ? panel-width : 0;
 
     title: Data.window-title;
-    background: #2a2a2a;
+    background: Data.theme.window;
     icon: @image-url("../../../img/app/librepcb.svg");
     default-font-family: "Noto Sans";
     preferred-width: 1024px;
@@ -70,7 +70,7 @@ export component AppWindow inherits Window {
         menubar := MainMenuBar {
             x: 0;
             y: 0;
-            z: 100; // For the tooltips.
+            z: 200; // For the tooltips.
             width: 100%;
             height: 26px;
             window-height: root.height;
@@ -85,87 +85,66 @@ export component AppWindow inherits Window {
             }
         }
 
+        Rectangle {
+            x: 0;
+            y: menubar.height;
+            width: sidebar.width;
+            height: 1px;
+            background: Data.theme.base-border;
+        }
+
         sidebar := SideBar {
             x: 0px;
-            y: menubar.height;
+            y: menubar.height + 1px;
             z: 90; // For the tooltips.
             width: ((root.width <= 1200px) || (root.height <= 600px)) ? 35px : 45px;
-            height: parent.height - self.y - statusbar.height - 1px;
+            height: parent.height - self.y - statusbar.height;
         }
 
-        if Data.panel-page == PanelPage.home: home-panel := HomePanel {
+        Rectangle {
             x: sidebar.width;
             y: sidebar.y;
+            width: 1px;
+            height: sidebar.height;
+            background: Data.theme.base-border;
+        }
+
+        panel := Rectangle {
+            x: sidebar.width + 1px;
+            y: sidebar.y - 1px;
             z: 80; // For the tooltips.
             width: panel-width;
             height: sidebar.height;
-        }
+            background: Data.theme.control;
+            visible: Data.panel-page != PanelPage.none;
 
-        if Data.panel-page == PanelPage.documents: documents-panel := DocumentsPanel {
-            x: sidebar.width;
-            y: sidebar.y;
-            z: 80; // For the tooltips.
-            width: panel-width;
-            height: sidebar.height;
-        }
+            if Data.panel-page == PanelPage.home: home-panel := HomePanel { }
 
-        if Data.panel-page == PanelPage.layers: GraphicsLayersPanel {
-            x: sidebar.width;
-            y: sidebar.y;
-            z: 80; // For the tooltips.
-            width: panel-width;
-            height: sidebar.height;
-        }
+            if Data.panel-page == PanelPage.documents: documents-panel := DocumentsPanel { }
 
-        if Data.panel-page == PanelPage.place-devices: PlaceDevicesPanel {
-            x: sidebar.width;
-            y: sidebar.y;
-            z: 80; // For the tooltips.
-            width: panel-width;
-            height: sidebar.height;
-            window-height: root.height;
-        }
+            if Data.panel-page == PanelPage.layers: GraphicsLayersPanel { }
 
-        if Data.panel-page == PanelPage.rule-check: RuleCheckPanel {
-            x: sidebar.width;
-            y: sidebar.y;
-            z: 80; // For the tooltips.
-            width: panel-width;
-            height: sidebar.height;
-        }
+            if Data.panel-page == PanelPage.place-devices: PlaceDevicesPanel {
+                window-height: root.height;
+            }
 
-        if Data.panel-page == PanelPage.order: OrderPanel {
-            x: sidebar.width;
-            y: sidebar.y;
-            z: 80; // For the tooltips.
-            width: panel-width;
-            height: sidebar.height;
-        }
+            if Data.panel-page == PanelPage.rule-check: RuleCheckPanel { }
 
-        if Data.panel-page == PanelPage.libraries: LibrariesPanel {
-            x: sidebar.width;
-            y: sidebar.y;
-            z: 80; // For the tooltips.
-            width: panel-width;
-            height: sidebar.height;
-        }
+            if Data.panel-page == PanelPage.order: OrderPanel { }
 
-        if Data.panel-page == PanelPage.about: AboutPanel {
-            x: sidebar.width;
-            y: sidebar.y;
-            z: 80; // For the tooltips.
-            width: panel-width;
-            height: sidebar.height;
+            if Data.panel-page == PanelPage.libraries: LibrariesPanel { }
+
+            if Data.panel-page == PanelPage.about: AboutPanel { }
         }
 
         HorizontalLayout {
-            x: sidebar.width + actual-panel-width;
-            y: sidebar.y + 1px;
+            x: panel.x + actual-panel-width;
+            y: sidebar.y - 1px;
             width: parent.width - self.x;
-            height: sidebar.height - 1px;
+            height: sidebar.height;
 
             if actual-panel-width > 0: Rectangle {
-                background: #555555;
+                background: Data.theme.base-border;
                 width: 1px;
             }
 
@@ -179,14 +158,21 @@ export component AppWindow inherits Window {
                 if i < (Data.sections.length - 1): Rectangle {
                     width: 1px;
                     horizontal-stretch: 0;
-                    background: #555555;
+                    background: Data.theme.base-border;
                 }
             }
+        }
+
+        Rectangle {
+            y: statusbar.y - 1px;
+            height: 1px;
+            background: Data.theme.base-border;
         }
 
         statusbar := StatusBar {
             x: 0;
             y: parent.height - self.height;
+            z: 100; // Avoid sidebar to be painted on statusbar if window is small.
             width: parent.width;
 
             focus-root => {

@@ -2,6 +2,7 @@ import {
     Button,
     MessageBanner,
 } from "../widgets.slint";
+import { Data } from "../api.slint";
 
 export component BreakingChangesMessageBanner inherits MessageBanner {
     text: @tr("Attention").to-uppercase() + ": " + @tr("You have changed some important properties of this library element. This is a serious issue as it breaks all dependent library elements! If this library element is already used somewhere, it is highly recommended to create a new one instead of modifying this one.");
@@ -12,7 +13,7 @@ export component CheckErrorsMessageBanner inherits MessageBanner {
 }
 
 export component FilesModifiedMessageBanner inherits MessageBanner {
-    background: #32a1ff;
+    background: Data.theme.info;
 
     callback reload-clicked <=> reload-btn.clicked;
 
@@ -24,14 +25,14 @@ export component FilesModifiedMessageBanner inherits MessageBanner {
             alignment: center;
 
             Text {
-                color: white;
+                color: Data.theme.info-text;
                 horizontal-alignment: left;
                 wrap: word-wrap;
                 text: @tr("The files have been modified on disk. It is recommended to close and reopen this tab to see the modifications.");
             }
 
             Text {
-                color: white;
+                color: Data.theme.info-text;
                 font-weight: 700;
                 horizontal-alignment: left;
                 wrap: word-wrap;

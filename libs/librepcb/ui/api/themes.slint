@@ -1,0 +1,126 @@
+// ATTENTION: The members of this struct need to be kept in sync with
+// the C++ implementation librepcb::UiTheme, and the type conversion
+// in uihelpers.cpp!
+export struct Theme {
+    // menu bar, side bar, status bar
+    window: color,
+
+    // tab content
+    base: color,
+    base-border: color,
+    base-text-disabled: color,
+    base-text-muted: color,
+    base-text: color,
+    base-text-hovered: color,
+    base-text-info: color,
+    base-text-success: color,
+    base-text-warning: color,
+    base-text-error: color,
+
+    // side panel, buttons, text edits, combo boxes, list items, ...
+    control: color,
+    control-disabled: color,
+    control-hovered: color,
+    control-checked: color,
+    control-border: color,
+    control-border-disabled: color,
+    control-text-disabled: color,
+    control-text-muted: color,  // for placeholders
+    control-text: color,
+
+    // selected text
+    selection: color,
+    selection-text: color,
+
+    // tooltips
+    tooltip: color,
+    tooltip-border: color,
+    tooltip-text: color,
+
+    // various
+    accent: color,
+    accent-text: color,
+    info: color,
+    info-text: color,
+    warning: color,
+    warning-text: color,
+    error: color,
+    error-text: color,
+}
+
+// ATTENTION: The colors defined here are only for the live preview! At runtime,
+// all colors will be loaded from the C++ class librepcb::UiTheme, so the single
+// source of truth for the themes is there, not here.
+export global Themes {
+    out property <Theme> light: {
+        window: #f0f0f0,
+        base: #ffffff,
+        base-border: #d0d0d0,
+        base-text-disabled: #9e9e9e,
+        base-text-muted: #7c7c7c,
+        base-text: #292929,
+        base-text-hovered: #000000,
+        base-text-info: #0059ff,
+        base-text-success: #008f00,
+        base-text-warning: #e24800,
+        base-text-error: #ff0000,
+        control: #fafafa,
+        control-disabled: #e4e4e4,
+        control-hovered: #e8e8e8,
+        control-checked: #d0d0d0,
+        control-border: #c0c0c0,
+        control-border-disabled: #dddddd,
+        control-text-disabled: #9e9e9e,
+        control-text-muted: #7c7c7c,
+        control-text: #000000,
+        selection: #29d682,
+        selection-text: #000000,
+        tooltip: #fffbc5,
+        tooltip-border: #b9b9b9,
+        tooltip-text: #3a3a3a,
+        accent: #29d682,
+        accent-text: #000000,
+        info: #00ccff,
+        info-text: #000000,
+        warning: #ffe659,
+        warning-text: #000000,
+        error: #ff3b3b,
+        error-text: #000000,
+    };
+
+    out property <Theme> dark: {
+        window: #353535,
+        base: #2a2a2a,
+        base-border: #505050,
+        base-text-disabled: #808080,
+        base-text-muted: #adadad,
+        base-text: #c4c4c4,
+        base-text-hovered: #e0e0e0,
+        base-text-info: #00ccff,
+        base-text-success: #00ff00,
+        base-text-warning: #ffff00,
+        base-text-error: #ff2020,
+        control: #303030,
+        control-disabled: #1a1a1a,
+        control-hovered: #404040,
+        control-checked: #505050,
+        control-border: #606060,
+        control-border-disabled: #414141,
+        control-text-disabled: #707070,
+        control-text-muted: #909090,
+        control-text: #c4c4c4,
+        selection: #29d682,
+        selection-text: #000000,
+        tooltip: #fffbc5,
+        tooltip-border: #535353,
+        tooltip-text: #3a3a3a,
+        accent: #29d682,
+        accent-text: #000000,
+        info: #00ccff,
+        info-text: #000000,
+        warning: #ffe659,
+        warning-text: #000000,
+        error: #ff4343,
+        error-text: #000000,
+    };
+}

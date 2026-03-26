@@ -1,6 +1,10 @@
+import { Data } from "../api.slint";
+
 export component WizardHeaderPanel inherits Rectangle {
-    background: #454545;
-    border-radius: 10px;
+    background: Data.theme.control;
+    border-color: Data.theme.control-border;
+    border-width: 1px;
+    border-radius: 5px;
 
     VerticalLayout {
         padding: 8px;
@@ -11,6 +15,7 @@ export component WizardHeaderPanel inherits Rectangle {
 }
 
 export component WizardHeaderText inherits Text {
+    color: Data.theme.control-text;
     font-size: 12px;
     wrap: word-wrap;
 }

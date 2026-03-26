@@ -53,7 +53,6 @@ export component AddSymbolPinToolBar inherits HorizontalLayout {
     import-btn := Button {
         icon: @image-url("../../../../font-awesome/svgs/solid/file-import.svg");
         text: @tr("Mass Import");
-        border-radius: 10px;
 
         clicked => {
             Backend.trigger-tab(section-index, section.current-tab-index, TabAction.symbol-import-pins);

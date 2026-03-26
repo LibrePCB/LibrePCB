@@ -1,5 +1,4 @@
-import { Palette } from "std-widgets.slint";
-import { Data, Constants } from "../api.slint";
+import { Data } from "../api.slint";
 
 export component Button inherits Rectangle {
     in property <string> text;
@@ -11,41 +10,48 @@ export component Button inherits Rectangle {
     out property has-hover <=> ta.has-hover;
     out property pressed <=> ta.pressed;
     property <color> text-color: {
-        if root.primary {
-            fs.has-focus ? white : #202020
-        } else if ta.pressed {
-            #909090
-        } else if !enabled {
-            Palette.foreground.darker(0.5)
+        if !enabled {
+            Data.theme.control-text-disabled
+        } else if primary {
+            Data.theme.accent-text
         } else {
-            Palette.foreground
+            Data.theme.control-text
         }
     };
 
     callback clicked;
 
-    height: self.preferred-height;
+    height: 25px;
     min-width: fs.min-width;
     background: {
-        if root.primary {
+        if !enabled {
+            Data.theme.control-disabled
+        } else if primary {
             if ta.pressed {
-                Constants.librepcb-color.darker(0.5)
+                Data.theme.accent.mix(Data.theme.accent-text, 0.8)
             } else if ta.has-hover {
-                Constants.librepcb-color.darker(0.2)
-            } else if !enabled {
-                Constants.librepcb-color.darker(1)
+                Data.theme.accent.mix(Data.theme.accent-text, 0.9)
             } else {
-                Constants.librepcb-color
+                Data.theme.accent
             }
+        } else if ta.pressed {
+            Data.theme.control-checked
         } else if ta.has-hover {
-            #404040
+            Data.theme.control-hovered
         } else {
-            #202020
+            Data.theme.control
         }
-    }
-    border-color: Constants.librepcb-color;
-    border-width: fs.has-focus ? 1px : 0;
-    border-radius: self.height / 2;
+    };
+    border-color: {
+        if !enabled {
+            Data.theme.control-border-disabled
+        } else if has-focus {
+            Data.theme.accent
+        } else {
+            Data.theme.control-border
+        }
+    };
+    border-width: (primary && enabled) ? 0 : 1px;
     forward-focus: fs;
 
     // Accessibility
@@ -57,6 +63,19 @@ export component Button inherits Rectangle {
         ta.clicked();
     }
 
+    // Focus rectangle for primary button.
+    if enabled && primary && has-focus: Rectangle {
+        width: parent.width - 4px;
+        height: parent.height - 4px;
+        background: Data.theme.accent-text;
+
+        Rectangle {
+            width: parent.width - 2px;
+            height: parent.height - 2px;
+            background: Data.theme.accent;
+        }
+    }
+
     fs := FocusScope {
         enabled: enabled;
 
@@ -64,21 +83,19 @@ export component Button inherits Rectangle {
             enabled: enabled;
 
             HorizontalLayout {
-                padding-top: 4px;
-                padding-bottom: 4px;
+                padding-top: 2px;
+                padding-bottom: 2px;
                 padding-left: 10px;
                 padding-right: self.padding-left;
                 spacing: 7px;
                 alignment: center;
 
                 if icon.width > 0: Rectangle {
-                    y: (parent.height - self.height) / 2;
-                    width: self.height;
-                    height: 20px;
+                    width: 17px;
 
                     Image {
                         width: 100%;
-                        height: 100%;
+                        height: self.width;
                         image-fit: contain;
                         colorize: text-color;
                         source: icon;

@@ -1,10 +1,9 @@
-import { Palette } from "std-widgets.slint";
-import { IconButton } from "iconbutton.slint";
+import { ControlIconButton } from "iconbutton.slint";
 import { LinkText } from "linktext.slint";
+import { TextInput } from "textinput.slint";
 import { ToolTip } from "tooltip.slint";
 import {
     Backend,
-    Constants,
     Data,
     Helpers,
     Int64,
@@ -94,21 +93,24 @@ export component LengthEdit inherits Rectangle {
         }
     }
 
-    preferred-height: 28px;
-    background: #202020;
+    preferred-height: 25px;
+    background: enabled ? Data.theme.control : Data.theme.control-disabled;
     border-color: {
-        if enabled && (!parse-result.valid) {
-            edt.has-focus ? #ff0000 : #900000
+        if !enabled {
+            Data.theme.control-border-disabled
         } else if edt.has-focus {
-            Constants.librepcb-color
-        } else if enabled {
-            #606060
+            if !parse-result.valid {
+                Data.theme.base-text-error
+            } else {
+                Data.theme.accent
+            }
+        } else if !parse-result.valid {
+            Data.theme.control-border.mix(Data.theme.base-text-error, 0.6)
         } else {
-            transparent
+            Data.theme.control-border
         }
-    }
+    };
     border-width: 1px;
-    border-radius: 10px;
     forward-focus: edt;
 
     // A bit ugly: Ensure enough space for numbers in the typical range.
@@ -127,18 +129,23 @@ export component LengthEdit inherits Rectangle {
         enabled: enabled;
 
         l := HorizontalLayout {
-            padding-left: 8px;
-            padding-right: 2px;
+            padding-left: 5px;
+            padding-right: 1px;
             padding-top: self.padding-right;
             padding-bottom: self.padding-top;
             spacing: 5px;
 
-            if icon.width > 0: Image {
+            if icon.width > 0: Rectangle {
                 width: 12px;
-                image-fit: contain;
-                colorize: enabled ? Palette.foreground : #909090;
-                source: icon;
-                accessible-role: none;
+
+                Image {
+                    width: 100%;
+                    height: self.width;
+                    image-fit: contain;
+                    colorize: enabled ? Data.theme.control-text : Data.theme.control-text-disabled;
+                    source: icon;
+                    accessible-role: none;
+                }
 
                 if has-dropdown: Rectangle {
                     x: (parent.width - self.width) / 2;
@@ -148,7 +155,55 @@ export component LengthEdit inherits Rectangle {
 
                     Path {
                         commands: "M 100 0 L 50 40 L 0 0 Z";
-                        fill: enabled ? Palette.foreground : #909090;
+                        fill: enabled ? Data.theme.control-text : Data.theme.control-text-disabled;
+                    }
+                }
+            }
+
+            if auto-supported: VerticalLayout {
+                alignment: center;
+
+                Rectangle {
+                    width: auto-btn.preferred-width + 4px;
+                    height: auto-btn.preferred-height + 2px;
+                    background: {
+                        if auto-checked && (!enabled) {
+                            Data.theme.control-disabled.mix(Data.theme.control-checked, 0.5)
+                        } else if auto-checked {
+                            Data.theme.control-checked
+                        } else {
+                            transparent
+                        }
+                    };
+                    border-color: {
+                        if !enabled {
+                            Data.theme.control-border-disabled
+                        } else {
+                            Data.theme.control-border
+                        }
+                    };
+                    border-width: 1px;
+                    border-radius: 5px;
+
+                    auto-btn := LinkText {
+                        horizontal-alignment: center;
+                        vertical-alignment: center;
+                        font-size: 10.5px;
+                        text-color: {
+                            if auto-checked {
+                                Data.theme.control-text
+                            } else {
+                                Data.theme.control-text-muted
+                            }
+                        };
+                        text-color-disabled: Data.theme.control-text-disabled;
+                        text-color-hovered: Data.theme.control-text;
+                        text: "AUTO";
+                        enabled: enabled;
+
+                        clicked => {
+                            root.auto-toggled(!auto-checked);
+                        }
                     }
                 }
             }
@@ -161,15 +216,13 @@ export component LengthEdit inherits Rectangle {
                 vertical-alignment: center;
                 color: {
                     if !enabled {
-                        #909090
+                        Data.theme.control-text-disabled
                     } else if auto-supported && auto-checked {
-                        #a0a0a0
+                        Data.theme.control-text-muted
                     } else {
-                        Palette.foreground
+                        Data.theme.control-text
                     }
                 };
-                selection-background-color: Constants.librepcb-color;
-                selection-foreground-color: black;
                 enabled: enabled;
                 accessible-role: none;
 
@@ -216,11 +269,11 @@ export component LengthEdit inherits Rectangle {
                             decrease-triggered();
                         }
                         return accept;
-                    } else if (event.text == Key.PageUp) && can-change-unit {
+                    } else if (event.text == Key.PageUp) && enabled && can-change-unit {
                         disable-update = false;
                         unit-changed(Helpers.get-previous-unit(unit));
                         return accept;
-                    } else if (event.text == Key.PageDown) && can-change-unit {
+                    } else if (event.text == Key.PageDown) && enabled && can-change-unit {
                         disable-update = false;
                         unit-changed(Helpers.get-next-unit(unit));
                         return accept;
@@ -236,122 +289,91 @@ export component LengthEdit inherits Rectangle {
                 }
             }
 
-            Rectangle {
-                background: black;
-                border-top-right-radius: root.border-radius;
-                border-bottom-right-radius: root.border-radius;
-                clip: true;
-
-                HorizontalLayout {
-                    if can-increase || can-decrease: VerticalLayout {
-                        up-btn := IconButton {
-                            width: 15px;
-                            enabled: enabled && can-increase;
-                            background-color: black;
-                            icon: @image-url("../../../font-awesome/svgs/solid/caret-up.svg");
-                            icon-offset-y: 1px;
-                            accessible-label: "increase";
-
-                            clicked => {
-                                disable-update = false;
-                                increase-triggered();
-                            }
-                        }
-
-                        down-btn := IconButton {
-                            width: 15px;
-                            enabled: enabled && can-decrease;
-                            background-color: black;
-                            icon: @image-url("../../../font-awesome/svgs/solid/caret-down.svg");
-                            icon-offset-y: -1px;
-                            accessible-label: "decrease";
-
-                            clicked => {
-                                disable-update = false;
-                                decrease-triggered();
-                            }
-                        }
-                    }
-
-                    Rectangle {
-                        width: 1px;
-
-                        Rectangle {
-                            y: (parent.height - self.height) / 2;
-                            height: 15px;
-                            background: gray;
-                        }
-                    }
-
-                    unit-btn := LinkText {
-                        y: ((parent.height - self.height) / 2) - 1px;
-                        width: self.preferred-width + 10px;
-                        horizontal-alignment: center;
-                        vertical-alignment: center;
-                        text-color: Palette.foreground;
-                        text-color-disabled: #909090;
-                        text: Helpers.get-unit-short-str(root.unit);
-                        enabled: can-change-unit;
-
-                        // Accessibility
-                        accessible-description: "unit";
-                        accessible-label: Helpers.get-unit-accessibility-label(unit);
-                        accessible-expandable: true;
-                        accessible-action-expand => {
-                            unit-btn.clicked();
-                        }
+            HorizontalLayout {
+                if can-increase || can-decrease: VerticalLayout {
+                    up-btn := ControlIconButton {
+                        width: 15px;
+                        enabled: enabled && can-increase;
+                        background-color: transparent;
+                        icon: @image-url("../../../font-awesome/svgs/solid/caret-up.svg");
+                        icon-offset-y: 1px;
+                        accessible-label: "increase";
 
                         clicked => {
-                            unit-popup.show();
-                        }
-
-                        unit-popup := PopupWindow {
-                            x: (parent.width - self.preferred-width) / 2;
-                            y: parent.height + 2px;
-
-                            Rectangle {
-                                background: black;
-                                border-radius: 5px;
-
-                                VerticalLayout {
-                                    padding: 5px;
-                                    spacing: 5px;
-
-                                    for unit in Helpers.all-length-units: unit-item-btn := LinkText {
-                                        text: Helpers.get-unit-short-str(unit);
-                                        text-color: (unit == root.unit) ? Constants.librepcb-color : unit-btn.text-color;
-                                        horizontal-alignment: center;
-                                        accessible-label: Helpers.get-unit-accessibility-label(unit);
-
-                                        clicked => {
-                                            unit-changed(unit);
-                                        }
-                                    }
-                                }
-                            }
+                            disable-update = false;
+                            increase-triggered();
                         }
                     }
 
-                    if auto-supported: HorizontalLayout {
-                        Rectangle {
-                            y: (parent.height - self.height) / 2;
-                            width: 1px;
-                            height: 15px;
-                            background: gray;
+                    down-btn := ControlIconButton {
+                        width: 15px;
+                        enabled: enabled && can-decrease;
+                        background-color: transparent;
+                        icon: @image-url("../../../font-awesome/svgs/solid/caret-down.svg");
+                        icon-offset-y: -1px;
+                        accessible-label: "decrease";
+
+                        clicked => {
+                            disable-update = false;
+                            decrease-triggered();
                         }
+                    }
+                }
 
-                        auto-btn := LinkText {
-                            width: self.preferred-width + 10px;
-                            horizontal-alignment: center;
-                            vertical-alignment: center;
-                            font-size: 10.5px;
-                            text-color: auto-checked ? white : #909090;
-                            text-color-disabled: auto-checked ? #d0d0d0 : #707070;
-                            text: "AUTO";
-                            enabled: enabled;
+                Rectangle {
+                    y: (parent.height - self.height) / 2;
+                    width: 1px;
+                    height: 15px;
+                    background: Data.theme.control-border.with-alpha(0.5);
+                }
 
-                            clicked => {
-                                root.auto-toggled(!auto-checked);
+                unit-btn := LinkText {
+                    width: self.preferred-width + 8px;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                    text-color: Data.theme.control-text.mix(Data.theme.control-text-muted, 0.5);
+                    text-color-disabled: enabled ? Data.theme.control-text-muted : Data.theme.control-text-disabled;
+                    text-color-hovered: Data.theme.control-text;
+                    text: Helpers.get-unit-short-str(root.unit);
+                    enabled: enabled && can-change-unit;
+
+                    // Accessibility
+                    accessible-description: "unit";
+                    accessible-label: Helpers.get-unit-accessibility-label(unit);
+                    accessible-expandable: true;
+                    accessible-action-expand => {
+                        unit-btn.clicked();
+                    }
+
+                    clicked => {
+                        unit-popup.show();
+                    }
+
+                    unit-popup := PopupWindow {
+                        x: (parent.width - self.preferred-width) / 2;
+                        y: parent.height;
+
+                        Rectangle {
+                            background: Data.theme.control;
+                            border-color: Data.theme.control-border;
+                            border-width: 1px;
+
+                            VerticalLayout {
+                                padding: 5px;
+                                spacing: 5px;
+
+                                for unit in Helpers.all-length-units: unit-item-btn := LinkText {
+                                    text: Helpers.get-unit-short-str(unit);
+                                    text-color: Data.theme.control-text-muted;
+                                    text-color-hovered: Data.theme.control-text;
+                                    font-weight: (unit == root.unit) ? 600 : 400;
+                                    horizontal-alignment: center;
+                                    accessible-label: Helpers.get-unit-accessibility-label(unit);
+
+                                    clicked => {
+                                        unit-changed(unit);
+                                    }
+                                }
                             }
                         }
                     }

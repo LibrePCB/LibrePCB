@@ -1,5 +1,6 @@
 import { IconButton } from "widgets.slint";
 import { Tab } from "tab.slint";
+import { ControlsGalleryTab } from "controlsgallerytab.slint";
 import { HomeTab } from "hometab.slint";
 import { CreateLibraryTab } from "library/createlibrarytab.slint";
 import { DownloadLibraryTab } from "library/downloadlibrarytab.slint";
@@ -45,7 +46,7 @@ component TabBarDropArea inherits TabDropArea {
     if self.contains-drag: Rectangle {
         x: max(-parent.x, 0);
         width: 2px;
-        background: Constants.librepcb-color;
+        background: Data.theme.accent;
     }
 }
 
@@ -65,8 +66,17 @@ component TabButton inherits Rectangle {
     callback close-clicked;
 
     preferred-width: l.preferred-width;
+    min-width: self.height;
     max-width: max(l.preferred-width, tab.title.is-empty ? 0 : 200px);
-    background: is-current-tab ? #505050 : (ta.has-hover ? #454545 : #3a3a3a);
+    background: {
+        if is-current-tab {
+            Data.theme.base
+        } else if ta.has-hover {
+            Data.theme.control
+        } else {
+            Data.theme.window
+        }
+    };
 
     // Accessibility
     accessible-role: AccessibleRole.tab;
@@ -102,20 +112,29 @@ component TabButton inherits Rectangle {
 
     l := HorizontalLayout {
         padding-left: 4px;
-        padding-right: 2px;
+        padding-right: tab.title.is-empty ? 4px : 2px;
         spacing: 3px;
+        alignment: tab.title.is-empty ? center : stretch;
+
+        property <color> color: {
+            if is-current-tab {
+                Data.theme.base-text-hovered
+            } else {
+                Data.theme.base-text.mix(Data.theme.base-text-muted, 0.5)
+            }
+        };
 
         Image {
             width: 16px;
             source: Helpers.get-icon-for-tab-type(tab.type);
-            colorize: txt.color;
+            colorize: color;
             accessible-role: none;
         }
 
-        txt := Text {
+        if !tab.title.is-empty: txt := Text {
             min-width: 0;
             vertical-alignment: center;
-            color: is-current-tab ? white : #a0a0a0;
+            color: color;
             text: tab.title;
             overflow: elide;
             accessible-role: none;
@@ -127,7 +146,7 @@ component TabButton inherits Rectangle {
             y: (parent.height - self.height) / 2;
             height: parent.height * 0.6;
             icon-scale: circle ? 0.5 : 0.7;
-            color-enabled: txt.color;
+            color-enabled: Data.theme.base-text;
             border-radius: 3px;
             icon: {
                 if circle {
@@ -144,12 +163,32 @@ component TabButton inherits Rectangle {
         }
     }
 
-    if is-current-section && is-current-tab: Rectangle {
+    Rectangle {
         x: 0;
         y: 0;
         width: 100%;
         height: 1px;
-        background: #29d682;
+        background: {
+            if is-current-section && is-current-tab {
+                Data.theme.accent
+            } else if is-current-tab {
+                Data.theme.control-text-disabled
+            } else {
+                Data.theme.base-border
+            }
+        };
+    }
+
+    Rectangle {
+        x: parent.width - 1px;
+        width: 1px;
+        background: Data.theme.base-border;
+    }
+
+    if !is-current-tab: Rectangle {
+        y: parent.height - 1px;
+        height: 1px;
+        background: Data.theme.base-border;
     }
 }
 
@@ -170,11 +209,17 @@ export component WindowSection inherits Rectangle {
             x: 0;
             y: 0;
             z: 100;  // For the tooltips
-            height: 30px;
-            background: #2c2c2c;
+            height: 26px;
+            background: Data.theme.window;
 
             // Accessibility
             accessible-role: tab-list;
+
+            Rectangle {
+                y: parent.height - 1px;
+                height: 1px;
+                background: Data.theme.base-border;
+            }
 
             HorizontalLayout {
                 for tab[index] in section.tabs: tab-btn := TabButton {
@@ -233,12 +278,18 @@ export component WindowSection inherits Rectangle {
             y: tab-bar.height;
             width: root.width;
             height: parent.height - self.y;
+            background: Data.theme.base;
 
             // Accessibility
             accessible-role: tab-panel;
 
             if !tab-open: empty-tab := Tab {
                 show-watermark: true;
+            }
+
+            if tab-open && (tab-type == TabType.controls-gallery): ControlsGalleryTab {
+                width: 100%;
+                height: 100%;
             }
 
             if tab-open && (tab-type == TabType.home): home-tab := HomeTab {
@@ -369,7 +420,7 @@ export component WindowSection inherits Rectangle {
             property <float> highlight-percentage: section.highlight ? 1.2 : 0;
             animate highlight-percentage { duration: 700ms; }
             if highlight-percentage > 0: Rectangle {
-                border-color: #29d682;
+                border-color: Data.theme.accent;
                 border-width: 3px;
                 opacity: section.highlight ? (1.2 - highlight-percentage) : 0;
             }

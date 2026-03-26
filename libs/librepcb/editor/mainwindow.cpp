@@ -286,7 +286,9 @@ MainWindow::MainWindow(GuiApplication& app,
         return handled;
       });
   b.on_request_project_preview(
-      [this](const slint::SharedString& fp, float width) {
+      [this](const slint::SharedString& fp, float width, const ui::Theme&) {
+        // Theme is not used, but needs to be a dependency of this callback
+        // to trigger re-rendering when the theme colors have changed.
         const qreal scale = mWidget->devicePixelRatioF();
         mProjectPreviewRenderer->request(FilePath(s2q(fp)),
                                          static_cast<int>(width * scale));

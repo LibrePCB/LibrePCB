@@ -31,10 +31,14 @@ import {
     TreeViewItemData,
     WindowSectionData,
 } from "types.slint";
+import { Theme, Themes } from "themes.slint";
 
 export global Data {
     // Preview mode: True for preview, set to false by the backend
     in property <bool> preview-mode: true;
+
+    // Theme (will be overridden by the backend at runtime)
+    in property <Theme> theme: Themes.dark;
 
     // Window data
     in property <int> window-id: 1;
@@ -140,6 +144,10 @@ export global Data {
                         undo: FeatureState.enabled,
                         redo: FeatureState.enabled,
                     },
+                },
+                {
+                    type: TabType.controls-gallery,
+                    title: "Controls",
                 },
             ],
             create-library-tabs: [
@@ -567,6 +575,13 @@ export global Data {
                                 description: "Hint description.",
                                 approved: false,
                                 supports-autofix: true,
+                            },
+                            {
+                                severity: NotificationType.warning,
+                                message: "Warning message",
+                                description: "Warning description.",
+                                approved: false,
+                                supports-autofix: false,
                             },
                         ],
                         unapproved: 0,

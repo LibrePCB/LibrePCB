@@ -1,43 +1,75 @@
 import { LinkText } from "linktext.slint";
+import { Data } from "../api.slint";
 
-export struct NavBarItemData {
+export struct NavBarPageData {
+    id: int,
     title: string,
     disabled: bool,
 }
 
-export component NavBar inherits HorizontalLayout {
-    in property <[NavBarItemData]> items;
-    in-out property <int> current-index: 0;
+export component NavBar inherits VerticalLayout {
+    in property <[NavBarPageData]> pages;
+    in-out property <int> current-id: 0;
 
-    callback page-clicked(index: int);
-    page-clicked(index) => {
-        current-index = index;
+    callback page-clicked(id: int);
+    page-clicked(id) => {
+        current-id = id;
     }
 
     height: self.preferred-height;
-    alignment: start;
 
-    for item[index] in items: item-l := HorizontalLayout {
-        item-btn := LinkText {
-            width: self.preferred-width + 16px;
-            height: self.preferred-height + 16px;
-            vertical-alignment: center;
-            horizontal-alignment: center;
-            text: item.title;
-            text-color: (index == current-index) ? #e0e0e0 : #909090;
-            text-color-hovered: (index == current-index) ? #ffffff : #a0a0a0;
-            enabled: !item.disabled;
+    HorizontalLayout {
+        z: 1; // Lift over the bottom border, for the accent bar.
+        alignment: start;
+        padding-top: 4px;
 
-            clicked => {
-                page-clicked(index);
+        for page[index] in pages: item-l := HorizontalLayout {
+            item-btn := LinkText {
+                width: self.preferred-width + 16px;
+                height: self.preferred-height + 6px;
+                vertical-alignment: center;
+                horizontal-alignment: center;
+                text: page.title;
+                text-color: {
+                    if page.id == current-id {
+                        Data.theme.base-text-hovered
+                    } else {
+                        Data.theme.base-text.mix(Data.theme.base-text-muted, 0.5)
+                    }
+                };
+                text-color-hovered: {
+                    if page.id == current-id {
+                        Data.theme.base-text-hovered
+                    } else {
+                        Data.theme.base-text
+                    }
+                };
+                enabled: !page.disabled;
+
+                clicked => {
+                    page-clicked(page.id);
+                }
+
+                if page.id == current-id: Rectangle {
+                    x: (parent.width - parent.preferred-width) / 2;
+                    y: parent.height - self.height;
+                    width: parent.preferred-width;
+                    height: 2px;
+                    background: Data.theme.accent;
+                }
+            }
+
+            if (index + 1) < pages.length: Text {
+                text: "•";
+                color: Data.theme.base-text-disabled;
+                vertical-alignment: center;
+                accessible-role: none;
             }
         }
+    }
 
-        if (index + 1) < items.length: Text {
-            text: "•";
-            color: #909090;
-            vertical-alignment: center;
-            accessible-role: none;
-        }
+    Rectangle {
+        height: 1px;
+        background: Data.theme.base-border;
     }
 }

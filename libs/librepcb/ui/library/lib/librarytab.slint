@@ -1,4 +1,3 @@
-import { ScrollView } from "std-widgets.slint";
 import { Tab } from "../../tab.slint";
 import { LibraryTreeView } from "../librarytreeview.slint";
 import {
@@ -22,13 +21,14 @@ import {
     Button,
     IconButton,
     LineEdit,
-    SlideView,
+    NavBar,
+    OverlayDialog,
+    ScrollView,
     Spinner,
     TextEdit,
 } from "../../widgets.slint";
 import {
     Backend,
-    Constants,
     Data,
     EditorCommandSet as Cmd,
     FeatureState,
@@ -54,7 +54,7 @@ component ChooseLibraryPopupListItem inherits TouchArea {
     }
 
     if self.height > 0: Rectangle {
-        background: parent.has-hover ? #383838 : transparent;
+        background: parent.has-hover ? Data.theme.control-hovered : transparent;
 
         HorizontalLayout {
             padding-left: 6px;
@@ -75,88 +75,57 @@ component ChooseLibraryPopupListItem inherits TouchArea {
                 vertical-alignment: center;
                 overflow: elide;
                 text: name;
+                color: root.has-hover ? Data.theme.base-text : Data.theme.control-text;
                 accessible-role: none;
             }
         }
     }
 }
 
-component AddLibraryDependencyPopup inherits PopupWindow {
+component AddLibraryDependencyDialog inherits OverlayDialog {
     in-out property <[LibraryDependency]> model;
 
     callback item-clicked(idx: int);
 
-    Rectangle {
-        background: #00000050;
+    view := ScrollView {
+        preferred-width: l.preferred-width;
+        preferred-height: l.preferred-height;
+        mouse-drag-pan-enabled: true;
 
-        Rectangle {
-            width: min(0.8 * parent.width, 500px);
-            height: min(self.preferred-height, 0.8 * parent.height);
-            background: #000000;
-            border-radius: 15px;
-            border-width: 1px;
-            border-color: Constants.librepcb-color;
+        l := VerticalLayout {
+            for item[idx] in model: item-ta := ChooseLibraryPopupListItem {
+                height: item.checked ? 0 : 26px;
+                icon: item.icon;
+                name: item.name;
+                accessible-item-index: idx;
 
-            VerticalLayout {
-                padding: 15px;
-
-                view := ScrollView {
-                    preferred-width: l.preferred-width;
-                    preferred-height: l.preferred-height;
-
-                    l := VerticalLayout {
-                        for item[idx] in model: item-ta := ChooseLibraryPopupListItem {
-                            height: item.checked ? 0 : 26px;
-                            icon: item.icon;
-                            name: item.name;
-                            accessible-item-index: idx;
-
-                            clicked => {
-                                item-clicked(idx);
-                            }
-                        }
-                    }
+                clicked => {
+                    item-clicked(idx);
                 }
             }
         }
     }
 }
 
-component ChooseLocalLibraryPopup inherits PopupWindow {
+component ChooseLocalLibraryDialog inherits OverlayDialog {
     in property <string> hide-library-with-path;
 
     callback item-clicked(path: string);
 
-    Rectangle {
-        background: #00000050;
+    view := ScrollView {
+        preferred-width: l.preferred-width;
+        preferred-height: l.preferred-height;
+        mouse-drag-pan-enabled: true;
 
-        Rectangle {
-            width: min(0.8 * parent.width, 500px);
-            height: min(self.preferred-height, 0.8 * parent.height);
-            background: #000000;
-            border-radius: 15px;
-            border-width: 1px;
-            border-color: Constants.librepcb-color;
+        l := VerticalLayout {
+            for item[idx] in Data.local-libraries: item-ta := ChooseLibraryPopupListItem {
+                height: (item.path == hide-library-with-path) ? 0 : 26px;
+                icon: item.icon;
+                name: item.name;
+                accessible-item-index: idx;
 
-            VerticalLayout {
-                padding: 15px;
-
-                view := ScrollView {
-                    preferred-width: l.preferred-width;
-                    preferred-height: l.preferred-height;
-
-                    l := VerticalLayout {
-                        for item[idx] in Data.local-libraries: item-ta := ChooseLibraryPopupListItem {
-                            height: (item.path == hide-library-with-path) ? 0 : 26px;
-                            icon: item.icon;
-                            name: item.name;
-                            accessible-item-index: idx;
-
-                            clicked => {
-                                item-clicked(item.path);
-                            }
-                        }
-                    }
+                clicked => {
+                    item-clicked(item.path);
                 }
             }
         }
@@ -166,6 +135,7 @@ component ChooseLocalLibraryPopup inherits PopupWindow {
 component LibraryMetadataTab inherits GridLayout {
     in property <int> section-index;
     in-out property <[LibraryTabData]> tabs;
+    in-out property <bool> show-add-dependency-dialog;
     in property <int> index;
     in property <bool> read-only;
 
@@ -294,7 +264,7 @@ component LibraryMetadataTab inherits GridLayout {
         deprecated-sw := DeprecatedRowCell {
             text: @tr("Check this if this library should no longer be used.");
             checked: tabs[index].deprecated;
-            enabled: !read-only;
+            read-only: read-only;
             accessible-label: deprecated-txt.text;
 
             toggled(checked) => {
@@ -332,7 +302,7 @@ component LibraryMetadataTab inherits GridLayout {
             read-only: read-only;
 
             add-dependency-clicked => {
-                add-dependency-popup.show();
+                show-add-dependency-dialog = true;
             }
         }
     }
@@ -373,16 +343,6 @@ component LibraryMetadataTab inherits GridLayout {
     Row {
         Rectangle { }
     }
-
-    add-dependency-popup := AddLibraryDependencyPopup {
-        width: parent.width;
-        height: parent.height;
-        model: tabs[index].dependencies;
-
-        item-clicked(idx) => {
-            self.model[idx].checked = true;
-        }
-    }
 }
 
 component LibraryImportButton inherits TouchArea {
@@ -400,8 +360,16 @@ component LibraryImportButton inherits TouchArea {
 
     Rectangle {
         height: self.preferred-height;
-        background: parent.pressed ? #303030 : (parent.has-hover ? #2a2a2a : #252525);
-        border-color: #808080;
+        background: {
+            if parent.pressed {
+                Data.theme.control-checked;
+            } else if parent.has-hover {
+                Data.theme.control-hovered;
+            } else {
+                Data.theme.control;
+            }
+        };
+        border-color: Data.theme.base-border;
         border-width: 1px;
 
         HorizontalLayout {
@@ -424,6 +392,7 @@ component LibraryImportButton inherits TouchArea {
 
                 title-txt := Text {
                     font-size: 20px;
+                    color: Data.theme.control-text;
                     overflow: elide;
                     horizontal-alignment: center;
                     text: @tr("Import {} Libraries", name);
@@ -436,7 +405,7 @@ component LibraryImportButton inherits TouchArea {
 
                 description-txt := Text {
                     font-size: 14px;
-                    color: #909090;
+                    color: Data.theme.control-text-muted;
                     horizontal-alignment: center;
                     wrap: word-wrap;
                     text: @tr("Start populating this library by importing {} library elements.", name);
@@ -511,7 +480,9 @@ component NewLibraryElementButton inherits IconButton {
     height: 35px;
     border-radius: self.height / 2;
     colorize: false;
-    background-color: #101010;
+    background-color: Data.theme.control;
+    border-color: Data.theme.base-border;
+    border-width: 1px;
     icon-scale: 0.6;
     tooltip-position: left;
     tooltip-delayed: false;
@@ -545,6 +516,7 @@ component LibraryTreeViewToolBar inherits Rectangle {
         padding: 5px;
 
         Text {
+            color: Data.theme.base-text;
             overflow: elide;
             text: @tr("" | "{n} selected item(s)" % count) + ":";
         }
@@ -590,15 +562,9 @@ component LibraryTreeViewToolBar inherits Rectangle {
 component LibraryContentTab inherits HorizontalLayout {
     in property <int> section-index;
     in-out property <[LibraryTabData]> tabs;
+    in-out property <LibraryElementsMoveAction> move-or-copy-action;
     in property <int> index;
     in property <bool> read-only;
-    property <LibraryElementsMoveAction> move-or-copy-action;
-
-    // If the tab is switched, restore scroll positions.
-    changed index => {
-        categories-view.restore-scroll-position();
-        elements-view.restore-scroll-position();
-    }
 
     VerticalLayout {
         horizontal-stretch: 20;
@@ -614,6 +580,7 @@ component LibraryContentTab inherits HorizontalLayout {
                 width: 16px;
                 height: self.width;
                 indeterminate: true;
+                foreground-color: Data.theme.control-text;
             }
 
             if !read-only: new-cmpcat-btn := NewLibraryElementButton {
@@ -637,17 +604,6 @@ component LibraryContentTab inherits HorizontalLayout {
 
                 clicked => {
                     Backend.trigger-library(Data.libraries[tabs[index].library-index].path, LibraryAction.new-package-category);
-                }
-            }
-
-            move-or-copy-category-popup := ChooseLocalLibraryPopup {
-                width: parent.width;
-                height: parent.height;
-                hide-library-with-path: Data.libraries[tabs[index].library-index].path;
-
-                item-clicked(path) => {
-                    tabs[index].move-or-copy-to-lib = path;
-                    tabs[index].move-or-copy-action = move-or-copy-action;
                 }
             }
 
@@ -691,12 +647,10 @@ component LibraryContentTab inherits HorizontalLayout {
 
             copy-clicked => {
                 move-or-copy-action = LibraryElementsMoveAction.copy-categories;
-                move-or-copy-category-popup.show();
             }
 
             move-clicked => {
                 move-or-copy-action = LibraryElementsMoveAction.move-categories;
-                move-or-copy-category-popup.show();
             }
 
             remove-clicked => {
@@ -707,7 +661,7 @@ component LibraryContentTab inherits HorizontalLayout {
 
     Rectangle {
         width: 1px;
-        background: #555555;
+        background: Data.theme.base-border;
     }
 
     VerticalLayout {
@@ -720,7 +674,8 @@ component LibraryContentTab inherits HorizontalLayout {
 
             if self.model.length == 0: Text {
                 width: 0.8 * parent.width;
-                color: #808080;
+                preferred-width: 0; // Do not influence the width of the view.
+                color: Data.theme.control-text-muted;
                 font-size: 18px;
                 wrap: word-wrap;
                 horizontal-alignment: center;
@@ -733,6 +688,7 @@ component LibraryContentTab inherits HorizontalLayout {
                 width: 16px;
                 height: self.width;
                 indeterminate: true;
+                foreground-color: Data.theme.control-text;
             }
 
             if !read-only: new-dev-btn := NewLibraryElementButton {
@@ -780,17 +736,6 @@ component LibraryContentTab inherits HorizontalLayout {
                 }
             }
 
-            move-or-copy-element-popup := ChooseLocalLibraryPopup {
-                width: parent.width;
-                height: parent.height;
-                hide-library-with-path: Data.libraries[tabs[index].library-index].path;
-
-                item-clicked(path) => {
-                    tabs[index].move-or-copy-to-lib = path;
-                    tabs[index].move-or-copy-action = move-or-copy-action;
-                }
-            }
-
             focus-gained(reason) => {
                 Data.set-current-tab(section-index, index);
             }
@@ -828,12 +773,10 @@ component LibraryContentTab inherits HorizontalLayout {
 
             copy-clicked => {
                 move-or-copy-action = LibraryElementsMoveAction.copy-elements;
-                move-or-copy-element-popup.show();
             }
 
             move-clicked => {
                 move-or-copy-action = LibraryElementsMoveAction.move-elements;
-                move-or-copy-element-popup.show();
             }
 
             remove-clicked => {
@@ -851,80 +794,93 @@ export component LibraryTab inherits Tab {
     property <bool> read-only: section.tabs[index].features.save != FeatureState.enabled;
     property <bool> compact-layout: self.width < 1024px;
 
-    // Wizard mode: Only one page at a time.
-    if tabs[index].wizard-mode && (tabs[index].page-index <= 0): LibraryMetadataTab {
-        section-index: section-index;
-        tabs: tabs;
-        index: index;
-        read-only: read-only;
+    VerticalLayout {
+        // Pages in wizard mode:
+        //  [0] Metadata tab: Set metadata
+        //  [1] Import tab: Import library elements
+        //
+        // Pages in normal mode:
+        //  [0] Metadata tab
+        //  [1] Import tab
+        //  [2] Content tab
+
+        if !tabs[index].wizard-mode && compact-layout: navbar := NavBar {
+            pages: [
+                { id: 0, title: @tr("Metadata") },
+                { id: 1, title: @tr("Import"), disabled: read-only },
+                { id: 2, title: @tr("Library Content") },
+            ];
+            current-id: tabs[index].page-index;
+
+            page-clicked(id) => {
+                Data.set-current-tab(section-index, index);
+                tabs[index].page-index = id;
+            }
+        }
+
+        HorizontalLayout {
+            property <bool> side-by-side: (!tabs[index].wizard-mode) && (!compact-layout);
+
+            if side-by-side || (tabs[index].page-index >= 2): content-tab := LibraryContentTab {
+                horizontal-stretch: 1;
+                section-index: section-index;
+                tabs: tabs;
+                index: index;
+                read-only: read-only;
+                move-or-copy-action <=> move-or-copy-action;
+            }
+
+            if tabs[index].page-index == 1: import-tab := LibraryImportTab {
+                section-index: section-index;
+                tabs: tabs;
+                index: index;
+            }
+
+            if side-by-side: Rectangle {
+                width: 1px;
+                background: Data.theme.base-border;
+            }
+
+            if side-by-side || (tabs[index].page-index <= 0): metadata-tab := LibraryMetadataTab {
+                horizontal-stretch: 1;
+                max-width: side-by-side ? min(500px, parent.width * 0.4) : root.width;
+                section-index: section-index;
+                tabs: tabs;
+                index: index;
+                read-only: read-only;
+                show-add-dependency-dialog <=> show-add-dependency-dialog;
+            }
+        }
     }
-    if tabs[index].wizard-mode && (tabs[index].page-index >= 1): LibraryImportTab {
-        section-index: section-index;
-        tabs: tabs;
-        index: index;
-    }
 
-    // Normal mode: Content left, metadata right.
-    if (!tabs[index].wizard-mode) && (!compact-layout): HorizontalLayout {
-        LibraryContentTab {
-            horizontal-stretch: 1;
-            section-index: section-index;
-            tabs: tabs;
-            index: index;
-            read-only: read-only;
+    property <bool> show-add-dependency-dialog: false;
+    if show-add-dependency-dialog: add-dependency-dialog := AddLibraryDependencyDialog {
+        model: tabs[index].dependencies;
+
+        item-clicked(idx) => {
+            self.model[idx].checked = true;
+            show-add-dependency-dialog = false;
         }
 
-        Rectangle {
-            width: 1px;
-            background: #555555;
-        }
-
-        LibraryMetadataTab {
-            horizontal-stretch: 1;
-            max-width: min(500px, parent.width * 0.4);
-            section-index: section-index;
-            tabs: tabs;
-            index: index;
-            read-only: read-only;
+        rejected => {
+            show-add-dependency-dialog = false;
         }
     }
 
-    // Compact mode: Slide between metadata, import and content.
-    if (!tabs[index].wizard-mode) && compact-layout: SlideView {
-        pages: [
-            { title: @tr("Metadata") },
-            { title: @tr("Import"), disabled: read-only },
-            { title: @tr("Library Content") },
-        ];
-        current-index: tabs[index].page-index;
-        duration: 0;  // Temporary, needs proper refactoring.
+    property <LibraryElementsMoveAction> move-or-copy-action: none;
+    if move-or-copy-action != LibraryElementsMoveAction.none: move-or-copy-category-popup := ChooseLocalLibraryDialog {
+        width: parent.width;
+        height: parent.height;
+        hide-library-with-path: Data.libraries[tabs[index].library-index].path;
 
-        LibraryMetadataTab {
-            width: parent.width;
-            section-index: section-index;
-            tabs: tabs;
-            index: index;
-            read-only: read-only;
+        item-clicked(path) => {
+            tabs[index].move-or-copy-to-lib = path;
+            tabs[index].move-or-copy-action = move-or-copy-action;
+            move-or-copy-action = LibraryElementsMoveAction.none;
         }
 
-        LibraryImportTab {
-            width: parent.width;
-            section-index: section-index;
-            tabs: tabs;
-            index: index;
-        }
-
-        LibraryContentTab {
-            width: parent.width;
-            section-index: section-index;
-            tabs: tabs;
-            index: index;
-            read-only: read-only;
-        }
-
-        page-clicked(idx) => {
-            Data.set-current-tab(section-index, index);
-            tabs[index].page-index = idx;
+        rejected => {
+            move-or-copy-action = LibraryElementsMoveAction.none;
         }
     }
 }

@@ -1,8 +1,7 @@
-import { ListView } from "std-widgets.slint";
 import {
     IconButton,
+    ListView,
     ListViewItemButton,
-    Palette,
     PanelHeader,
 } from "widgets.slint";
 import {
@@ -11,6 +10,7 @@ import {
     GraphicsLayerData,
     Helpers,
     TabAction,
+    TabType,
 } from "api.slint";
 
 component GraphicsLayerListItem inherits Rectangle {
@@ -18,12 +18,21 @@ component GraphicsLayerListItem inherits Rectangle {
     in property <int> index;
     in property <bool> enabled: true;
     in property <bool> selected: false;
+    in property <color> background-color;
     property <GraphicsLayerData> item: model[index];
 
     callback clicked <=> ta.clicked;
     callback double-clicked <=> ta.double-clicked;
 
-    background: ta.has-hover ? #404040 : (selected ? #353535 : transparent);
+    background: {
+        if selected {
+            Data.theme.control-checked
+        } else if ta.has-hover {
+            Data.theme.control-hovered
+        } else {
+            transparent
+        }
+    };
 
     // Accessibility
     accessible-role: list-item;
@@ -42,7 +51,11 @@ component GraphicsLayerListItem inherits Rectangle {
         y: 0;
         width: self.height;
         height: 100%;
-        background: item.color;
+        background: background-color;
+
+        Rectangle {
+            background: item.color;
+        }
     }
 
     ta := TouchArea {
@@ -66,6 +79,17 @@ component GraphicsLayerListItem inherits Rectangle {
                 tooltip: @tr("Toggle Visibility");
                 tooltip-side: right;
                 enabled: root.enabled;
+                colorize: {
+                    if !root.enabled {
+                        Data.theme.control-text-disabled
+                    } else if item.visible {
+                        Data.theme.control-text
+                    } else if self.has-hover {
+                        Data.theme.control-text.mix(Data.theme.control-text-muted, 0.5)
+                    } else {
+                        Data.theme.control-text-muted
+                    }
+                };
 
                 clicked => {
                     model[index].visible = !item.visible;
@@ -76,18 +100,27 @@ component GraphicsLayerListItem inherits Rectangle {
                 vertical-alignment: center;
                 font-size: 12px;
                 overflow: elide;
-                color: (root.enabled && item.visible) ? Palette.foreground : #707070;
+                color: (root.enabled && item.visible) ? Data.theme.control-text : Data.theme.control-text-muted;
                 text: item.name;
             }
         }
     }
 }
 
-export component GraphicsLayersPanel inherits Rectangle {
+export component GraphicsLayersPanel inherits FocusScope {
     property <length> item-height: 22px;
     in-out property <[GraphicsLayerData]> model: Data.current-tab.layers;
     property <int> selected-index: -1;
     property <bool> item-selected: (selected-index >= 0) && (selected-index < model.length);
+    property <color> background-color: {
+        if Data.current-tab.type == TabType.board-2d {
+            Data.current-board-2d-tab.background-color
+        } else if Data.current-tab.type == TabType.package {
+            Data.current-package-tab.background-color
+        } else {
+            Data.theme.base;
+        }
+    };
 
     function set-current-index(index: int) {
         if ((index + 1) * item-height) > (view.height - view.viewport-y) {
@@ -98,119 +131,116 @@ export component GraphicsLayersPanel inherits Rectangle {
         selected-index = index;
     }
 
-    background: #2a2a2a;
-
     // Set focus when panel is shown. Not sure if it's always desired(?).
     init => {
-        fs.focus();
+        root.focus();
     }
 
-    fs := FocusScope {
-        VerticalLayout {
-            header := PanelHeader {
-                z: 10;  // For the tooltip.
-                title: @tr("Layers").to-uppercase();
-                highlight: fs.has-focus;
+    VerticalLayout {
+        header := PanelHeader {
+            z: 10;  // For the tooltip.
+            title: @tr("Layers").to-uppercase();
+            highlight: root.has-focus;
 
-                top-btn := IconButton {
-                    width: self.height;
-                    icon: @image-url("../../bootstrap-icons/icons/front.svg");
-                    icon-scale: 0.6;
-                    tooltip: @tr("Top Layers");
+            top-btn := IconButton {
+                width: self.height;
+                icon: @image-url("../../bootstrap-icons/icons/front.svg");
+                icon-scale: 0.6;
+                tooltip: @tr("Top Layers");
 
-                    clicked => {
-                        Helpers.trigger-current-tab-action(TabAction.layers-top);
-                    }
-                }
-
-                bot-btn := IconButton {
-                    width: self.height;
-                    icon: @image-url("../../bootstrap-icons/icons/back.svg");
-                    icon-scale: 0.6;
-                    tooltip: @tr("Bottom Layers");
-
-                    clicked => {
-                        Helpers.trigger-current-tab-action(TabAction.layers-bottom);
-                    }
-                }
-
-                top-bot-btn := IconButton {
-                    width: self.height;
-                    icon: @image-url("../../bootstrap-icons/icons/union.svg");
-                    icon-scale: 0.6;
-                    tooltip: @tr("Top + Bottom Layers");
-
-                    clicked => {
-                        Helpers.trigger-current-tab-action(TabAction.layers-top-bottom);
-                    }
-                }
-
-                show-all-btn := IconButton {
-                    width: self.height;
-                    icon: @image-url("../../bootstrap-icons/icons/eye-fill.svg");
-                    icon-scale: 0.7;
-                    tooltip: @tr("Show All");
-
-                    clicked => {
-                        Helpers.trigger-current-tab-action(TabAction.layers-all);
-                    }
-                }
-
-                hide-all-btn := IconButton {
-                    width: self.height;
-                    icon: @image-url("../../bootstrap-icons/icons/eye-slash-fill.svg");
-                    icon-scale: 0.7;
-                    tooltip: @tr("Hide All");
-
-                    clicked => {
-                        Helpers.trigger-current-tab-action(TabAction.layers-none);
-                    }
-                }
-
-                layer-setup-btn := IconButton {
-                    width: self.height;
-                    icon: @image-url("../../font-awesome/svgs/solid/sliders.svg");
-                    icon-scale: 0.7;
-                    tooltip: @tr("Layer Setup");
-
-                    clicked => {
-                        Helpers.trigger-current-board-action(BoardAction.open-setup-dialog);
-                    }
+                clicked => {
+                    Helpers.trigger-current-tab-action(TabAction.layers-top);
                 }
             }
 
-            view := ListView {
-                vertical-stretch: 1;
-                visible: model.length > 0;
+            bot-btn := IconButton {
+                width: self.height;
+                icon: @image-url("../../bootstrap-icons/icons/back.svg");
+                icon-scale: 0.6;
+                tooltip: @tr("Bottom Layers");
 
-                for layer[index] in model: item := GraphicsLayerListItem {
-                    height: item-height;
-                    model: model;
-                    index: index;
-                    selected: (index == selected-index);
+                clicked => {
+                    Helpers.trigger-current-tab-action(TabAction.layers-bottom);
+                }
+            }
 
-                    clicked => {
-                        set-current-index(index);
-                        fs.focus();
-                    }
+            top-bot-btn := IconButton {
+                width: self.height;
+                icon: @image-url("../../bootstrap-icons/icons/union.svg");
+                icon-scale: 0.6;
+                tooltip: @tr("Top + Bottom Layers");
+
+                clicked => {
+                    Helpers.trigger-current-tab-action(TabAction.layers-top-bottom);
+                }
+            }
+
+            show-all-btn := IconButton {
+                width: self.height;
+                icon: @image-url("../../bootstrap-icons/icons/eye-fill.svg");
+                icon-scale: 0.7;
+                tooltip: @tr("Show All");
+
+                clicked => {
+                    Helpers.trigger-current-tab-action(TabAction.layers-all);
+                }
+            }
+
+            hide-all-btn := IconButton {
+                width: self.height;
+                icon: @image-url("../../bootstrap-icons/icons/eye-slash-fill.svg");
+                icon-scale: 0.7;
+                tooltip: @tr("Hide All");
+
+                clicked => {
+                    Helpers.trigger-current-tab-action(TabAction.layers-none);
+                }
+            }
+
+            layer-setup-btn := IconButton {
+                width: self.height;
+                icon: @image-url("../../font-awesome/svgs/solid/sliders.svg");
+                icon-scale: 0.7;
+                tooltip: @tr("Layer Setup");
+
+                clicked => {
+                    Helpers.trigger-current-board-action(BoardAction.open-setup-dialog);
                 }
             }
         }
 
-        key-pressed(event) => {
-            if (event.text == Key.DownArrow) && (selected-index < model.length - 1) {
-                set-current-index(selected-index + 1);
-                return accept;
-            } else if (event.text == Key.UpArrow) && (selected-index > 0) {
-                set-current-index(selected-index - 1);
-                return accept;
-            } else if item-selected {
-                if event.text == Key.Space {
-                    model[selected-index].visible = !model[selected-index].visible;
-                    return accept;
+        view := ListView {
+            vertical-stretch: 1;
+            visible: model.length > 0;
+
+            for layer[index] in model: item := GraphicsLayerListItem {
+                height: item-height;
+                model: model;
+                index: index;
+                selected: (index == selected-index);
+                background-color: background-color;
+
+                clicked => {
+                    set-current-index(index);
+                    root.focus();
                 }
             }
-            reject
         }
+    }
+
+    key-pressed(event) => {
+        if (event.text == Key.DownArrow) && (selected-index < model.length - 1) {
+            set-current-index(selected-index + 1);
+            return accept;
+        } else if (event.text == Key.UpArrow) && (selected-index > 0) {
+            set-current-index(selected-index - 1);
+            return accept;
+        } else if item-selected {
+            if event.text == Key.Space {
+                model[selected-index].visible = !model[selected-index].visible;
+                return accept;
+            }
+        }
+        reject
     }
 }

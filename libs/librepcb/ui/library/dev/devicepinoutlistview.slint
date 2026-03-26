@@ -1,6 +1,5 @@
-import { ScrollView } from "std-widgets.slint";
-import { ComboBox } from "../../widgets.slint";
-import { DevicePinoutData } from "../../api.slint";
+import { ComboBox, ScrollView } from "../../widgets.slint";
+import { Data, DevicePinoutData } from "../../api.slint";
 
 export component DevicePinoutListView inherits ScrollView {
     in-out property <[DevicePinoutData]> model;
@@ -27,6 +26,7 @@ export component DevicePinoutListView inherits ScrollView {
                 vertical-alignment: center;
                 overflow: elide;
                 text: item.pad-name + ":";
+                color: Data.theme.control-text;
                 accessible-role: none;
             }
         }
@@ -57,11 +57,12 @@ export component DevicePinoutListView inherits ScrollView {
                 // combobox is still operational, so the user can fix the
                 // error by assigning a valid signal.
                 if (item.signal-index < 0) || (item.signal-index >= signal-names.length): HorizontalLayout {
+                    padding-top: 1px;
                     padding-left: 8px;
                     padding-right: 15px;  // Skip the drop-down arrow
 
                     signal-uuid-txt := Text {
-                        color: red;
+                        color: Data.theme.base-text-error;
                         horizontal-alignment: left;
                         vertical-alignment: center;
                         font-family: "Noto Sans Mono";

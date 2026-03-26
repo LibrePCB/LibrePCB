@@ -1,5 +1,5 @@
 import { Badge, LinkText } from "../widgets.slint";
-import { RuleCheckData } from "../api.slint";
+import { Data, RuleCheckData } from "../api.slint";
 
 export component LibraryRuleCheckLink inherits HorizontalLayout {
     in property <RuleCheckData> data;
@@ -27,10 +27,22 @@ export component LibraryRuleCheckLink inherits HorizontalLayout {
 
     if has-messages: badge := Badge {
         y: (parent.height - self.height) / 2;
-        background: (data.unapproved > 0) ? #ff0000 : #006000;
+        background: {
+            if data.unapproved > 0 {
+                Data.theme.error.with-alpha(self.has-hover ? 1 : 0.7)
+            } else {
+                Data.theme.info.with-alpha(self.has-hover ? 1 : 0.7)
+            }
+        };
         border-color: self.background;
-        text-color: (data.unapproved > 0) ? white : #d0d0d0;
-        text-color-hover: (data.unapproved > 0) ? #c0c0c0 : white;
+        text-color: {
+            if data.unapproved > 0 {
+                Data.theme.error-text
+            } else {
+                Data.theme.info-text
+            }
+        };
+        text-color-hover: self.text-color;
         font-size: 12px;
         text: text;
         clickable: true;
@@ -42,8 +54,8 @@ export component LibraryRuleCheckLink inherits HorizontalLayout {
     }
 
     if !has-messages: link-btn := LinkText {
-        text-color: #00d000;
-        text-color-hovered: #00ff00;
+        text-color: Data.theme.base-text-success.with-alpha(0.8);
+        text-color-hovered: Data.theme.base-text-success;
         vertical-alignment: center;
         text: text;
         overflow: elide;

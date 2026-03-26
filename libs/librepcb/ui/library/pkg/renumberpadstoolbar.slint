@@ -17,7 +17,6 @@ export component ReNumberPadsToolBar inherits HorizontalLayout {
         primary: true;
         icon: @image-url("../../../../font-awesome/svgs/solid/check.svg");
         text: @tr("Accept");
-        border-radius: 10px;
 
         clicked => {
             Backend.trigger-tab(section-index, section.current-tab-index, TabAction.accept);
@@ -27,7 +26,6 @@ export component ReNumberPadsToolBar inherits HorizontalLayout {
     cancel-btn := Button {
         icon: @image-url("../../../../font-awesome/svgs/solid/xmark.svg");
         text: @tr("Cancel");
-        border-radius: 10px;
 
         clicked => {
             Backend.trigger-tab(section-index, section.current-tab-index, TabAction.abort);

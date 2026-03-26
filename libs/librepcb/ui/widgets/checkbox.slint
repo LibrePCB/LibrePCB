@@ -1,0 +1,134 @@
+import { Data } from "../api.slint";
+
+export component CheckBox inherits Rectangle {
+    in-out property <bool> checked: false;
+    in property <bool> enabled: true;
+    in property <bool> read-only: false;
+    in property <string> text;
+    in property <length> font-size: 12px;
+    in property <string> status-tip;
+    in property <bool> focusable: true;
+    out property has-focus <=> fs.has-focus;
+
+    preferred-width: l.preferred-width;
+    preferred-height: l.preferred-height;
+    max-width: text.is-empty ? l.preferred-width : l.max-width;
+    forward-focus: fs;
+
+    // Accessibility
+    accessible-role: checkbox;
+    accessible-description: status-tip;
+    accessible-checkable: true;
+    accessible-checked: checked;
+    accessible-enabled: enabled;
+    accessible-label: text;
+    accessible-read-only: read-only;
+    accessible-action-default => {
+        ta.clicked();
+    }
+
+    callback toggled(checked: bool);
+    toggled(state) => {
+        checked = state;
+    }
+
+    fs := FocusScope {
+        enabled: enabled && (!read-only) && focusable;
+
+        key-pressed(event) => {
+            // Only consume Space, but not Return as the Return key is often
+            // used to confirm a dialog or something like that.
+            if enabled && (!read-only) && (event.text == Key.Space) {
+                toggled(!checked);
+                return accept;
+            }
+            reject
+        }
+    }
+
+    l := HorizontalLayout {
+        spacing: 5px;
+
+        Rectangle {
+            y: (parent.height - self.height) / 2;
+            width: 16px;
+            height: self.width;
+            background: {
+                if !enabled {
+                    Data.theme.control-disabled
+                } else if ta.has-hover {
+                    Data.theme.control.mix(Data.theme.control-hovered, 0.5)
+                } else {
+                    Data.theme.control
+                }
+            };
+            border-color: {
+                if (!enabled) || read-only {
+                    Data.theme.control-border-disabled
+                } else if has-focus {
+                    Data.theme.accent
+                } else {
+                    Data.theme.control-border
+                }
+            };
+            border-width: 1px;
+
+            if checked: Image {
+                width: 80%;
+                height: self.width;
+                colorize: {
+                    if !enabled {
+                        Data.theme.control-text-disabled
+                    } else if read-only {
+                        Data.theme.control-text-muted
+                    } else {
+                        Data.theme.control-text
+                    }
+                };
+                source: @image-url("../../../font-awesome/svgs/solid/check.svg");
+                image-fit: contain;
+            }
+        }
+
+        if !text.is-empty: Text {
+            text: text;
+            wrap: word-wrap;
+            vertical-alignment: center;
+            font-size: font-size;
+            color: {
+                if !enabled {
+                    Data.theme.base-text-disabled
+                } else if read-only {
+                    Data.theme.base-text-muted
+                } else {
+                    Data.theme.base-text
+                }
+            };
+            accessible-role: none;
+        }
+    }
+
+    ta := TouchArea {
+        enabled: enabled && !read-only;
+
+        changed has-hover => {
+            if !root.status-tip.is-empty {
+                if self.has-hover {
+                    Data.status-tip = root.status-tip;
+                } else {
+                    Data.status-tip = "";
+                }
+            }
+        }
+
+        clicked => {
+            // The click may destroy this element without calling the
+            // has-hover handler anymore, so we clear the status tip
+            // manually to be on the safe side.
+            if !root.status-tip.is-empty {
+                Data.status-tip = "";
+            }
+            toggled(!checked);
+        }
+    }
+}

@@ -1,4 +1,4 @@
-import { Palette } from "std-widgets.slint";
+import { Data } from "../../api.slint";
 
 export component PackageEditorPanel inherits Rectangle {
     in property <bool> error-state;
@@ -6,10 +6,10 @@ export component PackageEditorPanel inherits Rectangle {
 
     width: self.preferred-width;
     height: self.preferred-height;
-    background: Palette.background;
-    border-color: error-state ? red : #505050;
+    background: Data.theme.control;
+    border-color: error-state ? Data.theme.base-text-error : Data.theme.control-border;
     border-width: error-state ? 2px : 1px;
-    border-radius: 8px;
+    border-radius: 5px;
     opacity: has-hover ? 1 : 0.8;
 
     animate opacity { duration: 100ms; }

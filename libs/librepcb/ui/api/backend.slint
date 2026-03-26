@@ -16,6 +16,7 @@ import {
     TabAction,
     WindowSectionAction,
 } from "types.slint";
+import { Theme } from "themes.slint";
 import { Data } from "data.slint";
 
 // Note: The callback implementations are just for the live preview, they will
@@ -251,8 +252,8 @@ export global Backend {
     //
     // The return value is a dummy and must always be `true` to allow
     // declarative, automatic re-evaluation.
-    pure callback request-project-preview(path: string, width: length) -> bool;
-    request-project-preview(path, width) => {
+    pure callback request-project-preview(path: string, width: length, theme: Theme) -> bool;
+    request-project-preview(path, width, theme) => {
         debug("Request project preview:", path, width);
         true
     }
@@ -352,4 +353,7 @@ export global Backend {
     // The backend parses the input string and returns whether it is a valid
     // ratio, and the parsed length value.
     pure callback parse-ratio-input(s: string, minimum: int, maximum: int) -> RatioEditParseResult;
+
+    // Toggle UI theme (only for development)
+    pure callback toggle-theme();
 }

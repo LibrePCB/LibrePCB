@@ -1,10 +1,7 @@
-import { ListView, Palette } from "std-widgets.slint";
+import { ListView } from "listview.slint";
 import { ListViewItemButton } from "listviewitembutton.slint";
 import {
-    Backend,
-    Constants,
-    EditorCommandSet as Cmd,
-    Helpers,
+    Data,
     TreeViewItemAction,
     TreeViewItemData,
 } from "../api.slint";
@@ -18,15 +15,15 @@ export component TreeView inherits FocusScope {
     in property <length> icon-size: font-size + 4px;  // 18px
     property <length> pin-size: 14px;
     property <int> current-index: -1;
-    property <length> scrollbar-width: (self.height < self.preferred-height) ? 7px : 0;
 
     callback item-key-pressed(index: int, item: TreeViewItemData, event: KeyEvent) -> EventResult;
-    callback item-hovered(index: int, item: TreeViewItemData);
+    callback control-hovered(index: int, item: TreeViewItemData);
     callback item-selected(index: int, item: TreeViewItemData);
     callback item-triggered(index: int, item: TreeViewItemData) -> bool;
     callback item-right-clicked(index: int, item: TreeViewItemData, x: length, y: length);
     callback item-deleted(index: int, item: TreeViewItemData) -> bool;
 
+    min-height: min(self.preferred-height, 3 * item-height);
     preferred-height: model.length * item-height;
 
     // Accessibility
@@ -68,19 +65,27 @@ export component TreeView inherits FocusScope {
 
             changed has-hover => {
                 if self.has-hover {
-                    item-hovered(index, item);
+                    control-hovered(index, item);
                 } else {
-                    item-hovered(-1, { });
+                    control-hovered(-1, { });
                 }
             }
 
             Rectangle {
-                background: (current-index == index) ? #454545 : (parent.has-hover ? #383838 : transparent);
+                background: {
+                    if current-index == index {
+                        Data.theme.control-checked
+                    } else if parent.has-hover {
+                        Data.theme.control-hovered
+                    } else {
+                        transparent
+                    }
+                };
 
                 HorizontalLayout {
                     spacing: 5px;
                     padding-left: 5px + (supports-expand ? 0 : item.level * 10px);
-                    padding-right: 5px + scrollbar-width;
+                    padding-right: 5px;
 
                     if supports-expand: expand-ta := TouchArea {
                         mouse-cursor: pointer;
@@ -94,7 +99,7 @@ export component TreeView inherits FocusScope {
                             height: parent.height - 2 * self.y;
                             image-fit: contain;
                             source: @image-url("../../../font-awesome/svgs/solid/angle-right.svg");
-                            colorize: Palette.foreground;
+                            colorize: Data.theme.control-text;
                             transform-rotation: item.expanded ? 90deg : 0;
                             visible: item.has-children;
                             accessible-role: none;
@@ -123,7 +128,13 @@ export component TreeView inherits FocusScope {
 
                     item-text-txt := Text {
                         horizontal-stretch: 1;
-                        color: is-enabled ? #dddddd : #a0a0a0;
+                        color: {
+                            if is-enabled {
+                                Data.theme.control-text
+                            } else {
+                                Data.theme.control-text-disabled
+                            }
+                        };
                         font-size: font-size;
                         overflow: TextOverflow.elide;
                         vertical-alignment: center;

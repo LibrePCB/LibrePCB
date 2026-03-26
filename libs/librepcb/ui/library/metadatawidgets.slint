@@ -2,13 +2,13 @@ import { LibraryRuleCheckLink } from "libraryrulechecklink.slint";
 import {
     Button,
     CategoryTreeLabel,
+    CheckBox,
+    ControlIconButton,
     IconButton,
     LineEdit,
     LinkText,
     ListViewItemButton,
     OverlayDialog,
-    Palette,
-    Switch,
     TreeView,
 } from "../widgets.slint";
 import {
@@ -27,6 +27,7 @@ import {
 component RowHeaderText inherits Text {
     width: self.preferred-width;
     vertical-alignment: center;
+    color: Data.theme.base-text;
     accessible-role: none;
 }
 
@@ -61,7 +62,7 @@ export component IconRowCell inherits HorizontalLayout {
     }
 
     if btn.has-hover: Text {
-        color: #a0a0a0;
+        color: Data.theme.control-text-muted;
         font-size: 11px;
         vertical-alignment: center;
         overflow: elide;
@@ -94,8 +95,9 @@ export component DeprecatedRowHeader inherits RowHeaderText {
     text: @tr("Deprecated:");
 }
 
-export component DeprecatedRowCell inherits Switch {
-    font-size: 10px;
+export component DeprecatedRowCell inherits CheckBox {
+    font-size: 11px;
+    focusable: true;
     text: @tr("Check this if this library element should no longer be used.");
     accessible-description: self.text;
 }
@@ -176,6 +178,7 @@ export component DependenciesRowCell inherits VerticalLayout {
             item-txt := Text {
                 vertical-alignment: center;
                 overflow: elide;
+                color: Data.theme.base-text;
                 text: item.name.is-empty ? item.uuid : item.name;
                 accessible-description: "dependency";
             }
@@ -210,7 +213,7 @@ export component DependenciesRowCell inherits VerticalLayout {
         }
 
         if add-dependency-btn.has-hover: Text {
-            color: #a0a0a0;
+            color: Data.theme.base-text;
             font-size: 11px;
             vertical-alignment: center;
             overflow: elide;
@@ -239,6 +242,13 @@ export component ParentRowCell inherits HorizontalLayout {
 
     tree-txt := CategoryTreeLabel {
         names: model;
+        color: {
+            if read-only {
+                Data.theme.base-text-muted
+            } else {
+                Data.theme.base-text
+            }
+        };
         accessible-description: "parent category";
     }
 
@@ -248,7 +258,7 @@ export component ParentRowCell inherits HorizontalLayout {
 
     if !read-only: Rectangle {
         width: 1px;
-        background: #707070;
+        background: Data.theme.base-border;
     }
 
     if !read-only: select-btn := IconButton {
@@ -273,8 +283,9 @@ export component CategoriesRowHeader inherits RowHeaderText {
 component CategoriesListViewRow inherits TouchArea {
     Rectangle {
         height: self.preferred-height;
-        background: #393939;
-        border-radius: 2px;
+        background: Data.theme.control;
+        border-color: Data.theme.control-border;
+        border-width: 1px;
 
         HorizontalLayout {
             padding: 2px;
@@ -315,6 +326,13 @@ export component CategoriesRowCell inherits HorizontalLayout {
 
             item-txt := CategoryTreeLabel {
                 names: item.names;
+                color: {
+                    if read-only {
+                        Data.theme.control-text-muted
+                    } else {
+                        Data.theme.control-text
+                    }
+                };
                 accessible-role: none;
             }
 
@@ -325,11 +343,11 @@ export component CategoriesRowCell inherits HorizontalLayout {
 
             if !read-only: Rectangle {
                 width: 1px;
-                background: #707070;
+                background: Data.theme.control-border;
                 visible: item-ta.has-hover;
             }
 
-            if !read-only: item-remove-btn := IconButton {
+            if !read-only: item-remove-btn := ControlIconButton {
                 width: 16px;
                 style: hyperlink;
                 icon: @image-url("../../../font-awesome/svgs/solid/trash-can.svg");
@@ -361,7 +379,7 @@ export component CategoriesRowCell inherits HorizontalLayout {
             }
 
             add-txt := Text {
-                color: parent.has-hover ? white : Palette.foreground;
+                color: parent.has-hover ? Data.theme.control-text : Data.theme.control-text-disabled.mix(Data.theme.control-text, 0.5);
                 vertical-alignment: center;
                 overflow: elide;
                 text: @tr("Add Category");
@@ -385,7 +403,7 @@ export component CategoriesChooserDialog inherits OverlayDialog {
     view := TreeView {
         model: model;
         supports-expand: false;
-        icons-color: Palette.foreground;
+        icons-color: Data.theme.base-text;
 
         item-selected(idx, item) => {
             item-picked(idx, item);
@@ -495,8 +513,8 @@ export component PcbDesignRulesRowCell inherits VerticalLayout {
         new-btn := LinkText {
             vertical-alignment: center;
             overflow: elide;
-            text-color: #909090;
-            text-color-hovered: #c0c0c0;
+            text-color: Data.theme.base-text-muted;
+            text-color-hovered: Data.theme.base-text;
             text: "+ " + @tr("New Design Rules");
 
             clicked => {
@@ -524,7 +542,7 @@ export component MetadataFooterRowCell inherits HorizontalLayout {
     in property <bool> read-only: false;
 
     alignment: start;
-    spacing: 5px;
+    spacing: 8px;
 
     if !read-only: save-btn := Button {
         width: max(self.preferred-width, 100px);

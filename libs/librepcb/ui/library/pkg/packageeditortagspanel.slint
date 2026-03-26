@@ -5,10 +5,10 @@ import {
     LengthEdit,
     LineEdit,
     LinkText,
-    Palette,
 } from "../../widgets.slint";
 import {
     Constants,
+    Data,
     PackageTabData,
     WindowSectionData,
 } from "../../api.slint";
@@ -24,8 +24,8 @@ export component PackageEditorTagsPanel inherits PackageEditorPanel {
     property <bool> activated: (root.has-hover || new-tag-edt.has-focus);
     property <length> badge-height: 20px;
 
-    background: new-tag-edt.has-focus ? Palette.background : transparent;
-    border-width: 0;
+    background: new-tag-edt.has-focus ? Data.theme.control : transparent;
+    border-width: new-tag-edt.has-focus ? 1px : 0;
     opacity: activated ? 1 : 0.5;
 
     VerticalLayout {
@@ -81,6 +81,8 @@ export component PackageEditorTagsPanel inherits PackageEditorPanel {
         }
 
         if new-tag-edt.has-focus: Text {
+            color: Data.theme.control-text;
+            font-weight: 700;
             text: @tr("Suggested Tags:");
         }
 
@@ -106,6 +108,7 @@ export component PackageEditorTagsPanel inherits PackageEditorPanel {
 
             new-tag-edt := LineEdit {
                 width: activated ? max(self.preferred-width, suggestions-l.min-width) : 0;
+                border-radius: self.height / 2;
                 placeholder-text: @tr("Type to add a new tag...");
 
                 animate width { duration: 150ms; }
@@ -119,7 +122,7 @@ export component PackageEditorTagsPanel inherits PackageEditorPanel {
             Image {
                 width: 25px;
                 height: self.width;
-                colorize: Palette.foreground;
+                colorize: new-tag-edt.has-focus ? Data.theme.control-text : tabs[index].foreground-color;
                 image-fit: contain;
                 source: @image-url("../../../../font-awesome/svgs/solid/tags.svg");
                 accessible-role: none;
