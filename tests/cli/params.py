@@ -20,7 +20,7 @@ class Library:
 EMPTY_LIBRARY = Library("Empty Library.lplib", 0, 0, 0, 0, 0, 0, 0)
 EMPTY_LIBRARY_PARAM = pytest.param(EMPTY_LIBRARY, id="EmptyLibrary")
 
-POPULATED_LIBRARY = Library("Populated Library.lplib", 10, 4, 19, 8, 15, 8, 2)
+POPULATED_LIBRARY = Library("Populated Library.lplib", 11, 4, 19, 8, 15, 8, 2)
 POPULATED_LIBRARY_PARAM = pytest.param(POPULATED_LIBRARY, id="PopulatedLibrary")
 
 

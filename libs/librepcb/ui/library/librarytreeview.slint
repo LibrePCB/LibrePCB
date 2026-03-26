@@ -190,8 +190,11 @@ export component LibraryTreeView inherits FocusScope {
                     }
 
                     if item.deprecated || (!item.summary.is-empty): item-summary-txt := Text {
+                        property <bool> is-category: (item.type == LibraryTreeViewItemType.component-category) || (item.type == LibraryTreeViewItemType.package-category);
+
                         horizontal-stretch: 1;
-                        color: item.deprecated ? #bb5555 : #909090;
+                        // Note: For categories, the summary property is used for error messages.
+                        color: (item.deprecated || is-category) ? #bb5555 : #909090;
                         font-size: 10.5px;
                         font-weight: 300;
                         horizontal-alignment: left;
