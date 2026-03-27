@@ -2,9 +2,9 @@ import { PackageEditorPanel } from "packageeditorpanel.slint";
 import {
     AngleEdit,
     LengthEdit,
-    Palette,
 } from "../../widgets.slint";
 import {
+    Data,
     PackageTabData,
     WindowSectionData,
 } from "../../api.slint";
@@ -27,7 +27,7 @@ export component PackageEditorTransformPanel inherits PackageEditorPanel {
                 Image {
                     width: parent.width;
                     height: self.width;
-                    colorize: Palette.foreground;
+                    colorize: Data.theme.control-text;
                     image-fit: contain;
                     source: @image-url("../../../../font-awesome/svgs/solid/up-down-left-right.svg");
                     accessible-role: none;
@@ -90,7 +90,7 @@ export component PackageEditorTransformPanel inherits PackageEditorPanel {
                 Image {
                     width: parent.width;
                     height: self.width;
-                    colorize: Palette.foreground;
+                    colorize: Data.theme.control-text;
                     image-fit: contain;
                     source: @image-url("../../../../font-awesome/svgs/solid/rotate-right.svg");
                     accessible-role: none;

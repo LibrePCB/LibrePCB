@@ -1,0 +1,15 @@
+import { Data } from "../api.slint";
+
+export component TextInput inherits TextInput {
+    color: {
+        if !self.enabled {
+            Data.theme.control-text-disabled
+        } else if self.read-only {
+            Data.theme.control-text-muted
+        } else {
+            Data.theme.control-text
+        }
+    };
+    selection-background-color: Data.theme.selection;
+    selection-foreground-color: Data.theme.selection-text;
+}

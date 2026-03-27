@@ -114,7 +114,7 @@ void KiCadLibraryImportWizardPage_Result::initializePage() {
           });
   connect(log.get(), &MessageLogger::msgEmitted, this,
           [this](const MessageLogger::Message& msg) {
-            mUi->txtMessages->append(msg.toRichText());
+            mUi->txtMessages->append(msg.toRichText(&mContext->getTheme()));
             mUi->txtMessages->verticalScrollBar()->setValue(
                 mUi->txtMessages->verticalScrollBar()->maximum());
           });

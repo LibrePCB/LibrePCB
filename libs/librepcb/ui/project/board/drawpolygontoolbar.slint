@@ -1,10 +1,11 @@
 import {
     ComboBox,
-    IconButton,
     LengthEdit,
+    ToolBarButton,
 } from "../../widgets.slint";
 import {
     Board2dTabData,
+    Data,
     WindowSectionData,
 } from "../../api.slint";
 
@@ -47,18 +48,11 @@ export component DrawPolygonToolBar inherits HorizontalLayout {
         }
     }
 
-    fill-sw := IconButton {
+    fill-sw := ToolBarButton {
         icon: @image-url("../../../../font-awesome/svgs/solid/fill-drip.svg");
-        icon-scale: 0.6;
         tooltip: @tr("Fill Area");
-        background-color: #202020;
-        background-color-hovered: #404040;
-        background-color-checked: black;
-        color-enabled: #606060;
-        color-hovered: #e0e0e0;
-        color-checked: #e0e0e0;
-        border-radius: 10px;
         checked: tabs[section.current-tab-index].tool-filled;
+        checkable: true;
 
         clicked => {
             tabs[section.current-tab-index].tool-filled = !self.checked;

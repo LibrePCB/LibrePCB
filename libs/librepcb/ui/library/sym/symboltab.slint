@@ -26,10 +26,12 @@ import {
     LinkText,
     MessageBanner,
     MessageBox,
+    NavBar,
     SceneButton,
-    SlideView,
     TextEdit,
+    ToolBar,
     ToolButton,
+    ToolButtonGroup,
 } from "../../widgets.slint";
 import {
     Backend,
@@ -163,7 +165,7 @@ component SymbolMetadataTab {
 
             deprecated-sw := DeprecatedRowCell {
                 checked: tabs[index].deprecated;
-                enabled: !read-only;
+                read-only: read-only;
                 accessible-label: deprecated-txt.text;
 
                 toggled(checked) => {
@@ -261,10 +263,10 @@ component SymbolEditorTab inherits TouchArea {
         y: toolbuttons-l.y + (move-down ? toolbar-r.height : 0);
         width: overlay-txt.preferred-width + 2 * overlay-txt.x;
         height: overlay-txt.preferred-height + 2 * overlay-txt.y;
-        background: tabs[index].overlay-color;
-        border-radius: 10px;
+        background: Data.theme.control;
+        border-radius: 3px;
         border-width: 1px;
-        border-color: tabs[index].overlay-text-color;
+        border-color: Data.theme.control-border;
 
         overlay-txt := Text {
             x: 8px;
@@ -272,89 +274,80 @@ component SymbolEditorTab inherits TouchArea {
             horizontal-alignment: left;
             vertical-alignment: top;
             font-family: "Noto Sans Mono";
-            color: tabs[index].overlay-text-color;
+            color: Data.theme.control-text;
             text: tabs[index].tool-overlay-text;
         }
     }
 
-    toolbar-r := Rectangle {
-        y: 0;
+    toolbar-r := ToolBar {
+        y: -1px;
         width: min(self.preferred-width, root.width - 10px);
-        height: 34px;
-        background: #505050;
-        border-bottom-left-radius: 11px;
-        border-bottom-right-radius: 11px;
         visible: self.width > 30px;
 
-        HorizontalLayout {
-            alignment: center;
-            padding: 3px;
+        if tabs[index].tool == EditorTool.line: line-toolbar := DrawSymbolPolygonToolBar {
+            section-index: section-index;
+            section: section;
+            show-angle-edt: true;
+            show-fill-sw: false;
+            show-grab-area-sw: false;
+        }
 
-            if tabs[index].tool == EditorTool.line: line-toolbar := DrawSymbolPolygonToolBar {
-                section-index: section-index;
-                section: section;
-                show-angle-edt: true;
-                show-fill-sw: false;
-                show-grab-area-sw: false;
-            }
+        if tabs[index].tool == EditorTool.rect: rect-toolbar := DrawSymbolPolygonToolBar {
+            section-index: section-index;
+            section: section;
+            show-angle-edt: false;
+            show-fill-sw: true;
+            show-grab-area-sw: true;
+        }
 
-            if tabs[index].tool == EditorTool.rect: rect-toolbar := DrawSymbolPolygonToolBar {
-                section-index: section-index;
-                section: section;
-                show-angle-edt: false;
-                show-fill-sw: true;
-                show-grab-area-sw: true;
-            }
+        if tabs[index].tool == EditorTool.polygon: polygon-toolbar := DrawSymbolPolygonToolBar {
+            section-index: section-index;
+            section: section;
+            show-angle-edt: true;
+            show-fill-sw: true;
+            show-grab-area-sw: true;
+        }
 
-            if tabs[index].tool == EditorTool.polygon: polygon-toolbar := DrawSymbolPolygonToolBar {
-                section-index: section-index;
-                section: section;
-                show-angle-edt: true;
-                show-fill-sw: true;
-                show-grab-area-sw: true;
-            }
+        if tabs[index].tool == EditorTool.circle: circle-toolbar := DrawSymbolPolygonToolBar {
+            section-index: section-index;
+            section: section;
+            show-angle-edt: false;
+            show-fill-sw: true;
+            show-grab-area-sw: true;
+        }
 
-            if tabs[index].tool == EditorTool.circle: circle-toolbar := DrawSymbolPolygonToolBar {
-                section-index: section-index;
-                section: section;
-                show-angle-edt: false;
-                show-fill-sw: true;
-                show-grab-area-sw: true;
-            }
+        if tabs[index].tool == EditorTool.arc: arc-toolbar := DrawSymbolPolygonToolBar {
+            section-index: section-index;
+            section: section;
+            show-angle-edt: false;
+            show-fill-sw: false;
+            show-grab-area-sw: false;
+        }
 
-            if tabs[index].tool == EditorTool.arc: arc-toolbar := DrawSymbolPolygonToolBar {
-                section-index: section-index;
-                section: section;
-                show-angle-edt: false;
-                show-fill-sw: false;
-                show-grab-area-sw: false;
-            }
+        if tabs[index].tool == EditorTool.name: name-toolbar := AddSymbolTextToolBar {
+            section-index: section-index;
+            section: section;
+            show-layer-cbx: false;
+            show-text-edt: false;
+        }
 
-            if tabs[index].tool == EditorTool.name: name-toolbar := AddSymbolTextToolBar {
-                section-index: section-index;
-                section: section;
-                show-layer-cbx: false;
-                show-text-edt: false;
-            }
+        if tabs[index].tool == EditorTool.value: value-toolbar := AddSymbolTextToolBar {
+            section-index: section-index;
+            section: section;
+            show-layer-cbx: false;
+            show-text-edt: false;
+        }
 
-            if tabs[index].tool == EditorTool.value: value-toolbar := AddSymbolTextToolBar {
-                section-index: section-index;
-                section: section;
-                show-layer-cbx: false;
-                show-text-edt: false;
-            }
+        if tabs[index].tool == EditorTool.text: text-toolbar := AddSymbolTextToolBar {
+            section-index: section-index;
+            section: section;
+            show-layer-cbx: true;
+            show-text-edt: true;
+        }
 
-            if tabs[index].tool == EditorTool.text: text-toolbar := AddSymbolTextToolBar {
-                section-index: section-index;
-                section: section;
-                show-layer-cbx: true;
-                show-text-edt: true;
-            }
-
-            if tabs[index].tool == EditorTool.pin: pin-toolbar := AddSymbolPinToolBar {
-                section-index: section-index;
-                section: section;
-            }
+        if tabs[index].tool == EditorTool.pin: pin-toolbar := AddSymbolPinToolBar {
+            section-index: section-index;
+            section: section;
         }
     }
 
@@ -374,6 +367,7 @@ component SymbolEditorTab inherits TouchArea {
             }
 
             import-pins-btn := Button {
+                border-radius: self.height / 2;
                 primary: true;
                 text: @tr("Import Pins");
 
@@ -413,6 +407,7 @@ component SymbolEditorTab inherits TouchArea {
         y: 7px + toolbutton-offset-y;
         width: self.preferred-width;
         height: parent.height - 2 * self.y;
+        alignment: start;
         spacing: 5px;
 
         tool-select-btn := ToolButton {
@@ -424,20 +419,25 @@ component SymbolEditorTab inherits TouchArea {
             }
         }
 
-        tool-line-btn := ToolButton {
-            cmd: Cmd.tool-line;
-            icon: @image-url("../../../../../img/actions/draw_wire.png");
-            checked: tabs[index].tool == EditorTool.line;
-            enabled: !read-only;
+        ToolButtonGroup {
+            tool-line-btn := ToolButton {
+                cmd: Cmd.tool-line;
+                icon: @image-url("../../../../../img/actions/draw_wire.png");
+                checked: tabs[index].tool == EditorTool.line;
+                enabled: !read-only;
+                is-last: false;
 
-            clicked => {
-                tool-triggered(TabAction.tool-line);
+                clicked => {
+                    tool-triggered(TabAction.tool-line);
+                }
             }
 
             tool-rect-btn := ToolButton {
                 cmd: Cmd.tool-rect;
                 checked: tabs[index].tool == EditorTool.rect;
                 enabled: !read-only;
+                is-first: false;
+                is-last: false;
 
                 clicked => {
                     tool-triggered(TabAction.tool-rect);
@@ -448,6 +448,8 @@ component SymbolEditorTab inherits TouchArea {
                 cmd: Cmd.tool-polygon;
                 checked: tabs[index].tool == EditorTool.polygon;
                 enabled: !read-only;
+                is-first: false;
+                is-last: false;
 
                 clicked => {
                     tool-triggered(TabAction.tool-polygon);
@@ -458,6 +460,8 @@ component SymbolEditorTab inherits TouchArea {
                 cmd: Cmd.tool-circle;
                 checked: tabs[index].tool == EditorTool.circle;
                 enabled: !read-only;
+                is-first: false;
+                is-last: false;
 
                 clicked => {
                     tool-triggered(TabAction.tool-circle);
@@ -468,6 +472,7 @@ component SymbolEditorTab inherits TouchArea {
                 cmd: Cmd.tool-arc;
                 checked: tabs[index].tool == EditorTool.arc;
                 enabled: !read-only;
+                is-first: false;
 
                 clicked => {
                     tool-triggered(TabAction.tool-arc);
@@ -475,13 +480,16 @@ component SymbolEditorTab inherits TouchArea {
             }
         }
 
-        tool-text-btn := ToolButton {
-            cmd: Cmd.tool-text;
-            checked: tabs[index].tool == EditorTool.text;
-            enabled: !read-only;
+        ToolButtonGroup {
+            tool-text-btn := ToolButton {
+                cmd: Cmd.tool-text;
+                checked: tabs[index].tool == EditorTool.text;
+                enabled: !read-only;
+                is-last: false;
 
-            clicked => {
-                tool-triggered(TabAction.tool-text);
+                clicked => {
+                    tool-triggered(TabAction.tool-text);
+                }
             }
 
             tool-name-btn := ToolButton {
@@ -489,6 +497,8 @@ component SymbolEditorTab inherits TouchArea {
                 icon: @image-url("../../../../../img/actions/add_name.png");
                 checked: tabs[index].tool == EditorTool.name;
                 enabled: !read-only;
+                is-first: false;
+                is-last: false;
 
                 clicked => {
                     tool-triggered(TabAction.tool-name);
@@ -500,6 +510,7 @@ component SymbolEditorTab inherits TouchArea {
                 icon: @image-url("../../../../../img/actions/add_value.png");
                 checked: tabs[index].tool == EditorTool.value;
                 enabled: !read-only;
+                is-first: false;
 
                 clicked => {
                     tool-triggered(TabAction.tool-value);
@@ -546,8 +557,8 @@ component SymbolEditorTab inherits TouchArea {
         zoom-fit-btn := SceneButton {
             icon: @image-url("../../../../font-awesome/svgs/solid/expand.svg");
             icon-scale: 0.9;
-            bg-color: tabs[index].background-color;
-            fg-color: tabs[index].foreground-color;
+            base-color: tabs[index].background-color;
+            base-text-color: tabs[index].foreground-color;
 
             clicked => {
                 Backend.trigger-tab(section-index, index, TabAction.zoom-fit);
@@ -556,8 +567,8 @@ component SymbolEditorTab inherits TouchArea {
 
         zoom-in-btn := SceneButton {
             icon: @image-url("../../../../bootstrap-icons/icons/zoom-in.svg");
-            bg-color: tabs[index].background-color;
-            fg-color: tabs[index].foreground-color;
+            base-color: tabs[index].background-color;
+            base-text-color: tabs[index].foreground-color;
 
             clicked => {
                 Backend.trigger-tab(section-index, index, TabAction.zoom-in);
@@ -566,8 +577,8 @@ component SymbolEditorTab inherits TouchArea {
 
         zoom-out-btn := SceneButton {
             icon: @image-url("../../../../bootstrap-icons/icons/zoom-out.svg");
-            bg-color: tabs[index].background-color;
-            fg-color: tabs[index].foreground-color;
+            base-color: tabs[index].background-color;
+            base-text-color: tabs[index].foreground-color;
 
             clicked => {
                 Backend.trigger-tab(section-index, index, TabAction.zoom-out);
@@ -649,65 +660,31 @@ export component SymbolTab inherits Tab {
             shown: tabs[index].checks.errors > 0;
         }
 
-        // Wizard mode: Only one page at a time.
-        if tabs[index].wizard-mode && (tabs[index].page-index <= 0): SymbolMetadataTab {
-            section-index: section-index;
-            tabs: tabs;
-            index: index;
-            read-only: read-only;
-        }
+        // Pages in wizard mode:
+        //  [0] Metadata tab: Set metadata
+        //
+        // Pages in normal mode:
+        //  [0] Metadata tab
+        //  [1] Editor tab
 
-        // Normal mode: Editor left, metadata right.
-        if (!tabs[index].wizard-mode) && (!compact-layout): HorizontalLayout {
-            SymbolEditorTab {
-                horizontal-stretch: 1;
-                section-index: section-index;
-                section: section;
-                tabs: tabs;
-                index: index;
-                read-only: read-only;
-
-                focus-requested => {
-                    if !root.has-focus {
-                        root.focus();
-                    }
-                }
-            }
-
-            Rectangle {
-                width: 1px;
-                background: #555555;
-            }
-
-            SymbolMetadataTab {
-                horizontal-stretch: 1;
-                max-width: min(500px, parent.width * 0.4);
-                section-index: section-index;
-                tabs: tabs;
-                index: index;
-                read-only: read-only;
-            }
-        }
-
-        // Compact mode: Slide between metadata and content.
-        if (!tabs[index].wizard-mode) && compact-layout: SlideView {
+        if !tabs[index].wizard-mode && compact-layout: navbar := NavBar {
             pages: [
-                { title: @tr("Metadata") },
-                { title: @tr("Graphics") },
+                { id: 0, title: @tr("Metadata") },
+                { id: 1, title: @tr("Graphics") },
             ];
-            current-index: tabs[index].page-index;
-            duration: 0;  // Temporary, needs proper refactoring.
+            current-id: tabs[index].page-index;
 
-            SymbolMetadataTab {
-                width: parent.width;
-                section-index: section-index;
-                tabs: tabs;
-                index: index;
-                read-only: read-only;
+            page-clicked(id) => {
+                Data.set-current-tab(section-index, index);
+                tabs[index].page-index = id;
             }
+        }
 
-            SymbolEditorTab {
-                width: parent.width;
+        HorizontalLayout {
+            property <bool> side-by-side: (!tabs[index].wizard-mode) && (!compact-layout);
+
+            if side-by-side || (tabs[index].page-index >= 1): editor-tab := SymbolEditorTab {
+                horizontal-stretch: 1;
                 section-index: section-index;
                 section: section;
                 tabs: tabs;
@@ -721,8 +698,18 @@ export component SymbolTab inherits Tab {
                 }
             }
 
-            page-clicked(idx) => {
-                tabs[index].page-index = idx;
+            if side-by-side: Rectangle {
+                width: 1px;
+                background: Data.theme.base-border;
+            }
+
+            if side-by-side || (tabs[index].page-index <= 0): metadata-tab := SymbolMetadataTab {
+                horizontal-stretch: 1;
+                max-width: side-by-side ? min(500px, parent.width * 0.4) : root.width;
+                section-index: section-index;
+                tabs: tabs;
+                index: index;
+                read-only: read-only;
             }
         }
     }

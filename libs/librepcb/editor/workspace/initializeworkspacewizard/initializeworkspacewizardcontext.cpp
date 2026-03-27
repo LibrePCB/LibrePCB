@@ -39,8 +39,9 @@ namespace editor {
  ******************************************************************************/
 
 InitializeWorkspaceWizardContext::InitializeWorkspaceWizardContext(
-    QObject* parent) noexcept
+    const UiTheme& theme, QObject* parent) noexcept
   : QObject(parent),
+    mTheme(theme),
     mWorkspacePath(),
     mWorkspacePathValid(false),
     mWorkspaceExists(false),

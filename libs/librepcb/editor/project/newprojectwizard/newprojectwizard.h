@@ -37,6 +37,7 @@ namespace librepcb {
 
 class Project;
 class Workspace;
+struct UiTheme;
 
 namespace editor {
 
@@ -65,8 +66,8 @@ public:
   // Constructors / Destructor
   NewProjectWizard() = delete;
   NewProjectWizard(const NewProjectWizard& other) = delete;
-  explicit NewProjectWizard(const Workspace& ws, Mode mode,
-                            QWidget* parent = nullptr) noexcept;
+  explicit NewProjectWizard(const UiTheme& theme, const Workspace& ws,
+                            Mode mode, QWidget* parent = nullptr) noexcept;
   ~NewProjectWizard() noexcept;
 
   // Setters

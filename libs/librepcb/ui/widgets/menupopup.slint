@@ -2,12 +2,12 @@ import { Data, EditorCommand } from "../api.slint";
 
 export component MenuSeparator inherits Rectangle {
     height: 10px;
-    background: #404040;
 
     Rectangle {
         y: parent.height / 2;
+        width: parent.width - 14px;
         height: 1px;
-        background: #707070;
+        background: Data.theme.base-border;
     }
 }
 
@@ -16,21 +16,35 @@ export component MenuItem inherits Rectangle {
     in property <string> text: cmd.text;
     in property <string> shortcuts: cmd.shortcut;
     in property <string> status-tip: cmd.status-tip;
-    in property <image> icon: cmd.icon;
-    in property <image> icon-checked: @image-url("../../../font-awesome/svgs/regular/square-check.svg");
-    in property <image> icon-unchecked: @image-url("../../../font-awesome/svgs/regular/square.svg");
+    in property <image> icon: {
+        if checkable {
+            if checked {
+                @image-url("../../../font-awesome/svgs/regular/square-check.svg")
+            } else {
+                @image-url("../../../font-awesome/svgs/regular/square.svg")
+            }
+        } else {
+            cmd.icon
+        }
+    };
     in property <angle> icon-rotation: 0deg;
     in property <color> icon-color: text-color;
     in property <bool> enabled: true;
     in property <bool> checkable: false;
     in property <bool> checked: false;
     in property <bool> default: false;
-    property <color> text-color: enabled ? #d0d0d0 : #808080;
+    property <color> text-color: enabled ? Data.theme.control-text : Data.theme.control-text-disabled;
 
     callback clicked;
 
-    height: 30px;
-    background: ta.has-hover ? #505050 : #404040;
+    height: 25px;
+    background: {
+        if ta.has-hover {
+            Data.theme.control-hovered
+        } else {
+            transparent
+        }
+    };
 
     // Accessibility
     accessible-role: button;
@@ -45,48 +59,36 @@ export component MenuItem inherits Rectangle {
 
     HorizontalLayout {
         padding-left: 5px;
-        padding-right: 10px;
+        padding-right: 8px;
         padding-top: 2px;
         padding-bottom: 2px;
         spacing: 3px;
 
         Rectangle {
-            property <bool> checkable-custom-icon: checkable && (icon.width > 0);
+            property <bool> checkable-custom-icon: checkable && checked && (icon.width > 0);
 
             width: self.height;
-            background: checkable-custom-icon ? #303030 : transparent;
+            background: checkable-custom-icon ? Data.theme.control-checked : transparent;
             border-radius: 5px;
             border-width: checkable-custom-icon ? 1px : 0;
-            border-color: #909090;
+            border-color: Data.theme.control-border;
 
             Image {
-                x: 4px;
-                y: self.x;
-                width: parent.width - 2 * self.x;
+                width: 80%;
                 height: self.width;
                 colorize: icon-color;
                 image-fit: contain;
                 vertical-alignment: center;
                 horizontal-alignment: center;
                 transform-rotation: icon-rotation;
-                source: {
-                    if icon.width > 0 {
-                        icon
-                    } else if checked {
-                        icon-checked
-                    } else if checkable {
-                        icon-unchecked
-                    } else {
-                        @image-url("")
-                    }
-                };
+                source: icon;
                 accessible-role: none;
             }
         }
 
         text-txt := Text {
             vertical-alignment: center;
-            font-size: 15px;
+            font-size: 13px;
             font-weight: default ? 600 : 400;
             color: text-color;
             text: text;
@@ -97,8 +99,9 @@ export component MenuItem inherits Rectangle {
             width: max(self.preferred-width, 80px);
             horizontal-alignment: right;
             vertical-alignment: center;
-            font-size: 13px;
-            color: enabled ? #b0b0b0 : #707070;
+            font-size: 12px;
+            font-weight: 300;
+            color: text-color;
             text: shortcuts;
             accessible-role: none;
         }
@@ -134,24 +137,47 @@ export component MenuPopup inherits PopupWindow {
     height: self.preferred-height;
 
     Rectangle {
-        background: #353535;
+        background: Data.theme.control;
+        border-color: Data.theme.control-border;
+        border-width: 1px;
 
         VerticalLayout {
+            padding: 1px;
+
             @children
         }
     }
 }
 
 export component MenuOverlay inherits Rectangle {
+    in property <length> opening-width: 0;
+
     width: self.preferred-width;
     height: self.preferred-height;
+    background: Data.theme.control;
+    border-color: Data.theme.control-border;
+    border-width: 1px;
 
     // The touch area is important to intercept and ignore any clicks
     // on disabled menu items or on menu separators, to avoid those
     // clicks from propagating to the elements underneath the menu.
-    TouchArea {
+    ta := TouchArea {
         VerticalLayout {
+            padding: 1px;
+
             @children
         }
+    }
+
+    // Ugly hack to hide the borders between the main menu item and this
+    // popup, to making the menu item look "connected" with the menu.
+    // One of the border comes from the menu item (thus y=-1px), the other
+    // comes from this popup (this height=2px).
+    if opening-width > 0: Rectangle {
+        x: 1px;
+        y: -1px;
+        width: opening-width - 2px;
+        height: 2px;
+        background: root.background;
     }
 }

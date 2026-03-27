@@ -38,10 +38,11 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-InitializeWorkspaceWizard::InitializeWorkspaceWizard(bool forceChoosePath,
+InitializeWorkspaceWizard::InitializeWorkspaceWizard(const UiTheme& theme,
+                                                     bool forceChoosePath,
                                                      QWidget* parent) noexcept
   : QWizard(parent),
-    mContext(),
+    mContext(theme),
     mUi(new Ui::InitializeWorkspaceWizard),
     mForceChoosePath(forceChoosePath),
     mNeedsToBeShown(true) {

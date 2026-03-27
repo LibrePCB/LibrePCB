@@ -33,6 +33,9 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+struct UiTheme;
+
 namespace editor {
 
 /*******************************************************************************
@@ -56,12 +59,15 @@ public:
   };
 
   // Constructors / Destructor
+  InitializeWorkspaceWizardContext() = delete;
   InitializeWorkspaceWizardContext(
       const InitializeWorkspaceWizardContext& other) = delete;
-  explicit InitializeWorkspaceWizardContext(QObject* parent = nullptr) noexcept;
+  explicit InitializeWorkspaceWizardContext(const UiTheme& theme,
+                                            QObject* parent = nullptr) noexcept;
   ~InitializeWorkspaceWizardContext() noexcept;
 
   // Getters
+  const UiTheme& getTheme() const noexcept { return mTheme; }
   const FilePath& getWorkspacePath() const noexcept { return mWorkspacePath; }
   bool isWorkspacePathValid() const noexcept { return mWorkspacePathValid; }
   bool getWorkspaceExists() const noexcept { return mWorkspaceExists; }
@@ -95,6 +101,8 @@ public:
       const InitializeWorkspaceWizardContext& rhs) = delete;
 
 private:  // Data
+  const UiTheme& mTheme;
+
   FilePath mWorkspacePath;
   bool mWorkspacePathValid;
   bool mWorkspaceExists;

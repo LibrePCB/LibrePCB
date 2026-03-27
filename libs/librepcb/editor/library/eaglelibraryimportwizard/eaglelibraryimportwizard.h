@@ -35,6 +35,7 @@ namespace librepcb {
 
 class FilePath;
 class Workspace;
+struct UiTheme;
 
 namespace editor {
 
@@ -57,7 +58,8 @@ class EagleLibraryImportWizard final : public QWizard {
 public:
   // Constructors / Destructor
   EagleLibraryImportWizard(const EagleLibraryImportWizard& other) = delete;
-  EagleLibraryImportWizard(Workspace& workspace, const FilePath& dstLibFp,
+  EagleLibraryImportWizard(const UiTheme& theme, Workspace& workspace,
+                           const FilePath& dstLibFp,
                            QWidget* parent = nullptr) noexcept;
   ~EagleLibraryImportWizard() noexcept;
 

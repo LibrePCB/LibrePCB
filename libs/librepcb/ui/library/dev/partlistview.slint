@@ -1,8 +1,7 @@
-import { ScrollView } from "std-widgets.slint";
 import {
     IconButton,
     LineEdit,
-    Palette,
+    ScrollView,
 } from "../../widgets.slint";
 import {
     Data,
@@ -11,13 +10,29 @@ import {
 } from "../../api.slint";
 
 component HorizontalLine inherits Rectangle {
+    in property <bool> read-only: false;
+
     height: 1px;
-    background: #505050;
+    background: {
+        if read-only {
+            Data.theme.control-border-disabled
+        } else {
+            Data.theme.control-border-disabled
+        }
+    };
 }
 
 component VerticalLine inherits Rectangle {
+    in property <bool> read-only: false;
+
     width: 1px;
-    background: #505050;
+    background: {
+        if read-only {
+            Data.theme.control-border-disabled
+        } else {
+            Data.theme.control-border-disabled
+        }
+    };
 }
 
 component PartListViewTextCell inherits Rectangle {
@@ -27,13 +42,14 @@ component PartListViewTextCell inherits Rectangle {
     in property <TextHorizontalAlignment> horizontal-alignment: left;
 
     preferred-width: txt.preferred-width + 10px;
+    background: Data.theme.window;
 
     txt := Text {
         x: 5px;
         width: parent.width - 10px;
         horizontal-alignment: horizontal-alignment;
         vertical-alignment: center;
-        color: #909090;
+        color: Data.theme.control-text;
         font-family: font-family;
         font-size: font-size;
         text: text;
@@ -66,17 +82,23 @@ export component PartListView inherits ScrollView {
     l := HorizontalLayout {
         padding-right: 8px;  // Reserve space for the scrollbar
 
-        VerticalLine { }
+        VerticalLine {
+            read-only: read-only;
+        }
 
         VerticalLayout {
-            HorizontalLine { }
+            HorizontalLine {
+                read-only: read-only;
+            }
 
             mpn-txt := PartListViewTextCell {
                 height: row-height;
                 text: @tr("Part Number (MPN)");
             }
 
-            HorizontalLine { }
+            HorizontalLine {
+                read-only: read-only;
+            }
 
             for item[index] in model: VerticalLayout {
                 HorizontalLayout {
@@ -86,13 +108,13 @@ export component PartListView inherits ScrollView {
                     Rectangle {
                         width: row-height;
                         height: row-height;
-                        background: #202020;
+                        background: Data.theme.control;
 
                         Image {
                             width: 70%;
                             height: self.width;
                             image-fit: contain;
-                            colorize: Palette.foreground;
+                            colorize: Data.theme.control-text;
                             source: @image-url("../../../../bootstrap-icons/icons/cart3.svg");
                             accessible-role: none;
                         }
@@ -132,22 +154,29 @@ export component PartListView inherits ScrollView {
                 }
 
                 HorizontalLine {
+                    read-only: read-only;
                     visible: is-visible-row(index);
                 }
             }
         }
 
-        VerticalLine { }
+        VerticalLine {
+            read-only: read-only;
+        }
 
         VerticalLayout {
-            HorizontalLine { }
+            HorizontalLine {
+                read-only: read-only;
+            }
 
             manufacturer-txt := PartListViewTextCell {
                 height: row-height;
                 text: @tr("Manufacturer");
             }
 
-            HorizontalLine { }
+            HorizontalLine {
+                read-only: read-only;
+            }
 
             for item[index] in model: VerticalLayout {
                 manufacturer-edt := LineEdit {
@@ -183,22 +212,29 @@ export component PartListView inherits ScrollView {
                 }
 
                 HorizontalLine {
+                    read-only: read-only;
                     visible: is-visible-row(index);
                 }
             }
         }
 
-        VerticalLine { }
+        VerticalLine {
+            read-only: read-only;
+        }
 
         VerticalLayout {
-            HorizontalLine { }
+            HorizontalLine {
+                read-only: read-only;
+            }
 
             attributes-txt := PartListViewTextCell {
                 height: row-height;
                 text: @tr("Attributes");
             }
 
-            HorizontalLine { }
+            HorizontalLine {
+                read-only: read-only;
+            }
 
             for item[index] in model: VerticalLayout {
                 attributes-ta := TouchArea {
@@ -207,7 +243,7 @@ export component PartListView inherits ScrollView {
                     mouse-cursor: pointer;
 
                     Rectangle {
-                        background: attributes-ta.has-hover ? #303030 : #202020;
+                        background: attributes-ta.has-hover ? Data.theme.control-hovered : Data.theme.control;
                         clip: true;
 
                         HorizontalLayout {
@@ -218,7 +254,7 @@ export component PartListView inherits ScrollView {
                                 property <string> separator: (attr-index < (item.attributes.length - 2)) ? ", " : "";
 
                                 vertical-alignment: center;
-                                color: attributes-ta.has-hover ? white : Palette.foreground;
+                                color: read-only ? Data.theme.control-text-muted : Data.theme.control-text;
                                 text: (attribute.value.is-empty ? attribute.key : (attribute.value + unit)) + separator;
                                 accessible-role: none;
                             }
@@ -232,7 +268,7 @@ export component PartListView inherits ScrollView {
                                     width: 70%;
                                     height: 70%;
                                     image-fit: contain;
-                                    colorize: attributes-ta.has-hover ? white : #909090;
+                                    colorize: Data.theme.control-text.with-alpha(0.7);
                                     source: @image-url("../../../../font-awesome/svgs/solid/arrow-up-right-from-square.svg");
                                     accessible-role: none;
                                 }
@@ -246,26 +282,33 @@ export component PartListView inherits ScrollView {
                 }
 
                 HorizontalLine {
+                    read-only: read-only;
                     visible: is-visible-row(index);
                 }
             }
         }
 
-        VerticalLine { }
+        VerticalLine {
+            read-only: read-only;
+        }
 
         if (!read-only) && (model.length > 2): VerticalLayout {
-            HorizontalLine { }
+            HorizontalLine {
+                read-only: read-only;
+            }
 
             PartListViewTextCell {
                 height: row-height;
             }
 
-            HorizontalLine { }
+            HorizontalLine {
+                read-only: read-only;
+            }
 
             for item[index] in model: VerticalLayout {
                 move-up-btn := IconButton {
                     height: row-height;
-                    background-color: #202020;
+                    background-color: Data.theme.control;
                     icon-size: 14px;
                     icon: @image-url("../../../../font-awesome/svgs/solid/arrow-up.svg");
                     enabled: (index > 0) && (!is-last-row(index));
@@ -276,25 +319,33 @@ export component PartListView inherits ScrollView {
                     }
                 }
 
-                HorizontalLine { }
+                HorizontalLine {
+                    read-only: read-only;
+                }
             }
         }
 
-        if (!read-only) && (model.length > 2): VerticalLine { }
+        if (!read-only) && (model.length > 2): VerticalLine {
+            read-only: read-only;
+        }
 
         if !read-only: VerticalLayout {
-            HorizontalLine { }
+            HorizontalLine {
+                read-only: read-only;
+            }
 
             PartListViewTextCell {
                 height: row-height;
             }
 
-            HorizontalLine { }
+            HorizontalLine {
+                read-only: read-only;
+            }
 
             for item[index] in model: VerticalLayout {
                 duplicate-btn := IconButton {
                     height: row-height;
-                    background-color: #202020;
+                    background-color: Data.theme.control;
                     icon-size: 14px;
                     icon: @image-url("../../../../font-awesome/svgs/solid/copy.svg");
                     enabled: !is-last-row(index);
@@ -305,25 +356,33 @@ export component PartListView inherits ScrollView {
                     }
                 }
 
-                HorizontalLine { }
+                HorizontalLine {
+                    read-only: read-only;
+                }
             }
         }
 
-        if !read-only: VerticalLine { }
+        if !read-only: VerticalLine {
+            read-only: read-only;
+        }
 
         if !read-only: VerticalLayout {
-            HorizontalLine { }
+            HorizontalLine {
+                read-only: read-only;
+            }
 
             PartListViewTextCell {
                 height: row-height;
             }
 
-            HorizontalLine { }
+            HorizontalLine {
+                read-only: read-only;
+            }
 
             for item[index] in model: VerticalLayout {
                 add-delete-btn := IconButton {
                     height: row-height;
-                    background-color: #202020;
+                    background-color: Data.theme.control;
                     icon-size: 13px;
                     icon: {
                         if is-last-row(index) {
@@ -344,10 +403,14 @@ export component PartListView inherits ScrollView {
                     }
                 }
 
-                HorizontalLine { }
+                HorizontalLine {
+                    read-only: read-only;
+                }
             }
         }
 
-        if !read-only: VerticalLine { }
+        if !read-only: VerticalLine {
+            read-only: read-only;
+        }
     }
 }

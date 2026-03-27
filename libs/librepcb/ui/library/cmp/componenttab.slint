@@ -31,11 +31,11 @@ import {
 import {
     AttributeListView,
     Button,
+    CheckBox,
     IconButton,
     LineEdit,
     LinkText,
-    SlideView,
-    Switch,
+    NavBar,
     TextEdit,
 } from "../../widgets.slint";
 import {
@@ -166,7 +166,7 @@ component ComponentMetadataTab inherits GridLayout {
 
         deprecated-sw := DeprecatedRowCell {
             checked: tabs[index].deprecated;
-            enabled: !read-only;
+            read-only: read-only;
             accessible-label: deprecated-txt.text;
 
             toggled(checked) => {
@@ -217,8 +217,8 @@ component ComponentMetadataTab inherits GridLayout {
     Row {
         schematic-only-txt := SchematicOnlyRowHeader { }
 
-        schematic-only-sw := Switch {
-            font-size: 10px;
+        schematic-only-sw := CheckBox {
+            font-size: 11px;
             text: @tr("Check this if this component cannot be placed on boards (e.g. supply symbols, sheet frames, ...).");
             checked: tabs[index].schematic-only;
             enabled: !read-only;
@@ -257,6 +257,7 @@ component ComponentMetadataTab inherits GridLayout {
         default-value-txt := DefaultValueRowHeader { }
 
         default-value-edt := TextEdit {
+            min-height: default-value-hint-l.preferred-height;
             text: tabs[index].default-value;
             validation-error: tabs[index].default-value-error;
             read-only: read-only;
@@ -272,7 +273,7 @@ component ComponentMetadataTab inherits GridLayout {
                 Row {
                     default-value-hint-txt := Text {
                         colspan: 2;
-                        color: #909090;
+                        color: Data.theme.control-text-muted;
                         font-size: 11px;
                         wrap: word-wrap;
                         text: @tr("The VALUE the component gets when added to the schematics.");
@@ -284,7 +285,7 @@ component ComponentMetadataTab inherits GridLayout {
                     specific-txt := Text {
                         horizontal-stretch: 0;
                         overflow: elide;
-                        color: #909090;
+                        color: Data.theme.control-text-muted;
                         font-size: 11px;
                         text: @tr("For specific components (e.g. \"ESP32-S3R2\"):");
                         accessible-role: none;
@@ -292,7 +293,7 @@ component ComponentMetadataTab inherits GridLayout {
 
                     specific-btn := LinkText {
                         horizontal-stretch: 1;
-                        text-color: #c0c0c0;
+                        text-color: Data.theme.control-text-muted;
                         font-size: 11px;
                         text: "{{MPN or DEVICE or COMPONENT}}";
                         accessible-description: specific-txt.text;
@@ -307,7 +308,7 @@ component ComponentMetadataTab inherits GridLayout {
                     generic-txt := Text {
                         horizontal-stretch: 0;
                         overflow: elide;
-                        color: #909090;
+                        color: Data.theme.control-text-muted;
                         font-size: 11px;
                         text: @tr("For generic components (e.g. \"OpAmp\"):");
                         accessible-role: none;
@@ -315,7 +316,7 @@ component ComponentMetadataTab inherits GridLayout {
 
                     generic-btn := LinkText {
                         horizontal-stretch: 1;
-                        text-color: #c0c0c0;
+                        text-color: Data.theme.control-text-muted;
                         font-size: 11px;
                         text: "{{MPN or DEVICE}}";
                         accessible-description: generic-txt.text;
@@ -463,6 +464,7 @@ component ComponentSignalsEditorTab inherits VerticalLayout {
 
         new-signal-txt := Text {
             vertical-alignment: center;
+            color: Data.theme.base-text;
             text: @tr("Add Signals:");
             accessible-role: none;
         }
@@ -555,21 +557,46 @@ export component ComponentTab inherits Tab {
             shown: tabs[index].checks.errors > 0;
         }
 
-        // Wizard mode: Only one page at a time.
-        if tabs[index].wizard-mode && (tabs[index].page-index <= 0): metadata-tab-1 := ComponentMetadataTab {
+        // Pages in wizard mode:
+        //  [0] Metadata tab: Set metadata
+        //  [1] Add gates tab: Choose symbols
+        //  [2] Signals tab: Modify signals
+        //
+        // Pages in normal mode:
+        //  [0] Metadata tab
+        //  [1] Signals tab
+        //  [2] Variants & Gates tab
+
+        if !tabs[index].wizard-mode: navbar := NavBar {
+            pages: [
+                { id: 0, title: @tr("Metadata") },
+                { id: 1, title: @tr("Signals") },
+                { id: 2, title: @tr("Variants & Gates") },
+            ];
+            current-id: tabs[index].page-index;
+
+            page-clicked(id) => {
+                Data.set-current-tab(section-index, index);
+                tabs[index].page-index = id;
+            }
+        }
+
+        if tabs[index].page-index <= 0: metadata-tab := ComponentMetadataTab {
             section-index: section-index;
             tabs: tabs;
             index: index;
             read-only: read-only;
             window-height: window-height;
         }
+
         if tabs[index].wizard-mode && (tabs[index].page-index == 1): add-gates-tab := ComponentAddGatesTab {
             section-index: section-index;
             tabs: tabs;
             index: index;
             window-height: window-height;
         }
-        if tabs[index].wizard-mode && (tabs[index].page-index >= 2): signals-tab-1 := ComponentSignalsEditorTab {
+
+        if tabs[index].page-index == (tabs[index].wizard-mode ? 2 : 1): signals-tab := ComponentSignalsEditorTab {
             section-index: section-index;
             tabs: tabs;
             index: index;
@@ -580,58 +607,20 @@ export component ComponentTab inherits Tab {
             }
         }
 
-        // Normal mode: Slide between metadata, signals and variants.
-        if !tabs[index].wizard-mode: SlideView {
-            pages: [
-                // In wizard mode: Metadata, Add Gates, Signals
-                { title: @tr("Metadata") },
-                { title: @tr("Signals") },
-                { title: @tr("Variants & Gates") },
-            ];
-            current-index: tabs[index].page-index;
-            duration: 0;  // Temporary, needs proper refactoring.
+        if tabs[index].page-index >= (tabs[index].wizard-mode ? 3 : 2): variants-tab := ComponentVariantListView {
+            model: tabs[index].variants;
+            signal-names: tabs[index].signal-names;
+            unit: tabs[index].unit;
+            wizard-mode: false;
+            read-only: read-only;
+            window-height: window-height;
 
-            metadata-tab-2 := ComponentMetadataTab {
-                width: parent.width;
-                window-height: window-height;
-                section-index: section-index;
-                tabs: tabs;
-                index: index;
-                read-only: read-only;
+            render-scene(variant, gate, width, height, frame-dummy) => {
+                Backend.render-scene(section-index, width, height, variant * 1000 + gate, frame-dummy)
             }
 
-            signals-tab-2 := ComponentSignalsEditorTab {
-                width: parent.width;
-                section-index: section-index;
-                tabs: tabs;
-                index: index;
-                read-only: read-only;
-
-                focus-rejected => {
-                    root.focus();
-                }
-            }
-
-            variants-tab := ComponentVariantListView {
-                width: parent.width;
-                window-height: window-height;
-                model: tabs[index].variants;
-                signal-names: tabs[index].signal-names;
-                unit: tabs[index].unit;
-                wizard-mode: false;
-                read-only: read-only;
-
-                render-scene(variant, gate, width, height, frame-dummy) => {
-                    Backend.render-scene(section-index, width, height, variant * 1000 + gate, frame-dummy)
-                }
-
-                add-variant-clicked => {
-                    Backend.trigger-tab(section-index, index, TabAction.component-add-variant);
-                }
-            }
-
-            page-clicked(idx) => {
-                tabs[index].page-index = idx;
+            add-variant-clicked => {
+                Backend.trigger-tab(section-index, index, TabAction.component-add-variant);
             }
         }
     }

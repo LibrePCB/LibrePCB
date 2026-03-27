@@ -40,12 +40,14 @@ import {
     LineEdit,
     MenuItem,
     MenuPopup,
+    NavBar,
     SceneButton,
-    SlideView,
     SliderSceneButton,
     Spinner,
     TextEdit,
+    ToolBar,
     ToolButton,
+    ToolButtonGroup,
 } from "../../widgets.slint";
 import {
     Backend,
@@ -178,7 +180,7 @@ component PackageMetadataTab inherits GridLayout {
 
         deprecated-sw := DeprecatedRowCell {
             checked: tabs[index].deprecated;
-            enabled: !read-only;
+            read-only: read-only;
             accessible-label: deprecated-txt.text;
 
             toggled(checked) => {
@@ -208,7 +210,7 @@ component PackageMetadataTab inherits GridLayout {
         assembly-type-cbx := ComboBox {
             model: Constants.package-assembly-types;
             current-index: tabs[index].assembly-type;
-            enabled: !read-only;
+            read-only: read-only;
             window-height: window-height;
             accessible-label: assembly-type-txt.text;
 
@@ -253,8 +255,10 @@ component PackagePadsEditorTab inherits VerticalLayout {
     if !read-only: Rectangle {
         width: parent.width - 2 * parent.padding-left;
         height: self.preferred-height + 16px;
-        background: #454545;
-        border-radius: 10px;
+        background: Data.theme.control;
+        border-color: Data.theme.control-border;
+        border-width: 1px;
+        border-radius: 8px;
 
         Text {
             property <string> s1: @tr("Add all (potentially solderable) package pads which are electrically independent, no matter if they actually have an electrical function in a particular part.");
@@ -263,6 +267,7 @@ component PackagePadsEditorTab inherits VerticalLayout {
 
             width: parent.width - 16px;
             font-size: 11px;
+            color: Data.theme.control-text;
             wrap: word-wrap;
             text: @tr("Important:") + " " + s1 + " " + s2 + " " + s3;
         }
@@ -274,6 +279,7 @@ component PackagePadsEditorTab inherits VerticalLayout {
 
         new-pad-txt := Text {
             vertical-alignment: center;
+            color: Data.theme.base-text;
             text: @tr("Add Pads:");
             accessible-role: none;
         }
@@ -355,7 +361,7 @@ component PackageEditorTab inherits TouchArea {
     property <bool> view-3d: tabs[index].view-3d;
     property <bool> footprint-selected: (tabs[index].footprint-index >= 0) && (tabs[index].footprint-index < tabs[index].footprints.length);
     property <length> toolbar-space: view-buttons-l.x - toolbuttons-l.x - toolbuttons-l.width - 10px;
-    property <length> toolbutton-offset-y: (toolbar-r.width > toolbar-space) ? toolbar-r.height : 0;
+    property <length> toolbutton-offset-y: ((!view-3d) && (toolbar-r.width > toolbar-space)) ? toolbar-r.height : 0;
 
     function tool-triggered(action: TabAction) {
         Data.set-current-tab(section-index, index);
@@ -366,8 +372,11 @@ component PackageEditorTab inherits TouchArea {
 
     mouse-cursor: tabs[index].tool-cursor;
 
-    if Data.preview-mode: Rectangle {
-        background: view-3d ? #e6f2ff : black;
+    // Stangely the 3D scene colors look different (wrong) when using the
+    // light theme, compared to the dark theme. This doesn't happen when
+    // we draw a black background first.
+    Rectangle {
+        background: Data.preview-mode ? tabs[index].background-color : black;
     }
 
     img := Image {
@@ -382,7 +391,7 @@ component PackageEditorTab inherits TouchArea {
     if view-3d && (!tabs[index].opengl-error.is-empty): Rectangle {
         width: self.preferred-width;
         height: self.preferred-height;
-        background: red;
+        background: Data.theme.error;
         border-radius: 8px;
 
         VerticalLayout {
@@ -390,7 +399,7 @@ component PackageEditorTab inherits TouchArea {
 
             opengl-error-txt := Text {
                 max-width: 0.7 * root.width;
-                color: white;
+                color: Data.theme.error-text;
                 wrap: word-wrap;
                 text: tabs[index].opengl-error;
             }
@@ -403,10 +412,10 @@ component PackageEditorTab inherits TouchArea {
         y: toolbuttons-l.y;
         width: overlay-txt.preferred-width + 2 * overlay-txt.x;
         height: overlay-txt.preferred-height + 2 * overlay-txt.y;
-        background: tabs[index].overlay-color;
-        border-radius: 10px;
+        background: Data.theme.control;
+        border-radius: 3px;
         border-width: 1px;
-        border-color: tabs[index].overlay-text-color;
+        border-color: Data.theme.control-border;
 
         overlay-txt := Text {
             x: 8px;
@@ -414,118 +423,109 @@ component PackageEditorTab inherits TouchArea {
             horizontal-alignment: left;
             vertical-alignment: top;
             font-family: "Noto Sans Mono";
-            color: tabs[index].overlay-text-color;
+            color: Data.theme.control-text;
             text: tabs[index].tool-overlay-text;
         }
     }
 
-    toolbar-r := Rectangle {
-        y: 0;
+    toolbar-r := ToolBar {
+        y: -1px;
         width: min(self.preferred-width, root.width - 10px);
-        height: 34px;
-        background: #505050;
-        border-bottom-left-radius: 11px;
-        border-bottom-right-radius: 11px;
-        visible: self.width > 30px;
+        visible: (!view-3d) && (self.width > 30px);
 
-        HorizontalLayout {
-            alignment: center;
-            padding: 3px;
+        if tabs[index].tool == EditorTool.line: line-toolbar := DrawFootprintPolygonToolBar {
+            section-index: section-index;
+            section: section;
+            show-angle-edt: true;
+            show-fill-sw: false;
+            show-grab-area-sw: false;
+        }
 
-            if tabs[index].tool == EditorTool.line: line-toolbar := DrawFootprintPolygonToolBar {
-                section-index: section-index;
-                section: section;
-                show-angle-edt: true;
-                show-fill-sw: false;
-                show-grab-area-sw: false;
-            }
+        if tabs[index].tool == EditorTool.rect: rect-toolbar := DrawFootprintPolygonToolBar {
+            section-index: section-index;
+            section: section;
+            show-angle-edt: false;
+            show-fill-sw: true;
+            show-grab-area-sw: true;
+        }
 
-            if tabs[index].tool == EditorTool.rect: rect-toolbar := DrawFootprintPolygonToolBar {
-                section-index: section-index;
-                section: section;
-                show-angle-edt: false;
-                show-fill-sw: true;
-                show-grab-area-sw: true;
-            }
+        if tabs[index].tool == EditorTool.polygon: polygon-toolbar := DrawFootprintPolygonToolBar {
+            section-index: section-index;
+            section: section;
+            show-angle-edt: true;
+            show-fill-sw: true;
+            show-grab-area-sw: true;
+        }
 
-            if tabs[index].tool == EditorTool.polygon: polygon-toolbar := DrawFootprintPolygonToolBar {
-                section-index: section-index;
-                section: section;
-                show-angle-edt: true;
-                show-fill-sw: true;
-                show-grab-area-sw: true;
-            }
+        if tabs[index].tool == EditorTool.circle: circle-toolbar := DrawFootprintPolygonToolBar {
+            section-index: section-index;
+            section: section;
+            show-angle-edt: false;
+            show-fill-sw: true;
+            show-grab-area-sw: true;
+        }
 
-            if tabs[index].tool == EditorTool.circle: circle-toolbar := DrawFootprintPolygonToolBar {
-                section-index: section-index;
-                section: section;
-                show-angle-edt: false;
-                show-fill-sw: true;
-                show-grab-area-sw: true;
-            }
+        if tabs[index].tool == EditorTool.arc: arc-toolbar := DrawFootprintPolygonToolBar {
+            section-index: section-index;
+            section: section;
+            show-angle-edt: false;
+            show-fill-sw: false;
+            show-grab-area-sw: false;
+        }
 
-            if tabs[index].tool == EditorTool.arc: arc-toolbar := DrawFootprintPolygonToolBar {
-                section-index: section-index;
-                section: section;
-                show-angle-edt: false;
-                show-fill-sw: false;
-                show-grab-area-sw: false;
-            }
+        if tabs[index].tool == EditorTool.name: name-toolbar := AddFootprintStrokeTextToolBar {
+            section-index: section-index;
+            section: section;
+            show-layer-cbx: false;
+            show-text-edt: false;
+        }
 
-            if tabs[index].tool == EditorTool.name: name-toolbar := AddFootprintStrokeTextToolBar {
-                section-index: section-index;
-                section: section;
-                show-layer-cbx: false;
-                show-text-edt: false;
-            }
+        if tabs[index].tool == EditorTool.value: value-toolbar := AddFootprintStrokeTextToolBar {
+            section-index: section-index;
+            section: section;
+            show-layer-cbx: false;
+            show-text-edt: false;
+        }
 
-            if tabs[index].tool == EditorTool.value: value-toolbar := AddFootprintStrokeTextToolBar {
-                section-index: section-index;
-                section: section;
-                show-layer-cbx: false;
-                show-text-edt: false;
-            }
+        if tabs[index].tool == EditorTool.text: text-toolbar := AddFootprintStrokeTextToolBar {
+            section-index: section-index;
+            section: section;
+            show-layer-cbx: true;
+            show-text-edt: true;
+        }
 
-            if tabs[index].tool == EditorTool.text: text-toolbar := AddFootprintStrokeTextToolBar {
-                section-index: section-index;
-                section: section;
-                show-layer-cbx: true;
-                show-text-edt: true;
-            }
+        if tabs[index].tool == EditorTool.pad-tht: pad-tht-toolbar := AddFootprintPadToolBar {
+            section-index: section-index;
+            section: section;
+            show-side-selector: false;
+            show-drill-edt: true;
+            show-ratio-sw: root.width > 850px;
+            show-pressfit-sw: root.width > 900px;
+            fiducial-mode: tabs[index].tool-fiducial;
+        }
 
-            if tabs[index].tool == EditorTool.pad-tht: pad-tht-toolbar := AddFootprintPadToolBar {
-                section-index: section-index;
-                section: section;
-                show-side-selector: false;
-                show-drill-edt: true;
-                show-ratio-sw: root.width > 850px;
-                show-pressfit-sw: root.width > 900px;
-                fiducial-mode: tabs[index].tool-fiducial;
-            }
+        if tabs[index].tool == EditorTool.pad-smt: pad-smt-toolbar := AddFootprintPadToolBar {
+            section-index: section-index;
+            section: section;
+            show-side-selector: true;
+            show-drill-edt: false;
+            show-pressfit-sw: false;
+            fiducial-mode: tabs[index].tool-fiducial;
+        }
 
-            if tabs[index].tool == EditorTool.pad-smt: pad-smt-toolbar := AddFootprintPadToolBar {
-                section-index: section-index;
-                section: section;
-                show-side-selector: true;
-                show-drill-edt: false;
-                show-pressfit-sw: false;
-                fiducial-mode: tabs[index].tool-fiducial;
-            }
+        if tabs[index].tool == EditorTool.zone: zone-toolbar := DrawFootprintZoneToolBar {
+            section-index: section-index;
+            section: section;
+        }
 
-            if tabs[index].tool == EditorTool.zone: zone-toolbar := DrawFootprintZoneToolBar {
-                section-index: section-index;
-                section: section;
-            }
+        if tabs[index].tool == EditorTool.hole: hole-toolbar := AddFootprintHoleToolBar {
+            section-index: section-index;
+            section: section;
+        }
 
-            if tabs[index].tool == EditorTool.hole: hole-toolbar := AddFootprintHoleToolBar {
-                section-index: section-index;
-                section: section;
-            }
-
-            if tabs[index].tool == EditorTool.renumber-pads: renumber-pads-toolbar := ReNumberPadsToolBar {
-                section-index: section-index;
-                section: section;
-            }
+        if tabs[index].tool == EditorTool.renumber-pads: renumber-pads-toolbar := ReNumberPadsToolBar {
+            section-index: section-index;
+            section: section;
         }
     }
 
@@ -534,6 +534,7 @@ component PackageEditorTab inherits TouchArea {
         y: 7px + toolbutton-offset-y;
         width: self.preferred-width;
         height: self.preferred-height;
+        alignment: start;
         spacing: 5px;
         visible: !view-3d;
 
@@ -547,20 +548,25 @@ component PackageEditorTab inherits TouchArea {
             }
         }
 
-        tool-line-btn := ToolButton {
-            cmd: Cmd.tool-line;
-            icon: @image-url("../../../../../img/actions/draw_wire.png");
-            checked: tabs[index].tool == EditorTool.line;
-            enabled: footprint-selected && (!read-only);
+        ToolButtonGroup {
+            tool-line-btn := ToolButton {
+                cmd: Cmd.tool-line;
+                icon: @image-url("../../../../../img/actions/draw_wire.png");
+                checked: tabs[index].tool == EditorTool.line;
+                enabled: footprint-selected && (!read-only);
+                is-last: false;
 
-            clicked => {
-                tool-triggered(TabAction.tool-line);
+                clicked => {
+                    tool-triggered(TabAction.tool-line);
+                }
             }
 
             tool-rect-btn := ToolButton {
                 cmd: Cmd.tool-rect;
                 checked: tabs[index].tool == EditorTool.rect;
                 enabled: footprint-selected && (!read-only);
+                is-first: false;
+                is-last: false;
 
                 clicked => {
                     tool-triggered(TabAction.tool-rect);
@@ -571,6 +577,8 @@ component PackageEditorTab inherits TouchArea {
                 cmd: Cmd.tool-polygon;
                 checked: tabs[index].tool == EditorTool.polygon;
                 enabled: footprint-selected && (!read-only);
+                is-first: false;
+                is-last: false;
 
                 clicked => {
                     tool-triggered(TabAction.tool-polygon);
@@ -581,6 +589,8 @@ component PackageEditorTab inherits TouchArea {
                 cmd: Cmd.tool-circle;
                 checked: tabs[index].tool == EditorTool.circle;
                 enabled: footprint-selected && (!read-only);
+                is-first: false;
+                is-last: false;
 
                 clicked => {
                     tool-triggered(TabAction.tool-circle);
@@ -591,6 +601,7 @@ component PackageEditorTab inherits TouchArea {
                 cmd: Cmd.tool-arc;
                 checked: tabs[index].tool == EditorTool.arc;
                 enabled: footprint-selected && (!read-only);
+                is-first: false;
 
                 clicked => {
                     tool-triggered(TabAction.tool-arc);
@@ -598,13 +609,16 @@ component PackageEditorTab inherits TouchArea {
             }
         }
 
-        tool-text-btn := ToolButton {
-            cmd: Cmd.tool-text;
-            checked: tabs[index].tool == EditorTool.text;
-            enabled: footprint-selected && (!read-only);
+        ToolButtonGroup {
+            tool-text-btn := ToolButton {
+                cmd: Cmd.tool-text;
+                checked: tabs[index].tool == EditorTool.text;
+                enabled: footprint-selected && (!read-only);
+                is-last: false;
 
-            clicked => {
-                tool-triggered(TabAction.tool-text);
+                clicked => {
+                    tool-triggered(TabAction.tool-text);
+                }
             }
 
             tool-name-btn := ToolButton {
@@ -612,6 +626,8 @@ component PackageEditorTab inherits TouchArea {
                 icon: @image-url("../../../../../img/actions/add_name.png");
                 checked: tabs[index].tool == EditorTool.name;
                 enabled: footprint-selected && (!read-only);
+                is-first: false;
+                is-last: false;
 
                 clicked => {
                     tool-triggered(TabAction.tool-name);
@@ -623,6 +639,7 @@ component PackageEditorTab inherits TouchArea {
                 icon: @image-url("../../../../../img/actions/add_value.png");
                 checked: tabs[index].tool == EditorTool.value;
                 enabled: footprint-selected && (!read-only);
+                is-first: false;
 
                 clicked => {
                     tool-triggered(TabAction.tool-value);
@@ -630,15 +647,18 @@ component PackageEditorTab inherits TouchArea {
             }
         }
 
-        tool-pad-tht-btn := ToolButton {
-            cmd: Cmd.tool-pad-tht;
-            icon: @image-url("../../../../../img/actions/add_tht_pad.png");
-            colorize: transparent;
-            checked: tabs[index].tool == EditorTool.pad-tht;
-            enabled: footprint-selected && (!read-only);
+        ToolButtonGroup {
+            tool-pad-tht-btn := ToolButton {
+                cmd: Cmd.tool-pad-tht;
+                icon: @image-url("../../../../../img/actions/add_tht_pad.png");
+                colorize: transparent;
+                checked: tabs[index].tool == EditorTool.pad-tht;
+                enabled: footprint-selected && (!read-only);
+                is-last: false;
 
-            clicked => {
-                tool-triggered(TabAction.tool-pad-tht);
+                clicked => {
+                    tool-triggered(TabAction.tool-pad-tht);
+                }
             }
 
             tool-pad-smt-btn := ToolButton {
@@ -648,6 +668,7 @@ component PackageEditorTab inherits TouchArea {
                 has-menu: true;
                 checked: tabs[index].tool == EditorTool.pad-smt;
                 enabled: footprint-selected && (!read-only);
+                is-first: false;
 
                 clicked => {
                     tool-triggered(TabAction.tool-pad-smt);
@@ -803,8 +824,8 @@ component PackageEditorTab inherits TouchArea {
             x: parent.width - self.width;
             icon: @image-url("../../../../font-awesome/svgs/solid/expand.svg");
             icon-scale: 0.9;
-            bg-color: tabs[index].background-color;
-            fg-color: tabs[index].foreground-color;
+            base-color: tabs[index].background-color;
+            base-text-color: tabs[index].foreground-color;
             enabled: footprint-selected;
 
             clicked => {
@@ -815,8 +836,8 @@ component PackageEditorTab inherits TouchArea {
         zoom-in-btn := SceneButton {
             x: parent.width - self.width;
             icon: @image-url("../../../../bootstrap-icons/icons/zoom-in.svg");
-            bg-color: tabs[index].background-color;
-            fg-color: tabs[index].foreground-color;
+            base-color: tabs[index].background-color;
+            base-text-color: tabs[index].foreground-color;
             enabled: footprint-selected;
 
             clicked => {
@@ -827,8 +848,8 @@ component PackageEditorTab inherits TouchArea {
         zoom-out-btn := SceneButton {
             x: parent.width - self.width;
             icon: @image-url("../../../../bootstrap-icons/icons/zoom-out.svg");
-            bg-color: tabs[index].background-color;
-            fg-color: tabs[index].foreground-color;
+            base-color: tabs[index].background-color;
+            base-text-color: tabs[index].foreground-color;
             enabled: footprint-selected;
 
             clicked => {
@@ -842,8 +863,8 @@ component PackageEditorTab inherits TouchArea {
             icon-scale: self.slider-enabled ? 0.8 : 0.9;
             icon: Cmd.toggle-background-image.icon;
             tooltip: self.slider-enabled ? @tr("Background Image") : Cmd.toggle-background-image.text;
-            bg-color: tabs[index].background-color;
-            fg-color: tabs[index].foreground-color;
+            base-color: tabs[index].background-color;
+            base-text-color: tabs[index].foreground-color;
             value: tabs[index].background-image-alpha;
             slider-enabled: tabs[index].background-image-set;
             enabled: footprint-selected;
@@ -862,8 +883,8 @@ component PackageEditorTab inherits TouchArea {
             icon: @image-url("../../../../bootstrap-icons/icons/cpu.svg");
             tooltip: @tr("Devices");
             value: tabs[index].devices-alpha;
-            bg-color: tabs[index].background-color;
-            fg-color: tabs[index].foreground-color;
+            base-color: tabs[index].background-color;
+            base-text-color: tabs[index].foreground-color;
 
             value-changed(value) => {
                 tabs[index].devices-alpha = value;
@@ -875,8 +896,8 @@ component PackageEditorTab inherits TouchArea {
             icon: @image-url("../../../../font-awesome/svgs/solid/highlighter.svg");
             tooltip: @tr("Solder Paste");
             value: tabs[index].solderpaste-alpha;
-            bg-color: tabs[index].background-color;
-            fg-color: tabs[index].foreground-color;
+            base-color: tabs[index].background-color;
+            base-text-color: tabs[index].foreground-color;
 
             value-changed(value) => {
                 tabs[index].solderpaste-alpha = value;
@@ -888,8 +909,8 @@ component PackageEditorTab inherits TouchArea {
             icon: @image-url("../../../../font-awesome/svgs/solid/font.svg");
             tooltip: @tr("Silkscreen");
             value: tabs[index].silkscreen-alpha;
-            bg-color: tabs[index].background-color;
-            fg-color: tabs[index].foreground-color;
+            base-color: tabs[index].background-color;
+            base-text-color: tabs[index].foreground-color;
 
             value-changed(value) => {
                 tabs[index].silkscreen-alpha = value;
@@ -901,8 +922,8 @@ component PackageEditorTab inherits TouchArea {
             icon: @image-url("../../../../font-awesome/svgs/solid/fill.svg");
             tooltip: @tr("Solder Resist");
             value: tabs[index].solderresist-alpha;
-            bg-color: tabs[index].background-color;
-            fg-color: tabs[index].foreground-color;
+            base-color: tabs[index].background-color;
+            base-text-color: tabs[index].foreground-color;
 
             value-changed(value) => {
                 tabs[index].solderresist-alpha = value;
@@ -912,8 +933,8 @@ component PackageEditorTab inherits TouchArea {
         toggle-3d-btn := SceneButton {
             x: parent.width - self.width;
             text: view-3d ? "2D" : "3D";
-            bg-color: tabs[index].background-color;
-            fg-color: tabs[index].foreground-color;
+            base-color: tabs[index].background-color;
+            base-text-color: tabs[index].foreground-color;
             enabled: footprint-selected;
 
             clicked => {
@@ -931,7 +952,7 @@ component PackageEditorTab inherits TouchArea {
         }
 
         if tabs[index].refreshing: spinner := Spinner {
-            x: (parent.width - self.width) / 2;
+            x: toggle-3d-btn.x + (toggle-3d-btn.width - self.width) / 2;
             width: 20px;
             height: self.width;
             foreground-color: tabs[index].foreground-color;
@@ -1050,74 +1071,35 @@ export component PackageTab inherits Tab {
             shown: tabs[index].checks.errors > 0;
         }
 
-        // Wizard mode: Only one page at a time.
-        if tabs[index].wizard-mode && (tabs[index].page-index <= 0): metadata-tab-1 := PackageMetadataTab {
-            section-index: section-index;
-            tabs: tabs;
-            index: index;
-            read-only: read-only;
-            window-height: window-height;
-        }
-        if tabs[index].wizard-mode && (tabs[index].page-index == 1): pads-tab-1 := PackagePadsEditorTab {
-            width: parent.width;
-            section-index: section-index;
-            tabs: tabs;
-            index: index;
-            read-only: read-only;
-        }
+        // Pages in wizard mode:
+        //  [0] Metadata tab: Set metadata
+        //  [1] Package pads tab: Add pads
+        //
+        // Pages in normal mode:
+        //  [0] Metadata tab
+        //  [1] Package pads tab
+        //  [2] Editor tab (footprints)
+        //  [3] Editor tab (3D models)
 
-        // Normal mode: Slide between metadata and content.
-        if !tabs[index].wizard-mode: SlideView {
+        if !tabs[index].wizard-mode: navbar := NavBar {
             pages: [
-                { title: @tr("Metadata") },
-                { title: @tr("Pads") },
-                { title: @tr("Footprints") },
-                { title: @tr("3D Models") },
+                { id: 0, title: @tr("Metadata") },
+                { id: 1, title: @tr("Pads") },
+                { id: 2, title: @tr("Footprints") },
+                { id: 3, title: @tr("3D Models") },
             ];
-            current-index: tabs[index].page-index;
-            current-navbar-index: {
+            current-id: {
                 if ((tabs[index].page-index == 2) && (tabs[index].view-3d)) {
                     3
                 } else {
                     tabs[index].page-index
                 }
             };
-            duration: 0;  // Temporary, needs proper refactoring.
 
-            metadata-tab-2 := PackageMetadataTab {
-                width: parent.width;
-                section-index: section-index;
-                tabs: tabs;
-                index: index;
-                read-only: read-only;
-                window-height: window-height;
-            }
+            page-clicked(id) => {
+                Data.set-current-tab(section-index, index);
 
-            pads-tab-2 := PackagePadsEditorTab {
-                width: parent.width;
-                section-index: section-index;
-                tabs: tabs;
-                index: index;
-                read-only: read-only;
-            }
-
-            editor-tab := PackageEditorTab {
-                width: parent.width;
-                section-index: section-index;
-                section: section;
-                tabs: tabs;
-                index: index;
-                read-only: read-only;
-
-                focus-requested => {
-                    if !root.has-focus {
-                        root.focus();
-                    }
-                }
-            }
-
-            page-clicked(idx) => {
-                if idx == 3 {
+                if id == 3 {
                     tabs[index].page-index = 2;
                     tabs[index].view-3d = true;
                     // When switching to 3D this way (rather than via "3D" btn),
@@ -1125,11 +1107,40 @@ export component PackageTab inherits Tab {
                     if tabs[index].devices-alpha == 0 {
                         tabs[index].devices-alpha = 1;
                     }
-                } else if idx == 2 {
+                } else if id == 2 {
                     tabs[index].page-index = 2;
                     tabs[index].view-3d = false;
                 } else {
-                    tabs[index].page-index = idx;
+                    tabs[index].page-index = id;
+                }
+            }
+        }
+
+        if tabs[index].page-index <= 0: metadata-tab := PackageMetadataTab {
+            section-index: section-index;
+            tabs: tabs;
+            index: index;
+            read-only: read-only;
+            window-height: window-height;
+        }
+
+        if tabs[index].page-index == 1: pads-tab := PackagePadsEditorTab {
+            section-index: section-index;
+            tabs: tabs;
+            index: index;
+            read-only: read-only;
+        }
+
+        if tabs[index].page-index >= 2: editor-tab := PackageEditorTab {
+            section-index: section-index;
+            section: section;
+            tabs: tabs;
+            index: index;
+            read-only: read-only;
+
+            focus-requested => {
+                if !root.has-focus {
+                    root.focus();
                 }
             }
         }

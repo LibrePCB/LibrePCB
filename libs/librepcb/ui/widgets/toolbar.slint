@@ -1,0 +1,110 @@
+import { IconButton } from "iconbutton.slint";
+import { Data } from "../api.slint";
+
+export component ToolBar inherits Rectangle {
+    height: 33px;
+    background: Data.theme.window;
+    border-color: Data.theme.base-border;
+    border-width: 1px;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: self.border-bottom-left-radius;
+
+    HorizontalLayout {
+        alignment: center;
+        padding: 4px;
+
+        @children
+    }
+}
+
+export component ToolBarWidget inherits FocusScope {
+    in property <length> content-padding: 5px;
+    in property <length> content-padding-left: self.content-padding;
+    in property <length> content-padding-right: self.content-padding;
+    in property <length> content-padding-top: self.content-padding;
+    in property <length> content-padding-bottom: self.content-padding;
+    in property <length> spacing: 3px;
+
+    width: self.preferred-width;
+    preferred-height: 25px;
+
+    Rectangle {
+        background: {
+            if !root.enabled {
+                Data.theme.control-disabled
+            } else {
+                Data.theme.control
+            }
+        };
+        border-color: {
+            if root.has-focus {
+                Data.theme.accent
+            } else if root.enabled {
+                Data.theme.control-border
+            } else {
+                Data.theme.control-border-disabled
+            }
+        }
+        border-width: 1px;
+
+        HorizontalLayout {
+            padding-left: content-padding-left;
+            padding-right: content-padding-right;
+            padding-top: content-padding-top;
+            padding-bottom: content-padding-bottom;
+            spacing: spacing;
+
+            @children
+        }
+    }
+}
+
+export component ToolBarButton inherits ToolBarWidget {
+    in property <image> icon;
+    in property <string> tooltip;
+    in property <string> status-tip;
+    in property <bool> checkable: false;
+    in-out property <bool> checked: false;
+
+    preferred-width: self.height;
+    content-padding: 1px;
+
+    callback clicked(bool);
+    clicked(b) => {
+        self.checked = b;
+    }
+
+    key-pressed(event) => {
+        if event.text == Key.Space {
+            clicked(!self.checked);
+            return accept;
+        }
+        reject
+    }
+
+    btn := IconButton {
+        width: self.height;
+        icon: icon;
+        tooltip: tooltip;
+        status-tip: status-tip;
+        background-color-hovered: transparent;
+        background-color-checked: Data.theme.control-checked;
+        color-disabled: Data.theme.control-text-disabled;
+        color-enabled: (checkable && (!root.checked)) ? Data.theme.control-text-muted : Data.theme.control-text;
+        color-hovered: Data.theme.control-text;
+        checked: checked;
+
+        clicked => {
+            root.clicked(!root.checked);
+        }
+    }
+}
+
+export component ToolBarSelectorButton inherits IconButton {
+    width: 18px;
+    style: checkable-hyperlink;
+    color-disabled: Data.theme.control-text-disabled;
+    color-enabled: Data.theme.control-text-disabled;
+    color-hovered: Data.theme.control-text-muted;
+    color-checked: Data.theme.control-text;
+}

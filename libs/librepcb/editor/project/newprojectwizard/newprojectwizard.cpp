@@ -51,8 +51,8 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-NewProjectWizard::NewProjectWizard(const Workspace& ws, Mode mode,
-                                   QWidget* parent) noexcept
+NewProjectWizard::NewProjectWizard(const UiTheme& theme, const Workspace& ws,
+                                   Mode mode, QWidget* parent) noexcept
   : QWizard(parent),
     mWorkspace(ws),
     mMode(mode),
@@ -64,7 +64,7 @@ NewProjectWizard::NewProjectWizard(const Workspace& ws, Mode mode,
 
   if (mMode == Mode::EagleImport) {
     addPage(mPageEagleImport =
-                new NewProjectWizardPage_EagleImport(mWorkspace, this));
+                new NewProjectWizardPage_EagleImport(theme, mWorkspace, this));
   }
   addPage(mPageMetadata = new NewProjectWizardPage_Metadata(mWorkspace, this));
   if (mMode == Mode::NewProject) {

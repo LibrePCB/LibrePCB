@@ -1,10 +1,11 @@
 import {
     AngleEdit,
     ComboBox,
-    IconButton,
     LengthEdit,
+    ToolBarButton,
 } from "../../widgets.slint";
 import {
+    Data,
     SymbolTabData,
     WindowSectionData,
 } from "../../api.slint";
@@ -69,38 +70,24 @@ export component DrawSymbolPolygonToolBar inherits HorizontalLayout {
         }
     }
 
-    if show-fill-sw: fill-sw := IconButton {
+    if show-fill-sw: fill-sw := ToolBarButton {
         icon: @image-url("../../../../font-awesome/svgs/solid/fill-drip.svg");
-        icon-scale: 0.6;
         tooltip: @tr("Fill Area");
         status-tip: @tr("Fill the polygon with its outline color (only when closed)");
-        background-color: #202020;
-        background-color-hovered: #404040;
-        background-color-checked: black;
-        color-enabled: #606060;
-        color-hovered: #e0e0e0;
-        color-checked: #e0e0e0;
-        border-radius: 10px;
         checked: tabs[section.current-tab-index].tool-filled;
+        checkable: true;
 
         clicked => {
             tabs[section.current-tab-index].tool-filled = !self.checked;
         }
     }
 
-    if show-grab-area-sw: grab-area-sw := IconButton {
+    if show-grab-area-sw: grab-area-sw := ToolBarButton {
         icon: @image-url("../../../../font-awesome/svgs/solid/hand.svg");
-        icon-scale: 0.6;
         tooltip: @tr("Grab Area");
         status-tip: @tr("Allow grabbing the symbol within the polygon's area");
-        background-color: #202020;
-        background-color-hovered: #404040;
-        background-color-checked: black;
-        color-enabled: #606060;
-        color-hovered: #e0e0e0;
-        color-checked: #e0e0e0;
-        border-radius: 10px;
         checked: tabs[section.current-tab-index].tool-grab-area;
+        checkable: true;
 
         clicked => {
             tabs[section.current-tab-index].tool-grab-area = !self.checked;

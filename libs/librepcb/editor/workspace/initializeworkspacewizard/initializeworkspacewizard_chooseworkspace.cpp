@@ -28,6 +28,7 @@
 
 #include <librepcb/core/exceptions.h>
 #include <librepcb/core/fileio/filepath.h>
+#include <librepcb/core/workspace/uitheme.h>
 
 /*******************************************************************************
  *  Namespace
@@ -131,11 +132,17 @@ void InitializeWorkspaceWizard_ChooseWorkspace::updateWorkspacePath() noexcept {
   }
 
   if (mContext.getWorkspaceExists()) {
-    mUi->lblStatus->setText("<font color=\"#62de70\">✔ " % message % "</font>");
+    mUi->lblStatus->setText(
+        QString("<font color=\"%1\">✔ %2</font>")
+            .arg(mContext.getTheme().baseTextSuccess.name(), message));
   } else if (mContext.isWorkspacePathValid()) {
-    mUi->lblStatus->setText("<font color=\"#63d0df\">➤ " % message % "</font>");
+    mUi->lblStatus->setText(
+        QString("<font color=\"%1\">➤ %2</font>")
+            .arg(mContext.getTheme().baseTextInfo.name(), message));
   } else {
-    mUi->lblStatus->setText("<font color=\"red\">⚠ " % message % "</font>");
+    mUi->lblStatus->setText(
+        QString("<font color=\"%1\">⚠ %2</font>")
+            .arg(mContext.getTheme().baseTextError.name(), message));
   }
 
   // Workaround to force nextId() to be reloaded.

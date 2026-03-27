@@ -545,6 +545,8 @@ add_library(
   workspace/theme.h
   workspace/themecolor.cpp
   workspace/themecolor.h
+  workspace/uitheme.cpp
+  workspace/uitheme.h
   workspace/workspace.cpp
   workspace/workspace.h
   workspace/workspacelibrarydb.cpp

@@ -81,11 +81,12 @@ WorkspaceSettings::WorkspaceSettings(QObject* parent)
     mUpgradeRequired(false),
     // Initialize settings items. Their constructor will register them as
     // child objects of this object, this way we will access them later.
-    userName("user", "", this),
+    uiTheme("ui_theme", "", this),
     applicationLocale("application_locale", "", this),
     defaultLengthUnit("default_length_unit", LengthUnit::millimeters(), this),
     projectAutosaveIntervalSeconds("project_autosave_interval", 600U, this),
     useOpenGl("use_opengl", false, this),
+    userName("user", "", this),
     libraryLocaleOrder("library_locale_order", "locale", QStringList(), this),
     libraryNormOrder("library_norm_order", "norm", QStringList(), this),
     apiEndpoints("api_endpoints", "endpoint",

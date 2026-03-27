@@ -33,6 +33,7 @@
 #include <librepcb/core/types/lengthunit.h>
 #include <librepcb/core/types/ratio.h>
 #include <librepcb/core/workspace/theme.h>
+#include <librepcb/core/workspace/uitheme.h>
 
 #include <optional>
 
@@ -68,6 +69,8 @@ Angle s2angle(int v) noexcept;
 
 int l2s(const Ratio& v) noexcept;
 Ratio s2ratio(int v) noexcept;
+
+ui::Theme l2s(const UiTheme& v) noexcept;
 
 ui::GridStyle l2s(Theme::GridStyle v) noexcept;
 Theme::GridStyle s2l(ui::GridStyle v) noexcept;

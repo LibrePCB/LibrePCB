@@ -37,6 +37,7 @@
 #include <librepcb/core/application.h>
 #include <librepcb/core/norms.h>
 #include <librepcb/core/utils/toolbox.h>
+#include <librepcb/core/workspace/uitheme.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacesettings.h>
 
@@ -69,6 +70,24 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
   discardTemporaryModifications();
 
   const EditorCommandSet& cmd = EditorCommandSet::instance();
+
+  // Initialize UI theme widgets
+  {
+    mUi->cbxUiTheme->addItem(tr("System Theme"), QString(""));
+    for (const UiTheme* theme : UiTheme::all()) {
+      mUi->cbxUiTheme->addItem(theme->getNameTr(), theme->id);
+    }
+    // Apply this setting immediately.
+    connect(mUi->cbxUiTheme, &QComboBox::currentIndexChanged, this,
+            [this](int i) {
+              if (i >= 0) {
+                mSettings.uiTheme.set(mUi->cbxUiTheme->itemData(i).toString());
+              }
+            });
+    // Link to color schemes tab.
+    connect(mUi->lblSeeColorSchemes, &QLabel::linkActivated, this,
+            [this]() { mUi->tabWidget->setCurrentWidget(mUi->themesTab); });
+  }
 
   // Initialize application locale widgets
   {
@@ -471,7 +490,11 @@ void WorkspaceSettingsDialog::keyPressEvent(QKeyEvent* event) noexcept {
 }
 
 void WorkspaceSettingsDialog::changeEvent(QEvent* event) noexcept {
-  if (event->type() == QEvent::LanguageChange) {
+  if (event->type() == QEvent::PaletteChange) {
+    // Workaround to avoid outdated hyperlink color.
+    mUi->lblSeeColorSchemes->setText("");
+    mUi->retranslateUi(this);
+  } else if (event->type() == QEvent::LanguageChange) {
     mUi->retranslateUi(this);
   }
   QDialog::changeEvent(event);
@@ -664,8 +687,12 @@ void WorkspaceSettingsDialog::updateDesktopIntegrationStatus() noexcept {
 void WorkspaceSettingsDialog::loadSettings() noexcept {
   discardTemporaryModifications();
 
-  // User Name
-  mUi->edtUserName->setText(mSettings.userName.get());
+  // UI Theme
+  {
+    QSignalBlocker blocker(mUi->cbxUiTheme);
+    mUi->cbxUiTheme->setCurrentIndex(
+        mUi->cbxUiTheme->findData(mSettings.uiTheme.get()));
+  }
 
   // Application Locale
   {
@@ -688,6 +715,9 @@ void WorkspaceSettingsDialog::loadSettings() noexcept {
 
   // Use OpenGL
   mUi->cbxUseOpenGl->setChecked(mSettings.useOpenGl.get());
+
+  // User Name
+  mUi->edtUserName->setText(mSettings.userName.get());
 
   // Library Locale Order
   mLibLocaleOrderModel->setValues(mSettings.libraryLocaleOrder.get());
@@ -722,8 +752,7 @@ void WorkspaceSettingsDialog::saveSettings() noexcept {
   discardTemporaryModifications();
 
   try {
-    // User Name
-    mSettings.userName.set(mUi->edtUserName->text().trimmed());
+    // UI Theme was applied immediately.
 
     // Application Locale was applied immediately.
 
@@ -739,6 +768,9 @@ void WorkspaceSettingsDialog::saveSettings() noexcept {
 
     // Use OpenGL
     mSettings.useOpenGl.set(mUi->cbxUseOpenGl->isChecked());
+
+    // User Name
+    mSettings.userName.set(mUi->edtUserName->text().trimmed());
 
     // Library Locale Order
     mSettings.libraryLocaleOrder.set(mLibLocaleOrderModel->getValues());
@@ -781,10 +813,12 @@ void WorkspaceSettingsDialog::saveSettings() noexcept {
 }
 
 void WorkspaceSettingsDialog::discardTemporaryModifications() noexcept {
+  mOldUiTheme = mSettings.uiTheme.get();
   mOldApplicationLocale = mSettings.applicationLocale.get();
 }
 
 void WorkspaceSettingsDialog::revertTemporaryModifications() noexcept {
+  mSettings.uiTheme.set(mOldUiTheme);
   mSettings.applicationLocale.set(mOldApplicationLocale);
 }
 

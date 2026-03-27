@@ -20,6 +20,8 @@ import {
 } from "../metadatawidgets.slint";
 import {
     HorizontalSlider,
+    IconButton,
+    IconButtonStyle,
     LineEdit,
     LinkText,
     MessageBanner,
@@ -172,7 +174,7 @@ export component OrganizationTab inherits Tab {
 
                 deprecated-sw := DeprecatedRowCell {
                     checked: tabs[index].deprecated;
-                    enabled: !read-only;
+                    read-only: read-only;
                     accessible-label: deprecated-txt.text;
 
                     toggled(checked) => {
@@ -206,10 +208,13 @@ export component OrganizationTab inherits Tab {
                 priority-txt := PriorityRowHeader { }
 
                 HorizontalLayout {
+                    z: 100; // For the tooltip
+
                     priority-value-txt := Text {
                         min-width: 30px;
                         horizontal-alignment: left;
                         vertical-alignment: center;
+                        color: Data.theme.base-text;
                         text: tabs[index].priority;
                     }
 
@@ -223,6 +228,23 @@ export component OrganizationTab inherits Tab {
                         value-accepted => {
                             Backend.trigger-tab(section-index, index, TabAction.apply);
                         }
+                    }
+
+                    priority-info-btn := IconButton {
+                        property <string> line-1: @tr("Organizations with higher priority will appear before organizations with lower priority.");
+                        property <string> line-2: "0..49: ⚠ " + @tr("Reserved for official organizations");
+                        property <string> line-3: "50..99: ✓ " + @tr("Recommended for your personal organizations");
+                        property <string> line-4: "100: ⚠ " + @tr("Reserved for LibrePCB Fab");
+                        property <string> line-5: "101+: 🛇 " + @tr("Not recommended");
+
+                        y: (parent.height - self.height) / 2;
+                        height: 16px;
+                        style: IconButtonStyle.read-only;
+                        icon: @image-url("../../../../bootstrap-icons/icons/info-circle.svg");
+                        tooltip: line-1 + "\n\n" + line-2 + "\n" + line-3 + "\n" + line-4 + "\n" + line-5;
+                        tooltip-position: left;
+                        tooltip-delayed: false;
+                        accessible-label: self.tooltip;
                     }
                 }
             }

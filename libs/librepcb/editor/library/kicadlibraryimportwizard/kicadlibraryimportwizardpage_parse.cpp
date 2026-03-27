@@ -80,7 +80,7 @@ void KiCadLibraryImportWizardPage_Parse::initializePage() {
   std::shared_ptr<MessageLogger> log = std::make_shared<MessageLogger>(false);
   connect(log.get(), &MessageLogger::msgEmitted, this,
           [this](const MessageLogger::Message& msg) {
-            mUi->txtMessages->append(msg.toRichText());
+            mUi->txtMessages->append(msg.toRichText(&mContext->getTheme()));
             mUi->txtMessages->verticalScrollBar()->setValue(
                 mUi->txtMessages->verticalScrollBar()->maximum());
           });

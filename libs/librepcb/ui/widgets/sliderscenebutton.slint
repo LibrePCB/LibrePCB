@@ -5,8 +5,8 @@ export component SliderSceneButton {
     in property <image> icon;
     in property <string> tooltip;
     in property <float> value;
-    in property <brush> bg-color;
-    in property <brush> fg-color;
+    in property <color> base-color;
+    in property <color> base-text-color;
     in property <bool> enabled: true;
     in property <bool> slider-enabled: true;
     in property <SceneButtonStyle> style: uncheckbox;
@@ -32,11 +32,11 @@ export component SliderSceneButton {
                     x: (parent.width - self.width) / 2;
                     width: self.preferred-width + 6px;
                     height: self.preferred-height + 2px;
-                    background: bg-color;
+                    background: base-color;
                     border-radius: 5px;
 
                     Text {
-                        color: fg-color;
+                        color: base-text-color;
                         horizontal-alignment: center;
                         font-size: 10px;
                         text: tooltip;
@@ -59,8 +59,8 @@ export component SliderSceneButton {
             btn := SceneButton {
                 icon: icon;
                 icon-scale: icon-scale;
-                bg-color: bg-color;
-                fg-color: fg-color;
+                base-color: base-color;
+                base-text-color: base-text-color;
                 style: style;
                 checked: {
                     if style == SceneButtonStyle.uncheckbox {

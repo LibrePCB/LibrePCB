@@ -21,8 +21,11 @@ export component Board3dTab inherits Tab {
 
     enabled: true;
 
-    if Data.preview-mode: Rectangle {
-        background: tabs[index].background-color;
+    // Stangely the 3D scene colors look different (wrong) when using the
+    // light theme, compared to the dark theme. This doesn't happen when
+    // we draw a black background first.
+    Rectangle {
+        background: Data.preview-mode ? tabs[index].background-color : black;
     }
 
     img := Image {
@@ -38,7 +41,7 @@ export component Board3dTab inherits Tab {
         if !tabs[index].error.is-empty: Rectangle {
             width: self.preferred-width;
             height: self.preferred-height;
-            background: red;
+            background: Data.theme.error;
             border-radius: 8px;
 
             VerticalLayout {
@@ -46,7 +49,7 @@ export component Board3dTab inherits Tab {
 
                 error-txt := Text {
                     max-width: 0.7 * root.width;
-                    color: white;
+                    color: Data.theme.error-text;
                     wrap: word-wrap;
                     text: tabs[index].error;
                 }
@@ -62,8 +65,8 @@ export component Board3dTab inherits Tab {
                 x: parent.width - self.width;
                 icon: @image-url("../../../../font-awesome/svgs/solid/expand.svg");
                 icon-scale: 0.9;
-                bg-color: tabs[index].background-color;
-                fg-color: tabs[index].foreground-color;
+                base-color: tabs[index].background-color;
+                base-text-color: tabs[index].foreground-color;
 
                 clicked => {
                     Backend.trigger-tab(section-index, index, TabAction.zoom-fit);
@@ -73,8 +76,8 @@ export component Board3dTab inherits Tab {
             zoom-in-btn := SceneButton {
                 x: parent.width - self.width;
                 icon: @image-url("../../../../bootstrap-icons/icons/zoom-in.svg");
-                bg-color: tabs[index].background-color;
-                fg-color: tabs[index].foreground-color;
+                base-color: tabs[index].background-color;
+                base-text-color: tabs[index].foreground-color;
 
                 clicked => {
                     Backend.trigger-tab(section-index, index, TabAction.zoom-in);
@@ -84,8 +87,8 @@ export component Board3dTab inherits Tab {
             zoom-out-btn := SceneButton {
                 x: parent.width - self.width;
                 icon: @image-url("../../../../bootstrap-icons/icons/zoom-out.svg");
-                bg-color: tabs[index].background-color;
-                fg-color: tabs[index].foreground-color;
+                base-color: tabs[index].background-color;
+                base-text-color: tabs[index].foreground-color;
 
                 clicked => {
                     Backend.trigger-tab(section-index, index, TabAction.zoom-out);
@@ -97,8 +100,8 @@ export component Board3dTab inherits Tab {
                 icon: @image-url("../../../../bootstrap-icons/icons/cpu.svg");
                 tooltip: @tr("Devices");
                 value: tabs[index].devices-alpha;
-                bg-color: tabs[index].background-color;
-                fg-color: tabs[index].foreground-color;
+                base-color: tabs[index].background-color;
+                base-text-color: tabs[index].foreground-color;
 
                 value-changed(value) => {
                     tabs[index].devices-alpha = value;
@@ -110,8 +113,8 @@ export component Board3dTab inherits Tab {
                 icon: @image-url("../../../../font-awesome/svgs/solid/highlighter.svg");
                 tooltip: @tr("Solder Paste");
                 value: tabs[index].solderpaste-alpha;
-                bg-color: tabs[index].background-color;
-                fg-color: tabs[index].foreground-color;
+                base-color: tabs[index].background-color;
+                base-text-color: tabs[index].foreground-color;
 
                 value-changed(value) => {
                     tabs[index].solderpaste-alpha = value;
@@ -123,8 +126,8 @@ export component Board3dTab inherits Tab {
                 icon: @image-url("../../../../font-awesome/svgs/solid/font.svg");
                 tooltip: @tr("Silkscreen");
                 value: tabs[index].silkscreen-alpha;
-                bg-color: tabs[index].background-color;
-                fg-color: tabs[index].foreground-color;
+                base-color: tabs[index].background-color;
+                base-text-color: tabs[index].foreground-color;
 
                 value-changed(value) => {
                     tabs[index].silkscreen-alpha = value;
@@ -136,8 +139,8 @@ export component Board3dTab inherits Tab {
                 icon: @image-url("../../../../font-awesome/svgs/solid/fill.svg");
                 tooltip: @tr("Solder Resist");
                 value: tabs[index].solderresist-alpha;
-                bg-color: tabs[index].background-color;
-                fg-color: tabs[index].foreground-color;
+                base-color: tabs[index].background-color;
+                base-text-color: tabs[index].foreground-color;
 
                 value-changed(value) => {
                     tabs[index].solderresist-alpha = value;
@@ -147,8 +150,8 @@ export component Board3dTab inherits Tab {
             toggle-2d-btn := SceneButton {
                 x: parent.width - self.width;
                 text: "2D";
-                bg-color: tabs[index].background-color;
-                fg-color: tabs[index].foreground-color;
+                base-color: tabs[index].background-color;
+                base-text-color: tabs[index].foreground-color;
 
                 clicked => {
                     Backend.trigger-board(tabs[index].project-index, tabs[index].board-index, BoardAction.open-2d);
@@ -160,7 +163,7 @@ export component Board3dTab inherits Tab {
             }
 
             if tabs[index].refreshing: spinner := Spinner {
-                x: (parent.width - self.width) / 2;
+                x: toggle-2d-btn.x + (toggle-2d-btn.width - self.width) / 2;
                 width: 20px;
                 height: self.width;
                 foreground-color: tabs[index].foreground-color;

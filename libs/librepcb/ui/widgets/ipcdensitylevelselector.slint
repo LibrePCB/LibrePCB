@@ -1,16 +1,5 @@
-import { IconButton } from "iconbutton.slint";
-import { ToolBarWidget } from "toolbarwidget.slint";
-import {
-    Helpers,
-    IpcDensityLevel,
-} from "../api.slint";
-
-component Button inherits IconButton {
-    width: 18px;
-    style: checkable-hyperlink;
-    color-enabled: #606060;
-    color-checked: #c0c0c0;
-}
+import { ToolBarWidget, ToolBarSelectorButton } from "toolbar.slint";
+import { IpcDensityLevel } from "../api.slint";
 
 export component IpcDensityLevelSelector inherits ToolBarWidget {
     in-out property <IpcDensityLevel> value;
@@ -44,7 +33,7 @@ export component IpcDensityLevelSelector inherits ToolBarWidget {
         value = v;
     }
 
-    a-btn := Button {
+    a-btn := ToolBarSelectorButton {
         icon: @image-url("../../../font-awesome/svgs/regular/circle.svg");
         checked: value == IpcDensityLevel.a;
         enabled: root.enabled;
@@ -56,7 +45,7 @@ export component IpcDensityLevelSelector inherits ToolBarWidget {
         }
     }
 
-    b-btn := Button {
+    b-btn := ToolBarSelectorButton {
         icon: @image-url("../../../font-awesome/svgs/solid/circle-half-stroke.svg");
         checked: value == IpcDensityLevel.b;
         enabled: root.enabled;
@@ -68,7 +57,7 @@ export component IpcDensityLevelSelector inherits ToolBarWidget {
         }
     }
 
-    c-btn := Button {
+    c-btn := ToolBarSelectorButton {
         icon: @image-url("../../../font-awesome/svgs/solid/circle.svg");
         icon-rotation: 90deg;
         checked: value == IpcDensityLevel.c;

@@ -1,17 +1,33 @@
-import { ScrollView } from "std-widgets.slint";
 import { ComboBox } from "combobox.slint";
 import { IconButton } from "iconbutton.slint";
 import { LineEdit } from "lineedit.slint";
+import { ScrollView } from "scrollview.slint";
 import { AttributeAction, AttributeData, Data } from "../api.slint";
 
 component HorizontalLine inherits Rectangle {
+    in property <bool> read-only: false;
+
     height: 1px;
-    background: #505050;
+    background: {
+        if read-only {
+            Data.theme.control-border-disabled
+        } else {
+            Data.theme.control-border-disabled
+        }
+    };
 }
 
 component VerticalLine inherits Rectangle {
+    in property <bool> read-only: false;
+
     width: 1px;
-    background: #505050;
+    background: {
+        if read-only {
+            Data.theme.control-border-disabled
+        } else {
+            Data.theme.control-border-disabled
+        }
+    };
 }
 
 export component AttributeListView inherits ScrollView {
@@ -40,10 +56,14 @@ export component AttributeListView inherits ScrollView {
     }
 
     l := HorizontalLayout {
-        VerticalLine { }
+        VerticalLine {
+            read-only: read-only;
+        }
 
         VerticalLayout {
-            HorizontalLine { }
+            HorizontalLine {
+                read-only: read-only;
+            }
 
             for item[index] in model: VerticalLayout {
                 key-edt := LineEdit {
@@ -76,15 +96,20 @@ export component AttributeListView inherits ScrollView {
                 }
 
                 HorizontalLine {
+                    read-only: read-only;
                     visible: is-visible-row(index);
                 }
             }
         }
 
-        VerticalLine { }
+        VerticalLine {
+            read-only: read-only;
+        }
 
         VerticalLayout {
-            HorizontalLine { }
+            HorizontalLine {
+                read-only: read-only;
+            }
 
             for item[index] in model: VerticalLayout {
                 type-cbx := ComboBox {
@@ -93,6 +118,7 @@ export component AttributeListView inherits ScrollView {
                     model: Data.attribute-types;
                     current-index: item.type;
                     enabled: (!read-only) && (!is-last-row(index));
+                    background: Data.theme.control;  // Even in disabled state.
                     frameless: true;
                     visible: self.height > 0;
                     accessible-label: "attribute type";
@@ -104,15 +130,20 @@ export component AttributeListView inherits ScrollView {
                 }
 
                 HorizontalLine {
+                    read-only: read-only;
                     visible: is-visible-row(index);
                 }
             }
         }
 
-        VerticalLine { }
+        VerticalLine {
+            read-only: read-only;
+        }
 
         VerticalLayout {
-            HorizontalLine { }
+            HorizontalLine {
+                read-only: read-only;
+            }
 
             for item[index] in model: VerticalLayout {
                 value-edt := LineEdit {
@@ -122,6 +153,7 @@ export component AttributeListView inherits ScrollView {
                     has-error: !item.value-valid;
                     read-only: read-only;
                     enabled: !is-last-row(index);
+                    background: Data.theme.control;  // Even in disabled state.
                     frameless: true;
                     visible: self.height > 0;
                     accessible-label: "attribute value";
@@ -137,15 +169,20 @@ export component AttributeListView inherits ScrollView {
                 }
 
                 HorizontalLine {
+                    read-only: read-only;
                     visible: is-visible-row(index);
                 }
             }
         }
 
-        VerticalLine { }
+        VerticalLine {
+            read-only: read-only;
+        }
 
         VerticalLayout {
-            HorizontalLine { }
+            HorizontalLine {
+                read-only: read-only;
+            }
 
             for item[index] in model: VerticalLayout {
                 unit-cbx := ComboBox {
@@ -154,6 +191,7 @@ export component AttributeListView inherits ScrollView {
                     model: Data.attribute-units[item.type];
                     current-index: item.unit;
                     enabled: (!read-only) && (!is-last-row(index)) && (self.model.length > 1);
+                    background: Data.theme.control;  // Even in disabled state.
                     frameless: true;
                     visible: self.height > 0;
                     accessible-description: "attribute unit";
@@ -165,20 +203,25 @@ export component AttributeListView inherits ScrollView {
                 }
 
                 HorizontalLine {
+                    read-only: read-only;
                     visible: is-visible-row(index);
                 }
             }
         }
 
-        VerticalLine { }
+        VerticalLine {
+            read-only: read-only;
+        }
 
         if (!read-only) && (model.length > 2): VerticalLayout {
-            HorizontalLine { }
+            HorizontalLine {
+                read-only: read-only;
+            }
 
             for item[index] in model: VerticalLayout {
                 move-up-btn := IconButton {
                     height: row-height;
-                    background-color: #202020;
+                    background-color: Data.theme.control;
                     icon-size: 14px;
                     icon: @image-url("../../../font-awesome/svgs/solid/arrow-up.svg");
                     enabled: (index > 0) && (!is-last-row(index));
@@ -189,19 +232,25 @@ export component AttributeListView inherits ScrollView {
                     }
                 }
 
-                HorizontalLine { }
+                HorizontalLine {
+                    read-only: read-only;
+                }
             }
         }
 
-        if (!read-only) && (model.length > 2): VerticalLine { }
+        if (!read-only) && (model.length > 2): VerticalLine {
+            read-only: read-only;
+        }
 
         if !read-only: VerticalLayout {
-            HorizontalLine { }
+            HorizontalLine {
+                read-only: read-only;
+            }
 
             for item[index] in model: VerticalLayout {
                 add-delete-btn := IconButton {
                     height: row-height;
-                    background-color: #202020;
+                    background-color: Data.theme.control;
                     icon-size: 13px;
                     icon: {
                         if is-last-row(index) {
@@ -222,10 +271,14 @@ export component AttributeListView inherits ScrollView {
                     }
                 }
 
-                HorizontalLine { }
+                HorizontalLine {
+                    read-only: read-only;
+                }
             }
         }
 
-        if !read-only: VerticalLine { }
+        if !read-only: VerticalLine {
+            read-only: read-only;
+        }
     }
 }

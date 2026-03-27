@@ -1,15 +1,30 @@
-import { ScrollView } from "std-widgets.slint";
-import { IconButton, LineEdit } from "../../widgets.slint";
-import { PackagePadData } from "../../api.slint";
+import { IconButton, LineEdit, ScrollView } from "../../widgets.slint";
+import { Data, PackagePadData } from "../../api.slint";
 
 component HorizontalLine inherits Rectangle {
+    in property <bool> read-only: false;
+
     height: 1px;
-    background: #505050;
+    background: {
+        if read-only {
+            Data.theme.control-border-disabled
+        } else {
+            Data.theme.control-border-disabled
+        }
+    };
 }
 
 component VerticalLine inherits Rectangle {
+    in property <bool> read-only: false;
+
     width: 1px;
-    background: #505050;
+    background: {
+        if read-only {
+            Data.theme.control-border-disabled
+        } else {
+            Data.theme.control-border-disabled
+        }
+    };
 }
 
 component PackagePadListViewTextCell inherits Rectangle {
@@ -19,15 +34,16 @@ component PackagePadListViewTextCell inherits Rectangle {
     in property <TextHorizontalAlignment> horizontal-alignment: left;
 
     preferred-width: txt.preferred-width + 10px;
+    background: Data.theme.window;
 
     txt := Text {
         x: 5px;
         width: parent.width - 10px;
         horizontal-alignment: horizontal-alignment;
         vertical-alignment: center;
-        color: #909090;
         font-family: font-family;
         font-size: font-size;
+        color: Data.theme.control-text;
         text: text;
         accessible-role: none;
     }
@@ -50,12 +66,16 @@ export component PackagePadListView inherits ScrollView {
 
         HorizontalLayout {
 
-            VerticalLine { }
+            VerticalLine {
+                read-only: read-only;
+            }
 
             VerticalLayout {
                 width: self.preferred-width;
 
-                HorizontalLine { }
+                HorizontalLine {
+                    read-only: read-only;
+                }
 
                 PackagePadListViewTextCell {
                     height: row-height;
@@ -64,11 +84,13 @@ export component PackagePadListView inherits ScrollView {
                 }
 
                 for item[index] in model: VerticalLayout {
-                    HorizontalLine { }
+                    HorizontalLine {
+                        read-only: read-only;
+                    }
 
                     number-cell := PackagePadListViewTextCell {
                         height: row-height;
-                        background: #202020;
+                        background: Data.theme.control;
                         horizontal-alignment: right;
                         font-size: 10px;
                         text: index + 1;
@@ -76,12 +98,16 @@ export component PackagePadListView inherits ScrollView {
                 }
             }
 
-            VerticalLine { }
+            VerticalLine {
+                read-only: read-only;
+            }
 
             if show-ids: VerticalLayout {
                 width: self.preferred-width;
 
-                HorizontalLine { }
+                HorizontalLine {
+                    read-only: read-only;
+                }
 
                 PackagePadListViewTextCell {
                     height: row-height;
@@ -89,11 +115,13 @@ export component PackagePadListView inherits ScrollView {
                 }
 
                 for item[index] in model: VerticalLayout {
-                    HorizontalLine { }
+                    HorizontalLine {
+                        read-only: read-only;
+                    }
 
                     id-cell := PackagePadListViewTextCell {
                         height: row-height;
-                        background: #202020;
+                        background: Data.theme.control;
                         horizontal-alignment: right;
                         font-family: "Noto Sans Mono";
                         font-size: 10px;
@@ -102,10 +130,14 @@ export component PackagePadListView inherits ScrollView {
                 }
             }
 
-            if show-ids: VerticalLine { }
+            if show-ids: VerticalLine {
+                read-only: read-only;
+            }
 
             VerticalLayout {
-                HorizontalLine { }
+                HorizontalLine {
+                    read-only: read-only;
+                }
 
                 name-header := PackagePadListViewTextCell {
                     height: row-height;
@@ -113,7 +145,9 @@ export component PackagePadListView inherits ScrollView {
                 }
 
                 for item[index] in model: VerticalLayout {
-                    HorizontalLine { }
+                    HorizontalLine {
+                        read-only: read-only;
+                    }
 
                     name-edt := LineEdit {
                         height: row-height;
@@ -135,23 +169,30 @@ export component PackagePadListView inherits ScrollView {
                 }
             }
 
-            VerticalLine { }
+            VerticalLine {
+                read-only: read-only;
+            }
 
             if !read-only: VerticalLayout {
                 width: self.preferred-width;
 
-                HorizontalLine { }
+                HorizontalLine {
+                    read-only: read-only;
+                }
 
                 PackagePadListViewTextCell {
                     height: row-height;
+                    min-width: row-height;
                 }
 
                 for item[index] in model: VerticalLayout {
-                    HorizontalLine { }
+                    HorizontalLine {
+                        read-only: read-only;
+                    }
 
                     delete-btn := IconButton {
                         height: row-height;
-                        background-color: #202020;
+                        background-color: Data.theme.control;
                         icon-scale: 0.6;
                         icon: @image-url("../../../../font-awesome/svgs/solid/trash-can.svg");
 
@@ -162,29 +203,41 @@ export component PackagePadListView inherits ScrollView {
                 }
             }
 
-            if !read-only: VerticalLine { }
+            if !read-only: VerticalLine {
+                read-only: read-only;
+            }
         }
 
-        HorizontalLine { }
+        HorizontalLine {
+            read-only: read-only;
+        }
 
         if model.length == 0: HorizontalLayout {
-            VerticalLine { }
+            VerticalLine {
+                read-only: read-only;
+            }
 
             Rectangle {
                 height: row-height;
-                background: #202020;
+                background: Data.theme.control;
 
                 no-pads-txt := Text {
                     width: parent.width - 10px;
                     horizontal-alignment: left;
                     wrap: word-wrap;
+                    color: Data.theme.control-text-muted;
+                    font-italic: true;
                     text: @tr("This package contains no pads (yet).");
                 }
             }
 
-            VerticalLine { }
+            VerticalLine {
+                read-only: read-only;
+            }
         }
 
-        if model.length == 0: HorizontalLine { }
+        if model.length == 0: HorizontalLine {
+            read-only: read-only;
+        }
     }
 }

@@ -67,6 +67,17 @@ public:
   // Static Methods
 
   /**
+   * @brief Detect if the operating system's UI theme is dark
+   *
+   * @warning  This function needs to be called once during application
+   *           startup, before the applications QPalette is modified!
+   *
+   * @retval true   System theme is dark.
+   * @retval false  System theme is light or could not be determined.
+   */
+  static bool isSystemThemeDark() noexcept;
+
+  /**
    * @brief Escape newlines to convert a multi-line to a single-line string
    *
    * @param s     Input string.

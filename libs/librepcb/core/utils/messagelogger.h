@@ -30,6 +30,8 @@
  ******************************************************************************/
 namespace librepcb {
 
+struct UiTheme;
+
 /*******************************************************************************
  *  Class MessageLogger
  ******************************************************************************/
@@ -48,7 +50,7 @@ public:
     QtMsgType type;
     QString message;
 
-    QString toRichText(bool colorized = true,
+    QString toRichText(const UiTheme* theme,
                        bool bulletPoint = false) const noexcept;
   };
 
@@ -81,7 +83,7 @@ public:
   bool hasMessages() const noexcept;
   QList<Message> getMessages() const noexcept;
   QStringList getMessagesPlain() const noexcept;
-  QString getMessagesRichText(bool colorized = true) const noexcept;
+  QString getMessagesRichText(const UiTheme* theme) const noexcept;
 
   // General Methods
   void clear() noexcept;

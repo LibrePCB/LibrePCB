@@ -35,6 +35,7 @@ namespace librepcb {
 
 class FilePath;
 class Workspace;
+struct UiTheme;
 
 namespace editor {
 
@@ -57,7 +58,8 @@ class KiCadLibraryImportWizard final : public QWizard {
 public:
   // Constructors / Destructor
   KiCadLibraryImportWizard(const KiCadLibraryImportWizard& other) = delete;
-  KiCadLibraryImportWizard(Workspace& workspace, const FilePath& dstLibFp,
+  KiCadLibraryImportWizard(const UiTheme& theme, Workspace& workspace,
+                           const FilePath& dstLibFp,
                            QWidget* parent = nullptr) noexcept;
   ~KiCadLibraryImportWizard() noexcept;
 

@@ -49,8 +49,9 @@ namespace editor {
  ******************************************************************************/
 
 NewProjectWizardPage_EagleImport::NewProjectWizardPage_EagleImport(
-    const Workspace& ws, QWidget* parent) noexcept
+    const UiTheme& theme, const Workspace& ws, QWidget* parent) noexcept
   : QWizardPage(parent),
+    mTheme(theme),
     mWorkspace(ws),
     mUi(new Ui::NewProjectWizardPage_EagleImport) {
   mUi->setupUi(this);
@@ -149,8 +150,8 @@ void NewProjectWizardPage_EagleImport::import(Project& project) {
     ds.openUrl(url);
   });
   connect(mImport->getLogger().get(), &MessageLogger::msgEmitted, browser,
-          [browser](const MessageLogger::Message& msg) {
-            browser->append(msg.toRichText(true, true));
+          [browser, &theme = mTheme](const MessageLogger::Message& msg) {
+            browser->append(msg.toRichText(&theme, true));
             browser->verticalScrollBar()->setValue(
                 browser->verticalScrollBar()->maximum());
             qApp->processEvents();

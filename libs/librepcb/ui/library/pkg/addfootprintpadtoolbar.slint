@@ -1,53 +1,17 @@
 import {
     ComboBox,
-    IconButton,
     LengthEdit,
     PadShapeSelector,
-    Palette,
     RatioEdit,
     TextFlagsBox,
-    ToolBarWidget,
+    ToolBarButton,
 } from "../../widgets.slint";
 import {
+    Data,
     PackageTabData,
     PadShape,
     WindowSectionData,
 } from "../../api.slint";
-
-component BoardSideSelector inherits ToolBarWidget {
-    in-out property <bool> bottom: false;
-
-    callback toggled(bool);
-    toggled(b) => {
-        bottom = b;
-    }
-
-    key-pressed(event) => {
-        if event.text == Key.Space {
-            toggled(!bottom);
-            return accept;
-        }
-        reject
-    }
-
-    btn := IconButton {
-        width: 18px;
-        style: checkable-hyperlink;
-        color-enabled: Palette.foreground;
-        icon: {
-            if bottom {
-                @image-url("../../../../bootstrap-icons/icons/back.svg")
-            } else {
-                @image-url("../../../../bootstrap-icons/icons/front.svg")
-            }
-        };
-        tooltip: @tr("Board Side");
-
-        clicked => {
-            toggled(!bottom);
-        }
-    }
-}
 
 export component AddFootprintPadToolBar inherits HorizontalLayout {
     in property <int> section-index;
@@ -71,11 +35,20 @@ export component AddFootprintPadToolBar inherits HorizontalLayout {
         }
     }
 
-    if show-side-selector: side-selector := BoardSideSelector {
-        bottom: tabs[section.current-tab-index].tool-bottom;
+    if show-side-selector: side-selector := ToolBarButton {
+        property <bool> bottom: tabs[section.current-tab-index].tool-bottom;
 
-        toggled(b) => {
-            tabs[section.current-tab-index].tool-bottom = b;
+        icon: {
+            if bottom {
+                @image-url("../../../../bootstrap-icons/icons/back.svg")
+            } else {
+                @image-url("../../../../bootstrap-icons/icons/front.svg")
+            }
+        };
+        tooltip: @tr("Board Side");
+
+        clicked => {
+            tabs[section.current-tab-index].tool-bottom = !bottom;
         }
     }
 

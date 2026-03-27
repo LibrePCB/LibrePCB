@@ -1,5 +1,5 @@
-import { Palette } from "std-widgets.slint";
 import { Button } from "button.slint";
+import { Data } from "../api.slint";
 
 export enum Arrow {
     none,
@@ -12,9 +12,12 @@ export component MessagePopup inherits PopupWindow {
     in property <bool> has-yes: false;
     in property <bool> has-cancel: true;
     in property <Arrow> arrow: none;
-    in property <color> background: Palette.background;
-    in property <color> border-color: Palette.foreground;
-    property <length> border-radius: 15px;
+    in property <color> background: Data.theme.tooltip;
+    in property <color> border-color: self.header-color;
+    in property <color> header-color: Data.theme.base-text;
+    in property <color> header-text-color: Data.theme.base;
+    in property <color> text-color: Data.theme.tooltip-text;
+    property <length> border-radius: 10px;
     property <length> arrow-size: 12px;
 
     width: r.preferred-width + ((arrow == Arrow.left) ? arrow-size : 0);
@@ -36,7 +39,7 @@ export component MessagePopup inherits PopupWindow {
             VerticalLayout {
                 Rectangle {
                     height: title-txt.preferred-height + 8px;
-                    background: background.darker(0.7);
+                    background: header-color;
                     border-color: border-color;
                     border-width: (border-color == Colors.transparent) ? 0 : 1px;
                     border-top-left-radius: border-radius;
@@ -47,6 +50,7 @@ export component MessagePopup inherits PopupWindow {
                         vertical-alignment: center;
                         font-weight: 700;
                         font-size: 13px;
+                        color: header-text-color;
                         text: title;
                     }
                 }
@@ -58,7 +62,7 @@ export component MessagePopup inherits PopupWindow {
                     @children
 
                     HorizontalLayout {
-                        alignment: LayoutAlignment.center;
+                        alignment: (arrow == Arrow.left) ? start : center;
                         spacing: 8px;
 
                         if has-ok: Button {

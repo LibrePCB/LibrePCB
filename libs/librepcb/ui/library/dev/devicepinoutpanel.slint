@@ -1,15 +1,14 @@
-import { ScrollView } from "std-widgets.slint";
 import { DevicePinoutListView } from "devicepinoutlistview.slint";
 import {
     Badge,
     Button,
     IconButton,
     LineEdit,
-    Palette,
+    ScrollView,
 } from "../../widgets.slint";
 import {
     Backend,
-    Constants,
+    Data,
     DeviceInteractivePinoutSignalData,
     DeviceTabData,
     TabAction,
@@ -17,7 +16,7 @@ import {
 
 component DevicePinoutShortcutsText inherits Text {
     font-size: 11px;
-    color: #707070;
+    color: Data.theme.control-text-muted;
     accessible-role: none;
 }
 
@@ -109,19 +108,12 @@ component DeviceInteractiveSignalListView inherits ScrollView {
 
             Rectangle {
                 property <bool> is-current: index == current-index;
-                property <color> text-color: {
-                    if is-current {
-                        item-ta.has-hover ? #404040 : black
-                    } else {
-                        item-ta.has-hover ? white : Palette.foreground
-                    }
-                };
 
                 background: {
                     if is-current {
-                        item-ta.has-hover ? #00ff84 : Constants.librepcb-color
+                        item-ta.has-hover ? Data.theme.accent.with-alpha(0.8) : Data.theme.accent;
                     } else {
-                        item-ta.has-hover ? #404040 : transparent
+                        item-ta.has-hover ? Data.theme.control-hovered : transparent
                     }
                 };
 
@@ -134,7 +126,7 @@ component DeviceInteractiveSignalListView inherits ScrollView {
                         width: 13px;
                         height: 20px;
                         image-fit: contain;
-                        colorize: text-color;
+                        colorize: name-txt.color;
                         source: {
                             if item.name.is-empty {
                                 @image-url("../../../../font-awesome/svgs/solid/link-slash.svg")
@@ -147,10 +139,10 @@ component DeviceInteractiveSignalListView inherits ScrollView {
                         accessible-role: none;
                     }
 
-                    Text {
+                    name-txt := Text {
                         horizontal-alignment: left;
                         vertical-alignment: center;
-                        color: text-color;
+                        color: is-current ? Data.theme.accent-text : Data.theme.control-text;
                         font-italic: item.name.is-empty;
                         overflow: elide;
                         text: item.name.is-empty ? @tr("(unconnected)") : item.name;
@@ -173,10 +165,10 @@ export component DevicePinoutPanel inherits Rectangle {
     in property <bool> interactive;
     in property <length> window-height;
 
-    background: #404040;
-    border-color: interactive ? Constants.librepcb-color : self.background;
+    background: interactive ? Data.theme.accent : Data.theme.control-checked;
+    border-color: self.background;
     border-width: 2px;
-    border-radius: 10px;
+    border-radius: 5px;
     clip: true;
 
     VerticalLayout {
@@ -186,10 +178,11 @@ export component DevicePinoutPanel inherits Rectangle {
             padding: 3px;
             spacing: 8px;
 
-            Text {
+            title-txt := Text {
                 horizontal-stretch: 1;
                 font-size: 14px;
                 font-weight: 700;
+                color: interactive ? Data.theme.accent-text : Data.theme.control-text;
                 overflow: elide;
                 vertical-alignment: center;
                 text: @tr("Pinout");
@@ -197,8 +190,9 @@ export component DevicePinoutPanel inherits Rectangle {
             }
 
             if interactive: Badge {
-                text-color: Constants.librepcb-color;
+                text-color: title-txt.color;
                 font-size: 11px;
+                font-weight: 700;
                 text: @tr("Pad {}/{}", tabs[index].interactive-pinout-number, tabs[index].pinout.length);
             }
 
@@ -213,19 +207,23 @@ export component DevicePinoutPanel inherits Rectangle {
                 tooltip: @tr("Open Datasheet");
                 tooltip-position: left;
                 status-tip: tabs[index].datasheet-url;
+                color-enabled: title-txt.color.with-alpha(0.7);
+                color-hovered: title-txt.color;
 
                 clicked => {
                     Backend.trigger-tab(section-index, index, TabAction.open-datasheet);
                 }
             }
 
-            if !interactive: reset-btn := IconButton {
+            if (!interactive) && (tabs[index].pinout.length > 0): reset-btn := IconButton {
                 height: 18px;
                 style: hyperlink;
                 icon: @image-url("../../../../bootstrap-icons/icons/bootstrap-reboot.svg");
                 tooltip: @tr("Reset All Connections");
                 tooltip-position: left;
                 status-tip: @tr("Reset all pads to 'unconnected' state");
+                color-enabled: title-txt.color.with-alpha(0.7);
+                color-hovered: title-txt.color;
 
                 clicked => {
                     Backend.trigger-tab(section-index, index, TabAction.device-pinout-reset);
@@ -235,10 +233,11 @@ export component DevicePinoutPanel inherits Rectangle {
             if interactive: exit-btn := IconButton {
                 height: 18px;
                 style: hyperlink;
-                color-enabled: Constants.librepcb-color;
                 icon: @image-url("../../../../font-awesome/svgs/solid/circle-xmark.svg");
                 tooltip: @tr("Exit Interactive Mode") + " (Esc)";
                 tooltip-position: left;
+                color-enabled: title-txt.color.with-alpha(0.7);
+                color-hovered: title-txt.color;
 
                 clicked => {
                     Backend.trigger-tab(section-index, index, TabAction.abort);
@@ -251,10 +250,9 @@ export component DevicePinoutPanel inherits Rectangle {
             spacing: 5px;
 
             Rectangle {
-                background: #202020;
-                border-color: interactive-filter-edt.has-focus ? Constants.librepcb-color : #606060;
+                background: interactive-filter-edt.background;
+                border-color: Data.theme.control-border;
                 border-width: 1px;
-                border-radius: 10px;
 
                 HorizontalLayout {
                     padding: 1px;
@@ -270,6 +268,7 @@ export component DevicePinoutPanel inherits Rectangle {
                         vertical-alignment: center;
                         overflow: elide;
                         font-family: "Noto Sans Mono";
+                        color: Data.theme.control-text-muted;
                         text: tabs[index].interactive-pinout-pad + ":";
                         accessible-label: "current pad";
                     }
@@ -279,7 +278,6 @@ export component DevicePinoutPanel inherits Rectangle {
                         text: tabs[index].interactive-pinout-filter;
                         placeholder-text: @tr("Type to filter signals...");
                         border-color: transparent;
-                        border-width: 0;
                         frameless: true;
                         accessible-label: "signal filter";
 
@@ -326,11 +324,11 @@ export component DevicePinoutPanel inherits Rectangle {
         Rectangle {
             min-width: 300px;
             max-width: self.preferred-width * 1.5;
-            background: #2c2c2c;
+            background: Data.theme.control;
 
             VerticalLayout {
                 alignment: start;
-                padding-top: interactive ? 0 : 5px;
+                padding-top: interactive ? 1px : 5px;
                 padding-bottom: 8px;
 
                 if interactive: interactive-view := DeviceInteractiveSignalListView {
@@ -361,6 +359,15 @@ export component DevicePinoutPanel inherits Rectangle {
                     // horizontally) if the layout is empty.
                     Rectangle {
                         height: 3px;
+                    }
+
+                    if tabs[index].pinout.length == 0: Text {
+                        preferred-width: 0; // Do not influence the layout.
+                        horizontal-alignment: center;
+                        color: Data.theme.control-text-muted;
+                        font-italic: true;
+                        wrap: word-wrap;
+                        text: @tr("The package contains no pads, thus the pinout is empty.");
                     }
 
                     if tabs[index].has-auto-connectable-pads: auto-connect-btn := Button {

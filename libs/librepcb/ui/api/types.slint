@@ -226,12 +226,14 @@ export struct TreeViewItemData {
 // Notifications
 ////////////////////////////////////////////////////////////////////////////////
 
+// ATTENTION: The backend sorts notifications by type, therefore the order of
+// the enum values must be sorted by severity.
 export enum NotificationType {
+    progress,
     tip,
     info,
     warning,
     critical,
-    progress,
 }
 
 export struct NotificationData {
@@ -657,6 +659,7 @@ export struct TabFeatures {
 
 // All the different kinds of window tabs
 export enum TabType {
+    controls-gallery, // For development purposes only
     home,
     create-library,
     download-library,

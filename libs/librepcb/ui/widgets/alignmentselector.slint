@@ -1,12 +1,4 @@
-import { IconButton } from "iconbutton.slint";
-import { ToolBarWidget } from "toolbarwidget.slint";
-
-component AlignmentButton inherits IconButton {
-    width: 18px;
-    style: checkable-hyperlink;
-    color-enabled: #606060;
-    color-checked: #c0c0c0;
-}
+import { ToolBarWidget, ToolBarSelectorButton } from "toolbar.slint";
 
 component AlignmentSelector inherits ToolBarWidget {
     in property <[image]> icons;
@@ -15,7 +7,7 @@ component AlignmentSelector inherits ToolBarWidget {
 
     callback index-clicked(int);
 
-    for i in 3: btn := AlignmentButton {
+    for i in 3: btn := ToolBarSelectorButton {
         icon: icons[i];
         tooltip: tooltips[i];
         checked: index == i;

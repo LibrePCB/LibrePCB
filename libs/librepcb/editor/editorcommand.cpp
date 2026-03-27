@@ -33,20 +33,12 @@
 namespace librepcb {
 namespace editor {
 
-static QIcon loadIcon(const QString& fp) noexcept {
-  if (fp.endsWith(".svg")) {
-    return EditorToolbox::svgIcon(fp);
-  } else {
-    return QIcon(fp);
-  }
-}
-
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
 
 EditorCommand::EditorCommand(const QString& identifier, const char* text,
-                             const char* description, const QString& iconFp,
+                             const char* description, const char* iconFp,
                              Flags flags,
                              const QList<QKeySequence>& defaultKeySequences,
                              QObject* parent) noexcept
@@ -56,10 +48,11 @@ EditorCommand::EditorCommand(const QString& identifier, const char* text,
     mText(text),
     mDescriptionNoTr(description),
     mDescription(description),
-    mIcon(loadIcon(iconFp)),
+    mIconFp(iconFp),
     mFlags(flags),
     mDefaultKeySequences(defaultKeySequences),
     mKeySequences(defaultKeySequences) {
+  updateIcon();
   updateTranslations();
 }
 
@@ -81,6 +74,16 @@ void EditorCommand::setKeySequences(
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
+
+void EditorCommand::updateIcon() noexcept {
+  if (mIconFp) {
+    if (std::string_view(mIconFp).ends_with(".svg")) {
+      mIcon = EditorToolbox::svgIcon(mIconFp);
+    } else {
+      mIcon = QIcon(mIconFp);
+    }
+  }
+}
 
 void EditorCommand::updateTranslations() noexcept {
   // Note: Translations are done within the EditorCommandSet context.

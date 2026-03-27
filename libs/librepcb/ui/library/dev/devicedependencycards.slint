@@ -4,6 +4,7 @@ import {
 } from "../../widgets.slint";
 import {
     Backend,
+    Data,
     DeviceTabData,
     TabAction,
 } from "../../api.slint";
@@ -23,15 +24,15 @@ component DeviceDependencyCard inherits Rectangle {
     pure callback render-scene(width: length, height: length) -> image;
     callback choose-clicked;
 
-    background: error ? #900000 : #404040;
-    border-color: self.background;
-    border-width: 2px;
-    border-radius: 10px;
+    background: error ? Data.theme.error : Data.theme.control-checked;
+    border-radius: 5px;
     clip: true;  // For the rounded corners
 
     VerticalLayout {
+        padding: 2px;
+
         VerticalLayout {
-            padding: 6px;
+            padding: 4px;
             spacing: 5px;
 
             HorizontalLayout {
@@ -43,6 +44,7 @@ component DeviceDependencyCard inherits Rectangle {
                     font-weight: 700;
                     overflow: elide;
                     vertical-alignment: center;
+                    color: error ? Data.theme.error-text : Data.theme.control-text;
                     text: error ? error-title : (name.is-empty ? uninitialized-title : name);
                     accessible-label: type;
                 }
@@ -54,6 +56,8 @@ component DeviceDependencyCard inherits Rectangle {
                     icon: @image-url("../../../../font-awesome/svgs/solid/folder-open.svg");
                     tooltip: choose-text;
                     tooltip-position: error ? left : right;
+                    color-enabled: error ? Data.theme.error-text.with-alpha(0.7) : Data.theme.control-text.mix(Data.theme.control-text-muted, 0.5);
+                    color-hovered: error ? Data.theme.error-text : Data.theme.control-text;
 
                     clicked => {
                         choose-clicked();
@@ -64,6 +68,7 @@ component DeviceDependencyCard inherits Rectangle {
                     horizontal-stretch: 1;
                     font-size: 10px;
                     font-weight: 300;
+                    color: title-txt.color;
                     horizontal-alignment: right;
                     vertical-alignment: center;
                     text: type.to-uppercase();
@@ -76,6 +81,7 @@ component DeviceDependencyCard inherits Rectangle {
                 font-size: error ? 12px : 11px;
                 font-weight: error ? 600 : 400;
                 font-italic: true;
+                color: title-txt.color;
                 wrap: word-wrap;
                 overflow: elide;
                 text: description;
@@ -88,7 +94,10 @@ component DeviceDependencyCard inherits Rectangle {
             min-height: 100px;
             preferred-width: 300px;
             preferred-height: 300px;
-            background: name.is-empty ? #202020 : preview-background;
+            background: name.is-empty ? Data.theme.control : preview-background;
+            border-bottom-left-radius: root.border-radius - parent.padding;
+            border-bottom-right-radius: root.border-radius - parent.padding;
+            clip: true;
 
             if (!name.is-empty) || error: Image {
                 x: 0;

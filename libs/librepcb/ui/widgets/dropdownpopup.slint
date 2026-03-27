@@ -1,5 +1,5 @@
-import { Palette, ScrollView } from "std-widgets.slint";
-import { Constants } from "../api.slint";
+import { ScrollView } from "scrollview.slint";
+import { Data } from "../api.slint";
 
 export component DropDownPopup inherits PopupWindow {
     in property <[string]> model;
@@ -7,7 +7,6 @@ export component DropDownPopup inherits PopupWindow {
     in property <string> current-text;
     in property <int> default-index: -1;
     in property <length> item-height: 25px;
-    in property <bool> rounded-corners: true;
     property <int> selected-index: 0;
 
     callback accepted(index: int);
@@ -22,8 +21,7 @@ export component DropDownPopup inherits PopupWindow {
     }
 
     width: self.preferred-width;
-    preferred-height: l.preferred-height + 1px;  // Workaround for unnecessary scrollbar.
-    max-height: 20 * item-height;  // Should be a multiple of item height.
+    close-policy: close-on-click-outside;  // For functional scrollbars.
     forward-focus: fs;
 
     // Accessibility
@@ -57,67 +55,80 @@ export component DropDownPopup inherits PopupWindow {
     }
 
     Rectangle {
-        background: black;
-        border-radius: rounded-corners ? 5px : 0;
+        background: Data.theme.control;
+        border-color: Data.theme.control-border;
+        border-width: 1px;
 
-        view := ScrollView {
-            width: root.width;
-            height: root.height;
-            viewport-width: l.width;
-            viewport-height: l.height;
+        VerticalLayout {
+            padding: 1px;
 
-            l := VerticalLayout {
-                width: root.width;
-                height: self.preferred-height;
+            view := ScrollView {
+                viewport-width: l.width;
+                viewport-height: l.height;
+                mouse-drag-pan-enabled: true;
 
-                for item[index] in model: item-ta := TouchArea {
-                    property <bool> is-current: (index == current-index) || ((!current-text.is-empty) && (item == current-text));
+                l := VerticalLayout {
+                    width: root.width - 2px;
+                    height: self.preferred-height;
+                    max-height: 20 * item-height;  // Should be a multiple of item height.
 
-                    height: item-height;
+                    for item[index] in model: item-ta := TouchArea {
+                        property <bool> is-current: (index == current-index) || ((!current-text.is-empty) && (item == current-text));
 
-                    // Accessibility
-                    accessible-role: list-item;
-                    accessible-item-index: index;
-                    accessible-item-selectable: true;
-                    accessible-item-selected: (index == selected-index);
-                    accessible-label: item;
+                        height: item-height;
 
-                    changed has-hover => {
-                        if self.has-hover {
-                            selected-index = index;
-                        }
-                    }
+                        // Accessibility
+                        accessible-role: list-item;
+                        accessible-item-index: index;
+                        accessible-item-selectable: true;
+                        accessible-item-selected: (index == selected-index);
+                        accessible-label: item;
 
-                    Rectangle {
-                        background: (index == selected-index) ? #505050 : (is-current ? #303030 : transparent);
-                        border-radius: rounded-corners ? (item-height / 2) : 0;
-
-                        HorizontalLayout {
-                            padding-left: 12px;
-                            padding-right: 12px;
-                            spacing: 5px;
-
-                            item-txt := Text {
-                                font-size: 13px;
-                                overflow: elide;
-                                vertical-alignment: center;
-                                color: is-current ? Constants.librepcb-color : Palette.foreground;
-                                text: item;
-                                accessible-role: none;
-                            }
-
-                            if index == default-index: Text {
-                                width: self.preferred-width;
-                                font-size: 10px;
-                                color: item-txt.color;
-                                vertical-alignment: center;
-                                text: @tr("default").to-lowercase();
+                        changed has-hover => {
+                            if self.has-hover {
+                                selected-index = index;
                             }
                         }
-                    }
 
-                    clicked => {
-                        accepted(index);
+                        Rectangle {
+                            background: {
+                                if is-current {
+                                    Data.theme.control-checked
+                                } else if index == selected-index {
+                                    Data.theme.control-hovered
+                                } else {
+                                    transparent
+                                }
+                            };
+
+                            HorizontalLayout {
+                                padding-left: 12px;
+                                padding-right: 12px;
+                                spacing: 5px;
+
+                                item-txt := Text {
+                                    font-size: 13px;
+                                    color: Data.theme.base-text;
+                                    overflow: elide;
+                                    vertical-alignment: center;
+                                    text: item;
+                                    accessible-role: none;
+                                }
+
+                                if index == default-index: Text {
+                                    width: self.preferred-width;
+                                    font-size: 11px;
+                                    color: Data.theme.base-text-disabled;
+                                    vertical-alignment: center;
+                                    text: @tr("default").to-lowercase();
+                                }
+                            }
+                        }
+
+                        clicked => {
+                            accepted(index);
+                            root.close();
+                        }
                     }
                 }
             }

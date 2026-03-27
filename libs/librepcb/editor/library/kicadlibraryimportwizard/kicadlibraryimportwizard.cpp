@@ -46,12 +46,14 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-KiCadLibraryImportWizard::KiCadLibraryImportWizard(Workspace& workspace,
+KiCadLibraryImportWizard::KiCadLibraryImportWizard(const UiTheme& theme,
+                                                   Workspace& workspace,
                                                    const FilePath& dstLibFp,
                                                    QWidget* parent) noexcept
   : QWizard(parent),
     mUi(new Ui::KiCadLibraryImportWizard),
-    mContext(new KiCadLibraryImportWizardContext(workspace, dstLibFp, this)) {
+    mContext(
+        new KiCadLibraryImportWizardContext(theme, workspace, dstLibFp, this)) {
   mUi->setupUi(this);
   setPixmap(WizardPixmap::LogoPixmap, QPixmap(":/img/logo/48x48.png"));
   setPixmap(QWizard::WatermarkPixmap,

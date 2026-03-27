@@ -24,12 +24,14 @@
 #include <librepcb/core/debug.h>
 #include <librepcb/core/exceptions.h>
 #include <librepcb/core/network/networkaccessmanager.h>
+#include <librepcb/core/workspace/uitheme.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacesettings.h>
 #include <librepcb/editor/dialogs/directorylockhandlerdialog.h>
 #include <librepcb/editor/editorcommandset.h>
 #include <librepcb/editor/guiapplication.h>
 #include <librepcb/editor/project/partinformationprovider.h>
+#include <librepcb/editor/utils/editortoolbox.h>
 #include <librepcb/editor/utils/slinthelpers.h>
 #include <librepcb/editor/workspace/initializeworkspacewizard/initializeworkspacewizard.h>
 
@@ -44,12 +46,19 @@ using namespace librepcb;
 using namespace librepcb::editor;
 
 /*******************************************************************************
+ *  Global Data
+ ******************************************************************************/
+
+static const UiTheme* sTheme = nullptr;
+
+/*******************************************************************************
  *  Function Prototypes
  ******************************************************************************/
 
 static void setApplicationMetadata() noexcept;
 static void configureApplicationSettings() noexcept;
 static void writeLogHeader() noexcept;
+static void setTheme(const QString& name) noexcept;
 static int runApplication() noexcept;
 static bool isFileFormatStableOrAcceptUnstable() noexcept;
 static int openWorkspace(FilePath& path);
@@ -84,6 +93,7 @@ int main(int argc, char* argv[]) {
   // shown.
   Application::loadBundledFonts();
   Application::setTranslationLocale(QLocale::system());
+  std::ignore = EditorToolbox::isSystemThemeDark();
 
   // Clean up old temporary files since at least on Windows this is not done
   // automatically. Let's do it in a thread to avoid delaying application start.
@@ -95,31 +105,12 @@ int main(int argc, char* argv[]) {
 
   // Use Fusion style with custom palette to make the legacy Qt dialogs looking
   // similar to the new Slint UI. Can be removed as soon as no Qt widgets are
-  // used anymore.
-  {
-    QPalette palette(QColor("#202020"), QColor("#2a2a2a"));
-    palette.setColor(QPalette::Window, "#2a2a2a");
-    palette.setColor(QPalette::WindowText, "#c4c4c4");
-    palette.setColor(QPalette::Base, "#353535");
-    palette.setColor(QPalette::AlternateBase, "#2e2e2e");
-    palette.setColor(QPalette::ToolTipBase, "#2e2e2e");
-    palette.setColor(QPalette::ToolTipText, "#dedede");
-    palette.setColor(QPalette::Text, "#c4c4c4");
-    palette.setColor(QPalette::PlaceholderText, "#959595");
-    palette.setColor(QPalette::Button, "#202020");
-    palette.setColor(QPalette::ButtonText, "#c4c4c4");
-    palette.setColor(QPalette::Link, "#29d682");
-    palette.setColor(QPalette::LinkVisited, "#29d682");
-    palette.setColor(QPalette::Highlight, "#29d682");
-    palette.setColor(QPalette::HighlightedText, "#161616");
-    palette.setColor(QPalette::Disabled, QPalette::Button, "#1a1a1a");
-    palette.setColor(QPalette::Disabled, QPalette::ButtonText, "#707070");
-    palette.setColor(QPalette::Disabled, QPalette::WindowText, "#707070");
-    palette.setColor(QPalette::Disabled, QPalette::Text, "#707070");
-    palette.setColor(QPalette::Disabled, QPalette::Light, "#707070");
-    app.setStyle("fusion");
-    app.setPalette(palette);
-  }
+  // used anymore. The actual palette will be set later.
+  app.setStyle("fusion");
+
+  // Apply default theme (will be overridden later if workspace settings are
+  // loaded).
+  setTheme(QString());
 
   // Register our custom translator to Slint.
   slint::set_translator(std::make_unique<SlintTranslator>());
@@ -196,6 +187,26 @@ static void writeLogHeader() noexcept {
 
   // write cache directory to log (nice to know for users)
   qInfo() << "Cache directory:" << Application::getCacheDir().toNative();
+}
+
+/*******************************************************************************
+ *  setTheme()
+ ******************************************************************************/
+
+static void setTheme(const QString& name) noexcept {
+  sTheme = UiTheme::find(name);
+  if (!sTheme) {
+    sTheme = EditorToolbox::isSystemThemeDark() ? &UiTheme::dark()
+                                                : &UiTheme::light();
+  }
+  qApp->setPalette(sTheme->qpalette);
+
+  QPixmapCache::clear();
+  for (QWidget* widget : qApp->allWidgets()) {
+    qApp->style()->unpolish(widget);
+    qApp->style()->polish(widget);
+    widget->update();
+  }
 }
 
 /*******************************************************************************
@@ -289,8 +300,9 @@ static bool isFileFormatStableOrAcceptUnstable() noexcept {
 static int openWorkspace(FilePath& path) {
   // Run initialize workspace wizard as many times as needed until a valid
   // workspace is selected.
+  Q_ASSERT(sTheme);
   std::unique_ptr<InitializeWorkspaceWizard> wizard(
-      new InitializeWorkspaceWizard(false));
+      new InitializeWorkspaceWizard(*sTheme, false));
   wizard->setWorkspacePath(path);  // can throw
   while (wizard->getNeedsToBeShown()) {
     if (wizard->exec() != QDialog::Accepted) {
@@ -314,6 +326,12 @@ static int openWorkspace(FilePath& path) {
   const bool wsContainsNewerFileFormats =
       wizard->getWorkspaceContainsNewerFileFormats();
   wizard.reset();
+
+  // Apply UI theme from workspace settings.
+  auto applyUiTheme = [&]() { setTheme(ws.getSettings().uiTheme.get()); };
+  applyUiTheme();
+  QObject::connect(&ws.getSettings().uiTheme, &WorkspaceSettingsItem::edited,
+                   &ws.getSettings().uiTheme, applyUiTheme);
 
   // Now since workspace settings are loaded, switch to the language defined
   // there (until now, the system language was used).
@@ -364,7 +382,7 @@ static int openWorkspace(FilePath& path) {
                    &ws.getSettings().keyboardShortcuts, applyKeyboardShortcuts);
 
   // Run the application.
-  GuiApplication app(ws, wsContainsNewerFileFormats);
+  GuiApplication app(ws, wsContainsNewerFileFormats, sTheme);
   app.exec();
   return 0;
 }

@@ -66,7 +66,7 @@ public:
   EditorCommand() = delete;
   EditorCommand(const EditorCommand& other) = delete;
   EditorCommand(const QString& identifier, const char* text,
-                const char* description, const QString& iconFp, Flags flags,
+                const char* description, const char* iconFp, Flags flags,
                 const QList<QKeySequence>& defaultKeySequences,
                 QObject* parent = nullptr) noexcept;
   ~EditorCommand() noexcept;
@@ -92,6 +92,7 @@ public:
   void setKeySequences(const QList<QKeySequence>& sequences) noexcept;
 
   // General Methods
+  void updateIcon() noexcept;
   void updateTranslations() noexcept;
   QAction* createAction(QObject* parent,
                         ActionFlags flags = ActionFlags()) const noexcept;
@@ -127,6 +128,7 @@ private:  // Data
   QString mText;
   const char* mDescriptionNoTr;
   QString mDescription;
+  const char* mIconFp;
   QIcon mIcon;
   Flags mFlags;
   QList<QKeySequence> mDefaultKeySequences;

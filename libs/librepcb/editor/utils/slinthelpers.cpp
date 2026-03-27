@@ -178,12 +178,24 @@ slint::Image q2s(const QPixmap& p) noexcept {
   if (p.isNull()) {
     return slint::Image();
   }
+  return q2s(p.toImage());
+}
 
-  QImage img = p.toImage();
+slint::Image q2s(QImage img) noexcept {
   img.convertTo(QImage::Format_RGBA8888);
   return slint::Image(slint::SharedPixelBuffer<slint::Rgba8Pixel>(
       img.width(), img.height(),
-      reinterpret_cast<const slint::Rgba8Pixel*>(img.bits())));
+      reinterpret_cast<const slint::Rgba8Pixel*>(img.constBits())));
+}
+
+QImage s2image(const slint::Image& img) noexcept {
+  if (auto data = img.to_rgba8()) {
+    return QImage(reinterpret_cast<const uchar*>(data->begin()), data->width(),
+                  data->height(), QImage::Format_RGBA8888);
+  } else {
+    qWarning() << "Unsupported slint::Image format.";
+    return QImage();
+  }
 }
 
 slint::Color q2s(const QColor& c) noexcept {

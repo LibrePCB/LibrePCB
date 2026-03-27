@@ -1,8 +1,9 @@
-import { Palette, ScrollView } from "std-widgets.slint";
 import { Badge } from "badge.slint";
 import { DropDownPopup } from "dropdownpopup.slint";
-import { IconButton } from "iconbutton.slint";
-import { Constants } from "../api.slint";
+import { ControlIconButton } from "iconbutton.slint";
+import { ScrollView } from "scrollview.slint";
+import { TextInput } from "textinput.slint";
+import { Data } from "../api.slint";
 
 export component LineEdit inherits Rectangle {
     in-out property <string> text;
@@ -18,7 +19,7 @@ export component LineEdit inherits Rectangle {
     in property <[string]> suggestions;
     in property <bool> frameless: false;
     out property <bool> has-focus <=> edt.has-focus;
-    property <bool> show-error-badge: enabled && has-error && (!validation-error.is-empty);
+    property <bool> show-error-badge: enabled && (!read-only) && has-error && (!validation-error.is-empty);
     property <int> current-autocompletion-index: -1;
     property <int> current-suggestion-index: -1;
 
@@ -32,6 +33,9 @@ export component LineEdit inherits Rectangle {
     callback autocompletion-accepted(string);
     autocompletion-accepted(text) => {
         text-edited(text);
+
+        // Move cursor to the end. Not sure if that makes sense though.
+        edt.set-selection-offsets(edt.text.character-count, edt.text.character-count);
     }
 
     callback suggestion-accepted(string);
@@ -73,22 +77,31 @@ export component LineEdit inherits Rectangle {
     }
 
     preferred-width: max(l.preferred-width, placeholder-txt.preferred-width + l.preferred-width - view.preferred-width, 100px);
-    preferred-height: 28px;
+    preferred-height: 25px;
     horizontal-stretch: 1;
-    background: #202020;
-    border-color: {
-        if enabled && has-error {
-            edt.has-focus ? #ff0000 : #900000
-        } else if edt.has-focus {
-            Constants.librepcb-color
-        } else if enabled && (!read-only) {
-            #606060
+    background: {
+        if !enabled {
+            Data.theme.control-disabled
         } else {
-            transparent
+            Data.theme.control
         }
-    }
+    };
+    border-color: {
+        if (!enabled) || read-only {
+            Data.theme.control-border-disabled
+        } else if edt.has-focus {
+            if has-error {
+                Data.theme.base-text-error
+            } else {
+                Data.theme.accent
+            }
+        } else if has-error {
+            Data.theme.control-border.mix(Data.theme.base-text-error, 0.7)
+        } else {
+            Data.theme.control-border
+        }
+    };
     border-width: frameless ? 0 : 1px;
-    border-radius: frameless ? 0 : 10px;
     forward-focus: edt;
 
     // Accessibility
@@ -108,10 +121,11 @@ export component LineEdit inherits Rectangle {
     }
 
     placeholder-txt := Text {
-        x: frameless ? 5px : 10px;
+        x: 5px + (root.border-radius / 2);
         width: root.width - 2 * self.x;
         font-size: font-size;
-        color: enabled ? #909090 : #707070;
+        font-italic: true;
+        color: enabled ? Data.theme.control-text-muted : Data.theme.control-text-disabled;
         text: placeholder-text;
         wrap: no-wrap;
         overflow: elide;
@@ -125,6 +139,8 @@ export component LineEdit inherits Rectangle {
         l := HorizontalLayout {
             x: 0;
             y: 0;
+            padding-top: 1px;
+            padding-bottom: 1px;
             padding-left: placeholder-txt.x;
             padding-right: 3px;
 
@@ -133,18 +149,14 @@ export component LineEdit inherits Rectangle {
                 preferred-width: edt.preferred-width;
                 viewport-width: edt.width;
                 viewport-height: edt.height;
+                thin-scrollbars: true;
 
                 edt := TextInput {
-                    property <length> y-offset: (self.width > parent.width) ? 3px : 0;
-
-                    y: ((parent.height - self.height) / 2) - y-offset;
+                    y: ((parent.height - self.height) / 2);
                     width: max(self.preferred-width, view.width);
                     height: self.preferred-height;
                     font-size: font-size;
                     font-weight: font-weight;
-                    color: enabled ? Palette.foreground : Palette.foreground.darker(0.5);
-                    selection-background-color: Constants.librepcb-color;
-                    selection-foreground-color: black;
                     enabled: enabled;
                     read-only: read-only;
                     single-line: true;
@@ -192,33 +204,40 @@ export component LineEdit inherits Rectangle {
                 width: 5px;
             }
 
-            if enabled && (!read-only) && show-clear-button: clear-btn := IconButton {
-                y: (parent.height - self.height) / 2;
-                height: 18px;
-                background-color: root.background;
-                border-radius: self.height / 2;
-                icon-scale: 0.7;
-                icon: @image-url("../../../font-awesome/svgs/solid/xmark.svg");
-                // If the error badge is shown inside the edit (=frameless), hide the button.
-                visible: ta.has-hover && (!edt.text.is-empty) && ((!show-error-badge) || (!frameless));
-                accessible-role: none;
+            if enabled && (!read-only) && show-clear-button: Rectangle {
+                width: clear-btn.preferred-width;
 
-                clicked => {
-                    clear-clicked();
+                clear-btn := ControlIconButton {
+                    height: 18px;
+                    style: hyperlink;
+                    border-radius: self.height / 2;
+                    icon-size: 13px;
+                    icon: @image-url("../../../font-awesome/svgs/solid/xmark.svg");
+                    // If the error badge is shown inside the edit (=frameless), hide the button.
+                    visible: ta.has-hover && (!edt.text.is-empty) && ((!show-error-badge) || (!frameless));
+                    accessible-role: none;
+
+                    clicked => {
+                        clear-clicked();
+                    }
                 }
             }
 
-            if enabled && (!read-only) && (suggestions.length > 0): expand-btn := IconButton {
-                y: (parent.height - self.height) / 2;
-                height: 18px;
-                background-color: root.background;
-                border-radius: self.height / 2;
-                icon-size: 13px;  // Same size as in ComboBox.
-                icon: @image-url("../../../font-awesome/svgs/solid/caret-down.svg");
-                accessible-role: none;
+            if enabled && (!read-only) && (suggestions.length > 0): Rectangle {
+                width: expand-btn.preferred-width;
 
-                clicked => {
-                    suggestions-popup.show();
+                expand-btn := ControlIconButton {
+                    y: (parent.height - self.height) / 2;
+                    height: 18px;
+                    style: hyperlink;
+                    border-radius: self.height / 2;
+                    icon-size: 13px;  // Same size as in ComboBox.
+                    icon: @image-url("../../../font-awesome/svgs/solid/caret-down.svg");
+                    accessible-role: none;
+
+                    clicked => {
+                        suggestions-popup.show();
+                    }
                 }
             }
         }
@@ -230,7 +249,7 @@ export component LineEdit inherits Rectangle {
         x: root.width - self.width - (frameless ? (expand-btn-width + 5px) : 20px);
         y: frameless ? ((parent.height - self.height) / 2) : -8px;
         width: min(self.preferred-width, root.width * (frameless ? 0.3 : 0.8));
-        background: #101010;
+        background: parent.background;
         text-color: root.border-color;
         font-size: 10px;
         text: validation-error;
@@ -238,12 +257,14 @@ export component LineEdit inherits Rectangle {
         description: "validation error";  // Accessibility
     }
 
-    if has-focus && (autocompletions.length > 0): autocompletions-r := Rectangle {
+    if enabled && (!read-only) && has-focus && (autocompletions.length > 0): autocompletions-r := Rectangle {
         x: 0;
         y: parent.height;
         width: parent.width;
-        height: min(autocompletions-l.preferred-height, 300px);
-        background: black;
+        height: min(autocompletions-l.preferred-height + 2px, 300px);
+        background: Data.theme.control;
+        border-color: Data.theme.control-border;
+        border-width: 1px;
 
         // Accessibility
         accessible-role: list;
@@ -251,19 +272,19 @@ export component LineEdit inherits Rectangle {
         accessible-item-count: autocompletions.length;
 
         autocompletions-view := ScrollView {
-            width: root.width;
-            height: parent.height;
+            width: root.width - 2px;
+            height: parent.height - 2px;
             viewport-width: autocompletions-l.width;
             viewport-height: autocompletions-l.height;
 
             autocompletions-l := VerticalLayout {
-                width: root.width;
+                width: root.width - 2px;
                 height: self.preferred-height;
 
                 for item[index] in autocompletions: autocompletion-item-ta := TouchArea {
                     property <bool> is-selected: index == current-autocompletion-index;
 
-                    width: root.width;
+                    width: root.width - 2px;
                     height: 22px;
 
                     // Accessibility
@@ -282,16 +303,16 @@ export component LineEdit inherits Rectangle {
                     }
 
                     Rectangle {
-                        background: is-selected ? #505050 : transparent;
+                        background: is-selected ? Data.theme.control-checked : transparent;
 
                         autocompletion-item-txt := Text {
                             x: 5px;
-                            width: parent.width - 2 * self.x;
                             y: (parent.height - self.height) / 2;
+                            width: parent.width - 2 * self.x;
+                            color: Data.theme.control-text;
                             font-size: 12px;
                             overflow: elide;
                             vertical-alignment: center;
-                            color: Palette.foreground;
                             text: item;
                             accessible-role: none;
                         }
@@ -305,7 +326,7 @@ export component LineEdit inherits Rectangle {
         }
     }
 
-    if frameless && (self.has-focus || self.has-error): Rectangle {
+    if frameless && enabled && (!read-only) && (self.has-focus || self.has-error): Rectangle {
         y: parent.height - self.height;
         height: 1px;
         background: parent.border-color;

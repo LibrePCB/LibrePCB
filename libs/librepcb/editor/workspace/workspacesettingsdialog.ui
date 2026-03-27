@@ -37,41 +37,74 @@
         <enum>QFormLayout::FieldGrowthPolicy::AllNonFixedFieldsGrow</enum>
        </property>
        <item row="0" column="0">
-        <widget class="QLabel" name="label_5">
+        <widget class="QLabel" name="label_16">
          <property name="text">
-          <string>Application Language:</string>
+          <string>Theme:</string>
          </property>
         </widget>
        </item>
        <item row="0" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout_7">
+         <item>
+          <widget class="QComboBox" name="cbxUiTheme"/>
+         </item>
+         <item>
+          <widget class="QLabel" name="lblSeeColorSchemes">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>9</pointsize>
+             <italic>true</italic>
+            </font>
+           </property>
+           <property name="text">
+            <string>See also &lt;a href=&quot;schemes&quot;&gt;color schemes&lt;/a&gt;</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_5">
+         <property name="text">
+          <string>Language:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
         <widget class="QComboBox" name="cbxAppLocale">
          <property name="insertPolicy">
           <enum>QComboBox::InsertPolicy::NoInsert</enum>
          </property>
         </widget>
        </item>
-       <item row="1" column="0">
+       <item row="2" column="0">
         <widget class="QLabel" name="label_4">
          <property name="text">
-          <string>Default Length Unit:</string>
+          <string>Length Unit:</string>
          </property>
         </widget>
        </item>
-       <item row="1" column="1">
+       <item row="2" column="1">
         <widget class="QComboBox" name="cbxDefaultLengthUnit">
          <property name="insertPolicy">
           <enum>QComboBox::InsertPolicy::NoInsert</enum>
          </property>
         </widget>
        </item>
-       <item row="2" column="0">
+       <item row="3" column="0">
         <widget class="QLabel" name="label_2">
          <property name="text">
           <string>User Name:</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="1">
+       <item row="3" column="1">
         <layout class="QVBoxLayout" name="verticalLayout_7">
          <property name="spacing">
           <number>3</number>
@@ -119,14 +152,14 @@
          </item>
         </layout>
        </item>
-       <item row="3" column="0">
+       <item row="4" column="0">
         <widget class="QLabel" name="label_6">
          <property name="text">
           <string>Autosave Interval:</string>
          </property>
         </widget>
        </item>
-       <item row="3" column="1">
+       <item row="4" column="1">
         <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,3">
          <item>
           <widget class="QSpinBox" name="spbAutosaveInterval">
@@ -147,28 +180,28 @@
          </item>
         </layout>
        </item>
-       <item row="4" column="0">
+       <item row="5" column="0">
         <widget class="QLabel" name="label_10">
          <property name="text">
           <string>Rendering Method:</string>
          </property>
         </widget>
        </item>
-       <item row="4" column="1">
+       <item row="5" column="1">
         <widget class="QCheckBox" name="cbxUseOpenGl">
          <property name="text">
           <string>Use OpenGL Hardware Acceleration</string>
          </property>
         </widget>
        </item>
-       <item row="5" column="0">
+       <item row="6" column="0">
         <widget class="QLabel" name="lblDesktopIntegration">
          <property name="text">
           <string>Desktop Integration:</string>
          </property>
         </widget>
        </item>
-       <item row="5" column="1">
+       <item row="6" column="1">
         <layout class="QVBoxLayout" name="verticalLayout_8">
          <property name="spacing">
           <number>3</number>
@@ -219,14 +252,14 @@
          </item>
         </layout>
        </item>
-       <item row="6" column="0">
+       <item row="7" column="0">
         <widget class="QLabel" name="label">
          <property name="text">
           <string>Dismissed Messages:</string>
          </property>
         </widget>
        </item>
-       <item row="6" column="1">
+       <item row="7" column="1">
         <widget class="QPushButton" name="btnResetDismissedMessages">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -472,7 +505,7 @@
      </widget>
      <widget class="QWidget" name="themesTab">
       <attribute name="title">
-       <string>Themes</string>
+       <string>Color Schemes</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_9">
        <item>
@@ -489,7 +522,7 @@
             </sizepolicy>
            </property>
            <property name="text">
-            <string>Current Theme:</string>
+            <string>Current Scheme:</string>
            </property>
           </widget>
          </item>

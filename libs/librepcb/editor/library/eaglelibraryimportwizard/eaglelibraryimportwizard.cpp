@@ -45,12 +45,14 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-EagleLibraryImportWizard::EagleLibraryImportWizard(Workspace& workspace,
+EagleLibraryImportWizard::EagleLibraryImportWizard(const UiTheme& theme,
+                                                   Workspace& workspace,
                                                    const FilePath& dstLibFp,
                                                    QWidget* parent) noexcept
   : QWizard(parent),
     mUi(new Ui::EagleLibraryImportWizard),
-    mContext(new EagleLibraryImportWizardContext(workspace, dstLibFp, this)) {
+    mContext(
+        new EagleLibraryImportWizardContext(theme, workspace, dstLibFp, this)) {
   mUi->setupUi(this);
   setPixmap(WizardPixmap::LogoPixmap, QPixmap(":/img/logo/48x48.png"));
   setPixmap(QWizard::WatermarkPixmap,

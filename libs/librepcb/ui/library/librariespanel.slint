@@ -1,10 +1,10 @@
-import { ListView } from "std-widgets.slint";
 import {
     Badge,
     Button,
     FilterTermEdit,
     IconButton,
     LinkText,
+    ListView,
     MessagePopup,
     PanelHeader,
     ProgressBar,
@@ -13,7 +13,6 @@ import {
 import {
     Action,
     Backend,
-    Constants,
     Data,
     LibraryAction,
     LibraryInfoData,
@@ -25,7 +24,6 @@ component LibraryUninstallPopup inherits MessagePopup {
     in property <int> index;
 
     title: @tr("Uninstall {}", model[index].name);
-    background: #700000;
     arrow: left;
     has-ok: false;
     has-yes: true;
@@ -33,16 +31,19 @@ component LibraryUninstallPopup inherits MessagePopup {
 
     Text {
         font-weight: 700;
+        color: root.text-color;
         text: @tr("Attention").to-uppercase() + ": " + @tr("This will remove the whole library directory and is not reversible:");
     }
 
     Text {
         font-family: "monospace";
+        color: root.text-color;
         wrap: word-wrap;
         text: model[index].path;
     }
 
     Text {
+        color: root.text-color;
         text: @tr("Are you really sure to remove '{}'?", model[index].name);
     }
 
@@ -58,7 +59,6 @@ component LibraryListViewItem inherits Rectangle {
     in property <bool> remote: false;
     in property <bool> is-current: false;
     in property <bool> enabled: true;
-    in property <length> scrollbar-width: 0;
     property <LibraryInfoData> lib: model[index];
     property <bool> has-switch: remote && (!lib.uuid.is-empty);
     property <bool> version-as-badge: (!lib.installed-version.is-empty) && (remote || (!lib.online-version.is-empty));
@@ -70,26 +70,28 @@ component LibraryListViewItem inherits Rectangle {
     states [
         outdated when lib.outdated: {
             status-text: @tr("Outdated:") + " v" + lib.installed-version + " < v" + lib.online-version;
-            status-color: red;
+            status-color: Data.theme.base-text-error;
             status-icon: @image-url("../../../font-awesome/svgs/solid/angles-up.svg");
         }
         up-to-date when (!lib.installed-version.is-empty) && (!lib.online-version.is-empty): {
             status-text: @tr("Up-to-date:") + " v" + lib.installed-version;
-            status-color: lime;
+            status-color: Data.theme.base-text-success;
             status-icon: @image-url("../../../font-awesome/svgs/solid/check.svg");
         }
     ]
 
     background: {
         if !enabled {
-            transparent
-        } else if remote && lib.installed-version.is-empty {
-            is-current ? #222222 : (ta.has-hover ? #111111 : #000000)
+            Data.theme.control-disabled
+        } else if is-current {
+            Data.theme.control-checked
+        } else if ta.has-hover {
+            Data.theme.control-hovered
         } else {
-            is-current ? #454545 : (ta.has-hover ? #383838 : transparent)
+            Data.theme.control
         }
     };
-    border-color: Constants.librepcb-color;
+    border-color: Data.theme.accent;
     border-width: lib.highlight ? 1px : 0;
 
     // Accessibility
@@ -118,7 +120,8 @@ component LibraryListViewItem inherits Rectangle {
 
         HorizontalLayout {
             padding: 2px;
-            padding-right: scrollbar-width + 6px;
+            padding-left: 4px;
+            padding-right: 9px;
             spacing: 3px;
 
             img := Image {
@@ -126,6 +129,7 @@ component LibraryListViewItem inherits Rectangle {
                 height: root.height - 6px;
                 image-fit: contain;
                 source: lib.icon;
+                opacity: lib.installed-version.is-empty ? 0.7 : 1;
                 accessible-role: none;
             }
 
@@ -142,7 +146,13 @@ component LibraryListViewItem inherits Rectangle {
 
                     name-txt := Text {
                         horizontal-stretch: 0;
-                        color: ((!enabled) || lib.installed-version.is-empty) ? #909090 : #dddddd;
+                        color: {
+                            if ((!enabled) || lib.installed-version.is-empty) {
+                                Data.theme.control-text-muted
+                            } else {
+                                Data.theme.control-text
+                            }
+                        };
                         font-size: 13px;
                         font-weight: 700;
                         vertical-alignment: bottom;
@@ -152,19 +162,19 @@ component LibraryListViewItem inherits Rectangle {
                     }
 
                     if !status-text.is-empty: status-btn := IconButton {
-                        height: 14px;
+                        height: 13px;
                         width: self.height;
                         style: read-only;
                         icon: status-icon;
                         tooltip: status-text;
-                        color-disabled: status-color.darker(0.5);
+                        color-disabled: status-color.with-alpha(0.5);
                         color-enabled: status-color;
                         enabled: enabled;
                     }
 
                     if status-text.is-empty: version-txt := Text {
                         horizontal-stretch: 0;
-                        color: name-txt.color.darker(0.2);
+                        color: name-txt.color;
                         font-size: 10px;
                         vertical-alignment: bottom;
                         overflow: elide;
@@ -186,6 +196,7 @@ component LibraryListViewItem inherits Rectangle {
 
                 if lib.progress > 0: Rectangle {
                     progress-bar := ProgressBar {
+                        height: 5px;
                         progress: lib.progress / 100;
                         accessible-role: none;
                     }
@@ -199,8 +210,8 @@ component LibraryListViewItem inherits Rectangle {
                 icon: @image-url("../../../font-awesome/svgs/solid/star.svg");
                 tooltip: @tr("Recommended");
                 tooltip-position: left;
-                color-disabled: yellow.darker(0.5);
-                color-enabled: yellow;
+                color-disabled: self.color-enabled.with-alpha(0.5);
+                color-enabled: Data.theme.base-text-warning;
                 enabled: enabled;
                 accessible-role: none;
             }
@@ -235,14 +246,21 @@ component LibraryListViewItem inherits Rectangle {
 
                 states [
                     install when lib.installed-version.is-empty && lib.checked: {
-                        checked-color: lime;
+                        checked-color: Data.theme.accent;
+                        checked-knob-color: Data.theme.accent-text;
                     }
                     update when (!lib.installed-version.is-empty) && lib.outdated && lib.checked: {
-                        checked-color: yellow;
-                        unchecked-color: red;
+                        checked-color: Data.theme.info;
+                        checked-knob-color: Data.theme.info-text;
                     }
                     uninstall when (!lib.installed-version.is-empty) && (!lib.checked): {
-                        unchecked-color: red;
+                        unchecked-color: Data.theme.error;
+                        unchecked-knob-color: Data.theme.error-text;
+                    }
+                    unchanged when (!lib.outdated) && (lib.installed-version.is-empty != lib.checked): {
+                        checked-color: Data.theme.accent;
+                        unchecked-color: Data.theme.control-checked;
+                        unchecked-knob-color: Data.theme.control-text-muted;
                     }
                 ]
 
@@ -300,7 +318,7 @@ component LibrariesPanelSection inherits FocusScope {
                 horizontal-alignment: left;
                 vertical-alignment: center;
                 font-size: 10px;
-                text-color: #c0c0c0;
+                text-color: Data.theme.control-text-muted;
                 text: @tr("Toggle All");
                 enabled: root.enabled;
 
@@ -318,8 +336,8 @@ component LibrariesPanelSection inherits FocusScope {
                 style: read-only;
                 icon: @image-url("../../../font-awesome/svgs/solid/triangle-exclamation.svg");
                 icon-scale: 0.7;
-                color-disabled: yellow.darker(1);
-                color-enabled: yellow;
+                color-disabled: self.color-enabled.darker(1);
+                color-enabled: Data.theme.base-text-warning;
                 tooltip: data.refreshing-error;
                 enabled: root.enabled;
             }
@@ -339,6 +357,7 @@ component LibrariesPanelSection inherits FocusScope {
             if !remote: create-btn := IconButton {
                 width: self.height;
                 icon: @image-url("../../../font-awesome/svgs/solid/plus.svg");
+                icon-scale: 0.7;
                 tooltip: @tr("Create a New Library") + "...";
                 enabled: root.enabled;
 
@@ -351,7 +370,7 @@ component LibrariesPanelSection inherits FocusScope {
             if remote && (!data.refreshing): check-for-updates-btn := IconButton {
                 width: self.height;
                 icon: @image-url("../../../font-awesome/svgs/solid/rotate.svg");
-                icon-scale: 0.7;
+                icon-scale: 0.65;
                 tooltip: @tr("Check For Updates");
                 enabled: root.enabled && check-for-updates-enabled;
 
@@ -383,9 +402,8 @@ component LibrariesPanelSection inherits FocusScope {
 
             Rectangle {
                 height: no-remote-libs-installed-txt.height;
-                border-color: yellow;
-                border-width: 1px;
-                border-radius: 8px;
+                background: Data.theme.warning;
+                border-radius: 5px;
 
                 no-remote-libs-installed-txt := Text {
                     x: 6px;
@@ -393,7 +411,7 @@ component LibrariesPanelSection inherits FocusScope {
                     height: self.preferred-height + (2 * self.x);
                     font-italic: true;
                     wrap: word-wrap;
-                    color: parent.border-color;
+                    color: Data.theme.warning-text;
                     vertical-alignment: center;
                     text: @tr("No remote part libraries are currently installed. To get parts like resistors, LEDs, microcontrollers etc., choose some libraries to be downloaded from the internet.");
                 }
@@ -404,6 +422,7 @@ component LibrariesPanelSection inherits FocusScope {
             padding: 8px;
 
             no-local-libs-installed-txt := Text {
+                color: Data.theme.control-text;
                 font-italic: true;
                 wrap: word-wrap;
                 text: @tr("No local libraries exist in this workspace. In order to create your own parts, add a new local library first with the button above.");
@@ -414,6 +433,7 @@ component LibrariesPanelSection inherits FocusScope {
             padding: 8px;
 
             no-libs-matching-filter-txt := Text {
+                color: Data.theme.control-text-muted;
                 font-italic: true;
                 wrap: word-wrap;
                 text: @tr("No libraries matching the filter.");
@@ -422,11 +442,10 @@ component LibrariesPanelSection inherits FocusScope {
 
         view := ListView {
             property <int> item-count: libraries.length;
-            property <length> scrollbar-width: (view.height < view.preferred-height) ? 8px : 0;
 
             vertical-stretch: 0;
+            min-height: item-height;
             preferred-height: libraries.length * item-height;
-            enabled: root.enabled;
 
             // Accessibility
             accessible-role: list;
@@ -445,7 +464,6 @@ component LibrariesPanelSection inherits FocusScope {
                 model: libraries;
                 index: index;
                 remote: remote;
-                scrollbar-width: scrollbar-width;
                 is-current: index == current-index;
                 enabled: root.enabled;
 
@@ -502,8 +520,7 @@ component LibrariesPanelSection inherits FocusScope {
     }
 }
 
-export component LibrariesPanel inherits Rectangle {
-    background: #2a2a2a;
+export component LibrariesPanel inherits VerticalLayout {
     forward-focus: local-libs;
 
     init => {
@@ -511,151 +528,183 @@ export component LibrariesPanel inherits Rectangle {
         local-libs.focus();
     }
 
-    VerticalLayout {
-        local-libs := LibrariesPanelSection {
-            property <length> max-height-impl: (root.height * self.preferred-height) / (self.preferred-height + remote-libs.preferred-height);
+    local-libs := LibrariesPanelSection {
+        property <length> max-height-impl: (root.height * self.preferred-height) / (self.preferred-height + remote-libs.preferred-height);
 
-            vertical-stretch: 0;
-            max-height: (self.preferred-height > max-height-impl) ? max-height-impl : self.preferred-height;
-            title: @tr("Local Libraries").to-uppercase();
-            title-count: Data.local-libraries-data.count;
-            libraries: Data.local-libraries;
-            data: Data.local-libraries-data;
-            remote: false;
-            min-items-height: (root.height >= 500px) ? 3 : 1;
-            enabled: !Data.libraries-operation-in-progress;
-        }
+        vertical-stretch: 0;
+        max-height: (self.preferred-height > max-height-impl) ? max-height-impl : self.preferred-height;
+        title: @tr("Local Libraries").to-uppercase();
+        title-count: Data.local-libraries-data.count;
+        libraries: Data.local-libraries;
+        data: Data.local-libraries-data;
+        remote: false;
+        min-items-height: (root.height >= 500px) ? 3 : 1;
+        enabled: !Data.libraries-operation-in-progress;
+    }
+
+    Rectangle {
+        height: 20px;
+    }
+
+    remote-libs := LibrariesPanelSection {
+        vertical-stretch: 1;
+        title: @tr("Remote Libraries").to-uppercase();
+        title-count: Data.remote-libraries-data.installed + "/" + Data.remote-libraries-data.count;
+        libraries: Data.remote-libraries;
+        data: Data.remote-libraries-data;
+        remote: true;
+        enabled: (!Data.libraries-operation-in-progress) && (!Data.remote-libraries-data.refreshing);
+    }
+
+    Rectangle {
+        property <bool> show: Data.preview-mode ? Data.remote-libraries[0].checked : (Data.remote-libraries-pending-operations > 0);
+
+        height: show ? self.preferred-height : 0;
+        background: Data.theme.window;
+
+        // Clip for the slide-in/out effect, but do not clip in steady
+        // state for the tooltips.
+        clip: self.height != self.preferred-height;
+
+        animate height { duration: 150ms; }
 
         Rectangle {
-            height: 20px;
+            y: 0;
+            height: 1px;
+            background: Data.theme.base-border;
         }
 
-        remote-libs := LibrariesPanelSection {
-            vertical-stretch: 1;
-            title: @tr("Remote Libraries").to-uppercase();
-            title-count: Data.remote-libraries-data.installed + "/" + Data.remote-libraries-data.count;
-            libraries: Data.remote-libraries;
-            data: Data.remote-libraries-data;
-            remote: true;
-            enabled: (!Data.libraries-operation-in-progress) && (!Data.remote-libraries-data.refreshing);
-        }
+        VerticalLayout {
+            spacing: 8px;
+            padding-bottom: 8px;
 
-        Rectangle {
-            property <bool> show: Data.preview-mode ? Data.remote-libraries[0].checked : (Data.remote-libraries-pending-operations > 0);
+            HorizontalLayout {
+                padding-top: 5px;
+                padding-left: 8px;
+                padding-right: 3px;
+                spacing: 3px;
+                z: 10;  // For the tooltips.
 
-            height: show ? self.preferred-height : 0;
-            background: black;
-            border-color: Constants.librepcb-color;
-            border-width: 1px;
-
-            // Clip for the slide-in/out effect, but do not clip in steady
-            // state for the tooltips.
-            clip: self.height != self.preferred-height;
-
-            animate height { duration: 150ms; }
-
-            VerticalLayout {
-                spacing: 8px;
-                padding-bottom: 8px;
-
-                PanelHeader {
-                    z: 10;  // For the tooltips.
-                    title: @tr("Pending Operations").to-uppercase();
-
-                    HorizontalLayout {
-                        padding-top: 5px;
-                        padding-right: 3px;
-                        spacing: 3px;
-
-                        if Data.remote-libraries-data.pending-installs > 0: pending-installs-badge := Badge {
-                            font-weight: 700;
-                            font-size: 12px;
-                            border-width: 1.3px;
-                            text-color: (Data.remote-libraries-data.pending-installs > 0) ? lime : #707070;
-                            text: "+" + Data.remote-libraries-data.pending-installs;
-                        }
-
-                        if Data.remote-libraries-data.pending-updates > 0: pending-updates-badge := Badge {
-                            font-weight: 700;
-                            font-size: 12px;
-                            border-width: 1.3px;
-                            text-color: (Data.remote-libraries-data.pending-updates > 0) ? yellow : #707070;
-                            text: "↑" + Data.remote-libraries-data.pending-updates;
-                        }
-
-                        if Data.remote-libraries-data.pending-uninstalls > 0: pending-uninstalls-badge := Badge {
-                            font-weight: 700;
-                            font-size: 12px;
-                            border-width: 1.3px;
-                            text-color: (Data.remote-libraries-data.pending-uninstalls > 0) ? red : #707070;
-                            text: "–" + Data.remote-libraries-data.pending-uninstalls;
-                        }
+                Rectangle {
+                    Text {
+                        x: 0;
+                        y: (parent.height - self.height) / 2 + 1px;
+                        font-weight: 700;
+                        overflow: elide;
+                        vertical-alignment: center;
+                        color: Data.theme.base-text;
+                        text: @tr("Pending Operations").to-uppercase();
+                        accessible-role: none;
                     }
                 }
 
-                VerticalLayout {
-                    padding-left: 8px;
-                    padding-right: 8px;
-                    spacing: 8px;
+                if Data.remote-libraries-data.pending-installs > 0: pending-installs-badge := Badge {
+                    font-weight: 700;
+                    font-size: 12px;
+                    border-width: 0;
+                    background: Data.theme.accent;
+                    text-color: Data.theme.accent-text;
+                    text: "+" + Data.remote-libraries-data.pending-installs;
+                }
 
-                    if Data.remote-libraries-data.pending-oneway-uninstalls > 0: Rectangle {
-                        height: nonreversible-warning-txt.preferred-height + 8px;
-                        border-color: red;
-                        border-width: 1px;
-                        border-radius: 5px;
-                        background: black;
+                if Data.remote-libraries-data.pending-updates > 0: pending-updates-badge := Badge {
+                    font-weight: 700;
+                    font-size: 12px;
+                    border-width: 0;
+                    background: Data.theme.info;
+                    text-color: Data.theme.info-text;
+                    text: "↑" + Data.remote-libraries-data.pending-updates;
+                }
 
-                        nonreversible-warning-txt := Text {
-                            width: parent.width - 8px;
-                            color: parent.border-color;
-                            font-weight: 700;
-                            horizontal-alignment: left;
-                            wrap: word-wrap;
-                            text: @tr("Warning").to-uppercase() + ": " + @tr("Some libraries marked for uninstallation are currently not available for installation, thus their deletion will be non-reversible!");
+                if Data.remote-libraries-data.pending-uninstalls > 0: pending-uninstalls-badge := Badge {
+                    font-weight: 700;
+                    font-size: 12px;
+                    border-width: 0;
+                    background: Data.theme.error;
+                    text-color: Data.theme.error-text;
+                    text: "–" + Data.remote-libraries-data.pending-uninstalls;
+                }
+            }
+
+            VerticalLayout {
+                padding-left: 8px;
+                padding-right: 8px;
+                spacing: 8px;
+
+                if Data.remote-libraries-data.pending-oneway-uninstalls > 0: Rectangle {
+                    height: nonreversible-warning-txt.preferred-height + 12px;
+                    border-radius: 5px;
+                    background: Data.theme.error;
+
+                    nonreversible-warning-txt := Text {
+                        width: parent.width - 12px;
+                        color: Data.theme.error-text;
+                        font-weight: 700;
+                        horizontal-alignment: left;
+                        wrap: word-wrap;
+                        text: @tr("Warning").to-uppercase() + ": " + @tr("Some libraries marked for uninstallation are currently not available for installation, thus their deletion will be non-reversible!");
+                    }
+                }
+
+                HorizontalLayout {
+                    spacing: 6px;
+
+                    apply-btn := Button {
+                        horizontal-stretch: 1;
+                        icon: {
+                            if Data.remote-libraries-data.pending-oneway-uninstalls > 0 {
+                                @image-url("../../../font-awesome/svgs/solid/triangle-exclamation.svg");
+                            } else {
+                                @image-url("../../../font-awesome/svgs/solid/check.svg");
+                            }
+                        };
+                        text: (root.width > 300px) ? @tr("" | "Apply {n} Modification(s)" % Data.remote-libraries-pending-operations) : @tr("Apply");
+                        primary: Data.remote-libraries-data.pending-oneway-uninstalls == 0;
+                        border-color: {
+                            if !self.enabled {
+                                Data.theme.control-border-disabled
+                            } else if (Data.remote-libraries-data.pending-oneway-uninstalls > 0) {
+                                Data.theme.base-text-error.with-alpha(self.has-focus ? 1 : 0.5)
+                            } else if self.has-focus {
+                                Data.theme.accent
+                            } else {
+                                Data.theme.control-border
+                            }
+                        };
+                        enabled: !Data.libraries-operation-in-progress;
+
+                        clicked => {
+                            Backend.trigger(Action.library-panel-apply);
                         }
                     }
 
-                    HorizontalLayout {
-                        spacing: 6px;
+                    cancel-btn := Button {
+                        horizontal-stretch: 0;
+                        text: @tr("Cancel");
 
-                        apply-btn := Button {
-                            horizontal-stretch: 1;
-                            icon: {
-                                if Data.remote-libraries-data.pending-oneway-uninstalls > 0 {
-                                    @image-url("../../../font-awesome/svgs/solid/triangle-exclamation.svg");
-                                } else {
-                                    @image-url("../../../font-awesome/svgs/solid/check.svg");
-                                }
-                            };
-                            text: (root.width > 300px) ? @tr("" | "Apply {n} Modification(s)" % Data.remote-libraries-pending-operations) : @tr("Apply");
-                            primary: Data.remote-libraries-data.pending-oneway-uninstalls == 0;
-                            border-color: (self.has-focus ? Constants.librepcb-color : red).darker(self.enabled ? 0 : 0.5);
-                            border-width: (self.has-focus || (Data.remote-libraries-data.pending-oneway-uninstalls > 0)) ? 1px : 0;
-                            enabled: !Data.libraries-operation-in-progress;
-
-                            clicked => {
-                                Backend.trigger(Action.library-panel-apply);
-                            }
-                        }
-
-                        cancel-btn := Button {
-                            horizontal-stretch: 0;
-                            text: @tr("Cancel");
-
-                            clicked => {
-                                Backend.trigger(Action.library-panel-cancel);
-                            }
+                        clicked => {
+                            Backend.trigger(Action.library-panel-cancel);
                         }
                     }
                 }
             }
         }
+    }
 
-        HorizontalLayout {
-            padding: min(5px, filter-edt.height);
+    if !Data.libraries-panel-filter.is-empty: Rectangle {
+        background: Data.theme.window;
+
+        Rectangle {
+            y: 0;
+            height: 1px;
+            background: Data.theme.base-border;
+        }
+
+        filter-l := HorizontalLayout {
+            padding: 5px;
 
             filter-edt := FilterTermEdit {
-                height: Data.libraries-panel-filter.is-empty ? 0 : self.preferred-height;
+                height: self.preferred-height;
                 term: Data.libraries-panel-filter;
 
                 animate height { duration: 100ms; }

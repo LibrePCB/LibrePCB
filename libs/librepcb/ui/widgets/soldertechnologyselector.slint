@@ -1,16 +1,5 @@
-import { IconButton } from "iconbutton.slint";
-import { ToolBarWidget } from "toolbarwidget.slint";
-import {
-    Helpers,
-    SolderTechnology,
-} from "../api.slint";
-
-component Button inherits IconButton {
-    width: 18px;
-    style: checkable-hyperlink;
-    color-enabled: #606060;
-    color-checked: #c0c0c0;
-}
+import { ToolBarWidget, ToolBarSelectorButton } from "toolbar.slint";
+import { SolderTechnology } from "../api.slint";
 
 export component SolderTechnologySelector inherits ToolBarWidget {
     in-out property <SolderTechnology> value;
@@ -48,7 +37,7 @@ export component SolderTechnologySelector inherits ToolBarWidget {
         value = v;
     }
 
-    hand-large-btn := Button {
+    hand-large-btn := ToolBarSelectorButton {
         icon: @image-url("../../../font-awesome/svgs/solid/child.svg");
         checked: value == SolderTechnology.hand-large;
         enabled: root.enabled;
@@ -60,7 +49,7 @@ export component SolderTechnologySelector inherits ToolBarWidget {
         }
     }
 
-    hand-btn := Button {
+    hand-btn := ToolBarSelectorButton {
         icon: @image-url("../../../font-awesome/svgs/solid/hand.svg");
         checked: value == SolderTechnology.hand;
         enabled: root.enabled;
@@ -72,7 +61,7 @@ export component SolderTechnologySelector inherits ToolBarWidget {
         }
     }
 
-    reflow-btn := Button {
+    reflow-btn := ToolBarSelectorButton {
         icon: @image-url("../../../font-awesome/svgs/solid/wind.svg");
         icon-rotation: 90deg;
         checked: value == SolderTechnology.reflow;
@@ -85,7 +74,7 @@ export component SolderTechnologySelector inherits ToolBarWidget {
         }
     }
 
-    wave-btn := Button {
+    wave-btn := ToolBarSelectorButton {
         icon: @image-url("../../../font-awesome/svgs/solid/water.svg");
         checked: value == SolderTechnology.wave;
         enabled: root.enabled;

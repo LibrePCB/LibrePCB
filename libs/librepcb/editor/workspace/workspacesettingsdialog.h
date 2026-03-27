@@ -120,6 +120,7 @@ private:
   QMap<Uuid, Theme> mThemes;
 
   // Original values of temporarily changed settings
+  QString mOldUiTheme;
   QString mOldApplicationLocale;
 };
 
