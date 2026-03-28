@@ -437,6 +437,32 @@ bool ffi_ibom_generate_html(const InteractiveHtmlBom * NONNULL obj,
                             QString * NONNULL err);
 
 /**
+ * Wrapper for [rotate_point]
+ */
+void ffi_math_rotate_point(double * NONNULL x,
+                           double * NONNULL y,
+                           double angle);
+
+/**
+ * Wrapper for [angle_to_point]
+ */
+double ffi_math_angle_to_point(double x, double y);
+
+/**
+ * Wrapper for [arc_radius]
+ */
+double ffi_math_arc_radius(double dx, double dy, double angle);
+
+/**
+ * Wrapper for [arc_radius_and_center]
+ */
+double ffi_math_arc_radius_and_center(double dx,
+                                      double dy,
+                                      double angle,
+                                      double * NONNULL x,
+                                      double * NONNULL y);
+
+/**
  * Wrapper for [increment_number_in_string]
  */
 void ffi_increment_number_in_string(QString * NONNULL s);

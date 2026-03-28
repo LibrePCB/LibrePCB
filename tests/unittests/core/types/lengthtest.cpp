@@ -172,15 +172,7 @@ TEST_P(LengthFromMmTest, test) {
   const LengthFromMmTestData& data = GetParam();
 
   const Length actual = Length::fromMm(data.input);
-
-  // On Windows, accept small deviations since the results on CI are slightly
-  // different. See discussion here:
-  // https://github.com/LibrePCB/LibrePCB/pull/511#issuecomment-529089212
-#if defined(Q_OS_WIN32) || defined(Q_OS_WIN64)
-  EXPECT_LE(std::abs(actual.toNm() - data.output.toNm()), 5);
-#else
   EXPECT_EQ(data.output.toNm(), actual.toNm());
-#endif
 }
 
 // clang-format off

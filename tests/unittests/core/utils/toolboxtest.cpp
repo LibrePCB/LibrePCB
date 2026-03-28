@@ -114,15 +114,12 @@ TEST_P(ToolboxArcCenterTest, test) {
   ASSERT_EQ(data.center.has_value(), actual.has_value());
 
   if (actual) {
-    // On Windows, accept small deviations since the results on CI are slightly
-    // different. See discussion here:
-    // https://github.com/LibrePCB/LibrePCB/pull/511#issuecomment-529089212
-#if defined(Q_OS_WIN32) || defined(Q_OS_WIN64)
-    EXPECT_LE(std::abs(actual->getX().toNm() - data.center->getX().toNm()), 5);
-    EXPECT_LE(std::abs(actual->getY().toNm() - data.center->getY().toNm()), 5);
-#else
-    EXPECT_EQ(*data.center, *actual);
-#endif
+    EXPECT_EQ(*data.center, *actual) << QString("(%1, %2) != (%3, %4)")
+                                            .arg(actual->getX().toNm())
+                                            .arg(actual->getY().toNm())
+                                            .arg(data.center->getX().toNm())
+                                            .arg(data.center->getY().toNm())
+                                            .toStdString();
   }
 }
 
@@ -132,7 +129,7 @@ static ToolboxArcCenterTestData sToolboxArcCenterTestData[] = {
   {Point(0, 0),                Point(0, 0),                Angle::deg0(),      std::nullopt},
   {Point(0, 0),                Point(0, 0),                Angle::fromDeg(20), std::nullopt},
   {Point(1000, 2000),          Point(5000, 4000),          Angle::deg0(),      std::nullopt},
-  {Point(47744137, 37820591),  Point(55364137, 24622364),  -Angle::deg90(),    Point(44955023, 27411478)},
+  {Point(47744137, 37820591),  Point(55364137, 24622364),  -Angle::deg90(),    Point(44955024, 27411478)},
   // Test to reproduce https://github.com/LibrePCB/LibrePCB/issues/974
   {Point(30875000, 32385000),  Point(26275000, 32385000),  -Angle::deg180(),   Point(28575000, 32385000)},
   // Test to reproduce another case where small deviations were observed

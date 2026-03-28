@@ -29,6 +29,8 @@
 
 #include <QtCore>
 
+#include <optional>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -366,6 +368,28 @@ public:
   static bool isValidMm(qreal millimeters) noexcept {
     return checkRange(millimeters * 1e6);
   }
+
+  /**
+   * @brief Try to create a #Length object from nanometers as a float
+   *
+   * @param nanometers     Nanometers.
+   *
+   * @return A new Length object with the (rounded) nanometers, or
+   *         `std::nullopt` if the input is not in the valid range.
+   */
+  static std::optional<Length> tryFromNm(qreal nanometers) noexcept;
+
+  /**
+   * @brief Create a #Length object from nanometers as a float
+   *
+   * @param nanometers     Nanometers.
+   *
+   * @return A new Length object
+   *
+   * @throws RangeError   If the argument is out of range, a RangeError
+   * exception will be thrown
+   */
+  static Length fromNm(qreal nanometers);
 
   /**
    * @brief Get a Length object with a specific length and map it to a specific
