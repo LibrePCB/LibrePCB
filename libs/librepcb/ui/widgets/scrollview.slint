@@ -74,6 +74,7 @@ export component ScrollBar inherits Rectangle {
 }
 
 export component ScrollView {
+    in property <bool> force-show-scrollbars: false;
     in property <bool> thin-scrollbars: false;
     in property <bool> mouse-drag-pan-enabled <=> flickable.interactive;
     in-out property <length> viewport-x <=> flickable.viewport-x;
@@ -109,7 +110,7 @@ export component ScrollView {
             horizontal: false;
             page-size: flickable.height;
             maximum: flickable.viewport-height - flickable.height;
-            opacity: (ta.has-hover || self.has-hover) ? 0.7 : 0;
+            opacity: (force-show-scrollbars || ta.has-hover || self.has-hover) ? 0.7 : 0;
 
             animate opacity {
                 delay: 100ms;
@@ -129,7 +130,7 @@ export component ScrollView {
             horizontal: true;
             page-size: flickable.width;
             maximum: flickable.viewport-width - flickable.width;
-            opacity: (ta.has-hover || self.has-hover) ? 0.7 : 0;
+            opacity: (force-show-scrollbars || ta.has-hover || self.has-hover) ? 0.7 : 0;
 
             animate opacity {
                 delay: 100ms;

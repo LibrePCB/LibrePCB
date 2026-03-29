@@ -446,6 +446,7 @@ component LibrariesPanelSection inherits FocusScope {
             vertical-stretch: 0;
             min-height: item-height;
             preferred-height: libraries.length * item-height;
+            force-show-scrollbars: root.has-focus;
 
             // Accessibility
             accessible-role: list;

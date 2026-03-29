@@ -42,6 +42,8 @@ export component LibraryTreeView inherits FocusScope {
     }
 
     view := ListView {
+        force-show-scrollbars: root.has-focus;
+
         scrolled => {
             scrolled(self.viewport-y);
         }

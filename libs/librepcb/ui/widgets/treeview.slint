@@ -41,6 +41,8 @@ export component TreeView inherits FocusScope {
     }
 
     view := ListView {
+        force-show-scrollbars: root.has-focus;
+
         for item[index] in model: item-ta := TouchArea {
             property <bool> is-enabled: item.action == TreeViewItemAction.none;
             property <bool> show-pin: item.supports-pinning && (item.pinned || self.has-hover || (current-index == index));

@@ -212,6 +212,7 @@ export component GraphicsLayersPanel inherits FocusScope {
         view := ListView {
             vertical-stretch: 1;
             visible: model.length > 0;
+            force-show-scrollbars: root.has-focus;
 
             for layer[index] in model: item := GraphicsLayerListItem {
                 height: item-height;
