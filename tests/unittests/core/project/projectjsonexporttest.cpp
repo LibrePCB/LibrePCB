@@ -147,8 +147,7 @@ TEST_F(ProjectJsonExportTest, testAssemblyVariant) {
 }
 
 TEST_F(ProjectJsonExportTest, testBoundingBox) {
-  auto makeBox = [](LengthBase_t x0, LengthBase_t y0, LengthBase_t x1,
-                    LengthBase_t y1) {
+  auto makeBox = [](int64_t x0, int64_t y0, int64_t x1, int64_t y1) {
     return ProjectJsonExport::BoundingBox{std::make_pair(
         Point(Length(x0), Length(y0)), Point(Length(x1), Length(y1)))};
   };

@@ -37,33 +37,6 @@
 namespace librepcb {
 
 /*******************************************************************************
- *  Typedefs
- ******************************************************************************/
-
-/**
- * @brief This type is the ONLY base type to store all lengths (always in
- * nanometers)!
- *
- * This is the base type of the class ::librepcb::Length.
- *
- * This type is normally a 64bit signed integer. 32bit integers could handle
- * these values also, but is limited to +/-2.147 meters. Maybe this is not
- * enough for large PCBs or schematics, so it's better to use 64bit variables
- * ;-)
- *
- * @note Set the define USE_32BIT_LENGTH_UNITS in the *.pro file if you want to
- * use 32bit integers instead of 64bit integers for all length units (maybe your
- * platform cannot handle 64bit as efficient as 32bit integers).
- *
- * @see ::librepcb::Length
- */
-#ifdef USE_32BIT_LENGTH_UNITS
-typedef qint32 LengthBase_t;
-#else
-typedef qint64 LengthBase_t;
-#endif
-
-/*******************************************************************************
  *  Class Length
  ******************************************************************************/
 
@@ -76,10 +49,9 @@ typedef qint64 LengthBase_t;
  * integer or float! It's very important to have a consistent length type over
  * the whole project.
  *
- * All lengths are stored in the integer base type ::librepcb::LengthBase_t. The
+ * All lengths are stored in the integer base type int64_t. The
  * internal unit is always nanometers, but this class provides also some
- * converting methods to other units. Read the documentation of
- * ::librepcb::LengthBase_t for more details.
+ * converting methods to other units.
  */
 class Length {
   Q_DECLARE_TR_FUNCTIONS(Length)
@@ -107,103 +79,12 @@ public:
    *
    * @param nanometers    The length in nanometers
    */
-  constexpr Length(LengthBase_t nanometers) noexcept
-    : mNanometers(nanometers) {}
+  constexpr Length(int64_t nanometers) noexcept : mNanometers(nanometers) {}
 
   /**
    * @brief Destructor
    */
   ~Length() = default;
-
-  // Setters
-
-  /**
-   * @brief Set the length in nanometers
-   *
-   * @param nanometers    The length in nanometers
-   */
-  void setLengthNm(LengthBase_t nanometers) noexcept {
-    mNanometers = nanometers;
-  }
-
-  /**
-   * @brief Set the length in millimeters
-   *
-   * @param millimeters   The length in millimeters
-   *
-   * @warning Please note that this method can decrease the precision of the
-   * length! If you need a length which is located exactly on the grid of a
-   * QGraphicsView (which is often required), you need to call mapToGrid()
-   * afterwards!
-   *
-   * @throws RangeError   If the argument is out of range, a RangeError
-   * exception will be thrown
-   */
-  void setLengthMm(qreal millimeters) { setLengthFromFloat(millimeters * 1e6); }
-
-  /**
-   * @brief Set the length in millimeters, represented in a QString
-   *
-   * @param millimeters   The length in millimeters in a QString with locale "C"
-   *
-   * @note This method is useful to read lengths from files! The problem with
-   * decreased precision does NOT exist by using this method!
-   *
-   * @throw Exception     If the string is not valid or the number is out of
-   * range, an Exception will be thrown
-   *
-   * @see #toMmString(), #fromMm(const QString&, const Length&)
-   */
-  void setLengthMm(const QString& millimeters) {
-    mNanometers = mmStringToNm(millimeters);
-  }
-
-  /**
-   * @brief Set the length in inches
-   *
-   * @param inches        The length in inches
-   *
-   * @warning Please note that this method can decrease the precision of the
-   * length! If you need a length which is located exactly on the grid of a
-   * QGraphicsView (which is often required), you need to call mapToGrid()
-   * afterwards!
-   *
-   * @throws RangeError   If the argument is out of range, a RangeError
-   * exception will be thrown
-   */
-  void setLengthInch(qreal inches) { setLengthFromFloat(inches * sNmPerInch); }
-
-  /**
-   * @brief Set the length in mils (1/1000 inch)
-   *
-   * @param mils          The length in mils
-   *
-   * @warning Please note that this method can decrease the precision of the
-   * length! If you need a length which is located exactly on the grid of a
-   * QGraphicsView (which is often required), you need to call mapToGrid()
-   * afterwards!
-   *
-   * @throws RangeError   If the argument is out of range, a RangeError
-   * exception will be thrown
-   */
-  void setLengthMil(qreal mils) { setLengthFromFloat(mils * sNmPerMil); }
-
-  /**
-   * @brief Set the length in pixels (from QGraphics* objects)
-   *
-   * @param pixels        The length in pixels, from a QGraphics* object
-   *
-   * @note This method is useful to read lengths from QGraphics* objects.
-   *
-   * @warning Please note that this method can decrease the precision of the
-   * length! If you need a length which is located exactly on the grid of a
-   * QGraphicsView (which is often required), you need to call mapToGrid()
-   * afterwards!
-   *
-   * @throws RangeError   If the argument is out of range, a RangeError
-   * exception will be thrown
-   */
-  void setLengthPx(qreal pixels) { setLengthFromFloat(pixels * sNmPerPixel); }
 
   // Conversions
 
@@ -212,7 +93,7 @@ public:
    *
    * @return The length in nanometers
    */
-  LengthBase_t toNm() const noexcept { return mNanometers; }
+  int64_t toNm() const noexcept { return mNanometers; }
 
   /**
    * @brief Get the length in nanometers as a QString
@@ -249,7 +130,7 @@ public:
    * @note This method is useful to store lengths in files. The problem with
    * decreased precision does NOT exist by using this method!
    *
-   * @see #setLengthMm(const QString&), #fromMm(const QString&, const Length&)
+   * @see #fromMm(const QString&)
    */
   QString toMmString() const noexcept;
 
@@ -289,19 +170,8 @@ public:
    * @brief Get a Length object with absolute value (mNanometers >= 0)
    *
    * @return A new Length object with absolute value
-   *
-   * @see ::librepcb::Length::makeAbs()
    */
   Length abs() const noexcept;
-
-  /**
-   * @brief Make the length absolute (mNanometers >= 0)
-   *
-   * @return A reference to the modified object
-   *
-   * @see ::librepcb::Length::abs()
-   */
-  Length& makeAbs() noexcept;
 
   /**
    * @brief Get a Length object which is mapped to a specific grid interval
@@ -341,33 +211,7 @@ public:
    */
   Length scaled(qreal factor) const noexcept;
 
-  /**
-   * @brief Scale this Length object with a specific factor
-   *
-   * @param factor        The scale factor (1.0 does nothing)
-   *
-   * @return A reference to the modified object
-   *
-   * @warning Be careful with this method, as it can decrease the precision!
-   *          To scale with an integer factor, use #operator*=() instead.
-   *
-   * @see scaled()
-   */
-  Length& scale(qreal factor) noexcept;
-
   // Static Functions
-
-  /**
-   * @brief Check if a float value in millimeters is in the allowed range
-   *
-   * @param millimeters   The value to check
-   *
-   * @retval true   Value is valid, can construct a #Length from it.
-   * @retval false  Value is invalid, constructing a #Length would throw.
-   */
-  static bool isValidMm(qreal millimeters) noexcept {
-    return checkRange(millimeters * 1e6);
-  }
 
   /**
    * @brief Try to create a #Length object from nanometers as a float
@@ -392,14 +236,11 @@ public:
   static Length fromNm(qreal nanometers);
 
   /**
-   * @brief Get a Length object with a specific length and map it to a specific
-   * grid
+   * @brief Get a Length object with a specific length
    *
-   * @param millimeters   See setLengthMm(qreal)
-   * @param gridInterval  See mapToGrid()
+   * @param millimeters   Millimeters.
    *
-   * @return A new Length object with a length which is mapped to the specified
-   * grid
+   * @return A new Length object
    *
    * @warning Please note that this method can decrease the precision of the
    * length! If you need a length which is located exactly on the grid of a
@@ -409,12 +250,10 @@ public:
    * @throws RangeError   If the argument is out of range, a RangeError
    * exception will be thrown
    */
-  static Length fromMm(qreal millimeters,
-                       const Length& gridInterval = Length(0));
+  static Length fromMm(qreal millimeters);
 
   /**
-   * @brief Get a Length object with a specific length and map it to a specific
-   * grid
+   * @brief Get a Length object with a specific length
    *
    * This method can be used to create a Length object from a QString which
    * contains a floating point number in millimeters, like QString("123.456")
@@ -423,11 +262,9 @@ public:
    * maximum count of decimals after the decimal point is 6, because the 6th
    * decimal represents one nanometer.
    *
-   * @param millimeters   See setLengthMm(const QString&)
-   * @param gridInterval  See mapToGrid()
+   * @param millimeters   Millimeters.
    *
-   * @return A new Length object with a length which is mapped to the specified
-   * grid
+   * @return A new Length object
    *
    * @note This method is useful to read lengths from files! The problem with
    * decreased precision does NOT exist by using this method!
@@ -435,20 +272,16 @@ public:
    * @throw Exception     If the argument is invalid or out of range, an
    * Exception will be thrown
    *
-   * @see #setLengthMm(const QString&), #toMmString()
+   * @see #toMmString()
    */
-  static Length fromMm(const QString& millimeters,
-                       const Length& gridInterval = Length(0));
+  static Length fromMm(const QString& millimeters);
 
   /**
-   * @brief Get a Length object with a specific length and map it to a specific
-   * grid
+   * @brief Get a Length object with a specific length
    *
-   * @param inches        See setLengthInch()
-   * @param gridInterval  See mapToGrid()
+   * @param inches        Inches.
    *
-   * @return A new Length object with a length which is mapped to the specified
-   * grid
+   * @return A new Length object
    *
    * @warning Please note that this method can decrease the precision of the
    * length! If you need a length which is located exactly on the grid of a
@@ -458,17 +291,14 @@ public:
    * @throws RangeError   If the argument is out of range, a RangeError
    * exception will be thrown
    */
-  static Length fromInch(qreal inches, const Length& gridInterval = Length(0));
+  static Length fromInch(qreal inches);
 
   /**
-   * @brief Get a Length object with a specific length and map it to a specific
-   * grid
+   * @brief Get a Length object with a specific length
    *
-   * @param mils          See setLengthMil()
-   * @param gridInterval  See mapToGrid()
+   * @param mils          Mils.
    *
-   * @return A new Length object with a length which is mapped to the specified
-   * grid
+   * @return A new Length object
    *
    * @warning Please note that this method can decrease the precision of the
    * length! If you need a length which is located exactly on the grid of a
@@ -478,17 +308,14 @@ public:
    * @throws RangeError   If the argument is out of range, a RangeError
    * exception will be thrown
    */
-  static Length fromMil(qreal mils, const Length& gridInterval = Length(0));
+  static Length fromMil(qreal mils);
 
   /**
-   * @brief Get a Length object with a specific length and map it to a specific
-   * grid
+   * @brief Get a Length object with a specific length
    *
-   * @param pixels        See setLengthPx()
-   * @param gridInterval  See mapToGrid()
+   * @param pixels        Pixels.
    *
-   * @return A new Length object with a length which is mapped to the specified
-   * grid
+   * @return A new Length object
    *
    * @note This method is useful to set the length/position of a QGraphics*
    * object.
@@ -501,7 +328,7 @@ public:
    * @throws RangeError   If the argument is out of range, a RangeError
    * exception will be thrown
    */
-  static Length fromPx(qreal pixels, const Length& gridInterval = Length(0));
+  static Length fromPx(qreal pixels);
 
   /**
    * @brief Get the smallest possible length value
@@ -534,7 +361,7 @@ public:
     mNanometers *= rhs.mNanometers;
     return *this;
   }
-  Length& operator*=(LengthBase_t rhs) {
+  Length& operator*=(int64_t rhs) {
     mNanometers *= rhs;
     return *this;
   }
@@ -542,7 +369,7 @@ public:
     mNanometers /= rhs.mNanometers;
     return *this;
   }
-  Length& operator/=(LengthBase_t rhs) {
+  Length& operator/=(int64_t rhs) {
     mNanometers /= rhs;
     return *this;
   }
@@ -556,114 +383,46 @@ public:
   Length operator*(const Length& rhs) const {
     return Length(mNanometers * rhs.mNanometers);
   }
-  Length operator*(LengthBase_t rhs) const { return Length(mNanometers * rhs); }
+  Length operator*(int64_t rhs) const { return Length(mNanometers * rhs); }
   Length operator/(const Length& rhs) const {
     return Length(mNanometers / rhs.mNanometers);
   }
-  Length operator/(LengthBase_t rhs) const { return Length(mNanometers / rhs); }
+  Length operator/(int64_t rhs) const { return Length(mNanometers / rhs); }
   Length operator%(const Length& rhs) const {
     return Length(mNanometers % rhs.mNanometers);
   }
   constexpr bool operator>(const Length& rhs) const {
     return mNanometers > rhs.mNanometers;
   }
-  constexpr bool operator>(LengthBase_t rhs) const { return mNanometers > rhs; }
+  constexpr bool operator>(int64_t rhs) const { return mNanometers > rhs; }
   constexpr bool operator<(const Length& rhs) const {
     return mNanometers < rhs.mNanometers;
   }
-  constexpr bool operator<(LengthBase_t rhs) const { return mNanometers < rhs; }
+  constexpr bool operator<(int64_t rhs) const { return mNanometers < rhs; }
   constexpr bool operator>=(const Length& rhs) const {
     return mNanometers >= rhs.mNanometers;
   }
-  constexpr bool operator>=(LengthBase_t rhs) const {
-    return mNanometers >= rhs;
-  }
+  constexpr bool operator>=(int64_t rhs) const { return mNanometers >= rhs; }
   constexpr bool operator<=(const Length& rhs) const {
     return mNanometers <= rhs.mNanometers;
   }
-  constexpr bool operator<=(LengthBase_t rhs) const {
-    return mNanometers <= rhs;
-  }
+  constexpr bool operator<=(int64_t rhs) const { return mNanometers <= rhs; }
   constexpr bool operator==(const Length& rhs) const {
     return mNanometers == rhs.mNanometers;
   }
-  constexpr bool operator==(LengthBase_t rhs) const {
-    return mNanometers == rhs;
-  }
+  constexpr bool operator==(int64_t rhs) const { return mNanometers == rhs; }
   constexpr bool operator!=(const Length& rhs) const {
     return mNanometers != rhs.mNanometers;
   }
-  constexpr bool operator!=(LengthBase_t rhs) const {
-    return mNanometers != rhs;
-  }
+  constexpr bool operator!=(int64_t rhs) const { return mNanometers != rhs; }
 
 private:
-  // Private Functions
-
-  /**
-   * @brief Set the length from a floating point number in nanometers
-   *
-   * This is a helper method for the setLength*() methods.
-   *
-   * @param nanometers    A floating point number in nanometers.
-   *
-   * @note The parameter is NOT an integer although we don't use numbers smaller
-   * than one nanometer. This way, the range of this parameter is much greater
-   * and we can compare the value with the range of an integer. If the value is
-   * outside the range of an integer, we will throw an exception. If we would
-   * pass the length as an integer, we couldn't detect such under-/overflows!
-   */
-  void setLengthFromFloat(qreal nanometers);
-
-  // Private Static Functions
-
-  /**
-   * @brief Check if a float value in nanometers is in the allowed range
-   *
-   * @param nanometers    The value to check
-   * @param doThrow       If true, throw a ::librepcb::RangeError if out of
-   *                      range instead of returning the result
-   *
-   * @retval true   Value is valid, can construct a #Length from it.
-   * @retval false  Value is invalid, constructing a #Length would throw.
-   */
-  static bool checkRange(qreal nanometers, bool doThrow = false);
-
-  /**
-   * @brief Map a length in nanometers to a grid interval in nanometers
-   *
-   * This is a helper function for mapToGrid().
-   *
-   * @param nanometers    The length we want to map to the grid
-   * @param gridInterval  The grid interval
-   *
-   * @return  The length which is mapped to the grid (always a multiple of
-   * gridInterval)
-   */
-  static LengthBase_t mapNmToGrid(LengthBase_t nanometers,
-                                  const Length& gridInterval) noexcept;
-
-  /**
-   * @brief Convert a length from a QString (in millimeters) to an integer (in
-   * nanometers)
-   *
-   * This is a helper function for Length(const QString&) and setLengthMm().
-   *
-   * @param millimeters   A QString which contains a floating point number with
-   * maximum six decimals after the decimal point. The locale of the string have
-   * to be "C"! Example: QString("-1234.56") for -1234.56mm
-   *
-   * @return The length in nanometers
-   */
-  static LengthBase_t mmStringToNm(const QString& millimeters);
-
-  // Private Member Variables
-  LengthBase_t mNanometers;  ///< the length in nanometers
+  int64_t mNanometers;  ///< the length in nanometers
 
   // Static Length Converting Constants
-  static constexpr LengthBase_t sNmPerInch = 25400000;  ///< 1 inch = 25.4mm
-  static constexpr LengthBase_t sNmPerMil = 25400;  ///< 1 inch = 25.4mm
-  static constexpr LengthBase_t sPixelsPerInch =
+  static constexpr int64_t sNmPerInch = 25400000;  ///< 1 inch = 25.4mm
+  static constexpr int64_t sNmPerMil = 25400;  ///< 1 inch = 25.4mm
+  static constexpr int64_t sPixelsPerInch =
       72;  ///< 72 dpi for the QGraphics* objects
   static constexpr qreal sNmPerPixel = (qreal)sNmPerInch / sPixelsPerInch;
   static constexpr qreal sPixelsPerNm = (qreal)sPixelsPerInch / sNmPerInch;
@@ -729,10 +488,10 @@ inline UnsignedLength& operator+=(UnsignedLength& lhs,
   return lhs;
 }
 
-inline Length operator*(const UnsignedLength& lhs, LengthBase_t rhs) noexcept {
+inline Length operator*(const UnsignedLength& lhs, int64_t rhs) noexcept {
   return (*lhs) * rhs;
 }
-inline Length operator/(const UnsignedLength& lhs, LengthBase_t rhs) noexcept {
+inline Length operator/(const UnsignedLength& lhs, int64_t rhs) noexcept {
   return (*lhs) / rhs;
 }
 inline Length operator+(const Length& lhs, const UnsignedLength& rhs) noexcept {
@@ -753,37 +512,37 @@ inline Length operator-(const UnsignedLength& lhs) noexcept {
 inline bool operator>(const UnsignedLength& lhs, const Length& rhs) noexcept {
   return (*lhs) > rhs;
 }
-inline bool operator>(const UnsignedLength& lhs, LengthBase_t rhs) noexcept {
+inline bool operator>(const UnsignedLength& lhs, int64_t rhs) noexcept {
   return (*lhs) > rhs;
 }
 inline bool operator>=(const UnsignedLength& lhs, const Length& rhs) noexcept {
   return (*lhs) >= rhs;
 }
-inline bool operator>=(const UnsignedLength& lhs, LengthBase_t rhs) noexcept {
+inline bool operator>=(const UnsignedLength& lhs, int64_t rhs) noexcept {
   return (*lhs) >= rhs;
 }
 inline bool operator<(const UnsignedLength& lhs, const Length& rhs) noexcept {
   return (*lhs) < rhs;
 }
-inline bool operator<(const UnsignedLength& lhs, LengthBase_t rhs) noexcept {
+inline bool operator<(const UnsignedLength& lhs, int64_t rhs) noexcept {
   return (*lhs) < rhs;
 }
 inline bool operator<=(const UnsignedLength& lhs, const Length& rhs) noexcept {
   return (*lhs) <= rhs;
 }
-inline bool operator<=(const UnsignedLength& lhs, LengthBase_t rhs) noexcept {
+inline bool operator<=(const UnsignedLength& lhs, int64_t rhs) noexcept {
   return (*lhs) <= rhs;
 }
 inline bool operator==(const UnsignedLength& lhs, const Length& rhs) noexcept {
   return (*lhs) == rhs;
 }
-inline bool operator==(const UnsignedLength& lhs, LengthBase_t rhs) noexcept {
+inline bool operator==(const UnsignedLength& lhs, int64_t rhs) noexcept {
   return (*lhs) == rhs;
 }
 inline bool operator!=(const UnsignedLength& lhs, const Length& rhs) noexcept {
   return (*lhs) != rhs;
 }
-inline bool operator!=(const UnsignedLength& lhs, LengthBase_t rhs) noexcept {
+inline bool operator!=(const UnsignedLength& lhs, int64_t rhs) noexcept {
   return (*lhs) != rhs;
 }
 
@@ -874,10 +633,10 @@ inline UnsignedLength& operator+=(UnsignedLength& lhs,
   return lhs;
 }
 
-inline Length operator*(const PositiveLength& lhs, LengthBase_t rhs) noexcept {
+inline Length operator*(const PositiveLength& lhs, int64_t rhs) noexcept {
   return (*lhs) * rhs;
 }
-inline Length operator/(const PositiveLength& lhs, LengthBase_t rhs) noexcept {
+inline Length operator/(const PositiveLength& lhs, int64_t rhs) noexcept {
   return (*lhs) / rhs;
 }
 inline Length operator+(const Length& lhs, const PositiveLength& rhs) noexcept {
@@ -914,7 +673,7 @@ inline bool operator>(const PositiveLength& lhs,
 inline bool operator>(const PositiveLength& lhs, const Length& rhs) noexcept {
   return (*lhs) > rhs;
 }
-inline bool operator>(const PositiveLength& lhs, LengthBase_t rhs) noexcept {
+inline bool operator>(const PositiveLength& lhs, int64_t rhs) noexcept {
   return (*lhs) > rhs;
 }
 inline bool operator>=(const UnsignedLength& lhs,
@@ -928,7 +687,7 @@ inline bool operator>=(const PositiveLength& lhs,
 inline bool operator>=(const PositiveLength& lhs, const Length& rhs) noexcept {
   return (*lhs) >= rhs;
 }
-inline bool operator>=(const PositiveLength& lhs, LengthBase_t rhs) noexcept {
+inline bool operator>=(const PositiveLength& lhs, int64_t rhs) noexcept {
   return (*lhs) >= rhs;
 }
 inline bool operator<(const UnsignedLength& lhs,
@@ -942,7 +701,7 @@ inline bool operator<(const PositiveLength& lhs,
 inline bool operator<(const PositiveLength& lhs, const Length& rhs) noexcept {
   return (*lhs) < rhs;
 }
-inline bool operator<(const PositiveLength& lhs, LengthBase_t rhs) noexcept {
+inline bool operator<(const PositiveLength& lhs, int64_t rhs) noexcept {
   return (*lhs) < rhs;
 }
 inline bool operator<=(const UnsignedLength& lhs,
@@ -956,7 +715,7 @@ inline bool operator<=(const PositiveLength& lhs,
 inline bool operator<=(const PositiveLength& lhs, const Length& rhs) noexcept {
   return (*lhs) <= rhs;
 }
-inline bool operator<=(const PositiveLength& lhs, LengthBase_t rhs) noexcept {
+inline bool operator<=(const PositiveLength& lhs, int64_t rhs) noexcept {
   return (*lhs) <= rhs;
 }
 inline bool operator==(const UnsignedLength& lhs,
@@ -970,7 +729,7 @@ inline bool operator==(const PositiveLength& lhs,
 inline bool operator==(const PositiveLength& lhs, const Length& rhs) noexcept {
   return (*lhs) == rhs;
 }
-inline bool operator==(const PositiveLength& lhs, LengthBase_t rhs) noexcept {
+inline bool operator==(const PositiveLength& lhs, int64_t rhs) noexcept {
   return (*lhs) == rhs;
 }
 inline bool operator!=(const UnsignedLength& lhs,
@@ -984,7 +743,7 @@ inline bool operator!=(const PositiveLength& lhs,
 inline bool operator!=(const PositiveLength& lhs, const Length& rhs) noexcept {
   return (*lhs) != rhs;
 }
-inline bool operator!=(const PositiveLength& lhs, LengthBase_t rhs) noexcept {
+inline bool operator!=(const PositiveLength& lhs, int64_t rhs) noexcept {
   return (*lhs) != rhs;
 }
 

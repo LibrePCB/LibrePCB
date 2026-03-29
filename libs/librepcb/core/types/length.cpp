@@ -26,6 +26,7 @@
 #include "../utils/qtmetatyperegistration.h"
 #include "../utils/toolbox.h"
 
+#include <librepcb/rust-core/ffi.h>
 #include <type_traits>
 
 #include <QtCore>
@@ -45,7 +46,7 @@ static QtMetaTypeRegistration<Length> sMetaType;
  ******************************************************************************/
 
 QString Length::toMmString() const noexcept {
-  return Toolbox::decimalFixedPointToString<LengthBase_t>(toNm(), 6);
+  return Toolbox::decimalFixedPointToString<int64_t>(toNm(), 6);
 }
 
 /*******************************************************************************
@@ -53,18 +54,7 @@ QString Length::toMmString() const noexcept {
  ******************************************************************************/
 
 Length Length::abs() const noexcept {
-  Length l(*this);
-  l.makeAbs();
-  return l;
-}
-
-Length& Length::makeAbs() noexcept {
-  if (mNanometers == std::numeric_limits<LengthBase_t>::min()) {
-    mNanometers = std::numeric_limits<LengthBase_t>::max();
-  } else {
-    mNanometers = qAbs(mNanometers);
-  }
-  return *this;
+  return Length(rs::ffi_length_abs(mNanometers));
 }
 
 Length Length::mappedToGrid(const Length& gridInterval) const noexcept {
@@ -73,18 +63,18 @@ Length Length::mappedToGrid(const Length& gridInterval) const noexcept {
 }
 
 Length& Length::mapToGrid(const Length& gridInterval) noexcept {
-  mNanometers = mapNmToGrid(mNanometers, gridInterval);
+  if (gridInterval != 0) {
+    mNanometers =
+        rs::ffi_length_rounded_to(mNanometers, gridInterval.abs().toNm());
+  }
   return *this;
 }
 
 Length Length::scaled(qreal factor) const noexcept {
-  Length length(*this);
-  return length.scale(factor);
-}
-
-Length& Length::scale(qreal factor) noexcept {
-  mNanometers *= factor;
-  return *this;
+  int64_t nm = 0;
+  const bool ok = rs::ffi_length_from_nm_f(mNanometers * factor, &nm);
+  Q_ASSERT(ok);
+  return Length(nm);
 }
 
 /*******************************************************************************
@@ -92,128 +82,49 @@ Length& Length::scale(qreal factor) noexcept {
  ******************************************************************************/
 
 std::optional<Length> Length::tryFromNm(qreal nanometers) noexcept {
-  if (checkRange(nanometers)) {
-    Length l;
-    l.setLengthFromFloat(nanometers);
-    return l;
+  int64_t nm;
+  if (rs::ffi_length_from_nm_f(nanometers, &nm)) {
+    return Length(nm);
   }
   return std::nullopt;
 }
 
 Length Length::fromNm(qreal nanometers) {
-  Length l;
-  l.setLengthFromFloat(nanometers);
-  return l;
+  int64_t nm;
+  if (rs::ffi_length_from_nm_f(nanometers, &nm)) {
+    return Length(nm);
+  }
+  throw RangeError(__FILE__, __LINE__, nanometers,
+                   std::numeric_limits<int64_t>::min(),
+                   std::numeric_limits<int64_t>::max());
 }
 
-Length Length::fromMm(qreal millimeters, const Length& gridInterval) {
-  Length l;
-  l.setLengthMm(millimeters);
-  return l.mapToGrid(gridInterval);
+Length Length::fromMm(qreal millimeters) {
+  return fromNm(millimeters * 1e6);
 }
 
-Length Length::fromMm(const QString& millimeters, const Length& gridInterval) {
-  Length l;
-  l.setLengthMm(millimeters);
-  return l.mapToGrid(gridInterval);
+Length Length::fromMm(const QString& millimeters) {
+  return Length(Toolbox::decimalFixedPointFromString<int64_t>(millimeters, 6));
 }
 
-Length Length::fromInch(qreal inches, const Length& gridInterval) {
-  Length l;
-  l.setLengthInch(inches);
-  return l.mapToGrid(gridInterval);
+Length Length::fromInch(qreal inches) {
+  return fromNm(inches * sNmPerInch);
 }
 
-Length Length::fromMil(qreal mils, const Length& gridInterval) {
-  Length l;
-  l.setLengthMil(mils);
-  return l.mapToGrid(gridInterval);
+Length Length::fromMil(qreal mils) {
+  return fromNm(mils * sNmPerMil);
 }
 
-Length Length::fromPx(qreal pixels, const Length& gridInterval) {
-  Length l;
-  l.setLengthPx(pixels);
-  return l.mapToGrid(gridInterval);
+Length Length::fromPx(qreal pixels) {
+  return fromNm(pixels * sNmPerPixel);
 }
 
 Length Length::min() noexcept {
-  return Length(std::numeric_limits<LengthBase_t>::min());
+  return Length(std::numeric_limits<int64_t>::min());
 }
 
 Length Length::max() noexcept {
-  return Length(std::numeric_limits<LengthBase_t>::max());
-}
-
-/*******************************************************************************
- *  Private Methods
- ******************************************************************************/
-
-void Length::setLengthFromFloat(qreal nanometers) {
-  checkRange(nanometers, true);  // Throws on range error.
-  // Note: Don't use qRound() because in Qt5 it is implemented strange.
-  mNanometers = (nanometers >= 0.0) ? qint64(nanometers + qreal(0.5))
-                                    : qint64(nanometers - qreal(0.5));
-}
-
-/*******************************************************************************
- *  Private Static Methods
- ******************************************************************************/
-
-bool Length::checkRange(qreal nanometers, bool doThrow) {
-  const LengthBase_t min = std::numeric_limits<LengthBase_t>::min();
-  const LengthBase_t max = std::numeric_limits<LengthBase_t>::max();
-  if ((nanometers >= static_cast<qreal>(min)) &&
-      (nanometers <= static_cast<qreal>(max))) {
-    return true;
-  } else if (!doThrow) {
-    return false;
-  } else {
-    throw RangeError(__FILE__, __LINE__, nanometers, min, max);
-  }
-}
-
-LengthBase_t Length::mapNmToGrid(LengthBase_t nanometers,
-                                 const Length& gridInterval) noexcept {
-  using LengthBaseU_t = std::make_unsigned<LengthBase_t>::type;
-
-  LengthBaseU_t grid_interval =
-      static_cast<LengthBaseU_t>(gridInterval.abs().mNanometers);
-  if (grid_interval == 0) return nanometers;
-
-  LengthBaseU_t nm_abs;
-  LengthBaseU_t max;
-
-  if (nanometers >= 0) {
-    nm_abs = static_cast<LengthBaseU_t>(nanometers);
-    max = static_cast<LengthBaseU_t>(std::numeric_limits<LengthBase_t>::max());
-  } else {
-    nm_abs = -static_cast<LengthBaseU_t>(nanometers);
-    max = static_cast<LengthBaseU_t>(std::numeric_limits<LengthBase_t>::min());
-  }
-
-  LengthBaseU_t remainder = nm_abs % grid_interval;
-  if (remainder > (grid_interval / 2)) {
-    // snap away from zero, but it might overflow
-    LengthBaseU_t tmp_snapped = nm_abs + (grid_interval - remainder);
-    if ((tmp_snapped < nm_abs) || (tmp_snapped > max)) {
-      // overflow, snap towards zero
-      nm_abs -= remainder;
-    } else {
-      nm_abs = tmp_snapped;
-    }
-  } else {
-    // snap towards zero
-    nm_abs -= remainder;
-  }
-
-  if (nanometers >= 0)
-    return static_cast<LengthBase_t>(nm_abs);
-  else
-    return static_cast<LengthBase_t>(-nm_abs);
-}
-
-LengthBase_t Length::mmStringToNm(const QString& millimeters) {
-  return Toolbox::decimalFixedPointFromString<LengthBase_t>(millimeters, 6);
+  return Length(std::numeric_limits<int64_t>::max());
 }
 
 /*******************************************************************************

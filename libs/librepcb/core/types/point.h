@@ -124,68 +124,6 @@ public:
    */
   void setY(const Length& y) noexcept { mY = y; }
 
-  /**
-   * @brief Set the X coordinate from a string in millimeters
-   *
-   * @param mm    A string with the new X coordinate in millimeters
-   *
-   * @throws Exception    If the string is not valid, an exception will be
-   * thrown.
-   */
-  void setXmm(const QString& mm) { mX.setLengthMm(mm); }
-
-  /**
-   * @brief Set the Y coordinate from a string in millimeters
-   *
-   * @param mm    A string with the new Y coordinate in millimeters
-   *
-   * @throws Exception    If the string is not valid, an exception will be
-   * thrown.
-   */
-  void setYmm(const QString& mm) { mY.setLengthMm(mm); }
-
-  /// @see Length::setLengthNm()
-  /// @warning Be careful with this method! Maybe you should call mapToGrid()
-  /// afterwards!
-  void setPointNm(LengthBase_t nmX, LengthBase_t nmY) noexcept {
-    mX.setLengthNm(nmX);
-    mY.setLengthNm(nmY);
-  }
-
-  /// @see Length::setLengthMm()
-  /// @warning Be careful with this method! Maybe you should call mapToGrid()
-  /// afterwards!
-  void setPointMm(const QPointF& millimeters) {
-    mX.setLengthMm(millimeters.x());
-    mY.setLengthMm(millimeters.y());
-  }
-
-  /// @see Length::setLengthInch()
-  /// @warning Be careful with this method! Maybe you should call mapToGrid()
-  /// afterwards!
-  void setPointInch(const QPointF& inches) {
-    mX.setLengthInch(inches.x());
-    mY.setLengthInch(inches.y());
-  }
-
-  /// @see Length::setLengthMil()
-  /// @warning Be careful with this method! Maybe you should call mapToGrid()
-  /// afterwards!
-  void setPointMil(const QPointF& mils) {
-    mX.setLengthMil(mils.x());
-    mX.setLengthMil(mils.y());
-  }
-
-  /// @see Length::setLengthPx()
-  /// @warning Be careful with this method! Maybe you should call mapToGrid()
-  /// afterwards!
-  /// @note This method is useful to read the position of a QGraphics* object.
-  ///       For this purpose, this method will invert the Y-coordinate.
-  void setPointPx(const QPointF& pixels) {
-    mX.setLengthPx(pixels.x());
-    mY.setLengthPx(-pixels.y());
-  }  // invert Y!
-
   // Getters
 
   /**
@@ -209,8 +147,7 @@ public:
    * @return The length of this vector (as a Length object)
    */
   UnsignedLength getLength() const noexcept {
-    LengthBase_t length =
-        static_cast<LengthBase_t>(std::hypot(mX.toNm(), mY.toNm()));
+    int64_t length = static_cast<int64_t>(std::hypot(mX.toNm(), mY.toNm()));
     Q_ASSERT(length >= 0);
     return UnsignedLength(length);
   }
@@ -278,25 +215,6 @@ public:
   }  // invert Y!
 
   // General Methods
-
-  /**
-   * @brief Get a Point object with both coordinates in absolute values (X,Y >=
-   * 0)
-   *
-   * @return A new Point object with absolute coordinates
-   *
-   * @see ::librepcb::Length::abs(), ::librepcb::Point::makeAbs()
-   */
-  Point abs() const noexcept;
-
-  /**
-   * @brief Make both coordinates absolute (X,Y >= 0)
-   *
-   * @return A reference to the modified object
-   *
-   * @see ::librepcb::Length::makeAbs(), ::librepcb::Point::abs()
-   */
-  Point& makeAbs() noexcept;
 
   /**
    * @brief Get a Point object which is mapped to a specific grid interval
@@ -444,7 +362,7 @@ public:
     mY *= rhs.mY;
     return *this;
   }
-  Point& operator*=(LengthBase_t rhs) {
+  Point& operator*=(int64_t rhs) {
     mX *= rhs;
     mY *= rhs;
     return *this;
@@ -454,7 +372,7 @@ public:
     mY /= rhs.mY;
     return *this;
   }
-  Point& operator/=(LengthBase_t rhs) {
+  Point& operator/=(int64_t rhs) {
     mX /= rhs;
     mY /= rhs;
     return *this;
@@ -467,9 +385,9 @@ public:
     return Point(mX - rhs.mX, mY - rhs.mY);
   }
   Point operator*(const Length& rhs) const { return Point(mX * rhs, mY * rhs); }
-  Point operator*(LengthBase_t rhs) const { return Point(mX * rhs, mY * rhs); }
+  Point operator*(int64_t rhs) const { return Point(mX * rhs, mY * rhs); }
   Point operator/(const Length& rhs) const { return Point(mX / rhs, mY / rhs); }
-  Point operator/(LengthBase_t rhs) const { return Point(mX / rhs, mY / rhs); }
+  Point operator/(int64_t rhs) const { return Point(mX / rhs, mY / rhs); }
   Point operator%(const Length& rhs) const { return Point(mX % rhs, mY % rhs); }
   bool operator==(const Point& rhs) const {
     return (mX == rhs.mX) && (mY == rhs.mY);

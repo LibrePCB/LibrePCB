@@ -437,6 +437,21 @@ bool ffi_ibom_generate_html(const InteractiveHtmlBom * NONNULL obj,
                             QString * NONNULL err);
 
 /**
+ * Wrapper for [Length::from_nm_f]
+ */
+bool ffi_length_from_nm_f(double val, int64_t * NONNULL out);
+
+/**
+ * Wrapper for [Length::abs]
+ */
+int64_t ffi_length_abs(int64_t val);
+
+/**
+ * Wrapper for [Length::rounded_to]
+ */
+int64_t ffi_length_rounded_to(int64_t val, int64_t multiple);
+
+/**
  * Wrapper for [rotate_point]
  */
 void ffi_math_rotate_point(double * NONNULL x,

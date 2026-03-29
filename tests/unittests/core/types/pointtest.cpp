@@ -194,9 +194,9 @@ TEST_P(PointLengthPrecisionTest, testPrecision) {
 // sqrt2 according wikipedia
 // 1.41421356237309504880168872420969807856967187537694807317667973799
 
-static const LengthBase_t MM = 1000000LL;
-static const LengthBase_t M = 1000000000LL;
-static const LengthBase_t KM = 1000000000000LL;
+static const int64_t MM = 1000000LL;
+static const int64_t M = 1000000000LL;
+static const int64_t KM = 1000000000000LL;
 
 // clang-format off
 INSTANTIATE_TEST_SUITE_P(PointLengthPrecisionTest, PointLengthPrecisionTest, ::testing::Values(

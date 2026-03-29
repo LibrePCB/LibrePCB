@@ -49,18 +49,6 @@ Point::Point(const SExpression& node)
 
 // General Methods
 
-Point Point::abs() const noexcept {
-  Point p(*this);
-  p.makeAbs();
-  return p;
-}
-
-Point& Point::makeAbs() noexcept {
-  mX.makeAbs();
-  mY.makeAbs();
-  return *this;
-}
-
 Point Point::mappedToGrid(const PositiveLength& gridInterval) const noexcept {
   Point p(*this);
   p.mapToGrid(gridInterval);
@@ -142,10 +130,7 @@ void Point::serialize(SExpression& root) const {
 // Static Methods
 
 Point Point::fromMm(qreal millimetersX, qreal millimetersY) {
-  Point p;
-  p.mX.setLengthMm(millimetersX);
-  p.mY.setLengthMm(millimetersY);
-  return p;
+  return Point(Length::fromMm(millimetersX), Length::fromMm(millimetersY));
 }
 
 Point Point::fromMm(const QPointF& millimeters) {
@@ -153,10 +138,7 @@ Point Point::fromMm(const QPointF& millimeters) {
 }
 
 Point Point::fromInch(qreal inchesX, qreal inchesY) {
-  Point p;
-  p.mX.setLengthInch(inchesX);
-  p.mY.setLengthInch(inchesY);
-  return p;
+  return Point(Length::fromInch(inchesX), Length::fromInch(inchesY));
 }
 
 Point Point::fromInch(const QPointF& inches) {
@@ -164,10 +146,7 @@ Point Point::fromInch(const QPointF& inches) {
 }
 
 Point Point::fromMil(qreal milsX, qreal milsY) {
-  Point p;
-  p.mX.setLengthMil(milsX);
-  p.mY.setLengthMil(milsY);
-  return p;
+  return Point(Length::fromMil(milsX), Length::fromMil(milsY));
 }
 
 Point Point::fromMil(const QPointF& mils) {
@@ -175,10 +154,7 @@ Point Point::fromMil(const QPointF& mils) {
 }
 
 Point Point::fromPx(qreal pixelsX, qreal pixelsY) {
-  Point p;
-  p.mX.setLengthPx(pixelsX);
-  p.mY.setLengthPx(-pixelsY);  // invert Y!
-  return p;
+  return Point(Length::fromPx(pixelsX), Length::fromPx(-pixelsY));  // invert Y!
 }
 
 Point Point::fromPx(const QPointF& pixels) {
