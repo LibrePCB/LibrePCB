@@ -117,14 +117,6 @@ TEST(BoardGerberExportTest, test) {
     FileUtils::writeFile(fp, content.toUtf8());
   }
 
-  // On Windows, abort here and skip this test because on AppVeyor the generated
-  // Gerber files are slightly different. The same happens on Apple Silicon.
-  // (https://github.com/LibrePCB/LibrePCB/issues/516).
-#if defined(Q_OS_WIN32) || defined(Q_OS_WIN64) || \
-    (defined(__APPLE__) && defined(__arm64__))
-  GTEST_SKIP();
-#endif
-
   // compare generated files with expected content
   foreach (const FilePath& fp, grbExport.getWrittenFiles()) {
     QString actual = FileUtils::readFile(fp);

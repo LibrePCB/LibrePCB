@@ -91,6 +91,21 @@ Length& Length::scale(qreal factor) noexcept {
  *  Static Methods
  ******************************************************************************/
 
+std::optional<Length> Length::tryFromNm(qreal nanometers) noexcept {
+  if (checkRange(nanometers)) {
+    Length l;
+    l.setLengthFromFloat(nanometers);
+    return l;
+  }
+  return std::nullopt;
+}
+
+Length Length::fromNm(qreal nanometers) {
+  Length l;
+  l.setLengthFromFloat(nanometers);
+  return l;
+}
+
 Length Length::fromMm(qreal millimeters, const Length& gridInterval) {
   Length l;
   l.setLengthMm(millimeters);

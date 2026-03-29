@@ -12,6 +12,7 @@
 mod ffi;
 
 // Modules
+pub mod math;
 pub mod toolbox;
 
 // Allow using the create! macro to create parametrized tests in test modules

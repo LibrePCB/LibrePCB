@@ -26,6 +26,8 @@
 #include "../utils/qtmetatyperegistration.h"
 #include "angle.h"
 
+#include <librepcb/rust-core/ffi.h>
+
 #include <QtCore>
 
 /*******************************************************************************
@@ -100,12 +102,11 @@ Point& Point::rotate(const Angle& angle, const Point& center) noexcept {
   } else if (angle != Angle::deg0()) {
     // angle is not a multiple of 90 degrees --> we must use floating point
     // arithmetic
-    qreal sin = std::sin(angle.toRad());
-    qreal cos = std::cos(angle.toRad());
-    setX(Length::fromMm(center.getX().toMm() + cos * dx.toMm() -
-                        sin * dy.toMm()));
-    setY(Length::fromMm(center.getY().toMm() + sin * dx.toMm() +
-                        cos * dy.toMm()));
+    double x = dx.toNm();
+    double y = dy.toNm();
+    rs::ffi_math_rotate_point(&x, &y, angle0_360.toDeg());
+    setX(center.getX() + Length::fromNm(x));
+    setY(center.getY() + Length::fromNm(y));
   }  // else: angle == 0°, nothing to do...
 
   return *this;

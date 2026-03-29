@@ -70,14 +70,11 @@ std::optional<Length> Toolbox::arcRadius(const Point& p1, const Point& p2,
     return std::nullopt;  // Given input is a straight line.
   }
 
-  const qreal x1 = p1.getX().toMm();
-  const qreal y1 = p1.getY().toMm();
-  const qreal x2 = p2.getX().toMm();
-  const qreal y2 = p2.getY().toMm();
-  const qreal d = std::sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
-  const qreal r = d / (2 * std::sin(angleMapped.toRad() / 2));
-  if (Length::isValidMm(r)) {
-    return Length::fromMm(r);
+  const Point delta = p2 - p1;
+  const double r = rs::ffi_math_arc_radius(
+      delta.getX().toNm(), delta.getY().toNm(), angleMapped.toDeg());
+  if (auto lr = Length::tryFromNm(r)) {
+    return *lr;
   } else {
     return std::nullopt;  // Too large radius.
   }
@@ -90,25 +87,16 @@ std::optional<Point> Toolbox::arcCenter(const Point& p1, const Point& p2,
     return std::nullopt;  // Given input is a straight line.
   }
 
-  // http://math.stackexchange.com/questions/27535/how-to-find-center-of-an-arc-given-start-point-end-point-radius-and-arc-direc
-  const qreal x0 = p1.getX().toMm();
-  const qreal y0 = p1.getY().toMm();
-  const qreal x1 = p2.getX().toMm();
-  const qreal y1 = p2.getY().toMm();
-  const qreal angleSgn = (angleMapped >= 0) ? 1 : -1;
-  const qreal d = std::sqrt((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0));
-  const qreal r = d / (2 * std::sin(angleMapped.toRad() / 2));
-  // Note: std::max() fixes https://github.com/LibrePCB/LibrePCB/issues/974
-  const qreal h = std::sqrt(std::max(r * r - d * d / 4.0, qreal(0)));
-  const qreal u = (x1 - x0) / d;
-  const qreal v = (y1 - y0) / d;
-  const qreal a = ((x0 + x1) / 2) - h * v * angleSgn;
-  const qreal b = ((y0 + y1) / 2) + h * u * angleSgn;
-  if (Length::isValidMm(a) && Length::isValidMm(b)) {
-    return Point::fromMm(a, b);
+  const Point delta = p2 - p1;
+  double x, y;
+  rs::ffi_math_arc_radius_and_center(delta.getX().toNm(), delta.getY().toNm(),
+                                     angleMapped.toDeg(), &x, &y);
+  const auto lx = Length::tryFromNm(x + p1.getX().toNm());
+  const auto ly = Length::tryFromNm(y + p1.getY().toNm());
+  if (lx && ly) {
+    return Point(*lx, *ly);
   } else {
-    return std::nullopt;  // Center too far away, consider it as a straight
-                          // line.
+    return std::nullopt;  // Center too far away, consider it as a straight line
   }
 }
 
@@ -144,7 +132,8 @@ Angle Toolbox::angleBetweenPoints(const Point& p1, const Point& p2) noexcept {
   if (delta.isOrigin()) {
     return Angle::deg0();
   }
-  return Angle::fromRad(std::atan2(delta.getY().toMm(), delta.getX().toMm()))
+  return Angle::fromDeg(rs::ffi_math_angle_to_point(delta.getX().toNm(),
+                                                    delta.getY().toNm()))
       .mapTo0_360deg();
 }
 
