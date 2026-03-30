@@ -1,4 +1,4 @@
-import { ListView } from "../widgets.slint";
+import { ListScrollView } from "../widgets.slint";
 import {
     Data,
     LibraryTreeViewItemData,
@@ -9,7 +9,7 @@ import {
 // library tree views
 export component LibraryTreeView inherits FocusScope {
     in-out property <[LibraryTreeViewItemData]> model;
-    in property <length> initial-scroll-position;
+    in-out property <length> viewport-y <=> view.viewport-y;
     in-out property <int> current-index: -1;
     in property <length> item-height: 20px;
     in property <length> font-size: 12px;
@@ -41,7 +41,14 @@ export component LibraryTreeView inherits FocusScope {
         item-selected(index, model[index]);
     }
 
-    view := ListView {
+    view := ListScrollView {
+        x: 0;
+        y: 0;
+        width: 100%;
+        height: 100%;
+        preferred-height: model.length * item-height;
+        viewport-height: model.length * item-height;
+        viewport-width: root.width;
         force-show-scrollbars: root.has-focus;
 
         scrolled => {
@@ -51,6 +58,9 @@ export component LibraryTreeView inherits FocusScope {
         for item[index] in model: item-ta := TouchArea {
             width: parent.width;
             height: item-height;
+
+            // Workaround for slow performance: Render only items in view.
+            visible: (self.y + view.viewport-y >= -item-height) && (self.y + item-height + view.viewport-y <= view.height);
 
             // Accessibility
             accessible-role: list-item;
@@ -249,23 +259,5 @@ export component LibraryTreeView inherits FocusScope {
             }
         }
         item-key-pressed(current-index, model[current-index], event)
-    }
-
-    // Ugly workaround to restore a previous scroll position. There seem to be
-    // no nice way that works, and even a fixed, short delay doesn't work in
-    // every case so we try several times.
-    property <int> restore-counter: 10;
-    Timer {
-        running: restore-counter > 0;
-        interval: 10ms;
-
-        triggered => {
-            if (view.height - view.viewport-height) <= initial-scroll-position {
-                view.viewport-y = initial-scroll-position;
-                restore-counter = 0;
-            } else {
-                restore-counter -= 1;
-            }
-        }
     }
 }

@@ -63,8 +63,9 @@ LibraryTab::LibraryTab(LibraryEditor& editor, bool wizardMode,
     mWizardMode(wizardMode),
     mCurrentPageIndex(mWizardMode ? 0 : 2),
     mCurrentCategoryIndex(0),
+    mCategoriesViewportY(0),
     mCurrentElementIndex(-1),
-    mViewsScrollPositions(new slint::VectorModel<float>({0, 0})),
+    mElementsViewportY(0),
     mNameParsed(mLibrary.getNames().getDefaultValue()),
     mVersionParsed(mLibrary.getVersion()),
     mDeprecated(false),
@@ -166,7 +167,6 @@ ui::LibraryTabData LibraryTab::getDerivedUiData() const noexcept {
       mEditor.getUiIndex(),  // Library index
       mWizardMode,  // Wizard mode
       mCurrentPageIndex,  // Page index
-      mViewsScrollPositions,  // View scroll positions
       q2s(mLibrary.getIconAsPixmap()),  // Icon
       mName,  // Name
       mNameError,  // Name error
@@ -182,8 +182,10 @@ ui::LibraryTabData LibraryTab::getDerivedUiData() const noexcept {
       mManufacturer,  // Manufacturer
       mCategories,  // Component categories
       mCurrentCategoryIndex,  // Current category index
+      mCategoriesViewportY,  // Categories view scroll position
       mFilteredElements,  // Filtered elements
       mCurrentElementIndex,  // Current element index
+      mElementsViewportY,  // Elements view scroll position
       ui::RuleCheckData{
           ui::RuleCheckType::LibraryCheck,  // Check type
           ui::RuleCheckState::UpToDate,  // Check state
@@ -199,6 +201,11 @@ ui::LibraryTabData LibraryTab::getDerivedUiData() const noexcept {
 }
 
 void LibraryTab::setDerivedUiData(const ui::LibraryTabData& data) noexcept {
+  // State
+  mCategoriesViewportY = data.categories_viewport_y;
+  mElementsViewportY = data.filtered_elements_viewport_y;
+
+  // Metadata
   mName = data.name;
   if (auto value = validateElementName(s2q(mName), mNameError)) {
     mNameParsed = *value;

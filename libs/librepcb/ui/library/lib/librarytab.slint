@@ -572,7 +572,7 @@ component LibraryContentTab inherits HorizontalLayout {
         categories-view := LibraryTreeView {
             model: tabs[index].categories;
             current-index: tabs[index].categories-index;
-            initial-scroll-position: tabs[index].views-scroll-positions[0];
+            viewport-y: tabs[index].categories-viewport-y;
 
             if Data.libraries-rescan-in-progress: Spinner {
                 x: parent.width - self.width - self.y;
@@ -638,7 +638,7 @@ component LibraryContentTab inherits HorizontalLayout {
             }
 
             scrolled(pos) => {
-                tabs[index].views-scroll-positions[0] = pos;
+                tabs[index].categories-viewport-y = pos;
             }
         }
 
@@ -676,7 +676,7 @@ component LibraryContentTab inherits HorizontalLayout {
         elements-view := LibraryTreeView {
             model: tabs[index].filtered-elements;
             current-index: tabs[index].filtered-elements-index;
-            initial-scroll-position: tabs[index].views-scroll-positions[1];
+            viewport-y: tabs[index].filtered-elements-viewport-y;
 
             if self.model.length == 0: Text {
                 width: 0.8 * parent.width;
@@ -767,7 +767,7 @@ component LibraryContentTab inherits HorizontalLayout {
             }
 
             scrolled(pos) => {
-                tabs[index].views-scroll-positions[1] = pos;
+                tabs[index].filtered-elements-viewport-y = pos;
             }
         }
 

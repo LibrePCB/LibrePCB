@@ -4,7 +4,7 @@ import {
     FilterTermEdit,
     IconButton,
     LinkText,
-    ListView,
+    ListScrollView,
     MessagePopup,
     PanelHeader,
     ProgressBar,
@@ -440,12 +440,13 @@ component LibrariesPanelSection inherits FocusScope {
             }
         }
 
-        view := ListView {
+        view := ListScrollView {
             property <int> item-count: libraries.length;
 
             vertical-stretch: 0;
             min-height: item-height;
             preferred-height: libraries.length * item-height;
+            viewport-height: libraries.length * item-height;
             force-show-scrollbars: root.has-focus;
 
             // Accessibility
