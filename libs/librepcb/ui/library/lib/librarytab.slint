@@ -583,27 +583,33 @@ component LibraryContentTab inherits HorizontalLayout {
                 foreground-color: Data.theme.control-text;
             }
 
-            if !read-only: new-cmpcat-btn := NewLibraryElementButton {
-                x: parent.width - self.width - 20px;
-                y: parent.height - 2 * self.height - 26px;
-                icon: @image-url("../../../../../img/places/folder.png");
-                tooltip: @tr("New Component Category");
-                show-plus: true;
+            if !read-only: VerticalLayout {
+                x: parent.width - self.width;
+                y: parent.height - self.height;
+                width: self.preferred-width;
+                height: self.preferred-height;
+                padding-right: 20px;
+                padding-bottom: 16px;
+                spacing: 10px;
 
-                clicked => {
-                    Backend.trigger-library(Data.libraries[tabs[index].library-index].path, LibraryAction.new-component-category);
+                new-cmpcat-btn := NewLibraryElementButton {
+                    icon: @image-url("../../../../../img/places/folder.png");
+                    tooltip: @tr("New Component Category");
+                    show-plus: true;
+
+                    clicked => {
+                        Backend.trigger-library(Data.libraries[tabs[index].library-index].path, LibraryAction.new-component-category);
+                    }
                 }
-            }
 
-            if !read-only: new-pkgcat-btn := NewLibraryElementButton {
-                x: parent.width - self.width - 20px;
-                y: parent.height - self.height - 16px;
-                icon: @image-url("../../../../../img/places/folder_green.png");
-                tooltip: @tr("New Package Category");
-                show-plus: true;
+                new-pkgcat-btn := NewLibraryElementButton {
+                    icon: @image-url("../../../../../img/places/folder_green.png");
+                    tooltip: @tr("New Package Category");
+                    show-plus: true;
 
-                clicked => {
-                    Backend.trigger-library(Data.libraries[tabs[index].library-index].path, LibraryAction.new-package-category);
+                    clicked => {
+                        Backend.trigger-library(Data.libraries[tabs[index].library-index].path, LibraryAction.new-package-category);
+                    }
                 }
             }
 
@@ -691,48 +697,51 @@ component LibraryContentTab inherits HorizontalLayout {
                 foreground-color: Data.theme.control-text;
             }
 
-            if !read-only: new-dev-btn := NewLibraryElementButton {
-                x: parent.width - self.width - 20px;
-                y: parent.height - 4 * self.height - 46px;
-                icon: @image-url("../../../../../img/device.png");
-                tooltip: @tr("New Device");
+            // Note: Buttons are in the same order as the items in the tree view.
+            if !read-only: VerticalLayout {
+                x: parent.width - self.width;
+                y: parent.height - self.height;
+                width: self.preferred-width;
+                height: self.preferred-height;
+                padding-right: 20px;
+                padding-bottom: 16px;
+                spacing: 10px;
 
-                clicked => {
-                    Backend.trigger-library(Data.libraries[tabs[index].library-index].path, LibraryAction.new-device);
+                new-dev-btn := NewLibraryElementButton {
+                    icon: @image-url("../../../../../img/device.png");
+                    tooltip: @tr("New Device");
+
+                    clicked => {
+                        Backend.trigger-library(Data.libraries[tabs[index].library-index].path, LibraryAction.new-device);
+                    }
                 }
-            }
 
-            if !read-only: new-cmp-btn := NewLibraryElementButton {
-                x: parent.width - self.width - 20px;
-                y: parent.height - 3 * self.height - 36px;
-                icon: @image-url("../../../../bootstrap-icons/icons/cpu.svg");
-                tooltip: @tr("New Component");
-                colorize: true;
+                new-cmp-btn := NewLibraryElementButton {
+                    icon: @image-url("../../../../bootstrap-icons/icons/cpu.svg");
+                    tooltip: @tr("New Component");
+                    colorize: true;
 
-                clicked => {
-                    Backend.trigger-library(Data.libraries[tabs[index].library-index].path, LibraryAction.new-component);
+                    clicked => {
+                        Backend.trigger-library(Data.libraries[tabs[index].library-index].path, LibraryAction.new-component);
+                    }
                 }
-            }
 
-            if !read-only: new-pkg-btn := NewLibraryElementButton {
-                x: parent.width - self.width - 20px;
-                y: parent.height - 2 * self.height - 26px;
-                icon: @image-url("../../../../../img/footprint.png");
-                tooltip: @tr("New Package");
+                new-sym-btn := NewLibraryElementButton {
+                    icon: @image-url("../../../../../img/symbol.png");
+                    tooltip: @tr("New Symbol");
 
-                clicked => {
-                    Backend.trigger-library(Data.libraries[tabs[index].library-index].path, LibraryAction.new-package);
+                    clicked => {
+                        Backend.trigger-library(Data.libraries[tabs[index].library-index].path, LibraryAction.new-symbol);
+                    }
                 }
-            }
 
-            if !read-only: new-sym-btn := NewLibraryElementButton {
-                x: parent.width - self.width - 20px;
-                y: parent.height - self.height - 16px;
-                icon: @image-url("../../../../../img/symbol.png");
-                tooltip: @tr("New Symbol");
+                new-pkg-btn := NewLibraryElementButton {
+                    icon: @image-url("../../../../../img/footprint.png");
+                    tooltip: @tr("New Package");
 
-                clicked => {
-                    Backend.trigger-library(Data.libraries[tabs[index].library-index].path, LibraryAction.new-symbol);
+                    clicked => {
+                        Backend.trigger-library(Data.libraries[tabs[index].library-index].path, LibraryAction.new-package);
+                    }
                 }
             }
 
