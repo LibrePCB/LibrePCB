@@ -51,8 +51,8 @@ public:
 
   // General Methods
   const QString& getText() const noexcept { return mText; }
-  slint::private_api::EventResult process(
-      const slint::private_api::KeyEvent& e) noexcept;
+  slint::private_api::EventResult processKeyPressed(
+      const slint::language::KeyEvent& e) noexcept;
 
   // Operator Overloadings
   SlintKeyEventTextBuilder& operator=(const SlintKeyEventTextBuilder& rhs) =

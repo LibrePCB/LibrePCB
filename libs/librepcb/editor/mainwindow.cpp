@@ -278,13 +278,19 @@ MainWindow::MainWindow(GuiApplication& app,
     }
     return handled;
   });
-  b.on_scene_key_event(
-      [this](int sectionIndex, const slint::private_api::KeyEvent& e) {
-        bool handled = false;
+  b.on_scene_key_pressed(
+      [this](int sectionIndex, const slint::language::KeyEvent& e) {
         if (auto section = mSections->value(sectionIndex)) {
-          handled = section->processSceneKeyEvent(e);
+          return section->processSceneKeyPressed(e);
         }
-        return handled;
+        return false;
+      });
+  b.on_scene_key_released(
+      [this](int sectionIndex, const slint::language::KeyEvent& e) {
+        if (auto section = mSections->value(sectionIndex)) {
+          return section->processSceneKeyReleased(e);
+        }
+        return false;
       });
   b.on_request_project_preview(
       [this](const slint::SharedString& fp, float width, const ui::Theme&) {

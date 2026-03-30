@@ -102,7 +102,8 @@ public:
                     slint::private_api::PointerEvent e) noexcept;
   bool scrollEvent(const QPointF& pos,
                    slint::private_api::PointerScrollEvent e) noexcept;
-  bool keyEvent(const slint::private_api::KeyEvent& e) noexcept;
+  bool keyPressed(const slint::language::KeyEvent& e) noexcept;
+  bool keyReleased(const slint::language::KeyEvent& e) noexcept;
   void scrollLeft() noexcept;
   void scrollRight() noexcept;
   void scrollUp() noexcept;

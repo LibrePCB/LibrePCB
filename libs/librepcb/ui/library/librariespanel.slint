@@ -510,7 +510,7 @@ component LibrariesPanelSection inherits FocusScope {
                 return accept;
             }
         }
-        Backend.libraries-key-event(event)
+        Backend.libraries-key-pressed(event)
     }
 
     uninstall-popup := LibraryUninstallPopup {
@@ -711,7 +711,7 @@ export component LibrariesPanel inherits VerticalLayout {
                 animate height { duration: 100ms; }
 
                 clear-clicked => {
-                    Backend.libraries-key-event({ text: Key.Escape })
+                    Backend.libraries-key-pressed({ text: Key.Escape })
                 }
             }
         }

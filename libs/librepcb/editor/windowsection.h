@@ -82,7 +82,8 @@ public:
                                 slint::private_api::PointerEvent e) noexcept;
   bool processSceneScrolled(const QPointF& pos,
                             slint::private_api::PointerScrollEvent e) noexcept;
-  bool processSceneKeyEvent(const slint::private_api::KeyEvent& e) noexcept;
+  bool processSceneKeyPressed(const slint::language::KeyEvent& e) noexcept;
+  bool processSceneKeyReleased(const slint::language::KeyEvent& e) noexcept;
 
   template <typename T>
   bool switchToTab() noexcept {

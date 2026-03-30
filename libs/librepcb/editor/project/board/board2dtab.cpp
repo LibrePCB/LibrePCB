@@ -1037,9 +1037,18 @@ bool Board2dTab::processSceneScrolled(
   return mView->scrollEvent(pos, e);
 }
 
-bool Board2dTab::processSceneKeyEvent(
-    const slint::private_api::KeyEvent& e) noexcept {
-  if (mView->keyEvent(e)) {
+bool Board2dTab::processSceneKeyPressed(
+    const slint::language::KeyEvent& e) noexcept {
+  if (mView->keyPressed(e)) {
+    restartIdleTimer();
+    return true;
+  }
+  return false;
+}
+
+bool Board2dTab::processSceneKeyReleased(
+    const slint::language::KeyEvent& e) noexcept {
+  if (mView->keyReleased(e)) {
     restartIdleTimer();
     return true;
   }

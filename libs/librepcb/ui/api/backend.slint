@@ -218,11 +218,11 @@ export global Backend {
         Data.preview-mode  // Make it fail if callback not bound in backend.
     }
 
-    // Key event on the libraries list
+    // Key pressed event on the libraries list
     //
     // Used for the filtering feature in the libraries panel.
-    callback libraries-key-event(event: KeyEvent) -> EventResult;
-    libraries-key-event(event) => {
+    callback libraries-key-pressed(event: KeyEvent) -> EventResult;
+    libraries-key-pressed(event) => {
         if event.text == Key.Escape {
             Data.libraries-panel-filter = "";
         } else {
@@ -240,8 +240,11 @@ export global Backend {
     // Process graphics scene scrolled event
     pure callback scene-scrolled(section: int, x-rel: length, y-rel: length, event: PointerScrollEvent) -> bool;
 
-    // Process graphics scene key event
-    pure callback scene-key-event(section: int, event: KeyEvent) -> bool;
+    // Process graphics scene key pressed event
+    pure callback scene-key-pressed(section: int, event: KeyEvent) -> bool;
+
+    // Process graphics scene key released event
+    pure callback scene-key-released(section: int, event: KeyEvent) -> bool;
 
     // Request generating the preview of a project (e.g. its README.md)
     //

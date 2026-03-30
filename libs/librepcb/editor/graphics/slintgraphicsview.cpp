@@ -330,18 +330,24 @@ bool SlintGraphicsView::scrollEvent(
   }
 }
 
-bool SlintGraphicsView::keyEvent(
-    const slint::private_api::KeyEvent& e) noexcept {
+bool SlintGraphicsView::keyPressed(
+    const slint::language::KeyEvent& e) noexcept {
   if (!mEventHandler) return false;
 
   if (const Qt::Key key = s2key(e.text)) {
-    if (e.event_type == slint::private_api::KeyEventType::KeyPressed) {
-      return mEventHandler->graphicsSceneKeyPressed(
-          GraphicsSceneKeyEvent{key, s2q(e.modifiers)});
-    } else if (e.event_type == slint::private_api::KeyEventType::KeyReleased) {
-      return mEventHandler->graphicsSceneKeyReleased(
-          GraphicsSceneKeyEvent{key, s2q(e.modifiers)});
-    }
+    return mEventHandler->graphicsSceneKeyPressed(
+        GraphicsSceneKeyEvent{key, s2q(e.modifiers)});
+  }
+  return false;
+}
+
+bool SlintGraphicsView::keyReleased(
+    const slint::language::KeyEvent& e) noexcept {
+  if (!mEventHandler) return false;
+
+  if (const Qt::Key key = s2key(e.text)) {
+    return mEventHandler->graphicsSceneKeyReleased(
+        GraphicsSceneKeyEvent{key, s2q(e.modifiers)});
   }
   return false;
 }

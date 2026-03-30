@@ -655,9 +655,14 @@ bool SymbolTab::processSceneScrolled(
   return mView->scrollEvent(pos, e);
 }
 
-bool SymbolTab::processSceneKeyEvent(
-    const slint::private_api::KeyEvent& e) noexcept {
-  return mView->keyEvent(e);
+bool SymbolTab::processSceneKeyPressed(
+    const slint::language::KeyEvent& e) noexcept {
+  return mView->keyPressed(e);
+}
+
+bool SymbolTab::processSceneKeyReleased(
+    const slint::language::KeyEvent& e) noexcept {
+  return mView->keyReleased(e);
 }
 
 bool SymbolTab::requestClose() noexcept {

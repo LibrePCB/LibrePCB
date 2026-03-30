@@ -732,9 +732,9 @@ void GuiApplication::createNewWindow(int id, int projectIndex) noexcept {
     DesktopServices ds(mWorkspace.getSettings());
     return ds.openUrl(QUrl(s2q(url)));
   });
-  b.on_libraries_key_event(std::bind(&SlintKeyEventTextBuilder::process,
-                                     mLibrariesFilter.get(),
-                                     std::placeholders::_1));
+  b.on_libraries_key_pressed(
+      std::bind(&SlintKeyEventTextBuilder::processKeyPressed,
+                mLibrariesFilter.get(), std::placeholders::_1));
   b.on_copy_to_clipboard([](const slint::SharedString& s) {
     QApplication::clipboard()->setText(s2q(s));
     return true;

@@ -1176,6 +1176,6 @@ export component PackageTab inherits Tab {
     }
 
     key-released(event) => {
-        Backend.scene-key-event(section-index, event) ? accept : reject
+        Backend.scene-key-released(section-index, event) ? accept : reject
     }
 }

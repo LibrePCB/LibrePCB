@@ -93,8 +93,10 @@ public:
   bool processSceneScrolled(
       const QPointF& pos,
       slint::private_api::PointerScrollEvent e) noexcept override;
-  bool processSceneKeyEvent(
-      const slint::private_api::KeyEvent& e) noexcept override;
+  bool processSceneKeyPressed(
+      const slint::language::KeyEvent& e) noexcept override;
+  bool processSceneKeyReleased(
+      const slint::language::KeyEvent& e) noexcept override;
 
   // IF_GraphicsViewEventHandler
   bool graphicsSceneKeyPressed(
