@@ -51,6 +51,7 @@ GraphicsScene::GraphicsScene(QObject* parent) noexcept
     mOverlayContentColor(Qt::black),
     mSceneRectMarker(),
     mOriginCrossVisible(true),
+    mCrosshairsVisible(false),
     mGrayOut(false),
     mSelectionRectItem(new QGraphicsRectItem()),
     mSceneCursorPos(),
@@ -106,6 +107,13 @@ void GraphicsScene::setGridInterval(const PositiveLength& interval) noexcept {
 void GraphicsScene::setOriginCrossVisible(bool visible) noexcept {
   if (visible != mOriginCrossVisible) {
     mOriginCrossVisible = visible;
+    setForegroundBrush(foregroundBrush());  // this will repaint the foreground
+  }
+}
+
+void GraphicsScene::setCrosshairsVisible(bool visible) noexcept {
+  if (visible != mCrosshairsVisible) {
+    mCrosshairsVisible = visible;
     setForegroundBrush(foregroundBrush());  // this will repaint the foreground
   }
 }
@@ -401,15 +409,23 @@ void GraphicsScene::drawForeground(QPainter* painter,
     painter->restore();
   }
 
-  // If enabled, draw a cursor at a specific position.
-  if (mSceneCursorCross || mSceneCursorCircle) {
+  // If enabled, draw a crosshair and/or cursor at a specific position.
+  if (mCrosshairsVisible || mSceneCursorCross || mSceneCursorCircle) {
     const qreal scaleFactor =
         QStyleOptionGraphicsItem::levelOfDetailFromTransform(
             painter->worldTransform());
     const qreal r = 20 / scaleFactor;
     const QPointF pos = mSceneCursorPos.toPxQPointF();
 
-    if (mSceneCursorCross) {
+    if (mCrosshairsVisible) {
+      // Full size crosshair.
+      painter->setPen(QPen(mGridColor, 0));
+      painter->drawLine(QPointF(pos.x(), rect.top()),
+                        QPointF(pos.x(), rect.bottom()));
+      painter->drawLine(QPointF(rect.left(), pos.y()),
+                        QPointF(rect.right(), pos.y()));
+    } else if (mSceneCursorCross) {
+      // Small crosshair.
       painter->setPen(QPen(mOverlayContentColor, 0));
       painter->drawLine(pos + QPointF(0, -r), pos + QPointF(0, r));
       painter->drawLine(pos + QPointF(-r, 0), pos + QPointF(r, 0));

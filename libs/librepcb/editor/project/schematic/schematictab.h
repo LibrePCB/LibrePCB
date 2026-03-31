@@ -165,7 +165,9 @@ private:
                                 const QString& settingsKey) noexcept;
   void goToSymbol(const QString& name, int index) noexcept;
   void applyTheme() noexcept;
+  void applyCrosshairs() noexcept;
   void requestRepaint() noexcept;
+  void setCurrentTool(ui::EditorTool tool) noexcept;
 
 private:
   // References
@@ -184,6 +186,7 @@ private:
   // State
   SearchContext mSearchContext;
   Theme::GridStyle mGridStyle;
+  bool mCrosshairs;
   QPointF mSceneImagePos;
   bool mIgnorePlacementLocks;
   int mFrameIndex;

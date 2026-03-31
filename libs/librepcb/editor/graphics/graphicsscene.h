@@ -82,6 +82,7 @@ public:
   void setGridStyle(Theme::GridStyle style) noexcept;
   void setGridInterval(const PositiveLength& interval) noexcept;
   void setOriginCrossVisible(bool visible) noexcept;
+  void setCrosshairsVisible(bool visible) noexcept;
   void setGrayOut(bool grayOut) noexcept;
 
   // General Methods
@@ -122,6 +123,7 @@ private:
   QColor mOverlayContentColor;
   QRectF mSceneRectMarker;
   bool mOriginCrossVisible;
+  bool mCrosshairsVisible;
   bool mGrayOut;
 
   std::unique_ptr<QGraphicsRectItem> mSelectionRectItem;

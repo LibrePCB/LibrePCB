@@ -152,6 +152,7 @@ Board2dTab::Board2dTab(GuiApplication& app, BoardEditor& editor,
                    .getSettings()
                    .themes.getActive()
                    .getBoardGridStyle()),
+    mCrosshairs(false),
     mIgnorePlacementLocks(false),
     mFrameIndex(0),
     mToolFeatures(),
@@ -279,6 +280,10 @@ Board2dTab::Board2dTab(GuiApplication& app, BoardEditor& editor,
   connect(&mApp.getWorkspace().getSettings().themes,
           &WorkspaceSettingsItem_Themes::edited, this, &Board2dTab::applyTheme);
   applyTheme();
+
+  // Restore client settings.
+  QSettings cs;
+  mCrosshairs = cs.value("board_editor/full_crosshairs", false).toBool();
 }
 
 Board2dTab::~Board2dTab() noexcept {
@@ -309,6 +314,7 @@ ui::TabData Board2dTab::getUiData() const noexcept {
   features.undo = toFs(mProjectEditor.getUndoStack().canUndo());
   features.redo = toFs(mProjectEditor.getUndoStack().canRedo());
   features.grid = toFs(mProject.getDirectory().isWritable());
+  features.crosshairs = toFs(mTool != ui::EditorTool::Select);
   features.zoom = toFs(true);
   features.import_graphics =
       toFs(mToolFeatures.testFlag(Feature::ImportGraphics));
@@ -366,6 +372,7 @@ ui::Board2dTabData Board2dTab::getDerivedUiData() const noexcept {
               .getSecondaryColor()),  // Overlay text color
       l2s(mGridStyle),  // Grid style
       l2s(*mBoard.getGridInterval()),  // Grid interval
+      mCrosshairs,  // Crosshairs
       l2s(mBoard.getGridUnit()),  // Length unit
       mScene->isFlipped(),  // Flip view (view from bottom)
       mBackgroundImageGraphicsItem->isVisible(),  // Background image set
@@ -438,6 +445,12 @@ void Board2dTab::setDerivedUiData(const ui::Board2dTabData& data) noexcept {
   mSceneImagePos = s2q(data.scene_image_pos);
 
   mGridStyle = s2l(data.grid_style);
+  if (data.crosshairs != mCrosshairs) {
+    mCrosshairs = data.crosshairs;
+    applyCrosshairs();
+    QSettings cs;
+    cs.setValue("board_editor/full_crosshairs", mCrosshairs);
+  }
   const std::optional<PositiveLength> interval = s2plength(data.grid_interval);
   if (interval && (*interval != mBoard.getGridInterval())) {
     mBoard.setGridInterval(*interval);
@@ -627,6 +640,7 @@ void Board2dTab::activate() noexcept {
           &BoardEditor::schedulePlanesRebuild);
 
   applyTheme();
+  applyCrosshairs();
   mBoardEditor.registerActiveTab(this);
   requestRepaint();
 }
@@ -1206,7 +1220,7 @@ void Board2dTab::fsmToolLeave() noexcept {
   while (!mFsmStateConnections.isEmpty()) {
     disconnect(mFsmStateConnections.takeLast());
   }
-  mTool = ui::EditorTool::Select;
+  setCurrentTool(ui::EditorTool::Select);
   fsmSetFeatures(Features());
   onDerivedUiDataChanged.notify();
 }
@@ -1214,12 +1228,12 @@ void Board2dTab::fsmToolLeave() noexcept {
 void Board2dTab::fsmToolEnter(BoardEditorState_Select& state) noexcept {
   Q_UNUSED(state);
 
-  mTool = ui::EditorTool::Select;
+  setCurrentTool(ui::EditorTool::Select);
   onDerivedUiDataChanged.notify();
 }
 
 void Board2dTab::fsmToolEnter(BoardEditorState_DrawTrace& state) noexcept {
-  mTool = ui::EditorTool::Wire;
+  setCurrentTool(ui::EditorTool::Wire);
 
   // Net class
   auto setNetClass = [this](NetClass* nc) {
@@ -1332,7 +1346,7 @@ void Board2dTab::fsmToolEnter(BoardEditorState_DrawTrace& state) noexcept {
 }
 
 void Board2dTab::fsmToolEnter(BoardEditorState_AddVia& state) noexcept {
-  mTool = ui::EditorTool::Via;
+  setCurrentTool(ui::EditorTool::Via);
 
   // Via drill
   mToolDrill.configure(state.getDrillDiameter(),
@@ -1408,9 +1422,9 @@ void Board2dTab::fsmToolEnter(BoardEditorState_AddVia& state) noexcept {
 }
 
 void Board2dTab::fsmToolEnter(BoardEditorState_AddPad& state) noexcept {
-  mTool = state.getType() == BoardEditorState_AddPad::PadType::THT
-      ? ui::EditorTool::PadTht
-      : ui::EditorTool::PadSmt;
+  setCurrentTool(state.getType() == BoardEditorState_AddPad::PadType::THT
+                     ? ui::EditorTool::PadTht
+                     : ui::EditorTool::PadSmt);
 
   // Nets
   mToolNetsQt.clear();
@@ -1589,7 +1603,7 @@ void Board2dTab::fsmToolEnter(BoardEditorState_AddPad& state) noexcept {
 }
 
 void Board2dTab::fsmToolEnter(BoardEditorState_DrawPolygon& state) noexcept {
-  mTool = ui::EditorTool::Polygon;
+  setCurrentTool(ui::EditorTool::Polygon);
 
   // Layers
   mToolLayersQt = Layer::sorted(state.getAvailableLayers());
@@ -1636,7 +1650,7 @@ void Board2dTab::fsmToolEnter(BoardEditorState_DrawPolygon& state) noexcept {
 }
 
 void Board2dTab::fsmToolEnter(BoardEditorState_AddStrokeText& state) noexcept {
-  mTool = ui::EditorTool::Text;
+  setCurrentTool(ui::EditorTool::Text);
 
   // Layers
   mToolLayersQt = Layer::sorted(state.getAvailableLayers());
@@ -1702,7 +1716,7 @@ void Board2dTab::fsmToolEnter(BoardEditorState_AddStrokeText& state) noexcept {
 }
 
 void Board2dTab::fsmToolEnter(BoardEditorState_DrawPlane& state) noexcept {
-  mTool = ui::EditorTool::Plane;
+  setCurrentTool(ui::EditorTool::Plane);
 
   // Nets
   mToolNetsQt.clear();
@@ -1751,7 +1765,7 @@ void Board2dTab::fsmToolEnter(BoardEditorState_DrawPlane& state) noexcept {
 }
 
 void Board2dTab::fsmToolEnter(BoardEditorState_DrawZone& state) noexcept {
-  mTool = ui::EditorTool::Zone;
+  setCurrentTool(ui::EditorTool::Zone);
 
   // Available layers
   mToolLayersQt = Layer::sorted(state.getAvailableLayers());
@@ -1790,7 +1804,7 @@ void Board2dTab::fsmToolEnter(BoardEditorState_DrawZone& state) noexcept {
 }
 
 void Board2dTab::fsmToolEnter(BoardEditorState_AddHole& state) noexcept {
-  mTool = ui::EditorTool::Hole;
+  setCurrentTool(ui::EditorTool::Hole);
 
   // Drill
   mToolDrill.configure(state.getDiameter(),
@@ -1809,14 +1823,14 @@ void Board2dTab::fsmToolEnter(BoardEditorState_AddHole& state) noexcept {
 void Board2dTab::fsmToolEnter(BoardEditorState_AddDevice& state) noexcept {
   Q_UNUSED(state);
 
-  mTool = ui::EditorTool::Component;
+  setCurrentTool(ui::EditorTool::Component);
   onDerivedUiDataChanged.notify();
 }
 
 void Board2dTab::fsmToolEnter(BoardEditorState_Measure& state) noexcept {
   Q_UNUSED(state);
 
-  mTool = ui::EditorTool::Measure;
+  setCurrentTool(ui::EditorTool::Measure);
   onDerivedUiDataChanged.notify();
 }
 
@@ -2722,9 +2736,21 @@ void Board2dTab::applyTheme() noexcept {
   onDerivedUiDataChanged.notify();
 }
 
+void Board2dTab::applyCrosshairs() noexcept {
+  if (mScene) {
+    mScene->setCrosshairsVisible(mCrosshairs &&
+                                 (mTool != ui::EditorTool::Select));
+  }
+}
+
 void Board2dTab::requestRepaint() noexcept {
   ++mFrameIndex;
   onDerivedUiDataChanged.notify();
+}
+
+void Board2dTab::setCurrentTool(ui::EditorTool tool) noexcept {
+  mTool = tool;
+  applyCrosshairs();
 }
 
 /*******************************************************************************

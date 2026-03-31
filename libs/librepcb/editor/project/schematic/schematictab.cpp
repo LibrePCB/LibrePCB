@@ -121,6 +121,7 @@ SchematicTab::SchematicTab(GuiApplication& app, SchematicEditor& editor,
                    .getSettings()
                    .themes.getActive()
                    .getSchematicGridStyle()),
+    mCrosshairs(false),
     mIgnorePlacementLocks(false),
     mFrameIndex(0),
     mToolFeatures(),
@@ -220,6 +221,7 @@ SchematicTab::SchematicTab(GuiApplication& app, SchematicEditor& editor,
     mPinNumbersLayer->setVisible(
         cs.value("schematic_editor/show_pin_numbers", true).toBool());
   }
+  mCrosshairs = cs.value("schematic_editor/full_crosshairs", false).toBool();
 }
 
 SchematicTab::~SchematicTab() noexcept {
@@ -249,6 +251,7 @@ ui::TabData SchematicTab::getUiData() const noexcept {
   features.undo = toFs(mProjectEditor.getUndoStack().canUndo());
   features.redo = toFs(mProjectEditor.getUndoStack().canRedo());
   features.grid = toFs(mProject.getDirectory().isWritable());
+  features.crosshairs = toFs(mTool != ui::EditorTool::Select);
   features.zoom = toFs(true);
   features.export_graphics = toFs(mTool == ui::EditorTool::Select);
   features.select = toFs(mToolFeatures.testFlag(Feature::Select));
@@ -300,6 +303,7 @@ ui::SchematicTabData SchematicTab::getDerivedUiData() const noexcept {
               .getSecondaryColor()),  // Overlay text color
       l2s(mGridStyle),  // Grid style
       l2s(*mSchematic.getGridInterval()),  // Grid interval
+      mCrosshairs,  // Crosshairs
       l2s(mSchematic.getGridUnit()),  // Length unit
       mPinNumbersLayer && mPinNumbersLayer->isVisible(),  // Show pin numbers
       mIgnorePlacementLocks,  // Ignore placement locks
@@ -350,6 +354,12 @@ void SchematicTab::setDerivedUiData(const ui::SchematicTabData& data) noexcept {
   mSceneImagePos = s2q(data.scene_image_pos);
 
   mGridStyle = s2l(data.grid_style);
+  if (data.crosshairs != mCrosshairs) {
+    mCrosshairs = data.crosshairs;
+    applyCrosshairs();
+    QSettings cs;
+    cs.setValue("schematic_editor/full_crosshairs", mCrosshairs);
+  }
   const std::optional<PositiveLength> interval = s2plength(data.grid_interval);
   if (interval && (*interval != mSchematic.getGridInterval())) {
     mSchematic.setGridInterval(*interval);
@@ -446,6 +456,7 @@ void SchematicTab::activate() noexcept {
   mSearchContext.init();
 
   applyTheme();
+  applyCrosshairs();
   mProjectEditor.registerActiveSchematicTab(this);
   requestRepaint();
 }
@@ -757,6 +768,10 @@ bool SchematicTab::graphicsSceneKeyReleased(
 bool SchematicTab::graphicsSceneMouseMoved(
     const GraphicsSceneMouseEvent& e) noexcept {
   emit cursorCoordinatesChanged(e.scenePos, mSchematic.getGridUnit());
+
+  mScene->setSceneCursor(e.scenePos.mappedToGrid(mSchematic.getGridInterval()),
+                         false, false);
+
   return mFsm->processGraphicsSceneMouseMoved(e);
 }
 
@@ -884,7 +899,7 @@ void SchematicTab::fsmToolLeave() noexcept {
   while (!mFsmStateConnections.isEmpty()) {
     disconnect(mFsmStateConnections.takeLast());
   }
-  mTool = ui::EditorTool::Select;
+  setCurrentTool(ui::EditorTool::Select);
   fsmSetFeatures(Features());
   onDerivedUiDataChanged.notify();
 }
@@ -892,12 +907,12 @@ void SchematicTab::fsmToolLeave() noexcept {
 void SchematicTab::fsmToolEnter(SchematicEditorState_Select& state) noexcept {
   Q_UNUSED(state);
 
-  mTool = ui::EditorTool::Select;
+  setCurrentTool(ui::EditorTool::Select);
   onDerivedUiDataChanged.notify();
 }
 
 void SchematicTab::fsmToolEnter(SchematicEditorState_DrawWire& state) noexcept {
-  mTool = ui::EditorTool::Wire;
+  setCurrentTool(ui::EditorTool::Wire);
 
   // Wire mode
   auto setWireMode = [this](SchematicEditorState_DrawWire::WireMode m) {
@@ -916,7 +931,7 @@ void SchematicTab::fsmToolEnter(SchematicEditorState_DrawWire& state) noexcept {
 }
 
 void SchematicTab::fsmToolEnter(SchematicEditorState_DrawBus& state) noexcept {
-  mTool = ui::EditorTool::Bus;
+  setCurrentTool(ui::EditorTool::Bus);
 
   // Wire mode
   auto setWireMode = [this](SchematicEditorState_DrawWire::WireMode m) {
@@ -937,13 +952,13 @@ void SchematicTab::fsmToolEnter(SchematicEditorState_DrawBus& state) noexcept {
 void SchematicTab::fsmToolEnter(SchematicEditorState_AddLabel& state) noexcept {
   Q_UNUSED(state);
 
-  mTool = ui::EditorTool::Label;
+  setCurrentTool(ui::EditorTool::Label);
   onDerivedUiDataChanged.notify();
 }
 
 void SchematicTab::fsmToolEnter(
     SchematicEditorState_AddComponent& state) noexcept {
-  mTool = ui::EditorTool::Component;
+  setCurrentTool(ui::EditorTool::Component);
 
   // Value
   auto setValue = [this](const QString& value) {
@@ -1035,7 +1050,7 @@ void SchematicTab::fsmToolEnter(
 
 void SchematicTab::fsmToolEnter(
     SchematicEditorState_DrawPolygon& state) noexcept {
-  mTool = ui::EditorTool::Polygon;
+  setCurrentTool(ui::EditorTool::Polygon);
 
   // Layers
   mToolLayersQt = Layer::sorted(state.getAvailableLayers());
@@ -1084,7 +1099,7 @@ void SchematicTab::fsmToolEnter(
 }
 
 void SchematicTab::fsmToolEnter(SchematicEditorState_AddText& state) noexcept {
-  mTool = ui::EditorTool::Text;
+  setCurrentTool(ui::EditorTool::Text);
 
   // Layers
   mToolLayersQt = Layer::sorted(state.getAvailableLayers());
@@ -1139,14 +1154,14 @@ void SchematicTab::fsmToolEnter(SchematicEditorState_AddText& state) noexcept {
 void SchematicTab::fsmToolEnter(SchematicEditorState_AddImage& state) noexcept {
   Q_UNUSED(state);
 
-  mTool = ui::EditorTool::Image;
+  setCurrentTool(ui::EditorTool::Image);
   onDerivedUiDataChanged.notify();
 }
 
 void SchematicTab::fsmToolEnter(SchematicEditorState_Measure& state) noexcept {
   Q_UNUSED(state);
 
-  mTool = ui::EditorTool::Measure;
+  setCurrentTool(ui::EditorTool::Measure);
   onDerivedUiDataChanged.notify();
 }
 
@@ -1278,9 +1293,21 @@ void SchematicTab::applyTheme() noexcept {
   onDerivedUiDataChanged.notify();
 }
 
+void SchematicTab::applyCrosshairs() noexcept {
+  if (mScene) {
+    mScene->setCrosshairsVisible(mCrosshairs &&
+                                 (mTool != ui::EditorTool::Select));
+  }
+}
+
 void SchematicTab::requestRepaint() noexcept {
   ++mFrameIndex;
   onDerivedUiDataChanged.notify();
+}
+
+void SchematicTab::setCurrentTool(ui::EditorTool tool) noexcept {
+  mTool = tool;
+  applyCrosshairs();
 }
 
 /*******************************************************************************

@@ -635,6 +635,7 @@ export struct TabFeatures {
     undo: FeatureState,
     redo: FeatureState,
     grid: FeatureState,
+    crosshairs: FeatureState,
     zoom: FeatureState,
     background-image: FeatureState,
     import-graphics: FeatureState,
@@ -1246,6 +1247,7 @@ export struct SchematicTabData {
     overlay-text-color: brush,
     grid-style: GridStyle,
     grid-interval: Int64,
+    crosshairs: bool,
     unit: LengthUnit,
     show-pin-numbers: bool,
     ignore-placement-locks: bool,
@@ -1266,7 +1268,6 @@ export struct SchematicTabData {
     tool-value: LineEditData,
     tool-attribute-value: LineEditData,
     tool-attribute-unit: ComboBoxData,
-
     scene-image-pos: Point,  // Absolute position of graphics scene
     frame: int,  // Frame index to trigger repainting
 
@@ -1284,6 +1285,7 @@ export struct Board2dTabData {
     overlay-text-color: brush,
     grid-style: GridStyle,
     grid-interval: Int64,
+    crosshairs: bool,
     unit: LengthUnit,
     flip-view: bool,
     background-image-set: bool,
@@ -1328,7 +1330,6 @@ export struct Board2dTabData {
     tool-no-planes: bool,
     tool-no-exposures: bool,
     tool-no-devices: bool,
-
     scene-image-pos: Point,  // Absolute position of graphics scene
     frame: int,  // Frame index to trigger repainting
 

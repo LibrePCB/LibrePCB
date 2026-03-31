@@ -118,6 +118,7 @@ bool BoardEditorState_DrawTrace::exit() noexcept {
   if (!abortPositioning(true, true)) return false;
 
   mAdapter.fsmSetViewCursor(std::nullopt);
+  mAdapter.fsmSetSceneCursor(Point(), false, false);
   mAdapter.fsmToolLeave();
   return true;
 }
@@ -179,9 +180,12 @@ bool BoardEditorState_DrawTrace::processGraphicsSceneMouseMoved(
     mCurrentSnapActive = !e.modifiers.testFlag(Qt::ShiftModifier);
     mCursorPos = e.scenePos;
     updateNetpointPositions();
+    mAdapter.fsmSetSceneCursor(mTargetPos, false, false);
     return true;
   }
 
+  mAdapter.fsmSetSceneCursor(e.scenePos.mappedToGrid(getGridInterval()), false,
+                             false);
   return false;
 }
 
