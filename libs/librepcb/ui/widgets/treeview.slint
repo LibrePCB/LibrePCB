@@ -1,4 +1,4 @@
-import { ListView } from "listview.slint";
+import { ListScrollView } from "listscrollview.slint";
 import { ListViewItemButton } from "listviewitembutton.slint";
 import {
     Data,
@@ -40,7 +40,13 @@ export component TreeView inherits FocusScope {
         item-selected(index, model[index]);
     }
 
-    view := ListView {
+    view := ListScrollView {
+        x: 0;
+        y: 0;
+        width: 100%;
+        height: 100%;
+        preferred-height: model.length * item-height;
+        viewport-height: model.length * item-height;
         force-show-scrollbars: root.has-focus;
 
         for item[index] in model: item-ta := TouchArea {

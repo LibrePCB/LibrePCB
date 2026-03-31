@@ -164,8 +164,9 @@ private:
   bool mWizardMode;
   int mCurrentPageIndex;
   int mCurrentCategoryIndex;
+  float mCategoriesViewportY;
   int mCurrentElementIndex;
-  std::shared_ptr<slint::VectorModel<float>> mViewsScrollPositions;
+  float mElementsViewportY;
   QString mFilterTerm;
 
   // Library metadata to be applied

@@ -214,10 +214,18 @@ bool WindowSection::processSceneScrolled(
   return false;
 }
 
-bool WindowSection::processSceneKeyEvent(
-    const slint::private_api::KeyEvent& e) noexcept {
+bool WindowSection::processSceneKeyPressed(
+    const slint::language::KeyEvent& e) noexcept {
   if (std::shared_ptr<WindowTab> t = getCurrentTab()) {
-    return t->processSceneKeyEvent(e);
+    return t->processSceneKeyPressed(e);
+  }
+  return false;
+}
+
+bool WindowSection::processSceneKeyReleased(
+    const slint::language::KeyEvent& e) noexcept {
+  if (std::shared_ptr<WindowTab> t = getCurrentTab()) {
+    return t->processSceneKeyReleased(e);
   }
   return false;
 }

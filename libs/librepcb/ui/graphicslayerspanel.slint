@@ -1,6 +1,6 @@
 import {
     IconButton,
-    ListView,
+    ListScrollView,
     ListViewItemButton,
     PanelHeader,
 } from "widgets.slint";
@@ -209,8 +209,10 @@ export component GraphicsLayersPanel inherits FocusScope {
             }
         }
 
-        view := ListView {
+        view := ListScrollView {
             vertical-stretch: 1;
+            preferred-height: model.length * item-height;
+            viewport-height: model.length * item-height;
             visible: model.length > 0;
             force-show-scrollbars: root.has-focus;
 

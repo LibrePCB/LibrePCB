@@ -47,12 +47,8 @@ SlintKeyEventTextBuilder::~SlintKeyEventTextBuilder() noexcept {
  *  General Methods
  ******************************************************************************/
 
-slint::private_api::EventResult SlintKeyEventTextBuilder::process(
-    const slint::private_api::KeyEvent& e) noexcept {
-  if (e.event_type != slint::private_api::KeyEventType::KeyPressed) {
-    return slint::private_api::EventResult::Reject;
-  }
-
+slint::private_api::EventResult SlintKeyEventTextBuilder::processKeyPressed(
+    const slint::language::KeyEvent& e) noexcept {
   const QString text(s2q(e.text));
   if (text.size() != 1) {
     return slint::private_api::EventResult::Reject;

@@ -1,0 +1,15 @@
+import { ScrollView } from "scrollview.slint";
+
+// ListView would be a better name, but currently causes troubles.
+// See https://github.com/slint-ui/slint/issues/861
+export component ListScrollView inherits ScrollView {
+    preferred-height: l.preferred-height;
+    mouse-drag-pan-enabled: true;
+    accessible-role: list;
+
+    l := VerticalLayout {
+        alignment: start;
+
+        @children
+    }
+}

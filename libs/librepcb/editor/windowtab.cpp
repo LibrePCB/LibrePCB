@@ -87,8 +87,14 @@ bool WindowTab::processSceneScrolled(
   return false;
 }
 
-bool WindowTab::processSceneKeyEvent(
-    const slint::private_api::KeyEvent& e) noexcept {
+bool WindowTab::processSceneKeyPressed(
+    const slint::language::KeyEvent& e) noexcept {
+  Q_UNUSED(e);
+  return false;
+}
+
+bool WindowTab::processSceneKeyReleased(
+    const slint::language::KeyEvent& e) noexcept {
   Q_UNUSED(e);
   return false;
 }

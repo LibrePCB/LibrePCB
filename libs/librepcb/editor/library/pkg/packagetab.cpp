@@ -999,9 +999,14 @@ bool PackageTab::processSceneScrolled(
   }
 }
 
-bool PackageTab::processSceneKeyEvent(
-    const slint::private_api::KeyEvent& e) noexcept {
-  return mView->keyEvent(e);
+bool PackageTab::processSceneKeyPressed(
+    const slint::language::KeyEvent& e) noexcept {
+  return mView->keyPressed(e);
+}
+
+bool PackageTab::processSceneKeyReleased(
+    const slint::language::KeyEvent& e) noexcept {
+  return mView->keyReleased(e);
 }
 
 bool PackageTab::requestClose() noexcept {

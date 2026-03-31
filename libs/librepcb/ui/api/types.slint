@@ -898,7 +898,6 @@ export struct LibraryTabData {
     library-index: int,
     wizard-mode: bool,
     page-index: int,
-    views-scroll-positions: [length],  // Ignored by the backend
 
     // Metadata
     icon: image,
@@ -918,8 +917,10 @@ export struct LibraryTabData {
     // Content
     categories: [LibraryTreeViewItemData],
     categories-index: int,
+    categories-viewport-y: length,  // Ignored by the backend
     filtered-elements: [LibraryTreeViewItemData],
     filtered-elements-index: int,
+    filtered-elements-viewport-y: length,  // Ignored by the backend
 
     // Checks
     checks: RuleCheckData,

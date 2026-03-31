@@ -94,7 +94,16 @@ export component ScrollView {
     vertical-stretch: 1;
 
     ta := TouchArea {
+        x: 0;
+        y: 0;
+        width: 100%;
+        height: 100%;
+
         flickable := Flickable {
+            x: 0;
+            y: 0;
+            width: 100%;
+            height: 100%;
             viewport-x <=> horizontal-bar.value;
             viewport-y <=> vertical-bar.value;
             interactive: false;

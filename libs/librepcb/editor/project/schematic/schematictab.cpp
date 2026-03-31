@@ -730,9 +730,14 @@ bool SchematicTab::processSceneScrolled(
   return mView->scrollEvent(pos, e);
 }
 
-bool SchematicTab::processSceneKeyEvent(
-    const slint::private_api::KeyEvent& e) noexcept {
-  return mView->keyEvent(e);
+bool SchematicTab::processSceneKeyPressed(
+    const slint::language::KeyEvent& e) noexcept {
+  return mView->keyPressed(e);
+}
+
+bool SchematicTab::processSceneKeyReleased(
+    const slint::language::KeyEvent& e) noexcept {
+  return mView->keyReleased(e);
 }
 
 /*******************************************************************************
