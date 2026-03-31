@@ -15,6 +15,7 @@ import {
     Int64,
     LengthEditParseResult,
     LengthUnit,
+    NotificationData,
     NotificationType,
     TabAction,
     TabType,
@@ -392,9 +393,11 @@ export component StatusBar inherits Rectangle {
             max-width: 150px;
 
             progress-bar := ProgressBar {
+                property <NotificationData> notification: Data.notifications[Data.notifications-progress-index];
+
                 width: 100%;
-                visible: Data.notifications[Data.notifications-progress-index].type == NotificationType.progress;
-                progress: Data.notifications[Data.notifications-progress-index].progress / 100;
+                visible: (Data.notifications-progress-index >= 0) && (notification.type == NotificationType.progress);
+                progress: notification.progress / 100;
             }
         }
 
