@@ -82,6 +82,7 @@ BoardEditorState_DrawTrace::BoardEditorState_DrawTrace(
                           ),
     mViaLayer(nullptr),
     mTargetPos(),
+    mTargetPosIsOnVia(false),
     mCursorPos(),
     mCurrentWidth(mContext.board.getDesignRules().getDefaultTraceWidth()),
     mCurrentAutoWidth(false),
@@ -107,6 +108,9 @@ BoardEditorState_DrawTrace::~BoardEditorState_DrawTrace() noexcept {
 
 bool BoardEditorState_DrawTrace::entry() noexcept {
   Q_ASSERT(mSubState == SubState_Idle);
+
+  mCursorPos = mAdapter.fsmMapGlobalPosToScenePos(QCursor::pos());
+  updateTargetPos();
 
   mAdapter.fsmToolEnter(*this);
   mAdapter.fsmSetViewCursor(Qt::CrossCursor);
@@ -144,6 +148,7 @@ bool BoardEditorState_DrawTrace::processKeyPressed(
     case Qt::Key_Shift:
       if (mSubState == SubState_PositioningNetPoint) {
         mCurrentSnapActive = false;
+        updateTargetPos();
         updateNetpointPositions();
         return true;
       }
@@ -161,6 +166,7 @@ bool BoardEditorState_DrawTrace::processKeyReleased(
     case Qt::Key_Shift:
       if (mSubState == SubState_PositioningNetPoint) {
         mCurrentSnapActive = true;
+        updateTargetPos();
         updateNetpointPositions();
         return true;
       }
@@ -174,18 +180,15 @@ bool BoardEditorState_DrawTrace::processKeyReleased(
 
 bool BoardEditorState_DrawTrace::processGraphicsSceneMouseMoved(
     const GraphicsSceneMouseEvent& e) noexcept {
-  if (mSubState == SubState_PositioningNetPoint) {
-    // Update snap, in case we missed the key pressed/released events for some
-    // reason (e.g. focus issue).
-    mCurrentSnapActive = !e.modifiers.testFlag(Qt::ShiftModifier);
-    mCursorPos = e.scenePos;
+  // Update snap, in case we missed the key pressed/released events for some
+  // reason (e.g. focus issue).
+  mCurrentSnapActive = !e.modifiers.testFlag(Qt::ShiftModifier);
+  mCursorPos = e.scenePos;
+  updateTargetPos();
+  if (mSubState == SubState_PositioningNetPoint) {  
     updateNetpointPositions();
-    mAdapter.fsmSetSceneCursor(mTargetPos, false, false);
     return true;
   }
-
-  mAdapter.fsmSetSceneCursor(e.scenePos.mappedToGrid(getGridInterval()), false,
-                             false);
   return false;
 }
 
@@ -273,6 +276,7 @@ void BoardEditorState_DrawTrace::setLayer(const Layer& layer) noexcept {
       abortPositioning(false, false);
       mCurrentLayer = &layer;
       startPositioning(mContext.board, startPos, true, nullptr, via, pad);
+      updateTargetPos();
       updateNetpointPositions();
     } else {
       mAddVia = true;
@@ -899,24 +903,29 @@ bool BoardEditorState_DrawTrace::abortPositioning(
   return success;
 }
 
-void BoardEditorState_DrawTrace::updateNetpointPositions() noexcept {
+void BoardEditorState_DrawTrace::updateTargetPos() noexcept {
   BoardGraphicsScene* scene = getActiveBoardScene();
-  if ((!scene) || (mSubState != SubState_PositioningNetPoint)) {
+  if (!scene) {
     return;
   }
 
   mTargetPos = mCursorPos.mappedToGrid(getGridInterval());
-  bool isOnVia = false;
+  mTargetPosIsOnVia = false;
+  bool snapping = false;
   if (mCurrentSnapActive) {
     // find anchor under cursor
-    const Layer& layer = mPositioningNetLine1->getLayer();
-    const NetSignal* netsignal = mCurrentNetSegment->getNetSignal();
+    const Layer& layer = mPositioningNetLine1 ?
+                           mPositioningNetLine1->getLayer() : *mCurrentLayer;
+    QSet<const NetSignal*> nets;
+    if (mCurrentNetSegment) {
+      nets.insert(mCurrentNetSegment->getNetSignal());
+    }
     std::shared_ptr<QGraphicsItem> item = findItemAtPos(
         mCursorPos,
         FindFlag::Vias | FindFlag::NetPoints | FindFlag::NetLines |
             FindFlag::BoardPads | FindFlag::FootprintPads |
             FindFlag::AcceptNextGridMatch,
-        &layer, {netsignal},
+        &layer, nets,
         {
             scene->getVias().value(mTempVia),
             scene->getNetPoints().value(mPositioningNetPoint1),
@@ -927,18 +936,31 @@ void BoardEditorState_DrawTrace::updateNetpointPositions() noexcept {
 
     if (auto via = std::dynamic_pointer_cast<BGI_Via>(item)) {
       mTargetPos = via->getVia().getPosition();
-      isOnVia = true;
+      mTargetPosIsOnVia = true;
+      snapping = true;
     } else if (auto pad = std::dynamic_pointer_cast<BGI_Pad>(item)) {
       mTargetPos = pad->getPad().getPosition();
-      isOnVia = (pad->getPad().getProperties().isTht());
+      mTargetPosIsOnVia = (pad->getPad().getProperties().isTht());
+      snapping = true;
     } else if (auto netpoint = std::dynamic_pointer_cast<BGI_NetPoint>(item)) {
       mTargetPos = netpoint->getNetPoint().getPosition();
+      snapping = true;
     } else if (auto netline = std::dynamic_pointer_cast<BGI_NetLine>(item)) {
       // Get closest point on the netline.
       mTargetPos = Toolbox::nearestPointOnLine(
           mTargetPos, netline->getNetLine().getP1().getPosition(),
           netline->getNetLine().getP2().getPosition());
+      snapping = true;
     }
+  }
+
+  mAdapter.fsmSetSceneCursor(mTargetPos, false, snapping);
+}
+
+void BoardEditorState_DrawTrace::updateNetpointPositions() noexcept {
+  BoardGraphicsScene* scene = getActiveBoardScene();
+  if ((!scene) || (mSubState != SubState_PositioningNetPoint)) {
+    return;
   }
 
   mPositioningNetPoint1->setPosition(calcMiddlePointPos(
@@ -947,7 +969,7 @@ void BoardEditorState_DrawTrace::updateNetpointPositions() noexcept {
     mPositioningNetPoint2->setPosition(mTargetPos);
   }
   if (mAddVia) {
-    showVia(!isOnVia);
+    showVia(!mTargetPosIsOnVia);
   }
 
   // Update the trace width

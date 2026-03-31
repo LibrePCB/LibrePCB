@@ -186,6 +186,11 @@ private:
   bool abortPositioning(bool showErrMsgBox, bool simplifySegment) noexcept;
 
   /**
+   * @brief Update #mTargetPos
+   */
+  void updateTargetPos() noexcept;
+
+  /**
    * @brief Update the currently active traces according
    * to the set parameters.
    *
@@ -233,7 +238,7 @@ private:
   SubState mSubState;  ///< the current substate
   QPointer<NetClass> mCurrentNetClass;  ///< `nullptr` in idle state
   WireMode mCurrentWireMode;  ///< the current wire mode
-  const Layer* mCurrentLayer;  ///< the current board layer name
+  const Layer* mCurrentLayer;  ///< the current board layer name (always valid)
   bool mAddVia;  ///< whether a via add is requested
   BI_Via* mTempVia;
   Via mCurrentViaProperties;  ///< The current Via properties
@@ -241,6 +246,7 @@ private:
   const Layer* mViaLayer;  ///< Layer where the via was started
   Point mTargetPos;  ///< the current target position of the
                      ///< active trace
+  bool mTargetPosIsOnVia; ///< Whether #mTargetPos is on a via or not
 
   Point mCursorPos;  ///< the current cursor position
   PositiveLength mCurrentWidth;  ///< the current wire width
