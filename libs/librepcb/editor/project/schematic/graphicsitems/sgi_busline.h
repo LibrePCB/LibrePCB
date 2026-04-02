@@ -72,7 +72,6 @@ public:
 private:  // Methods
   void busLineEdited(const SI_BusLine& obj, SI_BusLine::Event event) noexcept;
   void updatePositions() noexcept;
-  void updateBusName() noexcept;
   std::shared_ptr<GraphicsLayer> getLayer(const QString& name) const noexcept;
 
 private:  // Data

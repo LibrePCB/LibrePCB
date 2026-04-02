@@ -57,7 +57,6 @@ BGI_NetLine::BGI_NetLine(
 
   updateLine();
   updateLayer();
-  updateNetSignalName();
   updateVisibility();
 
   mNetLine.onEdited.attach(mOnNetLineEditedSlot);
@@ -122,7 +121,6 @@ void BGI_NetLine::netLineEdited(const BI_NetLine& obj,
       updateLine();
       break;
     case BI_NetLine::Event::NetSignalNameChanged:
-      updateNetSignalName();
       break;
     default:
       qWarning() << "Unhandled switch-case in SGI_NetLine::netLineEdited():"
@@ -180,10 +178,6 @@ void BGI_NetLine::updateLayer() noexcept {
   if (mLayer) {
     mLayer->onEdited.attach(mOnLayerEditedSlot);
   }
-}
-
-void BGI_NetLine::updateNetSignalName() noexcept {
-  setToolTip(mNetLine.getNetSegment().getNetNameToDisplay(true));
 }
 
 void BGI_NetLine::updateVisibility() noexcept {

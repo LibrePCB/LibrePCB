@@ -85,7 +85,6 @@ void FootprintPadGraphicsItem::updateText() noexcept {
     }
   }
   mGraphicsItem->setText(text);
-  mGraphicsItem->setToolTipText(text);
 }
 
 /*******************************************************************************

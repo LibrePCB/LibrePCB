@@ -65,7 +65,6 @@ SGI_NetPoint::SGI_NetPoint(SI_NetPoint& netpoint,
 
   updatePosition();
   updateJunction();
-  updateNetName();
 
   mNetPoint.onEdited.attach(mOnEditedSlot);
 }
@@ -115,7 +114,6 @@ void SGI_NetPoint::netPointEdited(const SI_NetPoint& obj,
       updateJunction();
       break;
     case SI_NetPoint::Event::NetSignalNameChanged:
-      updateNetName();
       break;
     default:
       qWarning() << "Unhandled switch-case in SGI_NetPoint::netPointlEdited():"
@@ -136,10 +134,6 @@ void SGI_NetPoint::updateJunction() noexcept {
                 ? SchematicGraphicsScene::ZValue_VisibleNetPoints
                 : SchematicGraphicsScene::ZValue_HiddenNetPoints);
   update();
-}
-
-void SGI_NetPoint::updateNetName() noexcept {
-  setToolTip(*mNetPoint.getNetSegment().getNetSignal().getName());
 }
 
 /*******************************************************************************

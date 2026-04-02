@@ -77,7 +77,6 @@ BGI_Via::BGI_Via(
 
   updatePosition();
   updateShapes();
-  updateToolTip();
   updateText();
 
   mVia.onEdited.attach(mOnEditedSlot);
@@ -185,7 +184,6 @@ void BGI_Via::viaEdited(const BI_Via& obj, BI_Via::Event event) noexcept {
   switch (event) {
     case BI_Via::Event::LayersChanged:
       attachToCopperLayers();
-      updateToolTip();
       updateVisibility();
       update();
       break;
@@ -200,7 +198,6 @@ void BGI_Via::viaEdited(const BI_Via& obj, BI_Via::Event event) noexcept {
       updateShapes();
       break;
     case BI_Via::Event::NetSignalNameChanged:
-      updateToolTip();
       updateText();
       break;
     default:
@@ -259,25 +256,6 @@ void BGI_Via::updateShapes() noexcept {
       mStopMaskTop.boundingRect();
 
   update();
-}
-
-void BGI_Via::updateToolTip() noexcept {
-  const Via& via = mVia.getVia();
-
-  QString s;
-  if (via.isThrough()) {
-    s += tr("Through-Hole Via");
-  } else if (via.isBlind()) {
-    s += tr("Blind Via");
-  } else if (via.isBuried()) {
-    s += tr("Buried Via");
-  }
-  s += "\n" % tr("Net: %1").arg(mVia.getNetSegment().getNetNameToDisplay(true));
-  if (!via.isThrough()) {
-    s += "\n" % tr("Start Layer: %1").arg(via.getStartLayer().getNameTr());
-    s += "\n" % tr("End Layer: %1").arg(via.getEndLayer().getNameTr());
-  }
-  setToolTip(s);
 }
 
 void BGI_Via::updateText() noexcept {

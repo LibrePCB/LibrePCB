@@ -58,7 +58,6 @@ BGI_NetPoint::BGI_NetPoint(
   updateLayer();
   updatePosition();
   updateDiameter();
-  updateNetSignalName();
 
   mNetPoint.onEdited.attach(mOnEditedSlot);
 }
@@ -108,7 +107,6 @@ void BGI_NetPoint::netPointEdited(const BI_NetPoint& obj,
       updateDiameter();
       break;
     case BI_NetPoint::Event::NetSignalNameChanged:
-      updateNetSignalName();
       break;
     default:
       qWarning() << "Unhandled switch-case in BGI_NetPoint::netPointEdited():"
@@ -169,10 +167,6 @@ void BGI_NetPoint::updateDiameter() noexcept {
   }
   mBoundingRect = mShape.boundingRect();
   update();
-}
-
-void BGI_NetPoint::updateNetSignalName() noexcept {
-  setToolTip(mNetPoint.getNetSegment().getNetNameToDisplay(true));
 }
 
 void BGI_NetPoint::updateVisibility() noexcept {

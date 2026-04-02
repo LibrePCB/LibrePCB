@@ -124,15 +124,6 @@ void PrimitiveFootprintPadGraphicsItem::setTextMirrored(
   mTextGraphicsItem->setMirrored(mirrored);
 }
 
-void PrimitiveFootprintPadGraphicsItem::setToolTipText(
-    const QString& text) noexcept {
-  setToolTip(text);
-  mOriginCrossGraphicsItem->setToolTip(text);
-  foreach (auto& item, mPathGraphicsItems) {
-    item.item->setToolTip(text);
-  }
-}
-
 void PrimitiveFootprintPadGraphicsItem::setLayer(
     const QString& layerName) noexcept {
   auto layer = mLayers.get(layerName);
@@ -181,7 +172,6 @@ void PrimitiveFootprintPadGraphicsItem::setGeometries(
       item->setShapeMode(
           isCopperLayer ? PrimitivePathGraphicsItem::ShapeMode::FilledOutline
                         : PrimitivePathGraphicsItem::ShapeMode::None);
-      item->setToolTip(toolTip());
       if (zValues.contains(layer->getName())) {
         item->setZValue(zValues.value(layer->getName()));
       } else {

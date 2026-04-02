@@ -70,7 +70,6 @@ BGI_Pad::BGI_Pad(
   mGraphicsItem->setGeometries(mPad.getGeometries(),
                                *mPad.getProperties().getCopperClearance());
   updateLayer();
-  updateToolTip();
 
   mPad.onEdited.attach(mOnPadEditedSlot);
   if (auto ptr = mDeviceGraphicsItem.lock()) {
@@ -141,7 +140,6 @@ void BGI_Pad::padEdited(const BI_Pad& obj, BI_Pad::Event event) noexcept {
       break;
     case BI_Pad::Event::TextChanged:
       mGraphicsItem->setText(obj.getText());
-      updateToolTip();
       break;
     case BI_Pad::Event::GeometriesChanged:
     case BI_Pad::Event::CopperClearanceChanged:
@@ -175,30 +173,6 @@ void BGI_Pad::updateLayer() noexcept {
         BoardGraphicsScene::ZValue_PadsBottom, mContext->flipView));
     mGraphicsItem->setLayer(Theme::Color::sBoardCopperBot);
   }
-}
-
-void BGI_Pad::updateToolTip() noexcept {
-  Q_ASSERT(mGraphicsItem);
-  QString s;
-  s += "<b>" % tr("Pad:") % " ";
-  if (const PackagePad* pad = mPad.getLibPackagePad()) {
-    s += *pad->getName();
-  } else {
-    s += "✖";
-  }
-  s += "</b><br>" % tr("Signal:") % " ";
-  if (const ComponentSignalInstance* sig = mPad.getComponentSignalInstance()) {
-    s += *sig->getCompSignal().getName();
-  } else {
-    s += "✖";
-  }
-  s += "<br>" % tr("Net:") % " ";
-  if (const NetSignal* net = mPad.getNetSignal()) {
-    s += *net->getName();
-  } else {
-    s += "✖";
-  }
-  mGraphicsItem->setToolTipText(s);
 }
 
 void BGI_Pad::updateHightlighted(bool selected) noexcept {

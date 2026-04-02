@@ -156,7 +156,6 @@ void SymbolPinGraphicsItem::updateText() noexcept {
   } else {
     text = *mPin->getName();
   }
-  setToolTip(text);
   mNameGraphicsItem->setText(text, true);
 
   // Also update the pin's visibility, despite the misleading method name o_o

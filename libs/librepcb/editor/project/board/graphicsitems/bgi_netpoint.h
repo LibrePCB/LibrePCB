@@ -77,7 +77,6 @@ private:  // Methods
   void updateLayer() noexcept;
   void updatePosition() noexcept;
   void updateDiameter() noexcept;
-  void updateNetSignalName() noexcept;
   void updateVisibility() noexcept;
 
 private:  // Data

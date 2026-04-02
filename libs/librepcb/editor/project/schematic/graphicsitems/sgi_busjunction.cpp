@@ -60,7 +60,6 @@ SGI_BusJunction::SGI_BusJunction(SI_BusJunction& netpoint,
 
   updatePosition();
   updateJunction();
-  updateToolTip();
 
   mBusJunction.onEdited.attach(mOnEditedSlot);
 }
@@ -108,7 +107,6 @@ void SGI_BusJunction::busJunctionEdited(const SI_BusJunction& obj,
       updateJunction();
       break;
     case SI_BusJunction::Event::BusNameChanged:
-      updateToolTip();
       break;
     default:
       qWarning()
@@ -130,10 +128,6 @@ void SGI_BusJunction::updateJunction() noexcept {
                 ? SchematicGraphicsScene::ZValue_VisibleBusJunctions
                 : SchematicGraphicsScene::ZValue_HiddenBusJunctions);
   update();
-}
-
-void SGI_BusJunction::updateToolTip() noexcept {
-  setToolTip(*mBusJunction.getBusSegment().getBus().getName());
 }
 
 /*******************************************************************************

@@ -58,7 +58,6 @@ SGI_NetLine::SGI_NetLine(SI_NetLine& netline, const GraphicsLayerList& layers,
   setZValue(SchematicGraphicsScene::ZValue_NetLines);
 
   updatePositions();
-  updateNetSignalName();
 
   mNetLine.onEdited.attach(mOnNetLineEditedSlot);
 }
@@ -106,7 +105,6 @@ void SGI_NetLine::netLineEdited(const SI_NetLine& obj,
       updatePositions();
       break;
     case SI_NetLine::Event::NetSignalNameChanged:
-      updateNetSignalName();
       break;
     default:
       qWarning() << "Unhandled switch-case in SGI_NetLine::netLineEdited():"
@@ -129,10 +127,6 @@ void SGI_NetLine::updatePositions() noexcept {
   mShape = Toolbox::shapeFromPath(mShape, QPen(Qt::SolidPattern, 0), QBrush(),
                                   mNetLine.getWidth());
   update();
-}
-
-void SGI_NetLine::updateNetSignalName() noexcept {
-  setToolTip(*mNetLine.getNetSegment().getNetSignal().getName());
 }
 
 /*******************************************************************************
