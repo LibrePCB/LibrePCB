@@ -113,6 +113,37 @@ void BoardSelectionQuery::addDeviceInstancesOfSelectedFootprints() noexcept {
   }
 }
 
+QSet<BI_Device*>
+    BoardSelectionQuery::addDeviceInstancesAndTextsOfSelectedPads() noexcept {
+  QSet<BI_Device*> devices;
+  for (auto it = mScene.getPads().begin(); it != mScene.getPads().end(); it++) {
+    BI_Device* dev = it.key()->getDevice();
+    if (dev && it.value()->isSelected() &&
+        ((!dev->isLocked()) || mIncludeLockedItems)) {
+      devices.insert(dev);
+    }
+  }
+  mResultDeviceInstances |= devices;
+  for (auto it = mScene.getStrokeTexts().begin();
+       it != mScene.getStrokeTexts().end(); it++) {
+    BI_Device* dev = it.key()->getDevice();
+    if (dev && devices.contains(dev) &&
+        ((!it.key()->getData().isLocked()) || mIncludeLockedItems)) {
+      mResultStrokeTexts.insert(it.key());
+    }
+  }
+  return devices;
+}
+
+void BoardSelectionQuery::addSelectedFootprintPads() noexcept {
+  for (auto it = mScene.getPads().begin(); it != mScene.getPads().end(); it++) {
+    if ((it.key()->getDevice()) && it.value()->isSelected() &&
+        ((!it.key()->getProperties().isLocked()) || mIncludeLockedItems)) {
+      mResultPads.insert(it.key());
+    }
+  }
+}
+
 void BoardSelectionQuery::addSelectedBoardPads() noexcept {
   for (auto it = mScene.getPads().begin(); it != mScene.getPads().end(); it++) {
     if ((!it.key()->getDevice()) && it.value()->isSelected() &&

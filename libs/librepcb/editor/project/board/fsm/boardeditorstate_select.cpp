@@ -464,6 +464,7 @@ bool BoardEditorState_Select::processEditProperties() noexcept {
 
   BoardSelectionQuery query(*scene, true);
   query.addDeviceInstancesOfSelectedFootprints();
+  query.addDeviceInstancesAndTextsOfSelectedPads();
   query.addSelectedBoardPads();
   query.addSelectedVias();
   query.addSelectedPlanes();
@@ -522,9 +523,13 @@ bool BoardEditorState_Select::processGraphicsSceneMouseMoved(
   if (!scene) return false;
 
   if (mSelectedItemsDragCommand) {
+    // If any individual footprint pads were selected, expand the selection
+    // to their devices now to allow dragging devices by their pads.
+    if (mSelectedItemsDragCommand->selectDevicesOfPads()) {
+      scheduleUpdateAvailableFeatures();
+    }
     // Move selected elements to cursor position
-    Point pos = e.scenePos;
-    mSelectedItemsDragCommand->setCurrentPosition(pos);
+    mSelectedItemsDragCommand->setCurrentPosition(e.scenePos);
     return true;
   } else if (mSelectedPolygon && mCmdPolygonEdit) {
     // Move polygon vertices
@@ -608,9 +613,14 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
       return true;
     } else {
       // handle items selection
-      QList<std::shared_ptr<QGraphicsItem>> items = findItemsAtPos(
-          e.scenePos,
-          FindFlag::All | FindFlag::DevicesOfPads | FindFlag::AcceptNearMatch);
+      FindFlags findFlags = FindFlag::All | FindFlag::AcceptNearMatch;
+      if (e.modifiers.testAnyFlags(Qt::ControlModifier)) {
+        // For multi-selection, individual pads make no sense, so we select
+        // their device.
+        findFlags |= FindFlag::DevicesOfPads;
+      }
+      QList<std::shared_ptr<QGraphicsItem>> items =
+          findItemsAtPos(e.scenePos, findFlags);
       if (items.isEmpty()) {
         // no items under mouse --> start drawing a selection rectangle
         scene->clearSelection();
@@ -731,6 +741,10 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonDoubleClicked(
         FindFlag::All | FindFlag::DevicesOfPads | FindFlag::AcceptNearMatch);
     foreach (auto item, items) {
       if (item->isSelected() && openPropertiesDialog(item)) {
+        return true;
+      } else if (auto devItem = std::dynamic_pointer_cast<BGI_Device>(item)) {
+        // Select the device by double-clicking on one of its pads.
+        devItem->setSelected(true);
         return true;
       }
     }
@@ -2011,13 +2025,6 @@ void BoardEditorState_Select::updateAvailableFeatures() noexcept {
     if (!query.getDeviceInstances().isEmpty()) {
       *features |= BoardEditorFsmAdapter::Feature::ResetTexts;
     }
-    if ((!query.getDeviceInstances().isEmpty()) ||
-        (!query.getPads().isEmpty()) || (!query.getVias().isEmpty()) ||
-        (!query.getPlanes().isEmpty()) || (!query.getZones().isEmpty()) ||
-        (!query.getPolygons().isEmpty()) ||
-        (!query.getStrokeTexts().isEmpty()) || (!query.getHoles().isEmpty())) {
-      *features |= BoardEditorFsmAdapter::Feature::Properties;
-    }
     if (!query.getNetLines().isEmpty()) {
       *features |= BoardEditorFsmAdapter::Feature::ModifyLineWidth;
     }
@@ -2132,6 +2139,16 @@ void BoardEditorState_Select::updateAvailableFeatures() noexcept {
       } else {
         *features |= BoardEditorFsmAdapter::Feature::Lock;
       }
+    }
+    // Individual footprint pads cannot be modified, but must be selectable
+    // for editing properties of their device, and for showing the info box.
+    query.addSelectedFootprintPads();
+    if ((!query.getDeviceInstances().isEmpty()) ||
+        (!query.getPads().isEmpty()) || (!query.getVias().isEmpty()) ||
+        (!query.getPlanes().isEmpty()) || (!query.getZones().isEmpty()) ||
+        (!query.getPolygons().isEmpty()) ||
+        (!query.getStrokeTexts().isEmpty()) || (!query.getHoles().isEmpty())) {
+      *features |= BoardEditorFsmAdapter::Feature::Properties;
     }
     infoText = buildInfoBoxText(query);
   } else {
