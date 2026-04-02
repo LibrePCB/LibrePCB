@@ -143,8 +143,8 @@ void PrimitiveCircleGraphicsItem::layerEdited(
   switch (event) {
     case GraphicsLayer::Event::ColorChanged:
     case GraphicsLayer::Event::HighlightColorChanged:
+    case GraphicsLayer::Event::AvailableChanged:
     case GraphicsLayer::Event::VisibleChanged:
-    case GraphicsLayer::Event::EnabledChanged:
       updateColors();
       updateVisibility();
       break;

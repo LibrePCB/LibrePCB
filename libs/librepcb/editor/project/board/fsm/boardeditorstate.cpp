@@ -134,7 +134,7 @@ QSet<const Layer*> BoardEditorState::getAllowedGeometryLayers() noexcept {
 
 void BoardEditorState::makeLayerVisible(const QString& layer) noexcept {
   if (std::shared_ptr<GraphicsLayer> l = mContext.layers.get(layer)) {
-    if (l->isEnabled()) {
+    if (l->isAvailable()) {
       l->setVisible(true);
     }
   }

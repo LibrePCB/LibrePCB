@@ -218,8 +218,8 @@ void BGI_Via::layerEdited(const GraphicsLayer& layer,
     case GraphicsLayer::Event::HighlightColorChanged:
       update();
       break;
+    case GraphicsLayer::Event::AvailableChanged:
     case GraphicsLayer::Event::VisibleChanged:
-    case GraphicsLayer::Event::EnabledChanged:
       updateVisibility();
       update();
       break;

@@ -183,9 +183,9 @@ Board2dTab::Board2dTab(GuiApplication& app, BoardEditor& editor,
   Q_ASSERT(&mBoard.getProject() == &mProject);
 
   // Load/store layers visibility.
-  updateEnabledCopperLayers();
+  updateAvailableCopperLayers();
   connect(&mBoard, &Board::innerLayerCountChanged, this,
-          &Board2dTab::updateEnabledCopperLayers);
+          &Board2dTab::updateAvailableCopperLayers);
   loadLayersVisibility();
   connect(&mProjectEditor, &ProjectEditor::projectAboutToBeSaved, this,
           &Board2dTab::storeLayersVisibility);
@@ -1833,10 +1833,10 @@ void Board2dTab::fsmToolEnter(BoardEditorState_Measure& state) noexcept {
  *  Private Methods
  ******************************************************************************/
 
-void Board2dTab::updateEnabledCopperLayers() noexcept {
+void Board2dTab::updateAvailableCopperLayers() noexcept {
   foreach (const Layer* layer, Layer::innerCopper()) {
     if (std::shared_ptr<GraphicsLayer> gLayer = mLayers->get(*layer)) {
-      gLayer->setEnabled(mBoard.getCopperLayers().contains(layer));
+      gLayer->setAvailable(mBoard.getCopperLayers().contains(layer));
     }
   }
 }
@@ -1852,7 +1852,7 @@ void Board2dTab::loadLayersVisibility() noexcept {
 void Board2dTab::storeLayersVisibility() noexcept {
   QMap<QString, bool> visibility;
   foreach (std::shared_ptr<GraphicsLayer> layer, mLayers->all()) {
-    if (layer->isEnabled()) {
+    if (layer->isAvailable()) {
       visibility[layer->getName()] = layer->isVisible();
     }
   }

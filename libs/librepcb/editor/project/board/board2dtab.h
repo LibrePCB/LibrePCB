@@ -202,7 +202,7 @@ signals:
   void autoAddPlaneRequested();
 
 private:
-  void updateEnabledCopperLayers() noexcept;
+  void updateAvailableCopperLayers() noexcept;
   void loadLayersVisibility() noexcept;
   void storeLayersVisibility() noexcept;
   void updateMessages() noexcept;

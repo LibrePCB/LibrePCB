@@ -58,8 +58,8 @@ public:
   enum class Event {
     ColorChanged,
     HighlightColorChanged,
+    AvailableChanged,
     VisibleChanged,
-    EnabledChanged,
   };
   Signal<GraphicsLayer, Event> onEdited;
   typedef Slot<GraphicsLayer, Event> OnEditedSlot;
@@ -78,15 +78,15 @@ public:
   const QColor& getColor(bool highlighted = false) const noexcept {
     return highlighted ? mColorHighlighted : mColor;
   }
+  bool isAvailable() const noexcept { return mIsAvailable; }
   bool getVisible() const noexcept { return mIsVisible; }
-  bool isEnabled() const noexcept { return mIsEnabled; }
-  bool isVisible() const noexcept { return mIsEnabled && mIsVisible; }
+  bool isVisible() const noexcept { return mIsAvailable && mIsVisible; }
 
   // Setters
   void setColor(const QColor& color) noexcept;
   void setColorHighlighted(const QColor& color) noexcept;
+  void setAvailable(bool enable) noexcept;
   void setVisible(bool visible) noexcept;
-  void setEnabled(bool enable) noexcept;
 
   // Operator Overloadings
   GraphicsLayer& operator=(const GraphicsLayer& rhs) = delete;
@@ -96,8 +96,8 @@ protected:  // Data
   const QString mNameTr;  ///< Translated layer name as shown in the GUI
   QColor mColor;  ///< Color of graphics items
   QColor mColorHighlighted;  ///< Color of highlighted graphics items
+  bool mIsAvailable;  ///< Availability of the layer itself
   bool mIsVisible;  ///< Visibility of graphics items on that layer
-  bool mIsEnabled;  ///< Availability of the layer itself
 };
 
 /*******************************************************************************

@@ -181,9 +181,9 @@ void PrimitiveTextGraphicsItem::layerEdited(
       mPenHighlighted.setColor(layer.getColor(true));
       update();
       break;
+    case GraphicsLayer::Event::AvailableChanged:
     case GraphicsLayer::Event::VisibleChanged:
-    case GraphicsLayer::Event::EnabledChanged:
-      setVisible(layer.isVisible() && layer.isEnabled());
+      setVisible(layer.isVisible() && layer.isAvailable());
       break;
     default:
       qWarning() << "Unhandled switch-case in "

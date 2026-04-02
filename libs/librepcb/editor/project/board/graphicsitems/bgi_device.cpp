@@ -179,8 +179,8 @@ void BGI_Device::layerEdited(const GraphicsLayer& layer,
     case GraphicsLayer::Event::ColorChanged:
     case GraphicsLayer::Event::HighlightColorChanged:
       break;
+    case GraphicsLayer::Event::AvailableChanged:
     case GraphicsLayer::Event::VisibleChanged:
-    case GraphicsLayer::Event::EnabledChanged:
       prepareGeometryChange();
       break;
     default:

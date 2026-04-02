@@ -140,8 +140,8 @@ void BGI_NetLine::layerEdited(const GraphicsLayer& layer,
     case GraphicsLayer::Event::HighlightColorChanged:
       update();
       break;
+    case GraphicsLayer::Event::AvailableChanged:
     case GraphicsLayer::Event::VisibleChanged:
-    case GraphicsLayer::Event::EnabledChanged:
       updateVisibility();
       break;
     default:

@@ -237,8 +237,8 @@ void PrimitiveFootprintPadGraphicsItem::layerEdited(
     const GraphicsLayer& layer, GraphicsLayer::Event event) noexcept {
   Q_UNUSED(layer);
   switch (event) {
+    case GraphicsLayer::Event::AvailableChanged:
     case GraphicsLayer::Event::VisibleChanged:
-    case GraphicsLayer::Event::EnabledChanged:
       updatePathLayers();
       break;
     default:

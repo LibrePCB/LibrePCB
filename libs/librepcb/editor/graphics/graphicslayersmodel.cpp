@@ -106,7 +106,7 @@ void GraphicsLayersModel::onEdited(const GraphicsLayer& layer,
       break;
     }
 
-    case GraphicsLayer::Event::EnabledChanged: {
+    case GraphicsLayer::Event::AvailableChanged: {
       mDelayTimer.start(50);
       break;
     }
@@ -123,7 +123,7 @@ void GraphicsLayersModel::updateEnabledLayers() noexcept {
   mEnabledLayers.clear();
   if (mList) {
     for (auto layer : mList->all()) {
-      if (layer->isEnabled()) {
+      if (layer->isAvailable()) {
         mIndices[layer.get()] = mEnabledLayers.count();
         mEnabledLayers.append(layer);
       }
