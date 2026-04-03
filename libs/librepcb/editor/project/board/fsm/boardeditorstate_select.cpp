@@ -83,7 +83,9 @@
 #include <librepcb/core/project/board/items/bi_stroketext.h>
 #include <librepcb/core/project/board/items/bi_via.h>
 #include <librepcb/core/project/board/items/bi_zone.h>
+#include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/circuit/componentinstance.h>
+#include <librepcb/core/project/circuit/componentsignalinstance.h>
 #include <librepcb/core/project/circuit/netclass.h>
 #include <librepcb/core/project/circuit/netsignal.h>
 #include <librepcb/core/project/project.h>
@@ -97,6 +99,8 @@
 
 #include <QtCore>
 #include <QtWidgets>
+
+#include <algorithm>
 
 /*******************************************************************************
  *  Namespace
@@ -464,6 +468,7 @@ bool BoardEditorState_Select::processEditProperties() noexcept {
 
   BoardSelectionQuery query(*scene, true);
   query.addDeviceInstancesOfSelectedFootprints();
+  query.addDeviceInstancesAndTextsOfSelectedPads();
   query.addSelectedBoardPads();
   query.addSelectedVias();
   query.addSelectedPlanes();
@@ -522,9 +527,13 @@ bool BoardEditorState_Select::processGraphicsSceneMouseMoved(
   if (!scene) return false;
 
   if (mSelectedItemsDragCommand) {
+    // If any individual footprint pads were selected, expand the selection
+    // to their devices now to allow dragging devices by their pads.
+    if (mSelectedItemsDragCommand->selectDevicesOfPads()) {
+      scheduleUpdateAvailableFeatures();
+    }
     // Move selected elements to cursor position
-    Point pos = e.scenePos;
-    mSelectedItemsDragCommand->setCurrentPosition(pos);
+    mSelectedItemsDragCommand->setCurrentPosition(e.scenePos);
     return true;
   } else if (mSelectedPolygon && mCmdPolygonEdit) {
     // Move polygon vertices
@@ -608,9 +617,14 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
       return true;
     } else {
       // handle items selection
-      QList<std::shared_ptr<QGraphicsItem>> items = findItemsAtPos(
-          e.scenePos,
-          FindFlag::All | FindFlag::DevicesOfPads | FindFlag::AcceptNearMatch);
+      FindFlags findFlags = FindFlag::All | FindFlag::AcceptNearMatch;
+      if (e.modifiers.testAnyFlags(Qt::ControlModifier)) {
+        // For multi-selection, individual pads make no sense, so we select
+        // their device.
+        findFlags |= FindFlag::DevicesOfPads;
+      }
+      QList<std::shared_ptr<QGraphicsItem>> items =
+          findItemsAtPos(e.scenePos, findFlags);
       if (items.isEmpty()) {
         // no items under mouse --> start drawing a selection rectangle
         scene->clearSelection();
@@ -731,6 +745,10 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonDoubleClicked(
         FindFlag::All | FindFlag::DevicesOfPads | FindFlag::AcceptNearMatch);
     foreach (auto item, items) {
       if (item->isSelected() && openPropertiesDialog(item)) {
+        return true;
+      } else if (auto devItem = std::dynamic_pointer_cast<BGI_Device>(item)) {
+        // Select the device by double-clicking on one of its pads.
+        devItem->setSelected(true);
         return true;
       }
     }
@@ -2011,13 +2029,6 @@ void BoardEditorState_Select::updateAvailableFeatures() noexcept {
     if (!query.getDeviceInstances().isEmpty()) {
       *features |= BoardEditorFsmAdapter::Feature::ResetTexts;
     }
-    if ((!query.getDeviceInstances().isEmpty()) ||
-        (!query.getPads().isEmpty()) || (!query.getVias().isEmpty()) ||
-        (!query.getPlanes().isEmpty()) || (!query.getZones().isEmpty()) ||
-        (!query.getPolygons().isEmpty()) ||
-        (!query.getStrokeTexts().isEmpty()) || (!query.getHoles().isEmpty())) {
-      *features |= BoardEditorFsmAdapter::Feature::Properties;
-    }
     if (!query.getNetLines().isEmpty()) {
       *features |= BoardEditorFsmAdapter::Feature::ModifyLineWidth;
     }
@@ -2133,6 +2144,16 @@ void BoardEditorState_Select::updateAvailableFeatures() noexcept {
         *features |= BoardEditorFsmAdapter::Feature::Lock;
       }
     }
+    // Individual footprint pads cannot be modified, but must be selectable
+    // for editing properties of their device, and for showing the info box.
+    query.addSelectedFootprintPads();
+    if ((!query.getDeviceInstances().isEmpty()) ||
+        (!query.getPads().isEmpty()) || (!query.getVias().isEmpty()) ||
+        (!query.getPlanes().isEmpty()) || (!query.getZones().isEmpty()) ||
+        (!query.getPolygons().isEmpty()) ||
+        (!query.getStrokeTexts().isEmpty()) || (!query.getHoles().isEmpty())) {
+      *features |= BoardEditorFsmAdapter::Feature::Properties;
+    }
     infoText = buildInfoBoxText(query);
   } else {
     // Do not update features in other states.
@@ -2143,95 +2164,279 @@ void BoardEditorState_Select::updateAvailableFeatures() noexcept {
   mAdapter.fsmSetViewInfoBoxText(infoText);
 }
 
+template <typename T>
+struct InfoBoxValue {
+  void add(T v) noexcept {
+    if (value && (value != v)) {
+      value = std::nullopt;
+      multiple = true;
+    } else {
+      value = v;
+    }
+  }
+  void setMultiple() noexcept { multiple = true; }
+  bool hasMultiple() const noexcept { return multiple; }
+  std::optional<T> get() const noexcept {
+    return (!multiple) ? value : std::nullopt;
+  }
+
+private:
+  std::optional<T> value;
+  bool multiple = false;
+};
+
 QString BoardEditorState_Select::buildInfoBoxText(
     const BoardSelectionQuery& query) const noexcept {
-  const int count = query.getDeviceInstances().count() +
-      query.getVias().count() + query.getPads().count() +
-      query.getNetLines().count() + query.getPlanes().count();
-  if ((count == 0) || (count > 50)) {
+  const int totalCount = query.getResultCount();
+  if (totalCount == 0) {
     return QString();
   }
 
-  struct AttributeSet {
-    QString name;
-    QSet<QString> values;
-  };
-  AttributeSet nets{tr("Net"), {}};
-  AttributeSet netClasses{tr("Class"), {}};
-  AttributeSet layers{tr("Layer"), {}};
-  AttributeSet names{tr("Name"), {}};
-  AttributeSet values{tr("Value"), {}};
-  AttributeSet packages{tr("Package"), {}};
-  for (const BI_Pad* pad : query.getPads()) {
-    const BI_NetSegment* ns = pad->getNetSegment();
-    if (!ns) continue;
-    if (const NetSignal* net = ns->getNetSignal()) {
-      nets.values.insert(*net->getName());
-      netClasses.values.insert(*net->getNetClass().getName());
-    } else {
-      nets.values.insert("✖");
-      netClasses.values.insert("✖");
+  // Collect selected objects. Generally, accept only a single kind of object
+  // to be selected, except for cases where this is not good enough.
+  const BI_Device* device = nullptr;
+  const BI_Pad* pad = nullptr;
+  InfoBoxValue<const NetSignal*> net;
+  InfoBoxValue<const Layer*> layer;
+  InfoBoxValue<std::pair<const Layer*, const Layer*>> layerSpan;  // Via
+  InfoBoxValue<Length> height;  // Text height
+  InfoBoxValue<Length> width;  // Trace, polygon line, text stroke
+  InfoBoxValue<Length> drill;  // Hole, via drill
+  InfoBoxValue<Length> size;  // Via size
+  std::optional<Point> position;
+  if (!query.getDeviceInstances().isEmpty()) {
+    // Devices have priority - any other objects are ignored.
+    if (query.getDeviceInstances().count() == 1) {
+      device = *query.getDeviceInstances().begin();
+      position = device->getPosition();
     }
-    if (!pad->getProperties().isTht()) {
-      layers.values.insert(pad->getSolderLayer().getNameTr());
+  } else if (query.getPads().count() == totalCount) {
+    // Only pads selected.
+    if (query.getPads().count() == 1) {
+      pad = *query.getPads().begin();
+      position = pad->getPosition();
+      // Note: Not adding net since we want to have a specific order.
+      // Note: Not adding layer since it seems obvious and thus unnecessary.
     }
-  }
-  for (const BI_Via* via : query.getVias()) {
-    if (const NetSignal* net = via->getNetSegment().getNetSignal()) {
-      nets.values.insert(*net->getName());
-      netClasses.values.insert(*net->getNetClass().getName());
-    } else {
-      nets.values.insert("✖");
-      netClasses.values.insert("✖");
+  } else if (query.getHoles().count() == totalCount) {
+    // Only holes selected.
+    for (const BI_Hole* hole : query.getHoles()) {
+      drill.add(*hole->getData().getDiameter());
+      if (drill.hasMultiple()) break;
     }
-  }
-  for (const BI_NetLine* nl : query.getNetLines()) {
-    if (const NetSignal* net = nl->getNetSegment().getNetSignal()) {
-      nets.values.insert(*net->getName());
-      netClasses.values.insert(*net->getNetClass().getName());
-    } else {
-      nets.values.insert("✖");
-      netClasses.values.insert("✖");
+    if (query.getHoles().count() == 1) {
+      const QVector<Vertex>& vertices =
+          (*query.getHoles().begin())->getData().getPath()->getVertices();
+      if (vertices.count() == 1) {
+        position = vertices.first().getPos();
+      }
     }
-    layers.values.insert(nl->getLayer().getNameTr());
-  }
-  for (const BI_Plane* plane : query.getPlanes()) {
-    if (const NetSignal* net = plane->getNetSignal()) {
-      nets.values.insert(*net->getName());
-      netClasses.values.insert(*net->getNetClass().getName());
-    } else {
-      nets.values.insert("✖");
-      netClasses.values.insert("✖");
+  } else if (query.getStrokeTexts().count() == totalCount) {
+    // Only stroke texts selected.
+    for (const BI_StrokeText* text : query.getStrokeTexts()) {
+      layer.add(&text->getData().getLayer());
+      height.add(*text->getData().getHeight());
+      width.add(*text->getData().getStrokeWidth());
+      if (layer.hasMultiple() && height.hasMultiple() && width.hasMultiple()) {
+        break;
+      }
     }
-    layers.values.insert(plane->getLayer().getNameTr());
-  }
-  for (const BI_Device* dev : query.getDeviceInstances()) {
-    names.values.insert(*dev->getComponentInstance().getName());
-    values.values.insert(
-        AttributeSubstitutor::substitute(
-            dev->getComponentInstance().getValue(),
-            ProjectAttributeLookup(*dev, dev->getParts(std::nullopt).value(0)))
-            .replace("\n", " "));
-    packages.values.insert(*dev->getLibPackage().getNames().getDefaultValue());
+  } else if (query.getPolygons().count() == totalCount) {
+    // Only polygons selected.
+    for (const BI_Polygon* polygon : query.getPolygons()) {
+      layer.add(&polygon->getData().getLayer());
+      width.add(*polygon->getData().getLineWidth());
+      if (layer.hasMultiple() && width.hasMultiple()) break;
+    }
+  } else if (query.getVias().count() == totalCount) {
+    // Only vias selected.
+    for (const BI_Via* via : query.getVias()) {
+      net.add(via->getNetSegment().getNetSignal());  // Can be nullptr
+      drill.add(*via->getActualDrillDiameter());
+      size.add(*via->getActualSize());
+      layerSpan.add(std::make_pair(&via->getVia().getStartLayer(),
+                                   &via->getVia().getEndLayer()));
+      if (net.hasMultiple() && size.hasMultiple() && drill.hasMultiple() &&
+          layerSpan.hasMultiple()) {
+        break;
+      }
+    }
+  } else if (query.getNetLines().count() + query.getNetPoints().count() +
+                 query.getPads().count() + query.getPlanes().count() +
+                 query.getVias().count() ==
+             totalCount) {
+    // A mix of net elements are selected. Find their common properties.
+    if (!query.getVias().isEmpty()) {
+      layer.setMultiple();
+    }
+    for (const BI_Via* via : query.getVias()) {
+      if (net.hasMultiple()) break;
+      net.add(via->getNetSegment().getNetSignal());  // Can be nullptr
+    }
+    for (const BI_Plane* plane : query.getPlanes()) {
+      if (net.hasMultiple() && layer.hasMultiple()) break;
+      net.add(plane->getNetSignal());  // Can be nullptr
+      layer.add(&plane->getLayer());
+    }
+    for (const BI_Pad* pad : query.getPads()) {
+      if (net.hasMultiple() && layer.hasMultiple()) break;
+      net.add(pad->getNetSignal());  // Can be nullptr
+      if (!pad->getProperties().isTht()) {
+        layer.add(&pad->getSolderLayer());
+      } else {
+        layer.setMultiple();
+      }
+    }
+    for (const BI_NetLine* nl : query.getNetLines()) {
+      if (net.hasMultiple() && layer.hasMultiple() && width.hasMultiple()) {
+        break;
+      }
+      net.add(nl->getNetSegment().getNetSignal());  // Can be nullptr
+      layer.add(&nl->getLayer());
+      width.add(*nl->getWidth());
+    }
   }
 
-  // Determine maximum name length.
-  qsizetype maxNameLen = 0U;
-  QVector<const AttributeSet*> attributes;
-  for (const AttributeSet* set :
-       {&nets, &netClasses, &layers, &names, &values, &packages}) {
-    if (set->values.count() == 1) {
-      attributes.append(set);
-      maxNameLen = std::max(maxNameLen, set->name.length());
+  // Build key/value pairs for selected objects.
+  QVector<std::pair<QString, QString>> keyValues;
+  const LengthUnit& unit = getLengthUnit();
+  auto formatLength = [&unit](const Length& l) {
+    return Toolbox::floatToString(unit.convertToUnit(l),
+                                  unit.getReasonableNumberOfDecimals() + 1,
+                                  QLocale());
+  };
+  auto appendNet = [&](const std::optional<const NetSignal*>& v) {
+    keyValues.append(std::make_pair(tr("Net"), (*v) ? *(*v)->getName() : "✖"));
+    if ((*v) && (mContext.project.getCircuit().getNetClasses().count() > 1)) {
+      keyValues.append(
+          std::make_pair(tr("Class"), *(*v)->getNetClass().getName()));
     }
+  };
+  if (device) {
+    const ComponentInstance& cmp = device->getComponentInstance();
+    std::shared_ptr<const Part> part = device->getParts(std::nullopt).value(0);
+    ProjectAttributeLookup lookup(*device, part);
+    const QString value =
+        AttributeSubstitutor::substitute(cmp.getValue(), lookup).simplified();
+    QString mpn = "✖";
+    if (auto ao = cmp.getAssemblyOptions().value(0)) {
+      if (auto part = ao->getParts().value(0)) {
+        mpn = *part->getMpn();
+      }
+    }
+    keyValues.append(std::make_pair(tr("Name"), *cmp.getName()));
+    const QString valueKey = tr("Value");
+    const QString mpnKey = tr("MPN");
+    if (value == mpn) {
+      keyValues.append(std::make_pair(valueKey % "/" % mpnKey, value));
+    } else {
+      keyValues.append(std::make_pair(valueKey, value));
+      keyValues.append(std::make_pair(mpnKey, mpn));
+    }
+    keyValues.append(std::make_pair(
+        tr("Package"), *device->getLibPackage().getNames().getDefaultValue()));
+  }
+  if (pad) {
+    if (const PackagePad* pkgPad = pad->getLibPackagePad()) {
+      keyValues.append(std::make_pair(tr("Pad"), *pkgPad->getName()));
+    }
+    if (const ComponentSignalInstance* s = pad->getComponentSignalInstance()) {
+      keyValues.append(
+          std::make_pair(tr("Signal"), *s->getCompSignal().getName()));
+    }
+    appendNet(pad->getNetSignal());
+    if (pad->getProperties().getShape() != FootprintPad::Shape::Custom) {
+      keyValues.append(std::make_pair(
+          tr("Size"),
+          QString("%1 x %2 %3")
+              .arg(formatLength(*pad->getProperties().getWidth()))
+              .arg(formatLength(*pad->getProperties().getHeight()))
+              .arg(unit.toShortStringTr())));
+    }
+    if (pad->getProperties().getHoles().count() == 1) {
+      auto hole = pad->getProperties().getHoles().at(0);
+      if (hole->isSlot() && (!hole->isMultiSegmentSlot()) &&
+          (!hole->isCurvedSlot())) {
+        const Length length =
+            *hole->getDiameter() + *hole->getPath()->getTotalStraightLength();
+        keyValues.append(
+            std::make_pair(tr("Slot"),
+                           QString("%1 x %2 %3")
+                               .arg(formatLength(*hole->getDiameter()))
+                               .arg(formatLength(length))
+                               .arg(unit.toShortStringTr())));
+      } else {
+        keyValues.append(
+            std::make_pair(tr("Drill"),
+                           QString("%1 %2")
+                               .arg(formatLength(*hole->getDiameter()))
+                               .arg(unit.toShortStringTr())));
+      }
+    }
+  }
+  if (auto v = net.get()) {
+    appendNet(v);
+  }
+  if (auto v = layer.get()) {
+    if (*v) {
+      keyValues.append(std::make_pair(tr("Layer"), (*v)->getNameTr()));
+    }
+  }
+  if (auto v = height.get()) {
+    keyValues.append(std::make_pair(
+        tr("Height"),
+        QString("%1 %2").arg(formatLength(*v)).arg(unit.toShortStringTr())));
+  }
+  if (auto v = width.get()) {
+    keyValues.append(std::make_pair(
+        tr("Width"),
+        QString("%1 %2").arg(formatLength(*v)).arg(unit.toShortStringTr())));
+  }
+  if (auto v = drill.get()) {
+    keyValues.append(std::make_pair(
+        tr("Drill"),
+        QString("%1 %2").arg(formatLength(*v)).arg(unit.toShortStringTr())));
+  }
+  if (auto v = size.get()) {
+    keyValues.append(std::make_pair(
+        tr("Size"),
+        QString("%1 %2").arg(formatLength(*v)).arg(unit.toShortStringTr())));
+  }
+  if (auto v = layerSpan.get()) {
+    if ((v->first != &Layer::topCopper()) ||
+        (v->second != &Layer::botCopper())) {
+      keyValues.append(
+          std::make_pair(tr("Start Layer"), v->first->getNameTr()));
+      keyValues.append(std::make_pair(tr("End Layer"), v->second->getNameTr()));
+    }
+  }
+  if (position) {
+    keyValues.append(std::make_pair(tr("Position"),
+                                    QString("%1, %2 %3")
+                                        .arg(formatLength(position->getX()))
+                                        .arg(formatLength(position->getY()))
+                                        .arg(unit.toShortStringTr())));
+  }
+
+  // Remove keys with empty values.
+  keyValues.erase(std::remove_if(keyValues.begin(), keyValues.end(),
+                                 [](const std::pair<QString, QString>& item) {
+                                   return item.second.isEmpty();
+                                 }),
+                  keyValues.end());
+
+  // Determine maximum key length.
+  qsizetype maxKeyLen = 0U;
+  for (const auto& item : keyValues) {
+    maxKeyLen = std::max(maxKeyLen, item.first.length());
   }
 
   // Build string.
   QStringList lines;
-  for (const AttributeSet* set : attributes) {
-    lines.append(set->name % ": " %
-                 QString(" ").repeated(maxNameLen - set->name.length()) %
-                 *set->values.begin());
+  for (const auto& item : keyValues) {
+    lines.append(item.first % ": " %
+                 QString(" ").repeated(maxKeyLen - item.first.length()) %
+                 item.second);
   }
   return lines.join("\n");
 }

@@ -80,7 +80,6 @@ private:  // Methods
                    GraphicsLayer::Event event) noexcept;
   void updateLine() noexcept;
   void updateLayer() noexcept;
-  void updateNetSignalName() noexcept;
   void updateVisibility() noexcept;
 
 private:  // Data

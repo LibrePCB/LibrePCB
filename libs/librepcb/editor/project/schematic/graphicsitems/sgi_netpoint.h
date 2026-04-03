@@ -75,7 +75,6 @@ private:  // Methods
                       SI_NetPoint::Event event) noexcept;
   void updatePosition() noexcept;
   void updateJunction() noexcept;
-  void updateNetName() noexcept;
 
 private:  // Data
   SI_NetPoint& mNetPoint;

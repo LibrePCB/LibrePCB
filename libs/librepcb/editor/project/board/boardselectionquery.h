@@ -111,7 +111,9 @@ public:
 
   // General Methods
   void addDeviceInstancesOfSelectedFootprints() noexcept;
+  QSet<BI_Device*> addDeviceInstancesAndTextsOfSelectedPads() noexcept;
   void addSelectedVias() noexcept;
+  void addSelectedFootprintPads() noexcept;
   void addSelectedBoardPads() noexcept;
   void addSelectedNetPoints() noexcept;
   void addSelectedNetLines() noexcept;

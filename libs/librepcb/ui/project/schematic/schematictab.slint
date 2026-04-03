@@ -11,6 +11,7 @@ import {
     MenuSeparator,
     MessageBox,
     SceneButton,
+    TextInput,
     ToolBar,
     ToolButton,
     ToolButtonGroup,
@@ -85,30 +86,34 @@ export component SchematicTab inherits Tab {
         accessible-role: none;
     }
 
-    // Show overlay, if text is not empty.
-    if !tabs[index].tool-overlay-text.is-empty: Rectangle {
-        x: 2 * toolbuttons-l.x + toolbuttons-l.width;
-        y: toolbuttons-l.y;
-        width: overlay-txt.preferred-width + 2 * overlay-txt.x;
-        height: overlay-txt.preferred-height + 2 * overlay-txt.y;
-        background: Data.theme.control;
-        border-radius: 3px;
-        border-width: 1px;
-        border-color: Data.theme.control-border;
-
-        overlay-txt := Text {
-            x: 6px;
-            y: 6px;
-            horizontal-alignment: left;
-            vertical-alignment: top;
-            font-family: "Noto Sans Mono";
-            color: Data.theme.control-text;
-            text: tabs[index].tool-overlay-text;
-        }
-    }
-
     ta := TouchArea {
         mouse-cursor: tabs[index].tool-cursor;
+
+        // Show overlay, if text is not empty.
+        if !tabs[index].tool-overlay-text.is-empty: Rectangle {
+            x: 2 * toolbuttons-l.x + toolbuttons-l.width;
+            y: toolbuttons-l.y;
+            width: min(self.preferred-width, 0.5 * parent.width);
+            height: self.preferred-height;
+            background: Data.theme.control;
+            border-radius: 3px;
+            border-width: 1px;
+            border-color: Data.theme.control-border;
+            clip: true;
+
+            VerticalLayout {
+                padding: 6px;
+
+                overlay-txt := TextInput {
+                    horizontal-alignment: left;
+                    vertical-alignment: top;
+                    font-family: "Noto Sans Mono";
+                    color: Data.theme.control-text;
+                    text: tabs[index].tool-overlay-text;
+                    read-only: true;
+                }
+            }
+        }
 
         toolbar-r := ToolBar {
             y: -1px;

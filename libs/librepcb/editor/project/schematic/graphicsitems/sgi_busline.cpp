@@ -56,7 +56,6 @@ SGI_BusLine::SGI_BusLine(SI_BusLine& line,
   setZValue(SchematicGraphicsScene::ZValue_Buses);
 
   updatePositions();
-  updateBusName();
 
   mBusLine.onEdited.attach(mOnBusLineEditedSlot);
 }
@@ -102,7 +101,6 @@ void SGI_BusLine::busLineEdited(const SI_BusLine& obj,
       updatePositions();
       break;
     case SI_BusLine::Event::BusNameChanged:
-      updateBusName();
       break;
     default:
       qWarning() << "Unhandled switch-case in SGI_BusLine::busLineEdited():"
@@ -125,10 +123,6 @@ void SGI_BusLine::updatePositions() noexcept {
   mShape = Toolbox::shapeFromPath(mShape, QPen(Qt::SolidPattern, 0), QBrush(),
                                   mBusLine.getWidth());
   update();
-}
-
-void SGI_BusLine::updateBusName() noexcept {
-  setToolTip(*mBusLine.getBusSegment().getBus().getName());
 }
 
 /*******************************************************************************

@@ -68,7 +68,6 @@ SGI_SymbolPin::SGI_SymbolPin(SI_SymbolPin& pin,
   setFlag(QGraphicsItem::ItemHasNoContents, true);
   setFlag(QGraphicsItem::ItemIsSelectable, true);
   setZValue(SchematicGraphicsScene::ZValue_SymbolPins);
-  setToolTip(*mPin.getLibPin().getName());
 
   // Setup circle.
   const UnsignedLength circleDiameter(1200000);
@@ -108,7 +107,6 @@ SGI_SymbolPin::SGI_SymbolPin(SI_SymbolPin& pin,
   updateNumbers();
   updateNumbersPosition();
   updateNumbersAlignment();
-  updateToolTip();
   updateHighlightedState();
 
   // Shape is always a circle.
@@ -170,11 +168,9 @@ void SGI_SymbolPin::pinEdited(const SI_SymbolPin& obj,
       break;
     case SI_SymbolPin::Event::NameChanged:
       updateName();
-      updateToolTip();
       break;
     case SI_SymbolPin::Event::NumbersChanged:
       updateNumbers();
-      updateToolTip();
       break;
     case SI_SymbolPin::Event::NumbersPositionChanged:
       updateNumbersPosition();
@@ -183,7 +179,6 @@ void SGI_SymbolPin::pinEdited(const SI_SymbolPin& obj,
       updateNumbersAlignment();
       break;
     case SI_SymbolPin::Event::NetNameChanged:
-      updateToolTip();
       break;
     default:
       qWarning() << "Unhandled switch-case in SGI_SymbolPin::pinEdited():"
@@ -262,24 +257,6 @@ void SGI_SymbolPin::updateNumbersPosition() noexcept {
 void SGI_SymbolPin::updateNumbersAlignment() noexcept {
   Q_ASSERT(mNumbersGraphicsItem);
   mNumbersGraphicsItem->setAlignment(mPin.getNumbersAlignment());
-}
-
-void SGI_SymbolPin::updateToolTip() noexcept {
-  Q_ASSERT(mCircleGraphicsItem && mNameGraphicsItem && mNumbersGraphicsItem);
-  QString s;
-  s += "<b>" % tr("Signal:") % " ";
-  s += *mPin.getComponentSignalInstance().getCompSignal().getName();
-  s += "</b><br>" % tr("Net:") % " ";
-  if (const NetSignal* net = mPin.getCompSigInstNetSignal()) {
-    s += *net->getName();
-  } else {
-    s += "✖";
-  }
-  s += "<br>" % tr("Pin:") % " " % *mPin.getLibPin().getName();
-  s += "<br>" % tr("Pad(s):") % " " % mPin.getNumbers().join(", ");
-  mCircleGraphicsItem->setToolTip(s);
-  mNameGraphicsItem->setToolTip(s);
-  mNumbersGraphicsItem->setToolTip(s);
 }
 
 /*******************************************************************************

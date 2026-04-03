@@ -24,6 +24,7 @@
 
 #include "../board/boardgraphicsscene.h"
 #include "../board/boardselectionquery.h"
+#include "../board/graphicsitems/bgi_device.h"
 #include "cmdboardholeedit.h"
 #include "cmdboardnetlineedit.h"
 #include "cmdboardnetpointedit.h"
@@ -91,6 +92,11 @@ CmdDragSelectedBoardItems::CmdDragSelectedBoardItems(
   query.addSelectedBoardStrokeTexts();
   query.addSelectedFootprintStrokeTexts();
   query.addSelectedHoles();
+
+  // Expand the selected individual pads to their devices, to allow dragging
+  // the devices (individual footprint pads cannot be dragged). However, the
+  // devices are not selected immediately, but later in selectDevicesOfPads().
+  mAutoSelectedDevices = query.addDeviceInstancesAndTextsOfSelectedPads();
 
   // find the center of all elements and create undo commands
   foreach (BI_Device* device, query.getDeviceInstances()) {
@@ -189,6 +195,15 @@ CmdDragSelectedBoardItems::~CmdDragSelectedBoardItems() noexcept {
 /*******************************************************************************
  *  Getters
  ******************************************************************************/
+
+bool CmdDragSelectedBoardItems::selectDevicesOfPads() noexcept {
+  for (BI_Device* dev : mAutoSelectedDevices) {
+    if (auto item = mScene.getDevices().value(dev)) {
+      item->setSelected(true);
+    }
+  }
+  return !mAutoSelectedDevices.isEmpty();
+}
 
 UnsignedLength CmdDragSelectedBoardItems::getMedianLineWidth() const noexcept {
   QList<UnsignedLength> values;

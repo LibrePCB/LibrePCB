@@ -71,7 +71,6 @@ private:  // Methods
                          SI_BusJunction::Event event) noexcept;
   void updatePosition() noexcept;
   void updateJunction() noexcept;
-  void updateToolTip() noexcept;
 
 private:  // Data
   SI_BusJunction& mBusJunction;

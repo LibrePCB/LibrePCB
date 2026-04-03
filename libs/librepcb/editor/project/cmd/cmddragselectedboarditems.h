@@ -34,6 +34,9 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class BI_Device;
+
 namespace editor {
 
 class BoardGraphicsScene;
@@ -76,6 +79,7 @@ public:
   bool hasStrokeTextsSelected() const noexcept {
     return !mStrokeTextEditCmds.isEmpty();
   }
+  bool selectDevicesOfPads() noexcept;
   UnsignedLength getMedianLineWidth() const noexcept;
 
   // General Methods
@@ -104,6 +108,9 @@ private:
   bool mLockedChanged;
   bool mLineWidthChanged;
   bool mTextsReset;
+
+  /// Auto-selected devices used for #selectDevicesOfPads()
+  QSet<BI_Device*> mAutoSelectedDevices;
 
   // Move commands
   QList<CmdDeviceInstanceEdit*> mDeviceEditCmds;

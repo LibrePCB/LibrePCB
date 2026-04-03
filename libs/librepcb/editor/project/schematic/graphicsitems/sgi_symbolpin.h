@@ -89,7 +89,6 @@ private:  // Methods
   void updateNumbers() noexcept;
   void updateNumbersPosition() noexcept;
   void updateNumbersAlignment() noexcept;
-  void updateToolTip() noexcept;
 
 private:  // Data
   SI_SymbolPin& mPin;

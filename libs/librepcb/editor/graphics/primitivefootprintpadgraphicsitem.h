@@ -71,7 +71,6 @@ public:
   void setMirrored(bool mirrored) noexcept;
   void setText(const QString& text) noexcept;
   void setTextMirrored(bool mirrored) noexcept;
-  void setToolTipText(const QString& text) noexcept;
   void setLayer(const QString& layerName) noexcept;
   void setGeometries(const QHash<const Layer*, QList<PadGeometry>>& geometries,
                      const Length& clearance) noexcept;

@@ -84,7 +84,6 @@ private:  // Methods
                               const QVariant& value) noexcept override;
   void updatePosition() noexcept;
   void updateShapes() noexcept;
-  void updateToolTip() noexcept;
   void updateText() noexcept;
   void updateTextHeight() noexcept;
   void updateVisibility() noexcept;

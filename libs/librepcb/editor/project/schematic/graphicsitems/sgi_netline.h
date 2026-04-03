@@ -74,7 +74,6 @@ public:
 private:  // Methods
   void netLineEdited(const SI_NetLine& obj, SI_NetLine::Event event) noexcept;
   void updatePositions() noexcept;
-  void updateNetSignalName() noexcept;
   std::shared_ptr<GraphicsLayer> getLayer(const QString& name) const noexcept;
 
 private:  // Data

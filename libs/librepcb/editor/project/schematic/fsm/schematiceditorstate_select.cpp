@@ -50,8 +50,11 @@
 #include "../symbolinstancepropertiesdialog.h"
 
 #include <librepcb/core/attribute/attributesubstitutor.h>
+#include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/library/cmp/componentsignal.h>
+#include <librepcb/core/project/board/items/bi_device.h>
 #include <librepcb/core/project/circuit/bus.h>
+#include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/circuit/componentsignalinstance.h>
 #include <librepcb/core/project/circuit/netclass.h>
 #include <librepcb/core/project/circuit/netsignal.h>
@@ -72,6 +75,8 @@
 
 #include <QtCore>
 #include <QtWidgets>
+
+#include <algorithm>
 
 /*******************************************************************************
  *  Namespace
@@ -1250,59 +1255,126 @@ void SchematicEditorState_Select::updateAvailableFeatures() noexcept {
 
 QString SchematicEditorState_Select::buildInfoBoxText(
     const SchematicSelectionQuery& query) const noexcept {
-  const int count = query.getPins().count() + query.getNetLines().count() +
-      query.getBusLines().count();
-  if ((count == 0) || (count > 50)) {
+  if (query.getResultCount() == 0) {
     return QString();
   }
 
-  struct AttributeSet {
-    QString name;
-    QSet<QString> values;
+  const SI_Symbol* symbol = nullptr;
+  const SI_SymbolPin* pin = nullptr;
+  std::optional<const NetSignal*> net;
+  bool multipleNets = false;
+  auto addNet = [&](const NetSignal* n) {
+    if (net && (net != n)) {
+      multipleNets = true;
+    } else {
+      net = n;
+    }
   };
-  AttributeSet cmpSignals{tr("Signal"), {}};
-  AttributeSet nets{tr("Net"), {}};
-  AttributeSet netClasses{tr("Class"), {}};
-  AttributeSet buses{tr("Bus"), {}};
-  AttributeSet pins{tr("Pin"), {}};
-  AttributeSet pads{tr("Pad(s)"), {}};
-  for (const SI_NetLine* nl : query.getNetLines()) {
-    nets.values.insert(*nl->getNetSegment().getNetSignal().getName());
-    netClasses.values.insert(
-        *nl->getNetSegment().getNetSignal().getNetClass().getName());
+  const Bus* bus = nullptr;
+  bool multipleBuses = false;
+  auto addBus = [&](const Bus& b) {
+    if (bus && (bus != &b)) {
+      multipleBuses = true;
+    } else {
+      bus = &b;
+    }
+  };
+
+  // Collect selected objects.
+  if (query.getSymbols().count() == 1) {
+    symbol = *query.getSymbols().begin();
   }
-  for (const SI_BusLine* bl : query.getBusLines()) {
-    buses.values.insert(*bl->getBusSegment().getBus().getName());
+  if (query.getPins().count() == 1) {
+    pin = *query.getPins().begin();
+  }
+  for (const SI_NetLabel* nl : query.getNetLabels()) {
+    if (multipleNets) break;
+    addNet(&nl->getNetSegment().getNetSignal());
+  }
+  for (const SI_NetLine* nl : query.getNetLines()) {
+    if (multipleNets) break;
+    addNet(&nl->getNetSegment().getNetSignal());
   }
   for (const SI_SymbolPin* pin : query.getPins()) {
-    cmpSignals.values.insert(
-        *pin->getComponentSignalInstance().getCompSignal().getName());
-    if (const NetSignal* net = pin->getCompSigInstNetSignal()) {
-      nets.values.insert(*net->getName());
-    } else {
-      nets.values.insert("✖");
-    }
-    pins.values.insert(*pin->getLibPin().getName());
-    pads.values.insert(pin->getNumbers().join(","));
+    if (multipleNets) break;
+    addNet(pin->getCompSigInstNetSignal());  // Can be nullptr
+  }
+  for (const SI_BusLabel* bl : query.getBusLabels()) {
+    if (multipleBuses) break;
+    addBus(bl->getBusSegment().getBus());
+  }
+  for (const SI_BusLine* bl : query.getBusLines()) {
+    if (multipleBuses) break;
+    addBus(bl->getBusSegment().getBus());
   }
 
-  // Determine maximum name length.
-  qsizetype maxNameLen = 0U;
-  QVector<const AttributeSet*> attributes;
-  for (const AttributeSet* set :
-       {&cmpSignals, &nets, &netClasses, &buses, &pins, &pads}) {
-    if (set->values.count() == 1) {
-      attributes.append(set);
-      maxNameLen = std::max(maxNameLen, set->name.length());
+  // Build key/value pairs for selected objects.
+  QVector<std::pair<QString, QString>> keyValues;
+  if (symbol) {
+    const ComponentInstance& cmp = symbol->getComponentInstance();
+    QPointer<const BI_Device> dev = cmp.getPrimaryDevice();
+    if (dev && (!cmp.getLibComponent().isSchematicOnly())) {
+      std::shared_ptr<const Part> part = dev
+          ? dev->getParts(std::nullopt).value(0)
+          : cmp.getParts(std::nullopt).value(0);
+      ProjectAttributeLookup lookup(*symbol, dev, part, nullptr);
+      const QString value =
+          AttributeSubstitutor::substitute(cmp.getValue(), lookup).simplified();
+      QString mpn = "✖";
+      if (auto ao = cmp.getAssemblyOptions().value(0)) {
+        if (auto part = ao->getParts().value(0)) {
+          mpn = *part->getMpn();
+        }
+      }
+      keyValues.append(std::make_pair(tr("Name"), *cmp.getName()));
+      const QString valueKey = tr("Value");
+      const QString mpnKey = tr("MPN");
+      if (value == mpn) {
+        keyValues.append(std::make_pair(valueKey % "/" % mpnKey, value));
+      } else {
+        keyValues.append(std::make_pair(valueKey, value));
+        keyValues.append(std::make_pair(mpnKey, mpn));
+      }
     }
+  }
+  if (net && (!multipleNets)) {
+    keyValues.append(
+        std::make_pair(tr("Net"), (*net) ? *(*net)->getName() : "✖"));
+    if ((*net) && (mContext.project.getCircuit().getNetClasses().count() > 1)) {
+      keyValues.append(
+          std::make_pair(tr("Class"), *(*net)->getNetClass().getName()));
+    }
+  }
+  if (bus && (!multipleBuses)) {
+    keyValues.append(std::make_pair(tr("Bus"), *bus->getName()));
+  }
+  if (pin) {
+    keyValues.append(std::make_pair(
+        tr("Signal"),
+        *pin->getComponentSignalInstance().getCompSignal().getName()));
+    keyValues.append(std::make_pair(tr("Pin"), *pin->getLibPin().getName()));
+    keyValues.append(std::make_pair(tr("Pad(s)"), pin->getNumbers().join(",")));
+  }
+
+  // Remove keys with empty values.
+  keyValues.erase(std::remove_if(keyValues.begin(), keyValues.end(),
+                                 [](const std::pair<QString, QString>& item) {
+                                   return item.second.isEmpty();
+                                 }),
+                  keyValues.end());
+
+  // Determine maximum key length.
+  qsizetype maxKeyLen = 0U;
+  for (const auto& item : keyValues) {
+    maxKeyLen = std::max(maxKeyLen, item.first.length());
   }
 
   // Build string.
   QStringList lines;
-  for (const AttributeSet* set : attributes) {
-    lines.append(set->name % ": " %
-                 QString(" ").repeated(maxNameLen - set->name.length()) %
-                 *set->values.begin());
+  for (const auto& item : keyValues) {
+    lines.append(item.first % ": " %
+                 QString(" ").repeated(maxKeyLen - item.first.length()) %
+                 item.second);
   }
   return lines.join("\n");
 }
