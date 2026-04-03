@@ -71,6 +71,14 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
+      # Workaround for spurious job failures due to Docker error.
+      # https://github.com/actions/runner-images/issues/13729
+      - name: Start Docker Service
+        run: |
+          $dockerState = Get-Service -Name "docker"
+          if ($dockerState.Status -ne "Running") {
+            Start-Service -Name "docker"
+          }
       - name: Start Docker Container
         run: >
           docker run -d -t --name ci -w C:/work
