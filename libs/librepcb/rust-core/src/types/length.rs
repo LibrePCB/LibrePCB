@@ -97,6 +97,34 @@ impl Length {
     }
   }
 
+  /// Round to the next lower (or equal) multiple of another length
+  ///
+  /// # Safety
+  ///
+  /// `multiple` must be > 0 (checked by assert)!
+  pub fn rounded_down_to(&self, multiple: Length) -> Self {
+    let rounded = self.rounded_to(multiple);
+    if rounded > *self {
+      rounded - multiple
+    } else {
+      rounded
+    }
+  }
+
+  /// Round to the next higher (or equal) multiple of another length
+  ///
+  /// # Safety
+  ///
+  /// `multiple` must be > 0 (checked by assert)!
+  pub fn rounded_up_to(&self, multiple: Length) -> Self {
+    let rounded = self.rounded_to(multiple);
+    if rounded < *self {
+      rounded + multiple
+    } else {
+      rounded
+    }
+  }
+
   /// Get as nanometers
   pub fn to_nm(&self) -> i64 {
     self.0
@@ -229,26 +257,28 @@ mod tests {
     assert_eq!(x.to_px(), val);
   }
 
-  create! {rounded_to, (input, multiple, expected), {
-    assert_eq!(l(input).rounded_to(l(multiple)), l(expected));
+  create! {rounded_to, (input, multiple, rounded, lower, upper), {
+    assert_eq!(l(input).rounded_to(l(multiple)), l(rounded));
+    assert_eq!(l(input).rounded_down_to(l(multiple)), l(lower));
+    assert_eq!(l(input).rounded_up_to(l(multiple)), l(upper));
   }}
   rounded_to! {
-    d01: (  0, 10,   0),
-    d02: ( 10,  1,  10),
-    d03: (-10,  1, -10),
-    d04: (  8, 10,  10),
-    d05: (  2, 10,   0),
-    d06: ( -8, 10, -10),
-    d07: ( -2, 10,   0),
-    d08: ( 18, 10,  20),
-    d09: ( 12, 10,  10),
-    d10: (-18, 10, -20),
-    d11: (-12, 10, -10),
-    d12: ( 10, 10,  10),
-    d13: (-10, 10, -10),
-    d14: ( 20, 10,  20),
-    d15: (-20, 10, -20),
-    d16: ( 15, 10,  20),
-    d17: (-15, 10, -20),
+    d01: (  0, 10,   0,   0,   0),
+    d02: ( 10,  1,  10,  10,  10),
+    d03: (-10,  1, -10, -10, -10),
+    d04: (  8, 10,  10,   0,  10),
+    d05: (  2, 10,   0,   0,  10),
+    d06: ( -8, 10, -10, -10,   0),
+    d07: ( -2, 10,   0, -10,   0),
+    d08: ( 18, 10,  20,  10,  20),
+    d09: ( 12, 10,  10,  10,  20),
+    d10: (-18, 10, -20, -20, -10),
+    d11: (-12, 10, -10, -20, -10),
+    d12: ( 10, 10,  10,  10,  10),
+    d13: (-10, 10, -10, -10, -10),
+    d14: ( 20, 10,  20,  20,  20),
+    d15: (-20, 10, -20, -20, -20),
+    d16: ( 15, 10,  20,  10,  20),
+    d17: (-15, 10, -20, -20, -10),
   }
 }

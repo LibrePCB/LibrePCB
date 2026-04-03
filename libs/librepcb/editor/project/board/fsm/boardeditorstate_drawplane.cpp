@@ -188,11 +188,31 @@ void BoardEditorState_DrawPlane::setLayer(const Layer& layer) noexcept {
   }
 }
 
+void BoardEditorState_DrawPlane::autoAdd() noexcept {
+  if (abortCommand(false)) {
+    if (startAddPlane(std::nullopt)) {
+      // Switch to the next layer, to allow adding planes on every layer just
+      // by clicking the button multiple times. After adding the plane on the
+      // bottom layer, exit the tool automatically.
+      const Layer* layer = Layer::copper(mCurrentLayer->getCopperNumber() + 1);
+      if (!mContext.board.getCopperLayers().contains(layer)) {
+        layer = &Layer::botCopper();
+      }
+      if (layer != mCurrentLayer) {
+        setLayer(*layer);
+      } else {
+        emit requestLeavingState();
+      }
+    }
+  }
+}
+
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 
-bool BoardEditorState_DrawPlane::startAddPlane(const Point& pos) noexcept {
+bool BoardEditorState_DrawPlane::startAddPlane(
+    const std::optional<Point>& pos) noexcept {
   // Discard any temporary changes and release undo stack.
   abortBlockingToolsInOtherEditors();
 
@@ -204,7 +224,12 @@ bool BoardEditorState_DrawPlane::startAddPlane(const Point& pos) noexcept {
     mIsUndoCmdActive = true;
 
     // Add plane with two vertices
-    Path path({Vertex(pos), Vertex(pos)});
+    Path path;
+    if (pos) {
+      path = Path({Vertex(*pos), Vertex(*pos)});
+    } else {
+      path = determineAutoPlaneOutline();  // can throw
+    }
     mCurrentPlane = new BI_Plane(mContext.board, Uuid::createRandom(),
                                  *mCurrentLayer, mCurrentNetSignal, path);
     mCurrentPlane->setConnectStyle(BI_Plane::ConnectStyle::ThermalRelief);
@@ -212,9 +237,17 @@ bool BoardEditorState_DrawPlane::startAddPlane(const Point& pos) noexcept {
 
     // Start undo command
     mCurrentPlaneEditCmd.reset(new CmdBoardPlaneEdit(*mCurrentPlane));
-    mLastVertexPos = pos;
+    mLastVertexPos = path.getVertices().last().getPos();
     makeLayerVisible(mCurrentLayer->getThemeColor());
     updatePlaneSettings();
+
+    // Finish command, if auto-add.
+    if (!pos) {
+      mContext.undoStack.appendToCmdGroup(mCurrentPlaneEditCmd.release());
+      mContext.undoStack.commitCmdGroup();
+      mIsUndoCmdActive = false;
+      mCurrentPlane = nullptr;
+    }
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
@@ -341,6 +374,44 @@ bool BoardEditorState_DrawPlane::abortCommand(bool showErrMsgBox) noexcept {
     }
     return false;
   }
+}
+
+Path BoardEditorState_DrawPlane::determineAutoPlaneOutline() const {
+  // Determine bounding box of board.
+  std::optional<std::pair<Point, Point>> bbox =
+      mContext.board.calculateBoundingRect();
+  if (!bbox) {
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        tr("Could not determine the bounding box of board. Make sure a valid "
+           "board outline polygon is present."));
+  }
+
+  // Determine left X coordinate of existing planes, so we don't add the
+  // new plane at the same position as existing planes.
+  QSet<Length> usedLeft;
+  for (const BI_Plane* plane : mContext.board.getPlanes()) {
+    for (const Vertex& vertex : plane->getOutline().getVertices()) {
+      usedLeft.insert(vertex.getPos().getX());
+    }
+  }
+
+  // Determine required spacing, which is a multiple of the current grid
+  // interval, and at least 2mm.
+  Length grid = *getGridInterval();
+  while (grid < Length(2000000)) {
+    grid *= 2;
+  }
+  Length minSpace = -grid / 2;
+  Length left;
+  do {
+    minSpace += grid;
+    left = (bbox->first.getX() - minSpace).roundedDownTo(grid);
+  } while (usedLeft.contains(left));
+  const Length bottom = (bbox->first.getY() - minSpace).roundedDownTo(grid);
+  const Length top = (bbox->second.getY() + minSpace).roundedUpTo(grid);
+  const Length right = (bbox->second.getX() + minSpace).roundedUpTo(grid);
+  return Path::rect(Point(left, bottom), Point(right, top));
 }
 
 /*******************************************************************************

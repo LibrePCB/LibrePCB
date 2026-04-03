@@ -908,6 +908,10 @@ void Board2dTab::trigger(ui::TabAction a) noexcept {
       addUnplacedComponentsToBoard(PlaceComponentsMode::All);
       break;
     }
+    case ui::TabAction::BoardAddPlane: {
+      emit autoAddPlaneRequested();  // Connected to current FSM state.
+      break;
+    }
     case ui::TabAction::ToolSelect: {
       mFsm->processSelect();
       break;
@@ -1746,6 +1750,11 @@ void Board2dTab::fsmToolEnter(BoardEditorState_DrawPlane& state) noexcept {
       &state, &BoardEditorState_DrawPlane::layerChanged, this, setLayer));
   mFsmStateConnections.append(connect(this, &Board2dTab::layerRequested, &state,
                                       &BoardEditorState_DrawPlane::setLayer));
+
+  // Auto-Add
+  mFsmStateConnections.append(connect(this, &Board2dTab::autoAddPlaneRequested,
+                                      &state,
+                                      &BoardEditorState_DrawPlane::autoAdd));
 
   onDerivedUiDataChanged.notify();
 }
