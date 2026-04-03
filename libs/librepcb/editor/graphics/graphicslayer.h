@@ -60,6 +60,7 @@ public:
     HighlightColorChanged,
     AvailableChanged,
     VisibleChanged,
+    DisabledChanged,
   };
   Signal<GraphicsLayer, Event> onEdited;
   typedef Slot<GraphicsLayer, Event> OnEditedSlot;
@@ -75,18 +76,22 @@ public:
   // Getters
   const QString& getName() const noexcept { return mName; }
   const QString& getNameTr() const noexcept { return mNameTr; }
-  const QColor& getColor(bool highlighted = false) const noexcept {
-    return highlighted ? mColorHighlighted : mColor;
+  const QColor& getColor() const noexcept { return mColor; }
+  QColor getColor(bool highlighted) const noexcept {
+    return highlighted ? mColorHighlighted
+                       : (mIsDisabled ? QColor(128, 128, 128, 64) : mColor);
   }
   bool isAvailable() const noexcept { return mIsAvailable; }
   bool getVisible() const noexcept { return mIsVisible; }
   bool isVisible() const noexcept { return mIsAvailable && mIsVisible; }
+  bool isDisabled() const noexcept { return mIsDisabled; }
 
   // Setters
   void setColor(const QColor& color) noexcept;
   void setColorHighlighted(const QColor& color) noexcept;
   void setAvailable(bool enable) noexcept;
   void setVisible(bool visible) noexcept;
+  void setDisabled(bool disabled) noexcept;
 
   // Operator Overloadings
   GraphicsLayer& operator=(const GraphicsLayer& rhs) = delete;
@@ -98,6 +103,7 @@ protected:  // Data
   QColor mColorHighlighted;  ///< Color of highlighted graphics items
   bool mIsAvailable;  ///< Availability of the layer itself
   bool mIsVisible;  ///< Visibility of graphics items on that layer
+  bool mIsDisabled;  ///< Whether items on this layer need to be drawn disabled
 };
 
 /*******************************************************************************

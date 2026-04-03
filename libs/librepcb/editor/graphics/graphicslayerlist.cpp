@@ -41,7 +41,7 @@ namespace editor {
  ******************************************************************************/
 
 GraphicsLayerList::GraphicsLayerList(const WorkspaceSettings* ws) noexcept
-  : mSettings(ws) {
+  : QObject(), mSettings(ws), mFocusedLayer(nullptr) {
   if (mSettings) {
     connect(&mSettings->themes, &WorkspaceSettingsItem_Themes::edited, this,
             &GraphicsLayerList::reloadSettings);
@@ -116,6 +116,20 @@ void GraphicsLayerList::showNone() noexcept {
   foreach (auto& layer, mLayers) {
     layer->setVisible(false);
   }
+}
+
+void GraphicsLayerList::setFocused(const GraphicsLayer* layer) noexcept {
+  if (layer != mFocusedLayer) {
+    mFocusedLayer = layer;
+    foreach (auto& layer, mLayers) {
+      layer->setDisabled(mFocusedLayer && (layer.get() != mFocusedLayer));
+    }
+    emit focusedLayerChanged(mFocusedLayer);
+  }
+}
+
+const GraphicsLayer* GraphicsLayerList::getFocused() const noexcept {
+  return mFocusedLayer;
 }
 
 std::unique_ptr<GraphicsLayerList> GraphicsLayerList::previewLayers(

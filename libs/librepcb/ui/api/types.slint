@@ -85,12 +85,21 @@ export enum GridStyle {
     lines,
 }
 
+export enum GraphicsLayerAction {
+    none,
+    show,  // Set visible, hide all others
+    focus,  // Set focused, unfocus all others
+}
+
 // Graphics layer data structure
 export struct GraphicsLayerData {
     name: string,
     color: color,
     color-highlighted: color,
     visible: bool,
+    disabled: bool,
+    is-focused: bool,  // Read-only
+    action: GraphicsLayerAction,  // Set by UI, reset by backend
 }
 
 // Actions for AttributeData

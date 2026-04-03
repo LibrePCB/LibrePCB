@@ -45,7 +45,8 @@ GraphicsLayer::GraphicsLayer(const GraphicsLayer& other) noexcept
     mColor(other.mColor),
     mColorHighlighted(other.mColorHighlighted),
     mIsAvailable(other.mIsAvailable),
-    mIsVisible(other.mIsVisible) {
+    mIsVisible(other.mIsVisible),
+    mIsDisabled(other.mIsDisabled) {
 }
 
 GraphicsLayer::GraphicsLayer(const QString& name, const QString& nameTr,
@@ -58,7 +59,8 @@ GraphicsLayer::GraphicsLayer(const QString& name, const QString& nameTr,
     mColor(color),
     mColorHighlighted(colorHighlighted),
     mIsAvailable(enabled),
-    mIsVisible(visible) {
+    mIsVisible(visible),
+    mIsDisabled(false) {
 }
 
 GraphicsLayer::~GraphicsLayer() noexcept {
@@ -93,6 +95,14 @@ void GraphicsLayer::setVisible(bool visible) noexcept {
   if (visible != mIsVisible) {
     mIsVisible = visible;
     onEdited.notify(Event::VisibleChanged);
+  }
+}
+
+void GraphicsLayer::setDisabled(bool disabled) noexcept {
+  if (disabled != mIsDisabled) {
+    mIsDisabled = disabled;
+    onEdited.notify(Event::DisabledChanged);
+    onEdited.notify(Event::ColorChanged);
   }
 }
 

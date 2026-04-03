@@ -70,10 +70,11 @@ signals:
 private:
   void onEdited(const GraphicsLayer& layer,
                 GraphicsLayer::Event event) noexcept;
-  void updateEnabledLayers() noexcept;
+  void focusedLayerChanged(const GraphicsLayer* focused) noexcept;
+  void updateLayers() noexcept;
 
   QPointer<GraphicsLayerList> mList;
-  QList<std::shared_ptr<GraphicsLayer>> mEnabledLayers;
+  QList<std::shared_ptr<GraphicsLayer>> mAvailableLayers;
   QHash<const GraphicsLayer*, std::size_t> mIndices;
   GraphicsLayer::OnEditedSlot mOnEditedSlot;
   QTimer mDelayTimer;

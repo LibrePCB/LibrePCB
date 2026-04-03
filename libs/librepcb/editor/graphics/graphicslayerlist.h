@@ -46,6 +46,8 @@ class GraphicsLayer;
  * @brief The GraphicsLayerList class
  */
 class GraphicsLayerList final : public QObject {
+  Q_OBJECT
+
 public:
   // Constructors / Destructor
   GraphicsLayerList() = delete;
@@ -68,6 +70,8 @@ public:
   void showTopAndBottom() noexcept;
   void showAll() noexcept;
   void showNone() noexcept;
+  void setFocused(const GraphicsLayer* layer) noexcept;
+  const GraphicsLayer* getFocused() const noexcept;
 
   // Static Methods
   static std::unique_ptr<GraphicsLayerList> previewLayers(
@@ -78,6 +82,9 @@ public:
       const WorkspaceSettings* ws) noexcept;
   static std::unique_ptr<GraphicsLayerList> boardLayers(
       const WorkspaceSettings* ws) noexcept;
+
+signals:
+  void focusedLayerChanged(const GraphicsLayer* focused);
 
 private:
   GraphicsLayerList(const WorkspaceSettings* ws) noexcept;
@@ -92,6 +99,7 @@ private:
 
   QPointer<const WorkspaceSettings> mSettings;
   QList<std::shared_ptr<GraphicsLayer>> mLayers;
+  const GraphicsLayer* mFocusedLayer;
 };
 
 /*******************************************************************************

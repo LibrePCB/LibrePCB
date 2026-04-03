@@ -7,6 +7,7 @@ import {
 import {
     BoardAction,
     Data,
+    GraphicsLayerAction,
     GraphicsLayerData,
     Helpers,
     TabAction,
@@ -17,16 +18,17 @@ component GraphicsLayerListItem inherits Rectangle {
     in-out property <[GraphicsLayerData]> model;
     in property <int> index;
     in property <bool> enabled: true;
-    in property <bool> selected: false;
+    in property <bool> is-current: false;
     in property <color> background-color;
     property <GraphicsLayerData> item: model[index];
 
-    callback clicked <=> ta.clicked;
-    callback double-clicked <=> ta.double-clicked;
+    callback selected;
 
     background: {
-        if selected {
+        /*if item.disabled {
             Data.theme.control-checked
+        } else */if is-current {
+            Data.theme.control-hovered
         } else if ta.has-hover {
             Data.theme.control-hovered
         } else {
@@ -39,7 +41,7 @@ component GraphicsLayerListItem inherits Rectangle {
     accessible-enabled: enabled;
     accessible-label: item.name;
     accessible-item-selectable: true;
-    accessible-item-selected: selected;
+    //accessible-item-selected: item.focused;
     accessible-item-index: index;
     accessible-action-default => {
         visible-btn.clicked();
@@ -100,9 +102,53 @@ component GraphicsLayerListItem inherits Rectangle {
                 vertical-alignment: center;
                 font-size: 12px;
                 overflow: elide;
-                color: (root.enabled && item.visible) ? Data.theme.control-text : Data.theme.control-text-muted;
+                color: (root.enabled && item.visible && (!item.disabled)) ? Data.theme.control-text : Data.theme.control-text-muted;
                 text: item.name;
+
+                if !item.visible: Rectangle {
+                    x: 0;
+                    width: parent.preferred-width;
+                    background: parent.color;
+                    height: 1px;
+                }
             }
+
+            if item.is-focused: disabled-btn := ListViewItemButton {
+                z: 10;  // For the tooltip.
+                icon: @image-url("../../bootstrap-icons/icons/star-fill.svg");
+                tooltip-side: left;
+                enabled: false;
+                colorize: {
+                    if !root.enabled {
+                        Data.theme.control-text-disabled
+                    } else if item.visible {
+                        Data.theme.control-text
+                    } else if self.has-hover {
+                        Data.theme.control-text.mix(Data.theme.control-text-muted, 0.5)
+                    } else {
+                        Data.theme.control-text-muted
+                    }
+                };
+
+                //clicked => {
+                //    model[index].disabled = !item.disabled;
+                //}
+            }
+        }
+
+        pointer-event(event) => {
+            if (event.button == PointerEventButton.left) && (event.kind == PointerEventKind.down) {
+                if item.is-focused || event.modifiers.control {
+                    model[index].disabled = !model[index].disabled;
+                } else {
+                    model[index].action = GraphicsLayerAction.focus;
+                }
+            }
+            root.selected();
+        }
+
+        double-clicked => {
+            model[index].action = GraphicsLayerAction.show;
         }
     }
 }
@@ -110,8 +156,7 @@ component GraphicsLayerListItem inherits Rectangle {
 export component GraphicsLayersPanel inherits FocusScope {
     property <length> item-height: 22px;
     in-out property <[GraphicsLayerData]> model: Data.current-tab.layers;
-    property <int> selected-index: -1;
-    property <bool> item-selected: (selected-index >= 0) && (selected-index < model.length);
+    property <int> current-index: -1;
     property <color> background-color: {
         if Data.current-tab.type == TabType.board-2d {
             Data.current-board-2d-tab.background-color
@@ -128,7 +173,7 @@ export component GraphicsLayersPanel inherits FocusScope {
         } else if (index * item-height) < -(view.viewport-y) {
             view.viewport-y = -(index * item-height);
         }
-        selected-index = index;
+        current-index = index;
     }
 
     // Set focus when panel is shown. Not sure if it's always desired(?).
@@ -220,10 +265,10 @@ export component GraphicsLayersPanel inherits FocusScope {
                 height: item-height;
                 model: model;
                 index: index;
-                selected: (index == selected-index);
+                is-current: (index == current-index);
                 background-color: background-color;
 
-                clicked => {
+                selected => {
                     set-current-index(index);
                     root.focus();
                 }
@@ -232,15 +277,15 @@ export component GraphicsLayersPanel inherits FocusScope {
     }
 
     key-pressed(event) => {
-        if (event.text == Key.DownArrow) && (selected-index < model.length - 1) {
-            set-current-index(selected-index + 1);
+        if (event.text == Key.DownArrow) && (current-index < model.length - 1) {
+            set-current-index(current-index + 1);
             return accept;
-        } else if (event.text == Key.UpArrow) && (selected-index > 0) {
-            set-current-index(selected-index - 1);
+        } else if (event.text == Key.UpArrow) && (current-index > 0) {
+            set-current-index(current-index - 1);
             return accept;
-        } else if item-selected {
+        } else if (current-index >= 0) && (current-index < model.length) {
             if event.text == Key.Space {
-                model[selected-index].visible = !model[selected-index].visible;
+                model[current-index].visible = !model[current-index].visible;
                 return accept;
             }
         }
