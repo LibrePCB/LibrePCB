@@ -16,6 +16,8 @@ cbindgen = { version = "0.27", optional = true }
 [dependencies]
 interactive-html-bom = "0.2.0"
 libm = "0.2.16"
+svg = "0.18.0"
+thiserror = "2.0.18"
 
 [dependencies.regex]
 version = "1.11"

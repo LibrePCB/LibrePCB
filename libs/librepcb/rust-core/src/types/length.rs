@@ -1,6 +1,6 @@
 //! Length type
 
-use std::ops::{Add, Sub};
+use std::ops::{Add, Neg, Sub};
 
 /// Nanometers per inch
 const NM_PER_INCH: f64 = 25400000.0;
@@ -31,6 +31,11 @@ const NM_PER_PIXEL: f64 = NM_PER_INCH / PIXELS_PER_INCH;
 pub struct Length(i64);
 
 impl Length {
+  /// Create zero length
+  pub fn zero() -> Self {
+    Self(0)
+  }
+
   /// Create from nanometers
   pub fn from_nm(val: i64) -> Self {
     Self(val)
@@ -153,6 +158,14 @@ impl Length {
   /// Convert to pixels
   pub fn to_px(&self) -> f64 {
     self.0 as f64 / NM_PER_PIXEL
+  }
+}
+
+impl Neg for Length {
+  type Output = Self;
+
+  fn neg(self) -> Self {
+    Self(-self.0)
   }
 }
 
