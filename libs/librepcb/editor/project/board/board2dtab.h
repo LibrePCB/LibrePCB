@@ -199,6 +199,7 @@ signals:
   void saveTraceWidthInNetClassRequested();
   void saveViaDrillInBoardRequested();
   void saveViaDrillInNetClassRequested();
+  void autoAddPlaneRequested();
 
 private:
   void updateEnabledCopperLayers() noexcept;

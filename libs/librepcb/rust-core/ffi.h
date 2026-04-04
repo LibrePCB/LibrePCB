@@ -452,6 +452,16 @@ int64_t ffi_length_abs(int64_t val);
 int64_t ffi_length_rounded_to(int64_t val, int64_t multiple);
 
 /**
+ * Wrapper for [Length::rounded_down_to]
+ */
+int64_t ffi_length_rounded_down_to(int64_t val, int64_t multiple);
+
+/**
+ * Wrapper for [Length::rounded_up_to]
+ */
+int64_t ffi_length_rounded_up_to(int64_t val, int64_t multiple);
+
+/**
  * Wrapper for [rotate_point]
  */
 void ffi_math_rotate_point(double * NONNULL x,

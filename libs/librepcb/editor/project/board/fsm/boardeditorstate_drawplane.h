@@ -81,6 +81,7 @@ public:
   QSet<const Layer*> getAvailableLayers() noexcept;
   const Layer& getLayer() const noexcept { return *mCurrentLayer; }
   void setLayer(const Layer& layer) noexcept;
+  void autoAdd() noexcept;
 
   // Operator Overloadings
   BoardEditorState_DrawPlane& operator=(const BoardEditorState_DrawPlane& rhs) =
@@ -90,11 +91,12 @@ signals:
   void netChanged(const std::optional<Uuid>& net);
 
 private:  // Methods
-  bool startAddPlane(const Point& pos) noexcept;
+  bool startAddPlane(const std::optional<Point>& pos) noexcept;
   bool addSegment(const Point& pos) noexcept;
   bool updateLastVertexPosition(const Point& pos) noexcept;
   void updatePlaneSettings() noexcept;
   bool abortCommand(bool showErrMsgBox) noexcept;
+  Path determineAutoPlaneOutline() const;
 
 signals:
   void layerChanged(const Layer& layer);

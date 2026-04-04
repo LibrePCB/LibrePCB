@@ -198,6 +198,26 @@ public:
   Length& mapToGrid(const Length& gridInterval) noexcept;
 
   /**
+   * @brief Get a Length object rounded down to the next multiple of an interval
+   *
+   * @param multiple Interval to round to. If this parameter is zero, this
+   *                 method will do nothing.
+   *
+   * @return A new Length object which is rounded
+   */
+  Length roundedDownTo(const Length& multiple) const noexcept;
+
+  /**
+   * @brief Get a Length object rounded up to the next multiple of an interval
+   *
+   * @param multiple Interval to round to. If this parameter is zero, this
+   *                 method will do nothing.
+   *
+   * @return A new Length object which is rounded
+   */
+  Length roundedUpTo(const Length& multiple) const noexcept;
+
+  /**
    * @brief Get a Length object which is scaled with a specific factor
    *
    * @param factor        The scale factor (1.0 does nothing)

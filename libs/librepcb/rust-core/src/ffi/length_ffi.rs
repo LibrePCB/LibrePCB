@@ -30,3 +30,19 @@ extern "C" fn ffi_length_rounded_to(val: i64, multiple: i64) -> i64 {
     .rounded_to(Length::from_nm(multiple))
     .to_nm()
 }
+
+/// Wrapper for [Length::rounded_down_to]
+#[no_mangle]
+extern "C" fn ffi_length_rounded_down_to(val: i64, multiple: i64) -> i64 {
+  Length::from_nm(val)
+    .rounded_down_to(Length::from_nm(multiple))
+    .to_nm()
+}
+
+/// Wrapper for [Length::rounded_up_to]
+#[no_mangle]
+extern "C" fn ffi_length_rounded_up_to(val: i64, multiple: i64) -> i64 {
+  Length::from_nm(val)
+    .rounded_up_to(Length::from_nm(multiple))
+    .to_nm()
+}

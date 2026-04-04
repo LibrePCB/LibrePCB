@@ -70,6 +70,24 @@ Length& Length::mapToGrid(const Length& gridInterval) noexcept {
   return *this;
 }
 
+Length Length::roundedDownTo(const Length& multiple) const noexcept {
+  if (multiple != 0) {
+    return Length(
+        rs::ffi_length_rounded_down_to(mNanometers, multiple.abs().toNm()));
+  } else {
+    return *this;
+  }
+}
+
+Length Length::roundedUpTo(const Length& multiple) const noexcept {
+  if (multiple != 0) {
+    return Length(
+        rs::ffi_length_rounded_up_to(mNanometers, multiple.abs().toNm()));
+  } else {
+    return *this;
+  }
+}
+
 Length Length::scaled(qreal factor) const noexcept {
   int64_t nm = 0;
   const bool ok = rs::ffi_length_from_nm_f(mNanometers * factor, &nm);

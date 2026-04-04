@@ -789,6 +789,7 @@ export enum TabAction {
     board-place-component,
     board-place-components-similar,
     board-place-components-all,
+    board-add-plane,
 
     // Tools
     tool-select,
@@ -1267,6 +1268,7 @@ export struct SchematicTabData {
     tool-attribute-value: LineEditData,
     tool-attribute-unit: ComboBoxData,
 
+    // Misc
     scene-image-pos: Point,  // Absolute position of graphics scene
     frame: int,  // Frame index to trigger repainting
 
@@ -1329,6 +1331,7 @@ export struct Board2dTabData {
     tool-no-exposures: bool,
     tool-no-devices: bool,
 
+    // Misc
     scene-image-pos: Point,  // Absolute position of graphics scene
     frame: int,  // Frame index to trigger repainting
 
