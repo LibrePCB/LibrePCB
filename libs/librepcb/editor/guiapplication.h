@@ -125,7 +125,8 @@ public:
 
   // Window Management
   NotificationsModel& getNotifications() noexcept { return *mNotifications; }
-  void createNewWindow(int id = -1, int projectIndex = -1) noexcept;
+  std::shared_ptr<MainWindow> createNewWindow(int id = -1,
+                                              int projectIndex = -1) noexcept;
   int getWindowCount() const noexcept;
   void stopWindowStateAutosaveTimer() noexcept;
 
@@ -176,7 +177,7 @@ private:
   std::shared_ptr<UiObjectList<ProjectEditor, ui::ProjectData>> mProjects;
   std::shared_ptr<UiObjectList<LibraryEditor, ui::LibraryData>> mLibraries;
   std::unique_ptr<ProjectLibraryUpdater> mProjectLibraryUpdater;
-  QList<std::shared_ptr<MainWindow>> mWindows;
+  std::shared_ptr<UiObjectList<MainWindow, int>> mWindows;
   QTimer mSaveOpenedWindowsCountdown;
 
   // Cache

@@ -26,6 +26,8 @@
 #include "appwindow.h"
 #include "utils/uiobjectlist.h"
 
+#include <librepcb/core/utils/signalslot.h>
+
 #include <QtCore>
 
 #include <memory>
@@ -60,6 +62,9 @@ class MainWindow final : public QObject {
   Q_OBJECT
 
 public:
+  // Signals
+  Signal<MainWindow> onUiDataChanged;
+
   // Constructors / Destructor
   MainWindow() = delete;
   MainWindow(const MainWindow& other) = delete;
@@ -70,6 +75,8 @@ public:
 
   // General Methods
   int getId() const noexcept { return mId; }
+  int getUiData() const noexcept { return mId; }
+  void setUiData(int data) noexcept { Q_UNUSED(data); }
   bool isCurrentWindow() const noexcept;
   void makeCurrentWindow() noexcept;
   QWidget& getWidget() noexcept { return *mWidget; }
