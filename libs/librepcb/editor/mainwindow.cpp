@@ -137,6 +137,7 @@ MainWindow::MainWindow(GuiApplication& app,
                        slint::ComponentHandle<ui::AppWindow> win, int id,
                        QObject* parent) noexcept
   : QObject(parent),
+    onUiDataChanged(*this),
     mId(id),
     mSettingsPrefix(QString("window_%1").arg(mId)),
     mApp(app),

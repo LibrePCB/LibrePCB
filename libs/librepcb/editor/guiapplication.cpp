@@ -87,7 +87,8 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
     mRemoteLibraries(new LibrariesModel(ws, LibrariesModel::Mode::RemoteLibs)),
     mLibrariesFilter(new SlintKeyEventTextBuilder()),
     mProjects(new UiObjectList<ProjectEditor, ui::ProjectData>()),
-    mLibraries(new UiObjectList<LibraryEditor, ui::LibraryData>()) {
+    mLibraries(new UiObjectList<LibraryEditor, ui::LibraryData>()),
+    mWindows(new UiObjectList<MainWindow, int>()) {
   QSettings cs;
 
   // Check if this is the first run with this application version. This can
@@ -119,7 +120,7 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
       createNewWindow(id);
     }
   }
-  if (mWindows.isEmpty()) {
+  if (mWindows->isEmpty()) {
     createNewWindow();
   }
 
@@ -288,7 +289,7 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
   mSaveOpenedWindowsCountdown.setSingleShot(true);
   connect(&mSaveOpenedWindowsCountdown, &QTimer::timeout, this, [this]() {
     QStringList ids;
-    for (const auto& win : mWindows) {
+    for (const auto& win : mWindows->values()) {
       ids.append(QString::number(win->getId()));
     }
     std::sort(ids.begin(), ids.end());
@@ -386,7 +387,7 @@ std::shared_ptr<LibraryEditor> GuiApplication::getLibrary(
 std::shared_ptr<LibraryEditor> GuiApplication::openLibrary(
     const FilePath& libDir) noexcept {
   auto switchToLibrary = [this](int index) {
-    for (auto win : mWindows) {
+    for (auto win : mWindows->values()) {
       win->setCurrentLibrary(index);
       win->showPanelPage(ui::PanelPage::Documents);
     }
@@ -506,7 +507,7 @@ std::shared_ptr<ProjectEditor> GuiApplication::openProject(
   }
 
   auto switchToProject = [this](int index) {
-    for (auto win : mWindows) {
+    for (auto win : mWindows->values()) {
       win->setCurrentProject(index);
       win->showPanelPage(ui::PanelPage::Documents);
     }
@@ -636,11 +637,12 @@ bool GuiApplication::requestClosingAllProjects() noexcept {
  *  Window Management
  ******************************************************************************/
 
-void GuiApplication::createNewWindow(int id, int projectIndex) noexcept {
+std::shared_ptr<MainWindow> GuiApplication::createNewWindow(
+    int id, int projectIndex) noexcept {
   // Reuse next free window ID.
   if (id < 1) {
     id = 1;
-    while (std::any_of(mWindows.begin(), mWindows.end(),
+    while (std::any_of(mWindows->begin(), mWindows->end(),
                        [id](const std::shared_ptr<MainWindow>& w) {
                          return w->getId() == id;
                        })) {
@@ -689,6 +691,7 @@ void GuiApplication::createNewWindow(int id, int projectIndex) noexcept {
   d.set_window_id(id);
   d.set_window_title(
       q2s(QString("LibrePCB %1").arg(Application::getVersion())));
+  d.set_window_ids(mWindows);
   d.set_about_librepcb_details(q2s(Application::buildFullVersionDetails()));
   d.set_workspace_path(q2s(mWorkspace.getPath().toNative()));
   d.set_notifications(mNotifications);
@@ -859,23 +862,28 @@ void GuiApplication::createNewWindow(int id, int projectIndex) noexcept {
       [this]() {
         MainWindow* mw = static_cast<MainWindow*>(sender());
         qDebug().nospace() << "Closed window with ID " << mw->getId() << ".";
-        mWindows.removeIf(
-            [mw](std::shared_ptr<MainWindow> p) { return p.get() == mw; });
+        if (auto index = mWindows->indexOf(mw)) {
+          mWindows->remove(*index);
+        } else {
+          Q_ASSERT(false);
+        }
         mw = nullptr;  // Not valid anymore!
 
         // Schedule saving number of opened windows.
         mSaveOpenedWindowsCountdown.start(10000);
       },
       Qt::QueuedConnection);
-  mWindows.append(mw);
+  mWindows->append(mw);
   qDebug().nospace() << "Opened new window with ID " << id << ".";
 
   // Schedule saving number of opened windows.
   mSaveOpenedWindowsCountdown.start(10000);
+
+  return mw;
 }
 
 int GuiApplication::getWindowCount() const noexcept {
-  return mWindows.count();
+  return mWindows->count();
 }
 
 void GuiApplication::stopWindowStateAutosaveTimer() noexcept {
@@ -897,7 +905,7 @@ void GuiApplication::quit(QPointer<QWidget> parent) noexcept {
       this,
       [this, parent]() {
         if (requestClosingAllProjects() && requestClosingAllLibraries()) {
-          mWindows.clear();
+          mWindows->clear();
           slint::quit_event_loop();
         }
       },
@@ -989,14 +997,14 @@ void GuiApplication::highlightErcMessage(
 }
 
 std::shared_ptr<MainWindow> GuiApplication::getCurrentWindow() noexcept {
-  for (auto& win : mWindows) {
+  for (auto& win : mWindows->values()) {
     if (win->isCurrentWindow()) {
       return win;
     }
   }
   // TODO: This does not work in every case yet, so we implement some fallback
   // as a workaround.
-  return mWindows.value(mWindows.count() - 1);
+  return mWindows->value(mWindows->count() - 1);
 }
 
 void GuiApplication::updateLibrariesContainStandardComponents() noexcept {
@@ -1059,6 +1067,9 @@ void GuiApplication::moveTab(int srcWindowId, int srcSectionIndex,
   }
   auto srcWindow = getWindowById(srcWindowId);
   auto dstWindow = getWindowById(dstWindowId);
+  if (srcWindow && (!dstWindow) && (dstWindowId == -1)) {
+    dstWindow = createNewWindow();  // Move tab to a new window.
+  }
   if (srcWindow && dstWindow) {
     bool wasCurrentTab = false;
     bool wasCurrentSection = false;
@@ -1083,7 +1094,7 @@ void GuiApplication::moveTab(int srcWindowId, int srcSectionIndex,
 }
 
 std::shared_ptr<MainWindow> GuiApplication::getWindowById(int id) noexcept {
-  for (const auto& win : mWindows) {
+  for (const auto& win : mWindows->values()) {
     if (win->getId() == id) {
       return win;
     }

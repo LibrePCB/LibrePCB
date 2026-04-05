@@ -1,4 +1,8 @@
-import { IconButton } from "widgets.slint";
+import {
+    IconButton,
+    MenuItem,
+    MenuPopup,
+} from "widgets.slint";
 import { Tab } from "tab.slint";
 import { ControlsGalleryTab } from "controlsgallerytab.slint";
 import { HomeTab } from "hometab.slint";
@@ -64,6 +68,7 @@ component TabButton inherits Rectangle {
 
     callback clicked;
     callback close-clicked;
+    callback move-to-window-clicked(id: int);
 
     preferred-width: l.preferred-width;
     min-width: self.height;
@@ -99,6 +104,10 @@ component TabButton inherits Rectangle {
                     clicked();
                 } else if (event.button == PointerEventButton.middle) && (event.kind == PointerEventKind.down) {
                     close-clicked();
+                } else if (event.button == PointerEventButton.right) && (event.kind == PointerEventKind.down) {
+                    if tab.type != TabType.home {
+                        context-menu-popup.show();
+                    }
                 }
             }
         }
@@ -190,6 +199,40 @@ component TabButton inherits Rectangle {
         height: 1px;
         background: Data.theme.base-border;
     }
+
+    context-menu-popup := MenuPopup {
+        x: -1px;
+        y: parent.height - 1px;
+
+        for id[index] in Data.window-ids: VerticalLayout {
+            if id != Data.window-id: move-to-window-item := MenuItem {
+                icon: @image-url("../../bootstrap-icons/icons/box-arrow-right.svg");
+                text: @tr("Move to Window {}", index + 1);
+
+                clicked => {
+                    move-to-window-clicked(id);
+                }
+            }
+        }
+
+        new-window-item := MenuItem {
+            icon: @image-url("../../bootstrap-icons/icons/window-plus.svg");
+            text: @tr("Move to New Window");
+
+            clicked => {
+                move-to-window-clicked(-1);
+            }
+        }
+
+        close-item := MenuItem {
+            icon: @image-url("../../font-awesome/svgs/solid/xmark.svg");
+            text: @tr("Close Tab");
+
+            clicked => {
+                close-clicked();
+            }
+        }
+    }
 }
 
 export component WindowSection inherits Rectangle {
@@ -200,8 +243,8 @@ export component WindowSection inherits Rectangle {
     property <bool> tab-open: (section.current-tab-index >= 0) && (section.current-tab-index < section.tabs.length);
     property <TabType> tab-type: section.tabs[section.current-tab-index].type;
 
-    pure function create-drop-id(section-index: int, tab-index: int) -> string {
-        Data.window-id + "," + section-index + "," + tab-index
+    pure function create-drop-id(window-id: int, section-index: int, tab-index: int) -> string {
+        window-id + "," + section-index + "," + tab-index
     }
 
     ta := TouchArea {
@@ -224,7 +267,7 @@ export component WindowSection inherits Rectangle {
             HorizontalLayout {
                 for tab[index] in section.tabs: tab-btn := TabButton {
                     tab: tab;
-                    drop-id: create-drop-id(section-index, index);
+                    drop-id: create-drop-id(Data.window-id, section-index, index);
                     is-current-section: is-current-section;
                     is-current-tab: index == section.current-tab-index;
 
@@ -235,10 +278,14 @@ export component WindowSection inherits Rectangle {
                     close-clicked => {
                         Backend.trigger-tab(section-index, index, TabAction.close);
                     }
+
+                    move-to-window-clicked(id) => {
+                        Backend.drop-tab(self.drop-id, create-drop-id(id, 0, -2), true);
+                    }
                 }
 
                 da := TabBarDropArea {
-                    id: create-drop-id(section-index, section.tabs.length);
+                    id: create-drop-id(Data.window-id, section-index, section.tabs.length);
 
                     controls-l := HorizontalLayout {
                         alignment: end;
@@ -396,7 +443,7 @@ export component WindowSection inherits Rectangle {
             TabPageDropArea {
                 x: (section-index == 0) ? 0 : -(parent.width / 8);
                 width: (section-index == 0) ? (parent.width / 8) : (parent.width / 4);
-                id: create-drop-id(section-index, -1);
+                id: create-drop-id(Data.window-id, section-index, -1);
                 force-switch-to-tab: true;
             }
 
@@ -404,7 +451,7 @@ export component WindowSection inherits Rectangle {
             TabPageDropArea {
                 x: parent.width / 8;
                 width: parent.width * 6 / 8;
-                id: create-drop-id(section-index, section.tabs.length);
+                id: create-drop-id(Data.window-id, section-index, section.tabs.length);
                 force-switch-to-tab: true;
             }
 
@@ -412,7 +459,7 @@ export component WindowSection inherits Rectangle {
             if section-index == (Data.sections.length - 1): TabPageDropArea {
                 x: parent.width * 7 / 8;
                 width: parent.width / 8;
-                id: create-drop-id(section-index + 1, -1);
+                id: create-drop-id(Data.window-id, section-index + 1, -1);
                 force-switch-to-tab: true;
             }
 
