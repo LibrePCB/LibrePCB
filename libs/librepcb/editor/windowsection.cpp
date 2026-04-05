@@ -158,13 +158,9 @@ std::shared_ptr<WindowTab> WindowSection::removeTab(int index,
   }
 
   if (auto tab = mTabs->takeAt(index)) {
-    const bool forceUpdate = index <= currentIndex;
-    if (index < currentIndex) {
-      --currentIndex;
-    }
+    // Disconnect the removed tab from this window section.
     tab->deactivate();  // setCurrentTab() doesn't do it because tab is removed.
     tab->setWindow(nullptr);
-    setCurrentTab(std::min(currentIndex, mTabs->count() - 1), forceUpdate);
     disconnect(tab.get(), &WindowTab::closeRequested, this,
                &WindowSection::tabCloseRequested);
     disconnect(tab.get(), &WindowTab::closeEnforced, this,
@@ -175,6 +171,19 @@ std::shared_ptr<WindowTab> WindowSection::removeTab(int index,
                &WindowSection::statusBarMessageChanged);
     disconnect(tab.get(), &WindowTab::cursorCoordinatesChanged, this,
                &WindowSection::cursorCoordinatesChanged);
+    mPreviousTabs.removeAll(tab.get());
+    // If the current tab was closed, try to switch back to the previous tab.
+    if (currentIndex == index) {
+      if (auto previousTab = mPreviousTabs.value(mPreviousTabs.count() - 1)) {
+        if (auto previousTabIndex = mTabs->indexOf(previousTab)) {
+          currentIndex = *previousTabIndex;
+        }
+      }
+    } else if (currentIndex > index) {
+      --currentIndex;  // Correct index to point to the same tab as before.
+    }
+    const bool forceUpdate = currentIndex >= index;
+    setCurrentTab(std::min(currentIndex, mTabs->count() - 1), forceUpdate);
     return tab;
   } else {
     return nullptr;
@@ -258,6 +267,8 @@ void WindowSection::setCurrentTab(int index, bool forceUpdate) noexcept {
   }
 
   mUiData.current_tab_index = index;
+  mPreviousTabs.removeAll(tab.get());
+  mPreviousTabs.append(tab.get());
   onUiDataChanged.notify();
   emit currentTabChanged();
 }

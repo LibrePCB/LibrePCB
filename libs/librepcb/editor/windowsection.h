@@ -161,6 +161,7 @@ private:
   GuiApplication& mApp;
   MainWindow& mWindow;
   std::shared_ptr<TabList> mTabs;
+  QVector<WindowTab*> mPreviousTabs;  /// History of current tabs
   ui::WindowSectionData mUiData;
 };
 
