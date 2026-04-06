@@ -60,6 +60,7 @@ public:
   void setRotation(const Angle& rot) noexcept;
   void setSize(const UnsignedLength& size) noexcept;
   void setLayer(const std::shared_ptr<const GraphicsLayer>& layer) noexcept;
+  void setState(GraphicsLayer::State state) noexcept;
 
   // Inherited from QGraphicsItem
   QRectF boundingRect() const noexcept override { return mBoundingRect; }
@@ -78,8 +79,7 @@ private:  // Methods
 
 private:  // Data
   std::shared_ptr<const GraphicsLayer> mLayer;
-  QPen mPen;
-  QPen mPenHighlighted;
+  GraphicsLayer::State mState;
   UnsignedLength mSize;
   QLineF mLineH;
   QLineF mLineV;

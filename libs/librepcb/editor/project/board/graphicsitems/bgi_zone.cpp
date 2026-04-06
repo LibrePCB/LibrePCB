@@ -55,6 +55,8 @@ BGI_Zone::BGI_Zone(
   mGraphicsItem->setAllLayers(mZone.getBoard().getCopperLayers());
   mGraphicsItem->setEnabledLayers(mZone.getData().getLayers());
   mGraphicsItem->setOutline(mZone.getData().getOutline());
+
+  updateContext();
   updateZValue();
   updateEditable();
 
@@ -82,6 +84,8 @@ QVector<int> BGI_Zone::getVertexIndicesAtPosition(
  ******************************************************************************/
 
 void BGI_Zone::updateContext() noexcept {
+  const GraphicsLayer::State state = mContext->getLayerState(false);
+  mGraphicsItem->setState(state);
   updateZValue();
 }
 

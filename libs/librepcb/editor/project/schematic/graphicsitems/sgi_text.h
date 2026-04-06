@@ -23,6 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../schematicgraphicsscene.h"
 #include "sgi_symbol.h"
 
 #include <librepcb/core/project/schematic/items/si_text.h>
@@ -36,7 +37,6 @@
 namespace librepcb {
 namespace editor {
 
-class GraphicsLayerList;
 class LineGraphicsItem;
 class TextGraphicsItem;
 
@@ -52,8 +52,10 @@ public:
   // Constructors / Destructor
   SGI_Text() = delete;
   SGI_Text(const SGI_Text& other) = delete;
-  SGI_Text(SI_Text& text, std::weak_ptr<SGI_Symbol> symbolItem,
-           const GraphicsLayerList& layers) noexcept;
+  SGI_Text(
+      SI_Text& text, std::weak_ptr<SGI_Symbol> symbolItem,
+      const GraphicsLayerList& layers,
+      std::shared_ptr<const SchematicGraphicsScene::Context> context) noexcept;
   virtual ~SGI_Text() noexcept;
 
   // General Methods
@@ -61,6 +63,7 @@ public:
   const std::weak_ptr<SGI_Symbol>& getSymbolGraphicsItem() noexcept {
     return mSymbolGraphicsItem;
   }
+  void updateContext() noexcept;
 
   // Inherited from QGraphicsItem
   virtual QPainterPath shape() const noexcept override;
@@ -82,6 +85,7 @@ private:  // Data
   SI_Text& mText;
   std::weak_ptr<SGI_Symbol> mSymbolGraphicsItem;
   const GraphicsLayerList& mLayers;
+  std::shared_ptr<const SchematicGraphicsScene::Context> mContext;
   QScopedPointer<TextGraphicsItem> mTextGraphicsItem;
   QScopedPointer<LineGraphicsItem> mAnchorGraphicsItem;
 

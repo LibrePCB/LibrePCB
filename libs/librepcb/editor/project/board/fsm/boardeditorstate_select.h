@@ -192,7 +192,7 @@ private:  // Methods
       const ComponentInstance& cmpInst) const noexcept;
   void scheduleUpdateAvailableFeatures() noexcept;
   void updateAvailableFeatures() noexcept;
-  QString buildInfoBoxText(const BoardSelectionQuery& query) const noexcept;
+  QString processSelection(const BoardSelectionQuery& query) const noexcept;
 
 private:  // Data
   /// An undo command will be active while dragging pasted items

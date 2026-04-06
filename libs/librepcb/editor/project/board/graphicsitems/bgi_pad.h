@@ -84,7 +84,6 @@ private:  // Methods
   virtual QVariant itemChange(GraphicsItemChange change,
                               const QVariant& value) noexcept override;
   void updateLayer() noexcept;
-  void updateHightlighted(bool selected) noexcept;
 
 private:  // Data
   BI_Pad& mPad;

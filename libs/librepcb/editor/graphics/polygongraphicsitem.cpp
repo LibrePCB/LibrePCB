@@ -125,17 +125,22 @@ void PolygonGraphicsItem::paint(QPainter* painter,
                                 QWidget* widget) noexcept {
   PrimitivePathGraphicsItem::paint(painter, option, widget);
 
-  const bool isSelected = option->state.testFlag(QStyle::State_Selected);
+  const bool selected = option->state.testFlag(QStyle::State_Selected);
   const qreal lod =
       option->levelOfDetailFromTransform(painter->worldTransform());
 
+  GraphicsLayer::State state = mState;
+  if (selected) {
+    state = GraphicsLayer::State::Highlighted;
+  }
+
   // Draw vertex handles, if editable and selected.
-  if (mEditable && isSelected && mLineLayer) {
+  if (mEditable && selected && mLineLayer) {
     const qreal radius = 20 / lod;
     mVertexHandleRadiusPx =
         std::min(std::max(radius, mPolygon.getLineWidth()->toPx() / 2),
                  mBoundingRectMarginPx);
-    QColor color = mLineLayer->getColor(isSelected);
+    QColor color = mLineLayer->getColor(state);
     color.setAlpha(color.alpha() / 3);
     painter->setBrush(Qt::NoBrush);
     for (int i = 0; i < mVertexHandles.count(); ++i) {

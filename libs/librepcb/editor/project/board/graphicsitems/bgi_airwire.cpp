@@ -70,6 +70,7 @@ BGI_AirWire::BGI_AirWire(
                         .normalized();
   }
 
+  updateContext();
   setVisible(mLayer && mLayer->isVisible());
 
   if (mLayer) {
@@ -97,21 +98,22 @@ void BGI_AirWire::paint(QPainter* painter,
                         QWidget* widget) {
   Q_UNUSED(widget);
 
-  const bool highlight = option->state.testFlag(QStyle::State_Selected) ||
-      mContext->highlightedNets->contains(&mAirWire.getNetSignal());
-  const qreal lod =
-      option->levelOfDetailFromTransform(painter->worldTransform());
+  if ((!mLayer) || (!mLayer->isVisible())) {
+    return;
+  }
 
-  // draw line
-  if (mLayer && mLayer->isVisible()) {
-    qreal width = highlight ? 3 / lod : 0;  // highlighted airwires are thicker
-    QPen pen(mLayer->getColor(highlight), width, Qt::SolidLine, Qt::RoundCap);
-    painter->setPen(pen);
-    painter->drawLines(mLines);
-    if (mLines.count() > 1) {
-      painter->setBrush(Qt::NoBrush);
-      painter->drawEllipse(mBoundingRect);
-    }
+  const GraphicsLayer::State state =
+      mContext->getLayerState(false, &mAirWire.getNetSignal());
+  // Highlighted airwires are thicker.
+  qreal width = (state == GraphicsLayer::State::Highlighted)
+      ? (3 / option->levelOfDetailFromTransform(painter->worldTransform()))
+      : 0;
+  QPen pen(mLayer->getColor(state), width, Qt::SolidLine, Qt::RoundCap);
+  painter->setPen(pen);
+  painter->drawLines(mLines);
+  if (mLines.count() > 1) {
+    painter->setBrush(Qt::NoBrush);
+    painter->drawEllipse(mBoundingRect);
   }
 }
 

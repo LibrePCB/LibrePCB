@@ -41,10 +41,9 @@ namespace editor {
 OriginCrossGraphicsItem::OriginCrossGraphicsItem(QGraphicsItem* parent) noexcept
   : QGraphicsItem(parent),
     mLayer(nullptr),
+    mState(GraphicsLayer::State::Enabled),
     mSize(0),
     mOnLayerEditedSlot(*this, &OriginCrossGraphicsItem::layerEdited) {
-  mPen.setWidth(0);
-  mPenHighlighted.setWidth(0);
   updateBoundingRectAndShape();
   setFlag(QGraphicsItem::ItemIsSelectable, true);
   setVisible(false);
@@ -81,12 +80,15 @@ void OriginCrossGraphicsItem::setLayer(
   mLayer = layer;
   if (mLayer) {
     mLayer->onEdited.attach(mOnLayerEditedSlot);
-    mPen.setColor(mLayer->getColor(false));
-    mPenHighlighted.setColor(mLayer->getColor(true));
     setVisible(mLayer->isVisible());
   } else {
     setVisible(false);
   }
+}
+
+void OriginCrossGraphicsItem::setState(GraphicsLayer::State state) noexcept {
+  mState = state;
+  update();
 }
 
 /*******************************************************************************
@@ -102,9 +104,16 @@ void OriginCrossGraphicsItem::paint(QPainter* painter,
                                     QWidget* widget) noexcept {
   Q_UNUSED(widget);
 
-  const bool isSelected = option->state.testFlag(QStyle::State_Selected);
+  if ((!mLayer) || (!mLayer->isVisible())) {
+    return;
+  }
 
-  painter->setPen(isSelected ? mPenHighlighted : mPen);
+  GraphicsLayer::State state = mState;
+  if (option->state.testFlag(QStyle::State_Selected)) {
+    state = GraphicsLayer::State::Highlighted;
+  }
+
+  painter->setPen(QPen(mLayer->getColor(state), 0));
   painter->drawLine(mLineH);
   painter->drawLine(mLineV);
 }
@@ -117,11 +126,7 @@ void OriginCrossGraphicsItem::layerEdited(const GraphicsLayer& layer,
                                           GraphicsLayer::Event event) noexcept {
   switch (event) {
     case GraphicsLayer::Event::ColorChanged:
-      mPen.setColor(layer.getColor(false));
-      update();
-      break;
     case GraphicsLayer::Event::HighlightColorChanged:
-      mPenHighlighted.setColor(layer.getColor(true));
       update();
       break;
     case GraphicsLayer::Event::VisibleChanged:

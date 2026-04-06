@@ -46,10 +46,12 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-SGI_BusLine::SGI_BusLine(SI_BusLine& line,
-                         const GraphicsLayerList& layers) noexcept
+SGI_BusLine::SGI_BusLine(
+    SI_BusLine& line, const GraphicsLayerList& layers,
+    std::shared_ptr<const SchematicGraphicsScene::Context> context) noexcept
   : QGraphicsItem(),
     mBusLine(line),
+    mContext(context),
     mLayer(layers.get(Theme::Color::sSchematicBuses)),
     mOnBusLineEditedSlot(*this, &SGI_BusLine::busLineEdited) {
   setFlag(QGraphicsItem::ItemIsSelectable, true);
@@ -76,17 +78,18 @@ void SGI_BusLine::paint(QPainter* painter,
                         QWidget* widget) noexcept {
   Q_UNUSED(widget);
 
-  const bool highlight = option->state.testFlag(QStyle::State_Selected);
-
-  // draw line
-  if (mLayer && mLayer->isVisible()) {
-    QPen pen(mLayer->getColor(highlight), mBusLine.getWidth()->toPx(),
-             Qt::SolidLine, Qt::RoundCap);
-    painter->setPen(pen);
-    // See https://github.com/LibrePCB/LibrePCB/issues/1440
-    mLineF.isNull() ? painter->drawPoint(mLineF.p1())
-                    : painter->drawLine(mLineF);
+  if ((!mLayer) || (!mLayer->isVisible())) {
+    return;
   }
+
+  const Bus* bus = &mBusLine.getBusSegment().getBus();
+  const bool selected = option->state.testFlag(QStyle::State_Selected);
+  const GraphicsLayer::State state = mContext->getLayerState(selected, bus);
+
+  painter->setPen(QPen(mLayer->getColor(state), mBusLine.getWidth()->toPx(),
+                       Qt::SolidLine, Qt::RoundCap));
+  // See https://github.com/LibrePCB/LibrePCB/issues/1440
+  mLineF.isNull() ? painter->drawPoint(mLineF.p1()) : painter->drawLine(mLineF);
 }
 
 /*******************************************************************************

@@ -49,10 +49,12 @@ namespace editor {
 
 class BoardEditor;
 class GuiApplication;
+class ProjectCrossProbe;
 class RuleCheckMessagesModel;
 class SchematicEditor;
 class SchematicTab;
 class UndoStack;
+class WindowTab;
 
 /*******************************************************************************
  *  Class ProjectEditor
@@ -93,14 +95,12 @@ public:
   ui::ProjectData getUiData() const noexcept;
   void setUiData(const ui::ProjectData& data) noexcept;
   void trigger(ui::ProjectAction a) noexcept;
+  void setCurrentTab(const WindowTab* tab) noexcept;
+  bool isCurrentTab(const WindowTab* tab) const noexcept;
   bool getUseIeee315Symbols() const noexcept { return mUseIeee315Symbols; }
-  std::shared_ptr<const QSet<const NetSignal*>> getHighlightedNetSignals()
-      const noexcept {
-    return mHighlightedNetSignals;
+  const std::shared_ptr<ProjectCrossProbe>& getCrossProbe() {
+    return mCrossProbe;
   }
-  void setHighlightedNetSignals(
-      const QSet<const NetSignal*>& netSignals) noexcept;
-
   bool hasUnsavedChanges() const noexcept;
 
   void undo() noexcept;
@@ -178,7 +178,6 @@ signals:
   void ercMessageHighlightRequested(std::shared_ptr<const RuleCheckMessage> msg,
                                     bool zoomTo, int windowId);
   void ercMarkersInvalidated();
-  void highlightedNetSignalsChanged();
   void projectLibraryUpdaterRequested(const FilePath& fp);
   void statusBarMessageChanged(const QString& message, int timeoutMs);
 
@@ -219,8 +218,9 @@ private:
   std::shared_ptr<UiObjectList<BoardEditor, ui::BoardData>> mBoards;
   std::unique_ptr<UndoStack> mUndoStack;
 
-  std::shared_ptr<QSet<const NetSignal*>> mHighlightedNetSignals;
+  std::shared_ptr<ProjectCrossProbe> mCrossProbe;
   QVector<QPointer<SchematicTab>> mActiveSchematicTabs;
+  QPointer<const WindowTab> mCurrentTab;  ///< Tab of the last user interaction
 
   // ERC
   std::shared_ptr<RuleCheckMessagesModel> mErcMessages;  // Lazy initialized

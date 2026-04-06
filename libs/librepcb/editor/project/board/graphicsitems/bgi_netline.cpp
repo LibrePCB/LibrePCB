@@ -55,6 +55,7 @@ BGI_NetLine::BGI_NetLine(
     mOnLayerEditedSlot(*this, &BGI_NetLine::layerEdited) {
   setFlag(QGraphicsItem::ItemIsSelectable, true);
 
+  updateContext();
   updateLine();
   updateLayer();
   updateVisibility();
@@ -87,19 +88,18 @@ void BGI_NetLine::paint(QPainter* painter,
                         QWidget* widget) noexcept {
   Q_UNUSED(widget);
 
-  const NetSignal* netsignal = mNetLine.getNetSegment().getNetSignal();
-  const bool highlight = option->state.testFlag(QStyle::State_Selected) ||
-      mContext->highlightedNets->contains(netsignal);
-
-  // draw line
-  if (mLayer->isVisible()) {
-    QPen pen(mLayer->getColor(highlight), mNetLine.getWidth()->toPx(),
-             Qt::SolidLine, Qt::RoundCap);
-    painter->setPen(pen);
-    // See https://github.com/LibrePCB/LibrePCB/issues/1440
-    mLineF.isNull() ? painter->drawPoint(mLineF.p1())
-                    : painter->drawLine(mLineF);
+  if ((!mLayer) || (!mLayer->isVisible())) {
+    return;
   }
+
+  const NetSignal* net = mNetLine.getNetSegment().getNetSignal();
+  const bool selected = option->state.testFlag(QStyle::State_Selected);
+  const GraphicsLayer::State state = mContext->getLayerState(selected, net);
+  QPen pen(mLayer->getColor(state), mNetLine.getWidth()->toPx(), Qt::SolidLine,
+           Qt::RoundCap);
+  painter->setPen(pen);
+  // See https://github.com/LibrePCB/LibrePCB/issues/1440
+  mLineF.isNull() ? painter->drawPoint(mLineF.p1()) : painter->drawLine(mLineF);
 }
 
 /*******************************************************************************

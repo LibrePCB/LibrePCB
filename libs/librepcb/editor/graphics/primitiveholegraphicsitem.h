@@ -23,6 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "graphicslayer.h"
+
 #include <librepcb/core/geometry/path.h>
 #include <librepcb/core/types/length.h>
 
@@ -38,7 +40,6 @@
 namespace librepcb {
 namespace editor {
 
-class GraphicsLayer;
 class GraphicsLayerList;
 class OriginCrossGraphicsItem;
 class PrimitivePathGraphicsItem;
@@ -63,6 +64,7 @@ public:
   // Setters
   void setHole(const NonEmptyPath& path, const PositiveLength& diameter,
                const std::optional<Length>& stopMaskOffset) noexcept;
+  void setState(GraphicsLayer::State state) noexcept;
 
   // Inherited from QGraphicsItem
   QPainterPath shape() const noexcept override;

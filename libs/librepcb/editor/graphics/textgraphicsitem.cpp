@@ -93,6 +93,11 @@ void TextGraphicsItem::setTextOverride(
   }
 }
 
+void TextGraphicsItem::setState(GraphicsLayer::State state) noexcept {
+  mTextGraphicsItem->setState(state);
+  mOriginCrossGraphicsItem->setState(state);
+}
+
 /*******************************************************************************
  *  Inherited from QGraphicsItem
  ******************************************************************************/

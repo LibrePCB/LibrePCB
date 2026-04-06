@@ -205,7 +205,7 @@ bool SchematicEditorState_AddLabel::addLabel(const Point& pos) noexcept {
       mNetLabelEditCmd = new CmdSchematicNetLabelEdit(*mCurrentNetLabel);
 
       // Highlight all elements of the current netsignal.
-      mAdapter.fsmSetHighlightedNetSignals(
+      mAdapter.fsmCrossProbe(
           {&line->getNetLine().getNetSegment().getNetSignal()});
     } else {
       return false;
@@ -253,7 +253,7 @@ bool SchematicEditorState_AddLabel::fixLabel(const Point& pos) noexcept {
     mCurrentBusLabel = nullptr;
     mBusLabelEditCmd = nullptr;
     mAdapter.fsmSetFeatures(SchematicEditorFsmAdapter::Features());
-    mAdapter.fsmSetHighlightedNetSignals({});
+    mAdapter.fsmCrossProbe();
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
@@ -265,7 +265,7 @@ bool SchematicEditorState_AddLabel::fixLabel(const Point& pos) noexcept {
 bool SchematicEditorState_AddLabel::abortCommand(bool showErrMsgBox) noexcept {
   try {
     mAdapter.fsmSetFeatures(SchematicEditorFsmAdapter::Features());
-    mAdapter.fsmSetHighlightedNetSignals({});
+    mAdapter.fsmCrossProbe();
     if (mUndoCmdActive) {
       mContext.undoStack.abortCmdGroup();  // can throw
       mUndoCmdActive = false;

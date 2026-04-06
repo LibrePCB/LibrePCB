@@ -49,11 +49,13 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-SGI_Symbol::SGI_Symbol(SI_Symbol& symbol,
-                       const GraphicsLayerList& layers) noexcept
+SGI_Symbol::SGI_Symbol(
+    SI_Symbol& symbol, const GraphicsLayerList& layers,
+    std::shared_ptr<const SchematicGraphicsScene::Context> context) noexcept
   : QGraphicsItemGroup(),
     onEdited(*this),
     mSymbol(symbol),
+    mContext(context),
     mOnEditedSlot(*this, &SGI_Symbol::symbolEdited) {
   setFlag(QGraphicsItem::ItemHasNoContents, true);
   setFlag(QGraphicsItem::ItemIsSelectable, true);
@@ -104,12 +106,31 @@ SGI_Symbol::SGI_Symbol(SI_Symbol& symbol,
     mImageGraphicsItems.append(i);
   }
 
+  updateContext();
   updatePosition();
   updateRotationAndMirrored();
   mSymbol.onEdited.attach(mOnEditedSlot);
 }
 
 SGI_Symbol::~SGI_Symbol() noexcept {
+}
+
+/*******************************************************************************
+ *  General Methods
+ ******************************************************************************/
+
+void SGI_Symbol::updateContext() noexcept {
+  const GraphicsLayer::State state =
+      mContext->getLayerState(false, &mSymbol.getComponentInstance());
+  foreach (const auto& i, mCircleGraphicsItems) {
+    i->setState(state);
+  }
+  foreach (const auto& i, mPolygonGraphicsItems) {
+    i->setState(state);
+  }
+  // foreach (const auto& i, mImageGraphicsItems) {
+  //   i->setState(state); // Not supported yet
+  // }
 }
 
 /*******************************************************************************
@@ -149,9 +170,9 @@ void SGI_Symbol::updateRotationAndMirrored() noexcept {
 QVariant SGI_Symbol::itemChange(GraphicsItemChange change,
                                 const QVariant& value) noexcept {
   if ((change == ItemSelectedHasChanged) && mOriginCrossGraphicsItem) {
-    mOriginCrossGraphicsItem->setSelected(value.toBool());
     // https://github.com/LibrePCB/LibrePCB/issues/1725
     mOriginCrossGraphicsItem->setVisible(value.toBool());
+    mOriginCrossGraphicsItem->setSelected(value.toBool());
     foreach (const auto& i, mCircleGraphicsItems) {
       i->setSelected(value.toBool());
     }

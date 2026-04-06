@@ -45,10 +45,12 @@ QRectF SGI_BusJunction::sBoundingRect;
  *  Constructors / Destructor
  ******************************************************************************/
 
-SGI_BusJunction::SGI_BusJunction(SI_BusJunction& netpoint,
-                                 const GraphicsLayerList& layers) noexcept
+SGI_BusJunction::SGI_BusJunction(
+    SI_BusJunction& netpoint, const GraphicsLayerList& layers,
+    std::shared_ptr<const SchematicGraphicsScene::Context> context) noexcept
   : QGraphicsItem(),
     mBusJunction(netpoint),
+    mContext(context),
     mLayer(layers.get(Theme::Color::sSchematicBuses)),
     mOnEditedSlot(*this, &SGI_BusJunction::busJunctionEdited) {
   setFlag(QGraphicsItem::ItemIsSelectable, true);
@@ -76,14 +78,20 @@ void SGI_BusJunction::paint(QPainter* painter,
                             QWidget* widget) {
   Q_UNUSED(widget);
 
-  const bool highlight = option->state.testFlag(QStyle::State_Selected);
+  if ((!mLayer) || (!mLayer->isVisible())) {
+    return;
+  }
 
-  if (mLayer->isVisible() && mIsVisibleJunction) {
+  const Bus* bus = &mBusJunction.getBusSegment().getBus();
+  const bool selected = option->state.testFlag(QStyle::State_Selected);
+  const GraphicsLayer::State state = mContext->getLayerState(selected, bus);
+
+  if (mIsVisibleJunction) {
     painter->setPen(Qt::NoPen);
-    painter->setBrush(QBrush(mLayer->getColor(highlight), Qt::SolidPattern));
+    painter->setBrush(QBrush(mLayer->getColor(state), Qt::SolidPattern));
     painter->drawEllipse(sBoundingRect);
-  } else if (mLayer->isVisible() && mIsOpenLineEnd) {
-    painter->setPen(QPen(mLayer->getColor(highlight), 0));
+  } else if (mIsOpenLineEnd) {
+    painter->setPen(QPen(mLayer->getColor(state), 0));
     painter->setBrush(Qt::NoBrush);
     painter->drawLine(sBoundingRect.topLeft() / 2,
                       sBoundingRect.bottomRight() / 2);

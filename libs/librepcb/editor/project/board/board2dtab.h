@@ -159,8 +159,12 @@ public:
   QPainterPath fsmCalcPosWithTolerance(
       const Point& pos, qreal multiplier) const noexcept override;
   Point fsmMapGlobalPosToScenePos(const QPoint& pos) const noexcept override;
-  void fsmSetHighlightedNetSignals(
-      const QSet<const NetSignal*>& sigs) noexcept override;
+  void fsmCrossProbe(
+      const QSet<const NetSignal*>& nets = {},
+      const QSet<const ComponentInstance*>& components = {},
+      const QSet<const ComponentSignalInstance*>& cmpSignals = {},
+      GraphicsLayer::State selfProbedState =
+          GraphicsLayer::State::Highlighted) noexcept override;
   void fsmAbortBlockingToolsInOtherEditors() noexcept override;
   void fsmSetStatusBarMessage(const QString& message,
                               int timeoutMs = -1) noexcept override;

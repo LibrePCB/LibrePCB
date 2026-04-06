@@ -124,26 +124,26 @@ std::unique_ptr<GraphicsLayerList> GraphicsLayerList::previewLayers(
   const Theme theme = ws ? ws->themes.getActive() : Theme();
 
   // schematic layers
-  l->add(theme, Theme::Color::sSchematicReferences);
-  l->add(theme, Theme::Color::sSchematicFrames);
-  l->add(theme, Theme::Color::sSchematicOutlines);
-  l->add(theme, Theme::Color::sSchematicGrabAreas);
+  l->add(theme, Theme::Color::sSchematicReferences, true, true);
+  l->add(theme, Theme::Color::sSchematicFrames, true, true);
+  l->add(theme, Theme::Color::sSchematicOutlines, true, true);
+  l->add(theme, Theme::Color::sSchematicGrabAreas, true, true);
   // l-> add(theme, Theme::Color::sSchematicHiddenGrabAreas); Not needed!
-  l->add(theme, Theme::Color::sSchematicOptionalPins);
-  l->add(theme, Theme::Color::sSchematicRequiredPins);
-  l->add(theme, Theme::Color::sSchematicPinLines);
-  l->add(theme, Theme::Color::sSchematicPinNames);
-  l->add(theme, Theme::Color::sSchematicPinNumbers);
-  l->add(theme, Theme::Color::sSchematicNames);
-  l->add(theme, Theme::Color::sSchematicValues);
-  l->add(theme, Theme::Color::sSchematicWires);
-  l->add(theme, Theme::Color::sSchematicNetLabels);
-  l->add(theme, Theme::Color::sSchematicBuses);
-  l->add(theme, Theme::Color::sSchematicBusLabels);
-  l->add(theme, Theme::Color::sSchematicImageBorders);
-  l->add(theme, Theme::Color::sSchematicDocumentation);
-  l->add(theme, Theme::Color::sSchematicComments);
-  l->add(theme, Theme::Color::sSchematicGuide);
+  l->add(theme, Theme::Color::sSchematicOptionalPins, true, true);
+  l->add(theme, Theme::Color::sSchematicRequiredPins, true, true);
+  l->add(theme, Theme::Color::sSchematicPinLines, true, true);
+  l->add(theme, Theme::Color::sSchematicPinNames, true, true);
+  l->add(theme, Theme::Color::sSchematicPinNumbers, true, true);
+  l->add(theme, Theme::Color::sSchematicNames, true, true);
+  l->add(theme, Theme::Color::sSchematicValues, true, true);
+  l->add(theme, Theme::Color::sSchematicWires, true, true);
+  l->add(theme, Theme::Color::sSchematicNetLabels, true, true);
+  l->add(theme, Theme::Color::sSchematicBuses, true, true);
+  l->add(theme, Theme::Color::sSchematicBusLabels, true, true);
+  l->add(theme, Theme::Color::sSchematicImageBorders, true, true);
+  l->add(theme, Theme::Color::sSchematicDocumentation, true, true);
+  l->add(theme, Theme::Color::sSchematicComments, true, true);
+  l->add(theme, Theme::Color::sSchematicGuide, true, true);
 
   // asymmetric board layers
   l->add(theme, Theme::Color::sBoardFrames);
@@ -203,26 +203,26 @@ std::unique_ptr<GraphicsLayerList> GraphicsLayerList::libraryLayers(
   const Theme theme = ws ? ws->themes.getActive() : Theme();
 
   // Add all required schematic layers.
-  l->add(theme, Theme::Color::sSchematicReferences);
-  l->add(theme, Theme::Color::sSchematicFrames);
-  l->add(theme, Theme::Color::sSchematicOutlines);
-  l->add(theme, Theme::Color::sSchematicGrabAreas);
-  l->add(theme, Theme::Color::sSchematicHiddenGrabAreas);
-  l->add(theme, Theme::Color::sSchematicOptionalPins);
-  l->add(theme, Theme::Color::sSchematicRequiredPins);
-  l->add(theme, Theme::Color::sSchematicPinLines);
-  l->add(theme, Theme::Color::sSchematicPinNames);
-  l->add(theme, Theme::Color::sSchematicPinNumbers);
-  l->add(theme, Theme::Color::sSchematicNames);
-  l->add(theme, Theme::Color::sSchematicValues);
-  l->add(theme, Theme::Color::sSchematicWires);
-  l->add(theme, Theme::Color::sSchematicNetLabels);
-  l->add(theme, Theme::Color::sSchematicBuses);
-  l->add(theme, Theme::Color::sSchematicBusLabels);
-  l->add(theme, Theme::Color::sSchematicImageBorders);
-  l->add(theme, Theme::Color::sSchematicDocumentation);
-  l->add(theme, Theme::Color::sSchematicComments);
-  l->add(theme, Theme::Color::sSchematicGuide);
+  l->add(theme, Theme::Color::sSchematicReferences, true, true);
+  l->add(theme, Theme::Color::sSchematicFrames, true, true);
+  l->add(theme, Theme::Color::sSchematicOutlines, true, true);
+  l->add(theme, Theme::Color::sSchematicGrabAreas, true, true);
+  l->add(theme, Theme::Color::sSchematicHiddenGrabAreas, true, true);
+  l->add(theme, Theme::Color::sSchematicOptionalPins, true, true);
+  l->add(theme, Theme::Color::sSchematicRequiredPins, true, true);
+  l->add(theme, Theme::Color::sSchematicPinLines, true, true);
+  l->add(theme, Theme::Color::sSchematicPinNames, true, true);
+  l->add(theme, Theme::Color::sSchematicPinNumbers, true, true);
+  l->add(theme, Theme::Color::sSchematicNames, true, true);
+  l->add(theme, Theme::Color::sSchematicValues, true, true);
+  l->add(theme, Theme::Color::sSchematicWires, true, true);
+  l->add(theme, Theme::Color::sSchematicNetLabels, true, true);
+  l->add(theme, Theme::Color::sSchematicBuses, true, true);
+  l->add(theme, Theme::Color::sSchematicBusLabels, true, true);
+  l->add(theme, Theme::Color::sSchematicImageBorders, true, true);
+  l->add(theme, Theme::Color::sSchematicDocumentation, true, true);
+  l->add(theme, Theme::Color::sSchematicComments, true, true);
+  l->add(theme, Theme::Color::sSchematicGuide, true, true);
 
   // Add all required board layers.
   l->add(theme, Theme::Color::sBoardFrames);
@@ -275,26 +275,26 @@ std::unique_ptr<GraphicsLayerList> GraphicsLayerList::schematicLayers(
     const WorkspaceSettings* ws) noexcept {
   std::unique_ptr<GraphicsLayerList> l(new GraphicsLayerList(ws));
   const Theme theme = ws ? ws->themes.getActive() : Theme();
-  l->add(theme, Theme::Color::sSchematicReferences);
-  l->add(theme, Theme::Color::sSchematicFrames);
-  l->add(theme, Theme::Color::sSchematicOutlines);
-  l->add(theme, Theme::Color::sSchematicGrabAreas);
+  l->add(theme, Theme::Color::sSchematicReferences, true, true);
+  l->add(theme, Theme::Color::sSchematicFrames, true, true);
+  l->add(theme, Theme::Color::sSchematicOutlines, true, true);
+  l->add(theme, Theme::Color::sSchematicGrabAreas, true, true);
   // l->add(theme, Theme::Color::sSchematicHiddenGrabAreas); Not needed!
-  l->add(theme, Theme::Color::sSchematicOptionalPins);
-  l->add(theme, Theme::Color::sSchematicRequiredPins);
-  l->add(theme, Theme::Color::sSchematicPinLines);
-  l->add(theme, Theme::Color::sSchematicPinNames);
-  l->add(theme, Theme::Color::sSchematicPinNumbers);
-  l->add(theme, Theme::Color::sSchematicNames);
-  l->add(theme, Theme::Color::sSchematicValues);
-  l->add(theme, Theme::Color::sSchematicWires);
-  l->add(theme, Theme::Color::sSchematicNetLabels);
-  l->add(theme, Theme::Color::sSchematicBuses);
-  l->add(theme, Theme::Color::sSchematicBusLabels);
-  l->add(theme, Theme::Color::sSchematicImageBorders);
-  l->add(theme, Theme::Color::sSchematicDocumentation);
-  l->add(theme, Theme::Color::sSchematicComments);
-  l->add(theme, Theme::Color::sSchematicGuide);
+  l->add(theme, Theme::Color::sSchematicOptionalPins, true, true);
+  l->add(theme, Theme::Color::sSchematicRequiredPins, true, true);
+  l->add(theme, Theme::Color::sSchematicPinLines, true, true);
+  l->add(theme, Theme::Color::sSchematicPinNames, true, true);
+  l->add(theme, Theme::Color::sSchematicPinNumbers, true, true);
+  l->add(theme, Theme::Color::sSchematicNames, true, true);
+  l->add(theme, Theme::Color::sSchematicValues, true, true);
+  l->add(theme, Theme::Color::sSchematicWires, true, true);
+  l->add(theme, Theme::Color::sSchematicNetLabels, true, true);
+  l->add(theme, Theme::Color::sSchematicBuses, true, true);
+  l->add(theme, Theme::Color::sSchematicBusLabels, true, true);
+  l->add(theme, Theme::Color::sSchematicImageBorders, true, true);
+  l->add(theme, Theme::Color::sSchematicDocumentation, true, true);
+  l->add(theme, Theme::Color::sSchematicComments, true, true);
+  l->add(theme, Theme::Color::sSchematicGuide, true, true);
   return l;
 }
 
@@ -360,12 +360,13 @@ std::unique_ptr<GraphicsLayerList> GraphicsLayerList::boardLayers(
  ******************************************************************************/
 
 void GraphicsLayerList::add(const Theme& theme, const QString& name,
-                            bool visible) noexcept {
+                            bool visible, bool grayscaleDisabled) noexcept {
   const ThemeColor& color = theme.getColor(name);
-  auto layer = std::make_shared<GraphicsLayer>(name, color.getNameTr(),
-                                               color.getPrimaryColor(),
-                                               color.getSecondaryColor());
-  layer->setVisible(visible);
+  auto layer = std::make_shared<GraphicsLayer>(
+      name, color.getNameTr(), color.getPrimaryColor(),
+      color.getSecondaryColor(), visible, true,
+      grayscaleDisabled ? GraphicsLayer::DisabledMode::Grayscale
+                        : GraphicsLayer::DisabledMode::SemiTransparentGray);
   mLayers.append(layer);
 }
 

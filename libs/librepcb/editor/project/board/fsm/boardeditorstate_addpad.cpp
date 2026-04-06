@@ -394,7 +394,7 @@ bool BoardEditorState_AddPad::start(const Point& pos) noexcept {
     mCurrentEditCmd.reset(new CmdBoardPadEdit(*mCurrentPad));
 
     // Highlight all elements of the current netsignal.
-    mAdapter.fsmSetHighlightedNetSignals({netsegment->getNetSignal()});
+    mAdapter.fsmCrossProbe({netsegment->getNetSignal()});
 
     makePadLayerVisible();
     return true;
@@ -438,7 +438,7 @@ bool BoardEditorState_AddPad::finish(const Point& pos) noexcept {
 bool BoardEditorState_AddPad::abortCommand(bool showErrMsgBox) noexcept {
   try {
     // Clear highlighted net signal.
-    mAdapter.fsmSetHighlightedNetSignals({});
+    mAdapter.fsmCrossProbe();
 
     // Delete the current edit command
     mCurrentEditCmd.reset();
@@ -479,7 +479,7 @@ void BoardEditorState_AddPad::applySelectedNetSignal() noexcept {
   }
 
   // Highlight all elements of the current netsignal.
-  mAdapter.fsmSetHighlightedNetSignals({netsignal});
+  mAdapter.fsmCrossProbe({netsignal});
 }
 
 NetSignal* BoardEditorState_AddPad::getCurrentNetSignal() const noexcept {

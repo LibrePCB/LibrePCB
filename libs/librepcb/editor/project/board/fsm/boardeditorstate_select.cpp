@@ -2154,7 +2154,7 @@ void BoardEditorState_Select::updateAvailableFeatures() noexcept {
         (!query.getStrokeTexts().isEmpty()) || (!query.getHoles().isEmpty())) {
       *features |= BoardEditorFsmAdapter::Feature::Properties;
     }
-    infoText = buildInfoBoxText(query);
+    infoText = processSelection(query);
   } else {
     // Do not update features in other states.
   }
@@ -2185,10 +2185,11 @@ private:
   bool multiple = false;
 };
 
-QString BoardEditorState_Select::buildInfoBoxText(
+QString BoardEditorState_Select::processSelection(
     const BoardSelectionQuery& query) const noexcept {
   const int totalCount = query.getResultCount();
   if (totalCount == 0) {
+    mAdapter.fsmCrossProbe();
     return QString();
   }
 
@@ -2204,6 +2205,12 @@ QString BoardEditorState_Select::buildInfoBoxText(
   InfoBoxValue<Length> drill;  // Hole, via drill
   InfoBoxValue<Length> size;  // Via size
   std::optional<Point> position;
+  QSet<const NetSignal*> crossProbeNets;
+  QSet<const ComponentInstance*> crossProbeComponents;
+  QSet<const ComponentSignalInstance*> crossProbeComponentSignals;
+  for (auto dev : query.getDeviceInstances()) {
+    crossProbeComponents.insert(&dev->getComponentInstance());
+  }
   if (!query.getDeviceInstances().isEmpty()) {
     // Devices have priority - any other objects are ignored.
     if (query.getDeviceInstances().count() == 1) {
@@ -2215,6 +2222,9 @@ QString BoardEditorState_Select::buildInfoBoxText(
     if (query.getPads().count() == 1) {
       pad = *query.getPads().begin();
       position = pad->getPosition();
+      if (auto sig = pad->getComponentSignalInstance()) {
+        crossProbeComponentSignals.insert(sig);
+      }
       // Note: Not adding net since we want to have a specific order.
       // Note: Not adding layer since it seems obvious and thus unnecessary.
     }
@@ -2256,9 +2266,8 @@ QString BoardEditorState_Select::buildInfoBoxText(
       size.add(*via->getActualSize());
       layerSpan.add(std::make_pair(&via->getVia().getStartLayer(),
                                    &via->getVia().getEndLayer()));
-      if (net.hasMultiple() && size.hasMultiple() && drill.hasMultiple() &&
-          layerSpan.hasMultiple()) {
-        break;
+      if (auto n = via->getNetSegment().getNetSignal()) {
+        crossProbeNets.insert(n);
       }
     }
   } else if (query.getNetLines().count() + query.getNetPoints().count() +
@@ -2270,16 +2279,24 @@ QString BoardEditorState_Select::buildInfoBoxText(
       layer.setMultiple();
     }
     for (const BI_Via* via : query.getVias()) {
-      if (net.hasMultiple()) break;
       net.add(via->getNetSegment().getNetSignal());  // Can be nullptr
+      if (auto n = via->getNetSegment().getNetSignal()) {
+        crossProbeNets.insert(n);
+      }
     }
     for (const BI_Plane* plane : query.getPlanes()) {
-      if (net.hasMultiple() && layer.hasMultiple()) break;
       net.add(plane->getNetSignal());  // Can be nullptr
       layer.add(&plane->getLayer());
+      if (auto n = plane->getNetSignal()) {
+        crossProbeNets.insert(n);
+      }
     }
     for (const BI_Pad* pad : query.getPads()) {
-      if (net.hasMultiple() && layer.hasMultiple()) break;
+      if (auto sig = pad->getComponentSignalInstance()) {
+        crossProbeComponentSignals.insert(sig);
+      } else if (net.hasMultiple() && layer.hasMultiple()) {
+        break;
+      }
       net.add(pad->getNetSignal());  // Can be nullptr
       if (!pad->getProperties().isTht()) {
         layer.add(&pad->getSolderLayer());
@@ -2288,14 +2305,24 @@ QString BoardEditorState_Select::buildInfoBoxText(
       }
     }
     for (const BI_NetLine* nl : query.getNetLines()) {
-      if (net.hasMultiple() && layer.hasMultiple() && width.hasMultiple()) {
-        break;
-      }
       net.add(nl->getNetSegment().getNetSignal());  // Can be nullptr
       layer.add(&nl->getLayer());
       width.add(*nl->getWidth());
+      if (auto n = nl->getNetSegment().getNetSignal()) {
+        crossProbeNets.insert(n);
+      }
+      if ((crossProbeNets.count() ==
+           mContext.project.getCircuit().getNetSignals().count()) &&
+          layer.hasMultiple() && width.hasMultiple()) {
+        break;
+      }
     }
   }
+
+  // Cross-probe selected objects to other editors.
+  mAdapter.fsmCrossProbe(crossProbeNets, crossProbeComponents,
+                         crossProbeComponentSignals,
+                         GraphicsLayer::State::Enabled);
 
   // Build key/value pairs for selected objects.
   QVector<std::pair<QString, QString>> keyValues;

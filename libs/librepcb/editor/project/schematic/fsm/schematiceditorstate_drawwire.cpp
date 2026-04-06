@@ -421,7 +421,7 @@ bool SchematicEditorState_DrawWire::startPositioning(
     updateNetpointPositions(snap);
 
     // Highlight all elements of the current netsignal.
-    mAdapter.fsmSetHighlightedNetSignals({&mCurrentNetSegment->getNetSignal()});
+    mAdapter.fsmCrossProbe({&mCurrentNetSegment->getNetSignal()});
 
     return true;
   } catch (const UserCanceled& e) {
@@ -690,7 +690,7 @@ bool SchematicEditorState_DrawWire::abortPositioning(
   SI_NetSegment* segment = simplifySegment ? mCurrentNetSegment : nullptr;
 
   try {
-    mAdapter.fsmSetHighlightedNetSignals({});
+    mAdapter.fsmCrossProbe();
     mSubState = SubState::IDLE;
     mFixedStartAnchor = nullptr;
     mCurrentNetSegment = nullptr;

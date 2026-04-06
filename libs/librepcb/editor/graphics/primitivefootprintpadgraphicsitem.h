@@ -72,6 +72,7 @@ public:
   void setText(const QString& text) noexcept;
   void setTextMirrored(bool mirrored) noexcept;
   void setLayer(const QString& layerName) noexcept;
+  void setState(GraphicsLayer::State state) noexcept;
   void setGeometries(const QHash<const Layer*, QList<PadGeometry>>& geometries,
                      const Length& clearance) noexcept;
 
@@ -94,6 +95,7 @@ private:  // Methods
 private:  // Data
   const GraphicsLayerList& mLayers;
   bool mMirror;
+  GraphicsLayer::State mState;
   std::shared_ptr<const GraphicsLayer> mCopperLayer;
   QScopedPointer<OriginCrossGraphicsItem> mOriginCrossGraphicsItem;
   QScopedPointer<PrimitivePathGraphicsItem> mTextGraphicsItem;

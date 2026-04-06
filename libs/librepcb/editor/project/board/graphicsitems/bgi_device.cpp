@@ -110,6 +110,7 @@ BGI_Device::BGI_Device(
     mHoleGraphicsItems.append(i);
   }
 
+  updateContext();
   updatePosition();
   updateRotationAndMirrored();
   updateBoardSide();
@@ -126,6 +127,21 @@ BGI_Device::~BGI_Device() noexcept {
  ******************************************************************************/
 
 void BGI_Device::updateContext() noexcept {
+  const GraphicsLayer::State state =
+      mContext->getLayerState(false, &mDevice.getComponentInstance());
+  mOriginCrossGraphicsItem->setState(state);
+  foreach (const auto& i, mCircleGraphicsItems) {
+    i->setState(state);
+  }
+  foreach (const auto& i, mPolygonGraphicsItems) {
+    i->setState(state);
+  }
+  foreach (const auto& i, mZoneGraphicsItems) {
+    i->setState(state);
+  }
+  foreach (const auto& i, mHoleGraphicsItems) {
+    i->setState(state);
+  }
   updateBoardSide();
 }
 

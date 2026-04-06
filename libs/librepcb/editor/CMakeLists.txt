@@ -800,6 +800,8 @@ add_library(
   project/partinformationtooltip.cpp
   project/partinformationtooltip.h
   project/partinformationtooltip.ui
+  project/projectcrossprobe.cpp
+  project/projectcrossprobe.h
   project/projecteditor.cpp
   project/projecteditor.h
   project/projectreadmerenderer.cpp

@@ -49,16 +49,15 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-SGI_SymbolPin::SGI_SymbolPin(SI_SymbolPin& pin,
-                             std::weak_ptr<SGI_Symbol> symbolItem,
-                             const GraphicsLayerList& layers,
-                             std::shared_ptr<const QSet<const NetSignal*>>
-                                 highlightedNetSignals) noexcept
+SGI_SymbolPin::SGI_SymbolPin(
+    SI_SymbolPin& pin, std::weak_ptr<SGI_Symbol> symbolItem,
+    const GraphicsLayerList& layers,
+    std::shared_ptr<const SchematicGraphicsScene::Context> context) noexcept
   : QGraphicsItemGroup(),
     mPin(pin),
     mSymbolGraphicsItem(symbolItem),
     mLayers(layers),
-    mHighlightedNetSignals(highlightedNetSignals),
+    mContext(context),
     mCircleGraphicsItem(new PrimitiveCircleGraphicsItem(this)),
     mLineGraphicsItem(new LineGraphicsItem(this)),
     mNameGraphicsItem(new PrimitiveTextGraphicsItem(this)),
@@ -100,6 +99,7 @@ SGI_SymbolPin::SGI_SymbolPin(SI_SymbolPin& pin,
   mNumbersGraphicsItem->setFlag(QGraphicsItem::ItemIsSelectable, true);
   mNumbersGraphicsItem->setFlag(QGraphicsItem::ItemStacksBehindParent, true);
 
+  updateContext();
   updatePosition();
   updateRotation();
   updateJunction();
@@ -107,7 +107,6 @@ SGI_SymbolPin::SGI_SymbolPin(SI_SymbolPin& pin,
   updateNumbers();
   updateNumbersPosition();
   updateNumbersAlignment();
-  updateHighlightedState();
 
   // Shape is always a circle.
   mShape.addEllipse(
@@ -126,13 +125,14 @@ SGI_SymbolPin::~SGI_SymbolPin() noexcept {
  *  General Methods
  ******************************************************************************/
 
-void SGI_SymbolPin::updateHighlightedState() noexcept {
-  const bool highlight = isSelected() ||
-      mHighlightedNetSignals->contains(mPin.getCompSigInstNetSignal());
-  mCircleGraphicsItem->setSelected(highlight);
-  mLineGraphicsItem->setSelected(highlight);
-  mNameGraphicsItem->setSelected(highlight);
-  mNumbersGraphicsItem->setSelected(highlight);
+void SGI_SymbolPin::updateContext() noexcept {
+  GraphicsLayer::State state = std::max(
+      mContext->getLayerState(false, mPin.getCompSigInstNetSignal()),
+      mContext->getLayerState(false, &mPin.getComponentSignalInstance()));
+  mCircleGraphicsItem->setState(state);
+  mLineGraphicsItem->setState(state);
+  mNameGraphicsItem->setState(state);
+  mNumbersGraphicsItem->setState(state);
 }
 
 /*******************************************************************************
@@ -143,7 +143,10 @@ QVariant SGI_SymbolPin::itemChange(GraphicsItemChange change,
                                    const QVariant& value) noexcept {
   if ((change == ItemSelectedHasChanged) && mCircleGraphicsItem &&
       mLineGraphicsItem && mNameGraphicsItem && mNumbersGraphicsItem) {
-    updateHighlightedState();
+    mCircleGraphicsItem->setSelected(value.toBool());
+    mLineGraphicsItem->setSelected(value.toBool());
+    mNameGraphicsItem->setSelected(value.toBool());
+    mNumbersGraphicsItem->setSelected(value.toBool());
   }
   return QGraphicsItem::itemChange(change, value);
 }

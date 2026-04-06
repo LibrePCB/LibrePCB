@@ -59,6 +59,14 @@ HoleGraphicsItem::~HoleGraphicsItem() noexcept {
 }
 
 /*******************************************************************************
+ *  General Methods
+ ******************************************************************************/
+
+void HoleGraphicsItem::setState(GraphicsLayer::State state) noexcept {
+  mGraphicsItem->setState(state);
+}
+
+/*******************************************************************************
  *  Inherited from QGraphicsItem
  ******************************************************************************/
 

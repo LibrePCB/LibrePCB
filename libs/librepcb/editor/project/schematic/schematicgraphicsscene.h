@@ -23,6 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../graphics/graphicslayer.h"
 #include "../../graphics/graphicsscene.h"
 
 #include <QtCore>
@@ -35,6 +36,9 @@
  ******************************************************************************/
 namespace librepcb {
 
+class Bus;
+class ComponentInstance;
+class ComponentSignalInstance;
 class NetSignal;
 class SI_BusJunction;
 class SI_BusLabel;
@@ -56,6 +60,7 @@ namespace editor {
 class GraphicsLayerList;
 class ImageGraphicsItem;
 class PolygonGraphicsItem;
+class ProjectCrossProbe;
 class SGI_BusJunction;
 class SGI_BusLabel;
 class SGI_BusLine;
@@ -65,6 +70,7 @@ class SGI_NetPoint;
 class SGI_Symbol;
 class SGI_SymbolPin;
 class SGI_Text;
+class WindowTab;
 
 /*******************************************************************************
  *  Class SchematicGraphicsScene
@@ -106,13 +112,24 @@ public:
     ZValue_ErcLocation,  ///< ERC location highlighting
   };
 
+  struct Context {
+    const WindowTab* tab = nullptr;
+    std::shared_ptr<const ProjectCrossProbe> crossProbe;
+    GraphicsLayer::State selfProbedState = GraphicsLayer::State::Enabled;
+    const bool& ignorePlacementLocks;
+
+    template <typename T = NetSignal>
+    GraphicsLayer::State getLayerState(bool highlight,
+                                       const T* obj1 = nullptr) const noexcept;
+  };
+
   // Constructors / Destructor
   SchematicGraphicsScene() = delete;
   SchematicGraphicsScene(const SchematicGraphicsScene& other) = delete;
-  explicit SchematicGraphicsScene(
-      Schematic& schematic, const GraphicsLayerList& layers,
-      std::shared_ptr<const QSet<const NetSignal*>> highlightedNetSignals,
-      bool& ignorePlacementLocks, QObject* parent = nullptr) noexcept;
+  explicit SchematicGraphicsScene(Schematic& schematic,
+                                  const GraphicsLayerList& layers,
+                                  std::shared_ptr<Context> context,
+                                  QObject* parent = nullptr) noexcept;
   virtual ~SchematicGraphicsScene() noexcept;
 
   // Getters
@@ -161,15 +178,16 @@ public:
   }
 
   // General Methods
+  void setSelfProbedState(GraphicsLayer::State state) noexcept;
   void selectAll() noexcept;
   void selectItemsInRect(const Point& p1, const Point& p2) noexcept;
   void clearSelection() noexcept;
-  void updateHighlightedNetSignals() noexcept;
 
   // Operator Overloadings
   SchematicGraphicsScene& operator=(const SchematicGraphicsScene& rhs) = delete;
 
 private:  // Methods
+  void updateCrossProbe() noexcept;
   void addSymbol(SI_Symbol& symbol) noexcept;
   void removeSymbol(SI_Symbol& symbol) noexcept;
   void addSymbolPin(SI_SymbolPin& pin,
@@ -209,8 +227,7 @@ private:  // Methods
 private:  // Data
   Schematic& mSchematic;
   const GraphicsLayerList& mLayers;
-  std::shared_ptr<const QSet<const NetSignal*>> mHighlightedNetSignals;
-  const bool& mIgnorePlacementLocks;
+  std::shared_ptr<Context> mContext;
   QHash<SI_Symbol*, std::shared_ptr<SGI_Symbol>> mSymbols;
   QHash<SI_SymbolPin*, std::shared_ptr<SGI_SymbolPin>> mSymbolPins;
   QHash<SI_BusJunction*, std::shared_ptr<SGI_BusJunction>> mBusJunctions;

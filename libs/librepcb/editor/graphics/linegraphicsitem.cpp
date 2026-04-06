@@ -40,13 +40,11 @@ namespace editor {
 LineGraphicsItem::LineGraphicsItem(QGraphicsItem* parent) noexcept
   : QGraphicsItem(parent),
     mLayer(nullptr),
+    mState(GraphicsLayer::State::Enabled),
+    mLineWidthPx(0),
     mOnLayerEditedSlot(*this, &LineGraphicsItem::layerEdited) {
   setFlag(QGraphicsItem::ItemIsSelectable, true);
 
-  mPen.setCapStyle(Qt::RoundCap);
-  mPenHighlighted.setCapStyle(Qt::RoundCap);
-  mPen.setWidth(0);
-  mPenHighlighted.setWidth(0);
   updateBoundingRectAndShape();
   setVisible(false);
 }
@@ -72,8 +70,7 @@ void LineGraphicsItem::setLine(const Point& p1, const Point& p2) noexcept {
 }
 
 void LineGraphicsItem::setLineWidth(const UnsignedLength& width) noexcept {
-  mPen.setWidthF(width->toPx());
-  mPenHighlighted.setWidthF(width->toPx());
+  mLineWidthPx = width->toPx();
   updateBoundingRectAndShape();
 }
 
@@ -85,12 +82,16 @@ void LineGraphicsItem::setLayer(
   mLayer = layer;
   if (mLayer) {
     mLayer->onEdited.attach(mOnLayerEditedSlot);
-    mPen.setColor(mLayer->getColor(false));
-    mPenHighlighted.setColor(mLayer->getColor(true));
     setVisible(mLayer->isVisible());
   } else {
     setVisible(false);
   }
+  update();
+}
+
+void LineGraphicsItem::setState(GraphicsLayer::State state) noexcept {
+  mState = state;
+  update();
 }
 
 /*******************************************************************************
@@ -105,11 +106,18 @@ void LineGraphicsItem::paint(QPainter* painter,
                              const QStyleOptionGraphicsItem* option,
                              QWidget* widget) noexcept {
   Q_UNUSED(widget);
-  if (option->state.testFlag(QStyle::State_Selected)) {
-    painter->setPen(mPenHighlighted);
-  } else {
-    painter->setPen(mPen);
+
+  if ((!mLayer) || (!mLayer->isVisible())) {
+    return;
   }
+
+  GraphicsLayer::State state = mState;
+  if (option->state.testFlag(QStyle::State_Selected)) {
+    state = GraphicsLayer::State::Highlighted;
+  }
+
+  painter->setPen(
+      QPen(mLayer->getColor(state), mLineWidthPx, Qt::SolidLine, Qt::RoundCap));
   painter->drawLine(mLine);
 }
 
@@ -121,11 +129,7 @@ void LineGraphicsItem::layerEdited(const GraphicsLayer& layer,
                                    GraphicsLayer::Event event) noexcept {
   switch (event) {
     case GraphicsLayer::Event::ColorChanged:
-      mPen.setColor(layer.getColor(false));
-      update();
-      break;
     case GraphicsLayer::Event::HighlightColorChanged:
-      mPenHighlighted.setColor(layer.getColor(true));
       update();
       break;
     case GraphicsLayer::Event::VisibleChanged:
@@ -142,7 +146,7 @@ void LineGraphicsItem::layerEdited(const GraphicsLayer& layer,
 void LineGraphicsItem::updateBoundingRectAndShape() noexcept {
   prepareGeometryChange();
   QRectF lineRect(mLine.p1(), mLine.p2());
-  mBoundingRect = Toolbox::adjustedBoundingRect(lineRect, mPen.widthF() / 2);
+  mBoundingRect = Toolbox::adjustedBoundingRect(lineRect, mLineWidthPx / 2);
   // TODO: Should we also update the shape?
   update();
 }

@@ -63,6 +63,7 @@ BGI_StrokeText::BGI_StrokeText(
 
   mOriginCrossGraphicsItem->setSize(UnsignedLength(1000000));
 
+  updateContext();
   updatePosition();
   updateTransform();
   updateLayer();
@@ -85,6 +86,13 @@ BGI_StrokeText::~BGI_StrokeText() noexcept {
  ******************************************************************************/
 
 void BGI_StrokeText::updateContext() noexcept {
+  const ComponentInstance* cmp = nullptr;
+  if (const BI_Device* dev = mText.getDevice()) {
+    cmp = &dev->getComponentInstance();
+  }
+  const GraphicsLayer::State state = mContext->getLayerState(false, cmp);
+  mPathGraphicsItem->setState(state);
+  mOriginCrossGraphicsItem->setState(state);
   updateLayer();
 }
 

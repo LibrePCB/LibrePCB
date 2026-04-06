@@ -24,6 +24,7 @@
 
 #include "../../graphics/imagegraphicsitem.h"
 #include "../../graphics/polygongraphicsitem.h"
+#include "../projectcrossprobe.h"
 #include "graphicsitems/sgi_busjunction.h"
 #include "graphicsitems/sgi_buslabel.h"
 #include "graphicsitems/sgi_busline.h"
@@ -60,18 +61,52 @@ namespace librepcb {
 namespace editor {
 
 /*******************************************************************************
+ *  Class Context
+ ******************************************************************************/
+
+template <typename T>
+GraphicsLayer::State SchematicGraphicsScene::Context::getLayerState(
+    bool highlight, const T* obj) const noexcept {
+  if (highlight) {
+    // Highlight has always priority.
+    return GraphicsLayer::State::Highlighted;
+  } else if (!crossProbe->isActive()) {
+    // Cross-probing not active -> normal enabled state.
+    return GraphicsLayer::State::Enabled;
+  }
+
+  const bool probed = crossProbe->isProbed(obj);
+  if (crossProbe->isCrossProbed(tab)) {
+    // Cross-probing from other tab -> highlight probed object, disable others.
+    return probed ? GraphicsLayer::State::Highlighted
+                  : GraphicsLayer::State::Disabled;
+  } else {
+    // Self-probing from this tab -> conditional probed state depending on tool.
+    return probed ? selfProbedState : GraphicsLayer::State::Enabled;
+  }
+}
+
+template GraphicsLayer::State SchematicGraphicsScene::Context::getLayerState(
+    bool highlight, const NetSignal* obj) const noexcept;
+template GraphicsLayer::State SchematicGraphicsScene::Context::getLayerState(
+    bool highlight, const ComponentInstance* obj) const noexcept;
+template GraphicsLayer::State SchematicGraphicsScene::Context::getLayerState(
+    bool highlight, const ComponentSignalInstance* obj) const noexcept;
+template GraphicsLayer::State SchematicGraphicsScene::Context::getLayerState(
+    bool highlight, const Bus* obj) const noexcept;
+
+/*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
 
-SchematicGraphicsScene::SchematicGraphicsScene(
-    Schematic& schematic, const GraphicsLayerList& layers,
-    std::shared_ptr<const QSet<const NetSignal*>> highlightedNetSignals,
-    bool& ignorePlacementLocks, QObject* parent) noexcept
+SchematicGraphicsScene::SchematicGraphicsScene(Schematic& schematic,
+                                               const GraphicsLayerList& layers,
+                                               std::shared_ptr<Context> context,
+                                               QObject* parent) noexcept
   : GraphicsScene(parent),
     mSchematic(schematic),
     mLayers(layers),
-    mHighlightedNetSignals(highlightedNetSignals),
-    mIgnorePlacementLocks(ignorePlacementLocks) {
+    mContext(context) {
   foreach (SI_Symbol* obj, mSchematic.getSymbols()) {
     addSymbol(*obj);
   }
@@ -115,6 +150,9 @@ SchematicGraphicsScene::SchematicGraphicsScene(
           &SchematicGraphicsScene::addImage);
   connect(&mSchematic, &Schematic::imageRemoved, this,
           &SchematicGraphicsScene::removeImage);
+
+  connect(mContext->crossProbe.get(), &ProjectCrossProbe::modified, this,
+          &SchematicGraphicsScene::updateCrossProbe, Qt::QueuedConnection);
 }
 
 SchematicGraphicsScene::~SchematicGraphicsScene() noexcept {
@@ -159,6 +197,11 @@ SchematicGraphicsScene::~SchematicGraphicsScene() noexcept {
  *  General Methods
  ******************************************************************************/
 
+void SchematicGraphicsScene::setSelfProbedState(
+    GraphicsLayer::State state) noexcept {
+  mContext->selfProbedState = state;
+}
+
 void SchematicGraphicsScene::selectAll() noexcept {
   foreach (auto item, mSymbols) {
     item->setSelected(true);
@@ -202,7 +245,7 @@ void SchematicGraphicsScene::selectItemsInRect(const Point& p1,
   foreach (auto item, mSymbols) {
     bool selectSymbol = item->mapToScene(item->shape()).intersects(rectPx);
     // Locked symbol texts shall act as an extended grab area for the symbol.
-    if ((!selectSymbol) && (!mIgnorePlacementLocks)) {
+    if ((!selectSymbol) && (!mContext->ignorePlacementLocks)) {
       for (SI_Text* text : item->getSymbol().getTexts()) {
         if (text->getTextObj().isLocked()) {
           if (auto textItem = mTexts.value(text)) {
@@ -250,7 +293,7 @@ void SchematicGraphicsScene::selectItemsInRect(const Point& p1,
     if (symbol && symbol->isSelected()) {
       item->setSelected(true);
     } else if ((!item->getText().getTextObj().isLocked()) ||
-               mIgnorePlacementLocks) {
+               mContext->ignorePlacementLocks) {
       item->setSelected(item->mapToScene(item->shape()).intersects(rectPx));
     }
   }
@@ -295,9 +338,25 @@ void SchematicGraphicsScene::clearSelection() noexcept {
   }
 }
 
-void SchematicGraphicsScene::updateHighlightedNetSignals() noexcept {
+/*******************************************************************************
+ *  Private Methods
+ ******************************************************************************/
+
+void SchematicGraphicsScene::updateCrossProbe() noexcept {
+  foreach (auto item, mSymbols) {
+    item->updateContext();
+  }
   foreach (auto item, mSymbolPins) {
-    item->updateHighlightedState();
+    item->updateContext();
+  }
+  foreach (auto item, mBusJunctions) {
+    item->update();
+  }
+  foreach (auto item, mBusLines) {
+    item->update();
+  }
+  foreach (auto item, mBusLabels) {
+    item->update();
   }
   foreach (auto item, mNetPoints) {
     item->update();
@@ -308,16 +367,15 @@ void SchematicGraphicsScene::updateHighlightedNetSignals() noexcept {
   foreach (auto item, mNetLabels) {
     item->update();
   }
+  foreach (auto item, mTexts) {
+    item->updateContext();
+  }
 }
-
-/*******************************************************************************
- *  Private Methods
- ******************************************************************************/
 
 void SchematicGraphicsScene::addSymbol(SI_Symbol& symbol) noexcept {
   Q_ASSERT(!mSymbols.contains(&symbol));
   std::shared_ptr<SGI_Symbol> item =
-      std::make_shared<SGI_Symbol>(symbol, mLayers);
+      std::make_shared<SGI_Symbol>(symbol, mLayers, mContext);
   addItem(*item);
   mSymbols.insert(&symbol, item);
 
@@ -357,8 +415,8 @@ void SchematicGraphicsScene::removeSymbol(SI_Symbol& symbol) noexcept {
 void SchematicGraphicsScene::addSymbolPin(
     SI_SymbolPin& pin, std::weak_ptr<SGI_Symbol> symbol) noexcept {
   Q_ASSERT(!mSymbolPins.contains(&pin));
-  std::shared_ptr<SGI_SymbolPin> item = std::make_shared<SGI_SymbolPin>(
-      pin, symbol, mLayers, mHighlightedNetSignals);
+  std::shared_ptr<SGI_SymbolPin> item =
+      std::make_shared<SGI_SymbolPin>(pin, symbol, mLayers, mContext);
   addItem(*item);
   mSymbolPins.insert(&pin, item);
 }
@@ -436,7 +494,7 @@ void SchematicGraphicsScene::removeBusJunctionsAndLines(
 void SchematicGraphicsScene::addBusJunction(SI_BusJunction& junction) noexcept {
   Q_ASSERT(!mBusJunctions.contains(&junction));
   std::shared_ptr<SGI_BusJunction> item =
-      std::make_shared<SGI_BusJunction>(junction, mLayers);
+      std::make_shared<SGI_BusJunction>(junction, mLayers, mContext);
   addItem(*item);
   mBusJunctions.insert(&junction, item);
 }
@@ -453,7 +511,7 @@ void SchematicGraphicsScene::removeBusJunction(
 void SchematicGraphicsScene::addBusLine(SI_BusLine& line) noexcept {
   Q_ASSERT(!mBusLines.contains(&line));
   std::shared_ptr<SGI_BusLine> item =
-      std::make_shared<SGI_BusLine>(line, mLayers);
+      std::make_shared<SGI_BusLine>(line, mLayers, mContext);
   addItem(*item);
   mBusLines.insert(&line, item);
 }
@@ -469,7 +527,7 @@ void SchematicGraphicsScene::removeBusLine(SI_BusLine& line) noexcept {
 void SchematicGraphicsScene::addBusLabel(SI_BusLabel& label) noexcept {
   Q_ASSERT(!mBusLabels.contains(&label));
   std::shared_ptr<SGI_BusLabel> item =
-      std::make_shared<SGI_BusLabel>(label, mLayers);
+      std::make_shared<SGI_BusLabel>(label, mLayers, mContext);
   addItem(*item);
   mBusLabels.insert(&label, item);
 }
@@ -548,7 +606,7 @@ void SchematicGraphicsScene::removeNetPointsAndNetLines(
 void SchematicGraphicsScene::addNetPoint(SI_NetPoint& netPoint) noexcept {
   Q_ASSERT(!mNetPoints.contains(&netPoint));
   std::shared_ptr<SGI_NetPoint> item =
-      std::make_shared<SGI_NetPoint>(netPoint, mLayers, mHighlightedNetSignals);
+      std::make_shared<SGI_NetPoint>(netPoint, mLayers, mContext);
   addItem(*item);
   mNetPoints.insert(&netPoint, item);
 }
@@ -564,7 +622,7 @@ void SchematicGraphicsScene::removeNetPoint(SI_NetPoint& netPoint) noexcept {
 void SchematicGraphicsScene::addNetLine(SI_NetLine& netLine) noexcept {
   Q_ASSERT(!mNetLines.contains(&netLine));
   std::shared_ptr<SGI_NetLine> item =
-      std::make_shared<SGI_NetLine>(netLine, mLayers, mHighlightedNetSignals);
+      std::make_shared<SGI_NetLine>(netLine, mLayers, mContext);
   addItem(*item);
   mNetLines.insert(&netLine, item);
 }
@@ -580,7 +638,7 @@ void SchematicGraphicsScene::removeNetLine(SI_NetLine& netLine) noexcept {
 void SchematicGraphicsScene::addNetLabel(SI_NetLabel& netLabel) noexcept {
   Q_ASSERT(!mNetLabels.contains(&netLabel));
   std::shared_ptr<SGI_NetLabel> item =
-      std::make_shared<SGI_NetLabel>(netLabel, mLayers, mHighlightedNetSignals);
+      std::make_shared<SGI_NetLabel>(netLabel, mLayers, mContext);
   addItem(*item);
   mNetLabels.insert(&netLabel, item);
 }
@@ -613,7 +671,7 @@ void SchematicGraphicsScene::removePolygon(SI_Polygon& polygon) noexcept {
 void SchematicGraphicsScene::addText(SI_Text& text) noexcept {
   Q_ASSERT(!mTexts.contains(&text));
   std::shared_ptr<SGI_Text> item = std::make_shared<SGI_Text>(
-      text, mSymbols.value(text.getSymbol()), mLayers);
+      text, mSymbols.value(text.getSymbol()), mLayers, mContext);
   addItem(*item);
   mTexts.insert(&text, item);
 }

@@ -69,6 +69,8 @@ BGI_Pad::BGI_Pad(
   mGraphicsItem->setTextMirrored(mContext->flipView);
   mGraphicsItem->setGeometries(mPad.getGeometries(),
                                *mPad.getProperties().getCopperClearance());
+
+  updateContext();
   updateLayer();
 
   mPad.onEdited.attach(mOnPadEditedSlot);
@@ -85,7 +87,16 @@ BGI_Pad::~BGI_Pad() noexcept {
  ******************************************************************************/
 
 void BGI_Pad::updateContext() noexcept {
-  updateHightlighted(isSelected());
+  GraphicsLayer::State state =
+      mContext->getLayerState(false, mPad.getNetSignal());
+  if (const BI_Device* dev = mPad.getDevice()) {
+    const ComponentInstance* cmp = &dev->getComponentInstance();
+    state = std::max(state, mContext->getLayerState(false, cmp));
+    if (const ComponentSignalInstance* s = mPad.getComponentSignalInstance()) {
+      state = std::max(state, mContext->getLayerState(false, s));
+    }
+  }
+  mGraphicsItem->setState(state);
   mGraphicsItem->setTextMirrored(mContext->flipView);
 }
 
@@ -101,7 +112,7 @@ QPainterPath BGI_Pad::shape() const noexcept {
 QVariant BGI_Pad::itemChange(GraphicsItemChange change,
                              const QVariant& value) noexcept {
   if ((change == ItemSelectedHasChanged) && mGraphicsItem) {
-    updateHightlighted(value.toBool());
+    mGraphicsItem->setSelected(value.toBool());
   }
   return QGraphicsItem::itemChange(change, value);
 }
@@ -173,11 +184,6 @@ void BGI_Pad::updateLayer() noexcept {
         BoardGraphicsScene::ZValue_PadsBottom, mContext->flipView));
     mGraphicsItem->setLayer(Theme::Color::sBoardCopperBot);
   }
-}
-
-void BGI_Pad::updateHightlighted(bool selected) noexcept {
-  mGraphicsItem->setSelected(
-      selected || mContext->highlightedNets->contains(mPad.getNetSignal()));
 }
 
 /*******************************************************************************

@@ -17,73 +17,70 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_SGI_BUSLINE_H
-#define LIBREPCB_EDITOR_SGI_BUSLINE_H
+#ifndef LIBREPCB_EDITOR_PROJECTCROSSPROBE_H
+#define LIBREPCB_EDITOR_PROJECTCROSSPROBE_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../schematicgraphicsscene.h"
-
-#include <librepcb/core/project/schematic/items/si_busline.h>
-
 #include <QtCore>
-#include <QtWidgets>
-
-#include <memory>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class Bus;
+class ComponentInstance;
+class ComponentSignalInstance;
+class NetSignal;
+
 namespace editor {
 
+class WindowTab;
+
 /*******************************************************************************
- *  Class SGI_BusLine
+ *  Class ProjectCrossProbe
  ******************************************************************************/
 
 /**
- * @brief The SGI_BusLine class
+ * @brief Holding the state of cross-probing objects between project tabs
  */
-class SGI_BusLine final : public QGraphicsItem {
+class ProjectCrossProbe final : public QObject {
+  Q_OBJECT
+
 public:
   // Constructors / Destructor
-  SGI_BusLine() = delete;
-  SGI_BusLine(const SGI_BusLine& other) = delete;
-  SGI_BusLine(
-      SI_BusLine& line, const GraphicsLayerList& layers,
-      std::shared_ptr<const SchematicGraphicsScene::Context> context) noexcept;
-  virtual ~SGI_BusLine() noexcept;
+  ProjectCrossProbe(const ProjectCrossProbe& other) = delete;
+  explicit ProjectCrossProbe(QObject* parent = nullptr) noexcept;
+  ~ProjectCrossProbe() noexcept;
 
   // General Methods
-  SI_BusLine& getBusLine() noexcept { return mBusLine; }
-
-  // Inherited from QGraphicsItem
-  QRectF boundingRect() const noexcept override { return mBoundingRect; }
-  QPainterPath shape() const noexcept override;
-  void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
-             QWidget* widget) noexcept override;
+  void reset() noexcept;
+  void set(const WindowTab* source, const QSet<const NetSignal*>& nets,
+           const QSet<const ComponentInstance*>& components,
+           const QSet<const ComponentSignalInstance*>& cmpSignals,
+           const QSet<const Bus*>& buses) noexcept;
+  bool isActive() const noexcept;
+  bool isCrossProbed(const WindowTab* target) const noexcept;
+  bool isSelfProbed(const WindowTab* target) const noexcept;
+  bool isProbed(const NetSignal* obj) const noexcept;
+  bool isProbed(const ComponentInstance* obj) const noexcept;
+  bool isProbed(const ComponentSignalInstance* obj) const noexcept;
+  bool isProbed(const Bus* obj) const noexcept;
 
   // Operator Overloadings
-  SGI_BusLine& operator=(const SGI_BusLine& rhs) = delete;
+  ProjectCrossProbe& operator=(const ProjectCrossProbe& rhs) = delete;
 
-private:  // Methods
-  void busLineEdited(const SI_BusLine& obj, SI_BusLine::Event event) noexcept;
-  void updatePositions() noexcept;
-  std::shared_ptr<GraphicsLayer> getLayer(const QString& name) const noexcept;
+signals:
+  void modified();
 
-private:  // Data
-  SI_BusLine& mBusLine;
-  std::shared_ptr<const SchematicGraphicsScene::Context> mContext;
-  std::shared_ptr<const GraphicsLayer> mLayer;
-
-  // Cached Attributes
-  QLineF mLineF;
-  QRectF mBoundingRect;
-  QPainterPath mShape;
-
-  // Slots
-  SI_BusLine::OnEditedSlot mOnBusLineEditedSlot;
+private:
+  const WindowTab* mSource;
+  QSet<const NetSignal*> mNets;
+  QSet<const ComponentInstance*> mComponents;
+  QSet<const ComponentSignalInstance*> mComponentSignals;
+  QSet<const Bus*> mBuses;
 };
 
 /*******************************************************************************

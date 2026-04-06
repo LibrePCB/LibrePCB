@@ -51,13 +51,12 @@ QVector<QLineF> SGI_NetLabel::sOriginCrossLines;
  *  Constructors / Destructor
  ******************************************************************************/
 
-SGI_NetLabel::SGI_NetLabel(SI_NetLabel& netlabel,
-                           const GraphicsLayerList& layers,
-                           std::shared_ptr<const QSet<const NetSignal*>>
-                               highlightedNetSignals) noexcept
+SGI_NetLabel::SGI_NetLabel(
+    SI_NetLabel& netlabel, const GraphicsLayerList& layers,
+    std::shared_ptr<const SchematicGraphicsScene::Context> context) noexcept
   : QGraphicsItem(),
     mNetLabel(netlabel),
-    mHighlightedNetSignals(highlightedNetSignals),
+    mContext(context),
     mOriginCrossLayer(layers.get(Theme::Color::sSchematicReferences)),
     mNetLabelLayer(layers.get(Theme::Color::sSchematicNetLabels)),
     mOnEditedSlot(*this, &SGI_NetLabel::netLabelEdited) {
@@ -109,33 +108,33 @@ void SGI_NetLabel::paint(QPainter* painter,
 
   const qreal lod =
       option->levelOfDetailFromTransform(painter->worldTransform());
-  const bool highlight = option->state.testFlag(QStyle::State_Selected) ||
-      mHighlightedNetSignals->contains(
-          &mNetLabel.getNetSegment().getNetSignal());
+  const NetSignal* net = &mNetLabel.getNetSegment().getNetSignal();
+  const bool selected = option->state.testFlag(QStyle::State_Selected);
+  const GraphicsLayer::State state = mContext->getLayerState(selected, net);
 
   if (mOriginCrossLayer && mOriginCrossLayer->isVisible() && (lod > 2)) {
     // draw origin cross
-    painter->setPen(QPen(mOriginCrossLayer->getColor(highlight), 0));
+    painter->setPen(QPen(mOriginCrossLayer->getColor(state), 0));
     painter->drawLines(sOriginCrossLines);
   }
 
   if (lod > 1) {
     // draw text
-    painter->setPen(QPen(mNetLabelLayer->getColor(highlight), 0));
+    painter->setPen(QPen(mNetLabelLayer->getColor(state), 0));
     painter->setFont(mFont);
     painter->save();
     if (mRotate180) {
       painter->rotate(180);
     }
     painter->drawStaticText(mTextOrigin, mStaticText);
-    painter->setPen(QPen(mNetLabelLayer->getColor(highlight), qreal(4) / 15));
+    painter->setPen(QPen(mNetLabelLayer->getColor(state), qreal(4) / 15));
     painter->drawLines(mOverlines);
     painter->restore();
   } else {
     // draw filled rect
     painter->setPen(Qt::NoPen);
     painter->setBrush(
-        QBrush(mNetLabelLayer->getColor(highlight), Qt::Dense5Pattern));
+        QBrush(mNetLabelLayer->getColor(state), Qt::Dense5Pattern));
     painter->drawRect(mBoundingRect);
   }
 }

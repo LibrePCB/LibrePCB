@@ -45,6 +45,7 @@ PrimitiveTextGraphicsItem::PrimitiveTextGraphicsItem(
     QGraphicsItem* parent) noexcept
   : QGraphicsItem(parent),
     mLayer(nullptr),
+    mState(GraphicsLayer::State::Enabled),
     mText(),
     mDisplayText(),
     mParseOverlines(false),
@@ -98,8 +99,6 @@ void PrimitiveTextGraphicsItem::setText(const QString& text,
 void PrimitiveTextGraphicsItem::setHeight(
     const PositiveLength& height) noexcept {
   mHeight = height;
-  mPen.setWidthF(OverlineMarkupParser::getLineWidth(height->toPx()));
-  mPenHighlighted.setWidthF(OverlineMarkupParser::getLineWidth(height->toPx()));
   updateBoundingRectAndShape();
 }
 
@@ -134,13 +133,16 @@ void PrimitiveTextGraphicsItem::setLayer(
   mLayer = layer;
   if (mLayer) {
     mLayer->onEdited.attach(mOnLayerEditedSlot);
-    mPen.setColor(mLayer->getColor(false));
-    mPenHighlighted.setColor(mLayer->getColor(true));
     setVisible(mLayer->isVisible());
     update();
   } else {
     setVisible(false);
   }
+}
+
+void PrimitiveTextGraphicsItem::setState(GraphicsLayer::State state) noexcept {
+  mState = state;
+  update();
 }
 
 /*******************************************************************************
@@ -156,12 +158,19 @@ void PrimitiveTextGraphicsItem::paint(QPainter* painter,
                                       const QStyleOptionGraphicsItem* option,
                                       QWidget* widget) noexcept {
   Q_UNUSED(widget);
-  painter->setFont(mFont);
-  if (option->state.testFlag(QStyle::State_Selected)) {
-    painter->setPen(mPenHighlighted);
-  } else {
-    painter->setPen(mPen);
+
+  if ((!mLayer) || (!mLayer->isVisible())) {
+    return;
   }
+
+  GraphicsLayer::State state = mState;
+  if (option->state.testFlag(QStyle::State_Selected)) {
+    state = GraphicsLayer::State::Highlighted;
+  }
+
+  painter->setFont(mFont);
+  painter->setPen(QPen(mLayer->getColor(state),
+                       OverlineMarkupParser::getLineWidth(mHeight->toPx())));
   painter->drawText(QRectF(), mTextFlags, mDisplayText);
   painter->drawLines(mOverlines);
 }
@@ -174,11 +183,7 @@ void PrimitiveTextGraphicsItem::layerEdited(
     const GraphicsLayer& layer, GraphicsLayer::Event event) noexcept {
   switch (event) {
     case GraphicsLayer::Event::ColorChanged:
-      mPen.setColor(layer.getColor(false));
-      update();
-      break;
     case GraphicsLayer::Event::HighlightColorChanged:
-      mPenHighlighted.setColor(layer.getColor(true));
       update();
       break;
     case GraphicsLayer::Event::VisibleChanged:

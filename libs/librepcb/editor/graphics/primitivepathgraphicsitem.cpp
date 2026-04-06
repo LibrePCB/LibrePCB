@@ -43,19 +43,14 @@ PrimitivePathGraphicsItem::PrimitivePathGraphicsItem(
     mMirror(false),
     mLineLayer(nullptr),
     mFillLayer(nullptr),
+    mState(GraphicsLayer::State::Enabled),
     mLighterColors(false),
     mShapeMode(ShapeMode::StrokeAndAreaByLayer),
+    mLineWidthPx(0),
     mBoundingRectMarginPx(0),
     mOnLayerEditedSlot(*this, &PrimitivePathGraphicsItem::layerEdited) {
   setFlag(QGraphicsItem::ItemIsSelectable, true);
 
-  mPen.setCapStyle(Qt::RoundCap);
-  mPenHighlighted.setCapStyle(Qt::RoundCap);
-  mPen.setJoinStyle(Qt::RoundJoin);
-  mPenHighlighted.setJoinStyle(Qt::RoundJoin);
-  mPen.setWidthF(0);
-  mPenHighlighted.setWidthF(0);
-  updateColors();
   updateBoundingRectAndShape();
   updateVisibility();
 }
@@ -87,8 +82,7 @@ void PrimitivePathGraphicsItem::setPath(const QPainterPath& path) noexcept {
 
 void PrimitivePathGraphicsItem::setLineWidth(
     const UnsignedLength& width) noexcept {
-  mPen.setWidthF(width->toPx());
-  mPenHighlighted.setWidthF(width->toPx());
+  mLineWidthPx = width->toPx();
   updateBoundingRectAndShape();
 }
 
@@ -101,7 +95,6 @@ void PrimitivePathGraphicsItem::setLineLayer(
   if (mLineLayer) {
     mLineLayer->onEdited.attach(mOnLayerEditedSlot);
   }
-  updateColors();
   updateVisibility();
   updateBoundingRectAndShape();  // grab area may have changed
 }
@@ -115,14 +108,18 @@ void PrimitivePathGraphicsItem::setFillLayer(
   if (mFillLayer) {
     mFillLayer->onEdited.attach(mOnLayerEditedSlot);
   }
-  updateColors();
   updateVisibility();
   updateBoundingRectAndShape();  // grab area may have changed
 }
 
+void PrimitivePathGraphicsItem::setState(GraphicsLayer::State state) noexcept {
+  mState = state;
+  update();
+}
+
 void PrimitivePathGraphicsItem::setLighterColors(bool lighter) noexcept {
   mLighterColors = lighter;
-  updateColors();
+  update();
 }
 
 void PrimitivePathGraphicsItem::setShapeMode(ShapeMode mode) noexcept {
@@ -135,10 +132,7 @@ void PrimitivePathGraphicsItem::setShapeMode(ShapeMode mode) noexcept {
  ******************************************************************************/
 
 QPainterPath PrimitivePathGraphicsItem::shape() const noexcept {
-  return ((mLineLayer && mLineLayer->isVisible()) ||
-          (mFillLayer && mFillLayer->isVisible()))
-      ? mShape
-      : QPainterPath();
+  return mShape;
 }
 
 void PrimitivePathGraphicsItem::paint(QPainter* painter,
@@ -146,14 +140,17 @@ void PrimitivePathGraphicsItem::paint(QPainter* painter,
                                       QWidget* widget) noexcept {
   Q_UNUSED(widget);
 
-  const bool isSelected = option->state.testFlag(QStyle::State_Selected);
+  GraphicsLayer::State state = mState;
+  if (option->state.testFlag(QStyle::State_Selected)) {
+    state = GraphicsLayer::State::Highlighted;
+  }
 
   if (mMirror) {
     painter->scale(-1, 1);
   }
 
-  painter->setPen(isSelected ? mPenHighlighted : mPen);
-  painter->setBrush(isSelected ? mBrushHighlighted : mBrush);
+  painter->setPen(getPen(state));
+  painter->setBrush(getBrush(state));
   painter->drawPath(mPainterPath);
 }
 
@@ -167,9 +164,11 @@ void PrimitivePathGraphicsItem::layerEdited(
   switch (event) {
     case GraphicsLayer::Event::ColorChanged:
     case GraphicsLayer::Event::HighlightColorChanged:
+      update();
+      break;
     case GraphicsLayer::Event::VisibleChanged:
     case GraphicsLayer::Event::EnabledChanged:
-      updateColors();
+      updateBoundingRectAndShape();  // Shape may have changed.
       updateVisibility();
       break;
     default:
@@ -180,50 +179,48 @@ void PrimitivePathGraphicsItem::layerEdited(
   }
 }
 
-void PrimitivePathGraphicsItem::updateColors() noexcept {
-  if (mLineLayer && mLineLayer->isVisible()) {
-    mPen.setStyle(Qt::SolidLine);
-    mPenHighlighted.setStyle(Qt::SolidLine);
-    mPen.setColor(convertColor(mLineLayer->getColor(false)));
-    mPenHighlighted.setColor(convertColor(mLineLayer->getColor(true)));
-  } else {
-    mPen.setStyle(Qt::NoPen);
-    mPenHighlighted.setStyle(Qt::NoPen);
-  }
-
-  if (mFillLayer && mFillLayer->isVisible()) {
-    mBrush.setStyle(Qt::SolidPattern);
-    mBrushHighlighted.setStyle(Qt::SolidPattern);
-    mBrush.setColor(convertColor(mFillLayer->getColor(false)));
-    mBrushHighlighted.setColor(convertColor(mFillLayer->getColor(true)));
-  } else {
-    mBrush.setStyle(Qt::NoBrush);
-    mBrushHighlighted.setStyle(Qt::NoBrush);
-  }
-  update();
-}
-
 void PrimitivePathGraphicsItem::updateBoundingRectAndShape() noexcept {
   prepareGeometryChange();
   if (mShapeMode == ShapeMode::FilledOutline) {
     mShape = mPainterPath;
   } else if (mShapeMode == ShapeMode::StrokeAndAreaByLayer) {
-    mShape = Toolbox::shapeFromPath(mPainterPath, mPen, mBrush);
+    mShape =
+        Toolbox::shapeFromPath(mPainterPath, getPen(mState), getBrush(mState));
   } else {
     mShape = QPainterPath();
   }
   mBoundingRect = mPainterPath.boundingRect() +
-      QMarginsF(mPen.widthF(), mPen.widthF(), mPen.widthF(), mPen.widthF());
+      QMarginsF(mLineWidthPx, mLineWidthPx, mLineWidthPx, mLineWidthPx);
   update();
 }
 
 void PrimitivePathGraphicsItem::updateVisibility() noexcept {
-  setVisible((mPen.style() != Qt::NoPen) || (mBrush.style() != Qt::NoBrush));
+  setVisible((mLineLayer && mLineLayer->isVisible()) ||
+             (mFillLayer && mFillLayer->isVisible()));
 }
 
 QColor PrimitivePathGraphicsItem::convertColor(
     const QColor& color) const noexcept {
   return mLighterColors ? color.lighter(200) : color;
+}
+
+QPen PrimitivePathGraphicsItem::getPen(
+    GraphicsLayer::State state) const noexcept {
+  if (mLineLayer && mLineLayer->isVisible()) {
+    return QPen(mLineLayer->getColor(state), mLineWidthPx, Qt::SolidLine,
+                Qt::RoundCap, Qt::RoundJoin);
+  } else {
+    return Qt::NoPen;
+  }
+}
+
+QBrush PrimitivePathGraphicsItem::getBrush(
+    GraphicsLayer::State state) const noexcept {
+  if (mFillLayer && mFillLayer->isVisible()) {
+    return QBrush(mFillLayer->getColor(state), Qt::SolidPattern);
+  } else {
+    return Qt::NoBrush;
+  }
 }
 
 /*******************************************************************************

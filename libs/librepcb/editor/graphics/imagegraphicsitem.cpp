@@ -118,7 +118,10 @@ void ImageGraphicsItem::paint(QPainter* painter,
                               QWidget* widget) noexcept {
   Q_UNUSED(widget);
 
-  const bool isSelected = option->state.testFlag(QStyle::State_Selected);
+  const bool selected = option->state.testFlag(QStyle::State_Selected);
+  const GraphicsLayer::State state = selected
+      ? GraphicsLayer::State::Highlighted
+      : GraphicsLayer::State::Enabled;
   const qreal lod =
       option->levelOfDetailFromTransform(painter->worldTransform());
   mVertexHandleRadiusPx = 20 / lod;
@@ -129,25 +132,25 @@ void ImageGraphicsItem::paint(QPainter* painter,
   // Draw border, if border is enabled or item is selected.
   if (mInvalidImage) {
     painter->setBrush(Qt::NoBrush);
-    painter->setPen(QPen(isSelected ? Qt::red : Qt::darkRed, 0));
+    painter->setPen(QPen(selected ? Qt::red : Qt::darkRed, 0));
     painter->drawRect(mImageRectPx);
   } else if (mBordersLayer) {
     std::optional<UnsignedLength> borderWidth = mImage->getBorderWidth();
-    if ((!borderWidth) && mEditable && isSelected) {
+    if ((!borderWidth) && mEditable && selected) {
       borderWidth = UnsignedLength(0);
     }
     if (borderWidth) {
       const qreal w = (*borderWidth)->toPx();
       painter->setBrush(Qt::NoBrush);
-      painter->setPen(QPen(mBordersLayer->getColor(isSelected), w,
-                           Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+      painter->setPen(QPen(mBordersLayer->getColor(state), w, Qt::SolidLine,
+                           Qt::RoundCap, Qt::RoundJoin));
       painter->drawRect(mImageRectPx.adjusted(-w / 2, -w / 2, w / 2, w / 2));
     }
   }
 
   // Draw resize handle if selected and editable.
-  if (mEditable && isSelected && mBordersLayer) {
-    QColor color = mBordersLayer->getColor(isSelected);
+  if (mEditable && selected && mBordersLayer) {
+    QColor color = mBordersLayer->getColor(state);
     color.setAlpha(color.alpha() / 3);
     painter->setBrush(Qt::NoBrush);
 

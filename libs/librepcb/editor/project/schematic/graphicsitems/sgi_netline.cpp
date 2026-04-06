@@ -46,12 +46,12 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-SGI_NetLine::SGI_NetLine(SI_NetLine& netline, const GraphicsLayerList& layers,
-                         std::shared_ptr<const QSet<const NetSignal*>>
-                             highlightedNetSignals) noexcept
+SGI_NetLine::SGI_NetLine(
+    SI_NetLine& netline, const GraphicsLayerList& layers,
+    std::shared_ptr<const SchematicGraphicsScene::Context> context) noexcept
   : QGraphicsItem(),
     mNetLine(netline),
-    mHighlightedNetSignals(highlightedNetSignals),
+    mContext(context),
     mLayer(layers.get(Theme::Color::sSchematicWires)),
     mOnNetLineEditedSlot(*this, &SGI_NetLine::netLineEdited) {
   setFlag(QGraphicsItem::ItemIsSelectable, true);
@@ -78,19 +78,18 @@ void SGI_NetLine::paint(QPainter* painter,
                         QWidget* widget) noexcept {
   Q_UNUSED(widget);
 
-  const bool highlight = option->state.testFlag(QStyle::State_Selected) ||
-      mHighlightedNetSignals->contains(
-          &mNetLine.getNetSegment().getNetSignal());
-
-  // draw line
-  if (mLayer && mLayer->isVisible()) {
-    QPen pen(mLayer->getColor(highlight), mNetLine.getWidth()->toPx(),
-             Qt::SolidLine, Qt::RoundCap);
-    painter->setPen(pen);
-    // See https://github.com/LibrePCB/LibrePCB/issues/1440
-    mLineF.isNull() ? painter->drawPoint(mLineF.p1())
-                    : painter->drawLine(mLineF);
+  if ((!mLayer) || (!mLayer->isVisible())) {
+    return;
   }
+
+  const NetSignal* net = &mNetLine.getNetSegment().getNetSignal();
+  const bool selected = option->state.testFlag(QStyle::State_Selected);
+  const GraphicsLayer::State state = mContext->getLayerState(selected, net);
+
+  painter->setPen(QPen(mLayer->getColor(state), mNetLine.getWidth()->toPx(),
+                       Qt::SolidLine, Qt::RoundCap));
+  // See https://github.com/LibrePCB/LibrePCB/issues/1440
+  mLineF.isNull() ? painter->drawPoint(mLineF.p1()) : painter->drawLine(mLineF);
 }
 
 /*******************************************************************************

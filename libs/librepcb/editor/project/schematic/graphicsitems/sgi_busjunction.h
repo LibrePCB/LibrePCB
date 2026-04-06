@@ -23,6 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../schematicgraphicsscene.h"
+
 #include <librepcb/core/project/schematic/items/si_busjunction.h>
 
 #include <QtCore>
@@ -36,9 +38,6 @@
 namespace librepcb {
 namespace editor {
 
-class GraphicsLayer;
-class GraphicsLayerList;
-
 /*******************************************************************************
  *  Class SGI_BusJunction
  ******************************************************************************/
@@ -51,8 +50,9 @@ public:
   // Constructors / Destructor
   SGI_BusJunction() = delete;
   SGI_BusJunction(const SGI_BusJunction& other) = delete;
-  SGI_BusJunction(SI_BusJunction& netpoint,
-                  const GraphicsLayerList& layers) noexcept;
+  SGI_BusJunction(
+      SI_BusJunction& netpoint, const GraphicsLayerList& layers,
+      std::shared_ptr<const SchematicGraphicsScene::Context> context) noexcept;
   virtual ~SGI_BusJunction() noexcept;
 
   // General Methods
@@ -74,6 +74,7 @@ private:  // Methods
 
 private:  // Data
   SI_BusJunction& mBusJunction;
+  std::shared_ptr<const SchematicGraphicsScene::Context> mContext;
   std::shared_ptr<const GraphicsLayer> mLayer;
 
   // Cached Attributes

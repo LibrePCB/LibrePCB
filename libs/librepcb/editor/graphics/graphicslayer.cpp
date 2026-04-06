@@ -42,8 +42,10 @@ GraphicsLayer::GraphicsLayer(const GraphicsLayer& other) noexcept
   : onEdited(*this),
     mName(other.mName),
     mNameTr(other.mNameTr),
+    mDisabledMode(other.mDisabledMode),
     mColor(other.mColor),
     mColorHighlighted(other.mColorHighlighted),
+    mColorDisabled(other.mColorDisabled),
     mIsVisible(other.mIsVisible),
     mIsEnabled(other.mIsEnabled) {
 }
@@ -51,26 +53,40 @@ GraphicsLayer::GraphicsLayer(const GraphicsLayer& other) noexcept
 GraphicsLayer::GraphicsLayer(const QString& name, const QString& nameTr,
                              const QColor& color,
                              const QColor& colorHighlighted, bool visible,
-                             bool enabled) noexcept
+                             bool enabled, DisabledMode disabledMode) noexcept
   : onEdited(*this),
     mName(name),
     mNameTr(nameTr),
+    mDisabledMode(disabledMode),
     mColor(color),
     mColorHighlighted(colorHighlighted),
+    mColorDisabled(),
     mIsVisible(visible),
     mIsEnabled(enabled) {
+  updateDisabledColor();
 }
 
 GraphicsLayer::~GraphicsLayer() noexcept {
 }
 
 /*******************************************************************************
- *  Setters
+ *  General Methods
  ******************************************************************************/
+
+const QColor& GraphicsLayer::getColor(State state) const noexcept {
+  if (state == State::Highlighted) {
+    return mColorHighlighted;
+  } else if (state == State::Disabled) {
+    return mColorDisabled;
+  } else {
+    return mColor;
+  }
+}
 
 void GraphicsLayer::setColor(const QColor& color) noexcept {
   if (color != mColor) {
     mColor = color;
+    updateDisabledColor();
     onEdited.notify(Event::ColorChanged);
   }
 }
@@ -93,6 +109,19 @@ void GraphicsLayer::setEnabled(bool enable) noexcept {
   if (enable != mIsEnabled) {
     mIsEnabled = enable;
     onEdited.notify(Event::EnabledChanged);
+  }
+}
+
+/*******************************************************************************
+ *  Private Methods
+ ******************************************************************************/
+
+void GraphicsLayer::updateDisabledColor() noexcept {
+  if (mDisabledMode == DisabledMode::Grayscale) {
+    const int gray = qGray(mColor.red(), mColor.green(), mColor.blue());
+    mColorDisabled = QColor(gray, gray, gray, mColor.alpha());
+  } else {
+    mColorDisabled = QColor(128, 128, 128, mColor.alpha() / 2);
   }
 }
 
