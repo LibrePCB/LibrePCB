@@ -518,7 +518,17 @@ void WorkspaceSettingsDialog::changeEvent(QEvent* event) noexcept {
 }
 
 void WorkspaceSettingsDialog::reject() noexcept {
-  revertTemporaryModifications();
+  if (hasTemporaryModifications()) {
+    const int ret = QMessageBox::question(
+        this, tr("Discard Changes?"),
+        tr("You made changes to some settings which will be lost when closing "
+           "the dialog. Are you sure to discard them?"),
+        QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Cancel);
+    if (ret != QMessageBox::Yes) {
+      return;
+    }
+    revertTemporaryModifications();
+  }
   QDialog::reject();
 }
 
@@ -836,6 +846,13 @@ void WorkspaceSettingsDialog::revertTemporaryModifications() noexcept {
   mSettings.applicationLocale.set(mOldApplicationLocale);
   mSettings.themes.setAll(mOldThemes);
   mSettings.themes.setActiveUuid(mOldActiveTheme);
+}
+
+bool WorkspaceSettingsDialog::hasTemporaryModifications() const noexcept {
+  return (mSettings.uiTheme.get() != mOldUiTheme) ||
+      (mSettings.applicationLocale.get() != mOldApplicationLocale) ||
+      (mSettings.themes.getAll() != mOldThemes) ||
+      (mSettings.themes.getActiveUuid() != mOldActiveTheme);
 }
 
 /*******************************************************************************

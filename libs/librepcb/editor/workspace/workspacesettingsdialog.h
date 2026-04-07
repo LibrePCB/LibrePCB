@@ -103,6 +103,7 @@ private:
   void saveSettings() noexcept;
   void discardTemporaryModifications() noexcept;
   void revertTemporaryModifications() noexcept;
+  bool hasTemporaryModifications() const noexcept;
 
 private:
   Workspace& mWorkspace;  /// Reference to the Workspace object
