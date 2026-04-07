@@ -64,7 +64,8 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
     mApiEndpointModel(new ApiEndpointListModelLegacy()),
     mKeyboardShortcutsModel(new KeyboardShortcutsModel(this)),
     mKeyboardShortcutsFilterModel(new QSortFilterProxyModel(this)),
-    mUi(new Ui::WorkspaceSettingsDialog) {
+    mUi(new Ui::WorkspaceSettingsDialog),
+    mOldActiveTheme(Uuid::createRandom()) {
   mUi->setupUi(this);
 
   discardTemporaryModifications();
@@ -319,48 +320,59 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
         static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
         this, &WorkspaceSettingsDialog::themeIndexChanged);
     connect(mUi->btnRemoveTheme, &QToolButton::clicked, this, [this]() {
-      if (Theme* theme = getCurrentTheme()) {
-        mThemes.remove(theme->getUuid());
-        updateThemesList(mSettings.themes.getActiveUuid());
+      Uuid active = mSettings.themes.getActiveUuid();
+      auto themes = mSettings.themes.getAll();
+      themes.remove(active);
+      if (!themes.isEmpty()) {
+        active = themes.first().getUuid();
       }
+      mSettings.themes.setActiveUuid(active);
+      mSettings.themes.setAll(themes);
+      updateThemesList();
     });
     connect(mUi->btnRenameTheme, &QToolButton::clicked, this,
             [this, askName]() {
-              if (Theme* theme = getCurrentTheme()) {
-                const QString name =
-                    askName(mUi->btnRenameTheme->text(), theme->getName());
-                if (!name.isEmpty()) {
-                  theme->setName(name);
-                  updateThemesList(theme->getUuid());
-                }
-              }
+              auto themes = mSettings.themes.getAll();
+              auto theme = themes.find(mSettings.themes.getActiveUuid());
+              if (theme == themes.end()) return;
+              const QString name =
+                  askName(mUi->btnRenameTheme->text(), theme->getName());
+              if (name.isEmpty()) return;
+              theme->setName(name);
+              mSettings.themes.setAll(themes);
+              updateThemesList();
             });
     connect(mUi->btnResetTheme, &QToolButton::clicked, this, [this]() {
-      if (Theme* theme = getCurrentTheme()) {
-        theme->restoreDefaults();
-        updateThemesList(theme->getUuid());
-      }
+      auto themes = mSettings.themes.getAll();
+      auto theme = themes.find(mSettings.themes.getActiveUuid());
+      if (theme == themes.end()) return;
+      theme->restoreDefaults();
+      mSettings.themes.setAll(themes);
+      updateThemesList();
     });
-    connect(mUi->btnDuplicateTheme, &QToolButton::clicked, this,
-            [this, askName]() {
-              if (Theme* theme = getCurrentTheme()) {
-                const QString name =
-                    askName(mUi->btnDuplicateTheme->text(),
-                            tr("Copy of %1").arg(theme->getName()));
-                if (!name.isEmpty()) {
-                  const Theme copy(Uuid::createRandom(), name, *theme);
-                  mThemes.insert(copy.getUuid(), copy);
-                  updateThemesList(copy.getUuid());
-                }
-              }
-            });
+    connect(
+        mUi->btnDuplicateTheme, &QToolButton::clicked, this, [this, askName]() {
+          auto themes = mSettings.themes.getAll();
+          auto theme = themes.find(mSettings.themes.getActiveUuid());
+          if (theme == themes.end()) return;
+          const QString name = askName(mUi->btnDuplicateTheme->text(),
+                                       tr("Copy of %1").arg(theme->getName()));
+          if (name.isEmpty()) return;
+          const Theme copy(Uuid::createRandom(), name, *theme);
+          themes.insert(copy.getUuid(), copy);
+          mSettings.themes.setAll(themes);
+          mSettings.themes.setActiveUuid(copy.getUuid());
+          updateThemesList();
+        });
     connect(mUi->btnNewTheme, &QToolButton::clicked, this, [this, askName]() {
       const QString name = askName(mUi->btnNewTheme->text(), tr("New Theme"));
-      if (!name.isEmpty()) {
-        const Theme theme(Uuid::createRandom(), name);
-        mThemes.insert(theme.getUuid(), theme);
-        updateThemesList(theme.getUuid());
-      }
+      if (name.isEmpty()) return;
+      const Theme theme(Uuid::createRandom(), name);
+      auto themes = mSettings.themes.getAll();
+      themes.insert(theme.getUuid(), theme);
+      mSettings.themes.setAll(themes);
+      mSettings.themes.setActiveUuid(theme.getUuid());
+      updateThemesList();
     });
     mUi->treeThemeColors->header()->setSectionsMovable(false);
     mUi->treeThemeColors->header()->setSectionResizeMode(
@@ -373,8 +385,10 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
                                                          QHeaderView::Stretch);
     connect(mUi->treeThemeColors, &QTreeWidget::itemDoubleClicked, this,
             [this](QTreeWidgetItem* item, int column) {
-              Theme* theme = getCurrentTheme();
-              if ((!item) || (column < 0) || (column > 1) || (!theme)) return;
+              if ((!item) || (column < 0) || (column > 1)) return;
+              auto themes = mSettings.themes.getAll();
+              auto theme = themes.find(mSettings.themes.getActiveUuid());
+              if (theme == themes.end()) return;
               QList<ThemeColor> colors = theme->getColors();
               const int index = mUi->treeThemeColors->indexOfTopLevelItem(item);
               if ((index < 0) || (index >= colors.count())) return;
@@ -391,6 +405,7 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
               }
               theme->setColors(colors);
               initColorTreeWidgetItem(*item, colors[index]);
+              mSettings.themes.setAll(themes);
             });
     for (auto cfg : {
              std::make_pair(mUi->cbxSchematicGridStyle,
@@ -401,11 +416,13 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
               static_cast<void (QComboBox::*)(int)>(
                   &QComboBox::currentIndexChanged),
               this, [this, cfg](int index) {
-                if (Theme* theme = getCurrentTheme()) {
-                  const Theme::GridStyle style =
-                      cfg.first->itemData(index).value<Theme::GridStyle>();
-                  (theme->*cfg.second)(style);
-                }
+                auto themes = mSettings.themes.getAll();
+                auto theme = themes.find(mSettings.themes.getActiveUuid());
+                if (theme == themes.end()) return;
+                const Theme::GridStyle style =
+                    cfg.first->itemData(index).value<Theme::GridStyle>();
+                ((*theme).*cfg.second)(style);
+                mSettings.themes.setAll(themes);
               });
     }
   }
@@ -582,20 +599,27 @@ void WorkspaceSettingsDialog::externalApplicationListIndexChanged(
   mUi->lblExternalApplicationsPlaceholders->setText(placeholdersText);
 }
 
-void WorkspaceSettingsDialog::updateThemesList(
-    const Uuid& selectedTheme) noexcept {
+void WorkspaceSettingsDialog::updateThemesList() noexcept {
+  QSignalBlocker blocker(mUi->cbxThemes);
+  mUi->cbxThemes->setCurrentIndex(-1);
   mUi->cbxThemes->clear();
-  foreach (const Theme& theme, mThemes) {
+  foreach (const Theme& theme, mSettings.themes.getAll()) {
     mUi->cbxThemes->addItem(theme.getName(), theme.getUuid().toStr());
   }
-  const int index =
-      std::max(0, mUi->cbxThemes->findData(selectedTheme.toStr()));
+  const int index = std::max(
+      0, mUi->cbxThemes->findData(mSettings.themes.getActiveUuid().toStr()));
   mUi->cbxThemes->setCurrentIndex(index);
+  themeIndexChanged(index);
 }
 
 void WorkspaceSettingsDialog::themeIndexChanged(int index) noexcept {
-  const bool valid = (index >= 0) && (index < mThemes.count());
-  const Theme theme = mThemes.values().value(index);
+  const auto& themes = mSettings.themes.getAll();
+  const bool valid = (index >= 0) && (index < themes.count());
+  const Theme theme = themes.values().value(index);
+
+  if (valid) {
+    mSettings.themes.setActiveUuid(theme.getUuid());
+  }
 
   mUi->btnRemoveTheme->setEnabled(valid);
   mUi->btnRenameTheme->setEnabled(valid);
@@ -638,13 +662,6 @@ void WorkspaceSettingsDialog::initColorTreeWidgetItem(
 
   item.setText(2, color.getCategoryTr());
   item.setText(3, color.getNameTr());
-}
-
-Theme* WorkspaceSettingsDialog::getCurrentTheme() noexcept {
-  const int index = mUi->cbxThemes->currentIndex();
-  const std::optional<Uuid> uuid =
-      Uuid::tryFromString(mUi->cbxThemes->itemData(index).toString());
-  return (uuid && mThemes.contains(*uuid)) ? &mThemes[*uuid] : nullptr;
 }
 
 void WorkspaceSettingsDialog::updateDismissedMessagesCount() noexcept {
@@ -744,8 +761,7 @@ void WorkspaceSettingsDialog::loadSettings() noexcept {
   mUi->treeKeyboardShortcuts->expandAll();
 
   // Themes
-  mThemes = mSettings.themes.getAll();
-  updateThemesList(mSettings.themes.getActiveUuid());
+  updateThemesList();
 }
 
 void WorkspaceSettingsDialog::saveSettings() noexcept {
@@ -799,11 +815,7 @@ void WorkspaceSettingsDialog::saveSettings() noexcept {
     // Keyboard shortcuts
     mSettings.keyboardShortcuts.set(mKeyboardShortcutsModel->getOverrides());
 
-    // Themes
-    mSettings.themes.setAll(mThemes);
-    if (const Theme* theme = getCurrentTheme()) {
-      mSettings.themes.setActiveUuid(theme->getUuid());
-    }
+    // Themes were applied immediately.
 
     // Save settings to disk.
     mWorkspace.saveSettings();  // can throw
@@ -815,11 +827,15 @@ void WorkspaceSettingsDialog::saveSettings() noexcept {
 void WorkspaceSettingsDialog::discardTemporaryModifications() noexcept {
   mOldUiTheme = mSettings.uiTheme.get();
   mOldApplicationLocale = mSettings.applicationLocale.get();
+  mOldThemes = mSettings.themes.getAll();
+  mOldActiveTheme = mSettings.themes.getActiveUuid();
 }
 
 void WorkspaceSettingsDialog::revertTemporaryModifications() noexcept {
   mSettings.uiTheme.set(mOldUiTheme);
   mSettings.applicationLocale.set(mOldApplicationLocale);
+  mSettings.themes.setAll(mOldThemes);
+  mSettings.themes.setActiveUuid(mOldActiveTheme);
 }
 
 /*******************************************************************************
