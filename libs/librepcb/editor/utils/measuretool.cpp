@@ -24,6 +24,7 @@
 
 #include "../editorcommandset.h"
 #include "../graphics/graphicsscene.h"
+#include "../utils/editortoolbox.h"
 #include "../widgets/graphicsview.h"
 
 #include <librepcb/core/library/pkg/footprint.h>
@@ -110,8 +111,8 @@ void MeasureTool::setSchematic(const Schematic* schematic) noexcept {
       }
     }
     foreach (const SI_Polygon* polygon, schematic->getPolygons()) {
-      mSnapCandidates |=
-          snapCandidatesFromPath(polygon->getPolygon().getPath());
+      mSnapCandidates |= EditorToolbox::snapCandidatesFromPath(
+          polygon->getPolygon().getPath());
     }
     foreach (const SI_Text* text, schematic->getTexts()) {
       mSnapCandidates.insert(text->getPosition());
@@ -133,28 +134,30 @@ void MeasureTool::setBoard(const Board* board) noexcept {
       }
       foreach (const BI_Via* via, segment->getVias()) {
         mSnapCandidates.insert(via->getPosition());
-        mSnapCandidates |=
-            snapCandidatesFromCircle(via->getPosition(), *via->getActualSize());
-        mSnapCandidates |= snapCandidatesFromCircle(
-            via->getPosition(), *via->getActualDrillDiameter());
+        mSnapCandidates |= EditorToolbox::snapCandidatesFromCircle(
+            via->getPosition(), via->getActualSize());
+        mSnapCandidates |= EditorToolbox::snapCandidatesFromCircle(
+            via->getPosition(), via->getActualDrillDiameter());
       }
     }
     foreach (const BI_Plane* plane, board->getPlanes()) {
-      mSnapCandidates |= snapCandidatesFromPath(plane->getOutline());
+      mSnapCandidates |=
+          EditorToolbox::snapCandidatesFromPath(plane->getOutline());
       foreach (const Path& fragment, plane->getFragments()) {
-        mSnapCandidates |= snapCandidatesFromPath(fragment);
+        mSnapCandidates |= EditorToolbox::snapCandidatesFromPath(fragment);
       }
     }
     foreach (const BI_Polygon* polygon, board->getPolygons()) {
-      mSnapCandidates |= snapCandidatesFromPath(polygon->getData().getPath());
+      mSnapCandidates |=
+          EditorToolbox::snapCandidatesFromPath(polygon->getData().getPath());
     }
     foreach (const BI_StrokeText* text, board->getStrokeTexts()) {
       mSnapCandidates.insert(text->getData().getPosition());
     }
     foreach (const BI_Hole* hole, board->getHoles()) {
       foreach (const Vertex& vertex, hole->getData().getPath()->getVertices()) {
-        mSnapCandidates |= snapCandidatesFromCircle(
-            vertex.getPos(), *hole->getData().getDiameter());
+        mSnapCandidates |= EditorToolbox::snapCandidatesFromCircle(
+            vertex.getPos(), hole->getData().getDiameter());
       }
     }
   }
@@ -286,11 +289,12 @@ QSet<Point> MeasureTool::snapCandidatesFromSymbol(
         p.getPosition() + Point(*p.getLength(), 0).rotated(p.getRotation())));
   }
   for (const Polygon& p : symbol.getPolygons()) {
-    candidates |= snapCandidatesFromPath(transform.map(p.getPath()));
+    candidates |=
+        EditorToolbox::snapCandidatesFromPath(transform.map(p.getPath()));
   }
   for (const Circle& c : symbol.getCircles()) {
-    candidates |= snapCandidatesFromCircle(transform.map(c.getCenter()),
-                                           *c.getDiameter());
+    candidates |= EditorToolbox::snapCandidatesFromCircle(
+        transform.map(c.getCenter()), c.getDiameter());
   }
   for (const Text& s : symbol.getTexts()) {
     candidates.insert(transform.map(s.getPosition()));
@@ -305,7 +309,7 @@ QSet<Point> MeasureTool::snapCandidatesFromFootprint(
     candidates.insert(transform.map(p.getPosition()));
     try {
       foreach (const Path& outline, p.getGeometry().toOutlines()) {
-        candidates |= snapCandidatesFromPath(transform.map(
+        candidates |= EditorToolbox::snapCandidatesFromPath(transform.map(
             outline.rotated(p.getRotation()).translated(p.getPosition())));
       }
     } catch (const Exception& e) {
@@ -315,54 +319,28 @@ QSet<Point> MeasureTool::snapCandidatesFromFootprint(
     for (const PadHole& h : p.getHoles()) {
       foreach (const Vertex& vertex,
                padTransform.map(h.getPath())->getVertices()) {
-        candidates |= snapCandidatesFromCircle(transform.map(vertex.getPos()),
-                                               *h.getDiameter());
+        candidates |= EditorToolbox::snapCandidatesFromCircle(
+            transform.map(vertex.getPos()), h.getDiameter());
       }
     }
   }
   for (const Polygon& p : footprint.getPolygons()) {
-    candidates |= snapCandidatesFromPath(transform.map(p.getPath()));
+    candidates |=
+        EditorToolbox::snapCandidatesFromPath(transform.map(p.getPath()));
   }
   for (const Circle& c : footprint.getCircles()) {
-    candidates |= snapCandidatesFromCircle(transform.map(c.getCenter()),
-                                           *c.getDiameter());
+    candidates |= EditorToolbox::snapCandidatesFromCircle(
+        transform.map(c.getCenter()), c.getDiameter());
   }
   for (const StrokeText& s : footprint.getStrokeTexts()) {
     candidates.insert(transform.map(s.getPosition()));
   }
   for (const Hole& h : footprint.getHoles()) {
     foreach (const Vertex& vertex, h.getPath()->getVertices()) {
-      candidates |= snapCandidatesFromCircle(transform.map(vertex.getPos()),
-                                             *h.getDiameter());
+      candidates |= EditorToolbox::snapCandidatesFromCircle(
+          transform.map(vertex.getPos()), h.getDiameter());
     }
   }
-  return candidates;
-}
-
-QSet<Point> MeasureTool::snapCandidatesFromPath(const Path& path) noexcept {
-  QSet<Point> candidates;
-  for (int i = 0; i < path.getVertices().count(); ++i) {
-    const Vertex& v = path.getVertices().at(i);
-    candidates.insert(v.getPos());
-    if ((v.getAngle().abs() == Angle::deg180()) &&
-        (i < (path.getVertices().count() - 1))) {
-      const Point& p2 = path.getVertices().at(i + 1).getPos();
-      const Point center = (v.getPos() + p2) / 2;
-      const Point middle = v.getPos().rotated(v.getAngle() / 2, center);
-      candidates.insert(middle);
-    }
-  }
-  return candidates;
-}
-
-QSet<Point> MeasureTool::snapCandidatesFromCircle(
-    const Point& center, const Length& diameter) noexcept {
-  QSet<Point> candidates;
-  candidates.insert(center);
-  candidates.insert(center + Point(0, diameter / 2));
-  candidates.insert(center + Point(0, -diameter / 2));
-  candidates.insert(center + Point(diameter / 2, 0));
-  candidates.insert(center + Point(-diameter / 2, 0));
   return candidates;
 }
 
@@ -375,24 +353,9 @@ void MeasureTool::updateCursorPosition(
   mCursorPos = mLastScenePos;
   mCursorSnapped = false;
   if (!modifiers.testFlag(Qt::ShiftModifier)) {
-    Point nearestCandidate;
-    Length nearestDistance(-1);
-    foreach (const Point& candidate, mSnapCandidates) {
-      const UnsignedLength distance = (mCursorPos - candidate).getLength();
-      if ((nearestDistance < 0) || (distance < nearestDistance)) {
-        nearestCandidate = candidate;
-        nearestDistance = *distance;
-      }
-    }
-
-    const Point posOnGrid = mCursorPos.mappedToGrid(mScene->getGridInterval());
-    const Length gridDistance = *(mCursorPos - posOnGrid).getLength();
-    if ((nearestDistance >= 0) && (nearestDistance <= gridDistance)) {
-      mCursorPos = nearestCandidate;
-      mCursorSnapped = true;
-    } else {
-      mCursorPos = posOnGrid;
-    }
+    mCursorPos =
+        EditorToolbox::snapPosition(mCursorPos, mScene->getGridInterval(),
+                                    mSnapCandidates, &mCursorSnapped);
   }
   updateRulerPositions();
 }

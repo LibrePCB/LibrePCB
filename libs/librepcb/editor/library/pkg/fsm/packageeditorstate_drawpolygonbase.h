@@ -115,6 +115,7 @@ private:  // Methods
   void updatePolygonPath() noexcept;
   void updateOverlayText() noexcept;
   void updateStatusBarMessage() noexcept;
+  void updateSnapCandidates() noexcept;
 
   void layerComboBoxValueChanged(const Layer& layer) noexcept;
   void lineWidthEditValueChanged(const UnsignedLength& value) noexcept;
@@ -124,6 +125,7 @@ private:  // Methods
 
 private:
   const Mode mMode;
+  QSet<Point> mSnapCandidates;
   Point mLastScenePos;
   Angle mLastAngle;
   Point mCursorPos;

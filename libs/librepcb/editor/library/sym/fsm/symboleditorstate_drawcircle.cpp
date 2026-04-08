@@ -25,6 +25,7 @@
 #include "../../../cmd/cmdcircleedit.h"
 #include "../../../graphics/circlegraphicsitem.h"
 #include "../../../undostack.h"
+#include "../../../utils/editortoolbox.h"
 #include "../symbolgraphicsitem.h"
 
 #include <librepcb/core/geometry/circle.h>
@@ -68,6 +69,7 @@ SymbolEditorState_DrawCircle::~SymbolEditorState_DrawCircle() noexcept {
  ******************************************************************************/
 
 bool SymbolEditorState_DrawCircle::entry() noexcept {
+  updateSnapCandidates();
   mAdapter.fsmToolEnter(*this);
   mAdapter.fsmSetViewCursor(Qt::CrossCursor);
   return true;
@@ -99,11 +101,12 @@ bool SymbolEditorState_DrawCircle::processGraphicsSceneMouseMoved(
 
 bool SymbolEditorState_DrawCircle::processGraphicsSceneLeftMouseButtonPressed(
     const GraphicsSceneMouseEvent& e) noexcept {
-  Point currentPos = e.scenePos.mappedToGrid(getGridInterval());
   if (mCurrentCircle) {
-    return finishAddCircle(currentPos);
+    return finishAddCircle(e.scenePos.mappedToGrid(getGridInterval()));
   } else {
-    return startAddCircle(currentPos);
+    // Not very nice to always snap, should be improved in future.
+    return startAddCircle(EditorToolbox::snapPosition(
+        e.scenePos, getGridInterval(), mSnapCandidates));
   }
 }
 
@@ -217,6 +220,7 @@ bool SymbolEditorState_DrawCircle::finishAddCircle(const Point& pos) noexcept {
     mCurrentCircle.reset();
     mContext.undoStack.appendToCmdGroup(mCurrentEditCmd.release());
     mContext.undoStack.commitCmdGroup();
+    updateSnapCandidates();
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
@@ -231,10 +235,18 @@ bool SymbolEditorState_DrawCircle::abortAddCircle() noexcept {
     mCurrentCircle.reset();
     mCurrentEditCmd.reset();
     mContext.undoStack.abortCmdGroup();
+    updateSnapCandidates();
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     return false;
+  }
+}
+
+void SymbolEditorState_DrawCircle::updateSnapCandidates() noexcept {
+  mSnapCandidates.clear();
+  for (const Circle& c : mContext.symbol.getCircles()) {
+    mSnapCandidates.insert(c.getCenter());
   }
 }
 

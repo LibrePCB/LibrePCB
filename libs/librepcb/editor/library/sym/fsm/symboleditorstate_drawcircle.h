@@ -99,8 +99,10 @@ private:  // Methods
   bool updateCircleDiameter(const Point& pos) noexcept;
   bool finishAddCircle(const Point& pos) noexcept;
   bool abortAddCircle() noexcept;
+  void updateSnapCandidates() noexcept;
 
 private:
+  QSet<Point> mSnapCandidates;
   Circle mCurrentProperties;
 
   std::unique_ptr<CmdCircleEdit> mCurrentEditCmd;

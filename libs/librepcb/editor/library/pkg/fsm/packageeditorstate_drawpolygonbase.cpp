@@ -25,6 +25,7 @@
 #include "../../../cmd/cmdpolygonedit.h"
 #include "../../../graphics/polygongraphicsitem.h"
 #include "../../../undostack.h"
+#include "../../../utils/editortoolbox.h"
 #include "../footprintgraphicsitem.h"
 
 #include <librepcb/core/library/pkg/footprint.h>
@@ -72,6 +73,7 @@ bool PackageEditorState_DrawPolygonBase::entry() noexcept {
                       .mappedToGrid(getGridInterval());
   updateCursorPosition(Qt::KeyboardModifier::NoModifier);
   updateStatusBarMessage();
+  updateSnapCandidates();
 
   notifyToolEnter();
   mAdapter.fsmSetViewCursor(Qt::CrossCursor);
@@ -97,7 +99,7 @@ bool PackageEditorState_DrawPolygonBase::exit() noexcept {
 
 bool PackageEditorState_DrawPolygonBase::processKeyPressed(
     const GraphicsSceneKeyEvent& e) noexcept {
-  if (e.key == Qt::Key_Shift) {
+  if ((e.key == Qt::Key_Shift) || (e.key == Qt::Key_Control)) {
     updateCursorPosition(e.modifiers);
     return true;
   }
@@ -107,7 +109,7 @@ bool PackageEditorState_DrawPolygonBase::processKeyPressed(
 
 bool PackageEditorState_DrawPolygonBase::processKeyReleased(
     const GraphicsSceneKeyEvent& e) noexcept {
-  if (e.key == Qt::Key_Shift) {
+  if ((e.key == Qt::Key_Shift) || (e.key == Qt::Key_Control)) {
     updateCursorPosition(e.modifiers);
     return true;
   }
@@ -175,6 +177,8 @@ void PackageEditorState_DrawPolygonBase::setLayer(const Layer& layer) noexcept {
     // Typical width according library conventions.
     setLineWidth(UnsignedLength(200000));
   }
+
+  updateSnapCandidates();
 }
 
 void PackageEditorState_DrawPolygonBase::setLineWidth(
@@ -289,6 +293,7 @@ bool PackageEditorState_DrawPolygonBase::abort(bool showErrMsgBox) noexcept {
     }
     updateOverlayText();
     updateStatusBarMessage();
+    updateSnapCandidates();
     return true;
   } catch (const Exception& e) {
     if (showErrMsgBox) {
@@ -355,6 +360,7 @@ bool PackageEditorState_DrawPolygonBase::addNextSegment() noexcept {
     mCurrentEditCmd->setPath(Path(vertices), true);
     updateOverlayText();
     updateStatusBarMessage();
+    updateSnapCandidates();
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
@@ -365,10 +371,15 @@ bool PackageEditorState_DrawPolygonBase::addNextSegment() noexcept {
 void PackageEditorState_DrawPolygonBase::updateCursorPosition(
     Qt::KeyboardModifiers modifiers) noexcept {
   mCursorPos = mLastScenePos;
-  if (!modifiers.testFlag(Qt::ShiftModifier)) {
+  bool snapped = false;
+  if ((!modifiers.testFlag(Qt::ShiftModifier)) &&
+      (!modifiers.testFlag(Qt::ControlModifier))) {
+    mCursorPos = EditorToolbox::snapPosition(mCursorPos, getGridInterval(),
+                                             mSnapCandidates, &snapped);
+  } else if (!modifiers.testFlag(Qt::ControlModifier)) {
     mCursorPos.mapToGrid(getGridInterval());
   }
-  mAdapter.fsmSetSceneCursor(mCursorPos, true, false);
+  mAdapter.fsmSetSceneCursor(mCursorPos, true, snapped);
 
   if (mCurrentPolygon && mCurrentEditCmd) {
     updatePolygonPath();
@@ -524,7 +535,8 @@ void PackageEditorState_DrawPolygonBase::updateOverlayText() noexcept {
 void PackageEditorState_DrawPolygonBase::updateStatusBarMessage() noexcept {
   QString note = " " %
       tr("(press %1 to disable snap, %2 to abort)")
-          .arg(QCoreApplication::translate("QShortcut", "Shift"))
+          .arg(QCoreApplication::translate("QShortcut", "Shift") % "/" %
+               QCoreApplication::translate("QShortcut", "Ctrl"))
           .arg(tr("right click"));
 
   if (mMode == Mode::RECT) {
@@ -553,6 +565,26 @@ void PackageEditorState_DrawPolygonBase::updateStatusBarMessage() noexcept {
     } else {
       mAdapter.fsmSetStatusBarMessage(tr("Click to specify the next point") %
                                       note);
+    }
+  }
+}
+
+void PackageEditorState_DrawPolygonBase::updateSnapCandidates() noexcept {
+  mSnapCandidates.clear();
+  if (auto fpt = mContext.currentFootprint) {
+    // Note: For now, we only snap to objects on the same layer to avoid too
+    // "noisy" snapping as it might be annoying. Though this has never been
+    // tested if it is really a problem.
+    for (const Polygon& p : fpt->getPolygons()) {
+      if (p.getLayer() == mCurrentProperties.getLayer()) {
+        mSnapCandidates |= EditorToolbox::snapCandidatesFromPath(p.getPath());
+      }
+    }
+    for (const Circle& c : fpt->getCircles()) {
+      if (c.getLayer() == mCurrentProperties.getLayer()) {
+        mSnapCandidates |= EditorToolbox::snapCandidatesFromCircle(
+            c.getCenter(), c.getDiameter());
+      }
     }
   }
 }

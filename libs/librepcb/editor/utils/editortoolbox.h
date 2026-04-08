@@ -24,6 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include <librepcb/core/library/resource.h>
+#include <librepcb/core/types/point.h>
 #include <librepcb/core/types/uuid.h>
 
 #include <QtCore>
@@ -37,6 +38,7 @@
 namespace librepcb {
 
 class ComponentInstance;
+class Path;
 class Workspace;
 class WorkspaceLibraryDb;
 
@@ -115,6 +117,41 @@ public:
    * @return The passed identifier, possibly modified for sorting.
    */
   static QString sortableCircuitIdentifier(QString identifier) noexcept;
+
+  /**
+   * @brief Determine points of a ::librepcb::Path to snap the cursor
+   *
+   * @param path  Any path.
+   *
+   * @return All path vertex positions, plus middle and center points of
+   *         180° arcs.
+   */
+  static QSet<Point> snapCandidatesFromPath(const Path& path) noexcept;
+
+  /**
+   * @brief Determine points of a :circle to snap the cursor
+   *
+   * @param center    Circle center.
+   * @param diameter  Circle diameter.
+   *
+   * @return The center point, plus north/east/south/west points.
+   */
+  static QSet<Point> snapCandidatesFromCircle(const Point& center,
+                                              PositiveLength diameter) noexcept;
+
+  /**
+   * @brief Determine position to snap the cursor to
+   *
+   * @param cursorPos       Hovered cursor position.
+   * @param gridInterval    Grid interval.
+   * @param snapCandidates  Possible snapping positios.
+   * @param snapped         Whether the cursor has snapped or not.
+   *
+   * @return Closest position, either from `snapPositions` or on the grid.
+   */
+  static Point snapPosition(Point cursorPos, PositiveLength gridInterval,
+                            const QSet<Point>& snapCandidates,
+                            bool* snapped = nullptr) noexcept;
 
   /**
    * @brief Load a SVG QIcon which is properly colorized
