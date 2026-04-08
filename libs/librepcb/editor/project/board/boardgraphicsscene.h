@@ -23,6 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../graphics/graphicslayer.h"
 #include "../../graphics/graphicsscene.h"
 
 #include <QtCore>
@@ -48,6 +49,7 @@ class BI_StrokeText;
 class BI_Via;
 class BI_Zone;
 class Board;
+class ComponentInstance;
 class Layer;
 class NetSignal;
 
@@ -66,6 +68,8 @@ class BGI_StrokeText;
 class BGI_Via;
 class BGI_Zone;
 class GraphicsLayerList;
+class ProjectCrossProbe;
+class WindowTab;
 
 /*******************************************************************************
  *  Class BoardGraphicsScene
@@ -115,8 +119,14 @@ public:
   };
 
   struct Context {
-    std::shared_ptr<const QSet<const NetSignal*>> highlightedNets;
+    const WindowTab* tab = nullptr;
+    std::shared_ptr<const ProjectCrossProbe> crossProbe;
+    GraphicsLayer::State selfProbedState = GraphicsLayer::State::Enabled;
     bool flipView = false;
+
+    template <typename T = NetSignal>
+    GraphicsLayer::State getLayerState(bool highlight,
+                                       const T* obj1 = nullptr) const noexcept;
   };
 
   // Constructors / Destructor
@@ -169,13 +179,13 @@ public:
   }
 
   // General Methods
+  void setSelfProbedState(GraphicsLayer::State state) noexcept;
   void setFlipped(bool flip) noexcept;
   bool isFlipped() const noexcept { return mContext->flipView; }
   void selectAll() noexcept;
   void selectItemsInRect(const Point& p1, const Point& p2) noexcept;
   void selectNetSegment(BI_NetSegment& netSegment) noexcept;
   void clearSelection() noexcept;
-  void updateContext() noexcept;
   static qreal getZValueOfCopperLayer(const Layer& layer, bool flip) noexcept;
   static qreal getFlippedZValue(ItemZValue value, bool flip) noexcept;
 
@@ -183,6 +193,7 @@ public:
   BoardGraphicsScene& operator=(const BoardGraphicsScene& rhs) = delete;
 
 private:  // Methods
+  void updateContext() noexcept;
   void addDevice(BI_Device& device) noexcept;
   void removeDevice(BI_Device& device) noexcept;
   void addPad(BI_Pad& pad, std::weak_ptr<BGI_Device> device) noexcept;

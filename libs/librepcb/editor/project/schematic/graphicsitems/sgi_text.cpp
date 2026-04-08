@@ -40,12 +40,15 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-SGI_Text::SGI_Text(SI_Text& text, std::weak_ptr<SGI_Symbol> symbolItem,
-                   const GraphicsLayerList& layers) noexcept
+SGI_Text::SGI_Text(
+    SI_Text& text, std::weak_ptr<SGI_Symbol> symbolItem,
+    const GraphicsLayerList& layers,
+    std::shared_ptr<const SchematicGraphicsScene::Context> context) noexcept
   : QGraphicsItemGroup(),
     mText(text),
     mSymbolGraphicsItem(symbolItem),
     mLayers(layers),
+    mContext(context),
     mTextGraphicsItem(new TextGraphicsItem(mText.getTextObj(), layers, this)),
     mAnchorGraphicsItem(new LineGraphicsItem()),
     mOnEditedSlot(*this, &SGI_Text::textEdited),
@@ -56,6 +59,7 @@ SGI_Text::SGI_Text(SI_Text& text, std::weak_ptr<SGI_Symbol> symbolItem,
 
   mAnchorGraphicsItem->setZValue(SchematicGraphicsScene::ZValue_TextAnchors);
 
+  updateContext();
   updateText();
   updateAnchorLayer();
   updateAnchorLine();
@@ -67,6 +71,16 @@ SGI_Text::SGI_Text(SI_Text& text, std::weak_ptr<SGI_Symbol> symbolItem,
 }
 
 SGI_Text::~SGI_Text() noexcept {
+}
+
+/*******************************************************************************
+ *  General Methods
+ ******************************************************************************/
+
+void SGI_Text::updateContext() noexcept {
+  const GraphicsLayer::State state = mContext->getLayerState(false);
+  mTextGraphicsItem->setState(state);
+  mAnchorGraphicsItem->setState(state);
 }
 
 /*******************************************************************************

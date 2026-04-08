@@ -131,7 +131,7 @@ private:  // Methods
   void openTextPropertiesDialog(Text& text) noexcept;
   void scheduleUpdateAvailableFeatures() noexcept;
   void updateAvailableFeatures() noexcept;
-  QString buildInfoBoxText(const SchematicSelectionQuery& query) const noexcept;
+  QString processSelection(const SchematicSelectionQuery& query) const noexcept;
 
 private:  // Data
   /// enum for all possible substates

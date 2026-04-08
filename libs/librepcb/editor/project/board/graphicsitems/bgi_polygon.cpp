@@ -52,6 +52,7 @@ BGI_Polygon::BGI_Polygon(
   setFlag(QGraphicsItem::ItemHasNoContents, true);
   setFlag(QGraphicsItem::ItemIsSelectable, true);
 
+  updateContext();
   updateZValue();
   updateEditable();
 
@@ -66,6 +67,7 @@ BGI_Polygon::~BGI_Polygon() noexcept {
  ******************************************************************************/
 
 void BGI_Polygon::updateContext() noexcept {
+  mGraphicsItem->setState(mContext->getLayerState(false));
   updateZValue();
 }
 

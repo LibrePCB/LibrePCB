@@ -127,6 +127,14 @@ void PrimitiveHoleGraphicsItem::setHole(
   }
 }
 
+void PrimitiveHoleGraphicsItem::setState(GraphicsLayer::State state) noexcept {
+  mHoleGraphicsItem->setState(state);
+  mStopMaskGraphicsItemBot->setState(state);
+  mStopMaskGraphicsItemTop->setState(state);
+  mOriginCrossGraphicsItemStart->setState(state);
+  mOriginCrossGraphicsItemEnd->setState(state);
+}
+
 /*******************************************************************************
  *  Inherited from QGraphicsItem
  ******************************************************************************/

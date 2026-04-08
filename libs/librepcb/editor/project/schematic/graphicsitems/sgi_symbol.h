@@ -23,6 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../schematicgraphicsscene.h"
+
 #include <librepcb/core/project/schematic/items/si_symbol.h>
 
 #include <QtCore>
@@ -38,7 +40,6 @@ class Point;
 namespace editor {
 
 class CircleGraphicsItem;
-class GraphicsLayerList;
 class ImageGraphicsItem;
 class OriginCrossGraphicsItem;
 class PolygonGraphicsItem;
@@ -63,11 +64,14 @@ public:
   // Constructors / Destructor
   SGI_Symbol() = delete;
   SGI_Symbol(const SGI_Symbol& other) = delete;
-  SGI_Symbol(SI_Symbol& symbol, const GraphicsLayerList& layers) noexcept;
+  SGI_Symbol(
+      SI_Symbol& symbol, const GraphicsLayerList& layers,
+      std::shared_ptr<const SchematicGraphicsScene::Context> context) noexcept;
   virtual ~SGI_Symbol() noexcept;
 
   // General Methods
   SI_Symbol& getSymbol() noexcept { return mSymbol; }
+  void updateContext() noexcept;
 
   // Inherited from QGraphicsItem
   QPainterPath shape() const noexcept override { return mShape; }
@@ -84,6 +88,7 @@ private:  // Methods
 
 private:  // Data
   SI_Symbol& mSymbol;
+  std::shared_ptr<const SchematicGraphicsScene::Context> mContext;
   std::shared_ptr<OriginCrossGraphicsItem> mOriginCrossGraphicsItem;
   QVector<std::shared_ptr<CircleGraphicsItem>> mCircleGraphicsItems;
   QVector<std::shared_ptr<PolygonGraphicsItem>> mPolygonGraphicsItems;

@@ -23,6 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../schematicgraphicsscene.h"
 #include "sgi_symbol.h"
 
 #include <librepcb/core/project/schematic/items/si_symbolpin.h>
@@ -38,7 +39,6 @@
 namespace librepcb {
 namespace editor {
 
-class GraphicsLayerList;
 class LineGraphicsItem;
 class PrimitiveCircleGraphicsItem;
 class PrimitiveTextGraphicsItem;
@@ -57,10 +57,10 @@ public:
   // Constructors / Destructor
   SGI_SymbolPin() = delete;
   SGI_SymbolPin(const SGI_SymbolPin& other) = delete;
-  SGI_SymbolPin(SI_SymbolPin& pin, std::weak_ptr<SGI_Symbol> symbolItem,
-                const GraphicsLayerList& layers,
-                std::shared_ptr<const QSet<const NetSignal*>>
-                    highlightedNetSignals) noexcept;
+  SGI_SymbolPin(
+      SI_SymbolPin& pin, std::weak_ptr<SGI_Symbol> symbolItem,
+      const GraphicsLayerList& layers,
+      std::shared_ptr<const SchematicGraphicsScene::Context> context) noexcept;
   virtual ~SGI_SymbolPin() noexcept;
 
   // General Methods
@@ -68,7 +68,7 @@ public:
   const std::weak_ptr<SGI_Symbol>& getSymbolGraphicsItem() noexcept {
     return mSymbolGraphicsItem;
   }
-  void updateHighlightedState() noexcept;
+  void updateContext() noexcept;
 
   // Inherited from QGraphicsItem
   QPainterPath shape() const noexcept override { return mShape; }
@@ -94,7 +94,7 @@ private:  // Data
   SI_SymbolPin& mPin;
   std::weak_ptr<SGI_Symbol> mSymbolGraphicsItem;
   const GraphicsLayerList& mLayers;
-  std::shared_ptr<const QSet<const NetSignal*>> mHighlightedNetSignals;
+  std::shared_ptr<const SchematicGraphicsScene::Context> mContext;
   QScopedPointer<PrimitiveCircleGraphicsItem> mCircleGraphicsItem;
   QScopedPointer<LineGraphicsItem> mLineGraphicsItem;
   QScopedPointer<PrimitiveTextGraphicsItem> mNameGraphicsItem;

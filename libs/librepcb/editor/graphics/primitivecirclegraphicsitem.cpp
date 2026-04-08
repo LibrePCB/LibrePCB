@@ -42,13 +42,12 @@ PrimitiveCircleGraphicsItem::PrimitiveCircleGraphicsItem(
   : QGraphicsItem(parent),
     mLineLayer(nullptr),
     mFillLayer(nullptr),
+    mState(GraphicsLayer::State::Enabled),
     mShapeMode(ShapeMode::StrokeAndAreaByLayer),
+    mLineWidthPx(0),
     mOnLayerEditedSlot(*this, &PrimitiveCircleGraphicsItem::layerEdited) {
   setFlag(QGraphicsItem::ItemIsSelectable, true);
 
-  mPen.setWidthF(0);
-  mPenHighlighted.setWidthF(0);
-  updateColors();
   updateBoundingRectAndShape();
   updateVisibility();
 }
@@ -72,8 +71,7 @@ void PrimitiveCircleGraphicsItem::setDiameter(
 
 void PrimitiveCircleGraphicsItem::setLineWidth(
     const UnsignedLength& width) noexcept {
-  mPen.setWidthF(width->toPx());
-  mPenHighlighted.setWidthF(width->toPx());
+  mLineWidthPx = width->toPx();
   updateBoundingRectAndShape();
 }
 
@@ -86,7 +84,6 @@ void PrimitiveCircleGraphicsItem::setLineLayer(
   if (mLineLayer) {
     mLineLayer->onEdited.attach(mOnLayerEditedSlot);
   }
-  updateColors();
   updateVisibility();
   updateBoundingRectAndShape();  // grab area may have changed
 }
@@ -100,7 +97,6 @@ void PrimitiveCircleGraphicsItem::setFillLayer(
   if (mFillLayer) {
     mFillLayer->onEdited.attach(mOnLayerEditedSlot);
   }
-  updateColors();
   updateVisibility();
   updateBoundingRectAndShape();  // grab area may have changed
 }
@@ -108,6 +104,12 @@ void PrimitiveCircleGraphicsItem::setFillLayer(
 void PrimitiveCircleGraphicsItem::setShapeMode(ShapeMode mode) noexcept {
   mShapeMode = mode;
   updateBoundingRectAndShape();
+}
+
+void PrimitiveCircleGraphicsItem::setState(
+    GraphicsLayer::State state) noexcept {
+  mState = state;
+  update();
 }
 
 /*******************************************************************************
@@ -126,10 +128,13 @@ void PrimitiveCircleGraphicsItem::paint(QPainter* painter,
                                         QWidget* widget) noexcept {
   Q_UNUSED(widget);
 
-  const bool isSelected = option->state.testFlag(QStyle::State_Selected);
+  GraphicsLayer::State state = mState;
+  if (option->state.testFlag(QStyle::State_Selected)) {
+    state = GraphicsLayer::State::Highlighted;
+  }
 
-  painter->setPen(isSelected ? mPenHighlighted : mPen);
-  painter->setBrush(isSelected ? mBrushHighlighted : mBrush);
+  painter->setPen(getPen(state));
+  painter->setBrush(getBrush(state));
   painter->drawEllipse(mCircleRect);
 }
 
@@ -143,9 +148,11 @@ void PrimitiveCircleGraphicsItem::layerEdited(
   switch (event) {
     case GraphicsLayer::Event::ColorChanged:
     case GraphicsLayer::Event::HighlightColorChanged:
+      update();
+      break;
     case GraphicsLayer::Event::VisibleChanged:
     case GraphicsLayer::Event::EnabledChanged:
-      updateColors();
+      updateBoundingRectAndShape();  // Shape may have changed.
       updateVisibility();
       break;
     default:
@@ -156,29 +163,6 @@ void PrimitiveCircleGraphicsItem::layerEdited(
   }
 }
 
-void PrimitiveCircleGraphicsItem::updateColors() noexcept {
-  if (mLineLayer && mLineLayer->isVisible()) {
-    mPen.setStyle(Qt::SolidLine);
-    mPenHighlighted.setStyle(Qt::SolidLine);
-    mPen.setColor(mLineLayer->getColor(false));
-    mPenHighlighted.setColor(mLineLayer->getColor(true));
-  } else {
-    mPen.setStyle(Qt::NoPen);
-    mPenHighlighted.setStyle(Qt::NoPen);
-  }
-
-  if (mFillLayer && mFillLayer->isVisible()) {
-    mBrush.setStyle(Qt::SolidPattern);
-    mBrushHighlighted.setStyle(Qt::SolidPattern);
-    mBrush.setColor(mFillLayer->getColor(false));
-    mBrushHighlighted.setColor(mFillLayer->getColor(true));
-  } else {
-    mBrush.setStyle(Qt::NoBrush);
-    mBrushHighlighted.setStyle(Qt::NoBrush);
-  }
-  update();
-}
-
 void PrimitiveCircleGraphicsItem::updateBoundingRectAndShape() noexcept {
   prepareGeometryChange();
   QPainterPath p;
@@ -186,14 +170,33 @@ void PrimitiveCircleGraphicsItem::updateBoundingRectAndShape() noexcept {
   if (mShapeMode == ShapeMode::FilledOutline) {
     mShape = p;
   } else {
-    mShape = Toolbox::shapeFromPath(p, mPen, mBrush);
+    mShape = Toolbox::shapeFromPath(p, getPen(mState), getBrush(mState));
   }
   mBoundingRect = mShape.controlPointRect();
   update();
 }
 
 void PrimitiveCircleGraphicsItem::updateVisibility() noexcept {
-  setVisible((mPen.style() != Qt::NoPen) || (mBrush.style() != Qt::NoBrush));
+  setVisible((mLineLayer && mLineLayer->isVisible()) ||
+             (mFillLayer && mFillLayer->isVisible()));
+}
+
+QPen PrimitiveCircleGraphicsItem::getPen(
+    GraphicsLayer::State state) const noexcept {
+  if (mLineLayer && mLineLayer->isVisible()) {
+    return QPen(mLineLayer->getColor(state), mLineWidthPx, Qt::SolidLine);
+  } else {
+    return Qt::NoPen;
+  }
+}
+
+QBrush PrimitiveCircleGraphicsItem::getBrush(
+    GraphicsLayer::State state) const noexcept {
+  if (mFillLayer && mFillLayer->isVisible()) {
+    return QBrush(mFillLayer->getColor(state), Qt::SolidPattern);
+  } else {
+    return Qt::NoBrush;
+  }
 }
 
 /*******************************************************************************

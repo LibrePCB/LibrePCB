@@ -73,6 +73,7 @@ public:
   void setLineLayer(const std::shared_ptr<const GraphicsLayer>& layer) noexcept;
   void setFillLayer(const std::shared_ptr<const GraphicsLayer>& layer) noexcept;
   void setShapeMode(ShapeMode mode) noexcept;
+  void setState(GraphicsLayer::State state) noexcept;
 
   // Inherited from QGraphicsItem
   virtual QRectF boundingRect() const noexcept override {
@@ -89,18 +90,17 @@ public:
 private:  // Methods
   void layerEdited(const GraphicsLayer& layer,
                    GraphicsLayer::Event event) noexcept;
-  void updateColors() noexcept;
   void updateBoundingRectAndShape() noexcept;
   void updateVisibility() noexcept;
+  QPen getPen(GraphicsLayer::State state) const noexcept;
+  QBrush getBrush(GraphicsLayer::State state) const noexcept;
 
 private:  // Data
   std::shared_ptr<const GraphicsLayer> mLineLayer;
   std::shared_ptr<const GraphicsLayer> mFillLayer;
+  GraphicsLayer::State mState;
   ShapeMode mShapeMode;
-  QPen mPen;
-  QPen mPenHighlighted;
-  QBrush mBrush;
-  QBrush mBrushHighlighted;
+  qreal mLineWidthPx;
   QRectF mCircleRect;
   QRectF mBoundingRect;
   QPainterPath mShape;

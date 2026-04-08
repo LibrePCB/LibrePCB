@@ -68,8 +68,8 @@ std::optional<ui::GraphicsLayerData> GraphicsLayersModel::row_data(
   if (auto layer = mEnabledLayers.value(i)) {
     return ui::GraphicsLayerData{
         q2s(layer->getNameTr()),  // Name
-        q2s(layer->getColor(false)),  // Color
-        q2s(layer->getColor(true)),  // Color highlighted
+        q2s(layer->getColor(GraphicsLayer::State::Enabled)),  // 1st Color
+        q2s(layer->getColor(GraphicsLayer::State::Highlighted)),  // 2nd Color
         layer->isVisible(),  // Visible
     };
   } else {

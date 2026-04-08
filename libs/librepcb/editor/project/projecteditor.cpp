@@ -40,6 +40,7 @@
 #include "cmd/cmdschematicedit.h"
 #include "cmd/cmdschematicremove.h"
 #include "outputjobsdialog/outputjobsdialog.h"
+#include "projectcrossprobe.h"
 #include "projectsetupdialog.h"
 #include "schematic/schematiceditor.h"
 #include "schematic/schematictab.h"
@@ -86,7 +87,7 @@ ProjectEditor::ProjectEditor(
     mSchematics(new UiObjectList<SchematicEditor, ui::SchematicData>()),
     mBoards(new UiObjectList<BoardEditor, ui::BoardData>()),
     mUndoStack(new UndoStack()),
-    mHighlightedNetSignals(new QSet<const NetSignal*>()),
+    mCrossProbe(new ProjectCrossProbe()),
     mActiveSchematicTabs(),
     mErcMessages(),
     mErcExecutionError(),
@@ -237,7 +238,7 @@ ProjectEditor::~ProjectEditor() noexcept {
   }
 
   // Delete objects to avoid issues with still connected signal/slots.
-  mHighlightedNetSignals->clear();
+  mCrossProbe->reset();
   if (mErcMessages) {
     mErcMessages->clear();
     mErcMessages.reset();
@@ -339,12 +340,12 @@ void ProjectEditor::trigger(ui::ProjectAction a) noexcept {
   }
 }
 
-void ProjectEditor::setHighlightedNetSignals(
-    const QSet<const NetSignal*>& netSignals) noexcept {
-  if (netSignals != *mHighlightedNetSignals) {
-    *mHighlightedNetSignals = netSignals;
-    emit highlightedNetSignalsChanged();
-  }
+void ProjectEditor::setCurrentTab(const WindowTab* tab) noexcept {
+  mCurrentTab = tab;
+}
+
+bool ProjectEditor::isCurrentTab(const WindowTab* tab) const noexcept {
+  return mCurrentTab && (mCurrentTab == tab);
 }
 
 bool ProjectEditor::hasUnsavedChanges() const noexcept {

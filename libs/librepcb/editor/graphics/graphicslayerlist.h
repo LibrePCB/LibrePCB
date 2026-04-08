@@ -81,8 +81,8 @@ public:
 
 private:
   GraphicsLayerList(const WorkspaceSettings* ws) noexcept;
-  void add(const Theme& theme, const QString& name,
-           bool visible = true) noexcept;
+  void add(const Theme& theme, const QString& name, bool visible = true,
+           bool grayscaleDisabled = false) noexcept;
   void reloadSettings() noexcept;
   void setVisibleLayers(const QSet<QString>& layers) noexcept;
   static QSet<QString> getCommonLayers() noexcept;

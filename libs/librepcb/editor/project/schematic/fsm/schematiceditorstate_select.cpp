@@ -1242,7 +1242,7 @@ void SchematicEditorState_Select::updateAvailableFeatures() noexcept {
           (!query.getTexts().isEmpty())) {
         *features |= SchematicEditorFsmAdapter::Feature::Properties;
       }
-      infoText = buildInfoBoxText(query);
+      infoText = processSelection(query);
     }
   } else {
     // Do not update features in other states.
@@ -1253,9 +1253,10 @@ void SchematicEditorState_Select::updateAvailableFeatures() noexcept {
   mAdapter.fsmSetViewInfoBoxText(infoText);
 }
 
-QString SchematicEditorState_Select::buildInfoBoxText(
+QString SchematicEditorState_Select::processSelection(
     const SchematicSelectionQuery& query) const noexcept {
   if (query.getResultCount() == 0) {
+    mAdapter.fsmCrossProbe();
     return QString();
   }
 
@@ -1279,6 +1280,10 @@ QString SchematicEditorState_Select::buildInfoBoxText(
       bus = &b;
     }
   };
+  QSet<const NetSignal*> crossProbeNets;
+  QSet<const ComponentInstance*> crossProbeComponents;
+  QSet<const ComponentSignalInstance*> crossProbeComponentSignals;
+  QSet<const Bus*> crossProbeBuses;
 
   // Collect selected objects.
   if (query.getSymbols().count() == 1) {
@@ -1287,26 +1292,34 @@ QString SchematicEditorState_Select::buildInfoBoxText(
   if (query.getPins().count() == 1) {
     pin = *query.getPins().begin();
   }
+  for (auto sym : query.getSymbols()) {
+    crossProbeComponents.insert(&sym->getComponentInstance());
+  }
   for (const SI_NetLabel* nl : query.getNetLabels()) {
-    if (multipleNets) break;
     addNet(&nl->getNetSegment().getNetSignal());
+    crossProbeNets.insert(&nl->getNetSegment().getNetSignal());
   }
   for (const SI_NetLine* nl : query.getNetLines()) {
-    if (multipleNets) break;
     addNet(&nl->getNetSegment().getNetSignal());
+    crossProbeNets.insert(&nl->getNetSegment().getNetSignal());
   }
   for (const SI_SymbolPin* pin : query.getPins()) {
-    if (multipleNets) break;
     addNet(pin->getCompSigInstNetSignal());  // Can be nullptr
+    crossProbeComponentSignals.insert(&pin->getComponentSignalInstance());
   }
   for (const SI_BusLabel* bl : query.getBusLabels()) {
-    if (multipleBuses) break;
     addBus(bl->getBusSegment().getBus());
+    crossProbeBuses.insert(&bl->getBusSegment().getBus());
   }
   for (const SI_BusLine* bl : query.getBusLines()) {
-    if (multipleBuses) break;
     addBus(bl->getBusSegment().getBus());
+    crossProbeBuses.insert(&bl->getBusSegment().getBus());
   }
+
+  // Cross-probe selected objects to other editors.
+  mAdapter.fsmCrossProbe(crossProbeNets, crossProbeComponents,
+                         crossProbeComponentSignals, crossProbeBuses,
+                         GraphicsLayer::State::Enabled);
 
   // Build key/value pairs for selected objects.
   QVector<std::pair<QString, QString>> keyValues;

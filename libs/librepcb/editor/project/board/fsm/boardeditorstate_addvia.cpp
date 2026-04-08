@@ -326,7 +326,7 @@ bool BoardEditorState_AddVia::addVia(const Point& pos) noexcept {
     mCurrentViaEditCmd.reset(new CmdBoardViaEdit(*mCurrentViaToPlace));
 
     // Highlight all elements of the current netsignal.
-    mAdapter.fsmSetHighlightedNetSignals({netsegment->getNetSignal()});
+    mAdapter.fsmCrossProbe({netsegment->getNetSignal()});
 
     return true;
   } catch (const Exception& e) {
@@ -451,7 +451,7 @@ bool BoardEditorState_AddVia::fixPosition(const Point& pos) noexcept {
 bool BoardEditorState_AddVia::abortCommand(bool showErrMsgBox) noexcept {
   try {
     // Clear highlighted net signal.
-    mAdapter.fsmSetHighlightedNetSignals({});
+    mAdapter.fsmCrossProbe();
 
     // Delete the current edit command
     mCurrentViaEditCmd.reset();
@@ -492,7 +492,7 @@ void BoardEditorState_AddVia::applySelectedNetSignal() noexcept {
   }
 
   // Highlight all elements of the current netsignal.
-  mAdapter.fsmSetHighlightedNetSignals({netsignal});
+  mAdapter.fsmCrossProbe();
 }
 
 void BoardEditorState_AddVia::updateClosestNetSignal(

@@ -23,7 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "primitivepathgraphicsitem.h"
+#include "graphicslayer.h"
 
 #include <librepcb/core/geometry/path.h>
 
@@ -80,6 +80,7 @@ public:
   void setAllLayers(const QSet<const Layer*>& layers) noexcept;
   void setEnabledLayers(const QSet<const Layer*>& layers) noexcept;
   void setOutline(const Path& path) noexcept;
+  void setState(GraphicsLayer::State state) noexcept;
 
   /**
    * Enable/disable editing mode when selected
@@ -111,10 +112,11 @@ public:
 private:  // Methods
   void layerEdited(const GraphicsLayer& layer,
                    GraphicsLayer::Event event) noexcept;
-  void updateColors() noexcept;
   void updateBoundingRectAndShape() noexcept;
   void updateBoundingRectMargin() noexcept;
   void updateVisibility() noexcept;
+  QPen getPen(GraphicsLayer::State state) const noexcept;
+  QBrush getBrush(GraphicsLayer::State state) const noexcept;
 
 private:  // Data
   const GraphicsLayerList& mLayers;
@@ -125,10 +127,7 @@ private:  // Data
 
   // Cached attributes
   std::shared_ptr<const GraphicsLayer> mLayer;
-  QPen mPen;
-  QPen mPenHighlighted;
-  QBrush mBrush;
-  QBrush mBrushHighlighted;
+  GraphicsLayer::State mState;
   QPainterPath mPainterPath;
   QRectF mBoundingRect;
   qreal mBoundingRectMarginPx;

@@ -75,6 +75,7 @@ BGI_Via::BGI_Via(
   mTextGraphicsItem->setMirrored(mContext->flipView);
   mTextGraphicsItem->setZValue(500);
 
+  updateContext();
   updatePosition();
   updateShapes();
   updateText();
@@ -98,6 +99,9 @@ BGI_Via::~BGI_Via() noexcept {
  ******************************************************************************/
 
 void BGI_Via::updateContext() noexcept {
+  const GraphicsLayer::State state =
+      mContext->getLayerState(false, mVia.getNetSegment().getNetSignal());
+  mTextGraphicsItem->setState(state);
   mTextGraphicsItem->setMirrored(mContext->flipView);
   update();
 }
@@ -114,15 +118,15 @@ void BGI_Via::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
                     QWidget* widget) noexcept {
   Q_UNUSED(widget);
 
-  const NetSignal* netsignal = mVia.getNetSegment().getNetSignal();
-  const bool highlight = option->state.testFlag(QStyle::State_Selected) ||
-      mContext->highlightedNets->contains(netsignal);
+  const bool selected = option->state.testFlag(QStyle::State_Selected);
+  const GraphicsLayer::State state =
+      mContext->getLayerState(selected, mVia.getNetSegment().getNetSignal());
 
   if (mBottomStopMaskLayer && mBottomStopMaskLayer->isVisible() &&
       (!mStopMaskBottom.isEmpty())) {
     // draw bottom stop mask
     painter->setPen(Qt::NoPen);
-    painter->setBrush(mBottomStopMaskLayer->getColor(highlight));
+    painter->setBrush(mBottomStopMaskLayer->getColor(state));
     painter->drawPath(mStopMaskBottom);
   }
 
@@ -130,9 +134,9 @@ void BGI_Via::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
     // Draw through-hole via.
     if (mVia.getActualSize() > mVia.getActualDrillDiameter()) {
       painter->setPen(Qt::NoPen);
-      painter->setBrush(mViaLayer->getColor(highlight));
+      painter->setBrush(mViaLayer->getColor(state));
     } else {
-      painter->setPen(QPen(mViaLayer->getColor(highlight), 0));
+      painter->setPen(QPen(mViaLayer->getColor(state), 0));
       painter->setBrush(Qt::NoBrush);
     }
     painter->drawPath(mCopper);
@@ -149,9 +153,8 @@ void BGI_Via::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
       int startAngle = 16 * 90;
       painter->setBrush(Qt::NoBrush);
       for (int i = 0; i < mBlindBuriedCopperLayers.count(); ++i) {
-        painter->setPen(
-            QPen(mBlindBuriedCopperLayers.at(i)->getColor(highlight), lineWidth,
-                 Qt::SolidLine, Qt::FlatCap));
+        painter->setPen(QPen(mBlindBuriedCopperLayers.at(i)->getColor(state),
+                             lineWidth, Qt::SolidLine, Qt::FlatCap));
         painter->drawArc(rect, startAngle, spanAngle);
         startAngle += spanAngle;
       }
@@ -162,7 +165,7 @@ void BGI_Via::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
       (!mStopMaskTop.isEmpty())) {
     // draw top stop mask
     painter->setPen(Qt::NoPen);
-    painter->setBrush(mTopStopMaskLayer->getColor(highlight));
+    painter->setBrush(mTopStopMaskLayer->getColor(state));
     painter->drawPath(mStopMaskTop);
   }
 }

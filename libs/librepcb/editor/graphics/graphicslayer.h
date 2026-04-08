@@ -54,6 +54,21 @@ class GraphicsLayer {
   Q_DECLARE_TR_FUNCTIONS(GraphicsLayer)
 
 public:
+  // Types
+  enum class DisabledMode {
+    Grayscale,  ///< Convert #mColor to grayscale, keep its alpha value
+    SemiTransparentGray,  ///< Always use a fixed gray with transparency
+  };
+
+  /// Item rendering state
+  enum class State {
+    // IMPORTANT: The order is relevant as it expresses the priority
+    // (higher values have priority over lower values).
+    Disabled,
+    Enabled,
+    Highlighted,
+  };
+
   // Signals
   enum class Event {
     ColorChanged,
@@ -67,17 +82,16 @@ public:
   // Constructors / Destructor
   GraphicsLayer() = delete;
   GraphicsLayer(const GraphicsLayer& other) noexcept;
-  explicit GraphicsLayer(const QString& name, const QString& nameTr,
-                         const QColor& color, const QColor& colorHighlighted,
-                         bool visible = true, bool enabled = true) noexcept;
+  explicit GraphicsLayer(
+      const QString& name, const QString& nameTr, const QColor& color,
+      const QColor& colorHighlighted, bool visible = true, bool enabled = true,
+      DisabledMode disabledMode = DisabledMode::SemiTransparentGray) noexcept;
   virtual ~GraphicsLayer() noexcept;
 
   // Getters
   const QString& getName() const noexcept { return mName; }
   const QString& getNameTr() const noexcept { return mNameTr; }
-  const QColor& getColor(bool highlighted = false) const noexcept {
-    return highlighted ? mColorHighlighted : mColor;
-  }
+  const QColor& getColor(State state = State::Enabled) const noexcept;
   bool getVisible() const noexcept { return mIsVisible; }
   bool isEnabled() const noexcept { return mIsEnabled; }
   bool isVisible() const noexcept { return mIsEnabled && mIsVisible; }
@@ -91,11 +105,16 @@ public:
   // Operator Overloadings
   GraphicsLayer& operator=(const GraphicsLayer& rhs) = delete;
 
+private:
+  void updateDisabledColor() noexcept;
+
 protected:  // Data
   const QString mName;  ///< Theme color name
   const QString mNameTr;  ///< Translated layer name as shown in the GUI
+  const DisabledMode mDisabledMode;  ///< Rendering mode for disabled state
   QColor mColor;  ///< Color of graphics items
   QColor mColorHighlighted;  ///< Color of highlighted graphics items
+  QColor mColorDisabled;  ///< Color of disabled graphics items (calculated)
   bool mIsVisible;  ///< Visibility of graphics items on that layer
   bool mIsEnabled;  ///< Availability of the layer itself
 };

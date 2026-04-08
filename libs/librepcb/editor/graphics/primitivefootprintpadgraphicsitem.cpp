@@ -56,6 +56,7 @@ PrimitiveFootprintPadGraphicsItem::PrimitiveFootprintPadGraphicsItem(
   : QGraphicsItemGroup(parent),
     mLayers(layers),
     mMirror(false),
+    mState(GraphicsLayer::State::Enabled),
     mCopperLayer(nullptr),
     mOriginCrossGraphicsItem(new OriginCrossGraphicsItem(this)),
     mTextGraphicsItem(new PrimitivePathGraphicsItem(this)),
@@ -135,6 +136,16 @@ void PrimitiveFootprintPadGraphicsItem::setLayer(
   }
 }
 
+void PrimitiveFootprintPadGraphicsItem::setState(
+    GraphicsLayer::State state) noexcept {
+  mState = state;
+  mOriginCrossGraphicsItem->setState(state);
+  mTextGraphicsItem->setState(state);
+  foreach (auto& item, mPathGraphicsItems) {
+    item.item->setState(state);
+  }
+}
+
 void PrimitiveFootprintPadGraphicsItem::setGeometries(
     const QHash<const Layer*, QList<PadGeometry> >& geometries,
     const Length& clearance) noexcept {
@@ -168,6 +179,7 @@ void PrimitiveFootprintPadGraphicsItem::setGeometries(
       auto item = std::make_shared<PrimitivePathGraphicsItem>(this);
       item->setRotation(mOriginCrossGraphicsItem->rotation());
       item->setMirrored(mMirror);
+      item->setState(mState);
       item->setPath(shape);
       item->setShapeMode(
           isCopperLayer ? PrimitivePathGraphicsItem::ShapeMode::FilledOutline

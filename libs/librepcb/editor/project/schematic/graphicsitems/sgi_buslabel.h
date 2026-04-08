@@ -23,6 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../schematicgraphicsscene.h"
+
 #include <librepcb/core/project/schematic/items/si_buslabel.h>
 
 #include <QtCore>
@@ -36,8 +38,6 @@
 namespace librepcb {
 namespace editor {
 
-class GraphicsLayer;
-class GraphicsLayerList;
 class LineGraphicsItem;
 
 /*******************************************************************************
@@ -52,7 +52,9 @@ public:
   // Constructors / Destructor
   SGI_BusLabel() = delete;
   SGI_BusLabel(const SGI_BusLabel& other) = delete;
-  SGI_BusLabel(SI_BusLabel& label, const GraphicsLayerList& layers) noexcept;
+  SGI_BusLabel(
+      SI_BusLabel& label, const GraphicsLayerList& layers,
+      std::shared_ptr<const SchematicGraphicsScene::Context> context) noexcept;
   virtual ~SGI_BusLabel() noexcept;
 
   // General Methods
@@ -78,6 +80,7 @@ private:  // Methods
 
 private:  // Data
   SI_BusLabel& mBusLabel;
+  std::shared_ptr<const SchematicGraphicsScene::Context> mContext;
   std::shared_ptr<const GraphicsLayer> mOriginCrossLayer;
   std::shared_ptr<const GraphicsLayer> mBusLabelLayer;
   QScopedPointer<LineGraphicsItem> mAnchorGraphicsItem;

@@ -23,6 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../schematicgraphicsscene.h"
+
 #include <librepcb/core/project/schematic/items/si_netpoint.h>
 
 #include <QtCore>
@@ -34,13 +36,7 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class NetSignal;
-
 namespace editor {
-
-class GraphicsLayer;
-class GraphicsLayerList;
 
 /*******************************************************************************
  *  Class SGI_NetPoint
@@ -54,9 +50,9 @@ public:
   // Constructors / Destructor
   SGI_NetPoint() = delete;
   SGI_NetPoint(const SGI_NetPoint& other) = delete;
-  SGI_NetPoint(SI_NetPoint& netpoint, const GraphicsLayerList& layers,
-               std::shared_ptr<const QSet<const NetSignal*>>
-                   highlightedNetSignals) noexcept;
+  SGI_NetPoint(
+      SI_NetPoint& netpoint, const GraphicsLayerList& layers,
+      std::shared_ptr<const SchematicGraphicsScene::Context> context) noexcept;
   virtual ~SGI_NetPoint() noexcept;
 
   // General Methods
@@ -78,7 +74,7 @@ private:  // Methods
 
 private:  // Data
   SI_NetPoint& mNetPoint;
-  std::shared_ptr<const QSet<const NetSignal*>> mHighlightedNetSignals;
+  std::shared_ptr<const SchematicGraphicsScene::Context> mContext;
   std::shared_ptr<const GraphicsLayer> mLayer;
 
   // Cached Attributes

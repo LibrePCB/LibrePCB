@@ -46,13 +46,12 @@ QRectF SGI_NetPoint::sBoundingRect;
  *  Constructors / Destructor
  ******************************************************************************/
 
-SGI_NetPoint::SGI_NetPoint(SI_NetPoint& netpoint,
-                           const GraphicsLayerList& layers,
-                           std::shared_ptr<const QSet<const NetSignal*>>
-                               highlightedNetSignals) noexcept
+SGI_NetPoint::SGI_NetPoint(
+    SI_NetPoint& netpoint, const GraphicsLayerList& layers,
+    std::shared_ptr<const SchematicGraphicsScene::Context> context) noexcept
   : QGraphicsItem(),
     mNetPoint(netpoint),
-    mHighlightedNetSignals(highlightedNetSignals),
+    mContext(context),
     mLayer(layers.get(Theme::Color::sSchematicWires)),
     mOnEditedSlot(*this, &SGI_NetPoint::netPointEdited) {
   setFlag(QGraphicsItem::ItemIsSelectable, true);
@@ -81,16 +80,20 @@ void SGI_NetPoint::paint(QPainter* painter,
                          QWidget* widget) {
   Q_UNUSED(widget);
 
-  const bool highlight = option->state.testFlag(QStyle::State_Selected) ||
-      mHighlightedNetSignals->contains(
-          &mNetPoint.getNetSegment().getNetSignal());
+  if ((!mLayer) || (!mLayer->isVisible())) {
+    return;
+  }
 
-  if (mLayer->isVisible() && mIsVisibleJunction) {
+  const NetSignal* net = &mNetPoint.getNetSegment().getNetSignal();
+  const bool selected = option->state.testFlag(QStyle::State_Selected);
+  const GraphicsLayer::State state = mContext->getLayerState(selected, net);
+
+  if (mIsVisibleJunction) {
     painter->setPen(Qt::NoPen);
-    painter->setBrush(QBrush(mLayer->getColor(highlight), Qt::SolidPattern));
+    painter->setBrush(QBrush(mLayer->getColor(state), Qt::SolidPattern));
     painter->drawEllipse(sBoundingRect);
-  } else if (mLayer->isVisible() && mIsOpenLineEnd) {
-    painter->setPen(QPen(mLayer->getColor(highlight), 0));
+  } else if (mIsOpenLineEnd) {
+    painter->setPen(QPen(mLayer->getColor(state), 0));
     painter->setBrush(Qt::NoBrush);
     painter->drawLine(sBoundingRect.topLeft() / 2,
                       sBoundingRect.bottomRight() / 2);

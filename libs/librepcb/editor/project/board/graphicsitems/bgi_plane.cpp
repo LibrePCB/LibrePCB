@@ -60,6 +60,7 @@ BGI_Plane::BGI_Plane(
     mOnLayerEditedSlot(*this, &BGI_Plane::layerEdited) {
   setFlag(QGraphicsItem::ItemIsSelectable, true);
 
+  updateContext();
   updateOutlineAndFragments();
   updateLayer();
   updateVisibility();
@@ -153,46 +154,48 @@ void BGI_Plane::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
                       QWidget* widget) noexcept {
   Q_UNUSED(widget);
 
+  if ((!mLayer) || (!mLayer->isVisible())) {
+    return;
+  }
+
   const bool selected = option->state.testFlag(QStyle::State_Selected);
-  const bool highlight =
-      selected || mContext->highlightedNets->contains(mPlane.getNetSignal());
+  const GraphicsLayer::State state =
+      mContext->getLayerState(selected, mPlane.getNetSignal());
   const qreal lod =
       option->levelOfDetailFromTransform(painter->worldTransform());
 
-  if (mLayer && mLayer->isVisible()) {
-    // Draw outline.
-    mLineWidthPx = 3 / lod;
-    painter->setPen(QPen(mLayer->getColor(highlight), mLineWidthPx,
-                         Qt::DashLine, Qt::RoundCap));
-    painter->setBrush(Qt::NoBrush);
-    painter->drawPath(mOutline);
+  // Draw outline.
+  mLineWidthPx = 3 / lod;
+  painter->setPen(
+      QPen(mLayer->getColor(state), mLineWidthPx, Qt::DashLine, Qt::RoundCap));
+  painter->setBrush(Qt::NoBrush);
+  painter->drawPath(mOutline);
 
-    // If the plane is selected, draw vertex handles.
-    if ((!mPlane.isLocked()) && selected) {
-      const qreal radius = 20 / lod;
-      mVertexHandleRadiusPx = std::min(radius, mBoundingRectMarginPx);
-      QColor color = mLayer->getColor(highlight);
-      color.setAlpha(color.alpha() / 2);
-      for (int i = 0; i < mVertexHandles.count(); ++i) {
-        const QPointF p = mVertexHandles.at(i).pos.toPxQPointF();
-        const qreal glowRadius =
-            std::min(radius, mVertexHandles.at(i).maxGlowRadiusPx * 1.5);
-        QRadialGradient gradient(p, glowRadius);
-        gradient.setColorAt(0, color);
-        gradient.setColorAt(0.5, color);
-        gradient.setColorAt(1, Qt::transparent);
-        painter->setPen(QPen(QBrush(gradient), glowRadius * 2));
-        painter->drawPoint(p);
-      }
+  // If the plane is selected, draw vertex handles.
+  if ((!mPlane.isLocked()) && selected) {
+    const qreal radius = 20 / lod;
+    mVertexHandleRadiusPx = std::min(radius, mBoundingRectMarginPx);
+    QColor color = mLayer->getColor(state);
+    color.setAlpha(color.alpha() / 2);
+    for (int i = 0; i < mVertexHandles.count(); ++i) {
+      const QPointF p = mVertexHandles.at(i).pos.toPxQPointF();
+      const qreal glowRadius =
+          std::min(radius, mVertexHandles.at(i).maxGlowRadiusPx * 1.5);
+      QRadialGradient gradient(p, glowRadius);
+      gradient.setColorAt(0, color);
+      gradient.setColorAt(0.5, color);
+      gradient.setColorAt(1, Qt::transparent);
+      painter->setPen(QPen(QBrush(gradient), glowRadius * 2));
+      painter->drawPoint(p);
     }
+  }
 
-    // Draw plane only if plane should be visible.
-    if (mPlane.isVisible()) {
-      painter->setPen(Qt::NoPen);
-      painter->setBrush(mLayer->getColor(highlight));
-      foreach (const QPainterPath& area, mAreas) {
-        painter->drawPath(area);
-      }
+  // Draw plane only if plane should be visible.
+  if (mPlane.isVisible()) {
+    painter->setPen(Qt::NoPen);
+    painter->setBrush(mLayer->getColor(state));
+    foreach (const QPainterPath& area, mAreas) {
+      painter->drawPath(area);
     }
   }
 }

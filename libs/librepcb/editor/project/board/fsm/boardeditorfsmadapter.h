@@ -23,6 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../../graphics/graphicslayer.h"
+
 #include <librepcb/core/types/point.h>
 
 #include <QtCore>
@@ -36,6 +38,8 @@
 namespace librepcb {
 
 class Board;
+class ComponentInstance;
+class ComponentSignalInstance;
 class NetSignal;
 
 namespace editor {
@@ -96,8 +100,12 @@ public:
   virtual QPainterPath fsmCalcPosWithTolerance(
       const Point& pos, qreal multiplier) const noexcept = 0;
   virtual Point fsmMapGlobalPosToScenePos(const QPoint& pos) const noexcept = 0;
-  virtual void fsmSetHighlightedNetSignals(
-      const QSet<const NetSignal*>& sigs) noexcept = 0;
+  virtual void fsmCrossProbe(
+      const QSet<const NetSignal*>& nets = {},
+      const QSet<const ComponentInstance*>& components = {},
+      const QSet<const ComponentSignalInstance*>& cmpSignals = {},
+      GraphicsLayer::State selfProbedState =
+          GraphicsLayer::State::Highlighted) noexcept = 0;
   virtual void fsmAbortBlockingToolsInOtherEditors() noexcept = 0;
   virtual void fsmSetStatusBarMessage(const QString& message,
                                       int timeoutMs = -1) noexcept = 0;

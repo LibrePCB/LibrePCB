@@ -23,6 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "graphicslayer.h"
+
 #include <librepcb/core/geometry/text.h>
 
 #include <QtCore>
@@ -61,6 +63,7 @@ public:
   // Setters
   void setOriginCrossVisible(bool visible) noexcept;
   void setTextOverride(const std::optional<QString>& text) noexcept;
+  void setState(GraphicsLayer::State state) noexcept;
 
   // Inherited from QGraphicsItem
   QPainterPath shape() const noexcept override;

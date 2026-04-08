@@ -650,7 +650,7 @@ bool BoardEditorState_DrawTrace::startPositioning(
     updateNetpointPositions();
 
     // Highlight all elements of the current netsignal.
-    mAdapter.fsmSetHighlightedNetSignals({mCurrentNetSegment->getNetSignal()});
+    mAdapter.fsmCrossProbe({mCurrentNetSegment->getNetSignal()});
 
     return true;
   } catch (const Exception& e) {
@@ -860,7 +860,7 @@ bool BoardEditorState_DrawTrace::abortPositioning(
   BI_NetSegment* segment = simplifySegment ? mCurrentNetSegment : nullptr;
 
   try {
-    mAdapter.fsmSetHighlightedNetSignals({});
+    mAdapter.fsmCrossProbe();
     mFixedStartAnchor = nullptr;
     mCurrentNetSegment = nullptr;
     mPositioningNetLine1 = nullptr;

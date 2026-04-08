@@ -61,6 +61,7 @@ public:
   void setLine(const Point& p1, const Point& p2) noexcept;
   void setLineWidth(const UnsignedLength& width) noexcept;
   void setLayer(const std::shared_ptr<const GraphicsLayer>& layer) noexcept;
+  void setState(GraphicsLayer::State state) noexcept;
 
   // Inherited from QGraphicsItem
   QRectF boundingRect() const noexcept override { return mBoundingRect; }
@@ -78,8 +79,8 @@ private:  // Methods
 
 private:  // Data
   std::shared_ptr<const GraphicsLayer> mLayer;
-  QPen mPen;
-  QPen mPenHighlighted;
+  GraphicsLayer::State mState;
+  qreal mLineWidthPx;
   QLineF mLine;
   QRectF mBoundingRect;
   QPainterPath mShape;

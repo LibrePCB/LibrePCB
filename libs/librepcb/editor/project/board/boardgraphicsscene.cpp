@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "boardgraphicsscene.h"
 
+#include "../projectcrossprobe.h"
 #include "graphicsitems/bgi_airwire.h"
 #include "graphicsitems/bgi_device.h"
 #include "graphicsitems/bgi_hole.h"
@@ -58,6 +59,39 @@
  ******************************************************************************/
 namespace librepcb {
 namespace editor {
+
+/*******************************************************************************
+ *  Class Context
+ ******************************************************************************/
+
+template <typename T>
+GraphicsLayer::State BoardGraphicsScene::Context::getLayerState(
+    bool highlight, const T* obj) const noexcept {
+  if (highlight) {
+    // Highlight has always priority.
+    return GraphicsLayer::State::Highlighted;
+  } else if (!crossProbe->isActive()) {
+    // Cross-probing not active -> normal enabled state.
+    return GraphicsLayer::State::Enabled;
+  }
+
+  const bool probed = crossProbe->isProbed(obj);
+  if (crossProbe->isCrossProbed(tab)) {
+    // Cross-probing from other tab -> highlight probed object, disable others.
+    return probed ? GraphicsLayer::State::Highlighted
+                  : GraphicsLayer::State::Disabled;
+  } else {
+    // Self-probing from this tab -> conditional probed state depending on tool.
+    return probed ? selfProbedState : GraphicsLayer::State::Enabled;
+  }
+}
+
+template GraphicsLayer::State BoardGraphicsScene::Context::getLayerState(
+    bool highlight, const NetSignal* obj) const noexcept;
+template GraphicsLayer::State BoardGraphicsScene::Context::getLayerState(
+    bool highlight, const ComponentInstance* obj) const noexcept;
+template GraphicsLayer::State BoardGraphicsScene::Context::getLayerState(
+    bool highlight, const ComponentSignalInstance* obj) const noexcept;
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -117,6 +151,9 @@ BoardGraphicsScene::BoardGraphicsScene(Board& board,
   connect(&mBoard, &Board::airWireAdded, this, &BoardGraphicsScene::addAirWire);
   connect(&mBoard, &Board::airWireRemoved, this,
           &BoardGraphicsScene::removeAirWire);
+
+  connect(mContext->crossProbe.get(), &ProjectCrossProbe::modified, this,
+          &BoardGraphicsScene::updateContext, Qt::QueuedConnection);
 }
 
 BoardGraphicsScene::~BoardGraphicsScene() noexcept {
@@ -160,6 +197,11 @@ BoardGraphicsScene::~BoardGraphicsScene() noexcept {
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
+
+void BoardGraphicsScene::setSelfProbedState(
+    GraphicsLayer::State state) noexcept {
+  mContext->selfProbedState = state;
+}
 
 void BoardGraphicsScene::setFlipped(bool flip) noexcept {
   if (flip != mContext->flipView) {
@@ -313,6 +355,36 @@ void BoardGraphicsScene::clearSelection() noexcept {
   }
 }
 
+qreal BoardGraphicsScene::getZValueOfCopperLayer(const Layer& layer,
+                                                 bool flip) noexcept {
+  if (layer.isTop()) {
+    return getFlippedZValue(ZValue_CopperTop, flip);
+  } else if (layer.isBottom()) {
+    return getFlippedZValue(ZValue_CopperBottom, flip);
+  } else if (layer.isInner()) {
+    // 0.0 => TOP
+    // 1.0 => BOTTOM
+    const qreal delta = static_cast<qreal>(layer.getCopperNumber()) / 100.0;
+    return flip ? (static_cast<int>(ZValue_InnerBottom) + delta)
+                : (static_cast<int>(ZValue_InnerTop) - delta);
+  } else {
+    return ZValue_Default;
+  }
+}
+
+qreal BoardGraphicsScene::getFlippedZValue(ItemZValue value,
+                                           bool flip) noexcept {
+  if (flip && (value >= ZValue_Bottom) && (value <= ZValue_Top)) {
+    return static_cast<qreal>(ZValue_Top + ZValue_Bottom - value);
+  } else {
+    return static_cast<qreal>(value);
+  }
+}
+
+/*******************************************************************************
+ *  Private Methods
+ ******************************************************************************/
+
 void BoardGraphicsScene::updateContext() noexcept {
   foreach (auto item, mDevices) {
     item->updateContext();
@@ -348,36 +420,6 @@ void BoardGraphicsScene::updateContext() noexcept {
     item->updateContext();
   }
 }
-
-qreal BoardGraphicsScene::getZValueOfCopperLayer(const Layer& layer,
-                                                 bool flip) noexcept {
-  if (layer.isTop()) {
-    return getFlippedZValue(ZValue_CopperTop, flip);
-  } else if (layer.isBottom()) {
-    return getFlippedZValue(ZValue_CopperBottom, flip);
-  } else if (layer.isInner()) {
-    // 0.0 => TOP
-    // 1.0 => BOTTOM
-    const qreal delta = static_cast<qreal>(layer.getCopperNumber()) / 100.0;
-    return flip ? (static_cast<int>(ZValue_InnerBottom) + delta)
-                : (static_cast<int>(ZValue_InnerTop) - delta);
-  } else {
-    return ZValue_Default;
-  }
-}
-
-qreal BoardGraphicsScene::getFlippedZValue(ItemZValue value,
-                                           bool flip) noexcept {
-  if (flip && (value >= ZValue_Bottom) && (value <= ZValue_Top)) {
-    return static_cast<qreal>(ZValue_Top + ZValue_Bottom - value);
-  } else {
-    return static_cast<qreal>(value);
-  }
-}
-
-/*******************************************************************************
- *  Private Methods
- ******************************************************************************/
 
 void BoardGraphicsScene::addDevice(BI_Device& device) noexcept {
   Q_ASSERT(!mDevices.contains(&device));

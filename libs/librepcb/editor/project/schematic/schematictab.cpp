@@ -33,6 +33,7 @@
 #include "../../utils/slinthelpers.h"
 #include "../../utils/uihelpers.h"
 #include "../../workspace/desktopservices.h"
+#include "../projectcrossprobe.h"
 #include "../projecteditor.h"
 #include "fsm/schematiceditorfsm.h"
 #include "fsm/schematiceditorstate_addcomponent.h"
@@ -434,11 +435,16 @@ void SchematicTab::highlightErcMessage(
 
 void SchematicTab::activate() noexcept {
   mScene.reset(new SchematicGraphicsScene(
-      mSchematic, *mLayers, mProjectEditor.getHighlightedNetSignals(),
-      mIgnorePlacementLocks, this));
+      mSchematic, *mLayers,
+      std::shared_ptr<SchematicGraphicsScene::Context>(
+          new SchematicGraphicsScene::Context{
+              this,  // tab
+              mProjectEditor.getCrossProbe(),  // cross probe
+              GraphicsLayer::State::Highlighted,  // Self-probe mode
+              mIgnorePlacementLocks,  // ignore placement locks
+          }),
+      this));
   mScene->setGridInterval(mSchematic.getGridInterval());
-  connect(&mProjectEditor, &ProjectEditor::highlightedNetSignalsChanged,
-          mScene.get(), &SchematicGraphicsScene::updateHighlightedNetSignals);
   connect(mScene.get(), &GraphicsScene::changed, this,
           &SchematicTab::requestRepaint);
 
@@ -458,6 +464,8 @@ void SchematicTab::deactivate() noexcept {
 }
 
 void SchematicTab::trigger(ui::TabAction a) noexcept {
+  mProjectEditor.setCurrentTab(this);
+
   switch (a) {
     case ui::TabAction::Print: {
       execGraphicsExportDialog(GraphicsExportDialog::Output::Print, "print");
@@ -722,21 +730,25 @@ slint::Image SchematicTab::renderScene(float width, float height,
 
 bool SchematicTab::processScenePointerEvent(
     const QPointF& pos, slint::private_api::PointerEvent e) noexcept {
+  mProjectEditor.setCurrentTab(this);
   return mView->pointerEvent(pos, e);
 }
 
 bool SchematicTab::processSceneScrolled(
     const QPointF& pos, slint::private_api::PointerScrollEvent e) noexcept {
+  mProjectEditor.setCurrentTab(this);
   return mView->scrollEvent(pos, e);
 }
 
 bool SchematicTab::processSceneKeyPressed(
     const slint::language::KeyEvent& e) noexcept {
+  mProjectEditor.setCurrentTab(this);
   return mView->keyPressed(e);
 }
 
 bool SchematicTab::processSceneKeyReleased(
     const slint::language::KeyEvent& e) noexcept {
+  mProjectEditor.setCurrentTab(this);
   return mView->keyReleased(e);
 }
 
@@ -859,9 +871,17 @@ void SchematicTab::fsmZoomToSceneRect(const QRectF& r) noexcept {
   mView->zoomToSceneRect(r);
 }
 
-void SchematicTab::fsmSetHighlightedNetSignals(
-    const QSet<const NetSignal*>& sigs) noexcept {
-  mProjectEditor.setHighlightedNetSignals(sigs);
+void SchematicTab::fsmCrossProbe(
+    const QSet<const NetSignal*>& nets,
+    const QSet<const ComponentInstance*>& components,
+    const QSet<const ComponentSignalInstance*>& cmpSignals,
+    const QSet<const Bus*>& buses,
+    GraphicsLayer::State selfProbedState) noexcept {
+  if (mScene && mProjectEditor.isCurrentTab(this)) {
+    mScene->setSelfProbedState(selfProbedState);
+    mProjectEditor.getCrossProbe()->set(this, nets, components, cmpSignals,
+                                        buses);
+  }
 }
 
 void SchematicTab::fsmAbortBlockingToolsInOtherEditors() noexcept {
@@ -886,6 +906,7 @@ void SchematicTab::fsmToolLeave() noexcept {
   }
   mTool = ui::EditorTool::Select;
   fsmSetFeatures(Features());
+  fsmCrossProbe();  // Reset cross-probing
   onDerivedUiDataChanged.notify();
 }
 

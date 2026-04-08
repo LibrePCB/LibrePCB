@@ -23,6 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "graphicslayer.h"
+
 #include <librepcb/core/geometry/hole.h>
 
 #include <QtCore>
@@ -55,8 +57,9 @@ public:
                    QGraphicsItem* parent = nullptr) noexcept;
   virtual ~HoleGraphicsItem() noexcept;
 
-  // Getters
+  // General Methods
   Hole& getObj() noexcept { return mHole; }
+  void setState(GraphicsLayer::State state) noexcept;
 
   // Inherited from QGraphicsItem
   QPainterPath shape() const noexcept override;

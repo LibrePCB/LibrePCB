@@ -55,6 +55,7 @@ BGI_NetPoint::BGI_NetPoint(
   setFlag(QGraphicsItem::ItemHasNoContents, true);
   setFlag(QGraphicsItem::ItemIsSelectable, true);
 
+  updateContext();
   updateLayer();
   updatePosition();
   updateDiameter();

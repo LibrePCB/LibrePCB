@@ -348,6 +348,9 @@ bool SchematicEditorState_DrawBus::startPositioning(
     // properly place the new junctions/line according the current wire mode
     updateJunctionPositions(snap);
 
+    // Highlight all elements of the current bus.
+    mAdapter.fsmCrossProbe({}, {}, {}, {&mCurrentSegment->getBus()});
+
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
@@ -514,7 +517,7 @@ bool SchematicEditorState_DrawBus::abortPositioning(
   SI_BusSegment* segment = simplifySegment ? mCurrentSegment : nullptr;
 
   try {
-    mAdapter.fsmSetHighlightedNetSignals({});
+    mAdapter.fsmCrossProbe();
     mSubState = SubState::IDLE;
     mFixedStartAnchor = nullptr;
     mCurrentSegment = nullptr;

@@ -69,6 +69,7 @@ public:
   void setFont(Font font) noexcept;
   void setLayer(const std::shared_ptr<const GraphicsLayer>& layer) noexcept;
   void setShapeEnabled(bool enabled) noexcept { mShapeEnabled = enabled; }
+  void setState(GraphicsLayer::State state) noexcept;
 
   // Inherited from QGraphicsItem
   QRectF boundingRect() const noexcept override { return mBoundingRect; }
@@ -87,6 +88,7 @@ private:  // Methods
 
 private:  // Data
   std::shared_ptr<const GraphicsLayer> mLayer;
+  GraphicsLayer::State mState;
   QString mText;
   QString mDisplayText;
   bool mParseOverlines;
@@ -95,8 +97,6 @@ private:  // Data
   Alignment mAlignment;
   bool mRotate180;
   QFont mFont;
-  QPen mPen;
-  QPen mPenHighlighted;
   int mTextFlags;
   QRectF mBoundingRect;
   QPainterPath mShape;

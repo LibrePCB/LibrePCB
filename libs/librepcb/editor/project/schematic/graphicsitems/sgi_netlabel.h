@@ -23,6 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../schematicgraphicsscene.h"
+
 #include <librepcb/core/project/schematic/items/si_netlabel.h>
 
 #include <QtCore>
@@ -34,13 +36,8 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class NetSignal;
-
 namespace editor {
 
-class GraphicsLayer;
-class GraphicsLayerList;
 class LineGraphicsItem;
 
 /*******************************************************************************
@@ -55,9 +52,9 @@ public:
   // Constructors / Destructor
   SGI_NetLabel() = delete;
   SGI_NetLabel(const SGI_NetLabel& other) = delete;
-  SGI_NetLabel(SI_NetLabel& netlabel, const GraphicsLayerList& layers,
-               std::shared_ptr<const QSet<const NetSignal*>>
-                   highlightedNetSignals) noexcept;
+  SGI_NetLabel(
+      SI_NetLabel& netlabel, const GraphicsLayerList& layers,
+      std::shared_ptr<const SchematicGraphicsScene::Context> context) noexcept;
   virtual ~SGI_NetLabel() noexcept;
 
   // General Methods
@@ -83,7 +80,7 @@ private:  // Methods
 
 private:  // Data
   SI_NetLabel& mNetLabel;
-  std::shared_ptr<const QSet<const NetSignal*>> mHighlightedNetSignals;
+  std::shared_ptr<const SchematicGraphicsScene::Context> mContext;
   std::shared_ptr<const GraphicsLayer> mOriginCrossLayer;
   std::shared_ptr<const GraphicsLayer> mNetLabelLayer;
   QScopedPointer<LineGraphicsItem> mAnchorGraphicsItem;

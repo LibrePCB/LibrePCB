@@ -51,10 +51,12 @@ QVector<QLineF> SGI_BusLabel::sOriginCrossLines;
  *  Constructors / Destructor
  ******************************************************************************/
 
-SGI_BusLabel::SGI_BusLabel(SI_BusLabel& label,
-                           const GraphicsLayerList& layers) noexcept
+SGI_BusLabel::SGI_BusLabel(
+    SI_BusLabel& label, const GraphicsLayerList& layers,
+    std::shared_ptr<const SchematicGraphicsScene::Context> context) noexcept
   : QGraphicsItem(),
     mBusLabel(label),
+    mContext(context),
     mOriginCrossLayer(layers.get(Theme::Color::sSchematicReferences)),
     mBusLabelLayer(layers.get(Theme::Color::sSchematicBusLabels)),
     mOnEditedSlot(*this, &SGI_BusLabel::busLabelEdited) {
@@ -104,33 +106,36 @@ void SGI_BusLabel::paint(QPainter* painter,
     return;
   }
 
+  const Bus* bus = &mBusLabel.getBusSegment().getBus();
+  const bool selected = option->state.testFlag(QStyle::State_Selected);
+  const GraphicsLayer::State state = mContext->getLayerState(selected, bus);
+
   const qreal lod =
       option->levelOfDetailFromTransform(painter->worldTransform());
-  const bool highlight = option->state.testFlag(QStyle::State_Selected);
 
   if (mOriginCrossLayer && mOriginCrossLayer->isVisible() && (lod > 2)) {
     // draw origin cross
-    painter->setPen(QPen(mOriginCrossLayer->getColor(highlight), 0));
+    painter->setPen(QPen(mOriginCrossLayer->getColor(state), 0));
     painter->drawLines(sOriginCrossLines);
   }
 
   if (lod > 1) {
     // draw text
-    painter->setPen(QPen(mBusLabelLayer->getColor(highlight), 0));
+    painter->setPen(QPen(mBusLabelLayer->getColor(state), 0));
     painter->setFont(mFont);
     painter->save();
     if (mRotate180) {
       painter->rotate(180);
     }
     painter->drawStaticText(mTextOrigin, mStaticText);
-    painter->setPen(QPen(mBusLabelLayer->getColor(highlight), qreal(4) / 15));
+    painter->setPen(QPen(mBusLabelLayer->getColor(state), qreal(4) / 15));
     painter->drawLines(mOverlines);
     painter->restore();
   } else {
     // draw filled rect
     painter->setPen(Qt::NoPen);
     painter->setBrush(
-        QBrush(mBusLabelLayer->getColor(highlight), Qt::Dense5Pattern));
+        QBrush(mBusLabelLayer->getColor(state), Qt::Dense5Pattern));
     painter->drawRect(mBoundingRect);
   }
 }

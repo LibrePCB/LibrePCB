@@ -39,6 +39,7 @@
 #include "../cmd/cmdadddevicetoboard.h"
 #include "../cmd/cmdboardedit.h"
 #include "../cmd/cmdboardspecctraimport.h"
+#include "../projectcrossprobe.h"
 #include "../projecteditor.h"
 #include "boardeditor.h"
 #include "boardgraphicsscene.h"
@@ -571,13 +572,13 @@ void Board2dTab::activate() noexcept {
       mBoard, *mLayers,
       std::shared_ptr<BoardGraphicsScene::Context>(
           new BoardGraphicsScene::Context{
-              mProjectEditor.getHighlightedNetSignals(),  // highlighted nets
+              this,  // tab
+              mProjectEditor.getCrossProbe(),  // cross probe
+              GraphicsLayer::State::Highlighted,  // Self-probe mode
               false,  // flip view
           }),
       this));
   mScene->setGridInterval(mBoard.getGridInterval());
-  connect(&mProjectEditor, &ProjectEditor::highlightedNetSignalsChanged,
-          mScene.get(), &BoardGraphicsScene::updateContext);
   connect(mScene.get(), &GraphicsScene::changed, this,
           &Board2dTab::requestRepaint);
 
@@ -652,6 +653,7 @@ void Board2dTab::deactivate() noexcept {
 }
 
 void Board2dTab::trigger(ui::TabAction a) noexcept {
+  mProjectEditor.setCurrentTab(this);
   restartIdleTimer();
 
   switch (a) {
@@ -1029,6 +1031,7 @@ slint::Image Board2dTab::renderScene(float width, float height,
 
 bool Board2dTab::processScenePointerEvent(
     const QPointF& pos, slint::private_api::PointerEvent e) noexcept {
+  mProjectEditor.setCurrentTab(this);
   if (mView->pointerEvent(pos, e)) {
     restartIdleTimer();
     return true;
@@ -1038,11 +1041,13 @@ bool Board2dTab::processScenePointerEvent(
 
 bool Board2dTab::processSceneScrolled(
     const QPointF& pos, slint::private_api::PointerScrollEvent e) noexcept {
+  mProjectEditor.setCurrentTab(this);
   return mView->scrollEvent(pos, e);
 }
 
 bool Board2dTab::processSceneKeyPressed(
     const slint::language::KeyEvent& e) noexcept {
+  mProjectEditor.setCurrentTab(this);
   if (mView->keyPressed(e)) {
     restartIdleTimer();
     return true;
@@ -1052,6 +1057,7 @@ bool Board2dTab::processSceneKeyPressed(
 
 bool Board2dTab::processSceneKeyReleased(
     const slint::language::KeyEvent& e) noexcept {
+  mProjectEditor.setCurrentTab(this);
   if (mView->keyReleased(e)) {
     restartIdleTimer();
     return true;
@@ -1185,9 +1191,15 @@ Point Board2dTab::fsmMapGlobalPosToScenePos(const QPoint& pos) const noexcept {
   }
 }
 
-void Board2dTab::fsmSetHighlightedNetSignals(
-    const QSet<const NetSignal*>& sigs) noexcept {
-  mProjectEditor.setHighlightedNetSignals(sigs);
+void Board2dTab::fsmCrossProbe(
+    const QSet<const NetSignal*>& nets,
+    const QSet<const ComponentInstance*>& components,
+    const QSet<const ComponentSignalInstance*>& cmpSignals,
+    GraphicsLayer::State selfProbedState) noexcept {
+  if (mScene && mProjectEditor.isCurrentTab(this)) {
+    mScene->setSelfProbedState(selfProbedState);
+    mProjectEditor.getCrossProbe()->set(this, nets, components, cmpSignals, {});
+  }
 }
 
 void Board2dTab::fsmAbortBlockingToolsInOtherEditors() noexcept {
@@ -1212,6 +1224,7 @@ void Board2dTab::fsmToolLeave() noexcept {
   }
   mTool = ui::EditorTool::Select;
   fsmSetFeatures(Features());
+  fsmCrossProbe();  // Reset cross-probing
   onDerivedUiDataChanged.notify();
 }
 
@@ -2630,6 +2643,8 @@ void Board2dTab::goToDevice(const QString& name, int index) noexcept {
       mScene->clearSelection();
       if (auto item = mScene->getDevices().value(device)) {
         item->setSelected(true);
+        mProjectEditor.getCrossProbe()->set(
+            nullptr, {}, {&device->getComponentInstance()}, {}, {});
         QRectF rect = item->mapRectToScene(item->childrenBoundingRect());
         // Zoom to a rectangle relative to the maximum graphics item dimension,
         // occupying 1/4th of the screen, but limiting the margin to 10mm.
@@ -2638,6 +2653,8 @@ void Board2dTab::goToDevice(const QString& name, int index) noexcept {
                      Length::fromMm(10).toPx());
         rect.adjust(-margin, -margin, margin, margin);
         mView->zoomToSceneRect(rect);
+      } else {
+        mProjectEditor.getCrossProbe()->set(nullptr, {}, {}, {}, {});
       }
     }
   }

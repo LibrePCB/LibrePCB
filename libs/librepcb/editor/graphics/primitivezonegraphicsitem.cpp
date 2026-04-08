@@ -22,8 +22,8 @@
  ******************************************************************************/
 #include "primitivezonegraphicsitem.h"
 
-#include "graphicslayer.h"
 #include "graphicslayerlist.h"
+#include "primitivepathgraphicsitem.h"
 
 #include <librepcb/core/geometry/path.h>
 #include <librepcb/core/utils/toolbox.h>
@@ -49,6 +49,7 @@ PrimitiveZoneGraphicsItem::PrimitiveZoneGraphicsItem(
     mOutline(),
     mEditable(false),
     mLayer(layers.get(Theme::Color::sBoardZones)),
+    mState(GraphicsLayer::State::Enabled),
     mBoundingRectMarginPx(0),
     mVertexHandleRadiusPx(0),
     mVertexHandles(),
@@ -56,14 +57,6 @@ PrimitiveZoneGraphicsItem::PrimitiveZoneGraphicsItem(
   setFlag(QGraphicsItem::ItemIsSelectable, true);
   setZValue(-1);
 
-  mPen.setCapStyle(Qt::RoundCap);
-  mPenHighlighted.setCapStyle(Qt::RoundCap);
-  mPen.setJoinStyle(Qt::RoundJoin);
-  mPenHighlighted.setJoinStyle(Qt::RoundJoin);
-  mPen.setWidthF(0);
-  mPenHighlighted.setWidthF(0);
-
-  updateColors();
   updateBoundingRectAndShape();
   updateVisibility();
 
@@ -194,6 +187,11 @@ void PrimitiveZoneGraphicsItem::setEditable(bool editable) noexcept {
   updateBoundingRectMargin();
 }
 
+void PrimitiveZoneGraphicsItem::setState(GraphicsLayer::State state) noexcept {
+  mState = state;
+  update();
+}
+
 /*******************************************************************************
  *  Inherited from QGraphicsItem
  ******************************************************************************/
@@ -215,20 +213,25 @@ void PrimitiveZoneGraphicsItem::paint(QPainter* painter,
                                       QWidget* widget) noexcept {
   Q_UNUSED(widget);
 
-  const bool isSelected = option->state.testFlag(QStyle::State_Selected);
+  const bool selected = option->state.testFlag(QStyle::State_Selected);
   const qreal lod =
       option->levelOfDetailFromTransform(painter->worldTransform());
 
+  GraphicsLayer::State state = mState;
+  if (selected) {
+    state = GraphicsLayer::State::Highlighted;
+  }
+
   // Draw outline & fill.
-  painter->setPen(isSelected ? mPenHighlighted : mPen);
-  painter->setBrush(isSelected ? mBrushHighlighted : mBrush);
+  painter->setPen(getPen(state));
+  painter->setBrush(getBrush(state));
   painter->drawPath(mPainterPath);
 
   // Draw vertex handles, if editable and selected.
-  if (mEditable && isSelected && mLayer) {
+  if (mEditable && selected && mLayer) {
     const qreal radius = 20 / lod;
     mVertexHandleRadiusPx = std::min(radius, mBoundingRectMarginPx);
-    QColor color = mLayer->getColor(isSelected);
+    QColor color = mLayer->getColor(state);
     color.setAlpha(color.alpha() / 3);
     painter->setBrush(Qt::NoBrush);
     for (int i = 0; i < mVertexHandles.count(); ++i) {
@@ -255,9 +258,10 @@ void PrimitiveZoneGraphicsItem::layerEdited(
   switch (event) {
     case GraphicsLayer::Event::ColorChanged:
     case GraphicsLayer::Event::HighlightColorChanged:
+      update();
+      break;
     case GraphicsLayer::Event::VisibleChanged:
     case GraphicsLayer::Event::EnabledChanged:
-      updateColors();
       updateVisibility();
       update();
       break;
@@ -269,32 +273,11 @@ void PrimitiveZoneGraphicsItem::layerEdited(
   }
 }
 
-void PrimitiveZoneGraphicsItem::updateColors() noexcept {
-  if (mLayer) {
-    QColor color = mLayer->getColor(false);
-    color.setAlpha(255);
-    QColor colorHighlighted = mLayer->getColor(true);
-    colorHighlighted.setAlpha(255);
-
-    mPen.setStyle(Qt::SolidLine);
-    mPenHighlighted.setStyle(Qt::SolidLine);
-    mPen.setColor(color);
-    mPenHighlighted.setColor(colorHighlighted);
-
-    mBrush.setStyle(Qt::SolidPattern);
-    mBrushHighlighted.setStyle(Qt::SolidPattern);
-    mBrush.setColor(mLayer->getColor(false));
-    mBrushHighlighted.setColor(mLayer->getColor(true));
-  }
-
-  update();
-}
-
 void PrimitiveZoneGraphicsItem::updateBoundingRectAndShape() noexcept {
   prepareGeometryChange();
-  mShape = Toolbox::shapeFromPath(mPainterPath, mPen, mBrush);
-  mBoundingRect = mPainterPath.boundingRect() +
-      QMarginsF(mPen.widthF(), mPen.widthF(), mPen.widthF(), mPen.widthF());
+  mShape =
+      Toolbox::shapeFromPath(mPainterPath, getPen(mState), getBrush(mState));
+  mBoundingRect = mPainterPath.boundingRect();
   update();
 }
 
@@ -330,6 +313,28 @@ void PrimitiveZoneGraphicsItem::updateVisibility() noexcept {
     visible = anyZoneLayerVisible || (!anyCopperLayerVisible);
   }
   setVisible(visible);
+}
+
+QPen PrimitiveZoneGraphicsItem::getPen(
+    GraphicsLayer::State state) const noexcept {
+  if (mLayer && mLayer->isVisible()) {
+    QColor color = mLayer->getColor(state);
+    if (state != GraphicsLayer::State::Disabled) {
+      color.setAlpha(255);
+    }
+    return QPen(color, 0, Qt::SolidLine);
+  } else {
+    return Qt::NoPen;
+  }
+}
+
+QBrush PrimitiveZoneGraphicsItem::getBrush(
+    GraphicsLayer::State state) const noexcept {
+  if (mLayer && mLayer->isVisible()) {
+    return QBrush(mLayer->getColor(state), Qt::SolidPattern);
+  } else {
+    return Qt::NoBrush;
+  }
 }
 
 /*******************************************************************************
