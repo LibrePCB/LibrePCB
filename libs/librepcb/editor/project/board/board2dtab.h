@@ -242,7 +242,7 @@ private:
   void execD356NetlistExportDialog() noexcept;
   void execSpecctraExportDialog() noexcept;
   void execSpecctraImportDialog() noexcept;
-  void goToDevice(const QString& name, int index) noexcept;
+  void findGoTo(const QString& name, int index) noexcept;
   bool toggleBackgroundImage() noexcept;
   void applyBackgroundImageSettings() noexcept;
   FilePath getBackgroundImageCacheDir() const noexcept;

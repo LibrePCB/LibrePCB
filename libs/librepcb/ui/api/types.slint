@@ -132,6 +132,11 @@ export enum IpcDensityLevel {
 // Widgets data
 ////////////////////////////////////////////////////////////////////////////////
 
+export struct SimpleListItemData {
+    icon: image,
+    text: string,
+}
+
 // Underlying data structure for LineEdit elements
 export struct LineEditData {
     enabled: bool,
@@ -854,7 +859,7 @@ export struct TabData {
 
     // Find
     find-term: string,  // Set by UI, handled in backend
-    find-autocompletions: [string],
+    find-autocompletions: [SimpleListItemData],
 
     // Layers
     layers: [GraphicsLayerData],

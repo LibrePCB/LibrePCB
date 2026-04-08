@@ -23,9 +23,9 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <QtCore>
+#include "appwindow.h"
 
-#include <slint.h>
+#include <QtCore>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -44,6 +44,14 @@ class SearchContext final : public QObject {
   Q_OBJECT
 
 public:
+  // Types
+  enum class ObjectType {
+    Component,
+    Net,
+  };
+  using Suggestion = std::pair<ObjectType, QString>;
+  using SuggestionList = QVector<Suggestion>;
+
   // Constructors / Destructor
   SearchContext(const SearchContext& other) = delete;
   explicit SearchContext(QObject* parent = nullptr) noexcept;
@@ -54,8 +62,8 @@ public:
   void deinit() noexcept;
   void setTerm(const QString& term) noexcept;
   const QString& getTerm() const noexcept { return mTerm; }
-  void setSuggestions(const QStringList& list) noexcept;
-  const std::shared_ptr<slint::FilterModel<slint::SharedString>>&
+  void setSuggestions(SuggestionList list) noexcept;
+  const std::shared_ptr<slint::FilterModel<ui::SimpleListItemData>>&
       getSuggestions() const noexcept {
     return mSuggestionsFiltered;
   }
@@ -73,8 +81,9 @@ private:
   bool mForward;  ///< Current search direction (forward or backward)
   int mIndex;  ///< Number of searches with the current search term
 
-  std::shared_ptr<slint::VectorModel<slint::SharedString>> mSuggestions;
-  std::shared_ptr<slint::FilterModel<slint::SharedString>> mSuggestionsFiltered;
+  std::shared_ptr<slint::VectorModel<ui::SimpleListItemData>> mSuggestions;
+  std::shared_ptr<slint::FilterModel<ui::SimpleListItemData>>
+      mSuggestionsFiltered;
 };
 
 /*******************************************************************************

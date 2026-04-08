@@ -243,7 +243,7 @@ Board2dTab::Board2dTab(GuiApplication& app, BoardEditor& editor,
 
   // Connect search context.
   connect(&mSearchContext, &SearchContext::goToTriggered, this,
-          &Board2dTab::goToDevice);
+          &Board2dTab::findGoTo);
 
   // Setup messages.
   connect(&mProject.getCircuit(), &Circuit::componentAdded, this,
@@ -882,12 +882,18 @@ void Board2dTab::trigger(ui::TabAction a) noexcept {
       break;
     }
     case ui::TabAction::FindRefreshSuggestions: {
-      QStringList names;
+      SearchContext::SuggestionList items;
       for (const BI_Device* dev : mBoard.getDeviceInstances()) {
-        names.append(*dev->getComponentInstance().getName());
+        items.append(std::make_pair(SearchContext::ObjectType::Component,
+                                    *dev->getComponentInstance().getName()));
       }
-      Toolbox::sortNumeric(names);
-      mSearchContext.setSuggestions(names);
+      for (const NetSignal* net : mProject.getCircuit().getNetSignals()) {
+        if (!net->isAnonymous()) {
+          items.append(
+              std::make_pair(SearchContext::ObjectType::Net, *net->getName()));
+        }
+      }
+      mSearchContext.setSuggestions(items);
       break;
     }
     case ui::TabAction::FindNext: {
@@ -2615,12 +2621,23 @@ void Board2dTab::execSpecctraImportDialog() noexcept {
   dlg.exec();
 }
 
-void Board2dTab::goToDevice(const QString& name, int index) noexcept {
-  QList<BI_Device*> deviceCandidates;
-  foreach (BI_Device* device, mBoard.getDeviceInstances().values()) {
+void Board2dTab::findGoTo(const QString& name, int index) noexcept {
+  if (!mScene) return;
+
+  mScene->clearSelection();
+  mProjectEditor.getCrossProbe()->set(nullptr, {}, {}, {}, {});
+
+  QVector<BI_Device*> deviceCandidates;
+  QVector<const NetSignal*> netCandidates;
+  for (BI_Device* device : mBoard.getDeviceInstances().values()) {
     if (device->getComponentInstance().getName()->startsWith(
             name, Qt::CaseInsensitive)) {
       deviceCandidates.append(device);
+    }
+  }
+  for (const NetSignal* net : mProject.getCircuit().getNetSignals()) {
+    if (net->getName()->contains(name, Qt::CaseInsensitive)) {
+      netCandidates.append(net);
     }
   }
 
@@ -2632,31 +2649,41 @@ void Board2dTab::goToDevice(const QString& name, int index) noexcept {
                    *b->getComponentInstance().getName());
       },
       Qt::CaseInsensitive, false);
+  Toolbox::sortNumeric(
+      netCandidates,
+      [](const QCollator& cmp, const NetSignal* a, const NetSignal* b) {
+        return cmp(*a->getName(), *b->getName());
+      },
+      Qt::CaseInsensitive, false);
 
-  if (!deviceCandidates.isEmpty()) {
-    while (index < 0) {
-      index += deviceCandidates.count();
-    }
-    index %= deviceCandidates.count();
+  const int resultCount = deviceCandidates.count() + netCandidates.count();
+  if (resultCount == 0) {
+    return;
+  }
+
+  while (index < 0) {
+    index += resultCount;
+  }
+  index %= resultCount;
+
+  if (index < deviceCandidates.count()) {
     BI_Device* device = deviceCandidates[index];
-    if (mScene) {
-      mScene->clearSelection();
-      if (auto item = mScene->getDevices().value(device)) {
-        item->setSelected(true);
-        mProjectEditor.getCrossProbe()->set(
-            nullptr, {}, {&device->getComponentInstance()}, {}, {});
-        QRectF rect = item->mapRectToScene(item->childrenBoundingRect());
-        // Zoom to a rectangle relative to the maximum graphics item dimension,
-        // occupying 1/4th of the screen, but limiting the margin to 10mm.
-        const qreal margin =
-            std::min(1.5f * std::max(rect.size().width(), rect.size().height()),
-                     Length::fromMm(10).toPx());
-        rect.adjust(-margin, -margin, margin, margin);
-        mView->zoomToSceneRect(rect);
-      } else {
-        mProjectEditor.getCrossProbe()->set(nullptr, {}, {}, {}, {});
-      }
+    if (auto item = mScene->getDevices().value(device)) {
+      item->setSelected(true);
+      mProjectEditor.getCrossProbe()->set(
+          nullptr, {}, {&device->getComponentInstance()}, {}, {});
+      QRectF rect = item->mapRectToScene(item->childrenBoundingRect());
+      // Zoom to a rectangle relative to the maximum graphics item dimension,
+      // occupying 1/4th of the screen, but limiting the margin to 10mm.
+      const qreal margin =
+          std::min(1.5f * std::max(rect.size().width(), rect.size().height()),
+                   Length::fromMm(10).toPx());
+      rect.adjust(-margin, -margin, margin, margin);
+      mView->zoomToSceneRect(rect);
     }
+  } else if (index < deviceCandidates.count() + netCandidates.count()) {
+    const NetSignal* net = netCandidates[index - deviceCandidates.count()];
+    mProjectEditor.getCrossProbe()->set(nullptr, {net}, {}, {}, {});
   }
 }
 

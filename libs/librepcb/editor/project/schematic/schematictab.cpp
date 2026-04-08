@@ -46,6 +46,9 @@
 
 #include <librepcb/core/attribute/attributetype.h>
 #include <librepcb/core/attribute/attributeunit.h>
+#include <librepcb/core/project/circuit/circuit.h>
+#include <librepcb/core/project/circuit/componentinstance.h>
+#include <librepcb/core/project/circuit/netsignal.h>
 #include <librepcb/core/project/erc/electricalrulecheckmessages.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/schematic/items/si_symbol.h>
@@ -612,12 +615,20 @@ void SchematicTab::trigger(ui::TabAction a) noexcept {
       break;
     }
     case ui::TabAction::FindRefreshSuggestions: {
-      QStringList names;
+      SearchContext::SuggestionList items;
       for (const SI_Symbol* sym : mSchematic.getSymbols()) {
-        names.append(sym->getName());
+        if (!sym->getComponentInstance().isPureSchematicOnly()) {
+          items.append(std::make_pair(SearchContext::ObjectType::Component,
+                                      sym->getName()));
+        }
       }
-      Toolbox::sortNumeric(names);
-      mSearchContext.setSuggestions(names);
+      for (const NetSignal* net : mProject.getCircuit().getNetSignals()) {
+        if (!net->isAnonymous()) {
+          items.append(
+              std::make_pair(SearchContext::ObjectType::Net, *net->getName()));
+        }
+      }
+      mSearchContext.setSuggestions(items);
       break;
     }
     case ui::TabAction::FindNext: {

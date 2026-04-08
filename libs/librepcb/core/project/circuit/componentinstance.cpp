@@ -90,6 +90,17 @@ ComponentInstance::~ComponentInstance() noexcept {
  *  Getters
  ******************************************************************************/
 
+bool ComponentInstance::isPureSchematicOnly() const noexcept {
+  if (!mIsPureSchematicOnly) {
+    // Maybe we should also check for the existence of {{NAME}} text elements
+    // (or any text on the text layer), but that feels a bit wrong at this
+    // place (texts are schematic elements, not circuit elements).
+    mIsPureSchematicOnly =
+        mLibComponent.isSchematicOnly() && mAssemblyOptions.isEmpty();
+  }
+  return *mIsPureSchematicOnly;
+}
+
 QSet<Uuid> ComponentInstance::getCompatibleDevices() const noexcept {
   QSet<Uuid> result;
   for (const ComponentAssemblyOption& option : mAssemblyOptions) {
@@ -173,6 +184,7 @@ void ComponentInstance::setAssemblyOptions(
     const ComponentAssemblyOptionList& options) noexcept {
   if (options != mAssemblyOptions) {
     mAssemblyOptions = options;
+    mIsPureSchematicOnly = std::nullopt;  // Invalidate cache.
     emit attributesChanged();
   }
 }

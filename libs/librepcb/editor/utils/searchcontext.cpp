@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "searchcontext.h"
 
+#include "editortoolbox.h"
 #include "slinthelpers.h"
 
 #include <QtCore>
@@ -51,11 +52,13 @@ void SearchContext::init() noexcept {
   mTerm.clear();
   mForward = true;
   mIndex = 0;
-  mSuggestions.reset(new slint::VectorModel<slint::SharedString>());
+  mSuggestions.reset(new slint::VectorModel<ui::SimpleListItemData>());
   QPointer<SearchContext> ctx = this;
-  mSuggestionsFiltered.reset(new slint::FilterModel<slint::SharedString>(
-      mSuggestions, [ctx](const slint::SharedString& data) {
-        return ctx && s2q(data).toLower().startsWith(ctx->mTerm.toLower());
+  mSuggestionsFiltered.reset(new slint::FilterModel<ui::SimpleListItemData>(
+      mSuggestions, [ctx](const ui::SimpleListItemData& data) {
+        // Note: Using contains() rather than startsWith() to find "!RST" with
+        // the term "RST".
+        return ctx && s2q(data.text).toLower().contains(ctx->mTerm.toLower());
       }));
 }
 
@@ -75,12 +78,31 @@ void SearchContext::setTerm(const QString& term) noexcept {
   }
 }
 
-void SearchContext::setSuggestions(const QStringList& list) noexcept {
+void SearchContext::setSuggestions(SuggestionList list) noexcept {
   if (mSuggestions) {
-    std::vector<slint::SharedString> vector;
+    const QHash<ObjectType, slint::Image> images = {
+        {ObjectType::Component,
+         q2s(EditorToolbox::svgIcon(":/bi/cpu.svg").pixmap(48, 48))},
+        {ObjectType::Net,
+         q2s(EditorToolbox::svgIcon(":/fa/solid/circle-nodes.svg")
+                 .pixmap(48, 48))},
+    };
+
+    Toolbox::sortNumeric(
+        list,
+        [](const QCollator& cmp, const Suggestion& a, const Suggestion& b) {
+          if (a.first != b.first) {
+            return a.first < b.first;
+          } else {
+            return cmp(a.second, b.second);
+          }
+        });
+
+    std::vector<ui::SimpleListItemData> vector;
     vector.reserve(list.size());
-    for (const auto& s : list) {
-      vector.push_back(q2s(s));
+    for (const auto& pair : list) {
+      vector.push_back(
+          ui::SimpleListItemData{images.value(pair.first), q2s(pair.second)});
     }
     mSuggestions->set_vector(vector);
   }

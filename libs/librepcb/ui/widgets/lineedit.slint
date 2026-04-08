@@ -3,7 +3,7 @@ import { DropDownPopup } from "dropdownpopup.slint";
 import { ControlIconButton } from "iconbutton.slint";
 import { ScrollView } from "scrollview.slint";
 import { TextInput } from "textinput.slint";
-import { Data } from "../api.slint";
+import { Data, SimpleListItemData } from "../api.slint";
 
 export component LineEdit inherits Rectangle {
     in-out property <string> text;
@@ -15,7 +15,7 @@ export component LineEdit inherits Rectangle {
     in property <bool> read-only: false;
     in property <length> font-size: 13px;
     in property <int> font-weight: 400;
-    in property <[string]> autocompletions;
+    in property <[SimpleListItemData]> autocompletions;
     in property <[string]> suggestions;
     in property <bool> frameless: false;
     out property <bool> has-focus <=> edt.has-focus;
@@ -180,7 +180,7 @@ export component LineEdit inherits Rectangle {
                             current-autocompletion-index = min(current-autocompletion-index + 1, autocompletions.length - 1);
                             return accept;
                         } else if (event.text == Key.Return) && (current-autocompletion-index >= 0) && (current-autocompletion-index < autocompletions.length) {
-                            autocompletion-accepted(autocompletions[current-autocompletion-index]);
+                            autocompletion-accepted(autocompletions[current-autocompletion-index].text);
                             current-autocompletion-index = -1;
                             return accept;
                         } else if (event.text == Key.UpArrow) && (autocompletions.length > 0) {
@@ -292,7 +292,7 @@ export component LineEdit inherits Rectangle {
                     accessible-item-index: index;
                     accessible-item-selectable: true;
                     accessible-item-selected: is-selected;
-                    accessible-label: item;
+                    accessible-label: item.text;
 
                     changed has-hover => {
                         if self.has-hover {
@@ -305,21 +305,37 @@ export component LineEdit inherits Rectangle {
                     Rectangle {
                         background: is-selected ? Data.theme.control-checked : transparent;
 
-                        autocompletion-item-txt := Text {
-                            x: 5px;
-                            y: (parent.height - self.height) / 2;
-                            width: parent.width - 2 * self.x;
-                            color: Data.theme.control-text;
-                            font-size: 12px;
-                            overflow: elide;
-                            vertical-alignment: center;
-                            text: item;
-                            accessible-role: none;
+                        HorizontalLayout {
+                            padding-left: 5px;
+                            padding-right: 5px;
+                            spacing: 5px;
+
+                            autocompletion-item-txt := Text {
+                                color: Data.theme.control-text;
+                                font-size: 12px;
+                                overflow: elide;
+                                vertical-alignment: center;
+                                text: item.text;
+                                accessible-role: none;
+                            }
+
+                            if item.icon.width > 0: Rectangle {
+                                width: 15px;
+
+                                Image {
+                                    width: 100%;
+                                    height: self.width;
+                                    source: item.icon;
+                                    colorize: Data.theme.control-text-disabled;
+                                    image-fit: contain;
+                                    accessible-role: none;
+                                }
+                            }
                         }
                     }
 
                     clicked => {
-                        autocompletion-accepted(item);
+                        autocompletion-accepted(item.text);
                     }
                 }
             }
