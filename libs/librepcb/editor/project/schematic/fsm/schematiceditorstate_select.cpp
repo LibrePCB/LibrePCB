@@ -1362,11 +1362,19 @@ QString SchematicEditorState_Select::processSelection(
     keyValues.append(std::make_pair(tr("Bus"), *bus->getName()));
   }
   if (pin) {
-    keyValues.append(std::make_pair(
-        tr("Signal"),
-        *pin->getComponentSignalInstance().getCompSignal().getName()));
+    const ComponentSignalInstance& sig = pin->getComponentSignalInstance();
+    const QString forcedNet = sig.getForcedNetSignalName();
+    const NetSignal* net = sig.getNetSignal();
+    keyValues.append(
+        std::make_pair(tr("Signal"), *sig.getCompSignal().getName()));
     keyValues.append(std::make_pair(tr("Pin"), *pin->getLibPin().getName()));
     keyValues.append(std::make_pair(tr("Pad(s)"), pin->getNumbers().join(",")));
+    if (net && (!forcedNet.isEmpty()) && (net->getName() != forcedNet)) {
+      const QString error = tr("Wire net '%1' does not match forced net '%2'!")
+                                .arg(*net->getName())
+                                .arg(forcedNet);
+      keyValues.append(std::make_pair(QString(), error));
+    }
   }
 
   // Remove keys with empty values.
@@ -1385,9 +1393,13 @@ QString SchematicEditorState_Select::processSelection(
   // Build string.
   QStringList lines;
   for (const auto& item : keyValues) {
-    lines.append(item.first % ": " %
-                 QString(" ").repeated(maxKeyLen - item.first.length()) %
-                 item.second);
+    if (!item.first.isEmpty()) {
+      lines.append(item.first % ": " %
+                   QString(" ").repeated(maxKeyLen - item.first.length()) %
+                   item.second);
+    } else {
+      lines.append(item.second);  // Just a value without key.
+    }
   }
   return lines.join("\n");
 }
