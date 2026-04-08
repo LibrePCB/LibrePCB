@@ -115,9 +115,11 @@ private:  // Methods
   void updatePolygonPath() noexcept;
   void updateOverlayText() noexcept;
   void updateStatusBarMessage() noexcept;
+  void updateSnapCandidates() noexcept;
 
 private:
   const Mode mMode;
+  QSet<Point> mSnapCandidates;
   Point mLastScenePos;
   Angle mLastAngle;
   Point mCursorPos;

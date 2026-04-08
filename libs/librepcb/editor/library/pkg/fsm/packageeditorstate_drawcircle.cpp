@@ -25,6 +25,7 @@
 #include "../../../cmd/cmdcircleedit.h"
 #include "../../../graphics/circlegraphicsitem.h"
 #include "../../../undostack.h"
+#include "../../../utils/editortoolbox.h"
 #include "../footprintgraphicsitem.h"
 
 #include <librepcb/core/library/pkg/footprint.h>
@@ -66,6 +67,7 @@ PackageEditorState_DrawCircle::~PackageEditorState_DrawCircle() noexcept {
  ******************************************************************************/
 
 bool PackageEditorState_DrawCircle::entry() noexcept {
+  updateSnapCandidates();
   mAdapter.fsmToolEnter(*this);
   mAdapter.fsmSetViewCursor(Qt::CrossCursor);
   return true;
@@ -97,11 +99,12 @@ bool PackageEditorState_DrawCircle::processGraphicsSceneMouseMoved(
 
 bool PackageEditorState_DrawCircle::processGraphicsSceneLeftMouseButtonPressed(
     const GraphicsSceneMouseEvent& e) noexcept {
-  const Point pos = e.scenePos.mappedToGrid(getGridInterval());
   if (mCurrentCircle) {
-    return finishAddCircle(pos);
+    return finishAddCircle(e.scenePos.mappedToGrid(getGridInterval()));
   } else {
-    return startAddCircle(pos);
+    // Not very nice to always snap, should be improved in future.
+    return startAddCircle(EditorToolbox::snapPosition(
+        e.scenePos, getGridInterval(), mSnapCandidates));
   }
 }
 
@@ -227,6 +230,7 @@ bool PackageEditorState_DrawCircle::finishAddCircle(const Point& pos) noexcept {
     mCurrentCircle.reset();
     mContext.undoStack.appendToCmdGroup(mCurrentEditCmd.release());
     mContext.undoStack.commitCmdGroup();
+    updateSnapCandidates();
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
@@ -241,10 +245,20 @@ bool PackageEditorState_DrawCircle::abortAddCircle() noexcept {
     mCurrentCircle.reset();
     mCurrentEditCmd.reset();
     mContext.undoStack.abortCmdGroup();
+    updateSnapCandidates();
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     return false;
+  }
+}
+
+void PackageEditorState_DrawCircle::updateSnapCandidates() noexcept {
+  mSnapCandidates.clear();
+  if (auto fpt = mContext.currentFootprint) {
+    for (const Circle& c : fpt->getCircles()) {
+      mSnapCandidates.insert(c.getCenter());
+    }
   }
 }
 

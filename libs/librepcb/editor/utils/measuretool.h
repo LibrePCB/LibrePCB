@@ -38,7 +38,6 @@ namespace librepcb {
 
 class Board;
 class Footprint;
-class Path;
 class Schematic;
 class Symbol;
 class Transform;
@@ -94,9 +93,6 @@ private:  // Methods
       const Symbol& symbol, const Transform& transform) noexcept;
   static QSet<Point> snapCandidatesFromFootprint(
       const Footprint& footprint, const Transform& transform) noexcept;
-  static QSet<Point> snapCandidatesFromPath(const Path& path) noexcept;
-  static QSet<Point> snapCandidatesFromCircle(const Point& center,
-                                              const Length& diameter) noexcept;
   void updateCursorPosition(Qt::KeyboardModifiers modifiers) noexcept;
   void updateRulerPositions() noexcept;
   void updateStatusBarMessage() noexcept;

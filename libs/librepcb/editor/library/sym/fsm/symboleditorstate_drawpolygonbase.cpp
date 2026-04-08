@@ -25,6 +25,7 @@
 #include "../../../cmd/cmdpolygonedit.h"
 #include "../../../graphics/polygongraphicsitem.h"
 #include "../../../undostack.h"
+#include "../../../utils/editortoolbox.h"
 #include "../symbolgraphicsitem.h"
 
 #include <librepcb/core/geometry/polygon.h>
@@ -74,6 +75,7 @@ bool SymbolEditorState_DrawPolygonBase::entry() noexcept {
                       .mappedToGrid(getGridInterval());
   updateCursorPosition(Qt::KeyboardModifier::NoModifier);
   updateStatusBarMessage();
+  updateSnapCandidates();
 
   notifyToolEnter();
   mAdapter.fsmSetViewCursor(Qt::CrossCursor);
@@ -99,7 +101,7 @@ bool SymbolEditorState_DrawPolygonBase::exit() noexcept {
 
 bool SymbolEditorState_DrawPolygonBase::processKeyPressed(
     const GraphicsSceneKeyEvent& e) noexcept {
-  if (e.key == Qt::Key_Shift) {
+  if ((e.key == Qt::Key_Shift) || (e.key == Qt::Key_Control)) {
     updateCursorPosition(e.modifiers);
     return true;
   }
@@ -109,7 +111,7 @@ bool SymbolEditorState_DrawPolygonBase::processKeyPressed(
 
 bool SymbolEditorState_DrawPolygonBase::processKeyReleased(
     const GraphicsSceneKeyEvent& e) noexcept {
-  if (e.key == Qt::Key_Shift) {
+  if ((e.key == Qt::Key_Shift) || (e.key == Qt::Key_Control)) {
     updateCursorPosition(e.modifiers);
     return true;
   }
@@ -167,6 +169,8 @@ void SymbolEditorState_DrawPolygonBase::setLayer(const Layer& layer) noexcept {
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setLayer(mCurrentProperties.getLayer(), true);
   }
+
+  updateSnapCandidates();
 }
 
 void SymbolEditorState_DrawPolygonBase::setLineWidth(
@@ -279,6 +283,7 @@ bool SymbolEditorState_DrawPolygonBase::abort(bool showErrMsgBox) noexcept {
     }
     updateOverlayText();
     updateStatusBarMessage();
+    updateSnapCandidates();
     return true;
   } catch (const Exception& e) {
     if (showErrMsgBox) {
@@ -355,10 +360,15 @@ bool SymbolEditorState_DrawPolygonBase::addNextSegment() noexcept {
 void SymbolEditorState_DrawPolygonBase::updateCursorPosition(
     Qt::KeyboardModifiers modifiers) noexcept {
   mCursorPos = mLastScenePos;
-  if (!modifiers.testFlag(Qt::ShiftModifier)) {
+  bool snapped = false;
+  if ((!modifiers.testFlag(Qt::ShiftModifier)) &&
+      (!modifiers.testFlag(Qt::ControlModifier))) {
+    mCursorPos = EditorToolbox::snapPosition(mCursorPos, getGridInterval(),
+                                             mSnapCandidates, &snapped);
+  } else if (!modifiers.testFlag(Qt::ControlModifier)) {
     mCursorPos.mapToGrid(getGridInterval());
   }
-  mAdapter.fsmSetSceneCursor(mCursorPos, true, false);
+  mAdapter.fsmSetSceneCursor(mCursorPos, true, snapped);
 
   if (mCurrentPolygon && mCurrentEditCmd) {
     updatePolygonPath();
@@ -514,7 +524,8 @@ void SymbolEditorState_DrawPolygonBase::updateOverlayText() noexcept {
 void SymbolEditorState_DrawPolygonBase::updateStatusBarMessage() noexcept {
   QString note = " " %
       tr("(press %1 to disable snap, %2 to abort)")
-          .arg(QCoreApplication::translate("QShortcut", "Shift"))
+          .arg(QCoreApplication::translate("QShortcut", "Shift") % "/" %
+               QCoreApplication::translate("QShortcut", "Ctrl"))
           .arg(tr("right click"));
 
   if (mMode == Mode::RECT) {
@@ -543,6 +554,25 @@ void SymbolEditorState_DrawPolygonBase::updateStatusBarMessage() noexcept {
     } else {
       mAdapter.fsmSetStatusBarMessage(tr("Click to specify the next point") %
                                       note);
+    }
+  }
+}
+
+void SymbolEditorState_DrawPolygonBase::updateSnapCandidates() noexcept {
+  mSnapCandidates.clear();
+
+  // Note: For now, we only snap to objects on the same layer to avoid too
+  // "noisy" snapping as it might be annoying. Though this has never been
+  // tested if it is really a problem.
+  for (const Polygon& p : mContext.symbol.getPolygons()) {
+    if (p.getLayer() == mCurrentProperties.getLayer()) {
+      mSnapCandidates |= EditorToolbox::snapCandidatesFromPath(p.getPath());
+    }
+  }
+  for (const Circle& c : mContext.symbol.getCircles()) {
+    if (c.getLayer() == mCurrentProperties.getLayer()) {
+      mSnapCandidates |= EditorToolbox::snapCandidatesFromCircle(
+          c.getCenter(), c.getDiameter());
     }
   }
 }

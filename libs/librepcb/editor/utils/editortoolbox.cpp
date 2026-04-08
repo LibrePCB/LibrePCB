@@ -28,6 +28,7 @@
 
 #include <librepcb/core/3d/occmodel.h>
 #include <librepcb/core/application.h>
+#include <librepcb/core/geometry/path.h>
 #include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/library/dev/device.h>
 #include <librepcb/core/project/board/items/bi_device.h>
@@ -174,6 +175,67 @@ QString EditorToolbox::sortableCircuitIdentifier(QString identifier) noexcept {
   identifier.remove('!');
   identifier.append(QString(" ").repeated(count));
   return identifier;
+}
+
+QSet<Point> EditorToolbox::snapCandidatesFromPath(const Path& path) noexcept {
+  QSet<Point> candidates;
+  for (int i = 0; i < path.getVertices().count(); ++i) {
+    const Vertex& v = path.getVertices().at(i);
+    candidates.insert(v.getPos());
+    if ((v.getAngle().abs() == Angle::deg180()) &&
+        (i < (path.getVertices().count() - 1))) {
+      const Point& p2 = path.getVertices().at(i + 1).getPos();
+      const Point center = (v.getPos() + p2) / 2;
+      const Point middle = v.getPos().rotated(v.getAngle() / 2, center);
+      candidates.insert(center);
+      candidates.insert(middle);
+    }
+  }
+  return candidates;
+}
+
+QSet<Point> EditorToolbox::snapCandidatesFromCircle(
+    const Point& center, PositiveLength diameter) noexcept {
+  QSet<Point> candidates;
+  candidates.insert(center);
+  candidates.insert(center + Point(0, diameter / 2));
+  candidates.insert(center + Point(0, -diameter / 2));
+  candidates.insert(center + Point(diameter / 2, 0));
+  candidates.insert(center + Point(-diameter / 2, 0));
+  return candidates;
+}
+
+Point EditorToolbox::snapPosition(Point cursorPos, PositiveLength gridInterval,
+                                  const QSet<Point>& snapCandidates,
+                                  bool* snapped) noexcept {
+  if (snapCandidates.contains(cursorPos)) {
+    if (snapped) *snapped = true;
+    return cursorPos;
+  } else if (cursorPos.isOnGrid(gridInterval)) {
+    if (snapped) *snapped = false;
+    return cursorPos;
+  }
+
+  Point nearestCandidate;
+  Length nearestDistance(-1);
+  for (const Point& candidate : snapCandidates) {
+    const UnsignedLength distance = (cursorPos - candidate).getLength();
+    if ((nearestDistance < 0) || (distance < nearestDistance)) {
+      nearestCandidate = candidate;
+      nearestDistance = *distance;
+    }
+  }
+
+  const Point posOnGrid = cursorPos.mappedToGrid(gridInterval);
+  const Length gridDistance = *(cursorPos - posOnGrid).getLength();
+  if ((nearestDistance >= 0) && (nearestDistance <= gridDistance)) {
+    cursorPos = nearestCandidate;
+    if (snapped) *snapped = true;
+  } else {
+    cursorPos = posOnGrid;
+    if (snapped) *snapped = false;
+  }
+  return cursorPos;
 }
 
 QIcon EditorToolbox::svgIcon(const QString& file) noexcept {
