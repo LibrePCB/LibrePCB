@@ -93,17 +93,17 @@ private:
   void changeEvent(QEvent* event) noexcept override;
   void reject() noexcept override;
   void externalApplicationListIndexChanged(int index) noexcept;
-  void updateThemesList(const Uuid& selectedTheme) noexcept;
+  void updateThemesList() noexcept;
   void themeIndexChanged(int index) noexcept;
   void initColorTreeWidgetItem(QTreeWidgetItem& item,
                                const ThemeColor& color) noexcept;
-  Theme* getCurrentTheme() noexcept;
   void updateDismissedMessagesCount() noexcept;
   void updateDesktopIntegrationStatus() noexcept;
   void loadSettings() noexcept;
   void saveSettings() noexcept;
   void discardTemporaryModifications() noexcept;
   void revertTemporaryModifications() noexcept;
+  bool hasTemporaryModifications() const noexcept;
 
 private:
   Workspace& mWorkspace;  /// Reference to the Workspace object
@@ -117,11 +117,12 @@ private:
 
   // Cached settings
   QVector<ExternalApplication> mExternalApplications;
-  QMap<Uuid, Theme> mThemes;
 
   // Original values of temporarily changed settings
   QString mOldUiTheme;
   QString mOldApplicationLocale;
+  QMap<Uuid, Theme> mOldThemes;
+  Uuid mOldActiveTheme;
 };
 
 /*******************************************************************************
