@@ -66,6 +66,7 @@ public:
   // Getters: Attributes
   const Uuid& getUuid() const noexcept { return mUuid; }
   const CircuitIdentifier& getName() const noexcept { return mName; }
+  bool isPureSchematicOnly() const noexcept;
   const QString& getValue() const noexcept { return mValue; }
   const QPointer<const BI_Device>& getPrimaryDevice() const noexcept {
     return mPrimaryDevice;
@@ -215,6 +216,7 @@ private:
 
   // Cached Properties
   QPointer<const BI_Device> mPrimaryDevice;
+  mutable std::optional<bool> mIsPureSchematicOnly;
 };
 
 /*******************************************************************************

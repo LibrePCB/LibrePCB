@@ -26,6 +26,7 @@
 #include "../../project/cmd/cmdsymbolinstanceeditall.h"
 #include "../../undocommand.h"
 #include "../../undostack.h"
+#include "../../utils/editortoolbox.h"
 #include "../../workspace/desktopservices.h"
 #include "ui_symbolinstancepropertiesdialog.h"
 
@@ -86,6 +87,10 @@ SymbolInstancePropertiesDialog::SymbolInstancePropertiesDialog(
           &SymbolInstancePropertiesDialog::buttonBoxClicked);
 
   // Component Instance Attributes
+  const bool hideName = mComponentInstance.isPureSchematicOnly();
+  if (hideName) {
+    EditorToolbox::removeFormLayoutRow(*mUi->lblCmpName);
+  }
   mUi->edtCompInstName->setText(*mComponentInstance.getName());
   mUi->edtCompInstValue->setText(mComponentInstance.getValue());
   mUi->assemblyOptionListEditorWidget->setReferences(&mWorkspace, &mProject,
@@ -127,7 +132,9 @@ SymbolInstancePropertiesDialog::SymbolInstancePropertiesDialog(
           });
 
   // Symbol Instance Attributes
-  mUi->lblSymbInstName->setText(mSymbol.getName());
+  const QString suffix = *mSymbol.getCompSymbVarItem().getSuffix();
+  mUi->gbxSymbInst->setTitle(suffix.isEmpty() ? tr("Gate")
+                                              : tr("Gate '%1'").arg(suffix));
   mUi->edtSymbInstPosX->setValue(mSymbol.getPosition().getX());
   mUi->edtSymbInstPosY->setValue(mSymbol.getPosition().getY());
   mUi->edtSymbInstRotation->setValue(mSymbol.getRotation());
@@ -147,9 +154,14 @@ SymbolInstancePropertiesDialog::SymbolInstancePropertiesDialog(
             ds.openLocalPath(FilePath(url));
           });
 
-  // set focus to component instance name
-  mUi->edtCompInstName->selectAll();
-  mUi->edtCompInstName->setFocus();
+  // set focus to component instance name or value
+  if (hideName) {
+    mUi->edtCompInstValue->selectAll();
+    mUi->edtCompInstValue->setFocus();
+  } else {
+    mUi->edtCompInstName->selectAll();
+    mUi->edtCompInstName->setFocus();
+  }
 }
 
 SymbolInstancePropertiesDialog::~SymbolInstancePropertiesDialog() noexcept {
