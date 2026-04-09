@@ -77,6 +77,7 @@ SchematicPainter::SchematicPainter(const Schematic& schematic,
           pin->getLibPin().getNameAlignment(),
           pin->getNumbersPosition(),
           pin->getNumbersAlignment(),
+          pin->hasError(),
       });
       if (pin->isVisibleJunction() && (!thumbnail)) {
         mNetJunctions.append(pin->getPosition());
@@ -283,10 +284,11 @@ void SchematicPainter::paint(
 
     // Draw Symbol Pins.
     foreach (const Pin& pin, symbol.pins) {
-      p.drawSymbolPin(
-          symbol.transform.map(pin.position),
-          symbol.transform.mapNonMirrorable(pin.rotation), *pin.length,
-          settings.getColor(Theme::Color::sSchematicPinLines), QColor());
+      p.drawSymbolPin(symbol.transform.map(pin.position),
+                      symbol.transform.mapNonMirrorable(pin.rotation),
+                      pin.hasError ? (*pin.length / 2) : *pin.length,
+                      settings.getColor(Theme::Color::sSchematicPinLines),
+                      QColor());
       Alignment nameAlignment = pin.nameAlignment;
       if (symbol.transform.getMirrored()) {
         nameAlignment.mirrorV();

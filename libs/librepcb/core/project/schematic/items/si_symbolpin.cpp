@@ -61,11 +61,15 @@ SI_SymbolPin::SI_SymbolPin(SI_Symbol& symbol, const SymbolPin& pin,
           this, &SI_SymbolPin::netSignalChanged);
   connect(&mComponentSignalInstance, &ComponentSignalInstance::padNamesChanged,
           this, &SI_SymbolPin::updateNumbers);
+  connect(&mComponentSignalInstance.getComponentInstance(),
+          &ComponentInstance::attributesChanged, this,
+          &SI_SymbolPin::updateForcedNetName);
 
   updateTransform();
   updateName();
   updateNumbers();
   updateNumbersTransform();
+  updateForcedNetName();
 
   mSymbol.onEdited.attach(mOnSymbolEditedSlot);
 }
@@ -94,6 +98,12 @@ bool SI_SymbolPin::isRequired() const noexcept {
 
 bool SI_SymbolPin::isVisibleJunction() const noexcept {
   return (mRegisteredNetLines.count() > 1);
+}
+
+bool SI_SymbolPin::hasError() const noexcept {
+  const NetSignal* net = getCompSigInstNetSignal();
+  const QString forced = mComponentSignalInstance.getForcedNetSignalName();
+  return net && (!forced.isEmpty()) && (net->getName() != forced);
 }
 
 NetLineAnchor SI_SymbolPin::toNetLineAnchor() const noexcept {
@@ -288,6 +298,14 @@ void SI_SymbolPin::updateNumbersTransform() noexcept {
   if (alignment != mNumbersAlignment) {
     mNumbersAlignment = alignment;
     onEdited.notify(Event::NumbersAlignmentChanged);
+  }
+}
+
+void SI_SymbolPin::updateForcedNetName() noexcept {
+  const QString current = mComponentSignalInstance.getForcedNetSignalName();
+  if (current != mForcedNetName) {
+    mForcedNetName = current;
+    onEdited.notify(Event::ForcedNetNameChanged);
   }
 }
 

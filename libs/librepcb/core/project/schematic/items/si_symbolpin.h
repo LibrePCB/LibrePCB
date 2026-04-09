@@ -64,6 +64,7 @@ public:
     NumbersPositionChanged,
     NumbersAlignmentChanged,
     NetNameChanged,
+    ForcedNetNameChanged,
   };
   Signal<SI_SymbolPin, Event> onEdited;
   typedef Slot<SI_SymbolPin, Event> OnEditedSlot;
@@ -118,6 +119,7 @@ public:
   bool isOpen() const noexcept override {
     return mRegisteredNetLines.isEmpty();
   }
+  bool hasError() const noexcept;
   NetLineAnchor toNetLineAnchor() const noexcept override;
 
   // General Methods
@@ -143,6 +145,7 @@ private:
   void updateName() noexcept;
   void updateNumbers() noexcept;
   void updateNumbersTransform() noexcept;
+  void updateForcedNetName() noexcept;
   QString getLibraryComponentName() const noexcept;
   QString getNetSignalName() const noexcept;
 
@@ -160,6 +163,7 @@ private:
   QString mNumbersTruncated;
   Point mNumbersPosition;
   Alignment mNumbersAlignment;
+  QString mForcedNetName;
 
   // Registered Elements
   QSet<SI_NetLine*> mRegisteredNetLines;  ///< all registered netlines

@@ -65,6 +65,7 @@ class SchematicPainter final : public GraphicsPagePainter {
     Alignment nameAlignment;
     Point numbersPosition;
     Alignment numbersAlignment;
+    bool hasError;
   };
 
   struct Line {

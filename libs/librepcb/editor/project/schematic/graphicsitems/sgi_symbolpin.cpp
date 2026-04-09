@@ -75,6 +75,7 @@ SGI_SymbolPin::SGI_SymbolPin(
       PrimitiveCircleGraphicsItem::ShapeMode::FilledOutline);
   mCircleGraphicsItem->setFlag(QGraphicsItem::ItemIsSelectable, true);
   mCircleGraphicsItem->setFlag(QGraphicsItem::ItemStacksBehindParent, true);
+  mCircleGraphicsItem->setZValue(1);
 
   // Setup line.
   mLineGraphicsItem->setLine(Point(0, 0),
@@ -167,6 +168,8 @@ void SGI_SymbolPin::pinEdited(const SI_SymbolPin& obj,
       updateNumbersPosition();
       break;
     case SI_SymbolPin::Event::JunctionChanged:
+    case SI_SymbolPin::Event::NetNameChanged:
+    case SI_SymbolPin::Event::ForcedNetNameChanged:
       updateJunction();
       break;
     case SI_SymbolPin::Event::NameChanged:
@@ -180,8 +183,6 @@ void SGI_SymbolPin::pinEdited(const SI_SymbolPin& obj,
       break;
     case SI_SymbolPin::Event::NumbersAlignmentChanged:
       updateNumbersAlignment();
-      break;
-    case SI_SymbolPin::Event::NetNameChanged:
       break;
     default:
       qWarning() << "Unhandled switch-case in SGI_SymbolPin::pinEdited():"
@@ -227,18 +228,29 @@ void SGI_SymbolPin::updateRotation() noexcept {
 void SGI_SymbolPin::updateJunction() noexcept {
   Q_ASSERT(mCircleGraphicsItem);
 
-  bool isConnected = mPin.getCompSigInstNetSignal();
+  const NetSignal* net = mPin.getCompSigInstNetSignal();
   std::shared_ptr<const GraphicsLayer> lineLayer = nullptr;
   std::shared_ptr<const GraphicsLayer> fillLayer = nullptr;
-  if (mPin.isVisibleJunction()) {
-    fillLayer = mLayers.get(Theme::Color::sSchematicWires);
-  } else if ((!isConnected) && mPin.isRequired()) {
+  UnsignedLength lineWidth(0);
+  if (mPin.hasError()) {
+    lineWidth = UnsignedLength(100000);
     lineLayer = mLayers.get(Theme::Color::sSchematicRequiredPins);
-  } else if (!isConnected) {
+  } else if (mPin.isVisibleJunction()) {
+    fillLayer = mLayers.get(Theme::Color::sSchematicWires);
+  } else if ((!net) && mPin.isRequired()) {
+    lineLayer = mLayers.get(Theme::Color::sSchematicRequiredPins);
+  } else if (!net) {
     lineLayer = mLayers.get(Theme::Color::sSchematicOptionalPins);
   }
+  mCircleGraphicsItem->setLineWidth(lineWidth);
   mCircleGraphicsItem->setLineLayer(lineLayer);
   mCircleGraphicsItem->setFillLayer(fillLayer);
+
+  Length length = *mPin.getLibPin().getLength();
+  if (mPin.hasError()) {
+    length /= 2;
+  }
+  mLineGraphicsItem->setLine(Point(0, 0), Point(length, 0));
 }
 
 void SGI_SymbolPin::updateName() noexcept {
