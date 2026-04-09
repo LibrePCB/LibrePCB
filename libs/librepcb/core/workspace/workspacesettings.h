@@ -24,6 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include "../exceptions.h"
+#include "../types/enums.h"
 #include "../types/lengthunit.h"
 #include "workspacesettingsitem_genericvalue.h"
 #include "workspacesettingsitem_genericvaluelist.h"
@@ -309,6 +310,20 @@ public:
    * @see ::librepcb::WorkspaceSettingsItem_KeyboardShortcuts
    */
   WorkspaceSettingsItem_Themes themes;
+
+  /**
+   * @brief Schematic grid style
+   *
+   * Default: ::librepcb::GridStyle::Lines
+   */
+  WorkspaceSettingsItem_GenericValue<GridStyle> schematicGridStyle;
+
+  /**
+   * @brief Schematic grid style
+   *
+   * Default: ::librepcb::GridStyle::Lines
+   */
+  WorkspaceSettingsItem_GenericValue<GridStyle> boardGridStyle;
 
   /**
    * @brief Dismissed messages

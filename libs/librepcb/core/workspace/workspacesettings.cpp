@@ -108,6 +108,8 @@ WorkspaceSettings::WorkspaceSettings(QObject* parent)
                               this),
     keyboardShortcuts(this),
     themes(this),
+    schematicGridStyle("schematic_grid_style", GridStyle::Lines, this),
+    boardGridStyle("board_grid_style", GridStyle::Lines, this),
     dismissedMessages("dismissed_messages", "message", QSet<QString>(), this) {
 }
 
@@ -124,6 +126,30 @@ void WorkspaceSettings::load(const SExpression& node,
            node.getChildren(SExpression::Type::List)) {
     mFileContent.insert(child->getName(), *child);
   }
+
+  // Migrating grid style from themes to the new global settings. This should
+  // be moved to the official file format migration for file format v3.
+  try {
+    auto it = mFileContent.find("themes");
+    if (it != mFileContent.end()) {
+      const Uuid active = deserialize<Uuid>(it->getChild("active/@0"));
+      for (const SExpression* themeNode : it->getChildren("theme")) {
+        if (themeNode->getChild("@0").getValue() == active.toStr()) {
+          if (const SExpression* node =
+                  themeNode->tryGetChild("schematic_grid_style/@0")) {
+            schematicGridStyle.setInitial(deserialize<GridStyle>(*node));
+          }
+          if (const SExpression* node =
+                  themeNode->tryGetChild("board_grid_style/@0")) {
+            boardGridStyle.setInitial(deserialize<GridStyle>(*node));
+          }
+        }
+      }
+    }
+  } catch (const Exception& e) {
+    qCritical() << "Could not migrate old workspace settings:" << e.getMsg();
+  }
+
   foreach (WorkspaceSettingsItem* item, getAllItems()) {
     try {
       if (mFileContent.contains(item->getKey())) {

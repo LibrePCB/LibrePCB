@@ -133,7 +133,7 @@ DeviceTab::DeviceTab(LibraryEditor& editor, std::unique_ptr<Device> dev,
   mComponentScene->setSelectionRectColors(
       theme.getColor(Theme::Color::sSchematicSelection).getPrimaryColor(),
       theme.getColor(Theme::Color::sSchematicSelection).getSecondaryColor());
-  mComponentScene->setGridStyle(Theme::GridStyle::Lines);
+  mComponentScene->setGridStyle(GridStyle::Lines);
 
   // Setup package scene.
   mPackageScene->setOriginCrossVisible(false);  // It's rather disruptive.
@@ -146,7 +146,7 @@ DeviceTab::DeviceTab(LibraryEditor& editor, std::unique_ptr<Device> dev,
   mPackageScene->setSelectionRectColors(
       theme.getColor(Theme::Color::sBoardSelection).getPrimaryColor(),
       theme.getColor(Theme::Color::sBoardSelection).getSecondaryColor());
-  mPackageScene->setGridStyle(Theme::GridStyle::Lines);
+  mPackageScene->setGridStyle(GridStyle::Lines);
 
   // Setup default manufacturer.
   mParts->setDefaultManufacturer(mEditor.getLibrary().getManufacturer());

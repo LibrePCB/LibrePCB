@@ -121,6 +121,8 @@ private:
   // Original values of temporarily changed settings
   QString mOldUiTheme;
   QString mOldApplicationLocale;
+  GridStyle mOldSchematicGridStyle;
+  GridStyle mOldBoardGridStyle;
   QMap<Uuid, Theme> mOldThemes;
   Uuid mOldActiveTheme;
 };

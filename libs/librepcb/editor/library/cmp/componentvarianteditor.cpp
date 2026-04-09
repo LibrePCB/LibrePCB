@@ -84,7 +84,7 @@ ComponentVariantEditor::ComponentVariantEditor(
   mScene->setSelectionRectColors(
       theme.getColor(Theme::Color::sSchematicSelection).getPrimaryColor(),
       theme.getColor(Theme::Color::sSchematicSelection).getSecondaryColor());
-  mScene->setGridStyle(Theme::GridStyle::Lines);  // Required for positioning.
+  mScene->setGridStyle(GridStyle::Lines);  // Required for positioning.
   connect(mScene.get(), &GraphicsScene::changed, this, [this]() {
     ++mFrameIndex;
     emit uiDataChanged();

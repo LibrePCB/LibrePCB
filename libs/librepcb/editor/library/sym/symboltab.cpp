@@ -91,10 +91,7 @@ SymbolTab::SymbolTab(LibraryEditor& editor, std::unique_ptr<Symbol> sym,
     mMsgImportPins(mApp.getWorkspace(), "EMPTY_SYMBOL_IMPORT_PINS"),
     mWizardMode(mode != Mode::Open),
     mCurrentPageIndex(mWizardMode ? 0 : 1),
-    mGridStyle(mApp.getWorkspace()
-                   .getSettings()
-                   .themes.getActive()
-                   .getSchematicGridStyle()),
+    mGridStyle(mApp.getWorkspace().getSettings().schematicGridStyle.get()),
     mUnit(LengthUnit::millimeters()),
     mChooseCategory(false),
     mCompactLayout(false),
@@ -152,6 +149,14 @@ SymbolTab::SymbolTab(LibraryEditor& editor, std::unique_ptr<Symbol> sym,
   SymbolEditorFsm::Context fsmContext{*mSymbol, *mUndoStack, !isWritable(),
                                       mUnit, *this};
   mFsm.reset(new SymbolEditorFsm(fsmContext));
+
+  // Apply workspace settings whenever they have been modified.
+  connect(&mApp.getWorkspace().getSettings().schematicGridStyle,
+          &WorkspaceSettingsItem::edited, this, [this]() {
+            mGridStyle =
+                mApp.getWorkspace().getSettings().schematicGridStyle.get();
+            applyTheme();
+          });
 
   // Refresh content.
   refreshUiData();

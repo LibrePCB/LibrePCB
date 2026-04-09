@@ -29,10 +29,10 @@
 #include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/rulecheck/rulecheckmessage.h>
 #include <librepcb/core/types/alignment.h>
+#include <librepcb/core/types/enums.h>
 #include <librepcb/core/types/length.h>
 #include <librepcb/core/types/lengthunit.h>
 #include <librepcb/core/types/ratio.h>
-#include <librepcb/core/workspace/theme.h>
 #include <librepcb/core/workspace/uitheme.h>
 
 #include <optional>
@@ -71,8 +71,8 @@ Ratio s2ratio(int v) noexcept;
 
 ui::Theme l2s(const UiTheme& v) noexcept;
 
-ui::GridStyle l2s(Theme::GridStyle v) noexcept;
-Theme::GridStyle s2l(ui::GridStyle v) noexcept;
+ui::GridStyle l2s(GridStyle v) noexcept;
+GridStyle s2l(ui::GridStyle v) noexcept;
 
 ui::LengthUnit l2s(const LengthUnit& v) noexcept;
 LengthUnit s2l(ui::LengthUnit v) noexcept;

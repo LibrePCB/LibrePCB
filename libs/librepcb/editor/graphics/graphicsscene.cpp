@@ -43,7 +43,7 @@ namespace editor {
 
 GraphicsScene::GraphicsScene(QObject* parent) noexcept
   : QGraphicsScene(parent),
-    mGridStyle(Theme::GridStyle::None),
+    mGridStyle(GridStyle::None),
     mGridInterval(2540000),
     mBackgroundColor(Qt::white),
     mGridColor(Qt::gray),
@@ -89,7 +89,7 @@ void GraphicsScene::setOverlayColors(const QColor& fill,
   setForegroundBrush(foregroundBrush());  // this will repaint the foreground
 }
 
-void GraphicsScene::setGridStyle(Theme::GridStyle style) noexcept {
+void GraphicsScene::setGridStyle(GridStyle style) noexcept {
   if (style != mGridStyle) {
     mGridStyle = style;
     setBackgroundBrush(backgroundBrush());  // this will repaint the background
@@ -200,7 +200,7 @@ void GraphicsScene::drawBackground(QPainter* painter,
   painter->fillRect(rect, mBackgroundColor);
 
   // draw background grid lines
-  gridPen.setWidth((mGridStyle == Theme::GridStyle::Dots) ? 2 : 1);
+  gridPen.setWidth((mGridStyle == GridStyle::Dots) ? 2 : 1);
   painter->setPen(gridPen);
   painter->setBrush(Qt::NoBrush);
   const qreal lod = QStyleOptionGraphicsItem::levelOfDetailFromTransform(
@@ -217,7 +217,7 @@ void GraphicsScene::drawBackground(QPainter* painter,
   int xIndex = qFloor(rect.left() / gridIntervalPixels);
   int yIndex = -qFloor(rect.bottom() / gridIntervalPixels);
   switch (mGridStyle) {
-    case Theme::GridStyle::Lines: {
+    case GridStyle::Lines: {
       QVarLengthArray<QLineF, 450> minorLines;
       QVarLengthArray<QLineF, 50> majorLines;
       for (qreal x = left; x < right; x += gridIntervalPixels) {
@@ -244,7 +244,7 @@ void GraphicsScene::drawBackground(QPainter* painter,
       break;
     }
 
-    case Theme::GridStyle::Dots: {
+    case GridStyle::Dots: {
       QVarLengthArray<QPointF, 1800> minorDots;
       QVarLengthArray<QPointF, 200> majorDots;
       for (qreal x = left; x < right; x += gridIntervalPixels) {

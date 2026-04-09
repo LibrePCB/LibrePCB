@@ -27,6 +27,8 @@
 #include "../../../graphics/textgraphicsitem.h"
 #include "../schematicgraphicsscene.h"
 
+#include <librepcb/core/workspace/theme.h>
+
 #include <QtCore>
 #include <QtWidgets>
 

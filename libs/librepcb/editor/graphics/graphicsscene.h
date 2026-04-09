@@ -23,9 +23,9 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include <librepcb/core/types/enums.h>
 #include <librepcb/core/types/lengthunit.h>
 #include <librepcb/core/types/point.h>
-#include <librepcb/core/workspace/theme.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -73,13 +73,13 @@ public:
   const PositiveLength& getGridInterval() const noexcept {
     return mGridInterval;
   }
-  Theme::GridStyle getGridStyle() const noexcept { return mGridStyle; }
+  GridStyle getGridStyle() const noexcept { return mGridStyle; }
 
   // Setters
   void setBackgroundColors(const QColor& fill, const QColor& grid) noexcept;
   void setOverlayColors(const QColor& fill, const QColor& content) noexcept;
   void setSelectionRectColors(const QColor& line, const QColor& fill) noexcept;
-  void setGridStyle(Theme::GridStyle style) noexcept;
+  void setGridStyle(GridStyle style) noexcept;
   void setGridInterval(const PositiveLength& interval) noexcept;
   void setOriginCrossVisible(bool visible) noexcept;
   void setGrayOut(bool grayOut) noexcept;
@@ -114,7 +114,7 @@ protected:
   void drawForeground(QPainter* painter, const QRectF& rect) noexcept override;
 
 private:
-  Theme::GridStyle mGridStyle;
+  GridStyle mGridStyle;
   PositiveLength mGridInterval;
   QColor mBackgroundColor;
   QColor mGridColor;
