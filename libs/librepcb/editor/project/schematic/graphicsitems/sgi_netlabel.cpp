@@ -34,7 +34,7 @@
 #include <librepcb/core/types/alignment.h>
 #include <librepcb/core/utils/overlinemarkupparser.h>
 #include <librepcb/core/utils/toolbox.h>
-#include <librepcb/core/workspace/theme.h>
+#include <librepcb/core/workspace/colorrole.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -57,8 +57,8 @@ SGI_NetLabel::SGI_NetLabel(
   : QGraphicsItem(),
     mNetLabel(netlabel),
     mContext(context),
-    mOriginCrossLayer(layers.get(Theme::Color::sSchematicReferences)),
-    mNetLabelLayer(layers.get(Theme::Color::sSchematicNetLabels)),
+    mOriginCrossLayer(layers.get(ColorRole::schematicReferences())),
+    mNetLabelLayer(layers.get(ColorRole::schematicNetLabels())),
     mOnEditedSlot(*this, &SGI_NetLabel::netLabelEdited) {
   setFlag(QGraphicsItem::ItemIsSelectable, true);
   setZValue(SchematicGraphicsScene::ZValue_NetLabels);
@@ -78,7 +78,7 @@ SGI_NetLabel::SGI_NetLabel(
   // create anchor graphics item
   mAnchorGraphicsItem.reset(new LineGraphicsItem());
   mAnchorGraphicsItem->setZValue(SchematicGraphicsScene::ZValue_NetLabels);
-  mAnchorGraphicsItem->setLayer(layers.get(Theme::Color::sSchematicReferences));
+  mAnchorGraphicsItem->setLayer(layers.get(ColorRole::schematicReferences()));
   mAnchorGraphicsItem->setSelected(isSelected());
 
   updatePosition();

@@ -34,7 +34,7 @@
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/schematic/items/si_symbol.h>
 #include <librepcb/core/utils/toolbox.h>
-#include <librepcb/core/workspace/theme.h>
+#include <librepcb/core/workspace/colorrole.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -64,7 +64,7 @@ SGI_Symbol::SGI_Symbol(
   mOriginCrossGraphicsItem = std::make_shared<OriginCrossGraphicsItem>(this);
   mOriginCrossGraphicsItem->setSize(UnsignedLength(1400000));
   mOriginCrossGraphicsItem->setLayer(
-      layers.get(Theme::Color::sSchematicReferences));
+      layers.get(ColorRole::schematicReferences()));
   // https://github.com/LibrePCB/LibrePCB/issues/1725
   mOriginCrossGraphicsItem->setVisible(isSelected());
   mShape.addRect(mOriginCrossGraphicsItem->boundingRect());

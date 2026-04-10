@@ -27,6 +27,7 @@
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/outputjobrunner.h>
 #include <librepcb/core/project/project.h>
+#include <librepcb/core/workspace/theme.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -488,7 +489,7 @@ void GraphicsOutputJobWidget::currentContentChanged(int index) noexcept {
     foreach (const auto& pair, s.getColors()) {
       const bool enabled = c.layers.contains(pair.first);
       QListWidgetItem* item =
-          new QListWidgetItem(t.getColor(pair.first).getNameTr());
+          new QListWidgetItem(t.getColor(pair.first).getRole().getNameTr());
       item->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
       item->setCheckState(enabled ? Qt::Checked : Qt::Unchecked);
       item->setData(Qt::DecorationRole,

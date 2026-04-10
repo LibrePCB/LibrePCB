@@ -33,6 +33,8 @@
  ******************************************************************************/
 namespace librepcb {
 
+class ColorRole;
+
 /*******************************************************************************
  *  Class ThemeColor
  ******************************************************************************/
@@ -44,16 +46,14 @@ class ThemeColor final {
 public:
   // Constructors / Destructor
   ThemeColor() = delete;
-  ThemeColor(const QString& identifier, const char* category, const char* name,
-             const QString& nameSuffix, const QColor& primary,
+  ThemeColor(const ColorRole& role, const char* category, const QColor& primary,
              const QColor& secondary) noexcept;
   ThemeColor(const ThemeColor& other) noexcept;
   ~ThemeColor() noexcept;
 
   // Getters
-  const QString& getIdentifier() const noexcept { return mIdentifier; }
+  const ColorRole& getRole() const noexcept { return *mRole; }
   QString getCategoryTr() const noexcept;
-  QString getNameTr() const noexcept;
   const QColor& getPrimaryColor() const noexcept { return mPrimary; }
   const QColor& getSecondaryColor() const noexcept { return mSecondary; }
   bool isEdited() const noexcept { return mEdited; }
@@ -74,10 +74,8 @@ public:
   ThemeColor& operator=(const ThemeColor& rhs) noexcept;
 
 private:  // Data
-  QString mIdentifier;
+  const ColorRole* mRole;
   const char* mCategoryNoTr;
-  const char* mNameNoTr;
-  QString mNameSuffix;
   QColor mPrimary;
   QColor mSecondary;  ///< Null if not applicable
   bool mEdited;

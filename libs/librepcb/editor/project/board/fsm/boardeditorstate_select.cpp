@@ -93,6 +93,7 @@
 #include <librepcb/core/utils/scopeguard.h>
 #include <librepcb/core/utils/tangentpathjoiner.h>
 #include <librepcb/core/utils/toolbox.h>
+#include <librepcb/core/workspace/colorrole.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
 #include <librepcb/core/workspace/workspacesettings.h>
@@ -250,10 +251,10 @@ bool BoardEditorState_Select::processImportDxf() noexcept {
       // Shaw the layers of the imported objects, otherwise the user might
       // not even see these objects.
       if (!data->getHoles().isEmpty()) {
-        makeLayerVisible(Theme::Color::sBoardHoles);
+        makeLayerVisible(ColorRole::boardHoles());
       }
       if (!data->getPolygons().isEmpty()) {
-        makeLayerVisible(dialog.getLayer().getThemeColor());
+        makeLayerVisible(dialog.getLayer().getColorRole());
       }
 
       // Start the paste tool.

@@ -28,7 +28,7 @@
 
 #include <librepcb/core/project/board/items/bi_airwire.h>
 #include <librepcb/core/project/board/items/bi_netline.h>
-#include <librepcb/core/workspace/theme.h>
+#include <librepcb/core/workspace/colorrole.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -49,7 +49,7 @@ BGI_AirWire::BGI_AirWire(
   : QGraphicsItem(),
     mAirWire(airwire),
     mContext(context),
-    mLayer(layers.get(Theme::Color::sBoardAirWires)),
+    mLayer(layers.get(ColorRole::boardAirWires())),
     mOnLayerEditedSlot(*this, &BGI_AirWire::layerEdited) {
   setZValue(BoardGraphicsScene::ZValue_AirWires);
 

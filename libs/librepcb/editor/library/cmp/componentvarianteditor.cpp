@@ -38,6 +38,7 @@
 #include <librepcb/core/library/cmp/componentsignal.h>
 #include <librepcb/core/library/cmp/componentsymbolvariant.h>
 #include <librepcb/core/library/sym/symbol.h>
+#include <librepcb/core/workspace/colorrole.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacesettings.h>
 
@@ -76,14 +77,14 @@ ComponentVariantEditor::ComponentVariantEditor(
   const Theme& theme = mWorkspace.getSettings().themes.getActive();
   mScene->setOriginCrossVisible(true);  // Required for positioning.
   mScene->setBackgroundColors(
-      theme.getColor(Theme::Color::sSchematicBackground).getPrimaryColor(),
-      theme.getColor(Theme::Color::sSchematicBackground).getSecondaryColor());
+      theme.getColor(ColorRole::schematicBackground()).getPrimaryColor(),
+      theme.getColor(ColorRole::schematicBackground()).getSecondaryColor());
   mScene->setOverlayColors(
-      theme.getColor(Theme::Color::sSchematicOverlays).getPrimaryColor(),
-      theme.getColor(Theme::Color::sSchematicOverlays).getSecondaryColor());
+      theme.getColor(ColorRole::schematicOverlays()).getPrimaryColor(),
+      theme.getColor(ColorRole::schematicOverlays()).getSecondaryColor());
   mScene->setSelectionRectColors(
-      theme.getColor(Theme::Color::sSchematicSelection).getPrimaryColor(),
-      theme.getColor(Theme::Color::sSchematicSelection).getSecondaryColor());
+      theme.getColor(ColorRole::schematicSelection()).getPrimaryColor(),
+      theme.getColor(ColorRole::schematicSelection()).getSecondaryColor());
   mScene->setGridStyle(GridStyle::Lines);  // Required for positioning.
   connect(mScene.get(), &GraphicsScene::changed, this, [this]() {
     ++mFrameIndex;

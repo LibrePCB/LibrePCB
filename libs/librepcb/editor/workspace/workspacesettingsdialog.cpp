@@ -37,6 +37,7 @@
 #include <librepcb/core/application.h>
 #include <librepcb/core/norms.h>
 #include <librepcb/core/utils/toolbox.h>
+#include <librepcb/core/workspace/colorrole.h>
 #include <librepcb/core/workspace/uitheme.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacesettings.h>
@@ -660,7 +661,7 @@ void WorkspaceSettingsDialog::initColorTreeWidgetItem(
   init(1, tr("Secondary color: %1"), color.getSecondaryColor());
 
   item.setText(2, color.getCategoryTr());
-  item.setText(3, color.getNameTr());
+  item.setText(3, color.getRole().getNameTr());
 }
 
 void WorkspaceSettingsDialog::updateDismissedMessagesCount() noexcept {

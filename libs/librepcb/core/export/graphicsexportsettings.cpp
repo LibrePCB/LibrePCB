@@ -24,6 +24,7 @@
 
 #include "../serialization/sexpression.h"
 #include "../types/layer.h"
+#include "../workspace/colorrole.h"
 #include "../workspace/theme.h"
 
 #include <QtCore>
@@ -128,31 +129,32 @@ QStringList GraphicsExportSettings::getPaintOrder() const noexcept {
   return l;
 }
 
-QColor GraphicsExportSettings::getColor(
-    const QString& colorName) const noexcept {
-  QColor color = getColorImpl(colorName);
+QColor GraphicsExportSettings::getColor(const QString& role) const noexcept {
+  QColor color = getColorImpl(role);
   if (color.isValid() && mBlackWhite) {
     color = (mBackgroundColor == Qt::black) ? Qt::white : Qt::black;
   }
   return color;
 }
 
-QColor GraphicsExportSettings::getFillColor(const QString& colorName,
-                                            bool isFilled,
+QColor GraphicsExportSettings::getFillColor(const QString& role, bool isFilled,
                                             bool isGrabArea) const noexcept {
-  QColor grabAreaColor = getColorImpl(Theme::getGrabAreaColorName(colorName));
   if (isFilled) {
-    return getColor(colorName);
-  } else if (isGrabArea && grabAreaColor.isValid()) {
-    if (mBlackWhite) {
-      int gray = qGray(grabAreaColor.rgb());
-      return QColor(gray, gray, gray, grabAreaColor.alpha());
-    } else {
-      return grabAreaColor;
+    return getColor(role);
+  } else if (isGrabArea) {
+    if (const ColorRole* grabAreaRole = ColorRole::getGrabAreaRole(role)) {
+      const QColor color = getColorImpl(grabAreaRole->getId());
+      if (color.isValid()) {
+        if (mBlackWhite) {
+          const int gray = qGray(color.rgb());
+          return QColor(gray, gray, gray, color.alpha());
+        } else {
+          return color;
+        }
+      }
     }
-  } else {
-    return QColor();
   }
+  return QColor();
 }
 
 /*******************************************************************************
@@ -162,8 +164,8 @@ QColor GraphicsExportSettings::getFillColor(const QString& colorName,
 void GraphicsExportSettings::loadColorsFromTheme(const Theme& theme,
                                                  bool schematic, bool board,
                                                  int innerLayerCount) noexcept {
-  auto addColor = [this, &theme](const QString& colorName, bool autoAdjust) {
-    QColor color = theme.getColor(colorName).getPrimaryColor();
+  auto addColor = [this, &theme](const ColorRole& role, bool autoAdjust) {
+    QColor color = theme.getColor(role).getPrimaryColor();
     if (autoAdjust) {
       // Make board layers looking better on white background since usually the
       // graphics export uses white background.
@@ -173,77 +175,79 @@ void GraphicsExportSettings::loadColorsFromTheme(const Theme& theme,
       int a = (color.alpha() / 2) + 127;  // avoid transparent colors
       color = QColor::fromHsv(h, s, v, a);
     }
-    mColors.append(std::make_pair(colorName, color));
+    mColors.append(std::make_pair(role.getId(), color));
   };
 
   mColors.clear();
 
   // Schematic layers.
   if (schematic) {
-    addColor(Theme::Color::sSchematicFrames, false);
-    addColor(Theme::Color::sSchematicOutlines, false);
-    addColor(Theme::Color::sSchematicGrabAreas, false);
-    addColor(Theme::Color::sSchematicPinLines, false);
-    addColor(Theme::Color::sSchematicPinNames, false);
-    addColor(Theme::Color::sSchematicPinNumbers, false);
-    addColor(Theme::Color::sSchematicNames, false);
-    addColor(Theme::Color::sSchematicValues, false);
-    addColor(Theme::Color::sSchematicWires, false);
-    addColor(Theme::Color::sSchematicNetLabels, false);
-    addColor(Theme::Color::sSchematicBuses, false);
-    addColor(Theme::Color::sSchematicBusLabels, false);
-    addColor(Theme::Color::sSchematicImageBorders, false);
-    addColor(Theme::Color::sSchematicDocumentation, false);
-    addColor(Theme::Color::sSchematicComments, false);
-    addColor(Theme::Color::sSchematicGuide, false);
+    addColor(ColorRole::schematicFrames(), false);
+    addColor(ColorRole::schematicOutlines(), false);
+    addColor(ColorRole::schematicGrabAreas(), false);
+    addColor(ColorRole::schematicPinLines(), false);
+    addColor(ColorRole::schematicPinNames(), false);
+    addColor(ColorRole::schematicPinNumbers(), false);
+    addColor(ColorRole::schematicNames(), false);
+    addColor(ColorRole::schematicValues(), false);
+    addColor(ColorRole::schematicWires(), false);
+    addColor(ColorRole::schematicNetLabels(), false);
+    addColor(ColorRole::schematicBuses(), false);
+    addColor(ColorRole::schematicBusLabels(), false);
+    addColor(ColorRole::schematicImageBorders(), false);
+    addColor(ColorRole::schematicDocumentation(), false);
+    addColor(ColorRole::schematicComments(), false);
+    addColor(ColorRole::schematicGuide(), false);
   }
 
   if (board) {
     // Asymmetric board layers.
-    addColor(Theme::Color::sBoardGuide, true);
-    addColor(Theme::Color::sBoardComments, true);
-    addColor(Theme::Color::sBoardDocumentation, true);
-    addColor(Theme::Color::sBoardAlignment, true);
-    addColor(Theme::Color::sBoardMeasures, true);
-    addColor(Theme::Color::sBoardFrames, true);
-    addColor(Theme::Color::sBoardAirWires, true);
-    addColor(Theme::Color::sBoardOutlines, true);
-    addColor(Theme::Color::sBoardHoles, true);
-    addColor(Theme::Color::sBoardPlatedCutouts, true);
-    addColor(Theme::Color::sBoardPads, true);
-    addColor(Theme::Color::sBoardVias, true);
+    addColor(ColorRole::boardGuide(), true);
+    addColor(ColorRole::boardComments(), true);
+    addColor(ColorRole::boardDocumentation(), true);
+    addColor(ColorRole::boardAlignment(), true);
+    addColor(ColorRole::boardMeasures(), true);
+    addColor(ColorRole::boardFrames(), true);
+    addColor(ColorRole::boardAirWires(), true);
+    addColor(ColorRole::boardOutlines(), true);
+    addColor(ColorRole::boardHoles(), true);
+    addColor(ColorRole::boardPlatedCutouts(), true);
+    addColor(ColorRole::boardPads(), true);
+    addColor(ColorRole::boardVias(), true);
 
     // Symmetric board layers in logical order.
-    addColor(Theme::Color::sBoardDocumentationTop, true);
-    addColor(Theme::Color::sBoardNamesTop, true);
-    addColor(Theme::Color::sBoardValuesTop, true);
-    addColor(Theme::Color::sBoardCourtyardTop, true);
-    addColor(Theme::Color::sBoardGrabAreasTop, true);
-    addColor(Theme::Color::sBoardLegendTop, true);
-    addColor(Theme::Color::sBoardGlueTop, true);
-    addColor(Theme::Color::sBoardSolderPasteTop, true);
-    addColor(Theme::Color::sBoardStopMaskTop, true);
-    addColor(Theme::Color::sBoardCopperTop, true);
+    addColor(ColorRole::boardDocumentationTop(), true);
+    addColor(ColorRole::boardNamesTop(), true);
+    addColor(ColorRole::boardValuesTop(), true);
+    addColor(ColorRole::boardCourtyardTop(), true);
+    addColor(ColorRole::boardGrabAreasTop(), true);
+    addColor(ColorRole::boardLegendTop(), true);
+    addColor(ColorRole::boardGlueTop(), true);
+    addColor(ColorRole::boardSolderPasteTop(), true);
+    addColor(ColorRole::boardStopMaskTop(), true);
+    addColor(ColorRole::boardCopperTop(), true);
     for (int i = 1; i <= innerLayerCount; ++i) {
-      addColor(QString(Theme::Color::sBoardCopperInner).arg(i), true);
+      if (const ColorRole* role = ColorRole::boardCopperInner(i)) {
+        addColor(*role, true);
+      }
     }
-    addColor(Theme::Color::sBoardCopperBot, true);
-    addColor(Theme::Color::sBoardStopMaskBot, true);
-    addColor(Theme::Color::sBoardSolderPasteBot, true);
-    addColor(Theme::Color::sBoardGlueBot, true);
-    addColor(Theme::Color::sBoardLegendBot, true);
-    addColor(Theme::Color::sBoardGrabAreasBot, true);
-    addColor(Theme::Color::sBoardCourtyardBot, true);
-    addColor(Theme::Color::sBoardValuesBot, true);
-    addColor(Theme::Color::sBoardNamesBot, true);
-    addColor(Theme::Color::sBoardDocumentationBot, true);
+    addColor(ColorRole::boardCopperBot(), true);
+    addColor(ColorRole::boardStopMaskBot(), true);
+    addColor(ColorRole::boardSolderPasteBot(), true);
+    addColor(ColorRole::boardGlueBot(), true);
+    addColor(ColorRole::boardLegendBot(), true);
+    addColor(ColorRole::boardGrabAreasBot(), true);
+    addColor(ColorRole::boardCourtyardBot(), true);
+    addColor(ColorRole::boardValuesBot(), true);
+    addColor(ColorRole::boardNamesBot(), true);
+    addColor(ColorRole::boardDocumentationBot(), true);
   }
 }
 
 void GraphicsExportSettings::loadBoardRenderingColors(
     int innerLayerCount) noexcept {
-  auto addColor = [this](const QString& colorName, const QColor& color) {
-    mColors.append(std::make_pair(colorName, color));
+  auto addColor = [this](const ColorRole& role, const QColor& color) {
+    mColors.append(std::make_pair(role.getId(), color));
   };
 
   mColors.clear();
@@ -251,21 +255,22 @@ void GraphicsExportSettings::loadBoardRenderingColors(
   // Note: Transparent layers mean to take colors from board settings.
   // RealisticBoardPainter will only use colors from these settings which
   // have a nonzero alpha value.
-  addColor(Theme::Color::sBoardOutlines, QColor(70, 80, 70));
-  addColor(Theme::Color::sBoardCopperTop, QColor(188, 156, 105));
-  addColor(Theme::Color::sBoardStopMaskTop, Qt::transparent);
-  addColor(Theme::Color::sBoardLegendTop, Qt::transparent);
-  addColor(Theme::Color::sBoardSolderPasteTop, Qt::darkGray);
-  addColor(Theme::Color::sBoardGlueTop, QColor(200, 50, 50, 80));  // untested
+  addColor(ColorRole::boardOutlines(), QColor(70, 80, 70));
+  addColor(ColorRole::boardCopperTop(), QColor(188, 156, 105));
+  addColor(ColorRole::boardStopMaskTop(), Qt::transparent);
+  addColor(ColorRole::boardLegendTop(), Qt::transparent);
+  addColor(ColorRole::boardSolderPasteTop(), Qt::darkGray);
+  addColor(ColorRole::boardGlueTop(), QColor(200, 50, 50, 80));  // untested
   for (int i = 1; i <= innerLayerCount; ++i) {
-    addColor(QString(Theme::Color::sBoardCopperInner).arg(i),
-             QColor(188, 156, 105));
+    if (const ColorRole* role = ColorRole::boardCopperInner(i)) {
+      addColor(*role, QColor(188, 156, 105));
+    }
   }
-  addColor(Theme::Color::sBoardCopperBot, QColor(188, 156, 105));
-  addColor(Theme::Color::sBoardStopMaskBot, Qt::transparent);
-  addColor(Theme::Color::sBoardLegendBot, Qt::transparent);
-  addColor(Theme::Color::sBoardSolderPasteBot, Qt::darkGray);
-  addColor(Theme::Color::sBoardGlueBot, QColor(200, 50, 50, 80));  // untested
+  addColor(ColorRole::boardCopperBot(), QColor(188, 156, 105));
+  addColor(ColorRole::boardStopMaskBot(), Qt::transparent);
+  addColor(ColorRole::boardLegendBot(), Qt::transparent);
+  addColor(ColorRole::boardSolderPasteBot(), Qt::darkGray);
+  addColor(ColorRole::boardGlueBot(), QColor(200, 50, 50, 80));  // untested
 }
 
 QImage GraphicsExportSettings::convertImageColors(QImage img) const noexcept {

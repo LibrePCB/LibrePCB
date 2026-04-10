@@ -28,7 +28,7 @@
 
 #include <librepcb/core/geometry/hole.h>
 #include <librepcb/core/project/board/board.h>
-#include <librepcb/core/workspace/theme.h>
+#include <librepcb/core/workspace/colorrole.h>
 
 #include <QtCore>
 
@@ -60,7 +60,7 @@ BoardEditorState_AddHole::~BoardEditorState_AddHole() noexcept {
 bool BoardEditorState_AddHole::entry() noexcept {
   Q_ASSERT(mIsUndoCmdActive == false);
 
-  makeLayerVisible(Theme::Color::sBoardHoles);
+  makeLayerVisible(ColorRole::boardHoles());
 
   // Add a new hole
   const Point pos = mAdapter.fsmMapGlobalPosToScenePos(QCursor::pos())

@@ -31,6 +31,7 @@
 #include <librepcb/core/application.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/library/pkg/package.h>
+#include <librepcb/core/workspace/colorrole.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
 #include <librepcb/core/workspace/workspacesettings.h>
@@ -61,10 +62,10 @@ PackageChooserDialog::PackageChooserDialog(const Workspace& ws,
 
   const Theme& theme = mWorkspace.getSettings().themes.getActive();
   mGraphicsScene->setBackgroundColors(
-      theme.getColor(Theme::Color::sBoardBackground).getPrimaryColor(),
-      theme.getColor(Theme::Color::sBoardBackground).getSecondaryColor());
+      theme.getColor(ColorRole::boardBackground()).getPrimaryColor(),
+      theme.getColor(ColorRole::boardBackground()).getSecondaryColor());
   mUi->graphicsView->setSpinnerColor(
-      theme.getColor(Theme::Color::sBoardBackground).getSecondaryColor());
+      theme.getColor(ColorRole::boardBackground()).getSecondaryColor());
   mUi->graphicsView->setScene(mGraphicsScene.data());
 
   mCategoryTreeModel.reset(new CategoryTreeModelLegacy(

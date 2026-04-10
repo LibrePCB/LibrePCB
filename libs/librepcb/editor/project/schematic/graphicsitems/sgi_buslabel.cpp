@@ -34,7 +34,7 @@
 #include <librepcb/core/types/alignment.h>
 #include <librepcb/core/utils/overlinemarkupparser.h>
 #include <librepcb/core/utils/toolbox.h>
-#include <librepcb/core/workspace/theme.h>
+#include <librepcb/core/workspace/colorrole.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -57,8 +57,8 @@ SGI_BusLabel::SGI_BusLabel(
   : QGraphicsItem(),
     mBusLabel(label),
     mContext(context),
-    mOriginCrossLayer(layers.get(Theme::Color::sSchematicReferences)),
-    mBusLabelLayer(layers.get(Theme::Color::sSchematicBusLabels)),
+    mOriginCrossLayer(layers.get(ColorRole::schematicReferences())),
+    mBusLabelLayer(layers.get(ColorRole::schematicBusLabels())),
     mOnEditedSlot(*this, &SGI_BusLabel::busLabelEdited) {
   setFlag(QGraphicsItem::ItemIsSelectable, true);
   setZValue(SchematicGraphicsScene::ZValue_Buses);
@@ -78,7 +78,7 @@ SGI_BusLabel::SGI_BusLabel(
   // create anchor graphics item
   mAnchorGraphicsItem.reset(new LineGraphicsItem());
   mAnchorGraphicsItem->setZValue(SchematicGraphicsScene::ZValue_Buses);
-  mAnchorGraphicsItem->setLayer(layers.get(Theme::Color::sSchematicReferences));
+  mAnchorGraphicsItem->setLayer(layers.get(ColorRole::schematicReferences()));
   mAnchorGraphicsItem->setSelected(isSelected());
 
   updatePosition();

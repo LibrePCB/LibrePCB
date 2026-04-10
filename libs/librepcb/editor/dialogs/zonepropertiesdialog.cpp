@@ -33,7 +33,6 @@
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/items/bi_zone.h>
 #include <librepcb/core/types/layer.h>
-#include <librepcb/core/workspace/theme.h>
 
 #include <QtCore>
 #include <QtWidgets>

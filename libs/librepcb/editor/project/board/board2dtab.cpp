@@ -84,6 +84,7 @@
 #include <librepcb/core/utils/messagelogger.h>
 #include <librepcb/core/utils/scopeguard.h>
 #include <librepcb/core/utils/tagmatcher.h>
+#include <librepcb/core/workspace/colorrole.h>
 #include <librepcb/core/workspace/theme.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
@@ -355,7 +356,7 @@ void Board2dTab::setUiData(const ui::TabData& data) noexcept {
 ui::Board2dTabData Board2dTab::getDerivedUiData() const noexcept {
   const Theme& theme = mApp.getWorkspace().getSettings().themes.getActive();
   const QColor bgColor =
-      theme.getColor(Theme::Color::sBoardBackground).getPrimaryColor();
+      theme.getColor(ColorRole::boardBackground()).getPrimaryColor();
   const QColor fgColor = (bgColor.lightnessF() >= 0.5) ? Qt::black : Qt::white;
 
   return ui::Board2dTabData{
@@ -363,9 +364,9 @@ ui::Board2dTabData Board2dTab::getDerivedUiData() const noexcept {
       mBoardEditor.getUiIndex(),  // Board index
       q2s(bgColor),  // Background color
       q2s(fgColor),  // Foreground color
-      q2s(theme.getColor(Theme::Color::sBoardInfoBox)
+      q2s(theme.getColor(ColorRole::boardInfoBox())
               .getPrimaryColor()),  // Overlay color
-      q2s(theme.getColor(Theme::Color::sBoardInfoBox)
+      q2s(theme.getColor(ColorRole::boardInfoBox())
               .getSecondaryColor()),  // Overlay text color
       l2s(mGridStyle),  // Grid style
       l2s(*mBoard.getGridInterval()),  // Grid interval
@@ -1020,7 +1021,7 @@ slint::Image Board2dTab::renderScene(float width, float height,
       pix.fill(mApp.getWorkspace()
                    .getSettings()
                    .themes.getActive()
-                   .getColor(Theme::Color::sBoardBackground)
+                   .getColor(ColorRole::boardBackground())
                    .getPrimaryColor());
       return q2s(pix);
     }
@@ -1858,8 +1859,9 @@ void Board2dTab::updateEnabledCopperLayers() noexcept {
 
 void Board2dTab::loadLayersVisibility() noexcept {
   foreach (std::shared_ptr<GraphicsLayer> layer, mLayers->all()) {
-    if (mBoard.getLayersVisibility().contains(layer->getName())) {
-      layer->setVisible(mBoard.getLayersVisibility().value(layer->getName()));
+    if (mBoard.getLayersVisibility().contains(layer->getRole().getId())) {
+      layer->setVisible(
+          mBoard.getLayersVisibility().value(layer->getRole().getId()));
     }
   }
 }
@@ -1868,7 +1870,7 @@ void Board2dTab::storeLayersVisibility() noexcept {
   QMap<QString, bool> visibility;
   foreach (std::shared_ptr<GraphicsLayer> layer, mLayers->all()) {
     if (layer->isEnabled()) {
-      visibility[layer->getName()] = layer->isVisible();
+      visibility[layer->getRole().getId()] = layer->isVisible();
     }
   }
   mBoard.setLayersVisibility(visibility);
@@ -1942,7 +1944,7 @@ void Board2dTab::highlightDrcMessage(
   } else if (mScene) {
     const ThemeColor& color =
         mApp.getWorkspace().getSettings().themes.getActive().getColor(
-            Theme::Color::sBoardOverlays);
+            ColorRole::boardOverlays());
     QPainterPath path = Path::toQPainterPathPx(msg->getLocations(), true);
     mDrcLocationGraphicsItem.reset(new QGraphicsPathItem());
     mDrcLocationGraphicsItem->setZValue(BoardGraphicsScene::ZValue_AirWires);
@@ -2708,7 +2710,7 @@ void Board2dTab::applyBackgroundImageSettings() noexcept {
     // Post-process the image.
     const Theme& theme = mApp.getWorkspace().getSettings().themes.getActive();
     mBackgroundImageGraphicsItem->setPixmap(s.buildPixmap(
-        theme.getColor(Theme::Color::sBoardBackground).getPrimaryColor()));
+        theme.getColor(ColorRole::boardBackground()).getPrimaryColor()));
 
     // Apply the image & transform.
     mBackgroundImageGraphicsItem->setTransform(s.calcTransform());
@@ -2730,21 +2732,21 @@ void Board2dTab::applyTheme() noexcept {
 
   if (mScene) {
     mScene->setBackgroundColors(
-        theme.getColor(Theme::Color::sBoardBackground).getPrimaryColor(),
-        theme.getColor(Theme::Color::sBoardBackground).getSecondaryColor());
+        theme.getColor(ColorRole::boardBackground()).getPrimaryColor(),
+        theme.getColor(ColorRole::boardBackground()).getSecondaryColor());
     mScene->setOverlayColors(
-        theme.getColor(Theme::Color::sBoardOverlays).getPrimaryColor(),
-        theme.getColor(Theme::Color::sBoardOverlays).getSecondaryColor());
+        theme.getColor(ColorRole::boardOverlays()).getPrimaryColor(),
+        theme.getColor(ColorRole::boardOverlays()).getSecondaryColor());
     mScene->setSelectionRectColors(
-        theme.getColor(Theme::Color::sBoardSelection).getPrimaryColor(),
-        theme.getColor(Theme::Color::sBoardSelection).getSecondaryColor());
+        theme.getColor(ColorRole::boardSelection()).getPrimaryColor(),
+        theme.getColor(ColorRole::boardSelection()).getSecondaryColor());
     mScene->setGridStyle(mGridStyle);
   }
 
   if (mUnplacedComponentGraphicsScene) {
     mUnplacedComponentGraphicsScene->setBackgroundColors(
-        theme.getColor(Theme::Color::sBoardBackground).getPrimaryColor(),
-        theme.getColor(Theme::Color::sBoardBackground).getSecondaryColor());
+        theme.getColor(ColorRole::boardBackground()).getPrimaryColor(),
+        theme.getColor(ColorRole::boardBackground()).getSecondaryColor());
   }
 
   onDerivedUiDataChanged.notify();

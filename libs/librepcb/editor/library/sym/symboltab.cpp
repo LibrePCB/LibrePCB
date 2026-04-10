@@ -60,6 +60,7 @@
 #include <librepcb/core/library/sym/symbol.h>
 #include <librepcb/core/library/sym/symbolcheckmessages.h>
 #include <librepcb/core/library/sym/symbolpainter.h>
+#include <librepcb/core/workspace/colorrole.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
 #include <librepcb/core/workspace/workspacesettings.h>
@@ -248,7 +249,7 @@ ui::TabData SymbolTab::getUiData() const noexcept {
 ui::SymbolTabData SymbolTab::getDerivedUiData() const noexcept {
   const Theme& theme = mEditor.getWorkspace().getSettings().themes.getActive();
   const QColor bgColor =
-      theme.getColor(Theme::Color::sSchematicBackground).getPrimaryColor();
+      theme.getColor(ColorRole::schematicBackground()).getPrimaryColor();
   const QColor fgColor = (bgColor.lightnessF() >= 0.5) ? Qt::black : Qt::white;
 
   return ui::SymbolTabData{
@@ -278,9 +279,9 @@ ui::SymbolTabData SymbolTab::getDerivedUiData() const noexcept {
       },
       q2s(bgColor),  // Background color
       q2s(fgColor),  // Foreground color
-      q2s(theme.getColor(Theme::Color::sSchematicInfoBox)
+      q2s(theme.getColor(ColorRole::schematicInfoBox())
               .getPrimaryColor()),  // Overlay color
-      q2s(theme.getColor(Theme::Color::sSchematicInfoBox)
+      q2s(theme.getColor(ColorRole::schematicInfoBox())
               .getSecondaryColor()),  // Overlay text color
       l2s(mGridStyle),  // Grid style
       l2s(*mSymbol->getGridInterval()),  // Grid interval
@@ -1644,14 +1645,14 @@ void SymbolTab::applyTheme() noexcept {
 
   if (mScene) {
     mScene->setBackgroundColors(
-        theme.getColor(Theme::Color::sSchematicBackground).getPrimaryColor(),
-        theme.getColor(Theme::Color::sSchematicBackground).getSecondaryColor());
+        theme.getColor(ColorRole::schematicBackground()).getPrimaryColor(),
+        theme.getColor(ColorRole::schematicBackground()).getSecondaryColor());
     mScene->setOverlayColors(
-        theme.getColor(Theme::Color::sSchematicOverlays).getPrimaryColor(),
-        theme.getColor(Theme::Color::sSchematicOverlays).getSecondaryColor());
+        theme.getColor(ColorRole::schematicOverlays()).getPrimaryColor(),
+        theme.getColor(ColorRole::schematicOverlays()).getSecondaryColor());
     mScene->setSelectionRectColors(
-        theme.getColor(Theme::Color::sSchematicSelection).getPrimaryColor(),
-        theme.getColor(Theme::Color::sSchematicSelection).getSecondaryColor());
+        theme.getColor(ColorRole::schematicSelection()).getPrimaryColor(),
+        theme.getColor(ColorRole::schematicSelection()).getSecondaryColor());
     mScene->setGridStyle(mGridStyle);
   }
 

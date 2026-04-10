@@ -31,6 +31,7 @@
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/types/layer.h>
 #include <librepcb/core/utils/toolbox.h>
+#include <librepcb/core/workspace/colorrole.h>
 #include <librepcb/core/workspace/theme.h>
 
 #include <QtCore>
@@ -177,9 +178,9 @@ bool BoardEditorState_DrawZone::startAddZone(const Point& pos) noexcept {
     // Start undo command
     mCurrentZoneEditCmd.reset(new CmdBoardZoneEdit(*mCurrentZone));
     mLastVertexPos = pos;
-    makeLayerVisible(Theme::Color::sBoardZones);
+    makeLayerVisible(ColorRole::boardZones());
     for (auto layer : mCurrentProperties.getLayers()) {
-      makeLayerVisible(layer->getThemeColor());
+      makeLayerVisible(layer->getColorRole());
     }
     return true;
   } catch (const Exception& e) {

@@ -36,7 +36,7 @@
 #include <librepcb/core/project/board/items/bi_device.h>
 #include <librepcb/core/types/layer.h>
 #include <librepcb/core/utils/transform.h>
-#include <librepcb/core/workspace/theme.h>
+#include <librepcb/core/workspace/colorrole.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -251,9 +251,8 @@ void BGI_Device::updateBoardSide() noexcept {
   }
 
   // Update grab area layer.
-  std::shared_ptr<const GraphicsLayer> grabAreaLayer =
-      mLayers.get(top ? Theme::Color::sBoardGrabAreasTop
-                      : Theme::Color::sBoardGrabAreasBot);
+  std::shared_ptr<const GraphicsLayer> grabAreaLayer = mLayers.get(
+      top ? ColorRole::boardGrabAreasTop() : ColorRole::boardGrabAreasBot());
   if (grabAreaLayer != mGrabAreaLayer) {
     if (mGrabAreaLayer) {
       mGrabAreaLayer->onEdited.detach(mOnLayerEditedSlot);
@@ -266,9 +265,8 @@ void BGI_Device::updateBoardSide() noexcept {
   }
 
   // Update origin cross layer.
-  mOriginCrossGraphicsItem->setLayer(
-      mLayers.get(top ? Theme::Color::sBoardReferencesTop
-                      : Theme::Color::sBoardReferencesBot));
+  mOriginCrossGraphicsItem->setLayer(mLayers.get(
+      top ? ColorRole::boardReferencesTop() : ColorRole::boardReferencesBot()));
 
   // Update circle layers.
   const CircleList& circles = mDevice.getLibFootprint().getCircles();
@@ -344,8 +342,8 @@ void BGI_Device::updateZoneLayers() noexcept {
 
 std::shared_ptr<const GraphicsLayer> BGI_Device::getLayer(
     const Layer& layer) const noexcept {
-  return mLayers.get(mDevice.getMirrored() ? layer.mirrored().getThemeColor()
-                                           : layer.getThemeColor());
+  return mLayers.get(mDevice.getMirrored() ? layer.mirrored().getColorRole()
+                                           : layer.getColorRole());
 }
 
 /*******************************************************************************

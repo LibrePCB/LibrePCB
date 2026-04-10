@@ -77,6 +77,7 @@
 #include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/library/pkg/packagecheckmessages.h>
 #include <librepcb/core/types/pcbcolor.h>
+#include <librepcb/core/workspace/colorrole.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
 #include <librepcb/core/workspace/workspacesettings.h>
@@ -315,10 +316,10 @@ ui::TabData PackageTab::getUiData() const noexcept {
 ui::PackageTabData PackageTab::getDerivedUiData() const noexcept {
   const Theme& theme = mEditor.getWorkspace().getSettings().themes.getActive();
   const QColor bgColor = mView3d
-      ? theme.getColor(Theme::Color::s3dBackground).getPrimaryColor()
-      : theme.getColor(Theme::Color::sBoardBackground).getPrimaryColor();
+      ? theme.getColor(ColorRole::board3dBackground()).getPrimaryColor()
+      : theme.getColor(ColorRole::boardBackground()).getPrimaryColor();
   const QColor fgColor = mView3d
-      ? theme.getColor(Theme::Color::s3dBackground).getSecondaryColor()
+      ? theme.getColor(ColorRole::board3dBackground()).getSecondaryColor()
       : ((bgColor.lightnessF() >= 0.5) ? Qt::black : Qt::white);
   const bool refreshing =
       (mOpenGlSceneBuilder && mOpenGlSceneBuilder->isBusy());
@@ -363,9 +364,9 @@ ui::PackageTabData PackageTab::getDerivedUiData() const noexcept {
       },
       q2s(bgColor),  // Background color
       q2s(fgColor),  // Foreground color
-      q2s(theme.getColor(Theme::Color::sBoardInfoBox)
+      q2s(theme.getColor(ColorRole::boardInfoBox())
               .getPrimaryColor()),  // Overlay color
-      q2s(theme.getColor(Theme::Color::sBoardInfoBox)
+      q2s(theme.getColor(ColorRole::boardInfoBox())
               .getSecondaryColor()),  // Overlay text color
       l2s(mGridStyle),  // Grid style
       l2s(*mPackage->getGridInterval()),  // Grid interval
@@ -2737,7 +2738,7 @@ void PackageTab::applyBackgroundImageSettings() noexcept {
     const Theme& theme =
         mEditor.getWorkspace().getSettings().themes.getActive();
     mBackgroundImageGraphicsItem->setPixmap(s.buildPixmap(
-        theme.getColor(Theme::Color::sBoardBackground).getPrimaryColor()));
+        theme.getColor(ColorRole::boardBackground()).getPrimaryColor()));
 
     // Apply the transform.
     mBackgroundImageGraphicsItem->setTransform(s.calcTransform());
@@ -2764,20 +2765,20 @@ void PackageTab::applyTheme() noexcept {
 
   if (mScene) {
     mScene->setBackgroundColors(
-        theme.getColor(Theme::Color::sBoardBackground).getPrimaryColor(),
-        theme.getColor(Theme::Color::sBoardBackground).getSecondaryColor());
+        theme.getColor(ColorRole::boardBackground()).getPrimaryColor(),
+        theme.getColor(ColorRole::boardBackground()).getSecondaryColor());
     mScene->setOverlayColors(
-        theme.getColor(Theme::Color::sBoardOverlays).getPrimaryColor(),
-        theme.getColor(Theme::Color::sBoardOverlays).getSecondaryColor());
+        theme.getColor(ColorRole::boardOverlays()).getPrimaryColor(),
+        theme.getColor(ColorRole::boardOverlays()).getSecondaryColor());
     mScene->setSelectionRectColors(
-        theme.getColor(Theme::Color::sBoardSelection).getPrimaryColor(),
-        theme.getColor(Theme::Color::sBoardSelection).getSecondaryColor());
+        theme.getColor(ColorRole::boardSelection()).getPrimaryColor(),
+        theme.getColor(ColorRole::boardSelection()).getSecondaryColor());
     mScene->setGridStyle(mGridStyle);
   }
 
   if (mOpenGlView) {
     mOpenGlView->setBackgroundColor(
-        theme.getColor(Theme::Color::s3dBackground).getPrimaryColor());
+        theme.getColor(ColorRole::board3dBackground()).getPrimaryColor());
   }
 
   onDerivedUiDataChanged.notify();

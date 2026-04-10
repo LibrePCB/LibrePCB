@@ -31,7 +31,7 @@
 #include <librepcb/core/project/schematic/items/si_busline.h>
 #include <librepcb/core/project/schematic/items/si_bussegment.h>
 #include <librepcb/core/utils/toolbox.h>
-#include <librepcb/core/workspace/theme.h>
+#include <librepcb/core/workspace/colorrole.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -52,7 +52,7 @@ SGI_BusLine::SGI_BusLine(
   : QGraphicsItem(),
     mBusLine(line),
     mContext(context),
-    mLayer(layers.get(Theme::Color::sSchematicBuses)),
+    mLayer(layers.get(ColorRole::schematicBuses())),
     mOnBusLineEditedSlot(*this, &SGI_BusLine::busLineEdited) {
   setFlag(QGraphicsItem::ItemIsSelectable, true);
   setZValue(SchematicGraphicsScene::ZValue_Buses);

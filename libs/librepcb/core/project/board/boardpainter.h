@@ -121,8 +121,8 @@ class BoardPainter final : public GraphicsPagePainter {
 
   struct ColorContent {
     QList<QPainterPath> areas;
-    QList<QPainterPath> thtPadAreas;  ///< Drawn on Theme::Color::sBoardPads
-    QList<QPainterPath> viaAreas;  ///< Drawn on Theme::Color::sBoardVias
+    QList<QPainterPath> thtPadAreas;  ///< Drawn on ColorRole::boardPads()
+    QList<QPainterPath> viaAreas;  ///< Drawn on ColorRole::boardVias()
     QList<Trace> traces;
     QList<PolygonData> polygons;
     QList<Circle> circles;

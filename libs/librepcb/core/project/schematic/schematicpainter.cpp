@@ -26,7 +26,7 @@
 #include "../../export/graphicsexportsettings.h"
 #include "../../export/graphicspainter.h"
 #include "../../library/sym/symbol.h"
-#include "../../workspace/theme.h"
+#include "../../workspace/colorrole.h"
 #include "../circuit/bus.h"
 #include "../circuit/netsignal.h"
 #include "items/si_busjunction.h"
@@ -230,10 +230,10 @@ void SchematicPainter::paint(
       // Draw Polygons.
       foreach (const Polygon& polygon, symbol.polygons) {
         if (doDraw(type, polygon.isGrabArea(), polygon.isFilled())) {
-          const QString color = polygon.getLayer().getThemeColor();
+          const QString role = polygon.getLayer().getColorRole().getId();
           p.drawPolygon(symbol.transform.map(polygon.getPath()),
-                        *polygon.getLineWidth(), settings.getColor(color),
-                        settings.getFillColor(color, polygon.isFilled(),
+                        *polygon.getLineWidth(), settings.getColor(role),
+                        settings.getFillColor(role, polygon.isFilled(),
                                               polygon.isGrabArea()));
         }
       }
@@ -241,11 +241,11 @@ void SchematicPainter::paint(
       // Draw Circles.
       foreach (const Circle& circle, symbol.circles) {
         if (doDraw(type, circle.isGrabArea(), circle.isFilled())) {
-          const QString color = circle.getLayer().getThemeColor();
+          const QString role = circle.getLayer().getColorRole().getId();
           p.drawCircle(symbol.transform.map(circle.getCenter()),
                        *circle.getDiameter(), *circle.getLineWidth(),
-                       settings.getColor(color),
-                       settings.getFillColor(color, circle.isFilled(),
+                       settings.getColor(role),
+                       settings.getFillColor(role, circle.isFilled(),
                                              circle.isGrabArea()));
         }
       }
@@ -272,11 +272,12 @@ void SchematicPainter::paint(
                 .rotated(-image.getRotation() + symbol.transform.getRotation());
         rot += Angle::deg180();
       }
-      p.drawImage(pos, rot,
-                  settings.convertImageColors(
-                      symbol.imageFiles.value(*image.getFileName())),
-                  image.getWidth(), image.getHeight(), image.getBorderWidth(),
-                  settings.getColor(Theme::Color::sSchematicImageBorders));
+      p.drawImage(
+          pos, rot,
+          settings.convertImageColors(
+              symbol.imageFiles.value(*image.getFileName())),
+          image.getWidth(), image.getHeight(), image.getBorderWidth(),
+          settings.getColor(ColorRole::schematicImageBorders().getId()));
     }
 
     // Draw line shapes (no fill, no grab area).
@@ -287,7 +288,7 @@ void SchematicPainter::paint(
       p.drawSymbolPin(symbol.transform.map(pin.position),
                       symbol.transform.mapNonMirrorable(pin.rotation),
                       pin.hasError ? (*pin.length / 2) : *pin.length,
-                      settings.getColor(Theme::Color::sSchematicPinLines),
+                      settings.getColor(ColorRole::schematicPinLines().getId()),
                       QColor());
       Alignment nameAlignment = pin.nameAlignment;
       if (symbol.transform.getMirrored()) {
@@ -298,15 +299,15 @@ void SchematicPainter::paint(
                                pin.namePosition.rotated(pin.rotation)),
           symbol.transform.mapNonMirrorable(pin.rotation + pin.nameRotation),
           *pin.nameHeight, nameAlignment, pin.name, mDefaultFont,
-          settings.getColor(Theme::Color::sSchematicPinNames), true, false,
-          true);
+          settings.getColor(ColorRole::schematicPinNames().getId()), true,
+          false, true);
       const Angle numberRot = symbol.transform.mapNonMirrorable(pin.rotation);
       p.drawText(symbol.transform.map(
                      pin.position + pin.numbersPosition.rotated(pin.rotation)),
                  numberRot, *SymbolPin::getNumbersHeight(),
                  pin.numbersAlignment, pin.numbers, mDefaultFont,
-                 settings.getColor(Theme::Color::sSchematicPinNumbers), true,
-                 false, false);
+                 settings.getColor(ColorRole::schematicPinNumbers().getId()),
+                 true, false, false);
     }
   }
 
@@ -316,59 +317,61 @@ void SchematicPainter::paint(
         image.getPosition(), image.getRotation(),
         settings.convertImageColors(mImageFiles.value(*image.getFileName())),
         image.getWidth(), image.getHeight(), image.getBorderWidth(),
-        settings.getColor(Theme::Color::sSchematicImageBorders));
+        settings.getColor(ColorRole::schematicImageBorders().getId()));
   }
 
   // Draw Polygons.
   foreach (const Polygon& polygon, mPolygons) {
-    const QString color = polygon.getLayer().getThemeColor();
+    const QString role = polygon.getLayer().getColorRole().getId();
     p.drawPolygon(
-        polygon.getPath(), *polygon.getLineWidth(), settings.getColor(color),
-        settings.getFillColor(color, polygon.isFilled(), polygon.isGrabArea()));
+        polygon.getPath(), *polygon.getLineWidth(), settings.getColor(role),
+        settings.getFillColor(role, polygon.isFilled(), polygon.isGrabArea()));
   }
 
   // Draw Texts.
   foreach (const Text& text, mTexts) {
-    const QString color = text.getLayer().getThemeColor();
+    const QString role = text.getLayer().getColorRole().getId();
     p.drawText(text.getPosition(), text.getRotation(), *text.getHeight(),
                text.getAlign(), text.getText(), mDefaultFont,
-               settings.getColor(color), true, false, false);
+               settings.getColor(role), true, false, false);
   }
 
   // Draw Net Lines.
   foreach (const Line& netline, mNetLines) {
     p.drawLine(netline.startPosition, netline.endPosition, *netline.width,
-               settings.getColor(Theme::Color::sSchematicWires));
+               settings.getColor(ColorRole::schematicWires().getId()));
   }
 
   // Draw Net Junctions.
   foreach (const Point& pos, mNetJunctions) {
-    p.drawNetJunction(pos, settings.getColor(Theme::Color::sSchematicWires));
+    p.drawNetJunction(pos,
+                      settings.getColor(ColorRole::schematicWires().getId()));
   }
 
   // Draw Net Labels.
   foreach (const Label& netlabel, mNetLabels) {
     p.drawNetLabel(netlabel.position, netlabel.rotation, netlabel.mirrored,
                    netlabel.text, mNetLabelFont,
-                   settings.getColor(Theme::Color::sSchematicNetLabels));
+                   settings.getColor(ColorRole::schematicNetLabels().getId()));
   }
 
   // Draw Bus Lines.
   foreach (const Line& netline, mBusLines) {
     p.drawLine(netline.startPosition, netline.endPosition, *netline.width,
-               settings.getColor(Theme::Color::sSchematicBuses));
+               settings.getColor(ColorRole::schematicBuses().getId()));
   }
 
   // Draw Bus Junctions.
   foreach (const Point& pos, mBusJunctions) {
-    p.drawNetJunction(pos, settings.getColor(Theme::Color::sSchematicBuses));
+    p.drawNetJunction(pos,
+                      settings.getColor(ColorRole::schematicBuses().getId()));
   }
 
   // Draw Bus Labels.
   foreach (const Label& netlabel, mBusLabels) {
     p.drawNetLabel(netlabel.position, netlabel.rotation, netlabel.mirrored,
                    netlabel.text, mNetLabelFont,
-                   settings.getColor(Theme::Color::sSchematicBusLabels));
+                   settings.getColor(ColorRole::schematicBusLabels().getId()));
   }
 }
 

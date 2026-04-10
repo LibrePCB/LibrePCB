@@ -543,6 +543,8 @@ add_library(
   utils/toolbox.h
   utils/transform.cpp
   utils/transform.h
+  workspace/colorrole.cpp
+  workspace/colorrole.h
   workspace/theme.cpp
   workspace/theme.h
   workspace/themecolor.cpp

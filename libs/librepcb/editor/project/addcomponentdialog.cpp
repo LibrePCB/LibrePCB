@@ -45,6 +45,7 @@
 #include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/library/sym/symbol.h>
 #include <librepcb/core/utils/scopeguard.h>
+#include <librepcb/core/workspace/colorrole.h>
 #include <librepcb/core/workspace/theme.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
 #include <librepcb/core/workspace/workspacesettings.h>
@@ -182,22 +183,22 @@ AddComponentDialog::AddComponentDialog(const WorkspaceLibraryDb& db,
   // Setup symbol graphics view.
   const Theme& theme = mSettings.themes.getActive();
   mComponentPreviewScene->setBackgroundColors(
-      theme.getColor(Theme::Color::sSchematicBackground).getPrimaryColor(),
-      theme.getColor(Theme::Color::sSchematicBackground).getSecondaryColor());
+      theme.getColor(ColorRole::schematicBackground()).getPrimaryColor(),
+      theme.getColor(ColorRole::schematicBackground()).getSecondaryColor());
   mComponentPreviewScene->setGridStyle(mSettings.schematicGridStyle.get());
   mComponentPreviewScene->setOriginCrossVisible(false);
   mUi->viewComponent->setSpinnerColor(
-      theme.getColor(Theme::Color::sSchematicBackground).getSecondaryColor());
+      theme.getColor(ColorRole::schematicBackground()).getSecondaryColor());
   mUi->viewComponent->setScene(mComponentPreviewScene.data());
 
   // Setup package graphics view.
   mDevicePreviewScene->setBackgroundColors(
-      theme.getColor(Theme::Color::sBoardBackground).getPrimaryColor(),
-      theme.getColor(Theme::Color::sBoardBackground).getSecondaryColor());
+      theme.getColor(ColorRole::boardBackground()).getPrimaryColor(),
+      theme.getColor(ColorRole::boardBackground()).getSecondaryColor());
   mDevicePreviewScene->setGridStyle(mSettings.boardGridStyle.get());
   mDevicePreviewScene->setOriginCrossVisible(false);
   mUi->viewDevice->setSpinnerColor(
-      theme.getColor(Theme::Color::sBoardBackground).getSecondaryColor());
+      theme.getColor(ColorRole::boardBackground()).getSecondaryColor());
   mUi->viewDevice->setScene(mDevicePreviewScene.data());
 
   mUi->treeCategories->setModel(mCategoryTreeModel.data());

@@ -24,6 +24,7 @@
 
 #include "../exceptions.h"
 #include "../types/layer.h"
+#include "colorrole.h"
 
 #include <QtCore>
 
@@ -42,75 +43,75 @@ Theme::Theme(const Uuid& uuid, const QString& name) noexcept
   const char* sch = QT_TR_NOOP("Schematic");
   const char* brd = QT_TR_NOOP("Board");
   const char* view3d = QT_TR_NOOP("3D View");
-  addColor(Color::sSchematicBackground,        sch, QT_TR_NOOP("Background/Grid"),      Qt::white,                  Qt::gray);
-  addColor(Color::sSchematicOverlays,          sch, QT_TR_NOOP("Overlays"),             QColor(255, 255, 255, 120), Qt::black);
-  addColor(Color::sSchematicInfoBox,           sch, QT_TR_NOOP("Info Box"),             QColor(255, 255, 255, 130), Qt::black);
-  addColor(Color::sSchematicSelection,         sch, QT_TR_NOOP("Selection"),            QColor(120, 170, 255, 255), QColor(150, 200, 255, 80));
-  addColor(Color::sSchematicReferences,        sch, QT_TR_NOOP("References"),           QColor(0, 0, 0, 50),        QColor(0, 0, 0, 80));
-  addColor(Color::sSchematicFrames,            sch, QT_TR_NOOP("Frames"),               Qt::black,                  Qt::darkGray);
-  addColor(Color::sSchematicWires,             sch, QT_TR_NOOP("Wires"),                Qt::darkGreen,              Qt::green);
-  addColor(Color::sSchematicNetLabels,         sch, QT_TR_NOOP("Net Labels"),           Qt::darkGreen,              Qt::green);
-  addColor(Color::sSchematicBuses,             sch, QT_TR_NOOP("Buses"),                QColor(0, 142, 255, 255),   QColor(114, 192, 255, 255));
-  addColor(Color::sSchematicBusLabels,         sch, QT_TR_NOOP("Bus Labels"),           QColor(0, 142, 255, 255),   QColor(114, 192, 255, 255));
-  addColor(Color::sSchematicImageBorders,      sch, QT_TR_NOOP("Image Borders"),        Qt::darkGray,               Qt::gray);
-  addColor(Color::sSchematicDocumentation,     sch, QT_TR_NOOP("Documentation"),        Qt::darkGray,               Qt::gray);
-  addColor(Color::sSchematicComments,          sch, QT_TR_NOOP("Comments"),             Qt::darkBlue,               Qt::blue);
-  addColor(Color::sSchematicGuide,             sch, QT_TR_NOOP("Guide"),                Qt::darkYellow,             Qt::yellow);
-  addColor(Color::sSchematicOutlines,          sch, QT_TR_NOOP("Outlines"),             Qt::darkRed,                Qt::red);
-  addColor(Color::sSchematicGrabAreas,         sch, QT_TR_NOOP("Grab Areas"),           QColor(255, 255, 225, 255), QColor(255, 255, 205, 255));
-  addColor(Color::sSchematicHiddenGrabAreas,   sch, QT_TR_NOOP("Hidden Grab Areas"),    QColor(0, 0, 255, 30),      QColor(0, 0, 255, 50));
-  addColor(Color::sSchematicNames,             sch, QT_TR_NOOP("Names"),                QColor(32, 32, 32, 255),    Qt::darkGray);
-  addColor(Color::sSchematicValues,            sch, QT_TR_NOOP("Values"),               QColor(80, 80, 80, 255),    Qt::gray);
-  addColor(Color::sSchematicOptionalPins,      sch, QT_TR_NOOP("Optional Pins"),        QColor(0, 255, 0, 255),     QColor(0, 255, 0, 127));
-  addColor(Color::sSchematicRequiredPins,      sch, QT_TR_NOOP("Required Pins"),        QColor(255, 0, 0, 255),     QColor(255, 0, 0, 127));
-  addColor(Color::sSchematicPinLines,          sch, QT_TR_NOOP("Pin Lines"),            Qt::darkRed,                Qt::red);
-  addColor(Color::sSchematicPinNames,          sch, QT_TR_NOOP("Pin Names"),            QColor(64, 64, 64, 255),    Qt::gray);
-  addColor(Color::sSchematicPinNumbers,        sch, QT_TR_NOOP("Pin Numbers"),          QColor(64, 64, 64, 255),    Qt::gray);
-  addColor(Color::sBoardBackground,            brd, QT_TR_NOOP("Background/Grid"),          Qt::black,                  Qt::gray);
-  addColor(Color::sBoardOverlays,              brd, QT_TR_NOOP("Overlays"),                 QColor(0, 0, 0, 120),       Qt::yellow);
-  addColor(Color::sBoardInfoBox,               brd, QT_TR_NOOP("Info Box"),                 QColor(0, 0, 0, 130),       Qt::yellow);
-  addColor(Color::sBoardDrcMarker,             brd, QT_TR_NOOP("DRC Marker"),               Qt::transparent,            QColor(255, 127, 0, 255));
-  addColor(Color::sBoardSelection,             brd, QT_TR_NOOP("Selection"),                QColor(120, 170, 255, 255), QColor(150, 200, 255, 80));
-  addColor(Color::sBoardFrames,                brd, QT_TR_NOOP("Frames"),                   QColor("#96E0E0E0"),        QColor("#FFFFFFFF"));
-  addColor(Color::sBoardOutlines,              brd, QT_TR_NOOP("Outlines"),                 QColor("#C8FFFFFF"),        QColor("#FFFFFFFF"));
-  addColor(Color::sBoardPlatedCutouts,         brd, QT_TR_NOOP("Plated Cutouts"),           QColor("#C800DDFF"),        QColor("#FF00FFFF"));
-  addColor(Color::sBoardHoles,                 brd, QT_TR_NOOP("Holes"),                    QColor("#C8FFFFFF"),        QColor("#FFFFFFFF"));
-  addColor(Color::sBoardPads,                  brd, QT_TR_NOOP("Pads"),                     QColor("#966DB515"),        QColor("#B44EFC14"));
-  addColor(Color::sBoardVias,                  brd, QT_TR_NOOP("Vias"),                     QColor("#966DB515"),        QColor("#B44EFC14"));
-  addColor(Color::sBoardZones,                 brd, QT_TR_NOOP("Zones"),                    QColor("#80494949"),        QColor("#A0666666"));
-  addColor(Color::sBoardAirWires,              brd, QT_TR_NOOP("Air Wires"),                Qt::yellow,                 Qt::yellow        );
-  addColor(Color::sBoardMeasures,              brd, QT_TR_NOOP("Measures"),                 QColor("#FF808000"),        QColor("#FFA3B200"));
-  addColor(Color::sBoardAlignment,             brd, QT_TR_NOOP("Alignment"),                QColor("#B4E59500"),        QColor("#DCFFBF00"));
-  addColor(Color::sBoardDocumentation,         brd, QT_TR_NOOP("Documentation"),            QColor("#76FBC697"),        QColor("#B6FBC697"));
-  addColor(Color::sBoardComments,              brd, QT_TR_NOOP("Comments"),                 QColor("#B4E59500"),        QColor("#DCFFBF00"));
-  addColor(Color::sBoardGuide,                 brd, QT_TR_NOOP("Guide"),                    QColor("#FF808000"),        QColor("#FFA3B200"));
-  addColor(Color::sBoardNamesTop,              brd, QT_TR_NOOP("Names Top"),                QColor("#96EDFFD8"),        QColor("#DCE0E0E0")  );
-  addColor(Color::sBoardNamesBot,              brd, QT_TR_NOOP("Names Bottom"),             QColor("#96EDFFD8"),        QColor("#DCE0E0E0")  );
-  addColor(Color::sBoardValuesTop,             brd, QT_TR_NOOP("Values Top"),               QColor("#96D8F2FF"),        QColor("#DCE0E0E0")  );
-  addColor(Color::sBoardValuesBot,             brd, QT_TR_NOOP("Values Bottom"),            QColor("#96D8F2FF"),        QColor("#DCE0E0E0")  );
-  addColor(Color::sBoardLegendTop,             brd, QT_TR_NOOP("Legend Top"),               QColor("#BBFFFFFF"),        QColor("#FFFFFFFF")  );
-  addColor(Color::sBoardLegendBot,             brd, QT_TR_NOOP("Legend Bottom"),            QColor("#BBFFFFFF"),        QColor("#FFFFFFFF")  );
-  addColor(Color::sBoardDocumentationTop,      brd, QT_TR_NOOP("Documentation Top"),        QColor("#76FBC697"),        QColor("#B6FBC697")  );
-  addColor(Color::sBoardDocumentationBot,      brd, QT_TR_NOOP("Documentation Bottom"),     QColor("#76FBC697"),        QColor("#B6FBC697")  );
-  addColor(Color::sBoardPackageOutlinesTop,    brd, QT_TR_NOOP("Package Outlines Top"),     QColor("#C000FFFF"),        QColor("#FF00FFFF")  );
-  addColor(Color::sBoardPackageOutlinesBot,    brd, QT_TR_NOOP("Package Outlines Bottom"),  QColor("#C000FFFF"),        QColor("#FF00FFFF")  );
-  addColor(Color::sBoardCourtyardTop,          brd, QT_TR_NOOP("Courtyard Top"),            QColor("#C0FF00FF"),        QColor("#FFFF00FF")  );
-  addColor(Color::sBoardCourtyardBot,          brd, QT_TR_NOOP("Courtyard Bottom"),         QColor("#C0FF00FF"),        QColor("#FFFF00FF")  );
-  addColor(Color::sBoardGrabAreasTop,          brd, QT_TR_NOOP("Grab Areas Top"),           QColor("#14FFFFFF"),        QColor("#32FFFFFF")  );
-  addColor(Color::sBoardGrabAreasBot,          brd, QT_TR_NOOP("Grab Areas Bottom"),        QColor("#14FFFFFF"),        QColor("#32FFFFFF")  );
-  addColor(Color::sBoardHiddenGrabAreasTop,    brd, QT_TR_NOOP("Hidden Grab Areas Top"),    QColor("#28FFFFFF"),        QColor("#46FFFFFF")  );
-  addColor(Color::sBoardHiddenGrabAreasBot,    brd, QT_TR_NOOP("Hidden Grab Areas Bottom"), QColor("#28FFFFFF"),        QColor("#46FFFFFF")  );
-  addColor(Color::sBoardReferencesTop,         brd, QT_TR_NOOP("References Top"),           QColor("#64FFFFFF"),        QColor("#B4FFFFFF")  );
-  addColor(Color::sBoardReferencesBot,         brd, QT_TR_NOOP("References Bottom"),        QColor("#64FFFFFF"),        QColor("#B4FFFFFF")  );
-  addColor(Color::sBoardStopMaskTop,           brd, QT_TR_NOOP("Stop Mask Top"   ),         QColor("#30FFFFFF"),        QColor("#60FFFFFF")  );
-  addColor(Color::sBoardStopMaskBot,           brd, QT_TR_NOOP("Stop Mask Bottom"),         QColor("#30FFFFFF"),        QColor("#60FFFFFF")  );
-  addColor(Color::sBoardSolderPasteTop,        brd, QT_TR_NOOP("Solder Paste Top"),         QColor("#20E0E0E0"),        QColor("#40E0E0E0")  );
-  addColor(Color::sBoardSolderPasteBot,        brd, QT_TR_NOOP("Solder Paste Bottom"),      QColor("#20E0E0E0"),        QColor("#40E0E0E0")  );
-  addColor(Color::sBoardFinishTop,             brd, QT_TR_NOOP("Finish Top"),               QColor(255, 0, 0, 130),     QColor(255, 0, 0, 130));
-  addColor(Color::sBoardFinishBot,             brd, QT_TR_NOOP("Finish Bottom"),            QColor(255, 0, 0, 130),     QColor(255, 0, 0, 130));
-  addColor(Color::sBoardGlueTop,               brd, QT_TR_NOOP("Glue Top"),                 QColor("#64E0E0E0"),        QColor("#78E0E0E0")  );
-  addColor(Color::sBoardGlueBot,               brd, QT_TR_NOOP("Glue Bottom"),              QColor("#64E0E0E0"),        QColor("#78E0E0E0")  );
-  addColor(Color::sBoardCopperTop,             brd, QT_TR_NOOP("Copper Top"),               QColor("#96CC0802"),        QColor("#C0FF0800"));
+  addColor(ColorRole::schematicBackground(),        sch, Qt::white,                  Qt::gray);
+  addColor(ColorRole::schematicOverlays(),          sch, QColor(255, 255, 255, 120), Qt::black);
+  addColor(ColorRole::schematicInfoBox(),           sch, QColor(255, 255, 255, 130), Qt::black);
+  addColor(ColorRole::schematicSelection(),         sch, QColor(120, 170, 255, 255), QColor(150, 200, 255, 80));
+  addColor(ColorRole::schematicReferences(),        sch, QColor(0, 0, 0, 50),        QColor(0, 0, 0, 80));
+  addColor(ColorRole::schematicFrames(),            sch, Qt::black,                  Qt::darkGray);
+  addColor(ColorRole::schematicWires(),             sch, Qt::darkGreen,              Qt::green);
+  addColor(ColorRole::schematicNetLabels(),         sch, Qt::darkGreen,              Qt::green);
+  addColor(ColorRole::schematicBuses(),             sch, QColor(0, 142, 255, 255),   QColor(114, 192, 255, 255));
+  addColor(ColorRole::schematicBusLabels(),         sch, QColor(0, 142, 255, 255),   QColor(114, 192, 255, 255));
+  addColor(ColorRole::schematicImageBorders(),      sch, Qt::darkGray,               Qt::gray);
+  addColor(ColorRole::schematicDocumentation(),     sch, Qt::darkGray,               Qt::gray);
+  addColor(ColorRole::schematicComments(),          sch, Qt::darkBlue,               Qt::blue);
+  addColor(ColorRole::schematicGuide(),             sch, Qt::darkYellow,             Qt::yellow);
+  addColor(ColorRole::schematicOutlines(),          sch, Qt::darkRed,                Qt::red);
+  addColor(ColorRole::schematicGrabAreas(),         sch, QColor(255, 255, 225, 255), QColor(255, 255, 205, 255));
+  addColor(ColorRole::schematicHiddenGrabAreas(),   sch, QColor(0, 0, 255, 30),      QColor(0, 0, 255, 50));
+  addColor(ColorRole::schematicNames(),             sch, QColor(32, 32, 32, 255),    Qt::darkGray);
+  addColor(ColorRole::schematicValues(),            sch, QColor(80, 80, 80, 255),    Qt::gray);
+  addColor(ColorRole::schematicOptionalPins(),      sch, QColor(0, 255, 0, 255),     QColor(0, 255, 0, 127));
+  addColor(ColorRole::schematicRequiredPins(),      sch, QColor(255, 0, 0, 255),     QColor(255, 0, 0, 127));
+  addColor(ColorRole::schematicPinLines(),          sch, Qt::darkRed,                Qt::red);
+  addColor(ColorRole::schematicPinNames(),          sch, QColor(64, 64, 64, 255),    Qt::gray);
+  addColor(ColorRole::schematicPinNumbers(),        sch, QColor(64, 64, 64, 255),    Qt::gray);
+  addColor(ColorRole::boardBackground(),            brd, Qt::black,                  Qt::gray);
+  addColor(ColorRole::boardOverlays(),              brd, QColor(0, 0, 0, 120),       Qt::yellow);
+  addColor(ColorRole::boardInfoBox(),               brd, QColor(0, 0, 0, 130),       Qt::yellow);
+  addColor(ColorRole::boardDrcMarker(),             brd, Qt::transparent,            QColor(255, 127, 0, 255));
+  addColor(ColorRole::boardSelection(),             brd, QColor(120, 170, 255, 255), QColor(150, 200, 255, 80));
+  addColor(ColorRole::boardFrames(),                brd, QColor("#96E0E0E0"),        QColor("#FFFFFFFF"));
+  addColor(ColorRole::boardOutlines(),              brd, QColor("#C8FFFFFF"),        QColor("#FFFFFFFF"));
+  addColor(ColorRole::boardPlatedCutouts(),         brd, QColor("#C800DDFF"),        QColor("#FF00FFFF"));
+  addColor(ColorRole::boardHoles(),                 brd, QColor("#C8FFFFFF"),        QColor("#FFFFFFFF"));
+  addColor(ColorRole::boardPads(),                  brd, QColor("#966DB515"),        QColor("#B44EFC14"));
+  addColor(ColorRole::boardVias(),                  brd, QColor("#966DB515"),        QColor("#B44EFC14"));
+  addColor(ColorRole::boardZones(),                 brd, QColor("#80494949"),        QColor("#A0666666"));
+  addColor(ColorRole::boardAirWires(),              brd, Qt::yellow,                 Qt::yellow        );
+  addColor(ColorRole::boardMeasures(),              brd, QColor("#FF808000"),        QColor("#FFA3B200"));
+  addColor(ColorRole::boardAlignment(),             brd, QColor("#B4E59500"),        QColor("#DCFFBF00"));
+  addColor(ColorRole::boardDocumentation(),         brd, QColor("#76FBC697"),        QColor("#B6FBC697"));
+  addColor(ColorRole::boardComments(),              brd, QColor("#B4E59500"),        QColor("#DCFFBF00"));
+  addColor(ColorRole::boardGuide(),                 brd, QColor("#FF808000"),        QColor("#FFA3B200"));
+  addColor(ColorRole::boardNamesTop(),              brd, QColor("#96EDFFD8"),        QColor("#DCE0E0E0")  );
+  addColor(ColorRole::boardNamesBot(),              brd, QColor("#96EDFFD8"),        QColor("#DCE0E0E0")  );
+  addColor(ColorRole::boardValuesTop(),             brd, QColor("#96D8F2FF"),        QColor("#DCE0E0E0")  );
+  addColor(ColorRole::boardValuesBot(),             brd, QColor("#96D8F2FF"),        QColor("#DCE0E0E0")  );
+  addColor(ColorRole::boardLegendTop(),             brd, QColor("#BBFFFFFF"),        QColor("#FFFFFFFF")  );
+  addColor(ColorRole::boardLegendBot(),             brd, QColor("#BBFFFFFF"),        QColor("#FFFFFFFF")  );
+  addColor(ColorRole::boardDocumentationTop(),      brd, QColor("#76FBC697"),        QColor("#B6FBC697")  );
+  addColor(ColorRole::boardDocumentationBot(),      brd, QColor("#76FBC697"),        QColor("#B6FBC697")  );
+  addColor(ColorRole::boardPackageOutlinesTop(),    brd, QColor("#C000FFFF"),        QColor("#FF00FFFF")  );
+  addColor(ColorRole::boardPackageOutlinesBot(),    brd, QColor("#C000FFFF"),        QColor("#FF00FFFF")  );
+  addColor(ColorRole::boardCourtyardTop(),          brd, QColor("#C0FF00FF"),        QColor("#FFFF00FF")  );
+  addColor(ColorRole::boardCourtyardBot(),          brd, QColor("#C0FF00FF"),        QColor("#FFFF00FF")  );
+  addColor(ColorRole::boardGrabAreasTop(),          brd, QColor("#14FFFFFF"),        QColor("#32FFFFFF")  );
+  addColor(ColorRole::boardGrabAreasBot(),          brd, QColor("#14FFFFFF"),        QColor("#32FFFFFF")  );
+  addColor(ColorRole::boardHiddenGrabAreasTop(),    brd, QColor("#28FFFFFF"),        QColor("#46FFFFFF")  );
+  addColor(ColorRole::boardHiddenGrabAreasBot(),    brd, QColor("#28FFFFFF"),        QColor("#46FFFFFF")  );
+  addColor(ColorRole::boardReferencesTop(),         brd, QColor("#64FFFFFF"),        QColor("#B4FFFFFF")  );
+  addColor(ColorRole::boardReferencesBot(),         brd, QColor("#64FFFFFF"),        QColor("#B4FFFFFF")  );
+  addColor(ColorRole::boardStopMaskTop(),           brd, QColor("#30FFFFFF"),        QColor("#60FFFFFF")  );
+  addColor(ColorRole::boardStopMaskBot(),           brd, QColor("#30FFFFFF"),        QColor("#60FFFFFF")  );
+  addColor(ColorRole::boardSolderPasteTop(),        brd, QColor("#20E0E0E0"),        QColor("#40E0E0E0")  );
+  addColor(ColorRole::boardSolderPasteBot(),        brd, QColor("#20E0E0E0"),        QColor("#40E0E0E0")  );
+  addColor(ColorRole::boardFinishTop(),             brd, QColor(255, 0, 0, 130),     QColor(255, 0, 0, 130));
+  addColor(ColorRole::boardFinishBot(),             brd, QColor(255, 0, 0, 130),     QColor(255, 0, 0, 130));
+  addColor(ColorRole::boardGlueTop(),               brd, QColor("#64E0E0E0"),        QColor("#78E0E0E0")  );
+  addColor(ColorRole::boardGlueBot(),               brd, QColor("#64E0E0E0"),        QColor("#78E0E0E0")  );
+  addColor(ColorRole::boardCopperTop(),             brd, QColor("#96CC0802"),        QColor("#C0FF0800"));
   // clang-format on
   for (int i = 1; i <= Layer::innerCopperCount(); ++i) {
     QColor primary;
@@ -145,16 +146,16 @@ Theme::Theme(const Uuid& uuid, const QString& name) noexcept
         primary = QColor("#FFFF00FF");
         secondary = QColor("#FFFF00FF");
     }
-    addColor(QString(Color::sBoardCopperInner).arg(i), brd,
-             QT_TR_NOOP("Copper Inner"), primary, secondary,
-             QString(" %1").arg(i));
+    if (const ColorRole* role = ColorRole::boardCopperInner(i)) {
+      addColor(*role, brd, primary, secondary);
+    }
   }
-  addColor(Color::sBoardCopperBot, brd, QT_TR_NOOP("Copper Bottom"),
-           QColor("#964578CC"), QColor("#C00A66FC"));
+  addColor(ColorRole::boardCopperBot(), brd, QColor("#964578CC"),
+           QColor("#C00A66FC"));
   // Use a background color which ensures good contrast to both black and white
   // STEP models. The secondary color is used e.g. for overlay buttons.
-  addColor(Color::s3dBackground, view3d, QT_TR_NOOP("Background/Foreground"),
-           QColor(230, 242, 255), Qt::black);
+  addColor(ColorRole::board3dBackground(), view3d, QColor(230, 242, 255),
+           Qt::black);
 }
 
 Theme::Theme(const Uuid& uuid, const QString& name,
@@ -178,15 +179,20 @@ Theme::~Theme() noexcept {
  *  Getters
  ******************************************************************************/
 
-const ThemeColor& Theme::getColor(const QString& identifier) const noexcept {
+const ThemeColor& Theme::getColor(const ColorRole& role) const noexcept {
+  return getColor(role.getId());
+}
+
+const ThemeColor& Theme::getColor(const QString& role) const noexcept {
   foreach (const ThemeColor& color, mColors) {
-    if (color.getIdentifier() == identifier) {
+    if (color.getRole().getId() == role) {
       return color;
     }
   }
 
-  qCritical() << "Requested unknown theme color:" << identifier;
-  static ThemeColor fallback("", "", "", "", QColor(), QColor());
+  qCritical() << "Requested unknown theme color:" << role;
+  static ThemeColor fallback(ColorRole::boardBackground(), "", QColor(),
+                             QColor());
   return fallback;
 }
 
@@ -213,7 +219,7 @@ void Theme::setColors(const QList<ThemeColor>& colors) noexcept {
     foreach (const ThemeColor& color, colors) {
       if (color.isEdited()) {
         std::unique_ptr<const SExpression> sexpr = color.serialize();
-        childs[color.getIdentifier()] = *sexpr;
+        childs[color.getRole().getId()] = *sexpr;
       }
     }
 
@@ -244,7 +250,7 @@ void Theme::load(const SExpression& root) {
   if (const SExpression* child = root.tryGetChild("colors")) {
     for (ThemeColor& color : mColors) {
       if (const SExpression* colorNode =
-              child->tryGetChild(color.getIdentifier())) {
+              child->tryGetChild(color.getRole().getId())) {
         color.load(*colorNode);
       }
     }
@@ -282,42 +288,12 @@ Theme& Theme::operator=(const Theme& rhs) noexcept {
 }
 
 /*******************************************************************************
- *  Static Methods
- ******************************************************************************/
-
-const QSet<QString>& Theme::getCopperColorNames() noexcept {
-  static QSet<QString> names;
-  if (names.isEmpty()) {
-    names.insert(Color::sBoardCopperTop);
-    names.insert(Color::sBoardCopperBot);
-    for (int i = 1; i <= Layer::innerCopperCount(); ++i) {
-      names.insert(QString(Color::sBoardCopperInner).arg(i));
-    }
-  }
-  return names;
-}
-
-QString Theme::getGrabAreaColorName(const QString& outlineColorName) noexcept {
-  if (outlineColorName == Color::sBoardLegendTop) {
-    return Color::sBoardGrabAreasTop;
-  } else if (outlineColorName == Color::sBoardLegendBot) {
-    return Color::sBoardGrabAreasBot;
-  } else if (outlineColorName == Color::sSchematicOutlines) {
-    return Color::sSchematicGrabAreas;
-  } else {
-    return QString();
-  }
-}
-
-/*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 
-void Theme::addColor(const QString& id, const char* category, const char* name,
-                     const QColor& primary, const QColor& secondary,
-                     const QString& nameSuffix) noexcept {
-  mColors.append(
-      ThemeColor(id, category, name, nameSuffix, primary, secondary));
+void Theme::addColor(const ColorRole& role, const char* category,
+                     const QColor& primary, const QColor& secondary) noexcept {
+  mColors.append(ThemeColor(role, category, primary, secondary));
 }
 
 SExpression& Theme::addNode(const QString& name) noexcept {

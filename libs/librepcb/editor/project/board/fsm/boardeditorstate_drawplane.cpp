@@ -184,7 +184,7 @@ void BoardEditorState_DrawPlane::setLayer(const Layer& layer) noexcept {
 
   if (mCurrentPlaneEditCmd) {
     mCurrentPlaneEditCmd->setLayer(*mCurrentLayer, true);
-    makeLayerVisible(mCurrentLayer->getThemeColor());
+    makeLayerVisible(mCurrentLayer->getColorRole());
   }
 }
 
@@ -238,7 +238,7 @@ bool BoardEditorState_DrawPlane::startAddPlane(
     // Start undo command
     mCurrentPlaneEditCmd.reset(new CmdBoardPlaneEdit(*mCurrentPlane));
     mLastVertexPos = path.getVertices().last().getPos();
-    makeLayerVisible(mCurrentLayer->getThemeColor());
+    makeLayerVisible(mCurrentLayer->getColorRole());
     updatePlaneSettings();
 
     // Finish command, if auto-add.

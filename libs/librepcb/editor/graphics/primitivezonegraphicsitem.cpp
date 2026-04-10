@@ -27,7 +27,7 @@
 
 #include <librepcb/core/geometry/path.h>
 #include <librepcb/core/utils/toolbox.h>
-#include <librepcb/core/workspace/theme.h>
+#include <librepcb/core/workspace/colorrole.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -48,7 +48,7 @@ PrimitiveZoneGraphicsItem::PrimitiveZoneGraphicsItem(
     mLayers(layers),
     mOutline(),
     mEditable(false),
-    mLayer(layers.get(Theme::Color::sBoardZones)),
+    mLayer(layers.get(ColorRole::boardZones())),
     mState(GraphicsLayer::State::Enabled),
     mBoundingRectMarginPx(0),
     mVertexHandleRadiusPx(0),

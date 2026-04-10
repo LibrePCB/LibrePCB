@@ -57,6 +57,7 @@
 #include <librepcb/core/library/libraryelementcheckmessages.h>
 #include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/library/sym/symbol.h>
+#include <librepcb/core/workspace/colorrole.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
 #include <librepcb/core/workspace/workspacesettings.h>
@@ -125,27 +126,27 @@ DeviceTab::DeviceTab(LibraryEditor& editor, std::unique_ptr<Device> dev,
   const Theme& theme = mApp.getWorkspace().getSettings().themes.getActive();
   mComponentScene->setOriginCrossVisible(false);  // It's rather disruptive.
   mComponentScene->setBackgroundColors(
-      theme.getColor(Theme::Color::sSchematicBackground).getPrimaryColor(),
-      theme.getColor(Theme::Color::sSchematicBackground).getSecondaryColor());
+      theme.getColor(ColorRole::schematicBackground()).getPrimaryColor(),
+      theme.getColor(ColorRole::schematicBackground()).getSecondaryColor());
   mComponentScene->setOverlayColors(
-      theme.getColor(Theme::Color::sSchematicOverlays).getPrimaryColor(),
-      theme.getColor(Theme::Color::sSchematicOverlays).getSecondaryColor());
+      theme.getColor(ColorRole::schematicOverlays()).getPrimaryColor(),
+      theme.getColor(ColorRole::schematicOverlays()).getSecondaryColor());
   mComponentScene->setSelectionRectColors(
-      theme.getColor(Theme::Color::sSchematicSelection).getPrimaryColor(),
-      theme.getColor(Theme::Color::sSchematicSelection).getSecondaryColor());
+      theme.getColor(ColorRole::schematicSelection()).getPrimaryColor(),
+      theme.getColor(ColorRole::schematicSelection()).getSecondaryColor());
   mComponentScene->setGridStyle(GridStyle::Lines);
 
   // Setup package scene.
   mPackageScene->setOriginCrossVisible(false);  // It's rather disruptive.
   mPackageScene->setBackgroundColors(
-      theme.getColor(Theme::Color::sBoardBackground).getPrimaryColor(),
-      theme.getColor(Theme::Color::sBoardBackground).getSecondaryColor());
+      theme.getColor(ColorRole::boardBackground()).getPrimaryColor(),
+      theme.getColor(ColorRole::boardBackground()).getSecondaryColor());
   mPackageScene->setOverlayColors(
-      theme.getColor(Theme::Color::sBoardOverlays).getPrimaryColor(),
-      theme.getColor(Theme::Color::sBoardOverlays).getSecondaryColor());
+      theme.getColor(ColorRole::boardOverlays()).getPrimaryColor(),
+      theme.getColor(ColorRole::boardOverlays()).getSecondaryColor());
   mPackageScene->setSelectionRectColors(
-      theme.getColor(Theme::Color::sBoardSelection).getPrimaryColor(),
-      theme.getColor(Theme::Color::sBoardSelection).getSecondaryColor());
+      theme.getColor(ColorRole::boardSelection()).getPrimaryColor(),
+      theme.getColor(ColorRole::boardSelection()).getSecondaryColor());
   mPackageScene->setGridStyle(GridStyle::Lines);
 
   // Setup default manufacturer.

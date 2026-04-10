@@ -28,7 +28,7 @@
 
 #include <librepcb/core/project/circuit/bus.h>
 #include <librepcb/core/project/schematic/items/si_bussegment.h>
-#include <librepcb/core/workspace/theme.h>
+#include <librepcb/core/workspace/colorrole.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -51,7 +51,7 @@ SGI_BusJunction::SGI_BusJunction(
   : QGraphicsItem(),
     mBusJunction(netpoint),
     mContext(context),
-    mLayer(layers.get(Theme::Color::sSchematicBuses)),
+    mLayer(layers.get(ColorRole::schematicBuses())),
     mOnEditedSlot(*this, &SGI_BusJunction::busJunctionEdited) {
   setFlag(QGraphicsItem::ItemIsSelectable, true);
 

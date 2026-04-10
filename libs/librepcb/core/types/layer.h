@@ -30,6 +30,8 @@
  ******************************************************************************/
 namespace librepcb {
 
+class ColorRole;
+
 /*******************************************************************************
  *  Class Layer
  ******************************************************************************/
@@ -83,13 +85,13 @@ public:
   const QString& getNameTr() const noexcept { return mNameTr; }
 
   /**
-   * @brief Get the name of the corresponding theme color
+   * @brief Get the graphics layer color role
    *
-   * @return The name of the corresponding theme color
+   * @return One of ::librepcb::ColorRole.
    *
-   * @see ::librepcb::Theme::Color
+   * @see ::librepcb::ColorRole
    */
-  const QString& getThemeColor() const noexcept { return mThemeColor; }
+  const ColorRole& getColorRole() const noexcept { return mColorRole; }
 
   /**
    * @brief Check if this is a schematic layer
@@ -295,13 +297,13 @@ public:
   static QVector<const Layer*> sorted(const QSet<const Layer*>& set) noexcept;
 
 private:  // Methods
-  Layer(const QString& id, const QString& nameTr, const QString& themeColor,
+  Layer(const QString& id, const QString& nameTr, const ColorRole& colorRole,
         Flags flags) noexcept;
 
 private:  // Data
   const QString mId;
   const QString mNameTr;
-  const QString mThemeColor;
+  const ColorRole& mColorRole;
   const Flags mFlags;
 };
 

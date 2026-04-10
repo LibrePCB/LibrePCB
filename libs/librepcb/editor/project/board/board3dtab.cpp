@@ -35,6 +35,7 @@
 #include <librepcb/core/project/board/boardplanefragmentsbuilder.h>
 #include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/project.h>
+#include <librepcb/core/workspace/colorrole.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacesettings.h>
 
@@ -135,9 +136,9 @@ ui::TabData Board3dTab::getUiData() const noexcept {
 ui::Board3dTabData Board3dTab::getDerivedUiData() const noexcept {
   const Theme& theme = mApp.getWorkspace().getSettings().themes.getActive();
   const QColor bgColor =
-      theme.getColor(Theme::Color::s3dBackground).getPrimaryColor();
+      theme.getColor(ColorRole::board3dBackground()).getPrimaryColor();
   const QColor fgColor =
-      theme.getColor(Theme::Color::s3dBackground).getSecondaryColor();
+      theme.getColor(ColorRole::board3dBackground()).getSecondaryColor();
 
   const bool refreshing = mBoardEditor.isRebuildingPlanes() ||
       (mSceneBuilder && mSceneBuilder->isBusy());
@@ -324,7 +325,7 @@ void Board3dTab::applyTheme() noexcept {
 
   if (mView) {
     mView->setBackgroundColor(
-        theme.getColor(Theme::Color::s3dBackground).getPrimaryColor());
+        theme.getColor(ColorRole::board3dBackground()).getPrimaryColor());
   }
 
   onDerivedUiDataChanged.notify();

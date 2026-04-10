@@ -75,7 +75,7 @@ BoardEditorState_AddStrokeText::~BoardEditorState_AddStrokeText() noexcept {
 bool BoardEditorState_AddStrokeText::entry() noexcept {
   Q_ASSERT(mIsUndoCmdActive == false);
 
-  makeLayerVisible(mCurrentProperties.getLayer().getThemeColor());
+  makeLayerVisible(mCurrentProperties.getLayer().getColorRole());
 
   // Add a new stroke text
   const Point pos = mAdapter.fsmMapGlobalPosToScenePos(QCursor::pos())
@@ -162,7 +162,7 @@ void BoardEditorState_AddStrokeText::setLayer(const Layer& layer) noexcept {
 
   if (mCurrentTextEditCmd) {
     mCurrentTextEditCmd->setLayer(mCurrentProperties.getLayer(), true);
-    makeLayerVisible(layer.getThemeColor());
+    makeLayerVisible(layer.getColorRole());
   }
 }
 

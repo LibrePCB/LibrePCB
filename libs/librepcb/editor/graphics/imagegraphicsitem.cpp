@@ -26,7 +26,7 @@
 #include "origincrossgraphicsitem.h"
 
 #include <librepcb/core/fileio/transactionaldirectory.h>
-#include <librepcb/core/workspace/theme.h>
+#include <librepcb/core/workspace/colorrole.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -49,7 +49,7 @@ ImageGraphicsItem::ImageGraphicsItem(const TransactionalDirectory& dir,
     mDir(dir),
     mImage(text),
     mEditable(false),
-    mBordersLayer(layers.get(Theme::Color::sSchematicImageBorders)),
+    mBordersLayer(layers.get(ColorRole::schematicImageBorders())),
     mOriginCrossGraphicsItem(new OriginCrossGraphicsItem(this)),
     mVertexHandleRadiusPx(0),
     mInvalidImage(false),
@@ -60,7 +60,7 @@ ImageGraphicsItem::ImageGraphicsItem(const TransactionalDirectory& dir,
 
   mOriginCrossGraphicsItem->setSize(UnsignedLength(1000000));
   mOriginCrossGraphicsItem->setLayer(
-      layers.get(Theme::Color::sSchematicReferences));
+      layers.get(ColorRole::schematicReferences()));
 
   // It's hard to decide what Z-value images should have. At the moment I think
   // images should be on top of filled polygons/circles (z=0), but below

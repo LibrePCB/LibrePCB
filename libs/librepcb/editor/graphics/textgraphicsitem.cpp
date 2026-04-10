@@ -27,7 +27,7 @@
 #include "origincrossgraphicsitem.h"
 #include "primitivetextgraphicsitem.h"
 
-#include <librepcb/core/workspace/theme.h>
+#include <librepcb/core/workspace/colorrole.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -66,7 +66,7 @@ TextGraphicsItem::TextGraphicsItem(Text& text, const GraphicsLayerList& layers,
 
   mOriginCrossGraphicsItem->setSize(UnsignedLength(1000000));
   mOriginCrossGraphicsItem->setLayer(
-      mLayers.get(Theme::Color::sSchematicReferences));
+      mLayers.get(ColorRole::schematicReferences()));
   mOriginCrossGraphicsItem->setRotation(mText.getRotation());
 
   // register to the text to get attribute updates
@@ -82,7 +82,7 @@ TextGraphicsItem::~TextGraphicsItem() noexcept {
 
 void TextGraphicsItem::setOriginCrossVisible(bool visible) noexcept {
   mOriginCrossGraphicsItem->setLayer(
-      visible ? mLayers.get(Theme::Color::sSchematicReferences) : nullptr);
+      visible ? mLayers.get(ColorRole::schematicReferences()) : nullptr);
 }
 
 void TextGraphicsItem::setTextOverride(

@@ -88,8 +88,8 @@ public:
     return mColors;
   }
   QStringList getPaintOrder() const noexcept;
-  QColor getColor(const QString& colorName) const noexcept;
-  QColor getFillColor(const QString& colorName, bool isFilled,
+  QColor getColor(const QString& role) const noexcept;
+  QColor getFillColor(const QString& role, bool isFilled,
                       bool isGrabArea) const noexcept;
 
   // Setters

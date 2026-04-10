@@ -136,7 +136,7 @@ void BoardEditorState_DrawPolygon::setLayer(const Layer& layer) noexcept {
 
   if (mCurrentPolygonEditCmd) {
     mCurrentPolygonEditCmd->setLayer(mCurrentProperties.getLayer(), true);
-    makeLayerVisible(mCurrentProperties.getLayer().getThemeColor());
+    makeLayerVisible(mCurrentProperties.getLayer().getColorRole());
   }
 }
 
@@ -189,7 +189,7 @@ bool BoardEditorState_DrawPolygon::startAddPolygon(const Point& pos) noexcept {
     // Start undo command
     mCurrentPolygonEditCmd.reset(new CmdBoardPolygonEdit(*mCurrentPolygon));
     mLastSegmentPos = pos;
-    makeLayerVisible(mCurrentProperties.getLayer().getThemeColor());
+    makeLayerVisible(mCurrentProperties.getLayer().getColorRole());
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());

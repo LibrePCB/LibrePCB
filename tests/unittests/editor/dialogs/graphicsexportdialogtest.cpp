@@ -30,6 +30,7 @@
 #include <librepcb/core/fileio/filepath.h>
 #include <librepcb/core/fileio/fileutils.h>
 #include <librepcb/core/types/lengthunit.h>
+#include <librepcb/core/workspace/colorrole.h>
 #include <librepcb/core/workspace/theme.h>
 #include <librepcb/editor/dialogs/graphicsexportdialog.h>
 #include <librepcb/editor/widgets/unsignedlengthedit.h>
@@ -517,7 +518,7 @@ TEST_F(GraphicsExportDialogTest, testShowPinNumbers) {
     EXPECT_EQ(defaultValue,
               getSettings(dlg, 1)
                   .at(0)
-                  ->getColor(Theme::Color::sSchematicPinNumbers)
+                  ->getColor(ColorRole::schematicPinNumbers().getId())
                   .isValid());
 
     // Check if the value can be changed and are applied properly.
@@ -525,7 +526,7 @@ TEST_F(GraphicsExportDialogTest, testShowPinNumbers) {
     EXPECT_EQ(newValue,
               getSettings(dlg, 1)
                   .at(0)
-                  ->getColor(Theme::Color::sSchematicPinNumbers)
+                  ->getColor(ColorRole::schematicPinNumbers().getId())
                   .isValid());
   }
 
@@ -545,7 +546,7 @@ TEST_F(GraphicsExportDialogTest, testShowPinNumbers) {
     EXPECT_EQ(newValue,
               getSettings(dlg, 1)
                   .at(0)
-                  ->getColor(Theme::Color::sSchematicPinNumbers)
+                  ->getColor(ColorRole::schematicPinNumbers().getId())
                   .isValid());
 
     // Restore default value.
@@ -554,7 +555,7 @@ TEST_F(GraphicsExportDialogTest, testShowPinNumbers) {
     EXPECT_EQ(defaultValue,
               getSettings(dlg, 1)
                   .at(0)
-                  ->getColor(Theme::Color::sSchematicPinNumbers)
+                  ->getColor(ColorRole::schematicPinNumbers().getId())
                   .isValid());
 
     // Sanity check that the export is actually successful.
@@ -951,22 +952,22 @@ TEST_F(GraphicsExportDialogTest, testMinLineWidth) {
 
 TEST_F(GraphicsExportDialogTest, testLayerColors) {
   const QStringList layers = {
-      Theme::Color::sSchematicFrames,
-      Theme::Color::sSchematicOutlines,
-      Theme::Color::sSchematicGrabAreas,
-      Theme::Color::sSchematicPinLines,
-      Theme::Color::sSchematicPinNames,
-      Theme::Color::sSchematicPinNumbers,
-      Theme::Color::sSchematicNames,
-      Theme::Color::sSchematicValues,
-      Theme::Color::sSchematicWires,
-      Theme::Color::sSchematicNetLabels,
-      Theme::Color::sSchematicBuses,
-      Theme::Color::sSchematicBusLabels,
-      Theme::Color::sSchematicImageBorders,
-      Theme::Color::sSchematicDocumentation,
-      Theme::Color::sSchematicComments,
-      Theme::Color::sSchematicGuide,
+      ColorRole::schematicFrames().getId(),  //
+      ColorRole::schematicOutlines().getId(),  //
+      ColorRole::schematicGrabAreas().getId(),  //
+      ColorRole::schematicPinLines().getId(),  //
+      ColorRole::schematicPinNames().getId(),  //
+      ColorRole::schematicPinNumbers().getId(),  //
+      ColorRole::schematicNames().getId(),  //
+      ColorRole::schematicValues().getId(),  //
+      ColorRole::schematicWires().getId(),  //
+      ColorRole::schematicNetLabels().getId(),  //
+      ColorRole::schematicBuses().getId(),  //
+      ColorRole::schematicBusLabels().getId(),  //
+      ColorRole::schematicImageBorders().getId(),  //
+      ColorRole::schematicDocumentation().getId(),  //
+      ColorRole::schematicComments().getId(),  //
+      ColorRole::schematicGuide().getId(),  //
   };
   QList<std::pair<QString, QColor>> defaultValue;
   QList<std::pair<QString, QColor>> newValue;

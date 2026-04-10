@@ -25,6 +25,8 @@
 #include "../utils/slinthelpers.h"
 #include "graphicslayerlist.h"
 
+#include <librepcb/core/workspace/colorrole.h>
+
 #include <QtCore>
 
 /*******************************************************************************
@@ -67,7 +69,7 @@ std::optional<ui::GraphicsLayerData> GraphicsLayersModel::row_data(
     std::size_t i) const {
   if (auto layer = mEnabledLayers.value(i)) {
     return ui::GraphicsLayerData{
-        q2s(layer->getNameTr()),  // Name
+        q2s(layer->getRole().getNameTr()),  // Name
         q2s(layer->getColor(GraphicsLayer::State::Enabled)),  // 1st Color
         q2s(layer->getColor(GraphicsLayer::State::Highlighted)),  // 2nd Color
         layer->isVisible(),  // Visible

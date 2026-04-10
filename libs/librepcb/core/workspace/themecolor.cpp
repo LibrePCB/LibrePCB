@@ -22,6 +22,8 @@
  ******************************************************************************/
 #include "themecolor.h"
 
+#include "colorrole.h"
+
 #include <QtCore>
 
 /*******************************************************************************
@@ -33,23 +35,18 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-ThemeColor::ThemeColor(const QString& identifier, const char* category,
-                       const char* name, const QString& nameSuffix,
+ThemeColor::ThemeColor(const ColorRole& role, const char* category,
                        const QColor& primary, const QColor& secondary) noexcept
-  : mIdentifier(identifier),
+  : mRole(&role),
     mCategoryNoTr(category),
-    mNameNoTr(name),
-    mNameSuffix(nameSuffix),
     mPrimary(primary),
     mSecondary(secondary),
     mEdited(false) {
 }
 
 ThemeColor::ThemeColor(const ThemeColor& other) noexcept
-  : mIdentifier(other.mIdentifier),
+  : mRole(other.mRole),
     mCategoryNoTr(other.mCategoryNoTr),
-    mNameNoTr(other.mNameNoTr),
-    mNameSuffix(other.mNameSuffix),
     mPrimary(other.mPrimary),
     mSecondary(other.mSecondary),
     mEdited(other.mEdited) {
@@ -66,12 +63,6 @@ QString ThemeColor::getCategoryTr() const noexcept {
   // Lazy load required to fix https://github.com/LibrePCB/LibrePCB/issues/1357.
   // Note: Translations are done within the Theme context.
   return QCoreApplication::translate("Theme", mCategoryNoTr);
-}
-
-QString ThemeColor::getNameTr() const noexcept {
-  // Lazy load required to fix https://github.com/LibrePCB/LibrePCB/issues/1357.
-  // Note: Translations are done within the Theme context.
-  return QCoreApplication::translate("Theme", mNameNoTr) % mNameSuffix;
 }
 
 /*******************************************************************************
@@ -111,7 +102,7 @@ void ThemeColor::load(const SExpression& root) {
 }
 
 std::unique_ptr<SExpression> ThemeColor::serialize() const {
-  std::unique_ptr<SExpression> root = SExpression::createList(mIdentifier);
+  std::unique_ptr<SExpression> root = SExpression::createList(mRole->getId());
   root->appendChild("primary", mPrimary);
   if (mSecondary.isValid()) {
     root->appendChild("secondary", mSecondary);
@@ -124,7 +115,7 @@ std::unique_ptr<SExpression> ThemeColor::serialize() const {
  ******************************************************************************/
 
 bool ThemeColor::operator==(const ThemeColor& rhs) const noexcept {
-  return (mIdentifier == rhs.mIdentifier)  //
+  return (mRole == rhs.mRole)  //
       && (mPrimary == rhs.mPrimary)  //
       && (mSecondary == rhs.mSecondary)  //
       && (mEdited == rhs.mEdited)  //
@@ -132,10 +123,8 @@ bool ThemeColor::operator==(const ThemeColor& rhs) const noexcept {
 }
 
 ThemeColor& ThemeColor::operator=(const ThemeColor& rhs) noexcept {
-  mIdentifier = rhs.mIdentifier;
+  mRole = rhs.mRole;
   mCategoryNoTr = rhs.mCategoryNoTr;
-  mNameNoTr = rhs.mNameNoTr;
-  mNameSuffix = rhs.mNameSuffix;
   mPrimary = rhs.mPrimary;
   mSecondary = rhs.mSecondary;
   mEdited = rhs.mEdited;
