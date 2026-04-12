@@ -24,6 +24,7 @@
 
 #include "../../3d/openglscenebuilder.h"
 #include "../../3d/slintopenglview.h"
+#include "../../editorcommandset.h"
 #include "../../guiapplication.h"
 #include "../../undostack.h"
 #include "../../utils/slinthelpers.h"
@@ -158,10 +159,11 @@ ui::Board3dTabData Board3dTab::getDerivedUiData() const noexcept {
       refreshing,  // Refreshing
       q2s(errors.join("\n\n")),  // Error
       mFrameIndex,  // Frame index
-  };
-}
-
-void Board3dTab::setDerivedUiData(const ui::Board3dTabData& data) noexcept {
+      q2s(EditorCommandSet::instance().zoomFitContent.getDisplayText()),
+      q2s(EditorCommandSet::instance().zoomIn.getDisplayText()),
+      q2s(EditorCommandSet::instance().zoomOut.getDisplayText()),
+      };
+      }void Board3dTab::setDerivedUiData(const ui::Board3dTabData& data) noexcept {
   mAlpha[OpenGlObject::Type::SolderResist] =
       qBound(0.0f, data.solderresist_alpha, 1.0f);
   mAlpha[OpenGlObject::Type::Silkscreen] =

@@ -844,7 +844,7 @@ public:
       QT_TR_NOOP("Set the zoom level to fit the whole content"),
       ":/fa/solid/expand.svg",
       EditorCommand::Flags(),
-      {QKeySequence(Qt::CTRL | Qt::Key_Home)},
+      {QKeySequence(Qt::CTRL | Qt::Key_Home), QKeySequence(Qt::Key_F)},
       &categoryView,
   };
   EditorCommand zoomIn{

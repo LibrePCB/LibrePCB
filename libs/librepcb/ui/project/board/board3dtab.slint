@@ -65,6 +65,7 @@ export component Board3dTab inherits Tab {
                 x: parent.width - self.width;
                 icon: @image-url("../../../../font-awesome/svgs/solid/expand.svg");
                 icon-scale: 0.9;
+                tooltip: tabs[index].zoom-fit-tooltip;
                 base-color: tabs[index].background-color;
                 base-text-color: tabs[index].foreground-color;
 
@@ -76,6 +77,7 @@ export component Board3dTab inherits Tab {
             zoom-in-btn := SceneButton {
                 x: parent.width - self.width;
                 icon: @image-url("../../../../bootstrap-icons/icons/zoom-in.svg");
+                tooltip: tabs[index].zoom-in-tooltip;
                 base-color: tabs[index].background-color;
                 base-text-color: tabs[index].foreground-color;
 
@@ -87,6 +89,7 @@ export component Board3dTab inherits Tab {
             zoom-out-btn := SceneButton {
                 x: parent.width - self.width;
                 icon: @image-url("../../../../bootstrap-icons/icons/zoom-out.svg");
+                tooltip: tabs[index].zoom-out-tooltip;
                 base-color: tabs[index].background-color;
                 base-text-color: tabs[index].foreground-color;
 
