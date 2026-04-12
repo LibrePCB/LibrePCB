@@ -162,8 +162,9 @@ ui::Board3dTabData Board3dTab::getDerivedUiData() const noexcept {
       q2s(EditorCommandSet::instance().zoomFitContent.getDisplayText()),
       q2s(EditorCommandSet::instance().zoomIn.getDisplayText()),
       q2s(EditorCommandSet::instance().zoomOut.getDisplayText()),
-      };
-      }void Board3dTab::setDerivedUiData(const ui::Board3dTabData& data) noexcept {
+  };
+}
+void Board3dTab::setDerivedUiData(const ui::Board3dTabData& data) noexcept {
   mAlpha[OpenGlObject::Type::SolderResist] =
       qBound(0.0f, data.solderresist_alpha, 1.0f);
   mAlpha[OpenGlObject::Type::Silkscreen] =
