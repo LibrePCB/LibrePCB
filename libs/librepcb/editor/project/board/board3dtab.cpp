@@ -286,6 +286,16 @@ bool Board3dTab::processSceneScrolled(
   return mView ? mView->scrollEvent(pos, e) : false;
 }
 
+bool Board3dTab::processSceneKeyPressed(
+    const slint::language::KeyEvent& e) noexcept {
+  mProjectEditor.setCurrentTab(this);
+  if ((e.text == QString("f")) || (e.text == QString("F"))) {
+    if (mView) mView->zoomAll();
+    return true;
+  }
+  return WindowTab::processSceneKeyPressed(e);
+}
+
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/

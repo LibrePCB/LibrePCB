@@ -82,6 +82,7 @@ public:
   bool processSceneScrolled(
       const QPointF& pos,
       slint::private_api::PointerScrollEvent e) noexcept override;
+  bool processSceneKeyPressed(const slint::language::KeyEvent& e) noexcept override;
 
   // Operator Overloadings
   Board3dTab& operator=(const Board3dTab& rhs) = delete;
