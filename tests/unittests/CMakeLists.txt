@@ -150,6 +150,7 @@ target_link_libraries(
           LibrePCB::Editor
           LibrePCB::Core
           # Third party
+          OpenCascade::OpenCascade
           GTest::GTest
           GTest::GMock
           ParsEagle::ParsEagle
