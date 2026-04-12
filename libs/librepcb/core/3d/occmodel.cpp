@@ -114,22 +114,6 @@ static bool tryGetColor(Handle(XCAFDoc_ColorTool) colorTool,
       colorTool->GetColor(label, XCAFDoc_ColorCurv, color);
 }
 
-#if OCC_VERSION_HEX >= 0x070500
-static bool tryGetColor(Handle(XCAFDoc_ColorTool) colorTool,
-                        const TopoDS_Shape& shape, Quantity_ColorRGBA& color) {
-  return colorTool->GetColor(shape, XCAFDoc_ColorSurf, color) ||
-      colorTool->GetColor(shape, XCAFDoc_ColorGen, color) ||
-      colorTool->GetColor(shape, XCAFDoc_ColorCurv, color);
-}
-
-static bool tryGetColor(Handle(XCAFDoc_ColorTool) colorTool,
-                        const TDF_Label& label, Quantity_ColorRGBA& color) {
-  return colorTool->GetColor(label, XCAFDoc_ColorSurf, color) ||
-      colorTool->GetColor(label, XCAFDoc_ColorGen, color) ||
-      colorTool->GetColor(label, XCAFDoc_ColorCurv, color);
-}
-#endif
-
 static bool tryGetColor(Handle(XCAFDoc_ColorTool) colorTool,
                         const TopoDS_Shape& shape, OccModel::Color& color) {
 #if OCC_VERSION_HEX >= 0x070500
@@ -411,11 +395,7 @@ void OccModel::addToAssembly(const OccModel& model, const Point3D& pos,
       modelExplorer.Init(shape, TopAbs_FACE);
       assemblyExplorer.Init(assemblyShapeTool->GetShape(cmpLabel), TopAbs_FACE);
       while (modelExplorer.More() && assemblyExplorer.More()) {
-#if OCC_VERSION_HEX >= 0x070500
-        Quantity_ColorRGBA color;
-#else
         Quantity_Color color;
-#endif
         TDF_Label label;
         if (modelShapeTool->FindShape(modelExplorer.Current(), label)) {
           if (tryGetColor(assemblyColorTool, label, color)) {
@@ -436,11 +416,7 @@ void OccModel::addToAssembly(const OccModel& model, const Point3D& pos,
       assemblyExplorer.Init(assemblyShapeTool->GetShape(cmpLabel), TopAbs_SOLID,
                             TopAbs_FACE);
       while (modelExplorer.More() && assemblyExplorer.More()) {
-#if OCC_VERSION_HEX >= 0x070500
-        Quantity_ColorRGBA color;
-#else
         Quantity_Color color;
-#endif
         TDF_Label label;
         if (modelShapeTool->FindShape(modelExplorer.Current(), label)) {
           if (tryGetColor(assemblyColorTool, label, color)) {
