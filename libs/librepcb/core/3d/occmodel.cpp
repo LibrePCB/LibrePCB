@@ -50,6 +50,9 @@
 #include <Poly_Triangulation.hxx>
 #include <Quantity_Color.hxx>
 #include <Standard_Version.hxx>
+#if OCC_VERSION_HEX >= 0x070500
+#include <Quantity_ColorRGBA.hxx>
+#endif
 #include <StdFail_NotDone.hxx>
 #include <STEPCAFControl_Reader.hxx>
 #include <STEPCAFControl_Writer.hxx>
@@ -111,9 +114,49 @@ static bool tryGetColor(Handle(XCAFDoc_ColorTool) colorTool,
       colorTool->GetColor(label, XCAFDoc_ColorCurv, color);
 }
 
+static bool tryGetColor(Handle(XCAFDoc_ColorTool) colorTool,
+                        const TopoDS_Shape& shape, OccModel::Color& color) {
+#if OCC_VERSION_HEX >= 0x070500
+  Quantity_ColorRGBA rgba;
+  if (colorTool->GetColor(shape, XCAFDoc_ColorSurf, rgba) ||
+      colorTool->GetColor(shape, XCAFDoc_ColorGen, rgba) ||
+      colorTool->GetColor(shape, XCAFDoc_ColorCurv, rgba)) {
+    const Quantity_Color rgb = rgba.GetRGB();
+    color = std::make_tuple(rgb.Red(), rgb.Green(), rgb.Blue(), rgba.Alpha());
+    return true;
+  }
+#endif
+  Quantity_Color rgb;
+  if (tryGetColor(colorTool, shape, rgb)) {
+    color = std::make_tuple(rgb.Red(), rgb.Green(), rgb.Blue(), 1.0);
+    return true;
+  }
+  return false;
+}
+
+static bool tryGetColor(Handle(XCAFDoc_ColorTool) colorTool,
+                        const TDF_Label& label, OccModel::Color& color) {
+#if OCC_VERSION_HEX >= 0x070500
+  Quantity_ColorRGBA rgba;
+  if (colorTool->GetColor(label, XCAFDoc_ColorSurf, rgba) ||
+      colorTool->GetColor(label, XCAFDoc_ColorGen, rgba) ||
+      colorTool->GetColor(label, XCAFDoc_ColorCurv, rgba)) {
+    const Quantity_Color rgb = rgba.GetRGB();
+    color = std::make_tuple(rgb.Red(), rgb.Green(), rgb.Blue(), rgba.Alpha());
+    return true;
+  }
+#endif
+  Quantity_Color rgb;
+  if (tryGetColor(colorTool, label, rgb)) {
+    color = std::make_tuple(rgb.Red(), rgb.Green(), rgb.Blue(), 1.0);
+    return true;
+  }
+  return false;
+}
+
 static bool tesselateFace(Handle(XCAFDoc_ColorTool) colorTool,
                           const TopoDS_Face& face, const gp_Trsf& transform,
-                          Quantity_Color color,
+                          OccModel::Color color,
                           QMap<OccModel::Color, QVector<QVector3D>>& result) {
   if (face.IsNull()) return false;
 
@@ -131,9 +174,7 @@ static bool tesselateFace(Handle(XCAFDoc_ColorTool) colorTool,
   if (triangulation.IsNull()) return false;
 
   tryGetColor(colorTool, face, color);
-  const OccModel::Color colorTuple =
-      std::make_tuple(color.Red(), color.Green(), color.Blue());
-  QVector<QVector3D>& triangles = result[colorTuple];
+  QVector<QVector3D>& triangles = result[color];
 
   Standard_Integer n1, n2, n3;
   for (Standard_Integer i = 1; i < (triangulation->NbTriangles() + 1); ++i) {
@@ -159,7 +200,7 @@ static bool tesselateFace(Handle(XCAFDoc_ColorTool) colorTool,
 
 static void tesselateShell(Handle(XCAFDoc_ColorTool) colorTool,
                            const TopoDS_Shape& shell, const gp_Trsf& transform,
-                           Quantity_Color color,
+                           OccModel::Color color,
                            QMap<OccModel::Color, QVector<QVector3D>>& result) {
   tryGetColor(colorTool, shell, color);
 
@@ -172,7 +213,7 @@ static void tesselateShell(Handle(XCAFDoc_ColorTool) colorTool,
 
 static void tesselateSolid(Handle(XCAFDoc_ColorTool) colorTool,
                            const TopoDS_Shape& solid, const gp_Trsf& transform,
-                           Quantity_Color color,
+                           OccModel::Color color,
                            QMap<OccModel::Color, QVector<QVector3D>>& result) {
   tryGetColor(colorTool, solid, color);
 
@@ -188,12 +229,13 @@ static void tesselateSolid(Handle(XCAFDoc_ColorTool) colorTool,
 
 static void tesselateLabel(Handle(XCAFDoc_ShapeTool) shapeTool,
                            Handle(XCAFDoc_ColorTool) colorTool,
-                           gp_Trsf transform, Quantity_Color color,
+                           gp_Trsf transform, OccModel::Color color,
                            TDF_Label label,
                            QMap<OccModel::Color, QVector<QVector3D>>& result) {
   if (!colorTool->IsVisible(label)) {
     return;
   }
+  tryGetColor(colorTool, label, color);
 
   TopoDS_Shape shape;
   if (!shapeTool->GetShape(label, shape)) {
@@ -479,8 +521,8 @@ QMap<OccModel::Color, QVector<QVector3D>> OccModel::tesselate() const {
     shapeTool->GetFreeShapes(labels);
     for (Standard_Integer i = 1; i <= labels.Length(); ++i) {
       tesselateLabel(shapeTool, colorTool, gp_Trsf(),
-                     Quantity_Color(0.5, 0.5, 0.5, Quantity_TOC_RGB),
-                     labels.Value(i), result);
+                     std::make_tuple(0.5, 0.5, 0.5, 1.0), labels.Value(i),
+                     result);
     }
   } catch (const Standard_Failure& e) {
     qCritical() << "OpenCascade error:" << e.GetMessageString();
@@ -595,10 +637,17 @@ std::unique_ptr<OccModel> OccModel::createBoard(const librepcb::Path& outline,
     TDF_Label label = shapeTool->AddShape(shape, false);
 
     if (!label.IsNull()) {
-      Quantity_Color shapeColor(color.redF(), color.greenF(), color.blueF(),
-                                Quantity_TOC_RGB);
       Handle(XCAFDoc_ColorTool) colorTool =
           XCAFDoc_DocumentTool::ColorTool(doc->Main());
+#if OCC_VERSION_HEX >= 0x070500
+      Quantity_ColorRGBA shapeColor(
+          Quantity_Color(color.redF(), color.greenF(), color.blueF(),
+                         Quantity_TOC_RGB),
+          color.alphaF());
+#else
+      Quantity_Color shapeColor(color.redF(), color.greenF(), color.blueF(),
+                                Quantity_TOC_RGB);
+#endif
       colorTool->SetColor(label, shapeColor, XCAFDoc_ColorSurf);
       TopExp_Explorer explorer;
       explorer.Init(shape, TopAbs_SOLID);

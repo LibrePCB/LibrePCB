@@ -468,8 +468,9 @@ void OpenGlSceneBuilder::publishDevice(const SceneData3D::DeviceData& obj,
       vertex = m.map(vertex);
     }
     std::shared_ptr<OpenGlTriangleObject> obj = items.value(it.key());
-    QColor color = QColor::fromRgbF(
-        std::get<0>(it.key()), std::get<1>(it.key()), std::get<2>(it.key()));
+    QColor color =
+        QColor::fromRgbF(std::get<0>(it.key()), std::get<1>(it.key()),
+                         std::get<2>(it.key()), std::get<3>(it.key()));
     if (obj) {
       obj->setData(color, vertices);
       emit objectUpdated(obj);
