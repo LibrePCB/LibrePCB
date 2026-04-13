@@ -13,9 +13,7 @@ export component SceneButton inherits Rectangle {
     in property <image> icon: command.icon;
     in property <float> icon-scale: 1.0;
     in property <string> tooltip;
-    property <string> effective-tooltip: (command.id != "")
-        ? (command.text + (command.shortcut != "" ? " (" + command.shortcut + ")" : ""))
-        : tooltip;
+    property <string> effective-tooltip: (command.id != "") ? (command.text + (command.shortcut != "" ? " (" + command.shortcut + ")" : "")) : tooltip;
     in property <color> base-color: white;
     in property <color> base-text-color: black;
     in property <length> font-size: 13px;

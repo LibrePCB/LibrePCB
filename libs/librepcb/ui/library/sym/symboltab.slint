@@ -589,6 +589,7 @@ component SymbolEditorTab inherits TouchArea {
             }
         }
     }
+
     pointer-event(event) => {
         if event.kind == PointerEventKind.down {
             Data.set-current-tab(section-index, index);
