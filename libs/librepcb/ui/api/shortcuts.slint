@@ -1208,6 +1208,12 @@ export global Shortcuts {
         if Backend.is-shortcut(event, Cmd.zoom-fit-content) {
             Backend.trigger-tab(section, tab, TabAction.zoom-fit);
             return true;
+        } else if Backend.is-shortcut(event, Cmd.flip-view) {
+            Backend.trigger-tab(section, tab, TabAction.zoom-fit);
+            return true;
+        } else if Backend.is-shortcut(event, Cmd.flip-horizontal) {
+            Backend.trigger-tab(section, tab, TabAction.zoom-fit);
+            return true;
         } else if Backend.is-shortcut(event, Cmd.zoom-in) {
             Backend.trigger-tab(section, tab, TabAction.zoom-in);
             return true;

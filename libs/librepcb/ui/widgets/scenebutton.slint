@@ -1,3 +1,4 @@
+import { EditorCommand } from "../api/types.slint";
 import { ToolTip } from "tooltip.slint";
 
 export enum SceneButtonStyle {
@@ -7,10 +8,14 @@ export enum SceneButtonStyle {
 }
 
 export component SceneButton inherits Rectangle {
+    in property <EditorCommand> command;
     in property <string> text;
-    in property <image> icon;
+    in property <image> icon: command.icon;
     in property <float> icon-scale: 1.0;
     in property <string> tooltip;
+    property <string> effective-tooltip: (command.id != "")
+        ? (command.text + (command.shortcut != "" ? " (" + command.shortcut + ")" : ""))
+        : tooltip;
     in property <color> base-color: white;
     in property <color> base-text-color: black;
     in property <length> font-size: 13px;
@@ -35,7 +40,7 @@ export component SceneButton inherits Rectangle {
     accessible-role: button;
     accessible-checkable: (style == SceneButtonStyle.checkbox) || (style == SceneButtonStyle.uncheckbox);
     accessible-checked: checked;
-    accessible-label: text + " " + tooltip;
+    accessible-label: text + " " + effective-tooltip;
     accessible-action-default => {
         ta.clicked();
     }
@@ -92,10 +97,10 @@ export component SceneButton inherits Rectangle {
             }
         }
 
-        if ta.has-hover && (!ta.pressed) && (!tooltip.is-empty): tt := ToolTip {
+        if ta.has-hover && (!ta.pressed) && (!effective-tooltip.is-empty): tt := ToolTip {
             x: -self.width - 5px;
             y: (parent.height - self.height) / 2;
-            text: tooltip;
+            text: effective-tooltip;
         }
     }
 }

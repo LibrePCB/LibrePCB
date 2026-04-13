@@ -591,7 +591,7 @@ export component Board2dTab inherits Tab {
 
             zoom-fit-btn := SceneButton {
                 x: parent.width - self.width;
-                icon: @image-url("../../../../font-awesome/svgs/solid/expand.svg");
+                command: Cmd.zoom-fit-content;
                 icon-scale: 0.9;
                 base-color: tabs[index].background-color;
                 base-text-color: tabs[index].foreground-color;
@@ -603,7 +603,7 @@ export component Board2dTab inherits Tab {
 
             zoom-in-btn := SceneButton {
                 x: parent.width - self.width;
-                icon: @image-url("../../../../bootstrap-icons/icons/zoom-in.svg");
+                command: Cmd.zoom-in;
                 base-color: tabs[index].background-color;
                 base-text-color: tabs[index].foreground-color;
 
@@ -614,7 +614,7 @@ export component Board2dTab inherits Tab {
 
             zoom-out-btn := SceneButton {
                 x: parent.width - self.width;
-                icon: @image-url("../../../../bootstrap-icons/icons/zoom-out.svg");
+                command: Cmd.zoom-out;
                 base-color: tabs[index].background-color;
                 base-text-color: tabs[index].foreground-color;
 
@@ -625,10 +625,9 @@ export component Board2dTab inherits Tab {
 
             flip-btn := SceneButton {
                 x: parent.width - self.width;
+                command: Cmd.flip-view;
                 style: self.checked ? checkbox : button;
                 icon-scale: self.checked ? 1.0 : 1.1;
-                icon: Cmd.flip-view.icon;
-                tooltip: Cmd.flip-view.text;
                 base-color: tabs[index].background-color;
                 base-text-color: tabs[index].foreground-color;
                 checked: tabs[index].flip-view;
