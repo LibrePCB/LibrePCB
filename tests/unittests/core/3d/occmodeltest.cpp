@@ -20,6 +20,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include <Standard_Version.hxx>
 #include <gtest/gtest.h>
 #include <librepcb/core/3d/occmodel.h>
 #include <librepcb/core/exceptions.h>
@@ -202,6 +203,32 @@ TEST_F(OccModelTest, testTesselate) {
       EXPECT_EQ(points.count() % 3, 0);
     }
     EXPECT_GE(result.count(), 1);
+  } else {
+    GTEST_SKIP();
+  }
+}
+
+TEST_F(OccModelTest, testTransparency) {
+  if (OccModel::isAvailable()) {
+    // Create a board with a semi-transparent color.
+    const Path outline = Path::rect(Point(Length(0), Length(0)),
+                                    Point(Length(10000), Length(10000)));
+    const QColor color(255, 0, 0, 128);  // Alpha = 0.5
+    std::unique_ptr<OccModel> model =
+        OccModel::createBoard(outline, {}, PositiveLength(1000), color);
+
+    const QMap<OccModel::Color, QVector<QVector3D>> result = model->tesselate();
+    ASSERT_EQ(result.count(), 1);
+
+    const OccModel::Color resultColor = result.keys().first();
+    EXPECT_NEAR(std::get<0>(resultColor), 1.0, 0.01);  // Red
+    EXPECT_NEAR(std::get<1>(resultColor), 0.0, 0.01);  // Green
+    EXPECT_NEAR(std::get<2>(resultColor), 0.0, 0.01);  // Blue
+#if OCC_VERSION_HEX >= 0x070500
+    EXPECT_NEAR(std::get<3>(resultColor), 0.5, 0.01);  // Alpha
+#else
+    EXPECT_NEAR(std::get<3>(resultColor), 1.0, 0.01);  // Alpha (fallback)
+#endif
   } else {
     GTEST_SKIP();
   }

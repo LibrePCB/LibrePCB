@@ -47,7 +47,7 @@ class StepExport final : public QObject {
 
 public:
   // Types
-  typedef std::tuple<qreal, qreal, qreal> Color;
+  typedef std::tuple<qreal, qreal, qreal, qreal> Color;
   typedef QMap<Color, QVector<QVector3D>> StepModel;
 
   // Constructors / Destructor

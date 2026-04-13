@@ -55,7 +55,7 @@ class OccModel final {
 
 public:
   // Types
-  typedef std::tuple<qreal, qreal, qreal> Color;
+  typedef std::tuple<qreal, qreal, qreal, qreal> Color;
 
   // Constructors / Destructor
   OccModel() noexcept = delete;
