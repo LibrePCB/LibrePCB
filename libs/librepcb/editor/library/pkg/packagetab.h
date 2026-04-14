@@ -220,7 +220,7 @@ private:
   void applyBackgroundImageSettings() noexcept;
   FilePath getBackgroundImageCacheDir() const noexcept;
   void requestRepaint() noexcept;
-  void applyTheme() noexcept;
+  void applyWorkspaceSettings() noexcept;
 
 private:
   // References

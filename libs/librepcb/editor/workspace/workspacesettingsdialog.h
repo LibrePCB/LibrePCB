@@ -24,6 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include "../modelview/editablelistmodel.h"
+#include "ui.h"
 
 #include <librepcb/core/workspace/workspacesettings.h>
 #include <librepcb/core/workspace/workspacesettingsitem_genericvaluelist.h>
@@ -31,15 +32,16 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <optional>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 
-class Theme;
-class ThemeColor;
 class Workspace;
 class WorkspaceSettings;
+struct UiTheme;
 
 namespace editor {
 
@@ -76,7 +78,7 @@ public:
   // Constructors / Destructor
   WorkspaceSettingsDialog() = delete;
   WorkspaceSettingsDialog(const WorkspaceSettingsDialog& other) = delete;
-  explicit WorkspaceSettingsDialog(Workspace& workspace,
+  explicit WorkspaceSettingsDialog(Workspace& workspace, const UiTheme& theme,
                                    QWidget* parent = nullptr);
   ~WorkspaceSettingsDialog();
 
@@ -93,10 +95,9 @@ private:
   void changeEvent(QEvent* event) noexcept override;
   void reject() noexcept override;
   void externalApplicationListIndexChanged(int index) noexcept;
-  void updateThemesList() noexcept;
-  void themeIndexChanged(int index) noexcept;
-  void initColorTreeWidgetItem(QTreeWidgetItem& item,
-                               const ThemeColor& color) noexcept;
+  void updateColorSchemes() noexcept;
+  void execColorSchemeDialog(std::shared_ptr<UserColorScheme> scheme,
+                             bool focusNameEdt = false) noexcept;
   void updateDismissedMessagesCount() noexcept;
   void updateDesktopIntegrationStatus() noexcept;
   void loadSettings() noexcept;
@@ -108,12 +109,15 @@ private:
 private:
   Workspace& mWorkspace;  /// Reference to the Workspace object
   WorkspaceSettings& mSettings;  ///< Reference to the WorkspaceSettings object
+  const UiTheme& mTheme;  ///< Reference to current UI theme
   QScopedPointer<LibraryLocaleOrderModel> mLibLocaleOrderModel;
   QScopedPointer<LibraryNormOrderModel> mLibNormOrderModel;
   QScopedPointer<ApiEndpointListModelLegacy> mApiEndpointModel;
   QScopedPointer<KeyboardShortcutsModel> mKeyboardShortcutsModel;
   QScopedPointer<QSortFilterProxyModel> mKeyboardShortcutsFilterModel;
   QScopedPointer<Ui::WorkspaceSettingsDialog> mUi;
+  std::optional<slint::ComponentHandle<ui::ColorSchemeDialog>>
+      mColorSchemeDialog;
 
   // Cached settings
   QVector<ExternalApplication> mExternalApplications;
@@ -123,8 +127,12 @@ private:
   QString mOldApplicationLocale;
   GridStyle mOldSchematicGridStyle;
   GridStyle mOldBoardGridStyle;
-  QMap<Uuid, Theme> mOldThemes;
-  Uuid mOldActiveTheme;
+  QMap<Uuid, UserColorScheme> mOldSchColorSchemes;
+  QMap<Uuid, UserColorScheme> mOldBrdColorSchemes;
+  QMap<Uuid, UserColorScheme> mOld3dColorSchemes;
+  Uuid mOldSchColorSchemeActive;
+  Uuid mOldBrdColorSchemeActive;
+  Uuid mOld3dColorSchemeActive;
 };
 
 /*******************************************************************************

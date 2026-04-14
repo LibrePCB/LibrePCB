@@ -32,7 +32,6 @@
 #include <librepcb/core/types/layer.h>
 #include <librepcb/core/utils/toolbox.h>
 #include <librepcb/core/workspace/colorrole.h>
-#include <librepcb/core/workspace/theme.h>
 
 #include <QtCore>
 

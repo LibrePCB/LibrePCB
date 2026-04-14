@@ -89,7 +89,7 @@ public:
 private:
   void scheduleSceneRebuild() noexcept;
   void sceneRebuildTimerTimeout() noexcept;
-  void applyTheme() noexcept;
+  void applyWorkspaceSettings() noexcept;
   void requestRepaint() noexcept;
 
   // References

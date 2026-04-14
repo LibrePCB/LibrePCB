@@ -81,6 +81,17 @@ public:
   bool isEdited() const noexcept { return mEdited; }
 
   /**
+   * @brief Clear the edited flag
+   *
+   * @warning This is a hacky, temporary way to initialize specific workspace
+   *          settings with the value of another workspace setting, as required
+   *          for file format migrations! Do not call this method unless you
+   *          know exactly what you are doing.
+   *
+   */
+  void clearEditedFlag() noexcept { mEdited = false; }
+
+  /**
    * @brief Restore default value
    */
   void restoreDefault() noexcept;

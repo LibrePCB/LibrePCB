@@ -408,6 +408,8 @@ add_library(
   modelview/attributelistmodellegacy.h
   modelview/checkableitemsdelegate.cpp
   modelview/checkableitemsdelegate.h
+  modelview/colorschememodel.cpp
+  modelview/colorschememodel.h
   modelview/comboboxdelegate.cpp
   modelview/comboboxdelegate.h
   modelview/editablelistmodel.h

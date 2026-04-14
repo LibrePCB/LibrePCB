@@ -17,74 +17,58 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CORE_THEMECOLOR_H
-#define LIBREPCB_CORE_THEMECOLOR_H
+#ifndef LIBREPCB_EDITOR_COLORSCHEMEMODEL_H
+#define LIBREPCB_EDITOR_COLORSCHEMEMODEL_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../serialization/sexpression.h"
+#include "ui.h"
 
 #include <QtCore>
-#include <QtGui>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 
-class ColorRole;
+class UserColorScheme;
+
+namespace editor {
 
 /*******************************************************************************
- *  Class ThemeColor
+ *  Class ColorSchemeModel
  ******************************************************************************/
 
 /**
- * @brief Color settings as used by ::librepcb::Theme
+ * @brief The ColorSchemeModel class
  */
-class ThemeColor final {
+class ColorSchemeModel final : public slint::Model<ui::ColorSchemeItemData> {
 public:
   // Constructors / Destructor
-  ThemeColor() = delete;
-  ThemeColor(const ColorRole& role, const char* category, const QColor& primary,
-             const QColor& secondary) noexcept;
-  ThemeColor(const ThemeColor& other) noexcept;
-  ~ThemeColor() noexcept;
+  ColorSchemeModel() = delete;
+  ColorSchemeModel(const ColorSchemeModel& other) = delete;
+  explicit ColorSchemeModel(std::shared_ptr<UserColorScheme> scheme) noexcept;
+  ~ColorSchemeModel() noexcept;
 
-  // Getters
-  const ColorRole& getRole() const noexcept { return *mRole; }
-  QString getCategoryTr() const noexcept;
-  const QColor& getPrimaryColor() const noexcept { return mPrimary; }
-  const QColor& getSecondaryColor() const noexcept { return mSecondary; }
-  bool isEdited() const noexcept { return mEdited; }
-
-  // Setters
-  void setPrimaryColor(const QColor& color) noexcept;
-  void setSecondaryColor(const QColor& color) noexcept;
-
-  // General Methods
-  void load(const SExpression& root);
-  std::unique_ptr<SExpression> serialize() const;
+  // Implementations
+  std::size_t row_count() const override;
+  std::optional<ui::ColorSchemeItemData> row_data(std::size_t i) const override;
+  void set_row_data(std::size_t i,
+                    const ui::ColorSchemeItemData& data) noexcept override;
 
   // Operator Overloadings
-  bool operator==(const ThemeColor& rhs) const noexcept;
-  bool operator!=(const ThemeColor& rhs) const noexcept {
-    return !(*this == rhs);
-  }
-  ThemeColor& operator=(const ThemeColor& rhs) noexcept;
+  ColorSchemeModel& operator=(const ColorSchemeModel& rhs) = delete;
 
-private:  // Data
-  const ColorRole* mRole;
-  const char* mCategoryNoTr;
-  QColor mPrimary;
-  QColor mSecondary;  ///< Null if not applicable
-  bool mEdited;
+private:
+  std::shared_ptr<UserColorScheme> mScheme;
 };
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

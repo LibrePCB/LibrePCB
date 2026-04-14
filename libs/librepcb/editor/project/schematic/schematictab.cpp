@@ -53,7 +53,6 @@
 #include <librepcb/core/project/schematic/schematicpainter.h>
 #include <librepcb/core/utils/toolbox.h>
 #include <librepcb/core/workspace/colorrole.h>
-#include <librepcb/core/workspace/theme.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
 #include <librepcb/core/workspace/workspacesettings.h>
@@ -212,12 +211,12 @@ SchematicTab::SchematicTab(GuiApplication& app, SchematicEditor& editor,
           &WorkspaceSettingsItem::edited, this, [this]() {
             mGridStyle =
                 mApp.getWorkspace().getSettings().schematicGridStyle.get();
-            applyTheme();
+            applyWorkspaceSettings();
           });
-  connect(&mApp.getWorkspace().getSettings().themes,
-          &WorkspaceSettingsItem_Themes::edited, this,
-          &SchematicTab::applyTheme);
-  applyTheme();
+  connect(&mApp.getWorkspace().getSettings().schematicColorSchemes,
+          &WorkspaceSettingsItem_ColorSchemes::colorsModified, this,
+          &SchematicTab::applyWorkspaceSettings);
+  applyWorkspaceSettings();
 
   // Restore client settings.
   QSettings cs;
@@ -289,9 +288,11 @@ void SchematicTab::setUiData(const ui::TabData& data) noexcept {
 }
 
 ui::SchematicTabData SchematicTab::getDerivedUiData() const noexcept {
-  const Theme& theme = mApp.getWorkspace().getSettings().themes.getActive();
+  const ColorScheme& scheme =
+      mApp.getWorkspace().getSettings().schematicColorSchemes.getActive();
+  const auto infoBoxColors = scheme.getColors(ColorRole::schematicInfoBox());
   const QColor bgColor =
-      theme.getColor(ColorRole::schematicBackground()).getPrimaryColor();
+      scheme.getColors(ColorRole::schematicBackground()).primary;
   const QColor fgColor = (bgColor.lightnessF() >= 0.5) ? Qt::black : Qt::white;
 
   return ui::SchematicTabData{
@@ -299,10 +300,8 @@ ui::SchematicTabData SchematicTab::getDerivedUiData() const noexcept {
       mSchematicEditor.getUiIndex(),  // Schematic index
       q2s(bgColor),  // Background color
       q2s(fgColor),  // Foreground color
-      q2s(theme.getColor(ColorRole::schematicInfoBox())
-              .getPrimaryColor()),  // Overlay color
-      q2s(theme.getColor(ColorRole::schematicInfoBox())
-              .getSecondaryColor()),  // Overlay text color
+      q2s(infoBoxColors.primary),  // Overlay color
+      q2s(infoBoxColors.secondary),  // Overlay text color
       l2s(mGridStyle),  // Grid style
       l2s(*mSchematic.getGridInterval()),  // Grid interval
       l2s(mSchematic.getGridUnit()),  // Length unit
@@ -413,15 +412,16 @@ void SchematicTab::highlightErcMessage(
     // Position on schematic not known.
     clearErcMarker();
   } else if (mScene) {
-    const ThemeColor& color =
-        mApp.getWorkspace().getSettings().themes.getActive().getColor(
-            ColorRole::schematicOverlays());
+    const auto colors = mApp.getWorkspace()
+                            .getSettings()
+                            .schematicColorSchemes.getActive()
+                            .getColors(ColorRole::schematicOverlays());
     QPainterPath path = Path::toQPainterPathPx(msg->getLocations(), true);
     mErcLocationGraphicsItem.reset(new QGraphicsPathItem());
     mErcLocationGraphicsItem->setZValue(
         SchematicGraphicsScene::ZValue_ErcLocation);
-    mErcLocationGraphicsItem->setPen(QPen(color.getPrimaryColor(), 0));
-    mErcLocationGraphicsItem->setBrush(color.getSecondaryColor());
+    mErcLocationGraphicsItem->setPen(QPen(colors.primary, 0));
+    mErcLocationGraphicsItem->setBrush(colors.secondary);
     mErcLocationGraphicsItem->setPath(path);
     mScene->addItem(*mErcLocationGraphicsItem.get());
 
@@ -455,7 +455,7 @@ void SchematicTab::activate() noexcept {
   // Initialize search context.
   mSearchContext.init();
 
-  applyTheme();
+  applyWorkspaceSettings();
   mProjectEditor.registerActiveSchematicTab(this);
   requestRepaint();
 }
@@ -1232,7 +1232,7 @@ void SchematicTab::execGraphicsExportDialog(
         mProject.getSchematicIndex(mSchematic), *mProject.getName(), 0,
         defaultFilePath,
         mApp.getWorkspace().getSettings().defaultLengthUnit.get(),
-        mApp.getWorkspace().getSettings().themes.getActive(),
+        mApp.getWorkspace().getSettings().schematicColorSchemes.getActive(),
         "schematic_editor/" % settingsKey, getWindow());
     connect(&dialog, &GraphicsExportDialog::requestOpenFile, this,
             [this](const FilePath& fp) {
@@ -1284,19 +1284,17 @@ void SchematicTab::goToSymbol(const QString& name, int index) noexcept {
   }
 }
 
-void SchematicTab::applyTheme() noexcept {
-  const Theme& theme = mApp.getWorkspace().getSettings().themes.getActive();
+void SchematicTab::applyWorkspaceSettings() noexcept {
+  const ColorScheme& scheme =
+      mApp.getWorkspace().getSettings().schematicColorSchemes.getActive();
 
   if (mScene) {
-    mScene->setBackgroundColors(
-        theme.getColor(ColorRole::schematicBackground()).getPrimaryColor(),
-        theme.getColor(ColorRole::schematicBackground()).getSecondaryColor());
-    mScene->setOverlayColors(
-        theme.getColor(ColorRole::schematicOverlays()).getPrimaryColor(),
-        theme.getColor(ColorRole::schematicOverlays()).getSecondaryColor());
-    mScene->setSelectionRectColors(
-        theme.getColor(ColorRole::schematicSelection()).getPrimaryColor(),
-        theme.getColor(ColorRole::schematicSelection()).getSecondaryColor());
+    const auto background = scheme.getColors(ColorRole::schematicBackground());
+    mScene->setBackgroundColors(background.primary, background.secondary);
+    const auto overlay = scheme.getColors(ColorRole::schematicOverlays());
+    mScene->setOverlayColors(overlay.primary, overlay.secondary);
+    const auto selection = scheme.getColors(ColorRole::schematicSelection());
+    mScene->setSelectionRectColors(selection.primary, selection.secondary);
     mScene->setGridStyle(mGridStyle);
   }
 

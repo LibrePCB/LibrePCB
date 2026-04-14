@@ -78,6 +78,7 @@ GraphicsScene::~GraphicsScene() noexcept {
 void GraphicsScene::setBackgroundColors(const QColor& fill,
                                         const QColor& grid) noexcept {
   mBackgroundColor = fill;
+  mBackgroundColor.setAlpha(255);  // Transparency makes no sense here
   mGridColor = grid;
   setBackgroundBrush(backgroundBrush());  // this will repaint the background
 }

@@ -59,14 +59,13 @@ SymbolChooserDialog::SymbolChooserDialog(const Workspace& ws,
     mCategorySelected(false) {
   mUi->setupUi(this);
 
-  const Theme& theme = mWorkspace.getSettings().themes.getActive();
-  mPreviewScene->setBackgroundColors(
-      theme.getColor(ColorRole::schematicBackground()).getPrimaryColor(),
-      theme.getColor(ColorRole::schematicBackground()).getSecondaryColor());
+  const ColorScheme& scheme =
+      mWorkspace.getSettings().schematicColorSchemes.getActive();
+  const auto background = scheme.getColors(ColorRole::schematicBackground());
+  mPreviewScene->setBackgroundColors(background.primary, background.secondary);
   mPreviewScene->setOriginCrossVisible(false);
 
-  mUi->graphicsView->setSpinnerColor(
-      theme.getColor(ColorRole::schematicBackground()).getSecondaryColor());
+  mUi->graphicsView->setSpinnerColor(background.secondary);
   mUi->graphicsView->setScene(mPreviewScene.data());
 
   mCategoryTreeModel.reset(new CategoryTreeModelLegacy(

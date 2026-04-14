@@ -27,7 +27,7 @@
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/outputjobrunner.h>
 #include <librepcb/core/project/project.h>
-#include <librepcb/core/workspace/theme.h>
+#include <librepcb/core/workspace/basecolorscheme.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -475,21 +475,25 @@ void GraphicsOutputJobWidget::currentContentChanged(int index) noexcept {
     foreach (const Board* board, mProject.getBoards()) {
       innerLayerCount = std::max(innerLayerCount, board->getInnerLayerCount());
     }
-    Theme t;
     GraphicsExportSettings s;
-    if (c.type == GraphicsOutputJob::Content::Type::BoardRendering) {
+    const ColorScheme* colors = nullptr;
+    if (c.type == GraphicsOutputJob::Content::Type::Schematic) {
+      colors = &BaseColorScheme::schematicLibrePcbLight();
+      s.loadColorsFromScheme(colors, nullptr);
+    } else if (c.type == GraphicsOutputJob::Content::Type::Board) {
+      colors = &BaseColorScheme::boardLibrePcbDark();
+      s.loadColorsFromScheme(nullptr, colors, innerLayerCount);
+    } else if (c.type == GraphicsOutputJob::Content::Type::BoardRendering) {
+      colors = &BaseColorScheme::boardLibrePcbDark();  // 2D, not 3D!
       s.loadBoardRenderingColors(innerLayerCount);
-    } else {
-      s.loadColorsFromTheme(
-          t, (c.type == GraphicsOutputJob::Content::Type::Schematic),
-          (c.type != GraphicsOutputJob::Content::Type::Schematic),
-          innerLayerCount);
     }
     mUi->lstLayerColors->clear();
     foreach (const auto& pair, s.getColors()) {
       const bool enabled = c.layers.contains(pair.first);
+      const ColorRole* role =
+          colors ? colors->getColors(pair.first).role : nullptr;
       QListWidgetItem* item =
-          new QListWidgetItem(t.getColor(pair.first).getRole().getNameTr());
+          new QListWidgetItem(role ? role->getNameTr() : QString());
       item->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
       item->setCheckState(enabled ? Qt::Checked : Qt::Unchecked);
       item->setData(Qt::DecorationRole,
