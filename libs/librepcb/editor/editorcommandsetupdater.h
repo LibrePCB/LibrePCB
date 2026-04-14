@@ -4,8 +4,8 @@
 #ifndef LIBREPCB_EDITOR_EDITORCOMMANDSETUPDATER_H
 #define LIBREPCB_EDITOR_EDITORCOMMANDSETUPDATER_H
 
-#include "appwindow.h"
 #include "editorcommandset.h"
+#include "ui.h"
 #include "utils/uihelpers.h"
 
 namespace librepcb {

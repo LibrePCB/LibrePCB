@@ -23,7 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "appwindow.h"
+#include "ui.h"
 
 #include <librepcb/core/fileio/filepath.h>
 #include <librepcb/core/utils/signalslot.h>

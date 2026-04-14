@@ -23,7 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "appwindow.h"
+#include "ui.h"
 
 #include <librepcb/core/types/length.h>
 #include <librepcb/core/types/lengthunit.h>

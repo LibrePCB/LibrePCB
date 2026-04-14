@@ -23,7 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "appwindow.h"
+#include "ui.h"
 
 #include <librepcb/core/library/cmp/cmpsigpindisplaytype.h>
 #include <librepcb/core/library/pkg/package.h>

@@ -23,7 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "appwindow.h"
+#include "ui.h"
 #include "utils/uiobjectlist.h"
 
 #include <librepcb/core/fileio/filepath.h>
