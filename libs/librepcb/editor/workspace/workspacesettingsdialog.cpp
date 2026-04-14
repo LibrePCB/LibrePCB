@@ -65,6 +65,8 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
     mKeyboardShortcutsModel(new KeyboardShortcutsModel(this)),
     mKeyboardShortcutsFilterModel(new QSortFilterProxyModel(this)),
     mUi(new Ui::WorkspaceSettingsDialog),
+    mOldSchematicGridStyle(mSettings.schematicGridStyle.get()),
+    mOldBoardGridStyle(mSettings.boardGridStyle.get()),
     mOldActiveTheme(Uuid::createRandom()) {
   mUi->setupUi(this);
 
@@ -302,15 +304,6 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
 
   // Initialize themes widgets.
   {
-    for (QComboBox* cbx :
-         {mUi->cbxSchematicGridStyle, mUi->cbxBoardGridStyle}) {
-      cbx->addItem(tr("None", "Grid style"),
-                   QVariant::fromValue(Theme::GridStyle::None));
-      cbx->addItem(tr("Dots", "Grid style"),
-                   QVariant::fromValue(Theme::GridStyle::Dots));
-      cbx->addItem(tr("Lines", "Grid style"),
-                   QVariant::fromValue(Theme::GridStyle::Lines));
-    }
     auto askName = [this](const QString& title, const QString& defaultName) {
       return QInputDialog::getText(this, title, tr("Name:"), QLineEdit::Normal,
                                    defaultName);
@@ -407,24 +400,31 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
               initColorTreeWidgetItem(*item, colors[index]);
               mSettings.themes.setAll(themes);
             });
-    for (auto cfg : {
-             std::make_pair(mUi->cbxSchematicGridStyle,
-                            &Theme::setSchematicGridStyle),
-             std::make_pair(mUi->cbxBoardGridStyle, &Theme::setBoardGridStyle),
-         }) {
-      connect(cfg.first,
+  }
+
+  // Initialize grid style widgets.
+  {
+    auto setup = [this](
+                     QComboBox* cbx,
+                     WorkspaceSettingsItem_GenericValue<GridStyle>& setting) {
+      cbx->addItem(tr("None", "Grid style"),
+                   QVariant::fromValue(GridStyle::None));
+      cbx->addItem(tr("Dots", "Grid style"),
+                   QVariant::fromValue(GridStyle::Dots));
+      cbx->addItem(tr("Lines", "Grid style"),
+                   QVariant::fromValue(GridStyle::Lines));
+      connect(cbx,
               static_cast<void (QComboBox::*)(int)>(
                   &QComboBox::currentIndexChanged),
-              this, [this, cfg](int index) {
-                auto themes = mSettings.themes.getAll();
-                auto theme = themes.find(mSettings.themes.getActiveUuid());
-                if (theme == themes.end()) return;
-                const Theme::GridStyle style =
-                    cfg.first->itemData(index).value<Theme::GridStyle>();
-                ((*theme).*cfg.second)(style);
-                mSettings.themes.setAll(themes);
+              this, [cbx, &setting](int index) {
+                const QVariant data = cbx->itemData(index);
+                if (data.isValid()) {
+                  setting.set(data.value<GridStyle>());
+                }
               });
-    }
+    };
+    setup(mUi->cbxSchematicGridStyle, mSettings.schematicGridStyle);
+    setup(mUi->cbxBoardGridStyle, mSettings.boardGridStyle);
   }
 
   // Now load all current settings
@@ -643,17 +643,6 @@ void WorkspaceSettingsDialog::themeIndexChanged(int index) noexcept {
     initColorTreeWidgetItem(*item, theme.getColors().at(i));
   }
   mUi->treeThemeColors->setEnabled(valid);
-
-  // Grid style.
-  for (const auto& cfg : {
-           std::make_pair(mUi->cbxSchematicGridStyle,
-                          theme.getSchematicGridStyle()),
-           std::make_pair(mUi->cbxBoardGridStyle, theme.getBoardGridStyle()),
-       }) {
-    const int index = cfg.first->findData(QVariant::fromValue(cfg.second));
-    cfg.first->setCurrentIndex(index);
-    cfg.first->setEnabled(valid);
-  }
 }
 
 void WorkspaceSettingsDialog::initColorTreeWidgetItem(
@@ -772,6 +761,13 @@ void WorkspaceSettingsDialog::loadSettings() noexcept {
 
   // Themes
   updateThemesList();
+
+  // Grid style
+  auto loadGridStyle = [](QComboBox* cbx, GridStyle gridStyle) {
+    cbx->setCurrentIndex(cbx->findData(QVariant::fromValue(gridStyle)));
+  };
+  loadGridStyle(mUi->cbxSchematicGridStyle, mSettings.schematicGridStyle.get());
+  loadGridStyle(mUi->cbxBoardGridStyle, mSettings.boardGridStyle.get());
 }
 
 void WorkspaceSettingsDialog::saveSettings() noexcept {
@@ -827,6 +823,8 @@ void WorkspaceSettingsDialog::saveSettings() noexcept {
 
     // Themes were applied immediately.
 
+    // Grid style was applied immediately.
+
     // Save settings to disk.
     mWorkspace.saveSettings();  // can throw
   } catch (const Exception& e) {
@@ -837,6 +835,8 @@ void WorkspaceSettingsDialog::saveSettings() noexcept {
 void WorkspaceSettingsDialog::discardTemporaryModifications() noexcept {
   mOldUiTheme = mSettings.uiTheme.get();
   mOldApplicationLocale = mSettings.applicationLocale.get();
+  mOldSchematicGridStyle = mSettings.schematicGridStyle.get();
+  mOldBoardGridStyle = mSettings.boardGridStyle.get();
   mOldThemes = mSettings.themes.getAll();
   mOldActiveTheme = mSettings.themes.getActiveUuid();
 }
@@ -844,15 +844,20 @@ void WorkspaceSettingsDialog::discardTemporaryModifications() noexcept {
 void WorkspaceSettingsDialog::revertTemporaryModifications() noexcept {
   mSettings.uiTheme.set(mOldUiTheme);
   mSettings.applicationLocale.set(mOldApplicationLocale);
+  mSettings.schematicGridStyle.set(mOldSchematicGridStyle);
+  mSettings.boardGridStyle.set(mOldBoardGridStyle);
   mSettings.themes.setAll(mOldThemes);
   mSettings.themes.setActiveUuid(mOldActiveTheme);
 }
 
 bool WorkspaceSettingsDialog::hasTemporaryModifications() const noexcept {
-  return (mSettings.uiTheme.get() != mOldUiTheme) ||
-      (mSettings.applicationLocale.get() != mOldApplicationLocale) ||
-      (mSettings.themes.getAll() != mOldThemes) ||
-      (mSettings.themes.getActiveUuid() != mOldActiveTheme);
+  return (mSettings.uiTheme.get() != mOldUiTheme)  //
+      || (mSettings.applicationLocale.get() != mOldApplicationLocale)  //
+      || (mSettings.schematicGridStyle.get() != mOldSchematicGridStyle)  //
+      || (mSettings.boardGridStyle.get() != mOldBoardGridStyle)  //
+      || (mSettings.themes.getAll() != mOldThemes)  //
+      || (mSettings.themes.getActiveUuid() != mOldActiveTheme)  //
+      ;
 }
 
 /*******************************************************************************

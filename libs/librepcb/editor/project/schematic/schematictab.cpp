@@ -118,10 +118,7 @@ SchematicTab::SchematicTab(GuiApplication& app, SchematicEditor& editor,
                                 this)),
     mMsgInstallLibraries(app.getWorkspace(), "EMPTY_SCHEMATIC_NO_LIBRARIES"),
     mMsgAddDrawingFrame(app.getWorkspace(), "EMPTY_SCHEMATIC_ADD_FRAME"),
-    mGridStyle(mApp.getWorkspace()
-                   .getSettings()
-                   .themes.getActive()
-                   .getSchematicGridStyle()),
+    mGridStyle(mApp.getWorkspace().getSettings().schematicGridStyle.get()),
     mIgnorePlacementLocks(false),
     mFrameIndex(0),
     mToolFeatures(),
@@ -209,7 +206,13 @@ SchematicTab::SchematicTab(GuiApplication& app, SchematicEditor& editor,
   };
   mFsm.reset(new SchematicEditorFsm(fsmContext));
 
-  // Apply theme whenever it has been modified.
+  // Apply workspace settings whenever they have been modified.
+  connect(&mApp.getWorkspace().getSettings().schematicGridStyle,
+          &WorkspaceSettingsItem::edited, this, [this]() {
+            mGridStyle =
+                mApp.getWorkspace().getSettings().schematicGridStyle.get();
+            applyTheme();
+          });
   connect(&mApp.getWorkspace().getSettings().themes,
           &WorkspaceSettingsItem_Themes::edited, this,
           &SchematicTab::applyTheme);

@@ -75,6 +75,23 @@ public:
   }
 
   /**
+   * @brief Set the initial value
+   *
+   * @warning This is a hacky, temporary way to initialize specific workspace
+   *          settings with the value of another workspace setting, as required
+   *          for file format migrations! Do not call this method unless you
+   *          know exactly what you are doing.
+   *
+   * @param value   The initial value
+   */
+  void setInitial(const T& value) noexcept {
+    if (value != mCurrentValue) {
+      mCurrentValue = value;
+      emit edited();
+    }
+  }
+
+  /**
    * @brief Get the default value
    *
    * @return Default value

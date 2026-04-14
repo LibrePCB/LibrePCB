@@ -48,6 +48,7 @@ class WorkspaceSettingsTest : public ::testing::Test {};
 TEST_F(WorkspaceSettingsTest, testLoadFromSExpression) {
   std::unique_ptr<SExpression> root = SExpression::parse(
       "(librepcb_workspace_settings\n"
+      " (ui_theme \"dark\")\n"
       " (user \"Foo Bar\")\n"
       " (application_locale \"de_CH\")\n"
       " (default_length_unit micrometers)\n"
@@ -72,6 +73,8 @@ TEST_F(WorkspaceSettingsTest, testLoadFromSExpression) {
       " (external_pdf_reader\n"
       "  (command \"evince \\\"{{FILEPATH}}\\\"\")\n"
       " )\n"
+      " (schematic_grid_style dots)\n"
+      " (board_grid_style none)\n"
       " (dismissed_messages\n"
       "  (message \"SOME_MESSAGE: foo\")\n"
       "  (message \"SOME_MESSAGE: bar\")\n"
@@ -81,6 +84,7 @@ TEST_F(WorkspaceSettingsTest, testLoadFromSExpression) {
 
   WorkspaceSettings obj;
   obj.load(*root, Application::getFileFormatVersion());
+  EXPECT_EQ("dark", obj.uiTheme.get());
   EXPECT_EQ("Foo Bar", obj.userName.get());
   EXPECT_EQ("de_CH", obj.applicationLocale.get());
   EXPECT_EQ(LengthUnit::micrometers(), obj.defaultLengthUnit.get());
@@ -99,6 +103,8 @@ TEST_F(WorkspaceSettingsTest, testLoadFromSExpression) {
             obj.externalFileManagerCommands.get());
   EXPECT_EQ(QStringList{"evince \"{{FILEPATH}}\""},
             obj.externalPdfReaderCommands.get());
+  EXPECT_EQ(GridStyle::Dots, obj.schematicGridStyle.get());
+  EXPECT_EQ(GridStyle::None, obj.boardGridStyle.get());
   EXPECT_EQ((QSet<QString>{"SOME_MESSAGE: foo", "SOME_MESSAGE: bar"}),
             obj.dismissedMessages.get());
 }
@@ -106,6 +112,7 @@ TEST_F(WorkspaceSettingsTest, testLoadFromSExpression) {
 TEST_F(WorkspaceSettingsTest, testStoreAndLoad) {
   // Store
   WorkspaceSettings obj1;
+  obj1.uiTheme.set("light");
   obj1.userName.set("foo bar");
   obj1.applicationLocale.set("de_CH");
   obj1.defaultLengthUnit.set(LengthUnit::nanometers());
@@ -120,12 +127,15 @@ TEST_F(WorkspaceSettingsTest, testStoreAndLoad) {
   obj1.externalWebBrowserCommands.set({"foo", "bar"});
   obj1.externalFileManagerCommands.set({"file", "manager"});
   obj1.externalPdfReaderCommands.set({"pdf", "reader"});
+  obj1.schematicGridStyle.set(GridStyle::None);
+  obj1.boardGridStyle.set(GridStyle::Lines);
   obj1.dismissedMessages.set({"foo", "bar"});
   const std::unique_ptr<const SExpression> root1 = obj1.serialize();
 
   // Load
   WorkspaceSettings obj2;
   obj2.load(*root1, Application::getFileFormatVersion());
+  EXPECT_EQ(obj1.uiTheme.get(), obj2.uiTheme.get());
   EXPECT_EQ(obj1.userName.get().toStdString(),
             obj2.userName.get().toStdString());
   EXPECT_EQ(obj1.applicationLocale.get().toStdString(),
@@ -143,6 +153,8 @@ TEST_F(WorkspaceSettingsTest, testStoreAndLoad) {
             obj2.externalFileManagerCommands.get());
   EXPECT_EQ(obj1.externalPdfReaderCommands.get(),
             obj2.externalPdfReaderCommands.get());
+  EXPECT_EQ(obj1.schematicGridStyle.get(), obj2.schematicGridStyle.get());
+  EXPECT_EQ(obj1.boardGridStyle.get(), obj2.boardGridStyle.get());
   EXPECT_EQ(obj1.dismissedMessages.get(), obj2.dismissedMessages.get());
   const std::unique_ptr<const SExpression> root2 = obj2.serialize();
 

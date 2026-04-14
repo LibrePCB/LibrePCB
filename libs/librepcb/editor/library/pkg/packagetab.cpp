@@ -109,10 +109,7 @@ PackageTab::PackageTab(LibraryEditor& editor, std::unique_ptr<Package> pkg,
     mWizardMode(mode != Mode::Open),
     mCurrentPageIndex(mWizardMode ? 0 : 2),
     mView3d(false),
-    mGridStyle(mApp.getWorkspace()
-                   .getSettings()
-                   .themes.getActive()
-                   .getBoardGridStyle()),
+    mGridStyle(mApp.getWorkspace().getSettings().boardGridStyle.get()),
     mUnit(LengthUnit::millimeters()),
     mChooseCategory(false),
     mOpenGlProjection(new OpenGlProjection()),
@@ -208,6 +205,13 @@ PackageTab::PackageTab(LibraryEditor& editor, std::unique_ptr<Package> pkg,
                                        mUnit,     *mLayers,    *this,
                                        nullptr,   nullptr};
   mFsm.reset(new PackageEditorFsm(fsmContext));
+
+  // Apply workspace settings whenever they have been modified.
+  connect(&mApp.getWorkspace().getSettings().boardGridStyle,
+          &WorkspaceSettingsItem::edited, this, [this]() {
+            mGridStyle = mApp.getWorkspace().getSettings().boardGridStyle.get();
+            applyTheme();
+          });
 
   // Load the first footprint & 3D model.
   setCurrentFootprintIndex(0);

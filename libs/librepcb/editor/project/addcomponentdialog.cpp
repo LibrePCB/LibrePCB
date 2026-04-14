@@ -184,7 +184,7 @@ AddComponentDialog::AddComponentDialog(const WorkspaceLibraryDb& db,
   mComponentPreviewScene->setBackgroundColors(
       theme.getColor(Theme::Color::sSchematicBackground).getPrimaryColor(),
       theme.getColor(Theme::Color::sSchematicBackground).getSecondaryColor());
-  mComponentPreviewScene->setGridStyle(theme.getBoardGridStyle());
+  mComponentPreviewScene->setGridStyle(mSettings.schematicGridStyle.get());
   mComponentPreviewScene->setOriginCrossVisible(false);
   mUi->viewComponent->setSpinnerColor(
       theme.getColor(Theme::Color::sSchematicBackground).getSecondaryColor());
@@ -194,7 +194,7 @@ AddComponentDialog::AddComponentDialog(const WorkspaceLibraryDb& db,
   mDevicePreviewScene->setBackgroundColors(
       theme.getColor(Theme::Color::sBoardBackground).getPrimaryColor(),
       theme.getColor(Theme::Color::sBoardBackground).getSecondaryColor());
-  mDevicePreviewScene->setGridStyle(theme.getBoardGridStyle());
+  mDevicePreviewScene->setGridStyle(mSettings.boardGridStyle.get());
   mDevicePreviewScene->setOriginCrossVisible(false);
   mUi->viewDevice->setSpinnerColor(
       theme.getColor(Theme::Color::sBoardBackground).getSecondaryColor());

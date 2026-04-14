@@ -28,6 +28,7 @@
 
 #include <librepcb/core/geometry/hole.h>
 #include <librepcb/core/project/board/board.h>
+#include <librepcb/core/workspace/theme.h>
 
 #include <QtCore>
 

@@ -149,10 +149,7 @@ Board2dTab::Board2dTab(GuiApplication& app, BoardEditor& editor,
     mMsgEmptySchematics(app.getWorkspace(), "EMPTY_BOARD_NO_COMPONENTS"),
     mMsgSetupDesignRules(app.getWorkspace(), "EMPTY_BOARD_SETUP_DESIGN_RULES"),
     mMsgPlaceDevices(app.getWorkspace(), "EMPTY_BOARD_PLACE_DEVICES"),
-    mGridStyle(mApp.getWorkspace()
-                   .getSettings()
-                   .themes.getActive()
-                   .getBoardGridStyle()),
+    mGridStyle(mApp.getWorkspace().getSettings().boardGridStyle.get()),
     mIgnorePlacementLocks(false),
     mFrameIndex(0),
     mToolFeatures(),
@@ -276,7 +273,12 @@ Board2dTab::Board2dTab(GuiApplication& app, BoardEditor& editor,
   };
   mFsm.reset(new BoardEditorFsm(fsmContext));
 
-  // Apply theme whenever it has been modified.
+  // Apply workspace settings whenever they have been modified.
+  connect(&mApp.getWorkspace().getSettings().boardGridStyle,
+          &WorkspaceSettingsItem::edited, this, [this]() {
+            mGridStyle = mApp.getWorkspace().getSettings().boardGridStyle.get();
+            applyTheme();
+          });
   connect(&mApp.getWorkspace().getSettings().themes,
           &WorkspaceSettingsItem_Themes::edited, this, &Board2dTab::applyTheme);
   applyTheme();

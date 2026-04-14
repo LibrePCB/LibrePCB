@@ -36,10 +36,10 @@
 #include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/types/alignment.h>
 #include <librepcb/core/types/elementname.h>
+#include <librepcb/core/types/enums.h>
 #include <librepcb/core/types/length.h>
 #include <librepcb/core/types/lengthunit.h>
 #include <librepcb/core/types/version.h>
-#include <librepcb/core/workspace/theme.h>
 
 #include <QtCore>
 
@@ -234,7 +234,7 @@ private:
   bool mWizardMode;
   int mCurrentPageIndex;
   bool mView3d;
-  Theme::GridStyle mGridStyle;
+  GridStyle mGridStyle;
   LengthUnit mUnit;
   bool mChooseCategory;
   std::shared_ptr<PackageModel> mCurrentModel;

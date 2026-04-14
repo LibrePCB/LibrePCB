@@ -188,7 +188,7 @@ private:
 
   // State
   SearchContext mSearchContext;
-  Theme::GridStyle mGridStyle;
+  GridStyle mGridStyle;
   QPointF mSceneImagePos;
   bool mIgnorePlacementLocks;
   int mFrameIndex;

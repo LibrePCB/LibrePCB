@@ -33,49 +33,11 @@
 namespace librepcb {
 
 /*******************************************************************************
- *  Non-Member Functions
- ******************************************************************************/
-
-template <>
-std::unique_ptr<SExpression> serialize(const Theme::GridStyle& obj) {
-  switch (obj) {
-    case Theme::GridStyle::None:
-      return SExpression::createToken("none");
-    case Theme::GridStyle::Dots:
-      return SExpression::createToken("dots");
-    case Theme::GridStyle::Lines:
-      return SExpression::createToken("lines");
-    default:
-      throw LogicError(__FILE__, __LINE__);
-  }
-}
-
-template <>
-inline Theme::GridStyle deserialize(const SExpression& sexpr) {
-  const QString str = sexpr.getValue();
-  if (str == "none") {
-    return Theme::GridStyle::None;
-  } else if (str == "dots") {
-    return Theme::GridStyle::Dots;
-  } else if (str == "lines") {
-    return Theme::GridStyle::Lines;
-  } else {
-    throw RuntimeError(__FILE__, __LINE__,
-                       QString("Unknown grid style: '%1'").arg(str));
-  }
-}
-
-/*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
 
 Theme::Theme(const Uuid& uuid, const QString& name) noexcept
-  : mNodes(),
-    mUuid(uuid),
-    mName(name),
-    mColors(),
-    mSchematicGridStyle(GridStyle::Lines),
-    mBoardGridStyle(GridStyle::Lines) {
+  : mNodes(), mUuid(uuid), mName(name), mColors() {
   // clang-format off
   const char* sch = QT_TR_NOOP("Schematic");
   const char* brd = QT_TR_NOOP("Board");
@@ -206,9 +168,7 @@ Theme::Theme(const Theme& other) noexcept
   : mNodes(other.mNodes),
     mUuid(other.mUuid),
     mName(other.mName),
-    mColors(other.mColors),
-    mSchematicGridStyle(other.mSchematicGridStyle),
-    mBoardGridStyle(other.mBoardGridStyle) {
+    mColors(other.mColors) {
 }
 
 Theme::~Theme() noexcept {
@@ -267,20 +227,6 @@ void Theme::setColors(const QList<ThemeColor>& colors) noexcept {
   }
 }
 
-void Theme::setSchematicGridStyle(GridStyle style) noexcept {
-  if (style != mSchematicGridStyle) {
-    mSchematicGridStyle = style;
-    addNode("schematic_grid_style").appendChild(style);
-  }
-}
-
-void Theme::setBoardGridStyle(GridStyle style) noexcept {
-  if (style != mBoardGridStyle) {
-    mBoardGridStyle = style;
-    addNode("board_grid_style").appendChild(style);
-  }
-}
-
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
@@ -303,12 +249,6 @@ void Theme::load(const SExpression& root) {
       }
     }
   }
-  if (const SExpression* value = root.tryGetChild("schematic_grid_style/@0")) {
-    mSchematicGridStyle = deserialize<GridStyle>(*value);
-  }
-  if (const SExpression* value = root.tryGetChild("board_grid_style/@0")) {
-    mBoardGridStyle = deserialize<GridStyle>(*value);
-  }
 }
 
 void Theme::serialize(SExpression& root) const {
@@ -330,8 +270,6 @@ bool Theme::operator==(const Theme& rhs) const noexcept {
       && (mUuid == rhs.mUuid)  //
       && (mName == rhs.mName)  //
       && (mColors == rhs.mColors)  //
-      && (mSchematicGridStyle == rhs.mSchematicGridStyle)  //
-      && (mBoardGridStyle == rhs.mBoardGridStyle)  //
       ;
 }
 
@@ -340,8 +278,6 @@ Theme& Theme::operator=(const Theme& rhs) noexcept {
   mUuid = rhs.mUuid;
   mName = rhs.mName;
   mColors = rhs.mColors;
-  mSchematicGridStyle = rhs.mSchematicGridStyle;
-  mBoardGridStyle = rhs.mBoardGridStyle;
   return *this;
 }
 

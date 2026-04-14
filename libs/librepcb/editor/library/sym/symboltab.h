@@ -32,10 +32,11 @@
 
 #include <librepcb/core/types/alignment.h>
 #include <librepcb/core/types/elementname.h>
+#include <librepcb/core/types/enums.h>
 #include <librepcb/core/types/length.h>
 #include <librepcb/core/types/lengthunit.h>
+#include <librepcb/core/types/uuid.h>
 #include <librepcb/core/types/version.h>
-#include <librepcb/core/workspace/theme.h>
 
 #include <QtCore>
 
@@ -207,7 +208,7 @@ private:
   // State
   bool mWizardMode;
   int mCurrentPageIndex;
-  Theme::GridStyle mGridStyle;
+  GridStyle mGridStyle;
   LengthUnit mUnit;
   bool mChooseCategory;
   bool mCompactLayout;

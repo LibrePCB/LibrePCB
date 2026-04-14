@@ -45,13 +45,6 @@ class Theme final {
   Q_DECLARE_TR_FUNCTIONS(Theme)
 
 public:
-  // Types
-  enum class GridStyle : int {
-    None,
-    Dots,
-    Lines,
-  };
-
   struct Color {
     // clang-format off
     static constexpr const char* sSchematicBackground      = "schematic_background";
@@ -141,16 +134,10 @@ public:
   const QString& getName() const noexcept { return mName; }
   const QList<ThemeColor>& getColors() const noexcept { return mColors; }
   const ThemeColor& getColor(const QString& identifier) const noexcept;
-  GridStyle getSchematicGridStyle() const noexcept {
-    return mSchematicGridStyle;
-  }
-  GridStyle getBoardGridStyle() const noexcept { return mBoardGridStyle; }
 
   // Setters
   void setName(const QString& name) noexcept;
   void setColors(const QList<ThemeColor>& colors) noexcept;
-  void setSchematicGridStyle(GridStyle style) noexcept;
-  void setBoardGridStyle(GridStyle style) noexcept;
 
   // General Methods
   void restoreDefaults() noexcept;
@@ -178,8 +165,6 @@ private:  // Data
   Uuid mUuid;
   QString mName;
   QList<ThemeColor> mColors;
-  GridStyle mSchematicGridStyle;
-  GridStyle mBoardGridStyle;
 };
 
 /*******************************************************************************
@@ -187,7 +172,5 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace librepcb
-
-Q_DECLARE_METATYPE(librepcb::Theme::GridStyle)
 
 #endif

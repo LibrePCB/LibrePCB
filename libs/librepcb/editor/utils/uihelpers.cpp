@@ -117,13 +117,13 @@ ui::Theme l2s(const UiTheme& v) noexcept {
   };
 }
 
-ui::GridStyle l2s(Theme::GridStyle v) noexcept {
+ui::GridStyle l2s(GridStyle v) noexcept {
   switch (v) {
-    case Theme::GridStyle::Lines:
+    case GridStyle::Lines:
       return ui::GridStyle::Lines;
-    case Theme::GridStyle::Dots:
+    case GridStyle::Dots:
       return ui::GridStyle::Dots;
-    case Theme::GridStyle::None:
+    case GridStyle::None:
       return ui::GridStyle::None;
     default:
       qCritical() << "Unhandled value in GridStyle conversion.";
@@ -131,17 +131,17 @@ ui::GridStyle l2s(Theme::GridStyle v) noexcept {
   }
 }
 
-Theme::GridStyle s2l(ui::GridStyle v) noexcept {
+GridStyle s2l(ui::GridStyle v) noexcept {
   switch (v) {
     case ui::GridStyle::Lines:
-      return Theme::GridStyle::Lines;
+      return GridStyle::Lines;
     case ui::GridStyle::Dots:
-      return Theme::GridStyle::Dots;
+      return GridStyle::Dots;
     case ui::GridStyle::None:
-      return Theme::GridStyle::None;
+      return GridStyle::None;
     default:
       qCritical() << "Unhandled value in GridStyle conversion.";
-      return Theme::GridStyle::None;
+      return GridStyle::None;
   }
 }
 

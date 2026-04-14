@@ -495,6 +495,8 @@ add_library(
   types/busname.h
   types/circuitidentifier.h
   types/elementname.h
+  types/enums.cpp
+  types/enums.h
   types/fileproofname.h
   types/layer.cpp
   types/layer.h

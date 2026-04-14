@@ -222,7 +222,7 @@ void ComponentGateEditor::reloadSymbol() noexcept {
     mScene->setSelectionRectColors(
         theme.getColor(Theme::Color::sSchematicSelection).getPrimaryColor(),
         theme.getColor(Theme::Color::sSchematicSelection).getSecondaryColor());
-    mScene->setGridStyle(Theme::GridStyle::None);
+    mScene->setGridStyle(GridStyle::None);
     mGraphicsItem.reset(new SymbolGraphicsItem(
         const_cast<Symbol&>(*mSymbol), mLayers, mComponent, mGate,
         mWorkspace.getSettings().libraryLocaleOrder.get(), false));
