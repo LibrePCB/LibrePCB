@@ -246,7 +246,7 @@ private:
   bool toggleBackgroundImage() noexcept;
   void applyBackgroundImageSettings() noexcept;
   FilePath getBackgroundImageCacheDir() const noexcept;
-  void applyTheme() noexcept;
+  void applyWorkspaceSettings() noexcept;
   void requestRepaint() noexcept;
 
 private:

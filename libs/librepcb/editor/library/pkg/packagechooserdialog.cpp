@@ -60,12 +60,11 @@ PackageChooserDialog::PackageChooserDialog(const Workspace& ws,
     mGraphicsScene(new GraphicsScene()) {
   mUi->setupUi(this);
 
-  const Theme& theme = mWorkspace.getSettings().themes.getActive();
-  mGraphicsScene->setBackgroundColors(
-      theme.getColor(ColorRole::boardBackground()).getPrimaryColor(),
-      theme.getColor(ColorRole::boardBackground()).getSecondaryColor());
-  mUi->graphicsView->setSpinnerColor(
-      theme.getColor(ColorRole::boardBackground()).getSecondaryColor());
+  const ColorScheme& scheme =
+      mWorkspace.getSettings().boardColorSchemes.getActive();
+  const auto background = scheme.getColors(ColorRole::boardBackground());
+  mGraphicsScene->setBackgroundColors(background.primary, background.secondary);
+  mUi->graphicsView->setSpinnerColor(background.secondary);
   mUi->graphicsView->setScene(mGraphicsScene.data());
 
   mCategoryTreeModel.reset(new CategoryTreeModelLegacy(

@@ -39,11 +39,11 @@
  ******************************************************************************/
 namespace librepcb {
 
+class ColorScheme;
 class GraphicsExport;
 class GraphicsExportSettings;
 class GraphicsPagePainter;
 class LengthUnit;
-class Theme;
 
 namespace editor {
 
@@ -100,7 +100,7 @@ public:
       const QList<std::shared_ptr<GraphicsPagePainter>>& pages, int currentPage,
       const QString& documentName, int innerLayerCount,
       const FilePath& defaultFilePath, const LengthUnit& lengthUnit,
-      const Theme& theme, const QString& settingsPrefix,
+      const ColorScheme& colors, const QString& settingsPrefix,
       QWidget* parent = nullptr) noexcept;
   ~GraphicsExportDialog() noexcept;
 
@@ -174,7 +174,7 @@ private:  // Data
   const QList<std::shared_ptr<GraphicsPagePainter>> mInputPages;
   const int mCurrentPage;  // Note: Might be out of range!
   const FilePath mDefaultFilePath;
-  const Theme& mTheme;
+  const ColorScheme& mColorScheme;
   const QString mSettingsPrefix;
   SaveAsCallback mSaveAsCallback;  // Guaranteed to be not null.
 

@@ -24,8 +24,8 @@
 
 #include "../serialization/sexpression.h"
 #include "../types/layer.h"
+#include "../workspace/basecolorscheme.h"
 #include "../workspace/colorrole.h"
-#include "../workspace/theme.h"
 
 #include <QtCore>
 #include <QtGui>
@@ -105,7 +105,9 @@ GraphicsExportSettings::GraphicsExportSettings() noexcept
     mBackgroundColor(Qt::transparent),
     mMinLineWidth(100000),
     mColors() {
-  loadColorsFromTheme(Theme(), true, true, Layer::innerCopperCount());
+  loadColorsFromScheme(&BaseColorScheme::schematicLibrePcbLight(),
+                       &BaseColorScheme::boardLibrePcbDark(),
+                       Layer::innerCopperCount());
 }
 
 GraphicsExportSettings::GraphicsExportSettings(
@@ -161,11 +163,12 @@ QColor GraphicsExportSettings::getFillColor(const QString& role, bool isFilled,
  *  General Methods
  ******************************************************************************/
 
-void GraphicsExportSettings::loadColorsFromTheme(const Theme& theme,
-                                                 bool schematic, bool board,
-                                                 int innerLayerCount) noexcept {
-  auto addColor = [this, &theme](const ColorRole& role, bool autoAdjust) {
-    QColor color = theme.getColor(role).getPrimaryColor();
+void GraphicsExportSettings::loadColorsFromScheme(
+    const ColorScheme* schematic, const ColorScheme* board,
+    int innerLayerCount) noexcept {
+  auto addColor = [this](const ColorScheme* scheme, const ColorRole& role,
+                         bool autoAdjust) {
+    QColor color = scheme->getColors(role).primary;
     if (autoAdjust) {
       // Make board layers looking better on white background since usually the
       // graphics export uses white background.
@@ -182,65 +185,65 @@ void GraphicsExportSettings::loadColorsFromTheme(const Theme& theme,
 
   // Schematic layers.
   if (schematic) {
-    addColor(ColorRole::schematicFrames(), false);
-    addColor(ColorRole::schematicOutlines(), false);
-    addColor(ColorRole::schematicGrabAreas(), false);
-    addColor(ColorRole::schematicPinLines(), false);
-    addColor(ColorRole::schematicPinNames(), false);
-    addColor(ColorRole::schematicPinNumbers(), false);
-    addColor(ColorRole::schematicNames(), false);
-    addColor(ColorRole::schematicValues(), false);
-    addColor(ColorRole::schematicWires(), false);
-    addColor(ColorRole::schematicNetLabels(), false);
-    addColor(ColorRole::schematicBuses(), false);
-    addColor(ColorRole::schematicBusLabels(), false);
-    addColor(ColorRole::schematicImageBorders(), false);
-    addColor(ColorRole::schematicDocumentation(), false);
-    addColor(ColorRole::schematicComments(), false);
-    addColor(ColorRole::schematicGuide(), false);
+    addColor(schematic, ColorRole::schematicFrames(), false);
+    addColor(schematic, ColorRole::schematicOutlines(), false);
+    addColor(schematic, ColorRole::schematicGrabAreas(), false);
+    addColor(schematic, ColorRole::schematicPinLines(), false);
+    addColor(schematic, ColorRole::schematicPinNames(), false);
+    addColor(schematic, ColorRole::schematicPinNumbers(), false);
+    addColor(schematic, ColorRole::schematicNames(), false);
+    addColor(schematic, ColorRole::schematicValues(), false);
+    addColor(schematic, ColorRole::schematicWires(), false);
+    addColor(schematic, ColorRole::schematicNetLabels(), false);
+    addColor(schematic, ColorRole::schematicBuses(), false);
+    addColor(schematic, ColorRole::schematicBusLabels(), false);
+    addColor(schematic, ColorRole::schematicImageBorders(), false);
+    addColor(schematic, ColorRole::schematicDocumentation(), false);
+    addColor(schematic, ColorRole::schematicComments(), false);
+    addColor(schematic, ColorRole::schematicGuide(), false);
   }
 
   if (board) {
     // Asymmetric board layers.
-    addColor(ColorRole::boardGuide(), true);
-    addColor(ColorRole::boardComments(), true);
-    addColor(ColorRole::boardDocumentation(), true);
-    addColor(ColorRole::boardAlignment(), true);
-    addColor(ColorRole::boardMeasures(), true);
-    addColor(ColorRole::boardFrames(), true);
-    addColor(ColorRole::boardAirWires(), true);
-    addColor(ColorRole::boardOutlines(), true);
-    addColor(ColorRole::boardHoles(), true);
-    addColor(ColorRole::boardPlatedCutouts(), true);
-    addColor(ColorRole::boardPads(), true);
-    addColor(ColorRole::boardVias(), true);
+    addColor(board, ColorRole::boardGuide(), true);
+    addColor(board, ColorRole::boardComments(), true);
+    addColor(board, ColorRole::boardDocumentation(), true);
+    addColor(board, ColorRole::boardAlignment(), true);
+    addColor(board, ColorRole::boardMeasures(), true);
+    addColor(board, ColorRole::boardFrames(), true);
+    addColor(board, ColorRole::boardAirWires(), true);
+    addColor(board, ColorRole::boardOutlines(), true);
+    addColor(board, ColorRole::boardHoles(), true);
+    addColor(board, ColorRole::boardPlatedCutouts(), true);
+    addColor(board, ColorRole::boardPads(), true);
+    addColor(board, ColorRole::boardVias(), true);
 
     // Symmetric board layers in logical order.
-    addColor(ColorRole::boardDocumentationTop(), true);
-    addColor(ColorRole::boardNamesTop(), true);
-    addColor(ColorRole::boardValuesTop(), true);
-    addColor(ColorRole::boardCourtyardTop(), true);
-    addColor(ColorRole::boardGrabAreasTop(), true);
-    addColor(ColorRole::boardLegendTop(), true);
-    addColor(ColorRole::boardGlueTop(), true);
-    addColor(ColorRole::boardSolderPasteTop(), true);
-    addColor(ColorRole::boardStopMaskTop(), true);
-    addColor(ColorRole::boardCopperTop(), true);
+    addColor(board, ColorRole::boardDocumentationTop(), true);
+    addColor(board, ColorRole::boardNamesTop(), true);
+    addColor(board, ColorRole::boardValuesTop(), true);
+    addColor(board, ColorRole::boardCourtyardTop(), true);
+    addColor(board, ColorRole::boardGrabAreasTop(), true);
+    addColor(board, ColorRole::boardLegendTop(), true);
+    addColor(board, ColorRole::boardGlueTop(), true);
+    addColor(board, ColorRole::boardSolderPasteTop(), true);
+    addColor(board, ColorRole::boardStopMaskTop(), true);
+    addColor(board, ColorRole::boardCopperTop(), true);
     for (int i = 1; i <= innerLayerCount; ++i) {
       if (const ColorRole* role = ColorRole::boardCopperInner(i)) {
-        addColor(*role, true);
+        addColor(board, *role, true);
       }
     }
-    addColor(ColorRole::boardCopperBot(), true);
-    addColor(ColorRole::boardStopMaskBot(), true);
-    addColor(ColorRole::boardSolderPasteBot(), true);
-    addColor(ColorRole::boardGlueBot(), true);
-    addColor(ColorRole::boardLegendBot(), true);
-    addColor(ColorRole::boardGrabAreasBot(), true);
-    addColor(ColorRole::boardCourtyardBot(), true);
-    addColor(ColorRole::boardValuesBot(), true);
-    addColor(ColorRole::boardNamesBot(), true);
-    addColor(ColorRole::boardDocumentationBot(), true);
+    addColor(board, ColorRole::boardCopperBot(), true);
+    addColor(board, ColorRole::boardStopMaskBot(), true);
+    addColor(board, ColorRole::boardSolderPasteBot(), true);
+    addColor(board, ColorRole::boardGlueBot(), true);
+    addColor(board, ColorRole::boardLegendBot(), true);
+    addColor(board, ColorRole::boardGrabAreasBot(), true);
+    addColor(board, ColorRole::boardCourtyardBot(), true);
+    addColor(board, ColorRole::boardValuesBot(), true);
+    addColor(board, ColorRole::boardNamesBot(), true);
+    addColor(board, ColorRole::boardDocumentationBot(), true);
   }
 }
 

@@ -46,7 +46,6 @@
 #include <librepcb/core/library/sym/symbol.h>
 #include <librepcb/core/utils/scopeguard.h>
 #include <librepcb/core/workspace/colorrole.h>
-#include <librepcb/core/workspace/theme.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
 #include <librepcb/core/workspace/workspacesettings.h>
 
@@ -181,25 +180,28 @@ AddComponentDialog::AddComponentDialog(const WorkspaceLibraryDb& db,
   }));
 
   // Setup symbol graphics view.
-  const Theme& theme = mSettings.themes.getActive();
-  mComponentPreviewScene->setBackgroundColors(
-      theme.getColor(ColorRole::schematicBackground()).getPrimaryColor(),
-      theme.getColor(ColorRole::schematicBackground()).getSecondaryColor());
-  mComponentPreviewScene->setGridStyle(mSettings.schematicGridStyle.get());
-  mComponentPreviewScene->setOriginCrossVisible(false);
-  mUi->viewComponent->setSpinnerColor(
-      theme.getColor(ColorRole::schematicBackground()).getSecondaryColor());
-  mUi->viewComponent->setScene(mComponentPreviewScene.data());
+  {
+    const ColorScheme& scheme = mSettings.schematicColorSchemes.getActive();
+    const auto background = scheme.getColors(ColorRole::schematicBackground());
+    mComponentPreviewScene->setBackgroundColors(background.primary,
+                                                background.secondary);
+    mComponentPreviewScene->setGridStyle(mSettings.schematicGridStyle.get());
+    mComponentPreviewScene->setOriginCrossVisible(false);
+    mUi->viewComponent->setSpinnerColor(background.secondary);
+    mUi->viewComponent->setScene(mComponentPreviewScene.data());
+  }
 
   // Setup package graphics view.
-  mDevicePreviewScene->setBackgroundColors(
-      theme.getColor(ColorRole::boardBackground()).getPrimaryColor(),
-      theme.getColor(ColorRole::boardBackground()).getSecondaryColor());
-  mDevicePreviewScene->setGridStyle(mSettings.boardGridStyle.get());
-  mDevicePreviewScene->setOriginCrossVisible(false);
-  mUi->viewDevice->setSpinnerColor(
-      theme.getColor(ColorRole::boardBackground()).getSecondaryColor());
-  mUi->viewDevice->setScene(mDevicePreviewScene.data());
+  {
+    const ColorScheme& scheme = mSettings.boardColorSchemes.getActive();
+    const auto background = scheme.getColors(ColorRole::boardBackground());
+    mDevicePreviewScene->setBackgroundColors(background.primary,
+                                             background.secondary);
+    mDevicePreviewScene->setGridStyle(mSettings.boardGridStyle.get());
+    mDevicePreviewScene->setOriginCrossVisible(false);
+    mUi->viewDevice->setSpinnerColor(background.secondary);
+    mUi->viewDevice->setScene(mDevicePreviewScene.data());
+  }
 
   mUi->treeCategories->setModel(mCategoryTreeModel.data());
   connect(mUi->treeCategories->selectionModel(),

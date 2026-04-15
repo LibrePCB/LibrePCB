@@ -212,18 +212,16 @@ void ComponentGateEditor::reloadSymbol() noexcept {
 
   if (mSymbol) {
     mScene.reset(new GraphicsScene());
-    const Theme& theme = mWorkspace.getSettings().themes.getActive();
-    mScene->setOriginCrossVisible(false);  // It's rather disruptive.
-    mScene->setBackgroundColors(
-        theme.getColor(ColorRole::schematicBackground()).getPrimaryColor(),
-        theme.getColor(ColorRole::schematicBackground()).getSecondaryColor());
-    mScene->setOverlayColors(
-        theme.getColor(ColorRole::schematicOverlays()).getPrimaryColor(),
-        theme.getColor(ColorRole::schematicOverlays()).getSecondaryColor());
-    mScene->setSelectionRectColors(
-        theme.getColor(ColorRole::schematicSelection()).getPrimaryColor(),
-        theme.getColor(ColorRole::schematicSelection()).getSecondaryColor());
+    const ColorScheme& scheme =
+        mWorkspace.getSettings().schematicColorSchemes.getActive();
+    const auto background = scheme.getColors(ColorRole::schematicBackground());
+    mScene->setBackgroundColors(background.primary, background.secondary);
+    const auto overlay = scheme.getColors(ColorRole::schematicOverlays());
+    mScene->setOverlayColors(overlay.primary, overlay.secondary);
+    const auto selection = scheme.getColors(ColorRole::schematicSelection());
+    mScene->setSelectionRectColors(selection.primary, selection.secondary);
     mScene->setGridStyle(GridStyle::None);
+    mScene->setOriginCrossVisible(false);  // It's rather disruptive.
     mGraphicsItem.reset(new SymbolGraphicsItem(
         const_cast<Symbol&>(*mSymbol), mLayers, mComponent, mGate,
         mWorkspace.getSettings().libraryLocaleOrder.get(), false));

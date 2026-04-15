@@ -74,18 +74,16 @@ ComponentVariantEditor::ComponentVariantEditor(
     mGates(new ComponentGateListModel(ws, layers, cache)),
     mHasUnassignedSignals(false) {
   // Setup preview scene.
-  const Theme& theme = mWorkspace.getSettings().themes.getActive();
-  mScene->setOriginCrossVisible(true);  // Required for positioning.
-  mScene->setBackgroundColors(
-      theme.getColor(ColorRole::schematicBackground()).getPrimaryColor(),
-      theme.getColor(ColorRole::schematicBackground()).getSecondaryColor());
-  mScene->setOverlayColors(
-      theme.getColor(ColorRole::schematicOverlays()).getPrimaryColor(),
-      theme.getColor(ColorRole::schematicOverlays()).getSecondaryColor());
-  mScene->setSelectionRectColors(
-      theme.getColor(ColorRole::schematicSelection()).getPrimaryColor(),
-      theme.getColor(ColorRole::schematicSelection()).getSecondaryColor());
+  const ColorScheme& scheme =
+      mWorkspace.getSettings().schematicColorSchemes.getActive();
+  const auto background = scheme.getColors(ColorRole::schematicBackground());
+  mScene->setBackgroundColors(background.primary, background.secondary);
+  const auto overlay = scheme.getColors(ColorRole::schematicOverlays());
+  mScene->setOverlayColors(overlay.primary, overlay.secondary);
+  const auto selection = scheme.getColors(ColorRole::schematicSelection());
+  mScene->setSelectionRectColors(selection.primary, selection.secondary);
   mScene->setGridStyle(GridStyle::Lines);  // Required for positioning.
+  mScene->setOriginCrossVisible(true);  // Required for positioning.
   connect(mScene.get(), &GraphicsScene::changed, this, [this]() {
     ++mFrameIndex;
     emit uiDataChanged();

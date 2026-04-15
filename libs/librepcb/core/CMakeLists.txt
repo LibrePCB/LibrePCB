@@ -543,14 +543,14 @@ add_library(
   utils/toolbox.h
   utils/transform.cpp
   utils/transform.h
+  workspace/basecolorscheme.cpp
+  workspace/basecolorscheme.h
   workspace/colorrole.cpp
   workspace/colorrole.h
-  workspace/theme.cpp
-  workspace/theme.h
-  workspace/themecolor.cpp
-  workspace/themecolor.h
   workspace/uitheme.cpp
   workspace/uitheme.h
+  workspace/usercolorscheme.cpp
+  workspace/usercolorscheme.h
   workspace/workspace.cpp
   workspace/workspace.h
   workspace/workspacelibrarydb.cpp
@@ -563,12 +563,12 @@ add_library(
   workspace/workspacesettings.h
   workspace/workspacesettingsitem.cpp
   workspace/workspacesettingsitem.h
+  workspace/workspacesettingsitem_colorschemes.cpp
+  workspace/workspacesettingsitem_colorschemes.h
   workspace/workspacesettingsitem_genericvalue.h
   workspace/workspacesettingsitem_genericvaluelist.h
   workspace/workspacesettingsitem_keyboardshortcuts.cpp
   workspace/workspacesettingsitem_keyboardshortcuts.h
-  workspace/workspacesettingsitem_themes.cpp
-  workspace/workspacesettingsitem_themes.h
 )
 target_include_directories(
   librepcb_core

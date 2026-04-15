@@ -60,14 +60,13 @@ ComponentChooserDialog::ComponentChooserDialog(const Workspace& ws,
     mGraphicsScene(new GraphicsScene()) {
   mUi->setupUi(this);
 
-  const Theme& theme = mWorkspace.getSettings().themes.getActive();
-  mGraphicsScene->setBackgroundColors(
-      theme.getColor(ColorRole::schematicBackground()).getPrimaryColor(),
-      theme.getColor(ColorRole::schematicBackground()).getSecondaryColor());
+  const ColorScheme& scheme =
+      mWorkspace.getSettings().schematicColorSchemes.getActive();
+  const auto background = scheme.getColors(ColorRole::schematicBackground());
+  mGraphicsScene->setBackgroundColors(background.primary, background.secondary);
   mGraphicsScene->setOriginCrossVisible(false);
 
-  mUi->graphicsView->setSpinnerColor(
-      theme.getColor(ColorRole::schematicBackground()).getSecondaryColor());
+  mUi->graphicsView->setSpinnerColor(background.secondary);
   mUi->graphicsView->setScene(mGraphicsScene.data());
 
   mCategoryTreeModel.reset(new CategoryTreeModelLegacy(

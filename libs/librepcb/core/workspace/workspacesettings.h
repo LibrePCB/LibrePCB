@@ -26,10 +26,10 @@
 #include "../exceptions.h"
 #include "../types/enums.h"
 #include "../types/lengthunit.h"
+#include "workspacesettingsitem_colorschemes.h"
 #include "workspacesettingsitem_genericvalue.h"
 #include "workspacesettingsitem_genericvaluelist.h"
 #include "workspacesettingsitem_keyboardshortcuts.h"
-#include "workspacesettingsitem_themes.h"
 
 #include <QtCore>
 
@@ -305,13 +305,6 @@ public:
   WorkspaceSettingsItem_KeyboardShortcuts keyboardShortcuts;
 
   /**
-   * @brief Themes
-   *
-   * @see ::librepcb::WorkspaceSettingsItem_KeyboardShortcuts
-   */
-  WorkspaceSettingsItem_Themes themes;
-
-  /**
    * @brief Schematic grid style
    *
    * Default: ::librepcb::GridStyle::Lines
@@ -324,6 +317,27 @@ public:
    * Default: ::librepcb::GridStyle::Lines
    */
   WorkspaceSettingsItem_GenericValue<GridStyle> boardGridStyle;
+
+  /**
+   * @brief Schematic color schemes
+   *
+   * @see ::librepcb::WorkspaceSettingsItem_ColorSchemes
+   */
+  WorkspaceSettingsItem_ColorSchemes schematicColorSchemes;
+
+  /**
+   * @brief Board 2D color schemes
+   *
+   * @see ::librepcb::WorkspaceSettingsItem_ColorSchemes
+   */
+  WorkspaceSettingsItem_ColorSchemes boardColorSchemes;
+
+  /**
+   * @brief 3D view color schemes
+   *
+   * @see ::librepcb::WorkspaceSettingsItem_ColorSchemes
+   */
+  WorkspaceSettingsItem_ColorSchemes view3dColorSchemes;
 
   /**
    * @brief Dismissed messages

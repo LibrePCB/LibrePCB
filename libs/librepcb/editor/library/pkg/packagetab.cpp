@@ -211,8 +211,11 @@ PackageTab::PackageTab(LibraryEditor& editor, std::unique_ptr<Package> pkg,
   connect(&mApp.getWorkspace().getSettings().boardGridStyle,
           &WorkspaceSettingsItem::edited, this, [this]() {
             mGridStyle = mApp.getWorkspace().getSettings().boardGridStyle.get();
-            applyTheme();
+            applyWorkspaceSettings();
           });
+  connect(&mApp.getWorkspace().getSettings().boardColorSchemes,
+          &WorkspaceSettingsItem_ColorSchemes::edited, this,
+          &PackageTab::applyWorkspaceSettings);
 
   // Load the first footprint & 3D model.
   setCurrentFootprintIndex(0);
@@ -314,12 +317,16 @@ ui::TabData PackageTab::getUiData() const noexcept {
 }
 
 ui::PackageTabData PackageTab::getDerivedUiData() const noexcept {
-  const Theme& theme = mEditor.getWorkspace().getSettings().themes.getActive();
+  const ColorScheme& scheme2d =
+      mApp.getWorkspace().getSettings().boardColorSchemes.getActive();
+  const ColorScheme& scheme3d =
+      mApp.getWorkspace().getSettings().view3dColorSchemes.getActive();
+  const auto infoBoxColors = scheme2d.getColors(ColorRole::boardInfoBox());
   const QColor bgColor = mView3d
-      ? theme.getColor(ColorRole::board3dBackground()).getPrimaryColor()
-      : theme.getColor(ColorRole::boardBackground()).getPrimaryColor();
+      ? scheme3d.getColors(ColorRole::board3dBackground()).primary
+      : scheme2d.getColors(ColorRole::boardBackground()).primary;
   const QColor fgColor = mView3d
-      ? theme.getColor(ColorRole::board3dBackground()).getSecondaryColor()
+      ? scheme3d.getColors(ColorRole::board3dBackground()).secondary
       : ((bgColor.lightnessF() >= 0.5) ? Qt::black : Qt::white);
   const bool refreshing =
       (mOpenGlSceneBuilder && mOpenGlSceneBuilder->isBusy());
@@ -364,10 +371,8 @@ ui::PackageTabData PackageTab::getDerivedUiData() const noexcept {
       },
       q2s(bgColor),  // Background color
       q2s(fgColor),  // Foreground color
-      q2s(theme.getColor(ColorRole::boardInfoBox())
-              .getPrimaryColor()),  // Overlay color
-      q2s(theme.getColor(ColorRole::boardInfoBox())
-              .getSecondaryColor()),  // Overlay text color
+      q2s(infoBoxColors.primary),  // Overlay color
+      q2s(infoBoxColors.secondary),  // Overlay text color
       l2s(mGridStyle),  // Grid style
       l2s(*mPackage->getGridInterval()),  // Grid interval
       l2s(mUnit),  // Unit
@@ -619,7 +624,7 @@ void PackageTab::activate() noexcept {
   connect(mOpenGlSceneRebuildTimer.get(), &QTimer::timeout, this,
           &PackageTab::updateOpenGlScene);
 
-  applyTheme();
+  applyWorkspaceSettings();
   scheduleOpenGlSceneUpdate();
   updateOpenGlScene();
   requestRepaint();
@@ -2598,7 +2603,7 @@ bool PackageTab::execGraphicsExportDialog(GraphicsExportDialog::Output output,
     GraphicsExportDialog dialog(
         GraphicsExportDialog::Mode::Board, output, pages, 0,
         *mPackage->getNames().getDefaultValue(), 0, defaultFilePath, mUnit,
-        mApp.getWorkspace().getSettings().themes.getActive(),
+        mApp.getWorkspace().getSettings().boardColorSchemes.getActive(),
         "package_editor/" % settingsKey, getWindow());
     connect(&dialog, &GraphicsExportDialog::requestOpenFile, this,
             [this](const FilePath& fp) {
@@ -2735,10 +2740,10 @@ void PackageTab::applyBackgroundImageSettings() noexcept {
 
   if (enable) {
     // Make the image background transparent.
-    const Theme& theme =
-        mEditor.getWorkspace().getSettings().themes.getActive();
-    mBackgroundImageGraphicsItem->setPixmap(s.buildPixmap(
-        theme.getColor(ColorRole::boardBackground()).getPrimaryColor()));
+    const ColorScheme& scheme =
+        mEditor.getWorkspace().getSettings().boardColorSchemes.getActive();
+    mBackgroundImageGraphicsItem->setPixmap(
+        s.buildPixmap(scheme.getColors(ColorRole::boardBackground()).primary));
 
     // Apply the transform.
     mBackgroundImageGraphicsItem->setTransform(s.calcTransform());
@@ -2760,25 +2765,24 @@ void PackageTab::requestRepaint() noexcept {
   onDerivedUiDataChanged.notify();
 }
 
-void PackageTab::applyTheme() noexcept {
-  const Theme& theme = mEditor.getWorkspace().getSettings().themes.getActive();
-
+void PackageTab::applyWorkspaceSettings() noexcept {
   if (mScene) {
-    mScene->setBackgroundColors(
-        theme.getColor(ColorRole::boardBackground()).getPrimaryColor(),
-        theme.getColor(ColorRole::boardBackground()).getSecondaryColor());
-    mScene->setOverlayColors(
-        theme.getColor(ColorRole::boardOverlays()).getPrimaryColor(),
-        theme.getColor(ColorRole::boardOverlays()).getSecondaryColor());
-    mScene->setSelectionRectColors(
-        theme.getColor(ColorRole::boardSelection()).getPrimaryColor(),
-        theme.getColor(ColorRole::boardSelection()).getSecondaryColor());
+    const ColorScheme& scheme =
+        mApp.getWorkspace().getSettings().boardColorSchemes.getActive();
+    const auto background = scheme.getColors(ColorRole::boardBackground());
+    mScene->setBackgroundColors(background.primary, background.secondary);
+    const auto overlay = scheme.getColors(ColorRole::boardOverlays());
+    mScene->setOverlayColors(overlay.primary, overlay.secondary);
+    const auto selection = scheme.getColors(ColorRole::boardSelection());
+    mScene->setSelectionRectColors(selection.primary, selection.secondary);
     mScene->setGridStyle(mGridStyle);
   }
 
   if (mOpenGlView) {
-    mOpenGlView->setBackgroundColor(
-        theme.getColor(ColorRole::board3dBackground()).getPrimaryColor());
+    const ColorScheme& scheme =
+        mApp.getWorkspace().getSettings().view3dColorSchemes.getActive();
+    const auto background = scheme.getColors(ColorRole::board3dBackground());
+    mOpenGlView->setBackgroundColor(background.primary);
   }
 
   onDerivedUiDataChanged.notify();

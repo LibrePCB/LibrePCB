@@ -23,6 +23,8 @@
 #include <gtest/gtest.h>
 #include <librepcb/core/application.h>
 #include <librepcb/core/types/version.h>
+#include <librepcb/core/utils/toolbox.h>
+#include <librepcb/core/workspace/colorrole.h>
 #include <librepcb/core/workspace/workspacesettings.h>
 
 #include <QtCore>
@@ -292,6 +294,46 @@ TEST_F(WorkspaceSettingsTest, testUpgradeFileFormat) {
       " (project_autosave_interval 42)\n"
       ")\n";
   EXPECT_EQ(expectedContent.toStdString(), actualContent.toStdString());
+}
+
+// Test that all base color schemes provide the same (all!) color roles,
+// in the same order, and containing only valid colors.
+TEST_F(WorkspaceSettingsTest, testBaseColorSchemes) {
+  WorkspaceSettings obj;
+  QSet<Uuid> uuids;
+  for (const auto& cfg : {
+           std::make_pair(&obj.schematicColorSchemes, "schematic_"),
+           std::make_pair(&obj.boardColorSchemes, "board_"),
+           std::make_pair(&obj.view3dColorSchemes, "3d_"),
+       }) {
+    QSet<QString> names;
+    // There must be at least one base color scheme.
+    const auto& schemes = cfg.first->getBaseSchemes();
+    ASSERT_GE(schemes.count(), 1);
+    // Verify colors of all base color schemes.
+    const auto firstColors = schemes.at(0)->getAllColors();
+    for (const BaseColorScheme* scheme : schemes) {
+      // Check that all UUIDs are unique accross all color schemes.
+      EXPECT_FALSE(uuids.contains(scheme->getUuid()));
+      uuids.insert(scheme->getUuid());
+      // Check that all names are unique for each kind of color scheme.
+      EXPECT_FALSE(names.contains(scheme->getName()));
+      names.insert(scheme->getName());
+      // Check colors.
+      const auto colors = scheme->getAllColors();
+      ASSERT_EQ(firstColors.count(), colors.count());
+      for (int i = 0; i < colors.count(); ++i) {
+        const auto color = colors.at(i);
+        // Check for valid color role, with the correct ID prefix.
+        EXPECT_TRUE(color.role && color.role->getId().startsWith(cfg.second));
+        // Check that the order of roles is identical for all color schemes.
+        EXPECT_EQ(firstColors.at(i).role, colors.at(i).role);
+        // Check that colors are valid.
+        EXPECT_TRUE(colors.at(i).primary.isValid());
+        EXPECT_TRUE(colors.at(i).secondary.isValid());
+      }
+    }
+  }
 }
 
 /*******************************************************************************

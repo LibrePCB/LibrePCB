@@ -123,31 +123,36 @@ DeviceTab::DeviceTab(LibraryEditor& editor, std::unique_ptr<Device> dev,
   }
 
   // Setup component scene.
-  const Theme& theme = mApp.getWorkspace().getSettings().themes.getActive();
-  mComponentScene->setOriginCrossVisible(false);  // It's rather disruptive.
-  mComponentScene->setBackgroundColors(
-      theme.getColor(ColorRole::schematicBackground()).getPrimaryColor(),
-      theme.getColor(ColorRole::schematicBackground()).getSecondaryColor());
-  mComponentScene->setOverlayColors(
-      theme.getColor(ColorRole::schematicOverlays()).getPrimaryColor(),
-      theme.getColor(ColorRole::schematicOverlays()).getSecondaryColor());
-  mComponentScene->setSelectionRectColors(
-      theme.getColor(ColorRole::schematicSelection()).getPrimaryColor(),
-      theme.getColor(ColorRole::schematicSelection()).getSecondaryColor());
-  mComponentScene->setGridStyle(GridStyle::Lines);
+  {
+    const ColorScheme& scheme =
+        mApp.getWorkspace().getSettings().schematicColorSchemes.getActive();
+    const auto background = scheme.getColors(ColorRole::schematicBackground());
+    mComponentScene->setBackgroundColors(background.primary,
+                                         background.secondary);
+    const auto overlay = scheme.getColors(ColorRole::schematicOverlays());
+    mComponentScene->setOverlayColors(overlay.primary, overlay.secondary);
+    const auto selection = scheme.getColors(ColorRole::schematicSelection());
+    mComponentScene->setSelectionRectColors(selection.primary,
+                                            selection.secondary);
+    mComponentScene->setGridStyle(GridStyle::Lines);
+    mComponentScene->setOriginCrossVisible(false);  // It's rather disruptive.
+  }
 
   // Setup package scene.
-  mPackageScene->setOriginCrossVisible(false);  // It's rather disruptive.
-  mPackageScene->setBackgroundColors(
-      theme.getColor(ColorRole::boardBackground()).getPrimaryColor(),
-      theme.getColor(ColorRole::boardBackground()).getSecondaryColor());
-  mPackageScene->setOverlayColors(
-      theme.getColor(ColorRole::boardOverlays()).getPrimaryColor(),
-      theme.getColor(ColorRole::boardOverlays()).getSecondaryColor());
-  mPackageScene->setSelectionRectColors(
-      theme.getColor(ColorRole::boardSelection()).getPrimaryColor(),
-      theme.getColor(ColorRole::boardSelection()).getSecondaryColor());
-  mPackageScene->setGridStyle(GridStyle::Lines);
+  {
+    const ColorScheme& scheme =
+        mApp.getWorkspace().getSettings().boardColorSchemes.getActive();
+    const auto background = scheme.getColors(ColorRole::boardBackground());
+    mPackageScene->setBackgroundColors(background.primary,
+                                       background.secondary);
+    const auto overlay = scheme.getColors(ColorRole::boardOverlays());
+    mPackageScene->setOverlayColors(overlay.primary, overlay.secondary);
+    const auto selection = scheme.getColors(ColorRole::boardSelection());
+    mPackageScene->setSelectionRectColors(selection.primary,
+                                          selection.secondary);
+    mPackageScene->setGridStyle(GridStyle::Lines);
+    mPackageScene->setOriginCrossVisible(false);  // It's rather disruptive.
+  }
 
   // Setup default manufacturer.
   mParts->setDefaultManufacturer(mEditor.getLibrary().getManufacturer());

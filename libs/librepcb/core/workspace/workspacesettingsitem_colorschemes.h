@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CORE_WORKSPACESETTINGSITEM_THEMES_H
-#define LIBREPCB_CORE_WORKSPACESETTINGSITEM_THEMES_H
+#ifndef LIBREPCB_CORE_WORKSPACESETTINGSITEM_COLORSCHEMES_H
+#define LIBREPCB_CORE_WORKSPACESETTINGSITEM_COLORSCHEMES_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "theme.h"
+#include "usercolorscheme.h"
 #include "workspacesettingsitem.h"
 
 #include <QtCore>
@@ -33,37 +33,53 @@
  ******************************************************************************/
 namespace librepcb {
 
+class BaseColorScheme;
+
 /*******************************************************************************
- *  Class WorkspaceSettingsItem_Themes
+ *  Class WorkspaceSettingsItem_ColorSchemes
  ******************************************************************************/
 
 /**
  * @brief Implementation of ::librepcb::WorkspaceSettingsItem to store
- *        theme configurations
+ *        color scheme configurations
  */
-class WorkspaceSettingsItem_Themes final : public WorkspaceSettingsItem {
+class WorkspaceSettingsItem_ColorSchemes final : public WorkspaceSettingsItem {
   Q_OBJECT
 
 public:
+  struct Kind {
+    static constexpr const char* sSchematic = "schematic_color_schemes";
+    static constexpr const char* sBoard = "board_color_schemes";
+    static constexpr const char* s3d = "3d_color_schemes";
+  };
+
   // Constructors / Destructor
-  WorkspaceSettingsItem_Themes() = delete;
-  WorkspaceSettingsItem_Themes(const WorkspaceSettingsItem_Themes& other) =
-      delete;
-  explicit WorkspaceSettingsItem_Themes(QObject* parent = nullptr) noexcept;
-  ~WorkspaceSettingsItem_Themes() noexcept;
+  WorkspaceSettingsItem_ColorSchemes() = delete;
+  WorkspaceSettingsItem_ColorSchemes(
+      const WorkspaceSettingsItem_ColorSchemes& other) = delete;
+  explicit WorkspaceSettingsItem_ColorSchemes(
+      const QString& kind, QObject* parent = nullptr) noexcept;
+  ~WorkspaceSettingsItem_ColorSchemes() noexcept;
 
   // Getters
-  const QMap<Uuid, Theme>& getAll() const noexcept { return mThemes; }
+  const QVector<const BaseColorScheme*>& getBaseSchemes() const noexcept {
+    return mBaseSchemes;
+  }
+  QMap<Uuid, UserColorScheme> getUserSchemes() const noexcept;
+  std::shared_ptr<UserColorScheme> getUserScheme(const Uuid& uuid) noexcept;
   const Uuid& getActiveUuid() const noexcept { return mActiveUuid; }
-  const Theme& getActive() const noexcept { return mActiveTheme; }
+  const ColorScheme& getActive() const noexcept { return *mActiveScheme; }
 
   // Setters
-  void setAll(const QMap<Uuid, Theme>& themes) noexcept;
+  void setUserSchemes(const QMap<Uuid, UserColorScheme>& schemes) noexcept;
   void setActiveUuid(const Uuid& uuid) noexcept;
 
   // Operator Overloadings
-  WorkspaceSettingsItem_Themes& operator=(
-      const WorkspaceSettingsItem_Themes& rhs) = delete;
+  WorkspaceSettingsItem_ColorSchemes& operator=(
+      const WorkspaceSettingsItem_ColorSchemes& rhs) = delete;
+
+signals:
+  void colorsModified();
 
 private:  // Methods
   /**
@@ -81,13 +97,14 @@ private:  // Methods
    */
   void serializeImpl(SExpression& root) const override;
 
-  void addTheme(const Theme& theme) noexcept;
-  void updateActiveTheme() noexcept;
+  void updateActive() noexcept;
 
 private:
-  QMap<Uuid, Theme> mThemes;
+  QVector<const BaseColorScheme*> mBaseSchemes;
+  QMap<Uuid, std::shared_ptr<UserColorScheme>> mUserSchemes;
   Uuid mActiveUuid;
-  Theme mActiveTheme;
+  const ColorScheme* mActiveScheme;
+  QVector<QMetaObject::Connection> mActiveConnections;
 };
 
 /*******************************************************************************

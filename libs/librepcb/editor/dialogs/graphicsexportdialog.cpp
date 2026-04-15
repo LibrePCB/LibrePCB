@@ -29,8 +29,8 @@
 
 #include <librepcb/core/export/graphicsexport.h>
 #include <librepcb/core/utils/toolbox.h>
+#include <librepcb/core/workspace/basecolorscheme.h>
 #include <librepcb/core/workspace/colorrole.h>
-#include <librepcb/core/workspace/theme.h>
 
 #include <QtConcurrent>
 #include <QtCore>
@@ -51,14 +51,15 @@ GraphicsExportDialog::GraphicsExportDialog(
     const QList<std::shared_ptr<GraphicsPagePainter>>& pages, int currentPage,
     const QString& documentName, int innerLayerCount,
     const FilePath& defaultFilePath, const LengthUnit& lengthUnit,
-    const Theme& theme, const QString& settingsPrefix, QWidget* parent) noexcept
+    const ColorScheme& colors, const QString& settingsPrefix,
+    QWidget* parent) noexcept
   : QDialog(parent),
     mMode(mode),
     mOutput(output),
     mInputPages(pages),
     mCurrentPage(currentPage),
     mDefaultFilePath(defaultFilePath),
-    mTheme(theme),
+    mColorScheme(colors),
     mSettingsPrefix(settingsPrefix),
     mSaveAsCallback(&FileDialog::getSaveFileName),
     mDefaultSettings(new GraphicsExportSettings()),
@@ -103,9 +104,10 @@ GraphicsExportDialog::GraphicsExportDialog(
 
   // Add all colors.
   if (mMode == Mode::Schematic) {
-    mDefaultSettings->loadColorsFromTheme(theme, true, false);
+    mDefaultSettings->loadColorsFromScheme(&mColorScheme, nullptr);
   } else if (mMode == Mode::Board) {
-    mDefaultSettings->loadColorsFromTheme(theme, false, true, innerLayerCount);
+    mDefaultSettings->loadColorsFromScheme(nullptr, &mColorScheme,
+                                           innerLayerCount);
   }
 
   // Open exported files checkbox.
@@ -1420,7 +1422,8 @@ void GraphicsExportDialog::setPageContent(
                    Qt::ItemIsDragEnabled);
     foreach (const auto& pair, mColors) {
       QTreeWidgetItem* child = new QTreeWidgetItem(node);
-      child->setText(0, mTheme.getColor(pair.first).getRole().getNameTr());
+      const ColorRole* role = mColorScheme.getColors(pair.first).role;
+      child->setText(0, role ? role->getNameTr() : QString());
       child->setCheckState(
           0, item.colors.contains(pair.first) ? Qt::Checked : Qt::Unchecked);
     }
@@ -1445,8 +1448,9 @@ bool GraphicsExportDialog::getOpenExportedFiles() const noexcept {
 void GraphicsExportDialog::updateColorsListWidget() noexcept {
   mUi->lstLayerColors->clear();
   foreach (const auto& pair, mColors) {
+    const ColorRole* role = mColorScheme.getColors(pair.first).role;
     QListWidgetItem* item =
-        new QListWidgetItem(mTheme.getColor(pair.first).getRole().getNameTr());
+        new QListWidgetItem(role ? role->getNameTr() : QString());
     item->setData(Qt::DecorationRole, pair.second);
     mUi->lstLayerColors->addItem(item);
   }
