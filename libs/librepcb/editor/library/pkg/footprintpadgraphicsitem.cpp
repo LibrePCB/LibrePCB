@@ -25,7 +25,7 @@
 #include "../../graphics/primitivefootprintpadgraphicsitem.h"
 
 #include <librepcb/core/types/layer.h>
-#include <librepcb/core/workspace/theme.h>
+#include <librepcb/core/workspace/colorrole.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -158,8 +158,8 @@ void FootprintPadGraphicsItem::packagePadListEdited(
 }
 
 void FootprintPadGraphicsItem::updateLayer() noexcept {
-  mGraphicsItem->setLayer(mPad->isTht() ? Theme::Color::sBoardPads
-                                        : mPad->getSmtLayer().getThemeColor());
+  mGraphicsItem->setLayer(mPad->isTht() ? ColorRole::boardPads()
+                                        : mPad->getSmtLayer().getColorRole());
 }
 
 void FootprintPadGraphicsItem::updateGeometries() noexcept {

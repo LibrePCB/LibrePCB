@@ -25,11 +25,14 @@
 #include "../dialogs/filedialog.h"
 #include "../editorcommandset.h"
 #include "../modelview/apiendpointlistmodellegacy.h"
+#include "../modelview/colorschememodel.h"
 #include "../modelview/comboboxdelegate.h"
 #include "../modelview/editablelistmodel.h"
 #include "../modelview/keyboardshortcutsmodel.h"
 #include "../modelview/keysequencedelegate.h"
 #include "../utils/editortoolbox.h"
+#include "../utils/slinthelpers.h"
+#include "../utils/uihelpers.h"
 #include "desktopintegration.h"
 #include "desktopservices.h"
 #include "ui_workspacesettingsdialog.h"
@@ -37,6 +40,7 @@
 #include <librepcb/core/application.h>
 #include <librepcb/core/norms.h>
 #include <librepcb/core/utils/toolbox.h>
+#include <librepcb/core/workspace/colorrole.h>
 #include <librepcb/core/workspace/uitheme.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacesettings.h>
@@ -55,10 +59,12 @@ namespace editor {
  ******************************************************************************/
 
 WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
+                                                 const UiTheme& theme,
                                                  QWidget* parent)
   : QDialog(parent),
     mWorkspace(workspace),
     mSettings(workspace.getSettings()),
+    mTheme(theme),
     mLibLocaleOrderModel(new LibraryLocaleOrderModel()),
     mLibNormOrderModel(new LibraryNormOrderModel()),
     mApiEndpointModel(new ApiEndpointListModelLegacy()),
@@ -67,7 +73,9 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
     mUi(new Ui::WorkspaceSettingsDialog),
     mOldSchematicGridStyle(mSettings.schematicGridStyle.get()),
     mOldBoardGridStyle(mSettings.boardGridStyle.get()),
-    mOldActiveTheme(Uuid::createRandom()) {
+    mOldSchColorSchemeActive(mSettings.schematicColorSchemes.getActiveUuid()),
+    mOldBrdColorSchemeActive(mSettings.boardColorSchemes.getActiveUuid()),
+    mOld3dColorSchemeActive(mSettings.view3dColorSchemes.getActiveUuid()) {
   mUi->setupUi(this);
 
   discardTemporaryModifications();
@@ -87,9 +95,6 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
                 mSettings.uiTheme.set(mUi->cbxUiTheme->itemData(i).toString());
               }
             });
-    // Link to color schemes tab.
-    connect(mUi->lblSeeColorSchemes, &QLabel::linkActivated, this,
-            [this]() { mUi->tabWidget->setCurrentWidget(mUi->themesTab); });
   }
 
   // Initialize application locale widgets
@@ -302,104 +307,70 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
         EditorCommand::ActionFlag::WidgetShortcut));
   }
 
-  // Initialize themes widgets.
+  // Initialize color schemes widgets.
   {
-    auto askName = [this](const QString& title, const QString& defaultName) {
-      return QInputDialog::getText(this, title, tr("Name:"), QLineEdit::Normal,
-                                   defaultName);
+    auto setup = [this](WorkspaceSettingsItem_ColorSchemes& schemes,
+                        QComboBox* cbx, QToolButton* btnModify,
+                        QToolButton* btnRemove, QToolButton* btnDuplicate) {
+      connect(cbx,
+              static_cast<void (QComboBox::*)(int)>(
+                  &QComboBox::currentIndexChanged),
+              this, [&schemes, cbx, btnModify, btnRemove](int index) {
+                const auto uuid =
+                    Uuid::tryFromString(cbx->itemData(index).toString());
+                if (uuid) {
+                  schemes.setActiveUuid(*uuid);
+                }
+                const bool editable = uuid && schemes.getUserScheme(*uuid);
+                btnModify->setEnabled(editable);
+                btnRemove->setEnabled(editable);
+              });
+      connect(btnModify, &QToolButton::clicked, this, [this, &schemes]() {
+        if (auto s = schemes.getUserScheme(schemes.getActiveUuid())) {
+          execColorSchemeDialog(s);
+        }
+      });
+      connect(btnRemove, &QToolButton::clicked, this, [this, &schemes]() {
+        if (auto s = schemes.getUserScheme(schemes.getActiveUuid())) {
+          schemes.setActiveUuid(s->getBase().getUuid());
+          auto userSchemes = schemes.getUserSchemes();
+          userSchemes.remove(s->getUuid());
+          schemes.setUserSchemes(userSchemes);
+          updateColorSchemes();
+        }
+      });
+      connect(btnDuplicate, &QToolButton::clicked, this, [this, &schemes]() {
+        const QString name =
+            tr("Copy of %1").arg(schemes.getActive().getName());
+        std::optional<UserColorScheme> newScheme;
+        if (auto s =
+                dynamic_cast<const UserColorScheme*>(&schemes.getActive())) {
+          newScheme = UserColorScheme(Uuid::createRandom(), name, *s);
+        } else if (auto s = dynamic_cast<const BaseColorScheme*>(
+                       &schemes.getActive())) {
+          newScheme = UserColorScheme(Uuid::createRandom(), name, *s);
+        }
+        if (newScheme) {
+          auto userSchemes = schemes.getUserSchemes();
+          userSchemes.insert(newScheme->getUuid(), *newScheme);
+          schemes.setUserSchemes(userSchemes);
+          schemes.setActiveUuid(newScheme->getUuid());
+          updateColorSchemes();
+          if (auto s = schemes.getUserScheme(newScheme->getUuid())) {
+            execColorSchemeDialog(s, true);
+          }
+        }
+      });
     };
-    connect(
-        mUi->cbxThemes,
-        static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-        this, &WorkspaceSettingsDialog::themeIndexChanged);
-    connect(mUi->btnRemoveTheme, &QToolButton::clicked, this, [this]() {
-      Uuid active = mSettings.themes.getActiveUuid();
-      auto themes = mSettings.themes.getAll();
-      themes.remove(active);
-      if (!themes.isEmpty()) {
-        active = themes.first().getUuid();
-      }
-      mSettings.themes.setActiveUuid(active);
-      mSettings.themes.setAll(themes);
-      updateThemesList();
-    });
-    connect(mUi->btnRenameTheme, &QToolButton::clicked, this,
-            [this, askName]() {
-              auto themes = mSettings.themes.getAll();
-              auto theme = themes.find(mSettings.themes.getActiveUuid());
-              if (theme == themes.end()) return;
-              const QString name =
-                  askName(mUi->btnRenameTheme->text(), theme->getName());
-              if (name.isEmpty()) return;
-              theme->setName(name);
-              mSettings.themes.setAll(themes);
-              updateThemesList();
-            });
-    connect(mUi->btnResetTheme, &QToolButton::clicked, this, [this]() {
-      auto themes = mSettings.themes.getAll();
-      auto theme = themes.find(mSettings.themes.getActiveUuid());
-      if (theme == themes.end()) return;
-      theme->restoreDefaults();
-      mSettings.themes.setAll(themes);
-      updateThemesList();
-    });
-    connect(
-        mUi->btnDuplicateTheme, &QToolButton::clicked, this, [this, askName]() {
-          auto themes = mSettings.themes.getAll();
-          auto theme = themes.find(mSettings.themes.getActiveUuid());
-          if (theme == themes.end()) return;
-          const QString name = askName(mUi->btnDuplicateTheme->text(),
-                                       tr("Copy of %1").arg(theme->getName()));
-          if (name.isEmpty()) return;
-          const Theme copy(Uuid::createRandom(), name, *theme);
-          themes.insert(copy.getUuid(), copy);
-          mSettings.themes.setAll(themes);
-          mSettings.themes.setActiveUuid(copy.getUuid());
-          updateThemesList();
-        });
-    connect(mUi->btnNewTheme, &QToolButton::clicked, this, [this, askName]() {
-      const QString name = askName(mUi->btnNewTheme->text(), tr("New Theme"));
-      if (name.isEmpty()) return;
-      const Theme theme(Uuid::createRandom(), name);
-      auto themes = mSettings.themes.getAll();
-      themes.insert(theme.getUuid(), theme);
-      mSettings.themes.setAll(themes);
-      mSettings.themes.setActiveUuid(theme.getUuid());
-      updateThemesList();
-    });
-    mUi->treeThemeColors->header()->setSectionsMovable(false);
-    mUi->treeThemeColors->header()->setSectionResizeMode(
-        0, QHeaderView::ResizeToContents);
-    mUi->treeThemeColors->header()->setSectionResizeMode(
-        1, QHeaderView::ResizeToContents);
-    mUi->treeThemeColors->header()->setSectionResizeMode(
-        2, QHeaderView::ResizeToContents);
-    mUi->treeThemeColors->header()->setSectionResizeMode(3,
-                                                         QHeaderView::Stretch);
-    connect(mUi->treeThemeColors, &QTreeWidget::itemDoubleClicked, this,
-            [this](QTreeWidgetItem* item, int column) {
-              if ((!item) || (column < 0) || (column > 1)) return;
-              auto themes = mSettings.themes.getAll();
-              auto theme = themes.find(mSettings.themes.getActiveUuid());
-              if (theme == themes.end()) return;
-              QList<ThemeColor> colors = theme->getColors();
-              const int index = mUi->treeThemeColors->indexOfTopLevelItem(item);
-              if ((index < 0) || (index >= colors.count())) return;
-              QColor value = (column == 1) ? colors[index].getSecondaryColor()
-                                           : colors[index].getPrimaryColor();
-              if (!value.isValid()) return;
-              value = QColorDialog::getColor(value, this, QString(),
-                                             QColorDialog::ShowAlphaChannel);
-              if (!value.isValid()) return;
-              if (column == 1) {
-                colors[index].setSecondaryColor(value);
-              } else {
-                colors[index].setPrimaryColor(value);
-              }
-              theme->setColors(colors);
-              initColorTreeWidgetItem(*item, colors[index]);
-              mSettings.themes.setAll(themes);
-            });
+    setup(mSettings.schematicColorSchemes, mUi->cbxSchematicColorSchemes,
+          mUi->btnEditSchematicColorScheme, mUi->btnRemoveSchematicColorScheme,
+          mUi->btnDuplicateSchematicColorScheme);
+    setup(mSettings.boardColorSchemes, mUi->cbxBoard2dColorSchemes,
+          mUi->btnEditBoard2dColorScheme, mUi->btnRemoveBoard2dColorScheme,
+          mUi->btnDuplicateBoard2dColorScheme);
+    setup(mSettings.view3dColorSchemes, mUi->cbxBoard3dColorSchemes,
+          mUi->btnEditBoard3dColorScheme, mUi->btnRemoveBoard3dColorScheme,
+          mUi->btnDuplicateBoard3dColorScheme);
   }
 
   // Initialize grid style widgets.
@@ -507,11 +478,7 @@ void WorkspaceSettingsDialog::keyPressEvent(QKeyEvent* event) noexcept {
 }
 
 void WorkspaceSettingsDialog::changeEvent(QEvent* event) noexcept {
-  if (event->type() == QEvent::PaletteChange) {
-    // Workaround to avoid outdated hyperlink color.
-    mUi->lblSeeColorSchemes->setText("");
-    mUi->retranslateUi(this);
-  } else if (event->type() == QEvent::LanguageChange) {
+  if (event->type() == QEvent::LanguageChange) {
     mUi->retranslateUi(this);
   }
   QDialog::changeEvent(event);
@@ -609,58 +576,62 @@ void WorkspaceSettingsDialog::externalApplicationListIndexChanged(
   mUi->lblExternalApplicationsPlaceholders->setText(placeholdersText);
 }
 
-void WorkspaceSettingsDialog::updateThemesList() noexcept {
-  QSignalBlocker blocker(mUi->cbxThemes);
-  mUi->cbxThemes->setCurrentIndex(-1);
-  mUi->cbxThemes->clear();
-  foreach (const Theme& theme, mSettings.themes.getAll()) {
-    mUi->cbxThemes->addItem(theme.getName(), theme.getUuid().toStr());
-  }
-  const int index = std::max(
-      0, mUi->cbxThemes->findData(mSettings.themes.getActiveUuid().toStr()));
-  mUi->cbxThemes->setCurrentIndex(index);
-  themeIndexChanged(index);
-}
-
-void WorkspaceSettingsDialog::themeIndexChanged(int index) noexcept {
-  const auto& themes = mSettings.themes.getAll();
-  const bool valid = (index >= 0) && (index < themes.count());
-  const Theme theme = themes.values().value(index);
-
-  if (valid) {
-    mSettings.themes.setActiveUuid(theme.getUuid());
-  }
-
-  mUi->btnRemoveTheme->setEnabled(valid);
-  mUi->btnRenameTheme->setEnabled(valid);
-  mUi->btnResetTheme->setEnabled(valid);
-  mUi->btnDuplicateTheme->setEnabled(valid);
-
-  // Colors.
-  mUi->treeThemeColors->clear();
-  for (int i = 0; i < theme.getColors().count(); ++i) {
-    QTreeWidgetItem* item = new QTreeWidgetItem(mUi->treeThemeColors);
-    initColorTreeWidgetItem(*item, theme.getColors().at(i));
-  }
-  mUi->treeThemeColors->setEnabled(valid);
-}
-
-void WorkspaceSettingsDialog::initColorTreeWidgetItem(
-    QTreeWidgetItem& item, const ThemeColor& color) noexcept {
-  auto init = [&item](int column, const QString& toolTip, const QColor& value) {
-    item.setBackground(column, value.isValid() ? value : Qt::transparent);
-    item.setToolTip(
-        column,
-        toolTip.arg(value.isValid() ? value.name(QColor::HexArgb).toUpper()
-                                    : tr("N/A")));
-    item.setText(column, value.isValid() ? "" : "✖");
-    item.setTextAlignment(column, Qt::AlignCenter);
+void WorkspaceSettingsDialog::updateColorSchemes() noexcept {
+  auto update = [](const WorkspaceSettingsItem_ColorSchemes& schemes,
+                   QComboBox* cbx) {
+    {
+      QSignalBlocker blocker(cbx);
+      cbx->clear();
+      for (const ColorScheme* scheme : schemes.getBaseSchemes()) {
+        cbx->addItem(scheme->getName(), scheme->getUuid().toStr());
+      }
+      for (const ColorScheme& scheme : schemes.getUserSchemes()) {
+        cbx->addItem("*" + scheme.getName(), scheme.getUuid().toStr());
+      }
+      cbx->setCurrentIndex(-1);
+    }
+    cbx->setCurrentIndex(cbx->findData(schemes.getActiveUuid().toStr()));
   };
-  init(0, tr("Primary color: %1"), color.getPrimaryColor());
-  init(1, tr("Secondary color: %1"), color.getSecondaryColor());
 
-  item.setText(2, color.getCategoryTr());
-  item.setText(3, color.getNameTr());
+  update(mSettings.schematicColorSchemes, mUi->cbxSchematicColorSchemes);
+  update(mSettings.boardColorSchemes, mUi->cbxBoard2dColorSchemes);
+  update(mSettings.view3dColorSchemes, mUi->cbxBoard3dColorSchemes);
+}
+
+void WorkspaceSettingsDialog::execColorSchemeDialog(
+    std::shared_ptr<UserColorScheme> scheme, bool focusNameEdt) noexcept {
+  if (!mColorSchemeDialog) {
+    mColorSchemeDialog = ui::ColorSchemeDialog::create();
+  }
+
+  auto& win = *mColorSchemeDialog;
+  win->global<ui::Data>().set_theme(l2s(mTheme));
+  win->set_name(q2s(scheme->getName()));
+  win->set_model(std::make_shared<ColorSchemeModel>(scheme));
+  win->set_current_index(0);
+  win->set_current_secondary(false);
+  win->on_name_edited([scheme](const slint::SharedString& s) {
+    const QString name = s2q(s).trimmed();
+    if (!name.isEmpty()) {
+      scheme->setName(name);
+    }
+  });
+  win->window().on_close_requested([thisPtr = QPointer(this)]() {
+    if (thisPtr) thisPtr->updateColorSchemes();
+    return slint::CloseRequestResponse::HideWindow;
+  });
+
+  QWidget* widget =
+      static_cast<QWidget*>(slint::cbindgen_private::slint_qt_get_widget(
+          &win->window().window_handle()));
+  Q_ASSERT(widget);
+  widget->setWindowModality(Qt::ApplicationModal);
+  win->show();
+  widget->move(geometry().center() - widget->rect().center());
+
+  if (focusNameEdt) {
+    win->fn_focus_name_edt();
+  }
 }
 
 void WorkspaceSettingsDialog::updateDismissedMessagesCount() noexcept {
@@ -759,8 +730,8 @@ void WorkspaceSettingsDialog::loadSettings() noexcept {
   mKeyboardShortcutsModel->setOverrides(mSettings.keyboardShortcuts.get());
   mUi->treeKeyboardShortcuts->expandAll();
 
-  // Themes
-  updateThemesList();
+  // Color Schemes
+  updateColorSchemes();
 
   // Grid style
   auto loadGridStyle = [](QComboBox* cbx, GridStyle gridStyle) {
@@ -837,8 +808,12 @@ void WorkspaceSettingsDialog::discardTemporaryModifications() noexcept {
   mOldApplicationLocale = mSettings.applicationLocale.get();
   mOldSchematicGridStyle = mSettings.schematicGridStyle.get();
   mOldBoardGridStyle = mSettings.boardGridStyle.get();
-  mOldThemes = mSettings.themes.getAll();
-  mOldActiveTheme = mSettings.themes.getActiveUuid();
+  mOldSchColorSchemes = mSettings.schematicColorSchemes.getUserSchemes();
+  mOldBrdColorSchemes = mSettings.boardColorSchemes.getUserSchemes();
+  mOld3dColorSchemes = mSettings.view3dColorSchemes.getUserSchemes();
+  mOldSchColorSchemeActive = mSettings.schematicColorSchemes.getActiveUuid();
+  mOldBrdColorSchemeActive = mSettings.boardColorSchemes.getActiveUuid();
+  mOld3dColorSchemeActive = mSettings.view3dColorSchemes.getActiveUuid();
 }
 
 void WorkspaceSettingsDialog::revertTemporaryModifications() noexcept {
@@ -846,8 +821,12 @@ void WorkspaceSettingsDialog::revertTemporaryModifications() noexcept {
   mSettings.applicationLocale.set(mOldApplicationLocale);
   mSettings.schematicGridStyle.set(mOldSchematicGridStyle);
   mSettings.boardGridStyle.set(mOldBoardGridStyle);
-  mSettings.themes.setAll(mOldThemes);
-  mSettings.themes.setActiveUuid(mOldActiveTheme);
+  mSettings.schematicColorSchemes.setUserSchemes(mOldSchColorSchemes);
+  mSettings.boardColorSchemes.setUserSchemes(mOldBrdColorSchemes);
+  mSettings.view3dColorSchemes.setUserSchemes(mOld3dColorSchemes);
+  mSettings.schematicColorSchemes.setActiveUuid(mOldSchColorSchemeActive);
+  mSettings.boardColorSchemes.setActiveUuid(mOldBrdColorSchemeActive);
+  mSettings.view3dColorSchemes.setActiveUuid(mOld3dColorSchemeActive);
 }
 
 bool WorkspaceSettingsDialog::hasTemporaryModifications() const noexcept {
@@ -855,8 +834,18 @@ bool WorkspaceSettingsDialog::hasTemporaryModifications() const noexcept {
       || (mSettings.applicationLocale.get() != mOldApplicationLocale)  //
       || (mSettings.schematicGridStyle.get() != mOldSchematicGridStyle)  //
       || (mSettings.boardGridStyle.get() != mOldBoardGridStyle)  //
-      || (mSettings.themes.getAll() != mOldThemes)  //
-      || (mSettings.themes.getActiveUuid() != mOldActiveTheme)  //
+      || (mSettings.schematicColorSchemes.getUserSchemes() !=
+          mOldSchColorSchemes)  //
+      ||
+      (mSettings.boardColorSchemes.getUserSchemes() != mOldBrdColorSchemes)  //
+      ||
+      (mSettings.view3dColorSchemes.getUserSchemes() != mOld3dColorSchemes)  //
+      || (mSettings.schematicColorSchemes.getActiveUuid() !=
+          mOldSchColorSchemeActive)  //
+      || (mSettings.boardColorSchemes.getActiveUuid() !=
+          mOldBrdColorSchemeActive)  //
+      || (mSettings.view3dColorSchemes.getActiveUuid() !=
+          mOld3dColorSchemeActive)  //
       ;
 }
 

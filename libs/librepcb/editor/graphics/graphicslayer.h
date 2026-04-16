@@ -35,6 +35,7 @@
  ******************************************************************************/
 namespace librepcb {
 
+class ColorRole;
 class Layer;
 
 namespace editor {
@@ -50,7 +51,7 @@ namespace editor {
  * These layers are used in graphics items (QGraphicsItem) to determine their
  * visibility and colors.
  */
-class GraphicsLayer {
+class GraphicsLayer final {
   Q_DECLARE_TR_FUNCTIONS(GraphicsLayer)
 
 public:
@@ -83,14 +84,13 @@ public:
   GraphicsLayer() = delete;
   GraphicsLayer(const GraphicsLayer& other) noexcept;
   explicit GraphicsLayer(
-      const QString& name, const QString& nameTr, const QColor& color,
+      const ColorRole& role, const QColor& color,
       const QColor& colorHighlighted, bool visible = true, bool enabled = true,
       DisabledMode disabledMode = DisabledMode::SemiTransparentGray) noexcept;
-  virtual ~GraphicsLayer() noexcept;
+  ~GraphicsLayer() noexcept;
 
   // Getters
-  const QString& getName() const noexcept { return mName; }
-  const QString& getNameTr() const noexcept { return mNameTr; }
+  const ColorRole& getRole() const noexcept { return mRole; }
   const QColor& getColor(State state = State::Enabled) const noexcept;
   bool getVisible() const noexcept { return mIsVisible; }
   bool isEnabled() const noexcept { return mIsEnabled; }
@@ -109,8 +109,7 @@ private:
   void updateDisabledColor() noexcept;
 
 protected:  // Data
-  const QString mName;  ///< Theme color name
-  const QString mNameTr;  ///< Translated layer name as shown in the GUI
+  const ColorRole& mRole;  ///< Color role (from ::librepcb::ColorRole)
   const DisabledMode mDisabledMode;  ///< Rendering mode for disabled state
   QColor mColor;  ///< Color of graphics items
   QColor mColorHighlighted;  ///< Color of highlighted graphics items

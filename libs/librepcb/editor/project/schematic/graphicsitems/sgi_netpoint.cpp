@@ -29,7 +29,7 @@
 #include <librepcb/core/project/circuit/netsignal.h>
 #include <librepcb/core/project/schematic/items/si_netpoint.h>
 #include <librepcb/core/project/schematic/items/si_netsegment.h>
-#include <librepcb/core/workspace/theme.h>
+#include <librepcb/core/workspace/colorrole.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -52,7 +52,7 @@ SGI_NetPoint::SGI_NetPoint(
   : QGraphicsItem(),
     mNetPoint(netpoint),
     mContext(context),
-    mLayer(layers.get(Theme::Color::sSchematicWires)),
+    mLayer(layers.get(ColorRole::schematicWires())),
     mOnEditedSlot(*this, &SGI_NetPoint::netPointEdited) {
   setFlag(QGraphicsItem::ItemIsSelectable, true);
   setZValue(SchematicGraphicsScene::ZValue_VisibleNetPoints);

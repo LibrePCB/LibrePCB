@@ -169,7 +169,7 @@ private:
   void execGraphicsExportDialog(GraphicsExportDialog::Output output,
                                 const QString& settingsKey) noexcept;
   void goToSymbol(const QString& name, int index) noexcept;
-  void applyTheme() noexcept;
+  void applyWorkspaceSettings() noexcept;
   void requestRepaint() noexcept;
 
 private:

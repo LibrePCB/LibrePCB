@@ -193,7 +193,7 @@ private:
   bool execGraphicsExportDialog(GraphicsExportDialog::Output output,
                                 const QString& settingsKey) noexcept;
   void requestRepaint() noexcept;
-  void applyTheme() noexcept;
+  void applyWorkspaceSettings() noexcept;
 
 private:
   // References

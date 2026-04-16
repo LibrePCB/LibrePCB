@@ -25,7 +25,7 @@
  ******************************************************************************/
 #include "../export/graphicsexportsettings.h"
 #include "../types/simplestring.h"
-#include "../workspace/theme.h"
+#include "../workspace/colorrole.h"
 #include "outputjob.h"
 
 #include <QtCore>
@@ -116,29 +116,29 @@ public:
         boards(BoardSet::set({std::nullopt})),
         assemblyVariants(AssemblyVariantSet::set({std::nullopt})),
         options() {
-      QSet<QString> enabledLayers;
+      QSet<QString> enabledColors;
       if (preset == Preset::Schematic) {
         type = Type::Schematic;
         title = tr("Schematic");
         boards = BoardSet::set({std::nullopt});
         assemblyVariants = AssemblyVariantSet::set({std::nullopt});
-        enabledLayers = {
-            QString(Theme::Color::sSchematicFrames),
-            QString(Theme::Color::sSchematicWires),
-            QString(Theme::Color::sSchematicNetLabels),
-            QString(Theme::Color::sSchematicBuses),
-            QString(Theme::Color::sSchematicBusLabels),
-            QString(Theme::Color::sSchematicImageBorders),
-            QString(Theme::Color::sSchematicDocumentation),
-            QString(Theme::Color::sSchematicComments),
-            QString(Theme::Color::sSchematicGuide),
-            QString(Theme::Color::sSchematicOutlines),
-            QString(Theme::Color::sSchematicGrabAreas),
-            QString(Theme::Color::sSchematicNames),
-            QString(Theme::Color::sSchematicValues),
-            QString(Theme::Color::sSchematicPinLines),
-            QString(Theme::Color::sSchematicPinNames),
-            QString(Theme::Color::sSchematicPinNumbers),
+        enabledColors = {
+            ColorRole::schematicFrames().getId(),
+            ColorRole::schematicWires().getId(),
+            ColorRole::schematicNetLabels().getId(),
+            ColorRole::schematicBuses().getId(),
+            ColorRole::schematicBusLabels().getId(),
+            ColorRole::schematicImageBorders().getId(),
+            ColorRole::schematicDocumentation().getId(),
+            ColorRole::schematicComments().getId(),
+            ColorRole::schematicGuide().getId(),
+            ColorRole::schematicOutlines().getId(),
+            ColorRole::schematicGrabAreas().getId(),
+            ColorRole::schematicNames().getId(),
+            ColorRole::schematicValues().getId(),
+            ColorRole::schematicPinLines().getId(),
+            ColorRole::schematicPinNames().getId(),
+            ColorRole::schematicPinNumbers().getId(),
         };
       } else if (preset != Preset::None) {
         if (preset == Preset::BoardAssemblyTop) {
@@ -165,54 +165,54 @@ public:
         boards = BoardSet::onlyDefault();
         assemblyVariants = AssemblyVariantSet::set({std::nullopt});
         if (preset == Preset::BoardRenderingTop) {
-          enabledLayers = {
-              QString(Theme::Color::sBoardOutlines),
-              QString(Theme::Color::sBoardCopperTop),
-              QString(Theme::Color::sBoardStopMaskTop),
-              QString(Theme::Color::sBoardLegendTop),
+          enabledColors = {
+              ColorRole::boardOutlines().getId(),
+              ColorRole::boardCopperTop().getId(),
+              ColorRole::boardStopMaskTop().getId(),
+              ColorRole::boardLegendTop().getId(),
           };
         } else if (preset == Preset::BoardRenderingBottom) {
-          enabledLayers = {
-              QString(Theme::Color::sBoardOutlines),
-              QString(Theme::Color::sBoardCopperBot),
-              QString(Theme::Color::sBoardStopMaskBot),
-              QString(Theme::Color::sBoardLegendBot),
+          enabledColors = {
+              ColorRole::boardOutlines().getId(),
+              ColorRole::boardCopperBot().getId(),
+              ColorRole::boardStopMaskBot().getId(),
+              ColorRole::boardLegendBot().getId(),
           };
         } else {
-          enabledLayers = {
-              QString(Theme::Color::sBoardFrames),
-              QString(Theme::Color::sBoardOutlines),
-              QString(Theme::Color::sBoardPlatedCutouts),
-              QString(Theme::Color::sBoardHoles),
-              QString(Theme::Color::sBoardPads),
-              QString(Theme::Color::sBoardMeasures),
-              QString(Theme::Color::sBoardDocumentation),
-              QString(Theme::Color::sBoardComments),
-              QString(Theme::Color::sBoardGuide),
+          enabledColors = {
+              ColorRole::boardFrames().getId(),
+              ColorRole::boardOutlines().getId(),
+              ColorRole::boardPlatedCutouts().getId(),
+              ColorRole::boardHoles().getId(),
+              ColorRole::boardPads().getId(),
+              ColorRole::boardMeasures().getId(),
+              ColorRole::boardDocumentation().getId(),
+              ColorRole::boardComments().getId(),
+              ColorRole::boardGuide().getId(),
           };
           if (preset != Preset::BoardAssemblyBottom) {
-            enabledLayers += {
-                QString(Theme::Color::sBoardLegendTop),
-                QString(Theme::Color::sBoardDocumentationTop),
-                QString(Theme::Color::sBoardGrabAreasTop),
-                QString(Theme::Color::sBoardNamesTop),
-                QString(Theme::Color::sBoardValuesTop),
+            enabledColors += {
+                ColorRole::boardLegendTop().getId(),
+                ColorRole::boardDocumentationTop().getId(),
+                ColorRole::boardGrabAreasTop().getId(),
+                ColorRole::boardNamesTop().getId(),
+                ColorRole::boardValuesTop().getId(),
             };
           }
           if (preset != Preset::BoardAssemblyTop) {
-            enabledLayers += {
-                QString(Theme::Color::sBoardLegendBot),
-                QString(Theme::Color::sBoardDocumentationBot),
-                QString(Theme::Color::sBoardGrabAreasBot),
-                QString(Theme::Color::sBoardNamesBot),
-                QString(Theme::Color::sBoardValuesBot),
+            enabledColors += {
+                ColorRole::boardLegendBot().getId(),
+                ColorRole::boardDocumentationBot().getId(),
+                ColorRole::boardGrabAreasBot().getId(),
+                ColorRole::boardNamesBot().getId(),
+                ColorRole::boardValuesBot().getId(),
             };
           }
           if (preset == Preset::BoardImage) {
-            enabledLayers += {
-                QString(Theme::Color::sBoardVias),
-                QString(Theme::Color::sBoardCopperTop),
-                QString(Theme::Color::sBoardCopperBot),
+            enabledColors += {
+                ColorRole::boardVias().getId(),
+                ColorRole::boardCopperTop().getId(),
+                ColorRole::boardCopperBot().getId(),
             };
           }
         }
@@ -223,7 +223,7 @@ public:
         defaultSettings.loadBoardRenderingColors(0);
       }
       foreach (const auto& pair, defaultSettings.getColors()) {
-        if (enabledLayers.contains(pair.first)) {
+        if (enabledColors.contains(pair.first)) {
           layers.insert(pair.first, pair.second);
         }
       }

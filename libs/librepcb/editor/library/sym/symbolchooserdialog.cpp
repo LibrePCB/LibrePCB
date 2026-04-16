@@ -30,6 +30,7 @@
 
 #include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/library/sym/symbol.h>
+#include <librepcb/core/workspace/colorrole.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
 #include <librepcb/core/workspace/workspacesettings.h>
@@ -58,14 +59,13 @@ SymbolChooserDialog::SymbolChooserDialog(const Workspace& ws,
     mCategorySelected(false) {
   mUi->setupUi(this);
 
-  const Theme& theme = mWorkspace.getSettings().themes.getActive();
-  mPreviewScene->setBackgroundColors(
-      theme.getColor(Theme::Color::sSchematicBackground).getPrimaryColor(),
-      theme.getColor(Theme::Color::sSchematicBackground).getSecondaryColor());
+  const ColorScheme& scheme =
+      mWorkspace.getSettings().schematicColorSchemes.getActive();
+  const auto background = scheme.getColors(ColorRole::schematicBackground());
+  mPreviewScene->setBackgroundColors(background.primary, background.secondary);
   mPreviewScene->setOriginCrossVisible(false);
 
-  mUi->graphicsView->setSpinnerColor(
-      theme.getColor(Theme::Color::sSchematicBackground).getSecondaryColor());
+  mUi->graphicsView->setSpinnerColor(background.secondary);
   mUi->graphicsView->setScene(mPreviewScene.data());
 
   mCategoryTreeModel.reset(new CategoryTreeModelLegacy(

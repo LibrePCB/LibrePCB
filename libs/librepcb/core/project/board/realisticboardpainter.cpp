@@ -26,7 +26,7 @@
 #include "../../types/pcbcolor.h"
 #include "../../utils/clipperhelpers.h"
 #include "../../utils/transform.h"
-#include "../../workspace/theme.h"
+#include "../../workspace/colorrole.h"
 
 #include <QtCore>
 #include <QtGui>
@@ -151,79 +151,80 @@ QVector<std::pair<QColor, QPainterPath>> RealisticBoardPainter::getContent(
     };
 
     // Board body.
-    color = settings.getColor(Theme::Color::sBoardOutlines);
+    color = settings.getColor(ColorRole::boardOutlines().getId());
     if (color.isValid() && (color.alpha() > 0)) {
-      auto it = mCachedContentPerLayer.find(Theme::Color::sBoardOutlines);
+      auto it = mCachedContentPerLayer.find(ColorRole::boardOutlines().getId());
       if (it == mCachedContentPerLayer.end()) {
-        it = mCachedContentPerLayer.insert(Theme::Color::sBoardOutlines,
+        it = mCachedContentPerLayer.insert(ColorRole::boardOutlines().getId(),
                                            toPainterPath(*mCachedBoardArea));
       }
       content.append(std::make_pair(color, *it));
     }
 
     // Copper.
-    // Note: Theme::getCopperColorNames() returns the layers in
-    // non-deterministic order, which is not good as it leads to
-    // non-deterministic paint order. However, this is the most efficient way
-    // and is most probably good enough as usually all copper layers have the
-    // same color anyway and usually even only one layer is enabled.
-    for (const QString& themeColor : Theme::getCopperColorNames()) {
-      color = settings.getColor(themeColor);
-      if (color.isValid() && (color.alpha() > 0)) {
-        auto it = mCachedContentPerLayer.find(themeColor);
-        if (it == mCachedContentPerLayer.end()) {
-          layers = QStringList{(themeColor == Theme::Color::sBoardCopperTop)
-                                   ? Layer::topCopper().getId()
-                                   : Layer::botCopper().getId()};
-          paths = *mCachedBoardArea;
-          if (!mCachedCopperHoles->empty()) {
-            ClipperHelpers::subtract(paths, *mCachedCopperHoles,
-                                     ClipperLib::pftEvenOdd,
-                                     ClipperLib::pftNonZero);
+    QHash<QString, const Layer*> layerMap;
+    for (int i = 0; i < Layer::innerCopperCount() + 2; ++i) {
+      const Layer* layer = Layer::copper(i);
+      Q_ASSERT(layer);
+      layerMap.insert(layer->getColorRole().getId(), layer);
+    }
+    for (const QString& role : settings.getPaintOrder()) {
+      if (const Layer* layer = layerMap.value(role)) {
+        color = settings.getColor(role);
+        if (color.isValid() && (color.alpha() > 0)) {
+          auto it = mCachedContentPerLayer.find(role);
+          if (it == mCachedContentPerLayer.end()) {
+            layers = QStringList{layer->getId()};
+            paths = *mCachedBoardArea;
+            if (!mCachedCopperHoles->empty()) {
+              ClipperHelpers::subtract(paths, *mCachedCopperHoles,
+                                       ClipperLib::pftEvenOdd,
+                                       ClipperLib::pftNonZero);
+            }
+            ClipperHelpers::intersect(paths, getPaths(layers),
+                                      ClipperLib::pftEvenOdd,
+                                      ClipperLib::pftNonZero);
+            it = mCachedContentPerLayer.insert(role, toPainterPath(paths));
           }
-          ClipperHelpers::intersect(paths, getPaths(layers),
-                                    ClipperLib::pftEvenOdd,
-                                    ClipperLib::pftNonZero);
-          it = mCachedContentPerLayer.insert(themeColor, toPainterPath(paths));
+          content.append(std::make_pair(color, *it));
         }
-        content.append(std::make_pair(color, *it));
       }
     }
 
     // Solder resist.
-    for (const char* themeColor :
-         {Theme::Color::sBoardStopMaskTop, Theme::Color::sBoardStopMaskBot}) {
-      color = settings.getColor(themeColor);
+    for (const QString& role : {ColorRole::boardStopMaskTop().getId(),
+                                ColorRole::boardStopMaskBot().getId()}) {
+      color = settings.getColor(role);
       if (color.isValid() && (color.alpha() == 0)) {
         if (auto boardColor = mData->getSolderResist()) {
           color = boardColor->toSolderResistColor();
         }
       }
       if (color.isValid() && (color.alpha() > 0)) {
-        auto it = mCachedContentPerLayer.find(themeColor);
+        auto it = mCachedContentPerLayer.find(role);
         if (it == mCachedContentPerLayer.end()) {
           it = mCachedContentPerLayer.insert(
-              themeColor,
+              role,
               toPainterPath(getSolderResistPaths(
-                  themeColor == Theme::Color::sBoardStopMaskBot)));
+                  role == ColorRole::boardStopMaskBot().getId())));
         }
         content.append(std::make_pair(color, *it));
       }
     }
 
     // Silkscreen.
-    for (const char* themeColor :
-         {Theme::Color::sBoardLegendTop, Theme::Color::sBoardLegendBot}) {
-      color = settings.getColor(themeColor);
+    for (const QString& role : {ColorRole::boardLegendTop().getId(),
+                                ColorRole::boardLegendBot().getId()}) {
+      color = settings.getColor(role);
       if (color.isValid() && (color.alpha() == 0)) {
         if (auto boardColor = mData->getSilkscreen()) {
           color = boardColor->toSilkscreenColor();
         }
       }
       if (color.isValid() && (color.alpha() > 0)) {
-        auto it = mCachedContentPerLayer.find(themeColor);
+        auto it = mCachedContentPerLayer.find(role);
         if (it == mCachedContentPerLayer.end()) {
-          const bool isBottom = themeColor == Theme::Color::sBoardLegendBot;
+          const bool isBottom = role == ColorRole::boardLegendBot().getId();
           layers = QStringList();
           foreach (const Layer* layer,
                    isBottom ? mData->getSilkscreenLayersBot()
@@ -234,30 +235,30 @@ QVector<std::pair<QColor, QPainterPath>> RealisticBoardPainter::getContent(
           ClipperHelpers::intersect(paths, getSolderResistPaths(isBottom),
                                     ClipperLib::pftNonZero,
                                     ClipperLib::pftEvenOdd);
-          it = mCachedContentPerLayer.insert(themeColor, toPainterPath(paths));
+          it = mCachedContentPerLayer.insert(role, toPainterPath(paths));
         }
         content.append(std::make_pair(color, *it));
       }
     }
 
     // Solder paste.
-    for (const char* themeColor : {Theme::Color::sBoardSolderPasteTop,
-                                   Theme::Color::sBoardSolderPasteBot}) {
-      color = settings.getColor(themeColor);
+    for (const QString& role : {ColorRole::boardSolderPasteTop().getId(),
+                                ColorRole::boardSolderPasteBot().getId()}) {
+      color = settings.getColor(role);
       if (color.isValid() && (color.alpha() > 0)) {
-        auto it = mCachedContentPerLayer.find(themeColor);
+        auto it = mCachedContentPerLayer.find(role);
         if (it == mCachedContentPerLayer.end()) {
           layers =
-              QStringList{(themeColor == Theme::Color::sBoardSolderPasteTop)
+              QStringList{(role == ColorRole::boardSolderPasteTop().getId())
                               ? Layer::topSolderPaste().getId()
                               : Layer::botSolderPaste().getId()};
           paths = getPaths(layers);
           ClipperHelpers::intersect(paths, *mCachedBoardArea,
                                     ClipperLib::pftNonZero,
                                     ClipperLib::pftEvenOdd);
-          it = mCachedContentPerLayer.insert(themeColor, toPainterPath(paths));
+          it = mCachedContentPerLayer.insert(role, toPainterPath(paths));
         }
-        content.append(std::make_pair(settings.getColor(themeColor), *it));
+        content.append(std::make_pair(settings.getColor(role), *it));
       }
     }
   } catch (const Exception& e) {

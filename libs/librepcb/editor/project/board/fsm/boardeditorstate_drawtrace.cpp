@@ -252,7 +252,7 @@ QSet<const Layer*> BoardEditorState_DrawTrace::getAvailableLayers() noexcept {
 
 void BoardEditorState_DrawTrace::setLayer(const Layer& layer) noexcept {
   if (!mContext.board.getCopperLayers().contains(&layer)) return;
-  makeLayerVisible(layer.getThemeColor());
+  makeLayerVisible(layer.getColorRole());
 
   if ((mSubState == SubState_PositioningNetPoint) &&
       (&layer != mCurrentLayer)) {
@@ -606,7 +606,7 @@ bool BoardEditorState_DrawTrace::startPositioning(
 
     // update layer
     Q_ASSERT(board.getCopperLayers().contains(layer));
-    makeLayerVisible(layer->getThemeColor());
+    makeLayerVisible(layer->getColorRole());
     mCurrentLayer = layer;
     emit layerChanged(*mCurrentLayer);
 

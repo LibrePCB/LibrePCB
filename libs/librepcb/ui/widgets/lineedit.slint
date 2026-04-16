@@ -13,6 +13,7 @@ export component LineEdit inherits Rectangle {
     in property <bool> show-clear-button: true;
     in property <bool> enabled: true;
     in property <bool> read-only: false;
+    in property <string> font-family;
     in property <length> font-size: 13px;
     in property <int> font-weight: 400;
     in property <[string]> autocompletions;
@@ -123,6 +124,7 @@ export component LineEdit inherits Rectangle {
     placeholder-txt := Text {
         x: 5px + (root.border-radius / 2);
         width: root.width - 2 * self.x;
+        font-family: font-family;
         font-size: font-size;
         font-italic: true;
         color: enabled ? Data.theme.control-text-muted : Data.theme.control-text-disabled;
@@ -155,6 +157,7 @@ export component LineEdit inherits Rectangle {
                     y: ((parent.height - self.height) / 2);
                     width: max(self.preferred-width, view.width);
                     height: self.preferred-height;
+                    font-family: font-family;
                     font-size: font-size;
                     font-weight: font-weight;
                     enabled: enabled;

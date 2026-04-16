@@ -1,0 +1,647 @@
+import "../../../share/librepcb/fonts/NotoSans-Light.ttf";
+import "../../../share/librepcb/fonts/NotoSans-LightItalic.ttf";
+import "../../../share/librepcb/fonts/NotoSans-Regular.ttf";
+import "../../../share/librepcb/fonts/NotoSans-Italic.ttf";
+import "../../../share/librepcb/fonts/NotoSans-Bold.ttf";
+import "../../../share/librepcb/fonts/NotoSans-BoldItalic.ttf";
+import "../../../share/librepcb/fonts/NotoSansMono-Regular.ttf";
+
+import {
+    Button,
+    IconButton,
+    LineEdit,
+    ListScrollView,
+    ToolTip,
+} from "widgets.slint";
+import { Data } from "api.slint";
+
+export enum ColorSchemeColorAction {
+    none,
+    set-hsv,
+    set-hex,
+    restore-default,
+}
+
+export struct ColorSchemeColorData {
+    hue: float,
+    saturation: float,
+    value: float,
+    alpha: float,
+    hex: string,
+    overridden: bool,
+
+    // Set by UI, handled in backend.
+    action: ColorSchemeColorAction,
+}
+
+export struct ColorSchemeItemData {
+    name: string,
+    primary: ColorSchemeColorData,
+    secondary: ColorSchemeColorData,
+}
+
+component ColorBox inherits Rectangle {
+    in property <ColorSchemeColorData> data;
+    in property <ColorSchemeColorData> background-data;
+    in property <bool> is-selected;
+    in property <string> tooltip;
+
+    callback clicked <=> ta.clicked;
+
+    width: 20px;
+    height: self.width;
+    border-color: {
+        if is-selected {
+            Data.theme.accent
+        } else if data.overridden {
+            Data.theme.control-text
+        } else {
+            Data.theme.control-border
+        }
+    };
+    border-width: (is-selected && data.overridden) ? 2px : 1px;
+
+    Rectangle {
+        width: parent.width - 6px;
+        height: self.width;
+        background: hsv(background-data.hue * 360, background-data.saturation, background-data.value, 1);
+
+        Rectangle {
+            background: hsv(data.hue * 360, data.saturation, data.value, data.alpha);
+        }
+    }
+
+    ta := TouchArea {
+        mouse-cursor: pointer;
+    }
+
+    if (!tooltip.is-empty) && ta.has-hover && (!ta.pressed): tt := ToolTip {
+        x: -self.width - 5px;
+        y: (parent.height - self.height) / 2;
+        text: tooltip;
+    }
+}
+
+component ColorArea inherits TouchArea {
+    in property <ColorSchemeColorData> data;
+
+    callback color-picked(saturation: float, value: float);
+
+    mouse-cursor: pointer;
+
+    Rectangle {
+        background: Data.theme.control-border;
+        border-radius: 6px;
+        clip: true;
+
+        // Hue
+        Rectangle {
+            width: parent.width - 2px;
+            height: parent.height - 2px;
+            border-radius: 5px;
+            background: hsv(data.hue * 360, 1, 1);
+        }
+
+        // Saturation
+        Rectangle {
+            width: parent.width - 2px;
+            height: parent.height - 2px;
+            border-radius: 5px;
+            background: @linear-gradient(90deg, white 0%, transparent 100%);
+        }
+
+        // Value
+        Rectangle {
+            width: parent.width - 2px;
+            height: parent.height - 2px;
+            border-radius: 5px;
+            background: @linear-gradient(0deg, black 0%, transparent 100%);
+        }
+    }
+
+    // Handle
+    Rectangle {
+        x: (parent.width * data.saturation) - (self.width / 2);
+        y: (parent.height * (1 - data.value)) - (self.height / 2);
+        width: 12px;
+        height: self.width;
+        border-color: Data.theme.base-text;
+        border-width: 2px;
+        border-radius: self.width / 2;
+    }
+
+    pointer-event(event) => {
+        if ((event.button == PointerEventButton.left) && (event.kind == PointerEventKind.down)) || ((event.kind == PointerEventKind.move) && self.pressed) {
+            color-picked(clamp(self.mouse-x / self.width, 0, 1), clamp(1 - (self.mouse-y / self.height), 0, 1));
+        }
+    }
+}
+
+component VerticalColorSlider inherits Rectangle {
+    in property <float> value;
+    in property <brush> brush-start;
+    in property <brush> brush-middle;
+    in property <brush> brush-end;
+
+    callback value-changed(value: float);
+
+    width: 14px;
+    border-color: Data.theme.control-border;
+    border-width: 1px;
+    border-radius: self.width / 2;
+    clip: true;
+
+    Image {
+        x: 0;
+        width: 100%;
+        height: 100%;
+        vertical-alignment: top;
+        horizontal-alignment: left;
+        source: @image-url("../../../img/squares-10px.svg");
+        vertical-tiling: repeat;
+        horizontal-tiling: repeat;
+        colorize: Data.theme.control-text-muted;
+        accessible-role: none;
+    }
+
+    VerticalLayout {
+        Rectangle {
+            height: self.width / 2;
+            background: brush-start;
+        }
+
+        Rectangle {
+            background: brush-middle;
+        }
+
+        Rectangle {
+            height: self.width / 2;
+            background: brush-end;
+        }
+    }
+
+    // Handle
+    Rectangle {
+        x: 0;
+        y: (parent.width / 2) + ((parent.height - parent.width) * (1 - value)) - (self.height / 2);
+        width: parent.width;
+        height: self.width;
+        border-color: Data.theme.base-text;
+        border-width: 3px;
+        border-radius: self.width / 2;
+
+        Rectangle {
+            width: parent.width;
+            height: self.width;
+            border-color: black;
+            border-width: 0.5px;
+            border-radius: self.width / 2;
+        }
+    }
+
+    TouchArea {
+        mouse-cursor: pointer;
+
+        pointer-event(event) => {
+            if ((event.button == PointerEventButton.left) && (event.kind == PointerEventKind.down)) || ((event.kind == PointerEventKind.move) && self.pressed) {
+                value-changed(clamp(1 - ((self.mouse-y - self.width / 2) / (self.height - self.width)), 0, 1));
+            }
+        }
+    }
+}
+
+component ColorLabels inherits HorizontalLayout {
+    in property <[int]> values;
+
+    alignment: space-between;
+
+    for value in values: Text {
+        min-width: 40px;
+        horizontal-alignment: right;
+        color: Data.theme.base-text;
+        text: value;
+        accessible-role: none;
+    }
+}
+
+export component ColorSchemeDialog inherits Window {
+    title: @tr("Color Scheme");
+    icon: @image-url("../../../img/app/librepcb.svg");
+    background: Data.theme.window;
+    default-font-family: "Noto Sans";
+    preferred-width: 300px;
+    preferred-height: 500px;
+    forward-focus: name-edt;
+
+    in property <string> name: "Foo Bar";
+    in-out property <[ColorSchemeItemData]> model: [
+        {
+            name: "Color 1",
+            primary: { hue: 1, saturation: 0, value: 1, alpha: 1, hex: "#ffff0000" },
+            secondary: { hue: 120, saturation: 1, value: 1, alpha: 1, hex: "#ff00ff00" },
+        },
+        {
+            name: "Color 2",
+            primary: { hue: 1, saturation: 1, value: 1, alpha: 1, hex: "#ffff0000", overridden: true },
+            secondary: { hue: 240, saturation: 1, value: 1, alpha: 1, hex: "#ff00ff00" },
+        },
+        {
+            name: "Color 3",
+            primary: { hue: 1, saturation: 1, value: 1, alpha: 0.2, hex: "#ffff0000" },
+            secondary: { hue: 1, saturation: 1, value: 1, alpha: 0.8, hex: "#ff00ff00", overridden: true },
+        },
+        {
+            name: "Color 4",
+            primary: { hue: 1, saturation: 1, value: 1, alpha: 1, hex: "#ffff0000" },
+            secondary: { hue: 1, saturation: 1, value: 1, alpha: 1, hex: "#ff00ff00" },
+        },
+    ];
+    in-out property <int> current-index: 0;
+    in-out property <bool> current-secondary: false;
+    property <ColorSchemeItemData> current-item: model[current-index];
+    property <ColorSchemeColorData> current-data: current-secondary ? current-item.secondary : current-item.primary;
+    property <color> current-color: hsv(current-data.hue * 360, current-data.saturation, current-data.value, current-data.alpha);
+    property <length> item-height: 24px;
+
+    callback name-edited(name: string);
+
+    public function focus-name-edt() {
+        name-edt.focus();
+        name-edt.select-all();
+    }
+
+    function set-current-index(index: int) {
+        if ((index + 1) * item-height) > (view.height - view.viewport-y) {
+            view.viewport-y = -(index + 1) * item-height + view.height;
+        } else if (index * item-height) < -(view.viewport-y) {
+            view.viewport-y = -(index * item-height);
+        }
+        current-index = index;
+    }
+
+    function set-current-color(h: float, s: float, v: float, a: float) {
+        if current-secondary {
+            model[current-index].secondary = {
+                hue: h,
+                saturation: s,
+                value: v,
+                alpha: a,
+                action: ColorSchemeColorAction.set-hsv,
+            };
+        } else {
+            model[current-index].primary = {
+                hue: h,
+                saturation: s,
+                value: v,
+                alpha: a,
+                action: ColorSchemeColorAction.set-hsv,
+            };
+        }
+    }
+
+    VerticalLayout {
+        padding: 7px;
+        spacing: 8px;
+
+        HorizontalLayout {
+            spacing: 5px;
+
+            name-txt := Text {
+                text: @tr("Name:");
+                color: Data.theme.base-text;
+                vertical-alignment: center;
+                accessible-role: none;
+            }
+
+            name-edt := LineEdit {
+                text: name;
+                show-clear-button: false;
+                accessible-description: name-txt.text;
+
+                text-edited(s) => {
+                    name-edited(s)
+                }
+
+                key-pressed(event) => {
+                    if event.text == Key.Return {
+                        root.hide();
+                        return accept;
+                    }
+                    reject
+                }
+            }
+        }
+
+        fs := FocusScope {
+            Rectangle {
+                background: Data.theme.control;
+                border-color: Data.theme.control-border;
+                border-width: 1px;
+
+                view := ListScrollView {
+                    width: parent.width - 2px;
+                    height: parent.height - 2px;
+                    accessible-item-count: model.length;
+
+                    for item[index] in model: item-ta := TouchArea {
+                        height: item-height;
+
+                        // Accessibility
+                        accessible-role: list-item;
+                        accessible-label: item.name;
+                        accessible-item-selectable: true;
+                        accessible-item-selected: (current-index == index);
+                        accessible-item-index: index;
+                        accessible-action-default => {
+                            item-ta.clicked();
+                        }
+
+                        Rectangle {
+                            background: {
+                                if index == current-index {
+                                    Data.theme.control-checked
+                                } else if item-ta.has-hover {
+                                    Data.theme.control-hovered
+                                } else {
+                                    Data.theme.control
+                                }
+                            };
+
+                            HorizontalLayout {
+                                spacing: 7px;
+                                padding-top: 1px;
+                                padding-bottom: 1px;
+                                padding-left: 4px;
+                                padding-right: 4px;
+
+                                HorizontalLayout {
+                                    spacing: 2px;
+
+                                    for sec in [false, true]: ColorBox {
+                                        data: sec ? item.secondary : item.primary;
+                                        background-data: model[0].primary;
+                                        is-selected: (current-index == index) && (current-secondary == sec);
+
+                                        clicked => {
+                                            current-secondary = sec;
+                                            set-current-index(index);
+                                            fs.focus();
+                                        }
+                                    }
+                                }
+
+                                Text {
+                                    vertical-alignment: center;
+                                    color: Data.theme.control-text;
+                                    text: item.name;
+                                    accessible-role: none;
+                                }
+                            }
+                        }
+
+                        clicked => {
+                            if current-index != index {
+                                current-secondary = false;
+                                set-current-index(index);
+                            }
+                            fs.focus();
+                        }
+                    }
+                }
+            }
+
+            key-pressed(event) => {
+                if event.text == Key.DownArrow {
+                    set-current-index(min(current-index + 1, model.length - 1));
+                    return accept;
+                } else if event.text == Key.UpArrow {
+                    set-current-index(max(current-index - 1, 0));
+                    return accept;
+                } else if event.text == Key.LeftArrow {
+                    current-secondary = false;
+                    return accept;
+                } else if event.text == Key.RightArrow {
+                    current-secondary = true;
+                    return accept;
+                }
+                reject
+            }
+        }
+
+        HorizontalLayout {
+            spacing: 8px;
+
+            ColorArea {
+                width: self.height;
+                min-height: 80px;
+                data: current-data;
+
+                color-picked(saturation, value) => {
+                    set-current-color(current-data.hue, saturation, value, current-data.alpha);
+                    hex-edt.clear-focus();
+                }
+            }
+
+            VerticalColorSlider {
+                brush-start: #ff0000;
+                brush-middle: @linear-gradient(0deg, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000);
+                brush-end: #ff0000;
+                value: current-data.hue;
+
+                value-changed(value) => {
+                    set-current-color(value, current-data.saturation, current-data.value, current-data.alpha);
+                    hex-edt.clear-focus();
+                }
+            }
+
+            VerticalColorSlider {
+                brush-start: hsv(current-data.hue * 360, current-data.saturation, current-data.value, 1);
+                brush-middle: @linear-gradient(180deg, hsv(current-data.hue * 360, current-data.saturation, current-data.value, 1), transparent);
+                brush-end: transparent;
+                value: current-data.alpha;
+
+                value-changed(value) => {
+                    set-current-color(current-data.hue, current-data.saturation, current-data.value, value);
+                    hex-edt.clear-focus();
+                }
+            }
+
+            VerticalLayout {
+                min-width: max(view.min-width, self.preferred-width);
+                spacing: 4px;
+
+                HorizontalLayout {
+                    height: 28px;
+
+                    Text {
+                        font-weight: 700;
+                        color: Data.theme.base-text;
+                        vertical-alignment: center;
+                        text: current-item.name;
+                    }
+
+                    ColorBox {
+                        z: 100; // For the tooltip.
+                        width: parent.height;
+                        data: model[current-index].primary;
+                        background-data: model[0].primary;
+                        is-selected: !current-secondary;
+                        tooltip: @tr("Primary Color");
+
+                        clicked => {
+                            current-secondary = false;
+                            hex-edt.clear-focus();
+                        }
+                    }
+
+                    IconButton {
+                        z: 100; // For the tooltip.
+                        style: hyperlink;
+                        icon-scale: 0.5;
+                        icon: @image-url("../../font-awesome/svgs/solid/angles-right.svg");
+                        tooltip: @tr("Copy primary color to secondary");
+                        tooltip-position: left;
+
+                        clicked => {
+                            current-secondary = true;
+                            set-current-color(model[current-index].primary.hue,
+                                              model[current-index].primary.saturation,
+                                              model[current-index].primary.value,
+                                              model[current-index].primary.alpha);
+                            hex-edt.clear-focus();
+                        }
+                    }
+
+                    ColorBox {
+                        z: 100; // For the tooltip.
+                        width: parent.height;
+                        data: model[current-index].secondary;
+                        background-data: model[0].primary;
+                        is-selected: current-secondary;
+                        tooltip: @tr("Secondary Color");
+
+                        clicked => {
+                            current-secondary = true;
+                            hex-edt.clear-focus();
+                        }
+                    }
+                }
+
+                GridLayout {
+                    spacing-horizontal: 5px;
+                    spacing-vertical: 3px;
+
+                    Row {
+                        Text {
+                            width: self.preferred-width;
+                            horizontal-alignment: left;
+                            vertical-alignment: center;
+                            color: Data.theme.base-text;
+                            text: "HSVA:";
+                            accessible-role: none;
+                        }
+
+                        ColorLabels {
+                            values: [
+                                round(current-data.hue * 360),
+                                round(current-data.saturation * 255),
+                                round(current-data.value * 255),
+                                round(current-data.alpha * 255),
+                            ];
+                        }
+                    }
+
+                    Row {
+                        Text {
+                            width: self.preferred-width;
+                            horizontal-alignment: left;
+                            vertical-alignment: center;
+                            color: Data.theme.base-text;
+                            text: "RGBA:";
+                            accessible-role: none;
+                        }
+
+                        ColorLabels {
+                            values: [
+                                current-color.red,
+                                current-color.green,
+                                current-color.blue,
+                                current-color.alpha,
+                            ];
+                        }
+                    }
+
+                    Row {
+                        Text {
+                            width: self.preferred-width;
+                            horizontal-alignment: left;
+                            vertical-alignment: center;
+                            color: Data.theme.base-text;
+                            text: "#RGBA:";
+                            accessible-role: none;
+                        }
+
+                        hex-edt := LineEdit {
+                            property <string> current-value: current-data.hex;
+                            property <bool> disable-update: false;
+
+                            min-width: self.preferred-width;
+                            height: self.preferred-height;
+                            font-family: "Noto Sans Mono";
+                            placeholder-text: "#RRGGBBAA";
+                            show-clear-button: false;
+                            text: current-value;
+
+                            text-edited(text) => {
+                                disable-update = true;
+                                if current-secondary {
+                                    model[current-index].secondary = {
+                                        hex: text,
+                                        action: ColorSchemeColorAction.set-hex,
+                                    };
+                                } else {
+                                    model[current-index].primary = {
+                                        hex: text,
+                                        action: ColorSchemeColorAction.set-hex,
+                                    };
+                                }
+                            }
+
+                            changed has-focus => {
+                                disable-update = false;
+                                self.text = current-value;
+                            }
+
+                            changed current-value => {
+                                if !disable-update {
+                                    self.text = current-value;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Button {
+                    text: @tr("Reset to Default");
+                    enabled: current-data.overridden;
+
+                    clicked => {
+                        if current-secondary {
+                            model[current-index].secondary.action = ColorSchemeColorAction.restore-default;
+                        } else {
+                            model[current-index].primary.action = ColorSchemeColorAction.restore-default;
+                        }
+                    }
+                }
+            }
+        }
+
+        Button {
+            text: @tr("Close");
+
+            clicked => {
+                root.hide();
+            }
+        }
+    }
+}

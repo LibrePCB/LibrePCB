@@ -40,6 +40,7 @@
 namespace librepcb {
 
 class Board;
+class ColorRole;
 class Layer;
 class LengthUnit;
 class NetSignal;
@@ -193,7 +194,7 @@ protected:  // Methods
   PositiveLength getGridInterval() const noexcept;
   const LengthUnit& getLengthUnit() const noexcept;
   QSet<const Layer*> getAllowedGeometryLayers() noexcept;
-  void makeLayerVisible(const QString& layer) noexcept;
+  void makeLayerVisible(const ColorRole& role) noexcept;
   void abortBlockingToolsInOtherEditors() noexcept;
   bool execCmd(UndoCommand* cmd);
   QWidget* parentWidget() noexcept;

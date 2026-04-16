@@ -24,7 +24,7 @@
 
 #include "../exceptions.h"
 #include "../serialization/sexpression.h"
-#include "../workspace/theme.h"
+#include "../workspace/colorrole.h"
 
 #include <QtCore>
 
@@ -38,14 +38,14 @@ namespace librepcb {
  ******************************************************************************/
 
 Layer::Layer(const QString& id, const QString& nameTr,
-             const QString& themeColor, Flags flags) noexcept
-  : mId(id), mNameTr(nameTr), mThemeColor(themeColor), mFlags(flags) {
+             const ColorRole& colorRole, Flags flags) noexcept
+  : mId(id), mNameTr(nameTr), mColorRole(colorRole), mFlags(flags) {
 }
 
 Layer::Layer(const Layer& other) noexcept
   : mId(other.mId),
     mNameTr(other.mNameTr),
-    mThemeColor(other.mThemeColor),
+    mColorRole(other.mColorRole),
     mFlags(other.mFlags) {
 }
 
@@ -91,168 +91,167 @@ const Layer& Layer::mirrored(int innerLayers) const noexcept {
 
 const Layer& Layer::schematicSheetFrames() noexcept {
   static Layer layer("sch_frames", tr("Sheet Frames"),
-                     Theme::Color::sSchematicFrames, Flag::Schematic);
+                     ColorRole::schematicFrames(), Flag::Schematic);
   return layer;
 }
 
 const Layer& Layer::schematicDocumentation() noexcept {
   static Layer layer("sch_documentation", tr("Documentation"),
-                     Theme::Color::sSchematicDocumentation, Flag::Schematic);
+                     ColorRole::schematicDocumentation(), Flag::Schematic);
   return layer;
 }
 
 const Layer& Layer::schematicComments() noexcept {
   static Layer layer("sch_comments", tr("Comments"),
-                     Theme::Color::sSchematicComments, Flag::Schematic);
+                     ColorRole::schematicComments(), Flag::Schematic);
   return layer;
 }
 
 const Layer& Layer::schematicGuide() noexcept {
-  static Layer layer("sch_guide", tr("Guide"), Theme::Color::sSchematicGuide,
+  static Layer layer("sch_guide", tr("Guide"), ColorRole::schematicGuide(),
                      Flag::Schematic);
   return layer;
 }
 
 const Layer& Layer::symbolOutlines() noexcept {
   static Layer layer("sym_outlines", tr("Outlines"),
-                     Theme::Color::sSchematicOutlines, Flag::Schematic);
+                     ColorRole::schematicOutlines(), Flag::Schematic);
   return layer;
 }
 
 const Layer& Layer::symbolHiddenGrabAreas() noexcept {
   static Layer layer("sym_hidden_grab_areas", tr("Hidden Grab Areas"),
-                     Theme::Color::sSchematicHiddenGrabAreas, Flag::Schematic);
+                     ColorRole::schematicHiddenGrabAreas(), Flag::Schematic);
   return layer;
 }
 
 const Layer& Layer::symbolNames() noexcept {
-  static Layer layer("sym_names", tr("Names"), Theme::Color::sSchematicNames,
+  static Layer layer("sym_names", tr("Names"), ColorRole::schematicNames(),
                      Flag::Schematic);
   return layer;
 }
 
 const Layer& Layer::symbolValues() noexcept {
-  static Layer layer("sym_values", tr("Values"), Theme::Color::sSchematicValues,
+  static Layer layer("sym_values", tr("Values"), ColorRole::schematicValues(),
                      Flag::Schematic);
   return layer;
 }
 
 const Layer& Layer::symbolPinNames() noexcept {
   static Layer layer("sym_pin_names", tr("Pin Names"),
-                     Theme::Color::sSchematicPinNames, Flag::Schematic);
+                     ColorRole::schematicPinNames(), Flag::Schematic);
   return layer;
 }
 
 const Layer& Layer::boardSheetFrames() noexcept {
-  static Layer layer("brd_frames", tr("Sheet Frames"),
-                     Theme::Color::sBoardFrames, Flag::Board);
+  static Layer layer("brd_frames", tr("Sheet Frames"), ColorRole::boardFrames(),
+                     Flag::Board);
   return layer;
 }
 
 const Layer& Layer::boardOutlines() noexcept {
   static Layer layer("brd_outlines", tr("Board Outlines"),
-                     Theme::Color::sBoardOutlines,
-                     Flag::Board | Flag::BoardEdge);
+                     ColorRole::boardOutlines(), Flag::Board | Flag::BoardEdge);
   return layer;
 }
 
 const Layer& Layer::boardCutouts() noexcept {
   static Layer layer("brd_cutouts", tr("Board Cutouts"),
-                     Theme::Color::sBoardOutlines,  // No dedicated theme layer.
+                     ColorRole::boardOutlines(),  // No dedicated color ID.
                      Flag::Board | Flag::BoardEdge);
   return layer;
 }
 
 const Layer& Layer::boardPlatedCutouts() noexcept {
   static Layer layer("brd_plated_cutouts", tr("Plated Board Cutouts"),
-                     Theme::Color::sBoardPlatedCutouts,
+                     ColorRole::boardPlatedCutouts(),
                      Flag::Board | Flag::BoardEdge);
   return layer;
 }
 
 const Layer& Layer::boardMeasures() noexcept {
-  static Layer layer("brd_measures", tr("Measures"),
-                     Theme::Color::sBoardMeasures, Flag::Board);
+  static Layer layer("brd_measures", tr("Measures"), ColorRole::boardMeasures(),
+                     Flag::Board);
   return layer;
 }
 
 const Layer& Layer::boardAlignment() noexcept {
   static Layer layer("brd_alignment", tr("Alignment"),
-                     Theme::Color::sBoardAlignment, Flag::Board);
+                     ColorRole::boardAlignment(), Flag::Board);
   return layer;
 }
 
 const Layer& Layer::boardDocumentation() noexcept {
   static Layer layer("brd_documentation", tr("Documentation"),
-                     Theme::Color::sBoardDocumentation, Flag::Board);
+                     ColorRole::boardDocumentation(), Flag::Board);
   return layer;
 }
 
 const Layer& Layer::boardComments() noexcept {
-  static Layer layer("brd_comments", tr("Comments"),
-                     Theme::Color::sBoardComments, Flag::Board);
+  static Layer layer("brd_comments", tr("Comments"), ColorRole::boardComments(),
+                     Flag::Board);
   return layer;
 }
 
 const Layer& Layer::boardGuide() noexcept {
-  static Layer layer("brd_guide", tr("Guide"), Theme::Color::sBoardGuide,
+  static Layer layer("brd_guide", tr("Guide"), ColorRole::boardGuide(),
                      Flag::Board);
   return layer;
 }
 
 const Layer& Layer::topNames() noexcept {
-  static Layer layer("top_names", tr("Top Names"), Theme::Color::sBoardNamesTop,
+  static Layer layer("top_names", tr("Top Names"), ColorRole::boardNamesTop(),
                      Flag::Board | Flag::Top);
   return layer;
 }
 
 const Layer& Layer::botNames() noexcept {
   static Layer layer("bot_names", tr("Bottom Names"),
-                     Theme::Color::sBoardNamesBot, Flag::Board | Flag::Bottom);
+                     ColorRole::boardNamesBot(), Flag::Board | Flag::Bottom);
   return layer;
 }
 
 const Layer& Layer::topValues() noexcept {
   static Layer layer("top_values", tr("Top Values"),
-                     Theme::Color::sBoardValuesTop, Flag::Board | Flag::Top);
+                     ColorRole::boardValuesTop(), Flag::Board | Flag::Top);
   return layer;
 }
 
 const Layer& Layer::botValues() noexcept {
   static Layer layer("bot_values", tr("Bottom Values"),
-                     Theme::Color::sBoardValuesBot, Flag::Board | Flag::Bottom);
+                     ColorRole::boardValuesBot(), Flag::Board | Flag::Bottom);
   return layer;
 }
 
 const Layer& Layer::topLegend() noexcept {
   static Layer layer("top_legend", tr("Top Legend"),
-                     Theme::Color::sBoardLegendTop, Flag::Board | Flag::Top);
+                     ColorRole::boardLegendTop(), Flag::Board | Flag::Top);
   return layer;
 }
 
 const Layer& Layer::botLegend() noexcept {
   static Layer layer("bot_legend", tr("Bottom Legend"),
-                     Theme::Color::sBoardLegendBot, Flag::Board | Flag::Bottom);
+                     ColorRole::boardLegendBot(), Flag::Board | Flag::Bottom);
   return layer;
 }
 
 const Layer& Layer::topDocumentation() noexcept {
   static Layer layer("top_documentation", tr("Top Documentation"),
-                     Theme::Color::sBoardDocumentationTop,
+                     ColorRole::boardDocumentationTop(),
                      Flag::Board | Flag::Top);
   return layer;
 }
 
 const Layer& Layer::botDocumentation() noexcept {
   static Layer layer("bot_documentation", tr("Bottom Documentation"),
-                     Theme::Color::sBoardDocumentationBot,
+                     ColorRole::boardDocumentationBot(),
                      Flag::Board | Flag::Bottom);
   return layer;
 }
 
 const Layer& Layer::topPackageOutlines() noexcept {
   static Layer layer("top_package_outlines", tr("Top Package Outlines"),
-                     Theme::Color::sBoardPackageOutlinesTop,
+                     ColorRole::boardPackageOutlinesTop(),
                      Flag::Board | Flag::Top | Flag::PackageOutline |
                          Flag::PolygonsRepresentAreas);
   return layer;
@@ -260,7 +259,7 @@ const Layer& Layer::topPackageOutlines() noexcept {
 
 const Layer& Layer::botPackageOutlines() noexcept {
   static Layer layer("bot_package_outlines", tr("Bottom Package Outlines"),
-                     Theme::Color::sBoardPackageOutlinesBot,
+                     ColorRole::boardPackageOutlinesBot(),
                      Flag::Board | Flag::Bottom | Flag::PackageOutline |
                          Flag::PolygonsRepresentAreas);
   return layer;
@@ -268,7 +267,7 @@ const Layer& Layer::botPackageOutlines() noexcept {
 
 const Layer& Layer::topCourtyard() noexcept {
   static Layer layer("top_courtyard", tr("Top Courtyard"),
-                     Theme::Color::sBoardCourtyardTop,
+                     ColorRole::boardCourtyardTop(),
                      Flag::Board | Flag::Top | Flag::PackageCourtyard |
                          Flag::PolygonsRepresentAreas);
   return layer;
@@ -276,7 +275,7 @@ const Layer& Layer::topCourtyard() noexcept {
 
 const Layer& Layer::botCourtyard() noexcept {
   static Layer layer("bot_courtyard", tr("Bottom Courtyard"),
-                     Theme::Color::sBoardCourtyardBot,
+                     ColorRole::boardCourtyardBot(),
                      Flag::Board | Flag::Bottom | Flag::PackageCourtyard |
                          Flag::PolygonsRepresentAreas);
   return layer;
@@ -284,79 +283,79 @@ const Layer& Layer::botCourtyard() noexcept {
 
 const Layer& Layer::topHiddenGrabAreas() noexcept {
   static Layer layer("top_hidden_grab_areas", tr("Top Hidden Grab Areas"),
-                     Theme::Color::sBoardHiddenGrabAreasTop,
+                     ColorRole::boardHiddenGrabAreasTop(),
                      Flag::Board | Flag::Top);
   return layer;
 }
 
 const Layer& Layer::botHiddenGrabAreas() noexcept {
   static Layer layer("bot_hidden_grab_areas", tr("Bottom Hidden Grab Areas"),
-                     Theme::Color::sBoardHiddenGrabAreasBot,
+                     ColorRole::boardHiddenGrabAreasBot(),
                      Flag::Board | Flag::Bottom);
   return layer;
 }
 
 const Layer& Layer::topStopMask() noexcept {
   static Layer layer("top_stop_mask", tr("Top Stop Mask"),
-                     Theme::Color::sBoardStopMaskTop,
+                     ColorRole::boardStopMaskTop(),
                      Flag::Board | Flag::Top | Flag::StopMask);
   return layer;
 }
 
 const Layer& Layer::botStopMask() noexcept {
   static Layer layer("bot_stop_mask", tr("Bottom Stop Mask"),
-                     Theme::Color::sBoardStopMaskBot,
+                     ColorRole::boardStopMaskBot(),
                      Flag::Board | Flag::Bottom | Flag::StopMask);
   return layer;
 }
 
 const Layer& Layer::topSolderPaste() noexcept {
   static Layer layer("top_solder_paste", tr("Top Solder Paste"),
-                     Theme::Color::sBoardSolderPasteTop,
+                     ColorRole::boardSolderPasteTop(),
                      Flag::Board | Flag::Top | Flag::SolderPaste);
   return layer;
 }
 
 const Layer& Layer::botSolderPaste() noexcept {
   static Layer layer("bot_solder_paste", tr("Bottom Solder Paste"),
-                     Theme::Color::sBoardSolderPasteBot,
+                     ColorRole::boardSolderPasteBot(),
                      Flag::Board | Flag::Bottom | Flag::SolderPaste);
   return layer;
 }
 
 const Layer& Layer::topFinish() noexcept {
   static Layer layer("top_finish", tr("Top Finish"),
-                     Theme::Color::sBoardFinishTop, Flag::Board | Flag::Top);
+                     ColorRole::boardFinishTop(), Flag::Board | Flag::Top);
   return layer;
 }
 
 const Layer& Layer::botFinish() noexcept {
   static Layer layer("bot_finish", tr("Bottom Finish"),
-                     Theme::Color::sBoardFinishBot, Flag::Board | Flag::Bottom);
+                     ColorRole::boardFinishBot(), Flag::Board | Flag::Bottom);
   return layer;
 }
 
 const Layer& Layer::topGlue() noexcept {
-  static Layer layer("top_glue", tr("Top Glue"), Theme::Color::sBoardGlueTop,
+  static Layer layer("top_glue", tr("Top Glue"), ColorRole::boardGlueTop(),
                      Flag::Board | Flag::Top);
   return layer;
 }
 
 const Layer& Layer::botGlue() noexcept {
-  static Layer layer("bot_glue", tr("Bottom Glue"), Theme::Color::sBoardGlueBot,
+  static Layer layer("bot_glue", tr("Bottom Glue"), ColorRole::boardGlueBot(),
                      Flag::Board | Flag::Bottom);
   return layer;
 }
 
 const Layer& Layer::topCopper() noexcept {
-  static Layer layer("top_cu", tr("Top Copper"), Theme::Color::sBoardCopperTop,
+  static Layer layer("top_cu", tr("Top Copper"), ColorRole::boardCopperTop(),
                      Flag::Board | Flag::Top | Flag::Copper | Flag(0));
   return layer;
 }
 
 const Layer& Layer::botCopper() noexcept {
   static Layer layer(
-      "bot_cu", tr("Bottom Copper"), Theme::Color::sBoardCopperBot,
+      "bot_cu", tr("Bottom Copper"), ColorRole::boardCopperBot(),
       Flag::Board | Flag::Bottom | Flag::Copper | Flag(innerCopperCount() + 1));
   return layer;
 }
@@ -365,10 +364,11 @@ const QVector<const Layer*>& Layer::innerCopper() noexcept {
   auto createThreadSafe = []() {
     QVector<const Layer*> list;
     for (int i = 1; i <= innerCopperCount(); ++i) {
+      const ColorRole* role = ColorRole::boardCopperInner(i);
+      Q_ASSERT(role);
       list.append(
           new Layer(QString("in%1_cu").arg(i), tr("Inner Copper %1").arg(i),
-                    QString(Theme::Color::sBoardCopperInner).arg(i),
-                    Flag::Board | Flag::Inner | Flag::Copper | Flag(i)));
+                    *role, Flag::Board | Flag::Inner | Flag::Copper | Flag(i)));
     }
     return list;
   };

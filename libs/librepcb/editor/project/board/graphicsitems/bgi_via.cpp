@@ -36,7 +36,7 @@
 #include <librepcb/core/types/alignment.h>
 #include <librepcb/core/types/layer.h>
 #include <librepcb/core/types/stroketextspacing.h>
-#include <librepcb/core/workspace/theme.h>
+#include <librepcb/core/workspace/colorrole.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -58,9 +58,9 @@ BGI_Via::BGI_Via(
     mVia(via),
     mLayers(layers),
     mContext(context),
-    mViaLayer(layers.get(Theme::Color::sBoardVias)),
-    mTopStopMaskLayer(layers.get(Theme::Color::sBoardStopMaskTop)),
-    mBottomStopMaskLayer(layers.get(Theme::Color::sBoardStopMaskBot)),
+    mViaLayer(layers.get(ColorRole::boardVias())),
+    mTopStopMaskLayer(layers.get(ColorRole::boardStopMaskTop())),
+    mBottomStopMaskLayer(layers.get(ColorRole::boardStopMaskBot())),
     mTextGraphicsItem(new PrimitivePathGraphicsItem(this)),
     mOnEditedSlot(*this, &BGI_Via::viaEdited),
     mOnLayerEditedSlot(*this, &BGI_Via::layerEdited) {

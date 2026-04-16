@@ -31,7 +31,6 @@
 #include <librepcb/core/library/dev/device.h>
 #include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/sqlitedatabase.h>
-#include <librepcb/core/workspace/theme.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
 #include <librepcb/core/workspace/workspacelibrarydbwriter.h>
 #include <librepcb/core/workspace/workspacesettings.h>

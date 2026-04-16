@@ -36,6 +36,7 @@
 namespace librepcb {
 
 class Angle;
+class ColorRole;
 class Layer;
 class Length;
 class PadGeometry;
@@ -71,7 +72,7 @@ public:
   void setMirrored(bool mirrored) noexcept;
   void setText(const QString& text) noexcept;
   void setTextMirrored(bool mirrored) noexcept;
-  void setLayer(const QString& layerName) noexcept;
+  void setLayer(const ColorRole& role) noexcept;
   void setState(GraphicsLayer::State state) noexcept;
   void setGeometries(const QHash<const Layer*, QList<PadGeometry>>& geometries,
                      const Length& clearance) noexcept;

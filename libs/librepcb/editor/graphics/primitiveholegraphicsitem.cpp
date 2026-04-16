@@ -27,7 +27,7 @@
 #include "origincrossgraphicsitem.h"
 #include "primitivepathgraphicsitem.h"
 
-#include <librepcb/core/workspace/theme.h>
+#include <librepcb/core/workspace/colorrole.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -46,7 +46,7 @@ PrimitiveHoleGraphicsItem::PrimitiveHoleGraphicsItem(
     const GraphicsLayerList& layers, bool originCrossesVisible,
     QGraphicsItem* parent) noexcept
   : QGraphicsItemGroup(parent),
-    mHoleLayer(layers.get(Theme::Color::sBoardHoles)),
+    mHoleLayer(layers.get(ColorRole::boardHoles())),
     mHoleGraphicsItem(new PrimitivePathGraphicsItem(this)),
     mStopMaskGraphicsItemBot(new PrimitivePathGraphicsItem(this)),
     mStopMaskGraphicsItemTop(new PrimitivePathGraphicsItem(this)),
@@ -65,10 +65,10 @@ PrimitiveHoleGraphicsItem::PrimitiveHoleGraphicsItem(
 
   // Setup stop mask items.
   mStopMaskGraphicsItemBot->setFillLayer(
-      layers.get(Theme::Color::sBoardStopMaskBot));
+      layers.get(ColorRole::boardStopMaskBot()));
   mStopMaskGraphicsItemBot->setZValue(-10);
   mStopMaskGraphicsItemTop->setFillLayer(
-      layers.get(Theme::Color::sBoardStopMaskTop));
+      layers.get(ColorRole::boardStopMaskTop()));
   mStopMaskGraphicsItemTop->setZValue(10);
 
   // Setup origin crosses.

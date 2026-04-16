@@ -30,8 +30,9 @@
  ******************************************************************************/
 namespace librepcb {
 
+class ColorRole;
+class ColorScheme;
 class Layer;
-class Theme;
 class WorkspaceSettings;
 
 namespace editor {
@@ -52,8 +53,9 @@ public:
   ~GraphicsLayerList() noexcept;
 
   // Getters
-  std::shared_ptr<GraphicsLayer> get(const QString& name) noexcept;
-  std::shared_ptr<const GraphicsLayer> get(const QString& name) const noexcept;
+  std::shared_ptr<GraphicsLayer> get(const ColorRole& role) noexcept;
+  std::shared_ptr<const GraphicsLayer> get(
+      const ColorRole& role) const noexcept;
   std::shared_ptr<GraphicsLayer> get(const Layer& layer) noexcept;
   std::shared_ptr<const GraphicsLayer> get(const Layer& layer) const noexcept;
   std::shared_ptr<const GraphicsLayer> grabArea(
@@ -81,8 +83,8 @@ public:
 
 private:
   GraphicsLayerList(const WorkspaceSettings* ws) noexcept;
-  void add(const Theme& theme, const QString& name, bool visible = true,
-           bool grayscaleDisabled = false) noexcept;
+  void add(const ColorScheme& scheme, const ColorRole& role,
+           bool visible = true, bool grayscaleDisabled = false) noexcept;
   void reloadSettings() noexcept;
   void setVisibleLayers(const QSet<QString>& layers) noexcept;
   static QSet<QString> getCommonLayers() noexcept;

@@ -31,6 +31,7 @@
 #include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/library/sym/symbol.h>
+#include <librepcb/core/workspace/colorrole.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
 #include <librepcb/core/workspace/workspacesettings.h>
@@ -59,14 +60,13 @@ ComponentChooserDialog::ComponentChooserDialog(const Workspace& ws,
     mGraphicsScene(new GraphicsScene()) {
   mUi->setupUi(this);
 
-  const Theme& theme = mWorkspace.getSettings().themes.getActive();
-  mGraphicsScene->setBackgroundColors(
-      theme.getColor(Theme::Color::sSchematicBackground).getPrimaryColor(),
-      theme.getColor(Theme::Color::sSchematicBackground).getSecondaryColor());
+  const ColorScheme& scheme =
+      mWorkspace.getSettings().schematicColorSchemes.getActive();
+  const auto background = scheme.getColors(ColorRole::schematicBackground());
+  mGraphicsScene->setBackgroundColors(background.primary, background.secondary);
   mGraphicsScene->setOriginCrossVisible(false);
 
-  mUi->graphicsView->setSpinnerColor(
-      theme.getColor(Theme::Color::sSchematicBackground).getSecondaryColor());
+  mUi->graphicsView->setSpinnerColor(background.secondary);
   mUi->graphicsView->setScene(mGraphicsScene.data());
 
   mCategoryTreeModel.reset(new CategoryTreeModelLegacy(

@@ -27,7 +27,7 @@
 #include "../../export/graphicspainter.h"
 #include "../../geometry/text.h"
 #include "../../library/pkg/footprint.h"
-#include "../../workspace/theme.h"
+#include "../../workspace/colorrole.h"
 #include "../project.h"
 #include "board.h"
 #include "items/bi_device.h"
@@ -153,22 +153,26 @@ void BoardPainter::paint(
   initContentByColor();
 
   // Draw THT pads & vias depending on copper layers visibility.
-  const QSet<QString> enabledCopperLayers =
-      Toolbox::toSet(settings.getPaintOrder()) & Theme::getCopperColorNames();
-  bool thtOnlyOnCopperLayers = !enabledCopperLayers.isEmpty();
+  QSet<QString> enabledCopperLayers;
+  for (const QString& colorRole : settings.getPaintOrder()) {
+    if (ColorRole::isCopperId(colorRole)) {
+      enabledCopperLayers.insert(colorRole);
+    }
+  }
+  const bool thtOnlyOnCopperLayers = !enabledCopperLayers.isEmpty();
 
   // Draw pad circles only if holes are enabled, but pads not.
   const bool drawPadHoles =
-      settings.getPaintOrder().contains(Theme::Color::sBoardHoles) &&
-      (!settings.getPaintOrder().contains(Theme::Color::sBoardPads));
+      settings.getPaintOrder().contains(ColorRole::boardHoles().getId()) &&
+      (!settings.getPaintOrder().contains(ColorRole::boardPads().getId()));
 
   // Draw each color in reverse order for correct stackup.
   GraphicsPainter p(painter);
   p.setMinLineWidth(settings.getMinLineWidth());
   foreach (const QString& color, settings.getPaintOrder()) {
     if (thtOnlyOnCopperLayers &&
-        ((color == Theme::Color::sBoardPads) ||
-         (color == Theme::Color::sBoardVias))) {
+        ((color == ColorRole::boardPads().getId()) ||
+         (color == ColorRole::boardVias().getId()))) {
       continue;
     }
 
@@ -182,13 +186,13 @@ void BoardPainter::paint(
     // Draw THT pad areas.
     foreach (const QPainterPath& area, content.thtPadAreas) {
       p.drawPath(area, Length(0), QColor(),
-                 settings.getColor(Theme::Color::sBoardPads));
+                 settings.getColor(ColorRole::boardPads().getId()));
     }
 
     // Draw via areas.
     foreach (const QPainterPath& area, content.viaAreas) {
       p.drawPath(area, Length(0), QColor(),
-                 settings.getColor(Theme::Color::sBoardVias));
+                 settings.getColor(ColorRole::boardVias().getId()));
     }
 
     // Draw traces.
@@ -249,38 +253,40 @@ void BoardPainter::initContentByColor() const noexcept {
       foreach (PolygonData polygon, footprint.polygons) {
         polygon.layer = &footprint.transform.map(*polygon.layer);
         polygon.path = footprint.transform.map(polygon.path);
-        const QString color = polygon.layer->getThemeColor();
-        mContentByColor[color].polygons.append(polygon);
+        const QString role = polygon.layer->getColorRole().getId();
+        mContentByColor[role].polygons.append(polygon);
       }
 
       // Footprint circles.
       foreach (Circle circle, footprint.circles) {
         circle.setLayer(footprint.transform.map(circle.getLayer()));
         circle.setCenter(footprint.transform.map(circle.getCenter()));
-        const QString color = circle.getLayer().getThemeColor();
-        mContentByColor[color].circles.append(circle);
+        const QString role = circle.getLayer().getColorRole().getId();
+        mContentByColor[role].circles.append(circle);
       }
 
       // Footprint holes.
       foreach (HoleData hole, footprint.holes) {
         hole.path = NonEmptyPath(footprint.transform.map(hole.path));
-        mContentByColor[Theme::Color::sBoardHoles].holes.append(hole);
+        mContentByColor[ColorRole::boardHoles().getId()].holes.append(hole);
         PadGeometry geometry =
             PadGeometry::stroke(hole.diameter, hole.path, {});
         if (const std::optional<Length>& offset = hole.stopMaskOffset) {
           geometry = geometry.withOffset(*offset);
         }
         const QPainterPath stopMask = geometry.toFilledQPainterPathPx();
-        mContentByColor[Theme::Color::sBoardStopMaskTop].areas.append(stopMask);
-        mContentByColor[Theme::Color::sBoardStopMaskBot].areas.append(stopMask);
+        mContentByColor[ColorRole::boardStopMaskTop().getId()].areas.append(
+            stopMask);
+        mContentByColor[ColorRole::boardStopMaskBot().getId()].areas.append(
+            stopMask);
       }
     }
 
     // Planes.
     foreach (const Plane& plane, mPlanes) {
-      const QString color = plane.layer->getThemeColor();
+      const QString role = plane.layer->getColorRole().getId();
       foreach (const Path& path, plane.fragments) {
-        mContentByColor[color].areas.append(path.toQPainterPathPx());
+        mContentByColor[role].areas.append(path.toQPainterPathPx());
       }
     }
 
@@ -289,21 +295,20 @@ void BoardPainter::initContentByColor() const noexcept {
       foreach (const auto& layerGeometry, pad.layerGeometries) {
         const QPainterPath path =
             pad.transform.mapPx(layerGeometry.second.toQPainterPathPx());
-        const QString color = layerGeometry.first->getThemeColor();
-        if ((!pad.holes.isEmpty()) &&
-            Theme::getCopperColorNames().contains(color)) {
-          ColorContent& tht = mContentByColor[Theme::Color::sBoardPads];
+        const QString role = layerGeometry.first->getColorRole().getId();
+        if ((!pad.holes.isEmpty()) && layerGeometry.first->isCopper()) {
+          ColorContent& tht = mContentByColor[ColorRole::boardPads().getId()];
           if (!tht.areas.contains(path)) {
             tht.areas.append(path);
           }
-          mContentByColor[color].thtPadAreas.append(path);
+          mContentByColor[role].thtPadAreas.append(path);
         } else {
-          mContentByColor[color].areas.append(path);
+          mContentByColor[role].areas.append(path);
         }
       }
       // Also add the holes for THT pads.
       for (const PadHole& hole : pad.holes) {
-        mContentByColor[Theme::Color::sBoardHoles].padHoles.append(
+        mContentByColor[ColorRole::boardHoles().getId()].padHoles.append(
             HoleData{hole.getDiameter(), pad.transform.map(hole.getPath()),
                      std::nullopt});
       }
@@ -316,17 +321,17 @@ void BoardPainter::initContentByColor() const noexcept {
             (layer->getCopperNumber() <= via.endLayer->getCopperNumber())) {
           const QPainterPath path = Via::toQPainterPathPx(via.drill, via.size)
                                         .translated(via.position.toPxQPointF());
-          ColorContent& vias = mContentByColor[Theme::Color::sBoardVias];
+          ColorContent& vias = mContentByColor[ColorRole::boardVias().getId()];
           if (!vias.areas.contains(path)) {
             vias.areas.append(path);
           }
-          mContentByColor[layer->getThemeColor()].viaAreas.append(path);
+          mContentByColor[layer->getColorRole().getId()].viaAreas.append(path);
         }
       }
       auto stopMasks = {
-          std::make_pair(QString(Theme::Color::sBoardStopMaskTop),
+          std::make_pair(ColorRole::boardStopMaskTop().getId(),
                          via.stopMaskDiameterTop),
-          std::make_pair(QString(Theme::Color::sBoardStopMaskBot),
+          std::make_pair(ColorRole::boardStopMaskBot().getId(),
                          via.stopMaskDiameterBottom),
       };
       for (const auto& cfg : stopMasks) {
@@ -339,33 +344,35 @@ void BoardPainter::initContentByColor() const noexcept {
 
     // Traces.
     foreach (const Trace& trace, mTraces) {
-      const QString color = trace.layer->getThemeColor();
-      mContentByColor[color].traces.append(trace);
+      const QString role = trace.layer->getColorRole().getId();
+      mContentByColor[role].traces.append(trace);
     }
 
     // Polygons.
     foreach (const PolygonData& polygon, mPolygons) {
-      const QString color = polygon.layer->getThemeColor();
-      mContentByColor[color].polygons.append(polygon);
+      const QString role = polygon.layer->getColorRole().getId();
+      mContentByColor[role].polygons.append(polygon);
     }
 
     // Holes.
     foreach (const HoleData& hole, mHoles) {
-      mContentByColor[Theme::Color::sBoardHoles].holes.append(hole);
+      mContentByColor[ColorRole::boardHoles().getId()].holes.append(hole);
       PadGeometry geometry = PadGeometry::stroke(hole.diameter, hole.path, {});
       if (const std::optional<Length>& offset = hole.stopMaskOffset) {
         geometry = geometry.withOffset(*offset);
       }
       const QPainterPath stopMask = geometry.toFilledQPainterPathPx();
-      mContentByColor[Theme::Color::sBoardStopMaskTop].areas.append(stopMask);
-      mContentByColor[Theme::Color::sBoardStopMaskBot].areas.append(stopMask);
+      mContentByColor[ColorRole::boardStopMaskTop().getId()].areas.append(
+          stopMask);
+      mContentByColor[ColorRole::boardStopMaskBot().getId()].areas.append(
+          stopMask);
     }
 
     // Texts.
     foreach (const StrokeTextData& text, mStrokeTexts) {
-      const QString color = text.layer->getThemeColor();
+      const QString role = text.layer->getColorRole().getId();
       foreach (const Path& path, text.transform.map(text.paths)) {
-        mContentByColor[color].polygons.append(
+        mContentByColor[role].polygons.append(
             PolygonData{text.layer, path, text.strokeWidth, false, false});
       }
 
@@ -382,7 +389,7 @@ void BoardPainter::initContentByColor() const noexcept {
         baselineOffset.setY(baseline);
       }
       baselineOffset.rotate(rotation);
-      mContentByColor[color].texts.append(
+      mContentByColor[role].texts.append(
           TextData{text.transform.getPosition() + baselineOffset, rotation,
                    PositiveLength(totalHeight), align, text.text});
     }

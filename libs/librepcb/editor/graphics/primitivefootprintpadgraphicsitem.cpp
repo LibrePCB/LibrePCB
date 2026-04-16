@@ -35,7 +35,7 @@
 #include <librepcb/core/types/length.h>
 #include <librepcb/core/types/point.h>
 #include <librepcb/core/types/stroketextspacing.h>
-#include <librepcb/core/workspace/theme.h>
+#include <librepcb/core/workspace/colorrole.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -71,7 +71,7 @@ PrimitiveFootprintPadGraphicsItem::PrimitiveFootprintPadGraphicsItem(
   mOriginCrossGraphicsItem->setSize(UnsignedLength(250000));
   if (originCrossVisible) {
     mOriginCrossGraphicsItem->setLayer(
-        mLayers.get(Theme::Color::sBoardReferencesTop));
+        mLayers.get(ColorRole::boardReferencesTop()));
   }
   mOriginCrossGraphicsItem->setZValue(1000);
 
@@ -126,8 +126,8 @@ void PrimitiveFootprintPadGraphicsItem::setTextMirrored(
 }
 
 void PrimitiveFootprintPadGraphicsItem::setLayer(
-    const QString& layerName) noexcept {
-  auto layer = mLayers.get(layerName);
+    const ColorRole& role) noexcept {
+  auto layer = mLayers.get(role);
   if (layer != mCopperLayer) {
     mCopperLayer = layer;
     mTextGraphicsItem->setLineLayer(mCopperLayer);
@@ -149,21 +149,21 @@ void PrimitiveFootprintPadGraphicsItem::setState(
 void PrimitiveFootprintPadGraphicsItem::setGeometries(
     const QHash<const Layer*, QList<PadGeometry> >& geometries,
     const Length& clearance) noexcept {
-  static const QHash<QString, float> zValues = {
-      {QString(Theme::Color::sBoardSolderPasteBot), -300},
-      {QString(Theme::Color::sBoardStopMaskBot), -200},
-      {QString(Theme::Color::sBoardCopperBot), -100},
-      {QString(Theme::Color::sBoardPads), 0},
-      {QString(Theme::Color::sBoardCopperTop), 100},
-      {QString(Theme::Color::sBoardStopMaskTop), 200},
-      {QString(Theme::Color::sBoardSolderPasteTop), 300},
+  static const QHash<const ColorRole*, float> zValues = {
+      {&ColorRole::boardSolderPasteBot(), -300},
+      {&ColorRole::boardStopMaskBot(), -200},
+      {&ColorRole::boardCopperBot(), -100},
+      {&ColorRole::boardPads(), 0},
+      {&ColorRole::boardCopperTop(), 100},
+      {&ColorRole::boardStopMaskTop(), 200},
+      {&ColorRole::boardSolderPasteTop(), 300},
   };
 
   mShapes.clear();
   mShapesBoundingRect = QRectF();
   mPathGraphicsItems.clear();
   for (auto it = geometries.begin(); it != geometries.end(); it++) {
-    if (auto layer = mLayers.get(it.key()->getThemeColor())) {
+    if (auto layer = mLayers.get(it.key()->getColorRole())) {
       const bool isCopperLayer =
           (layer == mCopperLayer) || (it.key()->isCopper());
       QPainterPath shape;
@@ -184,8 +184,8 @@ void PrimitiveFootprintPadGraphicsItem::setGeometries(
       item->setShapeMode(
           isCopperLayer ? PrimitivePathGraphicsItem::ShapeMode::FilledOutline
                         : PrimitivePathGraphicsItem::ShapeMode::None);
-      if (zValues.contains(layer->getName())) {
-        item->setZValue(zValues.value(layer->getName()));
+      if (zValues.contains(&layer->getRole())) {
+        item->setZValue(zValues.value(&layer->getRole()));
       } else {
         item->setZValue(static_cast<qreal>(it.key()->getCopperNumber()));
       }

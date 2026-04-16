@@ -27,8 +27,6 @@ import {
     Shortcuts,
 } from "api.slint";
 
-export { Backend, Data, Cmd as EditorCommandSet }
-
 export component AppWindow inherits Window {
     property <float> panel-width-factor: (Data.sections.length > 1) ? 0.25 : 0.3;
     property <length> panel-width: min(self.width * panel-width-factor, 350px);

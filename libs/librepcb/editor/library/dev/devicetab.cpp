@@ -57,6 +57,7 @@
 #include <librepcb/core/library/libraryelementcheckmessages.h>
 #include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/library/sym/symbol.h>
+#include <librepcb/core/workspace/colorrole.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
 #include <librepcb/core/workspace/workspacesettings.h>
@@ -122,31 +123,36 @@ DeviceTab::DeviceTab(LibraryEditor& editor, std::unique_ptr<Device> dev,
   }
 
   // Setup component scene.
-  const Theme& theme = mApp.getWorkspace().getSettings().themes.getActive();
-  mComponentScene->setOriginCrossVisible(false);  // It's rather disruptive.
-  mComponentScene->setBackgroundColors(
-      theme.getColor(Theme::Color::sSchematicBackground).getPrimaryColor(),
-      theme.getColor(Theme::Color::sSchematicBackground).getSecondaryColor());
-  mComponentScene->setOverlayColors(
-      theme.getColor(Theme::Color::sSchematicOverlays).getPrimaryColor(),
-      theme.getColor(Theme::Color::sSchematicOverlays).getSecondaryColor());
-  mComponentScene->setSelectionRectColors(
-      theme.getColor(Theme::Color::sSchematicSelection).getPrimaryColor(),
-      theme.getColor(Theme::Color::sSchematicSelection).getSecondaryColor());
-  mComponentScene->setGridStyle(GridStyle::Lines);
+  {
+    const ColorScheme& scheme =
+        mApp.getWorkspace().getSettings().schematicColorSchemes.getActive();
+    const auto background = scheme.getColors(ColorRole::schematicBackground());
+    mComponentScene->setBackgroundColors(background.primary,
+                                         background.secondary);
+    const auto overlay = scheme.getColors(ColorRole::schematicOverlays());
+    mComponentScene->setOverlayColors(overlay.primary, overlay.secondary);
+    const auto selection = scheme.getColors(ColorRole::schematicSelection());
+    mComponentScene->setSelectionRectColors(selection.primary,
+                                            selection.secondary);
+    mComponentScene->setGridStyle(GridStyle::Lines);
+    mComponentScene->setOriginCrossVisible(false);  // It's rather disruptive.
+  }
 
   // Setup package scene.
-  mPackageScene->setOriginCrossVisible(false);  // It's rather disruptive.
-  mPackageScene->setBackgroundColors(
-      theme.getColor(Theme::Color::sBoardBackground).getPrimaryColor(),
-      theme.getColor(Theme::Color::sBoardBackground).getSecondaryColor());
-  mPackageScene->setOverlayColors(
-      theme.getColor(Theme::Color::sBoardOverlays).getPrimaryColor(),
-      theme.getColor(Theme::Color::sBoardOverlays).getSecondaryColor());
-  mPackageScene->setSelectionRectColors(
-      theme.getColor(Theme::Color::sBoardSelection).getPrimaryColor(),
-      theme.getColor(Theme::Color::sBoardSelection).getSecondaryColor());
-  mPackageScene->setGridStyle(GridStyle::Lines);
+  {
+    const ColorScheme& scheme =
+        mApp.getWorkspace().getSettings().boardColorSchemes.getActive();
+    const auto background = scheme.getColors(ColorRole::boardBackground());
+    mPackageScene->setBackgroundColors(background.primary,
+                                       background.secondary);
+    const auto overlay = scheme.getColors(ColorRole::boardOverlays());
+    mPackageScene->setOverlayColors(overlay.primary, overlay.secondary);
+    const auto selection = scheme.getColors(ColorRole::boardSelection());
+    mPackageScene->setSelectionRectColors(selection.primary,
+                                          selection.secondary);
+    mPackageScene->setGridStyle(GridStyle::Lines);
+    mPackageScene->setOriginCrossVisible(false);  // It's rather disruptive.
+  }
 
   // Setup default manufacturer.
   mParts->setDefaultManufacturer(mEditor.getLibrary().getManufacturer());

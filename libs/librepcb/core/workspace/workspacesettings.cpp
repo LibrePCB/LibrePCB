@@ -107,9 +107,12 @@ WorkspaceSettings::WorkspaceSettings(QObject* parent)
     externalPdfReaderCommands("external_pdf_reader", "command", QStringList(),
                               this),
     keyboardShortcuts(this),
-    themes(this),
     schematicGridStyle("schematic_grid_style", GridStyle::Lines, this),
     boardGridStyle("board_grid_style", GridStyle::Lines, this),
+    schematicColorSchemes(WorkspaceSettingsItem_ColorSchemes::Kind::sSchematic,
+                          this),
+    boardColorSchemes(WorkspaceSettingsItem_ColorSchemes::Kind::sBoard, this),
+    view3dColorSchemes(WorkspaceSettingsItem_ColorSchemes::Kind::s3d, this),
     dismissedMessages("dismissed_messages", "message", QSet<QString>(), this) {
 }
 
@@ -127,22 +130,79 @@ void WorkspaceSettings::load(const SExpression& node,
     mFileContent.insert(child->getName(), *child);
   }
 
-  // Migrating grid style from themes to the new global settings. This should
-  // be moved to the official file format migration for file format v3.
+  // Migrating legacy themes to the new grid style & color scheme settings. This
+  // should be moved to the official file format migration for file format v3.
+  auto migrateColors =
+      [this](WorkspaceSettingsItem_ColorSchemes& schemes,
+             const QString& schemeKey, const QString& rolePrefix,
+             const QMap<QString, QColor>& primary,
+             const QMap<QString, QColor>& secondary, const QString& name,
+             const BaseColorScheme& base, bool active) {
+        if (mFileContent.contains(schemeKey)) return;  // Already migrated
+        UserColorScheme scheme(Uuid::createRandom(), name, base);
+        bool hasColors = false;
+        for (auto it = primary.begin(); it != primary.end(); it++) {
+          if (it.key().startsWith(rolePrefix) && it.value().isValid()) {
+            scheme.setPrimary(it.key(), it.value());
+            hasColors = true;
+          }
+        }
+        for (auto it = secondary.begin(); it != secondary.end(); it++) {
+          if (it.key().startsWith(rolePrefix) && it.value().isValid()) {
+            scheme.setSecondary(it.key(), it.value());
+            hasColors = true;
+          }
+        }
+        if (!hasColors) return;
+        auto all = schemes.getUserSchemes();
+        all.insert(scheme.getUuid(), scheme);
+        schemes.setUserSchemes(all);
+        if (active) schemes.setActiveUuid(scheme.getUuid());
+        schemes.clearEditedFlag();
+      };
   try {
     auto it = mFileContent.find("themes");
     if (it != mFileContent.end()) {
       const Uuid active = deserialize<Uuid>(it->getChild("active/@0"));
       for (const SExpression* themeNode : it->getChildren("theme")) {
-        if (themeNode->getChild("@0").getValue() == active.toStr()) {
+        const Uuid uuid = deserialize<Uuid>(themeNode->getChild("@0"));
+        if (uuid == active) {
           if (const SExpression* node =
                   themeNode->tryGetChild("schematic_grid_style/@0")) {
-            schematicGridStyle.setInitial(deserialize<GridStyle>(*node));
+            schematicGridStyle.set(deserialize<GridStyle>(*node));
+            schematicGridStyle.clearEditedFlag();
           }
           if (const SExpression* node =
                   themeNode->tryGetChild("board_grid_style/@0")) {
-            boardGridStyle.setInitial(deserialize<GridStyle>(*node));
+            boardGridStyle.set(deserialize<GridStyle>(*node));
+            boardGridStyle.clearEditedFlag();
           }
+        }
+        const QString name = themeNode->getChild("@1").getValue();
+        if (const SExpression* colorsNode = themeNode->tryGetChild("colors")) {
+          QMap<QString, QColor> primary, secondary;
+          for (const SExpression* colorNode :
+               colorsNode->getChildren(SExpression::Type::List)) {
+            if (const SExpression* node =
+                    colorNode->tryGetChild("primary/@0")) {
+              primary.insert(colorNode->getName(), deserialize<QColor>(*node));
+            }
+            if (const SExpression* node =
+                    colorNode->tryGetChild("secondary/@0")) {
+              secondary.insert(colorNode->getName(),
+                               deserialize<QColor>(*node));
+            }
+          }
+          migrateColors(schematicColorSchemes, "schematic_color_schemes",
+                        "schematic_", primary, secondary, name,
+                        BaseColorScheme::schematicLibrePcbLight(),
+                        uuid == active);
+          migrateColors(boardColorSchemes, "board_color_schemes", "board_",
+                        primary, secondary, name,
+                        BaseColorScheme::boardLibrePcbDark(), uuid == active);
+          migrateColors(view3dColorSchemes, "3d_color_schemes", "3d_", primary,
+                        secondary, name, BaseColorScheme::view3dLibrePcbLight(),
+                        uuid == active);
         }
       }
     }

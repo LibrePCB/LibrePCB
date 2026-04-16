@@ -132,8 +132,8 @@ QSet<const Layer*> BoardEditorState::getAllowedGeometryLayers() noexcept {
   return commonLayers | mContext.board.getCopperLayers();
 }
 
-void BoardEditorState::makeLayerVisible(const QString& layer) noexcept {
-  if (std::shared_ptr<GraphicsLayer> l = mContext.layers.get(layer)) {
+void BoardEditorState::makeLayerVisible(const ColorRole& role) noexcept {
+  if (std::shared_ptr<GraphicsLayer> l = mContext.layers.get(role)) {
     if (l->isEnabled()) {
       l->setVisible(true);
     }

@@ -29,7 +29,8 @@
 
 #include <librepcb/core/export/graphicsexport.h>
 #include <librepcb/core/utils/toolbox.h>
-#include <librepcb/core/workspace/theme.h>
+#include <librepcb/core/workspace/basecolorscheme.h>
+#include <librepcb/core/workspace/colorrole.h>
 
 #include <QtConcurrent>
 #include <QtCore>
@@ -50,14 +51,15 @@ GraphicsExportDialog::GraphicsExportDialog(
     const QList<std::shared_ptr<GraphicsPagePainter>>& pages, int currentPage,
     const QString& documentName, int innerLayerCount,
     const FilePath& defaultFilePath, const LengthUnit& lengthUnit,
-    const Theme& theme, const QString& settingsPrefix, QWidget* parent) noexcept
+    const ColorScheme& colors, const QString& settingsPrefix,
+    QWidget* parent) noexcept
   : QDialog(parent),
     mMode(mode),
     mOutput(output),
     mInputPages(pages),
     mCurrentPage(currentPage),
     mDefaultFilePath(defaultFilePath),
-    mTheme(theme),
+    mColorScheme(colors),
     mSettingsPrefix(settingsPrefix),
     mSaveAsCallback(&FileDialog::getSaveFileName),
     mDefaultSettings(new GraphicsExportSettings()),
@@ -102,9 +104,10 @@ GraphicsExportDialog::GraphicsExportDialog(
 
   // Add all colors.
   if (mMode == Mode::Schematic) {
-    mDefaultSettings->loadColorsFromTheme(theme, true, false);
+    mDefaultSettings->loadColorsFromScheme(&mColorScheme, nullptr);
   } else if (mMode == Mode::Board) {
-    mDefaultSettings->loadColorsFromTheme(theme, false, true, innerLayerCount);
+    mDefaultSettings->loadColorsFromScheme(nullptr, &mColorScheme,
+                                           innerLayerCount);
   }
 
   // Open exported files checkbox.
@@ -492,18 +495,18 @@ void GraphicsExportDialog::loadDefaultSettings() noexcept {
     allColors.insert(pair.first);
   }
   QSet<QString> commonColors = {
-      Theme::Color::sBoardMeasures,
-      Theme::Color::sBoardFrames,
-      Theme::Color::sBoardOutlines,
+      ColorRole::boardMeasures().getId(),
+      ColorRole::boardFrames().getId(),
+      ColorRole::boardOutlines().getId(),
   };
   QSet<QString> cutOutColors = {
-      Theme::Color::sBoardHoles,
-      Theme::Color::sBoardPlatedCutouts,
+      ColorRole::boardHoles().getId(),
+      ColorRole::boardPlatedCutouts().getId(),
   };
   QSet<QString> assemblyColors = {
-      Theme::Color::sBoardGuide,
-      Theme::Color::sBoardComments,
-      Theme::Color::sBoardDocumentation,
+      ColorRole::boardGuide().getId(),
+      ColorRole::boardComments().getId(),
+      ColorRole::boardDocumentation().getId(),
   };
   QList<ContentItem> items = {
       {
@@ -518,13 +521,13 @@ void GraphicsExportDialog::loadDefaultSettings() noexcept {
           false,
           commonColors + cutOutColors + assemblyColors +
               QSet<QString>{
-                  Theme::Color::sBoardDocumentationTop,
-                  Theme::Color::sBoardNamesTop,
-                  Theme::Color::sBoardValuesTop,
-                  Theme::Color::sBoardGrabAreasTop,
-                  Theme::Color::sBoardLegendTop,
-                  Theme::Color::sBoardSolderPasteTop,
-                  Theme::Color::sBoardStopMaskTop,
+                  ColorRole::boardDocumentationTop().getId(),
+                  ColorRole::boardNamesTop().getId(),
+                  ColorRole::boardValuesTop().getId(),
+                  ColorRole::boardGrabAreasTop().getId(),
+                  ColorRole::boardLegendTop().getId(),
+                  ColorRole::boardSolderPasteTop().getId(),
+                  ColorRole::boardStopMaskTop().getId(),
               },
       },
       {
@@ -533,13 +536,13 @@ void GraphicsExportDialog::loadDefaultSettings() noexcept {
           true,
           commonColors + cutOutColors + assemblyColors +
               QSet<QString>{
-                  Theme::Color::sBoardDocumentationBot,
-                  Theme::Color::sBoardNamesBot,
-                  Theme::Color::sBoardValuesBot,
-                  Theme::Color::sBoardGrabAreasBot,
-                  Theme::Color::sBoardLegendBot,
-                  Theme::Color::sBoardSolderPasteBot,
-                  Theme::Color::sBoardStopMaskBot,
+                  ColorRole::boardDocumentationBot().getId(),
+                  ColorRole::boardNamesBot().getId(),
+                  ColorRole::boardValuesBot().getId(),
+                  ColorRole::boardGrabAreasBot().getId(),
+                  ColorRole::boardLegendBot().getId(),
+                  ColorRole::boardSolderPasteBot().getId(),
+                  ColorRole::boardStopMaskBot().getId(),
               },
       },
       {
@@ -548,8 +551,8 @@ void GraphicsExportDialog::loadDefaultSettings() noexcept {
           false,
           commonColors + cutOutColors +
               QSet<QString>{
-                  Theme::Color::sBoardPads,
-                  Theme::Color::sBoardVias,
+                  ColorRole::boardPads().getId(),
+                  ColorRole::boardVias().getId(),
               },
       },
       {
@@ -558,9 +561,9 @@ void GraphicsExportDialog::loadDefaultSettings() noexcept {
           false,
           commonColors +
               QSet<QString>{
-                  Theme::Color::sBoardPads,
-                  Theme::Color::sBoardVias,
-                  Theme::Color::sBoardCopperTop,
+                  ColorRole::boardPads().getId(),
+                  ColorRole::boardVias().getId(),
+                  ColorRole::boardCopperTop().getId(),
               },
       },
       {
@@ -569,9 +572,9 @@ void GraphicsExportDialog::loadDefaultSettings() noexcept {
           false,
           commonColors +
               QSet<QString>{
-                  Theme::Color::sBoardPads,
-                  Theme::Color::sBoardVias,
-                  Theme::Color::sBoardCopperBot,
+                  ColorRole::boardPads().getId(),
+                  ColorRole::boardVias().getId(),
+                  ColorRole::boardCopperBot().getId(),
               },
       },
   };
@@ -1031,7 +1034,7 @@ void GraphicsExportDialog::applySettings() noexcept {
   QList<std::pair<QString, QColor>> colors = mColors;
   if ((mMode == Mode::Schematic) && (!getShowPinNumbers())) {
     for (int i = colors.count() - 1; i >= 0; --i) {
-      if (colors.at(i).first == Theme::Color::sSchematicPinNumbers) {
+      if (colors.at(i).first == ColorRole::schematicPinNumbers().getId()) {
         colors.removeAt(i);
       }
     }
@@ -1419,7 +1422,8 @@ void GraphicsExportDialog::setPageContent(
                    Qt::ItemIsDragEnabled);
     foreach (const auto& pair, mColors) {
       QTreeWidgetItem* child = new QTreeWidgetItem(node);
-      child->setText(0, mTheme.getColor(pair.first).getNameTr());
+      const ColorRole* role = mColorScheme.getColors(pair.first).role;
+      child->setText(0, role ? role->getNameTr() : QString());
       child->setCheckState(
           0, item.colors.contains(pair.first) ? Qt::Checked : Qt::Unchecked);
     }
@@ -1444,8 +1448,9 @@ bool GraphicsExportDialog::getOpenExportedFiles() const noexcept {
 void GraphicsExportDialog::updateColorsListWidget() noexcept {
   mUi->lstLayerColors->clear();
   foreach (const auto& pair, mColors) {
+    const ColorRole* role = mColorScheme.getColors(pair.first).role;
     QListWidgetItem* item =
-        new QListWidgetItem(mTheme.getColor(pair.first).getNameTr());
+        new QListWidgetItem(role ? role->getNameTr() : QString());
     item->setData(Qt::DecorationRole, pair.second);
     mUi->lstLayerColors->addItem(item);
   }

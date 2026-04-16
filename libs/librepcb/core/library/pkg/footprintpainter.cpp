@@ -27,7 +27,7 @@
 #include "../../export/graphicspainter.h"
 #include "../../geometry/text.h"
 #include "../../utils/transform.h"
-#include "../../workspace/theme.h"
+#include "../../workspace/colorrole.h"
 #include "footprint.h"
 
 #include <QtCore>
@@ -76,8 +76,8 @@ void FootprintPainter::paint(
 
   // Draw pad circles only if holes are enabled, but pads not.
   const bool drawPadHoles =
-      settings.getPaintOrder().contains(Theme::Color::sBoardHoles) &&
-      (!settings.getPaintOrder().contains(Theme::Color::sBoardPads));
+      settings.getPaintOrder().contains(ColorRole::boardHoles().getId()) &&
+      (!settings.getPaintOrder().contains(ColorRole::boardPads().getId()));
 
   // Draw each layer in reverse order for correct stackup.
   GraphicsPainter p(painter);
@@ -139,19 +139,19 @@ void FootprintPainter::initContentByColor() const noexcept {
   if (mContentByColor.isEmpty()) {
     // Footprint polygons.
     foreach (Polygon polygon, mPolygons) {
-      const QString color = polygon.getLayer().getThemeColor();
-      mContentByColor[color].polygons.append(polygon);
+      const QString role = polygon.getLayer().getColorRole().getId();
+      mContentByColor[role].polygons.append(polygon);
     }
 
     // Footprint circles.
     foreach (Circle circle, mCircles) {
-      const QString color = circle.getLayer().getThemeColor();
-      mContentByColor[color].circles.append(circle);
+      const QString role = circle.getLayer().getColorRole().getId();
+      mContentByColor[role].circles.append(circle);
     }
 
     // Footprint holes.
     foreach (Hole hole, mHoles) {
-      mContentByColor[Theme::Color::sBoardHoles].holes.append(hole);
+      mContentByColor[ColorRole::boardHoles().getId()].holes.append(hole);
     }
 
     // Footprint pads.
@@ -159,13 +159,14 @@ void FootprintPainter::initContentByColor() const noexcept {
       const Transform transform(pad.getPosition(), pad.getRotation());
       const QPainterPath path =
           transform.mapPx(pad.getGeometry().toQPainterPathPx());
-      const QString color = pad.isTht() ? Theme::Color::sBoardPads
-                                        : pad.getSmtLayer().getThemeColor();
-      mContentByColor[color].areas.append(path);
+      const QString role = pad.isTht()
+          ? ColorRole::boardPads().getId()
+          : pad.getSmtLayer().getColorRole().getId();
+      mContentByColor[role].areas.append(path);
 
       // Also add the holes for THT pads.
       for (const PadHole& hole : pad.getHoles()) {
-        mContentByColor[Theme::Color::sBoardHoles].padHoles.append(
+        mContentByColor[ColorRole::boardHoles().getId()].padHoles.append(
             Hole(hole.getUuid(), hole.getDiameter(),
                  transform.map(hole.getPath()), MaskConfig::off()));
       }
@@ -174,9 +175,9 @@ void FootprintPainter::initContentByColor() const noexcept {
     // Texts.
     foreach (StrokeText text, mStrokeTexts) {
       Transform transform(text);
-      const QString color = text.getLayer().getThemeColor();
+      const QString role = text.getLayer().getColorRole().getId();
       foreach (Path path, transform.map(text.generatePaths(mStrokeFont))) {
-        mContentByColor[color].polygons.append(
+        mContentByColor[role].polygons.append(
             Polygon(text.getUuid(), text.getLayer(), text.getStrokeWidth(),
                     false, false, path));
       }
@@ -194,7 +195,7 @@ void FootprintPainter::initContentByColor() const noexcept {
         baselineOffset.setY(baseline);
       }
       baselineOffset.rotate(rotation);
-      mContentByColor[color].texts.append(
+      mContentByColor[role].texts.append(
           Text(text.getUuid(), text.getLayer(), text.getText(),
                text.getPosition() + baselineOffset, rotation,
                PositiveLength(totalHeight), align, true));

@@ -27,7 +27,7 @@
 #include "../../../graphics/textgraphicsitem.h"
 #include "../schematicgraphicsscene.h"
 
-#include <librepcb/core/workspace/theme.h>
+#include <librepcb/core/workspace/colorrole.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -163,7 +163,7 @@ void SGI_Text::updateAnchorLayer() noexcept {
   Q_ASSERT(mAnchorGraphicsItem);
   if (mText.getSymbol() && (!mText.getTextObj().isLocked()) && isSelected()) {
     mAnchorGraphicsItem->setLayer(
-        mLayers.get(Theme::Color::sSchematicReferences));
+        mLayers.get(ColorRole::schematicReferences()));
     mAnchorGraphicsItem->setSelected(true);
   } else {
     mAnchorGraphicsItem->setLayer(nullptr);

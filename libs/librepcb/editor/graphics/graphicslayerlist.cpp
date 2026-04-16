@@ -25,7 +25,7 @@
 #include "graphicslayer.h"
 
 #include <librepcb/core/types/layer.h>
-#include <librepcb/core/workspace/theme.h>
+#include <librepcb/core/workspace/colorrole.h>
 #include <librepcb/core/workspace/workspacesettings.h>
 
 #include <QtCore>
@@ -43,7 +43,11 @@ namespace editor {
 GraphicsLayerList::GraphicsLayerList(const WorkspaceSettings* ws) noexcept
   : mSettings(ws) {
   if (mSettings) {
-    connect(&mSettings->themes, &WorkspaceSettingsItem_Themes::edited, this,
+    connect(&mSettings->schematicColorSchemes,
+            &WorkspaceSettingsItem_ColorSchemes::colorsModified, this,
+            &GraphicsLayerList::reloadSettings);
+    connect(&mSettings->boardColorSchemes,
+            &WorkspaceSettingsItem_ColorSchemes::colorsModified, this,
             &GraphicsLayerList::reloadSettings);
   }
 }
@@ -56,9 +60,9 @@ GraphicsLayerList::~GraphicsLayerList() noexcept {
  ******************************************************************************/
 
 std::shared_ptr<GraphicsLayer> GraphicsLayerList::get(
-    const QString& name) noexcept {
+    const ColorRole& role) noexcept {
   foreach (const std::shared_ptr<GraphicsLayer>& layer, mLayers) {
-    if (layer->getName() == name) {
+    if (layer->getRole() == role) {
       return layer;
     }
   }
@@ -66,9 +70,9 @@ std::shared_ptr<GraphicsLayer> GraphicsLayerList::get(
 }
 
 std::shared_ptr<const GraphicsLayer> GraphicsLayerList::get(
-    const QString& name) const noexcept {
+    const ColorRole& role) const noexcept {
   foreach (const std::shared_ptr<GraphicsLayer>& layer, mLayers) {
-    if (layer->getName() == name) {
+    if (layer->getRole() == role) {
       return layer;
     }
   }
@@ -77,17 +81,22 @@ std::shared_ptr<const GraphicsLayer> GraphicsLayerList::get(
 
 std::shared_ptr<GraphicsLayer> GraphicsLayerList::get(
     const Layer& layer) noexcept {
-  return get(layer.getThemeColor());
+  return get(layer.getColorRole());
 }
 
 std::shared_ptr<const GraphicsLayer> GraphicsLayerList::get(
     const Layer& layer) const noexcept {
-  return get(layer.getThemeColor());
+  return get(layer.getColorRole());
 }
 
 std::shared_ptr<const GraphicsLayer> GraphicsLayerList::grabArea(
     const Layer& outlineLayer) const noexcept {
-  return get(Theme::getGrabAreaColorName(outlineLayer.getThemeColor()));
+  if (const ColorRole* role =
+          ColorRole::getGrabAreaRole(outlineLayer.getColorRole().getId())) {
+    return get(*role);
+  } else {
+    return nullptr;
+  }
 }
 
 /*******************************************************************************
@@ -121,78 +130,82 @@ void GraphicsLayerList::showNone() noexcept {
 std::unique_ptr<GraphicsLayerList> GraphicsLayerList::previewLayers(
     const WorkspaceSettings* ws) noexcept {
   std::unique_ptr<GraphicsLayerList> l(new GraphicsLayerList(ws));
-  const Theme theme = ws ? ws->themes.getActive() : Theme();
+  const ColorScheme& sch = ws ? ws->schematicColorSchemes.getActive()
+                              : BaseColorScheme::schematicLibrePcbLight();
+  const ColorScheme& brd = ws
+      ? ws->boardColorSchemes.getActive()
+      : BaseColorScheme::schematicLibrePcbLight();  // TODO
 
   // schematic layers
-  l->add(theme, Theme::Color::sSchematicReferences, true, true);
-  l->add(theme, Theme::Color::sSchematicFrames, true, true);
-  l->add(theme, Theme::Color::sSchematicOutlines, true, true);
-  l->add(theme, Theme::Color::sSchematicGrabAreas, true, true);
-  // l-> add(theme, Theme::Color::sSchematicHiddenGrabAreas); Not needed!
-  l->add(theme, Theme::Color::sSchematicOptionalPins, true, true);
-  l->add(theme, Theme::Color::sSchematicRequiredPins, true, true);
-  l->add(theme, Theme::Color::sSchematicPinLines, true, true);
-  l->add(theme, Theme::Color::sSchematicPinNames, true, true);
-  l->add(theme, Theme::Color::sSchematicPinNumbers, true, true);
-  l->add(theme, Theme::Color::sSchematicNames, true, true);
-  l->add(theme, Theme::Color::sSchematicValues, true, true);
-  l->add(theme, Theme::Color::sSchematicWires, true, true);
-  l->add(theme, Theme::Color::sSchematicNetLabels, true, true);
-  l->add(theme, Theme::Color::sSchematicBuses, true, true);
-  l->add(theme, Theme::Color::sSchematicBusLabels, true, true);
-  l->add(theme, Theme::Color::sSchematicImageBorders, true, true);
-  l->add(theme, Theme::Color::sSchematicDocumentation, true, true);
-  l->add(theme, Theme::Color::sSchematicComments, true, true);
-  l->add(theme, Theme::Color::sSchematicGuide, true, true);
+  l->add(sch, ColorRole::schematicReferences(), true, true);
+  l->add(sch, ColorRole::schematicFrames(), true, true);
+  l->add(sch, ColorRole::schematicOutlines(), true, true);
+  l->add(sch, ColorRole::schematicGrabAreas(), true, true);
+  // l-> add(sch, ColorRole::schematicHiddenGrabAreas()); Not needed!
+  l->add(sch, ColorRole::schematicOptionalPins(), true, true);
+  l->add(sch, ColorRole::schematicRequiredPins(), true, true);
+  l->add(sch, ColorRole::schematicPinLines(), true, true);
+  l->add(sch, ColorRole::schematicPinNames(), true, true);
+  l->add(sch, ColorRole::schematicPinNumbers(), true, true);
+  l->add(sch, ColorRole::schematicNames(), true, true);
+  l->add(sch, ColorRole::schematicValues(), true, true);
+  l->add(sch, ColorRole::schematicWires(), true, true);
+  l->add(sch, ColorRole::schematicNetLabels(), true, true);
+  l->add(sch, ColorRole::schematicBuses(), true, true);
+  l->add(sch, ColorRole::schematicBusLabels(), true, true);
+  l->add(sch, ColorRole::schematicImageBorders(), true, true);
+  l->add(sch, ColorRole::schematicDocumentation(), true, true);
+  l->add(sch, ColorRole::schematicComments(), true, true);
+  l->add(sch, ColorRole::schematicGuide(), true, true);
 
   // asymmetric board layers
-  l->add(theme, Theme::Color::sBoardFrames);
-  l->add(theme, Theme::Color::sBoardOutlines);
-  l->add(theme, Theme::Color::sBoardPlatedCutouts);
-  l->add(theme, Theme::Color::sBoardHoles);
-  l->add(theme, Theme::Color::sBoardVias);
-  l->add(theme, Theme::Color::sBoardPads);
-  l->add(theme, Theme::Color::sBoardAirWires);
+  l->add(brd, ColorRole::boardFrames());
+  l->add(brd, ColorRole::boardOutlines());
+  l->add(brd, ColorRole::boardPlatedCutouts());
+  l->add(brd, ColorRole::boardHoles());
+  l->add(brd, ColorRole::boardVias());
+  l->add(brd, ColorRole::boardPads());
+  l->add(brd, ColorRole::boardAirWires());
 
   // copper layers
-  l->add(theme, Theme::Color::sBoardCopperTop);
-  for (int i = 1; i <= Layer::innerCopperCount(); ++i) {
-    l->add(theme, QString(Theme::Color::sBoardCopperInner).arg(i));
+  l->add(brd, ColorRole::boardCopperTop());
+  for (const ColorRole* role : ColorRole::boardCopperInner()) {
+    l->add(brd, *role);
   }
-  l->add(theme, Theme::Color::sBoardCopperBot);
+  l->add(brd, ColorRole::boardCopperBot());
 
   // symmetric board layers
-  // l->add(theme, Theme::Color::sBoardReferencesTop); Not sure.
-  // l->add(theme, Theme::Color::sBoardReferencesBot); Not sure.
-  // l->add(theme, Theme::Color::sBoardGrabAreasTop); Not sure.
-  // l->add(theme, Theme::Color::sBoardGrabAreasBot); Not sure.
-  // l-> add(theme, Theme::Color::sBoardHiddenGrabAreasTop); Not needed!
-  // l-> add(theme, Theme::Color::sBoardHiddenGrabAreasBot); Not needed!
-  l->add(theme, Theme::Color::sBoardNamesTop);
-  l->add(theme, Theme::Color::sBoardNamesBot);
-  l->add(theme, Theme::Color::sBoardValuesTop);
-  l->add(theme, Theme::Color::sBoardValuesBot);
-  l->add(theme, Theme::Color::sBoardLegendTop);
-  l->add(theme, Theme::Color::sBoardLegendBot);
-  l->add(theme, Theme::Color::sBoardDocumentationTop);
-  l->add(theme, Theme::Color::sBoardDocumentationBot);
-  // l->add(theme, Theme::Color::sBoardPackageOutlinesTop); Not sure.
-  // l->add(theme, Theme::Color::sBoardPackageOutlinesBot); Not sure.
-  // l->add(theme, Theme::Color::sBoardCourtyardTop); Not sure.
-  // l->add(theme, Theme::Color::sBoardCourtyardBot); Not sure.
-  l->add(theme, Theme::Color::sBoardStopMaskTop);
-  l->add(theme, Theme::Color::sBoardStopMaskBot);
-  l->add(theme, Theme::Color::sBoardSolderPasteTop);
-  l->add(theme, Theme::Color::sBoardSolderPasteBot);
-  l->add(theme, Theme::Color::sBoardGlueTop);
-  l->add(theme, Theme::Color::sBoardGlueBot);
+  // l->add(brd, ColorRole::boardReferencesTop()); Not sure.
+  // l->add(brd, ColorRole::boardReferencesBot()); Not sure.
+  // l->add(brd, ColorRole::boardGrabAreasTop()); Not sure.
+  // l->add(brd, ColorRole::boardGrabAreasBot()); Not sure.
+  // l-> add(brd, ColorRole::boardHiddenGrabAreasTop()); Not needed!
+  // l-> add(brd, ColorRole::boardHiddenGrabAreasBot()); Not needed!
+  l->add(brd, ColorRole::boardNamesTop());
+  l->add(brd, ColorRole::boardNamesBot());
+  l->add(brd, ColorRole::boardValuesTop());
+  l->add(brd, ColorRole::boardValuesBot());
+  l->add(brd, ColorRole::boardLegendTop());
+  l->add(brd, ColorRole::boardLegendBot());
+  l->add(brd, ColorRole::boardDocumentationTop());
+  l->add(brd, ColorRole::boardDocumentationBot());
+  // l->add(brd, ColorRole::boardPackageOutlinesTop()); Not sure.
+  // l->add(brd, ColorRole::boardPackageOutlinesBot()); Not sure.
+  // l->add(brd, ColorRole::boardCourtyardTop()); Not sure.
+  // l->add(brd, ColorRole::boardCourtyardBot()); Not sure.
+  l->add(brd, ColorRole::boardStopMaskTop());
+  l->add(brd, ColorRole::boardStopMaskBot());
+  l->add(brd, ColorRole::boardSolderPasteTop());
+  l->add(brd, ColorRole::boardSolderPasteBot());
+  l->add(brd, ColorRole::boardGlueTop());
+  l->add(brd, ColorRole::boardGlueBot());
 
   // other asymmetric board layers
-  l->add(theme, Theme::Color::sBoardMeasures);
-  l->add(theme, Theme::Color::sBoardAlignment);
-  l->add(theme, Theme::Color::sBoardDocumentation);
-  l->add(theme, Theme::Color::sBoardComments);
-  l->add(theme, Theme::Color::sBoardGuide);
+  l->add(brd, ColorRole::boardMeasures());
+  l->add(brd, ColorRole::boardAlignment());
+  l->add(brd, ColorRole::boardDocumentation());
+  l->add(brd, ColorRole::boardComments());
+  l->add(brd, ColorRole::boardGuide());
 
   return l;
 }
@@ -200,73 +213,77 @@ std::unique_ptr<GraphicsLayerList> GraphicsLayerList::previewLayers(
 std::unique_ptr<GraphicsLayerList> GraphicsLayerList::libraryLayers(
     const WorkspaceSettings* ws) noexcept {
   std::unique_ptr<GraphicsLayerList> l(new GraphicsLayerList(ws));
-  const Theme theme = ws ? ws->themes.getActive() : Theme();
+  const ColorScheme& sch = ws ? ws->schematicColorSchemes.getActive()
+                              : BaseColorScheme::schematicLibrePcbLight();
+  const ColorScheme& brd = ws
+      ? ws->boardColorSchemes.getActive()
+      : BaseColorScheme::schematicLibrePcbLight();  // TODO
 
   // Add all required schematic layers.
-  l->add(theme, Theme::Color::sSchematicReferences, true, true);
-  l->add(theme, Theme::Color::sSchematicFrames, true, true);
-  l->add(theme, Theme::Color::sSchematicOutlines, true, true);
-  l->add(theme, Theme::Color::sSchematicGrabAreas, true, true);
-  l->add(theme, Theme::Color::sSchematicHiddenGrabAreas, true, true);
-  l->add(theme, Theme::Color::sSchematicOptionalPins, true, true);
-  l->add(theme, Theme::Color::sSchematicRequiredPins, true, true);
-  l->add(theme, Theme::Color::sSchematicPinLines, true, true);
-  l->add(theme, Theme::Color::sSchematicPinNames, true, true);
-  l->add(theme, Theme::Color::sSchematicPinNumbers, true, true);
-  l->add(theme, Theme::Color::sSchematicNames, true, true);
-  l->add(theme, Theme::Color::sSchematicValues, true, true);
-  l->add(theme, Theme::Color::sSchematicWires, true, true);
-  l->add(theme, Theme::Color::sSchematicNetLabels, true, true);
-  l->add(theme, Theme::Color::sSchematicBuses, true, true);
-  l->add(theme, Theme::Color::sSchematicBusLabels, true, true);
-  l->add(theme, Theme::Color::sSchematicImageBorders, true, true);
-  l->add(theme, Theme::Color::sSchematicDocumentation, true, true);
-  l->add(theme, Theme::Color::sSchematicComments, true, true);
-  l->add(theme, Theme::Color::sSchematicGuide, true, true);
+  l->add(sch, ColorRole::schematicReferences(), true, true);
+  l->add(sch, ColorRole::schematicFrames(), true, true);
+  l->add(sch, ColorRole::schematicOutlines(), true, true);
+  l->add(sch, ColorRole::schematicGrabAreas(), true, true);
+  l->add(sch, ColorRole::schematicHiddenGrabAreas(), true, true);
+  l->add(sch, ColorRole::schematicOptionalPins(), true, true);
+  l->add(sch, ColorRole::schematicRequiredPins(), true, true);
+  l->add(sch, ColorRole::schematicPinLines(), true, true);
+  l->add(sch, ColorRole::schematicPinNames(), true, true);
+  l->add(sch, ColorRole::schematicPinNumbers(), true, true);
+  l->add(sch, ColorRole::schematicNames(), true, true);
+  l->add(sch, ColorRole::schematicValues(), true, true);
+  l->add(sch, ColorRole::schematicWires(), true, true);
+  l->add(sch, ColorRole::schematicNetLabels(), true, true);
+  l->add(sch, ColorRole::schematicBuses(), true, true);
+  l->add(sch, ColorRole::schematicBusLabels(), true, true);
+  l->add(sch, ColorRole::schematicImageBorders(), true, true);
+  l->add(sch, ColorRole::schematicDocumentation(), true, true);
+  l->add(sch, ColorRole::schematicComments(), true, true);
+  l->add(sch, ColorRole::schematicGuide(), true, true);
 
   // Add all required board layers.
-  l->add(theme, Theme::Color::sBoardFrames);
-  l->add(theme, Theme::Color::sBoardOutlines);
-  l->add(theme, Theme::Color::sBoardPlatedCutouts);
-  l->add(theme, Theme::Color::sBoardHoles);
-  l->add(theme, Theme::Color::sBoardVias);
-  l->add(theme, Theme::Color::sBoardPads);
-  l->add(theme, Theme::Color::sBoardZones);
-  l->add(theme, Theme::Color::sBoardAirWires);
-  l->add(theme, Theme::Color::sBoardMeasures);
-  l->add(theme, Theme::Color::sBoardAlignment);
-  l->add(theme, Theme::Color::sBoardDocumentation);
-  l->add(theme, Theme::Color::sBoardComments);
-  l->add(theme, Theme::Color::sBoardGuide);
-  l->add(theme, Theme::Color::sBoardCopperTop);
-  for (int i = 1; i <= Layer::innerCopperCount(); ++i) {
-    l->add(theme, QString(Theme::Color::sBoardCopperInner).arg(i));
+  l->add(brd, ColorRole::boardFrames());
+  l->add(brd, ColorRole::boardOutlines());
+  l->add(brd, ColorRole::boardPlatedCutouts());
+  l->add(brd, ColorRole::boardHoles());
+  l->add(brd, ColorRole::boardVias());
+  l->add(brd, ColorRole::boardPads());
+  l->add(brd, ColorRole::boardZones());
+  l->add(brd, ColorRole::boardAirWires());
+  l->add(brd, ColorRole::boardMeasures());
+  l->add(brd, ColorRole::boardAlignment());
+  l->add(brd, ColorRole::boardDocumentation());
+  l->add(brd, ColorRole::boardComments());
+  l->add(brd, ColorRole::boardGuide());
+  l->add(brd, ColorRole::boardCopperTop());
+  for (const ColorRole* role : ColorRole::boardCopperInner()) {
+    l->add(brd, *role);
   }
-  l->add(theme, Theme::Color::sBoardCopperBot);
-  l->add(theme, Theme::Color::sBoardReferencesTop);
-  l->add(theme, Theme::Color::sBoardReferencesBot);
-  l->add(theme, Theme::Color::sBoardGrabAreasTop);
-  l->add(theme, Theme::Color::sBoardGrabAreasBot);
-  l->add(theme, Theme::Color::sBoardHiddenGrabAreasTop);
-  l->add(theme, Theme::Color::sBoardHiddenGrabAreasBot);
-  l->add(theme, Theme::Color::sBoardNamesTop);
-  l->add(theme, Theme::Color::sBoardNamesBot);
-  l->add(theme, Theme::Color::sBoardValuesTop);
-  l->add(theme, Theme::Color::sBoardValuesBot);
-  l->add(theme, Theme::Color::sBoardLegendTop);
-  l->add(theme, Theme::Color::sBoardLegendBot);
-  l->add(theme, Theme::Color::sBoardDocumentationTop);
-  l->add(theme, Theme::Color::sBoardDocumentationBot);
-  l->add(theme, Theme::Color::sBoardPackageOutlinesTop);
-  l->add(theme, Theme::Color::sBoardPackageOutlinesBot);
-  l->add(theme, Theme::Color::sBoardCourtyardTop);
-  l->add(theme, Theme::Color::sBoardCourtyardBot);
-  l->add(theme, Theme::Color::sBoardStopMaskTop);
-  l->add(theme, Theme::Color::sBoardStopMaskBot);
-  l->add(theme, Theme::Color::sBoardSolderPasteTop);
-  l->add(theme, Theme::Color::sBoardSolderPasteBot);
-  l->add(theme, Theme::Color::sBoardGlueTop);
-  l->add(theme, Theme::Color::sBoardGlueBot);
+  l->add(brd, ColorRole::boardCopperBot());
+  l->add(brd, ColorRole::boardReferencesTop());
+  l->add(brd, ColorRole::boardReferencesBot());
+  l->add(brd, ColorRole::boardGrabAreasTop());
+  l->add(brd, ColorRole::boardGrabAreasBot());
+  l->add(brd, ColorRole::boardHiddenGrabAreasTop());
+  l->add(brd, ColorRole::boardHiddenGrabAreasBot());
+  l->add(brd, ColorRole::boardNamesTop());
+  l->add(brd, ColorRole::boardNamesBot());
+  l->add(brd, ColorRole::boardValuesTop());
+  l->add(brd, ColorRole::boardValuesBot());
+  l->add(brd, ColorRole::boardLegendTop());
+  l->add(brd, ColorRole::boardLegendBot());
+  l->add(brd, ColorRole::boardDocumentationTop());
+  l->add(brd, ColorRole::boardDocumentationBot());
+  l->add(brd, ColorRole::boardPackageOutlinesTop());
+  l->add(brd, ColorRole::boardPackageOutlinesBot());
+  l->add(brd, ColorRole::boardCourtyardTop());
+  l->add(brd, ColorRole::boardCourtyardBot());
+  l->add(brd, ColorRole::boardStopMaskTop());
+  l->add(brd, ColorRole::boardStopMaskBot());
+  l->add(brd, ColorRole::boardSolderPasteTop());
+  l->add(brd, ColorRole::boardSolderPasteBot());
+  l->add(brd, ColorRole::boardGlueTop());
+  l->add(brd, ColorRole::boardGlueBot());
 
   return l;
 }
@@ -274,84 +291,87 @@ std::unique_ptr<GraphicsLayerList> GraphicsLayerList::libraryLayers(
 std::unique_ptr<GraphicsLayerList> GraphicsLayerList::schematicLayers(
     const WorkspaceSettings* ws) noexcept {
   std::unique_ptr<GraphicsLayerList> l(new GraphicsLayerList(ws));
-  const Theme theme = ws ? ws->themes.getActive() : Theme();
-  l->add(theme, Theme::Color::sSchematicReferences, true, true);
-  l->add(theme, Theme::Color::sSchematicFrames, true, true);
-  l->add(theme, Theme::Color::sSchematicOutlines, true, true);
-  l->add(theme, Theme::Color::sSchematicGrabAreas, true, true);
-  // l->add(theme, Theme::Color::sSchematicHiddenGrabAreas); Not needed!
-  l->add(theme, Theme::Color::sSchematicOptionalPins, true, true);
-  l->add(theme, Theme::Color::sSchematicRequiredPins, true, true);
-  l->add(theme, Theme::Color::sSchematicPinLines, true, true);
-  l->add(theme, Theme::Color::sSchematicPinNames, true, true);
-  l->add(theme, Theme::Color::sSchematicPinNumbers, true, true);
-  l->add(theme, Theme::Color::sSchematicNames, true, true);
-  l->add(theme, Theme::Color::sSchematicValues, true, true);
-  l->add(theme, Theme::Color::sSchematicWires, true, true);
-  l->add(theme, Theme::Color::sSchematicNetLabels, true, true);
-  l->add(theme, Theme::Color::sSchematicBuses, true, true);
-  l->add(theme, Theme::Color::sSchematicBusLabels, true, true);
-  l->add(theme, Theme::Color::sSchematicImageBorders, true, true);
-  l->add(theme, Theme::Color::sSchematicDocumentation, true, true);
-  l->add(theme, Theme::Color::sSchematicComments, true, true);
-  l->add(theme, Theme::Color::sSchematicGuide, true, true);
+  const ColorScheme& sch = ws ? ws->schematicColorSchemes.getActive()
+                              : BaseColorScheme::schematicLibrePcbLight();
+  l->add(sch, ColorRole::schematicReferences(), true, true);
+  l->add(sch, ColorRole::schematicFrames(), true, true);
+  l->add(sch, ColorRole::schematicOutlines(), true, true);
+  l->add(sch, ColorRole::schematicGrabAreas(), true, true);
+  // l->add(sch, ColorRole::schematicHiddenGrabAreas()); Not needed!
+  l->add(sch, ColorRole::schematicOptionalPins(), true, true);
+  l->add(sch, ColorRole::schematicRequiredPins(), true, true);
+  l->add(sch, ColorRole::schematicPinLines(), true, true);
+  l->add(sch, ColorRole::schematicPinNames(), true, true);
+  l->add(sch, ColorRole::schematicPinNumbers(), true, true);
+  l->add(sch, ColorRole::schematicNames(), true, true);
+  l->add(sch, ColorRole::schematicValues(), true, true);
+  l->add(sch, ColorRole::schematicWires(), true, true);
+  l->add(sch, ColorRole::schematicNetLabels(), true, true);
+  l->add(sch, ColorRole::schematicBuses(), true, true);
+  l->add(sch, ColorRole::schematicBusLabels(), true, true);
+  l->add(sch, ColorRole::schematicImageBorders(), true, true);
+  l->add(sch, ColorRole::schematicDocumentation(), true, true);
+  l->add(sch, ColorRole::schematicComments(), true, true);
+  l->add(sch, ColorRole::schematicGuide(), true, true);
   return l;
 }
 
 std::unique_ptr<GraphicsLayerList> GraphicsLayerList::boardLayers(
     const WorkspaceSettings* ws) noexcept {
   std::unique_ptr<GraphicsLayerList> l(new GraphicsLayerList(ws));
-  const Theme theme = ws ? ws->themes.getActive() : Theme();
+  const ColorScheme& brd = ws
+      ? ws->boardColorSchemes.getActive()
+      : BaseColorScheme::schematicLibrePcbLight();  // TODO
 
   // asymmetric board layers
-  l->add(theme, Theme::Color::sBoardFrames, true);
-  l->add(theme, Theme::Color::sBoardOutlines, true);
-  l->add(theme, Theme::Color::sBoardPlatedCutouts, true);
-  l->add(theme, Theme::Color::sBoardHoles, true);
-  l->add(theme, Theme::Color::sBoardVias, true);
-  l->add(theme, Theme::Color::sBoardPads, true);
-  l->add(theme, Theme::Color::sBoardZones, true);
-  l->add(theme, Theme::Color::sBoardAirWires, true);
+  l->add(brd, ColorRole::boardFrames(), true);
+  l->add(brd, ColorRole::boardOutlines(), true);
+  l->add(brd, ColorRole::boardPlatedCutouts(), true);
+  l->add(brd, ColorRole::boardHoles(), true);
+  l->add(brd, ColorRole::boardVias(), true);
+  l->add(brd, ColorRole::boardPads(), true);
+  l->add(brd, ColorRole::boardZones(), true);
+  l->add(brd, ColorRole::boardAirWires(), true);
 
   // copper layers
-  l->add(theme, Theme::Color::sBoardCopperTop, true);
-  for (int i = 1; i <= Layer::innerCopperCount(); ++i) {
-    l->add(theme, QString(Theme::Color::sBoardCopperInner).arg(i), true);
+  l->add(brd, ColorRole::boardCopperTop(), true);
+  for (const ColorRole* role : ColorRole::boardCopperInner()) {
+    l->add(brd, *role, true);
   }
-  l->add(theme, Theme::Color::sBoardCopperBot, true);
+  l->add(brd, ColorRole::boardCopperBot(), true);
 
   // symmetric board layers
-  l->add(theme, Theme::Color::sBoardReferencesTop, true);
-  l->add(theme, Theme::Color::sBoardReferencesBot, true);
-  l->add(theme, Theme::Color::sBoardGrabAreasTop, false);
-  l->add(theme, Theme::Color::sBoardGrabAreasBot, false);
-  // l->add(theme, Theme::Color::sBoardHiddenGrabAreasTop, true); Not needed!
-  // l->add(theme, Theme::Color::sBoardHiddenGrabAreasBot, true); Not needed!
-  l->add(theme, Theme::Color::sBoardNamesTop, true);
-  l->add(theme, Theme::Color::sBoardNamesBot, true);
-  l->add(theme, Theme::Color::sBoardValuesTop, true);
-  l->add(theme, Theme::Color::sBoardValuesBot, true);
-  l->add(theme, Theme::Color::sBoardLegendTop, true);
-  l->add(theme, Theme::Color::sBoardLegendBot, true);
-  l->add(theme, Theme::Color::sBoardDocumentationTop, true);
-  l->add(theme, Theme::Color::sBoardDocumentationBot, true);
-  l->add(theme, Theme::Color::sBoardPackageOutlinesTop, false);
-  l->add(theme, Theme::Color::sBoardPackageOutlinesBot, false);
-  l->add(theme, Theme::Color::sBoardCourtyardTop, false);
-  l->add(theme, Theme::Color::sBoardCourtyardBot, false);
-  l->add(theme, Theme::Color::sBoardStopMaskTop, true);
-  l->add(theme, Theme::Color::sBoardStopMaskBot, true);
-  l->add(theme, Theme::Color::sBoardSolderPasteTop, false);
-  l->add(theme, Theme::Color::sBoardSolderPasteBot, false);
-  l->add(theme, Theme::Color::sBoardGlueTop, false);
-  l->add(theme, Theme::Color::sBoardGlueBot, false);
+  l->add(brd, ColorRole::boardReferencesTop(), true);
+  l->add(brd, ColorRole::boardReferencesBot(), true);
+  l->add(brd, ColorRole::boardGrabAreasTop(), false);
+  l->add(brd, ColorRole::boardGrabAreasBot(), false);
+  // l->add(brd, ColorRole::boardHiddenGrabAreasTop(), true); Not needed!
+  // l->add(brd, ColorRole::boardHiddenGrabAreasBot(), true); Not needed!
+  l->add(brd, ColorRole::boardNamesTop(), true);
+  l->add(brd, ColorRole::boardNamesBot(), true);
+  l->add(brd, ColorRole::boardValuesTop(), true);
+  l->add(brd, ColorRole::boardValuesBot(), true);
+  l->add(brd, ColorRole::boardLegendTop(), true);
+  l->add(brd, ColorRole::boardLegendBot(), true);
+  l->add(brd, ColorRole::boardDocumentationTop(), true);
+  l->add(brd, ColorRole::boardDocumentationBot(), true);
+  l->add(brd, ColorRole::boardPackageOutlinesTop(), false);
+  l->add(brd, ColorRole::boardPackageOutlinesBot(), false);
+  l->add(brd, ColorRole::boardCourtyardTop(), false);
+  l->add(brd, ColorRole::boardCourtyardBot(), false);
+  l->add(brd, ColorRole::boardStopMaskTop(), true);
+  l->add(brd, ColorRole::boardStopMaskBot(), true);
+  l->add(brd, ColorRole::boardSolderPasteTop(), false);
+  l->add(brd, ColorRole::boardSolderPasteBot(), false);
+  l->add(brd, ColorRole::boardGlueTop(), false);
+  l->add(brd, ColorRole::boardGlueBot(), false);
 
   // other asymmetric board layers
-  l->add(theme, Theme::Color::sBoardMeasures, true);
-  l->add(theme, Theme::Color::sBoardAlignment, true);
-  l->add(theme, Theme::Color::sBoardDocumentation, true);
-  l->add(theme, Theme::Color::sBoardComments, true);
-  l->add(theme, Theme::Color::sBoardGuide, true);
+  l->add(brd, ColorRole::boardMeasures(), true);
+  l->add(brd, ColorRole::boardAlignment(), true);
+  l->add(brd, ColorRole::boardDocumentation(), true);
+  l->add(brd, ColorRole::boardComments(), true);
+  l->add(brd, ColorRole::boardGuide(), true);
   return l;
 }
 
@@ -359,12 +379,11 @@ std::unique_ptr<GraphicsLayerList> GraphicsLayerList::boardLayers(
  *  Private Methods
  ******************************************************************************/
 
-void GraphicsLayerList::add(const Theme& theme, const QString& name,
+void GraphicsLayerList::add(const ColorScheme& scheme, const ColorRole& role,
                             bool visible, bool grayscaleDisabled) noexcept {
-  const ThemeColor& color = theme.getColor(name);
+  const ColorScheme::Colors colors = scheme.getColors(role);
   auto layer = std::make_shared<GraphicsLayer>(
-      name, color.getNameTr(), color.getPrimaryColor(),
-      color.getSecondaryColor(), visible, true,
+      role, colors.primary, colors.secondary, visible, true,
       grayscaleDisabled ? GraphicsLayer::DisabledMode::Grayscale
                         : GraphicsLayer::DisabledMode::SemiTransparentGray);
   mLayers.append(layer);
@@ -372,60 +391,66 @@ void GraphicsLayerList::add(const Theme& theme, const QString& name,
 
 void GraphicsLayerList::reloadSettings() noexcept {
   if (mSettings) {
-    const Theme& theme = mSettings->themes.getActive();
-    for (auto layer : mLayers) {
-      const ThemeColor& color = theme.getColor(layer->getName());
-      layer->setColor(color.getPrimaryColor());
-      layer->setColorHighlighted(color.getSecondaryColor());
+    for (const auto* settings : {
+             &mSettings->schematicColorSchemes,
+             &mSettings->boardColorSchemes,
+         }) {
+      const ColorScheme& scheme = settings->getActive();
+      for (auto layer : mLayers) {
+        if (const auto colors = scheme.tryGetColors(layer->getRole())) {
+          layer->setColor(colors->primary);
+          layer->setColorHighlighted(colors->secondary);
+        }
+      }
     }
   }
 }
 
 void GraphicsLayerList::setVisibleLayers(const QSet<QString>& layers) noexcept {
   foreach (auto& layer, mLayers) {
-    layer->setVisible(layers.contains(layer->getName()));
+    layer->setVisible(layers.contains(layer->getRole().getId()));
   }
 }
 
 QSet<QString> GraphicsLayerList::getCommonLayers() noexcept {
   QSet<QString> layers;
-  // layers.insert(Theme::Color::sBoardBackground));
-  // layers.insert(Theme::Color::sBoardErcAirWires));
-  layers.insert(Theme::Color::sBoardOutlines);
-  layers.insert(Theme::Color::sBoardPlatedCutouts);
-  layers.insert(Theme::Color::sBoardHoles);
-  layers.insert(Theme::Color::sBoardVias);
-  layers.insert(Theme::Color::sBoardPads);
-  layers.insert(Theme::Color::sBoardZones);
-  layers.insert(Theme::Color::sBoardAirWires);
+  // layers.insert(ColorRole::boardBackground().getId()));
+  // layers.insert(ColorRole::sBoardErcAirWires));
+  layers.insert(ColorRole::boardOutlines().getId());
+  layers.insert(ColorRole::boardPlatedCutouts().getId());
+  layers.insert(ColorRole::boardHoles().getId());
+  layers.insert(ColorRole::boardVias().getId());
+  layers.insert(ColorRole::boardPads().getId());
+  layers.insert(ColorRole::boardZones().getId());
+  layers.insert(ColorRole::boardAirWires().getId());
   return layers;
 }
 
 QSet<QString> GraphicsLayerList::getTopLayers() noexcept {
   QSet<QString> layers;
-  layers.insert(Theme::Color::sBoardLegendTop);
-  layers.insert(Theme::Color::sBoardReferencesTop);
-  layers.insert(Theme::Color::sBoardGrabAreasTop);
-  // layers.insert(Theme::Color::sBoardTestPointsTop);
-  layers.insert(Theme::Color::sBoardNamesTop);
-  layers.insert(Theme::Color::sBoardValuesTop);
-  // layers.insert(Theme::Color::sBoardCourtyardTop);
-  layers.insert(Theme::Color::sBoardDocumentationTop);
-  layers.insert(Theme::Color::sBoardCopperTop);
+  layers.insert(ColorRole::boardLegendTop().getId());
+  layers.insert(ColorRole::boardReferencesTop().getId());
+  layers.insert(ColorRole::boardGrabAreasTop().getId());
+  // layers.insert(ColorRole::sBoardTestPointsTop);
+  layers.insert(ColorRole::boardNamesTop().getId());
+  layers.insert(ColorRole::boardValuesTop().getId());
+  // layers.insert(ColorRole::boardCourtyardTop().getId());
+  layers.insert(ColorRole::boardDocumentationTop().getId());
+  layers.insert(ColorRole::boardCopperTop().getId());
   return layers;
 }
 
 QSet<QString> GraphicsLayerList::getBottomLayers() noexcept {
   QSet<QString> layers;
-  layers.insert(Theme::Color::sBoardLegendBot);
-  layers.insert(Theme::Color::sBoardReferencesBot);
-  layers.insert(Theme::Color::sBoardGrabAreasBot);
-  // layers.insert(Theme::Color::sBoardTestPointsBot);
-  layers.insert(Theme::Color::sBoardNamesBot);
-  layers.insert(Theme::Color::sBoardValuesBot);
-  // layers.insert(Theme::Color::sBoardCourtyardBot);
-  layers.insert(Theme::Color::sBoardDocumentationBot);
-  layers.insert(Theme::Color::sBoardCopperBot);
+  layers.insert(ColorRole::boardLegendBot().getId());
+  layers.insert(ColorRole::boardReferencesBot().getId());
+  layers.insert(ColorRole::boardGrabAreasBot().getId());
+  // layers.insert(ColorRole::sBoardTestPointsBot);
+  layers.insert(ColorRole::boardNamesBot().getId());
+  layers.insert(ColorRole::boardValuesBot().getId());
+  // layers.insert(ColorRole::boardCourtyardBot().getId());
+  layers.insert(ColorRole::boardDocumentationBot().getId());
+  layers.insert(ColorRole::boardCopperBot().getId());
   return layers;
 }
 

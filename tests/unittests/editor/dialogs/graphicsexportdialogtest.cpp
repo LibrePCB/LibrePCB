@@ -30,7 +30,8 @@
 #include <librepcb/core/fileio/filepath.h>
 #include <librepcb/core/fileio/fileutils.h>
 #include <librepcb/core/types/lengthunit.h>
-#include <librepcb/core/workspace/theme.h>
+#include <librepcb/core/workspace/basecolorscheme.h>
+#include <librepcb/core/workspace/colorrole.h>
 #include <librepcb/editor/dialogs/graphicsexportdialog.h>
 #include <librepcb/editor/widgets/unsignedlengthedit.h>
 #include <librepcb/editor/widgets/unsignedratioedit.h>
@@ -163,11 +164,10 @@ protected:
  ******************************************************************************/
 
 TEST_F(GraphicsExportDialogTest, testDefaultTab) {
-  Theme theme;
-  GraphicsExportDialog dlg(GraphicsExportDialog::Mode::Schematic,
-                           GraphicsExportDialog::Output::Pdf, getPages(0), 0,
-                           "test", 0, FilePath(), LengthUnit::millimeters(),
-                           theme, "unittest");
+  GraphicsExportDialog dlg(
+      GraphicsExportDialog::Mode::Schematic, GraphicsExportDialog::Output::Pdf,
+      getPages(0), 0, "test", 0, FilePath(), LengthUnit::millimeters(),
+      BaseColorScheme::schematicLibrePcbLight(), "unittest");
   prepareDialog(dlg, FilePath());
   QTabWidget& tabWidget = TestHelpers::getChild<QTabWidget>(dlg, "tabWidget");
   EXPECT_EQ(0, tabWidget.currentIndex());
@@ -175,21 +175,19 @@ TEST_F(GraphicsExportDialogTest, testDefaultTab) {
 
 TEST_F(GraphicsExportDialogTest, testExportSchematicEmptyPages) {
   FilePath fp = getFilePath("out.pdf");
-  Theme theme;
-  GraphicsExportDialog dlg(GraphicsExportDialog::Mode::Schematic,
-                           GraphicsExportDialog::Output::Pdf, getPages(0), 0,
-                           "test", 0, FilePath(), LengthUnit::millimeters(),
-                           theme, "unittest");
+  GraphicsExportDialog dlg(
+      GraphicsExportDialog::Mode::Schematic, GraphicsExportDialog::Output::Pdf,
+      getPages(0), 0, "test", 0, FilePath(), LengthUnit::millimeters(),
+      BaseColorScheme::schematicLibrePcbLight(), "unittest");
   prepareDialog(dlg, fp);
 }
 
 TEST_F(GraphicsExportDialogTest, testExportSchematicPdf) {
   FilePath outFile = getFilePath("out.pdf");
-  Theme theme;
-  GraphicsExportDialog dlg(GraphicsExportDialog::Mode::Schematic,
-                           GraphicsExportDialog::Output::Pdf, getPages(3), 0,
-                           "test", 0, FilePath(), LengthUnit::millimeters(),
-                           theme, "unittest");
+  GraphicsExportDialog dlg(
+      GraphicsExportDialog::Mode::Schematic, GraphicsExportDialog::Output::Pdf,
+      getPages(3), 0, "test", 0, FilePath(), LengthUnit::millimeters(),
+      BaseColorScheme::schematicLibrePcbLight(), "unittest");
   prepareDialog(dlg, outFile);
   performExport(dlg);
   EXPECT_EQ(QVector<FilePath>{outFile}, mRequestedFilesToOpen);
@@ -197,11 +195,11 @@ TEST_F(GraphicsExportDialogTest, testExportSchematicPdf) {
 }
 
 TEST_F(GraphicsExportDialogTest, testExportSchematicImage) {
-  Theme theme;
   GraphicsExportDialog dlg(GraphicsExportDialog::Mode::Schematic,
                            GraphicsExportDialog::Output::Image, getPages(3), 0,
                            "test", 0, FilePath(), LengthUnit::millimeters(),
-                           theme, "unittest");
+                           BaseColorScheme::schematicLibrePcbLight(),
+                           "unittest");
   prepareDialog(dlg, getFilePath("out.svg"));
   performExport(dlg);
   EXPECT_EQ(QVector<FilePath>{mOutputDir}, mRequestedFilesToOpen);
@@ -212,21 +210,19 @@ TEST_F(GraphicsExportDialogTest, testExportSchematicImage) {
 
 TEST_F(GraphicsExportDialogTest, testExportBoardEmptyPages) {
   FilePath fp = getFilePath("out.pdf");
-  Theme theme;
   GraphicsExportDialog dlg(GraphicsExportDialog::Mode::Board,
                            GraphicsExportDialog::Output::Pdf, getPages(0), 0,
                            "test", 0, FilePath(), LengthUnit::millimeters(),
-                           theme, "unittest");
+                           BaseColorScheme::boardLibrePcbDark(), "unittest");
   prepareDialog(dlg, fp);
 }
 
 TEST_F(GraphicsExportDialogTest, testExportBoardPdf) {
   FilePath outFile = getFilePath("out.pdf");
-  Theme theme;
   GraphicsExportDialog dlg(GraphicsExportDialog::Mode::Board,
                            GraphicsExportDialog::Output::Pdf, getPages(1), 0,
                            "test", 0, FilePath(), LengthUnit::millimeters(),
-                           theme, "unittest");
+                           BaseColorScheme::boardLibrePcbDark(), "unittest");
   prepareDialog(dlg, outFile);
   performExport(dlg);
   EXPECT_EQ(QVector<FilePath>{outFile}, mRequestedFilesToOpen);
@@ -235,11 +231,10 @@ TEST_F(GraphicsExportDialogTest, testExportBoardPdf) {
 
 TEST_F(GraphicsExportDialogTest, testExportBoardImage) {
   FilePath outFile = getFilePath("out.svg");
-  Theme theme;
   GraphicsExportDialog dlg(GraphicsExportDialog::Mode::Board,
                            GraphicsExportDialog::Output::Image, getPages(1), 0,
                            "test", 0, FilePath(), LengthUnit::millimeters(),
-                           theme, "unittest");
+                           BaseColorScheme::boardLibrePcbDark(), "unittest");
   prepareDialog(dlg, outFile);
   performExport(dlg);
   EXPECT_EQ(QVector<FilePath>{mOutputDir}, mRequestedFilesToOpen);
@@ -248,11 +243,10 @@ TEST_F(GraphicsExportDialogTest, testExportBoardImage) {
 
 TEST_F(GraphicsExportDialogTest, testExportManyPages) {
   FilePath outFile = getFilePath("out.pdf");
-  Theme theme;
-  GraphicsExportDialog dlg(GraphicsExportDialog::Mode::Schematic,
-                           GraphicsExportDialog::Output::Pdf, getPages(1000), 0,
-                           "test", 0, FilePath(), LengthUnit::millimeters(),
-                           theme, "unittest");
+  GraphicsExportDialog dlg(
+      GraphicsExportDialog::Mode::Schematic, GraphicsExportDialog::Output::Pdf,
+      getPages(1000), 0, "test", 0, FilePath(), LengthUnit::millimeters(),
+      BaseColorScheme::schematicLibrePcbLight(), "unittest");
   prepareDialog(dlg, outFile);
   performExport(dlg);
   EXPECT_EQ(QVector<FilePath>{outFile}, mRequestedFilesToOpen);
@@ -260,11 +254,11 @@ TEST_F(GraphicsExportDialogTest, testExportManyPages) {
 }
 
 TEST_F(GraphicsExportDialogTest, testCopyToClipboard) {
-  Theme theme;
   GraphicsExportDialog dlg(GraphicsExportDialog::Mode::Schematic,
                            GraphicsExportDialog::Output::Image, getPages(1), 0,
                            "test", 0, FilePath(), LengthUnit::millimeters(),
-                           theme, "unittest");
+                           BaseColorScheme::schematicLibrePcbLight(),
+                           "unittest");
   prepareDialog(dlg, FilePath());
   performCopyToClipboard(dlg);
   EXPECT_EQ(QVector<FilePath>{}, mRequestedFilesToOpen);
@@ -275,11 +269,11 @@ TEST_F(GraphicsExportDialogTest, testCopyToClipboard) {
 TEST_F(GraphicsExportDialogTest, testExportPdfManyTimes) {
   for (int i = 0; i < 50; ++i) {
     FilePath outFile = mOutputDir.getPathTo(QString::number(i) % ".pdf");
-    Theme theme;
     GraphicsExportDialog dlg(GraphicsExportDialog::Mode::Schematic,
                              GraphicsExportDialog::Output::Pdf, getPages(5), 0,
                              "test", 0, FilePath(), LengthUnit::millimeters(),
-                             theme, "unittest");
+                             BaseColorScheme::schematicLibrePcbLight(),
+                             "unittest");
     prepareDialog(dlg, outFile);
     performExport(dlg);
     EXPECT_EQ(QVector<FilePath>{outFile}, mRequestedFilesToOpen);
@@ -295,11 +289,11 @@ TEST_F(GraphicsExportDialogTest, testPageSize) {
   FilePath outFile = getFilePath("out.pdf");
 
   {
-    Theme theme;
     GraphicsExportDialog dlg(GraphicsExportDialog::Mode::Schematic,
                              GraphicsExportDialog::Output::Pdf, getPages(1), 0,
                              "test", 0, FilePath(), LengthUnit::millimeters(),
-                             theme, "unittest");
+                             BaseColorScheme::schematicLibrePcbLight(),
+                             "unittest");
     prepareDialog(dlg, outFile);
     QComboBox& cbx = TestHelpers::getChild<QComboBox>(dlg, widget);
 
@@ -316,11 +310,11 @@ TEST_F(GraphicsExportDialogTest, testPageSize) {
   // Check if the setting is saved and restored automatically, and can be
   // reset to its default value.
   {
-    Theme theme;
     GraphicsExportDialog dlg(GraphicsExportDialog::Mode::Schematic,
                              GraphicsExportDialog::Output::Pdf, getPages(1), 0,
                              "test", 0, FilePath(), LengthUnit::millimeters(),
-                             theme, "unittest");
+                             BaseColorScheme::schematicLibrePcbLight(),
+                             "unittest");
     prepareDialog(dlg, outFile);
     QComboBox& cbx = TestHelpers::getChild<QComboBox>(dlg, widget);
 
@@ -352,11 +346,11 @@ TEST_F(GraphicsExportDialogTest, testOrientation) {
   FilePath outFile = getFilePath("out.pdf");
 
   {
-    Theme theme;
     GraphicsExportDialog dlg(GraphicsExportDialog::Mode::Schematic,
                              GraphicsExportDialog::Output::Pdf, getPages(1), 0,
                              "test", 0, FilePath(), LengthUnit::millimeters(),
-                             theme, "unittest");
+                             BaseColorScheme::schematicLibrePcbLight(),
+                             "unittest");
     prepareDialog(dlg, outFile);
     QRadioButton& rbtnDefault =
         TestHelpers::getChild<QRadioButton>(dlg, defaultWidget);
@@ -375,11 +369,11 @@ TEST_F(GraphicsExportDialogTest, testOrientation) {
   // Check if the setting is saved and restored automatically, and can be
   // reset to its default value.
   {
-    Theme theme;
     GraphicsExportDialog dlg(GraphicsExportDialog::Mode::Schematic,
                              GraphicsExportDialog::Output::Pdf, getPages(1), 0,
                              "test", 0, FilePath(), LengthUnit::millimeters(),
-                             theme, "unittest");
+                             BaseColorScheme::schematicLibrePcbLight(),
+                             "unittest");
     prepareDialog(dlg, outFile);
     QRadioButton& rbtnDefault =
         TestHelpers::getChild<QRadioButton>(dlg, defaultWidget);
@@ -415,11 +409,11 @@ TEST_F(GraphicsExportDialogTest, testMargins) {
   FilePath outFile = getFilePath("out.pdf");
 
   {
-    Theme theme;
     GraphicsExportDialog dlg(GraphicsExportDialog::Mode::Schematic,
                              GraphicsExportDialog::Output::Pdf, getPages(1), 0,
                              "test", 0, FilePath(), LengthUnit::millimeters(),
-                             theme, "unittest");
+                             BaseColorScheme::schematicLibrePcbLight(),
+                             "unittest");
     prepareDialog(dlg, outFile);
     UnsignedLengthEdit& edtLeft =
         TestHelpers::getChild<UnsignedLengthEdit>(dlg, widgetLeft);
@@ -454,11 +448,11 @@ TEST_F(GraphicsExportDialogTest, testMargins) {
   // Check if the setting is saved and restored automatically, and can be
   // reset to its default value.
   {
-    Theme theme;
     GraphicsExportDialog dlg(GraphicsExportDialog::Mode::Schematic,
                              GraphicsExportDialog::Output::Pdf, getPages(1), 0,
                              "test", 0, FilePath(), LengthUnit::millimeters(),
-                             theme, "unittest");
+                             BaseColorScheme::schematicLibrePcbLight(),
+                             "unittest");
     prepareDialog(dlg, outFile);
     UnsignedLengthEdit& edtLeft =
         TestHelpers::getChild<UnsignedLengthEdit>(dlg, widgetLeft);
@@ -504,11 +498,11 @@ TEST_F(GraphicsExportDialogTest, testShowPinNumbers) {
   const FilePath outFile = getFilePath("out.pdf");
 
   {
-    Theme theme;
     GraphicsExportDialog dlg(GraphicsExportDialog::Mode::Schematic,
                              GraphicsExportDialog::Output::Pdf, getPages(1), 0,
                              "test", 0, FilePath(), LengthUnit::millimeters(),
-                             theme, "unittest");
+                             BaseColorScheme::schematicLibrePcbLight(),
+                             "unittest");
     prepareDialog(dlg, outFile);
     QCheckBox& cbx = TestHelpers::getChild<QCheckBox>(dlg, widget);
 
@@ -517,7 +511,7 @@ TEST_F(GraphicsExportDialogTest, testShowPinNumbers) {
     EXPECT_EQ(defaultValue,
               getSettings(dlg, 1)
                   .at(0)
-                  ->getColor(Theme::Color::sSchematicPinNumbers)
+                  ->getColor(ColorRole::schematicPinNumbers().getId())
                   .isValid());
 
     // Check if the value can be changed and are applied properly.
@@ -525,18 +519,18 @@ TEST_F(GraphicsExportDialogTest, testShowPinNumbers) {
     EXPECT_EQ(newValue,
               getSettings(dlg, 1)
                   .at(0)
-                  ->getColor(Theme::Color::sSchematicPinNumbers)
+                  ->getColor(ColorRole::schematicPinNumbers().getId())
                   .isValid());
   }
 
   // Check if the setting is saved and restored automatically, and can be
   // reset to its default value.
   {
-    Theme theme;
     GraphicsExportDialog dlg(GraphicsExportDialog::Mode::Schematic,
                              GraphicsExportDialog::Output::Pdf, getPages(1), 0,
                              "test", 0, FilePath(), LengthUnit::millimeters(),
-                             theme, "unittest");
+                             BaseColorScheme::schematicLibrePcbLight(),
+                             "unittest");
     prepareDialog(dlg, outFile);
     QCheckBox& cbx = TestHelpers::getChild<QCheckBox>(dlg, widget);
 
@@ -545,7 +539,7 @@ TEST_F(GraphicsExportDialogTest, testShowPinNumbers) {
     EXPECT_EQ(newValue,
               getSettings(dlg, 1)
                   .at(0)
-                  ->getColor(Theme::Color::sSchematicPinNumbers)
+                  ->getColor(ColorRole::schematicPinNumbers().getId())
                   .isValid());
 
     // Restore default value.
@@ -554,7 +548,7 @@ TEST_F(GraphicsExportDialogTest, testShowPinNumbers) {
     EXPECT_EQ(defaultValue,
               getSettings(dlg, 1)
                   .at(0)
-                  ->getColor(Theme::Color::sSchematicPinNumbers)
+                  ->getColor(ColorRole::schematicPinNumbers().getId())
                   .isValid());
 
     // Sanity check that the export is actually successful.
@@ -570,11 +564,11 @@ TEST_F(GraphicsExportDialogTest, testRotate) {
   FilePath outFile = getFilePath("out.pdf");
 
   {
-    Theme theme;
     GraphicsExportDialog dlg(GraphicsExportDialog::Mode::Schematic,
                              GraphicsExportDialog::Output::Pdf, getPages(1), 0,
                              "test", 0, FilePath(), LengthUnit::millimeters(),
-                             theme, "unittest");
+                             BaseColorScheme::schematicLibrePcbLight(),
+                             "unittest");
     prepareDialog(dlg, outFile);
     QCheckBox& cbx = TestHelpers::getChild<QCheckBox>(dlg, widget);
 
@@ -590,11 +584,11 @@ TEST_F(GraphicsExportDialogTest, testRotate) {
   // Check if the setting is saved and restored automatically, and can be
   // reset to its default value.
   {
-    Theme theme;
     GraphicsExportDialog dlg(GraphicsExportDialog::Mode::Schematic,
                              GraphicsExportDialog::Output::Pdf, getPages(1), 0,
                              "test", 0, FilePath(), LengthUnit::millimeters(),
-                             theme, "unittest");
+                             BaseColorScheme::schematicLibrePcbLight(),
+                             "unittest");
     prepareDialog(dlg, outFile);
     QCheckBox& cbx = TestHelpers::getChild<QCheckBox>(dlg, widget);
 
@@ -620,11 +614,11 @@ TEST_F(GraphicsExportDialogTest, testMirror) {
   FilePath outFile = getFilePath("out.pdf");
 
   {
-    Theme theme;
     GraphicsExportDialog dlg(GraphicsExportDialog::Mode::Schematic,
                              GraphicsExportDialog::Output::Pdf, getPages(1), 0,
                              "test", 0, FilePath(), LengthUnit::millimeters(),
-                             theme, "unittest");
+                             BaseColorScheme::schematicLibrePcbLight(),
+                             "unittest");
     prepareDialog(dlg, outFile);
     QCheckBox& cbx = TestHelpers::getChild<QCheckBox>(dlg, widget);
 
@@ -640,11 +634,11 @@ TEST_F(GraphicsExportDialogTest, testMirror) {
   // Check if the setting is saved and restored automatically, and can be
   // reset to its default value.
   {
-    Theme theme;
     GraphicsExportDialog dlg(GraphicsExportDialog::Mode::Schematic,
                              GraphicsExportDialog::Output::Pdf, getPages(1), 0,
                              "test", 0, FilePath(), LengthUnit::millimeters(),
-                             theme, "unittest");
+                             BaseColorScheme::schematicLibrePcbLight(),
+                             "unittest");
     prepareDialog(dlg, outFile);
     QCheckBox& cbx = TestHelpers::getChild<QCheckBox>(dlg, widget);
 
@@ -674,11 +668,11 @@ TEST_F(GraphicsExportDialogTest, testScale) {
   FilePath outFile = getFilePath("out.pdf");
 
   {
-    Theme theme;
     GraphicsExportDialog dlg(GraphicsExportDialog::Mode::Schematic,
                              GraphicsExportDialog::Output::Pdf, getPages(1), 0,
                              "test", 0, FilePath(), LengthUnit::millimeters(),
-                             theme, "unittest");
+                             BaseColorScheme::schematicLibrePcbLight(),
+                             "unittest");
     prepareDialog(dlg, outFile);
     QCheckBox& cbx = TestHelpers::getChild<QCheckBox>(dlg, widgetCbx);
     UnsignedRatioEdit& spbx =
@@ -703,11 +697,11 @@ TEST_F(GraphicsExportDialogTest, testScale) {
   // Check if the setting is saved and restored automatically, and can be
   // reset to its default value.
   {
-    Theme theme;
     GraphicsExportDialog dlg(GraphicsExportDialog::Mode::Schematic,
                              GraphicsExportDialog::Output::Pdf, getPages(1), 0,
                              "test", 0, FilePath(), LengthUnit::millimeters(),
-                             theme, "unittest");
+                             BaseColorScheme::schematicLibrePcbLight(),
+                             "unittest");
     prepareDialog(dlg, outFile);
     QCheckBox& cbx = TestHelpers::getChild<QCheckBox>(dlg, widgetCbx);
     UnsignedRatioEdit& spbx =
@@ -742,11 +736,11 @@ TEST_F(GraphicsExportDialogTest, testPixmapDpi) {
   FilePath outFile = getFilePath("out.svg");
 
   {
-    Theme theme;
-    GraphicsExportDialog dlg(GraphicsExportDialog::Mode::Schematic,
-                             GraphicsExportDialog::Output::Image, getPages(1),
-                             0, "test", 0, FilePath(),
-                             LengthUnit::millimeters(), theme, "unittest");
+    GraphicsExportDialog dlg(
+        GraphicsExportDialog::Mode::Schematic,
+        GraphicsExportDialog::Output::Image, getPages(1), 0, "test", 0,
+        FilePath(), LengthUnit::millimeters(),
+        BaseColorScheme::schematicLibrePcbLight(), "unittest");
     prepareDialog(dlg, outFile);
     QSpinBox& spbx = TestHelpers::getChild<QSpinBox>(dlg, widget);
 
@@ -762,11 +756,11 @@ TEST_F(GraphicsExportDialogTest, testPixmapDpi) {
   // Check if the setting is saved and restored automatically, and can be
   // reset to its default value.
   {
-    Theme theme;
-    GraphicsExportDialog dlg(GraphicsExportDialog::Mode::Schematic,
-                             GraphicsExportDialog::Output::Image, getPages(1),
-                             0, "test", 0, FilePath(),
-                             LengthUnit::millimeters(), theme, "unittest");
+    GraphicsExportDialog dlg(
+        GraphicsExportDialog::Mode::Schematic,
+        GraphicsExportDialog::Output::Image, getPages(1), 0, "test", 0,
+        FilePath(), LengthUnit::millimeters(),
+        BaseColorScheme::schematicLibrePcbLight(), "unittest");
     prepareDialog(dlg, outFile);
     QSpinBox& spbx = TestHelpers::getChild<QSpinBox>(dlg, widget);
 
@@ -793,11 +787,11 @@ TEST_F(GraphicsExportDialogTest, testBlackWhite) {
   FilePath outFile = getFilePath("out.pdf");
 
   {
-    Theme theme;
     GraphicsExportDialog dlg(GraphicsExportDialog::Mode::Schematic,
                              GraphicsExportDialog::Output::Pdf, getPages(1), 0,
                              "test", 0, FilePath(), LengthUnit::millimeters(),
-                             theme, "unittest");
+                             BaseColorScheme::schematicLibrePcbLight(),
+                             "unittest");
     prepareDialog(dlg, outFile);
     QCheckBox& cbx = TestHelpers::getChild<QCheckBox>(dlg, widget);
 
@@ -813,11 +807,11 @@ TEST_F(GraphicsExportDialogTest, testBlackWhite) {
   // Check if the setting is saved and restored automatically, and can be
   // reset to its default value.
   {
-    Theme theme;
     GraphicsExportDialog dlg(GraphicsExportDialog::Mode::Schematic,
                              GraphicsExportDialog::Output::Pdf, getPages(1), 0,
                              "test", 0, FilePath(), LengthUnit::millimeters(),
-                             theme, "unittest");
+                             BaseColorScheme::schematicLibrePcbLight(),
+                             "unittest");
     prepareDialog(dlg, outFile);
     QCheckBox& cbx = TestHelpers::getChild<QCheckBox>(dlg, widget);
 
@@ -846,11 +840,11 @@ TEST_F(GraphicsExportDialogTest, testBackgroundColor) {
   FilePath outFile = getFilePath("out.pdf");
 
   {
-    Theme theme;
     GraphicsExportDialog dlg(GraphicsExportDialog::Mode::Schematic,
                              GraphicsExportDialog::Output::Pdf, getPages(1), 0,
                              "test", 0, FilePath(), LengthUnit::millimeters(),
-                             theme, "unittest");
+                             BaseColorScheme::schematicLibrePcbLight(),
+                             "unittest");
     prepareDialog(dlg, outFile);
     QRadioButton& rbtnDefault =
         TestHelpers::getChild<QRadioButton>(dlg, widgetDefault);
@@ -869,11 +863,11 @@ TEST_F(GraphicsExportDialogTest, testBackgroundColor) {
   // Check if the setting is saved and restored automatically, and can be
   // reset to its default value.
   {
-    Theme theme;
     GraphicsExportDialog dlg(GraphicsExportDialog::Mode::Schematic,
                              GraphicsExportDialog::Output::Pdf, getPages(1), 0,
                              "test", 0, FilePath(), LengthUnit::millimeters(),
-                             theme, "unittest");
+                             BaseColorScheme::schematicLibrePcbLight(),
+                             "unittest");
     prepareDialog(dlg, outFile);
     QRadioButton& rbtnDefault =
         TestHelpers::getChild<QRadioButton>(dlg, widgetDefault);
@@ -904,11 +898,11 @@ TEST_F(GraphicsExportDialogTest, testMinLineWidth) {
   FilePath outFile = getFilePath("out.pdf");
 
   {
-    Theme theme;
     GraphicsExportDialog dlg(GraphicsExportDialog::Mode::Schematic,
                              GraphicsExportDialog::Output::Pdf, getPages(1), 0,
                              "test", 0, FilePath(), LengthUnit::millimeters(),
-                             theme, "unittest");
+                             BaseColorScheme::schematicLibrePcbLight(),
+                             "unittest");
     prepareDialog(dlg, outFile);
     UnsignedLengthEdit& edt =
         TestHelpers::getChild<UnsignedLengthEdit>(dlg, widget);
@@ -925,11 +919,11 @@ TEST_F(GraphicsExportDialogTest, testMinLineWidth) {
   // Check if the setting is saved and restored automatically, and can be
   // reset to its default value.
   {
-    Theme theme;
     GraphicsExportDialog dlg(GraphicsExportDialog::Mode::Schematic,
                              GraphicsExportDialog::Output::Pdf, getPages(1), 0,
                              "test", 0, FilePath(), LengthUnit::millimeters(),
-                             theme, "unittest");
+                             BaseColorScheme::schematicLibrePcbLight(),
+                             "unittest");
     prepareDialog(dlg, outFile);
     UnsignedLengthEdit& edt =
         TestHelpers::getChild<UnsignedLengthEdit>(dlg, widget);
@@ -951,29 +945,29 @@ TEST_F(GraphicsExportDialogTest, testMinLineWidth) {
 
 TEST_F(GraphicsExportDialogTest, testLayerColors) {
   const QStringList layers = {
-      Theme::Color::sSchematicFrames,
-      Theme::Color::sSchematicOutlines,
-      Theme::Color::sSchematicGrabAreas,
-      Theme::Color::sSchematicPinLines,
-      Theme::Color::sSchematicPinNames,
-      Theme::Color::sSchematicPinNumbers,
-      Theme::Color::sSchematicNames,
-      Theme::Color::sSchematicValues,
-      Theme::Color::sSchematicWires,
-      Theme::Color::sSchematicNetLabels,
-      Theme::Color::sSchematicBuses,
-      Theme::Color::sSchematicBusLabels,
-      Theme::Color::sSchematicImageBorders,
-      Theme::Color::sSchematicDocumentation,
-      Theme::Color::sSchematicComments,
-      Theme::Color::sSchematicGuide,
+      ColorRole::schematicFrames().getId(),  //
+      ColorRole::schematicOutlines().getId(),  //
+      ColorRole::schematicGrabAreas().getId(),  //
+      ColorRole::schematicPinLines().getId(),  //
+      ColorRole::schematicPinNames().getId(),  //
+      ColorRole::schematicPinNumbers().getId(),  //
+      ColorRole::schematicNames().getId(),  //
+      ColorRole::schematicValues().getId(),  //
+      ColorRole::schematicWires().getId(),  //
+      ColorRole::schematicNetLabels().getId(),  //
+      ColorRole::schematicBuses().getId(),  //
+      ColorRole::schematicBusLabels().getId(),  //
+      ColorRole::schematicImageBorders().getId(),  //
+      ColorRole::schematicDocumentation().getId(),  //
+      ColorRole::schematicComments().getId(),  //
+      ColorRole::schematicGuide().getId(),  //
   };
   QList<std::pair<QString, QColor>> defaultValue;
   QList<std::pair<QString, QColor>> newValue;
-  const Theme theme;
+  const ColorScheme& scheme = BaseColorScheme::schematicLibrePcbLight();
   for (int i = 0; i < layers.count(); ++i) {
-    const ThemeColor& color = theme.getColor(layers.at(i));
-    defaultValue.append(std::make_pair(layers.at(i), color.getPrimaryColor()));
+    const auto colors = scheme.getColors(layers.at(i));
+    defaultValue.append(std::make_pair(layers.at(i), colors.primary));
     newValue.append(
         std::make_pair(layers.at(i), QColor::colorNames().value(i)));
   }
@@ -982,11 +976,11 @@ TEST_F(GraphicsExportDialogTest, testLayerColors) {
   FilePath outFile = getFilePath("out.pdf");
 
   {
-    Theme theme;
     GraphicsExportDialog dlg(GraphicsExportDialog::Mode::Schematic,
                              GraphicsExportDialog::Output::Pdf, getPages(1), 0,
                              "test", 0, FilePath(), LengthUnit::millimeters(),
-                             theme, "unittest");
+                             BaseColorScheme::schematicLibrePcbLight(),
+                             "unittest");
     prepareDialog(dlg, outFile);
     enablePinNumbers(dlg);
     QListWidget& lst = TestHelpers::getChild<QListWidget>(dlg, widget);
@@ -1009,11 +1003,11 @@ TEST_F(GraphicsExportDialogTest, testLayerColors) {
   // Check if the setting is saved and restored automatically, and can be
   // reset to its default value.
   {
-    Theme theme;
     GraphicsExportDialog dlg(GraphicsExportDialog::Mode::Schematic,
                              GraphicsExportDialog::Output::Pdf, getPages(1), 0,
                              "test", 0, FilePath(), LengthUnit::millimeters(),
-                             theme, "unittest");
+                             BaseColorScheme::schematicLibrePcbLight(),
+                             "unittest");
     prepareDialog(dlg, outFile);
     enablePinNumbers(dlg);
     QListWidget& lst = TestHelpers::getChild<QListWidget>(dlg, widget);
@@ -1048,11 +1042,11 @@ TEST_F(GraphicsExportDialogTest, testOpenExportedFiles) {
   FilePath outFile = getFilePath("out.pdf");
 
   {
-    Theme theme;
     GraphicsExportDialog dlg(GraphicsExportDialog::Mode::Schematic,
                              GraphicsExportDialog::Output::Pdf, getPages(1), 0,
                              "test", 0, FilePath(), LengthUnit::millimeters(),
-                             theme, "unittest");
+                             BaseColorScheme::schematicLibrePcbLight(),
+                             "unittest");
     prepareDialog(dlg, outFile);
     QCheckBox& cbx = TestHelpers::getChild<QCheckBox>(dlg, widget);
 
@@ -1070,11 +1064,11 @@ TEST_F(GraphicsExportDialogTest, testOpenExportedFiles) {
   // Check if the setting is saved and restored automatically, and can be
   // reset to its default value.
   {
-    Theme theme;
     GraphicsExportDialog dlg(GraphicsExportDialog::Mode::Schematic,
                              GraphicsExportDialog::Output::Pdf, getPages(1), 0,
                              "test", 0, FilePath(), LengthUnit::millimeters(),
-                             theme, "unittest");
+                             BaseColorScheme::schematicLibrePcbLight(),
+                             "unittest");
     prepareDialog(dlg, outFile);
     QCheckBox& cbx = TestHelpers::getChild<QCheckBox>(dlg, widget);
 
@@ -1103,11 +1097,11 @@ TEST_F(GraphicsExportDialogTest, testPageRange) {
   FilePath outFile = getFilePath("out.pdf");
 
   {
-    Theme theme;
     GraphicsExportDialog dlg(GraphicsExportDialog::Mode::Schematic,
                              GraphicsExportDialog::Output::Pdf, getPages(3), 1,
                              "test", 0, FilePath(), LengthUnit::millimeters(),
-                             theme, "unittest");
+                             BaseColorScheme::schematicLibrePcbLight(),
+                             "unittest");
     prepareDialog(dlg, outFile);
     QRadioButton& rbtnAll = TestHelpers::getChild<QRadioButton>(dlg, widgetAll);
     QRadioButton& rbtnCurrent =
@@ -1154,11 +1148,11 @@ TEST_F(GraphicsExportDialogTest, testPageRange) {
   // Check if the setting is NOT saved and restored, to avoid accidentally
   // printing the wrong pages.
   {
-    Theme theme;
     GraphicsExportDialog dlg(GraphicsExportDialog::Mode::Schematic,
                              GraphicsExportDialog::Output::Pdf, getPages(3), 1,
                              "test", 0, FilePath(), LengthUnit::millimeters(),
-                             theme, "unittest");
+                             BaseColorScheme::schematicLibrePcbLight(),
+                             "unittest");
     prepareDialog(dlg, outFile);
     QRadioButton& rbtnAll = TestHelpers::getChild<QRadioButton>(dlg, widgetAll);
     QRadioButton& rbtnCurrent =

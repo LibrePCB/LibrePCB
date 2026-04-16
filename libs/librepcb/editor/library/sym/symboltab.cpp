@@ -60,6 +60,7 @@
 #include <librepcb/core/library/sym/symbol.h>
 #include <librepcb/core/library/sym/symbolcheckmessages.h>
 #include <librepcb/core/library/sym/symbolpainter.h>
+#include <librepcb/core/workspace/colorrole.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
 #include <librepcb/core/workspace/workspacesettings.h>
@@ -155,8 +156,11 @@ SymbolTab::SymbolTab(LibraryEditor& editor, std::unique_ptr<Symbol> sym,
           &WorkspaceSettingsItem::edited, this, [this]() {
             mGridStyle =
                 mApp.getWorkspace().getSettings().schematicGridStyle.get();
-            applyTheme();
+            applyWorkspaceSettings();
           });
+  connect(&mApp.getWorkspace().getSettings().schematicColorSchemes,
+          &WorkspaceSettingsItem_ColorSchemes::colorsModified, this,
+          &SymbolTab::applyWorkspaceSettings);
 
   // Refresh content.
   refreshUiData();
@@ -246,9 +250,11 @@ ui::TabData SymbolTab::getUiData() const noexcept {
 }
 
 ui::SymbolTabData SymbolTab::getDerivedUiData() const noexcept {
-  const Theme& theme = mEditor.getWorkspace().getSettings().themes.getActive();
+  const ColorScheme& scheme =
+      mApp.getWorkspace().getSettings().schematicColorSchemes.getActive();
+  const auto infoBoxColors = scheme.getColors(ColorRole::schematicInfoBox());
   const QColor bgColor =
-      theme.getColor(Theme::Color::sSchematicBackground).getPrimaryColor();
+      scheme.getColors(ColorRole::schematicBackground()).primary;
   const QColor fgColor = (bgColor.lightnessF() >= 0.5) ? Qt::black : Qt::white;
 
   return ui::SymbolTabData{
@@ -278,10 +284,8 @@ ui::SymbolTabData SymbolTab::getDerivedUiData() const noexcept {
       },
       q2s(bgColor),  // Background color
       q2s(fgColor),  // Foreground color
-      q2s(theme.getColor(Theme::Color::sSchematicInfoBox)
-              .getPrimaryColor()),  // Overlay color
-      q2s(theme.getColor(Theme::Color::sSchematicInfoBox)
-              .getSecondaryColor()),  // Overlay text color
+      q2s(infoBoxColors.primary),  // Overlay color
+      q2s(infoBoxColors.secondary),  // Overlay text color
       l2s(mGridStyle),  // Grid style
       l2s(*mSymbol->getGridInterval()),  // Grid interval
       l2s(mUnit),  // Unit
@@ -402,7 +406,7 @@ void SymbolTab::activate() noexcept {
       new SymbolGraphicsItem(*mSymbol, *mLayers, nullptr, nullptr, {}, false));
   mScene->addItem(*mGraphicsItem);
 
-  applyTheme();
+  applyWorkspaceSettings();
   requestRepaint();
 }
 
@@ -1620,7 +1624,7 @@ bool SymbolTab::execGraphicsExportDialog(GraphicsExportDialog::Output output,
     GraphicsExportDialog dialog(
         GraphicsExportDialog::Mode::Schematic, output, pages, 0,
         *mSymbol->getNames().getDefaultValue(), 0, defaultFilePath, mUnit,
-        mApp.getWorkspace().getSettings().themes.getActive(),
+        mApp.getWorkspace().getSettings().schematicColorSchemes.getActive(),
         "symbol_editor/" % settingsKey, getWindow());
     connect(&dialog, &GraphicsExportDialog::requestOpenFile, this,
             [this](const FilePath& fp) {
@@ -1639,19 +1643,17 @@ void SymbolTab::requestRepaint() noexcept {
   onDerivedUiDataChanged.notify();
 }
 
-void SymbolTab::applyTheme() noexcept {
-  const Theme& theme = mEditor.getWorkspace().getSettings().themes.getActive();
+void SymbolTab::applyWorkspaceSettings() noexcept {
+  const ColorScheme& scheme =
+      mApp.getWorkspace().getSettings().schematicColorSchemes.getActive();
 
   if (mScene) {
-    mScene->setBackgroundColors(
-        theme.getColor(Theme::Color::sSchematicBackground).getPrimaryColor(),
-        theme.getColor(Theme::Color::sSchematicBackground).getSecondaryColor());
-    mScene->setOverlayColors(
-        theme.getColor(Theme::Color::sSchematicOverlays).getPrimaryColor(),
-        theme.getColor(Theme::Color::sSchematicOverlays).getSecondaryColor());
-    mScene->setSelectionRectColors(
-        theme.getColor(Theme::Color::sSchematicSelection).getPrimaryColor(),
-        theme.getColor(Theme::Color::sSchematicSelection).getSecondaryColor());
+    const auto background = scheme.getColors(ColorRole::schematicBackground());
+    mScene->setBackgroundColors(background.primary, background.secondary);
+    const auto overlay = scheme.getColors(ColorRole::schematicOverlays());
+    mScene->setOverlayColors(overlay.primary, overlay.secondary);
+    const auto selection = scheme.getColors(ColorRole::schematicSelection());
+    mScene->setSelectionRectColors(selection.primary, selection.secondary);
     mScene->setGridStyle(mGridStyle);
   }
 

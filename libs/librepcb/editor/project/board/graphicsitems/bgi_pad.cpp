@@ -33,7 +33,7 @@
 #include <librepcb/core/project/circuit/componentsignalinstance.h>
 #include <librepcb/core/project/circuit/netsignal.h>
 #include <librepcb/core/types/layer.h>
-#include <librepcb/core/workspace/theme.h>
+#include <librepcb/core/workspace/colorrole.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -174,15 +174,15 @@ void BGI_Pad::deviceGraphicsItemEdited(const BGI_Device& obj,
 void BGI_Pad::updateLayer() noexcept {
   if (mPad.getProperties().isTht()) {
     setZValue(BoardGraphicsScene::ZValue_PadsTop);
-    mGraphicsItem->setLayer(Theme::Color::sBoardPads);
+    mGraphicsItem->setLayer(ColorRole::boardPads());
   } else if (mPad.getSolderLayer() == Layer::topCopper()) {
     setZValue(BoardGraphicsScene::getFlippedZValue(
         BoardGraphicsScene::ZValue_PadsTop, mContext->flipView));
-    mGraphicsItem->setLayer(Theme::Color::sBoardCopperTop);
+    mGraphicsItem->setLayer(ColorRole::boardCopperTop());
   } else {
     setZValue(BoardGraphicsScene::getFlippedZValue(
         BoardGraphicsScene::ZValue_PadsBottom, mContext->flipView));
-    mGraphicsItem->setLayer(Theme::Color::sBoardCopperBot);
+    mGraphicsItem->setLayer(ColorRole::boardCopperBot());
   }
 }
 

@@ -346,7 +346,7 @@ void GuiApplication::switchWorkspace(QWidget* parent) noexcept {
 }
 
 void GuiApplication::execWorkspaceSettingsDialog(QWidget* parent) noexcept {
-  WorkspaceSettingsDialog dlg(mWorkspace, parent);
+  WorkspaceSettingsDialog dlg(mWorkspace, *mTheme, parent);
   connect(&dlg, &WorkspaceSettingsDialog::desktopIntegrationStatusChanged, this,
           &GuiApplication::updateDesktopIntegrationNotification);
   dlg.exec();

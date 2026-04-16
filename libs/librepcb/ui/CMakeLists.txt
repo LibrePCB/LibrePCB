@@ -10,7 +10,7 @@ set(CMAKE_AUTORCC OFF)
 # Export library
 add_library(librepcb_ui STATIC)
 slint_target_sources(
-  librepcb_ui appwindow.slint
+  librepcb_ui ui.slint
   NAMESPACE ui
   # Generate multiple cpp files to parallelize compilation, but not too many
   # because of excessive RAM usage when compiling those (huge) files. A value

@@ -24,7 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include "../utils/uiobjectlist.h"
-#include "appwindow.h"
+#include "ui.h"
 
 #include <librepcb/core/project/projectloader.h>
 #include <librepcb/core/serialization/sexpression.h>

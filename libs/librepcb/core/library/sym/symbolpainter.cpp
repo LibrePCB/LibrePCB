@@ -25,7 +25,7 @@
 #include "../../application.h"
 #include "../../export/graphicsexportsettings.h"
 #include "../../export/graphicspainter.h"
-#include "../../workspace/theme.h"
+#include "../../workspace/colorrole.h"
 #include "symbol.h"
 
 #include <QtCore>
@@ -108,10 +108,10 @@ void SymbolPainter::paint(
     // Draw Polygons.
     foreach (const Polygon& polygon, mPolygons) {
       if (doDraw(type, polygon.isGrabArea(), polygon.isFilled())) {
-        const QString color = polygon.getLayer().getThemeColor();
+        const QString role = polygon.getLayer().getColorRole().getId();
         p.drawPolygon(polygon.getPath(), *polygon.getLineWidth(),
-                      settings.getColor(color),
-                      settings.getFillColor(color, polygon.isFilled(),
+                      settings.getColor(role),
+                      settings.getFillColor(role, polygon.isFilled(),
                                             polygon.isGrabArea()));
       }
     }
@@ -119,10 +119,10 @@ void SymbolPainter::paint(
     // Draw Circles.
     foreach (const Circle& circle, mCircles) {
       if (doDraw(type, circle.isGrabArea(), circle.isFilled())) {
-        const QString color = circle.getLayer().getThemeColor();
+        const QString role = circle.getLayer().getColorRole().getId();
         p.drawCircle(circle.getCenter(), *circle.getDiameter(),
-                     *circle.getLineWidth(), settings.getColor(color),
-                     settings.getFillColor(color, circle.isFilled(),
+                     *circle.getLineWidth(), settings.getColor(role),
+                     settings.getFillColor(role, circle.isFilled(),
                                            circle.isGrabArea()));
       }
     }
@@ -140,7 +140,7 @@ void SymbolPainter::paint(
         image.getPosition(), image.getRotation(),
         settings.convertImageColors(mImageFiles.value(*image.getFileName())),
         image.getWidth(), image.getHeight(), image.getBorderWidth(),
-        settings.getColor(Theme::Color::sSchematicImageBorders));
+        settings.getColor(ColorRole::schematicImageBorders().getId()));
   }
 
   // Draw line shapes (no fill, no grab area).
@@ -148,29 +148,30 @@ void SymbolPainter::paint(
 
   // Draw Texts.
   foreach (const Text& text, mTexts) {
-    const QString color = text.getLayer().getThemeColor();
+    const QString role = text.getLayer().getColorRole().getId();
     p.drawText(text.getPosition(), text.getRotation(), *text.getHeight(),
                text.getAlign(), text.getText(), mDefaultFont,
-               settings.getColor(color), true, false, false);
+               settings.getColor(role), true, false, false);
   }
 
   // Draw Pins.
   foreach (const SymbolPin& pin, mPins) {
     p.drawSymbolPin(pin.getPosition(), pin.getRotation(), *pin.getLength(),
-                    settings.getColor(Theme::Color::sSchematicPinLines),
+                    settings.getColor(ColorRole::schematicPinLines().getId()),
                     QColor());
     p.drawText(
         pin.getPosition() + pin.getNamePosition().rotated(pin.getRotation()),
         pin.getRotation() + pin.getNameRotation(), *pin.getNameHeight(),
         pin.getNameAlignment(), *pin.getName(), mDefaultFont,
-        settings.getColor(Theme::Color::sSchematicPinNames), true, false, true);
+        settings.getColor(ColorRole::schematicPinNames().getId()), true, false,
+        true);
     const bool flipped = Toolbox::isTextUpsideDown(pin.getRotation());
     p.drawText(pin.getPosition() +
                    pin.getNumbersPosition(flipped).rotated(pin.getRotation()),
                pin.getRotation(), *SymbolPin::getNumbersHeight(),
                pin.getNumbersAlignment(flipped), "1…", mDefaultFont,
-               settings.getColor(Theme::Color::sSchematicPinNumbers), true,
-               false, false);
+               settings.getColor(ColorRole::schematicPinNumbers().getId()),
+               true, false, false);
   }
 }
 

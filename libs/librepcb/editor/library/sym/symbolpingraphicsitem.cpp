@@ -31,7 +31,7 @@
 #include <librepcb/core/types/angle.h>
 #include <librepcb/core/types/point.h>
 #include <librepcb/core/utils/overlinemarkupparser.h>
-#include <librepcb/core/workspace/theme.h>
+#include <librepcb/core/workspace/colorrole.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -71,21 +71,21 @@ SymbolPinGraphicsItem::SymbolPinGraphicsItem(
   // circle
   mCircleGraphicsItem->setDiameter(UnsignedLength(1200000));
   mCircleGraphicsItem->setLineLayer(
-      layers.get(Theme::Color::sSchematicOptionalPins));
+      layers.get(ColorRole::schematicOptionalPins()));
   mCircleGraphicsItem->setShapeMode(
       PrimitiveCircleGraphicsItem::ShapeMode::FilledOutline);
 
   // line
   mLineGraphicsItem->setRotation(mPin->getRotation());
   mLineGraphicsItem->setLineWidth(UnsignedLength(158750));
-  mLineGraphicsItem->setLayer(layers.get(Theme::Color::sSchematicPinLines));
+  mLineGraphicsItem->setLayer(layers.get(ColorRole::schematicPinLines()));
 
   // name
   mNameGraphicsItem->setRotation(mPin->getRotation() + mPin->getNameRotation());
   mNameGraphicsItem->setAlignment(mPin->getNameAlignment());
   mNameGraphicsItem->setHeight(mPin->getNameHeight());
   mNameGraphicsItem->setFont(PrimitiveTextGraphicsItem::Font::SansSerif);
-  mNameGraphicsItem->setLayer(layers.get(Theme::Color::sSchematicPinNames));
+  mNameGraphicsItem->setLayer(layers.get(ColorRole::schematicPinNames()));
   updateNamePosition();
   updateText();
 
@@ -93,8 +93,7 @@ SymbolPinGraphicsItem::SymbolPinGraphicsItem(
   mNumbersGraphicsItem->setRotation(mPin->getRotation());
   mNumbersGraphicsItem->setHeight(SymbolPin::getNumbersHeight());
   mNumbersGraphicsItem->setFont(PrimitiveTextGraphicsItem::Font::SansSerif);
-  mNumbersGraphicsItem->setLayer(
-      layers.get(Theme::Color::sSchematicPinNumbers));
+  mNumbersGraphicsItem->setLayer(layers.get(ColorRole::schematicPinNumbers()));
   mNumbersGraphicsItem->setOpacity(0.4);
   mNumbersGraphicsItem->setText("1…");
   updateNumbersTransform();
@@ -125,10 +124,10 @@ void SymbolPinGraphicsItem::updateText() noexcept {
           : nullptr;
       if (signal && signal->isRequired()) {
         mCircleGraphicsItem->setLineLayer(
-            mLayers.get(Theme::Color::sSchematicRequiredPins));
+            mLayers.get(ColorRole::schematicRequiredPins()));
       } else if (signal && (!signal->isRequired())) {
         mCircleGraphicsItem->setLineLayer(
-            mLayers.get(Theme::Color::sSchematicOptionalPins));
+            mLayers.get(ColorRole::schematicOptionalPins()));
       } else {
         mCircleGraphicsItem->setLineLayer(nullptr);
       }

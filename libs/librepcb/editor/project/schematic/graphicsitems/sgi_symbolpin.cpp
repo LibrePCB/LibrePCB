@@ -34,7 +34,7 @@
 #include <librepcb/core/project/circuit/netsignal.h>
 #include <librepcb/core/project/schematic/items/si_symbol.h>
 #include <librepcb/core/utils/transform.h>
-#include <librepcb/core/workspace/theme.h>
+#include <librepcb/core/workspace/colorrole.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -81,22 +81,21 @@ SGI_SymbolPin::SGI_SymbolPin(
   mLineGraphicsItem->setLine(Point(0, 0),
                              Point(*mPin.getLibPin().getLength(), 0));
   mLineGraphicsItem->setLineWidth(UnsignedLength(158750));
-  mLineGraphicsItem->setLayer(mLayers.get(Theme::Color::sSchematicPinLines));
+  mLineGraphicsItem->setLayer(mLayers.get(ColorRole::schematicPinLines()));
   mLineGraphicsItem->setFlag(QGraphicsItem::ItemIsSelectable, true);
   mLineGraphicsItem->setFlag(QGraphicsItem::ItemStacksBehindParent, true);
 
   // Setup name text.
   mNameGraphicsItem->setFont(PrimitiveTextGraphicsItem::Font::SansSerif);
   mNameGraphicsItem->setHeight(mPin.getLibPin().getNameHeight());
-  mNameGraphicsItem->setLayer(mLayers.get(Theme::Color::sSchematicPinNames));
+  mNameGraphicsItem->setLayer(mLayers.get(ColorRole::schematicPinNames()));
   mNameGraphicsItem->setFlag(QGraphicsItem::ItemIsSelectable, true);
   mNameGraphicsItem->setFlag(QGraphicsItem::ItemStacksBehindParent, true);
 
   // Setup number text.
   mNumbersGraphicsItem->setFont(PrimitiveTextGraphicsItem::Font::SansSerif);
   mNumbersGraphicsItem->setHeight(PositiveLength(1500000));
-  mNumbersGraphicsItem->setLayer(
-      mLayers.get(Theme::Color::sSchematicPinNumbers));
+  mNumbersGraphicsItem->setLayer(mLayers.get(ColorRole::schematicPinNumbers()));
   mNumbersGraphicsItem->setFlag(QGraphicsItem::ItemIsSelectable, true);
   mNumbersGraphicsItem->setFlag(QGraphicsItem::ItemStacksBehindParent, true);
 
@@ -234,13 +233,13 @@ void SGI_SymbolPin::updateJunction() noexcept {
   UnsignedLength lineWidth(0);
   if (mPin.hasError()) {
     lineWidth = UnsignedLength(100000);
-    lineLayer = mLayers.get(Theme::Color::sSchematicRequiredPins);
+    lineLayer = mLayers.get(ColorRole::schematicRequiredPins());
   } else if (mPin.isVisibleJunction()) {
-    fillLayer = mLayers.get(Theme::Color::sSchematicWires);
+    fillLayer = mLayers.get(ColorRole::schematicWires());
   } else if ((!net) && mPin.isRequired()) {
-    lineLayer = mLayers.get(Theme::Color::sSchematicRequiredPins);
+    lineLayer = mLayers.get(ColorRole::schematicRequiredPins());
   } else if (!net) {
-    lineLayer = mLayers.get(Theme::Color::sSchematicOptionalPins);
+    lineLayer = mLayers.get(ColorRole::schematicOptionalPins());
   }
   mCircleGraphicsItem->setLineWidth(lineWidth);
   mCircleGraphicsItem->setLineLayer(lineLayer);

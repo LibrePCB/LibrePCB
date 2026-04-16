@@ -35,6 +35,7 @@
 #include <librepcb/core/project/board/boardplanefragmentsbuilder.h>
 #include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/project.h>
+#include <librepcb/core/workspace/colorrole.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacesettings.h>
 
@@ -90,9 +91,9 @@ Board3dTab::Board3dTab(GuiApplication& app, BoardEditor& editor,
           [this]() { onUiDataChanged.notify(); });
 
   // Apply theme whenever it has been modified.
-  connect(&mApp.getWorkspace().getSettings().themes,
-          &WorkspaceSettingsItem_Themes::edited, this, &Board3dTab::applyTheme);
-  applyTheme();
+  connect(&mApp.getWorkspace().getSettings().view3dColorSchemes,
+          &WorkspaceSettingsItem_ColorSchemes::edited, this,
+          &Board3dTab::applyWorkspaceSettings);
 }
 
 Board3dTab::~Board3dTab() noexcept {
@@ -133,11 +134,9 @@ ui::TabData Board3dTab::getUiData() const noexcept {
 }
 
 ui::Board3dTabData Board3dTab::getDerivedUiData() const noexcept {
-  const Theme& theme = mApp.getWorkspace().getSettings().themes.getActive();
-  const QColor bgColor =
-      theme.getColor(Theme::Color::s3dBackground).getPrimaryColor();
-  const QColor fgColor =
-      theme.getColor(Theme::Color::s3dBackground).getSecondaryColor();
+  const ColorScheme& scheme =
+      mApp.getWorkspace().getSettings().view3dColorSchemes.getActive();
+  const auto background = scheme.getColors(ColorRole::board3dBackground());
 
   const bool refreshing = mBoardEditor.isRebuildingPlanes() ||
       (mSceneBuilder && mSceneBuilder->isBusy());
@@ -147,8 +146,8 @@ ui::Board3dTabData Board3dTab::getDerivedUiData() const noexcept {
   return ui::Board3dTabData{
       mProjectEditor.getUiIndex(),  // Project index
       mBoardEditor.getUiIndex(),  // Board index
-      q2s(bgColor),  // Background color
-      q2s(fgColor),  // Foreground color
+      q2s(background.primary),  // Background color
+      q2s(background.secondary),  // Foreground color
       q2s((mView && mView->isPanning()) ? Qt::ClosedHandCursor
                                         : Qt::ArrowCursor),  // Cursor
       mAlpha.value(OpenGlObject::Type::SolderResist, 1),  // Solder resist alpha
@@ -208,7 +207,7 @@ void Board3dTab::activate() noexcept {
           &Board3dTab::sceneRebuildTimerTimeout);
   scheduleSceneRebuild();
 
-  applyTheme();
+  applyWorkspaceSettings();
   mBoardEditor.registerActiveTab(this);
   requestRepaint();
 }
@@ -319,12 +318,13 @@ void Board3dTab::sceneRebuildTimerTimeout() noexcept {
   onUiDataChanged.notify();
 }
 
-void Board3dTab::applyTheme() noexcept {
-  const Theme& theme = mApp.getWorkspace().getSettings().themes.getActive();
+void Board3dTab::applyWorkspaceSettings() noexcept {
+  const ColorScheme& scheme =
+      mApp.getWorkspace().getSettings().view3dColorSchemes.getActive();
 
   if (mView) {
-    mView->setBackgroundColor(
-        theme.getColor(Theme::Color::s3dBackground).getPrimaryColor());
+    const auto background = scheme.getColors(ColorRole::board3dBackground());
+    mView->setBackgroundColor(background.primary);
   }
 
   onDerivedUiDataChanged.notify();

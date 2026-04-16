@@ -23,7 +23,6 @@
 #include "graphicslayer.h"
 
 #include <librepcb/core/types/layer.h>
-#include <librepcb/core/workspace/theme.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -40,8 +39,7 @@ namespace editor {
 
 GraphicsLayer::GraphicsLayer(const GraphicsLayer& other) noexcept
   : onEdited(*this),
-    mName(other.mName),
-    mNameTr(other.mNameTr),
+    mRole(other.mRole),
     mDisabledMode(other.mDisabledMode),
     mColor(other.mColor),
     mColorHighlighted(other.mColorHighlighted),
@@ -50,13 +48,11 @@ GraphicsLayer::GraphicsLayer(const GraphicsLayer& other) noexcept
     mIsEnabled(other.mIsEnabled) {
 }
 
-GraphicsLayer::GraphicsLayer(const QString& name, const QString& nameTr,
-                             const QColor& color,
+GraphicsLayer::GraphicsLayer(const ColorRole& role, const QColor& color,
                              const QColor& colorHighlighted, bool visible,
                              bool enabled, DisabledMode disabledMode) noexcept
   : onEdited(*this),
-    mName(name),
-    mNameTr(nameTr),
+    mRole(role),
     mDisabledMode(disabledMode),
     mColor(color),
     mColorHighlighted(colorHighlighted),
