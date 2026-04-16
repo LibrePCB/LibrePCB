@@ -129,6 +129,74 @@ const BaseColorScheme& BaseColorScheme::schematicLibrePcbLight() noexcept {
   return instance;
 }
 
+const BaseColorScheme& BaseColorScheme::schematicLibrePcbDark() noexcept {
+  static const BaseColorScheme instance = create(  //
+      "e761ed45-b99d-4309-aa07-04bba9a80443",  // UUID
+      "LibrePCB Dark",  // Name
+      {
+          // Primary     Secondary   Role
+          {"#ff161616", "#ff474747", &ColorRole::schematicBackground()},
+          {"#78000000", "#ffffff00", &ColorRole::schematicOverlays()},
+          {"#82000000", "#ffffff00", &ColorRole::schematicInfoBox()},
+          {"#ff78aaff", "#5096c8ff", &ColorRole::schematicSelection()},
+          {"#54ffffff", "#9fffffff", &ColorRole::schematicReferences()},
+          {"#ff9e0000", "#ffff0000", &ColorRole::schematicFrames()},
+          {"#ff009a00", "#ff00ff00", &ColorRole::schematicWires()},
+          {"#ff009a00", "#ff00ff00", &ColorRole::schematicNetLabels()},
+          {"#ff0068ba", "#ff59b5ff", &ColorRole::schematicBuses()},
+          {"#ff0068ba", "#ff59b5ff", &ColorRole::schematicBusLabels()},
+          {"#ff5b5b5b", "#ffbababa", &ColorRole::schematicImageBorders()},
+          {"#ffc0bfbc", "#ffffffff", &ColorRole::schematicDocumentation()},
+          {"#ffb67700", "#ffffdb4b", &ColorRole::schematicComments()},
+          {"#ffc0c000", "#ffffff00", &ColorRole::schematicGuide()},
+          {"#ff9e0000", "#ffff0000", &ColorRole::schematicOutlines()},
+          {"#ff393939", "#ff535353", &ColorRole::schematicGrabAreas()},
+          {"#28ffffff", "#39ffffff", &ColorRole::schematicHiddenGrabAreas()},
+          {"#ffdeddda", "#ffffffff", &ColorRole::schematicNames()},
+          {"#ffc0c0c0", "#ffffffff", &ColorRole::schematicValues()},
+          {"#ff009a00", "#ff00ff00", &ColorRole::schematicOptionalPins()},
+          {"#ff9e0000", "#ffff0000", &ColorRole::schematicRequiredPins()},
+          {"#ff9e0000", "#ffff0000", &ColorRole::schematicPinLines()},
+          {"#ffe3e3e3", "#ffffffff", &ColorRole::schematicPinNames()},
+          {"#ff9e0000", "#ffff0000", &ColorRole::schematicPinNumbers()},
+      });
+  return instance;
+}
+
+const BaseColorScheme& BaseColorScheme::schematicSolarizedDark() noexcept {
+  static const BaseColorScheme instance = create(  //
+      "63bb162f-032d-4aeb-bef9-9546d8e15eaa",  // UUID
+      "Solarized Dark",  // Name
+      {
+          // Primary     Secondary   Role
+          {"#ff002b36", "#ff5b5b5b", &ColorRole::schematicBackground()},
+          {"#78000000", "#ffffff00", &ColorRole::schematicOverlays()},
+          {"#82000000", "#ffffff00", &ColorRole::schematicInfoBox()},
+          {"#846c71c4", "#506c71c4", &ColorRole::schematicSelection()},
+          {"#72657b83", "#ffeee8d5", &ColorRole::schematicReferences()},
+          {"#ff839496", "#ffeee8d5", &ColorRole::schematicFrames()},
+          {"#ff859900", "#ffdeff00", &ColorRole::schematicWires()},
+          {"#ff859900", "#ffdeff00", &ColorRole::schematicNetLabels()},
+          {"#ff268bd2", "#ff00ffff", &ColorRole::schematicBuses()},
+          {"#ff268bd2", "#ff00ffff", &ColorRole::schematicBusLabels()},
+          {"#ff657b83", "#ffeee8d5", &ColorRole::schematicImageBorders()},
+          {"#ffc0bcaf", "#ffffffff", &ColorRole::schematicDocumentation()},
+          {"#ffd33682", "#ffff88c1", &ColorRole::schematicComments()},
+          {"#ff2aa198", "#ff00ffec", &ColorRole::schematicGuide()},
+          {"#ffcb4b16", "#ffff7e49", &ColorRole::schematicOutlines()},
+          {"#ff134653", "#ff3d5b65", &ColorRole::schematicGrabAreas()},
+          {"#79586e75", "#bb586e75", &ColorRole::schematicHiddenGrabAreas()},
+          {"#ff93a1a1", "#fffdf6e3", &ColorRole::schematicNames()},
+          {"#ff839496", "#fffdf6e3", &ColorRole::schematicValues()},
+          {"#ff859900", "#ff00ff00", &ColorRole::schematicOptionalPins()},
+          {"#ffdc322f", "#ffff0000", &ColorRole::schematicRequiredPins()},
+          {"#ffcb4b16", "#ffff7e49", &ColorRole::schematicPinLines()},
+          {"#ffb58900", "#fffcff69", &ColorRole::schematicPinNames()},
+          {"#ff93a1a1", "#fffdf6e3", &ColorRole::schematicPinNumbers()},
+      });
+  return instance;
+}
+
 /*******************************************************************************
  *  Board Color Schemes
  ******************************************************************************/
@@ -225,6 +293,26 @@ const BaseColorScheme& BaseColorScheme::view3dLibrePcbLight() noexcept {
       "LibrePCB Light",  // Name
       {
           {"#ffe6f2ff", "#ff000000", &ColorRole::board3dBackground()},
+      });
+  return instance;
+}
+
+const BaseColorScheme& BaseColorScheme::view3dLibrePcbDark() noexcept {
+  static const BaseColorScheme instance = create(  //
+      "a8fa456b-bb69-4b18-b708-4c727a7d6547",  // UUID
+      "LibrePCB Dark",  // Name
+      {
+          {"#ff24242d", "#ffa8a8a8", &ColorRole::board3dBackground()},
+      });
+  return instance;
+}
+
+const BaseColorScheme& BaseColorScheme::view3dSolarizedDark() noexcept {
+  static const BaseColorScheme instance = create(  //
+      "633f0db1-9353-4fa7-9a60-9a18aae3d869",  // UUID
+      "Solarized Dark",  // Name
+      {
+          {"#ff002b36", "#ff839496", &ColorRole::board3dBackground()},
       });
   return instance;
 }
