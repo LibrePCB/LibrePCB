@@ -48,6 +48,8 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <algorithm>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -604,22 +606,43 @@ void WorkspaceSettingsDialog::execColorSchemeDialog(
     mColorSchemeDialog = ui::ColorSchemeDialog::create();
   }
 
+  auto applyChanges = [scheme, self = QPointer(this)]() {
+    if (self && self->mColorSchemeDialog) {
+      const QString s = s2q((*self->mColorSchemeDialog)->get_name()).trimmed();
+      if (!s.isEmpty()) {
+        scheme->setName(s);
+      }
+      self->updateColorSchemes();
+      (*self->mColorSchemeDialog)->hide();
+    }
+    return slint::CloseRequestResponse::HideWindow;
+  };
+
   auto& win = *mColorSchemeDialog;
   win->global<ui::Data>().set_theme(l2s(mTheme));
   win->set_name(q2s(scheme->getName()));
   win->set_model(std::make_shared<ColorSchemeModel>(scheme));
   win->set_current_index(0);
   win->set_current_secondary(false);
-  win->on_name_edited([scheme](const slint::SharedString& s) {
-    const QString name = s2q(s).trimmed();
-    if (!name.isEmpty()) {
-      scheme->setName(name);
+  win->on_copy_to_clipboard([scheme]() {
+    QStringList lines;
+    for (const auto& base : scheme->getBase().getAllColors()) {
+      const auto colors = scheme->getColors(*base.role);
+      lines.append(QString("\"%1\", \"%2\", %3")
+                       .arg(colors.primary.name(QColor::HexArgb))
+                       .arg(colors.secondary.name(QColor::HexArgb))
+                       .arg(base.role->getId()));
     }
+    const qsizetype maxLen =
+        std::ranges::max(lines, {}, &QString::length).length();
+    for (QString& line : lines) {
+      line.append(QString(" ").repeated(maxLen - line.length()));
+    }
+    QApplication::clipboard()->setText(lines.join("\n"));
+    return true;
   });
-  win->window().on_close_requested([thisPtr = QPointer(this)]() {
-    if (thisPtr) thisPtr->updateColorSchemes();
-    return slint::CloseRequestResponse::HideWindow;
-  });
+  win->on_close_requested(applyChanges);  // Closed with "Close" button
+  win->window().on_close_requested(applyChanges);  // Closed with "X" button
 
   QWidget* widget =
       static_cast<QWidget*>(slint::cbindgen_private::slint_qt_get_widget(

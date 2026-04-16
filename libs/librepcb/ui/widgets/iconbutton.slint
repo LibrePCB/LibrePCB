@@ -177,6 +177,11 @@ export component ControlIconButton inherits IconButton {
 export component CopyToClipboardIconButton inherits IconButton {
     in property <string> text-to-copy;
 
+    callback copy-to-clipboard(text: string) -> bool;
+    copy-to-clipboard(text) => {
+        Backend.copy-to-clipboard(text)
+    }
+
     icon: {
         if timer.running {
             @image-url("../../../font-awesome/svgs/solid/check.svg")
@@ -200,7 +205,7 @@ export component CopyToClipboardIconButton inherits IconButton {
     }
 
     clicked => {
-        if Backend.copy-to-clipboard(text-to-copy) {
+        if copy-to-clipboard(text-to-copy) {
             timer.running = true;
         }
     }

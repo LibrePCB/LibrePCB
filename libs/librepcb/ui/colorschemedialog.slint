@@ -8,6 +8,7 @@ import "../../../share/librepcb/fonts/NotoSansMono-Regular.ttf";
 
 import {
     Button,
+    CopyToClipboardIconButton,
     IconButton,
     LineEdit,
     ListScrollView,
@@ -233,7 +234,7 @@ export component ColorSchemeDialog inherits Window {
     preferred-height: 500px;
     forward-focus: name-edt;
 
-    in property <string> name: "Foo Bar";
+    in-out property <string> name: "Foo Bar";
     in-out property <[ColorSchemeItemData]> model: [
         {
             name: "Color 1",
@@ -263,7 +264,8 @@ export component ColorSchemeDialog inherits Window {
     property <color> current-color: hsv(current-data.hue * 360, current-data.saturation, current-data.value, current-data.alpha);
     property <length> item-height: 24px;
 
-    callback name-edited(name: string);
+    callback copy-to-clipboard() -> bool;
+    callback close-requested();
 
     public function focus-name-edt() {
         name-edt.focus();
@@ -319,12 +321,12 @@ export component ColorSchemeDialog inherits Window {
                 accessible-description: name-txt.text;
 
                 text-edited(s) => {
-                    name-edited(s)
+                    name = s;
                 }
 
                 key-pressed(event) => {
                     if event.text == Key.Return {
-                        root.hide();
+                        close-requested();
                         return accept;
                     }
                     reject
@@ -636,11 +638,27 @@ export component ColorSchemeDialog inherits Window {
             }
         }
 
-        Button {
-            text: @tr("Close");
+        HorizontalLayout {
+            spacing: 5px;
 
-            clicked => {
-                root.hide();
+            Button {
+                text: @tr("Close");
+
+                clicked => {
+                    close-requested();
+                }
+            }
+
+            CopyToClipboardIconButton {
+                border-color: Data.theme.control-border;
+                border-width: 1px;
+                tooltip: @tr("Copy all Colors Into Clipboard");
+                tooltip-position: left;
+                tooltip-delayed: true;
+
+                copy-to-clipboard(text) => {
+                    copy-to-clipboard();
+                }
             }
         }
     }
