@@ -89,12 +89,16 @@ public:
 
   // Schematic Color Schemes
   static const BaseColorScheme& schematicLibrePcbLight() noexcept;
+  static const BaseColorScheme& schematicLibrePcbDark() noexcept;
+  static const BaseColorScheme& schematicSolarizedDark() noexcept;
 
   // Board Color Schemes
   static const BaseColorScheme& boardLibrePcbDark() noexcept;
 
   // 3D View Color Schemes
   static const BaseColorScheme& view3dLibrePcbLight() noexcept;
+  static const BaseColorScheme& view3dLibrePcbDark() noexcept;
+  static const BaseColorScheme& view3dSolarizedDark() noexcept;
 
 private:  // Methods
   BaseColorScheme(const Uuid& uuid, const QString& name,
