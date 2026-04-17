@@ -71,8 +71,9 @@ SI_BusLine* CmdSchematicBusSegmentAddElements::addLine(SI_BusLine& line) {
 
 SI_BusLine* CmdSchematicBusSegmentAddElements::addLine(SI_BusJunction& a,
                                                        SI_BusJunction& b) {
-  SI_BusLine* netline = new SI_BusLine(mSegment, Uuid::createRandom(), a, b,
-                                       UnsignedLength(400000));  // can throw
+  SI_BusLine* netline =
+      new SI_BusLine(mSegment, Uuid::createRandom(), a, b,
+                     SI_BusLine::getDefaultWidth());  // can throw
   return addLine(*netline);
 }
 

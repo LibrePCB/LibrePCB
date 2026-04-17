@@ -51,6 +51,7 @@ class Technology;
 namespace librepcb {
 
 class Board;
+class Bus;
 class Component;
 class Device;
 class FilePath;
@@ -119,11 +120,11 @@ private:  // Methods
       const QString& devSetName, const QString& devName,
       const QString& pkgLibName, const QString& pkgLibUrn);
   NetSignal& importNet(Project& project, const parseagle::Net& net);
+  Bus& importBus(Project& project, const QString& eagleBusName);
   void importLibraries(const QList<parseagle::Library>& libs, bool isBoard);
   void importSchematic(Project& project, EagleLibraryConverter& converter,
                        const parseagle::Sheet& sheet);
   void importBoard(Project& project, EagleLibraryConverter& converter);
-  bool hasBuses(const parseagle::Schematic& schematic) const noexcept;
   std::optional<BoundedUnsignedRatio> tryGetDrcRatio(const QString& nr,
                                                      const QString& nmin,
                                                      const QString& nmax) const;
@@ -184,6 +185,9 @@ private:  // Data
 
   /// Key=eagleNetName, Value=netSignalUuid
   QHash<QString, Uuid> mNetSignalMap;
+
+  /// Key=eagleBusName, Value=busUuid
+  QHash<QString, Uuid> mBusMap;
 };
 
 /*******************************************************************************

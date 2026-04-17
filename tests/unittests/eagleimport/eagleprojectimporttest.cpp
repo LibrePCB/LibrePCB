@@ -24,6 +24,7 @@
 #include <librepcb/core/fileio/filepath.h>
 #include <librepcb/core/fileio/transactionaldirectory.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
+#include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectloader.h>
 #include <librepcb/eagleimport/eagleprojectimport.h>
@@ -76,8 +77,7 @@ TEST_F(EagleProjectImportTest, testImportOnlySchematic) {
   const QStringList msgs = import.open(getSch("testproject.sch"), FilePath());
   EXPECT_TRUE(import.isReady());
   EXPECT_EQ("testproject", import.getProjectName().toStdString());
-  EXPECT_EQ("Project contains buses which are not supported yet!",
-            msgs.join(";").toStdString());
+  EXPECT_EQ("", msgs.join(";").toStdString());
 
   {
     // Populate and save project.
@@ -94,6 +94,7 @@ TEST_F(EagleProjectImportTest, testImportOnlySchematic) {
     std::unique_ptr<Project> project = loader.open(getProjectDir(), "test.lpp");
     EXPECT_EQ(1, project->getSchematics().count());
     EXPECT_EQ(0, project->getBoards().count());
+    EXPECT_EQ(4, project->getCircuit().getBuses().count());
   }
 }
 
@@ -105,8 +106,7 @@ TEST_F(EagleProjectImportTest, testImportWithBoard) {
       import.open(getSch("testproject.sch"), getBrd("testproject.brd"));
   EXPECT_TRUE(import.isReady());
   EXPECT_EQ("testproject", import.getProjectName().toStdString());
-  EXPECT_EQ("Project contains buses which are not supported yet!",
-            msgs.join(";").toStdString());
+  EXPECT_EQ("", msgs.join(";").toStdString());
 
   {
     // Populate and save project.
@@ -123,6 +123,7 @@ TEST_F(EagleProjectImportTest, testImportWithBoard) {
     std::unique_ptr<Project> project = loader.open(getProjectDir(), "test.lpp");
     EXPECT_EQ(1, project->getSchematics().count());
     EXPECT_EQ(1, project->getBoards().count());
+    EXPECT_EQ(4, project->getCircuit().getBuses().count());
   }
 }
 

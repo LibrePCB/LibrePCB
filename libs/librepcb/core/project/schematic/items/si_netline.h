@@ -100,6 +100,11 @@ public:
   void removeFromSchematic() override;
   void updatePositions() noexcept;
 
+  // Static Methods
+  static UnsignedLength getDefaultWidth() noexcept {
+    return UnsignedLength(158750);
+  }
+
   // Operator Overloadings
   SI_NetLine& operator=(const SI_NetLine& rhs) = delete;
 
