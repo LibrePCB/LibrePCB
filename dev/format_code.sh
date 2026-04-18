@@ -246,6 +246,19 @@ else
   echo "  container by using the '--docker' argument."
 fi
 
+# Fix file modes: remove the executable bit from files that shouldn't be
+# executable (must stay in sync with the corresponding check in
+# ci/stylecheck.sh).
+echo "Fixing file modes..."
+for file in $(search_files ":/" ":!*.sh" ":!*.py" ":!/dist/appimage/AppRun"); do
+  if [ -x "$file" ]; then
+    if [ "$CHECK" == "" ]; then
+      chmod -x "$file"
+    fi
+    file_modified "$file"
+  fi
+done
+
 echo "Finished: $COUNTER files modified."
 
 # Nonzero exit code.

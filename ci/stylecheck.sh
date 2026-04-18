@@ -3,6 +3,11 @@
 # set shell settings (see https://sipb.mit.edu/doc/safe-shell/)
 set -euv -o pipefail
 
+# check that only *.sh, *.py and a few specific files have the executable bit
+# set - any other committed file with mode 100755 is considered a mistake
+(git ls-files --stage | awk '$1 == "100755" { print $4 }' | \
+  grep -vE '\.(sh|py)$|^dist/appimage/AppRun$') && exit 1
+
 # check if all files have Unix line endings (except 3rd-party libs)
 (git grep -Il $'\r' -- ':/' ':!/libs/polyclipping/') && exit 1
 
