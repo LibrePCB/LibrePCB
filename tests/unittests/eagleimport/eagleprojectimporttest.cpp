@@ -20,13 +20,17 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../testhelpers.h"
+
 #include <gtest/gtest.h>
 #include <librepcb/core/fileio/filepath.h>
+#include <librepcb/core/fileio/fileutils.h>
 #include <librepcb/core/fileio/transactionaldirectory.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectloader.h>
+#include <librepcb/core/types/uuid.h>
 #include <librepcb/eagleimport/eagleprojectimport.h>
 
 #include <QtCore>
@@ -40,6 +44,8 @@ namespace librepcb {
 namespace eagleimport {
 namespace tests {
 
+using namespace librepcb::tests;
+
 /*******************************************************************************
  *  Test Class
  ******************************************************************************/
@@ -52,11 +58,7 @@ protected:
 
   ~EagleProjectImportTest() { QDir(mTmpDir.toStr()).removeRecursively(); }
 
-  FilePath getSch(const QString& fp) const noexcept {
-    return FilePath(TEST_DATA_DIR "/unittests/eagleimport/" % fp);
-  }
-
-  FilePath getBrd(const QString& fp) const noexcept {
+  FilePath getPathTo(const QString& fp) const noexcept {
     return FilePath(TEST_DATA_DIR "/unittests/eagleimport/" % fp);
   }
 
@@ -74,7 +76,8 @@ TEST_F(EagleProjectImportTest, testImportOnlySchematic) {
   EagleProjectImport import;
   EXPECT_FALSE(import.isReady());
 
-  const QStringList msgs = import.open(getSch("testproject.sch"), FilePath());
+  const QStringList msgs =
+      import.open(getPathTo("testproject/testproject.sch"), FilePath());
   EXPECT_TRUE(import.isReady());
   EXPECT_EQ("testproject", import.getProjectName().toStdString());
   EXPECT_EQ("", msgs.join(";").toStdString());
@@ -99,19 +102,28 @@ TEST_F(EagleProjectImportTest, testImportOnlySchematic) {
 }
 
 TEST_F(EagleProjectImportTest, testImportWithBoard) {
-  EagleProjectImport import;
+  auto uuidFactory = TestHelpers::createDeterministicUuidFactory();
+  EagleProjectImport import(uuidFactory,
+                            TestHelpers::createDeterministicDateTime());
   EXPECT_FALSE(import.isReady());
 
   const QStringList msgs =
-      import.open(getSch("testproject.sch"), getBrd("testproject.brd"));
+      import.open(getPathTo("testproject/testproject.sch"),
+                  getPathTo("testproject/testproject.brd"));
   EXPECT_TRUE(import.isReady());
   EXPECT_EQ("testproject", import.getProjectName().toStdString());
   EXPECT_EQ("", msgs.join(";").toStdString());
 
+  const FilePath outFp = getPathTo("testproject/actual");
+  FileUtils::removeDirRecursively(outFp);
+
   {
     // Populate and save project.
+    std::unique_ptr<TransactionalDirectory> dir(
+        new TransactionalDirectory(TransactionalFileSystem::openRW(outFp)));
     std::unique_ptr<Project> project =
-        Project::create(getProjectDir(), "test.lpp");
+        Project::create(std::move(dir), "test.lpp", uuidFactory);
+    project->setCreated(TestHelpers::createDeterministicDateTime());
     import.import(*project);
     project->save();
     project->getDirectory().getFileSystem()->save();
@@ -119,12 +131,17 @@ TEST_F(EagleProjectImportTest, testImportWithBoard) {
 
   {
     // Open project again to see if there's no problem with it.
+    std::unique_ptr<TransactionalDirectory> dir(
+        new TransactionalDirectory(TransactionalFileSystem::openRO(outFp)));
     ProjectLoader loader;
-    std::unique_ptr<Project> project = loader.open(getProjectDir(), "test.lpp");
+    std::unique_ptr<Project> project = loader.open(std::move(dir), "test.lpp");
     EXPECT_EQ(1, project->getSchematics().count());
     EXPECT_EQ(1, project->getBoards().count());
     EXPECT_EQ(4, project->getCircuit().getBuses().count());
   }
+
+  // Compare exported project with golden sample.
+  TestHelpers::compareDirectories(outFp, getPathTo("testproject/expected"));
 }
 
 // This project has strange embedded libraries which shall be tested.
@@ -132,8 +149,9 @@ TEST_F(EagleProjectImportTest, testArduinoMicro) {
   EagleProjectImport import;
   EXPECT_FALSE(import.isReady());
 
-  const QStringList msgs = import.open(getSch("arduino-micro/Micro_Rev1j.sch"),
-                                       getBrd("arduino-micro/Micro_Rev1j.brd"));
+  const QStringList msgs =
+      import.open(getPathTo("arduino-micro/Micro_Rev1j.sch"),
+                  getPathTo("arduino-micro/Micro_Rev1j.brd"));
   EXPECT_TRUE(import.isReady());
   EXPECT_EQ("Micro_Rev1j", import.getProjectName().toStdString());
   EXPECT_EQ("", msgs.join(";").toStdString());
@@ -160,8 +178,8 @@ TEST_F(EagleProjectImportTest, testNodino) {
   EagleProjectImport import;
   EXPECT_FALSE(import.isReady());
 
-  const QStringList msgs = import.open(getSch("nodino-rc7/Nodino-RC7.sch"),
-                                       getBrd("nodino-rc7/Nodino-RC7.brd"));
+  const QStringList msgs = import.open(getPathTo("nodino-rc7/Nodino-RC7.sch"),
+                                       getPathTo("nodino-rc7/Nodino-RC7.brd"));
   EXPECT_TRUE(import.isReady());
   EXPECT_EQ("Nodino-RC7", import.getProjectName().toStdString());
   EXPECT_EQ("", msgs.join(";").toStdString());
