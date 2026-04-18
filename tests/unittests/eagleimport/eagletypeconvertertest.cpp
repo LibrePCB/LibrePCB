@@ -50,9 +50,7 @@ namespace tests {
 class EagleTypeConverterTest : public ::testing::Test {
 protected:
   static parseagle::DomElement dom(const QString& str) {
-    QDomDocument doc;
-    doc.setContent(str);
-    return parseagle::DomElement(doc.documentElement());
+    return parseagle::DomElement::parse(str);
   }
 };
 
