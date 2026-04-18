@@ -83,6 +83,11 @@ public:
   void removeFromSchematic() override;
   void updatePositions() noexcept;
 
+  // Static Methods
+  static UnsignedLength getDefaultWidth() noexcept {
+    return UnsignedLength(400000);
+  }
+
   // Operator Overloadings
   SI_BusLine& operator=(const SI_BusLine& rhs) = delete;
 

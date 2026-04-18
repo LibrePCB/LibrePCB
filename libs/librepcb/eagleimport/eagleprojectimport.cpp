@@ -47,12 +47,17 @@
 #include <librepcb/core/project/board/items/bi_stroketext.h>
 #include <librepcb/core/project/board/items/bi_via.h>
 #include <librepcb/core/project/board/items/bi_zone.h>
+#include <librepcb/core/project/circuit/bus.h>
 #include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/circuit/componentinstance.h>
 #include <librepcb/core/project/circuit/componentsignalinstance.h>
 #include <librepcb/core/project/circuit/netsignal.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectlibrary.h>
+#include <librepcb/core/project/schematic/items/si_busjunction.h>
+#include <librepcb/core/project/schematic/items/si_buslabel.h>
+#include <librepcb/core/project/schematic/items/si_busline.h>
+#include <librepcb/core/project/schematic/items/si_bussegment.h>
 #include <librepcb/core/project/schematic/items/si_netlabel.h>
 #include <librepcb/core/project/schematic/items/si_netline.h>
 #include <librepcb/core/project/schematic/items/si_netpoint.h>
@@ -63,6 +68,7 @@
 #include <librepcb/core/project/schematic/schematic.h>
 #include <librepcb/core/project/schematic/schematicnetsegmentsplitter.h>
 #include <librepcb/core/utils/messagelogger.h>
+#include <librepcb/core/utils/toolbox.h>
 #include <librepcb/core/utils/transform.h>
 #include <parseagle/board/board.h>
 #include <parseagle/schematic/schematic.h>
@@ -102,6 +108,7 @@ int EagleProjectImport::getSheetCount() const noexcept {
 
 void EagleProjectImport::reset() noexcept {
   mNetSignalMap.clear();
+  mBusMap.clear();
   mSchematicDirNames.clear();
   mComponentMap.clear();
   mLibDeviceMap.clear();
@@ -133,10 +140,6 @@ QStringList EagleProjectImport::open(const FilePath& sch, const FilePath& brd) {
     if (!schematic->getModules().isEmpty()) {
       warnings.append(
           tr("Project contains modules which are not supported yet!"));
-    }
-    if (hasBuses(*schematic)) {
-      warnings.append(
-          tr("Project contains buses which are not supported yet!"));
     }
     if (brd.isValid()) {
       board.reset(new parseagle::Board(brd.toStr(), &warnings));
@@ -529,6 +532,106 @@ void EagleProjectImport::importSchematic(Project& project,
     }
   }
 
+  // Collect net wire endpoints up-front so that buses can insert junctions at
+  // those positions. In EAGLE, netlines touching a bus are implicitly
+  // connected, but in LibrePCB we explicitly connect wires to buses.
+  QSet<Point> netWireEndpoints;
+  for (const parseagle::Net& eagleNet : sheet.getNets()) {
+    for (const parseagle::Segment& eagleSegment : eagleNet.getSegments()) {
+      for (const parseagle::Wire& eagleWire : eagleSegment.getWires()) {
+        if (eagleWire.getP1() == eagleWire.getP2()) continue;
+        netWireEndpoints.insert(C::convertPoint(eagleWire.getP1()));
+        netWireEndpoints.insert(C::convertPoint(eagleWire.getP2()));
+      }
+    }
+  }
+
+  // Buses (imported before nets so netlines can anchor on bus junctions).
+  for (const parseagle::Bus& eagleBus : sheet.getBuses()) {
+    try {
+      Bus& bus = importBus(project, eagleBus.getName());
+      for (const parseagle::Segment& eagleSeg : eagleBus.getSegments()) {
+        std::unique_ptr<SI_BusSegment> busSegment(
+            new SI_BusSegment(*schematic, Uuid::createRandom(), bus));
+
+        QHash<Point, SI_BusJunction*> junctionMap;
+        auto getOrCreateJunction = [&](const Point& pos) {
+          auto it = junctionMap.find(pos);
+          if (it == junctionMap.end()) {
+            SI_BusJunction* j =
+                new SI_BusJunction(*busSegment, Uuid::createRandom(), pos);
+            it = junctionMap.insert(pos, j);
+          }
+          return *it;
+        };
+
+        QList<SI_BusLine*> lines;
+        for (const parseagle::Wire& wire : eagleSeg.getWires()) {
+          const Point p1 = C::convertPoint(wire.getP1());
+          const Point p2 = C::convertPoint(wire.getP2());
+          if (p1 == p2) continue;
+
+          if (wire.getWireStyle() != parseagle::WireStyle::Continuous) {
+            log.warning(
+                tr("Dashed/dotted line is not supported, converting to "
+                   "continuous."));
+          }
+
+          // Find intermediate junction positions that lie strictly between
+          // p1 and p2 (e.g. where netlines touch the bus). The wire needs
+          // to be split into multiple bus lines so each intermediate point
+          // becomes an actual bus junction which netlines can anchor on.
+          QList<Point> intermediates;
+          for (const Point& p : netWireEndpoints) {
+            if (p == p1 || p == p2) continue;
+            if (Toolbox::shortestDistanceBetweenPointAndLine(p, p1, p2) <
+                UnsignedLength(1000)) {
+              intermediates.append(p);
+            }
+          }
+          std::sort(intermediates.begin(), intermediates.end(),
+                    [&p1](const Point& a, const Point& b) {
+                      return *((a - p1).getLength()) < *((b - p1).getLength());
+                    });
+
+          QList<Point> pathPoints;
+          pathPoints.append(p1);
+          pathPoints.append(intermediates);
+          pathPoints.append(p2);
+          for (int i = 0; i < pathPoints.count() - 1; ++i) {
+            SI_BusJunction* a = getOrCreateJunction(pathPoints.at(i));
+            SI_BusJunction* b = getOrCreateJunction(pathPoints.at(i + 1));
+            lines.append(new SI_BusLine(*busSegment, Uuid::createRandom(), *a,
+                                        *b, SI_BusLine::getDefaultWidth()));
+          }
+        }
+
+        if (lines.isEmpty()) {
+          log.warning(QString("Skipped segment of bus '%1' since it doesn't "
+                              "contain any lines.")
+                          .arg(eagleBus.getName()));
+          continue;
+        }
+
+        for (const parseagle::Label& eagleLabel : eagleSeg.getLabels()) {
+          const Angle rot =
+              C::convertAngle(eagleLabel.getRotation().getAngle());
+          const bool mirror = eagleLabel.getRotation().getMirror();
+          const Point pos = C::convertPoint(eagleLabel.getPosition());
+          SI_BusLabel* busLabel = new SI_BusLabel(
+              *busSegment,
+              NetLabel(Uuid::createRandom(), pos, mirror ? -rot : rot, mirror));
+          busSegment->addLabel(*busLabel);
+        }
+        busSegment->addJunctionsAndLines(junctionMap.values(), lines);
+        schematic->addBusSegment(*busSegment.release());
+      }
+    } catch (const Exception& e) {
+      log.critical(QString("Failed to import segment of bus '%1': %2")
+                       .arg(eagleBus.getName(), e.getMsg()));
+    }
+  }
+
   // Nets
   foreach (const parseagle::Net& eagleNet, sheet.getNets()) {
     NetSignal& netSignal = importNet(project, eagleNet);
@@ -536,6 +639,7 @@ void EagleProjectImport::importSchematic(Project& project,
       SchematicNetSegmentSplitter splitter;
       QMap<std::pair<Uuid, Uuid>, SI_SymbolPin*> pinMap;
       QHash<Uuid, SI_NetPoint*> netPointMap;
+      QMap<std::pair<Uuid, Uuid>, SI_BusJunction*> busJunctionMap;
       QHash<Point, NetLineAnchor> anchorMap;
 
       // Collect pin refs.
@@ -580,10 +684,25 @@ void EagleProjectImport::importSchematic(Project& project,
           if (it != anchorMap.end()) {
             // There's another pin on the same position -> add a netline to
             // connect them since EAGLE implicitly consider them as connected.
-            splitter.addNetLine(NetLine(
-                Uuid::createRandom(), UnsignedLength(158750), *it, pinAnchor));
+            splitter.addNetLine(NetLine(Uuid::createRandom(),
+                                        SI_NetLine::getDefaultWidth(), *it,
+                                        pinAnchor));
           }
           anchorMap.insert(symbolPin->getPosition(), pinAnchor);
+        }
+
+        // Collect bus anchors.
+        for (SI_BusSegment* s : schematic->getBusSegments()) {
+          for (SI_BusJunction* j : s->getJunctions()) {
+            if (!anchorMap.contains(j->getPosition())) {
+              busJunctionMap.insert(std::make_pair(s->getUuid(), j->getUuid()),
+                                    j);
+              const NetLineAnchor anchor =
+                  NetLineAnchor::busJunction(s->getUuid(), j->getUuid());
+              splitter.addFixedAnchor(anchor, j->getPosition());
+              anchorMap.insert(j->getPosition(), anchor);
+            }
+          }
         }
 
         // Convert wires.
@@ -603,7 +722,7 @@ void EagleProjectImport::importSchematic(Project& project,
             continue;
           }
           splitter.addNetLine(
-              NetLine(Uuid::createRandom(), UnsignedLength(158750),
+              NetLine(Uuid::createRandom(), SI_NetLine::getDefaultWidth(),
                       getOrCreateAnchor(C::convertPoint(eagleWire.getP1())),
                       getOrCreateAnchor(C::convertPoint(eagleWire.getP2()))));
           if (eagleWire.getWireStyle() != parseagle::WireStyle::Continuous) {
@@ -634,15 +753,20 @@ void EagleProjectImport::importSchematic(Project& project,
       }
 
       // Determine segments and add them to the schematic.
-      auto getAnchor = [&pinMap, &netPointMap](const NetLineAnchor& anchor) {
+      auto getAnchor = [&pinMap, &netPointMap,
+                        &busJunctionMap](const NetLineAnchor& anchor) {
         if (auto pin = anchor.tryGetPin()) {
-          auto pinPtr = pinMap.value(std::make_pair(pin->symbol, pin->pin));
-          if (pinPtr) {
-            return static_cast<SI_NetLineAnchor*>(pinPtr);
+          if (auto ptr = pinMap.value(std::make_pair(pin->symbol, pin->pin))) {
+            return static_cast<SI_NetLineAnchor*>(ptr);
           }
         } else if (auto junction = anchor.tryGetJunction()) {
           if (auto netPoint = netPointMap.value(*junction)) {
             return static_cast<SI_NetLineAnchor*>(netPoint);
+          }
+        } else if (auto bj = anchor.tryGetBusJunction()) {
+          if (auto ptr = busJunctionMap.value(
+                  std::make_pair(bj->segment, bj->junction))) {
+            return static_cast<SI_NetLineAnchor*>(ptr);
           }
         }
         throw LogicError(__FILE__, __LINE__, "Unknown net line anchor.");
@@ -676,12 +800,6 @@ void EagleProjectImport::importSchematic(Project& project,
                        .arg(eagleNet.getName(), e.getMsg()));
     }
   }
-
-  // Warn about unsupported objects.
-  if (!sheet.getBuses().isEmpty()) {
-    log.critical(tr("Skipped %n bus(es) because they are not supported yet!",
-                    nullptr, sheet.getBuses().count()));
-  }
 }
 
 NetSignal& EagleProjectImport::importNet(Project& project,
@@ -709,6 +827,29 @@ NetSignal& EagleProjectImport::importNet(Project& project,
   NetSignal* netSignal = project.getCircuit().getNetSignals().value(*it);
   Q_ASSERT(netSignal);
   return *netSignal;
+}
+
+Bus& EagleProjectImport::importBus(Project& project,
+                                   const QString& eagleBusName) {
+  auto it = mBusMap.find(eagleBusName);
+  if (it == mBusMap.end()) {
+    const Uuid uuid = Uuid::createRandom();
+    // Eagle bus names use format "ALIAS" or "ALIAS:net1,net2" or
+    // "ALIAS:net[i..j]" where "ALIAS:" is optional. If present, use it as name.
+    QString name = cleanBusName(eagleBusName.split(":").first());
+    if (name.isEmpty()) {
+      name = uuid.toStr().left(8);
+    } else if (project.getCircuit().getBusByName(name)) {
+      name = name.left(20) % "_" % uuid.toStr().left(8);
+    }
+    Bus* bus = new Bus(project.getCircuit(), uuid, BusName(name), true, false,
+                       std::nullopt);
+    project.getCircuit().addBus(*bus);
+    it = mBusMap.insert(eagleBusName, uuid);
+  }
+  Bus* bus = project.getCircuit().getBuses().value(*it);
+  Q_ASSERT(bus);
+  return *bus;
 }
 
 void EagleProjectImport::importBoard(Project& project,
@@ -1278,15 +1419,6 @@ void EagleProjectImport::importBoard(Project& project,
       }
     }
   }
-}
-
-bool EagleProjectImport::hasBuses(
-    const parseagle::Schematic& schematic) const noexcept {
-  int buses = 0;
-  foreach (const parseagle::Sheet& sheet, schematic.getSheets()) {
-    buses += sheet.getBuses().count();
-  }
-  return buses > 0;
 }
 
 std::optional<BoundedUnsignedRatio> EagleProjectImport::tryGetDrcRatio(
