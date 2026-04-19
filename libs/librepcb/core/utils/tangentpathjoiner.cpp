@@ -130,16 +130,13 @@ QVector<Path> TangentPathJoiner::join(QVector<Path> paths, qint64 timeoutMs,
               }
               // Prio 2: Long open paths or closed paths with a large area,
               // to get the outest most polygons instead of polygons inside
-              // e.g. a symbol body. Use combined absolute+relative tolerance
-              // to avoid sub-ULP floating-point differences (accumulation
-              // order, FMA) from producing platform-dependent orderings. The
-              // absolute floor (1e-6) prevents degenerate near-zero values
-              // (e.g. collinear vertices) from comparing unequal across
-              // platforms.
+              // e.g. a symbol body. Use a relative tolerance to avoid sub-ULP
+              // floating-point differences (accumulation order, FMA) from
+              // producing platform-dependent orderings for geometrically
+              // equivalent candidates, independent of the input magnitude.
               const double l1 = r1.calcLengthOrArea(paths);
               const double l2 = r2.calcLengthOrArea(paths);
-              const double maxL = std::max(l1, l2);
-              if ((maxL > 1e-6) && (std::abs(l1 - l2) > (maxL * 1e-12))) {
+              if (std::abs(l1 - l2) > (std::max(l1, l2) * 1e-12)) {
                 return l1 > l2;
               }
               // Prio 3: Paths consisting of many joints
