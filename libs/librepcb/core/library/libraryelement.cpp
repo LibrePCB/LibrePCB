@@ -39,11 +39,12 @@ namespace librepcb {
 LibraryElement::LibraryElement(const QString& shortElementName,
                                const QString& longElementName, const Uuid& uuid,
                                const Version& version, const QString& author,
+                               const QDateTime& created,
                                const ElementName& name_en_US,
                                const QString& description_en_US,
                                const QString& keywords_en_US)
   : LibraryBaseElement(shortElementName, longElementName, uuid, version, author,
-                       name_en_US, description_en_US, keywords_en_US),
+                       created, name_en_US, description_en_US, keywords_en_US),
     mGeneratedBy() {
 }
 

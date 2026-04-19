@@ -57,9 +57,9 @@ protected:
     mLibFs = TransactionalFileSystem::openRW(mLibDir);
 
     // create symbol inside project library
-    mExistingSymbol.reset(new Symbol(Uuid::createRandom(),
-                                     Version::fromString("1"), "",
-                                     ElementName("Existing Symbol"), "", ""));
+    mExistingSymbol.reset(new Symbol(
+        Uuid::createRandom(), Version::fromString("1"), "",
+        QDateTime::currentDateTime(), ElementName("Existing Symbol"), "", ""));
     TransactionalDirectory libSymDir(mLibFs, "sym");
     mExistingSymbol->saveIntoParentDirectory(libSymDir);
     mLibFs->save();
@@ -71,7 +71,8 @@ protected:
 
     // create symbol outside the project library (emulating workspace library)
     mNewSymbol.reset(new Symbol(Uuid::createRandom(), Version::fromString("1"),
-                                "", ElementName("New Symbol"), "", ""));
+                                "", QDateTime::currentDateTime(),
+                                ElementName("New Symbol"), "", ""));
     TransactionalDirectory tempSymDir(mTempFs);
     mNewSymbol->saveIntoParentDirectory(tempSymDir);
     mTempFs->save();

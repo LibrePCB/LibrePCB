@@ -95,6 +95,7 @@ public:
   // Constructors / Destructor
   EagleLibraryImport(const EagleLibraryImport& other) = delete;
   EagleLibraryImport(const FilePath& dstLibFp,
+                     std::function<Uuid()> createUuid = &Uuid::createRandom,
                      QObject* parent = nullptr) noexcept;
   ~EagleLibraryImport() noexcept;
 
@@ -153,6 +154,7 @@ private:  // Methods
 
 private:  // Data
   const FilePath mDestinationLibraryFp;
+  std::function<Uuid()> mCreateUuid;
   QScopedPointer<EagleLibraryConverterSettings> mSettings;
   std::shared_ptr<MessageLogger> mLogger;
 

@@ -1011,7 +1011,8 @@ void MainWindow::openComponentCategoryTab(LibraryEditor& editor,
         cat.reset(new ComponentCategory(
             Uuid::createRandom(), Version::fromString("0.1"),
             mApp.getWorkspace().getSettings().userName.get(),
-            ElementName("New Component Category"), QString(), QString()));
+            QDateTime::currentDateTime(), ElementName("New Component Category"),
+            QString(), QString()));
         if (copyFrom) {
           mode = ComponentCategoryTab::Mode::Duplicate;
           auto fs = TransactionalFileSystem::openRO(fp, &askForRestoringBackup);
@@ -1051,7 +1052,8 @@ void MainWindow::openPackageCategoryTab(LibraryEditor& editor,
         cat.reset(new PackageCategory(
             Uuid::createRandom(), Version::fromString("0.1"),
             mApp.getWorkspace().getSettings().userName.get(),
-            ElementName("New Package Category"), QString(), QString()));
+            QDateTime::currentDateTime(), ElementName("New Package Category"),
+            QString(), QString()));
         if (copyFrom) {
           mode = PackageCategoryTab::Mode::Duplicate;
           auto fs = TransactionalFileSystem::openRO(fp, &askForRestoringBackup);
@@ -1089,6 +1091,7 @@ void MainWindow::openSymbolTab(LibraryEditor& editor, const FilePath& fp,
         mode = SymbolTab::Mode::New;
         sym.reset(new Symbol(Uuid::createRandom(), Version::fromString("0.1"),
                              mApp.getWorkspace().getSettings().userName.get(),
+                             QDateTime::currentDateTime(),
                              ElementName("New Symbol"), QString(), QString()));
         if (copyFrom) {
           mode = SymbolTab::Mode::Duplicate;
@@ -1171,6 +1174,7 @@ void MainWindow::openPackageTab(LibraryEditor& editor, const FilePath& fp,
         mode = PackageTab::Mode::New;
         pkg.reset(new Package(Uuid::createRandom(), Version::fromString("0.1"),
                               mApp.getWorkspace().getSettings().userName.get(),
+                              QDateTime::currentDateTime(),
                               ElementName("New Package"), QString(), QString(),
                               Package::AssemblyType::Auto));
         if (copyFrom) {
@@ -1306,6 +1310,7 @@ void MainWindow::openComponentTab(LibraryEditor& editor, const FilePath& fp,
         cmp.reset(
             new Component(Uuid::createRandom(), Version::fromString("0.1"),
                           mApp.getWorkspace().getSettings().userName.get(),
+                          QDateTime::currentDateTime(),
                           ElementName("New Component"), QString(), QString()));
         if (copyFrom) {
           mode = ComponentTab::Mode::Duplicate;
@@ -1393,6 +1398,7 @@ void MainWindow::openDeviceTab(LibraryEditor& editor, const FilePath& fp,
         mode = DeviceTab::Mode::New;
         dev.reset(new Device(Uuid::createRandom(), Version::fromString("0.1"),
                              mApp.getWorkspace().getSettings().userName.get(),
+                             QDateTime::currentDateTime(),
                              ElementName("New Device"), QString(), QString(),
                              Uuid::createRandom(), Uuid::createRandom()));
         if (copyFrom) {
@@ -1438,7 +1444,8 @@ void MainWindow::openOrganizationTab(LibraryEditor& editor, const FilePath& fp,
         org.reset(new Organization(
             Uuid::createRandom(), Version::fromString("0.1"),
             mApp.getWorkspace().getSettings().userName.get(),
-            ElementName("New Organization"), QString(), QString()));
+            QDateTime::currentDateTime(), ElementName("New Organization"),
+            QString(), QString()));
         if (copyFrom) {
           mode = OrganizationTab::Mode::Duplicate;
           auto fs = TransactionalFileSystem::openRO(fp, &askForRestoringBackup);

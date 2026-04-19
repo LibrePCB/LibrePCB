@@ -82,14 +82,14 @@ TEST_F(TangentPathJoinerTest, testOnlyOneVertex) {
 TEST_F(TangentPathJoinerTest, testOneClosedPath) {
   QVector<Path> input = {Path(QVector<Vertex>{
       Vertex(Point(0, 0)),
-      Vertex(Point(1, 0)),
-      Vertex(Point(1, 1)),
+      Vertex(Point(1000, 0)),
+      Vertex(Point(1000, 1000)),
       Vertex(Point(0, 0)),
   })};
   QVector<Path> expected = {Path(QVector<Vertex>{
       Vertex(Point(0, 0)),
-      Vertex(Point(1, 0)),
-      Vertex(Point(1, 1)),
+      Vertex(Point(1000, 0)),
+      Vertex(Point(1000, 1000)),
       Vertex(Point(0, 0)),
   })};
   QVector<Path> output = TangentPathJoiner::join(input);
@@ -99,13 +99,13 @@ TEST_F(TangentPathJoinerTest, testOneClosedPath) {
 TEST_F(TangentPathJoinerTest, testOneOpenPath) {
   QVector<Path> input = {Path(QVector<Vertex>{
       Vertex(Point(0, 0)),
-      Vertex(Point(1, 0)),
-      Vertex(Point(1, 1)),
+      Vertex(Point(1000, 0)),
+      Vertex(Point(1000, 1000)),
   })};
   QVector<Path> expected = {Path(QVector<Vertex>{
       Vertex(Point(0, 0)),
-      Vertex(Point(1, 0)),
-      Vertex(Point(1, 1)),
+      Vertex(Point(1000, 0)),
+      Vertex(Point(1000, 1000)),
   })};
   QVector<Path> output = TangentPathJoiner::join(input);
   EXPECT_EQ(str(expected), str(output)) << debug(expected, output);
@@ -115,17 +115,17 @@ TEST_F(TangentPathJoinerTest, testTwoTangentPaths) {
   QVector<Path> input = {
       Path(QVector<Vertex>{
           Vertex(Point(0, 0), Angle::deg90()),
-          Vertex(Point(1, 0)),
+          Vertex(Point(1000, 0)),
       }),
       Path(QVector<Vertex>{
-          Vertex(Point(1, 0), Angle::deg180()),
-          Vertex(Point(1, 1)),
+          Vertex(Point(1000, 0), Angle::deg180()),
+          Vertex(Point(1000, 1000)),
       }),
   };
   QVector<Path> expected = {Path(QVector<Vertex>{
       Vertex(Point(0, 0), Angle::deg90()),
-      Vertex(Point(1, 0), Angle::deg180()),
-      Vertex(Point(1, 1)),
+      Vertex(Point(1000, 0), Angle::deg180()),
+      Vertex(Point(1000, 1000)),
   })};
   QVector<Path> output = TangentPathJoiner::join(input);
   EXPECT_EQ(str(expected), str(output)) << debug(expected, output);
@@ -134,18 +134,18 @@ TEST_F(TangentPathJoinerTest, testTwoTangentPaths) {
 TEST_F(TangentPathJoinerTest, testTwoTangentPathsFirstReversed) {
   QVector<Path> input = {
       Path(QVector<Vertex>{
-          Vertex(Point(1, 0), Angle::deg90()),
+          Vertex(Point(1000, 0), Angle::deg90()),
           Vertex(Point(0, 0)),
       }),
       Path(QVector<Vertex>{
-          Vertex(Point(1, 0), Angle::deg180()),
-          Vertex(Point(1, 1)),
+          Vertex(Point(1000, 0), Angle::deg180()),
+          Vertex(Point(1000, 1000)),
       }),
   };
   QVector<Path> expected = {Path(QVector<Vertex>{
       Vertex(Point(0, 0), -Angle::deg90()),
-      Vertex(Point(1, 0), Angle::deg180()),
-      Vertex(Point(1, 1)),
+      Vertex(Point(1000, 0), Angle::deg180()),
+      Vertex(Point(1000, 1000)),
   })};
   QVector<Path> output = TangentPathJoiner::join(input);
   EXPECT_EQ(str(expected), str(output)) << debug(expected, output);
@@ -155,17 +155,17 @@ TEST_F(TangentPathJoinerTest, testTwoTangentPathsSecondReversed) {
   QVector<Path> input = {
       Path(QVector<Vertex>{
           Vertex(Point(0, 0), Angle::deg90()),
-          Vertex(Point(1, 0)),
+          Vertex(Point(1000, 0)),
       }),
       Path(QVector<Vertex>{
-          Vertex(Point(1, 1), Angle::deg180()),
-          Vertex(Point(1, 0)),
+          Vertex(Point(1000, 1000), Angle::deg180()),
+          Vertex(Point(1000, 0)),
       }),
   };
   QVector<Path> expected = {Path(QVector<Vertex>{
       Vertex(Point(0, 0), Angle::deg90()),
-      Vertex(Point(1, 0), -Angle::deg180()),
-      Vertex(Point(1, 1)),
+      Vertex(Point(1000, 0), -Angle::deg180()),
+      Vertex(Point(1000, 1000)),
   })};
   QVector<Path> output = TangentPathJoiner::join(input);
   EXPECT_EQ(str(expected), str(output)) << debug(expected, output);
@@ -174,17 +174,17 @@ TEST_F(TangentPathJoinerTest, testTwoTangentPathsSecondReversed) {
 TEST_F(TangentPathJoinerTest, testTwoTangentPathsBothReversed) {
   QVector<Path> input = {
       Path(QVector<Vertex>{
-          Vertex(Point(1, 0), Angle::deg90()),
+          Vertex(Point(1000, 0), Angle::deg90()),
           Vertex(Point(0, 0)),
       }),
       Path(QVector<Vertex>{
-          Vertex(Point(1, 1), Angle::deg180()),
-          Vertex(Point(1, 0)),
+          Vertex(Point(1000, 1000), Angle::deg180()),
+          Vertex(Point(1000, 0)),
       }),
   };
   QVector<Path> expected = {Path(QVector<Vertex>{
-      Vertex(Point(1, 1), Angle::deg180()),
-      Vertex(Point(1, 0), Angle::deg90()),
+      Vertex(Point(1000, 1000), Angle::deg180()),
+      Vertex(Point(1000, 0), Angle::deg90()),
       Vertex(Point(0, 0)),
   })};
   QVector<Path> output = TangentPathJoiner::join(input);
@@ -195,37 +195,37 @@ TEST_F(TangentPathJoinerTest, testTwoNestedRects) {
   QVector<Path> input = {
       Path(QVector<Vertex>{
           Vertex(Point(0, 0)),
-          Vertex(Point(0, 1)),
-          Vertex(Point(1, 1)),
+          Vertex(Point(0, 1000)),
+          Vertex(Point(1000, 1000)),
       }),
       Path(QVector<Vertex>{
           Vertex(Point(0, 0)),
-          Vertex(Point(1, 0)),
+          Vertex(Point(1000, 0)),
       }),
       Path(QVector<Vertex>{
-          Vertex(Point(1, 0)),
-          Vertex(Point(1, 1)),
+          Vertex(Point(1000, 0)),
+          Vertex(Point(1000, 1000)),
       }),
       Path(QVector<Vertex>{
-          Vertex(Point(1, 0)),
-          Vertex(Point(2, 0)),
-          Vertex(Point(2, 1)),
-          Vertex(Point(1, 1)),
+          Vertex(Point(1000, 0)),
+          Vertex(Point(2000, 0)),
+          Vertex(Point(2000, 1000)),
+          Vertex(Point(1000, 1000)),
       }),
   };
   QVector<Path> expected = {
       Path(QVector<Vertex>{
-          Vertex(Point(1, 1)),
-          Vertex(Point(0, 1)),
+          Vertex(Point(1000, 1000)),
+          Vertex(Point(0, 1000)),
           Vertex(Point(0, 0)),
-          Vertex(Point(1, 0)),
-          Vertex(Point(2, 0)),
-          Vertex(Point(2, 1)),
-          Vertex(Point(1, 1)),
+          Vertex(Point(1000, 0)),
+          Vertex(Point(2000, 0)),
+          Vertex(Point(2000, 1000)),
+          Vertex(Point(1000, 1000)),
       }),
       Path(QVector<Vertex>{
-          Vertex(Point(1, 0)),
-          Vertex(Point(1, 1)),
+          Vertex(Point(1000, 0)),
+          Vertex(Point(1000, 1000)),
       }),
   };
   QVector<Path> output = TangentPathJoiner::join(input);
@@ -236,65 +236,65 @@ TEST_F(TangentPathJoinerTest, testSeveralTangentAndNonTangentPaths) {
   QVector<Path> input = {
       // Path 2, Segment 2
       Path(QVector<Vertex>{
-          Vertex(Point(1, 0)),
-          Vertex(Point(1, 1), Angle::deg90()),
-          Vertex(Point(2, 1)),
+          Vertex(Point(1000, 0)),
+          Vertex(Point(1000, 1000), Angle::deg90()),
+          Vertex(Point(2000, 1000)),
       }),
       // Path 1 (closed)
       Path(QVector<Vertex>{
           Vertex(Point(0, 0), Angle::deg90()),
-          Vertex(Point(1, 0)),
-          Vertex(Point(1, 1)),
+          Vertex(Point(1000, 0)),
+          Vertex(Point(1000, 1000)),
           Vertex(Point(0, 0)),
       }),
       // Path 3 (open)
       Path(QVector<Vertex>{
-          Vertex(Point(5, 5), Angle::deg90()),
-          Vertex(Point(6, 6)),
-          Vertex(Point(7, 7)),
+          Vertex(Point(5000, 5000), Angle::deg90()),
+          Vertex(Point(6000, 6000)),
+          Vertex(Point(7000, 7000)),
       }),
       // Path 2, Segment 1
       Path(QVector<Vertex>{
           Vertex(Point(0, 0)),
-          Vertex(Point(1, 0)),
+          Vertex(Point(1000, 0)),
       }),
       // Path 2, Segment 4 (reversed)
       Path(QVector<Vertex>{
-          Vertex(Point(4, 1)),
-          Vertex(Point(3, 1), Angle::deg90()),
-          Vertex(Point(3, 0)),
-          Vertex(Point(2, 0)),
+          Vertex(Point(4000, 1000)),
+          Vertex(Point(3000, 1000), Angle::deg90()),
+          Vertex(Point(3000, 0)),
+          Vertex(Point(2000, 0)),
       }),
       // Path 2, Segment 3
       Path(QVector<Vertex>{
-          Vertex(Point(2, 1), Angle::deg90()),
-          Vertex(Point(2, 0)),
+          Vertex(Point(2000, 1000), Angle::deg90()),
+          Vertex(Point(2000, 0)),
       }),
   };
   QVector<Path> expected = {
       // Path 1 (closed)
       Path(QVector<Vertex>{
           Vertex(Point(0, 0), Angle::deg90()),
-          Vertex(Point(1, 0)),
-          Vertex(Point(1, 1)),
+          Vertex(Point(1000, 0)),
+          Vertex(Point(1000, 1000)),
           Vertex(Point(0, 0)),
       }),
       // Path 2 (joined)
       Path(QVector<Vertex>{
           Vertex(Point(0, 0)),
-          Vertex(Point(1, 0)),
-          Vertex(Point(1, 1), Angle::deg90()),
-          Vertex(Point(2, 1), Angle::deg90()),
-          Vertex(Point(2, 0)),
-          Vertex(Point(3, 0), -Angle::deg90()),
-          Vertex(Point(3, 1)),
-          Vertex(Point(4, 1)),
+          Vertex(Point(1000, 0)),
+          Vertex(Point(1000, 1000), Angle::deg90()),
+          Vertex(Point(2000, 1000), Angle::deg90()),
+          Vertex(Point(2000, 0)),
+          Vertex(Point(3000, 0), -Angle::deg90()),
+          Vertex(Point(3000, 1000)),
+          Vertex(Point(4000, 1000)),
       }),
       // Path 3 (open)
       Path(QVector<Vertex>{
-          Vertex(Point(5, 5), Angle::deg90()),
-          Vertex(Point(6, 6)),
-          Vertex(Point(7, 7)),
+          Vertex(Point(5000, 5000), Angle::deg90()),
+          Vertex(Point(6000, 6000)),
+          Vertex(Point(7000, 7000)),
       }),
   };
   QVector<Path> output = TangentPathJoiner::join(input);
@@ -306,15 +306,15 @@ TEST_F(TangentPathJoinerTest, testManyIndependentPaths) {
   QVector<Path> input;
   for (int i = 0; i < 1000; ++i) {
     QVector<Vertex> vertices{
-        Vertex(Point(i, 0)),  Vertex(Point(i, 1), Angle::deg90()),
-        Vertex(Point(i, 2)),  Vertex(Point(i, 3)),
-        Vertex(Point(i, 4)),  Vertex(Point(i, 5)),
-        Vertex(Point(i, 6)),  Vertex(Point(i, 7)),
-        Vertex(Point(i, 8)),  Vertex(Point(i, 9)),
-        Vertex(Point(i, 10)), Vertex(Point(i, 11)),
-        Vertex(Point(i, 12)), Vertex(Point(i, 13)),
-        Vertex(Point(i, 14)), Vertex(Point(i, 15)),
-        Vertex(Point(i, 16)), Vertex(Point(i, 17)),
+        Vertex(Point(i, 0)),     Vertex(Point(i, 1), Angle::deg90()),
+        Vertex(Point(i, 2000)),  Vertex(Point(i, 3000)),
+        Vertex(Point(i, 4000)),  Vertex(Point(i, 5000)),
+        Vertex(Point(i, 6000)),  Vertex(Point(i, 7000)),
+        Vertex(Point(i, 8000)),  Vertex(Point(i, 9000)),
+        Vertex(Point(i, 10000)), Vertex(Point(i, 11000)),
+        Vertex(Point(i, 12000)), Vertex(Point(i, 13000)),
+        Vertex(Point(i, 14000)), Vertex(Point(i, 15000)),
+        Vertex(Point(i, 16000)), Vertex(Point(i, 17000)),
     };
     input.append(Path(vertices));
   }
@@ -330,14 +330,14 @@ TEST_F(TangentPathJoinerTest, testManyTangentPaths) {
   for (int i = 0; i < 1000; ++i) {
     QVector<Vertex> vertices{
         Vertex(Point(i, 0)),     Vertex(Point(i, 1), Angle::deg90()),
-        Vertex(Point(i, 2)),     Vertex(Point(i, 3)),
-        Vertex(Point(i, 4)),     Vertex(Point(i, 5)),
-        Vertex(Point(i, 6)),     Vertex(Point(i, 7)),
-        Vertex(Point(i, 8)),     Vertex(Point(i, 9)),
-        Vertex(Point(i, 10)),    Vertex(Point(i, 11)),
-        Vertex(Point(i, 12)),    Vertex(Point(i, 13)),
-        Vertex(Point(i, 14)),    Vertex(Point(i, 15)),
-        Vertex(Point(i, 16)),    Vertex(Point(i, 17)),
+        Vertex(Point(i, 2000)),  Vertex(Point(i, 3000)),
+        Vertex(Point(i, 4000)),  Vertex(Point(i, 5000)),
+        Vertex(Point(i, 6000)),  Vertex(Point(i, 7000)),
+        Vertex(Point(i, 8000)),  Vertex(Point(i, 9000)),
+        Vertex(Point(i, 10000)), Vertex(Point(i, 11000)),
+        Vertex(Point(i, 12000)), Vertex(Point(i, 13000)),
+        Vertex(Point(i, 14000)), Vertex(Point(i, 15000)),
+        Vertex(Point(i, 16000)), Vertex(Point(i, 17000)),
         Vertex(Point(i + 1, 0)),
     };
     input.append(Path(vertices));

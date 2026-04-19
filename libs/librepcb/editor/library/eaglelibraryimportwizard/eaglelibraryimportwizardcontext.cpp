@@ -46,7 +46,7 @@ EagleLibraryImportWizardContext::EagleLibraryImportWizardContext(
   : QObject(parent),
     mTheme(theme),
     mWorkspace(workspace),
-    mImport(new EagleLibraryImport(dstLibFp, parent)),
+    mImport(new EagleLibraryImport(dstLibFp, &Uuid::createRandom, parent)),
     mLbrFilePath(),
     mAddNamePrefix(false),
     mComponentCategoryUuid(),

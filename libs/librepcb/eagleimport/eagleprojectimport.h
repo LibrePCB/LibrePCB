@@ -28,6 +28,7 @@
 
 #include <QtCore>
 
+#include <functional>
 #include <memory>
 #include <optional>
 
@@ -66,6 +67,7 @@ class Symbol;
 namespace eagleimport {
 
 class EagleLibraryConverter;
+class EagleTypeConverter;
 
 /*******************************************************************************
  *  Class EagleProjectImport
@@ -80,7 +82,10 @@ class EagleProjectImport final : public QObject {
 public:
   // Constructors / Destructor
   EagleProjectImport(const EagleProjectImport& other) = delete;
-  explicit EagleProjectImport(QObject* parent = nullptr) noexcept;
+  explicit EagleProjectImport(
+      std::function<Uuid()> createUuid = &Uuid::createRandom,
+      const QDateTime& created = QDateTime::currentDateTime(),
+      QObject* parent = nullptr) noexcept;
   ~EagleProjectImport() noexcept;
 
   // Getters
@@ -142,6 +147,9 @@ private:  // Methods
   const parseagle::Part& getPart(const QString& name) const;
 
 private:  // Data
+  std::function<Uuid()> mCreateUuid;
+  const QDateTime mCreatedDateTime;
+  std::unique_ptr<EagleTypeConverter> mTc;
   std::shared_ptr<MessageLogger> mLogger;
   QString mProjectName;
   QScopedPointer<parseagle::Schematic> mSchematic;

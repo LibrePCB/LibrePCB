@@ -90,8 +90,9 @@ public:
   Package() = delete;
   Package(const Package& other) = delete;
   Package(const Uuid& uuid, const Version& version, const QString& author,
-          const ElementName& name_en_US, const QString& description_en_US,
-          const QString& keywords_en_US, AssemblyType assemblyType);
+          const QDateTime& created, const ElementName& name_en_US,
+          const QString& description_en_US, const QString& keywords_en_US,
+          AssemblyType assemblyType);
   ~Package() noexcept;
 
   // Getters

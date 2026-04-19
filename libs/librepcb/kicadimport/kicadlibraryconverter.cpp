@@ -55,6 +55,7 @@ KiCadLibraryConverterSettings::KiCadLibraryConverterSettings() noexcept
   : namePrefix(),
     version(Version::fromString("0.1")),
     author("KiCad Import"),
+    created(QDateTime::currentDateTime()),
     keywords("kicad,import") {
 }
 
@@ -90,6 +91,7 @@ std::unique_ptr<Package> KiCadLibraryConverter::createPackage(
   }
   std::unique_ptr<Package> package(new Package(
       Uuid::createRandom(), mSettings.version, mSettings.author,
+      mSettings.created,
       C::convertElementName(mSettings.namePrefix + kiFpt.name),
       C::convertElementDescription(libFp, kiFpt.name, kiFpt.properties),
       C::convertElementKeywords(mSettings.keywords, kiFpt.properties),
@@ -272,6 +274,7 @@ std::unique_ptr<Symbol> KiCadLibraryConverter::createSymbol(
   }
   std::unique_ptr<Symbol> symbol(new Symbol(
       Uuid::createRandom(), mSettings.version, mSettings.author,
+      mSettings.created,
       C::convertElementName(mSettings.namePrefix + kiGate.name),
       C::convertElementDescription(libFp, kiGate.name, kiSym.properties),
       C::convertElementKeywords(mSettings.keywords, kiSym.properties)));
@@ -360,6 +363,7 @@ std::unique_ptr<Component> KiCadLibraryConverter::createComponent(
   }
   std::unique_ptr<Component> component(new Component(
       Uuid::createRandom(), mSettings.version, mSettings.author,
+      mSettings.created,
       C::convertElementName(mSettings.namePrefix + kiSym.name),
       C::convertElementDescription(libFp, kiSym.name, kiSym.properties),
       C::convertElementKeywords(mSettings.keywords, kiSym.properties)));
@@ -471,6 +475,7 @@ std::unique_ptr<Device> KiCadLibraryConverter::createDevice(
   }
   std::unique_ptr<Device> device(new Device(
       Uuid::createRandom(), mSettings.version, mSettings.author,
+      mSettings.created,
       C::convertElementName(mSettings.namePrefix + kiSym.name),
       C::convertElementDescription(libFp, kiSym.name, kiSym.properties),
       C::convertElementKeywords(mSettings.keywords, kiSym.properties),
