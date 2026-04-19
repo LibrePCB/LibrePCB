@@ -5,7 +5,7 @@ description = "LibrePCB system level UI tests"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "pytest~=8.4.0",
+    "pytest",
     "slint-testing",
 ]
 
@@ -14,7 +14,7 @@ slint-testing = { git = "ssh://git@github.com/slint-ui/ui-testing.git", subdirec
 
 [dependency-groups]
 dev = [
-    "ruff~=0.11.13",
+    "ruff",
 ]
 
 [tool.setuptools]
