@@ -624,6 +624,7 @@ std::unique_ptr<SExpression> serialize(const QUrl& obj) {
 
 template <>
 std::unique_ptr<SExpression> serialize(const QDateTime& obj) {
+  if (!obj.isValid()) throw LogicError(__FILE__, __LINE__);
   return SExpression::createToken(obj.toUTC().toString(Qt::ISODate));
 }
 

@@ -39,13 +39,11 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-LibraryBaseElement::LibraryBaseElement(const QString& shortElementName,
-                                       const QString& longElementName,
-                                       const Uuid& uuid, const Version& version,
-                                       const QString& author,
-                                       const ElementName& name_en_US,
-                                       const QString& description_en_US,
-                                       const QString& keywords_en_US)
+LibraryBaseElement::LibraryBaseElement(
+    const QString& shortElementName, const QString& longElementName,
+    const Uuid& uuid, const Version& version, const QString& author,
+    const QDateTime& created, const ElementName& name_en_US,
+    const QString& description_en_US, const QString& keywords_en_US)
   : QObject(nullptr),
     mShortElementName(shortElementName),
     mLongElementName(longElementName),
@@ -53,7 +51,7 @@ LibraryBaseElement::LibraryBaseElement(const QString& shortElementName,
     mUuid(uuid),
     mVersion(version),
     mAuthor(author),
-    mCreated(QDateTime::currentDateTime()),
+    mCreated(created),
     mIsDeprecated(false),
     mNames(name_en_US),
     mDescriptions(description_en_US),

@@ -29,6 +29,7 @@
 
 #include <QtCore>
 
+#include <functional>
 #include <memory>
 #include <optional>
 
@@ -54,6 +55,8 @@ class Symbol;
 
 namespace eagleimport {
 
+class EagleTypeConverter;
+
 /*******************************************************************************
  *  Struct EagleLibraryConverterSettings
  ******************************************************************************/
@@ -64,9 +67,11 @@ namespace eagleimport {
 struct EagleLibraryConverterSettings final {
   EagleLibraryConverterSettings() noexcept;
 
+  std::function<Uuid()> createUuid;
   QString namePrefix;
   Version version;
   QString author;
+  QDateTime created;
   QString keywords;
   QSet<Uuid> symbolCategories;
   QSet<Uuid> packageCategories;
@@ -124,8 +129,9 @@ public:
 private:  // Methods
   void tryOrLogError(std::function<void()> func, MessageLogger& log);
 
-private:  // Data
+private:
   EagleLibraryConverterSettings mSettings;
+  std::unique_ptr<EagleTypeConverter> mTc;
 
   // State
 

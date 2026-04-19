@@ -37,11 +37,12 @@ namespace librepcb {
  ******************************************************************************/
 
 Organization::Organization(const Uuid& uuid, const Version& version,
-                           const QString& author, const ElementName& name_en_US,
+                           const QString& author, const QDateTime& created,
+                           const ElementName& name_en_US,
                            const QString& description_en_US,
                            const QString& keywords_en_US)
   : LibraryBaseElement(getShortElementName(), getLongElementName(), uuid,
-                       version, author, name_en_US, description_en_US,
+                       version, author, created, name_en_US, description_en_US,
                        keywords_en_US),
     mLogoPng(),
     mUrl(),

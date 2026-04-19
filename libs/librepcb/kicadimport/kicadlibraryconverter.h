@@ -60,6 +60,7 @@ struct KiCadLibraryConverterSettings final {
   QString namePrefix;
   Version version;
   QString author;
+  QDateTime created;
   QString keywords;
   QSet<Uuid> symbolCategories;
   QSet<Uuid> packageCategories;

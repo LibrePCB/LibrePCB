@@ -34,6 +34,8 @@
 
 #include <QtCore>
 
+#include <functional>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -81,11 +83,12 @@ public:
    *
    * @param directory     The project directory to use.
    * @param filename      The filename of the *.lpp project file.
+   * @param uuid          The UUID of the new project.
    *
    * @throw Exception     If the project could not be opened successfully
    */
   Project(std::unique_ptr<TransactionalDirectory> directory,
-          const QString& filename);
+          const QString& filename, const Uuid& uuid = Uuid::createRandom());
 
   /**
    * @brief The destructor will close the whole project (without saving!)
@@ -518,7 +521,8 @@ public:
 
   static std::unique_ptr<Project> create(
       std::unique_ptr<TransactionalDirectory> directory,
-      const QString& filename);
+      const QString& filename,
+      std::function<Uuid()> createUuid = &Uuid::createRandom);
   static bool isFilePathInsideProjectDirectory(const FilePath& fp) noexcept;
   static bool isProjectFile(const FilePath& file) noexcept;
   static bool isProjectDirectory(const FilePath& dir) noexcept;

@@ -60,9 +60,9 @@ public:
   Device() = delete;
   Device(const Device& other) = delete;
   Device(const Uuid& uuid, const Version& version, const QString& author,
-         const ElementName& name_en_US, const QString& description_en_US,
-         const QString& keywords_en_US, const Uuid& component,
-         const Uuid& package);
+         const QDateTime& created, const ElementName& name_en_US,
+         const QString& description_en_US, const QString& keywords_en_US,
+         const Uuid& component, const Uuid& package);
   ~Device() noexcept;
 
   // Getters

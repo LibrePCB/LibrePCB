@@ -41,10 +41,12 @@
 #include <librepcb/core/types/elementname.h>
 #include <librepcb/core/types/point.h>
 #include <librepcb/core/types/simplestring.h>
+#include <librepcb/core/types/uuid.h>
 #include <parseagle/common/enums.h>
 
 #include <QtCore>
 
+#include <functional>
 #include <memory>
 #include <optional>
 
@@ -118,9 +120,10 @@ public:
   };
 
   // Constructors / Destructor
-  EagleTypeConverter() = delete;
+  EagleTypeConverter(
+      std::function<Uuid()> createUuid = &Uuid::createRandom) noexcept;
   EagleTypeConverter(const EagleTypeConverter& other) = delete;
-  ~EagleTypeConverter() = delete;
+  ~EagleTypeConverter() noexcept;
 
   /**
    * @brief Convert an element (e.g. symbol) name
@@ -133,7 +136,7 @@ public:
    *
    * @return LibrePCB element name
    */
-  static ElementName convertElementName(const QString& n);
+  ElementName convertElementName(const QString& n) const;
 
   /**
    * @brief Convert an element (e.g. symbol) description
@@ -144,7 +147,7 @@ public:
    *
    * @return LibrePCB element description (no HTML)
    */
-  static QString convertElementDescription(const QString& d);
+  QString convertElementDescription(const QString& d) const;
 
   /**
    * @brief Convert a component name
@@ -156,7 +159,7 @@ public:
    *
    * @return LibrePCB component name (e.g. "R-0805")
    */
-  static ElementName convertComponentName(QString n);
+  ElementName convertComponentName(QString n) const;
 
   /**
    * @brief Convert a device name
@@ -169,8 +172,8 @@ public:
    *
    * @return LibrePCB device name
    */
-  static ElementName convertDeviceName(const QString& deviceSetName,
-                                       const QString& deviceName);
+  ElementName convertDeviceName(const QString& deviceSetName,
+                                const QString& deviceName) const;
 
   /**
    * @brief Convert a component prefix
@@ -182,7 +185,7 @@ public:
    *
    * @return LibrePCB component prefix
    */
-  static ComponentPrefix convertComponentPrefix(const QString& p);
+  ComponentPrefix convertComponentPrefix(const QString& p) const;
 
   /**
    * @brief Convert a component gate name
@@ -194,7 +197,7 @@ public:
    *
    * @return LibrePCB component symbol variant item suffix
    */
-  static ComponentSymbolVariantItemSuffix convertGateName(const QString& n);
+  ComponentSymbolVariantItemSuffix convertGateName(const QString& n) const;
 
   /**
    * @brief Convert a pin or pad name
@@ -206,7 +209,7 @@ public:
    *
    * @return LibrePCB circuit identifier
    */
-  static CircuitIdentifier convertPinOrPadName(const QString& n);
+  CircuitIdentifier convertPinOrPadName(const QString& n) const;
 
   /**
    * @brief Convert the inversion syntax of a text
@@ -215,7 +218,7 @@ public:
    *
    * @return Same text but with LibrePCB inversion syntax (e.g. "!RST/EN")
    */
-  static QString convertInversionSyntax(const QString& s) noexcept;
+  QString convertInversionSyntax(const QString& s) const noexcept;
 
   /**
    * @brief Try converting an attribute
@@ -225,8 +228,8 @@ public:
    *
    * @return LibrePCB attribute (nullptr on failure)
    */
-  static std::shared_ptr<Attribute> tryConvertAttribute(
-      const parseagle::Attribute& a, MessageLogger& log);
+  std::shared_ptr<Attribute> tryConvertAttribute(const parseagle::Attribute& a,
+                                                 MessageLogger& log) const;
 
   /**
    * @brief Try converting a list of attributes
@@ -241,8 +244,8 @@ public:
    *
    * @see #tryConvertAttribute()
    */
-  static void tryConvertAttributes(const QList<parseagle::Attribute>& in,
-                                   AttributeList& out, MessageLogger& log);
+  void tryConvertAttributes(const QList<parseagle::Attribute>& in,
+                            AttributeList& out, MessageLogger& log) const;
 
   /**
    * @brief Try extracting MPN and manufacturer from a list of attributes
@@ -252,9 +255,9 @@ public:
    * @param mpn           The found MPN (unmodified if not found)
    * @param manufacturer  The found manufacturer name (unmodified if not found)
    */
-  static void tryExtractMpnAndManufacturer(AttributeList& attributes,
-                                           SimpleString& mpn,
-                                           SimpleString& manufacturer) noexcept;
+  void tryExtractMpnAndManufacturer(AttributeList& attributes,
+                                    SimpleString& mpn,
+                                    SimpleString& manufacturer) const noexcept;
 
   /**
    * @brief Try to convert a layer ID to a schematic layer
@@ -263,7 +266,7 @@ public:
    *
    * @return LibrePCB schematic/symbol layer (`nullptr` to discard object)
    */
-  static const Layer* tryConvertSchematicLayer(int id) noexcept;
+  const Layer* tryConvertSchematicLayer(int id) const noexcept;
 
   /**
    * @brief Try to convert a layer ID to a board layer
@@ -272,7 +275,7 @@ public:
    *
    * @return LibrePCB board/footprint layer (`nullptr` to discard object)
    */
-  static const Layer* tryConvertBoardLayer(int id) noexcept;
+  const Layer* tryConvertBoardLayer(int id) const noexcept;
 
   /**
    * @brief Convert a layer setup string
@@ -281,7 +284,7 @@ public:
    *
    * @return Map to move all inner copper layers to the top (remove gaps)
    */
-  static QHash<const Layer*, const Layer*> convertLayerSetup(const QString& s);
+  QHash<const Layer*, const Layer*> convertLayerSetup(const QString& s) const;
 
   /**
    * @brief Convert an alignment
@@ -290,7 +293,7 @@ public:
    *
    * @return LibrePCB alignment
    */
-  static Alignment convertAlignment(parseagle::Alignment a);
+  Alignment convertAlignment(parseagle::Alignment a) const;
 
   /**
    * @brief Convert a length
@@ -299,7 +302,7 @@ public:
    *
    * @return LibrePCB length
    */
-  static Length convertLength(double l);
+  Length convertLength(double l) const;
 
   /**
    * @brief Convert a line width for a given layer
@@ -312,7 +315,7 @@ public:
    *
    * @return LibrePCB line width length
    */
-  static UnsignedLength convertLineWidth(double w, int layerId);
+  UnsignedLength convertLineWidth(double w, int layerId) const;
 
   /**
    * @brief Convert a parameter value to a LibrePCB type
@@ -326,7 +329,7 @@ public:
    * @throws If the value could not be converted
    */
   template <typename T>
-  static T convertParamTo(const parseagle::Param& p);
+  T convertParamTo(const parseagle::Param& p) const;
 
   /**
    * @brief Convert a point
@@ -335,7 +338,7 @@ public:
    *
    * @return LibrePCB point
    */
-  static Point convertPoint(const parseagle::Point& p);
+  Point convertPoint(const parseagle::Point& p) const;
 
   /**
    * @brief Convert an angle
@@ -344,7 +347,7 @@ public:
    *
    * @return LibrePCB angle
    */
-  static Angle convertAngle(double a);
+  Angle convertAngle(double a) const;
 
   /**
    * @brief Convert grid settings
@@ -356,8 +359,8 @@ public:
    * @param interval  LibrePCB grid interval (output)
    * @param unit      LibrePCB grid unit (output)
    */
-  static void convertGrid(const parseagle::Grid& g, PositiveLength& interval,
-                          LengthUnit& unit);
+  void convertGrid(const parseagle::Grid& g, PositiveLength& interval,
+                   LengthUnit& unit) const;
 
   /**
    * @brief Convert a vertex
@@ -366,7 +369,7 @@ public:
    *
    * @return LibrePCB vertex
    */
-  static Vertex convertVertex(const parseagle::Vertex& v);
+  Vertex convertVertex(const parseagle::Vertex& v) const;
 
   /**
    * @brief Convert vertices
@@ -376,7 +379,7 @@ public:
    *
    * @return LibrePCB path
    */
-  static Path convertVertices(const QList<parseagle::Vertex>& v, bool close);
+  Path convertVertices(const QList<parseagle::Vertex>& v, bool close) const;
 
   /**
    * @brief Try to join and convert multiple wires to polygons
@@ -388,9 +391,9 @@ public:
    *
    * @return Joined polygons as intermediate geometries
    */
-  static QList<Geometry> convertAndJoinWires(
-      const QList<parseagle::Wire>& wires, bool isGrabAreaIfClosed,
-      MessageLogger& log);
+  QList<Geometry> convertAndJoinWires(const QList<parseagle::Wire>& wires,
+                                      bool isGrabAreaIfClosed,
+                                      MessageLogger& log) const;
 
   /**
    * @brief Convert a rectangle
@@ -400,8 +403,8 @@ public:
    *
    * @return Intermediate geometry containing 4 line segments
    */
-  static Geometry convertRectangle(const parseagle::Rectangle& r,
-                                   bool isGrabArea);
+  Geometry convertRectangle(const parseagle::Rectangle& r,
+                            bool isGrabArea) const;
 
   /**
    * @brief Convert a polygon
@@ -411,7 +414,7 @@ public:
    *
    * @return Intermediate geometry (always closed)
    */
-  static Geometry convertPolygon(const parseagle::Polygon& p, bool isGrabArea);
+  Geometry convertPolygon(const parseagle::Polygon& p, bool isGrabArea) const;
 
   /**
    * @brief Convert a circle
@@ -421,7 +424,7 @@ public:
    *
    * @return Intermediate geometry
    */
-  static Geometry convertCircle(const parseagle::Circle& c, bool isGrabArea);
+  Geometry convertCircle(const parseagle::Circle& c, bool isGrabArea) const;
 
   /**
    * @brief Convert a hole
@@ -430,7 +433,7 @@ public:
    *
    * @return LibrePCB hole
    */
-  static std::shared_ptr<Hole> convertHole(const parseagle::Hole& h);
+  std::shared_ptr<Hole> convertHole(const parseagle::Hole& h) const;
 
   /**
    * @brief Convert a frame
@@ -439,7 +442,7 @@ public:
    *
    * @return Intermediate geometry containing 4 line segments
    */
-  static Geometry convertFrame(const parseagle::Frame& f);
+  Geometry convertFrame(const parseagle::Frame& f) const;
 
   /**
    * @brief Convert a text value
@@ -448,7 +451,7 @@ public:
    *
    * @return LibrePCB text value (e.g. "{{NAME}}")
    */
-  static QString convertTextValue(const QString& v);
+  QString convertTextValue(const QString& v) const;
 
   /**
    * @brief Convert the size (height) of a schematic text
@@ -457,7 +460,7 @@ public:
    *
    * @return LibrePCB text size
    */
-  static PositiveLength convertSchematicTextSize(double s);
+  PositiveLength convertSchematicTextSize(double s) const;
 
   /**
    * @brief Try to convert a schematic/symbol text
@@ -470,8 +473,8 @@ public:
    *
    * @return LibrePCB text if the layer is supported, otherwise `nullptr`
    */
-  static std::shared_ptr<Text> tryConvertSchematicText(const parseagle::Text& t,
-                                                       bool allowLocked);
+  std::shared_ptr<Text> tryConvertSchematicText(const parseagle::Text& t,
+                                                bool allowLocked) const;
 
   /**
    * @brief Try to convert a schematic/symbol attribute text
@@ -480,8 +483,8 @@ public:
    *
    * @return LibrePCB text if the layer is supported, otherwise `nullptr`
    */
-  static std::shared_ptr<Text> tryConvertSchematicAttribute(
-      const parseagle::Attribute& t);
+  std::shared_ptr<Text> tryConvertSchematicAttribute(
+      const parseagle::Attribute& t) const;
 
   /**
    * @brief Convert the size (height) of a board text
@@ -491,7 +494,7 @@ public:
    *
    * @return LibrePCB text size
    */
-  static PositiveLength convertBoardTextSize(int layerId, double size);
+  PositiveLength convertBoardTextSize(int layerId, double size) const;
 
   /**
    * @brief Convert the stroke width of a board text
@@ -502,8 +505,8 @@ public:
    *
    * @return LibrePCB stroke text width
    */
-  static UnsignedLength convertBoardTextStrokeWidth(int layerId, double size,
-                                                    int ratio);
+  UnsignedLength convertBoardTextStrokeWidth(int layerId, double size,
+                                             int ratio) const;
 
   /**
    * @brief Try to cnvert a board/footprint text
@@ -516,8 +519,8 @@ public:
    *
    * @return LibrePCB text if the layer is supported, otherwise `nullptr`
    */
-  static std::shared_ptr<StrokeText> tryConvertBoardText(
-      const parseagle::Text& t, bool allowLocked);
+  std::shared_ptr<StrokeText> tryConvertBoardText(const parseagle::Text& t,
+                                                  bool allowLocked) const;
 
   /**
    * @brief Try to convert a board/footprint attribute text
@@ -526,8 +529,8 @@ public:
    *
    * @return LibrePCB text if the layer is supported, otherwise `nullptr`
    */
-  static std::shared_ptr<StrokeText> tryConvertBoardAttribute(
-      const parseagle::Attribute& t);
+  std::shared_ptr<StrokeText> tryConvertBoardAttribute(
+      const parseagle::Attribute& t) const;
 
   /**
    * @brief Convert a symbol pin
@@ -536,7 +539,7 @@ public:
    *
    * @return LibrePCB objects to represent the pin
    */
-  static Pin convertSymbolPin(const parseagle::Pin& p);
+  Pin convertSymbolPin(const parseagle::Pin& p) const;
 
   /**
    * @brief Convert a THT pad
@@ -548,9 +551,9 @@ public:
    *
    * @return LibrePCB package pad + footprint pad
    */
-  static std::pair<std::shared_ptr<PackagePad>, std::shared_ptr<FootprintPad>>
+  std::pair<std::shared_ptr<PackagePad>, std::shared_ptr<FootprintPad>>
       convertThtPad(const parseagle::ThtPad& p,
-                    const BoundedUnsignedRatio& autoAnnularWidth);
+                    const BoundedUnsignedRatio& autoAnnularWidth) const;
 
   /**
    * @brief Convert an SMT pad
@@ -559,8 +562,8 @@ public:
    *
    * @return LibrePCB package pad + footprint pad
    */
-  static std::pair<std::shared_ptr<PackagePad>, std::shared_ptr<FootprintPad>>
-      convertSmtPad(const parseagle::SmtPad& p);
+  std::pair<std::shared_ptr<PackagePad>, std::shared_ptr<FootprintPad>>
+      convertSmtPad(const parseagle::SmtPad& p) const;
 
   /**
    * @brief Try to convert an intermediate geometry to a schematic circle
@@ -570,7 +573,7 @@ public:
    * @return    A circle if the geometry represents a circle on a valid
    *            schematic layer, otherwise `nullptr`
    */
-  static std::shared_ptr<Circle> tryConvertToSchematicCircle(const Geometry& g);
+  std::shared_ptr<Circle> tryConvertToSchematicCircle(const Geometry& g) const;
 
   /**
    * @brief Try to convert an intermediate geometry to a schematic polygon
@@ -579,8 +582,8 @@ public:
    *
    * @return A polygon if the layer is valid for schematics, otherwise `nullptr`
    */
-  static std::shared_ptr<Polygon> tryConvertToSchematicPolygon(
-      const Geometry& g);
+  std::shared_ptr<Polygon> tryConvertToSchematicPolygon(
+      const Geometry& g) const;
 
   /**
    * @brief Convert the outline of a board zone
@@ -593,8 +596,8 @@ public:
    *
    * @return Possibly multiple paths with the LibrePCB zone outline(s)
    */
-  static QVector<Path> convertBoardZoneOutline(const Path& outline,
-                                               const Length& lineWidth);
+  QVector<Path> convertBoardZoneOutline(const Path& outline,
+                                        const Length& lineWidth) const;
 
   /**
    * @brief Try to convert an intermediate geometry to board keepout zones
@@ -604,8 +607,8 @@ public:
    * @return    A keepout zone(s) if the geometry represents a zone,
    *            otherwise an empty vector
    */
-  static QVector<std::shared_ptr<Zone>> tryConvertToBoardZones(
-      const Geometry& g);
+  QVector<std::shared_ptr<Zone>> tryConvertToBoardZones(
+      const Geometry& g) const;
 
   /**
    * @brief Try to convert an intermediate geometry to a board circle
@@ -615,7 +618,7 @@ public:
    * @return    A circle if the geometry represents a circle on a valid
    *            board layer, otherwise `nullptr`
    */
-  static std::shared_ptr<Circle> tryConvertToBoardCircle(const Geometry& g);
+  std::shared_ptr<Circle> tryConvertToBoardCircle(const Geometry& g) const;
 
   /**
    * @brief Try to convert an intermediate geometry to a board polygon
@@ -624,7 +627,7 @@ public:
    *
    * @return A polygon if the layer is valid for boards, otherwise `nullptr`
    */
-  static std::shared_ptr<Polygon> tryConvertToBoardPolygon(const Geometry& g);
+  std::shared_ptr<Polygon> tryConvertToBoardPolygon(const Geometry& g) const;
 
   /**
    * @brief Get the EAGLE layer name for a given layer ID
@@ -648,6 +651,9 @@ public:
 
   // Operator Overloadings
   EagleTypeConverter& operator=(const EagleTypeConverter& rhs) = delete;
+
+private:
+  std::function<Uuid()> mCreateUuid;
 };
 
 /*******************************************************************************

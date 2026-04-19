@@ -47,9 +47,11 @@ namespace eagleimport {
  ******************************************************************************/
 
 EagleLibraryImport::EagleLibraryImport(const FilePath& dstLibFp,
+                                       std::function<Uuid()> createUuid,
                                        QObject* parent) noexcept
   : QThread(parent),
     mDestinationLibraryFp(dstLibFp),
+    mCreateUuid(createUuid),
     mSettings(new EagleLibraryConverterSettings()),
     mLogger(new MessageLogger(true)),
     mAbort(false) {
@@ -156,6 +158,7 @@ QStringList EagleLibraryImport::open(const FilePath& lbr) {
 
   try {
     parseagle::Library lib(lbr.toStr(), &errors);
+    EagleTypeConverter tc(mCreateUuid);
 
     foreach (const parseagle::Symbol& symbol, lib.getSymbols()) {
       mSymbols.append(Symbol{
@@ -180,8 +183,7 @@ QStringList EagleLibraryImport::open(const FilePath& lbr) {
       foreach (const parseagle::Gate& gate, deviceSet.getGates()) {
         symbolDisplayNames.insert(gate.getSymbol());
       }
-      const QString cmpName =
-          *EagleTypeConverter::convertComponentName(deviceSet.getName());
+      const QString cmpName = *tc.convertComponentName(deviceSet.getName());
       mComponents.append(Component{
           cmpName,
           deviceSet.getDescription(),
@@ -191,8 +193,7 @@ QStringList EagleLibraryImport::open(const FilePath& lbr) {
       });
       foreach (const parseagle::Device& device, deviceSet.getDevices()) {
         mDevices.append(Device{
-            *EagleTypeConverter::convertDeviceName(deviceSet.getName(),
-                                                   device.getName()),
+            *tc.convertDeviceName(deviceSet.getName(), device.getName()),
             deviceSet.getDescription(),
             Qt::Unchecked,
             cmpName,

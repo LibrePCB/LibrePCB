@@ -97,7 +97,8 @@ TEST_F(CmdSymbolReloadTest, test) {
   // Create a "empty" library element and save it to the file system.
   std::unique_ptr<Symbol> element(
       new Symbol(Uuid::fromString("acd99b30-59a5-419f-b067-ae704e4364bb"),
-                 Version::fromString("0.1"), "", ElementName("name"), "", ""));
+                 Version::fromString("0.1"), "", QDateTime::currentDateTime(),
+                 ElementName("name"), "", ""));
   element->saveTo(*dir);
   fs->save();
 
