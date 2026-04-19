@@ -152,7 +152,7 @@ std::unique_ptr<Symbol> EagleLibraryConverter::createSymbol(
   // Disable grab area on geometries located *within* another grab area to
   // avoid overlapping grab areas, but also to avoid triggering issue
   // https://github.com/LibrePCB/LibrePCB/issues/1278.
-  std::sort(geometries.begin(), geometries.end(),
+  std::stable_sort(geometries.begin(), geometries.end(),
             [](const EagleTypeConverter::Geometry& a,
                const EagleTypeConverter::Geometry& b) {
               if (a.path.isClosed() != b.path.isClosed()) {
