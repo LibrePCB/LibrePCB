@@ -46,6 +46,10 @@
 namespace librepcb {
 namespace editor {
 
+// Not sure what is a good light direction...
+const QVector3D SlintOpenGlView::sLightDir =
+    QVector3D(0.0f, 0.2f, 0.75f).normalized();
+
 static qreal calcAspectRatio(qreal width, qreal height) noexcept {
   return (height > 1) ? (width / height) : 1;
 }
@@ -177,15 +181,18 @@ slint::Image SlintOpenGlView::render(float width, float height) noexcept {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   // Set modelview-projection matrix.
-  const qreal zNear = 0.1;
-  const qreal zFar = 100.0;
+  QMatrix4x4 modelView;
+  modelView.setToIdentity();
+  modelView.translate(mProjection.center.x(), mProjection.center.y(),
+                      -sCameraPosZ);
+  modelView = modelView * mProjection.transform;
   QMatrix4x4 projection;
   projection.setToIdentity();
-  projection.perspective(mProjection.fov, calcAspectRatio(width, height), zNear,
-                         zFar);
-  projection.translate(mProjection.center.x(), mProjection.center.y(),
-                       -sCameraPosZ);
-  mProgram->setUniformValue("mvp_matrix", projection * mProjection.transform);
+  projection.perspective(mProjection.fov, calcAspectRatio(width, height),
+                         sNearZ, sFarZ);
+  mProgram->setUniformValue("mv_matrix", modelView);
+  mProgram->setUniformValue("mvp_matrix", projection * modelView);
+  mProgram->setUniformValue("light_dir", sLightDir);
 
   // Limit alpha of silkscreen.
   auto alpha = mAlpha;
@@ -330,7 +337,7 @@ void SlintOpenGlView::initializeGl() noexcept {
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_MULTISAMPLE);
   glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ZERO, GL_ONE);
   glEnable(GL_LINE_SMOOTH);
   glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
 

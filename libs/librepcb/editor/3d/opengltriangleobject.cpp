@@ -31,6 +31,24 @@
 namespace librepcb {
 namespace editor {
 
+// Helper to avoid too dark colors, since colors close to black make the
+// 3D shading almost invisible. Edges and faces are much better visible on
+// dark gray than on black objects.
+static QColor lighterDarkColor(QColor color, qreal minValue) {
+  float h, s, v, a;
+  color.getHsvF(&h, &s, &v, &a);
+  if (v >= minValue) return color;  // Not dark enough to touch
+
+  // How far into the "dark zone" are we? 0.0 = at minValue, 1.0 = pure black
+  float t = 1.0 - (v / minValue);
+  t = t * t * (3.0 - 2.0 * t);  // Smoothstep for natural, non-linear transition
+
+  return QColor::fromHsvF(h,
+                          s * (1.0 - t),  // Desaturate proportionally
+                          v + t * (minValue - v),  // Lift value toward minValue
+                          a);
+}
+
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
@@ -55,7 +73,7 @@ OpenGlTriangleObject::~OpenGlTriangleObject() noexcept {
 void OpenGlTriangleObject::setData(const QColor& color,
                                    const QVector<QVector3D>& data) noexcept {
   QMutexLocker lock(&mMutex);
-  mColor = color;
+  mColor = lighterDarkColor(color, 0.2);
   mNewTriangles = data;
 }
 
