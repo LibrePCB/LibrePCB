@@ -159,13 +159,16 @@ std::unique_ptr<Symbol> EagleLibraryConverter::createSymbol(
                 return a.path.isClosed();
               }
               if (a.path.isClosed()) {
-                // Use a relative tolerance to avoid sub-ULP floating-point
-                // differences (accumulation order, FMA) from producing
-                // platform-dependent orderings for geometrically equivalent
-                // candidates, independent of the input magnitude.
+                // Use combined absolute+relative tolerance to avoid sub-ULP
+                // floating-point differences (accumulation order, FMA) from
+                // producing platform-dependent orderings. The absolute floor
+                // (1e-6 mm²) prevents degenerate near-zero areas (e.g. all
+                // vertices collinear) from comparing unequal across platforms.
                 const double a1 = a.path.calcAreaOfStraightSegments();
                 const double a2 = b.path.calcAreaOfStraightSegments();
-                if (std::abs(a1 - a2) > (std::max(a1, a2) * 1e-12)) {
+                const double maxArea = std::max(a1, a2);
+                if ((maxArea > 1e-6) &&
+                    (std::abs(a1 - a2) > (maxArea * 1e-12))) {
                   return a1 > a2;
                 }
               }
