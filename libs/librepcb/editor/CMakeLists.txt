@@ -942,8 +942,6 @@ add_library(
   widgets/messagewidget.h
   widgets/numbereditbase.cpp
   widgets/numbereditbase.h
-  widgets/openglview.cpp
-  widgets/openglview.h
   widgets/patheditorwidget.cpp
   widgets/patheditorwidget.h
   widgets/positivelengthedit.cpp

@@ -75,7 +75,8 @@ if __name__ == '__main__':
         if not os.path.isfile(os.path.join(REPO_DIR, file)):
             continue
         try:
-            references = run(['git', 'grep', '-IlF', os.path.basename(file),
+            references = run(['git', 'grep', '-IlP',
+                              r'(?<!\w)' + os.path.basename(file),
                               '--', '*.cpp', '*.h', '*.ui'],
                              cwd=REPO_DIR).decode("utf-8").splitlines()
             if len(references) < 2:
