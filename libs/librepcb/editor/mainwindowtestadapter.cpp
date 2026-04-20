@@ -25,12 +25,14 @@
 #include "guiapplication.h"
 #include "mainwindow.h"
 #include "project/projecteditor.h"
+#include "windowsection.h"
 
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
 
 #include <QtCore>
+#include <QtNetwork>
 #include <QtWidgets>
 
 /*******************************************************************************
@@ -55,6 +57,8 @@ MainWindowTestAdapter::MainWindowTestAdapter(GuiApplication& app,
   connect(&mApp.getWorkspace().getLibraryDb(),
           &WorkspaceLibraryDb::scanFinished, this,
           [this]() { mLibraryScanFinished = true; });
+
+  startMcpServer();
 }
 
 MainWindowTestAdapter::~MainWindowTestAdapter() noexcept {
@@ -129,6 +133,76 @@ QVariant MainWindowTestAdapter::getOpenProjects(QVariant) const noexcept {
     root.append(prjObj);
   }
   return root;
+}
+
+void MainWindowTestAdapter::startMcpServer() noexcept {
+  const int port = 19999;
+  mMcpServer = new QTcpServer(this);
+  connect(mMcpServer, &QTcpServer::newConnection, this,
+          &MainWindowTestAdapter::handleMcpConnection);
+  if (!mMcpServer->listen(QHostAddress::Any, port)) {
+    qWarning() << "MCP server failed to listen on port" << port << ":"
+               << mMcpServer->errorString();
+  } else {
+    qInfo() << "MCP server listening on port" << port;
+  }
+}
+
+void MainWindowTestAdapter::handleMcpConnection() noexcept {
+  while (mMcpServer->hasPendingConnections()) {
+    QTcpSocket* socket = mMcpServer->nextPendingConnection();
+    connect(socket, &QTcpSocket::readyRead, this,
+            [this, socket]() { handleMcpData(socket); });
+    connect(socket, &QTcpSocket::disconnected, socket,
+            &QTcpSocket::deleteLater);
+  }
+}
+
+void MainWindowTestAdapter::handleMcpData(QTcpSocket* socket) noexcept {
+  while (socket->canReadLine()) {
+    const QByteArray line = socket->readLine().trimmed();
+    if (line.isEmpty()) continue;
+
+    QJsonParseError err;
+    const QJsonDocument doc = QJsonDocument::fromJson(line, &err);
+    if (doc.isNull()) {
+      socket->write(
+          QJsonDocument(QJsonObject{{"ok", false}, {"error", err.errorString()}})
+              .toJson(QJsonDocument::Compact) +
+          "\n");
+      continue;
+    }
+
+    const QJsonObject req = doc.object();
+    const QString cmd = req["command"].toString();
+    QString error;
+
+    if (cmd == "show-about-panel") {
+      QMetaObject::invokeMethod(
+          this, [this]() { mWindow.showPanelPage(ui::PanelPage::About); },
+          Qt::QueuedConnection);
+    } else if (cmd == "switch-tab") {
+      const int section = req.value("section").toInt(0);
+      const int index = req.value("index").toInt(0);
+      QMetaObject::invokeMethod(
+          this,
+          [this, section, index]() {
+            if (auto s = mWindow.mSections->value(section)) {
+              auto data = s->getUiData();
+              data.current_tab_index = index;
+              s->setUiData(data);
+            }
+          },
+          Qt::QueuedConnection);
+    } else {
+      error = "Unknown command: " + cmd;
+    }
+
+    QJsonObject resp;
+    resp["ok"] = error.isEmpty();
+    if (!error.isEmpty()) resp["error"] = error;
+    socket->write(QJsonDocument(resp).toJson(QJsonDocument::Compact) + "\n");
+  }
 }
 
 /*******************************************************************************

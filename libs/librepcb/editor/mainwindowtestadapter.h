@@ -26,6 +26,7 @@
 #include "ui.h"
 
 #include <QtCore>
+#include <QtNetwork>
 #include <QtWidgets>
 
 /*******************************************************************************
@@ -69,9 +70,14 @@ signals:
   void actionTriggered(ui::Action a);
 
 private:
+  void startMcpServer() noexcept;
+  void handleMcpConnection() noexcept;
+  void handleMcpData(QTcpSocket* socket) noexcept;
+
   GuiApplication& mApp;
   MainWindow& mWindow;
   bool mLibraryScanFinished = false;
+  QTcpServer* mMcpServer = nullptr;
 };
 
 /*******************************************************************************
