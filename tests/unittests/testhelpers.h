@@ -24,8 +24,12 @@
  *  Includes
  ******************************************************************************/
 #include <librepcb/core/exceptions.h>
+#include <librepcb/core/fileio/filepath.h>
+#include <librepcb/core/types/uuid.h>
 
 #include <QtCore>
+
+#include <functional>
 
 /*******************************************************************************
  *  Namespace
@@ -51,6 +55,37 @@ public:
   TestHelpers& operator=(const TestHelpers& rhs) = delete;
 
   // Static Methods
+
+  /**
+   * @brief Create an UUID factory that returns deterministic UUIDs
+   *
+   * This factory returns UUIDs of the form
+   * "00000000-0000-4000-8000-xxxxxxxxxxxx" with a monotonic counter.
+   *
+   * @return Factory function.
+   */
+  static std::function<Uuid()> createDeterministicUuidFactory() noexcept;
+
+  /**
+   * @brief Create a deterministic date time
+   *
+   * @return A hardcoded datetime.
+   */
+  static QDateTime createDeterministicDateTime() noexcept;
+
+  /**
+   * @brief Compare the contents of two directories recursively
+   *
+   * Recursively lists all files in both directories and checks that the sets
+   * of relative file paths are identical and that each file's content matches.
+   * Failures are reported via GTest macros, so this must only be called from
+   * within unit tests.
+   *
+   * @param actual    Directory produced by the code under test.
+   * @param expected  Golden sample directory to compare against.
+   */
+  static void compareDirectories(const FilePath& actual,
+                                 const FilePath& expected);
 
   /**
    * @brief Get a child object of a given parent object by path specification

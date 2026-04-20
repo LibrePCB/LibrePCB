@@ -55,7 +55,7 @@ public:
   LibraryBaseElement(const QString& shortElementName,
                      const QString& longElementName, const Uuid& uuid,
                      const Version& version, const QString& author,
-                     const ElementName& name_en_US,
+                     const QDateTime& created, const ElementName& name_en_US,
                      const QString& description_en_US,
                      const QString& keywords_en_US);
   LibraryBaseElement(const QString& shortElementName,

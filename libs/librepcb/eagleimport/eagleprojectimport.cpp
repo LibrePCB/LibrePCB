@@ -87,8 +87,15 @@ using C = EagleTypeConverter;
  *  Constructors / Destructor
  ******************************************************************************/
 
-EagleProjectImport::EagleProjectImport(QObject* parent) noexcept
-  : QObject(parent), mLogger(new MessageLogger(true)) {
+EagleProjectImport::EagleProjectImport(std::function<Uuid()> createUuid,
+                                       const QDateTime& created,
+                                       QObject* parent) noexcept
+  : QObject(parent),
+    mCreateUuid(createUuid),
+    mCreatedDateTime(created),
+    mTc(new EagleTypeConverter(createUuid)),
+    mLogger(new MessageLogger(true)) {
+  Q_ASSERT(mCreateUuid);
 }
 
 EagleProjectImport::~EagleProjectImport() noexcept {
@@ -173,6 +180,8 @@ void EagleProjectImport::import(Project& project) {
     // Try to apply the automatic THT annular width to get correct pad sizes in
     // footprints.
     EagleLibraryConverterSettings settings;
+    settings.createUuid = mCreateUuid;
+    settings.created = mCreatedDateTime;
     try {
       if (auto r = tryGetDrcRatio("rvPadBottom", "rlMinPadBottom",
                                   "rlMaxPadBottom")) {
@@ -197,21 +206,21 @@ void EagleProjectImport::import(Project& project) {
       if (name.isEmpty()) {
         name = libCmp.getUuid().toStr().left(8);  // Not so nice...
       }
-      ComponentInstance* cmp = new ComponentInstance(
-          project.getCircuit(), Uuid::createRandom(), libCmp,
-          symbVar->getUuid(), CircuitIdentifier(name));
+      ComponentInstance* cmp =
+          new ComponentInstance(project.getCircuit(), mCreateUuid(), libCmp,
+                                symbVar->getUuid(), CircuitIdentifier(name));
       if (!part.getValue().isEmpty()) {
         cmp->setValue(part.getValue());
       }
       AttributeList attributes = cmp->getAttributes();
-      C::tryConvertAttributes(part.getAttributes(), attributes, log);
+      mTc->tryConvertAttributes(part.getAttributes(), attributes, log);
       auto eagleDevSet = getDeviceSet(part.getLibrary(), part.getLibraryUrn(),
                                       part.getDeviceSet());
       const parseagle::Device eagleDev =
           getDevice(*eagleDevSet, part.getDevice());
       if (const parseagle::Technology* eagleTech =
               tryGetTechnology(eagleDev, part.getTechnology())) {
-        C::tryConvertAttributes(eagleTech->getAttributes(), attributes, log);
+        mTc->tryConvertAttributes(eagleTech->getAttributes(), attributes, log);
         if ((!attributes.contains("MPN")) &&
             (!attributes.contains("MANUFACTURER_PART_NUMBER")) &&
             (!attributes.contains("PART_NUMBER")) &&
@@ -413,14 +422,14 @@ void EagleProjectImport::importSchematic(Project& project,
   Schematic* schematic = new librepcb::Schematic(
       project,
       std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory()),
-      dirName, Uuid::createRandom(),
+      dirName, mCreateUuid(),
       ElementName(name));  // can throw
   project.addSchematic(*schematic);
 
   // Grid settings
   PositiveLength gridInterval = schematic->getGridInterval();
   LengthUnit gridUnit = schematic->getGridUnit();
-  C::convertGrid(mSchematic->getGrid(), gridInterval, gridUnit);
+  mTc->convertGrid(mSchematic->getGrid(), gridInterval, gridUnit);
   schematic->setGridInterval(gridInterval);
   schematic->setGridUnit(gridUnit);
 
@@ -442,11 +451,11 @@ void EagleProjectImport::importSchematic(Project& project,
     }
     const bool mirror = eagleInst.getRotation().getMirror();
     const Angle rotation =
-        C::convertAngle(mirror ? -eagleInst.getRotation().getAngle()
-                               : eagleInst.getRotation().getAngle());
+        mTc->convertAngle(mirror ? -eagleInst.getRotation().getAngle()
+                                 : eagleInst.getRotation().getAngle());
     SI_Symbol* symInst =
-        new SI_Symbol(*schematic, Uuid::createRandom(), *cmpInst, *gateIt,
-                      C::convertPoint(eagleInst.getPosition()), rotation,
+        new SI_Symbol(*schematic, mCreateUuid(), *cmpInst, *gateIt,
+                      mTc->convertPoint(eagleInst.getPosition()), rotation,
                       mirror, !eagleInst.getSmashed());
     if (eagleInst.getSmashed()) {
       foreach (const parseagle::Attribute& eagleAttr,
@@ -455,7 +464,7 @@ void EagleProjectImport::importSchematic(Project& project,
           continue;
         }
         try {
-          if (auto lpObj = C::tryConvertSchematicAttribute(eagleAttr)) {
+          if (auto lpObj = mTc->tryConvertSchematicAttribute(eagleAttr)) {
             SI_Text* obj = new SI_Text(*schematic, *lpObj);
             symInst->addText(*obj);
           } else {
@@ -488,24 +497,24 @@ void EagleProjectImport::importSchematic(Project& project,
   // Geometry
   QList<C::Geometry> geometries;
   try {
-    geometries += C::convertAndJoinWires(sheet.getWires(), true, log);
+    geometries += mTc->convertAndJoinWires(sheet.getWires(), true, log);
   } catch (const Exception& e) {
     log.warning(QString("Failed to join wires: %1").arg(e.getMsg()));
   }
   foreach (const parseagle::Rectangle& eagleObj, sheet.getRectangles()) {
-    geometries.append(C::convertRectangle(eagleObj, true));
+    geometries.append(mTc->convertRectangle(eagleObj, true));
   }
   foreach (const parseagle::Polygon& eagleObj, sheet.getPolygons()) {
-    geometries.append(C::convertPolygon(eagleObj, true));
+    geometries.append(mTc->convertPolygon(eagleObj, true));
   }
   foreach (const parseagle::Circle& eagleObj, sheet.getCircles()) {
-    geometries.append(C::convertCircle(eagleObj, true));
+    geometries.append(mTc->convertCircle(eagleObj, true));
   }
   foreach (const parseagle::Frame& eagleObj, sheet.getFrames()) {
-    geometries.append(C::convertFrame(eagleObj));
+    geometries.append(mTc->convertFrame(eagleObj));
   }
   foreach (const auto& g, geometries) {
-    if (auto o = C::tryConvertToSchematicPolygon(g)) {
+    if (auto o = mTc->tryConvertToSchematicPolygon(g)) {
       o->setIsGrabArea(g.grabArea && o->isFilled());
       SI_Polygon* obj = new SI_Polygon(*schematic, *o);
       schematic->addPolygon(*obj);
@@ -519,7 +528,7 @@ void EagleProjectImport::importSchematic(Project& project,
   // Texts
   foreach (const parseagle::Text& eagleObj, sheet.getTexts()) {
     try {
-      if (auto lpObj = C::tryConvertSchematicText(eagleObj, false)) {
+      if (auto lpObj = mTc->tryConvertSchematicText(eagleObj, false)) {
         SI_Text* obj = new SI_Text(*schematic, *lpObj);
         schematic->addText(*obj);
       } else {
@@ -540,8 +549,8 @@ void EagleProjectImport::importSchematic(Project& project,
     for (const parseagle::Segment& eagleSegment : eagleNet.getSegments()) {
       for (const parseagle::Wire& eagleWire : eagleSegment.getWires()) {
         if (eagleWire.getP1() == eagleWire.getP2()) continue;
-        netWireEndpoints.insert(C::convertPoint(eagleWire.getP1()));
-        netWireEndpoints.insert(C::convertPoint(eagleWire.getP2()));
+        netWireEndpoints.insert(mTc->convertPoint(eagleWire.getP1()));
+        netWireEndpoints.insert(mTc->convertPoint(eagleWire.getP2()));
       }
     }
   }
@@ -552,14 +561,14 @@ void EagleProjectImport::importSchematic(Project& project,
       Bus& bus = importBus(project, eagleBus.getName());
       for (const parseagle::Segment& eagleSeg : eagleBus.getSegments()) {
         std::unique_ptr<SI_BusSegment> busSegment(
-            new SI_BusSegment(*schematic, Uuid::createRandom(), bus));
+            new SI_BusSegment(*schematic, mCreateUuid(), bus));
 
         QHash<Point, SI_BusJunction*> junctionMap;
         auto getOrCreateJunction = [&](const Point& pos) {
           auto it = junctionMap.find(pos);
           if (it == junctionMap.end()) {
             SI_BusJunction* j =
-                new SI_BusJunction(*busSegment, Uuid::createRandom(), pos);
+                new SI_BusJunction(*busSegment, mCreateUuid(), pos);
             it = junctionMap.insert(pos, j);
           }
           return *it;
@@ -567,8 +576,8 @@ void EagleProjectImport::importSchematic(Project& project,
 
         QList<SI_BusLine*> lines;
         for (const parseagle::Wire& wire : eagleSeg.getWires()) {
-          const Point p1 = C::convertPoint(wire.getP1());
-          const Point p2 = C::convertPoint(wire.getP2());
+          const Point p1 = mTc->convertPoint(wire.getP1());
+          const Point p2 = mTc->convertPoint(wire.getP2());
           if (p1 == p2) continue;
 
           if (wire.getWireStyle() != parseagle::WireStyle::Continuous) {
@@ -601,8 +610,8 @@ void EagleProjectImport::importSchematic(Project& project,
           for (int i = 0; i < pathPoints.count() - 1; ++i) {
             SI_BusJunction* a = getOrCreateJunction(pathPoints.at(i));
             SI_BusJunction* b = getOrCreateJunction(pathPoints.at(i + 1));
-            lines.append(new SI_BusLine(*busSegment, Uuid::createRandom(), *a,
-                                        *b, SI_BusLine::getDefaultWidth()));
+            lines.append(new SI_BusLine(*busSegment, mCreateUuid(), *a, *b,
+                                        SI_BusLine::getDefaultWidth()));
           }
         }
 
@@ -615,12 +624,12 @@ void EagleProjectImport::importSchematic(Project& project,
 
         for (const parseagle::Label& eagleLabel : eagleSeg.getLabels()) {
           const Angle rot =
-              C::convertAngle(eagleLabel.getRotation().getAngle());
+              mTc->convertAngle(eagleLabel.getRotation().getAngle());
           const bool mirror = eagleLabel.getRotation().getMirror();
-          const Point pos = C::convertPoint(eagleLabel.getPosition());
+          const Point pos = mTc->convertPoint(eagleLabel.getPosition());
           SI_BusLabel* busLabel = new SI_BusLabel(
               *busSegment,
-              NetLabel(Uuid::createRandom(), pos, mirror ? -rot : rot, mirror));
+              NetLabel(mCreateUuid(), pos, mirror ? -rot : rot, mirror));
           busSegment->addLabel(*busLabel);
         }
         busSegment->addJunctionsAndLines(junctionMap.values(), lines);
@@ -684,9 +693,8 @@ void EagleProjectImport::importSchematic(Project& project,
           if (it != anchorMap.end()) {
             // There's another pin on the same position -> add a netline to
             // connect them since EAGLE implicitly consider them as connected.
-            splitter.addNetLine(NetLine(Uuid::createRandom(),
-                                        SI_NetLine::getDefaultWidth(), *it,
-                                        pinAnchor));
+            splitter.addNetLine(NetLine(
+                mCreateUuid(), SI_NetLine::getDefaultWidth(), *it, pinAnchor));
           }
           anchorMap.insert(symbolPin->getPosition(), pinAnchor);
         }
@@ -706,10 +714,11 @@ void EagleProjectImport::importSchematic(Project& project,
         }
 
         // Convert wires.
-        auto getOrCreateAnchor = [&anchorMap, &splitter](const Point& pos) {
+        auto getOrCreateAnchor = [this, &anchorMap,
+                                  &splitter](const Point& pos) {
           auto it = anchorMap.find(pos);
           if (it == anchorMap.end()) {
-            const Junction junction(Uuid::createRandom(), pos);
+            const Junction junction(mCreateUuid(), pos);
             splitter.addJunction(junction);
             it = anchorMap.insert(pos,
                                   NetLineAnchor::junction(junction.getUuid()));
@@ -721,10 +730,14 @@ void EagleProjectImport::importSchematic(Project& project,
           if (eagleWire.getP1() == eagleWire.getP2()) {
             continue;
           }
+          // Evaluate anchors in separate statements to ensure a deterministic
+          // order of mCreateUuid() calls across compilers/platforms.
+          const NetLineAnchor p1 =
+              getOrCreateAnchor(mTc->convertPoint(eagleWire.getP1()));
+          const NetLineAnchor p2 =
+              getOrCreateAnchor(mTc->convertPoint(eagleWire.getP2()));
           splitter.addNetLine(
-              NetLine(Uuid::createRandom(), SI_NetLine::getDefaultWidth(),
-                      getOrCreateAnchor(C::convertPoint(eagleWire.getP1())),
-                      getOrCreateAnchor(C::convertPoint(eagleWire.getP2()))));
+              NetLine(mCreateUuid(), SI_NetLine::getDefaultWidth(), p1, p2));
           if (eagleWire.getWireStyle() != parseagle::WireStyle::Continuous) {
             log.warning(
                 tr("Dashed/dotted line is not supported, converting to "
@@ -737,9 +750,9 @@ void EagleProjectImport::importSchematic(Project& project,
         }
         foreach (const parseagle::Label& eagleLabel, eagleSegment.getLabels()) {
           const Angle rot =
-              C::convertAngle(eagleLabel.getRotation().getAngle());
+              mTc->convertAngle(eagleLabel.getRotation().getAngle());
           const bool mirror = eagleLabel.getRotation().getMirror();
-          Point pos = C::convertPoint(eagleLabel.getPosition());
+          Point pos = mTc->convertPoint(eagleLabel.getPosition());
           if (eagleLabel.getXref()) {
             pos += Point(mirror ? -254000 : 254000, -1270000)
                        .rotated(mirror ? -rot : rot);
@@ -748,7 +761,7 @@ void EagleProjectImport::importSchematic(Project& project,
                    "normal net label."));
           }
           splitter.addNetLabel(
-              NetLabel(Uuid::createRandom(), pos, mirror ? -rot : rot, mirror));
+              NetLabel(mCreateUuid(), pos, mirror ? -rot : rot, mirror));
         }
       }
 
@@ -773,7 +786,7 @@ void EagleProjectImport::importSchematic(Project& project,
       };
       foreach (const auto& segment, splitter.split()) {
         SI_NetSegment* netSegment =
-            new SI_NetSegment(*schematic, Uuid::createRandom(), netSignal);
+            new SI_NetSegment(*schematic, mCreateUuid(), netSignal);
         schematic->addNetSegment(*netSegment);
         QList<SI_NetPoint*> netPoints;
         QList<SI_NetLine*> netLines;
@@ -806,9 +819,9 @@ NetSignal& EagleProjectImport::importNet(Project& project,
                                          const parseagle::Net& net) {
   auto it = mNetSignalMap.find(net.getName());
   if (it == mNetSignalMap.end()) {
-    const Uuid uuid = Uuid::createRandom();
+    const Uuid uuid = mCreateUuid();
     QString name =
-        C::convertInversionSyntax(cleanCircuitIdentifier(net.getName()));
+        mTc->convertInversionSyntax(cleanCircuitIdentifier(net.getName()));
     if (name.isEmpty()) {
       name = uuid.toStr().left(8);
     } else if (project.getCircuit().getNetSignalByName(name)) {
@@ -833,7 +846,7 @@ Bus& EagleProjectImport::importBus(Project& project,
                                    const QString& eagleBusName) {
   auto it = mBusMap.find(eagleBusName);
   if (it == mBusMap.end()) {
-    const Uuid uuid = Uuid::createRandom();
+    const Uuid uuid = mCreateUuid();
     // Eagle bus names use format "ALIAS" or "ALIAS:net1,net2" or
     // "ALIAS:net[i..j]" where "ALIAS:" is optional. If present, use it as name.
     QString name = cleanBusName(eagleBusName.split(":").first());
@@ -859,21 +872,21 @@ void EagleProjectImport::importBoard(Project& project,
   Board* board = new librepcb::Board(
       project,
       std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory()),
-      "default", Uuid::createRandom(),
+      "default", mCreateUuid(),
       ElementName("default"));  // can throw
   project.addBoard(*board);
 
   // Grid settings
   PositiveLength gridInterval = board->getGridInterval();
   LengthUnit gridUnit = board->getGridUnit();
-  C::convertGrid(mBoard->getGrid(), gridInterval, gridUnit);
+  mTc->convertGrid(mBoard->getGrid(), gridInterval, gridUnit);
   board->setGridInterval(gridInterval);
   board->setGridUnit(gridUnit);
 
   // Layer setup
   QHash<const Layer*, const Layer*> copperLayerMap;
   if (auto p = mBoard->getDesignRules().tryGetParam("layerSetup")) {
-    copperLayerMap = C::convertLayerSetup(p->getValue());
+    copperLayerMap = mTc->convertLayerSetup(p->getValue());
   }
   copperLayerMap.insert(&Layer::topCopper(), &Layer::topCopper());
   copperLayerMap.insert(&Layer::botCopper(), &Layer::botCopper());
@@ -890,10 +903,10 @@ void EagleProjectImport::importBoard(Project& project,
     r.setPadCmpSideAutoAnnularRing(false);  // Not sure if EAGLE supports this.
     r.setPadInnerAutoAnnularRing(true);  // Not sure if EAGLE supports this.
     if (auto p = mBoard->getDesignRules().tryGetParam("mdCopperDimension")) {
-      copperBoardDistance = C::convertParamTo<UnsignedLength>(*p);
+      copperBoardDistance = mTc->convertParamTo<UnsignedLength>(*p);
     }
     if (auto p = mBoard->getDesignRules().tryGetParam("mlViaStopLimit")) {
-      const auto value = C::convertParamTo<UnsignedLength>(*p);
+      const auto value = mTc->convertParamTo<UnsignedLength>(*p);
       r.setStopMaskMaxViaDiameter(value);
     }
     if (board->getInnerLayerCount() > 0) {
@@ -937,29 +950,29 @@ void EagleProjectImport::importBoard(Project& project,
   try {
     BoardDesignRuleCheckSettings s = board->getDrcSettings();
     if (auto p = mBoard->getDesignRules().tryGetParam("mdWireWire")) {
-      const auto value = C::convertParamTo<UnsignedLength>(*p);
+      const auto value = mTc->convertParamTo<UnsignedLength>(*p);
       s.setMinCopperCopperClearance(value);
     }
     if (auto p = mBoard->getDesignRules().tryGetParam("mdCopperDimension")) {
-      const auto value = C::convertParamTo<UnsignedLength>(*p);
+      const auto value = mTc->convertParamTo<UnsignedLength>(*p);
       s.setMinCopperBoardClearance(value);
       s.setMinCopperNpthClearance(value);
     }
     if (auto p = mBoard->getDesignRules().tryGetParam("mdDrill")) {
-      const auto value = C::convertParamTo<UnsignedLength>(*p);
+      const auto value = mTc->convertParamTo<UnsignedLength>(*p);
       s.setMinDrillDrillClearance(value);
       s.setMinDrillBoardClearance(value);
     }
     if (auto p = mBoard->getDesignRules().tryGetParam("msWidth")) {
-      const auto value = C::convertParamTo<UnsignedLength>(*p);
+      const auto value = mTc->convertParamTo<UnsignedLength>(*p);
       s.setMinCopperWidth(value);
     }
     if (auto p = mBoard->getDesignRules().tryGetParam("rlMinViaInner")) {
-      const auto value = C::convertParamTo<UnsignedLength>(*p);
+      const auto value = mTc->convertParamTo<UnsignedLength>(*p);
       s.setMinPthAnnularRing(value);
     }
     if (auto p = mBoard->getDesignRules().tryGetParam("msDrill")) {
-      const auto value = C::convertParamTo<UnsignedLength>(*p);
+      const auto value = mTc->convertParamTo<UnsignedLength>(*p);
       s.setMinNpthDrillDiameter(value);
       s.setMinPthDrillDiameter(value);
     }
@@ -993,12 +1006,14 @@ void EagleProjectImport::importBoard(Project& project,
                             cmpIt->libUrn, cmpIt->devSetName, cmpIt->devName,
                             eagleElem.getLibrary(), eagleElem.getLibraryUrn());
     const bool mirror = eagleElem.getRotation().getMirror();
-    const Angle rotation = C::convertAngle(eagleElem.getRotation().getAngle());
-    BI_Device* devInst = new BI_Device(
-        *board, *cmpInst, libDev.getUuid(),
-        libPkg.getFootprints().first()->getUuid(),
-        C::convertPoint(eagleElem.getPosition()), mirror ? -rotation : rotation,
-        mirror, eagleElem.getLocked(), true, !eagleElem.getSmashed());
+    const Angle rotation =
+        mTc->convertAngle(eagleElem.getRotation().getAngle());
+    BI_Device* devInst =
+        new BI_Device(*board, *cmpInst, libDev.getUuid(),
+                      libPkg.getFootprints().first()->getUuid(),
+                      mTc->convertPoint(eagleElem.getPosition()),
+                      mirror ? -rotation : rotation, mirror,
+                      eagleElem.getLocked(), true, !eagleElem.getSmashed());
     board->addDeviceInstance(*devInst);
 
     // Add stroke texts.
@@ -1009,7 +1024,7 @@ void EagleProjectImport::importBoard(Project& project,
           continue;
         }
         try {
-          if (auto lpObj = C::tryConvertBoardAttribute(eagleAttr)) {
+          if (auto lpObj = mTc->tryConvertBoardAttribute(eagleAttr)) {
             BI_StrokeText* obj = new BI_StrokeText(
                 *board,
                 BoardStrokeTextData(
@@ -1057,7 +1072,7 @@ void EagleProjectImport::importBoard(Project& project,
           project.getCircuit().getAssemblyVariants().getUuidSet());
     }
     SimpleString mpn(""), manufacturer("");
-    C::tryExtractMpnAndManufacturer(attributes, mpn, manufacturer);
+    mTc->tryExtractMpnAndManufacturer(attributes, mpn, manufacturer);
     if (!mpn->isEmpty()) {
       // Convert attributes to a Part.
       assemblyOption->getParts().append(
@@ -1070,21 +1085,21 @@ void EagleProjectImport::importBoard(Project& project,
   // Geometry
   QList<C::Geometry> geometries;
   try {
-    geometries += C::convertAndJoinWires(mBoard->getWires(), true, log);
+    geometries += mTc->convertAndJoinWires(mBoard->getWires(), true, log);
   } catch (const Exception& e) {
     log.warning(QString("Failed to join wires: %1").arg(e.getMsg()));
   }
   foreach (const parseagle::Rectangle& eagleObj, mBoard->getRectangles()) {
-    geometries.append(C::convertRectangle(eagleObj, true));
+    geometries.append(mTc->convertRectangle(eagleObj, true));
   }
   foreach (const parseagle::Polygon& eagleObj, mBoard->getPolygons()) {
-    geometries.append(C::convertPolygon(eagleObj, true));
+    geometries.append(mTc->convertPolygon(eagleObj, true));
   }
   foreach (const parseagle::Circle& eagleObj, mBoard->getCircles()) {
-    geometries.append(C::convertCircle(eagleObj, true));
+    geometries.append(mTc->convertCircle(eagleObj, true));
   }
   foreach (const auto& g, geometries) {
-    const auto zones = C::tryConvertToBoardZones(g);
+    const auto zones = mTc->tryConvertToBoardZones(g);
     if (!zones.isEmpty()) {
       foreach (const auto zone, zones) {
         QSet<const Layer*> layers;
@@ -1105,7 +1120,7 @@ void EagleProjectImport::importBoard(Project& project,
                                       zone->getOutline(), false));
         board->addZone(*obj);
       }
-    } else if (auto o = C::tryConvertToBoardPolygon(g)) {
+    } else if (auto o = mTc->tryConvertToBoardPolygon(g)) {
       o->setIsGrabArea(g.grabArea && o->isFilled());
       BI_Polygon* obj = new BI_Polygon(
           *board,
@@ -1123,7 +1138,7 @@ void EagleProjectImport::importBoard(Project& project,
   // Texts
   foreach (const parseagle::Text& eagleObj, mBoard->getTexts()) {
     try {
-      if (auto lpObj = C::tryConvertBoardText(eagleObj, false)) {
+      if (auto lpObj = mTc->tryConvertBoardText(eagleObj, false)) {
         BI_StrokeText* obj = new BI_StrokeText(
             *board,
             BoardStrokeTextData(
@@ -1147,7 +1162,7 @@ void EagleProjectImport::importBoard(Project& project,
   // Holes
   foreach (const parseagle::Hole& eagleObj, mBoard->getHoles()) {
     try {
-      std::shared_ptr<Hole> lpObj = C::convertHole(eagleObj);
+      std::shared_ptr<Hole> lpObj = mTc->convertHole(eagleObj);
       BI_Hole* obj = new BI_Hole(
           *board,
           BoardHoleData(lpObj->getUuid(), lpObj->getDiameter(),
@@ -1201,8 +1216,8 @@ void EagleProjectImport::importBoard(Project& project,
         const bool validLayers = eagleVia.tryGetStartLayer(startLayerId) &&
             eagleVia.tryGetEndLayer(endLayerId);
         const Layer* startLayer =
-            mapLayer(C::tryConvertBoardLayer(startLayerId));
-        const Layer* endLayer = mapLayer(C::tryConvertBoardLayer(endLayerId));
+            mapLayer(mTc->tryConvertBoardLayer(startLayerId));
+        const Layer* endLayer = mapLayer(mTc->tryConvertBoardLayer(endLayerId));
         if ((!validLayers) || (!startLayer) || (!endLayer) ||
             (!startLayer->isCopper()) || (!endLayer->isCopper()) ||
             (startLayer->getCopperNumber() > endLayer->getCopperNumber())) {
@@ -1211,8 +1226,8 @@ void EagleProjectImport::importBoard(Project& project,
                                  .arg(eagleVia.getExtent()));
         }
         const PositiveLength drillDiameter(
-            C::convertLength(eagleVia.getDrill()));
-        const Length sizeRaw = C::convertLength(eagleVia.getDiameter());
+            mTc->convertLength(eagleVia.getDrill()));
+        const Length sizeRaw = mTc->convertLength(eagleVia.getDiameter());
         std::optional<PositiveLength> size;
         if (sizeRaw >= *drillDiameter) {
           size = PositiveLength(sizeRaw);
@@ -1231,8 +1246,8 @@ void EagleProjectImport::importBoard(Project& project,
               tr("Square/octagon via shape not supported, converting to "
                  "circular."));
         }
-        const Via via(Uuid::createRandom(), *startLayer, *endLayer,
-                      C::convertPoint(eagleVia.getPosition()), drillDiameter,
+        const Via via(mCreateUuid(), *startLayer, *endLayer,
+                      mTc->convertPoint(eagleVia.getPosition()), drillDiameter,
                       size, stopMaskConfig);
         splitter.addVia(via, false);
         const TraceAnchor viaAnchor = TraceAnchor::via(via.getUuid());
@@ -1240,8 +1255,9 @@ void EagleProjectImport::importBoard(Project& project,
       }
 
       // Convert traces.
-      auto getOrCreateAnchor = [&padMap, &anchorMap, &splitter, netSignal](
-                                   const Layer& layer, const Point& pos) {
+      auto getOrCreateAnchor = [this, &padMap, &anchorMap, &splitter,
+                                netSignal](const Layer& layer,
+                                           const Point& pos) {
         // Find via.
         auto it = anchorMap.find(std::make_pair(nullptr, pos));
         // Find net point.
@@ -1269,7 +1285,7 @@ void EagleProjectImport::importBoard(Project& project,
         }
         // Find or add net point.
         if (it == anchorMap.end()) {
-          const Junction junction(Uuid::createRandom(), pos);
+          const Junction junction(mCreateUuid(), pos);
           splitter.addJunction(junction);
           it = anchorMap.insert(std::make_pair(&layer, pos),
                                 TraceAnchor::junction(junction.getUuid()));
@@ -1286,16 +1302,16 @@ void EagleProjectImport::importBoard(Project& project,
           continue;
         }
         const Layer* layer =
-            mapLayer(C::tryConvertBoardLayer(eagleWire.getLayer()));
+            mapLayer(mTc->tryConvertBoardLayer(eagleWire.getLayer()));
         if ((!layer) || (!layer->isCopper())) {
           log.critical(QString("Skipped trace on invalid layer: %1")
                            .arg(eagleWire.getLayer()));
           continue;
         }
         const TraceAnchor p1 =
-            getOrCreateAnchor(*layer, C::convertPoint(eagleWire.getP1()));
+            getOrCreateAnchor(*layer, mTc->convertPoint(eagleWire.getP1()));
         const TraceAnchor p2 =
-            getOrCreateAnchor(*layer, C::convertPoint(eagleWire.getP2()));
+            getOrCreateAnchor(*layer, mTc->convertPoint(eagleWire.getP2()));
         if (p1 == p2) {
           log.info("Attaching a trace to a pad removed a short trace segment.");
           continue;
@@ -1314,8 +1330,8 @@ void EagleProjectImport::importBoard(Project& project,
               tr("Curved trace is not supported, converting to straight."));
         }
         splitter.addTrace(Trace(
-            Uuid::createRandom(), *layer,
-            PositiveLength(C::convertLength(eagleWire.getWidth())), p1, p2));
+            mCreateUuid(), *layer,
+            PositiveLength(mTc->convertLength(eagleWire.getWidth())), p1, p2));
       }
 
       // Determine segments and add them to the board.
@@ -1339,7 +1355,7 @@ void EagleProjectImport::importBoard(Project& project,
       };
       foreach (const auto& segment, splitter.split()) {
         BI_NetSegment* netSegment =
-            new BI_NetSegment(*board, Uuid::createRandom(), netSignal);
+            new BI_NetSegment(*board, mCreateUuid(), netSignal);
         board->addNetSegment(*netSegment);
         QList<BI_Pad*> pads;
         QList<BI_Via*> vias;
@@ -1372,28 +1388,28 @@ void EagleProjectImport::importBoard(Project& project,
     foreach (const parseagle::Polygon& eagleObj, eagleSignal.getPolygons()) {
       try {
         const Layer* layer =
-            mapLayer(C::tryConvertBoardLayer(eagleObj.getLayer()));
+            mapLayer(mTc->tryConvertBoardLayer(eagleObj.getLayer()));
         if ((!layer) || (!layer->isCopper())) {
           throw RuntimeError(__FILE__, __LINE__, "Plane not on copper layer.");
         }
         if (eagleObj.getPour() == parseagle::PolygonPour::Cutout) {
-          const Path path = C::convertVertices(eagleObj.getVertices(), false);
-          const Length lineWidth = C::convertLength(eagleObj.getWidth());
+          const Path path = mTc->convertVertices(eagleObj.getVertices(), false);
+          const Length lineWidth = mTc->convertLength(eagleObj.getWidth());
           foreach (const Path& outline,
-                   C::convertBoardZoneOutline(path, lineWidth)) {
+                   mTc->convertBoardZoneOutline(path, lineWidth)) {
             BI_Zone* zone = new BI_Zone(
                 *board,
-                BoardZoneData(Uuid::createRandom(), {layer},
-                              Zone::Rule::NoPlanes, outline, false));
+                BoardZoneData(mCreateUuid(), {layer}, Zone::Rule::NoPlanes,
+                              outline, false));
             board->addZone(*zone);
           }
         } else {
-          const Length isolate = C::convertLength(eagleObj.getIsolate());
+          const Length isolate = mTc->convertLength(eagleObj.getIsolate());
           BI_Plane* obj =
-              new BI_Plane(*board, Uuid::createRandom(), *layer, netSignal,
-                           C::convertVertices(eagleObj.getVertices(), false));
+              new BI_Plane(*board, mCreateUuid(), *layer, netSignal,
+                           mTc->convertVertices(eagleObj.getVertices(), false));
           obj->setMinWidth(
-              UnsignedLength(C::convertLength(eagleObj.getWidth())));
+              UnsignedLength(mTc->convertLength(eagleObj.getWidth())));
           obj->setMinClearanceToCopper(
               (isolate > 0)
                   ? UnsignedLength(isolate)
@@ -1428,9 +1444,9 @@ std::optional<BoundedUnsignedRatio> EagleProjectImport::tryGetDrcRatio(
     const auto pmin = mBoard->getDesignRules().tryGetParam(nmin);
     const auto pmax = mBoard->getDesignRules().tryGetParam(nmax);
     if (pr && pmin && pmax) {
-      const auto vr = C::convertParamTo<UnsignedRatio>(*pr);
-      const auto vmin = C::convertParamTo<UnsignedLength>(*pmin);
-      const auto vmax = C::convertParamTo<UnsignedLength>(*pmax);
+      const auto vr = mTc->convertParamTo<UnsignedRatio>(*pr);
+      const auto vmin = mTc->convertParamTo<UnsignedLength>(*pmin);
+      const auto vmax = mTc->convertParamTo<UnsignedLength>(*pmax);
       // Note: Eagle allows to specify min>max so we have to correct this
       // case. It seems the min value is ignored then.
       return std::make_optional(

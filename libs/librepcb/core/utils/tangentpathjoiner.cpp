@@ -122,37 +122,39 @@ QVector<Path> TangentPathJoiner::join(QVector<Path> paths, qint64 timeoutMs,
   QElapsedTimer timer;
   timer.start();
   findAllPaths(found, paths, timer, timeoutMs, Result(), timedOut);
-  std::sort(found.begin(), found.end(),
-            [&paths](const Result& r1, const Result& r2) {
-              // Prio 1: Closed paths
-              if (r1.isClosed() != r2.isClosed()) {
-                return r1.isClosed();
-              }
-              // Prio 2: Long open paths or closed paths with a large area,
-              // to get the outest most polygons instead of polygons inside
-              // e.g. a symbol body
-              const qreal l1 = r1.calcLengthOrArea(paths);
-              const qreal l2 = r2.calcLengthOrArea(paths);
-              if (l1 != l2) {
-                return l1 > l2;
-              }
-              // Prio 3: Paths consisting of many joints
-              int c1 = r1.segments.count();
-              int c2 = r2.segments.count();
-              if (c1 != c2) {
-                return c1 > c2;
-              }
-              // Prio 4: Lower, non-reversed indices
-              for (int i = 0; i < c1; ++i) {
-                if (r1.segments.at(i).reverse != r2.segments.at(i).reverse) {
-                  return r2.segments.at(i).reverse;
-                }
-                if (r1.segments.at(i).index != r2.segments.at(i).index) {
-                  return r1.segments.at(i).index < r2.segments.at(i).index;
-                }
-              }
-              return false;
-            });
+  std::stable_sort(
+      found.begin(), found.end(), [&paths](const Result& r1, const Result& r2) {
+        // Prio 1: Closed paths
+        if (r1.isClosed() != r2.isClosed()) {
+          return r1.isClosed();
+        }
+        // Prio 2: Long open paths or closed paths with a large area,
+        // to get the outest most polygons instead of polygons inside
+        // e.g. a symbol body. Use a tolerance to avoid sub-ULP floating-point
+        // differences (accumulation order, FMA) from producing
+        // platform-dependent orderings for geometrically equivalent candidates.
+        const double l1 = r1.calcLengthOrArea(paths);
+        const double l2 = r2.calcLengthOrArea(paths);
+        if (std::abs(l1 - l2) > 50e-9) {
+          return l1 > l2;
+        }
+        // Prio 3: Paths consisting of many joints
+        int c1 = r1.segments.count();
+        int c2 = r2.segments.count();
+        if (c1 != c2) {
+          return c1 > c2;
+        }
+        // Prio 4: Lower, non-reversed indices
+        for (int i = 0; i < c1; ++i) {
+          if (r1.segments.at(i).reverse != r2.segments.at(i).reverse) {
+            return r2.segments.at(i).reverse;
+          }
+          if (r1.segments.at(i).index != r2.segments.at(i).index) {
+            return r1.segments.at(i).index < r2.segments.at(i).index;
+          }
+        }
+        return false;
+      });
 
   // Add found paths to result.
   QSet<int> consumedIndices;

@@ -167,7 +167,8 @@ TEST_F(AddComponentDialogTest, testChooseComponentDevice) {
 
   // Create component
   TransactionalDirectory cmp2Dir(mFs, uuid(4).toStr());
-  Component cmp2(uuid(4), version("0.1"), "", ElementName("cmp 2"), "", "");
+  Component cmp2(uuid(4), version("0.1"), "", QDateTime::currentDateTime(),
+                 ElementName("cmp 2"), "", "");
   auto cmp2SymbVar1 = std::make_shared<ComponentSymbolVariant>(
       uuid(7), "", ElementName("var 1"), "");
   cmp2.getSymbolVariants().append(cmp2SymbVar1);
@@ -178,14 +179,14 @@ TEST_F(AddComponentDialogTest, testChooseComponentDevice) {
 
   // Create package
   TransactionalDirectory pkg1Dir(mFs, uuid(5).toStr());
-  Package pkg1(uuid(5), version("0.1"), "", ElementName("pkg 1"), "", "",
-               Package::AssemblyType::Tht);
+  Package pkg1(uuid(5), version("0.1"), "", QDateTime::currentDateTime(),
+               ElementName("pkg 1"), "", "", Package::AssemblyType::Tht);
   pkg1.saveTo(pkg1Dir);
 
   // Create device
   TransactionalDirectory dev1Dir(mFs, uuid(6).toStr());
-  Device dev1(uuid(6), version("0.1"), "", ElementName("dev 1"), "", "",
-              uuid(4), uuid(5));
+  Device dev1(uuid(6), version("0.1"), "", QDateTime::currentDateTime(),
+              ElementName("dev 1"), "", "", uuid(4), uuid(5));
   dev1.saveTo(dev1Dir);
 
   // Save everything to disk
@@ -260,7 +261,8 @@ TEST_F(AddComponentDialogTest, testSetNormOrder) {
 
   // Create component
   TransactionalDirectory cmp2Dir(mFs, uuid(3).toStr());
-  Component cmp2(uuid(3), version("0.1"), "", ElementName("cmp 2"), "", "");
+  Component cmp2(uuid(3), version("0.1"), "", QDateTime::currentDateTime(),
+                 ElementName("cmp 2"), "", "");
   auto cmp2SymbVar1 = std::make_shared<ComponentSymbolVariant>(
       uuid(4), "", ElementName("var 1"), "");
   cmp2.getSymbolVariants().append(cmp2SymbVar1);

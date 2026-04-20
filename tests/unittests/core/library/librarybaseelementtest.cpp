@@ -47,7 +47,7 @@ protected:
 
     mNewElement.reset(new LibraryBaseElement(
         "sym", "symbol", Uuid::createRandom(), Version::fromString("1.0"),
-        "test", ElementName("Test"), "", ""));
+        "test", QDateTime::currentDateTime(), ElementName("Test"), "", ""));
   }
 
   virtual ~LibraryBaseElementTest() {

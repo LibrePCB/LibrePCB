@@ -48,11 +48,11 @@ namespace librepcb {
  ******************************************************************************/
 
 Project::Project(std::unique_ptr<TransactionalDirectory> directory,
-                 const QString& filename)
+                 const QString& filename, const Uuid& uuid)
   : QObject(nullptr),
     mDirectory(std::move(directory)),
     mFilename(filename),
-    mUuid(Uuid::createRandom()),
+    mUuid(uuid),
     mName("Unnamed"),
     mAuthor(),
     mVersion("v1"),
@@ -526,8 +526,8 @@ void Project::save() {
  ******************************************************************************/
 
 std::unique_ptr<Project> Project::create(
-    std::unique_ptr<TransactionalDirectory> directory,
-    const QString& filename) {
+    std::unique_ptr<TransactionalDirectory> directory, const QString& filename,
+    std::function<Uuid()> createUuid) {
   Q_ASSERT(directory);
   qDebug().nospace() << "Create project "
                      << directory->getAbsPath(filename).toNative() << "...";
@@ -552,16 +552,17 @@ std::unique_ptr<Project> Project::create(
   }
 
   // Create empty project.
-  std::unique_ptr<Project> p(new Project(std::move(directory), filename));
+  std::unique_ptr<Project> p(
+      new Project(std::move(directory), filename, createUuid()));
 
   // Add default assembly variant with name "Std".
   p->getCircuit().addAssemblyVariant(std::make_shared<AssemblyVariant>(
-      Uuid::createRandom(), FileProofName("Std"), "Standard assembly"));
+      createUuid(), FileProofName("Std"), "Standard assembly"));
 
   // Add default netclass with name "default".
   {
-    NetClass* netclass = new NetClass(p->getCircuit(), Uuid::createRandom(),
-                                      ElementName("default"));
+    NetClass* netclass =
+        new NetClass(p->getCircuit(), createUuid(), ElementName("default"));
     p->getCircuit().addNetClass(*netclass);
   }
 

@@ -23,6 +23,7 @@
 #include "testhelpers.h"
 
 #include <gtest/gtest.h>
+#include <librepcb/core/fileio/fileutils.h>
 #include <librepcb/core/utils/toolbox.h>
 
 #include <QtCore>
@@ -38,6 +39,53 @@ namespace tests {
 /*******************************************************************************
  *  Static Methods
  ******************************************************************************/
+
+std::function<Uuid()> TestHelpers::createDeterministicUuidFactory() noexcept {
+  auto counter = std::make_shared<quint64>(0);
+  return [counter]() -> Uuid {
+    ++(*counter);
+    return Uuid::fromString(QString("00000000-0000-4000-8000-%1")
+                                .arg(*counter, 12, 16, QLatin1Char('0')));
+  };
+}
+
+QDateTime TestHelpers::createDeterministicDateTime() noexcept {
+  return QDateTime::fromString("2000-01-02T03:04:05Z", Qt::ISODate);
+}
+
+void TestHelpers::compareDirectories(const FilePath& actual,
+                                     const FilePath& expected) {
+  const QList<FilePath> actualFiles =
+      FileUtils::getFilesInDirectory(actual, {}, true, false);
+  const QList<FilePath> expectedFiles =
+      FileUtils::getFilesInDirectory(expected, {}, true, false);
+
+  // Build relative-path sets for structural comparison.
+  QSet<QString> actualRels, expectedRels;
+  for (const FilePath& fp : actualFiles) {
+    actualRels.insert(fp.toRelative(actual));
+  }
+  for (const FilePath& fp : expectedFiles) {
+    expectedRels.insert(fp.toRelative(expected));
+  }
+
+  // Check for files missing in actual output.
+  for (const QString& rel : (expectedRels - actualRels)) {
+    ADD_FAILURE() << "Missing file in output: " << rel.toStdString();
+  }
+
+  // Check for unexpected files in actual output.
+  for (const QString& rel : (actualRels - expectedRels)) {
+    ADD_FAILURE() << "Unexpected file in output: " << rel.toStdString();
+  }
+
+  // Compare contents of files present in both, one at a time.
+  for (const QString& rel : (actualRels & expectedRels)) {
+    EXPECT_EQ(FileUtils::readFile(expected.getPathTo(rel)).toStdString(),
+              FileUtils::readFile(actual.getPathTo(rel)).toStdString())
+        << "File content differs: " << rel.toStdString();
+  }
+}
 
 void TestHelpers::testTabOrder(QWidget& widget) {
   // Skip test on systems other than Linux and Windows (details in function

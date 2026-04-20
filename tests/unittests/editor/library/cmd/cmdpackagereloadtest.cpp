@@ -103,8 +103,8 @@ TEST_F(CmdPackageReloadTest, test) {
   // Create a "empty" library element and save it to the file system.
   std::unique_ptr<Package> element(
       new Package(Uuid::fromString("acd99b30-59a5-419f-b067-ae704e4364bb"),
-                  Version::fromString("0.1"), "", ElementName("name"), "", "",
-                  Package::AssemblyType::Auto));
+                  Version::fromString("0.1"), "", QDateTime::currentDateTime(),
+                  ElementName("name"), "", "", Package::AssemblyType::Auto));
   element->saveTo(*dir);
   fs->save();
 

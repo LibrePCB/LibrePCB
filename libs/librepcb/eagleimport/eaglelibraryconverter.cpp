@@ -56,9 +56,11 @@ static QString generatedBy(QString libName, QStringList keys) {
  ******************************************************************************/
 
 EagleLibraryConverterSettings::EagleLibraryConverterSettings() noexcept
-  : namePrefix(),
+  : createUuid(&Uuid::createRandom),
+    namePrefix(),
     version(Version::fromString("0.1")),
     author("EAGLE Import"),
+    created(QDateTime::currentDateTime()),
     keywords("eagle,import"),
     autoThtAnnularWidth(EagleTypeConverter::getDefaultAutoThtAnnularWidth()) {
 }
@@ -69,7 +71,9 @@ EagleLibraryConverterSettings::EagleLibraryConverterSettings() noexcept
 
 EagleLibraryConverter::EagleLibraryConverter(
     const EagleLibraryConverterSettings& settings, QObject* parent) noexcept
-  : QObject(parent), mSettings(settings) {
+  : QObject(parent),
+    mSettings(settings),
+    mTc(new EagleTypeConverter(settings.createUuid)) {
 }
 
 EagleLibraryConverter::~EagleLibraryConverter() noexcept {
@@ -114,9 +118,10 @@ std::unique_ptr<Symbol> EagleLibraryConverter::createSymbol(
     throw LogicError(__FILE__, __LINE__, "Duplicate import.");
   }
   std::unique_ptr<Symbol> symbol(new Symbol(
-      Uuid::createRandom(), mSettings.version, mSettings.author,
-      C::convertElementName(mSettings.namePrefix + eagleSymbol.getName()),
-      C::convertElementDescription(eagleSymbol.getDescription()),
+      mSettings.createUuid(), mSettings.version, mSettings.author,
+      mSettings.created,
+      mTc->convertElementName(mSettings.namePrefix + eagleSymbol.getName()),
+      mTc->convertElementDescription(eagleSymbol.getDescription()),
       mSettings.keywords));
   symbol->setGeneratedBy(generatedBy(libName, {eagleSymbol.getName()}));
   symbol->setCategories(mSettings.symbolCategories);
@@ -129,38 +134,48 @@ std::unique_ptr<Symbol> EagleLibraryConverter::createSymbol(
         // pins.
         const bool grabArea = !eagleSymbol.getPins().isEmpty();
         geometries +=
-            C::convertAndJoinWires(eagleSymbol.getWires(), grabArea, log);
+            mTc->convertAndJoinWires(eagleSymbol.getWires(), grabArea, log);
       },
       log);
   foreach (const auto& obj, eagleSymbol.getRectangles()) {
-    geometries.append(C::convertRectangle(obj, true));
+    geometries.append(mTc->convertRectangle(obj, true));
   }
   foreach (const auto& obj, eagleSymbol.getPolygons()) {
-    geometries.append(C::convertPolygon(obj, true));
+    geometries.append(mTc->convertPolygon(obj, true));
   }
   foreach (const auto& obj, eagleSymbol.getCircles()) {
-    geometries.append(C::convertCircle(obj, true));
+    geometries.append(mTc->convertCircle(obj, true));
   }
   foreach (const auto& obj, eagleSymbol.getFrames()) {
-    geometries.append(C::convertFrame(obj));
+    geometries.append(mTc->convertFrame(obj));
   }
   // Disable grab area on geometries located *within* another grab area to
   // avoid overlapping grab areas, but also to avoid triggering issue
   // https://github.com/LibrePCB/LibrePCB/issues/1278.
-  std::sort(geometries.begin(), geometries.end(),
-            [](const EagleTypeConverter::Geometry& a,
-               const EagleTypeConverter::Geometry& b) {
-              if (a.path.isClosed() != b.path.isClosed()) {
-                return a.path.isClosed();
-              }
-              if (a.path.isClosed()) {
-                return a.path.calcAreaOfStraightSegments() >
-                    b.path.calcAreaOfStraightSegments();
-              } else {
-                return a.path.getTotalStraightLength() >
-                    b.path.getTotalStraightLength();
-              }
-            });
+  std::stable_sort(geometries.begin(), geometries.end(),
+                   [](const EagleTypeConverter::Geometry& a,
+                      const EagleTypeConverter::Geometry& b) {
+                     if (a.path.isClosed() != b.path.isClosed()) {
+                       return a.path.isClosed();
+                     }
+                     if (a.path.isClosed()) {
+                       // Use a tolerance to avoid sub-ULP floating-point
+                       // differences (accumulation order, FMA) from producing
+                       // platform-dependent orderings for geometrically
+                       // equivalent candidates.
+                       const double a1 = a.path.calcAreaOfStraightSegments();
+                       const double a2 = b.path.calcAreaOfStraightSegments();
+                       if (std::abs(a1 - a2) > 50e-9) {
+                         return a1 > a2;
+                       }
+                     }
+                     const UnsignedLength l1 = a.path.getTotalStraightLength();
+                     const UnsignedLength l2 = b.path.getTotalStraightLength();
+                     if ((*l1 - *l2).abs() < Length(50)) {
+                       return l1 > l2;
+                     }
+                     return false;
+                   });
   QPainterPath totalGrabArea;
   totalGrabArea.setFillRule(Qt::WindingFill);
   for (EagleTypeConverter::Geometry& g : geometries) {
@@ -176,9 +191,9 @@ std::unique_ptr<Symbol> EagleLibraryConverter::createSymbol(
   foreach (const auto& g, geometries) {
     tryOrLogError(
         [&]() {
-          if (auto o = C::tryConvertToSchematicCircle(g)) {
+          if (auto o = mTc->tryConvertToSchematicCircle(g)) {
             symbol->getCircles().append(o);
-          } else if (auto o = C::tryConvertToSchematicPolygon(g)) {
+          } else if (auto o = mTc->tryConvertToSchematicPolygon(g)) {
             symbol->getPolygons().append(o);
           } else {
             log.warning(tr("Skipped graphics object on layer %1 (%2).")
@@ -189,7 +204,7 @@ std::unique_ptr<Symbol> EagleLibraryConverter::createSymbol(
         log);
   }
   foreach (const auto& obj, eagleSymbol.getTexts()) {
-    if (auto lpObj = C::tryConvertSchematicText(obj, true)) {
+    if (auto lpObj = mTc->tryConvertSchematicText(obj, true)) {
       symbol->getTexts().append(lpObj);
     } else {
       log.warning(tr("Skipped text on layer %1 (%2).")
@@ -200,7 +215,7 @@ std::unique_ptr<Symbol> EagleLibraryConverter::createSymbol(
   foreach (const auto& obj, eagleSymbol.getPins()) {
     tryOrLogError(
         [&]() {
-          const auto pinObj = C::convertSymbolPin(obj);
+          const auto pinObj = mTc->convertSymbolPin(obj);
           symbol->getPins().append(pinObj.pin);
           mSymbolPinMap[key][obj.getName()] = std::make_pair(
               std::make_shared<parseagle::Pin>(obj), pinObj.pin->getUuid());
@@ -225,13 +240,14 @@ std::unique_ptr<Package> EagleLibraryConverter::createPackage(
     throw LogicError(__FILE__, __LINE__, "Duplicate import.");
   }
   std::unique_ptr<Package> package(new Package(
-      Uuid::createRandom(), mSettings.version, mSettings.author,
-      C::convertElementName(mSettings.namePrefix + eaglePackage.getName()),
-      C::convertElementDescription(eaglePackage.getDescription()),
+      mSettings.createUuid(), mSettings.version, mSettings.author,
+      mSettings.created,
+      mTc->convertElementName(mSettings.namePrefix + eaglePackage.getName()),
+      mTc->convertElementDescription(eaglePackage.getDescription()),
       mSettings.keywords, librepcb::Package::AssemblyType::Auto));
   package->setGeneratedBy(generatedBy(libName, {eaglePackage.getName()}));
   package->setCategories(mSettings.packageCategories);
-  auto footprint = std::make_shared<Footprint>(Uuid::createRandom(),
+  auto footprint = std::make_shared<Footprint>(mSettings.createUuid(),
                                                ElementName("default"), "");
   package->getFootprints().append(footprint);
 
@@ -239,29 +255,29 @@ std::unique_ptr<Package> EagleLibraryConverter::createPackage(
   tryOrLogError(
       [&]() {
         geometries +=
-            C::convertAndJoinWires(eaglePackage.getWires(), false, log);
+            mTc->convertAndJoinWires(eaglePackage.getWires(), false, log);
       },
       log);
   foreach (const auto& obj, eaglePackage.getRectangles()) {
-    geometries.append(C::convertRectangle(obj, false));
+    geometries.append(mTc->convertRectangle(obj, false));
   }
   foreach (const auto& obj, eaglePackage.getPolygons()) {
-    geometries.append(C::convertPolygon(obj, false));
+    geometries.append(mTc->convertPolygon(obj, false));
   }
   foreach (const auto& obj, eaglePackage.getCircles()) {
-    geometries.append(C::convertCircle(obj, false));
+    geometries.append(mTc->convertCircle(obj, false));
   }
   foreach (const auto& g, geometries) {
     tryOrLogError(
         [&]() {
-          const auto zones = C::tryConvertToBoardZones(g);
+          const auto zones = mTc->tryConvertToBoardZones(g);
           if (!zones.isEmpty()) {
             foreach (const auto& o, zones) {
               footprint->getZones().append(o);
             }
-          } else if (auto o = C::tryConvertToBoardCircle(g)) {
+          } else if (auto o = mTc->tryConvertToBoardCircle(g)) {
             footprint->getCircles().append(o);
-          } else if (auto o = C::tryConvertToBoardPolygon(g)) {
+          } else if (auto o = mTc->tryConvertToBoardPolygon(g)) {
             footprint->getPolygons().append(o);
           } else {
             log.warning(tr("Skipped graphics object on layer %1 (%2).")
@@ -272,7 +288,7 @@ std::unique_ptr<Package> EagleLibraryConverter::createPackage(
         log);
   }
   foreach (const auto& obj, eaglePackage.getTexts()) {
-    if (auto lpObj = C::tryConvertBoardText(obj, true)) {
+    if (auto lpObj = mTc->tryConvertBoardText(obj, true)) {
       footprint->getStrokeTexts().append(lpObj);
     } else {
       log.warning(tr("Skipped text on layer %1 (%2).")
@@ -281,13 +297,13 @@ std::unique_ptr<Package> EagleLibraryConverter::createPackage(
     }
   }
   foreach (const auto& obj, eaglePackage.getHoles()) {
-    tryOrLogError([&]() { footprint->getHoles().append(C::convertHole(obj)); },
-                  log);
+    tryOrLogError(
+        [&]() { footprint->getHoles().append(mTc->convertHole(obj)); }, log);
   }
   foreach (const auto& obj, eaglePackage.getThtPads()) {
     tryOrLogError(
         [&]() {
-          auto pair = C::convertThtPad(obj, mSettings.autoThtAnnularWidth);
+          auto pair = mTc->convertThtPad(obj, mSettings.autoThtAnnularWidth);
           package->getPads().append(pair.first);
           footprint->getPads().append(pair.second);
           mPackagePadMap[key][obj.getName()] = pair.first->getUuid();
@@ -297,7 +313,7 @@ std::unique_ptr<Package> EagleLibraryConverter::createPackage(
   foreach (const auto& obj, eaglePackage.getSmtPads()) {
     tryOrLogError(
         [&]() {
-          auto pair = C::convertSmtPad(obj);
+          auto pair = mTc->convertSmtPad(obj);
           package->getPads().append(pair.first);
           footprint->getPads().append(pair.second);
           mPackagePadMap[key][obj.getName()] = pair.first->getUuid();
@@ -311,7 +327,7 @@ std::unique_ptr<Package> EagleLibraryConverter::createPackage(
       (courtyardZone->getLayers() == Zone::Layers(Zone::Layer::Top)) &&
       (courtyardZone->getRules() == Zone::Rules(Zone::Rule::NoDevices))) {
     footprint->getPolygons().append(std::make_shared<Polygon>(
-        Uuid::createRandom(), Layer::topCourtyard(), UnsignedLength(0), false,
+        mSettings.createUuid(), Layer::topCourtyard(), UnsignedLength(0), false,
         false, courtyardZone->getOutline()));
     footprint->getZones().clear();
   }
@@ -349,19 +365,21 @@ std::unique_ptr<Component> EagleLibraryConverter::createComponent(
     throw LogicError(__FILE__, __LINE__, "Duplicate import.");
   }
   std::unique_ptr<Component> component(new Component(
-      Uuid::createRandom(), mSettings.version, mSettings.author,
-      C::convertComponentName(mSettings.namePrefix + eagleDeviceSet.getName()),
-      C::convertElementDescription(eagleDeviceSet.getDescription()),
+      mSettings.createUuid(), mSettings.version, mSettings.author,
+      mSettings.created,
+      mTc->convertComponentName(mSettings.namePrefix +
+                                eagleDeviceSet.getName()),
+      mTc->convertElementDescription(eagleDeviceSet.getDescription()),
       mSettings.keywords));
   component->setGeneratedBy(generatedBy(libName, {eagleDeviceSet.getName()}));
   component->setCategories(mSettings.componentCategories);
   component->setPrefixes(NormDependentPrefixMap(
-      C::convertComponentPrefix(eagleDeviceSet.getPrefix())));
+      mTc->convertComponentPrefix(eagleDeviceSet.getPrefix())));
   component->setDefaultValue(eagleDeviceSet.getUserValue()
                                  ? "{{ MPN }}"
                                  : "{{ MPN or DEVICE or COMPONENT }}");
   auto symbolVariant = std::make_shared<ComponentSymbolVariant>(
-      Uuid::createRandom(), "", ElementName("default"), "");
+      mSettings.createUuid(), "", ElementName("default"), "");
   component->getSymbolVariants().append(symbolVariant);
   QHash<QString, int> pinCount;
   foreach (const auto& gate, eagleDeviceSet.getGates()) {
@@ -381,13 +399,13 @@ std::unique_ptr<Component> EagleLibraryConverter::createComponent(
           tr("Dependent symbol \"%1\" not imported.").arg(gate.getSymbol()));
     }
     auto item = std::make_shared<ComponentSymbolVariantItem>(
-        Uuid::createRandom(), *symbolUuid, C::convertPoint(gate.getPosition()),
-        Angle(0), true,
-        C::convertGateName(addGateSuffixes ? gate.getName() : ""));
+        mSettings.createUuid(), *symbolUuid,
+        mTc->convertPoint(gate.getPosition()), Angle(0), true,
+        mTc->convertGateName(addGateSuffixes ? gate.getName() : ""));
     symbolVariant->getSymbolItems().append(item);
     for (auto pinIt = mSymbolPinMap[symbolKey].constBegin();
          pinIt != mSymbolPinMap[symbolKey].constEnd(); pinIt++) {
-      Uuid signalUuid = Uuid::createRandom();
+      Uuid signalUuid = mSettings.createUuid();
       QString signalName = pinIt.key();
       if ((pinCount[signalName] > 1) ||
           (component->getSignals().contains(signalName))) {
@@ -411,7 +429,7 @@ std::unique_ptr<Component> EagleLibraryConverter::createComponent(
           (pinIt->first->getFunction() == parseagle::PinFunction::Clock) ||
           (pinIt->first->getFunction() == parseagle::PinFunction::DotClock);
       component->getSignals().append(std::make_shared<ComponentSignal>(
-          signalUuid, C::convertPinOrPadName(signalName), signalRole,
+          signalUuid, mTc->convertPinOrPadName(signalName), signalRole,
           forcedNetName, isRequired, isNegated, isClock));
       item->getPinSignalMap().append(
           std::make_shared<ComponentPinSignalMapItem>(pinIt->second.value(),
@@ -456,10 +474,11 @@ std::unique_ptr<Device> EagleLibraryConverter::createDevice(
                            .arg(eagleDevice.getPackage()));
   }
   std::unique_ptr<Device> device(new Device(
-      Uuid::createRandom(), mSettings.version, mSettings.author,
-      C::convertDeviceName(mSettings.namePrefix + eagleDeviceSet.getName(),
-                           eagleDevice.getName()),
-      C::convertElementDescription(eagleDeviceSet.getDescription()),
+      mSettings.createUuid(), mSettings.version, mSettings.author,
+      mSettings.created,
+      mTc->convertDeviceName(mSettings.namePrefix + eagleDeviceSet.getName(),
+                             eagleDevice.getName()),
+      mTc->convertElementDescription(eagleDeviceSet.getDescription()),
       mSettings.keywords, *componentUuid, *packageUuid));
   device->setGeneratedBy(generatedBy(
       devLibName, {eagleDeviceSet.getName(), eagleDevice.getName()}));
@@ -479,9 +498,9 @@ std::unique_ptr<Device> EagleLibraryConverter::createDevice(
   }
   foreach (const auto& eagleTechnology, eagleDevice.getTechnologies()) {
     AttributeList attributes;
-    C::tryConvertAttributes(eagleTechnology.getAttributes(), attributes, log);
+    mTc->tryConvertAttributes(eagleTechnology.getAttributes(), attributes, log);
     SimpleString mpn(""), manufacturer("");
-    C::tryExtractMpnAndManufacturer(attributes, mpn, manufacturer);
+    mTc->tryExtractMpnAndManufacturer(attributes, mpn, manufacturer);
     if (mpn->isEmpty()) {
       mpn = cleanSimpleString(eagleTechnology.getName());  // Good idea or not?
     }

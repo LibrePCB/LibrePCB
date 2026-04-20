@@ -120,7 +120,8 @@ void CreateLibraryTab::trigger(ui::TabAction a) noexcept {
         // Create the new library.
         QScopedPointer<Library> lib(new Library(
             Uuid::createRandom(), *mVersion, s2q(mUiData.author).trimmed(),
-            *mName, s2q(mUiData.description).trimmed(),
+            QDateTime::currentDateTime(), *mName,
+            s2q(mUiData.description).trimmed(),
             QString("")));  // can throw
         if (mUrl) {
           lib->setUrl(*mUrl);

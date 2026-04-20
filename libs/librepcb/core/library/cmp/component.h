@@ -78,8 +78,8 @@ public:
   Component() = delete;
   Component(const Component& other) = delete;
   Component(const Uuid& uuid, const Version& version, const QString& author,
-            const ElementName& name_en_US, const QString& description_en_US,
-            const QString& keywords_en_US);
+            const QDateTime& created, const ElementName& name_en_US,
+            const QString& description_en_US, const QString& keywords_en_US);
   ~Component() noexcept;
 
   // General
