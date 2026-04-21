@@ -161,6 +161,12 @@ void SymbolPinGraphicsItem::updateText() noexcept {
   setVisible(isConnected || (!mItem) || (!mHideIfUnused));
 }
 
+void SymbolPinGraphicsItem::setOverridePinNumber(
+    const QString& number) noexcept {
+  mNumbersGraphicsItem->setText(number);
+  mNumbersGraphicsItem->setOpacity(0.8);  // For the device editor.
+}
+
 /*******************************************************************************
  *  Inherited from QGraphicsItem
  ******************************************************************************/

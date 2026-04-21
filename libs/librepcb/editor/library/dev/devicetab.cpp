@@ -41,8 +41,10 @@
 #include "../libraryelementcache.h"
 #include "../libraryelementcategoriesmodel.h"
 #include "../pkg/footprintgraphicsitem.h"
+#include "../pkg/footprintpadgraphicsitem.h"
 #include "../pkg/packagechooserdialog.h"
 #include "../sym/symbolgraphicsitem.h"
+#include "../sym/symbolpingraphicsitem.h"
 #include "devicepinoutbuilder.h"
 #include "devicepinoutlistmodel.h"
 #include "partlistmodel.h"
@@ -369,6 +371,7 @@ void DeviceTab::setDerivedUiData(const ui::DeviceTabData& data) noexcept {
   // Interactive pinout
   mPinoutBuilder->setCurrentSignalIndex(data.interactive_pinout_signal_index);
   mPinoutBuilder->setSignalsFilter(s2q(data.interactive_pinout_filter));
+  updateHighlightedPadsAndPins();
 
   onDerivedUiDataChanged.notify();
 }
@@ -377,11 +380,13 @@ void DeviceTab::trigger(ui::TabAction a) noexcept {
   switch (a) {
     case ui::TabAction::Abort: {
       mPinoutBuilder->exitInteractiveMode();
+      updateHighlightedPadsAndPins();
       onDerivedUiDataChanged.notify();
       break;
     }
     case ui::TabAction::Accept: {
       mPinoutBuilder->commitInteractiveMode();
+      updateHighlightedPadsAndPins();
       onDerivedUiDataChanged.notify();
       break;
     }
@@ -500,21 +505,25 @@ void DeviceTab::trigger(ui::TabAction a) noexcept {
     }
     case ui::TabAction::DevicePinoutReset: {
       mPinoutBuilder->resetAll();
+      updateHighlightedPadsAndPins();
       onDerivedUiDataChanged.notify();
       break;
     }
     case ui::TabAction::DevicePinoutConnectAuto: {
       mPinoutBuilder->autoConnect();
+      updateHighlightedPadsAndPins();
       onDerivedUiDataChanged.notify();
       break;
     }
     case ui::TabAction::DevicePinoutConnectInteractively: {
       mPinoutBuilder->startInteractiveMode();
+      updateHighlightedPadsAndPins();
       onDerivedUiDataChanged.notify();
       break;
     }
     case ui::TabAction::DevicePinoutLoadFromFile: {
       mPinoutBuilder->loadFromFile();
+      updateHighlightedPadsAndPins();
       onDerivedUiDataChanged.notify();
       break;
     }
@@ -724,17 +733,19 @@ void DeviceTab::refreshDependentElements() noexcept {
     mSignalNames->setReferences(nullptr, nullptr);
     mSymbolGraphicsItems.clear();
     mSymbols.clear();
+    mSymbolVariant.reset();
     mComponent.reset();
 
     try {
       mComponent = mApp.getLibraryElementCache().getComponent(
           mDevice->getComponentUuid(), true);  // can throw
+      mSymbolVariant = mComponent->getSymbolVariants().value(0);
       mSignalNames->setReferences(
           const_cast<ComponentSignalList*>(&mComponent->getSignals()),
           mUndoStack.get());
-      if (const auto& variant = mComponent->getSymbolVariants().value(0)) {
-        for (int i = 0; i < variant->getSymbolItems().count(); ++i) {
-          const auto gate = variant->getSymbolItems().at(i);
+      if (mSymbolVariant) {
+        for (int i = 0; i < mSymbolVariant->getSymbolItems().count(); ++i) {
+          const auto gate = mSymbolVariant->getSymbolItems().at(i);
           std::shared_ptr<const Symbol> symbol =
               mApp.getLibraryElementCache().getSymbol(gate->getSymbolUuid(),
                                                       true);  // can throw
@@ -763,16 +774,18 @@ void DeviceTab::refreshDependentElements() noexcept {
     mPinout->setReferences(&mDevice->getPadSignalMap(), nullptr, mSignalNames,
                            mUndoStack.get());
     mFootprintGraphicsItem.reset();
+    mFootprint.reset();
     mPackage.reset();
 
     try {
       mPackage = mApp.getLibraryElementCache().getPackage(
           mDevice->getPackageUuid(), true);  // can throw
+      mFootprint = mPackage->getFootprints().value(0);
       mPinout->setReferences(&mDevice->getPadSignalMap(), &mPackage->getPads(),
                              mSignalNames, mUndoStack.get());
-      if (auto footprint = mPackage->getFootprints().value(0)) {
+      if (mFootprint) {
         mFootprintGraphicsItem.reset(new FootprintGraphicsItem(
-            std::const_pointer_cast<Footprint>(footprint),
+            std::const_pointer_cast<Footprint>(mFootprint),
             mApp.getPreviewLayers(), Application::getDefaultStrokeFont(),
             &mPackage->getPads(), mComponent.get(),
             mApp.getWorkspace().getSettings().libraryLocaleOrder.get()));
@@ -786,6 +799,8 @@ void DeviceTab::refreshDependentElements() noexcept {
     mPinoutBuilder->setPads(mPackage ? mPackage->getPads() : PackagePadList());
   }
 
+  updatePreviewPinNumbers();
+  updateHighlightedPadsAndPins();
   onUiDataChanged.notify();
   onDerivedUiDataChanged.notify();
 }
@@ -950,6 +965,95 @@ void DeviceTab::selectPackage() noexcept {
       Q_ASSERT(mDevice->getPadSignalMap().getUuidSet() == pads);
     } catch (const Exception& e) {
       QMessageBox::critical(getWindow(), tr("Error"), e.getMsg());
+    }
+  }
+}
+
+void DeviceTab::updatePreviewPinNumbers() noexcept {
+  if ((!mComponent) || (!mSymbolVariant) ||
+      (mSymbolGraphicsItems.count() !=
+       mSymbolVariant->getSymbolItems().count()) ||
+      (mSymbolGraphicsItems.count() != mSymbols.count())) {
+    return;
+  }
+
+  QHash<Uuid, QStringList> signalNumbers;
+  for (const auto& padMap : mDevice->getPadSignalMap()) {
+    if (auto sigUuid = padMap.getSignalUuid()) {
+      QString padName = "?";
+      if (mPackage) {
+        if (auto pad = mPackage->getPads().find(padMap.getPadUuid())) {
+          padName = *pad->getName();
+        }
+      }
+      signalNumbers[*sigUuid].append(padName);
+    }
+  }
+  qDebug() << signalNumbers;
+
+  for (int i = 0; i < mSymbolGraphicsItems.count(); ++i) {
+    auto gate = mSymbolVariant->getSymbolItems().at(i);
+    auto symbol = std::const_pointer_cast<Symbol>(mSymbols.at(i));
+    auto graphicsItem = mSymbolGraphicsItems.at(i);
+    for (auto pin : symbol->getPins().values()) {
+      if (auto pinItem = graphicsItem->getGraphicsItem(pin)) {
+        QString numbers;
+        if (auto pinMap = gate->getPinSignalMap().find(pin->getUuid())) {
+          if (auto sigUuid = pinMap->getSignalUuid()) {
+            numbers = signalNumbers.value(*sigUuid).join(", ");
+          }
+        }
+        if (numbers.isEmpty()) {
+          numbers = "✖";
+        }
+        if (numbers.length() > 20) {
+          numbers = numbers.left(19) + "…";
+        }
+        pinItem->setOverridePinNumber(numbers);
+      }
+    }
+  }
+}
+
+void DeviceTab::updateHighlightedPadsAndPins() noexcept {
+  setHighlightedPad(mPinoutBuilder->getCurrentPadUuid());
+  setHighlightedSignalPins(mPinoutBuilder->getCurrentSignalUuid());
+}
+
+void DeviceTab::setHighlightedPad(const std::optional<Uuid>& pad) noexcept {
+  if (!mFootprintGraphicsItem) return;
+  mFootprintGraphicsItem->setSelectionRect(QRectF());
+  if ((!pad) || (!mPackage) || (!mFootprint)) return;
+  for (auto fptPad :
+       std::const_pointer_cast<Footprint>(mFootprint)->getPads().values()) {
+    if (fptPad->getPackagePadUuid() == pad) {
+      if (auto item = mFootprintGraphicsItem->getGraphicsItem(fptPad)) {
+        item->setSelected(true);
+      }
+    }
+  }
+}
+
+void DeviceTab::setHighlightedSignalPins(
+    const std::optional<Uuid>& signal) noexcept {
+  if (mSymbolGraphicsItems.count() != mSymbols.count()) return;
+  for (int i = 0; i < mSymbols.count(); ++i) {
+    auto symbol = std::const_pointer_cast<Symbol>(mSymbols.at(i));
+    auto graphicsItem = mSymbolGraphicsItems.at(i);
+    graphicsItem->setSelectionRect(QRectF());
+    if ((!signal) || (!symbol) || (!mComponent) || (!mSymbolVariant) ||
+        (mSymbolVariant->getSymbolItems().count() != mSymbols.count())) {
+      continue;
+    }
+    auto gate = mSymbolVariant->getSymbolItems().at(i);
+    for (auto pin : symbol->getPins().values()) {
+      if (auto pinMap = gate->getPinSignalMap().find(pin->getUuid())) {
+        if (pinMap->getSignalUuid() == signal) {
+          if (auto item = graphicsItem->getGraphicsItem(pin)) {
+            item->setSelected(true);
+          }
+        }
+      }
     }
   }
 }
