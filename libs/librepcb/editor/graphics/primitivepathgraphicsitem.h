@@ -79,7 +79,7 @@ public:
   void setLineLayer(const std::shared_ptr<const GraphicsLayer>& layer) noexcept;
   void setFillLayer(const std::shared_ptr<const GraphicsLayer>& layer) noexcept;
   void setState(GraphicsLayer::State state) noexcept;
-  void setLighterColors(bool lighter) noexcept;
+  void setLighterColorsWithMinAlpha(int minAlpha) noexcept;
   void setShapeMode(ShapeMode mode) noexcept;
 
   // Inherited from QGraphicsItem
@@ -101,16 +101,16 @@ private:  // Methods
                    GraphicsLayer::Event event) noexcept;
   void updateBoundingRectAndShape() noexcept;
   void updateVisibility() noexcept;
-  QColor convertColor(const QColor& color) const noexcept;
   QPen getPen(GraphicsLayer::State state) const noexcept;
   QBrush getBrush(GraphicsLayer::State state) const noexcept;
+  QColor convertColor(QColor color) const noexcept;
 
 protected:  // Data
   bool mMirror;
   std::shared_ptr<const GraphicsLayer> mLineLayer;
   std::shared_ptr<const GraphicsLayer> mFillLayer;
   GraphicsLayer::State mState;
-  bool mLighterColors;
+  int mLighterColorsMinAlpha;
   ShapeMode mShapeMode;
   qreal mLineWidthPx;
   QPainterPath mPainterPath;

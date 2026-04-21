@@ -51,7 +51,7 @@ namespace editor {
  ******************************************************************************/
 
 PrimitiveFootprintPadGraphicsItem::PrimitiveFootprintPadGraphicsItem(
-    const GraphicsLayerList& layers, bool originCrossVisible,
+    const GraphicsLayerList& layers, bool originCrossVisible, int textMinAlpha,
     QGraphicsItem* parent) noexcept
   : QGraphicsItemGroup(parent),
     mLayers(layers),
@@ -77,7 +77,7 @@ PrimitiveFootprintPadGraphicsItem::PrimitiveFootprintPadGraphicsItem(
 
   // text properties
   mTextGraphicsItem->setLineWidth(UnsignedLength(100000));
-  mTextGraphicsItem->setLighterColors(true);  // More contrast for readability.
+  mTextGraphicsItem->setLighterColorsWithMinAlpha(textMinAlpha);  // Contrast!
   mTextGraphicsItem->setShapeMode(PrimitivePathGraphicsItem::ShapeMode::None);
   mTextGraphicsItem->setZValue(500);
 }

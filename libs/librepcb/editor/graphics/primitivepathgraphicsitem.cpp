@@ -44,7 +44,7 @@ PrimitivePathGraphicsItem::PrimitivePathGraphicsItem(
     mLineLayer(nullptr),
     mFillLayer(nullptr),
     mState(GraphicsLayer::State::Enabled),
-    mLighterColors(false),
+    mLighterColorsMinAlpha(0),
     mShapeMode(ShapeMode::StrokeAndAreaByLayer),
     mLineWidthPx(0),
     mBoundingRectMarginPx(0),
@@ -117,8 +117,9 @@ void PrimitivePathGraphicsItem::setState(GraphicsLayer::State state) noexcept {
   update();
 }
 
-void PrimitivePathGraphicsItem::setLighterColors(bool lighter) noexcept {
-  mLighterColors = lighter;
+void PrimitivePathGraphicsItem::setLighterColorsWithMinAlpha(
+    int minAlpha) noexcept {
+  mLighterColorsMinAlpha = minAlpha;
   update();
 }
 
@@ -199,16 +200,11 @@ void PrimitivePathGraphicsItem::updateVisibility() noexcept {
              (mFillLayer && mFillLayer->isVisible()));
 }
 
-QColor PrimitivePathGraphicsItem::convertColor(
-    const QColor& color) const noexcept {
-  return mLighterColors ? color.lighter(200) : color;
-}
-
 QPen PrimitivePathGraphicsItem::getPen(
     GraphicsLayer::State state) const noexcept {
   if (mLineLayer && mLineLayer->isVisible()) {
-    return QPen(mLineLayer->getColor(state), mLineWidthPx, Qt::SolidLine,
-                Qt::RoundCap, Qt::RoundJoin);
+    return QPen(convertColor(mLineLayer->getColor(state)), mLineWidthPx,
+                Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
   } else {
     return Qt::NoPen;
   }
@@ -217,10 +213,18 @@ QPen PrimitivePathGraphicsItem::getPen(
 QBrush PrimitivePathGraphicsItem::getBrush(
     GraphicsLayer::State state) const noexcept {
   if (mFillLayer && mFillLayer->isVisible()) {
-    return QBrush(mFillLayer->getColor(state), Qt::SolidPattern);
+    return QBrush(convertColor(mFillLayer->getColor(state)), Qt::SolidPattern);
   } else {
     return Qt::NoBrush;
   }
+}
+
+QColor PrimitivePathGraphicsItem::convertColor(QColor color) const noexcept {
+  if (mLighterColorsMinAlpha) {
+    color = color.lighter(200);
+    color.setAlpha(std::max(color.alpha(), mLighterColorsMinAlpha));
+  }
+  return color;
 }
 
 /*******************************************************************************

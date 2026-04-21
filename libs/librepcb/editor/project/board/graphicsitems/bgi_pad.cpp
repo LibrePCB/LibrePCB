@@ -56,7 +56,8 @@ BGI_Pad::BGI_Pad(
     mPad(pad),
     mDeviceGraphicsItem(deviceItem),
     mContext(context),
-    mGraphicsItem(new PrimitiveFootprintPadGraphicsItem(layers, false, this)),
+    mGraphicsItem(
+        new PrimitiveFootprintPadGraphicsItem(layers, false, 150, this)),
     mOnPadEditedSlot(*this, &BGI_Pad::padEdited),
     mOnDeviceEditedSlot(*this, &BGI_Pad::deviceGraphicsItemEdited) {
   setFlag(QGraphicsItem::ItemHasNoContents, true);

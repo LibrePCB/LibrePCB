@@ -62,7 +62,7 @@ public:
   PrimitiveFootprintPadGraphicsItem(
       const PrimitiveFootprintPadGraphicsItem& other) = delete;
   PrimitiveFootprintPadGraphicsItem(const GraphicsLayerList& layers,
-                                    bool originCrossVisible,
+                                    bool originCrossVisible, int textMinAlpha,
                                     QGraphicsItem* parent = nullptr) noexcept;
   ~PrimitiveFootprintPadGraphicsItem() noexcept;
 

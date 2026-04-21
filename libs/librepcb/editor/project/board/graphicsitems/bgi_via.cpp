@@ -70,7 +70,7 @@ BGI_Via::BGI_Via(
   // text properties
   mTextGraphicsItem->setLineLayer(mViaLayer);
   mTextGraphicsItem->setLineWidth(UnsignedLength(100000));
-  mTextGraphicsItem->setLighterColors(true);  // More contrast for readability.
+  mTextGraphicsItem->setLighterColorsWithMinAlpha(150);  // More contrast.
   mTextGraphicsItem->setShapeMode(PrimitivePathGraphicsItem::ShapeMode::None);
   mTextGraphicsItem->setMirrored(mContext->flipView);
   mTextGraphicsItem->setZValue(500);

@@ -46,7 +46,8 @@ FootprintPadGraphicsItem::FootprintPadGraphicsItem(
   : QGraphicsItemGroup(parent),
     mPad(pad),
     mPackagePadList(packagePadList),
-    mGraphicsItem(new PrimitiveFootprintPadGraphicsItem(layers, true, this)),
+    mGraphicsItem(
+        new PrimitiveFootprintPadGraphicsItem(layers, true, 255, this)),
     mOnPadEditedSlot(*this, &FootprintPadGraphicsItem::padEdited),
     mOnPackagePadsEditedSlot(*this,
                              &FootprintPadGraphicsItem::packagePadListEdited) {
