@@ -65,6 +65,7 @@ public:
   void setRotation(const Angle& rot) noexcept;
   void setText(const QString& text, bool parseOverlines = false) noexcept;
   void setHeight(const PositiveLength& height) noexcept;
+  void setPixelSize(int pixels) noexcept;
   void setAlignment(const Alignment& align) noexcept;
   void setFont(Font font) noexcept;
   void setLayer(const std::shared_ptr<const GraphicsLayer>& layer) noexcept;
@@ -99,7 +100,7 @@ private:  // Data
   QString mDisplayText;
   bool mParseOverlines;
   QVector<QLineF> mOverlines;
-  PositiveLength mHeight;
+  std::optional<PositiveLength> mHeight;
   Alignment mAlignment;
   bool mRotate180;
   QFont mFont;

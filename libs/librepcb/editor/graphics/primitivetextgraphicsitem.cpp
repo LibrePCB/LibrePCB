@@ -50,7 +50,7 @@ PrimitiveTextGraphicsItem::PrimitiveTextGraphicsItem(
     mDisplayText(),
     mParseOverlines(false),
     mOverlines(),
-    mHeight(1),
+    mHeight(std::nullopt),
     mAlignment(HAlign::left(), VAlign::bottom()),
     mRotate180(false),
     mFont(Application::getDefaultSansSerifFont()),
@@ -101,6 +101,12 @@ void PrimitiveTextGraphicsItem::setText(const QString& text,
 void PrimitiveTextGraphicsItem::setHeight(
     const PositiveLength& height) noexcept {
   mHeight = height;
+  mFont.setPixelSize(qCeil(height->toPx()));
+  updateBoundingRectAndShape();
+}
+
+void PrimitiveTextGraphicsItem::setPixelSize(int pixels) noexcept {
+  mFont.setPixelSize(pixels);
   updateBoundingRectAndShape();
 }
 
@@ -171,9 +177,9 @@ void PrimitiveTextGraphicsItem::paint(QPainter* painter,
   if (option->state.testFlag(QStyle::State_Selected)) {
     state = GraphicsLayer::State::Highlighted;
   }
+  const qreal heightPx = mHeight ? (*mHeight)->toPx() : mFont.pixelSize();
   const qreal lod =
-      option->levelOfDetailFromTransform(painter->worldTransform()) *
-      mHeight->toPx();
+      option->levelOfDetailFromTransform(painter->worldTransform()) * heightPx;
 
   if (lod < mLevelOfDetailToHide) {
     // Extremely small, do not render at all.
@@ -186,7 +192,7 @@ void PrimitiveTextGraphicsItem::paint(QPainter* painter,
     // Render text.
     painter->setFont(mFont);
     painter->setPen(QPen(mLayer->getColor(state),
-                         OverlineMarkupParser::getLineWidth(mHeight->toPx())));
+                         OverlineMarkupParser::getLineWidth(heightPx)));
     painter->drawText(QRectF(), mTextFlags, mDisplayText);
     painter->drawLines(mOverlines);
   }
@@ -223,7 +229,6 @@ void PrimitiveTextGraphicsItem::updateBoundingRectAndShape() noexcept {
   } else {
     mTextFlags |= mAlignment.toQtAlign();
   }
-  mFont.setPixelSize(qCeil(mHeight->toPx()));
 
   const QFontMetricsF fm(mFont);
   if (mParseOverlines) {
@@ -237,7 +242,9 @@ void PrimitiveTextGraphicsItem::updateBoundingRectAndShape() noexcept {
 
   mShape = QPainterPath();
   mShape.addRect(mBoundingRect);
-  setScale(mHeight->toPx() / fm.height());
+  if (mHeight) {
+    setScale((*mHeight)->toPx() / fm.height());
+  }
   update();
 }
 

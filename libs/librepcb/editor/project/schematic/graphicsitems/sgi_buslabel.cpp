@@ -64,8 +64,8 @@ SGI_BusLabel::SGI_BusLabel(
 
   mTextGraphicsItem->setLayer(layers.get(ColorRole::schematicBusLabels()));
   mTextGraphicsItem->setFont(PrimitiveTextGraphicsItem::Font::Monospace);
-  mTextGraphicsItem->setHeight(PositiveLength(Length::fromPx(4)));
-  mTextGraphicsItem->setLevelOfDetailToPixelate(6);
+  mTextGraphicsItem->setPixelSize(4);
+  mTextGraphicsItem->setLevelOfDetailToPixelate(5);
   mTextGraphicsItem->setLevelOfDetailToHide(2);
   mTextGraphicsItem->setSelected(isSelected());
 

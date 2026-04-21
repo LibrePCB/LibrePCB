@@ -64,8 +64,8 @@ SGI_NetLabel::SGI_NetLabel(
 
   mTextGraphicsItem->setLayer(layers.get(ColorRole::schematicNetLabels()));
   mTextGraphicsItem->setFont(PrimitiveTextGraphicsItem::Font::Monospace);
-  mTextGraphicsItem->setHeight(PositiveLength(Length::fromPx(4)));
-  mTextGraphicsItem->setLevelOfDetailToPixelate(6);
+  mTextGraphicsItem->setPixelSize(4);
+  mTextGraphicsItem->setLevelOfDetailToPixelate(5);
   mTextGraphicsItem->setLevelOfDetailToHide(2);
   mTextGraphicsItem->setSelected(isSelected());
 
