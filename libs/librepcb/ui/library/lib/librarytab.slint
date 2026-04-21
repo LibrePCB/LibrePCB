@@ -824,6 +824,7 @@ export component LibraryTab inherits Tab {
             page-clicked(id) => {
                 Data.set-current-tab(section-index, index);
                 tabs[index].page-index = id;
+                root.focus();  // The focused component may have been deleted.
             }
         }
 
@@ -869,10 +870,12 @@ export component LibraryTab inherits Tab {
         item-clicked(idx) => {
             self.model[idx].checked = true;
             show-add-dependency-dialog = false;
+            root.focus();  // Keep keyboard shortcuts working.
         }
 
         rejected => {
             show-add-dependency-dialog = false;
+            root.focus();  // Keep keyboard shortcuts working.
         }
     }
 
@@ -886,10 +889,12 @@ export component LibraryTab inherits Tab {
             tabs[index].move-or-copy-to-lib = path;
             tabs[index].move-or-copy-action = move-or-copy-action;
             move-or-copy-action = LibraryElementsMoveAction.none;
+            root.focus();  // Keep keyboard shortcuts working.
         }
 
         rejected => {
             move-or-copy-action = LibraryElementsMoveAction.none;
+            root.focus();  // Keep keyboard shortcuts working.
         }
     }
 }

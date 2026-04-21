@@ -53,6 +53,8 @@ component SymbolMetadataTab {
     in property <int> index;
     in property <bool> read-only;
 
+    callback move-focus-to-tab;
+
     GridLayout {
         padding: 8px;
         spacing: 8px;
@@ -216,10 +218,12 @@ component SymbolMetadataTab {
         item-picked(idx, item) => {
             tabs[index].new-category = item.user-data;
             tabs[index].choose-category = false;
+            move-focus-to-tab();  // Keep keyboard shortcuts working.
         }
 
         rejected => {
             tabs[index].choose-category = false;
+            move-focus-to-tab();  // Keep keyboard shortcuts working.
         }
     }
 }
@@ -681,6 +685,7 @@ export component SymbolTab inherits Tab {
             page-clicked(id) => {
                 Data.set-current-tab(section-index, index);
                 tabs[index].page-index = id;
+                root.focus();  // The focused component may have been deleted.
             }
         }
 
@@ -714,6 +719,10 @@ export component SymbolTab inherits Tab {
                 tabs: tabs;
                 index: index;
                 read-only: read-only;
+
+                move-focus-to-tab => {
+                    root.focus();
+                }
             }
         }
     }

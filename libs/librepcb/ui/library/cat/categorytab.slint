@@ -195,10 +195,12 @@ component CategoryTab inherits Tab {
         item-picked(idx, item) => {
             tabs[index].new-parent = item.user-data;
             tabs[index].choose-parent = false;
+            root.focus();  // Keep keyboard shortcuts working.
         }
 
         rejected => {
             tabs[index].choose-parent = false;
+            root.focus();  // Keep keyboard shortcuts working.
         }
     }
 }
