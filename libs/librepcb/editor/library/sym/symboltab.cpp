@@ -654,13 +654,17 @@ slint::Image SymbolTab::renderScene(float width, float height,
   return slint::Image();
 }
 
-bool SymbolTab::processScenePointerEvent(
-    const QPointF& pos, slint::private_api::PointerEvent e) noexcept {
+bool SymbolTab::processScenePointerEvent(const QPointF& pos,
+                                         slint::private_api::PointerEvent e,
+                                         int scene) noexcept {
+  Q_UNUSED(scene);
   return mView->pointerEvent(pos, e);
 }
 
-bool SymbolTab::processSceneScrolled(
-    const QPointF& pos, slint::private_api::PointerScrollEvent e) noexcept {
+bool SymbolTab::processSceneScrolled(const QPointF& pos,
+                                     slint::private_api::PointerScrollEvent e,
+                                     int scene) noexcept {
+  Q_UNUSED(scene);
   return mView->scrollEvent(pos, e);
 }
 

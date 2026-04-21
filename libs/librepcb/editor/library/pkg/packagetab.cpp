@@ -991,8 +991,10 @@ slint::Image PackageTab::renderScene(float width, float height,
   return slint::Image();
 }
 
-bool PackageTab::processScenePointerEvent(
-    const QPointF& pos, slint::private_api::PointerEvent e) noexcept {
+bool PackageTab::processScenePointerEvent(const QPointF& pos,
+                                          slint::private_api::PointerEvent e,
+                                          int scene) noexcept {
+  Q_UNUSED(scene);
   if (mView3d && mOpenGlView) {
     return mOpenGlView->pointerEvent(pos, e);
   } else {
@@ -1000,8 +1002,10 @@ bool PackageTab::processScenePointerEvent(
   }
 }
 
-bool PackageTab::processSceneScrolled(
-    const QPointF& pos, slint::private_api::PointerScrollEvent e) noexcept {
+bool PackageTab::processSceneScrolled(const QPointF& pos,
+                                      slint::private_api::PointerScrollEvent e,
+                                      int scene) noexcept {
+  Q_UNUSED(scene);
   if (mView3d && mOpenGlView) {
     return mOpenGlView->scrollEvent(pos, e);
   } else {

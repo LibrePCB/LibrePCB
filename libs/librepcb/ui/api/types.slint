@@ -1193,6 +1193,12 @@ export struct DeviceTabData {
     // Checks
     checks: RuleCheckData,
 
+    // View
+    component-background-color: brush,
+    component-foreground-color: brush,
+    package-background-color: brush,
+    package-foreground-color: brush,
+
     // Messages
     interface-broken-msg: bool,
 
@@ -1205,6 +1211,9 @@ export struct DeviceTabData {
     interactive-pinout-filter: string,  // User input (signal name)
     interactive-pinout-signals: [DeviceInteractivePinoutSignalData],  // Filtered & sorted
     interactive-pinout-signal-index: int,  // Index of interactive-pinout-signals, UI can set to -2 to select "unconnected"
+
+    // Misc
+    frame: int,  // Frame index to trigger repainting
 
     // Actions
     new-category: string,  // Set to UUID by UI, reset by backend

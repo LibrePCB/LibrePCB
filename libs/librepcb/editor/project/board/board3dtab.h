@@ -77,11 +77,12 @@ public:
   void trigger(ui::TabAction a) noexcept override;
   slint::Image renderScene(float width, float height,
                            int scene) noexcept override;
-  bool processScenePointerEvent(
-      const QPointF& pos, slint::private_api::PointerEvent e) noexcept override;
-  bool processSceneScrolled(
-      const QPointF& pos,
-      slint::private_api::PointerScrollEvent e) noexcept override;
+  bool processScenePointerEvent(const QPointF& pos,
+                                slint::private_api::PointerEvent e,
+                                int scene) noexcept override;
+  bool processSceneScrolled(const QPointF& pos,
+                            slint::private_api::PointerScrollEvent e,
+                            int scene) noexcept override;
 
   // Operator Overloadings
   Board3dTab& operator=(const Board3dTab& rhs) = delete;

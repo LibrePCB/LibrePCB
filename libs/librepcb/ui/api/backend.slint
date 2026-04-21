@@ -235,10 +235,10 @@ export global Backend {
     pure callback render-scene(section: int, width: length, height: length, scene: int, frame-dummy: int) -> image;
 
     // Process a graphics scene pointer event
-    pure callback scene-pointer-event(section: int, x: length, y: length, event: PointerEvent);
+    pure callback scene-pointer-event(section: int, x: length, y: length, event: PointerEvent, scene: int);
 
     // Process graphics scene scrolled event
-    pure callback scene-scrolled(section: int, x-rel: length, y-rel: length, event: PointerScrollEvent) -> bool;
+    pure callback scene-scrolled(section: int, x-rel: length, y-rel: length, event: PointerScrollEvent, scene: int) -> bool;
 
     // Process graphics scene key pressed event
     pure callback scene-key-pressed(section: int, event: KeyEvent) -> bool;

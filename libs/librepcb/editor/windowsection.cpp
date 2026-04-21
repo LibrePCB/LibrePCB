@@ -207,18 +207,20 @@ slint::Image WindowSection::renderScene(float width, float height,
   return slint::Image();
 }
 
-bool WindowSection::processScenePointerEvent(
-    const QPointF& pos, slint::private_api::PointerEvent e) noexcept {
+bool WindowSection::processScenePointerEvent(const QPointF& pos,
+                                             slint::private_api::PointerEvent e,
+                                             int scene) noexcept {
   if (std::shared_ptr<WindowTab> t = getCurrentTab()) {
-    return t->processScenePointerEvent(pos, e);
+    return t->processScenePointerEvent(pos, e, scene);
   }
   return false;
 }
 
 bool WindowSection::processSceneScrolled(
-    const QPointF& pos, slint::private_api::PointerScrollEvent e) noexcept {
+    const QPointF& pos, slint::private_api::PointerScrollEvent e,
+    int scene) noexcept {
   if (std::shared_ptr<WindowTab> t = getCurrentTab()) {
-    return t->processSceneScrolled(pos, e);
+    return t->processSceneScrolled(pos, e, scene);
   }
   return false;
 }

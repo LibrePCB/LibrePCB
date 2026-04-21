@@ -264,20 +264,23 @@ MainWindow::MainWindow(GuiApplication& app,
     }
   });
   b.on_scene_pointer_event([this](int sectionIndex, float x, float y,
-                                  slint::private_api::PointerEvent e) {
+                                  slint::private_api::PointerEvent e,
+                                  int scene) {
     if (auto section = mSections->value(sectionIndex)) {
       const qreal scale = mWidget->devicePixelRatioF();
-      section->processScenePointerEvent(QPointF(x * scale, y * scale), e);
+      section->processScenePointerEvent(QPointF(x * scale, y * scale), e,
+                                        scene);
     }
   });
   b.on_scene_scrolled([this](int sectionIndex, float x, float y,
-                             slint::private_api::PointerScrollEvent e) {
-    bool handled = false;
+                             slint::private_api::PointerScrollEvent e,
+                             int scene) {
     if (auto section = mSections->value(sectionIndex)) {
       const qreal scale = mWidget->devicePixelRatioF();
-      handled = section->processSceneScrolled(QPointF(x * scale, y * scale), e);
+      return section->processSceneScrolled(QPointF(x * scale, y * scale), e,
+                                           scene);
     }
-    return handled;
+    return false;
   });
   b.on_scene_key_pressed(
       [this](int sectionIndex, const slint::language::KeyEvent& e) {
