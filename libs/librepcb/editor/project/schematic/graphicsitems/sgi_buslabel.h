@@ -39,6 +39,8 @@ namespace librepcb {
 namespace editor {
 
 class LineGraphicsItem;
+class OriginCrossGraphicsItem;
+class PrimitiveTextGraphicsItem;
 
 /*******************************************************************************
  *  Class SGI_BusLabel
@@ -47,7 +49,7 @@ class LineGraphicsItem;
 /**
  * @brief The SGI_BusLabel class
  */
-class SGI_BusLabel final : public QGraphicsItem {
+class SGI_BusLabel final : public QGraphicsItemGroup {
 public:
   // Constructors / Destructor
   SGI_BusLabel() = delete;
@@ -58,46 +60,34 @@ public:
   virtual ~SGI_BusLabel() noexcept;
 
   // General Methods
-  SI_BusLabel& getBusLabel() noexcept { return mBusLabel; }
+  SI_BusLabel& getBusLabel() noexcept { return mLabel; }
+  void updateContext() noexcept;
 
   // Inherited from QGraphicsItem
-  QRectF boundingRect() const noexcept override { return mBoundingRect; }
-  void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
-             QWidget* widget) noexcept override;
+  QPainterPath shape() const noexcept override;
 
   // Operator Overloadings
   SGI_BusLabel& operator=(const SGI_BusLabel& rhs) = delete;
 
 private:  // Methods
-  void busLabelEdited(const SI_BusLabel& obj,
-                      SI_BusLabel::Event event) noexcept;
+  void labelEdited(const SI_BusLabel& obj, SI_BusLabel::Event event) noexcept;
   virtual QVariant itemChange(GraphicsItemChange change,
                               const QVariant& value) noexcept override;
   void updatePosition() noexcept;
   void updateRotation() noexcept;
+  void updateMirrored() noexcept;
   void updateText() noexcept;
   void updateAnchor() noexcept;
 
 private:  // Data
-  SI_BusLabel& mBusLabel;
+  SI_BusLabel& mLabel;
   std::shared_ptr<const SchematicGraphicsScene::Context> mContext;
-  std::shared_ptr<const GraphicsLayer> mOriginCrossLayer;
-  std::shared_ptr<const GraphicsLayer> mBusLabelLayer;
-  QScopedPointer<LineGraphicsItem> mAnchorGraphicsItem;
-
-  // Cached Attributes
-  QStaticText mStaticText;
-  QVector<QLineF> mOverlines;
-  QFont mFont;
-  bool mRotate180;
-  QPointF mTextOrigin;
-  QRectF mBoundingRect;
+  std::unique_ptr<PrimitiveTextGraphicsItem> mTextGraphicsItem;
+  std::unique_ptr<OriginCrossGraphicsItem> mOriginCrossGraphicsItem;
+  std::unique_ptr<LineGraphicsItem> mAnchorGraphicsItem;
 
   // Slots
   SI_BusLabel::OnEditedSlot mOnEditedSlot;
-
-  // Static Stuff
-  static QVector<QLineF> sOriginCrossLines;
 };
 
 /*******************************************************************************

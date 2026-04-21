@@ -39,6 +39,8 @@ namespace librepcb {
 namespace editor {
 
 class LineGraphicsItem;
+class OriginCrossGraphicsItem;
+class PrimitiveTextGraphicsItem;
 
 /*******************************************************************************
  *  Class SGI_NetLabel
@@ -47,57 +49,45 @@ class LineGraphicsItem;
 /**
  * @brief The SGI_NetLabel class
  */
-class SGI_NetLabel final : public QGraphicsItem {
+class SGI_NetLabel final : public QGraphicsItemGroup {
 public:
   // Constructors / Destructor
   SGI_NetLabel() = delete;
   SGI_NetLabel(const SGI_NetLabel& other) = delete;
   SGI_NetLabel(
-      SI_NetLabel& netlabel, const GraphicsLayerList& layers,
+      SI_NetLabel& label, const GraphicsLayerList& layers,
       std::shared_ptr<const SchematicGraphicsScene::Context> context) noexcept;
   virtual ~SGI_NetLabel() noexcept;
 
   // General Methods
-  SI_NetLabel& getNetLabel() noexcept { return mNetLabel; }
+  SI_NetLabel& getNetLabel() noexcept { return mLabel; }
+  void updateContext() noexcept;
 
   // Inherited from QGraphicsItem
-  QRectF boundingRect() const noexcept override { return mBoundingRect; }
-  void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
-             QWidget* widget) noexcept override;
+  QPainterPath shape() const noexcept override;
 
   // Operator Overloadings
   SGI_NetLabel& operator=(const SGI_NetLabel& rhs) = delete;
 
 private:  // Methods
-  void netLabelEdited(const SI_NetLabel& obj,
-                      SI_NetLabel::Event event) noexcept;
+  void labelEdited(const SI_NetLabel& obj, SI_NetLabel::Event event) noexcept;
   virtual QVariant itemChange(GraphicsItemChange change,
                               const QVariant& value) noexcept override;
   void updatePosition() noexcept;
   void updateRotation() noexcept;
+  void updateMirrored() noexcept;
   void updateText() noexcept;
   void updateAnchor() noexcept;
 
 private:  // Data
-  SI_NetLabel& mNetLabel;
+  SI_NetLabel& mLabel;
   std::shared_ptr<const SchematicGraphicsScene::Context> mContext;
-  std::shared_ptr<const GraphicsLayer> mOriginCrossLayer;
-  std::shared_ptr<const GraphicsLayer> mNetLabelLayer;
-  QScopedPointer<LineGraphicsItem> mAnchorGraphicsItem;
-
-  // Cached Attributes
-  QStaticText mStaticText;
-  QVector<QLineF> mOverlines;
-  QFont mFont;
-  bool mRotate180;
-  QPointF mTextOrigin;
-  QRectF mBoundingRect;
+  std::unique_ptr<PrimitiveTextGraphicsItem> mTextGraphicsItem;
+  std::unique_ptr<OriginCrossGraphicsItem> mOriginCrossGraphicsItem;
+  std::unique_ptr<LineGraphicsItem> mAnchorGraphicsItem;
 
   // Slots
   SI_NetLabel::OnEditedSlot mOnEditedSlot;
-
-  // Static Stuff
-  static QVector<QLineF> sOriginCrossLines;
 };
 
 /*******************************************************************************

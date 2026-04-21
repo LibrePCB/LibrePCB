@@ -356,7 +356,7 @@ void SchematicGraphicsScene::updateCrossProbe() noexcept {
     item->update();
   }
   foreach (auto item, mBusLabels) {
-    item->update();
+    item->updateContext();
   }
   foreach (auto item, mNetPoints) {
     item->update();
@@ -365,7 +365,7 @@ void SchematicGraphicsScene::updateCrossProbe() noexcept {
     item->update();
   }
   foreach (auto item, mNetLabels) {
-    item->update();
+    item->updateContext();
   }
   foreach (auto item, mTexts) {
     item->updateContext();

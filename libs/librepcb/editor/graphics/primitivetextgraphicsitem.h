@@ -70,6 +70,12 @@ public:
   void setLayer(const std::shared_ptr<const GraphicsLayer>& layer) noexcept;
   void setShapeEnabled(bool enabled) noexcept { mShapeEnabled = enabled; }
   void setState(GraphicsLayer::State state) noexcept;
+  void setLevelOfDetailToPixelate(qreal lod) noexcept {
+    mLevelOfDetailToPixelate = lod;
+  }
+  void setLevelOfDetailToHide(qreal lod) noexcept {
+    mLevelOfDetailToHide = lod;
+  }
 
   // Inherited from QGraphicsItem
   QRectF boundingRect() const noexcept override { return mBoundingRect; }
@@ -101,6 +107,8 @@ private:  // Data
   QRectF mBoundingRect;
   QPainterPath mShape;
   bool mShapeEnabled;
+  qreal mLevelOfDetailToPixelate;
+  qreal mLevelOfDetailToHide;
 
   // Slots
   GraphicsLayer::OnEditedSlot mOnLayerEditedSlot;

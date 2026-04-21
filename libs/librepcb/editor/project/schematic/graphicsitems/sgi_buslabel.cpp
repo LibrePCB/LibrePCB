@@ -22,18 +22,17 @@
  ******************************************************************************/
 #include "sgi_buslabel.h"
 
-#include "../../../graphics/graphicslayer.h"
 #include "../../../graphics/graphicslayerlist.h"
 #include "../../../graphics/linegraphicsitem.h"
+#include "../../../graphics/origincrossgraphicsitem.h"
+#include "../../../graphics/primitivetextgraphicsitem.h"
 #include "../schematicgraphicsscene.h"
 
-#include <librepcb/core/application.h>
 #include <librepcb/core/project/circuit/bus.h>
 #include <librepcb/core/project/schematic/items/si_buslabel.h>
 #include <librepcb/core/project/schematic/items/si_bussegment.h>
 #include <librepcb/core/types/alignment.h>
-#include <librepcb/core/utils/overlinemarkupparser.h>
-#include <librepcb/core/utils/toolbox.h>
+#include <librepcb/core/types/length.h>
 #include <librepcb/core/workspace/colorrole.h>
 
 #include <QtCore>
@@ -45,8 +44,6 @@
 namespace librepcb {
 namespace editor {
 
-QVector<QLineF> SGI_BusLabel::sOriginCrossLines;
-
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
@@ -54,102 +51,79 @@ QVector<QLineF> SGI_BusLabel::sOriginCrossLines;
 SGI_BusLabel::SGI_BusLabel(
     SI_BusLabel& label, const GraphicsLayerList& layers,
     std::shared_ptr<const SchematicGraphicsScene::Context> context) noexcept
-  : QGraphicsItem(),
-    mBusLabel(label),
+  : QGraphicsItemGroup(),
+    mLabel(label),
     mContext(context),
-    mOriginCrossLayer(layers.get(ColorRole::schematicReferences())),
-    mBusLabelLayer(layers.get(ColorRole::schematicBusLabels())),
-    mOnEditedSlot(*this, &SGI_BusLabel::busLabelEdited) {
+    mTextGraphicsItem(new PrimitiveTextGraphicsItem(this)),
+    mOriginCrossGraphicsItem(new OriginCrossGraphicsItem(this)),
+    mAnchorGraphicsItem(new LineGraphicsItem()),
+    mOnEditedSlot(*this, &SGI_BusLabel::labelEdited) {
+  setFlag(QGraphicsItem::ItemHasNoContents, true);
   setFlag(QGraphicsItem::ItemIsSelectable, true);
   setZValue(SchematicGraphicsScene::ZValue_Buses);
 
-  mStaticText.setTextFormat(Qt::PlainText);
-  mStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
+  mTextGraphicsItem->setLayer(layers.get(ColorRole::schematicBusLabels()));
+  mTextGraphicsItem->setFont(PrimitiveTextGraphicsItem::Font::Monospace);
+  mTextGraphicsItem->setHeight(PositiveLength(Length::fromPx(4)));
+  mTextGraphicsItem->setLevelOfDetailToPixelate(6);
+  mTextGraphicsItem->setLevelOfDetailToHide(2);
+  mTextGraphicsItem->setSelected(isSelected());
 
-  mFont = Application::getDefaultMonospaceFont();
-  mFont.setPixelSize(4);
+  mOriginCrossGraphicsItem->setLayer(
+      layers.get(ColorRole::schematicReferences()));
+  mOriginCrossGraphicsItem->setSize(UnsignedLength(800000));
+  mOriginCrossGraphicsItem->setSelected(isSelected());
 
-  if (sOriginCrossLines.isEmpty()) {
-    qreal crossSizePx = Length(400000).toPx();
-    sOriginCrossLines.append(QLineF(-crossSizePx, 0, crossSizePx, 0));
-    sOriginCrossLines.append(QLineF(0, -crossSizePx, 0, crossSizePx));
-  }
-
-  // create anchor graphics item
-  mAnchorGraphicsItem.reset(new LineGraphicsItem());
-  mAnchorGraphicsItem->setZValue(SchematicGraphicsScene::ZValue_Buses);
   mAnchorGraphicsItem->setLayer(layers.get(ColorRole::schematicReferences()));
+  mAnchorGraphicsItem->setZValue(SchematicGraphicsScene::ZValue_Buses);
   mAnchorGraphicsItem->setSelected(isSelected());
 
+  updateContext();
   updatePosition();
   updateRotation();
+  updateMirrored();
   updateText();
   updateAnchor();
 
-  mBusLabel.onEdited.attach(mOnEditedSlot);
+  mLabel.onEdited.attach(mOnEditedSlot);
 }
 
 SGI_BusLabel::~SGI_BusLabel() noexcept {
 }
 
 /*******************************************************************************
+ *  General Methods
+ ******************************************************************************/
+
+void SGI_BusLabel::updateContext() noexcept {
+  const Bus* bus = &mLabel.getBusSegment().getBus();
+  const GraphicsLayer::State state = mContext->getLayerState(false, bus);
+  mTextGraphicsItem->setState(state);
+  mOriginCrossGraphicsItem->setState(state);
+  mAnchorGraphicsItem->setState(state);
+}
+
+/*******************************************************************************
  *  Inherited from QGraphicsItem
  ******************************************************************************/
 
-void SGI_BusLabel::paint(QPainter* painter,
-                         const QStyleOptionGraphicsItem* option,
-                         QWidget* widget) noexcept {
-  Q_UNUSED(widget);
-
-  // If the net label layer is disabled, do not draw anything.
-  if ((!mBusLabelLayer) || (!mBusLabelLayer->isVisible())) {
-    return;
-  }
-
-  const Bus* bus = &mBusLabel.getBusSegment().getBus();
-  const bool selected = option->state.testFlag(QStyle::State_Selected);
-  const GraphicsLayer::State state = mContext->getLayerState(selected, bus);
-
-  const qreal lod =
-      option->levelOfDetailFromTransform(painter->worldTransform());
-
-  if (mOriginCrossLayer && mOriginCrossLayer->isVisible() && (lod > 2)) {
-    // draw origin cross
-    painter->setPen(QPen(mOriginCrossLayer->getColor(state), 0));
-    painter->drawLines(sOriginCrossLines);
-  }
-
-  if (lod > 1) {
-    // draw text
-    painter->setPen(QPen(mBusLabelLayer->getColor(state), 0));
-    painter->setFont(mFont);
-    painter->save();
-    if (mRotate180) {
-      painter->rotate(180);
-    }
-    painter->drawStaticText(mTextOrigin, mStaticText);
-    painter->setPen(QPen(mBusLabelLayer->getColor(state), qreal(4) / 15));
-    painter->drawLines(mOverlines);
-    painter->restore();
-  } else {
-    // draw filled rect
-    painter->setPen(Qt::NoPen);
-    painter->setBrush(
-        QBrush(mBusLabelLayer->getColor(state), Qt::Dense5Pattern));
-    painter->drawRect(mBoundingRect);
-  }
+QPainterPath SGI_BusLabel::shape() const noexcept {
+  return mTextGraphicsItem->mapToParent(mTextGraphicsItem->shape()) |
+      mOriginCrossGraphicsItem->shape();
 }
 
 QVariant SGI_BusLabel::itemChange(GraphicsItemChange change,
                                   const QVariant& value) noexcept {
   if ((change == ItemSceneHasChanged) && mAnchorGraphicsItem) {
     if (QGraphicsScene* s = mAnchorGraphicsItem->scene()) {
-      s->removeItem(mAnchorGraphicsItem.data());
+      s->removeItem(mAnchorGraphicsItem.get());
     }
     if (QGraphicsScene* s = scene()) {
-      s->addItem(mAnchorGraphicsItem.data());
+      s->addItem(mAnchorGraphicsItem.get());
     }
   } else if ((change == ItemSelectedHasChanged) && mAnchorGraphicsItem) {
+    mTextGraphicsItem->setSelected(value.toBool());
+    mOriginCrossGraphicsItem->setSelected(value.toBool());
     mAnchorGraphicsItem->setSelected(value.toBool());
   }
   return QGraphicsItem::itemChange(change, value);
@@ -159,8 +133,8 @@ QVariant SGI_BusLabel::itemChange(GraphicsItemChange change,
  *  Private Methods
  ******************************************************************************/
 
-void SGI_BusLabel::busLabelEdited(const SI_BusLabel& obj,
-                                  SI_BusLabel::Event event) noexcept {
+void SGI_BusLabel::labelEdited(const SI_BusLabel& obj,
+                               SI_BusLabel::Event event) noexcept {
   Q_UNUSED(obj);
   switch (event) {
     case SI_BusLabel::Event::PositionChanged:
@@ -169,9 +143,10 @@ void SGI_BusLabel::busLabelEdited(const SI_BusLabel& obj,
       break;
     case SI_BusLabel::Event::RotationChanged:
       updateRotation();
-      updateText();
       break;
     case SI_BusLabel::Event::MirroredChanged:
+      updateMirrored();
+      break;
     case SI_BusLabel::Event::BusNameChanged:
       updateText();
       break;
@@ -179,66 +154,34 @@ void SGI_BusLabel::busLabelEdited(const SI_BusLabel& obj,
       updateAnchor();
       break;
     default:
-      qWarning() << "Unhandled switch-case in SGI_BusLabel::netLabelEdited():"
+      qWarning() << "Unhandled switch-case in SGI_BusLabel::labelEdited():"
                  << static_cast<int>(event);
       break;
   }
 }
 
 void SGI_BusLabel::updatePosition() noexcept {
-  setPos(mBusLabel.getPosition().toPxQPointF());
+  setPos(mLabel.getPosition().toPxQPointF());
 }
 
 void SGI_BusLabel::updateRotation() noexcept {
-  setRotation(-mBusLabel.getRotation().toDeg());
+  mTextGraphicsItem->setRotation(mLabel.getRotation());
+  mOriginCrossGraphicsItem->setRotation(mLabel.getRotation());
+}
+
+void SGI_BusLabel::updateMirrored() noexcept {
+  mTextGraphicsItem->setAlignment(
+      Alignment(mLabel.getMirrored() ? HAlign::right() : HAlign::left(),
+                VAlign::bottom()));
 }
 
 void SGI_BusLabel::updateText() noexcept {
-  prepareGeometryChange();
-
-  mRotate180 = Toolbox::isTextUpsideDown(mBusLabel.getRotation());
-
-  const Alignment align(
-      mBusLabel.getMirrored() ? HAlign::right() : HAlign::left(),
-      VAlign::bottom());
-  const int flags =
-      mRotate180 ? align.mirrored().toQtAlign() : align.toQtAlign();
-
-  QString displayText;
-  const QFontMetricsF fm(mFont);
-  OverlineMarkupParser::process(*mBusLabel.getBusSegment().getBus().getName(),
-                                fm, flags, displayText, mOverlines,
-                                mBoundingRect);
-
-  mStaticText.setText(displayText);
-  mStaticText.prepare(QTransform(), mFont);
-  if (mBusLabel.getMirrored() ^ mRotate180) {
-    mTextOrigin.setX(-mStaticText.size().width());
-  } else {
-    mTextOrigin.setX(0);
-  }
-  mTextOrigin.setY(mRotate180 ? 0 : -mStaticText.size().height());
-  mStaticText.prepare(QTransform()
-                          .rotate(mRotate180 ? 180 : 0)
-                          .translate(mTextOrigin.x(), mTextOrigin.y()),
-                      mFont);
-
-  QRectF rect =
-      QRectF(0, 0, mStaticText.size().width(), -mStaticText.size().height())
-          .normalized();
-
-  if (mBusLabel.getMirrored()) rect.moveLeft(-mStaticText.size().width());
-
-  qreal len = sOriginCrossLines[0].length();
-  mBoundingRect =
-      rect.united(QRectF(-len / 2, -len / 2, len, len)).normalized();
-
-  update();
+  mTextGraphicsItem->setText(*mLabel.getBusSegment().getBus().getName(), true);
 }
 
 void SGI_BusLabel::updateAnchor() noexcept {
-  mAnchorGraphicsItem->setLine(mBusLabel.getPosition(),
-                               mBusLabel.getAnchorPosition());
+  mAnchorGraphicsItem->setLine(mLabel.getPosition(),
+                               mLabel.getAnchorPosition());
 }
 
 /*******************************************************************************

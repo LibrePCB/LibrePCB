@@ -74,6 +74,9 @@ void OriginCrossGraphicsItem::setSize(const UnsignedLength& size) noexcept {
 
 void OriginCrossGraphicsItem::setLayer(
     const std::shared_ptr<const GraphicsLayer>& layer) noexcept {
+  if (layer == mLayer) {
+    return;
+  }
   if (mLayer) {
     mLayer->onEdited.detach(mOnLayerEditedSlot);
   }
@@ -87,8 +90,10 @@ void OriginCrossGraphicsItem::setLayer(
 }
 
 void OriginCrossGraphicsItem::setState(GraphicsLayer::State state) noexcept {
-  mState = state;
-  update();
+  if (state != mState) {
+    mState = state;
+    update();
+  }
 }
 
 /*******************************************************************************

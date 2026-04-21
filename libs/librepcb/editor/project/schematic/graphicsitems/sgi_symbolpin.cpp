@@ -96,6 +96,8 @@ SGI_SymbolPin::SGI_SymbolPin(
   mNumbersGraphicsItem->setFont(PrimitiveTextGraphicsItem::Font::SansSerif);
   mNumbersGraphicsItem->setHeight(PositiveLength(1500000));
   mNumbersGraphicsItem->setLayer(mLayers.get(ColorRole::schematicPinNumbers()));
+  mNumbersGraphicsItem->setLevelOfDetailToPixelate(0);
+  mNumbersGraphicsItem->setLevelOfDetailToHide(3.5);
   mNumbersGraphicsItem->setFlag(QGraphicsItem::ItemIsSelectable, true);
   mNumbersGraphicsItem->setFlag(QGraphicsItem::ItemStacksBehindParent, true);
 
