@@ -22,18 +22,17 @@
  ******************************************************************************/
 #include "sgi_netlabel.h"
 
-#include "../../../graphics/graphicslayer.h"
 #include "../../../graphics/graphicslayerlist.h"
 #include "../../../graphics/linegraphicsitem.h"
+#include "../../../graphics/origincrossgraphicsitem.h"
+#include "../../../graphics/primitivetextgraphicsitem.h"
 #include "../schematicgraphicsscene.h"
 
-#include <librepcb/core/application.h>
 #include <librepcb/core/project/circuit/netsignal.h>
 #include <librepcb/core/project/schematic/items/si_netlabel.h>
 #include <librepcb/core/project/schematic/items/si_netsegment.h>
 #include <librepcb/core/types/alignment.h>
-#include <librepcb/core/utils/overlinemarkupparser.h>
-#include <librepcb/core/utils/toolbox.h>
+#include <librepcb/core/types/length.h>
 #include <librepcb/core/workspace/colorrole.h>
 
 #include <QtCore>
@@ -45,110 +44,86 @@
 namespace librepcb {
 namespace editor {
 
-QVector<QLineF> SGI_NetLabel::sOriginCrossLines;
-
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
 
 SGI_NetLabel::SGI_NetLabel(
-    SI_NetLabel& netlabel, const GraphicsLayerList& layers,
+    SI_NetLabel& label, const GraphicsLayerList& layers,
     std::shared_ptr<const SchematicGraphicsScene::Context> context) noexcept
-  : QGraphicsItem(),
-    mNetLabel(netlabel),
+  : QGraphicsItemGroup(),
+    mLabel(label),
     mContext(context),
-    mOriginCrossLayer(layers.get(ColorRole::schematicReferences())),
-    mNetLabelLayer(layers.get(ColorRole::schematicNetLabels())),
-    mOnEditedSlot(*this, &SGI_NetLabel::netLabelEdited) {
+    mTextGraphicsItem(new PrimitiveTextGraphicsItem(this)),
+    mOriginCrossGraphicsItem(new OriginCrossGraphicsItem(this)),
+    mAnchorGraphicsItem(new LineGraphicsItem()),
+    mOnEditedSlot(*this, &SGI_NetLabel::labelEdited) {
+  setFlag(QGraphicsItem::ItemHasNoContents, true);
   setFlag(QGraphicsItem::ItemIsSelectable, true);
   setZValue(SchematicGraphicsScene::ZValue_NetLabels);
 
-  mStaticText.setTextFormat(Qt::PlainText);
-  mStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
+  mTextGraphicsItem->setLayer(layers.get(ColorRole::schematicNetLabels()));
+  mTextGraphicsItem->setFont(PrimitiveTextGraphicsItem::Font::Monospace);
+  mTextGraphicsItem->setHeight(PositiveLength(Length::fromPx(4)));
+  mTextGraphicsItem->setLevelOfDetailToPixelate(6);
+  mTextGraphicsItem->setLevelOfDetailToHide(2);
+  mTextGraphicsItem->setSelected(isSelected());
 
-  mFont = Application::getDefaultMonospaceFont();
-  mFont.setPixelSize(4);
+  mOriginCrossGraphicsItem->setLayer(
+      layers.get(ColorRole::schematicReferences()));
+  mOriginCrossGraphicsItem->setSize(UnsignedLength(800000));
+  mOriginCrossGraphicsItem->setSelected(isSelected());
 
-  if (sOriginCrossLines.isEmpty()) {
-    qreal crossSizePx = Length(400000).toPx();
-    sOriginCrossLines.append(QLineF(-crossSizePx, 0, crossSizePx, 0));
-    sOriginCrossLines.append(QLineF(0, -crossSizePx, 0, crossSizePx));
-  }
-
-  // create anchor graphics item
-  mAnchorGraphicsItem.reset(new LineGraphicsItem());
-  mAnchorGraphicsItem->setZValue(SchematicGraphicsScene::ZValue_NetLabels);
   mAnchorGraphicsItem->setLayer(layers.get(ColorRole::schematicReferences()));
+  mAnchorGraphicsItem->setZValue(SchematicGraphicsScene::ZValue_NetLabels);
   mAnchorGraphicsItem->setSelected(isSelected());
 
+  updateContext();
   updatePosition();
   updateRotation();
+  updateMirrored();
   updateText();
   updateAnchor();
 
-  mNetLabel.onEdited.attach(mOnEditedSlot);
+  mLabel.onEdited.attach(mOnEditedSlot);
 }
 
 SGI_NetLabel::~SGI_NetLabel() noexcept {
 }
 
 /*******************************************************************************
+ *  General Methods
+ ******************************************************************************/
+
+void SGI_NetLabel::updateContext() noexcept {
+  const NetSignal* net = &mLabel.getNetSegment().getNetSignal();
+  const GraphicsLayer::State state = mContext->getLayerState(false, net);
+  mTextGraphicsItem->setState(state);
+  mOriginCrossGraphicsItem->setState(state);
+  mAnchorGraphicsItem->setState(state);
+}
+
+/*******************************************************************************
  *  Inherited from QGraphicsItem
  ******************************************************************************/
 
-void SGI_NetLabel::paint(QPainter* painter,
-                         const QStyleOptionGraphicsItem* option,
-                         QWidget* widget) noexcept {
-  Q_UNUSED(widget);
-
-  // If the net label layer is disabled, do not draw anything.
-  if ((!mNetLabelLayer) || (!mNetLabelLayer->isVisible())) {
-    return;
-  }
-
-  const qreal lod =
-      option->levelOfDetailFromTransform(painter->worldTransform());
-  const NetSignal* net = &mNetLabel.getNetSegment().getNetSignal();
-  const bool selected = option->state.testFlag(QStyle::State_Selected);
-  const GraphicsLayer::State state = mContext->getLayerState(selected, net);
-
-  if (mOriginCrossLayer && mOriginCrossLayer->isVisible() && (lod > 2)) {
-    // draw origin cross
-    painter->setPen(QPen(mOriginCrossLayer->getColor(state), 0));
-    painter->drawLines(sOriginCrossLines);
-  }
-
-  if (lod > 1) {
-    // draw text
-    painter->setPen(QPen(mNetLabelLayer->getColor(state), 0));
-    painter->setFont(mFont);
-    painter->save();
-    if (mRotate180) {
-      painter->rotate(180);
-    }
-    painter->drawStaticText(mTextOrigin, mStaticText);
-    painter->setPen(QPen(mNetLabelLayer->getColor(state), qreal(4) / 15));
-    painter->drawLines(mOverlines);
-    painter->restore();
-  } else {
-    // draw filled rect
-    painter->setPen(Qt::NoPen);
-    painter->setBrush(
-        QBrush(mNetLabelLayer->getColor(state), Qt::Dense5Pattern));
-    painter->drawRect(mBoundingRect);
-  }
+QPainterPath SGI_NetLabel::shape() const noexcept {
+  return mTextGraphicsItem->mapToParent(mTextGraphicsItem->shape()) |
+      mOriginCrossGraphicsItem->shape();
 }
 
 QVariant SGI_NetLabel::itemChange(GraphicsItemChange change,
                                   const QVariant& value) noexcept {
   if ((change == ItemSceneHasChanged) && mAnchorGraphicsItem) {
     if (QGraphicsScene* s = mAnchorGraphicsItem->scene()) {
-      s->removeItem(mAnchorGraphicsItem.data());
+      s->removeItem(mAnchorGraphicsItem.get());
     }
     if (QGraphicsScene* s = scene()) {
-      s->addItem(mAnchorGraphicsItem.data());
+      s->addItem(mAnchorGraphicsItem.get());
     }
   } else if ((change == ItemSelectedHasChanged) && mAnchorGraphicsItem) {
+    mTextGraphicsItem->setSelected(value.toBool());
+    mOriginCrossGraphicsItem->setSelected(value.toBool());
     mAnchorGraphicsItem->setSelected(value.toBool());
   }
   return QGraphicsItem::itemChange(change, value);
@@ -158,8 +133,8 @@ QVariant SGI_NetLabel::itemChange(GraphicsItemChange change,
  *  Private Methods
  ******************************************************************************/
 
-void SGI_NetLabel::netLabelEdited(const SI_NetLabel& obj,
-                                  SI_NetLabel::Event event) noexcept {
+void SGI_NetLabel::labelEdited(const SI_NetLabel& obj,
+                               SI_NetLabel::Event event) noexcept {
   Q_UNUSED(obj);
   switch (event) {
     case SI_NetLabel::Event::PositionChanged:
@@ -168,9 +143,10 @@ void SGI_NetLabel::netLabelEdited(const SI_NetLabel& obj,
       break;
     case SI_NetLabel::Event::RotationChanged:
       updateRotation();
-      updateText();
       break;
     case SI_NetLabel::Event::MirroredChanged:
+      updateMirrored();
+      break;
     case SI_NetLabel::Event::NetNameChanged:
       updateText();
       break;
@@ -178,66 +154,35 @@ void SGI_NetLabel::netLabelEdited(const SI_NetLabel& obj,
       updateAnchor();
       break;
     default:
-      qWarning() << "Unhandled switch-case in SGI_NetLabel::netLabelEdited():"
+      qWarning() << "Unhandled switch-case in SGI_NetLabel::labelEdited():"
                  << static_cast<int>(event);
       break;
   }
 }
 
 void SGI_NetLabel::updatePosition() noexcept {
-  setPos(mNetLabel.getPosition().toPxQPointF());
+  setPos(mLabel.getPosition().toPxQPointF());
 }
 
 void SGI_NetLabel::updateRotation() noexcept {
-  setRotation(-mNetLabel.getRotation().toDeg());
+  mTextGraphicsItem->setRotation(mLabel.getRotation());
+  mOriginCrossGraphicsItem->setRotation(mLabel.getRotation());
+}
+
+void SGI_NetLabel::updateMirrored() noexcept {
+  mTextGraphicsItem->setAlignment(
+      Alignment(mLabel.getMirrored() ? HAlign::right() : HAlign::left(),
+                VAlign::bottom()));
 }
 
 void SGI_NetLabel::updateText() noexcept {
-  prepareGeometryChange();
-
-  mRotate180 = Toolbox::isTextUpsideDown(mNetLabel.getRotation());
-
-  const Alignment align(
-      mNetLabel.getMirrored() ? HAlign::right() : HAlign::left(),
-      VAlign::bottom());
-  const int flags =
-      mRotate180 ? align.mirrored().toQtAlign() : align.toQtAlign();
-
-  QString displayText;
-  const QFontMetricsF fm(mFont);
-  OverlineMarkupParser::process(
-      *mNetLabel.getNetSegment().getNetSignal().getName(), fm, flags,
-      displayText, mOverlines, mBoundingRect);
-
-  mStaticText.setText(displayText);
-  mStaticText.prepare(QTransform(), mFont);
-  if (mNetLabel.getMirrored() ^ mRotate180) {
-    mTextOrigin.setX(-mStaticText.size().width());
-  } else {
-    mTextOrigin.setX(0);
-  }
-  mTextOrigin.setY(mRotate180 ? 0 : -mStaticText.size().height());
-  mStaticText.prepare(QTransform()
-                          .rotate(mRotate180 ? 180 : 0)
-                          .translate(mTextOrigin.x(), mTextOrigin.y()),
-                      mFont);
-
-  QRectF rect =
-      QRectF(0, 0, mStaticText.size().width(), -mStaticText.size().height())
-          .normalized();
-
-  if (mNetLabel.getMirrored()) rect.moveLeft(-mStaticText.size().width());
-
-  qreal len = sOriginCrossLines[0].length();
-  mBoundingRect =
-      rect.united(QRectF(-len / 2, -len / 2, len, len)).normalized();
-
-  update();
+  mTextGraphicsItem->setText(*mLabel.getNetSegment().getNetSignal().getName(),
+                             true);
 }
 
 void SGI_NetLabel::updateAnchor() noexcept {
-  mAnchorGraphicsItem->setLine(mNetLabel.getPosition(),
-                               mNetLabel.getAnchorPosition());
+  mAnchorGraphicsItem->setLine(mLabel.getPosition(),
+                               mLabel.getAnchorPosition());
 }
 
 /*******************************************************************************

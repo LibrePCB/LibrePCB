@@ -56,6 +56,8 @@ PrimitiveTextGraphicsItem::PrimitiveTextGraphicsItem(
     mFont(Application::getDefaultSansSerifFont()),
     mTextFlags(0),
     mShapeEnabled(true),
+    mLevelOfDetailToPixelate(2.5),
+    mLevelOfDetailToHide(1),
     mOnLayerEditedSlot(*this, &PrimitiveTextGraphicsItem::layerEdited) {
   setFlag(QGraphicsItem::ItemIsSelectable, true);
 
@@ -141,8 +143,10 @@ void PrimitiveTextGraphicsItem::setLayer(
 }
 
 void PrimitiveTextGraphicsItem::setState(GraphicsLayer::State state) noexcept {
-  mState = state;
-  update();
+  if (state != mState) {
+    mState = state;
+    update();
+  }
 }
 
 /*******************************************************************************
@@ -167,12 +171,25 @@ void PrimitiveTextGraphicsItem::paint(QPainter* painter,
   if (option->state.testFlag(QStyle::State_Selected)) {
     state = GraphicsLayer::State::Highlighted;
   }
+  const qreal lod =
+      option->levelOfDetailFromTransform(painter->worldTransform()) *
+      mHeight->toPx();
 
-  painter->setFont(mFont);
-  painter->setPen(QPen(mLayer->getColor(state),
-                       OverlineMarkupParser::getLineWidth(mHeight->toPx())));
-  painter->drawText(QRectF(), mTextFlags, mDisplayText);
-  painter->drawLines(mOverlines);
+  if (lod < mLevelOfDetailToHide) {
+    // Extremely small, do not render at all.
+  } else if (lod < mLevelOfDetailToPixelate) {
+    // Still small, render only as a pattern.
+    painter->setPen(Qt::NoPen);
+    painter->setBrush(QBrush(mLayer->getColor(state), Qt::Dense5Pattern));
+    painter->drawRect(mBoundingRect);
+  } else {
+    // Render text.
+    painter->setFont(mFont);
+    painter->setPen(QPen(mLayer->getColor(state),
+                         OverlineMarkupParser::getLineWidth(mHeight->toPx())));
+    painter->drawText(QRectF(), mTextFlags, mDisplayText);
+    painter->drawLines(mOverlines);
+  }
 }
 
 /*******************************************************************************
