@@ -1118,6 +1118,8 @@ export component PackageTab inherits Tab {
                 } else {
                     tabs[index].page-index = id;
                 }
+
+                root.focus();  // The focused component may have been deleted.
             }
         }
 
@@ -1159,10 +1161,12 @@ export component PackageTab inherits Tab {
         item-picked(idx, item) => {
             tabs[index].new-category = item.user-data;
             tabs[index].choose-category = false;
+            root.focus();  // Keep keyboard shortcuts working.
         }
 
         rejected => {
             tabs[index].choose-category = false;
+            root.focus();  // Keep keyboard shortcuts working.
         }
     }
 

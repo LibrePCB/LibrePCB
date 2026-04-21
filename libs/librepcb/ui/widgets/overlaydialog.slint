@@ -7,6 +7,9 @@ export component OverlayDialog inherits Rectangle {
     background: black.with-alpha(0.3 - Data.theme.base.to-hsv().value * 0.2);
     forward-focus: fs;
 
+    // IMPORTANT: In both of those handlers, you have to explicitly set the
+    // focus on one of your components, since the OverlayDialog looses focus
+    // on close, which will break keyboard shortcuts!
     callback accepted;
     callback rejected;
 
@@ -18,7 +21,14 @@ export component OverlayDialog inherits Rectangle {
 
     // Set focus on show, to make keyboard shortcuts working.
     init => {
-        self.focus();
+        if self.visible {
+            self.focus();
+        }
+    }
+    changed visible => {
+        if self.visible {
+            self.focus();
+        }
     }
 
     ta := TouchArea {

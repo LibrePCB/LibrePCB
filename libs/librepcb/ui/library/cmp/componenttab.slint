@@ -578,6 +578,7 @@ export component ComponentTab inherits Tab {
             page-clicked(id) => {
                 Data.set-current-tab(section-index, index);
                 tabs[index].page-index = id;
+                root.focus();  // The focused component may have been deleted.
             }
         }
 
@@ -633,10 +634,12 @@ export component ComponentTab inherits Tab {
         item-picked(idx, item) => {
             tabs[index].new-category = item.user-data;
             tabs[index].choose-category = false;
+            root.focus();  // Keep keyboard shortcuts working.
         }
 
         rejected => {
             tabs[index].choose-category = false;
+            root.focus();  // Keep keyboard shortcuts working.
         }
     }
 
