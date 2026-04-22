@@ -65,6 +65,7 @@ public:
 
   // General Methods
   void updateText() noexcept;
+  void setOverridePinNumber(const QString& number) noexcept;
 
   // Inherited from QGraphicsItem
   QPainterPath shape() const noexcept override;

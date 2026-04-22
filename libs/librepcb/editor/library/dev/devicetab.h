@@ -37,7 +37,9 @@
 namespace librepcb {
 
 class Component;
+class ComponentSymbolVariant;
 class Device;
+class Footprint;
 class Package;
 class Symbol;
 
@@ -121,6 +123,10 @@ private:
   bool save() noexcept;
   void selectComponent() noexcept;
   void selectPackage() noexcept;
+  void updatePreviewPinNumbers() noexcept;
+  void updateHighlightedPadsAndPins() noexcept;
+  void setHighlightedPad(const std::optional<Uuid>& pad) noexcept;
+  void setHighlightedSignalPins(const std::optional<Uuid>& signal) noexcept;
   void applyWorkspaceSettings() noexcept;
   void requestRepaint() noexcept;
 
@@ -173,10 +179,12 @@ private:
 
   // Referenced library elements
   std::shared_ptr<const Component> mComponent;  // May be nullptr!
+  std::shared_ptr<const ComponentSymbolVariant> mSymbolVariant;  // May be null!
   QString mComponentDescription;  // Error message on failure
   QList<std::shared_ptr<const Symbol>> mSymbols;
   QList<std::shared_ptr<SymbolGraphicsItem>> mSymbolGraphicsItems;
   std::shared_ptr<const Package> mPackage;  // May be nullptr!
+  std::shared_ptr<const Footprint> mFootprint;  // May be nullptr!
   QString mPackageDescription;  // Error message on failure
   std::unique_ptr<FootprintGraphicsItem> mFootprintGraphicsItem;
 };

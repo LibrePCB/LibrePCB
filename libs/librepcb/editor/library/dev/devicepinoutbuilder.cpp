@@ -247,6 +247,14 @@ void DevicePinoutBuilder::exitInteractiveMode() noexcept {
   mCurrentPadIndex = -1;
 }
 
+std::optional<Uuid> DevicePinoutBuilder::getCurrentPadUuid() const noexcept {
+  if (auto pad = mPadsSorted.value(mCurrentPadIndex)) {
+    return pad->getUuid();
+  } else {
+    return std::nullopt;
+  }
+}
+
 QString DevicePinoutBuilder::getCurrentPadName() const noexcept {
   if (auto pad = mPadsSorted.value(mCurrentPadIndex)) {
     return *pad->getName();
@@ -260,6 +268,14 @@ void DevicePinoutBuilder::setSignalsFilter(const QString& filter) noexcept {
 
   mSignalsFilter = filter;
   updateFilteredSignals();
+}
+
+std::optional<Uuid> DevicePinoutBuilder::getCurrentSignalUuid() const noexcept {
+  if (auto sig = mFilteredSignals.value(mCurrentSignalIndex).first) {
+    return sig->getUuid();
+  } else {
+    return std::nullopt;
+  }
 }
 
 void DevicePinoutBuilder::setCurrentSignalIndex(int index) noexcept {

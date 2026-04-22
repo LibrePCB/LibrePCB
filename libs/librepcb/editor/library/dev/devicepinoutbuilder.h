@@ -76,11 +76,13 @@ public:
   void commitInteractiveMode() noexcept;
   void exitInteractiveMode() noexcept;
   int getCurrentPadNumber() const noexcept { return mCurrentPadIndex + 1; }
+  std::optional<Uuid> getCurrentPadUuid() const noexcept;
   QString getCurrentPadName() const noexcept;
   const QString& getSignalsFilter() const noexcept { return mSignalsFilter; }
   void setSignalsFilter(const QString& filter) noexcept;
   const auto& getFilteredSignals() noexcept { return mFilteredSignalsModel; }
   int getCurrentSignalIndex() const noexcept { return mCurrentSignalIndex; }
+  std::optional<Uuid> getCurrentSignalUuid() const noexcept;
   void setCurrentSignalIndex(int index) noexcept;
 
   // Operator Overloadings
