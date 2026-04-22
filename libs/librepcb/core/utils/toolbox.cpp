@@ -102,14 +102,17 @@ std::optional<Point> Toolbox::arcCenter(const Point& p1, const Point& p2,
 
 Angle Toolbox::arcAngle(const Point& p1, const Point& p2,
                         const Point& center) noexcept {
-  Point delta1 = p1 - center;
-  Point delta2 = p2 - center;
+  const Point delta1 = p1 - center;
+  const Point delta2 = p2 - center;
   if (delta1.isOrigin() || delta2.isOrigin()) {
     return Angle::deg0();
   }
   qreal angle1 = std::atan2(delta1.getY().toMm(), delta1.getX().toMm());
   qreal angle2 = std::atan2(delta2.getY().toMm(), delta2.getX().toMm());
-  return Angle::fromRad(angle2 - angle1).mapTo0_360deg();
+  if (std::optional<Angle> angle = Angle::tryFromRad(angle2 - angle1)) {
+    return angle->mappedTo0_360deg();
+  }
+  return Angle::deg0();
 }
 
 Angle Toolbox::arcAngleFrom3Points(const Point& start, const Point& mid,
@@ -117,14 +120,17 @@ Angle Toolbox::arcAngleFrom3Points(const Point& start, const Point& mid,
   const UnsignedLength h = shortestDistanceBetweenPointAndLine(mid, start, end);
   const UnsignedLength c = (end - start).getLength();
   const qreal phi = 4 * std::atan((2 * h->toMm()) / c->toMm());
-  const Angle angleMid = angleBetweenPoints(start, mid);
-  const Angle angleEnd = angleBetweenPoints(start, end);
-  const Angle angleDelta = angleMid - angleEnd;
-  if (angleDelta.mappedTo180deg() < 0) {
-    return Angle::fromRad(phi);
-  } else {
-    return -Angle::fromRad(phi);
+  if (std::optional<Angle> angle = Angle::tryFromRad(phi)) {
+    const Angle angleMid = angleBetweenPoints(start, mid);
+    const Angle angleEnd = angleBetweenPoints(start, end);
+    const Angle angleDelta = angleMid - angleEnd;
+    if (angleDelta.mappedTo180deg() < 0) {
+      return *angle;
+    } else {
+      return -*angle;
+    }
   }
+  return Angle::deg0();
 }
 
 Angle Toolbox::angleBetweenPoints(const Point& p1, const Point& p2) noexcept {
@@ -134,7 +140,7 @@ Angle Toolbox::angleBetweenPoints(const Point& p1, const Point& p2) noexcept {
   }
   return Angle::fromDeg(rs::ffi_math_angle_to_point(delta.getX().toNm(),
                                                     delta.getY().toNm()))
-      .mapTo0_360deg();
+      .mappedTo0_360deg();
 }
 
 Point Toolbox::nearestPointOnLine(const Point& p, const Point& l1,

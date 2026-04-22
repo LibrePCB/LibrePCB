@@ -106,7 +106,7 @@ Angle KiCadTypeConverter::convertArc(const Point& start, const Point& mid,
                                      const Point& end) {
   Angle angle = Toolbox::arcAngleFrom3Points(start, mid, end);
   if ((angle.mappedTo0_360deg() % Angle::deg45()) < Angle::fromDeg(0.1)) {
-    angle.round(Angle::deg45());
+    angle = angle.rounded(Angle::deg45());
   }
   return angle;
 }

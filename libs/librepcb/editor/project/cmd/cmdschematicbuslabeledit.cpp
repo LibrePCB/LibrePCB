@@ -108,7 +108,7 @@ void CmdSchematicBusLabelEdit::mirror(Qt::Orientation orientation,
     rotation += Angle::deg180();
     rotate(Angle::deg180(), mNewPos, false);
   }
-  rotation.mapTo0_360deg();
+  rotation = rotation.mappedTo0_360deg();
   if ((rotation == Angle::deg90()) || (rotation == Angle::deg270())) {
     rotate(Angle::deg180(), mNewPos, false);
   }

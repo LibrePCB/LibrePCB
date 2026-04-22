@@ -1,8 +1,8 @@
-//! Various helper functions
+//! Various helper functions.
 
 use regex::Regex;
 
-/// Copy a string while incrementing its contained number
+/// Copy a string while incrementing its contained number.
 ///
 /// - If the string contains one or more numbers, the last one gets incremented
 /// - If it does not contain a number, a "1" is appended instead

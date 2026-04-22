@@ -90,7 +90,7 @@ static Angle parseAngle(const SExpression& node) {
   Angle angle = Angle::fromDeg(deserialize<double>(node));
   const Angle multiple = Angle::fromDeg("1");
   if (fuzzyCompare(Angle::deg0(), angle % multiple)) {
-    angle.round(multiple);
+    angle = angle.rounded(multiple);
   }
   return angle;
 }

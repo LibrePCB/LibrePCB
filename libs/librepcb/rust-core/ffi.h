@@ -279,6 +279,46 @@ struct InteractiveHtmlBomRefMap {
 
 extern "C" {
 
+/**
+ * Wrapper for [Angle::from_udeg_f]
+ */
+bool ffi_angle_from_udeg_f(double val, int64_t * NONNULL out);
+
+/**
+ * Wrapper for [Angle::from_deg_f]
+ */
+bool ffi_angle_from_deg_f(double val, int64_t * NONNULL out);
+
+/**
+ * Wrapper for [Angle::from_rad_f]
+ */
+bool ffi_angle_from_rad_f(double val, int64_t * NONNULL out);
+
+/**
+ * Wrapper for [Angle::abs]
+ */
+int64_t ffi_angle_abs(int64_t val);
+
+/**
+ * Wrapper for [Angle::rounded_to]
+ */
+int64_t ffi_angle_rounded_to(int64_t val, int64_t multiple);
+
+/**
+ * Wrapper for [Angle::inverted]
+ */
+int64_t ffi_angle_inverted(int64_t val);
+
+/**
+ * Wrapper for [Angle::to_0_360_deg]
+ */
+int64_t ffi_angle_to_0_360_deg(int64_t val);
+
+/**
+ * Wrapper for [Angle::to_180_deg]
+ */
+int64_t ffi_angle_to_180_deg(int64_t val);
+
 extern size_t ffi_qbytearray_len(const QByteArray * NONNULL obj);
 
 extern const uint8_t *ffi_qbytearray_data(const QByteArray * NONNULL obj);

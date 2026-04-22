@@ -215,18 +215,18 @@ TEST_P(ToolboxArcAngleFrom3PointsTest, test) {
 
 // clang-format off
 static ToolboxArcAngleFrom3PointsTestData sToolboxArcAngleFrom3PointsTestData[] = {
-// start,                     mid,                     end,                       angle
-  {Point(0, 0),               Point(0, 0),             Point(0, 0),               Angle::deg0()   },
-  {Point(2000000, 0),         Point(1500000, 0),       Point(1000000, 0),         Angle::deg0()   },
-  {Point(2000000, 0),         Point(500000, 1500000),  Point(-1000000, 0),        Angle::deg180() },
-  {Point(2000000, 0),         Point(500000, -1500000), Point(-1000000, 0),       -Angle::deg180() },
-  {Point(2000000, 3000000),   Point(292893, 3121320),           Point(-1000000, 2000000),  Angle::deg90()  },
-  {Point(2000000, 3000000),   Point(707107, 1878680),           Point(-1000000, 2000000), -Angle::deg90() },
-  {Point(-1000000, 2000000),  Point(1707107, -1121320),           Point(2000000, 3000000),   Angle::deg270() },
-  {Point(2000000, 3000000),   Point(-1121320, 292893),           Point(3000000, 0),         Angle::deg270() },
-  {Point(2000000, 3000000),   Point(6121320, 2707107),           Point(3000000, 0),        -Angle::deg270() },
-  {Point(3000000, 0),         Point(3121320, 1707107),           Point(2000000, 3000000),   Angle::deg90()  },
-  {Point(3000000, 0),         Point(1878680, 1292893),           Point(2000000, 3000000),  -Angle::deg90()  }
+// start,                     mid,                      end,                       angle
+  {Point(0, 0),               Point(0, 0),              Point(0, 0),               Angle::deg0()   },
+  {Point(2000000, 0),         Point(1500000, 0),        Point(1000000, 0),         Angle::deg0()   },
+  {Point(2000000, 0),         Point(500000, 1500000),   Point(-1000000, 0),        Angle::deg180() },
+  {Point(2000000, 0),         Point(500000, -1500000),  Point(-1000000, 0),       -Angle::deg180() },
+  {Point(2000000, 3000000),   Point(292893, 3121320),   Point(-1000000, 2000000),  Angle::deg90()  },
+  {Point(2000000, 3000000),   Point(707107, 1878680),   Point(-1000000, 2000000), -Angle::deg90()  },
+  {Point(-1000000, 2000000),  Point(1707107, -1121320), Point(2000000, 3000000),   Angle::deg270() },
+  {Point(2000000, 3000000),   Point(-1121320, 292893),  Point(3000000, 0),         Angle::deg270() },
+  {Point(2000000, 3000000),   Point(6121320, 2707107),  Point(3000000, 0),        -Angle::deg270() },
+  {Point(3000000, 0),         Point(3121320, 1707107),  Point(2000000, 3000000),   Angle::deg90()  },
+  {Point(3000000, 0),         Point(1878680, 1292893),  Point(2000000, 3000000),  -Angle::deg90()  }
 };
 // clang-format on
 

@@ -1,5 +1,6 @@
-//! FFI for Rust modules, to be used from C++ through cbindgen
+//! FFI for Rust modules, to be used from C++ through cbindgen.
 
+mod angle_ffi;
 mod cpp_ffi;
 mod ibom_ffi;
 mod length_ffi;

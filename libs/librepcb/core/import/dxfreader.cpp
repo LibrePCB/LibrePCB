@@ -76,7 +76,7 @@ public:
     Point p2 = center + Point(radius, 0).rotated(angle2);
     Angle angle = angle2 - angle1;
     if (angle < 0) {
-      angle.invert();
+      angle = angle.inverted();
     }
     mReader.mPolygons.append(Path::line(p1, p2, angle));
   }

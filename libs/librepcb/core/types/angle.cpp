@@ -26,6 +26,8 @@
 #include "../utils/qtmetatyperegistration.h"
 #include "../utils/toolbox.h"
 
+#include <librepcb/rust-core/ffi.h>
+
 #include <QtCore>
 
 /*******************************************************************************
@@ -47,92 +49,64 @@ QString Angle::toDegString() const noexcept {
 }
 
 Angle Angle::abs() const noexcept {
-  Angle a(*this);
-  a.makeAbs();
-  return a;
-}
-
-Angle& Angle::makeAbs() noexcept {
-  mMicrodegrees = qAbs(mMicrodegrees);
-  return *this;
+  return Angle(rs::ffi_angle_abs(mMicrodegrees));
 }
 
 Angle Angle::inverted() const noexcept {
-  Angle a(*this);
-  a.invert();
-  return a;
-}
-
-Angle& Angle::invert() noexcept {
-  if (mMicrodegrees > 0) {
-    mMicrodegrees -= 360000000;
-  } else if (mMicrodegrees < 0) {
-    mMicrodegrees += 360000000;
-  }
-  return *this;
+  return Angle(rs::ffi_angle_inverted(mMicrodegrees));
 }
 
 Angle Angle::rounded(const Angle& interval) const noexcept {
-  Angle a(*this);
-  a.round(interval);
-  return a;
-}
-
-Angle& Angle::round(const Angle& interval) noexcept {
   if (interval > 0) {
-    qint32 value = mMicrodegrees;
-    value += (value >= 0) ? (interval.mMicrodegrees / 2)
-                          : (-interval.mMicrodegrees / 2);
-    setAngleMicroDeg(interval.mMicrodegrees * (value / interval.mMicrodegrees));
-  } else {
-    qCritical() << "Invalid value passed to Angle::round():" << interval;
+    return Angle(
+        rs::ffi_angle_rounded_to(mMicrodegrees, interval.toMicroDeg()));
   }
+  qCritical() << "Invalid value passed to Angle::round():" << interval;
   return *this;
 }
 
 Angle Angle::mappedTo0_360deg() const noexcept {
-  Angle a(*this);
-  a.mapTo0_360deg();
-  return a;
-}
-
-Angle& Angle::mapTo0_360deg() noexcept {
-  if (mMicrodegrees < 0) mMicrodegrees += 360000000;
-  return *this;
+  return Angle(rs::ffi_angle_to_0_360_deg(mMicrodegrees));
 }
 
 Angle Angle::mappedTo180deg() const noexcept {
-  Angle a(*this);
-  a.mapTo180deg();
-  return a;
-}
-
-Angle& Angle::mapTo180deg() noexcept {
-  if (mMicrodegrees < -180000000)
-    mMicrodegrees += 360000000;
-  else if (mMicrodegrees >= 180000000)
-    mMicrodegrees -= 360000000;
-  return *this;
+  return Angle(rs::ffi_angle_to_180_deg(mMicrodegrees));
 }
 
 // Static Methods
 
-Angle Angle::fromDeg(qreal degrees) noexcept {
-  Angle angle;
-  angle.setAngleDeg(degrees);
-  return angle;
+Angle Angle::fromDeg(qreal degrees) {
+  int64_t udeg;
+  if (rs::ffi_angle_from_deg_f(degrees, &udeg)) {
+    return Angle(udeg);
+  }
+  // Value was outside the range of int64_t, or an invalid float.
+  throw RangeError(__FILE__, __LINE__, degrees * 1e6,
+                   std::numeric_limits<int64_t>::min(),
+                   std::numeric_limits<int64_t>::max());
 }
 
 Angle Angle::fromDeg(const QString& degrees) {
-  Angle angle;
-  angle.setAngleDeg(degrees);
-  return angle;
+  return Angle(degStringToMicrodeg(degrees));
 }
 
-Angle Angle::fromRad(qreal radians) noexcept {
-  Angle angle;
-  angle.setAngleRad(radians);
-  return angle;
+Angle Angle::fromRad(qreal radians) {
+  if (auto angle = tryFromRad(radians)) {
+    return *angle;
+  }
+  // Value was outside the range of int64_t, or an invalid float.
+  throw RangeError(__FILE__, __LINE__, radians * (180.0 / M_PI) * 1e6,
+                   std::numeric_limits<int64_t>::min(),
+                   std::numeric_limits<int64_t>::max());
+}
+
+std::optional<Angle> Angle::tryFromRad(qreal radians) noexcept {
+  int64_t udeg;
+  if (rs::ffi_angle_from_rad_f(radians, &udeg)) {
+    return Angle(udeg);
+  } else {
+    return std::nullopt;
+  }
 }
 
 // Private Static Methods

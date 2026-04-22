@@ -406,7 +406,7 @@ void SymbolEditorState_DrawPolygonBase::updatePolygonPath() noexcept {
           Toolbox::arcAngle(arcStart, mCursorPos, mArcCenter).mappedTo180deg();
       if (((mLastAngle > Angle::deg90()) && (angle < 0)) ||
           ((mLastAngle < -Angle::deg90()) && (angle > 0))) {
-        angle.invert();
+        angle = angle.inverted();
       }
       // Remove the old arc segments.
       while (vertices.count() > 1) {

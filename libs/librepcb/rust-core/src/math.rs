@@ -1,4 +1,4 @@
-//! Various low-level math functions
+//! Various low-level math functions.
 //!
 //! <div class="warning">
 //! All functions in this module are deterministic across all platforms.
@@ -8,20 +8,20 @@
 
 use libm;
 
-/// π/180 as a deterministic constant
+/// π/180 as a deterministic constant.
 const PI_DIV_180: f64 = f64::from_bits(0x3F91DF46A2529D39);
 
-/// Convert degrees to radians
+/// Convert degrees to radians.
 pub fn to_radians(degrees: f64) -> f64 {
   degrees * PI_DIV_180
 }
 
-/// Convert radians to degrees
+/// Convert radians to degrees.
 pub fn to_degrees(radians: f64) -> f64 {
   radians / PI_DIV_180
 }
 
-/// Rotate a point (x, y) by a certain angle around (0, 0)
+/// Rotate a point (x, y) by a certain angle around (0, 0).
 ///
 /// # Notes
 ///
@@ -52,7 +52,7 @@ pub fn rotate_point(x: f64, y: f64, angle: f64) -> (f64, f64) {
   (cos * x - sin * y, sin * x + cos * y)
 }
 
-/// Calculate the angle from (0, 0) to a given point (x, y)
+/// Calculate the angle from (0, 0) to a given point (x, y).
 ///
 /// # Notes
 ///
@@ -73,7 +73,7 @@ pub fn angle_to_point(x: f64, y: f64) -> f64 {
   to_degrees(libm::atan2(y, x))
 }
 
-/// Calculate the radius of an arc given by start/end point and angle
+/// Calculate the radius of an arc given by start/end point and angle.
 ///
 /// The arc is given by its start point, end point and angle. The start point
 /// is always (0, 0).
@@ -102,7 +102,8 @@ pub fn arc_radius(dx: f64, dy: f64, angle: f64) -> f64 {
   d / (2.0 * libm::sin(to_radians(angle / 2.0)))
 }
 
-/// Calculate the radius and center of an arc given by start/end point and angle
+/// Calculate the radius and center of an arc given by start/end point and
+/// angle.
 ///
 /// The arc is given by its start point, end point and angle. The start point
 /// is always (0, 0). The algorithm is described in

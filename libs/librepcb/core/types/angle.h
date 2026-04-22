@@ -25,6 +25,8 @@
  ******************************************************************************/
 #include <QtCore>
 
+#include <optional>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -68,7 +70,7 @@ namespace librepcb {
  *
  * If you don't want an (ambiguous) angle in the range ]-360..+360[ degrees but
  * [0..360[ or [-180..+180[ degrees, there are converter methods available:
- * #mappedTo0_360deg(), #mapTo0_360deg(), #mappedTo180deg(), #mapTo180deg().
+ * #mappedTo0_360deg(), #mappedTo180deg()
  *
  * There are also some static method available to build some often used angles:
  * #deg0(), #deg45(), #deg90() and so on...
@@ -103,64 +105,6 @@ public:
    * @brief Destructor
    */
   ~Angle() noexcept {}
-
-  // Setters
-
-  /**
-   * @brief Set the angle in microdegrees
-   *
-   * @param microdegrees  The angle in microdegrees
-   */
-  void setAngleMicroDeg(qint32 microdegrees) noexcept {
-    mMicrodegrees = microdegrees % 360000000;
-  }
-
-  /**
-   * @brief Set the angle in degrees
-   *
-   * @param degrees       The angle in degrees
-   *
-   * @warning If you want to set the angle exactly to common values like
-   * 0/45/90/... degrees, you should not use this method. Please use
-   * setAngleMicroDeg() instead, because it is more accurate (no use of floating
-   * point numbers). Or you can also use the static methods #deg0(), #deg45()
-   * and so on.
-   */
-  void setAngleDeg(qreal degrees) noexcept {
-    const qreal value = std::fmod(degrees * 1e6, 360e6);
-    // Note: Don't use qRound() because in Qt5 it is implemented strange.
-    setAngleMicroDeg((value >= 0.0) ? qint64(value + qreal(0.5))
-                                    : qint64(value - qreal(0.5)));
-  }
-
-  /**
-   * @brief Set the angle in degrees, represented in a QString
-   *
-   * This method is useful to read angles from files.
-   *
-   * @param degrees       See fromDeg(const QString&)
-   *
-   * @throw Exception     If the argument is invalid, an Exception will be
-   * thrown
-   */
-  void setAngleDeg(const QString& degrees) {
-    mMicrodegrees = degStringToMicrodeg(degrees) % 360000000;
-  }
-
-  /**
-   * @brief Set the angle in radians
-   *
-   * @param radians       The angle in radians
-   *
-   * @warning If you want to set the angle exactly to common values like
-   * 0/45/90/... degrees, you should not use this method. Please use
-   * setAngleMicroDeg() instead, because it is more accurate (no use of floating
-   * point numbers). Or you can also use the static methods #deg0(), #deg45()
-   * and so on.
-   */
-  void setAngleRad(qreal radians) noexcept {
-    setAngleDeg(radians * (180.0 / M_PI));
-  }
 
   // Conversions
 
@@ -202,19 +146,8 @@ public:
    * @brief Get an Angle object with absolute value (mMicrodegrees >= 0)
    *
    * @return A new Angle object with absolute value
-   *
-   * @see ::librepcb::Angle::makeAbs()
    */
   Angle abs() const noexcept;
-
-  /**
-   * @brief Make the angle absolute (mMicrodegrees >= 0)
-   *
-   * @return A reference to the modified object
-   *
-   * @see ::librepcb::Angle::abs()
-   */
-  Angle& makeAbs() noexcept;
 
   /**
    * @brief Get an Angle object with inverted value
@@ -224,23 +157,8 @@ public:
    * be kept as-is.
    *
    * @return A new Angle object with inverted value
-   *
-   * @see ::librepcb::Angle::invert()
    */
   Angle inverted() const noexcept;
-
-  /**
-   * @brief Invert the angle
-   *
-   * Changes the sign while keeping the represented angle. For example, 270° is
-   * converted to -90° and vice versa. As a special case, an angle of 0° will
-   * be kept as-is.
-   *
-   * @return A reference to the modified object
-   *
-   * @see ::librepcb::Angle::inverted()
-   */
-  Angle& invert() noexcept;
 
   /**
    * @brief Get an Angle object rounded to a given interval
@@ -251,60 +169,22 @@ public:
    * @param interval    The interval to round to (must be > 0)
    *
    * @return A new Angle object with rounded value
-   *
-   * @see ::librepcb::Angle::round()
    */
   Angle rounded(const Angle& interval) const noexcept;
-
-  /**
-   * @brief Round the angle to a given interval
-   *
-   * Especially useful to get rid of very odd angles (like 179.999999°) when
-   * constructed from some inaccurate/calculated floating point input.
-   *
-   * @param interval    The interval to round to (must be > 0)
-   *
-   * @return A reference to the modified object
-   *
-   * @see ::librepcb::Angle::rounded()
-   */
-  Angle& round(const Angle& interval) noexcept;
 
   /**
    * @brief Get an Angle object which is mapped to [0..360[ degrees
    *
    * @return A new Angle object which is mapped to [0..360[ degrees
-   *
-   * @see ::librepcb::Angle::mapTo0_360deg()
    */
   Angle mappedTo0_360deg() const noexcept;
-
-  /**
-   * @brief Map this Angle object to [0..360[ degrees
-   *
-   * @return A reference to the modified object
-   *
-   * @see ::librepcb::Angle::mappedTo0_360deg()
-   */
-  Angle& mapTo0_360deg() noexcept;
 
   /**
    * @brief Get an Angle object which is mapped to [-180..+180[ degrees
    *
    * @return A new Angle object which is mapped to [-180..+180[ degrees
-   *
-   * @see ::librepcb::Angle::mapTo180deg()
    */
   Angle mappedTo180deg() const noexcept;
-
-  /**
-   * @brief Map this Angle object to [-180..+180[ degrees
-   *
-   * @return A reference to the modified object
-   *
-   * @see ::librepcb::Angle::mappedTo180deg()
-   */
-  Angle& mapTo180deg() noexcept;
 
   // Static Methods
 
@@ -315,7 +195,7 @@ public:
    *
    * @return A new Angle object with the specified angle
    */
-  static Angle fromDeg(qreal degrees) noexcept;
+  static Angle fromDeg(qreal degrees);
 
   /**
    * @brief Get an Angle object with a specific angle
@@ -342,8 +222,21 @@ public:
    * @param radians   See setAngleRad()
    *
    * @return A new Angle object with the specified angle
+   *
+   * @throw ::librepcb::RangeError if the argument is invalid.
    */
-  static Angle fromRad(qreal radians) noexcept;
+  static Angle fromRad(qreal radians);
+
+  /**
+   * @brief Try to get an Angle object from radians
+   *
+   * Same as #fromRad(), but returns `std::nullopt` on invalid argument.
+   *
+   * @param radians  See setAngleRad()
+   *
+   * @return ::librepcb::Angle if valid, `std::nullopt` if invalid.
+   */
+  static std::optional<Angle> tryFromRad(qreal radians) noexcept;
 
   // Static Methods to create often used angles
   static Angle deg0() noexcept { return Angle(0); }  ///<   0 degrees

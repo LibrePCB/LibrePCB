@@ -1,6 +1,6 @@
-//! Length type
+//! Basic type to represent a length.
 
-use std::ops::{Add, Sub};
+use std::ops::{Add, Neg, Sub};
 
 /// Nanometers per inch
 const NM_PER_INCH: f64 = 25400000.0;
@@ -11,7 +11,7 @@ const PIXELS_PER_INCH: f64 = 72.0;
 /// Nanometers per pixel
 const NM_PER_PIXEL: f64 = NM_PER_INCH / PIXELS_PER_INCH;
 
-/// Length type
+/// Basic type to represent a length.
 ///
 /// This type is used to represent ALL length values in symbols, schematics,
 /// footprints, boards and so on. You should never use another length type,
@@ -31,12 +31,17 @@ const NM_PER_PIXEL: f64 = NM_PER_INCH / PIXELS_PER_INCH;
 pub struct Length(i64);
 
 impl Length {
-  /// Create from nanometers
+  /// Create zero length.
+  pub fn zero() -> Self {
+    Self(0)
+  }
+
+  /// Create length from nanometers.
   pub fn from_nm(val: i64) -> Self {
     Self(val)
   }
 
-  /// Convert from floating point nanometers
+  /// Convert from nanometers (floating point).
   ///
   /// Rounds the value to the nearest integer and converts to [Length] if
   /// the value is valid. For invalid values or values outside the range of
@@ -50,37 +55,42 @@ impl Length {
     }
   }
 
-  /// Convert from micrometers
-  pub fn from_um(val: f64) -> Option<Self> {
+  /// Convert from micrometers (floating point).
+  pub fn from_um_f(val: f64) -> Option<Self> {
     Self::from_nm_f(val * 1e3)
   }
 
-  /// Convert from millimeters
-  pub fn from_mm(val: f64) -> Option<Self> {
+  /// Convert from millimeters.
+  pub fn from_mm(val: i32) -> Self {
+    Self::from_nm(val as i64 * 1_000_000)
+  }
+
+  /// Convert from millimeters (floating point).
+  pub fn from_mm_f(val: f64) -> Option<Self> {
     Self::from_nm_f(val * 1e6)
   }
 
-  /// Convert from inches
-  pub fn from_inch(val: f64) -> Option<Self> {
+  /// Convert from inches (floating point).
+  pub fn from_inch_f(val: f64) -> Option<Self> {
     Self::from_nm_f(val * NM_PER_INCH)
   }
 
-  /// Convert from mils
-  pub fn from_mils(val: f64) -> Option<Self> {
+  /// Convert from mils (floating point).
+  pub fn from_mils_f(val: f64) -> Option<Self> {
     Self::from_nm_f(val * NM_PER_MIL)
   }
 
-  /// Convert from pixels
-  pub fn from_px(val: f64) -> Option<Self> {
+  /// Convert from pixels (floating point).
+  pub fn from_px_f(val: f64) -> Option<Self> {
     Self::from_nm_f(val * NM_PER_PIXEL)
   }
 
-  /// Absolute value
+  /// Absolute value.
   pub fn abs(&self) -> Self {
     Self(self.0.saturating_abs())
   }
 
-  /// Round to the nearest multiple of another length
+  /// Round to the nearest multiple of another length.
   ///
   /// Useful to map coordinates to a grid.
   ///
@@ -97,7 +107,7 @@ impl Length {
     }
   }
 
-  /// Round to the next lower (or equal) multiple of another length
+  /// Round to the next lower (or equal) multiple of another length.
   ///
   /// # Safety
   ///
@@ -111,7 +121,7 @@ impl Length {
     }
   }
 
-  /// Round to the next higher (or equal) multiple of another length
+  /// Round to the next higher (or equal) multiple of another length.
   ///
   /// # Safety
   ///
@@ -125,34 +135,42 @@ impl Length {
     }
   }
 
-  /// Get as nanometers
+  /// Get as nanometers.
   pub fn to_nm(&self) -> i64 {
     self.0
   }
 
-  /// Convert to micrometers
+  /// Convert to micrometers.
   pub fn to_um(&self) -> f64 {
     self.0 as f64 / 1e3
   }
 
-  /// Convert to millimeters
+  /// Convert to millimeters.
   pub fn to_mm(&self) -> f64 {
     self.0 as f64 / 1e6
   }
 
-  /// Convert to inches
+  /// Convert to inches.
   pub fn to_inch(&self) -> f64 {
     self.0 as f64 / NM_PER_INCH
   }
 
-  /// Convert to mils
+  /// Convert to mils.
   pub fn to_mils(&self) -> f64 {
     self.0 as f64 / NM_PER_MIL
   }
 
-  /// Convert to pixels
+  /// Convert to pixels.
   pub fn to_px(&self) -> f64 {
     self.0 as f64 / NM_PER_PIXEL
+  }
+}
+
+impl Neg for Length {
+  type Output = Self;
+
+  fn neg(self) -> Self {
+    Self(-self.0)
   }
 }
 
@@ -215,6 +233,13 @@ mod tests {
   fn arithmetic() {
     assert_eq!(l(-5) + l(10), l(5));
     assert_eq!(l(5) - l(10), l(-5));
+    assert_eq!(-l(5), l(-5));
+    assert_eq!(-l(-5), l(5));
+  }
+
+  #[test]
+  fn zero() {
+    assert_eq!(Length::zero().to_nm(), 0);
   }
 
   #[test]
@@ -229,41 +254,49 @@ mod tests {
   }
 
   #[test]
-  fn from_to_um() {
+  fn from_to_um_f() {
     let val: f64 = -42.5;
-    let x = Length::from_um(val).unwrap();
+    let x = Length::from_um_f(val).unwrap();
     assert_eq!(x.to_nm(), -42500);
     assert_eq!(x.to_um(), val);
   }
 
   #[test]
-  fn from_to_mm() {
+  fn from_to_mm_f() {
     let val: f64 = -42.5;
-    let x = Length::from_mm(val).unwrap();
+    let x = Length::from_mm_f(val).unwrap();
     assert_eq!(x.to_nm(), -42500000);
     assert_eq!(x.to_mm(), val);
   }
 
   #[test]
-  fn from_to_inch() {
+  fn from_to_mm() {
+    let val: i32 = -42;
+    let x = Length::from_mm(val);
+    assert_eq!(x.to_nm(), -42000000);
+    assert_eq!(x.to_mm(), val as f64);
+  }
+
+  #[test]
+  fn from_to_inch_f() {
     let val: f64 = -42.5;
-    let x = Length::from_inch(val).unwrap();
+    let x = Length::from_inch_f(val).unwrap();
     assert_eq!(x.to_nm(), -1079500000);
     assert_eq!(x.to_inch(), val);
   }
 
   #[test]
-  fn from_to_mils() {
+  fn from_to_mils_f() {
     let val: f64 = -42.5;
-    let x = Length::from_mils(val).unwrap();
+    let x = Length::from_mils_f(val).unwrap();
     assert_eq!(x.to_nm(), -1079500);
     assert_eq!(x.to_mils(), val);
   }
 
   #[test]
-  fn from_to_px() {
+  fn from_to_px_f() {
     let val: f64 = -4.5;
-    let x = Length::from_px(val).unwrap();
+    let x = Length::from_px_f(val).unwrap();
     assert_eq!(x.to_nm(), -1587500);
     assert_eq!(x.to_px(), val);
   }

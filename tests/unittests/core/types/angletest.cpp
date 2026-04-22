@@ -139,24 +139,23 @@ INSTANTIATE_TEST_SUITE_P(AngleTest, AngleTest, ::testing::Values(
 // clang-format on
 
 /*******************************************************************************
- *  Parametrized setAngleDeg(float) and setAngleRad() Tests
+ *  Parametrized fromDeg(float) and fromRad() Tests
  ******************************************************************************/
 
-struct AngleSetAngleFloatTestData {
+struct AngleFromFloatTestData {
   qreal inputDegrees;
   qreal inputRadians;
   qint32 output;  // Microdegrees
   bool overflow;
 };
 
-class AngleSetAngleFloatTest
-  : public ::testing::TestWithParam<AngleSetAngleFloatTestData> {};
+class AngleFromFloatTest
+  : public ::testing::TestWithParam<AngleFromFloatTestData> {};
 
-TEST_P(AngleSetAngleFloatTest, testDeg) {
-  const AngleSetAngleFloatTestData& data = GetParam();
+TEST_P(AngleFromFloatTest, testDeg) {
+  const AngleFromFloatTestData& data = GetParam();
 
-  Angle a;
-  a.setAngleDeg(data.inputDegrees);
+  const Angle a = Angle::fromDeg(data.inputDegrees);
   EXPECT_EQ(data.output, a.toMicroDeg());
   EXPECT_EQ(data.output, Angle::fromDeg(data.inputDegrees).toMicroDeg());
   if (!data.overflow) {
@@ -164,11 +163,10 @@ TEST_P(AngleSetAngleFloatTest, testDeg) {
   }
 }
 
-TEST_P(AngleSetAngleFloatTest, testRad) {
-  const AngleSetAngleFloatTestData& data = GetParam();
+TEST_P(AngleFromFloatTest, testRad) {
+  const AngleFromFloatTestData& data = GetParam();
 
-  Angle a;
-  a.setAngleRad(data.inputRadians);
+  const Angle a = Angle::fromRad(data.inputRadians);
   EXPECT_EQ(data.output, a.toMicroDeg());
   EXPECT_EQ(data.output, Angle::fromRad(data.inputRadians).toMicroDeg());
   if (!data.overflow) {
@@ -176,7 +174,7 @@ TEST_P(AngleSetAngleFloatTest, testRad) {
   }
 }
 
-static AngleSetAngleFloatTestData sSetAngleFloatTestData[] = {
+static AngleFromFloatTestData sSetAngleFloatTestData[] = {
     // {degrees, radians, microdegrees, overflow}
     {0.0, 0.0, 0, false},
     {-0.0, 0.0, 0, false},
@@ -198,7 +196,7 @@ static AngleSetAngleFloatTestData sSetAngleFloatTestData[] = {
     {-0.1000006, -0.0017453397, -100001, true},  // round
 };
 
-INSTANTIATE_TEST_SUITE_P(AngleSetAngleFloatTest, AngleSetAngleFloatTest,
+INSTANTIATE_TEST_SUITE_P(AngleSetAngleFloatTest, AngleFromFloatTest,
                          ::testing::ValuesIn(sSetAngleFloatTestData));
 
 /*******************************************************************************

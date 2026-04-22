@@ -17,7 +17,11 @@ pub mod toolbox;
 mod types;
 
 // Re-Exports
+pub use types::angle::Angle;
 pub use types::length::Length;
+pub use types::point::Point;
+pub use types::vertex::Vertex;
+pub use types::vertex_vec::VertexVec;
 
 // Allow using the create! macro to create parametrized tests in test modules
 // without explicitly importing the parameterized_test crate every time.
