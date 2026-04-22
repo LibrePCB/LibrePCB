@@ -83,6 +83,18 @@ bool Path::isZeroLength() const noexcept {
   return true;
 }
 
+bool Path::isZeroArea() const noexcept {
+  if ((!isClosed()) || isZeroLength()) {
+    return true;
+  }
+
+  if (isCurved()) {
+    return mVertices.count() < 3;
+  } else {
+    return mVertices.count() < 4;
+  }
+}
+
 bool Path::isOnGrid(const PositiveLength& gridInterval) const noexcept {
   for (const auto& v : mVertices) {
     if (!v.getPos().isOnGrid(gridInterval)) {

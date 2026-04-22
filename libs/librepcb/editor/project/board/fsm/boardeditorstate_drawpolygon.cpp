@@ -48,6 +48,7 @@ BoardEditorState_DrawPolygon::BoardEditorState_DrawPolygon(
   : BoardEditorState(context),
     mIsUndoCmdActive(false),
     mLastSegmentPos(),
+    mLastAngle(0),
     mCurrentProperties(Uuid::createRandom(),  // UUID is not relevant here
                        Layer::boardOutlines(),  // Layer
                        UnsignedLength(0),  // Line width
@@ -57,7 +58,7 @@ BoardEditorState_DrawPolygon::BoardEditorState_DrawPolygon(
                        false  // Locked
                        ),
     mCurrentPolygon(nullptr),
-    mCurrentPolygonEditCmd(nullptr) {
+    mCurrentEditCmd(nullptr) {
 }
 
 BoardEditorState_DrawPolygon::~BoardEditorState_DrawPolygon() noexcept {
@@ -134,8 +135,8 @@ void BoardEditorState_DrawPolygon::setLayer(const Layer& layer) noexcept {
     emit layerChanged(mCurrentProperties.getLayer());
   }
 
-  if (mCurrentPolygonEditCmd) {
-    mCurrentPolygonEditCmd->setLayer(mCurrentProperties.getLayer(), true);
+  if (mCurrentEditCmd) {
+    mCurrentEditCmd->setLayer(mCurrentProperties.getLayer(), true);
     makeLayerVisible(mCurrentProperties.getLayer().getColorRole());
   }
 }
@@ -146,9 +147,23 @@ void BoardEditorState_DrawPolygon::setLineWidth(
     emit lineWidthChanged(mCurrentProperties.getLineWidth());
   }
 
-  if (mCurrentPolygonEditCmd) {
-    mCurrentPolygonEditCmd->setLineWidth(mCurrentProperties.getLineWidth(),
-                                         true);
+  if (mCurrentEditCmd) {
+    mCurrentEditCmd->setLineWidth(mCurrentProperties.getLineWidth(), true);
+  }
+}
+
+void BoardEditorState_DrawPolygon::setAngle(const Angle& angle) noexcept {
+  if (angle != mLastAngle) {
+    mLastAngle = angle;
+    emit angleChanged(mLastAngle);
+  }
+
+  if (mCurrentPolygon && mCurrentEditCmd) {
+    Path path = mCurrentPolygon->getData().getPath();
+    if (path.getVertices().count() > 1) {
+      path.getVertices()[path.getVertices().count() - 2].setAngle(mLastAngle);
+      mCurrentEditCmd->setPath(path, true);
+    }
   }
 }
 
@@ -157,9 +172,9 @@ void BoardEditorState_DrawPolygon::setFilled(bool filled) noexcept {
     emit filledChanged(mCurrentProperties.isFilled());
   }
 
-  if (mCurrentPolygonEditCmd) {
-    mCurrentPolygonEditCmd->setIsFilled(mCurrentProperties.isFilled(), true);
-    mCurrentPolygonEditCmd->setIsGrabArea(mCurrentProperties.isFilled(), true);
+  if (mCurrentEditCmd) {
+    mCurrentEditCmd->setIsFilled(mCurrentProperties.isFilled(), true);
+    mCurrentEditCmd->setIsGrabArea(mCurrentProperties.isFilled(), true);
   }
 }
 
@@ -179,7 +194,7 @@ bool BoardEditorState_DrawPolygon::startAddPolygon(const Point& pos) noexcept {
     mIsUndoCmdActive = true;
 
     // Add polygon with two vertices
-    mCurrentProperties.setPath(Path({Vertex(pos), Vertex(pos)}));
+    mCurrentProperties.setPath(Path({Vertex(pos, mLastAngle), Vertex(pos)}));
     mCurrentPolygon = new BI_Polygon(
         mContext.board,
         BoardPolygonData(Uuid::createRandom(), mCurrentProperties));
@@ -187,7 +202,7 @@ bool BoardEditorState_DrawPolygon::startAddPolygon(const Point& pos) noexcept {
         new CmdBoardPolygonAdd(*mCurrentPolygon));
 
     // Start undo command
-    mCurrentPolygonEditCmd.reset(new CmdBoardPolygonEdit(*mCurrentPolygon));
+    mCurrentEditCmd.reset(new CmdBoardPolygonEdit(*mCurrentPolygon));
     mLastSegmentPos = pos;
     makeLayerVisible(mCurrentProperties.getLayer().getColorRole());
     return true;
@@ -209,8 +224,8 @@ bool BoardEditorState_DrawPolygon::addSegment(const Point& pos) noexcept {
 
   try {
     // Finish undo command to allow reverting segment by segment
-    if (mCurrentPolygonEditCmd) {
-      mContext.undoStack.appendToCmdGroup(mCurrentPolygonEditCmd.release());
+    if (mCurrentEditCmd) {
+      mContext.undoStack.appendToCmdGroup(mCurrentEditCmd.release());
     }
     mContext.undoStack.commitCmdGroup();
     mIsUndoCmdActive = false;
@@ -224,12 +239,14 @@ bool BoardEditorState_DrawPolygon::addSegment(const Point& pos) noexcept {
     // Start a new undo command
     mContext.undoStack.beginCmdGroup(tr("Draw board polygon"));
     mIsUndoCmdActive = true;
-    mCurrentPolygonEditCmd.reset(new CmdBoardPolygonEdit(*mCurrentPolygon));
+    mCurrentEditCmd.reset(new CmdBoardPolygonEdit(*mCurrentPolygon));
 
     // Add new vertex
-    Path newPath = mCurrentPolygon->getData().getPath();
-    newPath.addVertex(pos, Angle::deg0());
-    mCurrentPolygonEditCmd->setPath(newPath, true);
+    QVector<Vertex> vertices =
+        mCurrentPolygon->getData().getPath().getVertices();
+    vertices.last().setAngle(mLastAngle);
+    vertices.append(Vertex(pos, Angle::deg0()));
+    mCurrentEditCmd->setPath(Path(vertices), true);
     mLastSegmentPos = pos;
     return true;
   } catch (const Exception& e) {
@@ -241,10 +258,10 @@ bool BoardEditorState_DrawPolygon::addSegment(const Point& pos) noexcept {
 
 bool BoardEditorState_DrawPolygon::updateLastVertexPosition(
     const Point& pos) noexcept {
-  if (mCurrentPolygonEditCmd) {
+  if (mCurrentEditCmd) {
     Path newPath = mCurrentPolygon->getData().getPath();
     newPath.getVertices().last().setPos(pos);
-    mCurrentPolygonEditCmd->setPath(newPath, true);
+    mCurrentEditCmd->setPath(newPath, true);
     return true;
   } else {
     return false;
@@ -254,7 +271,7 @@ bool BoardEditorState_DrawPolygon::updateLastVertexPosition(
 bool BoardEditorState_DrawPolygon::abortCommand(bool showErrMsgBox) noexcept {
   try {
     // Delete the current edit command
-    mCurrentPolygonEditCmd.reset();
+    mCurrentEditCmd.reset();
 
     // Abort the undo command
     if (mIsUndoCmdActive) {

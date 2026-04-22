@@ -83,6 +83,8 @@ public:
     return mCurrentProperties.getLineWidth();
   }
   void setLineWidth(const UnsignedLength& width) noexcept;
+  const Angle& getAngle() const noexcept { return mLastAngle; }
+  void setAngle(const Angle& angle) noexcept;
   bool getFilled() const noexcept { return mCurrentProperties.isFilled(); }
   void setFilled(bool filled) noexcept;
 
@@ -93,6 +95,7 @@ public:
 signals:
   void layerChanged(const Layer& layer);
   void lineWidthChanged(const UnsignedLength& width);
+  void angleChanged(const Angle& angle);
   void filledChanged(bool filled);
 
 private:  // Methods
@@ -105,6 +108,7 @@ private:
   // State
   bool mIsUndoCmdActive;
   Point mLastSegmentPos;
+  Angle mLastAngle;
 
   // Current tool settings
   BoardPolygonData mCurrentProperties;
@@ -112,7 +116,7 @@ private:
   // Information about the current polygon to place. Only valid if
   // mIsUndoCmdActive == true.
   BI_Polygon* mCurrentPolygon;
-  std::unique_ptr<CmdBoardPolygonEdit> mCurrentPolygonEditCmd;
+  std::unique_ptr<CmdBoardPolygonEdit> mCurrentEditCmd;
 };
 
 /*******************************************************************************

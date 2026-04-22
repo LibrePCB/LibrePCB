@@ -192,6 +192,7 @@ signals:
   void viaDrillRequested(const std::optional<PositiveLength>& drill);
   void viaSizeRequested(const std::optional<PositiveLength>& size);
   void layerRequested(const Layer& layer);
+  void angleRequested(const Angle& angle);
   void filledRequested(bool filled);
   void mirroredRequested(bool mirrored);
   void valueRequested(const QString& value);
@@ -288,6 +289,7 @@ private:
   LengthEditContext mToolLineWidth;
   LengthEditContext mToolSize;
   LengthEditContext mToolDrill;
+  Angle mToolAngle;
   bool mToolFilled;  // Also used for auto width
   bool mToolMirrored;  // Also used for auto via size
   QString mToolValue;

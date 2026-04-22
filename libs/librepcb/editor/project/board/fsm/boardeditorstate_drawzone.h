@@ -85,6 +85,8 @@ public:
     return mCurrentProperties.getRules();
   }
   void setRule(Zone::Rule rule, bool enable) noexcept;
+  const Angle& getAngle() const noexcept { return mLastAngle; }
+  void setAngle(const Angle& angle) noexcept;
 
   // Operator Overloadings
   BoardEditorState_DrawZone& operator=(const BoardEditorState_DrawZone& rhs) =
@@ -93,6 +95,7 @@ public:
 signals:
   void layersChanged(const QSet<const Layer*>& layers);
   void rulesChanged(Zone::Rules rules);
+  void angleChanged(const Angle& angle);
 
 private:  // Methods
   bool startAddZone(const Point& pos) noexcept;
@@ -104,6 +107,7 @@ private:  // Data
   // State
   bool mIsUndoCmdActive;
   Point mLastVertexPos;
+  Angle mLastAngle;
 
   // Current tool settings
   BoardZoneData mCurrentProperties;
@@ -111,7 +115,7 @@ private:  // Data
   // Information about the current zone to place. Only valid if
   // mIsUndoCmdActive == true.
   BI_Zone* mCurrentZone;
-  std::unique_ptr<CmdBoardZoneEdit> mCurrentZoneEditCmd;
+  std::unique_ptr<CmdBoardZoneEdit> mCurrentEditCmd;
 };
 
 /*******************************************************************************

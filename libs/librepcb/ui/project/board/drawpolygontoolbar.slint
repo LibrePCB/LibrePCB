@@ -1,4 +1,5 @@
 import {
+    AngleEdit,
     ComboBox,
     LengthEdit,
     ToolBarButton,
@@ -45,6 +46,24 @@ export component DrawPolygonToolBar inherits HorizontalLayout {
 
         decrease-triggered => {
             tabs[section.current-tab-index].tool-line-width.decrease = true;
+        }
+    }
+
+    angle-edt := AngleEdit {
+        data: tabs[section.current-tab-index].tool-angle;
+        tooltip: @tr("Arc Angle");
+        min-width-text: "123.4 °";
+
+        value-changed(v) => {
+            tabs[section.current-tab-index].tool-angle.value = v;
+        }
+
+        increase-triggered => {
+            tabs[section.current-tab-index].tool-angle.increase = true;
+        }
+
+        decrease-triggered => {
+            tabs[section.current-tab-index].tool-angle.decrease = true;
         }
     }
 

@@ -50,6 +50,7 @@ BoardEditorState_DrawZone::BoardEditorState_DrawZone(
   : BoardEditorState(context),
     mIsUndoCmdActive(false),
     mLastVertexPos(),
+    mLastAngle(0),
     mCurrentProperties(Uuid::createRandom(),  // UUID is not relevant here
                        {&Layer::topCopper()},  // Layers
                        Zone::Rule::All,  // Rules
@@ -134,8 +135,8 @@ void BoardEditorState_DrawZone::setLayers(
     emit layersChanged(mCurrentProperties.getLayers());
   }
 
-  if (mCurrentZoneEditCmd) {
-    mCurrentZoneEditCmd->setLayers(mCurrentProperties.getLayers(), true);
+  if (mCurrentEditCmd) {
+    mCurrentEditCmd->setLayers(mCurrentProperties.getLayers(), true);
   }
 }
 
@@ -147,8 +148,22 @@ void BoardEditorState_DrawZone::setRule(Zone::Rule rule, bool enable) noexcept {
     emit rulesChanged(mCurrentProperties.getRules());
   }
 
-  if (mCurrentZoneEditCmd) {
-    mCurrentZoneEditCmd->setRules(mCurrentProperties.getRules(), true);
+  if (mCurrentEditCmd) {
+    mCurrentEditCmd->setRules(mCurrentProperties.getRules(), true);
+  }
+}
+
+void BoardEditorState_DrawZone::setAngle(const Angle& angle) noexcept {
+  if (angle != mLastAngle) {
+    mLastAngle = angle;
+    emit angleChanged(mLastAngle);
+  }
+
+  if (mCurrentZone && mCurrentEditCmd) {
+    Path path = mCurrentZone->getData().getOutline();
+    Q_ASSERT(path.getVertices().count() >= 2);
+    path.getVertices()[path.getVertices().count() - 2].setAngle(mLastAngle);
+    mCurrentEditCmd->setOutline(path, true);
   }
 }
 
@@ -168,14 +183,14 @@ bool BoardEditorState_DrawZone::startAddZone(const Point& pos) noexcept {
     mIsUndoCmdActive = true;
 
     // Add zone with two vertices
-    mCurrentProperties.setOutline(Path({Vertex(pos), Vertex(pos)}));
+    mCurrentProperties.setOutline(Path({Vertex(pos, mLastAngle), Vertex(pos)}));
     mCurrentZone =
         new BI_Zone(mContext.board,
                     BoardZoneData(Uuid::createRandom(), mCurrentProperties));
     mContext.undoStack.appendToCmdGroup(new CmdBoardZoneAdd(*mCurrentZone));
 
     // Start undo command
-    mCurrentZoneEditCmd.reset(new CmdBoardZoneEdit(*mCurrentZone));
+    mCurrentEditCmd.reset(new CmdBoardZoneEdit(*mCurrentZone));
     mLastVertexPos = pos;
     makeLayerVisible(ColorRole::boardZones());
     for (auto layer : mCurrentProperties.getLayers()) {
@@ -192,38 +207,45 @@ bool BoardEditorState_DrawZone::startAddZone(const Point& pos) noexcept {
 bool BoardEditorState_DrawZone::addSegment(const Point& pos) noexcept {
   Q_ASSERT(mIsUndoCmdActive == true);
 
-  // Abort if no segment drawn
-  if (pos == mLastVertexPos) {
-    abortCommand(true);
-    return false;
-  }
-
-  // Abort if the path has been closed.
-  Path path = mCurrentZone->getData().getOutline();
-  if (path.isClosed()) {
-    abortCommand(true);
-    return false;
-  }
-
   try {
-    // If the zone has more than 2 vertices, start a new undo command
-    if (path.getVertices().count() > 2) {
-      if (mCurrentZoneEditCmd) {
-        mContext.undoStack.appendToCmdGroup(mCurrentZoneEditCmd.release());
+    // If no valid zone has been drawn (area = 0), abort before committing
+    // anything.
+    Path path = mCurrentZone->getData().getOutline();
+    const bool hasArea = !path.cleaned().toClosedPath().isZeroArea();
+    const bool finish = path.isClosed() || (pos == mLastVertexPos);
+    if (finish && (!hasArea)) {
+      abortCommand(true);
+      return false;
+    }
+
+    // If the zone represents a valid area, start a new undo command.
+    if (hasArea) {
+      path = path.cleaned().toOpenPath();
+      if (mCurrentEditCmd) {
+        mCurrentEditCmd->setOutline(path, true);
+        mContext.undoStack.appendToCmdGroup(mCurrentEditCmd.release());
       }
       mContext.undoStack.commitCmdGroup();
       mIsUndoCmdActive = false;
 
-      // Start a new undo command
-      mContext.undoStack.beginCmdGroup(tr("Draw board zone"));
+      // Start a new undo command.
+      mContext.undoStack.beginCmdGroup(tr("Draw Board Zone"));
       mIsUndoCmdActive = true;
-      mCurrentZoneEditCmd.reset(new CmdBoardZoneEdit(*mCurrentZone));
+      mCurrentEditCmd.reset(new CmdBoardZoneEdit(*mCurrentZone));
     }
 
-    // Add new vertex
-    path.addVertex(pos, Angle::deg0());
-    if (mCurrentZoneEditCmd) {
-      mCurrentZoneEditCmd->setOutline(path, true);
+    // If this was the last vertex to be added, abort now.
+    if (finish) {
+      abortCommand(true);
+      return false;
+    }
+
+    // Add new vertex.
+    QVector<Vertex> vertices = path.getVertices();
+    vertices.last().setAngle(mLastAngle);
+    vertices.append(Vertex(pos, Angle::deg0()));
+    if (mCurrentEditCmd) {
+      mCurrentEditCmd->setOutline(Path(vertices), true);
     }
     mLastVertexPos = pos;
     return true;
@@ -236,10 +258,10 @@ bool BoardEditorState_DrawZone::addSegment(const Point& pos) noexcept {
 
 bool BoardEditorState_DrawZone::updateLastVertexPosition(
     const Point& pos) noexcept {
-  if (mCurrentZoneEditCmd) {
+  if (mCurrentEditCmd) {
     Path newPath = mCurrentZone->getData().getOutline();
     newPath.getVertices().last().setPos(pos);
-    mCurrentZoneEditCmd->setOutline(Path(newPath), true);
+    mCurrentEditCmd->setOutline(Path(newPath), true);
     return true;
   } else {
     return false;
@@ -249,7 +271,7 @@ bool BoardEditorState_DrawZone::updateLastVertexPosition(
 bool BoardEditorState_DrawZone::abortCommand(bool showErrMsgBox) noexcept {
   try {
     // Delete the current edit command
-    mCurrentZoneEditCmd.reset();
+    mCurrentEditCmd.reset();
 
     // Abort the undo command
     if (mIsUndoCmdActive) {
