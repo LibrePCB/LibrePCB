@@ -73,17 +73,21 @@ slint::Image WindowTab::renderScene(float width, float height,
   return slint::Image();
 }
 
-bool WindowTab::processScenePointerEvent(
-    const QPointF& pos, slint::private_api::PointerEvent e) noexcept {
+bool WindowTab::processScenePointerEvent(const QPointF& pos,
+                                         slint::private_api::PointerEvent e,
+                                         int scene) noexcept {
   Q_UNUSED(pos);
   Q_UNUSED(e);
+  Q_UNUSED(scene);
   return false;
 }
 
-bool WindowTab::processSceneScrolled(
-    const QPointF& pos, slint::private_api::PointerScrollEvent e) noexcept {
+bool WindowTab::processSceneScrolled(const QPointF& pos,
+                                     slint::private_api::PointerScrollEvent e,
+                                     int scene) noexcept {
   Q_UNUSED(pos);
   Q_UNUSED(e);
+  Q_UNUSED(scene);
   return false;
 }
 

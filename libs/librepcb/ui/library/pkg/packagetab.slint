@@ -1012,11 +1012,11 @@ component PackageEditorTab inherits TouchArea {
             Data.set-current-tab(section-index, index);
             focus-requested();
         }
-        Backend.scene-pointer-event(section-index, self.mouse-x, self.mouse-y, event);
+        Backend.scene-pointer-event(section-index, self.mouse-x, self.mouse-y, event, 0);
     }
 
     scroll-event(event) => {
-        Backend.scene-scrolled(section-index, self.mouse-x, self.mouse-y, event) ? accept : reject
+        Backend.scene-scrolled(section-index, self.mouse-x, self.mouse-y, event, 0) ? accept : reject
     }
 }
 

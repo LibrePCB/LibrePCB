@@ -53,6 +53,7 @@ class GraphicsScene;
 class LibraryEditor;
 class LibraryElementCategoriesModel;
 class PartListModel;
+class SlintGraphicsView;
 class SymbolGraphicsItem;
 
 /*******************************************************************************
@@ -87,6 +88,12 @@ public:
   void trigger(ui::TabAction a) noexcept override;
   slint::Image renderScene(float width, float height,
                            int scene) noexcept override;
+  bool processScenePointerEvent(const QPointF& pos,
+                                slint::private_api::PointerEvent e,
+                                int scene) noexcept override;
+  bool processSceneScrolled(const QPointF& pos,
+                            slint::private_api::PointerScrollEvent e,
+                            int scene) noexcept override;
   bool requestClose() noexcept override;
 
   // Operator Overloadings
@@ -114,6 +121,8 @@ private:
   bool save() noexcept;
   void selectComponent() noexcept;
   void selectPackage() noexcept;
+  void applyWorkspaceSettings() noexcept;
+  void requestRepaint() noexcept;
 
 private:
   // References
@@ -123,6 +132,8 @@ private:
   QCollator mCollator;
   std::unique_ptr<DevicePinoutBuilder> mPinoutBuilder;
   std::shared_ptr<ComponentSignalNameListModel> mSignalNames;
+  std::unique_ptr<SlintGraphicsView> mComponentView;
+  std::unique_ptr<SlintGraphicsView> mPackageView;
   std::unique_ptr<GraphicsScene> mComponentScene;
   std::unique_ptr<GraphicsScene> mPackageScene;
 
@@ -132,6 +143,7 @@ private:
   bool mComponentSelected;
   bool mPackageSelected;
   bool mChooseCategory;
+  int mFrameIndex;
 
   // Library metadata to be applied
   slint::SharedString mName;

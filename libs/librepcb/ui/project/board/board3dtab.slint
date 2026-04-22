@@ -178,11 +178,11 @@ export component Board3dTab inherits Tab {
                     root.focus();
                 }
             }
-            Backend.scene-pointer-event(section-index, self.mouse-x, self.mouse-y, event);
+            Backend.scene-pointer-event(section-index, self.mouse-x, self.mouse-y, event, 0);
         }
 
         scroll-event(event) => {
-            Backend.scene-scrolled(section-index, self.mouse-x, self.mouse-y, event) ? accept : reject
+            Backend.scene-scrolled(section-index, self.mouse-x, self.mouse-y, event, 0) ? accept : reject
         }
     }
 

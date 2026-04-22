@@ -85,6 +85,12 @@ DeviceTab::DeviceTab(LibraryEditor& editor, std::unique_ptr<Device> dev,
     mPinoutBuilder(
         new DevicePinoutBuilder(mDevice->getPadSignalMap(), *mUndoStack)),
     mSignalNames(new ComponentSignalNameListModel()),
+    mComponentView(
+        new SlintGraphicsView(SlintGraphicsView::defaultSymbolSceneRect(),
+                              SlintGraphicsView::defaultMargins())),
+    mPackageView(
+        new SlintGraphicsView(SlintGraphicsView::defaultFootprintSceneRect(),
+                              SlintGraphicsView::defaultMargins())),
     mComponentScene(new GraphicsScene()),
     mPackageScene(new GraphicsScene()),
     mWizardMode(mode != Mode::Open),
@@ -92,6 +98,7 @@ DeviceTab::DeviceTab(LibraryEditor& editor, std::unique_ptr<Device> dev,
     mComponentSelected(true),
     mPackageSelected(true),
     mChooseCategory(false),
+    mFrameIndex(0),
     mNameParsed(mDevice->getNames().getDefaultValue()),
     mVersionParsed(mDevice->getVersion()),
     mCategories(new LibraryElementCategoriesModel(
@@ -122,37 +129,41 @@ DeviceTab::DeviceTab(LibraryEditor& editor, std::unique_ptr<Device> dev,
     mPackageSelected = false;
   }
 
-  // Setup component scene.
+  // Setup component view + scene.
   {
-    const ColorScheme& scheme =
-        mApp.getWorkspace().getSettings().schematicColorSchemes.getActive();
-    const auto background = scheme.getColors(ColorRole::schematicBackground());
-    mComponentScene->setBackgroundColors(background.primary,
-                                         background.secondary);
-    const auto overlay = scheme.getColors(ColorRole::schematicOverlays());
-    mComponentScene->setOverlayColors(overlay.primary, overlay.secondary);
-    const auto selection = scheme.getColors(ColorRole::schematicSelection());
-    mComponentScene->setSelectionRectColors(selection.primary,
-                                            selection.secondary);
     mComponentScene->setGridStyle(GridStyle::Lines);
     mComponentScene->setOriginCrossVisible(false);  // It's rather disruptive.
+    connect(mComponentScene.get(), &GraphicsScene::changed, this,
+            &DeviceTab::requestRepaint);
+    connect(mComponentView.get(), &SlintGraphicsView::transformChanged, this,
+            &DeviceTab::requestRepaint);
+    connect(mComponentView.get(), &SlintGraphicsView::stateChanged, this,
+            [this]() { onDerivedUiDataChanged.notify(); });
   }
 
-  // Setup package scene.
+  // Setup package view + scene.
   {
-    const ColorScheme& scheme =
-        mApp.getWorkspace().getSettings().boardColorSchemes.getActive();
-    const auto background = scheme.getColors(ColorRole::boardBackground());
-    mPackageScene->setBackgroundColors(background.primary,
-                                       background.secondary);
-    const auto overlay = scheme.getColors(ColorRole::boardOverlays());
-    mPackageScene->setOverlayColors(overlay.primary, overlay.secondary);
-    const auto selection = scheme.getColors(ColorRole::boardSelection());
-    mPackageScene->setSelectionRectColors(selection.primary,
-                                          selection.secondary);
     mPackageScene->setGridStyle(GridStyle::Lines);
     mPackageScene->setOriginCrossVisible(false);  // It's rather disruptive.
+    connect(mPackageScene.get(), &GraphicsScene::changed, this,
+            &DeviceTab::requestRepaint);
+    connect(mPackageView.get(), &SlintGraphicsView::transformChanged, this,
+            &DeviceTab::requestRepaint);
+    connect(mPackageView.get(), &SlintGraphicsView::stateChanged, this,
+            [this]() { onDerivedUiDataChanged.notify(); });
   }
+
+  // Apply workspace settings whenever they have been modified.
+  connect(&mApp.getWorkspace().getSettings().useOpenGl,
+          &WorkspaceSettingsItem::edited, this,
+          &DeviceTab::applyWorkspaceSettings);
+  connect(&mApp.getWorkspace().getSettings().schematicColorSchemes,
+          &WorkspaceSettingsItem_ColorSchemes::colorsModified, this,
+          &DeviceTab::applyWorkspaceSettings);
+  connect(&mApp.getWorkspace().getSettings().boardColorSchemes,
+          &WorkspaceSettingsItem_ColorSchemes::colorsModified, this,
+          &DeviceTab::applyWorkspaceSettings);
+  applyWorkspaceSettings();
 
   // Setup default manufacturer.
   mParts->setDefaultManufacturer(mEditor.getLibrary().getManufacturer());
@@ -242,6 +253,13 @@ ui::TabData DeviceTab::getUiData() const noexcept {
 }
 
 ui::DeviceTabData DeviceTab::getDerivedUiData() const noexcept {
+  const ColorScheme& sch =
+      mApp.getWorkspace().getSettings().schematicColorSchemes.getActive();
+  const auto schBgColors = sch.getColors(ColorRole::schematicBackground());
+  const ColorScheme& brd =
+      mApp.getWorkspace().getSettings().boardColorSchemes.getActive();
+  const auto brdBgColors = brd.getColors(ColorRole::boardBackground());
+
   const QString cmpName =
       mComponent ? *mComponent->getNames().getDefaultValue() : QString();
   const QString pkgName =
@@ -303,6 +321,10 @@ ui::DeviceTabData DeviceTab::getDerivedUiData() const noexcept {
           mCheckError,  // Check execution error
           !isWritable(),  // Check read-only
       },
+      q2s(schBgColors.primary),  // Component background color
+      q2s(schBgColors.secondary),  // Component foreground color
+      q2s(brdBgColors.primary),  // Package background color
+      q2s(brdBgColors.secondary),  // Package foreground color
       mIsInterfaceBroken,  // Interface broken
       hasUnconnectedPads,  // Has unconnected pads
       hasAutoConnectablePads,  // Has auto-connectable pads
@@ -312,6 +334,7 @@ ui::DeviceTabData DeviceTab::getDerivedUiData() const noexcept {
       q2s(mPinoutBuilder->getSignalsFilter()),  // Interactive signals filter
       mPinoutBuilder->getFilteredSignals(),  // Interactive signals
       mPinoutBuilder->getCurrentSignalIndex(),  // Interactive signal index
+      mFrameIndex,  // Frame index
       slint::SharedString(),  // New category
   };
 }
@@ -451,6 +474,13 @@ void DeviceTab::trigger(ui::TabAction a) noexcept {
       }
       break;
     }
+    case ui::TabAction::ZoomFit: {
+      // Currently we can't distinguish in which view the action was
+      // triggered, thus applying to both views.
+      mComponentView->zoomToSceneRect(mComponentScene->itemsBoundingRect());
+      mPackageView->zoomToSceneRect(mPackageScene->itemsBoundingRect());
+      break;
+    }
     case ui::TabAction::OpenDatasheet: {
       commitUiData();
       if (auto dbRes = mDevice->getResources().value(0)) {
@@ -497,18 +527,36 @@ void DeviceTab::trigger(ui::TabAction a) noexcept {
 
 slint::Image DeviceTab::renderScene(float width, float height,
                                     int scene) noexcept {
-  if ((scene == 0) && mComponentScene) {
-    SlintGraphicsView view(SlintGraphicsView::defaultSymbolSceneRect(),
-                           SlintGraphicsView::defaultMargins());
-    view.setUseOpenGl(mApp.getWorkspace().getSettings().useOpenGl.get());
-    return view.render(*mComponentScene, width, height);
-  } else if ((scene == 1) && (mPackageScene)) {
-    SlintGraphicsView view(SlintGraphicsView::defaultFootprintSceneRect(),
-                           SlintGraphicsView::defaultMargins());
-    view.setUseOpenGl(mApp.getWorkspace().getSettings().useOpenGl.get());
-    return view.render(*mPackageScene, width, height);
+  if (scene == 0) {
+    return mComponentView->render(*mComponentScene, width, height);
+  } else if (scene == 1) {
+    return mPackageView->render(*mPackageScene, width, height);
   } else {
     return slint::Image();
+  }
+}
+
+bool DeviceTab::processScenePointerEvent(const QPointF& pos,
+                                         slint::private_api::PointerEvent e,
+                                         int scene) noexcept {
+  if (scene == 0) {
+    return mComponentView->pointerEvent(pos, e);
+  } else if (scene == 1) {
+    return mPackageView->pointerEvent(pos, e);
+  } else {
+    return false;
+  }
+}
+
+bool DeviceTab::processSceneScrolled(const QPointF& pos,
+                                     slint::private_api::PointerScrollEvent e,
+                                     int scene) noexcept {
+  if (scene == 0) {
+    return mComponentView->scrollEvent(pos, e);
+  } else if (scene == 1) {
+    return mPackageView->scrollEvent(pos, e);
+  } else {
+    return false;
   }
 }
 
@@ -904,6 +952,45 @@ void DeviceTab::selectPackage() noexcept {
       QMessageBox::critical(getWindow(), tr("Error"), e.getMsg());
     }
   }
+}
+
+void DeviceTab::applyWorkspaceSettings() noexcept {
+  {
+    const ColorScheme& scheme =
+        mApp.getWorkspace().getSettings().schematicColorSchemes.getActive();
+    const auto background = scheme.getColors(ColorRole::schematicBackground());
+    mComponentScene->setBackgroundColors(background.primary,
+                                         background.secondary);
+    const auto overlay = scheme.getColors(ColorRole::schematicOverlays());
+    mComponentScene->setOverlayColors(overlay.primary, overlay.secondary);
+    const auto selection = scheme.getColors(ColorRole::schematicSelection());
+    mComponentScene->setSelectionRectColors(selection.primary,
+                                            selection.secondary);
+    mComponentView->setUseOpenGl(
+        mApp.getWorkspace().getSettings().useOpenGl.get());
+  }
+
+  {
+    const ColorScheme& scheme =
+        mApp.getWorkspace().getSettings().boardColorSchemes.getActive();
+    const auto background = scheme.getColors(ColorRole::boardBackground());
+    mPackageScene->setBackgroundColors(background.primary,
+                                       background.secondary);
+    const auto overlay = scheme.getColors(ColorRole::boardOverlays());
+    mPackageScene->setOverlayColors(overlay.primary, overlay.secondary);
+    const auto selection = scheme.getColors(ColorRole::boardSelection());
+    mPackageScene->setSelectionRectColors(selection.primary,
+                                          selection.secondary);
+    mPackageView->setUseOpenGl(
+        mApp.getWorkspace().getSettings().useOpenGl.get());
+  }
+
+  onDerivedUiDataChanged.notify();
+}
+
+void DeviceTab::requestRepaint() noexcept {
+  ++mFrameIndex;
+  onDerivedUiDataChanged.notify();
 }
 
 /*******************************************************************************
