@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "schematictab.h"
 
+#include "../../dialogs/filedialog.h"
 #include "../../graphics/graphicslayer.h"
 #include "../../graphics/graphicslayerlist.h"
 #include "../../graphics/slintgraphicsview.h"
@@ -44,11 +45,22 @@
 #include "schematiceditor.h"
 #include "schematicgraphicsscene.h"
 
+#include <librepcb/core/attribute/attributesubstitutor.h>
 #include <librepcb/core/attribute/attributetype.h>
 #include <librepcb/core/attribute/attributeunit.h>
+#include <librepcb/core/fileio/filepath.h>
+#include <librepcb/core/fileio/fileutils.h>
+#include <librepcb/core/library/cmp/component.h>
+#include <librepcb/core/project/board/items/bi_device.h>
+#include <librepcb/core/project/circuit/circuit.h>
+#include <librepcb/core/project/circuit/componentinstance.h>
+#include <librepcb/core/project/circuit/componentsignalinstance.h>
+#include <librepcb/core/project/circuit/netsignal.h>
 #include <librepcb/core/project/erc/electricalrulecheckmessages.h>
 #include <librepcb/core/project/project.h>
+#include <librepcb/core/project/projectattributelookup.h>
 #include <librepcb/core/project/schematic/items/si_symbol.h>
+#include <librepcb/core/project/schematic/items/si_symbolpin.h>
 #include <librepcb/core/project/schematic/schematic.h>
 #include <librepcb/core/project/schematic/schematicpainter.h>
 #include <librepcb/core/utils/toolbox.h>
@@ -481,6 +493,10 @@ void SchematicTab::trigger(ui::TabAction a) noexcept {
     }
     case ui::TabAction::ExportPdf: {
       execGraphicsExportDialog(GraphicsExportDialog::Output::Pdf, "pdf_export");
+      break;
+    }
+    case ui::TabAction::ExportProtelNetlist: {
+      execProtelNetlistExportDialog();
       break;
     }
     case ui::TabAction::SelectAll: {
@@ -1307,6 +1323,51 @@ void SchematicTab::applyWorkspaceSettings() noexcept {
 void SchematicTab::requestRepaint() noexcept {
   ++mFrameIndex;
   onDerivedUiDataChanged.notify();
+}
+
+void SchematicTab::execProtelNetlistExportDialog() noexcept {
+  try {
+    QString path = FileDialog::getSaveFileName(
+        getWindow(), tr("Export Protel Netlist"),
+        mProject.getPath().getPathTo("output/netlist.net").toStr(), "*.net");
+    if (path.isEmpty()) return;
+    if (!path.contains(".")) path.append(".net");
+
+    QString out;
+    const Circuit& circuit = mProject.getCircuit();
+    QMap<QString, QStringList> netPins;
+    for (const ComponentInstance* cmp : circuit.getComponentInstances()) {
+      if (cmp->isPureSchematicOnly()) {
+        continue;
+      }
+      ProjectAttributeLookup lookup(*cmp, nullptr,
+                                    cmp->getParts(std::nullopt).value(0));
+      out += "[\n";
+      out += *cmp->getName() + "\n";
+      out += *cmp->getLibComponent().getNames().getDefaultValue() + "\n";
+      out += AttributeSubstitutor::substitute(lookup("VALUE"), lookup)
+                 .simplified() +
+          "\n";
+      out += "]\n";
+
+      for (const ComponentSignalInstance* sig : cmp->getSignals()) {
+        if (auto net = sig->getNetSignal()) {
+          netPins[*net->getName()].append(*cmp->getName() + "-" +
+                                          *sig->getCompSignal().getName());
+        }
+      }
+    }
+    for (auto it = netPins.begin(); it != netPins.end(); ++it) {
+      out += "(\n";
+      out += it.key() + "\n";
+      for (const QString& p : it.value()) out += p + "\n";
+      out += ")\n";
+    }
+
+    FileUtils::writeFile(FilePath(path), out.toUtf8());
+  } catch (const Exception& e) {
+    QMessageBox::critical(getWindow(), tr("Error"), e.getMsg());
+  }
 }
 
 /*******************************************************************************

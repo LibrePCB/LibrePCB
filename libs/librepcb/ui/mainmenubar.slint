@@ -302,6 +302,16 @@ export component MainMenuBar {
                     }
                 }
 
+                MenuItem {
+                    text: "Export Protel Netlist...";
+                    enabled: Data.current-tab.type == TabType.schematic;
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.export-protel-netlist);
+                        close-menu();
+                    }
+                }
+
                 MenuSeparator { }
 
                 export-specctra-item := MenuItem {

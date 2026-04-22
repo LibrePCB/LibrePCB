@@ -169,6 +169,7 @@ private:
   void clearErcMarker() noexcept;
   void execGraphicsExportDialog(GraphicsExportDialog::Output output,
                                 const QString& settingsKey) noexcept;
+  void execProtelNetlistExportDialog() noexcept;
   void goToSymbol(const QString& name, int index) noexcept;
   void applyWorkspaceSettings() noexcept;
   void requestRepaint() noexcept;
