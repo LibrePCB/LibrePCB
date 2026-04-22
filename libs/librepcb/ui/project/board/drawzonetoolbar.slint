@@ -1,4 +1,8 @@
-import { ComboBox, TextFlagsBox } from "../../widgets.slint";
+import {
+    AngleEdit,
+    ComboBox,
+    TextFlagsBox,
+} from "../../widgets.slint";
 import {
     Board2dTabData,
     WindowSectionData,
@@ -51,6 +55,24 @@ export component DrawZoneToolBar inherits HorizontalLayout {
             } else if idx == 3 {
                 tabs[section.current-tab-index].tool-no-devices = state;
             }
+        }
+    }
+
+    angle-edt := AngleEdit {
+        data: tabs[section.current-tab-index].tool-angle;
+        tooltip: @tr("Arc Angle");
+        min-width-text: "123.4 °";
+
+        value-changed(v) => {
+            tabs[section.current-tab-index].tool-angle.value = v;
+        }
+
+        increase-triggered => {
+            tabs[section.current-tab-index].tool-angle.increase = true;
+        }
+
+        decrease-triggered => {
+            tabs[section.current-tab-index].tool-angle.decrease = true;
         }
     }
 }

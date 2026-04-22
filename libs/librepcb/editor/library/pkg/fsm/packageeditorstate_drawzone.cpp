@@ -249,35 +249,39 @@ bool PackageEditorState_DrawZone::abort(bool showErrMsgBox) noexcept {
 
 bool PackageEditorState_DrawZone::addNextSegment() noexcept {
   try {
-    // If no line was drawn, abort now.
-    QVector<Vertex> vertices = mCurrentZone->getOutline().getVertices();
-    const bool isEmpty = (vertices[vertices.count() - 1].getPos() ==
-                          vertices[vertices.count() - 2].getPos());
-    if (isEmpty) {
+    // If no valid zone has been drawn (area = 0), abort before committing
+    // anything.
+    Path path = mCurrentZone->getOutline();
+    QVector<Vertex> vertices = path.getVertices();
+    const bool hasArea = !path.cleaned().toClosedPath().isZeroArea();
+    const bool finish = path.isClosed() ||
+        (vertices[vertices.count() - 1].getPos() ==
+         vertices[vertices.count() - 2].getPos());
+    if (finish && (!hasArea)) {
       return abort();
     }
 
-    // If the outline is closed, remove the last vertex.
-    const bool closed = (vertices.first().getPos() == vertices.last().getPos());
-    if (closed) {
-      vertices.removeLast();
+    // If the zone represents a valid area, start a new undo command.
+    if (hasArea) {
+      path = path.cleaned().toOpenPath();
+      vertices = path.getVertices();
+      mCurrentEditCmd->setOutline(path, true);
+      mContext.undoStack.appendToCmdGroup(mCurrentEditCmd.release());
+      mContext.undoStack.commitCmdGroup();
+      mIsUndoCmdActive = false;
+
+      // Start a new undo command.
+      mContext.undoStack.beginCmdGroup(tr("Add Footprint Zone"));
+      mIsUndoCmdActive = true;
+      mCurrentEditCmd.reset(new CmdZoneEdit(*mCurrentZone));
     }
 
-    // Commit current segment.
-    mCurrentEditCmd->setOutline(Path(vertices), true);
-    mContext.undoStack.appendToCmdGroup(mCurrentEditCmd.release());
-    mContext.undoStack.commitCmdGroup();
-    mIsUndoCmdActive = false;
-
-    // If the outline is closed, abort now.
-    if (closed) {
+    // If this was the last vertex to be added, abort now.
+    if (finish) {
       return abort();
     }
 
-    // Add next segment.
-    mContext.undoStack.beginCmdGroup(tr("Add Footprint Zone"));
-    mIsUndoCmdActive = true;
-    mCurrentEditCmd.reset(new CmdZoneEdit(*mCurrentZone));
+    // Add new vertex.
     vertices.last().setAngle(mLastAngle);
     vertices.append(Vertex(mCursorPos, Angle::deg0()));
     mCurrentEditCmd->setOutline(Path(vertices), true);

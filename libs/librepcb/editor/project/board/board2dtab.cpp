@@ -403,6 +403,12 @@ ui::Board2dTabData Board2dTab::getDerivedUiData() const noexcept {
       mToolLineWidth.getUiData(),  // Tool line width
       mToolSize.getUiData(),  // Tool size
       mToolDrill.getUiData(),  // Tool drill
+      ui::AngleEditData{
+          // Tool angle
+          l2s(mToolAngle),  // Angle
+          false,  // Increase
+          false,  // Decrease
+      },
       mToolFilled,  // Tool filled
       mToolMirrored,  // Tool mirrored
       ui::LineEditData{
@@ -515,6 +521,15 @@ void Board2dTab::setDerivedUiData(const ui::Board2dTabData& data) noexcept {
       ((mToolDrill.getValue() > 0) && (!data.tool_pressfit))
           ? std::make_optional(PositiveLength(mToolDrill.getValue()))
           : std::nullopt);
+
+  // Tool angle
+  if (data.tool_angle.increase) {
+    emit angleRequested(mToolAngle + Angle::deg45());
+  } else if (data.tool_angle.decrease) {
+    emit angleRequested(mToolAngle - Angle::deg45());
+  } else {
+    emit angleRequested(s2angle(data.tool_angle.value));
+  }
 
   // Tool filled / auto-width
   emit filledRequested(data.tool_filled);
@@ -1642,6 +1657,17 @@ void Board2dTab::fsmToolEnter(BoardEditorState_DrawPolygon& state) noexcept {
       connect(&mToolLineWidth, &LengthEditContext::valueChangedUnsigned, &state,
               &BoardEditorState_DrawPolygon::setLineWidth));
 
+  // Angle
+  auto setAngle = [this](const Angle& angle) {
+    mToolAngle = angle;
+    onDerivedUiDataChanged.notify();
+  };
+  setAngle(state.getAngle());
+  mFsmStateConnections.append(connect(
+      &state, &BoardEditorState_DrawPolygon::angleChanged, this, setAngle));
+  mFsmStateConnections.append(connect(this, &Board2dTab::angleRequested, &state,
+                                      &BoardEditorState_DrawPolygon::setAngle));
+
   // Filled
   auto setFilled = [this](bool filled) {
     mToolFilled = filled;
@@ -1812,6 +1838,17 @@ void Board2dTab::fsmToolEnter(BoardEditorState_DrawZone& state) noexcept {
   mFsmStateConnections.append(connect(this, &Board2dTab::zoneRuleRequested,
                                       &state,
                                       &BoardEditorState_DrawZone::setRule));
+
+  // Angle
+  auto setAngle = [this](const Angle& angle) {
+    mToolAngle = angle;
+    onDerivedUiDataChanged.notify();
+  };
+  setAngle(state.getAngle());
+  mFsmStateConnections.append(connect(
+      &state, &BoardEditorState_DrawZone::angleChanged, this, setAngle));
+  mFsmStateConnections.append(connect(this, &Board2dTab::angleRequested, &state,
+                                      &BoardEditorState_DrawZone::setAngle));
 
   onDerivedUiDataChanged.notify();
 }
