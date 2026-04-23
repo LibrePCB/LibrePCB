@@ -30,12 +30,16 @@ jobs:
         run: git config --global --add safe.directory $GITHUB_WORKSPACE
       - name: Run Stylecheck
         run: ./ci/stylecheck.sh
+        if: ${{ !cancelled() }}
       - name: Build Translations
         run: python3 ./dev/i18n.py --update --translate
+        if: ${{ !cancelled() }}
       - name: Check EditorCommandSet
         run: python3 ./dev/generate_editorcommandset.py --check
+        if: ${{ !cancelled() }}
       - name: Find Unused Code
         run: python3 ./dev/find_unused_code.py
+        if: ${{ !cancelled() }}
 
   doxygen:
     name: Doxygen
@@ -121,7 +125,8 @@ jobs:
       # <--- caching
       - name: Print New Environment  # Print again since it has been modified
         run: docker exec ci bash ./ci/print_environment.sh
-      - name: Build LibrePCB
+      - id: build
+        name: Build LibrePCB
         run: docker exec ci bash ./ci/build_librepcb.sh
       - name: Build Archive
         run: docker exec ci bash ./ci/build_windows_archive.sh
@@ -129,21 +134,25 @@ jobs:
         run: docker exec ci bash ./ci/build_windows_installer.sh
       - name: Run rust-core tests
         run: docker exec -w C:/work/libs/librepcb/rust-core ci cargo test --features=fail-on-warnings
+        if: ${{ (steps.build.outcome == 'success') && (!cancelled()) }}
       - name: Run LibrePCB Unittests
         run: docker exec ci build\\tests\\unittests\\librepcb-unittests.exe
+        if: ${{ (steps.build.outcome == 'success') && (!cancelled()) }}
       - name: Run LibrePCB-CLI Functional Tests
         run: docker exec ci uv --directory ./tests/cli run --no-dev pytest -vvv --librepcb-executable="../../build/install/bin/librepcb-cli.exe"
+        if: ${{ (steps.build.outcome == 'success') && (!cancelled()) }}
       - name: Run LibrePCB Functional Tests
         run: docker exec ci uv --directory ./tests/funq run --no-dev pytest -vvv --librepcb-executable="../../build/install/bin/librepcb.exe" --reruns 5 --reruns-delay 10
+        if: ${{ (steps.build.outcome == 'success') && (!cancelled()) }}
       - name: Run LibrePCB UI Tests
-        if: ${{ success() && env.SLINT_UI_TESTING_AUTH }}
         run: docker exec ci uv --directory ./tests/ui run --no-dev pytest -vvv --librepcb-executable="../../build/install/bin/librepcb.exe"
+        if: ${{ (steps.build.outcome == 'success') && (!cancelled()) && env.SLINT_UI_TESTING_AUTH }}
         env:
           SLINT_UI_TESTING_AUTH: ${{ secrets.SLINT_UI_TESTING_AUTH }}
       - name: Tar Artifacts
         run: docker exec ci bash ./ci/tar_artifacts.sh
+        if: ${{ (steps.build.outcome == 'success') && (!cancelled()) }}
       - name: Upload Artifacts
-        if: ${{ success() && (github.event_name == 'push') && env.UPLOAD_URL }}
         run: >
           docker exec
           -e UPLOAD_URL="${{ secrets.UPLOAD_URL }}"
@@ -151,6 +160,7 @@ jobs:
           -e UPLOAD_PASS="${{ secrets.UPLOAD_PASS }}"
           -e UPLOAD_SIGN_KEY="${{ secrets.UPLOAD_SIGN_KEY }}"
           ci bash ./ci/upload_artifacts.sh
+        if: ${{ (steps.build.outcome == 'success') && (!cancelled()) && (github.event_name == 'push') && env.UPLOAD_URL }}
         env:
           UPLOAD_URL: ${{ secrets.UPLOAD_URL }}  # Required to use it in 'if' condition
       - name: Stop Container
@@ -223,30 +233,41 @@ jobs:
           SLINT_UI_TESTING_AUTH: ${{ secrets.SLINT_UI_TESTING_AUTH }}
       - name: Print New Environment
         run: ./ci/print_environment.sh
-      - name: Build LibrePCB
+      - id: build
+        name: Build LibrePCB
         run: ./ci/build_librepcb.sh
       - name: Build Bundle
         run: ./ci/build_mac_bundle.sh
       - name: Build DMG
         run: ./ci/build_mac_dmg.sh
       - name: Run rust-core tests
-        run: cd libs/librepcb/rust-core && cargo test --features=fail-on-warnings
+        run: >
+          cd libs/librepcb/rust-core && cargo llvm-cov
+          --features=fail-on-warnings
+          --fail-uncovered-lines 0
+          --fail-uncovered-regions 0
+          --fail-uncovered-functions 0
+          --show-missing-lines
+        if: ${{ (steps.build.outcome == 'success') && (!cancelled()) }}
       - name: Run LibrePCB Unittests
         run: ./build/tests/unittests/librepcb-unittests
+        if: ${{ (steps.build.outcome == 'success') && (!cancelled()) }}
       - name: Run LibrePCB-CLI Functional Tests
         run: uv --directory ./tests/cli run --no-dev pytest -vvv --librepcb-executable="../../build/install/LibrePCB.app/Contents/MacOS/librepcb-cli"
+        if: ${{ (steps.build.outcome == 'success') && (!cancelled()) }}
       - name: Run LibrePCB Functional Tests
         run: uv --directory ./tests/funq run --no-dev pytest -vvv --librepcb-executable="../../build/install/LibrePCB.app/Contents/MacOS/librepcb" --reruns 5 --reruns-delay 10
+        if: ${{ (steps.build.outcome == 'success') && (!cancelled()) }}
       - name: Run LibrePCB UI Tests
-        if: ${{ success() && env.SLINT_UI_TESTING_AUTH }}
         run: uv --directory ./tests/ui run --no-dev pytest -vvv --librepcb-executable="../../build/install/LibrePCB.app/Contents/MacOS/librepcb"
+        if: ${{ (steps.build.outcome == 'success') && (!cancelled()) && env.SLINT_UI_TESTING_AUTH }}
         env:
           SLINT_UI_TESTING_AUTH: ${{ secrets.SLINT_UI_TESTING_AUTH }}
       - name: Tar & Upload Artifacts
-        if: ${{ success() && (github.event_name == 'push') && env.UPLOAD_URL }}
         run: |
           ./ci/tar_artifacts.sh
           ./ci/upload_artifacts.sh
+        if: ${{ (steps.build.outcome == 'success') && (!cancelled()) && (github.event_name == 'push') && env.UPLOAD_URL }}
         env:
           UPLOAD_URL: ${{ secrets.UPLOAD_URL }}
           UPLOAD_USER: ${{ secrets.UPLOAD_USER }}

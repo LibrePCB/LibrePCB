@@ -218,6 +218,17 @@ mod tests {
   }
 
   #[test]
+  fn from_nm_f() {
+    assert_eq!(Length::from_nm_f(std::f64::NAN), None);
+    assert_eq!(Length::from_nm_f(std::f64::INFINITY), None);
+    assert_eq!(Length::from_nm_f(std::f64::NEG_INFINITY), None);
+    assert_eq!(Length::from_nm_f(100.3).unwrap().to_nm(), 100);
+    assert_eq!(Length::from_nm_f(100.7).unwrap().to_nm(), 101);
+    assert_eq!(Length::from_nm_f(-100.3).unwrap().to_nm(), -100);
+    assert_eq!(Length::from_nm_f(-100.7).unwrap().to_nm(), -101);
+  }
+
+  #[test]
   fn from_to_um() {
     let val: f64 = -42.5;
     let x = Length::from_um(val).unwrap();
@@ -255,6 +266,13 @@ mod tests {
     let x = Length::from_px(val).unwrap();
     assert_eq!(x.to_nm(), -1587500);
     assert_eq!(x.to_px(), val);
+  }
+
+  #[test]
+  fn abs() {
+    assert_eq!(l(0).abs().to_nm(), 0);
+    assert_eq!(l(100).abs().to_nm(), 100);
+    assert_eq!(l(-100).abs().to_nm(), 100);
   }
 
   create! {rounded_to, (input, multiple, rounded, lower, upper), {
