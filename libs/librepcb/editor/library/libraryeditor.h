@@ -80,6 +80,20 @@ public:
   void setUiData(const ui::LibraryData& data) noexcept;
 
   /**
+   * @brief Request to close all opened tabs
+   *
+   * If there are unsaved changes in any of the opened tabs, this method will
+   * ask the user whether the changes should be saved or not. If the user clicks
+   * on "cancel" or the library elements could not be saved successfully, this
+   * method will return false. If there were no unsaved changes or they were
+   * all successfully saved, the method returns true.
+   *
+   * @retval true     All tabs closed, library editor is safe to be closed.
+   * @retval false    Library still has unsaved changes.
+   */
+  bool requestCloseAllTabs() noexcept;
+
+  /**
    * @brief Request to close the library
    *
    * If there are unsaved changes to the library, this method will ask the user
@@ -88,12 +102,14 @@ public:
    * false. If there were no unsaved changes or they were successfully saved,
    * the method returns true.
    *
-   * @retval true   Library is safe to be closed.
-   * @retval false  Library still has unsaved changes.
+   * @retval true     Library is safe to be closed.
+   * @retval false    Library still has unsaved changes.
    */
-  bool requestClose() noexcept;
+  bool requestCloseLibrary() noexcept;
 
   bool hasUnsavedChanges() const noexcept;
+
+  bool discardUnsavedChanges() noexcept;
 
   /**
    * @brief Set the flag that manual modifications (no undo stack) are made
@@ -109,8 +125,8 @@ public:
 
   void registerTab(LibraryEditorTab& tab) noexcept;
   void unregisterTab(LibraryEditorTab& tab) noexcept;
-
   void forceClosingTabs(const QSet<FilePath>& fp) noexcept;
+  int getNumberOfLibraryTabs() const noexcept;
 
   // Operator Overloadings
   LibraryEditor& operator=(const LibraryEditor& rhs) = delete;

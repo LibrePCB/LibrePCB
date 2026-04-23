@@ -25,6 +25,7 @@
 #include "../guiapplication.h"
 #include "../undostack.h"
 #include "../utils/slinthelpers.h"
+#include "lib/librarytab.h"
 #include "libraryeditortab.h"
 
 #include <librepcb/core/fileio/transactionalfilesystem.h>
@@ -104,18 +105,24 @@ void LibraryEditor::setUiData(const ui::LibraryData& data) noexcept {
   Q_UNUSED(data);
 }
 
-bool LibraryEditor::requestClose() noexcept {
-  // Check all opened tabs first.
+bool LibraryEditor::requestCloseAllTabs() noexcept {
   for (auto tab : mRegisteredTabs) {
     Q_ASSERT(tab);
     if (tab && (!tab->requestClose())) {
       return false;
     }
   }
+  // If multiple library tabs are open, requestCloseLibrary() was not called
+  // by LibraryTab::requestClose(), so we have to do it now.
+  if ((getNumberOfLibraryTabs() != 1) && (!requestCloseLibrary())) {
+    return false;
+  }
+  return true;
+}
 
-  // Then check this library.
+bool LibraryEditor::requestCloseLibrary() noexcept {
   if ((!hasUnsavedChanges()) || (!mLibrary->getDirectory().isWritable())) {
-    return true;  // Nothing to save.
+    return true;  // No unsaved changes.
   }
 
   const QMessageBox::StandardButton choice = QMessageBox::question(
@@ -132,12 +139,28 @@ bool LibraryEditor::requestClose() noexcept {
   } else {
     return false;
   }
-
-  return true;
 }
 
 bool LibraryEditor::hasUnsavedChanges() const noexcept {
   return mManualModificationsMade || (!mUndoStack->isClean());
+}
+
+bool LibraryEditor::discardUnsavedChanges() noexcept {
+  try {
+    while ((!mUndoStack->isClean()) && mUndoStack->canUndo()) {
+      mUndoStack->undo();  // can throw
+    }
+    Q_ASSERT(mUndoStack->isClean());
+    mUndoStack->clear();
+    if (mManualModificationsMade) {
+      mManualModificationsMade = false;
+      emit manualModificationsMade();
+    }
+    return true;
+  } catch (const Exception& e) {
+    QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
+    return false;
+  }
 }
 
 void LibraryEditor::setManualModificationsMade() noexcept {
@@ -181,6 +204,16 @@ void LibraryEditor::forceClosingTabs(const QSet<FilePath>& fp) noexcept {
       tab->closeEnforced();
     }
   }
+}
+
+int LibraryEditor::getNumberOfLibraryTabs() const noexcept {
+  int count = 0;
+  for (auto tab : mRegisteredTabs) {
+    if (dynamic_cast<LibraryTab*>(tab.get())) {
+      ++count;
+    }
+  }
+  return count;
 }
 
 /*******************************************************************************

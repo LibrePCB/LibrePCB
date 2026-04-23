@@ -456,7 +456,7 @@ void GuiApplication::closeLibrary(const FilePath& libDir) noexcept {
 bool GuiApplication::requestClosingAllLibraries() noexcept {
   for (std::size_t i = 0; i < mLibraries->row_count(); ++i) {
     if (auto lib = mLibraries->value(i)) {
-      if (!lib->requestClose()) {
+      if (!lib->requestCloseAllTabs()) {
         return false;
       }
     }
