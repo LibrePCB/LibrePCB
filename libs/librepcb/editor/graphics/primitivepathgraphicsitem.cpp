@@ -203,7 +203,7 @@ void PrimitivePathGraphicsItem::updateVisibility() noexcept {
 QPen PrimitivePathGraphicsItem::getPen(
     GraphicsLayer::State state) const noexcept {
   if (mLineLayer && mLineLayer->isVisible()) {
-    return QPen(convertColor(mLineLayer->getColor(state)), mLineWidthPx,
+    return QPen(convertColor(mLineLayer->getColor(state), state), mLineWidthPx,
                 Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
   } else {
     return Qt::NoPen;
@@ -213,14 +213,16 @@ QPen PrimitivePathGraphicsItem::getPen(
 QBrush PrimitivePathGraphicsItem::getBrush(
     GraphicsLayer::State state) const noexcept {
   if (mFillLayer && mFillLayer->isVisible()) {
-    return QBrush(convertColor(mFillLayer->getColor(state)), Qt::SolidPattern);
+    return QBrush(convertColor(mFillLayer->getColor(state), state),
+                  Qt::SolidPattern);
   } else {
     return Qt::NoBrush;
   }
 }
 
-QColor PrimitivePathGraphicsItem::convertColor(QColor color) const noexcept {
-  if (mLighterColorsMinAlpha) {
+QColor PrimitivePathGraphicsItem::convertColor(
+    QColor color, GraphicsLayer::State state) const noexcept {
+  if (mLighterColorsMinAlpha && (state != GraphicsLayer::State::Disabled)) {
     color = color.lighter(200);
     color.setAlpha(std::max(color.alpha(), mLighterColorsMinAlpha));
   }

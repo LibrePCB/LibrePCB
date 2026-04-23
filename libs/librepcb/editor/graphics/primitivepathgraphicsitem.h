@@ -103,7 +103,7 @@ private:  // Methods
   void updateVisibility() noexcept;
   QPen getPen(GraphicsLayer::State state) const noexcept;
   QBrush getBrush(GraphicsLayer::State state) const noexcept;
-  QColor convertColor(QColor color) const noexcept;
+  QColor convertColor(QColor color, GraphicsLayer::State state) const noexcept;
 
 protected:  // Data
   bool mMirror;

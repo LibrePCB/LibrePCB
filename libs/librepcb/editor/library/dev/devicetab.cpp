@@ -1003,7 +1003,6 @@ void DeviceTab::updatePreviewPinNumbers() noexcept {
       signalNumbers[*sigUuid].append(padName);
     }
   }
-  qDebug() << signalNumbers;
 
   for (int i = 0; i < mSymbolGraphicsItems.count(); ++i) {
     auto gate = mSymbolVariant->getSymbolItems().at(i);
