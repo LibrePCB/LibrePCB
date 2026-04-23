@@ -431,7 +431,8 @@ void SchematicTab::highlightErcMessage(
     if (zoomTo) {
       const qreal zoomMargin = Length(20000000).toPx();
       mView->zoomToSceneRect(
-          rect.adjusted(-zoomMargin, -zoomMargin, zoomMargin, zoomMargin));
+          rect.adjusted(-zoomMargin, -zoomMargin, zoomMargin, zoomMargin),
+          false);
     }
   }
 }
@@ -611,7 +612,7 @@ void SchematicTab::trigger(ui::TabAction a) noexcept {
       break;
     }
     case ui::TabAction::ZoomFit: {
-      if (mScene) mView->zoomToSceneRect(mScene->itemsBoundingRect());
+      if (mScene) mView->zoomToSceneRect(mScene->itemsBoundingRect(), true);
       break;
     }
     case ui::TabAction::FindRefreshSuggestions: {
@@ -874,8 +875,9 @@ Point SchematicTab::fsmMapGlobalPosToScenePos(
   }
 }
 
-void SchematicTab::fsmZoomToSceneRect(const QRectF& r) noexcept {
-  mView->zoomToSceneRect(r);
+void SchematicTab::fsmZoomToSceneRect(const QRectF& r,
+                                      bool autoFitInView) noexcept {
+  mView->zoomToSceneRect(r, autoFitInView);
 }
 
 void SchematicTab::fsmCrossProbe(
@@ -1281,7 +1283,7 @@ void SchematicTab::goToSymbol(const QString& name, int index) noexcept {
             std::min(1.5f * std::max(rect.size().width(), rect.size().height()),
                      Length::fromMm(10).toPx());
         rect.adjust(-margin, -margin, margin, margin);
-        mView->zoomToSceneRect(rect);
+        mView->zoomToSceneRect(rect, false);
       }
     }
   }

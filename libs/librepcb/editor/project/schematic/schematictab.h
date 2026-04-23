@@ -130,7 +130,8 @@ public:
   QPainterPath fsmCalcPosWithTolerance(
       const Point& pos, qreal multiplier) const noexcept override;
   Point fsmMapGlobalPosToScenePos(const QPoint& pos) const noexcept override;
-  void fsmZoomToSceneRect(const QRectF& r) noexcept override;
+  void fsmZoomToSceneRect(const QRectF& r,
+                          bool autoFitInView) noexcept override;
   void fsmCrossProbe(
       const QSet<const NetSignal*>& nets = {},
       const QSet<const ComponentInstance*>& components = {},

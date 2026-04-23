@@ -174,7 +174,8 @@ slint::Image SlintGraphicsView::render(GraphicsScene& scene, float width,
     painter.setRenderHints(QPainter::Antialiasing |
                            QPainter::SmoothPixmapTransform);
     const QRectF targetRect(QPoint(0, 0), size);
-    if (mViewSize.isEmpty()) {
+    if ((mViewSize != targetRect.size()) &&
+        (mProjection.autoFitInView || mViewSize.isEmpty())) {
       const QRectF target = targetRect.marginsRemoved(mDefaultMargins);
       const QRectF initialRect = validateSceneRect(scene.itemsBoundingRect());
       mProjection.scale =
@@ -298,6 +299,7 @@ bool SlintGraphicsView::pointerEvent(
     }
     if (mPanning) {
       Projection projection = mProjection;
+      projection.autoFitInView = false;
       projection.offset -= scenePosPx - mPanningStartScenePos;
       applyProjection(projection);
       return true;
@@ -376,7 +378,8 @@ void SlintGraphicsView::zoomOut() noexcept {
   zoom(QPointF(mViewSize.width() / 2, mViewSize.height() / 2), 1 / 1.3);
 }
 
-void SlintGraphicsView::zoomToSceneRect(const QRectF& r) noexcept {
+void SlintGraphicsView::zoomToSceneRect(const QRectF& r,
+                                        bool autoFitInView) noexcept {
   const QRectF sourceRect = validateSceneRect(r);
   const QRectF targetRect =
       QRectF(QPointF(0, 0), mViewSize).marginsRemoved(mDefaultMargins);
@@ -386,6 +389,7 @@ void SlintGraphicsView::zoomToSceneRect(const QRectF& r) noexcept {
   }
 
   Projection projection;
+  projection.autoFitInView = autoFitInView;
   projection.scale =
       boundedScaleFactor(std::min(targetRect.width() / sourceRect.width(),
                                   targetRect.height() / sourceRect.height()));
@@ -433,6 +437,7 @@ QMarginsF SlintGraphicsView::defaultEditorMargins() noexcept {
 
 void SlintGraphicsView::scroll(const QPointF& delta) noexcept {
   Projection projection = mProjection;
+  projection.autoFitInView = false;
   projection.offset += delta;
   applyProjection(projection);
 }
@@ -443,6 +448,7 @@ void SlintGraphicsView::zoom(QPointF center, qreal factor) noexcept {
   }
 
   Projection projection = mProjection;
+  projection.autoFitInView = false;
 
   QTransform tf;
   tf.translate(projection.offset.x(), projection.offset.y());

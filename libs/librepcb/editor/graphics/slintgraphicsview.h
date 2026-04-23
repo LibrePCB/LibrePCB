@@ -53,24 +53,28 @@ class SlintGraphicsView final : public QObject {
   Q_OBJECT
 
   struct Projection {
+    bool autoFitInView = true;  ///< Default `true`, cleared on zoom/pan events
     QPointF offset;
     qreal scale = 1;
 
     Projection interpolated(const Projection& delta,
                             qreal factor) const noexcept {
       return Projection{
+          factor == qreal(1) ? delta.autoFitInView : false,
           offset + delta.offset * factor,
           scale + delta.scale * factor,
       };
     }
     bool operator==(const Projection& rhs) const noexcept {
-      return (offset == rhs.offset) && (scale == rhs.scale);
+      return (autoFitInView == rhs.autoFitInView) && (offset == rhs.offset) &&
+          (scale == rhs.scale);
     }
     bool operator!=(const Projection& rhs) const noexcept {
       return !(*this == rhs);
     }
     Projection operator-(const Projection& rhs) const noexcept {
       return Projection{
+          autoFitInView,
           offset - rhs.offset,
           scale - rhs.scale,
       };
@@ -110,7 +114,7 @@ public:
   void scrollDown() noexcept;
   void zoomIn() noexcept;
   void zoomOut() noexcept;
-  void zoomToSceneRect(const QRectF& r) noexcept;
+  void zoomToSceneRect(const QRectF& r, bool autoFitInView) noexcept;
 
   // Static Methods
   static QRectF defaultSymbolSceneRect() noexcept;

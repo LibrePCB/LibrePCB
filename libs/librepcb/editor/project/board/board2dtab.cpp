@@ -890,7 +890,7 @@ void Board2dTab::trigger(ui::TabAction a) noexcept {
       break;
     }
     case ui::TabAction::ZoomFit: {
-      if (mScene) mView->zoomToSceneRect(mScene->itemsBoundingRect());
+      if (mScene) mView->zoomToSceneRect(mScene->itemsBoundingRect(), true);
       break;
     }
     case ui::TabAction::ToggleBackgroundImage: {
@@ -1998,7 +1998,7 @@ void Board2dTab::highlightDrcMessage(
     rect.adjust(-margin, -margin, margin, margin);
     mScene->setSceneRectMarker(rect);
     if (zoomTo) {
-      mView->zoomToSceneRect(rect);
+      mView->zoomToSceneRect(rect, false);
     }
   }
 }
@@ -2696,7 +2696,7 @@ void Board2dTab::goToDevice(const QString& name, int index) noexcept {
             std::min(1.5f * std::max(rect.size().width(), rect.size().height()),
                      Length::fromMm(10).toPx());
         rect.adjust(-margin, -margin, margin, margin);
-        mView->zoomToSceneRect(rect);
+        mView->zoomToSceneRect(rect, false);
       } else {
         mProjectEditor.getCrossProbe()->set(nullptr, {}, {}, {}, {});
       }

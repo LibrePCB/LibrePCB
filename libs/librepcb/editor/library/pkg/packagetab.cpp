@@ -850,7 +850,7 @@ void PackageTab::trigger(ui::TabAction a) noexcept {
       if (mView3d && mOpenGlView) {
         mOpenGlView->zoomAll();
       } else if ((!mView3d) && mView && mScene) {
-        mView->zoomToSceneRect(mScene->itemsBoundingRect());
+        mView->zoomToSceneRect(mScene->itemsBoundingRect(), true);
       }
       break;
     }

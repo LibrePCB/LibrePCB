@@ -482,8 +482,9 @@ void DeviceTab::trigger(ui::TabAction a) noexcept {
     case ui::TabAction::ZoomFit: {
       // Currently we can't distinguish in which view the action was
       // triggered, thus applying to both views.
-      mComponentView->zoomToSceneRect(mComponentScene->itemsBoundingRect());
-      mPackageView->zoomToSceneRect(mPackageScene->itemsBoundingRect());
+      mComponentView->zoomToSceneRect(mComponentScene->itemsBoundingRect(),
+                                      true);
+      mPackageView->zoomToSceneRect(mPackageScene->itemsBoundingRect(), true);
       break;
     }
     case ui::TabAction::OpenDatasheet: {
