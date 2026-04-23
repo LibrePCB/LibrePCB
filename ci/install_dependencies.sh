@@ -43,6 +43,9 @@ then
   rustup default 1.89.0
   export PATH="/usr/local/opt/rustup/bin:$PATH"
 
+  # Install Cargo packages
+  cargo install --force cargo-llvm-cov
+
   # Install ccache
   echo "Installing ccache..."
   brew install --force-bottle ccache

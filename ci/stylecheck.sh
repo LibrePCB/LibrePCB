@@ -36,7 +36,7 @@ set -euv -o pipefail
 # lint rust crates
 cargo_toml_files=$(git ls-files -- '**Cargo.toml')
 for f in $cargo_toml_files; do
-  (cargo clippy --manifest-path="$f" --features="fail-on-warnings") || exit 1
+  (cargo clippy --manifest-path="$f" --features="fail-on-warnings,ffi") || exit 1
 done
 
 # run python style checks
