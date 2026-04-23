@@ -433,6 +433,9 @@ std::shared_ptr<LibraryEditor> GuiApplication::openLibrary(
     // Keep handle.
     const int index = mLibraries->count();
     auto editor = std::make_shared<LibraryEditor>(*this, std::move(lib), index);
+    connect(
+        editor.get(), &LibraryEditor::closeRequested, this,
+        [this, libDir]() { closeLibrary(libDir); }, Qt::QueuedConnection);
     mLibraries->insert(index, editor);
     switchToLibrary(index);
     return editor;
