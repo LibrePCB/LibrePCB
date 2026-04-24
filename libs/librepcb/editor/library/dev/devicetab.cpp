@@ -24,6 +24,7 @@
 
 #include "../../graphics/slintgraphicsview.h"
 #include "../../guiapplication.h"
+#include "../../mainwindow.h"
 #include "../../modelview/attributelistmodel.h"
 #include "../../rulecheck/rulecheckmessagesmodel.h"
 #include "../../undocommandgroup.h"
@@ -501,6 +502,18 @@ void DeviceTab::trigger(ui::TabAction a) noexcept {
     }
     case ui::TabAction::DeviceSelectPackage: {
       selectPackage();
+      break;
+    }
+    case ui::TabAction::DeviceOpenComponent: {
+      if (mWindow && mComponent) {
+        mWindow->requestComponentTab(mComponent->getDirectory().getAbsPath());
+      }
+      break;
+    }
+    case ui::TabAction::DeviceOpenPackage: {
+      if (mWindow && mPackage) {
+        mWindow->requestPackageTab(mPackage->getDirectory().getAbsPath());
+      }
       break;
     }
     case ui::TabAction::DevicePinoutReset: {

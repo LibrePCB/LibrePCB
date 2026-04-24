@@ -1,7 +1,9 @@
 import {
     Button,
     IconButton,
+    LinkText,
     SceneButton,
+    ToolTip,
 } from "../../widgets.slint";
 import {
     Backend,
@@ -30,6 +32,7 @@ component DeviceDependencyCard inherits Rectangle {
 
     property <string> choose-text: @tr("Choose {}", type) + "...";
 
+    callback open-clicked;
     callback choose-clicked;
 
     background: error ? Data.theme.error : Data.theme.control-checked;
@@ -46,7 +49,8 @@ component DeviceDependencyCard inherits Rectangle {
             HorizontalLayout {
                 spacing: 8px;
 
-                title-txt := Text {
+                title-btn := LinkText {
+                    z: 20;
                     horizontal-stretch: 0;
                     font-size: 14px;
                     font-weight: 700;
@@ -54,7 +58,26 @@ component DeviceDependencyCard inherits Rectangle {
                     vertical-alignment: center;
                     color: error ? Data.theme.error-text : Data.theme.control-text;
                     text: error ? error-title : (name.is-empty ? uninitialized-title : name);
+                    enabled: !name.is-empty;
                     accessible-label: type;
+
+                    if self.enabled && self.has-hover: Rectangle {
+                        x: 0;
+                        y: parent.height - self.height;
+                        width: parent.preferred-width;
+                        height: 1px;
+                        background: parent.color;
+                    }
+
+                    if self.enabled && self.has-hover: ToolTip {
+                        x: parent.width + 5px;
+                        y: (parent.height - self.height) / 2;
+                        text: @tr("Open Editor");
+                    }
+
+                    clicked => {
+                        open-clicked();
+                    }
                 }
 
                 if (!read-only) && ((!name.is-empty) || error): choose-btn-1 := IconButton {
@@ -76,7 +99,7 @@ component DeviceDependencyCard inherits Rectangle {
                     horizontal-stretch: 1;
                     font-size: 10px;
                     font-weight: 300;
-                    color: title-txt.color;
+                    color: title-btn.color;
                     horizontal-alignment: right;
                     vertical-alignment: center;
                     text: type.to-uppercase();
@@ -89,7 +112,7 @@ component DeviceDependencyCard inherits Rectangle {
                 font-size: error ? 12px : 11px;
                 font-weight: error ? 600 : 400;
                 font-italic: true;
-                color: title-txt.color;
+                color: title-btn.color;
                 wrap: word-wrap;
                 overflow: elide;
                 text: description;
@@ -172,6 +195,10 @@ export component ComponentCard inherits DeviceDependencyCard {
     foreground-color: self.tabs[self.index].component-foreground-color;
     scene: 0;
 
+    open-clicked => {
+        Backend.trigger-tab(self.section-index, self.index, TabAction.device-open-component);
+    }
+
     choose-clicked => {
         Backend.trigger-tab(self.section-index, self.index, TabAction.device-select-component);
     }
@@ -187,6 +214,10 @@ export component PackageCard inherits DeviceDependencyCard {
     background-color: self.tabs[self.index].package-background-color;
     foreground-color: self.tabs[self.index].package-foreground-color;
     scene: 1;
+
+    open-clicked => {
+        Backend.trigger-tab(self.section-index, self.index, TabAction.device-open-package);
+    }
 
     choose-clicked => {
         Backend.trigger-tab(self.section-index, self.index, TabAction.device-select-package);

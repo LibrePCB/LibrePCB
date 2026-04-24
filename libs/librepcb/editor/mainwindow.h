@@ -98,6 +98,8 @@ public:
                                                  int index) noexcept;
   void openBoard2dTab(int projectIndex, int index,
                       bool switchToTab = true) noexcept;
+  void requestComponentTab(const FilePath& fp) noexcept;
+  void requestPackageTab(const FilePath& fp) noexcept;
 
   // Operator Overloadings
   MainWindow& operator=(const MainWindow& rhs) = delete;

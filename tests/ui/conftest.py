@@ -48,6 +48,13 @@ def _query_childs(element, query):
     if segment_name.startswith("#"):
         segment_name = segment_name[1:]
         childs = element.query_descendants().match_type_name(segment_name).find_all()
+    elif "{" in segment_name:
+        childs = []
+        start = segment_name.find("{")
+        end = segment_name.find("}")
+        for value in segment_name[start + 1 : end].split(","):
+            name = segment_name[:start] + value + segment_name[end + 1 :]
+            childs += element.query_descendants().match_id(name).find_all()
     else:
         childs = element.query_descendants().match_id(segment_name).find_all()
     if len(segment) > 1:
@@ -107,6 +114,9 @@ class Element:
     def click(self):
         self._element.single_click(slint_testing.PointerEventButton.Left)
 
+    def mclick(self):
+        self._element.double_click(slint_testing.PointerEventButton.Middle)
+
     def dclick(self):
         self._element.double_click(slint_testing.PointerEventButton.Left)
 
@@ -133,6 +143,8 @@ class ElementQuery:
     * Each string segment matches Slint elements by their ID.
     * Segments starting with "#" match Slint elements by type name rather than
       by ID.
+    * String segments to match the ID may contain placeholder like `foo-{a,b}`
+      to match *any* of those substrings (i.e. `foo-a` or `foo-b`).
     * Optionally, a last segment can be supplied to specify the expected number
       of Slint elements matching the query. A star "*" means any number of
       result is allowed (0..n). A question mark "?" means any number of result
@@ -324,6 +336,10 @@ class ElementQuery:
     def click(self):
         for x in self._results:
             x.click()
+
+    def mclick(self):
+        for x in self._results:
+            x.mclick()
 
     def dclick(self):
         for x in self._results:

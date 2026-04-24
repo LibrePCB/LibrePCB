@@ -1505,6 +1505,18 @@ void MainWindow::openBoard2dTab(int projectIndex, int index,
   }
 }
 
+void MainWindow::requestComponentTab(const FilePath& fp) noexcept {
+  if (auto editor = mApp.openLibrary(fp.getParentDir().getParentDir())) {
+    openComponentTab(*editor, fp, false);
+  }
+}
+
+void MainWindow::requestPackageTab(const FilePath& fp) noexcept {
+  if (auto editor = mApp.openLibrary(fp.getParentDir().getParentDir())) {
+    openPackageTab(*editor, fp, false);
+  }
+}
+
 void MainWindow::openBoard3dTab(int projectIndex, int index) noexcept {
   if (!switchToProjectTab<Board3dTab>(projectIndex, index)) {
     if (auto prjEditor = mApp.getProjects().value(projectIndex)) {
