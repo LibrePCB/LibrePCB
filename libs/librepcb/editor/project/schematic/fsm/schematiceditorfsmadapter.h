@@ -94,7 +94,8 @@ public:
   virtual QPainterPath fsmCalcPosWithTolerance(
       const Point& pos, qreal multiplier) const noexcept = 0;
   virtual Point fsmMapGlobalPosToScenePos(const QPoint& pos) const noexcept = 0;
-  virtual void fsmZoomToSceneRect(const QRectF& r) noexcept = 0;
+  virtual void fsmZoomToSceneRect(const QRectF& r,
+                                  bool autoFitInView) noexcept = 0;
   virtual void fsmCrossProbe(
       const QSet<const NetSignal*>& nets = {},
       const QSet<const ComponentInstance*>& components = {},

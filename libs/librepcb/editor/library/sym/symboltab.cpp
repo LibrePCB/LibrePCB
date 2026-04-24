@@ -583,7 +583,7 @@ void SymbolTab::trigger(ui::TabAction a) noexcept {
       break;
     }
     case ui::TabAction::ZoomFit: {
-      if (mScene) mView->zoomToSceneRect(mScene->itemsBoundingRect());
+      if (mScene) mView->zoomToSceneRect(mScene->itemsBoundingRect(), true);
       break;
     }
     case ui::TabAction::SymbolImportPins: {

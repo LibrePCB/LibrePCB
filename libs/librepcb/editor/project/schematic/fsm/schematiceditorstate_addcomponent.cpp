@@ -511,7 +511,7 @@ void SchematicEditorState_AddComponent::startAddingComponent(
       mIsUndoCmdActive = false;
       abortCommand(false);  // reset attributes
       if (auto scene = getActiveSchematicScene()) {
-        mAdapter.fsmZoomToSceneRect(scene->itemsBoundingRect());
+        mAdapter.fsmZoomToSceneRect(scene->itemsBoundingRect(), true);
       }
       emit requestLeavingState();
     }
