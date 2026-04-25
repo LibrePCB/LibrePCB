@@ -100,7 +100,6 @@ public:
   WindowTab& operator=(const WindowTab& rhs) = delete;
 
 signals:
-  void panelPageRequested(ui::PanelPage p);
   void closeRequested();
   void closeEnforced();
   void statusBarMessageChanged(const QString& message, int timeoutMs);

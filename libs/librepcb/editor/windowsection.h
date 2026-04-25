@@ -147,7 +147,6 @@ public:
 
 signals:
   void currentTabChanged();
-  void panelPageRequested(ui::PanelPage p);
   void derivedUiDataChanged(std::size_t index);
   void statusBarMessageChanged(const QString& message, int timeoutMs);
   void cursorCoordinatesChanged(const Point& pos, const LengthUnit& unit);

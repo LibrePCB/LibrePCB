@@ -414,8 +414,6 @@ void MainWindow::addSection(int newIndex, bool makeCurrent) noexcept {
     const ui::Data& d = mWindow->global<ui::Data>();
     d.fn_current_tab_changed();
   });
-  connect(s.get(), &WindowSection::panelPageRequested, this,
-          &MainWindow::showPanelPage);
   connect(s.get(), &WindowSection::cursorCoordinatesChanged, this,
           [this](const Point& pos, const LengthUnit& unit) {
             const ui::Data& d = mWindow->global<ui::Data>();
@@ -529,6 +527,195 @@ void MainWindow::setCurrentLibrary(int index) noexcept {
 void MainWindow::setCurrentProject(int index) noexcept {
   const ui::Data& d = mWindow->global<ui::Data>();
   d.fn_set_current_project(index);
+}
+
+void MainWindow::openLibraryTab(const FilePath& fp, bool wizardMode) noexcept {
+  if (auto editor = mApp.openLibrary(fp)) {
+    if (!switchToLibraryElementTab<LibraryTab>(fp)) {
+      addTab(std::make_shared<LibraryTab>(*editor, wizardMode));
+    }
+  }
+}
+
+void MainWindow::openComponentCategoryTab(LibraryEditor& editor,
+                                          const FilePath& fp) noexcept {
+  openLibraryElementTab<ComponentCategory, ComponentCategoryTab>(editor, fp);
+}
+
+bool MainWindow::openNewComponentCategoryTab(
+    LibraryEditor& editor, const FilePath& duplicateFromFp,
+    const ComponentCategory* duplicateFromObj) noexcept {
+  return openNewLibraryElementTab<ComponentCategory, ComponentCategoryTab>(
+      editor, duplicateFromFp, duplicateFromObj, [this]() {
+        return std::unique_ptr<ComponentCategory>(new ComponentCategory(
+            Uuid::createRandom(), Version::fromString("0.1"),
+            mApp.getWorkspace().getSettings().userName.get(),
+            QDateTime::currentDateTime(), ElementName("New Component Category"),
+            QString(), QString()));
+      });
+}
+
+void MainWindow::openPackageCategoryTab(LibraryEditor& editor,
+                                        const FilePath& fp) noexcept {
+  openLibraryElementTab<PackageCategory, PackageCategoryTab>(editor, fp);
+}
+
+bool MainWindow::openNewPackageCategoryTab(
+    LibraryEditor& editor, const FilePath& duplicateFromFp,
+    const PackageCategory* duplicateFromObj) noexcept {
+  return openNewLibraryElementTab<PackageCategory, PackageCategoryTab>(
+      editor, duplicateFromFp, duplicateFromObj, [this]() {
+        return std::unique_ptr<PackageCategory>(new PackageCategory(
+            Uuid::createRandom(), Version::fromString("0.1"),
+            mApp.getWorkspace().getSettings().userName.get(),
+            QDateTime::currentDateTime(), ElementName("New Package Category"),
+            QString(), QString()));
+      });
+}
+
+void MainWindow::openSymbolTab(LibraryEditor& editor,
+                               const FilePath& fp) noexcept {
+  openLibraryElementTab<Symbol, SymbolTab>(editor, fp);
+}
+
+bool MainWindow::openNewSymbolTab(LibraryEditor& editor,
+                                  const FilePath& duplicateFromFp,
+                                  const Symbol* duplicateFromObj) noexcept {
+  return openNewLibraryElementTab<Symbol, SymbolTab>(
+      editor, duplicateFromFp, duplicateFromObj, [this]() {
+        return std::unique_ptr<Symbol>(
+            new Symbol(Uuid::createRandom(), Version::fromString("0.1"),
+                       mApp.getWorkspace().getSettings().userName.get(),
+                       QDateTime::currentDateTime(), ElementName("New Symbol"),
+                       QString(), QString()));
+      });
+}
+
+void MainWindow::openPackageTab(LibraryEditor& editor,
+                                const FilePath& fp) noexcept {
+  openLibraryElementTab<Package, PackageTab>(editor, fp);
+}
+
+bool MainWindow::openNewPackageTab(LibraryEditor& editor,
+                                   const FilePath& duplicateFromFp,
+                                   const Package* duplicateFromObj) noexcept {
+  return openNewLibraryElementTab<Package, PackageTab>(
+      editor, duplicateFromFp, duplicateFromObj, [this]() {
+        std::unique_ptr<Package> obj(new Package(
+            Uuid::createRandom(), Version::fromString("0.1"),
+            mApp.getWorkspace().getSettings().userName.get(),
+            QDateTime::currentDateTime(), ElementName("New Package"), QString(),
+            QString(), Package::AssemblyType::Auto));
+        obj->getFootprints().append(std::make_shared<Footprint>(
+            Uuid::createRandom(), ElementName("default"), ""));
+        return obj;
+      });
+}
+
+void MainWindow::openComponentTab(LibraryEditor& editor,
+                                  const FilePath& fp) noexcept {
+  openLibraryElementTab<Component, ComponentTab>(editor, fp);
+}
+
+bool MainWindow::openNewComponentTab(
+    LibraryEditor& editor, const FilePath& duplicateFromFp,
+    const Component* duplicateFromObj) noexcept {
+  return openNewLibraryElementTab<Component, ComponentTab>(
+      editor, duplicateFromFp, duplicateFromObj, [this]() {
+        std::unique_ptr<Component> obj(
+            new Component(Uuid::createRandom(), Version::fromString("0.1"),
+                          mApp.getWorkspace().getSettings().userName.get(),
+                          QDateTime::currentDateTime(),
+                          ElementName("New Component"), QString(), QString()));
+        obj->getSymbolVariants().append(
+            std::make_shared<ComponentSymbolVariant>(
+                Uuid::createRandom(), "", ElementName("default"), ""));
+        return obj;
+      });
+}
+
+void MainWindow::openDeviceTab(LibraryEditor& editor,
+                               const FilePath& fp) noexcept {
+  openLibraryElementTab<Device, DeviceTab>(editor, fp);
+}
+
+bool MainWindow::openNewDeviceTab(LibraryEditor& editor,
+                                  const FilePath& duplicateFromFp,
+                                  const Device* duplicateFromObj) noexcept {
+  return openNewLibraryElementTab<Device, DeviceTab>(
+      editor, duplicateFromFp, duplicateFromObj, [this]() {
+        return std::unique_ptr<Device>(new Device(
+            Uuid::createRandom(), Version::fromString("0.1"),
+            mApp.getWorkspace().getSettings().userName.get(),
+            QDateTime::currentDateTime(), ElementName("New Device"), QString(),
+            QString(), Uuid::createRandom(), Uuid::createRandom()));
+      });
+}
+
+void MainWindow::openOrganizationTab(LibraryEditor& editor,
+                                     const FilePath& fp) noexcept {
+  openLibraryElementTab<Organization, OrganizationTab>(editor, fp);
+}
+
+bool MainWindow::openNewOrganizationTab(
+    LibraryEditor& editor, const FilePath& duplicateFromFp,
+    const Organization* duplicateFromObj) noexcept {
+  return openNewLibraryElementTab<Organization, OrganizationTab>(
+      editor, duplicateFromFp, duplicateFromObj, [this]() {
+        return std::unique_ptr<Organization>(new Organization(
+            Uuid::createRandom(), Version::fromString("0.1"),
+            mApp.getWorkspace().getSettings().userName.get(),
+            QDateTime::currentDateTime(), ElementName("New Organization"),
+            QString(), QString()));
+      });
+}
+
+std::shared_ptr<SchematicTab> MainWindow::openSchematicTab(int projectIndex,
+                                                           int index) noexcept {
+  if (auto tab = switchToProjectTab<SchematicTab>(projectIndex, index)) {
+    return tab;
+  } else if (auto prjEditor = mApp.getProjects().value(projectIndex)) {
+    if (auto schEditor = prjEditor->getSchematics().value(index)) {
+      auto tab = std::make_shared<SchematicTab>(mApp, *schEditor);
+      addTab(tab);
+      return tab;
+    }
+  }
+  return nullptr;
+}
+
+void MainWindow::openBoard2dTab(int projectIndex, int index,
+                                bool switchToTab) noexcept {
+  if (!switchToProjectTab<Board2dTab>(projectIndex, index)) {
+    if (auto prjEditor = mApp.getProjects().value(projectIndex)) {
+      if (auto brdEditor = prjEditor->getBoards().value(index)) {
+        addTab(std::make_shared<Board2dTab>(mApp, *brdEditor), -1, -1,
+               switchToTab, switchToTab);
+      }
+    }
+  }
+}
+
+void MainWindow::openBoard3dTab(int projectIndex, int index) noexcept {
+  if (!switchToProjectTab<Board3dTab>(projectIndex, index)) {
+    if (auto prjEditor = mApp.getProjects().value(projectIndex)) {
+      if (auto brdEditor = prjEditor->getBoards().value(index)) {
+        addTab(std::make_shared<Board3dTab>(mApp, *brdEditor));
+      }
+    }
+  }
+}
+
+void MainWindow::requestComponentTab(const FilePath& fp) noexcept {
+  if (auto editor = mApp.openLibrary(fp.getParentDir().getParentDir())) {
+    openComponentTab(*editor, fp);
+  }
+}
+
+void MainWindow::requestPackageTab(const FilePath& fp) noexcept {
+  if (auto editor = mApp.openLibrary(fp.getParentDir().getParentDir())) {
+    openPackageTab(*editor, fp);
+  }
 }
 
 /*******************************************************************************
@@ -745,43 +932,43 @@ void MainWindow::triggerLibrary(slint::SharedString path,
     }
     case ui::LibraryAction::NewComponentCategory: {
       if (auto editor = mApp.getLibrary(fp)) {
-        openComponentCategoryTab(*editor, FilePath(), false);
+        openNewComponentCategoryTab(*editor);
       }
       break;
     }
     case ui::LibraryAction::NewPackageCategory: {
       if (auto editor = mApp.getLibrary(fp)) {
-        openPackageCategoryTab(*editor, FilePath(), false);
+        openNewPackageCategoryTab(*editor);
       }
       break;
     }
     case ui::LibraryAction::NewSymbol: {
       if (auto editor = mApp.getLibrary(fp)) {
-        openSymbolTab(*editor, FilePath(), false);
+        openNewSymbolTab(*editor);
       }
       break;
     }
     case ui::LibraryAction::NewPackage: {
       if (auto editor = mApp.getLibrary(fp)) {
-        openPackageTab(*editor, FilePath(), false);
+        openNewPackageTab(*editor);
       }
       break;
     }
     case ui::LibraryAction::NewComponent: {
       if (auto editor = mApp.getLibrary(fp)) {
-        openComponentTab(*editor, FilePath(), false);
+        openNewComponentTab(*editor);
       }
       break;
     }
     case ui::LibraryAction::NewDevice: {
       if (auto editor = mApp.getLibrary(fp)) {
-        openDeviceTab(*editor, FilePath(), false);
+        openNewDeviceTab(*editor);
       }
       break;
     }
     case ui::LibraryAction::NewOrganization: {
       if (auto editor = mApp.getLibrary(fp)) {
-        openOrganizationTab(*editor, FilePath(), false);
+        openNewOrganizationTab(*editor);
       }
       break;
     }
@@ -980,343 +1167,58 @@ void MainWindow::triggerBoard(int project, int board,
   }
 }
 
-void MainWindow::openLibraryTab(const FilePath& fp, bool wizardMode) noexcept {
-  if (auto editor = mApp.openLibrary(fp)) {
-    if (!switchToLibraryElementTab<LibraryTab>(fp)) {
-      auto tab = std::make_shared<LibraryTab>(*editor, wizardMode);
-      connect(tab.get(), &LibraryTab::componentCategoryEditorRequested, this,
-              &MainWindow::openComponentCategoryTab);
-      connect(tab.get(), &LibraryTab::packageCategoryEditorRequested, this,
-              &MainWindow::openPackageCategoryTab);
-      connect(tab.get(), &LibraryTab::symbolEditorRequested, this,
-              &MainWindow::openSymbolTab);
-      connect(tab.get(), &LibraryTab::packageEditorRequested, this,
-              &MainWindow::openPackageTab);
-      connect(tab.get(), &LibraryTab::componentEditorRequested, this,
-              &MainWindow::openComponentTab);
-      connect(tab.get(), &LibraryTab::deviceEditorRequested, this,
-              &MainWindow::openDeviceTab);
-      connect(tab.get(), &LibraryTab::organizationEditorRequested, this,
-              &MainWindow::openOrganizationTab);
-      addTab(tab);
-    }
-  }
-}
-
-void MainWindow::openComponentCategoryTab(LibraryEditor& editor,
-                                          const FilePath& fp,
-                                          bool copyFrom) noexcept {
-  if (copyFrom || (!switchToLibraryElementTab<ComponentCategoryTab>(fp))) {
-    try {
-      std::unique_ptr<ComponentCategory> cat;
-      ComponentCategoryTab::Mode mode = ComponentCategoryTab::Mode::Open;
-      if (fp.isValid() && (!copyFrom)) {
-        auto fs = TransactionalFileSystem::open(
-            fp, editor.isWritable(), &askForRestoringBackup,
-            DirectoryLockHandlerDialog::createDirectoryLockCallback());
-        cat = ComponentCategory::open(std::unique_ptr<TransactionalDirectory>(
-            new TransactionalDirectory(fs)));
-      } else {
-        mode = ComponentCategoryTab::Mode::New;
-        cat.reset(new ComponentCategory(
-            Uuid::createRandom(), Version::fromString("0.1"),
-            mApp.getWorkspace().getSettings().userName.get(),
-            QDateTime::currentDateTime(), ElementName("New Component Category"),
-            QString(), QString()));
-        if (copyFrom) {
-          mode = ComponentCategoryTab::Mode::Duplicate;
-          auto fs = TransactionalFileSystem::openRO(fp, &askForRestoringBackup);
-          std::unique_ptr<ComponentCategory> src =
-              ComponentCategory::open(std::unique_ptr<TransactionalDirectory>(
-                  new TransactionalDirectory(fs)));
-          duplicateLibraryElement(*cat, *src);
-        }
-      }
-      addTab(
-          std::make_shared<ComponentCategoryTab>(editor, std::move(cat), mode));
-    } catch (const UserCanceled& e) {
-    } catch (const Exception& e) {
-      QMessageBox::critical(mWidget, tr("Error"), e.getMsg());
-    }
-  }
-}
-
-void MainWindow::openPackageCategoryTab(LibraryEditor& editor,
-                                        const FilePath& fp,
-                                        bool copyFrom) noexcept {
-  if (copyFrom || (!switchToLibraryElementTab<PackageCategoryTab>(fp))) {
-    try {
-      std::unique_ptr<PackageCategory> cat;
-      PackageCategoryTab::Mode mode = PackageCategoryTab::Mode::Open;
-      if (fp.isValid() && (!copyFrom)) {
-        auto fs = TransactionalFileSystem::open(
-            fp, editor.isWritable(), &askForRestoringBackup,
-            DirectoryLockHandlerDialog::createDirectoryLockCallback());
-        cat = PackageCategory::open(std::unique_ptr<TransactionalDirectory>(
-            new TransactionalDirectory(fs)));
-      } else {
-        mode = PackageCategoryTab::Mode::New;
-        cat.reset(new PackageCategory(
-            Uuid::createRandom(), Version::fromString("0.1"),
-            mApp.getWorkspace().getSettings().userName.get(),
-            QDateTime::currentDateTime(), ElementName("New Package Category"),
-            QString(), QString()));
-        if (copyFrom) {
-          mode = PackageCategoryTab::Mode::Duplicate;
-          auto fs = TransactionalFileSystem::openRO(fp, &askForRestoringBackup);
-          std::unique_ptr<PackageCategory> src =
-              PackageCategory::open(std::unique_ptr<TransactionalDirectory>(
-                  new TransactionalDirectory(fs)));
-          duplicateLibraryElement(*cat, *src);
-        }
-      }
-      addTab(
-          std::make_shared<PackageCategoryTab>(editor, std::move(cat), mode));
-    } catch (const UserCanceled& e) {
-    } catch (const Exception& e) {
-      QMessageBox::critical(mWidget, tr("Error"), e.getMsg());
-    }
-  }
-}
-
-void MainWindow::openSymbolTab(LibraryEditor& editor, const FilePath& fp,
-                               bool copyFrom) noexcept {
-  if (copyFrom || (!switchToLibraryElementTab<SymbolTab>(fp))) {
-    try {
-      std::unique_ptr<Symbol> sym;
-      SymbolTab::Mode mode = SymbolTab::Mode::Open;
-      if (fp.isValid() && (!copyFrom)) {
-        auto fs = TransactionalFileSystem::open(
-            fp, editor.isWritable(), &askForRestoringBackup,
-            DirectoryLockHandlerDialog::createDirectoryLockCallback());
-        sym = Symbol::open(std::unique_ptr<TransactionalDirectory>(
-            new TransactionalDirectory(fs)));
-      } else {
-        mode = SymbolTab::Mode::New;
-        sym.reset(new Symbol(Uuid::createRandom(), Version::fromString("0.1"),
-                             mApp.getWorkspace().getSettings().userName.get(),
-                             QDateTime::currentDateTime(),
-                             ElementName("New Symbol"), QString(), QString()));
-        if (copyFrom) {
-          mode = SymbolTab::Mode::Duplicate;
-          auto fs = TransactionalFileSystem::openRO(fp, &askForRestoringBackup);
-          std::unique_ptr<Symbol> src =
-              Symbol::open(std::unique_ptr<TransactionalDirectory>(
-                  new TransactionalDirectory(fs)));
-          duplicateLibraryElement(*sym, *src);
-        }
-      }
-      addTab(std::make_shared<SymbolTab>(editor, std::move(sym), mode));
-    } catch (const UserCanceled& e) {
-    } catch (const Exception& e) {
-      QMessageBox::critical(mWidget, tr("Error"), e.getMsg());
-    }
-  }
-}
-
-void MainWindow::openPackageTab(LibraryEditor& editor, const FilePath& fp,
-                                bool copyFrom) noexcept {
-  if (copyFrom || (!switchToLibraryElementTab<PackageTab>(fp))) {
-    try {
-      std::unique_ptr<Package> pkg;
-      PackageTab::Mode mode = PackageTab::Mode::Open;
-      if (fp.isValid() && (!copyFrom)) {
-        auto fs = TransactionalFileSystem::open(
-            fp, editor.isWritable(), &askForRestoringBackup,
-            DirectoryLockHandlerDialog::createDirectoryLockCallback());
-        pkg = Package::open(std::unique_ptr<TransactionalDirectory>(
-            new TransactionalDirectory(fs)));
-      } else {
-        mode = PackageTab::Mode::New;
-        pkg.reset(new Package(Uuid::createRandom(), Version::fromString("0.1"),
-                              mApp.getWorkspace().getSettings().userName.get(),
-                              QDateTime::currentDateTime(),
-                              ElementName("New Package"), QString(), QString(),
-                              Package::AssemblyType::Auto));
-        if (copyFrom) {
-          mode = PackageTab::Mode::Duplicate;
-          auto fs = TransactionalFileSystem::openRO(fp, &askForRestoringBackup);
-          std::unique_ptr<Package> src =
-              Package::open(std::unique_ptr<TransactionalDirectory>(
-                  new TransactionalDirectory(fs)));
-          duplicateLibraryElement(*pkg, *src);
-        } else {
-          pkg->getFootprints().append(std::make_shared<Footprint>(
-              Uuid::createRandom(), ElementName("default"), ""));
-        }
-      }
-      addTab(std::make_shared<PackageTab>(editor, std::move(pkg), mode));
-    } catch (const UserCanceled& e) {
-    } catch (const Exception& e) {
-      QMessageBox::critical(mWidget, tr("Error"), e.getMsg());
-    }
-  }
-}
-
-void MainWindow::openComponentTab(LibraryEditor& editor, const FilePath& fp,
-                                  bool copyFrom) noexcept {
-  if (copyFrom || (!switchToLibraryElementTab<ComponentTab>(fp))) {
-    try {
-      std::unique_ptr<Component> cmp;
-      ComponentTab::Mode mode = ComponentTab::Mode::Open;
-      if (fp.isValid() && (!copyFrom)) {
-        auto fs = TransactionalFileSystem::open(
-            fp, editor.isWritable(), &askForRestoringBackup,
-            DirectoryLockHandlerDialog::createDirectoryLockCallback());
-        cmp = Component::open(std::unique_ptr<TransactionalDirectory>(
-            new TransactionalDirectory(fs)));
-      } else {
-        mode = ComponentTab::Mode::New;
-        cmp.reset(
-            new Component(Uuid::createRandom(), Version::fromString("0.1"),
-                          mApp.getWorkspace().getSettings().userName.get(),
-                          QDateTime::currentDateTime(),
-                          ElementName("New Component"), QString(), QString()));
-        if (copyFrom) {
-          mode = ComponentTab::Mode::Duplicate;
-          auto fs = TransactionalFileSystem::openRO(fp, &askForRestoringBackup);
-          std::unique_ptr<Component> src =
-              Component::open(std::unique_ptr<TransactionalDirectory>(
-                  new TransactionalDirectory(fs)));
-          duplicateLibraryElement(*cmp, *src);
-        } else {
-          cmp->getSymbolVariants().append(
-              std::make_shared<ComponentSymbolVariant>(
-                  Uuid::createRandom(), "", ElementName("default"), ""));
-        }
-      }
-      addTab(std::make_shared<ComponentTab>(editor, std::move(cmp), mode));
-    } catch (const UserCanceled& e) {
-    } catch (const Exception& e) {
-      QMessageBox::critical(mWidget, tr("Error"), e.getMsg());
-    }
-  }
-}
-
-void MainWindow::openDeviceTab(LibraryEditor& editor, const FilePath& fp,
-                               bool copyFrom) noexcept {
-  if (copyFrom || (!switchToLibraryElementTab<DeviceTab>(fp))) {
-    try {
-      std::unique_ptr<Device> dev;
-      DeviceTab::Mode mode = DeviceTab::Mode::Open;
-      if (fp.isValid() && (!copyFrom)) {
-        auto fs = TransactionalFileSystem::open(
-            fp, editor.isWritable(), &askForRestoringBackup,
-            DirectoryLockHandlerDialog::createDirectoryLockCallback());
-        dev = Device::open(std::unique_ptr<TransactionalDirectory>(
-            new TransactionalDirectory(fs)));
-      } else {
-        mode = DeviceTab::Mode::New;
-        dev.reset(new Device(Uuid::createRandom(), Version::fromString("0.1"),
-                             mApp.getWorkspace().getSettings().userName.get(),
-                             QDateTime::currentDateTime(),
-                             ElementName("New Device"), QString(), QString(),
-                             Uuid::createRandom(), Uuid::createRandom()));
-        if (copyFrom) {
-          mode = DeviceTab::Mode::Duplicate;
-          auto fs = TransactionalFileSystem::openRO(fp, &askForRestoringBackup);
-          std::unique_ptr<Device> src =
-              Device::open(std::unique_ptr<TransactionalDirectory>(
-                  new TransactionalDirectory(fs)));
-          duplicateLibraryElement(*dev, *src);
-        }
-      }
-      addTab(std::make_shared<DeviceTab>(editor, std::move(dev), mode));
-    } catch (const UserCanceled& e) {
-    } catch (const Exception& e) {
-      QMessageBox::critical(mWidget, tr("Error"), e.getMsg());
-    }
-  }
-}
-
-void MainWindow::openOrganizationTab(LibraryEditor& editor, const FilePath& fp,
-                                     bool copyFrom) noexcept {
-  if (copyFrom || (!switchToLibraryElementTab<OrganizationTab>(fp))) {
-    try {
-      std::unique_ptr<Organization> org;
-      OrganizationTab::Mode mode = OrganizationTab::Mode::Open;
-      if (fp.isValid() && (!copyFrom)) {
-        auto fs = TransactionalFileSystem::open(
-            fp, editor.isWritable(), &askForRestoringBackup,
-            DirectoryLockHandlerDialog::createDirectoryLockCallback());
-        org = Organization::open(std::unique_ptr<TransactionalDirectory>(
-            new TransactionalDirectory(fs)));
-      } else {
-        mode = OrganizationTab::Mode::New;
-        org.reset(new Organization(
-            Uuid::createRandom(), Version::fromString("0.1"),
-            mApp.getWorkspace().getSettings().userName.get(),
-            QDateTime::currentDateTime(), ElementName("New Organization"),
-            QString(), QString()));
-        if (copyFrom) {
-          mode = OrganizationTab::Mode::Duplicate;
-          auto fs = TransactionalFileSystem::openRO(fp, &askForRestoringBackup);
-          std::unique_ptr<Organization> src =
-              Organization::open(std::unique_ptr<TransactionalDirectory>(
-                  new TransactionalDirectory(fs)));
-          duplicateLibraryElement(*org, *src);
-        }
-      }
-      addTab(std::make_shared<OrganizationTab>(editor, std::move(org), mode));
-    } catch (const UserCanceled& e) {
-    } catch (const Exception& e) {
-      QMessageBox::critical(mWidget, tr("Error"), e.getMsg());
-    }
-  }
-}
-
-std::shared_ptr<SchematicTab> MainWindow::openSchematicTab(int projectIndex,
-                                                           int index) noexcept {
-  if (auto tab = switchToProjectTab<SchematicTab>(projectIndex, index)) {
-    return tab;
-  } else if (auto prjEditor = mApp.getProjects().value(projectIndex)) {
-    if (auto schEditor = prjEditor->getSchematics().value(index)) {
-      auto tab = std::make_shared<SchematicTab>(mApp, *schEditor);
-      addTab(tab);
-      return tab;
-    }
-  }
-  return nullptr;
-}
-
-void MainWindow::openBoard2dTab(int projectIndex, int index,
-                                bool switchToTab) noexcept {
-  if (!switchToProjectTab<Board2dTab>(projectIndex, index)) {
-    if (auto prjEditor = mApp.getProjects().value(projectIndex)) {
-      if (auto brdEditor = prjEditor->getBoards().value(index)) {
-        addTab(std::make_shared<Board2dTab>(mApp, *brdEditor), -1, -1,
-               switchToTab, switchToTab);
-      }
-    }
-  }
-}
-
-void MainWindow::requestComponentTab(const FilePath& fp) noexcept {
-  if (auto editor = mApp.openLibrary(fp.getParentDir().getParentDir())) {
-    openComponentTab(*editor, fp, false);
-  }
-}
-
-void MainWindow::requestPackageTab(const FilePath& fp) noexcept {
-  if (auto editor = mApp.openLibrary(fp.getParentDir().getParentDir())) {
-    openPackageTab(*editor, fp, false);
-  }
-}
-
-void MainWindow::openBoard3dTab(int projectIndex, int index) noexcept {
-  if (!switchToProjectTab<Board3dTab>(projectIndex, index)) {
-    if (auto prjEditor = mApp.getProjects().value(projectIndex)) {
-      if (auto brdEditor = prjEditor->getBoards().value(index)) {
-        addTab(std::make_shared<Board3dTab>(mApp, *brdEditor));
-      }
-    }
-  }
-}
-
 void MainWindow::updateHomeTabSection() noexcept {
   for (int i = 0; i < mSections->count(); ++i) {
     mSections->at(i)->setHomeTabVisible(i == 0);
   }
+}
+
+template <typename Element, typename Tab>
+void MainWindow::openLibraryElementTab(LibraryEditor& editor,
+                                       const FilePath& fp) noexcept {
+  if (!switchToLibraryElementTab<Tab>(fp)) {
+    try {
+      auto fs = TransactionalFileSystem::open(
+          fp, editor.isWritable(), &askForRestoringBackup,
+          DirectoryLockHandlerDialog::createDirectoryLockCallback());
+      std::unique_ptr<Element> obj =
+          Element::open(std::unique_ptr<TransactionalDirectory>(
+              new TransactionalDirectory(fs)));
+      addTab(std::make_shared<Tab>(editor, std::move(obj), Tab::Mode::Open));
+    } catch (const UserCanceled& e) {
+    } catch (const Exception& e) {
+      QMessageBox::critical(mWidget, tr("Error"), e.getMsg());
+    }
+  }
+}
+
+template <typename Element, typename Tab>
+bool MainWindow::openNewLibraryElementTab(
+    LibraryEditor& editor, const FilePath& duplicateFromFp,
+    const Element* duplicateFromObj,
+    std::function<std::unique_ptr<Element>()> factory) noexcept {
+  try {
+    auto obj = factory();
+    std::unique_ptr<Element> src;
+    if ((!duplicateFromObj) && duplicateFromFp.isValid()) {
+      auto fs = TransactionalFileSystem::openRO(duplicateFromFp,
+                                                &askForRestoringBackup);
+      src = Element::open(std::unique_ptr<TransactionalDirectory>(
+          new TransactionalDirectory(fs)));
+      duplicateFromObj = src.get();
+    }
+    if (duplicateFromObj) {
+      duplicateLibraryElement(*obj, *duplicateFromObj);
+    }
+    addTab(std::make_shared<Tab>(
+        editor, std::move(obj),
+        duplicateFromObj ? Tab::Mode::Duplicate : Tab::Mode::New));
+    return true;
+  } catch (const UserCanceled& e) {
+  } catch (const Exception& e) {
+    QMessageBox::critical(mWidget, tr("Error"), e.getMsg());
+  }
+  return false;
 }
 
 template <typename T>

@@ -90,22 +90,6 @@ public:
   // Operator Overloadings
   LibraryTab& operator=(const LibraryTab& rhs) = delete;
 
-signals:
-  void componentCategoryEditorRequested(LibraryEditor& editor,
-                                        const FilePath& fp, bool copyFrom);
-  void packageCategoryEditorRequested(LibraryEditor& editor, const FilePath& fp,
-                                      bool copyFrom);
-  void symbolEditorRequested(LibraryEditor& editor, const FilePath& fp,
-                             bool copyFrom);
-  void packageEditorRequested(LibraryEditor& editor, const FilePath& fp,
-                              bool copyFrom);
-  void componentEditorRequested(LibraryEditor& editor, const FilePath& fp,
-                                bool copyFrom);
-  void deviceEditorRequested(LibraryEditor& editor, const FilePath& fp,
-                             bool copyFrom);
-  void organizationEditorRequested(LibraryEditor& editor, const FilePath& fp,
-                                   bool copyFrom);
-
 protected:
   std::optional<std::pair<RuleCheckMessageList, QSet<SExpression>>>
       runChecksImpl() override;
