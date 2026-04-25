@@ -23,6 +23,7 @@
 #include "librarytab.h"
 
 #include "../../dialogs/filedialog.h"
+#include "../../mainwindow.h"
 #include "../../rulecheck/rulecheckmessagesmodel.h"
 #include "../../undostack.h"
 #include "../../utils/editortoolbox.h"
@@ -314,34 +315,34 @@ void LibraryTab::trigger(ui::TabAction a) noexcept {
       break;
     }
     case ui::TabAction::EditProperties: {
-      if (item && item->path.isValid()) {
+      if (item && item->path.isValid() && mWindow) {
         switch (item->type) {
           case ui::LibraryTreeViewItemType::ComponentCategory: {
-            emit componentCategoryEditorRequested(mEditor, item->path, false);
+            mWindow->openComponentCategoryTab(mEditor, item->path);
             break;
           }
           case ui::LibraryTreeViewItemType::PackageCategory: {
-            emit packageCategoryEditorRequested(mEditor, item->path, false);
+            mWindow->openPackageCategoryTab(mEditor, item->path);
             break;
           }
           case ui::LibraryTreeViewItemType::Symbol: {
-            emit symbolEditorRequested(mEditor, item->path, false);
+            mWindow->openSymbolTab(mEditor, item->path);
             break;
           }
           case ui::LibraryTreeViewItemType::Package: {
-            emit packageEditorRequested(mEditor, item->path, false);
+            mWindow->openPackageTab(mEditor, item->path);
             break;
           }
           case ui::LibraryTreeViewItemType::Component: {
-            emit componentEditorRequested(mEditor, item->path, false);
+            mWindow->openComponentTab(mEditor, item->path);
             break;
           }
           case ui::LibraryTreeViewItemType::Device: {
-            emit deviceEditorRequested(mEditor, item->path, false);
+            mWindow->openDeviceTab(mEditor, item->path);
             break;
           }
           case ui::LibraryTreeViewItemType::Organization: {
-            emit organizationEditorRequested(mEditor, item->path, false);
+            mWindow->openOrganizationTab(mEditor, item->path);
             break;
           }
           default: {
@@ -947,38 +948,38 @@ QList<std::shared_ptr<LibraryTab::TreeItem>> LibraryTab::getSelectedElements()
 
 void LibraryTab::duplicateElements(
     const QList<std::shared_ptr<TreeItem>>& items) noexcept {
-  if (items.count() != 1) {
+  if ((items.count() != 1) || (!mWindow)) {
     return;
   }
 
   auto item = items.first();
   switch (item->type) {
     case ui::LibraryTreeViewItemType::ComponentCategory: {
-      emit componentCategoryEditorRequested(mEditor, item->path, true);
+      mWindow->openNewComponentCategoryTab(mEditor, item->path);
       break;
     }
     case ui::LibraryTreeViewItemType::PackageCategory: {
-      emit packageCategoryEditorRequested(mEditor, item->path, true);
+      mWindow->openNewPackageCategoryTab(mEditor, item->path);
       break;
     }
     case ui::LibraryTreeViewItemType::Symbol: {
-      emit symbolEditorRequested(mEditor, item->path, true);
+      mWindow->openNewSymbolTab(mEditor, item->path);
       break;
     }
     case ui::LibraryTreeViewItemType::Package: {
-      emit packageEditorRequested(mEditor, item->path, true);
+      mWindow->openNewPackageTab(mEditor, item->path);
       break;
     }
     case ui::LibraryTreeViewItemType::Component: {
-      emit componentEditorRequested(mEditor, item->path, true);
+      mWindow->openNewComponentTab(mEditor, item->path);
       break;
     }
     case ui::LibraryTreeViewItemType::Device: {
-      emit deviceEditorRequested(mEditor, item->path, true);
+      mWindow->openNewDeviceTab(mEditor, item->path);
       break;
     }
     case ui::LibraryTreeViewItemType::Organization: {
-      emit organizationEditorRequested(mEditor, item->path, true);
+      mWindow->openNewOrganizationTab(mEditor, item->path);
       break;
     }
     default: {
