@@ -122,6 +122,54 @@ std::shared_ptr<const ComponentSymbolVariantItem> Component::getSymbVarItem(
  *  General Methods
  ******************************************************************************/
 
+void Component::duplicateFrom(const Component& other) {
+  LibraryElement::duplicateFrom(other);
+  setIsSchematicOnly(other.isSchematicOnly());
+  setDefaultValue(other.getDefaultValue());
+  setPrefixes(other.getPrefixes());
+  mAttributes = other.getAttributes();
+
+  // Copy signals but generate new UUIDs.
+  mSignals.clear();
+  QHash<Uuid, Uuid> signalUuidMap;
+  for (const ComponentSignal& signal : other.getSignals()) {
+    const Uuid newUuid = Uuid::createRandom();
+    signalUuidMap.insert(signal.getUuid(), newUuid);
+    mSignals.append(std::make_shared<ComponentSignal>(
+        newUuid, signal.getName(), signal.getRole(), signal.getForcedNetName(),
+        signal.isRequired(), signal.isNegated(), signal.isClock()));
+  }
+
+  // Copy symbol variants but generate new UUIDs.
+  mSymbolVariants.clear();
+  for (const ComponentSymbolVariant& var : other.getSymbolVariants()) {
+    // don't copy translations as they would need to be adjusted anyway
+    std::shared_ptr<ComponentSymbolVariant> copy(new ComponentSymbolVariant(
+        Uuid::createRandom(), var.getNorm(), var.getNames().getDefaultValue(),
+        var.getDescriptions().getDefaultValue()));
+    // Copy gates.
+    for (const ComponentSymbolVariantItem& item : var.getSymbolItems()) {
+      std::shared_ptr<ComponentSymbolVariantItem> gateCopy(
+          new ComponentSymbolVariantItem(
+              Uuid::createRandom(), item.getSymbolUuid(),
+              item.getSymbolPosition(), item.getSymbolRotation(),
+              item.isRequired(), item.getSuffix()));
+      // Copy pin-signal-map.
+      for (const ComponentPinSignalMapItem& map : item.getPinSignalMap()) {
+        std::optional<Uuid> signal = map.getSignalUuid();
+        if (signal) {
+          signal = *signalUuidMap.find(*map.getSignalUuid());
+        }
+        gateCopy->getPinSignalMap().append(
+            std::make_shared<ComponentPinSignalMapItem>(
+                map.getPinUuid(), signal, map.getDisplayType()));
+      }
+      copy->getSymbolItems().append(gateCopy);
+    }
+    mSymbolVariants.append(copy);
+  }
+}
+
 RuleCheckMessageList Component::runChecks() const {
   ComponentCheck check(*this);
   return check.runChecks();  // can throw

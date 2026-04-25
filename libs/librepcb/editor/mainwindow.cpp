@@ -129,6 +129,13 @@ static LocalizedNameMap copyLibraryElementNames(const LocalizedNameMap& names) {
   return LocalizedNameMap(names.getDefaultValue());
 }
 
+template <typename T>
+static void duplicateLibraryElement(T& element, const T& other) {
+  element.duplicateFrom(other);
+  element.setCreated(QDateTime::currentDateTime());
+  element.setNames(copyLibraryElementNames(other.getNames()));
+}
+
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
@@ -1022,11 +1029,7 @@ void MainWindow::openComponentCategoryTab(LibraryEditor& editor,
           std::unique_ptr<ComponentCategory> src =
               ComponentCategory::open(std::unique_ptr<TransactionalDirectory>(
                   new TransactionalDirectory(fs)));
-          cat->setNames(copyLibraryElementNames(src->getNames()));
-          cat->setDescriptions(src->getDescriptions());
-          cat->setKeywords(src->getKeywords());
-          cat->setMessageApprovals(src->getMessageApprovals());
-          cat->setParentUuid(src->getParentUuid());
+          duplicateLibraryElement(*cat, *src);
         }
       }
       addTab(
@@ -1064,11 +1067,7 @@ void MainWindow::openPackageCategoryTab(LibraryEditor& editor,
           std::unique_ptr<PackageCategory> src =
               PackageCategory::open(std::unique_ptr<TransactionalDirectory>(
                   new TransactionalDirectory(fs)));
-          cat->setNames(copyLibraryElementNames(src->getNames()));
-          cat->setDescriptions(src->getDescriptions());
-          cat->setKeywords(src->getKeywords());
-          cat->setMessageApprovals(src->getMessageApprovals());
-          cat->setParentUuid(src->getParentUuid());
+          duplicateLibraryElement(*cat, *src);
         }
       }
       addTab(
@@ -1104,56 +1103,7 @@ void MainWindow::openSymbolTab(LibraryEditor& editor, const FilePath& fp,
           std::unique_ptr<Symbol> src =
               Symbol::open(std::unique_ptr<TransactionalDirectory>(
                   new TransactionalDirectory(fs)));
-          sym->setNames(copyLibraryElementNames(src->getNames()));
-          sym->setDescriptions(src->getDescriptions());
-          sym->setKeywords(src->getKeywords());
-          sym->setMessageApprovals(src->getMessageApprovals());
-          sym->setCategories(src->getCategories());
-          sym->setResources(src->getResources());
-          sym->setGridInterval(src->getGridInterval());
-          QSet<QString> filesToCopy;
-          // Copy pins but generate new UUIDs.
-          for (const SymbolPin& pin : src->getPins()) {
-            sym->getPins().append(std::make_shared<SymbolPin>(
-                Uuid::createRandom(), pin.getName(), pin.getPosition(),
-                pin.getLength(), pin.getRotation(), pin.getNamePosition(),
-                pin.getNameRotation(), pin.getNameHeight(),
-                pin.getNameAlignment()));
-          }
-          // Copy polygons but generate new UUIDs.
-          for (const Polygon& polygon : src->getPolygons()) {
-            sym->getPolygons().append(std::make_shared<Polygon>(
-                Uuid::createRandom(), polygon.getLayer(),
-                polygon.getLineWidth(), polygon.isFilled(),
-                polygon.isGrabArea(), polygon.getPath()));
-          }
-          // Copy circles but generate new UUIDs.
-          for (const Circle& circle : src->getCircles()) {
-            sym->getCircles().append(std::make_shared<Circle>(
-                Uuid::createRandom(), circle.getLayer(), circle.getLineWidth(),
-                circle.isFilled(), circle.isGrabArea(), circle.getCenter(),
-                circle.getDiameter()));
-          }
-          // Copy texts but generate new UUIDs.
-          for (const Text& text : src->getTexts()) {
-            sym->getTexts().append(std::make_shared<Text>(
-                Uuid::createRandom(), text.getLayer(), text.getText(),
-                text.getPosition(), text.getRotation(), text.getHeight(),
-                text.getAlign(), text.isLocked()));
-          }
-          // Copy images but generate new UUIDs.
-          for (const Image& image : src->getImages()) {
-            sym->getImages().append(
-                std::make_shared<Image>(Uuid::createRandom(), image));
-            filesToCopy.insert(*image.getFileName());
-          }
-          // Copy all referenced files.
-          for (const QString& fileName : filesToCopy) {
-            if (src->getDirectory().fileExists(fileName)) {
-              sym->getDirectory().write(fileName,
-                                        src->getDirectory().read(fileName));
-            }
-          }
+          duplicateLibraryElement(*sym, *src);
         }
       }
       addTab(std::make_shared<SymbolTab>(editor, std::move(sym), mode));
@@ -1189,104 +1139,7 @@ void MainWindow::openPackageTab(LibraryEditor& editor, const FilePath& fp,
           std::unique_ptr<Package> src =
               Package::open(std::unique_ptr<TransactionalDirectory>(
                   new TransactionalDirectory(fs)));
-          pkg->setNames(copyLibraryElementNames(src->getNames()));
-          pkg->setDescriptions(src->getDescriptions());
-          pkg->setKeywords(src->getKeywords());
-          pkg->setMessageApprovals(src->getMessageApprovals());
-          pkg->setCategories(src->getCategories());
-          pkg->setResources(src->getResources());
-          pkg->setAssemblyType(src->getAssemblyType(false));
-          pkg->setGridInterval(src->getGridInterval());
-          pkg->setMinCopperClearance(src->getMinCopperClearance());
-          // Copy pads but generate new UUIDs.
-          QHash<Uuid, std::optional<Uuid>> padUuidMap;
-          for (const PackagePad& pad : src->getPads()) {
-            const Uuid newUuid = Uuid::createRandom();
-            padUuidMap.insert(pad.getUuid(), newUuid);
-            pkg->getPads().append(
-                std::make_shared<PackagePad>(newUuid, pad.getName()));
-          }
-          // Copy 3D models but generate new UUIDs.
-          QHash<Uuid, std::optional<Uuid>> modelsUuidMap;
-          for (const PackageModel& model : src->getModels()) {
-            auto newModel = std::make_shared<PackageModel>(Uuid::createRandom(),
-                                                           model.getName());
-            modelsUuidMap.insert(model.getUuid(), newModel->getUuid());
-            pkg->getModels().append(newModel);
-            const QByteArray fileContent =
-                src->getDirectory().readIfExists(model.getFileName());
-            if (!fileContent.isNull()) {
-              pkg->getDirectory().write(newModel->getFileName(), fileContent);
-            }
-          }
-          // Copy footprints but generate new UUIDs.
-          for (const Footprint& footprint : src->getFootprints()) {
-            // Don't copy translations as they would need to be adjusted anyway.
-            std::shared_ptr<Footprint> newFootprint(new Footprint(
-                Uuid::createRandom(), footprint.getNames().getDefaultValue(),
-                footprint.getDescriptions().getDefaultValue()));
-            newFootprint->setModelPosition(footprint.getModelPosition());
-            newFootprint->setModelRotation(footprint.getModelRotation());
-            // Copy models but with the new UUIDs.
-            QSet<Uuid> models;
-            foreach (const Uuid& uuid, footprint.getModels()) {
-              if (auto newUuid = modelsUuidMap.value(uuid)) {
-                models.insert(*newUuid);
-              }
-            }
-            newFootprint->setModels(models);
-            // Copy pads but generate new UUIDs.
-            for (const FootprintPad& pad : footprint.getPads()) {
-              std::optional<Uuid> pkgPad = pad.getPackagePadUuid();
-              if (pkgPad) {
-                pkgPad = padUuidMap.value(*pkgPad);  // Translate to new UUID
-              }
-              newFootprint->getPads().append(std::make_shared<FootprintPad>(
-                  Uuid::createRandom(), pkgPad, pad.getPosition(),
-                  pad.getRotation(), pad.getShape(), pad.getWidth(),
-                  pad.getHeight(), pad.getRadius(), pad.getCustomShapeOutline(),
-                  pad.getStopMaskConfig(), pad.getSolderPasteConfig(),
-                  pad.getCopperClearance(), pad.getComponentSide(),
-                  pad.getFunction(), pad.getHoles()));
-            }
-            // Copy polygons but generate new UUIDs.
-            for (const Polygon& polygon : footprint.getPolygons()) {
-              newFootprint->getPolygons().append(std::make_shared<Polygon>(
-                  Uuid::createRandom(), polygon.getLayer(),
-                  polygon.getLineWidth(), polygon.isFilled(),
-                  polygon.isGrabArea(), polygon.getPath()));
-            }
-            // Copy circles but generate new UUIDs.
-            for (const Circle& circle : footprint.getCircles()) {
-              newFootprint->getCircles().append(std::make_shared<Circle>(
-                  Uuid::createRandom(), circle.getLayer(),
-                  circle.getLineWidth(), circle.isFilled(), circle.isGrabArea(),
-                  circle.getCenter(), circle.getDiameter()));
-            }
-            // Copy stroke texts but generate new UUIDs.
-            for (const StrokeText& text : footprint.getStrokeTexts()) {
-              newFootprint->getStrokeTexts().append(
-                  std::make_shared<StrokeText>(
-                      Uuid::createRandom(), text.getLayer(), text.getText(),
-                      text.getPosition(), text.getRotation(), text.getHeight(),
-                      text.getStrokeWidth(), text.getLetterSpacing(),
-                      text.getLineSpacing(), text.getAlign(),
-                      text.getMirrored(), text.getAutoRotate(),
-                      text.isLocked()));
-            }
-            // Copy zones but generate new UUIDs.
-            for (const Zone& zone : footprint.getZones()) {
-              newFootprint->getZones().append(
-                  std::make_shared<Zone>(Uuid::createRandom(), zone));
-            }
-            // Copy holes but generate new UUIDs.
-            for (const Hole& hole : footprint.getHoles()) {
-              newFootprint->getHoles().append(std::make_shared<Hole>(
-                  Uuid::createRandom(), hole.getDiameter(), hole.getPath(),
-                  hole.getStopMaskConfig()));
-            }
-            pkg->getFootprints().append(newFootprint);
-          }
+          duplicateLibraryElement(*pkg, *src);
         } else {
           pkg->getFootprints().append(std::make_shared<Footprint>(
               Uuid::createRandom(), ElementName("default"), ""));
@@ -1325,57 +1178,7 @@ void MainWindow::openComponentTab(LibraryEditor& editor, const FilePath& fp,
           std::unique_ptr<Component> src =
               Component::open(std::unique_ptr<TransactionalDirectory>(
                   new TransactionalDirectory(fs)));
-          cmp->setNames(copyLibraryElementNames(src->getNames()));
-          cmp->setDescriptions(src->getDescriptions());
-          cmp->setKeywords(src->getKeywords());
-          cmp->setMessageApprovals(src->getMessageApprovals());
-          cmp->setCategories(src->getCategories());
-          cmp->setResources(src->getResources());
-          cmp->setIsSchematicOnly(src->isSchematicOnly());
-          cmp->getAttributes() = src->getAttributes();
-          cmp->setDefaultValue(src->getDefaultValue());
-          cmp->setPrefixes(src->getPrefixes());
-          // Copy signals but generate new UUIDs.
-          QHash<Uuid, Uuid> signalUuidMap;
-          for (const ComponentSignal& signal : src->getSignals()) {
-            const Uuid newUuid = Uuid::createRandom();
-            signalUuidMap.insert(signal.getUuid(), newUuid);
-            cmp->getSignals().append(std::make_shared<ComponentSignal>(
-                newUuid, signal.getName(), signal.getRole(),
-                signal.getForcedNetName(), signal.isRequired(),
-                signal.isNegated(), signal.isClock()));
-          }
-          // Copy symbol variants but generate new UUIDs.
-          for (const ComponentSymbolVariant& var : src->getSymbolVariants()) {
-            // don't copy translations as they would need to be adjusted anyway
-            std::shared_ptr<ComponentSymbolVariant> copy(
-                new ComponentSymbolVariant(
-                    Uuid::createRandom(), var.getNorm(),
-                    var.getNames().getDefaultValue(),
-                    var.getDescriptions().getDefaultValue()));
-            // Copy gates.
-            for (const ComponentSymbolVariantItem& item :
-                 var.getSymbolItems()) {
-              std::shared_ptr<ComponentSymbolVariantItem> gateCopy(
-                  new ComponentSymbolVariantItem(
-                      Uuid::createRandom(), item.getSymbolUuid(),
-                      item.getSymbolPosition(), item.getSymbolRotation(),
-                      item.isRequired(), item.getSuffix()));
-              // Copy pin-signal-map.
-              for (const ComponentPinSignalMapItem& map :
-                   item.getPinSignalMap()) {
-                std::optional<Uuid> signal = map.getSignalUuid();
-                if (signal) {
-                  signal = *signalUuidMap.find(*map.getSignalUuid());
-                }
-                gateCopy->getPinSignalMap().append(
-                    std::make_shared<ComponentPinSignalMapItem>(
-                        map.getPinUuid(), signal, map.getDisplayType()));
-              }
-              copy->getSymbolItems().append(gateCopy);
-            }
-            cmp->getSymbolVariants().append(copy);
-          }
+          duplicateLibraryElement(*cmp, *src);
         } else {
           cmp->getSymbolVariants().append(
               std::make_shared<ComponentSymbolVariant>(
@@ -1415,17 +1218,7 @@ void MainWindow::openDeviceTab(LibraryEditor& editor, const FilePath& fp,
           std::unique_ptr<Device> src =
               Device::open(std::unique_ptr<TransactionalDirectory>(
                   new TransactionalDirectory(fs)));
-          dev->setNames(copyLibraryElementNames(src->getNames()));
-          dev->setDescriptions(src->getDescriptions());
-          dev->setKeywords(src->getKeywords());
-          dev->setMessageApprovals(src->getMessageApprovals());
-          dev->setCategories(src->getCategories());
-          dev->setResources(src->getResources());
-          dev->setComponentUuid(src->getComponentUuid());
-          dev->setPackageUuid(src->getPackageUuid());
-          dev->getPadSignalMap() = src->getPadSignalMap();
-          dev->getAttributes() = src->getAttributes();
-          dev->getParts() = src->getParts();
+          duplicateLibraryElement(*dev, *src);
         }
       }
       addTab(std::make_shared<DeviceTab>(editor, std::move(dev), mode));
@@ -1461,21 +1254,7 @@ void MainWindow::openOrganizationTab(LibraryEditor& editor, const FilePath& fp,
           std::unique_ptr<Organization> src =
               Organization::open(std::unique_ptr<TransactionalDirectory>(
                   new TransactionalDirectory(fs)));
-          org->setNames(copyLibraryElementNames(src->getNames()));
-          org->setDescriptions(src->getDescriptions());
-          org->setKeywords(src->getKeywords());
-          org->setMessageApprovals(src->getMessageApprovals());
-          org->setLogoPng(src->getLogoPng());
-          org->setUrl(src->getUrl());
-          org->setCountry(src->getCountry());
-          org->setFabs(src->getFabs());
-          org->setShipping(src->getShipping());
-          org->setIsSponsor(src->isSponsor());
-          org->setPriority(src->getPriority());
-          org->setPcbDesignRules(src->getPcbDesignRules());
-          org->setPcbOutputJobs(src->getPcbOutputJobs());
-          org->setAssemblyOutputJobs(src->getAssemblyOutputJobs());
-          org->setUserOutputJobs(src->getUserOutputJobs());
+          duplicateLibraryElement(*org, *src);
         }
       }
       addTab(std::make_shared<OrganizationTab>(editor, std::move(org), mode));

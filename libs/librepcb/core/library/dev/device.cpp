@@ -84,6 +84,15 @@ void Device::setPackageUuid(const Uuid& uuid) noexcept {
  *  General Methods
  ******************************************************************************/
 
+void Device::duplicateFrom(const Device& other) {
+  LibraryElement::duplicateFrom(other);
+  setComponentUuid(other.getComponentUuid());
+  setPackageUuid(other.getPackageUuid());
+  mPadSignalMap = other.getPadSignalMap();
+  mAttributes = other.getAttributes();
+  mParts = other.getParts();
+}
+
 RuleCheckMessageList Device::runChecks() const {
   DeviceCheck check(*this);
   return check.runChecks();  // can throw

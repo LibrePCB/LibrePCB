@@ -129,6 +129,7 @@ public:
   }
 
   // General Methods
+  void duplicateFrom(const Package& other);
   virtual RuleCheckMessageList runChecks() const override;
 
   // Operator Overloadings

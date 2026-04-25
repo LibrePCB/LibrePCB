@@ -104,6 +104,7 @@ public:
   bool setMessageApproved(const SExpression& approval, bool approved) noexcept;
 
   // General Methods
+  void duplicateFrom(const LibraryBaseElement& other);
   virtual RuleCheckMessageList runChecks() const;
   virtual void save();
   virtual void saveTo(TransactionalDirectory& dest);

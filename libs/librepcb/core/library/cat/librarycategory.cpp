@@ -59,6 +59,11 @@ LibraryCategory::~LibraryCategory() noexcept {
  *  General Methods
  ******************************************************************************/
 
+void LibraryCategory::duplicateFrom(const LibraryCategory& other) {
+  LibraryBaseElement::duplicateFrom(other);
+  setParentUuid(other.getParentUuid());
+}
+
 RuleCheckMessageList LibraryCategory::runChecks() const {
   LibraryCategoryCheck check(*this);
   return check.runChecks();  // can throw

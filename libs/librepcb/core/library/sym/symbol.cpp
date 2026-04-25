@@ -97,6 +97,61 @@ bool Symbol::isEmpty() const noexcept {
       mTexts.isEmpty() && mImages.isEmpty();
 }
 
+void Symbol::duplicateFrom(const Symbol& other) {
+  LibraryElement::duplicateFrom(other);
+  setGridInterval(other.getGridInterval());
+
+  // Copy pins but generate new UUIDs.
+  mPins.clear();
+  for (const SymbolPin& pin : other.getPins()) {
+    mPins.append(std::make_shared<SymbolPin>(
+        Uuid::createRandom(), pin.getName(), pin.getPosition(), pin.getLength(),
+        pin.getRotation(), pin.getNamePosition(), pin.getNameRotation(),
+        pin.getNameHeight(), pin.getNameAlignment()));
+  }
+
+  // Copy polygons but generate new UUIDs.
+  mPolygons.clear();
+  for (const Polygon& polygon : other.getPolygons()) {
+    mPolygons.append(std::make_shared<Polygon>(
+        Uuid::createRandom(), polygon.getLayer(), polygon.getLineWidth(),
+        polygon.isFilled(), polygon.isGrabArea(), polygon.getPath()));
+  }
+
+  // Copy circles but generate new UUIDs.
+  mCircles.clear();
+  for (const Circle& circle : other.getCircles()) {
+    mCircles.append(std::make_shared<Circle>(
+        Uuid::createRandom(), circle.getLayer(), circle.getLineWidth(),
+        circle.isFilled(), circle.isGrabArea(), circle.getCenter(),
+        circle.getDiameter()));
+  }
+
+  // Copy texts but generate new UUIDs.
+  mTexts.clear();
+  for (const Text& text : other.getTexts()) {
+    mTexts.append(std::make_shared<Text>(Uuid::createRandom(), text.getLayer(),
+                                         text.getText(), text.getPosition(),
+                                         text.getRotation(), text.getHeight(),
+                                         text.getAlign(), text.isLocked()));
+  }
+
+  // Copy images but generate new UUIDs.
+  mImages.clear();
+  QSet<QString> filesToCopy;
+  for (const Image& image : other.getImages()) {
+    mImages.append(std::make_shared<Image>(Uuid::createRandom(), image));
+    filesToCopy.insert(*image.getFileName());
+  }
+
+  // Copy all referenced files.
+  for (const QString& fileName : filesToCopy) {
+    if (other.getDirectory().fileExists(fileName)) {
+      mDirectory->write(fileName, other.getDirectory().read(fileName));
+    }
+  }
+}
+
 RuleCheckMessageList Symbol::runChecks() const {
   SymbolCheck check(*this);
   return check.runChecks();  // can throw

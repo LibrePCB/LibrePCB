@@ -104,6 +104,7 @@ public:
   }
 
   // General Methods
+  void duplicateFrom(const Organization& other);
   virtual RuleCheckMessageList runChecks() const override;
   virtual void save() override;
 
