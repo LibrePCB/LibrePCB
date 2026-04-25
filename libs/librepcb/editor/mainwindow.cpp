@@ -807,7 +807,7 @@ void MainWindow::triggerLibraryElement(slint::SharedString path,
     }
     case ui::LibraryElementAction::Close: {
       if (auto lib = mApp.getLibrary(fp)) {
-        if (lib->requestClose()) {
+        if (lib->requestCloseAllTabs()) {
           mApp.closeLibrary(fp);
         }
       }
@@ -1031,6 +1031,7 @@ void MainWindow::openComponentCategoryTab(LibraryEditor& editor,
       }
       addTab(
           std::make_shared<ComponentCategoryTab>(editor, std::move(cat), mode));
+    } catch (const UserCanceled& e) {
     } catch (const Exception& e) {
       QMessageBox::critical(mWidget, tr("Error"), e.getMsg());
     }
@@ -1072,6 +1073,7 @@ void MainWindow::openPackageCategoryTab(LibraryEditor& editor,
       }
       addTab(
           std::make_shared<PackageCategoryTab>(editor, std::move(cat), mode));
+    } catch (const UserCanceled& e) {
     } catch (const Exception& e) {
       QMessageBox::critical(mWidget, tr("Error"), e.getMsg());
     }
@@ -1155,6 +1157,7 @@ void MainWindow::openSymbolTab(LibraryEditor& editor, const FilePath& fp,
         }
       }
       addTab(std::make_shared<SymbolTab>(editor, std::move(sym), mode));
+    } catch (const UserCanceled& e) {
     } catch (const Exception& e) {
       QMessageBox::critical(mWidget, tr("Error"), e.getMsg());
     }
@@ -1290,6 +1293,7 @@ void MainWindow::openPackageTab(LibraryEditor& editor, const FilePath& fp,
         }
       }
       addTab(std::make_shared<PackageTab>(editor, std::move(pkg), mode));
+    } catch (const UserCanceled& e) {
     } catch (const Exception& e) {
       QMessageBox::critical(mWidget, tr("Error"), e.getMsg());
     }
@@ -1379,6 +1383,7 @@ void MainWindow::openComponentTab(LibraryEditor& editor, const FilePath& fp,
         }
       }
       addTab(std::make_shared<ComponentTab>(editor, std::move(cmp), mode));
+    } catch (const UserCanceled& e) {
     } catch (const Exception& e) {
       QMessageBox::critical(mWidget, tr("Error"), e.getMsg());
     }
@@ -1424,6 +1429,7 @@ void MainWindow::openDeviceTab(LibraryEditor& editor, const FilePath& fp,
         }
       }
       addTab(std::make_shared<DeviceTab>(editor, std::move(dev), mode));
+    } catch (const UserCanceled& e) {
     } catch (const Exception& e) {
       QMessageBox::critical(mWidget, tr("Error"), e.getMsg());
     }
@@ -1473,6 +1479,7 @@ void MainWindow::openOrganizationTab(LibraryEditor& editor, const FilePath& fp,
         }
       }
       addTab(std::make_shared<OrganizationTab>(editor, std::move(org), mode));
+    } catch (const UserCanceled& e) {
     } catch (const Exception& e) {
       QMessageBox::critical(mWidget, tr("Error"), e.getMsg());
     }

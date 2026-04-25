@@ -175,6 +175,12 @@ class ElementQuery:
         else:
             self.wait(1)
 
+    def __len__(self):
+        """
+        Get the number of results
+        """
+        return len(self._results)
+
     def __getitem__(self, index):
         """
         Get a particular result by index (an `Element` object)

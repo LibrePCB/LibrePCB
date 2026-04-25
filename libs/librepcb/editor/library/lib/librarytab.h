@@ -85,6 +85,7 @@ public:
   ui::LibraryTabData getDerivedUiData() const noexcept;
   void setDerivedUiData(const ui::LibraryTabData& data) noexcept;
   void trigger(ui::TabAction a) noexcept override;
+  bool requestClose() noexcept override;
 
   // Operator Overloadings
   LibraryTab& operator=(const LibraryTab& rhs) = delete;

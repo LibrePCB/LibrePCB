@@ -117,6 +117,14 @@ LibraryTab::LibraryTab(LibraryEditor& editor, bool wizardMode,
 }
 
 LibraryTab::~LibraryTab() noexcept {
+  // If this was the last library tab, discard any unsaved changes in the
+  // library since the library editor might still be kept open, and a new
+  // library tab may be opened in future. That new tab shall then start with
+  // an empty undo stack.
+  if (mEditor.getNumberOfLibraryTabs() <= 1) {
+    mEditor.discardUnsavedChanges();
+  }
+
   deactivate();
 
   mUndoStack.release();  // We have "borrowed" it from the library editor...
@@ -395,14 +403,28 @@ void LibraryTab::trigger(ui::TabAction a) noexcept {
       break;
     }
     case ui::TabAction::Close: {
-      commitUiData();
-      WindowTab::trigger(a);
+      // Note: The LibraryEditor might still be kept open even when closing
+      // the library overview tab. However, it would be a bit counter-intuitive
+      // if this tab can be closed without saving the modifications. Let's make
+      // it behave identical to all the other library editor tabs.
+      if (requestClose()) {
+        WindowTab::trigger(a);
+      }
       break;
     }
     default: {
       WindowTab::trigger(a);
       break;
     }
+  }
+}
+
+bool LibraryTab::requestClose() noexcept {
+  commitUiData();
+  if (mEditor.getNumberOfLibraryTabs() > 1) {
+    return true;  // Still other library tabs open.
+  } else {
+    return mEditor.requestCloseLibrary();  // This was the last library tab.
   }
 }
 
