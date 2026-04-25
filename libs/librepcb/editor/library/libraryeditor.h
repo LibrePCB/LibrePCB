@@ -134,6 +134,7 @@ public:
 signals:
   void uiIndexChanged();
   void manualModificationsMade();
+  void closeRequested();
   void aboutToBeDestroyed();
 
 private:

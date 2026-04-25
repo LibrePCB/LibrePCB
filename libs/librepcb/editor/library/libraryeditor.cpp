@@ -195,6 +195,13 @@ void LibraryEditor::registerTab(LibraryEditorTab& tab) noexcept {
 void LibraryEditor::unregisterTab(LibraryEditorTab& tab) noexcept {
   Q_ASSERT(mRegisteredTabs.contains(&tab));
   mRegisteredTabs.removeAll(&tab);
+
+  // When closing the last tab of this library, automatically close the library
+  // editor too, to avoid spamming the documents panel with lots of opened
+  // libraries, required to be manually closed by the used.
+  if (mRegisteredTabs.isEmpty() && (!hasUnsavedChanges())) {
+    emit closeRequested();
+  }
 }
 
 void LibraryEditor::forceClosingTabs(const QSet<FilePath>& fp) noexcept {
