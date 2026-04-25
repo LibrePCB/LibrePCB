@@ -607,6 +607,7 @@ component PackageEditorTab inherits TouchArea {
                 checked: tabs[index].tool == EditorTool.arc;
                 enabled: footprint-selected && (!read-only);
                 is-first: false;
+                is-last: false;
 
                 clicked => {
                     tool-triggered(TabAction.tool-arc);
@@ -827,7 +828,7 @@ component PackageEditorTab inherits TouchArea {
 
         zoom-fit-btn := SceneButton {
             x: parent.width - self.width;
-            icon: @image-url("../../../../font-awesome/svgs/solid/expand.svg");
+            command: Cmd.zoom-fit-content;
             icon-scale: 0.9;
             base-color: tabs[index].background-color;
             base-text-color: tabs[index].foreground-color;
@@ -840,7 +841,7 @@ component PackageEditorTab inherits TouchArea {
 
         zoom-in-btn := SceneButton {
             x: parent.width - self.width;
-            icon: @image-url("../../../../bootstrap-icons/icons/zoom-in.svg");
+            command: Cmd.zoom-in;
             base-color: tabs[index].background-color;
             base-text-color: tabs[index].foreground-color;
             enabled: footprint-selected;
@@ -852,7 +853,7 @@ component PackageEditorTab inherits TouchArea {
 
         zoom-out-btn := SceneButton {
             x: parent.width - self.width;
-            icon: @image-url("../../../../bootstrap-icons/icons/zoom-out.svg");
+            command: Cmd.zoom-out;
             base-color: tabs[index].background-color;
             base-text-color: tabs[index].foreground-color;
             enabled: footprint-selected;
