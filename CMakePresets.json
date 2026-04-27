@@ -11,9 +11,6 @@
         "CMAKE_CXX_COMPILER": "clazy",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
         "BUILD_TESTS": "OFF"
-      },
-      "environment": {
-        "CLAZY_CHECKS": "level0,level1,no-connect-by-name,no-connect-non-signal,no-connect-not-normalized,no-container-anti-pattern,no-empty-qstringliteral,no-fully-qualified-moc-types,no-lambda-in-connect,no-lambda-unique-connection,no-lowercase-qml-type-name,no-mutable-container-key,no-overloaded-signal,no-qcolor-from-literal,no-qdatetime-utc,no-qenums,no-qfileinfo-exists,no-qgetenv,no-qmap-with-pointer-key,no-qstring-arg,no-qstring-comparison-to-implicit-char,no-qstring-insensitive-allocation,no-qstring-ref,no-qt-macros,no-strict-iterators,no-temporary-iterator,no-unused-non-trivial-variable,no-use-static-qregularexpression,no-writing-to-temporary,no-wrong-qevent-cast,no-wrong-qglobalstatic,no-auto-unexpected-qstringbuilder,no-child-event-qobject-cast,no-connect-3arg-lambda,no-const-signal-or-slot,no-detaching-temporary,no-foreach,no-incorrect-emit,no-install-event-filter,no-non-pod-global-static,no-overridden-signal,no-post-event,no-qdeleteall,no-qhash-namespace,no-qlatin1string-non-ascii,no-qproperty-without-notify,no-qstring-left,no-range-loop-detach,no-range-loop-reference,no-returning-data-from-temporary,no-rule-of-two-soft,no-skipped-base-method,no-virtual-signal"
       }
     }
   ],
