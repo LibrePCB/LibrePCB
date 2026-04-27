@@ -279,6 +279,12 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
           mLocalLibraries.get(), &LibrariesModel::setOnlineVersions);
   connect(mRemoteLibraries.get(), &LibrariesModel::notificationEmitted,
           mNotifications.get(), &NotificationsModel::push);
+  connect(mRemoteLibraries.get(), &LibrariesModel::statusBarMessageChanged,
+          this, [this](const QString& message, int timeoutMs) {
+            for (auto window : *mWindows) {
+              window->showStatusBarMessage(message, timeoutMs);
+            }
+          });
   connect(mRemoteLibraries.get(), &LibrariesModel::aboutToUninstallLibrary,
           this, &GuiApplication::closeLibrary);
 

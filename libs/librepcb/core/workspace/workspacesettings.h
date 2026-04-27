@@ -245,6 +245,13 @@ public:
   WorkspaceSettingsItem_GenericValueList<QList<ApiEndpoint>, true> apiEndpoints;
 
   /**
+   * @brief Automatic update mode for libraries
+   *
+   * Default: ::librepcb::AutoUpdateMode::Install
+   */
+  WorkspaceSettingsItem_GenericValue<AutoUpdateMode> librariesAutoUpdateMode;
+
+  /**
    * @brief Enable auto-fetch of live parts information (through #apiEndpoints)
    *
    * Default: True
