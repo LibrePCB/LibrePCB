@@ -6,6 +6,7 @@ Files:
  apps/*
  cmake/*
  CMakeLists.txt
+ CMakePresets.json
  dev/*
  dist/*
  i18n/*
