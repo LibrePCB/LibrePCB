@@ -79,7 +79,6 @@ public:  // Types
   struct Context {
     Symbol& symbol;
     UndoStack& undoStack;
-    const bool readOnly;
     const LengthUnit& lengthUnit;
     SymbolEditorFsmAdapter& adapter;
   };

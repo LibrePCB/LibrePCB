@@ -26,6 +26,7 @@
 #include "../../graphics/graphicsscene.h"
 #include "../../graphics/slintgraphicsview.h"
 #include "../../guiapplication.h"
+#include "../../mainwindow.h"
 #include "../../rulecheck/rulecheckmessagesmodel.h"
 #include "../../undostack.h"
 #include "../../utils/editortoolbox.h"
@@ -95,6 +96,7 @@ SymbolTab::SymbolTab(LibraryEditor& editor, std::unique_ptr<Symbol> sym,
     mGridStyle(mApp.getWorkspace().getSettings().schematicGridStyle.get()),
     mUnit(LengthUnit::millimeters()),
     mChooseCategory(false),
+    mElementDuplicated(false),
     mCompactLayout(false),
     mFrameIndex(0),
     mNameParsed(mSymbol->getNames().getDefaultValue()),
@@ -147,8 +149,7 @@ SymbolTab::SymbolTab(LibraryEditor& editor, std::unique_ptr<Symbol> sym,
           [this]() { onDerivedUiDataChanged.notify(); });
 
   // Load finite state machine (FSM).
-  SymbolEditorFsm::Context fsmContext{*mSymbol, *mUndoStack, !isWritable(),
-                                      mUnit, *this};
+  SymbolEditorFsm::Context fsmContext{*mSymbol, *mUndoStack, mUnit, *this};
   mFsm.reset(new SymbolEditorFsm(fsmContext));
 
   // Apply workspace settings whenever they have been modified.
@@ -218,7 +219,7 @@ ui::TabData SymbolTab::getUiData() const noexcept {
   features.undo = toFs(mUndoStack->canUndo());
   features.redo = toFs(mUndoStack->canRedo());
   if ((!mWizardMode) && ((!mCompactLayout) || (mCurrentPageIndex == 1))) {
-    features.grid = toFs(isWritable());
+    features.grid = toFs(writable);
     features.zoom = toFs(true);
     features.import_graphics =
         toFs(mToolFeatures.testFlag(Feature::ImportGraphics));
@@ -291,6 +292,7 @@ ui::SymbolTabData SymbolTab::getDerivedUiData() const noexcept {
       l2s(mUnit),  // Unit
       !mModifiedWatchedFiles.isEmpty(),  // Watched files modified
       mIsInterfaceBroken,  // Interface broken
+      mElementDuplicated && (!mDeprecated),  // Element duplicated
       mMsgImportPins.getUiData(),  // Message "import pins"
       mTool,  // Tool
       q2s(mView->isPanning() ? Qt::ClosedHandCursor
@@ -373,6 +375,9 @@ void SymbolTab::setDerivedUiData(const ui::SymbolTabData& data) noexcept {
 
   // Messages
   mMsgImportPins.setUiData(data.import_pins_msg);
+  if (data.deprecated || (!data.element_duplicated_msg)) {
+    mElementDuplicated = false;
+  }
 
   // Tool
   if (const Layer* layer = mToolLayersQt.value(data.tool_layer.current_index)) {
@@ -436,6 +441,15 @@ void SymbolTab::trigger(ui::TabAction a) noexcept {
       save();
       break;
     }
+    case ui::TabAction::SaveAs: {  // Duplicate the library element.
+      commitUiData();  // Exits the current tool and releases the undo stack.
+      if (mWindow && mWindow->openNewSymbolTab(mEditor, {}, mSymbol.get())) {
+        undoBreakingChanges(mIsInterfaceBroken);
+        mElementDuplicated = true;
+        onDerivedUiDataChanged.notify();
+      }
+      break;
+    }
     case ui::TabAction::ReloadFromDisk: {
       try {
         reloadFromDisk();
@@ -460,6 +474,12 @@ void SymbolTab::trigger(ui::TabAction a) noexcept {
       } catch (const Exception& e) {
         QMessageBox::critical(getWindow(), tr("Error"), e.getMsg());
       }
+      break;
+    }
+    case ui::TabAction::Unlock: {
+      mAllowBreakingChanges = true;
+      onUiDataChanged.notify();
+      onDerivedUiDataChanged.notify();
       break;
     }
     case ui::TabAction::Close: {
@@ -681,17 +701,22 @@ bool SymbolTab::processSceneKeyReleased(
 bool SymbolTab::requestClose() noexcept {
   commitUiData();
 
-  if ((!hasUnsavedChanges()) || (!isWritable())) {
+  if (!hasUnsavedChanges()) {
     return true;  // Nothing to save.
   }
 
-  const QMessageBox::StandardButton choice = QMessageBox::question(
-      getWindow(), tr("Save Changes?"),
-      tr("The symbol '%1' contains unsaved changes.\n"
-         "Do you want to save them before closing it?")
-          .arg(*mSymbol->getNames().getDefaultValue()),
-      QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
-      QMessageBox::Yes);
+  QMessageBox::StandardButtons buttons = QMessageBox::No | QMessageBox::Cancel;
+  QMessageBox::StandardButton defaultButton = QMessageBox::Cancel;
+  if ((!mIsInterfaceBroken) || mAllowBreakingChanges) {
+    buttons |= QMessageBox::Yes;
+    defaultButton = QMessageBox::Yes;
+  }
+  const QMessageBox::StandardButton choice =
+      QMessageBox::question(getWindow(), tr("Save Changes?"),
+                            tr("The symbol '%1' contains unsaved changes.\n"
+                               "Do you want to save them before closing it?")
+                                .arg(*mSymbol->getNames().getDefaultValue()),
+                            buttons, defaultButton);
   if (choice == QMessageBox::Yes) {
     return save();
   } else if (choice == QMessageBox::No) {
@@ -744,6 +769,10 @@ bool SymbolTab::graphicsSceneRightMouseButtonReleased(
 /*******************************************************************************
  *  SymbolEditorFsmAdapter
  ******************************************************************************/
+
+bool SymbolTab::fsmIsWritable() const noexcept {
+  return isWritable();
+}
 
 QWidget* SymbolTab::fsmGetParentWidget() noexcept {
   return getWindow();
@@ -1484,7 +1513,9 @@ bool SymbolTab::autoFix(const MsgSymbolOriginNotInCenter& msg) {
  ******************************************************************************/
 
 bool SymbolTab::isWritable() const noexcept {
-  return mIsNewElement || mSymbol->getDirectory().isWritable();
+  return mIsNewElement ||
+      (mSymbol->getDirectory().isWritable() &&
+       ((!mIsInterfaceBroken) || mAllowBreakingChanges));
 }
 
 void SymbolTab::refreshUiData() noexcept {

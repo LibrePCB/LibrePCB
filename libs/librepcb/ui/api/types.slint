@@ -687,6 +687,7 @@ export enum TabAction {
 
     // General
     save,
+    save-as,
     reload-from-disk,
     print,
     export-image,
@@ -995,6 +996,7 @@ export struct SymbolTabData {
     // Messages
     files-modified: bool,  // From the file system watcher
     interface-broken-msg: bool,
+    element-duplicated-msg: bool,
     import-pins-msg: DismissableMessageData,
 
     // Data about the currently active tool

@@ -18,6 +18,7 @@ import {
 import {
     BreakingChangesMessageBanner,
     CheckErrorsMessageBanner,
+    ElementDuplicatedMessageBanner,
     FilesModifiedMessageBanner,
 } from "../messagebanners.slint";
 import {
@@ -662,6 +663,24 @@ export component SymbolTab inherits Tab {
 
         BreakingChangesMessageBanner {
             shown: tabs[index].interface-broken-msg;
+            unlocked: !read-only;
+
+            action-invoked(action) => {
+                Backend.trigger-tab(section-index, index, action);
+            }
+        }
+
+        ElementDuplicatedMessageBanner {
+            shown: tabs[index].element-duplicated-msg;
+
+            deprecate-clicked => {
+                tabs[index].deprecated = true;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+
+            cancel-clicked => {
+                tabs[index].element-duplicated-msg = false;
+            }
         }
 
         CheckErrorsMessageBanner {

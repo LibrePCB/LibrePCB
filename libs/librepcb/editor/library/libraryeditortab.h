@@ -72,6 +72,7 @@ public:
 protected:
   bool isPathOutsideLibDir() const noexcept;
   bool hasUnsavedChanges() const noexcept;
+  void undoBreakingChanges(const bool& interfaceBroken) noexcept;
   void setWatchedFiles(const TransactionalDirectory& dir,
                        const QSet<QString>& filenames) noexcept;
   virtual void watchedFilesModifiedChanged() noexcept {}
@@ -97,6 +98,7 @@ protected:
   LibraryEditor& mEditor;
   std::unique_ptr<UndoStack> mUndoStack;
   bool mManualModificationsMade;
+  bool mAllowBreakingChanges;  ///< Default false, sticks at true after enabling
 
   // Rule check
   QSet<SExpression> mSupportedApprovals;

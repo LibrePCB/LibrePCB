@@ -200,9 +200,11 @@ bool SymbolEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
       // get items under cursor
       QList<std::shared_ptr<QGraphicsItem>> items =
           findItemsAtPosition(mStartPos);
-      if (findPolygonVerticesAtPosition(mStartPos) && (!mContext.readOnly)) {
+      if (findPolygonVerticesAtPosition(mStartPos) &&
+          mAdapter.fsmIsWritable()) {
         setState(SubState::MOVING_POLYGON_VERTEX);
-      } else if (findImageHandleAtPosition(mStartPos) && (!mContext.readOnly)) {
+      } else if (findImageHandleAtPosition(mStartPos) &&
+                 mAdapter.fsmIsWritable()) {
         setState(SubState::RESIZING_IMAGE);
       } else if (items.isEmpty()) {
         // start selecting
@@ -260,7 +262,7 @@ bool SymbolEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
         scheduleUpdateAvailableFeatures();  // Selection might have changed.
 
         // Start moving, if not read only.
-        if (!mContext.readOnly) {
+        if (mAdapter.fsmIsWritable()) {
           Q_ASSERT(!mCmdDragSelectedItems);
           setState(SubState::MOVING);
         }
@@ -694,7 +696,7 @@ bool SymbolEditorState_Select::openContextMenuAtPos(const Point& pos) noexcept {
         int remainingVertices =
             polygon->getPath().getVertices().count() - vertices.count();
         aRemoveVertex->setEnabled((remainingVertices >= 2) &&
-                                  (!mContext.readOnly));
+                                  mAdapter.fsmIsWritable());
         mb.addAction(aRemoveVertex);
       }
 
@@ -703,7 +705,7 @@ bool SymbolEditorState_Select::openContextMenuAtPos(const Point& pos) noexcept {
         QAction* aAddVertex = cmd.vertexAdd.createAction(
             &menu, this,
             [=, this]() { startAddingPolygonVertex(polygon, lineIndex, pos); });
-        aAddVertex->setEnabled(!mContext.readOnly);
+        aAddVertex->setEnabled(mAdapter.fsmIsWritable());
         mb.addAction(aAddVertex);
       }
 
@@ -769,7 +771,7 @@ bool SymbolEditorState_Select::openPropertiesDialogOfItem(
     SymbolPinPropertiesDialog dialog(
         i->getPtr(), mContext.undoStack, getLengthUnit(),
         "symbol_editor/pin_properties_dialog", parentWidget());
-    dialog.setReadOnly(mContext.readOnly);
+    dialog.setReadOnly(!mAdapter.fsmIsWritable());
     dialog.exec();
     return true;
   } else if (auto i = std::dynamic_pointer_cast<TextGraphicsItem>(item)) {
@@ -777,7 +779,7 @@ bool SymbolEditorState_Select::openPropertiesDialogOfItem(
                                 getAllowedTextLayers(), getLengthUnit(),
                                 "symbol_editor/text_properties_dialog",
                                 parentWidget());
-    dialog.setReadOnly(mContext.readOnly);
+    dialog.setReadOnly(!mAdapter.fsmIsWritable());
     dialog.exec();
     return true;
   } else if (auto i = std::dynamic_pointer_cast<PolygonGraphicsItem>(item)) {
@@ -785,7 +787,7 @@ bool SymbolEditorState_Select::openPropertiesDialogOfItem(
         i->getObj(), mContext.undoStack, getAllowedCircleAndPolygonLayers(),
         getLengthUnit(), "symbol_editor/polygon_properties_dialog",
         parentWidget());
-    dialog.setReadOnly(mContext.readOnly);
+    dialog.setReadOnly(!mAdapter.fsmIsWritable());
     dialog.exec();
     return true;
   } else if (auto i = std::dynamic_pointer_cast<CircleGraphicsItem>(item)) {
@@ -793,7 +795,7 @@ bool SymbolEditorState_Select::openPropertiesDialogOfItem(
         i->getObj(), mContext.undoStack, getAllowedCircleAndPolygonLayers(),
         getLengthUnit(), "symbol_editor/circle_properties_dialog",
         parentWidget());
-    dialog.setReadOnly(mContext.readOnly);
+    dialog.setReadOnly(!mAdapter.fsmIsWritable());
     dialog.exec();
     return true;
   }
@@ -1105,7 +1107,7 @@ SymbolEditorFsmAdapter::Features
 
   if (mState != SubState::PASTING) {
     features |= SymbolEditorFsmAdapter::Feature::Select;
-    if (!mContext.readOnly) {
+    if (mAdapter.fsmIsWritable()) {
       features |= SymbolEditorFsmAdapter::Feature::ImportGraphics;
       if (SymbolClipboardData::isValid(qApp->clipboard()->mimeData()) ||
           ImageHelpers::isImageInClipboard()) {
@@ -1119,7 +1121,7 @@ SymbolEditorFsmAdapter::Features
     if (cmd.getSelectedItemsCount() > 0) {
       features |= SymbolEditorFsmAdapter::Feature::Copy;
       features |= SymbolEditorFsmAdapter::Feature::Properties;
-      if (!mContext.readOnly) {
+      if (mAdapter.fsmIsWritable()) {
         features |= SymbolEditorFsmAdapter::Feature::Cut;
         features |= SymbolEditorFsmAdapter::Feature::Remove;
         features |= SymbolEditorFsmAdapter::Feature::Rotate;

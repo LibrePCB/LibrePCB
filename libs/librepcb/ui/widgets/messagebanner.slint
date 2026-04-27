@@ -5,13 +5,16 @@ export component MessageBanner inherits Rectangle {
     in property <string> text;
     in property <color> text-color: Data.theme.warning-text;
 
+    // Do not directly animate the height, as it would also animate when the
+    // window is resized, which is annoying.
+    property <float> height-factor: shown ? 1 : 0;
+    animate height-factor { duration: 150ms; }
+
     width: 100%;
-    height: shown ? self.preferred-height : 0;
+    height: self.preferred-height * height-factor;
     background: Data.theme.warning;
     visible: self.height > 0;
     clip: true;
-
-    animate height { duration: 150ms; }
 
     VerticalLayout {
         padding: 5px;
