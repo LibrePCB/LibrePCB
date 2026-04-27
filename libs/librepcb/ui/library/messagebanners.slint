@@ -10,7 +10,11 @@ import {
 } from "../api.slint";
 
 export component BreakingChangesMessageBanner inherits MessageBanner {
-    in property <bool> unlocked;
+    in property <bool> is-new-element;
+    in property <bool> is-unlocked;
+    property <bool> can-unlock: is-new-element;
+    property <bool> unlock-btn-hovered: false;
+    property <string> unlock-hover-text: @tr("If you are 100% sure that this library element is not referenced from any other library elements or projects yet, you may click & hold this button to remove the write protection. In case it is already used, this can end up in a fiasco! If in doubt, create a duplicate.");
 
     background: Data.theme.error;
     text-color: Data.theme.error-text;
@@ -31,18 +35,40 @@ export component BreakingChangesMessageBanner inherits MessageBanner {
                 text: @tr("Attention").to-uppercase() + ": " + @tr("Some of the applied modifications are not backward-compatible!");
             }
 
-            Text {
+            if !is-unlocked: TouchArea {
+                Text {
+                    width: 100%;
+                    height: 100%;
+                    color: root.text-color;
+                    horizontal-alignment: left;
+                    wrap: word-wrap;
+                    text: @tr("To avoid breaking other library elements or projects which reference this element, the editor has been put into read-only mode and saving is not possible anymore. Either undo the breaking changes, or duplicate this library element and make the modifications in the new library element.");
+                    visible: !(can-unlock && unlock-btn-hovered);
+                }
+
+                Text {
+                    width: 100%;
+                    height: 100%;
+                    color: root.text-color;
+                    horizontal-alignment: left;
+                    wrap: word-wrap;
+                    font-italic: true;
+                    text: unlock-hover-text;
+                    visible: can-unlock && unlock-btn-hovered;
+                    accessible-role: none;
+                }
+
+                double-clicked => {
+                    can-unlock = true;
+                }
+            }
+
+            if is-unlocked: Text {
                 color: root.text-color;
                 horizontal-alignment: left;
                 wrap: word-wrap;
-                font-italic: unlocked;
-                text: {
-                    if unlocked {
-                        @tr("You have removed the write protection. Keep in mind: With great power comes great responsibility!")
-                    } else {
-                        @tr("To avoid breaking other library elements or projects which reference this element, the editor has been put into read-only mode and saving is not possible anymore. Either undo the breaking changes, or duplicate this library element and make the modifications in the new library element.")
-                    }
-                };
+                font-italic: true;
+                text: @tr("You have removed the write protection. Keep in mind: With great power comes great responsibility!");
             }
         }
 
@@ -62,10 +88,14 @@ export component BreakingChangesMessageBanner inherits MessageBanner {
                 }
             }
 
-            if !unlocked: unlock-btn := Button {
+            if (!is-unlocked) && can-unlock: unlock-btn := Button {
                 icon: @image-url("../../../font-awesome/svgs/solid/lock-open.svg");
                 text: @tr("Unlock the fiasco").to-uppercase();
-                status-tip: @tr("DANGER: Press & hold to remove the read-only protection and allow making breaking changes");
+                accessible-description: unlock-hover-text;
+
+                changed has-hover => {
+                    unlock-btn-hovered = self.has-hover;
+                }
 
                 if self.pressed: Rectangle {
                     width: parent.width - 4px;

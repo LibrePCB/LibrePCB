@@ -133,6 +133,7 @@ template <typename T>
 static void duplicateLibraryElement(T& element, const T& other) {
   element.duplicateFrom(other);
   element.setCreated(QDateTime::currentDateTime());
+  element.setVersion(Version::fromString("0.1"));
   element.setNames(copyLibraryElementNames(other.getNames()));
 }
 

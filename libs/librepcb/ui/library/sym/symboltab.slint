@@ -663,7 +663,8 @@ export component SymbolTab inherits Tab {
 
         BreakingChangesMessageBanner {
             shown: tabs[index].interface-broken-msg;
-            unlocked: !read-only;
+            is-new-element: tabs[index].is-new-element;
+            is-unlocked: !read-only;
 
             action-invoked(action) => {
                 Backend.trigger-tab(section-index, index, action);

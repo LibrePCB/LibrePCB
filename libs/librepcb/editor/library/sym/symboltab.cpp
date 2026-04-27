@@ -89,7 +89,7 @@ SymbolTab::SymbolTab(LibraryEditor& editor, std::unique_ptr<Symbol> sym,
     mView(new SlintGraphicsView(SlintGraphicsView::defaultSymbolSceneRect(),
                                 SlintGraphicsView::defaultEditorMargins(),
                                 this)),
-    mIsNewElement(isPathOutsideLibDir()),
+    mIsNewElement(isNewElement(mSymbol->getCreated())),
     mMsgImportPins(mApp.getWorkspace(), "EMPTY_SYMBOL_IMPORT_PINS"),
     mWizardMode(mode != Mode::Open),
     mCurrentPageIndex(mWizardMode ? 0 : 1),
@@ -274,6 +274,7 @@ ui::SymbolTabData SymbolTab::getDerivedUiData() const noexcept {
       mCategories,  // Categories
       mCategoriesTree,  // Categories tree
       mChooseCategory,  // Choose category
+      mIsNewElement,  // Is new element
       ui::RuleCheckData{
           ui::RuleCheckType::SymbolCheck,  // Check type
           ui::RuleCheckState::UpToDate,  // Check state
@@ -1513,12 +1514,13 @@ bool SymbolTab::autoFix(const MsgSymbolOriginNotInCenter& msg) {
  ******************************************************************************/
 
 bool SymbolTab::isWritable() const noexcept {
-  return mIsNewElement ||
-      (mSymbol->getDirectory().isWritable() &&
+  return isPathOutsideLibDir() || (mSymbol->getDirectory().isWritable() &&
        ((!mIsInterfaceBroken) || mAllowBreakingChanges));
 }
 
 void SymbolTab::refreshUiData() noexcept {
+  mIsNewElement = isNewElement(mSymbol->getCreated());
+
   mName = q2s(*mSymbol->getNames().getDefaultValue());
   mNameError = slint::SharedString();
   mNameParsed = mSymbol->getNames().getDefaultValue();
@@ -1536,7 +1538,7 @@ void SymbolTab::refreshUiData() noexcept {
   // Update "interface broken" only when no command is active since it would
   // be annoying to get it during intermediate states.
   if (!mUndoStack->isCommandGroupActive()) {
-    mIsInterfaceBroken = (!mIsNewElement) && (!mWizardMode) &&
+    mIsInterfaceBroken = (!mWizardMode) &&
         (mSymbol->getPins().getUuidSet() != mOriginalSymbolPinUuids);
   }
 

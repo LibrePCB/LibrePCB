@@ -71,6 +71,7 @@ public:
 
 protected:
   bool isPathOutsideLibDir() const noexcept;
+  bool isNewElement(const QDateTime& created) const noexcept;
   bool hasUnsavedChanges() const noexcept;
   void undoBreakingChanges(const bool& interfaceBroken) noexcept;
   void setWatchedFiles(const TransactionalDirectory& dir,

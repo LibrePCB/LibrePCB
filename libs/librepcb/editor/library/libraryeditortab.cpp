@@ -103,6 +103,13 @@ bool LibraryEditorTab::isPathOutsideLibDir() const noexcept {
       (!fp.isLocatedInDir(mEditor.getFilePath()));
 }
 
+bool LibraryEditorTab::isNewElement(const QDateTime& created) const noexcept {
+  // An element is considered "new" when it's less than 10 days old, as this
+  // is circa the time one can remember whether the element was already used
+  // in other library elements or projects (for the write protection).
+  return created.secsTo(QDateTime::currentDateTime()) < (10 * 24 * 3600);
+}
+
 bool LibraryEditorTab::hasUnsavedChanges() const noexcept {
   return mManualModificationsMade || (!mUndoStack->isClean());
 }

@@ -202,7 +202,7 @@ private:
   std::unique_ptr<Symbol> mSymbol;
   std::unique_ptr<GraphicsLayerList> mLayers;
   std::unique_ptr<SlintGraphicsView> mView;
-  const bool mIsNewElement;
+  bool mIsNewElement;
 
   // Message handles
   DismissableMessageContext mMsgImportPins;
