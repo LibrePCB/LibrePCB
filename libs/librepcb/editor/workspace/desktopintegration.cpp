@@ -42,7 +42,8 @@ namespace editor {
 
 bool DesktopIntegration::isSupported() noexcept {
 #if LIBREPCB_ENABLE_DESKTOP_INTEGRATION && defined(Q_OS_LINUX)
-  return true;
+  static const bool val = qgetenv("LIBREPCB_ENABLE_DESKTOP_INTEGRATION") != "0";
+  return val;
 #else
   return false;
 #endif

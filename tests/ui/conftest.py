@@ -416,6 +416,9 @@ class LibrePcbFixture(object):
         # Disable warning about unstable file format, since tests are run also
         # on the (unstable) master branch
         self.env["LIBREPCB_DISABLE_UNSTABLE_WARNING"] = "1"
+        # Disable desktop integration by default, since the notification
+        # disturbes some tests.
+        self.env["LIBREPCB_ENABLE_DESKTOP_INTEGRATION"] = "0"
 
     def abspath(self, relpath):
         return os.path.join(self.tmpdir, relpath)
