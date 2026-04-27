@@ -163,9 +163,15 @@ jobs:
         if: ${{ (steps.build.outcome == 'success') && (!cancelled()) && (github.event_name == 'push') && env.UPLOAD_URL }}
         env:
           UPLOAD_URL: ${{ secrets.UPLOAD_URL }}  # Required to use it in 'if' condition
-      - name: Stop Container
-        if: ${{ always() }}
-        run: docker stop -t 30 ci
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v7
+        if: ${{ (steps.build.outcome == 'success') && (!cancelled()) }}
+        with:
+          name: ${{ github.job }}
+          if-no-files-found: ignore
+          path: |
+            libs/librepcb/rust-core/target/llvm-cov/html/
+            tests/ui/screenshot.png
 
   macos-arm64:
     name: MacOS ARM64
@@ -242,8 +248,9 @@ jobs:
         run: ./ci/build_mac_dmg.sh
       - name: Run rust-core tests
         run: >
-          cd libs/librepcb/rust-core && cargo llvm-cov
-          --features=fail-on-warnings
+          cd libs/librepcb/rust-core &&
+          cargo llvm-cov --features=fail-on-warnings --html &&
+          cargo llvm-cov report
           --fail-uncovered-lines 0
           --fail-uncovered-regions 0
           --fail-uncovered-functions 0
@@ -273,3 +280,12 @@ jobs:
           UPLOAD_USER: ${{ secrets.UPLOAD_USER }}
           UPLOAD_PASS: ${{ secrets.UPLOAD_PASS }}
           UPLOAD_SIGN_KEY: ${{ secrets.UPLOAD_SIGN_KEY }}
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v7
+        if: ${{ (steps.build.outcome == 'success') && (!cancelled()) }}
+        with:
+          name: ${{ github.job }}
+          if-no-files-found: ignore
+          path: |
+            libs/librepcb/rust-core/target/llvm-cov/html/
+            tests/ui/screenshot.png
