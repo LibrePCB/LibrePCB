@@ -64,6 +64,7 @@ public:
   // General Methods
   ProjectEditor& getProjectEditor() noexcept { return mProjectEditor; }
   Schematic& getSchematic() noexcept { return mSchematic; }
+  QString getDisplayName() const noexcept;
   int getUiIndex() const noexcept { return mUiIndex; }
   void setUiIndex(int index) noexcept;
   ui::SchematicData getUiData() const noexcept;

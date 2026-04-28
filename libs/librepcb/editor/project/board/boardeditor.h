@@ -72,6 +72,7 @@ public:
   // General Methods
   ProjectEditor& getProjectEditor() noexcept { return mProjectEditor; }
   Board& getBoard() noexcept { return mBoard; }
+  QString getDisplayName() const noexcept;
   int getUiIndex() const noexcept { return mUiIndex; }
   void setUiIndex(int index) noexcept;
   ui::BoardData getUiData() const noexcept;

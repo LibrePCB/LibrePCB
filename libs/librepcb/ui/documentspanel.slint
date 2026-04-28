@@ -217,10 +217,7 @@ component ProjectSection inherits Rectangle {
 
         for schematic[index] in project.schematics: schematic-item := DocumentsListItem {
             type: ItemType.schematic;
-            // The default schematic name "Main" is not very meaningful,
-            // especially for beginners. Thus hide it if there's only one
-            // schematic as it is not relevant then anyway.
-            text: (project.schematics.length == 1) ? @tr("Schematic") : schematic.name;
+            text: schematic.name;
             can-rename: project.schematics.length > 1;  // Because default name is hidden.
             icon: @image-url("../../font-awesome/svgs/regular/image.svg");
             selected: (Data.current-tab.type == TabType.schematic) && (Data.current-schematic-tab.project-index == project-index) && (Data.current-schematic-tab.schematic-index == index);
@@ -236,10 +233,7 @@ component ProjectSection inherits Rectangle {
 
         for board[index] in project.boards: board-item := DocumentsListItem {
             type: ItemType.board;
-            // The default board name "default" is not very meaningful,
-            // especially for beginners. Thus hide it if there's only one
-            // board as it is not relevant then anyway.
-            text: (project.boards.length == 1) ? @tr("Board") : board.name;
+            text: board.name;
             icon: @image-url("../../bootstrap-icons/icons/motherboard.svg");
             selected: {
                 if Data.current-tab.type == TabType.board-2d {

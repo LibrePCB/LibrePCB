@@ -121,7 +121,7 @@ ui::TabData Board3dTab::getUiData() const noexcept {
 
   return ui::TabData{
       ui::TabType::Board3d,  // Type
-      q2s(*mBoard.getName()),  // Title
+      q2s(mBoardEditor.getDisplayName()),  // Title
       features,  // Features
       !mProject.getDirectory().isWritable(),  // Read-only
       mProjectEditor.hasUnsavedChanges(),  // Unsaved changes

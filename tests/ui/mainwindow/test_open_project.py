@@ -19,9 +19,9 @@ def test_file_tree_dclick(librepcb):
         # Verify that schematic- and board tabs have been opened
         tabs = app.get("#TabButton *")
         tabs.wait(3)
-        assert tabs[1].label == "Main"
+        assert tabs[1].label == "Schematic"
         assert tabs[1].checked
-        assert tabs[2].label == "default"
+        assert tabs[2].label == "Board"
         assert not tabs[2].checked
 
         # Close project and wait until tabs have been closed

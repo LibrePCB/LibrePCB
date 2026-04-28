@@ -268,7 +268,7 @@ ui::TabData SchematicTab::getUiData() const noexcept {
 
   return ui::TabData{
       ui::TabType::Schematic,  // Type
-      q2s(*mSchematic.getName()),  // Title
+      q2s(mSchematicEditor.getDisplayName()),  // Title
       features,  // Features
       !mProject.getDirectory().isWritable(),  // Read-only
       mProjectEditor.hasUnsavedChanges(),  // Unsaved changes

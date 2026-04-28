@@ -126,6 +126,14 @@ BoardEditor::~BoardEditor() noexcept {
  *  General Methods
  ******************************************************************************/
 
+QString BoardEditor::getDisplayName() const noexcept {
+  // The default board name "default" is not very meaningful, especially for
+  // beginners. Thus hide it if there's only one board as it is not relevant
+  // then anyway.
+  return (mProjectEditor.getBoards().count() > 1) ? *mBoard.getName()
+                                                  : tr("Board");
+}
+
 void BoardEditor::setUiIndex(int index) noexcept {
   if (index != mUiIndex) {
     mUiIndex = index;
@@ -147,7 +155,7 @@ ui::BoardData BoardEditor::getUiData() const noexcept {
   }
 
   return ui::BoardData{
-      q2s(*mBoard.getName()),  // Name
+      q2s(getDisplayName()),  // Name
       ui::RuleCheckData{
           ui::RuleCheckType::Drc,  // Type
           drcState,  // State

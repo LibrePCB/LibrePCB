@@ -23,7 +23,9 @@
 #include "schematiceditor.h"
 
 #include "../../utils/slinthelpers.h"
+#include "../projecteditor.h"
 
+#include <librepcb/core/project/project.h>
 #include <librepcb/core/project/schematic/schematic.h>
 
 #include <QtCore>
@@ -57,6 +59,14 @@ SchematicEditor::~SchematicEditor() noexcept {
  *  General Methods
  ******************************************************************************/
 
+QString SchematicEditor::getDisplayName() const noexcept {
+  // The default schematic name "Main" is not very meaningful, especially for
+  // beginners. Thus hide it if there's only one schematic as it is not relevant
+  // then anyway.
+  return (mProjectEditor.getSchematics().count() > 1) ? *mSchematic.getName()
+                                                      : tr("Schematic");
+}
+
 void SchematicEditor::setUiIndex(int index) noexcept {
   if (index != mUiIndex) {
     mUiIndex = index;
@@ -66,7 +76,7 @@ void SchematicEditor::setUiIndex(int index) noexcept {
 
 ui::SchematicData SchematicEditor::getUiData() const noexcept {
   return ui::SchematicData{
-      q2s(*mSchematic.getName()),  // Name
+      q2s(getDisplayName()),  // Name
   };
 }
 
