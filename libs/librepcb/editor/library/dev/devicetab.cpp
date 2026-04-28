@@ -101,6 +101,7 @@ DeviceTab::DeviceTab(LibraryEditor& editor, std::unique_ptr<Device> dev,
     mComponentSelected(true),
     mPackageSelected(true),
     mChooseCategory(false),
+    mElementDuplicated(false),
     mFrameIndex(0),
     mNameParsed(mDevice->getNames().getDefaultValue()),
     mVersionParsed(mDevice->getVersion()),
@@ -297,6 +298,7 @@ ui::DeviceTabData DeviceTab::getDerivedUiData() const noexcept {
       mDescription,  // Description
       mKeywords,  // Keywords
       mAuthor,  // Author
+      mAgeDays,  // Age in days
       mVersion,  // Version
       mVersionError,  // Version error
       mDeprecated,  // Deprecated
@@ -329,6 +331,7 @@ ui::DeviceTabData DeviceTab::getDerivedUiData() const noexcept {
       q2s(brdBgColors.primary),  // Package background color
       q2s(brdBgColors.secondary),  // Package foreground color
       mIsInterfaceBroken,  // Interface broken
+      mElementDuplicated && (!mDeprecated),  // Element duplicated
       hasUnconnectedPads,  // Has unconnected pads
       hasAutoConnectablePads,  // Has auto-connectable pads
       areAllPadsUnconnected,  // All pads unconnected
@@ -368,6 +371,11 @@ void DeviceTab::setDerivedUiData(const ui::DeviceTabData& data) noexcept {
   mChooseCategory = data.choose_category;
   mDatasheetUrl = data.datasheet_url;
   validateUrl(s2q(mDatasheetUrl), mDatasheetUrlError, true);
+
+  // Messages
+  if (data.deprecated || (!data.element_duplicated_msg)) {
+    mElementDuplicated = false;
+  }
 
   // Interactive pinout
   mPinoutBuilder->setCurrentSignalIndex(data.interactive_pinout_signal_index);
@@ -456,6 +464,15 @@ void DeviceTab::trigger(ui::TabAction a) noexcept {
       save();
       break;
     }
+    case ui::TabAction::SaveAs: {  // Duplicate the library element.
+      commitUiData();  // Exits the current tool and releases the undo stack.
+      if (mWindow && mWindow->openNewDeviceTab(mEditor, {}, mDevice.get())) {
+        undoBreakingChanges(mIsInterfaceBroken);
+        mElementDuplicated = true;
+        onDerivedUiDataChanged.notify();
+      }
+      break;
+    }
     case ui::TabAction::Undo: {
       try {
         commitUiData();
@@ -472,6 +489,12 @@ void DeviceTab::trigger(ui::TabAction a) noexcept {
       } catch (const Exception& e) {
         QMessageBox::critical(getWindow(), tr("Error"), e.getMsg());
       }
+      break;
+    }
+    case ui::TabAction::Unlock: {
+      mAllowBreakingChanges = true;
+      onUiDataChanged.notify();
+      onDerivedUiDataChanged.notify();
       break;
     }
     case ui::TabAction::Close: {
@@ -586,17 +609,22 @@ bool DeviceTab::processSceneScrolled(const QPointF& pos,
 bool DeviceTab::requestClose() noexcept {
   commitUiData();
 
-  if ((!hasUnsavedChanges()) || (!isWritable())) {
+  if (!hasUnsavedChanges()) {
     return true;  // Nothing to save.
   }
 
-  const QMessageBox::StandardButton choice = QMessageBox::question(
-      getWindow(), tr("Save Changes?"),
-      tr("The device '%1' contains unsaved changes.\n"
-         "Do you want to save them before closing it?")
-          .arg(*mDevice->getNames().getDefaultValue()),
-      QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
-      QMessageBox::Yes);
+  QMessageBox::StandardButtons buttons = QMessageBox::No | QMessageBox::Cancel;
+  QMessageBox::StandardButton defaultButton = QMessageBox::Cancel;
+  if ((!mIsInterfaceBroken) || mAllowBreakingChanges) {
+    buttons |= QMessageBox::Yes;
+    defaultButton = QMessageBox::Yes;
+  }
+  const QMessageBox::StandardButton choice =
+      QMessageBox::question(getWindow(), tr("Save Changes?"),
+                            tr("The device '%1' contains unsaved changes.\n"
+                               "Do you want to save them before closing it?")
+                                .arg(*mDevice->getNames().getDefaultValue()),
+                            buttons, defaultButton);
   if (choice == QMessageBox::Yes) {
     return save();
   } else if (choice == QMessageBox::No) {
@@ -692,7 +720,9 @@ bool DeviceTab::autoFix(const MsgMissingCategories& msg) {
  ******************************************************************************/
 
 bool DeviceTab::isWritable() const noexcept {
-  return mIsNewElement || mDevice->getDirectory().isWritable();
+  return mIsNewElement ||
+      (mDevice->getDirectory().isWritable() &&
+       ((!mIsInterfaceBroken) || mAllowBreakingChanges));
 }
 
 static QString cleanDescription(const LocalizedDescriptionMap& descs) noexcept {
@@ -711,6 +741,7 @@ void DeviceTab::refreshUiData() noexcept {
   mVersionParsed = mDevice->getVersion();
   mDeprecated = mDevice->isDeprecated();
   mCategories->setCategories(mDevice->getCategories());
+  updateAgeDays(mDevice->getCreated());
 
   if (auto dbRes = mDevice->getResources().value(0)) {
     mDatasheetUrl = q2s(dbRes->getUrl().toString());

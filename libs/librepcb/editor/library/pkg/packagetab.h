@@ -132,6 +132,7 @@ public:
       const GraphicsSceneMouseEvent& e) noexcept override;
 
   // PackageEditorFsmAdapter
+  bool fsmIsWritable() const noexcept override;
   QWidget* fsmGetParentWidget() noexcept override;
   GraphicsScene* fsmGetGraphicsScene() noexcept override;
   PositiveLength fsmGetGridInterval() const noexcept override;
@@ -206,7 +207,6 @@ private:
   void setCurrentFootprintIndex(int index) noexcept;
   void setCurrentModelIndex(int index) noexcept;
   void autoSelectCurrentModelIndex() noexcept;
-  bool isWritable() const noexcept;
   void refreshUiData() noexcept;
   void commitUiData() noexcept;
   bool save() noexcept;
@@ -238,6 +238,7 @@ private:
   GridStyle mGridStyle;
   LengthUnit mUnit;
   bool mChooseCategory;
+  bool mElementDuplicated;
   std::shared_ptr<PackageModel> mCurrentModel;
   std::unique_ptr<OpenGlProjection> mOpenGlProjection;
   QHash<OpenGlObject::Type, float> mAlpha;

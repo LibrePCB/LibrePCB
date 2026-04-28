@@ -201,10 +201,11 @@ bool PackageEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
       // get items under cursor
       QList<std::shared_ptr<QGraphicsItem>> items =
           findItemsAtPosition(mStartPos);
-      if (findPolygonVerticesAtPosition(mStartPos) && (!mContext.readOnly)) {
+      if (findPolygonVerticesAtPosition(mStartPos) &&
+          mAdapter.fsmIsWritable()) {
         setState(SubState::MOVING_POLYGON_VERTEX);
       } else if (findZoneVerticesAtPosition(mStartPos) &&
-                 (!mContext.readOnly)) {
+                 mAdapter.fsmIsWritable()) {
         setState(SubState::MOVING_ZONE_VERTEX);
       } else if (items.isEmpty()) {
         // start selecting
@@ -264,7 +265,7 @@ bool PackageEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
         scheduleUpdateAvailableFeatures();  // Selection might have changed.
 
         // Start moving, if not read only.
-        if (!mContext.readOnly) {
+        if (mAdapter.fsmIsWritable()) {
           Q_ASSERT(!mCmdDragSelectedItems);
           setState(SubState::MOVING);
         }
@@ -769,7 +770,8 @@ bool PackageEditorState_Select::openContextMenuAtPos(
               });
           int remainingVertices =
               polygon->getPath().getVertices().count() - vertices.count();
-          aRemove->setEnabled((remainingVertices >= 2) && (!mContext.readOnly));
+          aRemove->setEnabled((remainingVertices >= 2) &&
+                              mAdapter.fsmIsWritable());
           mb.addAction(aRemove);
         }
 
@@ -779,7 +781,7 @@ bool PackageEditorState_Select::openContextMenuAtPos(
               cmd.vertexAdd.createAction(&menu, this, [=, this]() {
                 startAddingPolygonVertex(polygon, lineIndex, pos);
               });
-          aAddVertex->setEnabled(!mContext.readOnly);
+          aAddVertex->setEnabled(mAdapter.fsmIsWritable());
           mb.addAction(aAddVertex);
         }
 
@@ -802,7 +804,8 @@ bool PackageEditorState_Select::openContextMenuAtPos(
               [this, zone, vertices]() { removeZoneVertices(zone, vertices); });
           int remainingVertices =
               zone->getOutline().getVertices().count() - vertices.count();
-          aRemove->setEnabled((remainingVertices >= 2) && (!mContext.readOnly));
+          aRemove->setEnabled((remainingVertices >= 2) &&
+                              mAdapter.fsmIsWritable());
           mb.addAction(aRemove);
         }
 
@@ -811,7 +814,7 @@ bool PackageEditorState_Select::openContextMenuAtPos(
           QAction* aAddVertex = cmd.vertexAdd.createAction(
               &menu, this,
               [=, this]() { startAddingZoneVertex(zone, lineIndex, pos); });
-          aAddVertex->setEnabled(!mContext.readOnly);
+          aAddVertex->setEnabled(mAdapter.fsmIsWritable());
           mb.addAction(aAddVertex);
         }
 
@@ -916,7 +919,7 @@ bool PackageEditorState_Select::openPropertiesDialogOfItem(
     FootprintPadPropertiesDialog dialog(
         mContext.package, i->getObj(), mContext.undoStack, getLengthUnit(),
         "package_editor/footprint_pad_properties_dialog", parentWidget());
-    dialog.setReadOnly(mContext.readOnly);
+    dialog.setReadOnly(!mAdapter.fsmIsWritable());
     dialog.exec();
     return true;
   } else if (auto i = std::dynamic_pointer_cast<StrokeTextGraphicsItem>(item)) {
@@ -924,7 +927,7 @@ bool PackageEditorState_Select::openPropertiesDialogOfItem(
         i->getObj(), mContext.undoStack, getAllowedTextLayers(),
         getLengthUnit(), "package_editor/stroke_text_properties_dialog",
         parentWidget());
-    dialog.setReadOnly(mContext.readOnly);
+    dialog.setReadOnly(!mAdapter.fsmIsWritable());
     dialog.exec();
     return true;
   } else if (auto i = std::dynamic_pointer_cast<PolygonGraphicsItem>(item)) {
@@ -932,7 +935,7 @@ bool PackageEditorState_Select::openPropertiesDialogOfItem(
         i->getObj(), mContext.undoStack, getAllowedCircleAndPolygonLayers(),
         getLengthUnit(), "package_editor/polygon_properties_dialog",
         parentWidget());
-    dialog.setReadOnly(mContext.readOnly);
+    dialog.setReadOnly(!mAdapter.fsmIsWritable());
     dialog.exec();
     return true;
   } else if (auto i = std::dynamic_pointer_cast<CircleGraphicsItem>(item)) {
@@ -940,14 +943,14 @@ bool PackageEditorState_Select::openPropertiesDialogOfItem(
         i->getObj(), mContext.undoStack, getAllowedCircleAndPolygonLayers(),
         getLengthUnit(), "package_editor/circle_properties_dialog",
         parentWidget());
-    dialog.setReadOnly(mContext.readOnly);
+    dialog.setReadOnly(!mAdapter.fsmIsWritable());
     dialog.exec();
     return true;
   } else if (auto i = std::dynamic_pointer_cast<ZoneGraphicsItem>(item)) {
     ZonePropertiesDialog dialog(
         i->getObj(), mContext.undoStack, getLengthUnit(), mContext.layers,
         "package_editor/zone_properties_dialog", parentWidget());
-    dialog.setReadOnly(mContext.readOnly);
+    dialog.setReadOnly(!mAdapter.fsmIsWritable());
     dialog.exec();
     return true;
   } else if (auto i = std::dynamic_pointer_cast<HoleGraphicsItem>(item)) {
@@ -956,7 +959,7 @@ bool PackageEditorState_Select::openPropertiesDialogOfItem(
     HolePropertiesDialog dialog(
         const_cast<Hole&>(i->getObj()), mContext.undoStack, getLengthUnit(),
         "package_editor/hole_properties_dialog", parentWidget());
-    dialog.setReadOnly(mContext.readOnly);
+    dialog.setReadOnly(!mAdapter.fsmIsWritable());
     dialog.exec();
     return true;
   }
@@ -1704,7 +1707,7 @@ PackageEditorFsmAdapter::Features
   if (mContext.currentFootprint) {
     if (mState != SubState::PASTING) {
       features |= PackageEditorFsmAdapter::Feature::Select;
-      if (!mContext.readOnly) {
+      if (mAdapter.fsmIsWritable()) {
         features |= PackageEditorFsmAdapter::Feature::ImportGraphics;
         if (FootprintClipboardData::isValid(qApp->clipboard()->mimeData())) {
           features |= PackageEditorFsmAdapter::Feature::Paste;
@@ -1717,7 +1720,7 @@ PackageEditorFsmAdapter::Features
       if (cmd.getSelectedItemsCount() > 0) {
         features |= PackageEditorFsmAdapter::Feature::Copy;
         features |= PackageEditorFsmAdapter::Feature::Properties;
-        if (!mContext.readOnly) {
+        if (mAdapter.fsmIsWritable()) {
           features |= PackageEditorFsmAdapter::Feature::Cut;
           features |= PackageEditorFsmAdapter::Feature::Remove;
           features |= PackageEditorFsmAdapter::Feature::Rotate;

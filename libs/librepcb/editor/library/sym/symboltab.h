@@ -123,6 +123,7 @@ public:
       const GraphicsSceneMouseEvent& e) noexcept override;
 
   // SymbolEditorFsmAdapter
+  bool fsmIsWritable() const noexcept override;
   QWidget* fsmGetParentWidget() noexcept override;
   GraphicsScene* fsmGetGraphicsScene() noexcept override;
   SymbolGraphicsItem* fsmGetGraphicsItem() noexcept override;
@@ -184,7 +185,6 @@ protected:
   void notifyDerivedUiDataChanged() noexcept override;
 
 private:
-  bool isWritable() const noexcept;
   void refreshUiData() noexcept;
   void commitUiData() noexcept;
   bool save() noexcept;
@@ -212,6 +212,7 @@ private:
   GridStyle mGridStyle;
   LengthUnit mUnit;
   bool mChooseCategory;
+  bool mElementDuplicated;
   bool mCompactLayout;
   QPointF mSceneImagePos;
   int mFrameIndex;

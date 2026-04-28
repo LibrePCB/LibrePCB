@@ -149,6 +149,7 @@ private:
   bool mComponentSelected;
   bool mPackageSelected;
   bool mChooseCategory;
+  bool mElementDuplicated;
   int mFrameIndex;
 
   // Library metadata to be applied

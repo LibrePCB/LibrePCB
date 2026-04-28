@@ -51,7 +51,9 @@ export component Button inherits Rectangle {
             Data.theme.control-border
         }
     };
-    border-width: (primary && enabled) ? 0 : 1px;
+    // We used 0px for enabled, primary buttons before, but it doesn't look
+    // good on special backgrounds (e.g. error or warning messages).
+    border-width: 1px;
     forward-focus: fs;
 
     // Accessibility

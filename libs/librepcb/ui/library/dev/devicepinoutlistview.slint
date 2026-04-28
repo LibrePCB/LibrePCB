@@ -4,6 +4,7 @@ import { Data, DevicePinoutData } from "../../api.slint";
 export component DevicePinoutListView inherits ScrollView {
     in-out property <[DevicePinoutData]> model;
     in-out property <[string]> signal-names;
+    in property <bool> read-only;
     in property <length> window-height;
     property <length> row-height: 25px;
 
@@ -45,6 +46,7 @@ export component DevicePinoutListView inherits ScrollView {
                     current-index: item.signal-index;
                     editable-only-when-focused: true;
                     enabled: self.model.length > 1;  // If component signals available
+                    read-only: read-only;
                     accessible-label: "signal of pad " + item.pad-name;
 
                     current-index-changed(idx) => {

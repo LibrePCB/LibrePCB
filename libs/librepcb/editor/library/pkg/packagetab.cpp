@@ -32,6 +32,7 @@
 #include "../../graphics/graphicsscene.h"
 #include "../../graphics/slintgraphicsview.h"
 #include "../../guiapplication.h"
+#include "../../mainwindow.h"
 #include "../../rulecheck/rulecheckmessagesmodel.h"
 #include "../../undostack.h"
 #include "../../utils/editortoolbox.h"
@@ -113,6 +114,7 @@ PackageTab::PackageTab(LibraryEditor& editor, std::unique_ptr<Package> pkg,
     mGridStyle(mApp.getWorkspace().getSettings().boardGridStyle.get()),
     mUnit(LengthUnit::millimeters()),
     mChooseCategory(false),
+    mElementDuplicated(false),
     mOpenGlProjection(new OpenGlProjection()),
     mFrameIndex(0),
     mNameParsed(mPackage->getNames().getDefaultValue()),
@@ -202,9 +204,9 @@ PackageTab::PackageTab(LibraryEditor& editor, std::unique_ptr<Package> pkg,
   applyBackgroundImageSettings();
 
   // Load finite state machine (FSM).
-  PackageEditorFsm::Context fsmContext{*mPackage, *mUndoStack, !isWritable(),
-                                       mUnit,     *mLayers,    *this,
-                                       nullptr,   nullptr};
+  PackageEditorFsm::Context fsmContext{
+      *mPackage, *mUndoStack, mUnit, *mLayers, *this, nullptr, nullptr,
+  };
   mFsm.reset(new PackageEditorFsm(fsmContext));
 
   // Apply workspace settings whenever they have been modified.
@@ -274,7 +276,7 @@ FilePath PackageTab::getDirectoryPath() const noexcept {
 }
 
 ui::TabData PackageTab::getUiData() const noexcept {
-  const bool writable = isWritable();
+  const bool writable = fsmIsWritable();
 
   ui::TabFeatures features = {};
   features.save = toFs(writable);
@@ -282,7 +284,7 @@ ui::TabData PackageTab::getUiData() const noexcept {
   features.redo = toFs(mUndoStack->canRedo());
   if ((!mWizardMode) && (mCurrentPageIndex == 2) && (!mView3d) &&
       mFsm->getCurrentFootprint()) {
-    features.grid = toFs(isWritable());
+    features.grid = toFs(writable);
     features.zoom = toFs(true);
     features.background_image = toFs(true);
     features.import_graphics =
@@ -344,6 +346,7 @@ ui::PackageTabData PackageTab::getDerivedUiData() const noexcept {
       mDescription,  // Description
       mKeywords,  // Keywords
       mAuthor,  // Author
+      mAgeDays,  // Age in days
       mVersion,  // Version
       mVersionError,  // Version error
       mDeprecated,  // Deprecated
@@ -367,7 +370,7 @@ ui::PackageTabData PackageTab::getDerivedUiData() const noexcept {
           mCheckMessages->getUnapprovedCount(),  // Check unapproved count
           mCheckMessages->getErrorCount(),  // Check errors count
           mCheckError,  // Check execution error
-          !isWritable(),  // Check read-only
+          !fsmIsWritable(),  // Check read-only
       },
       q2s(bgColor),  // Background color
       q2s(fgColor),  // Foreground color
@@ -386,6 +389,7 @@ ui::PackageTabData PackageTab::getDerivedUiData() const noexcept {
       q2s(errors.join("\n\n")),  // Error
       !mModifiedWatchedFiles.isEmpty(),  // Watched files modified
       mIsInterfaceBroken,  // Interface broken
+      mElementDuplicated && (!mDeprecated),  // Element duplicated
       mTool,  // Tool
       q2s(((mView3d && mOpenGlView) ? mOpenGlView->isPanning()
                                     : mView->isPanning())
@@ -535,6 +539,11 @@ void PackageTab::setDerivedUiData(const ui::PackageTabData& data) noexcept {
   mAlpha[OpenGlObject::Type::Device] = qBound(0.0f, data.devices_alpha, 1.0f);
   if (mOpenGlView) {
     mOpenGlView->setAlpha(mAlpha);
+  }
+
+  // Messages
+  if (data.deprecated || (!data.element_duplicated_msg)) {
+    mElementDuplicated = false;
   }
 
   // Tool
@@ -687,6 +696,15 @@ void PackageTab::trigger(ui::TabAction a) noexcept {
       save();
       break;
     }
+    case ui::TabAction::SaveAs: {  // Duplicate the library element.
+      commitUiData();  // Exits the current tool and releases the undo stack.
+      if (mWindow && mWindow->openNewPackageTab(mEditor, {}, mPackage.get())) {
+        undoBreakingChanges(mIsInterfaceBroken);
+        mElementDuplicated = true;
+        onDerivedUiDataChanged.notify();
+      }
+      break;
+    }
     case ui::TabAction::ReloadFromDisk: {
       try {
         reloadFromDisk();
@@ -711,6 +729,12 @@ void PackageTab::trigger(ui::TabAction a) noexcept {
       } catch (const Exception& e) {
         QMessageBox::critical(getWindow(), tr("Error"), e.getMsg());
       }
+      break;
+    }
+    case ui::TabAction::Unlock: {
+      mAllowBreakingChanges = true;
+      onUiDataChanged.notify();
+      onDerivedUiDataChanged.notify();
       break;
     }
     case ui::TabAction::Close: {
@@ -1026,17 +1050,22 @@ bool PackageTab::processSceneKeyReleased(
 bool PackageTab::requestClose() noexcept {
   commitUiData();
 
-  if ((!hasUnsavedChanges()) || (!isWritable())) {
+  if (!hasUnsavedChanges()) {
     return true;  // Nothing to save.
   }
 
-  const QMessageBox::StandardButton choice = QMessageBox::question(
-      getWindow(), tr("Save Changes?"),
-      tr("The package '%1' contains unsaved changes.\n"
-         "Do you want to save them before closing it?")
-          .arg(*mPackage->getNames().getDefaultValue()),
-      QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
-      QMessageBox::Yes);
+  QMessageBox::StandardButtons buttons = QMessageBox::No | QMessageBox::Cancel;
+  QMessageBox::StandardButton defaultButton = QMessageBox::Cancel;
+  if ((!mIsInterfaceBroken) || mAllowBreakingChanges) {
+    buttons |= QMessageBox::Yes;
+    defaultButton = QMessageBox::Yes;
+  }
+  const QMessageBox::StandardButton choice =
+      QMessageBox::question(getWindow(), tr("Save Changes?"),
+                            tr("The package '%1' contains unsaved changes.\n"
+                               "Do you want to save them before closing it?")
+                                .arg(*mPackage->getNames().getDefaultValue()),
+                            buttons, defaultButton);
   if (choice == QMessageBox::Yes) {
     return save();
   } else if (choice == QMessageBox::No) {
@@ -1089,6 +1118,12 @@ bool PackageTab::graphicsSceneRightMouseButtonReleased(
 /*******************************************************************************
  *  PackageEditorFsmAdapter
  ******************************************************************************/
+
+bool PackageTab::fsmIsWritable() const noexcept {
+  return mIsNewElement ||
+      (mPackage->getDirectory().isWritable() &&
+       ((!mIsInterfaceBroken) || mAllowBreakingChanges));
+}
 
 QWidget* PackageTab::fsmGetParentWidget() noexcept {
   return getWindow();
@@ -2423,10 +2458,6 @@ void PackageTab::autoSelectCurrentModelIndex() noexcept {
   }
 }
 
-bool PackageTab::isWritable() const noexcept {
-  return mIsNewElement || mPackage->getDirectory().isWritable();
-}
-
 void PackageTab::refreshUiData() noexcept {
   mName = q2s(*mPackage->getNames().getDefaultValue());
   mNameError = slint::SharedString();
@@ -2441,6 +2472,7 @@ void PackageTab::refreshUiData() noexcept {
   mCategories->setCategories(mPackage->getCategories());
   mAssemblyType = mPackage->getAssemblyType(false);
   mMinCopperClearance.setValueUnsigned(mPackage->getMinCopperClearance());
+  updateAgeDays(mPackage->getCreated());
 
   // Update "interface broken" only when no command is active since it would
   // be annoying to get it during intermediate states.
