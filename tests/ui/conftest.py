@@ -25,6 +25,10 @@ def pytest_addoption(parser):
     )
 
 
+def pytest_report_header(config):
+    return f"librepcb: {os.path.abspath(config.getoption('--librepcb-executable'))}"
+
+
 # Avoid errors due to too long file path on Windows :-|
 def _long_path(path):
     if os.name == "nt":

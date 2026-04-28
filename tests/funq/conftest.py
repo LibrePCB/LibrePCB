@@ -39,6 +39,10 @@ def pytest_addoption(parser):
     )
 
 
+def pytest_report_header(config):
+    return f"librepcb: {os.path.abspath(config.getoption('--librepcb-executable'))}"
+
+
 class GlobalOptions:
     def __init__(self):
         self.funq_conf = "funq.conf"

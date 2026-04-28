@@ -23,6 +23,10 @@ def pytest_addoption(parser):
     )
 
 
+def pytest_report_header(config):
+    return f"librepcb-cli: {os.path.abspath(config.getoption('--librepcb-executable'))}"
+
+
 class CliExecutor(object):
     def __init__(self, config, tmpdir):
         super(CliExecutor, self).__init__()
