@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "librariesmodel.h"
 
+#include "../notification.h"
 #include "../utils/slinthelpers.h"
 #include "librarydownload.h"
 
@@ -89,6 +90,10 @@ ui::LibraryListData LibrariesModel::getUiData() const noexcept {
   data.count = mMergedLibs.size();
   data.installed = mInstalledLibs.size();
   for (auto& lib : mMergedLibs) {
+    if (lib.duplicate) {
+      ++data.pending_uninstalls;
+      continue;
+    }
     if (lib.outdated) {
       ++data.outdated;
     }
@@ -215,66 +220,77 @@ void LibrariesModel::applyChanges() noexcept {
   // extracting more than a few ZIP files at the same time...
   auto semaphore = std::make_shared<QSemaphore>(4);
 
-  int installed = 0;
+  // Remove libraries first.
   int uninstalled = 0;
   for (auto& lib : mMergedLibs) {
     const auto uuid = Uuid::tryFromString(s2q(lib.uuid));
-    if (!uuid) continue;
+    if ((!uuid) || (!isMarkedForUninstall(lib))) continue;
 
-    if (isMarkedForInstall(lib) || isMarkedForUpdate(lib)) {
-      // Install/update library.
-      const auto onlineLib = mOnlineLibs.find(*uuid);
-      if (onlineLib == mOnlineLibs.end()) continue;
-
-      // Determine destination directory.
-      const FilePath destDir = mWorkspace.getLibrariesPath().getPathTo(
-          "remote/" % onlineLib->uuid.toStr() % ".lplib");
-
-      // Start download.
-      auto dl = std::make_shared<LibraryDownload>(onlineLib->downloadUrl,
-                                                  destDir, semaphore);
-      if (onlineLib->downloadSize > 0) {
-        dl->setExpectedZipFileSize(onlineLib->downloadSize);
-      }
-      if (!onlineLib->downloadSha256.isEmpty()) {
-        dl->setExpectedChecksum(QCryptographicHash::Sha256,
-                                QByteArray::fromHex(onlineLib->downloadSha256));
-      }
-      connect(
-          dl.get(), &LibraryDownload::progressPercent, this,
-          [this, uuid](int percent) {
-            if (auto i = indexOf(*uuid)) {
-              mMergedLibs.at(*i).progress = percent;
-              notify_row_changed(*i);
-            }
-          },
-          Qt::QueuedConnection);
-      connect(
-          dl.get(), &LibraryDownload::finished, this,
-          [this, uuid, dl](bool success, const QString& errMsg) {
-            Q_UNUSED(success);
-            Q_UNUSED(errMsg);
-            mDownloadsInProgress.removeOne(dl);
-            if (mDownloadsInProgress.isEmpty()) {
-              mWorkspace.getLibraryDb().startLibraryRescan();
-            }
-          },
-          Qt::QueuedConnection);
-      mDownloadsInProgress.append(dl);
-      dl->start();
-      ++installed;
-    } else if (isMarkedForUninstall(lib)) {
-      // Uninstall library.
-      try {
-        const FilePath fp(s2q(lib.path));
-        emit aboutToUninstallLibrary(fp);  // Let the app close it if needed
-        FileUtils::removeDirRecursively(fp);  // can throw
-      } catch (const Exception& e) {
-        // TODO: This should be implemented without message box some day...
-        QMessageBox::critical(nullptr, tr("Error"), e.getMsg());
-      }
-      ++uninstalled;
+    try {
+      const FilePath fp(s2q(lib.path));
+      emit aboutToUninstallLibrary(fp);  // Let the app close it if needed
+      FileUtils::removeDirRecursively(fp);  // can throw
+      mInstalledLibDirs[*uuid].remove(fp);  // Important for duplicates!
+    } catch (const Exception& e) {
+      emit notificationEmitted(std::make_shared<Notification>(
+          ui::NotificationType::Critical, tr("Failed to Uninstall Library"),
+          tr("The directory '%1' could not be removed: %2")
+              .arg(s2q(lib.path), e.getMsg()),
+          QString(), QString(), true));
     }
+    ++uninstalled;
+  }
+
+  // Then start installations/updates.
+  int installed = 0;
+  for (auto& lib : mMergedLibs) {
+    const auto uuid = Uuid::tryFromString(s2q(lib.uuid));
+    if ((!uuid) || ((!isMarkedForInstall(lib)) && (!isMarkedForUpdate(lib)))) {
+      continue;
+    }
+
+    // Install/update library.
+    const auto onlineLib = mOnlineLibs.find(*uuid);
+    if (onlineLib == mOnlineLibs.end()) continue;
+
+    // Determine destination directory.
+    const FilePath destDir = mWorkspace.getLibrariesPath().getPathTo(
+        "remote/" % onlineLib->uuid.toStr() % ".lplib");
+
+    // Start download.
+    auto dl = std::make_shared<LibraryDownload>(onlineLib->downloadUrl, destDir,
+                                                semaphore);
+    if (onlineLib->downloadSize > 0) {
+      dl->setExpectedZipFileSize(onlineLib->downloadSize);
+    }
+    if (!onlineLib->downloadSha256.isEmpty()) {
+      dl->setExpectedChecksum(QCryptographicHash::Sha256,
+                              QByteArray::fromHex(onlineLib->downloadSha256));
+    }
+    dl->setExistingDirsToReplace(mInstalledLibDirs[onlineLib->uuid]);
+    connect(
+        dl.get(), &LibraryDownload::progressPercent, this,
+        [this, uuid](int percent) {
+          if (auto i = indexOf(*uuid)) {
+            mMergedLibs.at(*i).progress = percent;
+            notify_row_changed(*i);
+          }
+        },
+        Qt::QueuedConnection);
+    connect(
+        dl.get(), &LibraryDownload::finished, this,
+        [this, uuid, dl](bool success, const QString& errMsg) {
+          Q_UNUSED(success);
+          Q_UNUSED(errMsg);
+          mDownloadsInProgress.removeOne(dl);
+          if (mDownloadsInProgress.isEmpty()) {
+            mWorkspace.getLibraryDb().startLibraryRescan();
+          }
+        },
+        Qt::QueuedConnection);
+    mDownloadsInProgress.append(dl);
+    dl->start();
+    ++installed;
   }
 
   if ((installed == 0) && ((uninstalled > 0) || scanCanceled)) {
@@ -339,13 +355,21 @@ void LibrariesModel::set_row_data(std::size_t i,
 void LibrariesModel::updateLibraries(bool resetHighlight) noexcept {
   mInstalledLibs.clear();
   mInstalledLibsErrors.clear();
+  mInstalledLibDirs.clear();
 
   try {
+    QSet<Uuid> uuids;
     QMultiMap<Version, FilePath> libraries =
         mWorkspace.getLibraryDb().getAll<Library>();  // can throw
 
-    QSet<Uuid> uuids;
-    foreach (const FilePath& libDir, libraries) {
+    // Note: Iterate from high versions to low versions, to make sure the
+    // old versions are marked as duplicate, not the new versions. This avoids
+    // updating duplicate libraries even though another duplicate is already
+    // up-to-date.
+    auto rbegin = std::make_reverse_iterator(libraries.constEnd());
+    auto rend = std::make_reverse_iterator(libraries.constBegin());
+    for (auto it = rbegin; it != rend; ++it) {
+      const FilePath libDir = *it;
       Uuid uuid = Uuid::createRandom();
       Version version = Version::fromString("1");
       mWorkspace.getLibraryDb().getMetadata<Library>(libDir, &uuid,
@@ -370,9 +394,7 @@ void LibrariesModel::updateLibraries(bool resetHighlight) noexcept {
 
       const auto sName = q2s(name);
       mInstalledLibs.push_back(ui::LibraryInfoData{
-          uuids.contains(uuid)
-              ? slint::SharedString()
-              : q2s(uuid.toStr()),  // UUID (empty for duplicates)
+          q2s(uuid.toStr()),  // UUID
           q2s(libDir.toNative()),  // Path
           q2s(icon),  // Icon
           sName,  // Name
@@ -380,11 +402,13 @@ void LibrariesModel::updateLibraries(bool resetHighlight) noexcept {
           q2s(version.toStr()),  // Installed version
           slint::SharedString(),  // Online version
           false,  // Outdated
+          uuids.contains(uuid),  // Duplicate
           false,  // Recommended
           0,  // Progress [%]
-          true,  // Checked
+          !uuids.contains(uuid),  // Checked
           mHighlightedLib == libDir,  // Highlight
       });
+      mInstalledLibDirs[uuid].insert(libDir);
       uuids.insert(uuid);
     }
   } catch (const Exception& e) {
@@ -524,6 +548,7 @@ void LibrariesModel::updateMergedLibraries() noexcept {
           slint::SharedString(),  // Installed version
           q2s(lib.version.toStr()),  // Online version
           false,  // Outdated
+          false,  // Duplicate
           lib.recommended,  // Recommended
           0,  // Progress
           false,  // Checked
@@ -556,6 +581,7 @@ void LibrariesModel::updateCheckStates(bool notify) noexcept {
 void LibrariesModel::checkMissingDependenciesOfLibs() noexcept {
   QSet<Uuid> toBeInstalled;
   for (const auto& lib : mMergedLibs) {
+    if (lib.duplicate) continue;
     const auto uuid = Uuid::tryFromString(s2q(lib.uuid));
     if (uuid && isLibraryChecked(lib)) {
       toBeInstalled.insert(*uuid);
@@ -582,6 +608,7 @@ void LibrariesModel::checkMissingDependenciesOfLibs() noexcept {
 void LibrariesModel::uncheckLibsWithUnmetDependencies() noexcept {
   QSet<Uuid> toBeUninstalled;
   for (const auto& lib : mMergedLibs) {
+    if (lib.duplicate) continue;
     const auto uuid = Uuid::tryFromString(s2q(lib.uuid));
     if (uuid && (!isLibraryChecked(lib))) {
       toBeUninstalled.insert(*uuid);
@@ -608,22 +635,24 @@ void LibrariesModel::uncheckLibsWithUnmetDependencies() noexcept {
 bool LibrariesModel::isLibraryChecked(
     const ui::LibraryInfoData& lib) const noexcept {
   const auto uuid = Uuid::tryFromString(s2q(lib.uuid));
-  return uuid && mCheckStates.value(*uuid, !lib.installed_version.empty());
+  return uuid && (!lib.duplicate) &&
+      mCheckStates.value(*uuid, !lib.installed_version.empty());
 }
 
 bool LibrariesModel::isMarkedForInstall(
     const ui::LibraryInfoData& lib) noexcept {
-  return lib.installed_version.empty() && lib.checked;
+  return lib.installed_version.empty() && lib.checked && (!lib.duplicate);
 }
 
 bool LibrariesModel::isMarkedForUpdate(
     const ui::LibraryInfoData& lib) noexcept {
-  return (!lib.installed_version.empty()) && lib.outdated && lib.checked;
+  return (!lib.installed_version.empty()) && lib.outdated && lib.checked &&
+      (!lib.duplicate);
 }
 
 bool LibrariesModel::isMarkedForUninstall(
     const ui::LibraryInfoData& lib) noexcept {
-  return (!lib.installed_version.empty()) && (!lib.checked);
+  return ((!lib.installed_version.empty()) && (!lib.checked)) || lib.duplicate;
 }
 
 std::optional<std::size_t> LibrariesModel::indexOf(const Uuid& uuid) noexcept {

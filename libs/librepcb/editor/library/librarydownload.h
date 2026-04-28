@@ -67,6 +67,13 @@ public:
   void setExpectedChecksum(QCryptographicHash::Algorithm algorithm,
                            const QByteArray& checksum) noexcept;
 
+  /**
+   * @brief Set existing directories of the library to download
+   *
+   * @param dirs  Directories which shall be removed after the download.
+   */
+  void setExistingDirsToReplace(QSet<FilePath> dirs) noexcept;
+
   // Operator Overloadings
   LibraryDownload& operator=(const LibraryDownload& rhs) = delete;
 

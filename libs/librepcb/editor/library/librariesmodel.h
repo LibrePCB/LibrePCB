@@ -30,6 +30,7 @@
 
 #include <QtCore>
 
+#include <memory>
 #include <vector>
 
 /*******************************************************************************
@@ -43,6 +44,7 @@ class Workspace;
 namespace editor {
 
 class LibraryDownload;
+class Notification;
 
 /*******************************************************************************
  *  Class LibrariesModel
@@ -90,6 +92,7 @@ signals:
   void uiDataChanged(ui::LibraryListData data);
   void onlineVersionsAvailable(const QHash<Uuid, Version>& versions);
   void aboutToUninstallLibrary(const FilePath& fp);
+  void notificationEmitted(std::shared_ptr<Notification> notification);
 
 private:
   void updateLibraries(bool resetHighlight = true) noexcept;
@@ -114,6 +117,7 @@ private:
   bool mInitialized;
   std::vector<ui::LibraryInfoData> mInstalledLibs;  /// Either local or remote
   QStringList mInstalledLibsErrors;
+  QHash<Uuid, QSet<FilePath>> mInstalledLibDirs;
   QHash<Uuid, ApiEndpoint::Library> mOnlineLibs;
   QStringList mOnlineLibsErrors;
   std::vector<ui::LibraryInfoData> mMergedLibs;

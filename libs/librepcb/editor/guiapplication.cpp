@@ -277,6 +277,8 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
   // Setup library models & filter.
   connect(mRemoteLibraries.get(), &LibrariesModel::onlineVersionsAvailable,
           mLocalLibraries.get(), &LibrariesModel::setOnlineVersions);
+  connect(mRemoteLibraries.get(), &LibrariesModel::notificationEmitted,
+          mNotifications.get(), &NotificationsModel::push);
   connect(mRemoteLibraries.get(), &LibrariesModel::aboutToUninstallLibrary,
           this, &GuiApplication::closeLibrary);
 
@@ -675,6 +677,8 @@ std::shared_ptr<MainWindow> GuiApplication::createNewWindow(
             [](const ui::LibraryInfoData& a, const ui::LibraryInfoData& b) {
               if ((a.progress > 0) != (b.progress > 0)) {
                 return a.progress > 0;
+              } else if (a.duplicate != b.duplicate) {
+                return a.duplicate;
               } else if (a.outdated != b.outdated) {
                 return a.outdated;
               } else if (a.installed_version.empty() !=
