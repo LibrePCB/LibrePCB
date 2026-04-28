@@ -61,7 +61,6 @@ component LibraryListViewItem inherits Rectangle {
     in property <bool> enabled: true;
     property <LibraryInfoData> lib: model[index];
     property <bool> has-switch: remote && (!lib.uuid.is-empty);
-    property <bool> version-as-badge: (!lib.installed-version.is-empty) && (remote || (!lib.online-version.is-empty));
     property <bool> buttons-visible: ta.has-hover || is-current;
 
     property <string> status-text;
@@ -115,6 +114,18 @@ component LibraryListViewItem inherits Rectangle {
         }
     }
 
+    if has-switch && (lib.outdated || (lib.installed-version.is-empty == lib.checked)): Rectangle {
+        x: parent.width - self.width;
+        y: 0;
+        width: 12px;
+        height: self.width;
+
+        Path {
+            commands: "M 100 100 L 100 0 L 0 0 Z";
+            fill: Data.theme.base-text-warning;
+        }
+    }
+
     ta := TouchArea {
         enabled: root.enabled;
 
@@ -129,7 +140,6 @@ component LibraryListViewItem inherits Rectangle {
                 height: root.height - 6px;
                 image-fit: contain;
                 source: lib.icon;
-                opacity: lib.installed-version.is-empty ? 0.7 : 1;
                 accessible-role: none;
             }
 
@@ -147,7 +157,7 @@ component LibraryListViewItem inherits Rectangle {
                     name-txt := Text {
                         horizontal-stretch: 0;
                         color: {
-                            if ((!enabled) || lib.installed-version.is-empty) {
+                            if !enabled {
                                 Data.theme.control-text-muted
                             } else {
                                 Data.theme.control-text
@@ -172,12 +182,11 @@ component LibraryListViewItem inherits Rectangle {
                         enabled: enabled;
                     }
 
-                    if status-text.is-empty: version-txt := Text {
+                    if status-text.is-empty && buttons-visible: version-txt := Text {
                         horizontal-stretch: 0;
                         color: name-txt.color;
                         font-size: 10px;
                         vertical-alignment: bottom;
-                        overflow: elide;
                         text: "v" + (lib.installed-version.is-empty ? lib.online-version : lib.installed-version);
                         accessible-role: none;
                     }
