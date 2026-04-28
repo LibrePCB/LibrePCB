@@ -210,6 +210,11 @@ void LibrariesModel::applyChanges() noexcept {
   qApp->setOverrideCursor(Qt::WaitCursor);
   auto cursorSg = scopeGuard([]() { qApp->restoreOverrideCursor(); });
 
+  // Limit number of parallel file access threads, mainly for unreliable
+  // operating systems like MS Windows. It seems to be overwhelmed when
+  // extracting more than a few ZIP files at the same time...
+  auto semaphore = std::make_shared<QSemaphore>(4);
+
   int installed = 0;
   int uninstalled = 0;
   for (auto& lib : mMergedLibs) {
@@ -226,8 +231,8 @@ void LibrariesModel::applyChanges() noexcept {
           "remote/" % onlineLib->uuid.toStr() % ".lplib");
 
       // Start download.
-      auto dl =
-          std::make_shared<LibraryDownload>(onlineLib->downloadUrl, destDir);
+      auto dl = std::make_shared<LibraryDownload>(onlineLib->downloadUrl,
+                                                  destDir, semaphore);
       if (onlineLib->downloadSize > 0) {
         dl->setExpectedZipFileSize(onlineLib->downloadSize);
       }

@@ -52,13 +52,9 @@ public:
   // Constructors / Destructor
   LibraryDownload() = delete;
   LibraryDownload(const LibraryDownload& other) = delete;
-  LibraryDownload(const QUrl& urlToZip, const FilePath& destDir) noexcept;
+  LibraryDownload(const QUrl& urlToZip, const FilePath& destDir,
+                  std::shared_ptr<QSemaphore> semaphore) noexcept;
   ~LibraryDownload() noexcept;
-
-  // Getters
-  const FilePath& getDestinationDir() const noexcept { return mDestDir; }
-
-  // Setters
 
   /**
    * @copydoc ::librepcb::NetworkRequestBase::setExpectedReplyContentSize()
@@ -97,13 +93,10 @@ private:  // Methods
   void downloadErrored(const QString& errMsg) noexcept;
   void downloadAborted() noexcept;
   void downloadSucceeded() noexcept;
-  FilePath getPathToLibDir() noexcept;
+  static FilePath findLibraryInZip(const FilePath& root);
 
 private:  // Data
   std::unique_ptr<FileDownload> mFileDownload;
-  FilePath mDestDir;
-  FilePath mTempDestDir;
-  FilePath mTempZipFile;
 };
 
 /*******************************************************************************
