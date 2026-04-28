@@ -99,6 +99,7 @@ WorkspaceSettings::WorkspaceSettings(QObject* parent)
                      },
                  },
                  this),
+    librariesAutoUpdateMode("library_updates", AutoUpdateMode::Install, this),
     autofetchLivePartInformation("autofetch_live_part_information", true, this),
     externalWebBrowserCommands("external_web_browser", "command", QStringList(),
                                this),

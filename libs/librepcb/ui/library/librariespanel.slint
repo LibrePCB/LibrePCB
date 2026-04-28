@@ -68,6 +68,11 @@ component LibraryListViewItem inherits Rectangle {
     property <color> status-color;
     property <image> status-icon;
     states [
+        duplicate when lib.duplicate: {
+            status-text: @tr("Duplicate, will be removed");
+            status-color: Data.theme.base-text-warning;
+            status-icon: @image-url("../../../font-awesome/svgs/solid/triangle-exclamation.svg");
+        }
         outdated when lib.outdated: {
             status-text: @tr("Outdated:") + " v" + lib.installed-version + " < v" + lib.online-version;
             status-color: Data.theme.base-text-error;
@@ -241,6 +246,7 @@ component LibraryListViewItem inherits Rectangle {
                 horizontal-stretch: 0;
                 checked: lib-checked;
                 enabled: enabled;
+                read-only: lib.duplicate;
                 focusable: false;
                 accessible-label: "use library";
 

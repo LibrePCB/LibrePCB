@@ -30,6 +30,7 @@
 
 #include <QtCore>
 
+#include <memory>
 #include <vector>
 
 /*******************************************************************************
@@ -43,6 +44,7 @@ class Workspace;
 namespace editor {
 
 class LibraryDownload;
+class Notification;
 
 /*******************************************************************************
  *  Class LibrariesModel
@@ -69,7 +71,7 @@ public:
   // General Methods
   ui::LibraryListData getUiData() const noexcept;
   void setOnlineVersions(const QHash<Uuid, Version>& versions) noexcept;
-  void ensurePopulated(bool withIcons) noexcept;
+  void ensurePopulated(bool withIcons, bool isAutoCheck = false) noexcept;
   void highlightLibraryOnNextRescan(const FilePath& fp) noexcept;
   void checkForUpdates() noexcept;
   void cancelUpdateCheck() noexcept;
@@ -90,6 +92,8 @@ signals:
   void uiDataChanged(ui::LibraryListData data);
   void onlineVersionsAvailable(const QHash<Uuid, Version>& versions);
   void aboutToUninstallLibrary(const FilePath& fp);
+  void notificationEmitted(std::shared_ptr<Notification> notification);
+  void statusBarMessageChanged(const QString& message, int timeoutMs);
 
 private:
   void updateLibraries(bool resetHighlight = true) noexcept;
@@ -99,6 +103,7 @@ private:
   void onlineIconReceived(const Uuid& uuid, const QByteArray& data) noexcept;
   void errorWhileFetchingLibraryList(QString errorMsg) noexcept;
   void apiEndpointOperationFinished() noexcept;
+  void startAutoUpdate() noexcept;
   void updateMergedLibraries() noexcept;
   void updateCheckStates(bool notify) noexcept;
   void checkMissingDependenciesOfLibs() noexcept;
@@ -108,12 +113,16 @@ private:
   static bool isMarkedForUpdate(const ui::LibraryInfoData& lib) noexcept;
   static bool isMarkedForUninstall(const ui::LibraryInfoData& lib) noexcept;
   std::optional<std::size_t> indexOf(const Uuid& uuid) noexcept;
+  void setAutoUpdateErrorCount(int count) noexcept;
 
   Workspace& mWorkspace;
   const Mode mMode;
   bool mInitialized;
+  bool mIsAutoCheck;
+  int mAutoUpdateErrorCount;
   std::vector<ui::LibraryInfoData> mInstalledLibs;  /// Either local or remote
   QStringList mInstalledLibsErrors;
+  QHash<Uuid, QSet<FilePath>> mInstalledLibDirs;
   QHash<Uuid, ApiEndpoint::Library> mOnlineLibs;
   QStringList mOnlineLibsErrors;
   std::vector<ui::LibraryInfoData> mMergedLibs;
@@ -126,6 +135,8 @@ private:
 
   QList<std::shared_ptr<ApiEndpoint>> mApiEndpointsInProgress;
   QList<std::shared_ptr<LibraryDownload>> mDownloadsInProgress;
+
+  QTimer mAutoUpdateTimer;
 };
 
 /*******************************************************************************

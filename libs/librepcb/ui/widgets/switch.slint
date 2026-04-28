@@ -8,6 +8,7 @@ export enum TextSide {
 export component Switch inherits Rectangle {
     in-out property <bool> checked: false;
     in property <bool> enabled: true;
+    in property <bool> read-only: false;
     in property <string> text;
     in property <TextSide> text-side: right;
     in property <length> size: 25px;
@@ -40,6 +41,7 @@ export component Switch inherits Rectangle {
     accessible-checkable: true;
     accessible-checked: checked;
     accessible-enabled: enabled;
+    accessible-read-only: read-only;
     accessible-label: text;
     accessible-action-default => {
         ta.clicked();
@@ -56,7 +58,7 @@ export component Switch inherits Rectangle {
         key-pressed(event) => {
             // Only consume Space, but not Return as the Return key is often
             // used to confirm a dialog or something like that.
-            if event.text == Key.Space {
+            if (event.text == Key.Space) && (!read-only) {
                 toggled(!checked);
                 return accept;
             }
@@ -127,6 +129,8 @@ export component Switch inherits Rectangle {
     }
 
     ta := TouchArea {
+        // If read-only, still have the TouchArea enabled to avoid clicks
+        // propagating to any control (e.g. list view) behind the switch.
         enabled: enabled;
 
         changed has-hover => {
@@ -146,7 +150,9 @@ export component Switch inherits Rectangle {
             if !root.status-tip.is-empty {
                 Data.status-tip = "";
             }
-            toggled(!checked);
+            if !read-only {
+                toggled(!checked);
+            }
         }
     }
 }

@@ -4,6 +4,7 @@
 import os
 import platform
 import pytest
+import re
 import shutil
 import slint_testing
 import time
@@ -431,6 +432,17 @@ class LibrePcbFixture(object):
             path = self.abspath(path)
         self.workspace_path = path
 
+    def set_library_update_mode(self, mode):
+        assert mode in ["disabled", "check", "notify", "install"]
+        old_value = "(library_updates check)"
+        fp = self.get_workspace_path("data/settings.lp")
+        with open(fp, "r") as f:
+            content = f.read()
+        assert old_value in content
+        content = content.replace(old_value, f"(library_updates {mode})")
+        with open(fp, "w") as f:
+            f.write(content)
+
     def add_project(self, project, as_lppz=False):
         src = os.path.join(DATA_DIR, "projects", project)
         dst = os.path.join(self.tmpdir, project)
@@ -457,6 +469,26 @@ class LibrePcbFixture(object):
         dest = self.get_workspace_libraries_path("local")
         dest = os.path.join(dest, os.path.basename(path))
         shutil.copytree(_long_path(path), _long_path(dest))
+
+    def add_remote_library_to_workspace(self, zip_path, mark_outdated=False):
+        if not os.path.isabs(zip_path):
+            zip_path = os.path.join(DATA_DIR, zip_path)
+        outdir = self.get_workspace_libraries_path("remote")
+        shutil.unpack_archive(_long_path(zip_path), _long_path(outdir))
+        dest = os.path.join(outdir, os.path.basename(zip_path).replace("zip", "lplib"))
+        with os.scandir(outdir) as it:
+            for entry in it:
+                if entry.is_dir() and not entry.name.endswith(".lplib"):
+                    os.rename(entry.path, dest)
+        if mark_outdated:
+            lp_file = os.path.join(dest, "library.lp")
+            with open(lp_file, "r") as f:
+                content = f.read()
+            content = re.sub(
+                r" \(version \"(\d+\.?)+\"\)", ' (version "0.0.0.1")', content
+            )
+            with open(lp_file, "w") as f:
+                f.write(content)
 
     def add_project_to_workspace(self, project):
         src = os.path.join(DATA_DIR, "projects", project)
@@ -517,6 +549,20 @@ class Helpers(object):
                 raise TimeoutError(
                     f"Expected directories {directories}, but found {dirs}."
                 )
+            time.sleep(0.02)
+
+    @staticmethod
+    def wait_for_notification(app, title, visible=True, timeout=10.0):
+        start = time.time()
+        while True:
+            items = app.get("#NotificationsPopup #NotificationItem *")
+            for item in items:
+                if visible and (item.label == title):
+                    return item
+            if not visible:
+                return None
+            if time.time() > (start + timeout):
+                raise TimeoutError(f"Notification not emitted: {title}")
             time.sleep(0.02)
 
 

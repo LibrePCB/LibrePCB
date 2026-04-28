@@ -116,19 +116,22 @@ void DownloadLibraryTab::trigger(ui::TabAction a) noexcept {
         mUiData.download_progress = 0;
         onDerivedUiDataChanged.notify();
 
-        mDownload.reset(new LibraryDownload(*mUrl, mDirectory));
-        connect(mDownload.get(), &LibraryDownload::progressState,
+        mDownload.reset(new LibraryDownload(*mUrl, mDirectory,
+                                            std::make_shared<QSemaphore>(1)));
+        connect(mDownload.get(), &LibraryDownload::progressState, this,
                 [this](const QString& state) {
                   mUiData.download_status = q2s(state);
                   onDerivedUiDataChanged.notify();
                 });
-        connect(mDownload.get(), &LibraryDownload::progressPercent,
+        connect(mDownload.get(), &LibraryDownload::progressPercent, this,
                 [this](int percent) {
                   mUiData.download_progress = percent;
                   onDerivedUiDataChanged.notify();
                 });
+        // IMPORTANT: Must be QueuedConnection to avoid use-after-free since
+        // the LibraryDownload object gets deleted within downloadFinished()!
         connect(mDownload.get(), &LibraryDownload::finished, this,
-                &DownloadLibraryTab::downloadFinished);
+                &DownloadLibraryTab::downloadFinished, Qt::QueuedConnection);
         mDownload->start();
       } catch (const Exception& e) {
         mUiData.download_status = q2s(e.getMsg());
