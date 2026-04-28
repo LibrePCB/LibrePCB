@@ -70,6 +70,13 @@ LibraryElement::~LibraryElement() noexcept {
  *  General Methods
  ******************************************************************************/
 
+void LibraryElement::duplicateFrom(const LibraryElement& other) {
+  LibraryBaseElement::duplicateFrom(other);
+  setGeneratedBy(other.getGeneratedBy());
+  setCategories(other.getCategories());
+  setResources(other.getResources());
+}
+
 RuleCheckMessageList LibraryElement::runChecks() const {
   LibraryElementCheck check(*this);
   return check.runChecks();  // can throw

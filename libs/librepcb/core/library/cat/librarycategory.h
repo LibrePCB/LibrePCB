@@ -70,6 +70,7 @@ public:
   }
 
   // General Methods
+  void duplicateFrom(const LibraryCategory& other);
   virtual RuleCheckMessageList runChecks() const override;
 
   // Operator Overloadings

@@ -82,6 +82,7 @@ public:
   void setPackageUuid(const Uuid& uuid) noexcept;
 
   // General Methods
+  void duplicateFrom(const Device& other);
   virtual RuleCheckMessageList runChecks() const override;
 
   // Operator Overloadings

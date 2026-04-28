@@ -128,6 +128,18 @@ bool LibraryBaseElement::setMessageApproved(const SExpression& approval,
  *  General Methods
  ******************************************************************************/
 
+void LibraryBaseElement::duplicateFrom(const LibraryBaseElement& other) {
+  mDirectory->removeDirRecursively();  // Delete all files (will be re-added).
+  setVersion(other.getVersion());
+  setAuthor(other.getAuthor());
+  setCreated(other.getCreated());  // Note: should be overwritten afterwards.
+  setDeprecated(other.isDeprecated());
+  setNames(other.getNames());
+  setDescriptions(other.getDescriptions());
+  setKeywords(other.getKeywords());
+  setMessageApprovals(other.getMessageApprovals());
+}
+
 RuleCheckMessageList LibraryBaseElement::runChecks() const {
   LibraryBaseElementCheck check(*this);
   return check.runChecks();  // can throw

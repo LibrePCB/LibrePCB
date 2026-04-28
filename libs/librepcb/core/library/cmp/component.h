@@ -130,6 +130,7 @@ public:
       const Uuid& symbVar, const Uuid& item) const;
 
   // General Methods
+  void duplicateFrom(const Component& other);
   virtual RuleCheckMessageList runChecks() const override;
 
   // Operator Overloadings
