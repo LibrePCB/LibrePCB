@@ -40,11 +40,12 @@ namespace tests {
  ******************************************************************************/
 
 typedef struct {
-  QUrl url;
-  QString destFilename;
-  QString extractDirname;
-  QByteArray sha256;
-  bool success;
+  const char* url;
+  const char* destFilename;
+  const char* extractDirname;
+  const char* sha256;
+  const char* errorMsg;
+  bool testExistingDestination;
 } FileDownloadTestData;
 
 /*******************************************************************************
@@ -66,7 +67,7 @@ protected:
   }
 
   FilePath getExtractToDir(const FileDownloadTestData& data) {
-    if (!data.extractDirname.isEmpty()) {
+    if (data.extractDirname) {
       return mTmpDir.getPathTo(data.extractDirname);
     } else {
       return FilePath();
@@ -87,7 +88,8 @@ NetworkAccessManager* FileDownloadTest::sDownloadManager = nullptr;
 TEST_P(FileDownloadTest, testConstructorAndSettersAndDestructor) {
   const FileDownloadTestData& data = GetParam();
 
-  FileDownload dl(data.url, getDestination(data));
+  FileDownload dl(QUrl::fromLocalFile(data.url), getDestination(data),
+                  std::make_shared<QSemaphore>(1));
   dl.setExpectedReplyContentSize(100);
   dl.setExpectedChecksum(QCryptographicHash::Sha1, QByteArray("42"));
   dl.setZipExtractionDirectory(getExtractToDir(data));
@@ -96,18 +98,21 @@ TEST_P(FileDownloadTest, testConstructorAndSettersAndDestructor) {
 TEST_P(FileDownloadTest, testDownload) {
   const FileDownloadTestData& data = GetParam();
 
-  // remove target file/directory
-  if (getDestination(data).isExistingFile()) {
-    FileUtils::removeFile(getDestination(data));
-  }
-  if (getExtractToDir(data).isExistingDir()) {
-    FileUtils::removeDirRecursively(getExtractToDir(data));
+  // create destination files
+  if (data.testExistingDestination) {
+    FileUtils::writeFile(getDestination(data), "Foo");
+    FileUtils::writeFile(getExtractToDir(data).getPathTo("foo"), "Foo");
   }
 
   // start the file download
-  FileDownload* dl = new FileDownload(data.url, getDestination(data));
+  FileDownload* dl =
+      new FileDownload(QUrl::fromLocalFile(data.url), getDestination(data),
+                       std::make_shared<QSemaphore>(1));
   dl->setZipExtractionDirectory(getExtractToDir(data));
-  dl->setExpectedChecksum(QCryptographicHash::Sha256, data.sha256);
+  if (data.sha256) {
+    dl->setExpectedChecksum(QCryptographicHash::Sha256,
+                            QByteArray::fromHex(data.sha256));
+  }
   QObject::connect(dl, &FileDownload::progressState, &mSignalReceiver,
                    &NetworkRequestBaseSignalReceiver::progressState);
   QObject::connect(dl, &FileDownload::progressPercent, &mSignalReceiver,
@@ -131,10 +136,8 @@ TEST_P(FileDownloadTest, testDownload) {
   dl->start();
 
   // wait until download finished (with timeout)
-  qint64 start = QDateTime::currentDateTime().toMSecsSinceEpoch();
-  auto currentTime = []() {
-    return QDateTime::currentDateTime().toMSecsSinceEpoch();
-  };
+  qint64 start = QDateTime::currentMSecsSinceEpoch();
+  auto currentTime = []() { return QDateTime::currentMSecsSinceEpoch(); };
   while ((!mSignalReceiver.mDestroyed) && (currentTime() - start < 30000)) {
     QThread::msleep(100);
     qApp->processEvents();
@@ -151,29 +154,27 @@ TEST_P(FileDownloadTest, testDownload) {
   EXPECT_TRUE(mSignalReceiver.mReceivedData.isNull())
       << qPrintable(mSignalReceiver.mReceivedData);
   EXPECT_TRUE(mSignalReceiver.mReceivedContentType.isEmpty());
-  if (data.success) {
+  EXPECT_EQ(std::string(data.errorMsg ? data.errorMsg : ""),
+            mSignalReceiver.mErrorMessage.toStdString());
+  if (!data.errorMsg) {
     EXPECT_GE(mSignalReceiver.mSimpleProgressCallCount, 1);
     EXPECT_EQ(1, mSignalReceiver.mSucceededCallCount);
     EXPECT_EQ(0, mSignalReceiver.mErroredCallCount);
     EXPECT_EQ(1, mSignalReceiver.mFileDownloadedCallCount);
-    EXPECT_TRUE(mSignalReceiver.mErrorMessage.isNull())
-        << qPrintable(mSignalReceiver.mErrorMessage);
     EXPECT_TRUE(mSignalReceiver.mFinishedSuccess);
     EXPECT_EQ(getDestination(data), mSignalReceiver.mDownloadedToFilePath);
     EXPECT_EQ(getExtractToDir(data), mSignalReceiver.mExtractedToFilePath);
-    EXPECT_EQ(data.extractDirname.isNull(),
+    EXPECT_EQ(data.extractDirname == nullptr,
               getDestination(data).isExistingFile());
   } else {
     EXPECT_GE(mSignalReceiver.mSimpleProgressCallCount, 0);
     EXPECT_EQ(0, mSignalReceiver.mSucceededCallCount);
     EXPECT_EQ(1, mSignalReceiver.mErroredCallCount);
     EXPECT_EQ(0, mSignalReceiver.mFileDownloadedCallCount);
-    EXPECT_FALSE(mSignalReceiver.mErrorMessage.isEmpty())
-        << qPrintable(mSignalReceiver.mErrorMessage);
     EXPECT_FALSE(mSignalReceiver.mFinishedSuccess);
     EXPECT_FALSE(getDestination(data).isExistingFile());
   }
-  if (data.success && (!data.extractDirname.isNull())) {
+  if ((!data.errorMsg) && data.extractDirname) {
     EXPECT_EQ(1, mSignalReceiver.mZipFileExtractedCallCount);
     EXPECT_TRUE(getExtractToDir(data).isExistingDir());
     EXPECT_FALSE(getExtractToDir(data).isEmptyDir());
@@ -189,25 +190,35 @@ TEST_P(FileDownloadTest, testDownload) {
 
 // clang-format off
 INSTANTIATE_TEST_SUITE_P(FileDownloadTest, FileDownloadTest, ::testing::Values(
-    FileDownloadTestData({QUrl::fromLocalFile(TEST_DATA_DIR "/unittests/librepcbcommon/FileDownloadTest/first_pcb.zip"),
-                          QString("first_pcb_downloaded.zip"),
-                          QString("first_pcb_extracted"),
-                          QByteArray::fromHex("f6f18782790d2a185698f7028a83397d56ef6145679f646c8de5ddfc298d8f89"),
-                          true}),
-    FileDownloadTestData({QUrl::fromLocalFile(TEST_DATA_DIR "/unittests/librepcbcommon/FileDownloadTest/first_pcb.zip"),
-                          QString("first_pcb_downloaded.zip"),
-                          QString(),
-                          QByteArray::fromHex("f6f18782790d2a185698f7028a83397d56ef6145679f646c8de5ddfc298d8f88"), // wrong
+    FileDownloadTestData({TEST_DATA_DIR "/unittests/librepcbcommon/FileDownloadTest/first_pcb.zip",
+                          "first_pcb_downloaded.zip",
+                          "first_pcb_extracted",
+                          "f6f18782790d2a185698f7028a83397d56ef6145679f646c8de5ddfc298d8f89",
+                          nullptr, // no error
                           false}),
-    FileDownloadTestData({QUrl::fromLocalFile(TEST_DATA_DIR "/unittests/librepcbcommon/FileDownloadTest/libraries"),
-                          QString("libraries.json"),
-                          QString(),
-                          QByteArray(),
+    FileDownloadTestData({TEST_DATA_DIR "/unittests/librepcbcommon/FileDownloadTest/first_pcb.zip",
+                          "first_pcb_downloaded.zip",
+                          "first_pcb_extracted",
+                          "f6f18782790d2a185698f7028a83397d56ef6145679f646c8de5ddfc298d8f89",
+                          nullptr, // no error
                           true}),
-    FileDownloadTestData({QUrl::fromLocalFile("/some-invalid-url"),
-                          QString("some-invalid-url"),
-                          QString("some-invalid-url_extracted"),
-                          QByteArray(),
+    FileDownloadTestData({TEST_DATA_DIR "/unittests/librepcbcommon/FileDownloadTest/first_pcb.zip",
+                          "first_pcb_downloaded.zip",
+                          nullptr, // no extract dir
+                          "f6f18782790d2a185698f7028a83397d56ef6145679f646c8de5ddfc298d8f88", // wrong
+                          "Checksum verification of downloaded file failed!",
+                          false}),
+    FileDownloadTestData({TEST_DATA_DIR "/unittests/librepcbcommon/FileDownloadTest/libraries",
+                          "libraries.json",
+                          nullptr, // no extract dir
+                          nullptr, // no sha256
+                          nullptr, // no error
+                          false}),
+    FileDownloadTestData({"/some-invalid-url",
+                          "some-invalid-url",
+                          "some-invalid-url_extracted",
+                          nullptr, // no sha256
+                          "Error opening /some-invalid-url: No such file or directory (203)",
                           false})
 ));
 // clang-format on

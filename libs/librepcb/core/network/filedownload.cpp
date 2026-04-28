@@ -23,8 +23,9 @@
 #include "filedownload.h"
 
 #include "../exceptions.h"
+#include "../fileio/fileutils.h"
 #include "../fileio/ziparchive.h"
-#include "../utils/scopeguard.h"
+#include "../utils/scopeguardlist.h"
 
 #include <QtCore>
 
@@ -37,12 +38,15 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-FileDownload::FileDownload(const QUrl& url, const FilePath& dest) noexcept
+FileDownload::FileDownload(const QUrl& url, const FilePath& dest,
+                           std::shared_ptr<QSemaphore> semaphore) noexcept
   : NetworkRequestBase(url),
+    mSemaphore(semaphore),
     mDestination(dest),
-    mHashAlgorithm(QCryptographicHash::Md5),
+    mHash(),
     mExpectedChecksum(),
     mExtractZipToDir() {
+  Q_ASSERT(mSemaphore);
 }
 
 FileDownload::~FileDownload() noexcept {
@@ -55,13 +59,16 @@ FileDownload::~FileDownload() noexcept {
 void FileDownload::setExpectedChecksum(QCryptographicHash::Algorithm algorithm,
                                        const QByteArray& checksum) noexcept {
   Q_ASSERT(!mStarted);
-  mHashAlgorithm = algorithm;
+  mHash.reset(new QCryptographicHash(algorithm));
   mExpectedChecksum = checksum;
 }
 
-void FileDownload::setZipExtractionDirectory(const FilePath& dir) noexcept {
+void FileDownload::setZipExtractionDirectory(
+    const FilePath& dir,
+    std::function<FilePath(const FilePath&)> discoveryCallback) noexcept {
   Q_ASSERT(!mStarted);
   mExtractZipToDir = dir;
+  mZipDiscoveryCallback = discoveryCallback;
 }
 
 /*******************************************************************************
@@ -69,23 +76,14 @@ void FileDownload::setZipExtractionDirectory(const FilePath& dir) noexcept {
  ******************************************************************************/
 
 void FileDownload::prepareRequest() {
-  // check destination filepath
-  if (mDestination.isExistingFile() || mDestination.isExistingDir()) {
-    throw RuntimeError(__FILE__, __LINE__,
-                       QString("The destination file exists already: %1")
-                           .arg(mDestination.toNative()));
-  }
+  // Limit number of parallel file access threads.
+  mSemaphore->acquire();
+  QSemaphoreReleaser releaser(*mSemaphore);
 
-  // create destination directory
-  if (!mDestination.getParentDir().isEmptyDir()) {
-    if (!QDir().mkpath(mDestination.getParentDir().toStr())) {
-      throw RuntimeError(__FILE__, __LINE__,
-                         QString("Could not create directory \"%1\".")
-                             .arg(mDestination.getParentDir().toNative()));
-    }
-  }
+  // Create destination directory.
+  FileUtils::makePath(mDestination.getParentDir());  // can throw
 
-  // open temporary destination file
+  // Open temporary destination file.
   mFile.reset(new QSaveFile(mDestination.toStr(), this));
   if (!mFile->open(QIODevice::WriteOnly)) {
     throw RuntimeError(__FILE__, __LINE__,
@@ -95,36 +93,11 @@ void FileDownload::prepareRequest() {
 }
 
 void FileDownload::finalizeRequest() {
-  // check destination filepath again
-  if (mDestination.isExistingFile() || mDestination.isExistingDir()) {
-    throw RuntimeError(__FILE__, __LINE__,
-                       QString("The destination file exists already: %1")
-                           .arg(mDestination.toNative()));
-  }
-
-  // save to destination file
-  if (!mFile->commit()) {
-    throw RuntimeError(__FILE__, __LINE__,
-                       tr("Error while writing file \"%1\": %2")
-                           .arg(mDestination.toNative(), mFile->errorString()));
-  }
-
-  // if an error occurs below this line, remove the downloaded file
-  auto sg = scopeGuard([this]() { QFile::remove(mDestination.toStr()); });
-
-  // verify checksum of downloaded file
-  if (!mExpectedChecksum.isEmpty()) {
+  // Verify checksum of downloaded file.
+  if (mHash) {
     emit progressState(tr("Verify checksum..."));
-    QFile file(mDestination.toStr());
-    if (!file.open(QFile::ReadOnly)) {
-      throw RuntimeError(__FILE__, __LINE__,
-                         tr("Error while readback file \"%1\": %2")
-                             .arg(mDestination.toNative(), file.errorString()));
-    }
-    QCryptographicHash hash(mHashAlgorithm);
-    hash.addData(&file);
-    QString result = hash.result().toHex();
-    QString expected = mExpectedChecksum.toHex();
+    const QString result = mHash->result().toHex();
+    const QString expected = mExpectedChecksum.toHex();
     if (result != expected) {
       qDebug().nospace() << "Expected checksum " << expected << " but got "
                          << result << ".";
@@ -136,14 +109,57 @@ void FileDownload::finalizeRequest() {
     }
   }
 
-  // extract zip file if necessary
-  if (mExtractZipToDir.isValid()) {
-    emit progressState(tr("Extract files..."));
-    ZipArchive zip(mDestination);  // can throw
-    zip.extractTo(mExtractZipToDir);  // can throw
-  } else {
-    // do NOT remove the downloaded file
-    sg.dismiss();
+  // Limit number of parallel file access / unzip threads.
+  mSemaphore->acquire();
+  QSemaphoreReleaser releaser(*mSemaphore);
+
+  // Save to destination file.
+  emit progressState(tr("Write file..."));
+  if (!mFile->commit()) {
+    throw RuntimeError(__FILE__, __LINE__,
+                       tr("Error while writing file \"%1\": %2")
+                           .arg(mDestination.toNative(), mFile->errorString()));
+  }
+
+  // If the downloaded file is not a ZIP, we are done now.
+  if (!mExtractZipToDir.isValid()) {
+    return;
+  }
+
+  // Clean up temporary files and folders.
+  emit progressState(tr("Remove temporary files..."));
+  ScopeGuardList sgl;
+  sgl.add([fp = mDestination.toStr()]() { QFile::remove(fp); });
+  const FilePath tmpDirFp(mExtractZipToDir.toStr() % ".tmp");
+  FileUtils::removeDirRecursively(tmpDirFp);  // can throw
+  sgl.add([fp = tmpDirFp.toStr()]() { QDir(fp).removeRecursively(); });
+  const FilePath backupDirFp(mExtractZipToDir.toStr() % ".backup");
+  FileUtils::removeDirRecursively(backupDirFp);  // can throw
+  sgl.add([fp = backupDirFp.toStr()]() { QDir(fp).removeRecursively(); });
+
+  // Extract ZIP to temporary directory.
+  emit progressState(tr("Extract ZIP..."));
+  ZipArchive zip(mDestination);  // can throw
+  zip.extractTo(tmpDirFp);  // can throw
+
+  // Find the directory of interest in the temporary directory.
+  const FilePath srcDirFp = mZipDiscoveryCallback
+      ? mZipDiscoveryCallback(tmpDirFp)  // can throw
+      : tmpDirFp;
+  Q_ASSERT(srcDirFp.isValid() && srcDirFp.isLocatedInDir(tmpDirFp));
+
+  // Create backup of destination directory. This is better than removing
+  // the destination directory recursively, as this would not be atomic.
+  if (mExtractZipToDir.isExistingDir()) {
+    FileUtils::move(mExtractZipToDir, backupDirFp);  // can throw
+  }
+
+  // Move downloaded directory to destination.
+  // If this fails, try to restore the backup.
+  try {
+    FileUtils::move(srcDirFp, mExtractZipToDir);  // can throw
+  } catch (const Exception& e) {
+    QDir().rename(backupDirFp.toStr(), mExtractZipToDir.toStr());
   }
 }
 
@@ -157,7 +173,11 @@ void FileDownload::emitSuccessfullyFinishedSignals(
 }
 
 void FileDownload::fetchNewData(QIODevice& device) noexcept {
-  mFile->write(device.readAll());
+  const QByteArray data = device.readAll();
+  mFile->write(data);
+  if (mHash) {
+    mHash->addData(data);
+  }
 }
 
 /*******************************************************************************

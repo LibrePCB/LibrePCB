@@ -74,15 +74,14 @@ TEST_F(LibraryDownloadTest, testDownloadInvalidLibrary) {
 
   // start the file download
   LibraryDownload* dl =
-      new LibraryDownload(QUrl::fromLocalFile(srcLibZip.toNative()), dstLibDir);
+      new LibraryDownload(QUrl::fromLocalFile(srcLibZip.toNative()), dstLibDir,
+                          std::make_shared<QSemaphore>(1));
   QSignalSpy spyFinished(dl, SIGNAL(finished(bool, QString)));
   dl->start();
 
   // wait until download finished (with timeout)
-  qint64 start = QDateTime::currentDateTime().toMSecsSinceEpoch();
-  auto currentTime = []() {
-    return QDateTime::currentDateTime().toMSecsSinceEpoch();
-  };
+  qint64 start = QDateTime::currentMSecsSinceEpoch();
+  auto currentTime = []() { return QDateTime::currentMSecsSinceEpoch(); };
   while ((spyFinished.isEmpty()) && (currentTime() - start < 30000)) {
     QThread::msleep(100);
     qApp->processEvents();
@@ -109,15 +108,14 @@ TEST_F(LibraryDownloadTest, testDownloadValidLibrary) {
 
   // start the file download
   LibraryDownload* dl =
-      new LibraryDownload(QUrl::fromLocalFile(srcLibZip.toNative()), dstLibDir);
+      new LibraryDownload(QUrl::fromLocalFile(srcLibZip.toNative()), dstLibDir,
+                          std::make_shared<QSemaphore>(1));
   QSignalSpy spyFinished(dl, SIGNAL(finished(bool, QString)));
   dl->start();
 
   // wait until download finished (with timeout)
-  qint64 start = QDateTime::currentDateTime().toMSecsSinceEpoch();
-  auto currentTime = []() {
-    return QDateTime::currentDateTime().toMSecsSinceEpoch();
-  };
+  qint64 start = QDateTime::currentMSecsSinceEpoch();
+  auto currentTime = []() { return QDateTime::currentMSecsSinceEpoch(); };
   while ((spyFinished.isEmpty()) && (currentTime() - start < 30000)) {
     QThread::msleep(100);
     qApp->processEvents();
@@ -147,15 +145,14 @@ TEST_F(LibraryDownloadTest, testDownloadValidNestedLibrary) {
 
   // start the file download
   LibraryDownload* dl =
-      new LibraryDownload(QUrl::fromLocalFile(srcLibZip.toNative()), dstLibDir);
+      new LibraryDownload(QUrl::fromLocalFile(srcLibZip.toNative()), dstLibDir,
+                          std::make_shared<QSemaphore>(1));
   QSignalSpy spyFinished(dl, SIGNAL(finished(bool, QString)));
   dl->start();
 
   // wait until download finished (with timeout)
-  qint64 start = QDateTime::currentDateTime().toMSecsSinceEpoch();
-  auto currentTime = []() {
-    return QDateTime::currentDateTime().toMSecsSinceEpoch();
-  };
+  qint64 start = QDateTime::currentMSecsSinceEpoch();
+  auto currentTime = []() { return QDateTime::currentMSecsSinceEpoch(); };
   while ((spyFinished.isEmpty()) && (currentTime() - start < 30000)) {
     QThread::msleep(100);
     qApp->processEvents();
@@ -191,15 +188,14 @@ TEST_F(LibraryDownloadTest, testDownloadValidLibraryDestinationAlreadyExists) {
 
   // start the file download
   LibraryDownload* dl =
-      new LibraryDownload(QUrl::fromLocalFile(srcLibZip.toNative()), dstLibDir);
+      new LibraryDownload(QUrl::fromLocalFile(srcLibZip.toNative()), dstLibDir,
+                          std::make_shared<QSemaphore>(1));
   QSignalSpy spyFinished(dl, SIGNAL(finished(bool, QString)));
   dl->start();
 
   // wait until download finished (with timeout)
-  qint64 start = QDateTime::currentDateTime().toMSecsSinceEpoch();
-  auto currentTime = []() {
-    return QDateTime::currentDateTime().toMSecsSinceEpoch();
-  };
+  qint64 start = QDateTime::currentMSecsSinceEpoch();
+  auto currentTime = []() { return QDateTime::currentMSecsSinceEpoch(); };
   while ((spyFinished.isEmpty()) && (currentTime() - start < 30000)) {
     QThread::msleep(100);
     qApp->processEvents();

@@ -127,7 +127,8 @@ void InitializeWorkspaceWizardContext::installExampleProjects() const noexcept {
     const FilePath dst = dir.getPathTo(project.first);
     if (!dst.isExistingDir()) {
       FileDownload* dl =
-          new FileDownload(QUrl(project.second), FilePath::getRandomTempPath());
+          new FileDownload(QUrl(project.second), FilePath::getRandomTempPath(),
+                           std::make_shared<QSemaphore>(1));
       dl->setZipExtractionDirectory(dst);
       QGuiApplication::setOverrideCursor(Qt::WaitCursor);
       connect(dl, &FileDownload::finished, qApp,
