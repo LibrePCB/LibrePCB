@@ -87,6 +87,22 @@ void LibraryDownload::setExpectedChecksum(
   }
 }
 
+void LibraryDownload::setExistingDirsToReplace(QSet<FilePath> dirs) noexcept {
+  if (mFileDownload) {
+    mFileDownload->setZipCleanupCallback([dirs](const FilePath& dst) {
+      for (const FilePath& fp : std::as_const(dirs)) {
+        if (fp != dst) {
+          qDebug() << "Removing existing library directory:" << fp.toNative();
+          QDir(fp.toStr()).removeRecursively();
+        }
+      }
+    });
+  } else {
+    qCritical() << "Calling LibraryDownload::setExistingDirsToReplace() after "
+                   "start() is not allowed!";
+  }
+}
+
 /*******************************************************************************
  *  Public Slots
  ******************************************************************************/

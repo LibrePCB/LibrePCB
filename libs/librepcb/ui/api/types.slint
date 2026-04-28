@@ -1424,7 +1424,8 @@ export struct LibraryInfoData {
     installed-version: string,  // Empty if not installed
     online-version: string,  // Empty if not a remote library
     outdated: bool,  // Only for outdated remote libraries
-    recommended: bool,
+    duplicate: bool,  // Only for remote libraries --> make read-only
+    recommended: bool,  // Only for remote libraries
     progress: int,  // [%], 0 if not installing
     checked: bool,
     highlight: bool,

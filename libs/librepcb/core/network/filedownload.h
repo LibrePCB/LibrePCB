@@ -111,6 +111,16 @@ public:
                                  std::function<FilePath(const FilePath&)>
                                      discoveryCallback = nullptr) noexcept;
 
+  /**
+   * @brief Set a cleanup callback for ZIP downloads
+   *
+   * The callback will be called from the download thread after the download
+   * succeeded, with the downloaded directory passed as argument.
+   *
+   * @param cb       The callback to call. Shall never throw exceptions!
+   */
+  void setZipCleanupCallback(std::function<void(const FilePath&)> cb) noexcept;
+
   // Operator Overloadings
   FileDownload& operator=(const FileDownload& rhs) = delete;
 
@@ -150,6 +160,7 @@ private:
   QByteArray mExpectedChecksum;
   FilePath mExtractZipToDir;
   std::function<FilePath(const FilePath&)> mZipDiscoveryCallback;
+  std::function<void(const FilePath&)> mZipCleanupCallback;
 };
 
 /*******************************************************************************

@@ -71,6 +71,12 @@ void FileDownload::setZipExtractionDirectory(
   mZipDiscoveryCallback = discoveryCallback;
 }
 
+void FileDownload::setZipCleanupCallback(
+    std::function<void(const FilePath&)> cb) noexcept {
+  Q_ASSERT(!mStarted);
+  mZipCleanupCallback = cb;
+}
+
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
@@ -160,6 +166,12 @@ void FileDownload::finalizeRequest() {
     FileUtils::move(srcDirFp, mExtractZipToDir);  // can throw
   } catch (const Exception& e) {
     QDir().rename(backupDirFp.toStr(), mExtractZipToDir.toStr());
+    return;  // Do not call cleanup callback!
+  }
+
+  // Call cleanup callback.
+  if (mZipCleanupCallback) {
+    mZipCleanupCallback(mExtractZipToDir);
   }
 }
 
