@@ -45,6 +45,10 @@
 namespace librepcb {
 namespace editor {
 
+static AutoUpdateMode getUpdateMode(const Workspace& ws) noexcept {
+  return ws.getSettings().librariesAutoUpdateMode.get();
+}
+
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
@@ -55,12 +59,21 @@ LibrariesModel::LibrariesModel(Workspace& ws, Mode mode,
     mWorkspace(ws),
     mMode(mode),
     mInitialized(false),
+    mIsAutoCheck(false),
+    mAutoUpdatesInstalled(false),
+    mAutoUpdateErrorCount(0),
     mRequestIcons(false) {
   connect(&mWorkspace.getLibraryDb(),
           &WorkspaceLibraryDb::scanLibraryListUpdated, this,
           &LibrariesModel::updateLibraries, Qt::QueuedConnection);
 
-  QTimer::singleShot(1000, this, [this]() { ensurePopulated(false); });
+  // Setup auto-update.
+  connect(&mAutoUpdateTimer, &QTimer::timeout, this, [this]() {
+    mAutoUpdateTimer.setInterval(25 * 3600 * 1000);  // 25h
+    emit statusBarMessageChanged(tr("Looking for library updates..."), 2500);
+    ensurePopulated(false, true);
+  });
+  mAutoUpdateTimer.start(1000);
 
   // When the list of API endpoints is modified, re-fetch all remote libraries.
   if (mMode == Mode::RemoteLibs) {
@@ -70,8 +83,15 @@ LibrariesModel::LibrariesModel(Workspace& ws, Mode mode,
               mOnlineLibsErrors.clear();
               mOnlineLibs.clear();
               updateMergedLibraries();
-              ensurePopulated(false);
+              ensurePopulated(false, false);
             });
+  }
+
+  // Load auto-update error count.
+  if (mMode == Mode::RemoteLibs) {
+    QSettings cs;
+    mAutoUpdateErrorCount =
+        cs.value("library_manager/auto_update_errors", 0).toInt();
   }
 }
 
@@ -141,14 +161,17 @@ void LibrariesModel::setOnlineVersions(
   }
 }
 
-void LibrariesModel::ensurePopulated(bool withIcons) noexcept {
+void LibrariesModel::ensurePopulated(bool withIcons,
+                                     bool isAutoCheck) noexcept {
   if (withIcons) {
     mRequestIcons = true;
   }
+  mIsAutoCheck = isAutoCheck;
   if (mInstalledLibs.empty() || (!mInstalledLibsErrors.isEmpty())) {
     updateLibraries(false);
   }
   if ((mMode == Mode::RemoteLibs) &&
+      (getUpdateMode(mWorkspace) != AutoUpdateMode::Disabled) &&
       (mApiEndpointsInProgress.isEmpty() &&
        (mOnlineLibs.isEmpty() || (!mOnlineLibsErrors.isEmpty())))) {
     requestOnlineLibraries(false);
@@ -165,6 +188,7 @@ void LibrariesModel::highlightLibraryOnNextRescan(const FilePath& fp) noexcept {
 void LibrariesModel::checkForUpdates() noexcept {
   if (mMode != Mode::RemoteLibs) return;
 
+  mIsAutoCheck = false;
   requestOnlineLibraries(true);
 }
 
@@ -284,6 +308,7 @@ void LibrariesModel::applyChanges() noexcept {
           Q_UNUSED(errMsg);
           mDownloadsInProgress.removeOne(dl);
           if (mDownloadsInProgress.isEmpty()) {
+            mAutoUpdatesInstalled = mIsAutoCheck;
             mWorkspace.getLibraryDb().startLibraryRescan();
           }
         },
@@ -422,7 +447,16 @@ void LibrariesModel::updateLibraries(bool resetHighlight) noexcept {
             });
 
   mInitialized = true;
-  updateMergedLibraries();
+  const ui::LibraryListData uiData = updateMergedLibraries();
+
+  if (mAutoUpdatesInstalled) {
+    if (uiData.all_up_to_date) {
+      emit statusBarMessageChanged(tr("Successfully updated libraries"), 2500);
+    } else if (uiData.pending_updates) {
+      emit statusBarMessageChanged(tr("Failed to update libraries"), 2500);
+    }
+    mAutoUpdatesInstalled = false;
+  }
 
   if (resetHighlight) {
     mHighlightedLib = std::nullopt;
@@ -458,9 +492,11 @@ void LibrariesModel::onlineLibraryListReceived(
     mOnlineLibs.insert(uuid, lib);
     versions.insert(uuid, lib.version);
   }
-  apiEndpointOperationFinished();
   updateMergedLibraries();
   emit onlineVersionsAvailable(versions);
+
+  // Must come after updateMergedLibraries(), for the auto-update.
+  apiEndpointOperationFinished();
 
   if (mRequestIcons) {
     requestMissingOnlineIcons();
@@ -468,7 +504,7 @@ void LibrariesModel::onlineLibraryListReceived(
 }
 
 void LibrariesModel::requestMissingOnlineIcons() noexcept {
-  for (const ApiEndpoint::Library& lib : mOnlineLibs) {
+  for (const ApiEndpoint::Library& lib : std::as_const(mOnlineLibs)) {
     if (!mIcons.contains(lib.uuid)) {
       const Uuid uuid = lib.uuid;
       mIcons[uuid] = QPixmap();  // Mark as "requested".
@@ -501,8 +537,7 @@ void LibrariesModel::errorWhileFetchingLibraryList(QString errorMsg) noexcept {
   const ApiEndpoint* endpoint = qobject_cast<ApiEndpoint*>(sender());
   mOnlineLibsErrors.append(
       tr("Failed to fetch libraries from '%1': %2")
-          .arg(endpoint ? endpoint->getUrl().toString() : QString())
-          .arg(errorMsg));
+          .arg(endpoint ? endpoint->getUrl().toString() : QString(), errorMsg));
   apiEndpointOperationFinished();
   emit uiDataChanged(getUiData());
 }
@@ -513,18 +548,102 @@ void LibrariesModel::apiEndpointOperationFinished() noexcept {
     return ep.get() == endpoint;
   });
   endpoint = nullptr;  // Not valid anymore!
+
   if (mApiEndpointsInProgress.isEmpty()) {
-    emit uiDataChanged(getUiData());
+    const auto uiData = getUiData();
+    emit uiDataChanged(uiData);
+
+    // Show status bar message.
+    qInfo() << "Remote libraries with update available:"
+            << uiData.pending_updates;
+    if (uiData.all_up_to_date) {
+      emit statusBarMessageChanged(tr("All libraries are up-to-date"), 2500);
+    } else if (uiData.pending_updates > 0) {
+      emit statusBarMessageChanged(tr("Update available for %n libraries",
+                                      nullptr, uiData.pending_updates),
+                                   2500);
+    }
+
+    // IMPORTANT: Depend auto-update on "pending_updates", not on "outdated"!
+    // If a library is installed multiple times, "outdated" stays > 0 even
+    // after the auto-update, so every app restart would re-trigger the update.
+    if (mIsAutoCheck && (uiData.pending_updates > 0) &&
+        mDownloadsInProgress.isEmpty()) {
+      AutoUpdateMode mode = getUpdateMode(mWorkspace);
+      bool allowAutoUpdate =
+          (uiData.pending_uninstalls == 0) && (uiData.pending_installs == 0);
+      if (mode == AutoUpdateMode::Install) {
+        if (!allowAutoUpdate) {
+          mode = AutoUpdateMode::Notify;
+        } else if (mAutoUpdateErrorCount < 3) {
+          setAutoUpdateErrorCount(mAutoUpdateErrorCount + 1);
+          startAutoUpdate();
+        } else {
+          mode = AutoUpdateMode::Notify;
+          allowAutoUpdate = false;
+          qCritical() << "Automatic library update not executed due to too "
+                         "many previous errors.";
+        }
+      }
+      if (mode == AutoUpdateMode::Notify) {
+        QString msg =
+            tr("There are %n library update(s) available for installation.",
+               nullptr, uiData.pending_updates) %
+            " ";
+        QString btnName;
+        if (allowAutoUpdate) {
+          msg +=
+              tr("See details in the libraries side panel, or click the button "
+                 "below to download & install all updates.");
+          btnName = tr("Update Libraries");
+        } else {
+          msg +=
+              tr("Automatic update is not available this time due to "
+                 "additional required installations or removals. Please check "
+                 "the libraries side panel to review and apply the changes.");
+          btnName = tr("Open Libraries Panel");
+        }
+        auto notification = std::make_shared<Notification>(
+            ui::NotificationType::Info, tr("Library Updates Available"), msg,
+            btnName, QString(), true);
+        if (allowAutoUpdate) {
+          connect(notification.get(), &Notification::buttonClicked, this,
+                  &LibrariesModel::startAutoUpdate, Qt::QueuedConnection);
+        } else {
+          connect(
+              notification.get(), &Notification::buttonClicked, this,
+              [this]() { emit panelPageRequested(ui::PanelPage::Libraries); },
+              Qt::QueuedConnection);
+        }
+        connect(notification.get(), &Notification::buttonClicked,
+                notification.get(), &Notification::dismiss,
+                Qt::QueuedConnection);
+        connect(this, &LibrariesModel::uiDataChanged, notification.get(),
+                &Notification::dismiss, Qt::QueuedConnection);
+        emit notificationEmitted(notification);
+      }
+    }
   }
 }
 
-void LibrariesModel::updateMergedLibraries() noexcept {
+void LibrariesModel::startAutoUpdate() noexcept {
+  const auto uiData = getUiData();
+  qInfo() << "Starting update of" << uiData.pending_updates
+          << "remote libraries...";
+  emit statusBarMessageChanged(
+      tr("Updating %n libraries...", nullptr, uiData.pending_updates), 5000);
+  mCheckStates.clear();
+  updateMergedLibraries();
+  applyChanges();
+}
+
+ui::LibraryListData LibrariesModel::updateMergedLibraries() noexcept {
   mMergedLibs = mInstalledLibs;
   for (auto& lib : mMergedLibs) {
     lib.online_version = mOnlineVersions.value(lib.uuid);
   }
 
-  for (const auto& lib : mOnlineLibs) {
+  for (const auto& lib : std::as_const(mOnlineLibs)) {
     bool isInstalled = false;
     for (std::size_t i = 0; i < mInstalledLibs.size(); ++i) {
       auto& installedLib = mMergedLibs.at(i);
@@ -562,7 +681,12 @@ void LibrariesModel::updateMergedLibraries() noexcept {
 
   notify_reset();
 
-  emit uiDataChanged(getUiData());
+  const ui::LibraryListData uiData = getUiData();
+  if ((mMode == Mode::RemoteLibs) && uiData.all_up_to_date) {
+    setAutoUpdateErrorCount(0);
+  }
+  emit uiDataChanged(uiData);
+  return uiData;
 }
 
 void LibrariesModel::updateCheckStates(bool notify) noexcept {
@@ -580,8 +704,7 @@ void LibrariesModel::updateCheckStates(bool notify) noexcept {
 
 void LibrariesModel::checkMissingDependenciesOfLibs() noexcept {
   QSet<Uuid> toBeInstalled;
-  for (const auto& lib : mMergedLibs) {
-    if (lib.duplicate) continue;
+  for (const auto& lib : std::as_const(mMergedLibs)) {
     const auto uuid = Uuid::tryFromString(s2q(lib.uuid));
     if (uuid && isLibraryChecked(lib)) {
       toBeInstalled.insert(*uuid);
@@ -590,7 +713,7 @@ void LibrariesModel::checkMissingDependenciesOfLibs() noexcept {
 
   while (true) {
     const int oldCount = toBeInstalled.count();
-    for (const auto& lib : mOnlineLibs) {
+    for (const auto& lib : std::as_const(mOnlineLibs)) {
       if (toBeInstalled.contains(lib.uuid)) {
         toBeInstalled |= lib.dependencies;
       }
@@ -600,15 +723,14 @@ void LibrariesModel::checkMissingDependenciesOfLibs() noexcept {
     }
   }
 
-  for (const Uuid& uuid : toBeInstalled) {
+  for (const Uuid& uuid : std::as_const(toBeInstalled)) {
     mCheckStates[uuid] = true;
   }
 }
 
 void LibrariesModel::uncheckLibsWithUnmetDependencies() noexcept {
   QSet<Uuid> toBeUninstalled;
-  for (const auto& lib : mMergedLibs) {
-    if (lib.duplicate) continue;
+  for (const auto& lib : std::as_const(mMergedLibs)) {
     const auto uuid = Uuid::tryFromString(s2q(lib.uuid));
     if (uuid && (!isLibraryChecked(lib))) {
       toBeUninstalled.insert(*uuid);
@@ -617,7 +739,7 @@ void LibrariesModel::uncheckLibsWithUnmetDependencies() noexcept {
 
   while (true) {
     const int oldCount = toBeUninstalled.count();
-    for (const auto& lib : mOnlineLibs) {
+    for (const auto& lib : std::as_const(mOnlineLibs)) {
       if (!(lib.dependencies & toBeUninstalled).isEmpty()) {
         toBeUninstalled.insert(lib.uuid);
       }
@@ -627,7 +749,7 @@ void LibrariesModel::uncheckLibsWithUnmetDependencies() noexcept {
     }
   }
 
-  for (const Uuid& uuid : toBeUninstalled) {
+  for (const Uuid& uuid : std::as_const(toBeUninstalled)) {
     mCheckStates[uuid] = false;
   }
 }
@@ -662,6 +784,14 @@ std::optional<std::size_t> LibrariesModel::indexOf(const Uuid& uuid) noexcept {
     }
   }
   return std::nullopt;
+}
+
+void LibrariesModel::setAutoUpdateErrorCount(int count) noexcept {
+  if (count != mAutoUpdateErrorCount) {
+    QSettings cs;
+    cs.setValue("library_manager/auto_update_errors", count);
+    mAutoUpdateErrorCount = count;
+  }
 }
 
 /*******************************************************************************

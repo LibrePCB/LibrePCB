@@ -400,6 +400,22 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
     setup(mUi->cbxBoardGridStyle, mSettings.boardGridStyle);
   }
 
+  // Initialize automatic library update mode.
+  {
+    mUi->cbxLibrariesAutoUpdateMode->addItem(
+        tr("Disabled", "Update mode"),
+        QVariant::fromValue(AutoUpdateMode::Disabled));
+    mUi->cbxLibrariesAutoUpdateMode->addItem(
+        tr("Check (Silent)", "Update mode"),
+        QVariant::fromValue(AutoUpdateMode::Check));
+    mUi->cbxLibrariesAutoUpdateMode->addItem(
+        tr("Check & Notify", "Update mode"),
+        QVariant::fromValue(AutoUpdateMode::Notify));
+    mUi->cbxLibrariesAutoUpdateMode->addItem(
+        tr("Check & Install", "Update mode"),
+        QVariant::fromValue(AutoUpdateMode::Install));
+  }
+
   // Now load all current settings
   loadSettings();
 
@@ -762,6 +778,11 @@ void WorkspaceSettingsDialog::loadSettings() noexcept {
   };
   loadGridStyle(mUi->cbxSchematicGridStyle, mSettings.schematicGridStyle.get());
   loadGridStyle(mUi->cbxBoardGridStyle, mSettings.boardGridStyle.get());
+
+  // Automatic library update mode.
+  mUi->cbxLibrariesAutoUpdateMode->setCurrentIndex(
+      mUi->cbxLibrariesAutoUpdateMode->findData(
+          QVariant::fromValue(mSettings.librariesAutoUpdateMode.get())));
 }
 
 void WorkspaceSettingsDialog::saveSettings() noexcept {
@@ -818,6 +839,13 @@ void WorkspaceSettingsDialog::saveSettings() noexcept {
     // Themes were applied immediately.
 
     // Grid style was applied immediately.
+
+    // Automatic library update mode.
+    if (mUi->cbxLibrariesAutoUpdateMode->currentIndex() >= 0) {
+      mSettings.librariesAutoUpdateMode.set(
+          mUi->cbxLibrariesAutoUpdateMode->currentData()
+              .value<AutoUpdateMode>());
+    }
 
     // Save settings to disk.
     mWorkspace.saveSettings();  // can throw

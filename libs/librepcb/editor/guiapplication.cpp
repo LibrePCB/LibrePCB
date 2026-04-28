@@ -277,8 +277,20 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
   // Setup library models & filter.
   connect(mRemoteLibraries.get(), &LibrariesModel::onlineVersionsAvailable,
           mLocalLibraries.get(), &LibrariesModel::setOnlineVersions);
+  connect(mRemoteLibraries.get(), &LibrariesModel::panelPageRequested, this,
+          [this]() {
+            if (auto win = getCurrentWindow()) {
+              win->showPanelPage(ui::PanelPage::Libraries);
+            }
+          });
   connect(mRemoteLibraries.get(), &LibrariesModel::notificationEmitted,
           mNotifications.get(), &NotificationsModel::push);
+  connect(mRemoteLibraries.get(), &LibrariesModel::statusBarMessageChanged,
+          this, [this](const QString& message, int timeoutMs) {
+            for (auto window : *mWindows) {
+              window->showStatusBarMessage(message, timeoutMs);
+            }
+          });
   connect(mRemoteLibraries.get(), &LibrariesModel::aboutToUninstallLibrary,
           this, &GuiApplication::closeLibrary);
 
