@@ -100,6 +100,7 @@ public:
   const ImageList& getImages() const noexcept { return mImages; }
 
   // General Methods
+  void duplicateFrom(const Symbol& other);
   virtual RuleCheckMessageList runChecks() const override;
 
   // Operator Overloadings

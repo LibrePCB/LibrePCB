@@ -1,11 +1,163 @@
 import {
     Button,
+    LinkText,
     MessageBanner,
 } from "../widgets.slint";
-import { Data } from "../api.slint";
+import {
+    Data,
+    EditorCommandSet as Cmd,
+    TabAction,
+} from "../api.slint";
 
 export component BreakingChangesMessageBanner inherits MessageBanner {
-    text: @tr("Attention").to-uppercase() + ": " + @tr("You have changed some important properties of this library element. This is a serious issue as it breaks all dependent library elements! If this library element is already used somewhere, it is highly recommended to create a new one instead of modifying this one.");
+    in property <bool> is-unlocked;
+    in property <float> age-days;
+    property <bool> unlock-btn-hovered: false;
+    property <string> unlock-hover-text: @tr("If you are 100% sure that this library element is not referenced from any other library elements or projects yet, you may click & hold this button to remove the write protection. In case it is already used, this can end up in a fiasco! If in doubt, create a duplicate.");
+
+    background: Data.theme.error;
+    text-color: Data.theme.error-text;
+
+    callback action-invoked(action: TabAction);
+
+    HorizontalLayout {
+        spacing: 5px;
+
+        VerticalLayout {
+            alignment: center;
+
+            Text {
+                color: root.text-color;
+                font-weight: 700;
+                horizontal-alignment: left;
+                wrap: word-wrap;
+                text: @tr("Attention").to-uppercase() + ": " + @tr("Some of the applied modifications are not backward-compatible!");
+            }
+
+            if !is-unlocked: Rectangle {
+                Text {
+                    width: 100%;
+                    height: 100%;
+                    color: root.text-color;
+                    horizontal-alignment: left;
+                    wrap: word-wrap;
+                    text: @tr("To avoid breaking other library elements or projects which reference this element, the editor has been put into read-only mode and saving is not possible anymore. Either undo the breaking changes, or duplicate this library element and make the modifications in the new library element.");
+                    visible: !unlock-btn-hovered;
+                }
+
+                Text {
+                    width: 100%;
+                    height: 100%;
+                    color: root.text-color;
+                    horizontal-alignment: left;
+                    wrap: word-wrap;
+                    font-italic: true;
+                    text: unlock-hover-text;
+                    visible: unlock-btn-hovered;
+                    accessible-role: none;
+                }
+            }
+
+            if is-unlocked: Text {
+                color: root.text-color;
+                horizontal-alignment: left;
+                wrap: word-wrap;
+                font-italic: true;
+                text: @tr("You have removed the write protection. Keep in mind: With great power comes great responsibility!");
+            }
+        }
+
+        VerticalLayout {
+            width: self.preferred-width;
+            alignment: center;
+            spacing: 5px;
+
+            duplicate-btn := Button {
+                icon: @image-url("../../../font-awesome/svgs/solid/arrow-up-right-from-square.svg");
+                text: @tr("Duplicate");
+                status-tip: @tr("Create a new library element by duplicating this one");
+                primary: true;
+
+                clicked => {
+                    action-invoked(TabAction.save-as);
+                }
+            }
+
+            if !is-unlocked: unlock-btn := Button {
+                icon: @image-url("../../../font-awesome/svgs/solid/lock-open.svg");
+                text: @tr("Unlock").to-uppercase();
+                accessible-description: unlock-hover-text;
+
+                changed has-hover => {
+                    unlock-btn-hovered = self.has-hover;
+                }
+
+                if self.pressed: Rectangle {
+                    width: parent.width - 4px;
+                    height: parent.height - 4px;
+                    background: Data.theme.control;
+
+                    Rectangle {
+                        property <float> progress: 0.1;
+
+                        x: 0;
+                        width: parent.width * min(progress, 1);
+                        background: Data.theme.error;
+
+                        Timer {
+                            running: true;
+                            interval: 15ms;
+
+                            triggered => {
+                                progress = progress + 0.02 * (1 - clamp(age-days / 30, 0, 0.7));
+                                if progress > 1 {
+                                    self.running = false;
+                                    action-invoked(TabAction.unlock);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+export component ElementDuplicatedMessageBanner inherits MessageBanner {
+    background: Data.theme.info;
+
+    callback deprecate-clicked <=> deprecate-btn.clicked;
+    callback cancel-clicked <=> cancel-btn.clicked;
+
+    HorizontalLayout {
+        spacing: 5px;
+
+        VerticalLayout {
+            alignment: center;
+
+            Text {
+                color: Data.theme.info-text;
+                horizontal-alignment: left;
+                wrap: word-wrap;
+                text: @tr("This library element has been duplicated. Mark it as deprecated?");
+            }
+        }
+
+        deprecate-btn := Button {
+            y: (parent.height - self.height) / 2;
+            width: self.preferred-width;
+            text: @tr("Deprecate");
+            status-tip: @tr("Mark this library element as deprecated");
+            border-width: 1px;
+            primary: true;
+        }
+
+        cancel-btn := Button {
+            y: (parent.height - self.height) / 2;
+            width: self.preferred-width;
+            text: @tr("Cancel");
+        }
+    }
 }
 
 export component CheckErrorsMessageBanner inherits MessageBanner {
@@ -21,7 +173,6 @@ export component FilesModifiedMessageBanner inherits MessageBanner {
         spacing: 5px;
 
         VerticalLayout {
-            horizontal-stretch: 1;
             alignment: center;
 
             Text {
@@ -42,7 +193,7 @@ export component FilesModifiedMessageBanner inherits MessageBanner {
 
         reload-btn := Button {
             y: (parent.height - self.height) / 2;
-            horizontal-stretch: 0;
+            width: self.preferred-width;
             text: @tr("Reload");
             status-tip: @tr("Discard modifications (if any) and reload the modified files from disk");
         }

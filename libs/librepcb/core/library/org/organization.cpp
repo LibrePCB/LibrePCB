@@ -150,6 +150,37 @@ void Organization::setPcbDesignRules(
  *  General Methods
  ******************************************************************************/
 
+void Organization::duplicateFrom(const Organization& other) {
+  LibraryBaseElement::duplicateFrom(other);
+  setLogoPng(other.getLogoPng());
+  setUrl(other.getUrl());
+  setCountry(other.getCountry());
+  setFabs(other.getFabs());
+  setShipping(other.getShipping());
+  setIsSponsor(other.isSponsor());
+  setPriority(other.getPriority());
+  mOptions = other.mOptions;
+
+  // Copy PCB design rules but generate new UUIDs.
+  mPcbDesignRules.clear();
+  for (const OrganizationPcbDesignRules& rules : other.getPcbDesignRules()) {
+    OrganizationPcbDesignRules copy = rules;
+    copy.setUuid(Uuid::createRandom());
+    mPcbDesignRules.append(copy);
+  }
+
+  // Copy output jobs but generate new UUIDs.
+  for (OutputJobList* jobs :
+       {&mPcbOutputJobs, &mAssemblyOutputJobs, &mUserOutputJobs}) {
+    jobs->clear();
+    for (const auto& job : *jobs) {
+      auto copy = job.cloneShared();
+      copy->setUuid(Uuid::createRandom());
+      jobs->append(copy);
+    }
+  }
+}
+
 RuleCheckMessageList Organization::runChecks() const {
   OrganizationCheck check(*this);
   return check.runChecks();  // can throw

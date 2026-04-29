@@ -26,6 +26,7 @@
 #include "ui.h"
 #include "utils/uiobjectlist.h"
 
+#include <librepcb/core/fileio/filepath.h>
 #include <librepcb/core/utils/signalslot.h>
 
 #include <QtCore>
@@ -37,8 +38,14 @@
  ******************************************************************************/
 namespace librepcb {
 
-class FilePath;
+class Component;
+class ComponentCategory;
+class Device;
+class Organization;
+class Package;
+class PackageCategory;
 class RuleCheckMessage;
+class Symbol;
 
 namespace editor {
 
@@ -94,10 +101,42 @@ public:
                            bool zoomTo) noexcept;
   void setCurrentLibrary(int index) noexcept;
   void setCurrentProject(int index) noexcept;
+  void openLibraryTab(const FilePath& fp, bool wizardMode) noexcept;
+  void openComponentCategoryTab(LibraryEditor& editor,
+                                const FilePath& fp) noexcept;
+  bool openNewComponentCategoryTab(
+      LibraryEditor& editor, const FilePath& duplicateFromFp = {},
+      const ComponentCategory* duplicateFromObj = nullptr) noexcept;
+  void openPackageCategoryTab(LibraryEditor& editor,
+                              const FilePath& fp) noexcept;
+  bool openNewPackageCategoryTab(
+      LibraryEditor& editor, const FilePath& duplicateFromFp = {},
+      const PackageCategory* duplicateFromObj = nullptr) noexcept;
+  void openSymbolTab(LibraryEditor& editor, const FilePath& fp) noexcept;
+  bool openNewSymbolTab(LibraryEditor& editor,
+                        const FilePath& duplicateFromFp = {},
+                        const Symbol* duplicateFromObj = nullptr) noexcept;
+  void openPackageTab(LibraryEditor& editor, const FilePath& fp) noexcept;
+  bool openNewPackageTab(LibraryEditor& editor,
+                         const FilePath& duplicateFromFp = {},
+                         const Package* duplicateFromObj = nullptr) noexcept;
+  void openComponentTab(LibraryEditor& editor, const FilePath& fp) noexcept;
+  bool openNewComponentTab(
+      LibraryEditor& editor, const FilePath& duplicateFromFp = {},
+      const Component* duplicateFromObj = nullptr) noexcept;
+  void openDeviceTab(LibraryEditor& editor, const FilePath& fp) noexcept;
+  bool openNewDeviceTab(LibraryEditor& editor,
+                        const FilePath& duplicateFromFp = {},
+                        const Device* duplicateFromObj = nullptr) noexcept;
+  void openOrganizationTab(LibraryEditor& editor, const FilePath& fp) noexcept;
+  bool openNewOrganizationTab(
+      LibraryEditor& editor, const FilePath& duplicateFromFp = {},
+      const Organization* duplicateFromObj = nullptr) noexcept;
   std::shared_ptr<SchematicTab> openSchematicTab(int projectIndex,
                                                  int index) noexcept;
   void openBoard2dTab(int projectIndex, int index,
                       bool switchToTab = true) noexcept;
+  void openBoard3dTab(int projectIndex, int index) noexcept;
   void requestComponentTab(const FilePath& fp) noexcept;
   void requestPackageTab(const FilePath& fp) noexcept;
 
@@ -119,23 +158,15 @@ private:
   void triggerSchematic(int project, int schematic,
                         ui::SchematicAction a) noexcept;
   void triggerBoard(int project, int board, ui::BoardAction a) noexcept;
-  void openLibraryTab(const FilePath& fp, bool wizardMode) noexcept;
-  void openComponentCategoryTab(LibraryEditor& editor, const FilePath& fp,
-                                bool copyFrom) noexcept;
-  void openPackageCategoryTab(LibraryEditor& editor, const FilePath& fp,
-                              bool copyFrom) noexcept;
-  void openSymbolTab(LibraryEditor& editor, const FilePath& fp,
-                     bool copyFrom) noexcept;
-  void openPackageTab(LibraryEditor& editor, const FilePath& fp,
-                      bool copyFrom) noexcept;
-  void openComponentTab(LibraryEditor& editor, const FilePath& fp,
-                        bool copyFrom) noexcept;
-  void openDeviceTab(LibraryEditor& editor, const FilePath& fp,
-                     bool copyFrom) noexcept;
-  void openOrganizationTab(LibraryEditor& editor, const FilePath& fp,
-                           bool copyFrom) noexcept;
-  void openBoard3dTab(int projectIndex, int index) noexcept;
   void updateHomeTabSection() noexcept;
+  template <typename Element, typename Tab>
+  void openLibraryElementTab(LibraryEditor& editor,
+                             const FilePath& fp) noexcept;
+  template <typename Element, typename Tab>
+  bool openNewLibraryElementTab(
+      LibraryEditor& editor, const FilePath& duplicateFromFp,
+      const Element* duplicateFromObj,
+      std::function<std::unique_ptr<Element>()> factory) noexcept;
   template <typename T>
   bool switchToTab() noexcept;
   template <typename T>

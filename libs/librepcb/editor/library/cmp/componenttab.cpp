@@ -23,6 +23,7 @@
 #include "componenttab.h"
 
 #include "../../guiapplication.h"
+#include "../../mainwindow.h"
 #include "../../modelview/attributelistmodel.h"
 #include "../../rulecheck/rulecheckmessagesmodel.h"
 #include "../../undostack.h"
@@ -73,6 +74,7 @@ ComponentTab::ComponentTab(LibraryEditor& editor,
     mWizardMode(mode != Mode::Open),
     mCurrentPageIndex(mWizardMode ? 0 : 2),
     mChooseCategory(false),
+    mElementDuplicated(false),
     mNameParsed(mComponent->getNames().getDefaultValue()),
     mVersionParsed(mComponent->getVersion()),
     mDeprecated(false),
@@ -188,6 +190,7 @@ ui::ComponentTabData ComponentTab::getDerivedUiData() const noexcept {
       mDescription,  // Description
       mKeywords,  // Keywords
       mAuthor,  // Author
+      mAgeDays,  // Age in days
       mVersion,  // Version
       mVersionError,  // Version error
       mDeprecated,  // Deprecated
@@ -218,6 +221,7 @@ ui::ComponentTabData ComponentTab::getDerivedUiData() const noexcept {
       },
       l2s(mApp.getWorkspace().getSettings().defaultLengthUnit.get()),  // Unit
       mIsInterfaceBroken,  // Interface broken
+      mElementDuplicated && (!mDeprecated),  // Element duplicated
       slint::SharedString(),  // New category
   };
 }
@@ -272,6 +276,11 @@ void ComponentTab::setDerivedUiData(const ui::ComponentTabData& data) noexcept {
     }
   }
 
+  // Messages
+  if (data.deprecated || (!data.element_duplicated_msg)) {
+    mElementDuplicated = false;
+  }
+
   onDerivedUiDataChanged.notify();
 }
 
@@ -310,6 +319,16 @@ void ComponentTab::trigger(ui::TabAction a) noexcept {
       save();
       break;
     }
+    case ui::TabAction::SaveAs: {  // Duplicate the library element.
+      commitUiData();  // Exits the current tool and releases the undo stack.
+      if (mWindow &&
+          mWindow->openNewComponentTab(mEditor, {}, mComponent.get())) {
+        undoBreakingChanges(mIsInterfaceBroken);
+        mElementDuplicated = true;
+        onDerivedUiDataChanged.notify();
+      }
+      break;
+    }
     case ui::TabAction::Undo: {
       try {
         commitUiData();
@@ -326,6 +345,12 @@ void ComponentTab::trigger(ui::TabAction a) noexcept {
       } catch (const Exception& e) {
         QMessageBox::critical(getWindow(), tr("Error"), e.getMsg());
       }
+      break;
+    }
+    case ui::TabAction::Unlock: {
+      mAllowBreakingChanges = true;
+      onUiDataChanged.notify();
+      onDerivedUiDataChanged.notify();
       break;
     }
     case ui::TabAction::Close: {
@@ -372,17 +397,22 @@ slint::Image ComponentTab::renderScene(float width, float height,
 bool ComponentTab::requestClose() noexcept {
   commitUiData();
 
-  if ((!hasUnsavedChanges()) || (!isWritable())) {
+  if (!hasUnsavedChanges()) {
     return true;  // Nothing to save.
   }
 
-  const QMessageBox::StandardButton choice = QMessageBox::question(
-      getWindow(), tr("Save Changes?"),
-      tr("The component '%1' contains unsaved changes.\n"
-         "Do you want to save them before closing it?")
-          .arg(*mComponent->getNames().getDefaultValue()),
-      QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
-      QMessageBox::Yes);
+  QMessageBox::StandardButtons buttons = QMessageBox::No | QMessageBox::Cancel;
+  QMessageBox::StandardButton defaultButton = QMessageBox::Cancel;
+  if ((!mIsInterfaceBroken) || mAllowBreakingChanges) {
+    buttons |= QMessageBox::Yes;
+    defaultButton = QMessageBox::Yes;
+  }
+  const QMessageBox::StandardButton choice =
+      QMessageBox::question(getWindow(), tr("Save Changes?"),
+                            tr("The component '%1' contains unsaved changes.\n"
+                               "Do you want to save them before closing it?")
+                                .arg(*mComponent->getNames().getDefaultValue()),
+                            buttons, defaultButton);
   if (choice == QMessageBox::Yes) {
     return save();
   } else if (choice == QMessageBox::No) {
@@ -545,7 +575,9 @@ bool ComponentTab::autoFix(
  ******************************************************************************/
 
 bool ComponentTab::isWritable() const noexcept {
-  return mIsNewElement || mComponent->getDirectory().isWritable();
+  return mIsNewElement ||
+      (mComponent->getDirectory().isWritable() &&
+       ((!mIsInterfaceBroken) || mAllowBreakingChanges));
 }
 
 bool ComponentTab::isInterfaceBroken() const noexcept {
@@ -609,6 +641,7 @@ void ComponentTab::refreshUiData() noexcept {
   mPrefixParsed = mComponent->getPrefixes().getDefaultValue();
   mDefaultValue = q2s(mComponent->getDefaultValue());
   validateComponentDefaultValue(s2q(mDefaultValue), mDefaultValueError);
+  updateAgeDays(mComponent->getCreated());
 
   if (auto dbRes = mComponent->getResources().value(0)) {
     mDatasheetUrl = q2s(dbRes->getUrl().toString());

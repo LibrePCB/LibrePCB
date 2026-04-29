@@ -79,6 +79,7 @@ public:
   };
   Q_DECLARE_FLAGS(Features, Feature)
 
+  virtual bool fsmIsWritable() const noexcept = 0;
   virtual QWidget* fsmGetParentWidget() noexcept = 0;
   virtual GraphicsScene* fsmGetGraphicsScene() noexcept = 0;
   virtual PositiveLength fsmGetGridInterval() const noexcept = 0;

@@ -51,6 +51,8 @@ LibraryEditorTab::LibraryEditorTab(LibraryEditor& editor,
     mEditor(editor),
     mUndoStack(new UndoStack()),
     mManualModificationsMade(false),
+    mAllowBreakingChanges(false),
+    mAgeDays(0),
     mCheckMessages(new RuleCheckMessagesModel()),
     mAutoReloadOnFileModifications(false) {
   // Connect library editor.
@@ -102,8 +104,23 @@ bool LibraryEditorTab::isPathOutsideLibDir() const noexcept {
       (!fp.isLocatedInDir(mEditor.getFilePath()));
 }
 
+void LibraryEditorTab::updateAgeDays(const QDateTime& created) noexcept {
+  mAgeDays = created.secsTo(QDateTime::currentDateTime()) / float(24 * 3600);
+}
+
 bool LibraryEditorTab::hasUnsavedChanges() const noexcept {
   return mManualModificationsMade || (!mUndoStack->isClean());
+}
+
+void LibraryEditorTab::undoBreakingChanges(
+    const bool& interfaceBroken) noexcept {
+  try {
+    while (interfaceBroken && mUndoStack->canUndo()) {
+      mUndoStack->undo();
+    }
+  } catch (const Exception& e) {
+    qCritical() << "Failed to undo breaking changes:" << e.getMsg();
+  }
 }
 
 void LibraryEditorTab::setWatchedFiles(
@@ -118,10 +135,14 @@ void LibraryEditorTab::setWatchedFiles(
   for (const QString& name : filenames) {
     const FilePath fp = dir.getAbsPath(name);
     try {
-      const QByteArray content = dir.read(name);
-      const QByteArray sha256 = QCryptographicHash::hash(
-          content, QCryptographicHash::Algorithm::Sha256);
-      mWatchedFileHashes.insert(fp, sha256);
+      // Note: For newly created library elements, no files may have been
+      // written to the file system yet, so we skip those to avoid errors.
+      const QByteArray content = dir.readIfExists(name);
+      if (!content.isNull()) {
+        const QByteArray sha256 = QCryptographicHash::hash(
+            content, QCryptographicHash::Algorithm::Sha256);
+        mWatchedFileHashes.insert(fp, sha256);
+      }
     } catch (const Exception& e) {
       qCritical().nospace().noquote()
           << "Failed to hash file '" << fp.toNative() << "': " << e.getMsg();

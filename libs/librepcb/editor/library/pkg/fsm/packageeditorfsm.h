@@ -89,7 +89,6 @@ public:  // Types
   struct Context {
     Package& package;
     UndoStack& undoStack;
-    const bool readOnly;
     LengthUnit& lengthUnit;
     const GraphicsLayerList& layers;
     PackageEditorFsmAdapter& adapter;

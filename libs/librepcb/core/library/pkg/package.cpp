@@ -180,6 +180,104 @@ QVector<std::shared_ptr<const PackageModel>> Package::getModelsForFootprint(
  *  General Methods
  ******************************************************************************/
 
+void Package::duplicateFrom(const Package& other) {
+  LibraryElement::duplicateFrom(other);
+  setAlternativeNames(other.getAlternativeNames());
+  setAssemblyType(other.getAssemblyType(false));
+  setGridInterval(other.getGridInterval());
+  setMinCopperClearance(other.getMinCopperClearance());
+
+  // Copy pads but generate new UUIDs.
+  mPads.clear();
+  QHash<Uuid, std::optional<Uuid>> padUuidMap;
+  for (const PackagePad& pad : other.getPads()) {
+    const Uuid newUuid = Uuid::createRandom();
+    padUuidMap.insert(pad.getUuid(), newUuid);
+    mPads.append(std::make_shared<PackagePad>(newUuid, pad.getName()));
+  }
+
+  // Copy 3D models but generate new UUIDs.
+  mModels.clear();
+  QHash<Uuid, std::optional<Uuid>> modelsUuidMap;
+  for (const PackageModel& model : other.getModels()) {
+    auto newModel =
+        std::make_shared<PackageModel>(Uuid::createRandom(), model.getName());
+    modelsUuidMap.insert(model.getUuid(), newModel->getUuid());
+    mModels.append(newModel);
+    const QByteArray fileContent =
+        other.getDirectory().readIfExists(model.getFileName());
+    if (!fileContent.isNull()) {
+      mDirectory->write(newModel->getFileName(), fileContent);
+    }
+  }
+
+  // Copy footprints but generate new UUIDs.
+  mFootprints.clear();
+  for (const Footprint& footprint : other.getFootprints()) {
+    // Don't copy translations as they would need to be adjusted anyway.
+    std::shared_ptr<Footprint> newFootprint(new Footprint(
+        Uuid::createRandom(), footprint.getNames().getDefaultValue(),
+        footprint.getDescriptions().getDefaultValue()));
+    newFootprint->setModelPosition(footprint.getModelPosition());
+    newFootprint->setModelRotation(footprint.getModelRotation());
+    // Copy models but with the new UUIDs.
+    QSet<Uuid> models;
+    foreach (const Uuid& uuid, footprint.getModels()) {
+      if (auto newUuid = modelsUuidMap.value(uuid)) {
+        models.insert(*newUuid);
+      }
+    }
+    newFootprint->setModels(models);
+    // Copy pads but generate new UUIDs.
+    for (const FootprintPad& pad : footprint.getPads()) {
+      std::optional<Uuid> pkgPad = pad.getPackagePadUuid();
+      if (pkgPad) {
+        pkgPad = padUuidMap.value(*pkgPad);  // Translate to new UUID
+      }
+      newFootprint->getPads().append(std::make_shared<FootprintPad>(
+          Uuid::createRandom(), pkgPad, pad.getPosition(), pad.getRotation(),
+          pad.getShape(), pad.getWidth(), pad.getHeight(), pad.getRadius(),
+          pad.getCustomShapeOutline(), pad.getStopMaskConfig(),
+          pad.getSolderPasteConfig(), pad.getCopperClearance(),
+          pad.getComponentSide(), pad.getFunction(), pad.getHoles()));
+    }
+    // Copy polygons but generate new UUIDs.
+    for (const Polygon& polygon : footprint.getPolygons()) {
+      newFootprint->getPolygons().append(std::make_shared<Polygon>(
+          Uuid::createRandom(), polygon.getLayer(), polygon.getLineWidth(),
+          polygon.isFilled(), polygon.isGrabArea(), polygon.getPath()));
+    }
+    // Copy circles but generate new UUIDs.
+    for (const Circle& circle : footprint.getCircles()) {
+      newFootprint->getCircles().append(std::make_shared<Circle>(
+          Uuid::createRandom(), circle.getLayer(), circle.getLineWidth(),
+          circle.isFilled(), circle.isGrabArea(), circle.getCenter(),
+          circle.getDiameter()));
+    }
+    // Copy stroke texts but generate new UUIDs.
+    for (const StrokeText& text : footprint.getStrokeTexts()) {
+      newFootprint->getStrokeTexts().append(std::make_shared<StrokeText>(
+          Uuid::createRandom(), text.getLayer(), text.getText(),
+          text.getPosition(), text.getRotation(), text.getHeight(),
+          text.getStrokeWidth(), text.getLetterSpacing(), text.getLineSpacing(),
+          text.getAlign(), text.getMirrored(), text.getAutoRotate(),
+          text.isLocked()));
+    }
+    // Copy zones but generate new UUIDs.
+    for (const Zone& zone : footprint.getZones()) {
+      newFootprint->getZones().append(
+          std::make_shared<Zone>(Uuid::createRandom(), zone));
+    }
+    // Copy holes but generate new UUIDs.
+    for (const Hole& hole : footprint.getHoles()) {
+      newFootprint->getHoles().append(
+          std::make_shared<Hole>(Uuid::createRandom(), hole.getDiameter(),
+                                 hole.getPath(), hole.getStopMaskConfig()));
+    }
+    mFootprints.append(newFootprint);
+  }
+}
+
 RuleCheckMessageList Package::runChecks() const {
   PackageCheck check(*this);
   return check.runChecks();  // can throw

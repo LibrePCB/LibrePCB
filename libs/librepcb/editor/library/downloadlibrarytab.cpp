@@ -22,7 +22,8 @@
  ******************************************************************************/
 #include "downloadlibrarytab.h"
 
-#include "guiapplication.h"
+#include "../guiapplication.h"
+#include "../mainwindow.h"
 #include "librariesmodel.h"
 #include "librarydownload.h"
 #include "utils/slinthelpers.h"
@@ -220,8 +221,10 @@ void DownloadLibraryTab::downloadFinished(bool success,
 
   if (success) {
     // Highlight the new library in the libraries tab.
-    emit panelPageRequested(ui::PanelPage::Libraries);
-    mApp.getLocalLibraries().highlightLibraryOnNextRescan(mDirectory);
+    if (mWindow) {
+      mWindow->showPanelPage(ui::PanelPage::Libraries);
+      mApp.getLocalLibraries().highlightLibraryOnNextRescan(mDirectory);
+    }
 
     // Force rescan to index the new library.
     mApp.getWorkspace().getLibraryDb().startLibraryRescan();

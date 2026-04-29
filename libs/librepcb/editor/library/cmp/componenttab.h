@@ -116,6 +116,7 @@ private:
   bool mWizardMode;
   int mCurrentPageIndex;
   bool mChooseCategory;
+  bool mElementDuplicated;
 
   // Library metadata to be applied
   slint::SharedString mName;

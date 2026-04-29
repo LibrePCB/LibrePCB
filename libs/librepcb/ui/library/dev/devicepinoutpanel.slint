@@ -93,6 +93,7 @@ component DevicePinoutShortcutsOverlay inherits GridLayout {
 component DeviceInteractiveSignalListView inherits ScrollView {
     in-out property <[DeviceInteractivePinoutSignalData]> model;
     in property <int> current-index;
+    in property <bool> read-only;
 
     min-height: min(l.preferred-height, 50px);
     min-width: l.min-width;
@@ -105,6 +106,7 @@ component DeviceInteractiveSignalListView inherits ScrollView {
     l := VerticalLayout {
         for item[index] in model: item-ta := TouchArea {
             mouse-cursor: pointer;
+            enabled: !read-only;
 
             Rectangle {
                 property <bool> is-current: index == current-index;
@@ -215,7 +217,7 @@ export component DevicePinoutPanel inherits Rectangle {
                 }
             }
 
-            if (!interactive) && (tabs[index].pinout.length > 0): reset-btn := IconButton {
+            if (!read-only) && (!interactive) && (tabs[index].pinout.length > 0): reset-btn := IconButton {
                 height: 18px;
                 style: hyperlink;
                 icon: @image-url("../../../../bootstrap-icons/icons/bootstrap-reboot.svg");
@@ -279,6 +281,7 @@ export component DevicePinoutPanel inherits Rectangle {
                         placeholder-text: @tr("Type to filter signals...");
                         border-color: transparent;
                         frameless: true;
+                        read-only: read-only;
                         accessible-label: "signal filter";
 
                         // Actually we want to gain the focus in the init()
@@ -335,6 +338,7 @@ export component DevicePinoutPanel inherits Rectangle {
                     vertical-stretch: 1;
                     model: tabs[index].interactive-pinout-signals;
                     current-index: tabs[index].interactive-pinout-signal-index;
+                    read-only: read-only;
 
                     signal-clicked(idx) => {
                         tabs[index].interactive-pinout-signal-index = idx;
@@ -347,6 +351,7 @@ export component DevicePinoutPanel inherits Rectangle {
                     window-height: window-height;
                     model: tabs[index].pinout;
                     signal-names: tabs[index].signal-names;
+                    read-only: read-only;
                     visible: !interactive;
                 }
 
@@ -370,7 +375,7 @@ export component DevicePinoutPanel inherits Rectangle {
                         text: @tr("The package contains no pads, thus the pinout is empty.");
                     }
 
-                    if tabs[index].has-auto-connectable-pads: auto-connect-btn := Button {
+                    if (!read-only) && tabs[index].has-auto-connectable-pads: auto-connect-btn := Button {
                         text: @tr("Auto-Connect By Names");
                         icon: @image-url("../../../../font-awesome/svgs/solid/wand-magic-sparkles.svg");
                         status-tip: @tr("Try to automatically connect pads to signals by their name");
@@ -381,7 +386,7 @@ export component DevicePinoutPanel inherits Rectangle {
                         }
                     }
 
-                    if tabs[index].has-unconnected-pads: interactive-connect-btn := Button {
+                    if (!read-only) && tabs[index].has-unconnected-pads: interactive-connect-btn := Button {
                         text: @tr("Connect Interactively");
                         icon: @image-url("../../../../font-awesome/svgs/solid/hand-sparkles.svg");
                         status-tip: @tr("Connect the remaining pads one by one in an interactive mode");
@@ -392,7 +397,7 @@ export component DevicePinoutPanel inherits Rectangle {
                         }
                     }
 
-                    if tabs[index].all-pads-unconnected: import-btn := Button {
+                    if (!read-only) && tabs[index].all-pads-unconnected: import-btn := Button {
                         text: @tr("Load From File");
                         icon: @image-url("../../../../font-awesome/svgs/solid/arrow-up-from-bracket.svg");
                         status-tip: @tr("Import the pinout from a CSV file with these columns:") + " Pad,Signal";

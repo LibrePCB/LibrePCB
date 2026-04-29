@@ -129,8 +129,6 @@ void WindowSection::addTab(std::shared_ptr<WindowTab> tab, int index,
   // from the UI, we have to close it immediately to avoid dangling references.
   connect(tab.get(), &WindowTab::closeEnforced, this,
           &WindowSection::tabCloseRequested);
-  connect(tab.get(), &WindowTab::panelPageRequested, this,
-          &WindowSection::panelPageRequested);
   connect(tab.get(), &WindowTab::statusBarMessageChanged, this,
           &WindowSection::statusBarMessageChanged);
   connect(tab.get(), &WindowTab::cursorCoordinatesChanged, this,
@@ -165,8 +163,6 @@ std::shared_ptr<WindowTab> WindowSection::removeTab(int index,
                &WindowSection::tabCloseRequested);
     disconnect(tab.get(), &WindowTab::closeEnforced, this,
                &WindowSection::tabCloseRequested);
-    disconnect(tab.get(), &WindowTab::panelPageRequested, this,
-               &WindowSection::panelPageRequested);
     disconnect(tab.get(), &WindowTab::statusBarMessageChanged, this,
                &WindowSection::statusBarMessageChanged);
     disconnect(tab.get(), &WindowTab::cursorCoordinatesChanged, this,
