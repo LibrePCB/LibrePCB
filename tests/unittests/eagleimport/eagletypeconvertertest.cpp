@@ -49,8 +49,8 @@ namespace tests {
 
 class EagleTypeConverterTest : public ::testing::Test {
 protected:
-  static parseagle::DomElement dom(const QString& str) {
-    return parseagle::DomElement::parse(str);
+  static parseagle::DomElement dom(const QByteArray& data) {
+    return parseagle::DomElement::parse(data);
   }
 };
 
@@ -148,7 +148,7 @@ TEST_F(EagleTypeConverterTest, testConvertInversionSyntax) {
 TEST_F(EagleTypeConverterTest, testConvertAttributeValid) {
   EagleTypeConverter c;
   MessageLogger log;
-  const QString xml = "<attribute name=\"Foo Bar\" value=\"hello world!\"/>";
+  const char* xml = "<attribute name=\"Foo Bar\" value=\"hello world!\"/>";
   auto out = c.tryConvertAttribute(parseagle::Attribute(dom(xml)), log);
   ASSERT_TRUE(out != nullptr);
   EXPECT_EQ("FOO_BAR", out->getKey()->toStdString());
@@ -160,7 +160,7 @@ TEST_F(EagleTypeConverterTest, testConvertAttributeValid) {
 TEST_F(EagleTypeConverterTest, testConvertAttributeInvalid) {
   EagleTypeConverter c;
   MessageLogger log;
-  const QString xml = "<attribute name=\"!\" value=\"hello world!\"/>";
+  const char* xml = "<attribute name=\"!\" value=\"hello world!\"/>";
   auto out = c.tryConvertAttribute(parseagle::Attribute(dom(xml)), log);
   EXPECT_TRUE(out == nullptr);
   EXPECT_EQ(1, log.getMessages().count());
@@ -351,7 +351,8 @@ TEST_F(EagleTypeConverterTest, testConvertAndJoinWires) {
 
 TEST_F(EagleTypeConverterTest, testConvertRectangle) {
   EagleTypeConverter c;
-  QString xml = "<rectangle x1=\"1\" y1=\"2\" x2=\"4\" y2=\"3\" layer=\"1\"/>";
+  const char* xml =
+      "<rectangle x1=\"1\" y1=\"2\" x2=\"4\" y2=\"3\" layer=\"1\"/>";
   auto out = c.convertRectangle(parseagle::Rectangle(dom(xml)), true);
   EXPECT_EQ(1, out.layerId);
   EXPECT_EQ(UnsignedLength(0), out.lineWidth);
@@ -370,7 +371,7 @@ TEST_F(EagleTypeConverterTest, testConvertRectangle) {
 
 TEST_F(EagleTypeConverterTest, testConvertRectangleRotated) {
   EagleTypeConverter c;
-  QString xml =
+  const char* xml =
       "<rectangle x1=\"1\" y1=\"2\" x2=\"4\" y2=\"3\" layer=\"1\" "
       "rot=\"R90\"/>";
   auto out = c.convertRectangle(parseagle::Rectangle(dom(xml)), false);
@@ -391,7 +392,7 @@ TEST_F(EagleTypeConverterTest, testConvertRectangleRotated) {
 
 TEST_F(EagleTypeConverterTest, testConvertPolygon) {
   EagleTypeConverter c;
-  QString xml =
+  const char* xml =
       "<polygon width=\"2.54\" layer=\"1\">"
       "<vertex x=\"1\" y=\"2\" curve=\"45\"/>"
       "<vertex x=\"3\" y=\"4\"/>"
@@ -412,7 +413,7 @@ TEST_F(EagleTypeConverterTest, testConvertPolygon) {
 
 TEST_F(EagleTypeConverterTest, testConvertCircle) {
   EagleTypeConverter c;
-  QString xml =
+  const char* xml =
       "<circle x=\"1\" y=\"2\" radius=\"3.5\" width=\"0.254\" layer=\"1\"/>";
   auto out = c.convertCircle(parseagle::Circle(dom(xml)), true);
   EXPECT_EQ(1, out.layerId);
@@ -432,7 +433,7 @@ TEST_F(EagleTypeConverterTest, testConvertCircle) {
 
 TEST_F(EagleTypeConverterTest, testConvertCircleFilled) {
   EagleTypeConverter c;
-  QString xml =
+  const char* xml =
       "<circle x=\"1\" y=\"2\" radius=\"3.5\" width=\"0\" layer=\"1\"/>";
   auto out = c.convertCircle(parseagle::Circle(dom(xml)), false);
   EXPECT_EQ(1, out.layerId);
@@ -452,7 +453,7 @@ TEST_F(EagleTypeConverterTest, testConvertCircleFilled) {
 
 TEST_F(EagleTypeConverterTest, testConvertHole) {
   EagleTypeConverter c;
-  QString xml = "<hole x=\"1\" y=\"2\" drill=\"3.5\"/>";
+  const char* xml = "<hole x=\"1\" y=\"2\" drill=\"3.5\"/>";
   auto out = c.convertHole(parseagle::Hole(dom(xml)));
   EXPECT_EQ(PositiveLength(3500000), out->getDiameter());
   EXPECT_EQ(1, out->getPath()->getVertices().count());
@@ -462,7 +463,7 @@ TEST_F(EagleTypeConverterTest, testConvertHole) {
 
 TEST_F(EagleTypeConverterTest, testConvertFrame) {
   EagleTypeConverter c;
-  QString xml =
+  const char* xml =
       "<frame x1=\"10\" y1=\"20\" x2=\"40\" y2=\"30\" columns=\"6\" rows=\"4\" "
       "layer=\"94\"/>";
   auto out = c.convertFrame(parseagle::Frame(dom(xml)));
@@ -500,7 +501,7 @@ TEST_F(EagleTypeConverterTest, testTryConvertSchematicTextSize) {
 
 TEST_F(EagleTypeConverterTest, testTryConvertSchematicText) {
   EagleTypeConverter c;
-  QString xml =
+  const char* xml =
       "<text x=\"1\" y=\"2\" size=\"1.778\" layer=\"94\">foo\nbar</text>";
   auto out = c.tryConvertSchematicText(parseagle::Text(dom(xml)), true);
   ASSERT_TRUE(out);
@@ -532,7 +533,8 @@ TEST_F(EagleTypeConverterTest, testTryConvertBoardTextStrokeWidth) {
 
 TEST_F(EagleTypeConverterTest, testTryConvertBoardText) {
   EagleTypeConverter c;
-  QString xml = "<text x=\"1\" y=\"2\" size=\"3\" layer=\"1\">&gt;NAME</text>";
+  const char* xml =
+      "<text x=\"1\" y=\"2\" size=\"3\" layer=\"1\">&gt;NAME</text>";
   auto out = c.tryConvertBoardText(parseagle::Text(dom(xml)), true);
   ASSERT_TRUE(out);
   EXPECT_EQ(Layer::topCopper().getId().toStdString(),
@@ -552,7 +554,7 @@ TEST_F(EagleTypeConverterTest, testTryConvertBoardText) {
 
 TEST_F(EagleTypeConverterTest, testConvertSymbolPin) {
   EagleTypeConverter c;
-  QString xml = "<pin name=\"P$1\" x=\"1\" y=\"2\" length=\"point\"/>";
+  const char* xml = "<pin name=\"P$1\" x=\"1\" y=\"2\" length=\"point\"/>";
   auto out = c.convertSymbolPin(parseagle::Pin(dom(xml)));
   EXPECT_EQ("1", out.pin->getName()->toStdString());
   EXPECT_EQ(Point(1000000, 2000000), out.pin->getPosition());
@@ -564,7 +566,7 @@ TEST_F(EagleTypeConverterTest, testConvertSymbolPin) {
 
 TEST_F(EagleTypeConverterTest, testConvertSymbolPinRotated) {
   EagleTypeConverter c;
-  QString xml =
+  const char* xml =
       "<pin name=\"P$1\" x=\"1\" y=\"2\" length=\"middle\" rot=\"R90\"/>";
   auto out = c.convertSymbolPin(parseagle::Pin(dom(xml)));
   EXPECT_EQ("1", out.pin->getName()->toStdString());
@@ -577,7 +579,7 @@ TEST_F(EagleTypeConverterTest, testConvertSymbolPinRotated) {
 
 TEST_F(EagleTypeConverterTest, testConvertThtPad) {
   EagleTypeConverter c;
-  QString xml =
+  const char* xml =
       "<pad name=\"P$1\" x=\"1\" y=\"2\" drill=\"1.5\" shape=\"square\"/>";
   auto out =
       c.convertThtPad(parseagle::ThtPad(dom(xml)),
@@ -597,7 +599,7 @@ TEST_F(EagleTypeConverterTest, testConvertThtPad) {
 
 TEST_F(EagleTypeConverterTest, testConvertThtPadRotated) {
   EagleTypeConverter c;
-  QString xml =
+  const char* xml =
       "<pad name=\"P$1\" x=\"1\" y=\"2\" drill=\"1.5\" diameter=\"2.54\" "
       "shape=\"octagon\" rot=\"R90\"/>";
   auto out =
@@ -618,7 +620,7 @@ TEST_F(EagleTypeConverterTest, testConvertThtPadRotated) {
 
 TEST_F(EagleTypeConverterTest, testConvertSmtPad) {
   EagleTypeConverter c;
-  QString xml =
+  const char* xml =
       "<smd name=\"P$1\" x=\"1\" y=\"2\" dx=\"3\" dy=\"4\" layer=\"1\"/>";
   auto out = c.convertSmtPad(parseagle::SmtPad(dom(xml)));
   EXPECT_EQ("1", out.first->getName()->toStdString());
@@ -634,7 +636,7 @@ TEST_F(EagleTypeConverterTest, testConvertSmtPad) {
 
 TEST_F(EagleTypeConverterTest, testConvertSmtPadRotated) {
   EagleTypeConverter c;
-  QString xml =
+  const char* xml =
       "<smd name=\"P$1\" x=\"1\" y=\"2\" dx=\"3\" dy=\"4\" layer=\"16\" "
       "rot=\"R90\"/>";
   auto out = c.convertSmtPad(parseagle::SmtPad(dom(xml)));
