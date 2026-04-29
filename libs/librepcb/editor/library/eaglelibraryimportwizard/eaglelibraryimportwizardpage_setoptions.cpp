@@ -55,10 +55,14 @@ EagleLibraryImportWizardPage_SetOptions::
   mUi->setupUi(this);
   mUi->cbxAddNamePrefix->setText(mUi->cbxAddNamePrefix->text().arg(
       EagleLibraryImportWizardContext::NAME_PREFIX));
+  mUi->cbxAddToCategory->setText(mUi->cbxAddToCategory->text().arg(
+      eagleimport::EagleLibraryImport::CATEGORY_NAME));
   setButtonText(QWizard::CommitButton, tr("&Import!"));
   setCommitPage(true);
   connect(mUi->cbxAddNamePrefix, &QCheckBox::toggled, mContext.get(),
           &EagleLibraryImportWizardContext::setAddNamePrefix);
+  connect(mUi->cbxAddToCategory, &QCheckBox::toggled, mContext.get(),
+          &EagleLibraryImportWizardContext::setAddToCategory);
   connect(mUi->btnChooseComponentCategory, &QToolButton::clicked, this,
           [this]() {
             CategoryChooserDialog dialog(mContext->getWorkspace(),
@@ -98,6 +102,7 @@ EagleLibraryImportWizardPage_SetOptions::
 
 void EagleLibraryImportWizardPage_SetOptions::initializePage() {
   mUi->cbxAddNamePrefix->setChecked(mContext->getAddNamePrefix());
+  mUi->cbxAddToCategory->setChecked(mContext->getAddToCategory());
   mUi->gbxComponentCategory->setVisible(
       (mContext->getImport().getCheckedSymbolsCount() +
        mContext->getImport().getCheckedComponentsCount() +

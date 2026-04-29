@@ -60,6 +60,8 @@ class EagleLibraryImport final : public QThread {
   Q_OBJECT
 
 public:
+  static constexpr const char* CATEGORY_NAME = "EAGLE Import";
+
   struct Symbol {
     QString displayName;  // Same as symbol->getName()
     QString description;  // Same as symbol->getDescription()
@@ -133,13 +135,17 @@ public:
   // Operator Overloadings
   EagleLibraryImport& operator=(const EagleLibraryImport& rhs) = delete;
 
+  // Static Methods
+  static Uuid getComponentCategory() noexcept;
+  static Uuid getPackageCategory() noexcept;
+
 signals:
   void symbolCheckStateChanged(const QString& name, Qt::CheckState state);
   void packageCheckStateChanged(const QString& name, Qt::CheckState state);
   void componentCheckStateChanged(const QString& name, Qt::CheckState state);
   void progressStatus(const QString& status);
   void progressPercent(int percent);
-  void finished();
+  void importFinished();
 
 private:  // Methods
   template <typename T>

@@ -43,7 +43,7 @@ namespace eagleimport {
 using C = EagleTypeConverter;
 
 static QString generatedBy(QString libName, QStringList keys) {
-  if (libName.toLower().endsWith(".lbr")) {
+  if (libName.endsWith(".lbr", Qt::CaseInsensitive)) {
     libName.chop(4);
   }
   keys.prepend(libName);

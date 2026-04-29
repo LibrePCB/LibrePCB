@@ -27,6 +27,8 @@
 
 #include <librepcb/core/fileio/transactionaldirectory.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
+#include <librepcb/core/library/cat/componentcategory.h>
+#include <librepcb/core/library/cat/packagecategory.h>
 #include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/library/dev/device.h>
 #include <librepcb/core/library/pkg/package.h>
@@ -316,6 +318,33 @@ bool EagleLibraryImport::setElementDependent(T& element,
   return false;
 }
 
+template <typename T>
+static void tryCreateCategoryIfRequired(const FilePath& libDir,
+                                        const Uuid& uuid,
+                                        const QSet<Uuid>& usedCategories,
+                                        MessageLogger& log) noexcept {
+  try {
+    if (!usedCategories.contains(uuid)) {
+      return;  // Category is not needed.
+    }
+    const FilePath fp =
+        libDir.getPathTo(T::getShortElementName()).getPathTo(uuid.toStr());
+    if (fp.getPathTo(".librepcb-" % T::getShortElementName())
+            .isExistingFile()) {
+      return;  // Category exists already.
+    }
+    TransactionalDirectory dir(TransactionalFileSystem::openRW(fp));
+    T cat(uuid, Version::fromString("0.1"), "EAGLE Import",
+          QDateTime::currentDateTime(),
+          ElementName(EagleLibraryImport::CATEGORY_NAME),
+          "Imported library elements.", "eagle");
+    cat.saveTo(dir);
+    dir.getFileSystem()->save();
+  } catch (const Exception& e) {
+    log.critical(QString("Failed to create category: %1").arg(e.getMsg()));
+  }
+}
+
 void EagleLibraryImport::run() noexcept {
   // Note: This method is called from a different thread, thus be careful with
   //       calling other methods to only call thread-safe methods!
@@ -325,6 +354,16 @@ void EagleLibraryImport::run() noexcept {
 
   int totalCount = getCheckedElementsCount();
   int count = 0;
+
+  // Create categories, if required.
+  tryCreateCategoryIfRequired<librepcb::ComponentCategory>(
+      mDestinationLibraryFp, getComponentCategory(),
+      mSettings->symbolCategories | mSettings->componentCategories |
+          mSettings->deviceCategories,
+      *globalLog);
+  tryCreateCategoryIfRequired<librepcb::PackageCategory>(
+      mDestinationLibraryFp, getPackageCategory(), mSettings->packageCategories,
+      *globalLog);
 
   foreach (const Symbol& sym, mSymbols) {
     if (mAbort) {
@@ -433,7 +472,19 @@ void EagleLibraryImport::run() noexcept {
                          "Placeholders are numbers", totalCount)
                           .arg(count)
                           .arg(totalCount));
-  emit finished();
+  emit importFinished();
+}
+
+/*******************************************************************************
+ *  Static Methods
+ ******************************************************************************/
+
+Uuid EagleLibraryImport::getComponentCategory() noexcept {
+  return Uuid::fromString("5d23e248-e18b-4d98-b9d7-541c54747b45");
+}
+
+Uuid EagleLibraryImport::getPackageCategory() noexcept {
+  return Uuid::fromString("f52fabb6-7cdf-4e61-b26a-9d8ec0b8bc49");
 }
 
 /*******************************************************************************
