@@ -26,6 +26,7 @@ component DeviceDependencyCard inherits Rectangle {
     in property <string> description;
     in property <color> background-color;
     in property <color> foreground-color;
+    in property <bool> has-measure-tool;
     in property <int> scene;
     in property <bool> primary;
     in property <bool> read-only;
@@ -139,6 +140,8 @@ component DeviceDependencyCard inherits Rectangle {
                 accessible-role: none;
 
                 ta := TouchArea {
+                    mouse-cursor: tabs[index].tool-cursor;
+
                     view-buttons-l := VerticalLayout {
                         x: parent.width - self.preferred-width - 7px;
                         y: 7px;
@@ -153,6 +156,18 @@ component DeviceDependencyCard inherits Rectangle {
 
                             clicked => {
                                 Backend.trigger-tab(section-index, index, TabAction.zoom-fit);
+                            }
+                        }
+
+                        if has-measure-tool: measure-btn := SceneButton {
+                            width: 23px;
+                            icon: @image-url("../../../../font-awesome/svgs/solid/ruler.svg");
+                            icon-scale: 0.9;
+                            base-color: background-color;
+                            base-text-color: foreground-color;
+
+                            clicked => {
+                                Backend.trigger-tab(section-index, index, TabAction.tool-measure);
                             }
                         }
                     }
@@ -193,6 +208,7 @@ export component ComponentCard inherits DeviceDependencyCard {
     description: self.tabs[self.index].component-description;
     background-color: self.tabs[self.index].component-background-color;
     foreground-color: self.tabs[self.index].component-foreground-color;
+    has-measure-tool: false;
     scene: 0;
 
     open-clicked => {
@@ -213,6 +229,7 @@ export component PackageCard inherits DeviceDependencyCard {
     description: self.tabs[self.index].package-description;
     background-color: self.tabs[self.index].package-background-color;
     foreground-color: self.tabs[self.index].package-foreground-color;
+    has-measure-tool: true;
     scene: 1;
 
     open-clicked => {

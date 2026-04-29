@@ -811,6 +811,21 @@ export global Shortcuts {
         false
     }
 
+    public function process-device-tab-shortcuts(event: KeyEvent) -> bool {
+        if Backend.is-shortcut(event, Cmd.tool-measure) {
+            Backend.trigger-tab(section, tab, TabAction.tool-measure);
+            return true;
+        } else if Backend.is-shortcut(event, Cmd.abort) {
+            Backend.trigger-tab(section, tab, TabAction.abort);
+            return true;
+        } else if process-tab-shortcuts(event) {
+            return true;
+        } else if Backend.scene-key-pressed(section, event) {
+            return true;
+        }
+        false
+    }
+
     public function process-schematic-tab-shortcuts(event: KeyEvent) -> bool {
         // Tool-specific shortcuts
         if Data.current-section.schematic-tabs[tab].tool == EditorTool.wire {
@@ -1235,6 +1250,10 @@ export global Shortcuts {
             }
         } else if Data.current-tab.type == TabType.package {
             if process-package-tab-shortcuts(event) {
+                return true;
+            }
+        } else if Data.current-tab.type == TabType.device {
+            if process-device-tab-shortcuts(event) {
                 return true;
             }
         } else if Data.current-tab.type == TabType.schematic {
