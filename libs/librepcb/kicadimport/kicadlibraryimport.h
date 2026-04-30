@@ -116,6 +116,7 @@ public:
   };
 
   static constexpr const char* COMPATIBLE_KICAD_VERSION = "9.x";
+  static constexpr const char* CATEGORY_NAME = "KiCad Import";
 
   // Constructors / Destructor
   KiCadLibraryImport(const KiCadLibraryImport& other) = delete;
@@ -160,6 +161,10 @@ public:
 
   // Operator Overloadings
   KiCadLibraryImport& operator=(const KiCadLibraryImport& rhs) = delete;
+
+  // Static Methods
+  static Uuid getComponentCategory() noexcept;
+  static Uuid getPackageCategory() noexcept;
 
 signals:
   void symbolCheckStateChanged(const QString& libName, const QString& symName,

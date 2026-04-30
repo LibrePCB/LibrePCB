@@ -55,10 +55,14 @@ KiCadLibraryImportWizardPage_SetOptions::
   mUi->setupUi(this);
   mUi->cbxAddNamePrefix->setText(mUi->cbxAddNamePrefix->text().arg(
       KiCadLibraryImportWizardContext::NAME_PREFIX));
+  mUi->cbxAddToCategory->setText(mUi->cbxAddToCategory->text().arg(
+      kicadimport::KiCadLibraryImport::CATEGORY_NAME));
   setButtonText(QWizard::CommitButton, tr("&Import!"));
   setCommitPage(true);
   connect(mUi->cbxAddNamePrefix, &QCheckBox::toggled, mContext.get(),
           &KiCadLibraryImportWizardContext::setAddNamePrefix);
+  connect(mUi->cbxAddToCategory, &QCheckBox::toggled, mContext.get(),
+          &KiCadLibraryImportWizardContext::setAddToCategory);
   connect(mUi->btnChooseComponentCategory, &QToolButton::clicked, this,
           [this]() {
             CategoryChooserDialog dialog(mContext->getWorkspace(),
@@ -99,6 +103,7 @@ KiCadLibraryImportWizardPage_SetOptions::
 void KiCadLibraryImportWizardPage_SetOptions::initializePage() {
   auto result = mContext->getImport().getResult();
   mUi->cbxAddNamePrefix->setChecked(mContext->getAddNamePrefix());
+  mUi->cbxAddToCategory->setChecked(mContext->getAddToCategory());
   mUi->gbxComponentCategory->setVisible(result &&
                                         (result->symbolLibs.count() > 0));
   mUi->gbxPackageCategory->setVisible(result &&

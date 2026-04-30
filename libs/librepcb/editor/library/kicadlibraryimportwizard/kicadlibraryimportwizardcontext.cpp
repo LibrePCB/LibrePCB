@@ -50,6 +50,7 @@ KiCadLibraryImportWizardContext::KiCadLibraryImportWizardContext(
     mWorkspace(workspace),
     mLibsPath(),
     mAddNamePrefix(false),
+    mAddToCategory(true),
     mComponentCategoryUuid(),
     mPackageCategoryUuid(),
     mImport(
@@ -65,6 +66,9 @@ KiCadLibraryImportWizardContext::KiCadLibraryImportWizardContext(
       cs.value("library_editor/kicad_import_wizard/shapes3d_path").toString());
   setAddNamePrefix(
       cs.value("library_editor/kicad_import_wizard/add_name_prefix", false)
+          .toBool());
+  setAddToCategory(
+      cs.value("library_editor/kicad_import_wizard/add_category", true)
           .toBool());
   setComponentCategory(Uuid::tryFromString(
       cs.value("library_editor/kicad_import_wizard/component_category")
@@ -83,6 +87,8 @@ KiCadLibraryImportWizardContext::~KiCadLibraryImportWizardContext() noexcept {
               mShapes3dPath.toStr());
   cs.setValue("library_editor/kicad_import_wizard/add_name_prefix",
               mAddNamePrefix);
+  cs.setValue("library_editor/kicad_import_wizard/add_category",
+              mAddToCategory);
   cs.setValue(
       "library_editor/kicad_import_wizard/component_category",
       mComponentCategoryUuid ? mComponentCategoryUuid->toStr() : QString());
@@ -117,25 +123,40 @@ void KiCadLibraryImportWizardContext::setAddNamePrefix(bool add) noexcept {
   mImport->setNamePrefix(add ? NAME_PREFIX : QString());
 }
 
+void KiCadLibraryImportWizardContext::setAddToCategory(bool add) noexcept {
+  mAddToCategory = add;
+  setComponentCategory(mComponentCategoryUuid);
+  setPackageCategory(mPackageCategoryUuid);
+}
+
 void KiCadLibraryImportWizardContext::setComponentCategory(
     const std::optional<Uuid>& uuid) noexcept {
   mComponentCategoryUuid = uuid;
-  mImport->setSymbolCategories(mComponentCategoryUuid
-                                   ? QSet<Uuid>{*mComponentCategoryUuid}
-                                   : QSet<Uuid>{});
-  mImport->setComponentCategories(mComponentCategoryUuid
-                                      ? QSet<Uuid>{*mComponentCategoryUuid}
-                                      : QSet<Uuid>{});
-  mImport->setDeviceCategories(mComponentCategoryUuid
-                                   ? QSet<Uuid>{*mComponentCategoryUuid}
-                                   : QSet<Uuid>{});
+
+  QSet<Uuid> categories;
+  if (mAddToCategory) {
+    categories.insert(KiCadLibraryImport::getComponentCategory());
+  }
+  if (mComponentCategoryUuid) {
+    categories.insert(*mComponentCategoryUuid);
+  }
+  mImport->setSymbolCategories(categories);
+  mImport->setComponentCategories(categories);
+  mImport->setDeviceCategories(categories);
 }
 
 void KiCadLibraryImportWizardContext::setPackageCategory(
     const std::optional<Uuid>& uuid) noexcept {
   mPackageCategoryUuid = uuid;
-  mImport->setPackageCategories(
-      mPackageCategoryUuid ? QSet<Uuid>{*mPackageCategoryUuid} : QSet<Uuid>{});
+
+  QSet<Uuid> categories;
+  if (mAddToCategory) {
+    categories.insert(KiCadLibraryImport::getPackageCategory());
+  }
+  if (mPackageCategoryUuid) {
+    categories.insert(*mPackageCategoryUuid);
+  }
+  mImport->setPackageCategories(categories);
 }
 
 /*******************************************************************************

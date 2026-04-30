@@ -29,6 +29,8 @@
 #include <librepcb/core/fileio/fileutils.h>
 #include <librepcb/core/fileio/transactionaldirectory.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
+#include <librepcb/core/library/cat/componentcategory.h>
+#include <librepcb/core/library/cat/packagecategory.h>
 #include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/library/dev/device.h>
 #include <librepcb/core/library/pkg/package.h>
@@ -101,6 +103,33 @@ static QList<KiCadSymbolGate> mergeSymbolGates(
     gate.style = KiCadSymbolGate::Style::Base;
   }
   return ret;
+}
+
+template <typename T>
+static void tryCreateCategoryIfRequired(const FilePath& libDir,
+                                        const Uuid& uuid,
+                                        const QSet<Uuid>& usedCategories,
+                                        MessageLogger& log) noexcept {
+  try {
+    if (!usedCategories.contains(uuid)) {
+      return;  // Category is not needed.
+    }
+    const FilePath fp =
+        libDir.getPathTo(T::getShortElementName()).getPathTo(uuid.toStr());
+    if (fp.getPathTo(".librepcb-" % T::getShortElementName())
+            .isExistingFile()) {
+      return;  // Category exists already.
+    }
+    TransactionalDirectory dir(TransactionalFileSystem::openRW(fp));
+    T cat(uuid, Version::fromString("0.1"), "KiCad Import",
+          QDateTime::currentDateTime(),
+          ElementName(KiCadLibraryImport::CATEGORY_NAME),
+          "Imported library elements.", "kicad");
+    cat.saveTo(dir);
+    dir.getFileSystem()->save();
+  } catch (const Exception& e) {
+    log.critical(QString("Failed to create category: %1").arg(e.getMsg()));
+  }
 }
 
 /*******************************************************************************
@@ -690,6 +719,16 @@ std::shared_ptr<KiCadLibraryImport::Result> KiCadLibraryImport::import(
   int processedCount = 0;
   int importedCount = 0;
 
+  // Create categories, if required.
+  tryCreateCategoryIfRequired<librepcb::ComponentCategory>(
+      mDestinationLibraryFp, getComponentCategory(),
+      mSettings->symbolCategories | mSettings->componentCategories |
+          mSettings->deviceCategories,
+      *log);
+  tryCreateCategoryIfRequired<librepcb::PackageCategory>(
+      mDestinationLibraryFp, getPackageCategory(), mSettings->packageCategories,
+      *log);
+
   // Calculate total count.
   for (const FootprintLibrary& lib : result->footprintLibs) {
     for (const Footprint& fpt : lib.footprints) {
@@ -951,6 +990,18 @@ std::shared_ptr<KiCadLibraryImport::Result> KiCadLibraryImport::import(
                           .arg(totalCount));
   emit importFinished();
   return result;
+}
+
+/*******************************************************************************
+ *  Static Methods
+ ******************************************************************************/
+
+Uuid KiCadLibraryImport::getComponentCategory() noexcept {
+  return Uuid::fromString("7bbabe3b-da71-423e-8e50-fcdbce820fac");
+}
+
+Uuid KiCadLibraryImport::getPackageCategory() noexcept {
+  return Uuid::fromString("52a596cb-7d7e-446a-944c-f631be387ec9");
 }
 
 template <typename T>
