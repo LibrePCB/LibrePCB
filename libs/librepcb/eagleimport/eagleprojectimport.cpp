@@ -1231,7 +1231,7 @@ void EagleProjectImport::importBoard(Project& project,
         std::optional<PositiveLength> size;
         if (sizeRaw >= *drillDiameter) {
           size = PositiveLength(sizeRaw);
-        } else if (size != 0) {
+        } else if (sizeRaw != 0) {
           log.warning(
               "Via size smaller than drill diameter, using automatic size "
               "instead.");

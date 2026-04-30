@@ -51,7 +51,7 @@ TEST_F(EagleLibraryImportTest, testImport) {
 
   // Connect signals by hand because QSignalSpy is not threadsafe!
   int signalFinished = 0;
-  QObject::connect(&import, &EagleLibraryImport::finished,
+  QObject::connect(&import, &EagleLibraryImport::importFinished,
                    [&signalFinished]() { ++signalFinished; });
 
   QStringList parseErrors = import.open(src);

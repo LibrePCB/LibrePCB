@@ -72,6 +72,7 @@ public:
   eagleimport::EagleLibraryImport& getImport() noexcept { return *mImport; }
   const FilePath& getLbrFilePath() const noexcept { return mLbrFilePath; }
   bool getAddNamePrefix() const noexcept { return mAddNamePrefix; }
+  bool getAddToCategory() const noexcept { return mAddToCategory; }
   const std::optional<Uuid>& getComponentCategory() const noexcept {
     return mComponentCategoryUuid;
   }
@@ -82,6 +83,7 @@ public:
   // Setters
   void setLbrFilePath(const QString& filePath) noexcept;
   void setAddNamePrefix(bool add) noexcept;
+  void setAddToCategory(bool add) noexcept;
   void setComponentCategory(const std::optional<Uuid>& uuid) noexcept;
   void setPackageCategory(const std::optional<Uuid>& uuid) noexcept;
 
@@ -98,6 +100,7 @@ private:  // Data
   QScopedPointer<eagleimport::EagleLibraryImport> mImport;
   FilePath mLbrFilePath;
   bool mAddNamePrefix;
+  bool mAddToCategory;
   std::optional<Uuid> mComponentCategoryUuid;
   std::optional<Uuid> mPackageCategoryUuid;
 };

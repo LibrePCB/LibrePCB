@@ -54,12 +54,12 @@ EagleLibraryImportWizardPage_Result::EagleLibraryImportWizardPage_Result(
     mIsCompleted(false) {
   mUi->setupUi(this);
   mUi->gbxErrors->hide();
-  connect(&mContext->getImport(), &EagleLibraryImport::finished, this,
+  connect(&mContext->getImport(), &EagleLibraryImport::importFinished, this,
           &EagleLibraryImportWizardPage_Result::importFinished);
 
   // Connect finished signal directly with library scanner to get it emitted
   // even when closing this wizard while the import is still in progress.
-  connect(&mContext->getImport(), &EagleLibraryImport::finished,
+  connect(&mContext->getImport(), &EagleLibraryImport::importFinished,
           &mContext->getWorkspace().getLibraryDb(),
           &WorkspaceLibraryDb::startLibraryRescan);
 }
@@ -108,6 +108,11 @@ void EagleLibraryImportWizardPage_Result::importFinished() noexcept {
       connect(&mContext->getWorkspace().getLibraryDb(),
               &WorkspaceLibraryDb::scanProgressUpdate, mUi->prgImport,
               &QProgressBar::setValue, Qt::QueuedConnection));
+  mProgressBarConnections.append(connect(
+      &mContext->getWorkspace().getLibraryDb(),
+      &WorkspaceLibraryDb::scanFinished, this,
+      [this]() { mUi->prgImport->setFormat(tr("Finished!")); },
+      Qt::QueuedConnection));
 
   const auto log = mContext->getImport().getLogger();
   mUi->lblMessages->setText(log->getMessagesRichText(&mContext->getTheme()));

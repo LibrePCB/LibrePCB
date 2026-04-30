@@ -49,6 +49,7 @@ EagleLibraryImportWizardContext::EagleLibraryImportWizardContext(
     mImport(new EagleLibraryImport(dstLibFp, &Uuid::createRandom, parent)),
     mLbrFilePath(),
     mAddNamePrefix(false),
+    mAddToCategory(true),
     mComponentCategoryUuid(),
     mPackageCategoryUuid() {
   // Load settings.
@@ -59,6 +60,10 @@ EagleLibraryImportWizardContext::EagleLibraryImportWizardContext(
   setAddNamePrefix(
       clientSettings
           .value("library_editor/eagle_import_wizard/add_name_prefix", false)
+          .toBool());
+  setAddToCategory(
+      clientSettings
+          .value("library_editor/eagle_import_wizard/add_category", true)
           .toBool());
   setComponentCategory(Uuid::tryFromString(
       clientSettings
@@ -77,6 +82,8 @@ EagleLibraryImportWizardContext::~EagleLibraryImportWizardContext() noexcept {
                           mLbrFilePath.toStr());
   clientSettings.setValue("library_editor/eagle_import_wizard/add_name_prefix",
                           mAddNamePrefix);
+  clientSettings.setValue("library_editor/eagle_import_wizard/add_category",
+                          mAddToCategory);
   clientSettings.setValue(
       "library_editor/eagle_import_wizard/component_category",
       mComponentCategoryUuid ? mComponentCategoryUuid->toStr() : QString());
@@ -116,25 +123,40 @@ void EagleLibraryImportWizardContext::setAddNamePrefix(bool add) noexcept {
   mImport->setNamePrefix(add ? NAME_PREFIX : QString());
 }
 
+void EagleLibraryImportWizardContext::setAddToCategory(bool add) noexcept {
+  mAddToCategory = add;
+  setComponentCategory(mComponentCategoryUuid);
+  setPackageCategory(mPackageCategoryUuid);
+}
+
 void EagleLibraryImportWizardContext::setComponentCategory(
     const std::optional<Uuid>& uuid) noexcept {
   mComponentCategoryUuid = uuid;
-  mImport->setSymbolCategories(mComponentCategoryUuid
-                                   ? QSet<Uuid>{*mComponentCategoryUuid}
-                                   : QSet<Uuid>{});
-  mImport->setComponentCategories(mComponentCategoryUuid
-                                      ? QSet<Uuid>{*mComponentCategoryUuid}
-                                      : QSet<Uuid>{});
-  mImport->setDeviceCategories(mComponentCategoryUuid
-                                   ? QSet<Uuid>{*mComponentCategoryUuid}
-                                   : QSet<Uuid>{});
+
+  QSet<Uuid> categories;
+  if (mAddToCategory) {
+    categories.insert(EagleLibraryImport::getComponentCategory());
+  }
+  if (mComponentCategoryUuid) {
+    categories.insert(*mComponentCategoryUuid);
+  }
+  mImport->setSymbolCategories(categories);
+  mImport->setComponentCategories(categories);
+  mImport->setDeviceCategories(categories);
 }
 
 void EagleLibraryImportWizardContext::setPackageCategory(
     const std::optional<Uuid>& uuid) noexcept {
   mPackageCategoryUuid = uuid;
-  mImport->setPackageCategories(
-      mPackageCategoryUuid ? QSet<Uuid>{*mPackageCategoryUuid} : QSet<Uuid>{});
+
+  QSet<Uuid> categories;
+  if (mAddToCategory) {
+    categories.insert(EagleLibraryImport::getPackageCategory());
+  }
+  if (mPackageCategoryUuid) {
+    categories.insert(*mPackageCategoryUuid);
+  }
+  mImport->setPackageCategories(categories);
 }
 
 /*******************************************************************************
