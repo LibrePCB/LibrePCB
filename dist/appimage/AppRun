@@ -1,5 +1,10 @@
 #!/usr/bin/env sh
 
+# Improve desktop integration:
+#  - Fixes automatic light/dark theme detection
+#  - Makes LibrePCB using native file dialogs instead of Qt fallback
+export QT_QPA_PLATFORMTHEME=xdgdesktopportal
+
 # Wrapper allowing to bundle both the GUI and the CLI in a single AppImage.
 # If the called AppImage has "cli" in its name, the CLI executable is invoked.
 # If not, the GUI executable is invoked.
