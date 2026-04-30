@@ -73,6 +73,7 @@ public:
   const FilePath& getLibsPath() const noexcept { return mLibsPath; }
   const FilePath& getShapes3dPath() const noexcept { return mShapes3dPath; }
   bool getAddNamePrefix() const noexcept { return mAddNamePrefix; }
+  bool getAddToCategory() const noexcept { return mAddToCategory; }
   const std::optional<Uuid>& getComponentCategory() const noexcept {
     return mComponentCategoryUuid;
   }
@@ -87,6 +88,7 @@ public:
   void setLibsPath(const QString& libsPath, const QString& shapes3dPath,
                    std::shared_ptr<MessageLogger> log) noexcept;
   void setAddNamePrefix(bool add) noexcept;
+  void setAddToCategory(bool add) noexcept;
   void setComponentCategory(const std::optional<Uuid>& uuid) noexcept;
   void setPackageCategory(const std::optional<Uuid>& uuid) noexcept;
 
@@ -103,6 +105,7 @@ private:  // Data
   FilePath mLibsPath;
   FilePath mShapes3dPath;
   bool mAddNamePrefix;
+  bool mAddToCategory;
   std::optional<Uuid> mComponentCategoryUuid;
   std::optional<Uuid> mPackageCategoryUuid;
   QScopedPointer<kicadimport::KiCadLibraryImport> mImport;
