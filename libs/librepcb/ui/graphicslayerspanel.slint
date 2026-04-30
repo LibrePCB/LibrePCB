@@ -142,7 +142,7 @@ export component GraphicsLayersPanel inherits FocusScope {
             title: @tr("Layers").to-uppercase();
             highlight: root.has-focus;
 
-            top-btn := IconButton {
+            if self.max-buttons >= 6: top-btn := IconButton {
                 width: self.height;
                 icon: @image-url("../../bootstrap-icons/icons/front.svg");
                 icon-scale: 0.6;
@@ -153,7 +153,7 @@ export component GraphicsLayersPanel inherits FocusScope {
                 }
             }
 
-            bot-btn := IconButton {
+            if self.max-buttons >= 5: bot-btn := IconButton {
                 width: self.height;
                 icon: @image-url("../../bootstrap-icons/icons/back.svg");
                 icon-scale: 0.6;
@@ -164,7 +164,7 @@ export component GraphicsLayersPanel inherits FocusScope {
                 }
             }
 
-            top-bot-btn := IconButton {
+            if self.max-buttons >= 4: top-bot-btn := IconButton {
                 width: self.height;
                 icon: @image-url("../../bootstrap-icons/icons/union.svg");
                 icon-scale: 0.6;
@@ -175,7 +175,7 @@ export component GraphicsLayersPanel inherits FocusScope {
                 }
             }
 
-            show-all-btn := IconButton {
+            if self.max-buttons >= 3: show-all-btn := IconButton {
                 width: self.height;
                 icon: @image-url("../../bootstrap-icons/icons/eye-fill.svg");
                 icon-scale: 0.7;
@@ -186,7 +186,7 @@ export component GraphicsLayersPanel inherits FocusScope {
                 }
             }
 
-            hide-all-btn := IconButton {
+            if self.max-buttons >= 2: hide-all-btn := IconButton {
                 width: self.height;
                 icon: @image-url("../../bootstrap-icons/icons/eye-slash-fill.svg");
                 icon-scale: 0.7;
@@ -197,7 +197,7 @@ export component GraphicsLayersPanel inherits FocusScope {
                 }
             }
 
-            layer-setup-btn := IconButton {
+            if self.max-buttons >= 1: layer-setup-btn := IconButton {
                 width: self.height;
                 icon: @image-url("../../font-awesome/svgs/solid/sliders.svg");
                 icon-scale: 0.7;

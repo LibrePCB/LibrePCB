@@ -7,6 +7,7 @@ export component PanelHeader inherits Rectangle {
     in property <string> note;
     in property <bool> show-spinner: false;
     in property <bool> highlight: false;
+    out property <int> max-buttons: floor(self.width / self.height) - 1;
     property <length> content-height: 24px;
 
     height: spacing-top + content-height + 2px;

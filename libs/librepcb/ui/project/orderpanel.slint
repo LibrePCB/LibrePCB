@@ -323,11 +323,12 @@ export component OrderPanel inherits FocusScope {
             }
         }
 
-        PanelHeader {
+        property <bool> show-details: root.width > 200px;
+        if show-details: PanelHeader {
             title: @tr("Details");
         }
 
-        VerticalLayout {
+        if show-details: VerticalLayout {
             padding: 8px;
             spacing: 8px;
 

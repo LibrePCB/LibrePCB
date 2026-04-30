@@ -162,7 +162,7 @@ component ProjectSection inherits Rectangle {
                 title: project.name.to-uppercase();
                 highlight: project-index == Data.current-project-index;
 
-                if project.unsaved-changes && project.writable: save-btn := IconButton {
+                if (self.max-buttons >= 5) && project.unsaved-changes && project.writable: save-btn := IconButton {
                     cmd: Cmd.save;
                     icon-scale: 60%;
                     color-enabled: Data.theme.base-text-warning;
@@ -172,7 +172,7 @@ component ProjectSection inherits Rectangle {
                     }
                 }
 
-                new-sheet-btn := IconButton {
+                if self.max-buttons >= 4: new-sheet-btn := IconButton {
                     cmd: Cmd.sheet-new;
                     icon-scale: 60%;
 
@@ -181,7 +181,7 @@ component ProjectSection inherits Rectangle {
                     }
                 }
 
-                new-board-btn := IconButton {
+                if self.max-buttons >= 3: new-board-btn := IconButton {
                     cmd: Cmd.board-new;
                     icon: @image-url("../../bootstrap-icons/icons/motherboard.svg");
                     icon-scale: 60%;
@@ -191,7 +191,7 @@ component ProjectSection inherits Rectangle {
                     }
                 }
 
-                setup-dialog-btn := IconButton {
+                if self.max-buttons >= 2: setup-dialog-btn := IconButton {
                     cmd: Cmd.project-setup;
                     icon-scale: 60%;
 
@@ -200,7 +200,7 @@ component ProjectSection inherits Rectangle {
                     }
                 }
 
-                close-btn := IconButton {
+                if self.max-buttons >= 1: close-btn := IconButton {
                     cmd: Cmd.project-close;
                     icon-scale: 60%;
 
@@ -402,6 +402,7 @@ export component DocumentsPanel inherits ScrollView {
     mouse-drag-pan-enabled: true;
 
     VerticalLayout {
+        width: 100%;
         alignment: start;
 
         for project[project-index] in Data.projects: project-item := ProjectSection {
