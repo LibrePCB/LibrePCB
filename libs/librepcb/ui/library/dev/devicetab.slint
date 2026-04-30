@@ -593,4 +593,8 @@ export component DeviceTab inherits Tab {
     focus-gained(reason) => {
         Data.set-current-tab(section-index, index);
     }
+
+    key-released(event) => {
+        Backend.scene-key-released(section-index, event) ? accept : reject
+    }
 }

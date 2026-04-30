@@ -30,6 +30,7 @@
 #include "../../undocommandgroup.h"
 #include "../../undostack.h"
 #include "../../utils/editortoolbox.h"
+#include "../../utils/measuretool.h"
 #include "../../utils/slinthelpers.h"
 #include "../../utils/uihelpers.h"
 #include "../../workspace/categorytreemodel.h"
@@ -149,6 +150,7 @@ DeviceTab::DeviceTab(LibraryEditor& editor, std::unique_ptr<Device> dev,
   {
     mPackageScene->setGridStyle(GridStyle::Lines);
     mPackageScene->setOriginCrossVisible(false);  // It's rather disruptive.
+    mPackageView->setEventHandler(this);
     connect(mPackageScene.get(), &GraphicsScene::changed, this,
             &DeviceTab::requestRepaint);
     connect(mPackageView.get(), &SlintGraphicsView::transformChanged, this,
@@ -214,6 +216,8 @@ DeviceTab::DeviceTab(LibraryEditor& editor, std::unique_ptr<Device> dev,
 DeviceTab::~DeviceTab() noexcept {
   deactivate();
 
+  mMeasureTool.reset();
+  mPackageView->setEventHandler(nullptr);
   mParts->setReferences(nullptr, nullptr);
   mPinout->setReferences(nullptr, nullptr, nullptr, nullptr);
   mSignalNames->setReferences(nullptr, nullptr);
@@ -332,6 +336,8 @@ ui::DeviceTabData DeviceTab::getDerivedUiData() const noexcept {
       q2s(brdBgColors.secondary),  // Package foreground color
       mIsInterfaceBroken,  // Interface broken
       mElementDuplicated && (!mDeprecated),  // Element duplicated
+      mMeasureTool ? slint::private_api::MouseCursor::Crosshair
+                   : slint::private_api::MouseCursor::Default,  // Tool cursor
       hasUnconnectedPads,  // Has unconnected pads
       hasAutoConnectablePads,  // Has auto-connectable pads
       areAllPadsUnconnected,  // All pads unconnected
@@ -388,6 +394,9 @@ void DeviceTab::setDerivedUiData(const ui::DeviceTabData& data) noexcept {
 void DeviceTab::trigger(ui::TabAction a) noexcept {
   switch (a) {
     case ui::TabAction::Abort: {
+      if (leaveMeasureTool()) {
+        break;
+      }
       mPinoutBuilder->exitInteractiveMode();
       updateHighlightedPadsAndPins();
       onDerivedUiDataChanged.notify();
@@ -564,6 +573,10 @@ void DeviceTab::trigger(ui::TabAction a) noexcept {
       onDerivedUiDataChanged.notify();
       break;
     }
+    case ui::TabAction::ToolMeasure: {
+      toggleMeasureTool();
+      break;
+    }
     default: {
       WindowTab::trigger(a);
       break;
@@ -606,6 +619,16 @@ bool DeviceTab::processSceneScrolled(const QPointF& pos,
   }
 }
 
+bool DeviceTab::processSceneKeyPressed(
+    const slint::language::KeyEvent& e) noexcept {
+  return mPackageView->keyPressed(e);
+}
+
+bool DeviceTab::processSceneKeyReleased(
+    const slint::language::KeyEvent& e) noexcept {
+  return mPackageView->keyReleased(e);
+}
+
 bool DeviceTab::requestClose() noexcept {
   commitUiData();
 
@@ -632,6 +655,51 @@ bool DeviceTab::requestClose() noexcept {
   } else {
     return false;
   }
+}
+
+/*******************************************************************************
+ *  IF_GraphicsViewEventHandler Methods
+ ******************************************************************************/
+
+bool DeviceTab::graphicsSceneKeyPressed(
+    const GraphicsSceneKeyEvent& e) noexcept {
+  if (mMeasureTool) {
+    return mMeasureTool->processKeyPressed(e.key, e.modifiers);
+  }
+  return false;
+}
+
+bool DeviceTab::graphicsSceneKeyReleased(
+    const GraphicsSceneKeyEvent& e) noexcept {
+  if (mMeasureTool) {
+    return mMeasureTool->processKeyReleased(e.key, e.modifiers);
+  }
+  return false;
+}
+
+bool DeviceTab::graphicsSceneMouseMoved(
+    const GraphicsSceneMouseEvent& e) noexcept {
+  if (mMeasureTool) {
+    return mMeasureTool->processGraphicsSceneMouseMoved(e.scenePos,
+                                                        e.modifiers);
+  }
+  return false;
+}
+
+bool DeviceTab::graphicsSceneLeftMouseButtonPressed(
+    const GraphicsSceneMouseEvent& e) noexcept {
+  Q_UNUSED(e);
+  if (mMeasureTool) {
+    return mMeasureTool->processGraphicsSceneLeftMouseButtonPressed();
+  }
+  return false;
+}
+
+bool DeviceTab::graphicsSceneRightMouseButtonReleased(
+    const GraphicsSceneMouseEvent& e) noexcept {
+  Q_UNUSED(e);
+  toggleMeasureTool();
+  return true;
 }
 
 /*******************************************************************************
@@ -802,6 +870,7 @@ void DeviceTab::refreshDependentElements() noexcept {
           graphicsItem->setPosition(gate->getSymbolPosition());
           graphicsItem->setRotation(gate->getSymbolRotation());
           mComponentScene->addItem(*graphicsItem);
+          mComponentScene->setGridInterval(symbol->getGridInterval());
           mSymbolGraphicsItems.append(graphicsItem);
         }
       }
@@ -816,6 +885,7 @@ void DeviceTab::refreshDependentElements() noexcept {
 
   if (mPackageSelected &&
       ((!mPackage) || (mPackage->getUuid() != mDevice->getPackageUuid()))) {
+    leaveMeasureTool();
     mPinout->setReferences(&mDevice->getPadSignalMap(), nullptr, mSignalNames,
                            mUndoStack.get());
     mFootprintGraphicsItem.reset();
@@ -835,6 +905,7 @@ void DeviceTab::refreshDependentElements() noexcept {
             &mPackage->getPads(), mComponent.get(),
             mApp.getWorkspace().getSettings().libraryLocaleOrder.get()));
         mPackageScene->addItem(*mFootprintGraphicsItem);
+        mPackageScene->setGridInterval(mPackage->getGridInterval());
       }
       mPackageDescription = cleanDescription(mPackage->getDescriptions());
     } catch (const Exception& e) {
@@ -1012,6 +1083,36 @@ void DeviceTab::selectPackage() noexcept {
       QMessageBox::critical(getWindow(), tr("Error"), e.getMsg());
     }
   }
+}
+
+void DeviceTab::toggleMeasureTool() noexcept {
+  if (mMeasureTool) {
+    leaveMeasureTool();
+  } else {
+    startMeasureTool();
+  }
+}
+
+bool DeviceTab::startMeasureTool() noexcept {
+  if ((!mMeasureTool) && mPackage && mFootprint && mPackageScene) {
+    mMeasureTool.reset(new MeasureTool());
+    mMeasureTool->setFootprint(mFootprint.get());
+    mMeasureTool->enter(
+        *mPackageScene,
+        mApp.getWorkspace().getSettings().defaultLengthUnit.get(), Point());
+    onDerivedUiDataChanged.notify();
+  }
+  return mMeasureTool != nullptr;
+}
+
+bool DeviceTab::leaveMeasureTool() noexcept {
+  if (mMeasureTool) {
+    mMeasureTool->leave();
+    mMeasureTool.reset();
+    onDerivedUiDataChanged.notify();
+    return true;
+  }
+  return false;
 }
 
 void DeviceTab::updatePreviewPinNumbers() noexcept {

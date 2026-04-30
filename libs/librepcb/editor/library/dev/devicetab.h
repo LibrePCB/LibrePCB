@@ -23,6 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../widgets/if_graphicsvieweventhandler.h"
 #include "../libraryeditortab.h"
 
 #include <librepcb/core/library/dev/devicepadsignalmap.h>
@@ -54,6 +55,7 @@ class FootprintGraphicsItem;
 class GraphicsScene;
 class LibraryEditor;
 class LibraryElementCategoriesModel;
+class MeasureTool;
 class PartListModel;
 class SlintGraphicsView;
 class SymbolGraphicsItem;
@@ -65,7 +67,8 @@ class SymbolGraphicsItem;
 /**
  * @brief The DeviceTab class
  */
-class DeviceTab final : public LibraryEditorTab {
+class DeviceTab final : public LibraryEditorTab,
+                        public IF_GraphicsViewEventHandler {
   Q_OBJECT
 
 public:
@@ -96,7 +99,23 @@ public:
   bool processSceneScrolled(const QPointF& pos,
                             slint::private_api::PointerScrollEvent e,
                             int scene) noexcept override;
+  bool processSceneKeyPressed(
+      const slint::language::KeyEvent& e) noexcept override;
+  bool processSceneKeyReleased(
+      const slint::language::KeyEvent& e) noexcept override;
   bool requestClose() noexcept override;
+
+  // IF_GraphicsViewEventHandler
+  bool graphicsSceneKeyPressed(
+      const GraphicsSceneKeyEvent& e) noexcept override;
+  bool graphicsSceneKeyReleased(
+      const GraphicsSceneKeyEvent& e) noexcept override;
+  bool graphicsSceneMouseMoved(
+      const GraphicsSceneMouseEvent& e) noexcept override;
+  bool graphicsSceneLeftMouseButtonPressed(
+      const GraphicsSceneMouseEvent& e) noexcept override;
+  bool graphicsSceneRightMouseButtonReleased(
+      const GraphicsSceneMouseEvent& e) noexcept override;
 
   // Operator Overloadings
   DeviceTab& operator=(const DeviceTab& rhs) = delete;
@@ -123,6 +142,9 @@ private:
   bool save() noexcept;
   void selectComponent() noexcept;
   void selectPackage() noexcept;
+  void toggleMeasureTool() noexcept;
+  bool startMeasureTool() noexcept;
+  bool leaveMeasureTool() noexcept;
   void updatePreviewPinNumbers() noexcept;
   void updateHighlightedPadsAndPins() noexcept;
   void setHighlightedPad(const std::optional<Uuid>& pad) noexcept;
@@ -142,6 +164,7 @@ private:
   std::unique_ptr<SlintGraphicsView> mPackageView;
   std::unique_ptr<GraphicsScene> mComponentScene;
   std::unique_ptr<GraphicsScene> mPackageScene;
+  std::unique_ptr<MeasureTool> mMeasureTool;  // Only valid if in measure mode
 
   // State
   bool mWizardMode;
