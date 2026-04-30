@@ -102,6 +102,7 @@ export component MainMenuBar {
 
     public function focus-search() {
         if search-edt.enabled {
+            search-edt.accept-focus = true;
             search-edt.select-all();
             search-edt.focus();
         }
@@ -1889,6 +1890,23 @@ export component MainMenuBar {
         }
 
         search-edt := LineEdit {
+            // Ugly hack to avoid accidentally focusing the search bar (can
+            // happen unintentionally when closing a window section), which
+            // would open the dropdown and is thus very annoying. Also the
+            // search edit shall not be part of the tab cycle as it can be
+            // focused by keyboard shortcut. Still waiting for Slint feature
+            // https://github.com/slint-ui/slint/pull/9091.
+            // Note: A drawback of this workaround is that the first
+            // double-click doesn't select the text.
+            property <bool> accept-focus: false;
+            if !self.has-focus: TouchArea {
+                mouse-cursor: MouseCursor.text;
+                clicked => {
+                    search-edt.accept-focus = true;
+                    search-edt.focus();
+                }
+            }
+
             y: 2px;
             height: parent.height - 2 * self.y;
             max-width: self.enabled ? 300px : 0;
@@ -1900,10 +1918,21 @@ export component MainMenuBar {
             enabled: Data.current-tab.features.find == FeatureState.enabled;
             visible: self.enabled;
 
+            changed enabled => {
+                if (!self.enabled) && self.has-focus {
+                    focus-root();
+                }
+            }
+
             changed has-focus => {
                 if self.has-focus {
-                    Helpers.trigger-current-tab-action(TabAction.find-refresh-suggestions);
+                    if accept-focus {
+                        Helpers.trigger-current-tab-action(TabAction.find-refresh-suggestions);
+                    } else {
+                        focus-root();
+                    }
                 }
+                accept-focus = false;
             }
 
             text-edited(text) => {

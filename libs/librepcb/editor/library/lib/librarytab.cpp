@@ -371,6 +371,9 @@ void LibraryTab::trigger(ui::TabAction a) noexcept {
       }
       break;
     }
+    case ui::TabAction::FindRefreshSuggestions: {
+      break;  // Avoid warning about unhandled action.
+    }
     case ui::TabAction::LibraryChooseIcon: {
       const QString fp = FileDialog::getOpenFileName(
           getWindow(), tr("Choose Library Icon"),
