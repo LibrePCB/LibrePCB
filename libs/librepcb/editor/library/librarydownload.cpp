@@ -38,14 +38,13 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-LibraryDownload::LibraryDownload(const QUrl& urlToZip,
-                                 const FilePath& destDir) noexcept
-  : QObject(nullptr),
-    mDestDir(destDir),
-    mTempDestDir(destDir.toStr() % ".tmp"),
-    mTempZipFile(mDestDir.toStr() % ".zip") {
-  mFileDownload.reset(new FileDownload(urlToZip, mTempZipFile));
-  mFileDownload->setZipExtractionDirectory(mTempDestDir);
+LibraryDownload::LibraryDownload(const QUrl& urlToZip, const FilePath& destDir,
+                                 std::shared_ptr<QSemaphore> semaphore) noexcept
+  : QObject(nullptr) {
+  mFileDownload.reset(new FileDownload(
+      urlToZip, FilePath(destDir.toStr() % ".zip"), semaphore));
+  mFileDownload->setZipExtractionDirectory(destDir,
+                                           &LibraryDownload::findLibraryInZip);
   connect(mFileDownload.get(), &FileDownload::progressState, this,
           &LibraryDownload::progressState, Qt::QueuedConnection);
   connect(mFileDownload.get(), &FileDownload::progressPercent, this,
@@ -88,6 +87,22 @@ void LibraryDownload::setExpectedChecksum(
   }
 }
 
+void LibraryDownload::setExistingDirsToReplace(QSet<FilePath> dirs) noexcept {
+  if (mFileDownload) {
+    mFileDownload->setZipCleanupCallback([dirs](const FilePath& dst) {
+      for (const FilePath& fp : std::as_const(dirs)) {
+        if (fp != dst) {
+          qDebug() << "Removing existing library directory:" << fp.toNative();
+          QDir(fp.toStr()).removeRecursively();
+        }
+      }
+    });
+  } else {
+    qCritical() << "Calling LibraryDownload::setExistingDirsToReplace() after "
+                   "start() is not allowed!";
+  }
+}
+
 /*******************************************************************************
  *  Public Slots
  ******************************************************************************/
@@ -97,28 +112,6 @@ void LibraryDownload::start() noexcept {
     qCritical()
         << "Calling LibraryDownload::start() multiple times is not allowed!";
     return;
-  }
-
-  // Delete the temporary destination directory if it already exists. It might
-  // be left there after a failed or aborted download attempt.
-  if (mTempDestDir.isExistingDir()) {
-    try {
-      FileUtils::removeDirRecursively(mTempDestDir);
-    } catch (const Exception& e) {
-      emit finished(false, e.getMsg());
-      return;
-    }
-  }
-
-  // Delete the temporary ZIP file if it already exists. It might
-  // be left there after a failed or aborted download attempt.
-  if (mTempZipFile.isExistingFile()) {
-    try {
-      FileUtils::removeFile(mTempZipFile);
-    } catch (const Exception& e) {
-      emit finished(false, e.getMsg());
-      return;
-    }
   }
 
   // Release ownership of the FileDownload object because it will be deleted by
@@ -135,83 +128,34 @@ void LibraryDownload::abort() noexcept {
  ******************************************************************************/
 
 void LibraryDownload::downloadErrored(const QString& errMsg) noexcept {
-  emit LibraryDownload::finished(false, errMsg);
+  emit finished(false, errMsg);
 }
 
 void LibraryDownload::downloadAborted() noexcept {
-  emit LibraryDownload::finished(false, QString());
+  emit finished(false, QString());
 }
 
 void LibraryDownload::downloadSucceeded() noexcept {
-  // check if directory contains a library
-  FilePath libDir = getPathToLibDir();
-  if (!libDir.isValid()) {
-    try {
-      FileUtils::removeDirRecursively(mDestDir);
-    } catch (...) {
-    }  // clean up
-    emit finished(
-        false,
-        tr("The downloaded ZIP file does not contain a LibrePCB library."));
-    return;
-  }
-
-  // back-up existing library (if any)
-  FilePath backupDir = FilePath(mDestDir.toStr() % ".backup");
-  try {
-    FileUtils::removeDirRecursively(backupDir);  // can throw
-    if (mDestDir.isExistingDir())
-      FileUtils::move(mDestDir, backupDir);  // can throw
-  } catch (const Exception& e) {
-    try {
-      FileUtils::removeDirRecursively(backupDir);
-    } catch (...) {
-    }
-    emit finished(false, e.getMsg());
-    return;
-  }
-
-  // move downloaded directory to destination
-  try {
-    FileUtils::move(libDir, mDestDir);  // can throw
-  } catch (const Exception& e) {
-    try {
-      FileUtils::removeDirRecursively(mDestDir);
-      FileUtils::move(backupDir, mDestDir);
-      FileUtils::removeDirRecursively(mTempDestDir);
-    } catch (...) {
-    }
-    emit finished(false, e.getMsg());
-    return;
-  }
-
-  // clean up
-  try {
-    FileUtils::removeDirRecursively(mTempDestDir);  // can throw
-    FileUtils::removeDirRecursively(backupDir);  // can throw
-  } catch (...) {
-  }
-
   emit finished(true, QString());
 }
 
-FilePath LibraryDownload::getPathToLibDir() noexcept {
-  if (Library::isValidElementDirectory<Library>(mTempDestDir)) {
-    return mTempDestDir;
+FilePath LibraryDownload::findLibraryInZip(const FilePath& root) {
+  if (Library::isValidElementDirectory<Library>(root)) {
+    return root;
   }
 
-  QStringList subdirs =
-      QDir(mTempDestDir.toStr()).entryList(QDir::Dirs | QDir::NoDotAndDotDot);
-  if (subdirs.count() != 1) {
-    return FilePath();
+  const QStringList subdirs =
+      QDir(root.toStr()).entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+  if (subdirs.count() == 1) {
+    const FilePath subdir = root.getPathTo(subdirs.first());
+    if (Library::isValidElementDirectory<Library>(subdir)) {
+      return subdir;
+    }
   }
 
-  FilePath subdir = mTempDestDir.getPathTo(subdirs.first());
-  if (Library::isValidElementDirectory<Library>(subdir)) {
-    return subdir;
-  } else {
-    return FilePath();
-  }
+  throw RuntimeError(
+      __FILE__, __LINE__,
+      tr("The downloaded ZIP file does not contain a LibrePCB library."));
 }
 
 /*******************************************************************************

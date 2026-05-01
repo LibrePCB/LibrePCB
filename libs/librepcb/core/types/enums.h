@@ -23,7 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <QtCore>
+#include <QMetaType>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -33,6 +33,17 @@ namespace librepcb {
 /*******************************************************************************
  *  Various Basic Enums
  ******************************************************************************/
+
+/**
+ * @brief Mode for automatic online updates
+ */
+enum class AutoUpdateMode : int {
+  // Note: Sorted to make comparison operators working in a meaningful way.
+  Disabled,  ///< Automatic update check disabled
+  Check,  ///< Automatically check for updates, but no notification
+  Notify,  ///< Automatically check for updates, then notify the user
+  Install,  ///< Automatically check for, download, and install updates
+};
 
 /**
  * @brief Grid style for the 2D graphics views
@@ -49,6 +60,7 @@ enum class GridStyle : int {
 
 }  // namespace librepcb
 
+Q_DECLARE_METATYPE(librepcb::AutoUpdateMode)
 Q_DECLARE_METATYPE(librepcb::GridStyle)
 
 #endif

@@ -28,6 +28,8 @@
 
 #include <QtCore>
 
+#include <functional>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -54,10 +56,17 @@ public:
   /**
    * @brief Constructor
    *
-   * @param url           The URL to the file to download
-   * @param dest          The path to the destination file (must not exist!)
+   * @param url         The URL to the file to download
+   * @param dest        The path to the destination file. If it exists already,
+   *                    it will be overwritten.
+   * @param semaphore   Semaphore to limit the number of threads which perform
+   *                    file opterations or unzip at the same time. For this
+   *                    to work, the same semaphore needs to be passed to all
+   *                    parallel file downloads. If this is not needed, pass
+   *                    `std::make_shared<QSemaphore>(1)`.
    */
-  FileDownload(const QUrl& url, const FilePath& dest) noexcept;
+  FileDownload(const QUrl& url, const FilePath& dest,
+               std::shared_ptr<QSemaphore> semaphore) noexcept;
 
   ~FileDownload() noexcept;
 
@@ -84,9 +93,33 @@ public:
    *
    * @note The downloaded ZIP file will be removed after extracting it.
    *
-   * @param dir           Destination directory (may or may not exist)
+   * @note  Writing/overwriting the destination directory will be done
+   *        atomically. The extraction goes into a temporary directory, which
+   *        then gets renamed afterwards. A previously already existing
+   *        destination directory will be backed up and restored after a
+   *        failure, and removed after success.
+   *
+   * @param dir               Destination directory (may or may not exist).
+   * @param discoveryCallback Optional function to find the subfolder of the
+   *                          downloaded ZIP which shall be moved to the
+   *                          destination path (to strip root folders from ZIP).
+   *                          IMPORTANT: The callback must either return the
+   *                          passed path as-is, a valid path to a subdirectory
+   *                          of it, or it must throw an exception!
    */
-  void setZipExtractionDirectory(const FilePath& dir) noexcept;
+  void setZipExtractionDirectory(const FilePath& dir,
+                                 std::function<FilePath(const FilePath&)>
+                                     discoveryCallback = nullptr) noexcept;
+
+  /**
+   * @brief Set a cleanup callback for ZIP downloads
+   *
+   * The callback will be called from the download thread after the download
+   * succeeded, with the downloaded directory passed as argument.
+   *
+   * @param cb       The callback to call. Shall never throw exceptions!
+   */
+  void setZipCleanupCallback(std::function<void(const FilePath&)> cb) noexcept;
 
   // Operator Overloadings
   FileDownload& operator=(const FileDownload& rhs) = delete;
@@ -119,12 +152,15 @@ private:  // Methods
   void emitSuccessfullyFinishedSignals(QString contentType) noexcept override;
   void fetchNewData(QIODevice& device) noexcept override;
 
-private:  // Data
+private:
+  std::shared_ptr<QSemaphore> mSemaphore;
   FilePath mDestination;
-  QScopedPointer<QSaveFile> mFile;
-  QCryptographicHash::Algorithm mHashAlgorithm;
+  std::unique_ptr<QSaveFile> mFile;
+  std::unique_ptr<QCryptographicHash> mHash;
   QByteArray mExpectedChecksum;
   FilePath mExtractZipToDir;
+  std::function<FilePath(const FilePath&)> mZipDiscoveryCallback;
+  std::function<void(const FilePath&)> mZipCleanupCallback;
 };
 
 /*******************************************************************************

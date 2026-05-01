@@ -25,7 +25,7 @@
 #include "../exceptions.h"
 #include "../serialization/sexpression.h"
 
-#include <QtCore>
+#include <QString>
 
 /*******************************************************************************
  *  Namespace
@@ -35,6 +35,39 @@ namespace librepcb {
 /*******************************************************************************
  *  Serialization
  ******************************************************************************/
+
+template <>
+std::unique_ptr<SExpression> serialize(const AutoUpdateMode& obj) {
+  switch (obj) {
+    case AutoUpdateMode::Disabled:
+      return SExpression::createToken("disabled");
+    case AutoUpdateMode::Check:
+      return SExpression::createToken("check");
+    case AutoUpdateMode::Notify:
+      return SExpression::createToken("notify");
+    case AutoUpdateMode::Install:
+      return SExpression::createToken("install");
+    default:
+      throw LogicError(__FILE__, __LINE__);
+  }
+}
+
+template <>
+AutoUpdateMode deserialize(const SExpression& sexpr) {
+  const QString str = sexpr.getValue();
+  if (str == "disabled") {
+    return AutoUpdateMode::Disabled;
+  } else if (str == "check") {
+    return AutoUpdateMode::Check;
+  } else if (str == "notify") {
+    return AutoUpdateMode::Notify;
+  } else if (str == "install") {
+    return AutoUpdateMode::Install;
+  } else {
+    throw RuntimeError(__FILE__, __LINE__,
+                       QString("Unknown auto update mode: '%1'").arg(str));
+  }
+}
 
 template <>
 std::unique_ptr<SExpression> serialize(const GridStyle& obj) {
