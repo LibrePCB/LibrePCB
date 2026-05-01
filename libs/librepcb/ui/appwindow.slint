@@ -28,8 +28,8 @@ import {
 } from "api.slint";
 
 export component AppWindow inherits Window {
-    property <float> panel-width-factor: (Data.sections.length > 1) ? 0.25 : 0.3;
-    property <length> panel-width: min(self.width * panel-width-factor, 350px);
+    property <length> default-panel-width: min(self.width * ((Data.sections.length > 1) ? 0.25 : 0.3), 350px);
+    property <length> panel-width: clamp(default-panel-width * Data.panel-width-factor, 50px, root.width - 200px);
     property <length> actual-panel-width: (Data.panel-page != PanelPage.none) ? panel-width : 0;
 
     title: Data.window-title;
@@ -115,6 +115,41 @@ export component AppWindow inherits Window {
             height: sidebar.height;
             background: Data.theme.control;
             visible: Data.panel-page != PanelPage.none;
+
+            TouchArea {
+                // Note: This touch area goes only to the *right* of the panel,
+                // to avoid overlapping the panel content. And the width of 5px
+                // is just enough to allow grabbing the handle even if there's
+                // a scrollbar in the panel (which have a TouchArea that
+                // overflows the side panel by 4px).
+                x: panel.width;
+                width: self.has-hover ? 10px : 5px;
+                mouse-cursor: MouseCursor.col-resize;
+
+                if self.has-hover || self.pressed: Rectangle {
+                    x: 0;
+                    width: 1px;
+                    background: Data.theme.base-text-disabled;
+                    opacity: 0.7;
+                }
+
+                property <float> previous-panel-width-factor;
+                property <PanelPage> previous-panel-page;
+                pointer-event(event) => {
+                    if (event.button == PointerEventButton.left) && (event.kind == PointerEventKind.down) {
+                        previous-panel-page = Data.panel-page;
+                        previous-panel-width-factor = Data.panel-width-factor;
+                    } else if self.pressed && (event.kind == PointerEventKind.move) {
+                        if (self.x + self.mouse-x) > 50px {
+                            Data.panel-page = previous-panel-page;
+                            Data.panel-width-factor = max(self.x + self.mouse-x, 100px) / default-panel-width;
+                        } else if Data.panel-page != PanelPage.none {
+                            Data.panel-page = PanelPage.none;
+                            Data.panel-width-factor = previous-panel-width-factor;
+                        }
+                    }
+                }
+            }
 
             if Data.panel-page == PanelPage.home: home-panel := HomePanel { }
 

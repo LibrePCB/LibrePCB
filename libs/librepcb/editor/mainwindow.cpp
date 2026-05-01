@@ -370,6 +370,10 @@ MainWindow::MainWindow(GuiApplication& app,
     // since the user wants to control window geometry then.
     qInfo() << "Failed to restore window geometry, e.g. due to window manager.";
   }
+  if (float f = cs.value(mSettingsPrefix % "/panel_width_factor").toFloat();
+      f > 0) {
+    d.set_panel_width_factor(f);
+  }
   d.set_erc_zoom_to_location(
       cs.value(mSettingsPrefix % "/erc_zoom_to_location", true).toBool());
   d.set_drc_zoom_to_location(
@@ -745,6 +749,8 @@ slint::CloseRequestResponse MainWindow::closeRequested() noexcept {
   QSettings cs;
   const ui::Data& d = mWindow->global<ui::Data>();
   cs.setValue(mSettingsPrefix % "/geometry", mWidget->saveGeometry());
+  cs.setValue(mSettingsPrefix % "/panel_width_factor",
+              d.get_panel_width_factor());
   cs.setValue(mSettingsPrefix % "/erc_zoom_to_location",
               d.get_erc_zoom_to_location());
   cs.setValue(mSettingsPrefix % "/drc_zoom_to_location",
