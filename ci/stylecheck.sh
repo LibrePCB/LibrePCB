@@ -53,5 +53,8 @@ done
 # run reuse checks
 (reuse --suppress-deprecation lint) || exit 1
 
+# run spellcheck
+./dev/spellcheck.sh || exit 1
+
 # validate AppStream files
 appstream-util validate share/metainfo/org.librepcb.LibrePCB.metainfo.xml
