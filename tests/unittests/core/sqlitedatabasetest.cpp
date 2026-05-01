@@ -64,7 +64,7 @@ protected:
  *  Test Methods
  ******************************************************************************/
 
-TEST_F(SQLiteDatabaseTest, testIfContructorCreatesFile) {
+TEST_F(SQLiteDatabaseTest, testIfConstructorCreatesFile) {
   EXPECT_FALSE(mTempDbFilePath.isExistingFile());
   {
     SQLiteDatabase db(mTempDbFilePath);

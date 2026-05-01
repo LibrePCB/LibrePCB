@@ -7,7 +7,7 @@ is more convenient to work directly with Cargo in this directory.
 ## Features
 
 * `fail-on-warnings`: Turn compiler warnings into errors (used on CI).
-* `ffi`: Compile with the foreigh functions interface as called from the
+* `ffi`: Compile with the foreign functions interface as called from the
   LibrePCB C++ code. Note: `cargo test` must be run *without* this feature.
 
 ## Build

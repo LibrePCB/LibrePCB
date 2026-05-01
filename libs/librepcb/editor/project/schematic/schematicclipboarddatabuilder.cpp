@@ -136,7 +136,7 @@ std::unique_ptr<SchematicClipboardData> SchematicClipboardDataBuilder::generate(
             symbol->getRotation(), symbol->getMirrored(), texts));
   }
 
-  // Add (splitted) bus segments including junctions, lines and labels
+  // Add (split) bus segments including junctions, lines and labels
   QHash<SI_BusSegment*, SchematicSelectionQuery::BusSegmentItems>
       busSegmentItems = query.getBusSegmentItems();
   for (auto it = busSegmentItems.constBegin(); it != busSegmentItems.constEnd();
@@ -170,7 +170,7 @@ std::unique_ptr<SchematicClipboardData> SchematicClipboardDataBuilder::generate(
     }
   }
 
-  // Add (splitted) net segments including netpoints, netlines and netlabels
+  // Add (split) net segments including netpoints, netlines and netlabels
   QHash<SI_NetSegment*, SchematicSelectionQuery::NetSegmentItems>
       netSegmentItems = query.getNetSegmentItems();
   for (auto it = netSegmentItems.constBegin(); it != netSegmentItems.constEnd();

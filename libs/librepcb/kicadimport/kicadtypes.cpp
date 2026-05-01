@@ -107,7 +107,7 @@ static kicadimport::KiCadStrokeType deserializeStrokeType(
   } else if (node.getValue() == "dash_dot") {
     return kicadimport::KiCadStrokeType::DashDot;
   } else if (node.getValue() == "dash_dot_dot") {
-    return kicadimport::KiCadStrokeType::DashDotDOt;
+    return kicadimport::KiCadStrokeType::DashDotDot;
   } else if (node.getValue() == "dot") {
     return kicadimport::KiCadStrokeType::Dot;
   } else if (node.getValue() == "default") {

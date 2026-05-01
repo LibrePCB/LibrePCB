@@ -879,7 +879,7 @@ RuleCheckMessageList BoardDesignRuleCheck::checkCopperHoleClearances(
 
   emitStatus(tr("Check hole clearances..."));
 
-  // Determine tha areas where copper is available on *any* layer.
+  // Determine the areas where copper is available on *any* layer.
   ClipperLib::Paths copperPathsAnyLayer;
   foreach (const ClipperLib::Paths& paths, calcData.copperPathsPerLayer) {
     ClipperHelpers::unite(copperPathsAnyLayer, paths, ClipperLib::pftEvenOdd,
@@ -1221,7 +1221,7 @@ RuleCheckMessageList BoardDesignRuleCheck::checkMinimumPthAnnularRing(
 
   emitStatus(tr("Check PTH annular rings..."));
 
-  // Determine tha areas where copper is available on *all* layers.
+  // Determine the areas where copper is available on *all* layers.
   QList<ClipperLib::Paths> thtCopperAreas;
   foreach (const Layer* layer, data.copperLayers) {
     thtCopperAreas.append(calcData.copperPathsPerLayer.value(layer));
@@ -2072,7 +2072,7 @@ RuleCheckMessageList BoardDesignRuleCheck::checkBoardCutouts(
         PositiveLength(std::max(*lineWidth, Length(100000))));
   };
 
-  // Helper to get the locations of path segemnts.
+  // Helper to get the locations of path segments.
   QVector<Path> locations;
   auto treeToLocations = [&](const ClipperLib::PolyTree& tree) {
     locations.clear();

@@ -11,7 +11,7 @@ if [ "$OS" = "mac" ]
 then
   # Update homebrow to avoid issues due to outdated package database. But
   # because even the update sometimes fails, let's ignore any errors with
-  # "|| true" (Apple-style error handling). Maybe this way we get succussful
+  # "|| true" (Apple-style error handling). Maybe this way we get successful
   # builds even if homebrow failed, which saves a lot of time and nerves.
   echo "Updating package database..."
   brew update || true

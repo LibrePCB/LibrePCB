@@ -111,7 +111,7 @@ void KiCadLibraryImportWizardPage_SelectElements::initializePage() {
     item->setCheckState(0, state);
   };
 
-  auto setDisabledIfAllChildsDisabled = [](QTreeWidgetItem* item) {
+  auto setDisabledIfAllChildrenDisabled = [](QTreeWidgetItem* item) {
     for (int i = 0; i < item->childCount(); ++i) {
       if (!item->child(i)->isDisabled()) {
         return;
@@ -143,10 +143,10 @@ void KiCadLibraryImportWizardPage_SelectElements::initializePage() {
     if (libRoot->childCount() == 0) {
       delete libRoot;
     }
-    setDisabledIfAllChildsDisabled(libRoot);
+    setDisabledIfAllChildrenDisabled(libRoot);
   }
   devRoot->setHidden(devRoot->childCount() == 0);
-  setDisabledIfAllChildsDisabled(devRoot);
+  setDisabledIfAllChildrenDisabled(devRoot);
 
   // List components.
   QTreeWidgetItem* cmpRoot = new QTreeWidgetItem();
@@ -169,10 +169,10 @@ void KiCadLibraryImportWizardPage_SelectElements::initializePage() {
     if (libRoot->childCount() == 0) {
       delete libRoot;
     }
-    setDisabledIfAllChildsDisabled(libRoot);
+    setDisabledIfAllChildrenDisabled(libRoot);
   }
   cmpRoot->setHidden(cmpRoot->childCount() == 0);
-  setDisabledIfAllChildsDisabled(cmpRoot);
+  setDisabledIfAllChildrenDisabled(cmpRoot);
 
   // List symbols.
   QTreeWidgetItem* symRoot = new QTreeWidgetItem();
@@ -195,10 +195,10 @@ void KiCadLibraryImportWizardPage_SelectElements::initializePage() {
     if (libRoot->childCount() == 0) {
       delete libRoot;
     }
-    setDisabledIfAllChildsDisabled(libRoot);
+    setDisabledIfAllChildrenDisabled(libRoot);
   }
   symRoot->setHidden(symRoot->childCount() == 0);
-  setDisabledIfAllChildsDisabled(symRoot);
+  setDisabledIfAllChildrenDisabled(symRoot);
 
   // List packages.
   QTreeWidgetItem* pkgRoot = new QTreeWidgetItem();
@@ -219,10 +219,10 @@ void KiCadLibraryImportWizardPage_SelectElements::initializePage() {
     if (libRoot->childCount() == 0) {
       delete libRoot;
     }
-    setDisabledIfAllChildsDisabled(libRoot);
+    setDisabledIfAllChildrenDisabled(libRoot);
   }
   pkgRoot->setHidden(pkgRoot->childCount() == 0);
-  setDisabledIfAllChildsDisabled(pkgRoot);
+  setDisabledIfAllChildrenDisabled(pkgRoot);
 
   // Insert all items at once for better performance.
   mUi->treeWidget->insertTopLevelItems(0, {devRoot, cmpRoot, symRoot, pkgRoot});
@@ -309,11 +309,11 @@ void KiCadLibraryImportWizardPage_SelectElements::updateItemCheckState(
 }
 
 void KiCadLibraryImportWizardPage_SelectElements::updateRootNodes() noexcept {
-  auto updateCheckState = [](QTreeWidgetItem* item, int* totalChilds,
-                             int* checkedChilds) {
+  auto updateCheckState = [](QTreeWidgetItem* item, int* totalChildren,
+                             int* checkedChildren) {
     QSet<Qt::CheckState> childCheckStates;
-    if (totalChilds) {
-      *totalChilds += item->childCount();
+    if (totalChildren) {
+      *totalChildren += item->childCount();
     }
     for (int i = 0; i < item->childCount(); ++i) {
       if (item->child(i)->isDisabled()) {
@@ -321,8 +321,8 @@ void KiCadLibraryImportWizardPage_SelectElements::updateRootNodes() noexcept {
       }
       Qt::CheckState state = item->child(i)->checkState(0);
       childCheckStates.insert(state);
-      if (checkedChilds && (state != Qt::Unchecked)) {
-        ++(*checkedChilds);
+      if (checkedChildren && (state != Qt::Unchecked)) {
+        ++(*checkedChildren);
       }
     }
     Qt::CheckState rootCheckState = Qt::Unchecked;
@@ -340,10 +340,10 @@ void KiCadLibraryImportWizardPage_SelectElements::updateRootNodes() noexcept {
     QTreeWidgetItem* root = mUi->treeWidget->topLevelItem(i);
 
     // Determine child count and check state.
-    int totalChilds = 0;
-    int checkedChilds = 0;
+    int totalChildren = 0;
+    int checkedChildren = 0;
     for (int k = 0; k < root->childCount(); ++k) {
-      updateCheckState(root->child(k), &totalChilds, &checkedChilds);
+      updateCheckState(root->child(k), &totalChildren, &checkedChildren);
     }
     updateCheckState(root, nullptr, nullptr);
 
@@ -373,8 +373,8 @@ void KiCadLibraryImportWizardPage_SelectElements::updateRootNodes() noexcept {
     root->setText(0,
                   QString("%1 (%2/%3)")
                       .arg(elementTypeStr)
-                      .arg(checkedChilds)
-                      .arg(totalChilds));
+                      .arg(checkedChildren)
+                      .arg(totalChildren));
   }
 }
 

@@ -69,8 +69,8 @@ TEST_F(CmdPackageReloadTest, test) {
  (min_copper_clearance 2.3)
  (pad 175b71f7-b284-4c31-b05f-b0aa64ad48e0 (name "NewPad"))
  (footprint 2b7ac931-7855-4f1e-bbfe-c07f2c6c0d89
-  (name "New Fpt Name")
-  (description "New Fpt Desc")
+  (name "New Footprint Name")
+  (description "New Footprint Description")
   (3d_position 1.0 2.0 3.0) (3d_rotation 4.0 5.0 6.0)
   (pad 175b71f7-b284-4c31-b05f-b0aa64ad48e0 (side top) (shape roundrect)
    (position -0.85 0.0) (rotation 0.0) (size 1.3 1.5) (radius 0.0)

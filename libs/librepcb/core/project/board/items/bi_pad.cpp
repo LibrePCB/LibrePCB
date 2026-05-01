@@ -550,7 +550,7 @@ QString BI_Pad::getNetSignalName() const noexcept {
   }
 }
 
-UnsignedLength BI_Pad::getSizeForMaskOffsetCalculaton() const noexcept {
+UnsignedLength BI_Pad::getSizeForMaskOffsetCalculation() const noexcept {
   if (mProperties.getShape() == Pad::Shape::Custom) {
     // Width/height of the shape are not directly known and difficulat/heavy to
     // determine. So let's consider the pad as small to always get the smallest
@@ -583,7 +583,7 @@ QList<PadGeometry> BI_Pad::getGeometryOnLayer(
     } else if (cfg.isEnabled()) {
       // Use offset from design rules.
       offset = *mBoard.getDesignRules().getStopMaskClearance().calcValue(
-          *getSizeForMaskOffsetCalculaton());
+          *getSizeForMaskOffsetCalculation());
     }
   } else if (layer.isSolderPaste()) {
     const MaskConfig& cfg = mProperties.getSolderPasteConfig();
@@ -596,7 +596,7 @@ QList<PadGeometry> BI_Pad::getGeometryOnLayer(
       } else {
         // Use offset from design rules.
         offset = -mBoard.getDesignRules().getSolderPasteClearance().calcValue(
-            *getSizeForMaskOffsetCalculaton());
+            *getSizeForMaskOffsetCalculation());
       }
     }
   }

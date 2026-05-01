@@ -43,7 +43,7 @@ namespace editor {
 /**
  * @brief Helper to handle some of the ::librepcb::editor::EditorCommand actions
  *
- * Indended to share code between the various editors.
+ * Intended to share code between the various editors.
  */
 class StandardEditorCommandHandler final : public QObject {
   Q_OBJECT

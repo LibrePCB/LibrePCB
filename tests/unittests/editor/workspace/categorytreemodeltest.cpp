@@ -48,11 +48,11 @@ class CategoryTreeModelTest : public ::testing::Test {
 protected:
   struct Item {
     QString text;
-    QVector<Item> childs;
+    QVector<Item> children;
   };
   struct SharedItem {
     QString text;
-    QVector<std::shared_ptr<SharedItem>> childs;
+    QVector<std::shared_ptr<SharedItem>> children;
   };
 
   FilePath mWsDir;
@@ -97,7 +97,7 @@ protected:
   std::string str(const QVector<Item>& items) {
     std::string s = "[";
     foreach (const auto& child, items) {
-      s += child.text.toStdString() + ": " + str(child.childs) + ", ";
+      s += child.text.toStdString() + ": " + str(child.children) + ", ";
     }
     return s + "]";
   }
@@ -109,7 +109,7 @@ protected:
       if (auto item = model.row_data(i)) {
         auto list = &items;
         if (auto parent = levelItem.value(item->level - 1)) {
-          list = &parent->childs;
+          list = &parent->children;
         }
         list->append(
             std::make_shared<SharedItem>(SharedItem{s2q(item->text), {}}));
@@ -122,7 +122,7 @@ protected:
   QVector<Item> toValue(const QVector<std::shared_ptr<SharedItem>>& shared) {
     QVector<Item> result;
     for (const auto& item : shared) {
-      result.append(Item{item->text, toValue(item->childs)});
+      result.append(Item{item->text, toValue(item->children)});
     }
     return result;
   }

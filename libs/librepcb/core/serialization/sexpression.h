@@ -123,15 +123,15 @@ public:
    * - To get the whole "via" element (incl. children), use the path "via".
    * - To get the Y coordinate of the via, use the path "via/position/@1".
    *
-   * @attention If there exist several childs with (the begin of) the specified
-   *            path, only the first match is returned! So if the example above
-   *            had more "via" elements, all after the first one would be
-   *            ignored. And for example if the first "via" element had no
-   *            "position" child, an exception is raised even if the following
-   *            "via" elements do have a "position" child.
+   * @attention If there exist several children with (the begin of) the
+   *            specified path, only the first match is returned! So if the
+   *            example above had more "via" elements, all after the first one
+   *            would be ignored. And for example if the first "via" element
+   *            had no "position" child, an exception is raised even if the
+   *            following "via" elements do have a "position" child.
    *
    * @note  In contrast to #getChildren(), this method skips linebreak
-   *        elements. So if you acces an element by index (e.g. "@3"),
+   *        elements. So if you access an element by index (e.g. "@3"),
    *        the n-th child which is *not* a linebreak will be returned.
    *
    * @param path    The path to the child to get, separated by forward slashes

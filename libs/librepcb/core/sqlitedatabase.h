@@ -57,7 +57,7 @@ public:
 
   private:
     SQLiteDatabase& mDb;
-    bool mIsCommited;
+    bool mIsCommitted;
   };
 
   // Constructors / Destructor

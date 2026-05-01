@@ -179,7 +179,7 @@ public:
    * @brief Map a given layer to the transformed coordinate system
    *
    * @param layer The layer to map.
-   * @return The mirrored layer if it's a symetric layer and the
+   * @return The mirrored layer if it's a symmetric layer and the
    *         transformation is mirroring, otherwise the layer is returned as-is.
    */
   const Layer& map(const Layer& layer) const noexcept;

@@ -64,7 +64,7 @@ class LibraryTab final : public LibraryEditorTab {
     bool isDeprecated = false;
     bool isExternal = false;
     QString userData;  // UUID for categories, filepath for elements
-    QVector<std::shared_ptr<TreeItem>> childs;
+    QVector<std::shared_ptr<TreeItem>> children;
   };
 
 public:
@@ -130,8 +130,8 @@ private:
       int level) noexcept;
   void setSelectedCategory(
       const std::optional<ui::LibraryTreeViewItemData>& data) noexcept;
-  void getChildsRecursive(TreeItem& item,
-                          QSet<std::shared_ptr<TreeItem>>& childs) noexcept;
+  void getChildrenRecursive(TreeItem& item,
+                            QSet<std::shared_ptr<TreeItem>>& children) noexcept;
   QList<std::shared_ptr<TreeItem>> getSelectedCategories() const noexcept;
   QList<std::shared_ptr<TreeItem>> getSelectedElements() const noexcept;
   void duplicateElements(

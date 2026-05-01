@@ -447,18 +447,18 @@ TEST_F(PathTest, testDonut) {
   const PositiveLength outerDiameter(1000);
   const PositiveLength innerDiameter(500);
 
-  const Point ot(Length(0), Length(500));
-  const Point ob(Length(0), Length(-500));
-  const Point it(Length(0), Length(250));
-  const Point ib(Length(0), Length(-250));
+  const Point outerTop(Length(0), Length(500));
+  const Point outerBot(Length(0), Length(-500));
+  const Point innerTop(Length(0), Length(250));
+  const Point innerBot(Length(0), Length(-250));
   Path expected;
-  expected.addVertex(ot, -Angle::deg180());
-  expected.addVertex(ob, Angle::deg0());
-  expected.addVertex(ib, Angle::deg180());
-  expected.addVertex(it, Angle::deg180());
-  expected.addVertex(ib, Angle::deg0());
-  expected.addVertex(ob, -Angle::deg180());
-  expected.addVertex(ot, Angle::deg0());
+  expected.addVertex(outerTop, -Angle::deg180());
+  expected.addVertex(outerBot, Angle::deg0());
+  expected.addVertex(innerBot, Angle::deg180());
+  expected.addVertex(innerTop, Angle::deg180());
+  expected.addVertex(innerBot, Angle::deg0());
+  expected.addVertex(outerBot, -Angle::deg180());
+  expected.addVertex(outerTop, Angle::deg0());
 
   const Path actual = Path::donut(outerDiameter, innerDiameter);
 

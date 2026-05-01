@@ -75,7 +75,7 @@ fi
 COUNTER=0
 
 # This function searches for all files for a given Git match pattern.
-# It searchs sorted for tracked files first, then following untracked files.
+# It searches sorted for tracked files first, then following untracked files.
 #
 # All found files are put on stdout so it is parsable by foreach loop.
 search_files() {

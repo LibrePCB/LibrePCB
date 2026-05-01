@@ -40,7 +40,7 @@ struct UiTheme;
  * @brief Generic logger class to pass messages between objects
  *
  * @note  This class is thread-safe, i.e. several threads can log or retrieve
- *        logging messages simultanously.
+ *        logging messages simultaneously.
  */
 class MessageLogger final : public QObject {
   Q_OBJECT

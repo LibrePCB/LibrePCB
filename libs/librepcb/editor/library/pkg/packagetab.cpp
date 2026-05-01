@@ -1737,8 +1737,7 @@ void PackageTab::fsmToolEnter(PackageEditorState_AddPads& state) noexcept {
     if (s.getShape() == Pad::Shape::RoundedOctagon) {
       return ui::PadShape::Octagon;
     } else if (s.getShape() == Pad::Shape::Custom) {
-      return ui::PadShape::Octagon;  // Not currect but should never be the
-                                     // case.
+      return ui::PadShape::Octagon;  // Not correct but should never be the case
     } else if (*s.getRadius() == Ratio::fromPercent(0)) {
       return ui::PadShape::Rect;
     } else if (*s.getRadius() == Ratio::fromPercent(100)) {

@@ -58,12 +58,12 @@ class Angle;
  *
  * @warning The implementation of this class is very critical for generating
  *          correct Gerber files widely compatible with CAM software used by
- *          PCB fabricators. A lot of know how is contained in the implementtion
- *          to avoid issues with PCB fabricators. When changing anything here,
- *          read the Gerber specs very carefully, follow their recommendations
- *          and try to determine the compatibility with CAM software like
- *          CAM350 or Generis2000. In addition, add unit tests for each new
- *          requirement.
+ *          PCB fabricators. A lot of know how is contained in the
+ *          implementation to avoid issues with PCB fabricators. When changing
+ *          anything here, read the Gerber specs very carefully, follow their
+ *          recommendations and try to determine the compatibility with CAM
+ *          software like CAM350 or Generis2000. In addition, add unit tests
+ *          for each new requirement.
  */
 class GerberApertureList final {
   Q_DECLARE_TR_FUNCTIONS(GerberApertureList)

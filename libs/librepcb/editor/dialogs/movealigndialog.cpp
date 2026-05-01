@@ -170,7 +170,7 @@ MoveAlignDialog::MoveAlignDialog(const QList<Point>& positions,
     mUi->btnCenterVertically->setEnabled(false);
   }
 
-  // Move focus into X coordiante for to allow editing it immediately.
+  // Move focus into X coordinate for to allow editing it immediately.
   mUi->edtX->setFocus();
 
   // Install event filter on group boxes to make the Return key working.

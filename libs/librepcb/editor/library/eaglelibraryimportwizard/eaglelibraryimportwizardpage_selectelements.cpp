@@ -225,13 +225,13 @@ void EagleLibraryImportWizardPage_SelectElements::updateRootNodes() noexcept {
 
     // Determine child count and check state.
     QSet<Qt::CheckState> childCheckStates;
-    int totalChilds = root->childCount();
-    int checkedChilds = 0;
-    for (int k = 0; k < totalChilds; ++k) {
+    int totalChildren = root->childCount();
+    int checkedChildren = 0;
+    for (int k = 0; k < totalChildren; ++k) {
       Qt::CheckState state = root->child(k)->checkState(0);
       childCheckStates.insert(state);
       if (state != Qt::Unchecked) {
-        ++checkedChilds;
+        ++checkedChildren;
       }
     }
 
@@ -272,8 +272,8 @@ void EagleLibraryImportWizardPage_SelectElements::updateRootNodes() noexcept {
     root->setText(0,
                   QString("%1 (%2/%3)")
                       .arg(elementTypeStr)
-                      .arg(checkedChilds)
-                      .arg(totalChilds));
+                      .arg(checkedChildren)
+                      .arg(totalChildren));
   }
 }
 

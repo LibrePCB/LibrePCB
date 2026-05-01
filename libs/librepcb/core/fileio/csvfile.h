@@ -42,7 +42,7 @@ class FilePath;
  * The class allows building CSV and write them to a file. It is guaranteed
  * that the written files are valid:
  *
- *  - Whenn adding a row with a wrong value count, #addValue() throws an
+ *  - When adding a row with a wrong value count, #addValue() throws an
  *    exception.
  *  - Linebreaks inside values are replaced by spaces.
  *  - If a value contains the separator character (e.g. the comma), the value

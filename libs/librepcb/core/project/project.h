@@ -621,7 +621,7 @@ private:  // Data
 
   /// Custom attributes to be included in BOM export.
   ///
-  /// @note This property is considere legacy as BOM export should be done by
+  /// @note This property is considered legacy as BOM export should be done by
   ///       output jobs which have their own settings. It is kept to provide a
   ///       smooth migration experience but should be removed in file format
   ///       v3 (or later).

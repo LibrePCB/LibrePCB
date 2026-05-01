@@ -80,13 +80,13 @@ int CategoryTreeModelLegacy::columnCount(
 int CategoryTreeModelLegacy::rowCount(
     const QModelIndex& parent) const noexcept {
   const Item* item = itemFromIndex(parent);
-  return item ? item->childs.count() : 0;
+  return item ? item->children.count() : 0;
 }
 
 QModelIndex CategoryTreeModelLegacy::index(
     int row, int column, const QModelIndex& parent) const noexcept {
   Item* p = itemFromIndex(parent);
-  if ((p) && (row >= 0) && (row < p->childs.count()) && (column == 0)) {
+  if ((p) && (row >= 0) && (row < p->children.count()) && (column == 0)) {
     return createIndex(row, column, p);
   } else {
     return QModelIndex();
@@ -143,7 +143,7 @@ void CategoryTreeModelLegacy::update() noexcept {
   t.start();
 
   // Determine new items.
-  QVector<std::shared_ptr<Item>> items = getChilds(nullptr);
+  QVector<std::shared_ptr<Item>> items = getChildren(nullptr);
 
   // Add virtual category for library elements with no category assigned.
   try {
@@ -166,19 +166,19 @@ void CategoryTreeModelLegacy::update() noexcept {
 }
 
 QVector<std::shared_ptr<CategoryTreeModelLegacy::Item>>
-    CategoryTreeModelLegacy::getChilds(
+    CategoryTreeModelLegacy::getChildren(
         std::shared_ptr<Item> parent) const noexcept {
-  QVector<std::shared_ptr<Item>> childs;
+  QVector<std::shared_ptr<Item>> children;
   std::optional<Uuid> parentUuid = parent ? parent->uuid : std::nullopt;
   try {
     QSet<Uuid> uuids = listPackageCategories()
-        ? mLibrary.getChilds<PackageCategory>(parentUuid)
-        : mLibrary.getChilds<ComponentCategory>(parentUuid);
+        ? mLibrary.getChildren<PackageCategory>(parentUuid)
+        : mLibrary.getChildren<ComponentCategory>(parentUuid);
     foreach (const Uuid& uuid, uuids) {
       std::shared_ptr<Item> child(
           new Item{parent, uuid, QString(), QString(), {}});
-      child->childs = getChilds(child);
-      if (!child->childs.isEmpty() || listAll() || containsItems(uuid)) {
+      child->children = getChildren(child);
+      if (!child->children.isEmpty() || listAll() || containsItems(uuid)) {
         FilePath fp = listPackageCategories()
             ? mLibrary.getLatest<PackageCategory>(uuid)
             : mLibrary.getLatest<ComponentCategory>(uuid);
@@ -191,7 +191,7 @@ QVector<std::shared_ptr<CategoryTreeModelLegacy::Item>>
                 fp, mLocaleOrder, &child->text, &child->tooltip);
           }
         }
-        childs.append(child);
+        children.append(child);
       }
     }
   } catch (const Exception& e) {
@@ -200,14 +200,14 @@ QVector<std::shared_ptr<CategoryTreeModelLegacy::Item>>
 
   // Sort items by text.
   Toolbox::sortNumeric(
-      childs,
+      children,
       [](const QCollator& cmp, const std::shared_ptr<Item>& lhs,
          const std::shared_ptr<Item>& rhs) {
         return cmp(lhs->text, rhs->text);
       },
       Qt::CaseInsensitive, false);
 
-  return childs;
+  return children;
 }
 
 bool CategoryTreeModelLegacy::containsItems(
@@ -245,10 +245,10 @@ bool CategoryTreeModelLegacy::listPackageCategories() const noexcept {
 
 void CategoryTreeModelLegacy::updateModelItem(
     std::shared_ptr<Item> parentItem,
-    const QVector<std::shared_ptr<Item>>& newChilds) noexcept {
-  for (int i = 0; i < newChilds.count(); ++i) {
-    std::shared_ptr<Item> item = parentItem->childs.value(i);  // Might be null.
-    std::shared_ptr<Item> newItem = newChilds.at(i);
+    const QVector<std::shared_ptr<Item>>& newChildren) noexcept {
+  for (int i = 0; i < newChildren.count(); ++i) {
+    std::shared_ptr<Item> item = parentItem->children.value(i);  // Can be null.
+    std::shared_ptr<Item> newItem = newChildren.at(i);
     if (item) {
       // Update existing item.
       if ((item->uuid != newItem->uuid) || (item->text != newItem->text) ||
@@ -260,31 +260,31 @@ void CategoryTreeModelLegacy::updateModelItem(
         Q_ASSERT(idx.isValid());
         emit dataChanged(idx, idx);
       }
-      updateModelItem(item, newItem->childs);
+      updateModelItem(item, newItem->children);
     } else {
       // Add new item.
       newItem->parent = parentItem;  // Update parent of item.
       QModelIndex idx = indexFromItem(parentItem.get());
       Q_ASSERT(idx.isValid() != (parentItem == mRootItem));
       beginInsertRows(idx, i, i);
-      parentItem->childs.insert(i, newItem);
+      parentItem->children.insert(i, newItem);
       endInsertRows();
     }
   }
 
   // Remove no longer existing items.
-  const int removeCount = parentItem->childs.count() - newChilds.count();
+  const int removeCount = parentItem->children.count() - newChildren.count();
   if (removeCount > 0) {
     QModelIndex idx = indexFromItem(parentItem.get());
     Q_ASSERT(idx.isValid() != (parentItem == mRootItem));
-    const int removeFrom = newChilds.count();
+    const int removeFrom = newChildren.count();
     beginRemoveRows(idx, removeFrom, removeFrom + removeCount - 1);
-    parentItem->childs.remove(removeFrom, removeCount);
+    parentItem->children.remove(removeFrom, removeCount);
     endRemoveRows();
   }
 
-  // Sanity check that the number of childs is now correct.
-  Q_ASSERT(parentItem->childs.count() == newChilds.count());
+  // Sanity check that the number of children is now correct.
+  Q_ASSERT(parentItem->children.count() == newChildren.count());
 }
 
 CategoryTreeModelLegacy::Item* CategoryTreeModelLegacy::itemFromIndex(
@@ -296,7 +296,7 @@ CategoryTreeModelLegacy::Item* CategoryTreeModelLegacy::itemFromIndex(
   } else if (index.column() != 0) {
     return nullptr;
   } else if (Item* parent = static_cast<Item*>(index.internalPointer())) {
-    return parent->childs.value(index.row()).get();
+    return parent->children.value(index.row()).get();
   } else {
     return nullptr;
   }
@@ -305,8 +305,8 @@ CategoryTreeModelLegacy::Item* CategoryTreeModelLegacy::itemFromIndex(
 QModelIndex CategoryTreeModelLegacy::indexFromItem(
     const Item* item) const noexcept {
   if (std::shared_ptr<Item> parent = (item ? item->parent.lock() : nullptr)) {
-    for (int i = 0; i < parent->childs.count(); ++i) {
-      if (parent->childs.at(i).get() == item) {
+    for (int i = 0; i < parent->children.count(); ++i) {
+      if (parent->children.at(i).get() == item) {
         return createIndex(i, 0, parent.get());
       }
     }

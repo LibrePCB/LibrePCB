@@ -244,7 +244,7 @@ bool PackageEditorState_DrawPolygonBase::start() noexcept {
       mArcInSecondState = false;
     }
 
-    // Create inital path.
+    // Create initial path.
     Path path;
     if (mMode == Mode::ARC) {
       for (int i = 0; i < 3; ++i) {

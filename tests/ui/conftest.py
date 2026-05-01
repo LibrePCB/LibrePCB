@@ -47,27 +47,27 @@ def _flatten(items):
             yield x
 
 
-def _query_childs(element, query):
+def _query_children(element, query):
     segment = query[0].split("[")
     segment_name = segment[0]
     if segment_name.startswith("#"):
         segment_name = segment_name[1:]
-        childs = element.query_descendants().match_type_name(segment_name).find_all()
+        children = element.query_descendants().match_type_name(segment_name).find_all()
     elif "{" in segment_name:
-        childs = []
+        children = []
         start = segment_name.find("{")
         end = segment_name.find("}")
         for value in segment_name[start + 1 : end].split(","):
             name = segment_name[:start] + value + segment_name[end + 1 :]
-            childs += element.query_descendants().match_id(name).find_all()
+            children += element.query_descendants().match_id(name).find_all()
     else:
-        childs = element.query_descendants().match_id(segment_name).find_all()
+        children = element.query_descendants().match_id(segment_name).find_all()
     if len(segment) > 1:
         index = int(segment[1][:-1])
-        childs = [childs[index]]
+        children = [children[index]]
     if len(query) > 1:
-        childs = [_query_childs(child, query[1:]) for child in childs]
-    return childs
+        children = [_query_children(child, query[1:]) for child in children]
+    return children
 
 
 class Element:
@@ -212,7 +212,7 @@ class ElementQuery:
         if not self._query:
             self._results = [root]
         else:
-            self._results = list(_flatten(_query_childs(root, self._query)))
+            self._results = list(_flatten(_query_children(root, self._query)))
         self._results = [Element(x) for x in self._results]
 
     def wait(self, min=1, max=-1, timeout=10.0):

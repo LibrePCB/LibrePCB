@@ -715,7 +715,7 @@ std::unique_ptr<SExpression> BoardSpecctraExport::toKeepout(
   ClipperHelpers::offset(paths, offset, maxArcTolerance());
   if (paths.size() != 1) throw LogicError(__FILE__, __LINE__);
 
-  // Sort layers for reproducability.
+  // Sort layers for reproducibility.
   QList<const Layer*> layersSorted =
       Toolbox::sortedQSet(layers, [](const Layer* a, const Layer* b) {
         return a->getCopperNumber() < b->getCopperNumber();

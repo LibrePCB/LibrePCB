@@ -1026,9 +1026,9 @@ bool PackageEditorState_Select::copySelectedItemsToClipboard() noexcept {
   return true;
 }
 
-template <typename TCpy, typename TSel>
-static bool hasSelectedObjects(const TCpy& copied,
-                               const TSel& selected) noexcept {
+template <typename TCopied, typename TSelected>
+static bool hasSelectedObjects(const TCopied& copied,
+                               const TSelected& selected) noexcept {
   if (auto copiedObj = copied.value(0)) {
     foreach (const auto& sel, selected) {
       if (sel && (sel->getObj().getUuid() != copiedObj->getUuid())) {

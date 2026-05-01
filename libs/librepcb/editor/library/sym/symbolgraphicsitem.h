@@ -96,8 +96,8 @@ public:
     return mTextGraphicsItems.value(text);
   }
   std::shared_ptr<ImageGraphicsItem> getGraphicsItem(
-      std::shared_ptr<Image> iamge) noexcept {
-    return mImageGraphicsItems.value(iamge);
+      std::shared_ptr<Image> image) noexcept {
+    return mImageGraphicsItems.value(image);
   }
   QList<std::shared_ptr<SymbolPinGraphicsItem>> getSelectedPins() noexcept;
   QList<std::shared_ptr<CircleGraphicsItem>> getSelectedCircles() noexcept;

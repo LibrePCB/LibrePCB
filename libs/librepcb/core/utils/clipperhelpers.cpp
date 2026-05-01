@@ -294,11 +294,11 @@ ClipperLib::Paths ClipperHelpers::treeToPaths(
 ClipperLib::Paths ClipperHelpers::flattenTree(
     const ClipperLib::PolyNode& node) {
   ClipperLib::Paths paths;
-  for (const ClipperLib::PolyNode* outlineChild : node.Childs) {
+  for (const ClipperLib::PolyNode* outlineChild : node.Childs) {  // notypo
     Q_ASSERT(outlineChild);
     if (outlineChild->IsHole()) throw LogicError(__FILE__, __LINE__);
     ClipperLib::Paths holes;
-    for (ClipperLib::PolyNode* holeChild : outlineChild->Childs) {
+    for (ClipperLib::PolyNode* holeChild : outlineChild->Childs) {  // notypo
       Q_ASSERT(holeChild);
       if (!holeChild->IsHole()) throw LogicError(__FILE__, __LINE__);
       holes.push_back(holeChild->Contour);

@@ -35,7 +35,7 @@ namespace librepcb {
  ******************************************************************************/
 
 /**
- * @brief The CmpSigPinDisplayType clas
+ * @brief The CmpSigPinDisplayType class
  */
 class CmpSigPinDisplayType final {
   Q_DECLARE_TR_FUNCTIONS(CmpSigPinDisplayType)

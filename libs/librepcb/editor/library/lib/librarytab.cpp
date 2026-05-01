@@ -598,9 +598,9 @@ void LibraryTab::refreshLibElements() noexcept {
       mCmpCatElementCount);
   loadOrganizations();
 
-  sortItemsRecursive(mCmpCatRoot->childs);
-  sortItemsRecursive(mPkgCatRoot->childs);
-  sortItemsRecursive(mOrganizationsRoot->childs);
+  sortItemsRecursive(mCmpCatRoot->children);
+  sortItemsRecursive(mPkgCatRoot->children);
+  sortItemsRecursive(mOrganizationsRoot->children);
 
   mCategories->clear();
   const int count =
@@ -615,16 +615,16 @@ void LibraryTab::refreshLibElements() noexcept {
       false,  // Is external
       slint::SharedString(),  // User data
   });
-  if (!mUncategorizedRoot->childs.isEmpty()) {
+  if (!mUncategorizedRoot->children.isEmpty()) {
     addCategoriesToModel(ui::LibraryTreeViewItemType::Uncategorized,
                          *mUncategorizedRoot,
-                         mUncategorizedRoot->childs.count());
+                         mUncategorizedRoot->children.count());
   }
   addCategoriesToModel(ui::LibraryTreeViewItemType::ComponentCategory,
                        *mCmpCatRoot, mCmpCatElementCount);
   addCategoriesToModel(ui::LibraryTreeViewItemType::PackageCategory,
                        *mPkgCatRoot, mPkgCatElementCount);
-  if (!mOrganizationsRoot->childs.isEmpty()) {
+  if (!mOrganizationsRoot->children.isEmpty()) {
     mCategories->push_back(ui::LibraryTreeViewItemData{
         ui::LibraryTreeViewItemType::Organization,  // Type
         0,  // Level
@@ -654,7 +654,7 @@ std::shared_ptr<LibraryTab::TreeItem> LibraryTab::createRootItem(
       false,  // Deprecated
       false,  // External
       uuid.toStr(),  // User data
-      {},  // Childs
+      {},  // Children
   });
   mLibElementsMap.insert(uuid.toStr(), root);
   return root;
@@ -723,7 +723,7 @@ std::shared_ptr<LibraryTab::TreeItem> LibraryTab::getOrCreateCategory(
         item->summary = tr("Invalid Parent").toUpper();
       }
     }
-    parent->childs.append(item);
+    parent->children.append(item);
   } catch (const Exception& e) {
     qCritical() << "Failed to load category:" << e.getMsg();
   }
@@ -754,12 +754,12 @@ void LibraryTab::loadElements(ui::LibraryTreeViewItemType type,
         QSet<Uuid> processedItems;
         if (auto cat = getOrCreateCategory<CategoryType>(catType, catUuid, root,
                                                          processedItems)) {
-          cat->childs.push_back(item);
+          cat->children.push_back(item);
           addedToCategory = true;
         }
       }
       if (!addedToCategory) {
-        mUncategorizedRoot->childs.push_back(item);
+        mUncategorizedRoot->children.push_back(item);
       }
       mLibElementsMap.insert(fp.toStr(), item);
     }
@@ -782,7 +782,7 @@ void LibraryTab::loadOrganizations() {
                                         &item->summary);
       mDb.getMetadata<Organization>(fp, nullptr, nullptr, &item->isDeprecated);
       item->summary = item->summary.split("\n").first().left(200);
-      mOrganizationsRoot->childs.push_back(item);
+      mOrganizationsRoot->children.push_back(item);
       mLibElementsMap.insert(fp.toStr(), item);
     }
   } catch (const Exception& e) {
@@ -804,7 +804,7 @@ void LibraryTab::sortItemsRecursive(
       },
       Qt::CaseInsensitive, false);
   for (auto child : items) {
-    sortItemsRecursive(child->childs);
+    sortItemsRecursive(child->children);
   }
 }
 
@@ -827,10 +827,10 @@ void LibraryTab::addCategoriesToModel(
     TreeItem& item, ui::LibraryTreeViewItemType type,
     slint::VectorModel<ui::LibraryTreeViewItemData>& model,
     int level) noexcept {
-  for (auto child : item.childs) {
+  for (auto child : item.children) {
     if (child->type == type) {
       const int count =
-          std::count_if(child->childs.begin(), child->childs.end(),
+          std::count_if(child->children.begin(), child->children.end(),
                         [type](const std::shared_ptr<TreeItem>& item) {
                           return item->type != type;
                         });
@@ -860,7 +860,7 @@ void LibraryTab::setSelectedCategory(
     if (uuid) {
       if (auto item = mLibElementsMap.value(uuid->toStr())) {
         QSet<std::shared_ptr<TreeItem>> set;
-        getChildsRecursive(*item, set);
+        getChildrenRecursive(*item, set);
         items = Toolbox::toList(set);
       }
     } else {
@@ -869,7 +869,7 @@ void LibraryTab::setSelectedCategory(
     sortItemsRecursive(items);
   } else if (uuid) {
     if (auto item = mLibElementsMap.value(uuid->toStr())) {
-      items = item->childs;
+      items = item->children;
     }
   }
 
@@ -884,7 +884,7 @@ void LibraryTab::setSelectedCategory(
       ui::LibraryTreeViewItemType::Organization,
   };
   for (auto item : items) {
-    if ((!item->childs.isEmpty()) || (item->name.isEmpty()) ||
+    if ((!item->children.isEmpty()) || (item->name.isEmpty()) ||
         (!types.contains(item->type))) {
       continue;
     }
@@ -915,11 +915,11 @@ void LibraryTab::setSelectedCategory(
   mElements->set_vector(std::move(rows));
 }
 
-void LibraryTab::getChildsRecursive(
-    TreeItem& item, QSet<std::shared_ptr<TreeItem>>& childs) noexcept {
-  childs |= Toolbox::toSet(item.childs);
-  for (auto child : item.childs) {
-    getChildsRecursive(*child, childs);
+void LibraryTab::getChildrenRecursive(
+    TreeItem& item, QSet<std::shared_ptr<TreeItem>>& children) noexcept {
+  children |= Toolbox::toSet(item.children);
+  for (auto child : item.children) {
+    getChildrenRecursive(*child, children);
   }
 }
 

@@ -282,7 +282,7 @@ public:
    * @param elementId     ID of the element to add translations.
    * @param locale        Locale of the translations.
    * @param name          Element name.
-   * @param description   Eleemnt description.
+   * @param description   Element description.
    * @param keywords      Element keywords.
    * @return ID of the added translation.
    */

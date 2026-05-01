@@ -95,9 +95,9 @@ void CategoryTreeModel::refresh() noexcept {
     });
 
     if (mFilters.testFlag(Filter::CmpCat)) {
-      loadChilds<ComponentCategory>(std::nullopt, 1);  // can throw
+      loadChildren<ComponentCategory>(std::nullopt, 1);  // can throw
     } else if (mFilters.testFlag(Filter::PkgCat)) {
-      loadChilds<PackageCategory>(std::nullopt, 1);  // can throw
+      loadChildren<PackageCategory>(std::nullopt, 1);  // can throw
     }
   } catch (const Exception& e) {
     qCritical() << "Failed to refresh CategoryTreeModel:" << e.getMsg();
@@ -106,10 +106,10 @@ void CategoryTreeModel::refresh() noexcept {
 }
 
 template <typename T>
-void CategoryTreeModel::loadChilds(const std::optional<Uuid>& parent,
-                                   int level) {
-  QVector<std::pair<Uuid, QString>> childs;
-  for (auto uuid : mDb.getChilds<T>(parent)) {  // can throw
+void CategoryTreeModel::loadChildren(const std::optional<Uuid>& parent,
+                                     int level) {
+  QVector<std::pair<Uuid, QString>> children;
+  for (auto uuid : mDb.getChildren<T>(parent)) {  // can throw
     if (uuid == mHiddenCategory) continue;
 
     const FilePath fp = mDb.getLatest<T>(uuid);  // can throw
@@ -118,17 +118,17 @@ void CategoryTreeModel::loadChilds(const std::optional<Uuid>& parent,
     mDb.getTranslations<T>(fp, mSettings.libraryLocaleOrder.get(),
                            &name);  // can throw
 
-    childs.append(std::make_pair(uuid, name));
+    children.append(std::make_pair(uuid, name));
   }
 
   Toolbox::sortNumeric(
-      childs,
+      children,
       [](const QCollator& collator, const std::pair<Uuid, QString>& lhs,
          const std::pair<Uuid, QString>& rhs) {
         return collator(lhs.second, rhs.second);
       });
 
-  for (const auto& pair : childs) {
+  for (const auto& pair : children) {
     mItems.push_back(ui::TreeViewItemData{
         level,  // Level
         mIcon,  // Icon
@@ -142,7 +142,7 @@ void CategoryTreeModel::loadChilds(const std::optional<Uuid>& parent,
         false,  // Pinned
         ui::TreeViewItemAction::None,  // Action
     });
-    loadChilds<T>(pair.first, level + 1);
+    loadChildren<T>(pair.first, level + 1);
   }
 }
 

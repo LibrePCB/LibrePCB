@@ -42,9 +42,9 @@ UndoCommandGroup::UndoCommandGroup(const QString& text) noexcept
 }
 
 UndoCommandGroup::~UndoCommandGroup() noexcept {
-  // delete childs in reverse order
-  while (mChilds.count() > 0) {
-    delete mChilds.takeLast();
+  // delete children in reverse order
+  while (mChildren.count() > 0) {
+    delete mChildren.takeLast();
   }
 }
 
@@ -57,20 +57,20 @@ bool UndoCommandGroup::appendChild(UndoCommand* cmd) {
   // exception)
   std::unique_ptr<UndoCommand> cmdScopeGuard(cmd);
 
-  if ((!cmd) || (mChilds.contains(cmd)) || (wasEverReverted())) {
+  if ((!cmd) || (mChildren.contains(cmd)) || (wasEverReverted())) {
     throw LogicError(__FILE__, __LINE__);
   }
 
   if (wasEverExecuted()) {
     if (cmdScopeGuard->execute()) {  // can throw
-      mChilds.append(cmdScopeGuard.release());
+      mChildren.append(cmdScopeGuard.release());
       return true;
     } else {
       cmdScopeGuard
           ->undo();  // just to be sure the command has executed nothing...
     }
   } else {
-    mChilds.append(cmdScopeGuard.release());
+    mChildren.append(cmdScopeGuard.release());
   }
   return false;
 }
@@ -81,9 +81,9 @@ bool UndoCommandGroup::appendChild(UndoCommand* cmd) {
 
 bool UndoCommandGroup::performExecute() {
   mHasDoneSomething = false;
-  ScopeGuardList sgl(mChilds.count());
-  for (int i = 0; i < mChilds.count(); ++i) {  // from bottom to top
-    UndoCommand* cmd = mChilds.at(i);
+  ScopeGuardList sgl(mChildren.count());
+  for (int i = 0; i < mChildren.count(); ++i) {  // from bottom to top
+    UndoCommand* cmd = mChildren.at(i);
     if (cmd->execute()) {  // can throw
       mHasDoneSomething = true;
     }
@@ -97,9 +97,9 @@ bool UndoCommandGroup::performExecute() {
 }
 
 void UndoCommandGroup::performUndo() {
-  ScopeGuardList sgl(mChilds.count());
-  for (int i = mChilds.count() - 1; i >= 0; --i) {  // from top to bottom
-    UndoCommand* cmd = mChilds.at(i);
+  ScopeGuardList sgl(mChildren.count());
+  for (int i = mChildren.count() - 1; i >= 0; --i) {  // from top to bottom
+    UndoCommand* cmd = mChildren.at(i);
     cmd->undo();
     sgl.add([cmd]() { cmd->redo(); });
   }
@@ -110,9 +110,9 @@ void UndoCommandGroup::performUndo() {
 }
 
 void UndoCommandGroup::performRedo() {
-  ScopeGuardList sgl(mChilds.count());
-  for (int i = 0; i < mChilds.count(); ++i) {  // from bottom to top
-    UndoCommand* cmd = mChilds.at(i);
+  ScopeGuardList sgl(mChildren.count());
+  for (int i = 0; i < mChildren.count(); ++i) {  // from bottom to top
+    UndoCommand* cmd = mChildren.at(i);
     cmd->redo();
     sgl.add([cmd]() { cmd->undo(); });
   }
@@ -129,12 +129,12 @@ void UndoCommandGroup::performRedo() {
 void UndoCommandGroup::execNewChildCmd(UndoCommand* cmd) {
   std::unique_ptr<UndoCommand> cmdScopeGuard(cmd);
 
-  if ((!cmd) || (mChilds.contains(cmd)) || (wasEverExecuted())) {
+  if ((!cmd) || (mChildren.contains(cmd)) || (wasEverExecuted())) {
     throw LogicError(__FILE__, __LINE__);
   }
 
   if (cmdScopeGuard->execute()) {  // can throw
-    mChilds.append(cmdScopeGuard.release());
+    mChildren.append(cmdScopeGuard.release());
     mHasDoneSomething = true;
     performPostExecution();
   } else {

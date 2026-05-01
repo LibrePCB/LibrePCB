@@ -102,7 +102,7 @@ public:
   /**
    * @brief Execute "open file" dialog to choose an image
    *
-   * @note  If neccessary, this method does convert the selected image file
+   * @note  If necessary, this method does convert the selected image file
    *        to a supported image format. However, if the file extension is
    *        one of the supported formats, this method does not open or validate
    *        the file. Always call ::librepcb::Image::tryLoad() afterwards to
@@ -115,7 +115,7 @@ public:
    * @param settingsKey The dialog saves the chosen file under this QSettings
    *                    key and preselects the file when opening the next time.
    *                    Set to something like "schematic_editor/add_image/file".
-   * @retval true       An image has been chosen (and converted if neccessary).
+   * @retval true       An image has been chosen (and converted if necessary).
    * @retval false      The user canceled the file dialog.
    * @throws Exception  If a format conversion was needed and it failed.
    */
@@ -165,7 +165,7 @@ public:
    * If the clipboard contains a *filepath* to an image file (rather than the
    * image itself), this method tries to load the image from that file.
    *
-   * @note  If neccessary, this method does convert the image to a supported
+   * @note  If necessary, this method does convert the image to a supported
    *        image format. However, if the clipboard already contains one of
    *        the supported formats, this method does not validate the file.
    *        Always call ::librepcb::Image::tryLoad() afterwards to do so.

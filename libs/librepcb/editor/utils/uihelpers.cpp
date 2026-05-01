@@ -334,7 +334,7 @@ static bool isKeySequence(const slint::private_api::KeyEvent& e,
   }
 
   // Compare the modifiers. For special key characters, allow an additional
-  // SHIFT modifier as this migh be required on some keyboard layouts. See
+  // SHIFT modifier as this might be required on some keyboard layouts. See
   // discussion in https://github.com/LibrePCB/LibrePCB/issues/1641.
   static QString specialChars = "+-*/.,:;_[]=@#%&()?!{}<>|";
   const slint::private_api::KeyboardModifiers seqMod =

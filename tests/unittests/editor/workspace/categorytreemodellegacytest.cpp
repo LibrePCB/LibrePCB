@@ -47,7 +47,7 @@ class CategoryTreeModelLegacyTest : public ::testing::Test {
 protected:
   struct Item {
     QString text;
-    QVector<Item> childs;
+    QVector<Item> children;
   };
 
   FilePath mWsDir;
@@ -75,7 +75,7 @@ protected:
   std::string str(const QVector<Item>& items) {
     std::string s = "[";
     foreach (const Item& child, items) {
-      s += child.text.toStdString() + ": " + str(child.childs) + ", ";
+      s += child.text.toStdString() + ": " + str(child.children) + ", ";
     }
     return s + "]";
   }

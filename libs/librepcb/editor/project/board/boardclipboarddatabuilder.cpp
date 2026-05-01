@@ -118,7 +118,7 @@ std::unique_ptr<BoardClipboardData> BoardClipboardDataBuilder::generate(
     }
   }
 
-  // Add (splitted) net segments including pads, vias, netpoints, and netlines
+  // Add (split) net segments including pads, vias, netpoints, and netlines
   QHash<BI_NetSegment*, BoardSelectionQuery::NetSegmentItems> netSegmentItems =
       query.getNetSegmentItems();
   for (auto it = netSegmentItems.constBegin(); it != netSegmentItems.constEnd();
