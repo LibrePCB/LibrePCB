@@ -53,7 +53,7 @@ public:
   SGI_BusLine(
       SI_BusLine& line, const GraphicsLayerList& layers,
       std::shared_ptr<const SchematicGraphicsScene::Context> context) noexcept;
-  virtual ~SGI_BusLine() noexcept;
+  ~SGI_BusLine() noexcept override;
 
   // General Methods
   SI_BusLine& getBusLine() noexcept { return mBusLine; }

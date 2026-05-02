@@ -50,7 +50,7 @@ public:
   CmdBoardPolygonAdd() = delete;
   CmdBoardPolygonAdd(const CmdBoardPolygonAdd& other) = delete;
   explicit CmdBoardPolygonAdd(BI_Polygon& polygon) noexcept;
-  ~CmdBoardPolygonAdd() noexcept;
+  ~CmdBoardPolygonAdd() noexcept override;
 
 private:  // Methods
   /// @copydoc ::librepcb::editor::UndoCommand::performExecute()

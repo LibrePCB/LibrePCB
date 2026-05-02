@@ -260,11 +260,11 @@ public:
   // Constructors / Destructor
   GraphicsOutputJob(const GraphicsOutputJob& other) noexcept;
   explicit GraphicsOutputJob(const SExpression& node);
-  virtual ~GraphicsOutputJob() noexcept;
+  ~GraphicsOutputJob() noexcept override;
 
   // Getters
-  virtual QString getTypeTr() const noexcept override;
-  virtual QIcon getTypeIcon() const noexcept override;
+  QString getTypeTr() const noexcept override;
+  QIcon getTypeIcon() const noexcept override;
   const SimpleString& getDocumentTitle() const noexcept {
     return mDocumentTitle;
   }
@@ -279,7 +279,7 @@ public:
   // General Methods
   static QString getTypeName() noexcept { return "graphics"; }
   static QString getTypeTrStatic() noexcept { return tr("PDF/Image"); }
-  virtual std::shared_ptr<OutputJob> cloneShared() const noexcept override;
+  std::shared_ptr<OutputJob> cloneShared() const noexcept override;
 
   // Operator Overloadings
   GraphicsOutputJob& operator=(const GraphicsOutputJob& rhs) = delete;
@@ -291,8 +291,8 @@ public:
 
 private:  // Methods
   GraphicsOutputJob() noexcept;
-  virtual void serializeDerived(SExpression& root) const override;
-  virtual bool equals(const OutputJob& rhs) const noexcept override;
+  void serializeDerived(SExpression& root) const override;
+  bool equals(const OutputJob& rhs) const noexcept override;
 
 private:  // Data
   SimpleString mDocumentTitle;

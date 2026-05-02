@@ -69,7 +69,7 @@ public:
       const std::shared_ptr<ComponentSignalNameListModel>& sigs,
       std::shared_ptr<ComponentSymbolVariantItem> gate, UndoStack* stack,
       QObject* parent = nullptr) noexcept;
-  ~ComponentGateEditor() noexcept;
+  ~ComponentGateEditor() noexcept override;
 
   // General Methods
   ui::ComponentGateData getUiData() const;

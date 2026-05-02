@@ -40,8 +40,8 @@
 #include <system_error>
 
 #include <cerrno>
+#include <csignal>
 #include <pwd.h>
-#include <signal.h>
 #include <unistd.h>
 #if defined(Q_OS_SOLARIS)
 #include <libproc.h>
@@ -111,7 +111,7 @@ const QString& SystemInfo::getFullUsername() noexcept {
             .trimmed();
 #elif defined(Q_OS_UNIX)  // UNIX/Linux
     passwd* userinfo = getpwuid(getuid());
-    if (userinfo == NULL) {
+    if (!userinfo) {
       qWarning() << "Could not fetch user info via getpwuid!";
     } else {
       QString gecosString = QString::fromLocal8Bit(userinfo->pw_gecos);

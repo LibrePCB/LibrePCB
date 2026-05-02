@@ -51,10 +51,11 @@ class InitializeWorkspaceWizard_ChooseWorkspace final : public QWizardPage {
 public:
   // Constructors / Destructor
   explicit InitializeWorkspaceWizard_ChooseWorkspace(
-      InitializeWorkspaceWizardContext& context, QWidget* parent = 0) noexcept;
+      InitializeWorkspaceWizardContext& context,
+      QWidget* parent = nullptr) noexcept;
   InitializeWorkspaceWizard_ChooseWorkspace(
       const InitializeWorkspaceWizard_ChooseWorkspace& other) = delete;
-  ~InitializeWorkspaceWizard_ChooseWorkspace() noexcept;
+  ~InitializeWorkspaceWizard_ChooseWorkspace() noexcept override;
 
   // Inherited Methods
   void initializePage() noexcept override;

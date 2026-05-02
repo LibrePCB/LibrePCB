@@ -77,7 +77,7 @@ public:
   Circuit() = delete;
   Circuit(const Circuit& other) = delete;
   explicit Circuit(Project& project);
-  ~Circuit() noexcept;
+  ~Circuit() noexcept override;
 
   // Getters
   Project& getProject() const noexcept { return mProject; }

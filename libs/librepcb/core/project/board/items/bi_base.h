@@ -50,7 +50,7 @@ public:
   BI_Base() = delete;
   BI_Base(const BI_Base& other) = delete;
   BI_Base(Board& board) noexcept;
-  virtual ~BI_Base() noexcept;
+  ~BI_Base() noexcept override;
 
   // Getters
   Project& getProject() const noexcept;

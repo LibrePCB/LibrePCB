@@ -50,7 +50,7 @@ public:
   // Constructors / Destructor
   explicit AngleEdit(QWidget* parent = nullptr) noexcept;
   AngleEdit(const AngleEdit& other) = delete;
-  virtual ~AngleEdit() noexcept;
+  ~AngleEdit() noexcept override;
 
   // Getters
   const Angle& getValue() const noexcept { return mValue; }

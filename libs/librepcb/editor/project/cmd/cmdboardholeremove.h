@@ -48,7 +48,7 @@ class CmdBoardHoleRemove final : public UndoCommand {
 public:
   // Constructors / Destructor
   explicit CmdBoardHoleRemove(BI_Hole& hole) noexcept;
-  ~CmdBoardHoleRemove() noexcept;
+  ~CmdBoardHoleRemove() noexcept override;
 
 private:
   // Private Methods

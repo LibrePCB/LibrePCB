@@ -62,7 +62,7 @@ public:
                      const QString& longElementName, bool dirnameMustBeUuid,
                      std::unique_ptr<TransactionalDirectory> directory,
                      const SExpression& root);
-  virtual ~LibraryBaseElement() noexcept;
+  ~LibraryBaseElement() noexcept override;
 
   // Getters: General
   const TransactionalDirectory& getDirectory() const noexcept {

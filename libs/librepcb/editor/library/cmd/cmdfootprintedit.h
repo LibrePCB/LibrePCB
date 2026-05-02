@@ -52,7 +52,7 @@ public:
   CmdFootprintEdit() = delete;
   CmdFootprintEdit(const CmdFootprintEdit& other) = delete;
   explicit CmdFootprintEdit(Footprint& fpt) noexcept;
-  ~CmdFootprintEdit() noexcept;
+  ~CmdFootprintEdit() noexcept override;
 
   // Setters
   void setName(const ElementName& name) noexcept;

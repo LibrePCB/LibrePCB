@@ -340,19 +340,20 @@ void GraphicsOutputJobWidget::addClicked() noexcept {
       qBound(0, mUi->lstContent->currentRow() + 1, mUi->lstContent->count());
   auto content = mJob->getContent();
   QMenu menu;
-  menu.addAction(QIcon(":/img/actions/schematic.png"), tr("Schematic"), [&]() {
-    content.insert(index,
-                   GraphicsOutputJob::Content(
-                       GraphicsOutputJob::Content::Preset::Schematic));
-  });
   menu.addAction(
-      QIcon(":/img/actions/board_editor.png"), tr("Board Image"), [&]() {
+      QIcon(":/img/actions/schematic.png"), tr("Schematic"), &menu, [&]() {
+        content.insert(index,
+                       GraphicsOutputJob::Content(
+                           GraphicsOutputJob::Content::Preset::Schematic));
+      });
+  menu.addAction(
+      QIcon(":/img/actions/board_editor.png"), tr("Board Image"), &menu, [&]() {
         content.insert(index,
                        GraphicsOutputJob::Content(
                            GraphicsOutputJob::Content::Preset::BoardImage));
       });
   menu.addAction(
-      QIcon(":/img/actions/board_editor.png"), tr("Assembly Top/Bottom"),
+      QIcon(":/img/actions/board_editor.png"), tr("Assembly Top/Bottom"), &menu,
       [&]() {
         content.insert(
             index,
@@ -365,7 +366,7 @@ void GraphicsOutputJobWidget::addClicked() noexcept {
       });
   menu.addAction(
       QIcon(":/img/actions/board_editor.png"), tr("Rendering Top/Bottom"),
-      [&]() {
+      &menu, [&]() {
         content.insert(
             index,
             GraphicsOutputJob::Content(

@@ -60,7 +60,7 @@ public:
   WindowTab() = delete;
   WindowTab(const WindowTab& other) = delete;
   explicit WindowTab(GuiApplication& app, QObject* parent = nullptr) noexcept;
-  virtual ~WindowTab() noexcept;
+  ~WindowTab() noexcept override;
 
   // General Methods
   virtual void setWindow(MainWindow* w) noexcept { mWindow = w; }

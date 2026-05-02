@@ -60,7 +60,7 @@ public:
   BI_Hole() = delete;
   BI_Hole(const BI_Hole& other) = delete;
   BI_Hole(Board& board, const BoardHoleData& data);
-  ~BI_Hole() noexcept;
+  ~BI_Hole() noexcept override;
 
   // Getters
   const BoardHoleData& getData() const noexcept { return mData; }

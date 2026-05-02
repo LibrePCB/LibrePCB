@@ -62,7 +62,7 @@ public:
   LibraryElementCache(const LibraryElementCache& other) = delete;
   explicit LibraryElementCache(const WorkspaceLibraryDb& db,
                                QObject* parent = nullptr) noexcept;
-  ~LibraryElementCache() noexcept;
+  ~LibraryElementCache() noexcept override;
 
   // General Methods
   void reset() noexcept;

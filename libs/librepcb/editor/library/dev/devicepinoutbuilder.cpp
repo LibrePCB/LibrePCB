@@ -401,8 +401,8 @@ void DevicePinoutBuilder::updateFilteredSignals() noexcept {
           return bUsed;
         }
         if (!filter.isEmpty()) {
-          const bool aMatch = aName.toLower().startsWith(filter);
-          const bool bMatch = bName.toLower().startsWith(filter);
+          const bool aMatch = aName.startsWith(filter, Qt::CaseInsensitive);
+          const bool bMatch = bName.startsWith(filter, Qt::CaseInsensitive);
           if (aMatch != bMatch) {
             return aMatch;
           }
@@ -417,7 +417,7 @@ void DevicePinoutBuilder::updateFilteredSignals() noexcept {
       Qt::CaseInsensitive, false);
 
   std::vector<ui::DeviceInteractivePinoutSignalData> items;
-  for (const auto& obj : mFilteredSignals) {
+  for (const auto& obj : std::as_const(mFilteredSignals)) {
     items.push_back(ui::DeviceInteractivePinoutSignalData{
         obj.first ? q2s(*obj.first->getName()) : slint::SharedString(),  // Name
         obj.second,  // Used
@@ -440,7 +440,7 @@ QMap<Uuid, Uuid> DevicePinoutBuilder::getMap() const noexcept {
 void DevicePinoutBuilder::setMap(const QString& cmdText,
                                  const QMap<Uuid, Uuid>& map) {
   std::unique_ptr<UndoCommandGroup> cmdGrp(new UndoCommandGroup(cmdText));
-  for (auto item : mList.values()) {
+  for (const auto& item : mList.values()) {
     auto it = map.find(item->getPadUuid());
     const std::optional<Uuid> sig =
         (it != map.end()) ? std::make_optional(*it) : std::nullopt;

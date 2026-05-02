@@ -52,7 +52,7 @@ class CmdDeviceInstanceAdd final : public UndoCommand {
 public:
   // Constructors / Destructor
   explicit CmdDeviceInstanceAdd(BI_Device& device) noexcept;
-  ~CmdDeviceInstanceAdd() noexcept;
+  ~CmdDeviceInstanceAdd() noexcept override;
 
 private:  // Methods
   /// @copydoc ::librepcb::editor::UndoCommand::performExecute()

@@ -60,7 +60,7 @@ public:
   explicit GerberExcellonOutputJobWidget(
       Project& project, std::shared_ptr<GerberExcellonOutputJob> job,
       QWidget* parent = nullptr) noexcept;
-  ~GerberExcellonOutputJobWidget() noexcept;
+  ~GerberExcellonOutputJobWidget() noexcept override;
 
   // Operator Overloads
   GerberExcellonOutputJobWidget& operator=(

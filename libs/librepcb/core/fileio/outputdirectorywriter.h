@@ -49,7 +49,7 @@ public:
   OutputDirectoryWriter() = delete;
   OutputDirectoryWriter(const OutputDirectoryWriter& other) = delete;
   explicit OutputDirectoryWriter(const FilePath& dirPath) noexcept;
-  ~OutputDirectoryWriter() noexcept;
+  ~OutputDirectoryWriter() noexcept override;
 
   // Getters
   const FilePath& getDirectoryPath() const noexcept { return mDirPath; }

@@ -32,6 +32,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -358,7 +360,7 @@ bool PackageEditorState_AddPads::startAddPad(const Point& pos) noexcept {
     }
     mContext.undoStack.appendToCmdGroup(new CmdFootprintPadInsert(
         mContext.currentFootprint->getPads(), mCurrentPad));
-    mCurrentEditCmd.reset(new CmdFootprintPadEdit(*mCurrentPad));
+    mCurrentEditCmd = std::make_unique<CmdFootprintPadEdit>(*mCurrentPad);
     mCurrentGraphicsItem =
         mContext.currentGraphicsItem->getGraphicsItem(mCurrentPad);
     Q_ASSERT(mCurrentGraphicsItem);

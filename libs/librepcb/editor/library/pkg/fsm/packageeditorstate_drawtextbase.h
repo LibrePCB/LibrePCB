@@ -61,7 +61,7 @@ public:
       const PackageEditorState_DrawTextBase& other) = delete;
   explicit PackageEditorState_DrawTextBase(Context& context,
                                            Mode mode) noexcept;
-  virtual ~PackageEditorState_DrawTextBase() noexcept;
+  ~PackageEditorState_DrawTextBase() noexcept override;
 
   // General Methods
   bool entry() noexcept override;
@@ -88,7 +88,7 @@ public:
     return mCurrentProperties.getText();
   }
   void setText(const QString& text) noexcept;
-  QStringList getTextSuggestions() const noexcept;
+  const QStringList getTextSuggestions() const noexcept;
   const PositiveLength& getHeight() const noexcept {
     return mCurrentProperties.getHeight();
   }

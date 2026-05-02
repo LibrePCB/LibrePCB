@@ -86,6 +86,8 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -207,7 +209,7 @@ PackageTab::PackageTab(LibraryEditor& editor, std::unique_ptr<Package> pkg,
   PackageEditorFsm::Context fsmContext{
       *mPackage, *mUndoStack, mUnit, *mLayers, *this, nullptr, nullptr,
   };
-  mFsm.reset(new PackageEditorFsm(fsmContext));
+  mFsm = std::make_unique<PackageEditorFsm>(fsmContext);
 
   // Apply workspace settings whenever they have been modified.
   connect(&mApp.getWorkspace().getSettings().boardGridStyle,
@@ -600,7 +602,7 @@ void PackageTab::setDerivedUiData(const ui::PackageTabData& data) noexcept {
 }
 
 void PackageTab::activate() noexcept {
-  mScene.reset(new GraphicsScene(this));
+  mScene = std::make_unique<GraphicsScene>(this);
   mScene->setGridInterval(mPackage->getGridInterval());
   connect(mScene.get(), &GraphicsScene::changed, this,
           &PackageTab::requestRepaint);
@@ -610,14 +612,14 @@ void PackageTab::activate() noexcept {
     mScene->addItem(*item);
   }
 
-  mOpenGlView.reset(new SlintOpenGlView(*mOpenGlProjection, this));
+  mOpenGlView = std::make_unique<SlintOpenGlView>(*mOpenGlProjection, this);
   mOpenGlView->setAlpha(mAlpha);
   connect(mOpenGlView.get(), &SlintOpenGlView::stateChanged, this,
           [this]() { onDerivedUiDataChanged.notify(); });
   connect(mOpenGlView.get(), &SlintOpenGlView::contentChanged, this,
           &PackageTab::requestRepaint);
 
-  mOpenGlSceneBuilder.reset(new OpenGlSceneBuilder());
+  mOpenGlSceneBuilder = std::make_unique<OpenGlSceneBuilder>();
   connect(mOpenGlSceneBuilder.get(), &OpenGlSceneBuilder::objectAdded,
           mOpenGlView.get(), &SlintOpenGlView::addObject);
   connect(mOpenGlSceneBuilder.get(), &OpenGlSceneBuilder::objectRemoved,
@@ -628,7 +630,7 @@ void PackageTab::activate() noexcept {
             requestRepaint();
           });
 
-  mOpenGlSceneRebuildTimer.reset(new QTimer(this));
+  mOpenGlSceneRebuildTimer = std::make_unique<QTimer>(this);
   mOpenGlSceneRebuildTimer->setSingleShot(true);
   connect(mOpenGlSceneRebuildTimer.get(), &QTimer::timeout, this,
           &PackageTab::updateOpenGlScene);
@@ -1229,7 +1231,7 @@ void PackageTab::fsmToolEnter(PackageEditorState_DrawLine& state) noexcept {
   // Layers
   mToolLayersQt = Layer::sorted(state.getAvailableLayers());
   mToolLayers->clear();
-  for (const Layer* layer : mToolLayersQt) {
+  for (const Layer* layer : std::as_const(mToolLayersQt)) {
     mToolLayers->push_back(q2s(layer->getNameTr()));
   }
 
@@ -1275,7 +1277,7 @@ void PackageTab::fsmToolEnter(PackageEditorState_DrawRect& state) noexcept {
   // Layers
   mToolLayersQt = Layer::sorted(state.getAvailableLayers());
   mToolLayers->clear();
-  for (const Layer* layer : mToolLayersQt) {
+  for (const Layer* layer : std::as_const(mToolLayersQt)) {
     mToolLayers->push_back(q2s(layer->getNameTr()));
   }
 
@@ -1335,7 +1337,7 @@ void PackageTab::fsmToolEnter(PackageEditorState_DrawPolygon& state) noexcept {
   // Layers
   mToolLayersQt = Layer::sorted(state.getAvailableLayers());
   mToolLayers->clear();
-  for (const Layer* layer : mToolLayersQt) {
+  for (const Layer* layer : std::as_const(mToolLayersQt)) {
     mToolLayers->push_back(q2s(layer->getNameTr()));
   }
 
@@ -1408,7 +1410,7 @@ void PackageTab::fsmToolEnter(PackageEditorState_DrawCircle& state) noexcept {
   // Layers
   mToolLayersQt = Layer::sorted(state.getAvailableLayers());
   mToolLayers->clear();
-  for (const Layer* layer : mToolLayersQt) {
+  for (const Layer* layer : std::as_const(mToolLayersQt)) {
     mToolLayers->push_back(q2s(layer->getNameTr()));
   }
 
@@ -1469,7 +1471,7 @@ void PackageTab::fsmToolEnter(PackageEditorState_DrawArc& state) noexcept {
   // Layers
   mToolLayersQt = Layer::sorted(state.getAvailableLayers());
   mToolLayers->clear();
-  for (const Layer* layer : mToolLayersQt) {
+  for (const Layer* layer : std::as_const(mToolLayersQt)) {
     mToolLayers->push_back(q2s(layer->getNameTr()));
   }
 
@@ -1606,7 +1608,7 @@ void PackageTab::fsmToolEnter(PackageEditorState_DrawText& state) noexcept {
   // Layers
   mToolLayersQt = Layer::sorted(state.getAvailableLayers());
   mToolLayers->clear();
-  for (const Layer* layer : mToolLayersQt) {
+  for (const Layer* layer : std::as_const(mToolLayersQt)) {
     mToolLayers->push_back(q2s(layer->getNameTr()));
   }
 
@@ -1695,7 +1697,7 @@ void PackageTab::fsmToolEnter(PackageEditorState_AddPads& state) noexcept {
   mToolPackagePadsQt = {std::nullopt};
   mToolPackagePads->set_vector({q2s(tr("(unconnected)"))});
   if (!state.getFunctionIsFiducial()) {
-    for (auto pad : mPackage->getPads()) {
+    for (const auto& pad : mPackage->getPads()) {
       mToolPackagePadsQt.append(pad.getUuid());
       mToolPackagePads->push_back(q2s(*pad.getName()));
     }
@@ -2412,9 +2414,9 @@ void PackageTab::setCurrentFootprintIndex(int index) noexcept {
   }
 
   if (footprint) {
-    item.reset(new FootprintGraphicsItem(footprint, *mLayers,
-                                         Application::getDefaultStrokeFont(),
-                                         &mPackage->getPads()));
+    item = std::make_shared<FootprintGraphicsItem>(
+        footprint, *mLayers, Application::getDefaultStrokeFont(),
+        &mPackage->getPads());
     if (mScene) mScene->addItem(*item);
   } else {
     item.reset();

@@ -61,7 +61,7 @@ public:
   AssemblyVariantListModel() = delete;
   AssemblyVariantListModel(const AssemblyVariantListModel& other) = delete;
   explicit AssemblyVariantListModel(QObject* parent = nullptr) noexcept;
-  ~AssemblyVariantListModel() noexcept;
+  ~AssemblyVariantListModel() noexcept override;
 
   // Setters
   void setCircuit(Circuit* circuit) noexcept;

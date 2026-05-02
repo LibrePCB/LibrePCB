@@ -30,6 +30,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -41,7 +43,7 @@ namespace tests {
  ******************************************************************************/
 
 class ProjectTest : public ::testing::Test {
-protected:
+public:
   FilePath mProjectDir;
   FilePath mProjectFile;
   FilePath mLogsDir;
@@ -53,14 +55,14 @@ protected:
     mLogsDir = mProjectDir.getPathTo("logs");
   }
 
-  virtual ~ProjectTest() {
+  ~ProjectTest() override {
     QDir(mProjectDir.getParentDir().toStr()).removeRecursively();
   }
 
   std::unique_ptr<TransactionalDirectory> createDir(
       bool writable = true) const noexcept {
-    return std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
-        TransactionalFileSystem::open(mProjectDir, writable)));
+    return std::make_unique<TransactionalDirectory>(
+        TransactionalFileSystem::open(mProjectDir, writable));
   }
 };
 

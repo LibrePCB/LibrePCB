@@ -35,6 +35,8 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -236,7 +238,8 @@ bool SchematicEditorState_AddImage::start(const Point& pos, QByteArray data,
     mContext.undoStack.appendToCmdGroup(new CmdSchematicImageAdd(
         *mCurrentImage, mContext.schematic.getDirectory(),
         fileExists ? QByteArray() : data));
-    mCurrentEditCmd.reset(new CmdImageEdit(*mCurrentImage->getImage()));
+    mCurrentEditCmd =
+        std::make_unique<CmdImageEdit>(*mCurrentImage->getImage());
     mCurrentGraphicsItem = scene->getImages().value(mCurrentImage);
     Q_ASSERT(mCurrentGraphicsItem);
     mCurrentGraphicsItem->setSelected(true);

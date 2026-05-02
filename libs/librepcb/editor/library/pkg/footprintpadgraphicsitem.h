@@ -56,7 +56,7 @@ public:
                            const GraphicsLayerList& layers,
                            const PackagePadList* packagePadList,
                            QGraphicsItem* parent = nullptr) noexcept;
-  ~FootprintPadGraphicsItem() noexcept;
+  ~FootprintPadGraphicsItem() noexcept override;
 
   // Getters
   FootprintPad& getObj() noexcept { return *mPad; }
@@ -76,8 +76,8 @@ private:  // Methods
   void packagePadListEdited(const PackagePadList& list, int index,
                             const std::shared_ptr<const PackagePad>& pad,
                             PackagePadList::Event event) noexcept;
-  virtual QVariant itemChange(GraphicsItemChange change,
-                              const QVariant& value) noexcept override;
+  QVariant itemChange(GraphicsItemChange change,
+                      const QVariant& value) noexcept override;
   void updateLayer() noexcept;
   void updateGeometries() noexcept;
 

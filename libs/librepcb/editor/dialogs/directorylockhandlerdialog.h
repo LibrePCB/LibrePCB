@@ -55,7 +55,7 @@ public:
   DirectoryLockHandlerDialog(const FilePath& directory, const QString& user,
                              bool allowOverrideLock,
                              QWidget* parent = nullptr) noexcept;
-  ~DirectoryLockHandlerDialog() noexcept;
+  ~DirectoryLockHandlerDialog() noexcept override;
 
   // Operator Overloadings
   DirectoryLockHandlerDialog& operator=(const DirectoryLockHandlerDialog& rhs) =

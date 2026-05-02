@@ -48,7 +48,7 @@ class CmdSchematicBusSegmentEdit final : public UndoCommand {
 public:
   // Constructors / Destructor
   explicit CmdSchematicBusSegmentEdit(SI_BusSegment& segment) noexcept;
-  ~CmdSchematicBusSegmentEdit() noexcept;
+  ~CmdSchematicBusSegmentEdit() noexcept override;
 
   // Setters
   void setBus(Bus& bus) noexcept;

@@ -105,7 +105,7 @@ public:
   LengthEditContext(const LengthEditContext& other) = delete;
   explicit LengthEditContext(const WorkspaceSettings& ws,
                              QObject* parent = nullptr) noexcept;
-  virtual ~LengthEditContext() noexcept;
+  ~LengthEditContext() noexcept override;
 
   // General Methods
   ui::LengthEditData getUiData() const noexcept;

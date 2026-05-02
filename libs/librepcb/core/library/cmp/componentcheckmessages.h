@@ -51,7 +51,7 @@ public:
   explicit MsgDuplicateSignalName(const ComponentSignal& signal) noexcept;
   MsgDuplicateSignalName(const MsgDuplicateSignalName& other) noexcept
     : RuleCheckMessage(other) {}
-  virtual ~MsgDuplicateSignalName() noexcept {}
+  ~MsgDuplicateSignalName() noexcept override {}
 };
 
 /*******************************************************************************
@@ -70,7 +70,7 @@ public:
   MsgMissingComponentDefaultValue(
       const MsgMissingComponentDefaultValue& other) noexcept
     : RuleCheckMessage(other) {}
-  virtual ~MsgMissingComponentDefaultValue() noexcept {}
+  ~MsgMissingComponentDefaultValue() noexcept override {}
 };
 
 /*******************************************************************************
@@ -88,7 +88,7 @@ public:
   MsgMissingComponentPrefix() noexcept;
   MsgMissingComponentPrefix(const MsgMissingComponentPrefix& other) noexcept
     : RuleCheckMessage(other) {}
-  virtual ~MsgMissingComponentPrefix() noexcept {}
+  ~MsgMissingComponentPrefix() noexcept override {}
 };
 
 /*******************************************************************************
@@ -106,7 +106,7 @@ public:
   MsgMissingSymbolVariant() noexcept;
   MsgMissingSymbolVariant(const MsgMissingSymbolVariant& other) noexcept
     : RuleCheckMessage(other) {}
-  virtual ~MsgMissingSymbolVariant() noexcept {}
+  ~MsgMissingSymbolVariant() noexcept override {}
 };
 
 /*******************************************************************************
@@ -126,7 +126,7 @@ public:
       std::shared_ptr<const ComponentSymbolVariant> symbVar) noexcept;
   MsgMissingSymbolVariantItem(const MsgMissingSymbolVariantItem& other) noexcept
     : RuleCheckMessage(other), mSymbVar(other.mSymbVar) {}
-  virtual ~MsgMissingSymbolVariantItem() noexcept {}
+  ~MsgMissingSymbolVariantItem() noexcept override {}
 
   // Getters
   std::shared_ptr<const ComponentSymbolVariant> getSymbVar() const noexcept {
@@ -156,7 +156,7 @@ public:
   MsgNonFunctionalComponentSignalInversionSign(
       const MsgNonFunctionalComponentSignalInversionSign& other) noexcept
     : RuleCheckMessage(other), mSignal(other.mSignal) {}
-  virtual ~MsgNonFunctionalComponentSignalInversionSign() noexcept {}
+  ~MsgNonFunctionalComponentSignalInversionSign() noexcept override {}
 
   // Getters
   const std::shared_ptr<const ComponentSignal>& getSignal() const noexcept {
@@ -185,7 +185,7 @@ public:
   MsgNoPinsInSymbolVariantConnected(
       const MsgNoPinsInSymbolVariantConnected& other) noexcept
     : RuleCheckMessage(other) {}
-  virtual ~MsgNoPinsInSymbolVariantConnected() noexcept {}
+  ~MsgNoPinsInSymbolVariantConnected() noexcept override {}
 
   // Getters
   std::shared_ptr<const ComponentSymbolVariant> getSymbVar() const noexcept {
@@ -211,7 +211,7 @@ public:
   MsgSuspiciousForcedNets() noexcept;
   MsgSuspiciousForcedNets(const MsgSuspiciousForcedNets& other) noexcept
     : RuleCheckMessage(other) {}
-  virtual ~MsgSuspiciousForcedNets() noexcept {}
+  ~MsgSuspiciousForcedNets() noexcept override {}
 };
 
 /*******************************************************************************

@@ -47,7 +47,7 @@ public:
   // Constructors / Destructor
   SlintKeyEventTextBuilder(const SlintKeyEventTextBuilder& other) = delete;
   explicit SlintKeyEventTextBuilder(QObject* parent = nullptr) noexcept;
-  ~SlintKeyEventTextBuilder() noexcept;
+  ~SlintKeyEventTextBuilder() noexcept override;
 
   // General Methods
   const QString& getText() const noexcept { return mText; }

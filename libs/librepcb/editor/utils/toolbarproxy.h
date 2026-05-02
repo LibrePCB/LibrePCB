@@ -49,7 +49,7 @@ public:
   // Constructors / Destructor
   ToolBarProxy(QObject* parent = nullptr) noexcept;
   ToolBarProxy(const ToolBarProxy& other) = delete;
-  ~ToolBarProxy() noexcept;
+  ~ToolBarProxy() noexcept override;
 
   // Setters
   void setToolBar(QToolBar* toolbar) noexcept;

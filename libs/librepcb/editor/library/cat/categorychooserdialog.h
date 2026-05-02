@@ -61,8 +61,8 @@ public:
   CategoryChooserDialog() = delete;
   CategoryChooserDialog(const CategoryChooserDialog& other) = delete;
   explicit CategoryChooserDialog(const Workspace& ws, Filters filters,
-                                 QWidget* parent = 0) noexcept;
-  ~CategoryChooserDialog() noexcept;
+                                 QWidget* parent = nullptr) noexcept;
+  ~CategoryChooserDialog() noexcept override;
 
   // Getters
   std::optional<Uuid> getSelectedCategoryUuid() const noexcept;

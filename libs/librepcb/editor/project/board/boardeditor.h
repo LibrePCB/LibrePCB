@@ -67,7 +67,7 @@ public:
   BoardEditor(const BoardEditor& other) = delete;
   explicit BoardEditor(ProjectEditor& prjEditor, Board& board, int uiIndex,
                        QObject* parent = nullptr) noexcept;
-  ~BoardEditor() noexcept;
+  ~BoardEditor() noexcept override;
 
   // General Methods
   ProjectEditor& getProjectEditor() noexcept { return mProjectEditor; }

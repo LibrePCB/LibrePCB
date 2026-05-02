@@ -54,11 +54,11 @@ public:
   GerberX3OutputJob() noexcept;
   GerberX3OutputJob(const GerberX3OutputJob& other) noexcept;
   explicit GerberX3OutputJob(const SExpression& node);
-  virtual ~GerberX3OutputJob() noexcept;
+  ~GerberX3OutputJob() noexcept override;
 
   // Getters
-  virtual QString getTypeTr() const noexcept override;
-  virtual QIcon getTypeIcon() const noexcept override;
+  QString getTypeTr() const noexcept override;
+  QIcon getTypeIcon() const noexcept override;
   const BoardSet& getBoards() const noexcept { return mBoards; }
   const AssemblyVariantSet& getAssemblyVariants() const noexcept {
     return mAssemblyVariants;
@@ -97,14 +97,14 @@ public:
   static QString getTypeTrStatic() noexcept {
     return tr("Pick&Place / Glue Mask (Gerber X3)");
   }
-  virtual std::shared_ptr<OutputJob> cloneShared() const noexcept override;
+  std::shared_ptr<OutputJob> cloneShared() const noexcept override;
 
   // Operator Overloadings
   GerberX3OutputJob& operator=(const GerberX3OutputJob& rhs) = delete;
 
 private:  // Methods
-  virtual void serializeDerived(SExpression& root) const override;
-  virtual bool equals(const OutputJob& rhs) const noexcept override;
+  void serializeDerived(SExpression& root) const override;
+  bool equals(const OutputJob& rhs) const noexcept override;
 
 private:  // Data
   BoardSet mBoards;

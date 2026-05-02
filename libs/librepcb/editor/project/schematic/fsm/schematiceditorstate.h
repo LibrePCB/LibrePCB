@@ -91,7 +91,7 @@ public:
   SchematicEditorState(const SchematicEditorState& other) = delete;
   explicit SchematicEditorState(const Context& context,
                                 QObject* parent = nullptr) noexcept;
-  virtual ~SchematicEditorState() noexcept;
+  ~SchematicEditorState() noexcept override;
 
   // General Methods
   virtual bool entry() noexcept { return true; }

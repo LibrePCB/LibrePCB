@@ -41,10 +41,12 @@ namespace tests {
  ******************************************************************************/
 
 class CmdPackageReloadTest : public ::testing::Test {
-protected:
+public:
   FilePath mTmpDir;
   CmdPackageReloadTest() : mTmpDir(FilePath::getRandomTempPath()) {}
-  ~CmdPackageReloadTest() { QDir(mTmpDir.toStr()).removeRecursively(); }
+  ~CmdPackageReloadTest() override {
+    QDir(mTmpDir.toStr()).removeRecursively();
+  }
 };
 
 /*******************************************************************************

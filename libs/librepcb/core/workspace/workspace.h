@@ -35,7 +35,6 @@
  ******************************************************************************/
 namespace librepcb {
 
-class Library;
 class Project;
 class TransactionalFileSystem;
 class WorkspaceLibraryDb;
@@ -78,7 +77,7 @@ public:
   /**
    * The destructor
    */
-  ~Workspace() noexcept;
+  ~Workspace() noexcept override;
 
   // Getters
 

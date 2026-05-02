@@ -42,6 +42,8 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -177,7 +179,7 @@ void Board3dTab::setDerivedUiData(const ui::Board3dTabData& data) noexcept {
 
 void Board3dTab::activate() noexcept {
   if (!mView) {
-    mView.reset(new SlintOpenGlView(*mProjection));
+    mView = std::make_shared<SlintOpenGlView>(*mProjection);
     mView->setAlpha(mAlpha);
     connect(mView.get(), &SlintOpenGlView::stateChanged, this,
             [this]() { onDerivedUiDataChanged.notify(); });
@@ -186,7 +188,7 @@ void Board3dTab::activate() noexcept {
   }
 
   if (!mSceneBuilder) {
-    mSceneBuilder.reset(new OpenGlSceneBuilder(this));
+    mSceneBuilder = std::make_shared<OpenGlSceneBuilder>(this);
     connect(mSceneBuilder.get(), &OpenGlSceneBuilder::objectAdded, mView.get(),
             &SlintOpenGlView::addObject);
     connect(mSceneBuilder.get(), &OpenGlSceneBuilder::objectRemoved,
@@ -201,7 +203,7 @@ void Board3dTab::activate() noexcept {
   }
 
   // Setup timer for automatic scene rebuild.
-  mSceneRebuildTimer.reset(new QTimer(this));
+  mSceneRebuildTimer = std::make_unique<QTimer>(this);
   mSceneRebuildTimer->setInterval(150);
   connect(mSceneRebuildTimer.get(), &QTimer::timeout, this,
           &Board3dTab::sceneRebuildTimerTimeout);

@@ -48,7 +48,7 @@ public:
   SymbolEditorState_AddNames() = delete;
   SymbolEditorState_AddNames(const SymbolEditorState_AddNames& other) = delete;
   explicit SymbolEditorState_AddNames(const Context& context) noexcept;
-  ~SymbolEditorState_AddNames() noexcept;
+  ~SymbolEditorState_AddNames() noexcept override;
 
   // Operator Overloadings
   SymbolEditorState_AddNames& operator=(const SymbolEditorState_AddNames& rhs) =

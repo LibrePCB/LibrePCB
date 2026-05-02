@@ -41,7 +41,7 @@ namespace tests {
 
 class SQLiteDatabaseTest : public ::testing::Test {
 protected:
-  virtual void SetUp() override {
+  void SetUp() override {
     // create temporary, empty directory
     mTempDir = FilePath::getRandomTempPath();
     mTempDbFilePath = mTempDir.getPathTo("db.sqlite");
@@ -51,7 +51,7 @@ protected:
     FileUtils::makePath(mTempDir);
   }
 
-  virtual void TearDown() override {
+  void TearDown() override {
     // remove temporary directory
     FileUtils::removeDirRecursively(mTempDir);  // can throw
   }

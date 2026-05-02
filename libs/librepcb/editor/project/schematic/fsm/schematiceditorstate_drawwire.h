@@ -79,25 +79,23 @@ public:
   SchematicEditorState_DrawWire(const SchematicEditorState_DrawWire& other) =
       delete;
   explicit SchematicEditorState_DrawWire(const Context& context) noexcept;
-  virtual ~SchematicEditorState_DrawWire() noexcept;
+  ~SchematicEditorState_DrawWire() noexcept override;
 
   // General Methods
-  virtual bool entry() noexcept override;
-  virtual bool exit() noexcept override;
+  bool entry() noexcept override;
+  bool exit() noexcept override;
 
   // Event Handlers
-  virtual bool processAbortCommand() noexcept override;
-  virtual bool processKeyPressed(
-      const GraphicsSceneKeyEvent& e) noexcept override;
-  virtual bool processKeyReleased(
-      const GraphicsSceneKeyEvent& e) noexcept override;
-  virtual bool processGraphicsSceneMouseMoved(
+  bool processAbortCommand() noexcept override;
+  bool processKeyPressed(const GraphicsSceneKeyEvent& e) noexcept override;
+  bool processKeyReleased(const GraphicsSceneKeyEvent& e) noexcept override;
+  bool processGraphicsSceneMouseMoved(
       const GraphicsSceneMouseEvent& e) noexcept override;
-  virtual bool processGraphicsSceneLeftMouseButtonPressed(
+  bool processGraphicsSceneLeftMouseButtonPressed(
       const GraphicsSceneMouseEvent& e) noexcept override;
-  virtual bool processGraphicsSceneLeftMouseButtonDoubleClicked(
+  bool processGraphicsSceneLeftMouseButtonDoubleClicked(
       const GraphicsSceneMouseEvent& e) noexcept override;
-  virtual bool processGraphicsSceneRightMouseButtonReleased(
+  bool processGraphicsSceneRightMouseButtonReleased(
       const GraphicsSceneMouseEvent& e) noexcept override;
 
   // Connection to UI

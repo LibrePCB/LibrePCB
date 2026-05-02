@@ -182,9 +182,8 @@ QByteArray D356NetlistGenerator::generate() const {
     line += QString("%1").arg(cleanString(record.padName).left(4), -4);
     line += record.midPoint ? "M" : " ";
     if (const auto hole = record.hole) {
-      line += QString("D%1%2")
-                  .arg(formatLength(*hole->first, false, 4))
-                  .arg(hole->second ? "P" : "U");
+      line += QString("D%1%2").arg(formatLength(*hole->first, false, 4),
+                                   hole->second ? "P" : "U");
     } else {
       line += "      ";
     }
@@ -193,9 +192,9 @@ QByteArray D356NetlistGenerator::generate() const {
     } else {
       line += "   ";
     }
-    line += QString("X%1Y%2")
-                .arg(formatLength(record.position.getX(), true, 6))
-                .arg(formatLength(record.position.getY(), true, 6));
+    line +=
+        QString("X%1Y%2").arg(formatLength(record.position.getX(), true, 6),
+                              formatLength(record.position.getY(), true, 6));
     if (const auto width = record.width) {
       line += QString("X%1").arg(formatLength(**width, false, 4));
     } else {

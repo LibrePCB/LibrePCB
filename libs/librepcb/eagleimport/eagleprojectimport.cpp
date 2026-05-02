@@ -75,6 +75,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -140,7 +142,7 @@ QStringList EagleProjectImport::open(const FilePath& sch, const FilePath& brd) {
   std::unique_ptr<parseagle::Board> board;
 
   try {
-    schematic.reset(new parseagle::Schematic(sch.toStr(), &warnings));
+    schematic = std::make_unique<parseagle::Schematic>(sch.toStr(), &warnings);
     if (schematic->getSheets().isEmpty()) {
       warnings.append(tr("Project contains no schematic sheets."));
     }
@@ -149,7 +151,7 @@ QStringList EagleProjectImport::open(const FilePath& sch, const FilePath& brd) {
           tr("Project contains modules which are not supported yet!"));
     }
     if (brd.isValid()) {
-      board.reset(new parseagle::Board(brd.toStr(), &warnings));
+      board = std::make_unique<parseagle::Board>(brd.toStr(), &warnings);
     }
   } catch (const std::exception& e) {
     qWarning() << "Failed to parse EAGLE project:" << e.what();
@@ -420,9 +422,8 @@ void EagleProjectImport::importSchematic(Project& project,
   // Create schematic.
   MessageLogger log(mLogger.get(), name);
   Schematic* schematic = new librepcb::Schematic(
-      project,
-      std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory()),
-      dirName, mCreateUuid(),
+      project, std::make_unique<TransactionalDirectory>(), dirName,
+      mCreateUuid(),
       ElementName(name));  // can throw
   project.addSchematic(*schematic);
 
@@ -869,11 +870,10 @@ void EagleProjectImport::importBoard(Project& project,
                                      EagleLibraryConverter& converter) {
   // Create board.
   MessageLogger log(mLogger.get(), "BOARD");
-  Board* board = new librepcb::Board(
-      project,
-      std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory()),
-      "default", mCreateUuid(),
-      ElementName("default"));  // can throw
+  Board* board =
+      new librepcb::Board(project, std::make_unique<TransactionalDirectory>(),
+                          "default", mCreateUuid(),
+                          ElementName("default"));  // can throw
   project.addBoard(*board);
 
   // Grid settings
@@ -988,8 +988,7 @@ void EagleProjectImport::importBoard(Project& project,
       log.critical(QString("Component '%1' (%2) not found in circuit. Note "
                            "that LibrePCB does not yet support placing devices "
                            "on the board which don't exist in the schematic.")
-                       .arg(eagleElem.getName())
-                       .arg(eagleElem.getPackage()));
+                       .arg(eagleElem.getName(), eagleElem.getPackage()));
       continue;
     }
     ComponentInstance* cmpInst =

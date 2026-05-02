@@ -55,6 +55,7 @@ public:
 
   // Constructors / Destructor
   RuleCheckMessage() = delete;
+  virtual ~RuleCheckMessage() noexcept;
 
   // Getters
   Severity getSeverity() const noexcept { return mSeverity; }
@@ -91,7 +92,6 @@ protected:  // Methods
   RuleCheckMessage(Severity severity, const QString& msg,
                    const QString& description, const QString& approvalName,
                    const QVector<Path>& locations = {}) noexcept;
-  virtual ~RuleCheckMessage() noexcept;
 
 protected:  // Data
   Severity mSeverity;

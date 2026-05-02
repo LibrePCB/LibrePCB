@@ -61,7 +61,7 @@ public:
   explicit LppzOutputJobWidget(Project& project,
                                std::shared_ptr<LppzOutputJob> job,
                                QWidget* parent = nullptr) noexcept;
-  ~LppzOutputJobWidget() noexcept;
+  ~LppzOutputJobWidget() noexcept override;
 
   // Operator Overloads
   LppzOutputJobWidget& operator=(const LppzOutputJobWidget& rhs) = delete;

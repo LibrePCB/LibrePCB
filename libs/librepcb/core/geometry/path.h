@@ -85,7 +85,8 @@ public:
   Path cleaned() const noexcept;
   Path toClosedPath() const noexcept;
   Path toOpenPath() const noexcept;
-  QVector<Path> toOutlineStrokes(const PositiveLength& width) const noexcept;
+  const QVector<Path> toOutlineStrokes(
+      const PositiveLength& width) const noexcept;
   const QPainterPath& toQPainterPathPx() const noexcept;
   QString toSvgPathMm() const noexcept;
 
@@ -168,7 +169,7 @@ public:
                             bool bottomRight) noexcept;
   static Path trapezoid(const PositiveLength& width,
                         const PositiveLength& height, const Length& dw,
-                        const Length dh) noexcept;
+                        const Length& dh) noexcept;
   static Path octagon(
       const PositiveLength& width, const PositiveLength& height,
       const UnsignedLength& cornerRadius = UnsignedLength(0)) noexcept;

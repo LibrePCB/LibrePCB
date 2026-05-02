@@ -54,7 +54,7 @@ class CmdDeviceInstanceEdit final : public UndoCommand {
 public:
   // Constructors / Destructor
   explicit CmdDeviceInstanceEdit(BI_Device& dev) noexcept;
-  ~CmdDeviceInstanceEdit() noexcept;
+  ~CmdDeviceInstanceEdit() noexcept override;
 
   // General Methods
   void setPosition(const Point& pos, bool immediate) noexcept;

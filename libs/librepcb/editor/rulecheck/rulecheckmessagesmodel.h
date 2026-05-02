@@ -55,7 +55,7 @@ public:
   // Constructors / Destructor
   RuleCheckMessagesModel(const RuleCheckMessagesModel& other) = delete;
   explicit RuleCheckMessagesModel(QObject* parent = nullptr) noexcept;
-  virtual ~RuleCheckMessagesModel() noexcept;
+  ~RuleCheckMessagesModel() noexcept override;
 
   // General Methods
   void clear() noexcept;

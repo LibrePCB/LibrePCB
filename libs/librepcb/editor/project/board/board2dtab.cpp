@@ -92,6 +92,8 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -580,20 +582,19 @@ void Board2dTab::setDerivedUiData(const ui::Board2dTabData& data) noexcept {
 }
 
 void Board2dTab::activate() noexcept {
-  mLayersModel.reset(new GraphicsLayersModel(*mLayers));
+  mLayersModel = std::make_shared<GraphicsLayersModel>(*mLayers);
   connect(mLayersModel.get(), &GraphicsLayersModel::layersVisibilityChanged,
           &mBoardEditor, &BoardEditor::schedulePlanesRebuild);
 
-  mScene.reset(new BoardGraphicsScene(
+  mScene = std::make_unique<BoardGraphicsScene>(
       mBoard, *mLayers,
-      std::shared_ptr<BoardGraphicsScene::Context>(
-          new BoardGraphicsScene::Context{
-              this,  // tab
-              mProjectEditor.getCrossProbe(),  // cross probe
-              GraphicsLayer::State::Highlighted,  // Self-probe mode
-              false,  // flip view
-          }),
-      this));
+      std::make_shared<BoardGraphicsScene::Context>(BoardGraphicsScene::Context{
+          this,  // tab
+          mProjectEditor.getCrossProbe(),  // cross probe
+          GraphicsLayer::State::Highlighted,  // Self-probe mode
+          false,  // flip view
+      }),
+      this);
   mScene->setGridInterval(mBoard.getGridInterval());
   connect(mScene.get(), &GraphicsScene::changed, this,
           &Board2dTab::requestRepaint);
@@ -607,17 +608,18 @@ void Board2dTab::activate() noexcept {
                                     &Board::triggerAirWiresRebuild));
 
   // Unplaced component state.
-  mUnplacedComponentsModel.reset(new slint::VectorModel<slint::SharedString>());
-  mUnplacedComponentDevicesModel.reset(
-      new slint::VectorModel<slint::SharedString>());
-  mUnplacedComponentFootprintsModel.reset(
-      new slint::VectorModel<slint::SharedString>());
-  mUnplacedComponentGraphicsScene.reset(new GraphicsScene());
+  mUnplacedComponentsModel =
+      std::make_shared<slint::VectorModel<slint::SharedString>>();
+  mUnplacedComponentDevicesModel =
+      std::make_shared<slint::VectorModel<slint::SharedString>>();
+  mUnplacedComponentFootprintsModel =
+      std::make_shared<slint::VectorModel<slint::SharedString>>();
+  mUnplacedComponentGraphicsScene = std::make_unique<GraphicsScene>();
   mUnplacedComponentGraphicsScene->setOriginCrossVisible(false);
   mUnplacedComponentGraphicsItem.reset();
 
   // Update unplaced components when needed.
-  mUnplacedComponentsUpdateTimer.reset(new QTimer(this));
+  mUnplacedComponentsUpdateTimer = std::make_unique<QTimer>(this);
   mUnplacedComponentsUpdateTimer->setSingleShot(true);
   connect(mUnplacedComponentsUpdateTimer.get(), &QTimer::timeout, this,
           &Board2dTab::updateUnplacedComponents);
@@ -637,7 +639,7 @@ void Board2dTab::activate() noexcept {
   mSearchContext.init();
 
   // Setup input idle timer for planes rebuilding during commands.
-  mInputIdleTimer.reset(new QTimer());
+  mInputIdleTimer = std::make_unique<QTimer>();
   mInputIdleTimer->setInterval(700);
   mInputIdleTimer->setSingleShot(true);
   connect(mInputIdleTimer.get(), &QTimer::timeout, &mBoardEditor,
@@ -1223,7 +1225,7 @@ void Board2dTab::fsmCrossProbe(
 }
 
 void Board2dTab::fsmAbortBlockingToolsInOtherEditors() noexcept {
-  mProjectEditor.abortBlockingToolsInOtherEditors(this);
+  emit mProjectEditor.abortBlockingToolsInOtherEditors(this);
 }
 
 void Board2dTab::fsmSetStatusBarMessage(const QString& message,
@@ -1312,7 +1314,7 @@ void Board2dTab::fsmToolEnter(BoardEditorState_DrawTrace& state) noexcept {
   // Layers
   mToolLayersQt = Layer::sorted(state.getAvailableLayers());
   mToolLayers->clear();
-  for (const Layer* layer : mToolLayersQt) {
+  for (const Layer* layer : std::as_const(mToolLayersQt)) {
     mToolLayers->push_back(q2s(layer->getNameTr()));
   }
 
@@ -1630,7 +1632,7 @@ void Board2dTab::fsmToolEnter(BoardEditorState_DrawPolygon& state) noexcept {
   // Layers
   mToolLayersQt = Layer::sorted(state.getAvailableLayers());
   mToolLayers->clear();
-  for (const Layer* layer : mToolLayersQt) {
+  for (const Layer* layer : std::as_const(mToolLayersQt)) {
     mToolLayers->push_back(q2s(layer->getNameTr()));
   }
 
@@ -1688,7 +1690,7 @@ void Board2dTab::fsmToolEnter(BoardEditorState_AddStrokeText& state) noexcept {
   // Layers
   mToolLayersQt = Layer::sorted(state.getAvailableLayers());
   mToolLayers->clear();
-  for (const Layer* layer : mToolLayersQt) {
+  for (const Layer* layer : std::as_const(mToolLayersQt)) {
     mToolLayers->push_back(q2s(layer->getNameTr()));
   }
 
@@ -1779,7 +1781,7 @@ void Board2dTab::fsmToolEnter(BoardEditorState_DrawPlane& state) noexcept {
   // Layers
   mToolLayersQt = Layer::sorted(state.getAvailableLayers());
   mToolLayers->clear();
-  for (const Layer* layer : mToolLayersQt) {
+  for (const Layer* layer : std::as_const(mToolLayersQt)) {
     mToolLayers->push_back(q2s(layer->getNameTr()));
   }
 
@@ -1808,14 +1810,14 @@ void Board2dTab::fsmToolEnter(BoardEditorState_DrawZone& state) noexcept {
   // Available layers
   mToolLayersQt = Layer::sorted(state.getAvailableLayers());
   mToolLayers->clear();
-  for (const Layer* layer : mToolLayersQt) {
+  for (const Layer* layer : std::as_const(mToolLayersQt)) {
     mToolLayers->push_back(q2s(layer->getNameTr()));
   }
 
   // Layers
   auto setLayers = [this](const QSet<const Layer*>& layers) {
     if (!layers.isEmpty()) {
-      mToolLayer = layers.values().first();
+      mToolLayer = *layers.cbegin();  // ?!?!
     }
     onDerivedUiDataChanged.notify();
   };
@@ -1985,7 +1987,7 @@ void Board2dTab::highlightDrcMessage(
                             .boardColorSchemes.getActive()
                             .getColors(ColorRole::boardOverlays());
     QPainterPath path = Path::toQPainterPathPx(msg->getLocations(), true);
-    mDrcLocationGraphicsItem.reset(new QGraphicsPathItem());
+    mDrcLocationGraphicsItem = std::make_unique<QGraphicsPathItem>();
     mDrcLocationGraphicsItem->setZValue(BoardGraphicsScene::ZValue_AirWires);
     mDrcLocationGraphicsItem->setPen(QPen(colors.primary, 0));
     mDrcLocationGraphicsItem->setBrush(colors.secondary);
@@ -2125,9 +2127,8 @@ void Board2dTab::setSelectedUnplacedComponentDevice(int index) noexcept {
           mApp.getWorkspace().getLibraryDb().getLatest<Package>(
               device.packageUuid);
       if (pkgFp.isValid()) {
-        pkg = Package::open(std::unique_ptr<TransactionalDirectory>(
-                                new TransactionalDirectory(
-                                    TransactionalFileSystem::openRO(pkgFp))))
+        pkg = Package::open(std::make_unique<TransactionalDirectory>(
+                                TransactionalFileSystem::openRO(pkgFp)))
                   .release();
         packageOwned = true;
       }
@@ -2182,10 +2183,10 @@ void Board2dTab::setSelectedUnplacedComponentFootprint(int index) noexcept {
 
   if (mUnplacedComponent && mUnplacedComponentPackage) {
     if (auto fpt = mUnplacedComponentPackage->getFootprints().value(index)) {
-      mUnplacedComponentGraphicsItem.reset(new FootprintGraphicsItem(
+      mUnplacedComponentGraphicsItem = std::make_unique<FootprintGraphicsItem>(
           fpt, mApp.getPreviewLayers(), Application::getDefaultStrokeFont(),
           &mUnplacedComponentPackage->getPads(),
-          &mUnplacedComponent->getLibComponent(), mProject.getLocaleOrder()));
+          &mUnplacedComponent->getLibComponent(), mProject.getLocaleOrder());
       mUnplacedComponentGraphicsScene->addItem(*mUnplacedComponentGraphicsItem);
     }
   }
@@ -2394,7 +2395,7 @@ void Board2dTab::addUnplacedComponentsToBoard(
   }
 
   // Release undo stack.
-  mProjectEditor.abortBlockingToolsInOtherEditors(this);
+  emit mProjectEditor.abortBlockingToolsInOtherEditors(this);
 
   // Memorize selection.
   if (mode != PlaceComponentsMode::All) {
@@ -2419,7 +2420,7 @@ void Board2dTab::addUnplacedComponentsToBoard(
   }
   std::unique_ptr<UndoCommandGroup> cmd(
       new UndoCommandGroup(tr("Add devices to board")));
-  for (const Uuid& cmpUuid : mUnplacedComponents) {
+  for (const Uuid& cmpUuid : std::as_const(mUnplacedComponents)) {
     ComponentInstance* cmp =
         mProject.getCircuit().getComponentInstanceByUuid(cmpUuid);
     if (cmp &&
@@ -2619,7 +2620,7 @@ void Board2dTab::execSpecctraImportDialog() noexcept {
     const FilePath fp(path);
 
     // Release undo stack.
-    mProjectEditor.abortBlockingToolsInOtherEditors(this);
+    emit mProjectEditor.abortBlockingToolsInOtherEditors(this);
 
     // Set UI into busy state during the import.
     QApplication::setOverrideCursor(Qt::WaitCursor);

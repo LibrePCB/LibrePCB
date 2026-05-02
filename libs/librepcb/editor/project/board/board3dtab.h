@@ -64,7 +64,7 @@ public:
   Board3dTab(const Board3dTab& other) = delete;
   explicit Board3dTab(GuiApplication& app, BoardEditor& editor,
                       QObject* parent = nullptr) noexcept;
-  ~Board3dTab() noexcept;
+  ~Board3dTab() noexcept override;
 
   // General Methods
   int getProjectIndex() const noexcept;

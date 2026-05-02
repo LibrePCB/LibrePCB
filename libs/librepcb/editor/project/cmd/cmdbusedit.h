@@ -51,7 +51,7 @@ public:
   // Constructors / Destructor
   CmdBusEdit() = delete;
   explicit CmdBusEdit(Bus& bus) noexcept;
-  ~CmdBusEdit() noexcept;
+  ~CmdBusEdit() noexcept override;
 
   // Setters
   void setName(const BusName& name, bool isAutoName) noexcept;

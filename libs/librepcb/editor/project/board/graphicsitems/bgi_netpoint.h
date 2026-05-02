@@ -54,7 +54,7 @@ public:
   BGI_NetPoint(
       BI_NetPoint& netpoint, const GraphicsLayerList& layers,
       std::shared_ptr<const BoardGraphicsScene::Context> context) noexcept;
-  virtual ~BGI_NetPoint() noexcept;
+  ~BGI_NetPoint() noexcept override;
 
   // General Methods
   BI_NetPoint& getNetPoint() noexcept { return mNetPoint; }

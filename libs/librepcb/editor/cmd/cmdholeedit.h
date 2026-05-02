@@ -56,7 +56,7 @@ public:
   CmdHoleEdit() = delete;
   CmdHoleEdit(const CmdHoleEdit& other) = delete;
   explicit CmdHoleEdit(Hole& hole) noexcept;
-  ~CmdHoleEdit() noexcept;
+  ~CmdHoleEdit() noexcept override;
 
   // Setters
   void setPath(const NonEmptyPath& path, bool immediate) noexcept;

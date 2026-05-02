@@ -54,7 +54,7 @@ public:
   // PackagePadListModel() = delete;
   PackagePadListModel(const PackagePadListModel& other) = delete;
   explicit PackagePadListModel(QObject* parent = nullptr) noexcept;
-  ~PackagePadListModel() noexcept;
+  ~PackagePadListModel() noexcept override;
 
   // General Methods
   void setReferences(PackagePadList* list, UndoStack* stack) noexcept;

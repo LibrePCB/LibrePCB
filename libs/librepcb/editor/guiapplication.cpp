@@ -61,6 +61,7 @@
 #include <QtCore>
 
 #include <algorithm>
+#include <memory>
 
 /*******************************************************************************
  *  Namespace
@@ -115,8 +116,8 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
   }
 
   // Open windows.
-  for (const QString& idStr : cs.value("global/windows").toStringList()) {
-    if (int id = idStr.toInt()) {
+  for (const auto& s : cs.value("global/windows").toStringList()) {  // NOLINT
+    if (int id = s.toInt()) {
       createNewWindow(id);
     }
   }
@@ -178,7 +179,7 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
 
   // Setup warning about missing libraries, and update visibility each time the
   // workspace library was scanned.
-  mNotificationNoLibrariesInstalled.reset(new Notification(
+  mNotificationNoLibrariesInstalled = std::make_shared<Notification>(
       ui::NotificationType::Tip, tr("No Libraries Installed"),
       tr("This workspace does not contain any libraries, which are essential "
          "to create and modify projects. You should open the libraries panel "
@@ -186,7 +187,7 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
       tr("Open Library Manager"),
       QString("WORKSPACE_V%1_HAS_NO_LIBRARIES")
           .arg(Application::getFileFormatVersion().toStr()),
-      true));
+      true);
   connect(mNotificationNoLibrariesInstalled.get(), &Notification::buttonClicked,
           this, [this]() {
             if (auto win = getCurrentWindow()) {
@@ -199,14 +200,14 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
   updateNoLibrariesInstalledNotification();
 
   // Suggest to install the desktop integration, if available.
-  mNotificationDesktopIntegration.reset(new Notification(
+  mNotificationDesktopIntegration = std::make_shared<Notification>(
       ui::NotificationType::Tip, tr("Application is Not Installed"),
       tr("This application executable does not seem to be integrated into your "
          "desktop environment. If desired, install it now to allow opening "
          "LibrePCB projects through the file manager. Click the button for "
          "details, or do it from the preferences dialog at any time."),
       tr("Install Desktop Integration") % "...",
-      "DESKTOP_INTEGRATION_NOT_INSTALLED", true));
+      "DESKTOP_INTEGRATION_NOT_INSTALLED", true);
   connect(mNotificationDesktopIntegration.get(), &Notification::buttonClicked,
           this, [this]() {
             DesktopIntegration::execDialog(DesktopIntegration::Mode::Install,
@@ -441,8 +442,8 @@ std::shared_ptr<LibraryEditor> GuiApplication::openLibrary(
                                                                      // throw
 
     // Open library.
-    auto lib = Library::open(std::unique_ptr<TransactionalDirectory>(
-        new TransactionalDirectory(fs)));  // can throw
+    auto lib = Library::open(
+        std::make_unique<TransactionalDirectory>(fs));  // can throw
 
     // Keep handle.
     const int index = mLibraries->count();
@@ -587,9 +588,9 @@ std::shared_ptr<ProjectEditor> GuiApplication::openProject(
 
     // Open project.
     ProjectLoader loader;
-    std::unique_ptr<Project> project = loader.open(
-        std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(fs)),
-        projectFileName);  // can throw
+    std::unique_ptr<Project> project =
+        loader.open(std::make_unique<TransactionalDirectory>(fs),
+                    projectFileName);  // can throw
 
     // Open editor & keep handle.
     const int index = mProjects->count();
@@ -979,7 +980,7 @@ void GuiApplication::openProjectLibraryUpdater(
       break;
     }
   }
-  mProjectLibraryUpdater.reset(new ProjectLibraryUpdater(
+  mProjectLibraryUpdater = std::make_unique<ProjectLibraryUpdater>(
       mWorkspace, project, [this](const FilePath& fp) {
         for (int i = 0; i < mProjects->count(); ++i) {
           auto prjEditor = mProjects->at(i);
@@ -991,10 +992,11 @@ void GuiApplication::openProjectLibraryUpdater(
           }
         }
         return false;
-      }));
+      });
   if (wasOpen) {
     connect(
-        mProjectLibraryUpdater.get(), &ProjectLibraryUpdater::finished, this,
+        mProjectLibraryUpdater.get(), &ProjectLibraryUpdater::finishedUpdate,
+        this,
         [this](const FilePath& fp) { openProject(fp, qApp->activeWindow()); });
   }
   mProjectLibraryUpdater->show();

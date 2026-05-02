@@ -53,7 +53,7 @@ public:
                   const ElementName& name_en_US,
                   const QString& description_en_US,
                   const QString& keywords_en_US);
-  ~PackageCategory() noexcept;
+  ~PackageCategory() noexcept override;
 
   // Operator Overloadings
   PackageCategory& operator=(const PackageCategory& rhs) = delete;

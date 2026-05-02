@@ -51,7 +51,7 @@ public:
   CmdFootprintPadEdit() = delete;
   CmdFootprintPadEdit(const CmdFootprintPadEdit& other) = delete;
   explicit CmdFootprintPadEdit(FootprintPad& pad) noexcept;
-  ~CmdFootprintPadEdit() noexcept;
+  ~CmdFootprintPadEdit() noexcept override;
 
   // Setters
   void setPackagePadUuid(const std::optional<Uuid>& pad,

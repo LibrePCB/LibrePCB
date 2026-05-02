@@ -47,7 +47,7 @@ public:
   MsgDeviceHasNoParts() noexcept;
   MsgDeviceHasNoParts(const MsgDeviceHasNoParts& other) noexcept
     : RuleCheckMessage(other) {}
-  virtual ~MsgDeviceHasNoParts() noexcept {}
+  ~MsgDeviceHasNoParts() noexcept override {}
 };
 
 /*******************************************************************************
@@ -65,7 +65,7 @@ public:
   MsgNoPadsInDeviceConnected() noexcept;
   MsgNoPadsInDeviceConnected(const MsgNoPadsInDeviceConnected& other) noexcept
     : RuleCheckMessage(other) {}
-  virtual ~MsgNoPadsInDeviceConnected() noexcept {}
+  ~MsgNoPadsInDeviceConnected() noexcept override {}
 };
 
 /*******************************************************************************

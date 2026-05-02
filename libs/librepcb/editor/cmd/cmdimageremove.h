@@ -54,7 +54,7 @@ public:
   CmdImageRemove(const CmdImageRemove& other) = delete;
   CmdImageRemove(ImageList& list, TransactionalDirectory& dir,
                  std::shared_ptr<Image> image) noexcept;
-  ~CmdImageRemove() noexcept;
+  ~CmdImageRemove() noexcept override;
 
   // Operator Overloadings
   CmdImageRemove& operator=(const CmdImageRemove& rhs) = delete;

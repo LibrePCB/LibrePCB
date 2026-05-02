@@ -51,7 +51,7 @@ public:
   CmdAttributeEdit() = delete;
   CmdAttributeEdit(const CmdAttributeEdit& other) = delete;
   explicit CmdAttributeEdit(Attribute& attribute) noexcept;
-  ~CmdAttributeEdit() noexcept;
+  ~CmdAttributeEdit() noexcept override;
 
   // Setters
   void setKey(const AttributeKey& key) noexcept;

@@ -48,7 +48,7 @@ class CmdCombineBuses final : public UndoCommandGroup {
 public:
   // Constructors / Destructor
   CmdCombineBuses(Circuit& circuit, Bus& toBeRemoved, Bus& result) noexcept;
-  ~CmdCombineBuses() noexcept;
+  ~CmdCombineBuses() noexcept override;
 
 private:
   /// @copydoc ::librepcb::editor::UndoCommand::performExecute()

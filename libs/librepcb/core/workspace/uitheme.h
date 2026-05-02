@@ -95,7 +95,7 @@ struct UiTheme {
   static const UiTheme& light() noexcept;
   static const UiTheme& dark() noexcept;
   static const UiTheme* find(const QString& id) noexcept;
-  static QVector<const UiTheme*> all() noexcept;
+  static const QVector<const UiTheme*> all() noexcept;
 };
 
 /*******************************************************************************

@@ -55,7 +55,7 @@ public:
   explicit WorkspaceSettingsItem(const QString& key,
                                  QObject* parent = nullptr) noexcept;
   WorkspaceSettingsItem(const WorkspaceSettingsItem& other) = delete;
-  virtual ~WorkspaceSettingsItem() noexcept;
+  ~WorkspaceSettingsItem() noexcept override;
 
   /**
    * @brief Get the setting key used for serialization

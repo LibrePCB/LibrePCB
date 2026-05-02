@@ -49,12 +49,12 @@ public:
   OpenGlTriangleObject() = delete;
   explicit OpenGlTriangleObject(Type type) noexcept;
   OpenGlTriangleObject(const OpenGlTriangleObject& other) = delete;
-  virtual ~OpenGlTriangleObject() noexcept;
+  ~OpenGlTriangleObject() noexcept override;
 
   // General Methods
   void setData(const QColor& color, const QVector<QVector3D>& data) noexcept;
-  virtual void draw(QOpenGLFunctions& gl, QOpenGLShaderProgram& program,
-                    qreal alpha) noexcept override;
+  void draw(QOpenGLFunctions& gl, QOpenGLShaderProgram& program,
+            qreal alpha) noexcept override;
 
   // Operator Overloadings
   OpenGlTriangleObject& operator=(const OpenGlTriangleObject& rhs) = delete;

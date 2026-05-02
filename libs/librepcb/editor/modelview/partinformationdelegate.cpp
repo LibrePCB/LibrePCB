@@ -174,7 +174,8 @@ void PartInformationDelegate::paint(QPainter* painter,
       }
       painter->setBrush(bgBrush);
       painter->setPen(outlinePen);
-      painter->drawRoundedRect(rect, rect.height() / 2, rect.height() / 2);
+      painter->drawRoundedRect(rect, rect.height() / qreal(2),
+                               rect.height() / qreal(2));
 
       const QString text = data.getDisplayText();
       if (!text.isEmpty()) {

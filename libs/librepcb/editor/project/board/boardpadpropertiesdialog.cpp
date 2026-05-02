@@ -46,7 +46,8 @@ BoardPadPropertiesDialog::BoardPadPropertiesDialog(
     mUndoStack(undoStack),
     mHoles(mPad.getProperties().getHoles()),
     mSelectedHoleIndex(-1),
-    mUi(new Ui::BoardPadPropertiesDialog) {
+    mUi(new Ui::BoardPadPropertiesDialog),
+    mAutoCustomOutline(mPad.getProperties().getCustomShapeOutline()) {
   mUi->setupUi(this);
   mUi->edtWidth->configure(lengthUnit, LengthEditBase::Steps::generic(),
                            settingsPrefix % "/width");
@@ -128,7 +129,6 @@ BoardPadPropertiesDialog::BoardPadPropertiesDialog(
           &BoardPadPropertiesDialog::updateShapeDependentWidgets);
 
   // Automatically set/clear custom shape outline to improve user experience.
-  mAutoCustomOutline = mPad.getProperties().getCustomShapeOutline();
   if (mPad.getProperties().getShape() != Pad::Shape::Custom) {
     const QVector<Path> outlines =
         mPad.getProperties().getGeometry().toOutlines();

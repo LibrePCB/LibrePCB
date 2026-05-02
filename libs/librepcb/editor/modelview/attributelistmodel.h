@@ -54,7 +54,7 @@ public:
   // AttributeListModel() = delete;
   AttributeListModel(const AttributeListModel& other) = delete;
   explicit AttributeListModel(QObject* parent = nullptr) noexcept;
-  ~AttributeListModel() noexcept;
+  ~AttributeListModel() noexcept override;
 
   // General Methods
   void setReferences(AttributeList* list, UndoStack* stack) noexcept;

@@ -68,7 +68,7 @@ public:
                                  const LengthUnit& lengthUnit,
                                  const QString& settingsPrefix,
                                  QWidget* parent) noexcept;
-  ~DeviceInstancePropertiesDialog() noexcept;
+  ~DeviceInstancePropertiesDialog() noexcept override;
 
   // Operator Overloadings
   DeviceInstancePropertiesDialog& operator=(

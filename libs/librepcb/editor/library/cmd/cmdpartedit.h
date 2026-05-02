@@ -51,7 +51,7 @@ public:
   CmdPartEdit() = delete;
   CmdPartEdit(const CmdPartEdit& other) = delete;
   explicit CmdPartEdit(const std::shared_ptr<Part>& part) noexcept;
-  ~CmdPartEdit() noexcept;
+  ~CmdPartEdit() noexcept override;
 
   // Setters
   void setMpn(const SimpleString& value) noexcept;

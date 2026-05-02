@@ -53,7 +53,7 @@ public:
       delete;
   explicit CmdComponentSymbolVariantEdit(
       ComponentSymbolVariant& variant) noexcept;
-  ~CmdComponentSymbolVariantEdit() noexcept;
+  ~CmdComponentSymbolVariantEdit() noexcept override;
 
   // Setters
   void setNorm(const QString& norm) noexcept;

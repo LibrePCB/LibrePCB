@@ -50,7 +50,7 @@ public:
   PackageEditorState_Measure() = delete;
   PackageEditorState_Measure(const PackageEditorState_Measure& other) = delete;
   explicit PackageEditorState_Measure(Context& context) noexcept;
-  ~PackageEditorState_Measure() noexcept;
+  ~PackageEditorState_Measure() noexcept override;
 
   // General Methods
   bool entry() noexcept override;

@@ -53,7 +53,7 @@ public:
   GraphicsLayersModel(const GraphicsLayersModel& other) = delete;
   explicit GraphicsLayersModel(GraphicsLayerList& layers,
                                QObject* parent = nullptr) noexcept;
-  virtual ~GraphicsLayersModel() noexcept;
+  ~GraphicsLayersModel() noexcept override;
 
   // Implementations
   std::size_t row_count() const override;

@@ -69,6 +69,8 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -899,11 +901,11 @@ void DeviceTab::refreshDependentElements() noexcept {
       mPinout->setReferences(&mDevice->getPadSignalMap(), &mPackage->getPads(),
                              mSignalNames, mUndoStack.get());
       if (mFootprint) {
-        mFootprintGraphicsItem.reset(new FootprintGraphicsItem(
+        mFootprintGraphicsItem = std::make_unique<FootprintGraphicsItem>(
             std::const_pointer_cast<Footprint>(mFootprint),
             mApp.getPreviewLayers(), Application::getDefaultStrokeFont(),
             &mPackage->getPads(), mComponent.get(),
-            mApp.getWorkspace().getSettings().libraryLocaleOrder.get()));
+            mApp.getWorkspace().getSettings().libraryLocaleOrder.get());
         mPackageScene->addItem(*mFootprintGraphicsItem);
         mPackageScene->setGridInterval(mPackage->getGridInterval());
       }
@@ -1028,7 +1030,7 @@ void DeviceTab::selectComponent() noexcept {
       std::unique_ptr<CmdDeviceEdit> cmdDevEdit(new CmdDeviceEdit(*mDevice));
       cmdDevEdit->setComponentUuid(*cmpUuid);
       cmdGroup->appendChild(cmdDevEdit.release());
-      for (auto item : mDevice->getPadSignalMap().values()) {
+      for (const auto& item : mDevice->getPadSignalMap().values()) {
         std::optional<Uuid> signalUuid = item->getSignalUuid();
         if (!signalUuid || !cmp->getSignals().contains(*signalUuid)) {
           std::unique_ptr<CmdDevicePadSignalMapItemEdit> cmdItem(
@@ -1095,7 +1097,7 @@ void DeviceTab::toggleMeasureTool() noexcept {
 
 bool DeviceTab::startMeasureTool() noexcept {
   if ((!mMeasureTool) && mPackage && mFootprint && mPackageScene) {
-    mMeasureTool.reset(new MeasureTool());
+    mMeasureTool = std::make_unique<MeasureTool>();
     mMeasureTool->setFootprint(mFootprint.get());
     mMeasureTool->enter(
         *mPackageScene,
@@ -1140,7 +1142,7 @@ void DeviceTab::updatePreviewPinNumbers() noexcept {
     auto gate = mSymbolVariant->getSymbolItems().at(i);
     auto symbol = std::const_pointer_cast<Symbol>(mSymbols.at(i));
     auto graphicsItem = mSymbolGraphicsItems.at(i);
-    for (auto pin : symbol->getPins().values()) {
+    for (const auto& pin : symbol->getPins().values()) {
       if (auto pinItem = graphicsItem->getGraphicsItem(pin)) {
         QString numbers;
         if (auto pinMap = gate->getPinSignalMap().find(pin->getUuid())) {
@@ -1169,7 +1171,7 @@ void DeviceTab::setHighlightedPad(const std::optional<Uuid>& pad) noexcept {
   if (!mFootprintGraphicsItem) return;
   mFootprintGraphicsItem->setSelectionRect(QRectF());
   if ((!pad) || (!mPackage) || (!mFootprint)) return;
-  for (auto fptPad :
+  for (const auto& fptPad :
        std::const_pointer_cast<Footprint>(mFootprint)->getPads().values()) {
     if (fptPad->getPackagePadUuid() == pad) {
       if (auto item = mFootprintGraphicsItem->getGraphicsItem(fptPad)) {
@@ -1191,7 +1193,7 @@ void DeviceTab::setHighlightedSignalPins(
       continue;
     }
     auto gate = mSymbolVariant->getSymbolItems().at(i);
-    for (auto pin : symbol->getPins().values()) {
+    for (const auto& pin : symbol->getPins().values()) {
       if (auto pinMap = gate->getPinSignalMap().find(pin->getUuid())) {
         if (pinMap->getSignalUuid() == signal) {
           if (auto item = graphicsItem->getGraphicsItem(pin)) {

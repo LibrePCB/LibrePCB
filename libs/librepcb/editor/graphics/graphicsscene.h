@@ -67,7 +67,7 @@ class GraphicsScene : public QGraphicsScene {
 public:
   // Constructors / Destructor
   explicit GraphicsScene(QObject* parent = nullptr) noexcept;
-  virtual ~GraphicsScene() noexcept;
+  ~GraphicsScene() noexcept override;
 
   // Getters
   const PositiveLength& getGridInterval() const noexcept {

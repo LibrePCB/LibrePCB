@@ -111,6 +111,7 @@ bool CmdCombineBoardNetSegments::performExecute() {
     BI_NetLine* newNetLine =
         cmdAdd->addNetLine(*p1, *p2, netline->getLayer(), netline->getWidth());
     Q_ASSERT(newNetLine);
+    Q_UNUSED(newNetLine);
   }
   execNewChildCmd(new CmdBoardNetSegmentRemove(mOldSegment));  // can throw
   execNewChildCmd(cmdAdd.release());  // can throw

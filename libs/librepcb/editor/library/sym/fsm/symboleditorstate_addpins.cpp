@@ -34,6 +34,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -236,7 +238,7 @@ bool SymbolEditorState_AddPins::addNextPin(const Point& pos) noexcept {
     mCurrentGraphicsItem = item->getGraphicsItem(mCurrentPin);
     Q_ASSERT(mCurrentGraphicsItem);
     mCurrentGraphicsItem->setSelected(true);
-    mCurrentEditCmd.reset(new CmdSymbolPinEdit(mCurrentPin));
+    mCurrentEditCmd = std::make_unique<CmdSymbolPinEdit>(mCurrentPin);
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());

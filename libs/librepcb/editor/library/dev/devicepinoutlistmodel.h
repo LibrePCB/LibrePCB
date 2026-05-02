@@ -56,7 +56,7 @@ public:
   // DevicePinoutListModel() = delete;
   DevicePinoutListModel(const DevicePinoutListModel& other) = delete;
   explicit DevicePinoutListModel(QObject* parent = nullptr) noexcept;
-  ~DevicePinoutListModel() noexcept;
+  ~DevicePinoutListModel() noexcept override;
 
   // General Methods
   void setReferences(DevicePadSignalMap* list, const PackagePadList* pads,

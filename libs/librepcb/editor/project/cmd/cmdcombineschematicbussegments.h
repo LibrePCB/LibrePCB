@@ -56,7 +56,7 @@ public:
                                  SI_BusJunction& oldAnchor,
                                  SI_BusSegment& result,
                                  SI_BusJunction& newAnchor) noexcept;
-  ~CmdCombineSchematicBusSegments() noexcept;
+  ~CmdCombineSchematicBusSegments() noexcept override;
 
   // Operator Overloadings
   CmdCombineSchematicBusSegments& operator=(

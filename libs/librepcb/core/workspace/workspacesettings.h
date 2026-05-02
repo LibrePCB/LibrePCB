@@ -75,7 +75,7 @@ public:
   // Constructors / Destructor
   WorkspaceSettings(const WorkspaceSettings& other) = delete;
   explicit WorkspaceSettings(QObject* parent = nullptr);
-  ~WorkspaceSettings() noexcept;
+  ~WorkspaceSettings() noexcept override;
 
   /**
    * @brief Load settings from file

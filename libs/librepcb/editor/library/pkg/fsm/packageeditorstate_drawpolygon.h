@@ -50,7 +50,7 @@ public:
   PackageEditorState_DrawPolygon(const PackageEditorState_DrawPolygon& other) =
       delete;
   explicit PackageEditorState_DrawPolygon(Context& context) noexcept;
-  ~PackageEditorState_DrawPolygon() noexcept;
+  ~PackageEditorState_DrawPolygon() noexcept override;
 
   // Operator Overloadings
   PackageEditorState_DrawPolygon& operator=(

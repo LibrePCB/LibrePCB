@@ -51,8 +51,7 @@ QWidget* CheckableItemsDelegate::createEditor(
     QWidget* parent, const QStyleOptionViewItem& option,
     const QModelIndex& index) const {
   Q_UNUSED(option);
-  auto items =
-      index.data(Qt::UserRole).value<CheckableItemsEditorWidget::ItemList>();
+  Q_UNUSED(index);
   CheckableItemsEditorWidget* edt = new CheckableItemsEditorWidget(parent);
   edt->setWindowFlags(Qt::Popup | Qt::FramelessWindowHint);
   return edt;

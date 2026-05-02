@@ -38,6 +38,8 @@
 
 #include <QtTest>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -52,7 +54,7 @@ using ::librepcb::tests::TestHelpers;
  ******************************************************************************/
 
 class AddComponentDialogTest : public ::testing::Test {
-protected:
+public:
   FilePath mWsDir;
   std::unique_ptr<WorkspaceLibraryDb> mWsDb;
   std::unique_ptr<SQLiteDatabase> mDb;
@@ -62,13 +64,13 @@ protected:
   AddComponentDialogTest() : mWsDir(FilePath::getRandomTempPath()) {
     QSettings().clear();
     FileUtils::makePath(mWsDir);
-    mWsDb.reset(new WorkspaceLibraryDb(mWsDir));
-    mDb.reset(new SQLiteDatabase(mWsDb->getFilePath()));
-    mWriter.reset(new WorkspaceLibraryDbWriter(mWsDir, *mDb));
-    mFs.reset(new TransactionalFileSystem(mWsDir, true));
+    mWsDb = std::make_unique<WorkspaceLibraryDb>(mWsDir);
+    mDb = std::make_unique<SQLiteDatabase>(mWsDb->getFilePath());
+    mWriter = std::make_unique<WorkspaceLibraryDbWriter>(mWsDir, *mDb);
+    mFs = std::make_shared<TransactionalFileSystem>(mWsDir, true);
   }
 
-  ~AddComponentDialogTest() {
+  ~AddComponentDialogTest() override {
     mFs.reset();
     mWriter.reset();
     mDb.reset();

@@ -72,8 +72,8 @@ FileFormatMigration::~FileFormatMigration() noexcept {
  *  Static Methods
  ******************************************************************************/
 
-QList<std::shared_ptr<FileFormatMigration>> FileFormatMigration::getMigrations(
-    const Version& fileFormat) {
+const QList<std::shared_ptr<FileFormatMigration>>
+    FileFormatMigration::getMigrations(const Version& fileFormat) {
   QList<std::shared_ptr<FileFormatMigration>> migrations;
   if (fileFormat <= Version::fromString("0.1")) {
     migrations.append(std::make_shared<FileFormatMigrationV01>());

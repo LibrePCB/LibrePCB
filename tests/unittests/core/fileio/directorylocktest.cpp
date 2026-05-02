@@ -41,7 +41,7 @@ namespace tests {
 
 class DirectoryLockTest : public ::testing::Test {
 protected:
-  virtual void SetUp() override {
+  void SetUp() override {
     // create temporary, empty directory
     mTempDir = FilePath::getRandomTempPath();
     mTempLockFilePath = FilePath(mTempDir.toStr() % "/.lock");
@@ -51,7 +51,7 @@ protected:
     FileUtils::makePath(mTempDir);
   }
 
-  virtual void TearDown() override {
+  void TearDown() override {
     // remove temporary directory
     FileUtils::removeDirRecursively(mTempDir);  // can throw
   }
@@ -392,8 +392,7 @@ TEST_F(DirectoryLockTest, testLockFileContent) {
   QDateTime lockTime =
       QDateTime::fromString(QString(lines.value(5)), Qt::ISODate);
   EXPECT_TRUE(lockTime.isValid());
-  EXPECT_NEAR(lockTime.toMSecsSinceEpoch(),
-              QDateTime::currentDateTime().toMSecsSinceEpoch(),
+  EXPECT_NEAR(lockTime.toMSecsSinceEpoch(), QDateTime::currentMSecsSinceEpoch(),
               10000);  // allow up to 10 seconds difference
 }
 

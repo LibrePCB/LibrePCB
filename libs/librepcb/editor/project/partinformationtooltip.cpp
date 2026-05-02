@@ -135,13 +135,11 @@ void PartInformationToolTip::setProviderInfo(const QString& name,
   } else {
     const QString provider =
         QString("<a href=\"%1\" style=\"color:black\">%2</a>")
-            .arg(url.toString())
-            .arg(name.toHtmlEscaped());
+            .arg(url.toString(), name.toHtmlEscaped());
     text = tr("This information is kindly provided by %1 through the "
               "LibrePCB&nbsp;API, see details "
               "<a href=\"%2\" style=\"color:black;\">here</a>.")
-               .arg(provider)
-               .arg(infoUrl.toString().toHtmlEscaped());
+               .arg(provider, infoUrl.toString().toHtmlEscaped());
     text += " ";
     text += tr(
         "For more information about the part, click on the source logo above.");
@@ -167,11 +165,11 @@ void PartInformationToolTip::showPart(
       (info->manufacturer != mPartInfo->manufacturer)) {
     mPartInfo = info;
 
-    QString header = QString(
-                         "<span style=\"font-size:large\"><b><a href=\"%1\" "
-                         "style=\"color:black\">%2</a></b></span>")
-                         .arg(info->productUrl.toString())
-                         .arg(info->mpn.toHtmlEscaped());
+    QString header =
+        QString(
+            "<span style=\"font-size:large\"><b><a href=\"%1\" "
+            "style=\"color:black\">%2</a></b></span>")
+            .arg(info->productUrl.toString(), info->mpn.toHtmlEscaped());
     if (!info->manufacturer.isEmpty()) {
       header +=
           QString("&nbsp;&nbsp;%1").arg(info->manufacturer.toHtmlEscaped());
@@ -181,31 +179,30 @@ void PartInformationToolTip::showPart(
     QString details;
     if (!info->getStatusTr().isEmpty()) {
       details += QString("<div><span style=\"color:%1\">⬤</span> %2</div>")
-                     .arg(info->getStatusColorName())
-                     .arg(info->getStatusTr().toHtmlEscaped());
+                     .arg(info->getStatusColorName(),
+                          info->getStatusTr().toHtmlEscaped());
     }
     if (!info->getAvailabilityTr().isEmpty()) {
       details += QString("<div><span style=\"color:%1\">⬤</span> %2</div>")
-                     .arg(info->getAvailabilityColorName())
-                     .arg(info->getAvailabilityTr().toHtmlEscaped());
+                     .arg(info->getAvailabilityColorName(),
+                          info->getAvailabilityTr().toHtmlEscaped());
     }
     if (!info->prices.isEmpty()) {
       details += "<div><table>";
-      foreach (int quantity, info->prices.keys().mid(0, 3)) {
+      foreach (int quantity, info->prices.keys().mid(0, 3)) {  // NOLINT
         details +=
             QString("<tr><td align=\"right\">%1 %2:</td><td>%3</td></tr>")
-                .arg(PartInformation::formatQuantity(locale(), quantity))
-                //: Abbreviation for "pieces", keep it very short!
-                .arg(tr("pcs").toHtmlEscaped())
-                .arg(info->getPriceStr(quantity, "", " USD").toHtmlEscaped());
+                .arg(PartInformation::formatQuantity(locale(), quantity),
+                     //: Abbreviation for "pieces", keep it very short!
+                     tr("pcs").toHtmlEscaped(),
+                     info->getPriceStr(quantity, "", " USD").toHtmlEscaped());
       }
       details += "</table></div>";
     }
     foreach (const auto& resource, info->resources.mid(0, 2)) {
       details +=
           QString("<div>➤ <a href=\"%1\" style=\"color:black\">%2</a></div>")
-              .arg(resource.url.toString())
-              .arg(resource.name.toHtmlEscaped());
+              .arg(resource.url.toString(), resource.name.toHtmlEscaped());
     }
     mUi->lblDetails->setText(details);
 

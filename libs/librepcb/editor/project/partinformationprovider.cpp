@@ -528,7 +528,7 @@ void PartInformationProvider::removeOutdatedInformation() noexcept {
   int count = 0;
   const qint64 timestamp = QDateTime::currentSecsSinceEpoch();
   for (auto it = mCache.begin(); it != mCache.end(); it++) {
-    for (const QString& source : it->keys()) {
+    for (const QString& source : it->keys()) {  // NOLINT
       const qint64 lifetimeSecs = timestamp - it->value(source)->timestamp;
       if (lifetimeSecs > 6 * 3600) {  // 6 hours
         it->remove(source);
@@ -579,7 +579,7 @@ void PartInformationProvider::saveCacheToDisk() noexcept {
     std::unique_ptr<SExpression> root =
         SExpression::createList("librepcb_parts_cache");
     root->ensureLineBreak();
-    for (const auto& map : mCache) {
+    for (const auto& map : std::as_const(mCache)) {
       for (auto it = map.begin(); it != map.end(); it++) {
         it.value()->serialize(root->appendList("part"));
         root->ensureLineBreak();

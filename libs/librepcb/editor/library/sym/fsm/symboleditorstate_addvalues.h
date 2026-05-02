@@ -50,7 +50,7 @@ public:
   SymbolEditorState_AddValues(const SymbolEditorState_AddValues& other) =
       delete;
   explicit SymbolEditorState_AddValues(const Context& context) noexcept;
-  ~SymbolEditorState_AddValues() noexcept;
+  ~SymbolEditorState_AddValues() noexcept override;
 
   // Operator Overloadings
   SymbolEditorState_AddValues& operator=(

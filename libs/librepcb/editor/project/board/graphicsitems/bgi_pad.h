@@ -62,7 +62,7 @@ public:
   BGI_Pad(BI_Pad& pad, std::weak_ptr<BGI_Device> deviceItem,
           const GraphicsLayerList& layers,
           std::shared_ptr<const BoardGraphicsScene::Context> context) noexcept;
-  virtual ~BGI_Pad() noexcept;
+  ~BGI_Pad() noexcept override;
 
   // General Methods
   BI_Pad& getPad() noexcept { return mPad; }
@@ -81,8 +81,8 @@ private:  // Methods
   void padEdited(const BI_Pad& obj, BI_Pad::Event event) noexcept;
   void deviceGraphicsItemEdited(const BGI_Device& obj,
                                 BGI_Device::Event event) noexcept;
-  virtual QVariant itemChange(GraphicsItemChange change,
-                              const QVariant& value) noexcept override;
+  QVariant itemChange(GraphicsItemChange change,
+                      const QVariant& value) noexcept override;
   void updateLayer() noexcept;
 
 private:  // Data

@@ -50,7 +50,7 @@ class GraphicsLayerList final : public QObject {
 public:
   // Constructors / Destructor
   GraphicsLayerList() = delete;
-  ~GraphicsLayerList() noexcept;
+  ~GraphicsLayerList() noexcept override;
 
   // Getters
   std::shared_ptr<GraphicsLayer> get(const ColorRole& role) noexcept;

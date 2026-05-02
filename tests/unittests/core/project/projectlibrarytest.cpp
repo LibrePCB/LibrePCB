@@ -28,6 +28,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -39,7 +41,7 @@ namespace tests {
  ******************************************************************************/
 
 class ProjectLibraryTest : public ::testing::Test {
-protected:
+public:
   FilePath mTempDir;
   FilePath mLibDir;
   std::shared_ptr<TransactionalFileSystem> mTempFs;
@@ -57,9 +59,9 @@ protected:
     mLibFs = TransactionalFileSystem::openRW(mLibDir);
 
     // create symbol inside project library
-    mExistingSymbol.reset(new Symbol(
+    mExistingSymbol = std::make_unique<Symbol>(
         Uuid::createRandom(), Version::fromString("1"), "",
-        QDateTime::currentDateTime(), ElementName("Existing Symbol"), "", ""));
+        QDateTime::currentDateTime(), ElementName("Existing Symbol"), "", "");
     TransactionalDirectory libSymDir(mLibFs, "sym");
     mExistingSymbol->saveIntoParentDirectory(libSymDir);
     mLibFs->save();
@@ -70,9 +72,9 @@ protected:
             .toStr());
 
     // create symbol outside the project library (emulating workspace library)
-    mNewSymbol.reset(new Symbol(Uuid::createRandom(), Version::fromString("1"),
-                                "", QDateTime::currentDateTime(),
-                                ElementName("New Symbol"), "", ""));
+    mNewSymbol = std::make_unique<Symbol>(
+        Uuid::createRandom(), Version::fromString("1"), "",
+        QDateTime::currentDateTime(), ElementName("New Symbol"), "", "");
     TransactionalDirectory tempSymDir(mTempFs);
     mNewSymbol->saveIntoParentDirectory(tempSymDir);
     mTempFs->save();
@@ -93,11 +95,11 @@ protected:
     mNewSymbolFile.setCaching(false);
   }
 
-  virtual ~ProjectLibraryTest() { QDir(mTempDir.toStr()).removeRecursively(); }
+  ~ProjectLibraryTest() override { QDir(mTempDir.toStr()).removeRecursively(); }
 
   Symbol* getFirstSymbol(ProjectLibrary& lib) {
     if (lib.getSymbols().isEmpty()) throw LogicError(__FILE__, __LINE__);
-    return lib.getSymbols().values().first();
+    return lib.getSymbols().values().constFirst();
   }
 
   void saveToDisk() {
@@ -112,8 +114,7 @@ protected:
 
 TEST_F(ProjectLibraryTest, testLoadSymbol) {
   {
-    ProjectLibrary lib(std::unique_ptr<TransactionalDirectory>(
-        new TransactionalDirectory(mLibFs)));
+    ProjectLibrary lib(std::make_unique<TransactionalDirectory>(mLibFs));
     lib.addSymbol(*mExistingSymbol.release());
     EXPECT_EQ(1, lib.getSymbols().count());
     EXPECT_TRUE(mExistingSymbolFile.exists());
@@ -123,8 +124,7 @@ TEST_F(ProjectLibraryTest, testLoadSymbol) {
 
 TEST_F(ProjectLibraryTest, testAddSymbol) {
   {
-    ProjectLibrary lib(std::unique_ptr<TransactionalDirectory>(
-        new TransactionalDirectory(mLibFs)));
+    ProjectLibrary lib(std::make_unique<TransactionalDirectory>(mLibFs));
     lib.addSymbol(*mNewSymbol.release());
     EXPECT_EQ(1, lib.getSymbols().count());
     EXPECT_TRUE(mExistingSymbolFile.exists());
@@ -138,8 +138,7 @@ TEST_F(ProjectLibraryTest, testAddSymbol) {
 
 TEST_F(ProjectLibraryTest, testAddSymbol_Save) {
   {
-    ProjectLibrary lib(std::unique_ptr<TransactionalDirectory>(
-        new TransactionalDirectory(mLibFs)));
+    ProjectLibrary lib(std::make_unique<TransactionalDirectory>(mLibFs));
     lib.addSymbol(*mNewSymbol.release());
     saveToDisk();
     EXPECT_EQ(1, lib.getSymbols().count());
@@ -154,8 +153,7 @@ TEST_F(ProjectLibraryTest, testAddSymbol_Save) {
 
 TEST_F(ProjectLibraryTest, testAddRemoveSymbol) {
   {
-    ProjectLibrary lib(std::unique_ptr<TransactionalDirectory>(
-        new TransactionalDirectory(mLibFs)));
+    ProjectLibrary lib(std::make_unique<TransactionalDirectory>(mLibFs));
     lib.addSymbol(*mNewSymbol);
     lib.removeSymbol(*mNewSymbol.release());
     EXPECT_EQ(0, lib.getSymbols().count());
@@ -170,8 +168,7 @@ TEST_F(ProjectLibraryTest, testAddRemoveSymbol) {
 
 TEST_F(ProjectLibraryTest, testAddRemoveSymbol_Save) {
   {
-    ProjectLibrary lib(std::unique_ptr<TransactionalDirectory>(
-        new TransactionalDirectory(mLibFs)));
+    ProjectLibrary lib(std::make_unique<TransactionalDirectory>(mLibFs));
     lib.addSymbol(*mNewSymbol);
     lib.removeSymbol(*mNewSymbol.release());
     saveToDisk();
@@ -187,8 +184,7 @@ TEST_F(ProjectLibraryTest, testAddRemoveSymbol_Save) {
 
 TEST_F(ProjectLibraryTest, testRemoveSymbol) {
   {
-    ProjectLibrary lib(std::unique_ptr<TransactionalDirectory>(
-        new TransactionalDirectory(mLibFs)));
+    ProjectLibrary lib(std::make_unique<TransactionalDirectory>(mLibFs));
     lib.addSymbol(*mExistingSymbol.release());
     lib.removeSymbol(*getFirstSymbol(lib));
     EXPECT_EQ(0, lib.getSymbols().count());
@@ -199,8 +195,7 @@ TEST_F(ProjectLibraryTest, testRemoveSymbol) {
 
 TEST_F(ProjectLibraryTest, testRemoveSymbol_Save) {
   {
-    ProjectLibrary lib(std::unique_ptr<TransactionalDirectory>(
-        new TransactionalDirectory(mLibFs)));
+    ProjectLibrary lib(std::make_unique<TransactionalDirectory>(mLibFs));
     lib.addSymbol(*mExistingSymbol.release());
     lib.removeSymbol(*getFirstSymbol(lib));
     saveToDisk();
@@ -214,8 +209,7 @@ TEST_F(ProjectLibraryTest, testRemoveSymbol_Save) {
 
 TEST_F(ProjectLibraryTest, testRemoveAddSymbol) {
   {
-    ProjectLibrary lib(std::unique_ptr<TransactionalDirectory>(
-        new TransactionalDirectory(mLibFs)));
+    ProjectLibrary lib(std::make_unique<TransactionalDirectory>(mLibFs));
     lib.addSymbol(*mExistingSymbol.release());
     Symbol* sym = getFirstSymbol(lib);
     lib.removeSymbol(*sym);
@@ -228,8 +222,7 @@ TEST_F(ProjectLibraryTest, testRemoveAddSymbol) {
 
 TEST_F(ProjectLibraryTest, testRemoveAddSymbol_Save) {
   {
-    ProjectLibrary lib(std::unique_ptr<TransactionalDirectory>(
-        new TransactionalDirectory(mLibFs)));
+    ProjectLibrary lib(std::make_unique<TransactionalDirectory>(mLibFs));
     lib.addSymbol(*mExistingSymbol.release());
     Symbol* sym = getFirstSymbol(lib);
     lib.removeSymbol(*sym);
@@ -242,8 +235,7 @@ TEST_F(ProjectLibraryTest, testRemoveAddSymbol_Save) {
 }
 
 TEST_F(ProjectLibraryTest, testSavingToExistingEmptyDirectory) {
-  ProjectLibrary lib(std::unique_ptr<TransactionalDirectory>(
-      new TransactionalDirectory(mLibFs)));
+  ProjectLibrary lib(std::make_unique<TransactionalDirectory>(mLibFs));
 
   // already create the destination directory to see if saving still works
   EXPECT_FALSE(mNewSymbolFile.dir().exists());

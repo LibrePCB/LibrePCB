@@ -48,7 +48,7 @@ class CmdBoardHoleAdd final : public UndoCommand {
 public:
   // Constructors / Destructor
   explicit CmdBoardHoleAdd(BI_Hole& hole) noexcept;
-  ~CmdBoardHoleAdd() noexcept;
+  ~CmdBoardHoleAdd() noexcept override;
 
   // Getters
   BI_Hole* getHole() const noexcept { return mHole; }

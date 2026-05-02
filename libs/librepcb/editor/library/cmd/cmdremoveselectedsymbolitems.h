@@ -52,7 +52,7 @@ public:
   CmdRemoveSelectedSymbolItems(const CmdRemoveSelectedSymbolItems& other) =
       delete;
   CmdRemoveSelectedSymbolItems(Symbol& sym, SymbolGraphicsItem& item) noexcept;
-  ~CmdRemoveSelectedSymbolItems() noexcept;
+  ~CmdRemoveSelectedSymbolItems() noexcept override;
 
   // Operator Overloadings
   CmdRemoveSelectedSymbolItems& operator=(

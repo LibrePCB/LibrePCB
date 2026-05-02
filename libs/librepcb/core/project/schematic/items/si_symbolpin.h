@@ -74,7 +74,7 @@ public:
   SI_SymbolPin(const SI_SymbolPin& other) = delete;
   explicit SI_SymbolPin(SI_Symbol& symbol, const SymbolPin& pin,
                         const ComponentPinSignalMapItem& item);
-  ~SI_SymbolPin();
+  ~SI_SymbolPin() override;
 
   // Getters
 

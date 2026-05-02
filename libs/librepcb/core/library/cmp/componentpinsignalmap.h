@@ -129,7 +129,7 @@ public:
   ComponentPinSignalMapHelpers() = delete;  // disable instantiation
 
   static ComponentPinSignalMap create(
-      const QSet<Uuid> pins,
+      const QSet<Uuid>& pins,
       const CmpSigPinDisplayType& display =
           CmpSigPinDisplayType::componentSignal()) noexcept {
     ComponentPinSignalMap map;

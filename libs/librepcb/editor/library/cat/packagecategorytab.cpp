@@ -343,7 +343,7 @@ void PackageCategoryTab::refreshUiData() noexcept {
     CategoryTreeBuilder<PackageCategory> builder(
         mEditor.getWorkspace().getLibraryDb(),
         mEditor.getWorkspace().getSettings().libraryLocaleOrder.get(), true);
-    for (auto item : builder.buildTree(mCategory->getParentUuid())) {
+    for (const auto& item : builder.buildTree(mCategory->getParentUuid())) {
       parents.push_back(q2s(item));
     }
   } catch (const Exception& e) {

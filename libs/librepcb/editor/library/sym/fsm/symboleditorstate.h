@@ -63,7 +63,7 @@ public:
   SymbolEditorState() = delete;
   SymbolEditorState(const SymbolEditorState& other) = delete;
   explicit SymbolEditorState(const Context& context) noexcept;
-  virtual ~SymbolEditorState() noexcept;
+  ~SymbolEditorState() noexcept override;
 
   // General Methods
   virtual bool entry() noexcept { return true; }

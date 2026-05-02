@@ -69,7 +69,7 @@ public:
   const PadHoleList& getHoles() const noexcept { return mHoles; }
 
   // General Methods
-  QVector<Path> toOutlines() const;
+  const QVector<Path> toOutlines() const;
   QPainterPath toQPainterPathPx() const noexcept;
   QPainterPath toFilledQPainterPathPx() const noexcept;
   QPainterPath toHolesQPainterPathPx() const noexcept;

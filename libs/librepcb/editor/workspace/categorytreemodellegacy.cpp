@@ -29,6 +29,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -148,12 +150,12 @@ void CategoryTreeModelLegacy::update() noexcept {
   // Add virtual category for library elements with no category assigned.
   try {
     if (containsItems(std::nullopt)) {
-      items.append(std::shared_ptr<Item>(
-          new Item{std::weak_ptr<Item>(),
-                   std::nullopt,
-                   tr("(Without Category)"),
-                   tr("All library elements without a category"),
-                   {}}));
+      items.append(std::make_shared<Item>(
+          Item{std::weak_ptr<Item>(),
+               std::nullopt,
+               tr("(Without Category)"),
+               tr("All library elements without a category"),
+               {}}));
     }
   } catch (const Exception& e) {
     qCritical() << "Failed to update category tree model:" << e.getMsg();

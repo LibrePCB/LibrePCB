@@ -124,7 +124,7 @@ void GraphicsLayersModel::updateEnabledLayers() noexcept {
   mIndices.clear();
   mEnabledLayers.clear();
   if (mList) {
-    for (auto layer : mList->all()) {
+    for (const auto& layer : mList->all()) {
       if (layer->isEnabled()) {
         mIndices[layer.get()] = mEnabledLayers.count();
         mEnabledLayers.append(layer);

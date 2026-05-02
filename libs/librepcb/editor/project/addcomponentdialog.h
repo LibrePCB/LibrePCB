@@ -104,7 +104,7 @@ public:
                               const QStringList& localeOrder,
                               const QStringList& normOrder,
                               QWidget* parent = nullptr);
-  ~AddComponentDialog() noexcept;
+  ~AddComponentDialog() noexcept override;
 
   // Getters
   std::shared_ptr<const Component> getSelectedComponent() const noexcept {
@@ -143,10 +143,10 @@ public:
   void selectComponentByKeyword(
       const QString keyword,
       const std::optional<Uuid>& selectedDevice = std::nullopt) noexcept;
-  virtual bool eventFilter(QObject* obj, QEvent* e) noexcept override;
+  bool eventFilter(QObject* obj, QEvent* e) noexcept override;
 
 protected:
-  virtual bool event(QEvent* event) noexcept override;
+  bool event(QEvent* event) noexcept override;
 
 private slots:
   void searchEditTextChanged(const QString& text) noexcept;
@@ -176,7 +176,7 @@ private:
   void addPartItem(std::shared_ptr<Part> part, QTreeWidgetItem* parent);
   void schedulePartsInformationUpdate() noexcept;
   void updatePartsInformation(int downloadDelayMs = 0) noexcept;
-  virtual void accept() noexcept override;
+  void accept() noexcept override;
 
   // General
   const WorkspaceLibraryDb& mDb;

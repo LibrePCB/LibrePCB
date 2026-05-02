@@ -36,6 +36,8 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -116,8 +118,7 @@ std::unique_ptr<FootprintClipboardData> FootprintClipboardData::fromMimeData(
   if (!content.isNull()) {
     const std::unique_ptr<const SExpression> root =
         SExpression::parse(content, FilePath());
-    return std::unique_ptr<FootprintClipboardData>(
-        new FootprintClipboardData(*root));  // can throw
+    return std::make_unique<FootprintClipboardData>(*root);  // can throw
   } else {
     return nullptr;
   }

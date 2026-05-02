@@ -148,7 +148,7 @@ DirectoryLock::LockStatus DirectoryLock::getStatus(
  *  General Methods
  ******************************************************************************/
 
-void DirectoryLock::tryLock(LockHandlerCallback lockHandler) {
+void DirectoryLock::tryLock(const LockHandlerCallback& lockHandler) {
   QString user;
   LockStatus status = getStatus(&user);  // can throw
   switch (status) {

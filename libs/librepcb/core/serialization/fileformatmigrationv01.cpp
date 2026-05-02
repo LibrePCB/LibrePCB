@@ -1035,11 +1035,11 @@ void FileFormatMigrationV01::upgradeBoardDesignRules(SExpression& root) {
     name.replace("creammask_", "solderpaste_");
     child->setName(name);
   }
-  for (const QString param : {"stopmask_clearance", "solderpaste_clearance",
-                              "pad_annular_ring", "via_annular_ring"}) {
+  for (const char* param : {"stopmask_clearance", "solderpaste_clearance",
+                            "pad_annular_ring", "via_annular_ring"}) {
     SExpression& newChild = node.appendList(param);
-    for (const QString property : {"ratio", "min", "max"}) {
-      SExpression& oldChild = node.getChild(param % "_" % property);
+    for (const char* property : {"ratio", "min", "max"}) {
+      SExpression& oldChild = node.getChild(QString(param) % "_" % property);
       newChild.appendChild(property, oldChild.getChild("@0"));
       node.removeChild(oldChild);
     }

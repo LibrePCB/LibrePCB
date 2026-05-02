@@ -49,7 +49,7 @@ class CmdBoardStrokeTextEdit final : public UndoCommand {
 public:
   // Constructors / Destructor
   explicit CmdBoardStrokeTextEdit(BI_StrokeText& text) noexcept;
-  ~CmdBoardStrokeTextEdit() noexcept;
+  ~CmdBoardStrokeTextEdit() noexcept override;
 
   // Getters
   BI_StrokeText& getObj() const noexcept { return mText; }

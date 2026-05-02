@@ -57,7 +57,7 @@ public:
   explicit OutputJobHomeWidget(const WorkspaceSettings& settings,
                                const Project& project,
                                QWidget* parent = nullptr) noexcept;
-  ~OutputJobHomeWidget() noexcept;
+  ~OutputJobHomeWidget() noexcept override;
 
   // Operator Overloads
   OutputJobHomeWidget& operator=(const OutputJobHomeWidget& rhs) = delete;

@@ -50,7 +50,7 @@ class CmdNetClassAdd final : public UndoCommand {
 public:
   // Constructors / Destructor
   CmdNetClassAdd(Circuit& circuit, const ElementName& name) noexcept;
-  ~CmdNetClassAdd() noexcept;
+  ~CmdNetClassAdd() noexcept override;
 
   // Getters
   NetClass* getNetClass() const noexcept { return mNetClass; }

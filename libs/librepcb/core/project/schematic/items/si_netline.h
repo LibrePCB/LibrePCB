@@ -78,7 +78,7 @@ public:
   SI_NetLine(const SI_NetLine& other) = delete;
   SI_NetLine(SI_NetSegment& segment, const Uuid& uuid, SI_NetLineAnchor& a,
              SI_NetLineAnchor& b, const UnsignedLength& width);
-  ~SI_NetLine() noexcept;
+  ~SI_NetLine() noexcept override;
 
   // Getters
   SI_NetSegment& getNetSegment() const noexcept { return mNetSegment; }

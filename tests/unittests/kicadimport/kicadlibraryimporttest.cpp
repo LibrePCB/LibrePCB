@@ -28,6 +28,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -40,16 +42,16 @@ namespace tests {
  ******************************************************************************/
 
 class KiCadLibraryImportTest : public ::testing::Test {
-protected:
+public:
   FilePath mWsDir;
   std::unique_ptr<WorkspaceLibraryDb> mWsDb;
 
   KiCadLibraryImportTest() : mWsDir(FilePath::getRandomTempPath()) {
     FileUtils::makePath(mWsDir);
-    mWsDb.reset(new WorkspaceLibraryDb(mWsDir));
+    mWsDb = std::make_unique<WorkspaceLibraryDb>(mWsDir);
   }
 
-  virtual ~KiCadLibraryImportTest() {
+  ~KiCadLibraryImportTest() override {
     QDir(mWsDir.toStr()).removeRecursively();
   }
 

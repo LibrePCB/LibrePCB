@@ -58,7 +58,7 @@ public:
       Workspace& workspace, Project& project, const Uuid& component,
       const Uuid& symbolVariant,
       const std::optional<ComponentAssemblyOptionList>& options) noexcept;
-  ~CmdAddComponentToCircuit() noexcept;
+  ~CmdAddComponentToCircuit() noexcept override;
 
   // Getters
   ComponentInstance* getComponentInstance() const noexcept;

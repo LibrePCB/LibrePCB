@@ -54,7 +54,7 @@ public:
   Organization(const Uuid& uuid, const Version& version, const QString& author,
                const QDateTime& created, const ElementName& name_en_US,
                const QString& description_en_US, const QString& keywords_en_US);
-  ~Organization() noexcept;
+  ~Organization() noexcept override;
 
   // Getters
   const QByteArray& getLogoPng() const noexcept { return mLogoPng; }
@@ -105,8 +105,8 @@ public:
 
   // General Methods
   void duplicateFrom(const Organization& other);
-  virtual RuleCheckMessageList runChecks() const override;
-  virtual void save() override;
+  RuleCheckMessageList runChecks() const override;
+  void save() override;
 
   // Operator Overloadings
   Organization& operator=(const Organization& rhs) = delete;
@@ -126,7 +126,7 @@ signals:
   void pcbDesignRulesModified();
 
 protected:  // Methods
-  virtual void serialize(SExpression& root) const override;
+  void serialize(SExpression& root) const override;
 
 private:  // Methods
   Organization(std::unique_ptr<TransactionalDirectory> directory,

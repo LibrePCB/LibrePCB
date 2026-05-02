@@ -48,12 +48,14 @@ class FileSystem : public QObject {
 public:
   // Constructors / Destructor
   FileSystem(QObject* parent = nullptr) noexcept : QObject(parent) {}
-  virtual ~FileSystem() noexcept {}
+  ~FileSystem() noexcept override {}
 
   // File Operations
   virtual FilePath getAbsPath(const QString& path = "") const noexcept = 0;
-  virtual QStringList getDirs(const QString& path = "") const noexcept = 0;
-  virtual QStringList getFiles(const QString& path = "") const noexcept = 0;
+  virtual const QStringList getDirs(
+      const QString& path = "") const noexcept = 0;
+  virtual const QStringList getFiles(
+      const QString& path = "") const noexcept = 0;
   virtual bool fileExists(const QString& path) const noexcept = 0;
   virtual QByteArray read(const QString& path) const = 0;
   virtual QByteArray readIfExists(const QString& path) const = 0;

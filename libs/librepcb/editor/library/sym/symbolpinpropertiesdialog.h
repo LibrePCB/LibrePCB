@@ -64,7 +64,7 @@ public:
                             UndoStack& undoStack, const LengthUnit& lengthUnit,
                             const QString& settingsPrefix,
                             QWidget* parent = nullptr) noexcept;
-  ~SymbolPinPropertiesDialog() noexcept;
+  ~SymbolPinPropertiesDialog() noexcept override;
 
   // Setters
   void setReadOnly(bool readOnly) noexcept;

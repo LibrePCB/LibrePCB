@@ -50,7 +50,7 @@ public:
   // Constructors / Destructor
   explicit RatioEdit(QWidget* parent = nullptr) noexcept;
   RatioEdit(const RatioEdit& other) = delete;
-  virtual ~RatioEdit() noexcept;
+  ~RatioEdit() noexcept override;
 
   // Getters
   const Ratio& getValue() const noexcept { return mValue; }

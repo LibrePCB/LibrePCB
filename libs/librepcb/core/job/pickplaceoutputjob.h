@@ -64,11 +64,11 @@ public:
   PickPlaceOutputJob() noexcept;
   PickPlaceOutputJob(const PickPlaceOutputJob& other) noexcept;
   explicit PickPlaceOutputJob(const SExpression& node);
-  virtual ~PickPlaceOutputJob() noexcept;
+  ~PickPlaceOutputJob() noexcept override;
 
   // Getters
-  virtual QString getTypeTr() const noexcept override;
-  virtual QIcon getTypeIcon() const noexcept override;
+  QString getTypeTr() const noexcept override;
+  QIcon getTypeIcon() const noexcept override;
   Technologies getTechnologies() const noexcept { return mTechnologies; }
   bool getIncludeComment() const noexcept { return mIncludeComment; }
   const BoardSet& getBoards() const noexcept { return mBoards; }
@@ -101,14 +101,14 @@ public:
   static QString getTypeTrStatic() noexcept {
     return tr("Pick&Place") % " (*.csv)";
   }
-  virtual std::shared_ptr<OutputJob> cloneShared() const noexcept override;
+  std::shared_ptr<OutputJob> cloneShared() const noexcept override;
 
   // Operator Overloadings
   PickPlaceOutputJob& operator=(const PickPlaceOutputJob& rhs) = delete;
 
 private:  // Methods
-  virtual void serializeDerived(SExpression& root) const override;
-  virtual bool equals(const OutputJob& rhs) const noexcept override;
+  void serializeDerived(SExpression& root) const override;
+  bool equals(const OutputJob& rhs) const noexcept override;
 
 private:  // Data
   Technologies mTechnologies;

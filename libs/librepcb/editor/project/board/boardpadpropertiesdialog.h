@@ -62,7 +62,7 @@ public:
                            const LengthUnit& lengthUnit,
                            const QString& settingsPrefix,
                            QWidget* parent = nullptr) noexcept;
-  ~BoardPadPropertiesDialog() noexcept;
+  ~BoardPadPropertiesDialog() noexcept override;
 
   // Operator Overloadings
   BoardPadPropertiesDialog& operator=(const BoardPadPropertiesDialog& rhs) =

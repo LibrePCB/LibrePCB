@@ -52,7 +52,7 @@ class CmdProjectEdit final : public UndoCommand {
 public:
   // Constructors / Destructor
   explicit CmdProjectEdit(Project& project) noexcept;
-  ~CmdProjectEdit() noexcept;
+  ~CmdProjectEdit() noexcept override;
 
   // Setters
   void setName(const ElementName& newName) noexcept;

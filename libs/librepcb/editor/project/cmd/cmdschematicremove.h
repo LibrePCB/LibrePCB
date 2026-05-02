@@ -48,7 +48,7 @@ class CmdSchematicRemove final : public UndoCommand {
 public:
   // Constructors / Destructor
   CmdSchematicRemove(Project& project, Schematic& schematic) noexcept;
-  ~CmdSchematicRemove() noexcept;
+  ~CmdSchematicRemove() noexcept override;
 
 private:
   // Private Methods

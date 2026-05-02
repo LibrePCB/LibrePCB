@@ -52,7 +52,7 @@ public:
   CmdBoardZoneEdit() = delete;
   CmdBoardZoneEdit(const CmdBoardZoneEdit& other) = delete;
   explicit CmdBoardZoneEdit(BI_Zone& polygon) noexcept;
-  ~CmdBoardZoneEdit() noexcept;
+  ~CmdBoardZoneEdit() noexcept override;
 
   // Setters
   void setLayers(const QSet<const Layer*>& layers, bool immediate);

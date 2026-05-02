@@ -51,7 +51,7 @@ public:
   // Constructors / Destructor
   CmdProjectLibraryAddElement(ProjectLibrary& library,
                               ElementType& element) noexcept;
-  ~CmdProjectLibraryAddElement() noexcept;
+  ~CmdProjectLibraryAddElement() noexcept override;
 
 private:
   // Private Methods

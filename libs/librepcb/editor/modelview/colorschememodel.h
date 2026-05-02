@@ -49,7 +49,7 @@ public:
   ColorSchemeModel() = delete;
   ColorSchemeModel(const ColorSchemeModel& other) = delete;
   explicit ColorSchemeModel(std::shared_ptr<UserColorScheme> scheme) noexcept;
-  ~ColorSchemeModel() noexcept;
+  ~ColorSchemeModel() noexcept override;
 
   // Implementations
   std::size_t row_count() const override;

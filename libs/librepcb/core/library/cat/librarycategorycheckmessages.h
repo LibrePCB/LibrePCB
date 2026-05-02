@@ -47,7 +47,7 @@ public:
   MsgInvalidParent() noexcept;
   MsgInvalidParent(const MsgInvalidParent& other) noexcept
     : RuleCheckMessage(other) {}
-  virtual ~MsgInvalidParent() noexcept {}
+  ~MsgInvalidParent() noexcept override {}
 };
 
 /*******************************************************************************

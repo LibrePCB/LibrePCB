@@ -53,7 +53,7 @@ public:
   CmdChangeBusOfSchematicBusSegment(
       const CmdChangeBusOfSchematicBusSegment& other) = delete;
   CmdChangeBusOfSchematicBusSegment(SI_BusSegment& seg, Bus& newBus) noexcept;
-  ~CmdChangeBusOfSchematicBusSegment() noexcept;
+  ~CmdChangeBusOfSchematicBusSegment() noexcept override;
 
 private:
   /// @copydoc ::librepcb::editor::UndoCommand::performExecute()

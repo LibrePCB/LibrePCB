@@ -47,7 +47,8 @@ FootprintPadPropertiesDialog::FootprintPadPropertiesDialog(
     mUndoStack(undoStack),
     mHoles(mPad.getHoles()),
     mSelectedHoleIndex(-1),
-    mUi(new Ui::FootprintPadPropertiesDialog) {
+    mUi(new Ui::FootprintPadPropertiesDialog),
+    mAutoCustomOutline(mPad.getCustomShapeOutline()) {
   mUi->setupUi(this);
   mUi->edtWidth->configure(lengthUnit, LengthEditBase::Steps::generic(),
                            settingsPrefix % "/width");
@@ -129,7 +130,6 @@ FootprintPadPropertiesDialog::FootprintPadPropertiesDialog(
           &FootprintPadPropertiesDialog::updateShapeDependentWidgets);
 
   // Automatically set/clear custom shape outline to improve user experience.
-  mAutoCustomOutline = mPad.getCustomShapeOutline();
   if (mPad.getShape() != Pad::Shape::Custom) {
     const QVector<Path> outlines = mPad.getGeometry().toOutlines();
     if (!outlines.isEmpty()) {

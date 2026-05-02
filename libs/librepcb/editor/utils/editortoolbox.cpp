@@ -94,9 +94,10 @@ public:
     QSvgRenderer renderer(content);
     const QSize svgSize = renderer.defaultSize().scaled(
         rect.width(), rect.height(), Qt::KeepAspectRatio);
-    const QRectF targetRect(rect.x() + (rect.width() - svgSize.width()) / 2,
-                            rect.y() + (rect.height() - svgSize.height()) / 2,
-                            svgSize.width(), svgSize.height());
+    const QRectF targetRect(
+        rect.x() + (rect.width() - svgSize.width()) / qreal(2),
+        rect.y() + (rect.height() - svgSize.height()) / qreal(2),
+        svgSize.width(), svgSize.height());
     renderer.render(painter, targetRect);
   }
   QPixmap pixmap(const QSize& size, QIcon::Mode mode,
@@ -161,7 +162,7 @@ QString EditorToolbox::toMultiLine(const QString& s) noexcept {
 
 QString EditorToolbox::cleanKeywords(const QString& userInput) noexcept {
   QStringList list;
-  for (QString s : userInput.split(",")) {
+  for (QString s : userInput.split(",")) {  // NOLINT
     s = s.toLower().trimmed();
     if ((!s.isEmpty()) && (!list.contains(s))) {
       list.append(s);

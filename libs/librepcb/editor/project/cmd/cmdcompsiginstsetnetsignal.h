@@ -49,7 +49,7 @@ public:
   // Constructors / Destructor
   CmdCompSigInstSetNetSignal(ComponentSignalInstance& cmpSigInstance,
                              NetSignal* netsignal) noexcept;
-  ~CmdCompSigInstSetNetSignal() noexcept;
+  ~CmdCompSigInstSetNetSignal() noexcept override;
 
 private:
   // Private Methods

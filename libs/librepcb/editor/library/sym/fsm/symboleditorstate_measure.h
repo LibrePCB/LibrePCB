@@ -50,7 +50,7 @@ public:
   SymbolEditorState_Measure() = delete;
   SymbolEditorState_Measure(const SymbolEditorState_Measure& other) = delete;
   explicit SymbolEditorState_Measure(const Context& context) noexcept;
-  ~SymbolEditorState_Measure() noexcept;
+  ~SymbolEditorState_Measure() noexcept override;
 
   // General Methods
   bool entry() noexcept override;

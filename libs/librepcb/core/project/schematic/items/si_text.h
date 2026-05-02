@@ -63,7 +63,7 @@ public:
   SI_Text() = delete;
   SI_Text(const SI_Text& other) = delete;
   SI_Text(Schematic& schematic, const Text& text);
-  ~SI_Text() noexcept;
+  ~SI_Text() noexcept override;
 
   // Getters
   const Uuid& getUuid() const noexcept { return mTextObj.getUuid(); }

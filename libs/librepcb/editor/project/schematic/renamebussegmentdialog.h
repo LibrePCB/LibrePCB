@@ -67,10 +67,10 @@ public:
   RenameBusSegmentDialog(const RenameBusSegmentDialog& other) = delete;
   RenameBusSegmentDialog(UndoStack& undoStack, SI_BusSegment& segment,
                          QWidget* parent = nullptr) noexcept;
-  ~RenameBusSegmentDialog() noexcept;
+  ~RenameBusSegmentDialog() noexcept override;
 
   // General Methods
-  virtual void accept() noexcept override;
+  void accept() noexcept override;
 
   // Operator Overloads
   RenameBusSegmentDialog& operator=(const RenameBusSegmentDialog& rhs) = delete;

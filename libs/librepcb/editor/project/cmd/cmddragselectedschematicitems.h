@@ -62,7 +62,7 @@ public:
   // Constructors / Destructor
   CmdDragSelectedSchematicItems(SchematicGraphicsScene& scene,
                                 const Point& startPos = Point()) noexcept;
-  ~CmdDragSelectedSchematicItems() noexcept;
+  ~CmdDragSelectedSchematicItems() noexcept override;
 
   // General Methods
   void snapToGrid() noexcept;
@@ -75,10 +75,10 @@ private:
   // Private Methods
 
   /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
-  virtual bool performExecute() override;
+  bool performExecute() override;
 
   /// @copydoc ::librepcb::editor::UndoCommandGroup::performPostExecution()
-  virtual void performPostExecution() noexcept override;
+  void performPostExecution() noexcept override;
 
   // Private Member Variables
   Schematic& mSchematic;

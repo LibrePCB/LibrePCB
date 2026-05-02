@@ -54,7 +54,7 @@ public:
   explicit AssemblyVariantListEditorWidget(QWidget* parent = nullptr) noexcept;
   AssemblyVariantListEditorWidget(
       const AssemblyVariantListEditorWidget& other) = delete;
-  ~AssemblyVariantListEditorWidget() noexcept;
+  ~AssemblyVariantListEditorWidget() noexcept override;
 
   // Setters
   void setFrameStyle(int style) noexcept;

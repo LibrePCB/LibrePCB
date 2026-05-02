@@ -55,18 +55,18 @@ public:
       mPolylineVertices(0),
       mPolylinePath() {}
 
-  virtual ~DxfReaderImpl() {}
+  ~DxfReaderImpl() override {}
 
-  virtual void addPoint(const DL_PointData& data) override {
+  void addPoint(const DL_PointData& data) override {
     mReader.mPoints.append(point(data.x, data.y));
   }
 
-  virtual void addLine(const DL_LineData& data) override {
+  void addLine(const DL_LineData& data) override {
     mReader.mPolygons.append(
         Path::line(point(data.x1, data.y1), point(data.x2, data.y2)));
   }
 
-  virtual void addArc(const DL_ArcData& data) override {
+  void addArc(const DL_ArcData& data) override {
     Point center = point(data.cx, data.cy);
     Length radius = length(data.radius);
     Angle angle1 = angle(data.angle1);
@@ -81,7 +81,7 @@ public:
     mReader.mPolygons.append(Path::line(p1, p2, angle));
   }
 
-  virtual void addCircle(const DL_CircleData& data) override {
+  void addCircle(const DL_CircleData& data) override {
     Length diameter = length(data.radius * 2);
     if (diameter > 0) {
       mReader.mCircles.append(
@@ -92,25 +92,25 @@ public:
     }
   }
 
-  virtual void addEllipse(const DL_EllipseData& data) override {
+  void addEllipse(const DL_EllipseData& data) override {
     Q_UNUSED(data);
     qWarning() << "Ellipse in DXF file ignored since it is not supported yet.";
   }
 
-  virtual void addPolyline(const DL_PolylineData& data) override {
+  void addPolyline(const DL_PolylineData& data) override {
     mPolylineClosed = (data.flags & DL_CLOSED_PLINE) != 0;
     mPolylineVertices = data.number;
     mPolylinePath = Path();
   }
 
-  virtual void addVertex(const DL_VertexData& data) override {
+  void addVertex(const DL_VertexData& data) override {
     mPolylinePath.addVertex(point(data.x, data.y), bulgeToAngle(data.bulge));
     if (mPolylinePath.getVertices().count() == mPolylineVertices) {
       endSequence();
     }
   }
 
-  virtual void endSequence() override {
+  void endSequence() override {
     if (mPolylinePath.getVertices().count() >= 2) {
       if (mPolylineClosed && (mPolylinePath.getVertices().count() >= 3)) {
         mPolylinePath.close();
@@ -120,8 +120,7 @@ public:
     mPolylinePath = Path();
   }
 
-  virtual void setVariableInt(const std::string& key, int value,
-                              int code) override {
+  void setVariableInt(const std::string& key, int value, int code) override {
     if ((key == "$INSUNITS") && (code == 70)) {
       // Unit specified in DXF, use corresponding conversion scaling factors.
       QHash<int, qreal> map = {

@@ -50,7 +50,7 @@ public:
   SI_Image() = delete;
   SI_Image(const SI_Image& other) = delete;
   SI_Image(Schematic& schematic, const Image& image);
-  ~SI_Image() noexcept;
+  ~SI_Image() noexcept override;
 
   // Getters
   const Uuid& getUuid() const noexcept { return mImage->getUuid(); }

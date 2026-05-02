@@ -128,7 +128,7 @@ LibraryTab::~LibraryTab() noexcept {
 
   deactivate();
 
-  mUndoStack.release();  // We have "borrowed" it from the library editor...
+  std::ignore = mUndoStack.release();  // We have just "borrowed" it!
 }
 
 /*******************************************************************************
@@ -803,7 +803,7 @@ void LibraryTab::sortItemsRecursive(
         }
       },
       Qt::CaseInsensitive, false);
-  for (auto child : items) {
+  for (const auto& child : std::as_const(items)) {
     sortItemsRecursive(child->children);
   }
 }
@@ -827,7 +827,7 @@ void LibraryTab::addCategoriesToModel(
     TreeItem& item, ui::LibraryTreeViewItemType type,
     slint::VectorModel<ui::LibraryTreeViewItemData>& model,
     int level) noexcept {
-  for (auto child : item.children) {
+  for (const auto& child : std::as_const(item.children)) {
     if (child->type == type) {
       const int count =
           std::count_if(child->children.begin(), child->children.end(),
@@ -864,7 +864,7 @@ void LibraryTab::setSelectedCategory(
         items = Toolbox::toList(set);
       }
     } else {
-      items = mLibElementsMap.values().toVector();
+      items = mLibElementsMap.values().toVector();  // NOLINT
     }
     sortItemsRecursive(items);
   } else if (uuid) {
@@ -883,7 +883,7 @@ void LibraryTab::setSelectedCategory(
       ui::LibraryTreeViewItemType::Device,
       ui::LibraryTreeViewItemType::Organization,
   };
-  for (auto item : items) {
+  for (const auto& item : std::as_const(items)) {
     if ((!item->children.isEmpty()) || (item->name.isEmpty()) ||
         (!types.contains(item->type))) {
       continue;
@@ -918,7 +918,7 @@ void LibraryTab::setSelectedCategory(
 void LibraryTab::getChildrenRecursive(
     TreeItem& item, QSet<std::shared_ptr<TreeItem>>& children) noexcept {
   children |= Toolbox::toSet(item.children);
-  for (auto child : item.children) {
+  for (const auto& child : std::as_const(item.children)) {
     getChildrenRecursive(*child, children);
   }
 }
@@ -1019,7 +1019,7 @@ void LibraryTab::moveOrCopyElementsTo(
   // Extract names and file paths.
   QStringList names;
   QSet<FilePath> paths;
-  for (auto item : items) {
+  for (const auto& item : items) {
     names.append(item->name);
     paths.insert(item->path);
   }
@@ -1075,7 +1075,7 @@ void LibraryTab::moveOrCopyElementsTo(
   mEditor.forceClosingTabs(paths);
 
   // Copy/move elements.
-  for (const FilePath& fp : paths) {
+  for (const FilePath& fp : std::as_const(paths)) {
     const QString relPath = fp.toRelative(fp.getParentDir().getParentDir());
     const FilePath destination = dstLib.getPathTo(relPath);
     try {
@@ -1106,7 +1106,7 @@ void LibraryTab::deleteElements(
   // Extract names and file paths.
   QStringList names;
   QSet<FilePath> paths;
-  for (auto item : items) {
+  for (const auto& item : items) {
     names.append(item->name);
     paths.insert(item->path);
   }
@@ -1136,7 +1136,7 @@ void LibraryTab::deleteElements(
   if (ret == QMessageBox::Yes) {
     // Close opened tabs of elements to be deleted.
     mEditor.forceClosingTabs(paths);
-    for (const FilePath& fp : paths) {
+    for (const FilePath& fp : std::as_const(paths)) {
       try {
         FileUtils::removeDirRecursively(fp);
       } catch (const Exception& e) {

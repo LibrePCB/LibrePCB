@@ -52,7 +52,7 @@ public:
   explicit KeySequencesEditorWidget(const QList<QKeySequence>& defaultSequences,
                                     QWidget* parent = nullptr) noexcept;
   KeySequencesEditorWidget(const KeySequencesEditorWidget& other) = delete;
-  ~KeySequencesEditorWidget() noexcept;
+  ~KeySequencesEditorWidget() noexcept override;
 
   // General Methods
   const std::optional<QList<QKeySequence>>& getOverrides() const noexcept {

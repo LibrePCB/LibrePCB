@@ -29,6 +29,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -59,7 +61,7 @@ FileDownload::~FileDownload() noexcept {
 void FileDownload::setExpectedChecksum(QCryptographicHash::Algorithm algorithm,
                                        const QByteArray& checksum) noexcept {
   Q_ASSERT(!mStarted);
-  mHash.reset(new QCryptographicHash(algorithm));
+  mHash = std::make_unique<QCryptographicHash>(algorithm);
   mExpectedChecksum = checksum;
 }
 
@@ -90,7 +92,7 @@ void FileDownload::prepareRequest() {
   FileUtils::makePath(mDestination.getParentDir());  // can throw
 
   // Open temporary destination file.
-  mFile.reset(new QSaveFile(mDestination.toStr(), this));
+  mFile = std::make_unique<QSaveFile>(mDestination.toStr(), this);
   if (!mFile->open(QIODevice::WriteOnly)) {
     throw RuntimeError(__FILE__, __LINE__,
                        QString("Could not open file \"%1\": %2")

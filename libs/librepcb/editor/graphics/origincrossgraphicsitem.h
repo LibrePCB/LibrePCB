@@ -53,7 +53,7 @@ public:
   // OriginCrossGraphicsItem() = delete;
   OriginCrossGraphicsItem(const OriginCrossGraphicsItem& other) = delete;
   explicit OriginCrossGraphicsItem(QGraphicsItem* parent = nullptr) noexcept;
-  virtual ~OriginCrossGraphicsItem() noexcept;
+  ~OriginCrossGraphicsItem() noexcept override;
 
   // Setters
   void setPosition(const Point& pos) noexcept;
@@ -66,7 +66,7 @@ public:
   QRectF boundingRect() const noexcept override { return mBoundingRect; }
   QPainterPath shape() const noexcept override;
   void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
-             QWidget* widget = 0) noexcept override;
+             QWidget* widget = nullptr) noexcept override;
 
   // Operator Overloadings
   OriginCrossGraphicsItem& operator=(const OriginCrossGraphicsItem& rhs) =

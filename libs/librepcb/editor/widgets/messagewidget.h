@@ -59,7 +59,7 @@ public:
   // Constructors / Destructor
   explicit MessageWidget(QWidget* parent = nullptr) noexcept;
   MessageWidget(const MessageWidget& other) = delete;
-  ~MessageWidget() noexcept;
+  ~MessageWidget() noexcept override;
 
   /**
    * @brief Initialize widget without the "don't show again" feature

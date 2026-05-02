@@ -84,7 +84,7 @@ void SI_BusLabel::addToSchematic() {
     throw LogicError(__FILE__, __LINE__);
   }
   mNameChangedConnection =
-      connect(&mSegment.getBus(), &Bus::nameChanged,
+      connect(&mSegment.getBus(), &Bus::nameChanged, this,
               [this]() { onEdited.notify(Event::BusNameChanged); });
   SI_Base::addToSchematic();
 }

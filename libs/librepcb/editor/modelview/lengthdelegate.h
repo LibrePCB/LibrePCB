@@ -49,7 +49,7 @@ public:
   // Constructors / Destructor
   explicit LengthDelegate(QObject* parent = nullptr) noexcept;
   LengthDelegate(const LengthDelegate& other) = delete;
-  ~LengthDelegate() noexcept;
+  ~LengthDelegate() noexcept override;
 
   // Setters
   void setUnit(const LengthUnit& unit) noexcept;

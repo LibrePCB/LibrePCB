@@ -243,7 +243,7 @@ void ComponentInstance::registerSymbol(SI_Symbol& symbol) {
   }
   if (!mRegisteredSymbols.isEmpty()) {
     if (symbol.getSchematic() !=
-        mRegisteredSymbols.values().first()->getSchematic()) {
+        (*mRegisteredSymbols.begin())->getSchematic()) {
       // Actually it would be possible to place the symbols of a component on
       // different schematics. But maybe some time this will no longer be
       // possible due to the concept of hierarchical sheets, sub-circuits or

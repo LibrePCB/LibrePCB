@@ -49,7 +49,7 @@ public:
   ProjectReadmeRenderer() = delete;
   ProjectReadmeRenderer(const ProjectReadmeRenderer& other) = delete;
   explicit ProjectReadmeRenderer(QObject* parent = nullptr) noexcept;
-  virtual ~ProjectReadmeRenderer() noexcept;
+  ~ProjectReadmeRenderer() noexcept override;
 
   // General Methods
   void request(const FilePath& fp, int width) noexcept;

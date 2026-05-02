@@ -52,7 +52,7 @@ public:
   CmdBoardPolygonEdit() = delete;
   CmdBoardPolygonEdit(const CmdBoardPolygonEdit& other) = delete;
   explicit CmdBoardPolygonEdit(BI_Polygon& polygon) noexcept;
-  ~CmdBoardPolygonEdit() noexcept;
+  ~CmdBoardPolygonEdit() noexcept override;
 
   // Getters
   BI_Polygon& getObj() const noexcept { return mPolygon; }

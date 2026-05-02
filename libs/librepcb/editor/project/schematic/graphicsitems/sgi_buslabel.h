@@ -57,7 +57,7 @@ public:
   SGI_BusLabel(
       SI_BusLabel& label, const GraphicsLayerList& layers,
       std::shared_ptr<const SchematicGraphicsScene::Context> context) noexcept;
-  virtual ~SGI_BusLabel() noexcept;
+  ~SGI_BusLabel() noexcept override;
 
   // General Methods
   SI_BusLabel& getBusLabel() noexcept { return mLabel; }
@@ -71,8 +71,8 @@ public:
 
 private:  // Methods
   void labelEdited(const SI_BusLabel& obj, SI_BusLabel::Event event) noexcept;
-  virtual QVariant itemChange(GraphicsItemChange change,
-                              const QVariant& value) noexcept override;
+  QVariant itemChange(GraphicsItemChange change,
+                      const QVariant& value) noexcept override;
   void updatePosition() noexcept;
   void updateRotation() noexcept;
   void updateMirrored() noexcept;

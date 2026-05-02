@@ -55,6 +55,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -259,11 +261,10 @@ void BoardEditorState_AddVia::setSize(
   }
 }
 
-QVector<std::pair<Uuid, QString>> BoardEditorState_AddVia::getAvailableNets()
-    const noexcept {
+const QVector<std::pair<Uuid, QString>>
+    BoardEditorState_AddVia::getAvailableNets() const noexcept {
   QVector<std::pair<Uuid, QString>> nets;
-  for (const NetSignal* net :
-       mContext.project.getCircuit().getNetSignals().values()) {
+  for (const NetSignal* net : mContext.project.getCircuit().getNetSignals()) {
     nets.append(std::make_pair(net->getUuid(), *net->getName()));
   }
   Toolbox::sortNumeric(
@@ -323,7 +324,7 @@ bool BoardEditorState_AddVia::addVia(const Point& pos) noexcept {
         cmdAddVia->addVia(Via(Uuid::createRandom(), mCurrentProperties));
     Q_ASSERT(mCurrentViaToPlace);
     mContext.undoStack.appendToCmdGroup(cmdAddVia.release());
-    mCurrentViaEditCmd.reset(new CmdBoardViaEdit(*mCurrentViaToPlace));
+    mCurrentViaEditCmd = std::make_unique<CmdBoardViaEdit>(*mCurrentViaToPlace);
 
     // Highlight all elements of the current netsignal.
     mAdapter.fsmCrossProbe({netsegment->getNetSignal()});
@@ -533,7 +534,7 @@ void BoardEditorState_AddVia::updateClosestNetSignal(
     }
     mClosestNetSignalIsUpToDate = true;
     QTimer* timer = new QTimer(this);
-    connect(timer, &QTimer::timeout, [this, timer]() {
+    connect(timer, &QTimer::timeout, this, [this, timer]() {
       mClosestNetSignalIsUpToDate = false;
       timer->deleteLater();
     });

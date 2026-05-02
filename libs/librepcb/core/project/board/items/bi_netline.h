@@ -88,7 +88,7 @@ public:
   BI_NetLine(BI_NetSegment& segment, const Uuid& uuid, BI_NetLineAnchor& a,
              BI_NetLineAnchor& b, const Layer& layer,
              const PositiveLength& width);
-  ~BI_NetLine() noexcept;
+  ~BI_NetLine() noexcept override;
 
   // Getters
   BI_NetSegment& getNetSegment() const noexcept { return mNetSegment; }

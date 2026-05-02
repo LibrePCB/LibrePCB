@@ -103,7 +103,7 @@ public:
   Board2dTab(const Board2dTab& other) = delete;
   explicit Board2dTab(GuiApplication& app, BoardEditor& editor,
                       QObject* parent = nullptr) noexcept;
-  ~Board2dTab() noexcept;
+  ~Board2dTab() noexcept override;
 
   // General Methods
   int getProjectIndex() const noexcept;

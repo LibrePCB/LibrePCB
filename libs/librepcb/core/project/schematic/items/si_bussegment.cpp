@@ -82,7 +82,8 @@ Point SI_BusSegment::calcNearestPoint(const Point& p) const noexcept {
   return pos;
 }
 
-QSet<SI_NetSegment*> SI_BusSegment::getAttachedNetSegments() const noexcept {
+const QSet<SI_NetSegment*> SI_BusSegment::getAttachedNetSegments()
+    const noexcept {
   QSet<SI_NetSegment*> set;
   for (SI_BusJunction* bj : mJunctions) {
     for (SI_NetLine* nl : bj->getNetLines()) {
@@ -120,6 +121,7 @@ void SI_BusSegment::addJunctionsAndLines(
     const QList<SI_BusJunction*>& junctions, const QList<SI_BusLine*>& lines) {
   ScopeGuardList sgl(junctions.count() + lines.count());
   foreach (SI_BusJunction* bj, junctions) {
+    // NOLINTNEXTLINE
     if ((mJunctions.values().contains(bj)) || (&bj->getBusSegment() != this)) {
       throw LogicError(__FILE__, __LINE__);
     }
@@ -141,6 +143,7 @@ void SI_BusSegment::addJunctionsAndLines(
     });
   }
   foreach (SI_BusLine* bl, lines) {
+    // NOLINTNEXTLINE
     if ((mLines.values().contains(bl)) || (&bl->getBusSegment() != this)) {
       throw LogicError(__FILE__, __LINE__);
     }
@@ -225,6 +228,7 @@ void SI_BusSegment::removeJunctionsAndLines(
  ******************************************************************************/
 
 void SI_BusSegment::addLabel(SI_BusLabel& label) {
+  // NOLINTNEXTLINE
   if ((mLabels.values().contains(&label)) || (&label.getBusSegment() != this)) {
     throw LogicError(__FILE__, __LINE__);
   }

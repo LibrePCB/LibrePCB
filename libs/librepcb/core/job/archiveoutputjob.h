@@ -50,12 +50,12 @@ public:
   ArchiveOutputJob() noexcept;
   ArchiveOutputJob(const ArchiveOutputJob& other) noexcept;
   explicit ArchiveOutputJob(const SExpression& node);
-  virtual ~ArchiveOutputJob() noexcept;
+  ~ArchiveOutputJob() noexcept override;
 
   // Getters
-  virtual QString getTypeTr() const noexcept override;
-  virtual QIcon getTypeIcon() const noexcept override;
-  virtual QSet<Uuid> getDependencies() const noexcept override;
+  QString getTypeTr() const noexcept override;
+  QIcon getTypeIcon() const noexcept override;
+  QSet<Uuid> getDependencies() const noexcept override;
   const QMap<Uuid, QString>& getInputJobs() const noexcept {
     return mInputJobs;
   }
@@ -70,15 +70,15 @@ public:
   static QString getTypeTrStatic() noexcept {
     return tr("Archive") % " (*.zip)";
   }
-  virtual void removeDependency(const Uuid& jobUuid) override;
-  virtual std::shared_ptr<OutputJob> cloneShared() const noexcept override;
+  void removeDependency(const Uuid& jobUuid) override;
+  std::shared_ptr<OutputJob> cloneShared() const noexcept override;
 
   // Operator Overloadings
   ArchiveOutputJob& operator=(const ArchiveOutputJob& rhs) = delete;
 
 private:  // Methods
-  virtual void serializeDerived(SExpression& root) const override;
-  virtual bool equals(const OutputJob& rhs) const noexcept override;
+  void serializeDerived(SExpression& root) const override;
+  bool equals(const OutputJob& rhs) const noexcept override;
 
 private:  // Data
   QMap<Uuid, QString> mInputJobs;  ///< Job UUID, destination path

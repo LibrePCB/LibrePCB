@@ -63,7 +63,7 @@ void AsyncCopyOperation::abort() noexcept {
 void AsyncCopyOperation::run() noexcept {
   // Note: This method is called from a different thread, thus be careful with
   //       calling other methods to only call thread-safe methods!
-  emit started();
+  emit startedCopy();
 
   try {
     // Abort if destination already exists. Otherwise it would be deleted
@@ -122,7 +122,7 @@ void AsyncCopyOperation::run() noexcept {
     emit failed(e.getMsg());
   }
 
-  emit finished();
+  emit finishedCopy();
 }
 
 /*******************************************************************************

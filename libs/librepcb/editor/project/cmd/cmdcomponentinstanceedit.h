@@ -54,7 +54,7 @@ class CmdComponentInstanceEdit final : public UndoCommand {
 public:
   // Constructors / Destructor
   CmdComponentInstanceEdit(Circuit& circuit, ComponentInstance& cmp) noexcept;
-  ~CmdComponentInstanceEdit() noexcept;
+  ~CmdComponentInstanceEdit() noexcept override;
 
   // Setters
   void setName(const CircuitIdentifier& name) noexcept;

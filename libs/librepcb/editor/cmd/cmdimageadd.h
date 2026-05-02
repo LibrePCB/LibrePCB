@@ -66,7 +66,7 @@ public:
   CmdImageAdd(ImageList& list, TransactionalDirectory& dir,
               std::shared_ptr<Image> image,
               const QByteArray& fileContent) noexcept;
-  ~CmdImageAdd() noexcept;
+  ~CmdImageAdd() noexcept override;
 
   // Operator Overloadings
   CmdImageAdd& operator=(const CmdImageAdd& rhs) = delete;

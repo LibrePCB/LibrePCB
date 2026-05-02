@@ -53,7 +53,7 @@ public:
   Library(const Uuid& uuid, const Version& version, const QString& author,
           const QDateTime& created, const ElementName& name_en_US,
           const QString& description_en_US, const QString& keywords_en_US);
-  ~Library() noexcept;
+  ~Library() noexcept override;
 
   // Getters
   template <typename ElementType>
@@ -78,8 +78,8 @@ public:
   }
 
   // General Methods
-  virtual void save() override;
-  virtual void moveTo(TransactionalDirectory& dest) override;
+  void save() override;
+  void moveTo(TransactionalDirectory& dest) override;
   template <typename ElementType>
   QStringList searchForElements() const noexcept;
 
@@ -101,7 +101,7 @@ signals:
   void manufacturerChanged(const SimpleString& mfr);
 
 protected:
-  virtual void serialize(SExpression& root) const override;
+  void serialize(SExpression& root) const override;
 
 private:  // Methods
   Library(std::unique_ptr<TransactionalDirectory> directory,

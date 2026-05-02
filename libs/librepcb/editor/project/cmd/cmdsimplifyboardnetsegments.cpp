@@ -59,7 +59,7 @@ CmdSimplifyBoardNetSegments::~CmdSimplifyBoardNetSegments() noexcept {
  ******************************************************************************/
 
 bool CmdSimplifyBoardNetSegments::performExecute() {
-  for (BI_NetSegment* seg : mSegments) {
+  for (BI_NetSegment* seg : std::as_const(mSegments)) {
     simplifySegment(*seg);
   }
   return UndoCommandGroup::performExecute();

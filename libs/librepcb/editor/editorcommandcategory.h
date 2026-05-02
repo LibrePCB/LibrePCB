@@ -55,7 +55,7 @@ public:
     setObjectName(objectName);
     updateTranslations();
   }
-  ~EditorCommandCategory() noexcept {}
+  ~EditorCommandCategory() noexcept override {}
 
   // Getters
   const char* getTextNoTr() const noexcept { return mTextNoTr; }

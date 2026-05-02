@@ -57,7 +57,7 @@ public:
   explicit OrganizationsDbModel(const WorkspaceLibraryDb& db,
                                 const WorkspaceSettings& ws,
                                 QObject* parent = nullptr) noexcept;
-  virtual ~OrganizationsDbModel() noexcept;
+  ~OrganizationsDbModel() noexcept override;
 
   // Implementations
   std::size_t row_count() const override;

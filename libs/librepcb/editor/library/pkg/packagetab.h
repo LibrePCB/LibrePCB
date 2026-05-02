@@ -91,7 +91,7 @@ public:
   PackageTab(const PackageTab& other) = delete;
   explicit PackageTab(LibraryEditor& editor, std::unique_ptr<Package> pkg,
                       Mode mode, QObject* parent = nullptr) noexcept;
-  ~PackageTab() noexcept;
+  ~PackageTab() noexcept override;
 
   // General Methods
   FilePath getDirectoryPath() const noexcept override;

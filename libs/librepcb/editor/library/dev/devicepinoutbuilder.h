@@ -55,7 +55,7 @@ public:
   DevicePinoutBuilder(const DevicePinoutBuilder& other) = delete;
   DevicePinoutBuilder(DevicePadSignalMap& list, UndoStack& undoStack,
                       QObject* parent = nullptr) noexcept;
-  ~DevicePinoutBuilder() noexcept;
+  ~DevicePinoutBuilder() noexcept override;
 
   // General Methods
   void setPads(const PackagePadList& list) noexcept;

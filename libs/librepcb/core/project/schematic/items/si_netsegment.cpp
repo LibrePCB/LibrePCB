@@ -91,7 +91,7 @@ QSet<QString> SI_NetSegment::getForcedNetNames() const noexcept {
 QString SI_NetSegment::getForcedNetName() const noexcept {
   QSet<QString> names = getForcedNetNames();
   if (names.count() == 1) {
-    return names.values().first();
+    return *names.begin();
   } else {
     return QString();
   }
@@ -188,6 +188,7 @@ void SI_NetSegment::addNetPointsAndNetLines(
     const QList<SI_NetPoint*>& netpoints, const QList<SI_NetLine*>& netlines) {
   ScopeGuardList sgl(netpoints.count() + netlines.count());
   foreach (SI_NetPoint* netpoint, netpoints) {
+    // NOLINTNEXTLINE
     if ((mNetPoints.values().contains(netpoint)) ||
         (&netpoint->getNetSegment() != this)) {
       throw LogicError(__FILE__, __LINE__);
@@ -210,6 +211,7 @@ void SI_NetSegment::addNetPointsAndNetLines(
     });
   }
   foreach (SI_NetLine* netline, netlines) {
+    // NOLINTNEXTLINE
     if ((mNetLines.values().contains(netline)) ||
         (&netline->getNetSegment() != this)) {
       throw LogicError(__FILE__, __LINE__);
@@ -297,6 +299,7 @@ void SI_NetSegment::removeNetPointsAndNetLines(
  ******************************************************************************/
 
 void SI_NetSegment::addNetLabel(SI_NetLabel& netlabel) {
+  // NOLINTNEXTLINE
   if ((mNetLabels.values().contains(&netlabel)) ||
       (&netlabel.getNetSegment() != this)) {
     throw LogicError(__FILE__, __LINE__);

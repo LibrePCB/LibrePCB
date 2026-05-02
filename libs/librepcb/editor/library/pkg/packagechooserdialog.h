@@ -65,7 +65,7 @@ public:
   PackageChooserDialog(const PackageChooserDialog& other) = delete;
   PackageChooserDialog(const Workspace& ws, const GraphicsLayerList* layers,
                        QWidget* parent = nullptr) noexcept;
-  ~PackageChooserDialog() noexcept;
+  ~PackageChooserDialog() noexcept override;
 
   // Getters
   const std::optional<Uuid>& getSelectedPackageUuid() const noexcept {

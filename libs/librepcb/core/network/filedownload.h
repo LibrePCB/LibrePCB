@@ -68,7 +68,7 @@ public:
   FileDownload(const QUrl& url, const FilePath& dest,
                std::shared_ptr<QSemaphore> semaphore) noexcept;
 
-  ~FileDownload() noexcept;
+  ~FileDownload() noexcept override;
 
   // Setters
 

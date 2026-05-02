@@ -286,7 +286,7 @@ public:
    *
    * @throw   Exception on error (e.g. already locked, no access rights, ...)
    */
-  void tryLock(LockHandlerCallback lockHandler = nullptr);
+  void tryLock(const LockHandlerCallback& lockHandler = nullptr);
 
   /**
    * @brief Unlock the specified directory if it was locked by this object

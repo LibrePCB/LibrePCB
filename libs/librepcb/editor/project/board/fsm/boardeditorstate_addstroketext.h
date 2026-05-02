@@ -58,22 +58,22 @@ public:
   BoardEditorState_AddStrokeText(const BoardEditorState_AddStrokeText& other) =
       delete;
   explicit BoardEditorState_AddStrokeText(const Context& context) noexcept;
-  virtual ~BoardEditorState_AddStrokeText() noexcept;
+  ~BoardEditorState_AddStrokeText() noexcept override;
 
   // General Methods
-  virtual bool entry() noexcept override;
-  virtual bool exit() noexcept override;
+  bool entry() noexcept override;
+  bool exit() noexcept override;
 
   // Event Handlers
-  virtual bool processRotate(const Angle& rotation) noexcept override;
-  virtual bool processFlip(Qt::Orientation orientation) noexcept override;
-  virtual bool processGraphicsSceneMouseMoved(
+  bool processRotate(const Angle& rotation) noexcept override;
+  bool processFlip(Qt::Orientation orientation) noexcept override;
+  bool processGraphicsSceneMouseMoved(
       const GraphicsSceneMouseEvent& e) noexcept override;
-  virtual bool processGraphicsSceneLeftMouseButtonPressed(
+  bool processGraphicsSceneLeftMouseButtonPressed(
       const GraphicsSceneMouseEvent& e) noexcept override;
-  virtual bool processGraphicsSceneLeftMouseButtonDoubleClicked(
+  bool processGraphicsSceneLeftMouseButtonDoubleClicked(
       const GraphicsSceneMouseEvent& e) noexcept override;
-  virtual bool processGraphicsSceneRightMouseButtonReleased(
+  bool processGraphicsSceneRightMouseButtonReleased(
       const GraphicsSceneMouseEvent& e) noexcept override;
 
   // Connection to UI
@@ -89,7 +89,7 @@ public:
   const QString& getText() const noexcept {
     return mCurrentProperties.getText();
   }
-  QStringList getTextSuggestions() const noexcept;
+  const QStringList getTextSuggestions() const noexcept;
   void setText(const QString& text) noexcept;
   bool getMirrored() const noexcept { return mCurrentProperties.getMirrored(); }
   void setMirrored(bool mirrored) noexcept;

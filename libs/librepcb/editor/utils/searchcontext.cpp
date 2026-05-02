@@ -26,6 +26,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -51,12 +53,13 @@ void SearchContext::init() noexcept {
   mTerm.clear();
   mForward = true;
   mIndex = 0;
-  mSuggestions.reset(new slint::VectorModel<slint::SharedString>());
+  mSuggestions = std::make_shared<slint::VectorModel<slint::SharedString>>();
   QPointer<SearchContext> ctx = this;
-  mSuggestionsFiltered.reset(new slint::FilterModel<slint::SharedString>(
-      mSuggestions, [ctx](const slint::SharedString& data) {
-        return ctx && s2q(data).toLower().startsWith(ctx->mTerm.toLower());
-      }));
+  mSuggestionsFiltered =
+      std::make_shared<slint::FilterModel<slint::SharedString>>(
+          mSuggestions, [ctx](const slint::SharedString& data) {
+            return ctx && s2q(data).toLower().startsWith(ctx->mTerm.toLower());
+          });
 }
 
 void SearchContext::deinit() noexcept {

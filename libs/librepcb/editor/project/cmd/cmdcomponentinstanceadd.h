@@ -56,7 +56,7 @@ public:
                           const ComponentAssemblyOptionList& options) noexcept;
   CmdComponentInstanceAdd(Circuit& circuit,
                           ComponentInstance* component) noexcept;
-  ~CmdComponentInstanceAdd() noexcept;
+  ~CmdComponentInstanceAdd() noexcept override;
 
   // Getters
   ComponentInstance* getComponentInstance() const noexcept {

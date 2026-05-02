@@ -54,7 +54,7 @@ public:
   explicit NetClass(Circuit& circuit, const Uuid& uuid,
                     const ElementName& name);
   explicit NetClass(Circuit& circuit, const SExpression& node);
-  ~NetClass() noexcept;
+  ~NetClass() noexcept override;
 
   // Getters
   Circuit& getCircuit() const noexcept { return mCircuit; }

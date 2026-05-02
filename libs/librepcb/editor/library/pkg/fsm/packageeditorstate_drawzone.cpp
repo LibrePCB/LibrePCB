@@ -31,6 +31,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -209,7 +211,7 @@ bool PackageEditorState_DrawZone::start() noexcept {
         std::make_shared<Zone>(Uuid::createRandom(), mCurrentProperties);
     mContext.undoStack.appendToCmdGroup(
         new CmdZoneInsert(mContext.currentFootprint->getZones(), mCurrentZone));
-    mCurrentEditCmd.reset(new CmdZoneEdit(*mCurrentZone));
+    mCurrentEditCmd = std::make_unique<CmdZoneEdit>(*mCurrentZone);
     mCurrentGraphicsItem =
         mContext.currentGraphicsItem->getGraphicsItem(mCurrentZone);
     Q_ASSERT(mCurrentGraphicsItem);
@@ -273,7 +275,7 @@ bool PackageEditorState_DrawZone::addNextSegment() noexcept {
       // Start a new undo command.
       mContext.undoStack.beginCmdGroup(tr("Add Footprint Zone"));
       mIsUndoCmdActive = true;
-      mCurrentEditCmd.reset(new CmdZoneEdit(*mCurrentZone));
+      mCurrentEditCmd = std::make_unique<CmdZoneEdit>(*mCurrentZone);
     }
 
     // If this was the last vertex to be added, abort now.
@@ -357,8 +359,8 @@ void PackageEditorState_DrawZone::updateOverlayText() noexcept {
 void PackageEditorState_DrawZone::updateStatusBarMessage() noexcept {
   QString note = " " %
       tr("(press %1 to disable snap, %2 to abort)")
-          .arg(QCoreApplication::translate("QShortcut", "Shift"))
-          .arg(tr("right click"));
+          .arg(QCoreApplication::translate("QShortcut", "Shift"),
+               tr("right click"));
 
   if (!mIsUndoCmdActive) {
     mAdapter.fsmSetStatusBarMessage(tr("Click to specify the first point") %

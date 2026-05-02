@@ -94,11 +94,11 @@ ResourceList KiCadTypeConverter::convertResources(
   return ret;
 }
 
-Point KiCadTypeConverter::convertSymbolPoint(const QPointF& p) {
+Point KiCadTypeConverter::convertSymbolPoint(QPointF p) {
   return Point::fromMm(p.x(), p.y());
 }
 
-Point KiCadTypeConverter::convertFootprintPoint(const QPointF& p) {
+Point KiCadTypeConverter::convertFootprintPoint(QPointF p) {
   return Point::fromMm(p.x(), -p.y());
 }
 
@@ -373,8 +373,7 @@ std::shared_ptr<SymbolPin> KiCadTypeConverter::convertSymbolPin(
       SymbolPin::getDefaultNameHeight(), SymbolPin::getDefaultNameAlignment());
 }
 
-const Layer& KiCadTypeConverter::convertFootprintGeometryLayer(
-    const KiCadLayer& l) {
+const Layer& KiCadTypeConverter::convertFootprintGeometryLayer(KiCadLayer l) {
   switch (l) {
     case KiCadLayer::FrontAdhesion:
       return Layer::topGlue();
@@ -458,7 +457,7 @@ QList<KiCadTypeConverter::LineGroup>
   QList<LineGroup> groups;
   for (auto it = map.begin(); it != map.end(); it++) {
     LineGroup group{it.key().first, it.key().second, {}};
-    for (const Line& line : it.value()) {
+    for (const Line& line : std::as_const(it.value())) {
       group.paths.append(Path::line(line.start, line.end, line.angle));
     }
     groups.append(group);

@@ -49,7 +49,7 @@ public:
   PackageEditorState_DrawArc() = delete;
   PackageEditorState_DrawArc(const PackageEditorState_DrawArc& other) = delete;
   explicit PackageEditorState_DrawArc(Context& context) noexcept;
-  ~PackageEditorState_DrawArc() noexcept;
+  ~PackageEditorState_DrawArc() noexcept override;
 
   // Operator Overloadings
   PackageEditorState_DrawArc& operator=(const PackageEditorState_DrawArc& rhs) =

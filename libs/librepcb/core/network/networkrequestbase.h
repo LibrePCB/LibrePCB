@@ -63,7 +63,7 @@ public:
   NetworkRequestBase(const NetworkRequestBase& other) = delete;
   NetworkRequestBase(const QUrl& url,
                      const QByteArray& postData = QByteArray()) noexcept;
-  virtual ~NetworkRequestBase() noexcept;
+  ~NetworkRequestBase() noexcept override;
 
   // Setters
 

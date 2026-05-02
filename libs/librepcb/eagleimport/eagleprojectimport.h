@@ -51,7 +51,6 @@ class Technology;
 
 namespace librepcb {
 
-class Board;
 class Bus;
 class Component;
 class Device;
@@ -61,7 +60,6 @@ class NetSignal;
 class Package;
 class Project;
 class ProjectLibrary;
-class Schematic;
 class Symbol;
 
 namespace eagleimport {
@@ -86,7 +84,7 @@ public:
       std::function<Uuid()> createUuid = &Uuid::createRandom,
       const QDateTime& created = QDateTime::currentDateTime(),
       QObject* parent = nullptr) noexcept;
-  ~EagleProjectImport() noexcept;
+  ~EagleProjectImport() noexcept override;
 
   // Getters
   std::shared_ptr<MessageLogger> getLogger() const noexcept { return mLogger; }

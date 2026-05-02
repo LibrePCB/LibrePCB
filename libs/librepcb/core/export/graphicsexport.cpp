@@ -371,8 +371,8 @@ GraphicsExport::Result GraphicsExport::run(RunArgs args) noexcept {
                 __FILE__, __LINE__,
                 tr("Failed to export image '%1' due to unknown file extension. "
                    "Supported extensions: %2")
-                    .arg(outputFilePath.toNative())
-                    .arg(supportedExtensions.join(", ")));
+                    .arg(outputFilePath.toNative(),
+                         supportedExtensions.join(", ")));
           } else {
             throw RuntimeError(
                 __FILE__, __LINE__,
@@ -456,8 +456,7 @@ QRectF GraphicsExport::calcSourceRect(
   return picture.boundingRect();
 }
 
-QPageLayout::Orientation GraphicsExport::getOrientation(
-    const QSizeF& size) noexcept {
+QPageLayout::Orientation GraphicsExport::getOrientation(QSizeF size) noexcept {
   return size.height() > size.width() ? QPageLayout::Orientation::Portrait
                                       : QPageLayout::Orientation::Landscape;
 }

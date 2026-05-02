@@ -111,7 +111,7 @@ public:
   PartInformationProvider(const PartInformationProvider& other) noexcept =
       delete;
   explicit PartInformationProvider(QObject* parent = nullptr) noexcept;
-  ~PartInformationProvider() noexcept;
+  ~PartInformationProvider() noexcept override;
 
   // Getters
   bool isOperational() const noexcept;

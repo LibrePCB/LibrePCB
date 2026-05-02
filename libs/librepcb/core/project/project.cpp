@@ -38,6 +38,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -74,9 +76,8 @@ Project::Project(std::unique_ptr<TransactionalDirectory> directory,
       TransactionalDirectory(*mDirectory, "resources/fontobene")));
 
   // Load project library.
-  mProjectLibrary.reset(
-      new ProjectLibrary(std::unique_ptr<TransactionalDirectory>(
-          new TransactionalDirectory(*mDirectory, "library"))));
+  mProjectLibrary.reset(new ProjectLibrary(
+      std::make_unique<TransactionalDirectory>(*mDirectory, "library")));
 
   // Initialize circuit.
   mCircuit.reset(new Circuit(*this));
@@ -604,7 +605,7 @@ void Project::updatePrimaryBoard() {
   Board* primary = mBoards.value(0);
   if (mPrimaryBoard != primary) {
     mPrimaryBoard = primary;
-    primaryBoardChanged(mPrimaryBoard);
+    emit primaryBoardChanged(mPrimaryBoard);
   }
 }
 

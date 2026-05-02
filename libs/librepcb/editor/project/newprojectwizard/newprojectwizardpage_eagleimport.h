@@ -70,7 +70,7 @@ public:
                                             QWidget* parent = nullptr) noexcept;
   NewProjectWizardPage_EagleImport(
       const NewProjectWizardPage_EagleImport& other) = delete;
-  ~NewProjectWizardPage_EagleImport() noexcept;
+  ~NewProjectWizardPage_EagleImport() noexcept override;
 
   // General Methods
   void import(Project& project);
@@ -80,7 +80,7 @@ public:
       const NewProjectWizardPage_EagleImport& rhs) = delete;
 
 signals:
-  void projectSelected(const QString& name) const;
+  void projectSelected(const QString& name) const;  // NOLINT
 
 private:  // Methods
   void updateStatus() noexcept;

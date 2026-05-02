@@ -55,6 +55,8 @@ namespace librepcb {
  */
 class GraphicsPagePainter {
 public:
+  virtual ~GraphicsPagePainter() = default;
+
   /**
    * @brief Draw page content on a QPainter
    *
@@ -104,7 +106,7 @@ public:
   // Constructors / Destructor
   GraphicsExport(QObject* parent = nullptr) noexcept;
   GraphicsExport(const GraphicsExport& other) = delete;
-  ~GraphicsExport() noexcept;
+  ~GraphicsExport() noexcept override;
 
   // General Methods
 
@@ -209,7 +211,7 @@ private:  // Methods
       const GraphicsExportSettings& settings) noexcept;
   static QRectF calcSourceRect(const GraphicsPagePainter& page,
                                const GraphicsExportSettings& settings) noexcept;
-  static QPageLayout::Orientation getOrientation(const QSizeF& size) noexcept;
+  static QPageLayout::Orientation getOrientation(QSizeF size) noexcept;
 
 private:  // Data
   QString mCreator;

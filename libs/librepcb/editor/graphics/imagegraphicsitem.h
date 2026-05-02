@@ -58,7 +58,7 @@ public:
                     const std::shared_ptr<Image>& image,
                     const GraphicsLayerList& layers,
                     QGraphicsItem* parent = nullptr) noexcept;
-  virtual ~ImageGraphicsItem() noexcept;
+  ~ImageGraphicsItem() noexcept override;
 
   // Getters
   const std::shared_ptr<Image>& getObj() noexcept { return mImage; }
@@ -93,7 +93,7 @@ private:  // Methods
   QVariant itemChange(GraphicsItemChange change,
                       const QVariant& value) noexcept override;
   void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
-             QWidget* widget = 0) noexcept override;
+             QWidget* widget = nullptr) noexcept override;
   void imageEdited(const Image& image, Image::Event event) noexcept;
   void updatePixmap() noexcept;
   void updateBoundingRectAndShape() noexcept;

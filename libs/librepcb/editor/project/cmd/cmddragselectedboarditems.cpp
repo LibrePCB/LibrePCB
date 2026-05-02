@@ -197,7 +197,7 @@ CmdDragSelectedBoardItems::~CmdDragSelectedBoardItems() noexcept {
  ******************************************************************************/
 
 bool CmdDragSelectedBoardItems::selectDevicesOfPads() noexcept {
-  for (BI_Device* dev : mAutoSelectedDevices) {
+  for (BI_Device* dev : std::as_const(mAutoSelectedDevices)) {
     if (auto item = mScene.getDevices().value(dev)) {
       item->setSelected(true);
     }

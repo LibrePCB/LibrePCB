@@ -474,7 +474,7 @@ Qt::Key s2key(const slint::SharedString& k) noexcept {
     return seq[0].key();
   } else {
     qWarning() << "Unknown Slint key:" << s2q(k);
-    return Qt::Key(0);
+    return Qt::Key();
   }
 }
 

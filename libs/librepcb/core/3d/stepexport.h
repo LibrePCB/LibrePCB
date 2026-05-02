@@ -53,7 +53,7 @@ public:
   // Constructors / Destructor
   StepExport(QObject* parent = nullptr) noexcept;
   StepExport(const StepExport& other) = delete;
-  ~StepExport() noexcept;
+  ~StepExport() noexcept override;
 
   // General Methods
 

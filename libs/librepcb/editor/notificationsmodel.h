@@ -58,7 +58,7 @@ public:
   NotificationsModel(const NotificationsModel& other) = delete;
   explicit NotificationsModel(Workspace& ws,
                               QObject* parent = nullptr) noexcept;
-  ~NotificationsModel() noexcept;
+  ~NotificationsModel() noexcept override;
 
   // General Methods
   void push(std::shared_ptr<Notification> notification) noexcept;

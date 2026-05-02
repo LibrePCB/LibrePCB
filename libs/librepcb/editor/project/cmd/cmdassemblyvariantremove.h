@@ -52,7 +52,7 @@ public:
   CmdAssemblyVariantRemove(const CmdAssemblyVariantRemove& other) = delete;
   CmdAssemblyVariantRemove(Circuit& circuit,
                            std::shared_ptr<AssemblyVariant> av) noexcept;
-  ~CmdAssemblyVariantRemove() noexcept;
+  ~CmdAssemblyVariantRemove() noexcept override;
 
   // Operator Overloadings
   CmdAssemblyVariantRemove& operator=(const CmdAssemblyVariantRemove& rhs) =

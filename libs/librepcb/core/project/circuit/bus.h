@@ -57,7 +57,7 @@ public:
   explicit Bus(Circuit& circuit, const Uuid& uuid, const BusName& name,
                bool autoName, bool prefixNetNames,
                const std::optional<UnsignedLength>& maxTraceLengthDifference);
-  ~Bus() noexcept;
+  ~Bus() noexcept override;
 
   // Getters: Attributes
   const Uuid& getUuid() const noexcept { return mUuid; }

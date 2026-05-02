@@ -114,7 +114,7 @@ void DesktopServices::downloadAndOpenResourceAsync(
   };
   const QString ext = extensions.value(mediaType);
   QString fileName = url.fileName();
-  if (fileName.toLower().endsWith(ext)) fileName.chop(ext.count());
+  if (fileName.endsWith(ext, Qt::CaseInsensitive)) fileName.chop(ext.count());
   fileName = cleanFileProofName(fileName);
   if (fileName.isEmpty()) fileName = cleanFileProofName(name);
   if (fileName.isEmpty()) fileName = "unnamed";
@@ -174,7 +174,7 @@ void DesktopServices::downloadAndOpenResourceAsync(
         [dst, openCachedFile, openInBrowser](QByteArray data,
                                              QString contentType) {
           try {
-            if (!contentType.toLower().contains("html")) {
+            if (!contentType.contains("html", Qt::CaseInsensitive)) {
               // Save file in cache and open it.
               FileUtils::writeFile(dst, data);
               openCachedFile();
@@ -242,12 +242,10 @@ bool DesktopServices::openUrlFallback(const QUrl& url) const noexcept {
 
   if (success) {
     qInfo().noquote() << QString("Successfully opened URL with %1: \"%2\"")
-                             .arg(handlerName)
-                             .arg(url.toString());
+                             .arg(handlerName, url.toString());
   } else {
     qCritical().noquote() << QString("Failed to open URL with %1: \"%2\"")
-                                 .arg(handlerName)
-                                 .arg(url.toString());
+                                 .arg(handlerName, url.toString());
   }
   return success;
 }

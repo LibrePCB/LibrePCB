@@ -74,7 +74,7 @@ static std::optional<QColor> fromHexRgba(QString s) {
     return std::nullopt;
   }
   bool ok;
-  const uint value = s.mid(1).toUInt(&ok, 16);
+  const uint value = QStringView(s).mid(1).toUInt(&ok, 16);
   if (!ok) {
     return std::nullopt;
   }

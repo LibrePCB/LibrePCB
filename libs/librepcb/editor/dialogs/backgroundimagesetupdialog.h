@@ -67,7 +67,7 @@ public:
   BackgroundImageSetupDialog(const BackgroundImageSetupDialog& other) = delete;
   explicit BackgroundImageSetupDialog(const QString& settingsPrefix,
                                       QWidget* parent = nullptr) noexcept;
-  ~BackgroundImageSetupDialog() noexcept;
+  ~BackgroundImageSetupDialog() noexcept override;
 
   // General Methods
   const QImage& getImage() const noexcept { return mImage; }

@@ -80,7 +80,7 @@ public:
                const UnsignedLength& copperClearance, ComponentSide side,
                Function function, const PadHoleList& holes) noexcept;
   explicit FootprintPad(const SExpression& node);
-  ~FootprintPad() noexcept;
+  ~FootprintPad() noexcept override;
 
   // Getters
   using Pad::getHoles;

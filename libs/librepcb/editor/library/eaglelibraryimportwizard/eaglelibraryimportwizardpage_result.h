@@ -58,11 +58,11 @@ public:
   EagleLibraryImportWizardPage_Result(
       std::shared_ptr<EagleLibraryImportWizardContext> context,
       QWidget* parent = nullptr) noexcept;
-  ~EagleLibraryImportWizardPage_Result() noexcept;
+  ~EagleLibraryImportWizardPage_Result() noexcept override;
 
   // General Methods
-  virtual void initializePage() override;
-  virtual bool isComplete() const override;
+  void initializePage() override;
+  bool isComplete() const override;
 
   // Operator Overloadings
   EagleLibraryImportWizardPage_Result& operator=(

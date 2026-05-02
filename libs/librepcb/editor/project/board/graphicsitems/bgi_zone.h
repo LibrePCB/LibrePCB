@@ -54,7 +54,7 @@ public:
   BGI_Zone(const BGI_Zone& other) = delete;
   BGI_Zone(BI_Zone& zone, const GraphicsLayerList& layers,
            std::shared_ptr<const BoardGraphicsScene::Context> context) noexcept;
-  virtual ~BGI_Zone() noexcept;
+  ~BGI_Zone() noexcept override;
 
   // General Methods
   BI_Zone& getZone() noexcept { return mZone; }

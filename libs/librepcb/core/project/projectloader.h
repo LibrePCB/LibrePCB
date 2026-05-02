@@ -67,7 +67,7 @@ public:
   // Constructors / Destructor
   explicit ProjectLoader(QObject* parent = nullptr) noexcept;
   ProjectLoader(const ProjectLoader& other) = delete;
-  ~ProjectLoader() noexcept;
+  ~ProjectLoader() noexcept override;
 
   // Setters
   void setAutoAssignDeviceModels(bool v) noexcept {

@@ -299,16 +299,12 @@ TEST_F(WorkspaceSettingsTest, testUpgradeFileFormat) {
 // Test that all base color schemes provide the same (all!) color roles,
 // in the same order, and containing only valid colors.
 TEST_F(WorkspaceSettingsTest, testBaseColorSchemes) {
-  WorkspaceSettings obj;
   QSet<Uuid> uuids;
-  for (const auto& cfg : {
-           std::make_pair(&obj.schematicColorSchemes, "schematic_"),
-           std::make_pair(&obj.boardColorSchemes, "board_"),
-           std::make_pair(&obj.view3dColorSchemes, "3d_"),
-       }) {
+  auto check = [&uuids](const WorkspaceSettingsItem_ColorSchemes& obj,
+                        const char* prefix) {
     QSet<QString> names;
     // There must be at least one base color scheme.
-    const auto& schemes = cfg.first->getBaseSchemes();
+    const auto& schemes = obj.getBaseSchemes();
     ASSERT_GE(schemes.count(), 1);
     // Verify colors of all base color schemes.
     const auto firstColors = schemes.at(0)->getAllColors();
@@ -325,7 +321,7 @@ TEST_F(WorkspaceSettingsTest, testBaseColorSchemes) {
       for (int i = 0; i < colors.count(); ++i) {
         const auto color = colors.at(i);
         // Check for valid color role, with the correct ID prefix.
-        EXPECT_TRUE(color.role && color.role->getId().startsWith(cfg.second));
+        EXPECT_TRUE(color.role && color.role->getId().startsWith(prefix));
         // Check that the order of roles is identical for all color schemes.
         EXPECT_EQ(firstColors.at(i).role, colors.at(i).role);
         // Check that colors are valid.
@@ -333,7 +329,12 @@ TEST_F(WorkspaceSettingsTest, testBaseColorSchemes) {
         EXPECT_TRUE(colors.at(i).secondary.isValid());
       }
     }
-  }
+  };
+
+  WorkspaceSettings obj;
+  check(obj.schematicColorSchemes, "schematic_");
+  check(obj.boardColorSchemes, "board_");
+  check(obj.view3dColorSchemes, "3d_");
 }
 
 /*******************************************************************************

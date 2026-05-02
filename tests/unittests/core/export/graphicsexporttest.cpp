@@ -40,7 +40,7 @@ namespace tests {
  ******************************************************************************/
 
 class GraphicsExportTest : public ::testing::Test {
-protected:
+public:
   FilePath mOutputDir;
   QVector<FilePath> mSavedFiles;  // From signal savingFile().
 
@@ -48,14 +48,16 @@ protected:
     QSettings().clear();
   }
 
-  ~GraphicsExportTest() { QDir(mOutputDir.toStr()).removeRecursively(); }
+  ~GraphicsExportTest() override {
+    QDir(mOutputDir.toStr()).removeRecursively();
+  }
 
   FilePath getFilePath(const QString& fileName) const {
     return mOutputDir.getPathTo(fileName);
   }
 
   void prepare(GraphicsExport& e) {
-    QObject::connect(&e, &GraphicsExport::savingFile,
+    QObject::connect(&e, &GraphicsExport::savingFile,  // NOLINT
                      [this](const FilePath& fp) { mSavedFiles.append(fp); });
   }
 

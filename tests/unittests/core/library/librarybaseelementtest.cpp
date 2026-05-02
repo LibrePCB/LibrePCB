@@ -38,7 +38,7 @@ namespace tests {
  ******************************************************************************/
 
 class LibraryBaseElementTest : public ::testing::Test {
-protected:
+public:
   FilePath mTempDir;
   QScopedPointer<LibraryBaseElement> mNewElement;
 
@@ -50,7 +50,7 @@ protected:
         "test", QDateTime::currentDateTime(), ElementName("Test"), "", ""));
   }
 
-  virtual ~LibraryBaseElementTest() {
+  ~LibraryBaseElementTest() override {
     QDir(mTempDir.toStr()).removeRecursively();
   }
 };

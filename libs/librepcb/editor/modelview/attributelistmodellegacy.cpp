@@ -31,6 +31,7 @@
 #include <QtCore>
 
 #include <algorithm>
+#include <memory>
 
 /*******************************************************************************
  *  Namespace
@@ -67,7 +68,7 @@ AttributeListModelLegacy::~AttributeListModelLegacy() noexcept {
  ******************************************************************************/
 
 void AttributeListModelLegacy::setAttributeList(AttributeList* list) noexcept {
-  emit beginResetModel();
+  beginResetModel();
 
   if (mAttributeList) {
     mAttributeList->onEdited.detach(mOnEditedSlot);
@@ -79,7 +80,7 @@ void AttributeListModelLegacy::setAttributeList(AttributeList* list) noexcept {
     mAttributeList->onEdited.attach(mOnEditedSlot);
   }
 
-  emit endResetModel();
+  endResetModel();
 }
 
 void AttributeListModelLegacy::setUndoStack(UndoStack* stack) noexcept {
@@ -106,7 +107,7 @@ void AttributeListModelLegacy::add(
     mNewValue = QString();
     mNewUnit = mNewType->getDefaultUnit();
   } catch (const Exception& e) {
-    QMessageBox::critical(0, tr("Error"), e.getMsg());
+    QMessageBox::critical(nullptr, tr("Error"), e.getMsg());
   }
 }
 
@@ -121,7 +122,7 @@ void AttributeListModelLegacy::remove(
     std::shared_ptr<Attribute> attr = mAttributeList->get(key);
     execCmd(new CmdAttributeRemove(*mAttributeList, attr.get()));
   } catch (const Exception& e) {
-    QMessageBox::critical(0, tr("Error"), e.getMsg());
+    QMessageBox::critical(nullptr, tr("Error"), e.getMsg());
   }
 }
 
@@ -138,7 +139,7 @@ void AttributeListModelLegacy::moveUp(
       execCmd(new CmdAttributesSwap(*mAttributeList, index, index - 1));
     }
   } catch (const Exception& e) {
-    QMessageBox::critical(0, tr("Error"), e.getMsg());
+    QMessageBox::critical(nullptr, tr("Error"), e.getMsg());
   }
 }
 
@@ -155,7 +156,7 @@ void AttributeListModelLegacy::moveDown(
       execCmd(new CmdAttributesSwap(*mAttributeList, index, index + 1));
     }
   } catch (const Exception& e) {
-    QMessageBox::critical(0, tr("Error"), e.getMsg());
+    QMessageBox::critical(nullptr, tr("Error"), e.getMsg());
   }
 }
 
@@ -322,7 +323,7 @@ bool AttributeListModelLegacy::setData(const QModelIndex& index,
     std::shared_ptr<Attribute> item = mAttributeList->value(index.row());
     std::unique_ptr<CmdAttributeEdit> cmd;
     if (item) {
-      cmd.reset(new CmdAttributeEdit(*item));
+      cmd = std::make_unique<CmdAttributeEdit>(*item);
     }
     if ((index.column() == COLUMN_KEY) && role == Qt::EditRole) {
       QString key = cleanAttributeKey(value.toString().trimmed());
@@ -383,7 +384,7 @@ bool AttributeListModelLegacy::setData(const QModelIndex& index,
     }
     return true;
   } catch (const Exception& e) {
-    QMessageBox::critical(0, tr("Error"), e.getMsg());
+    QMessageBox::critical(nullptr, tr("Error"), e.getMsg());
   }
   return false;
 }
@@ -408,7 +409,8 @@ void AttributeListModelLegacy::attributeListEdited(
       endRemoveRows();
       break;
     case AttributeList::Event::ElementEdited:
-      dataChanged(this->index(index, 0), this->index(index, _COLUMN_COUNT - 1));
+      emit dataChanged(this->index(index, 0),
+                       this->index(index, _COLUMN_COUNT - 1));
       break;
     default:
       qWarning() << "Unhandled switch-case in "

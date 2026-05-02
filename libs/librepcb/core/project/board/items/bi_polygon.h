@@ -63,7 +63,7 @@ public:
   BI_Polygon() = delete;
   BI_Polygon(const BI_Polygon& other) = delete;
   BI_Polygon(Board& board, const BoardPolygonData& data);
-  ~BI_Polygon() noexcept;
+  ~BI_Polygon() noexcept override;
 
   // Getters
   const BoardPolygonData& getData() const noexcept { return mData; }

@@ -51,7 +51,7 @@ class CmdSymbolInstanceAdd final : public UndoCommand {
 public:
   // Constructors / Destructor
   explicit CmdSymbolInstanceAdd(SI_Symbol& symbol) noexcept;
-  ~CmdSymbolInstanceAdd() noexcept;
+  ~CmdSymbolInstanceAdd() noexcept override;
 
 private:  // Methods
   /// @copydoc ::librepcb::editor::UndoCommand::performExecute()

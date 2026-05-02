@@ -58,25 +58,24 @@ public:
   BoardEditorState_AddDevice() = delete;
   BoardEditorState_AddDevice(const BoardEditorState_AddDevice& other) = delete;
   BoardEditorState_AddDevice(const Context& context) noexcept;
-  virtual ~BoardEditorState_AddDevice() noexcept;
+  ~BoardEditorState_AddDevice() noexcept override;
 
   // General Methods
-  virtual bool entry() noexcept override;
-  virtual bool exit() noexcept override;
+  bool entry() noexcept override;
+  bool exit() noexcept override;
 
   // Event Handlers
-  virtual bool processAddDevice(ComponentInstance& component,
-                                const Uuid& device,
-                                const Uuid& footprint) noexcept override;
-  virtual bool processRotate(const Angle& rotation) noexcept override;
-  virtual bool processFlip(Qt::Orientation orientation) noexcept override;
-  virtual bool processGraphicsSceneMouseMoved(
+  bool processAddDevice(ComponentInstance& component, const Uuid& device,
+                        const Uuid& footprint) noexcept override;
+  bool processRotate(const Angle& rotation) noexcept override;
+  bool processFlip(Qt::Orientation orientation) noexcept override;
+  bool processGraphicsSceneMouseMoved(
       const GraphicsSceneMouseEvent& e) noexcept override;
-  virtual bool processGraphicsSceneLeftMouseButtonPressed(
+  bool processGraphicsSceneLeftMouseButtonPressed(
       const GraphicsSceneMouseEvent& e) noexcept override;
-  virtual bool processGraphicsSceneLeftMouseButtonDoubleClicked(
+  bool processGraphicsSceneLeftMouseButtonDoubleClicked(
       const GraphicsSceneMouseEvent& e) noexcept override;
-  virtual bool processGraphicsSceneRightMouseButtonReleased(
+  bool processGraphicsSceneRightMouseButtonReleased(
       const GraphicsSceneMouseEvent& e) noexcept override;
 
   // Operator Overloadings

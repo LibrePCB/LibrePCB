@@ -396,7 +396,7 @@ void GraphicsLayerList::reloadSettings() noexcept {
              &mSettings->boardColorSchemes,
          }) {
       const ColorScheme& scheme = settings->getActive();
-      for (auto layer : mLayers) {
+      for (auto layer : std::as_const(mLayers)) {
         if (const auto colors = scheme.tryGetColors(layer->getRole())) {
           layer->setColor(colors->primary);
           layer->setColorHighlighted(colors->secondary);

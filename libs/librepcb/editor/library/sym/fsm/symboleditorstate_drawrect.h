@@ -49,7 +49,7 @@ public:
   SymbolEditorState_DrawRect() = delete;
   SymbolEditorState_DrawRect(const SymbolEditorState_DrawRect& other) = delete;
   explicit SymbolEditorState_DrawRect(const Context& context) noexcept;
-  ~SymbolEditorState_DrawRect() noexcept;
+  ~SymbolEditorState_DrawRect() noexcept override;
 
   // Operator Overloadings
   SymbolEditorState_DrawRect& operator=(const SymbolEditorState_DrawRect& rhs) =

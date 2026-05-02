@@ -99,14 +99,12 @@ TEST_P(NetworkRequestTest, testDownload) {
   QObject::connect(request, &NetworkRequest::dataReceived, &mSignalReceiver,
                    &NetworkRequestBaseSignalReceiver::dataReceived);
   QObject::connect(request, &NetworkRequest::destroyed, &mSignalReceiver,
-                   &NetworkRequestBaseSignalReceiver::destroyed);
+                   &NetworkRequestBaseSignalReceiver::objectDestroyed);
   request->start();
 
   // wait until request finished (with timeout)
-  qint64 start = QDateTime::currentDateTime().toMSecsSinceEpoch();
-  auto currentTime = []() {
-    return QDateTime::currentDateTime().toMSecsSinceEpoch();
-  };
+  qint64 start = QDateTime::currentMSecsSinceEpoch();
+  auto currentTime = []() { return QDateTime::currentMSecsSinceEpoch(); };
   while ((!mSignalReceiver.mDestroyed) && (currentTime() - start < 30000)) {
     QThread::msleep(100);
     qApp->processEvents();

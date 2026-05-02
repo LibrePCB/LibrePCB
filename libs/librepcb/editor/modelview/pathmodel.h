@@ -56,7 +56,7 @@ public:
   PathModel() = delete;
   PathModel(const PathModel& other) = delete;
   explicit PathModel(QObject* parent = nullptr) noexcept;
-  ~PathModel() noexcept;
+  ~PathModel() noexcept override;
 
   // Setters
   void setPath(const Path& path) noexcept;

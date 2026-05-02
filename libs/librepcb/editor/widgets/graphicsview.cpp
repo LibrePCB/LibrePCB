@@ -51,7 +51,7 @@ GraphicsView::GraphicsView(QWidget* parent,
     mInfoBoxLabel(new QLabel(this)),
     mEventHandlerObject(eventHandler),
     mScene(nullptr),
-    mZoomAnimation(nullptr),
+    mZoomAnimation(new QVariantAnimation()),
     mUseOpenGl(false),
     mPanningActive(false),
     mPanningButton(Qt::NoButton),
@@ -75,7 +75,6 @@ GraphicsView::GraphicsView(QWidget* parent,
   mInfoBoxLabel->hide();
   setInfoBoxColors(Qt::white, Qt::black);
 
-  mZoomAnimation = new QVariantAnimation();
   connect(mZoomAnimation, &QVariantAnimation::valueChanged, this,
           &GraphicsView::zoomAnimationValueChanged);
 
@@ -109,15 +108,15 @@ void GraphicsView::setSpinnerColor(const QColor& color) noexcept {
 
 void GraphicsView::setInfoBoxColors(const QColor& fill,
                                     const QColor& text) noexcept {
-  mInfoBoxLabel->setStyleSheet(QString("QLabel {"
-                                       "  background-color: %1;"
-                                       "  border: none;"
-                                       "  border-bottom-right-radius: 15px;"
-                                       "  padding: 5px;"
-                                       "  color: %2;"
-                                       "}")
-                                   .arg(fill.name(QColor::HexArgb))
-                                   .arg(text.name(QColor::HexArgb)));
+  mInfoBoxLabel->setStyleSheet(
+      QString("QLabel {"
+              "  background-color: %1;"
+              "  border: none;"
+              "  border-bottom-right-radius: 15px;"
+              "  padding: 5px;"
+              "  color: %2;"
+              "}")
+          .arg(fill.name(QColor::HexArgb), text.name(QColor::HexArgb)));
 }
 
 void GraphicsView::setUseOpenGl(bool useOpenGl) noexcept {

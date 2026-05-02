@@ -54,7 +54,7 @@ public:
       delete;
   explicit CmdDevicePadSignalMapItemEdit(
       const std::shared_ptr<DevicePadSignalMapItem>& item) noexcept;
-  ~CmdDevicePadSignalMapItemEdit() noexcept;
+  ~CmdDevicePadSignalMapItemEdit() noexcept override;
 
   // Setters
   void setSignalUuid(const std::optional<Uuid>& uuid) noexcept;

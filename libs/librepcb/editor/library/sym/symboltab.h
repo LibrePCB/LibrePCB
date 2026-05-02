@@ -82,7 +82,7 @@ public:
   SymbolTab(const SymbolTab& other) = delete;
   explicit SymbolTab(LibraryEditor& editor, std::unique_ptr<Symbol> sym,
                      Mode mode, QObject* parent = nullptr) noexcept;
-  ~SymbolTab() noexcept;
+  ~SymbolTab() noexcept override;
 
   // General Methods
   FilePath getDirectoryPath() const noexcept override;

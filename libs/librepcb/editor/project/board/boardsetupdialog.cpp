@@ -375,9 +375,8 @@ void BoardSetupDialog::loadDrcSources(
 
   QStringList loaded;
   for (const BoardDesignRuleCheckSettings::Source& src : mDrcSources) {
-    loaded.append(QString("%1 (%2)")
-                      .arg(*src.organizationName)
-                      .arg(*src.pcbDesignRulesName));
+    loaded.append(
+        QString("%1 (%2)").arg(*src.organizationName, *src.pcbDesignRulesName));
   }
   mUi->lblDrcConfigTitle->setText(tr("Configuration Base:"));
   if (loaded.isEmpty()) {
@@ -389,14 +388,12 @@ void BoardSetupDialog::loadDrcSources(
       auto addDesignRules = [&](const WorkspaceLibraryDb::Organization& org,
                                 const WorkspaceLibraryDb::PcbDesignRules& dru) {
         loaded.append(QString("<a href=\"%1:%2\">%3</a>")
-                          .arg(org.uuid.toStr())
-                          .arg(dru.uuid.toStr())
-                          .arg(QString("%1 (%2)")
-                                   .arg(org.name)
-                                   .arg(dru.name)
+                          .arg(org.uuid.toStr(), dru.uuid.toStr(),
+                               QString("%1 (%2)")
+                                   .arg(org.name, dru.name)
                                    .toHtmlEscaped()));
       };
-      for (const auto& org : organizations) {
+      for (const auto& org : std::as_const(organizations)) {
         if (org.isSponsor) {
           if (org.pcbDesignRules.count() > 1) {
             for (const auto& dru : org.pcbDesignRules) {
@@ -481,7 +478,7 @@ void BoardSetupDialog::loadDrcSettingsPreset() noexcept {
         EditorToolbox::svgIcon(":/fa/solid/triangle-exclamation.svg"),
         "Error loading presets from DB");
   }
-  for (const auto& org : *organizations) {
+  for (const auto& org : std::as_const(*organizations)) {
     if (org.pcbDesignRules.count() > 1) {
       QMenu* subMenu = menu.addMenu(org.logo, org.name);
       for (const auto& dru : org.pcbDesignRules) {

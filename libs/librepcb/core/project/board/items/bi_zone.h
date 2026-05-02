@@ -62,7 +62,7 @@ public:
   BI_Zone() = delete;
   BI_Zone(const BI_Zone& other) = delete;
   BI_Zone(Board& board, const BoardZoneData& data);
-  ~BI_Zone() noexcept;
+  ~BI_Zone() noexcept override;
 
   // Getters
   const BoardZoneData& getData() const noexcept { return mData; }

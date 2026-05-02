@@ -66,7 +66,7 @@ public:
   FootprintPainter() = delete;
   explicit FootprintPainter(const Footprint& footprint) noexcept;
   FootprintPainter(const FootprintPainter& other) = delete;
-  ~FootprintPainter() noexcept;
+  ~FootprintPainter() noexcept override;
 
   // General Methods
   void paint(QPainter& painter,

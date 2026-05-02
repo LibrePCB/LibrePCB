@@ -51,7 +51,7 @@ public:
   CmdPackagePadEdit() = delete;
   CmdPackagePadEdit(const CmdPackagePadEdit& other) = delete;
   explicit CmdPackagePadEdit(PackagePad& pad) noexcept;
-  ~CmdPackagePadEdit() noexcept;
+  ~CmdPackagePadEdit() noexcept override;
 
   // Setters
   void setName(const CircuitIdentifier& name) noexcept;

@@ -41,10 +41,7 @@ namespace librepcb {
 class ScopeGuardBase {
 public:
   ScopeGuardBase() noexcept : mActive(true) {}
-
-  ScopeGuardBase(ScopeGuardBase&& rhs) noexcept : mActive(rhs.mActive) {
-    rhs.dismiss();
-  }
+  ScopeGuardBase(ScopeGuardBase& rhs) = delete;
 
   /**
    * Do not execute cleanup code
@@ -74,9 +71,6 @@ public:
   ScopeGuard(const ScopeGuard&) = delete;
 
   ScopeGuard(Fun f) noexcept : mF(std::move(f)) {}
-
-  ScopeGuard(ScopeGuard&& rhs) noexcept
-    : ScopeGuardBase(std::move(rhs)), mF(std::move(rhs.mF)) {}
 
   /**
    * Calls the attached cleanup function

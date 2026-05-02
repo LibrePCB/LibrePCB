@@ -59,7 +59,7 @@ public:
   BGI_NetLine(
       BI_NetLine& netline, const GraphicsLayerList& layers,
       std::shared_ptr<const BoardGraphicsScene::Context> context) noexcept;
-  virtual ~BGI_NetLine() noexcept;
+  ~BGI_NetLine() noexcept override;
 
   // General Methods
   BI_NetLine& getNetLine() noexcept { return mNetLine; }

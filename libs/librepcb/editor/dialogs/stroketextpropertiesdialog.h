@@ -69,7 +69,7 @@ public:
                              const LengthUnit& lengthUnit,
                              const QString& settingsPrefix,
                              QWidget* parent = nullptr) noexcept;
-  ~StrokeTextPropertiesDialog() noexcept;
+  ~StrokeTextPropertiesDialog() noexcept override;
 
   // Setters
   void setReadOnly(bool readOnly) noexcept;

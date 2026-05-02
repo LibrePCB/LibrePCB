@@ -93,7 +93,7 @@ void PartListModel::apply() {
     return;
   }
 
-  for (auto editor : mItems) {
+  for (auto editor : std::as_const(mItems)) {
     editor->apply();
   }
 

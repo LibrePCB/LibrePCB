@@ -54,7 +54,7 @@ BI_Device::BI_Device(Board& board, ComponentInstance& compInstance,
   : BI_Base(board),
     onEdited(*this),
     mCompInstance(compInstance),
-    mLibDevice(nullptr),
+    mLibDevice(mBoard.getProject().getLibrary().getDevice(deviceUuid)),
     mLibPackage(nullptr),
     mLibFootprint(nullptr),
     mLibModel(nullptr),
@@ -63,8 +63,7 @@ BI_Device::BI_Device(Board& board, ComponentInstance& compInstance,
     mMirrored(mirror),
     mLocked(locked),
     mEnableGlue(glue) {
-  // get device from library
-  mLibDevice = mBoard.getProject().getLibrary().getDevice(deviceUuid);
+  // Check if library device was found.
   if (!mLibDevice) {
     qCritical() << "No device for component:" << mCompInstance.getUuid();
     throw RuntimeError(__FILE__, __LINE__,
@@ -272,6 +271,7 @@ StrokeTextList BI_Device::getDefaultStrokeTexts() const noexcept {
 }
 
 void BI_Device::addStrokeText(BI_StrokeText& text) {
+  // NOLINTNEXTLINE
   if ((mStrokeTexts.values().contains(&text)) ||
       (&text.getBoard() != &mBoard)) {
     throw LogicError(__FILE__, __LINE__);

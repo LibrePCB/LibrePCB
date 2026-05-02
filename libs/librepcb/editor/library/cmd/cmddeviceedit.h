@@ -51,7 +51,7 @@ public:
   CmdDeviceEdit() = delete;
   CmdDeviceEdit(const CmdDeviceEdit& other) = delete;
   explicit CmdDeviceEdit(Device& device) noexcept;
-  ~CmdDeviceEdit() noexcept;
+  ~CmdDeviceEdit() noexcept override;
 
   // Setters
   void setComponentUuid(const Uuid& uuid) noexcept;

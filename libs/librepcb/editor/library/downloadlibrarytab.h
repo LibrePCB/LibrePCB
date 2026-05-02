@@ -59,7 +59,7 @@ public:
   DownloadLibraryTab(const DownloadLibraryTab& other) = delete;
   explicit DownloadLibraryTab(GuiApplication& app,
                               QObject* parent = nullptr) noexcept;
-  ~DownloadLibraryTab() noexcept;
+  ~DownloadLibraryTab() noexcept override;
 
   // General Methods
   ui::TabData getUiData() const noexcept override;

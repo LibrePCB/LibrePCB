@@ -267,6 +267,7 @@ void CmdRemoveBoardItems::removeNetSegmentItems(
       BI_NetLine* newNetLine = cmdAddElements->addNetLine(
           *p1, *p2, trace.getLayer(), trace.getWidth());
       Q_ASSERT(newNetLine);
+      Q_UNUSED(newNetLine);
     }
     execNewChildCmd(cmdAddElements);  // can throw
     mModifiedNetSegments.append(newNetSegment);

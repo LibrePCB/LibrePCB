@@ -52,7 +52,7 @@ public:
   SI_Polygon() = delete;
   SI_Polygon(const SI_Polygon& other) = delete;
   SI_Polygon(Schematic& schematic, const Polygon& polygon);
-  ~SI_Polygon() noexcept;
+  ~SI_Polygon() noexcept override;
 
   // Getters
   const Uuid& getUuid() const noexcept;

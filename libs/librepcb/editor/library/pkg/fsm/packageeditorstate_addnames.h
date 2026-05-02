@@ -50,7 +50,7 @@ public:
   PackageEditorState_AddNames(const PackageEditorState_AddNames& other) =
       delete;
   explicit PackageEditorState_AddNames(Context& context) noexcept;
-  ~PackageEditorState_AddNames() noexcept;
+  ~PackageEditorState_AddNames() noexcept override;
 
   // Operator Overloadings
   PackageEditorState_AddNames& operator=(

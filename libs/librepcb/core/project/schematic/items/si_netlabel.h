@@ -64,7 +64,7 @@ public:
   SI_NetLabel() = delete;
   SI_NetLabel(const SI_NetLabel& other) = delete;
   explicit SI_NetLabel(SI_NetSegment& segment, const NetLabel& label);
-  ~SI_NetLabel() noexcept;
+  ~SI_NetLabel() noexcept override;
 
   // Getters
   const Uuid& getUuid() const noexcept { return mNetLabel.getUuid(); }

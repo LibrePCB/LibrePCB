@@ -101,7 +101,7 @@ public:
   // Constructors / Destructor
   explicit CmdBoardSpecctraImport(Board& board, const SExpression& root,
                                   std::shared_ptr<MessageLogger> logger);
-  ~CmdBoardSpecctraImport() noexcept;
+  ~CmdBoardSpecctraImport() noexcept override;
 
 private:  // Methods
   /// @copydoc ::librepcb::editor::UndoCommand::performExecute()

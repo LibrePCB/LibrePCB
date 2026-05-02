@@ -81,6 +81,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -148,9 +150,8 @@ bool CmdPasteSchematicItems::performExecute() {
   std::unique_ptr<TransactionalDirectory> cmpDir = mData->getDirectory("cmp");
   foreach (const QString& dirname, cmpDir->getDirs()) {
     if (!mProject.getLibrary().getComponent(Uuid::fromString(dirname))) {
-      std::unique_ptr<Component> cmp =
-          Component::open(std::unique_ptr<TransactionalDirectory>(
-              new TransactionalDirectory(*cmpDir, dirname)));
+      std::unique_ptr<Component> cmp = Component::open(
+          std::make_unique<TransactionalDirectory>(*cmpDir, dirname));
       execNewChildCmd(new CmdProjectLibraryAddElement<Component>(
           mProject.getLibrary(), *cmp.release()));
     }
@@ -160,9 +161,8 @@ bool CmdPasteSchematicItems::performExecute() {
   std::unique_ptr<TransactionalDirectory> symDir = mData->getDirectory("sym");
   foreach (const QString& dirname, symDir->getDirs()) {
     if (!mProject.getLibrary().getSymbol(Uuid::fromString(dirname))) {
-      std::unique_ptr<Symbol> sym =
-          Symbol::open(std::unique_ptr<TransactionalDirectory>(
-              new TransactionalDirectory(*symDir, dirname)));
+      std::unique_ptr<Symbol> sym = Symbol::open(
+          std::make_unique<TransactionalDirectory>(*symDir, dirname));
       execNewChildCmd(new CmdProjectLibraryAddElement<Symbol>(
           mProject.getLibrary(), *sym.release()));
     }
@@ -182,7 +182,7 @@ bool CmdPasteSchematicItems::performExecute() {
   // Paste components
   QHash<Uuid, Uuid> componentInstanceMap;
   for (const std::shared_ptr<SchematicClipboardData::ComponentInstance>& cmp :
-       componentInstances) {
+       std::as_const(componentInstances)) {
     const Component* libCmp =
         mProject.getLibrary().getComponent(cmp->libComponentUuid);
     if (!libCmp) throw LogicError(__FILE__, __LINE__);

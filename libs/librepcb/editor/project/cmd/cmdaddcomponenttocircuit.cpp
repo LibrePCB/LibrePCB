@@ -35,6 +35,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -89,9 +91,9 @@ bool CmdAddComponentToCircuit::performExecute() {
              "workspace library!")
               .arg(mComponentUuid.toStr()));
     }
-    cmp = Component::open(std::unique_ptr<TransactionalDirectory>(
-                              new TransactionalDirectory(
-                                  TransactionalFileSystem::openRO(cmpFp))))
+    cmp = Component::open(std::make_unique<TransactionalDirectory>(
+
+                              TransactionalFileSystem::openRO(cmpFp)))
               .release();  // can throw
     CmdProjectLibraryAddElement<Component>* cmdAddToLibrary =
         new CmdProjectLibraryAddElement<Component>(mProject.getLibrary(), *cmp);

@@ -49,7 +49,7 @@ public:
       const CmdRemoveSelectedFootprintItems& other) = delete;
   CmdRemoveSelectedFootprintItems(
       const PackageEditorState::Context& context) noexcept;
-  ~CmdRemoveSelectedFootprintItems() noexcept;
+  ~CmdRemoveSelectedFootprintItems() noexcept override;
 
   // Operator Overloadings
   CmdRemoveSelectedFootprintItems& operator=(

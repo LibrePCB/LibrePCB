@@ -78,7 +78,7 @@ public:
       mErrorMessage(),
       mFinishedSuccess(false) {}
 
-  void progressState(QString state) {
+  void progressState(const QString& state) {
     EXPECT_EQ(mThread, QThread::currentThread());
     EXPECT_FALSE(state.isEmpty());
     mProgressStateCallCount++;
@@ -110,7 +110,7 @@ public:
     mSucceededCallCount++;
   }
 
-  void errored(QString errorMsg) {
+  void errored(const QString& errorMsg) {
     EXPECT_EQ(mThread, QThread::currentThread());
     mErrorMessage = errorMsg;
     mErroredCallCount++;
@@ -122,23 +122,23 @@ public:
     mFinishedCallCount++;
   }
 
-  void dataReceived(QByteArray data, QString contentType) {
+  void dataReceived(const QByteArray& data, const QString& contentType) {
     mReceivedData = data;
     mReceivedContentType = contentType;
     mDataReceivedCallCount++;
   }
 
-  void fileDownloaded(FilePath filepath) {
+  void fileDownloaded(const FilePath& filepath) {
     mDownloadedToFilePath = filepath;
     mFileDownloadedCallCount++;
   }
 
-  void zipFileExtracted(FilePath directory) {
+  void zipFileExtracted(const FilePath& directory) {
     mExtractedToFilePath = directory;
     mZipFileExtractedCallCount++;
   }
 
-  void destroyed(QObject* obj) {
+  void objectDestroyed(QObject* obj) {
     EXPECT_EQ(mThread, QThread::currentThread());
     EXPECT_FALSE(mDestroyed);
     Q_UNUSED(obj);

@@ -154,7 +154,7 @@ bool CmdRemoveSelectedSchematicItems::performExecute() {
 
   // If net segments have been modified, we also need to simplify the
   // connected bus segments afterwards.
-  for (SI_NetSegment* ns : mModifiedNetSegments) {
+  for (SI_NetSegment* ns : std::as_const(mModifiedNetSegments)) {
     mModifiedBusSegments |= ns->getAllConnectedBusSegments();
   }
 

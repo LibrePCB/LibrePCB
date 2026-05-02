@@ -47,10 +47,10 @@ public:
   PackageCheck() = delete;
   PackageCheck(const PackageCheck& other) = delete;
   explicit PackageCheck(const Package& package) noexcept;
-  virtual ~PackageCheck() noexcept;
+  ~PackageCheck() noexcept override;
 
   // General Methods
-  virtual RuleCheckMessageList runChecks() const override;
+  RuleCheckMessageList runChecks() const override;
 
   // Operator Overloadings
   PackageCheck& operator=(const PackageCheck& rhs) = delete;

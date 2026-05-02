@@ -55,7 +55,7 @@ public:
   SymbolEditorState_AddImage() = delete;
   SymbolEditorState_AddImage(const SymbolEditorState_AddImage& other) = delete;
   explicit SymbolEditorState_AddImage(const Context& context) noexcept;
-  ~SymbolEditorState_AddImage() noexcept;
+  ~SymbolEditorState_AddImage() noexcept override;
 
   // General Methods
   bool entry() noexcept override;

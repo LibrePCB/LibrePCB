@@ -58,7 +58,7 @@ public:
   CreateLibraryTab(const CreateLibraryTab& other) = delete;
   explicit CreateLibraryTab(GuiApplication& app,
                             QObject* parent = nullptr) noexcept;
-  ~CreateLibraryTab() noexcept;
+  ~CreateLibraryTab() noexcept override;
 
   // General Methods
   ui::TabData getUiData() const noexcept override;

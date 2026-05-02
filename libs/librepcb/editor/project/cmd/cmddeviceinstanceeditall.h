@@ -52,7 +52,7 @@ class CmdDeviceInstanceEditAll final : public UndoCommandGroup {
 public:
   // Constructors / Destructor
   explicit CmdDeviceInstanceEditAll(BI_Device& dev) noexcept;
-  ~CmdDeviceInstanceEditAll() noexcept;
+  ~CmdDeviceInstanceEditAll() noexcept override;
 
   // General Methods
   void setPosition(const Point& pos, bool immediate) noexcept;

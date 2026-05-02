@@ -48,7 +48,7 @@ public:
   // Constructors / Destructor
   explicit KeySequenceDelegate(QObject* parent = nullptr) noexcept;
   KeySequenceDelegate(const KeySequenceDelegate& other) = delete;
-  ~KeySequenceDelegate() noexcept;
+  ~KeySequenceDelegate() noexcept override;
 
   // Inherited from QStyledItemDelegate
   QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option,

@@ -70,17 +70,17 @@ void TestHelpers::compareDirectories(const FilePath& actual,
   }
 
   // Check for files missing in actual output.
-  for (const QString& rel : (expectedRels - actualRels)) {
+  for (const QString& rel : (expectedRels - actualRels)) {  // NOLINT
     ADD_FAILURE() << "Missing file in output: " << rel.toStdString();
   }
 
   // Check for unexpected files in actual output.
-  for (const QString& rel : (actualRels - expectedRels)) {
+  for (const QString& rel : (actualRels - expectedRels)) {  // NOLINT
     ADD_FAILURE() << "Unexpected file in output: " << rel.toStdString();
   }
 
   // Compare contents of files present in both, one at a time.
-  for (const QString& rel : (actualRels & expectedRels)) {
+  for (const QString& rel : (actualRels & expectedRels)) {  // NOLINT
     EXPECT_EQ(FileUtils::readFile(expected.getPathTo(rel)).toStdString(),
               FileUtils::readFile(actual.getPathTo(rel)).toStdString())
         << "File content differs: " << rel.toStdString();

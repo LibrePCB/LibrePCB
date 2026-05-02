@@ -123,7 +123,7 @@ GraphicsExportSettings::~GraphicsExportSettings() noexcept {
  *  Getters
  ******************************************************************************/
 
-QStringList GraphicsExportSettings::getPaintOrder() const noexcept {
+const QStringList GraphicsExportSettings::getPaintOrder() const noexcept {
   QStringList l;
   for (int i = mColors.count() - 1; i >= 0; --i) {
     l.append(mColors.at(i).first);

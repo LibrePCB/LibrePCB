@@ -99,8 +99,8 @@ public:
   static QString convertElementKeywords(const QString& commonKeywords,
                                         const QList<KiCadProperty>& props);
   static ResourceList convertResources(const QList<KiCadProperty>& props);
-  static Point convertSymbolPoint(const QPointF& p);
-  static Point convertFootprintPoint(const QPointF& p);
+  static Point convertSymbolPoint(QPointF p);
+  static Point convertFootprintPoint(QPointF p);
   static Angle convertArc(const Point& start, const Point& mid,
                           const Point& end);
   static UnsignedLength convertSymbolStrokeWidth(qreal width);
@@ -125,7 +125,7 @@ public:
   static std::shared_ptr<SymbolPin> convertSymbolPin(const KiCadSymbolPin& p,
                                                      const QString& name,
                                                      qreal pinNamesOffset);
-  static const Layer& convertFootprintGeometryLayer(const KiCadLayer& l);
+  static const Layer& convertFootprintGeometryLayer(KiCadLayer l);
   static Line convertFootprintLine(const KiCadFootprintLine& l);
   static Line convertFootprintArc(const KiCadFootprintArc& a);
   static QList<LineGroup> groupLinesByLayerAndWidth(const QList<Line>& lines);

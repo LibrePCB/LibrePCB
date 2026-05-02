@@ -175,10 +175,10 @@ bool KiCadLibraryImport::canStartSelecting() const noexcept {
     return false;
   }
 
-  for (const SymbolLibrary& lib : result->symbolLibs) {
+  for (const SymbolLibrary& lib : std::as_const(result->symbolLibs)) {
     if (!lib.symbols.isEmpty()) return true;
   }
-  for (const FootprintLibrary& lib : result->footprintLibs) {
+  for (const FootprintLibrary& lib : std::as_const(result->footprintLibs)) {
     if (!lib.footprints.isEmpty()) return true;
   }
   return false;
@@ -194,7 +194,7 @@ bool KiCadLibraryImport::canStartImport() const noexcept {
     return false;
   }
 
-  for (const SymbolLibrary& lib : result->symbolLibs) {
+  for (const SymbolLibrary& lib : std::as_const(result->symbolLibs)) {
     for (const Symbol& sym : lib.symbols) {
       if ((sym.symChecked != Qt::Unchecked) && (!sym.symAlreadyImported)) {
         for (const Gate& gate : sym.gates) {
@@ -213,7 +213,7 @@ bool KiCadLibraryImport::canStartImport() const noexcept {
       }
     }
   }
-  for (const FootprintLibrary& lib : result->footprintLibs) {
+  for (const FootprintLibrary& lib : std::as_const(result->footprintLibs)) {
     for (const Footprint& fpt : lib.footprints) {
       if ((fpt.checked != Qt::Unchecked) && (!fpt.alreadyImported)) {
         return true;
@@ -374,7 +374,7 @@ bool KiCadLibraryImport::startParse(
     std::shared_ptr<MessageLogger> log) noexcept {
   if (mState != State::Scanned) {
     log->critical("Unexpected state.");
-    parseFinished();
+    emit parseFinished();
     return false;
   }
 
@@ -389,7 +389,7 @@ bool KiCadLibraryImport::startImport(
     std::shared_ptr<MessageLogger> log) noexcept {
   if (mState != State::Parsed) {
     log->critical("Unexpected state.");
-    importFinished();
+    emit importFinished();
     return false;
   }
 
@@ -432,7 +432,7 @@ std::shared_ptr<KiCadLibraryImport::Result> KiCadLibraryImport::scan(
 
   // Helper to find files or directories in a directory.
   auto findItems = [](const FilePath& dir, QDir::Filter filter,
-                      const QString& pattern) {
+                      const QString& pattern) -> const QList<FilePath> {
     QList<FilePath> files;
     QDir qDir(dir.toStr());
     qDir.setFilter(filter | QDir::NoDotAndDotDot);
@@ -579,7 +579,7 @@ std::shared_ptr<KiCadLibraryImport::Result> KiCadLibraryImport::parse(
           SExpression::parse(FileUtils::readFile(lib.file), lib.file,
                              SExpression::Mode::Permissive);
       KiCadSymbolLibrary kiLib = KiCadSymbolLibrary::parse(*root, symLog);
-      for (const auto& kiSymbol : kiLib.symbols) {
+      for (const auto& kiSymbol : std::as_const(kiLib.symbols)) {
         const QString cmpGeneratedBy = generatedBy(
             lib.file.getCompleteBasename(),
             {kiSymbol.extends.isEmpty() ? kiSymbol.name : kiSymbol.extends});
@@ -650,7 +650,7 @@ std::shared_ptr<KiCadLibraryImport::Result> KiCadLibraryImport::parse(
   int footprintCount = 0;
   for (FootprintLibrary& lib : result->footprintLibs) {
     lib.footprints.clear();  // Might be a leftover from previous run.
-    for (const FilePath& fptFp : lib.files) {
+    for (const FilePath& fptFp : std::as_const(lib.files)) {
       if (mAbort) break;
 
       MessageLogger fptLog(
@@ -730,14 +730,14 @@ std::shared_ptr<KiCadLibraryImport::Result> KiCadLibraryImport::import(
       *log);
 
   // Calculate total count.
-  for (const FootprintLibrary& lib : result->footprintLibs) {
+  for (const FootprintLibrary& lib : std::as_const(result->footprintLibs)) {
     for (const Footprint& fpt : lib.footprints) {
       if ((fpt.checked != Qt::Unchecked) && (!fpt.alreadyImported)) {
         ++totalCount;  // Package.
       }
     }
   }
-  for (const SymbolLibrary& lib : result->symbolLibs) {
+  for (const SymbolLibrary& lib : std::as_const(result->symbolLibs)) {
     for (const Symbol& sym : lib.symbols) {
       if ((sym.symChecked != Qt::Unchecked) && (!sym.symAlreadyImported)) {
         for (const Gate& gate : sym.gates) {
@@ -759,7 +759,7 @@ std::shared_ptr<KiCadLibraryImport::Result> KiCadLibraryImport::import(
 
   // Import packages.
   QSet<QString> missing3dShapeLibs;
-  for (const FootprintLibrary& lib : result->footprintLibs) {
+  for (const FootprintLibrary& lib : std::as_const(result->footprintLibs)) {
     for (const Footprint& fpt : lib.footprints) {
       if (mAbort) {
         break;
@@ -780,7 +780,7 @@ std::shared_ptr<KiCadLibraryImport::Result> KiCadLibraryImport::import(
 
         // Find 3D models.
         QMap<QString, FilePath> models;
-        for (const KiCadFootprintModel& model : kiFpt.models) {
+        for (const KiCadFootprintModel& model : std::as_const(kiFpt.models)) {
           const QStringList pathSegments = model.path.split("/");
           const QString libName = pathSegments.value(pathSegments.count() - 2);
           const QString fileName = pathSegments.value(pathSegments.count() - 1)
@@ -792,7 +792,8 @@ std::shared_ptr<KiCadLibraryImport::Result> KiCadLibraryImport::import(
             continue;
           }
           bool libFound = false;
-          for (const Package3DLibrary& lib : result->package3dLibs) {
+          for (const Package3DLibrary& lib :
+               std::as_const(result->package3dLibs)) {
             if (lib.dir.getFilename() == libName) {
               libFound = true;
               for (const FilePath& fp : lib.stepFiles) {
@@ -828,7 +829,7 @@ std::shared_ptr<KiCadLibraryImport::Result> KiCadLibraryImport::import(
   }
 
   // Import symbols, components & devices.
-  for (const SymbolLibrary& lib : result->symbolLibs) {
+  for (const SymbolLibrary& lib : std::as_const(result->symbolLibs)) {
     MessageLogger libLog(log.get(), lib.file.getCompleteBasename());
     try {
       std::unique_ptr<SExpression> root =
@@ -925,7 +926,8 @@ std::shared_ptr<KiCadLibraryImport::Result> KiCadLibraryImport::import(
           try {
             bool baseSymbolFound = true;
             if (!kiSym.extends.isEmpty()) {
-              for (const KiCadSymbol& kiSymBase : kiLib.symbols) {
+              for (const KiCadSymbol& kiSymBase :
+                   std::as_const(kiLib.symbols)) {
                 if (kiSymBase.name == kiSym.extends) {
                   kiGates = mergeSymbolGates(kiSymBase.gates, kiSymBase.name);
                   baseSymbolFound = true;

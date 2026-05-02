@@ -59,7 +59,7 @@ public:
   SymbolEditorState_DrawPolygonBase(
       const SymbolEditorState_DrawPolygonBase& other) = delete;
   SymbolEditorState_DrawPolygonBase(const Context& context, Mode mode) noexcept;
-  virtual ~SymbolEditorState_DrawPolygonBase() noexcept;
+  ~SymbolEditorState_DrawPolygonBase() noexcept override;
 
   // General Methods
   bool processKeyPressed(const GraphicsSceneKeyEvent& e) noexcept override;

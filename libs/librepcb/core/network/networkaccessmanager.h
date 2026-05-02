@@ -68,7 +68,7 @@ public:
   // Constructors / Destructor
   explicit NetworkAccessManager(const FilePath& cache = FilePath()) noexcept;
   NetworkAccessManager(const NetworkAccessManager& other) = delete;
-  ~NetworkAccessManager() noexcept;
+  ~NetworkAccessManager() noexcept override;
 
   // General Methods
   QNetworkReply* get(const QNetworkRequest& request) noexcept;

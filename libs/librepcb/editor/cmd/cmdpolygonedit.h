@@ -54,7 +54,7 @@ public:
   CmdPolygonEdit() = delete;
   CmdPolygonEdit(const CmdPolygonEdit& other) = delete;
   explicit CmdPolygonEdit(Polygon& polygon) noexcept;
-  ~CmdPolygonEdit() noexcept;
+  ~CmdPolygonEdit() noexcept override;
 
   // Setters
   void setLayer(const Layer& layer, bool immediate) noexcept;

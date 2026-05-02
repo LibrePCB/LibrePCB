@@ -263,8 +263,7 @@ std::optional<QImage> Image::tryLoad(const QByteArray& data,
     if (errorMsg) {
       *errorMsg =
           tr("Unsupported image file format '%1'. Supported formats are: %2")
-              .arg(format)
-              .arg(getSupportedExtensions().join(", "));
+              .arg(format, getSupportedExtensions().join(", "));
     }
     return std::nullopt;
   }

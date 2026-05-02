@@ -66,7 +66,7 @@ public:
   ComponentChooserDialog(const ComponentChooserDialog& other) = delete;
   ComponentChooserDialog(const Workspace& ws, const GraphicsLayerList* layers,
                          QWidget* parent = nullptr) noexcept;
-  ~ComponentChooserDialog() noexcept;
+  ~ComponentChooserDialog() noexcept override;
 
   // Getters
   const std::optional<Uuid>& getSelectedComponentUuid() const noexcept {

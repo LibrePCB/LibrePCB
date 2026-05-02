@@ -35,6 +35,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -190,7 +192,7 @@ bool BoardEditorState_DrawZone::startAddZone(const Point& pos) noexcept {
     mContext.undoStack.appendToCmdGroup(new CmdBoardZoneAdd(*mCurrentZone));
 
     // Start undo command
-    mCurrentEditCmd.reset(new CmdBoardZoneEdit(*mCurrentZone));
+    mCurrentEditCmd = std::make_unique<CmdBoardZoneEdit>(*mCurrentZone);
     mLastVertexPos = pos;
     makeLayerVisible(ColorRole::boardZones());
     for (auto layer : mCurrentProperties.getLayers()) {
@@ -231,7 +233,7 @@ bool BoardEditorState_DrawZone::addSegment(const Point& pos) noexcept {
       // Start a new undo command.
       mContext.undoStack.beginCmdGroup(tr("Draw Board Zone"));
       mIsUndoCmdActive = true;
-      mCurrentEditCmd.reset(new CmdBoardZoneEdit(*mCurrentZone));
+      mCurrentEditCmd = std::make_unique<CmdBoardZoneEdit>(*mCurrentZone);
     }
 
     // If this was the last vertex to be added, abort now.

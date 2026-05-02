@@ -59,7 +59,7 @@ public:
   SchematicEditor(const SchematicEditor& other) = delete;
   explicit SchematicEditor(ProjectEditor& prjEditor, Schematic& schematic,
                            int uiIndex, QObject* parent = nullptr) noexcept;
-  ~SchematicEditor() noexcept;
+  ~SchematicEditor() noexcept override;
 
   // General Methods
   ProjectEditor& getProjectEditor() noexcept { return mProjectEditor; }

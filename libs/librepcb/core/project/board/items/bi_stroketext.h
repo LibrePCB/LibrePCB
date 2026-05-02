@@ -66,7 +66,7 @@ public:
   BI_StrokeText() = delete;
   BI_StrokeText(const BI_StrokeText& other) = delete;
   BI_StrokeText(Board& board, const BoardStrokeTextData& data);
-  ~BI_StrokeText() noexcept;
+  ~BI_StrokeText() noexcept override;
 
   // Getters
   const BoardStrokeTextData& getData() const noexcept { return mData; }

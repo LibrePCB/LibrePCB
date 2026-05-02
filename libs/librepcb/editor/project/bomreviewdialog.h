@@ -68,10 +68,10 @@ public:
   BomReviewDialog(const WorkspaceSettings& settings, Project& project,
                   const Board* board = nullptr,
                   QWidget* parent = nullptr) noexcept;
-  ~BomReviewDialog() noexcept;
+  ~BomReviewDialog() noexcept override;
 
   // General Methods
-  virtual bool eventFilter(QObject* obj, QEvent* e) noexcept override;
+  bool eventFilter(QObject* obj, QEvent* e) noexcept override;
 
   // Operator Overloads
   BomReviewDialog& operator=(const BomReviewDialog& rhs) = delete;

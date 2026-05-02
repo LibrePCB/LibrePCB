@@ -51,20 +51,22 @@ using namespace librepcb::tests;
  ******************************************************************************/
 
 class EagleProjectImportTest : public ::testing::Test {
-protected:
+public:
   FilePath mTmpDir;
 
   EagleProjectImportTest() : mTmpDir(FilePath::getRandomTempPath()) {}
 
-  ~EagleProjectImportTest() { QDir(mTmpDir.toStr()).removeRecursively(); }
+  ~EagleProjectImportTest() override {
+    QDir(mTmpDir.toStr()).removeRecursively();
+  }
 
   FilePath getPathTo(const QString& fp) const noexcept {
     return FilePath(TEST_DATA_DIR "/unittests/eagleimport/" % fp);
   }
 
   std::unique_ptr<TransactionalDirectory> getProjectDir() const {
-    return std::unique_ptr<TransactionalDirectory>(
-        new TransactionalDirectory(TransactionalFileSystem::openRW(mTmpDir)));
+    return std::make_unique<TransactionalDirectory>(
+        TransactionalFileSystem::openRW(mTmpDir));
   }
 };
 

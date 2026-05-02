@@ -110,6 +110,7 @@ void BI_NetSegment::addElements(const QList<BI_Pad*>& pads,
   ScopeGuardList sgl(pads.count() + vias.count() + netpoints.count() +
                      netlines.count());
   foreach (BI_Pad* pad, pads) {
+    // NOLINTNEXTLINE
     if ((mPads.values().contains(pad)) || (pad->getNetSegment() != this)) {
       throw LogicError(__FILE__, __LINE__);
     }
@@ -130,6 +131,7 @@ void BI_NetSegment::addElements(const QList<BI_Pad*>& pads,
     });
   }
   foreach (BI_Via* via, vias) {
+    // NOLINTNEXTLINE
     if ((mVias.values().contains(via)) || (&via->getNetSegment() != this)) {
       throw LogicError(__FILE__, __LINE__);
     }
@@ -150,6 +152,7 @@ void BI_NetSegment::addElements(const QList<BI_Pad*>& pads,
     });
   }
   foreach (BI_NetPoint* netpoint, netpoints) {
+    // NOLINTNEXTLINE
     if ((mNetPoints.values().contains(netpoint)) ||
         (&netpoint->getNetSegment() != this)) {
       throw LogicError(__FILE__, __LINE__);
@@ -172,6 +175,7 @@ void BI_NetSegment::addElements(const QList<BI_Pad*>& pads,
     });
   }
   foreach (BI_NetLine* netline, netlines) {
+    // NOLINTNEXTLINE
     if ((mNetLines.values().contains(netline)) ||
         (&netline->getNetSegment() != this)) {
       throw LogicError(__FILE__, __LINE__);

@@ -56,7 +56,7 @@ public:
   PartEditor(const PartEditor& other) = delete;
   explicit PartEditor(std::shared_ptr<Part> part, UndoStack* stack,
                       QObject* parent = nullptr) noexcept;
-  ~PartEditor() noexcept;
+  ~PartEditor() noexcept override;
 
   // General Methods
   ui::PartData getUiData() const;

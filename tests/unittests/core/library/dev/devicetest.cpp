@@ -28,6 +28,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -39,7 +41,7 @@ namespace tests {
  ******************************************************************************/
 
 class DeviceTest : public ::testing::Test {
-protected:
+public:
   FilePath mTmpDir;
   static constexpr const char* sUuid = "4f5ee784-4b1b-407c-802b-44625163d90f";
 
@@ -48,14 +50,14 @@ protected:
     mTmpDir = FilePath::getRandomTempPath().getPathTo(sUuid);
   }
 
-  virtual ~DeviceTest() {
+  ~DeviceTest() override {
     QDir(mTmpDir.getParentDir().toStr()).removeRecursively();
   }
 
   std::unique_ptr<TransactionalDirectory> createDir(
       bool writable = true) const noexcept {
-    return std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
-        TransactionalFileSystem::open(mTmpDir, writable)));
+    return std::make_unique<TransactionalDirectory>(
+        TransactionalFileSystem::open(mTmpDir, writable));
   }
 };
 

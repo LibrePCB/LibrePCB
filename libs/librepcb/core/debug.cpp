@@ -40,7 +40,7 @@ Debug::Debug()
     mDebugLevelLogFile(DebugLevel_t::Nothing),
     mStderrStream(new QTextStream(stderr)),
     mLogFilepath(),
-    mLogFile(0) {
+    mLogFile(nullptr) {
   // determine the filename of the log file which will be used if logging is
   // enabled
   QString datetime =
@@ -56,12 +56,12 @@ Debug::Debug()
 
 Debug::~Debug() {
   delete mStderrStream;
-  mStderrStream = 0;
+  mStderrStream = nullptr;
 
   if (mLogFile) {
     mLogFile->close();
     delete mLogFile;
-    mLogFile = 0;
+    mLogFile = nullptr;
   }
 }
 
@@ -90,14 +90,14 @@ void Debug::setDebugLevelLogFile(DebugLevel_t level) {
                            << mLogFilepath.toNative() << ": "
                            << mLogFile->errorString();
       delete mLogFile;
-      mLogFile = 0;
+      mLogFile = nullptr;
     }
   } else if ((mDebugLevelLogFile != DebugLevel_t::Nothing) &&
              (level == DebugLevel_t::Nothing) && (mLogFile)) {
     // disable logging to file
     mLogFile->close();
     delete mLogFile;
-    mLogFile = 0;
+    mLogFile = nullptr;
   }
 
   mDebugLevelLogFile = level;

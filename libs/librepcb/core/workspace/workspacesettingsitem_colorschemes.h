@@ -59,13 +59,13 @@ public:
       const WorkspaceSettingsItem_ColorSchemes& other) = delete;
   explicit WorkspaceSettingsItem_ColorSchemes(
       const QString& kind, QObject* parent = nullptr) noexcept;
-  ~WorkspaceSettingsItem_ColorSchemes() noexcept;
+  ~WorkspaceSettingsItem_ColorSchemes() noexcept override;
 
   // Getters
   const QVector<const BaseColorScheme*>& getBaseSchemes() const noexcept {
     return mBaseSchemes;
   }
-  QMap<Uuid, UserColorScheme> getUserSchemes() const noexcept;
+  const QMap<Uuid, UserColorScheme> getUserSchemes() const noexcept;
   std::shared_ptr<UserColorScheme> getUserScheme(const Uuid& uuid) noexcept;
   const Uuid& getActiveUuid() const noexcept { return mActiveUuid; }
   const ColorScheme& getActive() const noexcept { return *mActiveScheme; }
@@ -85,7 +85,7 @@ private:  // Methods
   /**
    * @copydoc ::librepcb::WorkspaceSettingsItem::restoreDefaultImpl()
    */
-  virtual void restoreDefaultImpl() noexcept override;
+  void restoreDefaultImpl() noexcept override;
 
   /**
    * @copydoc ::librepcb::WorkspaceSettingsItem::loadImpl()

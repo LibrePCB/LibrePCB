@@ -36,6 +36,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -47,12 +49,12 @@ namespace tests {
  ******************************************************************************/
 
 class OutputJobRunnerTest : public ::testing::Test {
-protected:
+public:
   FilePath mOutDir;
 
   OutputJobRunnerTest() { mOutDir = FilePath::getRandomTempPath(); }
 
-  virtual ~OutputJobRunnerTest() { QDir(mOutDir.toStr()).removeRecursively(); }
+  ~OutputJobRunnerTest() override { QDir(mOutDir.toStr()).removeRecursively(); }
 
   std::unique_ptr<BI_Polygon> createBoardOutline(Board& board) const {
     std::unique_ptr<BI_Polygon> polygon(new BI_Polygon(
@@ -73,18 +75,17 @@ protected:
   }
 
   std::unique_ptr<Board> createBoard(Project& project) const {
-    std::unique_ptr<Board> board(new Board(
-        project,
-        std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory()),
-        "board", Uuid::createRandom(), ElementName("New Board")));
+    std::unique_ptr<Board> board(
+        new Board(project, std::make_unique<TransactionalDirectory>(), "board",
+                  Uuid::createRandom(), ElementName("New Board")));
     board->setInnerLayerCount(2);
     return board;
   }
 
   std::unique_ptr<Project> createProject() const {
     std::unique_ptr<Project> project = Project::create(
-        std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
-            TransactionalFileSystem::openRW(FilePath::getRandomTempPath()))),
+        std::make_unique<TransactionalDirectory>(
+            TransactionalFileSystem::openRW(FilePath::getRandomTempPath())),
         "project.lpp");
     return project;
   }
@@ -160,10 +161,10 @@ TEST_F(OutputJobRunnerTest, testOutputFolderBreakout) {
 // directory is allowed!
 TEST_F(OutputJobRunnerTest, testProjectFolderBreakout) {
   const FilePath projectDir = mOutDir.getPathTo("project");
-  std::unique_ptr<Project> project = Project::create(
-      std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
-          TransactionalFileSystem::openRW(projectDir))),
-      "project.lpp");
+  std::unique_ptr<Project> project =
+      Project::create(std::make_unique<TransactionalDirectory>(
+                          TransactionalFileSystem::openRW(projectDir)),
+                      "project.lpp");
   project->save();
   project->getDirectory().getFileSystem()->save();
 

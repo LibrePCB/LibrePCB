@@ -49,7 +49,7 @@ class CmdBoardNetLineEdit final : public UndoCommand {
 public:
   // Constructors / Destructor
   explicit CmdBoardNetLineEdit(BI_NetLine& netline) noexcept;
-  ~CmdBoardNetLineEdit() noexcept;
+  ~CmdBoardNetLineEdit() noexcept override;
 
   // Getters
   BI_NetLine& getObj() const noexcept { return mNetLine; }

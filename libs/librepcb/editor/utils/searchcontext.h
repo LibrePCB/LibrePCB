@@ -47,7 +47,7 @@ public:
   // Constructors / Destructor
   SearchContext(const SearchContext& other) = delete;
   explicit SearchContext(QObject* parent = nullptr) noexcept;
-  ~SearchContext() noexcept;
+  ~SearchContext() noexcept override;
 
   // General Methods
   void init() noexcept;

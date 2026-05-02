@@ -53,7 +53,7 @@ public:
   CmdAssemblyVariantEdit(const CmdAssemblyVariantEdit& other) = delete;
   explicit CmdAssemblyVariantEdit(Circuit& circuit,
                                   std::shared_ptr<AssemblyVariant> av) noexcept;
-  ~CmdAssemblyVariantEdit() noexcept;
+  ~CmdAssemblyVariantEdit() noexcept override;
 
   // Setters
   void setName(const FileProofName& value) noexcept;

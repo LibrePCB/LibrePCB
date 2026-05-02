@@ -68,7 +68,7 @@ public:
                                   const GraphicsLayerList& layers,
                                   const LibraryElementCache& cache,
                                   QObject* parent = nullptr) noexcept;
-  ~ComponentGateListModel() noexcept;
+  ~ComponentGateListModel() noexcept override;
 
   // General Methods
   void setReferences(ComponentSymbolVariantItemList* list,

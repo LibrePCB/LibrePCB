@@ -49,7 +49,7 @@ public:
   CmdSchematicTextAdd() = delete;
   CmdSchematicTextAdd(const CmdSchematicTextAdd& other) = delete;
   explicit CmdSchematicTextAdd(SI_Text& text) noexcept;
-  ~CmdSchematicTextAdd() noexcept;
+  ~CmdSchematicTextAdd() noexcept override;
 
   // Operator Overloadings
   CmdSchematicTextAdd& operator=(const CmdSchematicTextAdd& rhs) = delete;

@@ -57,7 +57,7 @@ public:
   ProjectLibrary() = delete;
   ProjectLibrary(const ProjectLibrary& other) = delete;
   ProjectLibrary(std::unique_ptr<TransactionalDirectory> directory);
-  ~ProjectLibrary() noexcept;
+  ~ProjectLibrary() noexcept override;
 
   // Getters: General
   TransactionalDirectory& getDirectory() const { return *mDirectory; }

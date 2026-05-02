@@ -52,7 +52,7 @@ public:
   ZoneGraphicsItem(const ZoneGraphicsItem& other) = delete;
   ZoneGraphicsItem(Zone& zone, const GraphicsLayerList& layers,
                    QGraphicsItem* parent = nullptr) noexcept;
-  virtual ~ZoneGraphicsItem() noexcept;
+  ~ZoneGraphicsItem() noexcept override;
 
   // Getters
   Zone& getObj() noexcept { return mZone; }

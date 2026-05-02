@@ -85,7 +85,7 @@ bool CmdRemoveSelectedBoardItems::performExecute() {
   mScene.clearSelection();
 
   // remove items
-  mWrappedCommand.reset(new CmdRemoveBoardItems(mScene.getBoard()));
+  mWrappedCommand = std::make_unique<CmdRemoveBoardItems>(mScene.getBoard());
   mWrappedCommand->removeDeviceInstances(query.getDeviceInstances());
   mWrappedCommand->removeBoardPads(query.getPads());
   mWrappedCommand->removeVias(query.getVias());

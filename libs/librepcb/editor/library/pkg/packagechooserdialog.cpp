@@ -39,6 +39,8 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -234,9 +236,8 @@ void PackageChooserDialog::updatePreview(const FilePath& fp) noexcept {
 
   if (fp.isValid() && mLayers) {
     try {
-      mPackage = Package::open(
-          std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
-              TransactionalFileSystem::openRO(fp))));  // can throw
+      mPackage = Package::open(std::make_unique<TransactionalDirectory>(
+          TransactionalFileSystem::openRO(fp)));  // can throw
       if (mPackage->getFootprints().count() > 0) {
         mGraphicsItem.reset(new FootprintGraphicsItem(
             mPackage->getFootprints().first(), *mLayers,

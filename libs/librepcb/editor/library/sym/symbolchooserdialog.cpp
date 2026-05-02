@@ -38,6 +38,8 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -237,9 +239,8 @@ void SymbolChooserDialog::setSelectedSymbol(const FilePath& fp) noexcept {
 
   if (fp.isValid()) {
     try {
-      mSelectedSymbol = Symbol::open(
-          std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
-              TransactionalFileSystem::openRO(fp))));  // can throw
+      mSelectedSymbol = Symbol::open(std::make_unique<TransactionalDirectory>(
+          TransactionalFileSystem::openRO(fp)));  // can throw
       mUi->lblSymbolName->setText(
           *mSelectedSymbol->getNames().value(localeOrder()));
       mUi->lblSymbolDescription->setText(

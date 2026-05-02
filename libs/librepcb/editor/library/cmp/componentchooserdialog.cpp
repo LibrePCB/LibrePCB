@@ -39,6 +39,8 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -239,11 +241,9 @@ void ComponentChooserDialog::updatePreview(const FilePath& fp) noexcept {
 
   if (fp.isValid() && mLayers) {
     try {
-      mComponent.reset(
-          Component::open(std::unique_ptr<TransactionalDirectory>(
-                              new TransactionalDirectory(
-                                  TransactionalFileSystem::openRO(fp))))
-              .release());  // can throw
+      mComponent.reset(Component::open(std::make_unique<TransactionalDirectory>(
+                                           TransactionalFileSystem::openRO(fp)))
+                           .release());  // can throw
       if (mComponent && mComponent->getSymbolVariants().count() > 0) {
         const ComponentSymbolVariant& symbVar =
             *mComponent->getSymbolVariants().first();
@@ -253,9 +253,8 @@ void ComponentChooserDialog::updatePreview(const FilePath& fp) noexcept {
             FilePath fp = mWorkspace.getLibraryDb().getLatest<Symbol>(
                 item.getSymbolUuid());  // can throw
             std::shared_ptr<Symbol> sym(
-                Symbol::open(std::unique_ptr<TransactionalDirectory>(
-                                 new TransactionalDirectory(
-                                     TransactionalFileSystem::openRO(fp))))
+                Symbol::open(std::make_unique<TransactionalDirectory>(
+                                 TransactionalFileSystem::openRO(fp)))
                     .release());  // can throw
             mSymbols.append(sym);
 

@@ -95,7 +95,7 @@ public:
   EagleLibraryConverter(const EagleLibraryConverter& other) = delete;
   explicit EagleLibraryConverter(const EagleLibraryConverterSettings& settings,
                                  QObject* parent = nullptr) noexcept;
-  ~EagleLibraryConverter() noexcept;
+  ~EagleLibraryConverter() noexcept override;
 
   // Getters
   Uuid getComponentSignalOfSymbolPin(const QString& libName,

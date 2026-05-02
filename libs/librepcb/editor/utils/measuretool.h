@@ -60,7 +60,7 @@ public:
   // Constructors / Destructor
   MeasureTool(const MeasureTool& other) = delete;
   explicit MeasureTool(QObject* parent = nullptr) noexcept;
-  ~MeasureTool() noexcept;
+  ~MeasureTool() noexcept override;
 
   // General Methods
   void setSymbol(const Symbol* symbol) noexcept;

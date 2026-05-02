@@ -47,7 +47,7 @@ class CmdNetClassRemove final : public UndoCommand {
 public:
   // Constructors / Destructor
   explicit CmdNetClassRemove(NetClass& netclass) noexcept;
-  ~CmdNetClassRemove() noexcept;
+  ~CmdNetClassRemove() noexcept override;
 
 private:
   // Private Methods

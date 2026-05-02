@@ -34,6 +34,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -174,7 +176,8 @@ void SchematicEditorState_AddText::setHeight(
   }
 }
 
-QStringList SchematicEditorState_AddText::getTextSuggestions() const noexcept {
+const QStringList SchematicEditorState_AddText::getTextSuggestions()
+    const noexcept {
   return {
       "{{SHEET}}",  //
       "{{PAGE_X_OF_Y}}",  //
@@ -215,8 +218,8 @@ bool SchematicEditorState_AddText::addText(const Point& pos) noexcept {
     std::unique_ptr<CmdSchematicTextAdd> cmdAdd(
         new CmdSchematicTextAdd(*mCurrentTextToPlace));
     mContext.undoStack.appendToCmdGroup(cmdAdd.release());
-    mCurrentTextEditCmd.reset(
-        new CmdTextEdit(mCurrentTextToPlace->getTextObj()));
+    mCurrentTextEditCmd =
+        std::make_unique<CmdTextEdit>(mCurrentTextToPlace->getTextObj());
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());

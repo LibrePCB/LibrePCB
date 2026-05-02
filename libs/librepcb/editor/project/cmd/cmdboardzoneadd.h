@@ -50,7 +50,7 @@ public:
   CmdBoardZoneAdd() = delete;
   CmdBoardZoneAdd(const CmdBoardZoneAdd& other) = delete;
   explicit CmdBoardZoneAdd(BI_Zone& zone) noexcept;
-  ~CmdBoardZoneAdd() noexcept;
+  ~CmdBoardZoneAdd() noexcept override;
 
 private:  // Methods
   /// @copydoc ::librepcb::editor::UndoCommand::performExecute()

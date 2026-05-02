@@ -76,7 +76,7 @@ public:
             const Uuid& deviceUuid, const Uuid& footprintUuid,
             const Point& position, const Angle& rotation, bool mirror,
             bool locked, bool glue, bool loadInitialStrokeTexts);
-  ~BI_Device() noexcept;
+  ~BI_Device() noexcept override;
 
   // Getters
   const Uuid& getComponentInstanceUuid() const noexcept;

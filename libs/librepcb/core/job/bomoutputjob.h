@@ -53,11 +53,11 @@ public:
   BomOutputJob() noexcept;
   BomOutputJob(const BomOutputJob& other) noexcept;
   explicit BomOutputJob(const SExpression& node);
-  virtual ~BomOutputJob() noexcept;
+  ~BomOutputJob() noexcept override;
 
   // Getters
-  virtual QString getTypeTr() const noexcept override;
-  virtual QIcon getTypeIcon() const noexcept override;
+  QString getTypeTr() const noexcept override;
+  QIcon getTypeIcon() const noexcept override;
   const QStringList& getCustomAttributes() const noexcept {
     return mCustomAttributes;
   }
@@ -78,14 +78,14 @@ public:
   static QString getTypeTrStatic() noexcept {
     return tr("Bill Of Materials") % " (*.csv)";
   }
-  virtual std::shared_ptr<OutputJob> cloneShared() const noexcept override;
+  std::shared_ptr<OutputJob> cloneShared() const noexcept override;
 
   // Operator Overloadings
   BomOutputJob& operator=(const BomOutputJob& rhs) = delete;
 
 private:  // Methods
-  virtual void serializeDerived(SExpression& root) const override;
-  virtual bool equals(const OutputJob& rhs) const noexcept override;
+  void serializeDerived(SExpression& root) const override;
+  bool equals(const OutputJob& rhs) const noexcept override;
 
 private:  // Data
   QStringList mCustomAttributes;

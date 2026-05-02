@@ -67,7 +67,7 @@ public:
   // Constructors / Destructor
   explicit CmdRemoveSelectedSchematicItems(
       SchematicGraphicsScene& scene) noexcept;
-  ~CmdRemoveSelectedSchematicItems() noexcept;
+  ~CmdRemoveSelectedSchematicItems() noexcept override;
 
   // Output
   const QSet<SI_NetSegment*>& getModifiedNetSegments() const noexcept {

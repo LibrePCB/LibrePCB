@@ -30,6 +30,8 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -90,8 +92,7 @@ SchematicClipboardData::~SchematicClipboardData() noexcept {
 
 std::unique_ptr<TransactionalDirectory> SchematicClipboardData::getDirectory(
     const QString& path) noexcept {
-  return std::unique_ptr<TransactionalDirectory>(
-      new TransactionalDirectory(mFileSystem, path));
+  return std::make_unique<TransactionalDirectory>(mFileSystem, path);
 }
 
 /*******************************************************************************
@@ -143,8 +144,7 @@ std::unique_ptr<SchematicClipboardData> SchematicClipboardData::fromMimeData(
     const QMimeData* mime) {
   QByteArray content = mime ? mime->data(getMimeType()) : QByteArray();
   if (!content.isNull()) {
-    return std::unique_ptr<SchematicClipboardData>(
-        new SchematicClipboardData(content));  // can throw
+    return std::make_unique<SchematicClipboardData>(content);  // can throw
   } else {
     return nullptr;
   }

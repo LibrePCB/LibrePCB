@@ -50,7 +50,7 @@ public:
                           const Length& height = Length(100000000)) noexcept
     : mPos(x, y), mWidth(width), mHeight(height) {}
 
-  virtual ~GraphicsPagePainterMock() noexcept {}
+  ~GraphicsPagePainterMock() noexcept override {}
 
   void paint(QPainter& painter,
              const GraphicsExportSettings& settings) const noexcept override {

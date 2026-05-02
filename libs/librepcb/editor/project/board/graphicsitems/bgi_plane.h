@@ -62,7 +62,7 @@ public:
   BGI_Plane(
       BI_Plane& plane, const GraphicsLayerList& layers,
       std::shared_ptr<const BoardGraphicsScene::Context> context) noexcept;
-  virtual ~BGI_Plane() noexcept;
+  ~BGI_Plane() noexcept override;
 
   // Getters
 
@@ -95,7 +95,7 @@ public:
   }
   QPainterPath shape() const noexcept override;
   void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
-             QWidget* widget = 0) noexcept override;
+             QWidget* widget = nullptr) noexcept override;
 
   // Operator Overloadings
   BGI_Plane& operator=(const BGI_Plane& rhs) = delete;

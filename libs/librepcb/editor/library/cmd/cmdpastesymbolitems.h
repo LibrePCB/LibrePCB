@@ -58,7 +58,7 @@ public:
   CmdPasteSymbolItems(Symbol& symbol, SymbolGraphicsItem& graphicsItem,
                       std::unique_ptr<SymbolClipboardData> data,
                       const Point& posOffset) noexcept;
-  ~CmdPasteSymbolItems() noexcept;
+  ~CmdPasteSymbolItems() noexcept override;
 
   // Operator Overloadings
   CmdPasteSymbolItems& operator=(const CmdPasteSymbolItems& rhs) = delete;

@@ -56,8 +56,8 @@ namespace editor {
 class NoEditDelegate : public QStyledItemDelegate {
 public:
   NoEditDelegate(QObject* parent = nullptr) : QStyledItemDelegate(parent) {}
-  virtual QWidget* createEditor(QWidget*, const QStyleOptionViewItem&,
-                                const QModelIndex&) const {
+  QWidget* createEditor(QWidget*, const QStyleOptionViewItem&,
+                        const QModelIndex&) const override {
     return nullptr;
   }
 };
@@ -426,7 +426,7 @@ void ComponentAssemblyOptionListEditorWidget::itemSelectionChanged() noexcept {
       (option && mComponent &&
        (!mComponent->getUsedDeviceUuids().contains(option->getDevice()))) ||
       part);
-  selectedPartChanged(part);
+  emit selectedPartChanged(part);
 }
 
 std::pair<int, int> ComponentAssemblyOptionListEditorWidget::getIndices(

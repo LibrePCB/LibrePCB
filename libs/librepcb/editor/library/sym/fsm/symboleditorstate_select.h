@@ -72,7 +72,7 @@ public:
   SymbolEditorState_Select() = delete;
   SymbolEditorState_Select(const SymbolEditorState_Select& other) = delete;
   explicit SymbolEditorState_Select(const Context& context) noexcept;
-  ~SymbolEditorState_Select() noexcept;
+  ~SymbolEditorState_Select() noexcept override;
 
   // General Methods
   bool entry() noexcept override;

@@ -51,7 +51,7 @@ public:
   CmdFlipSelectedBoardItems(BoardGraphicsScene& scene,
                             Qt::Orientation orientation,
                             bool includeLockedItems) noexcept;
-  ~CmdFlipSelectedBoardItems() noexcept;
+  ~CmdFlipSelectedBoardItems() noexcept override;
 
 private:
   // Private Methods

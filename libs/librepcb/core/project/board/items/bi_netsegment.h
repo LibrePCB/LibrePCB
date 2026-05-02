@@ -58,7 +58,7 @@ public:
   BI_NetSegment() = delete;
   BI_NetSegment(const BI_NetSegment& other) = delete;
   BI_NetSegment(Board& board, const Uuid& uuid, NetSignal* signal);
-  ~BI_NetSegment() noexcept;
+  ~BI_NetSegment() noexcept override;
 
   // Getters
   const Uuid& getUuid() const noexcept { return mUuid; }

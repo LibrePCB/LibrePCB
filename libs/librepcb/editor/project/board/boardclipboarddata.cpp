@@ -30,6 +30,8 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -111,8 +113,7 @@ bool BoardClipboardData::isEmpty() const noexcept {
 
 std::unique_ptr<TransactionalDirectory> BoardClipboardData::getDirectory(
     const QString& path) noexcept {
-  return std::unique_ptr<TransactionalDirectory>(
-      new TransactionalDirectory(mFileSystem, path));
+  return std::make_unique<TransactionalDirectory>(mFileSystem, path);
 }
 
 /*******************************************************************************
@@ -179,8 +180,7 @@ std::unique_ptr<BoardClipboardData> BoardClipboardData::fromMimeData(
     const QMimeData* mime) {
   QByteArray content = mime ? mime->data(getMimeType()) : QByteArray();
   if (!content.isNull()) {
-    return std::unique_ptr<BoardClipboardData>(
-        new BoardClipboardData(content));  // can throw
+    return std::make_unique<BoardClipboardData>(content);  // can throw
   } else {
     return nullptr;
   }

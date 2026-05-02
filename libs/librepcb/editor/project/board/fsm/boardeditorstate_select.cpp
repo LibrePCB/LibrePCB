@@ -102,6 +102,7 @@
 #include <QtWidgets>
 
 #include <algorithm>
+#include <memory>
 
 /*******************************************************************************
  *  Namespace
@@ -144,7 +145,7 @@ bool BoardEditorState_Select::entry() noexcept {
 
   mAdapter.fsmToolEnter(*this);
 
-  mUpdateAvailableFeaturesTimer.reset(new QTimer());
+  mUpdateAvailableFeaturesTimer = std::make_unique<QTimer>();
   mUpdateAvailableFeaturesTimer->setSingleShot(true);
   mUpdateAvailableFeaturesTimer->setInterval(50);
   connect(mUpdateAvailableFeaturesTimer.get(), &QTimer::timeout, this,
@@ -331,8 +332,8 @@ bool BoardEditorState_Select::processPaste() noexcept {
             FootprintClipboardData::fromMimeData(
                 qApp->clipboard()->mimeData());  // can throw
         if (footprintData) {
-          data.reset(new BoardClipboardData(footprintData->getFootprintUuid(),
-                                            footprintData->getCursorPos()));
+          data = std::make_unique<BoardClipboardData>(
+              footprintData->getFootprintUuid(), footprintData->getCursorPos());
           for (const auto& polygon : footprintData->getPolygons()) {
             data->getPolygons().append(BoardPolygonData(
                 polygon.getUuid(), polygon.getLayer(), polygon.getLineWidth(),
@@ -606,15 +607,16 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
              (!mCmdPlaneEdit) && (!mCmdZoneEdit)) {
     if (findPolygonVerticesAtPosition(e.scenePos)) {
       // start moving polygon vertex
-      mCmdPolygonEdit.reset(new CmdBoardPolygonEdit(*mSelectedPolygon));
+      mCmdPolygonEdit =
+          std::make_unique<CmdBoardPolygonEdit>(*mSelectedPolygon);
       return true;
     } else if (findPlaneVerticesAtPosition(e.scenePos)) {
       // start moving plane vertex
-      mCmdPlaneEdit.reset(new CmdBoardPlaneEdit(*mSelectedPlane));
+      mCmdPlaneEdit = std::make_unique<CmdBoardPlaneEdit>(*mSelectedPlane);
       return true;
     } else if (findZoneVerticesAtPosition(e.scenePos)) {
       // start moving zone vertex
-      mCmdZoneEdit.reset(new CmdBoardZoneEdit(*mSelectedZone));
+      mCmdZoneEdit = std::make_unique<CmdBoardZoneEdit>(*mSelectedZone);
       return true;
     } else {
       // handle items selection
@@ -851,7 +853,7 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
           a->setChecked(true);
           a->setEnabled(false);
         } else {
-          connect(a, &QAction::triggered, [this, scene, device, item]() {
+          connect(a, &QAction::triggered, &menu, [this, scene, device, item]() {
             try {
               CmdReplaceDevice* cmd = new CmdReplaceDevice(
                   mContext.workspace, scene->getBoard(), device->getDevice(),
@@ -877,6 +879,7 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
           a->setChecked(true);
           a->setEnabled(false);
         } else {
+          // NOLINTNEXTLINE
           connect(a, &QAction::triggered, [this, scene, device, &footprint]() {
             try {
               Uuid deviceUuid = device->getDevice().getLibDevice().getUuid();
@@ -908,7 +911,7 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
           a->setChecked(true);
           a->setEnabled(false);
         } else {
-          connect(a, &QAction::triggered, [this, device, uuid]() {
+          connect(a, &QAction::triggered, &menu, [this, device, uuid]() {
             try {
               std::unique_ptr<CmdDeviceInstanceEdit> cmd(
                   new CmdDeviceInstanceEdit(device->getDevice()));
@@ -1266,8 +1269,8 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
 bool BoardEditorState_Select::startMovingSelectedItems(
     BoardGraphicsScene& scene, const Point& startPos) noexcept {
   Q_ASSERT(!mSelectedItemsDragCommand);
-  mSelectedItemsDragCommand.reset(
-      new CmdDragSelectedBoardItems(scene, getIgnoreLocks(), false, startPos));
+  mSelectedItemsDragCommand = std::make_unique<CmdDragSelectedBoardItems>(
+      scene, getIgnoreLocks(), false, startPos);
   return true;
 }
 
@@ -1564,7 +1567,7 @@ void BoardEditorState_Select::startAddingPolygonVertex(
 
     mSelectedPolygon = &polygon;
     mSelectedPolygonVertices = {vertex};
-    mCmdPolygonEdit.reset(new CmdBoardPolygonEdit(polygon));
+    mCmdPolygonEdit = std::make_unique<CmdBoardPolygonEdit>(polygon);
     mCmdPolygonEdit->setPath(path, true);
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
@@ -1582,7 +1585,7 @@ void BoardEditorState_Select::startAddingPlaneVertex(
 
     mSelectedPlane = &plane;
     mSelectedPlaneVertices = {vertex};
-    mCmdPlaneEdit.reset(new CmdBoardPlaneEdit(plane));
+    mCmdPlaneEdit = std::make_unique<CmdBoardPlaneEdit>(plane);
     mCmdPlaneEdit->setOutline(path, true);
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
@@ -1600,7 +1603,7 @@ void BoardEditorState_Select::startAddingZoneVertex(BI_Zone& zone, int vertex,
 
     mSelectedZone = &zone;
     mSelectedZoneVertices = {vertex};
-    mCmdZoneEdit.reset(new CmdBoardZoneEdit(zone));
+    mCmdZoneEdit = std::make_unique<CmdBoardZoneEdit>(zone);
     mCmdZoneEdit->setOutline(path, true);
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
@@ -1648,8 +1651,8 @@ bool BoardEditorState_Select::startPaste(
       mIsUndoCmdActive = false;
     } else {
       // Start moving the selected items.
-      mSelectedItemsDragCommand.reset(new CmdDragSelectedBoardItems(
-          scene, true, false, startPos));  // can throw
+      mSelectedItemsDragCommand = std::make_unique<CmdDragSelectedBoardItems>(
+          scene, true, false, startPos);  // can throw
     }
     return true;
   } else {
@@ -1792,8 +1795,8 @@ bool BoardEditorState_Select::measureSelectedItems(
   QString text =
       tr("Total length of %n trace segment(s): %2 mm / %3 in", "",
          visitedNetLines.count())
-          .arg(Toolbox::floatToString(totalLength->toMm(), 6, locale))
-          .arg(Toolbox::floatToString(totalLength->toInch(), 6, locale));
+          .arg(Toolbox::floatToString(totalLength->toMm(), 6, locale),
+               Toolbox::floatToString(totalLength->toInch(), 6, locale));
   if (totalSelectedNetlines == visitedNetLines.count()) {
     QMessageBox::information(parentWidget(), title, text);
   } else {
@@ -2333,7 +2336,7 @@ QString BoardEditorState_Select::processSelection(
                                   unit.getReasonableNumberOfDecimals() + 1,
                                   QLocale());
   };
-  auto appendNet = [&](const std::optional<const NetSignal*>& v) {
+  auto appendNet = [&](std::optional<const NetSignal*> v) {
     keyValues.append(std::make_pair(tr("Net"), (*v) ? *(*v)->getName() : "✖"));
     if ((*v) && (mContext.project.getCircuit().getNetClasses().count() > 1)) {
       keyValues.append(
@@ -2377,9 +2380,9 @@ QString BoardEditorState_Select::processSelection(
       keyValues.append(std::make_pair(
           tr("Size"),
           QString("%1 x %2 %3")
-              .arg(formatLength(*pad->getProperties().getWidth()))
-              .arg(formatLength(*pad->getProperties().getHeight()))
-              .arg(unit.toShortStringTr())));
+              .arg(formatLength(*pad->getProperties().getWidth()),
+                   formatLength(*pad->getProperties().getHeight()),
+                   unit.toShortStringTr())));
     }
     if (pad->getProperties().getHoles().count() == 1) {
       auto hole = pad->getProperties().getHoles().at(0);
@@ -2387,18 +2390,16 @@ QString BoardEditorState_Select::processSelection(
           (!hole->isCurvedSlot())) {
         const Length length =
             *hole->getDiameter() + *hole->getPath()->getTotalStraightLength();
-        keyValues.append(
-            std::make_pair(tr("Slot"),
-                           QString("%1 x %2 %3")
-                               .arg(formatLength(*hole->getDiameter()))
-                               .arg(formatLength(length))
-                               .arg(unit.toShortStringTr())));
+        keyValues.append(std::make_pair(
+            tr("Slot"),
+            QString("%1 x %2 %3")
+                .arg(formatLength(*hole->getDiameter()), formatLength(length),
+                     unit.toShortStringTr())));
       } else {
-        keyValues.append(
-            std::make_pair(tr("Drill"),
-                           QString("%1 %2")
-                               .arg(formatLength(*hole->getDiameter()))
-                               .arg(unit.toShortStringTr())));
+        keyValues.append(std::make_pair(
+            tr("Drill"),
+            QString("%1 %2").arg(formatLength(*hole->getDiameter()),
+                                 unit.toShortStringTr())));
       }
     }
   }
@@ -2413,22 +2414,22 @@ QString BoardEditorState_Select::processSelection(
   if (auto v = height.get()) {
     keyValues.append(std::make_pair(
         tr("Height"),
-        QString("%1 %2").arg(formatLength(*v)).arg(unit.toShortStringTr())));
+        QString("%1 %2").arg(formatLength(*v), unit.toShortStringTr())));
   }
   if (auto v = width.get()) {
     keyValues.append(std::make_pair(
         tr("Width"),
-        QString("%1 %2").arg(formatLength(*v)).arg(unit.toShortStringTr())));
+        QString("%1 %2").arg(formatLength(*v), unit.toShortStringTr())));
   }
   if (auto v = drill.get()) {
     keyValues.append(std::make_pair(
         tr("Drill"),
-        QString("%1 %2").arg(formatLength(*v)).arg(unit.toShortStringTr())));
+        QString("%1 %2").arg(formatLength(*v), unit.toShortStringTr())));
   }
   if (auto v = size.get()) {
     keyValues.append(std::make_pair(
         tr("Size"),
-        QString("%1 %2").arg(formatLength(*v)).arg(unit.toShortStringTr())));
+        QString("%1 %2").arg(formatLength(*v), unit.toShortStringTr())));
   }
   if (auto v = layerSpan.get()) {
     if ((v->first != &Layer::topCopper()) ||
@@ -2439,11 +2440,11 @@ QString BoardEditorState_Select::processSelection(
     }
   }
   if (position) {
-    keyValues.append(std::make_pair(tr("Position"),
-                                    QString("%1, %2 %3")
-                                        .arg(formatLength(position->getX()))
-                                        .arg(formatLength(position->getY()))
-                                        .arg(unit.toShortStringTr())));
+    keyValues.append(std::make_pair(
+        tr("Position"),
+        QString("%1, %2 %3")
+            .arg(formatLength(position->getX()), formatLength(position->getY()),
+                 unit.toShortStringTr())));
   }
 
   // Remove keys with empty values.

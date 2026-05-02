@@ -51,7 +51,7 @@ public:
   explicit CmdSchematicNetSegmentAdd(SI_NetSegment& segment) noexcept;
   CmdSchematicNetSegmentAdd(Schematic& schematic,
                             NetSignal& netsignal) noexcept;
-  ~CmdSchematicNetSegmentAdd() noexcept;
+  ~CmdSchematicNetSegmentAdd() noexcept override;
 
   // Getters
   SI_NetSegment* getNetSegment() const noexcept { return mNetSegment; }

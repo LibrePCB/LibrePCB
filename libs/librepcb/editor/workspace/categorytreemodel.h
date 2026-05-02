@@ -67,7 +67,7 @@ public:
       const WorkspaceLibraryDb& db, const WorkspaceSettings& ws,
       Filters filters, const std::optional<Uuid>& hiddenCategory = std::nullopt,
       QObject* parent = nullptr) noexcept;
-  virtual ~CategoryTreeModel() noexcept;
+  ~CategoryTreeModel() noexcept override;
 
   // Implementations
   std::size_t row_count() const override;

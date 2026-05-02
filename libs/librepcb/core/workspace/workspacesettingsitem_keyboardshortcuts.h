@@ -49,7 +49,7 @@ public:
       const WorkspaceSettingsItem_KeyboardShortcuts& other) = delete;
   explicit WorkspaceSettingsItem_KeyboardShortcuts(
       QObject* parent = nullptr) noexcept;
-  ~WorkspaceSettingsItem_KeyboardShortcuts() noexcept;
+  ~WorkspaceSettingsItem_KeyboardShortcuts() noexcept override;
 
   // Getters
   const QMap<QString, QList<QKeySequence>>& get() const noexcept {
@@ -67,7 +67,7 @@ private:  // Methods
   /**
    * @copydoc ::librepcb::WorkspaceSettingsItem::restoreDefaultImpl()
    */
-  virtual void restoreDefaultImpl() noexcept override;
+  void restoreDefaultImpl() noexcept override;
 
   /**
    * @copydoc ::librepcb::WorkspaceSettingsItem::loadImpl()

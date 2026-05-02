@@ -56,7 +56,7 @@ public:
                                  SI_NetLineAnchor& oldAnchor,
                                  SI_NetSegment& result,
                                  SI_NetLineAnchor& newAnchor) noexcept;
-  ~CmdCombineSchematicNetSegments() noexcept;
+  ~CmdCombineSchematicNetSegments() noexcept override;
 
   // Operator Overloadings
   CmdCombineSchematicNetSegments& operator=(

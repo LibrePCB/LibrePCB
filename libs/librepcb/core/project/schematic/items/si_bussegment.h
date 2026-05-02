@@ -57,14 +57,14 @@ public:
   SI_BusSegment() = delete;
   SI_BusSegment(const SI_BusSegment& other) = delete;
   SI_BusSegment(Schematic& schematic, const Uuid& uuid, Bus& bus);
-  ~SI_BusSegment() noexcept;
+  ~SI_BusSegment() noexcept override;
 
   // Getters
   const Uuid& getUuid() const noexcept { return mUuid; }
   Bus& getBus() const noexcept { return *mBus; }
   bool isUsed() const noexcept;
   Point calcNearestPoint(const Point& p) const noexcept;
-  QSet<SI_NetSegment*> getAttachedNetSegments() const noexcept;
+  const QSet<SI_NetSegment*> getAttachedNetSegments() const noexcept;
 
   // Setters
   void setBus(Bus& bus);

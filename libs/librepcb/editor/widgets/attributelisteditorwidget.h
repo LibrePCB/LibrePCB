@@ -52,7 +52,7 @@ public:
   // Constructors / Destructor
   explicit AttributeListEditorWidget(QWidget* parent = nullptr) noexcept;
   AttributeListEditorWidget(const AttributeListEditorWidget& other) = delete;
-  ~AttributeListEditorWidget() noexcept;
+  ~AttributeListEditorWidget() noexcept override;
 
   // Setters
   void setFrameStyle(int style) noexcept;

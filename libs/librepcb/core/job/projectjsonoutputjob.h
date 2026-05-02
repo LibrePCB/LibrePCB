@@ -48,11 +48,11 @@ public:
   ProjectJsonOutputJob() noexcept;
   ProjectJsonOutputJob(const ProjectJsonOutputJob& other) noexcept;
   explicit ProjectJsonOutputJob(const SExpression& node);
-  virtual ~ProjectJsonOutputJob() noexcept;
+  ~ProjectJsonOutputJob() noexcept override;
 
   // Getters
-  virtual QString getTypeTr() const noexcept override;
-  virtual QIcon getTypeIcon() const noexcept override;
+  QString getTypeTr() const noexcept override;
+  QIcon getTypeIcon() const noexcept override;
   const QString& getOutputPath() const noexcept { return mOutputPath; }
 
   // Setters
@@ -63,14 +63,14 @@ public:
   static QString getTypeTrStatic() noexcept {
     return tr("Project Data") % " (*.json)";
   }
-  virtual std::shared_ptr<OutputJob> cloneShared() const noexcept override;
+  std::shared_ptr<OutputJob> cloneShared() const noexcept override;
 
   // Operator Overloadings
   ProjectJsonOutputJob& operator=(const ProjectJsonOutputJob& rhs) = delete;
 
 private:  // Methods
-  virtual void serializeDerived(SExpression& root) const override;
-  virtual bool equals(const OutputJob& rhs) const noexcept override;
+  void serializeDerived(SExpression& root) const override;
+  bool equals(const OutputJob& rhs) const noexcept override;
 
 private:  // Data
   QString mOutputPath;

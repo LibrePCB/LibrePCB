@@ -48,7 +48,7 @@ class CmdDeviceInstanceRemove final : public UndoCommand {
 public:
   // Constructors / Destructor
   CmdDeviceInstanceRemove(BI_Device& dev) noexcept;
-  ~CmdDeviceInstanceRemove() noexcept;
+  ~CmdDeviceInstanceRemove() noexcept override;
 
 private:
   // Private Methods

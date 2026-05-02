@@ -35,6 +35,7 @@
 #include <QtCore>
 
 #include <chrono>
+#include <memory>
 
 /*******************************************************************************
  *  Namespace
@@ -71,8 +72,7 @@ TEST(BoardPlaneFragmentsBuilderTest, testFragments) {
       TransactionalFileSystem::openRO(projectFp.getParentDir());
   ProjectLoader loader;
   std::unique_ptr<Project> project =
-      loader.open(std::unique_ptr<TransactionalDirectory>(
-                      new TransactionalDirectory(projectFs)),
+      loader.open(std::make_unique<TransactionalDirectory>(projectFs),
                   projectFp.getFilename());  // can throw
   Board* board = project->getBoards().first();
 
@@ -116,8 +116,7 @@ TEST(BoardPlaneFragmentsBuilderTest, testManyThreads) {
       TransactionalFileSystem::openRO(projectFp.getParentDir());
   ProjectLoader loader;
   std::unique_ptr<Project> project =
-      loader.open(std::unique_ptr<TransactionalDirectory>(
-                      new TransactionalDirectory(projectFs)),
+      loader.open(std::make_unique<TransactionalDirectory>(projectFs),
                   projectFp.getFilename());  // can throw
   Board* board = project->getBoards().first();
 

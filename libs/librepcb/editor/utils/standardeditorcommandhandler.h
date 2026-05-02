@@ -55,7 +55,7 @@ public:
       delete;
   StandardEditorCommandHandler(const WorkspaceSettings& settings,
                                QWidget* parent = nullptr) noexcept;
-  ~StandardEditorCommandHandler() noexcept;
+  ~StandardEditorCommandHandler() noexcept override;
 
   // Action Handlers
   void onlineDocumentation() const noexcept;

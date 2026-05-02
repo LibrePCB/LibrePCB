@@ -51,20 +51,20 @@ public:
   CmdPackageReload() = delete;
   CmdPackageReload(const CmdPackageReload& other) = delete;
   explicit CmdPackageReload(Package& element) noexcept;
-  virtual ~CmdPackageReload() noexcept;
+  ~CmdPackageReload() noexcept override;
 
   // Operator Overloadings
   CmdPackageReload& operator=(const CmdPackageReload& rhs) = delete;
 
 protected:  // Methods
   /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
-  virtual bool performExecute() override;
+  bool performExecute() override;
 
   /// @copydoc ::librepcb::editor::UndoCommand::performUndo()
-  virtual void performUndo() override;
+  void performUndo() override;
 
   /// @copydoc ::librepcb::editor::UndoCommand::performRedo()
-  virtual void performRedo() override;
+  void performRedo() override;
 
 private:  // Data
   Package& mElement;

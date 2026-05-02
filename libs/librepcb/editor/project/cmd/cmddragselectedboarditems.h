@@ -66,7 +66,7 @@ public:
                                      bool includeLockedItems,
                                      bool includeNetLines = false,
                                      const Point& startPos = Point()) noexcept;
-  ~CmdDragSelectedBoardItems() noexcept;
+  ~CmdDragSelectedBoardItems() noexcept override;
 
   // Getters
   bool hasAnythingSelected() const noexcept { return mItemCount > 0; }

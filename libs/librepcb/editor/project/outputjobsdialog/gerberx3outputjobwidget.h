@@ -59,7 +59,7 @@ public:
   explicit GerberX3OutputJobWidget(Project& project,
                                    std::shared_ptr<GerberX3OutputJob> job,
                                    QWidget* parent = nullptr) noexcept;
-  ~GerberX3OutputJobWidget() noexcept;
+  ~GerberX3OutputJobWidget() noexcept override;
 
   // Operator Overloads
   GerberX3OutputJobWidget& operator=(const GerberX3OutputJobWidget& rhs) =

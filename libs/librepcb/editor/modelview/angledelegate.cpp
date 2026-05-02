@@ -99,8 +99,8 @@ void AngleDelegate::updateEditorGeometry(QWidget* editor,
 
 void AngleDelegate::editingFinished() noexcept {
   AngleEdit* edt = static_cast<AngleEdit*>(sender());
-  commitData(edt);
-  closeEditor(edt);
+  emit commitData(edt);
+  emit closeEditor(edt);
 }
 
 /*******************************************************************************

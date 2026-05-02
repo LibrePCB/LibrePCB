@@ -80,7 +80,7 @@ public:
   Component(const Uuid& uuid, const Version& version, const QString& author,
             const QDateTime& created, const ElementName& name_en_US,
             const QString& description_en_US, const QString& keywords_en_US);
-  ~Component() noexcept;
+  ~Component() noexcept override;
 
   // General
   bool isSchematicOnly() const noexcept { return mSchematicOnly; }
@@ -131,7 +131,7 @@ public:
 
   // General Methods
   void duplicateFrom(const Component& other);
-  virtual RuleCheckMessageList runChecks() const override;
+  RuleCheckMessageList runChecks() const override;
 
   // Operator Overloadings
   Component& operator=(const Component& rhs) = delete;
@@ -148,7 +148,7 @@ public:
   }
 
 protected:  // Methods
-  virtual void serialize(SExpression& root) const override;
+  void serialize(SExpression& root) const override;
 
 private:  // Methods
   Component(std::unique_ptr<TransactionalDirectory> directory,

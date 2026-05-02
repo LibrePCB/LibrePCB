@@ -60,7 +60,7 @@ public:
   SI_BusJunction(const SI_BusJunction& other) = delete;
   SI_BusJunction(SI_BusSegment& segment, const Uuid& uuid,
                  const Point& position);
-  ~SI_BusJunction() noexcept;
+  ~SI_BusJunction() noexcept override;
 
   // Getters
   const Uuid& getUuid() const noexcept { return mJunction.getUuid(); }

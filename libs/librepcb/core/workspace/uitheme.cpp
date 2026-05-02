@@ -185,7 +185,7 @@ const UiTheme* UiTheme::find(const QString& id) noexcept {
   return nullptr;
 }
 
-QVector<const UiTheme*> UiTheme::all() noexcept {
+const QVector<const UiTheme*> UiTheme::all() noexcept {
   return {
       &light(),
       &dark(),

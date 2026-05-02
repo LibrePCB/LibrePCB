@@ -49,7 +49,7 @@ public:
   UndoCommandGroup() = delete;
   UndoCommandGroup(const UndoCommandGroup& other) = delete;
   explicit UndoCommandGroup(const QString& text) noexcept;
-  virtual ~UndoCommandGroup() noexcept;
+  ~UndoCommandGroup() noexcept override;
 
   // Getters
   int getChildCount() const noexcept { return mChildren.count(); }
@@ -78,13 +78,13 @@ public:
 
 protected:
   /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
-  virtual bool performExecute() override;
+  bool performExecute() override;
 
   /// @copydoc ::librepcb::editor::UndoCommand::performUndo()
-  virtual void performUndo() override;
+  void performUndo() override;
 
   /// @copydoc ::librepcb::editor::UndoCommand::performRedo()
-  virtual void performRedo() override;
+  void performRedo() override;
 
   /**
    * @brief Perform custom actions after modifying the undo stack state

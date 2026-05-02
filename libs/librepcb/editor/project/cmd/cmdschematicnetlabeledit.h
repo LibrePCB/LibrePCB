@@ -51,7 +51,7 @@ class CmdSchematicNetLabelEdit final : public UndoCommand {
 public:
   // Constructors / Destructor
   explicit CmdSchematicNetLabelEdit(SI_NetLabel& netlabel) noexcept;
-  ~CmdSchematicNetLabelEdit() noexcept;
+  ~CmdSchematicNetLabelEdit() noexcept override;
 
   // Setters
   void setPosition(const Point& position, bool immediate) noexcept;

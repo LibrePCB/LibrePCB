@@ -54,7 +54,7 @@ public:
   QuickAccessModel() = delete;
   QuickAccessModel(const QuickAccessModel& other) = delete;
   explicit QuickAccessModel(Workspace& ws, QObject* parent = nullptr) noexcept;
-  virtual ~QuickAccessModel() noexcept;
+  ~QuickAccessModel() noexcept override;
 
   // General Methods
   void pushRecentProject(const FilePath& fp) noexcept;

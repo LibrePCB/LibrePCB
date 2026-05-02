@@ -38,7 +38,7 @@ namespace tests {
  ******************************************************************************/
 
 class TransactionalFileSystemTest : public ::testing::Test {
-protected:
+public:
   FilePath mTmpDir;
   FilePath mNonExistingDir;
   FilePath mEmptyDir;
@@ -74,7 +74,7 @@ protected:
     FileUtils::writeFile(mPopulatedDir.getPathTo("foo dir/bar dir/X"), "X");
   }
 
-  virtual ~TransactionalFileSystemTest() {
+  ~TransactionalFileSystemTest() override {
     QDir(mTmpDir.toStr()).removeRecursively();
   }
 };

@@ -62,7 +62,7 @@ public:
    */
   explicit CmdSchematicImageAdd(SI_Image& image, TransactionalDirectory& dir,
                                 const QByteArray& fileContent) noexcept;
-  ~CmdSchematicImageAdd() noexcept;
+  ~CmdSchematicImageAdd() noexcept override;
 
   // Operator Overloadings
   CmdSchematicImageAdd& operator=(const CmdSchematicImageAdd& rhs) = delete;

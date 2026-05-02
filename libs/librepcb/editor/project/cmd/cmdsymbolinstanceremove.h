@@ -48,7 +48,7 @@ class CmdSymbolInstanceRemove final : public UndoCommand {
 public:
   // Constructors / Destructor
   CmdSymbolInstanceRemove(Schematic& schematic, SI_Symbol& symbol) noexcept;
-  ~CmdSymbolInstanceRemove() noexcept;
+  ~CmdSymbolInstanceRemove() noexcept override;
 
 private:
   // Private Methods

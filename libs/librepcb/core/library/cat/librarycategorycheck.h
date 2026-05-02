@@ -47,10 +47,10 @@ public:
   LibraryCategoryCheck() = delete;
   LibraryCategoryCheck(const LibraryCategoryCheck& other) = delete;
   explicit LibraryCategoryCheck(const LibraryCategory& category) noexcept;
-  virtual ~LibraryCategoryCheck() noexcept;
+  ~LibraryCategoryCheck() noexcept override;
 
   // General Methods
-  virtual RuleCheckMessageList runChecks() const override;
+  RuleCheckMessageList runChecks() const override;
 
   // Operator Overloadings
   LibraryCategoryCheck& operator=(const LibraryCategoryCheck& rhs) = delete;

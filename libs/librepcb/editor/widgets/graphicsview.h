@@ -54,7 +54,7 @@ public:
   explicit GraphicsView(
       QWidget* parent = nullptr,
       IF_GraphicsViewEventHandler* eventHandler = nullptr) noexcept;
-  ~GraphicsView() noexcept;
+  ~GraphicsView() noexcept override;
 
   // Getters
   GraphicsScene* getScene() const noexcept { return mScene; }
@@ -109,8 +109,8 @@ private slots:
 
 private:
   // Inherited Methods
-  void wheelEvent(QWheelEvent* event);
-  bool eventFilter(QObject* obj, QEvent* event);
+  void wheelEvent(QWheelEvent* event) override;
+  bool eventFilter(QObject* obj, QEvent* event) override;
 
   // General Attributes
   QScopedPointer<WaitingSpinnerWidget> mWaitingSpinnerWidget;

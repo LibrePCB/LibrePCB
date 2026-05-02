@@ -59,7 +59,7 @@ public:
   explicit CopyOutputJobWidget(Project& project,
                                std::shared_ptr<CopyOutputJob> job,
                                QWidget* parent = nullptr) noexcept;
-  ~CopyOutputJobWidget() noexcept;
+  ~CopyOutputJobWidget() noexcept override;
 
   // Operator Overloads
   CopyOutputJobWidget& operator=(const CopyOutputJobWidget& rhs) = delete;

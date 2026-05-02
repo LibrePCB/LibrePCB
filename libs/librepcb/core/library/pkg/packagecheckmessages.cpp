@@ -279,8 +279,7 @@ MsgMinimumWidthViolation::MsgMinimumWidthViolation(
 QString MsgMinimumWidthViolation::getMessage(
     std::shared_ptr<const Footprint> footprint, const Layer& layer) noexcept {
   return tr("Minimum width of '%1' in '%2'")
-      .arg(layer.getNameTr())
-      .arg(*footprint->getNames().getDefaultValue());
+      .arg(layer.getNameTr(), *footprint->getNames().getDefaultValue());
 }
 
 QString MsgMinimumWidthViolation::getDescriptionAppendix() noexcept {

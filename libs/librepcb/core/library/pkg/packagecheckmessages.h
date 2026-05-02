@@ -58,7 +58,7 @@ public:
   MsgAmbiguousFootprintTags() noexcept;
   MsgAmbiguousFootprintTags(const MsgAmbiguousFootprintTags& other) noexcept
     : RuleCheckMessage(other) {}
-  virtual ~MsgAmbiguousFootprintTags() noexcept {}
+  ~MsgAmbiguousFootprintTags() noexcept override {}
 };
 
 /*******************************************************************************
@@ -76,7 +76,7 @@ public:
   MsgDeprecatedAssemblyType() noexcept;
   MsgDeprecatedAssemblyType(const MsgDeprecatedAssemblyType& other) noexcept
     : RuleCheckMessage(other) {}
-  virtual ~MsgDeprecatedAssemblyType() noexcept {}
+  ~MsgDeprecatedAssemblyType() noexcept override {}
 };
 
 /*******************************************************************************
@@ -94,7 +94,7 @@ public:
   MsgSuspiciousAssemblyType() noexcept;
   MsgSuspiciousAssemblyType(const MsgSuspiciousAssemblyType& other) noexcept
     : RuleCheckMessage(other) {}
-  virtual ~MsgSuspiciousAssemblyType() noexcept {}
+  ~MsgSuspiciousAssemblyType() noexcept override {}
 };
 
 /*******************************************************************************
@@ -113,7 +113,7 @@ public:
   explicit MsgDuplicatePadName(const PackagePad& pad) noexcept;
   MsgDuplicatePadName(const MsgDuplicatePadName& other) noexcept
     : RuleCheckMessage(other) {}
-  virtual ~MsgDuplicatePadName() noexcept {}
+  ~MsgDuplicatePadName() noexcept override {}
 };
 
 /*******************************************************************************
@@ -135,7 +135,7 @@ public:
   MsgFiducialClearanceLessThanStopMask(
       const MsgFiducialClearanceLessThanStopMask& other) noexcept
     : RuleCheckMessage(other), mFootprint(other.mFootprint), mPad(other.mPad) {}
-  virtual ~MsgFiducialClearanceLessThanStopMask() noexcept {}
+  ~MsgFiducialClearanceLessThanStopMask() noexcept override {}
 
   // Getters
   std::shared_ptr<const Footprint> getFootprint() const noexcept {
@@ -165,7 +165,7 @@ public:
                             std::shared_ptr<const FootprintPad> pad) noexcept;
   MsgFiducialStopMaskNotSet(const MsgFiducialStopMaskNotSet& other) noexcept
     : RuleCheckMessage(other), mFootprint(other.mFootprint), mPad(other.mPad) {}
-  virtual ~MsgFiducialStopMaskNotSet() noexcept {}
+  ~MsgFiducialStopMaskNotSet() noexcept override {}
 
   // Getters
   std::shared_ptr<const Footprint> getFootprint() const noexcept {
@@ -197,7 +197,7 @@ public:
     : RuleCheckMessage(other),
       mFootprint(other.mFootprint),
       mHole(other.mHole) {}
-  virtual ~MsgHoleWithoutStopMask() noexcept {}
+  ~MsgHoleWithoutStopMask() noexcept override {}
 
   // Getters
   std::shared_ptr<const Footprint> getFootprint() const noexcept {
@@ -228,7 +228,7 @@ public:
                              const QString& pkgPadName) noexcept;
   MsgInvalidCustomPadOutline(const MsgInvalidCustomPadOutline& other) noexcept
     : RuleCheckMessage(other), mFootprint(other.mFootprint), mPad(other.mPad) {}
-  virtual ~MsgInvalidCustomPadOutline() noexcept {}
+  ~MsgInvalidCustomPadOutline() noexcept override {}
 
   // Getters
   std::shared_ptr<const Footprint> getFootprint() const noexcept {
@@ -258,7 +258,7 @@ public:
                           std::shared_ptr<const FootprintPad> pad) noexcept;
   MsgInvalidPadConnection(const MsgInvalidPadConnection& other) noexcept
     : RuleCheckMessage(other), mFootprint(other.mFootprint), mPad(other.mPad) {}
-  virtual ~MsgInvalidPadConnection() noexcept {}
+  ~MsgInvalidPadConnection() noexcept override {}
 
   // Getters
   std::shared_ptr<const Footprint> getFootprint() const noexcept {
@@ -299,7 +299,7 @@ public:
       mPolygon(other.mPolygon),
       mCircle(other.mCircle),
       mStrokeText(other.mStrokeText) {}
-  virtual ~MsgMinimumWidthViolation() noexcept {}
+  ~MsgMinimumWidthViolation() noexcept override {}
 
   // Getters
   std::shared_ptr<const Footprint> getFootprint() const noexcept {
@@ -341,7 +341,7 @@ public:
       std::shared_ptr<const Footprint> footprint) noexcept;
   MsgMissingCourtyard(const MsgMissingCourtyard& other) noexcept
     : RuleCheckMessage(other), mFootprint(other.mFootprint) {}
-  virtual ~MsgMissingCourtyard() noexcept {}
+  ~MsgMissingCourtyard() noexcept override {}
 
   // Getters
   std::shared_ptr<const Footprint> getFootprint() const noexcept {
@@ -367,7 +367,7 @@ public:
   MsgMissingFootprint() noexcept;
   MsgMissingFootprint(const MsgMissingFootprint& other) noexcept
     : RuleCheckMessage(other) {}
-  virtual ~MsgMissingFootprint() noexcept {}
+  ~MsgMissingFootprint() noexcept override {}
 };
 
 /*******************************************************************************
@@ -386,7 +386,7 @@ public:
   MsgMissingFootprintModel(std::shared_ptr<const Footprint> footprint) noexcept;
   MsgMissingFootprintModel(const MsgMissingFootprintModel& other) noexcept
     : RuleCheckMessage(other), mFootprint(other.mFootprint) {}
-  virtual ~MsgMissingFootprintModel() noexcept {}
+  ~MsgMissingFootprintModel() noexcept override {}
 
   // Getters
   std::shared_ptr<const Footprint> getFootprint() const noexcept {
@@ -414,7 +414,7 @@ public:
       std::shared_ptr<const Footprint> footprint) noexcept;
   MsgMissingFootprintName(const MsgMissingFootprintName& other) noexcept
     : RuleCheckMessage(other), mFootprint(other.mFootprint) {}
-  virtual ~MsgMissingFootprintName() noexcept {}
+  ~MsgMissingFootprintName() noexcept override {}
 
   // Getters
   std::shared_ptr<const Footprint> getFootprint() const noexcept {
@@ -442,7 +442,7 @@ public:
       std::shared_ptr<const Footprint> footprint) noexcept;
   MsgMissingFootprintValue(const MsgMissingFootprintValue& other) noexcept
     : RuleCheckMessage(other), mFootprint(other.mFootprint) {}
-  virtual ~MsgMissingFootprintValue() noexcept {}
+  ~MsgMissingFootprintValue() noexcept override {}
 
   // Getters
   std::shared_ptr<const Footprint> getFootprint() const noexcept {
@@ -470,7 +470,7 @@ public:
       std::shared_ptr<const Footprint> footprint) noexcept;
   MsgMissingPackageOutline(const MsgMissingPackageOutline& other) noexcept
     : RuleCheckMessage(other), mFootprint(other.mFootprint) {}
-  virtual ~MsgMissingPackageOutline() noexcept {}
+  ~MsgMissingPackageOutline() noexcept override {}
 
   // Getters
   std::shared_ptr<const Footprint> getFootprint() const noexcept {
@@ -501,7 +501,7 @@ public:
     : RuleCheckMessage(other),
       mFootprint(other.mFootprint),
       mCenter(other.mCenter) {}
-  virtual ~MsgFootprintOriginNotInCenter() noexcept {}
+  ~MsgFootprintOriginNotInCenter() noexcept override {}
 
   // Getters
   std::shared_ptr<const Footprint> getFootprint() const noexcept {
@@ -537,7 +537,7 @@ public:
       mFootprint(other.mFootprint),
       mPad1(other.mPad1),
       mPad2(other.mPad2) {}
-  virtual ~MsgOverlappingPads() noexcept {}
+  ~MsgOverlappingPads() noexcept override {}
 
   // Getters
   std::shared_ptr<const Footprint> getFootprint() const noexcept {
@@ -571,7 +571,7 @@ public:
                              const Length& annularRing) noexcept;
   MsgPadAnnularRingViolation(const MsgPadAnnularRingViolation& other) noexcept
     : RuleCheckMessage(other), mFootprint(other.mFootprint), mPad(other.mPad) {}
-  virtual ~MsgPadAnnularRingViolation() noexcept {}
+  ~MsgPadAnnularRingViolation() noexcept override {}
 
   // Getters
   std::shared_ptr<const Footprint> getFootprint() const noexcept {
@@ -608,7 +608,7 @@ public:
       mFootprint(other.mFootprint),
       mPad1(other.mPad1),
       mPad2(other.mPad2) {}
-  virtual ~MsgPadClearanceViolation() noexcept {}
+  ~MsgPadClearanceViolation() noexcept override {}
 
   // Getters
   std::shared_ptr<const Footprint> getFootprint() const noexcept {
@@ -641,7 +641,7 @@ public:
                           const QString& pkgPadName) noexcept;
   MsgPadHoleOutsideCopper(const MsgPadHoleOutsideCopper& other) noexcept
     : RuleCheckMessage(other), mFootprint(other.mFootprint), mPad(other.mPad) {}
-  virtual ~MsgPadHoleOutsideCopper() noexcept {}
+  ~MsgPadHoleOutsideCopper() noexcept override {}
 
   // Getters
   std::shared_ptr<const Footprint> getFootprint() const noexcept {
@@ -672,7 +672,7 @@ public:
                             const QString& pkgPadName) noexcept;
   MsgPadOriginOutsideCopper(const MsgPadOriginOutsideCopper& other) noexcept
     : RuleCheckMessage(other), mFootprint(other.mFootprint), mPad(other.mPad) {}
-  virtual ~MsgPadOriginOutsideCopper() noexcept {}
+  ~MsgPadOriginOutsideCopper() noexcept override {}
 
   // Getters
   std::shared_ptr<const Footprint> getFootprint() const noexcept {
@@ -704,7 +704,7 @@ public:
                            const Length& clearance) noexcept;
   MsgPadOverlapsWithLegend(const MsgPadOverlapsWithLegend& other) noexcept
     : RuleCheckMessage(other), mFootprint(other.mFootprint), mPad(other.mPad) {}
-  virtual ~MsgPadOverlapsWithLegend() noexcept {}
+  ~MsgPadOverlapsWithLegend() noexcept override {}
 
   // Getters
   std::shared_ptr<const Footprint> getFootprint() const noexcept {
@@ -735,7 +735,7 @@ public:
                     const QString& pkgPadName) noexcept;
   MsgPadStopMaskOff(const MsgPadStopMaskOff& other) noexcept
     : RuleCheckMessage(other), mFootprint(other.mFootprint), mPad(other.mPad) {}
-  virtual ~MsgPadStopMaskOff() noexcept {}
+  ~MsgPadStopMaskOff() noexcept override {}
 
   // Getters
   std::shared_ptr<const Footprint> getFootprint() const noexcept {
@@ -766,7 +766,7 @@ public:
                             const QString& pkgPadName) noexcept;
   MsgPadWithCopperClearance(const MsgPadWithCopperClearance& other) noexcept
     : RuleCheckMessage(other), mFootprint(other.mFootprint), mPad(other.mPad) {}
-  virtual ~MsgPadWithCopperClearance() noexcept {}
+  ~MsgPadWithCopperClearance() noexcept override {}
 
   // Getters
   std::shared_ptr<const Footprint> getFootprint() const noexcept {
@@ -797,7 +797,7 @@ public:
                            const QString& pkgPadName) noexcept;
   MsgSmtPadWithSolderPaste(const MsgSmtPadWithSolderPaste& other) noexcept
     : RuleCheckMessage(other), mFootprint(other.mFootprint), mPad(other.mPad) {}
-  virtual ~MsgSmtPadWithSolderPaste() noexcept {}
+  ~MsgSmtPadWithSolderPaste() noexcept override {}
 
   // Getters
   std::shared_ptr<const Footprint> getFootprint() const noexcept {
@@ -828,7 +828,7 @@ public:
                               const QString& pkgPadName) noexcept;
   MsgSmtPadWithoutSolderPaste(const MsgSmtPadWithoutSolderPaste& other) noexcept
     : RuleCheckMessage(other), mFootprint(other.mFootprint), mPad(other.mPad) {}
-  virtual ~MsgSmtPadWithoutSolderPaste() noexcept {}
+  ~MsgSmtPadWithoutSolderPaste() noexcept override {}
 
   // Getters
   std::shared_ptr<const Footprint> getFootprint() const noexcept {
@@ -858,7 +858,7 @@ public:
                            const QString& pkgPadName) noexcept;
   MsgSuspiciousPadFunction(const MsgSuspiciousPadFunction& other) noexcept
     : RuleCheckMessage(other), mFootprint(other.mFootprint), mPad(other.mPad) {}
-  virtual ~MsgSuspiciousPadFunction() noexcept {}
+  ~MsgSuspiciousPadFunction() noexcept override {}
 
   // Getters
   std::shared_ptr<const Footprint> getFootprint() const noexcept {
@@ -889,7 +889,7 @@ public:
                            const QString& pkgPadName) noexcept;
   MsgThtPadWithSolderPaste(const MsgThtPadWithSolderPaste& other) noexcept
     : RuleCheckMessage(other), mFootprint(other.mFootprint), mPad(other.mPad) {}
-  virtual ~MsgThtPadWithSolderPaste() noexcept {}
+  ~MsgThtPadWithSolderPaste() noexcept override {}
 
   // Getters
   std::shared_ptr<const Footprint> getFootprint() const noexcept {
@@ -919,7 +919,7 @@ public:
                             const QString& pkgPadName) noexcept;
   MsgUnspecifiedPadFunction(const MsgUnspecifiedPadFunction& other) noexcept
     : RuleCheckMessage(other), mFootprint(other.mFootprint), mPad(other.mPad) {}
-  virtual ~MsgUnspecifiedPadFunction() noexcept {}
+  ~MsgUnspecifiedPadFunction() noexcept override {}
 
   // Getters
   std::shared_ptr<const Footprint> getFootprint() const noexcept {
@@ -950,7 +950,7 @@ public:
                             const QString& pkgPadName) noexcept;
   MsgUnusedCustomPadOutline(const MsgUnusedCustomPadOutline& other) noexcept
     : RuleCheckMessage(other), mFootprint(other.mFootprint), mPad(other.mPad) {}
-  virtual ~MsgUnusedCustomPadOutline() noexcept {}
+  ~MsgUnusedCustomPadOutline() noexcept override {}
 
   // Getters
   std::shared_ptr<const Footprint> getFootprint() const noexcept {
@@ -982,7 +982,7 @@ public:
     : RuleCheckMessage(other),
       mFootprint(other.mFootprint),
       mZone(other.mZone) {}
-  virtual ~MsgUselessZone() noexcept {}
+  ~MsgUselessZone() noexcept override {}
 
   // Getters
   std::shared_ptr<const Footprint> getFootprint() const noexcept {
@@ -1016,7 +1016,7 @@ public:
       mFootprint(other.mFootprint),
       mText(other.mText),
       mExpectedLayer(other.mExpectedLayer) {}
-  virtual ~MsgWrongFootprintTextLayer() noexcept {}
+  ~MsgWrongFootprintTextLayer() noexcept override {}
 
   // Getters
   std::shared_ptr<const Footprint> getFootprint() const noexcept {

@@ -77,7 +77,7 @@ void CheckableItemsEditorWidget::updateWidgets() noexcept {
     QCheckBox* cbx = new QCheckBox(this);
     cbx->setText(std::get<1>(item));
     cbx->setCheckState(std::get<2>(item));
-    connect(cbx, &QCheckBox::stateChanged, cbx, [&item](int state) {
+    connect(cbx, &QCheckBox::stateChanged, cbx, [&item](int state) {  // NOLINT
       std::get<2>(item) = static_cast<Qt::CheckState>(state);
     });
     mLayout->addWidget(cbx);

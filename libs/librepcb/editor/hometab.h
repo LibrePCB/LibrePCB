@@ -50,7 +50,7 @@ public:
   HomeTab() = delete;
   HomeTab(const HomeTab& other) = delete;
   explicit HomeTab(GuiApplication& app, QObject* parent = nullptr) noexcept;
-  ~HomeTab() noexcept;
+  ~HomeTab() noexcept override;
 
   // General Methods
   ui::TabData getUiData() const noexcept override;

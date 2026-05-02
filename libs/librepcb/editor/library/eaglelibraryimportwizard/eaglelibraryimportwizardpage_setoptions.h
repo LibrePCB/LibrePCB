@@ -58,10 +58,10 @@ public:
   EagleLibraryImportWizardPage_SetOptions(
       std::shared_ptr<EagleLibraryImportWizardContext> context,
       QWidget* parent = nullptr) noexcept;
-  ~EagleLibraryImportWizardPage_SetOptions() noexcept;
+  ~EagleLibraryImportWizardPage_SetOptions() noexcept override;
 
   // General Methods
-  virtual void initializePage() override;
+  void initializePage() override;
 
   // Operator Overloadings
   EagleLibraryImportWizardPage_SetOptions& operator=(

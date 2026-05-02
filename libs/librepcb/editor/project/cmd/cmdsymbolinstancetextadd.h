@@ -48,7 +48,7 @@ class CmdSymbolInstanceTextAdd final : public UndoCommand {
 public:
   // Constructors / Destructor
   CmdSymbolInstanceTextAdd(SI_Symbol& symbol, SI_Text& text) noexcept;
-  ~CmdSymbolInstanceTextAdd() noexcept;
+  ~CmdSymbolInstanceTextAdd() noexcept override;
 
 private:
   // Private Methods

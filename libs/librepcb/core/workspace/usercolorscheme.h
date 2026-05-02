@@ -54,7 +54,7 @@ public:
   UserColorScheme(const SExpression& root,
                   const QVector<const BaseColorScheme*>& bases);
   UserColorScheme(const UserColorScheme& other) noexcept;
-  ~UserColorScheme() noexcept;
+  ~UserColorScheme() noexcept override;
 
   // Getters
   const Uuid& getUuid() const noexcept override { return mUuid; }

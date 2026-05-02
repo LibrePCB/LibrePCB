@@ -57,7 +57,7 @@ public:
   // ComponentPinoutListModel() = delete;
   ComponentPinoutListModel(const ComponentPinoutListModel& other) = delete;
   explicit ComponentPinoutListModel(QObject* parent = nullptr) noexcept;
-  ~ComponentPinoutListModel() noexcept;
+  ~ComponentPinoutListModel() noexcept override;
 
   // General Methods
   void setReferences(ComponentPinSignalMap* list, const SymbolPinList* pins,

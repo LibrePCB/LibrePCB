@@ -27,6 +27,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -57,10 +59,8 @@ CmdBoardAdd::~CmdBoardAdd() noexcept {
  ******************************************************************************/
 
 bool CmdBoardAdd::performExecute() {
-  mBoard = new Board(
-      mProject,
-      std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory()),
-      mDirName, Uuid::createRandom(), mName);  // can throw
+  mBoard = new Board(mProject, std::make_unique<TransactionalDirectory>(),
+                     mDirName, Uuid::createRandom(), mName);  // can throw
   if (mBoardToCopy) {
     mBoard->copyFrom(*mBoardToCopy);  // can throw
   } else {

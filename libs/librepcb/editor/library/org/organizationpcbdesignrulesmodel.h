@@ -60,7 +60,7 @@ public:
   OrganizationPcbDesignRulesModel(
       const OrganizationPcbDesignRulesModel& other) = delete;
   explicit OrganizationPcbDesignRulesModel(QObject* parent = nullptr) noexcept;
-  ~OrganizationPcbDesignRulesModel() noexcept;
+  ~OrganizationPcbDesignRulesModel() noexcept override;
 
   // General Methods
   void setReferences(

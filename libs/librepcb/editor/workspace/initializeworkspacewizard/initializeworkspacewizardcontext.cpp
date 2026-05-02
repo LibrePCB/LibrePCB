@@ -67,7 +67,7 @@ bool InitializeWorkspaceWizardContext::getWorkspaceContainsNewerFileFormats()
     const noexcept {
   return (!mDataDirs.isEmpty()) &&
       (Application::getFileFormatVersion() <
-       Toolbox::sorted(mDataDirs.values()).last());
+       Toolbox::sorted(mDataDirs.values()).constLast());
 }
 
 void InitializeWorkspaceWizardContext::setWorkspacePath(const FilePath& fp) {

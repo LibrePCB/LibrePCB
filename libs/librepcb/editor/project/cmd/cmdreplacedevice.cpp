@@ -78,7 +78,7 @@ bool CmdReplaceDevice::performExecute() {
     if (netsegment) {
       std::unique_ptr<CmdBoardNetSegmentAddElements> cmdAdd(
           new CmdBoardNetSegmentAddElements(*netsegment));
-      QMap<const Layer*, BI_NetPoint*> newNetPoints = {};
+      QHash<const Layer*, BI_NetPoint*> newNetPoints = {};
       QSet<BI_NetLine*> connectedNetLines = pad->getNetLines();
       if (connectedNetLines.count() > 1) {
         foreach (BI_NetLine* netline, connectedNetLines) {
@@ -140,6 +140,7 @@ bool CmdReplaceDevice::performExecute() {
   execNewChildCmd(cmd);  // can throw
   BI_Device* newDevice = cmd->getDeviceInstance();
   Q_ASSERT(newDevice);
+  Q_UNUSED(newDevice);
 
   // TODO: reconnect all netpoints/netlines
 

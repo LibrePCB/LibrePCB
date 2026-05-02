@@ -59,7 +59,7 @@ public:
                            const QString& settingsPrefix,
                            QuickAccessModel* quickAccessModel = nullptr,
                            QObject* parent = nullptr) noexcept;
-  virtual ~FileSystemModel() noexcept;
+  ~FileSystemModel() noexcept override;
 
   // Implementations
   std::size_t row_count() const override;

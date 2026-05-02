@@ -31,6 +31,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -58,8 +60,7 @@ TEST_F(CmdBoardSpecctraImportTest, test) {
       TransactionalFileSystem::openRO(projectFp.getParentDir());
   ProjectLoader loader;
   std::unique_ptr<Project> project =
-      loader.open(std::unique_ptr<TransactionalDirectory>(
-                      new TransactionalDirectory(projectFs)),
+      loader.open(std::make_unique<TransactionalDirectory>(projectFs),
                   projectFp.getFilename());  // can throw
 
   // Load SES.

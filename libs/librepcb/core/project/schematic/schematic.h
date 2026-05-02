@@ -88,7 +88,7 @@ public:
   Schematic(Project& project, std::unique_ptr<TransactionalDirectory> directory,
             const QString& directoryName, const Uuid& uuid,
             const ElementName& name);
-  ~Schematic() noexcept;
+  ~Schematic() noexcept override;
 
   // Getters: General
   Project& getProject() const noexcept { return mProject; }

@@ -159,7 +159,7 @@ public:
       DirectoryLock::LockHandlerCallback lockCallback = nullptr,
       QObject* parent = nullptr);
   TransactionalFileSystem(const TransactionalFileSystem& other) = delete;
-  virtual ~TransactionalFileSystem() noexcept;
+  ~TransactionalFileSystem() noexcept override;
 
   // Getters
   const FilePath& getPath() const noexcept { return mFilePath; }
@@ -167,17 +167,16 @@ public:
   bool isRestoredFromAutosave() const noexcept { return mRestoredFromAutosave; }
 
   // Inherited from FileSystem
-  virtual FilePath getAbsPath(const QString& path = "") const noexcept override;
-  virtual QStringList getDirs(const QString& path = "") const noexcept override;
-  virtual QStringList getFiles(
-      const QString& path = "") const noexcept override;
-  virtual bool fileExists(const QString& path) const noexcept override;
-  virtual QByteArray read(const QString& path) const override;
-  virtual QByteArray readIfExists(const QString& path) const override;
-  virtual void write(const QString& path, const QByteArray& content) override;
-  virtual void renameFile(const QString& src, const QString& dst) override;
-  virtual void removeFile(const QString& path) override;
-  virtual void removeDirRecursively(const QString& path = "") override;
+  FilePath getAbsPath(const QString& path = "") const noexcept override;
+  const QStringList getDirs(const QString& path = "") const noexcept override;
+  const QStringList getFiles(const QString& path = "") const noexcept override;
+  bool fileExists(const QString& path) const noexcept override;
+  QByteArray read(const QString& path) const override;
+  QByteArray readIfExists(const QString& path) const override;
+  void write(const QString& path, const QByteArray& content) override;
+  void renameFile(const QString& src, const QString& dst) override;
+  void removeFile(const QString& path) override;
+  void removeDirRecursively(const QString& path = "") override;
 
   // General Methods
   State saveState() const noexcept { return mState; }
@@ -203,14 +202,14 @@ public:
   }
   static std::shared_ptr<TransactionalFileSystem> openRO(
       const FilePath& filepath,
-      RestoreCallback restoreCallback = &RestoreMode::no,
+      const RestoreCallback& restoreCallback = &RestoreMode::no,
       QObject* parent = nullptr) {
     return open(filepath, false, restoreCallback, nullptr, parent);
   }
   static std::shared_ptr<TransactionalFileSystem> openRW(
       const FilePath& filepath,
-      RestoreCallback restoreCallback = &RestoreMode::no,
-      DirectoryLock::LockHandlerCallback lockCallback = nullptr,
+      const RestoreCallback& restoreCallback = &RestoreMode::no,
+      const DirectoryLock::LockHandlerCallback& lockCallback = nullptr,
       QObject* parent = nullptr) {
     return open(filepath, true, restoreCallback, lockCallback, parent);
   }

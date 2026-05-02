@@ -51,7 +51,7 @@ public:
   BI_AirWire(const BI_AirWire& other) = delete;
   BI_AirWire(Board& board, const NetSignal& netsignal,
              const BI_NetLineAnchor& p1, const BI_NetLineAnchor& p2);
-  ~BI_AirWire() noexcept;
+  ~BI_AirWire() noexcept override;
 
   // Getters
   const NetSignal& getNetSignal() const noexcept { return mNetSignal; }

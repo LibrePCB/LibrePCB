@@ -51,7 +51,7 @@ public:
                         const QString& description, const QString& buttonText,
                         const QString& dismissKey, bool autoPopUp,
                         QObject* parent = nullptr) noexcept;
-  ~Notification() noexcept;
+  ~Notification() noexcept override;
 
   // General Methods
   const QString& getDismissKey() const noexcept { return mDismissKey; }

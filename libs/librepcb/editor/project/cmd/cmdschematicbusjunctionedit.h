@@ -49,7 +49,7 @@ class CmdSchematicBusJunctionEdit final : public UndoCommand {
 public:
   // Constructors / Destructor
   explicit CmdSchematicBusJunctionEdit(SI_BusJunction& junction) noexcept;
-  ~CmdSchematicBusJunctionEdit() noexcept;
+  ~CmdSchematicBusJunctionEdit() noexcept override;
 
   // Setters
   void setPosition(const Point& pos, bool immediate) noexcept;

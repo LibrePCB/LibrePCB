@@ -56,7 +56,7 @@ public:
       delete;
   explicit CmdSimplifyBoardNetSegments(
       const QList<BI_NetSegment*>& segments) noexcept;
-  ~CmdSimplifyBoardNetSegments() noexcept;
+  ~CmdSimplifyBoardNetSegments() noexcept override;
 
   // Operator Overloadings
   CmdSimplifyBoardNetSegments& operator=(

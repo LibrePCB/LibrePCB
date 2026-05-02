@@ -51,7 +51,7 @@ class CmdBoardNetSegmentRemoveElements final : public UndoCommand {
 public:
   // Constructors / Destructor
   CmdBoardNetSegmentRemoveElements(BI_NetSegment& segment) noexcept;
-  ~CmdBoardNetSegmentRemoveElements() noexcept;
+  ~CmdBoardNetSegmentRemoveElements() noexcept override;
 
   // General Methods
   void removePad(BI_Pad& pad);

@@ -957,7 +957,7 @@ void BoardEditorState_DrawTrace::updateNetpointPositions() noexcept {
 
 void BoardEditorState_DrawTrace::showVia(bool isVisible) noexcept {
   try {
-    if (isVisible && !mTempVia) {
+    if (isVisible && (!mTempVia) && mPositioningNetPoint2) {
       CmdBoardNetSegmentRemoveElements* cmdRemove =
           new CmdBoardNetSegmentRemoveElements(*mCurrentNetSegment);
       cmdRemove->removeNetLine(*mPositioningNetLine2);

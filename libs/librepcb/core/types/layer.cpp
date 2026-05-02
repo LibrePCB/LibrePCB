@@ -349,14 +349,14 @@ const Layer& Layer::botGlue() noexcept {
 
 const Layer& Layer::topCopper() noexcept {
   static Layer layer("top_cu", tr("Top Copper"), ColorRole::boardCopperTop(),
-                     Flag::Board | Flag::Top | Flag::Copper | Flag(0));
+                     Flag::Board | Flag::Top | Flag::Copper);
   return layer;
 }
 
 const Layer& Layer::botCopper() noexcept {
-  static Layer layer(
-      "bot_cu", tr("Bottom Copper"), ColorRole::boardCopperBot(),
-      Flag::Board | Flag::Bottom | Flag::Copper | Flag(innerCopperCount() + 1));
+  static Layer layer("bot_cu", tr("Bottom Copper"), ColorRole::boardCopperBot(),
+                     Flag::Board | Flag::Bottom | Flag::Copper |
+                         static_cast<Flag>(innerCopperCount() + 1));  // NOLINT
   return layer;
 }
 
@@ -366,9 +366,10 @@ const QVector<const Layer*>& Layer::innerCopper() noexcept {
     for (int i = 1; i <= innerCopperCount(); ++i) {
       const ColorRole* role = ColorRole::boardCopperInner(i);
       Q_ASSERT(role);
-      list.append(
-          new Layer(QString("in%1_cu").arg(i), tr("Inner Copper %1").arg(i),
-                    *role, Flag::Board | Flag::Inner | Flag::Copper | Flag(i)));
+      list.append(new Layer(QString("in%1_cu").arg(i),
+                            tr("Inner Copper %1").arg(i), *role,
+                            Flag::Board | Flag::Inner | Flag::Copper |
+                                static_cast<Flag>(i)));  // NOLINT
     }
     return list;
   };

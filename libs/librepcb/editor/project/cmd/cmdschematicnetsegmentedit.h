@@ -48,7 +48,7 @@ class CmdSchematicNetSegmentEdit final : public UndoCommand {
 public:
   // Constructors / Destructor
   explicit CmdSchematicNetSegmentEdit(SI_NetSegment& netsegment) noexcept;
-  ~CmdSchematicNetSegmentEdit() noexcept;
+  ~CmdSchematicNetSegmentEdit() noexcept override;
 
   // Setters
   void setNetSignal(NetSignal& netsignal) noexcept;

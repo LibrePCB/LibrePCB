@@ -53,7 +53,7 @@ using librepcb::tests::TestHelpers;
  ******************************************************************************/
 
 class GraphicsExportDialogTest : public ::testing::Test {
-protected:
+public:
   FilePath mOutputDir;
   QVector<FilePath> mRequestedFilesToOpen;  // From signal requestOpenFile().
 
@@ -61,7 +61,9 @@ protected:
     QSettings().clear();
   }
 
-  ~GraphicsExportDialogTest() { QDir(mOutputDir.toStr()).removeRecursively(); }
+  ~GraphicsExportDialogTest() override {
+    QDir(mOutputDir.toStr()).removeRecursively();
+  }
 
   FilePath getFilePath(const QString& fileName) const {
     return mOutputDir.getPathTo(fileName);
@@ -79,7 +81,7 @@ protected:
     dlg.setSaveAsCallback([fp](QWidget*, const QString&, const QString&,
                                const QString&, QString*,
                                QFileDialog::Options) { return fp.toNative(); });
-    QObject::connect(
+    QObject::connect(  // NOLINT
         &dlg, &GraphicsExportDialog::requestOpenFile,
         [this](const FilePath& fp) { mRequestedFilesToOpen.append(fp); });
     dlg.show();

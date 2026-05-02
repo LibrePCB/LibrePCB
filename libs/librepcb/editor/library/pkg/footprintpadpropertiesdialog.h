@@ -66,7 +66,7 @@ public:
                                const LengthUnit& lengthUnit,
                                const QString& settingsPrefix,
                                QWidget* parent = nullptr) noexcept;
-  ~FootprintPadPropertiesDialog() noexcept;
+  ~FootprintPadPropertiesDialog() noexcept override;
 
   // Setters
   void setReadOnly(bool readOnly) noexcept;

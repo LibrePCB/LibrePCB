@@ -75,6 +75,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -337,7 +339,7 @@ MainWindow::MainWindow(GuiApplication& app,
 
   // Setup test adapter.
   if (qgetenv("LIBREPCB_ENABLE_TEST_ADAPTER") == "1") {
-    mTestAdapter.reset(new MainWindowTestAdapter(app, *this, mWidget));
+    mTestAdapter = std::make_unique<MainWindowTestAdapter>(app, *this, mWidget);
     connect(
         mTestAdapter.get(), &MainWindowTestAdapter::actionTriggered, this,
         [this](ui::Action a) { trigger(a); }, Qt::QueuedConnection);
@@ -552,11 +554,11 @@ bool MainWindow::openNewComponentCategoryTab(
     const ComponentCategory* duplicateFromObj) noexcept {
   return openNewLibraryElementTab<ComponentCategory, ComponentCategoryTab>(
       editor, duplicateFromFp, duplicateFromObj, [this]() {
-        return std::unique_ptr<ComponentCategory>(new ComponentCategory(
+        return std::make_unique<ComponentCategory>(
             Uuid::createRandom(), Version::fromString("0.1"),
             mApp.getWorkspace().getSettings().userName.get(),
             QDateTime::currentDateTime(), ElementName("New Component Category"),
-            QString(), QString()));
+            QString(), QString());
       });
 }
 
@@ -570,11 +572,11 @@ bool MainWindow::openNewPackageCategoryTab(
     const PackageCategory* duplicateFromObj) noexcept {
   return openNewLibraryElementTab<PackageCategory, PackageCategoryTab>(
       editor, duplicateFromFp, duplicateFromObj, [this]() {
-        return std::unique_ptr<PackageCategory>(new PackageCategory(
+        return std::make_unique<PackageCategory>(
             Uuid::createRandom(), Version::fromString("0.1"),
             mApp.getWorkspace().getSettings().userName.get(),
             QDateTime::currentDateTime(), ElementName("New Package Category"),
-            QString(), QString()));
+            QString(), QString());
       });
 }
 
@@ -588,11 +590,11 @@ bool MainWindow::openNewSymbolTab(LibraryEditor& editor,
                                   const Symbol* duplicateFromObj) noexcept {
   return openNewLibraryElementTab<Symbol, SymbolTab>(
       editor, duplicateFromFp, duplicateFromObj, [this]() {
-        return std::unique_ptr<Symbol>(
-            new Symbol(Uuid::createRandom(), Version::fromString("0.1"),
-                       mApp.getWorkspace().getSettings().userName.get(),
-                       QDateTime::currentDateTime(), ElementName("New Symbol"),
-                       QString(), QString()));
+        return std::make_unique<Symbol>(
+            Uuid::createRandom(), Version::fromString("0.1"),
+            mApp.getWorkspace().getSettings().userName.get(),
+            QDateTime::currentDateTime(), ElementName("New Symbol"), QString(),
+            QString());
       });
 }
 
@@ -649,11 +651,11 @@ bool MainWindow::openNewDeviceTab(LibraryEditor& editor,
                                   const Device* duplicateFromObj) noexcept {
   return openNewLibraryElementTab<Device, DeviceTab>(
       editor, duplicateFromFp, duplicateFromObj, [this]() {
-        return std::unique_ptr<Device>(new Device(
+        return std::make_unique<Device>(
             Uuid::createRandom(), Version::fromString("0.1"),
             mApp.getWorkspace().getSettings().userName.get(),
             QDateTime::currentDateTime(), ElementName("New Device"), QString(),
-            QString(), Uuid::createRandom(), Uuid::createRandom()));
+            QString(), Uuid::createRandom(), Uuid::createRandom());
       });
 }
 
@@ -667,11 +669,11 @@ bool MainWindow::openNewOrganizationTab(
     const Organization* duplicateFromObj) noexcept {
   return openNewLibraryElementTab<Organization, OrganizationTab>(
       editor, duplicateFromFp, duplicateFromObj, [this]() {
-        return std::unique_ptr<Organization>(new Organization(
+        return std::make_unique<Organization>(
             Uuid::createRandom(), Version::fromString("0.1"),
             mApp.getWorkspace().getSettings().userName.get(),
             QDateTime::currentDateTime(), ElementName("New Organization"),
-            QString(), QString()));
+            QString(), QString());
       });
 }
 
@@ -1189,8 +1191,7 @@ void MainWindow::openLibraryElementTab(LibraryEditor& editor,
           fp, editor.isWritable(), &askForRestoringBackup,
           DirectoryLockHandlerDialog::createDirectoryLockCallback());
       std::unique_ptr<Element> obj =
-          Element::open(std::unique_ptr<TransactionalDirectory>(
-              new TransactionalDirectory(fs)));
+          Element::open(std::make_unique<TransactionalDirectory>(fs));
       addTab(std::make_shared<Tab>(editor, std::move(obj), Tab::Mode::Open));
     } catch (const UserCanceled& e) {
     } catch (const Exception& e) {
@@ -1210,8 +1211,7 @@ bool MainWindow::openNewLibraryElementTab(
     if ((!duplicateFromObj) && duplicateFromFp.isValid()) {
       auto fs = TransactionalFileSystem::openRO(duplicateFromFp,
                                                 &askForRestoringBackup);
-      src = Element::open(std::unique_ptr<TransactionalDirectory>(
-          new TransactionalDirectory(fs)));
+      src = Element::open(std::make_unique<TransactionalDirectory>(fs));
       duplicateFromObj = src.get();
     }
     if (duplicateFromObj) {
@@ -1230,7 +1230,7 @@ bool MainWindow::openNewLibraryElementTab(
 
 template <typename T>
 bool MainWindow::switchToTab() noexcept {
-  for (auto section : *mSections) {
+  for (const auto& section : *mSections) {
     if (section->switchToTab<T>()) {
       return true;
     }
@@ -1240,7 +1240,7 @@ bool MainWindow::switchToTab() noexcept {
 
 template <typename T>
 bool MainWindow::switchToLibraryElementTab(const FilePath& fp) noexcept {
-  for (auto section : *mSections) {
+  for (const auto& section : *mSections) {
     if (section->switchToLibraryElementTab<T>(fp)) {
       return true;
     }
@@ -1251,7 +1251,7 @@ bool MainWindow::switchToLibraryElementTab(const FilePath& fp) noexcept {
 template <typename T>
 std::shared_ptr<T> MainWindow::switchToProjectTab(int prjIndex,
                                                   int objIndex) noexcept {
-  for (auto section : *mSections) {
+  for (const auto& section : *mSections) {
     if (auto tab = section->switchToProjectTab<T>(prjIndex, objIndex)) {
       return tab;
     }

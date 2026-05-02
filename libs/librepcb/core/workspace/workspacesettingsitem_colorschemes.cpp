@@ -65,10 +65,10 @@ WorkspaceSettingsItem_ColorSchemes::
  *  Getters
  ******************************************************************************/
 
-QMap<Uuid, UserColorScheme> WorkspaceSettingsItem_ColorSchemes::getUserSchemes()
-    const noexcept {
+const QMap<Uuid, UserColorScheme>
+    WorkspaceSettingsItem_ColorSchemes::getUserSchemes() const noexcept {
   QMap<Uuid, UserColorScheme> schemes;
-  for (auto scheme : mUserSchemes) {
+  for (const auto& scheme : mUserSchemes) {
     schemes.insert(scheme->getUuid(), *scheme);
   }
   return schemes;
@@ -146,7 +146,7 @@ void WorkspaceSettingsItem_ColorSchemes::updateActive() noexcept {
     if (auto scheme = mUserSchemes.value(mActiveUuid)) {
       return static_cast<const ColorScheme*>(scheme.get());
     }
-    for (const BaseColorScheme* scheme : mBaseSchemes) {
+    for (const BaseColorScheme* scheme : std::as_const(mBaseSchemes)) {
       if (scheme->getUuid() == mActiveUuid) {
         return static_cast<const ColorScheme*>(scheme);
       }

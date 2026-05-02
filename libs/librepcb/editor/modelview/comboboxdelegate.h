@@ -57,7 +57,7 @@ public:
   explicit ComboBoxDelegate(bool editable = false,
                             QObject* parent = nullptr) noexcept;
   ComboBoxDelegate(const ComboBoxDelegate& other) = delete;
-  ~ComboBoxDelegate() noexcept;
+  ~ComboBoxDelegate() noexcept override;
 
   // Inherited from QStyledItemDelegate
   QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option,

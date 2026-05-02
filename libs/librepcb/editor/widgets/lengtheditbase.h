@@ -94,7 +94,7 @@ public:
                           const Length& value,
                           QWidget* parent = nullptr) noexcept;
   LengthEditBase(const LengthEditBase& other) = delete;
-  virtual ~LengthEditBase() noexcept;
+  ~LengthEditBase() noexcept override;
 
   // Getters
   const LengthUnit& getDisplayedUnit() const noexcept;
@@ -125,7 +125,7 @@ public:
   void configure(const LengthUnit& defaultUnit,
                  const QVector<PositiveLength>& steps,
                  const QString& uniqueIdentifier) noexcept;
-  virtual void stepBy(int steps) override;
+  void stepBy(int steps) override;
 
   // Reimplemented Methods
   QSize minimumSizeHint() const override;
@@ -138,7 +138,7 @@ signals:
   void displayedUnitChanged(const LengthUnit& unit);
 
 protected:  // Methods
-  virtual QAbstractSpinBox::StepEnabled stepEnabled() const override;
+  QAbstractSpinBox::StepEnabled stepEnabled() const override;
   void setValueImpl(Length value) noexcept;
   void updateValueFromText(QString text) noexcept;
   void updateSingleStep() noexcept;

@@ -56,11 +56,11 @@ GerberExcellonOutputJobWidget::GerberExcellonOutputJobWidget(
       tr("Note that it's highly recommended to review the generated files "
          "before ordering PCBs.") %
       "</b><br>";
-  infos += tr("This could be done with the free application <a "
-              "href=\"%1\">gerbv</a> or the <a href=\"%2\">official reference "
-              "viewer from Ucamco</a>.")
-               .arg("http://gerbv.geda-project.org/")
-               .arg("https://gerber.ucamco.com/") %
+  infos +=
+      tr("This could be done with the free application <a "
+         "href=\"%1\">gerbv</a> or the <a href=\"%2\">official reference "
+         "viewer from Ucamco</a>.")
+          .arg("http://gerbv.geda-project.org/", "https://gerber.ucamco.com/") %
       "</p>";
   infos += "<p>" %
       tr("As a simpler and faster alternative, you could use the "

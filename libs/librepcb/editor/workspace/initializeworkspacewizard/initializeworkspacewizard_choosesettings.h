@@ -51,10 +51,11 @@ class InitializeWorkspaceWizard_ChooseSettings final : public QWizardPage {
 public:
   // Constructors / Destructor
   explicit InitializeWorkspaceWizard_ChooseSettings(
-      InitializeWorkspaceWizardContext& context, QWidget* parent = 0) noexcept;
+      InitializeWorkspaceWizardContext& context,
+      QWidget* parent = nullptr) noexcept;
   InitializeWorkspaceWizard_ChooseSettings(
       const InitializeWorkspaceWizard_ChooseSettings& other) = delete;
-  ~InitializeWorkspaceWizard_ChooseSettings() noexcept;
+  ~InitializeWorkspaceWizard_ChooseSettings() noexcept override;
 
   // Inherited from QWizardPage
   bool validatePage() noexcept override;

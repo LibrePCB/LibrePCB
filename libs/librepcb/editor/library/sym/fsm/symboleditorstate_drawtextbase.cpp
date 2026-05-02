@@ -33,6 +33,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -184,7 +186,7 @@ void SymbolEditorState_DrawTextBase::setText(const QString& text) noexcept {
   }
 }
 
-QStringList SymbolEditorState_DrawTextBase::getTextSuggestions()
+const QStringList SymbolEditorState_DrawTextBase::getTextSuggestions()
     const noexcept {
   if (mMode == Mode::TEXT) {
     return {
@@ -252,7 +254,7 @@ bool SymbolEditorState_DrawTextBase::startAddText(const Point& pos) noexcept {
         std::make_shared<Text>(Uuid::createRandom(), mCurrentProperties);
     mContext.undoStack.appendToCmdGroup(
         new CmdTextInsert(mContext.symbol.getTexts(), mCurrentText));
-    mCurrentEditCmd.reset(new CmdTextEdit(*mCurrentText));
+    mCurrentEditCmd = std::make_unique<CmdTextEdit>(*mCurrentText);
     mCurrentGraphicsItem = item->getGraphicsItem(mCurrentText);
     Q_ASSERT(mCurrentGraphicsItem);
     mCurrentGraphicsItem->setSelected(true);

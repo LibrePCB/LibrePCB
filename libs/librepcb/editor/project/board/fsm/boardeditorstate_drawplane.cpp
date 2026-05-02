@@ -39,6 +39,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -133,11 +135,10 @@ bool BoardEditorState_DrawPlane::
  *  Connection to UI
  ******************************************************************************/
 
-QVector<std::pair<Uuid, QString>> BoardEditorState_DrawPlane::getAvailableNets()
-    const noexcept {
+const QVector<std::pair<Uuid, QString>>
+    BoardEditorState_DrawPlane::getAvailableNets() const noexcept {
   QVector<std::pair<Uuid, QString>> nets;
-  for (const NetSignal* net :
-       mContext.project.getCircuit().getNetSignals().values()) {
+  for (const NetSignal* net : mContext.project.getCircuit().getNetSignals()) {
     nets.append(std::make_pair(net->getUuid(), *net->getName()));
   }
   Toolbox::sortNumeric(
@@ -236,7 +237,7 @@ bool BoardEditorState_DrawPlane::startAddPlane(
     mContext.undoStack.appendToCmdGroup(new CmdBoardPlaneAdd(*mCurrentPlane));
 
     // Start undo command
-    mCurrentPlaneEditCmd.reset(new CmdBoardPlaneEdit(*mCurrentPlane));
+    mCurrentPlaneEditCmd = std::make_unique<CmdBoardPlaneEdit>(*mCurrentPlane);
     mLastVertexPos = path.getVertices().last().getPos();
     makeLayerVisible(mCurrentLayer->getColorRole());
     updatePlaneSettings();
@@ -277,7 +278,8 @@ bool BoardEditorState_DrawPlane::addSegment(const Point& pos) noexcept {
       // Start a new undo command
       mContext.undoStack.beginCmdGroup(tr("Draw board plane"));
       mIsUndoCmdActive = true;
-      mCurrentPlaneEditCmd.reset(new CmdBoardPlaneEdit(*mCurrentPlane));
+      mCurrentPlaneEditCmd =
+          std::make_unique<CmdBoardPlaneEdit>(*mCurrentPlane);
     }
 
     // Add new vertex

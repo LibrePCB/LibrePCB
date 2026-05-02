@@ -61,7 +61,7 @@ public:
   SI_BusLine(const SI_BusLine& other) = delete;
   SI_BusLine(SI_BusSegment& segment, const Uuid& uuid, SI_BusJunction& a,
              SI_BusJunction& b, const UnsignedLength& width);
-  ~SI_BusLine() noexcept;
+  ~SI_BusLine() noexcept override;
 
   // Getters
   SI_BusSegment& getBusSegment() const noexcept { return mSegment; }

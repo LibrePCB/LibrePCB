@@ -48,7 +48,7 @@ class CmdBusRemove final : public UndoCommand {
 public:
   // Constructors / Destructor
   CmdBusRemove(Circuit& circuit, Bus& bus) noexcept;
-  ~CmdBusRemove() noexcept;
+  ~CmdBusRemove() noexcept override;
 
 private:
   // Private Methods

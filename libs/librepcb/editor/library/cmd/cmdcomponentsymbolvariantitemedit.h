@@ -53,7 +53,7 @@ public:
       const CmdComponentSymbolVariantItemEdit& other) = delete;
   explicit CmdComponentSymbolVariantItemEdit(
       ComponentSymbolVariantItem& item) noexcept;
-  ~CmdComponentSymbolVariantItemEdit() noexcept;
+  ~CmdComponentSymbolVariantItemEdit() noexcept override;
 
   // Setters
   void setSymbolUuid(const Uuid& uuid) noexcept;

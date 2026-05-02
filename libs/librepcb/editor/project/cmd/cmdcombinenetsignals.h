@@ -49,7 +49,7 @@ public:
   // Constructors / Destructor
   CmdCombineNetSignals(Circuit& circuit, NetSignal& toBeRemoved,
                        NetSignal& result) noexcept;
-  ~CmdCombineNetSignals() noexcept;
+  ~CmdCombineNetSignals() noexcept override;
 
 private:
   // Private Methods

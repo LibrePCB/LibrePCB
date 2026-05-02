@@ -55,7 +55,7 @@ public:
   PrimitiveZoneGraphicsItem(const PrimitiveZoneGraphicsItem& other) = delete;
   PrimitiveZoneGraphicsItem(const GraphicsLayerList& layers,
                             QGraphicsItem* parent = nullptr) noexcept;
-  virtual ~PrimitiveZoneGraphicsItem() noexcept;
+  ~PrimitiveZoneGraphicsItem() noexcept override;
 
   // Getters
 
@@ -103,7 +103,7 @@ public:
   }
   QPainterPath shape() const noexcept override;
   void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
-             QWidget* widget = 0) noexcept override;
+             QWidget* widget = nullptr) noexcept override;
 
   // Operator Overloadings
   PrimitiveZoneGraphicsItem& operator=(const PrimitiveZoneGraphicsItem& rhs) =

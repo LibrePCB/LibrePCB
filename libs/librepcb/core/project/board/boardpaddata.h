@@ -80,7 +80,7 @@ public:
                Function function, const PadHoleList& holes,
                bool locked) noexcept;
   explicit BoardPadData(const SExpression& node);
-  ~BoardPadData() noexcept;
+  ~BoardPadData() noexcept override;
 
   // Getters
   using Pad::getHoles;

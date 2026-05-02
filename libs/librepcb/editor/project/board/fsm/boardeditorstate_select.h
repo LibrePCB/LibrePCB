@@ -81,37 +81,37 @@ public:
   BoardEditorState_Select() = delete;
   BoardEditorState_Select(const BoardEditorState_Select& other) = delete;
   explicit BoardEditorState_Select(const Context& context) noexcept;
-  virtual ~BoardEditorState_Select() noexcept;
+  ~BoardEditorState_Select() noexcept override;
 
   // General Methods
-  virtual bool entry() noexcept override;
-  virtual bool exit() noexcept override;
+  bool entry() noexcept override;
+  bool exit() noexcept override;
 
   // Event Handlers
-  virtual bool processImportDxf() noexcept override;
-  virtual bool processSelectAll() noexcept override;
-  virtual bool processCut() noexcept override;
-  virtual bool processCopy() noexcept override;
-  virtual bool processPaste() noexcept override;
-  virtual bool processMove(const Point& delta) noexcept override;
-  virtual bool processRotate(const Angle& rotation) noexcept override;
-  virtual bool processFlip(Qt::Orientation orientation) noexcept override;
-  virtual bool processSnapToGrid() noexcept override;
-  virtual bool processSetLocked(bool locked) noexcept override;
-  virtual bool processChangeLineWidth(int step) noexcept override;
-  virtual bool processResetAllTexts() noexcept override;
-  virtual bool processRemove() noexcept override;
-  virtual bool processEditProperties() noexcept override;
-  virtual bool processAbortCommand() noexcept override;
-  virtual bool processGraphicsSceneMouseMoved(
+  bool processImportDxf() noexcept override;
+  bool processSelectAll() noexcept override;
+  bool processCut() noexcept override;
+  bool processCopy() noexcept override;
+  bool processPaste() noexcept override;
+  bool processMove(const Point& delta) noexcept override;
+  bool processRotate(const Angle& rotation) noexcept override;
+  bool processFlip(Qt::Orientation orientation) noexcept override;
+  bool processSnapToGrid() noexcept override;
+  bool processSetLocked(bool locked) noexcept override;
+  bool processChangeLineWidth(int step) noexcept override;
+  bool processResetAllTexts() noexcept override;
+  bool processRemove() noexcept override;
+  bool processEditProperties() noexcept override;
+  bool processAbortCommand() noexcept override;
+  bool processGraphicsSceneMouseMoved(
       const GraphicsSceneMouseEvent& e) noexcept override;
-  virtual bool processGraphicsSceneLeftMouseButtonPressed(
+  bool processGraphicsSceneLeftMouseButtonPressed(
       const GraphicsSceneMouseEvent& e) noexcept override;
-  virtual bool processGraphicsSceneLeftMouseButtonReleased(
+  bool processGraphicsSceneLeftMouseButtonReleased(
       const GraphicsSceneMouseEvent& e) noexcept override;
-  virtual bool processGraphicsSceneLeftMouseButtonDoubleClicked(
+  bool processGraphicsSceneLeftMouseButtonDoubleClicked(
       const GraphicsSceneMouseEvent& e) noexcept override;
-  virtual bool processGraphicsSceneRightMouseButtonReleased(
+  bool processGraphicsSceneRightMouseButtonReleased(
       const GraphicsSceneMouseEvent& e) noexcept override;
 
   // Operator Overloadings

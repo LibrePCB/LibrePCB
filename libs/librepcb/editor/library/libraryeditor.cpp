@@ -106,7 +106,7 @@ void LibraryEditor::setUiData(const ui::LibraryData& data) noexcept {
 }
 
 bool LibraryEditor::requestCloseAllTabs() noexcept {
-  for (auto tab : mRegisteredTabs) {
+  for (const auto& tab : std::as_const(mRegisteredTabs)) {
     Q_ASSERT(tab);
     if (tab && (!tab->requestClose())) {
       return false;
@@ -205,17 +205,17 @@ void LibraryEditor::unregisterTab(LibraryEditorTab& tab) noexcept {
 }
 
 void LibraryEditor::forceClosingTabs(const QSet<FilePath>& fp) noexcept {
-  for (auto tab : mRegisteredTabs) {
+  for (const auto& tab : std::as_const(mRegisteredTabs)) {
     Q_ASSERT(tab);
     if (tab && (fp.contains(tab->getDirectoryPath()))) {
-      tab->closeEnforced();
+      emit tab->closeEnforced();
     }
   }
 }
 
 int LibraryEditor::getNumberOfLibraryTabs() const noexcept {
   int count = 0;
-  for (auto tab : mRegisteredTabs) {
+  for (const auto& tab : mRegisteredTabs) {
     if (dynamic_cast<LibraryTab*>(tab.get())) {
       ++count;
     }

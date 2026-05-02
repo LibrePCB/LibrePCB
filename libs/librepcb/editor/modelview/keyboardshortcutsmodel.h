@@ -52,7 +52,7 @@ public:
   KeyboardShortcutsModel() = delete;
   KeyboardShortcutsModel(const KeyboardShortcutsModel& other) = delete;
   explicit KeyboardShortcutsModel(QObject* parent = nullptr) noexcept;
-  ~KeyboardShortcutsModel() noexcept;
+  ~KeyboardShortcutsModel() noexcept override;
 
   // General Methods
   const QMap<QString, QList<QKeySequence>>& getOverrides() const noexcept {

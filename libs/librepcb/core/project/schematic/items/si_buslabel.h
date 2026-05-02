@@ -64,7 +64,7 @@ public:
   SI_BusLabel() = delete;
   SI_BusLabel(const SI_BusLabel& other) = delete;
   explicit SI_BusLabel(SI_BusSegment& segment, const NetLabel& label);
-  ~SI_BusLabel() noexcept;
+  ~SI_BusLabel() noexcept override;
 
   // Getters
   const Uuid& getUuid() const noexcept { return mNetLabel.getUuid(); }

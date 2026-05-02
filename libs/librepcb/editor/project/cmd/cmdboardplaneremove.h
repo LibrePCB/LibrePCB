@@ -48,7 +48,7 @@ class CmdBoardPlaneRemove final : public UndoCommand {
 public:
   // Constructors / Destructor
   explicit CmdBoardPlaneRemove(BI_Plane& plane) noexcept;
-  ~CmdBoardPlaneRemove() noexcept;
+  ~CmdBoardPlaneRemove() noexcept override;
 
 private:
   // Private Methods

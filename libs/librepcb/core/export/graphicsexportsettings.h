@@ -87,7 +87,7 @@ public:
   const QList<std::pair<QString, QColor>>& getColors() const noexcept {
     return mColors;
   }
-  QStringList getPaintOrder() const noexcept;
+  const QStringList getPaintOrder() const noexcept;
   QColor getColor(const QString& role) const noexcept;
   QColor getFillColor(const QString& role, bool isFilled,
                       bool isGrabArea) const noexcept;
@@ -113,7 +113,9 @@ public:
   }
   void setRotate(bool rotate) noexcept { mRotate = rotate; }
   void setMirror(bool mirror) noexcept { mMirror = mirror; }
-  void setScale(std::optional<UnsignedRatio> scale) noexcept { mScale = scale; }
+  void setScale(const std::optional<UnsignedRatio>& scale) noexcept {
+    mScale = scale;
+  }
   void setPixmapDpi(int dpi) noexcept { mPixmapDpi = dpi; }
   void setBlackWhite(bool blackWhite) noexcept { mBlackWhite = blackWhite; }
   void setBackgroundColor(const QColor& c) noexcept { mBackgroundColor = c; }

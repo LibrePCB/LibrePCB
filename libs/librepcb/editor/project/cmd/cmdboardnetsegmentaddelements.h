@@ -55,7 +55,7 @@ class CmdBoardNetSegmentAddElements final : public UndoCommand {
 public:
   // Constructors / Destructor
   CmdBoardNetSegmentAddElements(BI_NetSegment& segment) noexcept;
-  ~CmdBoardNetSegmentAddElements() noexcept;
+  ~CmdBoardNetSegmentAddElements() noexcept override;
 
   // General Methods
   BI_Pad* addPad(BI_Pad& pad);

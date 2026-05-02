@@ -48,10 +48,10 @@ public:
   // Constructors / Destructor
   explicit EditableTableWidget(QWidget* parent = nullptr) noexcept;
   EditableTableWidget(const EditableTableWidget& other) = delete;
-  virtual ~EditableTableWidget() noexcept;
+  ~EditableTableWidget() noexcept override;
 
   // Setters
-  virtual void setModel(QAbstractItemModel* model) noexcept override;
+  void setModel(QAbstractItemModel* model) noexcept override;
   void setReadOnly(bool readOnly) noexcept;
   void setAddButtonOnLastRow(bool btn) noexcept { mAddButtonOnLastRow = btn; }
   void setShowCopyButton(bool show) noexcept { mShowCopyButton = show; }
@@ -62,18 +62,17 @@ public:
 
   // Inherited
   using QAbstractItemView::edit;  // Required to override edit() overload below.
-  virtual void reset() override;
+  void reset() override;
 
   // Operator Overloadings
   EditableTableWidget& operator=(const EditableTableWidget& rhs) = delete;
 
 protected:
-  virtual bool edit(const QModelIndex& index, EditTrigger trigger,
-                    QEvent* event) override;
-  virtual void currentChanged(const QModelIndex& current,
-                              const QModelIndex& previous) override;
-  virtual void rowsInserted(const QModelIndex& parent, int start,
-                            int end) override;
+  bool edit(const QModelIndex& index, EditTrigger trigger,
+            QEvent* event) override;
+  void currentChanged(const QModelIndex& current,
+                      const QModelIndex& previous) override;
+  void rowsInserted(const QModelIndex& parent, int start, int end) override;
 
 signals:
   void readOnlyChanged(bool readOnly);

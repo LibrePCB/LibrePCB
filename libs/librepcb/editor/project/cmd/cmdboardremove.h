@@ -48,7 +48,7 @@ class CmdBoardRemove final : public UndoCommand {
 public:
   // Constructors / Destructor
   explicit CmdBoardRemove(Board& board) noexcept;
-  ~CmdBoardRemove() noexcept;
+  ~CmdBoardRemove() noexcept override;
 
 private:
   // Private Methods

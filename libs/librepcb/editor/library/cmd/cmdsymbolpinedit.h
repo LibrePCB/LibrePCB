@@ -51,7 +51,7 @@ public:
   CmdSymbolPinEdit() = delete;
   CmdSymbolPinEdit(const CmdSymbolPinEdit& other) = delete;
   explicit CmdSymbolPinEdit(std::shared_ptr<SymbolPin> pin) noexcept;
-  ~CmdSymbolPinEdit() noexcept;
+  ~CmdSymbolPinEdit() noexcept override;
 
   // Setters
   void setName(const CircuitIdentifier& name, bool immediate) noexcept;

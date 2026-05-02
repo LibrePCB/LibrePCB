@@ -51,7 +51,7 @@ class CmdSchematicBusSegmentAddElements final : public UndoCommand {
 public:
   // Constructors / Destructor
   CmdSchematicBusSegmentAddElements(SI_BusSegment& segment) noexcept;
-  ~CmdSchematicBusSegmentAddElements() noexcept;
+  ~CmdSchematicBusSegmentAddElements() noexcept override;
 
   // General Methods
   SI_BusJunction* addJunction(SI_BusJunction& junction);

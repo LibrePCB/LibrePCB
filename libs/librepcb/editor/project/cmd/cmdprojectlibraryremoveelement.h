@@ -49,7 +49,7 @@ public:
   // Constructors / Destructor
   CmdProjectLibraryRemoveElement(ProjectLibrary& library,
                                  ElementType& element) noexcept;
-  ~CmdProjectLibraryRemoveElement() noexcept;
+  ~CmdProjectLibraryRemoveElement() noexcept override;
 
 private:
   // Private Methods

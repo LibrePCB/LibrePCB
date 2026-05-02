@@ -33,6 +33,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -202,7 +204,7 @@ bool BoardEditorState_DrawPolygon::startAddPolygon(const Point& pos) noexcept {
         new CmdBoardPolygonAdd(*mCurrentPolygon));
 
     // Start undo command
-    mCurrentEditCmd.reset(new CmdBoardPolygonEdit(*mCurrentPolygon));
+    mCurrentEditCmd = std::make_unique<CmdBoardPolygonEdit>(*mCurrentPolygon);
     mLastSegmentPos = pos;
     makeLayerVisible(mCurrentProperties.getLayer().getColorRole());
     return true;
@@ -239,7 +241,7 @@ bool BoardEditorState_DrawPolygon::addSegment(const Point& pos) noexcept {
     // Start a new undo command
     mContext.undoStack.beginCmdGroup(tr("Draw board polygon"));
     mIsUndoCmdActive = true;
-    mCurrentEditCmd.reset(new CmdBoardPolygonEdit(*mCurrentPolygon));
+    mCurrentEditCmd = std::make_unique<CmdBoardPolygonEdit>(*mCurrentPolygon);
 
     // Add new vertex
     QVector<Vertex> vertices =

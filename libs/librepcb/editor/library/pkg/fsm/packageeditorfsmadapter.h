@@ -79,6 +79,7 @@ public:
   };
   Q_DECLARE_FLAGS(Features, Feature)
 
+  virtual ~PackageEditorFsmAdapter() = default;
   virtual bool fsmIsWritable() const noexcept = 0;
   virtual QWidget* fsmGetParentWidget() noexcept = 0;
   virtual GraphicsScene* fsmGetGraphicsScene() noexcept = 0;

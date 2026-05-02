@@ -77,7 +77,7 @@ public:
   /**
    * @brief Destructor
    */
-  virtual ~MessageLogger() noexcept;
+  ~MessageLogger() noexcept override;
 
   // Getters
   bool hasMessages() const noexcept;

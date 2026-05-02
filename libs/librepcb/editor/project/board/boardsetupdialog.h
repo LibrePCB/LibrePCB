@@ -60,8 +60,8 @@ public:
   BoardSetupDialog() = delete;
   BoardSetupDialog(const BoardSetupDialog& other) = delete;
   BoardSetupDialog(GuiApplication& app, Board& board, UndoStack& undoStack,
-                   QWidget* parent = 0) noexcept;
-  ~BoardSetupDialog();
+                   QWidget* parent = nullptr) noexcept;
+  ~BoardSetupDialog() override;
 
   // General Methods
   void openDrcSettingsTab() noexcept;

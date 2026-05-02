@@ -68,7 +68,7 @@ public:
   WorkspaceLibraryScanner(const FilePath& librariesPath,
                           const FilePath& dbFilePath) noexcept;
   WorkspaceLibraryScanner(const WorkspaceLibraryScanner& other) = delete;
-  ~WorkspaceLibraryScanner() noexcept;
+  ~WorkspaceLibraryScanner() noexcept override;
 
   // Getters
   int getProgressPercent() const noexcept { return mLastProgressPercent; }

@@ -60,7 +60,7 @@ public:
   // Constructors / Destructor
   StrokeFont(const FilePath& fontFilePath, const QByteArray& content) noexcept;
   StrokeFont(const StrokeFont& other) = delete;
-  ~StrokeFont() noexcept;
+  ~StrokeFont() noexcept override;
 
   // Getters
   Ratio getLetterSpacing() const noexcept;

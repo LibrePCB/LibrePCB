@@ -61,7 +61,7 @@ static void setupFile(const FilePath& pth, const QByteArray& content,
  ******************************************************************************/
 
 class FileUtilsTest : public ::testing::Test {
-protected:
+public:
   FilePath root{FilePath::getRandomTempPath()};
 
   // the sources of already existing files and directories
@@ -98,7 +98,7 @@ protected:
     setupFile(subdirSubdirFileHidden, "hiddenContent\n", true);
   }
 
-  ~FileUtilsTest() {
+  ~FileUtilsTest() override {
     // each test should clean itself after run
     QDir(root.toNative()).removeRecursively();
   }

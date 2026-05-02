@@ -59,7 +59,7 @@ public:
   /**
    * @brief Destructor
    */
-  ~OrderPcbApiRequest() noexcept;
+  ~OrderPcbApiRequest() noexcept override;
 
   // Getters
 
@@ -132,42 +132,42 @@ signals:
    * @param infoUrl       The received service information URL.
    * @param maxFileSize   The received maximum file size in bytes (-1 if N/A).
    */
-  void infoRequestSucceeded(QUrl infoUrl, int maxFileSize) const;
+  void infoRequestSucceeded(QUrl infoUrl, int maxFileSize);
 
   /**
    * @brief Information request failed
    *
    * @param errorMsg  Error message.
    */
-  void infoRequestFailed(QString errorMsg) const;
+  void infoRequestFailed(QString errorMsg);
 
   /**
    * @brief Upload progress state changed
    *
    * @param state   SHort description of current state.
    */
-  void uploadProgressState(QString state) const;
+  void uploadProgressState(QString state);
 
   /**
    * @brief Upload progress in percent changed
    *
    * @param percent   Current upload progress in percent.
    */
-  void uploadProgressPercent(int percent) const;
+  void uploadProgressPercent(int percent);
 
   /**
    * @brief Upload succeeded
    *
    * @param redirectUrl   The received URL to be opened in the web browser.
    */
-  void uploadSucceeded(QUrl redirectUrl) const;
+  void uploadSucceeded(QUrl redirectUrl);
 
   /**
    * @brief Information request failed
    *
    * @param errorMsg  Error message.
    */
-  void uploadFailed(QString errorMsg) const;
+  void uploadFailed(QString errorMsg);
 
 private:  // Methods
   void infoRequestResponseReceived(const QByteArray& data) noexcept;

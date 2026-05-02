@@ -39,6 +39,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -90,9 +92,8 @@ bool CmdAddSymbolToSchematic::performExecute() {
              "workspace library!")
               .arg(symbolUuid.toStr()));
     }
-    Symbol* sym = Symbol::open(std::unique_ptr<TransactionalDirectory>(
-                                   new TransactionalDirectory(
-                                       TransactionalFileSystem::openRO(symFp))))
+    Symbol* sym = Symbol::open(std::make_unique<TransactionalDirectory>(
+                                   TransactionalFileSystem::openRO(symFp)))
                       .release();  // can throw
     CmdProjectLibraryAddElement<Symbol>* cmdAddToLibrary =
         new CmdProjectLibraryAddElement<Symbol>(

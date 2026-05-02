@@ -55,7 +55,7 @@ public:
       mList(list),
       mElement(element),
       mIndex(index) {}
-  ~CmdListElementInsert() noexcept {}
+  ~CmdListElementInsert() noexcept override {}
 
   // Operator Overloadings
   CmdListElementInsert& operator=(const CmdListElementInsert& rhs) = delete;

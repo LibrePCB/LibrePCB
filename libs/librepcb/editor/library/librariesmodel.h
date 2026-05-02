@@ -66,7 +66,7 @@ public:
   LibrariesModel(const LibrariesModel& other) = delete;
   explicit LibrariesModel(Workspace& ws, Mode mode,
                           QObject* parent = nullptr) noexcept;
-  virtual ~LibrariesModel() noexcept;
+  ~LibrariesModel() noexcept override;
 
   // General Methods
   ui::LibraryListData getUiData() const noexcept;

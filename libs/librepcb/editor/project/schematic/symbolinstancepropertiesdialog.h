@@ -70,7 +70,7 @@ public:
                                  const LengthUnit& lengthUnit,
                                  const QString& settingsPrefix,
                                  QWidget* parent) noexcept;
-  ~SymbolInstancePropertiesDialog() noexcept;
+  ~SymbolInstancePropertiesDialog() noexcept override;
 
   // Operator Overloadings
   SymbolInstancePropertiesDialog& operator=(
@@ -79,7 +79,7 @@ public:
 private:  // Methods
   void setSelectedPart(std::shared_ptr<Part> part) noexcept;
   void buttonBoxClicked(QAbstractButton* button) noexcept;
-  void accept();
+  void accept() override;
   bool applyChanges() noexcept;
 
 private:  // Data

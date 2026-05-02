@@ -57,7 +57,7 @@ public:
                                    ComponentInstance& cmpInstance,
                                    const ComponentSignal& cmpSignal,
                                    NetSignal* netsignal = nullptr);
-  ~ComponentSignalInstance() noexcept;
+  ~ComponentSignalInstance() noexcept override;
 
   // Getters
   Circuit& getCircuit() const noexcept { return mCircuit; }

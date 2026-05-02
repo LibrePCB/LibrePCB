@@ -99,9 +99,7 @@ FileParseError::FileParseError(const char* file, int line,
   : RuntimeError(
         file, line,
         QString("File parse error: %1\nFile: %2\nInvalid Content: '%3'")
-            .arg(msg)
-            .arg(filePath.toNative())
-            .arg(invalidFileContent)) {
+            .arg(msg, filePath.toNative(), invalidFileContent)) {
 }
 
 FileParseError::FileParseError(const FileParseError& other) noexcept

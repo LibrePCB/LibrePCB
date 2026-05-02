@@ -88,7 +88,7 @@ public:
   SymbolEditorFsm() = delete;
   SymbolEditorFsm(const SymbolEditorFsm& other) = delete;
   explicit SymbolEditorFsm(const Context& context) noexcept;
-  ~SymbolEditorFsm() noexcept;
+  ~SymbolEditorFsm() noexcept override;
 
   // Event Handlers
   bool processKeyPressed(const GraphicsSceneKeyEvent& e) noexcept;
