@@ -42,7 +42,7 @@ namespace librepcb {
  * <b>Why we need well-formatted paths and what do they look like</b>
  *
  * Using QString for paths to directories or files works not bad, but there are
- * some disadventages. As the receiver of a filepath in form of a QString,
+ * some disadvantages. As the receiver of a filepath in form of a QString,
  * you...
  *  - never know whether it uses native separators or not ("/" or "\", depends
  * on the OS)
@@ -417,7 +417,7 @@ public:  // Methods
    * @return   A string which is either empty or a valid filename (based on
    *           userInput)
    *
-   * @note  This function does exectly the same on all supported platforms,
+   * @note  This function does exactly the same on all supported platforms,
    *        even if the set of allowed characters depends on the platform.
    *        This way we can guarantee that all created files/directories are
    *        platform independent.

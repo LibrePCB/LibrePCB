@@ -51,7 +51,7 @@ class CategoryTreeModelLegacy final : public QAbstractItemModel {
     std::optional<Uuid> uuid;  ///< std::nullopt for items without category
     QString text;
     QString tooltip;
-    QVector<std::shared_ptr<Item>> childs;
+    QVector<std::shared_ptr<Item>> children;
   };
 
 public:
@@ -103,14 +103,14 @@ public:
 
 private:  // Methods
   void update() noexcept;
-  QVector<std::shared_ptr<Item>> getChilds(
+  QVector<std::shared_ptr<Item>> getChildren(
       std::shared_ptr<Item> parent) const noexcept;
   bool containsItems(const std::optional<Uuid>& uuid) const;
   bool listAll() const noexcept;
   bool listPackageCategories() const noexcept;
   void updateModelItem(
       std::shared_ptr<Item> parentItem,
-      const QVector<std::shared_ptr<Item>>& newChilds) noexcept;
+      const QVector<std::shared_ptr<Item>>& newChildren) noexcept;
   Item* itemFromIndex(const QModelIndex& index) const noexcept;
   QModelIndex indexFromItem(const Item* item) const noexcept;
 

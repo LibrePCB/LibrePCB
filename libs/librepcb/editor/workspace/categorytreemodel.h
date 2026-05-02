@@ -79,7 +79,7 @@ public:
 private:  // Methods
   void refresh() noexcept;
   template <typename T>
-  void loadChilds(const std::optional<Uuid>& parent, int level);
+  void loadChildren(const std::optional<Uuid>& parent, int level);
 
 private:  // Data
   const WorkspaceLibraryDb& mDb;

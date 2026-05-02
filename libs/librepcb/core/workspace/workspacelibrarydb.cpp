@@ -126,7 +126,7 @@ template QList<Uuid> WorkspaceLibraryDb::find<Device>(
 // specialization for Package
 template <>
 QList<Uuid> WorkspaceLibraryDb::find<Package>(const QString& keyword) const {
-  // ATTENTION: Keep SQL in sync with the generig find() method below!
+  // ATTENTION: Keep SQL in sync with the generic find() method below!
   QSqlQuery query = mDb->prepareQuery(
       "SELECT packages.uuid FROM packages "
       "LEFT JOIN packages_tr "
@@ -645,7 +645,7 @@ AttributeList WorkspaceLibraryDb::getPartAttributes(int partId) const {
   return attributes;
 }
 
-QSet<Uuid> WorkspaceLibraryDb::getChilds(
+QSet<Uuid> WorkspaceLibraryDb::getChildren(
     const QString& categoriesTable,
     const std::optional<Uuid>& categoryUuid) const {
   QSqlQuery query;

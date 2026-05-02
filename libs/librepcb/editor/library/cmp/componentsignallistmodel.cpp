@@ -217,7 +217,7 @@ ui::ComponentSignalData ComponentSignalListModel::createItem(
 
 void ComponentSignalListModel::updateSortOrder(bool notify) noexcept {
   // Note: The sorting needs to be done only when the underlying list data
-  // was modfied, not when the UI data is changed, since this would lead to
+  // was modified, not when the UI data is changed, since this would lead to
   // reordering while the user is typing, causing focus issues etc.
 
   if (!mComponent) return;

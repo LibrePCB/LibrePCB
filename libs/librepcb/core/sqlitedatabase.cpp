@@ -37,17 +37,17 @@ namespace librepcb {
  ******************************************************************************/
 
 SQLiteDatabase::TransactionScopeGuard::TransactionScopeGuard(SQLiteDatabase& db)
-  : mDb(db), mIsCommited(false) {
+  : mDb(db), mIsCommitted(false) {
   mDb.beginTransaction();  // can throw
 }
 
 void SQLiteDatabase::TransactionScopeGuard::commit() {
   mDb.commitTransaction();  // can throw
-  mIsCommited = true;
+  mIsCommitted = true;
 }
 
 SQLiteDatabase::TransactionScopeGuard::~TransactionScopeGuard() noexcept {
-  if (!mIsCommited) {
+  if (!mIsCommitted) {
     try {
       mDb.rollbackTransaction();  // can throw
     } catch (Exception& e) {

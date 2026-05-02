@@ -54,7 +54,7 @@
 namespace librepcb {
 namespace editor {
 
-// Allow some procentual deviation due to floating point inaccuracy:
+// Allow some percentual deviation due to floating point inaccuracy:
 // 25nm <= 0.001% <= 1um
 static bool fuzzyCompare(const Point& exact, const Point& imported) {
   const Length maxDim = std::max(imported.getX(), imported.getY());
@@ -151,12 +151,12 @@ CmdBoardSpecctraImport::CmdBoardSpecctraImport(
     mLogger->debug("Placement resolution: " % logRes);
     mComponents = QList<ComponentOut>();
     for (const SExpression* cmpNode : child->getChildren("component")) {
-      QList<const SExpression*> childs = cmpNode->getChildren("place");
-      if (childs.count() != 1) {
+      QList<const SExpression*> children = cmpNode->getChildren("place");
+      if (children.count() != 1) {
         throw RuntimeError(__FILE__, __LINE__,
                            "Unexpected component placement count.");
       }
-      const SExpression* node = childs.first();
+      const SExpression* node = children.first();
       QString name = node->getChild("@0").getValue();
       Point pos(parseLength(node->getChild("@1"), resolution),
                 parseLength(node->getChild("@2"), resolution));
@@ -235,22 +235,22 @@ CmdBoardSpecctraImport::CmdBoardSpecctraImport(
     }
     for (const SExpression* wireNode : netNode->getChildren("wire")) {
       for (const SExpression* pathNode : wireNode->getChildren("path")) {
-        QList<const SExpression*> childs =
+        QList<const SExpression*> children =
             pathNode->getChildren(SExpression::Type::Token);
-        if ((childs.count() < 2) || ((childs.count() % 2) != 0)) {
+        if ((children.count() < 2) || ((children.count() % 2) != 0)) {
           throw RuntimeError(__FILE__, __LINE__,
                              "Unexpected number of vertices in path element.");
         }
-        WireOut wire{deserialize<const Layer*>(*childs.at(0)),
-                     parseLength(*childs.at(1), resolution),
+        WireOut wire{deserialize<const Layer*>(*children.at(0)),
+                     parseLength(*children.at(1), resolution),
                      {}};
         if (wire.width <= 0) {
           mLogger->warning("Skippted wire with zero width.");
           continue;
         }
-        for (int i = 3; i < childs.count(); i += 2) {
-          Length x = parseLength(*childs.at(i - 1), resolution);
-          Length y = parseLength(*childs.at(i), resolution);
+        for (int i = 3; i < children.count(); i += 2) {
+          Length x = parseLength(*children.at(i - 1), resolution);
+          Length y = parseLength(*children.at(i), resolution);
           wire.path.addVertex(Point(x, y));
         }
         if (wire.path.getVertices().count() < 2) {

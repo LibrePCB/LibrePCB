@@ -37,8 +37,8 @@ pub fn to_degrees(radians: f64) -> f64 {
 ///
 /// # Arguments
 ///
-/// * `x` - X-coordiante of the point.
-/// * `y` - Y-coordiante of the point.
+/// * `x` - X-coordinate of the point.
+/// * `y` - Y-coordinate of the point.
 /// * `angle` - Angle in degrees counter-clockwise.
 ///
 /// # Returns
@@ -63,8 +63,8 @@ pub fn rotate_point(x: f64, y: f64, angle: f64) -> (f64, f64) {
 ///
 /// # Arguments
 ///
-/// * `x` - X-coordiante of the point.
-/// * `y` - Y-coordiante of the point.
+/// * `x` - X-coordinate of the point.
+/// * `y` - Y-coordinate of the point.
 ///
 /// # Returns
 ///
@@ -89,8 +89,8 @@ pub fn angle_to_point(x: f64, y: f64) -> f64 {
 ///
 /// # Arguments
 ///
-/// * `x` - X-coordiante of the arcs end point.
-/// * `y` - Y-coordiante of the arcs end point.
+/// * `x` - X-coordinate of the arcs end point.
+/// * `y` - Y-coordinate of the arcs end point.
 /// * `angle` - Arc angle in degrees counter-clockwise.
 ///
 /// # Returns
@@ -120,8 +120,8 @@ pub fn arc_radius(dx: f64, dy: f64, angle: f64) -> f64 {
 ///
 /// # Arguments
 ///
-/// * `x` - X-coordiante of the arcs end point.
-/// * `y` - Y-coordiante of the arcs end point.
+/// * `x` - X-coordinate of the arcs end point.
+/// * `y` - Y-coordinate of the arcs end point.
 /// * `angle` - Arc angle in degrees counter-clockwise.
 ///
 /// # Returns

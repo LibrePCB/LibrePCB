@@ -52,7 +52,7 @@ public:
   virtual ~UndoCommandGroup() noexcept;
 
   // Getters
-  int getChildCount() const noexcept { return mChilds.count(); }
+  int getChildCount() const noexcept { return mChildren.count(); }
 
   // General Methods
 
@@ -117,7 +117,7 @@ private:
    * The child which is executed first is at index zero, the last executed
    * command is at the top of the list.
    */
-  QList<UndoCommand*> mChilds;
+  QList<UndoCommand*> mChildren;
 };
 
 /*******************************************************************************

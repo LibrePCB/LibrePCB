@@ -76,9 +76,9 @@ struct FileProofNameConstraint {
 
 /**
  * FileProofName is a wrapper around QString which guarantees to contain a
- * string useble within filenames
+ * string usable within filenames
  *
- * A sttring name is considered file-proof if it:
+ * A string name is considered file-proof if it:
  *   - contains minimum 1 and maximum 20 characters
  *   - contains only the characters [-a-zA-Z0-9_+().]
  *

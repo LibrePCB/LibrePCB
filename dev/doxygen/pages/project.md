@@ -185,7 +185,7 @@ upgrading the files.
 
 Opening a project multiple times simultaneously can be dangerous. Even if the application's design
 does not allow to open a project multiple times, it's still possible to save a project in a shared
-folder and open it from different computers at the same time (for example). This could demage the
+folder and open it from different computers at the same time (for example). This could damage the
 project files.
 
 To avoid such problems, the constructor of librepcb::project::Project tries to lock the project's
@@ -229,7 +229,7 @@ class which is used by librepcb::project::Project.
 
 It's important to keep all files of a project valid and consistent. If the
 application crashes, the project files must not be demaged. Even a crash while
-saving the project should not demage the project, i.e. the save procedure must
+saving the project should not damage the project, i.e. the save procedure must
 be 100% atomic.
 
 To guarantee consistent project files in every case, following steps are done

@@ -233,11 +233,11 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
     auto placeholderFilePath =
         std::make_pair(QString("{{FILEPATH}}"),
                        tr("Absolute path to the file to open",
-                          "Decription for '{{FILEPATH}}' placeholder"));
+                          "Description for '{{FILEPATH}}' placeholder"));
     auto placeholderUrl =
         std::make_pair(QString("{{URL}}"),
                        tr("URL to the file to open (file://)",
-                          "Decription for '{{URL}}' placeholder"));
+                          "Description for '{{URL}}' placeholder"));
 
     connect(mUi->lstExternalApplications, &QListWidget::currentRowChanged, this,
             &WorkspaceSettingsDialog::externalApplicationListIndexChanged);
@@ -248,9 +248,9 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
         &mSettings.externalWebBrowserCommands,
         "firefox",
         "\"{{URL}}\"",
-        {std::make_pair(
-            QString("{{URL}}"),
-            tr("Website URL to open", "Decription for '{{URL}}' placeholder"))},
+        {std::make_pair(QString("{{URL}}"),
+                        tr("Website URL to open",
+                           "Description for '{{URL}}' placeholder"))},
         {},
     });
 

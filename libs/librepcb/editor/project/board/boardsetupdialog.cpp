@@ -157,7 +157,7 @@ BoardSetupDialog::BoardSetupDialog(GuiApplication& app, Board& board,
     rbtn->setToolTip(
         tr("<p>Don't use the defined pad shape, but automatic annular rings "
            "calculated by the parameters below. The annular ring of "
-           "unconnected pads is reduced to the specified mimimum value.</p>"
+           "unconnected pads is reduced to the specified minimum value.</p>"
            "<p>This option is more space-efficient, but works only reliable "
            "if the entered parameters comply with the PCB manufacturers "
            "capabilities.</p>"));

@@ -101,8 +101,8 @@ Version Version::fromString(const QString& str) {
 std::optional<Version> Version::tryFromString(const QString& str) noexcept {
   QVector<uint> numbers;
   // split and convert to integer
-  QStringList splitted = str.split('.', Qt::KeepEmptyParts, Qt::CaseSensitive);
-  foreach (const QString& numberStr, splitted) {
+  QStringList split = str.split('.', Qt::KeepEmptyParts, Qt::CaseSensitive);
+  foreach (const QString& numberStr, split) {
     bool ok = false;
     uint number = numberStr.toUInt(&ok);
     if ((!ok) || (number > 99999)) {

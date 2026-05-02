@@ -313,7 +313,7 @@ TEST_F(WorkspaceSettingsTest, testBaseColorSchemes) {
     // Verify colors of all base color schemes.
     const auto firstColors = schemes.at(0)->getAllColors();
     for (const BaseColorScheme* scheme : schemes) {
-      // Check that all UUIDs are unique accross all color schemes.
+      // Check that all UUIDs are unique across all color schemes.
       EXPECT_FALSE(uuids.contains(scheme->getUuid()));
       uuids.insert(scheme->getUuid());
       // Check that all names are unique for each kind of color scheme.

@@ -803,56 +803,57 @@ TEST_F(WorkspaceLibraryDbTest, testGetDeviceMetadataNullptr) {
 }
 
 /*******************************************************************************
- *  Tests for getChilds()
+ *  Tests for getChildren()
  ******************************************************************************/
 
-TEST_F(WorkspaceLibraryDbTest, testGetChildsEmptyDb) {
+TEST_F(WorkspaceLibraryDbTest, testGetChildrenEmptyDb) {
   EXPECT_EQ(str(QSet<Uuid>{}),
-            str(mWsDb->getChilds<ComponentCategory>(std::nullopt)));
+            str(mWsDb->getChildren<ComponentCategory>(std::nullopt)));
   EXPECT_EQ(str(QSet<Uuid>{}),
-            str(mWsDb->getChilds<PackageCategory>(std::nullopt)));
+            str(mWsDb->getChildren<PackageCategory>(std::nullopt)));
 }
 
-TEST_F(WorkspaceLibraryDbTest, testGetChildsInexistent) {
+TEST_F(WorkspaceLibraryDbTest, testGetChildrenInexistent) {
   mWriter->addCategory<ComponentCategory>(0, toAbs("cmpcat"), uuid(1),
                                           version("0.1"), false, std::nullopt);
   mWriter->addCategory<PackageCategory>(0, toAbs("pkgcat"), uuid(2),
                                         version("0.1"), false, std::nullopt);
 
   EXPECT_EQ(str(QSet<Uuid>{}),
-            str(mWsDb->getChilds<ComponentCategory>(uuid(2))));
-  EXPECT_EQ(str(QSet<Uuid>{}), str(mWsDb->getChilds<PackageCategory>(uuid(1))));
+            str(mWsDb->getChildren<ComponentCategory>(uuid(2))));
+  EXPECT_EQ(str(QSet<Uuid>{}),
+            str(mWsDb->getChildren<PackageCategory>(uuid(1))));
 }
 
-TEST_F(WorkspaceLibraryDbTest, testGetChildsInvalidWithUuid) {
+TEST_F(WorkspaceLibraryDbTest, testGetChildrenInvalidWithUuid) {
   mWriter->addCategory<ComponentCategory>(0, toAbs("cmpcat"), uuid(1),
                                           version("0.1"), false, uuid(2));
   mWriter->addCategory<PackageCategory>(0, toAbs("pkgcat"), uuid(3),
                                         version("0.1"), false, uuid(4));
 
   EXPECT_EQ(str(QSet<Uuid>{uuid(1)}),
-            str(mWsDb->getChilds<ComponentCategory>(uuid(2))));
+            str(mWsDb->getChildren<ComponentCategory>(uuid(2))));
   EXPECT_EQ(str(QSet<Uuid>{uuid(3)}),
-            str(mWsDb->getChilds<PackageCategory>(uuid(4))));
+            str(mWsDb->getChildren<PackageCategory>(uuid(4))));
 }
 
-TEST_F(WorkspaceLibraryDbTest, testGetChildsInvalidWithoutUuid) {
+TEST_F(WorkspaceLibraryDbTest, testGetChildrenInvalidWithoutUuid) {
   mWriter->addCategory<ComponentCategory>(0, toAbs("cmpcat"), uuid(1),
                                           version("0.1"), false, uuid(2));
   mWriter->addCategory<PackageCategory>(0, toAbs("pkgcat"), uuid(3),
                                         version("0.1"), false, uuid(4));
 
   EXPECT_EQ(str(QSet<Uuid>{uuid(1)}),
-            str(mWsDb->getChilds<ComponentCategory>(std::nullopt)));
+            str(mWsDb->getChildren<ComponentCategory>(std::nullopt)));
   EXPECT_EQ(str(QSet<Uuid>{uuid(3)}),
-            str(mWsDb->getChilds<PackageCategory>(std::nullopt)));
+            str(mWsDb->getChildren<PackageCategory>(std::nullopt)));
 }
 
 // Further tests only check with ComponentCategory, since the implementation
 // is the same for PackageCategory and the tests above have proven that each
 // element type is generally working.
 
-TEST_F(WorkspaceLibraryDbTest, testGetChildsDuplicatesWithUuid) {
+TEST_F(WorkspaceLibraryDbTest, testGetChildrenDuplicatesWithUuid) {
   mWriter->addCategory<ComponentCategory>(0, toAbs("cmpcat1"), uuid(1),
                                           version("0.1"), false, std::nullopt);
   mWriter->addCategory<ComponentCategory>(0, toAbs("cmpcat2"), uuid(2),
@@ -863,10 +864,10 @@ TEST_F(WorkspaceLibraryDbTest, testGetChildsDuplicatesWithUuid) {
                                           version("0.1"), false, uuid(1));
 
   EXPECT_EQ(str(QSet<Uuid>{uuid(2)}),
-            str(mWsDb->getChilds<ComponentCategory>(uuid(1))));
+            str(mWsDb->getChildren<ComponentCategory>(uuid(1))));
 }
 
-TEST_F(WorkspaceLibraryDbTest, testGetChildsDuplicatesWithoutUuid) {
+TEST_F(WorkspaceLibraryDbTest, testGetChildrenDuplicatesWithoutUuid) {
   mWriter->addCategory<ComponentCategory>(0, toAbs("cmpcat1"), uuid(1),
                                           version("0.1"), false, std::nullopt);
   mWriter->addCategory<ComponentCategory>(0, toAbs("cmpcat2"), uuid(2),
@@ -877,7 +878,7 @@ TEST_F(WorkspaceLibraryDbTest, testGetChildsDuplicatesWithoutUuid) {
                                           version("0.1"), false, uuid(1));
 
   EXPECT_EQ(str(QSet<Uuid>{uuid(1)}),
-            str(mWsDb->getChilds<ComponentCategory>(std::nullopt)));
+            str(mWsDb->getChildren<ComponentCategory>(std::nullopt)));
 }
 
 /*******************************************************************************

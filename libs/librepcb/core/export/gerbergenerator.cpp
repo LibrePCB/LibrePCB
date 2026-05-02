@@ -115,7 +115,7 @@ void GerberGenerator::setLayerPolarity(Polarity p) noexcept {
       break;
     default:
       qCritical()
-          << "Unhandled siwtch-case in GerberGenerator::setLayerPolarity():"
+          << "Unhandled switch-case in GerberGenerator::setLayerPolarity():"
           << static_cast<int>(p);
       break;
   }
@@ -541,7 +541,7 @@ void GerberGenerator::printHeader() noexcept {
   // coordinate format specification:
   //  - leading zeros omitted
   //  - absolute coordinates
-  //  - coordiante format "6.6" --> allows us to directly use nanometers (i64)!
+  //  - coordinate format "6.6" --> allows us to directly use nanometers (i64)!
   mOutput.append("%FSLAX66Y66*%\n");
 
   // set unit to millimeters

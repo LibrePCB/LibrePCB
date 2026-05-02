@@ -653,7 +653,7 @@ QAbstractScrollArea {
            <item row="16" column="1">
             <widget class="QCheckBox" name="cbxBlindViasAllowed">
              <property name="toolTip">
-              <string>Allow vias whith either start or end on an inner copper layer.</string>
+              <string>Allow vias which either start or end on an inner copper layer.</string>
              </property>
              <property name="text">
               <string>Blind Vias</string>

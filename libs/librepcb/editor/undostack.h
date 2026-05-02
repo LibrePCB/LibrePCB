@@ -276,7 +276,7 @@ public:
   void undo();
 
   /**
-   * @brief Redo the last undoed command
+   * @brief Redo the last undone command
    *
    * @throw Exception If an error occurs, this class tries to revert all changes
    *                  to restore the state of BEFORE calling this method. But

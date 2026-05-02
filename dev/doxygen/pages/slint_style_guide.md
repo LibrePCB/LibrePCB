@@ -47,7 +47,7 @@ be used for the given component types:
 | `item`  | Any kinds of list view or tree view item |
 | `l`     | `VerticalLayout`, `HorizontalLayout`, `GridLayout` etc. |
 | `r`     | `Rectangle` |
-| `sw`    | `Switch`, `CheckBox` and other checkable componens, except buttons |
+| `sw`    | `Switch`, `CheckBox` and other checkable components, except buttons |
 | `ta`    | `TouchArea` |
 | `tt`    | `ToolTip` |
 | `txt`   | `Text` |

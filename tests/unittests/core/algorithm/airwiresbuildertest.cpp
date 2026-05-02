@@ -121,7 +121,7 @@ TEST_F(AirWiresBuilderTest, testThreeUnconnectedPointsVshape) {
 }
 
 // Test added for bug https://github.com/LibrePCB/LibrePCB/issues/588
-TEST_F(AirWiresBuilderTest, testThreeUnconnectedColinearPoints) {
+TEST_F(AirWiresBuilderTest, testThreeUnconnectedCollinearPoints) {
   AirWiresBuilder builder;
   const int id0 = builder.addPoint(Point(0, 0));
   const int id1 = builder.addPoint(Point(100000, 0));
@@ -135,7 +135,7 @@ TEST_F(AirWiresBuilderTest, testThreeUnconnectedColinearPoints) {
 }
 
 // Test added for bug https://github.com/LibrePCB/LibrePCB/issues/588
-TEST_F(AirWiresBuilderTest, testThreeUnconnectedDiagonalColinearPoints) {
+TEST_F(AirWiresBuilderTest, testThreeUnconnectedDiagonalCollinearPoints) {
   AirWiresBuilder builder;
   const int id0 = builder.addPoint(Point(0, 0));
   const int id1 = builder.addPoint(Point(1000000, 1000000));
@@ -149,7 +149,7 @@ TEST_F(AirWiresBuilderTest, testThreeUnconnectedDiagonalColinearPoints) {
 }
 
 // Test added for bug https://github.com/LibrePCB/LibrePCB/issues/588
-TEST_F(AirWiresBuilderTest, testThreeUnconnectedDiagonalColinearPoints2) {
+TEST_F(AirWiresBuilderTest, testThreeUnconnectedDiagonalCollinearPoints2) {
   AirWiresBuilder builder;
   const int id0 = builder.addPoint(Point(71437500, 78898800));
   const int id1 = builder.addPoint(Point(70485000, 80010000));
@@ -163,7 +163,7 @@ TEST_F(AirWiresBuilderTest, testThreeUnconnectedDiagonalColinearPoints2) {
 }
 
 // Test added for bug https://github.com/LibrePCB/LibrePCB/issues/588
-TEST_F(AirWiresBuilderTest, testPartlyConnectedColinearPoints) {
+TEST_F(AirWiresBuilderTest, testPartlyConnectedCollinearPoints) {
   AirWiresBuilder builder;
   const int id0 = builder.addPoint(Point(0, 0));
   const int id1 = builder.addPoint(Point(100000, 100000));

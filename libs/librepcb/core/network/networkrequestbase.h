@@ -114,7 +114,7 @@ public:
    *
    * It turned out at least st.com blocks downloading files if the request
    * is not coming from a browser. For downloading datasheets we don't care
-   * about the user agent so let's just work arount this issue by using
+   * about the user agent so let's just work around this issue by using
    * a well-known user agent.
    */
   void useBrowserUserAgent() noexcept;

@@ -145,7 +145,7 @@ void FileSystemModel::set_row_data(std::size_t i,
 
 void FileSystemModel::expandDir(const FilePath& fp, std::size_t index,
                                 int level) noexcept {
-  QVector<std::size_t> childsToBeExpanded;
+  QVector<std::size_t> childrenToBeExpanded;
 
   QDir dir(fp.toStr());
   dir.setFilter(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot);
@@ -154,7 +154,7 @@ void FileSystemModel::expandDir(const FilePath& fp, std::size_t index,
     const FilePath itemFp(info.absoluteFilePath());
     const bool expand = info.isDir() && mExpandedDirs.contains(itemFp);
     if (expand) {
-      childsToBeExpanded.append(index);
+      childrenToBeExpanded.append(index);
     }
     const bool isProjectFile =
         (itemFp.getSuffix() == "lpp") || (itemFp.getSuffix() == "lppz");
@@ -202,8 +202,8 @@ void FileSystemModel::expandDir(const FilePath& fp, std::size_t index,
   }
 
   // Expand children from bottom to top to keep indices valid.
-  std::reverse(childsToBeExpanded.begin(), childsToBeExpanded.end());
-  for (std::size_t i : childsToBeExpanded) {
+  std::reverse(childrenToBeExpanded.begin(), childrenToBeExpanded.end());
+  for (std::size_t i : childrenToBeExpanded) {
     expandDir(FilePath(s2q(mItems.at(i).user_data)), i + 1,
               mItems.at(i).level + 1);
   }

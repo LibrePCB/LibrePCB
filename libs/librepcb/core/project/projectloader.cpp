@@ -239,7 +239,7 @@ std::unique_ptr<Project> ProjectLoader::open(
             .arg(fp.toNative()));
   }
 
-  // Upgrate file format, if needed.
+  // Upgrade file format, if needed.
   for (auto migration : FileFormatMigration::getMigrations(fileFormat)) {
     if (!mMigrationLog) {
       mMigrationLog = MigrationLog{filename,
@@ -782,7 +782,7 @@ void ProjectLoader::loadSchematicUserSettings(Schematic& s) {
         s.getDirectory().read(fp), s.getDirectory().getAbsPath(fp));
   } catch (const Exception&) {
     // Project user settings are normally not put under version control and
-    // thus the likelyhood of parse errors is higher (e.g. when switching to
+    // thus the likelihood of parse errors is higher (e.g. when switching to
     // an older, now incompatible revision). To avoid frustration, we just
     // ignore these errors and load the default settings instead...
     qCritical() << "Could not load schematic user settings, defaults will be "
@@ -896,7 +896,7 @@ void ProjectLoader::loadBoardDeviceInstance(Board& b, const SExpression& node) {
   if (!cmp) {
     throw RuntimeError(
         __FILE__, __LINE__,
-        QString("The component instace '%1' does not exist in the circuit.")
+        QString("The component instance '%1' does not exist in the circuit.")
             .arg(cmpUuid.toStr()));
   }
   BI_Device* device =
@@ -1094,7 +1094,7 @@ void ProjectLoader::loadBoardUserSettings(Board& b) {
     }
   } catch (const Exception&) {
     // Project user settings are normally not put under version control and
-    // thus the likelyhood of parse errors is higher (e.g. when switching to
+    // thus the likelihood of parse errors is higher (e.g. when switching to
     // an older, now incompatible revision). To avoid frustration, we just
     // ignore these errors and load the default settings instead...
     qCritical() << "Could not load board user settings, defaults will be "
@@ -1109,7 +1109,7 @@ void ProjectLoader::loadProjectUserSettings(Project& p) {
         p.getDirectory().read(fp), p.getDirectory().getAbsPath(fp));
   } catch (const Exception&) {
     // Project user settings are normally not put under version control and
-    // thus the likelyhood of parse errors is higher (e.g. when switching to
+    // thus the likelihood of parse errors is higher (e.g. when switching to
     // an older, now incompatible revision). To avoid frustration, we just
     // ignore these errors and load the default settings instead...
     qCritical() << "Could not load project user settings, defaults will be "

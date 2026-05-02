@@ -196,7 +196,7 @@ bool PackageEditorState_DrawZone::start() noexcept {
   if (!mContext.currentGraphicsItem) return false;
 
   try {
-    // Create inital path.
+    // Create initial path.
     mCurrentProperties.setOutline(Path({
         Vertex(mCursorPos, mLastAngle),
         Vertex(mCursorPos),

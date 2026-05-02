@@ -428,7 +428,7 @@ BoardPlaneFragmentsBuilder::LayerJobResult BoardPlaneFragmentsBuilder::runLayer(
       ClipperLib::Paths removedAreas;
       ClipperLib::Paths connectedNetSignalAreas;
 
-      // Start with board outline shrinked by the given clearance and clipped
+      // Start with board outline shrunk by the given clearance and clipped
       // to the plane outline.
       // Except if the board clearance is zero, in this case we don't clip the
       // plane to the board outlines.
@@ -579,7 +579,7 @@ BoardPlaneFragmentsBuilder::LayerJobResult BoardPlaneFragmentsBuilder::runLayer(
 
       // Collect pads.
       ClipperLib::Paths thermalPadAreas;
-      ClipperLib::Paths thermalPadAreasShrinked;
+      ClipperLib::Paths thermalPadAreasShrunk;
       ClipperLib::Paths thermalPadClearanceAreas;
       foreach (const PadData& pad, data->pads) {
         const bool sameNet = it->netSignal && (pad.netSignal == it->netSignal);
@@ -659,14 +659,14 @@ BoardPlaneFragmentsBuilder::LayerJobResult BoardPlaneFragmentsBuilder::runLayer(
               }
               thermalPadClearanceAreas.insert(thermalPadClearanceAreas.end(),
                                               tmp.begin(), tmp.end());
-              // Memorize slightly shrinked copper area for later removal of
+              // Memorize slightly shrunk copper area for later removal of
               // unconnected thermal spokes,
               offset = -maxArcTolerance() - 10;
               tmp = ClipperHelpers::convert(
                   pad.transform.map(geometry.withOffset(offset).toOutlines()),
                   maxArcTolerance());
-              thermalPadAreasShrinked.insert(thermalPadAreasShrinked.end(),
-                                             tmp.begin(), tmp.end());
+              thermalPadAreasShrunk.insert(thermalPadAreasShrunk.end(),
+                                           tmp.begin(), tmp.end());
             }
             removedAreas.insert(removedAreas.end(), clipperPaths.begin(),
                                 clipperPaths.end());
@@ -719,7 +719,7 @@ BoardPlaneFragmentsBuilder::LayerJobResult BoardPlaneFragmentsBuilder::runLayer(
       // Split thermal spokes and flatten result for detecting unconnected
       // thermal spokes.
       std::unique_ptr<ClipperLib::PolyTree> tree =
-          ClipperHelpers::subtractToTree(fragments, thermalPadAreasShrinked,
+          ClipperHelpers::subtractToTree(fragments, thermalPadAreasShrunk,
                                          ClipperLib::pftEvenOdd,
                                          ClipperLib::pftNonZero);  // can throw
       fragments = ClipperHelpers::flattenTree(*tree);  // can throw

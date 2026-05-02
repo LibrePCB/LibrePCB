@@ -13,7 +13,7 @@ fn main() {
       r.write_to_file("ffi.h");
     } else {
       // Do not fail the build on invalid source files as this is annoying
-      // during development beause it would suppress the compiler errors.
+      // during development because it would suppress the compiler errors.
       println!("cargo::warning=Failed to generate ffi.h with cbindgen.");
     }
   }

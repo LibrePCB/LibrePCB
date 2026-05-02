@@ -1494,8 +1494,7 @@ void Board2dTab::fsmToolEnter(BoardEditorState_AddPad& state) noexcept {
     if (s.getShape() == Pad::Shape::RoundedOctagon) {
       return ui::PadShape::Octagon;
     } else if (s.getShape() == Pad::Shape::Custom) {
-      return ui::PadShape::Octagon;  // Not currect but should never be the
-                                     // case.
+      return ui::PadShape::Octagon;  // Not correct but should never be the case
     } else if (*s.getRadius() == Ratio::fromPercent(0)) {
       return ui::PadShape::Rect;
     } else if (*s.getRadius() == Ratio::fromPercent(100)) {
@@ -2297,19 +2296,19 @@ std::pair<QList<Board2dTab::DeviceMetadata>, int>
   }
 
   // Prio 4: Use the most used device in the current board.
-  QHash<Uuid, int> devOccurences;
+  QHash<Uuid, int> devOccurrences;
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
     Q_ASSERT(device);
     if (device->getComponentInstance().getLibComponent().getUuid() ==
         cmp.getLibComponent().getUuid()) {
-      ++devOccurences[device->getLibDevice().getUuid()];
+      ++devOccurrences[device->getLibDevice().getUuid()];
     }
   }
   auto maxCountIt =
-      std::max_element(devOccurences.constBegin(), devOccurences.constEnd());
-  if (maxCountIt != devOccurences.constEnd()) {
+      std::max_element(devOccurrences.constBegin(), devOccurrences.constEnd());
+  if (maxCountIt != devOccurrences.constEnd()) {
     for (int i = 0; i < devices.count(); ++i) {
-      if (devOccurences.value(devices.at(i).deviceUuid) == (*maxCountIt)) {
+      if (devOccurrences.value(devices.at(i).deviceUuid) == (*maxCountIt)) {
         return std::make_pair(devices, i);
       }
     }
@@ -2335,16 +2334,16 @@ std::optional<Uuid> Board2dTab::getSuggestedFootprint(
   }
 
   // Prio 2: Use the most used footprint in the current board.
-  QHash<Uuid, int> fptOccurences;
+  QHash<Uuid, int> fptOccurrences;
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
     if (device->getLibPackage().getUuid() == libPkgUuid) {
-      ++fptOccurences[device->getLibFootprint().getUuid()];
+      ++fptOccurrences[device->getLibFootprint().getUuid()];
     }
   }
   auto maxCountIt =
-      std::max_element(fptOccurences.constBegin(), fptOccurences.constEnd());
-  if (maxCountIt != fptOccurences.constEnd()) {
-    QList<Uuid> uuids = fptOccurences.keys(*maxCountIt);
+      std::max_element(fptOccurrences.constBegin(), fptOccurrences.constEnd());
+  if (maxCountIt != fptOccurrences.constEnd()) {
+    QList<Uuid> uuids = fptOccurrences.keys(*maxCountIt);
     if (uuids.count() > 0) {
       return uuids.first();
     }

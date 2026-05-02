@@ -499,7 +499,7 @@ bool BoardEditorState_DrawTrace::startPositioning(
         throw Exception(__FILE__, __LINE__,
                         "Sorry, this operation is not implemented yet! "
                         ":-/\nPlease let us know if you need this feature so "
-                        "we can priorize it. As a workaround, you can assign "
+                        "we can prioritize it. As a workaround, you can assign "
                         "the pad to a net while adding it.");
       }
     };

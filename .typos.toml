@@ -1,0 +1,19 @@
+# Configuration file for the 'typos' spell checker tool, to be run with
+# the wrapper script dev/spellcheck.sh.
+
+[default]
+extend-ignore-re = [
+    # Ignore lines that end with '# notypo' or '// notypo'
+    "(?Rm)^.*(#|//) notypo$",
+]
+extend-ignore-identifiers-re = [
+    "[pP][nN][pP]",  # PnP
+]
+
+[default.extend-words]
+fpt = "fpt"  # Footprint
+lod = "lod"  # Level of detail
+ND = "ND"  # For CC-BY-ND-4.0
+OCCT = "OCCT"
+OCE = "OCE"
+THT = "THT"

@@ -118,11 +118,9 @@ void NetworkRequestBase::useBrowserUserAgent() noexcept {
 void NetworkRequestBase::start() noexcept {
   Q_ASSERT(QThread::currentThread() != NetworkAccessManager::instance());
 
-  NetworkAccessManager* nam = NetworkAccessManager::instance();
-  if (nam) {
+  if (NetworkAccessManager* manager = NetworkAccessManager::instance()) {
     mStarted = true;
-    moveToThread(
-        nam);  // move event processing of this object to the download thread
+    moveToThread(manager);  // process events of this object in download thread
     emit progressState(tr("Start request..."));
     emit startRequested();  // execute executeRequest() in download thread
   } else {
@@ -149,8 +147,8 @@ void NetworkRequestBase::executeRequest() noexcept {
   emit progressState(tr("Request started..."));
 
   // get network access manager object
-  NetworkAccessManager* nam = NetworkAccessManager::instance();
-  if (!nam) {
+  NetworkAccessManager* manager = NetworkAccessManager::instance();
+  if (!manager) {
     finalize(tr("Network access manager is not running."));
     return;
   }
@@ -171,7 +169,7 @@ void NetworkRequestBase::executeRequest() noexcept {
       QNetworkRequest::AlwaysCache) {
     QString contentType;
     if (std::unique_ptr<QIODevice> dev =
-            nam->readFromCache(mUrl, contentType)) {
+            manager->readFromCache(mUrl, contentType)) {
       try {
         fetchNewData(*dev);
         finalizeRequest();  // can throw
@@ -187,9 +185,9 @@ void NetworkRequestBase::executeRequest() noexcept {
 
   // start request
   if (!mPostData.isNull()) {
-    mReply.reset(nam->post(mRequest, mPostData));
+    mReply.reset(manager->post(mRequest, mPostData));
   } else {
-    mReply.reset(nam->get(mRequest));
+    mReply.reset(manager->get(mRequest));
   }
   if (!mReply) {
     finalize("Network request failed with unknown error!");  // No tr() needed.
@@ -343,13 +341,14 @@ void NetworkRequestBase::finalize(const QString& errorMsg,
 
   if (errorMsg.isNull()) {
     // If a minimum cache time was specified, apply it to the cache now.
-    NetworkAccessManager* nam = NetworkAccessManager::instance();
+    NetworkAccessManager* manager = NetworkAccessManager::instance();
     const bool fromCache = onlyFromCache ||
         (mReply &&
          mReply->attribute(QNetworkRequest::SourceIsFromCacheAttribute)
              .toBool());
-    const bool cacheExtended = (!fromCache) && (mMinimumCacheTime > 0) && nam &&
-        nam->setMinimumCacheExpirationDate(
+    const bool cacheExtended = (!fromCache) && (mMinimumCacheTime > 0) &&
+        manager &&
+        manager->setMinimumCacheExpirationDate(
             mUrl, QDateTime::currentDateTimeUtc().addSecs(mMinimumCacheTime));
     qDebug().nospace().noquote()
         << "Request succeeded: " << mUrl.toString()

@@ -54,7 +54,7 @@ PartInformationToolTip::PartInformationToolTip(
     mArrowPositionY(0),
     mPictureDelayTimer(new QTimer(this)) {
   mUi->setupUi(this);
-  mUi->lblSourceDetails->setMinimumWidth(minimumWidth() - 20);  // Fix sizHint()
+  mUi->lblSourceDetails->setMinimumWidth(minimumWidth() - 20);  // Fix sizeHint
   setWindowFlags(Qt::ToolTip | Qt::FramelessWindowHint |
                  Qt::NoDropShadowWindowHint);
   mWaitingSpinner->hide();

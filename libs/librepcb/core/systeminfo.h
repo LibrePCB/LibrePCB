@@ -86,7 +86,7 @@ public:
    *
    * @param pid   The process ID to query
    *
-   * @return  True if the process is running, fals if not
+   * @return  True if the process is running, false if not
    *
    * @throw  Exception    In case of an error.
    */

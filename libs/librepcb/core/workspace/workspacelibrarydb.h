@@ -378,11 +378,11 @@ public:
    *          doesn't exist.
    */
   template <typename ElementType>
-  QSet<Uuid> getChilds(const std::optional<Uuid>& parent) const {
+  QSet<Uuid> getChildren(const std::optional<Uuid>& parent) const {
     static_assert(std::is_same<ElementType, ComponentCategory>::value ||
                       std::is_same<ElementType, PackageCategory>::value,
                   "Unsupported ElementType");
-    return getChilds(getTable<ElementType>(), parent);
+    return getChildren(getTable<ElementType>(), parent);
   }
 
   /**
@@ -555,8 +555,8 @@ private:
                            const FilePath catDir,
                            std::optional<Uuid>* parent) const;
   AttributeList getPartAttributes(int partId) const;
-  QSet<Uuid> getChilds(const QString& categoriesTable,
-                       const std::optional<Uuid>& categoryUuid) const;
+  QSet<Uuid> getChildren(const QString& categoriesTable,
+                         const std::optional<Uuid>& categoryUuid) const;
   QSet<Uuid> getByCategory(const QString& elementsTable,
                            const QString& categoryTable,
                            const std::optional<Uuid>& category,

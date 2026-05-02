@@ -190,7 +190,7 @@ private:
    * to the set parameters.
    *
    * Uses the current mCursorPos to where the currently active trace is snapped
-   * to and how its BI_NetLine are palced. Also determines whether a BI_Via
+   * to and how its BI_NetLine are placed. Also determines whether a BI_Via
    * should be added or if the target anchor can provide the desired layer
    * change.
    */

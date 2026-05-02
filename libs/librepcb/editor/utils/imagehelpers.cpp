@@ -252,7 +252,7 @@ bool ImageHelpers::getImageFromClipboard(QByteArray& data, QString& format,
     }
   }
 
-  // If there is an SVG, we should priorize it over the pixmap formats.
+  // If there is an SVG, we should prioritize it over the pixmap formats.
   data = d->data("image/svg+xml");
   if (!data.isEmpty()) {
     format = "svg";

@@ -588,7 +588,7 @@ public:
   /**
    * @brief Convert the outline of a board zone
    *
-   * Our zones do not support setting aline width, so we have to offet the
+   * Our zones do not support setting aline width, so we have to offset the
    * outline to get the same keepout area.
    *
    * @param outline   EAGLE keepout zone outline

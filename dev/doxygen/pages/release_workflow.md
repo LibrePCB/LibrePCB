@@ -137,7 +137,7 @@ downloading translations from [Transifex].
 
 1. Only proceed if the file format is freezed and `FILE_FORMAT_STABLE`
    is set to `1`! If this is the first release of a new file format, also
-   make sure to migrate the exmaple projects to the new file format.
+   make sure to migrate the example projects to the new file format.
 2. Make sure CI uses the latest Qt version. If necessary, update CI first and
    test the artifacts before proceeding with the release procedure.
 3. Make sure all submodules point to persistent commits (commits could be

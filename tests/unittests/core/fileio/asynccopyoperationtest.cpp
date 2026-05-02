@@ -135,7 +135,7 @@ TEST_F(AsyncCopyOperationTest, testEmptySourceDir) {
   EXPECT_EQ(mSignalFailed.count(), 0);
   EXPECT_EQ(mSignalFinished, 1);
 
-  // Verify copied directoy.
+  // Verify copied directory.
   EXPECT_TRUE(mDestinationDir.isEmptyDir());
 }
 
@@ -152,7 +152,7 @@ TEST_F(AsyncCopyOperationTest, testPopulatedSourceDir) {
   EXPECT_EQ(mSignalFailed.count(), 0);
   EXPECT_EQ(mSignalFinished, 1);
 
-  // Verify copied directoy.
+  // Verify copied directory.
   EXPECT_EQ(FileUtils::readFile(mDestinationDir.getPathTo("foo/a dir/f")), "A");
   EXPECT_EQ(FileUtils::readFile(mDestinationDir.getPathTo(".dotfile")), "B");
 }
@@ -170,7 +170,7 @@ TEST_F(AsyncCopyOperationTest, testNonExistentSourceDir) {
   EXPECT_EQ(mSignalFailed.count(), 1);
   EXPECT_EQ(mSignalFinished, 1);
 
-  // Verify copied directoy.
+  // Verify copied directory.
   EXPECT_FALSE(mDestinationDir.isExistingDir());
 }
 

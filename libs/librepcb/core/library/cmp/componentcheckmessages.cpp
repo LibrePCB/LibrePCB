@@ -166,7 +166,7 @@ MsgSuspiciousForcedNets::MsgSuspiciousForcedNets() noexcept
   : RuleCheckMessage(
         Severity::Warning, tr("Suspicious use of forced nets"),
         tr("At least one signal of this component has a forced net set, which "
-           "is very unusal and can cause serious troubles if not used "
+           "is very unusual and can cause serious troubles if not used "
            "intentionally.\n\nPlease consult the user manual to ensure this is "
            "what you want. If you're unsure, clear the forced net on all "
            "component signals."),

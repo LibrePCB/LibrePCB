@@ -53,7 +53,7 @@ class SceneData3D;
  * white silkscreen instead of just rendering all objects the same way as
  * on screen.
  *
- * Used in conjuction with ::librepcb::GraphicsExport. Colors are obtained from
+ * Used in conjunction with ::librepcb::GraphicsExport. Colors are obtained from
  * ::librepcb::SceneData3D and whether the top or the bottom side is rendered
  * is controlled by ::librepcb::GraphicsExportSettings::getMirror().
  *

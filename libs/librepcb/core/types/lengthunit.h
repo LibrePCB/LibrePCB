@@ -171,7 +171,7 @@ public:
    * the unit, this helper method is provided.
    *
    * @note  The returned number of decimals will *NOT* be enough to represent
-   *        all possiblle ::librepcb::Length values without losing precision!
+   *        all possible ::librepcb::Length values without losing precision!
    *        So a value with truncated number of decimal places may not be
    *        converted back to a ::librepcb::Length object since this might lead
    *        to a different value!

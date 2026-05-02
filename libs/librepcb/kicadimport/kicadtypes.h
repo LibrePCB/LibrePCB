@@ -57,7 +57,7 @@ enum class KiCadStrokeType {
   Unknown,  // Parse error
   Dash,
   DashDot,
-  DashDotDOt,
+  DashDotDot,
   Dot,
   Default,
   Solid,

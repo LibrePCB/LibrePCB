@@ -35,6 +35,7 @@ Files:
  .gitmodules
  .rustfmt.toml
  .tx/*
+ .typos.toml
  AUTHORS.md
  ci/*
  CONTRIBUTING.md
