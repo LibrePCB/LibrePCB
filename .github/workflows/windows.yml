@@ -1,0 +1,119 @@
+on:
+  workflow_call:
+
+jobs:
+  windows-x64:
+    name: Windows x86_64
+    runs-on: windows-2025
+    env:
+      # Docker image tag: windowsservercore-ltsc2025-qt6.10-64bit-1
+      # Using digest for easier verification of the transparent build chain.
+      # https://github.com/LibrePCB/docker-librepcb-dev/actions/runs/20745227440/job/59560845499
+      IMAGE_DIGEST: f78cc56d8c863317e44d20ab5a14080e20c0f13af8cab20533d2a6437a2437c9
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      # Workaround for spurious job failures due to Docker error.
+      # https://github.com/actions/runner-images/issues/13729
+      - name: Start Docker Service
+        run: |
+          $dockerState = Get-Service -Name "docker"
+          if ($dockerState.Status -ne "Running") {
+            Start-Service -Name "docker"
+          }
+      - name: Start Docker Container
+        run: >
+          docker run -d -t --name ci -w C:/work
+          -v ${{ github.workspace }}:C:/work
+          -e OS="windows"
+          -e ARCH="x86_64"
+          -e CI_BRANCH_NAME="${{ env.CI_BRANCH_NAME }}"
+          -e CCACHE_DIR="C:/work/build/.ccache-dir"
+          -e CCACHE_MAXSIZE="${{ env.CCACHE_MAXSIZE }}"
+          -e CARGO_HOME="C:/work/build/.cargo-home"
+          -e CARGO_INCREMENTAL="${{ env.CARGO_INCREMENTAL }}"
+          -e LIBREPCB_BUILD_AUTHOR="${{ env.LIBREPCB_BUILD_AUTHOR }}"
+          "ghcr.io/librepcb/docker-librepcb-dev@sha256:${{ env.IMAGE_DIGEST }}"
+      - name: Print Environment
+        run: docker exec ci bash ./ci/print_environment.sh
+      - name: Install Dependencies
+        run: >
+          docker exec
+          -e SLINT_UI_TESTING_AUTH="${{ secrets.SLINT_UI_TESTING_AUTH }}"
+          ci bash ./ci/install_dependencies.sh
+      # caching --->
+      - name: Cache .ccache
+        uses: actions/cache@v4
+        with:
+          key: ${{ github.job }}-${{ github.ref }}
+          restore-keys: ${{ github.job }}-refs/heads/master
+          path: build/.ccache-dir
+      - name: Cache .cargo
+        uses: actions/cache@v4
+        with:
+          key: ${{ github.job }}-${{ hashFiles('libs/librepcb/**/Cargo.lock') }}-${{ github.ref }}
+          restore-keys: ${{ github.job }}-${{ hashFiles('libs/librepcb/**/Cargo.lock') }}-refs/heads/master
+          path: |
+            ./build/.cargo-home/bin/
+            ./build/.cargo-home/registry/index/
+            ./build/.cargo-home/registry/cache/
+            ./build/.cargo-home/git/db/
+            ./build/cargo/
+            ./libs/librepcb/rust-core/target/
+      # <--- caching
+      - name: Print New Environment  # Print again since it has been modified
+        run: docker exec ci bash ./ci/print_environment.sh
+      - id: build
+        name: Build LibrePCB
+        run: >
+          docker exec
+          -e CARGO_INCREMENTAL="0"
+          -e CCACHE_MAXSIZE="1G"
+          -e LIBREPCB_BUILD_AUTHOR="LibrePCB CI"
+          ci bash ./ci/build_librepcb.sh
+      - name: Build Archive
+        run: docker exec ci bash ./ci/build_windows_archive.sh
+      - name: Build Installer
+        run: docker exec ci bash ./ci/build_windows_installer.sh
+      - name: Run rust-core tests
+        run: docker exec -w C:/work/libs/librepcb/rust-core ci cargo test --features=fail-on-warnings
+        if: ${{ (steps.build.outcome == 'success') && (!cancelled()) }}
+      - name: Run LibrePCB Unittests
+        run: docker exec ci build\\tests\\unittests\\librepcb-unittests.exe
+        if: ${{ (steps.build.outcome == 'success') && (!cancelled()) }}
+      - name: Run LibrePCB-CLI Functional Tests
+        run: docker exec ci uv --directory ./tests/cli run --no-dev pytest -vvv --librepcb-executable="../../build/install/bin/librepcb-cli.exe"
+        if: ${{ (steps.build.outcome == 'success') && (!cancelled()) }}
+      - name: Run LibrePCB Functional Tests
+        run: docker exec ci uv --directory ./tests/funq run --no-dev pytest -vvv --librepcb-executable="../../build/install/bin/librepcb.exe" --reruns 5 --reruns-delay 10
+        if: ${{ (steps.build.outcome == 'success') && (!cancelled()) }}
+      - name: Run LibrePCB UI Tests
+        run: docker exec ci uv --directory ./tests/ui run --no-dev pytest -vvv --librepcb-executable="../../build/install/bin/librepcb.exe"
+        if: ${{ (steps.build.outcome == 'success') && (!cancelled()) && env.SLINT_UI_TESTING_AUTH }}
+        env:
+          SLINT_UI_TESTING_AUTH: ${{ secrets.SLINT_UI_TESTING_AUTH }}
+      - name: Tar Artifacts
+        run: docker exec ci bash ./ci/tar_artifacts.sh
+        if: ${{ (steps.build.outcome == 'success') && (!cancelled()) }}
+      - name: Upload Artifacts
+        run: >
+          docker exec
+          -e UPLOAD_URL="${{ secrets.UPLOAD_URL }}"
+          -e UPLOAD_USER="${{ secrets.UPLOAD_USER }}"
+          -e UPLOAD_PASS="${{ secrets.UPLOAD_PASS }}"
+          -e UPLOAD_SIGN_KEY="${{ secrets.UPLOAD_SIGN_KEY }}"
+          ci bash ./ci/upload_artifacts.sh
+        if: ${{ (steps.build.outcome == 'success') && (!cancelled()) && (github.event_name == 'push') && env.UPLOAD_URL }}
+        env:
+          CI_BRANCH_NAME: ${{ github.ref }}
+          UPLOAD_URL: ${{ secrets.UPLOAD_URL }}  # Required to use it in 'if' condition
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v7
+        if: ${{ (steps.build.outcome == 'success') && (!cancelled()) }}
+        with:
+          name: ${{ github.job }}
+          if-no-files-found: ignore
+          path: |
+            libs/librepcb/rust-core/target/llvm-cov/html/
+            tests/ui/screenshot.png
