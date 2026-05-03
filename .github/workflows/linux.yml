@@ -16,20 +16,19 @@ jobs:
       CC: ${{ matrix.cc }}
       CXX: ${{ matrix.cxx }}
       CMAKE_OPTIONS: ${{ matrix.cmake_options }}
-      LD_LIBRARY_PATH: ${{ matrix.ld_library_path }}
     strategy:
       matrix:
         include:
           - name: Ubuntu 22.04 Qt6.10 GCC
             image: librepcb/librepcb-dev:ubuntu-22.04-qt6.10-1
-          - name: Ubuntu 22.04 Clang
-            image: librepcb/librepcb-dev:ubuntu-22.04-6
+          - name: Ubuntu 24.04 Clang
+            image: librepcb/librepcb-dev:ubuntu-24.04-4
             cc: clang
             cxx: clang++
             cmake_options: '-DCMAKE_CXX_FLAGS="-DQT_FORCE_ASSERTS=1"'
             ld_library_path: ${{ github.workspace }}/build/install/lib
-          - name: Ubuntu 24.04 Unbundled
-            image: librepcb/librepcb-dev:ubuntu-24.04-4
+          - name: Ubuntu 26.04 Unbundled
+            image: librepcb/librepcb-dev:ubuntu-26.04-1
             cmake_options: '-DCMAKE_CXX_FLAGS="-DQT_FORCE_ASSERTS=1"'
             ld_library_path: ${{ github.workspace }}/build/install/lib
             unbundle: true
@@ -37,6 +36,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
+      # https://github.com/actions/checkout/issues/1048
+      - name: Fix Git Permissions
+        run: git config --global --add safe.directory $GITHUB_WORKSPACE
       - name: Print Environment
         run: ./ci/print_environment.sh
       # caching --->
@@ -65,7 +67,7 @@ jobs:
           SLINT_UI_TESTING_AUTH: ${{ secrets.SLINT_UI_TESTING_AUTH }}
       - name: Print New Environment
         run: ./ci/print_environment.sh
-      - name: Remove Unbundled Libraries
+      - name: Unbundle Libraries
         run: |
           rm -r libs/dxflib
           rm -r libs/googletest

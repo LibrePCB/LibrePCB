@@ -11,11 +11,11 @@ jobs:
         with:
           clean: true
           submodules: recursive
-      - name: Print Environment
-        run: ./ci/print_environment.sh
       # https://github.com/actions/checkout/issues/1048
       - name: Fix Git Permissions
         run: git config --global --add safe.directory $GITHUB_WORKSPACE
+      - name: Print Environment
+        run: ./ci/print_environment.sh
       - name: Run Stylecheck
         run: ./ci/stylecheck.sh
         if: ${{ !cancelled() }}
