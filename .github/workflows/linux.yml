@@ -60,10 +60,7 @@ jobs:
             ./libs/librepcb/rust-core/target/
       # <--- caching
       - name: Install Dependencies
-        run: |
-          source ./ci/install_dependencies.sh
-          # Pass modified PATH to following steps:
-          echo "$PATH" > "$GITHUB_PATH"
+        run: ./ci/install_dependencies.sh
         env:
           SLINT_UI_TESTING_AUTH: ${{ secrets.SLINT_UI_TESTING_AUTH }}
       - name: Print New Environment
