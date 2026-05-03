@@ -1,0 +1,30 @@
+on:
+  workflow_call:
+
+jobs:
+  linux:
+    name: ${{ matrix.name }}
+    runs-on: ubuntu-24.04
+    container: ${{ matrix.image }}
+    env:
+      OS: 'linux'
+      ARCH: 'x86_64'
+      CARGO_INCREMENTAL: 0 # Avoid creating additional build artifacts
+      CCACHE_MAXSIZE: '1G'
+      CCACHE_DIR: '/Users/runner/ccache-dir'
+      CARGO_HOME: '/Users/runner/cargo-home'
+    strategy:
+      matrix:
+        include:
+          - name: Ubuntu 22.04 Qt6.10 GCC
+            image: librepcb/librepcb-dev:ubuntu-22.04-qt6.10-1
+          - name: Ubuntu 22.04 Clang
+            image: librepcb/librepcb-dev:ubuntu-22.04-6
+          - name: Ubuntu 24.04 Unbundled
+            image: librepcb/librepcb-dev:ubuntu-24.04-4
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Print Environment
+        run: ./ci/print_environment.sh

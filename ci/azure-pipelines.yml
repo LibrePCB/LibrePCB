@@ -14,5 +14,4 @@ variables:
   CARGO_INCREMENTAL: 0
 
 jobs:
-- template: azure-jobs-linux.yml
 - template: azure-jobs-macos.yml

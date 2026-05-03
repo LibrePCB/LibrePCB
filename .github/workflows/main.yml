@@ -8,6 +8,11 @@ jobs:
     uses: ./.github/workflows/check.yml
     secrets: inherit
 
+  linux:
+    name: Linux
+    uses: ./.github/workflows/linux.yml
+    secrets: inherit
+
   windows:
     name: Windows
     uses: ./.github/workflows/windows.yml
