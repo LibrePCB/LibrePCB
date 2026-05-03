@@ -11,8 +11,8 @@ jobs:
       ARCH: 'x86_64'
       CARGO_INCREMENTAL: 0 # Avoid creating additional build artifacts
       CCACHE_MAXSIZE: '1G'
-      CCACHE_DIR: ${{ runner.temp }}/ccache-dir
-      CARGO_HOME: ${{ runner.temp }}/cargo-home
+      CCACHE_DIR: ${{ github.workspace }}/.ccache
+      CARGO_HOME: ${{ github.workspace }}/.cargo
       CC: ${{ matrix.cc }}
       CXX: ${{ matrix.cxx }}
       CMAKE_OPTIONS: ${{ matrix.cmake_options }}
