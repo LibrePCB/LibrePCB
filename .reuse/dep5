@@ -25,6 +25,7 @@ License: GPL-3.0-or-later
 
 Files:
  .clang-format
+ .clang-tidy
  .cmake-format.py
  .editorconfig
  .git-blame-ignore-revs

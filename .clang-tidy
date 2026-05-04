@@ -1,0 +1,110 @@
+---
+# Tidy Checks:  https://clang.llvm.org/extra/clang-tidy/checks/list.html
+# Clazy Checks: https://github.com/KDE/clazy
+Checks: >
+  -*,
+  clang-analyzer-*,
+  clang-diagnostic-*,
+  bugprone-argument-comment,
+  bugprone-assert-side-effect,
+  bugprone-chained-comparison,
+  bugprone-compare-pointer-to-member-virtual-function,
+  bugprone-copy-constructor-init,
+  bugprone-copy-constructor-mutates-argument,
+  bugprone-derived-method-shadowing-base-method,
+  bugprone-exception-copy-constructor-throws,
+  bugprone-forward-declaration-namespace,
+  bugprone-incorrect-enable-if,
+  bugprone-incorrect-roundings,
+  bugprone-integer-division,
+  bugprone-redundant-branch-condition,
+  bugprone-suspicious-missing-comma,
+  bugprone-suspicious-semicolon,
+  bugprone-suspicious-string-compare,
+  bugprone-switch-missing-default-case,
+  bugprone-throw-keyword-missing,
+  bugprone-unused-return-value,
+  bugprone-use-after-move,
+  clazy-auto-unexpected-qstringbuilder,
+  clazy-base-class-event,
+  clazy-child-event-qobject-cast,
+  clazy-connect-3arg-lambda,
+  clazy-connect-by-name,
+  clazy-connect-non-signal,
+  clazy-connect-not-normalized,
+  clazy-const-signal-or-slot,
+  clazy-container-anti-pattern,
+  clazy-detaching-temporary,
+  clazy-empty-qstringliteral,
+  clazy-foreach,
+  clazy-global-const-char-pointer,
+  clazy-implicit-casts,
+  clazy-incorrect-emit,
+  clazy-install-event-filter,
+  clazy-lambda-in-connect,
+  clazy-lambda-unique-connection,
+  clazy-lowercase-qml-type-name,
+  clazy-mutable-container-key,
+  clazy-old-style-connect,
+  clazy-overloaded-signal,
+  clazy-overridden-signal,
+  clazy-post-event,
+  clazy-qdatetime-utc,
+  clazy-qdeleteall,
+  clazy-qenums,
+  clazy-qfileinfo-exists,
+  clazy-qgetenv,
+  clazy-qlatin1string-non-ascii,
+  clazy-qmap-with-pointer-key,
+  clazy-qproperty-without-notify,
+  clazy-qstring-arg,
+  clazy-qstring-comparison-to-implicit-char,
+  clazy-qstring-insensitive-allocation,
+  clazy-qstring-left,
+  clazy-qstring-ref,
+  clazy-qt-macros,
+  clazy-range-loop-detach,
+  clazy-range-loop-reference,
+  clazy-readlock-detaching,
+  clazy-returning-data-from-temporary,
+  clazy-returning-void-expression,
+  clazy-rule-of-two-soft,
+  clazy-skipped-base-method,
+  clazy-static-pmf,
+  clazy-strict-iterators,
+  clazy-temporary-iterator,
+  clazy-unused-non-trivial-variable,
+  clazy-virtual-call-ctor,
+  clazy-virtual-signal,
+  clazy-writing-to-temporary,
+  clazy-wrong-qevent-cast,
+  clazy-wrong-qglobalstatic,
+  cppcoreguidelines-misleading-capture-default-by-value,
+  cppcoreguidelines-no-malloc,
+  cppcoreguidelines-prefer-member-initializer,
+  cppcoreguidelines-virtual-class-destructor,
+  modernize-deprecated-headers,
+  modernize-make-shared,
+  modernize-make-unique,
+  modernize-use-nullptr,
+  modernize-use-override,
+  readability-trailing-comma,
+WarningsAsErrors: '*'
+HeaderFileExtensions:
+  - ''
+  - h
+  - hh
+  - hpp
+  - hxx
+ImplementationFileExtensions:
+  - c
+  - cc
+  - cpp
+  - cxx
+HeaderFilterRegex: '.*'
+ExcludeHeaderFilterRegex: 'ui\.h|/dxflib/|/type_safe/|/slint/|/fontobene-qt/|/muparser/|/polyclipping/|/delaunay-triangulation/'
+FormatStyle:     none
+User:            root
+CheckOptions:    {}
+SystemHeaders:   false
+...

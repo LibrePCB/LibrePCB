@@ -28,6 +28,18 @@ This page describes the code style guide for LibrePCB developers.
   please try to follow our coding style manually as good as possible.
 
 
+# Static Code Analysis {#doc_code_style_guide_analysis}
+
+- On C++ code we also enforce some guidelines and perform static code analysis
+  with [`clang-tidy`](https://clang.llvm.org/extra/clang-tidy/) and the
+  [Clazy](https://github.com/KDE/clazy) plugin. This is run on CI and only
+  changes that do not introduce any warnings will be merged.
+- In the repository root there is a `.clang-tidy` file with the exact rules.
+  Some IDEs may allow to run `clang-tidy` with those rules.
+- To manually check all files, run the script `./dev/clang_tidy.sh`
+  (currently only for Linux, and works best with Docker installed).
+
+
 # General {#doc_code_style_guide_general}
 
 - Use strongly typed enums (`enum class`, since C++11) whenever reasonable
