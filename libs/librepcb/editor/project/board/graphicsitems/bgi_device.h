@@ -72,7 +72,7 @@ public:
   BGI_Device(
       BI_Device& device, const GraphicsLayerList& layers,
       std::shared_ptr<const BoardGraphicsScene::Context> context) noexcept;
-  virtual ~BGI_Device() noexcept;
+  ~BGI_Device() noexcept override;
 
   // General Methods
   BI_Device& getDevice() noexcept { return mDevice; }
@@ -88,8 +88,8 @@ private:  // Methods
   void deviceEdited(const BI_Device& obj, BI_Device::Event event) noexcept;
   void layerEdited(const GraphicsLayer& layer,
                    GraphicsLayer::Event event) noexcept;
-  virtual QVariant itemChange(GraphicsItemChange change,
-                              const QVariant& value) noexcept override;
+  QVariant itemChange(GraphicsItemChange change,
+                      const QVariant& value) noexcept override;
   void updatePosition() noexcept;
   void updateRotationAndMirrored() noexcept;
   void updateBoardSide() noexcept;

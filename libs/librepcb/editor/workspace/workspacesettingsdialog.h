@@ -80,7 +80,7 @@ public:
   WorkspaceSettingsDialog(const WorkspaceSettingsDialog& other) = delete;
   explicit WorkspaceSettingsDialog(Workspace& workspace, const UiTheme& theme,
                                    QWidget* parent = nullptr);
-  ~WorkspaceSettingsDialog();
+  ~WorkspaceSettingsDialog() override;
 
   // Operator Overloadings
   WorkspaceSettingsDialog& operator=(const WorkspaceSettingsDialog& rhs) =

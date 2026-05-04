@@ -52,7 +52,7 @@ public:
   PolygonGraphicsItem(const PolygonGraphicsItem& other) = delete;
   PolygonGraphicsItem(Polygon& polygon, const GraphicsLayerList& layers,
                       QGraphicsItem* parent = nullptr) noexcept;
-  virtual ~PolygonGraphicsItem() noexcept;
+  ~PolygonGraphicsItem() noexcept override;
 
   // Getters
   Polygon& getObj() noexcept { return mPolygon; }
@@ -89,7 +89,7 @@ public:
   QVariant itemChange(GraphicsItemChange change,
                       const QVariant& value) noexcept override;
   void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
-             QWidget* widget = 0) noexcept override;
+             QWidget* widget = nullptr) noexcept override;
 
   // Operator Overloadings
   PolygonGraphicsItem& operator=(const PolygonGraphicsItem& rhs) = delete;

@@ -48,7 +48,7 @@ class CmdRemoveUnusedNetSignalsAndBuses final : public UndoCommandGroup {
 public:
   // Constructors / Destructor
   CmdRemoveUnusedNetSignalsAndBuses(Circuit& circuit) noexcept;
-  ~CmdRemoveUnusedNetSignalsAndBuses() noexcept;
+  ~CmdRemoveUnusedNetSignalsAndBuses() noexcept override;
 
 private:
   // Private Methods

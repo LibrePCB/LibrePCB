@@ -77,7 +77,7 @@ public:
       GuiApplication& app, std::unique_ptr<Project> project, int uiIndex,
       const std::optional<ProjectLoader::MigrationLog>& migrationLog,
       QObject* parent = nullptr) noexcept;
-  ~ProjectEditor() noexcept;
+  ~ProjectEditor() noexcept override;
 
   // General Methods
   GuiApplication& getApp() noexcept { return mApp; }

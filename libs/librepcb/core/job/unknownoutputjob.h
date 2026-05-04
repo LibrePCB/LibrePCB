@@ -51,22 +51,22 @@ public:
   UnknownOutputJob() = delete;
   UnknownOutputJob(const UnknownOutputJob& other) noexcept;
   explicit UnknownOutputJob(const SExpression& node);
-  virtual ~UnknownOutputJob() noexcept;
+  ~UnknownOutputJob() noexcept override;
 
   // Getters
-  virtual QString getTypeTr() const noexcept override;
-  virtual QIcon getTypeIcon() const noexcept override;
+  QString getTypeTr() const noexcept override;
+  QIcon getTypeIcon() const noexcept override;
 
   // General Methods
-  virtual std::shared_ptr<OutputJob> cloneShared() const noexcept override;
-  virtual void serialize(SExpression& root) const override;
+  std::shared_ptr<OutputJob> cloneShared() const noexcept override;
+  void serialize(SExpression& root) const override;
 
   // Operator Overloadings
   UnknownOutputJob& operator=(const UnknownOutputJob& rhs) = delete;
 
 private:  // Methods
-  virtual void serializeDerived(SExpression& root) const override;
-  virtual bool equals(const OutputJob& rhs) const noexcept override;
+  void serializeDerived(SExpression& root) const override;
+  bool equals(const OutputJob& rhs) const noexcept override;
 
 private:  // Data
   SExpression mNode;

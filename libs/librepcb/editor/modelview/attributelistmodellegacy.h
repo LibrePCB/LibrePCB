@@ -62,7 +62,7 @@ public:
   AttributeListModelLegacy() = delete;
   AttributeListModelLegacy(const AttributeListModelLegacy& other) = delete;
   explicit AttributeListModelLegacy(QObject* parent = nullptr) noexcept;
-  ~AttributeListModelLegacy() noexcept;
+  ~AttributeListModelLegacy() noexcept override;
 
   // Setters
   void setAttributeList(AttributeList* list) noexcept;

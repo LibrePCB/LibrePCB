@@ -71,7 +71,7 @@ public:
             ComponentInstance& cmpInstance, const Uuid& symbolItem,
             const Point& position, const Angle& rotation, bool mirrored,
             bool loadInitialTexts);
-  ~SI_Symbol() noexcept;
+  ~SI_Symbol() noexcept override;
 
   // Getters
   const Uuid& getUuid() const noexcept { return mUuid; }

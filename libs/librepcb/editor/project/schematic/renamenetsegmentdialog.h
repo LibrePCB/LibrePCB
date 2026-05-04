@@ -67,10 +67,10 @@ public:
   RenameNetSegmentDialog(const RenameNetSegmentDialog& other) = delete;
   RenameNetSegmentDialog(UndoStack& undoStack, SI_NetSegment& segment,
                          QWidget* parent = nullptr) noexcept;
-  ~RenameNetSegmentDialog() noexcept;
+  ~RenameNetSegmentDialog() noexcept override;
 
   // General Methods
-  virtual void accept() noexcept override;
+  void accept() noexcept override;
 
   // Operator Overloads
   RenameNetSegmentDialog& operator=(const RenameNetSegmentDialog& rhs) = delete;

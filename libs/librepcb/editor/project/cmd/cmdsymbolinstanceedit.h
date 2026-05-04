@@ -50,7 +50,7 @@ class CmdSymbolInstanceEdit final : public UndoCommand {
 public:
   // Constructors / Destructor
   explicit CmdSymbolInstanceEdit(SI_Symbol& symbol) noexcept;
-  ~CmdSymbolInstanceEdit() noexcept;
+  ~CmdSymbolInstanceEdit() noexcept override;
 
   // General Methods
   void setPosition(const Point& pos, bool immediate) noexcept;

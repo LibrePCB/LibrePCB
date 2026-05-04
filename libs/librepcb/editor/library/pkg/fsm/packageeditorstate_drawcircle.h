@@ -56,7 +56,7 @@ public:
   PackageEditorState_DrawCircle(const PackageEditorState_DrawCircle& other) =
       delete;
   explicit PackageEditorState_DrawCircle(Context& context) noexcept;
-  ~PackageEditorState_DrawCircle() noexcept;
+  ~PackageEditorState_DrawCircle() noexcept override;
 
   // General Methods
   bool entry() noexcept override;

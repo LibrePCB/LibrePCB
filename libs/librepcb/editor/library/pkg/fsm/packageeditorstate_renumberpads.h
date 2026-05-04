@@ -57,7 +57,7 @@ public:
   PackageEditorState_ReNumberPads(
       const PackageEditorState_ReNumberPads& other) = delete;
   explicit PackageEditorState_ReNumberPads(Context& context) noexcept;
-  ~PackageEditorState_ReNumberPads() noexcept;
+  ~PackageEditorState_ReNumberPads() noexcept override;
 
   // General Methods
   bool entry() noexcept override;

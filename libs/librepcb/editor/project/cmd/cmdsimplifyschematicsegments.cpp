@@ -77,10 +77,10 @@ bool CmdSimplifySchematicSegments::performExecute() {
   // some day. I think we need to determine all bus- and net segment
   // modifications first, and then apply them all so we can take into account
   // the dependencies between net segments and bus segments.
-  for (SI_BusSegment* seg : mBusSegments) {
+  for (SI_BusSegment* seg : std::as_const(mBusSegments)) {
     simplifySegment(*seg);
   }
-  for (SI_NetSegment* seg : mNetSegments) {
+  for (SI_NetSegment* seg : std::as_const(mNetSegments)) {
     simplifySegment(*seg);
   }
   return UndoCommandGroup::performExecute();

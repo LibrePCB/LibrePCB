@@ -59,7 +59,7 @@ public:
                  const QString& longElementName, bool dirnameMustBeUuid,
                  std::unique_ptr<TransactionalDirectory> directory,
                  const SExpression& root);
-  virtual ~LibraryElement() noexcept;
+  ~LibraryElement() noexcept override;
 
   // Getters
   const QString& getGeneratedBy() const noexcept { return mGeneratedBy; }
@@ -75,13 +75,13 @@ public:
 
   // General Methods
   void duplicateFrom(const LibraryElement& other);
-  virtual RuleCheckMessageList runChecks() const override;
+  RuleCheckMessageList runChecks() const override;
 
   // Operator Overloadings
   LibraryElement& operator=(const LibraryElement& rhs) = delete;
 
 protected:
-  virtual void serialize(SExpression& root) const override;
+  void serialize(SExpression& root) const override;
 
   QString mGeneratedBy;  ///< If not empty, the element is generated.
   QSet<Uuid> mCategories;

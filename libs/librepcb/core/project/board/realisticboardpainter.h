@@ -67,7 +67,7 @@ public:
   RealisticBoardPainter() = delete;
   explicit RealisticBoardPainter(std::shared_ptr<SceneData3D> data);
   RealisticBoardPainter(const RealisticBoardPainter& other) = delete;
-  ~RealisticBoardPainter() noexcept;
+  ~RealisticBoardPainter() noexcept override;
 
   // General Methods
   void paint(QPainter& painter,

@@ -61,7 +61,7 @@ public:
   explicit ProjectJsonOutputJobWidget(Project& project,
                                       std::shared_ptr<ProjectJsonOutputJob> job,
                                       QWidget* parent = nullptr) noexcept;
-  ~ProjectJsonOutputJobWidget() noexcept;
+  ~ProjectJsonOutputJobWidget() noexcept override;
 
   // Operator Overloads
   ProjectJsonOutputJobWidget& operator=(const ProjectJsonOutputJobWidget& rhs) =

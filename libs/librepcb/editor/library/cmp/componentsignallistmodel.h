@@ -58,7 +58,7 @@ public:
   // ComponentSignalListModel() = delete;
   ComponentSignalListModel(const ComponentSignalListModel& other) = delete;
   explicit ComponentSignalListModel(QObject* parent = nullptr) noexcept;
-  ~ComponentSignalListModel() noexcept;
+  ~ComponentSignalListModel() noexcept override;
 
   // General Methods
   void setReferences(Component* component, UndoStack* stack) noexcept;

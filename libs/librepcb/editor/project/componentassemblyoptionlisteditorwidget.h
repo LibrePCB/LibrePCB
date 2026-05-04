@@ -67,7 +67,7 @@ public:
       QWidget* parent = nullptr) noexcept;
   ComponentAssemblyOptionListEditorWidget(
       const ComponentAssemblyOptionListEditorWidget& other) = delete;
-  ~ComponentAssemblyOptionListEditorWidget() noexcept;
+  ~ComponentAssemblyOptionListEditorWidget() noexcept override;
 
   // Getters
   const ComponentAssemblyOptionList& getOptions() const noexcept {

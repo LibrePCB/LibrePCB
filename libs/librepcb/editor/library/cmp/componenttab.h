@@ -71,7 +71,7 @@ public:
   ComponentTab(const ComponentTab& other) = delete;
   explicit ComponentTab(LibraryEditor& editor, std::unique_ptr<Component> cmp,
                         Mode mode, QObject* parent = nullptr) noexcept;
-  ~ComponentTab() noexcept;
+  ~ComponentTab() noexcept override;
 
   // General Methods
   FilePath getDirectoryPath() const noexcept override;

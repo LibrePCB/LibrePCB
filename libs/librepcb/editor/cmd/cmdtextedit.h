@@ -54,7 +54,7 @@ public:
   CmdTextEdit() = delete;
   CmdTextEdit(const CmdTextEdit& other) = delete;
   explicit CmdTextEdit(Text& text) noexcept;
-  ~CmdTextEdit() noexcept;
+  ~CmdTextEdit() noexcept override;
 
   // Setters
   void setLayer(const Layer& layer, bool immediate) noexcept;

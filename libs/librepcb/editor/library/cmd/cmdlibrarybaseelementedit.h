@@ -49,7 +49,7 @@ public:
   CmdLibraryBaseElementEdit(const CmdLibraryBaseElementEdit& other) = delete;
   explicit CmdLibraryBaseElementEdit(LibraryBaseElement& element,
                                      const QString& text) noexcept;
-  virtual ~CmdLibraryBaseElementEdit() noexcept;
+  ~CmdLibraryBaseElementEdit() noexcept override;
 
   // Setters
   void setName(const QString& locale, const ElementName& name) noexcept;
@@ -69,13 +69,13 @@ public:
 
 protected:  // Methods
   /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
-  virtual bool performExecute() override;
+  bool performExecute() override;
 
   /// @copydoc ::librepcb::editor::UndoCommand::performUndo()
-  virtual void performUndo() override;
+  void performUndo() override;
 
   /// @copydoc ::librepcb::editor::UndoCommand::performRedo()
-  virtual void performRedo() override;
+  void performRedo() override;
 
 private:  // Data
   LibraryBaseElement& mElement;

@@ -58,7 +58,7 @@ public:
   // PrimitiveTextGraphicsItem() = delete;
   PrimitiveTextGraphicsItem(const PrimitiveTextGraphicsItem& other) = delete;
   explicit PrimitiveTextGraphicsItem(QGraphicsItem* parent = nullptr) noexcept;
-  ~PrimitiveTextGraphicsItem() noexcept;
+  ~PrimitiveTextGraphicsItem() noexcept override;
 
   // Setters
   void setPosition(const Point& pos) noexcept;
@@ -82,7 +82,7 @@ public:
   QRectF boundingRect() const noexcept override { return mBoundingRect; }
   QPainterPath shape() const noexcept override;
   void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
-             QWidget* widget = 0) noexcept override;
+             QWidget* widget = nullptr) noexcept override;
 
   // Operator Overloadings
   PrimitiveTextGraphicsItem& operator=(const PrimitiveTextGraphicsItem& rhs) =

@@ -48,7 +48,7 @@ class CmdDeviceStrokeTextAdd final : public UndoCommand {
 public:
   // Constructors / Destructor
   CmdDeviceStrokeTextAdd(BI_Device& device, BI_StrokeText& text) noexcept;
-  ~CmdDeviceStrokeTextAdd() noexcept;
+  ~CmdDeviceStrokeTextAdd() noexcept override;
 
 private:
   // Private Methods

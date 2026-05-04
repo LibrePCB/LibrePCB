@@ -69,6 +69,8 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -150,7 +152,7 @@ SymbolTab::SymbolTab(LibraryEditor& editor, std::unique_ptr<Symbol> sym,
 
   // Load finite state machine (FSM).
   SymbolEditorFsm::Context fsmContext{*mSymbol, *mUndoStack, mUnit, *this};
-  mFsm.reset(new SymbolEditorFsm(fsmContext));
+  mFsm = std::make_unique<SymbolEditorFsm>(fsmContext);
 
   // Apply workspace settings whenever they have been modified.
   connect(&mApp.getWorkspace().getSettings().schematicGridStyle,
@@ -403,13 +405,15 @@ void SymbolTab::setDerivedUiData(const ui::SymbolTabData& data) noexcept {
 }
 
 void SymbolTab::activate() noexcept {
-  mScene.reset(new GraphicsScene(this));
+  mScene = std::make_unique<GraphicsScene>(this);
   mScene->setGridInterval(mSymbol->getGridInterval());
   connect(mScene.get(), &GraphicsScene::changed, this,
           &SymbolTab::requestRepaint);
 
-  mGraphicsItem.reset(
-      new SymbolGraphicsItem(*mSymbol, *mLayers, nullptr, nullptr, {}, false));
+  mGraphicsItem = std::make_unique<SymbolGraphicsItem>(
+      *mSymbol, *mLayers, QPointer<const Component>{},
+      std::shared_ptr<const ComponentSymbolVariantItem>{}, QStringList{},
+      false);
   mScene->addItem(*mGraphicsItem);
 
   applyWorkspaceSettings();

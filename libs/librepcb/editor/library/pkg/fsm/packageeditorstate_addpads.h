@@ -59,20 +59,20 @@ public:
   PackageEditorState_AddPads(const PackageEditorState_AddPads& other) = delete;
   explicit PackageEditorState_AddPads(Context& context, PadType type,
                                       Pad::Function function) noexcept;
-  virtual ~PackageEditorState_AddPads() noexcept;
+  ~PackageEditorState_AddPads() noexcept override;
 
   // General Methods
-  virtual bool entry() noexcept override;
-  virtual bool exit() noexcept override;
+  bool entry() noexcept override;
+  bool exit() noexcept override;
 
   // Event Handlers
-  virtual bool processGraphicsSceneMouseMoved(
+  bool processGraphicsSceneMouseMoved(
       const GraphicsSceneMouseEvent& e) noexcept override;
-  virtual bool processGraphicsSceneLeftMouseButtonPressed(
+  bool processGraphicsSceneLeftMouseButtonPressed(
       const GraphicsSceneMouseEvent& e) noexcept override;
-  virtual bool processGraphicsSceneRightMouseButtonReleased(
+  bool processGraphicsSceneRightMouseButtonReleased(
       const GraphicsSceneMouseEvent& e) noexcept override;
-  virtual bool processRotate(const Angle& rotation) noexcept override;
+  bool processRotate(const Angle& rotation) noexcept override;
 
   // Connection to UI
   PadType getType() const noexcept { return mPadType; }

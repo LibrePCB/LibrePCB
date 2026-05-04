@@ -53,7 +53,7 @@ public:
   explicit InitializeWorkspaceWizard(const UiTheme& theme, bool forceChoosePath,
                                      QWidget* parent = nullptr) noexcept;
   InitializeWorkspaceWizard(const InitializeWorkspaceWizard& other) = delete;
-  ~InitializeWorkspaceWizard() noexcept;
+  ~InitializeWorkspaceWizard() noexcept override;
 
   // Getters
   bool getNeedsToBeShown() const noexcept { return mNeedsToBeShown; }

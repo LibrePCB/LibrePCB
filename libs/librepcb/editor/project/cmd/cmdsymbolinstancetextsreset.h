@@ -47,7 +47,7 @@ class CmdSymbolInstanceTextsReset final : public UndoCommandGroup {
 public:
   // Constructors / Destructor
   CmdSymbolInstanceTextsReset(SI_Symbol& symbol) noexcept;
-  ~CmdSymbolInstanceTextsReset() noexcept;
+  ~CmdSymbolInstanceTextsReset() noexcept override;
 
 private:
   // Private Methods

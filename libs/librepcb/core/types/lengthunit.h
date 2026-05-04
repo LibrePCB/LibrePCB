@@ -82,7 +82,7 @@ private:
     Nanometers,
     Inches,
     Mils,
-    _COUNT  ///< count of units, must be the last entry of the enum
+    COUNT  ///< count of units, must be the last entry of the enum
   };
 
 public:

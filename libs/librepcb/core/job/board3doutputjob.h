@@ -51,11 +51,11 @@ public:
   Board3DOutputJob() noexcept;
   Board3DOutputJob(const Board3DOutputJob& other) noexcept;
   explicit Board3DOutputJob(const SExpression& node);
-  virtual ~Board3DOutputJob() noexcept;
+  ~Board3DOutputJob() noexcept override;
 
   // Getters
-  virtual QString getTypeTr() const noexcept override;
-  virtual QIcon getTypeIcon() const noexcept override;
+  QString getTypeTr() const noexcept override;
+  QIcon getTypeIcon() const noexcept override;
   const BoardSet& getBoards() const noexcept { return mBoards; }
   const AssemblyVariantSet& getAssemblyVariants() const noexcept {
     return mAssemblyVariants;
@@ -72,14 +72,14 @@ public:
   static QString getTypeTrStatic() noexcept {
     return tr("3D Model") % " (*.step)";
   }
-  virtual std::shared_ptr<OutputJob> cloneShared() const noexcept override;
+  std::shared_ptr<OutputJob> cloneShared() const noexcept override;
 
   // Operator Overloadings
   Board3DOutputJob& operator=(const Board3DOutputJob& rhs) = delete;
 
 protected:  // Methods
-  virtual void serializeDerived(SExpression& root) const override;
-  virtual bool equals(const OutputJob& rhs) const noexcept override;
+  void serializeDerived(SExpression& root) const override;
+  bool equals(const OutputJob& rhs) const noexcept override;
 
 private:  // Data
   BoardSet mBoards;

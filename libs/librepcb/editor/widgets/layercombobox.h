@@ -49,7 +49,7 @@ public:
   // Constructors / Destructor
   explicit LayerComboBox(QWidget* parent = nullptr) noexcept;
   LayerComboBox(const LayerComboBox& other) = delete;
-  ~LayerComboBox() noexcept;
+  ~LayerComboBox() noexcept override;
 
   // Getters
   const Layer* getCurrentLayer() const noexcept;

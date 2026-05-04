@@ -96,6 +96,7 @@ bool CmdCombineSchematicNetSegments::performExecute() {
     Q_ASSERT(p2);
     SI_NetLine* newNetLine = cmdAdd->addNetLine(*p1, *p2);
     Q_ASSERT(newNetLine);
+    Q_UNUSED(newNetLine);
   }
   execNewChildCmd(new CmdSchematicNetSegmentRemove(mOldSegment));  // can throw
   execNewChildCmd(cmdAdd.release());  // can throw

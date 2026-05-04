@@ -50,7 +50,7 @@ class CmdNetSignalEdit final : public UndoCommand {
 public:
   // Constructors / Destructor
   CmdNetSignalEdit(Circuit& circuit, NetSignal& netsignal) noexcept;
-  ~CmdNetSignalEdit() noexcept;
+  ~CmdNetSignalEdit() noexcept override;
 
   // Setters
   void setName(const CircuitIdentifier& name, bool isAutoName) noexcept;

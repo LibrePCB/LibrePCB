@@ -56,7 +56,7 @@ public:
       SI_Text& text, std::weak_ptr<SGI_Symbol> symbolItem,
       const GraphicsLayerList& layers,
       std::shared_ptr<const SchematicGraphicsScene::Context> context) noexcept;
-  virtual ~SGI_Text() noexcept;
+  ~SGI_Text() noexcept override;
 
   // General Methods
   SI_Text& getText() noexcept { return mText; }
@@ -66,7 +66,7 @@ public:
   void updateContext() noexcept;
 
   // Inherited from QGraphicsItem
-  virtual QPainterPath shape() const noexcept override;
+  QPainterPath shape() const noexcept override;
 
   // Operator Overloadings
   SGI_Text& operator=(const SGI_Text& rhs) = delete;
@@ -75,8 +75,8 @@ private:  // Methods
   void textEdited(const SI_Text& obj, SI_Text::Event event) noexcept;
   void symbolGraphicsItemEdited(const SGI_Symbol& obj,
                                 SGI_Symbol::Event event) noexcept;
-  virtual QVariant itemChange(GraphicsItemChange change,
-                              const QVariant& value) noexcept override;
+  QVariant itemChange(GraphicsItemChange change,
+                      const QVariant& value) noexcept override;
   void updateText() noexcept;
   void updateAnchorLayer() noexcept;
   void updateAnchorLine() noexcept;

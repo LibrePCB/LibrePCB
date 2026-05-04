@@ -59,7 +59,7 @@ public:
   explicit NetlistOutputJobWidget(Project& project,
                                   std::shared_ptr<NetlistOutputJob> job,
                                   QWidget* parent = nullptr) noexcept;
-  ~NetlistOutputJobWidget() noexcept;
+  ~NetlistOutputJobWidget() noexcept override;
 
   // Operator Overloads
   NetlistOutputJobWidget& operator=(const NetlistOutputJobWidget& rhs) = delete;

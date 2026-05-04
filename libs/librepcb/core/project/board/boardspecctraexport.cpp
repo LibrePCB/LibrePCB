@@ -633,7 +633,7 @@ std::unique_ptr<SExpression> BoardSpecctraExport::genWiringPadStack(
       mBoard.getCopperLayers(), [](const Layer* a, const Layer* b) {
         return a->getCopperNumber() < b->getCopperNumber();
       });
-  for (const Layer* layer : layers) {
+  for (const Layer* layer : std::as_const(layers)) {
     if (via.getVia().isOnLayer(*layer)) {
       root->ensureLineBreak();
       auto& node = root->appendList("shape");
@@ -730,7 +730,7 @@ std::unique_ptr<SExpression> BoardSpecctraExport::toKeepout(
 
   std::unique_ptr<SExpression> root = SExpression::createList("keepout");
   root->appendChild(id);
-  for (const Layer* layer : layersSorted) {
+  for (const Layer* layer : std::as_const(layersSorted)) {
     root->ensureLineBreak();
     root->appendChild(toPolygon(layer ? layer->getId() : "signal",
                                 UnsignedLength(0),

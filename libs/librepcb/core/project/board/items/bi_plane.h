@@ -76,7 +76,7 @@ public:
   BI_Plane(const BI_Plane& other) = delete;
   BI_Plane(Board& board, const Uuid& uuid, const Layer& layer,
            NetSignal* netsignal, const Path& outline);
-  ~BI_Plane() noexcept;
+  ~BI_Plane() noexcept override;
 
   // Getters
   const Uuid& getUuid() const noexcept { return mUuid; }

@@ -48,7 +48,7 @@ public:
   CmdImageEdit() = delete;
   CmdImageEdit(const CmdImageEdit& other) = delete;
   explicit CmdImageEdit(Image& image) noexcept;
-  ~CmdImageEdit() noexcept;
+  ~CmdImageEdit() noexcept override;
 
   // Setters
   void setFileName(const FileProofName& name, bool immediate) noexcept;

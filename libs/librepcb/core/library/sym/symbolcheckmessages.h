@@ -53,7 +53,7 @@ public:
   explicit MsgDuplicatePinName(const SymbolPin& pin) noexcept;
   MsgDuplicatePinName(const MsgDuplicatePinName& other) noexcept
     : RuleCheckMessage(other) {}
-  virtual ~MsgDuplicatePinName() noexcept {}
+  ~MsgDuplicatePinName() noexcept override {}
 };
 
 /*******************************************************************************
@@ -80,7 +80,7 @@ public:
                                const QString& details) noexcept;
   MsgInvalidImageFile(const MsgInvalidImageFile& other) noexcept
     : RuleCheckMessage(other) {}
-  virtual ~MsgInvalidImageFile() noexcept {}
+  ~MsgInvalidImageFile() noexcept override {}
 
 private:
   static QString buildMessagePattern(Error error) noexcept;
@@ -102,7 +102,7 @@ public:
   MsgMissingSymbolName() noexcept;
   MsgMissingSymbolName(const MsgMissingSymbolName& other) noexcept
     : RuleCheckMessage(other) {}
-  virtual ~MsgMissingSymbolName() noexcept {}
+  ~MsgMissingSymbolName() noexcept override {}
 };
 
 /*******************************************************************************
@@ -120,7 +120,7 @@ public:
   MsgMissingSymbolValue() noexcept;
   MsgMissingSymbolValue(const MsgMissingSymbolValue& other) noexcept
     : RuleCheckMessage(other) {}
-  virtual ~MsgMissingSymbolValue() noexcept {}
+  ~MsgMissingSymbolValue() noexcept override {}
 };
 
 /*******************************************************************************
@@ -141,7 +141,7 @@ public:
   MsgNonFunctionalSymbolPinInversionSign(
       const MsgNonFunctionalSymbolPinInversionSign& other) noexcept
     : RuleCheckMessage(other), mPin(other.mPin) {}
-  virtual ~MsgNonFunctionalSymbolPinInversionSign() noexcept {}
+  ~MsgNonFunctionalSymbolPinInversionSign() noexcept override {}
 
   // Getters
   const std::shared_ptr<const SymbolPin>& getPin() const noexcept {
@@ -168,7 +168,7 @@ public:
   explicit MsgSymbolOriginNotInCenter(const Point& center) noexcept;
   MsgSymbolOriginNotInCenter(const MsgSymbolOriginNotInCenter& other) noexcept
     : RuleCheckMessage(other), mCenter(other.mCenter) {}
-  virtual ~MsgSymbolOriginNotInCenter() noexcept {}
+  ~MsgSymbolOriginNotInCenter() noexcept override {}
 
   // Getters
   const Point& getCenter() const noexcept { return mCenter; }
@@ -194,7 +194,7 @@ public:
       QVector<std::shared_ptr<const SymbolPin>> pins) noexcept;
   MsgOverlappingSymbolPins(const MsgOverlappingSymbolPins& other) noexcept
     : RuleCheckMessage(other), mPins(other.mPins) {}
-  virtual ~MsgOverlappingSymbolPins() noexcept {}
+  ~MsgOverlappingSymbolPins() noexcept override {}
 
   // Getters
   const QVector<std::shared_ptr<const SymbolPin>>& getPins() const noexcept {
@@ -228,7 +228,7 @@ public:
     : RuleCheckMessage(other),
       mPin(other.mPin),
       mGridInterval(other.mGridInterval) {}
-  virtual ~MsgSymbolPinNotOnGrid() noexcept {}
+  ~MsgSymbolPinNotOnGrid() noexcept override {}
 
   // Getters
   const std::shared_ptr<const SymbolPin>& getPin() const noexcept {
@@ -262,7 +262,7 @@ public:
     : RuleCheckMessage(other),
       mText(other.mText),
       mExpectedLayer(other.mExpectedLayer) {}
-  virtual ~MsgWrongSymbolTextLayer() noexcept {}
+  ~MsgWrongSymbolTextLayer() noexcept override {}
 
   // Getters
   std::shared_ptr<const Text> getText() const noexcept { return mText; }

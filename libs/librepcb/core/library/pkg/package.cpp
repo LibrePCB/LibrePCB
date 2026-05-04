@@ -163,8 +163,8 @@ Package::AssemblyType Package::guessAssemblyType() const noexcept {
   }
 }
 
-QVector<std::shared_ptr<const PackageModel>> Package::getModelsForFootprint(
-    const Uuid& fpt) const noexcept {
+const QVector<std::shared_ptr<const PackageModel>>
+    Package::getModelsForFootprint(const Uuid& fpt) const noexcept {
   QVector<std::shared_ptr<const PackageModel>> result;
   if (std::shared_ptr<const Footprint> footprint = mFootprints.find(fpt)) {
     for (auto modelIt = mModels.begin(); modelIt != mModels.end(); ++modelIt) {

@@ -36,6 +36,7 @@
 #include <QtCore>
 
 #include <algorithm>
+#include <memory>
 
 /*******************************************************************************
  *  Namespace
@@ -73,9 +74,9 @@ bool PackageEditorState_ReNumberPads::entry() noexcept {
   const QString note = " " %
       tr("(press %1 for single-selection, %2 to change numbering mode, %3 to "
          "finish)")
-          .arg(QCoreApplication::translate("QShortcut", "Ctrl"))
-          .arg(QCoreApplication::translate("QShortcut", "Shift"))
-          .arg(QCoreApplication::translate("QShortcut", "Return"));
+          .arg(QCoreApplication::translate("QShortcut", "Ctrl"),
+               QCoreApplication::translate("QShortcut", "Shift"),
+               QCoreApplication::translate("QShortcut", "Return"));
   mAdapter.fsmSetStatusBarMessage(tr("Click on the next pad") % note);
   mAdapter.fsmSetViewCursor(Qt::PointingHandCursor);
   return true;
@@ -312,8 +313,8 @@ void PackageEditorState_ReNumberPads::updateCurrentPad(bool force) noexcept {
     }
 
     // Assign new pad numbers.
-    mTmpCmd.reset(new UndoCommandGroup("group"));
-    for (auto padPtr : pads) {
+    mTmpCmd = std::make_unique<UndoCommandGroup>("group");
+    for (const auto& padPtr : pads) {
       if (std::shared_ptr<PackagePad> pkgPad =
               mPackagePads.value(pkgPadIndex)) {
         std::unique_ptr<CmdFootprintPadEdit> cmd(

@@ -445,6 +445,7 @@ BI_Device* Board::getDeviceInstanceByComponentUuid(
 }
 
 void Board::addDeviceInstance(BI_Device& instance) {
+  // NOLINTNEXTLINE
   if ((mDeviceInstances.values().contains(&instance)) ||
       (&instance.getBoard() != this)) {
     throw LogicError(__FILE__, __LINE__);
@@ -479,6 +480,7 @@ void Board::removeDeviceInstance(BI_Device& instance) {
  ******************************************************************************/
 
 void Board::addNetSegment(BI_NetSegment& netsegment) {
+  // NOLINTNEXTLINE
   if ((mNetSegments.values().contains(&netsegment)) ||
       (&netsegment.getBoard() != this)) {
     throw LogicError(__FILE__, __LINE__);
@@ -512,6 +514,7 @@ void Board::removeNetSegment(BI_NetSegment& netsegment) {
  ******************************************************************************/
 
 void Board::addPlane(BI_Plane& plane) {
+  // NOLINTNEXTLINE
   if ((mPlanes.values().contains(&plane)) || (&plane.getBoard() != this)) {
     throw LogicError(__FILE__, __LINE__);
   }
@@ -568,6 +571,7 @@ QSet<const Layer*> Board::takeScheduledLayersForPlanesRebuild(
  ******************************************************************************/
 
 void Board::addZone(BI_Zone& zone) {
+  // NOLINTNEXTLINE
   if ((mZones.values().contains(&zone)) || (&zone.getBoard() != this)) {
     throw LogicError(__FILE__, __LINE__);
   }
@@ -599,6 +603,7 @@ void Board::removeZone(BI_Zone& zone) {
  ******************************************************************************/
 
 void Board::addPolygon(BI_Polygon& polygon) {
+  // NOLINTNEXTLINE
   if ((mPolygons.values().contains(&polygon)) ||
       (&polygon.getBoard() != this)) {
     throw LogicError(__FILE__, __LINE__);
@@ -632,6 +637,7 @@ void Board::removePolygon(BI_Polygon& polygon) {
  ******************************************************************************/
 
 void Board::addStrokeText(BI_StrokeText& text) {
+  // NOLINTNEXTLINE
   if ((mStrokeTexts.values().contains(&text)) || (&text.getBoard() != this)) {
     throw LogicError(__FILE__, __LINE__);
   }
@@ -664,6 +670,7 @@ void Board::removeStrokeText(BI_StrokeText& text) {
  ******************************************************************************/
 
 void Board::addHole(BI_Hole& hole) {
+  // NOLINTNEXTLINE
   if ((mHoles.values().contains(&hole)) || (&hole.getBoard() != this)) {
     throw LogicError(__FILE__, __LINE__);
   }
@@ -1040,36 +1047,36 @@ void Board::save() {
     mPreferredFootprintTags.serialize(
         root->appendList("preferred_footprint_tags"));
     root->ensureLineBreak();
-    for (const BI_Device* obj : mDeviceInstances) {
+    for (const BI_Device* obj : std::as_const(mDeviceInstances)) {
       root->ensureLineBreak();
       obj->serialize(root->appendList("device"));
     }
     root->ensureLineBreak();
-    for (const BI_NetSegment* obj : mNetSegments) {
+    for (const BI_NetSegment* obj : std::as_const(mNetSegments)) {
       root->ensureLineBreak();
       obj->serialize(root->appendList("netsegment"));
     }
     root->ensureLineBreak();
-    for (const BI_Plane* obj : mPlanes) {
+    for (const BI_Plane* obj : std::as_const(mPlanes)) {
       root->ensureLineBreak();
       obj->serialize(root->appendList("plane"));
     }
-    for (const BI_Zone* obj : mZones) {
+    for (const BI_Zone* obj : std::as_const(mZones)) {
       root->ensureLineBreak();
       obj->getData().serialize(root->appendList("zone"));
     }
     root->ensureLineBreak();
-    for (const BI_Polygon* obj : mPolygons) {
+    for (const BI_Polygon* obj : std::as_const(mPolygons)) {
       root->ensureLineBreak();
       obj->getData().serialize(root->appendList("polygon"));
     }
     root->ensureLineBreak();
-    for (const BI_StrokeText* obj : mStrokeTexts) {
+    for (const BI_StrokeText* obj : std::as_const(mStrokeTexts)) {
       root->ensureLineBreak();
       obj->getData().serialize(root->appendList("stroke_text"));
     }
     root->ensureLineBreak();
-    for (const BI_Hole* obj : mHoles) {
+    for (const BI_Hole* obj : std::as_const(mHoles)) {
       root->ensureLineBreak();
       obj->getData().serialize(root->appendList("hole"));
     }
@@ -1089,7 +1096,7 @@ void Board::save() {
       child.appendChild("visible", it.value());
     }
     root->ensureLineBreak();
-    for (const BI_Plane* plane : mPlanes) {
+    for (const BI_Plane* plane : std::as_const(mPlanes)) {
       root->ensureLineBreak();
       SExpression& node = root->appendList("plane");
       node.appendChild(plane->getUuid());

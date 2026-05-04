@@ -229,8 +229,8 @@ bool SymbolInstancePropertiesDialog::applyChanges() noexcept {
       QString msg = tr("There is already a component with the name '%1' in the "
                        "schematic. Do you want to swap their names?")
                         .arg(*newName);
-      msg += "\n\n • " % msgTmpl.arg(*newName).arg(*oldName);
-      msg += "\n • " % msgTmpl.arg(*oldName).arg(*newName);
+      msg += "\n\n • " % msgTmpl.arg(*newName, *oldName);
+      msg += "\n • " % msgTmpl.arg(*oldName, *newName);
       const int answer = QMessageBox::question(
           this, tr("Name already in use"), msg,
           QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Yes);

@@ -136,7 +136,7 @@ public:
   BoardPainter() = delete;
   explicit BoardPainter(const Board& board);
   BoardPainter(const BoardPainter& other) = delete;
-  ~BoardPainter() noexcept;
+  ~BoardPainter() noexcept override;
 
   // General Methods
   void paint(QPainter& painter,

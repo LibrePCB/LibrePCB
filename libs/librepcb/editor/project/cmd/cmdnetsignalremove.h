@@ -48,7 +48,7 @@ class CmdNetSignalRemove final : public UndoCommand {
 public:
   // Constructors / Destructor
   CmdNetSignalRemove(Circuit& circuit, NetSignal& netsignal) noexcept;
-  ~CmdNetSignalRemove() noexcept;
+  ~CmdNetSignalRemove() noexcept override;
 
 private:
   // Private Methods

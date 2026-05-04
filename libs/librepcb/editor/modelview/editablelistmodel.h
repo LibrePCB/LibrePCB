@@ -86,7 +86,7 @@ public:
       mNewValue(),
       mPlaceholderText(),
       mComboBoxItems() {}
-  ~EditableListModel() noexcept {}
+  ~EditableListModel() noexcept override {}
 
   // Getters
   const T& getValues() const noexcept { return mValues; }
@@ -104,28 +104,28 @@ public:
   }
 
   void setValues(const T& values) noexcept {
-    emit beginResetModel();
+    beginResetModel();
     mValues = values;
-    emit endResetModel();
+    endResetModel();
   }
 
   void setChoices(const T& choices) noexcept {
-    emit beginResetModel();
+    beginResetModel();
     mChoices = choices;
     updateComboBoxItems();
-    emit endResetModel();
+    endResetModel();
   }
 
   void setDisplayText(const ValueType& value, const QString& text) noexcept {
-    emit beginResetModel();
+    beginResetModel();
     mDisplayTexts[value] = text;
-    emit endResetModel();
+    endResetModel();
   }
 
   void setIcon(const ValueType& value, const QIcon& icon) noexcept {
-    emit beginResetModel();
+    beginResetModel();
     mIcons[value] = icon;
-    emit endResetModel();
+    endResetModel();
   }
 
   // Slots

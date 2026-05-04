@@ -41,6 +41,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -205,11 +207,10 @@ bool BoardEditorState_AddPad::processRotate(const Angle& rotation) noexcept {
  *  Connection to UI
  ******************************************************************************/
 
-QVector<std::pair<Uuid, QString>> BoardEditorState_AddPad::getAvailableNets()
-    const noexcept {
+const QVector<std::pair<Uuid, QString>>
+    BoardEditorState_AddPad::getAvailableNets() const noexcept {
   QVector<std::pair<Uuid, QString>> nets;
-  for (const NetSignal* net :
-       mContext.project.getCircuit().getNetSignals().values()) {
+  for (const NetSignal* net : mContext.project.getCircuit().getNetSignals()) {
     nets.append(std::make_pair(net->getUuid(), *net->getName()));
   }
   Toolbox::sortNumeric(
@@ -392,7 +393,7 @@ bool BoardEditorState_AddPad::start(const Point& pos) noexcept {
         BoardPadData(Uuid::createRandom(), mCurrentProperties));
     Q_ASSERT(mCurrentPad);
     mContext.undoStack.appendToCmdGroup(cmdAddPad.release());
-    mCurrentEditCmd.reset(new CmdBoardPadEdit(*mCurrentPad));
+    mCurrentEditCmd = std::make_unique<CmdBoardPadEdit>(*mCurrentPad);
 
     // Highlight all elements of the current netsignal.
     mAdapter.fsmCrossProbe({netsegment->getNetSignal()});

@@ -61,6 +61,8 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -479,13 +481,13 @@ void ProjectEditor::setManualModificationsMade() noexcept {
 }
 
 void ProjectEditor::execSetupDialog() noexcept {
-  abortBlockingToolsInOtherEditors(nullptr);  // Release undo stack.
+  emit abortBlockingToolsInOtherEditors(nullptr);  // Release undo stack.
   ProjectSetupDialog dialog(*mProject, *mUndoStack, qApp->activeWindow());
   dialog.exec();
 }
 
 void ProjectEditor::execOutputJobsDialog(const QString& typeName) noexcept {
-  abortBlockingToolsInOtherEditors(nullptr);  // Release undo stack.
+  emit abortBlockingToolsInOtherEditors(nullptr);  // Release undo stack.
   OutputJobsDialog dlg(mWorkspace, mApp.getLibraryElementCache(), *mProject,
                        *mUndoStack, qApp->activeWindow());
 
@@ -567,7 +569,7 @@ std::shared_ptr<SchematicEditor> ProjectEditor::execNewSheetDialog() noexcept {
                          tr("Invalid name: '%1'").arg(name));
     }
 
-    abortBlockingToolsInOtherEditors(nullptr);  // Release undo stack.
+    emit abortBlockingToolsInOtherEditors(nullptr);  // Release undo stack.
     const int index = mProject->getSchematics().count();
     CmdSchematicAdd* cmd = new CmdSchematicAdd(*mProject, dirName,
                                                ElementName(name));  // can throw
@@ -589,7 +591,7 @@ void ProjectEditor::execRenameSheetDialog(int index) noexcept {
       QLineEdit::Normal, *schematic->getName(), &ok);
   if (!ok) return;
 
-  abortBlockingToolsInOtherEditors(nullptr);  // Release undo stack.
+  emit abortBlockingToolsInOtherEditors(nullptr);  // Release undo stack.
 
   try {
     std::unique_ptr<CmdSchematicEdit> cmd(new CmdSchematicEdit(*schematic));
@@ -604,7 +606,7 @@ void ProjectEditor::execDeleteSheetDialog(int index) noexcept {
   Schematic* schematic = mProject->getSchematicByIndex(index);
   if (!schematic) return;
 
-  abortBlockingToolsInOtherEditors(nullptr);  // Release undo stack.
+  emit abortBlockingToolsInOtherEditors(nullptr);  // Release undo stack.
 
   try {
     mUndoStack->execCmd(new CmdSchematicRemove(*mProject, *schematic));
@@ -639,7 +641,7 @@ std::shared_ptr<BoardEditor> ProjectEditor::execNewBoardDialog(
       tr("Choose a name:"), QLineEdit::Normal, name, &ok);
   if (!ok) return nullptr;
 
-  abortBlockingToolsInOtherEditors(nullptr);  // Release undo stack.
+  emit abortBlockingToolsInOtherEditors(nullptr);  // Release undo stack.
 
   try {
     const QString dirName = FilePath::cleanFileName(
@@ -670,7 +672,7 @@ void ProjectEditor::execDeleteBoardDialog(int index) noexcept {
           .arg(*board->getName()));
   if (btn != QMessageBox::Yes) return;
 
-  abortBlockingToolsInOtherEditors(nullptr);  // Release undo stack.
+  emit abortBlockingToolsInOtherEditors(nullptr);  // Release undo stack.
 
   try {
     mUndoStack->execCmd(new CmdBoardRemove(*board));
@@ -737,7 +739,7 @@ void ProjectEditor::runErc() noexcept {
 
     // Update UI.
     if (!mErcMessages) {
-      mErcMessages.reset(new RuleCheckMessagesModel());
+      mErcMessages = std::make_shared<RuleCheckMessagesModel>();
       connect(mErcMessages.get(),
               &RuleCheckMessagesModel::unapprovedCountChanged, this,
               [this]() { onUiDataChanged.notify(); });
@@ -788,7 +790,7 @@ void ProjectEditor::refreshBuses() noexcept {
   Toolbox::sortNumeric(buses, [](const QCollator& comp, Bus* a, Bus* b) {
     return comp(*a->getName(), *b->getName());
   });
-  for (const Bus* bus : buses) {
+  for (const Bus* bus : std::as_const(buses)) {
     if (!bus->hasAutoName()) {
       mBuses->push_back(
           ui::BusData{q2s(bus->getUuid().toStr()), q2s(*bus->getName())});

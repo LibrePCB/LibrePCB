@@ -59,7 +59,7 @@ public:
   explicit Board3DOutputJobWidget(Project& project,
                                   std::shared_ptr<Board3DOutputJob> job,
                                   QWidget* parent = nullptr) noexcept;
-  ~Board3DOutputJobWidget() noexcept;
+  ~Board3DOutputJobWidget() noexcept override;
 
   // Operator Overloads
   Board3DOutputJobWidget& operator=(const Board3DOutputJobWidget& rhs) = delete;

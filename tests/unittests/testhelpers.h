@@ -111,8 +111,7 @@ public:
         throw LogicError(
             __FILE__, __LINE__,
             QString("Child object '%1' not found! Available children: %2")
-                .arg(name)
-                .arg(childrenNames.join(", ")));
+                .arg(name, childrenNames.join(", ")));
       }
       qObject = child;
     }

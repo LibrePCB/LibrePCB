@@ -81,12 +81,12 @@ FilePath TransactionalDirectory::getAbsPath(
   return mFileSystem->getAbsPath(mPath % "/" % path);
 }
 
-QStringList TransactionalDirectory::getDirs(
+const QStringList TransactionalDirectory::getDirs(
     const QString& path) const noexcept {
   return mFileSystem->getDirs(mPath % "/" % path);
 }
 
-QStringList TransactionalDirectory::getFiles(
+const QStringList TransactionalDirectory::getFiles(
     const QString& path) const noexcept {
   return mFileSystem->getFiles(mPath % "/" % path);
 }

@@ -50,11 +50,11 @@ public:
   NetlistOutputJob() noexcept;
   NetlistOutputJob(const NetlistOutputJob& other) noexcept;
   explicit NetlistOutputJob(const SExpression& node);
-  virtual ~NetlistOutputJob() noexcept;
+  ~NetlistOutputJob() noexcept override;
 
   // Getters
-  virtual QString getTypeTr() const noexcept override;
-  virtual QIcon getTypeIcon() const noexcept override;
+  QString getTypeTr() const noexcept override;
+  QIcon getTypeIcon() const noexcept override;
   const BoardSet& getBoards() const noexcept { return mBoards; }
   const QString& getOutputPath() const noexcept { return mOutputPath; }
 
@@ -67,14 +67,14 @@ public:
   static QString getTypeTrStatic() noexcept {
     return tr("Netlist") % " (*.d356)";
   }
-  virtual std::shared_ptr<OutputJob> cloneShared() const noexcept override;
+  std::shared_ptr<OutputJob> cloneShared() const noexcept override;
 
   // Operator Overloadings
   NetlistOutputJob& operator=(const NetlistOutputJob& rhs) = delete;
 
 protected:  // Methods
-  virtual void serializeDerived(SExpression& root) const override;
-  virtual bool equals(const OutputJob& rhs) const noexcept override;
+  void serializeDerived(SExpression& root) const override;
+  bool equals(const OutputJob& rhs) const noexcept override;
 
 private:  // Data
   BoardSet mBoards;

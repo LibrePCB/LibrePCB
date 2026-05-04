@@ -56,7 +56,7 @@ public:
   PackageEditorState_DrawZone(const PackageEditorState_DrawZone& other) =
       delete;
   explicit PackageEditorState_DrawZone(Context& context) noexcept;
-  virtual ~PackageEditorState_DrawZone() noexcept;
+  ~PackageEditorState_DrawZone() noexcept override;
 
   // General Methods
   bool entry() noexcept override;

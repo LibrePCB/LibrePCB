@@ -53,7 +53,7 @@ public:
   // LineGraphicsItem() = delete;
   LineGraphicsItem(const LineGraphicsItem& other) = delete;
   explicit LineGraphicsItem(QGraphicsItem* parent = nullptr) noexcept;
-  virtual ~LineGraphicsItem() noexcept;
+  ~LineGraphicsItem() noexcept override;
 
   // Setters
   void setPosition(const Point& pos) noexcept;
@@ -67,7 +67,7 @@ public:
   QRectF boundingRect() const noexcept override { return mBoundingRect; }
   QPainterPath shape() const noexcept override;
   void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
-             QWidget* widget = 0) noexcept override;
+             QWidget* widget = nullptr) noexcept override;
 
   // Operator Overloadings
   LineGraphicsItem& operator=(const LineGraphicsItem& rhs) = delete;

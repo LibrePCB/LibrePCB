@@ -97,7 +97,7 @@ public:
   static ClipperLib::Paths flattenTree(const ClipperLib::PolyNode& node);
 
   // Type Conversions
-  static QVector<Path> convert(const ClipperLib::Paths& paths) noexcept;
+  static const QVector<Path> convert(const ClipperLib::Paths& paths) noexcept;
   static Path convert(const ClipperLib::Path& path) noexcept;
   static Point convert(const ClipperLib::IntPoint& point) noexcept;
   static ClipperLib::Paths convert(

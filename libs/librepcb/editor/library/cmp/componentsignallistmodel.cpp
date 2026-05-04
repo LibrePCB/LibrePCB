@@ -76,7 +76,7 @@ void ComponentSignalListModel::setReferences(Component* component,
   if (mComponent) {
     mComponent->getSignals().onEdited.attach(mOnEditedSlot);
 
-    for (auto obj : mComponent->getSignals()) {
+    for (const auto& obj : mComponent->getSignals()) {
       mItems.append(createItem(obj, mItems.count()));
     }
     updateSortOrder(false);

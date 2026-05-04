@@ -119,7 +119,7 @@ public:
   /**
    * @brief The destructor (will also call #clear())
    */
-  ~UndoStack() noexcept;
+  ~UndoStack() noexcept override;
 
   // Getters
 

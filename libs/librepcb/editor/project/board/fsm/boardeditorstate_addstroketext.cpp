@@ -33,6 +33,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -177,7 +179,7 @@ void BoardEditorState_AddStrokeText::setHeight(
   }
 }
 
-QStringList BoardEditorState_AddStrokeText::getTextSuggestions()
+const QStringList BoardEditorState_AddStrokeText::getTextSuggestions()
     const noexcept {
   return {
       "{{BOARD}}",  //
@@ -227,7 +229,8 @@ bool BoardEditorState_AddStrokeText::addText(const Point& pos) noexcept {
     std::unique_ptr<CmdBoardStrokeTextAdd> cmdAdd(
         new CmdBoardStrokeTextAdd(*mCurrentTextToPlace));
     mContext.undoStack.appendToCmdGroup(cmdAdd.release());
-    mCurrentTextEditCmd.reset(new CmdBoardStrokeTextEdit(*mCurrentTextToPlace));
+    mCurrentTextEditCmd =
+        std::make_unique<CmdBoardStrokeTextEdit>(*mCurrentTextToPlace);
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());

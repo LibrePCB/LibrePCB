@@ -47,10 +47,10 @@ public:
   SymbolCheck() = delete;
   SymbolCheck(const SymbolCheck& other) = delete;
   explicit SymbolCheck(const Symbol& symbol) noexcept;
-  virtual ~SymbolCheck() noexcept;
+  ~SymbolCheck() noexcept override;
 
   // General Methods
-  virtual RuleCheckMessageList runChecks() const override;
+  RuleCheckMessageList runChecks() const override;
 
   // Operator Overloadings
   SymbolCheck& operator=(const SymbolCheck& rhs) = delete;

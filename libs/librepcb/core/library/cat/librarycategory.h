@@ -57,7 +57,7 @@ public:
                   const QString& longElementName,
                   std::unique_ptr<TransactionalDirectory> directory,
                   const SExpression& root);
-  virtual ~LibraryCategory() noexcept;
+  ~LibraryCategory() noexcept override;
 
   // Getters: Attributes
   const std::optional<Uuid>& getParentUuid() const noexcept {
@@ -71,13 +71,13 @@ public:
 
   // General Methods
   void duplicateFrom(const LibraryCategory& other);
-  virtual RuleCheckMessageList runChecks() const override;
+  RuleCheckMessageList runChecks() const override;
 
   // Operator Overloadings
   LibraryCategory& operator=(const LibraryCategory& rhs) = delete;
 
 protected:
-  virtual void serialize(SExpression& root) const override;
+  void serialize(SExpression& root) const override;
 
   std::optional<Uuid> mParentUuid;
 };

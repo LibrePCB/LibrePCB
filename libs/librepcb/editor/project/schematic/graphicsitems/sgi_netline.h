@@ -53,7 +53,7 @@ public:
   SGI_NetLine(
       SI_NetLine& netline, const GraphicsLayerList& layers,
       std::shared_ptr<const SchematicGraphicsScene::Context> context) noexcept;
-  virtual ~SGI_NetLine() noexcept;
+  ~SGI_NetLine() noexcept override;
 
   // General Methods
   SI_NetLine& getNetLine() noexcept { return mNetLine; }

@@ -84,7 +84,7 @@ public:
   explicit KiCadLibraryConverter(WorkspaceLibraryDb& db,
                                  const KiCadLibraryConverterSettings& settings,
                                  QObject* parent = nullptr) noexcept;
-  ~KiCadLibraryConverter() noexcept;
+  ~KiCadLibraryConverter() noexcept override;
 
   // General Methods
   void reset() noexcept;

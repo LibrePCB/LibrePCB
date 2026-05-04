@@ -50,7 +50,7 @@ class CmdBoardPadEdit final : public UndoCommand {
 public:
   // Constructors / Destructor
   explicit CmdBoardPadEdit(BI_Pad& pad) noexcept;
-  ~CmdBoardPadEdit() noexcept;
+  ~CmdBoardPadEdit() noexcept override;
 
   // Setters
   void setComponentSideAndHoles(Pad::ComponentSide side,

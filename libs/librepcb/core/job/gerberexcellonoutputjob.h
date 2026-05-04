@@ -52,11 +52,11 @@ public:
   // Constructors / Destructor
   GerberExcellonOutputJob(const GerberExcellonOutputJob& other) noexcept;
   explicit GerberExcellonOutputJob(const SExpression& node);
-  virtual ~GerberExcellonOutputJob() noexcept;
+  ~GerberExcellonOutputJob() noexcept override;
 
   // Getters
-  virtual QString getTypeTr() const noexcept override;
-  virtual QIcon getTypeIcon() const noexcept override;
+  QString getTypeTr() const noexcept override;
+  QIcon getTypeIcon() const noexcept override;
   const QString& getSuffixDrills() const noexcept { return mSuffixDrills; }
   const QString& getSuffixDrillsNpth() const noexcept {
     return mSuffixDrillsNpth;
@@ -131,7 +131,7 @@ public:
   // General Methods
   static QString getTypeName() noexcept { return "gerber_excellon"; }
   static QString getTypeTrStatic() noexcept { return tr("Gerber/Excellon"); }
-  virtual std::shared_ptr<OutputJob> cloneShared() const noexcept override;
+  std::shared_ptr<OutputJob> cloneShared() const noexcept override;
 
   // Operator Overloadings
   GerberExcellonOutputJob& operator=(const GerberExcellonOutputJob& rhs) =
@@ -143,8 +143,8 @@ public:
 
 private:  // Methods
   GerberExcellonOutputJob() noexcept;
-  virtual void serializeDerived(SExpression& root) const override;
-  virtual bool equals(const OutputJob& rhs) const noexcept override;
+  void serializeDerived(SExpression& root) const override;
+  bool equals(const OutputJob& rhs) const noexcept override;
 
 private:  // Data
   QString mSuffixDrills;  // NPTH and PTH combined

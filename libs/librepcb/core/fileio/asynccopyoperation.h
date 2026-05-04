@@ -49,7 +49,7 @@ public:
   AsyncCopyOperation(const AsyncCopyOperation& other) = delete;
   AsyncCopyOperation(const FilePath& source, const FilePath& destination,
                      QObject* parent = nullptr) noexcept;
-  ~AsyncCopyOperation() noexcept;
+  ~AsyncCopyOperation() noexcept override;
 
   // Getters
   const FilePath& getSource() const noexcept { return mSource; }
@@ -74,12 +74,12 @@ public:
   AsyncCopyOperation& operator=(const AsyncCopyOperation& rhs) = delete;
 
 signals:
-  void started();
+  void startedCopy();
   void progressStatus(const QString& status);
   void progressPercent(int percent);
   void succeeded();
   void failed(const QString& error);
-  void finished();
+  void finishedCopy();
 
 private:  // Methods
   void run() noexcept override;

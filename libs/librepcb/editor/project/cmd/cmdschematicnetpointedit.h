@@ -49,7 +49,7 @@ class CmdSchematicNetPointEdit final : public UndoCommand {
 public:
   // Constructors / Destructor
   explicit CmdSchematicNetPointEdit(SI_NetPoint& point) noexcept;
-  ~CmdSchematicNetPointEdit() noexcept;
+  ~CmdSchematicNetPointEdit() noexcept override;
 
   // Setters
   void setPosition(const Point& pos, bool immediate) noexcept;

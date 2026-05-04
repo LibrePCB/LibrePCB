@@ -76,7 +76,7 @@ public:
                      std::shared_ptr<const ComponentSymbolVariantItem> cmpItem,
                      const QStringList& localeOrder,
                      bool hideUnusedPins) noexcept;
-  ~SymbolGraphicsItem() noexcept;
+  ~SymbolGraphicsItem() noexcept override;
 
   // Getters
   std::shared_ptr<SymbolPinGraphicsItem> getGraphicsItem(

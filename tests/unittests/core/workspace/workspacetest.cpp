@@ -40,7 +40,7 @@ namespace tests {
  ******************************************************************************/
 
 class WorkspaceTest : public ::testing::Test {
-protected:
+public:
   FilePath mWsDir;
   FilePath mVersionFile;
   FilePath mProjectsPath;
@@ -56,7 +56,7 @@ protected:
     mLibrariesPath = mDataPath.getPathTo("libraries");
   }
 
-  virtual ~WorkspaceTest() {
+  ~WorkspaceTest() override {
     QDir(mWsDir.getParentDir().toStr()).removeRecursively();
   }
 };

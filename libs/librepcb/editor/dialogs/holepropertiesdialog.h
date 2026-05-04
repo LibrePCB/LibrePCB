@@ -65,7 +65,7 @@ public:
                        const LengthUnit& lengthUnit,
                        const QString& settingsPrefix,
                        QWidget* parent = nullptr) noexcept;
-  ~HolePropertiesDialog() noexcept;
+  ~HolePropertiesDialog() noexcept override;
 
   // Setters
   void setReadOnly(bool readOnly) noexcept;

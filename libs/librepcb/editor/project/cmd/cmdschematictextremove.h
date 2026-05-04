@@ -50,7 +50,7 @@ public:
   CmdSchematicTextRemove() = delete;
   CmdSchematicTextRemove(const CmdSchematicTextRemove& other) = delete;
   CmdSchematicTextRemove(SI_Text& text) noexcept;
-  ~CmdSchematicTextRemove() noexcept;
+  ~CmdSchematicTextRemove() noexcept override;
 
   // Operator Overloadings
   CmdSchematicTextRemove& operator=(const CmdSchematicTextRemove& rhs) = delete;

@@ -50,7 +50,7 @@ class CmdBoardViaEdit final : public UndoCommand {
 public:
   // Constructors / Destructor
   explicit CmdBoardViaEdit(BI_Via& via) noexcept;
-  ~CmdBoardViaEdit() noexcept;
+  ~CmdBoardViaEdit() noexcept override;
 
   // Setters
   void setLayers(const Layer& startLayer, const Layer& endLayer) noexcept;

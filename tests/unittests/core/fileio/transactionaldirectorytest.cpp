@@ -36,7 +36,7 @@ namespace tests {
  ******************************************************************************/
 
 class TransactionalDirectoryTest : public ::testing::Test {
-protected:
+public:
   std::shared_ptr<TransactionalFileSystem> mFileSystem;
   std::shared_ptr<TransactionalFileSystem> mEmptyFileSystem;
 
@@ -54,7 +54,7 @@ protected:
         TransactionalFileSystem::openRO(FilePath::getRandomTempPath());
   }
 
-  virtual ~TransactionalDirectoryTest() {}
+  ~TransactionalDirectoryTest() override {}
 };
 
 /*******************************************************************************

@@ -62,7 +62,7 @@ public:
   BoardSpecctraExport() = delete;
   BoardSpecctraExport(const BoardSpecctraExport& other) = delete;
   explicit BoardSpecctraExport(const Board& board) noexcept;
-  ~BoardSpecctraExport() noexcept;
+  ~BoardSpecctraExport() noexcept override;
 
   // General Methods
   QByteArray generate() const;

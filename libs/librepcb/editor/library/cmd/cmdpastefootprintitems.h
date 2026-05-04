@@ -60,7 +60,7 @@ public:
                          FootprintGraphicsItem& graphicsItem,
                          std::unique_ptr<FootprintClipboardData> data,
                          const Point& posOffset) noexcept;
-  ~CmdPasteFootprintItems() noexcept;
+  ~CmdPasteFootprintItems() noexcept override;
 
   // Operator Overloadings
   CmdPasteFootprintItems& operator=(const CmdPasteFootprintItems& rhs) = delete;

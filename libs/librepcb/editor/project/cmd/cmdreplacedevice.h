@@ -53,7 +53,7 @@ public:
   CmdReplaceDevice(Workspace& workspace, Board& board, BI_Device& device,
                    const Uuid& newDeviceUuid,
                    const std::optional<Uuid>& newFootprintUuid) noexcept;
-  ~CmdReplaceDevice() noexcept;
+  ~CmdReplaceDevice() noexcept override;
 
 private:
   // Private Methods

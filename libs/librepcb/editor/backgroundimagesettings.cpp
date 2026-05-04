@@ -93,7 +93,7 @@ void BackgroundImageSettings::saveToDir(const FilePath& dir) noexcept {
       root->appendChild("enabled", enabled);
       root->ensureLineBreak();
       root->appendChild("rotation", rotation);
-      for (const auto& ref : references) {
+      for (const auto& ref : std::as_const(references)) {
         root->ensureLineBreak();
         SExpression& refNode = root->appendList("reference");
         SExpression& sourceNode = refNode.appendList("source");

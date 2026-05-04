@@ -61,7 +61,7 @@ public:
   BI_Via() = delete;
   BI_Via(const BI_Via& other) = delete;
   BI_Via(BI_NetSegment& netsegment, const Via& via);
-  ~BI_Via() noexcept;
+  ~BI_Via() noexcept override;
 
   // Getters
   BI_NetSegment& getNetSegment() const noexcept { return mNetSegment; }

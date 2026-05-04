@@ -59,7 +59,7 @@ class GraphicsExportWidget final : public QWidget {
     PageItem() = delete;
     PageItem(bool showPageNumber, bool showResolution, int number) noexcept;
     PageItem(const PageItem& other) = delete;
-    ~PageItem() noexcept;
+    ~PageItem() noexcept override;
 
     // General Methods
     void setContent(const QSize& pageSize, const QRectF margins,
@@ -88,7 +88,7 @@ public:
   // Constructors / Destructor
   GraphicsExportWidget(const GraphicsExportWidget& other) = delete;
   explicit GraphicsExportWidget(QWidget* parent = nullptr) noexcept;
-  ~GraphicsExportWidget() noexcept;
+  ~GraphicsExportWidget() noexcept override;
 
   // General Methods
   void setShowPageNumbers(bool show) noexcept;

@@ -57,7 +57,7 @@ public:
   CmdDragSelectedSymbolItems(const CmdDragSelectedSymbolItems& other) = delete;
   explicit CmdDragSelectedSymbolItems(SymbolGraphicsItem& item,
                                       const PositiveLength& grid) noexcept;
-  ~CmdDragSelectedSymbolItems() noexcept;
+  ~CmdDragSelectedSymbolItems() noexcept override;
 
   // Getters
   int getSelectedItemsCount() const noexcept;

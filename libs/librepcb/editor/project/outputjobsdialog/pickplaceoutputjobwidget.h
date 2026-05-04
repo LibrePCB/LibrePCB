@@ -59,7 +59,7 @@ public:
   explicit PickPlaceOutputJobWidget(Project& project,
                                     std::shared_ptr<PickPlaceOutputJob> job,
                                     QWidget* parent = nullptr) noexcept;
-  ~PickPlaceOutputJobWidget() noexcept;
+  ~PickPlaceOutputJobWidget() noexcept override;
 
   // Operator Overloads
   PickPlaceOutputJobWidget& operator=(const PickPlaceOutputJobWidget& rhs) =

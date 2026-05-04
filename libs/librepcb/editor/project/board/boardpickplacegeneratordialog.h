@@ -65,7 +65,7 @@ public:
   explicit BoardPickPlaceGeneratorDialog(const WorkspaceSettings& settings,
                                          Board& board,
                                          QWidget* parent = nullptr);
-  ~BoardPickPlaceGeneratorDialog();
+  ~BoardPickPlaceGeneratorDialog() override;
 
 private:  // Methods
   void setFileExtension(const QString& extension) noexcept;

@@ -63,13 +63,13 @@ public:
   explicit PartInformationDelegate(bool fillCell,
                                    QObject* parent = nullptr) noexcept;
   PartInformationDelegate(const PartInformationDelegate& other) = delete;
-  ~PartInformationDelegate() noexcept;
+  ~PartInformationDelegate() noexcept override;
 
   // Inherited from QStyledItemDelegate
-  virtual QSize sizeHint(const QStyleOptionViewItem& option,
-                         const QModelIndex& index) const noexcept override;
-  virtual void paint(QPainter* painter, const QStyleOptionViewItem& option,
-                     const QModelIndex& index) const override;
+  QSize sizeHint(const QStyleOptionViewItem& option,
+                 const QModelIndex& index) const noexcept override;
+  void paint(QPainter* painter, const QStyleOptionViewItem& option,
+             const QModelIndex& index) const override;
 
   // Operator Overloadings
   PartInformationDelegate& operator=(const PartInformationDelegate& rhs) =

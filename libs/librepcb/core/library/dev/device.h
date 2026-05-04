@@ -63,7 +63,7 @@ public:
          const QDateTime& created, const ElementName& name_en_US,
          const QString& description_en_US, const QString& keywords_en_US,
          const Uuid& component, const Uuid& package);
-  ~Device() noexcept;
+  ~Device() noexcept override;
 
   // Getters
   const Uuid& getComponentUuid() const noexcept { return mComponentUuid; }
@@ -83,7 +83,7 @@ public:
 
   // General Methods
   void duplicateFrom(const Device& other);
-  virtual RuleCheckMessageList runChecks() const override;
+  RuleCheckMessageList runChecks() const override;
 
   // Operator Overloadings
   Device& operator=(const Device& rhs) = delete;
@@ -104,7 +104,7 @@ signals:
   void packageUuidChanged(const Uuid& uuid);
 
 protected:  // Methods
-  virtual void serialize(SExpression& root) const override;
+  void serialize(SExpression& root) const override;
 
 private:  // Methods
   Device(std::unique_ptr<TransactionalDirectory> directory,

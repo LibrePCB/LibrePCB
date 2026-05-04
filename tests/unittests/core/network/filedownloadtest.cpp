@@ -53,14 +53,14 @@ typedef struct {
  ******************************************************************************/
 
 class FileDownloadTest : public ::testing::TestWithParam<FileDownloadTestData> {
-protected:
+public:
   FilePath mTmpDir;
   NetworkRequestBaseSignalReceiver mSignalReceiver;
   static NetworkAccessManager* sDownloadManager;
 
   FileDownloadTest() : mTmpDir(FilePath::getRandomTempPath()) {}
 
-  ~FileDownloadTest() { QDir(mTmpDir.toStr()).removeRecursively(); }
+  ~FileDownloadTest() override { QDir(mTmpDir.toStr()).removeRecursively(); }
 
   FilePath getDestination(const FileDownloadTestData& data) {
     return mTmpDir.getPathTo(data.destFilename);
@@ -132,7 +132,7 @@ TEST_P(FileDownloadTest, testDownload) {
   QObject::connect(dl, &FileDownload::zipFileExtracted, &mSignalReceiver,
                    &NetworkRequestBaseSignalReceiver::zipFileExtracted);
   QObject::connect(dl, &FileDownload::destroyed, &mSignalReceiver,
-                   &NetworkRequestBaseSignalReceiver::destroyed);
+                   &NetworkRequestBaseSignalReceiver::objectDestroyed);
   dl->start();
 
   // wait until download finished (with timeout)

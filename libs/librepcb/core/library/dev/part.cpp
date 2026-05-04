@@ -91,9 +91,8 @@ QStringList Part::getAttributeValuesTr() const noexcept {
 QStringList Part::getAttributeKeyValuesTr() const noexcept {
   QStringList result;
   for (const Attribute& attribute : mAttributes) {
-    result.append(QString("%1=%2")
-                      .arg(*attribute.getKey())
-                      .arg(attribute.getValueTr(true)));
+    result.append(
+        QString("%1=%2").arg(*attribute.getKey(), attribute.getValueTr(true)));
   }
   return result;
 }

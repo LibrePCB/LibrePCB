@@ -41,8 +41,8 @@ namespace editor {
  ******************************************************************************/
 
 CmdDeviceInstanceEditAll::CmdDeviceInstanceEditAll(BI_Device& dev) noexcept
-  : UndoCommandGroup(tr("Edit device instance")), mDevEditCmd(nullptr) {
-  mDevEditCmd = new CmdDeviceInstanceEdit(dev);
+  : UndoCommandGroup(tr("Edit device instance")),
+    mDevEditCmd(new CmdDeviceInstanceEdit(dev)) {
   appendChild(mDevEditCmd);
 
   foreach (BI_StrokeText* text, dev.getStrokeTexts()) {

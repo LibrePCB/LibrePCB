@@ -78,7 +78,7 @@ public:
   explicit CategoryTreeModelLegacy(const WorkspaceLibraryDb& library,
                                    const QStringList& localeOrder,
                                    Filters filters) noexcept;
-  ~CategoryTreeModelLegacy() noexcept;
+  ~CategoryTreeModelLegacy() noexcept override;
 
   // Setters
   void setLocaleOrder(const QStringList& order) noexcept;

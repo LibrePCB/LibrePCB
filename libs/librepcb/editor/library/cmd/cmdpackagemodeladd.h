@@ -55,7 +55,7 @@ public:
   CmdPackageModelAdd(Package& pkg, std::shared_ptr<PackageModel> model,
                      const QByteArray& fileContent,
                      bool addToFootprints) noexcept;
-  ~CmdPackageModelAdd() noexcept;
+  ~CmdPackageModelAdd() noexcept override;
 
   // Operator Overloadings
   CmdPackageModelAdd& operator=(const CmdPackageModelAdd& rhs) = delete;

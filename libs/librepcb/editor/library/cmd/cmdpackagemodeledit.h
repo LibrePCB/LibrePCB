@@ -51,7 +51,7 @@ public:
   CmdPackageModelEdit() = delete;
   CmdPackageModelEdit(const CmdPackageModelEdit& other) = delete;
   explicit CmdPackageModelEdit(Package& package, PackageModel& model) noexcept;
-  virtual ~CmdPackageModelEdit() noexcept;
+  ~CmdPackageModelEdit() noexcept override;
 
   // Setters
   void setName(const ElementName& name) noexcept;
@@ -62,13 +62,13 @@ public:
 
 protected:  // Methods
   /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
-  virtual bool performExecute() override;
+  bool performExecute() override;
 
   /// @copydoc ::librepcb::editor::UndoCommand::performUndo()
-  virtual void performUndo() override;
+  void performUndo() override;
 
   /// @copydoc ::librepcb::editor::UndoCommand::performRedo()
-  virtual void performRedo() override;
+  void performRedo() override;
 
 private:  // Data
   Package& mPackage;

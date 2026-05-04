@@ -51,7 +51,7 @@ public:
   // Constructors / Destructor
   explicit UnsignedRatioEdit(QWidget* parent = nullptr) noexcept;
   UnsignedRatioEdit(const UnsignedRatioEdit& other) = delete;
-  virtual ~UnsignedRatioEdit() noexcept;
+  ~UnsignedRatioEdit() noexcept override;
 
   // Getters
   const UnsignedRatio& getValue() const noexcept { return mValue; }

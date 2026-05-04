@@ -48,7 +48,7 @@ class CmdBoardPolygonRemove final : public UndoCommand {
 public:
   // Constructors / Destructor
   explicit CmdBoardPolygonRemove(BI_Polygon& polygon) noexcept;
-  ~CmdBoardPolygonRemove() noexcept;
+  ~CmdBoardPolygonRemove() noexcept override;
 
 private:
   // Private Methods

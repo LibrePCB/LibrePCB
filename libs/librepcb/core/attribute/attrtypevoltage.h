@@ -44,10 +44,11 @@ public:
   // Constructors / Destructor
   AttrTypeVoltage(const AttrTypeVoltage& other) = delete;
 
-  bool isValueValid(const QString& value) const noexcept;
-  QString valueFromTr(const QString& value) const noexcept;
-  QString printableValueTr(const QString& value,
-                           const AttributeUnit* unit = nullptr) const noexcept;
+  bool isValueValid(const QString& value) const noexcept override;
+  QString valueFromTr(const QString& value) const noexcept override;
+  QString printableValueTr(
+      const QString& value,
+      const AttributeUnit* unit = nullptr) const noexcept override;
   static const AttrTypeVoltage& instance() noexcept {
     static AttrTypeVoltage x;
     return x;
@@ -59,7 +60,7 @@ public:
 private:
   // Constructors / Destructor
   AttrTypeVoltage() noexcept;
-  ~AttrTypeVoltage() noexcept;
+  ~AttrTypeVoltage() noexcept override;
 };
 
 /*******************************************************************************

@@ -58,7 +58,7 @@ public:
   OutputJobListWidgetItem(const OutputJobListWidgetItem& other) = delete;
   explicit OutputJobListWidgetItem(std::shared_ptr<OutputJob> job,
                                    QWidget* parent = nullptr) noexcept;
-  ~OutputJobListWidgetItem() noexcept;
+  ~OutputJobListWidgetItem() noexcept override;
 
   // Getters
   QString getTitle() const noexcept;

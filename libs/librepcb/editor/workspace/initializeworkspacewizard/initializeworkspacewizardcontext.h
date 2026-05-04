@@ -64,7 +64,7 @@ public:
       const InitializeWorkspaceWizardContext& other) = delete;
   explicit InitializeWorkspaceWizardContext(const UiTheme& theme,
                                             QObject* parent = nullptr) noexcept;
-  ~InitializeWorkspaceWizardContext() noexcept;
+  ~InitializeWorkspaceWizardContext() noexcept override;
 
   // Getters
   const UiTheme& getTheme() const noexcept { return mTheme; }

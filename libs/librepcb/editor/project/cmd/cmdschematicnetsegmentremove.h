@@ -48,7 +48,7 @@ class CmdSchematicNetSegmentRemove final : public UndoCommand {
 public:
   // Constructors / Destructor
   explicit CmdSchematicNetSegmentRemove(SI_NetSegment& segment) noexcept;
-  ~CmdSchematicNetSegmentRemove() noexcept;
+  ~CmdSchematicNetSegmentRemove() noexcept override;
 
 private:
   // Private Methods

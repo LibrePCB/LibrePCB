@@ -54,10 +54,11 @@ class InitializeWorkspaceWizard_Upgrade final : public QWizardPage {
 public:
   // Constructors / Destructor
   explicit InitializeWorkspaceWizard_Upgrade(
-      InitializeWorkspaceWizardContext& context, QWidget* parent = 0) noexcept;
+      InitializeWorkspaceWizardContext& context,
+      QWidget* parent = nullptr) noexcept;
   InitializeWorkspaceWizard_Upgrade(
       const InitializeWorkspaceWizard_Upgrade& other) = delete;
-  ~InitializeWorkspaceWizard_Upgrade() noexcept;
+  ~InitializeWorkspaceWizard_Upgrade() noexcept override;
 
   // Inherited from QWizardPage
   void initializePage() noexcept override;

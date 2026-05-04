@@ -62,7 +62,7 @@ FileSystemModel::FileSystemModel(const Workspace& ws, const FilePath& root,
 
   // Restore expanded directories.
   QSettings cs;
-  for (const QString& path :
+  for (const QString& path :  // NOLINT
        cs.value(mSettingsPrefix % "/expanded").toStringList()) {
     const FilePath fp = mRoot.getPathTo(path);
     if (fp.isValid()) {
@@ -86,7 +86,7 @@ FileSystemModel::~FileSystemModel() noexcept {
   // Save expanded directories.
   QSettings cs;
   QStringList paths;
-  for (const FilePath& fp : mExpandedDirs) {
+  for (const FilePath& fp : std::as_const(mExpandedDirs)) {
     paths.append(fp.toRelative(mRoot));
   }
   std::sort(paths.begin(), paths.end());
@@ -211,7 +211,7 @@ void FileSystemModel::expandDir(const FilePath& fp, std::size_t index,
 
 void FileSystemModel::collapseDir(const FilePath& fp, std::size_t index,
                                   int level) noexcept {
-  for (const QString& dir : mWatcher.directories()) {
+  for (const QString& dir : mWatcher.directories()) {  // NOLINT
     const FilePath dirFp(dir);
     if ((dirFp == fp) || dirFp.isLocatedInDir(fp)) {
       if (!mWatcher.removePath(dir)) {

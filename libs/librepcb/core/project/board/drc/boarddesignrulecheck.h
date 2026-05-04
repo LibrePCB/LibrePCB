@@ -70,7 +70,7 @@ public:
 
   // Constructors / Destructor
   explicit BoardDesignRuleCheck(QObject* parent = nullptr) noexcept;
-  ~BoardDesignRuleCheck() noexcept;
+  ~BoardDesignRuleCheck() noexcept override;
 
   // General Methods
   void start(Board& board, const BoardDesignRuleCheckSettings& settings,

@@ -171,6 +171,7 @@ TextList SI_Symbol::getDefaultTexts() const noexcept {
 }
 
 void SI_Symbol::addText(SI_Text& text) {
+  // NOLINTNEXTLINE
   if ((mTexts.values().contains(&text)) ||
       (&text.getSchematic() != &mSchematic)) {
     throw LogicError(__FILE__, __LINE__);

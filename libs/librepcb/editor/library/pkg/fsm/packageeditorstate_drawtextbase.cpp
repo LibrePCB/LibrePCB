@@ -31,6 +31,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -211,7 +213,7 @@ void PackageEditorState_DrawTextBase::setText(const QString& text) noexcept {
   }
 }
 
-QStringList PackageEditorState_DrawTextBase::getTextSuggestions()
+const QStringList PackageEditorState_DrawTextBase::getTextSuggestions()
     const noexcept {
   if (mMode == Mode::TEXT) {
     return {
@@ -288,7 +290,7 @@ bool PackageEditorState_DrawTextBase::startAddText(const Point& pos) noexcept {
         std::make_shared<StrokeText>(Uuid::createRandom(), mCurrentProperties);
     mContext.undoStack.appendToCmdGroup(new CmdStrokeTextInsert(
         mContext.currentFootprint->getStrokeTexts(), mCurrentText));
-    mCurrentEditCmd.reset(new CmdStrokeTextEdit(*mCurrentText));
+    mCurrentEditCmd = std::make_unique<CmdStrokeTextEdit>(*mCurrentText);
     mCurrentGraphicsItem =
         mContext.currentGraphicsItem->getGraphicsItem(mCurrentText);
     Q_ASSERT(mCurrentGraphicsItem);

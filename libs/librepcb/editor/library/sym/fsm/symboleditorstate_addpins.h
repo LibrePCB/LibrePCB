@@ -55,7 +55,7 @@ public:
   SymbolEditorState_AddPins() = delete;
   SymbolEditorState_AddPins(const SymbolEditorState_AddPins& other) = delete;
   explicit SymbolEditorState_AddPins(const Context& context) noexcept;
-  ~SymbolEditorState_AddPins() noexcept;
+  ~SymbolEditorState_AddPins() noexcept override;
 
   // General Methods
   bool entry() noexcept override;

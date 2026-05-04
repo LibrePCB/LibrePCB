@@ -43,6 +43,9 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
+
+class Library;
+
 namespace editor {
 
 static AutoUpdateMode getUpdateMode(const Workspace& ws) noexcept {

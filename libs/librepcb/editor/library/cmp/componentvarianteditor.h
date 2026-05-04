@@ -66,7 +66,7 @@ public:
       const std::shared_ptr<ComponentSignalNameListModel>& sigs,
       std::shared_ptr<ComponentSymbolVariant> variant, UndoStack* stack,
       const bool* wizardMode, QObject* parent = nullptr) noexcept;
-  ~ComponentVariantEditor() noexcept;
+  ~ComponentVariantEditor() noexcept override;
 
   // General Methods
   ui::ComponentVariantData getUiData() const;

@@ -53,7 +53,7 @@ public:
   CheckableItemsEditorWidget() = delete;
   explicit CheckableItemsEditorWidget(QWidget* parent = nullptr) noexcept;
   CheckableItemsEditorWidget(const CheckableItemsEditorWidget& other) = delete;
-  ~CheckableItemsEditorWidget() noexcept;
+  ~CheckableItemsEditorWidget() noexcept override;
 
   // General Methods
   const ItemList& getItems() const noexcept { return mItems; }

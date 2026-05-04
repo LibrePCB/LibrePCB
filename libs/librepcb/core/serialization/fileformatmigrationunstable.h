@@ -55,28 +55,26 @@ public:
   explicit FileFormatMigrationUnstable(QObject* parent = nullptr) noexcept;
   FileFormatMigrationUnstable(const FileFormatMigrationUnstable& other) =
       delete;
-  ~FileFormatMigrationUnstable() noexcept;
+  ~FileFormatMigrationUnstable() noexcept override;
 
   // General Methods
-  virtual void upgradeComponentCategory(TransactionalDirectory& dir) override;
-  virtual void upgradePackageCategory(TransactionalDirectory& dir) override;
-  virtual void upgradeSymbol(TransactionalDirectory& dir) override;
-  virtual void upgradePackage(TransactionalDirectory& dir) override;
-  virtual void upgradeComponent(TransactionalDirectory& dir) override;
-  virtual void upgradeDevice(TransactionalDirectory& dir) override;
-  virtual void upgradeLibrary(TransactionalDirectory& dir) override;
-  virtual void upgradeWorkspaceData(TransactionalDirectory& dir) override;
+  void upgradeComponentCategory(TransactionalDirectory& dir) override;
+  void upgradePackageCategory(TransactionalDirectory& dir) override;
+  void upgradeSymbol(TransactionalDirectory& dir) override;
+  void upgradePackage(TransactionalDirectory& dir) override;
+  void upgradeComponent(TransactionalDirectory& dir) override;
+  void upgradeDevice(TransactionalDirectory& dir) override;
+  void upgradeLibrary(TransactionalDirectory& dir) override;
+  void upgradeWorkspaceData(TransactionalDirectory& dir) override;
 
   // Operator Overloadings
   FileFormatMigrationUnstable& operator=(
       const FileFormatMigrationUnstable& rhs) = delete;
 
 protected:
-  virtual void upgradeOutputJobs(SExpression& root,
-                                 ProjectContext& context) override;
-  virtual void upgradeCircuit(SExpression& root,
-                              QList<Message>& messages) override;
-  virtual void upgradeBoard(SExpression& root) override;
+  void upgradeOutputJobs(SExpression& root, ProjectContext& context) override;
+  void upgradeCircuit(SExpression& root, QList<Message>& messages) override;
+  void upgradeBoard(SExpression& root) override;
 };
 
 /*******************************************************************************

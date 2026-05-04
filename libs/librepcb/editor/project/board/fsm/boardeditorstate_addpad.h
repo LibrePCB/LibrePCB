@@ -60,26 +60,26 @@ public:
   BoardEditorState_AddPad(const BoardEditorState_AddPad& other) = delete;
   explicit BoardEditorState_AddPad(const Context& context, PadType type,
                                    Pad::Function function) noexcept;
-  virtual ~BoardEditorState_AddPad() noexcept;
+  ~BoardEditorState_AddPad() noexcept override;
 
   // General Methods
-  virtual bool entry() noexcept override;
-  virtual bool exit() noexcept override;
+  bool entry() noexcept override;
+  bool exit() noexcept override;
 
   // Event Handlers
-  virtual bool processGraphicsSceneMouseMoved(
+  bool processGraphicsSceneMouseMoved(
       const GraphicsSceneMouseEvent& e) noexcept override;
-  virtual bool processGraphicsSceneLeftMouseButtonPressed(
+  bool processGraphicsSceneLeftMouseButtonPressed(
       const GraphicsSceneMouseEvent& e) noexcept override;
-  virtual bool processGraphicsSceneLeftMouseButtonDoubleClicked(
+  bool processGraphicsSceneLeftMouseButtonDoubleClicked(
       const GraphicsSceneMouseEvent& e) noexcept override;
-  virtual bool processGraphicsSceneRightMouseButtonReleased(
+  bool processGraphicsSceneRightMouseButtonReleased(
       const GraphicsSceneMouseEvent& e) noexcept override;
-  virtual bool processRotate(const Angle& rotation) noexcept override;
+  bool processRotate(const Angle& rotation) noexcept override;
 
   // Connection to UI
   PadType getType() const noexcept { return mPadType; }
-  QVector<std::pair<Uuid, QString>> getAvailableNets() const noexcept;
+  const QVector<std::pair<Uuid, QString> > getAvailableNets() const noexcept;
   std::optional<Uuid> getNet() const noexcept { return mCurrentNetSignal; }
   void setNet(const std::optional<Uuid>& net) noexcept;
   Pad::ComponentSide getComponentSide() const noexcept {

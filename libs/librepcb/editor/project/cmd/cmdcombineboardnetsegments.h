@@ -54,7 +54,7 @@ public:
   CmdCombineBoardNetSegments(BI_NetSegment& toBeRemoved,
                              BI_NetLineAnchor& oldAnchor, BI_NetSegment& result,
                              BI_NetLineAnchor& newAnchor) noexcept;
-  ~CmdCombineBoardNetSegments() noexcept;
+  ~CmdCombineBoardNetSegments() noexcept override;
 
   // Operator Overloadings
   CmdCombineBoardNetSegments& operator=(const CmdCombineBoardNetSegments& rhs) =

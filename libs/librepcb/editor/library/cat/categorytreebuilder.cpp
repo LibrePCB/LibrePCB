@@ -56,7 +56,7 @@ CategoryTreeBuilder<ElementType>::~CategoryTreeBuilder() noexcept {
  ******************************************************************************/
 
 template <typename ElementType>
-QStringList CategoryTreeBuilder<ElementType>::buildTree(
+const QStringList CategoryTreeBuilder<ElementType>::buildTree(
     const std::optional<Uuid>& category, bool* success) const {
   QStringList names;
   QSet<FilePath> paths;

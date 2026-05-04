@@ -72,7 +72,7 @@ public:
       mSchematic() {}
   ErcMsgBase(const ErcMsgBase& other) noexcept
     : RuleCheckMessage(other), mSchematic(other.mSchematic) {}
-  virtual ~ErcMsgBase() noexcept {}
+  ~ErcMsgBase() noexcept override {}
 
   // Getters
   const std::optional<Uuid>& getSchematic() const noexcept {
@@ -109,7 +109,7 @@ public:
   explicit ErcMsgUnusedNetClass(const NetClass& netClass) noexcept;
   ErcMsgUnusedNetClass(const ErcMsgUnusedNetClass& other) noexcept
     : ErcMsgBase(other) {}
-  virtual ~ErcMsgUnusedNetClass() noexcept {}
+  ~ErcMsgUnusedNetClass() noexcept override {}
 };
 
 /*******************************************************************************
@@ -127,7 +127,7 @@ public:
   ErcMsgUnusedBus() = delete;
   explicit ErcMsgUnusedBus(const Bus& bus) noexcept;
   ErcMsgUnusedBus(const ErcMsgUnusedBus& other) noexcept : ErcMsgBase(other) {}
-  virtual ~ErcMsgUnusedBus() noexcept {}
+  ~ErcMsgUnusedBus() noexcept override {}
 };
 
 /*******************************************************************************
@@ -145,7 +145,7 @@ public:
   ErcMsgOpenNet() = delete;
   explicit ErcMsgOpenNet(const NetSignal& net) noexcept;
   ErcMsgOpenNet(const ErcMsgOpenNet& other) noexcept : ErcMsgBase(other) {}
-  virtual ~ErcMsgOpenNet() noexcept {}
+  ~ErcMsgOpenNet() noexcept override {}
 };
 
 /*******************************************************************************
@@ -165,7 +165,7 @@ public:
                               const SI_NetSegment& netSegment) noexcept;
   ErcMsgOpenNetInBus(const ErcMsgOpenNetInBus& other) noexcept
     : ErcMsgBase(other) {}
-  virtual ~ErcMsgOpenNetInBus() noexcept {}
+  ~ErcMsgOpenNetInBus() noexcept override {}
 };
 
 /*******************************************************************************
@@ -185,7 +185,7 @@ public:
                                  const SI_NetSegment& netSegment) noexcept;
   ErcMsgUnnamedNetInBus(const ErcMsgUnnamedNetInBus& other) noexcept
     : ErcMsgBase(other) {}
-  virtual ~ErcMsgUnnamedNetInBus() noexcept {}
+  ~ErcMsgUnnamedNetInBus() noexcept override {}
 };
 
 /*******************************************************************************
@@ -205,7 +205,7 @@ public:
                                    const SI_NetLine& openWire) noexcept;
   ErcMsgOpenWireInSegment(const ErcMsgOpenWireInSegment& other) noexcept
     : ErcMsgBase(other) {}
-  virtual ~ErcMsgOpenWireInSegment() noexcept {}
+  ~ErcMsgOpenWireInSegment() noexcept override {}
 };
 
 /*******************************************************************************
@@ -226,7 +226,7 @@ public:
   ErcMsgUnconnectedRequiredSignal(
       const ErcMsgUnconnectedRequiredSignal& other) noexcept
     : ErcMsgBase(other) {}
-  virtual ~ErcMsgUnconnectedRequiredSignal() noexcept {}
+  ~ErcMsgUnconnectedRequiredSignal() noexcept override {}
 };
 
 /*******************************************************************************
@@ -247,7 +247,7 @@ public:
   ErcMsgForcedNetSignalNameConflict(
       const ErcMsgForcedNetSignalNameConflict& other) noexcept
     : ErcMsgBase(other) {}
-  virtual ~ErcMsgForcedNetSignalNameConflict() noexcept {}
+  ~ErcMsgForcedNetSignalNameConflict() noexcept override {}
 
 private:
   static QString getSignalNet(const ComponentSignalInstance& signal) noexcept;
@@ -271,7 +271,7 @@ public:
       const ComponentSymbolVariantItem& gate) noexcept;
   ErcMsgUnplacedRequiredGate(const ErcMsgUnplacedRequiredGate& other) noexcept
     : ErcMsgBase(other) {}
-  virtual ~ErcMsgUnplacedRequiredGate() noexcept {}
+  ~ErcMsgUnplacedRequiredGate() noexcept override {}
 };
 
 /*******************************************************************************
@@ -292,7 +292,7 @@ public:
       const ComponentSymbolVariantItem& gate) noexcept;
   ErcMsgUnplacedOptionalGate(const ErcMsgUnplacedOptionalGate& other) noexcept
     : ErcMsgBase(other) {}
-  virtual ~ErcMsgUnplacedOptionalGate() noexcept {}
+  ~ErcMsgUnplacedOptionalGate() noexcept override {}
 };
 
 /*******************************************************************************
@@ -312,7 +312,7 @@ public:
   ErcMsgConnectedPinWithoutWire(
       const ErcMsgConnectedPinWithoutWire& other) noexcept
     : ErcMsgBase(other) {}
-  virtual ~ErcMsgConnectedPinWithoutWire() noexcept {}
+  ~ErcMsgConnectedPinWithoutWire() noexcept override {}
 };
 
 /*******************************************************************************
@@ -332,7 +332,7 @@ public:
   explicit ErcMsgUnconnectedJunction(const SI_BusJunction& junction) noexcept;
   ErcMsgUnconnectedJunction(const ErcMsgUnconnectedJunction& other) noexcept
     : ErcMsgBase(other) {}
-  virtual ~ErcMsgUnconnectedJunction() noexcept {}
+  ~ErcMsgUnconnectedJunction() noexcept override {}
 };
 
 /*******************************************************************************

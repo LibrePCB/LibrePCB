@@ -50,23 +50,21 @@ public:
   BoardEditorState_Measure() = delete;
   BoardEditorState_Measure(const BoardEditorState_Measure& other) = delete;
   explicit BoardEditorState_Measure(const Context& context) noexcept;
-  virtual ~BoardEditorState_Measure() noexcept;
+  ~BoardEditorState_Measure() noexcept override;
 
   // General Methods
-  virtual bool entry() noexcept override;
-  virtual bool exit() noexcept override;
+  bool entry() noexcept override;
+  bool exit() noexcept override;
 
   // Event Handlers
-  virtual bool processCopy() noexcept override;
-  virtual bool processRemove() noexcept override;
-  virtual bool processAbortCommand() noexcept override;
-  virtual bool processKeyPressed(
-      const GraphicsSceneKeyEvent& e) noexcept override;
-  virtual bool processKeyReleased(
-      const GraphicsSceneKeyEvent& e) noexcept override;
-  virtual bool processGraphicsSceneMouseMoved(
+  bool processCopy() noexcept override;
+  bool processRemove() noexcept override;
+  bool processAbortCommand() noexcept override;
+  bool processKeyPressed(const GraphicsSceneKeyEvent& e) noexcept override;
+  bool processKeyReleased(const GraphicsSceneKeyEvent& e) noexcept override;
+  bool processGraphicsSceneMouseMoved(
       const GraphicsSceneMouseEvent& e) noexcept override;
-  virtual bool processGraphicsSceneLeftMouseButtonPressed(
+  bool processGraphicsSceneLeftMouseButtonPressed(
       const GraphicsSceneMouseEvent& e) noexcept override;
 
   // Operator Overloadings

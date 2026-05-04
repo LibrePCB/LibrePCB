@@ -50,7 +50,7 @@ public:
   CmdSchematicPolygonAdd() = delete;
   CmdSchematicPolygonAdd(const CmdSchematicPolygonAdd& other) = delete;
   explicit CmdSchematicPolygonAdd(SI_Polygon& polygon) noexcept;
-  ~CmdSchematicPolygonAdd() noexcept;
+  ~CmdSchematicPolygonAdd() noexcept override;
 
   // Operator Overloadings
   CmdSchematicPolygonAdd& operator=(const CmdSchematicPolygonAdd& rhs) = delete;

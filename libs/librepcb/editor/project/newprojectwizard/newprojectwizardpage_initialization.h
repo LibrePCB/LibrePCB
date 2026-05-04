@@ -53,7 +53,7 @@ public:
       QWidget* parent = nullptr) noexcept;
   NewProjectWizardPage_Initialization(
       const NewProjectWizardPage_Initialization& other) = delete;
-  ~NewProjectWizardPage_Initialization() noexcept;
+  ~NewProjectWizardPage_Initialization() noexcept override;
 
   // Getters
   bool getCreateSchematic() const noexcept;

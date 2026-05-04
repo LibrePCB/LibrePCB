@@ -48,7 +48,7 @@ class CmdSchematicBusLabelAdd final : public UndoCommand {
 public:
   // Constructors / Destructor
   explicit CmdSchematicBusLabelAdd(SI_BusLabel& label) noexcept;
-  ~CmdSchematicBusLabelAdd() noexcept;
+  ~CmdSchematicBusLabelAdd() noexcept override;
 
 private:
   // Private Methods

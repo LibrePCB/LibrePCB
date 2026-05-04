@@ -51,7 +51,7 @@ public:
   CmdComponentSignalEdit() = delete;
   CmdComponentSignalEdit(const CmdComponentSignalEdit& other) = delete;
   explicit CmdComponentSignalEdit(ComponentSignal& signal) noexcept;
-  ~CmdComponentSignalEdit() noexcept;
+  ~CmdComponentSignalEdit() noexcept override;
 
   // Setters
   void setName(const CircuitIdentifier& name) noexcept;

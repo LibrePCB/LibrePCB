@@ -124,7 +124,7 @@ public:
   DrcMsgMissingDevice(const Uuid& uuid, const QString& name) noexcept;
   DrcMsgMissingDevice(const DrcMsgMissingDevice& other) noexcept
     : RuleCheckMessage(other) {}
-  virtual ~DrcMsgMissingDevice() noexcept {}
+  ~DrcMsgMissingDevice() noexcept override {}
 };
 
 /*******************************************************************************
@@ -187,7 +187,7 @@ public:
                           const QVector<Path>& locations);
   DrcMsgMissingConnection(const DrcMsgMissingConnection& other) noexcept
     : RuleCheckMessage(other) {}
-  virtual ~DrcMsgMissingConnection() noexcept {}
+  ~DrcMsgMissingConnection() noexcept override {}
 };
 
 /*******************************************************************************
@@ -210,7 +210,7 @@ public:
                              const QVector<Path>& locations);
   DrcMsgImpossibleConnection(const DrcMsgImpossibleConnection& other) noexcept
     : RuleCheckMessage(other) {}
-  virtual ~DrcMsgImpossibleConnection() noexcept {}
+  ~DrcMsgImpossibleConnection() noexcept override {}
 };
 
 /*******************************************************************************
@@ -228,7 +228,7 @@ public:
   DrcMsgMissingBoardOutline() noexcept;
   DrcMsgMissingBoardOutline(const DrcMsgMissingBoardOutline& other) noexcept
     : RuleCheckMessage(other) {}
-  virtual ~DrcMsgMissingBoardOutline() noexcept {}
+  ~DrcMsgMissingBoardOutline() noexcept override {}
 };
 
 /*******************************************************************************
@@ -246,7 +246,7 @@ public:
   explicit DrcMsgMultipleBoardOutlines(const QVector<Path>& locations) noexcept;
   DrcMsgMultipleBoardOutlines(const DrcMsgMultipleBoardOutlines& other) noexcept
     : RuleCheckMessage(other) {}
-  virtual ~DrcMsgMultipleBoardOutlines() noexcept {}
+  ~DrcMsgMultipleBoardOutlines() noexcept override {}
 };
 
 /*******************************************************************************
@@ -268,7 +268,7 @@ public:
   DrcMsgOpenBoardOutlinePolygon(
       const DrcMsgOpenBoardOutlinePolygon& other) noexcept
     : RuleCheckMessage(other) {}
-  virtual ~DrcMsgOpenBoardOutlinePolygon() noexcept {}
+  ~DrcMsgOpenBoardOutlinePolygon() noexcept override {}
 };
 
 /*******************************************************************************
@@ -290,7 +290,7 @@ public:
   DrcMsgMinimumBoardOutlineInnerRadiusViolation(
       const DrcMsgMinimumBoardOutlineInnerRadiusViolation& other) noexcept
     : RuleCheckMessage(other) {}
-  virtual ~DrcMsgMinimumBoardOutlineInnerRadiusViolation() noexcept {}
+  ~DrcMsgMinimumBoardOutlineInnerRadiusViolation() noexcept override {}
 };
 
 /*******************************************************************************
@@ -308,7 +308,7 @@ public:
   explicit DrcMsgPlatedCutouts(const QVector<Path>& locations) noexcept;
   DrcMsgPlatedCutouts(const DrcMsgPlatedCutouts& other) noexcept
     : RuleCheckMessage(other) {}
-  virtual ~DrcMsgPlatedCutouts() noexcept {}
+  ~DrcMsgPlatedCutouts() noexcept override {}
 };
 
 /*******************************************************************************
@@ -335,7 +335,7 @@ public:
   DrcMsgPlatedCutoutWithoutCopper(
       const DrcMsgPlatedCutoutWithoutCopper& other) noexcept
     : RuleCheckMessage(other) {}
-  virtual ~DrcMsgPlatedCutoutWithoutCopper() noexcept {}
+  ~DrcMsgPlatedCutoutWithoutCopper() noexcept override {}
 
 private:
   static QString determineMessage() noexcept;
@@ -366,7 +366,7 @@ public:
   DrcMsgNonPlatedCutoutWithCopper(
       const DrcMsgNonPlatedCutoutWithCopper& other) noexcept
     : RuleCheckMessage(other) {}
-  virtual ~DrcMsgNonPlatedCutoutWithCopper() noexcept {}
+  ~DrcMsgNonPlatedCutoutWithCopper() noexcept override {}
 
 private:
   static QString determineMessage() noexcept;
@@ -391,7 +391,7 @@ public:
   explicit DrcMsgEmptyNetSegment(const Data::Segment& ns) noexcept;
   DrcMsgEmptyNetSegment(const DrcMsgEmptyNetSegment& other) noexcept
     : RuleCheckMessage(other), mUuid(other.mUuid) {}
-  virtual ~DrcMsgEmptyNetSegment() noexcept {}
+  ~DrcMsgEmptyNetSegment() noexcept override {}
 
   const Uuid& getUuid() const noexcept { return mUuid; }
 
@@ -419,7 +419,7 @@ public:
                             const QVector<Path>& locations) noexcept;
   DrcMsgUnconnectedJunction(const DrcMsgUnconnectedJunction& other) noexcept
     : RuleCheckMessage(other) {}
-  virtual ~DrcMsgUnconnectedJunction() noexcept {}
+  ~DrcMsgUnconnectedJunction() noexcept override {}
 };
 
 /*******************************************************************************
@@ -444,7 +444,7 @@ public:
   DrcMsgMinimumTextHeightViolation(
       const DrcMsgMinimumTextHeightViolation& other) noexcept
     : RuleCheckMessage(other) {}
-  virtual ~DrcMsgMinimumTextHeightViolation() noexcept {}
+  ~DrcMsgMinimumTextHeightViolation() noexcept override {}
 };
 
 /*******************************************************************************
@@ -486,7 +486,7 @@ public:
                               const QVector<Path>& locations) noexcept;
   DrcMsgMinimumWidthViolation(const DrcMsgMinimumWidthViolation& other) noexcept
     : RuleCheckMessage(other) {}
-  virtual ~DrcMsgMinimumWidthViolation() noexcept {}
+  ~DrcMsgMinimumWidthViolation() noexcept override {}
 };
 
 /*******************************************************************************
@@ -597,7 +597,7 @@ public:
   DrcMsgCopperCopperClearanceViolation(
       const DrcMsgCopperCopperClearanceViolation& other) noexcept
     : RuleCheckMessage(other) {}
-  virtual ~DrcMsgCopperCopperClearanceViolation() noexcept {}
+  ~DrcMsgCopperCopperClearanceViolation() noexcept override {}
 
 private:
   static QString getLayerName(const QSet<const Layer*>& layers);
@@ -652,7 +652,7 @@ public:
   DrcMsgCopperBoardClearanceViolation(
       const DrcMsgCopperBoardClearanceViolation& other) noexcept
     : RuleCheckMessage(other) {}
-  virtual ~DrcMsgCopperBoardClearanceViolation() noexcept {}
+  ~DrcMsgCopperBoardClearanceViolation() noexcept override {}
 
 private:
   static QString determineMessage(const Data::Pad& pad,
@@ -682,7 +682,7 @@ public:
   DrcMsgCopperHoleClearanceViolation(
       const DrcMsgCopperHoleClearanceViolation& other) noexcept
     : RuleCheckMessage(other) {}
-  virtual ~DrcMsgCopperHoleClearanceViolation() noexcept {}
+  ~DrcMsgCopperHoleClearanceViolation() noexcept override {}
 };
 
 /*******************************************************************************
@@ -732,7 +732,7 @@ public:
                             const QVector<Path>& locations) noexcept;
   DrcMsgCopperInKeepoutZone(const DrcMsgCopperInKeepoutZone& other) noexcept
     : RuleCheckMessage(other) {}
-  virtual ~DrcMsgCopperInKeepoutZone() noexcept {}
+  ~DrcMsgCopperInKeepoutZone() noexcept override {}
 
 private:
   void addZoneApprovalNodes(const Data::Zone& zone,
@@ -762,7 +762,7 @@ public:
   DrcMsgDrillDrillClearanceViolation(
       const DrcMsgDrillDrillClearanceViolation& other) noexcept
     : RuleCheckMessage(other) {}
-  virtual ~DrcMsgDrillDrillClearanceViolation() noexcept {}
+  ~DrcMsgDrillDrillClearanceViolation() noexcept override {}
 };
 
 /*******************************************************************************
@@ -784,7 +784,7 @@ public:
   DrcMsgDrillBoardClearanceViolation(
       const DrcMsgDrillBoardClearanceViolation& other) noexcept
     : RuleCheckMessage(other) {}
-  virtual ~DrcMsgDrillBoardClearanceViolation() noexcept {}
+  ~DrcMsgDrillBoardClearanceViolation() noexcept override {}
 };
 
 /*******************************************************************************
@@ -807,7 +807,7 @@ public:
                           const QVector<Path>& locations) noexcept;
   DrcMsgDeviceInCourtyard(const DrcMsgDeviceInCourtyard& other) noexcept
     : RuleCheckMessage(other) {}
-  virtual ~DrcMsgDeviceInCourtyard() noexcept {}
+  ~DrcMsgDeviceInCourtyard() noexcept override {}
 };
 
 /*******************************************************************************
@@ -830,7 +830,7 @@ public:
                            const QVector<Path>& locations) noexcept;
   DrcMsgOverlappingDevices(const DrcMsgOverlappingDevices& other) noexcept
     : RuleCheckMessage(other) {}
-  virtual ~DrcMsgOverlappingDevices() noexcept {}
+  ~DrcMsgOverlappingDevices() noexcept override {}
 };
 
 /*******************************************************************************
@@ -854,7 +854,7 @@ public:
                             const QVector<Path>& locations) noexcept;
   DrcMsgDeviceInKeepoutZone(const DrcMsgDeviceInKeepoutZone& other) noexcept
     : RuleCheckMessage(other) {}
-  virtual ~DrcMsgDeviceInKeepoutZone() noexcept {}
+  ~DrcMsgDeviceInKeepoutZone() noexcept override {}
 
 private:
   void addZoneApprovalNodes(const Data::Zone& zone,
@@ -905,7 +905,7 @@ public:
                               const QVector<Path>& locations) noexcept;
   DrcMsgExposureInKeepoutZone(const DrcMsgExposureInKeepoutZone& other) noexcept
     : RuleCheckMessage(other) {}
-  virtual ~DrcMsgExposureInKeepoutZone() noexcept {}
+  ~DrcMsgExposureInKeepoutZone() noexcept override {}
 
 private:
   void addZoneApprovalNodes(const Data::Zone& zone,
@@ -945,7 +945,7 @@ public:
   DrcMsgMinimumAnnularRingViolation(
       const DrcMsgMinimumAnnularRingViolation& other) noexcept
     : RuleCheckMessage(other) {}
-  virtual ~DrcMsgMinimumAnnularRingViolation() noexcept {}
+  ~DrcMsgMinimumAnnularRingViolation() noexcept override {}
 
 private:
   static QString determineMessage(const Data::Pad& pad,
@@ -973,7 +973,7 @@ public:
   DrcMsgMinimumDrillDiameterViolation(
       const DrcMsgMinimumDrillDiameterViolation& other) noexcept
     : RuleCheckMessage(other) {}
-  virtual ~DrcMsgMinimumDrillDiameterViolation() noexcept {}
+  ~DrcMsgMinimumDrillDiameterViolation() noexcept override {}
 
 private:
   static QString determineMessage(const DrcHoleRef& hole,
@@ -1000,7 +1000,7 @@ public:
   DrcMsgMinimumSlotWidthViolation(
       const DrcMsgMinimumSlotWidthViolation& other) noexcept
     : RuleCheckMessage(other) {}
-  virtual ~DrcMsgMinimumSlotWidthViolation() noexcept {}
+  ~DrcMsgMinimumSlotWidthViolation() noexcept override {}
 
 private:
   static QString determineMessage(bool plated,
@@ -1032,7 +1032,7 @@ public:
                              const QVector<Path>& locations) noexcept;
   DrcMsgInvalidPadConnection(const DrcMsgInvalidPadConnection& other) noexcept
     : RuleCheckMessage(other) {}
-  virtual ~DrcMsgInvalidPadConnection() noexcept {}
+  ~DrcMsgInvalidPadConnection() noexcept override {}
 
 private:
   static QString determineMessage(const Data::Pad& pad,
@@ -1063,7 +1063,7 @@ public:
                       const QVector<Path>& locations) noexcept;
   DrcMsgForbiddenSlot(const DrcMsgForbiddenSlot& other) noexcept
     : RuleCheckMessage(other) {}
-  virtual ~DrcMsgForbiddenSlot() noexcept {}
+  ~DrcMsgForbiddenSlot() noexcept override {}
 
 private:
   static QString determineMessage(const NonEmptyPath& path) noexcept;
@@ -1089,7 +1089,7 @@ public:
                      const QVector<Path>& locations) noexcept;
   DrcMsgForbiddenVia(const DrcMsgForbiddenVia& other) noexcept
     : RuleCheckMessage(other) {}
-  virtual ~DrcMsgForbiddenVia() noexcept {}
+  ~DrcMsgForbiddenVia() noexcept override {}
 
 private:
   static QString determineMessage(const Data::Segment& ns,
@@ -1116,7 +1116,7 @@ public:
                    const QVector<Path>& locations) noexcept;
   DrcMsgInvalidVia(const DrcMsgInvalidVia& other) noexcept
     : RuleCheckMessage(other) {}
-  virtual ~DrcMsgInvalidVia() noexcept {}
+  ~DrcMsgInvalidVia() noexcept override {}
 };
 
 /*******************************************************************************
@@ -1139,7 +1139,7 @@ public:
   DrcMsgPlaneThermalSpokeWidthIgnored(
       const DrcMsgPlaneThermalSpokeWidthIgnored& other) noexcept
     : RuleCheckMessage(other), mPlaneUuid(other.mPlaneUuid) {}
-  virtual ~DrcMsgPlaneThermalSpokeWidthIgnored() noexcept {}
+  ~DrcMsgPlaneThermalSpokeWidthIgnored() noexcept override {}
 
   const Uuid& getUuid() const noexcept { return mPlaneUuid; }
 
@@ -1169,7 +1169,7 @@ public:
   DrcMsgSilkscreenClearanceViolation(
       const DrcMsgSilkscreenClearanceViolation& other) noexcept
     : RuleCheckMessage(other) {}
-  virtual ~DrcMsgSilkscreenClearanceViolation() noexcept {}
+  ~DrcMsgSilkscreenClearanceViolation() noexcept override {}
 };
 
 /*******************************************************************************
@@ -1191,7 +1191,7 @@ public:
                     const QVector<Path>& locations) noexcept;
   DrcMsgUselessZone(const DrcMsgUselessZone& other) noexcept
     : RuleCheckMessage(other) {}
-  virtual ~DrcMsgUselessZone() noexcept {}
+  ~DrcMsgUselessZone() noexcept override {}
 };
 
 /*******************************************************************************
@@ -1213,7 +1213,7 @@ public:
                    const QVector<Path>& locations) noexcept;
   DrcMsgUselessVia(const DrcMsgUselessVia& other) noexcept
     : RuleCheckMessage(other) {}
-  virtual ~DrcMsgUselessVia() noexcept {}
+  ~DrcMsgUselessVia() noexcept override {}
 };
 
 /*******************************************************************************
@@ -1232,7 +1232,7 @@ public:
   explicit DrcMsgDisabledLayer(const Layer& layer) noexcept;
   DrcMsgDisabledLayer(const DrcMsgDisabledLayer& other) noexcept
     : RuleCheckMessage(other) {}
-  virtual ~DrcMsgDisabledLayer() noexcept {}
+  ~DrcMsgDisabledLayer() noexcept override {}
 };
 
 /*******************************************************************************
@@ -1251,7 +1251,7 @@ public:
   explicit DrcMsgUnusedLayer(const Layer& layer) noexcept;
   DrcMsgUnusedLayer(const DrcMsgUnusedLayer& other) noexcept
     : RuleCheckMessage(other) {}
-  virtual ~DrcMsgUnusedLayer() noexcept {}
+  ~DrcMsgUnusedLayer() noexcept override {}
 };
 
 /*******************************************************************************

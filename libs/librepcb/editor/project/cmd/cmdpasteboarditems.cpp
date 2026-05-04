@@ -320,7 +320,7 @@ bool CmdPasteBoardItems::performExecute() {
   }
 
   // Paste zones
-  for (const BoardZoneData& zone : mData->getZones()) {
+  for (const BoardZoneData& zone : std::as_const(mData->getZones())) {
     BoardZoneData copy(Uuid::createRandom(), zone);  // assign new UUID
     copy.setOutline(copy.getOutline().translated(mPosOffset));  // move
     BI_Zone* item = new BI_Zone(mBoard, copy);
@@ -331,7 +331,7 @@ bool CmdPasteBoardItems::performExecute() {
   }
 
   // Paste polygons
-  for (const BoardPolygonData& polygon : mData->getPolygons()) {
+  for (const BoardPolygonData& polygon : std::as_const(mData->getPolygons())) {
     BoardPolygonData copy(Uuid::createRandom(), polygon);  // assign new UUID
     copy.setPath(copy.getPath().translated(mPosOffset));  // move
     BI_Polygon* item = new BI_Polygon(mBoard, copy);
@@ -342,7 +342,8 @@ bool CmdPasteBoardItems::performExecute() {
   }
 
   // Paste stroke texts
-  for (const BoardStrokeTextData& text : mData->getStrokeTexts()) {
+  for (const BoardStrokeTextData& text :
+       std::as_const(mData->getStrokeTexts())) {
     BoardStrokeTextData copy(Uuid::createRandom(), text);  // assign new UUID
     copy.setPosition(copy.getPosition() + mPosOffset);  // move
     BI_StrokeText* item = new BI_StrokeText(mBoard, copy);
@@ -353,7 +354,7 @@ bool CmdPasteBoardItems::performExecute() {
   }
 
   // Paste holes
-  for (const BoardHoleData& hole : mData->getHoles()) {
+  for (const BoardHoleData& hole : std::as_const(mData->getHoles())) {
     BoardHoleData copy(Uuid::createRandom(), hole);  // assign new UUID
     copy.setPath(NonEmptyPath(copy.getPath()->translated(mPosOffset)));  // move
     BI_Hole* item = new BI_Hole(mBoard, copy);

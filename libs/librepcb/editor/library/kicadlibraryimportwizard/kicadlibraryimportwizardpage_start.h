@@ -58,7 +58,7 @@ public:
   KiCadLibraryImportWizardPage_Start(
       std::shared_ptr<KiCadLibraryImportWizardContext> context,
       QWidget* parent = nullptr) noexcept;
-  ~KiCadLibraryImportWizardPage_Start() noexcept;
+  ~KiCadLibraryImportWizardPage_Start() noexcept override;
 
   // Operator Overloadings
   KiCadLibraryImportWizardPage_Start& operator=(

@@ -127,23 +127,24 @@ void KiCadLibraryImportWizardPage_SelectElements::initializePage() {
   devRoot->setData(0, Qt::UserRole, ElementType::Device);
   devRoot->setFlags(devRoot->flags() | Qt::ItemIsUserCheckable);
   devRoot->setCheckState(0, Qt::Unchecked);
-  for (const KiCadLibraryImport::SymbolLibrary& lib : result->symbolLibs) {
-    QTreeWidgetItem* libRoot =
-        new QTreeWidgetItem(devRoot, {lib.file.getCompleteBasename()});
+  for (const KiCadLibraryImport::SymbolLibrary& lib :
+       std::as_const(result->symbolLibs)) {
+    std::unique_ptr<QTreeWidgetItem> libRoot(
+        new QTreeWidgetItem({lib.file.getCompleteBasename()}));
     libRoot->setData(0, Qt::UserRole, ElementType::Device);
     libRoot->setFlags(libRoot->flags() | Qt::ItemIsUserCheckable);
     libRoot->setCheckState(0, Qt::Unchecked);
     for (const KiCadLibraryImport::Symbol& sym : lib.symbols) {
       if (!sym.pkgGeneratedBy.isEmpty()) {
-        QTreeWidgetItem* item = new QTreeWidgetItem(libRoot, {sym.name});
+        QTreeWidgetItem* item = new QTreeWidgetItem(libRoot.get(), {sym.name});
         setupItem(item, ElementType::Device, sym.devAlreadyImported,
                   sym.devChecked);
       }
     }
-    if (libRoot->childCount() == 0) {
-      delete libRoot;
+    if (libRoot->childCount() > 0) {
+      setDisabledIfAllChildrenDisabled(libRoot.get());
+      devRoot->addChild(libRoot.release());
     }
-    setDisabledIfAllChildrenDisabled(libRoot);
   }
   devRoot->setHidden(devRoot->childCount() == 0);
   setDisabledIfAllChildrenDisabled(devRoot);
@@ -153,23 +154,24 @@ void KiCadLibraryImportWizardPage_SelectElements::initializePage() {
   cmpRoot->setData(0, Qt::UserRole, ElementType::Component);
   cmpRoot->setFlags(cmpRoot->flags() | Qt::ItemIsUserCheckable);
   cmpRoot->setCheckState(0, Qt::Unchecked);
-  for (const KiCadLibraryImport::SymbolLibrary& lib : result->symbolLibs) {
-    QTreeWidgetItem* libRoot =
-        new QTreeWidgetItem(cmpRoot, {lib.file.getCompleteBasename()});
+  for (const KiCadLibraryImport::SymbolLibrary& lib :
+       std::as_const(result->symbolLibs)) {
+    std::unique_ptr<QTreeWidgetItem> libRoot(
+        new QTreeWidgetItem({lib.file.getCompleteBasename()}));
     libRoot->setData(0, Qt::UserRole, ElementType::Component);
     libRoot->setFlags(libRoot->flags() | Qt::ItemIsUserCheckable);
     libRoot->setCheckState(0, Qt::Unchecked);
     for (const KiCadLibraryImport::Symbol& sym : lib.symbols) {
       if (sym.extends.isEmpty()) {
-        QTreeWidgetItem* item = new QTreeWidgetItem(libRoot, {sym.name});
+        QTreeWidgetItem* item = new QTreeWidgetItem(libRoot.get(), {sym.name});
         setupItem(item, ElementType::Component, sym.cmpAlreadyImported,
                   sym.cmpChecked);
       }
     }
-    if (libRoot->childCount() == 0) {
-      delete libRoot;
+    if (libRoot->childCount() > 0) {
+      setDisabledIfAllChildrenDisabled(libRoot.get());
+      cmpRoot->addChild(libRoot.release());
     }
-    setDisabledIfAllChildrenDisabled(libRoot);
   }
   cmpRoot->setHidden(cmpRoot->childCount() == 0);
   setDisabledIfAllChildrenDisabled(cmpRoot);
@@ -179,23 +181,24 @@ void KiCadLibraryImportWizardPage_SelectElements::initializePage() {
   symRoot->setData(0, Qt::UserRole, ElementType::Symbol);
   symRoot->setFlags(symRoot->flags() | Qt::ItemIsUserCheckable);
   symRoot->setCheckState(0, Qt::Unchecked);
-  for (const KiCadLibraryImport::SymbolLibrary& lib : result->symbolLibs) {
-    QTreeWidgetItem* libRoot =
-        new QTreeWidgetItem(symRoot, {lib.file.getCompleteBasename()});
+  for (const KiCadLibraryImport::SymbolLibrary& lib :
+       std::as_const(result->symbolLibs)) {
+    std::unique_ptr<QTreeWidgetItem> libRoot(
+        new QTreeWidgetItem({lib.file.getCompleteBasename()}));
     libRoot->setData(0, Qt::UserRole, ElementType::Symbol);
     libRoot->setFlags(libRoot->flags() | Qt::ItemIsUserCheckable);
     libRoot->setCheckState(0, Qt::Unchecked);
     for (const KiCadLibraryImport::Symbol& sym : lib.symbols) {
       if (sym.extends.isEmpty()) {
-        QTreeWidgetItem* item = new QTreeWidgetItem(libRoot, {sym.name});
+        QTreeWidgetItem* item = new QTreeWidgetItem(libRoot.get(), {sym.name});
         setupItem(item, ElementType::Symbol, sym.symAlreadyImported,
                   sym.symChecked);
       }
     }
-    if (libRoot->childCount() == 0) {
-      delete libRoot;
+    if (libRoot->childCount() > 0) {
+      setDisabledIfAllChildrenDisabled(libRoot.get());
+      symRoot->addChild(libRoot.release());
     }
-    setDisabledIfAllChildrenDisabled(libRoot);
   }
   symRoot->setHidden(symRoot->childCount() == 0);
   setDisabledIfAllChildrenDisabled(symRoot);
@@ -206,20 +209,20 @@ void KiCadLibraryImportWizardPage_SelectElements::initializePage() {
   pkgRoot->setFlags(pkgRoot->flags() | Qt::ItemIsUserCheckable);
   pkgRoot->setCheckState(0, Qt::Unchecked);
   for (const KiCadLibraryImport::FootprintLibrary& lib :
-       result->footprintLibs) {
-    QTreeWidgetItem* libRoot =
-        new QTreeWidgetItem(pkgRoot, {lib.dir.getCompleteBasename()});
+       std::as_const(result->footprintLibs)) {
+    std::unique_ptr<QTreeWidgetItem> libRoot(
+        new QTreeWidgetItem({lib.dir.getCompleteBasename()}));
     libRoot->setData(0, Qt::UserRole, ElementType::Package);
     libRoot->setFlags(libRoot->flags() | Qt::ItemIsUserCheckable);
     libRoot->setCheckState(0, Qt::Unchecked);
     for (const KiCadLibraryImport::Footprint& fpt : lib.footprints) {
-      QTreeWidgetItem* item = new QTreeWidgetItem(libRoot, {fpt.name});
+      QTreeWidgetItem* item = new QTreeWidgetItem(libRoot.get(), {fpt.name});
       setupItem(item, ElementType::Package, fpt.alreadyImported, fpt.checked);
     }
-    if (libRoot->childCount() == 0) {
-      delete libRoot;
+    if (libRoot->childCount() > 0) {
+      setDisabledIfAllChildrenDisabled(libRoot.get());
+      pkgRoot->addChild(libRoot.release());
     }
-    setDisabledIfAllChildrenDisabled(libRoot);
   }
   pkgRoot->setHidden(pkgRoot->childCount() == 0);
   setDisabledIfAllChildrenDisabled(pkgRoot);

@@ -74,7 +74,7 @@ public:
   Symbol(const Uuid& uuid, const Version& version, const QString& author,
          const QDateTime& created, const ElementName& name_en_US,
          const QString& description_en_US, const QString& keywords_en_US);
-  ~Symbol() noexcept;
+  ~Symbol() noexcept override;
 
   // Getters: Attributes
   const PositiveLength& getGridInterval() const noexcept {
@@ -101,7 +101,7 @@ public:
 
   // General Methods
   void duplicateFrom(const Symbol& other);
-  virtual RuleCheckMessageList runChecks() const override;
+  RuleCheckMessageList runChecks() const override;
 
   // Operator Overloadings
   Symbol& operator=(const Symbol& rhs) = delete;
@@ -118,7 +118,7 @@ public:
   }
 
 protected:  // Methods
-  virtual void serialize(SExpression& root) const override;
+  void serialize(SExpression& root) const override;
 
 private:  // Methods
   Symbol(std::unique_ptr<TransactionalDirectory> directory,

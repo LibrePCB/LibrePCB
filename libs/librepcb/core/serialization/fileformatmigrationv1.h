@@ -57,20 +57,20 @@ public:
   // Constructors / Destructor
   explicit FileFormatMigrationV1(QObject* parent = nullptr) noexcept;
   FileFormatMigrationV1(const FileFormatMigrationV1& other) = delete;
-  virtual ~FileFormatMigrationV1() noexcept;
+  ~FileFormatMigrationV1() noexcept override;
 
   // General Methods
-  virtual void upgradeComponentCategory(TransactionalDirectory& dir) override;
-  virtual void upgradePackageCategory(TransactionalDirectory& dir) override;
-  virtual void upgradeSymbol(TransactionalDirectory& dir) override;
-  virtual void upgradePackage(TransactionalDirectory& dir) override;
-  virtual void upgradeComponent(TransactionalDirectory& dir) override;
-  virtual void upgradeDevice(TransactionalDirectory& dir) override;
-  virtual void upgradeOrganization(TransactionalDirectory& dir) override;
-  virtual void upgradeLibrary(TransactionalDirectory& dir) override;
-  virtual void upgradeProject(TransactionalDirectory& dir,
-                              QList<Message>& messages) override;
-  virtual void upgradeWorkspaceData(TransactionalDirectory& dir) override;
+  void upgradeComponentCategory(TransactionalDirectory& dir) override;
+  void upgradePackageCategory(TransactionalDirectory& dir) override;
+  void upgradeSymbol(TransactionalDirectory& dir) override;
+  void upgradePackage(TransactionalDirectory& dir) override;
+  void upgradeComponent(TransactionalDirectory& dir) override;
+  void upgradeDevice(TransactionalDirectory& dir) override;
+  void upgradeOrganization(TransactionalDirectory& dir) override;
+  void upgradeLibrary(TransactionalDirectory& dir) override;
+  void upgradeProject(TransactionalDirectory& dir,
+                      QList<Message>& messages) override;
+  void upgradeWorkspaceData(TransactionalDirectory& dir) override;
 
   // Operator Overloadings
   FileFormatMigrationV1& operator=(const FileFormatMigrationV1& rhs) = delete;

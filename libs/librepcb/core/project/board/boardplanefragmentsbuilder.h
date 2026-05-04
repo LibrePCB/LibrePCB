@@ -76,7 +76,7 @@ public:
   // Constructors / Destructor
   explicit BoardPlaneFragmentsBuilder(QObject* parent = nullptr) noexcept;
   BoardPlaneFragmentsBuilder(const BoardPlaneFragmentsBuilder& other) = delete;
-  ~BoardPlaneFragmentsBuilder() noexcept;
+  ~BoardPlaneFragmentsBuilder() noexcept override;
 
   // General Methods
 

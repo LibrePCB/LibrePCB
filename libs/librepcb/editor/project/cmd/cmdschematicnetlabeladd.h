@@ -50,7 +50,7 @@ class CmdSchematicNetLabelAdd final : public UndoCommand {
 public:
   // Constructors / Destructor
   explicit CmdSchematicNetLabelAdd(SI_NetLabel& netLabel) noexcept;
-  ~CmdSchematicNetLabelAdd() noexcept;
+  ~CmdSchematicNetLabelAdd() noexcept override;
 
 private:
   // Private Methods

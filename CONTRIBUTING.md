@@ -43,6 +43,8 @@ there are many other ways how to contribute to the LibrePCB project, see
   - You can use [clang-format](https://clang.llvm.org/docs/ClangFormat.html) to
     automatically format the code. To format all files at once, just run the
     script [`./dev/format_code.sh`](dev/format_code.sh).
+  - Our CI will also run a static code analysis on every pull request. To run
+    it locally, call [`./dev/clang_tidy.sh`](dev/clang_tidy.sh) (Linux only).
 - Make commits of logical units.
   - Make sure your commit messages are in the
     [proper format](http://chris.beams.io/posts/git-commit/):

@@ -55,7 +55,7 @@ public:
   TextGraphicsItem(const TextGraphicsItem& other) = delete;
   TextGraphicsItem(Text& text, const GraphicsLayerList& layers,
                    QGraphicsItem* parent = nullptr) noexcept;
-  virtual ~TextGraphicsItem() noexcept;
+  ~TextGraphicsItem() noexcept override;
 
   // Getters
   Text& getObj() noexcept { return mText; }
@@ -73,8 +73,8 @@ public:
 
 private:  // Methods
   void textEdited(const Text& text, Text::Event event) noexcept;
-  virtual QVariant itemChange(GraphicsItemChange change,
-                              const QVariant& value) noexcept override;
+  QVariant itemChange(GraphicsItemChange change,
+                      const QVariant& value) noexcept override;
   void updateText() noexcept;
 
 private:  // Data

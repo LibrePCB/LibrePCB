@@ -49,7 +49,7 @@ class CmdNetClassEdit final : public UndoCommand {
 public:
   // Constructors / Destructor
   explicit CmdNetClassEdit(NetClass& netclass) noexcept;
-  ~CmdNetClassEdit() noexcept;
+  ~CmdNetClassEdit() noexcept override;
 
   // Setters
   void setName(const ElementName& name) noexcept;

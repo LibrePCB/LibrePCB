@@ -105,7 +105,7 @@ static double getResolution(const SExpression& node, QString& logStr) {
     throw RuntimeError(__FILE__, __LINE__,
                        QString("Unsupported unit: '%1'").arg(unit));
   }
-  logStr = QString("1/%1 %2").arg(resolutionNode.getValue()).arg(unit);
+  logStr = QString("1/%1 %2").arg(resolutionNode.getValue(), unit);
   return resolution;
 }
 
@@ -437,7 +437,7 @@ bool CmdBoardSpecctraImport::performExecute() {
   QSet<QString> importedComponents;
   QSet<Uuid> updatedComponents;
   if (mComponents) {
-    for (const auto& item : *mComponents) {
+    for (const auto& item : std::as_const(*mComponents)) {
       if (item.name == "BOARD") {
         continue;  // Currently board-level pads cannot be edited.
       }
@@ -493,7 +493,7 @@ bool CmdBoardSpecctraImport::performExecute() {
   // accidentally removed.
   QSet<NetSignal*> importedNets;
   QVector<NetOutProcessed> nets;
-  for (const auto& net : mNets) {
+  for (const auto& net : std::as_const(mNets)) {
     NetSignal* netSignal = mCircuit.getNetSignalByName(net.netName);
     // ATTENTION: The ~anonymous~ comes from our own Specctra export!
     if ((!netSignal) && (!net.netName.startsWith("~anonymous~"))) {

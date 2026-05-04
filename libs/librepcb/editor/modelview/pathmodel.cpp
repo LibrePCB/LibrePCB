@@ -48,9 +48,9 @@ PathModel::~PathModel() noexcept {
 
 void PathModel::setPath(const Path& path) noexcept {
   if (path != mPath) {
-    emit beginResetModel();
+    beginResetModel();
     mPath = path;
-    emit endResetModel();
+    endResetModel();
     emit pathChanged(mPath);
   }
 }
@@ -272,7 +272,7 @@ bool PathModel::setData(const QModelIndex& index, const QVariant& value,
     }
     return true;
   } catch (const Exception& e) {
-    QMessageBox::critical(0, tr("Error"), e.getMsg());
+    QMessageBox::critical(nullptr, tr("Error"), e.getMsg());
   }
   return false;
 }

@@ -59,7 +59,7 @@ public:
   CmdPasteSchematicItems(SchematicGraphicsScene& scene,
                          std::unique_ptr<SchematicClipboardData> data,
                          const Point& posOffset) noexcept;
-  ~CmdPasteSchematicItems() noexcept;
+  ~CmdPasteSchematicItems() noexcept override;
 
   // Operator Overloadings
   CmdPasteSchematicItems& operator=(const CmdPasteSchematicItems& rhs) = delete;

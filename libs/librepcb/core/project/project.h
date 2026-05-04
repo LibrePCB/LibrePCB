@@ -93,7 +93,7 @@ public:
   /**
    * @brief The destructor will close the whole project (without saving!)
    */
-  ~Project() noexcept;
+  ~Project() noexcept override;
 
   // Getters
 

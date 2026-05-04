@@ -41,8 +41,8 @@ namespace editor {
  ******************************************************************************/
 
 CmdSymbolInstanceEditAll::CmdSymbolInstanceEditAll(SI_Symbol& symbol) noexcept
-  : UndoCommandGroup(tr("Drag Symbol")), mSymEditCmd(nullptr) {
-  mSymEditCmd = new CmdSymbolInstanceEdit(symbol);
+  : UndoCommandGroup(tr("Drag Symbol")),
+    mSymEditCmd(new CmdSymbolInstanceEdit(symbol)) {
   appendChild(mSymEditCmd);
 
   foreach (SI_Text* text, symbol.getTexts()) {

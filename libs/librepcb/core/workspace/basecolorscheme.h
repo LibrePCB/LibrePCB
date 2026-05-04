@@ -49,6 +49,7 @@ public:
     const ColorRole* role = nullptr;
   };
 
+  virtual ~ColorScheme() = default;
   virtual const Uuid& getUuid() const noexcept = 0;
   virtual const QString& getName() const noexcept = 0;
   virtual Colors getColors(const ColorRole& role) const noexcept;
@@ -75,7 +76,7 @@ public:
   // Constructors / Destructor
   BaseColorScheme() = delete;
   BaseColorScheme(const BaseColorScheme& other) = delete;
-  ~BaseColorScheme() noexcept;
+  ~BaseColorScheme() noexcept override;
 
   // General Methods
   const Uuid& getUuid() const noexcept override { return mUuid; }

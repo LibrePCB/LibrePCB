@@ -50,10 +50,6 @@ public:
     mScopeGuards.reserve(size);
   }
 
-  ScopeGuardList(ScopeGuardList&& rhs) noexcept
-    : ScopeGuardBase(std::move(rhs)),
-      mScopeGuards(std::move(rhs.mScopeGuards)) {}
-
   ScopeGuardList(const ScopeGuardList&) = delete;
   ScopeGuardList& operator=(const ScopeGuardList&) = delete;
 

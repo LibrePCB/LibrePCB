@@ -73,7 +73,7 @@ public:
   explicit GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
                           const UiTheme* const& theme,
                           QObject* parent = nullptr) noexcept;
-  ~GuiApplication() noexcept;
+  ~GuiApplication() noexcept override;
 
   // Workspace
   Workspace& getWorkspace() noexcept { return mWorkspace; }

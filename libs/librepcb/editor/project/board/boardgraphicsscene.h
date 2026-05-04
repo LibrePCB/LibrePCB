@@ -135,7 +135,7 @@ public:
   explicit BoardGraphicsScene(Board& board, const GraphicsLayerList& layers,
                               std::shared_ptr<Context> context,
                               QObject* parent = nullptr) noexcept;
-  virtual ~BoardGraphicsScene() noexcept;
+  ~BoardGraphicsScene() noexcept override;
 
   // Getters
   Board& getBoard() noexcept { return mBoard; }

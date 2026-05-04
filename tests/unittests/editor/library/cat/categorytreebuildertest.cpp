@@ -31,6 +31,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -43,7 +45,7 @@ namespace tests {
  ******************************************************************************/
 
 class CategoryTreeBuilderTest : public ::testing::Test {
-protected:
+public:
   FilePath mWsDir;
   std::unique_ptr<WorkspaceLibraryDb> mWsDb;
   std::unique_ptr<SQLiteDatabase> mDb;
@@ -51,12 +53,12 @@ protected:
 
   CategoryTreeBuilderTest() : mWsDir(FilePath::getRandomTempPath()) {
     FileUtils::makePath(mWsDir);
-    mWsDb.reset(new WorkspaceLibraryDb(mWsDir));
-    mDb.reset(new SQLiteDatabase(mWsDb->getFilePath()));
-    mWriter.reset(new WorkspaceLibraryDbWriter(mWsDir, *mDb));
+    mWsDb = std::make_unique<WorkspaceLibraryDb>(mWsDir);
+    mDb = std::make_unique<SQLiteDatabase>(mWsDb->getFilePath());
+    mWriter = std::make_unique<WorkspaceLibraryDbWriter>(mWsDir, *mDb);
   }
 
-  virtual ~CategoryTreeBuilderTest() {
+  ~CategoryTreeBuilderTest() override {
     QDir(mWsDir.toStr()).removeRecursively();
   }
 

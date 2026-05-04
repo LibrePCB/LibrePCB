@@ -49,7 +49,7 @@ public:
   // Constructors / Destructor
   explicit CmdBusAdd(Circuit& circuit) noexcept;
   explicit CmdBusAdd(Bus& bus) noexcept;
-  ~CmdBusAdd() noexcept;
+  ~CmdBusAdd() noexcept override;
 
   // Getters
   Bus* getBus() const noexcept { return mBus; }

@@ -51,7 +51,7 @@ public:
   CmdZoneEdit() = delete;
   CmdZoneEdit(const CmdZoneEdit& other) = delete;
   explicit CmdZoneEdit(Zone& zone) noexcept;
-  ~CmdZoneEdit() noexcept;
+  ~CmdZoneEdit() noexcept override;
 
   // Setters
   void setLayers(Zone::Layers layers, bool immediate) noexcept;

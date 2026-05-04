@@ -111,7 +111,7 @@ public:
   /**
    * @brief The destructor
    */
-  virtual ~Exception() noexcept {}
+  ~Exception() noexcept override {}
 
   // Getters
 
@@ -152,8 +152,8 @@ public:
   const char* what() const noexcept override;
 
   // Inherited from QException (see QException documentation for more details)
-  virtual void raise() const override { throw *this; }
-  virtual Exception* clone() const override { return new Exception(*this); }
+  void raise() const override { throw *this; }
+  Exception* clone() const override { return new Exception(*this); }
 
 private:
   // Attributes
@@ -197,8 +197,8 @@ public:
   LogicError(const LogicError& other) noexcept;
 
   // Inherited from Exception
-  virtual void raise() const override { throw *this; }
-  virtual LogicError* clone() const override { return new LogicError(*this); }
+  void raise() const override { throw *this; }
+  LogicError* clone() const override { return new LogicError(*this); }
 };
 
 /*******************************************************************************
@@ -236,13 +236,11 @@ public:
   /**
    * @brief Destructor
    */
-  virtual ~RuntimeError() noexcept {}
+  ~RuntimeError() noexcept override {}
 
   // Inherited from Exception
-  virtual void raise() const override { throw *this; }
-  virtual RuntimeError* clone() const override {
-    return new RuntimeError(*this);
-  }
+  void raise() const override { throw *this; }
+  RuntimeError* clone() const override { return new RuntimeError(*this); }
 };
 
 /*******************************************************************************
@@ -293,8 +291,8 @@ public:
   RangeError(const RangeError& other) noexcept;
 
   // Inherited from RuntimeError
-  virtual void raise() const override { throw *this; }
-  virtual RangeError* clone() const override { return new RangeError(*this); }
+  void raise() const override { throw *this; }
+  RangeError* clone() const override { return new RangeError(*this); }
 };
 
 /*******************************************************************************
@@ -335,10 +333,8 @@ public:
   FileParseError(const FileParseError& other) noexcept;
 
   // Inherited from RuntimeError
-  virtual void raise() const override { throw *this; }
-  virtual FileParseError* clone() const override {
-    return new FileParseError(*this);
-  }
+  void raise() const override { throw *this; }
+  FileParseError* clone() const override { return new FileParseError(*this); }
 };
 
 /*******************************************************************************
@@ -387,10 +383,8 @@ public:
   UserCanceled(const UserCanceled& other) noexcept;
 
   // Inherited from Exception
-  virtual void raise() const override { throw *this; }
-  virtual UserCanceled* clone() const override {
-    return new UserCanceled(*this);
-  }
+  void raise() const override { throw *this; }
+  UserCanceled* clone() const override { return new UserCanceled(*this); }
 };
 
 /*******************************************************************************

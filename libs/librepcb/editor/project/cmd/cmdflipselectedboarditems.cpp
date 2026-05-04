@@ -128,8 +128,8 @@ bool CmdFlipSelectedBoardItems::performExecute() {
     ++count;
   }
   foreach (BI_Plane* plane, query.getPlanes()) {
-    for (const Vertex& vertex :
-         Toolbox::toSet(plane->getOutline().getVertices().toList())) {
+    foreach (const Vertex& vertex,
+             Toolbox::toSet(plane->getOutline().getVertices())) {
       center += vertex.getPos();
       ++count;
     }
@@ -141,8 +141,8 @@ bool CmdFlipSelectedBoardItems::performExecute() {
     }
   }
   foreach (BI_Polygon* polygon, query.getPolygons()) {
-    for (const Vertex& vertex :
-         Toolbox::toSet(polygon->getData().getPath().getVertices().toList())) {
+    foreach (const Vertex& vertex,
+             Toolbox::toSet(polygon->getData().getPath().getVertices())) {
       center += vertex.getPos();
       ++count;
     }

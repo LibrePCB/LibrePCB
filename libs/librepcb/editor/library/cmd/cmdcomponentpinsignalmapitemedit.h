@@ -57,7 +57,7 @@ public:
       const CmdComponentPinSignalMapItemEdit& other) = delete;
   explicit CmdComponentPinSignalMapItemEdit(
       const std::shared_ptr<ComponentPinSignalMapItem>& item) noexcept;
-  ~CmdComponentPinSignalMapItemEdit() noexcept;
+  ~CmdComponentPinSignalMapItemEdit() noexcept override;
 
   // Setters
   void setSignalUuid(const std::optional<Uuid>& uuid) noexcept;

@@ -219,7 +219,7 @@ bool ImageHelpers::isImageInClipboard() noexcept {
   // the clipboard when copying things (e.g. in the symbol editor). But
   // when pasting, we want that *data* to be pasted, not the image.
   bool hasImageData = false;
-  for (const QString& format : d->formats()) {
+  for (const QString& format : d->formats()) {  // NOLINT
     if (format.startsWith("application/x-librepcb-clipboard")) {
       return false;
     } else if (format.startsWith("image/")) {
@@ -246,7 +246,7 @@ bool ImageHelpers::getImageFromClipboard(QByteArray& data, QString& format,
   // consider it as an image! LibrePCB does sometimes put image data into
   // the clipboard when copying things (e.g. in the symbol editor). But
   // when pasting, we want that *data* to be pasted, not the image.
-  for (const QString& format : d->formats()) {
+  for (const QString& format : d->formats()) {  // NOLINT
     if (format.startsWith("application/x-librepcb-clipboard")) {
       return false;
     }

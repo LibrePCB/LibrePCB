@@ -41,6 +41,8 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -124,8 +126,7 @@ void ProjectLibraryUpdater::btnUpdateClicked() {
         ProjectLoader loader;
         loader.setAutoAssignDeviceModels(true);  // Make use of new 3D models.
         std::unique_ptr<Project> project =
-            loader.open(std::unique_ptr<TransactionalDirectory>(
-                            new TransactionalDirectory(fs)),
+            loader.open(std::make_unique<TransactionalDirectory>(fs),
                         mProjectFilePath.getFilename());  // can throw
         log(tr("Save project %1...").arg(prettyPath(mProjectFilePath)));
         project->save();  // force upgrading file format
@@ -144,7 +145,7 @@ void ProjectLibraryUpdater::btnUpdateClicked() {
     }
 
     // re-open project if it was previously open
-    emit finished(mProjectFilePath);
+    emit finishedUpdate(mProjectFilePath);
 
     // bring this window to front again (with some delay to make it working
     // properly)

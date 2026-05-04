@@ -32,6 +32,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -182,8 +184,8 @@ bool BoardEditorState_AddDevice::addDevice(ComponentInstance& cmp,
     Q_ASSERT(mCurrentDeviceToPlace);
 
     // add command to move the current device
-    mCurrentDeviceEditCmd.reset(
-        new CmdDeviceInstanceEditAll(*mCurrentDeviceToPlace));
+    mCurrentDeviceEditCmd =
+        std::make_unique<CmdDeviceInstanceEditAll>(*mCurrentDeviceToPlace);
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"),

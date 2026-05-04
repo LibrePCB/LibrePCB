@@ -221,7 +221,7 @@ void GraphicsScene::drawBackground(QPainter* painter,
     case GridStyle::Lines: {
       QVarLengthArray<QLineF, 450> minorLines;
       QVarLengthArray<QLineF, 50> majorLines;
-      for (qreal x = left; x < right; x += gridIntervalPixels) {
+      for (qreal x = left; x < right; x += gridIntervalPixels) {  // NOLINT
         if (xIndex % 10) {
           minorLines.append(QLineF(x, rect.top(), x, rect.bottom()));
         } else {
@@ -229,7 +229,7 @@ void GraphicsScene::drawBackground(QPainter* painter,
         }
         ++xIndex;
       }
-      for (qreal y = bottom; y > top; y -= gridIntervalPixels) {
+      for (qreal y = bottom; y > top; y -= gridIntervalPixels) {  // NOLINT
         if (yIndex % 10) {
           minorLines.append(QLineF(rect.left(), y, rect.right(), y));
         } else {
@@ -248,9 +248,9 @@ void GraphicsScene::drawBackground(QPainter* painter,
     case GridStyle::Dots: {
       QVarLengthArray<QPointF, 1800> minorDots;
       QVarLengthArray<QPointF, 200> majorDots;
-      for (qreal x = left; x < right; x += gridIntervalPixels) {
+      for (qreal x = left; x < right; x += gridIntervalPixels) {  // NOLINT
         yIndex = -qFloor(rect.bottom() / gridIntervalPixels);
-        for (qreal y = bottom; y > top; y -= gridIntervalPixels) {
+        for (qreal y = bottom; y > top; y -= gridIntervalPixels) {  // NOLINT
           if ((xIndex % 10) || (yIndex % 10)) {
             minorDots.append(QPointF(x, y));
           } else {

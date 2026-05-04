@@ -84,7 +84,7 @@ void SI_NetLabel::addToSchematic() {
     throw LogicError(__FILE__, __LINE__);
   }
   mNameChangedConnection =
-      connect(&mNetSegment.getNetSignal(), &NetSignal::nameChanged,
+      connect(&mNetSegment.getNetSignal(), &NetSignal::nameChanged, this,
               [this]() { onEdited.notify(Event::NetNameChanged); });
   SI_Base::addToSchematic();
 }

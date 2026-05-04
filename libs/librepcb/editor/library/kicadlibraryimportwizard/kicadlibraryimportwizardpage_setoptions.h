@@ -58,10 +58,10 @@ public:
   KiCadLibraryImportWizardPage_SetOptions(
       std::shared_ptr<KiCadLibraryImportWizardContext> context,
       QWidget* parent = nullptr) noexcept;
-  ~KiCadLibraryImportWizardPage_SetOptions() noexcept;
+  ~KiCadLibraryImportWizardPage_SetOptions() noexcept override;
 
   // General Methods
-  virtual void initializePage() override;
+  void initializePage() override;
 
   // Operator Overloadings
   KiCadLibraryImportWizardPage_SetOptions& operator=(

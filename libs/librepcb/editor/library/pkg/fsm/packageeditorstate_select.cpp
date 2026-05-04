@@ -61,6 +61,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -91,7 +93,7 @@ PackageEditorState_Select::~PackageEditorState_Select() noexcept {
 bool PackageEditorState_Select::entry() noexcept {
   mAdapter.fsmToolEnter(*this);
 
-  mUpdateAvailableFeaturesTimer.reset(new QTimer());
+  mUpdateAvailableFeaturesTimer = std::make_unique<QTimer>();
   mUpdateAvailableFeaturesTimer->setSingleShot(true);
   mUpdateAvailableFeaturesTimer->setInterval(50);
   connect(mUpdateAvailableFeaturesTimer.get(), &QTimer::timeout, this,
@@ -144,8 +146,8 @@ bool PackageEditorState_Select::processGraphicsSceneMouseMoved(
     case SubState::MOVING:
     case SubState::PASTING: {
       if (!mCmdDragSelectedItems) {
-        mCmdDragSelectedItems.reset(new CmdDragSelectedFootprintItems(
-            *mContext.currentGraphicsItem, getGridInterval()));
+        mCmdDragSelectedItems = std::make_unique<CmdDragSelectedFootprintItems>(
+            *mContext.currentGraphicsItem, getGridInterval());
         scheduleUpdateAvailableFeatures();
       }
       Point delta = (currentPos - mStartPos).mappedToGrid(getGridInterval());
@@ -157,7 +159,7 @@ bool PackageEditorState_Select::processGraphicsSceneMouseMoved(
         return false;
       }
       if (!mCmdPolygonEdit) {
-        mCmdPolygonEdit.reset(new CmdPolygonEdit(*mSelectedPolygon));
+        mCmdPolygonEdit = std::make_unique<CmdPolygonEdit>(*mSelectedPolygon);
         scheduleUpdateAvailableFeatures();
       }
       QVector<Vertex> vertices = mSelectedPolygon->getPath().getVertices();
@@ -174,7 +176,7 @@ bool PackageEditorState_Select::processGraphicsSceneMouseMoved(
         return false;
       }
       if (!mCmdZoneEdit) {
-        mCmdZoneEdit.reset(new CmdZoneEdit(*mSelectedZone));
+        mCmdZoneEdit = std::make_unique<CmdZoneEdit>(*mSelectedZone);
         scheduleUpdateAvailableFeatures();
       }
       QVector<Vertex> vertices = mSelectedZone->getOutline().getVertices();
@@ -777,8 +779,8 @@ bool PackageEditorState_Select::openContextMenuAtPos(
 
         int lineIndex = i->getLineIndexAtPosition(pos);
         if (lineIndex >= 0) {
-          QAction* aAddVertex =
-              cmd.vertexAdd.createAction(&menu, this, [=, this]() {
+          QAction* aAddVertex = cmd.vertexAdd.createAction(
+              &menu, this, [polygon, lineIndex, pos, this]() {
                 startAddingPolygonVertex(polygon, lineIndex, pos);
               });
           aAddVertex->setEnabled(mAdapter.fsmIsWritable());
@@ -812,8 +814,9 @@ bool PackageEditorState_Select::openContextMenuAtPos(
         int lineIndex = i->getLineIndexAtPosition(pos);
         if (lineIndex >= 0) {
           QAction* aAddVertex = cmd.vertexAdd.createAction(
-              &menu, this,
-              [=, this]() { startAddingZoneVertex(zone, lineIndex, pos); });
+              &menu, this, [zone, lineIndex, pos, this]() {
+                startAddingZoneVertex(zone, lineIndex, pos);
+              });
           aAddVertex->setEnabled(mAdapter.fsmIsWritable());
           mb.addAction(aAddVertex);
         }
@@ -1194,8 +1197,8 @@ bool PackageEditorState_Select::startPaste(
       clearSelectionRect(true);
     } else {
       // Start moving the selected items.
-      mCmdDragSelectedItems.reset(new CmdDragSelectedFootprintItems(
-          *mContext.currentGraphicsItem, getGridInterval()));
+      mCmdDragSelectedItems = std::make_unique<CmdDragSelectedFootprintItems>(
+          *mContext.currentGraphicsItem, getGridInterval());
     }
     return true;
   } else {
@@ -1559,7 +1562,7 @@ void PackageEditorState_Select::startAddingPolygonVertex(
     Point newPos = pos.mappedToGrid(getGridInterval());
     Angle newAngle = path.getVertices()[vertex - 1].getAngle();
     path.getVertices().insert(vertex, Vertex(newPos, newAngle));
-    mCmdPolygonEdit.reset(new CmdPolygonEdit(*polygon));
+    mCmdPolygonEdit = std::make_unique<CmdPolygonEdit>(*polygon);
     mCmdPolygonEdit->setPath(path, true);
 
     mSelectedPolygon = polygon;
@@ -1601,7 +1604,7 @@ void PackageEditorState_Select::startAddingZoneVertex(
     Point newPos = pos.mappedToGrid(getGridInterval());
     Angle newAngle = path.getVertices()[vertex - 1].getAngle();
     path.getVertices().insert(vertex, Vertex(newPos, newAngle));
-    mCmdZoneEdit.reset(new CmdZoneEdit(*zone));
+    mCmdZoneEdit = std::make_unique<CmdZoneEdit>(*zone);
     mCmdZoneEdit->setOutline(path, true);
 
     mSelectedZone = zone;
@@ -1649,7 +1652,7 @@ bool PackageEditorState_Select::findPolygonVerticesAtPosition(
   if (!mContext.currentGraphicsItem) return {};
 
   if (mContext.currentFootprint) {
-    for (auto ptr : mContext.currentFootprint->getPolygons().values()) {
+    for (const auto& ptr : mContext.currentFootprint->getPolygons().values()) {
       auto graphicsItem = mContext.currentGraphicsItem->getGraphicsItem(ptr);
       if (graphicsItem && graphicsItem->isSelected()) {
         mSelectedPolygonVertices =
@@ -1672,7 +1675,7 @@ bool PackageEditorState_Select::findZoneVerticesAtPosition(
   if (!mContext.currentGraphicsItem) return {};
 
   if (mContext.currentFootprint) {
-    for (auto ptr : mContext.currentFootprint->getZones().values()) {
+    for (const auto& ptr : mContext.currentFootprint->getZones().values()) {
       auto graphicsItem = mContext.currentGraphicsItem->getGraphicsItem(ptr);
       if (graphicsItem && graphicsItem->isSelected()) {
         mSelectedZoneVertices = graphicsItem->getVertexIndicesAtPosition(pos);

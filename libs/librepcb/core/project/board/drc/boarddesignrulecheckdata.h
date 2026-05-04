@@ -210,7 +210,7 @@ struct BoardDesignRuleCheckData final {
 
   // Helper Methods
   UnsignedLength getMinCopperCopperClearance(
-      const std::optional<Uuid> netClass) const noexcept {
+      const std::optional<Uuid>& netClass) const noexcept {
     if (netClass) {
       auto it = netClasses.find(*netClass);
       if (it != netClasses.end()) {
@@ -221,7 +221,7 @@ struct BoardDesignRuleCheckData final {
     return settings.getMinCopperCopperClearance();
   }
   UnsignedLength getMinCopperWidth(
-      const std::optional<Uuid> netClass) const noexcept {
+      const std::optional<Uuid>& netClass) const noexcept {
     if (netClass) {
       auto it = netClasses.find(*netClass);
       if (it != netClasses.end()) {
@@ -231,7 +231,7 @@ struct BoardDesignRuleCheckData final {
     return settings.getMinCopperWidth();
   }
   UnsignedLength getMinViaDrillDiameter(
-      const std::optional<Uuid> netClass) const noexcept {
+      const std::optional<Uuid>& netClass) const noexcept {
     if (netClass) {
       auto it = netClasses.find(*netClass);
       if (it != netClasses.end()) {

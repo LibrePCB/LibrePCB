@@ -170,8 +170,7 @@ QDataStream& operator<<(QDataStream& stream, const Point& point) {
 
 QDebug operator<<(QDebug stream, const Point& point) {
   stream << QString("Point(%1mm, %2mm)")
-                .arg(point.getX().toMmString())
-                .arg(point.getY().toMmString());
+                .arg(point.getX().toMmString(), point.getY().toMmString());
   return stream;
 }
 

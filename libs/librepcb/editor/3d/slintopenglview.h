@@ -92,7 +92,7 @@ public:
       const OpenGlProjection& projection = OpenGlProjection(),
       QObject* parent = nullptr) noexcept;
   SlintOpenGlView(const SlintOpenGlView& other) = delete;
-  virtual ~SlintOpenGlView() noexcept;
+  ~SlintOpenGlView() noexcept override;
 
   // Getters
   bool isPanning() const noexcept;

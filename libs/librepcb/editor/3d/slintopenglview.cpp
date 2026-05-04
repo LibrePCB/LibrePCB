@@ -28,6 +28,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 // Compatibility defines to fix build error on some targets, see
 // https://github.com/LibrePCB/LibrePCB/issues/1205.
 #ifndef GL_MULTISAMPLE
@@ -157,7 +159,7 @@ slint::Image SlintOpenGlView::render(float width, float height) noexcept {
     QOpenGLFramebufferObjectFormat format;
     format.setAttachment(QOpenGLFramebufferObject::CombinedDepthStencil);
     format.setSamples(4);
-    mFbo.reset(new QOpenGLFramebufferObject(size, format));
+    mFbo = std::make_unique<QOpenGLFramebufferObject>(size, format);
   }
   if (!mFbo->bind()) {
     mErrors.append("Failed to bind OpenGL FBO.");

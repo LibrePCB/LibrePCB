@@ -151,7 +151,7 @@ void ComponentGateListModel::add() {
   auto gate = std::make_shared<ComponentSymbolVariantItem>(
       Uuid::createRandom(), *symbolUuid, Point(), Angle(), true,
       ComponentSymbolVariantItemSuffix(""));
-  for (auto pin : sym->getPins()) {
+  for (const auto& pin : sym->getPins()) {
     std::optional<Uuid> sigUuid;
     if (mWizardMode && (*mWizardMode)) {
       QString name = *pin.getName();
@@ -232,7 +232,7 @@ void ComponentGateListModel::trigger(
       cmdGrp->appendChild(
           new CmdComponentSymbolVariantItemRemove(*mList, obj.get()));
       if (mWizardMode && (*mWizardMode) && mComponent) {
-        for (auto pinout : obj->getPinSignalMap()) {
+        for (const auto& pinout : obj->getPinSignalMap()) {
           if (auto sigUuid = pinout.getSignalUuid()) {
             if (auto sig = mComponent->getSignals().find(*sigUuid)) {
               cmdGrp->appendChild(new CmdComponentSignalRemove(

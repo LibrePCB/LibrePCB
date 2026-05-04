@@ -103,7 +103,7 @@ public:
   PackageEditorFsm() = delete;
   PackageEditorFsm(const PackageEditorFsm& other) = delete;
   explicit PackageEditorFsm(const Context& context) noexcept;
-  ~PackageEditorFsm() noexcept;
+  ~PackageEditorFsm() noexcept override;
 
   // Getters
   const std::shared_ptr<Footprint>& getCurrentFootprint() noexcept;

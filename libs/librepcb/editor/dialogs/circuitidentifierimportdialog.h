@@ -55,7 +55,7 @@ public:
       delete;
   CircuitIdentifierImportDialog(const QString& settingsPrefix,
                                 QWidget* parent = nullptr) noexcept;
-  ~CircuitIdentifierImportDialog() noexcept;
+  ~CircuitIdentifierImportDialog() noexcept override;
 
   // Getters
   const QList<CircuitIdentifier>& getValues() const noexcept { return mValues; }

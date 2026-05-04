@@ -80,7 +80,7 @@ TEST_F(SerializableObjectListTest, testInstantiationWithMinimalElementClass) {
   MinimalList l2(std::move(l1));  // move ctor
   MinimalList l3(*sexpr);  // SExpression ctor
   l3.append(std::make_shared<MinimalMock>("foo"));
-  EXPECT_TRUE(l1.isEmpty());
+  EXPECT_TRUE(l1.isEmpty());  // NOLINT
   EXPECT_EQ(0, l2.count());
   EXPECT_FALSE(l2.contains(0));
   EXPECT_NE(nullptr, l3.value(0));
@@ -102,7 +102,7 @@ TEST_F(SerializableObjectListTest, testCopyConstructor) {
 TEST_F(SerializableObjectListTest, testMoveConstructor) {
   List l1{mMocks[0]};
   List l2(std::move(l1));
-  EXPECT_EQ(0, l1.count());
+  EXPECT_EQ(0, l1.count());  // NOLINT
   EXPECT_EQ(1, l2.count());
   EXPECT_EQ(mMocks[0], l2[0]);
 }
@@ -373,7 +373,7 @@ TEST_F(SerializableObjectListTest, testOperatorMove) {
   List l1{mMocks[0], mMocks[1]};
   List l2{mMocks[2]};
   l2 = std::move(l1);
-  EXPECT_EQ(0, l1.count());
+  EXPECT_EQ(0, l1.count());  // NOLINT
   EXPECT_EQ(2, l2.count());
   EXPECT_EQ(mMocks[0], l2[0]);
   EXPECT_EQ(mMocks[1], l2[1]);

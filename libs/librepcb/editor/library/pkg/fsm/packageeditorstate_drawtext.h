@@ -50,7 +50,7 @@ public:
   PackageEditorState_DrawText(const PackageEditorState_DrawText& other) =
       delete;
   explicit PackageEditorState_DrawText(Context& context) noexcept;
-  ~PackageEditorState_DrawText() noexcept;
+  ~PackageEditorState_DrawText() noexcept override;
 
   // Operator Overloadings
   PackageEditorState_DrawText& operator=(

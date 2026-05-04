@@ -28,6 +28,7 @@
 #include <QtGui>
 
 #include <algorithm>
+#include <memory>
 
 /*******************************************************************************
  *  Namespace
@@ -91,7 +92,7 @@ const SExpression& SExpression::getChild(int index) const {
   return *mChildren.at(index);
 }
 
-QList<SExpression*> SExpression::getChildren(Type type) noexcept {
+const QList<SExpression*> SExpression::getChildren(Type type) noexcept {
   QList<SExpression*> children;
   for (const auto& child : mChildren) {
     if (child->getType() == type) {
@@ -101,7 +102,8 @@ QList<SExpression*> SExpression::getChildren(Type type) noexcept {
   return children;
 }
 
-QList<const SExpression*> SExpression::getChildren(Type type) const noexcept {
+const QList<const SExpression*> SExpression::getChildren(
+    Type type) const noexcept {
   QList<const SExpression*> children;
   for (const auto& child : mChildren) {
     if (child->getType() == type) {
@@ -111,7 +113,8 @@ QList<const SExpression*> SExpression::getChildren(Type type) const noexcept {
   return children;
 }
 
-QList<SExpression*> SExpression::getChildren(const QString& name) noexcept {
+const QList<SExpression*> SExpression::getChildren(
+    const QString& name) noexcept {
   QList<SExpression*> children;
   for (const auto& child : mChildren) {
     if (child->isList() && (child->mValue == name)) {
@@ -121,7 +124,7 @@ QList<SExpression*> SExpression::getChildren(const QString& name) noexcept {
   return children;
 }
 
-QList<const SExpression*> SExpression::getChildren(
+const QList<const SExpression*> SExpression::getChildren(
     const QString& name) const noexcept {
   QList<const SExpression*> children;
   for (const auto& child : mChildren) {
@@ -151,7 +154,7 @@ SExpression* SExpression::tryGetChild(const QString& path) noexcept {
   foreach (const QString& name, path.split('/')) {
     if (name.startsWith('@')) {
       bool valid = false;
-      int index = name.mid(1).toInt(&valid);
+      int index = QStringView(name).mid(1).toInt(&valid);
       if ((valid) && (index >= 0) && skipLineBreaks(child->mChildren, index)) {
         child = child->mChildren.at(index).get();
       } else {
@@ -298,7 +301,7 @@ SExpression& SExpression::operator=(const SExpression& rhs) noexcept {
   mValue = rhs.mValue;
   mChildren.resize(rhs.mChildren.size());
   for (std::size_t i = 0; i < rhs.mChildren.size(); ++i) {
-    mChildren[i].reset(new SExpression(*rhs.mChildren.at(i)));
+    mChildren[i] = std::make_unique<SExpression>(*rhs.mChildren.at(i));
   }
   mFilePath = rhs.mFilePath;
   return *this;
@@ -607,7 +610,7 @@ void SExpression::skipWhitespaceAndComments(const QString& content, int& index,
 
 template <>
 std::unique_ptr<SExpression> serialize(const SExpression& obj) {
-  return std::unique_ptr<SExpression>(new SExpression(obj));
+  return std::make_unique<SExpression>(obj);
 }
 
 template <>

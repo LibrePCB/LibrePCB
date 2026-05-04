@@ -130,7 +130,7 @@ public:
                                   const GraphicsLayerList& layers,
                                   std::shared_ptr<Context> context,
                                   QObject* parent = nullptr) noexcept;
-  virtual ~SchematicGraphicsScene() noexcept;
+  ~SchematicGraphicsScene() noexcept override;
 
   // Getters
   Schematic& getSchematic() noexcept { return mSchematic; }

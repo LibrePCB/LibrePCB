@@ -53,17 +53,17 @@ public:
   MainWindowTestAdapter(const MainWindowTestAdapter& other) = delete;
   explicit MainWindowTestAdapter(GuiApplication& app, MainWindow& win,
                                  QWidget* parent = nullptr) noexcept;
-  ~MainWindowTestAdapter() noexcept;
+  ~MainWindowTestAdapter() noexcept override;
 
   // Operator Overloadings
   MainWindowTestAdapter& operator=(const MainWindowTestAdapter& rhs) = delete;
 
 public slots:
   QVariant trigger(QVariant action) noexcept;
-  QVariant isLibraryScanFinished(QVariant) const noexcept {
+  QVariant isLibraryScanFinished(QVariant) const noexcept {  // NOLINT
     return mLibraryScanFinished;
   }
-  QVariant getOpenProjects(QVariant) const noexcept;
+  QVariant getOpenProjects(QVariant) const noexcept;  // NOLINT
 
 signals:
   void actionTriggered(ui::Action a);

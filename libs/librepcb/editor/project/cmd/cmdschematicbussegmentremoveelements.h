@@ -49,7 +49,7 @@ class CmdSchematicBusSegmentRemoveElements final : public UndoCommand {
 public:
   // Constructors / Destructor
   CmdSchematicBusSegmentRemoveElements(SI_BusSegment& segment) noexcept;
-  ~CmdSchematicBusSegmentRemoveElements() noexcept;
+  ~CmdSchematicBusSegmentRemoveElements() noexcept override;
 
   // General Methods
   void removeJunction(SI_BusJunction& junction);

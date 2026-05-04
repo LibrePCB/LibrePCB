@@ -52,7 +52,7 @@ public:
   CmdSchematicImageRemove(const CmdSchematicImageRemove& other) = delete;
   explicit CmdSchematicImageRemove(SI_Image& image,
                                    TransactionalDirectory& dir) noexcept;
-  ~CmdSchematicImageRemove() noexcept;
+  ~CmdSchematicImageRemove() noexcept override;
 
   // Operator Overloadings
   CmdSchematicImageRemove& operator=(const CmdSchematicImageRemove& rhs) =

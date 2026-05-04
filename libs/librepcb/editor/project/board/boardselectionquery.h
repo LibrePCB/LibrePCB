@@ -72,7 +72,7 @@ public:
   explicit BoardSelectionQuery(BoardGraphicsScene& scene,
                                bool includeLockedItems,
                                QObject* parent = nullptr);
-  ~BoardSelectionQuery() noexcept;
+  ~BoardSelectionQuery() noexcept override;
 
   // Getters
   const QSet<BI_Device*>& getDeviceInstances() const noexcept {

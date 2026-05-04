@@ -52,7 +52,7 @@ public:
   CircleGraphicsItem(const CircleGraphicsItem& other) = delete;
   CircleGraphicsItem(Circle& circle, const GraphicsLayerList& layers,
                      QGraphicsItem* parent = nullptr) noexcept;
-  virtual ~CircleGraphicsItem() noexcept;
+  ~CircleGraphicsItem() noexcept override;
 
   // Getters
   Circle& getObj() noexcept { return mCircle; }

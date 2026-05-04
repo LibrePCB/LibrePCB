@@ -55,7 +55,7 @@ public:
   CmdNetSignalAdd(
       Circuit& circuit, NetClass& netclass,
       const std::optional<CircuitIdentifier>& name = std::nullopt) noexcept;
-  ~CmdNetSignalAdd() noexcept;
+  ~CmdNetSignalAdd() noexcept override;
 
   // Getters
   NetSignal* getNetSignal() const noexcept { return mNetSignal; }

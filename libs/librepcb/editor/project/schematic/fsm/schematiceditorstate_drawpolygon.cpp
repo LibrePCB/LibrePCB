@@ -34,6 +34,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -188,8 +190,8 @@ bool SchematicEditorState_DrawPolygon::startAddPolygon(
         new CmdSchematicPolygonAdd(*mCurrentPolygon));
 
     // Start undo command
-    mCurrentPolygonEditCmd.reset(
-        new CmdPolygonEdit(mCurrentPolygon->getPolygon()));
+    mCurrentPolygonEditCmd =
+        std::make_unique<CmdPolygonEdit>(mCurrentPolygon->getPolygon());
     mLastSegmentPos = pos;
     return true;
   } catch (const Exception& e) {
@@ -225,8 +227,8 @@ bool SchematicEditorState_DrawPolygon::addSegment(const Point& pos) noexcept {
     // Start a new undo command
     mContext.undoStack.beginCmdGroup(tr("Draw schematic polygon"));
     mIsUndoCmdActive = true;
-    mCurrentPolygonEditCmd.reset(
-        new CmdPolygonEdit(mCurrentPolygon->getPolygon()));
+    mCurrentPolygonEditCmd =
+        std::make_unique<CmdPolygonEdit>(mCurrentPolygon->getPolygon());
 
     // Add new vertex
     Path newPath = mCurrentPolygon->getPolygon().getPath();

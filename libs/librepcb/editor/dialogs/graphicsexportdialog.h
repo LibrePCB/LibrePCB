@@ -102,7 +102,7 @@ public:
       const FilePath& defaultFilePath, const LengthUnit& lengthUnit,
       const ColorScheme& colors, const QString& settingsPrefix,
       QWidget* parent = nullptr) noexcept;
-  ~GraphicsExportDialog() noexcept;
+  ~GraphicsExportDialog() noexcept override;
 
   // General Methods
   void setSaveAsCallback(SaveAsCallback callback) noexcept;

@@ -61,7 +61,7 @@ public:
       SI_SymbolPin& pin, std::weak_ptr<SGI_Symbol> symbolItem,
       const GraphicsLayerList& layers,
       std::shared_ptr<const SchematicGraphicsScene::Context> context) noexcept;
-  virtual ~SGI_SymbolPin() noexcept;
+  ~SGI_SymbolPin() noexcept override;
 
   // General Methods
   SI_SymbolPin& getPin() noexcept { return mPin; }
@@ -80,8 +80,8 @@ private:  // Methods
   void pinEdited(const SI_SymbolPin& obj, SI_SymbolPin::Event event) noexcept;
   void symbolGraphicsItemEdited(const SGI_Symbol& obj,
                                 SGI_Symbol::Event event) noexcept;
-  virtual QVariant itemChange(GraphicsItemChange change,
-                              const QVariant& value) noexcept override;
+  QVariant itemChange(GraphicsItemChange change,
+                      const QVariant& value) noexcept override;
   void updatePosition() noexcept;
   void updateRotation() noexcept;
   void updateJunction() noexcept;

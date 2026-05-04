@@ -39,6 +39,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -222,7 +224,7 @@ std::unique_ptr<Package> KiCadLibraryConverter::createPackage(
           if (res.hole) {
             footprint->getHoles().append(res.hole);
           }
-          for (auto polygon : res.polygons) {
+          for (const auto& polygon : std::as_const(res.polygons)) {
             footprint->getPolygons().append(polygon);
           }
         },
@@ -528,9 +530,9 @@ std::unique_ptr<Device> KiCadLibraryConverter::createDevice(
 void KiCadLibraryConverter::loadAlreadyImportedSymbol(
     const QString& generatedBy) {
   const FilePath fp = getAlreadyImportedFp<Symbol>({generatedBy});  // can throw
-  std::unique_ptr<Symbol> symbol = Symbol::open(
-      std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
-          std::make_shared<TransactionalFileSystem>(fp))));  // can throw
+  std::unique_ptr<Symbol> symbol =
+      Symbol::open(std::make_unique<TransactionalDirectory>(
+          std::make_shared<TransactionalFileSystem>(fp)));  // can throw
   for (const SymbolPin& pin : symbol->getPins()) {
     mSymbolPinMap.insert(std::make_pair(generatedBy, *pin.getName()),
                          pin.getUuid());
@@ -541,9 +543,9 @@ void KiCadLibraryConverter::loadAlreadyImportedSymbol(
 QString KiCadLibraryConverter::loadAlreadyImportedPackage(
     const QStringList& generatedBy) {
   const FilePath fp = getAlreadyImportedFp<Package>(generatedBy);  // can throw
-  std::unique_ptr<Package> package = Package::open(
-      std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
-          std::make_shared<TransactionalFileSystem>(fp))));  // can throw
+  std::unique_ptr<Package> package =
+      Package::open(std::make_unique<TransactionalDirectory>(
+          std::make_shared<TransactionalFileSystem>(fp)));  // can throw
   for (const PackagePad& pad : package->getPads()) {
     mPackagePadMap[package->getGeneratedBy()][*pad.getName()] = pad.getUuid();
   }
@@ -555,9 +557,9 @@ void KiCadLibraryConverter::loadAlreadyImportedComponent(
     const QString& generatedBy) {
   const FilePath fp =
       getAlreadyImportedFp<Component>({generatedBy});  // can throw
-  std::unique_ptr<Component> component = Component::open(
-      std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
-          std::make_shared<TransactionalFileSystem>(fp))));  // can throw
+  std::unique_ptr<Component> component =
+      Component::open(std::make_unique<TransactionalDirectory>(
+          std::make_shared<TransactionalFileSystem>(fp)));  // can throw
   for (const ComponentSignal& signal : component->getSignals()) {
     mComponentSignalMap.insert(std::make_pair(generatedBy, *signal.getName()),
                                signal.getUuid());

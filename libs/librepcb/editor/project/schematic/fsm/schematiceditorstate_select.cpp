@@ -77,6 +77,7 @@
 #include <QtWidgets>
 
 #include <algorithm>
+#include <memory>
 
 /*******************************************************************************
  *  Namespace
@@ -112,7 +113,7 @@ bool SchematicEditorState_Select::entry() noexcept {
   Q_ASSERT(mSubState == SubState::IDLE);
   mAdapter.fsmToolEnter(*this);
 
-  mUpdateAvailableFeaturesTimer.reset(new QTimer());
+  mUpdateAvailableFeaturesTimer = std::make_unique<QTimer>();
   mUpdateAvailableFeaturesTimer->setSingleShot(true);
   mUpdateAvailableFeaturesTimer->setInterval(50);
   connect(mUpdateAvailableFeaturesTimer.get(), &QTimer::timeout, this,
@@ -420,11 +421,13 @@ bool SchematicEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
   if (mSubState == SubState::IDLE) {
     if (findPolygonVerticesAtPosition(e.scenePos)) {
       // start moving polygon vertex
-      mCmdPolygonEdit.reset(new CmdPolygonEdit(mSelectedPolygon->getPolygon()));
+      mCmdPolygonEdit =
+          std::make_unique<CmdPolygonEdit>(mSelectedPolygon->getPolygon());
       mSubState = SubState::MOVING_POLYGON_VERTICES;
       return true;
     } else if (findImageHandleAtPosition(e.scenePos)) {
-      mCmdImageEdit.reset(new CmdImageEdit(*mSelectedImage->getImage()));
+      mCmdImageEdit =
+          std::make_unique<CmdImageEdit>(*mSelectedImage->getImage());
       mSubState = SubState::RESIZING_IMAGE;
       return true;
     } else {
@@ -778,8 +781,8 @@ bool SchematicEditorState_Select::processGridIntervalChanged(
 bool SchematicEditorState_Select::startMovingSelectedItems(
     SchematicGraphicsScene& scene, const Point& startPos) noexcept {
   Q_ASSERT(!mSelectedItemsDragCommand);
-  mSelectedItemsDragCommand.reset(
-      new CmdDragSelectedSchematicItems(scene, startPos));
+  mSelectedItemsDragCommand =
+      std::make_unique<CmdDragSelectedSchematicItems>(scene, startPos);
   mSubState = SubState::MOVING;
   return true;
 }
@@ -933,7 +936,7 @@ void SchematicEditorState_Select::startAddingPolygonVertex(
 
     mSelectedPolygon = &polygon;
     mSelectedPolygonVertices = {vertex};
-    mCmdPolygonEdit.reset(new CmdPolygonEdit(polygon.getPolygon()));
+    mCmdPolygonEdit = std::make_unique<CmdPolygonEdit>(polygon.getPolygon());
     mCmdPolygonEdit->setPath(path, true);
     mSubState = SubState::MOVING_POLYGON_VERTICES;
   } catch (const Exception& e) {
@@ -972,9 +975,9 @@ bool SchematicEditorState_Select::pasteFromClipboard() noexcept {
     if (!data) {
       if (std::unique_ptr<const SymbolClipboardData> symbolData =
               SymbolClipboardData::fromMimeData(mimeData)) {  // can throw
-        data.reset(new SchematicClipboardData(symbolData->getSymbolUuid(),
-                                              symbolData->getCursorPos(),
-                                              AssemblyVariantList()));
+        data = std::make_unique<SchematicClipboardData>(
+            symbolData->getSymbolUuid(), symbolData->getCursorPos(),
+            AssemblyVariantList());
         std::unique_ptr<TransactionalDirectory> dir = data->getDirectory();
         std::unique_ptr<const TransactionalDirectory> symbolDir =
             const_cast<SymbolClipboardData&>(*symbolData).getDirectory();
@@ -1026,8 +1029,8 @@ bool SchematicEditorState_Select::pasteFromClipboard() noexcept {
 
     if (mContext.undoStack.appendToCmdGroup(cmd.release())) {  // can throw
       // start moving the selected items
-      mSelectedItemsDragCommand.reset(
-          new CmdDragSelectedSchematicItems(*scene, mStartPos));
+      mSelectedItemsDragCommand =
+          std::make_unique<CmdDragSelectedSchematicItems>(*scene, mStartPos);
       return true;
     } else {
       // no items pasted -> abort
@@ -1371,8 +1374,7 @@ QString SchematicEditorState_Select::processSelection(
     keyValues.append(std::make_pair(tr("Pad(s)"), pin->getNumbers().join(",")));
     if (net && (!forcedNet.isEmpty()) && (net->getName() != forcedNet)) {
       const QString error = tr("Wire net '%1' does not match forced net '%2'!")
-                                .arg(*net->getName())
-                                .arg(forcedNet);
+                                .arg(*net->getName(), forcedNet);
       keyValues.append(std::make_pair(QString(), error));
     }
   }

@@ -78,7 +78,7 @@ void FootprintListModel::setReferences(Package* pkg,
     mPackage->getFootprints().onEdited.attach(mOnEditedSlot);
     mPackage->getModels().onEdited.attach(mOnModelsEditedSlot);
 
-    for (auto obj : mPackage->getFootprints()) {
+    for (const auto& obj : mPackage->getFootprints()) {
       mItems.append(createItem(obj));
     }
   }

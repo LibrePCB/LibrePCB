@@ -216,12 +216,11 @@ Version LibraryBaseElement::readFileFormat(
       VersionFile::fromByteArray(directory.read(fileName));
   const Version fileFormat = versionFile.getVersion();
   if (fileFormat > Application::getFileFormatVersion()) {
-    throw RuntimeError(__FILE__, __LINE__,
-                       tr("This library element was created with a newer "
-                          "application version.\n"
-                          "You need at least LibrePCB %1 to open it.\n\n%2")
-                           .arg(fileFormat.toPrettyStr(3))
-                           .arg(directory.getAbsPath().toNative()));
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        tr("This library element was created with a newer application "
+           "version.\nYou need at least LibrePCB %1 to open it.\n\n%2")
+            .arg(fileFormat.toPrettyStr(3), directory.getAbsPath().toNative()));
   }
   return fileFormat;
 }

@@ -55,7 +55,7 @@ public:
   HoleGraphicsItem(Hole& hole, const GraphicsLayerList& layers,
                    bool originCrossesVisible,
                    QGraphicsItem* parent = nullptr) noexcept;
-  virtual ~HoleGraphicsItem() noexcept;
+  ~HoleGraphicsItem() noexcept override;
 
   // General Methods
   Hole& getObj() noexcept { return mHole; }

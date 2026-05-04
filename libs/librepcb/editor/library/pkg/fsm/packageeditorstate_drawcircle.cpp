@@ -32,6 +32,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -192,7 +194,7 @@ bool PackageEditorState_DrawCircle::startAddCircle(const Point& pos) noexcept {
         std::make_shared<Circle>(Uuid::createRandom(), mCurrentProperties);
     mContext.undoStack.appendToCmdGroup(new CmdCircleInsert(
         mContext.currentFootprint->getCircles(), mCurrentCircle));
-    mCurrentEditCmd.reset(new CmdCircleEdit(*mCurrentCircle));
+    mCurrentEditCmd = std::make_unique<CmdCircleEdit>(*mCurrentCircle);
     mCurrentGraphicsItem =
         mContext.currentGraphicsItem->getGraphicsItem(mCurrentCircle);
     Q_ASSERT(mCurrentGraphicsItem);

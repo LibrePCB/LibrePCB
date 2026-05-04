@@ -89,7 +89,7 @@ bool CmdChangeBusOfSchematicBusSegment::performExecute() {
 void CmdChangeBusOfSchematicBusSegment::changeBusOfSegment() {
   // Remove all attached net segments.
   QSet<SI_NetSegment*> netSegments = mSegment.getAttachedNetSegments();
-  for (SI_NetSegment* ns : netSegments) {
+  for (SI_NetSegment* ns : std::as_const(netSegments)) {
     execNewChildCmd(new CmdSchematicNetSegmentRemove(*ns));  // can throw
   }
 
@@ -105,7 +105,7 @@ void CmdChangeBusOfSchematicBusSegment::changeBusOfSegment() {
   execNewChildCmd(new CmdSchematicBusSegmentAdd(mSegment));  // can throw
 
   // Re-add all net segments.
-  for (SI_NetSegment* ns : netSegments) {
+  for (SI_NetSegment* ns : std::as_const(netSegments)) {
     execNewChildCmd(new CmdSchematicNetSegmentAdd(*ns));  // can throw
   }
 }

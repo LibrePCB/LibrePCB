@@ -28,6 +28,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -41,8 +43,8 @@ namespace editor {
 LibraryDownload::LibraryDownload(const QUrl& urlToZip, const FilePath& destDir,
                                  std::shared_ptr<QSemaphore> semaphore) noexcept
   : QObject(nullptr) {
-  mFileDownload.reset(new FileDownload(
-      urlToZip, FilePath(destDir.toStr() % ".zip"), semaphore));
+  mFileDownload = std::make_unique<FileDownload>(
+      urlToZip, FilePath(destDir.toStr() % ".zip"), semaphore);
   mFileDownload->setZipExtractionDirectory(destDir,
                                            &LibraryDownload::findLibraryInZip);
   connect(mFileDownload.get(), &FileDownload::progressState, this,

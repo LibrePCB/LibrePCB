@@ -274,7 +274,7 @@ void BI_Pad::setComponentSideAndHoles(Pad::ComponentSide side,
     const Layer& smtLayer = (side == Pad::ComponentSide::Bottom)
         ? Layer::botCopper()
         : Layer::topCopper();
-    for (const BI_NetLine* nl : mRegisteredNetLines) {
+    for (const BI_NetLine* nl : std::as_const(mRegisteredNetLines)) {
       if (nl->getLayer() != smtLayer) {
         throw LogicError(__FILE__, __LINE__,
                          "Cannot modify pad with traces connected to it.");

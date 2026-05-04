@@ -104,13 +104,13 @@ std::shared_ptr<InteractiveHtmlBom> BoardInteractiveHtmlBomGenerator::generate(
       {&Layer::topCopper(), InteractiveHtmlBom::Layer::Top},
       {&Layer::botCopper(), InteractiveHtmlBom::Layer::Bottom},
   };
-  const QMap<const Layer*, InteractiveHtmlBom::DrawingKind> drawingKindMap = {
+  const QHash<const Layer*, InteractiveHtmlBom::DrawingKind> drawingKindMap = {
       {&Layer::topNames(), InteractiveHtmlBom::DrawingKind::ReferenceText},
       {&Layer::botNames(), InteractiveHtmlBom::DrawingKind::ReferenceText},
       {&Layer::topValues(), InteractiveHtmlBom::DrawingKind::ValueText},
       {&Layer::botValues(), InteractiveHtmlBom::DrawingKind::ValueText},
   };
-  QMap<const Layer*, InteractiveHtmlBom::DrawingLayer> drawingLayerMap = {
+  QHash<const Layer*, InteractiveHtmlBom::DrawingLayer> drawingLayerMap = {
       {&Layer::boardOutlines(), InteractiveHtmlBom::DrawingLayer::Edge},
       {&Layer::boardCutouts(), InteractiveHtmlBom::DrawingLayer::Edge},
       {&Layer::boardPlatedCutouts(), InteractiveHtmlBom::DrawingLayer::Edge},
@@ -262,7 +262,7 @@ std::shared_ptr<InteractiveHtmlBom> BoardInteractiveHtmlBomGenerator::generate(
         valueMpn.split("\n", Qt::SkipEmptyParts).join(" "),
         lookup("PACKAGE"),
     };
-    for (const QString& attr : mCustomAttributes) {
+    for (const QString& attr : std::as_const(mCustomAttributes)) {
       fields.append(AttributeSubstitutor::substitute(lookup(attr), lookup));
     }
     const std::size_t id =
@@ -308,7 +308,7 @@ std::shared_ptr<InteractiveHtmlBom> BoardInteractiveHtmlBomGenerator::generate(
 
   // Sort BOM items.
   QList<QList<BomItem>> sortedItems;
-  for (const auto& items : bomItems) {
+  for (const auto& items : std::as_const(bomItems)) {
     QList<BomItem> sorted = items;
     Toolbox::sortNumeric(
         sorted,
@@ -354,7 +354,7 @@ std::shared_ptr<InteractiveHtmlBom> BoardInteractiveHtmlBomGenerator::generate(
            InteractiveHtmlBom::Sides::Bottom,
            InteractiveHtmlBom::Sides::Both,
        }) {
-    for (const QList<BomItem>& items : sortedItems) {
+    for (const QList<BomItem>& items : std::as_const(sortedItems)) {
       QList<std::pair<QString, std::size_t>> parts;
       for (const auto& item : items) {
         if ((item.side == sides) ||

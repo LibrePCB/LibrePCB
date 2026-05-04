@@ -54,7 +54,7 @@ public:
   CmdPackageModelRemove(const CmdPackageModelRemove& other) = delete;
   CmdPackageModelRemove(Package& pkg,
                         std::shared_ptr<PackageModel> model) noexcept;
-  ~CmdPackageModelRemove() noexcept;
+  ~CmdPackageModelRemove() noexcept override;
 
   // Operator Overloadings
   CmdPackageModelRemove& operator=(const CmdPackageModelRemove& rhs) = delete;

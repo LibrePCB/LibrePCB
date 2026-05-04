@@ -51,16 +51,15 @@ protected:
                    .arg(line.id)
                    .arg(line.p1)
                    .arg(line.p2)
-                   .arg(line.layer ? line.layer->getId() : "nullptr")
-                   .arg(line.width.toMmString())
+                   .arg(line.layer ? line.layer->getId() : "nullptr",
+                        line.width.toMmString())
                    .arg(line.modified ? "true" : "false"));
     }
     for (auto it = result.newJunctions.begin(); it != result.newJunctions.end();
          it++) {
       s.append(QString("new junction id=%1 x=%2 y=%3")
                    .arg(it.key())
-                   .arg(it->getX().toMmString())
-                   .arg(it->getY().toMmString()));
+                   .arg(it->getX().toMmString(), it->getY().toMmString()));
     }
     for (int id : Toolbox::sortedQSet(result.disconnectedFixedAnchors)) {
       s.append(QString("disconnected pin/pad id=%1").arg(id));

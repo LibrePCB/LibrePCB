@@ -243,7 +243,7 @@ LengthUnit LengthUnit::fromString(const QString& str) {
 }
 
 LengthUnit LengthUnit::fromIndex(int index) {
-  if (index >= static_cast<int>(LengthUnit_t::_COUNT))
+  if (index >= static_cast<int>(LengthUnit_t::COUNT))
     throw LogicError(__FILE__, __LINE__, QString::number(index));
 
   return LengthUnit(static_cast<LengthUnit_t>(index));
@@ -251,7 +251,7 @@ LengthUnit LengthUnit::fromIndex(int index) {
 
 QList<LengthUnit> LengthUnit::getAllUnits() noexcept {
   QList<LengthUnit> list;
-  for (int i = 0; i < static_cast<int>(LengthUnit_t::_COUNT); i++)
+  for (int i = 0; i < static_cast<int>(LengthUnit_t::COUNT); i++)
     list.append(LengthUnit(static_cast<LengthUnit_t>(i)));
   return list;
 }

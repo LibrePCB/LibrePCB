@@ -125,7 +125,7 @@ TraceAnchor BoardNetSegmentSplitter::replaceAnchor(
   if (mAnchorsToReplace.contains(anchor)) {
     auto key = qMakePair(anchor, &layer);
     auto it = mReplacedAnchors.find(key);
-    if (it == mReplacedAnchors.constEnd()) {
+    if (it == mReplacedAnchors.end()) {
       std::shared_ptr<Junction> newJunction = std::make_shared<Junction>(
           Uuid::createRandom(), mAnchorsToReplace.value(anchor));
       mJunctions.append(newJunction);

@@ -54,7 +54,7 @@ public:
   // PartListModel() = delete;
   PartListModel(const PartListModel& other) = delete;
   explicit PartListModel(QObject* parent = nullptr) noexcept;
-  ~PartListModel() noexcept;
+  ~PartListModel() noexcept override;
 
   // General Methods
   void setDefaultManufacturer(const SimpleString& mfr) noexcept;

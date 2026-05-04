@@ -49,13 +49,13 @@ public:
   // Constructors / Destructor
   explicit DoubleSpinBox(QWidget* parent = nullptr) noexcept;
   DoubleSpinBox(const DoubleSpinBox& other) = delete;
-  virtual ~DoubleSpinBox() noexcept;
+  ~DoubleSpinBox() noexcept override;
 
   // Operator Overloadings
   DoubleSpinBox& operator=(const DoubleSpinBox& rhs) = delete;
 
   // Inherited Methods
-  virtual QString textFromValue(double val) const override;
+  QString textFromValue(double val) const override;
 };
 
 /*******************************************************************************

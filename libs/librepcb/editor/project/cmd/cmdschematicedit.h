@@ -51,7 +51,7 @@ public:
   CmdSchematicEdit() = delete;
   CmdSchematicEdit(const CmdSchematicEdit& other) = delete;
   explicit CmdSchematicEdit(Schematic& schematic) noexcept;
-  ~CmdSchematicEdit() noexcept;
+  ~CmdSchematicEdit() noexcept override;
 
   // Setters
   void setName(const ElementName& name) noexcept;

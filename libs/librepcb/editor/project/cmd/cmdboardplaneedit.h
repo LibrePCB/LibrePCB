@@ -51,7 +51,7 @@ class CmdBoardPlaneEdit final : public UndoCommand {
 public:
   // Constructors / Destructor
   explicit CmdBoardPlaneEdit(BI_Plane& plane) noexcept;
-  ~CmdBoardPlaneEdit() noexcept;
+  ~CmdBoardPlaneEdit() noexcept override;
 
   // Setters
   void translate(const Point& deltaPos, bool immediate) noexcept;

@@ -110,7 +110,7 @@ public:
   BoardEditorFsm(const BoardEditorFsm& other) = delete;
   explicit BoardEditorFsm(const Context& context,
                           QObject* parent = nullptr) noexcept;
-  virtual ~BoardEditorFsm() noexcept;
+  ~BoardEditorFsm() noexcept override;
 
   // Getters
   State getCurrentState() const noexcept { return mCurrentState; }

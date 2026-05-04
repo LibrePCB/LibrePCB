@@ -58,21 +58,21 @@ public:
   SchematicEditorState_AddImage(const SchematicEditorState_AddImage& other) =
       delete;
   explicit SchematicEditorState_AddImage(const Context& context) noexcept;
-  virtual ~SchematicEditorState_AddImage() noexcept;
+  ~SchematicEditorState_AddImage() noexcept override;
 
   // General Methods
-  virtual bool entry() noexcept override;
-  virtual bool exit() noexcept override;
+  bool entry() noexcept override;
+  bool exit() noexcept override;
 
   // Event Handlers
-  virtual bool processAddImage(const QByteArray& data, const QString& format,
-                               const QString& basename) noexcept override;
-  virtual bool processRotate(const Angle& rotation) noexcept override;
-  virtual bool processGraphicsSceneMouseMoved(
+  bool processAddImage(const QByteArray& data, const QString& format,
+                       const QString& basename) noexcept override;
+  bool processRotate(const Angle& rotation) noexcept override;
+  bool processGraphicsSceneMouseMoved(
       const GraphicsSceneMouseEvent& e) noexcept override;
-  virtual bool processGraphicsSceneLeftMouseButtonPressed(
+  bool processGraphicsSceneLeftMouseButtonPressed(
       const GraphicsSceneMouseEvent& e) noexcept override;
-  virtual bool processGraphicsSceneRightMouseButtonReleased(
+  bool processGraphicsSceneRightMouseButtonReleased(
       const GraphicsSceneMouseEvent& e) noexcept override;
 
   // Operator Overloadings

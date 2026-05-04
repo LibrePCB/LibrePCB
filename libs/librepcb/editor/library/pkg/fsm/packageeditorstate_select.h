@@ -72,7 +72,7 @@ public:
   PackageEditorState_Select() = delete;
   PackageEditorState_Select(const PackageEditorState_Select& other) = delete;
   explicit PackageEditorState_Select(Context& context) noexcept;
-  ~PackageEditorState_Select() noexcept;
+  ~PackageEditorState_Select() noexcept override;
 
   // General Methods
   bool entry() noexcept override;

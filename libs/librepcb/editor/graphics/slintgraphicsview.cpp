@@ -27,6 +27,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -156,7 +158,7 @@ slint::Image SlintGraphicsView::render(GraphicsScene& scene, float width,
       QOpenGLFramebufferObjectFormat format;
       format.setAttachment(QOpenGLFramebufferObject::CombinedDepthStencil);
       format.setSamples(4);
-      mGlFbo.reset(new QOpenGLFramebufferObject(size, format));
+      mGlFbo = std::make_unique<QOpenGLFramebufferObject>(size, format);
     }
     if (openGlError.isEmpty() && (!mGlFbo->bind())) {
       openGlError = "Failed to bind OpenGL FBO.";
@@ -167,7 +169,7 @@ slint::Image SlintGraphicsView::render(GraphicsScene& scene, float width,
   {
     std::unique_ptr<QOpenGLPaintDevice> glDev;
     if (mGlFbo && openGlError.isEmpty()) {
-      glDev.reset(new QOpenGLPaintDevice(size));
+      glDev = std::make_unique<QOpenGLPaintDevice>(size);
     }
     QPainter painter(glDev ? static_cast<QPaintDevice*>(glDev.get())
                            : static_cast<QPaintDevice*>(&pixmap));

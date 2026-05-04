@@ -83,7 +83,7 @@ public:
   DeviceTab(const DeviceTab& other) = delete;
   explicit DeviceTab(LibraryEditor& editor, std::unique_ptr<Device> dev,
                      Mode mode, QObject* parent = nullptr) noexcept;
-  ~DeviceTab() noexcept;
+  ~DeviceTab() noexcept override;
 
   // General Methods
   FilePath getDirectoryPath() const noexcept override;

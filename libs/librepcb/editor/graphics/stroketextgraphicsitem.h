@@ -54,7 +54,7 @@ public:
   StrokeTextGraphicsItem(StrokeText& text, const GraphicsLayerList& layers,
                          const StrokeFont& font,
                          QGraphicsItem* parent = nullptr) noexcept;
-  virtual ~StrokeTextGraphicsItem() noexcept;
+  ~StrokeTextGraphicsItem() noexcept override;
 
   // Getters
   StrokeText& getObj() noexcept { return mText; }

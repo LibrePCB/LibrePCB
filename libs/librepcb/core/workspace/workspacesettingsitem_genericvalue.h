@@ -53,7 +53,7 @@ public:
     : WorkspaceSettingsItem(key, parent),
       mDefaultValue(defaultValue),
       mCurrentValue(defaultValue) {}
-  ~WorkspaceSettingsItem_GenericValue() noexcept {}
+  ~WorkspaceSettingsItem_GenericValue() noexcept override {}
 
   /**
    * @brief Get the current value
@@ -89,7 +89,7 @@ private:  // Methods
   /**
    * @copydoc ::librepcb::WorkspaceSettingsItem::restoreDefaultImpl()
    */
-  virtual void restoreDefaultImpl() noexcept override { set(mDefaultValue); }
+  void restoreDefaultImpl() noexcept override { set(mDefaultValue); }
 
   /**
    * @copydoc ::librepcb::WorkspaceSettingsItem::loadImpl()

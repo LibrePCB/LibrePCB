@@ -81,7 +81,7 @@ public:
       const AttributeUnit* unit = nullptr) const noexcept = 0;
 
   // Static Methods
-  static QList<const AttributeType*> getAllTypes() noexcept;
+  static const QList<const AttributeType*> getAllTypes() noexcept;
   static const AttributeType& fromString(const QString& type);
 
   // Operator Overloadings

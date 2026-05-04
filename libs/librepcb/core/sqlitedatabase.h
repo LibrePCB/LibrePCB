@@ -64,7 +64,7 @@ public:
   SQLiteDatabase() = delete;
   SQLiteDatabase(const SQLiteDatabase& other) = delete;
   SQLiteDatabase(const FilePath& filepath, QObject* parent = nullptr);
-  ~SQLiteDatabase() noexcept;
+  ~SQLiteDatabase() noexcept override;
 
   // SQL Commands
   void beginTransaction();

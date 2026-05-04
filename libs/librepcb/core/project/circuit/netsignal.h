@@ -56,7 +56,7 @@ public:
   NetSignal(const NetSignal& other) = delete;
   explicit NetSignal(Circuit& circuit, const Uuid& uuid, NetClass& netclass,
                      const CircuitIdentifier& name, bool autoName);
-  ~NetSignal() noexcept;
+  ~NetSignal() noexcept override;
 
   // Getters: Attributes
   const Uuid& getUuid() const noexcept { return mUuid; }

@@ -59,23 +59,23 @@ public:
   BoardEditorState_DrawPlane() = delete;
   BoardEditorState_DrawPlane(const BoardEditorState_DrawPlane& other) = delete;
   explicit BoardEditorState_DrawPlane(const Context& context) noexcept;
-  virtual ~BoardEditorState_DrawPlane() noexcept;
+  ~BoardEditorState_DrawPlane() noexcept override;
 
   // General Methods
-  virtual bool entry() noexcept override;
-  virtual bool exit() noexcept override;
+  bool entry() noexcept override;
+  bool exit() noexcept override;
 
   // Event Handlers
-  virtual bool processAbortCommand() noexcept override;
-  virtual bool processGraphicsSceneMouseMoved(
+  bool processAbortCommand() noexcept override;
+  bool processGraphicsSceneMouseMoved(
       const GraphicsSceneMouseEvent& e) noexcept override;
-  virtual bool processGraphicsSceneLeftMouseButtonPressed(
+  bool processGraphicsSceneLeftMouseButtonPressed(
       const GraphicsSceneMouseEvent& e) noexcept override;
-  virtual bool processGraphicsSceneLeftMouseButtonDoubleClicked(
+  bool processGraphicsSceneLeftMouseButtonDoubleClicked(
       const GraphicsSceneMouseEvent& e) noexcept override;
 
   // Connection to UI
-  QVector<std::pair<Uuid, QString>> getAvailableNets() const noexcept;
+  const QVector<std::pair<Uuid, QString> > getAvailableNets() const noexcept;
   std::optional<Uuid> getNet() const noexcept;
   void setNet(const std::optional<Uuid>& net) noexcept;
   QSet<const Layer*> getAvailableLayers() noexcept;

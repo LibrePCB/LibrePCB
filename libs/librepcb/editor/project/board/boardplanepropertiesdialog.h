@@ -62,7 +62,7 @@ public:
                              UndoStack& undoStack, const LengthUnit& lengthUnit,
                              const QString& settingsPrefix,
                              QWidget* parent) noexcept;
-  ~BoardPlanePropertiesDialog() noexcept;
+  ~BoardPlanePropertiesDialog() noexcept override;
 
 private:  // GUI Events
   void buttonBoxClicked(QAbstractButton* button) noexcept;

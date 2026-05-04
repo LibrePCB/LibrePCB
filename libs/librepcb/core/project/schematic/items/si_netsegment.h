@@ -60,7 +60,7 @@ public:
   SI_NetSegment() = delete;
   SI_NetSegment(const SI_NetSegment& other) = delete;
   SI_NetSegment(Schematic& schematic, const Uuid& uuid, NetSignal& signal);
-  ~SI_NetSegment() noexcept;
+  ~SI_NetSegment() noexcept override;
 
   // Getters
   const Uuid& getUuid() const noexcept { return mUuid; }

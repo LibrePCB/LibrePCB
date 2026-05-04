@@ -48,7 +48,7 @@ class CmdBoardStrokeTextAdd final : public UndoCommand {
 public:
   // Constructors / Destructor
   explicit CmdBoardStrokeTextAdd(BI_StrokeText& text) noexcept;
-  ~CmdBoardStrokeTextAdd() noexcept;
+  ~CmdBoardStrokeTextAdd() noexcept override;
 
   // Getters
   BI_StrokeText* getStrokeText() const noexcept { return mStrokeText; }

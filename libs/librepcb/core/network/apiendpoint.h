@@ -69,7 +69,7 @@ public:
   ApiEndpoint() = delete;
   ApiEndpoint(const ApiEndpoint& other) = delete;
   explicit ApiEndpoint(const QUrl& url) noexcept;
-  ~ApiEndpoint() noexcept;
+  ~ApiEndpoint() noexcept override;
 
   // Getters
   const QUrl& getUrl() const noexcept { return mUrl; }

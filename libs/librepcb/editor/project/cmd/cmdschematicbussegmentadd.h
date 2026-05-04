@@ -50,7 +50,7 @@ public:
   // Constructors / Destructor
   explicit CmdSchematicBusSegmentAdd(SI_BusSegment& segment) noexcept;
   CmdSchematicBusSegmentAdd(Schematic& schematic, Bus& bus) noexcept;
-  ~CmdSchematicBusSegmentAdd() noexcept;
+  ~CmdSchematicBusSegmentAdd() noexcept override;
 
   // Getters
   SI_BusSegment* getSegment() const noexcept { return mSegment; }

@@ -90,9 +90,8 @@ void OutputDirectoryWriter::storeIndex() {
   QStringList lines;
   for (auto it = mIndex.begin(); it != mIndex.end(); ++it) {
     if (it.key().isExistingFile()) {
-      lines.append(QString("%1 | %2")
-                       .arg(it.key().toRelative(mDirPath))
-                       .arg(it.value().toStr()));
+      lines.append(QString("%1 | %2").arg(it.key().toRelative(mDirPath),
+                                          it.value().toStr()));
     }
   }
   std::sort(lines.begin(), lines.end());
@@ -158,8 +157,7 @@ FilePath OutputDirectoryWriter::beginWritingFile(const Uuid& job,
             " " %
             tr("Make sure to specify unique output file paths, "
                "e.g. by using placeholders like '%1' or '%2'.")
-                .arg("{{BOARD}}")
-                .arg("{{VARIANT}}"));
+                .arg("{{BOARD}}", "{{VARIANT}}"));
   }
 
   mIndex.insert(fp, job);

@@ -51,7 +51,7 @@ class CmdSchematicBusLabelEdit final : public UndoCommand {
 public:
   // Constructors / Destructor
   explicit CmdSchematicBusLabelEdit(SI_BusLabel& label) noexcept;
-  ~CmdSchematicBusLabelEdit() noexcept;
+  ~CmdSchematicBusLabelEdit() noexcept override;
 
   // Setters
   void setPosition(const Point& position, bool immediate) noexcept;

@@ -122,7 +122,7 @@ public:
   KiCadLibraryImport(const KiCadLibraryImport& other) = delete;
   KiCadLibraryImport(WorkspaceLibraryDb& db, const FilePath& dstLibFp,
                      QObject* parent = nullptr) noexcept;
-  ~KiCadLibraryImport() noexcept;
+  ~KiCadLibraryImport() noexcept override;
 
   // Getters
   State getState() const noexcept { return mState; }

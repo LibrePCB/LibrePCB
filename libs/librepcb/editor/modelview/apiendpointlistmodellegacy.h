@@ -57,7 +57,7 @@ public:
   // ApiEndpointListModelLegacy() = delete;
   ApiEndpointListModelLegacy(const ApiEndpointListModelLegacy& other) = delete;
   explicit ApiEndpointListModelLegacy(QObject* parent = nullptr) noexcept;
-  ~ApiEndpointListModelLegacy() noexcept;
+  ~ApiEndpointListModelLegacy() noexcept override;
 
   // General Methods
   void setValues(const QList<WorkspaceSettings::ApiEndpoint>& values) noexcept;

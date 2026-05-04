@@ -56,7 +56,7 @@ public:
   SymbolEditorState_DrawCircle(const SymbolEditorState_DrawCircle& other) =
       delete;
   explicit SymbolEditorState_DrawCircle(const Context& context) noexcept;
-  ~SymbolEditorState_DrawCircle() noexcept;
+  ~SymbolEditorState_DrawCircle() noexcept override;
 
   // General Methods
   bool entry() noexcept override;

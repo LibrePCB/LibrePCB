@@ -57,7 +57,7 @@ public:
   // PackageModelListModel() = delete;
   PackageModelListModel(const PackageModelListModel& other) = delete;
   explicit PackageModelListModel(QObject* parent = nullptr) noexcept;
-  ~PackageModelListModel() noexcept;
+  ~PackageModelListModel() noexcept override;
 
   // General Methods
   void setReferences(Package* pkg, UndoStack* stack) noexcept;

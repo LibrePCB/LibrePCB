@@ -100,10 +100,11 @@ public:
   bool containsChild(const SExpression& child) const noexcept;
   SExpression& getChild(int index);
   const SExpression& getChild(int index) const;
-  QList<SExpression*> getChildren(Type type) noexcept;
-  QList<const SExpression*> getChildren(Type type) const noexcept;
-  QList<SExpression*> getChildren(const QString& name) noexcept;
-  QList<const SExpression*> getChildren(const QString& name) const noexcept;
+  const QList<SExpression*> getChildren(Type type) noexcept;
+  const QList<const SExpression*> getChildren(Type type) const noexcept;
+  const QList<SExpression*> getChildren(const QString& name) noexcept;
+  const QList<const SExpression*> getChildren(
+      const QString& name) const noexcept;
 
   /**
    * @brief Get a child by path

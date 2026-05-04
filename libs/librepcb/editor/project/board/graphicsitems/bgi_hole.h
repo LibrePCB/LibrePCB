@@ -50,7 +50,7 @@ public:
   BGI_Hole() = delete;
   BGI_Hole(const BGI_Hole& other) = delete;
   BGI_Hole(BI_Hole& hole, const GraphicsLayerList& layers) noexcept;
-  virtual ~BGI_Hole() noexcept;
+  ~BGI_Hole() noexcept override;
 
   // General Methods
   BI_Hole& getHole() noexcept { return mHole; }

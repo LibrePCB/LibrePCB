@@ -61,7 +61,7 @@ public:
   explicit ComponentInstance(Circuit& circuit, const Uuid& uuid,
                              const Component& cmp, const Uuid& symbVar,
                              const CircuitIdentifier& name);
-  ~ComponentInstance() noexcept;
+  ~ComponentInstance() noexcept override;
 
   // Getters: Attributes
   const Uuid& getUuid() const noexcept { return mUuid; }

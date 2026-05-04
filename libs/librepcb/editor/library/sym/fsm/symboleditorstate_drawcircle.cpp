@@ -34,6 +34,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -183,7 +185,7 @@ bool SymbolEditorState_DrawCircle::startAddCircle(const Point& pos) noexcept {
         std::make_shared<Circle>(Uuid::createRandom(), mCurrentProperties);
     mContext.undoStack.appendToCmdGroup(
         new CmdCircleInsert(mContext.symbol.getCircles(), mCurrentCircle));
-    mCurrentEditCmd.reset(new CmdCircleEdit(*mCurrentCircle));
+    mCurrentEditCmd = std::make_unique<CmdCircleEdit>(*mCurrentCircle);
     mCurrentGraphicsItem = item->getGraphicsItem(mCurrentCircle);
     Q_ASSERT(mCurrentGraphicsItem);
     mCurrentGraphicsItem->setSelected(true);

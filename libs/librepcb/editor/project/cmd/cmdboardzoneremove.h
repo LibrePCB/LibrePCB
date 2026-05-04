@@ -48,7 +48,7 @@ class CmdBoardZoneRemove final : public UndoCommand {
 public:
   // Constructors / Destructor
   explicit CmdBoardZoneRemove(BI_Zone& zone) noexcept;
-  ~CmdBoardZoneRemove() noexcept;
+  ~CmdBoardZoneRemove() noexcept override;
 
 private:
   // Private Methods

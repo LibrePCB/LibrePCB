@@ -167,7 +167,7 @@ Path Path::toOpenPath() const noexcept {
   return p;
 }
 
-QVector<Path> Path::toOutlineStrokes(
+const QVector<Path> Path::toOutlineStrokes(
     const PositiveLength& width) const noexcept {
   QVector<Path> paths;
   paths.reserve(mVertices.count());
@@ -240,8 +240,8 @@ QString Path::toSvgPathMm() const noexcept {
                    .arg(0)
                    .arg(v0.getAngle().abs() >= Angle::deg180() ? 1 : 0)
                    .arg(v0.getAngle() < 0 ? 1 : 0)
-                   .arg(formatLength(v1.getPos().getX()))
-                   .arg(formatLength(-v1.getPos().getY())));
+                   .arg(formatLength(v1.getPos().getX()),
+                        formatLength(-v1.getPos().getY())));
     } else {
       s.append(QString("L %1 %2 ")
                    .arg(formatLength(v1.getPos().getX()),
@@ -635,7 +635,7 @@ Path Path::chamferedRect(const PositiveLength& width,
 }
 
 Path Path::trapezoid(const PositiveLength& width, const PositiveLength& height,
-                     const Length& dw, const Length dh) noexcept {
+                     const Length& dw, const Length& dh) noexcept {
   Path p;
   const Length dwClipped =
       (dw >= 0) ? std::min(dw, *width) : std::max(dw, -width);

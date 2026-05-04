@@ -37,6 +37,8 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -83,8 +85,7 @@ SymbolClipboardData::~SymbolClipboardData() noexcept {
 
 std::unique_ptr<TransactionalDirectory> SymbolClipboardData::getDirectory(
     const QString& path) noexcept {
-  return std::unique_ptr<TransactionalDirectory>(
-      new TransactionalDirectory(mFileSystem, path));
+  return std::make_unique<TransactionalDirectory>(mFileSystem, path);
 }
 
 /*******************************************************************************
@@ -129,8 +130,7 @@ std::unique_ptr<SymbolClipboardData> SymbolClipboardData::fromMimeData(
     const QMimeData* mime) {
   QByteArray content = mime ? mime->data(getMimeType()) : QByteArray();
   if (!content.isNull()) {
-    return std::unique_ptr<SymbolClipboardData>(
-        new SymbolClipboardData(content));  // can throw
+    return std::make_unique<SymbolClipboardData>(content);  // can throw
   } else {
     return nullptr;
   }

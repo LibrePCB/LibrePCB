@@ -103,7 +103,7 @@ const AttributeUnit* AttributeType::tryExtractUnitFromValue(
  *  Static Methods
  ******************************************************************************/
 
-QList<const AttributeType*> AttributeType::getAllTypes() noexcept {
+const QList<const AttributeType*> AttributeType::getAllTypes() noexcept {
   QList<const AttributeType*> types;
   types.append(&AttrTypeString::instance());
   types.append(&AttrTypeResistance::instance());

@@ -64,7 +64,7 @@ public:
       delete;
   explicit PrimitiveCircleGraphicsItem(
       QGraphicsItem* parent = nullptr) noexcept;
-  virtual ~PrimitiveCircleGraphicsItem() noexcept;
+  ~PrimitiveCircleGraphicsItem() noexcept override;
 
   // Setters
   void setPosition(const Point& pos) noexcept;
@@ -76,12 +76,10 @@ public:
   void setState(GraphicsLayer::State state) noexcept;
 
   // Inherited from QGraphicsItem
-  virtual QRectF boundingRect() const noexcept override {
-    return mBoundingRect;
-  }
-  virtual QPainterPath shape() const noexcept override;
-  virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
-                     QWidget* widget = 0) noexcept override;
+  QRectF boundingRect() const noexcept override { return mBoundingRect; }
+  QPainterPath shape() const noexcept override;
+  void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
+             QWidget* widget = nullptr) noexcept override;
 
   // Operator Overloadings
   PrimitiveCircleGraphicsItem& operator=(

@@ -61,7 +61,7 @@ public:
     }
     mList->onEdited.attach(mOnListEditedSlot);
   }
-  ~DerivedUiObjectList() noexcept {}
+  ~DerivedUiObjectList() noexcept override {}
 
   // Implementations
   std::size_t row_count() const noexcept override { return mList->row_count(); }

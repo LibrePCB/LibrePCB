@@ -62,7 +62,7 @@ public:
                                   const OutputJobList& allJobs,
                                   std::shared_ptr<ArchiveOutputJob> job,
                                   QWidget* parent = nullptr) noexcept;
-  ~ArchiveOutputJobWidget() noexcept;
+  ~ArchiveOutputJobWidget() noexcept override;
 
   // Operator Overloads
   ArchiveOutputJobWidget& operator=(const ArchiveOutputJobWidget& rhs) = delete;

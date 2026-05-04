@@ -53,7 +53,7 @@ public:
   // Constructors / Destructor
   explicit NumberEditBase(QWidget* parent = nullptr) noexcept;
   NumberEditBase(const NumberEditBase& other) = delete;
-  virtual ~NumberEditBase() noexcept;
+  ~NumberEditBase() noexcept override;
 
   // General Methods
   void setReadOnly(bool readOnly) noexcept;

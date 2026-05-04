@@ -53,15 +53,15 @@ public:
   SGI_BusJunction(
       SI_BusJunction& netpoint, const GraphicsLayerList& layers,
       std::shared_ptr<const SchematicGraphicsScene::Context> context) noexcept;
-  virtual ~SGI_BusJunction() noexcept;
+  ~SGI_BusJunction() noexcept override;
 
   // General Methods
   SI_BusJunction& getBusJunction() noexcept { return mBusJunction; }
 
   // Inherited from QGraphicsItem
-  QRectF boundingRect() const { return sBoundingRect; }
+  QRectF boundingRect() const override { return sBoundingRect; }
   void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
-             QWidget* widget);
+             QWidget* widget) override;
 
   // Operator Overloadings
   SGI_BusJunction& operator=(const SGI_BusJunction& rhs) = delete;

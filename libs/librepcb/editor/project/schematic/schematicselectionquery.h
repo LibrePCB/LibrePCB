@@ -77,7 +77,7 @@ public:
   SchematicSelectionQuery(const SchematicSelectionQuery& other) = delete;
   explicit SchematicSelectionQuery(SchematicGraphicsScene& scene,
                                    QObject* parent = nullptr);
-  ~SchematicSelectionQuery() noexcept;
+  ~SchematicSelectionQuery() noexcept override;
 
   // Getters
   const QSet<SI_Symbol*>& getSymbols() const noexcept { return mResultSymbols; }

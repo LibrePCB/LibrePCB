@@ -51,7 +51,7 @@ public:
   // Constructors / Destructor
   CmdBoardAdd(Project& project, const QString& dirName, const ElementName& name,
               const Board* boardToCopy = nullptr) noexcept;
-  ~CmdBoardAdd() noexcept;
+  ~CmdBoardAdd() noexcept override;
 
   // Getters
   Board* getBoard() const noexcept { return mBoard; }

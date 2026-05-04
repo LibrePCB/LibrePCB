@@ -32,6 +32,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -264,7 +266,7 @@ bool PackageEditorState_DrawPolygonBase::start() noexcept {
         std::make_shared<Polygon>(Uuid::createRandom(), mCurrentProperties);
     mContext.undoStack.appendToCmdGroup(new CmdPolygonInsert(
         mContext.currentFootprint->getPolygons(), mCurrentPolygon));
-    mCurrentEditCmd.reset(new CmdPolygonEdit(*mCurrentPolygon));
+    mCurrentEditCmd = std::make_unique<CmdPolygonEdit>(*mCurrentPolygon);
     mCurrentGraphicsItem =
         mContext.currentGraphicsItem->getGraphicsItem(mCurrentPolygon);
     Q_ASSERT(mCurrentGraphicsItem);
@@ -354,7 +356,7 @@ bool PackageEditorState_DrawPolygonBase::addNextSegment() noexcept {
     // Add next polygon segment.
     mContext.undoStack.beginCmdGroup(tr("Add Footprint Polygon"));
     mIsUndoCmdActive = true;
-    mCurrentEditCmd.reset(new CmdPolygonEdit(*mCurrentPolygon));
+    mCurrentEditCmd = std::make_unique<CmdPolygonEdit>(*mCurrentPolygon);
     vertices.last().setAngle(mLastAngle);
     vertices.append(Vertex(mCursorPos, Angle::deg0()));
     mCurrentEditCmd->setPath(Path(vertices), true);

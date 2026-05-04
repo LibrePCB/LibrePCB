@@ -48,7 +48,7 @@ class CmdComponentInstanceRemove final : public UndoCommand {
 public:
   // Constructors / Destructor
   CmdComponentInstanceRemove(Circuit& circuit, ComponentInstance& cmp) noexcept;
-  ~CmdComponentInstanceRemove() noexcept;
+  ~CmdComponentInstanceRemove() noexcept override;
 
 private:
   // Private Methods

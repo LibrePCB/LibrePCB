@@ -68,7 +68,7 @@ public:
                                    const LengthUnit& lengthUnit,
                                    const QString& settingsPrefix,
                                    QWidget* parent = nullptr) noexcept;
-  ~GraphicsOutputJobWidget() noexcept;
+  ~GraphicsOutputJobWidget() noexcept override;
 
   // Operator Overloads
   GraphicsOutputJobWidget& operator=(const GraphicsOutputJobWidget& rhs) =

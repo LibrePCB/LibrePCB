@@ -41,6 +41,8 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -122,9 +124,9 @@ std::unique_ptr<Project> NewProjectWizard::createProject() const {
   TransactionalDirectory dir(fs);
 
   // create project and set some metadata
-  std::unique_ptr<Project> project = Project::create(
-      std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(fs)),
-      mPageMetadata->getFullFilePath().getFilename());
+  std::unique_ptr<Project> project =
+      Project::create(std::make_unique<TransactionalDirectory>(fs),
+                      mPageMetadata->getFullFilePath().getFilename());
   project->setName(ElementName(
       cleanElementName(mPageMetadata->getProjectName())));  // can throw
   project->setAuthor(mPageMetadata->getProjectAuthor());
@@ -136,8 +138,7 @@ std::unique_ptr<Project> NewProjectWizard::createProject() const {
   // add schematic
   if (mPageInitialization && mPageInitialization->getCreateSchematic()) {
     Schematic* schematic = new Schematic(
-        *project,
-        std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory()),
+        *project, std::make_unique<TransactionalDirectory>(),
         mPageInitialization->getSchematicDirName(), Uuid::createRandom(),
         ElementName(mPageInitialization->getSchematicName()));  // can throw
     project->addSchematic(*schematic);
@@ -146,8 +147,7 @@ std::unique_ptr<Project> NewProjectWizard::createProject() const {
   // add board
   if (mPageInitialization && mPageInitialization->getCreateBoard()) {
     Board* board = new Board(
-        *project,
-        std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory()),
+        *project, std::make_unique<TransactionalDirectory>(),
         mPageInitialization->getBoardDirName(), Uuid::createRandom(),
         ElementName(mPageInitialization->getBoardName()));  // can throw
     board->addDefaultContent();

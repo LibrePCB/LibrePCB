@@ -102,10 +102,10 @@ BI_NetLine::BI_NetLine(BI_NetSegment& segment, const Uuid& uuid,
 
   // check layer
   if (!mTrace.getLayer().isCopper()) {
-    throw RuntimeError(__FILE__, __LINE__,
-                       QString("The layer of netpoint \"%1\" is invalid (%2).")
-                           .arg(mTrace.getUuid().toStr())
-                           .arg(mTrace.getLayer().getNameTr()));
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        QString("The layer of netpoint \"%1\" is invalid (%2).")
+            .arg(mTrace.getUuid().toStr(), mTrace.getLayer().getNameTr()));
   }
 
   // check if both netpoints are different

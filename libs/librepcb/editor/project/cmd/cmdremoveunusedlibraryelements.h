@@ -47,7 +47,7 @@ class CmdRemoveUnusedLibraryElements final : public UndoCommandGroup {
 public:
   // Constructors / Destructor
   CmdRemoveUnusedLibraryElements(Project& project) noexcept;
-  ~CmdRemoveUnusedLibraryElements() noexcept;
+  ~CmdRemoveUnusedLibraryElements() noexcept override;
 
 private:  // Methods
   /// @copydoc ::librepcb::editor::UndoCommand::performExecute()

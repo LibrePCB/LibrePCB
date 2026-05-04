@@ -60,7 +60,7 @@ public:
       delete;
   explicit SymbolEditorState_DrawTextBase(const Context& context,
                                           Mode mode) noexcept;
-  virtual ~SymbolEditorState_DrawTextBase() noexcept;
+  ~SymbolEditorState_DrawTextBase() noexcept override;
 
   // General Methods
   bool entry() noexcept override;
@@ -86,7 +86,7 @@ public:
     return mCurrentProperties.getText();
   }
   void setText(const QString& text) noexcept;
-  QStringList getTextSuggestions() const noexcept;
+  const QStringList getTextSuggestions() const noexcept;
   const PositiveLength& getHeight() const noexcept {
     return mCurrentProperties.getHeight();
   }

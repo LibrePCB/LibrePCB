@@ -51,7 +51,7 @@ public:
   CmdListElementsSwap(SerializableObjectList<T, P, OnEditedArgs...>& list,
                       int i, int j) noexcept
     : UndoCommand(tr("Move %1").arg(P::tagname)), mList(list), mI(i), mJ(j) {}
-  ~CmdListElementsSwap() noexcept {}
+  ~CmdListElementsSwap() noexcept override {}
 
   // Operator Overloadings
   CmdListElementsSwap& operator=(const CmdListElementsSwap& rhs) = delete;

@@ -72,7 +72,7 @@ public:
   SchematicTab(const SchematicTab& other) = delete;
   explicit SchematicTab(GuiApplication& app, SchematicEditor& editor,
                         QObject* parent = nullptr) noexcept;
-  ~SchematicTab() noexcept;
+  ~SchematicTab() noexcept override;
 
   // General Methods
   int getProjectIndex() const noexcept;

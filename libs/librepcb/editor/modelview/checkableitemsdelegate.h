@@ -49,7 +49,7 @@ public:
   // Constructors / Destructor
   explicit CheckableItemsDelegate(QObject* parent = nullptr) noexcept;
   CheckableItemsDelegate(const CheckableItemsDelegate& other) = delete;
-  ~CheckableItemsDelegate() noexcept;
+  ~CheckableItemsDelegate() noexcept override;
 
   // Inherited from QStyledItemDelegate
   QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option,

@@ -61,7 +61,7 @@ public:
   KiCadLibraryImportWizard(const UiTheme& theme, Workspace& workspace,
                            const FilePath& dstLibFp,
                            QWidget* parent = nullptr) noexcept;
-  ~KiCadLibraryImportWizard() noexcept;
+  ~KiCadLibraryImportWizard() noexcept override;
 
   // General Methods
   void reject() noexcept override;

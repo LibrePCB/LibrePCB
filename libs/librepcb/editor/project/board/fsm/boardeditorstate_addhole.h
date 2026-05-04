@@ -57,18 +57,18 @@ public:
   BoardEditorState_AddHole() = delete;
   BoardEditorState_AddHole(const BoardEditorState_AddHole& other) = delete;
   explicit BoardEditorState_AddHole(const Context& context) noexcept;
-  virtual ~BoardEditorState_AddHole() noexcept;
+  ~BoardEditorState_AddHole() noexcept override;
 
   // General Methods
-  virtual bool entry() noexcept override;
-  virtual bool exit() noexcept override;
+  bool entry() noexcept override;
+  bool exit() noexcept override;
 
   // Event Handlers
-  virtual bool processGraphicsSceneMouseMoved(
+  bool processGraphicsSceneMouseMoved(
       const GraphicsSceneMouseEvent& e) noexcept override;
-  virtual bool processGraphicsSceneLeftMouseButtonPressed(
+  bool processGraphicsSceneLeftMouseButtonPressed(
       const GraphicsSceneMouseEvent& e) noexcept override;
-  virtual bool processGraphicsSceneLeftMouseButtonDoubleClicked(
+  bool processGraphicsSceneLeftMouseButtonDoubleClicked(
       const GraphicsSceneMouseEvent& e) noexcept override;
 
   // Connection to UI

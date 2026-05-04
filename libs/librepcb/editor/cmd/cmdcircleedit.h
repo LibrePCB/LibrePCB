@@ -54,7 +54,7 @@ public:
   CmdCircleEdit() = delete;
   CmdCircleEdit(const CmdCircleEdit& other) = delete;
   explicit CmdCircleEdit(Circle& circle) noexcept;
-  ~CmdCircleEdit() noexcept;
+  ~CmdCircleEdit() noexcept override;
 
   // Setters
   void setLayer(const Layer& layer, bool immediate) noexcept;

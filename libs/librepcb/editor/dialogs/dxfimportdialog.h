@@ -65,7 +65,7 @@ public:
                            const LengthUnit& lengthUnit,
                            const QString& settingsPrefix,
                            QWidget* parent = nullptr) noexcept;
-  ~DxfImportDialog() noexcept;
+  ~DxfImportDialog() noexcept override;
 
   // Getters
   const Layer& getLayer() const noexcept;

@@ -71,7 +71,7 @@ public:
   CmdRemoveBoardItems() = delete;
   CmdRemoveBoardItems(const CmdRemoveBoardItems& other) = delete;
   explicit CmdRemoveBoardItems(Board& board) noexcept;
-  ~CmdRemoveBoardItems() noexcept;
+  ~CmdRemoveBoardItems() noexcept override;
 
   // Set items to remove
   void removeDeviceInstances(const QSet<BI_Device*>& set) {

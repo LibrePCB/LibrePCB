@@ -31,6 +31,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -136,7 +138,7 @@ bool PackageEditorState_AddHoles::startAddHole(const Point& pos) noexcept {
         std::make_shared<Hole>(Uuid::createRandom(), mCurrentProperties);
     mContext.undoStack.appendToCmdGroup(
         new CmdHoleInsert(mContext.currentFootprint->getHoles(), mCurrentHole));
-    mCurrentEditCmd.reset(new CmdHoleEdit(*mCurrentHole));
+    mCurrentEditCmd = std::make_unique<CmdHoleEdit>(*mCurrentHole);
     mCurrentGraphicsItem =
         mContext.currentGraphicsItem->getGraphicsItem(mCurrentHole);
     Q_ASSERT(mCurrentGraphicsItem);

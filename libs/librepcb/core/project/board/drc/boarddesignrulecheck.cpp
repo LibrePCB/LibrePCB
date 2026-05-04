@@ -1933,15 +1933,13 @@ RuleCheckMessageList BoardDesignRuleCheck::checkDeviceClearances(
   RuleCheckMessageList messages;
   emitStatus(tr("Check device clearances..."));
 
-  for (const auto& layers :
-       {std::make_pair(&Layer::topPackageOutlines(), &Layer::topCourtyard()),
-        std::make_pair(&Layer::botPackageOutlines(), &Layer::botCourtyard())}) {
+  const auto process = [&](const Layer& outlines, const Layer& courtyard) {
     // Determine device outlines and courtyards.
-    QMap<const Data::Device*, ClipperLib::Paths> deviceOutlines;
-    QMap<const Data::Device*, ClipperLib::Paths> deviceCourtyards;
+    QHash<const Data::Device*, ClipperLib::Paths> deviceOutlines;
+    QHash<const Data::Device*, ClipperLib::Paths> deviceCourtyards;
     for (const Data::Device& dev : data.devices) {
-      deviceOutlines.insert(&dev, getDeviceOutlinePaths(dev, *layers.first));
-      deviceCourtyards.insert(&dev, getDeviceOutlinePaths(dev, *layers.second));
+      deviceOutlines.insert(&dev, getDeviceOutlinePaths(dev, outlines));
+      deviceCourtyards.insert(&dev, getDeviceOutlinePaths(dev, courtyard));
     }
 
     // Helper functions.
@@ -1970,16 +1968,19 @@ RuleCheckMessageList BoardDesignRuleCheck::checkDeviceClearances(
     };
 
     // Check for overlaps.
+    const QList<const Data::Device*> devs = deviceCourtyards.keys();  // NOLINT
     for (int i = 0; i < deviceCourtyards.count(); ++i) {
-      const Data::Device* dev1 = deviceCourtyards.keys()[i];
+      const Data::Device* dev1 = devs.at(i);
       Q_ASSERT(dev1);
       for (int k = i + 1; k < deviceCourtyards.count(); ++k) {
-        const Data::Device* dev2 = deviceCourtyards.keys()[k];
+        const Data::Device* dev2 = devs.at(k);
         Q_ASSERT(dev2);
         check(dev1, dev2);
       }
     }
-  }
+  };
+  process(Layer::topPackageOutlines(), Layer::topCourtyard());
+  process(Layer::botPackageOutlines(), Layer::botCourtyard());
 
   return messages;
 }

@@ -101,7 +101,7 @@ public:
   Board(Project& project, std::unique_ptr<TransactionalDirectory> directory,
         const QString& directoryName, const Uuid& uuid,
         const ElementName& name);
-  ~Board() noexcept;
+  ~Board() noexcept override;
 
   // Getters: General
   Project& getProject() const noexcept { return mProject; }

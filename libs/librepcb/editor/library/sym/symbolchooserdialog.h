@@ -65,7 +65,7 @@ public:
   SymbolChooserDialog(const SymbolChooserDialog& other) = delete;
   SymbolChooserDialog(const Workspace& ws, const GraphicsLayerList& layers,
                       QWidget* parent = nullptr) noexcept;
-  ~SymbolChooserDialog() noexcept;
+  ~SymbolChooserDialog() noexcept override;
 
   // Getters
   std::optional<Uuid> getSelectedSymbolUuid() const noexcept;

@@ -64,7 +64,7 @@ public:
   EagleLibraryImportWizardContext(const UiTheme& theme, Workspace& workspace,
                                   const FilePath& dstLibFp,
                                   QObject* parent = nullptr) noexcept;
-  ~EagleLibraryImportWizardContext() noexcept;
+  ~EagleLibraryImportWizardContext() noexcept override;
 
   // Getters
   const UiTheme& getTheme() const noexcept { return mTheme; }

@@ -50,7 +50,7 @@ public:
   SymbolEditorState_DrawPolygon(const SymbolEditorState_DrawPolygon& other) =
       delete;
   explicit SymbolEditorState_DrawPolygon(const Context& context) noexcept;
-  ~SymbolEditorState_DrawPolygon() noexcept;
+  ~SymbolEditorState_DrawPolygon() noexcept override;
 
   // Operator Overloadings
   SymbolEditorState_DrawPolygon& operator=(

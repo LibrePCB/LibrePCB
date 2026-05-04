@@ -39,10 +39,10 @@ namespace tests {
  ******************************************************************************/
 
 class ApplicationTest : public ::testing::Test {
-protected:
+public:
   ApplicationTest() {}
 
-  ~ApplicationTest() { Application::setTranslationLocale(QLocale()); }
+  ~ApplicationTest() override { Application::setTranslationLocale(QLocale()); }
 
   std::string getTranslatedString() {
     return QCoreApplication::translate("ui::MainMenuBar", "File").toStdString();

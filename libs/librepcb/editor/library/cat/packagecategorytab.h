@@ -65,7 +65,7 @@ public:
   explicit PackageCategoryTab(LibraryEditor& editor,
                               std::unique_ptr<PackageCategory> cat, Mode mode,
                               QObject* parent = nullptr) noexcept;
-  ~PackageCategoryTab() noexcept;
+  ~PackageCategoryTab() noexcept override;
 
   // General Methods
   FilePath getDirectoryPath() const noexcept override;

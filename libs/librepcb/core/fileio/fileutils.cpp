@@ -174,7 +174,7 @@ QList<FilePath> FileUtils::getFilesInDirectory(const FilePath& dir,
   QList<FilePath> files;
   QDir qDir(dir.toStr());
   qDir.setFilter(QDir::Files | QDir::NoDotAndDotDot |
-                 (skipHiddenFiles ? QDir::Filter(0) : QDir::Hidden));
+                 (skipHiddenFiles ? QDir::Filter() : QDir::Hidden));
   if (!filters.isEmpty()) {
     qDir.setNameFilters(filters);
   }
@@ -188,7 +188,7 @@ QList<FilePath> FileUtils::getFilesInDirectory(const FilePath& dir,
 
   QDir qDir2(dir.toStr());
   qDir2.setFilter(QDir::Dirs | QDir::NoDotAndDotDot |
-                  (skipHiddenFiles ? QDir::Filter(0) : QDir::Hidden));
+                  (skipHiddenFiles ? QDir::Filter() : QDir::Hidden));
   foreach (const QFileInfo& info, qDir2.entryInfoList()) {
     FilePath fp(info.absoluteFilePath());
     files += getFilesInDirectory(fp, filters, recursive, skipHiddenFiles);

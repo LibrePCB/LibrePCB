@@ -53,15 +53,15 @@ public:
   SGI_NetPoint(
       SI_NetPoint& netpoint, const GraphicsLayerList& layers,
       std::shared_ptr<const SchematicGraphicsScene::Context> context) noexcept;
-  virtual ~SGI_NetPoint() noexcept;
+  ~SGI_NetPoint() noexcept override;
 
   // General Methods
   SI_NetPoint& getNetPoint() noexcept { return mNetPoint; }
 
   // Inherited from QGraphicsItem
-  QRectF boundingRect() const { return sBoundingRect; }
+  QRectF boundingRect() const override { return sBoundingRect; }
   void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
-             QWidget* widget);
+             QWidget* widget) override;
 
   // Operator Overloadings
   SGI_NetPoint& operator=(const SGI_NetPoint& rhs) = delete;

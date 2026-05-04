@@ -61,7 +61,7 @@ public:
   EagleLibraryImportWizard(const UiTheme& theme, Workspace& workspace,
                            const FilePath& dstLibFp,
                            QWidget* parent = nullptr) noexcept;
-  ~EagleLibraryImportWizard() noexcept;
+  ~EagleLibraryImportWizard() noexcept override;
 
   // General Methods
   void reject() noexcept override;

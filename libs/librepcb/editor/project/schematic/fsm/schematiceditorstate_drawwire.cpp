@@ -854,10 +854,10 @@ std::optional<NetSignal*>
                          QString(" (%1)").arg(QCoreApplication::translate(
                              "QShortcut", "Ctrl"))));
   NetSignal* selectedNet = nullptr;
-  for (NetSignal* net : nets) {
+  for (NetSignal* net : std::as_const(nets)) {
     QAction* a =
         menu.addAction(QIcon(":/img/actions/draw_wire.png"), *net->getName(),
-                       [&selectedNet, net]() { selectedNet = net; });
+                       &menu, [&selectedNet, net]() { selectedNet = net; });
     a->setEnabled(!net->isAnonymous());
   }
   menu.addSeparator();

@@ -57,7 +57,7 @@ public:
                                          QWidget* parent = nullptr) noexcept;
   NewProjectWizardPage_Metadata(const NewProjectWizardPage_Metadata& other) =
       delete;
-  ~NewProjectWizardPage_Metadata() noexcept;
+  ~NewProjectWizardPage_Metadata() noexcept override;
 
   // Setters
   void setProjectName(const QString& name) noexcept;

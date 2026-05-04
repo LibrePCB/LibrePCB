@@ -106,8 +106,8 @@ DeviceInstancePropertiesDialog::DeviceInstancePropertiesDialog(
       htmlLink.arg(mDevice.getLibPackage().getDirectory().getAbsPath().toStr(),
                    *mDevice.getLibPackage().getNames().value(localeOrder)) %
       QString(" (%1 \"%2\")")
-          .arg(tr("Footprint"))
-          .arg(*mDevice.getLibFootprint().getNames().value(localeOrder)));
+          .arg(tr("Footprint"),
+               *mDevice.getLibFootprint().getNames().value(localeOrder)));
   mUi->lblLibPackageName->setToolTip(
       (mDevice.getLibPackage().getDescriptions().value(localeOrder) + "\n\n" +
        mDevice.getLibPackage().getDirectory().getAbsPath().toNative())

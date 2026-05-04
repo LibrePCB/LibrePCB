@@ -68,7 +68,7 @@ public:
       mOnUiDataChangedSlot(
           *this, &UiObjectList<TObj, TUiData>::elementUiDataChangedHandler) {}
   UiObjectList(const UiObjectList& other) = delete;
-  ~UiObjectList() noexcept {}
+  ~UiObjectList() noexcept override {}
 
   // General Methods
   int count() const noexcept { return mObjects.count(); }

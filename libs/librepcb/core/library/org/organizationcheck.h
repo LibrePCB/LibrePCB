@@ -47,10 +47,10 @@ public:
   OrganizationCheck() = delete;
   OrganizationCheck(const OrganizationCheck& other) = delete;
   explicit OrganizationCheck(const Organization& Organization) noexcept;
-  virtual ~OrganizationCheck() noexcept;
+  ~OrganizationCheck() noexcept override;
 
   // General Methods
-  virtual RuleCheckMessageList runChecks() const override;
+  RuleCheckMessageList runChecks() const override;
 
   // Operator Overloadings
   OrganizationCheck& operator=(const OrganizationCheck& rhs) = delete;

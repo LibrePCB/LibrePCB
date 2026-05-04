@@ -45,6 +45,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -177,7 +179,7 @@ void ComponentGateEditor::chooseSymbol() {
   }
   auto newPinout =
       ComponentPinSignalMapHelpers::create(sym->getPins().getUuidSet());
-  for (auto item : newPinout.values()) {
+  for (const auto& item : newPinout.values()) {
     cmdGrp->appendChild(
         new CmdComponentPinSignalMapItemInsert(mGate->getPinSignalMap(), item));
   }
@@ -211,7 +213,7 @@ void ComponentGateEditor::reloadSymbol() noexcept {
   mSymbol = mCache.getSymbol(mGate->getSymbolUuid(), false);  // fail silently
 
   if (mSymbol) {
-    mScene.reset(new GraphicsScene());
+    mScene = std::make_unique<GraphicsScene>();
     const ColorScheme& scheme =
         mWorkspace.getSettings().schematicColorSchemes.getActive();
     const auto background = scheme.getColors(ColorRole::schematicBackground());
@@ -222,13 +224,13 @@ void ComponentGateEditor::reloadSymbol() noexcept {
     mScene->setSelectionRectColors(selection.primary, selection.secondary);
     mScene->setGridStyle(GridStyle::None);
     mScene->setOriginCrossVisible(false);  // It's rather disruptive.
-    mGraphicsItem.reset(new SymbolGraphicsItem(
+    mGraphicsItem = std::make_unique<SymbolGraphicsItem>(
         const_cast<Symbol&>(*mSymbol), mLayers, mComponent, mGate,
-        mWorkspace.getSettings().libraryLocaleOrder.get(), false));
+        mWorkspace.getSettings().libraryLocaleOrder.get(), false);
     mScene->addItem(*mGraphicsItem);
-    mComponentGraphicsItem.reset(new SymbolGraphicsItem(
+    mComponentGraphicsItem = std::make_unique<SymbolGraphicsItem>(
         const_cast<Symbol&>(*mSymbol), mLayers, mComponent, mGate,
-        mWorkspace.getSettings().libraryLocaleOrder.get(), false));
+        mWorkspace.getSettings().libraryLocaleOrder.get(), false);
     mComponentGraphicsItem->setPosition(mGate->getSymbolPosition());
     mComponentGraphicsItem->setRotation(mGate->getSymbolRotation());
     if (mComponentScene) {

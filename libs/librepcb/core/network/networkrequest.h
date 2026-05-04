@@ -51,7 +51,7 @@ public:
   NetworkRequest(const NetworkRequest& other) = delete;
   NetworkRequest(const QUrl& url,
                  const QByteArray& postData = QByteArray()) noexcept;
-  ~NetworkRequest() noexcept;
+  ~NetworkRequest() noexcept override;
 
   // Operator Overloadings
   NetworkRequest& operator=(const NetworkRequest& rhs) = delete;

@@ -52,7 +52,7 @@ public:
   // Constructors / Destructor
   explicit AlignmentSelector(QWidget* parent = nullptr) noexcept;
   AlignmentSelector(const AlignmentSelector& other) = delete;
-  ~AlignmentSelector() noexcept;
+  ~AlignmentSelector() noexcept override;
 
   // General Methods
   void setReadOnly(bool readOnly) noexcept;

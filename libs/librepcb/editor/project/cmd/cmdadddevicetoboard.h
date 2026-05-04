@@ -61,7 +61,7 @@ public:
                       const Point& position = Point(),
                       const Angle& rotation = Angle(),
                       bool mirror = false) noexcept;
-  ~CmdAddDeviceToBoard() noexcept;
+  ~CmdAddDeviceToBoard() noexcept override;
 
   // Getters
   BI_Device* getDeviceInstance() const noexcept { return mDeviceInstance; }

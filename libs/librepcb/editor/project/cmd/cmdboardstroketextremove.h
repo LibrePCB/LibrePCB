@@ -48,7 +48,7 @@ class CmdBoardStrokeTextRemove final : public UndoCommand {
 public:
   // Constructors / Destructor
   explicit CmdBoardStrokeTextRemove(BI_StrokeText& text) noexcept;
-  ~CmdBoardStrokeTextRemove() noexcept;
+  ~CmdBoardStrokeTextRemove() noexcept override;
 
 private:
   // Private Methods

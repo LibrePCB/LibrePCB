@@ -48,7 +48,7 @@ class CmdSymbolInstanceTextRemove final : public UndoCommand {
 public:
   // Constructors / Destructor
   CmdSymbolInstanceTextRemove(SI_Symbol& symbol, SI_Text& text) noexcept;
-  ~CmdSymbolInstanceTextRemove() noexcept;
+  ~CmdSymbolInstanceTextRemove() noexcept override;
 
 private:
   // Private Methods

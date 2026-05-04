@@ -60,7 +60,7 @@ public:
   explicit InteractiveHtmlBomOutputJobWidget(
       Project& project, std::shared_ptr<InteractiveHtmlBomOutputJob> job,
       QWidget* parent = nullptr) noexcept;
-  ~InteractiveHtmlBomOutputJobWidget() noexcept;
+  ~InteractiveHtmlBomOutputJobWidget() noexcept override;
 
   // Operator Overloads
   InteractiveHtmlBomOutputJobWidget& operator=(

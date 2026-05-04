@@ -326,7 +326,7 @@ void LengthEditBase::changeUnitActionTriggered() noexcept {
     group.addAction(action);
     action->setCheckable(true);
     action->setChecked(unit == getDisplayedUnit());
-    connect(action, &QAction::triggered, [this, unit]() {
+    connect(action, &QAction::triggered, this, [this, unit]() {
       setSelectedUnit(unit);
       updateText();
     });

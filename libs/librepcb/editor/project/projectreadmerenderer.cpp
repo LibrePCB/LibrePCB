@@ -31,6 +31,8 @@
 #include <QtConcurrent>
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -96,7 +98,7 @@ void ProjectReadmeRenderer::start() noexcept {
 
   // Start rendering in thread.
   emit runningChanged(true);
-  mWatcher.reset(new QFutureWatcher<QPixmap>());
+  mWatcher = std::make_unique<QFutureWatcher<QPixmap>>();
   connect(mWatcher.get(), &QFutureWatcher<QPixmap>::finished, this, [this]() {
     emit runningChanged(false);
     emit finished(mWatcher->result());
@@ -117,7 +119,7 @@ QPixmap ProjectReadmeRenderer::render(const FilePath& fp, int width) noexcept {
     QString md;
     std::unique_ptr<ZipArchive> zip;
     if (fp.getSuffix() == "lppz") {
-      zip.reset(new ZipArchive(fp));
+      zip = std::make_unique<ZipArchive>(fp);
       if (auto content = zip->tryReadFile("README.md")) {
         md = *content;
       }

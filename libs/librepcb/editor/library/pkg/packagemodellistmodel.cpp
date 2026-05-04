@@ -78,7 +78,7 @@ void PackageModelListModel::setReferences(Package* pkg,
   if (mPackage) {
     mPackage->getModels().onEdited.attach(mOnEditedSlot);
 
-    for (auto sig : mPackage->getModels()) {
+    for (const auto& sig : mPackage->getModels()) {
       mItems.append(createItem(sig));
     }
   }

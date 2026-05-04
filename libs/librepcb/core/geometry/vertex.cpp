@@ -77,9 +77,9 @@ bool Vertex::operator<(const Vertex& rhs) const noexcept {
 
 QDebug operator<<(QDebug stream, const Vertex& vertex) {
   stream << QString("Vertex(%1mm, %2mm, %3°)")
-                .arg(vertex.getPos().getX().toMmString())
-                .arg(vertex.getPos().getY().toMmString())
-                .arg(vertex.getAngle().toDegString());
+                .arg(vertex.getPos().getX().toMmString(),
+                     vertex.getPos().getY().toMmString(),
+                     vertex.getAngle().toDegString());
   return stream;
 }
 

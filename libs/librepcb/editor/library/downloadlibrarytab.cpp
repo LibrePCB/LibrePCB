@@ -33,6 +33,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -117,8 +119,8 @@ void DownloadLibraryTab::trigger(ui::TabAction a) noexcept {
         mUiData.download_progress = 0;
         onDerivedUiDataChanged.notify();
 
-        mDownload.reset(new LibraryDownload(*mUrl, mDirectory,
-                                            std::make_shared<QSemaphore>(1)));
+        mDownload = std::make_unique<LibraryDownload>(
+            *mUrl, mDirectory, std::make_shared<QSemaphore>(1));
         connect(mDownload.get(), &LibraryDownload::progressState, this,
                 [this](const QString& state) {
                   mUiData.download_status = q2s(state);

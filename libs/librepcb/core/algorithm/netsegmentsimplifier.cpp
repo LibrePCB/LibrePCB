@@ -75,7 +75,7 @@ NetSegmentSimplifier::Result NetSegmentSimplifier::simplify() noexcept {
   // First, group all anchors by position.
   // Important: Fixed anchors (pads & vias) must appear first, and non-fixed
   // anchors (junctions) last! Thus we sort the anchors by type.
-  for (const Anchor& anchor : mAnchors) {
+  for (const Anchor& anchor : std::as_const(mAnchors)) {
     mAnchorMap[anchor.pos].append(anchor);
   }
   for (auto it = mAnchorMap.begin(); it != mAnchorMap.end(); it++) {
@@ -85,7 +85,7 @@ NetSegmentSimplifier::Result NetSegmentSimplifier::simplify() noexcept {
   }
 
   // Get all IDs of pins or pads.
-  for (const Anchor& anchor : mAnchors) {
+  for (const Anchor& anchor : std::as_const(mAnchors)) {
     if (anchor.type == AnchorType::Fixed) {
       mPinsOrPads.insert(anchor.id);
     }
@@ -125,7 +125,7 @@ NetSegmentSimplifier::Result NetSegmentSimplifier::simplify() noexcept {
       connectedFixedAnchors - getConnectedFixedAnchors(),
       mModified,
   };
-  for (const Anchor& anchor : mAnchors) {
+  for (const Anchor& anchor : std::as_const(mAnchors)) {
     if (anchor.isNew) {
       result.newJunctions.insert(anchor.id, anchor.pos);
     }
@@ -213,7 +213,7 @@ void NetSegmentSimplifier::splitLinesAtAnchors() noexcept {
     const Point p1 = mAnchors.at(line.p1).pos;
     const Point p2 = mAnchors.at(line.p2).pos;
     if (p1 != p2) {
-      for (const Anchor& anchor : mAnchors) {
+      for (const Anchor& anchor : std::as_const(mAnchors)) {
         if ((anchor.pos != p1) && (anchor.pos != p2) &&
             isAnchorOnLayer(anchor, line.layer) &&
             isStraightLine(p1, anchor.pos, p2)) {
@@ -301,7 +301,7 @@ void NetSegmentSimplifier::removeDuplicateJunctions() noexcept {
 
 void NetSegmentSimplifier::removeRedundantLines() noexcept {
   auto isDuplicateLine = [&](const Line& line) {
-    for (const Line& other : mLines) {
+    for (const Line& other : std::as_const(mLines)) {
       if ((other.id != line.id) && (other.layer == line.layer) &&
           (other.width >= line.width) &&
           (QSet<int>{other.p1, other.p2} == QSet<int>{line.p1, line.p2})) {
@@ -310,7 +310,7 @@ void NetSegmentSimplifier::removeRedundantLines() noexcept {
     }
     return false;
   };
-  for (int id : mLines.keys()) {
+  for (int id : mLines.keys()) {  // NOLINT
     if (isDuplicateLine(mLines.value(id))) {
       mLines.remove(id);
       mModified = true;
@@ -394,7 +394,7 @@ bool NetSegmentSimplifier::mergeNextLines() noexcept {
 
 const NetSegmentSimplifier::Anchor* NetSegmentSimplifier::findAnchor(
     const Point& pos, const Layer* layer) noexcept {
-  for (const Anchor& anchor : mAnchorMap[pos]) {
+  for (const Anchor& anchor : std::as_const(mAnchorMap[pos])) {
     if (isAnchorOnLayer(anchor, layer)) {
       return &anchor;
     }

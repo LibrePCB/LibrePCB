@@ -56,7 +56,7 @@ public:
   // Constructors / Destructor
   explicit WaitingSpinnerWidget(QWidget* parent = nullptr) noexcept;
   WaitingSpinnerWidget(const WaitingSpinnerWidget& other) = delete;
-  ~WaitingSpinnerWidget() noexcept;
+  ~WaitingSpinnerWidget() noexcept override;
 
   // Setters
   void setColor(const QColor& color) noexcept { mColor = color; }

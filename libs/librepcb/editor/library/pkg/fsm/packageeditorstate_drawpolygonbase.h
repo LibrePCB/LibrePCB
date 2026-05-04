@@ -59,7 +59,7 @@ public:
   PackageEditorState_DrawPolygonBase(
       const PackageEditorState_DrawPolygonBase& other) = delete;
   PackageEditorState_DrawPolygonBase(Context& context, Mode mode) noexcept;
-  virtual ~PackageEditorState_DrawPolygonBase() noexcept;
+  ~PackageEditorState_DrawPolygonBase() noexcept override;
 
   // General Methods
   bool entry() noexcept override;

@@ -151,7 +151,7 @@ public:
    * throws an exception.
    */
   explicit WorkspaceLibraryDb(const FilePath& librariesPath);
-  ~WorkspaceLibraryDb() noexcept;
+  ~WorkspaceLibraryDb() noexcept override;
 
   // Getters
 
@@ -305,7 +305,7 @@ public:
    * @retval false If the element was not found.
    */
   template <typename ElementType>
-  bool getMetadata(const FilePath elemDir, Uuid* uuid = nullptr,
+  bool getMetadata(const FilePath& elemDir, Uuid* uuid = nullptr,
                    Version* version = nullptr,
                    bool* deprecated = nullptr) const {
     return getMetadata(getTable<ElementType>(), elemDir, uuid, version,
@@ -341,7 +341,7 @@ public:
    * @retval false If the category was not found.
    */
   template <typename ElementType>
-  bool getCategoryMetadata(const FilePath catDir,
+  bool getCategoryMetadata(const FilePath& catDir,
                            std::optional<Uuid>* parent = nullptr) const {
     static_assert(std::is_same<ElementType, ComponentCategory>::value ||
                       std::is_same<ElementType, PackageCategory>::value,
@@ -465,7 +465,7 @@ public:
    * @return Element resources (empty if element doesn't exist).
    */
   template <typename ElementType>
-  ResourceList getResources(const FilePath elemDir) const {
+  ResourceList getResources(const FilePath& elemDir) const {
     static_assert(std::is_same<ElementType, Component>::value ||
                       std::is_same<ElementType, Device>::value,
                   "Unsupported ElementType");

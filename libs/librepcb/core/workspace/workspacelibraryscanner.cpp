@@ -38,6 +38,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -488,9 +490,9 @@ std::unique_ptr<ElementType> WorkspaceLibraryScanner::openAndMigrate(
     const FilePath& fp) {
   // Try to open the library element read-only first.
   auto fs = TransactionalFileSystem::openRO(fp);
-  std::unique_ptr<ElementType> element = ElementType::open(
-      std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(fs)),
-      true);  // can throw
+  std::unique_ptr<ElementType> element =
+      ElementType::open(std::make_unique<TransactionalDirectory>(fs),
+                        true);  // can throw
   if (!element) {
     // If this didn't work, a file format migration is required so we try
     // it again in read/write mode. Afterwards save the element to disk to
@@ -498,9 +500,8 @@ std::unique_ptr<ElementType> WorkspaceLibraryScanner::openAndMigrate(
     // are no library elements with legacy file format in the workspace
     // so we don't need to keep backwards compatibility forever.
     fs = TransactionalFileSystem::openRW(fp);
-    element = ElementType::open(
-        std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(fs)),
-        false);  // can throw
+    element = ElementType::open(std::make_unique<TransactionalDirectory>(fs),
+                                false);  // can throw
     fs->save();  // can throw
     fs->releaseLock();  // can throw
   }

@@ -48,7 +48,7 @@ public:
   // Constructors / Destructor
   explicit AngleDelegate(QObject* parent = nullptr) noexcept;
   AngleDelegate(const AngleDelegate& other) = delete;
-  ~AngleDelegate() noexcept;
+  ~AngleDelegate() noexcept override;
 
   // Inherited from QStyledItemDelegate
   QString displayText(const QVariant& value,

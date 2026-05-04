@@ -139,7 +139,7 @@ template <typename T>
 void LibraryElementCategoriesModel::loadItems() {
   T builder(mWs.getLibraryDb(), mWs.getSettings().libraryLocaleOrder.get(),
             false);
-  for (const Uuid& uuid : mCategories) {
+  for (const Uuid& uuid : std::as_const(mCategories)) {
     const QStringList names = builder.buildTree(uuid);
     mItems.push_back(ui::LibraryElementCategoryData{
         q2s(uuid.toStr()),  // UUID

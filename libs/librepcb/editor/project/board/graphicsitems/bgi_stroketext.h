@@ -58,7 +58,7 @@ public:
       BI_StrokeText& text, std::weak_ptr<BGI_Device> deviceItem,
       const GraphicsLayerList& layers,
       std::shared_ptr<const BoardGraphicsScene::Context> context) noexcept;
-  virtual ~BGI_StrokeText() noexcept;
+  ~BGI_StrokeText() noexcept override;
 
   // General Methods
   BI_StrokeText& getStrokeText() noexcept { return mText; }
@@ -68,7 +68,7 @@ public:
   void updateContext() noexcept;
 
   // Inherited from QGraphicsItem
-  virtual QPainterPath shape() const noexcept override;
+  QPainterPath shape() const noexcept override;
 
   // Operator Overloadings
   BGI_StrokeText& operator=(const BGI_StrokeText& rhs) = delete;
@@ -78,8 +78,8 @@ private:  // Methods
                         BI_StrokeText::Event event) noexcept;
   void deviceGraphicsItemEdited(const BGI_Device& obj,
                                 BGI_Device::Event event) noexcept;
-  virtual QVariant itemChange(GraphicsItemChange change,
-                              const QVariant& value) noexcept override;
+  QVariant itemChange(GraphicsItemChange change,
+                      const QVariant& value) noexcept override;
   void updatePosition() noexcept;
   void updateTransform() noexcept;
   void updateLayer() noexcept;

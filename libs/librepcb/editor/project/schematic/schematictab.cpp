@@ -60,10 +60,15 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
+
+class Library;
+
 namespace editor {
 
 static ui::WireMode l2s(SchematicEditorState_DrawWire::WireMode v) noexcept {
@@ -416,7 +421,7 @@ void SchematicTab::highlightErcMessage(
                             .schematicColorSchemes.getActive()
                             .getColors(ColorRole::schematicOverlays());
     QPainterPath path = Path::toQPainterPathPx(msg->getLocations(), true);
-    mErcLocationGraphicsItem.reset(new QGraphicsPathItem());
+    mErcLocationGraphicsItem = std::make_unique<QGraphicsPathItem>();
     mErcLocationGraphicsItem->setZValue(
         SchematicGraphicsScene::ZValue_ErcLocation);
     mErcLocationGraphicsItem->setPen(QPen(colors.primary, 0));
@@ -438,16 +443,16 @@ void SchematicTab::highlightErcMessage(
 }
 
 void SchematicTab::activate() noexcept {
-  mScene.reset(new SchematicGraphicsScene(
+  mScene = std::make_unique<SchematicGraphicsScene>(
       mSchematic, *mLayers,
-      std::shared_ptr<SchematicGraphicsScene::Context>(
-          new SchematicGraphicsScene::Context{
+      std::make_shared<SchematicGraphicsScene::Context>(
+          SchematicGraphicsScene::Context{
               this,  // tab
               mProjectEditor.getCrossProbe(),  // cross probe
               GraphicsLayer::State::Highlighted,  // Self-probe mode
               mIgnorePlacementLocks,  // ignore placement locks
           }),
-      this));
+      this);
   mScene->setGridInterval(mSchematic.getGridInterval());
   connect(mScene.get(), &GraphicsScene::changed, this,
           &SchematicTab::requestRepaint);
@@ -894,7 +899,7 @@ void SchematicTab::fsmCrossProbe(
 }
 
 void SchematicTab::fsmAbortBlockingToolsInOtherEditors() noexcept {
-  mProjectEditor.abortBlockingToolsInOtherEditors(this);
+  emit mProjectEditor.abortBlockingToolsInOtherEditors(this);
 }
 
 void SchematicTab::fsmSetStatusBarMessage(const QString& message,
@@ -1037,7 +1042,7 @@ void SchematicTab::fsmToolEnter(
     mToolAttributeUnitsQt =
         type ? type->getAvailableUnits() : QList<const AttributeUnit*>{};
     mToolAttributeUnits->clear();
-    for (const AttributeUnit* unit : mToolAttributeUnitsQt) {
+    for (const AttributeUnit* unit : std::as_const(mToolAttributeUnitsQt)) {
       mToolAttributeUnits->push_back(q2s(unit->getSymbolTr()));
     }
     onDerivedUiDataChanged.notify();
@@ -1070,7 +1075,7 @@ void SchematicTab::fsmToolEnter(
   // Layers
   mToolLayersQt = Layer::sorted(state.getAvailableLayers());
   mToolLayers->clear();
-  for (const Layer* layer : mToolLayersQt) {
+  for (const Layer* layer : std::as_const(mToolLayersQt)) {
     mToolLayers->push_back(q2s(layer->getNameTr()));
   }
 
@@ -1119,7 +1124,7 @@ void SchematicTab::fsmToolEnter(SchematicEditorState_AddText& state) noexcept {
   // Layers
   mToolLayersQt = Layer::sorted(state.getAvailableLayers());
   mToolLayers->clear();
-  for (const Layer* layer : mToolLayersQt) {
+  for (const Layer* layer : std::as_const(mToolLayersQt)) {
     mToolLayers->push_back(q2s(layer->getNameTr()));
   }
 

@@ -58,7 +58,7 @@ public:
   // FootprintListModel() = delete;
   FootprintListModel(const FootprintListModel& other) = delete;
   explicit FootprintListModel(QObject* parent = nullptr) noexcept;
-  ~FootprintListModel() noexcept;
+  ~FootprintListModel() noexcept override;
 
   // General Methods
   void setReferences(Package* pkg, UndoStack* stack) noexcept;

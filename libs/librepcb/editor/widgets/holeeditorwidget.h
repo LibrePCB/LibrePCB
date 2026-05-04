@@ -57,7 +57,7 @@ public:
   HoleEditorWidget() = delete;
   explicit HoleEditorWidget(QWidget* parent = nullptr) noexcept;
   HoleEditorWidget(const HoleEditorWidget& other) = delete;
-  virtual ~HoleEditorWidget() noexcept;
+  ~HoleEditorWidget() noexcept override;
 
   // Getters
   const PositiveLength& getDiameter() const noexcept { return mDiameter; }

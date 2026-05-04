@@ -56,7 +56,7 @@ public:
   LibraryDependenciesModel(const LibraryDependenciesModel& other) = delete;
   explicit LibraryDependenciesModel(const Workspace& ws, const Uuid& libUuid,
                                     QObject* parent = nullptr) noexcept;
-  ~LibraryDependenciesModel() noexcept;
+  ~LibraryDependenciesModel() noexcept override;
 
   // General Methods
   const QSet<Uuid>& getUuids() const noexcept { return mCheckedUuids; }

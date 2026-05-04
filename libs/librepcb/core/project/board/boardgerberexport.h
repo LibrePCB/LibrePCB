@@ -69,7 +69,7 @@ public:
   BoardGerberExport() = delete;
   BoardGerberExport(const BoardGerberExport& other) = delete;
   explicit BoardGerberExport(const Board& board) noexcept;
-  ~BoardGerberExport() noexcept;
+  ~BoardGerberExport() noexcept override;
 
   // Getters
   FilePath getOutputDirectory(

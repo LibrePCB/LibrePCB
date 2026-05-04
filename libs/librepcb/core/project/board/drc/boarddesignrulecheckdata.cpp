@@ -63,12 +63,12 @@ namespace librepcb {
 
 BoardDesignRuleCheckData::BoardDesignRuleCheckData(
     const Board& board, const BoardDesignRuleCheckSettings& drcSettings,
-    bool quickCheck) noexcept {
-  settings = drcSettings;
-  quick = quickCheck;
+    bool quickCheck) noexcept
+  : settings(drcSettings),
+    quick(quickCheck),
+    silkscreenLayersTop(board.getSilkscreenLayersTop()),
+    silkscreenLayersBot(board.getSilkscreenLayersBot()) {
   copperLayers = board.getCopperLayers();
-  silkscreenLayersTop = board.getSilkscreenLayersTop();
-  silkscreenLayersBot = board.getSilkscreenLayersBot();
 
   // Helper to convert a pad.
   auto convertPad = [](const BI_Pad* pad) {

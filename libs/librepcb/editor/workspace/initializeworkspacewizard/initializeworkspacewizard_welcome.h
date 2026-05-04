@@ -51,10 +51,11 @@ class InitializeWorkspaceWizard_Welcome final : public QWizardPage {
 public:
   // Constructors / Destructor
   explicit InitializeWorkspaceWizard_Welcome(
-      InitializeWorkspaceWizardContext& context, QWidget* parent = 0) noexcept;
+      InitializeWorkspaceWizardContext& context,
+      QWidget* parent = nullptr) noexcept;
   InitializeWorkspaceWizard_Welcome(
       const InitializeWorkspaceWizard_Welcome& other) = delete;
-  ~InitializeWorkspaceWizard_Welcome() noexcept;
+  ~InitializeWorkspaceWizard_Welcome() noexcept override;
 
   // Inherited from QWizardPage
   int nextId() const noexcept override;

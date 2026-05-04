@@ -69,7 +69,7 @@ public:
                        const GraphicsLayerList& layers,
                        const QString& settingsPrefix,
                        QWidget* parent = nullptr) noexcept;
-  ~ZonePropertiesDialog() noexcept;
+  ~ZonePropertiesDialog() noexcept override;
 
   // Setters
   void setReadOnly(bool readOnly) noexcept;

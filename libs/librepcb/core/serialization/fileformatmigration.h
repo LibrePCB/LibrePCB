@@ -65,7 +65,7 @@ public:
                                const Version& toVersion,
                                QObject* parent = nullptr) noexcept;
   FileFormatMigration(const FileFormatMigration& other) = delete;
-  virtual ~FileFormatMigration() noexcept;
+  ~FileFormatMigration() noexcept override;
 
   // Getters
   const Version& getFromVersion() const noexcept { return mFromVersion; }
@@ -85,7 +85,7 @@ public:
   virtual void upgradeWorkspaceData(TransactionalDirectory& dir) = 0;
 
   // Static Methods
-  static QList<std::shared_ptr<FileFormatMigration>> getMigrations(
+  static const QList<std::shared_ptr<FileFormatMigration> > getMigrations(
       const Version& fileFormat);
 
   // Operator Overloadings

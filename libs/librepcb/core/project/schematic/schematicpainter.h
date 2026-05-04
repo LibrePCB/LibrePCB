@@ -97,7 +97,7 @@ public:
   explicit SchematicPainter(const Schematic& schematic, QStringList* errors,
                             bool thumbnail = false) noexcept;
   SchematicPainter(const SchematicPainter& other) = delete;
-  ~SchematicPainter() noexcept;
+  ~SchematicPainter() noexcept override;
 
   // General Methods
   void paint(QPainter& painter,

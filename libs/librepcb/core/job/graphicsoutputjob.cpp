@@ -143,9 +143,9 @@ QString GraphicsOutputJob::getTypeTr() const noexcept {
 }
 
 QIcon GraphicsOutputJob::getTypeIcon() const noexcept {
-  if (mOutputPath.toLower().endsWith(".pdf")) {
+  if (mOutputPath.endsWith(".pdf", Qt::CaseInsensitive)) {
     return QIcon(":/img/actions/pdf.png");
-  } else if (mOutputPath.toLower().endsWith(".svg")) {
+  } else if (mOutputPath.endsWith(".svg", Qt::CaseInsensitive)) {
     return QIcon(":/img/actions/export_svg.png");
   } else {
     return QIcon(":/img/actions/export_pixmap.png");

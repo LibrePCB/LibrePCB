@@ -81,7 +81,8 @@ BGI_Via::BGI_Via(
   updateText();
 
   mVia.onEdited.attach(mOnEditedSlot);
-  for (auto layer : {mViaLayer, mTopStopMaskLayer, mBottomStopMaskLayer}) {
+  for (const auto& layer :
+       {mViaLayer, mTopStopMaskLayer, mBottomStopMaskLayer}) {
     if (layer) {
       layer->onEdited.attach(mOnLayerEditedSlot);
     }
@@ -291,7 +292,7 @@ void BGI_Via::updateVisibility() noexcept {
        (!mStopMaskBottom.isEmpty()));
   if (!visible) {
     // Check copper visibility.
-    for (auto layer : mBlindBuriedCopperLayers) {
+    for (const auto& layer : std::as_const(mBlindBuriedCopperLayers)) {
       if (layer && layer->isVisible()) {
         visible = true;
         break;

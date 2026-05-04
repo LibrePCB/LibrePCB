@@ -58,7 +58,7 @@ public:
   SI_NetPoint() = delete;
   SI_NetPoint(const SI_NetPoint& other) = delete;
   SI_NetPoint(SI_NetSegment& segment, const Uuid& uuid, const Point& position);
-  ~SI_NetPoint() noexcept;
+  ~SI_NetPoint() noexcept override;
 
   // Getters
   const Uuid& getUuid() const noexcept { return mJunction.getUuid(); }

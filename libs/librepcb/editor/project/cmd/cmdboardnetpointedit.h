@@ -49,7 +49,7 @@ class CmdBoardNetPointEdit final : public UndoCommand {
 public:
   // Constructors / Destructor
   explicit CmdBoardNetPointEdit(BI_NetPoint& point) noexcept;
-  ~CmdBoardNetPointEdit() noexcept;
+  ~CmdBoardNetPointEdit() noexcept override;
 
   // Setters
   void setPosition(const Point& pos, bool immediate) noexcept;

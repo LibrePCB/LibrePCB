@@ -41,14 +41,16 @@ namespace tests {
  ******************************************************************************/
 
 class ZipWriterZipArchiveTest : public ::testing::Test {
-protected:
+public:
   FilePath mTmpDir;
   FilePath mZipFilePath;
 
   ZipWriterZipArchiveTest()
     : mTmpDir(FilePath::getRandomTempPath()),
       mZipFilePath(mTmpDir.getPathTo("test file.zip")) {}
-  ~ZipWriterZipArchiveTest() { QDir(mTmpDir.toStr()).removeRecursively(); }
+  ~ZipWriterZipArchiveTest() override {
+    QDir(mTmpDir.toStr()).removeRecursively();
+  }
 };
 
 /*******************************************************************************

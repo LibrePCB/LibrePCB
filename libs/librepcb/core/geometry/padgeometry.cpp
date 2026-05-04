@@ -76,7 +76,7 @@ UnsignedLength PadGeometry::getCornerRadius() const noexcept {
  *  General Methods
  ******************************************************************************/
 
-QVector<Path> PadGeometry::toOutlines() const {
+const QVector<Path> PadGeometry::toOutlines() const {
   const Length w = getWidth();
   const Length h = getHeight();
   const UnsignedLength r = getCornerRadius();

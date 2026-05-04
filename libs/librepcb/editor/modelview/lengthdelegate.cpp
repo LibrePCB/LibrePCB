@@ -109,8 +109,8 @@ void LengthDelegate::updateEditorGeometry(QWidget* editor,
 
 void LengthDelegate::editingFinished() noexcept {
   LengthEdit* edt = static_cast<LengthEdit*>(sender());
-  commitData(edt);
-  closeEditor(edt);
+  emit commitData(edt);
+  emit closeEditor(edt);
 }
 
 /*******************************************************************************

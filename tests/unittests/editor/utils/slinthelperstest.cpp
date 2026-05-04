@@ -39,7 +39,7 @@ namespace tests {
 class SlintHelpersTest : public ::testing::Test {
   Q_DECLARE_TR_FUNCTIONS(ui::SlintHelpersTest)
 
-protected:
+public:
   std::unique_ptr<QTranslator> mTranslator;
 
   SlintHelpersTest() : mTranslator(new QTranslator(qApp)) {
@@ -58,7 +58,7 @@ protected:
     notr("Translated %n String(s)", nullptr, 5);
   }
 
-  ~SlintHelpersTest() {
+  ~SlintHelpersTest() override {
     if (!qApp->removeTranslator(mTranslator.get())) {
       qWarning() << "Failed to remove translator.";
     }

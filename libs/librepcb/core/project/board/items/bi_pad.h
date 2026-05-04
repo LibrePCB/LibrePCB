@@ -99,7 +99,7 @@ public:
    * @param padUuid   Footprint pad UUID.
    */
   BI_Pad(BI_Device& device, const Uuid& padUuid);
-  ~BI_Pad() noexcept;
+  ~BI_Pad() noexcept override;
 
   // Getters
   BI_NetSegment* getNetSegment() const noexcept { return mNetSegment; }

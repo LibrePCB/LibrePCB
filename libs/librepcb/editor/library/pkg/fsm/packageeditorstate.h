@@ -59,7 +59,7 @@ public:
   PackageEditorState() = delete;
   PackageEditorState(const PackageEditorState& other) = delete;
   explicit PackageEditorState(Context& context) noexcept;
-  virtual ~PackageEditorState() noexcept;
+  ~PackageEditorState() noexcept override;
 
   // General Methods
   virtual bool entry() noexcept { return true; }

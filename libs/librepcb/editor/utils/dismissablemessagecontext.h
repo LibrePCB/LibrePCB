@@ -81,7 +81,7 @@ public:
                                      bool active = false,
                                      QObject* parent = nullptr) noexcept;
   DismissableMessageContext(const DismissableMessageContext& other) = delete;
-  ~DismissableMessageContext() noexcept;
+  ~DismissableMessageContext() noexcept override;
 
   /**
    * @brief Get UI data

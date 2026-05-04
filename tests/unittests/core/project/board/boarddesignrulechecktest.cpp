@@ -32,6 +32,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -64,8 +66,7 @@ TEST(BoardDesignRuleCheckTest, testMessages) {
       TransactionalFileSystem::openRO(projectFp.getParentDir());
   ProjectLoader loader;
   std::unique_ptr<Project> project =
-      loader.open(std::unique_ptr<TransactionalDirectory>(
-                      new TransactionalDirectory(projectFs)),
+      loader.open(std::make_unique<TransactionalDirectory>(projectFs),
                   projectFp.getFilename());  // can throw
 
   // Run DRC for each board.
@@ -122,7 +123,7 @@ TEST(BoardDesignRuleCheckTest, testMessages) {
                             .arg(approvals.count())
                             .arg(board->getDrcMessageApprovals().count());
     std::cout << "  * " << qPrintable(msg) << "\n";
-    summary.append(QString(" * %1: %2").arg(*board->getName()).arg(msg));
+    summary.append(QString(" * %1: %2").arg(*board->getName(), msg));
     EXPECT_EQ(expected->toByteArray().toStdString(),
               actual->toByteArray().toStdString());
     EXPECT_EQ(board->getDrcMessageApprovals().count(), approvals.count());
@@ -145,8 +146,7 @@ TEST(BoardDesignRuleCheckTest, testMultithreading) {
       TransactionalFileSystem::openRO(projectFp.getParentDir());
   ProjectLoader loader;
   std::unique_ptr<Project> project =
-      loader.open(std::unique_ptr<TransactionalDirectory>(
-                      new TransactionalDirectory(projectFs)),
+      loader.open(std::make_unique<TransactionalDirectory>(projectFs),
                   projectFp.getFilename());  // can throw
   Board* board = project->getBoards().first();
 

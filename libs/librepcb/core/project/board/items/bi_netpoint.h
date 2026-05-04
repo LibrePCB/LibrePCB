@@ -61,7 +61,7 @@ public:
   BI_NetPoint() = delete;
   BI_NetPoint(const BI_NetPoint& other) = delete;
   BI_NetPoint(BI_NetSegment& segment, const Uuid& uuid, const Point& position);
-  ~BI_NetPoint() noexcept;
+  ~BI_NetPoint() noexcept override;
 
   // Getters
   const Uuid& getUuid() const noexcept { return mJunction.getUuid(); }

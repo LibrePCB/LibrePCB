@@ -54,7 +54,7 @@ public:
       mList(list),
       mElement(element),
       mIndex(-1) {}
-  ~CmdListElementRemove() noexcept {}
+  ~CmdListElementRemove() noexcept override {}
 
   // Operator Overloadings
   CmdListElementRemove& operator=(const CmdListElementRemove& rhs) = delete;

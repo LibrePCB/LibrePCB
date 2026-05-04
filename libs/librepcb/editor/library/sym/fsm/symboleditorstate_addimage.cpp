@@ -33,6 +33,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -219,7 +221,7 @@ bool SymbolEditorState_AddImage::start(const Point& pos, QByteArray data,
     mContext.undoStack.appendToCmdGroup(new CmdImageAdd(
         mContext.symbol.getImages(), mContext.symbol.getDirectory(),
         mCurrentImage, fileExists ? QByteArray() : data));
-    mCurrentEditCmd.reset(new CmdImageEdit(*mCurrentImage));
+    mCurrentEditCmd = std::make_unique<CmdImageEdit>(*mCurrentImage);
     mCurrentGraphicsItem = item->getGraphicsItem(mCurrentImage);
     Q_ASSERT(mCurrentGraphicsItem);
     mCurrentGraphicsItem->setSelected(true);

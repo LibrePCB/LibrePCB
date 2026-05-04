@@ -334,7 +334,7 @@ BoardPlaneFragmentsBuilder::Result BoardPlaneFragmentsBuilder::run(
     for (auto& tuple : data->holes) {
       std::get<2>(tuple) = std::get<0>(tuple).map(std::get<2>(tuple));
     }
-    for (const TraceData& trace : data->traces) {
+    for (const TraceData& trace : std::as_const(data->traces)) {
       data->polygons.append(
           PolygonData{Transform(), trace.layer, trace.netSignal,
                       Path({Vertex(trace.startPos), Vertex(trace.endPos)}),

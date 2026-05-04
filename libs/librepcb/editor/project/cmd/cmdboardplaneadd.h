@@ -50,7 +50,7 @@ public:
   CmdBoardPlaneAdd() = delete;
   CmdBoardPlaneAdd(const CmdBoardPlaneAdd& other) = delete;
   explicit CmdBoardPlaneAdd(BI_Plane& plane) noexcept;
-  ~CmdBoardPlaneAdd() noexcept;
+  ~CmdBoardPlaneAdd() noexcept override;
 
 private:  // Methods
   /// @copydoc ::librepcb::editor::UndoCommand::performExecute()

@@ -151,7 +151,7 @@ void LibraryEditorTab::setWatchedFiles(
 
   // Register/unregister watched files with QFileSystemWatcher.
   QSet<FilePath> watched;
-  for (QString path : mFileSystemWatcher.files()) {
+  for (const QString& path : mFileSystemWatcher.files()) {  // NOLINT
     const FilePath fp(path);
     if (!mWatchedFileHashes.contains(fp)) {
       mFileSystemWatcher.removePath(path);
@@ -159,7 +159,7 @@ void LibraryEditorTab::setWatchedFiles(
       watched.insert(fp);
     }
   }
-  for (const FilePath& fp : mWatchedFileHashes.keys()) {
+  for (const FilePath& fp : mWatchedFileHashes.keys()) {  // NOLINT
     if ((!watched.contains(fp)) && (!mFileSystemWatcher.addPath(fp.toStr()))) {
       qCritical().nospace().noquote()
           << "Failed to watch file '" << fp.toNative() << "'.";

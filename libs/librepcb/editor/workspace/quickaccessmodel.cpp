@@ -207,7 +207,7 @@ void QuickAccessModel::saveFavoriteProjects() noexcept {
 void QuickAccessModel::refreshItems() noexcept {
   QSet<FilePath> listedPaths;
   std::vector<ui::TreeViewItemData> items;
-  for (const FilePath& fp : mRecentProjects + mFavoriteProjects) {
+  for (const FilePath& fp : mRecentProjects + mFavoriteProjects) {  // NOLINT
     const bool favorite = mFavoriteProjects.contains(fp);
     if (((listedPaths.count() < 5) || (favorite)) &&
         (!listedPaths.contains(fp)) && fp.isExistingFile()) {
@@ -260,14 +260,14 @@ void QuickAccessModel::setWatchedProjects(
   }
 
   QSet<FilePath> watched;
-  for (const QString& dir : mWatcher.directories()) {
+  for (const QString& dir : mWatcher.directories()) {  // NOLINT
     watched.insert(FilePath(dir));
   }
 
-  for (const FilePath& fp : watched - toBeWatched) {
+  for (const FilePath& fp : watched - toBeWatched) {  // NOLINT
     mWatcher.removePath(fp.toStr());
   }
-  for (const FilePath& fp : toBeWatched - watched) {
+  for (const FilePath& fp : toBeWatched - watched) {  // NOLINT
     if (!mWatcher.addPath(fp.toStr())) {
       qWarning() << "Failed to watch file:" << fp.toNative();
     }

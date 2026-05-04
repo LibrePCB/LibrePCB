@@ -65,13 +65,13 @@ public:
 
   explicit ProjectLibraryUpdater(Workspace& ws, const FilePath& project,
                                  CloseCallback cb) noexcept;
-  ~ProjectLibraryUpdater();
+  ~ProjectLibraryUpdater() override;
 
 private slots:
   void btnUpdateClicked();
 
 signals:
-  void finished(const FilePath& fp);
+  void finishedUpdate(const FilePath& fp);
 
 private:
   void log(const QString& msg) noexcept;

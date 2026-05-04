@@ -423,8 +423,8 @@ void MeasureTool::updateStatusBarMessage() noexcept {
     emit statusBarMessageChanged(
         tr("Press %1 to copy the value to clipboard or %2 to clear the "
            "measurement")
-            .arg(copyKeys.first().toString(QKeySequence::NativeText))
-            .arg(deleteKeys.first().toString(QKeySequence::NativeText)));
+            .arg(copyKeys.first().toString(QKeySequence::NativeText),
+                 deleteKeys.first().toString(QKeySequence::NativeText)));
   } else if (mStartPos && (!mEndPos)) {
     emit statusBarMessageChanged(tr("Click to specify the end point") %
                                  disableSnapNote);

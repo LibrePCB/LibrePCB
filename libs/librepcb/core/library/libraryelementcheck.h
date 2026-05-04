@@ -47,10 +47,10 @@ public:
   LibraryElementCheck() = delete;
   LibraryElementCheck(const LibraryElementCheck& other) = delete;
   explicit LibraryElementCheck(const LibraryElement& element) noexcept;
-  virtual ~LibraryElementCheck() noexcept;
+  ~LibraryElementCheck() noexcept override;
 
   // General Methods
-  virtual RuleCheckMessageList runChecks() const override;
+  RuleCheckMessageList runChecks() const override;
 
   // Operator Overloadings
   LibraryElementCheck& operator=(const LibraryElementCheck& rhs) = delete;

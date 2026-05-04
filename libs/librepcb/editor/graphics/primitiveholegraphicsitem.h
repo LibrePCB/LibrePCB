@@ -59,7 +59,7 @@ public:
   PrimitiveHoleGraphicsItem(const GraphicsLayerList& layers,
                             bool originCrossesVisible,
                             QGraphicsItem* parent = nullptr) noexcept;
-  virtual ~PrimitiveHoleGraphicsItem() noexcept;
+  ~PrimitiveHoleGraphicsItem() noexcept override;
 
   // Setters
   void setHole(const NonEmptyPath& path, const PositiveLength& diameter,

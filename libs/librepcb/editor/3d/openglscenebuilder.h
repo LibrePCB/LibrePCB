@@ -58,7 +58,7 @@ public:
   // Constructors / Destructor
   OpenGlSceneBuilder(QObject* parent = nullptr) noexcept;
   OpenGlSceneBuilder(const OpenGlSceneBuilder& other) = delete;
-  ~OpenGlSceneBuilder() noexcept;
+  ~OpenGlSceneBuilder() noexcept override;
 
   // General Methods
 

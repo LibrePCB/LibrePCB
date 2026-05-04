@@ -55,7 +55,7 @@ public:
       const CmdChangeNetSignalOfSchematicNetSegment& other) = delete;
   CmdChangeNetSignalOfSchematicNetSegment(SI_NetSegment& seg,
                                           NetSignal& newSig) noexcept;
-  ~CmdChangeNetSignalOfSchematicNetSegment() noexcept;
+  ~CmdChangeNetSignalOfSchematicNetSegment() noexcept override;
 
 private:
   // Private Methods

@@ -88,7 +88,7 @@ public:
                         const PackagePadList* packagePadList = nullptr,
                         const Component* component = nullptr,
                         const QStringList& localeOrder = {}) noexcept;
-  ~FootprintGraphicsItem() noexcept;
+  ~FootprintGraphicsItem() noexcept override;
 
   // Getters
   std::shared_ptr<FootprintPadGraphicsItem> getGraphicsItem(

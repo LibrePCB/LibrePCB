@@ -51,6 +51,8 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -483,16 +485,14 @@ void OrganizationTab::execOutputJobsDialog(
 Project& OrganizationTab::getTmpProject() {
   if (!mTmpProject) {
     auto fs = TransactionalFileSystem::openRO(FilePath::getRandomTempPath());
-    mTmpProject = Project::create(
-        std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(fs)),
-        "tmp.lpp");
+    mTmpProject = Project::create(std::make_unique<TransactionalDirectory>(fs),
+                                  "tmp.lpp");
   }
   if (mTmpProject->getBoards().isEmpty()) {
-    Board* brd = new Board(
-        *mTmpProject,
-        std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
-            mTmpProject->getDirectory(), "boards/board")),
-        "board", Uuid::createRandom(), ElementName("board"));
+    Board* brd = new Board(*mTmpProject,
+                           std::make_unique<TransactionalDirectory>(
+                               mTmpProject->getDirectory(), "boards/board"),
+                           "board", Uuid::createRandom(), ElementName("board"));
     mTmpProject->addBoard(*brd);
   }
   return *mTmpProject.get();

@@ -48,7 +48,7 @@ public:
   CmdLibraryCategoryEdit() = delete;
   CmdLibraryCategoryEdit(const CmdLibraryCategoryEdit& other) = delete;
   explicit CmdLibraryCategoryEdit(LibraryCategory& category) noexcept;
-  virtual ~CmdLibraryCategoryEdit() noexcept;
+  ~CmdLibraryCategoryEdit() noexcept override;
 
   // Setters
   void setParentUuid(const std::optional<Uuid>& parentUuid) noexcept;
@@ -58,13 +58,13 @@ public:
 
 private:  // Methods
   /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
-  virtual bool performExecute() override;
+  bool performExecute() override;
 
   /// @copydoc ::librepcb::editor::UndoCommand::performUndo()
-  virtual void performUndo() override;
+  void performUndo() override;
 
   /// @copydoc ::librepcb::editor::UndoCommand::performRedo()
-  virtual void performRedo() override;
+  void performRedo() override;
 
 private:  // Data
   LibraryCategory& mCategory;

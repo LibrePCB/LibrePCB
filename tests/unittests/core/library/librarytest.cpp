@@ -28,6 +28,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -39,7 +41,7 @@ namespace tests {
  ******************************************************************************/
 
 class LibraryTest : public ::testing::Test {
-protected:
+public:
   FilePath mTmpDir;
 
   LibraryTest() {
@@ -47,14 +49,14 @@ protected:
     mTmpDir = FilePath::getRandomTempPath().getPathTo("test dir.lplib");
   }
 
-  virtual ~LibraryTest() {
+  ~LibraryTest() override {
     QDir(mTmpDir.getParentDir().toStr()).removeRecursively();
   }
 
   std::unique_ptr<TransactionalDirectory> createDir(
       bool writable = true) const noexcept {
-    return std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
-        TransactionalFileSystem::open(mTmpDir, writable)));
+    return std::make_unique<TransactionalDirectory>(
+        TransactionalFileSystem::open(mTmpDir, writable));
   }
 };
 

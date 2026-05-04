@@ -65,7 +65,7 @@ public:
   TransactionalDirectory(TransactionalDirectory& other,
                          const QString& subdir = "",
                          QObject* parent = nullptr) noexcept;
-  virtual ~TransactionalDirectory() noexcept;
+  ~TransactionalDirectory() noexcept override;
 
   // Getters
   std::shared_ptr<const TransactionalFileSystem> getFileSystem()
@@ -80,17 +80,16 @@ public:
   bool isRestoredFromAutosave() const noexcept;
 
   // Inherited from FileSystem
-  virtual FilePath getAbsPath(const QString& path = "") const noexcept override;
-  virtual QStringList getDirs(const QString& path = "") const noexcept override;
-  virtual QStringList getFiles(
-      const QString& path = "") const noexcept override;
-  virtual bool fileExists(const QString& path) const noexcept override;
-  virtual QByteArray read(const QString& path) const override;
-  virtual QByteArray readIfExists(const QString& path) const override;
-  virtual void write(const QString& path, const QByteArray& content) override;
-  virtual void renameFile(const QString& src, const QString& dst) override;
-  virtual void removeFile(const QString& path) override;
-  virtual void removeDirRecursively(const QString& path = "") override;
+  FilePath getAbsPath(const QString& path = "") const noexcept override;
+  const QStringList getDirs(const QString& path = "") const noexcept override;
+  const QStringList getFiles(const QString& path = "") const noexcept override;
+  bool fileExists(const QString& path) const noexcept override;
+  QByteArray read(const QString& path) const override;
+  QByteArray readIfExists(const QString& path) const override;
+  void write(const QString& path, const QByteArray& content) override;
+  void renameFile(const QString& src, const QString& dst) override;
+  void removeFile(const QString& path) override;
+  void removeDirRecursively(const QString& path = "") override;
 
   // General Methods
   void copyTo(TransactionalDirectory& dest) const;

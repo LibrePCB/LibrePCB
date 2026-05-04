@@ -328,7 +328,7 @@ void BackgroundImageSetupDialog::startScreenshot() noexcept {
   if (screens.count() > 1) {
     QMenu menu;
     QHash<QAction*, QScreen*> screenMap;
-    for (QScreen* screen : screens) {
+    for (QScreen* screen : std::as_const(screens)) {
       QString name = tr("Screen %1").arg(screenMap.count() + 1);
       QString type = (screen->manufacturer() + " " + screen->model()).trimmed();
       if (!type.isEmpty()) {
@@ -610,7 +610,7 @@ QImage BackgroundImageSetupDialog::cropImage(const QImage& img,
     if (pos.x() >= img.height()) pos.setY(img.height() - 1);
     histogram[img.pixel(pos)]++;
   }
-  const int maxHistogramCount = Toolbox::sorted(histogram.values()).last();
+  const int maxHistogramCount = Toolbox::sorted(histogram.values()).constLast();
   const QRgb bgColor = histogram.key(maxHistogramCount);
 
   // Create new empty pixmap.

@@ -68,7 +68,7 @@ public:
   NewProjectWizard(const NewProjectWizard& other) = delete;
   explicit NewProjectWizard(const UiTheme& theme, const Workspace& ws,
                             Mode mode, QWidget* parent = nullptr) noexcept;
-  ~NewProjectWizard() noexcept;
+  ~NewProjectWizard() noexcept override;
 
   // Setters
   void setLocationOverride(const FilePath& dir) noexcept;

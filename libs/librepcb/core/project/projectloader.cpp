@@ -235,8 +235,7 @@ std::unique_ptr<Project> ProjectLoader::open(
         __FILE__, __LINE__,
         tr("This project was created with a newer application version.\n"
            "You need at least LibrePCB %1 to open it.\n\n%2")
-            .arg(fileFormat.toPrettyStr(3))
-            .arg(fp.toNative()));
+            .arg(fileFormat.toPrettyStr(3), fp.toNative()));
   }
 
   // Upgrade file format, if needed.
@@ -275,8 +274,8 @@ std::unique_ptr<Project> ProjectLoader::open(
     const QByteArray html = mMigrationLog->toHtml(false);
     const QString logFileName =
         QString("logs/%1_migration_to_v%2.html")
-            .arg(mMigrationLog->dateTime.date().toString("yyyy-MM-dd"))
-            .arg(Application::getFileFormatVersion().toStr());
+            .arg(mMigrationLog->dateTime.date().toString("yyyy-MM-dd"),
+                 Application::getFileFormatVersion().toStr());
     directory->write(logFileName, html);
   }
 
@@ -523,8 +522,7 @@ void ProjectLoader::loadCircuit(Project& p) {
           __FILE__, __LINE__,
           QString("The signal count of the component instance '%1' does "
                   "not match with the signal count of the component '%2'.")
-              .arg(cmp->getUuid().toStr())
-              .arg(libCmp->getUuid().toStr()));
+              .arg(cmp->getUuid().toStr(), libCmp->getUuid().toStr()));
     }
   }
 

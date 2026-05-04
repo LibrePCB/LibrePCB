@@ -55,7 +55,7 @@ public:
   CmdBoardEdit() = delete;
   CmdBoardEdit(const CmdBoardEdit& other) = delete;
   explicit CmdBoardEdit(Board& board) noexcept;
-  ~CmdBoardEdit() noexcept;
+  ~CmdBoardEdit() noexcept override;
 
   // Setters
   void setName(const ElementName& name) noexcept;

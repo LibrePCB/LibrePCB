@@ -99,7 +99,7 @@ public:
   SchematicEditorFsm(const SchematicEditorFsm& other) = delete;
   explicit SchematicEditorFsm(const Context& context,
                               QObject* parent = nullptr) noexcept;
-  virtual ~SchematicEditorFsm() noexcept;
+  ~SchematicEditorFsm() noexcept override;
 
   // Event Handlers
   bool processSelect() noexcept;

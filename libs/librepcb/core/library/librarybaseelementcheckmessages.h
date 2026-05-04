@@ -48,7 +48,7 @@ public:
   MsgMissingAuthor() noexcept;
   MsgMissingAuthor(const MsgMissingAuthor& other) noexcept
     : RuleCheckMessage(other) {}
-  virtual ~MsgMissingAuthor() noexcept {}
+  ~MsgMissingAuthor() noexcept override {}
 };
 
 /*******************************************************************************
@@ -67,7 +67,7 @@ public:
   explicit MsgNameNotTitleCase(const ElementName& name) noexcept;
   MsgNameNotTitleCase(const MsgNameNotTitleCase& other) noexcept
     : RuleCheckMessage(other), mName(other.mName) {}
-  virtual ~MsgNameNotTitleCase() noexcept {}
+  ~MsgNameNotTitleCase() noexcept override {}
 
   const ElementName& getName() const noexcept { return mName; }
   ElementName getFixedName() const noexcept { return getFixedName(mName); }

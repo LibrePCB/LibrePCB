@@ -59,7 +59,7 @@ public:
   ProjectSetupDialog(const ProjectSetupDialog& other) = delete;
   ProjectSetupDialog(Project& project, UndoStack& undoStack,
                      QWidget* parent = nullptr) noexcept;
-  ~ProjectSetupDialog();
+  ~ProjectSetupDialog() override;
 
   // Operator Overloadings
   ProjectSetupDialog& operator=(const ProjectSetupDialog& rhs) = delete;

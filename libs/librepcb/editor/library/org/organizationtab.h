@@ -68,7 +68,7 @@ public:
   explicit OrganizationTab(LibraryEditor& editor,
                            std::unique_ptr<Organization> cat, Mode mode,
                            QObject* parent = nullptr) noexcept;
-  ~OrganizationTab() noexcept;
+  ~OrganizationTab() noexcept override;
 
   // General Methods
   FilePath getDirectoryPath() const noexcept override;

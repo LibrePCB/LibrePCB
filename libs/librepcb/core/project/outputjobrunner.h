@@ -69,7 +69,7 @@ public:
   OutputJobRunner() = delete;
   OutputJobRunner(const OutputJobRunner& other) = delete;
   explicit OutputJobRunner(Project& project) noexcept;
-  ~OutputJobRunner() noexcept;
+  ~OutputJobRunner() noexcept override;
 
   // Getters
   const FilePath& getOutputDirectory() const noexcept;

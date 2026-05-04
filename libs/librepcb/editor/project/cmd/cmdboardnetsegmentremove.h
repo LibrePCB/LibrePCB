@@ -48,7 +48,7 @@ class CmdBoardNetSegmentRemove final : public UndoCommand {
 public:
   // Constructors / Destructor
   explicit CmdBoardNetSegmentRemove(BI_NetSegment& segment) noexcept;
-  ~CmdBoardNetSegmentRemove() noexcept;
+  ~CmdBoardNetSegmentRemove() noexcept override;
 
 private:
   // Private Methods

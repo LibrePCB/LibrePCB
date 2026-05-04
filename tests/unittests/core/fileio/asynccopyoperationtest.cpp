@@ -38,7 +38,7 @@ namespace tests {
  ******************************************************************************/
 
 class AsyncCopyOperationTest : public ::testing::Test {
-protected:
+public:
   FilePath mTmpDir;
   FilePath mNonExistingDir;
   FilePath mEmptyDir;
@@ -71,14 +71,14 @@ protected:
     FileUtils::writeFile(mPopulatedDir.getPathTo(".dotfile"), "B");
   }
 
-  virtual ~AsyncCopyOperationTest() {
+  ~AsyncCopyOperationTest() override {
     QDir(mTmpDir.toStr()).removeRecursively();
   }
 
   bool run(AsyncCopyOperation& copy, unsigned long timeout) {
     // Connect all signals by hand because QSignalSpy is not threadsafe!
     QObject::connect(
-        &copy, &AsyncCopyOperation::started, &mContext,
+        &copy, &AsyncCopyOperation::startedCopy, &mContext,
         [this]() { ++mSignalStarted; }, Qt::QueuedConnection);
     QObject::connect(
         &copy, &AsyncCopyOperation::progressStatus, &mContext,
@@ -105,7 +105,7 @@ protected:
         },
         Qt::QueuedConnection);
     QObject::connect(
-        &copy, &AsyncCopyOperation::finished, &mContext,
+        &copy, &AsyncCopyOperation::finishedCopy, &mContext,
         [this]() { ++mSignalFinished; }, Qt::QueuedConnection);
 
     copy.start();

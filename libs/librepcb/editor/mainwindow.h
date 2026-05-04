@@ -78,7 +78,7 @@ public:
   explicit MainWindow(GuiApplication& app,
                       slint::ComponentHandle<ui::AppWindow> win, int id,
                       QObject* parent = nullptr) noexcept;
-  ~MainWindow() noexcept;
+  ~MainWindow() noexcept override;
 
   // General Methods
   int getId() const noexcept { return mId; }

@@ -53,7 +53,7 @@ public:
   CmdAssemblyVariantAdd(Circuit& circuit, std::shared_ptr<AssemblyVariant> av,
                         std::shared_ptr<AssemblyVariant> copyFromAv,
                         int index = -1) noexcept;
-  ~CmdAssemblyVariantAdd() noexcept;
+  ~CmdAssemblyVariantAdd() noexcept override;
 
   // Operator Overloadings
   CmdAssemblyVariantAdd& operator=(const CmdAssemblyVariantAdd& rhs) = delete;

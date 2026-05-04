@@ -61,7 +61,7 @@ public:
   BGI_Via(const BGI_Via& other) = delete;
   BGI_Via(BI_Via& via, const GraphicsLayerList& layers,
           std::shared_ptr<const BoardGraphicsScene::Context> context) noexcept;
-  virtual ~BGI_Via() noexcept;
+  ~BGI_Via() noexcept override;
 
   // General Methods
   BI_Via& getVia() noexcept { return mVia; }
@@ -80,8 +80,8 @@ private:  // Methods
   void viaEdited(const BI_Via& obj, BI_Via::Event event) noexcept;
   void layerEdited(const GraphicsLayer& layer,
                    GraphicsLayer::Event event) noexcept;
-  virtual QVariant itemChange(GraphicsItemChange change,
-                              const QVariant& value) noexcept override;
+  QVariant itemChange(GraphicsItemChange change,
+                      const QVariant& value) noexcept override;
   void updatePosition() noexcept;
   void updateShapes() noexcept;
   void updateText() noexcept;

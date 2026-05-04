@@ -52,7 +52,7 @@ public:
   CmdOrganizationEdit() = delete;
   CmdOrganizationEdit(const CmdOrganizationEdit& other) = delete;
   explicit CmdOrganizationEdit(Organization& organization) noexcept;
-  ~CmdOrganizationEdit() noexcept;
+  ~CmdOrganizationEdit() noexcept override;
 
   // Setters
   void setLogoPng(const QByteArray& png) noexcept;

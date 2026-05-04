@@ -59,18 +59,18 @@ public:
   BoardEditorState_AddVia() = delete;
   BoardEditorState_AddVia(const BoardEditorState_AddVia& other) = delete;
   explicit BoardEditorState_AddVia(const Context& context) noexcept;
-  virtual ~BoardEditorState_AddVia() noexcept;
+  ~BoardEditorState_AddVia() noexcept override;
 
   // General Methods
-  virtual bool entry() noexcept override;
-  virtual bool exit() noexcept override;
+  bool entry() noexcept override;
+  bool exit() noexcept override;
 
   // Event Handlers
-  virtual bool processGraphicsSceneMouseMoved(
+  bool processGraphicsSceneMouseMoved(
       const GraphicsSceneMouseEvent& e) noexcept override;
-  virtual bool processGraphicsSceneLeftMouseButtonPressed(
+  bool processGraphicsSceneLeftMouseButtonPressed(
       const GraphicsSceneMouseEvent& e) noexcept override;
-  virtual bool processGraphicsSceneLeftMouseButtonDoubleClicked(
+  bool processGraphicsSceneLeftMouseButtonDoubleClicked(
       const GraphicsSceneMouseEvent& e) noexcept override;
 
   // Connection to UI
@@ -86,7 +86,7 @@ public:
   }
   PositiveLength getSize() const noexcept;
   void setSize(const std::optional<PositiveLength>& size) noexcept;
-  QVector<std::pair<Uuid, QString>> getAvailableNets() const noexcept;
+  const QVector<std::pair<Uuid, QString> > getAvailableNets() const noexcept;
   bool getUseAutoNet() const noexcept { return mUseAutoNetSignal; }
   std::optional<Uuid> getNet() const noexcept { return mCurrentNetSignal; }
   void setNet(bool autoNet, const std::optional<Uuid>& net) noexcept;

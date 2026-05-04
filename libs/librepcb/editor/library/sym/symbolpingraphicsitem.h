@@ -57,7 +57,7 @@ public:
       QPointer<const Component> cmp,
       std::shared_ptr<const ComponentSymbolVariantItem> cmpItem,
       bool hideIfUnused, QGraphicsItem* parent = nullptr) noexcept;
-  ~SymbolPinGraphicsItem() noexcept;
+  ~SymbolPinGraphicsItem() noexcept override;
 
   // Getters
   SymbolPin& getObj() noexcept { return *mPin; }
@@ -75,8 +75,8 @@ public:
 
 private:  // Methods
   void pinEdited(const SymbolPin& pin, SymbolPin::Event event) noexcept;
-  virtual QVariant itemChange(GraphicsItemChange change,
-                              const QVariant& value) noexcept override;
+  QVariant itemChange(GraphicsItemChange change,
+                      const QVariant& value) noexcept override;
   void setLength(const UnsignedLength& length) noexcept;
   void updateNamePosition() noexcept;
   void updateNumbersTransform() noexcept;

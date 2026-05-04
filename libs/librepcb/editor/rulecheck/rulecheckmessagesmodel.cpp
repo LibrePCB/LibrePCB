@@ -175,7 +175,7 @@ void RuleCheckMessagesModel::sortMessages() noexcept {
 void RuleCheckMessagesModel::updateCounters() noexcept {
   int unapproved = 0;
   int errors = 0;
-  for (auto msg : mMessages) {
+  for (const auto& msg : std::as_const(mMessages)) {
     if (!mApprovals.contains(msg->getApproval())) {
       ++unapproved;
     }

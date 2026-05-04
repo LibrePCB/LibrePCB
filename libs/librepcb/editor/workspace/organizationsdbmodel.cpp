@@ -79,7 +79,7 @@ void OrganizationsDbModel::refresh() noexcept {
     QList<WorkspaceLibraryDb::Organization> organizations =
         mDb.getAllLatestOrganizations(mSettings.libraryLocaleOrder.get(), true,
                                       false);  // can throw
-    for (const auto& org : organizations) {
+    for (const auto& org : std::as_const(organizations)) {
       if (org.pcbDesignRules.isEmpty()) continue;
       if (org.priority <= 0) continue;
       auto designRules = std::make_shared<

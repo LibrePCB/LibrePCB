@@ -48,7 +48,7 @@ public:
   CmdPackageEdit() = delete;
   CmdPackageEdit(const CmdPackageEdit& other) = delete;
   explicit CmdPackageEdit(Package& package) noexcept;
-  virtual ~CmdPackageEdit() noexcept;
+  ~CmdPackageEdit() noexcept override;
 
   // Setters
   void setAlternativeNames(
@@ -61,13 +61,13 @@ public:
 
 protected:  // Methods
   /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
-  virtual bool performExecute() override;
+  bool performExecute() override;
 
   /// @copydoc ::librepcb::editor::UndoCommand::performUndo()
-  virtual void performUndo() override;
+  void performUndo() override;
 
   /// @copydoc ::librepcb::editor::UndoCommand::performRedo()
-  virtual void performRedo() override;
+  void performRedo() override;
 
 private:  // Data
   Package& mPackage;

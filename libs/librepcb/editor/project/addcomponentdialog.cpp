@@ -52,6 +52,8 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -385,9 +387,8 @@ void AddComponentDialog::treeComponents_currentItemChanged(
       if ((!mSelectedComponent) ||
           (mSelectedComponent->getDirectory().getAbsPath() != cmpFp)) {
         std::shared_ptr<Component> component(
-            Component::open(std::unique_ptr<TransactionalDirectory>(
-                                new TransactionalDirectory(
-                                    TransactionalFileSystem::openRO(cmpFp))))
+            Component::open(std::make_unique<TransactionalDirectory>(
+                                TransactionalFileSystem::openRO(cmpFp)))
                 .release());
         setSelectedComponent(component);
       }
@@ -396,9 +397,8 @@ void AddComponentDialog::treeComponents_currentItemChanged(
         if ((!mSelectedDevice) ||
             (mSelectedDevice->getDirectory().getAbsPath() != devFp)) {
           std::shared_ptr<Device> device(
-              Device::open(std::unique_ptr<TransactionalDirectory>(
-                               new TransactionalDirectory(
-                                   TransactionalFileSystem::openRO(devFp))))
+              Device::open(std::make_unique<TransactionalDirectory>(
+                               TransactionalFileSystem::openRO(devFp)))
                   .release());
           setSelectedDevice(device);
         }
@@ -847,9 +847,8 @@ void AddComponentDialog::setSelectedSymbVar(
       FilePath symbolFp = mDb.getLatest<Symbol>(item.getSymbolUuid());
       if (!symbolFp.isValid()) continue;  // TODO: show warning
       std::shared_ptr<Symbol> symbol(
-          Symbol::open(std::unique_ptr<TransactionalDirectory>(
-                           new TransactionalDirectory(
-                               TransactionalFileSystem::openRO(symbolFp))))
+          Symbol::open(std::make_unique<TransactionalDirectory>(
+                           TransactionalFileSystem::openRO(symbolFp)))
               .release());
       mPreviewSymbols.append(symbol);
 
@@ -878,8 +877,8 @@ void AddComponentDialog::setSelectedDevice(std::shared_ptr<const Device> dev) {
   if (mSelectedDevice) {
     FilePath pkgFp = mDb.getLatest<Package>(mSelectedDevice->getPackageUuid());
     if (pkgFp.isValid()) {
-      mSelectedPackage = Package::open(std::unique_ptr<TransactionalDirectory>(
-          new TransactionalDirectory(TransactionalFileSystem::openRO(pkgFp))));
+      mSelectedPackage = Package::open(std::make_unique<TransactionalDirectory>(
+          TransactionalFileSystem::openRO(pkgFp)));
       QString devName = *mSelectedDevice->getNames().value(mLocaleOrder);
       QString pkgName = *mSelectedPackage->getNames().value(mLocaleOrder);
       if (devName.contains(pkgName, Qt::CaseInsensitive)) {

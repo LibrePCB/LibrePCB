@@ -69,7 +69,7 @@ public:
                 const char* description, const char* iconFp, Flags flags,
                 const QList<QKeySequence>& defaultKeySequences,
                 QObject* parent = nullptr) noexcept;
-  ~EditorCommand() noexcept;
+  ~EditorCommand() noexcept override;
 
   // Getters
   const QString& getIdentifier() const noexcept { return mIdentifier; }

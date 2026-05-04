@@ -34,7 +34,6 @@ namespace librepcb {
 
 class BI_NetLine;
 class BI_NetPoint;
-class CmdBoardNetSegmentAddElements;
 class Point;
 
 namespace editor {
@@ -54,7 +53,7 @@ class CmdBoardSplitNetLine : public UndoCommandGroup {
 public:
   // Constructors / Destructor
   explicit CmdBoardSplitNetLine(BI_NetLine& netline, const Point& pos) noexcept;
-  ~CmdBoardSplitNetLine() noexcept;
+  ~CmdBoardSplitNetLine() noexcept override;
 
   BI_NetPoint* getSplitPoint() noexcept { return mSplitPoint; };
 

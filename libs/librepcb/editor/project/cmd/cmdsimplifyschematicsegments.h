@@ -59,7 +59,7 @@ public:
   explicit CmdSimplifySchematicSegments(
       const QSet<SI_NetSegment*>& netSegments,
       const QSet<SI_BusSegment*>& busSegments) noexcept;
-  ~CmdSimplifySchematicSegments() noexcept;
+  ~CmdSimplifySchematicSegments() noexcept override;
 
   // Operator Overloadings
   CmdSimplifySchematicSegments& operator=(

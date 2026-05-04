@@ -63,7 +63,7 @@ public:
                                     const LengthUnit& lengthUnit,
                                     const QString& settingsPrefix,
                                     QWidget* parent) noexcept;
-  ~BoardViaPropertiesDialog() noexcept;
+  ~BoardViaPropertiesDialog() noexcept override;
 
 private:
   // Private Methods

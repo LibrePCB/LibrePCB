@@ -36,6 +36,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -140,9 +142,9 @@ std::shared_ptr<const T> LibraryElementCache::getElement(
     try {
       FilePath fp = mDb->getLatest<T>(uuid);
       if (fp.isValid()) {
-        element.reset(T::open(std::unique_ptr<TransactionalDirectory>(
-                                  new TransactionalDirectory(
-                                      TransactionalFileSystem::openRO(fp))))
+        element.reset(T::open(std::make_unique<TransactionalDirectory>(
+
+                                  TransactionalFileSystem::openRO(fp)))
                           .release());
         container.insert(uuid, element);
       } else {

@@ -53,7 +53,7 @@ public:
   // Constructors / Destructor
   ProjectCrossProbe(const ProjectCrossProbe& other) = delete;
   explicit ProjectCrossProbe(QObject* parent = nullptr) noexcept;
-  ~ProjectCrossProbe() noexcept;
+  ~ProjectCrossProbe() noexcept override;
 
   // General Methods
   void reset() noexcept;

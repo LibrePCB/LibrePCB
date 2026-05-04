@@ -47,10 +47,10 @@ public:
   DeviceCheck() = delete;
   DeviceCheck(const DeviceCheck& other) = delete;
   explicit DeviceCheck(const Device& device) noexcept;
-  virtual ~DeviceCheck() noexcept;
+  ~DeviceCheck() noexcept override;
 
   // General Methods
-  virtual RuleCheckMessageList runChecks() const override;
+  RuleCheckMessageList runChecks() const override;
 
   // Operator Overloadings
   DeviceCheck& operator=(const DeviceCheck& rhs) = delete;

@@ -60,7 +60,7 @@ public:
   CmdPasteBoardItems(BoardGraphicsScene& scene,
                      std::unique_ptr<BoardClipboardData> data,
                      const Point& posOffset) noexcept;
-  ~CmdPasteBoardItems() noexcept;
+  ~CmdPasteBoardItems() noexcept override;
 
   // Operator Overloadings
   CmdPasteBoardItems& operator=(const CmdPasteBoardItems& rhs) = delete;

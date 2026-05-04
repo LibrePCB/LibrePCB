@@ -47,7 +47,7 @@ public:
   MsgMissingCategories() noexcept;
   MsgMissingCategories(const MsgMissingCategories& other) noexcept
     : RuleCheckMessage(other) {}
-  virtual ~MsgMissingCategories() noexcept {}
+  ~MsgMissingCategories() noexcept override {}
 };
 
 /*******************************************************************************

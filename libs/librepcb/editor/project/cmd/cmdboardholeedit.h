@@ -52,7 +52,7 @@ public:
   CmdBoardHoleEdit() = delete;
   CmdBoardHoleEdit(const CmdBoardHoleEdit& other) = delete;
   explicit CmdBoardHoleEdit(BI_Hole& hole) noexcept;
-  ~CmdBoardHoleEdit() noexcept;
+  ~CmdBoardHoleEdit() noexcept override;
 
   // Setters
   void setPath(const NonEmptyPath& path, bool immediate) noexcept;

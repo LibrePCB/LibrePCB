@@ -771,8 +771,7 @@ KiCadSymbolLibrary KiCadSymbolLibrary::parse(const SExpression& node,
       obj.symbols.append(KiCadSymbol::parse(*child, log));
     } catch (const Exception& e) {
       log.critical(QString("Failed to parse symbol '%1': %2")
-                       .arg(symbolName)
-                       .arg(e.getMsg()));
+                       .arg(symbolName, e.getMsg()));
     }
   }
   return obj;

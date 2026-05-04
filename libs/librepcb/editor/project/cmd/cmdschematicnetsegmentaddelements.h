@@ -52,7 +52,7 @@ class CmdSchematicNetSegmentAddElements final : public UndoCommand {
 public:
   // Constructors / Destructor
   CmdSchematicNetSegmentAddElements(SI_NetSegment& segment) noexcept;
-  ~CmdSchematicNetSegmentAddElements() noexcept;
+  ~CmdSchematicNetSegmentAddElements() noexcept override;
 
   // General Methods
   SI_NetPoint* addNetPoint(SI_NetPoint& netpoint);

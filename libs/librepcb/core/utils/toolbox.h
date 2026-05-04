@@ -109,12 +109,12 @@ public:
    * @return The created QVector (in arbitrary order!).
    */
   template <typename T>
-  static inline QList<T> toList(const QSet<T>& set) noexcept {
+  static const QList<T> toList(const QSet<T>& set) noexcept {
     return QList<T>(set.begin(), set.end());
   }
 
   template <typename T>
-  static QList<T> sortedQSet(const QSet<T>& set) noexcept {
+  static const QList<T> sortedQSet(const QSet<T>& set) noexcept {
     static_assert(!std::is_pointer<T>::value,
                   "Container holds pointers, sorting makes no sense.");
     QList<T> list = set.values();
@@ -123,14 +123,15 @@ public:
   }
 
   template <typename T, typename Compare>
-  static QList<T> sortedQSet(const QSet<T>& set, const Compare& cmp) noexcept {
+  static const QList<T> sortedQSet(const QSet<T>& set,
+                                   const Compare& cmp) noexcept {
     QList<T> list = set.values();
     std::sort(list.begin(), list.end(), cmp);
     return list;
   }
 
   template <typename T>
-  static T sorted(const T& container) noexcept {
+  static const T sorted(const T& container) noexcept {
     static_assert(!std::is_pointer<T>::value,
                   "Container holds pointers, sorting makes no sense.");
     T copy(container);

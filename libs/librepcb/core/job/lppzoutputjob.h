@@ -50,11 +50,11 @@ public:
   LppzOutputJob() noexcept;
   LppzOutputJob(const LppzOutputJob& other) noexcept;
   explicit LppzOutputJob(const SExpression& node);
-  virtual ~LppzOutputJob() noexcept;
+  ~LppzOutputJob() noexcept override;
 
   // Getters
-  virtual QString getTypeTr() const noexcept override;
-  virtual QIcon getTypeIcon() const noexcept override;
+  QString getTypeTr() const noexcept override;
+  QIcon getTypeIcon() const noexcept override;
   const QString& getOutputPath() const noexcept { return mOutputPath; }
 
   // Setters
@@ -65,14 +65,14 @@ public:
   static QString getTypeTrStatic() noexcept {
     return tr("Project Archive") % " (*.lppz)";
   }
-  virtual std::shared_ptr<OutputJob> cloneShared() const noexcept override;
+  std::shared_ptr<OutputJob> cloneShared() const noexcept override;
 
   // Operator Overloadings
   LppzOutputJob& operator=(const LppzOutputJob& rhs) = delete;
 
 private:  // Methods
-  virtual void serializeDerived(SExpression& root) const override;
-  virtual bool equals(const OutputJob& rhs) const noexcept override;
+  void serializeDerived(SExpression& root) const override;
+  bool equals(const OutputJob& rhs) const noexcept override;
 
 private:  // Data
   QString mOutputPath;

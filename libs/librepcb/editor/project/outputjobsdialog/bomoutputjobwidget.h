@@ -59,7 +59,7 @@ public:
   explicit BomOutputJobWidget(Project& project,
                               std::shared_ptr<BomOutputJob> job,
                               QWidget* parent = nullptr) noexcept;
-  ~BomOutputJobWidget() noexcept;
+  ~BomOutputJobWidget() noexcept override;
 
   // Operator Overloads
   BomOutputJobWidget& operator=(const BomOutputJobWidget& rhs) = delete;

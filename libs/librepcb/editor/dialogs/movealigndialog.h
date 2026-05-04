@@ -58,7 +58,7 @@ public:
   MoveAlignDialog(const MoveAlignDialog& other) = delete;
   MoveAlignDialog(const QList<Point>& positions, const QString& settingsPrefix,
                   QWidget* parent = nullptr) noexcept;
-  ~MoveAlignDialog() noexcept;
+  ~MoveAlignDialog() noexcept override;
 
   // Getters
   const QList<Point>& getNewPositions() const noexcept { return mNewPositions; }
@@ -70,7 +70,7 @@ signals:
   void positionsChanged(const QList<Point>& positions);
 
 private:  // Methods
-  virtual bool eventFilter(QObject* watched, QEvent* event) noexcept override;
+  bool eventFilter(QObject* watched, QEvent* event) noexcept override;
   void updateNewPositions() noexcept;
   static Point calcCenter(const QList<Point>& p) noexcept;
 

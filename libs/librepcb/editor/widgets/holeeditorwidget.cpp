@@ -255,9 +255,9 @@ void HoleEditorWidget::updateLinearOuterSize(const Path& path) noexcept {
   mUi->lblOuterSize->setText(
       tr("Outer Size:") %
       QString(" %1x%2%3")
-          .arg(Toolbox::floatToString(width, decimals, locale))
-          .arg(Toolbox::floatToString(height, decimals, locale))
-          .arg(unit.toShortStringTr()));
+          .arg(Toolbox::floatToString(width, decimals, locale),
+               Toolbox::floatToString(height, decimals, locale),
+               unit.toShortStringTr()));
 }
 
 /*******************************************************************************

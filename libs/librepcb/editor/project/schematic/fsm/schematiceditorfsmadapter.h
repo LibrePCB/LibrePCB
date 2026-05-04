@@ -80,6 +80,7 @@ public:
   };
   Q_DECLARE_FLAGS(Features, Feature)
 
+  virtual ~SchematicEditorFsmAdapter() = default;
   virtual QWidget* fsmGetParentWidget() noexcept = 0;
   virtual SchematicGraphicsScene* fsmGetGraphicsScene() noexcept = 0;
   virtual bool fsmGetIgnoreLocks() const noexcept = 0;

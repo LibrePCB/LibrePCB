@@ -47,7 +47,7 @@ class CmdDeviceStrokeTextsReset final : public UndoCommandGroup {
 public:
   // Constructors / Destructor
   CmdDeviceStrokeTextsReset(BI_Device& device) noexcept;
-  ~CmdDeviceStrokeTextsReset() noexcept;
+  ~CmdDeviceStrokeTextsReset() noexcept override;
 
 private:
   // Private Methods

@@ -67,7 +67,7 @@ public:
   SGI_Symbol(
       SI_Symbol& symbol, const GraphicsLayerList& layers,
       std::shared_ptr<const SchematicGraphicsScene::Context> context) noexcept;
-  virtual ~SGI_Symbol() noexcept;
+  ~SGI_Symbol() noexcept override;
 
   // General Methods
   SI_Symbol& getSymbol() noexcept { return mSymbol; }
@@ -83,8 +83,8 @@ private:  // Methods
   void symbolEdited(const SI_Symbol& obj, SI_Symbol::Event event) noexcept;
   void updatePosition() noexcept;
   void updateRotationAndMirrored() noexcept;
-  virtual QVariant itemChange(GraphicsItemChange change,
-                              const QVariant& value) noexcept override;
+  QVariant itemChange(GraphicsItemChange change,
+                      const QVariant& value) noexcept override;
 
 private:  // Data
   SI_Symbol& mSymbol;

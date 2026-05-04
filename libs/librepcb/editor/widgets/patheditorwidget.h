@@ -55,7 +55,7 @@ public:
   // Constructors / Destructor
   explicit PathEditorWidget(QWidget* parent = nullptr) noexcept;
   PathEditorWidget(const PathEditorWidget& other) = delete;
-  ~PathEditorWidget() noexcept;
+  ~PathEditorWidget() noexcept override;
 
   // General Methods
   void setFrameShape(QFrame::Shape shape) noexcept;

@@ -51,7 +51,7 @@ public:
   // Constructors / Destructor
   CmdSchematicAdd(Project& project, const QString& dirName,
                   const ElementName& name) noexcept;
-  ~CmdSchematicAdd() noexcept;
+  ~CmdSchematicAdd() noexcept override;
 
   // Getters
   Schematic* getSchematic() const noexcept { return mSchematic; }

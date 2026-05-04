@@ -55,7 +55,7 @@ public:
   BGI_Polygon(
       BI_Polygon& polygon, const GraphicsLayerList& layers,
       std::shared_ptr<const BoardGraphicsScene::Context> context) noexcept;
-  virtual ~BGI_Polygon() noexcept;
+  ~BGI_Polygon() noexcept override;
 
   // General Methods
   BI_Polygon& getPolygon() noexcept { return mPolygon; }

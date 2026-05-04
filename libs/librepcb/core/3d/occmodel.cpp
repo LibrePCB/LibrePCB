@@ -71,6 +71,7 @@
 #include <XCAFDoc_ColorTool.hxx>
 #include <XCAFDoc_DocumentTool.hxx>
 #include <XCAFDoc_ShapeTool.hxx>
+#include <memory>
 #endif
 // clang-format on
 
@@ -581,7 +582,7 @@ std::unique_ptr<OccModel> OccModel::createAssembly(const QString& name) {
         cleanString(name).toStdString().c_str());
     TDataStd_Name::Set(label, shapeName);
 
-    result.reset(new OccModel(std::unique_ptr<Data>(new Data{doc, label})));
+    result.reset(new OccModel(std::make_unique<Data>(Data{doc, label})));
   } catch (const Standard_Failure& e) {
     qCritical() << "OpenCascade error:" << e.GetMessageString();
     throw RuntimeError(
@@ -663,8 +664,7 @@ std::unique_ptr<OccModel> OccModel::createBoard(const librepcb::Path& outline,
     shapeTool->UpdateAssemblies();
 #endif
 
-    result.reset(
-        new OccModel(std::unique_ptr<Data>(new Data{doc, TDF_Label()})));
+    result.reset(new OccModel(std::make_unique<Data>(Data{doc, TDF_Label()})));
   } catch (const Standard_Failure& e) {
     qCritical() << "OpenCascade error:" << e.GetMessageString();
     throw RuntimeError(__FILE__, __LINE__,
@@ -713,8 +713,7 @@ std::unique_ptr<OccModel> OccModel::loadStep(const QByteArray content) {
       doc->Close();
       throw RuntimeError(__FILE__, __LINE__, "Failed to transfer STEP model.");
     }
-    result.reset(
-        new OccModel(std::unique_ptr<Data>(new Data{doc, TDF_Label()})));
+    result.reset(new OccModel(std::make_unique<Data>(Data{doc, TDF_Label()})));
   } catch (const Standard_Failure& e) {
     qCritical() << "OpenCascade error:" << e.GetMessageString();
     throw RuntimeError(

@@ -32,6 +32,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -140,7 +142,8 @@ bool BoardEditorState_AddHole::addHole(const Point& pos) noexcept {
     std::unique_ptr<CmdBoardHoleAdd> cmdAdd(
         new CmdBoardHoleAdd(*mCurrentHoleToPlace));
     mContext.undoStack.appendToCmdGroup(cmdAdd.release());
-    mCurrentHoleEditCmd.reset(new CmdBoardHoleEdit(*mCurrentHoleToPlace));
+    mCurrentHoleEditCmd =
+        std::make_unique<CmdBoardHoleEdit>(*mCurrentHoleToPlace);
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());

@@ -55,11 +55,11 @@ public:
   InteractiveHtmlBomOutputJob(
       const InteractiveHtmlBomOutputJob& other) noexcept;
   explicit InteractiveHtmlBomOutputJob(const SExpression& node);
-  virtual ~InteractiveHtmlBomOutputJob() noexcept;
+  ~InteractiveHtmlBomOutputJob() noexcept override;
 
   // Getters
-  virtual QString getTypeTr() const noexcept override;
-  virtual QIcon getTypeIcon() const noexcept override;
+  QString getTypeTr() const noexcept override;
+  QIcon getTypeIcon() const noexcept override;
   InteractiveHtmlBom::ViewMode getViewMode() const noexcept {
     return mViewMode;
   }
@@ -110,15 +110,15 @@ public:
   static QString getTypeTrStatic() noexcept {
     return tr("Interactive Bill Of Materials") % " (*.html)";
   }
-  virtual std::shared_ptr<OutputJob> cloneShared() const noexcept override;
+  std::shared_ptr<OutputJob> cloneShared() const noexcept override;
 
   // Operator Overloadings
   InteractiveHtmlBomOutputJob& operator=(
       const InteractiveHtmlBomOutputJob& rhs) = delete;
 
 private:  // Methods
-  virtual void serializeDerived(SExpression& root) const override;
-  virtual bool equals(const OutputJob& rhs) const noexcept override;
+  void serializeDerived(SExpression& root) const override;
+  bool equals(const OutputJob& rhs) const noexcept override;
 
 private:  // Data
   InteractiveHtmlBom::ViewMode mViewMode;

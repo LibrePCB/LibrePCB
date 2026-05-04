@@ -61,7 +61,7 @@ public:
   LibraryEditorTab(const LibraryEditorTab& other) = delete;
   explicit LibraryEditorTab(LibraryEditor& editor,
                             QObject* parent = nullptr) noexcept;
-  virtual ~LibraryEditorTab() noexcept;
+  ~LibraryEditorTab() noexcept override;
 
   // General Methods
   virtual FilePath getDirectoryPath() const noexcept = 0;

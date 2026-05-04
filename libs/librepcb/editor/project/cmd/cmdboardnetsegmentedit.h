@@ -48,7 +48,7 @@ class CmdBoardNetSegmentEdit final : public UndoCommand {
 public:
   // Constructors / Destructor
   explicit CmdBoardNetSegmentEdit(BI_NetSegment& netsegment) noexcept;
-  ~CmdBoardNetSegmentEdit() noexcept;
+  ~CmdBoardNetSegmentEdit() noexcept override;
 
   // Setters
   void setNetSignal(NetSignal* netsignal) noexcept;

@@ -212,7 +212,7 @@ void CircuitIdentifierImportDialog::parseInput() noexcept {
   QSignalBlocker signalBlocker(mUi->txtResult->verticalScrollBar());
   mUi->txtResult->clear();
   mValues.clear();
-  for (const InputItem& item : items) {
+  for (const InputItem& item : std::as_const(items)) {
     if (item.cleaned.isEmpty() && (!item.filtered.isEmpty())) {
       mUi->txtResult->setTextColor(Qt::red);
       mUi->txtResult->append("(" % tr("INVALID INPUT") % ")");

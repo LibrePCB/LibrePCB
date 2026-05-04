@@ -42,6 +42,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -93,9 +95,8 @@ bool CmdAddDeviceToBoard::performExecute() {
              "workspace library!")
               .arg(mDeviceUuid.toStr()));
     }
-    dev = Device::open(std::unique_ptr<TransactionalDirectory>(
-                           new TransactionalDirectory(
-                               TransactionalFileSystem::openRO(devFp))))
+    dev = Device::open(std::make_unique<TransactionalDirectory>(
+                           TransactionalFileSystem::openRO(devFp)))
               .release();  // can throw
     CmdProjectLibraryAddElement<Device>* cmdAddToLibrary =
         new CmdProjectLibraryAddElement<Device>(
@@ -117,9 +118,8 @@ bool CmdAddDeviceToBoard::performExecute() {
              "workspace library!")
               .arg(pkgUuid.toStr()));
     }
-    pkg = Package::open(std::unique_ptr<TransactionalDirectory>(
-                            new TransactionalDirectory(
-                                TransactionalFileSystem::openRO(pkgFp))))
+    pkg = Package::open(std::make_unique<TransactionalDirectory>(
+                            TransactionalFileSystem::openRO(pkgFp)))
               .release();  // can throw
     CmdProjectLibraryAddElement<Package>* cmdAddToLibrary =
         new CmdProjectLibraryAddElement<Package>(

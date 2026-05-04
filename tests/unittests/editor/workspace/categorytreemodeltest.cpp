@@ -33,6 +33,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -45,7 +47,7 @@ namespace tests {
  ******************************************************************************/
 
 class CategoryTreeModelTest : public ::testing::Test {
-protected:
+public:
   struct Item {
     QString text;
     QVector<Item> children;
@@ -63,21 +65,21 @@ protected:
 
   CategoryTreeModelTest() : mWsDir(FilePath::getRandomTempPath()) {
     FileUtils::makePath(mWsDir);
-    mWsDb.reset(new WorkspaceLibraryDb(mWsDir));
-    mDb.reset(new SQLiteDatabase(mWsDb->getFilePath()));
-    mWriter.reset(new WorkspaceLibraryDbWriter(mWsDir, *mDb));
-    mSettings.reset(new WorkspaceSettings());
+    mWsDb = std::make_unique<WorkspaceLibraryDb>(mWsDir);
+    mDb = std::make_unique<SQLiteDatabase>(mWsDb->getFilePath());
+    mWriter = std::make_unique<WorkspaceLibraryDbWriter>(mWsDir, *mDb);
+    mSettings = std::make_unique<WorkspaceSettings>();
   }
 
-  virtual ~CategoryTreeModelTest() { QDir(mWsDir.toStr()).removeRecursively(); }
+  ~CategoryTreeModelTest() override {
+    QDir(mWsDir.toStr()).removeRecursively();
+  }
 
   std::string str(const std::optional<ui::TreeViewItemData>& data) {
     if (data) {
       return QString("{level=%1, text='%2', hint='%3', user_data='%4'}")
           .arg(data->level)
-          .arg(s2q(data->text))
-          .arg(s2q(data->hint))
-          .arg(s2q(data->user_data))
+          .arg(s2q(data->text), s2q(data->hint), s2q(data->user_data))
           .toStdString();
     } else {
       return std::string("{nullopt}");

@@ -65,7 +65,7 @@ public:
   LibraryEditor(const LibraryEditor& other) = delete;
   LibraryEditor(GuiApplication& app, std::unique_ptr<Library> lib, int uiIndex,
                 QObject* parent = nullptr) noexcept;
-  ~LibraryEditor() noexcept;
+  ~LibraryEditor() noexcept override;
 
   // General Methods
   GuiApplication& getApp() noexcept { return mApp; }

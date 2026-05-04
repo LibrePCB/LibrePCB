@@ -95,13 +95,10 @@ std::shared_ptr<CsvFile> PickPlaceCsvWriter::generateCsv() const {
             "Rotation:            Degrees CCW\n"
             "Board Side:          %6\n"
             "Assembly Types:      %7")
-            .arg(mData.getProjectName())
-            .arg(mData.getProjectVersion())
-            .arg(mData.getBoardName())
-            .arg(Application::getVersion())
-            .arg(QDateTime::currentDateTime().toString(Qt::ISODate))
-            .arg(boardSideToString(mBoardSide))
-            .arg(enabledTypeNames.join(", "));
+            .arg(mData.getProjectName(), mData.getProjectVersion(),
+                 mData.getBoardName(), Application::getVersion(),
+                 QDateTime::currentDateTime().toString(Qt::ISODate),
+                 boardSideToString(mBoardSide), enabledTypeNames.join(", "));
     file->setComment(comment);
   }
 

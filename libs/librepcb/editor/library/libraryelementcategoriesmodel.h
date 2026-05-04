@@ -63,7 +63,7 @@ public:
       delete;
   explicit LibraryElementCategoriesModel(const Workspace& ws, Type type,
                                          QObject* parent = nullptr) noexcept;
-  virtual ~LibraryElementCategoriesModel() noexcept;
+  ~LibraryElementCategoriesModel() noexcept override;
 
   // General Methods
   const QSet<Uuid>& getCategories() const noexcept { return mCategories; }

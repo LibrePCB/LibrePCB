@@ -46,7 +46,7 @@ public:
   // Constructors / Destructor
   explicit PositiveLengthEdit(QWidget* parent = nullptr) noexcept;
   PositiveLengthEdit(const PositiveLengthEdit& other) = delete;
-  virtual ~PositiveLengthEdit() noexcept;
+  ~PositiveLengthEdit() noexcept override;
 
   // Getters
   PositiveLength getValue() const noexcept;
@@ -65,7 +65,7 @@ signals:
                     const librepcb::Length& diff);
 
 private:
-  virtual void valueChangedImpl(const Length& diff) noexcept override;
+  void valueChangedImpl(const Length& diff) noexcept override;
 };
 
 /*******************************************************************************

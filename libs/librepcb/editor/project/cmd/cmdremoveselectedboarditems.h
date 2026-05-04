@@ -56,7 +56,7 @@ public:
   // Constructors / Destructor
   explicit CmdRemoveSelectedBoardItems(BoardGraphicsScene& scene,
                                        bool includeLockedItems) noexcept;
-  ~CmdRemoveSelectedBoardItems() noexcept;
+  ~CmdRemoveSelectedBoardItems() noexcept override;
 
   // Output
   QList<BI_NetSegment*> getModifiedNetSegments() const noexcept;

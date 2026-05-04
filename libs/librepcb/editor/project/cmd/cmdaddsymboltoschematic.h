@@ -59,7 +59,7 @@ public:
                           const Uuid& symbolItem,
                           const Point& position = Point(),
                           const Angle& angle = Angle()) noexcept;
-  ~CmdAddSymbolToSchematic() noexcept;
+  ~CmdAddSymbolToSchematic() noexcept override;
 
   // Getters
   SI_Symbol* getSymbolInstance() const noexcept { return mSymbolInstance; }

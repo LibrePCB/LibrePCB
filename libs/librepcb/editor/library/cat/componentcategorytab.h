@@ -65,7 +65,7 @@ public:
   explicit ComponentCategoryTab(LibraryEditor& editor,
                                 std::unique_ptr<ComponentCategory> cat,
                                 Mode mode, QObject* parent = nullptr) noexcept;
-  ~ComponentCategoryTab() noexcept;
+  ~ComponentCategoryTab() noexcept override;
 
   // General Methods
   FilePath getDirectoryPath() const noexcept override;

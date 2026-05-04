@@ -350,13 +350,13 @@ void OutputJobsDialog::addClicked() noexcept {
   QMenu menu;
   menu.addSection(tr("Documentation"));
   menu.addAction(QIcon(":/img/actions/pdf.png"),
-                 escape(tr("Schematic PDF/Image")),
+                 escape(tr("Schematic PDF/Image")), &menu,
                  [&]() { add(GraphicsOutputJob::schematicPdf()); });
   menu.addAction(QIcon(":/img/actions/pdf.png"),
-                 escape(tr("Board Assembly PDF/Image")),
+                 escape(tr("Board Assembly PDF/Image")), &menu,
                  [&]() { add(GraphicsOutputJob::boardAssemblyPdf()); });
   menu.addAction(QIcon(":/img/actions/pdf.png"),
-                 escape(tr("Board Rendering PDF/Image")),
+                 escape(tr("Board Rendering PDF/Image")), &menu,
                  [&]() { add(GraphicsOutputJob::boardRenderingPdf()); });
   menu.addSection(tr("Production Data"));
   {
@@ -365,25 +365,25 @@ void OutputJobsDialog::addClicked() noexcept {
                      escape(GerberExcellonOutputJob::getTypeTrStatic()));
     if (auto job = migratedBoardFabSettings(mProject)) {
       sub->addAction(EditorToolbox::svgIcon(":/fa/solid/file-import.svg"),
-                     escape(tr("Import Old Settings")),
+                     escape(tr("Import Old Settings")), &menu,
                      [&, job]() { add(job); });
     }
     sub->addAction(QIcon(":/img/actions/export_gerber.png"),
-                   escape(tr("Generic Default Settings (*.gbr)")),
+                   escape(tr("Generic Default Settings (*.gbr)")), &menu,
                    [&]() { add(GerberExcellonOutputJob::defaultStyle()); });
     sub->addAction(QIcon(":/img/actions/export_gerber.png"),
-                   escape(tr("Generic Default Settings (Protel Style)")),
+                   escape(tr("Generic Default Settings (Protel Style)")), &menu,
                    [&]() { add(GerberExcellonOutputJob::protelStyle()); });
     if (organizations) {
       bool separatorAdded = false;
-      for (const auto& org : *organizations) {
+      for (const auto& org : std::as_const(*organizations)) {
         for (const auto& job : org.outputJobs) {
           if (job.type == GerberExcellonOutputJob::getTypeName()) {
             if (!separatorAdded) {
               sub->addSeparator();
               separatorAdded = true;
             }
-            sub->addAction(org.logo, job.name, [&]() {
+            sub->addAction(org.logo, job.name, &menu, [&]() {
               addOrganizationGerberExcellon(org.uuid, job.kind, job.uuid);
             });
           }
@@ -400,16 +400,16 @@ void OutputJobsDialog::addClicked() noexcept {
     }
   }
   menu.addAction(QIcon(":/img/actions/export_pick_place_file.png"),
-                 escape(PickPlaceOutputJob::getTypeTrStatic()),
+                 escape(PickPlaceOutputJob::getTypeTrStatic()), &menu,
                  [&]() { add(std::make_shared<PickPlaceOutputJob>()); });
   menu.addAction(QIcon(":/img/actions/export_pick_place_file.png"),
-                 escape(GerberX3OutputJob::getTypeTrStatic()),
+                 escape(GerberX3OutputJob::getTypeTrStatic()), &menu,
                  [&]() { add(std::make_shared<GerberX3OutputJob>()); });
   menu.addAction(QIcon(":/img/places/file.png"),
-                 escape(NetlistOutputJob::getTypeTrStatic()),
+                 escape(NetlistOutputJob::getTypeTrStatic()), &menu,
                  [&]() { add(std::make_shared<NetlistOutputJob>()); });
   menu.addAction(QIcon(":/img/actions/generate_bom.png"),
-                 escape(BomOutputJob::getTypeTrStatic()), [&]() {
+                 escape(BomOutputJob::getTypeTrStatic()), &menu, [&]() {
                    auto job = std::make_shared<BomOutputJob>();
                    // For file format v2, we import the custom BOM attributes
                    // coming from the legacy BOM export dialog as a smooth
@@ -417,26 +417,26 @@ void OutputJobsDialog::addClicked() noexcept {
                    job->setCustomAttributes(mProject.getCustomBomAttributes());
                    add(job);
                  });
-  menu.addAction(QIcon(":/img/actions/generate_ibom.png"),
-                 escape(InteractiveHtmlBomOutputJob::getTypeTrStatic()), [&]() {
-                   add(std::make_shared<InteractiveHtmlBomOutputJob>());
-                 });
+  menu.addAction(
+      QIcon(":/img/actions/generate_ibom.png"),
+      escape(InteractiveHtmlBomOutputJob::getTypeTrStatic()), &menu,
+      [&]() { add(std::make_shared<InteractiveHtmlBomOutputJob>()); });
   menu.addAction(QIcon(":/img/actions/export_step.png"),
-                 escape(Board3DOutputJob::getTypeTrStatic()),
+                 escape(Board3DOutputJob::getTypeTrStatic()), &menu,
                  [&]() { add(std::make_shared<Board3DOutputJob>()); });
   menu.addSection(tr("Generic"));
   menu.addAction(QIcon(":/img/actions/copy.png"),
-                 escape(CopyOutputJob::getTypeTrStatic()),
+                 escape(CopyOutputJob::getTypeTrStatic()), &menu,
                  [&]() { add(std::make_shared<CopyOutputJob>()); });
   menu.addAction(QIcon(":/img/actions/export_zip.png"),
-                 escape(ArchiveOutputJob::getTypeTrStatic()),
+                 escape(ArchiveOutputJob::getTypeTrStatic()), &menu,
                  [&]() { add(std::make_shared<ArchiveOutputJob>()); });
   menu.addSection("LibrePCB");
   menu.addAction(QIcon(":/img/logo/48x48.png"),
-                 escape(ProjectJsonOutputJob::getTypeTrStatic()),
+                 escape(ProjectJsonOutputJob::getTypeTrStatic()), &menu,
                  [&]() { add(std::make_shared<ProjectJsonOutputJob>()); });
   menu.addAction(QIcon(":/img/logo/48x48.png"),
-                 escape(LppzOutputJob::getTypeTrStatic()),
+                 escape(LppzOutputJob::getTypeTrStatic()), &menu,
                  [&]() { add(std::make_shared<LppzOutputJob>()); });
   menu.exec(QCursor::pos());
 }
@@ -534,7 +534,7 @@ void OutputJobsDialog::removeUnknownFiles() noexcept {
       if (answer == QMessageBox::Yes) {
         startLog();
         writeTitleLine(tr("Remove Unknown Files"));
-        connect(&writer, &OutputDirectoryWriter::aboutToRemoveFile,
+        connect(&writer, &OutputDirectoryWriter::aboutToRemoveFile, this,
                 [this](const FilePath& fp) {
                   writeLogLine(fp.toRelative(mProject.getPath()));
                 });
@@ -837,16 +837,16 @@ void OutputJobsDialog::writeTitleLine(const QString& msg) noexcept {
 
 void OutputJobsDialog::writeOutputFileLine(const FilePath& fp) noexcept {
   writeLogLine(QString("<a style=\"text-decoration:none;\" href=\"%1\">%2</a>")
-                   .arg(fp.toQUrl().toString(QUrl::PrettyDecoded))
-                   .arg(fp.toRelative(mProject.getPath())));
+                   .arg(fp.toQUrl().toString(QUrl::PrettyDecoded),
+                        fp.toRelative(mProject.getPath())));
 }
 
 void OutputJobsDialog::writeUnknownFileLine(const FilePath& fp) noexcept {
   writeLogLine(
       QString(
           "<a style=\"text-decoration:none;color:DarkRed;\" href=\"%1\">%2</a>")
-          .arg(fp.toQUrl().toString(QUrl::PrettyDecoded))
-          .arg(fp.toRelative(mProject.getPath())));
+          .arg(fp.toQUrl().toString(QUrl::PrettyDecoded),
+               fp.toRelative(mProject.getPath())));
 }
 
 void OutputJobsDialog::writeStrikeThroughLine(const QString& msg) noexcept {

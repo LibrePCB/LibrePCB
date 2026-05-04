@@ -127,7 +127,7 @@ std::shared_ptr<PickPlaceData> BoardPickPlaceGenerator::generate() noexcept {
     exportedDesignators.insert(designator);
 
     // Add all items.
-    for (const PickPlaceDataItem& item : items) {
+    for (const PickPlaceDataItem& item : std::as_const(items)) {
       data->addItem(item);
     }
   }

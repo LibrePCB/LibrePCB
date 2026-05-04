@@ -64,27 +64,27 @@ public:
   SchematicEditorState_AddComponent(
       const SchematicEditorState_AddComponent& other) = delete;
   explicit SchematicEditorState_AddComponent(const Context& context) noexcept;
-  virtual ~SchematicEditorState_AddComponent() noexcept;
+  ~SchematicEditorState_AddComponent() noexcept override;
 
   // General Methods
-  virtual bool entry() noexcept override;
-  virtual bool exit() noexcept override;
+  bool entry() noexcept override;
+  bool exit() noexcept override;
 
   // Event Handlers
-  virtual bool processAddComponent(
+  bool processAddComponent(
       const QString& searchTerm = QString()) noexcept override;
-  virtual bool processAddComponent(const Uuid& cmp,
-                                   const Uuid& symbVar) noexcept override;
-  virtual bool processRotate(const Angle& rotation) noexcept override;
-  virtual bool processMirror(Qt::Orientation orientation) noexcept override;
-  virtual bool processAbortCommand() noexcept override;
-  virtual bool processGraphicsSceneMouseMoved(
+  bool processAddComponent(const Uuid& cmp,
+                           const Uuid& symbVar) noexcept override;
+  bool processRotate(const Angle& rotation) noexcept override;
+  bool processMirror(Qt::Orientation orientation) noexcept override;
+  bool processAbortCommand() noexcept override;
+  bool processGraphicsSceneMouseMoved(
       const GraphicsSceneMouseEvent& e) noexcept override;
-  virtual bool processGraphicsSceneLeftMouseButtonPressed(
+  bool processGraphicsSceneLeftMouseButtonPressed(
       const GraphicsSceneMouseEvent& e) noexcept override;
-  virtual bool processGraphicsSceneLeftMouseButtonDoubleClicked(
+  bool processGraphicsSceneLeftMouseButtonDoubleClicked(
       const GraphicsSceneMouseEvent& e) noexcept override;
-  virtual bool processGraphicsSceneRightMouseButtonReleased(
+  bool processGraphicsSceneRightMouseButtonReleased(
       const GraphicsSceneMouseEvent& e) noexcept override;
 
   // Connection to UI

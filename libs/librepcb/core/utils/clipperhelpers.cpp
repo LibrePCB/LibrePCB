@@ -315,7 +315,8 @@ ClipperLib::Paths ClipperHelpers::flattenTree(
  *  Conversion Methods
  ******************************************************************************/
 
-QVector<Path> ClipperHelpers::convert(const ClipperLib::Paths& paths) noexcept {
+const QVector<Path> ClipperHelpers::convert(
+    const ClipperLib::Paths& paths) noexcept {
   QVector<Path> p;
   p.reserve(paths.size());
   for (const ClipperLib::Path& path : paths) {

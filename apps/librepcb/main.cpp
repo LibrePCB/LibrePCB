@@ -202,7 +202,7 @@ static void setTheme(const QString& name) noexcept {
   qApp->setPalette(sTheme->qpalette);
 
   QPixmapCache::clear();
-  for (QWidget* widget : qApp->allWidgets()) {
+  for (QWidget* widget : qApp->allWidgets()) {  // NOLINT
     qApp->style()->unpolish(widget);
     qApp->style()->polish(widget);
     widget->update();

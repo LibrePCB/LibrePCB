@@ -112,7 +112,7 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
       ++i;
     }
     // Apply this setting immediately.
-    connect(mUi->cbxAppLocale, &QComboBox::currentIndexChanged,
+    connect(mUi->cbxAppLocale, &QComboBox::currentIndexChanged, this,
             [this](int index) {
               if (index >= 0) {
                 mSettings.applicationLocale.set(
@@ -645,9 +645,9 @@ void WorkspaceSettingsDialog::execColorSchemeDialog(
     for (const auto& base : scheme->getBase().getAllColors()) {
       const auto colors = scheme->getColors(*base.role);
       lines.append(QString("\"%1\", \"%2\", %3")
-                       .arg(colors.primary.name(QColor::HexArgb))
-                       .arg(colors.secondary.name(QColor::HexArgb))
-                       .arg(base.role->getId()));
+                       .arg(colors.primary.name(QColor::HexArgb),
+                            colors.secondary.name(QColor::HexArgb),
+                            base.role->getId()));
     }
     const qsizetype maxLen =
         std::ranges::max(lines, {}, &QString::length).length();

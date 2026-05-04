@@ -65,6 +65,7 @@
 #include <QtCore>
 
 #include <algorithm>
+#include <memory>
 
 /*******************************************************************************
  *  Namespace
@@ -223,8 +224,7 @@ int CommandLineInterface::execute(const QStringList& args) noexcept {
       tr("Remove all boards not specified with '%1' from the project before "
          "executing all the other actions. If '%1' is not passed, all boards "
          "will be removed. Pass '%2' to save the modified project to disk.")
-          .arg("--board[-index]")
-          .arg("--save"));
+          .arg("--board[-index]", "--save"));
   QCommandLineOption assemblyVariantOption(
       "variant",
       tr("The name of the assembly variant(s) to export. Can be given multiple "
@@ -322,7 +322,7 @@ int CommandLineInterface::execute(const QStringList& args) noexcept {
     option.setDescription("[" % tr("Deprecated, replaced by:").toUpper() %
                           " --" % replacement.names().value(0) % "] " %
                           option.description());
-    for (const QString& name : option.names()) {
+    for (const QString& name : option.names()) {  // NOLINT
       deprecations.insert(name, replacement.names().value(0));
     }
   };
@@ -620,8 +620,7 @@ bool CommandLineInterface::openProject(
     }
     ProjectLoader loader;
     std::unique_ptr<Project> project =
-        loader.open(std::unique_ptr<TransactionalDirectory>(
-                        new TransactionalDirectory(projectFs)),
+        loader.open(std::make_unique<TransactionalDirectory>(projectFs),
                     projectFileName);  // can throw
     if (auto log = loader.getMigrationLog()) {
       print(tr("Attention: Project has been migrated to a newer file format!"));
@@ -630,9 +629,7 @@ bool CommandLineInterface::openProject(
             ? QString(" (%1x)").arg(msg.affectedItems)
             : "";
         print(QString(" - %1%2: %3")
-                  .arg(msg.getSeverityStrTr())
-                  .arg(multiplier)
-                  .arg(msg.message));
+                  .arg(msg.getSeverityStrTr(), multiplier, msg.message));
       }
     }
 
@@ -1056,8 +1053,7 @@ bool CommandLineInterface::openProject(
       }
       foreach (const auto& job, jobs) {
         print(tr("Export %1 assembly data to '%2'...")
-                  .arg(job.boardSideStr)
-                  .arg(job.destStr));
+                  .arg(job.boardSideStr, job.destStr));
         foreach (const Board* board, boards) {
           foreach (std::shared_ptr<AssemblyVariant> av, assemblyVariants) {
             const QString destPathStr = AttributeSubstitutor::substitute(
@@ -1174,9 +1170,8 @@ bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
 
     std::shared_ptr<TransactionalFileSystem> libFs =
         TransactionalFileSystem::open(libFp, save);  // can throw
-    std::unique_ptr<Library> lib =
-        Library::open(std::unique_ptr<TransactionalDirectory>(
-            new TransactionalDirectory(libFs)));  // can throw
+    std::unique_ptr<Library> lib = Library::open(
+        std::make_unique<TransactionalDirectory>(libFs));  // can throw
     processLibraryElement(libDir, *libFs, *lib, runCheck, minifyStepFiles, save,
                           strict,
                           success);  // can throw
@@ -1191,9 +1186,8 @@ bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
         qInfo().noquote() << tr("Open '%1'...").arg(prettyPath(fp, libDir));
         std::shared_ptr<TransactionalFileSystem> fs =
             TransactionalFileSystem::open(fp, save);  // can throw
-        std::unique_ptr<ComponentCategory> element =
-            ComponentCategory::open(std::unique_ptr<TransactionalDirectory>(
-                new TransactionalDirectory(fs)));  // can throw
+        std::unique_ptr<ComponentCategory> element = ComponentCategory::open(
+            std::make_unique<TransactionalDirectory>(fs));  // can throw
         processLibraryElement(libDir, *fs, *element, runCheck, minifyStepFiles,
                               save, strict,
                               success);  // can throw
@@ -1210,9 +1204,8 @@ bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
         qInfo().noquote() << tr("Open '%1'...").arg(prettyPath(fp, libDir));
         std::shared_ptr<TransactionalFileSystem> fs =
             TransactionalFileSystem::open(fp, save);  // can throw
-        std::unique_ptr<PackageCategory> element =
-            PackageCategory::open(std::unique_ptr<TransactionalDirectory>(
-                new TransactionalDirectory(fs)));  // can throw
+        std::unique_ptr<PackageCategory> element = PackageCategory::open(
+            std::make_unique<TransactionalDirectory>(fs));  // can throw
         processLibraryElement(libDir, *fs, *element, runCheck, minifyStepFiles,
                               save, strict,
                               success);  // can throw
@@ -1229,9 +1222,8 @@ bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
         qInfo().noquote() << tr("Open '%1'...").arg(prettyPath(fp, libDir));
         std::shared_ptr<TransactionalFileSystem> fs =
             TransactionalFileSystem::open(fp, save);  // can throw
-        std::unique_ptr<Symbol> element =
-            Symbol::open(std::unique_ptr<TransactionalDirectory>(
-                new TransactionalDirectory(fs)));  // can throw
+        std::unique_ptr<Symbol> element = Symbol::open(
+            std::make_unique<TransactionalDirectory>(fs));  // can throw
         processLibraryElement(libDir, *fs, *element, runCheck, minifyStepFiles,
                               save, strict,
                               success);  // can throw
@@ -1248,9 +1240,8 @@ bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
         qInfo().noquote() << tr("Open '%1'...").arg(prettyPath(fp, libDir));
         std::shared_ptr<TransactionalFileSystem> fs =
             TransactionalFileSystem::open(fp, save);  // can throw
-        std::unique_ptr<Package> element =
-            Package::open(std::unique_ptr<TransactionalDirectory>(
-                new TransactionalDirectory(fs)));  // can throw
+        std::unique_ptr<Package> element = Package::open(
+            std::make_unique<TransactionalDirectory>(fs));  // can throw
         processLibraryElement(libDir, *fs, *element, runCheck, minifyStepFiles,
                               save, strict,
                               success);  // can throw
@@ -1267,9 +1258,8 @@ bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
         qInfo().noquote() << tr("Open '%1'...").arg(prettyPath(fp, libDir));
         std::shared_ptr<TransactionalFileSystem> fs =
             TransactionalFileSystem::open(fp, save);  // can throw
-        std::unique_ptr<Component> element =
-            Component::open(std::unique_ptr<TransactionalDirectory>(
-                new TransactionalDirectory(fs)));  // can throw
+        std::unique_ptr<Component> element = Component::open(
+            std::make_unique<TransactionalDirectory>(fs));  // can throw
         processLibraryElement(libDir, *fs, *element, runCheck, minifyStepFiles,
                               save, strict,
                               success);  // can throw
@@ -1286,9 +1276,8 @@ bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
         qInfo().noquote() << tr("Open '%1'...").arg(prettyPath(fp, libDir));
         std::shared_ptr<TransactionalFileSystem> fs =
             TransactionalFileSystem::open(fp, save);  // can throw
-        std::unique_ptr<Device> element =
-            Device::open(std::unique_ptr<TransactionalDirectory>(
-                new TransactionalDirectory(fs)));  // can throw
+        std::unique_ptr<Device> element = Device::open(
+            std::make_unique<TransactionalDirectory>(fs));  // can throw
         processLibraryElement(libDir, *fs, *element, runCheck, minifyStepFiles,
                               save, strict,
                               success);  // can throw
@@ -1305,9 +1294,8 @@ bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
         qInfo().noquote() << tr("Open '%1'...").arg(prettyPath(fp, libDir));
         std::shared_ptr<TransactionalFileSystem> fs =
             TransactionalFileSystem::open(fp, save);  // can throw
-        std::unique_ptr<Organization> element =
-            Organization::open(std::unique_ptr<TransactionalDirectory>(
-                new TransactionalDirectory(fs)));  // can throw
+        std::unique_ptr<Organization> element = Organization::open(
+            std::make_unique<TransactionalDirectory>(fs));  // can throw
         processLibraryElement(libDir, *fs, *element, runCheck, minifyStepFiles,
                               save, strict,
                               success);  // can throw
@@ -1473,9 +1461,8 @@ bool CommandLineInterface::openSymbol(
     print(tr("Open symbol '%1'...").arg(prettyPath(symbolFp, symbolFile)));
     std::shared_ptr<TransactionalFileSystem> symbolFs =
         TransactionalFileSystem::open(symbolFp, false);  // can throw
-    std::unique_ptr<Symbol> symbol =
-        Symbol::open(std::unique_ptr<TransactionalDirectory>(
-            new TransactionalDirectory(symbolFs)));  // can throw
+    std::unique_ptr<Symbol> symbol = Symbol::open(
+        std::make_unique<TransactionalDirectory>(symbolFs));  // can throw
     qInfo().noquote()
         << tr("Opened symbol: %1").arg(*symbol->getNames().getDefaultValue());
 
@@ -1571,9 +1558,8 @@ bool CommandLineInterface::openPackage(
     print(tr("Open package '%1'...").arg(prettyPath(packageFp, packageFile)));
     std::shared_ptr<TransactionalFileSystem> packageFs =
         TransactionalFileSystem::open(packageFp, false);  // can throw
-    std::unique_ptr<Package> package =
-        Package::open(std::unique_ptr<TransactionalDirectory>(
-            new TransactionalDirectory(packageFs)));  // can throw
+    std::unique_ptr<Package> package = Package::open(
+        std::make_unique<TransactionalDirectory>(packageFs));  // can throw
     qInfo().noquote()
         << tr("Opened package: %1").arg(*package->getNames().getDefaultValue());
 
@@ -1631,9 +1617,8 @@ bool CommandLineInterface::openPackage(
         // Set up graphics export
         GraphicsExport graphicsExport;
         graphicsExport.setDocumentName(
-            QString("%1 (%2)")
-                .arg(*package->getNames().getDefaultValue())
-                .arg(*footprint->getNames().getDefaultValue()));
+            QString("%1 (%2)").arg(*package->getNames().getDefaultValue(),
+                                   *footprint->getNames().getDefaultValue()));
 
         // Create export settings
         std::shared_ptr<GraphicsExportSettings> settings =
@@ -1717,8 +1702,8 @@ bool CommandLineInterface::openStep(const QString& filePath, bool minify,
         QLocale locale = QLocale::c();
         locale.setNumberOptions(QLocale::DefaultNumberOptions);
         print(QString(" - Minified from %1 bytes to %2 bytes (%3%)")
-                  .arg(locale.toString(stepContent.size()))
-                  .arg(locale.toString(minified.size()))
+                  .arg(locale.toString(stepContent.size()),
+                       locale.toString(minified.size()))
                   .arg(percent, 0, 'f', 0));
         if (minified.size() > stepContent.size()) {
           printErr(" - ERROR: The output is larger than the input!");

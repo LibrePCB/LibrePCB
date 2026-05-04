@@ -99,7 +99,7 @@ public:
   EagleLibraryImport(const FilePath& dstLibFp,
                      std::function<Uuid()> createUuid = &Uuid::createRandom,
                      QObject* parent = nullptr) noexcept;
-  ~EagleLibraryImport() noexcept;
+  ~EagleLibraryImport() noexcept override;
 
   // Getters
   std::shared_ptr<MessageLogger> getLogger() const noexcept { return mLogger; }

@@ -52,20 +52,20 @@ public:
   CmdSymbolReload() = delete;
   CmdSymbolReload(const CmdSymbolReload& other) = delete;
   explicit CmdSymbolReload(Symbol& element) noexcept;
-  virtual ~CmdSymbolReload() noexcept;
+  ~CmdSymbolReload() noexcept override;
 
   // Operator Overloadings
   CmdSymbolReload& operator=(const CmdSymbolReload& rhs) = delete;
 
 protected:  // Methods
   /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
-  virtual bool performExecute() override;
+  bool performExecute() override;
 
   /// @copydoc ::librepcb::editor::UndoCommand::performUndo()
-  virtual void performUndo() override;
+  void performUndo() override;
 
   /// @copydoc ::librepcb::editor::UndoCommand::performRedo()
-  virtual void performRedo() override;
+  void performRedo() override;
 
 private:  // Data
   Symbol& mElement;

@@ -27,6 +27,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -55,10 +57,9 @@ CmdSchematicAdd::~CmdSchematicAdd() noexcept {
  ******************************************************************************/
 
 bool CmdSchematicAdd::performExecute() {
-  mSchematic = new Schematic(
-      mProject,
-      std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory()),
-      mDirName, Uuid::createRandom(), mName);
+  mSchematic =
+      new Schematic(mProject, std::make_unique<TransactionalDirectory>(),
+                    mDirName, Uuid::createRandom(), mName);
 
   performRedo();  // can throw
 

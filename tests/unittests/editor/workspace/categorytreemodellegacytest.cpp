@@ -32,6 +32,8 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -44,7 +46,7 @@ namespace tests {
  ******************************************************************************/
 
 class CategoryTreeModelLegacyTest : public ::testing::Test {
-protected:
+public:
   struct Item {
     QString text;
     QVector<Item> children;
@@ -57,12 +59,12 @@ protected:
 
   CategoryTreeModelLegacyTest() : mWsDir(FilePath::getRandomTempPath()) {
     FileUtils::makePath(mWsDir);
-    mWsDb.reset(new WorkspaceLibraryDb(mWsDir));
-    mDb.reset(new SQLiteDatabase(mWsDb->getFilePath()));
-    mWriter.reset(new WorkspaceLibraryDbWriter(mWsDir, *mDb));
+    mWsDb = std::make_unique<WorkspaceLibraryDb>(mWsDir);
+    mDb = std::make_unique<SQLiteDatabase>(mWsDb->getFilePath());
+    mWriter = std::make_unique<WorkspaceLibraryDbWriter>(mWsDir, *mDb);
   }
 
-  virtual ~CategoryTreeModelLegacyTest() {
+  ~CategoryTreeModelLegacyTest() override {
     QDir(mWsDir.toStr()).removeRecursively();
   }
 

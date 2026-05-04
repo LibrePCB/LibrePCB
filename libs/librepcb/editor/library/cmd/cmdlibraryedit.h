@@ -48,7 +48,7 @@ public:
   CmdLibraryEdit() = delete;
   CmdLibraryEdit(const CmdLibraryEdit& other) = delete;
   explicit CmdLibraryEdit(Library& library) noexcept;
-  virtual ~CmdLibraryEdit() noexcept;
+  ~CmdLibraryEdit() noexcept override;
 
   // Setters
   void setUrl(const QUrl& url) noexcept;
@@ -61,13 +61,13 @@ public:
 
 protected:  // Methods
   /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
-  virtual bool performExecute() override;
+  bool performExecute() override;
 
   /// @copydoc ::librepcb::editor::UndoCommand::performUndo()
-  virtual void performUndo() override;
+  void performUndo() override;
 
   /// @copydoc ::librepcb::editor::UndoCommand::performRedo()
-  virtual void performRedo() override;
+  void performRedo() override;
 
 private:  // Data
   Library& mLibrary;

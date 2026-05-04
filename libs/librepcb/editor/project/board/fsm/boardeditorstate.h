@@ -97,7 +97,7 @@ public:
   BoardEditorState(const BoardEditorState& other) = delete;
   explicit BoardEditorState(const Context& context,
                             QObject* parent = nullptr) noexcept;
-  virtual ~BoardEditorState() noexcept;
+  ~BoardEditorState() noexcept override;
 
   // General Methods
   virtual bool entry() noexcept { return true; }

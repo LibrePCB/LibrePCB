@@ -55,7 +55,7 @@ public:
   SymbolPainter() = delete;
   explicit SymbolPainter(const Symbol& symbol, QStringList* errors) noexcept;
   SymbolPainter(const SymbolPainter& other) = delete;
-  ~SymbolPainter() noexcept;
+  ~SymbolPainter() noexcept override;
 
   // General Methods
   void paint(QPainter& painter,

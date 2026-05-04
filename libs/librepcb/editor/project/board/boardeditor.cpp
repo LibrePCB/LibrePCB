@@ -53,6 +53,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -238,6 +240,7 @@ void BoardEditor::setUiData(const ui::BoardData& data) noexcept {
     setPreferredFootprintTags([&](Board::PreferredFootprintTags& tags) {
       editPreferredFootprintTags(
           {&tags.thtTop, &tags.thtBot},
+          // NOLINTNEXTLINE
           solderTechnologyTags.values() + ipcDensityLevelTags.values(),
           solderTechnologyTags.value(data.tht_soldering), QVector<Tag>{});
     });
@@ -246,6 +249,7 @@ void BoardEditor::setUiData(const ui::BoardData& data) noexcept {
     setPreferredFootprintTags([&](Board::PreferredFootprintTags& tags) {
       editPreferredFootprintTags(
           {&tags.smtTop, &tags.smtBot},
+          // NOLINTNEXTLINE
           solderTechnologyTags.values() + ipcDensityLevelTags.values(),
           solderTechnologyTags.value(data.smt_soldering), QVector<Tag>{});
     });
@@ -269,7 +273,7 @@ void BoardEditor::schedulePlanesRebuild() {
 
 void BoardEditor::startPlanesRebuild(bool force) noexcept {
   if ((!mPlanesBuilder) || force) {
-    mPlanesBuilder.reset(new BoardPlaneFragmentsBuilder(this));
+    mPlanesBuilder = std::make_unique<BoardPlaneFragmentsBuilder>(this);
     connect(mPlanesBuilder.get(), &BoardPlaneFragmentsBuilder::finished, this,
             [this](BoardPlaneFragmentsBuilder::Result result) {
               if (result.applyToBoard() && result.board) {
@@ -303,7 +307,7 @@ void BoardEditor::startPlanesRebuild(bool force) noexcept {
       layers.insert(&Layer::topCopper());
       layers.insert(&Layer::botCopper());
     }
-    for (auto tab : mActive2dTabs) {
+    for (const auto& tab : std::as_const(mActive2dTabs)) {
       if (tab) {
         layers |= tab->getVisibleCopperLayers();
       }
@@ -357,7 +361,9 @@ void BoardEditor::unregisterActiveTab(Board3dTab* tab) noexcept {
 }
 
 void BoardEditor::execBoardSetupDialog(bool switchToDrcSettings) noexcept {
-  mProjectEditor.abortBlockingToolsInOtherEditors(this);  // Release undo stack.
+  // Release undo stack.
+  emit mProjectEditor.abortBlockingToolsInOtherEditors(this);
+
   BoardSetupDialog dialog(mProjectEditor.getApp(), mBoard,
                           mProjectEditor.getUndoStack(), qApp->activeWindow());
   if (switchToDrcSettings) {
@@ -424,7 +430,7 @@ void BoardEditor::prepareOrderPcb() noexcept {
   }
 
   // Prepare network request.
-  mOrderRequest.reset(new OrderPcbApiRequest(ep->url));
+  mOrderRequest = std::make_unique<OrderPcbApiRequest>(ep->url);
   connect(mOrderRequest.get(), &OrderPcbApiRequest::infoRequestSucceeded, this,
           [this]() { onUiDataChanged.notify(); });
   connect(mOrderRequest.get(), &OrderPcbApiRequest::infoRequestFailed, this,
@@ -635,7 +641,7 @@ void BoardEditor::setDrcResult(
 
   // Update UI.
   if (!mDrcMessages) {
-    mDrcMessages.reset(new RuleCheckMessagesModel());
+    mDrcMessages = std::make_shared<RuleCheckMessagesModel>();
     mDrcMessages->setAutofixHandler(std::bind(&BoardEditor::autoFixHandler,
                                               this, std::placeholders::_1,
                                               std::placeholders::_2));
@@ -664,7 +670,7 @@ void BoardEditor::registeredTabsModified() noexcept {
     mPlanesRebuildTimer.reset();
     mPlanesBuilder.reset();
   } else if (!mPlanesRebuildTimer) {
-    mPlanesRebuildTimer.reset(new QTimer(this));
+    mPlanesRebuildTimer = std::make_unique<QTimer>(this);
     connect(mPlanesRebuildTimer.get(), &QTimer::timeout, this,
             &BoardEditor::planesRebuildTimerTimeout);
     mPlanesRebuildTimer->setInterval(100);

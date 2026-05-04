@@ -60,19 +60,19 @@ public:
   BoardEditorState_DrawZone() = delete;
   BoardEditorState_DrawZone(const BoardEditorState_DrawZone& other) = delete;
   explicit BoardEditorState_DrawZone(const Context& context) noexcept;
-  virtual ~BoardEditorState_DrawZone() noexcept;
+  ~BoardEditorState_DrawZone() noexcept override;
 
   // General Methods
-  virtual bool entry() noexcept override;
-  virtual bool exit() noexcept override;
+  bool entry() noexcept override;
+  bool exit() noexcept override;
 
   // Event Handlers
-  virtual bool processAbortCommand() noexcept override;
-  virtual bool processGraphicsSceneMouseMoved(
+  bool processAbortCommand() noexcept override;
+  bool processGraphicsSceneMouseMoved(
       const GraphicsSceneMouseEvent& e) noexcept override;
-  virtual bool processGraphicsSceneLeftMouseButtonPressed(
+  bool processGraphicsSceneLeftMouseButtonPressed(
       const GraphicsSceneMouseEvent& e) noexcept override;
-  virtual bool processGraphicsSceneLeftMouseButtonDoubleClicked(
+  bool processGraphicsSceneLeftMouseButtonDoubleClicked(
       const GraphicsSceneMouseEvent& e) noexcept override;
 
   // Connection to UI

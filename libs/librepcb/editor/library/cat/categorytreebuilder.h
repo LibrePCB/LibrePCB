@@ -75,8 +75,8 @@ public:
    *         is either empty or contains error messages.
    * @throw In case of database errors.
    */
-  QStringList buildTree(const std::optional<Uuid>& category,
-                        bool* success = nullptr) const;
+  const QStringList buildTree(const std::optional<Uuid>& category,
+                              bool* success = nullptr) const;
 
   // Operator Overloadings
   CategoryTreeBuilder& operator=(const CategoryTreeBuilder& rhs) = delete;

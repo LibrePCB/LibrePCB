@@ -97,7 +97,7 @@ FilePath TransactionalFileSystem::getAbsPath(
                                         : FilePath();
 }
 
-QStringList TransactionalFileSystem::getDirs(
+const QStringList TransactionalFileSystem::getDirs(
     const QString& path) const noexcept {
   QString dirpath = cleanPath(path);
   if (!checkIfPathIsSafe(dirpath)) {
@@ -130,7 +130,7 @@ QStringList TransactionalFileSystem::getDirs(
   return dirnames.values();
 }
 
-QStringList TransactionalFileSystem::getFiles(
+const QStringList TransactionalFileSystem::getFiles(
     const QString& path) const noexcept {
   QString dirpath = cleanPath(path);
   if (!checkIfPathIsSafe(dirpath)) {

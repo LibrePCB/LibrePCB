@@ -59,7 +59,7 @@ public:
       delete;
   explicit CmdDragSelectedFootprintItems(FootprintGraphicsItem& item,
                                          const PositiveLength& grid) noexcept;
-  ~CmdDragSelectedFootprintItems() noexcept;
+  ~CmdDragSelectedFootprintItems() noexcept override;
 
   // Getters
   int getSelectedItemsCount() const noexcept;

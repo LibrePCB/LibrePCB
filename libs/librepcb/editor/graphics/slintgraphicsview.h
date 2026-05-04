@@ -87,7 +87,7 @@ public:
                              const QMarginsF& defaultMargins,
                              QObject* parent = nullptr) noexcept;
   SlintGraphicsView(const SlintGraphicsView& other) = delete;
-  virtual ~SlintGraphicsView() noexcept;
+  ~SlintGraphicsView() noexcept override;
 
   // Getters
   bool isPanning() const noexcept { return mPanning; }

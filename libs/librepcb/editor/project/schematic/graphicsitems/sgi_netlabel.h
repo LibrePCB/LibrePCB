@@ -57,7 +57,7 @@ public:
   SGI_NetLabel(
       SI_NetLabel& label, const GraphicsLayerList& layers,
       std::shared_ptr<const SchematicGraphicsScene::Context> context) noexcept;
-  virtual ~SGI_NetLabel() noexcept;
+  ~SGI_NetLabel() noexcept override;
 
   // General Methods
   SI_NetLabel& getNetLabel() noexcept { return mLabel; }
@@ -71,8 +71,8 @@ public:
 
 private:  // Methods
   void labelEdited(const SI_NetLabel& obj, SI_NetLabel::Event event) noexcept;
-  virtual QVariant itemChange(GraphicsItemChange change,
-                              const QVariant& value) noexcept override;
+  QVariant itemChange(GraphicsItemChange change,
+                      const QVariant& value) noexcept override;
   void updatePosition() noexcept;
   void updateRotation() noexcept;
   void updateMirrored() noexcept;

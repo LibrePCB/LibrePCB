@@ -48,9 +48,9 @@ ApiEndpointListModelLegacy::~ApiEndpointListModelLegacy() noexcept {
 
 void ApiEndpointListModelLegacy::setValues(
     const QList<WorkspaceSettings::ApiEndpoint>& values) noexcept {
-  emit beginResetModel();
+  beginResetModel();
   mValues = values;
-  emit endResetModel();
+  endResetModel();
 }
 
 /*******************************************************************************
@@ -65,7 +65,7 @@ void ApiEndpointListModelLegacy::add(
     return;
   }
 
-  for (const auto& ep : mValues) {
+  for (const auto& ep : std::as_const(mValues)) {
     if (ep.url == mNewUrl) {
       QMessageBox::critical(nullptr, tr("Error"),
                             QString("URL already exists."));

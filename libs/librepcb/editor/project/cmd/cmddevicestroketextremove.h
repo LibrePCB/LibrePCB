@@ -48,7 +48,7 @@ class CmdDeviceStrokeTextRemove final : public UndoCommand {
 public:
   // Constructors / Destructor
   CmdDeviceStrokeTextRemove(BI_Device& device, BI_StrokeText& text) noexcept;
-  ~CmdDeviceStrokeTextRemove() noexcept;
+  ~CmdDeviceStrokeTextRemove() noexcept override;
 
 private:
   // Private Methods

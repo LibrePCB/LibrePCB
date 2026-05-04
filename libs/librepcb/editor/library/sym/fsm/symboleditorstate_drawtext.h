@@ -48,7 +48,7 @@ public:
   SymbolEditorState_DrawText() = delete;
   SymbolEditorState_DrawText(const SymbolEditorState_DrawText& other) = delete;
   explicit SymbolEditorState_DrawText(const Context& context) noexcept;
-  ~SymbolEditorState_DrawText() noexcept;
+  ~SymbolEditorState_DrawText() noexcept override;
 
   // Operator Overloadings
   SymbolEditorState_DrawText& operator=(const SymbolEditorState_DrawText& rhs) =

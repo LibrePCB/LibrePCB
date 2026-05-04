@@ -50,7 +50,7 @@ public:
   // Constructors / Destructor
   explicit CmdBoardNetSegmentAdd(BI_NetSegment& segment) noexcept;
   CmdBoardNetSegmentAdd(Board& board, NetSignal* netsignal) noexcept;
-  ~CmdBoardNetSegmentAdd() noexcept;
+  ~CmdBoardNetSegmentAdd() noexcept override;
 
   // Getters
   BI_NetSegment* getNetSegment() const noexcept { return mNetSegment; }

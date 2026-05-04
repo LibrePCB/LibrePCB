@@ -64,7 +64,7 @@ public:
   PrimitiveFootprintPadGraphicsItem(const GraphicsLayerList& layers,
                                     bool originCrossVisible, int textMinAlpha,
                                     QGraphicsItem* parent = nullptr) noexcept;
-  ~PrimitiveFootprintPadGraphicsItem() noexcept;
+  ~PrimitiveFootprintPadGraphicsItem() noexcept override;
 
   // Setters
   void setPosition(const Point& position) noexcept;
@@ -87,8 +87,8 @@ public:
 private:  // Methods
   void layerEdited(const GraphicsLayer& layer,
                    GraphicsLayer::Event event) noexcept;
-  virtual QVariant itemChange(GraphicsItemChange change,
-                              const QVariant& value) noexcept override;
+  QVariant itemChange(GraphicsItemChange change,
+                      const QVariant& value) noexcept override;
   void updatePathLayers() noexcept;
   void updateTextHeight() noexcept;
   void updateRegisteredLayers() noexcept;

@@ -93,7 +93,7 @@ public:
           const QDateTime& created, const ElementName& name_en_US,
           const QString& description_en_US, const QString& keywords_en_US,
           AssemblyType assemblyType);
-  ~Package() noexcept;
+  ~Package() noexcept override;
 
   // Getters
   const QList<AlternativeName>& getAlternativeNames() const noexcept {
@@ -111,7 +111,7 @@ public:
   const PackagePadList& getPads() const noexcept { return mPads; }
   PackageModelList& getModels() noexcept { return mModels; }
   const PackageModelList& getModels() const noexcept { return mModels; }
-  QVector<std::shared_ptr<const PackageModel>> getModelsForFootprint(
+  const QVector<std::shared_ptr<const PackageModel> > getModelsForFootprint(
       const Uuid& fpt) const noexcept;
   FootprintList& getFootprints() noexcept { return mFootprints; }
   const FootprintList& getFootprints() const noexcept { return mFootprints; }
@@ -130,7 +130,7 @@ public:
 
   // General Methods
   void duplicateFrom(const Package& other);
-  virtual RuleCheckMessageList runChecks() const override;
+  RuleCheckMessageList runChecks() const override;
 
   // Operator Overloadings
   Package& operator=(const Package& rhs) = delete;
@@ -147,7 +147,7 @@ public:
   }
 
 protected:  // Methods
-  virtual void serialize(SExpression& root) const override;
+  void serialize(SExpression& root) const override;
 
 private:  // Methods
   Package(std::unique_ptr<TransactionalDirectory> directory,

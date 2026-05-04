@@ -117,7 +117,7 @@ void Circuit::removeAssemblyVariant(std::shared_ptr<AssemblyVariant> av) {
                      "The last assembly variant cannot be removed!");
   }
   mAssemblyVariants.remove(av.get());
-  assemblyVariantRemoved(av);
+  emit assemblyVariantRemoved(av);
 }
 
 void Circuit::setAssemblyVariantName(std::shared_ptr<AssemblyVariant> av,
@@ -147,6 +147,7 @@ NetClass* Circuit::getNetClassByName(const ElementName& name) const noexcept {
 }
 
 void Circuit::addNetClass(NetClass& netclass) {
+  // NOLINTNEXTLINE
   if ((mNetClasses.values().contains(&netclass)) ||
       (&netclass.getCircuit() != this)) {
     throw LogicError(__FILE__, __LINE__);
@@ -233,6 +234,7 @@ NetSignal* Circuit::getNetSignalWithMostElements() const noexcept {
 }
 
 void Circuit::addNetSignal(NetSignal& netsignal) {
+  // NOLINTNEXTLINE
   if ((mNetSignals.values().contains(&netsignal)) ||
       (&netsignal.getCircuit() != this)) {
     throw LogicError(__FILE__, __LINE__);
@@ -302,6 +304,7 @@ Bus* Circuit::getBusByName(const QString& name) const noexcept {
 }
 
 void Circuit::addBus(Bus& bus) {
+  // NOLINTNEXTLINE
   if ((mBuses.values().contains(&bus)) || (&bus.getCircuit() != this)) {
     throw LogicError(__FILE__, __LINE__);
   }

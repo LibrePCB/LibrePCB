@@ -68,7 +68,7 @@ public:
   // PrimitivePathGraphicsItem() = delete;
   PrimitivePathGraphicsItem(const PrimitivePathGraphicsItem& other) = delete;
   explicit PrimitivePathGraphicsItem(QGraphicsItem* parent = nullptr) noexcept;
-  virtual ~PrimitivePathGraphicsItem() noexcept;
+  ~PrimitivePathGraphicsItem() noexcept override;
 
   // Setters
   void setPosition(const Point& pos) noexcept;
@@ -90,7 +90,7 @@ public:
   }
   QPainterPath shape() const noexcept override;
   void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
-             QWidget* widget = 0) noexcept override;
+             QWidget* widget = nullptr) noexcept override;
 
   // Operator Overloadings
   PrimitivePathGraphicsItem& operator=(const PrimitivePathGraphicsItem& rhs) =

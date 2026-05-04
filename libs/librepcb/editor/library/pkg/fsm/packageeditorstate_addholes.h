@@ -56,7 +56,7 @@ public:
   PackageEditorState_AddHoles(const PackageEditorState_AddHoles& other) =
       delete;
   explicit PackageEditorState_AddHoles(Context& context) noexcept;
-  ~PackageEditorState_AddHoles() noexcept;
+  ~PackageEditorState_AddHoles() noexcept override;
 
   // General Methods
   bool entry() noexcept override;

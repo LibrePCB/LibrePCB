@@ -59,16 +59,16 @@ public:
   BGI_AirWire(
       BI_AirWire& airwire, const GraphicsLayerList& layers,
       std::shared_ptr<const BoardGraphicsScene::Context> context) noexcept;
-  virtual ~BGI_AirWire() noexcept;
+  ~BGI_AirWire() noexcept override;
 
   // General Methods
   BI_AirWire& getAirWire() noexcept { return mAirWire; }
   void updateContext() noexcept;
 
   // Inherited from QGraphicsItem
-  QRectF boundingRect() const { return mBoundingRect; }
+  QRectF boundingRect() const override { return mBoundingRect; }
   void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
-             QWidget* widget);
+             QWidget* widget) override;
 
   // Operator Overloadings
   BGI_AirWire& operator=(const BGI_AirWire& rhs) = delete;

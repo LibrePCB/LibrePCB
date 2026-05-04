@@ -33,6 +33,8 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -59,7 +61,7 @@ AssemblyVariantListModel::~AssemblyVariantListModel() noexcept {
  ******************************************************************************/
 
 void AssemblyVariantListModel::setCircuit(Circuit* circuit) noexcept {
-  emit beginResetModel();
+  beginResetModel();
 
   if (mCircuit) {
     mCircuit->getAssemblyVariants().onEdited.detach(mOnEditedSlot);
@@ -71,7 +73,7 @@ void AssemblyVariantListModel::setCircuit(Circuit* circuit) noexcept {
     mCircuit->getAssemblyVariants().onEdited.attach(mOnEditedSlot);
   }
 
-  emit endResetModel();
+  endResetModel();
 }
 
 void AssemblyVariantListModel::setUndoStack(UndoStack* stack) noexcept {
@@ -107,7 +109,7 @@ void AssemblyVariantListModel::copy(
       execCmd(new CmdAssemblyVariantAdd(*mCircuit, copy, obj));
     }
   } catch (const Exception& e) {
-    QMessageBox::critical(0, tr("Error"), e.getMsg());
+    QMessageBox::critical(nullptr, tr("Error"), e.getMsg());
   }
 }
 
@@ -124,7 +126,7 @@ void AssemblyVariantListModel::remove(
       execCmd(new CmdAssemblyVariantRemove(*mCircuit, obj));
     }
   } catch (const Exception& e) {
-    QMessageBox::critical(0, tr("Error"), e.getMsg());
+    QMessageBox::critical(nullptr, tr("Error"), e.getMsg());
   }
 }
 
@@ -141,7 +143,7 @@ void AssemblyVariantListModel::moveUp(
                                           index, index - 1));
     }
   } catch (const Exception& e) {
-    QMessageBox::critical(0, tr("Error"), e.getMsg());
+    QMessageBox::critical(nullptr, tr("Error"), e.getMsg());
   }
 }
 
@@ -158,7 +160,7 @@ void AssemblyVariantListModel::moveDown(
                                           index, index + 1));
     }
   } catch (const Exception& e) {
-    QMessageBox::critical(0, tr("Error"), e.getMsg());
+    QMessageBox::critical(nullptr, tr("Error"), e.getMsg());
   }
 }
 
@@ -261,7 +263,7 @@ bool AssemblyVariantListModel::setData(const QModelIndex& index,
         mCircuit->getAssemblyVariants().value(index.row());
     std::unique_ptr<CmdAssemblyVariantEdit> cmd;
     if (item) {
-      cmd.reset(new CmdAssemblyVariantEdit(*mCircuit, item));
+      cmd = std::make_unique<CmdAssemblyVariantEdit>(*mCircuit, item);
     }
     const bool editRole = (role == Qt::EditRole);
     if ((index.column() == COLUMN_NAME) && editRole) {
@@ -284,7 +286,7 @@ bool AssemblyVariantListModel::setData(const QModelIndex& index,
       return true;
     }
   } catch (const Exception& e) {
-    QMessageBox::critical(0, tr("Error"), e.getMsg());
+    QMessageBox::critical(nullptr, tr("Error"), e.getMsg());
   }
   return false;
 }
@@ -309,7 +311,8 @@ void AssemblyVariantListModel::listEdited(
       endRemoveRows();
       break;
     case AssemblyVariantList::Event::ElementEdited:
-      dataChanged(this->index(index, 0), this->index(index, _COLUMN_COUNT - 1));
+      emit dataChanged(this->index(index, 0),
+                       this->index(index, _COLUMN_COUNT - 1));
       break;
     default:
       qWarning() << "Unhandled switch-case in "

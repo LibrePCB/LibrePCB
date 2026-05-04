@@ -47,10 +47,10 @@ public:
   ComponentCheck() = delete;
   ComponentCheck(const ComponentCheck& other) = delete;
   explicit ComponentCheck(const Component& component) noexcept;
-  virtual ~ComponentCheck() noexcept;
+  ~ComponentCheck() noexcept override;
 
   // General Methods
-  virtual RuleCheckMessageList runChecks() const override;
+  RuleCheckMessageList runChecks() const override;
 
   // Operator Overloadings
   ComponentCheck& operator=(const ComponentCheck& rhs) = delete;

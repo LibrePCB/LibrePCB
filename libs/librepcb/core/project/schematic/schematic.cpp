@@ -118,6 +118,7 @@ void Schematic::setName(const ElementName& name) noexcept {
  ******************************************************************************/
 
 void Schematic::addSymbol(SI_Symbol& symbol) {
+  // NOLINTNEXTLINE
   if ((!mIsAddedToProject) || (mSymbols.values().contains(&symbol)) ||
       (&symbol.getSchematic() != this)) {
     throw LogicError(__FILE__, __LINE__);
@@ -147,6 +148,7 @@ void Schematic::removeSymbol(SI_Symbol& symbol) {
  ******************************************************************************/
 
 void Schematic::addBusSegment(SI_BusSegment& s) {
+  // NOLINTNEXTLINE
   if ((!mIsAddedToProject) || (mBusSegments.values().contains(&s)) ||
       (&s.getSchematic() != this)) {
     throw LogicError(__FILE__, __LINE__);
@@ -176,6 +178,7 @@ void Schematic::removeBusSegment(SI_BusSegment& s) {
  ******************************************************************************/
 
 void Schematic::addNetSegment(SI_NetSegment& netsegment) {
+  // NOLINTNEXTLINE
   if ((!mIsAddedToProject) || (mNetSegments.values().contains(&netsegment)) ||
       (&netsegment.getSchematic() != this)) {
     throw LogicError(__FILE__, __LINE__);
@@ -206,6 +209,7 @@ void Schematic::removeNetSegment(SI_NetSegment& netsegment) {
  ******************************************************************************/
 
 void Schematic::addPolygon(SI_Polygon& polygon) {
+  // NOLINTNEXTLINE
   if ((!mIsAddedToProject) || (mPolygons.values().contains(&polygon)) ||
       (&polygon.getSchematic() != this)) {
     throw LogicError(__FILE__, __LINE__);
@@ -236,6 +240,7 @@ void Schematic::removePolygon(SI_Polygon& polygon) {
  ******************************************************************************/
 
 void Schematic::addText(SI_Text& text) {
+  // NOLINTNEXTLINE
   if ((!mIsAddedToProject) || (mTexts.values().contains(&text)) ||
       (&text.getSchematic() != this)) {
     throw LogicError(__FILE__, __LINE__);
@@ -264,6 +269,7 @@ void Schematic::removeText(SI_Text& text) {
  ******************************************************************************/
 
 void Schematic::addImage(SI_Image& image) {
+  // NOLINTNEXTLINE
   if ((!mIsAddedToProject) || (mImages.values().contains(&image)) ||
       (&image.getSchematic() != this)) {
     throw LogicError(__FILE__, __LINE__);
@@ -396,32 +402,32 @@ void Schematic::save() {
     gridNode.appendChild("interval", mGridInterval);
     gridNode.appendChild("unit", mGridUnit);
     root->ensureLineBreak();
-    for (const SI_Symbol* obj : mSymbols) {
+    for (const SI_Symbol* obj : std::as_const(mSymbols)) {
       root->ensureLineBreak();
       obj->serialize(root->appendList("symbol"));
     }
     root->ensureLineBreak();
-    for (const SI_BusSegment* obj : mBusSegments) {
+    for (const SI_BusSegment* obj : std::as_const(mBusSegments)) {
       root->ensureLineBreak();
       obj->serialize(root->appendList("bussegment"));
     }
     root->ensureLineBreak();
-    for (const SI_NetSegment* obj : mNetSegments) {
+    for (const SI_NetSegment* obj : std::as_const(mNetSegments)) {
       root->ensureLineBreak();
       obj->serialize(root->appendList("netsegment"));
     }
     root->ensureLineBreak();
-    for (const SI_Polygon* obj : mPolygons) {
+    for (const SI_Polygon* obj : std::as_const(mPolygons)) {
       root->ensureLineBreak();
       obj->getPolygon().serialize(root->appendList("polygon"));
     }
     root->ensureLineBreak();
-    for (const SI_Text* obj : mTexts) {
+    for (const SI_Text* obj : std::as_const(mTexts)) {
       root->ensureLineBreak();
       obj->getTextObj().serialize(root->appendList("text"));
     }
     root->ensureLineBreak();
-    for (const SI_Image* obj : mImages) {
+    for (const SI_Image* obj : std::as_const(mImages)) {
       root->ensureLineBreak();
       obj->getImage()->serialize(root->appendList("image"));
     }

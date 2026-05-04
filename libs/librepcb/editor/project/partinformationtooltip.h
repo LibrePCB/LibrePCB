@@ -62,7 +62,7 @@ public:
   PartInformationToolTip(const PartInformationToolTip& other) = delete;
   explicit PartInformationToolTip(const WorkspaceSettings& settings,
                                   QWidget* parent = nullptr) noexcept;
-  ~PartInformationToolTip() noexcept;
+  ~PartInformationToolTip() noexcept override;
 
   // Setters
   void setProviderInfo(const QString& name, const QUrl& url,
@@ -73,14 +73,14 @@ public:
 
   // General Methods
   void hideAndReset(bool reset = true) noexcept;
-  virtual bool eventFilter(QObject* watched, QEvent* event) noexcept override;
+  bool eventFilter(QObject* watched, QEvent* event) noexcept override;
 
   // Operator Overloads
   PartInformationToolTip& operator=(const PartInformationToolTip& rhs) = delete;
 
 protected:
-  virtual void showEvent(QShowEvent* e) noexcept override;
-  virtual void hideEvent(QHideEvent* e) noexcept override;
+  void showEvent(QShowEvent* e) noexcept override;
+  void hideEvent(QHideEvent* e) noexcept override;
 
 private:  // Methods
   void scheduleLoadPicture() noexcept;

@@ -33,6 +33,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -51,11 +53,10 @@ protected:
         FileProofName("AV0"), "Hello World!");
   }
   std::unique_ptr<Board> createBoard(Project& project) const {
-    std::unique_ptr<Board> board(new Board(
-        project,
-        std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory()),
-        "board", Uuid::fromString("1ff89be5-dd83-4b08-8d95-d09e0fd72b25"),
-        ElementName("New Board")));
+    std::unique_ptr<Board> board(
+        new Board(project, std::make_unique<TransactionalDirectory>(), "board",
+                  Uuid::fromString("1ff89be5-dd83-4b08-8d95-d09e0fd72b25"),
+                  ElementName("New Board")));
     board->setInnerLayerCount(5);
     board->setPcbThickness(PositiveLength(Length(1500000)));
     board->setSolderResist(&PcbColor::black());
@@ -66,8 +67,8 @@ protected:
   }
   std::unique_ptr<Project> createProject() const {
     std::unique_ptr<Project> project = Project::create(
-        std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
-            TransactionalFileSystem::openRW(FilePath::getRandomTempPath()))),
+        std::make_unique<TransactionalDirectory>(
+            TransactionalFileSystem::openRW(FilePath::getRandomTempPath())),
         "project.lpp");
     project->setUuid(Uuid::fromString("7b3985b2-91ad-4e93-8d15-7668869ed45d"));
     project->setName(ElementName("New Project"));

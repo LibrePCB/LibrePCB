@@ -198,7 +198,7 @@ TEST_F(OccModelTest, testTesselate) {
     const QByteArray content = FileUtils::readFile(fp);
     std::unique_ptr<OccModel> model = OccModel::loadStep(content);
     const QMap<OccModel::Color, QVector<QVector3D>> result = model->tesselate();
-    for (auto points : result) {
+    for (const auto& points : result) {
       EXPECT_GE(points.count(), 3);
       EXPECT_EQ(points.count() % 3, 0);
     }
@@ -220,7 +220,7 @@ TEST_F(OccModelTest, testTransparency) {
     const QMap<OccModel::Color, QVector<QVector3D>> result = model->tesselate();
     ASSERT_EQ(result.count(), 1);
 
-    const OccModel::Color resultColor = result.keys().first();
+    const OccModel::Color resultColor = result.keys().first();  // NOLINT
     EXPECT_NEAR(std::get<0>(resultColor), 1.0, 0.01);  // Red
     EXPECT_NEAR(std::get<1>(resultColor), 0.0, 0.01);  // Green
     EXPECT_NEAR(std::get<2>(resultColor), 0.0, 0.01);  // Blue

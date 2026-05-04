@@ -51,6 +51,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -83,7 +85,7 @@ SymbolEditorState_Select::~SymbolEditorState_Select() noexcept {
 bool SymbolEditorState_Select::entry() noexcept {
   mAdapter.fsmToolEnter(*this);
 
-  mUpdateAvailableFeaturesTimer.reset(new QTimer());
+  mUpdateAvailableFeaturesTimer = std::make_unique<QTimer>();
   mUpdateAvailableFeaturesTimer->setSingleShot(true);
   mUpdateAvailableFeaturesTimer->setInterval(50);
   connect(mUpdateAvailableFeaturesTimer.get(), &QTimer::timeout, this,
@@ -137,8 +139,8 @@ bool SymbolEditorState_Select::processGraphicsSceneMouseMoved(
     case SubState::MOVING:
     case SubState::PASTING: {
       if (!mCmdDragSelectedItems) {
-        mCmdDragSelectedItems.reset(
-            new CmdDragSelectedSymbolItems(*item, getGridInterval()));
+        mCmdDragSelectedItems = std::make_unique<CmdDragSelectedSymbolItems>(
+            *item, getGridInterval());
         scheduleUpdateAvailableFeatures();
       }
       Point delta = (currentPos - mStartPos).mappedToGrid(getGridInterval());
@@ -150,7 +152,7 @@ bool SymbolEditorState_Select::processGraphicsSceneMouseMoved(
         return false;
       }
       if (!mCmdPolygonEdit) {
-        mCmdPolygonEdit.reset(new CmdPolygonEdit(*mSelectedPolygon));
+        mCmdPolygonEdit = std::make_unique<CmdPolygonEdit>(*mSelectedPolygon);
         scheduleUpdateAvailableFeatures();
       }
       QVector<Vertex> vertices = mSelectedPolygon->getPath().getVertices();
@@ -167,7 +169,7 @@ bool SymbolEditorState_Select::processGraphicsSceneMouseMoved(
         return false;
       }
       if (!mCmdImageEdit) {
-        mCmdImageEdit.reset(new CmdImageEdit(*mSelectedImage));
+        mCmdImageEdit = std::make_unique<CmdImageEdit>(*mSelectedImage);
         scheduleUpdateAvailableFeatures();
       }
       if (!e.modifiers.testFlag(Qt::ShiftModifier)) {
@@ -703,8 +705,9 @@ bool SymbolEditorState_Select::openContextMenuAtPos(const Point& pos) noexcept {
       int lineIndex = i->getLineIndexAtPosition(pos);
       if (lineIndex >= 0) {
         QAction* aAddVertex = cmd.vertexAdd.createAction(
-            &menu, this,
-            [=, this]() { startAddingPolygonVertex(polygon, lineIndex, pos); });
+            &menu, this, [polygon, lineIndex, pos, this]() {
+              startAddingPolygonVertex(polygon, lineIndex, pos);
+            });
         aAddVertex->setEnabled(mAdapter.fsmIsWritable());
         mb.addAction(aAddVertex);
       }
@@ -890,8 +893,8 @@ bool SymbolEditorState_Select::startPaste(
       clearSelectionRect(true);
     } else {
       // Start moving the selected items.
-      mCmdDragSelectedItems.reset(
-          new CmdDragSelectedSymbolItems(*item, getGridInterval()));
+      mCmdDragSelectedItems = std::make_unique<CmdDragSelectedSymbolItems>(
+          *item, getGridInterval());
     }
     return true;
   } else {
@@ -1005,7 +1008,7 @@ void SymbolEditorState_Select::startAddingPolygonVertex(
     Point newPos = pos.mappedToGrid(getGridInterval());
     Angle newAngle = path.getVertices()[vertex - 1].getAngle();
     path.getVertices().insert(vertex, Vertex(newPos, newAngle));
-    mCmdPolygonEdit.reset(new CmdPolygonEdit(*polygon));
+    mCmdPolygonEdit = std::make_unique<CmdPolygonEdit>(*polygon);
     mCmdPolygonEdit->setPath(path, true);
 
     mSelectedPolygon = polygon;
@@ -1054,7 +1057,7 @@ bool SymbolEditorState_Select::findPolygonVerticesAtPosition(
   SymbolGraphicsItem* item = getGraphicsItem();
   if (!item) return false;
 
-  for (auto ptr : mContext.symbol.getPolygons().values()) {
+  for (const auto& ptr : mContext.symbol.getPolygons().values()) {
     auto graphicsItem = item->getGraphicsItem(ptr);
     if (graphicsItem && graphicsItem->isSelected()) {
       mSelectedPolygonVertices = graphicsItem->getVertexIndicesAtPosition(pos);
@@ -1075,7 +1078,7 @@ bool SymbolEditorState_Select::findImageHandleAtPosition(
   SymbolGraphicsItem* item = getGraphicsItem();
   if (!item) return false;
 
-  for (auto ptr : mContext.symbol.getImages().values()) {
+  for (const auto& ptr : mContext.symbol.getImages().values()) {
     auto graphicsItem = item->getGraphicsItem(ptr);
     if (graphicsItem && graphicsItem->isSelected() &&
         graphicsItem->isResizeHandleAtPosition(pos)) {

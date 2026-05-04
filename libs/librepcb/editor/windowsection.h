@@ -66,7 +66,7 @@ public:
   WindowSection(const WindowSection& other) = delete;
   explicit WindowSection(GuiApplication& app, MainWindow& win,
                          QObject* parent = nullptr) noexcept;
-  ~WindowSection() noexcept;
+  ~WindowSection() noexcept override;
 
   // General Methods
   const ui::WindowSectionData& getUiData() const noexcept { return mUiData; }

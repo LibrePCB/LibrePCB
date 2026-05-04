@@ -54,7 +54,7 @@ public:
   LibraryDownload(const LibraryDownload& other) = delete;
   LibraryDownload(const QUrl& urlToZip, const FilePath& destDir,
                   std::shared_ptr<QSemaphore> semaphore) noexcept;
-  ~LibraryDownload() noexcept;
+  ~LibraryDownload() noexcept override;
 
   /**
    * @copydoc ::librepcb::NetworkRequestBase::setExpectedReplyContentSize()

@@ -50,7 +50,7 @@ public:
   SI_Base() = delete;
   SI_Base(const SI_Base& other) = delete;
   SI_Base(Schematic& schematic) noexcept;
-  virtual ~SI_Base() noexcept;
+  ~SI_Base() noexcept override;
 
   // Getters
   Project& getProject() const noexcept;

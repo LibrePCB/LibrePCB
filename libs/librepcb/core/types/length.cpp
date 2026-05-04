@@ -92,6 +92,7 @@ Length Length::scaled(qreal factor) const noexcept {
   int64_t nm = 0;
   const bool ok = rs::ffi_length_from_nm_f(mNanometers * factor, &nm);
   Q_ASSERT(ok);
+  Q_UNUSED(ok);
   return Length(nm);
 }
 
