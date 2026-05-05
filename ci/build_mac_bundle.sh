@@ -3,14 +3,6 @@
 # set shell settings (see https://sipb.mit.edu/doc/safe-shell/)
 set -euv -o pipefail
 
-# Fix macdeployqt issue (https://github.com/actions/runner-images/issues/7522)
-if [ -n "${AZURE_PIPELINES-}" ]
-then
-  echo "Killing XProtect..."
-  sudo pkill -9 XProtect >/dev/null || true;
-  while pgrep XProtect; do sleep 3; done;
-fi
-
 # Sanity check that the app doesn't link to libunwind, since this seems to
 # cause incompatibility with macOS 10.14.
 BINARY="./build/install/bin/librepcb.app/Contents/MacOS/librepcb"

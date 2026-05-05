@@ -1,0 +1,88 @@
+on:
+  workflow_call:
+
+jobs:
+  stylecheck:
+    name: Stylecheck
+    runs-on: ubuntu-24.04
+    container: librepcb/librepcb-dev:devtools-7
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          clean: true
+          submodules: recursive
+      # https://github.com/actions/checkout/issues/1048
+      - name: Fix Git Permissions
+        run: git config --global --add safe.directory $GITHUB_WORKSPACE
+      - name: Print Environment
+        run: ./ci/print_environment.sh
+      - name: Run Stylecheck
+        run: ./ci/stylecheck.sh
+        if: ${{ !cancelled() }}
+      - name: Build Translations
+        run: python3 ./dev/i18n.py --update --translate
+        if: ${{ !cancelled() }}
+      - name: Check EditorCommandSet
+        run: python3 ./dev/generate_editorcommandset.py --check
+        if: ${{ !cancelled() }}
+      - name: Find Unused Code
+        run: python3 ./dev/find_unused_code.py
+        if: ${{ !cancelled() }}
+
+  clang-tidy:
+    name: Clang Tidy
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+      - id: restore_cache
+        name: Restore Cache
+        uses: actions/cache/restore@v5
+        with:
+          key: ${{ github.job }}-${{ github.ref }}-${{ github.run_id }}
+          restore-keys: |
+            ${{ github.job }}-${{ github.ref }}
+            ${{ github.job }}-refs/heads/master
+          path: |
+            ./build/clang-tidy/.cargo-home/bin/
+            ./build/clang-tidy/.cargo-home/registry/index/
+            ./build/clang-tidy/.cargo-home/registry/cache/
+            ./build/clang-tidy/.cargo-home/git/db/
+            ./build/clang-tidy/.ctcache/
+      - name: Run clang-tidy
+        run: ./dev/clang_tidy.sh
+      - name: Save Cache
+        uses: actions/cache/save@v5
+        with:
+          key: ${{ steps.restore_cache.outputs.cache-primary-key }}
+          path: |
+            ./build/clang-tidy/.cargo-home/bin/
+            ./build/clang-tidy/.cargo-home/registry/index/
+            ./build/clang-tidy/.cargo-home/registry/cache/
+            ./build/clang-tidy/.cargo-home/git/db/
+            ./build/clang-tidy/.ctcache/
+        if: ${{ steps.restore_cache }}
+
+  doxygen:
+    name: Doxygen
+    runs-on: ubuntu-24.04
+    container: librepcb/librepcb-dev:devtools-7
+    steps:
+      - uses: actions/checkout@v6
+      # https://github.com/actions/checkout/issues/1048
+      - name: Fix Git Permissions
+        run: git config --global --add safe.directory $GITHUB_WORKSPACE
+      - name: Build Documentation
+        run: ./ci/build_doxygen.sh
+      - name: Tar & Upload Artifacts
+        if: ${{ success() && (github.event_name == 'push') && env.UPLOAD_URL }}
+        run: |
+          ./ci/tar_artifacts.sh
+          ./ci/upload_artifacts.sh
+        env:
+          CI_BRANCH_NAME: ${{ github.ref }}
+          UPLOAD_URL: ${{ secrets.UPLOAD_URL }}
+          UPLOAD_USER: ${{ secrets.UPLOAD_USER }}
+          UPLOAD_PASS: ${{ secrets.UPLOAD_PASS }}
+          UPLOAD_SIGN_KEY: ${{ secrets.UPLOAD_SIGN_KEY }}

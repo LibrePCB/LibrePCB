@@ -6,7 +6,6 @@
 [![Website](https://img.shields.io/badge/Website-librepcb.org-29d682.svg)](https://librepcb.org/)
 [![Docs](https://img.shields.io/badge/Docs-read-yellow.svg)](https://librepcb.org/docs/)
 
-[![Azure Build Status](https://dev.azure.com/LibrePCB/LibrePCB/_apis/build/status/LibrePCB.LibrePCB?branchName=master)](https://dev.azure.com/LibrePCB/LibrePCB/_build/latest?definitionId=2&branchName=master)
 [![Github Actions](https://github.com/LibrePCB/LibrePCB/actions/workflows/main.yml/badge.svg)](https://github.com/LibrePCB/LibrePCB/actions)
 [![OpenSSF Best Practices](https://bestpractices.coreinfrastructure.org/projects/1652/badge)](https://bestpractices.coreinfrastructure.org/projects/1652)
 
