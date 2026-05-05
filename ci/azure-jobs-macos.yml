@@ -8,9 +8,9 @@ jobs:
     ARCH: 'x86_64'
     COPYFILE_DISABLE: 1 # Stop creating shit files (https://superuser.com/questions/259703/get-mac-tar-to-stop-putting-filenames-in-tar-archives)
     HOMEBREW_NO_INSTALL_CLEANUP: 1 # Might speed up homebrew commands(?)
-    # Qt 6.5.6 is the last version that runs on macOS 10.14.
-    QT_URL: 'https://qt.mirror.constant.com/archive/qt/6.5/6.5.6/src/single/qt-everywhere-opensource-src-6.5.6.tar.xz'
-    QT_SHA256: '607d5ca0671907592f0a75cec4cc97f3ec68640d396fb2c6d0ad77ca969de30d'
+    # Qt 6.5.8 is the last version that runs on macOS 10.14.
+    QT_URL: 'https://qt.mirror.constant.com/archive/qt/6.5/6.5.8/src/single/qt-everywhere-opensource-src-6.5.8.tar.xz'
+    QT_SHA256: '4eeb391891b325cd00aed6e42cb4ef966ffeef0877e188c9667a702944760c27'
     QT_ROOT: $(Agent.TempDirectory)/qt
     OCC_VERSION: '7_9_1'
     OCC_ROOT: $(Agent.TempDirectory)/occ
