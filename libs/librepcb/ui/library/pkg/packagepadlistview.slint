@@ -2,29 +2,13 @@ import { IconButton, LineEdit, ScrollView } from "../../widgets.slint";
 import { Data, PackagePadData } from "../../api.slint";
 
 component HorizontalLine inherits Rectangle {
-    in property <bool> read-only: false;
-
     height: 1px;
-    background: {
-        if read-only {
-            Data.theme.control-border-disabled
-        } else {
-            Data.theme.control-border-disabled
-        }
-    };
+    background: Data.theme.control-border-disabled;
 }
 
 component VerticalLine inherits Rectangle {
-    in property <bool> read-only: false;
-
     width: 1px;
-    background: {
-        if read-only {
-            Data.theme.control-border-disabled
-        } else {
-            Data.theme.control-border-disabled
-        }
-    };
+    background: Data.theme.control-border-disabled;
 }
 
 component PackagePadListViewTextCell inherits Rectangle {
@@ -66,16 +50,12 @@ export component PackagePadListView inherits ScrollView {
 
         HorizontalLayout {
 
-            VerticalLine {
-                read-only: read-only;
-            }
+            VerticalLine { }
 
             VerticalLayout {
                 width: self.preferred-width;
 
-                HorizontalLine {
-                    read-only: read-only;
-                }
+                HorizontalLine { }
 
                 PackagePadListViewTextCell {
                     height: row-height;
@@ -84,9 +64,7 @@ export component PackagePadListView inherits ScrollView {
                 }
 
                 for item[index] in model: VerticalLayout {
-                    HorizontalLine {
-                        read-only: read-only;
-                    }
+                    HorizontalLine { }
 
                     number-cell := PackagePadListViewTextCell {
                         height: row-height;
@@ -98,16 +76,12 @@ export component PackagePadListView inherits ScrollView {
                 }
             }
 
-            VerticalLine {
-                read-only: read-only;
-            }
+            VerticalLine { }
 
             if show-ids: VerticalLayout {
                 width: self.preferred-width;
 
-                HorizontalLine {
-                    read-only: read-only;
-                }
+                HorizontalLine { }
 
                 PackagePadListViewTextCell {
                     height: row-height;
@@ -115,9 +89,7 @@ export component PackagePadListView inherits ScrollView {
                 }
 
                 for item[index] in model: VerticalLayout {
-                    HorizontalLine {
-                        read-only: read-only;
-                    }
+                    HorizontalLine { }
 
                     id-cell := PackagePadListViewTextCell {
                         height: row-height;
@@ -130,14 +102,10 @@ export component PackagePadListView inherits ScrollView {
                 }
             }
 
-            if show-ids: VerticalLine {
-                read-only: read-only;
-            }
+            if show-ids: VerticalLine { }
 
             VerticalLayout {
-                HorizontalLine {
-                    read-only: read-only;
-                }
+                HorizontalLine { }
 
                 name-header := PackagePadListViewTextCell {
                     height: row-height;
@@ -145,9 +113,7 @@ export component PackagePadListView inherits ScrollView {
                 }
 
                 for item[index] in model: VerticalLayout {
-                    HorizontalLine {
-                        read-only: read-only;
-                    }
+                    HorizontalLine { }
 
                     name-edt := LineEdit {
                         height: row-height;
@@ -169,16 +135,12 @@ export component PackagePadListView inherits ScrollView {
                 }
             }
 
-            VerticalLine {
-                read-only: read-only;
-            }
+            VerticalLine { }
 
             if !read-only: VerticalLayout {
                 width: self.preferred-width;
 
-                HorizontalLine {
-                    read-only: read-only;
-                }
+                HorizontalLine { }
 
                 PackagePadListViewTextCell {
                     height: row-height;
@@ -186,9 +148,7 @@ export component PackagePadListView inherits ScrollView {
                 }
 
                 for item[index] in model: VerticalLayout {
-                    HorizontalLine {
-                        read-only: read-only;
-                    }
+                    HorizontalLine { }
 
                     delete-btn := IconButton {
                         height: row-height;
@@ -203,19 +163,13 @@ export component PackagePadListView inherits ScrollView {
                 }
             }
 
-            if !read-only: VerticalLine {
-                read-only: read-only;
-            }
+            if !read-only: VerticalLine { }
         }
 
-        HorizontalLine {
-            read-only: read-only;
-        }
+        HorizontalLine { }
 
         if model.length == 0: HorizontalLayout {
-            VerticalLine {
-                read-only: read-only;
-            }
+            VerticalLine { }
 
             Rectangle {
                 height: row-height;
@@ -231,13 +185,9 @@ export component PackagePadListView inherits ScrollView {
                 }
             }
 
-            VerticalLine {
-                read-only: read-only;
-            }
+            VerticalLine { }
         }
 
-        if model.length == 0: HorizontalLine {
-            read-only: read-only;
-        }
+        if model.length == 0: HorizontalLine { }
     }
 }

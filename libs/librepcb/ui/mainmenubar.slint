@@ -1379,11 +1379,11 @@ export component MainMenuBar {
                     }
                 }
 
-                update-project-library-item := MenuItem {
-                    cmd: Cmd.project-library-update;
+                project-library-manager-item := MenuItem {
+                    cmd: Cmd.project-library-manager;
 
                     clicked => {
-                        Helpers.trigger-current-project-action(ProjectAction.update-library);
+                        Helpers.trigger-current-project-action(ProjectAction.open-library-manager);
                         close-menu();
                     }
                 }

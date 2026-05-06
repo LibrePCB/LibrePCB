@@ -44,6 +44,7 @@
 #include "project/board/board2dtab.h"
 #include "project/board/board3dtab.h"
 #include "project/board/boardeditor.h"
+#include "project/library/projectlibrarytab.h"
 #include "project/projecteditor.h"
 #include "project/projectreadmerenderer.h"
 #include "project/schematic/schematiceditor.h"
@@ -713,9 +714,29 @@ void MainWindow::openBoard3dTab(int projectIndex, int index) noexcept {
   }
 }
 
+void MainWindow::openProjectLibraryTab(int projectIndex) noexcept {
+  if (!switchToProjectTab<ProjectLibraryTab>(projectIndex, 0)) {
+    if (auto prjEditor = mApp.getProjects().value(projectIndex)) {
+      addTab(std::make_shared<ProjectLibraryTab>(mApp, *prjEditor));
+    }
+  }
+}
+
+void MainWindow::requestDeviceTab(const FilePath& fp) noexcept {
+  if (auto editor = mApp.openLibrary(fp.getParentDir().getParentDir())) {
+    openDeviceTab(*editor, fp);
+  }
+}
+
 void MainWindow::requestComponentTab(const FilePath& fp) noexcept {
   if (auto editor = mApp.openLibrary(fp.getParentDir().getParentDir())) {
     openComponentTab(*editor, fp);
+  }
+}
+
+void MainWindow::requestSymbolTab(const FilePath& fp) noexcept {
+  if (auto editor = mApp.openLibrary(fp.getParentDir().getParentDir())) {
+    openSymbolTab(*editor, fp);
   }
 }
 
@@ -1054,6 +1075,10 @@ void MainWindow::triggerProject(int index, ui::ProjectAction a) noexcept {
       if (editor->requestClose()) {
         mApp.closeProject(index);
       }
+      break;
+    }
+    case ui::ProjectAction::OpenLibraryManager: {
+      openProjectLibraryTab(index);
       break;
     }
     case ui::ProjectAction::NewSheet: {

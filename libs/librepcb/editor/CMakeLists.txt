@@ -740,6 +740,10 @@ add_library(
   project/cmd/cmdsymbolinstancetextsreset.h
   project/componentassemblyoptionlisteditorwidget.cpp
   project/componentassemblyoptionlisteditorwidget.h
+  project/library/projectlibrarymodel.cpp
+  project/library/projectlibrarymodel.h
+  project/library/projectlibrarytab.cpp
+  project/library/projectlibrarytab.h
   project/newprojectwizard/newprojectwizard.cpp
   project/newprojectwizard/newprojectwizard.h
   project/newprojectwizard/newprojectwizard.ui

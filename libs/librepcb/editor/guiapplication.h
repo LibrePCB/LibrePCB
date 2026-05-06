@@ -122,6 +122,7 @@ public:
                                              QWidget* parent) noexcept;
   void closeProject(int index) noexcept;
   bool requestClosingAllProjects() noexcept;
+  void openProjectLibraryUpdater(const FilePath& project) noexcept;
 
   // Window Management
   NotificationsModel& getNotifications() noexcept { return *mNotifications; }
@@ -147,7 +148,6 @@ protected:
 private:
   void openProjectsPassedByCommandLine() noexcept;
   void openProjectPassedByOs(const QString& file, bool silent = false) noexcept;
-  void openProjectLibraryUpdater(const FilePath& project) noexcept;
 
   void highlightErcMessage(std::shared_ptr<const RuleCheckMessage> msg,
                            bool zoomTo, int windowId) noexcept;

@@ -600,8 +600,6 @@ std::shared_ptr<ProjectEditor> GuiApplication::openProject(
             &GuiApplication::statusBarMessageChanged);
     connect(editor.get(), &ProjectEditor::ercMessageHighlightRequested, this,
             &GuiApplication::highlightErcMessage);
-    connect(editor.get(), &ProjectEditor::projectLibraryUpdaterRequested, this,
-            &GuiApplication::openProjectLibraryUpdater);
     mProjects->append(editor);
 
     // Switch to documents tab.
@@ -649,6 +647,42 @@ bool GuiApplication::requestClosingAllProjects() noexcept {
     }
   }
   return true;
+}
+
+void GuiApplication::openProjectLibraryUpdater(
+    const FilePath& project) noexcept {
+  bool wasOpen = false;
+  for (auto prj : *mProjects) {
+    if (prj->getProject().getFilepath() == project) {
+      wasOpen = true;
+      break;
+    }
+  }
+  mProjectLibraryUpdater = std::make_unique<ProjectLibraryUpdater>(
+      mWorkspace, project, [this](const FilePath& fp) {
+        for (int i = 0; i < mProjects->count(); ++i) {
+          auto prjEditor = mProjects->at(i);
+          if (prjEditor->getProject().getFilepath() == fp) {
+            if (prjEditor->requestClose()) {
+              closeProject(i);
+              return true;
+            }
+          }
+        }
+        return false;
+      });
+  if (wasOpen) {
+    connect(mProjectLibraryUpdater.get(),
+            &ProjectLibraryUpdater::finishedUpdate, this,
+            [this](const FilePath& fp) {
+              if (auto prj = openProject(fp, qApp->activeWindow())) {
+                if (auto win = getCurrentWindow()) {
+                  win->openProjectLibraryTab(prj->getUiIndex());
+                }
+              }
+            });
+  }
+  mProjectLibraryUpdater->show();
 }
 
 /*******************************************************************************
@@ -969,37 +1003,6 @@ void GuiApplication::openProjectPassedByOs(const QString& file,
   } else if (!silent) {
     qWarning() << "Ignore invalid request to open project:" << file;
   }
-}
-
-void GuiApplication::openProjectLibraryUpdater(
-    const FilePath& project) noexcept {
-  bool wasOpen = false;
-  for (auto prj : *mProjects) {
-    if (prj->getProject().getFilepath() == project) {
-      wasOpen = true;
-      break;
-    }
-  }
-  mProjectLibraryUpdater = std::make_unique<ProjectLibraryUpdater>(
-      mWorkspace, project, [this](const FilePath& fp) {
-        for (int i = 0; i < mProjects->count(); ++i) {
-          auto prjEditor = mProjects->at(i);
-          if (prjEditor->getProject().getFilepath() == fp) {
-            if (prjEditor->requestClose()) {
-              closeProject(i);
-              return true;
-            }
-          }
-        }
-        return false;
-      });
-  if (wasOpen) {
-    connect(
-        mProjectLibraryUpdater.get(), &ProjectLibraryUpdater::finishedUpdate,
-        this,
-        [this](const FilePath& fp) { openProject(fp, qApp->activeWindow()); });
-  }
-  mProjectLibraryUpdater->show();
 }
 
 void GuiApplication::highlightErcMessage(

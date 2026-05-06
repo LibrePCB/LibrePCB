@@ -1,0 +1,590 @@
+import { Tab } from "../../tab.slint";
+import {
+    ChooseLocalLibraryDialog,
+} from "../../library/lib/chooselibrarydialog.slint";
+import {
+    Button,
+    CheckBox,
+    LinkText,
+    OverlayDialog,
+    ScrollView,
+    Spinner,
+} from "../../widgets.slint";
+import {
+    Backend,
+    Data,
+    LibraryTreeViewItemType,
+    ProjectLibraryItemAction,
+    ProjectLibraryItemData,
+    ProjectLibraryTabData,
+    TabAction,
+    WindowSectionData,
+} from "../../api.slint";
+
+component HorizontalLine inherits Rectangle {
+    height: 1px;
+    background: Data.theme.control-border-disabled;
+}
+
+component VerticalLine inherits Rectangle {
+    width: 1px;
+    background: Data.theme.control-border-disabled;
+}
+
+component TableCell inherits TouchArea {
+    in property <bool> header;
+    in property <bool> current-row;
+    in property <string> status-tip;
+
+    enabled: !header;
+
+    callback entered;
+    callback exited;
+    callback triggered;
+
+    changed has-hover => {
+        if self.has-hover {
+            Data.status-tip = root.status-tip;
+            entered();
+        } else {
+            Data.status-tip = "";
+            exited();
+        }
+    }
+
+    clicked => {
+        // The click may destroy this element without calling the
+        // has-hover handler anymore, so we clear the status tip
+        // manually to be on the safe side.
+        if !root.status-tip.is-empty {
+            Data.status-tip = "";
+        }
+        triggered();
+    }
+
+    Rectangle {
+        background: {
+            if header {
+                Data.theme.window
+            } else if current-row {
+                Data.theme.control-hovered
+            } else {
+                Data.theme.control
+            }
+        };
+
+        @children
+    }
+}
+
+component LayoutTableCell inherits TableCell {
+    in property <LayoutAlignment> alignment: start;
+
+    HorizontalLayout {
+        alignment: alignment;
+        padding-left: 5px;
+        padding-right: 5px;
+        spacing: 4px;
+
+        @children
+    }
+}
+
+component TextTableCell inherits LayoutTableCell {
+    in property <string> text;
+
+    txt := Text {
+        text: text;
+        color: Data.theme.control-text;
+        vertical-alignment: center;
+        overflow: elide;
+    }
+}
+
+component ProjectLibraryListView inherits ScrollView {
+    in-out property <[ProjectLibraryItemData]> model;
+    in property <int> checkable-items;
+    in property <bool> all-checked;
+    property <length> row-height: 25px;
+    property <int> hovered-index: -1;
+
+    min-height: min(l.preferred-height, 3 * row-height);
+    min-width: l.min-width;
+    preferred-width: l.preferred-width;
+    preferred-height: l.preferred-height;
+    mouse-drag-pan-enabled: true;
+
+    callback all-toggled(checked: bool);
+
+    // Avoid scrolling into nirvana when the model count decreases.
+    function scroll-into-view() {
+        if self.viewport-y < -model.length * row-height {
+            self.viewport-y = -model.length * row-height;
+        }
+    }
+    init => {
+        scroll-into-view();
+    }
+
+    l := HorizontalLayout {
+        height: self.preferred-height;
+        padding-right: 8px;  // For the scrollbar
+
+        changed height => {
+            scroll-into-view();
+        }
+
+        VerticalLine { }
+
+        VerticalLayout {
+            HorizontalLine { }
+
+            TextTableCell {
+                height: row-height;
+                header: true;
+                text: @tr("Library Element");
+            }
+
+            HorizontalLine { }
+
+            for item[idx] in model: VerticalLayout {
+                LayoutTableCell {
+                    height: row-height;
+                    current-row: idx == hovered-index;
+
+                    entered => {
+                        hovered-index = idx;
+                    }
+
+                    exited => {
+                        hovered-index = -1;
+                    }
+
+                    Rectangle {
+                        width: row-height;
+                        height: row-height;
+
+                        Image {
+                            width: 80%;
+                            height: 80%;
+                            source: {
+                                if item.type == LibraryTreeViewItemType.symbol {
+                                    @image-url("../../../../../img/symbol.png")
+                                } else if item.type == LibraryTreeViewItemType.package {
+                                    @image-url("../../../../../img/footprint.png")
+                                } else if item.type == LibraryTreeViewItemType.component {
+                                    @image-url("../../../../bootstrap-icons/icons/cpu.svg")
+                                } else if item.type == LibraryTreeViewItemType.device {
+                                    @image-url("../../../../../img/device.png")
+                                } else {
+                                    @image-url("")
+                                }
+                            };
+                            colorize: {
+                                if item.type == LibraryTreeViewItemType.component {
+                                    Data.theme.control-text
+                                } else {
+                                    transparent
+                                }
+                            };
+                            accessible-role: none;
+                        }
+                    }
+
+                    name-txt := Text {
+                        text: item.name;
+                        color: Data.theme.control-text;
+                        vertical-alignment: center;
+                        overflow: elide;
+                    }
+
+                    if item.deprecated: Text {
+                        min-width: self.preferred-width;
+                        font-size: 10.5px;
+                        font-weight: 300;
+                        vertical-alignment: center;
+                        text: @tr("Deprecated").to-uppercase();
+                        color: Data.theme.base-text-error;
+                    }
+                }
+
+                HorizontalLine { }
+            }
+        }
+
+        VerticalLine { }
+
+        VerticalLayout {
+            HorizontalLine { }
+
+            TextTableCell {
+                height: row-height;
+                header: true;
+                text: @tr("Available in Library");
+            }
+
+            HorizontalLine { }
+
+            for item[idx] in model: VerticalLayout {
+                LayoutTableCell {
+                    height: row-height;
+                    current-row: idx == hovered-index;
+                    mouse-cursor: item.latest-version.is-empty ? default : pointer;
+                    status-tip: @tr("Open \"{0}\" from {1}", item.name, item.library-name);
+
+                    entered => {
+                        hovered-index = idx;
+                    }
+
+                    exited => {
+                        hovered-index = -1;
+                    }
+
+                    triggered => {
+                        if !item.latest-version.is-empty {
+                            model[idx].action = ProjectLibraryItemAction.open;
+                        }
+                    }
+
+                    if (!item.latest-version.is-empty) && (item.library-icon.width > 0): Rectangle {
+                        width: row-height;
+                        height: row-height;
+
+                        Image {
+                            width: 80%;
+                            height: 80%;
+                            source: item.library-icon;
+                            accessible-role: none;
+                        }
+                    }
+
+                    library-txt := Text {
+                        text: {
+                            if item.copy-in-progress {
+                                @tr("Waiting for rescan...")
+                            } else if item.latest-version.is-empty {
+                                @tr("Not found in any library")
+                            } else {
+                                item.library-name
+                            }
+                        };
+                        color: {
+                            if item.latest-version.is-empty {
+                                Data.theme.control-text-muted
+                            } else {
+                                Data.theme.control-text
+                            }
+                        };
+                        font-italic: item.latest-version.is-empty;
+                        vertical-alignment: center;
+                        overflow: elide;
+                    }
+
+                    if !item.latest-version.is-empty: Rectangle {
+                        width: row-height;
+                        height: row-height;
+                        visible: parent.has-hover;
+
+                        Image {
+                            width: 50%;
+                            height: 50%;
+                            source: @image-url("../../../../font-awesome/svgs/solid/arrow-up-right-from-square.svg");
+                            colorize: Data.theme.control-text;
+                            accessible-role: none;
+                        }
+                    }
+                }
+
+                HorizontalLine { }
+            }
+        }
+
+        VerticalLine { }
+
+        VerticalLayout {
+            width: self.preferred-width;
+
+            HorizontalLine { }
+
+            TextTableCell {
+                height: row-height;
+                header: true;
+                text: @tr("Version");
+                alignment: center;
+            }
+
+            HorizontalLine { }
+
+            for item[idx] in model: VerticalLayout {
+                version-cell := TextTableCell {
+                    height: row-height;
+                    current-row: idx == hovered-index;
+                    alignment: center;
+                    text: {
+                        if (item.latest-version.is-empty) || (item.latest-version == item.version) {
+                            item.version
+                        } else {
+                            item.version + " → " + item.latest-version
+                        }
+                    };
+
+                    entered => {
+                        hovered-index = idx;
+                    }
+
+                    exited => {
+                        hovered-index = -1;
+                    }
+                }
+
+                HorizontalLine { }
+            }
+        }
+
+        VerticalLine { }
+
+        checkboxes-ta := TouchArea {
+            width: row-height;
+
+            VerticalLayout {
+                HorizontalLine { }
+
+                TableCell {
+                    height: row-height;
+                    header: true;
+
+                    if (checkable-items == 0) || (!checkboxes-ta.has-hover): Image {
+                        width: 15px;
+                        height: self.width;
+                        colorize: Data.theme.control-text;
+                        source: {
+                            if checkable-items == 0 {
+                                @image-url("../../../../font-awesome/svgs/solid/list-check.svg")
+                            } else {
+                                @image-url("../../../../font-awesome/svgs/solid/download.svg")
+                            }
+                        };
+                        accessible-role: none;
+                    }
+
+                    if (checkable-items > 0) && checkboxes-ta.has-hover: all-sw := CheckBox {
+                        width: self.preferred-width;
+                        height: self.preferred-height;
+                        checked: all-checked;
+                        accessible-label: "check all";
+
+                        toggled(checked) => {
+                            all-toggled(checked);
+                        }
+                    }
+                }
+
+                HorizontalLine { }
+
+                for item[idx] in model: VerticalLayout {
+                    TableCell {
+                        height: row-height;
+                        current-row: idx == hovered-index;
+
+                        entered => {
+                            hovered-index = idx;
+                        }
+
+                        exited => {
+                            hovered-index = -1;
+                        }
+
+                        if item.latest-version.is-empty && (!item.copy-in-progress): checked-sw := CheckBox {
+                            width: self.preferred-width;
+                            height: self.preferred-height;
+                            checked: item.checked;
+                            accessible-label: "copy to workspace library";
+
+                            toggled(checked) => {
+                                model[idx].checked = checked;
+                            }
+                        }
+
+                        if item.copy-in-progress: Spinner {
+                            width: 20px;
+                            height: 20px;
+                            indeterminate: true;
+                        }
+
+                        if !item.latest-version.is-empty: Image {
+                            width: 13px;
+                            height: self.width;
+                            colorize: {
+                                if item.latest-version == item.version {
+                                    Data.theme.base-text-success
+                                } else if item.downgrade {
+                                    Data.theme.base-text-error
+                                } else {
+                                    Data.theme.base-text-warning
+                                }
+                            };
+                            source: {
+                                if item.latest-version == item.version {
+                                    @image-url("../../../../font-awesome/svgs/solid/check.svg")
+                                } else if item.downgrade {
+                                    @image-url("../../../../font-awesome/svgs/solid/angles-down.svg")
+                                } else {
+                                    @image-url("../../../../font-awesome/svgs/solid/angles-up.svg")
+                                }
+                            };
+                            accessible-role: none;
+                        }
+                    }
+
+                    HorizontalLine { }
+                }
+            }
+        }
+
+        VerticalLine { }
+    }
+}
+
+export component ProjectLibraryTab inherits Tab {
+    in property <int> section-index;
+    in-out property <WindowSectionData> section;
+    property <[ProjectLibraryTabData]> tabs: section.project-library-tabs;
+    property <int> index: section.current-tab-index;
+    property <ProjectLibraryTabData> tab: tabs[index];
+    property <bool> read-only: !Data.projects[tab.project-index].writable;
+    property <bool> is-empty: tabs[index].items.length == 0;
+
+    enabled: true;
+
+    VerticalLayout {
+        alignment: start;
+        padding: 8px;
+        spacing: 8px;
+
+        if is-empty: Rectangle {
+            height: self.preferred-height + 16px;
+            background: Data.theme.control;
+            border-color: Data.theme.control-border;
+            border-width: 1px;
+            border-radius: 8px;
+
+            Text {
+                width: parent.width - 16px;
+                font-size: 11px;
+                color: Data.theme.control-text;
+                wrap: word-wrap;
+                text: @tr("This project contains no library elements (yet).");
+            }
+        }
+
+        if !is-empty: view := ProjectLibraryListView {
+            width: root.width - 8px;  // 8px wider to the right for the scrollbar
+            viewport-y: tabs[index].items-viewport-y;
+            model: tabs[index].items;
+            checkable-items: tab.checkable-items;
+            all-checked: tab.all-checked;
+
+            all-toggled(checked) => {
+                tabs[index].all-checked = checked;
+            }
+
+            scrolled() => {
+                tabs[index].items-viewport-y = self.viewport-y;
+            }
+        }
+
+        HorizontalLayout {
+            spacing: 5px;
+
+            if (!is-empty) && (!read-only): update-btn := Button {
+                icon: @image-url("../../../../font-awesome/svgs/solid/arrows-rotate.svg");
+                text: @tr("Update All Elements") + "...";
+                status-tip: @tr("Update the project's library elements from workspace libraries");
+                primary: tab.downgraded-items == 0;
+                border-color: {
+                    if tab.downgraded-items > 0 {
+                        Data.theme.base-text-error
+                    } else {
+                        Data.theme.control-border
+                    }
+                };
+
+                clicked => {
+                    Backend.trigger-tab(section-index, index, TabAction.apply);
+                }
+            }
+
+            close-btn := Button {
+                text: @tr("Close");
+                primary: is-empty || read-only;
+
+                clicked => {
+                    Backend.trigger-tab(section-index, index, TabAction.close);
+                }
+            }
+
+            if Data.libraries-rescan-in-progress: Spinner {
+                width: 20px;
+                height: 20px;
+                indeterminate: true;
+            }
+
+            Rectangle { }
+
+            if tab.checkable-items > 0: copy-btn := LinkText {
+                font-size: 11px;
+                text: {
+                    if tab.checked-items > 0 {
+                        @tr("" | "Copy {n} element(s) to local library" % tab.checked-items)
+                    } else {
+                        @tr("" | "{n} element(s) not found in workspace" % tab.checkable-items)
+                    }
+                };
+                status-tip: @tr("Copy the checked library elements into a local workspace library");
+                wrap: word-wrap;
+                horizontal-alignment: right;
+                vertical-alignment: center;
+                enabled: (tab.checked-items > 0) && (!Data.libraries-rescan-in-progress);
+
+                clicked => {
+                    choose-library = true;
+                }
+            }
+        }
+
+        if (!is-empty) && (!read-only) && (tab.downgraded-items > 0): Text {
+            color: Data.theme.base-text-error;
+            wrap: word-wrap;
+            text: @tr("Attention: Some elements will be downgraded due to a current limitation of the project library updater! Update your workspace libraries first to avoid this.");
+        }
+    }
+
+    property <bool> choose-library: false;
+    if choose-library: choose-library-dialog := ChooseLocalLibraryDialog {
+        width: parent.width;
+        height: parent.height;
+
+        item-clicked(path) => {
+            tabs[index].copy-to-library = path;
+            choose-library = false;
+            root.focus();  // Keep keyboard shortcuts working.
+        }
+
+        rejected => {
+            choose-library = false;
+            root.focus();  // Keep keyboard shortcuts working.
+        }
+    }
+
+    focus-gained(reason) => {
+        Data.set-current-tab(section-index, index);
+    }
+
+    key-pressed(event) => {
+        if event.text == Key.Return {
+            Backend.trigger-tab(section-index, index, TabAction.apply);
+            return accept;
+        }
+        reject
+    }
+}

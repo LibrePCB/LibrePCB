@@ -199,6 +199,8 @@ export global Helpers {
             @image-url("../../../bootstrap-icons/icons/motherboard.svg")
         } else if (t == TabType.board-3d) {
             @image-url("../../../bootstrap-icons/icons/badge-3d.svg")
+        } else if (t == TabType.project-library) {
+            @image-url("../../../bootstrap-icons/icons/database.svg")
         } else {
             debug("Unhandled case in get-icon-for-tab-type().");
             @image-url("")

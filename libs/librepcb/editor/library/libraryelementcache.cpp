@@ -143,7 +143,6 @@ std::shared_ptr<const T> LibraryElementCache::getElement(
       FilePath fp = mDb->getLatest<T>(uuid);
       if (fp.isValid()) {
         element.reset(T::open(std::make_unique<TransactionalDirectory>(
-
                                   TransactionalFileSystem::openRO(fp)))
                           .release());
         container.insert(uuid, element);

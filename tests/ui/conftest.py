@@ -258,32 +258,36 @@ class ElementQuery:
                 )
             time.sleep(0.01)
 
-    def read(self, keys):
+    def read(self, keys, indices=None):
         """
         Read several element properties
         """
+        if indices is None:
+            filtered_results = self._results
+        else:
+            filtered_results = [self._results[i] for i in indices]
         props = dict()
         for key in keys:
             match key:
                 case "valid":
-                    props[key] = [r.valid for r in self._results]
+                    props[key] = [r.valid for r in filtered_results]
                 case "label":
-                    props[key] = [r.label for r in self._results]
+                    props[key] = [r.label for r in filtered_results]
                 case "placeholder":
-                    props[key] = [r.placeholder for r in self._results]
+                    props[key] = [r.placeholder for r in filtered_results]
                 case "value":
-                    props[key] = [r.value for r in self._results]
+                    props[key] = [r.value for r in filtered_results]
                 case "checked":
-                    props[key] = [r.checked for r in self._results]
+                    props[key] = [r.checked for r in filtered_results]
                 case "enabled":
-                    props[key] = [r.enabled for r in self._results]
+                    props[key] = [r.enabled for r in filtered_results]
                 case "readonly":
-                    props[key] = [r.readonly for r in self._results]
+                    props[key] = [r.readonly for r in filtered_results]
                 case _:
                     raise ValueError(f"Unknown property: '{key}'")
         return props
 
-    def wait_for(self, timeout=10.0, **properties):
+    def wait_for(self, timeout=10.0, indices=None, **properties):
         """
         Wait for all query's results to have specific properties set
         """
@@ -305,7 +309,7 @@ class ElementQuery:
             # due to model resets). This would invalidate element handles,
             # so we regularly have to re-evaluate the query.
             self.refresh()
-            actual_props = self.read(properties.keys())
+            actual_props = self.read(properties.keys(), indices)
             if all([_compare(v, properties[k]) for k, v in actual_props.items()]):
                 return
             if time.time() > (start + timeout):

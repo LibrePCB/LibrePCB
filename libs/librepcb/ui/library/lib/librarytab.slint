@@ -1,6 +1,10 @@
 import { Tab } from "../../tab.slint";
 import { LibraryTreeView } from "../librarytreeview.slint";
 import {
+    ChooseLibraryDialogListItem,
+    ChooseLocalLibraryDialog,
+} from "chooselibrarydialog.slint";
+import {
     AuthorRowHeader,
     DependenciesRowCell,
     DependenciesRowHeader,
@@ -41,47 +45,6 @@ import {
     WindowSectionData,
 } from "../../api.slint";
 
-component ChooseLibraryPopupListItem inherits TouchArea {
-    in property <image> icon;
-    in property <string> name;
-
-    // Accessibility
-    accessible-role: list-item;
-    accessible-enabled: self.enabled;
-    accessible-label: name;
-    accessible-action-default => {
-        self.clicked();
-    }
-
-    if self.height > 0: Rectangle {
-        background: parent.has-hover ? Data.theme.control-hovered : transparent;
-
-        HorizontalLayout {
-            padding-left: 6px;
-            padding-right: 6px;
-            spacing: 5px;
-            alignment: start;
-
-            Image {
-                y: (parent.height - self.height) / 2;
-                width: 18px;
-                height: self.width;
-                image-fit: contain;
-                source: icon;
-                accessible-role: none;
-            }
-
-            name-txt := Text {
-                vertical-alignment: center;
-                overflow: elide;
-                text: name;
-                color: root.has-hover ? Data.theme.base-text : Data.theme.control-text;
-                accessible-role: none;
-            }
-        }
-    }
-}
-
 component AddLibraryDependencyDialog inherits OverlayDialog {
     in-out property <[LibraryDependency]> model;
 
@@ -93,7 +56,7 @@ component AddLibraryDependencyDialog inherits OverlayDialog {
         mouse-drag-pan-enabled: true;
 
         l := VerticalLayout {
-            for item[idx] in model: item-ta := ChooseLibraryPopupListItem {
+            for item[idx] in model: item-ta := ChooseLibraryDialogListItem {
                 height: item.checked ? 0 : 26px;
                 icon: item.icon;
                 name: item.name;
@@ -101,31 +64,6 @@ component AddLibraryDependencyDialog inherits OverlayDialog {
 
                 clicked => {
                     item-clicked(idx);
-                }
-            }
-        }
-    }
-}
-
-component ChooseLocalLibraryDialog inherits OverlayDialog {
-    in property <string> hide-library-with-path;
-
-    callback item-clicked(path: string);
-
-    view := ScrollView {
-        preferred-width: l.preferred-width;
-        preferred-height: l.preferred-height;
-        mouse-drag-pan-enabled: true;
-
-        l := VerticalLayout {
-            for item[idx] in Data.local-libraries: item-ta := ChooseLibraryPopupListItem {
-                height: (item.path == hide-library-with-path) ? 0 : 26px;
-                icon: item.icon;
-                name: item.name;
-                accessible-item-index: idx;
-
-                clicked => {
-                    item-clicked(item.path);
                 }
             }
         }
@@ -880,7 +818,7 @@ export component LibraryTab inherits Tab {
     }
 
     property <LibraryElementsMoveAction> move-or-copy-action: none;
-    if move-or-copy-action != LibraryElementsMoveAction.none: move-or-copy-category-popup := ChooseLocalLibraryDialog {
+    if move-or-copy-action != LibraryElementsMoveAction.none: move-or-copy-category-dialog := ChooseLocalLibraryDialog {
         width: parent.width;
         height: parent.height;
         hide-library-with-path: Data.libraries[tabs[index].library-index].path;

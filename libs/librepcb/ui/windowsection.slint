@@ -21,6 +21,7 @@ import { OrganizationTab } from "library/org/organizationtab.slint";
 import { SchematicTab } from "project/schematic/schematictab.slint";
 import { Board2dTab } from "project/board/board2dtab.slint";
 import { Board3dTab } from "project/board/board3dtab.slint";
+import { ProjectLibraryTab } from "project/library/projectlibrarytab.slint";
 import {
     Backend,
     Constants,
@@ -433,6 +434,13 @@ export component WindowSection inherits Rectangle {
             }
 
             if tab-open && (tab-type == TabType.board-3d): board-3d-tab := Board3dTab {
+                width: 100%;
+                height: 100%;
+                section-index: section-index;
+                section: section;
+            }
+
+            if tab-open && (tab-type == TabType.project-library): project-library-tab := ProjectLibraryTab {
                 width: 100%;
                 height: 100%;
                 section-index: section-index;

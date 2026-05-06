@@ -175,10 +175,10 @@ signals:
   void manualModificationsMade();
   void projectAboutToBeSaved();
   void projectSavedToDisk();
+  void aboutToBeDestroyed();
   void ercMessageHighlightRequested(std::shared_ptr<const RuleCheckMessage> msg,
                                     bool zoomTo, int windowId);
   void ercMarkersInvalidated();
-  void projectLibraryUpdaterRequested(const FilePath& fp);
   void statusBarMessageChanged(const QString& message, int timeoutMs);
 
   /**
