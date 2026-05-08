@@ -645,6 +645,14 @@ bool SchematicEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
     mb.addAction(cmd.deviceResetTextAll.createAction(
         &menu, this,
         &SchematicEditorState_Select::resetAllTextsOfSelectedItems));
+    const ComponentInstance& cmp = sym->getSymbol().getComponentInstance();
+    if (cmp.getSymbols().count() !=
+        cmp.getSymbolVariant().getSymbolItems().count()) {
+      mb.addAction(cmd.placeRemainingGates.createAction(
+          &menu, this, [this, uuid = cmp.getUuid()]() {
+            emit requestAddRemainingGates(uuid, std::nullopt);
+          }));
+    }
     EditorToolbox::addResourcesToMenu(mContext.workspace, mb,
                                       sym->getSymbol().getComponentInstance(),
                                       std::nullopt, parentWidget(), menu);

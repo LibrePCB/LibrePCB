@@ -68,6 +68,9 @@ SchematicEditorFsm::SchematicEditorFsm(const Context& context,
   foreach (SchematicEditorState* state, mStates) {
     connect(state, &SchematicEditorState::requestLeavingState, this,
             &SchematicEditorFsm::processSelect, Qt::QueuedConnection);
+    connect(state, &SchematicEditorState::requestAddRemainingGates, this,
+            &SchematicEditorFsm::processAddRemainingGates,
+            Qt::QueuedConnection);
   }
 
   enterNextState(State::SELECT);
@@ -118,6 +121,21 @@ bool SchematicEditorFsm::processAddComponent(const Uuid& cmp,
   }
   if (SchematicEditorState* state = getCurrentStateObj()) {
     if (state->processAddComponent(cmp, symbVar)) {
+      return true;
+    }
+  }
+  setNextState(oldState);  // restore previous state
+  return false;
+}
+
+bool SchematicEditorFsm::processAddRemainingGates(
+    const Uuid& cmp, const std::optional<Uuid>& gate) noexcept {
+  State oldState = mCurrentState;
+  if (!setNextState(State::ADD_COMPONENT)) {
+    return false;
+  }
+  if (SchematicEditorState* state = getCurrentStateObj()) {
+    if (state->processAddRemainingGates(cmp, gate)) {
       return true;
     }
   }

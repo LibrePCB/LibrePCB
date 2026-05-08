@@ -127,6 +127,7 @@ public:
   NotificationsModel& getNotifications() noexcept { return *mNotifications; }
   std::shared_ptr<MainWindow> createNewWindow(int id = -1,
                                               int projectIndex = -1) noexcept;
+  std::shared_ptr<MainWindow> getCurrentWindow() noexcept;
   int getWindowCount() const noexcept;
   void stopWindowStateAutosaveTimer() noexcept;
 
@@ -152,7 +153,6 @@ private:
   void highlightErcMessage(std::shared_ptr<const RuleCheckMessage> msg,
                            bool zoomTo, int windowId) noexcept;
 
-  std::shared_ptr<MainWindow> getCurrentWindow() noexcept;
   void updateLibrariesContainStandardComponents() noexcept;
   void updateNoLibrariesInstalledNotification() noexcept;
   void updateDesktopIntegrationNotification() noexcept;

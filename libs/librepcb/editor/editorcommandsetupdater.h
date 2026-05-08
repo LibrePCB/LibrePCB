@@ -191,6 +191,7 @@ public:
     out.set_locked(l2s(cmd.locked, out.get_locked()));
     out.set_visible(l2s(cmd.visible, out.get_visible()));
     out.set_copy_mpn_to_clipboard(l2s(cmd.copyMpnToClipboard, out.get_copy_mpn_to_clipboard()));
+    out.set_place_remaining_gates(l2s(cmd.placeRemainingGates, out.get_place_remaining_gates()));
     out.set_open_product_website(l2s(cmd.openProductWebsite, out.get_open_product_website()));
     out.set_open_pricing_website(l2s(cmd.openPricingWebsite, out.get_open_pricing_website()));
     // clang-format on
