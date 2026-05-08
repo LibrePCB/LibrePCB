@@ -99,8 +99,7 @@ public:
       const GraphicsSceneMouseEvent& e) noexcept override;
   bool processGraphicsSceneRightMouseButtonReleased(
       const GraphicsSceneMouseEvent& e) noexcept override;
-  bool processGridIntervalChanged(
-      const PositiveLength& interval) noexcept override;
+  bool processChangedSelection() noexcept override;
 
   // Operator Overloadings
   SchematicEditorState_Select& operator=(
@@ -130,8 +129,9 @@ private:  // Methods
   void openPolygonPropertiesDialog(Polygon& polygon) noexcept;
   void openTextPropertiesDialog(Text& text) noexcept;
   void scheduleUpdateAvailableFeatures() noexcept;
-  void updateAvailableFeatures() noexcept;
-  QString processSelection(const SchematicSelectionQuery& query) const noexcept;
+  void updateAvailableFeatures(bool doCrossProbe = true) noexcept;
+  QString processSelection(const SchematicSelectionQuery& query,
+                           bool doCrossProbe) const noexcept;
 
 private:  // Data
   /// enum for all possible substates

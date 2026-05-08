@@ -156,6 +156,7 @@ public:
       const GraphicsSceneMouseEvent& e) noexcept;
   bool processGraphicsSceneRightMouseButtonReleased(
       const GraphicsSceneMouseEvent& e) noexcept;
+  bool processChangedSelection() noexcept;
 
   // Operator Overloadings
   BoardEditorFsm& operator=(const BoardEditorFsm& rhs) = delete;

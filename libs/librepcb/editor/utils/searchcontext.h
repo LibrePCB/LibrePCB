@@ -23,9 +23,12 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "ui.h"
+
 #include <QtCore>
 
-#include <slint.h>
+#include <memory>
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -44,6 +47,17 @@ class SearchContext final : public QObject {
   Q_OBJECT
 
 public:
+  // Types
+  enum class ObjectType {
+    Component,
+    Net,
+  };
+  struct Candidate {
+    ObjectType type;
+    QString name;
+    bool operator==(const Candidate& rhs) const noexcept = default;
+  };
+
   // Constructors / Destructor
   SearchContext(const SearchContext& other) = delete;
   explicit SearchContext(QObject* parent = nullptr) noexcept;
@@ -54,10 +68,10 @@ public:
   void deinit() noexcept;
   void setTerm(const QString& term) noexcept;
   const QString& getTerm() const noexcept { return mTerm; }
-  void setSuggestions(const QStringList& list) noexcept;
-  const std::shared_ptr<slint::FilterModel<slint::SharedString>>&
-      getSuggestions() const noexcept {
-    return mSuggestionsFiltered;
+  void setCandidates(const QVector<Candidate>& list) noexcept;
+  const std::shared_ptr<slint::VectorModel<ui::SimpleListItemData>>& getModel()
+      const noexcept {
+    return mModel;
   }
   void findNext() noexcept;
   void findPrevious() noexcept;
@@ -66,15 +80,19 @@ public:
   SearchContext& operator=(const SearchContext& rhs) = delete;
 
 signals:
-  void goToTriggered(const QString& name, int index = 0);
+  void goToTriggered(const QVector<Candidate>& objects);
+
+private:
+  void applyFilter() noexcept;
 
 private:
   QString mTerm;
+  std::optional<QRegularExpression> mTermRe;  ///< If #mTerm contains wildcards
   bool mForward;  ///< Current search direction (forward or backward)
   int mIndex;  ///< Number of searches with the current search term
-
-  std::shared_ptr<slint::VectorModel<slint::SharedString>> mSuggestions;
-  std::shared_ptr<slint::FilterModel<slint::SharedString>> mSuggestionsFiltered;
+  QVector<Candidate> mCandidates;
+  QVector<Candidate> mCandidatesFiltered;
+  std::shared_ptr<slint::VectorModel<ui::SimpleListItemData>> mModel;
 };
 
 /*******************************************************************************

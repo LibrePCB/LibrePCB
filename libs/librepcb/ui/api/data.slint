@@ -123,7 +123,12 @@ export global Data {
                         find: FeatureState.enabled,
                     },
                     unsaved-changes: true,
-                    find-autocompletions: ["C1", "C2", "C20", "U15"],
+                    find-autocompletions: [
+                        { text: "C1", icon: @image-url("../../../../img/app/librepcb.svg") },
+                        { text: "C2" },
+                        { text: "C20" },
+                        { text: "U15" },
+                    ],
                     layers: [
                         {
                             name: "Top Copper",

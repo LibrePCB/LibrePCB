@@ -175,6 +175,7 @@ public:
     Q_UNUSED(e);
     return false;
   }
+  virtual bool processChangedSelection() noexcept { return false; }
 
   // Operator Overloadings
   BoardEditorState& operator=(const BoardEditorState& rhs) = delete;

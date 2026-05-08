@@ -149,7 +149,7 @@ bool BoardEditorState_Select::entry() noexcept {
   mUpdateAvailableFeaturesTimer->setSingleShot(true);
   mUpdateAvailableFeaturesTimer->setInterval(50);
   connect(mUpdateAvailableFeaturesTimer.get(), &QTimer::timeout, this,
-          &BoardEditorState_Select::updateAvailableFeatures);
+          [this]() { updateAvailableFeatures(true); });
   scheduleUpdateAvailableFeatures();
 
   mConnections.append(
@@ -1262,6 +1262,16 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
   return true;
 }
 
+bool BoardEditorState_Select::processChangedSelection() noexcept {
+  // Actually it would be better to call scheduleUpdateAvailableFeatures(),
+  // but this doesn't work nicely with the "find" feature in the board editor,
+  // as it will reset the cross-probed objects, effectively clearing the
+  // highlighted objects. Thus we do a synchronous call where we can pass
+  // doCrossProbe=false.
+  updateAvailableFeatures(false);
+  return true;
+}
+
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
@@ -1992,9 +2002,12 @@ void BoardEditorState_Select::scheduleUpdateAvailableFeatures() noexcept {
   if (mUpdateAvailableFeaturesTimer) mUpdateAvailableFeaturesTimer->start();
 }
 
-void BoardEditorState_Select::updateAvailableFeatures() noexcept {
+void BoardEditorState_Select::updateAvailableFeatures(
+    bool doCrossProbe) noexcept {
   BoardGraphicsScene* scene = getActiveBoardScene();
   if (!scene) return;
+
+  if (mUpdateAvailableFeaturesTimer) mUpdateAvailableFeaturesTimer->stop();
 
   std::optional<BoardEditorFsmAdapter::Features> features;
   QString infoText;
@@ -2158,7 +2171,7 @@ void BoardEditorState_Select::updateAvailableFeatures() noexcept {
         (!query.getStrokeTexts().isEmpty()) || (!query.getHoles().isEmpty())) {
       *features |= BoardEditorFsmAdapter::Feature::Properties;
     }
-    infoText = processSelection(query);
+    infoText = processSelection(query, doCrossProbe);
   } else {
     // Do not update features in other states.
   }
@@ -2190,10 +2203,12 @@ private:
 };
 
 QString BoardEditorState_Select::processSelection(
-    const BoardSelectionQuery& query) const noexcept {
+    const BoardSelectionQuery& query, bool doCrossProbe) const noexcept {
   const int totalCount = query.getResultCount();
   if (totalCount == 0) {
-    mAdapter.fsmCrossProbe();
+    if (doCrossProbe) {
+      mAdapter.fsmCrossProbe();
+    }
     return QString();
   }
 
@@ -2324,9 +2339,11 @@ QString BoardEditorState_Select::processSelection(
   }
 
   // Cross-probe selected objects to other editors.
-  mAdapter.fsmCrossProbe(crossProbeNets, crossProbeComponents,
-                         crossProbeComponentSignals,
-                         GraphicsLayer::State::Enabled);
+  if (doCrossProbe) {
+    mAdapter.fsmCrossProbe(crossProbeNets, crossProbeComponents,
+                           crossProbeComponentSignals,
+                           GraphicsLayer::State::Enabled);
+  }
 
   // Build key/value pairs for selected objects.
   QVector<std::pair<QString, QString>> keyValues;

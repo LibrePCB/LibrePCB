@@ -40,15 +40,25 @@
 #include "fsm/schematiceditorstate_addtext.h"
 #include "fsm/schematiceditorstate_drawbus.h"
 #include "fsm/schematiceditorstate_drawpolygon.h"
+#include "graphicsitems/sgi_netlabel.h"
+#include "graphicsitems/sgi_netline.h"
 #include "graphicsitems/sgi_symbol.h"
+#include "graphicsitems/sgi_symbolpin.h"
 #include "schematiceditor.h"
 #include "schematicgraphicsscene.h"
 
 #include <librepcb/core/attribute/attributetype.h>
 #include <librepcb/core/attribute/attributeunit.h>
+#include <librepcb/core/project/circuit/circuit.h>
+#include <librepcb/core/project/circuit/componentinstance.h>
+#include <librepcb/core/project/circuit/netsignal.h>
 #include <librepcb/core/project/erc/electricalrulecheckmessages.h>
 #include <librepcb/core/project/project.h>
+#include <librepcb/core/project/schematic/items/si_netlabel.h>
+#include <librepcb/core/project/schematic/items/si_netline.h>
+#include <librepcb/core/project/schematic/items/si_netsegment.h>
 #include <librepcb/core/project/schematic/items/si_symbol.h>
+#include <librepcb/core/project/schematic/items/si_symbolpin.h>
 #include <librepcb/core/project/schematic/schematic.h>
 #include <librepcb/core/project/schematic/schematicpainter.h>
 #include <librepcb/core/utils/toolbox.h>
@@ -188,7 +198,7 @@ SchematicTab::SchematicTab(GuiApplication& app, SchematicEditor& editor,
 
   // Connect search context.
   connect(&mSearchContext, &SearchContext::goToTriggered, this,
-          &SchematicTab::goToSymbol);
+          &SchematicTab::goToObjects);
 
   // Setup messages.
   connect(&mApp.getWorkspace().getLibraryDb(),
@@ -280,7 +290,7 @@ ui::TabData SchematicTab::getUiData() const noexcept {
       q2s(mProjectEditor.getUndoStack().getUndoCmdText()),  // Undo text
       q2s(mProjectEditor.getUndoStack().getRedoCmdText()),  // Redo text
       q2s(mSearchContext.getTerm()),  // Find term
-      mSearchContext.getSuggestions(),  // Find suggestions
+      mSearchContext.getModel(),  // Find suggestions
       nullptr,  // Layers
   };
 }
@@ -621,12 +631,19 @@ void SchematicTab::trigger(ui::TabAction a) noexcept {
       break;
     }
     case ui::TabAction::FindRefreshSuggestions: {
-      QStringList names;
+      QVector<SearchContext::Candidate> objects;
       for (const SI_Symbol* sym : mSchematic.getSymbols()) {
-        names.append(sym->getName());
+        if (!sym->getComponentInstance().isPureSchematicOnly()) {
+          objects.append(
+              {SearchContext::ObjectType::Component, sym->getName()});
+        }
       }
-      Toolbox::sortNumeric(names);
-      mSearchContext.setSuggestions(names);
+      for (const NetSignal* net : mProject.getCircuit().getNetSignals()) {
+        if (!net->isAnonymous()) {
+          objects.append({SearchContext::ObjectType::Net, *net->getName()});
+        }
+      }
+      mSearchContext.setCandidates(objects);
       break;
     }
     case ui::TabAction::FindNext: {
@@ -1255,43 +1272,74 @@ void SchematicTab::execGraphicsExportDialog(
   }
 }
 
-void SchematicTab::goToSymbol(const QString& name, int index) noexcept {
-  QList<SI_Symbol*> symbolCandidates;
-  foreach (SI_Symbol* symbol, mSchematic.getSymbols().values()) {
-    if (symbol->getName().startsWith(name, Qt::CaseInsensitive)) {
-      symbolCandidates.append(symbol);
-    }
-  }
+void SchematicTab::goToObjects(
+    const QVector<SearchContext::Candidate>& objects) noexcept {
+  if (!mScene) return;
 
-  // Sort by name for a natural order of results.
-  Toolbox::sortNumeric(
-      symbolCandidates,
-      [](const QCollator& cmp, const SI_Symbol* lhs, const SI_Symbol* rhs) {
-        return cmp(lhs->getName(), rhs->getName());
-      },
-      Qt::CaseInsensitive, false);
-
-  if (symbolCandidates.count()) {
-    while (index < 0) {
-      index += symbolCandidates.count();
-    }
-    index %= symbolCandidates.count();
-    SI_Symbol* symbol = symbolCandidates[index];
-    if (mScene) {
-      mScene->clearSelection();
-      if (auto item = mScene->getSymbols().value(symbol)) {
-        item->setSelected(true);
-        QRectF rect = item->mapRectToScene(item->childrenBoundingRect());
-        // Zoom to a rectangle relative to the maximum graphics item dimension,
-        // occupying 1/4th of the screen, but limiting the margin to 10mm.
-        const qreal margin =
-            std::min(1.5f * std::max(rect.size().width(), rect.size().height()),
-                     Length::fromMm(10).toPx());
-        rect.adjust(-margin, -margin, margin, margin);
-        mView->zoomToSceneRect(rect, false);
+  // Cross-probe found objects.
+  QSet<const NetSignal*> nets;
+  QSet<const ComponentInstance*> components;
+  for (const auto& obj : objects) {
+    if (obj.type == SearchContext::ObjectType::Net) {
+      if (auto net = mProject.getCircuit().getNetSignalByName(obj.name)) {
+        nets.insert(net);
+      }
+    } else if (obj.type == SearchContext::ObjectType::Component) {
+      if (auto cmp =
+              mProject.getCircuit().getComponentInstanceByName(obj.name)) {
+        components.insert(cmp);
       }
     }
   }
+  mProjectEditor.getCrossProbe()->set(nullptr, nets, components, {}, {});
+
+  // Select objects & zoom to them.
+  mScene->clearSelection();
+  QRectF bbox;
+  auto setSelected = [&bbox](QGraphicsItem* item) {
+    item->setSelected(true);
+    bbox |= item->mapRectToScene(item->boundingRect() |
+                                 item->childrenBoundingRect());
+  };
+  if (!components.isEmpty()) {
+    for (const auto& item : mScene->getSymbols()) {
+      if (components.contains(&item->getSymbol().getComponentInstance())) {
+        setSelected(item.get());
+      }
+    }
+  }
+  if (!nets.isEmpty()) {
+    for (const auto& item : mScene->getSymbolPins()) {
+      const NetSignal* net = item->getPin().getCompSigInstNetSignal();
+      if (net && nets.contains(net)) {
+        setSelected(item.get());
+      }
+    }
+    for (const auto& item : mScene->getNetLines()) {
+      const NetSignal& net = item->getNetLine().getNetSegment().getNetSignal();
+      if (nets.contains(&net)) {
+        setSelected(item.get());
+      }
+    }
+    for (const auto& item : mScene->getNetLabels()) {
+      const NetSignal& net = item->getNetLabel().getNetSegment().getNetSignal();
+      if (nets.contains(&net)) {
+        setSelected(item.get());
+      }
+    }
+  }
+  if (!bbox.isEmpty()) {
+    // Zoom to a rectangle relative to the maximum graphics item dimension,
+    // occupying 1/4th of the screen, but limiting the margin to 10mm.
+    const qreal margin =
+        std::min(1.5f * std::max(bbox.size().width(), bbox.size().height()),
+                 Length::fromMm(10).toPx());
+    bbox.adjust(-margin, -margin, margin, margin);
+    mView->zoomToSceneRect(bbox, false);
+  }
+
+  // Enforce updating the info box for the selected objects.
+  mFsm->processChangedSelection();
 }
 
 void SchematicTab::applyWorkspaceSettings() noexcept {

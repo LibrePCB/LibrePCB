@@ -77,6 +77,7 @@ export component ScrollView {
     in property <bool> force-show-scrollbars: false;
     in property <bool> thin-scrollbars: false;
     in property <bool> mouse-drag-pan-enabled <=> flickable.interactive;
+    in property <bool> consume-scroll-events: false;
     in-out property <length> viewport-x <=> flickable.viewport-x;
     in-out property <length> viewport-y <=> flickable.viewport-y;
     in-out property <length> viewport-width <=> flickable.viewport-width;
@@ -149,6 +150,12 @@ export component ScrollView {
             scrolled => {
                 root.scrolled()
             }
+        }
+
+        // Depending on context, we need to consume scroll events to avoid
+        // them to propagate to elements below the scroll view.
+        scroll-event(event) => {
+            consume-scroll-events ? accept : reject
         }
     }
 }

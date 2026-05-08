@@ -117,7 +117,7 @@ bool SchematicEditorState_Select::entry() noexcept {
   mUpdateAvailableFeaturesTimer->setSingleShot(true);
   mUpdateAvailableFeaturesTimer->setInterval(50);
   connect(mUpdateAvailableFeaturesTimer.get(), &QTimer::timeout, this,
-          &SchematicEditorState_Select::updateAvailableFeatures);
+          [this]() { updateAvailableFeatures(true); });
   scheduleUpdateAvailableFeatures();
 
   mConnections.append(
@@ -767,10 +767,13 @@ bool SchematicEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
   return true;
 }
 
-bool SchematicEditorState_Select::processGridIntervalChanged(
-    const PositiveLength& interval) noexcept {
-  Q_UNUSED(interval);
-  scheduleUpdateAvailableFeatures();
+bool SchematicEditorState_Select::processChangedSelection() noexcept {
+  // Actually it would be better to call scheduleUpdateAvailableFeatures(),
+  // but this doesn't work nicely with the "find" feature in the schematic
+  // editor, as it will reset the cross-probed objects, effectively clearing
+  // the highlighted objects. Thus we do a synchronous call where we can pass
+  // doCrossProbe=false.
+  updateAvailableFeatures(false);
   return true;
 }
 
@@ -1178,7 +1181,8 @@ static bool isAnyOffGrid(const T& container,
   return false;
 }
 
-void SchematicEditorState_Select::updateAvailableFeatures() noexcept {
+void SchematicEditorState_Select::updateAvailableFeatures(
+    bool doCrossProbe) noexcept {
   std::optional<SchematicEditorFsmAdapter::Features> features;
   QString infoText;
   if (mSubState == SubState::PASTING) {
@@ -1245,7 +1249,7 @@ void SchematicEditorState_Select::updateAvailableFeatures() noexcept {
           (!query.getTexts().isEmpty())) {
         *features |= SchematicEditorFsmAdapter::Feature::Properties;
       }
-      infoText = processSelection(query);
+      infoText = processSelection(query, doCrossProbe);
     }
   } else {
     // Do not update features in other states.
@@ -1257,9 +1261,11 @@ void SchematicEditorState_Select::updateAvailableFeatures() noexcept {
 }
 
 QString SchematicEditorState_Select::processSelection(
-    const SchematicSelectionQuery& query) const noexcept {
+    const SchematicSelectionQuery& query, bool doCrossProbe) const noexcept {
   if (query.getResultCount() == 0) {
-    mAdapter.fsmCrossProbe();
+    if (doCrossProbe) {
+      mAdapter.fsmCrossProbe();
+    }
     return QString();
   }
 
@@ -1320,9 +1326,11 @@ QString SchematicEditorState_Select::processSelection(
   }
 
   // Cross-probe selected objects to other editors.
-  mAdapter.fsmCrossProbe(crossProbeNets, crossProbeComponents,
-                         crossProbeComponentSignals, crossProbeBuses,
-                         GraphicsLayer::State::Enabled);
+  if (doCrossProbe) {
+    mAdapter.fsmCrossProbe(crossProbeNets, crossProbeComponents,
+                           crossProbeComponentSignals, crossProbeBuses,
+                           GraphicsLayer::State::Enabled);
+  }
 
   // Build key/value pairs for selected objects.
   QVector<std::pair<QString, QString>> keyValues;
