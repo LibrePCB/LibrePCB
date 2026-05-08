@@ -22,19 +22,22 @@ jobs:
         name: Restore .ccache
         uses: actions/cache/restore@v5
         with:
-          key: ${{ github.job }}-${{ github.ref }}-${{ github.run_id }}
+          key: ccache-${{ github.job }}-${{ github.ref }}-${{ github.run_id }}
           restore-keys: |
-            ${{ github.job }}-${{ github.ref }}
-            ${{ github.job }}-refs/heads/master
+            ccache-${{ github.job }}-${{ github.ref }}
+            ccache-${{ github.job }}-refs/heads/master
+            ccache-${{ github.job }}
           path: build/.ccache-dir
       - id: restore_cargo
         name: Restore .cargo
         uses: actions/cache/restore@v5
         with:
-          key: ${{ github.job }}-${{ hashFiles('libs/librepcb/**/Cargo.lock') }}-${{ github.ref }}-${{ github.run_id }}
+          key: cargo-${{ github.job }}-${{ hashFiles('libs/librepcb/**/Cargo.lock') }}-${{ github.ref }}-${{ github.run_id }}
           restore-keys: |
-            ${{ github.job }}-${{ hashFiles('libs/librepcb/**/Cargo.lock') }}-${{ github.ref }}
-            ${{ github.job }}-${{ hashFiles('libs/librepcb/**/Cargo.lock') }}-refs/heads/master
+            cargo-${{ github.job }}-${{ hashFiles('libs/librepcb/**/Cargo.lock') }}-${{ github.ref }}
+            cargo-${{ github.job }}-${{ hashFiles('libs/librepcb/**/Cargo.lock') }}-refs/heads/master
+            cargo-${{ github.job }}-${{ hashFiles('libs/librepcb/**/Cargo.lock') }}
+            cargo-${{ github.job }}
           path: |
             ./build/.cargo-home/bin/
             ./build/.cargo-home/registry/index/

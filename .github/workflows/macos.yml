@@ -63,19 +63,22 @@ jobs:
         name: Restore .ccache
         uses: actions/cache/restore@v5
         with:
-          key: ${{ matrix.runner }}-${{ github.ref }}-${{ github.run_id }}
+          key: ccache-${{ matrix.runner }}-${{ github.ref }}-${{ github.run_id }}
           restore-keys: |
-            ${{ matrix.runner }}-${{ github.ref }}
-            ${{ matrix.runner }}-refs/heads/master
+            ccache-${{ matrix.runner }}-${{ github.ref }}
+            ccache-${{ matrix.runner }}-refs/heads/master
+            ccache-${{ matrix.runner }}
           path: ${{ env.CCACHE_DIR }}
       - id: restore_cargo
         name: Restore .cargo
         uses: actions/cache/restore@v5
         with:
-          key: ${{ matrix.runner }}-${{ hashFiles('libs/librepcb/**/Cargo.lock') }}-${{ github.ref }}-${{ github.run_id }}
+          key: cargo-${{ matrix.runner }}-${{ hashFiles('libs/librepcb/**/Cargo.lock') }}-${{ github.ref }}-${{ github.run_id }}
           restore-keys: |
-            ${{ matrix.runner }}-${{ hashFiles('libs/librepcb/**/Cargo.lock') }}-${{ github.ref }}
-            ${{ matrix.runner }}-${{ hashFiles('libs/librepcb/**/Cargo.lock') }}-refs/heads/master
+            cargo-${{ matrix.runner }}-${{ hashFiles('libs/librepcb/**/Cargo.lock') }}-${{ github.ref }}
+            cargo-${{ matrix.runner }}-${{ hashFiles('libs/librepcb/**/Cargo.lock') }}-refs/heads/master
+            cargo-${{ matrix.runner }}-${{ hashFiles('libs/librepcb/**/Cargo.lock') }}
+            cargo-${{ matrix.runner }}
           path: |
             ${{ env.CARGO_HOME }}/bin/
             ${{ env.CARGO_HOME }}/registry/index/
