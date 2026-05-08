@@ -146,11 +146,13 @@ export component LibraryTreeView inherits FocusScope {
                         colorize: {
                             if item.type == LibraryTreeViewItemType.all {
                                 Data.theme.control-text-muted
-                            } else if item.type == LibraryTreeViewItemType.organization {
-                                item.deprecated ? Data.theme.base-text-error : Data.theme.control-text-muted
                             } else if item.type == LibraryTreeViewItemType.uncategorized {
                                 Data.theme.base-text-warning
+                            } else if item.type == LibraryTreeViewItemType.organization {
+                                item.deprecated ? Data.theme.base-text-error : Data.theme.control-text-muted
                             } else if item.type == LibraryTreeViewItemType.component {
+                                item.deprecated ? Data.theme.base-text-error : Data.theme.control-text-muted
+                            } else if item.type == LibraryTreeViewItemType.symbol {
                                 item.deprecated ? Data.theme.base-text-error : Data.theme.control-text-muted
                             } else if item.is-external {
                                 Data.theme.control-text-muted

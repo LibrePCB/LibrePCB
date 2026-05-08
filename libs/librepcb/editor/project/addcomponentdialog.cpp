@@ -537,7 +537,7 @@ void AddComponentDialog::searchComponents(
     for (auto cmpIt = result.components.begin();
          cmpIt != result.components.end(); ++cmpIt) {
       QTreeWidgetItem* cmpItem = new QTreeWidgetItem(mUi->treeComponents);
-      cmpItem->setIcon(0, QIcon(":/img/symbol.png"));
+      cmpItem->setIcon(0, EditorToolbox::svgIcon(":/bi/cpu.svg"));
       cmpItem->setText(0, cmpIt.value().name);
       cmpItem->setForeground(
           0, cmpIt.value().deprecated ? QBrush(Qt::red) : QBrush());
@@ -744,7 +744,7 @@ void AddComponentDialog::setSelectedCategory(
     bool cmpDeprecated = false;
     mDb.getMetadata<Component>(cmpFp, nullptr, nullptr, &cmpDeprecated);
     QTreeWidgetItem* cmpItem = new QTreeWidgetItem(mUi->treeComponents);
-    cmpItem->setIcon(0, QIcon(":/img/symbol.png"));
+    cmpItem->setIcon(0, EditorToolbox::svgIcon(":/bi/cpu.svg"));
     cmpItem->setText(0, cmpName);
     cmpItem->setForeground(0, cmpDeprecated ? QBrush(Qt::red) : QBrush());
     cmpItem->setData(0, Qt::UserRole, cmpFp.toStr());
