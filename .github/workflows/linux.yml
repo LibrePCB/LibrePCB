@@ -22,8 +22,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: Ubuntu 22.04 Qt6.10 GCC
-            image: librepcb/librepcb-dev:ubuntu-22.04-qt6.10-1
+          - name: Ubuntu 22.04 Qt6.11 GCC
+            image: librepcb/librepcb-dev:ubuntu-22.04-qt6.11-1
+            has_llvm_cov: true
             deploy: true
           - name: Ubuntu 24.04 Clang
             image: librepcb/librepcb-dev:ubuntu-24.04-4
