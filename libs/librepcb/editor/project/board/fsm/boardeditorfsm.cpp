@@ -406,6 +406,15 @@ bool BoardEditorFsm::processGraphicsSceneRightMouseButtonReleased(
   return false;
 }
 
+bool BoardEditorFsm::processChangedSelection() noexcept {
+  if (BoardEditorState* state = getCurrentStateObj()) {
+    if (state->processChangedSelection()) {
+      return true;
+    }
+  }
+  return false;
+}
+
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/

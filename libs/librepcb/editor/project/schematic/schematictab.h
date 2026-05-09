@@ -170,7 +170,7 @@ private:
   void clearErcMarker() noexcept;
   void execGraphicsExportDialog(GraphicsExportDialog::Output output,
                                 const QString& settingsKey) noexcept;
-  void goToSymbol(const QString& name, int index) noexcept;
+  void goToObjects(const QVector<SearchContext::Candidate>& objects) noexcept;
   void applyWorkspaceSettings() noexcept;
   void requestRepaint() noexcept;
 

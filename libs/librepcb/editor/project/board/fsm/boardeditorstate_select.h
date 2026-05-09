@@ -113,6 +113,7 @@ public:
       const GraphicsSceneMouseEvent& e) noexcept override;
   bool processGraphicsSceneRightMouseButtonReleased(
       const GraphicsSceneMouseEvent& e) noexcept override;
+  bool processChangedSelection() noexcept override;
 
   // Operator Overloadings
   BoardEditorState_Select& operator=(const BoardEditorState_Select& rhs) =
@@ -191,8 +192,9 @@ private:  // Methods
   QList<DeviceMenuItem> getDeviceMenuItems(
       const ComponentInstance& cmpInst) const noexcept;
   void scheduleUpdateAvailableFeatures() noexcept;
-  void updateAvailableFeatures() noexcept;
-  QString processSelection(const BoardSelectionQuery& query) const noexcept;
+  void updateAvailableFeatures(bool doCrossProbe = true) noexcept;
+  QString processSelection(const BoardSelectionQuery& query,
+                           bool doCrossProbe) const noexcept;
 
 private:  // Data
   /// An undo command will be active while dragging pasted items
