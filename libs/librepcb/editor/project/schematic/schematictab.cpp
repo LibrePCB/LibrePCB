@@ -452,6 +452,11 @@ void SchematicTab::highlightErcMessage(
   }
 }
 
+bool SchematicTab::startAddingRemainingComponentGates(
+    const Uuid& cmp, const std::optional<Uuid>& gate) noexcept {
+  return mFsm->processAddRemainingGates(cmp, gate);
+}
+
 void SchematicTab::activate() noexcept {
   mScene = std::make_unique<SchematicGraphicsScene>(
       mSchematic, *mLayers,

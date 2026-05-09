@@ -1754,6 +1754,16 @@ export global EditorCommandSet {
         key: "c",
     };
 
+    in property <EditorCommand> place-remaining-gates: {
+        id: "place_remaining_gates",
+        icon: @image-url("../../../font-awesome/svgs/solid/plus.svg"),
+        text: "Place Remaining Gates",
+        status-tip: "Add more of the components gates to the schematic",
+        shortcut: "",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "",
+    };
+
     in property <EditorCommand> open-product-website: {
         id: "open_product_website",
         icon: @image-url("../../../font-awesome/svgs/solid/globe.svg"),

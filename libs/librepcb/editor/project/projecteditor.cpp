@@ -24,6 +24,7 @@
 
 #include "../dialogs/filedialog.h"
 #include "../guiapplication.h"
+#include "../mainwindow.h"
 #include "../notification.h"
 #include "../notificationsmodel.h"
 #include "../rulecheck/rulecheckmessagesmodel.h"
@@ -51,8 +52,11 @@
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/circuit/bus.h>
 #include <librepcb/core/project/circuit/circuit.h>
+#include <librepcb/core/project/circuit/componentinstance.h>
 #include <librepcb/core/project/erc/electricalrulecheck.h>
+#include <librepcb/core/project/erc/electricalrulecheckmessages.h>
 #include <librepcb/core/project/project.h>
+#include <librepcb/core/project/schematic/items/si_symbol.h>
 #include <librepcb/core/project/schematic/schematic.h>
 #include <librepcb/core/utils/scopeguard.h>
 #include <librepcb/core/workspace/workspace.h>
@@ -244,6 +248,7 @@ ProjectEditor::~ProjectEditor() noexcept {
   // Delete objects to avoid issues with still connected signal/slots.
   mCrossProbe->reset();
   if (mErcMessages) {
+    mErcMessages->setAutofixHandler(nullptr);
     mErcMessages->clear();
     mErcMessages.reset();
   }
@@ -591,7 +596,8 @@ void ProjectEditor::execRenameSheetDialog(int index) noexcept {
   emit abortBlockingToolsInOtherEditors(nullptr);  // Release undo stack.
 
   try {
-    std::unique_ptr<CmdSchematicEdit> cmd(new CmdSchematicEdit(*schematic));
+    std::unique_ptr<CmdSchematicEdit> cmd =
+        std::make_unique<CmdSchematicEdit>(*schematic);
     cmd->setName(ElementName(cleanElementName(name)));  // can throw
     mUndoStack->execCmd(cmd.release());
   } catch (const Exception& e) {
@@ -737,6 +743,9 @@ void ProjectEditor::runErc() noexcept {
     // Update UI.
     if (!mErcMessages) {
       mErcMessages = std::make_shared<RuleCheckMessagesModel>();
+      mErcMessages->setAutofixHandler(std::bind(&ProjectEditor::autoFixHandler,
+                                                this, std::placeholders::_1,
+                                                std::placeholders::_2));
       connect(mErcMessages.get(),
               &RuleCheckMessagesModel::unapprovedCountChanged, this,
               [this]() { onUiDataChanged.notify(); });
@@ -793,6 +802,73 @@ void ProjectEditor::refreshBuses() noexcept {
           ui::BusData{q2s(bus->getUuid().toStr()), q2s(*bus->getName())});
     }
   }
+}
+
+/*******************************************************************************
+ *  Rule Check Autofixes
+ ******************************************************************************/
+
+bool ProjectEditor::autoFixHandler(
+    const std::shared_ptr<const RuleCheckMessage>& msg,
+    bool checkOnly) noexcept {
+  try {
+    return autoFixImpl(msg, checkOnly);  // can throw
+  } catch (const Exception& e) {
+    if (!checkOnly) {
+      QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
+    }
+  }
+  return false;
+}
+
+bool ProjectEditor::autoFixImpl(
+    const std::shared_ptr<const RuleCheckMessage>& msg, bool checkOnly) {
+  if (autoFixHelper<ErcMsgUnplacedOptionalGate>(msg, checkOnly)) return true;
+  if (autoFixHelper<ErcMsgUnplacedRequiredGate>(msg, checkOnly)) return true;
+  return false;
+}
+
+template <typename MessageType>
+bool ProjectEditor::autoFixHelper(
+    const std::shared_ptr<const RuleCheckMessage>& msg, bool checkOnly) {
+  if (msg) {
+    if (auto m = msg->as<MessageType>()) {
+      if (checkOnly) {
+        return true;
+      } else {
+        return autoFix(*m);  // can throw
+      }
+    }
+  }
+  return false;
+}
+
+static bool autoFixUnplacedGate(GuiApplication& app, Project& prj, int prjIndex,
+                                const Uuid& cmp, const Uuid& gate) {
+  const ComponentInstance* cmpObj =
+      prj.getCircuit().getComponentInstanceByUuid(cmp);
+  if ((!cmpObj) || (cmpObj->getSymbols().isEmpty())) return false;
+  const SI_Symbol* firstGate = cmpObj->getSymbols().begin().value();
+  Q_ASSERT(firstGate);
+  int schematicIndex = prj.getSchematicIndex(firstGate->getSchematic());
+  if (auto win = app.getCurrentWindow()) {
+    if (auto tab = win->openSchematicTab(prjIndex, schematicIndex)) {
+      return tab->startAddingRemainingComponentGates(cmp, gate);
+    }
+  }
+  return false;
+}
+
+template <>
+bool ProjectEditor::autoFix(const ErcMsgUnplacedOptionalGate& msg) {
+  return autoFixUnplacedGate(mApp, *mProject, mUiIndex, msg.getComponent(),
+                             msg.getGate());
+}
+
+template <>
+bool ProjectEditor::autoFix(const ErcMsgUnplacedRequiredGate& msg) {
+  return autoFixUnplacedGate(mApp, *mProject, mUiIndex, msg.getComponent(),
+                             msg.getGate());
 }
 
 /*******************************************************************************

@@ -62,6 +62,8 @@ SchematicEditorState_AddComponent::SchematicEditorState_AddComponent(
   : SchematicEditorState(context),
     mIsUndoCmdActive(false),
     mUseAddComponentDialog(true),
+    mAbortAfterCurrentGate(false),
+    mAbortAfterLastGate(false),
     mAddComponentDialog(nullptr),
     mCurrentAngle(0),
     mCurrentMirrored(false),
@@ -69,7 +71,6 @@ SchematicEditorState_AddComponent::SchematicEditorState_AddComponent(
     mCurrentValueSuggestions(),
     mCurrentValueAttribute(),
     mCurrentComponent(nullptr),
-    mCurrentSymbVarItemIndex(-1),
     mCurrentSymbolToPlace(nullptr),
     mCurrentSymbolEditCommand(nullptr) {
 }
@@ -121,11 +122,13 @@ bool SchematicEditorState_AddComponent::processAddComponent(
     mCurrentMirrored = false;
     setValue(QString());
     mUseAddComponentDialog = true;
+    mAbortAfterCurrentGate = false;
+    mAbortAfterLastGate = false;
     startAddingComponent(std::nullopt, std::nullopt, std::nullopt, searchTerm);
     return true;
-  } catch (UserCanceled& exc) {
-  } catch (Exception& exc) {
-    QMessageBox::critical(parentWidget(), tr("Error"), exc.getMsg());
+  } catch (const UserCanceled& e) {
+  } catch (const Exception& e) {
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
   }
 
   return false;
@@ -140,13 +143,51 @@ bool SchematicEditorState_AddComponent::processAddComponent(
     mCurrentMirrored = false;
     setValue(QString());
     mUseAddComponentDialog = false;
+    mAbortAfterCurrentGate = false;
+    mAbortAfterLastGate = false;
     startAddingComponent(cmp, symbVar, std::nullopt);
     return true;
-  } catch (UserCanceled& exc) {
-  } catch (Exception& exc) {
-    QMessageBox::critical(parentWidget(), tr("Error"), exc.getMsg());
+  } catch (const UserCanceled& e) {
+  } catch (const Exception& e) {
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
   }
 
+  return false;
+}
+
+bool SchematicEditorState_AddComponent::processAddRemainingGates(
+    const Uuid& cmp, const std::optional<Uuid>& gate) noexcept {
+  if (!abortCommand(true)) return false;
+
+  mCurrentComponent =
+      mContext.project.getCircuit().getComponentInstanceByUuid(cmp);
+  if (!mCurrentComponent) return false;
+
+  try {
+    // Start a new command.
+    Q_ASSERT(!mIsUndoCmdActive);
+    mContext.undoStack.beginCmdGroup(tr("Add Component Gate to Schematic"));
+    mIsUndoCmdActive = true;
+
+    mCurrentAngle = Angle::deg0();
+    mCurrentMirrored = false;
+    setValue(mCurrentComponent->getValue());
+    mUseAddComponentDialog = false;
+    mAbortAfterCurrentGate = gate.has_value();
+    mAbortAfterLastGate = true;
+
+    const Point pos = mAdapter.fsmMapGlobalPosToScenePos(QCursor::pos())
+                          .mappedToGrid(getGridInterval());
+    if (!startAddingNextGate(pos, gate)) {
+      throw LogicError(__FILE__, __LINE__);  // No remaining gates to place.
+    }
+    return true;
+  } catch (const UserCanceled& e) {
+  } catch (const Exception& e) {
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
+  }
+
+  abortCommand(false);
   return false;
 }
 
@@ -228,41 +269,23 @@ bool SchematicEditorState_AddComponent::
     mContext.undoStack.beginCmdGroup(tr("Add Symbol to Schematic"));
     mIsUndoCmdActive = true;
 
-    // check if there is a next symbol to add
-    mCurrentSymbVarItemIndex++;
-    const ComponentSymbolVariantItem* currentSymbVarItem =
-        mCurrentComponent->getSymbolVariant()
-            .getSymbolItems()
-            .value(mCurrentSymbVarItemIndex)
-            .get();
-
-    if (currentSymbVarItem) {
-      // create the next symbol instance and add it to the schematic
-      CmdAddSymbolToSchematic* cmd = new CmdAddSymbolToSchematic(
-          mContext.workspace, mContext.schematic,
-          mCurrentSymbolToPlace->getComponentInstance(),
-          currentSymbVarItem->getUuid(), pos);
-      mContext.undoStack.appendToCmdGroup(cmd);
-      mCurrentSymbolToPlace = cmd->getSymbolInstance();
-      Q_ASSERT(mCurrentSymbolToPlace);
-
-      // add command to move the current symbol
-      Q_ASSERT(mCurrentSymbolEditCommand == nullptr);
-      mCurrentSymbolEditCommand =
-          new CmdSymbolInstanceEditAll(*mCurrentSymbolToPlace);
-      mCurrentSymbolEditCommand->setRotation(mCurrentAngle, true);
-      mCurrentSymbolEditCommand->setMirrored(mCurrentMirrored, true);
-    } else {
-      // all symbols placed, start adding the next component
+    // Place the next gate, if any.
+    if (mAbortAfterCurrentGate) {
+      abortCommand(false);  // reset attributes
+      emit requestLeavingState();
+    } else if (!startAddingNextGate(pos)) {
+      // All gates placed, start adding the next component.
       Uuid componentUuid = mCurrentComponent->getLibComponent().getUuid();
       Uuid symbVarUuid = mCurrentComponent->getSymbolVariant().getUuid();
       ComponentAssemblyOptionList options =
           mCurrentComponent->getAssemblyOptions();
-      mContext.undoStack.commitCmdGroup();
-      mIsUndoCmdActive = false;
       abortCommand(false);  // reset attributes
-      startAddingComponent(componentUuid, symbVarUuid, options, QString(),
-                           true);
+      if (mAbortAfterLastGate) {
+        emit requestLeavingState();
+      } else {
+        startAddingComponent(componentUuid, symbVarUuid, options, QString(),
+                             true);
+      }
     }
     return true;
   } catch (Exception& e) {
@@ -465,34 +488,15 @@ void SchematicEditorState_AddComponent::startAddingComponent(
       setValue(mCurrentComponent->getValue());
     }
 
-    // create the first symbol instance and add it to the schematic
-    mCurrentSymbVarItemIndex = 0;
-    const ComponentSymbolVariantItem* currentSymbVarItem =
-        mCurrentComponent->getSymbolVariant()
-            .getSymbolItems()
-            .value(mCurrentSymbVarItemIndex)
-            .get();
-    if (!currentSymbVarItem) {
+    // Add the first gate to the schematic.
+    const Point pos = mAdapter.fsmMapGlobalPosToScenePos(QCursor::pos())
+                          .mappedToGrid(getGridInterval());
+    if (!startAddingNextGate(pos)) {
       throw RuntimeError(__FILE__, __LINE__,
                          tr("The component with the UUID \"%1\" does "
                             "not have any symbol.")
                              .arg(mCurrentComponent->getUuid().toStr()));
     }
-    const Point pos = mAdapter.fsmMapGlobalPosToScenePos(QCursor::pos())
-                          .mappedToGrid(getGridInterval());
-    CmdAddSymbolToSchematic* cmd2 = new CmdAddSymbolToSchematic(
-        mContext.workspace, mContext.schematic, *mCurrentComponent,
-        currentSymbVarItem->getUuid(), pos);
-    mContext.undoStack.appendToCmdGroup(cmd2);
-    mCurrentSymbolToPlace = cmd2->getSymbolInstance();
-    Q_ASSERT(mCurrentSymbolToPlace);
-
-    // add command to move the current symbol
-    Q_ASSERT(mCurrentSymbolEditCommand == nullptr);
-    mCurrentSymbolEditCommand =
-        new CmdSymbolInstanceEditAll(*mCurrentSymbolToPlace);
-    mCurrentSymbolEditCommand->setRotation(mCurrentAngle, true);
-    mCurrentSymbolEditCommand->setMirrored(mCurrentMirrored, true);
 
     // If a schematic frame was added as the first symbol in the schematic,
     // place it at (0, 0) and exit this tool for convenience and to ensure
@@ -527,6 +531,45 @@ void SchematicEditorState_AddComponent::startAddingComponent(
   }
 }
 
+bool SchematicEditorState_AddComponent::startAddingNextGate(
+    const Point& pos, const std::optional<Uuid>& gate) {
+  if (!mCurrentComponent) return false;
+
+  // Check if there is a next gate to add.
+  const ComponentSymbolVariantItem* currentSymbVarItem = nullptr;
+  if (gate && (!mCurrentComponent->getSymbols().contains(*gate))) {
+    currentSymbVarItem = mCurrentComponent->getSymbolVariant()
+                             .getSymbolItems()
+                             .find(*gate)
+                             .get();
+  } else {
+    for (const auto& item : std::as_const(
+             mCurrentComponent->getSymbolVariant().getSymbolItems())) {
+      if (!mCurrentComponent->getSymbols().contains(item.getUuid())) {
+        currentSymbVarItem = &item;
+        break;
+      }
+    }
+  }
+  if (!currentSymbVarItem) return false;
+
+  // create the next symbol instance and add it to the schematic
+  CmdAddSymbolToSchematic* cmd = new CmdAddSymbolToSchematic(
+      mContext.workspace, mContext.schematic, *mCurrentComponent,
+      currentSymbVarItem->getUuid(), pos);
+  mContext.undoStack.appendToCmdGroup(cmd);
+  mCurrentSymbolToPlace = cmd->getSymbolInstance();
+  Q_ASSERT(mCurrentSymbolToPlace);
+
+  // add command to move the current symbol
+  Q_ASSERT(mCurrentSymbolEditCommand == nullptr);
+  mCurrentSymbolEditCommand =
+      new CmdSymbolInstanceEditAll(*mCurrentSymbolToPlace);
+  mCurrentSymbolEditCommand->setRotation(mCurrentAngle, true);
+  mCurrentSymbolEditCommand->setMirrored(mCurrentMirrored, true);
+  return true;
+}
+
 bool SchematicEditorState_AddComponent::abortCommand(
     bool showErrMsgBox) noexcept {
   try {
@@ -542,7 +585,6 @@ bool SchematicEditorState_AddComponent::abortCommand(
 
     // reset attributes, go back to idle state
     mCurrentComponent = nullptr;
-    mCurrentSymbVarItemIndex = -1;
     mCurrentSymbolToPlace = nullptr;
     return true;
   } catch (const Exception& e) {

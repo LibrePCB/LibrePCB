@@ -105,6 +105,8 @@ public:
   bool processSelect() noexcept;
   bool processAddComponent(const QString& searchTerm = QString()) noexcept;
   bool processAddComponent(const Uuid& cmp, const Uuid& symbVar) noexcept;
+  bool processAddRemainingGates(const Uuid& cmp,
+                                const std::optional<Uuid>& gate) noexcept;
   bool processAddNetLabel() noexcept;
   bool processDrawPolygon() noexcept;
   bool processAddText() noexcept;

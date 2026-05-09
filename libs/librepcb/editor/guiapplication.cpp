@@ -936,6 +936,17 @@ std::shared_ptr<MainWindow> GuiApplication::createNewWindow(
   return mw;
 }
 
+std::shared_ptr<MainWindow> GuiApplication::getCurrentWindow() noexcept {
+  for (auto& win : mWindows->values()) {
+    if (win->isCurrentWindow()) {
+      return win;
+    }
+  }
+  // TODO: This does not work in every case yet, so we implement some fallback
+  // as a workaround.
+  return mWindows->value(mWindows->count() - 1);
+}
+
 int GuiApplication::getWindowCount() const noexcept {
   return mWindows->count();
 }
@@ -1018,17 +1029,6 @@ void GuiApplication::highlightErcMessage(
   } else {
     qCritical() << "Unknown window ID:" << windowId;
   }
-}
-
-std::shared_ptr<MainWindow> GuiApplication::getCurrentWindow() noexcept {
-  for (auto& win : mWindows->values()) {
-    if (win->isCurrentWindow()) {
-      return win;
-    }
-  }
-  // TODO: This does not work in every case yet, so we implement some fallback
-  // as a workaround.
-  return mWindows->value(mWindows->count() - 1);
 }
 
 void GuiApplication::updateLibrariesContainStandardComponents() noexcept {

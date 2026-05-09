@@ -83,6 +83,8 @@ public:
   void setDerivedUiData(const ui::SchematicTabData& data) noexcept;
   void highlightErcMessage(const std::shared_ptr<const ErcMsgBase>& msg,
                            bool zoomTo) noexcept;
+  bool startAddingRemainingComponentGates(
+      const Uuid& cmp, const std::optional<Uuid>& gate) noexcept;
   void activate() noexcept override;
   void deactivate() noexcept override;
   void trigger(ui::TabAction a) noexcept override;

@@ -32,6 +32,7 @@
 #include <QtCore>
 
 #include <memory>
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -116,6 +117,12 @@ public:
     Q_UNUSED(symbVar);
     return false;
   }
+  virtual bool processAddRemainingGates(
+      const Uuid& cmp, const std::optional<Uuid>& gate) noexcept {
+    Q_UNUSED(cmp);
+    Q_UNUSED(gate);
+    return false;
+  }
   virtual bool processSelectAll() noexcept { return false; }
   virtual bool processCut() noexcept { return false; }
   virtual bool processCopy() noexcept { return false; }
@@ -183,6 +190,8 @@ signals:
    * the current state and entering the select tool.
    */
   void requestLeavingState();
+  void requestAddRemainingGates(const Uuid& uuid,
+                                const std::optional<Uuid>& gate);
 
 protected:  // Methods
   SchematicGraphicsScene* getActiveSchematicScene() noexcept;

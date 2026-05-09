@@ -270,8 +270,16 @@ public:
       const ComponentInstance& component,
       const ComponentSymbolVariantItem& gate) noexcept;
   ErcMsgUnplacedRequiredGate(const ErcMsgUnplacedRequiredGate& other) noexcept
-    : ErcMsgBase(other) {}
+    : ErcMsgBase(other), mComponent(other.mComponent), mGate(other.mGate) {}
   ~ErcMsgUnplacedRequiredGate() noexcept override {}
+
+  // Getters
+  const Uuid& getComponent() const noexcept { return mComponent; }
+  const Uuid& getGate() const noexcept { return mGate; }
+
+private:
+  const Uuid mComponent;
+  const Uuid mGate;
 };
 
 /*******************************************************************************
@@ -291,8 +299,16 @@ public:
       const ComponentInstance& component,
       const ComponentSymbolVariantItem& gate) noexcept;
   ErcMsgUnplacedOptionalGate(const ErcMsgUnplacedOptionalGate& other) noexcept
-    : ErcMsgBase(other) {}
+    : ErcMsgBase(other), mComponent(other.mComponent), mGate(other.mGate) {}
   ~ErcMsgUnplacedOptionalGate() noexcept override {}
+
+  // Getters
+  const Uuid& getComponent() const noexcept { return mComponent; }
+  const Uuid& getGate() const noexcept { return mGate; }
+
+private:
+  const Uuid mComponent;
+  const Uuid mGate;
 };
 
 /*******************************************************************************

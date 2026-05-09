@@ -75,6 +75,8 @@ public:
       const QString& searchTerm = QString()) noexcept override;
   bool processAddComponent(const Uuid& cmp,
                            const Uuid& symbVar) noexcept override;
+  bool processAddRemainingGates(
+      const Uuid& cmp, const std::optional<Uuid>& gate) noexcept override;
   bool processRotate(const Angle& rotation) noexcept override;
   bool processMirror(Qt::Orientation orientation) noexcept override;
   bool processAbortCommand() noexcept override;
@@ -132,12 +134,16 @@ private:  // Methods
       const std::optional<librepcb::ComponentAssemblyOptionList>& options =
           std::nullopt,
       const QString& searchTerm = QString(), bool keepValue = false);
+  bool startAddingNextGate(const Point& pos,
+                           const std::optional<Uuid>& gate = std::nullopt);
   bool abortCommand(bool showErrMsgBox) noexcept;
   void applyValueAndAttributeToComponent() noexcept;
 
 private:  // Data
   bool mIsUndoCmdActive;
   bool mUseAddComponentDialog;
+  bool mAbortAfterCurrentGate;
+  bool mAbortAfterLastGate;
   QScopedPointer<AddComponentDialog> mAddComponentDialog;
 
   // Current tool settings
@@ -149,7 +155,6 @@ private:  // Data
 
   // Information about the current component/symbol to place
   ComponentInstance* mCurrentComponent;
-  int mCurrentSymbVarItemIndex;
   SI_Symbol* mCurrentSymbolToPlace;
   CmdSymbolInstanceEditAll* mCurrentSymbolEditCommand;
 };

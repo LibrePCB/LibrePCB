@@ -295,7 +295,9 @@ ErcMsgUnplacedRequiredGate::ErcMsgUnplacedRequiredGate(
                tr("The gate '%1' of '%2' is marked as required, but it "
                   "is not added to the schematic.")
                    .arg(*gate.getSuffix(), *component.getName()),
-               "unplaced_required_gate") {
+               "unplaced_required_gate"),
+    mComponent(component.getUuid()),
+    mGate(gate.getUuid()) {
   mApproval->ensureLineBreak();
   mApproval->appendChild("component", component.getUuid());
   mApproval->ensureLineBreak();
@@ -318,7 +320,9 @@ ErcMsgUnplacedOptionalGate::ErcMsgUnplacedOptionalGate(
             .arg(*component.getName(), *gate.getSuffix()),
         tr("The optional gate '%1' of '%2' is not added to the schematic.")
             .arg(*gate.getSuffix(), *component.getName()),
-        "unplaced_optional_gate") {
+        "unplaced_optional_gate"),
+    mComponent(component.getUuid()),
+    mGate(gate.getUuid()) {
   mApproval->ensureLineBreak();
   mApproval->appendChild("component", component.getUuid());
   mApproval->ensureLineBreak();

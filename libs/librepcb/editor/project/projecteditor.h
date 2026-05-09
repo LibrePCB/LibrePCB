@@ -206,6 +206,17 @@ private:
   void projectSettingsChanged() noexcept;
   void refreshBuses() noexcept;
 
+  // ERC Autofixes
+  bool autoFixHandler(const std::shared_ptr<const RuleCheckMessage>& msg,
+                      bool checkOnly) noexcept;
+  bool autoFixImpl(const std::shared_ptr<const RuleCheckMessage>& msg,
+                   bool checkOnly);
+  template <typename MessageType>
+  bool autoFixHelper(const std::shared_ptr<const RuleCheckMessage>& msg,
+                     bool checkOnly);
+  template <typename MessageType>
+  bool autoFix(const MessageType& msg);
+
 private:
   GuiApplication& mApp;
   Workspace& mWorkspace;

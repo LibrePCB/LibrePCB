@@ -1862,6 +1862,15 @@ public:
       {QKeySequence(Qt::CTRL | Qt::Key_C)},
       &categoryContextMenu,
   };
+  EditorCommand placeRemainingGates{
+      "place_remaining_gates",  // clang-format break
+      QT_TR_NOOP("Place Remaining Gates"),
+      QT_TR_NOOP("Add more of the components gates to the schematic"),
+      ":/fa/solid/plus.svg",
+      EditorCommand::Flags(),
+      {},
+      &categoryContextMenu,
+  };
   EditorCommand openProductWebsite{
       "open_product_website",  // clang-format break
       QT_TR_NOOP("Open Product Website"),
