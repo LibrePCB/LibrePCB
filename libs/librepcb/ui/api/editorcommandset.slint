@@ -164,6 +164,16 @@ export global EditorCommandSet {
         key: Key.F6,
     };
 
+    in property <EditorCommand> project-library-manager: {
+        id: "project_library_manager",
+        icon: @image-url("../../../font-awesome/svgs/solid/database.svg"),
+        text: "Project Library Manager...",
+        status-tip: "Review the project's library elements & update them from workspace libraries",
+        shortcut: "Ctrl+F5",
+        modifiers: { alt: false, control: true, shift: false, meta: false },
+        key: Key.F5,
+    };
+
     in property <EditorCommand> grid-properties: {
         id: "grid_properties",
         icon: @image-url("../../../bootstrap-icons/icons/grid-3x3.svg"),
@@ -202,16 +212,6 @@ export global EditorCommandSet {
         shortcut: "F8",
         modifiers: { alt: false, control: false, shift: false, meta: false },
         key: Key.F8,
-    };
-
-    in property <EditorCommand> project-library-update: {
-        id: "project_library_update",
-        icon: @image-url("../../../font-awesome/svgs/solid/arrows-rotate.svg"),
-        text: "Update Project Library...",
-        status-tip: "Update the project's library elements from workspace libraries",
-        shortcut: "Ctrl+F5",
-        modifiers: { alt: false, control: true, shift: false, meta: false },
-        key: Key.F5,
     };
 
     in property <EditorCommand> sheet-new: {

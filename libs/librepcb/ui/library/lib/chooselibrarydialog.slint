@@ -1,0 +1,85 @@
+import {
+    OverlayDialog,
+    ScrollView,
+} from "../../widgets.slint";
+import {
+    Data,
+    LibraryInfoData,
+} from "../../api.slint";
+
+export component ChooseLibraryDialogListItem inherits TouchArea {
+    in property <image> icon;
+    in property <string> name;
+
+    // Accessibility
+    accessible-role: list-item;
+    accessible-enabled: self.enabled;
+    accessible-label: name;
+    accessible-action-default => {
+        self.clicked();
+    }
+
+    if self.height > 0: Rectangle {
+        background: parent.has-hover ? Data.theme.control-hovered : transparent;
+
+        HorizontalLayout {
+            padding-left: 6px;
+            padding-right: 6px;
+            spacing: 5px;
+            alignment: start;
+
+            Image {
+                y: (parent.height - self.height) / 2;
+                width: 18px;
+                height: self.width;
+                image-fit: contain;
+                source: icon;
+                accessible-role: none;
+            }
+
+            name-txt := Text {
+                vertical-alignment: center;
+                overflow: elide;
+                text: name;
+                color: root.has-hover ? Data.theme.base-text : Data.theme.control-text;
+                accessible-role: none;
+            }
+        }
+    }
+}
+
+export component ChooseLocalLibraryDialog inherits OverlayDialog {
+    in property <string> hide-library-with-path;
+
+    callback item-clicked(path: string);
+
+    view := ScrollView {
+        preferred-width: l.preferred-width;
+        preferred-height: l.preferred-height;
+        mouse-drag-pan-enabled: true;
+
+        l := VerticalLayout {
+            if Data.local-libraries.length == 0: Text {
+                wrap: word-wrap;
+                color: Data.theme.base-text;
+                text: @tr("The workspace contains no local libraries. To allow selecting a library, create a local library in the library manager first.");
+            }
+            if (Data.local-libraries.length == 1) && (Data.local-libraries[0].path == hide-library-with-path): Text {
+                wrap: word-wrap;
+                color: Data.theme.base-text;
+                text: @tr("The workspace contains no other local libraries.");
+            }
+
+            for item[idx] in Data.local-libraries: item-ta := ChooseLibraryDialogListItem {
+                height: (item.path == hide-library-with-path) ? 0 : 26px;
+                icon: item.icon;
+                name: item.name;
+                accessible-item-index: idx;
+
+                clicked => {
+                    item-clicked(item.path);
+                }
+            }
+        }
+    }
+}

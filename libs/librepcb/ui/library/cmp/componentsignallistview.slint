@@ -13,29 +13,13 @@ import {
 } from "../../api.slint";
 
 component HorizontalLine inherits Rectangle {
-    in property <bool> read-only: false;
-
     height: 1px;
-    background: {
-        if read-only {
-            Data.theme.control-border-disabled
-        } else {
-            Data.theme.control-border-disabled
-        }
-    };
+    background: Data.theme.control-border-disabled;
 }
 
 component VerticalLine inherits Rectangle {
-    in property <bool> read-only: false;
-
     width: 1px;
-    background: {
-        if read-only {
-            Data.theme.control-border-disabled
-        } else {
-            Data.theme.control-border-disabled
-        }
-    };
+    background: Data.theme.control-border-disabled;
 }
 
 component ComponentSignalListViewTextCell inherits Rectangle {
@@ -81,16 +65,12 @@ export component ComponentSignalListView {
 
             HorizontalLayout {
 
-                VerticalLine {
-                    read-only: read-only;
-                }
+                VerticalLine { }
 
                 VerticalLayout {
                     width: self.preferred-width;
 
-                    HorizontalLine {
-                        read-only: read-only;
-                    }
+                    HorizontalLine { }
 
                     ComponentSignalListViewTextCell {
                         height: row-height;
@@ -99,9 +79,7 @@ export component ComponentSignalListView {
                     }
 
                     for item[index] in model: VerticalLayout {
-                        HorizontalLine {
-                            read-only: read-only;
-                        }
+                        HorizontalLine { }
 
                         number-cell := ComponentSignalListViewTextCell {
                             height: row-height;
@@ -112,16 +90,12 @@ export component ComponentSignalListView {
                     }
                 }
 
-                VerticalLine {
-                    read-only: read-only;
-                }
+                VerticalLine { }
 
                 if show-ids: VerticalLayout {
                     width: self.preferred-width;
 
-                    HorizontalLine {
-                        read-only: read-only;
-                    }
+                    HorizontalLine { }
 
                     ComponentSignalListViewTextCell {
                         height: row-height;
@@ -129,9 +103,7 @@ export component ComponentSignalListView {
                     }
 
                     for item[index] in model: VerticalLayout {
-                        HorizontalLine {
-                            read-only: read-only;
-                        }
+                        HorizontalLine { }
 
                         id-cell := ComponentSignalListViewTextCell {
                             height: row-height;
@@ -143,14 +115,10 @@ export component ComponentSignalListView {
                     }
                 }
 
-                if show-ids: VerticalLine {
-                    read-only: read-only;
-                }
+                if show-ids: VerticalLine { }
 
                 VerticalLayout {
-                    HorizontalLine {
-                        read-only: read-only;
-                    }
+                    HorizontalLine { }
 
                     name-header := ComponentSignalListViewTextCell {
                         height: row-height;
@@ -158,9 +126,7 @@ export component ComponentSignalListView {
                     }
 
                     for item[index] in model: VerticalLayout {
-                        HorizontalLine {
-                            read-only: read-only;
-                        }
+                        HorizontalLine { }
 
                         name-edt := LineEdit {
                             height: row-height;
@@ -182,16 +148,12 @@ export component ComponentSignalListView {
                     }
                 }
 
-                VerticalLine {
-                    read-only: read-only;
-                }
+                VerticalLine { }
 
                 VerticalLayout {
                     width: max(self.preferred-width, required-header.preferred-width);
 
-                    HorizontalLine {
-                        read-only: read-only;
-                    }
+                    HorizontalLine { }
 
                     required-header := ComponentSignalListViewTextCell {
                         height: row-height;
@@ -199,9 +161,7 @@ export component ComponentSignalListView {
                     }
 
                     for item[index] in model: VerticalLayout {
-                        HorizontalLine {
-                            read-only: read-only;
-                        }
+                        HorizontalLine { }
 
                         Rectangle {
                             height: row-height;
@@ -224,9 +184,7 @@ export component ComponentSignalListView {
                     }
                 }
 
-                VerticalLine {
-                    read-only: read-only;
-                }
+                VerticalLine { }
 
                 VerticalLayout {
                     width: (forced-net-cells-l.preferred-width > 0) ? self.preferred-width : 0;
@@ -234,9 +192,7 @@ export component ComponentSignalListView {
 
                     animate width { duration: 150ms; }
 
-                    HorizontalLine {
-                        read-only: read-only;
-                    }
+                    HorizontalLine { }
 
                     ComponentSignalListViewTextCell {
                         height: row-height;
@@ -246,9 +202,7 @@ export component ComponentSignalListView {
 
                     forced-net-cells-l := VerticalLayout {
                         for item[index] in model: VerticalLayout {
-                            HorizontalLine {
-                                read-only: read-only;
-                            }
+                            HorizontalLine { }
 
                             forced-net-edt := LineEdit {
                                 property <bool> request-focus: index == show-forced-net-index;
@@ -294,16 +248,12 @@ export component ComponentSignalListView {
                     }
                 }
 
-                if forced-net-cells-l.preferred-width > 0: VerticalLine {
-                    read-only: read-only;
-                }
+                if forced-net-cells-l.preferred-width > 0: VerticalLine { }
 
                 if !read-only: VerticalLayout {
                     width: self.preferred-width;
 
-                    HorizontalLine {
-                        read-only: read-only;
-                    }
+                    HorizontalLine { }
 
                     ComponentSignalListViewTextCell {
                         height: row-height;
@@ -311,9 +261,7 @@ export component ComponentSignalListView {
                     }
 
                     for item[index] in model: VerticalLayout {
-                        HorizontalLine {
-                            read-only: read-only;
-                        }
+                        HorizontalLine { }
 
                         menu-btn := IconButton {
                             height: row-height;
@@ -331,19 +279,13 @@ export component ComponentSignalListView {
                     }
                 }
 
-                if !read-only: VerticalLine {
-                    read-only: read-only;
-                }
+                if !read-only: VerticalLine { }
             }
 
-            HorizontalLine {
-                read-only: read-only;
-            }
+            HorizontalLine { }
 
             if model.length == 0: HorizontalLayout {
-                VerticalLine {
-                    read-only: read-only;
-                }
+                VerticalLine { }
 
                 Rectangle {
                     height: row-height;
@@ -359,14 +301,10 @@ export component ComponentSignalListView {
                     }
                 }
 
-                VerticalLine {
-                    read-only: read-only;
-                }
+                VerticalLine { }
             }
 
-            if model.length == 0: HorizontalLine {
-                read-only: read-only;
-            }
+            if model.length == 0: HorizontalLine { }
         }
     }
 

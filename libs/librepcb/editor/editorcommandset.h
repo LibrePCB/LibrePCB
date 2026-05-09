@@ -252,6 +252,16 @@ public:
       {QKeySequence(Qt::Key_F6)},
       &categoryEditor,
   };
+  EditorCommand projectLibraryManager{
+      "project_library_manager",  // clang-format break
+      QT_TR_NOOP("Project Library Manager"),
+      QT_TR_NOOP("Review the project's library elements & update them from "
+                 "workspace libraries"),
+      ":/fa/solid/database.svg",
+      EditorCommand::Flag::OpensPopup,
+      {QKeySequence(Qt::CTRL | Qt::Key_F5)},  // Taken from projectLibraryUpdate
+      &categoryEditor,
+  };
   EditorCommand gridProperties{
       "grid_properties",  // clang-format break
       QT_TR_NOOP("Grid Properties"),
@@ -288,16 +298,16 @@ public:
       {QKeySequence(Qt::Key_F8)},
       &categoryEditor,
   };
-  EditorCommand projectLibraryUpdate{
-      "project_library_update",  // clang-format break
-      QT_TR_NOOP("Update Project Library"),
-      QT_TR_NOOP(
-          "Update the project's library elements from workspace libraries"),
-      ":/fa/solid/arrows-rotate.svg",
-      EditorCommand::Flag::OpensPopup,
-      {QKeySequence(Qt::CTRL | Qt::Key_F5)},
-      &categoryEditor,
-  };
+  // EditorCommand projectLibraryUpdate{
+  //     "project_library_update",  // clang-format break
+  //     QT_TR_NOOP("Update Project Library"),
+  //     QT_TR_NOOP(
+  //         "Update the project's library elements from workspace libraries"),
+  //     ":/fa/solid/arrows-rotate.svg",
+  //     EditorCommand::Flag::OpensPopup,
+  //     {QKeySequence(Qt::CTRL | Qt::Key_F5)},
+  //     &categoryEditor,
+  // };
   // EditorCommand schematicEditor{
   //     "schematic_editor",  // clang-format break
   //     QT_TR_NOOP("Schematic Editor"),

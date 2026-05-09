@@ -32,11 +32,11 @@ public:
     out.set_project_new(l2s(cmd.projectNew, out.get_project_new()));
     out.set_project_open(l2s(cmd.projectOpen, out.get_project_open()));
     out.set_project_setup(l2s(cmd.projectSetup, out.get_project_setup()));
+    out.set_project_library_manager(l2s(cmd.projectLibraryManager, out.get_project_library_manager()));
     out.set_grid_properties(l2s(cmd.gridProperties, out.get_grid_properties()));
     out.set_board_setup(l2s(cmd.boardSetup, out.get_board_setup()));
     out.set_run_quick_check(l2s(cmd.runQuickCheck, out.get_run_quick_check()));
     out.set_run_design_rule_check(l2s(cmd.runDesignRuleCheck, out.get_run_design_rule_check()));
-    out.set_project_library_update(l2s(cmd.projectLibraryUpdate, out.get_project_library_update()));
     out.set_sheet_new(l2s(cmd.sheetNew, out.get_sheet_new()));
     out.set_sheet_rename(l2s(cmd.sheetRename, out.get_sheet_rename()));
     out.set_sheet_remove(l2s(cmd.sheetRemove, out.get_sheet_remove()));

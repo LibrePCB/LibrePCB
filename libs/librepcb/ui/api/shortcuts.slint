@@ -31,8 +31,8 @@ export global Shortcuts {
         } else if Backend.is-shortcut(event, Cmd.project-setup) {
             Backend.trigger-project(project, ProjectAction.open-setup-dialog);
             return true;
-        } else if Backend.is-shortcut(event, Cmd.project-library-update) {
-            Backend.trigger-project(project, ProjectAction.update-library);
+        } else if Backend.is-shortcut(event, Cmd.project-library-manager) {
+            Backend.trigger-project(project, ProjectAction.open-library-manager);
             return true;
         } else if Backend.is-shortcut(event, Cmd.sheet-new) {
             Backend.trigger-project(project, ProjectAction.new-sheet);

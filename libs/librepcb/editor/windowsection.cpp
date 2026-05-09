@@ -35,6 +35,7 @@
 #include "library/sym/symboltab.h"
 #include "project/board/board2dtab.h"
 #include "project/board/board3dtab.h"
+#include "project/library/projectlibrarytab.h"
 #include "project/schematic/schematictab.h"
 #include "utils/deriveduiobjectlist.h"
 #include "windowtab.h"
@@ -93,6 +94,8 @@ WindowSection::WindowSection(GuiApplication& app, MainWindow& win,
         std::make_shared<
             DerivedUiObjectList<TabList, Board3dTab, ui::Board3dTabData>>(
             mTabs),
+        std::make_shared<DerivedUiObjectList<TabList, ProjectLibraryTab,
+                                             ui::ProjectLibraryTabData>>(mTabs),
         -1,  // Current tab index
         false,  // Highlight
     } {

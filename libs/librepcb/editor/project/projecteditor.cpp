@@ -225,6 +225,8 @@ ProjectEditor::ProjectEditor(
 }
 
 ProjectEditor::~ProjectEditor() noexcept {
+  emit aboutToBeDestroyed();
+
   // Stop timers.
   mAutoSaveTimer.stop();
   mErcTimer.stop();
@@ -327,11 +329,6 @@ void ProjectEditor::trigger(ui::ProjectAction a) noexcept {
 
     case ui::ProjectAction::OpenSetupDialog: {
       execSetupDialog();
-      break;
-    }
-
-    case ui::ProjectAction::UpdateLibrary: {
-      emit projectLibraryUpdaterRequested(mProject->getFilepath());
       break;
     }
 
