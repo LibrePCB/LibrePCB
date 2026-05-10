@@ -68,6 +68,14 @@ static int openWorkspace(FilePath& path);
  ******************************************************************************/
 
 int main(int argc, char* argv[]) {
+  // Workaround for issues with libfreetype 2.14 (crash with older Qt versions,
+  // partially missing glyph rendering with Qt 6.11.1), see
+  // https://qt-project.atlassian.net/browse/QTBUG-145783. The problem occurred
+  // with small schematic texts (~<2mm) on relatively large zoom factors.
+  if (qEnvironmentVariableIsEmpty("QT_MAX_CACHED_GLYPH_SIZE")) {
+    qputenv("QT_MAX_CACHED_GLYPH_SIZE", "32");
+  }
+
   QApplication app(argc, argv);
 
   // Give the main thread a higher priority than most other threads as GUI

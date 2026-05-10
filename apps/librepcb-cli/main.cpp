@@ -38,6 +38,12 @@ using namespace librepcb;
  ******************************************************************************/
 
 int main(int argc, char* argv[]) {
+  // From librepcb/main.cpp - not sure if we need this also in the CLI, but
+  // at least it shouldn't hurt.
+  if (qEnvironmentVariableIsEmpty("QT_MAX_CACHED_GLYPH_SIZE")) {
+    qputenv("QT_MAX_CACHED_GLYPH_SIZE", "32");
+  }
+
   // Creates the Debug object which installs the message handler. This must be
   // done as early as possible.
   Debug::instance();
