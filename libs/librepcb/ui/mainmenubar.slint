@@ -788,11 +788,19 @@ export component MainMenuBar {
                 }
 
                 ignore-locks-item := MenuItem {
-                    property <bool> ignore: Data.current-section.board-2d-tabs[Data.current-section.current-tab-index].ignore-placement-locks;
+                    property <bool> ignore: {
+                        if Data.current-tab.type == TabType.schematic {
+                            Data.current-schematic-tab.ignore-placement-locks
+                        } else if Data.current-tab.type == TabType.board-2d {
+                            Data.current-board-2d-tab.ignore-placement-locks
+                        } else {
+                            false
+                        }
+                    };
 
                     cmd: Cmd.ignore-locks;
                     icon: ignore ? @image-url("../../font-awesome/svgs/solid/lock-open.svg") : @image-url("../../font-awesome/svgs/solid/lock.svg");
-                    enabled: Data.current-tab.type == TabType.board-2d;
+                    enabled: (Data.current-tab.type == TabType.schematic) || (Data.current-tab.type == TabType.board-2d);
                     checked: ignore;
 
                     clicked => {

@@ -896,7 +896,10 @@ export global Shortcuts {
         }
 
         // Common shortcuts
-        if Backend.is-shortcut(event, Cmd.tool-select) {
+        if Backend.is-shortcut(event, Cmd.ignore-locks) {
+            Data.current-section.schematic-tabs[tab].ignore-placement-locks = !Data.current-section.schematic-tabs[tab].ignore-placement-locks;
+            return true;
+        } else if Backend.is-shortcut(event, Cmd.tool-select) {
             Backend.trigger-tab(section, tab, TabAction.tool-select);
             return true;
         } else if Backend.is-shortcut(event, Cmd.tool-polygon) {
