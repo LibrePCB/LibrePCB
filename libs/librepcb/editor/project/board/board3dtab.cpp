@@ -277,11 +277,11 @@ slint::Image Board3dTab::renderScene(float width, float height,
   return slint::Image();
 }
 
-bool Board3dTab::processScenePointerEvent(const QPointF& pos,
+void Board3dTab::processScenePointerEvent(const QPointF& pos,
                                           slint::private_api::PointerEvent e,
                                           int scene) noexcept {
   Q_UNUSED(scene);
-  return mView ? mView->pointerEvent(pos, e) : false;
+  if (mView) mView->pointerEvent(pos, e);
 }
 
 bool Board3dTab::processSceneScrolled(const QPointF& pos,

@@ -71,7 +71,7 @@ public:
   virtual void trigger(ui::TabAction a) noexcept;
   virtual slint::Image renderScene(float width, float height,
                                    int scene) noexcept;
-  virtual bool processScenePointerEvent(const QPointF& pos,
+  virtual void processScenePointerEvent(const QPointF& pos,
                                         slint::private_api::PointerEvent e,
                                         int scene) noexcept;
   virtual bool processSceneScrolled(const QPointF& pos,

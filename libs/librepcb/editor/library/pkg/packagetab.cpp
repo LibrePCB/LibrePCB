@@ -1017,14 +1017,14 @@ slint::Image PackageTab::renderScene(float width, float height,
   return slint::Image();
 }
 
-bool PackageTab::processScenePointerEvent(const QPointF& pos,
+void PackageTab::processScenePointerEvent(const QPointF& pos,
                                           slint::private_api::PointerEvent e,
                                           int scene) noexcept {
   Q_UNUSED(scene);
   if (mView3d && mOpenGlView) {
-    return mOpenGlView->pointerEvent(pos, e);
+    mOpenGlView->pointerEvent(pos, e);
   } else {
-    return mView->pointerEvent(pos, e);
+    mView->pointerEvent(pos, e);
   }
 }
 

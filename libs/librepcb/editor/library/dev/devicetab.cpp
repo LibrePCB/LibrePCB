@@ -597,15 +597,13 @@ slint::Image DeviceTab::renderScene(float width, float height,
   }
 }
 
-bool DeviceTab::processScenePointerEvent(const QPointF& pos,
+void DeviceTab::processScenePointerEvent(const QPointF& pos,
                                          slint::private_api::PointerEvent e,
                                          int scene) noexcept {
   if (scene == 0) {
-    return mComponentView->pointerEvent(pos, e);
+    mComponentView->pointerEvent(pos, e);
   } else if (scene == 1) {
-    return mPackageView->pointerEvent(pos, e);
-  } else {
-    return false;
+    mPackageView->pointerEvent(pos, e);
   }
 }
 

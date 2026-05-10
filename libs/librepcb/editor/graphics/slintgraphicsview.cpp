@@ -221,7 +221,7 @@ slint::Image SlintGraphicsView::render(GraphicsScene& scene, float width,
   return q2s(pixmap);
 }
 
-bool SlintGraphicsView::pointerEvent(
+void SlintGraphicsView::pointerEvent(
     const QPointF& pos, slint::private_api::PointerEvent e) noexcept {
   using slint::private_api::PointerEventButton;
   using slint::private_api::PointerEventKind;
@@ -246,49 +246,66 @@ bool SlintGraphicsView::pointerEvent(
 
   if ((e.button == PointerEventButton::Left) &&
       (e.kind == PointerEventKind::Down)) {
-    if (mEventHandler) {
-      if (isDoubleClick) {
-        if (mEventHandler->graphicsSceneLeftMouseButtonDoubleClicked(
-                mMouseEvent)) {
-          // Workaround for sticky button when a dialog is opened. It seems
-          // we don't receive the "button up" event from Slint in that case.
-          mMouseEvent.buttons.setFlag(s2q(e.button), false);
-          return true;
-        }
-      } else {
-        return mEventHandler->graphicsSceneLeftMouseButtonPressed(mMouseEvent);
-      }
+    // Process mouse events asynchronosuly to avoid focus issues as reported
+    // in https://github.com/LibrePCB/LibrePCB/issues/1740.
+    QMetaObject::invokeMethod(
+        this,
+        [this, isDoubleClick, e = mMouseEvent]() {
+          if (mEventHandler) {
+            if (isDoubleClick) {
+              mEventHandler->graphicsSceneLeftMouseButtonDoubleClicked(e);
+            } else {
+              mEventHandler->graphicsSceneLeftMouseButtonPressed(e);
+            }
+          }
+        },
+        Qt::QueuedConnection);
+    // Workaround for sticky button when a dialog is opened. It seems
+    // we don't receive the "button up" event from Slint in that case.
+    if (isDoubleClick) {
+      mMouseEvent.buttons.setFlag(s2q(e.button), false);
     }
   } else if ((e.button == PointerEventButton::Left) &&
              (e.kind == PointerEventKind::Up)) {
-    if (mEventHandler) {
-      return mEventHandler->graphicsSceneLeftMouseButtonReleased(mMouseEvent);
-    }
+    // Since the button down event was processed asynchronously, we should do
+    // the same for the button up event to keep all events in correct order.
+    QMetaObject::invokeMethod(
+        this,
+        [this, e = mMouseEvent]() {
+          if (mEventHandler) {
+            mEventHandler->graphicsSceneLeftMouseButtonReleased(e);
+          }
+        },
+        Qt::QueuedConnection);
   } else if ((e.button == PointerEventButton::Middle) &&
              (e.kind == PointerEventKind::Down)) {
     mPanningStartScreenPos = pos;
     mPanningStartScenePos = scenePosPx;
     mPanning = true;
     emit stateChanged();
-    return true;
   } else if ((e.button == PointerEventButton::Middle) &&
              (e.kind == PointerEventKind::Up)) {
     mPanning = false;
     emit stateChanged();
-    return true;
   } else if ((e.button == PointerEventButton::Right) &&
              (e.kind == PointerEventKind::Down)) {
     mPanningStartScreenPos = pos;
     mPanningStartScenePos = scenePosPx;
-    return true;
   } else if ((e.button == PointerEventButton::Right) &&
              (e.kind == PointerEventKind::Up)) {
     if (mPanning) {
       mPanning = false;
       emit stateChanged();
-      return true;
-    } else if (mEventHandler) {
-      return mEventHandler->graphicsSceneRightMouseButtonReleased(mMouseEvent);
+    } else {
+      // Process asynchronously too to keep all button events in correct order.
+      QMetaObject::invokeMethod(
+          this,
+          [this, e = mMouseEvent]() {
+            if (mEventHandler) {
+              mEventHandler->graphicsSceneRightMouseButtonReleased(e);
+            }
+          },
+          Qt::QueuedConnection);
     }
   } else if (e.kind == PointerEventKind::Move) {
     if ((!mPanning) && (mMouseEvent.buttons.testFlag(Qt::RightButton))) {
@@ -304,13 +321,10 @@ bool SlintGraphicsView::pointerEvent(
       projection.autoFitInView = false;
       projection.offset -= scenePosPx - mPanningStartScenePos;
       applyProjection(projection);
-      return true;
     } else if (mEventHandler) {
-      return mEventHandler->graphicsSceneMouseMoved(mMouseEvent);
+      mEventHandler->graphicsSceneMouseMoved(mMouseEvent);
     }
   }
-
-  return false;
 }
 
 bool SlintGraphicsView::scrollEvent(

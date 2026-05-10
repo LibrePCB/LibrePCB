@@ -90,7 +90,7 @@ public:
   void trigger(ui::TabAction a) noexcept override;
   slint::Image renderScene(float width, float height,
                            int scene) noexcept override;
-  bool processScenePointerEvent(const QPointF& pos,
+  void processScenePointerEvent(const QPointF& pos,
                                 slint::private_api::PointerEvent e,
                                 int scene) noexcept override;
   bool processSceneScrolled(const QPointF& pos,

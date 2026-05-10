@@ -1060,16 +1060,13 @@ slint::Image Board2dTab::renderScene(float width, float height,
   }
 }
 
-bool Board2dTab::processScenePointerEvent(const QPointF& pos,
+void Board2dTab::processScenePointerEvent(const QPointF& pos,
                                           slint::private_api::PointerEvent e,
                                           int scene) noexcept {
   Q_UNUSED(scene);
   mProjectEditor.setCurrentTab(this);
-  if (mView->pointerEvent(pos, e)) {
-    restartIdleTimer();
-    return true;
-  }
-  return false;
+  mView->pointerEvent(pos, e);
+  restartIdleTimer();
 }
 
 bool Board2dTab::processSceneScrolled(const QPointF& pos,

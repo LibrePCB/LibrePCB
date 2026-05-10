@@ -759,12 +759,12 @@ slint::Image SchematicTab::renderScene(float width, float height,
   return slint::Image();
 }
 
-bool SchematicTab::processScenePointerEvent(const QPointF& pos,
+void SchematicTab::processScenePointerEvent(const QPointF& pos,
                                             slint::private_api::PointerEvent e,
                                             int scene) noexcept {
   Q_UNUSED(scene);
   mProjectEditor.setCurrentTab(this);
-  return mView->pointerEvent(pos, e);
+  mView->pointerEvent(pos, e);
 }
 
 bool SchematicTab::processSceneScrolled(
