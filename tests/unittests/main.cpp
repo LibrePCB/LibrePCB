@@ -38,6 +38,12 @@ using namespace librepcb;
  ******************************************************************************/
 
 int main(int argc, char* argv[]) {
+  // From librepcb/main.cpp - not sure if we need this also in the unit tests,
+  // but at least it shouldn't hurt.
+  if (qEnvironmentVariableIsEmpty("QT_MAX_CACHED_GLYPH_SIZE")) {
+    qputenv("QT_MAX_CACHED_GLYPH_SIZE", "32");
+  }
+
   // initialize a common locale for all tests
   QLocale::setDefault(QLocale(QLocale::English, QLocale::UnitedStates));
 
