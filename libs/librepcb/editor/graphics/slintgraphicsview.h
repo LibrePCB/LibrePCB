@@ -102,7 +102,7 @@ public:
   void setEventHandler(IF_GraphicsViewEventHandler* obj) noexcept;
   void setMirror(bool mirror) noexcept;
   slint::Image render(GraphicsScene& scene, float width, float height) noexcept;
-  bool pointerEvent(const QPointF& pos,
+  void pointerEvent(const QPointF& pos,
                     slint::private_api::PointerEvent e) noexcept;
   bool scrollEvent(const QPointF& pos,
                    slint::private_api::PointerScrollEvent e) noexcept;

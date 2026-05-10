@@ -78,7 +78,7 @@ public:
                                        bool* wasCurrent = nullptr) noexcept;
   void triggerTab(int index, ui::TabAction a) noexcept;
   slint::Image renderScene(float width, float height, int scene) noexcept;
-  bool processScenePointerEvent(const QPointF& pos,
+  void processScenePointerEvent(const QPointF& pos,
                                 slint::private_api::PointerEvent e,
                                 int scene) noexcept;
   bool processSceneScrolled(const QPointF& pos,
