@@ -33,9 +33,8 @@ jobs:
             arch: arm64
             deployment_target: '11'
             # Qt 6.7.3 is the last version that runs on macOS 11.
-            # However, it is not available for download anymore so we use Qt 6.5 LTS.
-            qt_url: 'https://qt.mirror.constant.com/archive/qt/6.5/6.5.8/src/single/qt-everywhere-opensource-src-6.5.8.tar.xz'
-            qt_sha256: '4eeb391891b325cd00aed6e42cb4ef966ffeef0877e188c9667a702944760c27'
+            qt_url: 'https://download.qt.io/archive/qt/6.7/6.7.3/single/qt-everywhere-src-6.7.3.tar.xz'
+            qt_sha256: 'a3f1d257cbb14c6536585ffccf7c203ce7017418e1a0c2ed7c316c20c729c801'
           - name: MacOS x86_64
             runner: macos-15-intel  # Must be an x86_64 CPU: https://github.com/actions/runner-images
             arch: x86_64
