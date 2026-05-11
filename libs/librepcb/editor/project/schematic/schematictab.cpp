@@ -281,9 +281,13 @@ ui::TabData SchematicTab::getUiData() const noexcept {
   features.edit_properties = toFs(mToolFeatures.testFlag(Feature::Properties));
   features.find = toFs(true);
 
+  slint::DataTransfer dragData;
+  dragData.set_user_data(TransferData{mWindow ? mWindow->getId(), 0, 0});
+
   return ui::TabData{
       ui::TabType::Schematic,  // Type
       q2s(mSchematicEditor.getDisplayName()),  // Title
+      dragData,  // Drag data
       features,  // Features
       !mProject.getDirectory().isWritable(),  // Read-only
       mProjectEditor.hasUnsavedChanges(),  // Unsaved changes

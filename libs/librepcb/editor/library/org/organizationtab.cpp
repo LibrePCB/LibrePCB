@@ -146,6 +146,7 @@ ui::TabData OrganizationTab::getUiData() const noexcept {
   return ui::TabData{
       ui::TabType::Organization,  // Type
       q2s(*mOrganization->getNames().getDefaultValue()),  // Title
+      slint::DataTransfer(),  // Drag data
       features,  // Features
       !writable,  // Read-only
       hasUnsavedChanges(),  // Unsaved changes

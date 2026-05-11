@@ -93,6 +93,7 @@ ui::TabData ProjectLibraryTab::getUiData() const noexcept {
   return ui::TabData{
       ui::TabType::ProjectLibrary,  // Type
       q2s(*mProject.getName()),  // Title
+      slint::DataTransfer(),  // Drag data
       features,  // Features
       !mProject.getDirectory().isWritable(),  // Read-only
       mProjectEditor.hasUnsavedChanges(),  // Unsaved changes

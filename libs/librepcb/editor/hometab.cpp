@@ -49,6 +49,7 @@ ui::TabData HomeTab::getUiData() const noexcept {
   return ui::TabData{
       ui::TabType::Home,  // Type
       slint::SharedString(),  // Title
+      slint::DataTransfer(),  // Drag data
       ui::TabFeatures{},  // Features
       false,  // Read-only
       false,  // Unsaved changes

@@ -149,6 +149,7 @@ ui::TabData LibraryTab::getUiData() const noexcept {
   return ui::TabData{
       ui::TabType::Library,  // Type
       q2s(*mLibrary.getNames().getDefaultValue()),  // Title
+      slint::DataTransfer(),  // Drag data
       features,  // Features
       !mLibrary.getDirectory().isWritable(),  // Read-only
       mEditor.hasUnsavedChanges(),  // Unsaved changes

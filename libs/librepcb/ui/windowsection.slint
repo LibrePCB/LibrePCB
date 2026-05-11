@@ -39,11 +39,12 @@ component TabDropArea inherits DropArea {
     in property <bool> force-switch-to-tab: false;
 
     can-drop(event) => {
-        (event.mime-type == Constants.drag-tab-mime-type) && (event.data != id)
+        false;
+        //(event.mime-type == Constants.drag-tab-mime-type) && (event.data != id)
     }
 
     dropped(event) => {
-        Backend.drop-tab(event.data, id, force-switch-to-tab);
+        //Backend.drop-tab(event.data, id, force-switch-to-tab);
     }
 }
 
@@ -93,8 +94,8 @@ component TabButton inherits Rectangle {
     }
 
     DragArea {
-        mime-type: Constants.drag-tab-mime-type;
-        data: drop-id;
+        //mime-type: Constants.drag-tab-mime-type;
+        //data: drop-id;
         enabled: !tab.title.is-empty;  // The home tab shall not be draggable
 
         ta := TouchArea {

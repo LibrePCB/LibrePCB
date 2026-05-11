@@ -241,6 +241,7 @@ ui::TabData SymbolTab::getUiData() const noexcept {
   return ui::TabData{
       ui::TabType::Symbol,  // Type
       q2s(*mSymbol->getNames().getDefaultValue()),  // Title
+      slint::DataTransfer(),  // Drag data
       features,  // Features
       !writable,  // Read-only
       hasUnsavedChanges(),  // Unsaved changes

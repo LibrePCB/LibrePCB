@@ -80,6 +80,7 @@ ui::TabData CreateLibraryTab::getUiData() const noexcept {
   return ui::TabData{
       ui::TabType::CreateLibrary,  // Type
       q2s(tr("New Library")),  // Title
+      slint::DataTransfer(),  // Drag data
       ui::TabFeatures{},  // Features
       false,  // Read-only
       false,  // Unsaved changes

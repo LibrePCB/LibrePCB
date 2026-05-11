@@ -53,6 +53,12 @@ class WindowTab : public QObject {
   Q_OBJECT
 
 public:
+  struct TransferData {
+    int windowId;
+    int sectionIndex;
+    int tabIndex;
+  };
+
   // Signals
   Signal<WindowTab> onUiDataChanged;
 

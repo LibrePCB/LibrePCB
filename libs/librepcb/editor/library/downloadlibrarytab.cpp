@@ -75,6 +75,7 @@ ui::TabData DownloadLibraryTab::getUiData() const noexcept {
   return ui::TabData{
       ui::TabType::DownloadLibrary,  // Type
       q2s(tr("Download Library")),  // Title
+      slint::DataTransfer(),  // Drag data
       ui::TabFeatures{},  // Features
       false,  // Read-only
       false,  // Unsaved changes

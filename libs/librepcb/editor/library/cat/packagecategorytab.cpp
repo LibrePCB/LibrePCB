@@ -120,6 +120,7 @@ ui::TabData PackageCategoryTab::getUiData() const noexcept {
   return ui::TabData{
       ui::TabType::PackageCategory,  // Type
       q2s(*mCategory->getNames().getDefaultValue()),  // Title
+      slint::DataTransfer(),  // Drag data
       features,  // Features
       !writable,  // Read-only
       hasUnsavedChanges(),  // Unsaved changes

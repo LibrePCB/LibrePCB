@@ -168,6 +168,7 @@ ui::TabData ComponentTab::getUiData() const noexcept {
   return ui::TabData{
       ui::TabType::Component,  // Type
       q2s(*mComponent->getNames().getDefaultValue()),  // Title
+      slint::DataTransfer(),  // Drag data
       features,  // Features
       !writable,  // Read-only
       hasUnsavedChanges(),  // Unsaved changes

@@ -309,6 +309,7 @@ ui::TabData PackageTab::getUiData() const noexcept {
   return ui::TabData{
       ui::TabType::Package,  // Type
       q2s(*mPackage->getNames().getDefaultValue()),  // Title
+      slint::DataTransfer(),  // Drag data
       features,  // Features
       !writable,  // Read-only
       hasUnsavedChanges(),  // Unsaved changes

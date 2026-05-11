@@ -251,6 +251,7 @@ ui::TabData DeviceTab::getUiData() const noexcept {
   return ui::TabData{
       ui::TabType::Device,  // Type
       q2s(*mDevice->getNames().getDefaultValue()),  // Title
+      slint::DataTransfer(),  // Drag data
       features,  // Features
       !writable,  // Read-only
       hasUnsavedChanges(),  // Unsaved changes
