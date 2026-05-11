@@ -387,6 +387,13 @@ class Application(slint_testing.Application):
     def get(self, path, window=0):
         return self.root(window=window).get(path)
 
+    def trigger_shortcut(self, keys, window=0):
+        win = self.windows[window]
+        for key in keys:
+            win.dispatch_event(slint_testing.KeyPressedEvent(key))
+        for key in keys:
+            win.dispatch_event(slint_testing.KeyReleasedEvent(key))
+
 
 class LibrePcbFixture(object):
     def __init__(self, config, tmpdir):
@@ -450,6 +457,14 @@ class LibrePcbFixture(object):
         content = content.replace(old_value, f"(library_updates {mode})")
         with open(fp, "w") as f:
             f.write(content)
+
+    def set_keyboard_shortcut(self, id, shortcut):
+        fp = self.get_workspace_path("data/settings.lp")
+        with open(fp, "r") as f:
+            lines = f.read().splitlines()
+        lines.insert(1, f' (keyboard_shortcuts (shortcut {id} "{shortcut}"))')
+        with open(fp, "w") as f:
+            f.write("\n".join(lines))
 
     def add_project(self, project, as_lppz=False):
         src = os.path.join(DATA_DIR, "projects", project)

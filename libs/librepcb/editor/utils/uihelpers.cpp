@@ -365,7 +365,7 @@ bool isShortcut(const slint::private_api::KeyEvent& e,
 
   // Find the command with the corresponding keyboard shortcut.
   if (const EditorCommand* c = map.value(cmd.id)) {
-    for (const QKeySequence& seq : c->getDefaultKeySequences()) {
+    for (const QKeySequence& seq : c->getKeySequences()) {
       if (isKeySequence(e, seq)) {
         return true;
       }
