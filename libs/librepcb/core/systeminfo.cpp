@@ -46,7 +46,7 @@
 #if defined(Q_OS_SOLARIS)
 #include <libproc.h>
 #endif
-#if defined(Q_OS_OPENBSD)
+#if defined(Q_OS_OPENBSD) || defined(Q_OS_FREEBSD)
 #include <sys/sysctl.h>
 #endif
 #elif defined(Q_OS_WIN32) || defined(Q_OS_WIN64)  // Windows
@@ -272,15 +272,17 @@ QString SystemInfo::getProcessNameByPid(qint64 pid) {
                        tr("proc_name() failed with error %1.").arg(errno));
   }
 #elif defined(Q_OS_FREEBSD)
-  char exePath[64];
-  char buf[PATH_MAX + 1];
-  sprintf(exePath, "/proc/%lld/file", pid);
-  size_t len = (size_t)readlink(exePath, buf, sizeof(buf));
-  if (len >= sizeof(buf)) {
-    return QString();  // process not running
+  char pathbuf[PATH_MAX] = { 0, };
+  size_t pathbufsz = PATH_MAX;
+  int mib[4] = { CTL_KERN, KERN_PROC, KERN_PROC_PATHNAME, static_cast<pid_t>(pid) };
+  if (sysctl(mib, 4, pathbuf, &pathbufsz, NULL, 0) != 0) {
+    int saved_errno = errno;
+    throw RuntimeError(__FILE__, __LINE__,
+                       tr("sysctl() failed with errno=%1 (%2).")
+                           .arg(saved_errno)
+                           .arg(QString::fromLocal8Bit(strerror(saved_errno))));
   }
-  buf[len] = 0;
-  processName = QFileInfo(QFile::decodeName(buf)).fileName();
+  processName = QFileInfo(QFile::decodeName(pathbuf)).fileName();
 #elif defined(Q_OS_OPENBSD)
   // https://man.openbsd.org/sysctl.2
   // NOTE: This will return only the first 16 bytes of the process name. If
