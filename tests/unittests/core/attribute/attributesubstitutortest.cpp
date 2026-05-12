@@ -68,8 +68,8 @@ TEST_P(AttributeSubstitutorTest, testData) {
   const AttributeSubstitutorTestData& data = GetParam();
 
   QString output = AttributeSubstitutor::substitute(data.input, &lookup);
-  EXPECT_EQ(data.output, output)
-      << "Actual value: '" << qPrintable(output) << "'";
+  EXPECT_EQ(data.output, output) << "'" << qPrintable(output) << "' != '"
+                                 << qPrintable(data.output) << "'";
 }
 
 /*******************************************************************************
@@ -88,13 +88,13 @@ INSTANTIATE_TEST_SUITE_P(AttributeSubstitutorTest, AttributeSubstitutorTest, ::t
     //ASTD({"{{KEY_1}} {{KEY_1}}",                "Normal value Normal value"}),
     ASTD({"some {}}}{{ noise",                  "some {}}}{{ noise"}),
     ASTD({"{{KEY_2}}",                          "Value with {}}}{{ noise"}),
-    ASTD({"{{KEY_3}}",                          "Recursive  value"}),
+    ASTD({"{{KEY_3}}",                          "Recursive value"}),
     ASTD({"{{KEY_4}}",                          "Recursive Normal value value"}),
     ASTD({"{{KEY_5}}",                          "Recursive Recursive Normal value value value"}),
-    ASTD({"{{KEY_6}}",                          "Endless Endless  part 2 part 1"}),
-    ASTD({"{{KEY_7}}",                          "Endless Endless  part 1 part 2"}),
-    ASTD({"Foo {KEY_7 }}{{KEY_7}} {{KEYY}}",    "Foo {KEY_7 }}Endless Endless  part 1 part 2 "}),
-    ASTD({"{{KEY_3}} foo{ { KEY_5}} {{KEY}}",   "Recursive  value foo{ { KEY_5}} "}),
+    ASTD({"{{KEY_6}}",                          "Endless Endless part 2 part 1"}),
+    ASTD({"{{KEY_7}}",                          "Endless Endless part 1 part 2"}),
+    ASTD({"Foo {KEY_7 }}{{KEY_7}} {{KEYY}}",    "Foo {KEY_7 }}Endless Endless part 1 part 2"}),
+    ASTD({"{{KEY_3}} foo{ { KEY_5}} {{KEY}}",   "Recursive value foo{ { KEY_5}}"}),
     ASTD({"{{KEY_1}} {{KEY_2 or KEY_3}} foo",   "Normal value Value with {}}}{{ noise foo"}),
     //ASTD({"{{KEY_8 or KEY_1}}",                 "Normal value"}),
     //ASTD({"{{KEY or KEY_4 or KEY_3}} {{KEY_1}}","Recursive Normal value value Normal value"}),
@@ -106,7 +106,24 @@ INSTANTIATE_TEST_SUITE_P(AttributeSubstitutorTest, AttributeSubstitutorTest, ::t
     ASTD({"{{ '{{' }}",                         "{{"}),
     ASTD({"{{ '}}' }}",                         "}}"}),
     ASTD({"{{KEY_1}}KEY_2",                     "Normal valueKEY_2"}),
-    ASTD({"{{KEY_1 or FOO}} or KEY_1",          "Normal value or KEY_1"})
+    ASTD({"{{KEY_1 or FOO}} or KEY_1",          "Normal value or KEY_1"}),
+    // Whitespace trimming
+    ASTD({"{{KEY_1}} {{KEY_8}} foo",            "Normal value foo"}),
+    ASTD({"{{KEY_1}} {{NONEXISTENT}} foo",      "Normal value foo"}),
+    ASTD({"{{NONEXISTENT}} {{KEY_1}} foo",      "Normal value foo"}),
+    ASTD({"{{KEY}} {{KEY_1}} foo",              "Normal value foo"}),
+    ASTD({"{{KEY}} {{KEY_1}} {{KEY}}",          "Normal value"}),
+    ASTD({"{{KEY}} {{KEY}} {{KEY}}",            ""}),
+    ASTD({"{{NONEXISTENT}} {{NONEXISTENT}}",    ""}),
+    // Newline trimming
+    ASTD({"{{KEY_1}}\n{{KEY_8}}\nfoo",          "Normal value\nfoo"}),
+    ASTD({"{{KEY_1}}\n{{NONEXISTENT}}\nfoo",    "Normal value\nfoo"}),
+    ASTD({"{{NONEXISTENT}}\n{{KEY_1}}\nfoo",    "Normal value\nfoo"}),
+    ASTD({"{{KEY}}\n{{KEY_1}}\nfoo",            "Normal value\nfoo"}),
+    ASTD({"{{KEY}}\n{{KEY_1}}\n{{KEY}}",        "Normal value"}),
+    ASTD({"{{KEY}}\n{{KEY}}\n{{KEY}}",          ""}),
+    ASTD({"{{NONEXISTENT}}\n{{NONEXISTENT}}",   ""}),
+    ASTD({"Foo\n\nBar",                         "Foo\n\nBar"})
 ));
 // clang-format on
 
