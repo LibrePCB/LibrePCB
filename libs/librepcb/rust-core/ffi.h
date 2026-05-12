@@ -530,7 +530,12 @@ double ffi_math_arc_radius_and_center(double dx,
 /**
  * Wrapper for [increment_number_in_string]
  */
-void ffi_increment_number_in_string(QString * NONNULL s);
+void ffi_toolbox_increment_number_in_string(QString * NONNULL s);
+
+/**
+ * Wrapper for [lz_str::decompress_from_base64]
+ */
+bool ffi_toolbox_decode_base64_lzstring(QString * NONNULL s);
 
 /**
  * Create a new [ZipArchive] object from file path
