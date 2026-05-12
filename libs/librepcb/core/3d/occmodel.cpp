@@ -47,6 +47,7 @@
 #include <Message_Messenger.hxx>
 #include <Message_Printer.hxx>
 #include <Message_SequenceOfPrinters.hxx>
+#include <NCollection_List.hxx>
 #include <Poly_Triangulation.hxx>
 #include <Quantity_Color.hxx>
 #include <Standard_Version.hxx>
@@ -616,9 +617,9 @@ std::unique_ptr<OccModel> OccModel::createBoard(const librepcb::Path& outline,
       // Cutting fails if there are no holes.
       face = pathToFace(outline.cleaned(), Length(0));
     } else {
-      TopTools_ListOfShape boardFaces;
+      NCollection_List<TopoDS_Shape> boardFaces;
       boardFaces.Append(pathToFace(outline.cleaned(), Length(0)));
-      TopTools_ListOfShape holeFaces;
+      NCollection_List<TopoDS_Shape> holeFaces;
       foreach (const Path& hole, holes) {
         holeFaces.Append(pathToFace({hole.cleaned()}, Length(0)));
       }
