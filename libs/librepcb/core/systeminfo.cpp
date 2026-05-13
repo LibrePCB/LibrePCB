@@ -272,27 +272,30 @@ QString SystemInfo::getProcessNameByPid(qint64 pid) {
                        tr("proc_name() failed with error %1.").arg(errno));
   }
 #elif defined(Q_OS_FREEBSD)
-  char pathbuf[PATH_MAX] = { 0, };
+  char pathbuf[PATH_MAX] = {
+      0,
+  };
   size_t pathbufsz = PATH_MAX;
-  int mib[4] = { CTL_KERN, KERN_PROC, KERN_PROC_PATHNAME, static_cast<pid_t>(pid) };
+  int mib[4] = {CTL_KERN, KERN_PROC, KERN_PROC_PATHNAME,
+                static_cast<pid_t>(pid)};
   int rc = sysctl(mib, 4, pathbuf, &pathbufsz, NULL, 0);
   if (rc == -1) {
     switch (errno) {
-      case ESRCH: // explicitly No such process
+      case ESRCH:  // explicitly No such process
         return QString();
-      break;
       default: {
         int saved_errno = errno;
-        char errbuf[512] = { 0, };
-        // Should 512 not be enough, the error string returned by strerror_r() will
-        // be truncated but still be nul-terminated
+        char errbuf[512] = {
+            0,
+        };
+        // Should 512 not be enough, the error string returned by strerror_r()
+        // will be truncated but still be nul-terminated.
         strerror_r(saved_errno, errbuf, sizeof(errbuf));
         throw RuntimeError(__FILE__, __LINE__,
                            tr("sysctl() failed with errno=%1 (%2).")
                                .arg(saved_errno)
                                .arg(QString::fromLocal8Bit(errbuf)));
       }
-      break;
     }
   }
   processName = QFileInfo(QFile::decodeName(pathbuf)).fileName();
