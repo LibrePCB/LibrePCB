@@ -950,6 +950,11 @@ export global Shortcuts {
             } else if Backend.is-shortcut(event, Cmd.layer-down) && (Data.current-section.board-2d-tabs[tab].tool-layer.current-index < (Data.current-section.board-2d-tabs[tab].tool-layer.items.length - 1)) {
                 Data.current-section.board-2d-tabs[tab].tool-layer.current-index += 1;
                 return true;
+            } else if Backend.is-shortcut(event, Cmd.flip-horizontal) {
+                // Support 'f' shortcut for toggling between top/bottom layers, see
+                // https://librepcb.discourse.group/t/wire-routing-controls/1032.
+                Data.current-section.board-2d-tabs[tab].tool-layer.current-index = (Data.current-section.board-2d-tabs[tab].tool-layer.items.length - 1) - Data.current-section.board-2d-tabs[tab].tool-layer.current-index;
+                return true;
             } else if Backend.is-shortcut(event, Cmd.line-width-increase) {
                 Data.current-section.board-2d-tabs[tab].tool-line-width.increase = true;
                 return true;
