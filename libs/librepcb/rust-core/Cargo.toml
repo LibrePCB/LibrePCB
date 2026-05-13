@@ -16,6 +16,7 @@ cbindgen = { version = "0.27", optional = true }
 [dependencies]
 interactive-html-bom = "0.2.0"
 libm = "0.2.16"
+lz-str = "0.2.1"  # Keep in sync with interactive-html-bom
 
 [dependencies.regex]
 version = "1.11"

@@ -172,7 +172,7 @@ UnsignedLength Toolbox::shortestDistanceBetweenPointAndLine(
 }
 
 QString Toolbox::incrementNumberInString(QString string) noexcept {
-  rs::ffi_increment_number_in_string(&string);
+  rs::ffi_toolbox_increment_number_in_string(&string);
   return string;
 }
 

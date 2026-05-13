@@ -267,6 +267,7 @@ dependencies = [
  "cbindgen",
  "interactive-html-bom",
  "libm",
+ "lz-str",
  "parameterized_test",
  "regex",
  "zip",

@@ -55,8 +55,7 @@ QString AttributeSubstitutor::substitute(QString str, LookupFunction lookup,
       if (key.startsWith('\'') && key.endsWith('\'')) {
         // replace "{{'VALUE'}}" with "VALUE"
         str.replace(startPos, length, key.mid(1, key.length() - 2));
-        startPos +=
-            key.length() - 2;  // do not search for variables in the value
+        startPos += key.length() - 2;  // Do not search for variables in value
         keyFound = true;
         break;
       } else if ((getValueOfKey(key, value, lookup)) &&
@@ -69,7 +68,17 @@ QString AttributeSubstitutor::substitute(QString str, LookupFunction lookup,
       }
     }
     if (!keyFound) {
-      // attribute not found, remove "{{KEY}}" from str
+      // Attribute not found, remove "{{KEY}}" from str.
+      if ((startPos + length == str.length()) && (startPos > 0) &&
+          (str.at(startPos - 1).isSpace())) {
+        // At the end of str, also remove leading whitespace of "{{KEY}}".
+        --startPos;
+        ++length;
+      } else if ((str.length() > startPos + length) &&
+                 str.at(startPos + length).isSpace()) {
+        // Not the end of str, remove a trailing whitespace after "{{KEY}}".
+        ++length;
+      }
       str.remove(startPos, length);
     }
   }

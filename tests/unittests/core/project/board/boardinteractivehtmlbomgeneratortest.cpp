@@ -29,6 +29,7 @@
 #include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectloader.h>
+#include <librepcb/rust-core/ffi.h>
 
 #include <QtCore>
 
@@ -55,7 +56,7 @@ TEST_F(BoardInteractiveHtmlBomGeneratorTest, test) {
       TEST_DATA_DIR
       "/unittests/librepcbproject/BoardInteractiveHtmlBomGeneratorTest");
 
-  // open project from test data directory
+  // Open project from test data directory.
   FilePath projectFp(TEST_DATA_DIR "/projects/Gerber Test/project.lpp");
   std::shared_ptr<TransactionalFileSystem> projectFs =
       TransactionalFileSystem::openRO(projectFp.getParentDir());
@@ -64,7 +65,7 @@ TEST_F(BoardInteractiveHtmlBomGeneratorTest, test) {
       loader.open(std::make_unique<TransactionalDirectory>(projectFs),
                   projectFp.getFilename());  // can throw
 
-  // export BOM
+  // Export BOM.
   Board* board = project->getBoards().first();
   BoardInteractiveHtmlBomGenerator gen(
       *board, project->getCircuit().getAssemblyVariants().first());
@@ -72,14 +73,24 @@ TEST_F(BoardInteractiveHtmlBomGeneratorTest, test) {
       gen.generate(QDateTime::fromSecsSinceEpoch(9, Qt::UTC));
   const QString actual = ibom->generateHtml();
 
-  // write to file
-  const FilePath fp = testDataDir.getPathTo("actual.html");
-  FileUtils::writeFile(fp, actual.toUtf8());
+  // For better diffs, extract the compressed data string (lz-string).
+  QRegularExpression re("var pcbdata =.*\\\"(.*)\\\"");
+  QString data = re.match(actual).captured(1);  // NOLINT
+  const bool success = rs::ffi_toolbox_decode_base64_lzstring(&data);
+  EXPECT_TRUE(success);
+  data = QJsonDocument::fromJson(data.toUtf8()).toJson(QJsonDocument::Indented);
 
-  // compare generated files with expected content
-  const QString expected =
-      FileUtils::readFile(testDataDir.getPathTo("expected.html"));
-  EXPECT_EQ(expected.toStdString(), actual.toStdString());
+  // Write to files.
+  FileUtils::writeFile(testDataDir.getPathTo("actual.html"), actual.toUtf8());
+  FileUtils::writeFile(testDataDir.getPathTo("actual.json"), data.toUtf8());
+
+  // Compare generated files with expected content.
+  EXPECT_EQ(
+      FileUtils::readFile(testDataDir.getPathTo("expected.html")).toStdString(),
+      actual.toStdString());
+  EXPECT_EQ(
+      FileUtils::readFile(testDataDir.getPathTo("expected.json")).toStdString(),
+      data.toStdString());
 }
 
 /*******************************************************************************
