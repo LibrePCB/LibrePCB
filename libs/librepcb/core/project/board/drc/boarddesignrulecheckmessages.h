@@ -272,6 +272,51 @@ public:
 };
 
 /*******************************************************************************
+ *  Class DrcMsgIntersectingBoardOutlines
+ ******************************************************************************/
+
+/**
+ * @brief The DrcMsgIntersectingBoardOutlines class
+ */
+class DrcMsgIntersectingBoardOutlines final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(DrcMsgIntersectingBoardOutlines)
+
+public:
+  using Data = BoardDesignRuleCheckData;
+
+  // Constructors / Destructor
+  explicit DrcMsgIntersectingBoardOutlines(
+      const Data::Polygon& polygon1, const Data::Device* device1,
+      const Data::Polygon& polygon2, const Data::Device* device2,
+      const QVector<Path>& locations) noexcept;
+  DrcMsgIntersectingBoardOutlines(
+      const DrcMsgIntersectingBoardOutlines& other) noexcept
+    : RuleCheckMessage(other) {}
+  ~DrcMsgIntersectingBoardOutlines() noexcept override {}
+};
+
+/*******************************************************************************
+ *  Class DrcMsgCutoutOutsideBoardArea
+ ******************************************************************************/
+
+/**
+ * @brief The DrcMsgCutoutOutsideBoardArea class
+ */
+class DrcMsgCutoutOutsideBoardArea final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(DrcMsgCutoutOutsideBoardArea)
+
+public:
+  // Constructors / Destructor
+  explicit DrcMsgCutoutOutsideBoardArea(
+      const Uuid& polygon, const std::optional<Uuid>& device,
+      const QVector<Path>& locations) noexcept;
+  DrcMsgCutoutOutsideBoardArea(
+      const DrcMsgCutoutOutsideBoardArea& other) noexcept
+    : RuleCheckMessage(other) {}
+  ~DrcMsgCutoutOutsideBoardArea() noexcept override {}
+};
+
+/*******************************************************************************
  *  Class DrcMsgMinimumBoardOutlineInnerRadiusViolation
  ******************************************************************************/
 

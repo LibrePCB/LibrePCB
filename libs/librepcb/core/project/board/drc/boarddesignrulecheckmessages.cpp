@@ -283,6 +283,79 @@ DrcMsgOpenBoardOutlinePolygon::DrcMsgOpenBoardOutlinePolygon(
 }
 
 /*******************************************************************************
+ *  DrcMsgIntersectingBoardOutlines
+ ******************************************************************************/
+
+DrcMsgIntersectingBoardOutlines::DrcMsgIntersectingBoardOutlines(
+    const Data::Polygon& polygon1, const Data::Device* device1,
+    const BoardDesignRuleCheckData::Polygon& polygon2,
+    const BoardDesignRuleCheckData::Device* device2,
+    const QVector<Path>& locations) noexcept
+  : RuleCheckMessage(
+        Severity::Error, tr("Intersecting board outlines"),
+        tr("Two board outline polygons are intersecting each other, which will "
+           "lead to invalid production data.") %
+            "\n\n" %
+            tr("Make sure there is exactly one board outline polygon. Cutouts "
+               "at the board edge need to be part of the board outline "
+               "polygon, not separate polygons. Cutouts inside the board need "
+               "to be drawn on the '%1' layer.")
+                .arg(Layer::boardCutouts().getNameTr()),
+        "intersecting_board_outlines", locations) {
+  auto serialize = [](SExpression& node, const Data::Polygon& polygon,
+                      const Data::Device* device) {
+    node.ensureLineBreak();
+    if (device) {
+      node.appendChild("device", device->uuid);
+      node.ensureLineBreak();
+      node.appendChild("polygon", polygon.uuid);
+    } else {
+      node.appendChild("polygon", polygon.uuid);
+    }
+    node.ensureLineBreak();
+  };
+
+  mApproval->ensureLineBreak();
+  SExpression& node1 = mApproval->appendList("object");
+  mApproval->ensureLineBreak();
+  SExpression& node2 = mApproval->appendList("object");
+  mApproval->ensureLineBreak();
+
+  // Sort nodes to make the approval canonical.
+  serialize(node1, polygon1, device1);
+  serialize(node2, polygon2, device2);
+  if (node2 < node1) {
+    std::swap(node1, node2);
+  }
+}
+
+/*******************************************************************************
+ *  DrcMsgCutoutOutsideBoardArea
+ ******************************************************************************/
+
+DrcMsgCutoutOutsideBoardArea::DrcMsgCutoutOutsideBoardArea(
+    const Uuid& polygon, const std::optional<Uuid>& device,
+    const QVector<Path>& locations) noexcept
+  : RuleCheckMessage(
+        Severity::Error, tr("Cutout outside of board area"),
+        tr("A cutout polygon is outside the board area (either partially or "
+           "fully), which will lead to invalid production data.") %
+            "\n\n" %
+            tr("Make sure all cutouts are fully inside the board area. "
+               "Cutouts at the board edge need to be part of the board "
+               "outlines polygon on the '%1' layer, not separate polygons.")
+                .arg(Layer::boardOutlines().getNameTr()),
+        "cutout_outside_board_area", locations) {
+  mApproval->ensureLineBreak();
+  if (device) {
+    mApproval->appendChild("device", *device);
+    mApproval->ensureLineBreak();
+  }
+  mApproval->appendChild("polygon", polygon);
+  mApproval->ensureLineBreak();
+}
+
+/*******************************************************************************
  *  DrcMsgMinimumBoardOutlineInnerRadiusViolation
  ******************************************************************************/
 

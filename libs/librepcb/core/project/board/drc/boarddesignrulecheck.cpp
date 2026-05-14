@@ -1989,32 +1989,44 @@ RuleCheckMessageList BoardDesignRuleCheck::checkBoardOutline(const Data& data) {
   RuleCheckMessageList messages;
   emitStatus(tr("Check board outline..."));
 
-  // Report all open polygons.
+  // Collect all valid outlines and report all open polygons.
+  struct Object {
+    const Data::Polygon* polygon;  // Always non-null.
+    const Data::Device* device;  // Can be nullptr.
+    Path path;  // In global board coordinates.
+  };
+  QVector<Object> closedOutlinesAndCutouts;
   const QSet<const Layer*> allOutlineLayers = {
       &Layer::boardOutlines(),
       &Layer::boardCutouts(),
       &Layer::boardPlatedCutouts(),
   };
   for (const Data::Polygon& polygon : data.polygons) {
-    if (allOutlineLayers.contains(polygon.layer) &&
-        (!polygon.path.isClosed())) {
-      const QVector<Path> locations = polygon.path.toOutlineStrokes(
-          PositiveLength(std::max(*polygon.lineWidth, Length(100000))));
-      messages.append(std::make_shared<DrcMsgOpenBoardOutlinePolygon>(
-          polygon.uuid, std::nullopt, locations));
+    if (allOutlineLayers.contains(polygon.layer)) {
+      if (polygon.path.isClosed()) {
+        closedOutlinesAndCutouts.append(
+            Object{&polygon, nullptr, polygon.path});
+      } else {
+        const QVector<Path> locations = polygon.path.toOutlineStrokes(
+            PositiveLength(std::max(*polygon.lineWidth, Length(100000))));
+        messages.append(std::make_shared<DrcMsgOpenBoardOutlinePolygon>(
+            polygon.uuid, std::nullopt, locations));
+      }
     }
   }
   for (const Data::Device& dev : data.devices) {
     Transform transform(dev.position, dev.rotation, dev.mirror);
     for (const Data::Polygon& polygon : dev.polygons) {
-      if (allOutlineLayers.contains(polygon.layer) &&
-          (!polygon.path.isClosed())) {
-        const QVector<Path> locations =
-            transform.map(polygon.path)
-                .toOutlineStrokes(PositiveLength(
-                    std::max(*polygon.lineWidth, Length(100000))));
-        messages.append(std::make_shared<DrcMsgOpenBoardOutlinePolygon>(
-            polygon.uuid, dev.uuid, locations));
+      const Path path = transform.map(polygon.path);
+      if (allOutlineLayers.contains(polygon.layer)) {
+        if (polygon.path.isClosed()) {
+          closedOutlinesAndCutouts.append(Object{&polygon, &dev, path});
+        } else {
+          const QVector<Path> locations = path.toOutlineStrokes(
+              PositiveLength(std::max(*polygon.lineWidth, Length(100000))));
+          messages.append(std::make_shared<DrcMsgOpenBoardOutlinePolygon>(
+              polygon.uuid, dev.uuid, locations));
+        }
       }
     }
   }
@@ -2028,12 +2040,47 @@ RuleCheckMessageList BoardDesignRuleCheck::checkBoardOutline(const Data& data) {
     messages.append(std::make_shared<DrcMsgMultipleBoardOutlines>(outlines));
   }
 
-  // Determine actually drawn board area.
-  QVector<Path> allOutlines = getBoardOutlines(data, allOutlineLayers);
-  ClipperLib::Paths drawnBoardArea =
-      ClipperHelpers::convert(allOutlines, maxArcTolerance());
-  const std::unique_ptr<ClipperLib::PolyTree> drawnBoardAreaTree =
-      ClipperHelpers::uniteToTree(drawnBoardArea, ClipperLib::pftEvenOdd);
+  // Check for intersections between several board outlines.
+  for (int i = 0; i < closedOutlinesAndCutouts.count(); ++i) {
+    const Object& obj1 = closedOutlinesAndCutouts.at(i);
+    for (int k = i + 1; k < closedOutlinesAndCutouts.count(); ++k) {
+      const Object& obj2 = closedOutlinesAndCutouts.at(k);
+      if ((obj1.polygon->layer == &Layer::boardOutlines()) &&
+          (obj2.polygon->layer == &Layer::boardOutlines())) {
+        ClipperLib::Paths intersections{
+            ClipperHelpers::convert(obj1.path, maxArcTolerance())};
+        ClipperHelpers::intersect(
+            intersections,
+            {ClipperHelpers::convert(obj2.path, maxArcTolerance())},
+            ClipperLib::pftEvenOdd, ClipperLib::pftEvenOdd);
+        if (!intersections.empty()) {
+          messages.append(std::make_shared<DrcMsgIntersectingBoardOutlines>(
+              *obj1.polygon, obj1.device, *obj2.polygon, obj2.device,
+              ClipperHelpers::convert(intersections)));
+        }
+      }
+    }
+  }
+
+  // Check if there are any cutouts located outside the board outline.
+  // Intended especially to catch cutouts at the board edge which were made
+  // with separate polygons instead of drawing a single board outline polygon.
+  ClipperLib::Paths outlinesArea =
+      ClipperHelpers::convert(outlines, maxArcTolerance());
+  for (const Object& obj : std::as_const(closedOutlinesAndCutouts)) {
+    if (obj.polygon->layer != &Layer::boardOutlines()) {
+      ClipperLib::Paths subtraction{
+          ClipperHelpers::convert(obj.path, maxArcTolerance())};
+      ClipperHelpers::subtract(subtraction, outlinesArea,
+                               ClipperLib::pftNonZero, ClipperLib::pftNonZero);
+      if (!subtraction.empty()) {
+        messages.append(std::make_shared<DrcMsgCutoutOutsideBoardArea>(
+            obj.polygon->uuid,
+            obj.device ? obj.device->uuid : std::optional<Uuid>(),
+            ClipperHelpers::convert(subtraction)));
+      }
+    }
+  }
 
   // Check if the board outline can be manufactured with the smallest tool.
   const UnsignedLength minEdgeRadius(data.settings.getMinOutlineToolDiameter() /
@@ -2041,12 +2088,16 @@ RuleCheckMessageList BoardDesignRuleCheck::checkBoardOutline(const Data& data) {
   if (minEdgeRadius > 0) {
     const Length offset1 = std::max(minEdgeRadius - Length(10000), Length(0));
     const Length offset2 = -minEdgeRadius;
-    drawnBoardArea = ClipperHelpers::treeToPaths(*drawnBoardAreaTree);
-    ClipperLib::Paths nonManufacturableAreas = drawnBoardArea;
+    const QVector<Path> cutouts = getBoardOutlines(
+        data, {&Layer::boardCutouts(), &Layer::boardPlatedCutouts()});
+    ClipperHelpers::subtract(
+        outlinesArea, ClipperHelpers::convert(cutouts, maxArcTolerance()),
+        ClipperLib::pftNonZero, ClipperLib::pftNonZero);
+    ClipperLib::Paths nonManufacturableAreas = outlinesArea;
     ClipperHelpers::offset(nonManufacturableAreas, offset1, maxArcTolerance());
     ClipperHelpers::offset(nonManufacturableAreas, offset2, maxArcTolerance());
     const std::unique_ptr<ClipperLib::PolyTree> difference =
-        ClipperHelpers::subtractToTree(nonManufacturableAreas, drawnBoardArea,
+        ClipperHelpers::subtractToTree(nonManufacturableAreas, outlinesArea,
                                        ClipperLib::pftEvenOdd,
                                        ClipperLib::pftEvenOdd);
     nonManufacturableAreas = ClipperHelpers::flattenTree(*difference);
