@@ -480,7 +480,7 @@ std::shared_ptr<WindowTab> MainWindow::removeTab(
 }
 
 void MainWindow::showPanelPage(ui::PanelPage page) noexcept {
-  mWindow->global<ui::Data>().set_panel_page(page);
+  mWindow->global<ui::Data>().fn_set_panel_page(page);
 }
 
 void MainWindow::popUpNotifications() noexcept {

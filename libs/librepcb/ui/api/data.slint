@@ -49,7 +49,7 @@ export global Data {
 
     // State
     in-out property <float> panel-width-factor: 1;
-    in property <PanelPage> panel-page: PanelPage.home;
+    in-out property <PanelPage> panel-page: PanelPage.home;
     in property <bool> erc-zoom-to-location: true; // ERC panel: "zoom to location"
     in property <bool> drc-zoom-to-location: true; // DRC panel: "zoom to location"
     in property <bool> order-pcb-open-web-browser: true; // Order panel: "open web browser after upload"
@@ -1711,65 +1711,163 @@ export global Data {
         }
     };
 
+    property <PanelPage> previous-library-element-panel-page: PanelPage.none;
+    property <PanelPage> previous-package-panel-page: PanelPage.none;
+    property <PanelPage> previous-project-panel-page: PanelPage.none;
+    property <PanelPage> previous-board-2d-panel-page: PanelPage.none;
+    property <PanelPage> previous-board-3d-panel-page: PanelPage.none;
+    public function set-panel-page(page: PanelPage) {
+        if page == PanelPage.layers {
+            if current-tab.type == TabType.board-2d {
+                previous-board-2d-panel-page = page;
+            }
+        } else if page == PanelPage.place-devices {
+            if current-tab.type == TabType.board-2d {
+                previous-board-2d-panel-page = page;
+            }
+        } else if page == PanelPage.rule-check {
+            if current-tab.type == TabType.library {
+                previous-library-element-panel-page = page;
+            } else if current-tab.type == TabType.component-category {
+                previous-library-element-panel-page = page;
+            } else if current-tab.type == TabType.package-category {
+                previous-library-element-panel-page = page;
+            } else if current-tab.type == TabType.symbol {
+                previous-library-element-panel-page = page;
+            } else if current-tab.type == TabType.package {
+                previous-library-element-panel-page = page;
+                previous-package-panel-page = page;
+            } else if current-tab.type == TabType.component {
+                previous-library-element-panel-page = page;
+            } else if current-tab.type == TabType.device {
+                previous-library-element-panel-page = page;
+            } else if current-tab.type == TabType.organization {
+                previous-library-element-panel-page = page;
+            } else if current-tab.type == TabType.schematic {
+                previous-project-panel-page = page;
+            } else if current-tab.type == TabType.board-2d {
+                previous-board-2d-panel-page = page;
+            }
+            // Also memorize it for tabs which have no memory yet, to avoid
+            // them switching to the documents panel as fallback.
+            if previous-package-panel-page == PanelPage.none {
+                previous-package-panel-page = page;
+            }
+            if previous-project-panel-page == PanelPage.none {
+                previous-project-panel-page = page;
+            }
+            if previous-board-2d-panel-page == PanelPage.none {
+                previous-board-2d-panel-page = page;
+            }
+        } else if page == PanelPage.order {
+            previous-project-panel-page = page;
+            previous-board-2d-panel-page = page;
+            previous-board-3d-panel-page = page;
+        } else if page != PanelPage.none {
+            previous-library-element-panel-page = PanelPage.none;
+            previous-package-panel-page = PanelPage.none;
+            previous-project-panel-page = PanelPage.none;
+            previous-board-2d-panel-page = PanelPage.none;
+            previous-board-3d-panel-page = PanelPage.none;
+        }
+        panel-page = page;
+    }
+
     public function current-tab-changed() {
         if current-tab.type == TabType.library {
             current-project-index = -1;
             current-rule-check-project-index = -1;
             current-rule-check-board-index = -1;
             current-library-index = current-library-tab.library-index;
+            if previous-library-element-panel-page != PanelPage.none {
+                panel-page = previous-library-element-panel-page;
+            }
         } else if current-tab.type == TabType.component-category {
             current-project-index = -1;
             current-rule-check-project-index = -1;
             current-rule-check-board-index = -1;
             current-library-index = current-component-category-tab.library-index;
+            if previous-library-element-panel-page != PanelPage.none {
+                panel-page = previous-library-element-panel-page;
+            }
         } else if current-tab.type == TabType.package-category {
             current-project-index = -1;
             current-rule-check-project-index = -1;
             current-rule-check-board-index = -1;
             current-library-index = current-package-category-tab.library-index;
+            if previous-library-element-panel-page != PanelPage.none {
+                panel-page = previous-library-element-panel-page;
+            }
         } else if current-tab.type == TabType.symbol {
             current-project-index = -1;
             current-rule-check-project-index = -1;
             current-rule-check-board-index = -1;
             current-library-index = current-symbol-tab.library-index;
+            if previous-library-element-panel-page != PanelPage.none {
+                panel-page = previous-library-element-panel-page;
+            }
         } else if current-tab.type == TabType.package {
             current-project-index = -1;
             current-rule-check-project-index = -1;
             current-rule-check-board-index = -1;
             current-library-index = current-package-tab.library-index;
+            if previous-package-panel-page != PanelPage.none {
+                panel-page = previous-package-panel-page;
+            }
         } else if current-tab.type == TabType.component {
             current-project-index = -1;
             current-rule-check-project-index = -1;
             current-rule-check-board-index = -1;
             current-library-index = current-component-tab.library-index;
+            if previous-library-element-panel-page != PanelPage.none {
+                panel-page = previous-library-element-panel-page;
+            }
         } else if current-tab.type == TabType.device {
             current-project-index = -1;
             current-rule-check-project-index = -1;
             current-rule-check-board-index = -1;
+            if previous-library-element-panel-page != PanelPage.none {
+                panel-page = previous-library-element-panel-page;
+            }
         } else if current-tab.type == TabType.organization {
             current-project-index = -1;
             current-rule-check-project-index = -1;
             current-rule-check-board-index = -1;
+            if previous-library-element-panel-page != PanelPage.none {
+                panel-page = previous-library-element-panel-page;
+            }
         } else if current-tab.type == TabType.schematic {
             current-library-index = -1;
             current-project-index = current-schematic-tab.project-index;
             current-rule-check-project-index = current-project-index;
             current-rule-check-board-index = -1;
+            if previous-project-panel-page != PanelPage.none {
+                panel-page = previous-project-panel-page;
+            }
         } else if current-tab.type == TabType.board-2d {
             current-library-index = -1;
             current-project-index = current-board-2d-tab.project-index;
             current-rule-check-project-index = current-project-index;
             current-rule-check-board-index = current-board-2d-tab.board-index;
+            if previous-board-2d-panel-page != PanelPage.none {
+                panel-page = previous-board-2d-panel-page;
+            }
         } else if current-tab.type == TabType.board-3d {
             current-library-index = -1;
             current-project-index = current-board-3d-tab.project-index;
-            current-rule-check-project-index = current-project-index;
-            current-rule-check-board-index = current-board-3d-tab.board-index;
+            current-rule-check-project-index = -1; // Hide DRC
+            current-rule-check-board-index = -1; // Hide DRC
+            if previous-board-3d-panel-page != PanelPage.none {
+                panel-page = previous-board-3d-panel-page;
+            }
         } else if current-tab.type == TabType.project-library {
             current-library-index = -1;
             current-project-index = current-project-library-tab.project-index;
-            current-rule-check-project-index = current-project-index;
-            current-rule-check-board-index = -1;
+            current-rule-check-project-index = -1; // Hide ERC
+            current-rule-check-board-index = -1; // Hide ERC
+            if previous-project-panel-page != PanelPage.none {
+                panel-page = previous-project-panel-page;
+            }
         } else if current-tab.type != TabType.home {
             current-library-index = -1;
             current-project-index = -1;

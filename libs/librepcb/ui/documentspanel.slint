@@ -17,6 +17,7 @@ import {
     LibraryElementAction,
     OrganizationTabData,
     PackageTabData,
+    PanelPage,
     ProjectAction,
     ProjectData,
     SchematicAction,
@@ -99,6 +100,7 @@ component DocumentsListItem inherits Rectangle {
                 tooltip: Cmd.sheet-remove.text;
 
                 clicked => {
+                    Data.set-panel-page(PanelPage.documents); // Avoid auto-switching.
                     schematic-action-triggered(SchematicAction.delete);
                 }
             }
@@ -110,6 +112,7 @@ component DocumentsListItem inherits Rectangle {
                 tooltip: @tr("Open 3D View");
 
                 clicked => {
+                    Data.set-panel-page(PanelPage.documents); // Avoid auto-switching.
                     board-action-triggered(BoardAction.open-3d);
                 }
             }
@@ -132,6 +135,7 @@ component DocumentsListItem inherits Rectangle {
                 tooltip: Cmd.board-copy.text;
 
                 clicked => {
+                    Data.set-panel-page(PanelPage.documents); // Avoid auto-switching.
                     board-action-triggered(BoardAction.copy);
                 }
             }
@@ -143,6 +147,7 @@ component DocumentsListItem inherits Rectangle {
                 tooltip: Cmd.board-remove.text;
 
                 clicked => {
+                    Data.set-panel-page(PanelPage.documents); // Avoid auto-switching.
                     board-action-triggered(BoardAction.delete);
                 }
             }
@@ -177,6 +182,7 @@ component ProjectSection inherits Rectangle {
                     icon-scale: 60%;
 
                     clicked => {
+                        Data.set-panel-page(PanelPage.documents); // Avoid auto-switching.
                         Backend.trigger-project(project-index, ProjectAction.new-sheet);
                     }
                 }
@@ -187,6 +193,7 @@ component ProjectSection inherits Rectangle {
                     icon-scale: 60%;
 
                     clicked => {
+                        Data.set-panel-page(PanelPage.documents); // Avoid auto-switching.
                         Backend.trigger-project(project-index, ProjectAction.new-board);
                     }
                 }
@@ -205,6 +212,7 @@ component ProjectSection inherits Rectangle {
                     icon-scale: 60%;
 
                     clicked => {
+                        Data.set-panel-page(PanelPage.documents); // Avoid auto-switching.
                         Backend.trigger-project(project-index, ProjectAction.close);
                     }
                 }
@@ -223,6 +231,7 @@ component ProjectSection inherits Rectangle {
             selected: (Data.current-tab.type == TabType.schematic) && (Data.current-schematic-tab.project-index == project-index) && (Data.current-schematic-tab.schematic-index == index);
 
             clicked => {
+                Data.set-panel-page(PanelPage.documents); // Avoid auto-switching.
                 Backend.trigger-schematic(project-index, index, SchematicAction.open);
             }
 
@@ -246,6 +255,7 @@ component ProjectSection inherits Rectangle {
             };
 
             clicked => {
+                Data.set-panel-page(PanelPage.documents); // Avoid auto-switching.
                 Backend.trigger-board(project-index, index, BoardAction.open-2d);
             }
 
@@ -275,6 +285,7 @@ component LibrarySection inherits Rectangle {
                     icon-scale: 60%;
 
                     clicked => {
+                        Data.set-panel-page(PanelPage.documents); // Avoid auto-switching.
                         Backend.trigger-library-element(library.path, LibraryElementAction.close);
                     }
                 }
@@ -292,6 +303,7 @@ component LibrarySection inherits Rectangle {
             selected: (Data.current-tab.type == TabType.library) && (Data.current-library-tab.library-index == library-index);
 
             clicked => {
+                Data.set-panel-page(PanelPage.documents); // Avoid auto-switching.
                 Backend.trigger-library-element(library.path, LibraryElementAction.open);
             }
         }
@@ -312,6 +324,7 @@ component LibrarySection inherits Rectangle {
                     selected: (Data.current-tab.type == TabType.component-category) && (Data.current-component-category-tab.library-index == library-index) && (Data.current-component-category-tab.path == derived-tab.path);
 
                     clicked => {
+                        Data.set-panel-page(PanelPage.documents); // Avoid auto-switching.
                         Backend.trigger-library-element(derived-tab.path, LibraryElementAction.open);
                     }
                 }
@@ -325,6 +338,7 @@ component LibrarySection inherits Rectangle {
                     selected: (Data.current-tab.type == TabType.package-category) && (Data.current-package-category-tab.library-index == library-index) && (Data.current-package-category-tab.path == derived-tab.path);
 
                     clicked => {
+                        Data.set-panel-page(PanelPage.documents); // Avoid auto-switching.
                         Backend.trigger-library-element(derived-tab.path, LibraryElementAction.open);
                     }
                 }
@@ -338,6 +352,7 @@ component LibrarySection inherits Rectangle {
                     selected: (Data.current-tab.type == TabType.symbol) && (Data.current-symbol-tab.library-index == library-index) && (Data.current-symbol-tab.path == derived-tab.path);
 
                     clicked => {
+                        Data.set-panel-page(PanelPage.documents); // Avoid auto-switching.
                         Backend.trigger-library-element(derived-tab.path, LibraryElementAction.open);
                     }
                 }
@@ -351,6 +366,7 @@ component LibrarySection inherits Rectangle {
                     selected: (Data.current-tab.type == TabType.package) && (Data.current-package-tab.library-index == library-index) && (Data.current-package-tab.path == derived-tab.path);
 
                     clicked => {
+                        Data.set-panel-page(PanelPage.documents); // Avoid auto-switching.
                         Backend.trigger-library-element(derived-tab.path, LibraryElementAction.open);
                     }
                 }
@@ -364,6 +380,7 @@ component LibrarySection inherits Rectangle {
                     selected: (Data.current-tab.type == TabType.component) && (Data.current-component-tab.library-index == library-index) && (Data.current-component-tab.path == derived-tab.path);
 
                     clicked => {
+                        Data.set-panel-page(PanelPage.documents); // Avoid auto-switching.
                         Backend.trigger-library-element(derived-tab.path, LibraryElementAction.open);
                     }
                 }
@@ -377,6 +394,7 @@ component LibrarySection inherits Rectangle {
                     selected: (Data.current-tab.type == TabType.device) && (Data.current-device-tab.library-index == library-index) && (Data.current-device-tab.path == derived-tab.path);
 
                     clicked => {
+                        Data.set-panel-page(PanelPage.documents); // Avoid auto-switching.
                         Backend.trigger-library-element(derived-tab.path, LibraryElementAction.open);
                     }
                 }
@@ -390,6 +408,7 @@ component LibrarySection inherits Rectangle {
                     selected: (Data.current-tab.type == TabType.organization) && (Data.current-organization-tab.library-index == library-index) && (Data.current-organization-tab.path == derived-tab.path);
 
                     clicked => {
+                        Data.set-panel-page(PanelPage.documents); // Avoid auto-switching.
                         Backend.trigger-library-element(derived-tab.path, LibraryElementAction.open);
                     }
                 }
