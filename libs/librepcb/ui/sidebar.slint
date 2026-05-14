@@ -50,6 +50,7 @@ component SideBarButton inherits Rectangle {
     // Accessibility
     accessible-role: button;
     accessible-enabled: enabled;
+    accessible-checked: checked;
     accessible-label: tooltip;
     accessible-value: status;
     accessible-action-default => {
@@ -152,9 +153,19 @@ component SideBarButton inherits Rectangle {
 export component SideBar {
     function button-clicked(page: PanelPage) {
         if Data.panel-page == page {
-            Data.panel-page = PanelPage.none;
+            Data.set-panel-page(PanelPage.none);
         } else {
-            Data.panel-page = page;
+            Data.set-panel-page(page);
+        }
+    }
+
+    function button-enable-changed(enabled: bool, checked: bool) {
+        if checked && (!enabled) {
+            if documents-btn.enabled {
+                Data.panel-page = PanelPage.documents;
+            } else {
+                Data.panel-page = PanelPage.home;
+            }
         }
     }
 
@@ -182,9 +193,7 @@ export component SideBar {
             }
 
             changed enabled => {
-                if self.checked && (!self.enabled) {
-                    Data.panel-page = PanelPage.home;
-                }
+                button-enable-changed(self.enabled, self.checked);
             }
         }
 
@@ -200,13 +209,7 @@ export component SideBar {
             }
 
             changed enabled => {
-                if self.checked && (!self.enabled) {
-                    if documents-btn.enabled {
-                        Data.panel-page = PanelPage.documents;
-                    } else {
-                        Data.panel-page = PanelPage.home;
-                    }
-                }
+                button-enable-changed(self.enabled, self.checked);
             }
         }
 
@@ -240,13 +243,7 @@ export component SideBar {
             }
 
             changed enabled => {
-                if self.checked && (!self.enabled) {
-                    if documents-btn.enabled {
-                        Data.panel-page = PanelPage.documents;
-                    } else {
-                        Data.panel-page = PanelPage.home;
-                    }
-                }
+                button-enable-changed(self.enabled, self.checked);
             }
         }
 
@@ -302,13 +299,7 @@ export component SideBar {
             }
 
             changed enabled => {
-                if self.checked && (!self.enabled) {
-                    if documents-btn.enabled {
-                        Data.panel-page = PanelPage.documents;
-                    } else {
-                        Data.panel-page = PanelPage.home;
-                    }
-                }
+                button-enable-changed(self.enabled, self.checked);
             }
         }
 
@@ -335,9 +326,7 @@ export component SideBar {
             }
 
             changed enabled => {
-                if self.checked && (!self.enabled) {
-                    Data.panel-page = PanelPage.home;
-                }
+                button-enable-changed(self.enabled, self.checked);
             }
         }
 
