@@ -9,6 +9,7 @@ import {
     Board3dTabData,
     BoardAction,
     Data,
+    EditorCommandSet,
     TabAction,
     WindowSectionData,
 } from "../../api.slint";
@@ -63,7 +64,7 @@ export component Board3dTab inherits Tab {
 
             zoom-fit-btn := SceneButton {
                 x: parent.width - self.width;
-                icon: @image-url("../../../../font-awesome/svgs/solid/expand.svg");
+                command: EditorCommandSet.zoom-fit-content;
                 icon-scale: 0.9;
                 base-color: tabs[index].background-color;
                 base-text-color: tabs[index].foreground-color;
@@ -75,7 +76,7 @@ export component Board3dTab inherits Tab {
 
             zoom-in-btn := SceneButton {
                 x: parent.width - self.width;
-                icon: @image-url("../../../../bootstrap-icons/icons/zoom-in.svg");
+                command: EditorCommandSet.zoom-in;
                 base-color: tabs[index].background-color;
                 base-text-color: tabs[index].foreground-color;
 
@@ -86,7 +87,7 @@ export component Board3dTab inherits Tab {
 
             zoom-out-btn := SceneButton {
                 x: parent.width - self.width;
-                icon: @image-url("../../../../bootstrap-icons/icons/zoom-out.svg");
+                command: EditorCommandSet.zoom-out;
                 base-color: tabs[index].background-color;
                 base-text-color: tabs[index].foreground-color;
 

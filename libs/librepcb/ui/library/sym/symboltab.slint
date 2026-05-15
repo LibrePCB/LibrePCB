@@ -564,7 +564,7 @@ component SymbolEditorTab inherits TouchArea {
         width: self.preferred-width;
 
         zoom-fit-btn := SceneButton {
-            icon: @image-url("../../../../font-awesome/svgs/solid/expand.svg");
+            command: Cmd.zoom-fit-content;
             icon-scale: 0.9;
             base-color: tabs[index].background-color;
             base-text-color: tabs[index].foreground-color;
@@ -575,7 +575,7 @@ component SymbolEditorTab inherits TouchArea {
         }
 
         zoom-in-btn := SceneButton {
-            icon: @image-url("../../../../bootstrap-icons/icons/zoom-in.svg");
+            command: Cmd.zoom-in;
             base-color: tabs[index].background-color;
             base-text-color: tabs[index].foreground-color;
 
@@ -585,7 +585,7 @@ component SymbolEditorTab inherits TouchArea {
         }
 
         zoom-out-btn := SceneButton {
-            icon: @image-url("../../../../bootstrap-icons/icons/zoom-out.svg");
+            command: Cmd.zoom-out;
             base-color: tabs[index].background-color;
             base-text-color: tabs[index].foreground-color;
 
