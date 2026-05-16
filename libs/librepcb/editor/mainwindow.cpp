@@ -279,8 +279,19 @@ MainWindow::MainWindow(GuiApplication& app,
                                   int scene) {
     if (auto section = mSections->value(sectionIndex)) {
       const qreal scale = mWidget->devicePixelRatioF();
-      section->processScenePointerEvent(QPointF(x * scale, y * scale), e,
-                                        scene);
+      const QPointF pos(x * scale, y * scale);
+      // Process pointer events asynchronosuly to avoid focus issues as reported
+      // in https://github.com/LibrePCB/LibrePCB/issues/1740. We do it at this
+      // early stage because we need to process *all* pointer events
+      // asynchronously, not just click events, since otherwise the events may
+      // be processed out of order and thus causing other issues.
+      // if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0): Remove lambda.
+      QMetaObject::invokeMethod(
+          section.get(),
+          [s = section.get(), pos, e, scene]() {
+            s->processScenePointerEvent(pos, e, scene);
+          },
+          Qt::QueuedConnection);
     }
   });
   b.on_scene_scrolled([this](int sectionIndex, float x, float y,

@@ -246,37 +246,23 @@ void SlintGraphicsView::pointerEvent(
 
   if ((e.button == PointerEventButton::Left) &&
       (e.kind == PointerEventKind::Down)) {
-    // Process mouse events asynchronosuly to avoid focus issues as reported
-    // in https://github.com/LibrePCB/LibrePCB/issues/1740.
-    QMetaObject::invokeMethod(
-        this,
-        [this, isDoubleClick, e = mMouseEvent]() {
-          if (mEventHandler) {
-            if (isDoubleClick) {
-              mEventHandler->graphicsSceneLeftMouseButtonDoubleClicked(e);
-            } else {
-              mEventHandler->graphicsSceneLeftMouseButtonPressed(e);
-            }
-          }
-        },
-        Qt::QueuedConnection);
-    // Workaround for sticky button when a dialog is opened. It seems
-    // we don't receive the "button up" event from Slint in that case.
-    if (isDoubleClick) {
-      mMouseEvent.buttons.setFlag(s2q(e.button), false);
+    if (mEventHandler) {
+      if (isDoubleClick) {
+        if (mEventHandler->graphicsSceneLeftMouseButtonDoubleClicked(
+                mMouseEvent)) {
+          // Workaround for sticky button when a dialog is opened. It seems
+          // we don't receive the "button up" event from Slint in that case.
+          mMouseEvent.buttons.setFlag(s2q(e.button), false);
+        }
+      } else {
+        mEventHandler->graphicsSceneLeftMouseButtonPressed(mMouseEvent);
+      }
     }
   } else if ((e.button == PointerEventButton::Left) &&
              (e.kind == PointerEventKind::Up)) {
-    // Since the button down event was processed asynchronously, we should do
-    // the same for the button up event to keep all events in correct order.
-    QMetaObject::invokeMethod(
-        this,
-        [this, e = mMouseEvent]() {
-          if (mEventHandler) {
-            mEventHandler->graphicsSceneLeftMouseButtonReleased(e);
-          }
-        },
-        Qt::QueuedConnection);
+    if (mEventHandler) {
+      mEventHandler->graphicsSceneLeftMouseButtonReleased(mMouseEvent);
+    }
   } else if ((e.button == PointerEventButton::Middle) &&
              (e.kind == PointerEventKind::Down)) {
     mPanningStartScreenPos = pos;
@@ -296,16 +282,8 @@ void SlintGraphicsView::pointerEvent(
     if (mPanning) {
       mPanning = false;
       emit stateChanged();
-    } else {
-      // Process asynchronously too to keep all button events in correct order.
-      QMetaObject::invokeMethod(
-          this,
-          [this, e = mMouseEvent]() {
-            if (mEventHandler) {
-              mEventHandler->graphicsSceneRightMouseButtonReleased(e);
-            }
-          },
-          Qt::QueuedConnection);
+    } else if (mEventHandler) {
+      mEventHandler->graphicsSceneRightMouseButtonReleased(mMouseEvent);
     }
   } else if (e.kind == PointerEventKind::Move) {
     if ((!mPanning) && (mMouseEvent.buttons.testFlag(Qt::RightButton))) {
@@ -314,6 +292,8 @@ void SlintGraphicsView::pointerEvent(
       if (distance > 5) {
         mPanning = true;
         emit stateChanged();
+      } else {
+        return;
       }
     }
     if (mPanning) {
