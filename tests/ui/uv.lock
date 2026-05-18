@@ -37,7 +37,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "pytest" },
-    { name = "slint-testing", git = "ssh://git@github.com/slint-ui/ui-testing.git?subdirectory=python&rev=036b48c3e68b8ab1c738636e087c52b52ed57a11" },
+    { name = "slint-testing", git = "ssh://git@github.com/slint-ui/ui-testing.git?subdirectory=python&rev=a985c7d745caa1d842c22a15523049eeef43a50b" },
 ]
 
 [package.metadata.requires-dev]
@@ -128,7 +128,7 @@ wheels = [
 [[package]]
 name = "slint-testing"
 version = "0.1"
-source = { git = "ssh://git@github.com/slint-ui/ui-testing.git?subdirectory=python&rev=036b48c3e68b8ab1c738636e087c52b52ed57a11#036b48c3e68b8ab1c738636e087c52b52ed57a11" }
+source = { git = "ssh://git@github.com/slint-ui/ui-testing.git?subdirectory=python&rev=a985c7d745caa1d842c22a15523049eeef43a50b#a985c7d745caa1d842c22a15523049eeef43a50b" }
 dependencies = [
     { name = "protobuf" },
 ]

@@ -116,7 +116,9 @@ void WindowSection::setHomeTabVisible(bool visible) noexcept {
   const bool hasHomeTab =
       std::dynamic_pointer_cast<HomeTab>(mTabs->value(0)) != nullptr;
   if (visible && (!hasHomeTab)) {
-    addTab(std::make_shared<HomeTab>(mApp), 0);
+    // Do not make the home tab active since this is not desired when closing
+    // the first section, which moved the home tab to the second section.
+    addTab(std::make_shared<HomeTab>(mApp), 0, false);
   } else if ((!visible) && hasHomeTab) {
     removeTab(0);
   }

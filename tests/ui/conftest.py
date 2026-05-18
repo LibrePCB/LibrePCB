@@ -70,6 +70,32 @@ def _query_children(element, query):
     return children
 
 
+class Rect:
+    """
+    Position & size of a UI element
+    """
+
+    def __init__(self, pos, size):
+        self.pos = pos
+        self.size = size
+
+    def position_abs(self, rel_x, rel_y):
+        """
+        Convert a relative, normalized position to an absolute position
+
+        For example (0, 0) to get the top left, (1, 1) to get the bottom
+        right position of the UI element.
+        """
+        return (self.pos[0] + self.size[0] * rel_x, self.pos[1] + self.size[1] * rel_y)
+
+    @property
+    def center_abs(self):
+        """
+        Get the absolute center position of the UI element
+        """
+        return self.position_abs(0.5, 0.5)
+
+
 class Element:
     """
     Wrapper around slint_testing.Element
@@ -88,6 +114,14 @@ class Element:
     @property
     def position_abs(self):
         return self._element.absolute_position
+
+    @property
+    def size(self):
+        return self._element.size
+
+    @property
+    def rect(self):
+        return Rect(self.position_abs, self.size)
 
     @property
     def label(self):
@@ -325,6 +359,10 @@ class ElementQuery:
         return self._flatten([x.valid for x in self._results])
 
     @property
+    def rect(self):
+        return self._flatten([x.rect for x in self._results])
+
+    @property
     def label(self):
         return self._flatten([x.label for x in self._results])
 
@@ -393,6 +431,21 @@ class Application(slint_testing.Application):
             win.dispatch_event(slint_testing.KeyPressedEvent(key))
         for key in keys:
             win.dispatch_event(slint_testing.KeyReleasedEvent(key))
+
+    def drag_and_drop(
+        self,
+        start,
+        end,
+        button=slint_testing.PointerEventButton.Left,
+        steps=3,
+        window=0,
+    ):
+        self.windows[window].drag_and_drop(
+            slint_testing.LogicalPosition(*start),
+            slint_testing.LogicalPosition(*end),
+            button,
+            steps,
+        )
 
 
 class LibrePcbFixture(object):

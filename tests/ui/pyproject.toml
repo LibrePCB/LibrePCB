@@ -10,7 +10,7 @@ dependencies = [
 ]
 
 [tool.uv.sources]
-slint-testing = { git = "ssh://git@github.com/slint-ui/ui-testing.git", subdirectory = "python", rev = "036b48c3e68b8ab1c738636e087c52b52ed57a11" }
+slint-testing = { git = "ssh://git@github.com/slint-ui/ui-testing.git", subdirectory = "python", rev = "a985c7d745caa1d842c22a15523049eeef43a50b" }
 
 [dependency-groups]
 dev = [
