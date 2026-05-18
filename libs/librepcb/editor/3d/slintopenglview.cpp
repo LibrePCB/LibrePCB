@@ -274,6 +274,12 @@ bool SlintOpenGlView::scrollEvent(
   return true;
 }
 
+void SlintOpenGlView::rotate(qreal angle, qreal x, qreal y, qreal z) noexcept {
+  OpenGlProjection projection = mProjection;
+  projection.transform.rotate(angle, x, y, z);
+  applyOpenGlProjection(projection);
+}
+
 void SlintOpenGlView::zoomIn() noexcept {
   const QPointF center(mViewSize.width() / 2, mViewSize.height() / 2);
   zoom(center, 1.3);

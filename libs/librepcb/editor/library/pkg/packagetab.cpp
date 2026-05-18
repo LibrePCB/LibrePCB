@@ -815,25 +815,37 @@ void PackageTab::trigger(ui::TabAction a) noexcept {
       break;
     }
     case ui::TabAction::MoveLeft: {
-      if (!mFsm->processMove(Point(-mPackage->getGridInterval(), 0))) {
+      if (mView3d && mOpenGlView) {
+        mOpenGlView->rotate(10, 0, -1, 0);
+      } else if ((!mView3d) && mView &&
+                 (!mFsm->processMove(Point(-mPackage->getGridInterval(), 0)))) {
         mView->scrollLeft();
       }
       break;
     }
     case ui::TabAction::MoveRight: {
-      if (!mFsm->processMove(Point(*mPackage->getGridInterval(), 0))) {
+      if (mView3d && mOpenGlView) {
+        mOpenGlView->rotate(10, 0, 1, 0);
+      } else if ((!mView3d) && mView &&
+                 (!mFsm->processMove(Point(*mPackage->getGridInterval(), 0)))) {
         mView->scrollRight();
       }
       break;
     }
     case ui::TabAction::MoveUp: {
-      if (!mFsm->processMove(Point(0, *mPackage->getGridInterval()))) {
+      if (mView3d && mOpenGlView) {
+        mOpenGlView->rotate(10, -1, 0, 0);
+      } else if ((!mView3d) && mView &&
+                 (!mFsm->processMove(Point(0, *mPackage->getGridInterval())))) {
         mView->scrollUp();
       }
       break;
     }
     case ui::TabAction::MoveDown: {
-      if (!mFsm->processMove(Point(0, -mPackage->getGridInterval()))) {
+      if (mView3d && mOpenGlView) {
+        mOpenGlView->rotate(10, 1, 0, 0);
+      } else if ((!mView3d) && mView &&
+                 (!mFsm->processMove(Point(0, -mPackage->getGridInterval())))) {
         mView->scrollDown();
       }
       break;

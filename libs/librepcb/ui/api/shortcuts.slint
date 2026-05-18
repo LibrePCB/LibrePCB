@@ -1240,6 +1240,8 @@ export global Shortcuts {
         } else if Backend.is-shortcut(event, Cmd.toggle-3d) {
             Backend.trigger-board(Data.current-board-3d-tab.project-index, Data.current-board-3d-tab.board-index, BoardAction.open-2d);
             return true;
+        } else if process-tab-shortcuts(event) {
+            return true;
         } else if Backend.scene-key-pressed(section, event) {
             return true;
         } else if process-board-shortcuts(Data.current-board-3d-tab.project-index, Data.current-board-3d-tab.board-index, event) {

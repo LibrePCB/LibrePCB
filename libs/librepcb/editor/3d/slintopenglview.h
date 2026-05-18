@@ -115,6 +115,7 @@ public:
                     slint::private_api::PointerEvent e) noexcept;
   bool scrollEvent(const QPointF& pos,
                    slint::private_api::PointerScrollEvent e) noexcept;
+  void rotate(qreal angle, qreal x, qreal y, qreal z) noexcept;
   void zoomIn() noexcept;
   void zoomOut() noexcept;
   void zoomAll() noexcept;

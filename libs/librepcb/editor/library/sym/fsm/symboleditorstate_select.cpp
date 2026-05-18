@@ -452,8 +452,7 @@ bool SymbolEditorState_Select::processMove(const Point& delta) noexcept {
         std::unique_ptr<CmdDragSelectedSymbolItems> cmd(
             new CmdDragSelectedSymbolItems(*item, getGridInterval()));
         cmd->translate(delta);
-        mContext.undoStack.execCmd(cmd.release());
-        return true;
+        return mContext.undoStack.execCmd(cmd.release());
       } catch (const Exception& e) {
         QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
       }

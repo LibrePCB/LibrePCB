@@ -249,6 +249,22 @@ void Board3dTab::trigger(ui::TabAction a) noexcept {
       mProjectEditor.redo();
       break;
     }
+    case ui::TabAction::MoveLeft: {
+      if (mView) mView->rotate(10, 0, -1, 0);
+      break;
+    }
+    case ui::TabAction::MoveRight: {
+      if (mView) mView->rotate(10, 0, 1, 0);
+      break;
+    }
+    case ui::TabAction::MoveUp: {
+      if (mView) mView->rotate(10, -1, 0, 0);
+      break;
+    }
+    case ui::TabAction::MoveDown: {
+      if (mView) mView->rotate(10, 1, 0, 0);
+      break;
+    }
     case ui::TabAction::ZoomIn: {
       if (mView) mView->zoomIn();
       break;

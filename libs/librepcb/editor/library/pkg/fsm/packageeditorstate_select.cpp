@@ -460,8 +460,7 @@ bool PackageEditorState_Select::processMove(const Point& delta) noexcept {
             new CmdDragSelectedFootprintItems(*mContext.currentGraphicsItem,
                                               getGridInterval()));
         cmd->translate(delta);
-        mContext.undoStack.execCmd(cmd.release());
-        return true;
+        return mContext.undoStack.execCmd(cmd.release());
       } catch (const Exception& e) {
         QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
       }
