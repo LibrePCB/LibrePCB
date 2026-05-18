@@ -183,6 +183,8 @@ component ProjectLibraryListView inherits ScrollView {
                             colorize: {
                                 if item.type == LibraryTreeViewItemType.component {
                                     Data.theme.control-text
+                                } else if item.type == LibraryTreeViewItemType.symbol {
+                                    Data.theme.control-text
                                 } else {
                                     transparent
                                 }
