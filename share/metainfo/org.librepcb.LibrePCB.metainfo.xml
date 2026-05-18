@@ -22,30 +22,39 @@
     </ul>
   </description>
 
+  <!--
+    NOTES:
+      - Maximum resolution 1600x900px
+      - Captured with QT_SCALE_FACTOR=1.2
+  -->
   <screenshots>
     <screenshot type="default">
-      <caption>Control panel, board editor and schematic editor</caption>
-      <image>https://raw.githubusercontent.com/LibrePCB/librepcb-doc/b5488bb1dd8473d33110e744023e3ca14d796db1/about/img/screenshot.png</image>
+      <caption>Schematic- and Board Editor</caption>
+      <image>https://raw.githubusercontent.com/LibrePCB/librepcb-doc/fb31bb154f00a4e0adebe8b1ac50877eebae96b4/static/cross-probing.png</image>
     </screenshot>
     <screenshot>
-      <caption>Control panel</caption>
-      <image>https://raw.githubusercontent.com/LibrePCB/librepcb-website/5be4a16236c62ac587ead7d0d535d75d91c27f60/static/img/control_panel.png</image>
+      <caption>Library Browser</caption>
+      <image>https://raw.githubusercontent.com/LibrePCB/librepcb-doc/fb31bb154f00a4e0adebe8b1ac50877eebae96b4/static/add-component.png</image>
     </screenshot>
     <screenshot>
-      <caption>Schematic Editor</caption>
-      <image>https://raw.githubusercontent.com/LibrePCB/librepcb-website/5be4a16236c62ac587ead7d0d535d75d91c27f60/static/img/schematic_editor.png</image>
+      <caption>Library Management</caption>
+      <image>https://raw.githubusercontent.com/LibrePCB/librepcb-doc/fb31bb154f00a4e0adebe8b1ac50877eebae96b4/static/libraries.png</image>
     </screenshot>
     <screenshot>
-      <caption>Board editor</caption>
-      <image>https://raw.githubusercontent.com/LibrePCB/librepcb-website/5be4a16236c62ac587ead7d0d535d75d91c27f60/static/img/board_editor.png</image>
+      <caption>Device Editor</caption>
+      <image>https://raw.githubusercontent.com/LibrePCB/librepcb-doc/fb31bb154f00a4e0adebe8b1ac50877eebae96b4/static/device.png</image>
     </screenshot>
     <screenshot>
-      <caption>Library browser</caption>
-      <image>https://raw.githubusercontent.com/LibrePCB/librepcb-website/5be4a16236c62ac587ead7d0d535d75d91c27f60/static/img/add_component_dialog.png</image>
+      <caption>Board Editor and 3D Preview</caption>
+      <image>https://raw.githubusercontent.com/LibrePCB/librepcb-doc/fb31bb154f00a4e0adebe8b1ac50877eebae96b4/static/board.png</image>
     </screenshot>
     <screenshot>
-      <caption>Library manager</caption>
-      <image>https://raw.githubusercontent.com/LibrePCB/librepcb-website/5be4a16236c62ac587ead7d0d535d75d91c27f60/static/img/library_manager.png</image>
+      <caption>Design Rule Check</caption>
+      <image>https://raw.githubusercontent.com/LibrePCB/librepcb-doc/fb31bb154f00a4e0adebe8b1ac50877eebae96b4/static/drc.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Output Jobs</caption>
+      <image>https://raw.githubusercontent.com/LibrePCB/librepcb-doc/fb31bb154f00a4e0adebe8b1ac50877eebae96b4/static/output-jobs.png</image>
     </screenshot>
   </screenshots>
 
@@ -80,6 +89,22 @@
         - Remove development releases when stable release is ready!
         - For prereleases, use tilde instead of dash (e.g. "1.0.0~rc1")!
     -->
+    <release version="2.1.0" date="2026-05-19" type="stable">
+      <description>
+        <p>Highlights:</p>
+        <ul>
+          <li>More themes &amp; color schemes</li>
+          <li>Cross-probing &amp; net highlighting</li>
+          <li>New project library manager</li>
+          <li>Automatic library updates</li>
+          <li>More realistic 3D renderings</li>
+          <li>View &amp; edit board from bottom</li>
+          <li>Several device editor improvements</li>
+          <li>Many more improvements &amp; bugfixes</li>
+        </ul>
+      </description>
+      <url type="details">https://librepcb.org/release-notes/2.1.0/</url>
+    </release>
     <release version="2.0.1" date="2026-02-22" type="stable">
       <description>
         <p>Highlights:</p>
