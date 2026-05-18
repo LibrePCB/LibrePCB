@@ -361,7 +361,9 @@ void GuiApplication::switchWorkspace(QWidget* parent) noexcept {
 }
 
 void GuiApplication::execWorkspaceSettingsDialog(QWidget* parent) noexcept {
-  WorkspaceSettingsDialog dlg(mWorkspace, *mTheme, parent);
+  // Note: We have to pass mTheme as a pointer since the theme may change
+  // while the settings dialog is open.
+  WorkspaceSettingsDialog dlg(mWorkspace, mTheme, parent);
   connect(&dlg, &WorkspaceSettingsDialog::desktopIntegrationStatusChanged, this,
           &GuiApplication::updateDesktopIntegrationNotification);
   dlg.exec();

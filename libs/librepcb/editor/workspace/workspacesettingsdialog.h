@@ -78,7 +78,8 @@ public:
   // Constructors / Destructor
   WorkspaceSettingsDialog() = delete;
   WorkspaceSettingsDialog(const WorkspaceSettingsDialog& other) = delete;
-  explicit WorkspaceSettingsDialog(Workspace& workspace, const UiTheme& theme,
+  explicit WorkspaceSettingsDialog(Workspace& workspace,
+                                   const UiTheme* const& theme,
                                    QWidget* parent = nullptr);
   ~WorkspaceSettingsDialog() override;
 
@@ -109,7 +110,7 @@ private:
 private:
   Workspace& mWorkspace;  /// Reference to the Workspace object
   WorkspaceSettings& mSettings;  ///< Reference to the WorkspaceSettings object
-  const UiTheme& mTheme;  ///< Reference to current UI theme
+  const UiTheme* const& mTheme;  ///< Reference to current UI theme
   QScopedPointer<LibraryLocaleOrderModel> mLibLocaleOrderModel;
   QScopedPointer<LibraryNormOrderModel> mLibNormOrderModel;
   QScopedPointer<ApiEndpointListModelLegacy> mApiEndpointModel;

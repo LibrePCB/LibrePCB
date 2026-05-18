@@ -61,7 +61,7 @@ namespace editor {
  ******************************************************************************/
 
 WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
-                                                 const UiTheme& theme,
+                                                 const UiTheme* const& theme,
                                                  QWidget* parent)
   : QDialog(parent),
     mWorkspace(workspace),
@@ -635,7 +635,7 @@ void WorkspaceSettingsDialog::execColorSchemeDialog(
   };
 
   auto& win = *mColorSchemeDialog;
-  win->global<ui::Data>().set_theme(l2s(mTheme));
+  win->global<ui::Data>().set_theme(l2s(*mTheme));
   win->set_name(q2s(scheme->getName()));
   win->set_model(std::make_shared<ColorSchemeModel>(scheme));
   win->set_current_index(0);
