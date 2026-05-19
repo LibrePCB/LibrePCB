@@ -41,19 +41,127 @@
 #include <librepcb/core/project/schematic/items/si_netlabel.h>
 #include <librepcb/core/project/schematic/items/si_netline.h>
 #include <librepcb/core/project/schematic/items/si_netpoint.h>
+#include <librepcb/core/project/schematic/items/si_netsegment.h>
 #include <librepcb/core/project/schematic/items/si_polygon.h>
 #include <librepcb/core/project/schematic/items/si_symbol.h>
 #include <librepcb/core/project/schematic/items/si_symbolpin.h>
 #include <librepcb/core/project/schematic/items/si_text.h>
 #include <librepcb/core/project/schematic/schematic.h>
+#include <librepcb/rust-core/ffi.h>
 
 #include <QtCore>
+
+#include <memory>
+#include <vector>
 
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
 namespace editor {
+
+/*******************************************************************************
+ *  Local Classes
+ ******************************************************************************/
+namespace {
+
+// Preview helper for a boundary netline which cannot be kept orthogonal by
+// moving an existing netpoint. It replaces one line with an L-bend at the
+// moving side, then either gets discarded during preview or appended to the
+// final undo command.
+class CmdSchematicNetLineSplit final : public UndoCommand {
+public:
+  CmdSchematicNetLineSplit(SI_NetLine& line, SI_NetLineAnchor& movingAnchor,
+                           SI_NetLineAnchor& fixedAnchor)
+    : UndoCommand(QObject::tr("Split netline")),
+      mNetSegment(line.getNetSegment()),
+      mOldLine(line),
+      mBendNetPoint(new SI_NetPoint(mNetSegment, Uuid::createRandom(),
+                                    movingAnchor.getPosition())),
+      mLineToMoving(new SI_NetLine(mNetSegment, Uuid::createRandom(),
+                                   movingAnchor, *mBendNetPoint,
+                                   line.getWidth())),
+      mLineToFixed(new SI_NetLine(mNetSegment, Uuid::createRandom(),
+                                  *mBendNetPoint, fixedAnchor,
+                                  line.getWidth())),
+      mApplied(false) {}
+
+  ~CmdSchematicNetLineSplit() noexcept override {
+    if (mApplied && (!wasEverExecuted())) {
+      // Preview-only splits have already modified the scene. Revert them before
+      // deleting the replacement objects below.
+      try {
+        revert();
+      } catch (...) {
+      }
+    }
+    if (!mApplied) {
+      delete mLineToFixed;
+      delete mLineToMoving;
+      delete mBendNetPoint;
+    }
+    // If mApplied is still true, the SI_NetSegment currently owns these objects
+    // and will delete them with the rest of the segment.
+  }
+
+  SI_NetPoint& getBendNetPoint() noexcept { return *mBendNetPoint; }
+
+  void apply() {
+    if (mApplied) return;
+
+    // Keep the segment cohesive at every step: add the replacement L-bend
+    // before removing the original straight line.
+    mNetSegment.addNetPointsAndNetLines({mBendNetPoint},
+                                        {mLineToMoving, mLineToFixed});
+    mNetSegment.removeNetPointsAndNetLines({}, {&mOldLine});
+    mApplied = true;
+  }
+
+  void revert() {
+    if (!mApplied) return;
+
+    // Same cohesion requirement in reverse: restore the original line before
+    // removing the temporary replacement geometry.
+    mNetSegment.addNetPointsAndNetLines({}, {&mOldLine});
+    mNetSegment.removeNetPointsAndNetLines({mBendNetPoint},
+                                           {mLineToMoving, mLineToFixed});
+    mApplied = false;
+  }
+
+private:
+  bool performExecute() override {
+    apply();  // can throw
+    return true;
+  }
+
+  void performUndo() override { revert(); }  // can throw
+
+  void performRedo() override { apply(); }  // can throw
+
+  SI_NetSegment& mNetSegment;
+  SI_NetLine& mOldLine;
+  SI_NetPoint* mBendNetPoint;
+  SI_NetLine* mLineToMoving;
+  SI_NetLine* mLineToFixed;
+  bool mApplied;
+};
+
+rs::OrthogonalWireDragAnchorKind getAnchorKind(
+    SI_NetLineAnchor& anchor, const QSet<SI_SymbolPin*>& movingPins,
+    const QSet<SI_NetPoint*>& movingNetPoints) noexcept {
+  if (SI_SymbolPin* pin = dynamic_cast<SI_SymbolPin*>(&anchor)) {
+    return movingPins.contains(pin) ? rs::OrthogonalWireDragAnchorKind::Moving
+                                    : rs::OrthogonalWireDragAnchorKind::Fixed;
+  }
+  if (SI_NetPoint* netpoint = dynamic_cast<SI_NetPoint*>(&anchor)) {
+    return movingNetPoints.contains(netpoint)
+        ? rs::OrthogonalWireDragAnchorKind::Moving
+        : rs::OrthogonalWireDragAnchorKind::Movable;
+  }
+  return rs::OrthogonalWireDragAnchorKind::Fixed;
+}
+
+}  // namespace
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -152,9 +260,128 @@ CmdDragSelectedSchematicItems::CmdDragSelectedSchematicItems(
     mCenterPos /= mItemCount;
     mCenterPos.mapToGrid(mSchematic.getGridInterval());
   }
+
+  const QSet<SI_NetPoint*> movingNetPoints = QSet<SI_NetPoint*>(
+      query.getNetPoints().begin(), query.getNetPoints().end());
+  QSet<SI_SymbolPin*> movingPins;
+  foreach (SI_Symbol* symbol, query.getSymbols()) {
+    foreach (SI_SymbolPin* pin, symbol->getPins()) {
+      movingPins.insert(pin);
+    }
+  }
+
+  // Build a plain anchor/wire graph for the Rust algorithm. Schematic-specific
+  // object ownership and undo commands stay here; the actual orthogonal routing
+  // decision is calculated on this generic graph.
+  QHash<SI_NetLineAnchor*, std::size_t> anchorIndexes;
+  std::vector<SI_NetLineAnchor*> anchors;
+  std::vector<rs::OrthogonalWireDragAnchor> rustAnchors;
+  auto addAnchor = [&](SI_NetLineAnchor& anchor) {
+    if (auto it = anchorIndexes.find(&anchor); it != anchorIndexes.end()) {
+      return it.value();
+    }
+    const std::size_t index = anchors.size();
+    const Point& pos = anchor.getPosition();
+    anchorIndexes.insert(&anchor, index);
+    anchors.push_back(&anchor);
+    rustAnchors.push_back(rs::OrthogonalWireDragAnchor{
+        pos.getX().toNm(), pos.getY().toNm(),
+        getAnchorKind(anchor, movingPins, movingNetPoints)});
+    return index;
+  };
+
+  QQueue<SI_NetLineAnchor*> queue;
+  QSet<SI_NetLineAnchor*> queuedAnchors;
+  QSet<SI_NetLineAnchor*> processedAnchors;
+  auto enqueueAnchor = [&](SI_NetLineAnchor& anchor) {
+    if (getAnchorKind(anchor, movingPins, movingNetPoints) ==
+        rs::OrthogonalWireDragAnchorKind::Fixed) {
+      return;
+    }
+    if (queuedAnchors.contains(&anchor) || processedAnchors.contains(&anchor)) {
+      return;
+    }
+    queue.enqueue(&anchor);
+    queuedAnchors.insert(&anchor);
+  };
+
+  // Preserve the schematic feature scope: component pins seed the orthogonal
+  // wire adjustment. Selected netpoints are still marked as "Moving" in the
+  // graph if reached, but dragging a netpoint alone does not start this
+  // component-wire heuristic.
+  foreach (SI_SymbolPin* pin, movingPins) {
+    enqueueAnchor(*pin);
+  }
+
+  QSet<SI_NetLine*> addedLines;
+  std::vector<SI_NetLine*> lines;
+  std::vector<rs::OrthogonalWireDragWire> rustWires;
+  while (!queue.isEmpty()) {
+    SI_NetLineAnchor* anchor = queue.dequeue();
+    queuedAnchors.remove(anchor);
+    if (processedAnchors.contains(anchor)) continue;
+    processedAnchors.insert(anchor);
+    addAnchor(*anchor);
+
+    foreach (SI_NetLine* line, anchor->getNetLines()) {
+      const std::size_t p1 = addAnchor(line->getP1());
+      const std::size_t p2 = addAnchor(line->getP2());
+      if (!addedLines.contains(line)) {
+        addedLines.insert(line);
+        lines.push_back(line);
+        rustWires.push_back(rs::OrthogonalWireDragWire{p1, p2});
+      }
+      if (SI_NetLineAnchor* other = line->getOtherPoint(*anchor)) {
+        enqueueAnchor(*other);
+      }
+    }
+  }
+
+  if ((!rustAnchors.empty()) && (!rustWires.empty())) {
+    std::unique_ptr<rs::OrthogonalWireDragOutput,
+                    decltype(&rs::ffi_orthogonal_wire_drag_delete)>
+        output(rs::ffi_orthogonal_wire_drag_new(
+                   rustAnchors.data(), rustAnchors.size(), rustWires.data(),
+                   rustWires.size()),
+               &rs::ffi_orthogonal_wire_drag_delete);
+
+    for (std::size_t i = 0;
+         i < rs::ffi_orthogonal_wire_drag_anchor_movement_count(output.get());
+         ++i) {
+      const rs::OrthogonalWireDragAnchorMovement movement =
+          rs::ffi_orthogonal_wire_drag_anchor_movement(output.get(), i);
+      if (movement.anchor >= anchors.size()) continue;
+      SI_NetPoint* netpoint =
+          dynamic_cast<SI_NetPoint*>(anchors.at(movement.anchor));
+      if (!netpoint) continue;
+      mStretchEdits.append({new CmdSchematicNetPointEdit(*netpoint),
+                            {movement.stretch_x, movement.stretch_y}});
+    }
+
+    for (std::size_t i = 0;
+         i < rs::ffi_orthogonal_wire_drag_wire_split_count(output.get()); ++i) {
+      const rs::OrthogonalWireDragWireSplit split =
+          rs::ffi_orthogonal_wire_drag_wire_split(output.get(), i);
+      if ((split.wire >= lines.size()) ||
+          (split.moving_anchor >= anchors.size()) ||
+          (split.fixed_anchor >= anchors.size())) {
+        continue;
+      }
+      if ((!split.trigger_x) && (!split.trigger_y)) continue;
+      mSplitNetLineEdits.append({lines.at(split.wire),
+                                 anchors.at(split.moving_anchor),
+                                 anchors.at(split.fixed_anchor),
+                                 {split.trigger_x, split.trigger_y},
+                                 {split.stretch_x, split.stretch_y}});
+    }
+  }
 }
 
 CmdDragSelectedSchematicItems::~CmdDragSelectedSchematicItems() noexcept {
+  if (!wasEverExecuted()) {
+    discardSplitNetLineEdits();
+    discardStretchEdits();
+  }
 }
 
 /*******************************************************************************
@@ -200,6 +427,10 @@ void CmdDragSelectedSchematicItems::setCurrentPosition(
   delta.mapToGrid(mSchematic.getGridInterval());
 
   if (delta != mDeltaPos) {
+    // Split first so any newly inserted bend point receives the same preview
+    // movement as propagated netpoints below.
+    activateNeededSplitNetLineEdits(delta);
+
     // move selected elements
     foreach (CmdSymbolInstanceEdit* cmd, mSymbolEditCmds) {
       cmd->translate(delta - mDeltaPos, true);
@@ -225,12 +456,34 @@ void CmdDragSelectedSchematicItems::setCurrentPosition(
     foreach (CmdImageEdit* cmd, mImageEditCmds) {
       cmd->translate(delta - mDeltaPos, true);
     }
+    const Point increment = delta - mDeltaPos;
+    foreach (const StretchNetPointEdit& s, mStretchEdits) {
+      // Apply only the propagated axes. The selected items still follow the
+      // full cursor delta, while stationary wire geometry moves just enough to
+      // stay orthogonal.
+      const Point masked(s.mask.stretchX ? increment.getX() : Length(0),
+                         s.mask.stretchY ? increment.getY() : Length(0));
+      if (!masked.isOrigin()) {
+        s.cmd->translate(masked, true);
+      }
+    }
     mDeltaPos = delta;
+
+    // If the drag returned to the original line axis, drop preview bends so a
+    // temporary perpendicular excursion does not leave extra netpoints behind.
+    deactivateUnneededSplitNetLineEdits(delta);
   }
 }
 
 void CmdDragSelectedSchematicItems::rotate(
     const Angle& angle, bool aroundCurrentPosition) noexcept {
+  // The orthogonal-stretch heuristic was set up assuming each wire's pre-drag
+  // orientation. A rotation invalidates that, so revert any live stretches
+  // (the netpoints snap back to their pre-drag positions) and stop tracking
+  // them for the remainder of the drag.
+  discardSplitNetLineEdits();
+  discardStretchEdits();
+
   const Point center = (aroundCurrentPosition && (mItemCount > 1))
       ? (mStartPos + mDeltaPos).mappedToGrid(mSchematic.getGridInterval())
       : (mCenterPos + mDeltaPos);
@@ -265,6 +518,11 @@ void CmdDragSelectedSchematicItems::rotate(
 
 void CmdDragSelectedSchematicItems::mirror(
     Qt::Orientation orientation, bool aroundCurrentPosition) noexcept {
+  // Same reasoning as rotate(): a mirror invalidates the per-axis stretch
+  // attribution captured at drag start.
+  discardSplitNetLineEdits();
+  discardStretchEdits();
+
   const Point center = (aroundCurrentPosition && (mItemCount > 1))
       ? (mStartPos + mDeltaPos).mappedToGrid(mSchematic.getGridInterval())
       : (mCenterPos + mDeltaPos);
@@ -323,6 +581,8 @@ bool CmdDragSelectedSchematicItems::performExecute() {
     mTextEditCmds.clear();
     qDeleteAll(mImageEditCmds);
     mImageEditCmds.clear();
+    discardSplitNetLineEdits();
+    discardStretchEdits();
     return false;
   }
 
@@ -358,6 +618,21 @@ bool CmdDragSelectedSchematicItems::performExecute() {
   foreach (CmdImageEdit* cmd, mImageEditCmds) {
     appendChild(cmd);  // can throw
   }
+  for (SplitNetLineEdit& s : mSplitNetLineEdits) {
+    if (s.splitCmd) {
+      appendChild(s.splitCmd);  // can throw
+      s.splitCmd = nullptr;  // ownership transferred to the group
+    }
+  }
+  // Stretch netpoints: appended last so they run after their connected
+  // symbols / netpoints in the undo group (though execution-order doesn't
+  // really matter here since positions were already applied immediately
+  // during the drag preview).
+  foreach (const StretchNetPointEdit& s, mStretchEdits) {
+    appendChild(s.cmd);  // can throw
+  }
+  mSplitNetLineEdits.clear();
+  mStretchEdits.clear();  // ownership transferred to the group
 
   // execute all child commands
   return UndoCommandGroup::performExecute();  // can throw
@@ -365,6 +640,82 @@ bool CmdDragSelectedSchematicItems::performExecute() {
 
 void CmdDragSelectedSchematicItems::performPostExecution() noexcept {
   mSchematic.updateAllLabelAnchors();
+}
+
+void CmdDragSelectedSchematicItems::activateNeededSplitNetLineEdits(
+    const Point& delta) noexcept {
+  for (SplitNetLineEdit& s : mSplitNetLineEdits) {
+    if (s.splitCmd) continue;
+    if ((!s.triggerMask.stretchX || (delta.getX() == 0)) &&
+        (!s.triggerMask.stretchY || (delta.getY() == 0))) {
+      continue;
+    }
+
+    CmdSchematicNetLineSplit* splitCmd = new CmdSchematicNetLineSplit(
+        *s.line, *s.movingAnchor, *s.fixedAnchor);  // can throw
+    // Mutate the live scene for preview. If the drag is committed,
+    // performExecute transfers this already-applied command into the undo
+    // group.
+    splitCmd->apply();  // can throw
+    s.splitCmd = splitCmd;
+    if (s.bendMask.stretchX || s.bendMask.stretchY) {
+      s.stretchCmd = new CmdSchematicNetPointEdit(splitCmd->getBendNetPoint());
+      mStretchEdits.append({s.stretchCmd, s.bendMask});
+    }
+  }
+}
+
+void CmdDragSelectedSchematicItems::deactivateUnneededSplitNetLineEdits(
+    const Point& delta) noexcept {
+  for (SplitNetLineEdit& s : mSplitNetLineEdits) {
+    if (!s.splitCmd) continue;
+    if ((s.triggerMask.stretchX && (delta.getX() != 0)) ||
+        (s.triggerMask.stretchY && (delta.getY() != 0))) {
+      continue;
+    }
+
+    discardStretchEdit(s.stretchCmd);
+    s.stretchCmd = nullptr;
+    delete s.splitCmd;
+    s.splitCmd = nullptr;
+  }
+}
+
+void CmdDragSelectedSchematicItems::discardSplitNetLineEdits() noexcept {
+  for (SplitNetLineEdit& s : mSplitNetLineEdits) {
+    // The stretch command may have already moved the bend point in preview;
+    // delete it first so its destructor restores the bend before the split is
+    // reverted and removed.
+    if (s.stretchCmd) {
+      discardStretchEdit(s.stretchCmd);
+      s.stretchCmd = nullptr;
+    }
+    delete s.splitCmd;
+    s.splitCmd = nullptr;
+  }
+  mSplitNetLineEdits.clear();
+}
+
+void CmdDragSelectedSchematicItems::discardStretchEdit(
+    CmdSchematicNetPointEdit* cmd) noexcept {
+  // Split-created stretch commands are also listed in mStretchEdits for normal
+  // preview movement. Remove them from there to keep ownership single.
+  for (int i = 0; i < mStretchEdits.count(); ++i) {
+    if (mStretchEdits.at(i).cmd == cmd) {
+      delete mStretchEdits.takeAt(i).cmd;
+      return;
+    }
+  }
+  delete cmd;
+}
+
+void CmdDragSelectedSchematicItems::discardStretchEdits() noexcept {
+  // ~CmdSchematicNetPointEdit restores mOldPos when wasEverExecuted() is
+  // false, so deleting un-executed cmds rolls back any live-preview shifts.
+  foreach (const StretchNetPointEdit& s, mStretchEdits) {
+    delete s.cmd;
+  }
+  mStretchEdits.clear();
 }
 
 /*******************************************************************************
