@@ -13,6 +13,8 @@ mod ffi;
 
 // Modules
 pub mod math;
+#[cfg(any(test, feature = "ffi"))]
+mod orthogonal_wire;
 pub mod toolbox;
 mod types;
 
