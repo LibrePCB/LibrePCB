@@ -28,8 +28,9 @@ if __name__ == '__main__':
     g = Github(auth=auth)
     repo = g.get_repo("LibrePCB/LibrePCB")
     contributors = list(repo.get_contributors())
-    contributors = sorted(contributors,
-                          key=lambda user: user.contributions, reverse=True)
+    contributors = sorted(
+        contributors, key=lambda user: (-user.contributions, user.login.lower())
+    )
     lines = []
     for c in contributors:
         if c.login in ['ubruhin']:
