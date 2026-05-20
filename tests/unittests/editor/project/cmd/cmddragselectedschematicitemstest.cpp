@@ -26,6 +26,7 @@
 #include <gtest/gtest.h>
 #include <librepcb/core/fileio/transactionaldirectory.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
+#include <librepcb/core/geometry/netlabel.h>
 #include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/library/cmp/componentpinsignalmap.h>
 #include <librepcb/core/library/cmp/componentsignal.h>
@@ -38,6 +39,7 @@
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectlibrary.h>
 #include <librepcb/core/project/schematic/items/si_netline.h>
+#include <librepcb/core/project/schematic/items/si_netlabel.h>
 #include <librepcb/core/project/schematic/items/si_netpoint.h>
 #include <librepcb/core/project/schematic/items/si_netsegment.h>
 #include <librepcb/core/project/schematic/items/si_symbol.h>
@@ -347,6 +349,49 @@ TEST_F(CmdDragSelectedSchematicItemsTest,
   EXPECT_EQ(point(5.08, 10), netPoint->getPosition());
   EXPECT_EQ(1, netPointCountAt(segment, point(0, 10)));
   EXPECT_EQ(0, netPointCountAt(segment, point(5.08, 20)));
+  EXPECT_TRUE(allNetLinesOrthogonal(segment));
+}
+
+TEST_F(CmdDragSelectedSchematicItemsTest,
+       testDragMovesNetLabelOnShiftedWire) {
+  createProject();
+  ComponentInstance& c1 = addComponentInstance(CircuitIdentifier("U1"));
+  ComponentInstance& c2 = addComponentInstance(CircuitIdentifier("U2"));
+  NetSignal& net = addNetSignal(CircuitIdentifier("N"));
+  connect(c1, net);
+  connect(c2, net);
+  SI_Symbol& s1 = addSymbol(c1, point(0, 0));
+  SI_Symbol& s2 = addSymbol(c2, point(20, 0));
+  SI_NetSegment& segment = addNetSegment(net);
+  SI_NetPoint* netPoint = new SI_NetPoint(segment, uuid(), point(10, 0));
+  SI_NetLine* firstLine = new SI_NetLine(segment, uuid(), pin(s1), *netPoint,
+                                         SI_NetLine::getDefaultWidth());
+  SI_NetLine* secondLine = new SI_NetLine(segment, uuid(), *netPoint, pin(s2),
+                                          SI_NetLine::getDefaultWidth());
+  segment.addNetPointsAndNetLines({netPoint}, {firstLine, secondLine});
+  SI_NetLabel* label = new SI_NetLabel(
+      segment, NetLabel(uuid(), point(5, 1), Angle::deg0(), false));
+  segment.addNetLabel(*label);
+  createScene();
+  select(s1);
+
+  CmdDragSelectedSchematicItems cmd(*mScene, Point());
+  cmd.setCurrentPosition(point(0, 5.08));
+  EXPECT_TRUE(cmd.execute());
+
+  EXPECT_EQ(point(10, 5.08), netPoint->getPosition());
+  EXPECT_EQ(point(5, 6.08), label->getPosition());
+  EXPECT_EQ(point(5, 5.08), label->getAnchorPosition());
+  EXPECT_TRUE(allNetLinesOrthogonal(segment));
+
+  cmd.undo();
+  EXPECT_EQ(point(10, 0), netPoint->getPosition());
+  EXPECT_EQ(point(5, 1), label->getPosition());
+  EXPECT_TRUE(allNetLinesOrthogonal(segment));
+
+  cmd.redo();
+  EXPECT_EQ(point(10, 5.08), netPoint->getPosition());
+  EXPECT_EQ(point(5, 6.08), label->getPosition());
   EXPECT_TRUE(allNetLinesOrthogonal(segment));
 }
 

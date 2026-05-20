@@ -161,6 +161,21 @@ rs::OrthogonalWireDragAnchorKind getAnchorKind(
   return rs::OrthogonalWireDragAnchorKind::Fixed;
 }
 
+bool pointOnOrthogonalSegment(const Point& point, const Point& p1,
+                              const Point& p2) noexcept {
+  if (p1.getX() == p2.getX()) {
+    return (point.getX() == p1.getX()) &&
+        (point.getY() >= qMin(p1.getY(), p2.getY())) &&
+        (point.getY() <= qMax(p1.getY(), p2.getY()));
+  }
+  if (p1.getY() == p2.getY()) {
+    return (point.getY() == p1.getY()) &&
+        (point.getX() >= qMin(p1.getX(), p2.getX())) &&
+        (point.getX() <= qMax(p1.getX(), p2.getX()));
+  }
+  return false;
+}
+
 }  // namespace
 
 /*******************************************************************************
@@ -269,6 +284,8 @@ CmdDragSelectedSchematicItems::CmdDragSelectedSchematicItems(
       movingPins.insert(pin);
     }
   }
+  const QSet<SI_NetLabel*> selectedNetLabels = QSet<SI_NetLabel*>(
+      query.getNetLabels().begin(), query.getNetLabels().end());
 
   // Build a plain anchor/wire graph for the Rust algorithm. Schematic-specific
   // object ownership and undo commands stay here; the actual orthogonal routing
@@ -338,6 +355,24 @@ CmdDragSelectedSchematicItems::CmdDragSelectedSchematicItems(
   }
 
   if ((!rustAnchors.empty()) && (!rustWires.empty())) {
+    auto mask = [](bool x, bool y) {
+      StretchAxisMask m;
+      m.stretchX = x;
+      m.stretchY = y;
+      return m;
+    };
+    auto mergeMask = [](StretchAxisMask& dst, const StretchAxisMask& src) {
+      dst.stretchX |= src.stretchX;
+      dst.stretchY |= src.stretchY;
+    };
+    std::vector<StretchAxisMask> anchorMasks(anchors.size());
+    for (std::size_t i = 0; i < rustAnchors.size(); ++i) {
+      if (rustAnchors.at(i).kind ==
+          rs::OrthogonalWireDragAnchorKind::Moving) {
+        anchorMasks.at(i) = mask(true, true);
+      }
+    }
+
     std::unique_ptr<rs::OrthogonalWireDragOutput,
                     decltype(&rs::ffi_orthogonal_wire_drag_delete)>
         output(rs::ffi_orthogonal_wire_drag_new(
@@ -354,6 +389,8 @@ CmdDragSelectedSchematicItems::CmdDragSelectedSchematicItems(
       SI_NetPoint* netpoint =
           dynamic_cast<SI_NetPoint*>(anchors.at(movement.anchor));
       if (!netpoint) continue;
+      anchorMasks.at(movement.anchor) =
+          mask(movement.stretch_x, movement.stretch_y);
       mStretchEdits.append({new CmdSchematicNetPointEdit(*netpoint),
                             {movement.stretch_x, movement.stretch_y}});
     }
@@ -374,6 +411,33 @@ CmdDragSelectedSchematicItems::CmdDragSelectedSchematicItems(
                                  {split.trigger_x, split.trigger_y},
                                  {split.stretch_x, split.stretch_y}});
     }
+
+    QHash<SI_NetLabel*, StretchAxisMask> netLabelMasks;
+    for (std::size_t i = 0; i < lines.size(); ++i) {
+      const rs::OrthogonalWireDragWire& wire = rustWires.at(i);
+      const StretchAxisMask lineMask =
+          mask(anchorMasks.at(wire.p1).stretchX &&
+                   anchorMasks.at(wire.p2).stretchX,
+               anchorMasks.at(wire.p1).stretchY &&
+                   anchorMasks.at(wire.p2).stretchY);
+      if ((!lineMask.stretchX) && (!lineMask.stretchY)) continue;
+
+      SI_NetLine* line = lines.at(i);
+      const Point p1 = line->getP1().getPosition();
+      const Point p2 = line->getP2().getPosition();
+      foreach (SI_NetLabel* label, line->getNetSegment().getNetLabels()) {
+        if (selectedNetLabels.contains(label)) continue;
+        if (!pointOnOrthogonalSegment(label->getAnchorPosition(), p1, p2)) {
+          continue;
+        }
+        mergeMask(netLabelMasks[label], lineMask);
+      }
+    }
+    for (auto it = netLabelMasks.constBegin(); it != netLabelMasks.constEnd();
+         ++it) {
+      mStretchNetLabelEdits.append(
+          {new CmdSchematicNetLabelEdit(*it.key()), it.value()});
+    }
   }
 }
 
@@ -381,6 +445,7 @@ CmdDragSelectedSchematicItems::~CmdDragSelectedSchematicItems() noexcept {
   if (!wasEverExecuted()) {
     discardSplitNetLineEdits();
     discardStretchEdits();
+    discardStretchNetLabelEdits();
   }
 }
 
@@ -467,6 +532,15 @@ void CmdDragSelectedSchematicItems::setCurrentPosition(
         s.cmd->translate(masked, true);
       }
     }
+    foreach (const StretchNetLabelEdit& s, mStretchNetLabelEdits) {
+      // Labels are not anchors in the wire graph, so mirror the movement of
+      // the wire portion they were attached to at drag start.
+      const Point masked(s.mask.stretchX ? increment.getX() : Length(0),
+                         s.mask.stretchY ? increment.getY() : Length(0));
+      if (!masked.isOrigin()) {
+        s.cmd->translate(masked, true);
+      }
+    }
     mDeltaPos = delta;
 
     // If the drag returned to the original line axis, drop preview bends so a
@@ -483,6 +557,7 @@ void CmdDragSelectedSchematicItems::rotate(
   // them for the remainder of the drag.
   discardSplitNetLineEdits();
   discardStretchEdits();
+  discardStretchNetLabelEdits();
 
   const Point center = (aroundCurrentPosition && (mItemCount > 1))
       ? (mStartPos + mDeltaPos).mappedToGrid(mSchematic.getGridInterval())
@@ -522,6 +597,7 @@ void CmdDragSelectedSchematicItems::mirror(
   // attribution captured at drag start.
   discardSplitNetLineEdits();
   discardStretchEdits();
+  discardStretchNetLabelEdits();
 
   const Point center = (aroundCurrentPosition && (mItemCount > 1))
       ? (mStartPos + mDeltaPos).mappedToGrid(mSchematic.getGridInterval())
@@ -583,6 +659,7 @@ bool CmdDragSelectedSchematicItems::performExecute() {
     mImageEditCmds.clear();
     discardSplitNetLineEdits();
     discardStretchEdits();
+    discardStretchNetLabelEdits();
     return false;
   }
 
@@ -609,6 +686,9 @@ bool CmdDragSelectedSchematicItems::performExecute() {
   foreach (CmdSchematicNetLabelEdit* cmd, mNetLabelEditCmds) {
     appendChild(cmd);  // can throw
   }
+  foreach (const StretchNetLabelEdit& s, mStretchNetLabelEdits) {
+    appendChild(s.cmd);  // can throw
+  }
   foreach (CmdPolygonEdit* cmd, mPolygonEditCmds) {
     appendChild(cmd);  // can throw
   }
@@ -633,6 +713,7 @@ bool CmdDragSelectedSchematicItems::performExecute() {
   }
   mSplitNetLineEdits.clear();
   mStretchEdits.clear();  // ownership transferred to the group
+  mStretchNetLabelEdits.clear();  // ownership transferred to the group
 
   // execute all child commands
   return UndoCommandGroup::performExecute();  // can throw
@@ -716,6 +797,13 @@ void CmdDragSelectedSchematicItems::discardStretchEdits() noexcept {
     delete s.cmd;
   }
   mStretchEdits.clear();
+}
+
+void CmdDragSelectedSchematicItems::discardStretchNetLabelEdits() noexcept {
+  foreach (const StretchNetLabelEdit& s, mStretchNetLabelEdits) {
+    delete s.cmd;
+  }
+  mStretchNetLabelEdits.clear();
 }
 
 /*******************************************************************************
