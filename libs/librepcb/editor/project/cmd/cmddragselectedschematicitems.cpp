@@ -163,6 +163,10 @@ rs::OrthogonalWireDragAnchorKind getAnchorKind(
   return rs::OrthogonalWireDragAnchorKind::Fixed;
 }
 
+qint32 getPinSideKey(const SI_SymbolPin& pin) noexcept {
+  return pin.getRotation().mappedTo0_360deg().toMicroDeg();
+}
+
 bool pointOnOrthogonalSegment(const Point& point, const Point& p1,
                               const Point& p2) noexcept {
   if (p1.getX() == p2.getX()) {
@@ -305,8 +309,21 @@ CmdDragSelectedSchematicItems::CmdDragSelectedSchematicItems(
       query.getNetPoints().begin(), query.getNetPoints().end());
   QSet<SI_SymbolPin*> movingPins;
   foreach (SI_Symbol* symbol, query.getSymbols()) {
+    QHash<qint32, int> connectedPinsPerSide;
     foreach (SI_SymbolPin* pin, symbol->getPins()) {
-      movingPins.insert(pin);
+      if (!pin->getNetLines().isEmpty()) {
+        connectedPinsPerSide[getPinSideKey(*pin)] += 1;
+      }
+    }
+    foreach (SI_SymbolPin* pin, symbol->getPins()) {
+      // Moving several connected pins on the same symbol side orthogonally can
+      // easily hide overlaps between parallel nets. Keep the old direct-wire
+      // behavior for such sides; allow the orthogonal adjustment only for
+      // single connected pins.
+      if ((!pin->getNetLines().isEmpty()) &&
+          (connectedPinsPerSide.value(getPinSideKey(*pin)) == 1)) {
+        movingPins.insert(pin);
+      }
     }
   }
   const QSet<SI_NetLabel*> selectedNetLabels = QSet<SI_NetLabel*>(

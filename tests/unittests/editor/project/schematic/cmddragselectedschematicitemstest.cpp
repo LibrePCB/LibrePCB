@@ -154,6 +154,25 @@ protected:
     return *instance;
   }
 
+  void addPinSignal(const Uuid& pinUuid, const Uuid& signalUuid,
+                    const CircuitIdentifier& name, const Point& position,
+                    const Angle& rotation = Angle::deg0()) {
+    mSymbol->getPins().append(std::make_shared<SymbolPin>(
+        pinUuid, name, position, UnsignedLength(0), rotation, Point(),
+        Angle::deg0(), PositiveLength(1000000),
+        Alignment(HAlign::left(), VAlign::center())));
+    mComponent->getSignals().append(std::make_shared<ComponentSignal>(
+        signalUuid, name, SignalRole::passive(), "", false, false, false));
+    mComponent->getSymbolVariants()
+        .first()
+        ->getSymbolItems()
+        .first()
+        ->getPinSignalMap()
+        .append(std::make_shared<ComponentPinSignalMapItem>(
+            pinUuid, std::optional<Uuid>(signalUuid),
+            CmpSigPinDisplayType::componentSignal()));
+  }
+
   SI_Symbol& addSymbol(ComponentInstance& component, const Point& position) {
     SI_Symbol* symbol = new SI_Symbol(*mSchematic, uuid(), component, mGateUuid,
                                       position, Angle::deg0(), false, false);
@@ -179,8 +198,17 @@ protected:
     return *symbol.getPin(mPinUuid);
   }
 
+  SI_SymbolPin& pin(SI_Symbol& symbol, const Uuid& pinUuid) const {
+    return *symbol.getPin(pinUuid);
+  }
+
   void connect(ComponentInstance& component, NetSignal& netSignal) {
-    component.getSignalInstance(mSignalUuid)->setNetSignal(&netSignal);
+    connect(component, netSignal, mSignalUuid);
+  }
+
+  void connect(ComponentInstance& component, NetSignal& netSignal,
+               const Uuid& signalUuid) {
+    component.getSignalInstance(signalUuid)->setNetSignal(&netSignal);
   }
 
   void createScene() {
@@ -398,6 +426,48 @@ TEST_F(CmdDragSelectedSchematicItemsTest, testDragMovesNetLabelOnShiftedWire) {
   EXPECT_EQ(point(10, 5.08), netPoint->getPosition());
   EXPECT_EQ(point(5, 6.08), label->getPosition());
   EXPECT_TRUE(allNetLinesOrthogonal(segment));
+}
+
+TEST_F(CmdDragSelectedSchematicItemsTest,
+       testDragMultiPinSideKeepsDirectWires) {
+  createProject();
+  const Uuid pin2Uuid = uuid();
+  const Uuid signal2Uuid = uuid();
+  addPinSignal(pin2Uuid, signal2Uuid, CircuitIdentifier("P2"), point(0, 2.54));
+  ComponentInstance& c1 = addComponentInstance(CircuitIdentifier("U1"));
+  ComponentInstance& c2 = addComponentInstance(CircuitIdentifier("U2"));
+  ComponentInstance& c3 = addComponentInstance(CircuitIdentifier("U3"));
+  NetSignal& net1 = addNetSignal(CircuitIdentifier("N1"));
+  NetSignal& net2 = addNetSignal(CircuitIdentifier("N2"));
+  connect(c1, net1);
+  connect(c1, net2, signal2Uuid);
+  connect(c2, net1);
+  connect(c3, net2, signal2Uuid);
+  SI_Symbol& s1 = addSymbol(c1, point(0, 0));
+  SI_Symbol& s2 = addSymbol(c2, point(20, 0));
+  SI_Symbol& s3 = addSymbol(c3, point(20, 0));
+  SI_NetSegment& segment1 = addNetSegment(net1);
+  SI_NetLine* line1 = new SI_NetLine(segment1, uuid(), pin(s1), pin(s2),
+                                     SI_NetLine::getDefaultWidth());
+  segment1.addNetPointsAndNetLines({}, {line1});
+  SI_NetSegment& segment2 = addNetSegment(net2);
+  SI_NetLine* line2 =
+      new SI_NetLine(segment2, uuid(), pin(s1, pin2Uuid), pin(s3, pin2Uuid),
+                     SI_NetLine::getDefaultWidth());
+  segment2.addNetPointsAndNetLines({}, {line2});
+  createScene();
+  select(s1);
+
+  CmdDragSelectedSchematicItems cmd(*mScene, Point());
+  cmd.setCurrentPosition(point(0, 5.08));
+  EXPECT_TRUE(cmd.execute());
+
+  EXPECT_EQ(0, segment1.getNetPoints().count());
+  EXPECT_EQ(1, segment1.getNetLines().count());
+  EXPECT_EQ(0, segment2.getNetPoints().count());
+  EXPECT_EQ(1, segment2.getNetLines().count());
+  EXPECT_FALSE(isOrthogonal(*line1));
+  EXPECT_FALSE(isOrthogonal(*line2));
 }
 
 TEST_F(CmdDragSelectedSchematicItemsTest, testNoDragDiscardsCleanly) {
