@@ -133,6 +133,15 @@ private:
   };
   QList<StretchNetPointEdit> mStretchEdits;
 
+  /// Net labels attached to wire portions which are moved by the orthogonal
+  /// adjustment. They follow the same masked delta to stay visually attached
+  /// to the wire they describe.
+  struct StretchNetLabelEdit {
+    CmdSchematicNetLabelEdit* cmd;
+    StretchAxisMask mask;
+  };
+  QList<StretchNetLabelEdit> mStretchNetLabelEdits;
+
   /// Fixed-anchor netlines which need a temporary bend point once the drag
   /// moves perpendicular to their original orientation.
   struct SplitNetLineEdit {
@@ -159,6 +168,7 @@ private:
   /// mid-drag.
   void discardStretchEdit(CmdSchematicNetPointEdit* cmd) noexcept;
   void discardStretchEdits() noexcept;
+  void discardStretchNetLabelEdits() noexcept;
 };
 
 /*******************************************************************************
