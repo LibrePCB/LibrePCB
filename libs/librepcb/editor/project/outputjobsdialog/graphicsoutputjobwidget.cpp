@@ -341,7 +341,7 @@ void GraphicsOutputJobWidget::addClicked() noexcept {
   auto content = mJob->getContent();
   QMenu menu;
   menu.addAction(
-      QIcon(":/img/actions/schematic.png"), tr("Schematic"), &menu, [&]() {
+      QIcon(":/img/actions/schematic.svg"), tr("Schematic"), &menu, [&]() {
         content.insert(index,
                        GraphicsOutputJob::Content(
                            GraphicsOutputJob::Content::Preset::Schematic));
@@ -514,7 +514,7 @@ void GraphicsOutputJobWidget::updateContentList() noexcept {
     item->setFlags(Qt::ItemIsEditable | Qt::ItemIsSelectable |
                    Qt::ItemIsEnabled);
     if (content.type == GraphicsOutputJob::Content::Type::Schematic) {
-      item->setIcon(QIcon(":/img/actions/schematic.png"));
+      item->setIcon(QIcon(":/img/actions/schematic.svg"));
     } else if (content.type == GraphicsOutputJob::Content::Type::Board) {
       item->setIcon(QIcon(":/img/actions/board_editor.png"));
     } else if (content.type ==

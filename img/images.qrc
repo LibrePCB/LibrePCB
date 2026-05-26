@@ -132,6 +132,7 @@
         <file>actions/run.png</file>
         <file>actions/run_all.png</file>
         <file>actions/schematic.png</file>
+        <file>actions/schematic.svg</file>
         <file>actions/search.png</file>
         <file>actions/settings.png</file>
         <file>actions/undo.png</file>
