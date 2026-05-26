@@ -39,7 +39,7 @@ then
   brew install --force-bottle rustup
   rustup install --profile minimal 1.89.0
   rustup default 1.89.0
-  export PATH="/usr/local/opt/rustup/bin:$PATH"
+  export PATH="$(brew --prefix rustup)/bin:$PATH"
 
   # Install Cargo packages
   cargo install --force cargo-llvm-cov
