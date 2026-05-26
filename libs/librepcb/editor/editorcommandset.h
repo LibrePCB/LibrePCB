@@ -919,7 +919,7 @@ public:
       "show_pin_numbers",  // clang-format break
       QT_TR_NOOP("Show Pin Numbers"),
       QT_TR_NOOP("Show or hide symbol pin numbers"),
-      ":/bi/123.svg",
+      ":/img/actions/show_pin_numbers.svg",
       EditorCommand::Flags(),
       {QKeySequence()},
       &categoryView,

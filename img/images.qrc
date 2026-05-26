@@ -135,6 +135,7 @@
         <file>actions/schematic.svg</file>
         <file>actions/search.png</file>
         <file>actions/settings.png</file>
+        <file>actions/show_pin_numbers.svg</file>
         <file>actions/undo.png</file>
         <file>actions/up.png</file>
         <file>actions/wizard.png</file>
