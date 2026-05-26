@@ -47,7 +47,6 @@
         <file alias="/fa/solid/clone.svg">../libs/font-awesome/svgs/solid/clone.svg</file>
         <file alias="/fa/solid/cubes.svg">../libs/font-awesome/svgs/solid/cubes.svg</file>
         <file alias="/fa/solid/draw-polygon.svg">../libs/font-awesome/svgs/solid/draw-polygon.svg</file>
-        <file alias="/fa/solid/expand.svg">../libs/font-awesome/svgs/solid/expand.svg</file>
         <file alias="/fa/solid/eye-slash.svg">../libs/font-awesome/svgs/solid/eye-slash.svg</file>
         <file alias="/fa/solid/eye.svg">../libs/font-awesome/svgs/solid/eye.svg</file>
         <file alias="/fa/solid/file-circle-plus.svg">../libs/font-awesome/svgs/solid/file-circle-plus.svg</file>
@@ -137,6 +136,7 @@
         <file>actions/undo.png</file>
         <file>actions/up.png</file>
         <file>actions/wizard.png</file>
+        <file>actions/zoom-fit.svg</file>
         <file>app/librepcb.png</file>
         <file>app/librepcb.svg</file>
         <file>arrow-right-left-across-line.svg</file>

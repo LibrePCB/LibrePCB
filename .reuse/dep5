@@ -93,6 +93,10 @@ Files:
 Copyright: Font Awesome
 License: CC-BY-4.0
 
+Files: img/actions/zoom-fit.svg
+Copyright: LibrePCB Developers
+License: CC0-1.0
+
 Files: libs/font-awesome/*
 Copyright: Font Awesome
 License: MIT
