@@ -48,6 +48,7 @@ Files:
  img/actions/board_editor.png
  img/actions/draw_bus.png
  img/actions/draw_wire.png
+ img/actions/draw_wire.svg
  img/actions/export_pick_place_file.png
  img/actions/schematic.png
  img/capacitor-bipolar-eu.svg
