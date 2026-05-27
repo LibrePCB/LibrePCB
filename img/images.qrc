@@ -103,6 +103,7 @@
         <file>actions/cut.png</file>
         <file>actions/delete.png</file>
         <file>actions/down.png</file>
+        <file>actions/draw_trace.svg</file>
         <file>actions/draw_wire.png</file>
         <file>actions/draw_wire.svg</file>
         <file>actions/edit.png</file>

@@ -1184,7 +1184,7 @@ public:
       "tool_trace",  // clang-format break
       QT_TR_NOOP("Draw Trace"),
       QT_TR_NOOP("Draw copper traces to interconnect devices"),
-      ":/img/actions/draw_wire.svg",
+      ":/img/actions/draw_trace.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_W)},
       &categoryTools,
