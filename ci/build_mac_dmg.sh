@@ -8,13 +8,14 @@ set -euv -o pipefail
 pushd "./build/install/"  # Avoid having path in DMG name
 for run in {1..10}; do
   if [ ! -f ./LibrePCB.dmg ]; then
-    create-dmg --skip-jenkins --volname "LibrePCB" \
+    create-dmg --volname "LibrePCB" \
       --volicon ./LibrePCB.app/Contents/Resources/librepcb.icns \
+      --background ../../ci/dmg_background.png \
       --window-size 500 300 \
       --icon-size 96 \
-      --icon LibrePCB.app 140 150 \
+      --icon LibrePCB.app 115 133 \
       --hide-extension LibrePCB.app \
-      --app-drop-link 360 150 \
+      --app-drop-link 388 133 \
       ./LibrePCB.dmg ./LibrePCB.app || true
     sleep 5
   fi
