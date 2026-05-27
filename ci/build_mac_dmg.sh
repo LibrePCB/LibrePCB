@@ -10,6 +10,11 @@ for run in {1..10}; do
   if [ ! -f ./LibrePCB.dmg ]; then
     create-dmg --skip-jenkins --volname "LibrePCB" \
       --volicon ./LibrePCB.app/Contents/Resources/librepcb.icns \
+      --window-size 500 300 \
+      --icon-size 96 \
+      --icon LibrePCB.app 140 150 \
+      --hide-extension LibrePCB.app \
+      --app-drop-link 360 150 \
       ./LibrePCB.dmg ./LibrePCB.app || true
     sleep 5
   fi
