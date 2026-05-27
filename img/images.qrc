@@ -106,6 +106,7 @@
         <file>actions/draw_trace.svg</file>
         <file>actions/draw_wire.png</file>
         <file>actions/draw_wire.svg</file>
+        <file>actions/drill.svg</file>
         <file>actions/edit.png</file>
         <file>actions/export_gerber.png</file>
         <file>actions/export_pick_place_file.png</file>

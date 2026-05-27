@@ -1138,7 +1138,7 @@ public:
       "tool_hole",  // clang-format break
       QT_TR_NOOP("Add Hole"),
       QT_TR_NOOP("Add non-plated holes (NPTH drills)"),
-      ":/fa/solid/bore-hole.svg",
+      ":/img/actions/drill.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_O)},
       &categoryTools,

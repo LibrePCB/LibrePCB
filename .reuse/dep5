@@ -50,6 +50,7 @@ Files:
  img/actions/draw_trace.svg
  img/actions/draw_wire.png
  img/actions/draw_wire.svg
+ img/actions/drill.svg
  img/actions/export_pick_place_file.png
  img/actions/output_jobs.svg
  img/actions/schematic.png
