@@ -482,6 +482,15 @@ public:
   QSet<Uuid> getComponentDevices(const Uuid& component) const;
 
   /**
+   * @brief Get all devices of a specific package
+   *
+   * @param package     Package UUID to get the devices of.
+   *
+   * @return UUIDs of devices. Empty if the passed package doesn't exist.
+   */
+  QSet<Uuid> getPackageDevices(const Uuid& package) const;
+
+  /**
    * @brief Get all parts of a specific device
    *
    * @param device      Device UUID to get the parts of.

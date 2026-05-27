@@ -766,6 +766,20 @@ void PackageTab::trigger(ui::TabAction a) noexcept {
       mFsm->processSelectAll();
       break;
     }
+    case ui::TabAction::ShowUsages: {
+      QStringList items;
+      const auto& db = mApp.getWorkspace().getLibraryDb();
+      const QSet<Uuid> devs = db.getPackageDevices(mPackage->getUuid());
+      for (const Uuid& dev : devs) {
+        const FilePath fp = db.getLatest<Device>(dev);
+        if (!fp.isValid()) continue;
+        QString name;
+        if (!db.getTranslations<Device>(fp, mApp.getWorkspace().getSettings().libraryLocaleOrder.get(), &name)) continue;
+        items.append(name);
+      }
+      QMessageBox::information(nullptr, "Usages", items.join("\n"));
+      break;
+    }
     case ui::TabAction::Abort: {
       mFsm->processAbortCommand();
       break;

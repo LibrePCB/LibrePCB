@@ -153,6 +153,15 @@ public:
       {QKeySequence(Qt::SHIFT | Qt::Key_F3)},
       &categoryEditor,
   };
+  EditorCommand showUsages{
+      "show_usages",  // clang-format break
+      QT_TR_NOOP("Show Usages"),
+      QT_TR_NOOP("Show all library elements which reference this element"),
+      nullptr,
+      EditorCommand::Flags(),
+      {},
+      &categoryEditor,
+  };
   EditorCommand fileManager{
       "file_manager",  // clang-format break
       QT_TR_NOOP("Show in File Manager"),

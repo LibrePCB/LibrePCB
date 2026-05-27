@@ -23,6 +23,7 @@ public:
     out.set_find(l2s(cmd.find, out.get_find()));
     out.set_find_next(l2s(cmd.findNext, out.get_find_next()));
     out.set_find_previous(l2s(cmd.findPrevious, out.get_find_previous()));
+    out.set_show_usages(l2s(cmd.showUsages, out.get_show_usages()));
     out.set_file_manager(l2s(cmd.fileManager, out.get_file_manager()));
     out.set_workspace_switch(l2s(cmd.workspaceSwitch, out.get_workspace_switch()));
     out.set_workspace_settings(l2s(cmd.workspaceSettings, out.get_workspace_settings()));

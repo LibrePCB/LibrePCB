@@ -74,6 +74,16 @@ export global EditorCommandSet {
         key: Key.F3,
     };
 
+    in property <EditorCommand> show-usages: {
+        id: "show_usages",
+        icon: @image-url(""),
+        text: "Show Usages",
+        status-tip: "Show all library elements which reference this element",
+        shortcut: "",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "",
+    };
+
     in property <EditorCommand> file-manager: {
         id: "file_manager",
         icon: @image-url("../../../font-awesome/svgs/solid/arrow-up-right-from-square.svg"),

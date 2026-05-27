@@ -256,6 +256,17 @@ QSet<Uuid> WorkspaceLibraryDb::getComponentDevices(
   return getUuidSet(query);
 }
 
+QSet<Uuid> WorkspaceLibraryDb::getPackageDevices(
+    const Uuid& package) const {
+  QSqlQuery query = mDb->prepareQuery(
+      "SELECT uuid FROM devices "
+      "WHERE package_uuid = :uuid "
+      "GROUP BY uuid");
+  query.bindValue(":uuid", package.toStr());
+  mDb->exec(query);
+  return getUuidSet(query);
+}
+
 QList<WorkspaceLibraryDb::Part> WorkspaceLibraryDb::getDeviceParts(
     const Uuid& device) const {
   SQLiteDatabase::TransactionScopeGuard sg(*mDb);  // Atomic attributes query!

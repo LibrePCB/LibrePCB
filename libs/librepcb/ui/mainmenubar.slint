@@ -1204,6 +1204,15 @@ export component MainMenuBar {
                         close-menu();
                     }
                 }
+
+                show-package-usages-item := MenuItem {
+                    cmd: Cmd.show-usages;
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.show-usages);
+                        close-menu();
+                    }
+                }
             }
         }
 
