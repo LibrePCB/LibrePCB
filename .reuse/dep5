@@ -50,6 +50,7 @@ Files:
  img/actions/draw_wire.png
  img/actions/draw_wire.svg
  img/actions/export_pick_place_file.png
+ img/actions/output_jobs.svg
  img/actions/schematic.png
  img/actions/schematic.svg
  img/actions/show_pin_numbers.svg
@@ -187,7 +188,6 @@ Files:
  img/actions/delete.png
  img/actions/export_zip.png
  img/actions/open_browser.png
- img/actions/output_jobs.png
  img/actions/paste.png
  img/status/dialog_error.png
 Copyright: Open Icon Library

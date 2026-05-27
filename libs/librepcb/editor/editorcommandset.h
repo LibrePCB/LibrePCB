@@ -607,7 +607,7 @@ public:
       "output_jobs",  // clang-format break
       QT_TR_NOOP("Output Jobs"),
       QT_TR_NOOP("Modify or run output jobs"),
-      ":/fa/solid/play.svg",
+      ":/img/actions/output_jobs.svg",
       EditorCommand::Flag::OpensPopup,
       {QKeySequence(Qt::Key_F11)},
       &categoryImportExport,

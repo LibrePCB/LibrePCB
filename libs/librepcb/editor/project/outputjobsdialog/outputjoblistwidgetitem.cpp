@@ -54,7 +54,7 @@ OutputJobListWidgetItem::OutputJobListWidgetItem(std::shared_ptr<OutputJob> job,
     mUi->lblName->setFont(font);
     mUi->lblName->setText(tr("Output Jobs"));
     mUi->lblIcon->setPixmap(
-        QIcon(":/img/actions/output_jobs.png").pixmap(mUi->lblIcon->size()));
+        QIcon(":/img/actions/output_jobs.svg").pixmap(mUi->lblIcon->size()));
     mUi->btnRun->setFixedSize(mUi->btnOpenDirectory->size());
     mUi->btnRun->setIconSize(mUi->btnOpenDirectory->iconSize());
     mUi->lblType->hide();
@@ -108,9 +108,7 @@ void OutputJobListWidgetItem::updateJobInfo() noexcept {
   } else {
     mUi->btnRun->setToolTip(tr("Run all jobs"));
   }
-  mUi->btnRun->setIcon((mJob && mJob->getDependencies().isEmpty())
-                           ? QIcon(":/img/actions/run.png")
-                           : QIcon(":/img/actions/run_all.png"));
+  mUi->btnRun->setIcon(QIcon(":/img/actions/output_jobs.svg"));
 }
 
 void OutputJobListWidgetItem::setStatusColor(const QColor& color) noexcept {
