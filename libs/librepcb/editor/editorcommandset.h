@@ -1193,7 +1193,7 @@ public:
       "tool_via",  // clang-format break
       QT_TR_NOOP("Add Via"),
       QT_TR_NOOP("Add plated through-hole vias"),
-      ":/bi/record-circle-fill.svg",
+      ":/img/actions/via.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_V)},
       &categoryTools,

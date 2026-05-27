@@ -140,6 +140,7 @@
         <file>actions/show_pin_numbers.svg</file>
         <file>actions/undo.png</file>
         <file>actions/up.png</file>
+        <file>actions/via.svg</file>
         <file>actions/wizard.png</file>
         <file>actions/zoom-fit.svg</file>
         <file>app/librepcb.png</file>
