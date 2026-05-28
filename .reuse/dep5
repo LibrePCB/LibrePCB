@@ -24,6 +24,11 @@ Copyright: LibrePCB Developers, see AUTHORS.md
 License: GPL-3.0-or-later
 
 Files:
+ dist/dmg/*
+Copyright: LibrePCB Developers, see AUTHORS.md
+License: CC0-1.0
+
+Files:
  .clang-format
  .clang-tidy
  .cmake-format.py

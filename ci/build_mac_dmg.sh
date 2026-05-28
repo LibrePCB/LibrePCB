@@ -10,7 +10,7 @@ for run in {1..10}; do
   if [ ! -f ./LibrePCB.dmg ]; then
     create-dmg --volname "LibrePCB" \
       --volicon ./LibrePCB.app/Contents/Resources/librepcb.icns \
-      --background ../../ci/dmg_background.png \
+      --background ../../dist/dmg/background.png \
       --window-size 500 300 \
       --icon-size 96 \
       --icon LibrePCB.app 115 133 \
