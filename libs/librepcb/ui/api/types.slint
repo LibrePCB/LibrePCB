@@ -1144,6 +1144,10 @@ export struct PackageTabData {
     tool-no-exposures: bool,
     tool-no-devices: bool,
 
+    // Show usages
+    show-usages: bool,
+    usages: [TreeViewItemData],
+
     // Misc
     scene-image-pos: Point,  // Absolute position of graphics scene
     frame: int,  // Frame index to trigger repainting
@@ -1151,6 +1155,7 @@ export struct PackageTabData {
     // Actions
     new-category: string,  // Set to UUID by UI, reset by backend
     new-footprint: string,  // Set to new name by UI, reset by backend
+    open-device: string,  // Set to user_data by UI, reset by backend
 }
 
 // Additional data for component editor tabs

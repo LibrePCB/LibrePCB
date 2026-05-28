@@ -450,6 +450,8 @@ ui::PackageTabData PackageTab::getDerivedUiData() const noexcept {
       mToolZoneRules.testFlag(Zone::Rule::NoPlanes),  // Tool no planes
       mToolZoneRules.testFlag(Zone::Rule::NoExposure),  // Tool no exposure
       mToolZoneRules.testFlag(Zone::Rule::NoDevices),  // Tool no devices
+      mUsagesModel != nullptr,  // Show usages
+      mUsagesModel,  // Usages
       q2s(mSceneImagePos),  // Scene image position
       mFrameIndex,  // Frame index
       slint::SharedString(),  // New category
@@ -597,6 +599,14 @@ void PackageTab::setDerivedUiData(const ui::PackageTabData& data) noexcept {
   emit zoneRuleRequested(Zone::Rule::NoPlanes, data.tool_no_planes);
   emit zoneRuleRequested(Zone::Rule::NoExposure, data.tool_no_exposures);
   emit zoneRuleRequested(Zone::Rule::NoDevices, data.tool_no_devices);
+
+  // Show usages
+  if (!data.show_usages) {
+    mUsagesModel = nullptr;
+  }
+  if ((!data.open_device.empty()) && mWindow) {
+    mWindow->openDeviceTab(mEditor, FilePath(s2q(data.open_device)));
+  }
 
   requestRepaint();
 }
@@ -767,17 +777,57 @@ void PackageTab::trigger(ui::TabAction a) noexcept {
       break;
     }
     case ui::TabAction::ShowUsages: {
-      QStringList items;
+      std::vector<ui::TreeViewItemData> items;
       const auto& db = mApp.getWorkspace().getLibraryDb();
       const QSet<Uuid> devs = db.getPackageDevices(mPackage->getUuid());
+      QHash<FilePath, std::pair<slint::Image, QString>> libraries;
       for (const Uuid& dev : devs) {
         const FilePath fp = db.getLatest<Device>(dev);
         if (!fp.isValid()) continue;
-        QString name;
-        if (!db.getTranslations<Device>(fp, mApp.getWorkspace().getSettings().libraryLocaleOrder.get(), &name)) continue;
-        items.append(name);
+        QString name, description;
+        if (!db.getTranslations<Device>(
+                fp, mApp.getWorkspace().getSettings().libraryLocaleOrder.get(),
+                &name, &description)) {
+          continue;
+        }
+
+        const FilePath libFp = fp.getParentDir().getParentDir();
+        auto libIt = libraries.find(libFp);
+        if (libIt == libraries.end()) {
+          QPixmap icon;
+          QString name;
+          if (!mPackage->getDirectory().getAbsPath().isLocatedInDir(libFp)) {
+            db.getTranslations<Library>(
+                libFp,
+                mApp.getWorkspace().getSettings().libraryLocaleOrder.get(),
+                &name);
+          }
+          db.getLibraryMetadata(libFp, &icon);
+          libIt = libraries.insert(libFp, std::make_pair(q2s(icon), name));
+        }
+
+        ui::TreeViewItemData item = {};
+        item.icon = libIt->first;
+        item.text = q2s(name);
+        item.hint = q2s(libIt->second);
+        item.user_data = q2s(fp.toStr());
+        items.push_back(item);
       }
-      QMessageBox::information(nullptr, "Usages", items.join("\n"));
+      Toolbox::sortNumeric(
+          items,
+          [](const QCollator& collator, const ui::TreeViewItemData& lhs,
+             const ui::TreeViewItemData& rhs) {
+            if (lhs.hint.empty() != rhs.hint.empty()) {
+              return lhs.hint.empty();
+            } else if (lhs.hint != rhs.hint) {
+              return collator(s2q(lhs.hint), s2q(rhs.hint));
+            } else {
+              return collator(s2q(lhs.text), s2q(rhs.text));
+            }
+          });
+      mUsagesModel =
+          std::make_shared<slint::VectorModel<ui::TreeViewItemData>>(items);
+      onDerivedUiDataChanged.notify();
       break;
     }
     case ui::TabAction::Abort: {

@@ -256,8 +256,7 @@ QSet<Uuid> WorkspaceLibraryDb::getComponentDevices(
   return getUuidSet(query);
 }
 
-QSet<Uuid> WorkspaceLibraryDb::getPackageDevices(
-    const Uuid& package) const {
+QSet<Uuid> WorkspaceLibraryDb::getPackageDevices(const Uuid& package) const {
   QSqlQuery query = mDb->prepareQuery(
       "SELECT uuid FROM devices "
       "WHERE package_uuid = :uuid "

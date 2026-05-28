@@ -150,6 +150,23 @@ export component TreeView inherits FocusScope {
                         accessible-role: none;
                     }
 
+                    if !item.hint.is-empty: item-hint-txt := Text {
+                        horizontal-stretch: 100;
+                        color: {
+                            if is-enabled {
+                                Data.theme.control-text-muted
+                            } else {
+                                Data.theme.control-text-disabled
+                            }
+                        };
+                        font-size: font-size;
+                        font-weight: 300;
+                        overflow: TextOverflow.elide;
+                        vertical-alignment: center;
+                        text: item.hint;
+                        accessible-role: none;
+                    }
+
                     if show-pin: item-pin-btn := ListViewItemButton {
                         icon: {
                             if item.pinned {

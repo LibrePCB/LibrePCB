@@ -17,7 +17,6 @@ import { Tab } from "../../tab.slint";
 import {
     AssemblyTypeRowHeader,
     AuthorRowHeader,
-    CategoriesChooserDialog,
     CategoriesRowCell,
     CategoriesRowHeader,
     DeprecatedRowCell,
@@ -34,6 +33,7 @@ import {
     ElementDuplicatedMessageBanner,
     FilesModifiedMessageBanner,
 } from "../messagebanners.slint";
+import { TreeViewDialog } from "../treeviewdialog.slint";
 import {
     Button,
     ComboBox,
@@ -1174,7 +1174,7 @@ export component PackageTab inherits Tab {
         }
     }
 
-    if tabs[index].choose-category: add-category-dialog := CategoriesChooserDialog {
+    if tabs[index].choose-category: add-category-dialog := TreeViewDialog {
         width: parent.width;
         height: parent.height;
         model: tabs[index].categories-tree;
@@ -1187,6 +1187,24 @@ export component PackageTab inherits Tab {
 
         rejected => {
             tabs[index].choose-category = false;
+            root.focus();  // Keep keyboard shortcuts working.
+        }
+    }
+
+    if tabs[index].show-usages: usages-dialog := TreeViewDialog {
+        width: parent.width;
+        height: parent.height;
+        model: tabs[index].usages;
+        icons-color: transparent;  // Do not colorize.
+        placeholder-text: @tr("This package is not used by any device.");
+
+        item-picked(idx, item) => {
+            tabs[index].open-device = item.user-data;
+            root.focus();  // Keep keyboard shortcuts working.
+        }
+
+        rejected => {
+            tabs[index].show-usages = false;
             root.focus();  // Keep keyboard shortcuts working.
         }
     }
