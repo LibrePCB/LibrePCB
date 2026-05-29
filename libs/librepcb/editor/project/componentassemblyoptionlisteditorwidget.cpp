@@ -422,10 +422,25 @@ void ComponentAssemblyOptionListEditorWidget::itemSelectionChanged() noexcept {
       option ? option->getParts().value(pair.second) : nullptr;
   mAddPartButton->setEnabled(option || part);
   mEditButton->setEnabled(option || part);
-  mRemoveButton->setEnabled(
-      (option && mComponent &&
-       (!mComponent->getUsedDeviceUuids().contains(option->getDevice()))) ||
-      part);
+  mRemoveButton->setEnabled([this, &part, &option]() {
+    if (part) {
+      return true;  // Remove will only clear the part.
+    }
+    if ((!option) || (!mComponent)) {
+      return false;  // Invalid selection.
+    }
+    if (!mComponent->getUsedDeviceUuids().contains(option->getDevice())) {
+      return true;  // Device is not placed in any board.
+    }
+    // https://github.com/LibrePCB/LibrePCB/issues/1816
+    int optionsForDevice = 0;
+    for (const ComponentAssemblyOption& opt : std::as_const(mOptions)) {
+      if (opt.getDevice() == option->getDevice()) {
+        ++optionsForDevice;
+      }
+    }
+    return optionsForDevice > 1;  // Not the last entry for this device.
+  }());
   emit selectedPartChanged(part);
 }
 
