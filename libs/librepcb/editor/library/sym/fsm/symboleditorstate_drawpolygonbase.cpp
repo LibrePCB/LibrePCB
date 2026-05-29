@@ -526,8 +526,8 @@ void SymbolEditorState_DrawPolygonBase::updateOverlayText() noexcept {
 void SymbolEditorState_DrawPolygonBase::updateStatusBarMessage() noexcept {
   QString note = " " %
       tr("(press %1 to disable snap, %2 to abort)")
-          .arg(QCoreApplication::translate("QShortcut", "Shift") % "/" %
-               QCoreApplication::translate("QShortcut", "Ctrl"))
+          .arg(EditorToolbox::modifierKeyText(Qt::ShiftModifier) % "/" %
+               EditorToolbox::modifierKeyText(Qt::ControlModifier))
           .arg(tr("right click"));
 
   if (mMode == Mode::RECT) {

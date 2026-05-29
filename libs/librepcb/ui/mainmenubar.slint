@@ -434,7 +434,7 @@ export component MainMenuBar {
                     text: @tr("Cut");
                     icon: @image-url("../../font-awesome/svgs/solid/scissors.svg");
                     status-tip: @tr("Cut the selected object(s) to clipboard");
-                    shortcuts: "Ctrl+X";
+                    shortcuts: Cmd.clipboard-cut.shortcut;
                     enabled: Data.current-tab.features.cut == FeatureState.enabled;
 
                     clicked => {
@@ -447,7 +447,7 @@ export component MainMenuBar {
                     text: @tr("Copy");
                     icon: @image-url("../../font-awesome/svgs/regular/copy.svg");
                     status-tip: @tr("Copy the selected object(s) to clipboard");
-                    shortcuts: "Ctrl+C";
+                    shortcuts: Cmd.clipboard-copy.shortcut;
                     enabled: Data.current-tab.features.copy == FeatureState.enabled;
 
                     clicked => {
@@ -460,7 +460,7 @@ export component MainMenuBar {
                     text: @tr("Paste");
                     icon: @image-url("../../font-awesome/svgs/solid/paste.svg");
                     status-tip: @tr("Paste object(s) from the clipboard");
-                    shortcuts: "Ctrl+V";
+                    shortcuts: Cmd.clipboard-paste.shortcut;
                     enabled: Data.current-tab.features.paste == FeatureState.enabled;
 
                     clicked => {

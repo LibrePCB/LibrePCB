@@ -310,7 +310,9 @@ ui::EditorCommand l2s(const EditorCommand& cmd, ui::EditorCommand in) noexcept {
   in.status_tip = q2s(cmd.getDescription());
   const QKeySequence shortcut = cmd.getKeySequences().value(0);
   if (shortcut.count() == 1) {
-    in.shortcut = q2s(shortcut.toString());
+    // Use the native text so that on macOS the modifier symbols (e.g. "⌘"
+    // instead of "Ctrl") are shown, matching the actually used keys.
+    in.shortcut = q2s(shortcut.toString(QKeySequence::NativeText));
     in.modifiers = q2s(shortcut[0].keyboardModifiers());
     in.key = q2s(shortcut[0].key());
     if (in.modifiers.shift && (in.key.size() == 1) &&
