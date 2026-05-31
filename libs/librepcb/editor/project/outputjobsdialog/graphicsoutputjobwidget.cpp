@@ -24,6 +24,8 @@
 
 #include "ui_graphicsoutputjobwidget.h"
 
+#include "../../utils/editortoolbox.h"
+
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/outputjobrunner.h>
 #include <librepcb/core/project/project.h>
@@ -341,7 +343,7 @@ void GraphicsOutputJobWidget::addClicked() noexcept {
   auto content = mJob->getContent();
   QMenu menu;
   menu.addAction(
-      QIcon(":/img/actions/schematic.svg"), tr("Schematic"), &menu, [&]() {
+      EditorToolbox::svgIcon(":/img/schematic.svg"), tr("Schematic"), &menu, [&]() {
         content.insert(index,
                        GraphicsOutputJob::Content(
                            GraphicsOutputJob::Content::Preset::Schematic));
@@ -514,7 +516,7 @@ void GraphicsOutputJobWidget::updateContentList() noexcept {
     item->setFlags(Qt::ItemIsEditable | Qt::ItemIsSelectable |
                    Qt::ItemIsEnabled);
     if (content.type == GraphicsOutputJob::Content::Type::Schematic) {
-      item->setIcon(QIcon(":/img/actions/schematic.svg"));
+      item->setIcon(EditorToolbox::svgIcon(":/img/schematic.svg"));
     } else if (content.type == GraphicsOutputJob::Content::Type::Board) {
       item->setIcon(QIcon(":/img/actions/board_editor.png"));
     } else if (content.type ==

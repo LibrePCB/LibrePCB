@@ -24,6 +24,8 @@
 
 #include "ui_outputjoblistwidgetitem.h"
 
+#include "../../utils/editortoolbox.h"
+
 #include <librepcb/core/job/outputjob.h>
 
 #include <QtCore>
@@ -54,7 +56,7 @@ OutputJobListWidgetItem::OutputJobListWidgetItem(std::shared_ptr<OutputJob> job,
     mUi->lblName->setFont(font);
     mUi->lblName->setText(tr("Output Jobs"));
     mUi->lblIcon->setPixmap(
-        QIcon(":/img/actions/output_jobs.svg").pixmap(mUi->lblIcon->size()));
+        EditorToolbox::svgIcon(":/img/output_jobs.svg").pixmap(mUi->lblIcon->size()));
     mUi->btnRun->setFixedSize(mUi->btnOpenDirectory->size());
     mUi->btnRun->setIconSize(mUi->btnOpenDirectory->iconSize());
     mUi->lblType->hide();
@@ -108,7 +110,9 @@ void OutputJobListWidgetItem::updateJobInfo() noexcept {
   } else {
     mUi->btnRun->setToolTip(tr("Run all jobs"));
   }
-  mUi->btnRun->setIcon(QIcon(":/img/actions/output_jobs.svg"));
+  mUi->btnRun->setIcon((mJob && mJob->getDependencies().isEmpty())
+                           ? QIcon(":/img/actions/run.png")
+                           : QIcon(":/img/actions/run_all.png"));
 }
 
 void OutputJobListWidgetItem::setStatusColor(const QColor& color) noexcept {

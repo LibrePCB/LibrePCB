@@ -40,6 +40,7 @@ Files:
  AUTHORS.md
  ci/*
  CONTRIBUTING.md
+ img/README.md
  img/actions/add_name.png
  img/actions/add_smt_pad.png
  img/actions/add_symbol_pin.png
@@ -47,16 +48,9 @@ Files:
  img/actions/add_value.png
  img/actions/board_editor.png
  img/actions/draw_bus.png
- img/actions/draw_trace.svg
  img/actions/draw_wire.png
- img/actions/draw_wire.svg
- img/actions/drill.svg
  img/actions/export_pick_place_file.png
- img/actions/output_jobs.svg
  img/actions/schematic.png
- img/actions/schematic.svg
- img/actions/show_pin_numbers.svg
- img/actions/via.svg
  img/capacitor-bipolar-eu.svg
  img/capacitor-bipolar-us.svg
  img/capacitor-unipolar-eu.svg
@@ -71,6 +65,9 @@ Files:
  img/command_toolbars/wire_straight.png
  img/command_toolbars/wire_v_h.png
  img/device.png
+ img/draw_trace.svg
+ img/draw_wire.svg
+ img/drill.svg
  img/empty.png
  img/footprint.png
  img/gnd.svg
@@ -80,14 +77,18 @@ Files:
  img/inductor-us.svg
  img/norm/iec_60617.svg
  img/norm/ieee_315.svg
- img/README.md
+ img/output_jobs.svg
  img/resistor-eu.svg
  img/resistor-us.svg
+ img/schematic.svg
+ img/show_pin_numbers.svg
  img/squares-10px.svg
  img/symbol.png
  img/vcc.svg
+ img/via.svg
  img/video-tutorial.png
  img/wizards/watermark.jpg
+ img/zoom-fit.svg
  libs/README.md
  README.md
  SECURITY.md
@@ -100,9 +101,6 @@ Files:
 Copyright: Font Awesome
 License: CC-BY-4.0
 
-Files: img/actions/zoom-fit.svg
-Copyright: LibrePCB Developers
-License: CC0-1.0
 
 Files: libs/font-awesome/*
 Copyright: Font Awesome

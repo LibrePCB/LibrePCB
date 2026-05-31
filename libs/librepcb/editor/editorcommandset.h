@@ -607,7 +607,7 @@ public:
       "output_jobs",  // clang-format break
       QT_TR_NOOP("Output Jobs"),
       QT_TR_NOOP("Modify or run output jobs"),
-      ":/img/actions/output_jobs.svg",
+      ":/img/output_jobs.svg",
       EditorCommand::Flag::OpensPopup,
       {QKeySequence(Qt::Key_F11)},
       &categoryImportExport,
@@ -919,7 +919,7 @@ public:
       "show_pin_numbers",  // clang-format break
       QT_TR_NOOP("Show Pin Numbers"),
       QT_TR_NOOP("Show or hide symbol pin numbers"),
-      ":/img/actions/show_pin_numbers.svg",
+      ":/img/show_pin_numbers.svg",
       EditorCommand::Flags(),
       {QKeySequence()},
       &categoryView,
@@ -967,7 +967,7 @@ public:
       "tool_line",  // clang-format break
       QT_TR_NOOP("Draw Line"),
       QT_TR_NOOP("Draw graphical lines"),
-      ":/img/actions/draw_wire.svg",
+      ":/img/draw_wire.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_L)},
       &categoryTools,
@@ -1138,7 +1138,7 @@ public:
       "tool_hole",  // clang-format break
       QT_TR_NOOP("Add Hole"),
       QT_TR_NOOP("Add non-plated holes (NPTH drills)"),
-      ":/img/actions/drill.svg",
+      ":/img/drill.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_O)},
       &categoryTools,
@@ -1148,7 +1148,7 @@ public:
       QT_TR_NOOP("Draw Wire"),
       QT_TR_NOOP(
           "Draw wires to create electrical connections between symbol pins"),
-      ":/img/actions/draw_wire.svg",
+      ":/img/draw_wire.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_W)},
       &categoryTools,
@@ -1184,7 +1184,7 @@ public:
       "tool_trace",  // clang-format break
       QT_TR_NOOP("Draw Trace"),
       QT_TR_NOOP("Draw copper traces to interconnect devices"),
-      ":/img/actions/draw_trace.svg",
+      ":/img/draw_trace.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_W)},
       &categoryTools,
@@ -1193,7 +1193,7 @@ public:
       "tool_via",  // clang-format break
       QT_TR_NOOP("Add Via"),
       QT_TR_NOOP("Add plated through-hole vias"),
-      ":/img/actions/via.svg",
+      ":/img/via.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_V)},
       &categoryTools,

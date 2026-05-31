@@ -88,8 +88,7 @@ public:
     }
 
     QByteArray content = mSvgContent;
-    content.replace("fill=\"currentColor\"",
-                    QString("fill=\"%1\"").arg(color.name()).toUtf8());
+    content.replace("currentColor", color.name().toUtf8());
 
     QSvgRenderer renderer(content);
     const QSize svgSize = renderer.defaultSize().scaled(

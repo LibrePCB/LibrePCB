@@ -227,7 +227,7 @@ component ProjectSection inherits Rectangle {
             type: ItemType.schematic;
             text: schematic.name;
             can-rename: project.schematics.length > 1;  // Because default name is hidden.
-            icon: @image-url("../../../img/actions/schematic.svg");
+            icon: @image-url("../../../img/schematic.svg");
             selected: (Data.current-tab.type == TabType.schematic) && (Data.current-schematic-tab.project-index == project-index) && (Data.current-schematic-tab.schematic-index == index);
 
             clicked => {

@@ -15,7 +15,7 @@
   </property>
   <property name="windowIcon">
    <iconset>
-    <normaloff>:/img/actions/output_jobs.svg</normaloff>:/img/actions/output_jobs.svg</iconset>
+    <normaloff>:/img/output_jobs.svg</normaloff>:/img/output_jobs.svg</iconset>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="2,0,5">
    <property name="spacing">

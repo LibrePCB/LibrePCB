@@ -103,9 +103,6 @@
         <file>actions/cut.png</file>
         <file>actions/delete.png</file>
         <file>actions/down.png</file>
-        <file>actions/draw_trace.svg</file>
-        <file>actions/draw_wire.svg</file>
-        <file>actions/drill.svg</file>
         <file>actions/edit.png</file>
         <file>actions/export_gerber.png</file>
         <file>actions/export_pick_place_file.png</file>
@@ -122,7 +119,6 @@
         <file>actions/new.png</file>
         <file>actions/open.png</file>
         <file>actions/open_browser.png</file>
-        <file>actions/output_jobs.svg</file>
         <file>actions/paste.png</file>
         <file>actions/pdf.png</file>
         <file>actions/plus_2.png</file>
@@ -133,15 +129,11 @@
         <file>actions/run.png</file>
         <file>actions/run_all.png</file>
         <file>actions/schematic.png</file>
-        <file>actions/schematic.svg</file>
         <file>actions/search.png</file>
         <file>actions/settings.png</file>
-        <file>actions/show_pin_numbers.svg</file>
         <file>actions/undo.png</file>
         <file>actions/up.png</file>
-        <file>actions/via.svg</file>
         <file>actions/wizard.png</file>
-        <file>actions/zoom-fit.svg</file>
         <file>app/librepcb.png</file>
         <file>app/librepcb.svg</file>
         <file>arrow-right-left-across-line.svg</file>
@@ -159,6 +151,9 @@
         <file>command_toolbars/wire_straight.png</file>
         <file>command_toolbars/wire_v_h.png</file>
         <file>device.png</file>
+        <file>draw_trace.svg</file>
+        <file>draw_wire.svg</file>
+        <file>drill.svg</file>
         <file>empty.png</file>
         <file>footprint.png</file>
         <file>glue.png</file>
@@ -169,18 +164,23 @@
         <file>logo/64x64.png</file>
         <file>norm/iec_60617.svg</file>
         <file>norm/ieee_315.svg</file>
+        <file>output_jobs.svg</file>
         <file>places/file.png</file>
         <file>places/folder.png</file>
         <file>places/folder_green.png</file>
         <file>places/project_folder.png</file>
         <file>resistor-eu.svg</file>
+        <file>schematic.svg</file>
+        <file>show_pin_numbers.svg</file>
         <file>status/dialog_error.png</file>
         <file>status/dialog_warning.png</file>
         <file>status/info.png</file>
         <file>symbol.png</file>
         <file>vcc.svg</file>
+        <file>via.svg</file>
         <file>wizards/eagle_watermark.png</file>
         <file>wizards/kicad_watermark.png</file>
         <file>wizards/watermark.jpg</file>
+        <file>zoom-fit.svg</file>
     </qresource>
 </RCC>

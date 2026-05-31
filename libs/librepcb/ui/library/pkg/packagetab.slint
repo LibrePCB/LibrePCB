@@ -558,7 +558,7 @@ component PackageEditorTab inherits TouchArea {
         ToolButtonGroup {
             tool-line-btn := ToolButton {
                 cmd: Cmd.tool-line;
-                icon: @image-url("../../../../../img/actions/draw_wire.svg");
+                icon: @image-url("../../../../../img/draw_wire.svg");
                 checked: tabs[index].tool == EditorTool.line;
                 enabled: footprint-selected && (!read-only);
                 is-last: false;
@@ -829,7 +829,7 @@ component PackageEditorTab inherits TouchArea {
 
         zoom-fit-btn := SceneButton {
             x: parent.width - self.width;
-            icon: @image-url("../../../../../img/actions/zoom-fit.svg");
+            icon: @image-url("../../../../../img/zoom-fit.svg");
             base-color: tabs[index].background-color;
             base-text-color: tabs[index].foreground-color;
             enabled: footprint-selected;

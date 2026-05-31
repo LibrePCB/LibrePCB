@@ -262,7 +262,7 @@ export component SchematicTab inherits Tab {
             ToolButtonGroup {
                 tool-wire-btn := ToolButton {
                     cmd: Cmd.tool-wire;
-                    icon: @image-url("../../../../../img/actions/draw_wire.svg");
+                    icon: @image-url("../../../../../img/draw_wire.svg");
                     checked: tabs[index].tool == EditorTool.wire;
                     is-last: false;
 
@@ -467,7 +467,7 @@ export component SchematicTab inherits Tab {
             width: self.preferred-width;
 
             zoom-fit-btn := SceneButton {
-                icon: @image-url("../../../../../img/actions/zoom-fit.svg");
+                icon: @image-url("../../../../../img/zoom-fit.svg");
                 base-color: tabs[index].background-color;
                 base-text-color: tabs[index].foreground-color;
 
@@ -497,7 +497,7 @@ export component SchematicTab inherits Tab {
             }
 
             show-pins-btn := SceneButton {
-                icon: @image-url("../../../../../img/actions/show_pin_numbers.svg");
+                icon: @image-url("../../../../../img/show_pin_numbers.svg");
                 icon-scale: 0.9;
                 tooltip: @tr("Pin Numbers");
                 base-color: tabs[index].background-color;
