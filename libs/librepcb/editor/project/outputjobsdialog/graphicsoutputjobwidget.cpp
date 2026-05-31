@@ -22,9 +22,8 @@
  ******************************************************************************/
 #include "graphicsoutputjobwidget.h"
 
-#include "ui_graphicsoutputjobwidget.h"
-
 #include "../../utils/editortoolbox.h"
+#include "ui_graphicsoutputjobwidget.h"
 
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/outputjobrunner.h>
@@ -342,12 +341,13 @@ void GraphicsOutputJobWidget::addClicked() noexcept {
       qBound(0, mUi->lstContent->currentRow() + 1, mUi->lstContent->count());
   auto content = mJob->getContent();
   QMenu menu;
-  menu.addAction(
-      EditorToolbox::svgIcon(":/img/schematic.svg"), tr("Schematic"), &menu, [&]() {
-        content.insert(index,
+  menu.addAction(EditorToolbox::svgIcon(":/img/schematic.svg"), tr("Schematic"),
+                 &menu, [&]() {
+                   content.insert(
+                       index,
                        GraphicsOutputJob::Content(
                            GraphicsOutputJob::Content::Preset::Schematic));
-      });
+                 });
   menu.addAction(
       QIcon(":/img/actions/board_editor.png"), tr("Board Image"), &menu, [&]() {
         content.insert(index,

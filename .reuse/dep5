@@ -40,7 +40,6 @@ Files:
  AUTHORS.md
  ci/*
  CONTRIBUTING.md
- img/README.md
  img/actions/add_name.png
  img/actions/add_smt_pad.png
  img/actions/add_symbol_pin.png
@@ -48,7 +47,6 @@ Files:
  img/actions/add_value.png
  img/actions/board_editor.png
  img/actions/draw_bus.png
- img/actions/draw_wire.png
  img/actions/export_pick_place_file.png
  img/actions/schematic.png
  img/capacitor-bipolar-eu.svg
@@ -78,6 +76,7 @@ Files:
  img/norm/iec_60617.svg
  img/norm/ieee_315.svg
  img/output_jobs.svg
+ img/README.md
  img/resistor-eu.svg
  img/resistor-us.svg
  img/schematic.svg
@@ -100,7 +99,6 @@ Files:
  img/actions/align_vertically.svg
 Copyright: Font Awesome
 License: CC-BY-4.0
-
 
 Files: libs/font-awesome/*
 Copyright: Font Awesome
