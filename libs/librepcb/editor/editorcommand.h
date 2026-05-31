@@ -88,6 +88,10 @@ public:
     return mKeySequences;
   }
 
+  // Static Methods
+  static QList<QKeySequence> getShortcutsWithMacFallbacks(
+      const QList<QKeySequence>& sequences) noexcept;
+
   // Setters
   void setKeySequences(const QList<QKeySequence>& sequences) noexcept;
 

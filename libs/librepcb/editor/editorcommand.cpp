@@ -60,6 +60,53 @@ EditorCommand::~EditorCommand() noexcept {
 }
 
 /*******************************************************************************
+ *  Static Methods
+ ******************************************************************************/
+
+QList<QKeySequence> EditorCommand::getShortcutsWithMacFallbacks(
+    const QList<QKeySequence>& sequences) noexcept {
+#if defined(Q_OS_MACOS)
+  QList<QKeySequence> result = sequences;
+  for (const QKeySequence& seq : sequences) {
+    if (seq.isEmpty()) continue;
+    if (seq.count() == 1) {
+      QKeyCombination comb = seq[0];
+      Qt::KeyboardModifiers modifiers = comb.keyboardModifiers();
+      Qt::Key key = comb.key();
+
+      // Fallback 1: If it has Command (Qt::ControlModifier), add a fallback with Control (Qt::MetaModifier)
+      if (modifiers.testFlag(Qt::ControlModifier)) {
+        Qt::KeyboardModifiers fallbackModifiers = (modifiers & ~Qt::ControlModifier) | Qt::MetaModifier;
+        QKeySequence fallback(QKeyCombination(fallbackModifiers, key));
+        if (!result.contains(fallback)) {
+          result.append(fallback);
+        }
+
+        // If it also has Qt::Key_Delete, add a fallback for that too
+        if (key == Qt::Key_Delete) {
+          QKeySequence fallback2(QKeyCombination(fallbackModifiers, Qt::Key_Backspace));
+          if (!result.contains(fallback2)) {
+            result.append(fallback2);
+          }
+        }
+      }
+
+      // Fallback 2: If it has Qt::Key_Delete, add a fallback with Qt::Key_Backspace
+      if (key == Qt::Key_Delete) {
+        QKeySequence fallback(QKeyCombination(modifiers, Qt::Key_Backspace));
+        if (!result.contains(fallback)) {
+          result.append(fallback);
+        }
+      }
+    }
+  }
+  return result;
+#else
+  return sequences;
+#endif
+}
+
+/*******************************************************************************
  *  Setters
  ******************************************************************************/
 
@@ -125,7 +172,7 @@ QAction* EditorCommand::setupAction(QAction* action,
     action->setMenuRole(QAction::QuitRole);
   }
   if (!flags.testFlag(ActionFlag::NoShortcuts)) {
-    action->setShortcuts(mKeySequences);
+    action->setShortcuts(getShortcutsWithMacFallbacks(mKeySequences));
     if (flags.testFlag(ActionFlag::WidgetShortcut)) {
       action->setShortcutContext(Qt::WidgetShortcut);
     } else if (flags.testFlag(ActionFlag::ApplicationShortcut)) {
@@ -137,8 +184,9 @@ QAction* EditorCommand::setupAction(QAction* action,
     }
     action->installEventFilter(const_cast<EditorCommand*>(this));
     connect(this, &EditorCommand::shortcutsChanged, action,
-            static_cast<void (QAction::*)(const QList<QKeySequence>&)>(
-                &QAction::setShortcuts));
+            [action](const QList<QKeySequence>& seqs) {
+              action->setShortcuts(getShortcutsWithMacFallbacks(seqs));
+            });
   }
   return action;
 }
