@@ -456,6 +456,7 @@ std::shared_ptr<LibraryEditor> GuiApplication::openLibrary(
     mLibraries->insert(index, editor);
     switchToLibrary(index);
     return editor;
+  } catch (const UserCanceled& e) {
   } catch (const Exception& e) {
     QMessageBox::critical(qApp->activeWindow(), tr("Failed to open library"),
                           e.getMsg());
