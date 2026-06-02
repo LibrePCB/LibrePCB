@@ -133,7 +133,8 @@ void PrimitivePathGraphicsItem::setShapeMode(ShapeMode mode) noexcept {
  ******************************************************************************/
 
 QPainterPath PrimitivePathGraphicsItem::shape() const noexcept {
-  return mShape;
+  // Important: Make only selectable when visible.
+  return isVisible() ? mShape : QPainterPath();
 }
 
 void PrimitivePathGraphicsItem::paint(QPainter* painter,
