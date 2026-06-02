@@ -99,6 +99,11 @@ void AttributeListModel::apply() {
       // Clean value & remove unit suffix.
       value = value.trimmed();
       type->tryExtractUnitFromValue(value);
+      // Convert locale-dependent decimal point to 'C' decimal point, see
+      // also https://github.com/LibrePCB/LibrePCB/issues/1367.
+      if (!type->isValueValid(value)) {
+        value.replace(QLocale().decimalPoint(), ".");
+      }
     }
     const AttributeUnit* unit =
         type ? type->getAvailableUnits().value(item.unit) : nullptr;
@@ -202,6 +207,11 @@ void AttributeListModel::set_row_data(std::size_t i,
               type->tryExtractUnitFromValue(valueWithoutUnit)) {
         unit = newUnit;
         unitModified = true;
+      }
+      // Convert locale-dependent decimal point to 'C' decimal point, see
+      // also https://github.com/LibrePCB/LibrePCB/issues/1367.
+      if (type && (!type->isValueValid(valueWithoutUnit))) {
+        valueWithoutUnit.replace(QLocale().decimalPoint(), ".");
       }
     }
 
