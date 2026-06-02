@@ -166,11 +166,12 @@ ProjectEditor::ProjectEditor(
 
   // Show notification if file format has been migrated.
   if (mMigrationLog) {
-    QString msg =
+    const QString msg1 =
         tr("The project '%1' has been migrated to a new file format. "
            "After saving, it will not be possible anymore to open it with an "
            "older LibrePCB version!")
             .arg(*mProject->getName() % " " % mProject->getVersion());
+    QString msg = msg1;
     if (!mMigrationLog->messages.isEmpty()) {
       msg += "\n\n" %
           tr("The migration produced %n message(s), please review before "
@@ -180,10 +181,22 @@ ProjectEditor::ProjectEditor(
     auto notification = std::make_shared<Notification>(
         ui::NotificationType::Warning,
         tr("ATTENTION: Project File Format Upgraded"), msg,
-        (!mMigrationLog->messages.isEmpty()) ? tr("Show Messages") : QString(),
+        (!mMigrationLog->messages.isEmpty())
+            ? tr("Show %n Message(s)", nullptr, mMigrationLog->messages.count())
+            : QString(),
         QString(), true);
-    connect(notification.get(), &Notification::buttonClicked, this,
-            &ProjectEditor::openMigrationLog);
+    connect(
+        notification.get(), &Notification::buttonClicked, this,
+        [this, msg1, weakPtr = std::weak_ptr<Notification>(notification)]() {
+          const FilePath fp = openMigrationLog();
+          // Append file path to the message description, just in case the
+          // migration log failed to open in the web browser.
+          if (auto notification = weakPtr.lock()) {
+            notification->setDescription(
+                msg1 % "\n\n" %
+                tr("Migration log saved to '%1'.").arg(fp.toNative()));
+          }
+        });
     connect(this, &ProjectEditor::projectSavedToDisk, notification.get(),
             &Notification::dismiss);
     connect(this, &ProjectEditor::destroyed, notification.get(),
@@ -701,23 +714,38 @@ void ProjectEditor::unregisterActiveSchematicTab(SchematicTab* tab) noexcept {
  *  Private Methods
  ******************************************************************************/
 
-void ProjectEditor::openMigrationLog() noexcept {
+FilePath ProjectEditor::openMigrationLog() noexcept {
+  if (!mMigrationLog) {
+    return FilePath();
+  }
+
+  // Important: Don't store the HTML in /tmp or ~/.cache because if LibrePCB
+  // runs in a sandbox, other apps may not have access to read those
+  // directories. In addition, even though the cache directory is globally
+  // readable by Snap and Flatpak applications, the Firefox and Chromium Snaps
+  // reject to open HTML files from those places. See:
+  // * https://bugs.launchpad.net/snapd/+bug/1972762
+  // * https://askubuntu.com/questions/1370653/snap-apps-dont-find-files-in-tmp
+  // * https://librepcb.discourse.group/t/unable-to-see-messages-from-file-format-upgrade/1036.
+  // So we store the HTML in the project directory instead, but schedule it for
+  // deletion once the project is saved (leading to a new, final migration log).
+  const FilePath fp =
+      mProject->getPath().getPathTo(mMigrationLog->getRelativeFilePath(true));
+  qInfo().nospace() << "Saving project migration log to " << fp.toNative()
+                    << "...";
   try {
-    if (mMigrationLog) {
-      const FilePath fp =
-          FilePath::getRandomTempPath().getPathTo("migration.html");
-      FileUtils::writeFile(fp, mMigrationLog->toHtml(true));
-      DesktopServices ds(mWorkspace.getSettings());
-      if (!ds.openLocalPath(fp)) {
-        throw RuntimeError(
-            __FILE__, __LINE__,
-            QString("Failed to open the file '%1' with the web browser.")
-                .arg(fp.toNative()));
-      }
+    FileUtils::writeFile(fp, mMigrationLog->toHtml(true));
+    DesktopServices ds(mWorkspace.getSettings());
+    if (!ds.openLocalPath(fp)) {
+      throw RuntimeError(
+          __FILE__, __LINE__,
+          QString("Failed to open the file '%1' with the web browser.")
+              .arg(fp.toNative()));
     }
   } catch (const Exception& e) {
     QMessageBox::critical(qApp->activeWindow(), "Error", e.getMsg());
   }
+  return fp;
 }
 
 void ProjectEditor::scheduleErcRun() noexcept {

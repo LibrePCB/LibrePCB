@@ -61,6 +61,7 @@ public:
     Version toVersion;
     QList<FileFormatMigration::Message> messages;  ///< Sorted
 
+    QString getRelativeFilePath(bool isTemporary) const noexcept;
     QByteArray toHtml(bool isTemporary) const noexcept;
   };
 

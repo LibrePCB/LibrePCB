@@ -117,6 +117,33 @@ static const char* HTML_LOG_FOOTER = R"(    </tbody>
 </body>
 </html>)";
 
+QString ProjectLoader::MigrationLog::getRelativeFilePath(
+    bool isTemporary) const noexcept {
+  if (isTemporary) {
+    // Important: Don't store the HTML in /tmp or ~/.cache because if LibrePCB
+    // runs in a sandbox, other apps may not have access to read those
+    // directories. In addition, even though the cache directory is globally
+    // readable by Snap and Flatpak applications, the Firefox and Chromium Snaps
+    // reject to open HTML files from those places. See:
+    // * https://bugs.launchpad.net/snapd/+bug/1972762
+    // * https://askubuntu.com/questions/1370653/snap-apps-dont-find-files-in-tmp
+    // * https://librepcb.discourse.group/t/unable-to-see-messages-from-file-format-upgrade/1036.
+    // So we store the HTML in the project directory instead, but schedule it
+    // for deletion once the project is saved (leading to a new, final migration
+    // log).
+    //
+    // Using a deterministic file name, not containing the date or file format.
+    // This is important because the temporary file may be created today with
+    // LibrePCB 1.x, but will get deleted in a year with LibrePCB 2.x, so the
+    // file name shall not change between those sessions.
+    return "logs/migration_preview.html";
+  } else {
+    return QString("logs/%1_migration_to_v%2.html")
+        .arg(dateTime.date().toString("yyyy-MM-dd"),
+             Application::getFileFormatVersion().toStr());
+  }
+}
+
 QByteArray ProjectLoader::MigrationLog::toHtml(
     bool isTemporary) const noexcept {
   const QHash<FileFormatMigration::Message::Severity, QString> classes = {
@@ -131,8 +158,8 @@ QByteArray ProjectLoader::MigrationLog::toHtml(
         "black;padding:8px;margin-bottom:15px;\">\n";
     html += "    <span style=\"color:blue;\">" %
         tr("Note: This is a temporary file since the project has not been "
-           "saved to disk yet. When you save the project, this log will be "
-           "written to the projects '%1' directory.")
+           "saved to disk yet. When you save the project, the final log file "
+           "will be persisted in the projects '%1' directory.")
             .arg("logs")
             .toHtmlEscaped() %
         "</span></br>\n";
@@ -256,6 +283,11 @@ std::unique_ptr<Project> ProjectLoader::open(
 
   // Sort & save migration messages.
   if (mMigrationLog) {
+    // Make sure to delete the temporary migration log (may not even exist
+    // *now*, but may exist at the time the project gets saved).
+    directory->removeFile(mMigrationLog->getRelativeFilePath(true));
+    // Save final migration log to file system, which gets saved to disk
+    // as soon as the project gets saved.
     std::sort(mMigrationLog->messages.begin(), mMigrationLog->messages.end(),
               [](const FileFormatMigration::Message& a,
                  const FileFormatMigration::Message& b) {
@@ -270,13 +302,8 @@ std::unique_ptr<Project> ProjectLoader::open(
                   return a.message < b.message;
                 }
               });
-
-    const QByteArray html = mMigrationLog->toHtml(false);
-    const QString logFileName =
-        QString("logs/%1_migration_to_v%2.html")
-            .arg(mMigrationLog->dateTime.date().toString("yyyy-MM-dd"),
-                 Application::getFileFormatVersion().toStr());
-    directory->write(logFileName, html);
+    directory->write(mMigrationLog->getRelativeFilePath(false),
+                     mMigrationLog->toHtml(false));
   }
 
   // Load project.
