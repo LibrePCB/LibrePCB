@@ -199,8 +199,10 @@ signals:
 private:
   /**
    * @brief Open the HTML with all project file format upgrade messages
+   *
+   * @return File path to the temporary migration log.
    */
-  void openMigrationLog() noexcept;
+  FilePath openMigrationLog() noexcept;
   void scheduleErcRun() noexcept;
   void runErc() noexcept;
   void projectSettingsChanged() noexcept;
