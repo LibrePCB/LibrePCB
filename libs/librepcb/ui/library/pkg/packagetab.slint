@@ -1179,14 +1179,16 @@ export component PackageTab inherits Tab {
         model: tabs[index].categories-tree;
 
         item-picked(idx, item) => {
-            tabs[index].new-category = item.user-data;
-            tabs[index].choose-category = false;
             root.focus();  // Keep keyboard shortcuts working.
+            tabs[index].new-category = item.user-data;
+            // Close the dialog *as the last operation* to avoid crashes!
+            tabs[index].choose-category = false;
         }
 
         rejected => {
-            tabs[index].choose-category = false;
             root.focus();  // Keep keyboard shortcuts working.
+            // Close the dialog *as the last operation* to avoid crashes!
+            tabs[index].choose-category = false;
         }
     }
 

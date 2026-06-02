@@ -806,14 +806,16 @@ export component LibraryTab inherits Tab {
         model: tabs[index].dependencies;
 
         item-clicked(idx) => {
-            self.model[idx].checked = true;
-            show-add-dependency-dialog = false;
             root.focus();  // Keep keyboard shortcuts working.
+            self.model[idx].checked = true;
+            // Close the dialog *as the last operation* to avoid crashes!
+            show-add-dependency-dialog = false;
         }
 
         rejected => {
-            show-add-dependency-dialog = false;
             root.focus();  // Keep keyboard shortcuts working.
+            // Close the dialog *as the last operation* to avoid crashes!
+            show-add-dependency-dialog = false;
         }
     }
 
@@ -824,15 +826,17 @@ export component LibraryTab inherits Tab {
         hide-library-with-path: Data.libraries[tabs[index].library-index].path;
 
         item-clicked(path) => {
+            root.focus();  // Keep keyboard shortcuts working.
             tabs[index].move-or-copy-to-lib = path;
             tabs[index].move-or-copy-action = move-or-copy-action;
+            // Close the dialog *as the last operation* to avoid crashes!
             move-or-copy-action = LibraryElementsMoveAction.none;
-            root.focus();  // Keep keyboard shortcuts working.
         }
 
         rejected => {
-            move-or-copy-action = LibraryElementsMoveAction.none;
             root.focus();  // Keep keyboard shortcuts working.
+            // Close the dialog *as the last operation* to avoid crashes!
+            move-or-copy-action = LibraryElementsMoveAction.none;
         }
     }
 }

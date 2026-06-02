@@ -567,14 +567,16 @@ export component ProjectLibraryTab inherits Tab {
         height: parent.height;
 
         item-clicked(path) => {
-            tabs[index].copy-to-library = path;
-            choose-library = false;
             root.focus();  // Keep keyboard shortcuts working.
+            tabs[index].copy-to-library = path;
+            // Close the dialog *as the last operation* to avoid crashes!
+            choose-library = false;
         }
 
         rejected => {
-            choose-library = false;
             root.focus();  // Keep keyboard shortcuts working.
+            // Close the dialog *as the last operation* to avoid crashes!
+            choose-library = false;
         }
     }
 
