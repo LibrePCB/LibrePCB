@@ -76,14 +76,16 @@ QString AttrTypeFrequency::valueFromTr(const QString& value) const noexcept {
 
 QString AttrTypeFrequency::printableValueTr(
     const QString& value, const AttributeUnit* unit) const noexcept {
-  bool ok = false;
-  float v = value.toFloat(&ok);
-  if (ok && unit)
-    return QLocale().toString(v) % unit->getSymbolTr();
-  else if (ok)
-    return QLocale().toString(v);
-  else
-    return QString();
+  // Important: Do not format the number with the user's locale as this would
+  // make output files like schematics or even Gerber files non-deterministic.
+  // As we know the value is either empty or a valid number in 'C' locale, we
+  // can print it as-is, without any further validation or formatting.
+  // See: https://github.com/LibrePCB/LibrePCB/issues/1814
+  if (unit && (!value.isEmpty())) {
+    return value % unit->getSymbolTr();
+  } else {
+    return value;
+  }
 }
 
 /*******************************************************************************
