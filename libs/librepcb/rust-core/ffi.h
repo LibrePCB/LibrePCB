@@ -16,6 +16,42 @@ namespace librepcb {
 namespace rs {
 
 /**
+ * Wrapper for [ViewMode]
+ */
+enum class InteractiveHtmlBomViewMode {
+  /**
+   * BOM only
+   */
+  BomOnly,
+  /**
+   * BOM left, drawings right
+   */
+  LeftRight,
+  /**
+   * BOM top, drawings bottom
+   */
+  TopBottom,
+};
+
+/**
+ * Wrapper for [HighlightPin1Mode]
+ */
+enum class InteractiveHtmlBomHighlightPin1Mode {
+  /**
+   * No pins
+   */
+  None,
+  /**
+   * Selected pins
+   */
+  Selected,
+  /**
+   * All pins
+   */
+  All,
+};
+
+/**
  * Wrapper for [DrawingKind]
  */
 enum class InteractiveHtmlBomDrawingKind {
@@ -60,24 +96,6 @@ enum class InteractiveHtmlBomDrawingLayer {
 };
 
 /**
- * Wrapper for [HighlightPin1Mode]
- */
-enum class InteractiveHtmlBomHighlightPin1Mode {
-  /**
-   * No pins
-   */
-  None,
-  /**
-   * Selected pins
-   */
-  Selected,
-  /**
-   * All pins
-   */
-  All,
-};
-
-/**
  * Wrapper for [Layer]
  */
 enum class InteractiveHtmlBomLayer {
@@ -107,24 +125,6 @@ enum class InteractiveHtmlBomSides {
    * Front + Back
    */
   Both,
-};
-
-/**
- * Wrapper for [ViewMode]
- */
-enum class InteractiveHtmlBomViewMode {
-  /**
-   * BOM only
-   */
-  BomOnly,
-  /**
-   * BOM left, drawings right
-   */
-  LeftRight,
-  /**
-   * BOM top, drawings bottom
-   */
-  TopBottom,
 };
 
 /**
@@ -475,6 +475,19 @@ void ffi_ibom_add_zone(InteractiveHtmlBom * NONNULL obj,
 bool ffi_ibom_generate_html(const InteractiveHtmlBom * NONNULL obj,
                             QString * NONNULL out,
                             QString * NONNULL err);
+
+bool ffi_keyring_init();
+
+bool ffi_keyring_set_password(const QString * NONNULL service,
+                              const QString * NONNULL user,
+                              const QString * NONNULL password);
+
+bool ffi_keyring_get_password(const QString * NONNULL service,
+                              const QString * NONNULL user,
+                              QString * NONNULL password);
+
+bool ffi_keyring_delete_credentials(const QString * NONNULL service,
+                                    const QString * NONNULL user);
 
 /**
  * Wrapper for [Length::from_nm_f]

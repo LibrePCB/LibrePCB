@@ -28,6 +28,8 @@
 
 #include <QtCore>
 
+#include <optional>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -47,6 +49,14 @@ class ApiEndpoint final : public QObject {
 
 public:
   // Types
+  typedef std::function<void(const QString& errorMsg, const QString& deviceCode,
+                             const QUrl& verificationUriComplete,
+                             int expiresInSeconds, int intervalSeconds)>
+      OAuthDeviceCodeCallback;
+  typedef std::function<void(const QString& errorMsg,
+                             const QString& accessToken,
+                             const QString& tokenType, int expiresIn)>
+      OAuthTokenCallback;
   struct Part {
     QString mpn;
     QString manufacturer;
@@ -73,8 +83,15 @@ public:
 
   // Getters
   const QUrl& getUrl() const noexcept { return mUrl; }
+  bool hasCredentials() const noexcept;
 
   // General Methods
+  bool deleteCredentials() noexcept;
+  void requestOAuthDeviceCode(const QString& clientId, const QString& label,
+                              const OAuthDeviceCodeCallback& callback) noexcept;
+  void requestOAuthToken(const QString& grantType, const QString& deviceCode,
+                         const QString& clientId,
+                         const OAuthTokenCallback& callback) noexcept;
   void requestLibraryList(bool forceNoCache = false) noexcept;
   void requestPartsInformationStatus() const noexcept;
   void requestPartsInformation(const QUrl& url,
@@ -84,6 +101,10 @@ public:
   ApiEndpoint& operator=(const ApiEndpoint& rhs) = delete;
 
 signals:
+  void oAuthDeviceCodeReceived(const QString& errorMsg,
+                               const QString& deviceCode,
+                               const QUrl& verificationUriComplete,
+                               int expiresInSeconds, int intervalSeconds);
   void libraryListReceived(QList<Library> libs);
   void errorWhileFetchingLibraryList(const QString& errorMsg);
   void errorWhileFetchingPartsInformationStatus(const QString& errorMsg);
@@ -92,6 +113,9 @@ signals:
   void errorWhileFetchingPartsInformation(const QString& errorMsg);
 
 private:  // Methods
+  const QString& getToken() const noexcept;
+  // void errorWhileFetchingOAuthDeviceCode(const QString& errorMsg) noexcept;
+  // void oAuthDeviceCodeResponseReceived(const QByteArray& data) noexcept;
   void requestLibraryList(const QUrl& url, bool forceNoCache) noexcept;
   void libraryListResponseReceived(const QByteArray& data,
                                    bool forceNoCache) noexcept;
@@ -100,6 +124,7 @@ private:  // Methods
 
 private:  // Data
   QUrl mUrl;
+  mutable std::optional<QString> mCachedToken;
 };
 
 /*******************************************************************************

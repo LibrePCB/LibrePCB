@@ -26,6 +26,8 @@
 #include "../types/version.h"
 #include "network/networkrequest.h"
 
+#include <librepcb/rust-core/ffi.h>
+
 #include <QtCore>
 
 /*******************************************************************************
@@ -47,6 +49,118 @@ ApiEndpoint::~ApiEndpoint() noexcept {
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
+
+bool ApiEndpoint::hasCredentials() const noexcept {
+  return !getToken().isEmpty();
+}
+
+bool ApiEndpoint::deleteCredentials() noexcept {
+  const QString service = "librepcb";
+  const QString user = mUrl.toString();
+  const bool success = rs::ffi_keyring_delete_credentials(&service, &user);
+  if (!success) {
+    qWarning().nospace() << "Failed to delete credentials for "
+                         << mUrl.toString() << ".";
+  }
+  return success;
+}
+
+void ApiEndpoint::requestOAuthDeviceCode(
+    const QString& clientId, const QString& label,
+    const OAuthDeviceCodeCallback& callback) noexcept {
+  auto errorCallback = [callback](const QString& errorMsg) {
+    callback(errorMsg, QString(), QUrl(), 0, 0);
+  };
+
+  auto successCallback = [callback](const QByteArray& data) {
+    QJsonDocument doc = QJsonDocument::fromJson(data);
+    if (doc.isNull() || doc.isEmpty() || (!doc.isObject())) {
+      callback("Received JSON object is not valid.", QString(), QUrl(), 0, 0);
+      return;
+    }
+    const QString deviceCode = doc.object().value("device_code").toString();
+    const QUrl uri(doc.object().value("verification_uri_complete").toString(),
+                   QUrl::StrictMode);
+    const int expiresIn = doc.object().value("expires_in").toInt();
+    const int interval = doc.object().value("interval").toInt();
+    if (deviceCode.isEmpty() || (!uri.isValid()) || uri.isLocalFile() ||
+        (expiresIn <= 0) || (interval <= 0)) {
+      callback("Received invalid data from server: " % QString(data), QString(),
+               QUrl(), 0, 0);
+      return;
+    }
+    callback(QString(), deviceCode, uri, expiresIn, interval);
+  };
+
+  const QJsonObject obj{
+      {"client_id", clientId},
+      {"label", label},
+  };
+  const QByteArray postData = QJsonDocument(obj).toJson();
+
+  NetworkRequest* request = new NetworkRequest(
+      QUrl(mUrl.toString() % "/api/v1/oauth/device/code"), postData);
+  request->setHeaderField("Content-Type", "application/json");
+  request->setHeaderField("Content-Length",
+                          QString::number(postData.size()).toUtf8());
+  request->setHeaderField("Accept", "application/json;charset=UTF-8");
+  request->setHeaderField("Accept-Charset", "UTF-8");
+  connect(request, &NetworkRequest::errored, this, errorCallback,
+          Qt::QueuedConnection);
+  connect(request, &NetworkRequest::dataReceived, this, successCallback,
+          Qt::QueuedConnection);
+  request->start();
+}
+
+void ApiEndpoint::requestOAuthToken(
+    const QString& grantType, const QString& deviceCode,
+    const QString& clientId, const OAuthTokenCallback& callback) noexcept {
+  auto errorCallback = [callback](const QString& errorMsg) {
+    callback(errorMsg, QString(), QString(), 0);
+  };
+
+  auto successCallback = [callback](const QByteArray& data) {
+    QJsonDocument doc = QJsonDocument::fromJson(data);
+    if (doc.isNull() || doc.isEmpty() || (!doc.isObject())) {
+      callback("Received JSON object is not valid.", QString(), QString(), 0);
+      return;
+    }
+    const QString error = doc.object().value("error").toString();
+    const QString accessToken = doc.object().value("access_token").toString();
+    const QString tokenType = doc.object().value("token_type").toString();
+    const int expiresIn = doc.object().value("expires_in").toInt();
+    if ((!accessToken.isEmpty()) && (!tokenType.isEmpty()) && (expiresIn > 0)) {
+      callback(QString(), accessToken, tokenType, expiresIn);
+    } else if ((error == "authorization_pending") || (error == "slow_down")) {
+      callback(QString(), QString(), QString(), 0);
+    } else if (!error.isEmpty()) {
+      callback("Received error from server: " % error, QString(), QString(), 0);
+    } else {
+      callback("Received invalid data from server: " % QString(data), QString(),
+               QString(), 0);
+    }
+  };
+
+  const QJsonObject obj{
+      {"grant_type", grantType},
+      {"device_code", deviceCode},
+      //{"client_id", clientId},
+  };
+  const QByteArray postData = QJsonDocument(obj).toJson();
+
+  NetworkRequest* request = new NetworkRequest(
+      QUrl(mUrl.toString() % "/api/v1/oauth/token"), postData);
+  request->setHeaderField("Content-Type", "application/json");
+  request->setHeaderField("Content-Length",
+                          QString::number(postData.size()).toUtf8());
+  request->setHeaderField("Accept", "application/json;charset=UTF-8");
+  request->setHeaderField("Accept-Charset", "UTF-8");
+  connect(request, &NetworkRequest::errored, this, errorCallback,
+          Qt::QueuedConnection);
+  connect(request, &NetworkRequest::dataReceived, this, successCallback,
+          Qt::QueuedConnection);
+  request->start();
+}
 
 void ApiEndpoint::requestLibraryList(bool forceNoCache) noexcept {
   QString path =
@@ -100,6 +214,44 @@ void ApiEndpoint::requestPartsInformation(
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
+
+const QString& ApiEndpoint::getToken() const noexcept {
+  if (!mCachedToken) {
+    QString token;
+    const QString service = "librepcb";
+    const QString user = mUrl.toString();
+    if (!rs::ffi_keyring_get_password(&service, &user, &token)) {
+      qWarning() << "No authentication token found for" << mUrl;
+    }
+    mCachedToken = token;
+  }
+  return *mCachedToken;
+}
+
+/*void ApiEndpoint::errorWhileFetchingOAuthDeviceCode(
+    const QString& errorMsg) noexcept {
+  emit oAuthDeviceCodeReceived(errorMsg, QString(), QUrl(), 0, 0);
+}
+
+void ApiEndpoint::oAuthDeviceCodeResponseReceived(
+    const QByteArray& data) noexcept {
+  QJsonDocument doc = QJsonDocument::fromJson(data);
+  if (doc.isNull() || doc.isEmpty() || (!doc.isObject())) {
+    errorWhileFetchingOAuthDeviceCode(tr("Received JSON object is not valid."));
+    return;
+  }
+  const QString deviceCode = doc.object().value("device_code").toString();
+  const QUrl uri(doc.object().value("verification_uri_complete").toString(),
+                 QUrl::StrictMode);
+  const int expiresIn = doc.object().value("expires_in").toString().toInt();
+  const int interval = doc.object().value("interval").toString().toInt();
+  if (deviceCode.isEmpty() || (!uri.isValid()) || uri.isLocalFile() ||
+      (!expiresIn) || (!interval)) {
+    errorWhileFetchingOAuthDeviceCode("Received invalid data from the server.");
+    return;
+  }
+  emit oAuthDeviceCodeReceived(QString(), deviceCode, uri, expiresIn, interval);
+}*/
 
 void ApiEndpoint::requestLibraryList(const QUrl& url,
                                      bool forceNoCache) noexcept {

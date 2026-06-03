@@ -23,6 +23,7 @@
 #include "editabletablewidget.h"
 
 #include "../editorcommandset.h"
+#include "../utils/editortoolbox.h"
 
 #include <QtCore>
 #include <QtWidgets>
@@ -40,6 +41,7 @@ namespace editor {
 EditableTableWidget::EditableTableWidget(QWidget* parent) noexcept
   : QTableView(parent),
     mAddButtonOnLastRow(true),
+    mShowLoginButton(false),
     mShowCopyButton(false),
     mShowEditButton(false),
     mShowMoveButtons(false),
@@ -214,6 +216,12 @@ void EditableTableWidget::installButtons(int row) noexcept {
     const int itemsCount =
         mAddButtonOnLastRow ? (model()->rowCount() - 1) : model()->rowCount();
     if (row < itemsCount) {
+      if (mShowLoginButton) {
+        layout->addWidget(createButton(
+            "btnLogin", EditorToolbox::svgIcon(":/fa/solid/user-lock.svg"), "",
+            tr("Log In/Out"), size, size, &EditableTableWidget::btnLoginClicked,
+            index, false, false));
+      }
       if (mShowEditButton) {
         layout->addWidget(createButton(
             "btnEdit", QIcon(":/img/actions/edit.png"), "", tr("Edit"), size,
@@ -238,6 +246,7 @@ void EditableTableWidget::installButtons(int row) noexcept {
           size, &EditableTableWidget::btnRemoveClicked, index, true, true));
     } else {
       int width = size;
+      if (mShowLoginButton) width += size;
       if (mShowEditButton) width += size;
       if (mShowCopyButton) width += size;
       if (mShowMoveButtons) width += 2 * size;

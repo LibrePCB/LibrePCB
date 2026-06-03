@@ -22,6 +22,8 @@
  ******************************************************************************/
 #include "apiendpointlistmodellegacy.h"
 
+#include "../workspace/desktopservices.h"
+
 #include <QtCore>
 #include <QtWidgets>
 
@@ -35,8 +37,9 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-ApiEndpointListModelLegacy::ApiEndpointListModelLegacy(QObject* parent) noexcept
-  : QAbstractTableModel(parent), mValues(), mNewUrl() {
+ApiEndpointListModelLegacy::ApiEndpointListModelLegacy(
+    const WorkspaceSettings& settings, QObject* parent) noexcept
+  : QAbstractTableModel(parent), mSettings(settings), mValues(), mNewUrl() {
 }
 
 ApiEndpointListModelLegacy::~ApiEndpointListModelLegacy() noexcept {
@@ -50,6 +53,7 @@ void ApiEndpointListModelLegacy::setValues(
     const QList<WorkspaceSettings::ApiEndpoint>& values) noexcept {
   beginResetModel();
   mValues = values;
+  refreshEndpoints();
   endResetModel();
 }
 
@@ -83,6 +87,7 @@ void ApiEndpointListModelLegacy::add(
 
   beginInsertRows(QModelIndex(), mValues.count(), mValues.count());
   mValues.append(ep);
+  refreshEndpoints();
   endInsertRows();
 
   mNewUrl = QUrl();
@@ -96,6 +101,7 @@ void ApiEndpointListModelLegacy::remove(
   if ((row >= 0) && (row < mValues.count())) {
     beginRemoveRows(QModelIndex(), row, row);
     mValues.removeAt(row);
+    refreshEndpoints();
     endRemoveRows();
   }
 }
@@ -116,6 +122,61 @@ void ApiEndpointListModelLegacy::moveDown(
     mValues.move(row, row + 1);
     emit dataChanged(index(row, 0), index(row + 1, _COLUMN_COUNT - 1));
   }
+}
+
+void ApiEndpointListModelLegacy::logInOut(
+    const QPersistentModelIndex& itemIndex) noexcept {
+  const int row = itemIndex.data(Qt::EditRole).toInt();
+  if ((row < 0) || (row >= mValues.count())) {
+    return;
+  }
+  const WorkspaceSettings::ApiEndpoint& value = mValues.at(row);
+  auto ep = mEndpoints.value(value.url);
+  if (!ep) {
+    return;
+  }
+
+  // Log out
+  if (ep->hasCredentials()) {
+    ep->deleteCredentials();
+    emit dataChanged(index(row, 0), index(row + 1, _COLUMN_COUNT - 1));
+    return;
+  }
+
+  // Log in
+  auto logInCallback = [this, ep](const QString& errorMsg,
+                                  const QString& deviceCode,
+                                  const QUrl& verificationUriComplete,
+                                  int expiresInSeconds, int intervalSeconds) {
+    qDebug() << errorMsg << deviceCode << verificationUriComplete
+             << expiresInSeconds << intervalSeconds;
+    if (verificationUriComplete.isValid()) {
+      DesktopServices ds(mSettings);
+      ds.openWebUrl(verificationUriComplete);
+
+      QTimer* timer = new QTimer();
+      timer->setInterval(intervalSeconds * 1000);
+      connect(timer, &QTimer::timeout, this, [deviceCode, timer, ep]() {
+        ep->requestOAuthToken(
+            "urn:ietf:params:oauth:grant-type:device_code", deviceCode,
+            "librepcb",
+            [timer](const QString& errorMsg, const QString& accessToken,
+                    const QString& tokenType, int expiresIn) {
+          qDebug() << errorMsg << accessToken << tokenType << expiresIn;
+          if (errorMsg.isEmpty() && accessToken.isEmpty()) {
+            // Keep polling.
+            return;
+          }
+          timer->deleteLater();
+             // if (!accessToken.isEmpty()) {
+             //
+             // }
+            });
+      });
+      timer->start();
+    }
+  };
+  ep->requestOAuthDeviceCode("librepcb", "Foo Bar", logInCallback);
 }
 
 /*******************************************************************************
@@ -204,6 +265,27 @@ QVariant ApiEndpointListModelLegacy::data(const QModelIndex& index,
           return QVariant();
       }
     }
+    case COLUMN_USER: {
+      const QString user;
+      switch (role) {
+        case Qt::DisplayRole:
+          if (item) {
+            return user.isEmpty() ? tr("Log In") % " →" : user;
+          } else {
+            return QVariant();
+          }
+        case Qt::ForegroundRole:
+          if (user.isEmpty()) {
+            QColor color = qApp->palette().text().color();
+            color.setAlpha(128);
+            return QBrush(color);
+          } else {
+            return QVariant();
+          }
+        default:
+          return QVariant();
+      }
+    }
     case COLUMN_ACTIONS: {
       switch (role) {
         case Qt::EditRole:
@@ -233,6 +315,8 @@ QVariant ApiEndpointListModelLegacy::headerData(int section,
           return tr("Parts Info");
         case COLUMN_ORDER:
           return tr("Order PCB");
+        case COLUMN_USER:
+          return tr("User");
         default:
           return QVariant();
       }
@@ -274,6 +358,7 @@ bool ApiEndpointListModelLegacy::setData(const QModelIndex& itemIndex,
       mNewUrl = url;
     } else if (url.isValid()) {
       item->url = url;
+      refreshEndpoints();
     }
   } else if ((itemIndex.column() == COLUMN_LIBRARIES) &&
              (role == Qt::CheckStateRole) && item) {
@@ -294,6 +379,22 @@ bool ApiEndpointListModelLegacy::setData(const QModelIndex& itemIndex,
   emit dataChanged(index(0, itemIndex.column()),
                    index(mValues.count(), itemIndex.column()));
   return true;
+}
+
+/*******************************************************************************
+ *  PrivateMethods
+ ******************************************************************************/
+
+void ApiEndpointListModelLegacy::refreshEndpoints() noexcept {
+  QHash<QUrl, std::shared_ptr<ApiEndpoint>> tmp;
+  for (const auto& endpoint : mValues) {
+    std::shared_ptr<ApiEndpoint> ep = mEndpoints.value(endpoint.url);
+    if (!ep) {
+      ep = std::make_shared<ApiEndpoint>(endpoint.url);
+    }
+    tmp.insert(endpoint.url, ep);
+  }
+  mEndpoints = tmp;
 }
 
 /*******************************************************************************

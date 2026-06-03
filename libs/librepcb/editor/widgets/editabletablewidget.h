@@ -54,6 +54,7 @@ public:
   void setModel(QAbstractItemModel* model) noexcept override;
   void setReadOnly(bool readOnly) noexcept;
   void setAddButtonOnLastRow(bool btn) noexcept { mAddButtonOnLastRow = btn; }
+  void setShowLoginButton(bool show) noexcept { mShowLoginButton = show; }
   void setShowCopyButton(bool show) noexcept { mShowCopyButton = show; }
   void setShowEditButton(bool show) noexcept { mShowEditButton = show; }
   void setShowMoveButtons(bool show) noexcept { mShowMoveButtons = show; }
@@ -80,6 +81,7 @@ signals:
   void currentRowChanged(int row);
   void btnAddClicked(const QPersistentModelIndex& itemIndex);
   void btnRemoveClicked(const QPersistentModelIndex& itemIndex);
+  void btnLoginClicked(const QPersistentModelIndex& itemIndex);
   void btnCopyClicked(const QPersistentModelIndex& itemIndex);
   void btnEditClicked(const QPersistentModelIndex& itemIndex);
   void btnMoveUpClicked(const QPersistentModelIndex& itemIndex);
@@ -98,6 +100,7 @@ private:
                             const QPersistentModelIndex& itemIndex) noexcept;
 
   bool mAddButtonOnLastRow;
+  bool mShowLoginButton;
   bool mShowCopyButton;
   bool mShowEditButton;
   bool mShowMoveButtons;

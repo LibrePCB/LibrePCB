@@ -76,13 +76,13 @@ curl 'https://api.example.com/api/v1/libraries/v0.1'
 ~~~
 
 
-## Authentication {#doc_server_api_authentication}
+# Authentication {#doc_server_api_authentication}
 
 API servers may optionally support authentication, e.g. to provide access to
 personal, confidential or paid content. Authentication uses the
 **OAuth 2.0 Device Authorization Grant** ([RFC 8628]).
 
-### Request a Device Code
+## Request a Device Code
 
 To initiate the login, send a POST request to `/oauth/device/code`, with
 the following JSON data:
@@ -101,7 +101,7 @@ The response is a JSON object with the following attributes:
 | expires_in                | integer | Seconds until `device_code` and `verification_uri_complete` expire |
 | interval                  | integer | Minimum seconds between poll requests                              |
 
-#### Example
+### Example
 
 **Request:**
 
@@ -122,7 +122,7 @@ curl -X POST -H "Content-Type: application/json" \
 }
 ~~~
 
-### Poll for Access Token
+## Poll for Access Token
 
 While the user is completing the login in the web browser (at the page
 `verification_uri_complete`), the client polls for receiving the access token
@@ -155,7 +155,7 @@ Or a successful response (HTTP 200), with the following JSON data:
 | token_type   | string  | Currently always "bearer"                    |
 | expires_in   | integer | Token lifetime in seconds                    |
 
-#### Example
+### Example
 
 **Request:**
 
@@ -181,7 +181,7 @@ curl -X POST -H "Content-Type: application/json" \
 }
 ~~~
 
-### Authenticate Further Requests
+## Authenticate Further Requests
 
 Once a token has been obtained (see above), include it as a Bearer token in
 every API request:
@@ -192,11 +192,10 @@ curl -H "Authorization: Bearer <token>" \
 ~~~
 
 The server responds with HTTP 401 if the supplied token is invalid. The client
-shall then clear the stored token and ask the user to log in again. The body
-of the response may still contain valid data, if the requested resource is
-also available anonymously.
+should then ask the user to log in again. The body of the response may still
+contain valid data, if the requested resource is also available anonymously.
 
-### Token Details
+## Token Details
 
 * Tokens are prefixed with `lphub_` followed by a URL-safe base64 string
   (e.g. `lphub_vZdNYE5Ib...`).

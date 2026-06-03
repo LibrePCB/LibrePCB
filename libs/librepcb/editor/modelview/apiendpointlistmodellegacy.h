@@ -23,6 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include <librepcb/core/network/apiendpoint.h>
 #include <librepcb/core/workspace/workspacesettings.h>
 
 #include <QtCore>
@@ -31,6 +32,9 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class WorkspaceSettings;
+
 namespace editor {
 
 /*******************************************************************************
@@ -49,6 +53,7 @@ public:
     COLUMN_LIBRARIES,
     COLUMN_PARTS,
     COLUMN_ORDER,
+    COLUMN_USER,
     COLUMN_ACTIONS,
     _COLUMN_COUNT
   };
@@ -56,7 +61,8 @@ public:
   // Constructors / Destructor
   // ApiEndpointListModelLegacy() = delete;
   ApiEndpointListModelLegacy(const ApiEndpointListModelLegacy& other) = delete;
-  explicit ApiEndpointListModelLegacy(QObject* parent = nullptr) noexcept;
+  explicit ApiEndpointListModelLegacy(const WorkspaceSettings& settings,
+                                      QObject* parent = nullptr) noexcept;
   ~ApiEndpointListModelLegacy() noexcept override;
 
   // General Methods
@@ -70,6 +76,7 @@ public:
   void remove(const QPersistentModelIndex& itemIndex) noexcept;
   void moveUp(const QPersistentModelIndex& itemIndex) noexcept;
   void moveDown(const QPersistentModelIndex& itemIndex) noexcept;
+  void logInOut(const QPersistentModelIndex& itemIndex) noexcept;
 
   // Inherited from QAbstractItemModel
   int rowCount(const QModelIndex& parent = QModelIndex()) const override;
@@ -86,8 +93,13 @@ public:
   ApiEndpointListModelLegacy& operator=(
       const ApiEndpointListModelLegacy& rhs) noexcept;
 
+private:
+  void refreshEndpoints() noexcept;
+
 private:  // Data
+  const WorkspaceSettings& mSettings;
   QList<WorkspaceSettings::ApiEndpoint> mValues;
+  QHash<QUrl, std::shared_ptr<ApiEndpoint>> mEndpoints;
   QUrl mNewUrl;
 };
 
