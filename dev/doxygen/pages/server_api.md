@@ -76,15 +76,148 @@ curl 'https://api.example.com/api/v1/libraries/v0.1'
 ~~~
 
 
+## Authentication {#doc_server_api_authentication}
+
+API servers may optionally support authentication, e.g. to provide access to
+personal, confidential or paid content. Authentication uses the
+**OAuth 2.0 Device Authorization Grant** ([RFC 8628]).
+
+### Request a Device Code
+
+To initiate the login, send a POST request to `/oauth/device/code`, with
+the following JSON data:
+
+| Name      | Type   | Description                                            |
+|-----------|--------|--------------------------------------------------------|
+| client_id | string | Must be "librepcb"                                     |
+| label     | string | Optional, human-readable device name, e.g. "user@host" |
+
+The response is a JSON object with the following attributes:
+
+| Name                      | Type    | Description                                                        |
+|---------------------------|---------|--------------------------------------------------------------------|
+| device_code               | string  | Temporary, opaque code used for polling                            |
+| verification_uri_complete | string  | URL to be opened in the web browser to log in                      |
+| expires_in                | integer | Seconds until `device_code` and `verification_uri_complete` expire |
+| interval                  | integer | Minimum seconds between poll requests                              |
+
+#### Example
+
+**Request:**
+
+~~~{.sh}
+curl -X POST -H "Content-Type: application/json" \
+     -d '{"client_id": "librepcb", "label": "user@host"}' \
+     'https://api.example.com/api/v1/oauth/device/code'
+~~~
+
+**Response:**
+
+~~~{.json}
+{
+  "device_code": "czrcREKCVlwUew...",
+  "verification_uri_complete": "https://example.com/device?code=A9HYYP7E",
+  "expires_in": 600,
+  "interval": 5
+}
+~~~
+
+### Poll for Access Token
+
+While the user is completing the login in the web browser (at the page
+`verification_uri_complete`), the client polls for receiving the access token
+(respecting the `interval` parameter!).
+
+Polling is done with a POST request to `/oauth/token`, with the following
+JSON data:
+
+| Name        | Type   | Description                                            |
+|-------------|--------|--------------------------------------------------------|
+| grant_type  | string | Must be "urn:ietf:params:oauth:grant-type:device_code" |
+| device_code | string | The `device_code` from step 1                          |
+| client_id   | string | Must be "librepcb"                                     |
+
+The response is either an error response (HTTP 400), with a single JSON field
+`error`, indicating the status of the login:
+
+| `error` Field          | Description                                  |
+|------------------------|----------------------------------------------|
+| `authorization_pending`| User hasn't approved yet — keep polling      |
+| `slow_down`            | Polling too fast — increase interval by 5 s  |
+| `expired_token`        | Device code expired — restart procedure      |
+| `access_denied`        | User declined — abort                        |
+
+Or a successful response (HTTP 200), with the following JSON data:
+
+| Name         | Type    | Description                                  |
+|--------------|---------|----------------------------------------------|
+| access_token | string  | The bearer token to use in API requests      |
+| token_type   | string  | Currently always "bearer"                    |
+| expires_in   | integer | Token lifetime in seconds                    |
+
+#### Example
+
+**Request:**
+
+~~~{.sh}
+curl -X POST -H "Content-Type: application/json" \
+     -d '{"grant_type": "urn:...", "device_code": "czrcREKCVlwUew...", "client_id" : "librepcb"}' \
+     'https://api.example.com/api/v1/oauth/token'
+~~~
+
+**Error Response:**
+
+~~~{.json}
+{ "error": "authorization_pending" }
+~~~
+
+**Successful Response**
+
+~~~{.json}
+{
+  "access_token": "app_vZdNYE5IbeoSVQgAcQ8Y-6rooj2umAhq...",
+  "token_type": "bearer",
+  "expires_in": 7776000
+}
+~~~
+
+### Authenticate Further Requests
+
+Once a token has been obtained (see above), include it as a Bearer token in
+every API request:
+
+~~~{.sh}
+curl -H "Authorization: Bearer <token>" \
+     'https://api.example.com/api/v1/libraries/v0.1'
+~~~
+
+The server responds with HTTP 401 if the supplied token is invalid. The client
+shall then clear the stored token and ask the user to log in again. The body
+of the response may still contain valid data, if the requested resource is
+also available anonymously.
+
+### Token Details
+
+* Tokens are prefixed with `lphub_` followed by a URL-safe base64 string
+  (e.g. `lphub_vZdNYE5Ib...`).
+* The tokens expiry resets on each successful authenticated request. So it
+  stays valid forever as long as the user runs LibrePCB regularly.
+* The expiry period is an implementation detail of the server. It may be
+  set to 365 days (or even longer) to avoid requiring users to log in every
+  time when they don't use LibrePCB often.
+* The client application shall store the token in a secure way. Using the
+  key store of the operating system is highly recommended.
+
+
 # Available Resources {#doc_server_api_resources}
 
 Following resources are available:
 
-| Path         | Description                           |
-|--------------|---------------------------------------|
-| [/libraries] | Fetch list of available libraries     |
-| [/order]     | Upload a project to start ordering it |
-| [/parts]     | Request live information about parts  |
+| Path           | Description                           |
+|----------------|---------------------------------------|
+| [/libraries]   | Fetch list of available libraries     |
+| [/order]       | Upload a project to start ordering it |
+| [/parts]       | Request live information about parts  |
 
 
 ## Libraries {#doc_server_api_resources_libraries}
@@ -447,4 +580,6 @@ curl -X POST -H "Content-Type: application/json" -d @request.json \
 [/libraries]: @ref doc_server_api_resources_libraries
 [/order]: @ref doc_server_api_resources_order
 [/parts]: @ref doc_server_api_resources_parts
+[/oauth]: @ref doc_server_api_resources_oauth
 [ISO 8601]: https://en.wikipedia.org/wiki/ISO_8601
+[RFC 8628]: https://datatracker.ietf.org/doc/html/rfc8628
