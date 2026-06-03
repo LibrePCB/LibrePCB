@@ -3,6 +3,7 @@
 mod angle_ffi;
 mod cpp_ffi;
 mod ibom_ffi;
+mod keyring_ffi;
 mod length_ffi;
 mod math_ffi;
 mod toolbox_ffi;

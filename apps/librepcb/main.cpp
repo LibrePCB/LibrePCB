@@ -34,6 +34,7 @@
 #include <librepcb/editor/utils/editortoolbox.h>
 #include <librepcb/editor/utils/slinthelpers.h>
 #include <librepcb/editor/workspace/initializeworkspacewizard/initializeworkspacewizard.h>
+#include <librepcb/rust-core/ffi.h>
 
 #include <QtConcurrent>
 #include <QtCore>
@@ -122,6 +123,11 @@ int main(int argc, char* argv[]) {
 
   // Register our custom translator to Slint.
   slint::set_translator(std::make_unique<SlintTranslator>());
+
+  // Init keyring.
+  if (!rs::ffi_keyring_init()) {
+    qCritical() << "Failed to initialize keyring.";
+  }
 
   // Start network access manager thread with HTTP cache to avoid extensive
   // requests (e.g. downloading library pictures each time opening the manager).

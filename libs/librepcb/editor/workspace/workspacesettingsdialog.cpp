@@ -69,7 +69,7 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
     mTheme(theme),
     mLibLocaleOrderModel(new LibraryLocaleOrderModel()),
     mLibNormOrderModel(new LibraryNormOrderModel()),
-    mApiEndpointModel(new ApiEndpointListModelLegacy()),
+    mApiEndpointModel(new ApiEndpointListModelLegacy(mSettings)),
     mKeyboardShortcutsModel(new KeyboardShortcutsModel(this)),
     mKeyboardShortcutsFilterModel(new QSortFilterProxyModel(this)),
     mUi(new Ui::WorkspaceSettingsDialog),
@@ -206,10 +206,22 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
 
   // Initialize API endpoint widgets
   {
+    mUi->edtApiEndpoints->setShowLoginButton(true);
     mUi->edtApiEndpoints->setShowMoveButtons(true);
     mUi->edtApiEndpoints->setModel(mApiEndpointModel.data());
     mUi->edtApiEndpoints->horizontalHeader()->setSectionResizeMode(
         ApiEndpointListModelLegacy::COLUMN_URL, QHeaderView::Stretch);
+    mUi->edtApiEndpoints->horizontalHeader()->setSectionResizeMode(
+        ApiEndpointListModelLegacy::COLUMN_LIBRARIES,
+        QHeaderView::ResizeToContents);
+    mUi->edtApiEndpoints->horizontalHeader()->setSectionResizeMode(
+        ApiEndpointListModelLegacy::COLUMN_PARTS,
+        QHeaderView::ResizeToContents);
+    mUi->edtApiEndpoints->horizontalHeader()->setSectionResizeMode(
+        ApiEndpointListModelLegacy::COLUMN_ORDER,
+        QHeaderView::ResizeToContents);
+    mUi->edtApiEndpoints->horizontalHeader()->setSectionResizeMode(
+        ApiEndpointListModelLegacy::COLUMN_USER, QHeaderView::ResizeToContents);
     mUi->edtApiEndpoints->horizontalHeader()->setSectionResizeMode(
         ApiEndpointListModelLegacy::COLUMN_ACTIONS,
         QHeaderView::ResizeToContents);
@@ -221,6 +233,8 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
             mApiEndpointModel.data(), &ApiEndpointListModelLegacy::moveUp);
     connect(mUi->edtApiEndpoints, &EditableTableWidget::btnMoveDownClicked,
             mApiEndpointModel.data(), &ApiEndpointListModelLegacy::moveDown);
+    connect(mUi->edtApiEndpoints, &EditableTableWidget::btnLoginClicked,
+            mApiEndpointModel.data(), &ApiEndpointListModelLegacy::logInOut);
     connect(mUi->lblApiEndpointsInfo, &QLabel::linkActivated, this,
             [this](const QString& url) {
               DesktopServices ds(mWorkspace.getSettings());
