@@ -355,6 +355,17 @@ bool AttributeListModelLegacy::setData(const QModelIndex& index,
       QString attrValue = value.toString().trimmed();
       const AttributeType* type = item ? &item->getType() : mNewType;
       const AttributeUnit* unit = type->tryExtractUnitFromValue(attrValue);
+      if (!type->isValueValid(attrValue)) {
+        // Convert locale-dependent decimal point to 'C' decimal point, see
+        // also https://github.com/LibrePCB/LibrePCB/issues/1367.
+        attrValue.replace(QLocale().decimalPoint(), ".");
+      }
+      if (!type->isValueValid(attrValue)) {
+        throw RuntimeError(
+            __FILE__, __LINE__,
+            QString("The value '%1' is not valid for attributes of type '%2'.")
+                .arg(attrValue, type->getNameTr()));
+      }
       if (cmd) {
         cmd->setValue(attrValue);
         if (unit) {
