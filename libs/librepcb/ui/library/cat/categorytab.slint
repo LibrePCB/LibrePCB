@@ -193,14 +193,16 @@ component CategoryTab inherits Tab {
         model: tabs[index].parents-tree;
 
         item-picked(idx, item) => {
-            tabs[index].new-parent = item.user-data;
-            tabs[index].choose-parent = false;
             root.focus();  // Keep keyboard shortcuts working.
+            tabs[index].new-parent = item.user-data;
+            // Close the dialog *as the last operation* to avoid crashes!
+            tabs[index].choose-parent = false;
         }
 
         rejected => {
-            tabs[index].choose-parent = false;
             root.focus();  // Keep keyboard shortcuts working.
+            // Close the dialog *as the last operation* to avoid crashes!
+            tabs[index].choose-parent = false;
         }
     }
 }

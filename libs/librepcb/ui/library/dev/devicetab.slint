@@ -471,13 +471,15 @@ component DeviceContentTab {
 
         accepted => {
             Backend.trigger-tab(section-index, index, TabAction.apply);
-            attributes-editor-part-index = -1;
             move-focus-to-tab();  // Keep keyboard shortcuts working.
+            // Close the dialog *as the last operation* to avoid crashes!
+            attributes-editor-part-index = -1;
         }
 
         rejected => {
-            attributes-editor-part-index = -1;
             move-focus-to-tab();  // Keep keyboard shortcuts working.
+            // Close the dialog *as the last operation* to avoid crashes!
+            attributes-editor-part-index = -1;
         }
     }
 }
@@ -579,14 +581,16 @@ export component DeviceTab inherits Tab {
         model: tabs[index].categories-tree;
 
         item-picked(idx, item) => {
-            tabs[index].new-category = item.user-data;
-            tabs[index].choose-category = false;
             root.focus();  // Keep keyboard shortcuts working.
+            tabs[index].new-category = item.user-data;
+            // Close the dialog *as the last operation* to avoid crashes!
+            tabs[index].choose-category = false;
         }
 
         rejected => {
-            tabs[index].choose-category = false;
             root.focus();  // Keep keyboard shortcuts working.
+            // Close the dialog *as the last operation* to avoid crashes!
+            tabs[index].choose-category = false;
         }
     }
 
