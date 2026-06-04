@@ -233,6 +233,15 @@ public:
                                  QPointer<QWidget> editor,
                                  QMenu& root) noexcept;
 
+  /**
+   * @brief Create a QFuture that implements an asynchronous delay
+   *
+   * @param milliseconds   Desired delay in milliseconds.
+   *
+   * @return Returns a QFuture that finishes after the specified delay.
+   */
+  static QFuture<void> asyncDelay(int milliseconds) noexcept;
+
 private:
   /**
    * @brief Helper for #removeFormLayoutRow(QLabel&)

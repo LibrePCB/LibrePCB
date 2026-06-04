@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "apiendpointlistmodellegacy.h"
 
+#include "../utils/editortoolbox.h"
 #include "../workspace/desktopservices.h"
 
 #include <QtCore>
@@ -53,7 +54,6 @@ void ApiEndpointListModelLegacy::setValues(
     const QList<WorkspaceSettings::ApiEndpoint>& values) noexcept {
   beginResetModel();
   mValues = values;
-  refreshEndpoints();
   endResetModel();
 }
 
@@ -87,7 +87,6 @@ void ApiEndpointListModelLegacy::add(
 
   beginInsertRows(QModelIndex(), mValues.count(), mValues.count());
   mValues.append(ep);
-  refreshEndpoints();
   endInsertRows();
 
   mNewUrl = QUrl();
@@ -101,7 +100,6 @@ void ApiEndpointListModelLegacy::remove(
   if ((row >= 0) && (row < mValues.count())) {
     beginRemoveRows(QModelIndex(), row, row);
     mValues.removeAt(row);
-    refreshEndpoints();
     endRemoveRows();
   }
 }
@@ -131,10 +129,12 @@ void ApiEndpointListModelLegacy::logInOut(
     return;
   }
   const WorkspaceSettings::ApiEndpoint& value = mValues.at(row);
-  auto ep = mEndpoints.value(value.url);
-  if (!ep) {
+  if (!value.url.isValid()) {
     return;
   }
+
+  std::shared_ptr<ApiEndpoint> ep = ApiEndpoint::get(value.url);
+  Q_ASSERT(ep);
 
   // Log out
   if (ep->hasCredentials()) {
@@ -144,45 +144,53 @@ void ApiEndpointListModelLegacy::logInOut(
   }
 
   // Log in
-  auto logInCallback = [this, row, ep](
-                           const QString& errorMsg, const QString& deviceCode,
-                           const QUrl& verificationUriComplete,
-                           int expiresInSeconds, int intervalSeconds) {
-    qDebug() << errorMsg << deviceCode << verificationUriComplete
-             << expiresInSeconds << intervalSeconds;
-    if (verificationUriComplete.isValid()) {
-      DesktopServices ds(mSettings);
-      ds.openWebUrl(verificationUriComplete);
-
-      QTimer* timer = new QTimer();
-      timer->setInterval(intervalSeconds * 1000);
-      connect(
-          timer, &QTimer::timeout, this, [this, row, deviceCode, timer, ep]() {
-            ep->requestOAuthToken(
-                "urn:ietf:params:oauth:grant-type:device_code", deviceCode,
-                this,
-                [this, row, timer, ep](
-                    const QString& errorMsg, const QString& accessToken,
-                    const QString& tokenType, int expiresIn) {
-                  qDebug() << errorMsg << accessToken << tokenType << expiresIn;
-                  if (errorMsg.isEmpty() && accessToken.isEmpty()) {
-                    return;  // Keep polling.
-                  }
-                  if (!accessToken.isEmpty()) {
-                    ep->setAccessToken(accessToken);
-                    emit dataChanged(index(row, 0),
-                                     index(row + 1, _COLUMN_COUNT - 1));
-                  }
-                  timer->deleteLater();
-                  // if (!accessToken.isEmpty()) {
-                  //
-                  // }
-                });
-          });
-      timer->start();
-    }
-  };
-  ep->requestOAuthDeviceCode("librepcb", "Foo Bar", this, logInCallback);
+  auto future = ep->requestOAuthDeviceCode("librepcb", "Foo Bar");
+  future
+      .then(this,
+            [this, ep](const ApiEndpoint::OAuthDeviceCodeResult& result) {
+              DesktopServices ds(mSettings);
+              if (!ds.openWebUrl(result.verificationUriComplete)) {
+                QMessageBox::warning(
+                    nullptr, tr("Error"),
+                    tr("Failed to open the web browser. Please "
+                       "open this URL to complete the login:") %
+                        "\n\n" % ep->getUrl().toString());
+              }
+              // return EditorToolbox::asyncDelay(result.intervalSeconds *
+              // 1000);
+            })
+      .then(this,
+            []() {
+              /*QTimer* timer = new QTimer();
+              timer->setInterval(result.intervalSeconds * 1000);
+              connect(timer, &QTimer::timeout, this, [this, result, timer, ep]()
+              { ep->requestOAuthToken(
+                    "urn:ietf:params:oauth:grant-type:device_code",
+                    result.deviceCode, this,
+                    [this, timer, ep](const QString& errorMsg,
+                                      const QString& accessToken,
+                                      const QString& tokenType, int expiresIn) {
+                      qDebug()
+                          << errorMsg << accessToken << tokenType << expiresIn;
+                      if (errorMsg.isEmpty() && accessToken.isEmpty()) {
+                        return;  // Keep polling.
+                      }
+                      if (!accessToken.isEmpty()) {
+                        ep->setAccessToken(result.accessToken);
+                        emit dataChanged(index(row, 0),
+                                         index(row + 1, _COLUMN_COUNT - 1));
+                      }
+                      timer->deleteLater();
+                      // if (!accessToken.isEmpty()) {
+                      //
+                      // }
+                    });
+              });
+              timer->start();*/
+            })
+      .onFailed(this, [](const ApiEndpoint::Exception& e) {
+        QMessageBox::critical(nullptr, tr("Error"), e.getMsg());
+      });
 }
 
 /*******************************************************************************
@@ -272,7 +280,8 @@ QVariant ApiEndpointListModelLegacy::data(const QModelIndex& index,
       }
     }
     case COLUMN_USER: {
-      auto ep = item ? mEndpoints.value(item->url) : nullptr;
+      auto ep =
+          (item && item->url.isValid()) ? ApiEndpoint::get(item->url) : nullptr;
       switch (role) {
         case Qt::DisplayRole:
           if (item) {
@@ -365,7 +374,6 @@ bool ApiEndpointListModelLegacy::setData(const QModelIndex& itemIndex,
       mNewUrl = url;
     } else if (url.isValid()) {
       item->url = url;
-      refreshEndpoints();
     }
   } else if ((itemIndex.column() == COLUMN_LIBRARIES) &&
              (role == Qt::CheckStateRole) && item) {
@@ -386,22 +394,6 @@ bool ApiEndpointListModelLegacy::setData(const QModelIndex& itemIndex,
   emit dataChanged(index(0, itemIndex.column()),
                    index(mValues.count(), itemIndex.column()));
   return true;
-}
-
-/*******************************************************************************
- *  PrivateMethods
- ******************************************************************************/
-
-void ApiEndpointListModelLegacy::refreshEndpoints() noexcept {
-  QHash<QUrl, std::shared_ptr<ApiEndpoint>> tmp;
-  for (const auto& endpoint : mValues) {
-    std::shared_ptr<ApiEndpoint> ep = mEndpoints.value(endpoint.url);
-    if (!ep) {
-      ep = std::make_shared<ApiEndpoint>(endpoint.url);
-    }
-    tmp.insert(endpoint.url, ep);
-  }
-  mEndpoints = tmp;
 }
 
 /*******************************************************************************

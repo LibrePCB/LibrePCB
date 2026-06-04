@@ -83,28 +83,39 @@ bool ApiEndpoint::setAccessToken(const QString& token) noexcept {
 
 QFuture<ApiEndpoint::OAuthDeviceCodeResult> ApiEndpoint::requestOAuthDeviceCode(
     const QString& clientId, const QString& label) noexcept {
-  auto errorCallback = [callback](const QString& errorMsg) {
-    callback(errorMsg, QString(), QUrl(), 0, 0);
+  auto promise = std::make_shared<QPromise<OAuthDeviceCodeResult>>();
+  promise->start();
+
+  auto errorCallback = [promise](const QString& errorMsg) {
+    promise->setException(Exception(errorMsg));
+    promise->finish();
   };
 
-  auto successCallback = [callback](const QByteArray& data) {
+  auto successCallback = [promise](const QByteArray& data) {
     QJsonDocument doc = QJsonDocument::fromJson(data);
     if (doc.isNull() || doc.isEmpty() || (!doc.isObject())) {
-      callback("Received JSON object is not valid.", QString(), QUrl(), 0, 0);
+      promise->setException(Exception("Received JSON object is not valid."));
+      promise->finish();
       return;
     }
-    const QString deviceCode = doc.object().value("device_code").toString();
-    const QUrl uri(doc.object().value("verification_uri_complete").toString(),
-                   QUrl::StrictMode);
-    const int expiresIn = doc.object().value("expires_in").toInt();
-    const int interval = doc.object().value("interval").toInt();
-    if (deviceCode.isEmpty() || (!uri.isValid()) || uri.isLocalFile() ||
-        (expiresIn <= 0) || (interval <= 0)) {
-      callback("Received invalid data from server: " % QString(data), QString(),
-               QUrl(), 0, 0);
+    const OAuthDeviceCodeResult result{
+        doc.object().value("device_code").toString(),
+        QUrl(doc.object().value("verification_uri_complete").toString(),
+             QUrl::StrictMode),
+        doc.object().value("expires_in").toInt(),
+        doc.object().value("interval").toInt(),
+    };
+    if (result.deviceCode.isEmpty() ||
+        (!result.verificationUriComplete.isValid()) ||
+        result.verificationUriComplete.isLocalFile() ||
+        (result.expiresInSeconds <= 0) || (result.intervalSeconds <= 0)) {
+      promise->setException(
+          Exception("Received invalid device code response from server."));
+      promise->finish();
       return;
     }
-    callback(QString(), deviceCode, uri, expiresIn, interval);
+    promise->addResult(result);
+    promise->finish();
   };
 
   const QJsonObject obj{
@@ -120,11 +131,13 @@ QFuture<ApiEndpoint::OAuthDeviceCodeResult> ApiEndpoint::requestOAuthDeviceCode(
                           QString::number(postData.size()).toUtf8());
   request->setHeaderField("Accept", "application/json;charset=UTF-8");
   request->setHeaderField("Accept-Charset", "UTF-8");
-  connect(request, &NetworkRequest::errored, receiver, errorCallback,
+  connect(request, &NetworkRequest::errored, this, errorCallback,
           Qt::QueuedConnection);
-  connect(request, &NetworkRequest::dataReceived, receiver, successCallback,
+  connect(request, &NetworkRequest::dataReceived, this, successCallback,
           Qt::QueuedConnection);
   request->start();
+
+  return promise->future();
 }
 
 void ApiEndpoint::requestOAuthToken(
