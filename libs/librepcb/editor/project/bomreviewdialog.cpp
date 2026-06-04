@@ -100,7 +100,7 @@ BomReviewDialog::BomReviewDialog(const WorkspaceSettings& settings,
         if (item) {
           const auto data =
               item->data(Qt::UserRole).value<PartInformationDelegate::Data>();
-          if (data.info && (data.info->info.results == 1)) {
+          if (data.info && (data.info->data.results == 1)) {
             const QRect rect =
                 mUi->tableWidget->visualItemRect(item).intersected(
                     mUi->tableWidget->viewport()->rect());
@@ -206,9 +206,9 @@ void BomReviewDialog::tableCellDoubleClicked(int row, int column) noexcept {
   if (auto item = mUi->tableWidget->item(row, column)) {
     const auto data =
         item->data(Qt::UserRole).value<PartInformationDelegate::Data>();
-    if (data.info && data.info->info.pricingUrl.isValid()) {
+    if (data.info && data.info->data.pricingUrl.isValid()) {
       DesktopServices ds(mSettings);
-      ds.openWebUrl(data.info->info.pricingUrl);
+      ds.openWebUrl(data.info->data.pricingUrl);
     }
   }
 }
@@ -342,7 +342,7 @@ void BomReviewDialog::updatePartsInformation() noexcept {
       manufacturerItem->setData(Qt::UserRole, QVariant::fromValue(data));
 
       if (item.isMount() && (!countedParts.contains(row)) && (data.info) &&
-          (!data.info->info.prices.isEmpty())) {
+          (!data.info->data.prices.isEmpty())) {
         totalPrice += data.info->getPrice(item.getDesignators().count()) *
             item.getDesignators().count();
         partsWithPrice += item.getDesignators().count();

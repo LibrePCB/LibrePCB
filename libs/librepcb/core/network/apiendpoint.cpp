@@ -318,10 +318,8 @@ QFuture<ApiEndpoint::PartsInformationResult>
     for (const QJsonValue& partJson : partsArray) {
       const QJsonObject partObj = partJson.toObject();
       PartInformation info{
-          Part{
-              partObj["mpn"].toString(),
-              partObj["manufacturer"].toString(),
-          },
+          partObj["mpn"].toString(),
+          partObj["manufacturer"].toString(),
           partObj["results"].toInt(),
           QUrl(partObj["product_url"].toString(), QUrl::StrictMode),
           QUrl(partObj["picture_url"].toString(), QUrl::StrictMode),

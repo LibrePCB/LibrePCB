@@ -161,18 +161,18 @@ void PartInformationToolTip::showPart(
     return;
   }
 
-  if ((!mPartInfo) || (info->info.part.mpn != mPartInfo->info.part.mpn) ||
-      (info->info.part.manufacturer != mPartInfo->info.part.manufacturer)) {
+  if ((!mPartInfo) || (info->data.mpn != mPartInfo->data.mpn) ||
+      (info->data.manufacturer != mPartInfo->data.manufacturer)) {
     mPartInfo = info;
 
     QString header = QString(
                          "<span style=\"font-size:large\"><b><a href=\"%1\" "
                          "style=\"color:black\">%2</a></b></span>")
-                         .arg(info->info.productUrl.toString(),
-                              info->info.part.mpn.toHtmlEscaped());
-    if (!info->info.part.manufacturer.isEmpty()) {
+                         .arg(info->data.productUrl.toString(),
+                              info->data.mpn.toHtmlEscaped());
+    if (!info->data.manufacturer.isEmpty()) {
       header += QString("&nbsp;&nbsp;%1")
-                    .arg(info->info.part.manufacturer.toHtmlEscaped());
+                    .arg(info->data.manufacturer.toHtmlEscaped());
     }
     mUi->lblHeader->setText(header);
 
@@ -187,9 +187,9 @@ void PartInformationToolTip::showPart(
                      .arg(info->getAvailabilityColorName(),
                           info->getAvailabilityTr().toHtmlEscaped());
     }
-    if (!info->info.prices.isEmpty()) {
+    if (!info->data.prices.isEmpty()) {
       details += "<div><table>";
-      foreach (int quantity, info->info.prices.keys().mid(0, 3)) {  // NOLINT
+      foreach (int quantity, info->data.prices.keys().mid(0, 3)) {  // NOLINT
         details +=
             QString("<tr><td align=\"right\">%1 %2:</td><td>%3</td></tr>")
                 .arg(PartInformation::formatQuantity(locale(), quantity),
@@ -199,14 +199,14 @@ void PartInformationToolTip::showPart(
       }
       details += "</table></div>";
     }
-    foreach (const auto& resource, info->info.resources.mid(0, 2)) {
+    foreach (const auto& resource, info->data.resources.mid(0, 2)) {
       details +=
           QString("<div>➤ <a href=\"%1\" style=\"color:black\">%2</a></div>")
               .arg(resource.url.toString(), resource.name.toHtmlEscaped());
     }
     mUi->lblDetails->setText(details);
 
-    if (info->info.pricingUrl.isValid()) {
+    if (info->data.pricingUrl.isValid()) {
       mUi->lblProviderLogo->setCursor(Qt::PointingHandCursor);
     } else {
       mUi->lblProviderLogo->unsetCursor();
@@ -243,8 +243,8 @@ bool PartInformationToolTip::eventFilter(QObject* watched,
     if ((watched == mUi->lblExpand) || (watched == mUi->lblSource)) {
       setSourceDetailsExpanded(mUi->lblSourceDetails->height() == 0, true);
     } else if ((watched == mUi->lblProviderLogo) && mPartInfo &&
-               mPartInfo->info.pricingUrl.isValid()) {
-      openUrl(mPartInfo->info.pricingUrl);
+               mPartInfo->data.pricingUrl.isValid()) {
+      openUrl(mPartInfo->data.pricingUrl);
     }
   }
   if ((watched == parentWidget()) &&
@@ -276,7 +276,7 @@ void PartInformationToolTip::hideEvent(QHideEvent* e) noexcept {
  ******************************************************************************/
 
 void PartInformationToolTip::scheduleLoadPicture() noexcept {
-  if (mPartInfo && mPartInfo->info.pictureUrl.isValid() &&
+  if (mPartInfo && mPartInfo->data.pictureUrl.isValid() &&
       (!mUi->lblPicture->isVisible())) {
     mWaitingSpinner->show();
     startLoadPicture(true);
@@ -285,9 +285,9 @@ void PartInformationToolTip::scheduleLoadPicture() noexcept {
 }
 
 void PartInformationToolTip::startLoadPicture(bool onlyCache) noexcept {
-  if (mPartInfo && mPartInfo->info.pictureUrl.isValid() &&
+  if (mPartInfo && mPartInfo->data.pictureUrl.isValid() &&
       (!mUi->lblPicture->isVisible())) {
-    NetworkRequest* request = new NetworkRequest(mPartInfo->info.pictureUrl);
+    NetworkRequest* request = new NetworkRequest(mPartInfo->data.pictureUrl);
     if (onlyCache) {
       // Immediately after showing the tooltip, only load the image from cache
       // to avoid extensive network load!
@@ -295,7 +295,7 @@ void PartInformationToolTip::startLoadPicture(bool onlyCache) noexcept {
     }
     request->setMinimumCacheTime(14 * 24 * 3600);  // 14 days
     const QString format =
-        mPartInfo->info.pictureUrl.fileName().split('.').last().toLower();
+        mPartInfo->data.pictureUrl.fileName().split('.').last().toLower();
     connect(
         request, &NetworkRequest::dataReceived, this,
         [this, onlyCache, format](const QByteArray& data) {
