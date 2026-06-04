@@ -144,7 +144,7 @@ void ApiEndpointListModelLegacy::logInOut(
   }
 
   // Log in
-  auto logInCallback = [this, ep](const QString& errorMsg,
+  auto logInCallback = [this, row, ep](const QString& errorMsg,
                                   const QString& deviceCode,
                                   const QUrl& verificationUriComplete,
                                   int expiresInSeconds, int intervalSeconds) {
@@ -156,21 +156,25 @@ void ApiEndpointListModelLegacy::logInOut(
 
       QTimer* timer = new QTimer();
       timer->setInterval(intervalSeconds * 1000);
-      connect(timer, &QTimer::timeout, this, [deviceCode, timer, ep]() {
+      connect(timer, &QTimer::timeout, this, [this, row, deviceCode, timer, ep]() {
         ep->requestOAuthToken(
             "urn:ietf:params:oauth:grant-type:device_code", deviceCode,
             "librepcb",
-            [timer](const QString& errorMsg, const QString& accessToken,
-                    const QString& tokenType, int expiresIn) {
-          qDebug() << errorMsg << accessToken << tokenType << expiresIn;
-          if (errorMsg.isEmpty() && accessToken.isEmpty()) {
-            // Keep polling.
-            return;
-          }
-          timer->deleteLater();
-             // if (!accessToken.isEmpty()) {
-             //
-             // }
+            [this, row, timer, ep](const QString& errorMsg,
+                              const QString& accessToken,
+                              const QString& tokenType, int expiresIn) {
+              qDebug() << errorMsg << accessToken << tokenType << expiresIn;
+              if (errorMsg.isEmpty() && accessToken.isEmpty()) {
+                return;  // Keep polling.
+              }
+              if (!accessToken.isEmpty()) {
+                ep->setAccessToken(accessToken);
+                emit dataChanged(index(row, 0), index(row + 1, _COLUMN_COUNT - 1));
+              }
+              timer->deleteLater();
+              // if (!accessToken.isEmpty()) {
+              //
+              // }
             });
       });
       timer->start();
@@ -266,16 +270,16 @@ QVariant ApiEndpointListModelLegacy::data(const QModelIndex& index,
       }
     }
     case COLUMN_USER: {
-      const QString user;
+      auto ep = item ? mEndpoints.value(item->url) : nullptr;
       switch (role) {
         case Qt::DisplayRole:
           if (item) {
-            return user.isEmpty() ? tr("Log In") % " →" : user;
+            return (ep && ep->hasCredentials()) ? tr("Logged In") : (tr("Log In") % " →");
           } else {
             return QVariant();
           }
         case Qt::ForegroundRole:
-          if (user.isEmpty()) {
+          if (ep && (!ep->hasCredentials())) {
             QColor color = qApp->palette().text().color();
             color.setAlpha(128);
             return QBrush(color);
