@@ -27,7 +27,6 @@
 #include "librarydownload.h"
 
 #include <librepcb/core/fileio/fileutils.h>
-#include <librepcb/core/network/apiendpoint.h>
 #include <librepcb/core/network/networkrequest.h>
 #include <librepcb/core/utils/scopeguard.h>
 #include <librepcb/core/workspace/workspace.h>
@@ -82,7 +81,10 @@ LibrariesModel::LibrariesModel(Workspace& ws, Mode mode,
   if (mMode == Mode::RemoteLibs) {
     connect(&mWorkspace.getSettings().apiEndpoints,
             &WorkspaceSettingsItem::edited, this, [this]() {
-              mApiEndpointsInProgress.clear();
+              for (auto& future : mLibrariesInProgress) {
+                future.cancel();
+              }
+              mLibrariesInProgress.clear();
               mOnlineLibsErrors.clear();
               mOnlineLibs.clear();
               updateMergedLibraries();
@@ -107,7 +109,7 @@ LibrariesModel::~LibrariesModel() noexcept {
 
 ui::LibraryListData LibrariesModel::getUiData() const noexcept {
   ui::LibraryListData data = {};
-  data.refreshing = (!mInitialized) || (!mApiEndpointsInProgress.isEmpty());
+  data.refreshing = (!mInitialized) || (!mLibrariesInProgress.isEmpty());
   data.refreshing_error =
       q2s((mInstalledLibsErrors + mOnlineLibsErrors).join("\n\n"));
   data.count = mMergedLibs.size();
@@ -175,7 +177,7 @@ void LibrariesModel::ensurePopulated(bool withIcons,
   }
   if ((mMode == Mode::RemoteLibs) &&
       (getUpdateMode(mWorkspace) != AutoUpdateMode::Disabled) &&
-      (mApiEndpointsInProgress.isEmpty() &&
+      (mLibrariesInProgress.isEmpty() &&
        (mOnlineLibs.isEmpty() || (!mOnlineLibsErrors.isEmpty())))) {
     requestOnlineLibraries(false);
   }
@@ -198,7 +200,10 @@ void LibrariesModel::checkForUpdates() noexcept {
 void LibrariesModel::cancelUpdateCheck() noexcept {
   if (mMode != Mode::RemoteLibs) return;
 
-  mApiEndpointsInProgress.clear();  // Should cancel the network requests.
+  for (auto& future : mLibrariesInProgress) {
+    future.cancel();
+  }
+  mLibrariesInProgress.clear();
   mOnlineLibsErrors.clear();
   emit uiDataChanged(getUiData());
 }
@@ -332,8 +337,11 @@ void LibrariesModel::cancel() noexcept {
   if (!mDownloadsInProgress.isEmpty()) {
     mDownloadsInProgress.clear();
     emit uiDataChanged(getUiData());
-  } else if (!mApiEndpointsInProgress.isEmpty()) {
-    mApiEndpointsInProgress.clear();
+  } else if (!mLibrariesInProgress.isEmpty()) {
+    for (auto& future : mLibrariesInProgress) {
+      future.cancel();
+    }
+    mLibrariesInProgress.clear();
     emit uiDataChanged(getUiData());
   } else {
     mCheckStates.clear();
@@ -467,53 +475,50 @@ void LibrariesModel::updateLibraries(bool resetHighlight) noexcept {
 }
 
 void LibrariesModel::requestOnlineLibraries(bool forceNoCache) noexcept {
-  mApiEndpointsInProgress.clear();  // Disconnects all signal/slot connections.
+  for (auto& future : mLibrariesInProgress) {
+    future.cancel();
+  }
+  mLibrariesInProgress.clear();
   mOnlineLibs.clear();
   mOnlineLibsErrors.clear();
   for (const WorkspaceSettings::ApiEndpoint& ep :
        mWorkspace.getSettings().apiEndpoints.get()) {
-    if (ep.url.isValid() && ep.useForLibraries) {
-      std::shared_ptr<ApiEndpoint> repo = std::make_shared<ApiEndpoint>(ep.url);
-      mApiEndpointsInProgress.append(repo);
-      repo->requestLibraries(
-          forceNoCache, this,
-          std::bind(&LibrariesModel::onlineLibraryListReceived, this,
-                    std::placeholders::_1, std::placeholders::_2));
+    if (ep.url.isValid() && ep.useForLibraries &&
+        (!mLibrariesInProgress.contains(ep.url))) {
+      std::shared_ptr<ApiEndpoint> repo = ApiEndpoint::get(ep.url);
+      auto future = repo->requestLibraries(forceNoCache);
+      future
+          .then(this,
+                [this, url = ep.url](QFuture<ApiEndpoint::Library> future) {
+                  QHash<Uuid, Version> versions;
+                  foreach (const auto& lib, future.results()) {
+                    const Uuid uuid = lib.uuid;
+                    mOnlineLibs.insert(uuid, lib);
+                    versions.insert(uuid, lib.version);
+                  }
+                  updateMergedLibraries();
+                  emit onlineVersionsAvailable(versions);
+
+                  // Must come after updateMergedLibraries(), for the
+                  // auto-update.
+                  apiEndpointOperationFinished(url);
+
+                  if (mRequestIcons) {
+                    requestMissingOnlineIcons();
+                  }
+                })
+          .onFailed([this, url = ep.url](const ApiEndpoint::Exception& e) {
+            mOnlineLibsErrors.append(
+                tr("Failed to fetch libraries from '%1': %2")
+                    .arg(url.toString(), e.getMsg()));
+            apiEndpointOperationFinished(url);
+            emit uiDataChanged(getUiData());
+          });
+      mLibrariesInProgress.insert(ep.url, future);
     }
   }
-  if (!mApiEndpointsInProgress.isEmpty()) {
+  if (!mLibrariesInProgress.isEmpty()) {
     emit uiDataChanged(getUiData());
-  }
-}
-
-void LibrariesModel::onlineLibraryListReceived(
-    const QString& errorMsg,
-    const QVector<ApiEndpoint::Library>& libraries) noexcept {
-  if (!errorMsg.isEmpty()) {
-    const ApiEndpoint* endpoint = qobject_cast<ApiEndpoint*>(sender());
-    mOnlineLibsErrors.append(
-        tr("Failed to fetch libraries from '%1': %2")
-            .arg(endpoint ? endpoint->getUrl().toString() : QString(),
-                 errorMsg));
-    apiEndpointOperationFinished();
-    emit uiDataChanged(getUiData());
-    return;
-  }
-
-  QHash<Uuid, Version> versions;
-  for (const auto& lib : libraries) {
-    const Uuid uuid = lib.uuid;
-    mOnlineLibs.insert(uuid, lib);
-    versions.insert(uuid, lib.version);
-  }
-  updateMergedLibraries();
-  emit onlineVersionsAvailable(versions);
-
-  // Must come after updateMergedLibraries(), for the auto-update.
-  apiEndpointOperationFinished();
-
-  if (mRequestIcons) {
-    requestMissingOnlineIcons();
   }
 }
 
@@ -547,14 +552,10 @@ void LibrariesModel::onlineIconReceived(const Uuid& uuid,
   }
 }
 
-void LibrariesModel::apiEndpointOperationFinished() noexcept {
-  const ApiEndpoint* endpoint = qobject_cast<ApiEndpoint*>(sender());
-  mApiEndpointsInProgress.removeIf([endpoint](std::shared_ptr<ApiEndpoint> ep) {
-    return ep.get() == endpoint;
-  });
-  endpoint = nullptr;  // Not valid anymore!
+void LibrariesModel::apiEndpointOperationFinished(const QUrl& url) noexcept {
+  mLibrariesInProgress.remove(url);
 
-  if (mApiEndpointsInProgress.isEmpty()) {
+  if (mLibrariesInProgress.isEmpty()) {
     const auto uiData = getUiData();
     emit uiDataChanged(uiData);
 
