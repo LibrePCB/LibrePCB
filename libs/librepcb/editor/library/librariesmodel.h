@@ -99,10 +99,11 @@ signals:
 private:
   void updateLibraries(bool resetHighlight = true) noexcept;
   void requestOnlineLibraries(bool forceNoCache) noexcept;
-  void onlineLibraryListReceived(QList<ApiEndpoint::Library> libs) noexcept;
+  void onlineLibraryListReceived(
+      const QString& errorMsg,
+      const QVector<ApiEndpoint::Library>& libraries) noexcept;
   void requestMissingOnlineIcons() noexcept;
   void onlineIconReceived(const Uuid& uuid, const QByteArray& data) noexcept;
-  void errorWhileFetchingLibraryList(QString errorMsg) noexcept;
   void apiEndpointOperationFinished() noexcept;
   void startAutoUpdate() noexcept;
   ui::LibraryListData updateMergedLibraries() noexcept;

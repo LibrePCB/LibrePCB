@@ -308,11 +308,6 @@ void PartInformationProvider::setApiEndpoint(const QUrl& url) noexcept {
   if (url.isValid()) {
     mEndpoint.reset(new ApiEndpoint(url));
     mSource = mEndpoint->getUrl().toString(QUrl::PrettyDecoded);
-    connect(mEndpoint.data(),
-            &ApiEndpoint::errorWhileFetchingPartsInformationStatus, this,
-            &PartInformationProvider::errorWhileFetchingStatus);
-    connect(mEndpoint.data(), &ApiEndpoint::partsInformationStatusReceived,
-            this, &PartInformationProvider::statusReceived);
     connect(mEndpoint.data(), &ApiEndpoint::errorWhileFetchingPartsInformation,
             this, &PartInformationProvider::errorWhileFetchingPartsInformation);
     connect(mEndpoint.data(), &ApiEndpoint::partsInformationReceived, this,
@@ -410,11 +405,27 @@ void PartInformationProvider::requestStatus() noexcept {
   if (mEndpoint && (!mStatusReceived) && (!mDisabledDueToErrors) &&
       (ts - mStatusRequestedTimestamp > 30)) {
     mStatusRequestedTimestamp = ts;
-    mEndpoint->requestPartsInformationStatus();
+    mEndpoint->requestPartsStatus(
+        this,
+        std::bind(&PartInformationProvider::statusReceived, this,
+                  std::placeholders::_1, std::placeholders::_2));
   }
 }
 
-void PartInformationProvider::statusReceived(const QJsonObject& json) noexcept {
+void PartInformationProvider::statusReceived(const QString& errorMsg,
+                                             const QJsonObject& json) noexcept {
+  if (!errorMsg.isEmpty()) {
+    qCritical().noquote() << "Failed to request parts information API status:"
+                          << errorMsg;
+    if (mErrorCounter < 1) {
+      ++mErrorCounter;
+    } else if (!mDisabledDueToErrors) {
+      qInfo() << "Live parts information disabled due to errors.";
+      mDisabledDueToErrors = true;
+    }
+    return;
+  }
+
   mProviderName = json["provider_name"].toString();
   mProviderUrl = json["provider_url"].toString();
   mProviderLogoUrl = json["provider_logo_url"].toString();
@@ -448,18 +459,6 @@ void PartInformationProvider::statusReceived(const QJsonObject& json) noexcept {
     emit serviceOperational();
   } else {
     qInfo() << "Live parts information API is currently not available.";
-  }
-}
-
-void PartInformationProvider::errorWhileFetchingStatus(
-    const QString& errorMsg) noexcept {
-  qCritical().noquote() << "Failed to request parts information API status:"
-                        << errorMsg;
-  if (mErrorCounter < 1) {
-    ++mErrorCounter;
-  } else if (!mDisabledDueToErrors) {
-    qInfo() << "Live parts information disabled due to errors.";
-    mDisabledDueToErrors = true;
   }
 }
 

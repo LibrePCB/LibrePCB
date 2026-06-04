@@ -35,6 +35,9 @@
  ******************************************************************************/
 namespace librepcb {
 
+QMutex ApiEndpoint::sInstancesMutex;
+QHash<QUrl, std::shared_ptr<ApiEndpoint>> ApiEndpoint::sInstances;
+
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
@@ -79,7 +82,7 @@ bool ApiEndpoint::setAccessToken(const QString& token) noexcept {
 }
 
 void ApiEndpoint::requestOAuthDeviceCode(
-    const QString& clientId, const QString& label,
+    const QString& clientId, const QString& label, QObject* receiver,
     const OAuthDeviceCodeCallback& callback) noexcept {
   auto errorCallback = [callback](const QString& errorMsg) {
     callback(errorMsg, QString(), QUrl(), 0, 0);
@@ -118,16 +121,16 @@ void ApiEndpoint::requestOAuthDeviceCode(
                           QString::number(postData.size()).toUtf8());
   request->setHeaderField("Accept", "application/json;charset=UTF-8");
   request->setHeaderField("Accept-Charset", "UTF-8");
-  connect(request, &NetworkRequest::errored, this, errorCallback,
+  connect(request, &NetworkRequest::errored, receiver, errorCallback,
           Qt::QueuedConnection);
-  connect(request, &NetworkRequest::dataReceived, this, successCallback,
+  connect(request, &NetworkRequest::dataReceived, receiver, successCallback,
           Qt::QueuedConnection);
   request->start();
 }
 
 void ApiEndpoint::requestOAuthToken(
-    const QString& grantType, const QString& deviceCode,
-    const QString& clientId, const OAuthTokenCallback& callback) noexcept {
+    const QString& grantType, const QString& deviceCode, QObject* receiver,
+    const OAuthTokenCallback& callback) noexcept {
   auto errorCallback = [callback](const QString& errorMsg) {
     callback(errorMsg, QString(), QString(), 0);
   };
@@ -155,8 +158,8 @@ void ApiEndpoint::requestOAuthToken(
   };
 
   const QJsonObject obj{
-      {"grant_type", grantType}, {"device_code", deviceCode},
-      //{"client_id", clientId},
+      {"grant_type", grantType},
+      {"device_code", deviceCode},
   };
   const QByteArray postData = QJsonDocument(obj).toJson();
 
@@ -167,29 +170,42 @@ void ApiEndpoint::requestOAuthToken(
                           QString::number(postData.size()).toUtf8());
   request->setHeaderField("Accept", "application/json;charset=UTF-8");
   request->setHeaderField("Accept-Charset", "UTF-8");
-  connect(request, &NetworkRequest::errored, this, errorCallback,
+  connect(request, &NetworkRequest::errored, receiver, errorCallback,
           Qt::QueuedConnection);
-  connect(request, &NetworkRequest::dataReceived, this, successCallback,
+  connect(request, &NetworkRequest::dataReceived, receiver, successCallback,
           Qt::QueuedConnection);
   request->start();
 }
 
-void ApiEndpoint::requestLibraryList(bool forceNoCache) noexcept {
+void ApiEndpoint::requestLibraries(bool forceNoCache, QObject* receiver,
+                                   const LibrariesCallback& callback) noexcept {
   QString path =
       "/api/v1/libraries/v" % Application::getFileFormatVersion().toStr();
-  requestLibraryList(QUrl(mUrl.toString() % path), forceNoCache);
+  requestLibraries(QUrl(mUrl.toString() % path), forceNoCache);
 }
 
-void ApiEndpoint::requestPartsInformationStatus() const noexcept {
+void ApiEndpoint::requestPartsStatus(
+    QObject* receiver, const PartsStatusCallback& callback) const noexcept {
+  auto errorCallback = [callback](const QString& errorMsg) {
+    callback(errorMsg, QJsonObject());
+  };
+
+  auto successCallback = [callback](const QByteArray& data) {
+    QJsonDocument doc = QJsonDocument::fromJson(data);
+    if (doc.isNull() || doc.isEmpty() || (!doc.isObject())) {
+      callback("Received JSON object is not valid.", QJsonObject());
+    } else {
+      callback(QString(), doc.object());
+    }
+  };
+
   NetworkRequest* request =
       new NetworkRequest(QUrl(mUrl.toString() % "/api/v1/parts"));
   request->setHeaderField("Accept", "application/json;charset=UTF-8");
   request->setHeaderField("Accept-Charset", "UTF-8");
-  connect(request, &NetworkRequest::errored, this,
-          &ApiEndpoint::errorWhileFetchingPartsInformationStatus,
+  connect(request, &NetworkRequest::errored, receiver, errorCallback,
           Qt::QueuedConnection);
-  connect(request, &NetworkRequest::dataReceived, this,
-          &ApiEndpoint::partsInformationStatusResponseReceived,
+  connect(request, &NetworkRequest::dataReceived, receiver, successCallback,
           Qt::QueuedConnection);
   request->start();
 }
@@ -224,6 +240,19 @@ void ApiEndpoint::requestPartsInformation(
 }
 
 /*******************************************************************************
+ *  Static Methods
+ ******************************************************************************/
+
+std::shared_ptr<ApiEndpoint> ApiEndpoint::get(const QUrl& url) noexcept {
+  QMutexLocker lock(&sInstancesMutex);
+  auto it = sInstances.find(url);
+  if (it == sInstances.end()) {
+    it = sInstances.insert(url, std::make_shared<ApiEndpoint>(url));
+  }
+  return *it;
+}
+
+/*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 
@@ -240,77 +269,52 @@ const QString& ApiEndpoint::getToken() const noexcept {
   return *mCachedToken;
 }
 
-/*void ApiEndpoint::errorWhileFetchingOAuthDeviceCode(
-    const QString& errorMsg) noexcept {
-  emit oAuthDeviceCodeReceived(errorMsg, QString(), QUrl(), 0, 0);
-}
-
-void ApiEndpoint::oAuthDeviceCodeResponseReceived(
-    const QByteArray& data) noexcept {
-  QJsonDocument doc = QJsonDocument::fromJson(data);
-  if (doc.isNull() || doc.isEmpty() || (!doc.isObject())) {
-    errorWhileFetchingOAuthDeviceCode(tr("Received JSON object is not valid."));
-    return;
-  }
-  const QString deviceCode = doc.object().value("device_code").toString();
-  const QUrl uri(doc.object().value("verification_uri_complete").toString(),
-                 QUrl::StrictMode);
-  const int expiresIn = doc.object().value("expires_in").toString().toInt();
-  const int interval = doc.object().value("interval").toString().toInt();
-  if (deviceCode.isEmpty() || (!uri.isValid()) || uri.isLocalFile() ||
-      (!expiresIn) || (!interval)) {
-    errorWhileFetchingOAuthDeviceCode("Received invalid data from the server.");
-    return;
-  }
-  emit oAuthDeviceCodeReceived(QString(), deviceCode, uri, expiresIn, interval);
-}*/
-
-void ApiEndpoint::requestLibraryList(const QUrl& url,
-                                     bool forceNoCache) noexcept {
+void ApiEndpoint::requestLibraries(const QUrl& url,
+                                   bool forceNoCache) noexcept {
   NetworkRequest* request = new NetworkRequest(url);
   request->setHeaderField("Accept", "application/json;charset=UTF-8");
   request->setHeaderField("Accept-Charset", "UTF-8");
   if (forceNoCache) {
     request->setCacheLoadControl(QNetworkRequest::AlwaysNetwork);
   }
-  connect(request, &NetworkRequest::errored, this,
-          &ApiEndpoint::errorWhileFetchingLibraryList, Qt::QueuedConnection);
-  connect(
-      request, &NetworkRequest::dataReceived, this,
-      [this, forceNoCache](const QByteArray& data) {
-        libraryListResponseReceived(data, forceNoCache);
-      },
-      Qt::QueuedConnection);
+  // connect(request, &NetworkRequest::errored, this,
+  //         &ApiEndpoint::errorWhileFetchingLibraryList, Qt::QueuedConnection);
+  // connect(
+  //     request, &NetworkRequest::dataReceived, this,
+  //     [this, forceNoCache](const QByteArray& data) {
+  //       libraryListResponseReceived(data, forceNoCache);
+  //     },
+  //     Qt::QueuedConnection);
   request->start();
 }
 
 void ApiEndpoint::libraryListResponseReceived(const QByteArray& data,
                                               bool forceNoCache) noexcept {
   QJsonDocument doc = QJsonDocument::fromJson(data);
-  if (doc.isNull() || doc.isEmpty() || (!doc.isObject())) {
-    emit errorWhileFetchingLibraryList(
-        tr("Received JSON object is not valid."));
-    return;
-  }
+  // if (doc.isNull() || doc.isEmpty() || (!doc.isObject())) {
+  //   emit errorWhileFetchingLibraryList(
+  //       tr("Received JSON object is not valid."));
+  //   return;
+  // }
   QJsonValue nextResultsLink = doc.object().value("next");
   if (nextResultsLink.isString()) {
     QUrl url = QUrl(nextResultsLink.toString());
     if (url.isValid()) {
       qDebug().nospace() << "Request more results from API endpoint "
                          << url.toString() << "...";
-      requestLibraryList(url, forceNoCache);
+      requestLibraries(url, forceNoCache);
     } else {
       qWarning() << "Invalid URL in received JSON object:"
                  << nextResultsLink.toString();
     }
   }
   const QJsonValue results = doc.object().value("results");
-  if ((results.isNull()) || (!results.isArray())) {
-    emit errorWhileFetchingLibraryList(
-        tr("Received JSON object does not contain "
-           "any results."));
-    return;
-  }
+  // if ((results.isNull()) || (!results.isArray())) {
+  //   emit errorWhileFetchingLibraryList(
+  //       tr("Received JSON object does not contain "
+  //          "any results."));
+  //   return;
+  // }
 
   // Parse JSON.
   QList<Library> libs;
@@ -351,18 +355,7 @@ void ApiEndpoint::libraryListResponseReceived(const QByteArray& data,
     }
     libs.append(lib);
   }
-  emit libraryListReceived(libs);
-}
-
-void ApiEndpoint::partsInformationStatusResponseReceived(
-    const QByteArray& data) noexcept {
-  QJsonDocument doc = QJsonDocument::fromJson(data);
-  if (doc.isNull() || doc.isEmpty() || (!doc.isObject())) {
-    emit errorWhileFetchingPartsInformation(
-        tr("Received JSON object is not valid."));
-    return;
-  }
-  emit partsInformationStatusReceived(doc.object());
+  // emit libraryListReceived(libs);
 }
 
 void ApiEndpoint::partsInformationResponseReceived(
