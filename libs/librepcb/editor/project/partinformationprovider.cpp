@@ -247,8 +247,6 @@ PartInformationProvider::PartInformationProvider(QObject* parent) noexcept
     mErrorCounter(0),
     mDisabledDueToErrors(false),
     mStatusRequestedTimestamp(0),
-    mStatusReceived(false),
-    mQueryMaxPartCount(0),
     mCacheModified(false) {
   // Try to recover from errors every hour.
   {
@@ -285,8 +283,20 @@ PartInformationProvider::~PartInformationProvider() noexcept {
  ******************************************************************************/
 
 bool PartInformationProvider::isOperational() const noexcept {
-  return mEndpoint && mStatusReceived && mQueryUrl.isValid() &&
-      (!mDisabledDueToErrors) && (mQueryMaxPartCount > 0);
+  return mEndpoint && mStatusResult && mStatusResult->queryUrl.isValid() &&
+      (!mDisabledDueToErrors) && (mStatusResult->queryMaxPartCount > 0);
+}
+
+QString PartInformationProvider::getProviderName() const noexcept {
+  return mStatusResult ? mStatusResult->providerName : QString();
+}
+
+QUrl PartInformationProvider::getProviderUrl() const noexcept {
+  return mStatusResult ? mStatusResult->providerUrl : QUrl();
+}
+
+QUrl PartInformationProvider::getInfoUrl() const noexcept {
+  return mStatusResult ? mStatusResult->infoUrl : QUrl();
 }
 
 /*******************************************************************************
@@ -298,21 +308,31 @@ void PartInformationProvider::setCacheDir(const FilePath& dir) noexcept {
   loadCacheFromDisk();
 }
 
-void PartInformationProvider::setApiEndpoint(const QUrl& url) noexcept {
-  if (mEndpoint && (mEndpoint->getUrl() == url)) {
+void PartInformationProvider::setApiEndpoint(
+    const std::shared_ptr<ApiEndpoint>& ep) noexcept {
+  if (mEndpoint == ep) {
     return;
   }
 
-  mEndpoint.reset();
+  if (mEndpoint) {
+    disconnect(mEndpoint.get(),
+               &ApiEndpoint::errorWhileFetchingPartsInformation, this,
+               &PartInformationProvider::errorWhileFetchingPartsInformation);
+    disconnect(mEndpoint.get(), &ApiEndpoint::partsInformationReceived, this,
+               &PartInformationProvider::partsInformationReceived);
+  }
+
+  mEndpoint = ep;
   mSource.clear();
-  if (url.isValid()) {
-    mEndpoint.reset(new ApiEndpoint(url));
+
+  if (mEndpoint) {
     mSource = mEndpoint->getUrl().toString(QUrl::PrettyDecoded);
-    connect(mEndpoint.data(), &ApiEndpoint::errorWhileFetchingPartsInformation,
+    connect(mEndpoint.get(), &ApiEndpoint::errorWhileFetchingPartsInformation,
             this, &PartInformationProvider::errorWhileFetchingPartsInformation);
-    connect(mEndpoint.data(), &ApiEndpoint::partsInformationReceived, this,
+    connect(mEndpoint.get(), &ApiEndpoint::partsInformationReceived, this,
             &PartInformationProvider::partsInformationReceived);
   }
+
   reset();
 }
 
@@ -365,7 +385,8 @@ void PartInformationProvider::requestScheduledParts() noexcept {
   }
 
   QVector<ApiEndpoint::Part> batch;
-  const int count = std::min(int(mScheduledParts.count()), mQueryMaxPartCount);
+  const int count = std::min(int(mScheduledParts.count()),
+                             std::min(10, mStatusResult->queryMaxPartCount));
   for (int i = 0; i < count; ++i) {
     const auto& part = mScheduledParts.at(i);
     auto it = mCache.find(part);
@@ -376,7 +397,7 @@ void PartInformationProvider::requestScheduledParts() noexcept {
     mRequestedParts.insert(part);
   }
   mScheduledParts.remove(0, count);
-  mEndpoint->requestPartsInformation(mQueryUrl, batch);
+  mEndpoint->requestPartsInformation(mStatusResult->queryUrl, batch);
 }
 
 /*******************************************************************************
@@ -387,14 +408,12 @@ void PartInformationProvider::reset() noexcept {
   mErrorCounter = 0;
   mDisabledDueToErrors = false;
   mStatusRequestedTimestamp = 0;
-  mStatusReceived = mEndpoint.isNull();
-  mProviderName.clear();
-  mProviderUrl.clear();
-  mProviderLogoUrl.clear();
+  if (mEndpoint) {
+    mStatusResult = std::nullopt;
+  } else {
+    mStatusResult = ApiEndpoint::PartsStatusResult{};
+  }
   mProviderLogo = QPixmap();
-  mInfoUrl.clear();
-  mQueryUrl.clear();
-  mQueryMaxPartCount = 0;
   mScheduledParts.clear();
   mRequestedParts.clear();
   emit providerInfoChanged();
@@ -402,63 +421,55 @@ void PartInformationProvider::reset() noexcept {
 
 void PartInformationProvider::requestStatus() noexcept {
   const qint64 ts = QDateTime::currentSecsSinceEpoch();
-  if (mEndpoint && (!mStatusReceived) && (!mDisabledDueToErrors) &&
+  if (mEndpoint && (!mStatusResult) && (!mDisabledDueToErrors) &&
       (ts - mStatusRequestedTimestamp > 30)) {
     mStatusRequestedTimestamp = ts;
-    mEndpoint->requestPartsStatus(
-        this,
-        std::bind(&PartInformationProvider::statusReceived, this,
-                  std::placeholders::_1, std::placeholders::_2));
-  }
-}
+    mEndpoint->requestPartsStatus()
+        .then(
+            this,
+            [this](const ApiEndpoint::PartsStatusResult& result) {
+              mStatusResult = result;
+              mErrorCounter = 0;
+              mDisabledDueToErrors = false;
+              mStatusRequestedTimestamp = 0;
+              emit providerInfoChanged();
 
-void PartInformationProvider::statusReceived(const QString& errorMsg,
-                                             const QJsonObject& json) noexcept {
-  if (!errorMsg.isEmpty()) {
-    qCritical().noquote() << "Failed to request parts information API status:"
-                          << errorMsg;
-    if (mErrorCounter < 1) {
-      ++mErrorCounter;
-    } else if (!mDisabledDueToErrors) {
-      qInfo() << "Live parts information disabled due to errors.";
-      mDisabledDueToErrors = true;
-    }
-    return;
-  }
+              // Request provider logo if an URL is given.
+              if (mStatusResult->providerLogoUrl.isValid()) {
+                NetworkRequest* request =
+                    new NetworkRequest(mStatusResult->providerLogoUrl);
+                request->setMinimumCacheTime(7 * 24 * 3600);  // 7 days
+                connect(
+                    request, &NetworkRequest::dataReceived, this,
+                    [this](const QByteArray& data) {
+                      mProviderLogo.loadFromData(data);
+                      if (!mProviderLogo.isNull()) {
+                        emit providerInfoChanged();
+                      }
+                    },
+                    Qt::QueuedConnection);
+                request->start();
+              }
 
-  mProviderName = json["provider_name"].toString();
-  mProviderUrl = json["provider_url"].toString();
-  mProviderLogoUrl = json["provider_logo_url"].toString();
-  mInfoUrl = json["info_url"].toString();
-  mQueryUrl = json["query_url"].toString();
-  mQueryMaxPartCount = std::min(10, json["max_parts"].toInt());
-  mErrorCounter = 0;
-  mDisabledDueToErrors = false;
-  mStatusRequestedTimestamp = 0;
-  mStatusReceived = true;
-  emit providerInfoChanged();
-
-  // Request provider logo if an URL is given.
-  if (mProviderLogoUrl.isValid()) {
-    NetworkRequest* request = new NetworkRequest(mProviderLogoUrl);
-    request->setMinimumCacheTime(7 * 24 * 3600);  // 7 days
-    connect(
-        request, &NetworkRequest::dataReceived, this,
-        [this](const QByteArray& data) {
-          mProviderLogo.loadFromData(data);
-          if (!mProviderLogo.isNull()) {
-            emit providerInfoChanged();
+              if (mStatusResult->queryUrl.isValid()) {
+                qInfo() << "Live parts information API is operational.";
+                emit serviceOperational();
+              } else {
+                qInfo()
+                    << "Live parts information API is currently not available.";
+              }
+            })
+        .onFailed(this, [this](const ApiEndpoint::Exception& e) {
+          qCritical().noquote()
+              << "Failed to request parts information API status:"
+              << e.getMsg();
+          if (mErrorCounter < 1) {
+            ++mErrorCounter;
+          } else if (!mDisabledDueToErrors) {
+            qInfo() << "Live parts information disabled due to errors.";
+            mDisabledDueToErrors = true;
           }
-        },
-        Qt::QueuedConnection);
-    request->start();
-  }
-
-  if (mQueryUrl.isValid()) {
-    qInfo() << "Live parts information API is operational.";
-    emit serviceOperational();
-  } else {
-    qInfo() << "Live parts information API is currently not available.";
+        });
   }
 }
 

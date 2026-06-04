@@ -72,11 +72,11 @@ public:
     QString description;
     QString author;
     Version version;
-    bool recommended;
+    bool recommended = false;
     QSet<Uuid> dependencies;
     QUrl iconUrl;
     QUrl downloadUrl;
-    qint64 downloadSize;
+    qint64 downloadSize = -1;
     QByteArray downloadSha256;
   };
 
@@ -84,18 +84,26 @@ public:
   struct OAuthDeviceCodeResult {
     QString deviceCode;
     QUrl verificationUriComplete;
-    int expiresInSeconds;
-    int intervalSeconds;
+    int expiresInSeconds = 0;
+    int intervalSeconds = 0;
   };
   struct OAuthTokenResult {
     QString accessToken;  // If empty, keep polling.
     QString tokenType;
-    int expiresInSeconds;
-    bool slowDown;
+    int expiresInSeconds = 0;
+    bool slowDown = false;
   };
-  typedef std::function<void(const QString& errorMsg,
-                             const QJsonObject& status)>
-      PartsStatusCallback;
+  struct UserResult {
+    QString email;  // Validated to be non-empty.
+  };
+  struct PartsStatusResult {
+    QString providerName;  // Not validated.
+    QUrl providerUrl;  // Optional.
+    QUrl providerLogoUrl;  // Optional.
+    QUrl infoUrl;  // Optional.
+    QUrl queryUrl;  // If invalid, parts API is (temporarily) not operational.
+    int queryMaxPartCount = 0;  // Not validated.
+  };
 
   // Constructors / Destructor
   ApiEndpoint() = delete;
@@ -114,9 +122,9 @@ public:
       const QString& clientId, const QString& label) noexcept;
   QFuture<OAuthTokenResult> requestOAuthToken(
       const QString& grantType, const QString& deviceCode) noexcept;
+  QFuture<UserResult> requestUser() noexcept;
   QFuture<Library> requestLibraries(bool forceNoCache = false) noexcept;
-  void requestPartsStatus(QObject* receiver,
-                          const PartsStatusCallback& callback) const noexcept;
+  QFuture<PartsStatusResult> requestPartsStatus() const noexcept;
   void requestPartsInformation(const QUrl& url,
                                const QVector<Part>& parts) const noexcept;
 

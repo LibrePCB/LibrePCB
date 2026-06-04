@@ -24,6 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include <librepcb/core/fileio/filepath.h>
+#include <librepcb/core/network/apiendpoint.h>
 
 #include <QtCore>
 #include <QtGui>
@@ -35,7 +36,6 @@
  ******************************************************************************/
 namespace librepcb {
 
-class ApiEndpoint;
 class SExpression;
 
 namespace editor {
@@ -115,15 +115,14 @@ public:
 
   // Getters
   bool isOperational() const noexcept;
-  const QString& getProviderName() const noexcept { return mProviderName; }
-  const QUrl& getProviderUrl() const noexcept { return mProviderUrl; }
-  const QUrl& getProviderLogoUrl() const noexcept { return mProviderLogoUrl; }
+  QString getProviderName() const noexcept;
+  QUrl getProviderUrl() const noexcept;
+  QUrl getInfoUrl() const noexcept;
   const QPixmap getProviderLogo() const noexcept { return mProviderLogo; }
-  const QUrl& getInfoUrl() const noexcept { return mInfoUrl; }
 
   // Setters
   void setCacheDir(const FilePath& dir) noexcept;
-  void setApiEndpoint(const QUrl& url) noexcept;
+  void setApiEndpoint(const std::shared_ptr<ApiEndpoint>& ep) noexcept;
 
   // General Methods
   bool startOperation(int timeoutMs = 0) noexcept;
@@ -152,8 +151,6 @@ signals:
 private:  // Methods
   void reset() noexcept;
   void requestStatus() noexcept;
-  void statusReceived(const QString& errorMsg,
-                      const QJsonObject& json) noexcept;
   void partsInformationReceived(const QJsonObject& json) noexcept;
   void errorWhileFetchingPartsInformation(const QString& errorMsg) noexcept;
   void removeOutdatedInformation() noexcept;
@@ -163,7 +160,7 @@ private:  // Methods
 private:  // Data
   // Configuration
   FilePath mCacheFp;
-  QScopedPointer<ApiEndpoint> mEndpoint;
+  std::shared_ptr<ApiEndpoint> mEndpoint;
   QString mSource;  ///< URL of #mEndpoint
 
   // Error handling
@@ -172,14 +169,8 @@ private:  // Data
 
   // Status request state
   qint64 mStatusRequestedTimestamp;
-  bool mStatusReceived;
-  QString mProviderName;  ///< Valid only if #mStatusReceived is `true`
-  QUrl mProviderUrl;  ///< Valid only if #mStatusReceived is `true`
-  QUrl mProviderLogoUrl;  ///< Valid only if #mStatusReceived is `true`
+  std::optional<ApiEndpoint::PartsStatusResult> mStatusResult;
   QPixmap mProviderLogo;  ///< Requested asynchronously.
-  QUrl mInfoUrl;  ///< Valid only if #mStatusReceived is `true`
-  QUrl mQueryUrl;  ///< Valid only if #mStatusReceived is `true`
-  int mQueryMaxPartCount;  ///< Valid only if #mStatusReceived is `true`
 
   // Query request state
   QVector<Part> mScheduledParts;
