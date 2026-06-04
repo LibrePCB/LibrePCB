@@ -82,14 +82,14 @@ public:
 
   // Callbacks
   struct OAuthDeviceCodeResult {
-    const QString& deviceCode;
-    const QUrl& verificationUriComplete;
+    QString deviceCode;
+    QUrl verificationUriComplete;
     int expiresInSeconds;
     int intervalSeconds;
   };
   struct OAuthTokenResult {
-    const QString& accessToken;  // If empty, keep polling.
-    const QString& tokenType;
+    QString accessToken;  // If empty, keep polling.
+    QString tokenType;
     int expiresInSeconds;
     bool slowDown;
   };

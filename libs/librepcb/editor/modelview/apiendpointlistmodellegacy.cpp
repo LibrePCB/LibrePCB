@@ -147,46 +147,81 @@ void ApiEndpointListModelLegacy::logInOut(
   auto future = ep->requestOAuthDeviceCode("librepcb", "Foo Bar");
   future
       .then(this,
-            [this, ep](const ApiEndpoint::OAuthDeviceCodeResult& result) {
+            [this, row, ep](const ApiEndpoint::OAuthDeviceCodeResult& result) {
               DesktopServices ds(mSettings);
               if (!ds.openWebUrl(result.verificationUriComplete)) {
                 QMessageBox::warning(
                     nullptr, tr("Error"),
                     tr("Failed to open the web browser. Please "
                        "open this URL to complete the login:") %
-                        "\n\n" % ep->getUrl().toString());
+                        "\n\n" % result.verificationUriComplete.toString());
               }
-              // return EditorToolbox::asyncDelay(result.intervalSeconds *
-              // 1000);
-            })
-      .then(this,
-            []() {
-              /*QTimer* timer = new QTimer();
-              timer->setInterval(result.intervalSeconds * 1000);
-              connect(timer, &QTimer::timeout, this, [this, result, timer, ep]()
-              { ep->requestOAuthToken(
-                    "urn:ietf:params:oauth:grant-type:device_code",
-                    result.deviceCode, this,
-                    [this, timer, ep](const QString& errorMsg,
-                                      const QString& accessToken,
-                                      const QString& tokenType, int expiresIn) {
-                      qDebug()
-                          << errorMsg << accessToken << tokenType << expiresIn;
-                      if (errorMsg.isEmpty() && accessToken.isEmpty()) {
-                        return;  // Keep polling.
-                      }
-                      if (!accessToken.isEmpty()) {
-                        ep->setAccessToken(result.accessToken);
-                        emit dataChanged(index(row, 0),
-                                         index(row + 1, _COLUMN_COUNT - 1));
-                      }
-                      timer->deleteLater();
-                      // if (!accessToken.isEmpty()) {
-                      //
-                      // }
-                    });
-              });
-              timer->start();*/
+              QTimer* pollTimer = new QTimer(this);
+              pollTimer->setSingleShot(true);
+              auto pollIntervalMs =
+                  std::make_shared<int>(result.intervalSeconds * 1000);
+              const QString deviceCode = result.deviceCode;
+              const qint64 timeoutAtMs = QDateTime::currentMSecsSinceEpoch() +
+                  (static_cast<qint64>(result.expiresInSeconds) * 1000);
+
+              connect(
+                  pollTimer, &QTimer::timeout, this,
+                  [this, row, ep, deviceCode, timeoutAtMs, pollTimer,
+                   pollIntervalMs]() {
+                    if (QDateTime::currentMSecsSinceEpoch() >= timeoutAtMs) {
+                      pollTimer->deleteLater();
+                      QMessageBox::warning(
+                          nullptr, tr("Error"),
+                          tr("Login timed out. Please try again."));
+                      return;
+                    }
+
+                    ep->requestOAuthToken(
+                          "urn:ietf:params:oauth:grant-type:device_code",
+                          deviceCode)
+                        .then(this,
+                              [this, row, ep, timeoutAtMs, pollTimer,
+                               pollIntervalMs](
+                                  const ApiEndpoint::OAuthTokenResult& result) {
+                                if (!result.accessToken.isEmpty()) {
+                                  pollTimer->deleteLater();
+                                  if (!ep->setAccessToken(result.accessToken)) {
+                                    QMessageBox::critical(
+                                        nullptr, tr("Error"),
+                                        tr("Failed to store the access "
+                                           "token."));
+                                  } else {
+                                    emit dataChanged(
+                                        index(row, 0),
+                                        index(row, _COLUMN_COUNT - 1));
+                                  }
+                                  return;
+                                }
+
+                                if (result.slowDown) {
+                                  *pollIntervalMs += 5000;
+                                }
+
+                                if (QDateTime::currentMSecsSinceEpoch() >=
+                                    timeoutAtMs) {
+                                  pollTimer->deleteLater();
+                                  QMessageBox::warning(
+                                      nullptr, tr("Error"),
+                                      tr("Login timed out. Please try "
+                                         "again."));
+                                } else {
+                                  pollTimer->start(*pollIntervalMs);
+                                }
+                              })
+                        .onFailed(this,
+                                  [pollTimer](const ApiEndpoint::Exception& e) {
+                                    pollTimer->deleteLater();
+                                    QMessageBox::critical(nullptr, tr("Error"),
+                                                          e.getMsg());
+                                  });
+                  });
+
+              pollTimer->start(*pollIntervalMs);
             })
       .onFailed(this, [](const ApiEndpoint::Exception& e) {
         QMessageBox::critical(nullptr, tr("Error"), e.getMsg());
