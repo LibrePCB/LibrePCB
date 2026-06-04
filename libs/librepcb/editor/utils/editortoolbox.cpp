@@ -404,7 +404,7 @@ void EditorToolbox::addResourcesToMenu(const Workspace& ws, MenuBuilder& mb,
                                               *part.getManufacturer()});
         if ((!part.getMpn()->isEmpty()) &&
             (!part.getManufacturer()->isEmpty()) &&
-            ((!info) || (info->resources.value(0).url.isValid())) &&
+            ((!info) || (info->info.resources.value(0).url.isValid())) &&
             (!parts.contains(part)) && (actions.count() < 20)) {
           QAction* a = new QAction(
               svgIcon(":/fa/solid/magnifying-glass.svg"),
@@ -495,11 +495,12 @@ void EditorToolbox::searchAndOpenDatasheet(const Workspace& ws,
   auto openPartDatasheet =
       [&ws,
        parent](std::shared_ptr<PartInformationProvider::PartInformation> info) {
-        if (info && (!info->resources.isEmpty()) &&
-            (info->resources[0].url.isValid())) {
+        if (info && (!info->info.resources.isEmpty()) &&
+            (info->info.resources[0].url.isValid())) {
           DesktopServices::downloadAndOpenResourceAsync(
-              ws.getSettings(), info->mpn, info->resources[0].mediaType,
-              info->resources[0].url, parent);
+              ws.getSettings(), info->info.part.mpn,
+              info->info.resources[0].mediaType, info->info.resources[0].url,
+              parent);
         } else {
           QMessageBox::information(
               parent, tr("No datasheet found"),

@@ -69,24 +69,10 @@ public:
       }
     }
   };
-  struct PartResource {
-    QString name;
-    QString mediaType;
-    QUrl url;
-  };
   struct PartInformation {
     QString source;  // API server URL; Empty for entries from LibrePCB < 2.0
     qint64 timestamp;  // Seconds since epoch
-    QString mpn;
-    QString manufacturer;
-    int results;
-    QUrl productUrl;  // Empty if N/A
-    QUrl pictureUrl;  // Empty if N/A
-    QUrl pricingUrl;  // Empty if N/A
-    QString status;  // Empty if N/A
-    std::optional<int> availability;  // nullopt if N/A
-    QMap<int, qreal> prices;  // Empty if N/A
-    QVector<PartResource> resources;  // Empty if N/A
+    ApiEndpoint::PartInformation info;
 
     QString getStatusTr() const noexcept;
     QString getStatusColorName() const noexcept;
@@ -151,8 +137,6 @@ signals:
 private:  // Methods
   void reset() noexcept;
   void requestStatus() noexcept;
-  void partsInformationReceived(const QJsonObject& json) noexcept;
-  void errorWhileFetchingPartsInformation(const QString& errorMsg) noexcept;
   void removeOutdatedInformation() noexcept;
   void loadCacheFromDisk() noexcept;
   void saveCacheToDisk() noexcept;
