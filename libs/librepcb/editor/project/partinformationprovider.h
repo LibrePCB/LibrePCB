@@ -152,8 +152,8 @@ signals:
 private:  // Methods
   void reset() noexcept;
   void requestStatus() noexcept;
-  void statusReceived(const QJsonObject& json) noexcept;
-  void errorWhileFetchingStatus(const QString& errorMsg) noexcept;
+  void statusReceived(const QString& errorMsg,
+                      const QJsonObject& json) noexcept;
   void partsInformationReceived(const QJsonObject& json) noexcept;
   void errorWhileFetchingPartsInformation(const QString& errorMsg) noexcept;
   void removeOutdatedInformation() noexcept;

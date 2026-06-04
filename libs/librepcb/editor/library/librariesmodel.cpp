@@ -474,12 +474,11 @@ void LibrariesModel::requestOnlineLibraries(bool forceNoCache) noexcept {
        mWorkspace.getSettings().apiEndpoints.get()) {
     if (ep.url.isValid() && ep.useForLibraries) {
       std::shared_ptr<ApiEndpoint> repo = std::make_shared<ApiEndpoint>(ep.url);
-      connect(repo.get(), &ApiEndpoint::libraryListReceived, this,
-              &LibrariesModel::onlineLibraryListReceived);
-      connect(repo.get(), &ApiEndpoint::errorWhileFetchingLibraryList, this,
-              &LibrariesModel::errorWhileFetchingLibraryList);
       mApiEndpointsInProgress.append(repo);
-      repo->requestLibraryList(forceNoCache);
+      repo->requestLibraries(
+          forceNoCache, this,
+          std::bind(&LibrariesModel::onlineLibraryListReceived, this,
+                    std::placeholders::_1, std::placeholders::_2));
     }
   }
   if (!mApiEndpointsInProgress.isEmpty()) {
@@ -488,9 +487,21 @@ void LibrariesModel::requestOnlineLibraries(bool forceNoCache) noexcept {
 }
 
 void LibrariesModel::onlineLibraryListReceived(
-    QList<ApiEndpoint::Library> libs) noexcept {
+    const QString& errorMsg,
+    const QVector<ApiEndpoint::Library>& libraries) noexcept {
+  if (!errorMsg.isEmpty()) {
+    const ApiEndpoint* endpoint = qobject_cast<ApiEndpoint*>(sender());
+    mOnlineLibsErrors.append(
+        tr("Failed to fetch libraries from '%1': %2")
+            .arg(endpoint ? endpoint->getUrl().toString() : QString(),
+                 errorMsg));
+    apiEndpointOperationFinished();
+    emit uiDataChanged(getUiData());
+    return;
+  }
+
   QHash<Uuid, Version> versions;
-  for (const auto& lib : libs) {
+  for (const auto& lib : libraries) {
     const Uuid uuid = lib.uuid;
     mOnlineLibs.insert(uuid, lib);
     versions.insert(uuid, lib.version);
@@ -534,15 +545,6 @@ void LibrariesModel::onlineIconReceived(const Uuid& uuid,
       notify_row_changed(i);
     }
   }
-}
-
-void LibrariesModel::errorWhileFetchingLibraryList(QString errorMsg) noexcept {
-  const ApiEndpoint* endpoint = qobject_cast<ApiEndpoint*>(sender());
-  mOnlineLibsErrors.append(
-      tr("Failed to fetch libraries from '%1': %2")
-          .arg(endpoint ? endpoint->getUrl().toString() : QString(), errorMsg));
-  apiEndpointOperationFinished();
-  emit uiDataChanged(getUiData());
 }
 
 void LibrariesModel::apiEndpointOperationFinished() noexcept {

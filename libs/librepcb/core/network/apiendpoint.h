@@ -49,14 +49,6 @@ class ApiEndpoint final : public QObject {
 
 public:
   // Types
-  typedef std::function<void(const QString& errorMsg, const QString& deviceCode,
-                             const QUrl& verificationUriComplete,
-                             int expiresInSeconds, int intervalSeconds)>
-      OAuthDeviceCodeCallback;
-  typedef std::function<void(const QString& errorMsg,
-                             const QString& accessToken,
-                             const QString& tokenType, int expiresIn)>
-      OAuthTokenCallback;
   struct Part {
     QString mpn;
     QString manufacturer;
@@ -75,6 +67,22 @@ public:
     QByteArray downloadSha256;
   };
 
+  // Callbacks
+  typedef std::function<void(const QString& errorMsg, const QString& deviceCode,
+                             const QUrl& verificationUriComplete,
+                             int expiresInSeconds, int intervalSeconds)>
+      OAuthDeviceCodeCallback;
+  typedef std::function<void(const QString& errorMsg,
+                             const QString& accessToken,
+                             const QString& tokenType, int expiresIn)>
+      OAuthTokenCallback;
+  typedef std::function<void(const QString& errorMsg,
+                             const QVector<Library>& libraries)>
+      LibrariesCallback;
+  typedef std::function<void(const QString& errorMsg,
+                             const QJsonObject& status)>
+      PartsStatusCallback;
+
   // Constructors / Destructor
   ApiEndpoint() = delete;
   ApiEndpoint(const ApiEndpoint& other) = delete;
@@ -89,43 +97,41 @@ public:
   bool deleteCredentials() noexcept;
   bool setAccessToken(const QString& token) noexcept;
   void requestOAuthDeviceCode(const QString& clientId, const QString& label,
+                              QObject* receiver,
                               const OAuthDeviceCodeCallback& callback) noexcept;
   void requestOAuthToken(const QString& grantType, const QString& deviceCode,
-                         const QString& clientId,
+                         QObject* receiver,
                          const OAuthTokenCallback& callback) noexcept;
-  void requestLibraryList(bool forceNoCache = false) noexcept;
-  void requestPartsInformationStatus() const noexcept;
+  void requestLibraries(bool forceNoCache, QObject* receiver,
+                        const LibrariesCallback& callback) noexcept;
+  void requestPartsStatus(QObject* receiver,
+                          const PartsStatusCallback& callback) const noexcept;
   void requestPartsInformation(const QUrl& url,
                                const QVector<Part>& parts) const noexcept;
+
+  // Static Methods
+  static std::shared_ptr<ApiEndpoint> get(const QUrl& url) noexcept;
 
   // Operators
   ApiEndpoint& operator=(const ApiEndpoint& rhs) = delete;
 
 signals:
-  void oAuthDeviceCodeReceived(const QString& errorMsg,
-                               const QString& deviceCode,
-                               const QUrl& verificationUriComplete,
-                               int expiresInSeconds, int intervalSeconds);
-  void libraryListReceived(QList<Library> libs);
-  void errorWhileFetchingLibraryList(const QString& errorMsg);
-  void errorWhileFetchingPartsInformationStatus(const QString& errorMsg);
-  void partsInformationStatusReceived(const QJsonObject& status);
   void partsInformationReceived(const QJsonObject& info);
   void errorWhileFetchingPartsInformation(const QString& errorMsg);
 
 private:  // Methods
   const QString& getToken() const noexcept;
-  // void errorWhileFetchingOAuthDeviceCode(const QString& errorMsg) noexcept;
-  // void oAuthDeviceCodeResponseReceived(const QByteArray& data) noexcept;
-  void requestLibraryList(const QUrl& url, bool forceNoCache) noexcept;
+  void requestLibraries(const QUrl& url, bool forceNoCache) noexcept;
   void libraryListResponseReceived(const QByteArray& data,
                                    bool forceNoCache) noexcept;
-  void partsInformationStatusResponseReceived(const QByteArray& data) noexcept;
   void partsInformationResponseReceived(const QByteArray& data) noexcept;
 
 private:  // Data
   QUrl mUrl;
   mutable std::optional<QString> mCachedToken;
+
+  static QMutex sInstancesMutex;
+  static QHash<QUrl, std::shared_ptr<ApiEndpoint>> sInstances;
 };
 
 /*******************************************************************************

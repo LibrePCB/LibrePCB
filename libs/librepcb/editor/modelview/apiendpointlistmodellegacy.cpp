@@ -144,10 +144,10 @@ void ApiEndpointListModelLegacy::logInOut(
   }
 
   // Log in
-  auto logInCallback = [this, row, ep](const QString& errorMsg,
-                                  const QString& deviceCode,
-                                  const QUrl& verificationUriComplete,
-                                  int expiresInSeconds, int intervalSeconds) {
+  auto logInCallback = [this, row, ep](
+                           const QString& errorMsg, const QString& deviceCode,
+                           const QUrl& verificationUriComplete,
+                           int expiresInSeconds, int intervalSeconds) {
     qDebug() << errorMsg << deviceCode << verificationUriComplete
              << expiresInSeconds << intervalSeconds;
     if (verificationUriComplete.isValid()) {
@@ -156,31 +156,33 @@ void ApiEndpointListModelLegacy::logInOut(
 
       QTimer* timer = new QTimer();
       timer->setInterval(intervalSeconds * 1000);
-      connect(timer, &QTimer::timeout, this, [this, row, deviceCode, timer, ep]() {
-        ep->requestOAuthToken(
-            "urn:ietf:params:oauth:grant-type:device_code", deviceCode,
-            "librepcb",
-            [this, row, timer, ep](const QString& errorMsg,
-                              const QString& accessToken,
-                              const QString& tokenType, int expiresIn) {
-              qDebug() << errorMsg << accessToken << tokenType << expiresIn;
-              if (errorMsg.isEmpty() && accessToken.isEmpty()) {
-                return;  // Keep polling.
-              }
-              if (!accessToken.isEmpty()) {
-                ep->setAccessToken(accessToken);
-                emit dataChanged(index(row, 0), index(row + 1, _COLUMN_COUNT - 1));
-              }
-              timer->deleteLater();
-              // if (!accessToken.isEmpty()) {
-              //
-              // }
-            });
-      });
+      connect(
+          timer, &QTimer::timeout, this, [this, row, deviceCode, timer, ep]() {
+            ep->requestOAuthToken(
+                "urn:ietf:params:oauth:grant-type:device_code", deviceCode,
+                this,
+                [this, row, timer, ep](
+                    const QString& errorMsg, const QString& accessToken,
+                    const QString& tokenType, int expiresIn) {
+                  qDebug() << errorMsg << accessToken << tokenType << expiresIn;
+                  if (errorMsg.isEmpty() && accessToken.isEmpty()) {
+                    return;  // Keep polling.
+                  }
+                  if (!accessToken.isEmpty()) {
+                    ep->setAccessToken(accessToken);
+                    emit dataChanged(index(row, 0),
+                                     index(row + 1, _COLUMN_COUNT - 1));
+                  }
+                  timer->deleteLater();
+                  // if (!accessToken.isEmpty()) {
+                  //
+                  // }
+                });
+          });
       timer->start();
     }
   };
-  ep->requestOAuthDeviceCode("librepcb", "Foo Bar", logInCallback);
+  ep->requestOAuthDeviceCode("librepcb", "Foo Bar", this, logInCallback);
 }
 
 /*******************************************************************************
@@ -274,7 +276,8 @@ QVariant ApiEndpointListModelLegacy::data(const QModelIndex& index,
       switch (role) {
         case Qt::DisplayRole:
           if (item) {
-            return (ep && ep->hasCredentials()) ? tr("Logged In") : (tr("Log In") % " →");
+            return (ep && ep->hasCredentials()) ? tr("Logged In")
+                                                : (tr("Log In") % " →");
           } else {
             return QVariant();
           }
