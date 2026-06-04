@@ -72,7 +72,7 @@ public:
   struct PartInformation {
     QString source;  // API server URL; Empty for entries from LibrePCB < 2.0
     qint64 timestamp;  // Seconds since epoch
-    ApiEndpoint::PartInformation info;
+    ApiEndpoint::PartInformation data;  // Raw data from ApiEndpoint
 
     QString getStatusTr() const noexcept;
     QString getStatusColorName() const noexcept;

@@ -108,7 +108,8 @@ public:
     QUrl url;
   };
   struct PartInformation {
-    Part part;
+    QString mpn;
+    QString manufacturer;
     int results = 0;
     QUrl productUrl;  // Empty if N/A
     QUrl pictureUrl;  // Empty if N/A

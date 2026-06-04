@@ -54,7 +54,7 @@ QString PartInformationProvider::PartInformation::getStatusTr() const noexcept {
       //: Part lifecycle status. Please keep it very very short!
       {"obsolete", tr("Obsolete")},
   };
-  return translations.value(info.status.toLower(), info.status);
+  return translations.value(data.status.toLower(), data.status);
 }
 
 QString PartInformationProvider::PartInformation::getStatusColorName()
@@ -65,23 +65,23 @@ QString PartInformationProvider::PartInformation::getStatusColorName()
       {"nrnd", "gray"},
       {"obsolete", "red"},
   };
-  return map.value(info.status.toLower());
+  return map.value(data.status.toLower());
 }
 
 QString PartInformationProvider::PartInformation::getAvailabilityTr()
     const noexcept {
   QString s;
-  if (info.availability) {
-    if (*info.availability > 5) {
+  if (data.availability) {
+    if (*data.availability > 5) {
       //: Part supplier availability. Please keep it relatively short!
       s = tr("Excellent Availability");
-    } else if (*info.availability > 0) {
+    } else if (*data.availability > 0) {
       //: Part supplier availability. Please keep it relatively short!
       s = tr("Good Availability");
-    } else if (*info.availability > -5) {
+    } else if (*data.availability > -5) {
       //: Part supplier availability. Please keep it relatively short!
       s = tr("Available");
-    } else if (*info.availability > -10) {
+    } else if (*data.availability > -10) {
       //: Part supplier availability. Please keep it relatively short!
       s = tr("Bad Availability");
     } else {
@@ -95,14 +95,14 @@ QString PartInformationProvider::PartInformation::getAvailabilityTr()
 QString PartInformationProvider::PartInformation::getAvailabilityColorName()
     const noexcept {
   QString s;
-  if (info.availability) {
-    if (*info.availability > 5) {
+  if (data.availability) {
+    if (*data.availability > 5) {
       s = "lime";
-    } else if (*info.availability > 0) {
+    } else if (*data.availability > 0) {
       s = "green";
-    } else if (*info.availability > -5) {
+    } else if (*data.availability > -5) {
       s = "gold";
-    } else if (*info.availability > -10) {
+    } else if (*data.availability > -10) {
       s = "darkorange";
     } else {
       s = "red";
@@ -114,7 +114,7 @@ QString PartInformationProvider::PartInformation::getAvailabilityColorName()
 qreal PartInformationProvider::PartInformation::getPrice(
     int quantity) const noexcept {
   qreal price = 0;
-  for (auto it = info.prices.begin(); it != info.prices.end(); it++) {
+  for (auto it = data.prices.begin(); it != data.prices.end(); it++) {
     if ((quantity >= it.key()) || (price == 0)) {
       price = it.value();
     }
@@ -150,42 +150,42 @@ QString PartInformationProvider::PartInformation::formatQuantity(
 
 void PartInformationProvider::PartInformation::serialize(
     SExpression& root) const {
-  root.appendChild("mpn", info.part.mpn);
-  root.appendChild("manufacturer", info.part.manufacturer);
+  root.appendChild("mpn", data.mpn);
+  root.appendChild("manufacturer", data.manufacturer);
   root.ensureLineBreak();
   root.appendChild("source", source);
   root.ensureLineBreak();
   root.appendChild("timestamp", timestamp);
   root.ensureLineBreak();
-  root.appendChild("results", info.results);
+  root.appendChild("results", data.results);
   root.ensureLineBreak();
-  if (!info.status.isEmpty()) {
-    root.appendChild("status", info.status);
+  if (!data.status.isEmpty()) {
+    root.appendChild("status", data.status);
     root.ensureLineBreak();
   }
-  if (info.availability) {
-    root.appendChild("availability", *info.availability);
+  if (data.availability) {
+    root.appendChild("availability", *data.availability);
     root.ensureLineBreak();
   }
-  if (!info.productUrl.isEmpty()) {
-    root.appendChild("product_url", info.productUrl);
+  if (!data.productUrl.isEmpty()) {
+    root.appendChild("product_url", data.productUrl);
     root.ensureLineBreak();
   }
-  if (!info.pictureUrl.isEmpty()) {
-    root.appendChild("picture_url", info.pictureUrl);
+  if (!data.pictureUrl.isEmpty()) {
+    root.appendChild("picture_url", data.pictureUrl);
     root.ensureLineBreak();
   }
-  if (!info.pricingUrl.isEmpty()) {
-    root.appendChild("pricing_url", info.pricingUrl);
+  if (!data.pricingUrl.isEmpty()) {
+    root.appendChild("pricing_url", data.pricingUrl);
     root.ensureLineBreak();
   }
-  for (auto it = info.prices.begin(); it != info.prices.end(); it++) {
+  for (auto it = data.prices.begin(); it != data.prices.end(); it++) {
     SExpression& child = root.appendList("price");
     child.appendChild("quantity", it.key());
     child.appendChild("price", Length::fromMm(it.value()));  // No comment!
     root.ensureLineBreak();
   }
-  for (const ApiEndpoint::PartResource& resource : info.resources) {
+  for (const ApiEndpoint::PartResource& resource : data.resources) {
     SExpression& child = root.appendList("resource");
     child.appendChild("name", resource.name);
     child.appendChild("media_type", resource.mediaType);
@@ -205,32 +205,32 @@ void PartInformationProvider::PartInformation::load(const SExpression& node) {
     source = "https://api.librepcb.org";
   }
   timestamp = deserialize<qint64>(node.getChild("timestamp/@0"));
-  info.part.mpn = node.getChild("mpn/@0").getValue();
-  info.part.manufacturer = node.getChild("manufacturer/@0").getValue();
+  data.mpn = node.getChild("mpn/@0").getValue();
+  data.manufacturer = node.getChild("manufacturer/@0").getValue();
   if (const SExpression* e = node.tryGetChild("results/@0")) {
-    info.results = deserialize<int>(*e);
+    data.results = deserialize<int>(*e);
   }
   if (const SExpression* e = node.tryGetChild("product_url/@0")) {
-    info.productUrl = deserialize<QUrl>(*e);
+    data.productUrl = deserialize<QUrl>(*e);
   }
   if (const SExpression* e = node.tryGetChild("picture_url/@0")) {
-    info.pictureUrl = deserialize<QUrl>(*e);
+    data.pictureUrl = deserialize<QUrl>(*e);
   }
   if (const SExpression* e = node.tryGetChild("pricing_url/@0")) {
-    info.pricingUrl = deserialize<QUrl>(*e);
+    data.pricingUrl = deserialize<QUrl>(*e);
   }
   if (const SExpression* e = node.tryGetChild("status/@0")) {
-    info.status = e->getValue();
+    data.status = e->getValue();
   }
   if (const SExpression* e = node.tryGetChild("availability/@0")) {
-    info.availability = deserialize<int>(*e);
+    data.availability = deserialize<int>(*e);
   }
   foreach (const SExpression* child, node.getChildren("price")) {
-    info.prices.insert(deserialize<int>(child->getChild("quantity/@0")),
+    data.prices.insert(deserialize<int>(child->getChild("quantity/@0")),
                        deserialize<Length>(child->getChild("price/@0")).toMm());
   }
   foreach (const SExpression* child, node.getChildren("resource")) {
-    info.resources.append(ApiEndpoint::PartResource{
+    data.resources.append(ApiEndpoint::PartResource{
         child->getChild("name/@0").getValue(),
         child->getChild("media_type/@0").getValue(),
         deserialize<QUrl>(child->getChild("url/@0"))});
@@ -389,16 +389,16 @@ void PartInformationProvider::requestScheduledParts() noexcept {
       .then(this,
             [this](const ApiEndpoint::PartsInformationResult& result) {
               const qint64 timestamp = QDateTime::currentSecsSinceEpoch();
-              for (const ApiEndpoint::PartInformation& pinfo : result.parts) {
-                const Part part{
-                    pinfo.part.mpn,
-                    pinfo.part.manufacturer,
-                };
+              for (const ApiEndpoint::PartInformation& data : result.parts) {
                 std::shared_ptr<PartInformation> info =
                     std::make_shared<PartInformation>();
                 info->source = mSource;
                 info->timestamp = timestamp;
-                info->info = pinfo;
+                info->data = data;
+                const Part part{
+                    data.mpn,
+                    data.manufacturer,
+                };
                 mCache[part][info->source] = info;
                 mCacheModified = true;
               }
@@ -527,7 +527,7 @@ void PartInformationProvider::loadCacheFromDisk() noexcept {
       std::shared_ptr<PartInformation> info =
           std::make_shared<PartInformation>();
       info->load(*node);
-      const Part part{info->info.part.mpn, info->info.part.manufacturer};
+      const Part part{info->data.mpn, info->data.manufacturer};
       auto& map = mCache[part];
       auto it = map.find(info->source);
       if ((it == map.end()) || (info->timestamp > it.value()->timestamp)) {
