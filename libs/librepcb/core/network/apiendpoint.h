@@ -87,10 +87,12 @@ public:
     int expiresInSeconds;
     int intervalSeconds;
   };
-  typedef std::function<void(const QString& errorMsg,
-                             const QString& accessToken,
-                             const QString& tokenType, int expiresIn)>
-      OAuthTokenCallback;
+  struct OAuthTokenResult {
+    const QString& accessToken;  // If empty, keep polling.
+    const QString& tokenType;
+    int expiresInSeconds;
+    bool slowDown;
+  };
   typedef std::function<void(const QString& errorMsg,
                              const QJsonObject& status)>
       PartsStatusCallback;
@@ -110,9 +112,8 @@ public:
   bool setAccessToken(const QString& token) noexcept;
   QFuture<OAuthDeviceCodeResult> requestOAuthDeviceCode(
       const QString& clientId, const QString& label) noexcept;
-  void requestOAuthToken(const QString& grantType, const QString& deviceCode,
-                         QObject* receiver,
-                         const OAuthTokenCallback& callback) noexcept;
+  QFuture<OAuthTokenResult> requestOAuthToken(
+      const QString& grantType, const QString& deviceCode) noexcept;
   QFuture<Library> requestLibraries(bool forceNoCache = false) noexcept;
   void requestPartsStatus(QObject* receiver,
                           const PartsStatusCallback& callback) const noexcept;
