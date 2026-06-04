@@ -38,7 +38,6 @@
  ******************************************************************************/
 namespace librepcb {
 
-class ApiEndpoint;
 class Workspace;
 
 namespace editor {
@@ -99,12 +98,9 @@ signals:
 private:
   void updateLibraries(bool resetHighlight = true) noexcept;
   void requestOnlineLibraries(bool forceNoCache) noexcept;
-  void onlineLibraryListReceived(
-      const QString& errorMsg,
-      const QVector<ApiEndpoint::Library>& libraries) noexcept;
   void requestMissingOnlineIcons() noexcept;
   void onlineIconReceived(const Uuid& uuid, const QByteArray& data) noexcept;
-  void apiEndpointOperationFinished() noexcept;
+  void apiEndpointOperationFinished(const QUrl& url) noexcept;
   void startAutoUpdate() noexcept;
   ui::LibraryListData updateMergedLibraries() noexcept;
   void updateCheckStates(bool notify) noexcept;
@@ -136,7 +132,7 @@ private:
   QHash<slint::SharedString, slint::SharedString> mOnlineVersions;
   std::optional<FilePath> mHighlightedLib;
 
-  QList<std::shared_ptr<ApiEndpoint>> mApiEndpointsInProgress;
+  QHash<QUrl, QFuture<ApiEndpoint::Library>> mLibrariesInProgress;
   QList<std::shared_ptr<LibraryDownload>> mDownloadsInProgress;
 
   QTimer mAutoUpdateTimer;

@@ -48,6 +48,19 @@ class ApiEndpoint final : public QObject {
   Q_OBJECT
 
 public:
+  class Exception : public QException {
+    QString mMsg;
+
+  public:
+    Exception() = delete;
+    Exception(const QString& msg) noexcept : mMsg(msg) {}
+    Exception(const Exception& other) noexcept : mMsg(other.mMsg) {}
+    Exception& operator=(const Exception& rhs) = delete;
+    const QString& getMsg() const noexcept { return mMsg; }
+    Exception* clone() const override { return new Exception(*this); }
+    void raise() const override { throw *this; }
+  };
+
   // Types
   struct Part {
     QString mpn;
@@ -68,17 +81,16 @@ public:
   };
 
   // Callbacks
-  typedef std::function<void(const QString& errorMsg, const QString& deviceCode,
-                             const QUrl& verificationUriComplete,
-                             int expiresInSeconds, int intervalSeconds)>
-      OAuthDeviceCodeCallback;
+   struct OAuthDeviceCodeResult {
+    const QString& deviceCode;
+    const QUrl& verificationUriComplete;
+    int expiresInSeconds;
+    int intervalSeconds;
+  };
   typedef std::function<void(const QString& errorMsg,
                              const QString& accessToken,
                              const QString& tokenType, int expiresIn)>
       OAuthTokenCallback;
-  typedef std::function<void(const QString& errorMsg,
-                             const QVector<Library>& libraries)>
-      LibrariesCallback;
   typedef std::function<void(const QString& errorMsg,
                              const QJsonObject& status)>
       PartsStatusCallback;
@@ -96,14 +108,11 @@ public:
   // General Methods
   bool deleteCredentials() noexcept;
   bool setAccessToken(const QString& token) noexcept;
-  void requestOAuthDeviceCode(const QString& clientId, const QString& label,
-                              QObject* receiver,
-                              const OAuthDeviceCodeCallback& callback) noexcept;
+  QFuture<OAuthDeviceCodeResult> requestOAuthDeviceCode(const QString& clientId, const QString& label) noexcept;
   void requestOAuthToken(const QString& grantType, const QString& deviceCode,
                          QObject* receiver,
                          const OAuthTokenCallback& callback) noexcept;
-  void requestLibraries(bool forceNoCache, QObject* receiver,
-                        const LibrariesCallback& callback) noexcept;
+  QFuture<Library> requestLibraries(bool forceNoCache = false) noexcept;
   void requestPartsStatus(QObject* receiver,
                           const PartsStatusCallback& callback) const noexcept;
   void requestPartsInformation(const QUrl& url,
@@ -121,9 +130,12 @@ signals:
 
 private:  // Methods
   const QString& getToken() const noexcept;
-  void requestLibraries(const QUrl& url, bool forceNoCache) noexcept;
-  void libraryListResponseReceived(const QByteArray& data,
-                                   bool forceNoCache) noexcept;
+  QFuture<Library> requestLibraries(
+      const QUrl& url, bool forceNoCache,
+      std::shared_ptr<QPromise<Library>> promise) noexcept;
+  void libraryListResponseReceived(
+      const QByteArray& data, bool forceNoCache,
+      std::shared_ptr<QPromise<Library>> promise) noexcept;
   void partsInformationResponseReceived(const QByteArray& data) noexcept;
 
 private:  // Data

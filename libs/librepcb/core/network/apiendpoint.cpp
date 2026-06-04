@@ -81,9 +81,8 @@ bool ApiEndpoint::setAccessToken(const QString& token) noexcept {
   return success;
 }
 
-void ApiEndpoint::requestOAuthDeviceCode(
-    const QString& clientId, const QString& label, QObject* receiver,
-    const OAuthDeviceCodeCallback& callback) noexcept {
+QFuture<ApiEndpoint::OAuthDeviceCodeResult> ApiEndpoint::requestOAuthDeviceCode(
+    const QString& clientId, const QString& label) noexcept {
   auto errorCallback = [callback](const QString& errorMsg) {
     callback(errorMsg, QString(), QUrl(), 0, 0);
   };
@@ -177,11 +176,13 @@ void ApiEndpoint::requestOAuthToken(
   request->start();
 }
 
-void ApiEndpoint::requestLibraries(bool forceNoCache, QObject* receiver,
-                                   const LibrariesCallback& callback) noexcept {
-  QString path =
+QFuture<ApiEndpoint::Library> ApiEndpoint::requestLibraries(
+    bool forceNoCache) noexcept {
+  auto promise = std::make_shared<QPromise<Library>>();
+  promise->start();
+  const QString path =
       "/api/v1/libraries/v" % Application::getFileFormatVersion().toStr();
-  requestLibraries(QUrl(mUrl.toString() % path), forceNoCache);
+  return requestLibraries(QUrl(mUrl.toString() % path), forceNoCache, promise);
 }
 
 void ApiEndpoint::requestPartsStatus(
@@ -269,55 +270,63 @@ const QString& ApiEndpoint::getToken() const noexcept {
   return *mCachedToken;
 }
 
-void ApiEndpoint::requestLibraries(const QUrl& url,
-                                   bool forceNoCache) noexcept {
+QFuture<ApiEndpoint::Library> ApiEndpoint::requestLibraries(
+    const QUrl& url, bool forceNoCache,
+    std::shared_ptr<QPromise<Library>> promise) noexcept {
   NetworkRequest* request = new NetworkRequest(url);
   request->setHeaderField("Accept", "application/json;charset=UTF-8");
   request->setHeaderField("Accept-Charset", "UTF-8");
   if (forceNoCache) {
     request->setCacheLoadControl(QNetworkRequest::AlwaysNetwork);
   }
-  // connect(request, &NetworkRequest::errored, this,
-  //         &ApiEndpoint::errorWhileFetchingLibraryList, Qt::QueuedConnection);
-  // connect(
-  //     request, &NetworkRequest::dataReceived, this,
-  //     [this, forceNoCache](const QByteArray& data) {
-  //       libraryListResponseReceived(data, forceNoCache);
-  //     },
-  //     Qt::QueuedConnection);
+  connect(
+      request, &NetworkRequest::errored, this,
+      [promise](const QString& errorMsg) {
+        promise->setException(Exception(errorMsg));
+        promise->finish();
+      },
+      Qt::QueuedConnection);
+  connect(
+      request, &NetworkRequest::dataReceived, this,
+      [this, promise, forceNoCache](const QByteArray& data) {
+        libraryListResponseReceived(data, forceNoCache, promise);
+      },
+      Qt::QueuedConnection);
   request->start();
+
+  return promise->future();
 }
 
-void ApiEndpoint::libraryListResponseReceived(const QByteArray& data,
-                                              bool forceNoCache) noexcept {
+void ApiEndpoint::libraryListResponseReceived(
+    const QByteArray& data, bool forceNoCache,
+    std::shared_ptr<QPromise<Library>> promise) noexcept {
   QJsonDocument doc = QJsonDocument::fromJson(data);
-  // if (doc.isNull() || doc.isEmpty() || (!doc.isObject())) {
-  //   emit errorWhileFetchingLibraryList(
-  //       tr("Received JSON object is not valid."));
-  //   return;
-  // }
+  if (doc.isNull() || doc.isEmpty() || (!doc.isObject())) {
+    promise->setException(Exception("Received JSON object is not valid."));
+    promise->finish();
+    return;
+  }
   QJsonValue nextResultsLink = doc.object().value("next");
   if (nextResultsLink.isString()) {
     QUrl url = QUrl(nextResultsLink.toString());
     if (url.isValid()) {
       qDebug().nospace() << "Request more results from API endpoint "
                          << url.toString() << "...";
-      requestLibraries(url, forceNoCache);
+      requestLibraries(url, forceNoCache, promise);
     } else {
       qWarning() << "Invalid URL in received JSON object:"
                  << nextResultsLink.toString();
     }
   }
   const QJsonValue results = doc.object().value("results");
-  // if ((results.isNull()) || (!results.isArray())) {
-  //   emit errorWhileFetchingLibraryList(
-  //       tr("Received JSON object does not contain "
-  //          "any results."));
-  //   return;
-  // }
+  if ((results.isNull()) || (!results.isArray())) {
+    promise->setException(
+        Exception("Received JSON object does not contain any results."));
+    promise->finish();
+    return;
+  }
 
   // Parse JSON.
-  QList<Library> libs;
   const QJsonArray resultsArray = results.toArray();
   for (const QJsonValue& item : resultsArray) {
     const QJsonObject obj = item.toObject();
@@ -353,9 +362,9 @@ void ApiEndpoint::libraryListResponseReceived(const QByteArray& data,
         qWarning() << "Invalid library dependency UUID:" << value.toString();
       }
     }
-    libs.append(lib);
+    promise->addResult(lib);
   }
-  // emit libraryListReceived(libs);
+  promise->finish();
 }
 
 void ApiEndpoint::partsInformationResponseReceived(
