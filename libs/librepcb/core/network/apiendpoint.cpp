@@ -140,33 +140,41 @@ QFuture<ApiEndpoint::OAuthDeviceCodeResult> ApiEndpoint::requestOAuthDeviceCode(
   return promise->future();
 }
 
-void ApiEndpoint::requestOAuthToken(
-    const QString& grantType, const QString& deviceCode, QObject* receiver,
-    const OAuthTokenCallback& callback) noexcept {
-  auto errorCallback = [callback](const QString& errorMsg) {
-    callback(errorMsg, QString(), QString(), 0);
+QFuture<ApiEndpoint::OAuthTokenResult> ApiEndpoint::requestOAuthToken(
+    const QString& grantType, const QString& deviceCode) noexcept {
+  auto promise = std::make_shared<QPromise<OAuthTokenResult>>();
+  promise->start();
+
+  auto errorCallback = [promise](const QString& errorMsg) {
+    promise->setException(Exception(errorMsg));
+    promise->finish();
   };
 
-  auto successCallback = [callback](const QByteArray& data) {
+  auto successCallback = [promise](const QByteArray& data) {
     QJsonDocument doc = QJsonDocument::fromJson(data);
     if (doc.isNull() || doc.isEmpty() || (!doc.isObject())) {
-      callback("Received JSON object is not valid.", QString(), QString(), 0);
+      promise->setException(Exception("Received JSON object is not valid."));
+      promise->finish();
       return;
     }
     const QString error = doc.object().value("error").toString();
-    const QString accessToken = doc.object().value("access_token").toString();
-    const QString tokenType = doc.object().value("token_type").toString();
-    const int expiresIn = doc.object().value("expires_in").toInt();
-    if ((!accessToken.isEmpty()) && (!tokenType.isEmpty()) && (expiresIn > 0)) {
-      callback(QString(), accessToken, tokenType, expiresIn);
-    } else if ((error == "authorization_pending") || (error == "slow_down")) {
-      callback(QString(), QString(), QString(), 0);
+    const OAuthTokenResult result{
+        doc.object().value("access_token").toString(),
+        doc.object().value("token_type").toString(),
+        doc.object().value("expires_in").toInt(),
+        error == "slow_down",
+    };
+    if ((error == "authorization_pending") || (error == "slow_down") ||
+        ((!result.accessToken.isEmpty()) && (!result.tokenType.isEmpty()) &&
+         (result.expiresInSeconds > 0))) {
+      promise->addResult(result);
     } else if (!error.isEmpty()) {
-      callback("Received error from server: " % error, QString(), QString(), 0);
+      promise->setException(Exception("Received error from server: " % error));
     } else {
-      callback("Received invalid data from server: " % QString(data), QString(),
-               QString(), 0);
+      promise->setException(
+          Exception("Received invalid token response from server."));
     }
+    promise->finish();
   };
 
   const QJsonObject obj{
@@ -182,11 +190,13 @@ void ApiEndpoint::requestOAuthToken(
                           QString::number(postData.size()).toUtf8());
   request->setHeaderField("Accept", "application/json;charset=UTF-8");
   request->setHeaderField("Accept-Charset", "UTF-8");
-  connect(request, &NetworkRequest::errored, receiver, errorCallback,
+  connect(request, &NetworkRequest::errored, this, errorCallback,
           Qt::QueuedConnection);
-  connect(request, &NetworkRequest::dataReceived, receiver, successCallback,
+  connect(request, &NetworkRequest::dataReceived, this, successCallback,
           Qt::QueuedConnection);
   request->start();
+
+  return promise->future();
 }
 
 QFuture<ApiEndpoint::Library> ApiEndpoint::requestLibraries(
