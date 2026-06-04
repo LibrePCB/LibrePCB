@@ -62,25 +62,6 @@ public:
   };
 
   // Types
-  struct Part {
-    QString mpn;
-    QString manufacturer;
-  };
-  struct Library {
-    Uuid uuid;
-    QString name;
-    QString description;
-    QString author;
-    Version version;
-    bool recommended = false;
-    QSet<Uuid> dependencies;
-    QUrl iconUrl;
-    QUrl downloadUrl;
-    qint64 downloadSize = -1;
-    QByteArray downloadSha256;
-  };
-
-  // Callbacks
   struct OAuthDeviceCodeResult {
     QString deviceCode;
     QUrl verificationUriComplete;
@@ -96,6 +77,19 @@ public:
   struct UserResult {
     QString email;  // Validated to be non-empty.
   };
+  struct Library {
+    Uuid uuid;
+    QString name;
+    QString description;
+    QString author;
+    Version version;
+    bool recommended = false;
+    QSet<Uuid> dependencies;
+    QUrl iconUrl;
+    QUrl downloadUrl;
+    qint64 downloadSize = -1;
+    QByteArray downloadSha256;
+  };
   struct PartsStatusResult {
     QString providerName;  // Not validated.
     QUrl providerUrl;  // Optional.
@@ -103,6 +97,29 @@ public:
     QUrl infoUrl;  // Optional.
     QUrl queryUrl;  // If invalid, parts API is (temporarily) not operational.
     int queryMaxPartCount = 0;  // Not validated.
+  };
+  struct Part {
+    QString mpn;
+    QString manufacturer;
+  };
+  struct PartResource {
+    QString name;
+    QString mediaType;
+    QUrl url;
+  };
+  struct PartInformation {
+    Part part;
+    int results = 0;
+    QUrl productUrl;  // Empty if N/A
+    QUrl pictureUrl;  // Empty if N/A
+    QUrl pricingUrl;  // Empty if N/A
+    QString status;  // Empty if N/A
+    std::optional<int> availability;  // nullopt if N/A
+    QMap<int, qreal> prices;  // Empty if N/A
+    QVector<PartResource> resources;  // Empty if N/A
+  };
+  struct PartsInformationResult {
+    QVector<PartInformation> parts;
   };
 
   // Constructors / Destructor
@@ -125,18 +142,14 @@ public:
   QFuture<UserResult> requestUser() noexcept;
   QFuture<Library> requestLibraries(bool forceNoCache = false) noexcept;
   QFuture<PartsStatusResult> requestPartsStatus() const noexcept;
-  void requestPartsInformation(const QUrl& url,
-                               const QVector<Part>& parts) const noexcept;
+  QFuture<PartsInformationResult> requestPartsInformation(
+      const QUrl& url, const QVector<Part>& parts) const noexcept;
 
   // Static Methods
   static std::shared_ptr<ApiEndpoint> get(const QUrl& url) noexcept;
 
   // Operators
   ApiEndpoint& operator=(const ApiEndpoint& rhs) = delete;
-
-signals:
-  void partsInformationReceived(const QJsonObject& info);
-  void errorWhileFetchingPartsInformation(const QString& errorMsg);
 
 private:  // Methods
   const QString& getToken() const noexcept;
@@ -146,7 +159,6 @@ private:  // Methods
   void libraryListResponseReceived(
       const QByteArray& data, bool forceNoCache,
       std::shared_ptr<QPromise<Library>> promise) noexcept;
-  void partsInformationResponseReceived(const QByteArray& data) noexcept;
 
 private:  // Data
   QUrl mUrl;

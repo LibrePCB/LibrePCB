@@ -151,7 +151,7 @@ AddComponentDialog::AddComponentDialog(const WorkspaceLibraryDb& db,
             if (item && (column == 2)) {
               const auto data = item->data(2, Qt::UserRole)
                                     .value<PartInformationDelegate::Data>();
-              if (data.info && (data.info->results == 1)) {
+              if (data.info && (data.info->info.results == 1)) {
                 const QRect rect =
                     mUi->treeComponents->visualItemRect(item).intersected(
                         mUi->treeComponents->viewport()->rect());
@@ -425,9 +425,9 @@ void AddComponentDialog::treeComponents_itemDoubleClicked(QTreeWidgetItem* item,
   if (item && item->parent() && item->parent()->parent() && (column == 2)) {
     const auto data =
         item->data(2, Qt::UserRole).value<PartInformationDelegate::Data>();
-    if (data.info && data.info->pricingUrl.isValid()) {
+    if (data.info && data.info->info.pricingUrl.isValid()) {
       DesktopServices ds(mSettings);
-      ds.openWebUrl(data.info->pricingUrl);
+      ds.openWebUrl(data.info->info.pricingUrl);
     }
   } else if (item) {
     // On macOS, the main window looses focus and we don't get mouse move
@@ -482,27 +482,27 @@ void AddComponentDialog::customComponentsContextMenuRequested(
 
   QMenu menu(this);
   menu.addAction(mActionCopyMpn.get());
-  if (partInfo && partInfo->productUrl.isValid()) {
+  if (partInfo && partInfo->info.productUrl.isValid()) {
     menu.addAction(
         cmd.openProductWebsite.createAction(this, this, [this, partInfo]() {
           DesktopServices ds(mSettings);
-          ds.openWebUrl(partInfo->productUrl);
+          ds.openWebUrl(partInfo->info.productUrl);
         }));
   }
-  if (partInfo && partInfo->pricingUrl.isValid()) {
+  if (partInfo && partInfo->info.pricingUrl.isValid()) {
     menu.addAction(
         cmd.openPricingWebsite.createAction(this, this, [this, partInfo]() {
           DesktopServices ds(mSettings);
-          ds.openWebUrl(partInfo->pricingUrl);
+          ds.openWebUrl(partInfo->info.pricingUrl);
         }));
   }
-  if (partInfo && (!partInfo->resources.isEmpty())) {
+  if (partInfo && (!partInfo->info.resources.isEmpty())) {
     QAction* action =
         new QAction(EditorToolbox::svgIcon(":/fa/solid/file-pdf.svg"),
-                    partInfo->resources.first().name + "...", &menu);
+                    partInfo->info.resources.first().name + "...", &menu);
     connect(action, &QAction::triggered, this, [this, partInfo]() {
       DesktopServices ds(mSettings);
-      ds.openWebUrl(partInfo->resources.first().url);
+      ds.openWebUrl(partInfo->info.resources.first().url);
     });
     menu.addAction(action);
   }

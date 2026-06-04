@@ -100,11 +100,10 @@ QFuture<ApiEndpoint::OAuthDeviceCodeResult> ApiEndpoint::requestOAuthDeviceCode(
     }
     const QJsonObject obj = doc.object();
     const OAuthDeviceCodeResult result{
-        obj.value("device_code").toString(),
-        QUrl(obj.value("verification_uri_complete").toString(),
-             QUrl::StrictMode),
-        obj.value("expires_in").toInt(),
-        obj.value("interval").toInt(),
+        obj["device_code"].toString(),
+        QUrl(obj["verification_uri_complete"].toString(), QUrl::StrictMode),
+        obj["expires_in"].toInt(),
+        obj["interval"].toInt(),
     };
     if (result.deviceCode.isEmpty() ||
         (!result.verificationUriComplete.isValid()) ||
@@ -159,11 +158,11 @@ QFuture<ApiEndpoint::OAuthTokenResult> ApiEndpoint::requestOAuthToken(
       return;
     }
     const QJsonObject obj = doc.object();
-    const QString error = obj.value("error").toString();
+    const QString error = obj["error"].toString();
     const OAuthTokenResult result{
-        obj.value("access_token").toString(),
-        obj.value("token_type").toString(),
-        obj.value("expires_in").toInt(),
+        obj["access_token"].toString(),
+        obj["token_type"].toString(),
+        obj["expires_in"].toInt(),
         error == "slow_down",
     };
     if ((error == "authorization_pending") || (error == "slow_down") ||
@@ -219,7 +218,7 @@ QFuture<ApiEndpoint::UserResult> ApiEndpoint::requestUser() noexcept {
     }
     const QJsonObject obj = doc.object();
     const UserResult result{
-        obj.value("email").toString(),
+        obj["email"].toString(),
     };
     if (!result.email.isEmpty()) {
       promise->addResult(result);
@@ -271,12 +270,12 @@ QFuture<ApiEndpoint::PartsStatusResult> ApiEndpoint::requestPartsStatus()
     }
     const QJsonObject obj = doc.object();
     const PartsStatusResult result{
-        obj.value("provider_name").toString(),
-        QUrl(obj.value("provider_url").toString(), QUrl::StrictMode),
-        QUrl(obj.value("provider_logo_url").toString(), QUrl::StrictMode),
-        QUrl(obj.value("info_url").toString(), QUrl::StrictMode),
-        QUrl(obj.value("query_url").toString(), QUrl::StrictMode),
-        obj.value("max_parts").toInt(),
+        obj["provider_name"].toString(),
+        QUrl(obj["provider_url"].toString(), QUrl::StrictMode),
+        QUrl(obj["provider_logo_url"].toString(), QUrl::StrictMode),
+        QUrl(obj["info_url"].toString(), QUrl::StrictMode),
+        QUrl(obj["query_url"].toString(), QUrl::StrictMode),
+        obj["max_parts"].toInt(),
     };
     promise->addResult(result);
     promise->finish();
@@ -295,8 +294,66 @@ QFuture<ApiEndpoint::PartsStatusResult> ApiEndpoint::requestPartsStatus()
   return promise->future();
 }
 
-void ApiEndpoint::requestPartsInformation(
-    const QUrl& url, const QVector<Part>& parts) const noexcept {
+QFuture<ApiEndpoint::PartsInformationResult>
+    ApiEndpoint::requestPartsInformation(
+        const QUrl& url, const QVector<Part>& parts) const noexcept {
+  auto promise = std::make_shared<QPromise<PartsInformationResult>>();
+  promise->start();
+
+  auto errorCallback = [promise](const QString& errorMsg) {
+    promise->setException(Exception(errorMsg));
+    promise->finish();
+  };
+
+  auto successCallback = [promise](const QByteArray& data) {
+    const QJsonDocument doc = QJsonDocument::fromJson(data);
+    if (doc.isNull() || doc.isEmpty() || (!doc.isObject())) {
+      promise->setException(Exception("Received JSON object is not valid."));
+      promise->finish();
+      return;
+    }
+    const QJsonObject obj = doc.object();
+    PartsInformationResult result{};
+    const QJsonArray partsArray = obj["parts"].toArray();
+    for (const QJsonValue& partJson : partsArray) {
+      const QJsonObject partObj = partJson.toObject();
+      PartInformation info{
+          Part{
+              partObj["mpn"].toString(),
+              partObj["manufacturer"].toString(),
+          },
+          partObj["results"].toInt(),
+          QUrl(partObj["product_url"].toString(), QUrl::StrictMode),
+          QUrl(partObj["picture_url"].toString(), QUrl::StrictMode),
+          QUrl(partObj["pricing_url"].toString(), QUrl::StrictMode),
+          partObj["status"].toString(),
+          std::nullopt,  // Availability
+          {},  // Prices
+          {},  // Resources
+      };
+      const int availability = partObj["availability"].toInt(INT_MIN);
+      if (availability != INT_MIN) {
+        info.availability = availability;
+      }
+      const QJsonArray pricesArray = partObj["prices"].toArray();
+      for (const QJsonValue& priceJson : pricesArray) {
+        info.prices.insert(priceJson["quantity"].toInt(),
+                           priceJson["price"].toDouble());
+      }
+      const QJsonArray resourcesArray = partObj["resources"].toArray();
+      for (const QJsonValue& resJson : resourcesArray) {
+        info.resources.append(PartResource{
+            resJson["name"].toString(),
+            resJson["mediatype"].toString(),
+            resJson["url"].toString(),
+        });
+      }
+      result.parts.append(info);
+    }
+    promise->addResult(result);
+    promise->finish();
+  };
+
   // Build JSON object to be uploaded.
   QJsonArray partsArray;
   foreach (const Part& part, parts) {
@@ -316,12 +373,13 @@ void ApiEndpoint::requestPartsInformation(
                           QString::number(postData.size()).toUtf8());
   request->setHeaderField("Accept", "application/json;charset=UTF-8");
   request->setHeaderField("Accept-Charset", "UTF-8");
-  connect(request, &NetworkRequest::errored, this,
-          &ApiEndpoint::errorWhileFetchingPartsInformation,
+  connect(request, &NetworkRequest::errored, this, errorCallback,
           Qt::QueuedConnection);
-  connect(request, &NetworkRequest::dataReceived, this,
-          &ApiEndpoint::partsInformationResponseReceived, Qt::QueuedConnection);
+  connect(request, &NetworkRequest::dataReceived, this, successCallback,
+          Qt::QueuedConnection);
   request->start();
+
+  return promise->future();
 }
 
 /*******************************************************************************
@@ -414,31 +472,30 @@ void ApiEndpoint::libraryListResponseReceived(
   const QJsonArray resultsArray = results.toArray();
   for (const QJsonValue& item : resultsArray) {
     const QJsonObject obj = item.toObject();
-    auto uuid = Uuid::tryFromString(obj.value("uuid").toString());
-    auto version = Version::tryFromString(obj.value("version").toString());
+    auto uuid = Uuid::tryFromString(obj["uuid"].toString());
+    auto version = Version::tryFromString(obj["version"].toString());
     if (!uuid) {
-      qCritical() << "Invalid UUID received:" << obj.value("uuid").toString();
+      qCritical() << "Invalid UUID received:" << obj["uuid"].toString();
       continue;
     }
     if (!version) {
-      qCritical() << "Invalid version received:"
-                  << obj.value("version").toString();
+      qCritical() << "Invalid version received:" << obj["version"].toString();
       continue;
     }
     Library lib{
         *uuid,
-        obj.value("name").toObject().value("default").toString(),
-        obj.value("description").toObject().value("default").toString(),
-        obj.value("author").toString(),
+        obj["name"].toObject().value("default").toString(),
+        obj["description"].toObject().value("default").toString(),
+        obj["author"].toString(),
         *version,
-        obj.value("recommended").toBool(),
+        obj["recommended"].toBool(),
         {},
-        QUrl(obj.value("icon_url").toString()),
-        QUrl(obj.value("download_url").toString()),
-        obj.value("download_size").toInt(-1),
-        obj.value("download_sha256").toString().toUtf8(),
+        QUrl(obj["icon_url"].toString()),
+        QUrl(obj["download_url"].toString()),
+        obj["download_size"].toInt(-1),
+        obj["download_sha256"].toString().toUtf8(),
     };
-    const QJsonArray dependenciesArray = obj.value("dependencies").toArray();
+    const QJsonArray dependenciesArray = obj["dependencies"].toArray();
     for (const QJsonValue& value : dependenciesArray) {
       if (auto uuid = Uuid::tryFromString(value.toString())) {
         lib.dependencies.insert(*uuid);
@@ -449,17 +506,6 @@ void ApiEndpoint::libraryListResponseReceived(
     promise->addResult(lib);
   }
   promise->finish();
-}
-
-void ApiEndpoint::partsInformationResponseReceived(
-    const QByteArray& data) noexcept {
-  QJsonDocument doc = QJsonDocument::fromJson(data);
-  if (doc.isNull() || doc.isEmpty() || (!doc.isObject())) {
-    emit errorWhileFetchingPartsInformation(
-        tr("Received JSON object is not valid."));
-    return;
-  }
-  emit partsInformationReceived(doc.object());
 }
 
 /*******************************************************************************

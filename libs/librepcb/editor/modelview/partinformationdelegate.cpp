@@ -50,7 +50,7 @@ QSize PartInformationDelegate::Data::calcSizeHint(
 QString PartInformationDelegate::Data::getDisplayText(
     bool maxLen) const noexcept {
   QString s;
-  if (info && (info->results == 1)) {
+  if (info && (info->info.results == 1)) {
     s = info->getPriceStr(priceQuantity);
     if (s.isEmpty()) {
       s = info->getStatusTr();
@@ -64,9 +64,9 @@ QString PartInformationDelegate::Data::getDisplayText(
 
 bool PartInformationDelegate::Data::getColors(QBrush& background, QPen& outline,
                                               QPen& text) const noexcept {
-  if (info && (info->results == 1)) {
-    const QString sts = info->status.toLower();
-    const std::optional<int> av = info->availability;
+  if (info && (info->info.results == 1)) {
+    const QString sts = info->info.status.toLower();
+    const std::optional<int> av = info->info.availability;
     if (sts == "preview") {
       // Ignore availability in this case since preview state somehow indicates
       // the part might not be available *yet*, which users probably expect.
@@ -198,7 +198,7 @@ bool PartInformationDelegate::getData(const QModelIndex& index,
   const QVariant d = index.data(Qt::UserRole);
   if (d.canConvert<Data>()) {
     data = d.value<Data>();
-    return (data.info && (data.info->results == 1)) ||
+    return (data.info && (data.info->info.results == 1)) ||
         ((!data.info) && (data.progress > 0));
   } else {
     return false;
