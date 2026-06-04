@@ -93,13 +93,9 @@ public:
   ApiEndpointListModelLegacy& operator=(
       const ApiEndpointListModelLegacy& rhs) noexcept;
 
-private:
-  void refreshEndpoints() noexcept;
-
 private:  // Data
   const WorkspaceSettings& mSettings;
   QList<WorkspaceSettings::ApiEndpoint> mValues;
-  QHash<QUrl, std::shared_ptr<ApiEndpoint>> mEndpoints;
   QUrl mNewUrl;
 };
 

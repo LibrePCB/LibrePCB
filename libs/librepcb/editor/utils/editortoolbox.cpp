@@ -472,6 +472,13 @@ void EditorToolbox::addResourcesToMenu(const Workspace& ws, MenuBuilder& mb,
   }
 }
 
+QFuture<void> EditorToolbox::asyncDelay(int milliseconds) noexcept {
+  auto promise = std::make_shared<QPromise<void>>();
+  promise->start();
+  QTimer::singleShot(milliseconds, nullptr, [promise]() { promise->finish(); });
+  return promise->future();
+}
+
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/

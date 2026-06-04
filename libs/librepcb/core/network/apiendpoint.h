@@ -81,7 +81,7 @@ public:
   };
 
   // Callbacks
-   struct OAuthDeviceCodeResult {
+  struct OAuthDeviceCodeResult {
     const QString& deviceCode;
     const QUrl& verificationUriComplete;
     int expiresInSeconds;
@@ -108,7 +108,8 @@ public:
   // General Methods
   bool deleteCredentials() noexcept;
   bool setAccessToken(const QString& token) noexcept;
-  QFuture<OAuthDeviceCodeResult> requestOAuthDeviceCode(const QString& clientId, const QString& label) noexcept;
+  QFuture<OAuthDeviceCodeResult> requestOAuthDeviceCode(
+      const QString& clientId, const QString& label) noexcept;
   void requestOAuthToken(const QString& grantType, const QString& deviceCode,
                          QObject* receiver,
                          const OAuthTokenCallback& callback) noexcept;
