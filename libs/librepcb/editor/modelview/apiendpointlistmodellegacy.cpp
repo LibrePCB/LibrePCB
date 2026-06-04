@@ -153,7 +153,15 @@ void ApiEndpointListModelLegacy::logInOut(
                          "open this URL to complete the login:") %
                           "\n\n" % result.verificationUriComplete.toString());
                 }
-                startOAuthTokenPolling(ep, result);
+                const int intervalMs = result.intervalSeconds * 1000;
+                const qint64 timeoutAtMs = QDateTime::currentMSecsSinceEpoch() +
+                    (static_cast<qint64>(result.expiresInSeconds) * 1000);
+                QTimer::singleShot(intervalMs, this,
+                                   [this, ep, deviceCode = result.deviceCode,
+                                    intervalMs, timeoutAtMs]() {
+                                     pollOAuthToken(ep, deviceCode, intervalMs,
+                                                    timeoutAtMs);
+                                   });
               })
         .onFailed(this, [](const ApiEndpoint::Exception& e) {
           QMessageBox::critical(nullptr, tr("Error"), e.getMsg());
@@ -161,87 +169,46 @@ void ApiEndpointListModelLegacy::logInOut(
   }
 }
 
-int ApiEndpointListModelLegacy::getCurrentApiEndpointRow(
-    const QUrl& url) const noexcept {
-  for (int i = 0; i < mValues.count(); ++i) {
-    if (mValues.at(i).url == url) {
-      return i;
-    }
-  }
-  return -1;
-}
-
-void ApiEndpointListModelLegacy::startOAuthTokenPolling(
-    const std::shared_ptr<ApiEndpoint>& ep,
-    const ApiEndpoint::OAuthDeviceCodeResult& result) noexcept {
-  QTimer* pollTimer = new QTimer(this);
-  pollTimer->setSingleShot(true);
-  pollTimer->setInterval(result.intervalSeconds * 1000);
-
-  const QString deviceCode = result.deviceCode;
-  const qint64 timeoutAtMs = QDateTime::currentMSecsSinceEpoch() +
-      (static_cast<qint64>(result.expiresInSeconds) * 1000);
-
-  connect(pollTimer, &QTimer::timeout, this,
-          [this, ep, deviceCode, timeoutAtMs, pollTimer]() {
-            pollOAuthToken(ep, deviceCode, timeoutAtMs, pollTimer);
-          });
-
-  pollTimer->start();
-}
-
 void ApiEndpointListModelLegacy::pollOAuthToken(
     const std::shared_ptr<ApiEndpoint>& ep, const QString& deviceCode,
-    qint64 timeoutAtMs, QTimer* pollTimer) noexcept {
-  if (QDateTime::currentMSecsSinceEpoch() >= timeoutAtMs) {
-    pollTimer->deleteLater();
-    QMessageBox::warning(nullptr, tr("Error"),
-                         tr("Login timed out. Please try again."));
-    return;
-  }
-
+    int intervalMs, qint64 timeoutAtMs) noexcept {
   ep->requestOAuthToken("urn:ietf:params:oauth:grant-type:device_code",
                         deviceCode)
       .then(this,
-            [this, ep, timeoutAtMs,
-             pollTimer](const ApiEndpoint::OAuthTokenResult& result) {
-              handleOAuthTokenResult(ep, result, timeoutAtMs, pollTimer);
+            [this, ep, deviceCode, intervalMs,
+             timeoutAtMs](const ApiEndpoint::OAuthTokenResult& result) {
+              handleOAuthTokenResult(ep, result, deviceCode, intervalMs,
+                                     timeoutAtMs);
             })
-      .onFailed(this, [pollTimer](const ApiEndpoint::Exception& e) {
-        pollTimer->deleteLater();
+      .onFailed(this, [](const ApiEndpoint::Exception& e) {
         QMessageBox::critical(nullptr, tr("Error"), e.getMsg());
       });
 }
 
 void ApiEndpointListModelLegacy::handleOAuthTokenResult(
     const std::shared_ptr<ApiEndpoint>& ep,
-    const ApiEndpoint::OAuthTokenResult& result, qint64 timeoutAtMs,
-    QTimer* pollTimer) noexcept {
+    const ApiEndpoint::OAuthTokenResult& result, const QString& deviceCode,
+    int intervalMs, qint64 timeoutAtMs) noexcept {
   if (!result.accessToken.isEmpty()) {
-    pollTimer->deleteLater();
     if (!ep->setAccessToken(result.accessToken)) {
       QMessageBox::critical(nullptr, tr("Error"),
                             tr("Failed to store the access token."));
-    } else {
-      const int row = getCurrentApiEndpointRow(ep->getUrl());
-      if (row >= 0) {
-        emit dataChanged(index(row, 0), index(row, _COLUMN_COUNT - 1));
-      }
     }
-    return;
-  }
-
-  if (result.slowDown) {
-    pollTimer->setInterval(pollTimer->interval() + 5000);
-  }
-
-  if (QDateTime::currentMSecsSinceEpoch() >= timeoutAtMs) {
-    pollTimer->deleteLater();
+  } else if (QDateTime::currentMSecsSinceEpoch() >= timeoutAtMs) {
     QMessageBox::warning(nullptr, tr("Error"),
                          tr("Login timed out. Please try again."));
   } else {
-    pollTimer->start();
+    if (result.slowDown) {
+      intervalMs += 5000;
+    }
+    QTimer::singleShot(
+        intervalMs, this, [this, ep, deviceCode, intervalMs, timeoutAtMs]() {
+          pollOAuthToken(ep, deviceCode, intervalMs, timeoutAtMs);
+        });
   }
+
+  emit dataChanged(index(0, COLUMN_USER),
+                   index(mValues.count() - 1, COLUMN_USER));
 }
 
 /*******************************************************************************
