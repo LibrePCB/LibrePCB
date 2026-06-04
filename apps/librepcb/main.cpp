@@ -23,6 +23,7 @@
 #include <librepcb/core/application.h>
 #include <librepcb/core/debug.h>
 #include <librepcb/core/exceptions.h>
+#include <librepcb/core/network/apiendpoint.h>
 #include <librepcb/core/network/networkaccessmanager.h>
 #include <librepcb/core/workspace/uitheme.h>
 #include <librepcb/core/workspace/workspace.h>
@@ -369,7 +370,8 @@ static int openWorkspace(FilePath& path) {
   PartInformationProvider::instance().setCacheDir(Application::getCacheDir());
   auto applyPartInformationProviderSettings = [&ws]() {
     const auto ep = ws.getSettings().getApiEndpointForPartsInfo();
-    PartInformationProvider::instance().setApiEndpoint(ep ? ep->url : QUrl());
+    PartInformationProvider::instance().setApiEndpoint(
+        ep ? ApiEndpoint::get(ep->url) : nullptr);
   };
   applyPartInformationProviderSettings();
   QObject::connect(

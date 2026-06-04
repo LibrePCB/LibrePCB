@@ -92,18 +92,19 @@ QFuture<ApiEndpoint::OAuthDeviceCodeResult> ApiEndpoint::requestOAuthDeviceCode(
   };
 
   auto successCallback = [promise](const QByteArray& data) {
-    QJsonDocument doc = QJsonDocument::fromJson(data);
+    const QJsonDocument doc = QJsonDocument::fromJson(data);
     if (doc.isNull() || doc.isEmpty() || (!doc.isObject())) {
       promise->setException(Exception("Received JSON object is not valid."));
       promise->finish();
       return;
     }
+    const QJsonObject obj = doc.object();
     const OAuthDeviceCodeResult result{
-        doc.object().value("device_code").toString(),
-        QUrl(doc.object().value("verification_uri_complete").toString(),
+        obj.value("device_code").toString(),
+        QUrl(obj.value("verification_uri_complete").toString(),
              QUrl::StrictMode),
-        doc.object().value("expires_in").toInt(),
-        doc.object().value("interval").toInt(),
+        obj.value("expires_in").toInt(),
+        obj.value("interval").toInt(),
     };
     if (result.deviceCode.isEmpty() ||
         (!result.verificationUriComplete.isValid()) ||
@@ -151,17 +152,18 @@ QFuture<ApiEndpoint::OAuthTokenResult> ApiEndpoint::requestOAuthToken(
   };
 
   auto successCallback = [promise](const QByteArray& data) {
-    QJsonDocument doc = QJsonDocument::fromJson(data);
+    const QJsonDocument doc = QJsonDocument::fromJson(data);
     if (doc.isNull() || doc.isEmpty() || (!doc.isObject())) {
       promise->setException(Exception("Received JSON object is not valid."));
       promise->finish();
       return;
     }
-    const QString error = doc.object().value("error").toString();
+    const QJsonObject obj = doc.object();
+    const QString error = obj.value("error").toString();
     const OAuthTokenResult result{
-        doc.object().value("access_token").toString(),
-        doc.object().value("token_type").toString(),
-        doc.object().value("expires_in").toInt(),
+        obj.value("access_token").toString(),
+        obj.value("token_type").toString(),
+        obj.value("expires_in").toInt(),
         error == "slow_down",
     };
     if ((error == "authorization_pending") || (error == "slow_down") ||
@@ -199,6 +201,48 @@ QFuture<ApiEndpoint::OAuthTokenResult> ApiEndpoint::requestOAuthToken(
   return promise->future();
 }
 
+QFuture<ApiEndpoint::UserResult> ApiEndpoint::requestUser() noexcept {
+  auto promise = std::make_shared<QPromise<UserResult>>();
+  promise->start();
+
+  auto errorCallback = [promise](const QString& errorMsg) {
+    promise->setException(Exception(errorMsg));
+    promise->finish();
+  };
+
+  auto successCallback = [promise](const QByteArray& data) {
+    const QJsonDocument doc = QJsonDocument::fromJson(data);
+    if (doc.isNull() || doc.isEmpty() || (!doc.isObject())) {
+      promise->setException(Exception("Received JSON object is not valid."));
+      promise->finish();
+      return;
+    }
+    const QJsonObject obj = doc.object();
+    const UserResult result{
+        obj.value("email").toString(),
+    };
+    if (!result.email.isEmpty()) {
+      promise->addResult(result);
+    } else {
+      promise->setException(
+          Exception("Received invalid user response from server."));
+    }
+    promise->finish();
+  };
+
+  NetworkRequest* request =
+      new NetworkRequest(QUrl(mUrl.toString() % "/api/v1/user"));
+  request->setHeaderField("Accept", "application/json;charset=UTF-8");
+  request->setHeaderField("Accept-Charset", "UTF-8");
+  connect(request, &NetworkRequest::errored, this, errorCallback,
+          Qt::QueuedConnection);
+  connect(request, &NetworkRequest::dataReceived, this, successCallback,
+          Qt::QueuedConnection);
+  request->start();
+
+  return promise->future();
+}
+
 QFuture<ApiEndpoint::Library> ApiEndpoint::requestLibraries(
     bool forceNoCache) noexcept {
   auto promise = std::make_shared<QPromise<Library>>();
@@ -208,30 +252,47 @@ QFuture<ApiEndpoint::Library> ApiEndpoint::requestLibraries(
   return requestLibraries(QUrl(mUrl.toString() % path), forceNoCache, promise);
 }
 
-void ApiEndpoint::requestPartsStatus(
-    QObject* receiver, const PartsStatusCallback& callback) const noexcept {
-  auto errorCallback = [callback](const QString& errorMsg) {
-    callback(errorMsg, QJsonObject());
+QFuture<ApiEndpoint::PartsStatusResult> ApiEndpoint::requestPartsStatus()
+    const noexcept {
+  auto promise = std::make_shared<QPromise<PartsStatusResult>>();
+  promise->start();
+
+  auto errorCallback = [promise](const QString& errorMsg) {
+    promise->setException(Exception(errorMsg));
+    promise->finish();
   };
 
-  auto successCallback = [callback](const QByteArray& data) {
-    QJsonDocument doc = QJsonDocument::fromJson(data);
+  auto successCallback = [promise](const QByteArray& data) {
+    const QJsonDocument doc = QJsonDocument::fromJson(data);
     if (doc.isNull() || doc.isEmpty() || (!doc.isObject())) {
-      callback("Received JSON object is not valid.", QJsonObject());
-    } else {
-      callback(QString(), doc.object());
+      promise->setException(Exception("Received JSON object is not valid."));
+      promise->finish();
+      return;
     }
+    const QJsonObject obj = doc.object();
+    const PartsStatusResult result{
+        obj.value("provider_name").toString(),
+        QUrl(obj.value("provider_url").toString(), QUrl::StrictMode),
+        QUrl(obj.value("provider_logo_url").toString(), QUrl::StrictMode),
+        QUrl(obj.value("info_url").toString(), QUrl::StrictMode),
+        QUrl(obj.value("query_url").toString(), QUrl::StrictMode),
+        obj.value("max_parts").toInt(),
+    };
+    promise->addResult(result);
+    promise->finish();
   };
 
   NetworkRequest* request =
       new NetworkRequest(QUrl(mUrl.toString() % "/api/v1/parts"));
   request->setHeaderField("Accept", "application/json;charset=UTF-8");
   request->setHeaderField("Accept-Charset", "UTF-8");
-  connect(request, &NetworkRequest::errored, receiver, errorCallback,
+  connect(request, &NetworkRequest::errored, this, errorCallback,
           Qt::QueuedConnection);
-  connect(request, &NetworkRequest::dataReceived, receiver, successCallback,
+  connect(request, &NetworkRequest::dataReceived, this, successCallback,
           Qt::QueuedConnection);
   request->start();
+
+  return promise->future();
 }
 
 void ApiEndpoint::requestPartsInformation(
