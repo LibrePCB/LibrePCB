@@ -62,6 +62,19 @@ bool ApiEndpoint::deleteCredentials() noexcept {
     qWarning().nospace() << "Failed to delete credentials for "
                          << mUrl.toString() << ".";
   }
+  mCachedToken = std::nullopt;
+  return success;
+}
+
+bool ApiEndpoint::setAccessToken(const QString& token) noexcept {
+  const QString service = "librepcb";
+  const QString user = mUrl.toString();
+  const bool success = rs::ffi_keyring_set_password(&service, &user, &token);
+  if (!success) {
+    qWarning().nospace() << "Failed to set access token for " << mUrl.toString()
+                         << ".";
+  }
+  mCachedToken = std::nullopt;
   return success;
 }
 
@@ -142,8 +155,7 @@ void ApiEndpoint::requestOAuthToken(
   };
 
   const QJsonObject obj{
-      {"grant_type", grantType},
-      {"device_code", deviceCode},
+      {"grant_type", grantType}, {"device_code", deviceCode},
       //{"client_id", clientId},
   };
   const QByteArray postData = QJsonDocument(obj).toJson();

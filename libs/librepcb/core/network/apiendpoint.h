@@ -87,6 +87,7 @@ public:
 
   // General Methods
   bool deleteCredentials() noexcept;
+  bool setAccessToken(const QString& token) noexcept;
   void requestOAuthDeviceCode(const QString& clientId, const QString& label,
                               const OAuthDeviceCodeCallback& callback) noexcept;
   void requestOAuthToken(const QString& grantType, const QString& deviceCode,
