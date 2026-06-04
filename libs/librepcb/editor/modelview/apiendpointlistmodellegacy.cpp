@@ -143,27 +143,36 @@ void ApiEndpointListModelLegacy::logInOut(
   } else {
     // Log in
     ep->requestOAuthDeviceCode("librepcb", "Foo Bar")
-        .then(
-            this,
-            [this, row, ep](const ApiEndpoint::OAuthDeviceCodeResult& result) {
-              DesktopServices ds(mSettings);
-              if (!ds.openWebUrl(result.verificationUriComplete)) {
-                QMessageBox::warning(
-                    nullptr, tr("Error"),
-                    tr("Failed to open the web browser. Please "
-                       "open this URL to complete the login:") %
-                        "\n\n" % result.verificationUriComplete.toString());
-              }
-              startOAuthTokenPolling(row, ep, result);
-            })
+        .then(this,
+              [this, ep](const ApiEndpoint::OAuthDeviceCodeResult& result) {
+                DesktopServices ds(mSettings);
+                if (!ds.openWebUrl(result.verificationUriComplete)) {
+                  QMessageBox::warning(
+                      nullptr, tr("Error"),
+                      tr("Failed to open the web browser. Please "
+                         "open this URL to complete the login:") %
+                          "\n\n" % result.verificationUriComplete.toString());
+                }
+                startOAuthTokenPolling(ep, result);
+              })
         .onFailed(this, [](const ApiEndpoint::Exception& e) {
           QMessageBox::critical(nullptr, tr("Error"), e.getMsg());
         });
   }
 }
 
+int ApiEndpointListModelLegacy::getCurrentApiEndpointRow(
+    const QUrl& url) const noexcept {
+  for (int i = 0; i < mValues.count(); ++i) {
+    if (mValues.at(i).url == url) {
+      return i;
+    }
+  }
+  return -1;
+}
+
 void ApiEndpointListModelLegacy::startOAuthTokenPolling(
-    int row, const std::shared_ptr<ApiEndpoint>& ep,
+    const std::shared_ptr<ApiEndpoint>& ep,
     const ApiEndpoint::OAuthDeviceCodeResult& result) noexcept {
   QTimer* pollTimer = new QTimer(this);
   pollTimer->setSingleShot(true);
@@ -174,15 +183,15 @@ void ApiEndpointListModelLegacy::startOAuthTokenPolling(
       (static_cast<qint64>(result.expiresInSeconds) * 1000);
 
   connect(pollTimer, &QTimer::timeout, this,
-          [this, row, ep, deviceCode, timeoutAtMs, pollTimer]() {
-            pollOAuthToken(row, ep, deviceCode, timeoutAtMs, pollTimer);
+          [this, ep, deviceCode, timeoutAtMs, pollTimer]() {
+            pollOAuthToken(ep, deviceCode, timeoutAtMs, pollTimer);
           });
 
   pollTimer->start();
 }
 
 void ApiEndpointListModelLegacy::pollOAuthToken(
-    int row, const std::shared_ptr<ApiEndpoint>& ep, const QString& deviceCode,
+    const std::shared_ptr<ApiEndpoint>& ep, const QString& deviceCode,
     qint64 timeoutAtMs, QTimer* pollTimer) noexcept {
   if (QDateTime::currentMSecsSinceEpoch() >= timeoutAtMs) {
     pollTimer->deleteLater();
@@ -194,9 +203,9 @@ void ApiEndpointListModelLegacy::pollOAuthToken(
   ep->requestOAuthToken("urn:ietf:params:oauth:grant-type:device_code",
                         deviceCode)
       .then(this,
-            [this, row, ep, timeoutAtMs,
+            [this, ep, timeoutAtMs,
              pollTimer](const ApiEndpoint::OAuthTokenResult& result) {
-              handleOAuthTokenResult(row, ep, result, timeoutAtMs, pollTimer);
+              handleOAuthTokenResult(ep, result, timeoutAtMs, pollTimer);
             })
       .onFailed(this, [pollTimer](const ApiEndpoint::Exception& e) {
         pollTimer->deleteLater();
@@ -205,7 +214,7 @@ void ApiEndpointListModelLegacy::pollOAuthToken(
 }
 
 void ApiEndpointListModelLegacy::handleOAuthTokenResult(
-    int row, const std::shared_ptr<ApiEndpoint>& ep,
+    const std::shared_ptr<ApiEndpoint>& ep,
     const ApiEndpoint::OAuthTokenResult& result, qint64 timeoutAtMs,
     QTimer* pollTimer) noexcept {
   if (!result.accessToken.isEmpty()) {
@@ -214,7 +223,10 @@ void ApiEndpointListModelLegacy::handleOAuthTokenResult(
       QMessageBox::critical(nullptr, tr("Error"),
                             tr("Failed to store the access token."));
     } else {
-      emit dataChanged(index(row, 0), index(row, _COLUMN_COUNT - 1));
+      const int row = getCurrentApiEndpointRow(ep->getUrl());
+      if (row >= 0) {
+        emit dataChanged(index(row, 0), index(row, _COLUMN_COUNT - 1));
+      }
     }
     return;
   }
