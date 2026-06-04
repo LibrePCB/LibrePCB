@@ -136,17 +136,15 @@ void ApiEndpointListModelLegacy::logInOut(
   std::shared_ptr<ApiEndpoint> ep = ApiEndpoint::get(value.url);
   Q_ASSERT(ep);
 
-  // Log out
   if (ep->hasCredentials()) {
+    // Log out
     ep->deleteCredentials();
     emit dataChanged(index(row, 0), index(row + 1, _COLUMN_COUNT - 1));
-    return;
-  }
-
-  // Log in
-  auto future = ep->requestOAuthDeviceCode("librepcb", "Foo Bar");
-  future
-      .then(this,
+  } else {
+    // Log in
+    ep->requestOAuthDeviceCode("librepcb", "Foo Bar")
+        .then(
+            this,
             [this, row, ep](const ApiEndpoint::OAuthDeviceCodeResult& result) {
               DesktopServices ds(mSettings);
               if (!ds.openWebUrl(result.verificationUriComplete)) {
@@ -156,76 +154,82 @@ void ApiEndpointListModelLegacy::logInOut(
                        "open this URL to complete the login:") %
                         "\n\n" % result.verificationUriComplete.toString());
               }
-              QTimer* pollTimer = new QTimer(this);
-              pollTimer->setSingleShot(true);
-              auto pollIntervalMs =
-                  std::make_shared<int>(result.intervalSeconds * 1000);
-              const QString deviceCode = result.deviceCode;
-              const qint64 timeoutAtMs = QDateTime::currentMSecsSinceEpoch() +
-                  (static_cast<qint64>(result.expiresInSeconds) * 1000);
-
-              connect(
-                  pollTimer, &QTimer::timeout, this,
-                  [this, row, ep, deviceCode, timeoutAtMs, pollTimer,
-                   pollIntervalMs]() {
-                    if (QDateTime::currentMSecsSinceEpoch() >= timeoutAtMs) {
-                      pollTimer->deleteLater();
-                      QMessageBox::warning(
-                          nullptr, tr("Error"),
-                          tr("Login timed out. Please try again."));
-                      return;
-                    }
-
-                    ep->requestOAuthToken(
-                          "urn:ietf:params:oauth:grant-type:device_code",
-                          deviceCode)
-                        .then(this,
-                              [this, row, ep, timeoutAtMs, pollTimer,
-                               pollIntervalMs](
-                                  const ApiEndpoint::OAuthTokenResult& result) {
-                                if (!result.accessToken.isEmpty()) {
-                                  pollTimer->deleteLater();
-                                  if (!ep->setAccessToken(result.accessToken)) {
-                                    QMessageBox::critical(
-                                        nullptr, tr("Error"),
-                                        tr("Failed to store the access "
-                                           "token."));
-                                  } else {
-                                    emit dataChanged(
-                                        index(row, 0),
-                                        index(row, _COLUMN_COUNT - 1));
-                                  }
-                                  return;
-                                }
-
-                                if (result.slowDown) {
-                                  *pollIntervalMs += 5000;
-                                }
-
-                                if (QDateTime::currentMSecsSinceEpoch() >=
-                                    timeoutAtMs) {
-                                  pollTimer->deleteLater();
-                                  QMessageBox::warning(
-                                      nullptr, tr("Error"),
-                                      tr("Login timed out. Please try "
-                                         "again."));
-                                } else {
-                                  pollTimer->start(*pollIntervalMs);
-                                }
-                              })
-                        .onFailed(this,
-                                  [pollTimer](const ApiEndpoint::Exception& e) {
-                                    pollTimer->deleteLater();
-                                    QMessageBox::critical(nullptr, tr("Error"),
-                                                          e.getMsg());
-                                  });
-                  });
-
-              pollTimer->start(*pollIntervalMs);
+              startOAuthTokenPolling(row, ep, result);
             })
-      .onFailed(this, [](const ApiEndpoint::Exception& e) {
+        .onFailed(this, [](const ApiEndpoint::Exception& e) {
+          QMessageBox::critical(nullptr, tr("Error"), e.getMsg());
+        });
+  }
+}
+
+void ApiEndpointListModelLegacy::startOAuthTokenPolling(
+    int row, const std::shared_ptr<ApiEndpoint>& ep,
+    const ApiEndpoint::OAuthDeviceCodeResult& result) noexcept {
+  QTimer* pollTimer = new QTimer(this);
+  pollTimer->setSingleShot(true);
+  pollTimer->setInterval(result.intervalSeconds * 1000);
+
+  const QString deviceCode = result.deviceCode;
+  const qint64 timeoutAtMs = QDateTime::currentMSecsSinceEpoch() +
+      (static_cast<qint64>(result.expiresInSeconds) * 1000);
+
+  connect(pollTimer, &QTimer::timeout, this,
+          [this, row, ep, deviceCode, timeoutAtMs, pollTimer]() {
+            pollOAuthToken(row, ep, deviceCode, timeoutAtMs, pollTimer);
+          });
+
+  pollTimer->start();
+}
+
+void ApiEndpointListModelLegacy::pollOAuthToken(
+    int row, const std::shared_ptr<ApiEndpoint>& ep, const QString& deviceCode,
+    qint64 timeoutAtMs, QTimer* pollTimer) noexcept {
+  if (QDateTime::currentMSecsSinceEpoch() >= timeoutAtMs) {
+    pollTimer->deleteLater();
+    QMessageBox::warning(nullptr, tr("Error"),
+                         tr("Login timed out. Please try again."));
+    return;
+  }
+
+  ep->requestOAuthToken("urn:ietf:params:oauth:grant-type:device_code",
+                        deviceCode)
+      .then(this,
+            [this, row, ep, timeoutAtMs,
+             pollTimer](const ApiEndpoint::OAuthTokenResult& result) {
+              handleOAuthTokenResult(row, ep, result, timeoutAtMs, pollTimer);
+            })
+      .onFailed(this, [pollTimer](const ApiEndpoint::Exception& e) {
+        pollTimer->deleteLater();
         QMessageBox::critical(nullptr, tr("Error"), e.getMsg());
       });
+}
+
+void ApiEndpointListModelLegacy::handleOAuthTokenResult(
+    int row, const std::shared_ptr<ApiEndpoint>& ep,
+    const ApiEndpoint::OAuthTokenResult& result, qint64 timeoutAtMs,
+    QTimer* pollTimer) noexcept {
+  if (!result.accessToken.isEmpty()) {
+    pollTimer->deleteLater();
+    if (!ep->setAccessToken(result.accessToken)) {
+      QMessageBox::critical(nullptr, tr("Error"),
+                            tr("Failed to store the access token."));
+    } else {
+      emit dataChanged(index(row, 0), index(row, _COLUMN_COUNT - 1));
+    }
+    return;
+  }
+
+  if (result.slowDown) {
+    pollTimer->setInterval(pollTimer->interval() + 5000);
+  }
+
+  if (QDateTime::currentMSecsSinceEpoch() >= timeoutAtMs) {
+    pollTimer->deleteLater();
+    QMessageBox::warning(nullptr, tr("Error"),
+                         tr("Login timed out. Please try again."));
+  } else {
+    pollTimer->start();
+  }
 }
 
 /*******************************************************************************
