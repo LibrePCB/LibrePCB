@@ -94,13 +94,14 @@ public:
       const ApiEndpointListModelLegacy& rhs) noexcept;
 
 private:  // Methods
+  int getCurrentApiEndpointRow(const QUrl& url) const noexcept;
   void startOAuthTokenPolling(
-      int row, const std::shared_ptr<ApiEndpoint>& ep,
+      const std::shared_ptr<ApiEndpoint>& ep,
       const ApiEndpoint::OAuthDeviceCodeResult& result) noexcept;
-  void pollOAuthToken(int row, const std::shared_ptr<ApiEndpoint>& ep,
+  void pollOAuthToken(const std::shared_ptr<ApiEndpoint>& ep,
                       const QString& deviceCode, qint64 timeoutAtMs,
                       QTimer* pollTimer) noexcept;
-  void handleOAuthTokenResult(int row, const std::shared_ptr<ApiEndpoint>& ep,
+  void handleOAuthTokenResult(const std::shared_ptr<ApiEndpoint>& ep,
                               const ApiEndpoint::OAuthTokenResult& result,
                               qint64 timeoutAtMs, QTimer* pollTimer) noexcept;
 
