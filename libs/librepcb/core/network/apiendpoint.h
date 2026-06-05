@@ -35,6 +35,8 @@
  ******************************************************************************/
 namespace librepcb {
 
+class NetworkRequest;
+
 /*******************************************************************************
  *  Class ApiEndpoint
  ******************************************************************************/
@@ -122,6 +124,12 @@ public:
   struct PartsInformationResult {
     QVector<PartInformation> parts;
   };
+  enum class RequestFlag : uint32_t {
+    Authenticated = (1 << 0),
+    ForceNoCache = (1 << 1),
+  };
+  Q_DECLARE_FLAGS(RequestFlags, RequestFlag)
+
 
   // Constructors / Destructor
   ApiEndpoint() = delete;
@@ -131,11 +139,13 @@ public:
 
   // Getters
   const QUrl& getUrl() const noexcept { return mUrl; }
-  bool hasCredentials() const noexcept;
 
-  // General Methods
+  // Credentials
+  bool hasCredentials() const noexcept;
   bool deleteCredentials() noexcept;
-  bool setAccessToken(const QString& token) noexcept;
+  bool setCredentials(const QString& accessToken) noexcept;
+
+  // API Access
   QFuture<OAuthDeviceCodeResult> requestOAuthDeviceCode(
       const QString& clientId, const QString& label) noexcept;
   QFuture<OAuthTokenResult> requestOAuthToken(
@@ -153,17 +163,22 @@ public:
   ApiEndpoint& operator=(const ApiEndpoint& rhs) = delete;
 
 private:  // Methods
-  const QString& getToken() const noexcept;
   QFuture<Library> requestLibraries(
       const QUrl& url, bool forceNoCache,
       std::shared_ptr<QPromise<Library>> promise) noexcept;
   void libraryListResponseReceived(
       const QByteArray& data, bool forceNoCache,
       std::shared_ptr<QPromise<Library>> promise) noexcept;
+  template <typename SuccessFunctor, typename ErrorFunctor>
+  std::unique_ptr<NetworkRequest> startRequest(
+      const QUrl& url, const QByteArray& postData,
+      RequestFlags flags,
+      SuccessFunctor successCallback, ErrorFunctor errorCallback) const noexcept;
+  const std::optional<QByteArray>& getAuthorizationHeader() const noexcept;
 
 private:  // Data
   QUrl mUrl;
-  mutable std::optional<QString> mCachedToken;
+  mutable std::optional<std::optional<QByteArray>> mCachedAuthorizationHeader;
 
   static QMutex sInstancesMutex;
   static QHash<QUrl, std::shared_ptr<ApiEndpoint>> sInstances;
