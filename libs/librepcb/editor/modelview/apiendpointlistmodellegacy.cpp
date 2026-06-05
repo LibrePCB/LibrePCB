@@ -190,7 +190,7 @@ void ApiEndpointListModelLegacy::handleOAuthTokenResult(
     const ApiEndpoint::OAuthTokenResult& result, const QString& deviceCode,
     int intervalMs, qint64 timeoutAtMs) noexcept {
   if (!result.accessToken.isEmpty()) {
-    if (!ep->setAccessToken(result.accessToken)) {
+    if (!ep->setCredentials(result.accessToken)) {
       QMessageBox::critical(nullptr, tr("Error"),
                             tr("Failed to store the access token."));
     }

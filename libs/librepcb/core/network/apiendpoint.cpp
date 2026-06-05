@@ -50,11 +50,11 @@ ApiEndpoint::~ApiEndpoint() noexcept {
 }
 
 /*******************************************************************************
- *  General Methods
+ *  Credentials
  ******************************************************************************/
 
 bool ApiEndpoint::hasCredentials() const noexcept {
-  return !getToken().isEmpty();
+  return getAuthorizationHeader().has_value();
 }
 
 bool ApiEndpoint::deleteCredentials() noexcept {
@@ -65,21 +65,26 @@ bool ApiEndpoint::deleteCredentials() noexcept {
     qWarning().nospace() << "Failed to delete credentials for "
                          << mUrl.toString() << ".";
   }
-  mCachedToken = std::nullopt;
+  mCachedAuthorizationHeader = std::nullopt;
   return success;
 }
 
-bool ApiEndpoint::setAccessToken(const QString& token) noexcept {
+bool ApiEndpoint::setCredentials(const QString& accessToken) noexcept {
   const QString service = "librepcb";
   const QString user = mUrl.toString();
-  const bool success = rs::ffi_keyring_set_password(&service, &user, &token);
+  const bool success =
+      rs::ffi_keyring_set_password(&service, &user, &accessToken);
   if (!success) {
     qWarning().nospace() << "Failed to set access token for " << mUrl.toString()
                          << ".";
   }
-  mCachedToken = std::nullopt;
+  mCachedAuthorizationHeader = std::nullopt;
   return success;
 }
+
+/*******************************************************************************
+ *  API Access
+ ******************************************************************************/
 
 QFuture<ApiEndpoint::OAuthDeviceCodeResult> ApiEndpoint::requestOAuthDeviceCode(
     const QString& clientId, const QString& label) noexcept {
@@ -123,20 +128,8 @@ QFuture<ApiEndpoint::OAuthDeviceCodeResult> ApiEndpoint::requestOAuthDeviceCode(
       {"label", label},
   };
   const QByteArray postData = QJsonDocument(obj).toJson();
-
-  NetworkRequest* request = new NetworkRequest(
-      QUrl(mUrl.toString() % "/api/v1/oauth/device/code"), postData);
-  request->setHeaderField("Content-Type", "application/json");
-  request->setHeaderField("Content-Length",
-                          QString::number(postData.size()).toUtf8());
-  request->setHeaderField("Accept", "application/json;charset=UTF-8");
-  request->setHeaderField("Accept-Charset", "UTF-8");
-  connect(request, &NetworkRequest::errored, this, errorCallback,
-          Qt::QueuedConnection);
-  connect(request, &NetworkRequest::dataReceived, this, successCallback,
-          Qt::QueuedConnection);
-  request->start();
-
+  startRequest(QUrl(mUrl.toString() % "/api/v1/oauth/device/code"), postData,
+               RequestFlags(), successCallback, errorCallback);
   return promise->future();
 }
 
@@ -183,31 +176,14 @@ QFuture<ApiEndpoint::OAuthTokenResult> ApiEndpoint::requestOAuthToken(
       {"device_code", deviceCode},
   };
   const QByteArray postData = QJsonDocument(obj).toJson();
-
-  NetworkRequest* request = new NetworkRequest(
-      QUrl(mUrl.toString() % "/api/v1/oauth/token"), postData);
-  request->setHeaderField("Content-Type", "application/json");
-  request->setHeaderField("Content-Length",
-                          QString::number(postData.size()).toUtf8());
-  request->setHeaderField("Accept", "application/json;charset=UTF-8");
-  request->setHeaderField("Accept-Charset", "UTF-8");
-  connect(request, &NetworkRequest::errored, this, errorCallback,
-          Qt::QueuedConnection);
-  connect(request, &NetworkRequest::dataReceived, this, successCallback,
-          Qt::QueuedConnection);
-  request->start();
-
+  startRequest(QUrl(mUrl.toString() % "/api/v1/oauth/token"), postData,
+               RequestFlags(), successCallback, errorCallback);
   return promise->future();
 }
 
 QFuture<ApiEndpoint::UserResult> ApiEndpoint::requestUser() noexcept {
   auto promise = std::make_shared<QPromise<UserResult>>();
   promise->start();
-
-  auto errorCallback = [promise](const QString& errorMsg) {
-    promise->setException(Exception(errorMsg));
-    promise->finish();
-  };
 
   auto successCallback = [promise](const QByteArray& data) {
     const QJsonDocument doc = QJsonDocument::fromJson(data);
@@ -229,16 +205,13 @@ QFuture<ApiEndpoint::UserResult> ApiEndpoint::requestUser() noexcept {
     promise->finish();
   };
 
-  NetworkRequest* request =
-      new NetworkRequest(QUrl(mUrl.toString() % "/api/v1/user"));
-  request->setHeaderField("Accept", "application/json;charset=UTF-8");
-  request->setHeaderField("Accept-Charset", "UTF-8");
-  connect(request, &NetworkRequest::errored, this, errorCallback,
-          Qt::QueuedConnection);
-  connect(request, &NetworkRequest::dataReceived, this, successCallback,
-          Qt::QueuedConnection);
-  request->start();
+  auto errorCallback = [promise](const QString& errorMsg) {
+    promise->setException(Exception(errorMsg));
+    promise->finish();
+  };
 
+  startRequest(QUrl(mUrl.toString() % "/api/v1/user"), QByteArray(),
+               RequestFlag::Authenticated, successCallback, errorCallback);
   return promise->future();
 }
 
@@ -255,11 +228,6 @@ QFuture<ApiEndpoint::PartsStatusResult> ApiEndpoint::requestPartsStatus()
     const noexcept {
   auto promise = std::make_shared<QPromise<PartsStatusResult>>();
   promise->start();
-
-  auto errorCallback = [promise](const QString& errorMsg) {
-    promise->setException(Exception(errorMsg));
-    promise->finish();
-  };
 
   auto successCallback = [promise](const QByteArray& data) {
     const QJsonDocument doc = QJsonDocument::fromJson(data);
@@ -281,16 +249,13 @@ QFuture<ApiEndpoint::PartsStatusResult> ApiEndpoint::requestPartsStatus()
     promise->finish();
   };
 
-  NetworkRequest* request =
-      new NetworkRequest(QUrl(mUrl.toString() % "/api/v1/parts"));
-  request->setHeaderField("Accept", "application/json;charset=UTF-8");
-  request->setHeaderField("Accept-Charset", "UTF-8");
-  connect(request, &NetworkRequest::errored, this, errorCallback,
-          Qt::QueuedConnection);
-  connect(request, &NetworkRequest::dataReceived, this, successCallback,
-          Qt::QueuedConnection);
-  request->start();
+  auto errorCallback = [promise](const QString& errorMsg) {
+    promise->setException(Exception(errorMsg));
+    promise->finish();
+  };
 
+  startRequest(QUrl(mUrl.toString() % "/api/v1/parts"), QByteArray(),
+               RequestFlag::Authenticated, successCallback, errorCallback);
   return promise->future();
 }
 
@@ -299,11 +264,6 @@ QFuture<ApiEndpoint::PartsInformationResult>
         const QUrl& url, const QVector<Part>& parts) const noexcept {
   auto promise = std::make_shared<QPromise<PartsInformationResult>>();
   promise->start();
-
-  auto errorCallback = [promise](const QString& errorMsg) {
-    promise->setException(Exception(errorMsg));
-    promise->finish();
-  };
 
   auto successCallback = [promise](const QByteArray& data) {
     const QJsonDocument doc = QJsonDocument::fromJson(data);
@@ -352,7 +312,11 @@ QFuture<ApiEndpoint::PartsInformationResult>
     promise->finish();
   };
 
-  // Build JSON object to be uploaded.
+  auto errorCallback = [promise](const QString& errorMsg) {
+    promise->setException(Exception(errorMsg));
+    promise->finish();
+  };
+
   QJsonArray partsArray;
   foreach (const Part& part, parts) {
     partsArray.append(QJsonObject{
@@ -364,19 +328,8 @@ QFuture<ApiEndpoint::PartsInformationResult>
       {"parts", partsArray},
   };
   const QByteArray postData = QJsonDocument(obj).toJson();
-
-  NetworkRequest* request = new NetworkRequest(url, postData);
-  request->setHeaderField("Content-Type", "application/json");
-  request->setHeaderField("Content-Length",
-                          QString::number(postData.size()).toUtf8());
-  request->setHeaderField("Accept", "application/json;charset=UTF-8");
-  request->setHeaderField("Accept-Charset", "UTF-8");
-  connect(request, &NetworkRequest::errored, this, errorCallback,
-          Qt::QueuedConnection);
-  connect(request, &NetworkRequest::dataReceived, this, successCallback,
-          Qt::QueuedConnection);
-  request->start();
-
+  startRequest(url, postData,
+               RequestFlag::Authenticated, successCallback, errorCallback);
   return promise->future();
 }
 
@@ -397,43 +350,24 @@ std::shared_ptr<ApiEndpoint> ApiEndpoint::get(const QUrl& url) noexcept {
  *  Private Methods
  ******************************************************************************/
 
-const QString& ApiEndpoint::getToken() const noexcept {
-  if (!mCachedToken) {
-    QString token;
-    const QString service = "librepcb";
-    const QString user = mUrl.toString();
-    if (!rs::ffi_keyring_get_password(&service, &user, &token)) {
-      qWarning() << "No authentication token found for" << mUrl;
-    }
-    mCachedToken = token;
-  }
-  return *mCachedToken;
-}
-
 QFuture<ApiEndpoint::Library> ApiEndpoint::requestLibraries(
     const QUrl& url, bool forceNoCache,
     std::shared_ptr<QPromise<Library>> promise) noexcept {
-  NetworkRequest* request = new NetworkRequest(url);
-  request->setHeaderField("Accept", "application/json;charset=UTF-8");
-  request->setHeaderField("Accept-Charset", "UTF-8");
-  if (forceNoCache) {
-    request->setCacheLoadControl(QNetworkRequest::AlwaysNetwork);
-  }
-  connect(
-      request, &NetworkRequest::errored, this,
-      [promise](const QString& errorMsg) {
-        promise->setException(Exception(errorMsg));
-        promise->finish();
-      },
-      Qt::QueuedConnection);
-  connect(
-      request, &NetworkRequest::dataReceived, this,
-      [this, promise, forceNoCache](const QByteArray& data) {
-        libraryListResponseReceived(data, forceNoCache, promise);
-      },
-      Qt::QueuedConnection);
-  request->start();
+  auto successCallback = [this, forceNoCache, promise](const QByteArray& data) {
+libraryListResponseReceived(data, forceNoCache, promise);
+  };
 
+  auto errorCallback = [promise](const QString& errorMsg) {
+    promise->setException(Exception(errorMsg));
+    promise->finish();
+  };
+
+  RequestFlags flags = RequestFlag::Authenticated;
+  if (forceNoCache) {
+    flags |= RequestFlag::ForceNoCache;
+  }
+  startRequest(url, QByteArray(),
+               RequestFlag::Authenticated, successCallback, errorCallback);
   return promise->future();
 }
 
@@ -504,6 +438,58 @@ void ApiEndpoint::libraryListResponseReceived(
     promise->addResult(lib);
   }
   promise->finish();
+}
+
+template <typename SuccessFunctor, typename ErrorFunctor>
+std::unique_ptr<NetworkRequest> ApiEndpoint::startRequest(
+    const QUrl& url, const QByteArray& postData, RequestFlags flags,
+    SuccessFunctor successCallback, ErrorFunctor errorCallback) const noexcept {
+  auto request = std::make_unique<NetworkRequest>(url, postData);
+  if (flags.testFlag(RequestFlag::Authenticated)) {
+    if (auto header = getAuthorizationHeader()) {
+      request->setHeaderField("Authorization", *header);
+    }
+  }
+  if (!postData.isNull()) {
+    request->setHeaderField("Content-Type", "application/json");
+    request->setHeaderField("Content-Length",
+                            QString::number(postData.size()).toUtf8());
+  }
+  request->setHeaderField("Accept", "application/json;charset=UTF-8");
+  request->setHeaderField("Accept-Charset", "UTF-8");
+  if (flags.testFlag(RequestFlag::ForceNoCache)) {
+    request->setCacheLoadControl(QNetworkRequest::AlwaysNetwork);
+  }
+  connect(request.get(), &NetworkRequest::dataReceived, this, successCallback,
+          Qt::QueuedConnection);
+  connect(request.get(), &NetworkRequest::errored, this, errorCallback,
+          Qt::QueuedConnection);
+  request->start();
+  return request;
+}
+
+const std::optional<QByteArray>& ApiEndpoint::getAuthorizationHeader()
+    const noexcept {
+  if (!mCachedAuthorizationHeader) {
+    QString token;
+    const QString service = "librepcb";
+    const QString user = mUrl.toString();
+    if (!rs::ffi_keyring_get_password(&service, &user, &token)) {
+      qWarning() << "No authentication token found for" << mUrl;
+    }
+    const QString re = "\\A[-a-zA-Z0-9._~+=/]{20,2048}\\z";
+    if (QRegularExpression(re)  // NOLINT
+            .match(token, 0, QRegularExpression::PartialPreferCompleteMatch)
+            .hasMatch()) {
+      mCachedAuthorizationHeader = std::optional<QByteArray>(token.toUtf8());
+    } else if (!token.isEmpty()) {
+      mCachedAuthorizationHeader = std::optional<QByteArray>();
+      qWarning().nospace() << "Found an authorization token in the keyring, "
+                              "but it didn't match our validation regex "
+                           << re << ".";
+    }
+  }
+  return *mCachedAuthorizationHeader;
 }
 
 /*******************************************************************************
