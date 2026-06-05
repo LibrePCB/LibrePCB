@@ -101,6 +101,7 @@ private:  // Methods
                               const ApiEndpoint::OAuthTokenResult& result,
                               const QString& deviceCode, int intervalMs,
                               qint64 timeoutAtMs) noexcept;
+  void requestMissingUserData() noexcept;
 
 private:  // Data
   const WorkspaceSettings& mSettings;
