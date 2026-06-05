@@ -55,6 +55,8 @@ void ApiEndpointListModelLegacy::setValues(
   beginResetModel();
   mValues = values;
   endResetModel();
+
+  requestMissingUserData();
 }
 
 /*******************************************************************************
@@ -129,12 +131,10 @@ void ApiEndpointListModelLegacy::logInOut(
     return;
   }
   const WorkspaceSettings::ApiEndpoint& value = mValues.at(row);
-  if (!value.url.isValid()) {
+  std::shared_ptr<ApiEndpoint> ep = ApiEndpoint::get(value.url);
+  if ((!value.url.isValid()) || (!ep)) {
     return;
   }
-
-  std::shared_ptr<ApiEndpoint> ep = ApiEndpoint::get(value.url);
-  Q_ASSERT(ep);
 
   if (ep->hasCredentials()) {
     // Log out
@@ -209,6 +209,29 @@ void ApiEndpointListModelLegacy::handleOAuthTokenResult(
 
   emit dataChanged(index(0, COLUMN_USER),
                    index(mValues.count() - 1, COLUMN_USER));
+
+  requestMissingUserData();
+}
+
+void ApiEndpointListModelLegacy::requestMissingUserData() noexcept {
+  for (const WorkspaceSettings::ApiEndpoint& value : std::as_const(mValues)) {
+    if (auto ep = ApiEndpoint::get(value.url)) {
+      if ((ep->hasCredentials()) && (!ep->getCachedUserResult())) {
+        ep->requestUser()
+            .then(this,
+                  [this](const ApiEndpoint::UserResult& result) {
+                    Q_UNUSED(result);
+                    emit dataChanged(index(0, COLUMN_USER),
+                                     index(mValues.count() - 1, COLUMN_USER));
+                  })
+            .onFailed(this, [this](const ApiEndpoint::Exception& e) {
+              Q_UNUSED(e);
+              emit dataChanged(index(0, COLUMN_USER),
+                               index(mValues.count() - 1, COLUMN_USER));
+            });
+      }
+    }
+  }
 }
 
 /*******************************************************************************
@@ -300,16 +323,43 @@ QVariant ApiEndpointListModelLegacy::data(const QModelIndex& index,
     case COLUMN_USER: {
       auto ep =
           (item && item->url.isValid()) ? ApiEndpoint::get(item->url) : nullptr;
+      QString userEmail, loginError;
+      if (ep) {
+        if (auto variant = ep->getCachedUserResult()) {
+          if (auto data = std::get_if<ApiEndpoint::UserResult>(&(*variant))) {
+            userEmail = data->email;
+          } else if (auto err = std::get_if<QString>(&(*variant))) {
+            loginError = *err;
+          } else {
+            loginError = "LogicError";
+          }
+        }
+      }
       switch (role) {
         case Qt::DisplayRole:
-          if (item) {
-            return (ep && ep->hasCredentials()) ? tr("Logged In")
-                                                : (tr("Log In") % " →");
+          if (!userEmail.isEmpty()) {
+            return userEmail;
+          } else if (!loginError.isEmpty()) {
+            return tr("Login failed");
+          } else if (ep && ep->hasCredentials()) {
+            return "Checking...";
+          } else if (ep) {
+            return tr("Log In") + " →";
+          } else {
+            return QVariant();
+          }
+        case Qt::ToolTipRole:
+          if (!loginError.isEmpty()) {
+            return loginError;
           } else {
             return QVariant();
           }
         case Qt::ForegroundRole:
-          if (ep && (!ep->hasCredentials())) {
+          if (!userEmail.isEmpty()) {
+            return QBrush(Qt::green);
+          } else if (!loginError.isEmpty()) {
+            return QBrush(Qt::red);
+          } else if (ep && (!ep->hasCredentials())) {
             QColor color = qApp->palette().text().color();
             color.setAlpha(128);
             return QBrush(color);
@@ -392,6 +442,7 @@ bool ApiEndpointListModelLegacy::setData(const QModelIndex& itemIndex,
       mNewUrl = url;
     } else if (url.isValid()) {
       item->url = url;
+      requestMissingUserData();
     }
   } else if ((itemIndex.column() == COLUMN_LIBRARIES) &&
              (role == Qt::CheckStateRole) && item) {

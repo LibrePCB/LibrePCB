@@ -35,8 +35,6 @@
  ******************************************************************************/
 namespace librepcb {
 
-class NetworkRequest;
-
 /*******************************************************************************
  *  Class ApiEndpoint
  ******************************************************************************/
@@ -130,7 +128,6 @@ public:
   };
   Q_DECLARE_FLAGS(RequestFlags, RequestFlag)
 
-
   // Constructors / Destructor
   ApiEndpoint() = delete;
   ApiEndpoint(const ApiEndpoint& other) = delete;
@@ -139,6 +136,10 @@ public:
 
   // Getters
   const QUrl& getUrl() const noexcept { return mUrl; }
+  const std::optional<std::variant<UserResult, QString>>& getCachedUserResult()
+      const noexcept {
+    return mCachedUserResult;
+  }
 
   // Credentials
   bool hasCredentials() const noexcept;
@@ -169,16 +170,16 @@ private:  // Methods
   void libraryListResponseReceived(
       const QByteArray& data, bool forceNoCache,
       std::shared_ptr<QPromise<Library>> promise) noexcept;
-  template <typename SuccessFunctor, typename ErrorFunctor>
-  std::unique_ptr<NetworkRequest> startRequest(
-      const QUrl& url, const QByteArray& postData,
-      RequestFlags flags,
-      SuccessFunctor successCallback, ErrorFunctor errorCallback) const noexcept;
+  void startRequest(
+      const QUrl& url, const QByteArray& postData, RequestFlags flags,
+      const std::function<void(const QByteArray&)>& successCallback,
+      const std::function<void(const QString&)>& errorCallback) const noexcept;
   const std::optional<QByteArray>& getAuthorizationHeader() const noexcept;
 
 private:  // Data
   QUrl mUrl;
   mutable std::optional<std::optional<QByteArray>> mCachedAuthorizationHeader;
+  mutable std::optional<std::variant<UserResult, QString>> mCachedUserResult;
 
   static QMutex sInstancesMutex;
   static QHash<QUrl, std::shared_ptr<ApiEndpoint>> sInstances;

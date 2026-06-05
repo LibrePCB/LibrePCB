@@ -483,39 +483,43 @@ void LibrariesModel::requestOnlineLibraries(bool forceNoCache) noexcept {
   mOnlineLibsErrors.clear();
   for (const WorkspaceSettings::ApiEndpoint& ep :
        mWorkspace.getSettings().apiEndpoints.get()) {
-    if (ep.url.isValid() && ep.useForLibraries &&
-        (!mLibrariesInProgress.contains(ep.url))) {
-      std::shared_ptr<ApiEndpoint> repo = ApiEndpoint::get(ep.url);
-      auto future = repo->requestLibraries(forceNoCache);
-      future
-          .then(this,
-                [this, url = ep.url](QFuture<ApiEndpoint::Library> future) {
-                  QHash<Uuid, Version> versions;
-                  foreach (const auto& lib, future.results()) {
-                    const Uuid uuid = lib.uuid;
-                    mOnlineLibs.insert(uuid, lib);
-                    versions.insert(uuid, lib.version);
-                  }
-                  updateMergedLibraries();
-                  emit onlineVersionsAvailable(versions);
-
-                  // Must come after updateMergedLibraries(), for the
-                  // auto-update.
-                  apiEndpointOperationFinished(url);
-
-                  if (mRequestIcons) {
-                    requestMissingOnlineIcons();
-                  }
-                })
-          .onFailed([this, url = ep.url](const ApiEndpoint::Exception& e) {
-            mOnlineLibsErrors.append(
-                tr("Failed to fetch libraries from '%1': %2")
-                    .arg(url.toString(), e.getMsg()));
-            apiEndpointOperationFinished(url);
-            emit uiDataChanged(getUiData());
-          });
-      mLibrariesInProgress.insert(ep.url, future);
+    if ((!ep.url.isValid()) || (!ep.useForLibraries) ||
+        (mLibrariesInProgress.contains(ep.url))) {
+      continue;
     }
+    std::shared_ptr<ApiEndpoint> repo = ApiEndpoint::get(ep.url);
+    if (!repo) {
+      continue;
+    }
+
+    auto future = repo->requestLibraries(forceNoCache);
+    future
+        .then(this,
+              [this, url = ep.url](QFuture<ApiEndpoint::Library> future) {
+                QHash<Uuid, Version> versions;
+                foreach (const auto& lib, future.results()) {
+                  const Uuid uuid = lib.uuid;
+                  mOnlineLibs.insert(uuid, lib);
+                  versions.insert(uuid, lib.version);
+                }
+                updateMergedLibraries();
+                emit onlineVersionsAvailable(versions);
+
+                // Must come after updateMergedLibraries(), for the
+                // auto-update.
+                apiEndpointOperationFinished(url);
+
+                if (mRequestIcons) {
+                  requestMissingOnlineIcons();
+                }
+              })
+        .onFailed([this, url = ep.url](const ApiEndpoint::Exception& e) {
+          mOnlineLibsErrors.append(tr("Failed to fetch libraries from '%1': %2")
+                                       .arg(url.toString(), e.getMsg()));
+          apiEndpointOperationFinished(url);
+          emit uiDataChanged(getUiData());
+        });
+    mLibrariesInProgress.insert(ep.url, future);
   }
   if (!mLibrariesInProgress.isEmpty()) {
     emit uiDataChanged(getUiData());

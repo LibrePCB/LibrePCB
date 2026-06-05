@@ -66,6 +66,7 @@ bool ApiEndpoint::deleteCredentials() noexcept {
                          << mUrl.toString() << ".";
   }
   mCachedAuthorizationHeader = std::nullopt;
+  mCachedUserResult = std::nullopt;
   return success;
 }
 
@@ -79,6 +80,7 @@ bool ApiEndpoint::setCredentials(const QString& accessToken) noexcept {
                          << ".";
   }
   mCachedAuthorizationHeader = std::nullopt;
+  mCachedUserResult = std::nullopt;
   return success;
 }
 
@@ -185,10 +187,12 @@ QFuture<ApiEndpoint::UserResult> ApiEndpoint::requestUser() noexcept {
   auto promise = std::make_shared<QPromise<UserResult>>();
   promise->start();
 
-  auto successCallback = [promise](const QByteArray& data) {
+  auto successCallback = [this, promise](const QByteArray& data) {
     const QJsonDocument doc = QJsonDocument::fromJson(data);
     if (doc.isNull() || doc.isEmpty() || (!doc.isObject())) {
-      promise->setException(Exception("Received JSON object is not valid."));
+      const QString msg = "Received JSON object is not valid.";
+      mCachedUserResult = msg;
+      promise->setException(Exception(msg));
       promise->finish();
       return;
     }
@@ -197,15 +201,18 @@ QFuture<ApiEndpoint::UserResult> ApiEndpoint::requestUser() noexcept {
         obj["email"].toString(),
     };
     if (!result.email.isEmpty()) {
+      mCachedUserResult = result;
       promise->addResult(result);
     } else {
-      promise->setException(
-          Exception("Received invalid user response from server."));
+      const QString msg = "Received invalid user response from server.";
+      mCachedUserResult = msg;
+      promise->setException(Exception(msg));
     }
     promise->finish();
   };
 
-  auto errorCallback = [promise](const QString& errorMsg) {
+  auto errorCallback = [this, promise](const QString& errorMsg) {
+    mCachedUserResult = errorMsg;
     promise->setException(Exception(errorMsg));
     promise->finish();
   };
@@ -328,8 +335,8 @@ QFuture<ApiEndpoint::PartsInformationResult>
       {"parts", partsArray},
   };
   const QByteArray postData = QJsonDocument(obj).toJson();
-  startRequest(url, postData,
-               RequestFlag::Authenticated, successCallback, errorCallback);
+  startRequest(url, postData, RequestFlag::Authenticated, successCallback,
+               errorCallback);
   return promise->future();
 }
 
@@ -338,6 +345,10 @@ QFuture<ApiEndpoint::PartsInformationResult>
  ******************************************************************************/
 
 std::shared_ptr<ApiEndpoint> ApiEndpoint::get(const QUrl& url) noexcept {
+  if (!url.isValid()) {
+    return nullptr;
+  }
+
   QMutexLocker lock(&sInstancesMutex);
   auto it = sInstances.find(url);
   if (it == sInstances.end()) {
@@ -354,7 +365,7 @@ QFuture<ApiEndpoint::Library> ApiEndpoint::requestLibraries(
     const QUrl& url, bool forceNoCache,
     std::shared_ptr<QPromise<Library>> promise) noexcept {
   auto successCallback = [this, forceNoCache, promise](const QByteArray& data) {
-libraryListResponseReceived(data, forceNoCache, promise);
+    libraryListResponseReceived(data, forceNoCache, promise);
   };
 
   auto errorCallback = [promise](const QString& errorMsg) {
@@ -366,8 +377,8 @@ libraryListResponseReceived(data, forceNoCache, promise);
   if (forceNoCache) {
     flags |= RequestFlag::ForceNoCache;
   }
-  startRequest(url, QByteArray(),
-               RequestFlag::Authenticated, successCallback, errorCallback);
+  startRequest(url, QByteArray(), RequestFlag::Authenticated, successCallback,
+               errorCallback);
   return promise->future();
 }
 
@@ -440,11 +451,11 @@ void ApiEndpoint::libraryListResponseReceived(
   promise->finish();
 }
 
-template <typename SuccessFunctor, typename ErrorFunctor>
-std::unique_ptr<NetworkRequest> ApiEndpoint::startRequest(
+void ApiEndpoint::startRequest(
     const QUrl& url, const QByteArray& postData, RequestFlags flags,
-    SuccessFunctor successCallback, ErrorFunctor errorCallback) const noexcept {
-  auto request = std::make_unique<NetworkRequest>(url, postData);
+    const std::function<void(const QByteArray&)>& successCallback,
+    const std::function<void(const QString&)>& errorCallback) const noexcept {
+  NetworkRequest* request = new NetworkRequest(url, postData);
   if (flags.testFlag(RequestFlag::Authenticated)) {
     if (auto header = getAuthorizationHeader()) {
       request->setHeaderField("Authorization", *header);
@@ -460,34 +471,39 @@ std::unique_ptr<NetworkRequest> ApiEndpoint::startRequest(
   if (flags.testFlag(RequestFlag::ForceNoCache)) {
     request->setCacheLoadControl(QNetworkRequest::AlwaysNetwork);
   }
-  connect(request.get(), &NetworkRequest::dataReceived, this, successCallback,
+  connect(request, &NetworkRequest::dataReceived, this, successCallback,
           Qt::QueuedConnection);
-  connect(request.get(), &NetworkRequest::errored, this, errorCallback,
+  connect(request, &NetworkRequest::errored, this, errorCallback,
           Qt::QueuedConnection);
   request->start();
-  return request;
 }
 
 const std::optional<QByteArray>& ApiEndpoint::getAuthorizationHeader()
     const noexcept {
-  if (!mCachedAuthorizationHeader) {
+  if (!mCachedAuthorizationHeader.has_value()) {
     QString token;
     const QString service = "librepcb";
     const QString user = mUrl.toString();
-    if (!rs::ffi_keyring_get_password(&service, &user, &token)) {
-      qWarning() << "No authentication token found for" << mUrl;
-    }
+    std::ignore = rs::ffi_keyring_get_password(&service, &user, &token);
+    std::optional<QByteArray> header;
     const QString re = "\\A[-a-zA-Z0-9._~+=/]{20,2048}\\z";
     if (QRegularExpression(re)  // NOLINT
             .match(token, 0, QRegularExpression::PartialPreferCompleteMatch)
             .hasMatch()) {
-      mCachedAuthorizationHeader = std::optional<QByteArray>(token.toUtf8());
+      header = "Bearer " + token.toUtf8();
+      qInfo().nospace() << "Valid authentication token found for "
+                        << mUrl.toString()
+                        << ", using it for further requests.";
     } else if (!token.isEmpty()) {
-      mCachedAuthorizationHeader = std::optional<QByteArray>();
-      qWarning().nospace() << "Found an authorization token in the keyring, "
-                              "but it didn't match our validation regex "
-                           << re << ".";
+      qWarning().nospace()
+          << "Found an authorization token for " << mUrl.toString()
+          << " in the keyring, but it didn't match our validation regex " << re
+          << ".";
+    } else {
+      qInfo().nospace() << "No authentication token found for "
+                        << mUrl.toString() << ", will make anonymous requests.";
     }
+    mCachedAuthorizationHeader = header;
   }
   return *mCachedAuthorizationHeader;
 }
