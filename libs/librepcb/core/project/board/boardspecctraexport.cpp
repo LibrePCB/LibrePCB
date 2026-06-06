@@ -37,6 +37,7 @@
 #include "../project.h"
 #include "../projectlibrary.h"
 #include "board.h"
+#include "boarddesignrules.h"
 #include "drc/boarddesignrulechecksettings.h"
 #include "items/bi_device.h"
 #include "items/bi_hole.h"
@@ -56,6 +57,30 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
+
+/*******************************************************************************
+ *  Struct ViaData
+ ******************************************************************************/
+
+BoardSpecctraExport::ViaData::ViaData(const BI_Via& via) noexcept
+  : drill(via.getActualDrillDiameter()),
+    autoDrill(!via.getDrillDiameter()),
+    size(via.getActualSize()),
+    autoSize(!via.getSize()),
+    startLayer(via.getVia().getStartLayer()),
+    endLayer(via.getVia().getEndLayer()),
+    exposureConfig(via.getVia().getExposureConfig()) {
+}
+
+BoardSpecctraExport::ViaData::ViaData(const BoardDesignRules& rules) noexcept
+  : drill(rules.getDefaultViaDrillDiameter()),
+    autoDrill(true),
+    size(Via::calcSizeFromRules(drill, rules.getViaAnnularRing())),
+    autoSize(true),
+    startLayer(Layer::topCopper()),
+    endLayer(Layer::botCopper()),
+    exposureConfig(MaskConfig::off()) {
+}
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -81,6 +106,9 @@ QByteArray BoardSpecctraExport::generate() const {
       addToPadStacks(viaPadStacks, genWiringPadStack(*via));
     }
   }
+  // Important: Always add a via pad stack from the default settings. Without
+  // any via in the DSN file, FreeRouting won't route anything at all.
+  addToPadStacks(viaPadStacks, genWiringPadStack(mBoard.getDesignRules()));
   // Sort for a more natural order of vias.
   QCollator collator;
   collator.setLocale(QLocale::c());  // Important for locale-independent output.
@@ -626,7 +654,7 @@ std::unique_ptr<SExpression> BoardSpecctraExport::genWiring() const {
 }
 
 std::unique_ptr<SExpression> BoardSpecctraExport::genWiringPadStack(
-    const BI_Via& via) const {
+    const ViaData& via) const {
   std::unique_ptr<SExpression> root = SExpression::createList("padstack");
   root->appendChild(getWiringPadStackId(via));
   QList<const Layer*> layers = Toolbox::sortedQSet(
@@ -634,10 +662,10 @@ std::unique_ptr<SExpression> BoardSpecctraExport::genWiringPadStack(
         return a->getCopperNumber() < b->getCopperNumber();
       });
   for (const Layer* layer : std::as_const(layers)) {
-    if (via.getVia().isOnLayer(*layer)) {
+    if (Via::isOnLayer(*layer, via.startLayer, via.endLayer)) {
       root->ensureLineBreak();
       auto& node = root->appendList("shape");
-      node.appendChild(toCircle(layer->getId(), via.getActualSize()));
+      node.appendChild(toCircle(layer->getId(), via.size));
     }
   }
   root->ensureLineBreak();
@@ -646,7 +674,7 @@ std::unique_ptr<SExpression> BoardSpecctraExport::genWiringPadStack(
   return root;
 }
 
-QString BoardSpecctraExport::getWiringPadStackId(const BI_Via& via) const {
+QString BoardSpecctraExport::getWiringPadStackId(const ViaData& via) const {
   auto getLayerName = [](const Layer& l) {
     if (l == Layer::topCopper()) {
       return QString("top");
@@ -661,26 +689,24 @@ QString BoardSpecctraExport::getWiringPadStackId(const BI_Via& via) const {
   // CmdBoardSpecctraImport::extractViaSize() and
   // CmdBoardSpecctraImport::extractViaExposureConfig().
   QString s = "via";
-  if (auto drill = via.getDrillDiameter()) {
-    s += "-" % (*drill)->toMmString();
-  } else {
-    s += "-" % via.getActualDrillDiameter()->toMmString() % ":auto";
+  s += "-" % via.drill->toMmString();
+  if (via.autoDrill) {
+    s += ":auto";
   }
-  if (auto size = via.getSize()) {
-    s += "-" % (*size)->toMmString();
-  } else {
-    s += "-" % via.getActualSize()->toMmString() % ":auto";
+  s += "-" % via.size->toMmString();
+  if (via.autoSize) {
+    s += ":auto";
   }
-  if (via.getVia().isThrough()) {
+  if ((via.startLayer == Layer::topCopper()) &&
+      (via.endLayer == Layer::botCopper())) {
     s += "-tht";
   } else {
     s += QString("-%1:%2").arg(
-        getLayerName(via.getVia().getStartLayer())
-            .arg(getLayerName(via.getVia().getEndLayer())));
+        getLayerName(via.startLayer).arg(getLayerName(via.endLayer)));
   }
-  if (auto offset = via.getVia().getExposureConfig().getOffset()) {
+  if (auto offset = via.exposureConfig.getOffset()) {
     s += QString("-exposed:%1").arg(offset->toMmString());
-  } else if (via.getVia().getExposureConfig().isEnabled()) {
+  } else if (via.exposureConfig.isEnabled()) {
     s += "-exposed";
   }
   return s;
