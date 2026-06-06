@@ -235,11 +235,14 @@ CmdBoardSpecctraImport::CmdBoardSpecctraImport(
     }
     for (const SExpression* wireNode : netNode->getChildren("wire")) {
       for (const SExpression* pathNode : wireNode->getChildren("path")) {
-        QList<const SExpression*> children =
-            pathNode->getChildren(SExpression::Type::Token);
+        QList<const SExpression*> children = pathNode->getChildren(
+            SExpression::Type::Token | SExpression::Type::String);
         if ((children.count() < 2) || ((children.count() % 2) != 0)) {
           throw RuntimeError(__FILE__, __LINE__,
-                             "Unexpected number of vertices in path element.");
+                             QString("Unexpected number of vertices (%1) in "
+                                     "wire path of net '%2'.")
+                                 .arg(children.count())
+                                 .arg(net.netName));
         }
         WireOut wire{deserialize<const Layer*>(*children.at(0)),
                      parseLength(*children.at(1), resolution),

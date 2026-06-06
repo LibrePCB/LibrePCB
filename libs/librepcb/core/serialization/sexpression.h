@@ -75,12 +75,13 @@ public:
     LibrePCB,  ///< LibrePCB syntax (very strict)
     Permissive,  ///< Compatibility with other tools (very permissive)
   };
-  enum class Type {
-    List,  ///< has a tag name and an arbitrary number of children
-    Token,  ///< values without quotes (e.g. `-12.34`)
-    String,  ///< values with double quotes (e.g. `"Foo!"`)
-    LineBreak,  ///< manual line break inside a List
+  enum class Type : uint32_t {
+    List = (1 << 0),  ///< has a tag name and an arbitrary number of children
+    Token = (1 << 1),  ///< values without quotes (e.g. `-12.34`)
+    String = (1 << 2),  ///< values with double quotes (e.g. `"Foo!"`)
+    LineBreak = (1 << 3),  ///< manual line break inside a List
   };
+  Q_DECLARE_FLAGS(TypeFilter, Type)
 
   // Constructors / Destructor
   SExpression() noexcept;
@@ -100,8 +101,8 @@ public:
   bool containsChild(const SExpression& child) const noexcept;
   SExpression& getChild(int index);
   const SExpression& getChild(int index) const;
-  const QList<SExpression*> getChildren(Type type) noexcept;
-  const QList<const SExpression*> getChildren(Type type) const noexcept;
+  const QList<SExpression*> getChildren(TypeFilter types) noexcept;
+  const QList<const SExpression*> getChildren(TypeFilter types) const noexcept;
   const QList<SExpression*> getChildren(const QString& name) noexcept;
   const QList<const SExpression*> getChildren(
       const QString& name) const noexcept;
@@ -253,5 +254,7 @@ uint qHash(const std::unique_ptr<SExpression>& ptr, uint seed = 0) noexcept;
  ******************************************************************************/
 
 }  // namespace librepcb
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(librepcb::SExpression::TypeFilter)
 
 #endif
