@@ -54,6 +54,10 @@ class BackgroundImageSetupDialog final : public QDialog,
 
 public:
   // Types
+  enum class Mode {
+    Footprint,
+    Board,
+  };
   enum class State {
     Idle,
     Crop,
@@ -65,7 +69,7 @@ public:
   // Constructors / Destructor
   BackgroundImageSetupDialog() = delete;
   BackgroundImageSetupDialog(const BackgroundImageSetupDialog& other) = delete;
-  explicit BackgroundImageSetupDialog(const QString& settingsPrefix,
+  explicit BackgroundImageSetupDialog(Mode mode, const QString& settingsPrefix,
                                       QWidget* parent = nullptr) noexcept;
   ~BackgroundImageSetupDialog() noexcept override;
 
@@ -102,6 +106,7 @@ private:
   static QImage cropImage(const QImage& img, const QPainterPath& p) noexcept;
 
   QScopedPointer<Ui::BackgroundImageSetupDialog> mUi;
+  const Mode mMode;
   const QString mSettingsPrefix;
 
   // State
