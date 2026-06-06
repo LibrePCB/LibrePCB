@@ -92,10 +92,10 @@ const SExpression& SExpression::getChild(int index) const {
   return *mChildren.at(index);
 }
 
-const QList<SExpression*> SExpression::getChildren(Type type) noexcept {
+const QList<SExpression*> SExpression::getChildren(TypeFilter types) noexcept {
   QList<SExpression*> children;
   for (const auto& child : mChildren) {
-    if (child->getType() == type) {
+    if (types.testFlag(child->getType())) {
       children.append(child.get());
     }
   }
@@ -103,10 +103,10 @@ const QList<SExpression*> SExpression::getChildren(Type type) noexcept {
 }
 
 const QList<const SExpression*> SExpression::getChildren(
-    Type type) const noexcept {
+    TypeFilter types) const noexcept {
   QList<const SExpression*> children;
   for (const auto& child : mChildren) {
-    if (child->getType() == type) {
+    if (types.testFlag(child->getType())) {
       children.append(child.get());
     }
   }

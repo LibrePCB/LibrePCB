@@ -41,16 +41,25 @@ namespace editor {
 namespace tests {
 
 /*******************************************************************************
+ *  Test Data Type
+ ******************************************************************************/
+
+typedef struct {
+  const char* sesFileName;
+} TestData;
+
+/*******************************************************************************
  *  Test Class
  ******************************************************************************/
 
-class CmdBoardSpecctraImportTest : public ::testing::Test {};
+class CmdBoardSpecctraImportTest : public ::testing::TestWithParam<TestData> {};
 
 /*******************************************************************************
  *  Test Methods
  ******************************************************************************/
 
-TEST_F(CmdBoardSpecctraImportTest, test) {
+TEST_P(CmdBoardSpecctraImportTest, test) {
+  const TestData& data = GetParam();
   FilePath testDataDir(TEST_DATA_DIR
                        "/unittests/librepcbproject/BoardSpecctraExportTest");
 
@@ -64,7 +73,7 @@ TEST_F(CmdBoardSpecctraImportTest, test) {
                   projectFp.getFilename());  // can throw
 
   // Load SES.
-  const FilePath fp = testDataDir.getPathTo("session.ses");
+  const FilePath fp = testDataDir.getPathTo(data.sesFileName);
   std::unique_ptr<SExpression> root = SExpression::parse(
       FileUtils::readFile(fp), fp, SExpression::Mode::Permissive);
 
@@ -75,6 +84,16 @@ TEST_F(CmdBoardSpecctraImportTest, test) {
   const bool ret = imp.execute();
   EXPECT_TRUE(ret);
 }
+
+/*******************************************************************************
+ *  Test Data
+ ******************************************************************************/
+
+// NOLINTNEXTLINE
+INSTANTIATE_TEST_SUITE_P(
+    CmdBoardSpecctraImportTest, CmdBoardSpecctraImportTest,
+    ::testing::Values(TestData({"session_freerouting_old.ses"}),
+                      TestData({"session_freerouting_2.4.0.ses"})));
 
 /*******************************************************************************
  *  End of File
