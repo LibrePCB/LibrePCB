@@ -1,0 +1,42 @@
+import {
+    Button,
+    ComboBox,
+    IconButton,
+} from "../../widgets.slint";
+import {
+    Backend,
+    Board2dTabData,
+    TabAction,
+    WindowSectionData,
+} from "../../api.slint";
+
+export component AutorouterToolBar inherits HorizontalLayout {
+    in property <int> section-index;
+    in-out property <WindowSectionData> section;
+    property <[Board2dTabData]> tabs: section.board-2d-tabs;
+
+    spacing: 2px;
+
+    router-cbx := ComboBox {
+        model: ["FreeRouting (local)", "FreeRouting 2.4.0 (online)"];
+        current-index: 1;
+    }
+
+    //router-refresh-btn := IconButton {
+    //    icon: @image-url("../../../../font-awesome/svgs/solid/arrow-rotate-left.svg");
+    //    icon-scale: 0.7;
+    //}
+
+    cancel-btn := Button {
+        text: @tr("Cancel");
+    }
+
+    start-btn := Button {
+        text: @tr("Start");
+        primary: true;
+
+        clicked => {
+            Backend.trigger-tab(section-index, section.current-tab-index, TabAction.board-autorouter-start);
+        }
+    }
+}

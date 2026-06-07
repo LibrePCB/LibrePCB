@@ -181,6 +181,7 @@ public:
   void fsmToolEnter(BoardEditorState_DrawZone& state) noexcept override;
   void fsmToolEnter(BoardEditorState_AddHole& state) noexcept override;
   void fsmToolEnter(BoardEditorState_AddDevice& state) noexcept override;
+  void fsmToolEnter(BoardEditorState_Autorouter& state) noexcept override;
   void fsmToolEnter(BoardEditorState_Measure& state) noexcept override;
 
   // Operator Overloadings
@@ -206,6 +207,7 @@ signals:
   void saveViaDrillInBoardRequested();
   void saveViaDrillInNetClassRequested();
   void autoAddPlaneRequested();
+  void autorouterStartRequested();
 
 private:
   void updateEnabledCopperLayers() noexcept;

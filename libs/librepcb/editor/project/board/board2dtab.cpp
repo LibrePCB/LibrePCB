@@ -49,6 +49,7 @@
 #include "fsm/boardeditorstate_addpad.h"
 #include "fsm/boardeditorstate_addstroketext.h"
 #include "fsm/boardeditorstate_addvia.h"
+#include "fsm/boardeditorstate_autorouter.h"
 #include "fsm/boardeditorstate_drawplane.h"
 #include "fsm/boardeditorstate_drawpolygon.h"
 #include "fsm/boardeditorstate_drawtrace.h"
@@ -945,6 +946,10 @@ void Board2dTab::trigger(ui::TabAction a) noexcept {
       emit autoAddPlaneRequested();  // Connected to current FSM state.
       break;
     }
+    case ui::TabAction::BoardAutorouterStart: {
+      emit autorouterStartRequested();  // Connected to current FSM state.
+      break;
+    }
     case ui::TabAction::ToolSelect: {
       mFsm->processSelect();
       break;
@@ -1007,6 +1012,10 @@ void Board2dTab::trigger(ui::TabAction a) noexcept {
     }
     case ui::TabAction::ToolHole: {
       mFsm->processAddHole();
+      break;
+    }
+    case ui::TabAction::ToolAutorouter: {
+      mFsm->processOpenAutorouter();
       break;
     }
     case ui::TabAction::ToolMeasure: {
@@ -1885,6 +1894,17 @@ void Board2dTab::fsmToolEnter(BoardEditorState_AddDevice& state) noexcept {
   Q_UNUSED(state);
 
   mTool = ui::EditorTool::Component;
+  onDerivedUiDataChanged.notify();
+}
+
+void Board2dTab::fsmToolEnter(BoardEditorState_Autorouter& state) noexcept {
+  mTool = ui::EditorTool::Autorouter;
+
+  // Start
+  mFsmStateConnections.append(
+      connect(this, &Board2dTab::autorouterStartRequested, &state,
+              &BoardEditorState_Autorouter::start));
+
   onDerivedUiDataChanged.notify();
 }
 

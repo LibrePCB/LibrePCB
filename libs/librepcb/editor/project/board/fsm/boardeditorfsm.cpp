@@ -27,6 +27,7 @@
 #include "boardeditorstate_addpad.h"
 #include "boardeditorstate_addstroketext.h"
 #include "boardeditorstate_addvia.h"
+#include "boardeditorstate_autorouter.h"
 #include "boardeditorstate_drawplane.h"
 #include "boardeditorstate_drawpolygon.h"
 #include "boardeditorstate_drawtrace.h"
@@ -94,6 +95,7 @@ BoardEditorFsm::BoardEditorFsm(const Context& context, QObject* parent) noexcept
   mStates.insert(State::DRAW_PLANE, new BoardEditorState_DrawPlane(context));
   mStates.insert(State::DRAW_ZONE, new BoardEditorState_DrawZone(context));
   mStates.insert(State::DRAW_TRACE, new BoardEditorState_DrawTrace(context));
+  mStates.insert(State::AUTOROUTER, new BoardEditorState_Autorouter(context));
   mStates.insert(State::MEASURE, new BoardEditorState_Measure(context));
 
   enterNextState(State::SELECT);
@@ -186,6 +188,10 @@ bool BoardEditorFsm::processDrawZone() noexcept {
 
 bool BoardEditorFsm::processDrawTrace() noexcept {
   return setNextState(State::DRAW_TRACE);
+}
+
+bool BoardEditorFsm::processOpenAutorouter() noexcept {
+  return setNextState(State::AUTOROUTER);
 }
 
 bool BoardEditorFsm::processImportDxf() noexcept {

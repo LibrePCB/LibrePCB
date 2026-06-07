@@ -1,4 +1,5 @@
 import { DrawTraceToolBar } from "drawtracetoolbar.slint";
+import { AutorouterToolBar } from "autoroutertoolbar.slint";
 import { AddPadToolBar } from "addpadtoolbar.slint";
 import { AddViaToolBar } from "addviatoolbar.slint";
 import { DrawPolygonToolBar } from "drawpolygontoolbar.slint";
@@ -132,6 +133,11 @@ export component Board2dTab inherits Tab {
                 section-index: section-index;
                 section: section;
                 show-via-size: root.width > 755px;
+            }
+
+            if tabs[index].tool == EditorTool.autorouter: autorouter-toolbar := AutorouterToolBar {
+                section-index: section-index;
+                section: section;
             }
 
             if tabs[index].tool == EditorTool.via: via-toolbar := AddViaToolBar {
@@ -422,10 +428,31 @@ export component Board2dTab inherits Tab {
             tool-trace-btn := ToolButton {
                 cmd: Cmd.tool-trace;
                 icon: @image-url("../../../../../img/actions/draw_wire.png");
-                checked: tabs[index].tool == EditorTool.wire;
+                has-menu: true;
+                checked: (tabs[index].tool == EditorTool.wire) || (tabs[index].tool == EditorTool.autorouter);
 
                 clicked => {
                     tool-triggered(TabAction.tool-wire);
+                }
+
+                right-clicked => {
+                    trace-popup.show();
+                }
+
+                trace-popup := MenuPopup {
+                    x: parent.width + 5px;
+                    y: 0;
+
+                    tool-trace-autorouter-item := MenuItem {
+                        //cmd: Cmd.tool-autorouter;
+                        text: @tr("Autorouter");
+                        icon: @image-url("../../../../../img/actions/wizard.png");
+                        icon-color: transparent;  // Do not colorize.
+
+                        clicked => {
+                            Backend.trigger-tab(section-index, index, TabAction.tool-autorouter);
+                        }
+                    }
                 }
             }
 

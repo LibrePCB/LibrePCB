@@ -50,6 +50,7 @@ class BoardEditorState_AddHole;
 class BoardEditorState_AddPad;
 class BoardEditorState_AddStrokeText;
 class BoardEditorState_AddVia;
+class BoardEditorState_Autorouter;
 class BoardEditorState_DrawPlane;
 class BoardEditorState_DrawPolygon;
 class BoardEditorState_DrawTrace;
@@ -123,6 +124,7 @@ public:
   virtual void fsmToolEnter(BoardEditorState_DrawZone& state) noexcept = 0;
   virtual void fsmToolEnter(BoardEditorState_AddHole& state) noexcept = 0;
   virtual void fsmToolEnter(BoardEditorState_AddDevice& state) noexcept = 0;
+  virtual void fsmToolEnter(BoardEditorState_Autorouter& state) noexcept = 0;
   virtual void fsmToolEnter(BoardEditorState_Measure& state) noexcept = 0;
 };
 

@@ -91,6 +91,8 @@ public:
     DRAW_ZONE,
     /// ::librepcb::editor::BoardEditorState_DrawTrace
     DRAW_TRACE,
+    /// ::librepcb::editor::BoardEditorState_Autorouter
+    AUTOROUTER,
     /// ::librepcb::editor::BoardEditorState_Measure
     MEASURE,
   };
@@ -128,6 +130,7 @@ public:
   bool processDrawPlane() noexcept;
   bool processDrawZone() noexcept;
   bool processDrawTrace() noexcept;
+  bool processOpenAutorouter() noexcept;
   bool processImportDxf() noexcept;
   bool processMeasure() noexcept;
   bool processAbortCommand() noexcept;

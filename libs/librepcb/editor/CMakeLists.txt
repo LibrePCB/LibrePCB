@@ -481,6 +481,8 @@ add_library(
   project/board/fsm/boardeditorstate_addstroketext.h
   project/board/fsm/boardeditorstate_addvia.cpp
   project/board/fsm/boardeditorstate_addvia.h
+  project/board/fsm/boardeditorstate_autorouter.cpp
+  project/board/fsm/boardeditorstate_autorouter.h
   project/board/fsm/boardeditorstate_drawplane.cpp
   project/board/fsm/boardeditorstate_drawplane.h
   project/board/fsm/boardeditorstate_drawpolygon.cpp
