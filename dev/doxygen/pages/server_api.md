@@ -212,11 +212,88 @@ contain valid data, if the requested resource is also available anonymously.
 
 Following resources are available:
 
-| Path           | Description                           |
-|----------------|---------------------------------------|
-| [/libraries]   | Fetch list of available libraries     |
-| [/order]       | Upload a project to start ordering it |
-| [/parts]       | Request live information about parts  |
+| Path         | Description                           |
+|--------------|---------------------------------------|
+| [/autoroute] | Autoroute a board                     |
+| [/libraries] | Fetch list of available libraries     |
+| [/order]     | Upload a project to start ordering it |
+| [/parts]     | Request live information about parts  |
+
+
+## Autoroute {#doc_server_api_resources_autoroute}
+
+### Example
+
+**Initial Request:**
+
+~~~{.sh}
+curl 'https://api.example.com/api/v1/autoroute'
+~~~
+
+**Initial Response:**
+
+~~~{.json}
+{
+  "routers": [
+    {
+      "id": "freerouting",
+      "name": "FreeRouting 2.4.0",
+      "deprecated": false,
+      "operational": true,
+      "unlock_url": null,
+    }
+  ]
+}
+~~~
+
+**Start Request:**
+
+~~~{.sh}
+curl -X POST -H "Content-Type: application/json" \
+     -d '{"router": "freerouting", "project": "My Project", "dsn": "<BASE64 DSN>"}' \
+     'https://api.example.com/autoroute'
+~~~
+
+**Start Response:**
+
+Same as the status response.
+
+**Status Request:**
+
+~~~{.sh}
+curl 'https://api.example.com/autoroute/42'
+~~~
+
+**Status Response (Running):**
+
+~~~{.json}
+{
+  "job_id": 42,
+  "status": "running",
+  "progress": 99,
+  "interval": 5
+}
+~~~
+
+**Status Response (Finished):**
+
+~~~{.json}
+{
+  "job_id": 42,
+  "status": "finished",
+  "ses": "<BASE64_SES>"
+}
+~~~
+
+**Cancel Request:**
+
+~~~{.sh}
+curl -X DELETE 'https://api.example.com/autoroute/42'
+~~~
+
+**Cancel Response:**
+
+HTTP 200
 
 
 ## Libraries {#doc_server_api_resources_libraries}
