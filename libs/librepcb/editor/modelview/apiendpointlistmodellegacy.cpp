@@ -340,7 +340,7 @@ QVariant ApiEndpointListModelLegacy::data(const QModelIndex& index,
           if (!userEmail.isEmpty()) {
             return userEmail;
           } else if (!loginError.isEmpty()) {
-            return tr("Login failed");
+            return tr("Login failed, see tooltip");
           } else if (ep && ep->hasCredentials()) {
             return "Checking...";
           } else if (ep) {

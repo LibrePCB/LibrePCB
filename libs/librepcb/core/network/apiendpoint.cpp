@@ -219,7 +219,7 @@ QFuture<ApiEndpoint::UserResult> ApiEndpoint::requestUser() noexcept {
     promise->finish();
   };
 
-  startRequest(QUrl(mUrl.toString() % "/api/v1/autoroute"), QByteArray(),
+  startRequest(QUrl(mUrl.toString() % "/api/v1/user"), QByteArray(),
                RequestFlag::Authenticated, successCallback, errorCallback);
   return promise->future();
 }
