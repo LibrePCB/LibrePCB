@@ -25,6 +25,7 @@
 #include "../../../undostack.h"
 #include "../../cmd/cmdboardspecctraimport.h"
 
+#include <librepcb/core/autorouter/onlineautorouter.h>
 #include <librepcb/core/project/board/boardspecctraexport.h>
 #include <librepcb/core/utils/messagelogger.h>
 #include <librepcb/core/workspace/workspace.h>
@@ -94,8 +95,7 @@ bool BoardEditorState_Autorouter::exit() noexcept {
   while (!mStatusRequests.isEmpty()) {
     mStatusRequests.takeLast().cancel();
   }
-  mCurrentPollRequest.cancel();
-  mCurrentPollRequest = {};
+  mAutorouter.reset();
   mAdapter.fsmToolLeave();
   return true;
 }
@@ -123,8 +123,7 @@ void BoardEditorState_Autorouter::setRouterId(const QString& id) noexcept {
 
 void BoardEditorState_Autorouter::start() noexcept {
   qDebug() << "start";
-  mCurrentPollRequest.cancel();
-  mCurrentPollRequest = {};
+  mAutorouter.reset();
 
   const Router* router = nullptr;
   for (auto& obj : mRouters) {
@@ -145,16 +144,11 @@ void BoardEditorState_Autorouter::start() noexcept {
   try {
     BoardSpecctraExport dsnExport(mContext.board);
     const QByteArray dsn = dsnExport.generate();  // can throw
-
-    mCurrentPollRequest = ep->requestAutorouteStart(router->id, dsn);
-    mCurrentPollRequest
-        .then(this,
-              [this, ep](const ApiEndpoint::AutorouteJobResult& result) {
-                jobStatusReceived(ep, result);
-              })
-        .onFailed(this, [this](const ApiEndpoint::Exception& e) {
-          // TODO
-        });
+    mAutorouter = std::make_unique<OnlineAutorouter>(
+        ep, router->id, std::make_shared<MessageLogger>());
+    connect(mAutorouter.get(), &Autorouter::statusNotification, this,
+            &BoardEditorState_Autorouter::statusReceived);
+    mAutorouter->start(dsn);
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
   }
@@ -164,30 +158,22 @@ void BoardEditorState_Autorouter::start() noexcept {
  *  Private Methods
  ******************************************************************************/
 
-void BoardEditorState_Autorouter::jobStatusReceived(
-    const std::shared_ptr<ApiEndpoint>& ep,
-    const ApiEndpoint::AutorouteJobResult& result) noexcept {
-  if (result.status == "finished") {
-    qInfo() << "Finished:" << result.ses;
-    std::unique_ptr<SExpression> root = SExpression::parse(
-        result.ses, FilePath(), SExpression::Mode::Permissive);  // can throw
-    mContext.undoStack.execCmd(new CmdBoardSpecctraImport(
-        mContext.board, *root,
-        std::make_shared<MessageLogger>()));  // can throw
-  } else {
-    qInfo() << "Status:" << result.jobId << result.status << result.progress;
-    QTimer::singleShot(
-        result.interval * 1000, this, [this, ep, jobId = result.jobId]() {
-          mCurrentPollRequest = ep->requestAutorouteStatus(jobId);
-          mCurrentPollRequest
-              .then(this,
-                    [this, ep](const ApiEndpoint::AutorouteJobResult& result) {
-                      jobStatusReceived(ep, result);
-                    })
-              .onFailed(this, [this](const ApiEndpoint::Exception& e) {
-                // TODO
-              });
-        });
+void BoardEditorState_Autorouter::statusReceived(
+    const Autorouter::Status& status) noexcept {
+  if (status.state == Autorouter::State::Succeeded) {
+    try {
+      std::unique_ptr<SExpression> root = SExpression::parse(
+          status.ses, FilePath(), SExpression::Mode::Permissive);  // can throw
+      mContext.undoStack.execCmd(new CmdBoardSpecctraImport(
+          mContext.board, *root,
+          std::make_shared<MessageLogger>()));  // can throw
+    } catch (const Exception& e) {
+      // TODO
+    }
+  }
+
+  if (status.state != Autorouter::State::Running) {
+    mAutorouter.reset();
   }
 }
 

@@ -60,11 +60,14 @@ public:
   OnlineAutorouter& operator=(const OnlineAutorouter& rhs) = delete;
 
 private:
+  void setFuture(const QFuture<ApiEndpoint::AutorouteJobResult>& f) noexcept;
   void handleStatus(const ApiEndpoint::AutorouteJobResult& result) noexcept;
   void handleFailure(const ApiEndpoint::Exception& e) noexcept;
 
   const std::shared_ptr<ApiEndpoint> mEndpoint;
   const QString mRouterId;
+  QString mJobId;
+  std::unique_ptr<QTimer> mPollTimer;
   QFuture<ApiEndpoint::AutorouteJobResult> mPollRequest;
 };
 

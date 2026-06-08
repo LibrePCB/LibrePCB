@@ -25,6 +25,7 @@
  ******************************************************************************/
 #include "boardeditorstate.h"
 
+#include <librepcb/core/autorouter/autorouter.h>
 #include <librepcb/core/network/apiendpoint.h>
 
 #include <QtCore>
@@ -82,16 +83,13 @@ signals:
   void routersChanged(const QVector<Router>& routers);
   void routerChanged(const QString& id);
 
-private:  // Methods
-  void jobStatusReceived(
-      const std::shared_ptr<ApiEndpoint>& ep,
-      const ApiEndpoint::AutorouteJobResult& result) noexcept;
+private:
+  void statusReceived(const Autorouter::Status& status) noexcept;
 
-private:  // Data
   QVector<Router> mRouters;
   QString mRouterId;
   QVector<QFuture<ApiEndpoint::AutorouteInfoResult>> mStatusRequests;
-  QFuture<ApiEndpoint::AutorouteJobResult> mCurrentPollRequest;
+  std::unique_ptr<Autorouter> mAutorouter;
 };
 
 /*******************************************************************************

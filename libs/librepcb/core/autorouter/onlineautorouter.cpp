@@ -36,11 +36,19 @@ namespace librepcb {
 OnlineAutorouter::OnlineAutorouter(
     const std::shared_ptr<ApiEndpoint>& ep, const QString& routerId,
     const std::shared_ptr<MessageLogger>& logger) noexcept
-  : Autorouter(logger), mEndpoint(ep), mRouterId(routerId) {
+  : Autorouter(logger),
+    mEndpoint(ep),
+    mRouterId(routerId),
+    mPollTimer(new QTimer(this)) {
   Q_ASSERT(mEndpoint);
+  mPollTimer->setSingleShot(true);
+  connect(mPollTimer.get(), &QTimer::timeout, this,
+          [this]() { setFuture(mEndpoint->requestAutorouteStatus(mJobId)); });
 }
 
 OnlineAutorouter::~OnlineAutorouter() noexcept {
+  mPollRequest.cancel();
+  mPollRequest = {};
 }
 
 /*******************************************************************************
@@ -50,6 +58,7 @@ OnlineAutorouter::~OnlineAutorouter() noexcept {
 void OnlineAutorouter::start(const QByteArray& dsn) noexcept {
   mPollRequest.cancel();
   mPollRequest = {};
+  mJobId.clear();
 
   emit statusNotification(Status{
       State::Running,
@@ -60,22 +69,19 @@ void OnlineAutorouter::start(const QByteArray& dsn) noexcept {
 
   mLogger->info(
       tr("Sending DSN to '%1'...").arg(mEndpoint->getUrl().toString()));
-  mPollRequest = mEndpoint->requestAutorouteStart(mRouterId, dsn);
-  mPollRequest
-      .then(this,
-            std::bind(&OnlineAutorouter::handleStatus, this,
-                      std::placeholders::_1))
-      .onFailed(this,
-                std::bind(&OnlineAutorouter::handleFailure, this,
-                          std::placeholders::_1));
+  setFuture(mEndpoint->requestAutorouteStart(mRouterId, dsn));
 }
 
 void OnlineAutorouter::cancel() noexcept {
+  mPollTimer->stop();
   mPollRequest.cancel();
   mPollRequest = {};
+  mJobId.clear();
+
+  mLogger->info(tr("Job cancelled."));
   emit statusNotification(Status{
       State::Canceled,
-      0,
+      100,
       QByteArray(),
       QString(),
   });
@@ -85,27 +91,52 @@ void OnlineAutorouter::cancel() noexcept {
  *  Private Methods
  ******************************************************************************/
 
+void OnlineAutorouter::setFuture(
+    const QFuture<ApiEndpoint::AutorouteJobResult>& f) noexcept {
+  mPollRequest = f;
+  mPollRequest
+      .then(this,
+            [this](const ApiEndpoint::AutorouteJobResult& result) {
+              handleStatus(result);
+            })
+      .onFailed(this,
+                [this](const ApiEndpoint::Exception& e) { handleFailure(e); });
+}
+
 void OnlineAutorouter::handleStatus(
     const ApiEndpoint::AutorouteJobResult& result) noexcept {
+  if (mJobId.isEmpty()) {
+    mJobId = result.jobId;
+    mLogger->debug(tr("Job ID: %1").arg(mJobId));
+  }
+
   if (result.status == "finished") {
-    qInfo() << "Finished:" << result.ses;
+    mLogger->info(tr("Job succeeded!"));
+    emit statusNotification(Status{
+        State::Succeeded,
+        100,
+        result.ses,
+        QString(),
+    });
   } else {
-    qInfo() << "Status:" << result.jobId << result.status << result.progress;
-    QTimer::singleShot(
-        result.interval * 1000, this, [this, jobId = result.jobId]() {
-          mPollRequest = mEndpoint->requestAutorouteStatus(jobId);
-          mPollRequest
-              .then(this,
-                    std::bind(&OnlineAutorouter::handleStatus, this,
-                              std::placeholders::_1))
-              .onFailed(this,
-                        std::bind(&OnlineAutorouter::handleFailure, this,
-                                  std::placeholders::_1));
-        });
+    mLogger->debug(tr("Progress: %1%%").arg(result.progress));
+    mPollTimer->start(result.interval * 1000);
   }
 }
 
 void OnlineAutorouter::handleFailure(const ApiEndpoint::Exception& e) noexcept {
+  mPollRequest.cancel();
+  mPollRequest = {};
+  mJobId.clear();
+
+  const QString msg = tr("API call failed: %1").arg(e.getMsg());
+  mLogger->critical(msg);
+  emit statusNotification(Status{
+      State::Failed,
+      100,
+      QByteArray(),
+      msg,
+  });
 }
 
 /*******************************************************************************
