@@ -21,7 +21,12 @@
  *  Includes
  ******************************************************************************/
 #include "boardeditorstate_autorouter.h"
-
+#include "../../../undostack.h"
+#include <librepcb/core/project/board/boardspecctraexport.h>
+#include <librepcb/core/workspace/workspace.h>
+#include <librepcb/core/workspace/workspacesettings.h>
+#include "../../cmd/cmdboardspecctraimport.h"
+#include <librepcb/core/utils/messagelogger.h>
 #include <QtCore>
 
 /*******************************************************************************
@@ -47,11 +52,47 @@ BoardEditorState_Autorouter::~BoardEditorState_Autorouter() noexcept {
  ******************************************************************************/
 
 bool BoardEditorState_Autorouter::entry() noexcept {
+  mRouters.clear();
+  for (const WorkspaceSettings::ApiEndpoint& cfg :
+       mContext.workspace.getSettings().apiEndpoints.get()) {
+    if (auto ep = ApiEndpoint::get(cfg.url)) {
+      auto future = ep->requestAutorouteInfo();
+      future
+          .then(this,
+                [this, url = cfg.url](
+                    const ApiEndpoint::AutorouteInfoResult& result) {
+                  for (const auto& router : result.routers) {
+                    mRouters.append(Router{
+                        url,
+                        router.id,
+                        url.toString() % "|" % router.id,
+                        router.name,
+                    });
+                  }
+                  if (!result.routers.isEmpty()) {
+                    emit routersChanged(mRouters);
+                  }
+                  if (mRouterId.isEmpty() && (!mRouters.isEmpty())) {
+                    setRouterId(mRouters.first().uniqueId);
+                  }
+                })
+          .onFailed(this, [this](const ApiEndpoint::Exception& e) {
+            // TODO
+          });
+      mStatusRequests.append(future);
+    }
+  }
+
   mAdapter.fsmToolEnter(*this);
   return true;
 }
 
 bool BoardEditorState_Autorouter::exit() noexcept {
+  while (!mStatusRequests.isEmpty()) {
+    mStatusRequests.takeLast().cancel();
+  }
+  mCurrentPollRequest.cancel();
+  mCurrentPollRequest = {};
   mAdapter.fsmToolLeave();
   return true;
 }
@@ -68,12 +109,81 @@ bool BoardEditorState_Autorouter::processAbortCommand() noexcept {
  *  Connection to UI
  ******************************************************************************/
 
+void BoardEditorState_Autorouter::setRouterId(const QString& id) noexcept {
+  if (id == mRouterId) {
+    return;
+  }
+
+  mRouterId = id;
+  emit routerChanged(mRouterId);
+}
+
 void BoardEditorState_Autorouter::start() noexcept {
+  qDebug() << "start";
+  mCurrentPollRequest.cancel();
+  mCurrentPollRequest = {};
+
+  const Router* router = nullptr;
+  for (auto& obj : mRouters) {
+    if (obj.uniqueId == mRouterId) {
+      router = &obj;
+      break;
+    }
+  }
+  if (!router) {
+    return;
+  }
+
+  std::shared_ptr<ApiEndpoint> ep = ApiEndpoint::get(router->endpoint);
+  if (!ep) {
+    return;
+  }
+
+  try {
+    BoardSpecctraExport dsnExport(mContext.board);
+    const QByteArray dsn = dsnExport.generate();  // can throw
+
+    mCurrentPollRequest = ep->requestAutorouteStart(router->id, dsn);
+    mCurrentPollRequest
+        .then(this,
+              [this, ep](const ApiEndpoint::AutorouteJobResult& result) {
+                jobStatusReceived(ep, result);
+              })
+        .onFailed(this, [this](const ApiEndpoint::Exception& e) {
+          // TODO
+        });
+  } catch (const Exception& e) {
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
+  }
 }
 
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
+
+void BoardEditorState_Autorouter::jobStatusReceived(
+    const std::shared_ptr<ApiEndpoint>& ep,
+    const ApiEndpoint::AutorouteJobResult& result) noexcept {
+  if (result.status == "finished") {
+    qInfo() << "Finished:" << result.ses;
+    std::unique_ptr<SExpression> root = SExpression::parse(result.ses, FilePath(), SExpression::Mode::Permissive); // can throw
+    mContext.undoStack.execCmd(new CmdBoardSpecctraImport(mContext.board, *root, std::make_shared<MessageLogger>()));// can throw
+  } else {
+    qInfo() << "Status:" << result.jobId << result.status << result.progress;
+    QTimer::singleShot(
+        result.interval * 1000, this, [this, ep, jobId = result.jobId]() {
+          mCurrentPollRequest = ep->requestAutorouteStatus(jobId);
+          mCurrentPollRequest
+              .then(this,
+                    [this, ep](const ApiEndpoint::AutorouteJobResult& result) {
+                      jobStatusReceived(ep, result);
+                    })
+              .onFailed(this, [this](const ApiEndpoint::Exception& e) {
+                // TODO
+              });
+        });
+  }
+}
 
 /*******************************************************************************
  *  End of File

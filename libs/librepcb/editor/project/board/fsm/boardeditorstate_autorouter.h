@@ -25,6 +25,8 @@
  ******************************************************************************/
 #include "boardeditorstate.h"
 
+#include <librepcb/core/network/apiendpoint.h>
+
 #include <QtCore>
 
 /*******************************************************************************
@@ -44,6 +46,14 @@ class BoardEditorState_Autorouter final : public BoardEditorState {
   Q_OBJECT
 
 public:
+  // Types
+  struct Router {
+    QUrl endpoint;
+    QString id;
+    QString uniqueId;  ///< Contains URL and endpoint-specific ID
+    QString name;
+  };
+
   // Constructors / Destructor
   BoardEditorState_Autorouter() = delete;
   BoardEditorState_Autorouter(const BoardEditorState_Autorouter& other) =
@@ -59,13 +69,29 @@ public:
   bool processAbortCommand() noexcept override;
 
   // Connection to UI
+  const QVector<Router>& getRouters() const noexcept { return mRouters; }
+  const QString& getRouterId() const noexcept { return mRouterId; }
+  void setRouterId(const QString& id) noexcept;
   void start() noexcept;
 
   // Operator Overloadings
   BoardEditorState_Autorouter& operator=(
       const BoardEditorState_Autorouter& rhs) = delete;
 
+signals:
+  void routersChanged(const QVector<Router>& routers);
+  void routerChanged(const QString& id);
+
+private:  // Methods
+  void jobStatusReceived(
+      const std::shared_ptr<ApiEndpoint>& ep,
+      const ApiEndpoint::AutorouteJobResult& result) noexcept;
+
 private:  // Data
+  QVector<Router> mRouters;
+  QString mRouterId;
+  QVector<QFuture<ApiEndpoint::AutorouteInfoResult>> mStatusRequests;
+  QFuture<ApiEndpoint::AutorouteJobResult> mCurrentPollRequest;
 };
 
 /*******************************************************************************

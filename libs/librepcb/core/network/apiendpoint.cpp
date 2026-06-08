@@ -67,6 +67,7 @@ bool ApiEndpoint::deleteCredentials() noexcept {
   }
   mCachedAuthorizationHeader = std::nullopt;
   mCachedUserResult = std::nullopt;
+  mCachedAutorouteStatusResult = std::nullopt;
   return success;
 }
 
@@ -81,6 +82,7 @@ bool ApiEndpoint::setCredentials(const QString& accessToken) noexcept {
   }
   mCachedAuthorizationHeader = std::nullopt;
   mCachedUserResult = std::nullopt;
+  mCachedAutorouteStatusResult = std::nullopt;
   return success;
 }
 
@@ -217,8 +219,152 @@ QFuture<ApiEndpoint::UserResult> ApiEndpoint::requestUser() noexcept {
     promise->finish();
   };
 
-  startRequest(QUrl(mUrl.toString() % "/api/v1/user"), QByteArray(),
+  startRequest(QUrl(mUrl.toString() % "/api/v1/autoroute"), QByteArray(),
                RequestFlag::Authenticated, successCallback, errorCallback);
+  return promise->future();
+}
+
+QFuture<ApiEndpoint::AutorouteInfoResult>
+    ApiEndpoint::requestAutorouteInfo() noexcept {
+  auto promise = std::make_shared<QPromise<AutorouteInfoResult>>();
+  promise->start();
+
+  auto successCallback = [this, promise](const QByteArray& data) {
+    const QJsonDocument doc = QJsonDocument::fromJson(data);
+    if (doc.isNull() || doc.isEmpty() || (!doc.isObject())) {
+      const QString msg = "Received JSON object is not valid.";
+      mCachedAutorouteStatusResult = msg;
+      promise->setException(Exception(msg));
+      promise->finish();
+      return;
+    }
+    const QJsonObject obj = doc.object();
+    AutorouteInfoResult result{};
+    const QJsonArray routersArray = obj["routers"].toArray();
+    bool isValid = true;
+    const QRegularExpression idRe("\\A[-a-z0-9._]{3,50}\\z");
+    for (const QJsonValue& routerJson : routersArray) {
+      const QJsonObject routerObj = routerJson.toObject();
+      const Autorouter router{
+          routerObj["id"].toString(),
+          routerObj["name"].toString(),
+      };
+      if ((!idRe.match(router.id, 0,  // NOLINT
+                       QRegularExpression::PartialPreferCompleteMatch)
+                .hasMatch()) &&
+          (!router.name.isEmpty())) {
+        isValid = false;
+      }
+      result.routers.append(router);
+    }
+    if (isValid) {
+      mCachedAutorouteStatusResult = result;
+      promise->addResult(result);
+    } else {
+      const QString msg =
+          "Received invalid autoroute status response from server.";
+      mCachedAutorouteStatusResult = msg;
+      promise->setException(Exception(msg));
+    }
+    promise->finish();
+  };
+
+  auto errorCallback = [this, promise](const QString& errorMsg) {
+    mCachedAutorouteStatusResult = errorMsg;
+    promise->setException(Exception(errorMsg));
+    promise->finish();
+  };
+
+  startRequest(QUrl(mUrl.toString() % "/api/v1/autoroute"), QByteArray(),
+               RequestFlag::Authenticated, successCallback, errorCallback);
+  return promise->future();
+}
+
+QFuture<ApiEndpoint::AutorouteJobResult> ApiEndpoint::requestAutorouteStart(
+    const QString& routerId, const QByteArray& dsn) noexcept {
+  auto promise = std::make_shared<QPromise<AutorouteJobResult>>();
+  promise->start();
+
+  auto successCallback = [this, promise](const QByteArray& data) {
+    const QJsonDocument doc = QJsonDocument::fromJson(data);
+    if (doc.isNull() || doc.isEmpty() || (!doc.isObject())) {
+      const QString msg = "Received JSON object is not valid.";
+      promise->setException(Exception(msg));
+      promise->finish();
+      return;
+    }
+    const QJsonObject obj = doc.object();
+    const AutorouteJobResult result{
+        obj["job_id"].toString(),
+        obj["status"].toString(),
+        obj["progress"].toInt(),
+        obj["interval"].toDouble(),
+        QByteArray::fromBase64(obj["ses"].toString().toUtf8()),
+    };
+    if (true) {  // TODO
+      promise->addResult(result);
+    } else {
+      const QString msg =
+          "Received invalid autoroute job response from server.";
+      promise->setException(Exception(msg));
+    }
+    promise->finish();
+  };
+
+  auto errorCallback = [this, promise](const QString& errorMsg) {
+    promise->setException(Exception(errorMsg));
+    promise->finish();
+  };
+
+  const QJsonObject obj{
+      {"router", routerId},
+      {"dsn", QString(dsn.toBase64())},
+  };
+  const QByteArray postData = QJsonDocument(obj).toJson();
+  startRequest(QUrl(mUrl.toString() % "/api/v1/autoroute"), postData,
+               RequestFlag::Authenticated, successCallback, errorCallback);
+  return promise->future();
+}
+
+QFuture<ApiEndpoint::AutorouteJobResult> ApiEndpoint::requestAutorouteStatus(
+    const QString& jobId) noexcept {
+  auto promise = std::make_shared<QPromise<AutorouteJobResult>>();
+  promise->start();
+
+  auto successCallback = [this, promise](const QByteArray& data) {
+    const QJsonDocument doc = QJsonDocument::fromJson(data);
+    if (doc.isNull() || doc.isEmpty() || (!doc.isObject())) {
+      const QString msg = "Received JSON object is not valid.";
+      promise->setException(Exception(msg));
+      promise->finish();
+      return;
+    }
+    const QJsonObject obj = doc.object();
+    const AutorouteJobResult result{
+        obj["job_id"].toString(),
+        obj["status"].toString(),
+        obj["progress"].toInt(),
+        obj["interval"].toDouble(),
+        QByteArray::fromBase64(obj["ses"].toString().toUtf8()),
+    };
+    if (true) {  // TODO
+      promise->addResult(result);
+    } else {
+      const QString msg =
+          "Received invalid autoroute job response from server.";
+      promise->setException(Exception(msg));
+    }
+    promise->finish();
+  };
+
+  auto errorCallback = [this, promise](const QString& errorMsg) {
+    promise->setException(Exception(errorMsg));
+    promise->finish();
+  };
+
+  startRequest(QUrl(mUrl.toString() % "/api/v1/autoroute/" % jobId),
+               QByteArray(), RequestFlag::Authenticated, successCallback,
+               errorCallback);
   return promise->future();
 }
 

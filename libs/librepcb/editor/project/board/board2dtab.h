@@ -202,6 +202,7 @@ signals:
   void ratioRequested(const UnsignedLimitedRatio& ratio);
   void pressFitRequested(bool pressFit);
   void zoneRuleRequested(Zone::Rule rule, bool enable);
+  void routerRequested(const QString& id);
   void saveTraceWidthInBoardRequested();
   void saveTraceWidthInNetClassRequested();
   void saveViaDrillInBoardRequested();
@@ -303,6 +304,9 @@ private:
   bool mToolFiducial;
   bool mToolPressFit;  // Also used for auto via drill
   Zone::Rules mToolZoneRules;
+  QStringList mToolRoutersQt;  // IDs
+  std::shared_ptr<slint::VectorModel<slint::SharedString>> mToolRouters;
+  QString mToolRouterId;
 
   // Unplaced components
   QList<Uuid> mUnplacedComponents;

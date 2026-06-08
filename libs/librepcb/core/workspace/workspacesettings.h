@@ -68,6 +68,7 @@ public:
     bool useForLibraries = false;  ///< Can be set on 0..n endpoints
     bool useForPartsInfo = false;  ///< Can be set on 0..1 endpoints
     bool useForOrder = false;  ///< Can be set on 0..1 endpoints
+    bool useForAutoroute = false;  ///< Can be set on 0..n endpoints
 
     bool operator==(const ApiEndpoint& rhs) const noexcept = default;
   };

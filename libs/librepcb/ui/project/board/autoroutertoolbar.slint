@@ -18,8 +18,12 @@ export component AutorouterToolBar inherits HorizontalLayout {
     spacing: 2px;
 
     router-cbx := ComboBox {
-        model: ["FreeRouting (local)", "FreeRouting 2.4.0 (online)"];
-        current-index: 1;
+        model: tabs[section.current-tab-index].tool-router.items;
+        current-index: tabs[section.current-tab-index].tool-router.current-index;
+
+        current-index-changed(index) => {
+            tabs[section.current-tab-index].tool-router.current-index = index;
+        }
     }
 
     //router-refresh-btn := IconButton {

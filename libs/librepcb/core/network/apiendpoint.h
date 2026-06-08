@@ -122,6 +122,20 @@ public:
   struct PartsInformationResult {
     QVector<PartInformation> parts;
   };
+  struct Autorouter {
+    QString id;
+    QString name;
+  };
+  struct AutorouteInfoResult {
+    QVector<Autorouter> routers;
+  };
+  struct AutorouteJobResult {
+    QString jobId;
+    QString status;
+    int progress = 0;
+    double interval = 0;
+    QByteArray ses;
+  };
   enum class RequestFlag : uint32_t {
     Authenticated = (1 << 0),
     ForceNoCache = (1 << 1),
@@ -152,6 +166,11 @@ public:
   QFuture<OAuthTokenResult> requestOAuthToken(
       const QString& grantType, const QString& deviceCode) noexcept;
   QFuture<UserResult> requestUser() noexcept;
+  QFuture<AutorouteInfoResult> requestAutorouteInfo() noexcept;
+  QFuture<AutorouteJobResult> requestAutorouteStart(
+      const QString& routerId, const QByteArray& dsn) noexcept;
+  QFuture<AutorouteJobResult> requestAutorouteStatus(
+      const QString& jobId) noexcept;
   QFuture<Library> requestLibraries(bool forceNoCache = false) noexcept;
   QFuture<PartsStatusResult> requestPartsStatus() const noexcept;
   QFuture<PartsInformationResult> requestPartsInformation(
@@ -180,6 +199,8 @@ private:  // Data
   QUrl mUrl;
   mutable std::optional<std::optional<QByteArray>> mCachedAuthorizationHeader;
   mutable std::optional<std::variant<UserResult, QString>> mCachedUserResult;
+  mutable std::optional<std::variant<AutorouteInfoResult, QString>>
+      mCachedAutorouteStatusResult;
 
   static QMutex sInstancesMutex;
   static QHash<QUrl, std::shared_ptr<ApiEndpoint>> sInstances;

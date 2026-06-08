@@ -184,6 +184,7 @@ Board2dTab::Board2dTab(GuiApplication& app, BoardEditor& editor,
     mToolFiducial(false),
     mToolPressFit(false),
     mToolZoneRules(),
+    mToolRouters(std::make_shared<slint::VectorModel<slint::SharedString>>()),
     mUnplacedComponentIndex(0),
     mUnplacedComponentDeviceIndex(0),
     mUnplacedComponentPackageOwned(false),
@@ -447,6 +448,11 @@ ui::Board2dTabData Board2dTab::getDerivedUiData() const noexcept {
       mToolZoneRules.testFlag(Zone::Rule::NoPlanes),  // Tool no planes
       mToolZoneRules.testFlag(Zone::Rule::NoExposure),  // Tool no exposure
       mToolZoneRules.testFlag(Zone::Rule::NoDevices),  // Tool no devices
+      ui::ComboBoxData{
+          // Tool router
+          mToolRouters,  // Items
+          static_cast<int>(mToolRoutersQt.indexOf(mToolRouterId)),  // Current
+      },
       q2s(mSceneImagePos),  // Scene image position
       mFrameIndex,  // Frame index
       slint::SharedString(),  // Set design rules organization/rules
@@ -581,6 +587,12 @@ void Board2dTab::setDerivedUiData(const ui::Board2dTabData& data) noexcept {
   emit zoneRuleRequested(Zone::Rule::NoPlanes, data.tool_no_planes);
   emit zoneRuleRequested(Zone::Rule::NoExposure, data.tool_no_exposures);
   emit zoneRuleRequested(Zone::Rule::NoDevices, data.tool_no_devices);
+
+  // Tool router
+  const QString& router = mToolRoutersQt.value(data.tool_router.current_index);
+  if (!router.isEmpty()) {
+    emit routerRequested(router);
+  }
 
   // Set design rules
   if (!data.set_design_rules.empty()) {
@@ -1899,6 +1911,32 @@ void Board2dTab::fsmToolEnter(BoardEditorState_AddDevice& state) noexcept {
 
 void Board2dTab::fsmToolEnter(BoardEditorState_Autorouter& state) noexcept {
   mTool = ui::EditorTool::Autorouter;
+
+  // Routers
+  auto setRouters =
+      [this](const QVector<BoardEditorState_Autorouter::Router>& routers) {
+        mToolRoutersQt.clear();
+        mToolRouters->clear();
+        for (const auto& router : routers) {
+          mToolRoutersQt.append(router.uniqueId);
+          mToolRouters->push_back(q2s(router.name));
+        }
+      };
+  setRouters(state.getRouters());
+  mFsmStateConnections.append(connect(
+      &state, &BoardEditorState_Autorouter::routersChanged, this, setRouters));
+
+  // Router
+  auto setRouter = [this](const QString& id) {
+    mToolRouterId = id;
+    onDerivedUiDataChanged.notify();
+  };
+  setRouter(state.getRouterId());
+  mFsmStateConnections.append(connect(
+      &state, &BoardEditorState_Autorouter::routerChanged, this, setRouter));
+  mFsmStateConnections.append(
+      connect(this, &Board2dTab::routerRequested, &state,
+              &BoardEditorState_Autorouter::setRouterId));
 
   // Start
   mFsmStateConnections.append(
