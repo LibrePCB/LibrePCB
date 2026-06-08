@@ -23,6 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../types/maskconfig.h"
 #include "../../types/point.h"
 
 #include <QtCore>
@@ -41,6 +42,7 @@ class BI_NetSegment;
 class BI_Pad;
 class BI_Via;
 class Board;
+class BoardDesignRules;
 class Hole;
 class Layer;
 class Path;
@@ -56,6 +58,30 @@ class SExpression;
  */
 class BoardSpecctraExport final : public QObject {
   Q_OBJECT
+
+  struct ViaData {
+    PositiveLength drill;
+    bool autoDrill;
+    PositiveLength size;
+    bool autoSize;
+    const Layer& startLayer;
+    const Layer& endLayer;
+    MaskConfig exposureConfig;
+
+    /**
+     * @brief Construct via data from an existing via on the board
+     *
+     * @param via Existing via.
+     */
+    ViaData(const BI_Via& via) noexcept;
+
+    /**
+     * @brief Construct via data for the default via settings of a board
+     *
+     * @param rules Board design rules to derive the default via data from.
+     */
+    ViaData(const BoardDesignRules& rules) noexcept;
+  };
 
 public:
   // Constructors / Destructor
@@ -88,8 +114,8 @@ private:
   std::unique_ptr<SExpression> genLibraryPadStack(const BI_Pad& pad) const;
   std::unique_ptr<SExpression> genNetwork() const;
   std::unique_ptr<SExpression> genWiring() const;
-  std::unique_ptr<SExpression> genWiringPadStack(const BI_Via& via) const;
-  QString getWiringPadStackId(const BI_Via& via) const;
+  std::unique_ptr<SExpression> genWiringPadStack(const ViaData& via) const;
+  QString getWiringPadStackId(const ViaData& via) const;
 
   template <typename THole>
   std::unique_ptr<SExpression> toKeepout(const QString& id,
