@@ -21,7 +21,7 @@
  *  Includes
  ******************************************************************************/
 #include "board2dtab.h"
-#include "../../notificationsmodel.h"
+
 #include "../../dialogs/backgroundimagesetupdialog.h"
 #include "../../dialogs/filedialog.h"
 #include "../../editorcommandset.h"
@@ -31,6 +31,7 @@
 #include "../../guiapplication.h"
 #include "../../library/libraryelementcache.h"
 #include "../../library/pkg/footprintgraphicsitem.h"
+#include "../../notificationsmodel.h"
 #include "../../undostack.h"
 #include "../../utils/editortoolbox.h"
 #include "../../utils/slinthelpers.h"
@@ -1255,7 +1256,8 @@ void Board2dTab::fsmCrossProbe(
   }
 }
 
-void Board2dTab::fsmPushNotification(const std::shared_ptr<Notification>& notification) noexcept {
+void Board2dTab::fsmPushNotification(
+    const std::shared_ptr<Notification>& notification) noexcept {
   mApp.getNotifications().push(notification);
 }
 

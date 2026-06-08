@@ -166,7 +166,8 @@ public:
       const QSet<const ComponentSignalInstance*>& cmpSignals = {},
       GraphicsLayer::State selfProbedState =
           GraphicsLayer::State::Highlighted) noexcept override;
-  void fsmPushNotification(const std::shared_ptr<Notification>& notification) noexcept override;
+  void fsmPushNotification(
+      const std::shared_ptr<Notification>& notification) noexcept override;
   void fsmAbortBlockingToolsInOtherEditors() noexcept override;
   void fsmSetStatusBarMessage(const QString& message,
                               int timeoutMs = -1) noexcept override;

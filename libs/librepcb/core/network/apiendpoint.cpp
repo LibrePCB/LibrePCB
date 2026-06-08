@@ -127,6 +127,8 @@ QFuture<ApiEndpoint::OAuthDeviceCodeResult> ApiEndpoint::requestOAuthDeviceCode(
     promise->finish();
   };
 
+  // TODO: Switch to application/x-www-form-urlencoded
+  // https://github.com/MicrosoftDocs/entra-docs/blob/main/docs/identity-platform/v2-oauth2-device-code.md
   const QJsonObject obj{
       {"client_id", clientId},
       {"label", label},
@@ -175,7 +177,10 @@ QFuture<ApiEndpoint::OAuthTokenResult> ApiEndpoint::requestOAuthToken(
     promise->finish();
   };
 
+  // TODO: Switch to application/x-www-form-urlencoded
+  // https://github.com/MicrosoftDocs/entra-docs/blob/main/docs/identity-platform/v2-oauth2-device-code.md
   const QJsonObject obj{
+      // TODO: Add client_id
       {"grant_type", grantType},
       {"device_code", deviceCode},
   };
