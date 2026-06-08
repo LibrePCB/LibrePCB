@@ -102,9 +102,10 @@ static std::shared_ptr<QWidget> createReferenceWidget(
  ******************************************************************************/
 
 BackgroundImageSetupDialog::BackgroundImageSetupDialog(
-    const QString& settingsPrefix, QWidget* parent) noexcept
+    Mode mode, const QString& settingsPrefix, QWidget* parent) noexcept
   : QDialog(parent),
     mUi(new Ui::BackgroundImageSetupDialog),
+    mMode(mode),
     mSettingsPrefix(settingsPrefix % "/background_image_dialog"),
     mState(State::Idle),
     mImage(),
@@ -464,18 +465,28 @@ void BackgroundImageSetupDialog::updateUi(QString msg) noexcept {
 
   // Show message if no image available to display.
   if (msg.isEmpty() && (!valid)) {
-    msg = "<p>" %
-        tr("This tool allows you to set a background image (typically a "
-           "datasheet drawing) in the footprint editor to easily verify the "
-           "size &amp; position of footprint pads etc. Note that the image "
-           "won't appear on the board, it's only visible in the footprint "
-           "editor.") %
-        "</p>";
+    if (mMode == Mode::Board) {
+      msg = "<p>" %
+          tr("This tool allows you to set a background image (typically a PCB "
+             "scan) in the board editor to easily verify or reproduce an "
+             "existing printed circuit board. Note that the image is "
+             "exclusively visible in the board editor, not in any exported "
+             "files.") %
+          "</p>";
+    } else {
+      msg = "<p>" %
+          tr("This tool allows you to set a background image (typically a "
+             "datasheet drawing) in the footprint editor to easily verify the "
+             "size &amp; position of footprint pads etc. Note that the image "
+             "won't appear on the board, it's only visible in the footprint "
+             "editor.") %
+          "</p>";
+    }
     msg += "<ol>";
     QStringList lines;
     lines.append(tr("Load an image with one of the buttons on the left side."));
     lines.append(
-        tr("Draw a line around the footprint to cut out the relevant area."));
+        tr("Draw a line around the area of interest to crop the image."));
     lines.append(tr("Rotate/mirror the image."));
     lines.append(
         tr("Specify two reference points to calculate X/Y scale & offset."));
@@ -543,11 +554,10 @@ void BackgroundImageSetupDialog::updateStatusMsg() noexcept {
     addStep(1);
     lines.append(
         tr("Crop the image by drawing a line with the cursor around the "
-           "footprint (single click to skip)."));
+           "area of interest (single click to skip)."));
   } else if (mState == State::Rotate) {
     addStep(2);
-    lines.append(tr(
-        "Rotate/mirror the image to match the orientation of the footprint."));
+    lines.append(tr("Rotate/mirror the image to get the desired orientation."));
   } else if (mState == State::SelectRef1) {
     addStep(3);
     lines.append(

@@ -2750,7 +2750,8 @@ bool PackageTab::toggleBackgroundImage() noexcept {
     mBackgroundImageSettings.enabled = false;
   } else {
     // Show dialog.
-    BackgroundImageSetupDialog dlg("package_editor", getWindow());
+    BackgroundImageSetupDialog dlg(BackgroundImageSetupDialog::Mode::Footprint,
+                                   "package_editor", getWindow());
     if (!mBackgroundImageSettings.image.isNull()) {
       dlg.setData(mBackgroundImageSettings.image,
                   mBackgroundImageSettings.rotation,

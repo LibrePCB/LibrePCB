@@ -2750,7 +2750,8 @@ bool Board2dTab::toggleBackgroundImage() noexcept {
     mBackgroundImageSettings.enabled = false;
   } else {
     // Show dialog.
-    BackgroundImageSetupDialog dlg("board_editor", getWindow());
+    BackgroundImageSetupDialog dlg(BackgroundImageSetupDialog::Mode::Board,
+                                   "board_editor", getWindow());
     if (!mBackgroundImageSettings.image.isNull()) {
       dlg.setData(mBackgroundImageSettings.image,
                   mBackgroundImageSettings.rotation,
