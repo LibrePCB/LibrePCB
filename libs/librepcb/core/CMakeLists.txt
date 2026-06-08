@@ -104,6 +104,10 @@ add_library(
   attribute/attrtypestring.h
   attribute/attrtypevoltage.cpp
   attribute/attrtypevoltage.h
+  autorouter/autorouter.cpp
+  autorouter/autorouter.h
+  autorouter/onlineautorouter.cpp
+  autorouter/onlineautorouter.h
   debug.cpp
   debug.h
   exceptions.cpp

@@ -21,12 +21,15 @@
  *  Includes
  ******************************************************************************/
 #include "boardeditorstate_autorouter.h"
+
 #include "../../../undostack.h"
+#include "../../cmd/cmdboardspecctraimport.h"
+
 #include <librepcb/core/project/board/boardspecctraexport.h>
+#include <librepcb/core/utils/messagelogger.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacesettings.h>
-#include "../../cmd/cmdboardspecctraimport.h"
-#include <librepcb/core/utils/messagelogger.h>
+
 #include <QtCore>
 
 /*******************************************************************************
@@ -166,8 +169,11 @@ void BoardEditorState_Autorouter::jobStatusReceived(
     const ApiEndpoint::AutorouteJobResult& result) noexcept {
   if (result.status == "finished") {
     qInfo() << "Finished:" << result.ses;
-    std::unique_ptr<SExpression> root = SExpression::parse(result.ses, FilePath(), SExpression::Mode::Permissive); // can throw
-    mContext.undoStack.execCmd(new CmdBoardSpecctraImport(mContext.board, *root, std::make_shared<MessageLogger>()));// can throw
+    std::unique_ptr<SExpression> root = SExpression::parse(
+        result.ses, FilePath(), SExpression::Mode::Permissive);  // can throw
+    mContext.undoStack.execCmd(new CmdBoardSpecctraImport(
+        mContext.board, *root,
+        std::make_shared<MessageLogger>()));  // can throw
   } else {
     qInfo() << "Status:" << result.jobId << result.status << result.progress;
     QTimer::singleShot(
