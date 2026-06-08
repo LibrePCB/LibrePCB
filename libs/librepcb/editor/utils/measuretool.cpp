@@ -417,7 +417,7 @@ void MeasureTool::updateStatusBarMessage() noexcept {
       EditorCommandSet::instance().remove.getKeySequences();
   const QString disableSnapNote = " " %
       tr("(press %1 to disable snap)")
-          .arg(QCoreApplication::translate("QShortcut", "Shift"));
+          .arg(EditorToolbox::modifierKeyText(Qt::ShiftModifier));
 
   if (mEndPos && (!copyKeys.isEmpty()) && (!deleteKeys.isEmpty())) {
     emit statusBarMessageChanged(

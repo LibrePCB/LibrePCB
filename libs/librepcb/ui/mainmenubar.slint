@@ -431,10 +431,8 @@ export component MainMenuBar {
                 }
 
                 cut-item := MenuItem {
-                    text: @tr("Cut");
+                    cmd: Cmd.clipboard-cut;
                     icon: @image-url("../../font-awesome/svgs/solid/scissors.svg");
-                    status-tip: @tr("Cut the selected object(s) to clipboard");
-                    shortcuts: "Ctrl+X";
                     enabled: Data.current-tab.features.cut == FeatureState.enabled;
 
                     clicked => {
@@ -444,10 +442,8 @@ export component MainMenuBar {
                 }
 
                 copy-item := MenuItem {
-                    text: @tr("Copy");
+                    cmd: Cmd.clipboard-copy;
                     icon: @image-url("../../font-awesome/svgs/regular/copy.svg");
-                    status-tip: @tr("Copy the selected object(s) to clipboard");
-                    shortcuts: "Ctrl+C";
                     enabled: Data.current-tab.features.copy == FeatureState.enabled;
 
                     clicked => {
@@ -457,10 +453,8 @@ export component MainMenuBar {
                 }
 
                 paste-item := MenuItem {
-                    text: @tr("Paste");
+                    cmd: Cmd.clipboard-paste;
                     icon: @image-url("../../font-awesome/svgs/solid/paste.svg");
-                    status-tip: @tr("Paste object(s) from the clipboard");
-                    shortcuts: "Ctrl+V";
                     enabled: Data.current-tab.features.paste == FeatureState.enabled;
 
                     clicked => {
