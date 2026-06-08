@@ -80,6 +80,22 @@ public:
   static bool isSystemThemeDark() noexcept;
 
   /**
+   * @brief Get the platform-specific display text for a keyboard modifier
+   *
+   * Intended for messages which refer to a modifier key (e.g. "press Ctrl to
+   * ..."). On macOS, the corresponding symbol (e.g. "⌘" for Control) is
+   * returned to match the native look & feel and the key which is actually
+   * used (the Command key is mapped to Qt::ControlModifier on macOS, while
+   * the physical Control key does not trigger the action). On other platforms,
+   * the textual name (e.g. "Ctrl") is returned.
+   *
+   * @param modifier  The keyboard modifier (e.g. Qt::ControlModifier).
+   *
+   * @return The display text for the given modifier.
+   */
+  static QString modifierKeyText(Qt::KeyboardModifier modifier) noexcept;
+
+  /**
    * @brief Escape newlines to convert a multi-line to a single-line string
    *
    * @param s     Input string.

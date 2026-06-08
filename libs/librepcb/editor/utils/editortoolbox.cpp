@@ -152,6 +152,39 @@ bool EditorToolbox::isSystemThemeDark() noexcept {
   return value;
 }
 
+QString EditorToolbox::modifierKeyText(Qt::KeyboardModifier modifier) noexcept {
+#if defined(Q_OS_MACOS)
+  // Use the native symbols which macOS users are familiar with. Note that on
+  // macOS Qt::ControlModifier corresponds to the Command key (not the physical
+  // Control key), which is exactly the key triggering the action.
+  switch (modifier) {
+    case Qt::ControlModifier:
+      return QStringLiteral("⌘");  // ⌘ Command (Place of Interest Sign)
+    case Qt::ShiftModifier:
+      return QStringLiteral("⇧");  // ⇧ Shift (Upwards White Arrow)
+    case Qt::AltModifier:
+      return QStringLiteral("⌥");  // ⌥ Option
+    case Qt::MetaModifier:
+      return QStringLiteral("⌃");  // ⌃ Control (Up Arrowhead)
+    default:
+      break;
+  }
+#endif
+  switch (modifier) {
+    case Qt::ControlModifier:
+      return QCoreApplication::translate("QShortcut", "Ctrl");
+    case Qt::ShiftModifier:
+      return QCoreApplication::translate("QShortcut", "Shift");
+    case Qt::AltModifier:
+      return QCoreApplication::translate("QShortcut", "Alt");
+    case Qt::MetaModifier:
+      return QCoreApplication::translate("QShortcut", "Meta");
+    default:
+      qWarning() << "Unhandled modifier in EditorToolbox::modifierKeyText().";
+      return QString();
+  }
+}
+
 QString EditorToolbox::toSingleLine(const QString& s) noexcept {
   return QString(s).replace("\n", "\\n");
 }
