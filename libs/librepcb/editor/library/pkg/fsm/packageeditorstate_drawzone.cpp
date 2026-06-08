@@ -25,6 +25,7 @@
 #include "../../../cmd/cmdzoneedit.h"
 #include "../../../graphics/zonegraphicsitem.h"
 #include "../../../undostack.h"
+#include "../../../utils/editortoolbox.h"
 #include "../footprintgraphicsitem.h"
 
 #include <librepcb/core/library/pkg/footprint.h>
@@ -359,7 +360,7 @@ void PackageEditorState_DrawZone::updateOverlayText() noexcept {
 void PackageEditorState_DrawZone::updateStatusBarMessage() noexcept {
   QString note = " " %
       tr("(press %1 to disable snap, %2 to abort)")
-          .arg(QCoreApplication::translate("QShortcut", "Shift"),
+          .arg(EditorToolbox::modifierKeyText(Qt::ShiftModifier),
                tr("right click"));
 
   if (!mIsUndoCmdActive) {

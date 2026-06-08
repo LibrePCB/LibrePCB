@@ -24,6 +24,7 @@
 
 #include "../../../undocommandgroup.h"
 #include "../../../undostack.h"
+#include "../../../utils/editortoolbox.h"
 #include "../../cmd/cmdfootprintpadedit.h"
 #include "../footprintgraphicsitem.h"
 #include "../footprintpadgraphicsitem.h"
@@ -74,8 +75,8 @@ bool PackageEditorState_ReNumberPads::entry() noexcept {
   const QString note = " " %
       tr("(press %1 for single-selection, %2 to change numbering mode, %3 to "
          "finish)")
-          .arg(QCoreApplication::translate("QShortcut", "Ctrl"),
-               QCoreApplication::translate("QShortcut", "Shift"),
+          .arg(EditorToolbox::modifierKeyText(Qt::ControlModifier),
+               EditorToolbox::modifierKeyText(Qt::ShiftModifier),
                QCoreApplication::translate("QShortcut", "Return"));
   mAdapter.fsmSetStatusBarMessage(tr("Click on the next pad") % note);
   mAdapter.fsmSetViewCursor(Qt::PointingHandCursor);

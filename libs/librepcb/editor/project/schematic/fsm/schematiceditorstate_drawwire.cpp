@@ -24,6 +24,7 @@
 
 #include "../../../editorcommandset.h"
 #include "../../../undostack.h"
+#include "../../../utils/editortoolbox.h"
 #include "../../cmd/cmdchangenetsignalofschematicnetsegment.h"
 #include "../../cmd/cmdcombineschematicnetsegments.h"
 #include "../../cmd/cmdcompsiginstsetnetsignal.h"
@@ -851,8 +852,9 @@ std::optional<NetSignal*>
   menu.setDefaultAction(
       menu.addAction(QIcon(":/img/actions/draw_wire.png"),
                      tr("Add New Bus Member") +
-                         QString(" (%1)").arg(QCoreApplication::translate(
-                             "QShortcut", "Ctrl"))));
+                         QString(" (%1)").arg(
+                             EditorToolbox::modifierKeyText(
+                                 Qt::ControlModifier))));
   NetSignal* selectedNet = nullptr;
   for (NetSignal* net : std::as_const(nets)) {
     QAction* a =
