@@ -22,11 +22,14 @@
  ******************************************************************************/
 #include "boardeditorstate_autorouter.h"
 
+#include "../../../notification.h"
 #include "../../../undostack.h"
 #include "../../cmd/cmdboardspecctraimport.h"
 
 #include <librepcb/core/autorouter/onlineautorouter.h>
+#include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/boardspecctraexport.h>
+#include <librepcb/core/project/project.h>
 #include <librepcb/core/utils/messagelogger.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacesettings.h>
@@ -96,6 +99,10 @@ bool BoardEditorState_Autorouter::exit() noexcept {
     mStatusRequests.takeLast().cancel();
   }
   mAutorouter.reset();
+  if (mNotification) {
+    mNotification->dismiss();
+    mNotification.reset();
+  }
   mAdapter.fsmToolLeave();
   return true;
 }
@@ -124,6 +131,10 @@ void BoardEditorState_Autorouter::setRouterId(const QString& id) noexcept {
 void BoardEditorState_Autorouter::start() noexcept {
   qDebug() << "start";
   mAutorouter.reset();
+  if (mNotification) {
+    mNotification->dismiss();
+    mNotification.reset();
+  }
 
   const Router* router = nullptr;
   for (auto& obj : mRouters) {
@@ -144,6 +155,15 @@ void BoardEditorState_Autorouter::start() noexcept {
   try {
     BoardSpecctraExport dsnExport(mContext.board);
     const QByteArray dsn = dsnExport.generate();  // can throw
+
+    mNotification = std::make_shared<Notification>(
+        ui::NotificationType::Progress,
+        tr("Routing '%1'...").arg(*mContext.project.getName()),
+        tr("Autorouting board '%1' with %2.")
+            .arg(*mContext.board.getName(), router->name),
+        QString(), QString(), true);
+    mAdapter.fsmPushNotification(mNotification);
+
     mAutorouter = std::make_unique<OnlineAutorouter>(
         ep, router->id, std::make_shared<MessageLogger>());
     connect(mAutorouter.get(), &Autorouter::statusNotification, this,
@@ -160,6 +180,10 @@ void BoardEditorState_Autorouter::start() noexcept {
 
 void BoardEditorState_Autorouter::statusReceived(
     const Autorouter::Status& status) noexcept {
+  if (mNotification) {
+    mNotification->setProgress(status.progressPercent);
+  }
+
   if (status.state == Autorouter::State::Succeeded) {
     try {
       std::unique_ptr<SExpression> root = SExpression::parse(
@@ -173,6 +197,10 @@ void BoardEditorState_Autorouter::statusReceived(
   }
 
   if (status.state != Autorouter::State::Running) {
+    if (mNotification) {
+      mNotification->dismiss();
+      mNotification.reset();
+    }
     mAutorouter.reset();
   }
 }

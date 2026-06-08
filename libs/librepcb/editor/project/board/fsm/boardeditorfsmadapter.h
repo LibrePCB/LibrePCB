@@ -58,6 +58,7 @@ class BoardEditorState_DrawZone;
 class BoardEditorState_Measure;
 class BoardEditorState_Select;
 class BoardGraphicsScene;
+class Notification;
 
 /*******************************************************************************
  *  Class BoardEditorFsmAdapter
@@ -108,6 +109,7 @@ public:
       const QSet<const ComponentSignalInstance*>& cmpSignals = {},
       GraphicsLayer::State selfProbedState =
           GraphicsLayer::State::Highlighted) noexcept = 0;
+  virtual void fsmPushNotification(const std::shared_ptr<Notification>& notification) noexcept = 0;
   virtual void fsmAbortBlockingToolsInOtherEditors() noexcept = 0;
   virtual void fsmSetStatusBarMessage(const QString& message,
                                       int timeoutMs = -1) noexcept = 0;

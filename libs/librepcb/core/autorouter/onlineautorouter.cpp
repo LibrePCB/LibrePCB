@@ -119,7 +119,13 @@ void OnlineAutorouter::handleStatus(
         QString(),
     });
   } else {
-    mLogger->debug(tr("Progress: %1%%").arg(result.progress));
+    mLogger->debug(tr("Progress: %1%").arg(result.progress));
+    emit statusNotification(Status{
+        State::Running,
+        result.progress,
+        result.ses,
+        QString(),
+    });
     mPollTimer->start(result.interval * 1000);
   }
 }

@@ -36,6 +36,8 @@
 namespace librepcb {
 namespace editor {
 
+class Notification;
+
 /*******************************************************************************
  *  Class BoardEditorState_Autorouter
  ******************************************************************************/
@@ -90,6 +92,7 @@ private:
   QString mRouterId;
   QVector<QFuture<ApiEndpoint::AutorouteInfoResult>> mStatusRequests;
   std::unique_ptr<Autorouter> mAutorouter;
+  std::shared_ptr<Notification> mNotification;
 };
 
 /*******************************************************************************

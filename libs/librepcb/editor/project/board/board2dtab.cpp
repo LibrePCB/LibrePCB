@@ -21,7 +21,7 @@
  *  Includes
  ******************************************************************************/
 #include "board2dtab.h"
-
+#include "../../notificationsmodel.h"
 #include "../../dialogs/backgroundimagesetupdialog.h"
 #include "../../dialogs/filedialog.h"
 #include "../../editorcommandset.h"
@@ -1253,6 +1253,10 @@ void Board2dTab::fsmCrossProbe(
     mScene->setSelfProbedState(selfProbedState);
     mProjectEditor.getCrossProbe()->set(this, nets, components, cmpSignals, {});
   }
+}
+
+void Board2dTab::fsmPushNotification(const std::shared_ptr<Notification>& notification) noexcept {
+  mApp.getNotifications().push(notification);
 }
 
 void Board2dTab::fsmAbortBlockingToolsInOtherEditors() noexcept {
