@@ -6,9 +6,9 @@ This directory contains system tests (simulating user input) using
 ## Requirements
 
 - [`uv`](https://docs.astral.sh/uv/)
-- Access to the Slint's [`ui-testing`](https://github.com/slint-ui/ui-testing)
-  framework. This is not public so far, therefore it's unfortunately not
-  possible yet for you to run those tests locally. On CI, those tests are run.
+- Access to the Slint's [UI Testing Framework](https://testing.slint.dev/).
+  This is not public so far, therefore it's unfortunately not possible yet
+  for you to run those tests locally. On CI, those tests are run.
 
 ## Run Tests
 

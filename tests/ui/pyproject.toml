@@ -9,8 +9,15 @@ dependencies = [
     "slint-testing",
 ]
 
+# slint-testing is not public, see https://testing.slint.dev/
+[[tool.uv.index]]
+name = "slint-private"
+url = "https://testing.slint.dev/simple/"
+authenticate = "always"
+explicit = true
+
 [tool.uv.sources]
-slint-testing = { git = "ssh://git@github.com/slint-ui/ui-testing.git", subdirectory = "python", rev = "a985c7d745caa1d842c22a15523049eeef43a50b" }
+slint-testing = { index = "slint-private" }
 
 [dependency-groups]
 dev = [

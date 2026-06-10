@@ -89,7 +89,8 @@ jobs:
       - name: Install Python Packages
         run: ./ci/install_python_packages.sh
         env:
-          SLINT_UI_TESTING_AUTH: ${{ secrets.SLINT_UI_TESTING_AUTH }}
+          UV_INDEX_SLINT_PRIVATE_USERNAME: ${{ secrets.UV_INDEX_SLINT_PRIVATE_USERNAME }}
+          UV_INDEX_SLINT_PRIVATE_PASSWORD: ${{ secrets.UV_INDEX_SLINT_PRIVATE_PASSWORD }}
       - name: Extend LD_LIBRARY_PATH
         run: echo "LD_LIBRARY_PATH=${{ github.workspace }}/build/install/lib:${{ env.LD_LIBRARY_PATH }}" >> $GITHUB_ENV
         if: ${{ matrix.extend_ld_library_path && (!cancelled()) }}
@@ -129,9 +130,10 @@ jobs:
         if: ${{ (steps.build.outcome == 'success') && (!cancelled()) }}
       - name: Run LibrePCB UI Tests
         run: xvfb-run -a --server-args="-screen 0 1600x1200x24" uv --directory "./tests/ui" run --no-dev pytest -vvv --librepcb-executable="../../build/install/bin/librepcb"
-        if: ${{ (steps.build.outcome == 'success') && (!cancelled()) && env.SLINT_UI_TESTING_AUTH }}
+        if: ${{ (steps.build.outcome == 'success') && (!cancelled()) && env.UV_INDEX_SLINT_PRIVATE_PASSWORD }}
         env:
-          SLINT_UI_TESTING_AUTH: ${{ secrets.SLINT_UI_TESTING_AUTH }}
+          UV_INDEX_SLINT_PRIVATE_USERNAME: ${{ secrets.UV_INDEX_SLINT_PRIVATE_USERNAME }}
+          UV_INDEX_SLINT_PRIVATE_PASSWORD: ${{ secrets.UV_INDEX_SLINT_PRIVATE_PASSWORD }}
 
       # Upload Artifacts
       - name: Tar & Upload Artifacts

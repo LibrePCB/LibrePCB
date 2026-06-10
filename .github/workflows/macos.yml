@@ -110,7 +110,8 @@ jobs:
       - name: Install Python Packages
         run: ./ci/install_python_packages.sh
         env:
-          SLINT_UI_TESTING_AUTH: ${{ secrets.SLINT_UI_TESTING_AUTH }}
+          UV_INDEX_SLINT_PRIVATE_USERNAME: ${{ secrets.UV_INDEX_SLINT_PRIVATE_USERNAME }}
+          UV_INDEX_SLINT_PRIVATE_PASSWORD: ${{ secrets.UV_INDEX_SLINT_PRIVATE_PASSWORD }}
       - name: Print New Environment
         run: ./ci/print_environment.sh
 
@@ -147,9 +148,10 @@ jobs:
         if: ${{ (steps.build.outcome == 'success') && (!cancelled()) }}
       - name: Run LibrePCB UI Tests
         run: uv --directory ./tests/ui run --no-dev pytest -vvv --librepcb-executable="../../build/install/LibrePCB.app/Contents/MacOS/librepcb"
-        if: ${{ (steps.build.outcome == 'success') && (!cancelled()) && env.SLINT_UI_TESTING_AUTH }}
+        if: ${{ (steps.build.outcome == 'success') && (!cancelled()) && env.UV_INDEX_SLINT_PRIVATE_PASSWORD }}
         env:
-          SLINT_UI_TESTING_AUTH: ${{ secrets.SLINT_UI_TESTING_AUTH }}
+          UV_INDEX_SLINT_PRIVATE_USERNAME: ${{ secrets.UV_INDEX_SLINT_PRIVATE_USERNAME }}
+          UV_INDEX_SLINT_PRIVATE_PASSWORD: ${{ secrets.UV_INDEX_SLINT_PRIVATE_PASSWORD }}
 
       # Upload Artifacts
       - name: Tar & Upload Artifacts
