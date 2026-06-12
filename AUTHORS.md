@@ -50,6 +50,7 @@ yourself by creating a pull request (see [CONTRIBUTING.md](CONTRIBUTING.md)).
 - [@picknick-](https://github.com/picknick-)
 - [@probonopd](https://github.com/probonopd)
 - Josua Schmid ([@schmijos](https://github.com/schmijos))
+- Sibo Van Gool ([@SiboVG](https://github.com/SiboVG))
 - Tobias Stoeckmann ([@stoeckmann](https://github.com/stoeckmann))
 - [@web-coder-of-rpi](https://github.com/web-coder-of-rpi)
 - yuri@FreeBSD ([@yurivict](https://github.com/yurivict))
