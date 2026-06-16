@@ -857,8 +857,8 @@ std::optional<NetSignal*>
   NetSignal* selectedNet = nullptr;
   for (NetSignal* net : std::as_const(nets)) {
     QAction* a =
-        menu.addAction(QIcon(":/img/draw-wire.svg"), *net->getName(),
-                       &menu, [&selectedNet, net]() { selectedNet = net; });
+        menu.addAction(QIcon(":/img/draw-wire.svg"), *net->getName(), &menu,
+                       [&selectedNet, net]() { selectedNet = net; });
     a->setEnabled(!net->isAnonymous());
   }
   menu.addSeparator();
