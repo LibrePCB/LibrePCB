@@ -11,7 +11,7 @@ for run in {1..10}; do
     create-dmg --volname "LibrePCB" \
       --volicon ./LibrePCB.app/Contents/Resources/librepcb.icns \
       --background ../../dist/dmg/background.png \
-      --window-size 500 300 \
+      --window-size 504 300 \
       --icon-size 96 \
       --icon LibrePCB.app 115 133 \
       --hide-extension LibrePCB.app \
