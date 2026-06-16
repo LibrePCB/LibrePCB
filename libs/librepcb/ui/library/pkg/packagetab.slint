@@ -558,7 +558,6 @@ component PackageEditorTab inherits TouchArea {
         ToolButtonGroup {
             tool-line-btn := ToolButton {
                 cmd: Cmd.tool-line;
-                icon: @image-url("../../../../../img/draw_wire.svg");
                 checked: tabs[index].tool == EditorTool.line;
                 enabled: footprint-selected && (!read-only);
                 is-last: false;

@@ -607,7 +607,7 @@ public:
       "output_jobs",  // clang-format break
       QT_TR_NOOP("Output Jobs"),
       QT_TR_NOOP("Modify or run output jobs"),
-      ":/img/output_jobs.svg",
+      ":/img/output-jobs.svg",
       EditorCommand::Flag::OpensPopup,
       {QKeySequence(Qt::Key_F11)},
       &categoryImportExport,
@@ -919,7 +919,7 @@ public:
       "show_pin_numbers",  // clang-format break
       QT_TR_NOOP("Show Pin Numbers"),
       QT_TR_NOOP("Show or hide symbol pin numbers"),
-      ":/img/show_pin_numbers.svg",
+      ":/img/show-pin-numbers.svg",
       EditorCommand::Flags(),
       {QKeySequence()},
       &categoryView,
@@ -967,7 +967,7 @@ public:
       "tool_line",  // clang-format break
       QT_TR_NOOP("Draw Line"),
       QT_TR_NOOP("Draw graphical lines"),
-      ":/img/draw_wire.svg",
+      ":/img/draw-wire.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_L)},
       &categoryTools,
@@ -1148,7 +1148,7 @@ public:
       QT_TR_NOOP("Draw Wire"),
       QT_TR_NOOP(
           "Draw wires to create electrical connections between symbol pins"),
-      ":/img/draw_wire.svg",
+      ":/img/draw-wire.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_W)},
       &categoryTools,
@@ -1184,7 +1184,7 @@ public:
       "tool_trace",  // clang-format break
       QT_TR_NOOP("Draw Trace"),
       QT_TR_NOOP("Draw copper traces to interconnect devices"),
-      ":/img/draw_trace.svg",
+      ":/img/draw-trace.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_W)},
       &categoryTools,

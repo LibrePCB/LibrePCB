@@ -151,8 +151,8 @@
         <file>command_toolbars/wire_straight.png</file>
         <file>command_toolbars/wire_v_h.png</file>
         <file>device.png</file>
-        <file>draw_trace.svg</file>
-        <file>draw_wire.svg</file>
+        <file>draw-trace.svg</file>
+        <file>draw-wire.svg</file>
         <file>drill.svg</file>
         <file>empty.png</file>
         <file>footprint.png</file>
@@ -164,14 +164,14 @@
         <file>logo/64x64.png</file>
         <file>norm/iec_60617.svg</file>
         <file>norm/ieee_315.svg</file>
-        <file>output_jobs.svg</file>
+        <file>output-jobs.svg</file>
         <file>places/file.png</file>
         <file>places/folder.png</file>
         <file>places/folder_green.png</file>
         <file>places/project_folder.png</file>
         <file>resistor-eu.svg</file>
         <file>schematic.svg</file>
-        <file>show_pin_numbers.svg</file>
+        <file>show-pin-numbers.svg</file>
         <file>status/dialog_error.png</file>
         <file>status/dialog_warning.png</file>
         <file>status/info.png</file>

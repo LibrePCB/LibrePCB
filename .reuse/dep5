@@ -63,8 +63,8 @@ Files:
  img/command_toolbars/wire_straight.png
  img/command_toolbars/wire_v_h.png
  img/device.png
- img/draw_trace.svg
- img/draw_wire.svg
+ img/draw-trace.svg
+ img/draw-wire.svg
  img/drill.svg
  img/empty.png
  img/footprint.png
@@ -75,12 +75,12 @@ Files:
  img/inductor-us.svg
  img/norm/iec_60617.svg
  img/norm/ieee_315.svg
- img/output_jobs.svg
+ img/output-jobs.svg
  img/README.md
  img/resistor-eu.svg
  img/resistor-us.svg
  img/schematic.svg
- img/show_pin_numbers.svg
+ img/show-pin-numbers.svg
  img/squares-10px.svg
  img/symbol.png
  img/vcc.svg
