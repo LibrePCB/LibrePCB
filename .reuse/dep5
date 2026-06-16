@@ -40,6 +40,7 @@ Files:
  AUTHORS.md
  ci/*
  CONTRIBUTING.md
+ dist/dmg/*
  img/actions/add_name.png
  img/actions/add_smt_pad.png
  img/actions/add_symbol_pin.png
