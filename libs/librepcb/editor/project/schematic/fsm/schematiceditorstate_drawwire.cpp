@@ -850,15 +850,15 @@ std::optional<NetSignal*>
                        });
   QMenu menu;
   menu.setDefaultAction(menu.addAction(
-      QIcon(":/img/draw-wire.svg"),
+      EditorToolbox::svgIcon(":/img/draw-wire.svg"),
       tr("Add New Bus Member") +
           QString(" (%1)").arg(
               EditorToolbox::modifierKeyText(Qt::ControlModifier))));
   NetSignal* selectedNet = nullptr;
   for (NetSignal* net : std::as_const(nets)) {
-    QAction* a =
-        menu.addAction(QIcon(":/img/draw-wire.svg"), *net->getName(), &menu,
-                       [&selectedNet, net]() { selectedNet = net; });
+    QAction* a = menu.addAction(EditorToolbox::svgIcon(":/img/draw-wire.svg"),
+                                *net->getName(), &menu,
+                                [&selectedNet, net]() { selectedNet = net; });
     a->setEnabled(!net->isAnonymous());
   }
   menu.addSeparator();
