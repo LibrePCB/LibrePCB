@@ -434,7 +434,6 @@ component SymbolEditorTab inherits TouchArea {
         ToolButtonGroup {
             tool-line-btn := ToolButton {
                 cmd: Cmd.tool-line;
-                icon: @image-url("../../../../../img/actions/draw_wire.png");
                 checked: tabs[index].tool == EditorTool.line;
                 enabled: !read-only;
                 is-last: false;
@@ -567,8 +566,7 @@ component SymbolEditorTab inherits TouchArea {
         width: self.preferred-width;
 
         zoom-fit-btn := SceneButton {
-            icon: @image-url("../../../../font-awesome/svgs/solid/expand.svg");
-            icon-scale: 0.9;
+            icon: @image-url("../../../../../img/zoom-fit.svg");
             base-color: tabs[index].background-color;
             base-text-color: tabs[index].foreground-color;
 

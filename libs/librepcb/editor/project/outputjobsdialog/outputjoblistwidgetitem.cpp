@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "outputjoblistwidgetitem.h"
 
+#include "../../utils/editortoolbox.h"
 #include "ui_outputjoblistwidgetitem.h"
 
 #include <librepcb/core/job/outputjob.h>
@@ -53,8 +54,8 @@ OutputJobListWidgetItem::OutputJobListWidgetItem(std::shared_ptr<OutputJob> job,
     font.setBold(true);
     mUi->lblName->setFont(font);
     mUi->lblName->setText(tr("Output Jobs"));
-    mUi->lblIcon->setPixmap(
-        QIcon(":/img/actions/output_jobs.png").pixmap(mUi->lblIcon->size()));
+    mUi->lblIcon->setPixmap(EditorToolbox::svgIcon(":/img/output-jobs.svg")
+                                .pixmap(mUi->lblIcon->size()));
     mUi->btnRun->setFixedSize(mUi->btnOpenDirectory->size());
     mUi->btnRun->setIconSize(mUi->btnOpenDirectory->iconSize());
     mUi->lblType->hide();

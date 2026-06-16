@@ -421,7 +421,6 @@ export component Board2dTab inherits Tab {
 
             tool-trace-btn := ToolButton {
                 cmd: Cmd.tool-trace;
-                icon: @image-url("../../../../../img/actions/draw_wire.png");
                 checked: tabs[index].tool == EditorTool.wire;
 
                 clicked => {
@@ -591,8 +590,7 @@ export component Board2dTab inherits Tab {
 
             zoom-fit-btn := SceneButton {
                 x: parent.width - self.width;
-                icon: @image-url("../../../../font-awesome/svgs/solid/expand.svg");
-                icon-scale: 0.9;
+                icon: @image-url("../../../../../img/zoom-fit.svg");
                 base-color: tabs[index].background-color;
                 base-text-color: tabs[index].foreground-color;
 

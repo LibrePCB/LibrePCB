@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "graphicsoutputjobwidget.h"
 
+#include "../../utils/editortoolbox.h"
 #include "ui_graphicsoutputjobwidget.h"
 
 #include <librepcb/core/project/board/board.h>
@@ -340,12 +341,13 @@ void GraphicsOutputJobWidget::addClicked() noexcept {
       qBound(0, mUi->lstContent->currentRow() + 1, mUi->lstContent->count());
   auto content = mJob->getContent();
   QMenu menu;
-  menu.addAction(
-      QIcon(":/img/actions/schematic.png"), tr("Schematic"), &menu, [&]() {
-        content.insert(index,
+  menu.addAction(EditorToolbox::svgIcon(":/img/schematic.svg"), tr("Schematic"),
+                 &menu, [&]() {
+                   content.insert(
+                       index,
                        GraphicsOutputJob::Content(
                            GraphicsOutputJob::Content::Preset::Schematic));
-      });
+                 });
   menu.addAction(
       QIcon(":/img/actions/board_editor.png"), tr("Board Image"), &menu, [&]() {
         content.insert(index,
@@ -514,7 +516,7 @@ void GraphicsOutputJobWidget::updateContentList() noexcept {
     item->setFlags(Qt::ItemIsEditable | Qt::ItemIsSelectable |
                    Qt::ItemIsEnabled);
     if (content.type == GraphicsOutputJob::Content::Type::Schematic) {
-      item->setIcon(QIcon(":/img/actions/schematic.png"));
+      item->setIcon(EditorToolbox::svgIcon(":/img/schematic.svg"));
     } else if (content.type == GraphicsOutputJob::Content::Type::Board) {
       item->setIcon(QIcon(":/img/actions/board_editor.png"));
     } else if (content.type ==

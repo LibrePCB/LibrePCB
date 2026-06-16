@@ -47,7 +47,6 @@ Files:
  img/actions/add_value.png
  img/actions/board_editor.png
  img/actions/draw_bus.png
- img/actions/draw_wire.png
  img/actions/export_pick_place_file.png
  img/actions/schematic.png
  img/capacitor-bipolar-eu.svg
@@ -64,6 +63,9 @@ Files:
  img/command_toolbars/wire_straight.png
  img/command_toolbars/wire_v_h.png
  img/device.png
+ img/draw-trace.svg
+ img/draw-wire.svg
+ img/drill.svg
  img/empty.png
  img/footprint.png
  img/gnd.svg
@@ -73,14 +75,19 @@ Files:
  img/inductor-us.svg
  img/norm/iec_60617.svg
  img/norm/ieee_315.svg
+ img/output-jobs.svg
  img/README.md
  img/resistor-eu.svg
  img/resistor-us.svg
+ img/schematic.svg
+ img/show-pin-numbers.svg
  img/squares-10px.svg
  img/symbol.png
  img/vcc.svg
+ img/via.svg
  img/video-tutorial.png
  img/wizards/watermark.jpg
+ img/zoom-fit.svg
  libs/README.md
  README.md
  SECURITY.md
@@ -180,7 +187,6 @@ Files:
  img/actions/delete.png
  img/actions/export_zip.png
  img/actions/open_browser.png
- img/actions/output_jobs.png
  img/actions/paste.png
  img/status/dialog_error.png
 Copyright: Open Icon Library
