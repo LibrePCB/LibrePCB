@@ -35,15 +35,16 @@ import {
 } from "api.slint";
 
 component TabDropArea inherits DropArea {
-    in property <string> id;
+    in property <data-transfer> data;
     in property <bool> force-switch-to-tab: false;
 
     can-drop(event) => {
-        (event.mime-type == Constants.drag-tab-mime-type) && (event.data != id)
+        Backend.can-drop-tab(event.data, data) ? DragAction.copy : DragAction.none
     }
 
     dropped(event) => {
-        Backend.drop-tab(event.data, id, force-switch-to-tab);
+        Backend.drop-tab(event.data, data, force-switch-to-tab);
+        return event.proposed-action;
     }
 }
 
@@ -63,7 +64,7 @@ component TabPageDropArea inherits TabDropArea {
 
 component TabButton inherits Rectangle {
     in property <TabData> tab;
-    in property <string> drop-id;
+    in property <data-transfer> data;
     in property <bool> is-current-section: false;
     in property <bool> is-current-tab: false;
 
@@ -93,8 +94,8 @@ component TabButton inherits Rectangle {
     }
 
     DragArea {
-        mime-type: Constants.drag-tab-mime-type;
-        data: drop-id;
+        data: data;
+        allow-copy: true;  // Actually we do a 'move', but its cursor looks ugly on Linux :-/
         enabled: !tab.title.is-empty;  // The home tab shall not be draggable
 
         ta := TouchArea {
@@ -117,7 +118,7 @@ component TabButton inherits Rectangle {
     if !tab.title.is-empty: TabBarDropArea {
         x: -10px;
         width: 10px + parent.width / 2;
-        id: drop-id;
+        data: data;
     }
 
     l := HorizontalLayout {
@@ -244,10 +245,6 @@ export component WindowSection inherits Rectangle {
     property <bool> tab-open: (section.current-tab-index >= 0) && (section.current-tab-index < section.tabs.length);
     property <TabType> tab-type: section.tabs[section.current-tab-index].type;
 
-    pure function create-drop-id(window-id: int, section-index: int, tab-index: int) -> string {
-        window-id + "," + section-index + "," + tab-index
-    }
-
     ta := TouchArea {
         tab-bar := Rectangle {
             x: 0;
@@ -268,7 +265,7 @@ export component WindowSection inherits Rectangle {
             HorizontalLayout {
                 for tab[index] in section.tabs: tab-btn := TabButton {
                     tab: tab;
-                    drop-id: create-drop-id(Data.window-id, section-index, index);
+                    data: Backend.create-tab-transfer(Data.window-id, section-index, index);
                     is-current-section: is-current-section;
                     is-current-tab: index == section.current-tab-index;
 
@@ -281,12 +278,12 @@ export component WindowSection inherits Rectangle {
                     }
 
                     move-to-window-clicked(id) => {
-                        Backend.drop-tab(self.drop-id, create-drop-id(id, 0, -2), true);
+                        Backend.drop-tab(self.data, Backend.create-tab-transfer(id, 0, -2), true);
                     }
                 }
 
                 da := TabBarDropArea {
-                    id: create-drop-id(Data.window-id, section-index, section.tabs.length);
+                    data: Backend.create-tab-transfer(Data.window-id, section-index, section.tabs.length);
 
                     controls-l := HorizontalLayout {
                         alignment: end;
@@ -451,7 +448,7 @@ export component WindowSection inherits Rectangle {
             TabPageDropArea {
                 x: (section-index == 0) ? 0 : -(parent.width / 8);
                 width: (section-index == 0) ? (parent.width / 8) : (parent.width / 4);
-                id: create-drop-id(Data.window-id, section-index, -1);
+                data: Backend.create-tab-transfer(Data.window-id, section-index, -1);
                 force-switch-to-tab: true;
             }
 
@@ -459,7 +456,7 @@ export component WindowSection inherits Rectangle {
             TabPageDropArea {
                 x: parent.width / 8;
                 width: parent.width * 6 / 8;
-                id: create-drop-id(Data.window-id, section-index, section.tabs.length);
+                data: Backend.create-tab-transfer(Data.window-id, section-index, section.tabs.length);
                 force-switch-to-tab: true;
             }
 
@@ -467,7 +464,7 @@ export component WindowSection inherits Rectangle {
             if section-index == (Data.sections.length - 1): TabPageDropArea {
                 x: parent.width * 7 / 8;
                 width: parent.width / 8;
-                id: create-drop-id(Data.window-id, section-index + 1, -1);
+                data: Backend.create-tab-transfer(Data.window-id, section-index + 1, -1);
                 force-switch-to-tab: true;
             }
 
