@@ -51,7 +51,7 @@ productive use, please install an official release as described in the
 To compile and run LibrePCB, you need the following software components:
 
 - C++ compiler: g++, MinGW or Clang (any version with C++20 support should work)
-- [Rust](https://www.rust-lang.org/) toolchain >= 1.85 (GNU, not MSVC)
+- [Rust](https://www.rust-lang.org/) toolchain >= 1.92 (GNU, not MSVC)
 - [Qt](http://www.qt.io/download-open-source/) >= 6.2 (make
   sure the [imageformats](https://doc.qt.io/qt-6/qtimageformats-index.html)
   plugin is installed too as it will be needed at runtime!)
