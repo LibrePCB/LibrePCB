@@ -190,16 +190,18 @@ export global Backend {
         debug("Trigger board action:", project-index, board-index, action);
     }
 
+    // Create a drag&drop data-transfer for a given tab
+    pure callback create-tab-transfer(window-id: int, section-index: int, tab-index: int) -> data-transfer;
+
+    // Check if a tab can be dropped at another location
+    pure callback can-drop-tab(src-data: data-transfer, dst-data: data-transfer) -> bool;
+
     // Move a tab with drag&drop
     //
-    // The source & destination data are coming from the drag event and is
-    // a comma-separated string containing window ID, section index, tab index
-    // (e.g. "1,1,0"). A destination tab index of -1 will create a new section
-    // for the moved tab.
-    pure callback drop-tab(src-data: string, dst-data: string, force-switch-to-tab: bool);
-    drop-tab(src-data, dst-data, force-switch-to-tab) => {
-        debug("Drop tab \{src-data} to \{dst-data}");
-    }
+    // The source & destination data are coming from the drag event and contain
+    // the window ID, section index, and tab index. A destination tab index
+    // of -1 will create a new section for the moved tab.
+    pure callback drop-tab(src-data: data-transfer, dst-data: data-transfer, force-switch-to-tab: bool);
 
     // Open an URL by an external application (usually the web browser)
     //

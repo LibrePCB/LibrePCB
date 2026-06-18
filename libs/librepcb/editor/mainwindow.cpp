@@ -329,7 +329,7 @@ MainWindow::MainWindow(GuiApplication& app,
       });
 
   // Update UI state.
-  d.fn_current_tab_changed();
+  d.invoke_current_tab_changed();
 
   // Apply UI theme.
   auto applyTheme = [this]() {
@@ -431,7 +431,7 @@ void MainWindow::addSection(int newIndex, bool makeCurrent) noexcept {
       std::make_shared<WindowSection>(mApp, *this);
   connect(s.get(), &WindowSection::currentTabChanged, this, [this]() {
     const ui::Data& d = mWindow->global<ui::Data>();
-    d.fn_current_tab_changed();
+    d.invoke_current_tab_changed();
   });
   connect(s.get(), &WindowSection::cursorCoordinatesChanged, this,
           [this](const Point& pos, const LengthUnit& unit) {
@@ -450,7 +450,7 @@ void MainWindow::addSection(int newIndex, bool makeCurrent) noexcept {
   if (makeCurrent || (mSections->count() == 1)) {
     const ui::Data& d = mWindow->global<ui::Data>();
     d.set_current_section_index(newIndex);
-    d.fn_current_tab_changed();
+    d.invoke_current_tab_changed();
   }
 
   updateHomeTabSection();
@@ -471,7 +471,7 @@ void MainWindow::addTab(std::shared_ptr<WindowTab> tab, int section, int index,
     s->addTab(tab, index, switchToTab);
     if (switchToSection) {
       d.set_current_section_index(section);
-      d.fn_current_tab_changed();
+      d.invoke_current_tab_changed();
     }
   }
 }
@@ -491,7 +491,7 @@ std::shared_ptr<WindowTab> MainWindow::removeTab(
 }
 
 void MainWindow::showPanelPage(ui::PanelPage page) noexcept {
-  mWindow->global<ui::Data>().fn_set_panel_page(page);
+  mWindow->global<ui::Data>().invoke_set_panel_page(page);
 }
 
 void MainWindow::popUpNotifications() noexcept {
@@ -540,12 +540,12 @@ void MainWindow::highlightErcMessage(
 
 void MainWindow::setCurrentLibrary(int index) noexcept {
   const ui::Data& d = mWindow->global<ui::Data>();
-  d.fn_set_current_library(index);
+  d.invoke_set_current_library(index);
 }
 
 void MainWindow::setCurrentProject(int index) noexcept {
   const ui::Data& d = mWindow->global<ui::Data>();
-  d.fn_set_current_project(index);
+  d.invoke_set_current_project(index);
 }
 
 void MainWindow::openLibraryTab(const FilePath& fp, bool wizardMode) noexcept {
@@ -925,7 +925,7 @@ void MainWindow::triggerSection(int section,
           d.set_current_section_index(qBound(-1, d.get_current_section_index(),
                                              mSections->count() - 1));
           updateHomeTabSection();
-          d.fn_current_tab_changed();
+          d.invoke_current_tab_changed();
         }
       }
       break;

@@ -37,8 +37,8 @@ then
   # macOS versions, therefore we use rustup to install an official build!
   echo "Installing Rust toolchain..."
   brew install --force-bottle rustup
-  rustup install --profile minimal 1.89.0
-  rustup default 1.89.0
+  rustup install --profile minimal 1.96.0
+  rustup default 1.96.0
   export PATH="$(brew --prefix rustup)/bin:$PATH"
 
   # Install Cargo packages
