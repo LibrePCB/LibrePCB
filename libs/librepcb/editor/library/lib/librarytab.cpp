@@ -353,6 +353,21 @@ void LibraryTab::trigger(ui::TabAction a) noexcept {
       }
       break;
     }
+    case ui::TabAction::Abort: {
+      if (!mFilterTerm.isEmpty()) {
+        mFilterTerm.clear();
+        mFilteredElements->reset();
+        onUiDataChanged.notify();
+      } else if (mCurrentCategoryIndex != 0) {
+        mCurrentCategoryIndex = 0;
+        mCategoriesViewportY = 0;
+        mCurrentElementIndex = 0;
+        mElementsViewportY = 0;
+        setSelectedCategory(mCategories->row_data(mCurrentCategoryIndex));
+        onDerivedUiDataChanged.notify();
+      }
+      break;
+    }
     case ui::TabAction::Undo: {
       try {
         commitUiData();
