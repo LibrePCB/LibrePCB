@@ -49,7 +49,7 @@ component TabDropArea inherits DropArea {
 }
 
 component TabBarDropArea inherits TabDropArea {
-    if self.contains-drag: Rectangle {
+    if self.has-drag: Rectangle {
         x: max(-parent.x, 0);
         width: 2px;
         background: Data.theme.accent;
@@ -57,7 +57,7 @@ component TabBarDropArea inherits TabDropArea {
 }
 
 component TabPageDropArea inherits TabDropArea {
-    if self.contains-drag: Rectangle {
+    if self.has-drag: Rectangle {
         background: #80808050;
     }
 }
