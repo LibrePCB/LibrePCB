@@ -37,6 +37,7 @@
 #include "bomreviewdialog.h"
 #include "cmd/cmdboardadd.h"
 #include "cmd/cmdboardremove.h"
+#include "cmd/cmdcomponentinstanceedit.h"
 #include "cmd/cmdschematicadd.h"
 #include "cmd/cmdschematicedit.h"
 #include "cmd/cmdschematicremove.h"
@@ -56,7 +57,10 @@
 #include <librepcb/core/project/erc/electricalrulecheck.h>
 #include <librepcb/core/project/erc/electricalrulecheckmessages.h>
 #include <librepcb/core/project/project.h>
+#include <librepcb/core/project/schematic/items/si_netsegment.h>
 #include <librepcb/core/project/schematic/items/si_symbol.h>
+#include <librepcb/core/project/schematic/items/si_symbolpin.h>
+#include <librepcb/core/project/schematic/items/si_text.h>
 #include <librepcb/core/project/schematic/schematic.h>
 #include <librepcb/core/utils/scopeguard.h>
 #include <librepcb/core/workspace/workspace.h>
@@ -350,6 +354,11 @@ void ProjectEditor::trigger(ui::ProjectAction a) noexcept {
       break;
     }
 
+    case ui::ProjectAction::RenumberComponents: {
+      execRenumberComponentsDialog(qApp->activeWindow());
+      break;
+    }
+
     default: {
       qWarning() << "Unhandled action in ProjectEditor:" << static_cast<int>(a);
       break;
@@ -559,6 +568,171 @@ void ProjectEditor::execLppzExportDialog(QWidget* parent) noexcept {
                                                           filter);  // can throw
     emit statusBarMessageChanged(tr("Export succeeded!"), 2000);
     qDebug() << "Successfully exported project to *.lppz.";
+  } catch (const Exception& e) {
+    QMessageBox::critical(parent, tr("Error"), e.getMsg());
+  }
+}
+
+static void traverseSymbolGroup(QVector<SI_Symbol*>& group,
+                                SI_Symbol* sym) noexcept {
+  group.append(sym);
+  for (SI_SymbolPin* pin : sym->getPins()) {
+    if (SI_NetSegment* ns = pin->getNetSegmentOfLines()) {
+      foreach (SI_SymbolPin* otherPin, ns->getAllConnectedPins()) {
+        if (!group.contains(&otherPin->getSymbol())) {
+          traverseSymbolGroup(group, &otherPin->getSymbol());
+        }
+      }
+    }
+  }
+}
+
+void ProjectEditor::execRenumberComponentsDialog(QWidget* parent) noexcept {
+  try {
+    // Find groups of interconnected symbols.
+    QVector<QVector<SI_Symbol*>> symGroups;
+    QSet<SI_Symbol*> traversedSymbols;
+    for (Schematic* sch : mProject->getSchematics()) {
+      for (SI_Symbol* sym : sch->getSymbols()) {
+        if (!traversedSymbols.contains(sym)) {
+          QVector<SI_Symbol*> group;
+          traverseSymbolGroup(group, sym);
+          symGroups.append(group);
+          for (SI_Symbol* s : std::as_const(group)) {
+            traversedSymbols.insert(s);
+          }
+        }
+      }
+    }
+
+    // Remove symbols which don't have a {{NAME}} text. This is not strictly
+    // needed, it is just intended to keep the diff as small as possible, and
+    // the user won't see the renumbering anyway for symbols without a {{NAME}}
+    // text. However, to stay on the safe side, we only skip symbols of
+    // schematic-only components (sheet frames, supply symbols, etc.).
+    /*for (QVector<SI_Symbol*>& group : symGroups) {
+      group.erase(
+          std::remove_if(
+              group.begin(), group.end(),
+              [](const SI_Symbol* sym) {
+                if (!sym->getComponentInstance().isPureSchematicOnly()) {
+                  return false;
+                }
+                for (const SI_Text* text : sym->getTexts()) {
+                  if (text->getTextObj().getText().contains("NAME")) {
+                    return false;
+                  }
+                }
+                return true;
+              }),
+          group.end());
+    }*/
+
+    // Sort groups by schematic page & position of top-left symbol.
+    for (QVector<SI_Symbol*>& group : symGroups) {
+      std::stable_sort(group.begin(), group.end(),
+                       [](const SI_Symbol* a, const SI_Symbol* b) {
+                         const Point ap = a->getPosition();
+                         const Point bp = b->getPosition();
+                         if (ap.getX() != bp.getX()) {
+                           return ap.getX() < bp.getX();
+                         } else {
+                           return ap.getY() > bp.getY();
+                         }
+                       });
+    }
+    std::stable_sort(
+        symGroups.begin(), symGroups.end(),
+        [this](const QVector<SI_Symbol*>& a, const QVector<SI_Symbol*>& b) {
+          const int ai = mProject->getSchematicIndex(a.first()->getSchematic());
+          const int bi = mProject->getSchematicIndex(b.first()->getSchematic());
+          if (ai != bi) {
+            return ai < bi;
+          }
+          const Point ap = a.first()->getPosition();
+          const Point bp = b.first()->getPosition();
+          if (ap.getX() != bp.getX()) {
+            return ap.getX() < bp.getX();
+          } else {
+            return ap.getY() > bp.getY();
+          }
+        });
+
+    // Helper to determine the next free designator.
+    QHash<QString, int> numbers;
+    const QRegularExpression re("^([^0-9]*)([0-9]*)(.*)");
+    auto getNewName = [&numbers, &re](const CircuitIdentifier& name) {
+      const QString prefix = re.match(*name).captured(1);  // NOLINT
+      const QString suffix = re.match(*name).captured(3);  // NOLINT
+      const int number = numbers.value(prefix, 0) + 1;
+      numbers.insert(prefix, number);
+      return CircuitIdentifier(prefix % QString::number(number) % suffix);
+    };
+
+    // Determine new designators.
+    // Also take into account all of the remaining components which are not
+    // added to any circuit. This is important to avoid potential name conflicts
+    // with those components (e.g. if a hidden component is named "C1", it has
+    // to be renamed to allow using "C1" for one of the visible components).
+    QHash<ComponentInstance*, CircuitIdentifier> renames;
+    for (QVector<SI_Symbol*>& group : symGroups) {
+      for (SI_Symbol* sym : group) {
+        ComponentInstance& cmp = sym->getComponentInstance();
+        if (!renames.contains(&cmp)) {
+          renames.insert(&cmp, getNewName(cmp.getName()));
+        }
+      }
+    }
+    for (ComponentInstance* cmp :
+         mProject->getCircuit().getComponentInstances()) {
+      if (!renames.contains(cmp)) {
+        renames.insert(cmp, getNewName(cmp->getName()));
+      }
+    }
+
+    // Abort if there are no renames.
+    int renameCount = 0;
+    for (auto it = renames.begin(); it != renames.end(); it++) {
+      if (it.key()->getName() != it.value()) {
+        ++renameCount;
+      }
+    }
+    if (renameCount == 0) {
+      QMessageBox::information(
+          parent, tr("Re-Number Components"),
+          tr("All components are already numbered nicely, nothing to do."));
+      return;
+    }
+
+    const QMessageBox::StandardButton choice = QMessageBox::question(
+        parent, tr("Re-Number Components"),
+        tr("This will re-number %n component(s). Continue?", nullptr,
+           renameCount),
+        QMessageBox::Yes | QMessageBox::Cancel);
+    if (choice != QMessageBox::Yes) {
+      return;
+    }
+
+    UndoStackTransaction transaction(*mUndoStack, tr("Re-Number Components"));
+
+    // Rename to a temporary name first to avoid conflicts.
+    int tmp = 0;
+    for (auto it = renames.begin(); it != renames.end(); it++) {
+      std::unique_ptr<CmdComponentInstanceEdit> cmd =
+          std::make_unique<CmdComponentInstanceEdit>(mProject->getCircuit(),
+                                                     *it.key());
+      cmd->setName(CircuitIdentifier(QString("_tmp_%1").arg(++tmp)));
+      transaction.append(cmd.release());  // can throw
+    }
+    // Now rename to the desired designator.
+    for (auto it = renames.begin(); it != renames.end(); it++) {
+      std::unique_ptr<CmdComponentInstanceEdit> cmd =
+          std::make_unique<CmdComponentInstanceEdit>(mProject->getCircuit(),
+                                                     *it.key());
+      cmd->setName(it.value());
+      transaction.append(cmd.release());  // can throw
+    }
+    transaction.commit();  // can throw
   } catch (const Exception& e) {
     QMessageBox::critical(parent, tr("Error"), e.getMsg());
   }

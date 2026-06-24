@@ -1496,6 +1496,16 @@ export component MainMenuBar {
                     }
                 }
 
+                renumber-components-item := MenuItem {
+                    text: @tr("Re-Number Components");
+                    enabled: Data.current-project.valid;
+
+                    clicked => {
+                        Helpers.trigger-current-project-action(ProjectAction.renumber-components);
+                        close-menu();
+                    }
+                }
+
                 MenuSeparator { }
 
                 new-board-item := MenuItem {
