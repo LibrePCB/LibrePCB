@@ -156,6 +156,8 @@ public:
    */
   void execLppzExportDialog(QWidget* parent) noexcept;
 
+  void execRenumberComponentsDialog(QWidget* parent) noexcept;
+
   std::shared_ptr<SchematicEditor> execNewSheetDialog() noexcept;
   void execRenameSheetDialog(int index) noexcept;
   void execDeleteSheetDialog(int index) noexcept;
