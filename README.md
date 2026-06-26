@@ -50,17 +50,15 @@ productive use, please install an official release as described in the
 
 To compile and run LibrePCB, you need the following software components:
 
-- C++ compiler: g++, MinGW or Clang (any version with C++20 support should work)
-- [Rust](https://www.rust-lang.org/) toolchain >= 1.92 (GNU, not MSVC)
-- [Qt](http://www.qt.io/download-open-source/) >= 6.2 (make
-  sure the [imageformats](https://doc.qt.io/qt-6/qtimageformats-index.html)
-  plugin is installed too as it will be needed at runtime!)
-- [OpenCASCADE](https://www.opencascade.com/) OCCT or OCE (optional,
-  OCCT highly preferred)
-- [OpenGL Utility Library](https://en.wikipedia.org/wiki/OpenGL_Utility_Library)
-  GLU (optional)
-- [OpenSSL](https://www.openssl.org/)
-- [CMake](https://cmake.org/) 3.22 or newer
+| Dependency | Version | Required |
+|---|---|---|
+| C++ compiler (g++, MinGW, or Clang) | C++20 support | ✅ Yes |
+| [Rust](https://www.rust-lang.org/) toolchain (GNU, not MSVC) | >= 1.92 | ✅ Yes |
+| [Qt](http://www.qt.io/download-open-source/) + imageformats plugin | >= 6.2 | ✅ Yes |
+| [OpenSSL](https://www.openssl.org/) | Any | ✅ Yes |
+| [CMake](https://cmake.org/) | >= 3.22 | ✅ Yes |
+| [OpenCASCADE](https://www.opencascade.com/) OCCT or OCE | Any (OCCT preferred) | ⚙️ Optional |
+| [OpenGL Utility Library](https://en.wikipedia.org/wiki/OpenGL_Utility_Library) GLU | Any | ⚙️ Optional |
 
 #### Prepared Docker Image
 
