@@ -1135,6 +1135,10 @@ void DeviceTab::updatePreviewPinNumbers() noexcept {
       signalNumbers[*sigUuid].append(padName);
     }
   }
+  // Sort pad names for better readability in the preview.
+  for (auto it = signalNumbers.begin(); it != signalNumbers.end(); it++) {
+    Toolbox::sortNumeric(it.value());
+  }
 
   for (int i = 0; i < mSymbolGraphicsItems.count(); ++i) {
     auto gate = mSymbolVariant->getSymbolItems().at(i);
