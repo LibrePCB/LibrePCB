@@ -69,7 +69,7 @@ void SceneData3D::addDevice(const Uuid& uuid, const Transform& transform,
 void SceneData3D::addPolygon(const Polygon& polygon,
                              const Transform& transform) noexcept {
   // For performance reasons, discard any object that won't be rendered.
-  if (isLayerNeeded(polygon.getLayer())) {
+  if (isLayerNeeded(transform.map(polygon.getLayer()))) {
     mPolygons.append(PolygonData{polygon, transform});
   }
 }
@@ -77,7 +77,7 @@ void SceneData3D::addPolygon(const Polygon& polygon,
 void SceneData3D::addCircle(const Circle& circle,
                             const Transform& transform) noexcept {
   // For performance reasons, discard any object that won't be rendered.
-  if (isLayerNeeded(circle.getLayer())) {
+  if (isLayerNeeded(transform.map(circle.getLayer()))) {
     mCircles.append(CircleData{circle, transform});
   }
 }
@@ -86,7 +86,7 @@ void SceneData3D::addStroke(const Layer& layer, const QVector<Path>& paths,
                             const Length& width,
                             const Transform& transform) noexcept {
   // For performance reasons, discard any object that won't be rendered.
-  if (isLayerNeeded(layer)) {
+  if (isLayerNeeded(layer)) {  // Layer is NOT transformed, only geometry!!!
     mStrokes.append(StrokeData{&layer, paths, width, transform});
   }
 }
@@ -109,7 +109,7 @@ void SceneData3D::addHole(const NonEmptyPath& path,
 void SceneData3D::addArea(const Layer& layer, const Path& outline,
                           const Transform& transform) noexcept {
   // For performance reasons, discard any object that won't be rendered.
-  if (isLayerNeeded(layer)) {
+  if (isLayerNeeded(transform.map(layer))) {
     mAreas.append(AreaData{&layer, outline, transform});
   }
 }
