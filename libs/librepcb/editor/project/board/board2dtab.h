@@ -29,6 +29,7 @@
 #include "../../utils/lengtheditcontext.h"
 #include "../../utils/searchcontext.h"
 #include "../../widgets/if_graphicsvieweventhandler.h"
+#include "boardgraphicsscene.h"
 #include "fsm/boardeditorfsmadapter.h"
 #include "fsm/boardeditorstate_drawtrace.h"
 #include "windowtab.h"
@@ -267,6 +268,7 @@ private:
   DismissableMessageContext mMsgPlaceDevices;
 
   // State
+  std::shared_ptr<BoardGraphicsScene::Context> mSceneContext;
   SearchContext mSearchContext;
   GridStyle mGridStyle;
   QPointF mSceneImagePos;

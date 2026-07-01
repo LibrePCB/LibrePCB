@@ -159,6 +159,12 @@ Board2dTab::Board2dTab(GuiApplication& app, BoardEditor& editor,
     mMsgEmptySchematics(app.getWorkspace(), "EMPTY_BOARD_NO_COMPONENTS"),
     mMsgSetupDesignRules(app.getWorkspace(), "EMPTY_BOARD_SETUP_DESIGN_RULES"),
     mMsgPlaceDevices(app.getWorkspace(), "EMPTY_BOARD_PLACE_DEVICES"),
+    mSceneContext(new BoardGraphicsScene::Context{
+        this,  // tab
+        mProjectEditor.getCrossProbe(),  // cross probe
+        GraphicsLayer::State::Highlighted,  // Self-probe mode
+        false,  // flip view
+    }),
     mGridStyle(mApp.getWorkspace().getSettings().boardGridStyle.get()),
     mIgnorePlacementLocks(false),
     mFrameIndex(0),
@@ -594,15 +600,8 @@ void Board2dTab::activate() noexcept {
   connect(mLayersModel.get(), &GraphicsLayersModel::layersVisibilityChanged,
           &mBoardEditor, &BoardEditor::schedulePlanesRebuild);
 
-  mScene = std::make_unique<BoardGraphicsScene>(
-      mBoard, *mLayers,
-      std::make_shared<BoardGraphicsScene::Context>(BoardGraphicsScene::Context{
-          this,  // tab
-          mProjectEditor.getCrossProbe(),  // cross probe
-          GraphicsLayer::State::Highlighted,  // Self-probe mode
-          false,  // flip view
-      }),
-      this);
+  mScene = std::make_unique<BoardGraphicsScene>(mBoard, *mLayers, mSceneContext,
+                                                this);
   mScene->setGridInterval(mBoard.getGridInterval());
   connect(mScene.get(), &GraphicsScene::changed, this,
           &Board2dTab::requestRepaint);
