@@ -393,6 +393,18 @@ void GuiApplication::execWorkspaceSettingsDialog(QWidget* parent) noexcept {
   dlg.exec();
 }
 
+void GuiApplication::scheduleWorkspaceSettingsSave() noexcept {
+  QTimer::singleShot(3000, this, [this]() {
+    try {
+      if (mWorkspace.getSettings().isEdited()) {
+        mWorkspace.saveSettings();  // can throw
+      }
+    } catch (const Exception& e) {
+      qCritical() << "Failed to save workspace settings:" << e.getMsg();
+    }
+  });
+}
+
 void GuiApplication::addExampleProjects(QWidget* parent) noexcept {
   const QString msg =
       tr("This downloads some example projects from the internet and copies "

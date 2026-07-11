@@ -95,7 +95,6 @@ SymbolTab::SymbolTab(LibraryEditor& editor, std::unique_ptr<Symbol> sym,
     mMsgImportPins(mApp.getWorkspace(), "EMPTY_SYMBOL_IMPORT_PINS"),
     mWizardMode(mode != Mode::Open),
     mCurrentPageIndex(mWizardMode ? 0 : 1),
-    mGridStyle(mApp.getWorkspace().getSettings().schematicGridStyle.get()),
     mUnit(LengthUnit::millimeters()),
     mChooseCategory(false),
     mElementDuplicated(false),
@@ -156,11 +155,8 @@ SymbolTab::SymbolTab(LibraryEditor& editor, std::unique_ptr<Symbol> sym,
 
   // Apply workspace settings whenever they have been modified.
   connect(&mApp.getWorkspace().getSettings().schematicGridStyle,
-          &WorkspaceSettingsItem::edited, this, [this]() {
-            mGridStyle =
-                mApp.getWorkspace().getSettings().schematicGridStyle.get();
-            applyWorkspaceSettings();
-          });
+          &WorkspaceSettingsItem::edited, this,
+          &SymbolTab::applyWorkspaceSettings);
   connect(&mApp.getWorkspace().getSettings().schematicColorSchemes,
           &WorkspaceSettingsItem_ColorSchemes::colorsModified, this,
           &SymbolTab::applyWorkspaceSettings);
@@ -290,7 +286,7 @@ ui::SymbolTabData SymbolTab::getDerivedUiData() const noexcept {
       q2s(fgColor),  // Foreground color
       q2s(infoBoxColors.primary),  // Overlay color
       q2s(infoBoxColors.secondary),  // Overlay text color
-      l2s(mGridStyle),  // Grid style
+      l2s(mApp.getWorkspace().getSettings().schematicGridStyle.get()),  // Grid
       l2s(*mSymbol->getGridInterval()),  // Grid interval
       l2s(mUnit),  // Unit
       !mModifiedWatchedFiles.isEmpty(),  // Watched files modified
@@ -363,13 +359,19 @@ void SymbolTab::setDerivedUiData(const ui::SymbolTabData& data) noexcept {
   mChooseCategory = data.choose_category;
 
   // View
-  mGridStyle = s2l(data.grid_style);
+  const GridStyle gridStyle = s2l(data.grid_style);
+  if (gridStyle != mApp.getWorkspace().getSettings().schematicGridStyle.get()) {
+    // Grid style setting used to be per-tab, but that is annoying for the
+    // use-case of temporarily hiding the grid for presenting a schematic to
+    // other people or for taking screenshots, since this has to be done for
+    // each tab again. Also it can be surprising that this UI setting is not
+    // persistent. It is probably much more intuitive to apply this setting
+    // to all tabs immediately, and storing it in the workspace settings.
+    mApp.getWorkspace().getSettings().schematicGridStyle.set(gridStyle);
+    mApp.scheduleWorkspaceSettingsSave();
+  }
   if (auto interval = s2plength(data.grid_interval)) {
     setGridInterval(*interval);
-  }
-  if (mScene) {
-    mScene->setGridStyle(mGridStyle);
-    mScene->setGridInterval(mSymbol->getGridInterval());
   }
   const LengthUnit unit = s2l(data.unit);
   if (unit != mUnit) {
@@ -1681,8 +1683,8 @@ void SymbolTab::requestRepaint() noexcept {
 }
 
 void SymbolTab::applyWorkspaceSettings() noexcept {
-  const ColorScheme& scheme =
-      mApp.getWorkspace().getSettings().schematicColorSchemes.getActive();
+  const WorkspaceSettings& settings = mApp.getWorkspace().getSettings();
+  const ColorScheme& scheme = settings.schematicColorSchemes.getActive();
 
   if (mScene) {
     const auto background = scheme.getColors(ColorRole::schematicBackground());
@@ -1691,7 +1693,7 @@ void SymbolTab::applyWorkspaceSettings() noexcept {
     mScene->setOverlayColors(overlay.primary, overlay.secondary);
     const auto selection = scheme.getColors(ColorRole::schematicSelection());
     mScene->setSelectionRectColors(selection.primary, selection.secondary);
-    mScene->setGridStyle(mGridStyle);
+    mScene->setGridStyle(settings.schematicGridStyle.get());
   }
 
   onDerivedUiDataChanged.notify();

@@ -113,7 +113,6 @@ PackageTab::PackageTab(LibraryEditor& editor, std::unique_ptr<Package> pkg,
     mWizardMode(mode != Mode::Open),
     mCurrentPageIndex(mWizardMode ? 0 : 2),
     mView3d(false),
-    mGridStyle(mApp.getWorkspace().getSettings().boardGridStyle.get()),
     mUnit(LengthUnit::millimeters()),
     mChooseCategory(false),
     mElementDuplicated(false),
@@ -213,10 +212,8 @@ PackageTab::PackageTab(LibraryEditor& editor, std::unique_ptr<Package> pkg,
 
   // Apply workspace settings whenever they have been modified.
   connect(&mApp.getWorkspace().getSettings().boardGridStyle,
-          &WorkspaceSettingsItem::edited, this, [this]() {
-            mGridStyle = mApp.getWorkspace().getSettings().boardGridStyle.get();
-            applyWorkspaceSettings();
-          });
+          &WorkspaceSettingsItem::edited, this,
+          &PackageTab::applyWorkspaceSettings);
   connect(&mApp.getWorkspace().getSettings().boardColorSchemes,
           &WorkspaceSettingsItem_ColorSchemes::edited, this,
           &PackageTab::applyWorkspaceSettings);
@@ -378,7 +375,7 @@ ui::PackageTabData PackageTab::getDerivedUiData() const noexcept {
       q2s(fgColor),  // Foreground color
       q2s(infoBoxColors.primary),  // Overlay color
       q2s(infoBoxColors.secondary),  // Overlay text color
-      l2s(mGridStyle),  // Grid style
+      l2s(mApp.getWorkspace().getSettings().boardGridStyle.get()),  // Grid
       l2s(*mPackage->getGridInterval()),  // Grid interval
       l2s(mUnit),  // Unit
       mBackgroundImageGraphicsItem->isVisible(),  // Background image set
@@ -519,13 +516,19 @@ void PackageTab::setDerivedUiData(const ui::PackageTabData& data) noexcept {
   }
 
   // View
-  mGridStyle = s2l(data.grid_style);
+  const GridStyle gridStyle = s2l(data.grid_style);
+  if (gridStyle != mApp.getWorkspace().getSettings().boardGridStyle.get()) {
+    // Grid style setting used to be per-tab, but that is annoying for the
+    // use-case of temporarily hiding the grid for presenting a schematic to
+    // other people or for taking screenshots, since this has to be done for
+    // each tab again. Also it can be surprising that this UI setting is not
+    // persistent. It is probably much more intuitive to apply this setting
+    // to all tabs immediately, and storing it in the workspace settings.
+    mApp.getWorkspace().getSettings().boardGridStyle.set(gridStyle);
+    mApp.scheduleWorkspaceSettingsSave();
+  }
   if (auto interval = s2plength(data.grid_interval)) {
     setGridInterval(*interval);
-  }
-  if (mScene) {
-    mScene->setGridStyle(mGridStyle);
-    mScene->setGridInterval(mPackage->getGridInterval());
   }
   const LengthUnit unit = s2l(data.unit);
   if (unit != mUnit) {
@@ -2816,21 +2819,21 @@ void PackageTab::requestRepaint() noexcept {
 }
 
 void PackageTab::applyWorkspaceSettings() noexcept {
+  const WorkspaceSettings& settings = mApp.getWorkspace().getSettings();
+
   if (mScene) {
-    const ColorScheme& scheme =
-        mApp.getWorkspace().getSettings().boardColorSchemes.getActive();
+    const ColorScheme& scheme = settings.boardColorSchemes.getActive();
     const auto background = scheme.getColors(ColorRole::boardBackground());
     mScene->setBackgroundColors(background.primary, background.secondary);
     const auto overlay = scheme.getColors(ColorRole::boardOverlays());
     mScene->setOverlayColors(overlay.primary, overlay.secondary);
     const auto selection = scheme.getColors(ColorRole::boardSelection());
     mScene->setSelectionRectColors(selection.primary, selection.secondary);
-    mScene->setGridStyle(mGridStyle);
+    mScene->setGridStyle(settings.boardGridStyle.get());
   }
 
   if (mOpenGlView) {
-    const ColorScheme& scheme =
-        mApp.getWorkspace().getSettings().view3dColorSchemes.getActive();
+    const ColorScheme& scheme = settings.view3dColorSchemes.getActive();
     const auto background = scheme.getColors(ColorRole::board3dBackground());
     mOpenGlView->setBackgroundColor(background.primary);
   }

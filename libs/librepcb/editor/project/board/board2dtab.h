@@ -270,7 +270,6 @@ private:
   // State
   std::shared_ptr<BoardGraphicsScene::Context> mSceneContext;
   SearchContext mSearchContext;
-  GridStyle mGridStyle;
   QPointF mSceneImagePos;
   bool mIgnorePlacementLocks;
   int mFrameIndex;
