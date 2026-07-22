@@ -47,6 +47,16 @@ int main(int argc, char* argv[]) {
   // Creates the Debug object which installs the message handler. This must be
   // done as early as possible.
   Debug::instance();
+  
+#ifdef Q_OS_LINUX
+  // Avoid requiring a real X server / Xvfb just to run the CLI headlessly.
+  // "offscreen" works fine for our PDF/image/gerber export (unlike
+  // "minimal", which doesn't actually render anything). Don't override if
+  // the user already set QT_QPA_PLATFORM themselves.
+  if (qEnvironmentVariableIsEmpty("QT_QPA_PLATFORM")) {
+    qputenv("QT_QPA_PLATFORM", "offscreen");
+  }
+#endif
 
   // Silence logging output, it's a command line tool where logging messages
   // could lead to issues when parsing the CLI output. Real errors will be
