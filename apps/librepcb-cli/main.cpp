@@ -47,13 +47,15 @@ int main(int argc, char* argv[]) {
   // Creates the Debug object which installs the message handler. This must be
   // done as early as possible.
   Debug::instance();
-  
+
 #ifdef Q_OS_LINUX
-  // Avoid requiring a real X server / Xvfb just to run the CLI headlessly.
-  // "offscreen" works fine for our PDF/image/gerber export (unlike
-  // "minimal", which doesn't actually render anything). Don't override if
-  // the user already set QT_QPA_PLATFORM themselves.
-  if (qEnvironmentVariableIsEmpty("QT_QPA_PLATFORM")) {
+  // Only force offscreen rendering if there's truly no display available
+  // and the user hasn't picked a platform themselves. This keeps existing
+  // setups working (e.g. CI running under xvfb-run) and only kicks in for
+  // genuinely headless environments.
+  if (qEnvironmentVariableIsEmpty("QT_QPA_PLATFORM") &&
+      qEnvironmentVariableIsEmpty("DISPLAY") &&
+      qEnvironmentVariableIsEmpty("WAYLAND_DISPLAY")) {
     qputenv("QT_QPA_PLATFORM", "offscreen");
   }
 #endif
