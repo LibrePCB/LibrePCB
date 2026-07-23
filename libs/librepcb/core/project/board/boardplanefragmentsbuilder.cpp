@@ -436,9 +436,8 @@ BoardPlaneFragmentsBuilder::LayerJobResult BoardPlaneFragmentsBuilder::runLayer(
     try {
       ClipperLib::Paths removedAreas;
       ClipperLib::Paths connectedNetSignalAreas;
-      const UnsignedLength planeClearance =
-          std::max(it->minClearanceToCopper,
-                   data->getNetClassClearance(it->netSignal));
+      const UnsignedLength planeClearance = std::max(
+          it->minClearanceToCopper, data->getNetClassClearance(it->netSignal));
 
       // Start with board outline shrunk by the given clearance and clipped
       // to the plane outline.
@@ -468,11 +467,10 @@ BoardPlaneFragmentsBuilder::LayerJobResult BoardPlaneFragmentsBuilder::runLayer(
       for (auto otherIt = data->planes.begin(); otherIt != it; otherIt++) {
         if ((otherIt->layer == it->layer) &&
             (otherIt->netSignal != it->netSignal)) {
-          const UnsignedLength clearance =
-              std::max(planeClearance,
-                       std::max(otherIt->minClearanceToCopper,
-                                data->getNetClassClearance(
-                                    otherIt->netSignal)));
+          const UnsignedLength clearance = std::max(
+              planeClearance,
+              std::max(otherIt->minClearanceToCopper,
+                       data->getNetClassClearance(otherIt->netSignal)));
           ClipperLib::Paths clipperPaths = ClipperHelpers::convert(
               result.planes.value(otherIt->uuid), maxArcTolerance());
           ClipperHelpers::offset(clipperPaths, *clearance,
@@ -530,11 +528,11 @@ BoardPlaneFragmentsBuilder::LayerJobResult BoardPlaneFragmentsBuilder::runLayer(
         } else {
           // Vias has different net than plane -> subtract with clearance.
           const Path path =
-              Path::circle(PositiveLength(
-                  via.diameter +
-                  std::max(planeClearance,
-                           data->getNetClassClearance(via.netSignal)) *
-                      2))
+              Path::circle(PositiveLength(via.diameter +
+                                          std::max(planeClearance,
+                                                   data->getNetClassClearance(
+                                                       via.netSignal)) *
+                                              2))
                   .translated(via.position);
           const ClipperLib::Path clipperPath =
               ClipperHelpers::convert(path, maxArcTolerance());
@@ -583,13 +581,13 @@ BoardPlaneFragmentsBuilder::LayerJobResult BoardPlaneFragmentsBuilder::runLayer(
             if ((!polygon.filled) || (polygon.width > 0)) {
               // Outline strokes.
               const QVector<Path> paths =
-                  polygon.path.toOutlineStrokes(PositiveLength(
-                      std::max(*polygon.width +
-                                   std::max(planeClearance,
-                                            data->getNetClassClearance(
-                                                polygon.netSignal)) *
-                                       2,
-                               Length(1))));
+                  polygon.path.toOutlineStrokes(PositiveLength(std::max(
+                      *polygon.width +
+                          std::max(
+                              planeClearance,
+                              data->getNetClassClearance(polygon.netSignal)) *
+                              2,
+                      Length(1))));
               const ClipperLib::Paths clipperPaths =
                   ClipperHelpers::convert(paths, maxArcTolerance());
               removedAreas.insert(removedAreas.end(), clipperPaths.begin(),
@@ -625,12 +623,11 @@ BoardPlaneFragmentsBuilder::LayerJobResult BoardPlaneFragmentsBuilder::runLayer(
             // pads of the same net, use the thermal gap clearance since usually
             // it is smaller than the planes clearance, so it leads to a higher
             // plane area.
-            const Length clearance =
-                std::max(sameNet ? *it->thermalGap
-                                 : *std::max(planeClearance,
-                                             data->getNetClassClearance(
-                                                 pad.netSignal)),
-                         *pad.clearance);
+            const Length clearance = std::max(
+                sameNet ? *it->thermalGap
+                        : *std::max(planeClearance,
+                                    data->getNetClassClearance(pad.netSignal)),
+                *pad.clearance);
             QVector<Path> paths =
                 pad.transform.map(geometry.withOffset(clearance).toOutlines());
             ClipperLib::Paths clipperPaths =

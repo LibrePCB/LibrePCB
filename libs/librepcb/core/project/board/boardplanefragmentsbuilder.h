@@ -219,8 +219,7 @@ private:  // Methods
 
     UnsignedLength getNetClassClearance(
         const std::optional<Uuid>& netSignal) const noexcept {
-      return netSignal ? netClassClearances.value(*netSignal,
-                                                  UnsignedLength(0))
+      return netSignal ? netClassClearances.value(*netSignal, UnsignedLength(0))
                        : UnsignedLength(0);
     }
   };

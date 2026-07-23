@@ -80,8 +80,8 @@ TEST(BoardPlaneFragmentsBuilderTest, testFragments) {
 
   // This snapshot predates netclass-specific plane clearances. Keep it focused
   // on its original plane geometry scenarios; dedicated coverage is below.
-  NetClass* specialNetClass = project->getCircuit().getNetClassByName(
-      ElementName("special"));
+  NetClass* specialNetClass =
+      project->getCircuit().getNetClassByName(ElementName("special"));
   ASSERT_NE(nullptr, specialNetClass);
   specialNetClass->setMinCopperCopperClearance(UnsignedLength(0));
 
@@ -127,8 +127,8 @@ TEST(BoardPlaneFragmentsBuilderTest, testNetClassClearance) {
       loader.open(std::make_unique<TransactionalDirectory>(projectFs),
                   projectFp.getFilename());  // can throw
   Board* board = project->getBoards().first();
-  NetClass* specialNetClass = project->getCircuit().getNetClassByName(
-      ElementName("special"));
+  NetClass* specialNetClass =
+      project->getCircuit().getNetClassByName(ElementName("special"));
   ASSERT_NE(nullptr, specialNetClass);
 
   const Uuid planeUuid =
@@ -154,9 +154,9 @@ TEST(BoardPlaneFragmentsBuilderTest, testNetClassClearance) {
   // A 3.33mm netclass clearance must invalidate the planes and enlarge the
   // same via cutout, removing the test point from copper.
   specialNetClass->setMinCopperCopperClearance(UnsignedLength(3330000));
-  EXPECT_TRUE(board->takeScheduledLayersForPlanesRebuild(
-                       board->getCopperLayers())
-                  .contains(&Layer::topCopper()));
+  EXPECT_TRUE(
+      board->takeScheduledLayersForPlanesRebuild(board->getCopperLayers())
+          .contains(&Layer::topCopper()));
   result = builder.runAndApply(*board);
   ASSERT_TRUE(result.contains(planeUuid));
   EXPECT_FALSE(containsPoint(result.value(planeUuid)));
