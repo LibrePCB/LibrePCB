@@ -23,6 +23,10 @@ mv "./build/install" "./build/AppDir/usr"
 # Expand LD_LIBRARY_PATH to allow linuxdeploy finding liblibrepcbslint.so.
 export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:`pwd`/build/AppDir/usr/lib"
 
+# Bundle the offscreen platform plugin too, so librepcb-cli can run
+# without a display (X11) available, see issue #1793 for details.
+export EXTRA_PLATFORM_PLUGINS="libqoffscreen.so"
+
 # Build AppImage, which will also make the AppDir portable.
 # Specify OpenSSL libraries manually since these runtime dependencies cannot
 # be detected by linuxdeploy.
@@ -38,7 +42,7 @@ mv "./build/AppDir/usr" "./build/install"
 
 # Test if the bundles are working (hopefully catching deployment issues).
 # Doesn't work for AppImages unfortunately because of missing fuse on CI.
-xvfb-run -a ./build/install/bin/librepcb-cli --version
+./build/install/bin/librepcb-cli --version
 xvfb-run -a ./build/install/bin/librepcb --exit-after-startup
 
 # Print checksums to allow fully transparent public verification.

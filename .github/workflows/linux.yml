@@ -123,7 +123,7 @@ jobs:
         run: xvfb-run -a ./build/tests/unittests/librepcb-unittests
         if: ${{ (steps.build.outcome == 'success') && (!cancelled()) }}
       - name: Run LibrePCB-CLI Functional Tests
-        run: xvfb-run -a --server-args="-screen 0 1024x768x24" uv --directory ./tests/cli run --no-dev pytest -vvv --librepcb-executable="../../build/install/bin/librepcb-cli"
+        run: uv --directory ./tests/cli run --no-dev pytest -vvv --librepcb-executable="../../build/install/bin/librepcb-cli"
         if: ${{ (steps.build.outcome == 'success') && (!cancelled()) }}
       - name: Run LibrePCB Functional Tests
         run: xvfb-run -a --server-args="-screen 0 1024x768x24" uv --directory ./tests/funq run --no-dev pytest -vvv --librepcb-executable="../../build/install/bin/librepcb" --reruns 5 --reruns-delay 10
