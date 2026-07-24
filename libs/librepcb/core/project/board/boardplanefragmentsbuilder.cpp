@@ -170,7 +170,7 @@ std::shared_ptr<BoardPlaneFragmentsBuilder::JobData>
   data->layers = Toolbox::toList(layers);
   foreach (const NetSignal* netSignal,
            board.getProject().getCircuit().getNetSignals()) {
-    data->netClassClearances.insert(
+    data->netSignalClearances.insert(
         netSignal->getUuid(),
         netSignal->getNetClass().getMinCopperCopperClearance());
   }
