@@ -11,9 +11,12 @@ set(DEFAULT_SLINT_EMBED_RESOURCES embed-files)
 set(SLINT_STYLE "cosmic-dark")
 
 # Include local submodule
-add_subdirectory(
-  "${PROJECT_SOURCE_DIR}/libs/slint/api/cpp" "${CMAKE_BINARY_DIR}/libs/slint"
-)
+if(NOT TARGET Slint)
+  add_subdirectory(
+    "${PROJECT_SOURCE_DIR}/libs/slint/api/cpp" "${CMAKE_BINARY_DIR}/libs/slint"
+  )
+endif()
+set(Slint_FOUND TRUE)
 
 # Suppress compiler warning (https://github.com/slint-ui/slint/issues/2681)
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")

@@ -3,16 +3,21 @@ if(EXISTS "${DXFLIB_SUBMODULE_BASEPATH}"
    AND NOT UNBUNDLE_DXFLIB
    AND NOT UNBUNDLE_ALL
 )
-  message(STATUS "Using vendored Dxflib")
+  if(NOT TARGET dxflib)
+    message(STATUS "Using vendored Dxflib")
 
-  # Include local submodule
-  add_subdirectory(
-    "${DXFLIB_SUBMODULE_BASEPATH}" "${CMAKE_BINARY_DIR}/libs/dxflib"
-    EXCLUDE_FROM_ALL
-  )
+    # Include local submodule
+    add_subdirectory(
+      "${DXFLIB_SUBMODULE_BASEPATH}" "${CMAKE_BINARY_DIR}/libs/dxflib"
+      EXCLUDE_FROM_ALL
+    )
 
-  # Disable deprecation warnings since they are not under our control.
-  target_compile_options(dxflib PRIVATE -Wno-deprecated-declarations)
+    # Disable deprecation warnings since they are not under our control.
+    target_compile_options(dxflib PRIVATE -Wno-deprecated-declarations)
+
+  endif()
+
+  set(Dxflib_FOUND TRUE)
 
   # Stop here, we're done
   return()

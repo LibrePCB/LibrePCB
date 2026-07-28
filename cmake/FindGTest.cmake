@@ -3,17 +3,21 @@ if(EXISTS "${GTEST_SUBMODULE_BASEPATH}"
    AND NOT UNBUNDLE_GTEST
    AND NOT UNBUNDLE_ALL
 )
-  message(STATUS "Using vendored GoogleTest / GoogleMock")
+  if(NOT TARGET gtest)
+    message(STATUS "Using vendored GoogleTest / GoogleMock")
 
-  # Include local submodule
-  add_subdirectory(
-    "${GTEST_SUBMODULE_BASEPATH}" "${CMAKE_BINARY_DIR}/libs/googletest"
-    EXCLUDE_FROM_ALL
-  )
+    # Include local submodule
+    add_subdirectory(
+      "${GTEST_SUBMODULE_BASEPATH}" "${CMAKE_BINARY_DIR}/libs/googletest"
+      EXCLUDE_FROM_ALL
+    )
 
-  # Aliases to namespaced variant
-  add_library(GTest::GTest ALIAS gtest)
-  add_library(GTest::GMock ALIAS gmock)
+    # Aliases to namespaced variant
+    add_library(GTest::GTest ALIAS gtest)
+    add_library(GTest::GMock ALIAS gmock)
+  endif()
+
+  set(GTest_FOUND TRUE)
 
   # Stop here, we're done
   return()

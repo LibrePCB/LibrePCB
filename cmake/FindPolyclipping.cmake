@@ -3,13 +3,17 @@ if(EXISTS "${POLYCLIPPING_SUBMODULE_BASEPATH}"
    AND NOT UNBUNDLE_POLYCLIPPING
    AND NOT UNBUNDLE_ALL
 )
-  message(STATUS "Using vendored Polyclipping")
+  if(NOT TARGET polyclipping)
+    message(STATUS "Using vendored Polyclipping")
 
-  # Add library
-  add_subdirectory(
-    "${POLYCLIPPING_SUBMODULE_BASEPATH}"
-    "${CMAKE_BINARY_DIR}/libs/polyclipping" EXCLUDE_FROM_ALL
-  )
+    # Add library
+    add_subdirectory(
+      "${POLYCLIPPING_SUBMODULE_BASEPATH}"
+      "${CMAKE_BINARY_DIR}/libs/polyclipping" EXCLUDE_FROM_ALL
+    )
+  endif()
+
+  set(Polyclipping_FOUND TRUE)
 
   # Stop here, we're done
   return()

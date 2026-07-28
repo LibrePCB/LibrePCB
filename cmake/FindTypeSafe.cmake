@@ -1,15 +1,19 @@
 set(TYPE_SAFE_SUBMODULE_BASEPATH "${PROJECT_SOURCE_DIR}/libs/type_safe")
 if(EXISTS "${TYPE_SAFE_SUBMODULE_BASEPATH}")
-  message(STATUS "Using vendored TypeSafe")
+  if(NOT TARGET type_safe)
+    message(STATUS "Using vendored TypeSafe")
 
-  # Include local submodule
-  add_subdirectory(
-    "${TYPE_SAFE_SUBMODULE_BASEPATH}" "${CMAKE_BINARY_DIR}/libs/type_safe"
-    EXCLUDE_FROM_ALL
-  )
+    # Include local submodule
+    add_subdirectory(
+      "${TYPE_SAFE_SUBMODULE_BASEPATH}" "${CMAKE_BINARY_DIR}/libs/type_safe"
+      EXCLUDE_FROM_ALL
+    )
 
-  # Alias static lib to namespaced variant
-  add_library(TypeSafe::TypeSafe ALIAS type_safe)
+    # Alias static lib to namespaced variant
+    add_library(TypeSafe::TypeSafe ALIAS type_safe)
+  endif()
+
+  set(TypeSafe_FOUND TRUE)
 
   # Stop here, we're done
   return()

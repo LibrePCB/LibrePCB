@@ -1,6 +1,9 @@
 # Add library
-add_library(open_cascade INTERFACE)
-add_library(OpenCascade::OpenCascade ALIAS open_cascade)
+if(NOT TARGET open_cascade)
+  add_library(open_cascade INTERFACE)
+  add_library(OpenCascade::OpenCascade ALIAS open_cascade)
+endif()
+set(OpenCascade_FOUND TRUE)
 
 # Leave library empty when building without OpenCascade
 if(NOT USE_OPENCASCADE)

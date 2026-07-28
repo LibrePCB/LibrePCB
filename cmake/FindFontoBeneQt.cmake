@@ -3,16 +3,20 @@ if(EXISTS "${FONTOBENE_SUBMODULE_BASEPATH}"
    AND NOT UNBUNDLE_FONTOBENE_QT
    AND NOT UNBUNDLE_ALL
 )
-  message(STATUS "Using vendored FontoBeneQt")
+  if(NOT TARGET fontobene_qt)
+    message(STATUS "Using vendored FontoBeneQt")
 
-  # Use same Qt version as for LibrePCB
-  set(FONTOBENE_QT_MAJOR_VERSION ${QT_MAJOR_VERSION})
+    # Use same Qt version as for LibrePCB
+    set(FONTOBENE_QT_MAJOR_VERSION ${QT_MAJOR_VERSION})
 
-  # Include local submodule
-  add_subdirectory(
-    "${FONTOBENE_SUBMODULE_BASEPATH}" "${CMAKE_BINARY_DIR}/libs/fontobene-qt"
-    EXCLUDE_FROM_ALL
-  )
+    # Include local submodule
+    add_subdirectory(
+      "${FONTOBENE_SUBMODULE_BASEPATH}" "${CMAKE_BINARY_DIR}/libs/fontobene-qt"
+      EXCLUDE_FROM_ALL
+    )
+  endif()
+
+  set(FontoBeneQt_FOUND TRUE)
 
   # Stop here, we're done
   return()
