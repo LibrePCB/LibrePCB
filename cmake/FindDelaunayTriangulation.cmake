@@ -1,23 +1,26 @@
+# Ignore subsequent calls (https://github.com/LibrePCB/LibrePCB/issues/1812)
+if(TARGET delaunay_triangulation)
+  return()
+endif()
+
+# Find bundled submodule
 set(DT_SUBMODULE_BASEPATH "${PROJECT_SOURCE_DIR}/libs/delaunay-triangulation")
 if(EXISTS "${DT_SUBMODULE_BASEPATH}")
-  if(NOT TARGET delaunay_triangulation)
-    message(STATUS "Using vendored DelaunayTriangulation")
+  message(STATUS "Using vendored DelaunayTriangulation")
 
-    # Add library
-    add_library(delaunay_triangulation INTERFACE)
-    target_include_directories(
-      delaunay_triangulation INTERFACE "${DT_SUBMODULE_BASEPATH}"
-    )
+  # Add library
+  add_library(delaunay_triangulation INTERFACE)
+  target_include_directories(
+    delaunay_triangulation INTERFACE "${DT_SUBMODULE_BASEPATH}"
+  )
 
-    # Alias lib to namespaced variant
-    add_library(
-      DelaunayTriangulation::DelaunayTriangulation ALIAS delaunay_triangulation
-    )
-  endif()
-
-  set(DelaunayTriangulation_FOUND TRUE)
+  # Alias lib to namespaced variant
+  add_library(
+    DelaunayTriangulation::DelaunayTriangulation ALIAS delaunay_triangulation
+  )
 
   # Stop here, we're done
+  set(DelaunayTriangulation_FOUND TRUE)
   return()
 endif()
 

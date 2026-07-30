@@ -1,3 +1,8 @@
+# Ignore subsequent calls (https://github.com/LibrePCB/LibrePCB/issues/1812)
+if(TARGET Slint)
+  return()
+endif()
+
 # Set compile options
 set(SLINT_FEATURE_BACKEND_QT ON)
 set(SLINT_FEATURE_BACKEND_WINIT OFF)
@@ -11,11 +16,9 @@ set(DEFAULT_SLINT_EMBED_RESOURCES embed-files)
 set(SLINT_STYLE "cosmic-dark")
 
 # Include local submodule
-if(NOT TARGET Slint)
-  add_subdirectory(
-    "${PROJECT_SOURCE_DIR}/libs/slint/api/cpp" "${CMAKE_BINARY_DIR}/libs/slint"
-  )
-endif()
+add_subdirectory(
+  "${PROJECT_SOURCE_DIR}/libs/slint/api/cpp" "${CMAKE_BINARY_DIR}/libs/slint"
+)
 set(Slint_FOUND TRUE)
 
 # Suppress compiler warning (https://github.com/slint-ui/slint/issues/2681)

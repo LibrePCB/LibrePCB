@@ -1,24 +1,27 @@
+# Ignore subsequent calls (https://github.com/LibrePCB/LibrePCB/issues/1812)
+if(TARGET dxflib)
+  return()
+endif()
+
+# Find bundled submodule
 set(DXFLIB_SUBMODULE_BASEPATH "${PROJECT_SOURCE_DIR}/libs/dxflib")
 if(EXISTS "${DXFLIB_SUBMODULE_BASEPATH}"
    AND NOT UNBUNDLE_DXFLIB
    AND NOT UNBUNDLE_ALL
 )
-  if(NOT TARGET dxflib)
-    message(STATUS "Using vendored Dxflib")
+  message(STATUS "Using vendored Dxflib")
 
-    # Include local submodule
-    add_subdirectory(
-      "${DXFLIB_SUBMODULE_BASEPATH}" "${CMAKE_BINARY_DIR}/libs/dxflib"
-      EXCLUDE_FROM_ALL
-    )
+  # Include local submodule
+  add_subdirectory(
+    "${DXFLIB_SUBMODULE_BASEPATH}" "${CMAKE_BINARY_DIR}/libs/dxflib"
+    EXCLUDE_FROM_ALL
+  )
 
-    # Disable deprecation warnings since they are not under our control.
-    target_compile_options(dxflib PRIVATE -Wno-deprecated-declarations)
-  endif()
-
-  set(Dxflib_FOUND TRUE)
+  # Disable deprecation warnings since they are not under our control.
+  target_compile_options(dxflib PRIVATE -Wno-deprecated-declarations)
 
   # Stop here, we're done
+  set(Dxflib_FOUND TRUE)
   return()
 endif()
 

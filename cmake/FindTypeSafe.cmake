@@ -1,21 +1,24 @@
+# Ignore subsequent calls (https://github.com/LibrePCB/LibrePCB/issues/1812)
+if(TARGET type_safe)
+  return()
+endif()
+
+# Find bundled submodule
 set(TYPE_SAFE_SUBMODULE_BASEPATH "${PROJECT_SOURCE_DIR}/libs/type_safe")
 if(EXISTS "${TYPE_SAFE_SUBMODULE_BASEPATH}")
-  if(NOT TARGET type_safe)
-    message(STATUS "Using vendored TypeSafe")
+  message(STATUS "Using vendored TypeSafe")
 
-    # Include local submodule
-    add_subdirectory(
-      "${TYPE_SAFE_SUBMODULE_BASEPATH}" "${CMAKE_BINARY_DIR}/libs/type_safe"
-      EXCLUDE_FROM_ALL
-    )
+  # Include local submodule
+  add_subdirectory(
+    "${TYPE_SAFE_SUBMODULE_BASEPATH}" "${CMAKE_BINARY_DIR}/libs/type_safe"
+    EXCLUDE_FROM_ALL
+  )
 
-    # Alias static lib to namespaced variant
-    add_library(TypeSafe::TypeSafe ALIAS type_safe)
-  endif()
-
-  set(TypeSafe_FOUND TRUE)
+  # Alias static lib to namespaced variant
+  add_library(TypeSafe::TypeSafe ALIAS type_safe)
 
   # Stop here, we're done
+  set(TypeSafe_FOUND TRUE)
   return()
 endif()
 

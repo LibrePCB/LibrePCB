@@ -1,24 +1,27 @@
+# Ignore subsequent calls (https://github.com/LibrePCB/LibrePCB/issues/1812)
+if(TARGET fontobene_qt)
+  return()
+endif()
+
+# Find bundled submodule
 set(FONTOBENE_SUBMODULE_BASEPATH "${PROJECT_SOURCE_DIR}/libs/fontobene-qt")
 if(EXISTS "${FONTOBENE_SUBMODULE_BASEPATH}"
    AND NOT UNBUNDLE_FONTOBENE_QT
    AND NOT UNBUNDLE_ALL
 )
-  if(NOT TARGET fontobene_qt)
-    message(STATUS "Using vendored FontoBeneQt")
+  message(STATUS "Using vendored FontoBeneQt")
 
-    # Use same Qt version as for LibrePCB
-    set(FONTOBENE_QT_MAJOR_VERSION ${QT_MAJOR_VERSION})
+  # Use same Qt version as for LibrePCB
+  set(FONTOBENE_QT_MAJOR_VERSION ${QT_MAJOR_VERSION})
 
-    # Include local submodule
-    add_subdirectory(
-      "${FONTOBENE_SUBMODULE_BASEPATH}" "${CMAKE_BINARY_DIR}/libs/fontobene-qt"
-      EXCLUDE_FROM_ALL
-    )
-  endif()
-
-  set(FontoBeneQt_FOUND TRUE)
+  # Include local submodule
+  add_subdirectory(
+    "${FONTOBENE_SUBMODULE_BASEPATH}" "${CMAKE_BINARY_DIR}/libs/fontobene-qt"
+    EXCLUDE_FROM_ALL
+  )
 
   # Stop here, we're done
+  set(FontoBeneQt_FOUND TRUE)
   return()
 endif()
 
@@ -39,6 +42,7 @@ if(FONTOBENE_FOUND)
   add_library(FontoBene::FontoBeneQt ALIAS fontobene_qt)
 
   # Stop here, we're done
+  set(FontoBeneQt_FOUND TRUE)
   return()
 endif()
 
@@ -62,6 +66,7 @@ if(FONTOBENE_INCLUDE_DIR)
   mark_as_advanced(FONTOBENE_INCLUDE_DIR)
 
   # Stop here, we're done
+  set(FontoBeneQt_FOUND TRUE)
   return()
 endif()
 
@@ -92,6 +97,7 @@ if(FONTOBENE_FOUND)
   add_library(FontoBene::FontoBeneQt ALIAS fontobene_qt)
 
   # Stop here, we're done
+  set(FontoBeneQt_FOUND TRUE)
   return()
 endif()
 
@@ -117,6 +123,7 @@ if(FONTOBENE_INCLUDE_DIR)
   mark_as_advanced(FONTOBENE_INCLUDE_DIR)
 
   # Stop here, we're done
+  set(FontoBeneQt_FOUND TRUE)
   return()
 endif()
 

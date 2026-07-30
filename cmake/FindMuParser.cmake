@@ -1,44 +1,47 @@
+# Ignore subsequent calls (https://github.com/LibrePCB/LibrePCB/issues/1812)
+if(TARGET muparser)
+  return()
+endif()
+
+# Find bundled submodule
 set(MUPARSER_SUBMODULE_BASEPATH "${PROJECT_SOURCE_DIR}/libs/muparser")
 if(EXISTS "${MUPARSER_SUBMODULE_BASEPATH}"
    AND NOT UNBUNDLE_MUPARSER
    AND NOT UNBUNDLE_ALL
 )
-  if(NOT TARGET muparser)
-    message(STATUS "Using vendored MuParser")
+  message(STATUS "Using vendored MuParser")
 
-    # Disable unneeded features
-    set(ENABLE_SAMPLES
-        OFF
-        CACHE BOOL "Build the samples" FORCE
-    )
-    set(ENABLE_OPENMP
-        OFF
-        CACHE BOOL "Enable OpenMP for multithreading" FORCE
-    )
-    set(ENABLE_WIDE_CHAR
-        OFF
-        CACHE BOOL "Enable wide character support" FORCE
-    )
+  # Disable unneeded features
+  set(ENABLE_SAMPLES
+      OFF
+      CACHE BOOL "Build the samples" FORCE
+  )
+  set(ENABLE_OPENMP
+      OFF
+      CACHE BOOL "Enable OpenMP for multithreading" FORCE
+  )
+  set(ENABLE_WIDE_CHAR
+      OFF
+      CACHE BOOL "Enable wide character support" FORCE
+  )
 
-    # Include local submodule
-    add_subdirectory(
-      "${MUPARSER_SUBMODULE_BASEPATH}" "${CMAKE_BINARY_DIR}/libs/muparser"
-      EXCLUDE_FROM_ALL
-    )
+  # Include local submodule
+  add_subdirectory(
+    "${MUPARSER_SUBMODULE_BASEPATH}" "${CMAKE_BINARY_DIR}/libs/muparser"
+    EXCLUDE_FROM_ALL
+  )
 
-    # Suppress compiler warnings since they are not under our control.
-    target_compile_options(muparser PRIVATE -Wno-deprecated-declarations)
-    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang") # Options which are unknown by GCC
-      target_compile_options(muparser PUBLIC -Wno-nested-anon-types)
-    endif()
-
-    # Alias lib to namespaced variant
-    add_library(MuParser::MuParser ALIAS muparser)
+  # Suppress compiler warnings since they are not under our control.
+  target_compile_options(muparser PRIVATE -Wno-deprecated-declarations)
+  if(CMAKE_CXX_COMPILER_ID MATCHES "Clang") # Options which are unknown by GCC
+    target_compile_options(muparser PUBLIC -Wno-nested-anon-types)
   endif()
 
-  set(MuParser_FOUND TRUE)
+  # Alias lib to namespaced variant
+  add_library(MuParser::MuParser ALIAS muparser)
 
   # Stop here, we're done
+  set(MuParser_FOUND TRUE)
   return()
 endif()
 
@@ -53,6 +56,7 @@ if(muparser_FOUND)
   endif()
 
   # Stop here, we're done
+  set(MuParser_FOUND TRUE)
   return()
 endif()
 
