@@ -23,33 +23,41 @@ export struct RenumberComponentsItemData {
 }
 
 export component RenumberComponentsDialog inherits Window {
-    title: @tr("Color Scheme");
+    title: @tr("Renumber Components");
     icon: @image-url("../../../img/app/librepcb.svg");
     background: Data.theme.window;
     default-font-family: "Noto Sans";
-    preferred-width: 300px;
+    preferred-width: 400px;
     preferred-height: 500px;
     forward-focus: fs;
 
-    in-out property <string> name: "Foo Bar";
     in-out property <[RenumberComponentsItemData]> model: [
         {
-            name: "Color 1",
+            name: "U1",
+            new-name: "U5",
+            value: "NE555",
         },
         {
-            name: "Color 2",
+            name: "U2",
+            new-name: "U1",
+            value: "STM32F407VET6",
         },
         {
-            name: "Color 3",
+            name: "R3",
+            new-name: "R27",
+            value: "100k",
         },
         {
-            name: "Color 4",
+            name: "R12",
+            new-name: "R13",
+            value: "1k",
         },
     ];
     in-out property <int> current-index: 0;
     property <RenumberComponentsItemData> current-item: model[current-index];
     property <length> item-height: 24px;
 
+    callback apply-requested();
     callback close-requested();
 
     function set-current-index(index: int) {
@@ -65,62 +73,125 @@ export component RenumberComponentsDialog inherits Window {
         padding: 7px;
         spacing: 8px;
 
+        Text {
+            text: @tr("The following components will be renamed to put them into a natural order:");
+            wrap: word-wrap;
+            color: Data.theme.base-text;
+        }
+
         fs := FocusScope {
+            vertical-stretch: 1;
+
             Rectangle {
                 background: Data.theme.control;
                 border-color: Data.theme.control-border;
                 border-width: 1px;
+
+                if model.length == 0: VerticalLayout {
+                    width: 80%;
+                    height: 80%;
+                    alignment: center;
+                    spacing: 8px;
+
+                    Rectangle {
+                        Image {
+                            width: min(0.5 * fs.width, 150px);
+                            height: min(0.5 * fs.height, 150px);
+                            source: @image-url("../../font-awesome/svgs/solid/check.svg");
+                            colorize: Data.theme.control-text-muted.with-alpha(0.3);
+                            image-fit: contain;
+                        }
+                    }
+
+                    Text {
+                        text: @tr("No components to renumber");
+                        font-size: 18px;
+                        horizontal-alignment: center;
+                        color: Data.theme.control-text-muted.with-alpha(0.7);
+                        wrap: word-wrap;
+                    }
+                }
 
                 view := ListScrollView {
                     width: parent.width - 2px;
                     height: parent.height - 2px;
                     accessible-item-count: model.length;
 
-                    for item[index] in model: item-ta := TouchArea {
-                        height: item-height;
-
-                        // Accessibility
-                        accessible-role: list-item;
-                        accessible-label: item.name;
-                        accessible-item-selectable: true;
-                        accessible-item-selected: (current-index == index);
-                        accessible-item-index: index;
-                        accessible-action-default => {
-                            item-ta.clicked();
-                        }
-
-                        Rectangle {
-                            background: {
-                                if index == current-index {
-                                    Data.theme.control-checked
-                                } else if item-ta.has-hover {
-                                    Data.theme.control-hovered
-                                } else {
-                                    Data.theme.control
+                    GridLayout {
+                        for item[index] in model: Row {
+                            Rectangle {
+                                ta-1 := TouchArea {
+                                    clicked => {
+                                        if current-index != index {
+                                            set-current-index(index);
+                                        }
+                                        fs.focus();
+                                    }
                                 }
-                            };
 
-                            HorizontalLayout {
-                                spacing: 7px;
-                                padding-top: 1px;
-                                padding-bottom: 1px;
-                                padding-left: 4px;
-                                padding-right: 4px;
+                                background: {
+                                    if index == current-index {
+                                        Data.theme.control-checked
+                                    } else if ta-1.has-hover || ta-2.has-hover {
+                                        Data.theme.control-hovered
+                                    } else {
+                                        Data.theme.control
+                                    }
+                                };
 
-                                Text {
-                                    vertical-alignment: center;
-                                    color: Data.theme.control-text;
-                                    text: item.name;
-                                    accessible-role: none;
+                                HorizontalLayout {
+                                    spacing: 7px;
+                                    padding-top: 1px;
+                                    padding-bottom: 1px;
+                                    padding-left: 4px;
+                                    padding-right: 4px;
+
+                                    Text {
+                                        vertical-alignment: center;
+                                        color: Data.theme.control-text;
+                                        text: item.name + " → " + item.new-name;
+                                        accessible-role: none;
+                                    }
                                 }
                             }
-                        }
 
-                        clicked => {
-                            if current-index != index {
-                                set-current-index(index);
+                            Rectangle {
+                                horizontal-stretch: 1;
+
+                                ta-2 := TouchArea {
+                                    clicked => {
+                                        if current-index != index {
+                                            set-current-index(index);
+                                        }
+                                        fs.focus();
+                                    }
+                                }
+
+                                background: {
+                                    if index == current-index {
+                                        Data.theme.control-checked
+                                    } else if ta-1.has-hover || ta-2.has-hover {
+                                        Data.theme.control-hovered
+                                    } else {
+                                        Data.theme.control
+                                    }
+                                };
+
+                                HorizontalLayout {
+                                    spacing: 7px;
+                                    padding-top: 1px;
+                                    padding-bottom: 1px;
+                                    padding-left: 4px;
+                                    padding-right: 4px;
+
+                                    Text {
+                                        vertical-alignment: center;
+                                        color: Data.theme.control-text;
+                                        text: item.value;
+                                        accessible-role: none;
+                                    }
+                                }
                             }
-                            fs.focus();
                         }
                     }
                 }
@@ -141,7 +212,18 @@ export component RenumberComponentsDialog inherits Window {
         HorizontalLayout {
             spacing: 5px;
 
-            Button {
+            if model.length > 0: apply-btn := Button {
+                horizontal-stretch: 5;
+                text: @tr("Apply");
+                primary: true;
+
+                clicked => {
+                    apply-requested();
+                }
+            }
+
+            close-btn := Button {
+                horizontal-stretch: 1;
                 text: @tr("Close");
 
                 clicked => {
