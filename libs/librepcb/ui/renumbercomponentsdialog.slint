@@ -1,0 +1,153 @@
+import "../../../share/librepcb/fonts/NotoSans-Light.ttf";
+import "../../../share/librepcb/fonts/NotoSans-LightItalic.ttf";
+import "../../../share/librepcb/fonts/NotoSans-Regular.ttf";
+import "../../../share/librepcb/fonts/NotoSans-Italic.ttf";
+import "../../../share/librepcb/fonts/NotoSans-Bold.ttf";
+import "../../../share/librepcb/fonts/NotoSans-BoldItalic.ttf";
+import "../../../share/librepcb/fonts/NotoSansMono-Regular.ttf";
+
+import {
+    Button,
+    CopyToClipboardIconButton,
+    IconButton,
+    LineEdit,
+    ListScrollView,
+    ToolTip,
+} from "widgets.slint";
+import { Data } from "api.slint";
+
+export struct RenumberComponentsItemData {
+    name: string,
+    new-name: string,
+    value: string,
+}
+
+export component RenumberComponentsDialog inherits Window {
+    title: @tr("Color Scheme");
+    icon: @image-url("../../../img/app/librepcb.svg");
+    background: Data.theme.window;
+    default-font-family: "Noto Sans";
+    preferred-width: 300px;
+    preferred-height: 500px;
+    forward-focus: fs;
+
+    in-out property <string> name: "Foo Bar";
+    in-out property <[RenumberComponentsItemData]> model: [
+        {
+            name: "Color 1",
+        },
+        {
+            name: "Color 2",
+        },
+        {
+            name: "Color 3",
+        },
+        {
+            name: "Color 4",
+        },
+    ];
+    in-out property <int> current-index: 0;
+    property <RenumberComponentsItemData> current-item: model[current-index];
+    property <length> item-height: 24px;
+
+    callback close-requested();
+
+    function set-current-index(index: int) {
+        if ((index + 1) * item-height) > (view.height - view.viewport-y) {
+            view.viewport-y = -(index + 1) * item-height + view.height;
+        } else if (index * item-height) < -(view.viewport-y) {
+            view.viewport-y = -(index * item-height);
+        }
+        current-index = index;
+    }
+
+    VerticalLayout {
+        padding: 7px;
+        spacing: 8px;
+
+        fs := FocusScope {
+            Rectangle {
+                background: Data.theme.control;
+                border-color: Data.theme.control-border;
+                border-width: 1px;
+
+                view := ListScrollView {
+                    width: parent.width - 2px;
+                    height: parent.height - 2px;
+                    accessible-item-count: model.length;
+
+                    for item[index] in model: item-ta := TouchArea {
+                        height: item-height;
+
+                        // Accessibility
+                        accessible-role: list-item;
+                        accessible-label: item.name;
+                        accessible-item-selectable: true;
+                        accessible-item-selected: (current-index == index);
+                        accessible-item-index: index;
+                        accessible-action-default => {
+                            item-ta.clicked();
+                        }
+
+                        Rectangle {
+                            background: {
+                                if index == current-index {
+                                    Data.theme.control-checked
+                                } else if item-ta.has-hover {
+                                    Data.theme.control-hovered
+                                } else {
+                                    Data.theme.control
+                                }
+                            };
+
+                            HorizontalLayout {
+                                spacing: 7px;
+                                padding-top: 1px;
+                                padding-bottom: 1px;
+                                padding-left: 4px;
+                                padding-right: 4px;
+
+                                Text {
+                                    vertical-alignment: center;
+                                    color: Data.theme.control-text;
+                                    text: item.name;
+                                    accessible-role: none;
+                                }
+                            }
+                        }
+
+                        clicked => {
+                            if current-index != index {
+                                set-current-index(index);
+                            }
+                            fs.focus();
+                        }
+                    }
+                }
+            }
+
+            key-pressed(event) => {
+                if event.text == Key.DownArrow {
+                    set-current-index(min(current-index + 1, model.length - 1));
+                    return accept;
+                } else if event.text == Key.UpArrow {
+                    set-current-index(max(current-index - 1, 0));
+                    return accept;
+                }
+                reject
+            }
+        }
+
+        HorizontalLayout {
+            spacing: 5px;
+
+            Button {
+                text: @tr("Close");
+
+                clicked => {
+                    close-requested();
+                }
+            }
+        }
+    }
+}
