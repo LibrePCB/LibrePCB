@@ -12,6 +12,7 @@ import { HomePanel } from "homepanel.slint";
 import { DocumentsPanel } from "documentspanel.slint";
 import { GraphicsLayersPanel } from "graphicslayerspanel.slint";
 import { PlaceDevicesPanel } from "project/placedevicespanel.slint";
+import { RenumberComponentsPanel } from "project/renumbercomponentspanel.slint";
 import { RuleCheckPanel } from "rulecheckpanel.slint";
 import { OrderPanel } from "project/orderpanel.slint";
 import { LibrariesPanel } from "library/librariespanel.slint";
@@ -160,6 +161,8 @@ export component AppWindow inherits Window {
             if Data.panel-page == PanelPage.place-devices: PlaceDevicesPanel {
                 window-height: root.height;
             }
+
+            if Data.panel-page == PanelPage.renumber-components: RenumberComponentsPanel { }
 
             if Data.panel-page == PanelPage.rule-check: RuleCheckPanel { }
 

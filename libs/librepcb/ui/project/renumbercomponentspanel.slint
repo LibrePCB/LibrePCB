@@ -1,0 +1,192 @@
+import { NameRowHeader } from "../library/metadatawidgets.slint";
+import {
+    Button,
+    ComboBox,
+    IconButton,
+    LinkText,
+    ListScrollView,
+    PanelHeader,
+} from "../widgets.slint";
+import {
+    Backend,
+    Board2dTabData,
+    BoardData,
+    Constants,
+    Data,
+    Helpers,
+    IpcDensityLevel,
+    NotificationType,
+    PanelPage,
+    ProjectAction,
+    RenumberComponentsItemData,
+    TabAction,
+} from "../api.slint";
+
+export component RenumberComponentsPanel inherits FocusScope {
+    property <length> item-height: 22px;
+    property <[RenumberComponentsItemData]> model: Data.current-project.renumber-components;
+    property <int> current-index: 0;
+
+    function set-current-index(index: int) {
+        if ((index + 1) * item-height) > (view.height - view.viewport-y) {
+            view.viewport-y = -(index + 1) * item-height + view.height;
+        } else if (index * item-height) < -(view.viewport-y) {
+            view.viewport-y = -(index * item-height);
+        }
+        current-index = index;
+    }
+
+    // Set focus when panel is shown. Not sure if it's always desired(?).
+    init => {
+        root.focus();
+    }
+
+    VerticalLayout {
+        header := PanelHeader {
+            z: 10;  // For the tooltip.
+            title: @tr("Renumber Components").to-uppercase();
+            highlight: root.has-focus;
+        }
+
+        VerticalLayout {
+            padding: 8px;
+
+            Text {
+                color: Data.theme.control-text;
+                wrap: word-wrap;
+                text: @tr("The following components will be renamed to put them into a natural order:");
+            }
+        }
+
+        view := ListScrollView {
+            vertical-stretch: 0;
+            //preferred-height: model.length * item-height;
+            //viewport-height: model.length * item-height;
+            force-show-scrollbars: root.has-focus;
+            visible: model.length > 0;
+
+            GridLayout {
+                for item[index] in model: Row {
+                    Rectangle {
+                        ta-1 := TouchArea {
+                            clicked => {
+                                if current-index != index {
+                                    set-current-index(index);
+                                }
+                                root.focus();
+                            }
+                        }
+
+                        background: {
+                            if index == current-index {
+                                Data.theme.control-checked
+                            } else if ta-1.has-hover || ta-2.has-hover {
+                                Data.theme.control-hovered
+                            } else {
+                                Data.theme.control
+                            }
+                        };
+
+                        HorizontalLayout {
+                            spacing: 7px;
+                            padding-top: 1px;
+                            padding-bottom: 1px;
+                            padding-left: 4px;
+                            padding-right: 4px;
+
+                            Text {
+                                vertical-alignment: center;
+                                color: Data.theme.control-text;
+                                text: item.name + " → " + item.new-name;
+                                accessible-role: none;
+                            }
+                        }
+                    }
+
+                    Rectangle {
+                        horizontal-stretch: 1;
+
+                        ta-2 := TouchArea {
+                            clicked => {
+                                if current-index != index {
+                                    set-current-index(index);
+                                }
+                                root.focus();
+                            }
+                        }
+
+                        background: {
+                            if index == current-index {
+                                Data.theme.control-checked
+                            } else if ta-1.has-hover || ta-2.has-hover {
+                                Data.theme.control-hovered
+                            } else {
+                                Data.theme.control
+                            }
+                        };
+
+                        HorizontalLayout {
+                            spacing: 7px;
+                            padding-top: 1px;
+                            padding-bottom: 1px;
+                            padding-left: 4px;
+                            padding-right: 4px;
+
+                            Text {
+                                vertical-alignment: center;
+                                color: Data.theme.control-text;
+                                text: item.value;
+                                accessible-role: none;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        HorizontalLayout {
+            padding: 8px;
+            spacing: 5px;
+
+            if model.length > 0: apply-btn := Button {
+                horizontal-stretch: 5;
+                text: @tr("Apply");
+                primary: true;
+
+                clicked => {
+                    Helpers.trigger-current-project-action(ProjectAction.renumber-components-apply);
+                }
+            }
+
+            cancel-btn := Button {
+                horizontal-stretch: 1;
+                text: @tr("Cancel");
+
+                clicked => {
+                    //close-requested();
+                }
+            }
+        }
+
+        Rectangle { }
+    }
+
+    /*key-pressed(event) => {
+        if (event.text == Key.DownArrow) && (selected-index < model.length - 1) {
+            set-current-index(selected-index + 1);
+            return accept;
+        } else if (event.text == Key.UpArrow) && (selected-index > 0) {
+            set-current-index(selected-index - 1);
+            return accept;
+        } else if item-selected {
+            if (event.text == Key.Return) && (!event.modifiers.shift) {
+                Helpers.trigger-current-tab-action(TabAction.board-place-component);
+                return accept;
+            } else if (event.text == Key.Return) && event.modifiers.shift {
+                Helpers.trigger-current-tab-action(TabAction.board-place-components-similar);
+                return accept;
+            }
+        }
+        reject
+    }*/
+}

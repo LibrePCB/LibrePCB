@@ -105,6 +105,7 @@ ProjectEditor::ProjectEditor(
     mActiveSchematicTabs(),
     mErcMessages(),
     mErcExecutionError(),
+    mRenumberComponentsModel(),
     mManualModificationsMade(false),
     mLastAutosaveStateId(mUndoStack->getUniqueStateId()),
     mAutoSaveTimer() {
@@ -315,6 +316,7 @@ ui::ProjectData ProjectEditor::getUiData() const noexcept {
           q2s(mErcExecutionError),  // Execution error
           !mProject->getDirectory().isWritable(),  // Read-only
       },
+      mRenumberComponentsModel,  // Renumber components
   };
 }
 
@@ -358,8 +360,19 @@ void ProjectEditor::trigger(ui::ProjectAction a) noexcept {
       break;
     }
 
-    case ui::ProjectAction::RenumberComponents: {
-      execRenumberComponentsDialog(qApp->activeWindow());
+    case ui::ProjectAction::RenumberComponentsOpen: {
+      if (!mRenumberComponentsModel) {
+        mRenumberComponentsModel =
+            std::make_shared<RenumberComponentsModel>(*this);
+        onUiDataChanged.notify();
+      }
+      break;
+    }
+
+    case ui::ProjectAction::RenumberComponentsApply: {
+      if (mRenumberComponentsModel) {
+        mRenumberComponentsModel->apply(qApp->activeWindow());
+      }
       break;
     }
 
@@ -575,36 +588,6 @@ void ProjectEditor::execLppzExportDialog(QWidget* parent) noexcept {
   } catch (const Exception& e) {
     QMessageBox::critical(parent, tr("Error"), e.getMsg());
   }
-}
-
-void ProjectEditor::execRenumberComponentsDialog(QWidget* parent) noexcept {
-  auto model = std::make_shared<RenumberComponentsModel>(*this);
-
-  auto win = ui::RenumberComponentsDialog::create();
-  win->global<ui::Data>().set_theme(l2s(mApp.getTheme()));
-  win->set_model(model);
-  win->set_current_index(0);
-  win->on_apply_requested(
-      std::bind(&RenumberComponentsModel::apply, model.get(), parent));
-
-  QEventLoop loop;
-  auto closeDialog = [&loop, &win]() {
-    win->hide();
-    loop.quit();
-    return slint::CloseRequestResponse::HideWindow;
-  };
-  win->on_close_requested(closeDialog);  // Closed with "Cancel" button
-  win->window().on_close_requested(closeDialog);  // Closed with "X" button
-
-  QWidget* widget =
-      static_cast<QWidget*>(slint::cbindgen_private::slint_qt_get_widget(
-          &win->window().window_handle()));
-  Q_ASSERT(widget);
-  widget->setWindowModality(Qt::ApplicationModal);
-  win->show();
-  // widget->move(geometry().center() - widget->rect().center());
-
-  loop.exec();
 }
 
 std::shared_ptr<SchematicEditor> ProjectEditor::execNewSheetDialog() noexcept {

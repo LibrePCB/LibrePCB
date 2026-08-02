@@ -48,6 +48,7 @@ class Workspace;
 namespace editor {
 
 class BoardEditor;
+class RenumberComponentsModel;
 class GuiApplication;
 class ProjectCrossProbe;
 class RuleCheckMessagesModel;
@@ -156,8 +157,6 @@ public:
    */
   void execLppzExportDialog(QWidget* parent) noexcept;
 
-  void execRenumberComponentsDialog(QWidget* parent) noexcept;
-
   std::shared_ptr<SchematicEditor> execNewSheetDialog() noexcept;
   void execRenameSheetDialog(int index) noexcept;
   void execDeleteSheetDialog(int index) noexcept;
@@ -243,6 +242,9 @@ private:
   QSet<SExpression> mDisappearedErcApprovals;
   QString mErcExecutionError;
   QTimer mErcTimer;
+
+  // Renumber components
+  std::shared_ptr<RenumberComponentsModel> mRenumberComponentsModel;
 
   /// Modifications bypassing the undo stack
   bool mManualModificationsMade;

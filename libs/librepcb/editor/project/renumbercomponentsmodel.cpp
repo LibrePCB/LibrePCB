@@ -55,7 +55,7 @@ RenumberComponentsModel::RenumberComponentsModel(ProjectEditor& editor,
                                                  QObject* parent) noexcept
   : QObject(parent), mProjectEditor(&editor), mUpToDate(false) {
   connect(&editor.getUndoStack(), &UndoStack::stateModified, this,
-          &RenumberComponentsModel::invalidate, Qt::QueuedConnection);
+          &RenumberComponentsModel::invalidate);
 }
 
 RenumberComponentsModel::~RenumberComponentsModel() noexcept {
@@ -229,7 +229,7 @@ void RenumberComponentsModel::update() const noexcept {
     }
   }
 
-  // Create UI model.
+  // Create model items.
   auto hideComponent = [](const ComponentInstance* cmp) {
     if (!cmp->isPureSchematicOnly()) {
       return false;

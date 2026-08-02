@@ -330,6 +330,22 @@ export component SideBar {
             }
         }
 
+        renumber-components-btn := SideBarButton {
+            icon: @image-url("../../bootstrap-icons/icons/sort-down.svg");
+            //tooltip: Cmd.order-pcb.text;
+            //shortcut: Cmd.order-pcb.shortcut;
+            enabled: Data.current-project.valid;
+            checked: Data.panel-page == PanelPage.renumber-components;
+
+            clicked => {
+                button-clicked(PanelPage.renumber-components);
+            }
+
+            changed enabled => {
+                button-enable-changed(self.enabled, self.checked);
+            }
+        }
+
         Rectangle {
             vertical-stretch: 1;
         }

@@ -49,7 +49,7 @@ export global Data {
 
     // State
     in-out property <float> panel-width-factor: 1;
-    in-out property <PanelPage> panel-page: PanelPage.home;
+    in-out property <PanelPage> panel-page: PanelPage.renumber-components;
     in property <bool> erc-zoom-to-location: true; // ERC panel: "zoom to location"
     in property <bool> drc-zoom-to-location: true; // DRC panel: "zoom to location"
     in property <bool> order-pcb-open-web-browser: true; // Order panel: "open web browser after upload"
@@ -1614,6 +1614,28 @@ export global Data {
                 unapproved: 42,
                 execution-error: "",
             },
+            renumber-components: [
+                {
+                    name: "U1",
+                    new-name: "U5",
+                    value: "NE555",
+                },
+                {
+                    name: "U2",
+                    new-name: "U1",
+                    value: "STM32F407VET6",
+                },
+                {
+                    name: "R3",
+                    new-name: "R27",
+                    value: "100k",
+                },
+                {
+                    name: "R12",
+                    new-name: "R13",
+                    value: "1k",
+                },
+            ],
         },
         {
             valid: true,
