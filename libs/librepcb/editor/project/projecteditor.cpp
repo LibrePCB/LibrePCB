@@ -695,8 +695,8 @@ void ProjectEditor::execRenumberComponentsDialog(QWidget* parent) noexcept {
         const QString value =
             AttributeSubstitutor::substitute(it.key()->getValue(), lookup)
                 .simplified();
-        items.emplace_back(q2s(*it.key()->getName()), q2s(it.value()),
-                           q2s(value));
+        items.push_back(ui::RenumberComponentsItemData{
+            q2s(*it.key()->getName()), q2s(it.value()), q2s(value)});
       }
     }
     Toolbox::sortNumeric(
