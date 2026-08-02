@@ -44,6 +44,7 @@
 #include "outputjobsdialog/outputjobsdialog.h"
 #include "projectcrossprobe.h"
 #include "projectsetupdialog.h"
+#include "renumbercomponentsmodel.cpp"
 #include "schematic/schematiceditor.h"
 #include "schematic/schematictab.h"
 #include "ui.h"
@@ -576,172 +577,15 @@ void ProjectEditor::execLppzExportDialog(QWidget* parent) noexcept {
   }
 }
 
-static void traverseSymbolGroup(QVector<SI_Symbol*>& group,
-                                SI_Symbol* sym) noexcept {
-  group.append(sym);
-  for (SI_SymbolPin* pin : sym->getPins()) {
-    if (SI_NetSegment* ns = pin->getNetSegmentOfLines()) {
-      foreach (SI_SymbolPin* otherPin, ns->getAllConnectedPins()) {
-        if (!group.contains(&otherPin->getSymbol())) {
-          traverseSymbolGroup(group, &otherPin->getSymbol());
-        }
-      }
-    }
-  }
-}
-
 void ProjectEditor::execRenumberComponentsDialog(QWidget* parent) noexcept {
-  QHash<ComponentInstance*, QString> renames;
-  auto model =
-      std::make_shared<slint::VectorModel<ui::RenumberComponentsItemData>>();
-
-  auto updateRenames = [&]() {
-    // Find groups of interconnected symbols.
-    QVector<QVector<SI_Symbol*>> symGroups;
-    QSet<SI_Symbol*> traversedSymbols;
-    for (Schematic* sch : mProject->getSchematics()) {
-      for (SI_Symbol* sym : sch->getSymbols()) {
-        if (!traversedSymbols.contains(sym)) {
-          QVector<SI_Symbol*> group;
-          traverseSymbolGroup(group, sym);
-          symGroups.append(group);
-          for (SI_Symbol* s : std::as_const(group)) {
-            traversedSymbols.insert(s);
-          }
-        }
-      }
-    }
-
-    // Sort groups by schematic page & position of top-left symbol.
-    for (QVector<SI_Symbol*>& group : symGroups) {
-      std::stable_sort(group.begin(), group.end(),
-                       [](const SI_Symbol* a, const SI_Symbol* b) {
-                         const Point ap = a->getPosition();
-                         const Point bp = b->getPosition();
-                         if (ap.getX() != bp.getX()) {
-                           return ap.getX() < bp.getX();
-                         } else {
-                           return ap.getY() > bp.getY();
-                         }
-                       });
-    }
-    std::stable_sort(
-        symGroups.begin(), symGroups.end(),
-        [this](const QVector<SI_Symbol*>& a, const QVector<SI_Symbol*>& b) {
-          const int ai = mProject->getSchematicIndex(a.first()->getSchematic());
-          const int bi = mProject->getSchematicIndex(b.first()->getSchematic());
-          if (ai != bi) {
-            return ai < bi;
-          }
-          const Point ap = a.first()->getPosition();
-          const Point bp = b.first()->getPosition();
-          if (ap.getX() != bp.getX()) {
-            return ap.getX() < bp.getX();
-          } else {
-            return ap.getY() > bp.getY();
-          }
-        });
-
-    // Helper to determine the next free designator.
-    QHash<QString, int> numbers;
-    const QRegularExpression re("^([^0-9]*)([0-9]*)(.*)");
-    auto getNewName = [&numbers, &re](const CircuitIdentifier& name) {
-      const QString prefix = re.match(*name).captured(1);  // NOLINT
-      const QString suffix = re.match(*name).captured(3);  // NOLINT
-      const int number = numbers.value(prefix, 0) + 1;
-      numbers.insert(prefix, number);
-      return prefix + QString::number(number) + suffix;
-    };
-
-    // Determine new designators.
-    // Also take into account all of the remaining components which are not
-    // added to any circuit. This is important to avoid potential name conflicts
-    // with those components (e.g. if a hidden component is named "C1", it has
-    // to be renamed to allow using "C1" for one of the visible components).
-    renames.clear();
-    for (QVector<SI_Symbol*>& group : symGroups) {
-      for (SI_Symbol* sym : group) {
-        ComponentInstance& cmp = sym->getComponentInstance();
-        if (!renames.contains(&cmp)) {
-          renames.insert(&cmp, getNewName(cmp.getName()));
-        }
-      }
-    }
-    for (ComponentInstance* cmp :
-         mProject->getCircuit().getComponentInstances()) {
-      if (!renames.contains(cmp)) {
-        renames.insert(cmp, getNewName(cmp->getName()));
-      }
-    }
-
-    // Create UI model.
-    std::vector<ui::RenumberComponentsItemData> items;
-    auto hideComponent = [](const ComponentInstance* cmp) {
-      if (!cmp->isPureSchematicOnly()) {
-        return false;
-      }
-      for (const SI_Symbol* sym : cmp->getSymbols()) {
-        for (const SI_Text* text : sym->getTexts()) {
-          if (text->getTextObj().getText().contains("NAME")) {
-            return false;
-          }
-        }
-      }
-      return true;
-    };
-    for (auto it = renames.begin(); it != renames.end(); it++) {
-      if ((it.key()->getName() != it.value()) && (!hideComponent(it.key()))) {
-        ProjectAttributeLookup lookup(*it.key(), nullptr, nullptr);
-        const QString value =
-            AttributeSubstitutor::substitute(it.key()->getValue(), lookup)
-                .simplified();
-        items.push_back(ui::RenumberComponentsItemData{
-            q2s(*it.key()->getName()), q2s(it.value()), q2s(value)});
-      }
-    }
-    Toolbox::sortNumeric(
-        items,
-        [](const QCollator& collator, const ui::RenumberComponentsItemData& a,
-           const ui::RenumberComponentsItemData& b) {
-          return collator(s2q(a.name), s2q(b.name));
-        });
-    model->set_vector(items);
-  };
-
-  updateRenames();
+  auto model = std::make_shared<RenumberComponentsModel>(*this);
 
   auto win = ui::RenumberComponentsDialog::create();
   win->global<ui::Data>().set_theme(l2s(mApp.getTheme()));
   win->set_model(model);
   win->set_current_index(0);
-  win->on_apply_requested([&]() {
-    try {
-      UndoStackTransaction transaction(*mUndoStack, tr("Re-Number Components"));
-
-      // Rename to a temporary name first to avoid conflicts.
-      int tmp = 0;
-      for (auto it = renames.begin(); it != renames.end(); it++) {
-        std::unique_ptr<CmdComponentInstanceEdit> cmd =
-            std::make_unique<CmdComponentInstanceEdit>(mProject->getCircuit(),
-                                                       *it.key());
-        cmd->setName(CircuitIdentifier(QString("_tmp_%1").arg(++tmp)));
-        transaction.append(cmd.release());  // can throw
-      }
-      // Now rename to the desired designator.
-      for (auto it = renames.begin(); it != renames.end(); it++) {
-        std::unique_ptr<CmdComponentInstanceEdit> cmd =
-            std::make_unique<CmdComponentInstanceEdit>(mProject->getCircuit(),
-                                                       *it.key());
-        cmd->setName(CircuitIdentifier(it.value()));  // can throw
-        transaction.append(cmd.release());  // can throw
-      }
-      transaction.commit();  // can throw
-    } catch (const Exception& e) {
-      QMessageBox::critical(parent, tr("Error"), e.getMsg());
-    }
-
-    updateRenames();
-  });
+  win->on_apply_requested(
+      std::bind(&RenumberComponentsModel::apply, model.get(), parent));
 
   QEventLoop loop;
   auto closeDialog = [&loop, &win]() {
