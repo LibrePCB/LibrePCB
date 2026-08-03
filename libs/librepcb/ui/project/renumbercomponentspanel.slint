@@ -24,7 +24,8 @@ import {
 
 export component RenumberComponentsPanel inherits FocusScope {
     property <length> item-height: 22px;
-    property <[RenumberComponentsItemData]> model: Data.current-project.renumber-components;
+    property <[RenumberComponentsItemData]> model;
+    //: Data.current-project.renumber-components;
     property <int> current-index: 0;
 
     function set-current-index(index: int) {
@@ -154,16 +155,16 @@ export component RenumberComponentsPanel inherits FocusScope {
                 primary: true;
 
                 clicked => {
-                    Helpers.trigger-current-project-action(ProjectAction.renumber-components-apply);
+                    Helpers.trigger-current-project-action(ProjectAction.renumber-components);
                 }
             }
 
-            cancel-btn := Button {
+            close-btn := Button {
                 horizontal-stretch: 1;
-                text: @tr("Cancel");
+                text: @tr("Close");
 
                 clicked => {
-                    //close-requested();
+                    Data.close-temporary-panel-page()
                 }
             }
         }

@@ -105,7 +105,7 @@ ProjectEditor::ProjectEditor(
     mActiveSchematicTabs(),
     mErcMessages(),
     mErcExecutionError(),
-    mRenumberComponentsModel(),
+    mRenumberComponentsModel(new RenumberComponentsModel(*this)),
     mManualModificationsMade(false),
     mLastAutosaveStateId(mUndoStack->getUniqueStateId()),
     mAutoSaveTimer() {
@@ -360,19 +360,8 @@ void ProjectEditor::trigger(ui::ProjectAction a) noexcept {
       break;
     }
 
-    case ui::ProjectAction::RenumberComponentsOpen: {
-      if (!mRenumberComponentsModel) {
-        mRenumberComponentsModel =
-            std::make_shared<RenumberComponentsModel>(*this);
-        onUiDataChanged.notify();
-      }
-      break;
-    }
-
-    case ui::ProjectAction::RenumberComponentsApply: {
-      if (mRenumberComponentsModel) {
-        mRenumberComponentsModel->apply(qApp->activeWindow());
-      }
+    case ui::ProjectAction::RenumberComponents: {
+      mRenumberComponentsModel->apply(qApp->activeWindow());
       break;
     }
 

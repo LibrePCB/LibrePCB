@@ -1501,7 +1501,9 @@ export component MainMenuBar {
                     enabled: Data.current-project.valid;
 
                     clicked => {
-                        Helpers.trigger-current-project-action(ProjectAction.renumber-components-open);
+                        //Helpers.trigger-current-project-action(ProjectAction.renumber-components-open);
+                        Data.panel-page = PanelPage.renumber-components;
+                        //Data.set-panel-page(PanelPage.renumber-components);
                         close-menu();
                     }
                 }

@@ -48,9 +48,9 @@ class Workspace;
 namespace editor {
 
 class BoardEditor;
-class RenumberComponentsModel;
 class GuiApplication;
 class ProjectCrossProbe;
+class RenumberComponentsModel;
 class RuleCheckMessagesModel;
 class SchematicEditor;
 class SchematicTab;

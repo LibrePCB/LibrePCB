@@ -1881,6 +1881,17 @@ export global Data {
         }
     }
 
+    public function close-temporary-panel-page() {
+        current-tab-changed();
+        if panel-page == PanelPage.renumber-components {
+            if projects.length + libraries.length > 0 {
+                panel-page = PanelPage.documents
+            } else {
+                panel-page = PanelPage.home
+            }
+        }
+    }
+
     public function set-current-tab(section: int, tab: int) {
         current-section-index = section;
         sections[section].current-tab-index = tab;
