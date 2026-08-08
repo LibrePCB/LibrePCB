@@ -61,10 +61,10 @@ export component RenumberComponentsDialog inherits Window {
     callback close-requested();
 
     function set-current-index(index: int) {
-        if ((index + 1) * item-height) > (view.height - view.viewport-y) {
-            view.viewport-y = -(index + 1) * item-height + view.height;
-        } else if (index * item-height) < -(view.viewport-y) {
-            view.viewport-y = -(index * item-height);
+        if ((index + 1) * item-height) > (view.height - view.content-y) {
+            view.content-y = -(index + 1) * item-height + view.height;
+        } else if (index * item-height) < -(view.content-y) {
+            view.content-y = -(index * item-height);
         }
         current-index = index;
     }
