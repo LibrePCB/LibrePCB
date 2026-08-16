@@ -55,6 +55,10 @@ BoardDesignRules::BoardDesignRules() noexcept
     mPadAnnularRing(UnsignedRatio(Ratio::fromPercent(25)),  // 25%
                     UnsignedLength(250000),  // 0.25mm
                     UnsignedLength(2000000)),  // 2mm
+    // pad copper expansion
+    mPadCopperExpansion(UnsignedRatio(Ratio::fromPercent(0)),  // 0%
+                        UnsignedLength(0),  // 0mm
+                        UnsignedLength(2000000)),  // 2mm
     // via annular ring
     mViaAnnularRing(UnsignedRatio(Ratio::fromPercent(25)),  // 25%
                     UnsignedLength(200000),  // 0.2mm
@@ -85,6 +89,13 @@ BoardDesignRules::BoardDesignRules(const SExpression& node)
     mPadInnerAutoAnnularRing(
         parsePadAutoAnnular(node.getChild("pad_annular_ring/inner/@0"))),
     mPadAnnularRing(node.getChild("pad_annular_ring")),
+    // pad copper expansion
+    mPadCopperExpansion(node.tryGetChild("pad_copper_expansion")
+                            ? BoundedUnsignedRatio(
+                                  *node.tryGetChild("pad_copper_expansion"))
+                            : BoundedUnsignedRatio(
+                                  UnsignedRatio(Ratio::fromPercent(0)),
+                                  UnsignedLength(0), UnsignedLength(2000000))),
     // via annular ring
     mViaAnnularRing(node.getChild("via_annular_ring")) {
 }
@@ -132,18 +143,18 @@ void BoardDesignRules::serialize(SExpression& root) const {
   root.ensureLineBreak();
   root.appendChild("default_via_drill_diameter", mDefaultViaDrillDiameter);
 
-  // stop mask
+          // stop mask
   root.ensureLineBreak();
   root.appendChild("stopmask_max_via_drill_diameter",
                    mStopMaskMaxViaDrillDiameter);
   root.ensureLineBreak();
   mStopMaskClearance.serialize(root.appendList("stopmask_clearance"));
 
-  // solder paste
+          // solder paste
   root.ensureLineBreak();
   mSolderPasteClearance.serialize(root.appendList("solderpaste_clearance"));
 
-  // pad annular ring
+          // pad annular ring
   {
     root.ensureLineBreak();
     SExpression& node = root.appendList("pad_annular_ring");
@@ -156,7 +167,11 @@ void BoardDesignRules::serialize(SExpression& root) const {
     mPadAnnularRing.serialize(node);
   }
 
-  // via annular ring
+          // pad copper expansion
+  root.ensureLineBreak();
+  mPadCopperExpansion.serialize(root.appendList("pad_copper_expansion"));
+
+          // via annular ring
   root.ensureLineBreak();
   mViaAnnularRing.serialize(root.appendList("via_annular_ring"));
 
@@ -190,6 +205,8 @@ BoardDesignRules& BoardDesignRules::operator=(
   mPadCmpSideAutoAnnularRing = rhs.mPadCmpSideAutoAnnularRing;
   mPadInnerAutoAnnularRing = rhs.mPadInnerAutoAnnularRing;
   mPadAnnularRing = rhs.mPadAnnularRing;
+  // pad copper expansion
+  mPadCopperExpansion = rhs.mPadCopperExpansion;
   // via annular ring
   mViaAnnularRing = rhs.mViaAnnularRing;
   return *this;
@@ -210,6 +227,8 @@ bool BoardDesignRules::operator==(const BoardDesignRules& rhs) const noexcept {
     return false;
   if (mPadInnerAutoAnnularRing != rhs.mPadInnerAutoAnnularRing) return false;
   if (mPadAnnularRing != rhs.mPadAnnularRing) return false;
+  // pad copper expansion
+  if (mPadCopperExpansion != rhs.mPadCopperExpansion) return false;
   // via annular ring
   if (mViaAnnularRing != rhs.mViaAnnularRing) return false;
   return true;

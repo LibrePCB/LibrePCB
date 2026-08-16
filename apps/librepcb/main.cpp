@@ -20,377 +20,69 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "./commandlineinterface.h"
+
 #include <librepcb/core/application.h>
 #include <librepcb/core/debug.h>
-#include <librepcb/core/exceptions.h>
-#include <librepcb/core/network/networkaccessmanager.h>
-#include <librepcb/core/workspace/uitheme.h>
-#include <librepcb/core/workspace/workspace.h>
-#include <librepcb/core/workspace/workspacesettings.h>
-#include <librepcb/editor/dialogs/directorylockhandlerdialog.h>
-#include <librepcb/editor/editorcommandset.h>
-#include <librepcb/editor/guiapplication.h>
-#include <librepcb/editor/project/partinformationprovider.h>
-#include <librepcb/editor/utils/editortoolbox.h>
-#include <librepcb/editor/utils/slinthelpers.h>
-#include <librepcb/editor/workspace/initializeworkspacewizard/initializeworkspacewizard.h>
 
-#include <QtConcurrent>
 #include <QtCore>
-#include <QtWidgets>
+#include <QtGui>
 
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
 using namespace librepcb;
-using namespace librepcb::editor;
-
-/*******************************************************************************
- *  Global Data
- ******************************************************************************/
-
-static const UiTheme* sTheme = nullptr;
-
-/*******************************************************************************
- *  Function Prototypes
- ******************************************************************************/
-
-static void setApplicationMetadata() noexcept;
-static void configureApplicationSettings() noexcept;
-static void writeLogHeader() noexcept;
-static void setTheme(const QString& name) noexcept;
-static int runApplication() noexcept;
-static bool isFileFormatStableOrAcceptUnstable() noexcept;
-static int openWorkspace(FilePath& path);
 
 /*******************************************************************************
  *  main()
  ******************************************************************************/
 
 int main(int argc, char* argv[]) {
-  // Workaround for issues with libfreetype 2.14 (crash with older Qt versions,
-  // partially missing glyph rendering with Qt 6.11.1), see
-  // https://qt-project.atlassian.net/browse/QTBUG-145783. The problem occurred
-  // with small schematic texts (~<2mm) on relatively large zoom factors.
+  // From librepcb/main.cpp - not sure if we need this also in the CLI, but
+  // at least it shouldn't hurt.
   if (qEnvironmentVariableIsEmpty("QT_MAX_CACHED_GLYPH_SIZE")) {
     qputenv("QT_MAX_CACHED_GLYPH_SIZE", "32");
   }
 
-  QApplication app(argc, argv);
+  // Creates the Debug object which installs the message handler. This must be
+  // done as early as possible.
+  Debug::instance();
 
-  // Give the main thread a higher priority than most other threads as GUI
-  // rendering and event processing are important for a smooth user experience.
-  QThread::currentThread()->setPriority(QThread::HighPriority);
+#ifdef Q_OS_LINUX
+  // Only force offscreen rendering if there's truly no display available
+  // and the user hasn't picked a platform themselves. This keeps existing
+  // setups working (e.g. CI running under xvfb-run) and only kicks in for
+  // genuinely headless environments.
+  if (qEnvironmentVariableIsEmpty("QT_QPA_PLATFORM") &&
+      qEnvironmentVariableIsEmpty("DISPLAY") &&
+      qEnvironmentVariableIsEmpty("WAYLAND_DISPLAY")) {
+    qputenv("QT_QPA_PLATFORM", "offscreen");
+  }
+#endif
+
+  // Silence logging output, it's a command line tool where logging messages
+  // could lead to issues when parsing the CLI output. Real errors will be
+  // printed to stderr explicitly and logging output can optionally be enabled
+  // with the "--verbose" flag. But still print fatal errors since this is the
+  // only way to print any error to stderr before the application gets aborted.
+  Debug::instance()->setDebugLevelStderr(Debug::DebugLevel_t::Fatal);
+
+  // Create Application instance
+  QGuiApplication app(argc, argv);
 
   // Set the organization / application names must be done very early because
   // some other classes will use these values (for example QSettings, Debug)!
-  setApplicationMetadata();
-
-  // Creates the Debug object which installs the message handler. This must be
-  // done as early as possible, but *after* setting application metadata
-  // (organization + name).
-  Debug::instance();
-
-  // Configure the application settings format and location used by QSettings
-  configureApplicationSettings();
-
-  // Write some information about the application instance to the log.
-  writeLogHeader();
+  QGuiApplication::setOrganizationName("LibrePCB");
+  QGuiApplication::setOrganizationDomain("librepcb.org");
+  QGuiApplication::setApplicationName("LibrePCB CLI");
+  QGuiApplication::setApplicationVersion(Application::getVersion());
 
   // Perform global initialization tasks. This must be done before any widget is
   // shown.
   Application::loadBundledFonts();
   Application::setTranslationLocale(QLocale::system());
-  std::ignore = EditorToolbox::isSystemThemeDark();
 
-  // Clean up old temporary files since at least on Windows this is not done
-  // automatically. Let's do it in a thread to avoid delaying application start.
-  std::ignore = QtConcurrent::run(&Application::cleanTemporaryDirectory);
-
-  // This is to remove the ugly frames around widgets in all status bars...
-  // (from http://www.qtcentre.org/threads/1904)
-  app.setStyleSheet("QStatusBar::item { border: 0px solid black; }");
-
-  // Use Fusion style with custom palette to make the legacy Qt dialogs looking
-  // similar to the new Slint UI. Can be removed as soon as no Qt widgets are
-  // used anymore. The actual palette will be set later.
-  app.setStyle("fusion");
-
-  // Apply default theme (will be overridden later if workspace settings are
-  // loaded).
-  setTheme(QString());
-
-  // Register our custom translator to Slint.
-  slint::set_translator(std::make_unique<SlintTranslator>());
-
-  // Start network access manager thread with HTTP cache to avoid extensive
-  // requests (e.g. downloading library pictures each time opening the manager).
-  QScopedPointer<NetworkAccessManager> networkAccessManager(
-      new NetworkAccessManager(Application::getCacheDir().getPathTo("http")));
-
-  // Run the actual application
-  int retval = runApplication();
-
-  // Stop network access manager thread
-  networkAccessManager.reset();
-
-  qDebug().nospace() << "Exit application with code " << retval << ".";
-  return retval;
-}
-
-/*******************************************************************************
- *  setApplicationMetadata()
- ******************************************************************************/
-
-static void setApplicationMetadata() noexcept {
-  QApplication::setOrganizationName("LibrePCB");
-  QApplication::setOrganizationDomain("librepcb.org");
-  QApplication::setApplicationName("LibrePCB");
-  QApplication::setApplicationVersion(Application::getVersion());
-  QApplication::setDesktopFileName("org.librepcb.LibrePCB");
-}
-
-/*******************************************************************************
- *  configureApplicationSettings()
- ******************************************************************************/
-
-static void configureApplicationSettings() noexcept {
-  // Make sure the INI format is used for settings on all platforms because:
-  // - Consistent storage format on all platforms
-  // - Useful for functional testing (control settings by fixtures)
-  // - Windows Registry is a mess (hard to find, edit and track changes of our
-  // settings)
-  QSettings::setDefaultFormat(QSettings::IniFormat);
-
-  // Use different configuration directory if supplied by environment variable
-  // "LIBREPCB_CONFIG_DIR" (useful for functional testing)
-  QString customConfigDir = qgetenv("LIBREPCB_CONFIG_DIR");
-  if (!customConfigDir.isEmpty()) {
-    QSettings::setPath(QSettings::IniFormat, QSettings::UserScope,
-                       customConfigDir);
-  }
-}
-
-/*******************************************************************************
- *  writeLogHeader()
- ******************************************************************************/
-
-static void writeLogHeader() noexcept {
-  // write application name and version to log
-  qInfo().noquote() << QString("LibrePCB %1 (%2)")
-                           .arg(Application::getVersion(),
-                                Application::getGitRevision());
-
-  // write Qt version to log
-  qInfo().noquote() << QString("Qt version: %1 (compiled against %2)")
-                           .arg(qVersion(), QT_VERSION_STR);
-
-  // write resources directory path to log
-  qInfo() << "Resources directory:"
-          << Application::getResourcesDir().toNative();
-
-  // write application settings file to log (nice to know for users)
-  qInfo() << "Application settings:"
-          << FilePath(QSettings().fileName()).toNative();
-
-  // write cache directory to log (nice to know for users)
-  qInfo() << "Cache directory:" << Application::getCacheDir().toNative();
-}
-
-/*******************************************************************************
- *  setTheme()
- ******************************************************************************/
-
-static void setTheme(const QString& name) noexcept {
-  sTheme = UiTheme::find(name);
-  if (!sTheme) {
-    sTheme = EditorToolbox::isSystemThemeDark() ? &UiTheme::dark()
-                                                : &UiTheme::light();
-  }
-  qApp->setPalette(sTheme->qpalette);
-
-  QPixmapCache::clear();
-  for (QWidget* widget : qApp->allWidgets()) {  // NOLINT
-    qApp->style()->unpolish(widget);
-    qApp->style()->polish(widget);
-    widget->update();
-  }
-}
-
-/*******************************************************************************
- *  openWorkspace()
- ******************************************************************************/
-
-static int runApplication() noexcept {
-  // For deployment testing purposes, exit the application now if the flag
-  // '--exit-after-startup' is passed. This shall be done *before* any user
-  // interaction (e.g. message box) to make it working headless.
-  const char* exitFlagName = "--exit-after-startup";
-  if (qApp->arguments().contains(exitFlagName)) {
-    qInfo().nospace() << "Exit requested by flag '" << exitFlagName << "'.";
-    return 0;
-  }
-
-  // If the file format is unstable (e.g. for nightly builds), ask to abort now.
-  // This warning *must* come that early to be really sure that no files are
-  // overwritten with unstable content!
-  if (!isFileFormatStableOrAcceptUnstable()) {
-    return 0;
-  }
-
-  // Get the path of the workspace to open. By default, open the recently used
-  // workspace stored in the user settings.
-  FilePath path = Workspace::getMostRecentlyUsedWorkspacePath();
-  qDebug() << "Recently used workspace:" << path.toNative();
-
-  // If the workspace path is specified by environment variable, use this one.
-  const char* wsEnvVarName = "LIBREPCB_WORKSPACE";
-  QString wsEnvStr = qgetenv(wsEnvVarName);
-  if (!wsEnvStr.isEmpty()) {
-    qInfo() << "Workspace path overridden by" << wsEnvVarName
-            << "environment variable:" << wsEnvStr;
-    path.setPath(wsEnvStr);
-  }
-
-  // If creating or opening a workspace failed, allow to choose another
-  // workspace path until it succeeds or the user aborts.
-  while (true) {
-    try {
-      return openWorkspace(path);  // can throw
-    } catch (const UserCanceled& e) {
-      return 0;  // User canceled -> exit application.
-    } catch (const Exception& e) {
-      QMessageBox::critical(
-          nullptr, QApplication::translate("Workspace", "Error"),
-          QString(QApplication::translate(
-                      "Workspace", "Could not open the workspace \"%1\":"))
-                  .arg(path.toNative()) %
-              "\n\n" % e.getMsg());
-      path = FilePath();  // Make sure the workspace selector wizard is shown.
-    }
-  }
-}
-
-/*******************************************************************************
- *  isFileFormatStableOrAcceptUnstable()
- ******************************************************************************/
-
-static bool isFileFormatStableOrAcceptUnstable() noexcept {
-  if (Application::isFileFormatStable() ||
-      (qgetenv("LIBREPCB_DISABLE_UNSTABLE_WARNING") == "1")) {
-    return true;
-  } else {
-    QMessageBox::StandardButton btn = QMessageBox::critical(
-        nullptr, QCoreApplication::translate("main", "Unstable file format!"),
-        QCoreApplication::translate(
-            "main",
-            "<p><b>ATTENTION: This application version is UNSTABLE!</b></p>"
-            "<p>Everything you do with this application can break your "
-            "workspace, libraries or projects! Saved files will not be "
-            "readable with stable releases of LibrePCB. It's highly "
-            "recommended to create a backup before proceeding. If you are "
-            "unsure, please download an official stable release instead.</p>"
-            "<p>For details, please take a look at LibrePCB's "
-            "<a href=\"%1\">versioning concept</a>.</p>"
-            "<p>Are you really sure to continue with the risk of breaking your "
-            "files?!</p>")
-            .arg("https://developers.librepcb.org/da/dbc/"
-                 "doc_release_workflow.html"),
-        QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Cancel);
-    return (btn == QMessageBox::Yes);
-  }
-}
-
-/*******************************************************************************
- *  openWorkspace()
- ******************************************************************************/
-
-static int openWorkspace(FilePath& path) {
-  // Run initialize workspace wizard as many times as needed until a valid
-  // workspace is selected.
-  Q_ASSERT(sTheme);
-  std::unique_ptr<InitializeWorkspaceWizard> wizard(
-      new InitializeWorkspaceWizard(*sTheme, false));
-  wizard->setWorkspacePath(path);  // can throw
-  while (wizard->getNeedsToBeShown()) {
-    if (wizard->exec() != QDialog::Accepted) {
-      throw UserCanceled(__FILE__, __LINE__);
-    }
-    Workspace::setMostRecentlyUsedWorkspacePath(wizard->getWorkspacePath());
-
-    // Just to be on the safe side that the workspace is now *really* ready
-    // to open (created, upgraded, initialized, ...), check the status again
-    // before continue opening the workspace.
-    wizard->setWorkspacePath(wizard->getWorkspacePath());  // can throw
-    wizard->restart();
-  }
-
-  // Open the workspace (can throw). If it is locked, a dialog will show
-  // an error and possibly provides an option to override the lock.
-  Workspace ws(wizard->getWorkspacePath(), wizard->getDataDir(),
-               DirectoryLockHandlerDialog::createDirectoryLockCallback());
-
-  // We don't need the wizard anymore (and it disturbes the Funq tests).
-  const bool wsContainsNewerFileFormats =
-      wizard->getWorkspaceContainsNewerFileFormats();
-  wizard.reset();
-
-  // Apply UI theme from workspace settings.
-  auto applyUiTheme = [&]() { setTheme(ws.getSettings().uiTheme.get()); };
-  applyUiTheme();
-  QObject::connect(&ws.getSettings().uiTheme, &WorkspaceSettingsItem::edited,
-                   &ws.getSettings().uiTheme, applyUiTheme);
-
-  // Now since workspace settings are loaded, switch to the language defined
-  // there (until now, the system language was used).
-  // Note: Until LibrePCB 2.0.1 we also set QLocale::setDefault(locale), but
-  // this is probably wrong as the setting is intended to change only the
-  // language, not the locale. Most translation locales have no country set
-  // anyway (e.g. only "de", not "de_CH"), so we don't know the user's country.
-  auto applyApplicationLocale = [&ws]() {
-    const QString name = ws.getSettings().applicationLocale.get();
-    const QLocale locale = name.isEmpty() ? QLocale::system() : QLocale(name);
-    Application::setTranslationLocale(locale);
-    EditorCommandSet::instance().updateTranslations();
-    slint::update_all_translations();
-  };
-  applyApplicationLocale();
-  QObject::connect(&ws.getSettings().applicationLocale,
-                   &WorkspaceSettingsItem::edited,
-                   &ws.getSettings().applicationLocale, applyApplicationLocale);
-
-  // Setup global parts information provider (with cache).
-  PartInformationProvider::instance().setCacheDir(Application::getCacheDir());
-  auto applyPartInformationProviderSettings = [&ws]() {
-    const auto ep = ws.getSettings().getApiEndpointForPartsInfo();
-    PartInformationProvider::instance().setApiEndpoint(ep ? ep->url : QUrl());
-  };
-  applyPartInformationProviderSettings();
-  QObject::connect(
-      &ws.getSettings().apiEndpoints, &WorkspaceSettingsItem::edited,
-      &ws.getSettings().apiEndpoints, applyPartInformationProviderSettings);
-
-  // Apply keyboard shortcuts from workspace settings globally.
-  auto applyKeyboardShortcuts = [&ws]() {
-    const auto& overrides = ws.getSettings().keyboardShortcuts.get();
-    EditorCommandSet& set = EditorCommandSet::instance();
-    foreach (EditorCommandCategory* category, set.getCategories()) {
-      foreach (EditorCommand* command, set.getCommands(category)) {
-        QList<QKeySequence> sequences =
-            overrides.contains(command->getIdentifier())
-            ? overrides.value(command->getIdentifier())
-            : command->getDefaultKeySequences();
-        command->setKeySequences(sequences);
-      }
-    }
-  };
-  applyKeyboardShortcuts();
-  QObject::connect(&ws.getSettings().keyboardShortcuts,
-                   &WorkspaceSettingsItem::edited,
-                   &ws.getSettings().keyboardShortcuts, applyKeyboardShortcuts);
-
-  // Run the application.
-  GuiApplication app(ws, wsContainsNewerFileFormats, sTheme);
-  app.exec();
-  return 0;
+  // Run application
+  cli::CommandLineInterface cli;
+  return cli.execute(app.arguments());
 }
