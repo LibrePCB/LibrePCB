@@ -176,8 +176,8 @@ export component AboutPanel inherits VerticalLayout {
         padding: 8px;
 
         ScrollView {
-            height: (self.width < self.content-width) ? (details-edt.height + 10px) : details-edt.height;
-            content-width: details-edt.preferred-width;
+            height: (self.width < self.viewport-width) ? (details-edt.height + 10px) : details-edt.height;
+            viewport-width: details-edt.preferred-width;
 
             details-edt := TextInput {
                 x: 0;

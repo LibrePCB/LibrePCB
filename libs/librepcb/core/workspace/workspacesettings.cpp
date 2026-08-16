@@ -233,15 +233,6 @@ void WorkspaceSettings::restoreDefaults() noexcept {
   mFileContent.clear();  // Remove even unknown settings!
 }
 
-bool WorkspaceSettings::isEdited() const noexcept {
-  foreach (const WorkspaceSettingsItem* item, getAllItems()) {
-    if (item->isEdited()) {
-      return true;
-    }
-  }
-  return false;
-}
-
 std::unique_ptr<SExpression> WorkspaceSettings::serialize() {
   foreach (const WorkspaceSettingsItem* item, getAllItems()) {
     if (item->isEdited() || mUpgradeRequired) {

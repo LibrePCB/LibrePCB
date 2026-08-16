@@ -146,8 +146,8 @@ export component HomeTab inherits Tab {
         preview-flickable := Flickable {
             vertical-stretch: 1;
             width: 100%;
-            content-width: self.width;
-            content-height: project-preview-img.height;
+            viewport-width: self.width;
+            viewport-height: project-preview-img.height;
             interactive: project-preview-img.source.width > 0;
 
             project-preview-img := Image {

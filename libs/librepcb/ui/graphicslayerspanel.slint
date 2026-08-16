@@ -123,10 +123,10 @@ export component GraphicsLayersPanel inherits FocusScope {
     };
 
     function set-current-index(index: int) {
-        if ((index + 1) * item-height) > (view.height - view.content-y) {
-            view.content-y = -(index + 1) * item-height + view.height;
-        } else if (index * item-height) < -(view.content-y) {
-            view.content-y = -(index * item-height);
+        if ((index + 1) * item-height) > (view.height - view.viewport-y) {
+            view.viewport-y = -(index + 1) * item-height + view.height;
+        } else if (index * item-height) < -(view.viewport-y) {
+            view.viewport-y = -(index * item-height);
         }
         selected-index = index;
     }
@@ -212,7 +212,7 @@ export component GraphicsLayersPanel inherits FocusScope {
         view := ListScrollView {
             vertical-stretch: 1;
             preferred-height: model.length * item-height;
-            content-height: model.length * item-height;
+            viewport-height: model.length * item-height;
             visible: model.length > 0;
             force-show-scrollbars: root.has-focus;
 

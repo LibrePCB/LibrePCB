@@ -306,10 +306,10 @@ component LibrariesPanelSection inherits FocusScope {
     min-height: l.min-height + max(min(libraries.length, min-items-height) - 1, 0) * item-height;
 
     function set-current-index(index: int) {
-        if (index + 1) * item-height > view.height - view.content-y {
-            view.content-y = -(index + 1) * item-height + view.height;
-        } else if index * item-height < -(view.content-y) {
-            view.content-y = -(index * item-height);
+        if (index + 1) * item-height > view.height - view.viewport-y {
+            view.viewport-y = -(index + 1) * item-height + view.height;
+        } else if index * item-height < -(view.viewport-y) {
+            view.viewport-y = -(index * item-height);
         }
         current-index = index;
     }
@@ -461,7 +461,7 @@ component LibrariesPanelSection inherits FocusScope {
             vertical-stretch: 0;
             min-height: item-height;
             preferred-height: libraries.length * item-height;
-            content-height: libraries.length * item-height;
+            viewport-height: libraries.length * item-height;
             force-show-scrollbars: root.has-focus;
 
             // Accessibility
@@ -470,7 +470,7 @@ component LibrariesPanelSection inherits FocusScope {
 
             changed item-count => {
                 if !Data.libraries-panel-filter.is-empty {
-                    self.content-y = 0;
+                    self.viewport-y = 0;
                     current-index = (item-count > 0) ? 0 : -1;
                 }
             }
@@ -531,7 +531,7 @@ component LibrariesPanelSection inherits FocusScope {
 
     uninstall-popup := LibraryUninstallPopup {
         x: root.width;
-        y: view.y + (current-index * item-height) + (item-height / 2) - (self.height / 2) + view.content-y;
+        y: view.y + (current-index * item-height) + (item-height / 2) - (self.height / 2) + view.viewport-y;
         model: libraries;
         index: current-index;
     }

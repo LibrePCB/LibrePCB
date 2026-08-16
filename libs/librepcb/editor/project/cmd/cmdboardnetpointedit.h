@@ -51,6 +51,9 @@ public:
   explicit CmdBoardNetPointEdit(BI_NetPoint& point) noexcept;
   ~CmdBoardNetPointEdit() noexcept override;
 
+  // Getters
+  BI_NetPoint& getObj() const noexcept { return mNetPoint; }
+
   // Setters
   void setPosition(const Point& pos, bool immediate) noexcept;
   void translate(const Point& deltaPos, bool immediate) noexcept;

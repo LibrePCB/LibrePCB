@@ -133,6 +133,7 @@ SchematicTab::SchematicTab(GuiApplication& app, SchematicEditor& editor,
                                 this)),
     mMsgInstallLibraries(app.getWorkspace(), "EMPTY_SCHEMATIC_NO_LIBRARIES"),
     mMsgAddDrawingFrame(app.getWorkspace(), "EMPTY_SCHEMATIC_ADD_FRAME"),
+    mGridStyle(mApp.getWorkspace().getSettings().schematicGridStyle.get()),
     mIgnorePlacementLocks(false),
     mFrameIndex(0),
     mToolFeatures(),
@@ -222,8 +223,11 @@ SchematicTab::SchematicTab(GuiApplication& app, SchematicEditor& editor,
 
   // Apply workspace settings whenever they have been modified.
   connect(&mApp.getWorkspace().getSettings().schematicGridStyle,
-          &WorkspaceSettingsItem::edited, this,
-          &SchematicTab::applyWorkspaceSettings);
+          &WorkspaceSettingsItem::edited, this, [this]() {
+            mGridStyle =
+                mApp.getWorkspace().getSettings().schematicGridStyle.get();
+            applyWorkspaceSettings();
+          });
   connect(&mApp.getWorkspace().getSettings().schematicColorSchemes,
           &WorkspaceSettingsItem_ColorSchemes::colorsModified, this,
           &SchematicTab::applyWorkspaceSettings);
@@ -312,7 +316,7 @@ ui::SchematicTabData SchematicTab::getDerivedUiData() const noexcept {
       q2s(fgColor),  // Foreground color
       q2s(infoBoxColors.primary),  // Overlay color
       q2s(infoBoxColors.secondary),  // Overlay text color
-      l2s(mApp.getWorkspace().getSettings().schematicGridStyle.get()),  // Grid
+      l2s(mGridStyle),  // Grid style
       l2s(*mSchematic.getGridInterval()),  // Grid interval
       l2s(mSchematic.getGridUnit()),  // Length unit
       mPinNumbersLayer && mPinNumbersLayer->isVisible(),  // Show pin numbers
@@ -363,24 +367,15 @@ ui::SchematicTabData SchematicTab::getDerivedUiData() const noexcept {
 void SchematicTab::setDerivedUiData(const ui::SchematicTabData& data) noexcept {
   mSceneImagePos = s2q(data.scene_image_pos);
 
-  const GridStyle gridStyle = s2l(data.grid_style);
-  if (gridStyle != mApp.getWorkspace().getSettings().schematicGridStyle.get()) {
-    // Grid style setting used to be per-tab, but that is annoying for the
-    // use-case of temporarily hiding the grid for presenting a schematic to
-    // other people or for taking screenshots, since this has to be done for
-    // each tab again. Also it can be surprising that this UI setting is not
-    // persistent. It is probably much more intuitive to apply this setting
-    // to all tabs immediately, and storing it in the workspace settings.
-    mApp.getWorkspace().getSettings().schematicGridStyle.set(gridStyle);
-    mApp.scheduleWorkspaceSettingsSave();
-  }
+  mGridStyle = s2l(data.grid_style);
   const std::optional<PositiveLength> interval = s2plength(data.grid_interval);
   if (interval && (*interval != mSchematic.getGridInterval())) {
-    if (mScene) {
-      mScene->setGridInterval(mSchematic.getGridInterval());
-    }
     mSchematic.setGridInterval(*interval);
     mProjectEditor.setManualModificationsMade();
+  }
+  if (mScene) {
+    mScene->setGridStyle(mGridStyle);
+    mScene->setGridInterval(mSchematic.getGridInterval());
   }
   const LengthUnit unit = s2l(data.unit);
   if (unit != mSchematic.getGridUnit()) {
@@ -1353,8 +1348,8 @@ void SchematicTab::goToObjects(
 }
 
 void SchematicTab::applyWorkspaceSettings() noexcept {
-  const WorkspaceSettings& settings = mApp.getWorkspace().getSettings();
-  const ColorScheme& scheme = settings.schematicColorSchemes.getActive();
+  const ColorScheme& scheme =
+      mApp.getWorkspace().getSettings().schematicColorSchemes.getActive();
 
   if (mScene) {
     const auto background = scheme.getColors(ColorRole::schematicBackground());
@@ -1363,7 +1358,7 @@ void SchematicTab::applyWorkspaceSettings() noexcept {
     mScene->setOverlayColors(overlay.primary, overlay.secondary);
     const auto selection = scheme.getColors(ColorRole::schematicSelection());
     mScene->setSelectionRectColors(selection.primary, selection.secondary);
-    mScene->setGridStyle(settings.schematicGridStyle.get());
+    mScene->setGridStyle(mGridStyle);
   }
 
   onDerivedUiDataChanged.notify();

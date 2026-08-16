@@ -102,7 +102,7 @@ QImage s2image(const slint::Image& img) noexcept;
 
 slint::Color q2s(const QColor& c) noexcept;
 
-slint::private_api::MouseCursorInner q2s(Qt::CursorShape s) noexcept;
+slint::private_api::MouseCursor q2s(Qt::CursorShape s) noexcept;
 
 Qt::MouseButton s2q(const slint::private_api::PointerEventButton& b) noexcept;
 

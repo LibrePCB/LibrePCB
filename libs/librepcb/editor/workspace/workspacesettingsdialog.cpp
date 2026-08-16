@@ -669,7 +669,7 @@ void WorkspaceSettingsDialog::execColorSchemeDialog(
   widget->move(geometry().center() - widget->rect().center());
 
   if (focusNameEdt) {
-    win->invoke_focus_name_edt();
+    win->fn_focus_name_edt();
   }
 }
 

@@ -338,10 +338,8 @@ ui::DeviceTabData DeviceTab::getDerivedUiData() const noexcept {
       q2s(brdBgColors.secondary),  // Package foreground color
       mIsInterfaceBroken,  // Interface broken
       mElementDuplicated && (!mDeprecated),  // Element duplicated
-      slint::cbindgen_private::MouseCursorInner(
-          mMeasureTool
-              ? slint::private_api::BuiltInMouseCursor::Crosshair  // Tool
-              : slint::private_api::BuiltInMouseCursor::Default),  // cursor
+      mMeasureTool ? slint::private_api::MouseCursor::Crosshair
+                   : slint::private_api::MouseCursor::Default,  // Tool cursor
       hasUnconnectedPads,  // Has unconnected pads
       hasAutoConnectablePads,  // Has auto-connectable pads
       areAllPadsUnconnected,  // All pads unconnected
@@ -1136,10 +1134,6 @@ void DeviceTab::updatePreviewPinNumbers() noexcept {
       }
       signalNumbers[*sigUuid].append(padName);
     }
-  }
-  // Sort pad names for better readability in the preview.
-  for (auto it = signalNumbers.begin(); it != signalNumbers.end(); it++) {
-    Toolbox::sortNumeric(it.value());
   }
 
   for (int i = 0; i < mSymbolGraphicsItems.count(); ++i) {

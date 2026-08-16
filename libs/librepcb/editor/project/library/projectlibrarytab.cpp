@@ -58,7 +58,7 @@ ProjectLibraryTab::ProjectLibraryTab(GuiApplication& app, ProjectEditor& editor,
     mModel(new ProjectLibraryModel(mProjectEditor,
                                    mApp.getWorkspace().getLibraryDb())),
     mAllChecked(false),
-    mContentY(0) {
+    mViewportY(0) {
   // Connect project editor.
   connect(&mProjectEditor, &ProjectEditor::uiIndexChanged, this,
           [this]() { onDerivedUiDataChanged.notify(); });
@@ -108,7 +108,7 @@ ui::ProjectLibraryTabData ProjectLibraryTab::getDerivedUiData() const noexcept {
   return ui::ProjectLibraryTabData{
       mProjectEditor.getUiIndex(),  // Project index
       mModel,  // Items
-      mContentY,  // Items viewport Y
+      mViewportY,  // Items viewport Y
       mModel->getDowngradedCount(),  // Downgraded items
       mModel->getCheckableCount(),  // Checkable items
       mModel->getCheckedCount(),  // Checked items
@@ -119,7 +119,7 @@ ui::ProjectLibraryTabData ProjectLibraryTab::getDerivedUiData() const noexcept {
 
 void ProjectLibraryTab::setDerivedUiData(
     const ui::ProjectLibraryTabData& data) noexcept {
-  mContentY = data.items_content_y;
+  mViewportY = data.items_viewport_y;
 
   if (data.all_checked != mAllChecked) {
     mAllChecked = data.all_checked;

@@ -520,19 +520,7 @@ bool SchematicEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
     Q_ASSERT(mSelectedItemsDragCommand);
     mSelectedItemsDragCommand->setCurrentPosition(e.scenePos);
     try {
-      const QSet<SI_NetSegment*> netSegments =
-          mSelectedItemsDragCommand->getModifiedNetSegments();
-      const QSet<SI_BusSegment*> busSegments =
-          mSelectedItemsDragCommand->getModifiedBusSegments();
-      if (execCmd(mSelectedItemsDragCommand.release()) &&
-          ((!netSegments.isEmpty()) || (!busSegments.isEmpty()))) {
-        try {
-          execCmd(new CmdSimplifySchematicSegments(netSegments,
-                                                   busSegments));  // can throw
-        } catch (const Exception& e) {
-          qCritical() << "Failed to simplify schematic segments:" << e.getMsg();
-        }
-      }
+      execCmd(mSelectedItemsDragCommand.release());  // can throw
     } catch (const Exception& e) {
       QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     }

@@ -78,10 +78,10 @@ export component ScrollView {
     in property <bool> thin-scrollbars: false;
     in property <bool> mouse-drag-pan-enabled <=> flickable.interactive;
     in property <bool> consume-scroll-events: false;
-    in-out property <length> content-x <=> flickable.content-x;
-    in-out property <length> content-y <=> flickable.content-y;
-    in-out property <length> content-width <=> flickable.content-width;
-    in-out property <length> content-height <=> flickable.content-height;
+    in-out property <length> viewport-x <=> flickable.viewport-x;
+    in-out property <length> viewport-y <=> flickable.viewport-y;
+    in-out property <length> viewport-width <=> flickable.viewport-width;
+    in-out property <length> viewport-height <=> flickable.viewport-height;
 
     // Workaround for crashing slint-lsp if those properties don't exist.
     property <length> visible-width <=> flickable.width;
@@ -105,8 +105,8 @@ export component ScrollView {
             y: 0;
             width: 100%;
             height: 100%;
-            content-x <=> horizontal-bar.value;
-            content-y <=> vertical-bar.value;
+            viewport-x <=> horizontal-bar.value;
+            viewport-y <=> vertical-bar.value;
             interactive: false;
 
             @children
@@ -119,7 +119,7 @@ export component ScrollView {
             height: horizontal-bar.visible ? parent.height - horizontal-bar.height : parent.height;
             horizontal: false;
             page-size: flickable.height;
-            maximum: flickable.content-height - flickable.height;
+            maximum: flickable.viewport-height - flickable.height;
             opacity: (force-show-scrollbars || ta.has-hover || self.has-hover) ? 0.7 : 0;
 
             animate opacity {
@@ -139,7 +139,7 @@ export component ScrollView {
             height: (self.has-hover && (!thin-scrollbars)) ? 8px : 6px;
             horizontal: true;
             page-size: flickable.width;
-            maximum: flickable.content-width - flickable.width;
+            maximum: flickable.viewport-width - flickable.width;
             opacity: (force-show-scrollbars || ta.has-hover || self.has-hover) ? 0.7 : 0;
 
             animate opacity {

@@ -202,24 +202,19 @@ slint::Color q2s(const QColor& c) noexcept {
   return slint::Color::from_argb_uint8(c.alpha(), c.red(), c.green(), c.blue());
 }
 
-slint::cbindgen_private::MouseCursorInner q2s(Qt::CursorShape s) noexcept {
+slint::private_api::MouseCursor q2s(Qt::CursorShape s) noexcept {
   switch (s) {
     case Qt::ArrowCursor:
-      return slint::cbindgen_private::MouseCursorInner(
-          slint::private_api::BuiltInMouseCursor::Default);
+      return slint::private_api::MouseCursor::Default;
     case Qt::PointingHandCursor:
-      return slint::cbindgen_private::MouseCursorInner(
-          slint::private_api::BuiltInMouseCursor::Pointer);
+      return slint::private_api::MouseCursor::Pointer;
     case Qt::CrossCursor:
-      return slint::cbindgen_private::MouseCursorInner(
-          slint::private_api::BuiltInMouseCursor::Crosshair);
+      return slint::private_api::MouseCursor::Crosshair;
     case Qt::ClosedHandCursor:
-      return slint::cbindgen_private::MouseCursorInner(
-          slint::private_api::BuiltInMouseCursor::Grabbing);
+      return slint::private_api::MouseCursor::Grabbing;
     default: {
       qWarning() << "Unsupported cursor shape:" << s;
-      return slint::cbindgen_private::MouseCursorInner(
-          slint::private_api::BuiltInMouseCursor::Default);
+      return slint::private_api::MouseCursor::Default;
     }
   }
 }

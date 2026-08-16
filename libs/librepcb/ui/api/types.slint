@@ -956,10 +956,10 @@ export struct LibraryTabData {
     // Content
     categories: [LibraryTreeViewItemData],
     categories-index: int,
-    categories-content-y: length,  // Ignored by the backend
+    categories-viewport-y: length,  // Ignored by the backend
     filtered-elements: [LibraryTreeViewItemData],
     filtered-elements-index: int,
-    filtered-elements-content-y: length,  // Ignored by the backend
+    filtered-elements-viewport-y: length,  // Ignored by the backend
 
     // Checks
     checks: RuleCheckData,
@@ -1418,7 +1418,7 @@ export struct Board3dTabData {
 export struct ProjectLibraryTabData {
     project-index: int,
     items: [ProjectLibraryItemData],
-    items-content-y: length,  // Ignored by the backend
+    items-viewport-y: length,  // Ignored by the backend
     downgraded-items: int,
     checkable-items: int,
     checked-items: int,

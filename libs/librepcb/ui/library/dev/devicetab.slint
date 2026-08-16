@@ -149,8 +149,7 @@ component DeviceMetadataTab inherits GridLayout {
         description-txt := DescriptionRowHeader { }
 
         description-edt := TextEdit {
-            min-height: 65px;  // Corresponds to 3 text rows
-            max-height: 250px;  // Allow growing up to this height for long texts
+            height: 100px;
             text: tabs[index].description;
             read-only: read-only;
             accessible-label: description-txt.text;

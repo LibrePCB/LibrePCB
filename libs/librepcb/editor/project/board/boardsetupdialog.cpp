@@ -67,7 +67,7 @@ BoardSetupDialog::BoardSetupDialog(GuiApplication& app, Board& board,
   connect(mUi->buttonBox, &QDialogButtonBox::clicked, this,
           &BoardSetupDialog::buttonBoxClicked);
 
-  // Tab: General
+          // Tab: General
   mUi->spbxInnerCopperLayerCount->setMinimum(0);
   mUi->spbxInnerCopperLayerCount->setMaximum(Layer::innerCopperCount());
   mUi->edtPcbThickness->setToolTip(tr("Default:") % " 1.6 mm");
@@ -107,7 +107,7 @@ BoardSetupDialog::BoardSetupDialog(GuiApplication& app, Board& board,
   mUi->cbxSilkBotNames->setText(Layer::botNames().getNameTr());
   mUi->cbxSilkBotValues->setText(Layer::botValues().getNameTr());
 
-  // Tab: Design Rules
+          // Tab: Design Rules
   mUi->edtDefaultTraceWidth->configure(
       mBoard.getGridUnit(), LengthEditBase::Steps::generic(),
       sSettingsPrefix % "/default_trace_width");
@@ -128,6 +128,13 @@ BoardSetupDialog::BoardSetupDialog(GuiApplication& app, Board& board,
   mUi->edtRulesSolderPasteClrMax->configure(
       mBoard.getGridUnit(), LengthEditBase::Steps::generic(),
       sSettingsPrefix % "/solderpaste_clearance_max");
+  mUi->edtRulesPadCopperExpansionRatio->setSingleStep(5.0);  // [%]
+  mUi->edtRulesPadCopperExpansionMin->configure(
+      mBoard.getGridUnit(), LengthEditBase::Steps::generic(),
+      sSettingsPrefix % "/pad_copper_expansion_min");
+  mUi->edtRulesPadCopperExpansionMax->configure(
+      mBoard.getGridUnit(), LengthEditBase::Steps::generic(),
+      sSettingsPrefix % "/pad_copper_expansion_max");
   mUi->edtRulesPadAnnularRingRatio->setSingleStep(5.0);  // [%]
   mUi->edtRulesPadAnnularRingMin->configure(
       mBoard.getGridUnit(), LengthEditBase::Steps::generic(),
@@ -174,6 +181,14 @@ BoardSetupDialog::BoardSetupDialog(GuiApplication& app, Board& board,
           mUi->edtRulesSolderPasteClrMax, &UnsignedLengthEdit::clipToMinimum);
   connect(mUi->edtRulesSolderPasteClrMax, &UnsignedLengthEdit::valueChanged,
           mUi->edtRulesSolderPasteClrMin, &UnsignedLengthEdit::clipToMaximum);
+  connect(mUi->edtRulesPadCopperExpansionMin,
+          &UnsignedLengthEdit::valueChanged,
+          mUi->edtRulesPadCopperExpansionMax,
+          &UnsignedLengthEdit::clipToMinimum);
+  connect(mUi->edtRulesPadCopperExpansionMax,
+          &UnsignedLengthEdit::valueChanged,
+          mUi->edtRulesPadCopperExpansionMin,
+          &UnsignedLengthEdit::clipToMaximum);
   connect(mUi->edtRulesPadAnnularRingMin, &UnsignedLengthEdit::valueChanged,
           mUi->edtRulesPadAnnularRingMax, &UnsignedLengthEdit::clipToMinimum);
   connect(mUi->edtRulesPadAnnularRingMax, &UnsignedLengthEdit::valueChanged,
@@ -183,7 +198,7 @@ BoardSetupDialog::BoardSetupDialog(GuiApplication& app, Board& board,
   connect(mUi->edtRulesViaAnnularRingMax, &UnsignedLengthEdit::valueChanged,
           mUi->edtRulesViaAnnularRingMin, &UnsignedLengthEdit::clipToMaximum);
 
-  // Tab: DRC Settings
+          // Tab: DRC Settings
   connect(mUi->btnLoadDrcSettings, &QToolButton::clicked, this,
           [this]() { loadDrcSettingsPreset(); });
   connect(mUi->lblDrcConfigName, &QLabel::linkActivated, this,
@@ -258,17 +273,17 @@ BoardSetupDialog::BoardSetupDialog(GuiApplication& app, Board& board,
         QVariant::fromValue(BoardDesignRuleCheckSettings::AllowedSlots::Any));
   }
 
-  // Load all settings.
+          // Load all settings.
   load();
 
-  // Load client settings.
+          // Load client settings.
   QSettings cs;
   const QSize windowSize = cs.value(sSettingsPrefix % "/window_size").toSize();
   if (!windowSize.isEmpty()) {
     resize(windowSize);
   }
 
-  // Always open first tab.
+          // Always open first tab.
   mUi->tabWidget->setCurrentIndex(0);
 }
 
@@ -333,7 +348,7 @@ void BoardSetupDialog::load() noexcept {
   mUi->cbxSilkBotNames->setChecked(botLegend.contains(&Layer::botNames()));
   mUi->cbxSilkBotValues->setChecked(botLegend.contains(&Layer::botValues()));
 
-  // Tab: Design Rules
+          // Tab: Design Rules
   const BoardDesignRules& r = mBoard.getDesignRules();
   mUi->edtDefaultTraceWidth->setValue(r.getDefaultTraceWidth());
   mUi->edtDefaultViaDrill->setValue(r.getDefaultViaDrillDiameter());
@@ -356,6 +371,12 @@ void BoardSetupDialog::load() noexcept {
   } else {
     mUi->rbtnRulesInnerPadFullShape->setChecked(true);
   }
+  mUi->edtRulesPadCopperExpansionRatio->setValue(
+      r.getPadCopperExpansion().getRatio());
+  mUi->edtRulesPadCopperExpansionMin->setValue(
+      r.getPadCopperExpansion().getMinValue());
+  mUi->edtRulesPadCopperExpansionMax->setValue(
+      r.getPadCopperExpansion().getMaxValue());
   mUi->edtRulesPadAnnularRingRatio->setValue(r.getPadAnnularRing().getRatio());
   mUi->edtRulesPadAnnularRingMin->setValue(r.getPadAnnularRing().getMinValue());
   mUi->edtRulesPadAnnularRingMax->setValue(r.getPadAnnularRing().getMaxValue());
@@ -364,7 +385,7 @@ void BoardSetupDialog::load() noexcept {
   mUi->edtRulesViaAnnularRingMax->setValue(r.getViaAnnularRing().getMaxValue());
   mUi->edtRulesStopMaskMaxViaDia->setValue(r.getStopMaskMaxViaDiameter());
 
-  // Tab: DRC Settings
+          // Tab: DRC Settings
   loadDrcSources(mBoard.getDrcSettings().getSources());
   loadDrcSettings(mBoard.getDrcSettings());
 }
@@ -535,7 +556,7 @@ bool BoardSetupDialog::apply() noexcept {
   try {
     std::unique_ptr<CmdBoardEdit> cmd(new CmdBoardEdit(mBoard));
 
-    // Tab: General
+            // Tab: General
     cmd->setName(
         ElementName(mUi->edtBoardName->text().trimmed()));  // can throw
     cmd->setInnerLayerCount(mUi->spbxInnerCopperLayerCount->value());
@@ -545,13 +566,13 @@ bool BoardSetupDialog::apply() noexcept {
           mUi->cbxSolderResist->currentData().value<const PcbColor*>());
     }
     if (const PcbColor* color =
-            mUi->cbxSilkscreenColor->currentData().value<const PcbColor*>()) {
+        mUi->cbxSilkscreenColor->currentData().value<const PcbColor*>()) {
       cmd->setSilkscreenColor(*color);
     }
     cmd->setSilkscreenLayersTop(getTopSilkscreenLayers());
     cmd->setSilkscreenLayersBot(getBotSilkscreenLayers());
 
-    // Tab: Design Rules
+            // Tab: Design Rules
     BoardDesignRules r = mBoard.getDesignRules();
     r.setDefaultTraceWidth(mUi->edtDefaultTraceWidth->getValue());
     r.setDefaultViaDrillDiameter(mUi->edtDefaultViaDrill->getValue());
@@ -571,6 +592,10 @@ bool BoardSetupDialog::apply() noexcept {
         mUi->edtRulesPadAnnularRingRatio->getValue(),
         mUi->edtRulesPadAnnularRingMin->getValue(),
         mUi->edtRulesPadAnnularRingMax->getValue()));  // can throw
+    r.setPadCopperExpansion(BoundedUnsignedRatio(
+        mUi->edtRulesPadCopperExpansionRatio->getValue(),
+        mUi->edtRulesPadCopperExpansionMin->getValue(),
+        mUi->edtRulesPadCopperExpansionMax->getValue()));  // can throw
     r.setViaAnnularRing(BoundedUnsignedRatio(
         mUi->edtRulesViaAnnularRingRatio->getValue(),
         mUi->edtRulesViaAnnularRingMin->getValue(),
@@ -578,7 +603,7 @@ bool BoardSetupDialog::apply() noexcept {
     r.setStopMaskMaxViaDiameter(mUi->edtRulesStopMaskMaxViaDia->getValue());
     cmd->setDesignRules(r);
 
-    // Tab: DRC Settings
+            // Tab: DRC Settings
     BoardDesignRuleCheckSettings s = mBoard.getDrcSettings();
     s.setSources(mDrcSources);
     s.setMinCopperCopperClearance(mUi->edtDrcClearanceCopperCopper->getValue());

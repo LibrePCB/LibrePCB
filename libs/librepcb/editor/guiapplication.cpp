@@ -62,36 +62,12 @@
 
 #include <algorithm>
 #include <memory>
-#include <optional>
 
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
 namespace editor {
-
-/*******************************************************************************
- *  TabDataTransfer
- ******************************************************************************/
-
-struct TabDataTransfer {
-  int windowId = 0;
-  int sectionIndex = 0;
-  int tabIndex = 0;
-
-  bool operator==(const TabDataTransfer& rhs) const noexcept = default;
-  bool operator!=(const TabDataTransfer& rhs) const noexcept = default;
-
-  static std::optional<TabDataTransfer> from(
-      const slint::DataTransfer& dt) noexcept {
-    const std::any userData = dt.user_data();
-    if (userData.has_value() && (userData.type() == typeid(TabDataTransfer))) {
-      return std::any_cast<TabDataTransfer>(userData);
-    } else {
-      return std::nullopt;
-    }
-  }
-};
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -391,18 +367,6 @@ void GuiApplication::execWorkspaceSettingsDialog(QWidget* parent) noexcept {
   connect(&dlg, &WorkspaceSettingsDialog::desktopIntegrationStatusChanged, this,
           &GuiApplication::updateDesktopIntegrationNotification);
   dlg.exec();
-}
-
-void GuiApplication::scheduleWorkspaceSettingsSave() noexcept {
-  QTimer::singleShot(3000, this, [this]() {
-    try {
-      if (mWorkspace.getSettings().isEdited()) {
-        mWorkspace.saveSettings();  // can throw
-      }
-    } catch (const Exception& e) {
-      qCritical() << "Failed to save workspace settings:" << e.getMsg();
-    }
-  });
 }
 
 void GuiApplication::addExampleProjects(QWidget* parent) noexcept {
@@ -792,7 +756,7 @@ std::shared_ptr<MainWindow> GuiApplication::createNewWindow(
   d.set_local_libraries(filteredLibs(mLocalLibraries));
   d.set_remote_libraries(sortedLibs(filteredLibs(mRemoteLibraries)));
   d.set_projects(mProjects);
-  d.invoke_set_current_project(projectIndex);
+  d.fn_set_current_project(projectIndex);
   d.set_libraries(mLibraries);
   d.set_min_length(l2s(Length::min()));
   d.set_norms(q2s(getAvailableNorms()));
@@ -816,26 +780,13 @@ std::shared_ptr<MainWindow> GuiApplication::createNewWindow(
   // Register global callbacks.
   const ui::Backend& b = win->global<ui::Backend>();
   b.on_is_shortcut(&isShortcut);
-  b.on_create_tab_transfer([](int windowId, int sectionIndex, int tabIndex) {
-    slint::DataTransfer dt;
-    dt.set_user_data(TabDataTransfer{windowId, sectionIndex, tabIndex});
-    return dt;
-  });
-  b.on_can_drop_tab([](const slint::DataTransfer& srcData,
-                       const slint::DataTransfer& dstData) {
-    const std::optional<TabDataTransfer> src = TabDataTransfer::from(srcData);
-    const std::optional<TabDataTransfer> dst = TabDataTransfer::from(dstData);
-    return src && dst && (*src != *dst);
-  });
-  b.on_drop_tab([this](const slint::DataTransfer& srcData,
-                       const slint::DataTransfer& dstData,
+  b.on_drop_tab([this](const slint::SharedString& srcData,
+                       const slint::SharedString& dstData,
                        bool forceSwitchToTab) {
-    const std::optional<TabDataTransfer> src = TabDataTransfer::from(srcData);
-    const std::optional<TabDataTransfer> dst = TabDataTransfer::from(dstData);
-    if (src && dst) {
-      moveTab(src->windowId, src->sectionIndex, src->tabIndex, dst->windowId,
-              dst->sectionIndex, dst->tabIndex, forceSwitchToTab);
-    }
+    const QStringList src = s2q(srcData).split(",");
+    const QStringList dst = s2q(dstData).split(",");
+    moveTab(src[0].toInt(), src[1].toInt(), src[2].toInt(),  //
+            dst[0].toInt(), dst[1].toInt(), dst[2].toInt(), forceSwitchToTab);
   });
   b.on_open_url([this](const slint::SharedString& url) {
     DesktopServices ds(mWorkspace.getSettings());

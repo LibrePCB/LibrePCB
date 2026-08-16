@@ -81,7 +81,6 @@ public:
   void openFile(const FilePath& fp, QWidget* parent) noexcept;
   void switchWorkspace(QWidget* parent) noexcept;
   void execWorkspaceSettingsDialog(QWidget* parent) noexcept;
-  void scheduleWorkspaceSettingsSave() noexcept;
   void addExampleProjects(QWidget* parent) noexcept;
 
   // General

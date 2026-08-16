@@ -68,7 +68,7 @@ public:
                                      const Point& startPos = Point()) noexcept;
   ~CmdDragSelectedBoardItems() noexcept override;
 
-  // Getters
+          // Getters
   bool hasAnythingSelected() const noexcept { return mItemCount > 0; }
   bool hasTracesSelected() const noexcept {
     return !mNetLineEditCmds.isEmpty();
@@ -82,7 +82,7 @@ public:
   bool selectDevicesOfPads() noexcept;
   UnsignedLength getMedianLineWidth() const noexcept;
 
-  // General Methods
+          // General Methods
   void snapToGrid() noexcept;
   void setLocked(bool locked) noexcept;
   void setLineWidth(const UnsignedLength& width) noexcept;
@@ -94,10 +94,10 @@ public:
 private:
   // Private Methods
 
-  /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
+          /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
   bool performExecute() override;
 
-  // Private Member Variables
+          // Private Member Variables
   BoardGraphicsScene& mScene;
   int mItemCount;
   Point mStartPos;
@@ -109,10 +109,60 @@ private:
   bool mLineWidthChanged;
   bool mTextsReset;
 
-  /// Auto-selected devices used for #selectDevicesOfPads()
+          /// Auto-selected devices used for #selectDevicesOfPads()
   QSet<BI_Device*> mAutoSelectedDevices;
 
-  // Move commands
+  /**
+   * @brief Constraint direction determined from the dragged trace itself.
+   *
+   * Like in KiCad/Eagle: the reference for "keep the angle" is the
+   * *original* direction of the dragged trace segment (or, if a lone
+   * junction point without an own selected segment was grabbed, the
+   * direction of one of its connected segments). Horizontal traces have a
+   * horizontal reference direction, vertical traces a vertical one, 45°
+   * traces a 45° one, etc.
+   *
+   * While dragging, the mouse-delta is projected onto the perpendicular of
+   * this reference direction and *only* that perpendicular component is
+   * applied as translation to every selected item. Since a pure
+   * translation can never change a segment's own direction, this
+   * guarantees:
+   *  - horizontal/vertical traces always stay exactly horizontal/vertical
+   *    (i.e. parallel to the grid axes), and
+   *  - traces drawn at any other angle keep that exact angle (in degrees),
+   * no matter how the mouse is moved - exactly like dragging a track in
+   * KiCad or a wire in Eagle.
+   */
+  bool mHasReferenceDirection;
+  QPointF mReferenceDirection;  ///< normalized, only valid if
+                                ///< #mHasReferenceDirection is true
+
+  /**
+   * @brief Per-point info needed for the KiCad/Eagle-style "trombone" drag.
+   *
+   * If the point has a fixed (non-dragged) neighbor trace, that neighbor
+   * must keep its own original angle - only its length may change. Since
+   * the dragged point must, at the same time, stay exactly on the shifted
+   * reference line (see #mReferenceDirection), its new position is the
+   * intersection of both lines: the shifted reference line and the
+   * neighbor's fixed-angle ray. This way *both* the dragged segment and
+   * the untouched neighbor keep their exact original angle; only lengths
+   * adapt - exactly like in KiCad or Eagle.
+   */
+  struct NetPointConstraint {
+    CmdBoardNetPointEdit* cmd;
+    Point originalPos;
+    bool hasNeighborRay = false;
+    QPointF neighborFixedPoint;
+    QPointF neighborDirection;  ///< normalized
+  };
+
+  Point computeNetPointPosition(const NetPointConstraint& c,
+                                const Point& delta) const noexcept;
+
+  QVector<NetPointConstraint> mNetPointConstraints;
+
+          // Move commands
   QList<CmdDeviceInstanceEdit*> mDeviceEditCmds;
   QList<CmdDeviceStrokeTextsReset*> mDeviceStrokeTextsResetCmds;
   QList<CmdBoardPadEdit*> mPadEditCmds;  // Only board pads.

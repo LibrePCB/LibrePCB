@@ -149,9 +149,9 @@ private:
   bool mWizardMode;
   int mCurrentPageIndex;
   int mCurrentCategoryIndex;
-  float mCategoriesContentY;
+  float mCategoriesViewportY;
   int mCurrentElementIndex;
-  float mElementsContentY;
+  float mElementsViewportY;
   QString mFilterTerm;
 
   // Library metadata to be applied

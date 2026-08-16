@@ -122,8 +122,7 @@ component LibraryMetadataTab inherits GridLayout {
         description-txt := DescriptionRowHeader { }
 
         description-edt := TextEdit {
-            min-height: 65px;  // Corresponds to 3 text rows
-            max-height: 250px;  // Allow growing up to this height for long texts
+            height: 100px;
             text: tabs[index].description;
             read-only: read-only;
             accessible-label: description-txt.text;
@@ -511,7 +510,7 @@ component LibraryContentTab inherits HorizontalLayout {
         categories-view := LibraryTreeView {
             model: tabs[index].categories;
             current-index: tabs[index].categories-index;
-            content-y: tabs[index].categories-content-y;
+            viewport-y: tabs[index].categories-viewport-y;
 
             if Data.libraries-rescan-in-progress: Spinner {
                 x: parent.width - self.width - self.y;
@@ -577,7 +576,7 @@ component LibraryContentTab inherits HorizontalLayout {
             }
 
             scrolled(pos) => {
-                tabs[index].categories-content-y = pos;
+                tabs[index].categories-viewport-y = pos;
             }
         }
 
@@ -615,7 +614,7 @@ component LibraryContentTab inherits HorizontalLayout {
         elements-view := LibraryTreeView {
             model: tabs[index].filtered-elements;
             current-index: tabs[index].filtered-elements-index;
-            content-y: tabs[index].filtered-elements-content-y;
+            viewport-y: tabs[index].filtered-elements-viewport-y;
 
             if self.model.length == 0: Text {
                 width: 0.8 * parent.width;
@@ -706,7 +705,7 @@ component LibraryContentTab inherits HorizontalLayout {
             }
 
             scrolled(pos) => {
-                tabs[index].filtered-elements-content-y = pos;
+                tabs[index].filtered-elements-viewport-y = pos;
             }
         }
 

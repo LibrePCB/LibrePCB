@@ -192,6 +192,7 @@ private:
 
   // State
   SearchContext mSearchContext;
+  GridStyle mGridStyle;
   QPointF mSceneImagePos;
   bool mIgnorePlacementLocks;
   int mFrameIndex;

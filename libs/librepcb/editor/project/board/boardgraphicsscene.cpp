@@ -285,13 +285,11 @@ void BoardGraphicsScene::selectItemsInRect(const Point& p1,
     item->setSelected(item->mapToScene(item->shape()).intersects(rectPx));
   }
   foreach (auto item, mStrokeTexts) {
-    // Propagate selection of devices to their stroke texts to allow moving
-    // selected devices including their texts. But also select just the text
-    // if it is within the selection rect, e.g. to allow selecting all texts
-    // on the values layer to delete them.
-    auto device = item->getDeviceGraphicsItem().lock();
-    item->setSelected((device && device->isSelected()) ||
-                      item->mapToScene(item->shape()).intersects(rectPx));
+    if (auto device = item->getDeviceGraphicsItem().lock()) {
+      item->setSelected(device->isSelected());
+    } else {
+      item->setSelected(item->mapToScene(item->shape()).intersects(rectPx));
+    }
   }
   foreach (auto item, mHoles) {
     item->setSelected(item->mapToScene(item->shape()).intersects(rectPx));

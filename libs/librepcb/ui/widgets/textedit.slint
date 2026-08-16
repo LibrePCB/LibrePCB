@@ -101,8 +101,8 @@ export component TextEdit inherits Rectangle {
         y: placeholder-txt.y;
         width: parent.width - (2 * self.x);
         height: parent.height - (2 * self.y);
-        content-width: self.width;
-        content-height: edt.preferred-height;
+        viewport-width: self.width;
+        viewport-height: edt.preferred-height;
         thin-scrollbars: true;
 
         edt := TextInput {
@@ -119,10 +119,10 @@ export component TextEdit inherits Rectangle {
             accessible-role: none;
 
             cursor-position-changed(position) => {
-                if position.y < -view.content-y {
-                    view.content-y = -position.y;
-                } else if (position.y + self.font-metrics.ascent - self.font-metrics.descent) > (view.height - view.content-y) {
-                    view.content-y = view.height - (position.y + self.font-metrics.ascent - self.font-metrics.descent);
+                if position.y < -view.viewport-y {
+                    view.viewport-y = -position.y;
+                } else if (position.y + self.font-metrics.ascent - self.font-metrics.descent) > (view.height - view.viewport-y) {
+                    view.viewport-y = view.height - (position.y + self.font-metrics.ascent - self.font-metrics.descent);
                 }
             }
 

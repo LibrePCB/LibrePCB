@@ -85,7 +85,7 @@ private:
   Project& mProject;
   std::shared_ptr<ProjectLibraryModel> mModel;
   bool mAllChecked;
-  float mContentY;
+  float mViewportY;
 };
 
 /*******************************************************************************

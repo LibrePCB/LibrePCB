@@ -12,10 +12,10 @@ export component DropDownPopup inherits PopupWindow {
     callback accepted(index: int);
 
     function set-selected-index(index: int) {
-        if ((index + 1) * item-height) > (view.height - view.content-y) {
-            view.content-y = -(index + 1) * item-height + view.height;
-        } else if (index * item-height) < -(view.content-y) {
-            view.content-y = -(index * item-height);
+        if ((index + 1) * item-height) > (view.height - view.viewport-y) {
+            view.viewport-y = -(index + 1) * item-height + view.height;
+        } else if (index * item-height) < -(view.viewport-y) {
+            view.viewport-y = -(index * item-height);
         }
         selected-index = index;
     }
@@ -64,8 +64,8 @@ export component DropDownPopup inherits PopupWindow {
 
             view := ScrollView {
                 preferred-height: l.preferred-height;
-                content-width: l.width;
-                content-height: l.height;
+                viewport-width: l.width;
+                viewport-height: l.height;
                 mouse-drag-pan-enabled: true;
 
                 l := VerticalLayout {

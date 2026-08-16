@@ -103,8 +103,7 @@ component PackageMetadataTab inherits GridLayout {
         description-txt := DescriptionRowHeader { }
 
         description-edt := TextEdit {
-            min-height: 65px;  // Corresponds to 3 text rows
-            max-height: 250px;  // Allow growing up to this height for long texts
+            height: 100px;
             text: tabs[index].description;
             read-only: read-only;
             accessible-label: description-txt.text;
@@ -558,6 +557,7 @@ component PackageEditorTab inherits TouchArea {
         ToolButtonGroup {
             tool-line-btn := ToolButton {
                 cmd: Cmd.tool-line;
+                icon: @image-url("../../../../../img/actions/draw_wire.png");
                 checked: tabs[index].tool == EditorTool.line;
                 enabled: footprint-selected && (!read-only);
                 is-last: false;
@@ -828,7 +828,8 @@ component PackageEditorTab inherits TouchArea {
 
         zoom-fit-btn := SceneButton {
             x: parent.width - self.width;
-            icon: @image-url("../../../../../img/zoom-fit.svg");
+            icon: @image-url("../../../../font-awesome/svgs/solid/expand.svg");
+            icon-scale: 0.9;
             base-color: tabs[index].background-color;
             base-text-color: tabs[index].foreground-color;
             enabled: footprint-selected;

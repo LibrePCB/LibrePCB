@@ -118,8 +118,8 @@ component ProjectLibraryListView inherits ScrollView {
 
     // Avoid scrolling into nirvana when the model count decreases.
     function scroll-into-view() {
-        if self.content-y < -model.length * row-height {
-            self.content-y = -model.length * row-height;
+        if self.viewport-y < -model.length * row-height {
+            self.viewport-y = -model.length * row-height;
         }
     }
     init => {
@@ -481,7 +481,7 @@ export component ProjectLibraryTab inherits Tab {
 
         if !is-empty: view := ProjectLibraryListView {
             width: root.width - 8px;  // 8px wider to the right for the scrollbar
-            content-y: tabs[index].items-content-y;
+            viewport-y: tabs[index].items-viewport-y;
             model: tabs[index].items;
             checkable-items: tab.checkable-items;
             all-checked: tab.all-checked;
@@ -491,7 +491,7 @@ export component ProjectLibraryTab inherits Tab {
             }
 
             scrolled() => {
-                tabs[index].items-content-y = self.content-y;
+                tabs[index].items-viewport-y = self.viewport-y;
             }
         }
 

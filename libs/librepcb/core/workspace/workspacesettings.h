@@ -91,16 +91,6 @@ public:
   void restoreDefaults() noexcept;
 
   /**
-   * @brief Check if any of the settings has been edited
-   *
-   * @retval true   Settings have been modified.
-   * @retval false  Settings not modified.
-   *
-   * @see ::librepcb::WorkspaceSettingsItem::isEdited()
-   */
-  bool isEdited() const noexcept;
-
-  /**
    * @brief Serialize settings to ::librepcb::SExpression
    *
    * @return ::librepcb::SExpression node containing all settings.

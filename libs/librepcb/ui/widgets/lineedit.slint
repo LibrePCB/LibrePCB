@@ -149,8 +149,8 @@ export component LineEdit inherits Rectangle {
             view := ScrollView {
                 min-width: 0;  // Required to avoid text overflow.
                 preferred-width: edt.preferred-width;
-                content-width: edt.width;
-                content-height: edt.height;
+                viewport-width: edt.width;
+                viewport-height: edt.height;
                 thin-scrollbars: true;
 
                 edt := TextInput {
@@ -277,8 +277,8 @@ export component LineEdit inherits Rectangle {
         autocompletions-view := ScrollView {
             width: root.width - 2px;
             height: parent.height - 2px;
-            content-width: autocompletions-l.width;
-            content-height: autocompletions-l.height;
+            viewport-width: autocompletions-l.width;
+            viewport-height: autocompletions-l.height;
             mouse-drag-pan-enabled: true;
             consume-scroll-events: true;
 

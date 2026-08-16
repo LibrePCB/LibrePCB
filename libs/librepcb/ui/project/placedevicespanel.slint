@@ -78,10 +78,10 @@ export component PlaceDevicesPanel inherits FocusScope {
     property <bool> settings-texts-visible: self.width > 270px;
 
     function set-current-index(index: int) {
-        if ((index + 1) * item-height) > (view.height - view.content-y) {
-            view.content-y = -(index + 1) * item-height + view.height;
-        } else if (index * item-height) < -(view.content-y) {
-            view.content-y = -(index * item-height);
+        if ((index + 1) * item-height) > (view.height - view.viewport-y) {
+            view.viewport-y = -(index + 1) * item-height + view.height;
+        } else if (index * item-height) < -(view.viewport-y) {
+            view.viewport-y = -(index * item-height);
         }
         Data.current-section.board-2d-tabs[Data.current-section.current-tab-index].unplaced-components-index = index;
 
@@ -290,7 +290,7 @@ export component PlaceDevicesPanel inherits FocusScope {
         view := ListScrollView {
             vertical-stretch: 1;
             preferred-height: model.length * item-height;
-            content-height: model.length * item-height;
+            viewport-height: model.length * item-height;
             force-show-scrollbars: root.has-focus;
             visible: model.length > 0;
 

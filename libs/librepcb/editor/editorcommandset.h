@@ -607,7 +607,7 @@ public:
       "output_jobs",  // clang-format break
       QT_TR_NOOP("Output Jobs"),
       QT_TR_NOOP("Modify or run output jobs"),
-      ":/img/output-jobs.svg",
+      ":/fa/solid/play.svg",
       EditorCommand::Flag::OpensPopup,
       {QKeySequence(Qt::Key_F11)},
       &categoryImportExport,
@@ -919,7 +919,7 @@ public:
       "show_pin_numbers",  // clang-format break
       QT_TR_NOOP("Show Pin Numbers"),
       QT_TR_NOOP("Show or hide symbol pin numbers"),
-      ":/img/show-pin-numbers.svg",
+      ":/bi/123.svg",
       EditorCommand::Flags(),
       {QKeySequence()},
       &categoryView,
@@ -967,7 +967,7 @@ public:
       "tool_line",  // clang-format break
       QT_TR_NOOP("Draw Line"),
       QT_TR_NOOP("Draw graphical lines"),
-      ":/img/draw-wire.svg",
+      ":/img/actions/draw_wire.png",
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_L)},
       &categoryTools,
@@ -1138,7 +1138,7 @@ public:
       "tool_hole",  // clang-format break
       QT_TR_NOOP("Add Hole"),
       QT_TR_NOOP("Add non-plated holes (NPTH drills)"),
-      ":/img/drill.svg",
+      ":/fa/solid/bore-hole.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_O)},
       &categoryTools,
@@ -1148,7 +1148,7 @@ public:
       QT_TR_NOOP("Draw Wire"),
       QT_TR_NOOP(
           "Draw wires to create electrical connections between symbol pins"),
-      ":/img/draw-wire.svg",
+      ":/img/actions/draw_wire.png",
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_W)},
       &categoryTools,
@@ -1184,7 +1184,7 @@ public:
       "tool_trace",  // clang-format break
       QT_TR_NOOP("Draw Trace"),
       QT_TR_NOOP("Draw copper traces to interconnect devices"),
-      ":/img/draw-trace.svg",
+      ":/img/actions/draw_wire.png",
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_W)},
       &categoryTools,
@@ -1193,7 +1193,7 @@ public:
       "tool_via",  // clang-format break
       QT_TR_NOOP("Add Via"),
       QT_TR_NOOP("Add plated through-hole vias"),
-      ":/img/via.svg",
+      ":/bi/record-circle-fill.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_V)},
       &categoryTools,

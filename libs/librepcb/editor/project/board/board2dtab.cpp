@@ -159,12 +159,7 @@ Board2dTab::Board2dTab(GuiApplication& app, BoardEditor& editor,
     mMsgEmptySchematics(app.getWorkspace(), "EMPTY_BOARD_NO_COMPONENTS"),
     mMsgSetupDesignRules(app.getWorkspace(), "EMPTY_BOARD_SETUP_DESIGN_RULES"),
     mMsgPlaceDevices(app.getWorkspace(), "EMPTY_BOARD_PLACE_DEVICES"),
-    mSceneContext(new BoardGraphicsScene::Context{
-        this,  // tab
-        mProjectEditor.getCrossProbe(),  // cross probe
-        GraphicsLayer::State::Highlighted,  // Self-probe mode
-        false,  // flip view
-    }),
+    mGridStyle(mApp.getWorkspace().getSettings().boardGridStyle.get()),
     mIgnorePlacementLocks(false),
     mFrameIndex(0),
     mToolFeatures(),
@@ -290,8 +285,10 @@ Board2dTab::Board2dTab(GuiApplication& app, BoardEditor& editor,
 
   // Apply workspace settings whenever they have been modified.
   connect(&mApp.getWorkspace().getSettings().boardGridStyle,
-          &WorkspaceSettingsItem::edited, this,
-          &Board2dTab::applyWorkspaceSettings);
+          &WorkspaceSettingsItem::edited, this, [this]() {
+            mGridStyle = mApp.getWorkspace().getSettings().boardGridStyle.get();
+            applyWorkspaceSettings();
+          });
   connect(&mApp.getWorkspace().getSettings().boardColorSchemes,
           &WorkspaceSettingsItem_ColorSchemes::edited, this,
           &Board2dTab::applyWorkspaceSettings);
@@ -379,7 +376,7 @@ ui::Board2dTabData Board2dTab::getDerivedUiData() const noexcept {
       q2s(fgColor),  // Foreground color
       q2s(infoBoxColors.primary),  // Overlay color
       q2s(infoBoxColors.secondary),  // Overlay text color
-      l2s(mApp.getWorkspace().getSettings().boardGridStyle.get()),  // Grid
+      l2s(mGridStyle),  // Grid style
       l2s(*mBoard.getGridInterval()),  // Grid interval
       l2s(mBoard.getGridUnit()),  // Length unit
       mScene->isFlipped(),  // Flip view (view from bottom)
@@ -458,24 +455,15 @@ ui::Board2dTabData Board2dTab::getDerivedUiData() const noexcept {
 void Board2dTab::setDerivedUiData(const ui::Board2dTabData& data) noexcept {
   mSceneImagePos = s2q(data.scene_image_pos);
 
-  const GridStyle gridStyle = s2l(data.grid_style);
-  if (gridStyle != mApp.getWorkspace().getSettings().boardGridStyle.get()) {
-    // Grid style setting used to be per-tab, but that is annoying for the
-    // use-case of temporarily hiding the grid for presenting a schematic to
-    // other people or for taking screenshots, since this has to be done for
-    // each tab again. Also it can be surprising that this UI setting is not
-    // persistent. It is probably much more intuitive to apply this setting
-    // to all tabs immediately, and storing it in the workspace settings.
-    mApp.getWorkspace().getSettings().boardGridStyle.set(gridStyle);
-    mApp.scheduleWorkspaceSettingsSave();
-  }
+  mGridStyle = s2l(data.grid_style);
   const std::optional<PositiveLength> interval = s2plength(data.grid_interval);
   if (interval && (*interval != mBoard.getGridInterval())) {
-    if (mScene) {
-      mScene->setGridInterval(mBoard.getGridInterval());
-    }
     mBoard.setGridInterval(*interval);
     mProjectEditor.setManualModificationsMade();
+  }
+  if (mScene) {
+    mScene->setGridStyle(mGridStyle);
+    mScene->setGridInterval(mBoard.getGridInterval());
   }
   const LengthUnit unit = s2l(data.unit);
   if (unit != mBoard.getGridUnit()) {
@@ -606,8 +594,15 @@ void Board2dTab::activate() noexcept {
   connect(mLayersModel.get(), &GraphicsLayersModel::layersVisibilityChanged,
           &mBoardEditor, &BoardEditor::schedulePlanesRebuild);
 
-  mScene = std::make_unique<BoardGraphicsScene>(mBoard, *mLayers, mSceneContext,
-                                                this);
+  mScene = std::make_unique<BoardGraphicsScene>(
+      mBoard, *mLayers,
+      std::make_shared<BoardGraphicsScene::Context>(BoardGraphicsScene::Context{
+          this,  // tab
+          mProjectEditor.getCrossProbe(),  // cross probe
+          GraphicsLayer::State::Highlighted,  // Self-probe mode
+          false,  // flip view
+      }),
+      this);
   mScene->setGridInterval(mBoard.getGridInterval());
   connect(mScene.get(), &GraphicsScene::changed, this,
           &Board2dTab::requestRepaint);
@@ -2816,8 +2811,8 @@ FilePath Board2dTab::getBackgroundImageCacheDir() const noexcept {
 }
 
 void Board2dTab::applyWorkspaceSettings() noexcept {
-  const WorkspaceSettings& settings = mApp.getWorkspace().getSettings();
-  const ColorScheme& scheme = settings.boardColorSchemes.getActive();
+  const ColorScheme& scheme =
+      mApp.getWorkspace().getSettings().boardColorSchemes.getActive();
 
   if (mScene) {
     const auto background = scheme.getColors(ColorRole::boardBackground());
@@ -2826,7 +2821,7 @@ void Board2dTab::applyWorkspaceSettings() noexcept {
     mScene->setOverlayColors(overlay.primary, overlay.secondary);
     const auto selection = scheme.getColors(ColorRole::boardSelection());
     mScene->setSelectionRectColors(selection.primary, selection.secondary);
-    mScene->setGridStyle(settings.boardGridStyle.get());
+    mScene->setGridStyle(mGridStyle);
   }
 
   if (mUnplacedComponentGraphicsScene) {

@@ -36,6 +36,7 @@
 #include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/types/alignment.h>
 #include <librepcb/core/types/elementname.h>
+#include <librepcb/core/types/enums.h>
 #include <librepcb/core/types/length.h>
 #include <librepcb/core/types/lengthunit.h>
 #include <librepcb/core/types/version.h>
@@ -234,6 +235,7 @@ private:
   bool mWizardMode;
   int mCurrentPageIndex;
   bool mView3d;
+  GridStyle mGridStyle;
   LengthUnit mUnit;
   bool mChooseCategory;
   bool mElementDuplicated;
