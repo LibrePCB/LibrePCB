@@ -281,7 +281,26 @@
          </property>
         </widget>
        </item>
-       <item row="14" column="0" colspan="4">
+       <item row="14" column="0">
+        <widget class="QLabel" name="label_37">
+         <property name="toolTip">
+          <string>Enlarges all copper pad shapes on the board by this percentage of the pad size (e.g. useful for easier hand soldering). Set to 0% to disable.</string>
+         </property>
+         <property name="text">
+          <string>Pads Copper Expansion:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="14" column="1">
+        <widget class="librepcb::editor::UnsignedLengthEdit" name="edtRulesPadCopperExpansionMin" native="true"/>
+       </item>
+       <item row="14" column="2">
+        <widget class="librepcb::editor::UnsignedRatioEdit" name="edtRulesPadCopperExpansionRatio" native="true"/>
+       </item>
+       <item row="14" column="3">
+        <widget class="librepcb::editor::UnsignedLengthEdit" name="edtRulesPadCopperExpansionMax" native="true"/>
+       </item>
+       <item row="15" column="0" colspan="4">
         <widget class="QLabel" name="label_3">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
@@ -566,7 +585,7 @@ QAbstractScrollArea {
             <x>0</x>
             <y>0</y>
             <width>753</width>
-            <height>380</height>
+            <height>354</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -963,6 +982,12 @@ QAbstractScrollArea {
  </widget>
  <customwidgets>
   <customwidget>
+   <class>librepcb::editor::PositiveLengthEdit</class>
+   <extends>QWidget</extends>
+   <header location="global">librepcb/editor/widgets/positivelengthedit.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>librepcb::editor::UnsignedLengthEdit</class>
    <extends>QWidget</extends>
    <header location="global">librepcb/editor/widgets/unsignedlengthedit.h</header>
@@ -972,12 +997,6 @@ QAbstractScrollArea {
    <class>librepcb::editor::UnsignedRatioEdit</class>
    <extends>QWidget</extends>
    <header location="global">librepcb/editor/widgets/unsignedratioedit.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>librepcb::editor::PositiveLengthEdit</class>
-   <extends>QWidget</extends>
-   <header location="global">librepcb/editor/widgets/positivelengthedit.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
@@ -1015,7 +1034,7 @@ QAbstractScrollArea {
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="btnGroupRulesCmpSidePadShape"/>
   <buttongroup name="btnGroupRulesInnerPadShape"/>
+  <buttongroup name="btnGroupRulesCmpSidePadShape"/>
  </buttongroups>
 </ui>

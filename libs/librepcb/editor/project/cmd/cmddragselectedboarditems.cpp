@@ -49,6 +49,8 @@
 #include <librepcb/core/project/board/items/bi_zone.h>
 #include <librepcb/core/project/project.h>
 
+#include <cmath>
+
 #include <QtCore>
 
 /*******************************************************************************
@@ -74,7 +76,9 @@ CmdDragSelectedBoardItems::CmdDragSelectedBoardItems(
     mSnappedToGrid(false),
     mLockedChanged(false),
     mLineWidthChanged(false),
-    mTextsReset(false) {
+    mTextsReset(false),
+    mHasReferenceDirection(false),
+    mReferenceDirection(1, 0) {
   // get all selected items
   BoardSelectionQuery query(mScene, includeLockedItems);
   query.addDeviceInstancesOfSelectedFootprints();
@@ -92,6 +96,33 @@ CmdDragSelectedBoardItems::CmdDragSelectedBoardItems(
   query.addSelectedBoardStrokeTexts();
   query.addSelectedFootprintStrokeTexts();
   query.addSelectedHoles();
+
+  // Determine the reference direction used to constrain the drag movement
+  // (see documentation of #mReferenceDirection). Prefer the direction of an
+  // explicitly selected/dragged trace segment; if only a lone junction
+  // point is being dragged, fall back to the direction of one of its
+  // connected segments so that segment keeps its angle.
+  auto tryUseDirection = [&](const Point& a, const Point& b) {
+    if (mHasReferenceDirection) return;
+    QPointF dir = b.toMmQPointF() - a.toMmQPointF();
+    const qreal len = std::hypot(dir.x(), dir.y());
+    if (len > 1e-9) {
+      mReferenceDirection = dir / len;
+      mHasReferenceDirection = true;
+    }
+  };
+  foreach (BI_NetLine* netline, query.getNetLines()) {
+    tryUseDirection(netline->getP1().getPosition(),
+                    netline->getP2().getPosition());
+  }
+  if (!mHasReferenceDirection) {
+    foreach (BI_NetPoint* netpoint, query.getNetPoints()) {
+      foreach (BI_NetLine* netline, netpoint->getNetLines()) {
+        tryUseDirection(netline->getP1().getPosition(),
+                        netline->getP2().getPosition());
+      }
+    }
+  }
 
   // Expand the selected individual pads to their devices, to allow dragging
   // the devices (individual footprint pads cannot be dragged). However, the
@@ -127,6 +158,31 @@ CmdDragSelectedBoardItems::CmdDragSelectedBoardItems(
     ++mItemCount;
     CmdBoardNetPointEdit* cmd = new CmdBoardNetPointEdit(*netpoint);
     mNetPointEditCmds.append(cmd);
+
+    // Find (at most) one neighbor trace connected to this point which is
+    // *not* part of the current selection. That neighbor stays where it is
+    // and must keep its own original angle - see #NetPointConstraint.
+    NetPointConstraint constraint;
+    constraint.cmd = cmd;
+    constraint.originalPos = netpoint->getPosition();
+    foreach (BI_NetLine* netline, netpoint->getNetLines()) {
+      if (query.getNetLines().contains(netline)) {
+        continue;  // Dragged along as well -> not a fixed neighbor.
+      }
+      BI_NetLineAnchor& farAnchor = (&netline->getP1() == netpoint)
+          ? netline->getP2()
+          : netline->getP1();
+      QPointF dir = netpoint->getPosition().toMmQPointF() -
+          farAnchor.getPosition().toMmQPointF();
+      const qreal len = std::hypot(dir.x(), dir.y());
+      if (len > 1e-9) {
+        constraint.hasNeighborRay = true;
+        constraint.neighborFixedPoint = farAnchor.getPosition().toMmQPointF();
+        constraint.neighborDirection = dir / len;
+        break;  // Only the first fixed neighbor is used as a constraint.
+      }
+    }
+    mNetPointConstraints.append(constraint);
   }
   foreach (BI_NetLine* netline, query.getNetLines()) {
     Q_ASSERT(netline);
@@ -305,9 +361,54 @@ void CmdDragSelectedBoardItems::resetAllTexts() noexcept {
   mTextsReset = true;
 }
 
+Point CmdDragSelectedBoardItems::computeNetPointPosition(
+    const NetPointConstraint& c, const Point& delta) const noexcept {
+  // Point on the shifted reference line (dragged segment offset by delta,
+  // keeping its own original direction).
+  const QPointF p1 = c.originalPos.toMmQPointF() + delta.toMmQPointF();
+
+  if ((!c.hasNeighborRay) || (!mHasReferenceDirection)) {
+    // No fixed neighbor (or no reference direction at all) -> just follow
+    // the shifted line / rigid translation.
+    return c.originalPos + delta;
+  }
+
+  // Intersect the shifted reference line (p1, mReferenceDirection) with the
+  // neighbor's fixed-angle ray (neighborFixedPoint, neighborDirection).
+  // Solving p1 + s*d1 == p2 + t*d2 for s (Cramer's rule):
+  const QPointF& d1 = mReferenceDirection;
+  const QPointF& d2 = c.neighborDirection;
+  const QPointF& p2 = c.neighborFixedPoint;
+  const qreal det = d1.x() * d2.y() - d1.y() * d2.x();
+  if (std::fabs(det) < 1e-9) {
+    // Parallel to the neighbor -> no unique intersection, best effort:
+    // just follow the shifted line.
+    return c.originalPos + delta;
+  }
+  const QPointF diff = p2 - p1;
+  const qreal s = (diff.x() * d2.y() - diff.y() * d2.x()) / det;
+  const QPointF intersection = p1 + s * d1;
+  return Point::fromMm(intersection);
+}
+
 void CmdDragSelectedBoardItems::setCurrentPosition(
     const Point& pos, const bool gridIncrement) noexcept {
   Point delta = pos - mStartPos;
+
+  if (mHasReferenceDirection) {
+    // Keep the reference trace (and everything moved rigidly together with
+    // it) at its exact original angle: only the component of the movement
+    // that is perpendicular to the reference direction is allowed. A pure
+    // translation along that perpendicular can never rotate the line, so a
+    // horizontal/vertical trace stays perfectly parallel to the grid axes,
+    // and a trace drawn at any other angle keeps that exact angle - just
+    // like dragging a track in KiCad or a wire in Eagle.
+    const QPointF perp(-mReferenceDirection.y(), mReferenceDirection.x());
+    const QPointF d = delta.toMmQPointF();
+    const qreal t = d.x() * perp.x() + d.y() * perp.y();
+    delta = Point::fromMm(t * perp.x(), t * perp.y());
+  }
+
   if (gridIncrement) {
     delta.mapToGrid(mScene.getBoard().getGridInterval());
   }
@@ -323,8 +424,8 @@ void CmdDragSelectedBoardItems::setCurrentPosition(
     foreach (CmdBoardViaEdit* cmd, mViaEditCmds) {
       cmd->translate(delta - mDeltaPos, true);
     }
-    foreach (CmdBoardNetPointEdit* cmd, mNetPointEditCmds) {
-      cmd->translate(delta - mDeltaPos, true);
+    foreach (const NetPointConstraint& c, mNetPointConstraints) {
+      c.cmd->setPosition(computeNetPointPosition(c, delta), true);
     }
     foreach (CmdBoardPlaneEdit* cmd, mPlaneEditCmds) {
       cmd->translate(delta - mDeltaPos, true);
