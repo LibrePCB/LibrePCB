@@ -534,8 +534,11 @@ bool BoardEditorState_Select::processGraphicsSceneMouseMoved(
     if (mSelectedItemsDragCommand->selectDevicesOfPads()) {
       scheduleUpdateAvailableFeatures();
     }
-    // Move selected elements to cursor position
-    mSelectedItemsDragCommand->setCurrentPosition(e.scenePos);
+    // Move selected elements to cursor position - holding Ctrl disables the
+    // angle-preserving trace adaptation (see
+    // CmdDragSelectedBoardItems::setCurrentPosition()'s freeMovement param).
+    mSelectedItemsDragCommand->setCurrentPosition(
+        e.scenePos, true, e.modifiers.testFlag(Qt::ControlModifier));
     return true;
   } else if (mSelectedPolygon && mCmdPolygonEdit) {
     // Move polygon vertices
@@ -683,9 +686,17 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
   if (!scene) return false;
 
   if ((!mIsUndoCmdActive) && mSelectedItemsDragCommand) {
-    // Stop moving items (set position of all selected elements permanent)
+    // Stop moving items (set position of all selected elements permanent).
+    // Important: pass the current Ctrl state here too, exactly like in
+    // processGraphicsSceneMouseMoved() above - otherwise, releasing the
+    // mouse button would silently re-evaluate the final position with
+    // freeMovement=false (the default), snapping any trace point that was
+    // freely dragged with Ctrl held back onto the angle-constrained
+    // position, even though the drag itself looked correct right up to
+    // the release.
     try {
-      mSelectedItemsDragCommand->setCurrentPosition(e.scenePos);
+      mSelectedItemsDragCommand->setCurrentPosition(
+          e.scenePos, true, e.modifiers.testFlag(Qt::ControlModifier));
       mContext.undoStack.execCmd(
           mSelectedItemsDragCommand.release());  // can throw
     } catch (const Exception& e) {

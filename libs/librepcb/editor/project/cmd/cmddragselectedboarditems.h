@@ -36,6 +36,9 @@
 namespace librepcb {
 
 class BI_Device;
+class BI_NetLine;
+class BI_NetLineAnchor;
+class BI_NetPoint;
 
 namespace editor {
 
@@ -87,8 +90,8 @@ public:
   void setLocked(bool locked) noexcept;
   void setLineWidth(const UnsignedLength& width) noexcept;
   void resetAllTexts() noexcept;
-  void setCurrentPosition(const Point& pos,
-                          const bool gridIncrement = true) noexcept;
+  void setCurrentPosition(const Point& pos, const bool gridIncrement = true,
+                          const bool freeMovement = false) noexcept;
   void rotate(const Angle& angle, bool aroundCurrentPosition) noexcept;
 
 private:
@@ -96,6 +99,32 @@ private:
 
   /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
   bool performExecute() override;
+
+  /// Angle-preserving constraint for a single net point being dragged
+  /// (either directly selected/dragged, or implicitly cascaded along
+  /// because it's a stub trace attached to a moving pad/via). See
+  /// #computeNetPointPosition() for how this is used.
+  struct NetPointConstraint {
+    CmdBoardNetPointEdit* cmd = nullptr;
+    Point originalPos;
+    /// True if #direction is meaningful (the point has a driving anchor
+    /// whose original angle to this point should be kept while the anchor
+    /// moves by the drag delta).
+    bool hasDirection = false;
+    /// Original position of the driving anchor (itself, if directly
+    /// dragged; or the pad/via, if reached via cascading).
+    Point anchorOriginalPos;
+    /// Unit vector, original direction from #anchorOriginalPos to
+    /// #originalPos.
+    QPointF direction;
+    /// True if there's exactly one other, genuinely fixed neighbor whose
+    /// own angle must also be kept exact (via line intersection).
+    bool hasNeighborRay = false;
+    QPointF neighborFixedPoint;
+    QPointF neighborDirection;
+  };
+  Point computeNetPointPosition(const NetPointConstraint& c,
+                                const Point& delta) const noexcept;
 
   // Private Member Variables
   BoardGraphicsScene& mScene;
@@ -124,6 +153,15 @@ private:
   QList<CmdBoardPolygonEdit*> mPolygonEditCmds;
   QList<CmdBoardStrokeTextEdit*> mStrokeTextEditCmds;
   QList<CmdBoardHoleEdit*> mHoleEditCmds;
+
+  /// Angle-preserving constraints for stub traces attached to a dragged
+  /// pad/via - see #NetPointConstraint. Directly selected/dragged net
+  /// points (#mNetPointEditCmds) are *not* constrained; they keep their
+  /// existing, unconstrained free-drag behavior unchanged.
+  QVector<NetPointConstraint> mNetPointConstraints;
+  /// Same set of commands as in #mNetPointConstraints (by #cmd), just as a
+  /// set for fast lookup - which of #mNetPointEditCmds are constrained.
+  QSet<CmdBoardNetPointEdit*> mConstrainedNetPointCmds;
 };
 
 /*******************************************************************************

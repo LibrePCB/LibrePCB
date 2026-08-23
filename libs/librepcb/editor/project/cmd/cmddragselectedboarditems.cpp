@@ -51,6 +51,8 @@
 
 #include <QtCore>
 
+#include <cmath>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -135,6 +137,138 @@ CmdDragSelectedBoardItems::CmdDragSelectedBoardItems(
     mItemCount += 2;
     CmdBoardNetLineEdit* cmd = new CmdBoardNetLineEdit(*netline);
     mNetLineEditCmds.append(cmd);
+  }
+
+          // Intelligent angle-preserving trace adaptation: when a whole
+          // device (or a via) is dragged, any trace stub connected to one of
+          // its pads (resp. the via) but not itself explicitly selected is
+          // dragged along implicitly too, keeping its own original angle
+          // (only its length adapts) - instead of just being left behind
+          // with a now-wrong, kinked angle. Holding Ctrl while dragging (see
+          // #setCurrentPosition()'s freeMovement parameter) disables this
+          // and moves the device with all stubs following it rigidly,
+          // exactly like before this feature existed.
+          //
+          // Deliberately limited to a *single* hop (the one net point
+          // directly touching the pad/via): walking arbitrarily long chains
+          // of bend points sounds appealing, but on a densely routed real
+          // board it can chain through many segments far away from the part
+          // being dragged, and if two of those distant segments happen to
+          // be near-parallel, the angle-intersection math places the point
+          // at a huge, effectively unbounded distance - sending traces
+          // flying across the whole board. Only adapting the immediate stub
+          // segment is what a component move should affect anyway.
+  auto computeRayTo = [](BI_NetLineAnchor& point, BI_NetLine& line,
+                         QPointF& outFixedPoint,
+                         QPointF& outDirection) -> bool {
+    BI_NetLineAnchor& farAnchor =
+        (&line.getP1() == &point) ? line.getP2() : line.getP1();
+    QPointF dir = point.getPosition().toMmQPointF() -
+        farAnchor.getPosition().toMmQPointF();
+    const qreal len = std::hypot(dir.x(), dir.y());
+    if (len <= 1e-9) {
+      return false;
+    }
+    outFixedPoint = farAnchor.getPosition().toMmQPointF();
+    outDirection = dir / len;
+    return true;
+  };
+          // True if `anchor` (a pad or via) is part of the current drag
+          // itself, in which case it must never be treated as a fixed
+          // neighbor - its position already follows the drag automatically.
+  auto isMovingPadOrVia = [&](BI_NetLineAnchor& anchor) -> bool {
+    if (BI_Pad* pad = dynamic_cast<BI_Pad*>(&anchor)) {
+      return pad->getDevice() &&
+          query.getDeviceInstances().contains(pad->getDevice());
+    }
+    if (BI_Via* via = dynamic_cast<BI_Via*>(&anchor)) {
+      return query.getVias().contains(via);
+    }
+    return false;
+  };
+  QSet<BI_NetPoint*> processedFarNetPoints;
+  auto tryCascade = [&](BI_NetLineAnchor& anchor, const Point& anchorPos) {
+    foreach (BI_NetLine* netline, anchor.getNetLines()) {
+      BI_NetLineAnchor& farAnchor = (&netline->getP1() == &anchor)
+          ? netline->getP2()
+          : netline->getP1();
+      BI_NetPoint* farNetPoint = dynamic_cast<BI_NetPoint*>(&farAnchor);
+      if ((!farNetPoint) || query.getNetPoints().contains(farNetPoint) ||
+          processedFarNetPoints.contains(farNetPoint)) {
+        continue;  // Not a stub, already handled directly above, or already
+                  // reached from a different pad/via of the same drag.
+      }
+      QPointF dir =
+          farNetPoint->getPosition().toMmQPointF() - anchorPos.toMmQPointF();
+      const qreal len = std::hypot(dir.x(), dir.y());
+      if (len <= 1e-9) {
+        continue;  // Degenerate (coincident points).
+      }
+      processedFarNetPoints.insert(farNetPoint);
+
+              // Look at every *other* line connected to this point (besides
+              // the one leading back to the moved pad/via) to find a
+              // genuinely fixed neighbor to keep at its exact original angle
+              // - but only if there's exactly one such neighbor. With 2+ (a
+              // real junction with several independently fixed branches),
+              // there is no single angle that can keep all of them exact,
+              // and guessing which one to intersect against would silently
+              // distort a branch that has nothing to do with the current
+              // drag. In that ambiguous case, this point is left completely
+              // untouched instead: only the segment to the dragged pad/via
+              // changes (stretches/rotates freely to follow it), while
+              // everything else around the junction stays perfectly still -
+              // this is also how KiCad-style footprint dragging behaves at
+              // real junctions.
+      int fixedNeighborCount = 0;
+      QPointF fixedNeighborPoint, fixedNeighborDir;
+      foreach (BI_NetLine* nl, farNetPoint->getNetLines()) {
+        if (nl == netline) {
+          continue;
+        }
+        BI_NetLineAnchor& otherEnd =
+            (&nl->getP1() == farNetPoint) ? nl->getP2() : nl->getP1();
+        if (isMovingPadOrVia(otherEnd)) {
+          continue;  // Follows the drag automatically - not a constraint.
+        }
+        QPointF p, d;
+        if (computeRayTo(*farNetPoint, *nl, p, d)) {
+          if (fixedNeighborCount == 0) {
+            fixedNeighborPoint = p;
+            fixedNeighborDir = d;
+          }
+          ++fixedNeighborCount;
+        }
+      }
+      if (fixedNeighborCount >= 2) {
+        continue;  // Real junction with 2+ fixed branches - leave it alone.
+      }
+
+      CmdBoardNetPointEdit* cmd = new CmdBoardNetPointEdit(*farNetPoint);
+      mNetPointEditCmds.append(cmd);
+
+      NetPointConstraint constraint;
+      constraint.cmd = cmd;
+      constraint.originalPos = farNetPoint->getPosition();
+      constraint.hasDirection = true;
+      constraint.anchorOriginalPos = anchorPos;
+      constraint.direction = dir / len;
+      constraint.hasNeighborRay = (fixedNeighborCount == 1);
+      if (constraint.hasNeighborRay) {
+        constraint.neighborFixedPoint = fixedNeighborPoint;
+        constraint.neighborDirection = fixedNeighborDir;
+      }
+      mNetPointConstraints.append(constraint);
+      mConstrainedNetPointCmds.insert(cmd);
+    }
+  };
+  foreach (BI_Device* device, query.getDeviceInstances()) {
+    foreach (BI_Pad* pad, device->getPads()) {
+      tryCascade(*pad, pad->getPosition());
+    }
+  }
+  foreach (BI_Via* via, query.getVias()) {
+    tryCascade(*via, via->getPosition());
   }
   foreach (BI_Plane* plane, query.getPlanes()) {
     Q_ASSERT(plane);
@@ -306,7 +440,8 @@ void CmdDragSelectedBoardItems::resetAllTexts() noexcept {
 }
 
 void CmdDragSelectedBoardItems::setCurrentPosition(
-    const Point& pos, const bool gridIncrement) noexcept {
+    const Point& pos, const bool gridIncrement,
+    const bool freeMovement) noexcept {
   Point delta = pos - mStartPos;
   if (gridIncrement) {
     delta.mapToGrid(mScene.getBoard().getGridInterval());
@@ -323,8 +458,16 @@ void CmdDragSelectedBoardItems::setCurrentPosition(
     foreach (CmdBoardViaEdit* cmd, mViaEditCmds) {
       cmd->translate(delta - mDeltaPos, true);
     }
+    foreach (const NetPointConstraint& c, mNetPointConstraints) {
+      const Point newPos = freeMovement
+          ? (c.originalPos + delta)
+          : computeNetPointPosition(c, delta);
+      c.cmd->setPosition(newPos, true);
+    }
     foreach (CmdBoardNetPointEdit* cmd, mNetPointEditCmds) {
-      cmd->translate(delta - mDeltaPos, true);
+      if (!mConstrainedNetPointCmds.contains(cmd)) {
+        cmd->translate(delta - mDeltaPos, true);
+      }
     }
     foreach (CmdBoardPlaneEdit* cmd, mPlaneEditCmds) {
       cmd->translate(delta - mDeltaPos, true);
@@ -347,6 +490,33 @@ void CmdDragSelectedBoardItems::setCurrentPosition(
     // items.
     mScene.getBoard().triggerAirWiresRebuild();
   }
+}
+
+Point CmdDragSelectedBoardItems::computeNetPointPosition(
+    const NetPointConstraint& c, const Point& delta) const noexcept {
+  if ((!c.hasNeighborRay) || (!c.hasDirection)) {
+    // No fixed neighbor to intersect with (a dangling stub end, or a real
+    // junction that's intentionally left untouched elsewhere) - just
+    // translate rigidly by the same delta as the driving anchor. For a
+    // dangling end this exactly preserves both the original angle and
+    // length (the whole stub moves as one rigid piece with the pad/via).
+    return c.originalPos + delta;
+  }
+  const QPointF p1 = c.anchorOriginalPos.toMmQPointF() + delta.toMmQPointF();
+  const QPointF& d1 = c.direction;
+  const QPointF& d2 = c.neighborDirection;
+  const QPointF& p2 = c.neighborFixedPoint;
+  const qreal det = d1.x() * d2.y() - d1.y() * d2.x();
+  if (std::fabs(det) < 1e-9) {
+    // The two segments are (numerically) parallel - no well-defined
+    // intersection exists; fall back to a plain rigid translation rather
+    // than dividing by ~0 and producing a point far off the board.
+    return c.originalPos + delta;
+  }
+  const QPointF diff = p2 - p1;
+  const qreal s = (diff.x() * d2.y() - diff.y() * d2.x()) / det;
+  const QPointF intersection = p1 + s * d1;
+  return Point::fromMm(intersection);
 }
 
 void CmdDragSelectedBoardItems::rotate(const Angle& angle,
