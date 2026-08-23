@@ -53,7 +53,7 @@ public:
   explicit BoardDesignRules(const SExpression& node);
   ~BoardDesignRules() noexcept;
 
-  // Getters: Default Values
+          // Getters: Default Values
   const PositiveLength& getDefaultTraceWidth() const noexcept {
     return mDefaultTraceWidth;
   }
@@ -61,7 +61,7 @@ public:
     return mDefaultViaDrillDiameter;
   }
 
-  // Getters: Stop Mask
+          // Getters: Stop Mask
   const UnsignedLength& getStopMaskMaxViaDiameter() const noexcept {
     return mStopMaskMaxViaDrillDiameter;
   }
@@ -69,12 +69,12 @@ public:
     return mStopMaskClearance;
   }
 
-  // Getters: Solder Paste
+          // Getters: Solder Paste
   const BoundedUnsignedRatio& getSolderPasteClearance() const noexcept {
     return mSolderPasteClearance;
   }
 
-  // Getters: Pad Annular Ring
+          // Getters: Pad Annular Ring
   bool getPadCmpSideAutoAnnularRing() const noexcept {
     return mPadCmpSideAutoAnnularRing;
   }
@@ -85,12 +85,17 @@ public:
     return mPadAnnularRing;
   }
 
-  // Getters: Via Annular Ring
+          // Getters: Pad Copper Expansion
+  const BoundedUnsignedRatio& getPadCopperExpansion() const noexcept {
+    return mPadCopperExpansion;
+  }
+
+          // Getters: Via Annular Ring
   const BoundedUnsignedRatio& getViaAnnularRing() const noexcept {
     return mViaAnnularRing;
   }
 
-  // Setters
+          // Setters
   void setDefaultTraceWidth(const PositiveLength& value) noexcept {
     mDefaultTraceWidth = value;
   }
@@ -115,11 +120,14 @@ public:
   void setPadAnnularRing(const BoundedUnsignedRatio& value) {
     mPadAnnularRing = value;
   }
+  void setPadCopperExpansion(const BoundedUnsignedRatio& value) {
+    mPadCopperExpansion = value;
+  }
   void setViaAnnularRing(const BoundedUnsignedRatio& value) {
     mViaAnnularRing = value;
   }
 
-  // General Methods
+          // General Methods
   void restoreDefaults() noexcept;
   void adjustToDrcSettings(const BoardDesignRuleCheckSettings& s) noexcept;
 
@@ -130,10 +138,10 @@ public:
    */
   void serialize(SExpression& root) const;
 
-  // Helper Methods
+          // Helper Methods
   bool doesViaRequireStopMaskOpening(const Length& drillDia) const noexcept;
 
-  // Operator Overloadings
+          // Operator Overloadings
   BoardDesignRules& operator=(const BoardDesignRules& rhs) noexcept;
   bool operator==(const BoardDesignRules& rhs) const noexcept;
   bool operator!=(const BoardDesignRules& rhs) const noexcept {
@@ -148,19 +156,23 @@ private:  // Data
   PositiveLength mDefaultTraceWidth;
   PositiveLength mDefaultViaDrillDiameter;
 
-  // Stop Mask
+          // Stop Mask
   UnsignedLength mStopMaskMaxViaDrillDiameter;
   BoundedUnsignedRatio mStopMaskClearance;
 
-  // Solder Paste
+          // Solder Paste
   BoundedUnsignedRatio mSolderPasteClearance;
 
-  // Pad Annular Ring
+          // Pad Annular Ring
   bool mPadCmpSideAutoAnnularRing;
   bool mPadInnerAutoAnnularRing;
   BoundedUnsignedRatio mPadAnnularRing;  /// Percentage of the drill diameter
 
-  // Via Annular Ring
+          // Pad Copper Expansion
+  BoundedUnsignedRatio
+      mPadCopperExpansion;  /// Percentage of pad size, expands copper shape
+
+          // Via Annular Ring
   BoundedUnsignedRatio mViaAnnularRing;  /// Percentage of the drill diameter
 };
 

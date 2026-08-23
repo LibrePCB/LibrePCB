@@ -660,6 +660,21 @@ QList<PadGeometry> BI_Pad::getGeometryOnCopperLayer(
           PadHoleList{std::make_shared<PadHole>(hole)}));
     }
   }
+
+  // Apply the global copper expansion (in percent of the pad size), as
+  // configured in the board design rules. This lets the user enlarge all
+  // copper pad shapes on the board, e.g. for easier hand soldering.
+  const UnsignedLength copperExpansion =
+      mBoard.getDesignRules().getPadCopperExpansion().calcValue(
+          *getSizeForMaskOffsetCalculation());
+  if (*copperExpansion > 0) {
+    QList<PadGeometry> expanded;
+    foreach (const PadGeometry& pg, result) {
+      expanded.append(pg.withOffset(*copperExpansion));
+    }
+    result = expanded;
+  }
+
   return result;
 }
 
