@@ -167,8 +167,8 @@ bool BoardEditorState_Select::exit() noexcept {
 
   mUpdateAvailableFeaturesTimer.reset();
 
-  // Avoid propagating the selection to other, non-selectable tools, thus
-  // clearing the selection.
+          // Avoid propagating the selection to other, non-selectable tools, thus
+          // clearing the selection.
   if (BoardGraphicsScene* scene = getActiveBoardScene()) {
     scene->clearSelection();
   }
@@ -204,25 +204,25 @@ bool BoardEditorState_Select::processImportDxf() noexcept {
         return false;  // Aborted.
       }
 
-      // This operation can take some time, use wait cursor to provide
-      // immediate UI feedback.
+              // This operation can take some time, use wait cursor to provide
+              // immediate UI feedback.
       QGuiApplication::setOverrideCursor(Qt::WaitCursor);
       auto cursorScopeGuard =
           scopeGuard([]() { QGuiApplication::restoreOverrideCursor(); });
 
-      // Read DXF file.
+              // Read DXF file.
       DxfReader import;
       import.setScaleFactor(dialog.getScaleFactor());
       import.parse(fp);  // can throw
 
-      // If enabled, join tangent paths.
+              // If enabled, join tangent paths.
       QVector<Path> paths = import.getPolygons().toVector();
       if (dialog.getJoinTangentPolylines()) {
         paths = TangentPathJoiner::join(paths, 2000);
       }
 
-      // Build board elements to import. ALthough this has nothing to do with
-      // the clipboard, we use BoardClipboardData since it works very well :-)
+              // Build board elements to import. ALthough this has nothing to do with
+              // the clipboard, we use BoardClipboardData since it works very well :-)
       std::unique_ptr<BoardClipboardData> data(
           new BoardClipboardData(scene->getBoard().getUuid(), Point(0, 0)));
       foreach (const auto& path, paths) {
@@ -244,13 +244,13 @@ bool BoardEditorState_Select::processImportDxf() noexcept {
         }
       }
 
-      // Abort with error if nothing was imported.
+              // Abort with error if nothing was imported.
       if (data->isEmpty()) {
         DxfImportDialog::throwNoObjectsImportedError();  // will throw
       }
 
-      // Shaw the layers of the imported objects, otherwise the user might
-      // not even see these objects.
+              // Shaw the layers of the imported objects, otherwise the user might
+              // not even see these objects.
       if (!data->getHoles().isEmpty()) {
         makeLayerVisible(ColorRole::boardHoles());
       }
@@ -258,7 +258,7 @@ bool BoardEditorState_Select::processImportDxf() noexcept {
         makeLayerVisible(dialog.getLayer().getColorRole());
       }
 
-      // Start the paste tool.
+              // Start the paste tool.
       return startPaste(*scene, std::move(data),
                         dialog.getPlacementPosition());  // can throw
     } catch (const Exception& e) {
@@ -325,8 +325,8 @@ bool BoardEditorState_Select::processPaste() noexcept {
           BoardClipboardData::fromMimeData(
               qApp->clipboard()->mimeData());  // can throw
 
-      // If there is no board data, get footprint data from clipboard to allow
-      // pasting graphical elements from the footprint editor.
+              // If there is no board data, get footprint data from clipboard to allow
+              // pasting graphical elements from the footprint editor.
       if (!data) {
         std::unique_ptr<const FootprintClipboardData> footprintData =
             FootprintClipboardData::fromMimeData(
@@ -356,7 +356,7 @@ bool BoardEditorState_Select::processPaste() noexcept {
         }
       }
 
-      // If there is something to paste, start the paste tool.
+              // If there is something to paste, start the paste tool.
       if (data) {
         return startPaste(*scene, std::move(data), std::nullopt);  // can throw
       }
@@ -534,8 +534,11 @@ bool BoardEditorState_Select::processGraphicsSceneMouseMoved(
     if (mSelectedItemsDragCommand->selectDevicesOfPads()) {
       scheduleUpdateAvailableFeatures();
     }
-    // Move selected elements to cursor position
-    mSelectedItemsDragCommand->setCurrentPosition(e.scenePos);
+    // Move selected elements to cursor position - holding Ctrl disables the
+    // angle-preserving trace adaptation (see
+    // CmdDragSelectedBoardItems::setCurrentPosition()'s freeMovement param).
+    mSelectedItemsDragCommand->setCurrentPosition(
+        e.scenePos, true, e.modifiers.testFlag(Qt::ControlModifier));
     return true;
   } else if (mSelectedPolygon && mCmdPolygonEdit) {
     // Move polygon vertices
@@ -582,7 +585,7 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
     const GraphicsSceneMouseEvent& e) noexcept {
   scheduleUpdateAvailableFeatures();
 
-  // Discard any temporary changes and release undo stack.
+          // Discard any temporary changes and release undo stack.
   abortBlockingToolsInOtherEditors();
 
   BoardGraphicsScene* scene = getActiveBoardScene();
@@ -634,7 +637,7 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
         return true;
       }
 
-      // Check if there's already an item selected.
+              // Check if there's already an item selected.
       std::shared_ptr<QGraphicsItem> selectedItem;
       foreach (auto item, items) {
         if (item->isSelected()) {
@@ -683,9 +686,17 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
   if (!scene) return false;
 
   if ((!mIsUndoCmdActive) && mSelectedItemsDragCommand) {
-    // Stop moving items (set position of all selected elements permanent)
+    // Stop moving items (set position of all selected elements permanent).
+    // Important: pass the current Ctrl state here too, exactly like in
+    // processGraphicsSceneMouseMoved() above - otherwise, releasing the
+    // mouse button would silently re-evaluate the final position with
+    // freeMovement=false (the default), snapping any trace point that was
+    // freely dragged with Ctrl held back onto the angle-constrained
+    // position, even though the drag itself looked correct right up to
+    // the release.
     try {
-      mSelectedItemsDragCommand->setCurrentPosition(e.scenePos);
+      mSelectedItemsDragCommand->setCurrentPosition(
+          e.scenePos, true, e.modifiers.testFlag(Qt::ControlModifier));
       mContext.undoStack.execCmd(
           mSelectedItemsDragCommand.release());  // can throw
     } catch (const Exception& e) {
@@ -737,7 +748,7 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonDoubleClicked(
     return processGraphicsSceneLeftMouseButtonPressed(e);
   }
 
-  // Discard any temporary changes and release undo stack.
+          // Discard any temporary changes and release undo stack.
   abortBlockingToolsInOtherEditors();
 
   if ((!mSelectedItemsDragCommand) && (!mCmdPolygonEdit) && (!mCmdPlaneEdit) &&
@@ -764,7 +775,7 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
     const GraphicsSceneMouseEvent& e) noexcept {
   scheduleUpdateAvailableFeatures();
 
-  // Discard any temporary changes and release undo stack.
+          // Discard any temporary changes and release undo stack.
   abortBlockingToolsInOtherEditors();
 
   BoardGraphicsScene* scene = getActiveBoardScene();
@@ -780,9 +791,9 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
         FindFlag::All | FindFlag::DevicesOfPads | FindFlag::AcceptNearMatch);
     if (items.isEmpty()) return false;
 
-    // If the right-clicked element is part of an active selection, keep it
-    // as-is. However, if it's not part of an active selection, clear the
-    // selection and select the right-clicked element instead.
+            // If the right-clicked element is part of an active selection, keep it
+            // as-is. However, if it's not part of an active selection, clear the
+            // selection and select the right-clicked element instead.
     std::shared_ptr<QGraphicsItem> selectedItem;
     foreach (auto item, items) {
       if (item->isSelected()) {
@@ -806,7 +817,7 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
     Q_ASSERT(selectedItem);
     Q_ASSERT(selectedItem->isSelected());
 
-    // build the context menus
+            // build the context menus
     QMenu menu;
     MenuBuilder mb(&menu);
     const EditorCommandSet& cmd = EditorCommandSet::instance();
@@ -929,7 +940,7 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
           mContext.workspace, mb, device->getDevice().getComponentInstance(),
           device->getDevice().getLibDevice().getUuid(), parentWidget(), menu);
     } else if (auto netline =
-                   std::dynamic_pointer_cast<BGI_NetLine>(selectedItem)) {
+               std::dynamic_pointer_cast<BGI_NetLine>(selectedItem)) {
       mb.addAction(cmd.setLineWidth.createAction(
           &menu, this, [this]() { changeWidthOfSelectedItems(0); }));
       mb.addAction(cmd.remove.createAction(
@@ -951,7 +962,7 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
             measureSelectedItems(netline->getNetLine());
           }));
     } else if (auto netpoint =
-                   std::dynamic_pointer_cast<BGI_NetPoint>(selectedItem)) {
+               std::dynamic_pointer_cast<BGI_NetPoint>(selectedItem)) {
       const Point pos = netpoint->getNetPoint().getPosition();
       mb.addAction(cmd.traceRemoveWhole.createAction(
           &menu, this, [this, scene, netpoint]() {
@@ -1011,7 +1022,7 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
       aSnap->setEnabled(!pos.isOnGrid(getGridInterval()));
       mb.addAction(aSnap);
     } else if (auto plane =
-                   std::dynamic_pointer_cast<BGI_Plane>(selectedItem)) {
+               std::dynamic_pointer_cast<BGI_Plane>(selectedItem)) {
       int lineIndex = plane->getLineIndexAtPosition(pos);
       QVector<int> vertices = plane->getVertexIndicesAtPosition(pos);
 
@@ -1126,7 +1137,7 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
       aIsLocked->setChecked(zone->getZone().getData().isLocked());
       mb.addAction(aIsLocked);
     } else if (auto item =
-                   std::dynamic_pointer_cast<BGI_Polygon>(selectedItem)) {
+               std::dynamic_pointer_cast<BGI_Polygon>(selectedItem)) {
       BI_Polygon* polygon = scene->getBoard().getPolygons().value(
           item->getPolygon().getData().getUuid());
       if (!polygon) return false;
@@ -1185,7 +1196,7 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
       aIsLocked->setChecked(polygon->getData().isLocked());
       mb.addAction(aIsLocked);
     } else if (auto text =
-                   std::dynamic_pointer_cast<BGI_StrokeText>(selectedItem)) {
+               std::dynamic_pointer_cast<BGI_StrokeText>(selectedItem)) {
       const Point pos = text->getStrokeText().getData().getPosition();
       mb.addAction(
           cmd.properties.createAction(
@@ -1254,7 +1265,7 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
       return true;
     }
 
-    // execute the context menu
+            // execute the context menu
     menu.exec(QCursor::pos());
     return true;
   }
@@ -1641,12 +1652,12 @@ bool BoardEditorState_Select::startPaste(
     const std::optional<Point>& fixedPosition) {
   Q_ASSERT(data);
 
-  // Start undo command group.
+          // Start undo command group.
   scene.clearSelection();
   mContext.undoStack.beginCmdGroup(tr("Paste board elements"));
   mIsUndoCmdActive = true;
 
-  // Paste items.
+          // Paste items.
   const Point startPos = mAdapter.fsmMapGlobalPosToScenePos(QCursor::pos());
   Point offset = fixedPosition
       ? (*fixedPosition)
@@ -1680,20 +1691,20 @@ bool BoardEditorState_Select::abortCommand(bool showErrMsgBox) noexcept {
     mSelectedPolygon = nullptr;
     mSelectedPolygonVertices.clear();
 
-    // Stop editing planes
+            // Stop editing planes
     mCmdPlaneEdit.reset();
     mSelectedPlane = nullptr;
     mSelectedPlaneVertices.clear();
 
-    // Stop editing zones
+            // Stop editing zones
     mCmdZoneEdit.reset();
     mSelectedZone = nullptr;
     mSelectedZoneVertices.clear();
 
-    // Delete the current undo command
+            // Delete the current undo command
     mSelectedItemsDragCommand.reset();
 
-    // Abort the undo command
+            // Abort the undo command
     if (mIsUndoCmdActive) {
       mContext.undoStack.abortCmdGroup();
       mIsUndoCmdActive = false;
@@ -1777,12 +1788,12 @@ bool BoardEditorState_Select::measureSelectedItems(
   BoardGraphicsScene* scene = getActiveBoardScene();
   if (!scene) return false;
 
-  // Store UUIDs of visited netlines
+          // Store UUIDs of visited netlines
   QSet<Uuid> visitedNetLines;
   visitedNetLines.insert(netline.getUuid());
 
-  // Get the netline length. Then traverse the selected netlines first in one
-  // direction, then in the other direction.
+          // Get the netline length. Then traverse the selected netlines first in one
+          // direction, then in the other direction.
   UnsignedLength totalLength = netline.getLength();
   try {
     measureLengthInDirection(*scene, false, netline, visitedNetLines,
@@ -1794,12 +1805,12 @@ bool BoardEditorState_Select::measureSelectedItems(
     return false;
   }
 
-  // Query the total number of selected netlines
+          // Query the total number of selected netlines
   BoardSelectionQuery query(*scene, true);
   query.addSelectedNetLines();
   int totalSelectedNetlines = query.getNetLines().size();
 
-  // Show result
+          // Show result
   QLocale locale;
   QString title = tr("Measurement Result");
   QString text =
@@ -1916,14 +1927,14 @@ void BoardEditorState_Select::openPlanePropertiesDialog(
       mContext.project, plane, mContext.undoStack, getLengthUnit(),
       "board_editor/plane_properties_dialog", parentWidget());
 
-  // Make sure the plane is visible visible since it's useful to see the actual
-  // plane fragments while the plane properties are modified.
+          // Make sure the plane is visible visible since it's useful to see the actual
+          // plane fragments while the plane properties are modified.
   bool visible = plane.isVisible();
   plane.setVisible(true);
 
   dialog.exec();
 
-  // Restore visibility
+          // Restore visibility
   plane.setVisible(visible);
 }
 
@@ -1986,7 +1997,7 @@ QList<BoardEditorState_Select::DeviceMenuItem>
       items.append(item);
     }
 
-    // sort by name.
+            // sort by name.
     Toolbox::sortNumeric(
         items,
         [](const QCollator& cmp, const DeviceMenuItem& lhs,
@@ -2212,8 +2223,8 @@ QString BoardEditorState_Select::processSelection(
     return QString();
   }
 
-  // Collect selected objects. Generally, accept only a single kind of object
-  // to be selected, except for cases where this is not good enough.
+          // Collect selected objects. Generally, accept only a single kind of object
+          // to be selected, except for cases where this is not good enough.
   const BI_Device* device = nullptr;
   const BI_Pad* pad = nullptr;
   InfoBoxValue<const NetSignal*> net;
@@ -2338,14 +2349,14 @@ QString BoardEditorState_Select::processSelection(
     }
   }
 
-  // Cross-probe selected objects to other editors.
+          // Cross-probe selected objects to other editors.
   if (doCrossProbe) {
     mAdapter.fsmCrossProbe(crossProbeNets, crossProbeComponents,
                            crossProbeComponentSignals,
                            GraphicsLayer::State::Enabled);
   }
 
-  // Build key/value pairs for selected objects.
+          // Build key/value pairs for selected objects.
   QVector<std::pair<QString, QString>> keyValues;
   const LengthUnit& unit = getLengthUnit();
   auto formatLength = [&unit](const Length& l) {
@@ -2464,20 +2475,20 @@ QString BoardEditorState_Select::processSelection(
                  unit.toShortStringTr())));
   }
 
-  // Remove keys with empty values.
+          // Remove keys with empty values.
   keyValues.erase(std::remove_if(keyValues.begin(), keyValues.end(),
                                  [](const std::pair<QString, QString>& item) {
                                    return item.second.isEmpty();
                                  }),
                   keyValues.end());
 
-  // Determine maximum key length.
+          // Determine maximum key length.
   qsizetype maxKeyLen = 0U;
   for (const auto& item : keyValues) {
     maxKeyLen = std::max(maxKeyLen, item.first.length());
   }
 
-  // Build string.
+          // Build string.
   QStringList lines;
   for (const auto& item : keyValues) {
     lines.append(item.first % ": " %
