@@ -144,7 +144,7 @@ private:
    * either the point's own original position offset by the global drag
    * delta - if the point itself was explicitly selected/dragged -, or a
    * moving pad/via of a dragged device/via - if this point is merely a
-   * stub connected to it, see #mCascadedFromDeviceDrag) with a fixed
+   * stub connected to it, see @c mCascadedFromDeviceDrag) with a fixed
    * direction (#direction). If the point also has a fixed (non-dragged)
    * neighbor trace, that neighbor must keep its own original angle - only
    * its length may change - so the point's new position is the
