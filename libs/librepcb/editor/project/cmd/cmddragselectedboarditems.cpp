@@ -97,11 +97,11 @@ CmdDragSelectedBoardItems::CmdDragSelectedBoardItems(
   query.addSelectedFootprintStrokeTexts();
   query.addSelectedHoles();
 
-          // Determine the reference direction used to constrain the drag movement
-          // (see documentation of #mReferenceDirection). Prefer the direction of an
-          // explicitly selected/dragged trace segment; if only a lone junction
-          // point is being dragged, fall back to the direction of one of its
-          // connected segments so that segment keeps its angle.
+  // Determine the reference direction used to constrain the drag movement
+  // (see documentation of #mReferenceDirection). Prefer the direction of an
+  // explicitly selected/dragged trace segment; if only a lone junction
+  // point is being dragged, fall back to the direction of one of its
+  // connected segments so that segment keeps its angle.
   auto tryUseDirection = [&](const Point& a, const Point& b) {
     if (mHasReferenceDirection) return;
     QPointF dir = b.toMmQPointF() - a.toMmQPointF();
@@ -124,10 +124,10 @@ CmdDragSelectedBoardItems::CmdDragSelectedBoardItems(
     }
   }
 
-          // Find (at most) one neighbor trace connected to `netpoint`, other than
-          // `excludeNetline`, which is *not* part of the current selection. That
-          // neighbor stays where it is and must keep its own original angle - see
-          // #NetPointConstraint.
+  // Find (at most) one neighbor trace connected to `netpoint`, other than
+  // `excludeNetline`, which is *not* part of the current selection. That
+  // neighbor stays where it is and must keep its own original angle - see
+  // #NetPointConstraint.
   auto findNeighborRay = [&](BI_NetPoint* netpoint, BI_NetLine* excludeNetline,
                              QPointF& outFixedPoint,
                              QPointF& outDirection) -> bool {
@@ -151,12 +151,12 @@ CmdDragSelectedBoardItems::CmdDragSelectedBoardItems(
     return false;
   };
 
-          // Expand the selected individual pads to their devices, to allow dragging
-          // the devices (individual footprint pads cannot be dragged). However, the
-          // devices are not selected immediately, but later in selectDevicesOfPads().
+  // Expand the selected individual pads to their devices, to allow dragging
+  // the devices (individual footprint pads cannot be dragged). However, the
+  // devices are not selected immediately, but later in selectDevicesOfPads().
   mAutoSelectedDevices = query.addDeviceInstancesAndTextsOfSelectedPads();
 
-          // find the center of all elements and create undo commands
+  // find the center of all elements and create undo commands
   foreach (BI_Device* device, query.getDeviceInstances()) {
     Q_ASSERT(device);
     mCenterPos += device->getPosition();
@@ -198,12 +198,12 @@ CmdDragSelectedBoardItems::CmdDragSelectedBoardItems(
     mNetPointConstraints.append(constraint);
   }
 
-          // Intelligent angle-preserving trace adaptation also applies when moving
-          // whole devices or vias: any trace stub connected to one of their pads
-          // (resp. the via) but not itself explicitly selected is now dragged along
-          // implicitly, keeping its own original angle (only its length adapts) -
-          // exactly like #NetPointConstraint above, just with the pad/via (instead
-          // of the point itself) as the moving anchor.
+  // Intelligent angle-preserving trace adaptation also applies when moving
+  // whole devices or vias: any trace stub connected to one of their pads
+  // (resp. the via) but not itself explicitly selected is now dragged along
+  // implicitly, keeping its own original angle (only its length adapts) -
+  // exactly like #NetPointConstraint above, just with the pad/via (instead
+  // of the point itself) as the moving anchor.
   QSet<BI_NetPoint*> cascadedNetPoints;
   auto tryCascade = [&](BI_NetLineAnchor& anchor, const Point& anchorPos) {
     foreach (BI_NetLine* netline, anchor.getNetLines()) {
@@ -300,7 +300,7 @@ CmdDragSelectedBoardItems::CmdDragSelectedBoardItems(
     mHoleEditCmds.append(cmd);
   }
 
-          // Note: If only 1 item is selected, use its exact position as center.
+  // Note: If only 1 item is selected, use its exact position as center.
   if (mItemCount > 1) {
     mCenterPos /= mItemCount;
     mCenterPos.mapToGrid(mScene.getBoard().getGridInterval());
@@ -373,8 +373,8 @@ void CmdDragSelectedBoardItems::snapToGrid() noexcept {
   }
   mSnappedToGrid = true;
 
-          // Force updating airwires immediately as they are important while moving
-          // items.
+  // Force updating airwires immediately as they are important while moving
+  // items.
   mScene.getBoard().triggerAirWiresRebuild();
 }
 
@@ -432,15 +432,15 @@ Point CmdDragSelectedBoardItems::computeNetPointPosition(
     return c.originalPos + delta;
   }
 
-          // Point on the shifted line through this point's driving anchor (the
-          // point itself if it was explicitly dragged, or a moving pad/via if this
-          // point is merely a stub connected to it), offset by delta, keeping its
-          // own original direction.
+  // Point on the shifted line through this point's driving anchor (the
+  // point itself if it was explicitly dragged, or a moving pad/via if this
+  // point is merely a stub connected to it), offset by delta, keeping its
+  // own original direction.
   const QPointF p1 = c.originalPos.toMmQPointF() + delta.toMmQPointF();
 
-          // Intersect that shifted line (p1, c.direction) with the neighbor's
-          // fixed-angle ray (neighborFixedPoint, neighborDirection). Solving
-          // p1 + s*d1 == p2 + t*d2 for s (Cramer's rule):
+  // Intersect that shifted line (p1, c.direction) with the neighbor's
+  // fixed-angle ray (neighborFixedPoint, neighborDirection). Solving
+  // p1 + s*d1 == p2 + t*d2 for s (Cramer's rule):
   const QPointF& d1 = c.direction;
   const QPointF& d2 = c.neighborDirection;
   const QPointF& p2 = c.neighborFixedPoint;
@@ -526,8 +526,8 @@ void CmdDragSelectedBoardItems::setCurrentPosition(
     }
     mDeltaPos = delta;
 
-            // Force updating airwires immediately as they are important while moving
-            // items.
+    // Force updating airwires immediately as they are important while moving
+    // items.
     mScene.getBoard().triggerAirWiresRebuild();
   }
 }
@@ -539,7 +539,7 @@ void CmdDragSelectedBoardItems::rotate(const Angle& angle,
           .mappedToGrid(mScene.getBoard().getGridInterval())
   : (mCenterPos + mDeltaPos);
 
-          // rotate selected elements
+  // rotate selected elements
   foreach (CmdDeviceInstanceEdit* cmd, mDeviceEditCmds) {
     cmd->rotate(angle, center, true);
   }
@@ -569,8 +569,8 @@ void CmdDragSelectedBoardItems::rotate(const Angle& angle,
   }
   mDeltaAngle += angle;
 
-          // Force updating airwires immediately as they are important while dragging
-          // items.
+  // Force updating airwires immediately as they are important while dragging
+  // items.
   mScene.getBoard().triggerAirWiresRebuild();
 }
 
@@ -647,7 +647,7 @@ bool CmdDragSelectedBoardItems::performExecute() {
     appendChild(cmd);  // can throw
   }
 
-          // execute all child commands
+  // execute all child commands
   return UndoCommandGroup::performExecute();  // can throw
 }
 
