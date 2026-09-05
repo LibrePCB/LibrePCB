@@ -25,6 +25,7 @@
 #include "../../3d/openglscenebuilder.h"
 #include "../../3d/slintopenglview.h"
 #include "../../guiapplication.h"
+#include "../../spacemouse/spacemousemotionmapper.h"
 #include "../../undostack.h"
 #include "../../utils/slinthelpers.h"
 #include "../../utils/uihelpers.h"
@@ -211,6 +212,7 @@ void Board3dTab::activate() noexcept {
 
   applyWorkspaceSettings();
   mBoardEditor.registerActiveTab(this);
+  mApp.registerActiveSpaceMouseTab(this);
   requestRepaint();
 }
 
@@ -221,6 +223,7 @@ void Board3dTab::deactivate() noexcept {
   }
   mSceneRebuildTimer.reset();
   mBoardEditor.unregisterActiveTab(this);
+  mApp.unregisterActiveSpaceMouseTab(this);
 
   // We could reset the view here to release memory. But it leads to a (possibly
   // expensive/slow) scene rebuild when switching to this tab again, which is
@@ -305,6 +308,15 @@ bool Board3dTab::processSceneScrolled(const QPointF& pos,
                                       int scene) noexcept {
   Q_UNUSED(scene);
   return mView ? mView->scrollEvent(pos, e) : false;
+}
+
+void Board3dTab::applySpaceMouseMotion(const SpaceMouseMotionEvent& e,
+                                       qreal dtSeconds) noexcept {
+  if (!mView) return;
+  const SpaceMouseMotion3d motion = toSpaceMouseMotion3d(e, dtSeconds);
+  mView->applyContinuousMotion(motion.panDelta, motion.zoomFactor,
+                               motion.rotateXDeg, motion.rotateYDeg,
+                               motion.rotateZDeg);
 }
 
 /*******************************************************************************
