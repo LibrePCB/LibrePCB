@@ -58,6 +58,7 @@ class GraphicsLayerList;
 class GraphicsLayersModel;
 class ProjectEditor;
 class SlintGraphicsView;
+struct SpaceMouseMotionEvent;
 
 /*******************************************************************************
  *  Class Board2dTab
@@ -128,6 +129,8 @@ public:
       const slint::language::KeyEvent& e) noexcept override;
   bool processSceneKeyReleased(
       const slint::language::KeyEvent& e) noexcept override;
+  void applySpaceMouseMotion(const SpaceMouseMotionEvent& e,
+                             qreal dtSeconds) noexcept override;
   QSet<const Layer*> getVisibleCopperLayers() const noexcept;
 
   // IF_GraphicsViewEventHandler

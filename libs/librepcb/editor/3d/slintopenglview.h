@@ -120,6 +120,28 @@ public:
   void zoomOut() noexcept;
   void zoomAll() noexcept;
 
+  /**
+   * @brief Apply a continuous pan/zoom/rotate delta (e.g. from a SpaceMouse)
+   *
+   * The 3D counterpart of ::SlintGraphicsView::applyContinuousMotion() - see
+   * its doc comment for why this exists as one combined entry point rather
+   * than separate calls. @p panDelta and @p zoomFactor use the same
+   * conventions as there; the three rotation angles are applied around the
+   * view's own current local X/Y/Z axes (the same convention already used
+   * by ::rotate()), each already scaled by whatever elapsed time the
+   * caller is normalizing against.
+   *
+   * @param panDelta    Model-space delta to add to the view center.
+   * @param zoomFactor  Multiplier for the field of view, same convention as
+   *                    ::zoomIn()/::zoomOut() (1 = no change).
+   * @param rotateXDeg  Rotation around the local X axis, in degrees.
+   * @param rotateYDeg  Rotation around the local Y axis, in degrees.
+   * @param rotateZDeg  Rotation around the local Z axis, in degrees.
+   */
+  void applyContinuousMotion(const QPointF& panDelta, qreal zoomFactor,
+                             qreal rotateXDeg, qreal rotateYDeg,
+                             qreal rotateZDeg) noexcept;
+
   // Operator Overloadings
   SlintOpenGlView& operator=(const SlintOpenGlView& rhs) = delete;
 

@@ -50,6 +50,7 @@ class ProjectEditor;
 class SchematicEditor;
 class SchematicEditorFsm;
 class SlintGraphicsView;
+struct SpaceMouseMotionEvent;
 
 /*******************************************************************************
  *  Class SchematicTab
@@ -100,6 +101,8 @@ public:
       const slint::language::KeyEvent& e) noexcept override;
   bool processSceneKeyReleased(
       const slint::language::KeyEvent& e) noexcept override;
+  void applySpaceMouseMotion(const SpaceMouseMotionEvent& e,
+                             qreal dtSeconds) noexcept override;
 
   // IF_GraphicsViewEventHandler
   bool graphicsSceneKeyPressed(

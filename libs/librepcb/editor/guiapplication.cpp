@@ -33,10 +33,13 @@
 #include "notificationsmodel.h"
 #include "project/newprojectwizard/newprojectwizard.h"
 #include "project/projecteditor.h"
+#include "spacemouse/if_spacemouseinputbackend.h"
+#include "spacemouse/spacemouseinputbackendfactory.h"
 #include "utils/editortoolbox.h"
 #include "utils/slinthelpers.h"
 #include "utils/slintkeyeventtextbuilder.h"
 #include "utils/uihelpers.h"
+#include "windowtab.h"
 #include "workspace/desktopintegration.h"
 #include "workspace/desktopservices.h"
 #include "workspace/initializeworkspacewizard/initializeworkspacewizard.h"
@@ -113,7 +116,8 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
     mLibrariesFilter(new SlintKeyEventTextBuilder()),
     mProjects(new UiObjectList<ProjectEditor, ui::ProjectData>()),
     mLibraries(new UiObjectList<LibraryEditor, ui::LibraryData>()),
-    mWindows(new UiObjectList<MainWindow, int>()) {
+    mWindows(new UiObjectList<MainWindow, int>()),
+    mSpaceMouseInput(createSpaceMouseInputBackend(this)) {
   QSettings cs;
 
   // Check if this is the first run with this application version. This can
@@ -152,6 +156,23 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
   // Setup quick access.
   connect(mQuickAccessModel.get(), &QuickAccessModel::openFileTriggered, this,
           [this](const FilePath& fp) { openFile(fp, qApp->activeWindow()); });
+
+  // Forward 3D mouse (SpaceMouse) motion to whichever tab is currently
+  // registered as the active target, if any (nothing is connected - and
+  // thus nothing happens - if no backend is available for this platform
+  // yet, see spacemouseinputbackendfactory.h). Applied directly inside
+  // the motion-event handler, scaled by real elapsed time since the
+  // previous report - see the doc comment on ::handleSpaceMouseMotion()
+  // for why that distinction matters. This mirrors how FreeCAD's own
+  // Windows backend does it (GuiNativeEventWin32.cpp's On3dmouseInput(),
+  // see the feature plan doc) rather than driving updates from a
+  // separate fixed-rate timer - the timer-based alternative is documented
+  // in the feature plan doc as a possible future improvement, not
+  // implemented here.
+  if (mSpaceMouseInput) {
+    connect(mSpaceMouseInput.get(), &IF_SpaceMouseInputBackend::motionEvent,
+            this, &GuiApplication::handleSpaceMouseMotion);
+  }
 
   // Connect notification signals.
   const qint64 startupTime = QDateTime::currentMSecsSinceEpoch();
@@ -1007,6 +1028,16 @@ void GuiApplication::stopWindowStateAutosaveTimer() noexcept {
   mSaveOpenedWindowsCountdown.stop();
 }
 
+void GuiApplication::registerActiveSpaceMouseTab(WindowTab* tab) noexcept {
+  if (!mActiveSpaceMouseTabs.contains(tab)) {
+    mActiveSpaceMouseTabs.append(tab);
+  }
+}
+
+void GuiApplication::unregisterActiveSpaceMouseTab(WindowTab* tab) noexcept {
+  mActiveSpaceMouseTabs.removeOne(tab);
+}
+
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
@@ -1176,6 +1207,55 @@ std::shared_ptr<MainWindow> GuiApplication::getWindowById(int id) noexcept {
     }
   }
   return nullptr;
+}
+
+void GuiApplication::handleSpaceMouseMotion(
+    const SpaceMouseMotionEvent& e) noexcept {
+  // Drop any tabs that got deleted without unregistering (shouldn't happen
+  // in practice since WindowTab::deactivate() always pairs with activate(),
+  // but QPointer makes this free, so let's not rely on that).
+  for (int i = mActiveSpaceMouseTabs.size() - 1; i >= 0; --i) {
+    if (!mActiveSpaceMouseTabs.at(i)) {
+      mActiveSpaceMouseTabs.removeAt(i);
+    }
+  }
+
+  // Applied directly here, scaled by real elapsed time since the previous
+  // processed report, rather than once per raw report with no time
+  // normalization - the latter is what made the view move roughly an
+  // order of magnitude faster than intended in an earlier version of this
+  // method, since 3Dconnexion devices keep re-reporting the current
+  // deflection at a high, USB-timing-dependent rate (commonly 100+ Hz)
+  // for as long as the cap is held off-center. This mirrors FreeCAD's own
+  // Windows backend (GuiNativeEventWin32.cpp's On3dmouseInput(), which
+  // scales by dwElapsedTime the same way) rather than a separate
+  // fixed-rate dispatch timer - see the feature plan doc for that
+  // alternative design and why it was not chosen here.
+  //
+  // The very first report has no previous timestamp to measure against,
+  // so it's dropped rather than guessed at (starting the timer here means
+  // the *second* report gets a sensible, usually sub-frame, dtSeconds).
+  if (!mSpaceMouseElapsedTimer.isValid()) {
+    mSpaceMouseElapsedTimer.start();
+    return;
+  }
+
+  // Clamp dtSeconds: if the device (or this handler) was stalled for a
+  // while - e.g. no reports arrived because the cap was centered, or the
+  // app was busy - the next report's elapsed time could otherwise produce
+  // one oversized, disorienting jump.
+  constexpr qreal kMaxDtSeconds = 0.25;
+  const qreal dtSeconds =
+      qMin(mSpaceMouseElapsedTimer.restart() / qreal(1000), kMaxDtSeconds);
+
+  if (mActiveSpaceMouseTabs.isEmpty()) {
+    return;
+  }
+
+  // Most recently activated tab wins - see the doc comment on
+  // ::registerActiveSpaceMouseTab() for why this is a simple heuristic
+  // rather than true per-window OS focus tracking.
+  mActiveSpaceMouseTabs.last()->applySpaceMouseMotion(e, dtSeconds);
 }
 
 /*******************************************************************************

@@ -116,6 +116,27 @@ public:
   void zoomOut() noexcept;
   void zoomToSceneRect(const QRectF& r, bool autoFitInView) noexcept;
 
+  /**
+   * @brief Apply a continuous navigation delta (pan and/or zoom)
+   *
+   * Common entry point for continuously-varying navigation input that is
+   * not naturally expressed as a single discrete Slint pointer/scroll
+   * event, e.g. a polled 3D mouse (SpaceMouse) device, or (in the future)
+   * trackpad gesture recognition. It shares the same underlying math as
+   * ::scroll() and ::zoom(), just packaged so it can be called repeatedly
+   * at whatever tick rate the input source delivers.
+   *
+   * @param panDelta    Pan delta, in *view* pixels (the same coordinate
+   *                    space as the position passed to ::pointerEvent()),
+   *                    i.e. independent of the current zoom level.
+   * @param zoomFactor  Multiplicative zoom factor (`1` = no change),
+   *                    applied around the center of the view since this
+   *                    kind of input has no associated on-screen cursor
+   *                    position to anchor to.
+   */
+  void applyContinuousMotion(const QPointF& panDelta,
+                             qreal zoomFactor) noexcept;
+
   // Static Methods
   static QRectF defaultSymbolSceneRect() noexcept;
   static QRectF defaultFootprintSceneRect() noexcept;
@@ -134,6 +155,9 @@ signals:
 private:  // Methods
   void scroll(const QPointF& delta) noexcept;
   void zoom(QPointF center, qreal factor) noexcept;
+  static void applyZoomAroundPoint(Projection& projection,
+                                   const QPointF& center,
+                                   qreal factor) noexcept;
   void smoothTo(const Projection& projection) noexcept;
   bool applyProjection(const Projection& projection) noexcept;
   QRectF validateSceneRect(const QRectF& r) const noexcept;
