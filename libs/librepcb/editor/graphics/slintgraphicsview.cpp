@@ -394,6 +394,28 @@ void SlintGraphicsView::zoomToSceneRect(const QRectF& r,
   smoothTo(projection);
 }
 
+void SlintGraphicsView::applyContinuousMotion(const QPointF& panDelta,
+                                              qreal zoomFactor) noexcept {
+  Projection projection = mProjection;
+  projection.autoFitInView = false;
+
+  // Pan, using the same view-pixels-to-scene-units conversion as scroll()'s
+  // callers already use (scrollEvent(), scrollLeft/Right/Up/Down()).
+  projection.offset += panDelta / projection.scale;
+
+  // Zoom around the center of the view: unlike a mouse wheel event, this
+  // kind of input has no on-screen cursor position to anchor to.
+  if (zoomFactor != qreal(1)) {
+    QPointF center(mViewSize.width() / 2, mViewSize.height() / 2);
+    if (mMirror && (mViewSize.width() > 0)) {
+      center.setX(mViewSize.width() - center.x());
+    }
+    applyZoomAroundPoint(projection, center, zoomFactor);
+  }
+
+  applyProjection(projection);
+}
+
 /*******************************************************************************
  *  Static Methods
  ******************************************************************************/
@@ -438,14 +460,14 @@ void SlintGraphicsView::scroll(const QPointF& delta) noexcept {
   applyProjection(projection);
 }
 
-void SlintGraphicsView::zoom(QPointF center, qreal factor) noexcept {
-  if (mMirror && (mViewSize.width() > 0)) {
-    center.setX(mViewSize.width() - center.x());
-  }
-
-  Projection projection = mProjection;
-  projection.autoFitInView = false;
-
+void SlintGraphicsView::applyZoomAroundPoint(Projection& projection,
+                                             const QPointF& center,
+                                             qreal factor) noexcept {
+  // Keeps `center` (in view-pixel coordinates) stationary on screen while
+  // changing the projection's scale. Shared by zoom() (mouse wheel /
+  // discrete shortcuts) and applyContinuousMotion() (e.g. a polled 3D
+  // mouse), which are otherwise the only two places that need to translate
+  // a "zoom around this point" request into an offset/scale pair.
   QTransform tf;
   tf.translate(projection.offset.x(), projection.offset.y());
   tf.scale(1 / projection.scale, 1 / projection.scale);
@@ -457,7 +479,16 @@ void SlintGraphicsView::zoom(QPointF center, qreal factor) noexcept {
   tf2.scale(1 / projection.scale, 1 / projection.scale);
   const QPointF scenePos2 = tf2.map(center);
   projection.offset -= scenePos2 - scenePos0;
+}
 
+void SlintGraphicsView::zoom(QPointF center, qreal factor) noexcept {
+  if (mMirror && (mViewSize.width() > 0)) {
+    center.setX(mViewSize.width() - center.x());
+  }
+
+  Projection projection = mProjection;
+  projection.autoFitInView = false;
+  applyZoomAroundPoint(projection, center, factor);
   applyProjection(projection);
 }
 

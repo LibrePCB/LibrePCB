@@ -34,6 +34,7 @@
 #include "../../guiapplication.h"
 #include "../../mainwindow.h"
 #include "../../rulecheck/rulecheckmessagesmodel.h"
+#include "../../spacemouse/spacemousemotionmapper.h"
 #include "../../undostack.h"
 #include "../../utils/editortoolbox.h"
 #include "../../utils/slinthelpers.h"
@@ -641,6 +642,7 @@ void PackageTab::activate() noexcept {
   applyWorkspaceSettings();
   scheduleOpenGlSceneUpdate();
   updateOpenGlScene();
+  mApp.registerActiveSpaceMouseTab(this);
   requestRepaint();
 }
 
@@ -648,6 +650,7 @@ void PackageTab::deactivate() noexcept {
   if (mOpenGlView) {
     *mOpenGlProjection = mOpenGlView->getProjection();
   }
+  mApp.unregisterActiveSpaceMouseTab(this);
   mOpenGlSceneRebuildTimer.reset();
   mOpenGlSceneBuilder.reset();
   mOpenGlView.reset();
@@ -1051,6 +1054,21 @@ bool PackageTab::processSceneScrolled(const QPointF& pos,
     return mOpenGlView->scrollEvent(pos, e);
   } else {
     return mView->scrollEvent(pos, e);
+  }
+}
+
+void PackageTab::applySpaceMouseMotion(const SpaceMouseMotionEvent& e,
+                                       qreal dtSeconds) noexcept {
+  // Only the 3D footprint preview is wired up so far - the 2D pad-editor
+  // view (SlintGraphicsView, the mView3d==false case) could reuse
+  // ::toSpaceMouseMotion2d() the same way Board2dTab/SchematicTab do, but
+  // that's out of scope for "Phase 4" (3D view support) - see the feature
+  // plan doc.
+  if (mView3d && mOpenGlView) {
+    const SpaceMouseMotion3d motion = toSpaceMouseMotion3d(e, dtSeconds);
+    mOpenGlView->applyContinuousMotion(motion.panDelta, motion.zoomFactor,
+                                       motion.rotateXDeg, motion.rotateYDeg,
+                                       motion.rotateZDeg);
   }
 }
 

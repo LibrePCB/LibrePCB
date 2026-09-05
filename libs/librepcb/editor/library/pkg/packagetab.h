@@ -65,6 +65,7 @@ class PackagePadListModel;
 class SlintGraphicsView;
 class SlintOpenGlView;
 struct OpenGlProjection;
+struct SpaceMouseMotionEvent;
 
 /*******************************************************************************
  *  Class PackageTab
@@ -108,6 +109,8 @@ public:
   bool processSceneScrolled(const QPointF& pos,
                             slint::private_api::PointerScrollEvent e,
                             int scene) noexcept override;
+  void applySpaceMouseMotion(const SpaceMouseMotionEvent& e,
+                             qreal dtSeconds) noexcept override;
   bool processSceneKeyPressed(
       const slint::language::KeyEvent& e) noexcept override;
   bool processSceneKeyReleased(

@@ -879,6 +879,10 @@ add_library(
   project/schematic/symbolinstancepropertiesdialog.ui
   rulecheck/rulecheckmessagesmodel.cpp
   rulecheck/rulecheckmessagesmodel.h
+  spacemouse/if_spacemouseinputbackend.h
+  spacemouse/spacemouseinputbackendfactory.cpp
+  spacemouse/spacemouseinputbackendfactory.h
+  spacemouse/spacemousemotionmapper.h
   undocommand.cpp
   undocommand.h
   undocommandgroup.cpp
@@ -1002,6 +1006,19 @@ add_library(
   workspace/workspacesettingsdialog.h
   workspace/workspacesettingsdialog.ui
 )
+
+# Windows-only 3D mouse (SpaceMouse) input backend (see feature plan, Phase
+# 2): uses the Win32 Raw Input API directly, so it's only built on Windows.
+# Other platforms will get their own backend in a later phase (see the
+# `IF_SpaceMouseInputBackend` interface for what a backend has to implement).
+if(WIN32)
+  target_sources(
+    librepcb_editor
+    PRIVATE spacemouse/spacemouseinputwin32.cpp
+            spacemouse/spacemouseinputwin32.h
+  )
+endif()
+
 target_include_directories(
   librepcb_editor
   PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../.."
@@ -1015,6 +1032,9 @@ target_link_libraries(
           # Third party
           OpenGL::GLU
 )
+if(WIN32)
+  target_link_libraries(librepcb_editor PRIVATE User32)
+endif()
 target_link_libraries(
   librepcb_editor
   PUBLIC # LibrePCB
