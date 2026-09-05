@@ -27,6 +27,7 @@
 #include "../../graphics/slintgraphicsview.h"
 #include "../../guiapplication.h"
 #include "../../rulecheck/rulecheckmessagesmodel.h"
+#include "../../spacemouse/spacemousemotionmapper.h"
 #include "../../undostack.h"
 #include "../../utils/editortoolbox.h"
 #include "../../utils/imagehelpers.h"
@@ -529,10 +530,12 @@ void SchematicTab::activate() noexcept {
 
   applyWorkspaceSettings();
   mProjectEditor.registerActiveSchematicTab(this);
+  mApp.registerActiveSpaceMouseTab(this);
   requestRepaint();
 }
 
 void SchematicTab::deactivate() noexcept {
+  mApp.unregisterActiveSpaceMouseTab(this);
   mProjectEditor.unregisterActiveSchematicTab(this);
   mSearchContext.deinit();
   mErcLocationGraphicsItem.reset();
@@ -841,6 +844,12 @@ bool SchematicTab::processSceneKeyReleased(
     const slint::language::KeyEvent& e) noexcept {
   mProjectEditor.setCurrentTab(this);
   return mView->keyReleased(e);
+}
+
+void SchematicTab::applySpaceMouseMotion(const SpaceMouseMotionEvent& e,
+                                         qreal dtSeconds) noexcept {
+  const SpaceMouseMotion2d motion = toSpaceMouseMotion2d(e, dtSeconds);
+  mView->applyContinuousMotion(motion.panDelta, motion.zoomFactor);
 }
 
 /*******************************************************************************
