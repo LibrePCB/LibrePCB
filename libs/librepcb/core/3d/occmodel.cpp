@@ -545,6 +545,14 @@ bool OccModel::isAvailable() noexcept {
   return (USE_OPENCASCADE != 0);
 }
 
+bool OccModel::hasRgbaSupport() noexcept {
+#if USE_OPENCASCADE
+  return (OCC_VERSION_HEX >= 0x070500);
+#else
+  return false;
+#endif
+}
+
 QString OccModel::getOccVersionString() noexcept {
   QString s = OCC_EDITION_NAME;
 #if USE_OPENCASCADE

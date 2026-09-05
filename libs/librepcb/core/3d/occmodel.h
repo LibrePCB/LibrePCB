@@ -71,6 +71,7 @@ public:
 
   // Static Methods
   static bool isAvailable() noexcept;
+  static bool hasRgbaSupport() noexcept;
   static QString getOccVersionString() noexcept;
   static void setVerboseOutput(bool verbose) noexcept;
   static std::unique_ptr<OccModel> createAssembly(const QString& name);

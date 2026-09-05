@@ -20,7 +20,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <Standard_Version.hxx>
 #include <gtest/gtest.h>
 #include <librepcb/core/3d/occmodel.h>
 #include <librepcb/core/application.h>
@@ -226,11 +225,11 @@ TEST_F(OccModelTest, testTransparency) {
     EXPECT_NEAR(std::get<0>(resultColor), 1.0, 0.01);  // Red
     EXPECT_NEAR(std::get<1>(resultColor), 0.0, 0.01);  // Green
     EXPECT_NEAR(std::get<2>(resultColor), 0.0, 0.01);  // Blue
-#if OCC_VERSION_HEX >= 0x070500
-    EXPECT_NEAR(std::get<3>(resultColor), 0.5, 0.01);  // Alpha
-#else
-    EXPECT_NEAR(std::get<3>(resultColor), 1.0, 0.01);  // Alpha (fallback)
-#endif
+    if (OccModel::hasRgbaSupport()) {
+      EXPECT_NEAR(std::get<3>(resultColor), 0.5, 0.01);  // Alpha
+    } else {
+      EXPECT_NEAR(std::get<3>(resultColor), 1.0, 0.01);  // Alpha (fallback)
+    }
   } else {
     GTEST_SKIP();
   }
