@@ -10,10 +10,17 @@ add_definitions(-DTEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/../data")
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
+# Conditionally-included tests (gated by build options)
+# [Claude AI assisted in authoring this solution]
+set(LIBREPCB_UNITTESTS_OPTIONAL_SOURCES)
+if(USE_OPENCASCADE)
+  list(APPEND LIBREPCB_UNITTESTS_OPTIONAL_SOURCES core/3d/occmodeltest.cpp)
+endif()
+
 # Main executable
 add_executable(
   librepcb_unittests
-  core/3d/occmodeltest.cpp
+  ${LIBREPCB_UNITTESTS_OPTIONAL_SOURCES}
   core/algorithm/airwiresbuildertest.cpp
   core/algorithm/netsegmentsimplifiertest.cpp
   core/applicationtest.cpp
