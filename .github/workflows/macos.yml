@@ -15,6 +15,8 @@ jobs:
       CCACHE_MAXSIZE: '500MB'
       CCACHE_DIR: '/Users/runner/ccache-dir'
       CARGO_HOME: '/Users/runner/cargo-home'
+      UV_URL: ${{ matrix.uv_url }}
+      UV_SHA256: ${{ matrix.uv_sha256 }}
       QT_URL: ${{ matrix.qt_url }}
       QT_SHA256: ${{ matrix.qt_sha256 }}
       QT_ROOT: '/Users/runner/qt'
@@ -32,6 +34,8 @@ jobs:
             runner: macos-14  # Must be an ARM64 CPU: https://github.com/actions/runner-images
             arch: arm64
             deployment_target: '11'
+            uv_url: 'https://github.com/astral-sh/uv/releases/download/0.12.10/uv-aarch64-apple-darwin.tar.gz'
+            uv_sha256: '51c6170e8e3a01cef9f33b94f582b7b81ac65046f55d40afb35f9cff5a68c179'
             # Qt 6.7.3 is the last version that runs on macOS 11.
             qt_url: 'https://download.qt.io/archive/qt/6.7/6.7.3/single/qt-everywhere-src-6.7.3.tar.xz'
             qt_sha256: 'a3f1d257cbb14c6536585ffccf7c203ce7017418e1a0c2ed7c316c20c729c801'
@@ -39,6 +43,8 @@ jobs:
             runner: macos-15-intel  # Must be an x86_64 CPU: https://github.com/actions/runner-images
             arch: x86_64
             deployment_target: '10.14'
+            uv_url: 'https://github.com/astral-sh/uv/releases/download/0.12.10/uv-x86_64-apple-darwin.tar.gz'
+            uv_sha256: '5296d5aa2b9143360405eea866f8ef4d5dc8986b164eb0dc35e8f876a9304d30'
             # Qt 6.5.8 is the last version that runs on macOS 10.14.
             qt_url: 'https://qt.mirror.constant.com/archive/qt/6.5/6.5.8/src/single/qt-everywhere-opensource-src-6.5.8.tar.xz'
             qt_sha256: '4eeb391891b325cd00aed6e42cb4ef966ffeef0877e188c9667a702944760c27'
