@@ -121,10 +121,10 @@ public:
    *
    * Common entry point for continuously-varying navigation input that is
    * not naturally expressed as a single discrete Slint pointer/scroll
-   * event, e.g. a polled 3D mouse (SpaceMouse) device, or (in the future)
-   * trackpad gesture recognition. It shares the same underlying math as
-   * ::scroll() and ::zoom(), just packaged so it can be called repeatedly
-   * at whatever tick rate the input source delivers.
+   * event, e.g. a polled 3D mouse (SpaceMouse) device, or trackpad
+   * gesture recognition. It shares the same underlying math as ::scroll()
+   * and ::zoom(), just packaged so it can be called repeatedly at
+   * whatever tick rate the input source delivers.
    *
    * @param panDelta    Pan delta, in *view* pixels (the same coordinate
    *                    space as the position passed to ::pointerEvent()),
