@@ -56,7 +56,6 @@ class ProjectEditor;
 class ProjectLibraryUpdater;
 class QuickAccessModel;
 class SlintKeyEventTextBuilder;
-class WindowTab;
 struct SpaceMouseMotionEvent;
 
 /*******************************************************************************
@@ -136,26 +135,6 @@ public:
   int getWindowCount() const noexcept;
   void stopWindowStateAutosaveTimer() noexcept;
 
-  // 3D Mouse (SpaceMouse) Input
-  /**
-   * @brief Register a tab as a possible target for 3D mouse motion events
-   *
-   * To be called from ::WindowTab::activate() by any tab that overrides
-   * ::WindowTab::applySpaceMouseMotion(), with a matching
-   * ::unregisterActiveSpaceMouseTab() call from ::WindowTab::deactivate().
-   * Mirrors the ::BoardEditor::registerActiveTab()/::unregisterActiveTab()
-   * pattern, but scoped process-wide rather than per-editor, since there's
-   * normally only one physical 3D mouse for the whole application.
-   *
-   * If more than one tab is currently registered (e.g. because the same or
-   * different documents are open in multiple windows/split sections), 3D
-   * mouse motion is applied to whichever one was activated most recently -
-   * this is a simple heuristic, not real per-window OS focus tracking, see
-   * the feature plan doc's "Phase 3" status notes.
-   */
-  void registerActiveSpaceMouseTab(WindowTab* tab) noexcept;
-  void unregisterActiveSpaceMouseTab(WindowTab* tab) noexcept;
-
   // General Methods
   void exec();
   void quit(QPointer<QWidget> parent) noexcept;
@@ -205,7 +184,6 @@ private:
   std::shared_ptr<UiObjectList<MainWindow, int>> mWindows;
   QTimer mSaveOpenedWindowsCountdown;
   std::unique_ptr<IF_SpaceMouseInputBackend> mSpaceMouseInput;
-  QVector<QPointer<WindowTab>> mActiveSpaceMouseTabs;
   // Time since the previous processed motion report - see the doc
   // comment on ::handleSpaceMouseMotion() for why this is needed.
   QElapsedTimer mSpaceMouseElapsedTimer;

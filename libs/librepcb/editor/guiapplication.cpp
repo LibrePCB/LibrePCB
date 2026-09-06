@@ -1028,16 +1028,6 @@ void GuiApplication::stopWindowStateAutosaveTimer() noexcept {
   mSaveOpenedWindowsCountdown.stop();
 }
 
-void GuiApplication::registerActiveSpaceMouseTab(WindowTab* tab) noexcept {
-  if (!mActiveSpaceMouseTabs.contains(tab)) {
-    mActiveSpaceMouseTabs.append(tab);
-  }
-}
-
-void GuiApplication::unregisterActiveSpaceMouseTab(WindowTab* tab) noexcept {
-  mActiveSpaceMouseTabs.removeOne(tab);
-}
-
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
@@ -1211,15 +1201,6 @@ std::shared_ptr<MainWindow> GuiApplication::getWindowById(int id) noexcept {
 
 void GuiApplication::handleSpaceMouseMotion(
     const SpaceMouseMotionEvent& e) noexcept {
-  // Drop any tabs that got deleted without unregistering (shouldn't happen
-  // in practice since WindowTab::deactivate() always pairs with activate(),
-  // but QPointer makes this free, so let's not rely on that).
-  for (int i = mActiveSpaceMouseTabs.size() - 1; i >= 0; --i) {
-    if (!mActiveSpaceMouseTabs.at(i)) {
-      mActiveSpaceMouseTabs.removeAt(i);
-    }
-  }
-
   // Applied directly here, scaled by real elapsed time since the previous
   // processed report, rather than once per raw report with no time
   // normalization - the latter is what made the view move roughly an
@@ -1248,14 +1229,14 @@ void GuiApplication::handleSpaceMouseMotion(
   const qreal dtSeconds =
       qMin(mSpaceMouseElapsedTimer.restart() / qreal(1000), kMaxDtSeconds);
 
-  if (mActiveSpaceMouseTabs.isEmpty()) {
-    return;
+  // Dispatch to whichever window/section/tab is actually current, mirroring
+  // the same window -> section -> tab chain ::processScenePointerEvent()
+  // walks (see the feature plan doc's "Phase 3 rework" entry) - this
+  // replaces the previous "most recently activated tab, process-wide"
+  // heuristic with real per-window OS focus tracking.
+  if (auto win = getCurrentWindow()) {
+    win->processSpaceMouseEvent(e, dtSeconds);
   }
-
-  // Most recently activated tab wins - see the doc comment on
-  // ::registerActiveSpaceMouseTab() for why this is a simple heuristic
-  // rather than true per-window OS focus tracking.
-  mActiveSpaceMouseTabs.last()->applySpaceMouseMotion(e, dtSeconds);
 }
 
 /*******************************************************************************

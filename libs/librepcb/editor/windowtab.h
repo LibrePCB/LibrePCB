@@ -88,11 +88,10 @@ public:
    *
    * Only relevant for tabs owning a ::SlintGraphicsView (or, from a later
    * phase, a ::SlintOpenGlView) - the default implementation does nothing.
-   * Only called for the tab most recently registered via
-   * ::GuiApplication::registerActiveSpaceMouseTab() and not yet
-   * unregistered again.
+   * Only called for the tab that is current in the current window's
+   * current section - see ::GuiApplication::handleSpaceMouseMotion().
    */
-  virtual void applySpaceMouseMotion(const SpaceMouseMotionEvent& e,
+  virtual void processSpaceMouseEvent(const SpaceMouseMotionEvent& e,
                                      qreal dtSeconds) noexcept {
     Q_UNUSED(e);
     Q_UNUSED(dtSeconds);
