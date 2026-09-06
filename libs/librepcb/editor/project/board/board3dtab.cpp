@@ -212,7 +212,6 @@ void Board3dTab::activate() noexcept {
 
   applyWorkspaceSettings();
   mBoardEditor.registerActiveTab(this);
-  mApp.registerActiveSpaceMouseTab(this);
   requestRepaint();
 }
 
@@ -223,7 +222,6 @@ void Board3dTab::deactivate() noexcept {
   }
   mSceneRebuildTimer.reset();
   mBoardEditor.unregisterActiveTab(this);
-  mApp.unregisterActiveSpaceMouseTab(this);
 
   // We could reset the view here to release memory. But it leads to a (possibly
   // expensive/slow) scene rebuild when switching to this tab again, which is
@@ -310,7 +308,7 @@ bool Board3dTab::processSceneScrolled(const QPointF& pos,
   return mView ? mView->scrollEvent(pos, e) : false;
 }
 
-void Board3dTab::applySpaceMouseMotion(const SpaceMouseMotionEvent& e,
+void Board3dTab::processSpaceMouseEvent(const SpaceMouseMotionEvent& e,
                                        qreal dtSeconds) noexcept {
   if (!mView) return;
   const SpaceMouseMotion3d motion = toSpaceMouseMotion3d(e, dtSeconds);

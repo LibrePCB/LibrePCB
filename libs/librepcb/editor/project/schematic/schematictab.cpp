@@ -530,12 +530,10 @@ void SchematicTab::activate() noexcept {
 
   applyWorkspaceSettings();
   mProjectEditor.registerActiveSchematicTab(this);
-  mApp.registerActiveSpaceMouseTab(this);
   requestRepaint();
 }
 
 void SchematicTab::deactivate() noexcept {
-  mApp.unregisterActiveSpaceMouseTab(this);
   mProjectEditor.unregisterActiveSchematicTab(this);
   mSearchContext.deinit();
   mErcLocationGraphicsItem.reset();
@@ -846,7 +844,7 @@ bool SchematicTab::processSceneKeyReleased(
   return mView->keyReleased(e);
 }
 
-void SchematicTab::applySpaceMouseMotion(const SpaceMouseMotionEvent& e,
+void SchematicTab::processSpaceMouseEvent(const SpaceMouseMotionEvent& e,
                                          qreal dtSeconds) noexcept {
   const SpaceMouseMotion2d motion = toSpaceMouseMotion2d(e, dtSeconds);
   mView->applyContinuousMotion(motion.panDelta, motion.zoomFactor);

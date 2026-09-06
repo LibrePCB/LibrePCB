@@ -45,6 +45,7 @@ namespace editor {
 
 class GuiApplication;
 class MainWindow;
+struct SpaceMouseMotionEvent;
 class WindowTab;
 
 /*******************************************************************************
@@ -86,6 +87,8 @@ public:
                             int scene) noexcept;
   bool processSceneKeyPressed(const slint::language::KeyEvent& e) noexcept;
   bool processSceneKeyReleased(const slint::language::KeyEvent& e) noexcept;
+  void processSpaceMouseEvent(const SpaceMouseMotionEvent& e,
+                              qreal dtSeconds) noexcept;
 
   template <typename T>
   bool switchToTab() noexcept {

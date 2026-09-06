@@ -399,12 +399,12 @@ void SlintGraphicsView::applyContinuousMotion(const QPointF& panDelta,
   Projection projection = mProjection;
   projection.autoFitInView = false;
 
-  // Pan, using the same view-pixels-to-scene-units conversion as scroll()'s
-  // callers already use (scrollEvent(), scrollLeft/Right/Up/Down()).
+  // Pan, using the same view-pixels-to-scene-units conversion that scroll()
+  // uses (scrollEvent(), scrollLeft/Right/Up/Down()).
   projection.offset += panDelta / projection.scale;
 
   // Zoom around the center of the view: unlike a mouse wheel event, this
-  // kind of input has no on-screen cursor position to anchor to.
+  // input has no on-screen cursor position to anchor to.
   if (zoomFactor != qreal(1)) {
     QPointF center(mViewSize.width() / 2, mViewSize.height() / 2);
     if (mMirror && (mViewSize.width() > 0)) {
@@ -465,8 +465,8 @@ void SlintGraphicsView::applyZoomAroundPoint(Projection& projection,
                                              qreal factor) noexcept {
   // Keeps `center` (in view-pixel coordinates) stationary on screen while
   // changing the projection's scale. Shared by zoom() (mouse wheel /
-  // discrete shortcuts) and applyContinuousMotion() (e.g. a polled 3D
-  // mouse), which are otherwise the only two places that need to translate
+  // discrete shortcuts) and applyContinuousMotion() (space mouse),
+  // which are otherwise the only two places that need to translate
   // a "zoom around this point" request into an offset/scale pair.
   QTransform tf;
   tf.translate(projection.offset.x(), projection.offset.y());

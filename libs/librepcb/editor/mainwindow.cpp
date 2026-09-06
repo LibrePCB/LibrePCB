@@ -490,6 +490,14 @@ std::shared_ptr<WindowTab> MainWindow::removeTab(
   return nullptr;
 }
 
+void MainWindow::processSpaceMouseEvent(const SpaceMouseMotionEvent& e,
+                                        qreal dtSeconds) noexcept {
+  const ui::Data& d = mWindow->global<ui::Data>();
+  if (auto s = mSections->value(d.get_current_section_index())) {
+    s->processSpaceMouseEvent(e, dtSeconds);
+  }
+}
+
 void MainWindow::showPanelPage(ui::PanelPage page) noexcept {
   mWindow->global<ui::Data>().invoke_set_panel_page(page);
 }

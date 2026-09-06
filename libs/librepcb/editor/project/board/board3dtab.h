@@ -84,7 +84,7 @@ public:
   bool processSceneScrolled(const QPointF& pos,
                             slint::private_api::PointerScrollEvent e,
                             int scene) noexcept override;
-  void applySpaceMouseMotion(const SpaceMouseMotionEvent& e,
+  void processSpaceMouseEvent(const SpaceMouseMotionEvent& e,
                              qreal dtSeconds) noexcept override;
 
   // Operator Overloadings

@@ -658,7 +658,6 @@ void PackageTab::activate() noexcept {
   applyWorkspaceSettings();
   scheduleOpenGlSceneUpdate();
   updateOpenGlScene();
-  mApp.registerActiveSpaceMouseTab(this);
   requestRepaint();
 }
 
@@ -666,7 +665,6 @@ void PackageTab::deactivate() noexcept {
   if (mOpenGlView) {
     *mOpenGlProjection = mOpenGlView->getProjection();
   }
-  mApp.unregisterActiveSpaceMouseTab(this);
   mOpenGlSceneRebuildTimer.reset();
   mOpenGlSceneBuilder.reset();
   mOpenGlView.reset();
@@ -1138,7 +1136,7 @@ bool PackageTab::processSceneScrolled(const QPointF& pos,
   }
 }
 
-void PackageTab::applySpaceMouseMotion(const SpaceMouseMotionEvent& e,
+void PackageTab::processSpaceMouseEvent(const SpaceMouseMotionEvent& e,
                                        qreal dtSeconds) noexcept {
   // Only the 3D footprint preview is wired up so far - the 2D pad-editor
   // view (SlintGraphicsView, the mView3d==false case) could reuse
