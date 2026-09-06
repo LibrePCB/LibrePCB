@@ -29,14 +29,14 @@ jobs:
       matrix:
         include:
           - name: MacOS ARM64
-            runner: macos-14  # Must be an ARM64 CPU: https://github.com/actions/runner-images
+            runner: macos-15  # Must be an ARM64 CPU: https://github.com/actions/runner-images
             arch: arm64
             deployment_target: '11'
             # Qt 6.7.3 is the last version that runs on macOS 11.
             qt_url: 'https://download.qt.io/archive/qt/6.7/6.7.3/single/qt-everywhere-src-6.7.3.tar.xz'
             qt_sha256: 'a3f1d257cbb14c6536585ffccf7c203ce7017418e1a0c2ed7c316c20c729c801'
           - name: MacOS x86_64
-            runner: macos-15-intel  # Must be an x86_64 CPU: https://github.com/actions/runner-images
+            runner: macos-26-intel  # Must be an x86_64 CPU: https://github.com/actions/runner-images
             arch: x86_64
             deployment_target: '10.14'
             # Qt 6.5.8 is the last version that runs on macOS 10.14.
