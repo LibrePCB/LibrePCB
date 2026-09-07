@@ -1060,8 +1060,7 @@ void PackageTab::processSpaceMouseEvent(const SpaceMouseMotionEvent& e,
   // Only the 3D footprint preview is wired up so far - the 2D pad-editor
   // view (SlintGraphicsView, the mView3d==false case) could reuse
   // ::toSpaceMouseMotion2d() the same way Board2dTab/SchematicTab do, but
-  // that's out of scope for "Phase 4" (3D view support) - see the feature
-  // plan doc.
+  // that has been deferred for a future effort.
   if (mView3d && mOpenGlView) {
     const SpaceMouseMotion3d motion = toSpaceMouseMotion3d(e, dtSeconds);
     mOpenGlView->applyContinuousMotion(motion.panDelta, motion.zoomFactor,
