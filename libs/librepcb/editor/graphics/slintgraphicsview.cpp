@@ -396,6 +396,11 @@ void SlintGraphicsView::zoomToSceneRect(const QRectF& r,
 
 void SlintGraphicsView::applyContinuousMotion(const QPointF& panDelta,
                                               qreal zoomFactor) noexcept {
+  // Skip the refresh if a no-op motion (no pan, no zoom) is received.
+  if ((panDelta == QPointF(0, 0)) && (zoomFactor == qreal(1))) {
+    return;
+  }
+
   Projection projection = mProjection;
   projection.autoFitInView = false;
 
