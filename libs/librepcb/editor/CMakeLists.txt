@@ -1007,17 +1007,17 @@ add_library(
   workspace/workspacesettingsdialog.ui
 )
 
-# Windows-only 3D mouse (SpaceMouse) input backend (see feature plan, Phase
-# 2): uses the Win32 Raw Input API directly, so it's only built on Windows.
-# Other platforms will get their own backend in a later phase (see the
-# `IF_SpaceMouseInputBackend` interface for what a backend has to implement).
-if(WIN32)
-  target_sources(
-    librepcb_editor
-    PRIVATE spacemouse/spacemouseinputwin32.cpp
-            spacemouse/spacemouseinputwin32.h
-  )
-endif()
+# Cross-platform 3D mouse (SpaceMouse) input backend, implemented by the
+# `librepcb-rust-spacemouse` Rust crate.
+target_sources(
+  librepcb_editor
+  PRIVATE spacemouse/spacemouseinputrust.cpp
+          spacemouse/spacemouseinputrust.h
+)
+target_link_libraries(
+  librepcb_editor
+  PRIVATE LibrePCB::RustSpaceMouse
+)
 
 target_include_directories(
   librepcb_editor
