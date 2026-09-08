@@ -1,0 +1,28 @@
+#
+# Claude AI assisted in the writing of this file.
+# It was reviewed and edited by a human.
+#
+
+[package]
+name = "librepcb-rust-spacemouse"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["lib", "staticlib"]
+
+[features]
+fail-on-warnings = []
+ffi = ["dep:cbindgen"]
+
+[build-dependencies]
+cbindgen = { version = "0.27", optional = true }
+
+[dependencies]
+# Cross-platform HID access 
+# Uses hidraw on Linux, IOHIDManager on macOS, and hid.dll on Windows. 
+# HID access is not written in pure Rust.  This bundles a copy of the hidapi
+# source code and compiles it as part of 'cargo build' using the cc crate.
+# (See the crate's README.md for why that's fine even though LibrePCB's own 
+# contribution stays 100% Rust).
+hidapi = "2"

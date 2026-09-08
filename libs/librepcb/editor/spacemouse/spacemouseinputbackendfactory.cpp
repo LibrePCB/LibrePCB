@@ -17,14 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// DISCLAIMER: Claude AI assisted in the writing of this file.
+// It was reviewed by a human.
+
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
 #include "spacemouseinputbackendfactory.h"
 
-#ifdef Q_OS_WIN
-#include "spacemouseinputwin32.h"
-#endif
+#include "spacemouseinputrust.h"
 
 /*******************************************************************************
  *  Namespace
@@ -34,12 +35,7 @@ namespace editor {
 
 std::unique_ptr<IF_SpaceMouseInputBackend> createSpaceMouseInputBackend(
     QObject* parent) noexcept {
-#ifdef Q_OS_WIN
-  return std::make_unique<SpaceMouseInputWin32>(parent);
-#else
-  Q_UNUSED(parent);
-  return nullptr;
-#endif
+  return std::make_unique<SpaceMouseInputRust>(parent);
 }
 
 /*******************************************************************************
