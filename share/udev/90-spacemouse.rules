@@ -1,0 +1,43 @@
+# AI Disclaimer: This file was originally authored by Claude AI.  It has
+# subsequently been reviewed and edited by a human.
+#
+# udev rule granting non-root read/write access to 3Dconnexion SpaceMouse
+# and related 3D-mouse HID devices.  This allows LibrePCB (which reads raw 
+# HID reports directly via the `hidapi` crate) can use them without running 
+# as root.
+#
+# Matches on:
+#   - 0x256F: 3Dconnexion's own USB vendor ID. Matched solely by VID
+#     because 3Dconnexion doesn't ship non-3D-input hardware.
+#   - 0x046D: Logitech's vendor ID, used by older/legacy 3Dconnexion
+#     devices (Logitech owns 3Dconnexion). Because Logitech also makes 
+#     unrelated peripherals (keyboards, webcams, headsets, mice) under
+#     this same ID, we must include *specific* PIDs in the check to 
+#     avoid granting access to unrelated devices.
+#
+# Product IDs verified directly against the USB ID Database
+# (https://the-sz.com/products/usbid/) on 2026-09-09. Not necessarily
+# exhaustive - add further product IDs here as new/older models are
+# confirmed, rather than widening the 046d match to the whole vendor.
+#
+# The use of MODE="0666" (rather than a dedicated user group) is
+# deliberate.  This avoids having to adjust the user's group membership,
+# and skirts a root-level install step that would be necessary otherwise.
+
+# 3Dconnexion SAM (native vendor ID) - broad vendor match, see above.
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="256f", MODE="0666"
+
+# Legacy Logitech-era 3Dconnexion devices (Logitech vendor ID) -
+# enumerated product IDs only; do not broaden this to the whole 046d
+# vendor, which covers many unrelated Logitech peripherals.
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="c603", MODE="0666" # SpaceMouse Plus XT
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="c605", MODE="0666" # CADman
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="c606", MODE="0666" # SpaceMouse Classic
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="c621", MODE="0666" # Spaceball 5000
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="c623", MODE="0666" # Space Traveller 3D Mouse
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="c625", MODE="0666" # SpacePilot 3D Mouse
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="c626", MODE="0666" # SpaceNavigator 3D Mouse
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="c627", MODE="0666" # SpaceExplorer 3D Mouse
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="c628", MODE="0666" # SpaceNavigator for Notebooks
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="c629", MODE="0666" # SpacePilot Pro 3D Mouse
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="c62b", MODE="0666" # SpaceMouse Pro (hardware-confirmed working, 2026-09-09)
