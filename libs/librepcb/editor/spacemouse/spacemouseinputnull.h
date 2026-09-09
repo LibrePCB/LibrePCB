@@ -18,18 +18,15 @@
  */
 
 // DISCLAIMER: Claude AI assisted in the writing of this file.
-// It was reviewed by a human.
+//             It was reviewed by a human.
+
+#ifndef LIBREPCB_EDITOR_SPACEMOUSEINPUTNULL_H
+#define LIBREPCB_EDITOR_SPACEMOUSEINPUTNULL_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "spacemouseinputbackendfactory.h"
-
-#ifdef LIBREPCB_SPACEMOUSE_AVAILABLE
-#include "spacemouseinputrust.h"
-#else
-#include "spacemouseinputnull.h"
-#endif
+#include "if_spacemouseinputbackend.h"
 
 /*******************************************************************************
  *  Namespace
@@ -37,14 +34,25 @@
 namespace librepcb {
 namespace editor {
 
-std::unique_ptr<IF_SpaceMouseInputBackend> createSpaceMouseInputBackend(
-    QObject* parent) noexcept {
-#ifdef LIBREPCB_SPACEMOUSE_AVAILABLE
-  return std::make_unique<SpaceMouseInputRust>(parent);
-#else
-  return std::make_unique<SpaceMouseInputNull>(parent);
-#endif
-}
+/**
+ * @brief No-op ::IF_SpaceMouseInputBackend implementation
+ *
+ * Used when no platform backend was compiled in (e.g. libudev wasn't found
+ * at build time on Linux - see rust-spacemouse/CMakeLists.txt). Always
+ * reports "not connected" and never emits, so the rest of the application
+ * doesn't need to know space mouse support was skipped in this build.
+ */
+class SpaceMouseInputNull final : public IF_SpaceMouseInputBackend {
+public:
+  explicit SpaceMouseInputNull(QObject* parent = nullptr) noexcept
+    : IF_SpaceMouseInputBackend(parent) {}
+  SpaceMouseInputNull(const SpaceMouseInputNull& other) = delete;
+  ~SpaceMouseInputNull() noexcept override = default;
+
+  bool isDeviceConnected() const noexcept override { return false; }
+
+  SpaceMouseInputNull& operator=(const SpaceMouseInputNull& rhs) = delete;
+};
 
 /*******************************************************************************
  *  End of File
@@ -52,3 +60,5 @@ std::unique_ptr<IF_SpaceMouseInputBackend> createSpaceMouseInputBackend(
 
 }  // namespace editor
 }  // namespace librepcb
+
+#endif
