@@ -172,13 +172,16 @@ if(BUILD_TESTS)
   find_package(GTest REQUIRED)
 endif()
 
+# Add rust-spacemouse before editor so the editor makefile can tell which
+# spacemouse backend it should build.
+add_subdirectory(libs/librepcb/rust-spacemouse)
+
 # Add libs
 add_subdirectory(libs/librepcb/core)
 add_subdirectory(libs/librepcb/editor)
 add_subdirectory(libs/librepcb/eagleimport)
 add_subdirectory(libs/librepcb/kicadimport)
 add_subdirectory(libs/librepcb/rust-core)
-add_subdirectory(libs/librepcb/rust-spacemouse)
 add_subdirectory(libs/librepcb/ui)
 add_subdirectory(libs/parseagle)
 

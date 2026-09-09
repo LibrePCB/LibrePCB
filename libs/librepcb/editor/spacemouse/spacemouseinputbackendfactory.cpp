@@ -25,7 +25,11 @@
  ******************************************************************************/
 #include "spacemouseinputbackendfactory.h"
 
+#ifdef LIBREPCB_SPACEMOUSE_AVAILABLE
 #include "spacemouseinputrust.h"
+#else
+#include "spacemouseinputnull.h"
+#endif
 
 /*******************************************************************************
  *  Namespace
@@ -35,7 +39,11 @@ namespace editor {
 
 std::unique_ptr<IF_SpaceMouseInputBackend> createSpaceMouseInputBackend(
     QObject* parent) noexcept {
+#ifdef LIBREPCB_SPACEMOUSE_AVAILABLE
   return std::make_unique<SpaceMouseInputRust>(parent);
+#else
+  return std::make_unique<SpaceMouseInputNull>(parent);
+#endif
 }
 
 /*******************************************************************************

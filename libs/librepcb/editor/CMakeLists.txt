@@ -1007,17 +1007,35 @@ add_library(
   workspace/workspacesettingsdialog.ui
 )
 
+# AI notice: The following section was provided by Claude Code, and has been
+# reviewed by a human.
+
 # Cross-platform 3D mouse (SpaceMouse) input backend, implemented by the
-# `librepcb-rust-spacemouse` Rust crate.
+# `librepcb-rust-spacemouse` Rust crate. Functionality will not be available
+# in this build if LIBREPCB_SPACEMOUSE_AVAILABLE came back false (most likely
+# because libudev is missing on a Linux build).  See also
+# rust-spacemouse/CMakeLists.txt. If the SpaceMouse is not available, a no-op
+# backend is built so the rest of the app can operate in spite of the missing
+# feature.
 target_sources(
   librepcb_editor
-  PRIVATE spacemouse/spacemouseinputrust.cpp
-          spacemouse/spacemouseinputrust.h
+  PRIVATE spacemouse/spacemouseinputnull.h
 )
-target_link_libraries(
-  librepcb_editor
-  PRIVATE LibrePCB::RustSpaceMouse
-)
+if(LIBREPCB_SPACEMOUSE_AVAILABLE)
+  target_sources(
+    librepcb_editor
+    PRIVATE spacemouse/spacemouseinputrust.cpp
+            spacemouse/spacemouseinputrust.h
+  )
+  target_link_libraries(
+    librepcb_editor
+    PRIVATE LibrePCB::RustSpaceMouse
+  )
+  target_compile_definitions(
+    librepcb_editor
+    PRIVATE LIBREPCB_SPACEMOUSE_AVAILABLE
+  )
+endif()
 
 target_include_directories(
   librepcb_editor
