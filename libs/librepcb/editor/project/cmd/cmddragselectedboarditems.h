@@ -113,38 +113,13 @@ private:
   QSet<BI_Device*> mAutoSelectedDevices;
 
   /**
-   * @brief Constraint direction determined from the dragged trace itself.
-   *
-   * Like in KiCad/Eagle: the reference for "keep the angle" is the
-   * *original* direction of the dragged trace segment (or, if a lone
-   * junction point without an own selected segment was grabbed, the
-   * direction of one of its connected segments). Horizontal traces have a
-   * horizontal reference direction, vertical traces a vertical one, 45°
-   * traces a 45° one, etc.
-   *
-   * While dragging, the mouse-delta is projected onto the perpendicular of
-   * this reference direction and *only* that perpendicular component is
-   * applied as translation to every selected item. Since a pure
-   * translation can never change a segment's own direction, this
-   * guarantees:
-   *  - horizontal/vertical traces always stay exactly horizontal/vertical
-   *    (i.e. parallel to the grid axes), and
-   *  - traces drawn at any other angle keep that exact angle (in degrees),
-   * no matter how the mouse is moved - exactly like dragging a track in
-   * KiCad or a wire in Eagle.
-   */
-  bool mHasReferenceDirection;
-  QPointF mReferenceDirection;  ///< normalized, only valid if
-                                ///< #mHasReferenceDirection is true
-
-  /**
    * @brief Per-point info needed for the KiCad/Eagle-style "trombone" drag.
    *
    * The point tries to stay on a line through a "driving" anchor (which is
    * either the point's own original position offset by the global drag
    * delta - if the point itself was explicitly selected/dragged -, or a
    * moving pad/via of a dragged device/via - if this point is merely a
-   * stub connected to it, see @c mCascadedFromDeviceDrag) with a fixed
+   * stub connected to it, see #mCascadedFromDeviceDrag) with a fixed
    * direction (#direction). If the point also has a fixed (non-dragged)
    * neighbor trace, that neighbor must keep its own original angle - only
    * its length may change - so the point's new position is the
