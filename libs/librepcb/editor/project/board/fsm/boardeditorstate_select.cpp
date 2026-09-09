@@ -669,6 +669,27 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
         items.first()->setSelected(true);
       }
 
+      if (e.modifiers.testFlag(Qt::ControlModifier)) {
+        // Ctrl+dragging a vertex (net point) also grabs the whole line(s)
+        // connected to it, not just that single point - exactly like
+        // Ctrl+dragging a wire endpoint in Eagle. Without Ctrl, only the
+        // point itself gets dragged (see startMovingSelectedItems() /
+        // CmdDragSelectedBoardItems, where an explicitly selected net line
+        // pulls both of its net points along rigidly).
+        foreach (auto item, items) {
+          if (auto npItem = std::dynamic_pointer_cast<BGI_NetPoint>(item)) {
+            if (!npItem->isSelected()) {
+              continue;
+            }
+            foreach (BI_NetLine* netline, npItem->getNetPoint().getNetLines()) {
+              if (auto lineItem = scene->getNetLines().value(netline)) {
+                lineItem->setSelected(true);
+              }
+            }
+          }
+        }
+      }
+
       if (startMovingSelectedItems(*scene, e.scenePos)) {
         return true;
       }
