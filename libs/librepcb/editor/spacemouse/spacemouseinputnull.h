@@ -38,9 +38,9 @@ namespace editor {
  * @brief No-op ::IF_SpaceMouseInputBackend implementation
  *
  * Used when no platform backend was compiled in (e.g. libudev wasn't found
- * at build time on Linux - see rust-spacemouse/CMakeLists.txt). Always
- * reports "not connected" and never emits, so the rest of the application
- * doesn't need to know space mouse support was skipped in this build.
+ * at build time on Linux). Always reports "not connected" and never emits, 
+ * so the rest of the application doesn't need to know space mouse support 
+ * was skipped in this build.
  */
 class SpaceMouseInputNull final : public IF_SpaceMouseInputBackend {
 public:
