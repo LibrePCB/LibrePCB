@@ -1,3 +1,6 @@
+# AI DISCLAIMER: This file was modified by Claude AI.  All modifications
+# have been reviewed by a human.
+
 # Enable Qt MOC/UIC/RCC
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
@@ -1004,6 +1007,9 @@ add_library(
   workspace/projectlibraryupdater/projectlibraryupdater.ui
   workspace/quickaccessmodel.cpp
   workspace/quickaccessmodel.h
+  workspace/settingswidgets/spacemousesettingswidget.cpp
+  workspace/settingswidgets/spacemousesettingswidget.h
+  workspace/settingswidgets/spacemousesettingswidget.ui
   workspace/workspacesettingsdialog.cpp
   workspace/workspacesettingsdialog.h
   workspace/workspacesettingsdialog.ui

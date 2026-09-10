@@ -39,6 +39,7 @@
 #include "../utils/uihelpers.h"
 #include "desktopintegration.h"
 #include "desktopservices.h"
+#include "settingswidgets/spacemousesettingswidget.h"
 #include "ui_workspacesettingsdialog.h"
 
 #include <librepcb/core/application.h>
@@ -53,57 +54,12 @@
 #include <QtWidgets>
 
 #include <algorithm>
-#include <cmath>
 
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
 namespace editor {
-
-/*******************************************************************************
- *  Helper Functions
- ******************************************************************************/
-
-namespace {
-
-/**
- * @brief Convert a Space Mouse settings-tab slider position to a sensitivity
- *        multiplier
- *
- * The slider reports an *exponent* in [-100, 100] (hundredths of [-1.0,
- * 1.0]), not the multiplier itself. The actual sensitivity multiplier is
- * 3^exponent, which gives a logarithmic ~0.33x..3.0x range while keeping
- * the nominal 1.0x exactly centered (slider at 0). Intentional design
- * choice: a linear slider would leave 1.0x off-center for a 0.1x..3.0x
- * range, and a logarithmic mapping is also the more natural feel for a
- * sensitivity control anyway.
- */
-double spaceMouseSliderToSensitivity(int sliderValue) noexcept {
-  return std::pow(3.0, sliderValue / 100.0);
-}
-
-/**
- * @brief Inverse of ::spaceMouseSliderToSensitivity()
- */
-int spaceMouseSensitivityToSlider(double sensitivity) noexcept {
-  if (sensitivity <= 0) {
-    // Not a valid sensitivity (shouldn't normally happen since the UI can
-    // only produce values > 0) - fall back to nominal (1.0x, slider at 0).
-    return 0;
-  }
-  return qBound(
-      -100, qRound(100.0 * std::log(sensitivity) / std::log(3.0)), 100);
-}
-
-/**
- * @brief Format a sensitivity multiplier for display (e.g. "1.2x")
- */
-QString spaceMouseSensitivityLabel(double sensitivity) noexcept {
-  return QString("%1x").arg(sensitivity, 0, 'f', 1);
-}
-
-}  // namespace
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -122,6 +78,7 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
     mKeyboardShortcutsModel(new KeyboardShortcutsModel(this)),
     mKeyboardShortcutsFilterModel(new QSortFilterProxyModel(this)),
     mUi(new Ui::WorkspaceSettingsDialog),
+    mSpaceMouseWidget(nullptr),
     mOldSchematicGridStyle(mSettings.schematicGridStyle.get()),
     mOldBoardGridStyle(mSettings.boardGridStyle.get()),
     mOldSchColorSchemeActive(mSettings.schematicColorSchemes.getActiveUuid()),
@@ -358,68 +315,11 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
         EditorCommand::ActionFlag::WidgetShortcut));
   }
 
-  // Initialize Space Mouse widgets. Availability is decided at compile time
-  // by LIBREPCB_SPACEMOUSE_AVAILABLE.
+  // Initialize Space Mouse widget (self-contained; see
+  // settingswidgets/spacemousesettingswidget.h).
   {
-#ifdef LIBREPCB_SPACEMOUSE_AVAILABLE
-    mUi->stkSpaceMouse->setCurrentWidget(mUi->pageSpaceMouseControls);
-
-    struct SpaceMouseAxisWidgets {
-      WorkspaceSettingsItem_SpaceMouse::Axis axis;
-      QLabel* icon;
-      QString iconPath;
-      QSlider* slider;
-      QLabel* valueLabel;
-      QCheckBox* invert;
-    };
-    const QVector<SpaceMouseAxisWidgets> axisWidgets = {
-        {WorkspaceSettingsItem_SpaceMouse::Axis::TranslationX,
-         mUi->lblSpaceMouseIconPanH, ":/img/settings/spacemouse-panx.svg",
-         mUi->sldSpaceMousePanH, mUi->lblSpaceMousePanHValue,
-         mUi->chkSpaceMousePanHInvert},
-        {WorkspaceSettingsItem_SpaceMouse::Axis::TranslationY,
-         mUi->lblSpaceMouseIconPanV, ":/img/settings/spacemouse-pany.svg",
-         mUi->sldSpaceMousePanV, mUi->lblSpaceMousePanVValue,
-         mUi->chkSpaceMousePanVInvert},
-        {WorkspaceSettingsItem_SpaceMouse::Axis::TranslationZ,
-         mUi->lblSpaceMouseIconZoom, ":/img/settings/spacemouse-panz.svg",
-         mUi->sldSpaceMouseZoom, mUi->lblSpaceMouseZoomValue,
-         mUi->chkSpaceMouseZoomInvert},
-        {WorkspaceSettingsItem_SpaceMouse::Axis::RotationX,
-         mUi->lblSpaceMouseIconPitch, ":/img/settings/spacemouse-pitch.svg",
-         mUi->sldSpaceMousePitch, mUi->lblSpaceMousePitchValue,
-         mUi->chkSpaceMousePitchInvert},
-        {WorkspaceSettingsItem_SpaceMouse::Axis::RotationY,
-         mUi->lblSpaceMouseIconRoll, ":/img/settings/spacemouse-roll.svg",
-         mUi->sldSpaceMouseRoll, mUi->lblSpaceMouseRollValue,
-         mUi->chkSpaceMouseRollInvert},
-        {WorkspaceSettingsItem_SpaceMouse::Axis::RotationZ,
-         mUi->lblSpaceMouseIconYaw, ":/img/settings/spacemouse-yaw.svg",
-         mUi->sldSpaceMouseYaw, mUi->lblSpaceMouseYawValue,
-         mUi->chkSpaceMouseYawInvert},
-    };
-    for (const SpaceMouseAxisWidgets& w : axisWidgets) {
-      w.icon->setPixmap(QIcon(w.iconPath).pixmap(20, 20));
-      // The slider reports an *exponent* in [-100, 100] (hundredths, so
-      // [-1.0, 1.0]), not the sensitivity multiplier itself. The actual
-      // multiplier is 3^exponent, which keeps 1.0x exactly centered (slider
-      // at 0) while still spanning a logarithmic ~0.33x..3.0x range - see
-      // spaceMouseSliderToSensitivity() below. The label is the only place
-      // the resulting multiplier is shown; there's no editable numeric box
-      // (that level of precision isn't needed here).
-      w.valueLabel->setText(spaceMouseSensitivityLabel(
-          spaceMouseSliderToSensitivity(w.slider->value())));
-      connect(w.slider, &QSlider::valueChanged, w.valueLabel,
-              [w](int value) {
-                w.valueLabel->setText(spaceMouseSensitivityLabel(
-                    spaceMouseSliderToSensitivity(value)));
-              });
-      w.slider->installEventFilter(this);
-      mSpaceMouseSliders.append(w.slider);
-    }
-#else
-    mUi->stkSpaceMouse->setCurrentWidget(mUi->pageSpaceMouseUnavailable);
-#endif
+    mSpaceMouseWidget = new SpaceMouseSettingsWidget(mSettings.spaceMouse, this);
+    mUi->spaceMouseTab->layout()->addWidget(mSpaceMouseWidget);
   }
 
   // Initialize color schemes widgets.
@@ -613,22 +513,6 @@ void WorkspaceSettingsDialog::changeEvent(QEvent* event) noexcept {
     mUi->retranslateUi(this);
   }
   QDialog::changeEvent(event);
-}
-
-bool WorkspaceSettingsDialog::eventFilter(QObject* watched,
-                                          QEvent* event) noexcept {
-  // Double-clicking a Space Mouse sensitivity slider resets it to nominal
-  // (1.0x, slider position 0) - QSlider has no dedicated double-click
-  // signal of its own, so we use an event filter to watch for it.
-  if (event->type() == QEvent::MouseButtonDblClick) {
-    if (QSlider* slider = qobject_cast<QSlider*>(watched)) {
-      if (mSpaceMouseSliders.contains(slider)) {
-        slider->setValue(0);
-        return true;  // Consume the event, don't also let QSlider handle it.
-      }
-    }
-  }
-  return QDialog::eventFilter(watched, event);
 }
 
 void WorkspaceSettingsDialog::reject() noexcept {
@@ -899,40 +783,7 @@ void WorkspaceSettingsDialog::loadSettings() noexcept {
   mUi->treeKeyboardShortcuts->expandAll();
 
   // Space Mouse
-#ifdef LIBREPCB_SPACEMOUSE_AVAILABLE
-  {
-    using Axis = WorkspaceSettingsItem_SpaceMouse::Axis;
-    auto load = [](QSlider* slider, QLabel* valueLabel, QCheckBox* invert,
-                    const WorkspaceSettingsItem_SpaceMouse::AxisSettings& s) {
-      const QSignalBlocker sliderBlocker(slider);
-      const int sliderValue = spaceMouseSensitivityToSlider(s.sensitivity);
-      slider->setValue(sliderValue);
-      valueLabel->setText(spaceMouseSensitivityLabel(
-          spaceMouseSliderToSensitivity(sliderValue)));
-      invert->setChecked(s.invert);
-    };
-    load(mUi->sldSpaceMousePanH, mUi->lblSpaceMousePanHValue,
-         mUi->chkSpaceMousePanHInvert,
-         mSettings.spaceMouse.get(Axis::TranslationX));
-    load(mUi->sldSpaceMousePanV, mUi->lblSpaceMousePanVValue,
-         mUi->chkSpaceMousePanVInvert,
-         mSettings.spaceMouse.get(Axis::TranslationY));
-    load(mUi->sldSpaceMouseZoom, mUi->lblSpaceMouseZoomValue,
-         mUi->chkSpaceMouseZoomInvert,
-         mSettings.spaceMouse.get(Axis::TranslationZ));
-    load(mUi->sldSpaceMousePitch, mUi->lblSpaceMousePitchValue,
-         mUi->chkSpaceMousePitchInvert,
-         mSettings.spaceMouse.get(Axis::RotationX));
-    load(mUi->sldSpaceMouseRoll, mUi->lblSpaceMouseRollValue,
-         mUi->chkSpaceMouseRollInvert,
-         mSettings.spaceMouse.get(Axis::RotationY));
-    load(mUi->sldSpaceMouseYaw, mUi->lblSpaceMouseYawValue,
-         mUi->chkSpaceMouseYawInvert,
-         mSettings.spaceMouse.get(Axis::RotationZ));
-    mUi->chkSpaceMouseEnableLed->setChecked(
-        mSettings.spaceMouse.getLedEnabled());
-  }
-#endif
+  mSpaceMouseWidget->load();
 
   // Color Schemes
   updateColorSchemes();
@@ -1002,33 +853,7 @@ void WorkspaceSettingsDialog::saveSettings() noexcept {
     mSettings.keyboardShortcuts.set(mKeyboardShortcutsModel->getOverrides());
 
     // Space Mouse
-#ifdef LIBREPCB_SPACEMOUSE_AVAILABLE
-    {
-      using Axis = WorkspaceSettingsItem_SpaceMouse::Axis;
-      auto save = [](QSlider* slider, QCheckBox* invert) {
-        WorkspaceSettingsItem_SpaceMouse::AxisSettings s;
-        s.sensitivity = spaceMouseSliderToSensitivity(slider->value());
-        s.invert = invert->isChecked();
-        return s;
-      };
-      WorkspaceSettingsItem_SpaceMouse::AxisSettingsMap settings;
-      settings[Axis::TranslationX] =
-          save(mUi->sldSpaceMousePanH, mUi->chkSpaceMousePanHInvert);
-      settings[Axis::TranslationY] =
-          save(mUi->sldSpaceMousePanV, mUi->chkSpaceMousePanVInvert);
-      settings[Axis::TranslationZ] =
-          save(mUi->sldSpaceMouseZoom, mUi->chkSpaceMouseZoomInvert);
-      settings[Axis::RotationX] =
-          save(mUi->sldSpaceMousePitch, mUi->chkSpaceMousePitchInvert);
-      settings[Axis::RotationY] =
-          save(mUi->sldSpaceMouseRoll, mUi->chkSpaceMouseRollInvert);
-      settings[Axis::RotationZ] =
-          save(mUi->sldSpaceMouseYaw, mUi->chkSpaceMouseYawInvert);
-      mSettings.spaceMouse.set(settings);
-      mSettings.spaceMouse.setLedEnabled(
-          mUi->chkSpaceMouseEnableLed->isChecked());
-    }
-#endif
+    mSpaceMouseWidget->save();
 
     // Themes were applied immediately.
 
