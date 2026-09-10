@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// DISCLAIMER: Claude AI assisted in the writing of this file.
-//             It was reviewed and edited by a human.
+// AI DISCLAIMER: Claude AI assisted in the writing of this file.
+// It was reviewed and edited by a human.
 
 #ifndef LIBREPCB_EDITOR_SPACEMOUSEINPUTRUST_H
 #define LIBREPCB_EDITOR_SPACEMOUSEINPUTRUST_H
@@ -80,6 +80,7 @@ public:
 
   // IF_SpaceMouseInputBackend
   bool isDeviceConnected() const noexcept override;
+  void setLedEnabled(bool enabled) noexcept override;
 
   // These functions are only called (by QMetaObject::invokeMethod()) on this
   // object's own thread in response to a Rust-side callback. These need to

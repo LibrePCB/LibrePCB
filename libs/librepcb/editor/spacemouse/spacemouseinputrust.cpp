@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// DISCLAIMER: Claude AI assisted in the writing of this file.
-//             It was reviewed and edited by a human.
+// AI DISCLAIMER: Claude AI assisted in the writing of this file.
+// It was reviewed and edited by a human.
 
 /*******************************************************************************
  *  Includes
@@ -107,6 +107,10 @@ SpaceMouseInputRust::~SpaceMouseInputRust() noexcept {
 
 bool SpaceMouseInputRust::isDeviceConnected() const noexcept {
   return mConnected.load(std::memory_order_relaxed);
+}
+
+void SpaceMouseInputRust::setLedEnabled(bool enabled) noexcept {
+  rs::spacemouse::ffi_spacemouse_backend_set_led(*mHandle, enabled);
 }
 
 void SpaceMouseInputRust::handleMotion(

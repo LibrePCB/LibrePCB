@@ -99,13 +99,12 @@ extern "C" {
  *
  * `user_data` is passed back unmodified as the first argument of every
  * callback invocation; Rust never dereferences it. The caller must keep
- * whatever it points to alive until after
- * [`ffi_spacemouse_backend_free`] returns, and must not call back into
- * Rust synchronously from within a callback (there is no re-entrancy
- * protection).
+ * whatever it points to alive until after [`ffi_spacemouse_backend_free`]
+ * returns, and must not call back into Rust synchronously from within a
+ * callback (there is no re-entrancy protection).
  *
  * Never returns null: Unlike opening a specific device, constructing the
- * backend itself cannot fail - "no compatible device found (yet)" is not
+ * backend itself cannot fail.  "No compatible device found (yet)" is not
  * an error, it's the normal state before `on_connected_changed(true)` is
  * ever invoked.
  */
@@ -117,6 +116,17 @@ FfiSpaceMouseBackend *ffi_spacemouse_backend_new(void *user_data,
  * Whether a compatible device is currently detected as connected.
  */
 bool ffi_spacemouse_backend_is_connected(const FfiSpaceMouseBackend * NONNULL backend);
+
+/**
+ * Set whether the device's LED (if it has one) should be lit.
+ *
+ * A one-shot command: applied immediately if a device is currently open,
+ * and (re-)applied automatically any time the device connects.  Devices
+ * without an LED, and any transient write failure, are both silently
+ * ignored.  See [`SpaceMouseBackend::set_led`] for additional info.
+ */
+void ffi_spacemouse_backend_set_led(const FfiSpaceMouseBackend * NONNULL backend,
+                                    bool enabled);
 
 /**
  * Stop capturing, join the background thread, and free the backend.
