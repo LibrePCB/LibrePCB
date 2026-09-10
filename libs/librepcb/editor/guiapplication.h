@@ -16,6 +16,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+ 
+// AI DISCLAIMER: Claude AI was used to modify this file for 3D mouse support.
+// It was reviewed and edited by a human.
 
 #ifndef LIBREPCB_EDITOR_GUIAPPLICATION_H
 #define LIBREPCB_EDITOR_GUIAPPLICATION_H
@@ -184,8 +187,7 @@ private:
   std::shared_ptr<UiObjectList<MainWindow, int>> mWindows;
   QTimer mSaveOpenedWindowsCountdown;
   std::unique_ptr<IF_SpaceMouseInputBackend> mSpaceMouseInput;
-  // Time since the previous processed motion report - see the doc
-  // comment on ::handleSpaceMouseMotion() for why this is needed.
+  // Time since the previous processed motion report
   QElapsedTimer mSpaceMouseElapsedTimer;
 
   // Cache

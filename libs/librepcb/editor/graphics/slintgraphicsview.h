@@ -17,6 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// AI DISCLAIMER: This file was modified by Claude AI.  All modifications have
+// been reviewed by a human.
+
 #ifndef LIBREPCB_EDITOR_SLINTGRAPHICSVIEW_H
 #define LIBREPCB_EDITOR_SLINTGRAPHICSVIEW_H
 
@@ -117,14 +120,14 @@ public:
   void zoomToSceneRect(const QRectF& r, bool autoFitInView) noexcept;
 
   /**
-   * @brief Apply a continuous navigation delta (pan and/or zoom)
+   * @brief Apply continuous movement delta (pan and/or zoom)
    *
    * Common entry point for continuously-varying navigation input that is
    * not naturally expressed as a single discrete Slint pointer/scroll
-   * event, e.g. a polled 3D mouse (SpaceMouse) device, or trackpad
+   * event.  This includes a polled 3D mouse (SpaceMouse) device, or trackpad
    * gesture recognition. It shares the same underlying math as ::scroll()
    * and ::zoom(), just packaged so it can be called repeatedly at
-   * whatever tick rate the input source delivers.
+   * the rate the input source delivers.
    *
    * @param panDelta    Pan delta, in *view* pixels (the same coordinate
    *                    space as the position passed to ::pointerEvent()),

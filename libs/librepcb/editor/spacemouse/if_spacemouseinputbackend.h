@@ -47,8 +47,8 @@ namespace editor {
  * Any sensitivity scaling, dead-zone handling or dominant-axis snapping is 
  * intentionally *not* done here, but left to the consumer.  Thus, this struct
  * remains a faithful, backend-independent representation of "what the device 
- * just reported", shared by every platform backend and (later) both the 2D and
- * 3D views.
+ * just reported".  Data is shared by every platform backend, as well as both 
+ * the 2D and 3D views.
  */
 struct SpaceMouseMotionEvent {
   qint16 translationX = 0;  ///< Pan left(-)/right(+)
@@ -76,12 +76,11 @@ struct SpaceMouseMotionEvent {
 /**
  * @brief Interface for a 3D mouse (SpaceMouse) input backend
  *
- * Implementations own whatever OS-level plumbing is needed to receive raw
- * motion reports from a connected 3Dconnexion (or compatible) device and
- * re-emit them as ::motionEvent(). A backend is expected to do nothing (and
- * never emit) until a compatible device is actually detected, so simply
- * instantiating one is a safe no-op on a machine without a 3D mouse
- * connected.
+ * Implementors own whatever OS-level plumbing is needed to receive raw motion 
+ * reports from a connected 3Dconnexion (or compatible) device and re-emit them
+ * as a ::motionEvent(). A backend is expected to do nothing (and never emit) 
+ * until a compatible device is actually detected, so simply instantiating one 
+ * is a safe no-op on a machine without a 3D mouse connected.
  *
  * Because there is usually only one physical device, only one instance is 
  * expected to exist per process.

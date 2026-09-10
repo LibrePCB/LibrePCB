@@ -85,10 +85,9 @@ public:
   // These functions are only called (by QMetaObject::invokeMethod()) on this
   // object's own thread in response to a Rust-side callback. These need to
   // be Public rather than private+friend because the trampolines are plain, 
-  // non-member `extern "C"` functions, and C++ access control has no clean 
-  // way to grant just those specific free functions access without also
-  // exposing them to unqualified name lookup in a way that's easy to get
-  // wrong across translation units.
+  // non-member `extern "C"` functions.  The C++ access control has no clean 
+  // way to grant just those specific functions access without also exposing 
+  // them to unqualified name lookup.
   void handleMotion(const SpaceMouseMotionEvent& event) noexcept;
   void handleConnectedChanged(bool connected) noexcept;
 

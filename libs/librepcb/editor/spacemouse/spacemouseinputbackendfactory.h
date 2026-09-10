@@ -17,6 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// AI DISCLAIMER: Claude AI assisted in the writing of this file.
+// It was reviewed and edited by a human.
+
 #ifndef LIBREPCB_EDITOR_SPACEMOUSEINPUTBACKENDFACTORY_H
 #define LIBREPCB_EDITOR_SPACEMOUSEINPUTBACKENDFACTORY_H
 
@@ -44,14 +47,13 @@ class IF_SpaceMouseInputBackend;
  *        platform LibrePCB is currently running on
  *
  * Kept as a free function (rather than e.g. a static factory method on the
- * interface) so callers - currently just ::GuiApplication - don't need to
+ * interface) so callers (currently just ::GuiApplication) don't need to
  * know or care which backend implementations exist, avoiding an `#ifdef`
  * per platform anywhere outside this one file.
  *
  * @return The platform backend, or `nullptr` if none is available (yet) for
- *         the current platform - see the feature plan doc, "Phase 6", for
- *         the platforms still to be added. A `nullptr` return is a
- *         perfectly normal, expected outcome, not an error.
+ *         the current platform. A `nullptr` return is a perfectly normal, 
+ *         expected outcome, not an error.
  */
 std::unique_ptr<IF_SpaceMouseInputBackend> createSpaceMouseInputBackend(
     QObject* parent = nullptr) noexcept;

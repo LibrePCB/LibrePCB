@@ -17,6 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// AI DISCLAIMER: This file was authored and/or modified by Claude AI.
+// All changes were reviewed by a human.
+
 /*******************************************************************************
  *  Includes
  ******************************************************************************/

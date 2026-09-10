@@ -490,6 +490,9 @@ std::shared_ptr<WindowTab> MainWindow::removeTab(
   return nullptr;
 }
 
+// Space Mouse events do not flow through the UI.  They need their own 
+// handling system1.  AI NOTICE: This function was authored by Claude AI
+// and reviewed by a human.
 void MainWindow::processSpaceMouseEvent(const SpaceMouseMotionEvent& e,
                                         qreal dtSeconds) noexcept {
   const ui::Data& d = mWindow->global<ui::Data>();
