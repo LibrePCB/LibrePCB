@@ -1013,9 +1013,6 @@ add_library(
   workspace/workspacesettingsdialog.ui
 )
 
-# AI notice: The following section was provided by Claude Code, and has been
-# reviewed by a human.
-
 # Cross-platform 3D mouse (SpaceMouse) input backend, implemented by the
 # `librepcb-rust-spacemouse` Rust crate. Functionality will not be available
 # in this build if LIBREPCB_SPACEMOUSE_AVAILABLE came back false (most likely
@@ -1056,9 +1053,6 @@ target_link_libraries(
           # Third party
           OpenGL::GLU
 )
-if(WIN32)
-  target_link_libraries(librepcb_editor PRIVATE User32)
-endif()
 target_link_libraries(
   librepcb_editor
   PUBLIC # LibrePCB
