@@ -81,20 +81,28 @@ void WorkspaceSettingsItem_SpaceMouse::set(
   }
 }
 
+void WorkspaceSettingsItem_SpaceMouse::setLedEnabled(bool enabled) noexcept {
+  if (mLedEnabled != enabled) {
+    mLedEnabled = enabled;
+    valueModified();
+  }
+}
+
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 
 void WorkspaceSettingsItem_SpaceMouse::restoreDefaultImpl() noexcept {
   const AxisSettingsMap defaults = defaultAxisSettings();
-  if (mAxisSettings != defaults) {
+  if ((mAxisSettings != defaults) || (!mLedEnabled)) {
     mAxisSettings = defaults;
+    mLedEnabled = true;
     valueModified();
   }
 }
 
 void WorkspaceSettingsItem_SpaceMouse::loadImpl(const SExpression& root) {
-  // Temporary object to make this method atomic.
+  // Temporary objects to make this method atomic.
   AxisSettingsMap settings = defaultAxisSettings();
   foreach (const SExpression* child, root.getChildren("axis")) {
     const std::optional<Axis> axis =
@@ -107,9 +115,15 @@ void WorkspaceSettingsItem_SpaceMouse::loadImpl(const SExpression& root) {
     s.invert = deserialize<bool>(child->getChild("invert/@0"));
     settings[*axis] = s;
   }
+  // Default LED to on, matching the checkbox's own default
+  bool ledEnabled = true;
+  if (const SExpression* child = root.tryGetChild("led_enabled")) {
+    ledEnabled = deserialize<bool>(child->getChild("@0"));
+  }
 
-  if (settings != mAxisSettings) {
+  if ((settings != mAxisSettings) || (ledEnabled != mLedEnabled)) {
     mAxisSettings = settings;
+    mLedEnabled = ledEnabled;
     valueModified();
   }
 }
@@ -128,6 +142,8 @@ void WorkspaceSettingsItem_SpaceMouse::serializeImpl(SExpression& root) const {
     child.appendChild("sensitivity", QString::number(s.sensitivity, 'f', 6));
     child.appendChild("invert", s.invert);
   }
+  root.ensureLineBreak();
+  root.appendChild("led_enabled", mLedEnabled);
   root.ensureLineBreak();
 }
 

@@ -17,6 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// AI DISCLAIMER:  Claude AI was used in the authoring of this file.
+// It has been reviewed and subsequently edited by a human.
+
 #ifndef LIBREPCB_EDITOR_IF_SPACEMOUSEINPUTBACKEND_H
 #define LIBREPCB_EDITOR_IF_SPACEMOUSEINPUTBACKEND_H
 
@@ -39,13 +42,12 @@ namespace editor {
  * @brief Raw motion values reported by a 3D mouse (SpaceMouse) device
  *
  * Values are the *raw*, unscaled 16-bit signed integers as reported by the
- * device's translation/rotation HID reports (3Dconnexion devices typically
- * report roughly -350..+350 at rest-to-full-deflection, but the exact range
- * is device-dependent). Any sensitivity scaling, dead-zone handling or
- * dominant-axis snapping is intentionally *not* done here, but left to the
- * consumer (see "Phase 5" in the feature plan doc), so this struct stays a
- * faithful, backend-independent representation of "what the device just
- * reported", shared by every platform backend and (later) both the 2D and
+ * device's translation/rotation HID reports.  Typical report values span the
+ * range of -350..+350 at rest-to-full-deflection, but are device-dependent. 
+ * Any sensitivity scaling, dead-zone handling or dominant-axis snapping is 
+ * intentionally *not* done here, but left to the consumer.  Thus, this struct
+ * remains a faithful, backend-independent representation of "what the device 
+ * just reported", shared by every platform backend and (later) both the 2D and
  * 3D views.
  */
 struct SpaceMouseMotionEvent {
@@ -72,8 +74,7 @@ struct SpaceMouseMotionEvent {
  ******************************************************************************/
 
 /**
- * @brief Interface for a platform-specific 3D mouse (SpaceMouse) input
- *        backend
+ * @brief Interface for a 3D mouse (SpaceMouse) input backend
  *
  * Implementations own whatever OS-level plumbing is needed to receive raw
  * motion reports from a connected 3Dconnexion (or compatible) device and
@@ -82,15 +83,8 @@ struct SpaceMouseMotionEvent {
  * instantiating one is a safe no-op on a machine without a 3D mouse
  * connected.
  *
- * Button events are intentionally *not* part of this interface: 3Dconnexion's
- * own driver (3DxWare) already lets users map device buttons to keystrokes
- * per application, so LibrePCB does not need (and should not build) its own
- * button handling - see the feature plan doc, section 1, "On button
- * mapping".
- *
- * Only one instance is expected to exist per process (there's normally only
- * one physical device) - see "Phase 3" in the feature plan doc for how it
- * gets wired up to the actually active editor tab.
+ * Because there is usually only one physical device, only one instance is 
+ * expected to exist per process.
  */
 class IF_SpaceMouseInputBackend : public QObject {
   Q_OBJECT
@@ -105,6 +99,19 @@ public:
    * @brief Whether a compatible device is currently detected as connected
    */
   virtual bool isDeviceConnected() const noexcept = 0;
+
+  /**
+   * @brief Set whether the device's LED should be lit
+   *
+   * This is a one-shot command, not a continuously-applied setting.  The 
+   * caller (see ::librepcb::editor::GuiApplication) is responsible for 
+   * invoking this function again after a reconnect if the desired state 
+   * should persist across unplug/replug. Not all devices have an LED; 
+   * implementations are expected to silently ignore the call in that case.
+   *
+   * @param enabled  Whether the LED should be on.
+   */
+  virtual void setLedEnabled(bool enabled) noexcept = 0;
 
   IF_SpaceMouseInputBackend& operator=(
       const IF_SpaceMouseInputBackend& rhs) = delete;
