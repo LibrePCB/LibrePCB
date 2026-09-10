@@ -30,6 +30,7 @@
 #include "workspacesettingsitem_genericvalue.h"
 #include "workspacesettingsitem_genericvaluelist.h"
 #include "workspacesettingsitem_keyboardshortcuts.h"
+#include "workspacesettingsitem_spacemouse.h"
 
 #include <QtCore>
 
@@ -320,6 +321,16 @@ public:
    * @see ::librepcb::WorkspaceSettingsItem_KeyboardShortcuts
    */
   WorkspaceSettingsItem_KeyboardShortcuts keyboardShortcuts;
+
+  /**
+   * @brief SpaceMouse (3Dconnexion/3Dx input device) settings
+   *
+   * Per-axis sensitivity & invert settings. Only relevant if SpaceMouse
+   * support is available in this build.
+   *
+   * @see ::librepcb::WorkspaceSettingsItem_SpaceMouse
+   */
+  WorkspaceSettingsItem_SpaceMouse spaceMouse;
 
   /**
    * @brief Schematic grid style

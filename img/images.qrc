@@ -181,6 +181,12 @@
         <file>wizards/eagle_watermark.png</file>
         <file>wizards/kicad_watermark.png</file>
         <file>wizards/watermark.jpg</file>
+        <file>spacemouse-panx.svg</file>
+        <file>spacemouse-pany.svg</file>
+        <file>spacemouse-panz.svg</file>
+        <file>spacemouse-pitch.svg</file>
+        <file>spacemouse-roll.svg</file>
+        <file>spacemouse-yaw.svg</file>
         <file>zoom-fit.svg</file>
     </qresource>
 </RCC>
