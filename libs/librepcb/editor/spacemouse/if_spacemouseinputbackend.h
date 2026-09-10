@@ -52,9 +52,9 @@ struct SpaceMouseMotionEvent {
   qint16 translationX = 0;  ///< Pan left(-)/right(+)
   qint16 translationY = 0;  ///< Pan away(-)/towards(+) the user
   qint16 translationZ = 0;  ///< Pan/zoom down(-)/up(+)
-  qint16 rotationX = 0;  ///< Tilt (pitch)
-  qint16 rotationY = 0;  ///< Tilt (yaw)
-  qint16 rotationZ = 0;  ///< Twist (roll)
+  qint16 rotationX = 0;  ///< Rotation about X (pitch) - YZ-plane
+  qint16 rotationY = 0;  ///< Rotation about Y (roll) - XZ-plane
+  qint16 rotationZ = 0;  ///< Rotation about Z (yaw) - XY-plane
 
   bool operator==(const SpaceMouseMotionEvent& rhs) const noexcept {
     return (translationX == rhs.translationX) &&

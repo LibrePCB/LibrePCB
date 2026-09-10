@@ -39,8 +39,8 @@ pub struct SpaceMouseMotion {
   pub translation_z: i16,
   /// Tilt (pitch)
   pub rotation_x: i16,
-  /// Tilt (yaw)
+  /// Tilt (roll)
   pub rotation_y: i16,
-  /// Twist (roll)
+  /// Twist (yaw)
   pub rotation_z: i16,
 }

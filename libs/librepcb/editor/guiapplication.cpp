@@ -64,6 +64,7 @@
 #include <QtCore>
 
 #include <algorithm>
+#include <limits>
 #include <memory>
 #include <optional>
 
@@ -1199,6 +1200,54 @@ std::shared_ptr<MainWindow> GuiApplication::getWindowById(int id) noexcept {
   return nullptr;
 }
 
+namespace {
+
+// DISCLAIMER: Claude AI assisted in the writing of the following function.
+// It was reviewed by a human.
+
+/**
+ * @brief Apply the user's per-axis SpaceMouse sensitivity/invert settings
+ *        to a raw motion event
+ *
+ * Applied here, at the point where raw device reports enter the app. This
+ * avoids modifying the mapper functions, the dispatch chain, or the Rust
+ * capture layer.
+ *
+ * Sensitivity is applied to the *raw* (pre-normalization) axis value. A
+ * sensitivity above 1.0x reaches full-speed motion at a smaller physical 
+ * deflection, and a sensitivity below 1.0x means even a full deflection 
+ * won't quite reach the nominal top speed. The result is clamped to 
+ * qint16's range to avoid overflow at high sensitivity as a safety measure.
+ */
+SpaceMouseMotionEvent applySpaceMouseSettings(
+    const SpaceMouseMotionEvent& raw,
+    const WorkspaceSettingsItem_SpaceMouse& settings) noexcept {
+  using Axis = WorkspaceSettingsItem_SpaceMouse::Axis;
+
+  auto apply = [&settings](qint16 value, Axis axis) noexcept -> qint16 {
+    const WorkspaceSettingsItem_SpaceMouse::AxisSettings& s =
+        settings.get(axis);
+    qreal scaled = qreal(value) * s.sensitivity;
+    if (s.invert) {
+      scaled = -scaled;
+    }
+    scaled = qBound<qreal>(std::numeric_limits<qint16>::min(), scaled,
+                            std::numeric_limits<qint16>::max());
+    return static_cast<qint16>(qRound(scaled));
+  };
+
+  SpaceMouseMotionEvent out;
+  out.translationX = apply(raw.translationX, Axis::TranslationX);
+  out.translationY = apply(raw.translationY, Axis::TranslationY);
+  out.translationZ = apply(raw.translationZ, Axis::TranslationZ);
+  out.rotationX = apply(raw.rotationX, Axis::RotationX);
+  out.rotationY = apply(raw.rotationY, Axis::RotationY);
+  out.rotationZ = apply(raw.rotationZ, Axis::RotationZ);
+  return out;
+}
+
+}  // namespace
+
 void GuiApplication::handleSpaceMouseMotion(
     const SpaceMouseMotionEvent& e) noexcept {
   // Applied directly here, scaled by real elapsed time since the previous
@@ -1235,7 +1284,9 @@ void GuiApplication::handleSpaceMouseMotion(
   // replaces the previous "most recently activated tab, process-wide"
   // heuristic with real per-window OS focus tracking.
   if (auto win = getCurrentWindow()) {
-    win->processSpaceMouseEvent(e, dtSeconds);
+    const SpaceMouseMotionEvent adjusted =
+        applySpaceMouseSettings(e, mWorkspace.getSettings().spaceMouse);
+    win->processSpaceMouseEvent(adjusted, dtSeconds);
   }
 }
 
