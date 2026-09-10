@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// DISCLAIMER: Claude AI assisted in the writing of this file.
-//             It was reviewed by a human.
+// AI DISCLAIMER: Claude AI assisted in the writing of this file.
+// It was reviewed and edited by a human.
 
 #ifndef LIBREPCB_EDITOR_SPACEMOUSEINPUTNULL_H
 #define LIBREPCB_EDITOR_SPACEMOUSEINPUTNULL_H
@@ -50,6 +50,7 @@ public:
   ~SpaceMouseInputNull() noexcept override = default;
 
   bool isDeviceConnected() const noexcept override { return false; }
+  void setLedEnabled(bool enabled) noexcept override { Q_UNUSED(enabled); }
 
   SpaceMouseInputNull& operator=(const SpaceMouseInputNull& rhs) = delete;
 };
