@@ -17,6 +17,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// AI DISCLAIMER: Claude AI assisted in the authoring of functions and
+// modifications related to Space Mouse support.  All changes were reviewed
+// and edited by a human.
+
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
@@ -158,21 +162,30 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
   connect(mQuickAccessModel.get(), &QuickAccessModel::openFileTriggered, this,
           [this](const FilePath& fp) { openFile(fp, qApp->activeWindow()); });
 
-  // Forward 3D mouse (SpaceMouse) motion to whichever tab is currently
-  // registered as the active target, if any (nothing is connected - and
-  // thus nothing happens - if no backend is available for this platform
-  // yet, see spacemouseinputbackendfactory.h). Applied directly inside
-  // the motion-event handler, scaled by real elapsed time since the
-  // previous report - see the doc comment on ::handleSpaceMouseMotion()
-  // for why that distinction matters. This mirrors how FreeCAD's own
-  // Windows backend does it (GuiNativeEventWin32.cpp's On3dmouseInput(),
-  // see the feature plan doc) rather than driving updates from a
-  // separate fixed-rate timer - the timer-based alternative is documented
-  // in the feature plan doc as a possible future improvement, not
-  // implemented here.
+  // Forward 3D mouse (SpaceMouse) motion to the active tab
+  // Motion events are applied directly inside the motion-event handler,
+  // and scaled by real elapsed time since the previous report.
   if (mSpaceMouseInput) {
     connect(mSpaceMouseInput.get(), &IF_SpaceMouseInputBackend::motionEvent,
             this, &GuiApplication::handleSpaceMouseMotion);
+
+    // LED control is a one-shot device command, not something applied per 
+	// motion event like sensitivity or invert, so it's only pushed to the 
+	// backend if it actually needs to change (upon new connections and 
+	// whenever the setting changes).
+    connect(mSpaceMouseInput.get(),
+            &IF_SpaceMouseInputBackend::deviceConnectedChanged, this,
+            [this](bool connected) {
+              if (connected) {
+                mSpaceMouseInput->setLedEnabled(
+                    mWorkspace.getSettings().spaceMouse.getLedEnabled());
+              }
+            });
+    connect(&mWorkspace.getSettings().spaceMouse, &WorkspaceSettingsItem::edited,
+            this, [this]() {
+              mSpaceMouseInput->setLedEnabled(
+                  mWorkspace.getSettings().spaceMouse.getLedEnabled());
+            });
   }
 
   // Connect notification signals.
@@ -1202,21 +1215,14 @@ std::shared_ptr<MainWindow> GuiApplication::getWindowById(int id) noexcept {
 
 namespace {
 
-// DISCLAIMER: Claude AI assisted in the writing of the following function.
-// It was reviewed by a human.
-
-/**
- * @brief Apply the user's per-axis SpaceMouse sensitivity/invert settings
- *        to a raw motion event
+/* Apply per-axis sensitivity & invert settings to raw motion events
  *
- * Applied here, at the point where raw device reports enter the app. This
- * avoids modifying the mapper functions, the dispatch chain, or the Rust
- * capture layer.
+ * Applying sensitivity & invert here avoids modifying the mapper 
+ * functions, the dispatch chain, or the Rust capture layer.
  *
  * Sensitivity is applied to the *raw* (pre-normalization) axis value. A
- * sensitivity above 1.0x reaches full-speed motion at a smaller physical 
- * deflection, and a sensitivity below 1.0x means even a full deflection 
- * won't quite reach the nominal top speed. The result is clamped to 
+ * sensitivity above 1.0x results in faster, "touchier" motion while  a 
+ * sensitivity below 1.0x results in slower motion. The result is clamped to 
  * qint16's range to avoid overflow at high sensitivity as a safety measure.
  */
 SpaceMouseMotionEvent applySpaceMouseSettings(
@@ -1250,21 +1256,9 @@ SpaceMouseMotionEvent applySpaceMouseSettings(
 
 void GuiApplication::handleSpaceMouseMotion(
     const SpaceMouseMotionEvent& e) noexcept {
-  // Applied directly here, scaled by real elapsed time since the previous
-  // processed report, rather than once per raw report with no time
-  // normalization - the latter is what made the view move roughly an
-  // order of magnitude faster than intended in an earlier version of this
-  // method, since 3Dconnexion devices keep re-reporting the current
-  // deflection at a high, USB-timing-dependent rate (commonly 100+ Hz)
-  // for as long as the cap is held off-center. This mirrors FreeCAD's own
-  // Windows backend (GuiNativeEventWin32.cpp's On3dmouseInput(), which
-  // scales by dwElapsedTime the same way) rather than a separate
-  // fixed-rate dispatch timer - see the feature plan doc for that
-  // alternative design and why it was not chosen here.
-  //
   // The very first report has no previous timestamp to measure against,
   // so it's dropped rather than guessed at (starting the timer here means
-  // the *second* report gets a sensible, usually sub-frame, dtSeconds).
+  // subsequent reports get a sensible, usually sub-frame, dtSeconds).
   if (!mSpaceMouseElapsedTimer.isValid()) {
     mSpaceMouseElapsedTimer.start();
     return;
@@ -1278,11 +1272,8 @@ void GuiApplication::handleSpaceMouseMotion(
   const qreal dtSeconds =
       qMin(mSpaceMouseElapsedTimer.restart() / qreal(1000), kMaxDtSeconds);
 
-  // Dispatch to whichever window/section/tab is actually current, mirroring
-  // the same window -> section -> tab chain ::processScenePointerEvent()
-  // walks (see the feature plan doc's "Phase 3 rework" entry) - this
-  // replaces the previous "most recently activated tab, process-wide"
-  // heuristic with real per-window OS focus tracking.
+  // Dispatch to the OS's current window/section/tab, mirroring the 
+  // window -> section -> tab chain ::processScenePointerEvent() walks.
   if (auto win = getCurrentWindow()) {
     const SpaceMouseMotionEvent adjusted =
         applySpaceMouseSettings(e, mWorkspace.getSettings().spaceMouse);

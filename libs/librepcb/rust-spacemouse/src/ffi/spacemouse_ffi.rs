@@ -1,12 +1,12 @@
-// Claude AI assisted in the writing of this file.
-// It was reviewed and edited by a human.
-
 //! FFI for [`crate::hid::SpaceMouseBackend`].
 //!
 //! Deliberately tiny: an opaque handle, a constructor taking two C-ABI
 //! callbacks, an `is_connected()` query, and a destructor. Everything else
 //! (motion mapping, sensitivity, calibration, dispatch) is a C++-side
 //! concern.  See the crate-level docs for more information.
+
+// AI DISCLAIMER: Claude AI assisted in the writing of this file.
+// It was reviewed and edited by a human.
 
 use crate::device::SpaceMouseMotion;
 use crate::hid::SpaceMouseBackend;
@@ -94,13 +94,12 @@ pub struct FfiSpaceMouseBackend {
 ///
 /// `user_data` is passed back unmodified as the first argument of every
 /// callback invocation; Rust never dereferences it. The caller must keep
-/// whatever it points to alive until after
-/// [`ffi_spacemouse_backend_free`] returns, and must not call back into
-/// Rust synchronously from within a callback (there is no re-entrancy
-/// protection).
+/// whatever it points to alive until after [`ffi_spacemouse_backend_free`]
+/// returns, and must not call back into Rust synchronously from within a 
+/// callback (there is no re-entrancy protection).
 ///
 /// Never returns null: Unlike opening a specific device, constructing the
-/// backend itself cannot fail - "no compatible device found (yet)" is not
+/// backend itself cannot fail.  "No compatible device found (yet)" is not
 /// an error, it's the normal state before `on_connected_changed(true)` is
 /// ever invoked.
 #[no_mangle]
@@ -123,6 +122,20 @@ extern "C" fn ffi_spacemouse_backend_is_connected(
   backend: &FfiSpaceMouseBackend,
 ) -> bool {
   backend.inner.is_connected()
+}
+
+/// Set whether the device's LED (if it has one) should be lit.
+///
+/// A one-shot command: applied immediately if a device is currently open,
+/// and (re-)applied automatically any time the device connects.  Devices
+/// without an LED, and any transient write failure, are both silently 
+/// ignored.  See [`SpaceMouseBackend::set_led`] for additional info.
+#[no_mangle]
+extern "C" fn ffi_spacemouse_backend_set_led(
+  backend: &FfiSpaceMouseBackend,
+  enabled: bool,
+) {
+  backend.inner.set_led(enabled);
 }
 
 /// Stop capturing, join the background thread, and free the backend.
