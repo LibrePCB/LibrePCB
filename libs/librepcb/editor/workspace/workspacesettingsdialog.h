@@ -17,6 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// AI DISCLAIMER: This file was modified by Claude AI.  All changes were
+// reviewed by a human.
+
 #ifndef LIBREPCB_EDITOR_WORKSPACESETTINGSDIALOG_H
 #define LIBREPCB_EDITOR_WORKSPACESETTINGSDIALOG_H
 
@@ -47,6 +50,7 @@ namespace editor {
 
 class ApiEndpointListModelLegacy;
 class KeyboardShortcutsModel;
+class SpaceMouseSettingsWidget;
 
 namespace Ui {
 class WorkspaceSettingsDialog;
@@ -94,7 +98,6 @@ private:
   void buttonBoxClicked(QAbstractButton* button) noexcept;
   void keyPressEvent(QKeyEvent* event) noexcept override;
   void changeEvent(QEvent* event) noexcept override;
-  bool eventFilter(QObject* watched, QEvent* event) noexcept override;
   void reject() noexcept override;
   void externalApplicationListIndexChanged(int index) noexcept;
   void updateColorSchemes() noexcept;
@@ -118,7 +121,7 @@ private:
   QScopedPointer<KeyboardShortcutsModel> mKeyboardShortcutsModel;
   QScopedPointer<QSortFilterProxyModel> mKeyboardShortcutsFilterModel;
   QScopedPointer<Ui::WorkspaceSettingsDialog> mUi;
-  QVector<QSlider*> mSpaceMouseSliders;
+  SpaceMouseSettingsWidget* mSpaceMouseWidget;
   std::optional<slint::ComponentHandle<ui::ColorSchemeDialog>>
       mColorSchemeDialog;
 
