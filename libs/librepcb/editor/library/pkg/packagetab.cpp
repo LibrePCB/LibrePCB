@@ -17,6 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// AI DISCLAIMER: Claude AI was used to author the functions for 3D mouse 
+// (SpaceMouse) support.  All modifications have been reviewed by a human.
+
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
@@ -1057,15 +1060,14 @@ bool PackageTab::processSceneScrolled(const QPointF& pos,
 
 void PackageTab::processSpaceMouseEvent(const SpaceMouseMotionEvent& e,
                                        qreal dtSeconds) noexcept {
-  // Only the 3D footprint preview is wired up so far - the 2D pad-editor
-  // view (SlintGraphicsView, the mView3d==false case) could reuse
-  // ::toSpaceMouseMotion2d() the same way Board2dTab/SchematicTab do, but
-  // that has been deferred for a future effort.
   if (mView3d && mOpenGlView) {
     const SpaceMouseMotion3d motion = toSpaceMouseMotion3d(e, dtSeconds);
     mOpenGlView->applyContinuousMotion(motion.panDelta, motion.zoomFactor,
                                        motion.rotateXDeg, motion.rotateYDeg,
                                        motion.rotateZDeg);
+  } else {
+    const SpaceMouseMotion2d motion = toSpaceMouseMotion2d(e, dtSeconds);
+    mView->applyContinuousMotion(motion.panDelta, motion.zoomFactor);
   }
 }
 

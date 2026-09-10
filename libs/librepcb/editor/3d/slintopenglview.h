@@ -17,6 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// AI DISCLAIMER: This file was authored and/or modified by Claude AI.
+// All changes were reviewed and updated by a human.
+
 #ifndef LIBREPCB_EDITOR_SLINTOPENGLVIEW_H
 #define LIBREPCB_EDITOR_SLINTOPENGLVIEW_H
 
@@ -123,13 +126,12 @@ public:
   /**
    * @brief Apply a continuous pan/zoom/rotate delta (e.g. from a SpaceMouse)
    *
-   * The 3D counterpart of ::SlintGraphicsView::applyContinuousMotion() - see
-   * its doc comment for why this exists as one combined entry point rather
-   * than separate calls. @p panDelta and @p zoomFactor use the same
-   * conventions as there; the three rotation angles are applied around the
-   * view's own current local X/Y/Z axes (the same convention already used
-   * by ::rotate()), each already scaled by whatever elapsed time the
-   * caller is normalizing against.
+   * The 3D counterpart of ::SlintGraphicsView::applyContinuousMotion(). 
+   * @p panDelta and @p zoomFactor use the same conventions as there; the 
+   * three rotation angles are applied around the view's own current local 
+   * X/Y/Z axes (the same convention already used by ::rotate()).  Both
+   * inputs have already been scaled by whatever elapsed time the caller is
+   * normalizing against.
    *
    * @param panDelta    Model-space delta to add to the view center.
    * @param zoomFactor  Multiplier for the field of view, same convention as
