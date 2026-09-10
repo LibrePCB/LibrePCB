@@ -374,27 +374,27 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
     };
     const QVector<SpaceMouseAxisWidgets> axisWidgets = {
         {WorkspaceSettingsItem_SpaceMouse::Axis::TranslationX,
-         mUi->lblSpaceMouseIconPanH, ":/img/spacemouse-panx.svg",
+         mUi->lblSpaceMouseIconPanH, ":/img/settings/spacemouse-panx.svg",
          mUi->sldSpaceMousePanH, mUi->lblSpaceMousePanHValue,
          mUi->chkSpaceMousePanHInvert},
         {WorkspaceSettingsItem_SpaceMouse::Axis::TranslationY,
-         mUi->lblSpaceMouseIconPanV, ":/img/spacemouse-pany.svg",
+         mUi->lblSpaceMouseIconPanV, ":/img/settings/spacemouse-pany.svg",
          mUi->sldSpaceMousePanV, mUi->lblSpaceMousePanVValue,
          mUi->chkSpaceMousePanVInvert},
         {WorkspaceSettingsItem_SpaceMouse::Axis::TranslationZ,
-         mUi->lblSpaceMouseIconZoom, ":/img/spacemouse-panz.svg",
+         mUi->lblSpaceMouseIconZoom, ":/img/settings/spacemouse-panz.svg",
          mUi->sldSpaceMouseZoom, mUi->lblSpaceMouseZoomValue,
          mUi->chkSpaceMouseZoomInvert},
         {WorkspaceSettingsItem_SpaceMouse::Axis::RotationX,
-         mUi->lblSpaceMouseIconPitch, ":/img/spacemouse-pitch.svg",
+         mUi->lblSpaceMouseIconPitch, ":/img/settings/spacemouse-pitch.svg",
          mUi->sldSpaceMousePitch, mUi->lblSpaceMousePitchValue,
          mUi->chkSpaceMousePitchInvert},
         {WorkspaceSettingsItem_SpaceMouse::Axis::RotationY,
-         mUi->lblSpaceMouseIconRoll, ":/img/spacemouse-roll.svg",
+         mUi->lblSpaceMouseIconRoll, ":/img/settings/spacemouse-roll.svg",
          mUi->sldSpaceMouseRoll, mUi->lblSpaceMouseRollValue,
          mUi->chkSpaceMouseRollInvert},
         {WorkspaceSettingsItem_SpaceMouse::Axis::RotationZ,
-         mUi->lblSpaceMouseIconYaw, ":/img/spacemouse-yaw.svg",
+         mUi->lblSpaceMouseIconYaw, ":/img/settings/spacemouse-yaw.svg",
          mUi->sldSpaceMouseYaw, mUi->lblSpaceMouseYawValue,
          mUi->chkSpaceMouseYawInvert},
     };
@@ -929,6 +929,8 @@ void WorkspaceSettingsDialog::loadSettings() noexcept {
     load(mUi->sldSpaceMouseYaw, mUi->lblSpaceMouseYawValue,
          mUi->chkSpaceMouseYawInvert,
          mSettings.spaceMouse.get(Axis::RotationZ));
+    mUi->chkSpaceMouseEnableLed->setChecked(
+        mSettings.spaceMouse.getLedEnabled());
   }
 #endif
 
@@ -1023,6 +1025,8 @@ void WorkspaceSettingsDialog::saveSettings() noexcept {
       settings[Axis::RotationZ] =
           save(mUi->sldSpaceMouseYaw, mUi->chkSpaceMouseYawInvert);
       mSettings.spaceMouse.set(settings);
+      mSettings.spaceMouse.setLedEnabled(
+          mUi->chkSpaceMouseEnableLed->isChecked());
     }
 #endif
 
