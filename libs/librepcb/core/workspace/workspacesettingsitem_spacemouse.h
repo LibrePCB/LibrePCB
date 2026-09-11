@@ -165,8 +165,13 @@ private:  // Methods
   static AxisSettingsMap defaultAxisSettings() noexcept;
 
 private:
+  /**
+   * @brief Default value of ::getLedEnabled()
+   */
+  static constexpr bool sDefaultLedEnabled = true;
+
   AxisSettingsMap mAxisSettings;
-  bool mLedEnabled = true;
+  bool mLedEnabled = sDefaultLedEnabled;
 };
 
 /*******************************************************************************

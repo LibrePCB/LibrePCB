@@ -32,6 +32,14 @@
  ******************************************************************************/
 namespace librepcb {
 
+namespace {
+
+// Decimal digits of precision used when serializing a Space Mouse axis
+// sensitivity multiplier to the settings file.
+constexpr int kSensitivitySerializationDecimals = 6;
+
+}  // namespace
+
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
@@ -96,7 +104,7 @@ void WorkspaceSettingsItem_SpaceMouse::restoreDefaultImpl() noexcept {
   const AxisSettingsMap defaults = defaultAxisSettings();
   if ((mAxisSettings != defaults) || (!mLedEnabled)) {
     mAxisSettings = defaults;
-    mLedEnabled = true;
+    mLedEnabled = sDefaultLedEnabled;
     valueModified();
   }
 }
@@ -116,7 +124,7 @@ void WorkspaceSettingsItem_SpaceMouse::loadImpl(const SExpression& root) {
     settings[*axis] = s;
   }
   // Default LED to on, matching the checkbox's own default
-  bool ledEnabled = true;
+  bool ledEnabled = sDefaultLedEnabled;
   if (const SExpression* child = root.tryGetChild("led_enabled")) {
     ledEnabled = deserialize<bool>(child->getChild("@0"));
   }
@@ -139,7 +147,9 @@ void WorkspaceSettingsItem_SpaceMouse::serializeImpl(SExpression& root) const {
     root.ensureLineBreak();
     SExpression& child = root.appendList("axis");
     child.appendChild(SExpression::createToken(axisToString(axis)));
-    child.appendChild("sensitivity", QString::number(s.sensitivity, 'f', 6));
+    child.appendChild(
+        "sensitivity",
+        QString::number(s.sensitivity, 'f', kSensitivitySerializationDecimals));
     child.appendChild("invert", s.invert);
   }
   root.ensureLineBreak();
