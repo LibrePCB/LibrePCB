@@ -169,22 +169,16 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
     connect(mSpaceMouseInput.get(), &IF_SpaceMouseInputBackend::motionEvent,
             this, &GuiApplication::handleSpaceMouseMotion);
 
-    // LED control is a one-shot device command, not something applied per 
-	// motion event like sensitivity or invert, so it's only pushed to the 
-	// backend if it actually needs to change (upon new connections and 
-	// whenever the setting changes).
+    // LED control is currently connection-bound rather than a user 
+	// preference. Turn it on whenever a device is connected (covering both 
+	// app startup and device unplug/replug), and off explicitly at app 
+	// shutdown (see the destructor).
     connect(mSpaceMouseInput.get(),
             &IF_SpaceMouseInputBackend::deviceConnectedChanged, this,
             [this](bool connected) {
               if (connected) {
-                mSpaceMouseInput->setLedEnabled(
-                    mWorkspace.getSettings().spaceMouse.getLedEnabled());
+                mSpaceMouseInput->setLedEnabled(true);
               }
-            });
-    connect(&mWorkspace.getSettings().spaceMouse, &WorkspaceSettingsItem::edited,
-            this, [this]() {
-              mSpaceMouseInput->setLedEnabled(
-                  mWorkspace.getSettings().spaceMouse.getLedEnabled());
             });
   }
 
@@ -386,6 +380,14 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
 }
 
 GuiApplication::~GuiApplication() noexcept {
+  // Since the SpaceMouse LED is connection bound, explicitly turn it off 
+  // before the backend (and its background capture thread) gets torn down. 
+  // Safe to call even if no device is currently connected - it's a 
+  // best-effort HID write, silently ignored either way.
+  if (mSpaceMouseInput) {
+    mSpaceMouseInput->setLedEnabled(false);
+  }
+
   mProjectLibraryUpdater.reset();
 }
 

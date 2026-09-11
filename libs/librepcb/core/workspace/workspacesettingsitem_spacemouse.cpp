@@ -35,7 +35,9 @@ namespace librepcb {
 namespace {
 
 // Decimal digits of precision used when serializing a Space Mouse axis
-// sensitivity multiplier to the settings file.
+// sensitivity multiplier to the settings file.  Since multipliers are
+// presently in units of 1/100, six decimal places is overkill.
+// (see kSliderRange in spacemousesettingswidget.cpp)
 constexpr int kSensitivitySerializationDecimals = 6;
 
 }  // namespace
@@ -89,22 +91,14 @@ void WorkspaceSettingsItem_SpaceMouse::set(
   }
 }
 
-void WorkspaceSettingsItem_SpaceMouse::setLedEnabled(bool enabled) noexcept {
-  if (mLedEnabled != enabled) {
-    mLedEnabled = enabled;
-    valueModified();
-  }
-}
-
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 
 void WorkspaceSettingsItem_SpaceMouse::restoreDefaultImpl() noexcept {
   const AxisSettingsMap defaults = defaultAxisSettings();
-  if ((mAxisSettings != defaults) || (!mLedEnabled)) {
+  if (mAxisSettings != defaults) {
     mAxisSettings = defaults;
-    mLedEnabled = sDefaultLedEnabled;
     valueModified();
   }
 }
@@ -123,15 +117,9 @@ void WorkspaceSettingsItem_SpaceMouse::loadImpl(const SExpression& root) {
     s.invert = deserialize<bool>(child->getChild("invert/@0"));
     settings[*axis] = s;
   }
-  // Default LED to on, matching the checkbox's own default
-  bool ledEnabled = sDefaultLedEnabled;
-  if (const SExpression* child = root.tryGetChild("led_enabled")) {
-    ledEnabled = deserialize<bool>(child->getChild("@0"));
-  }
 
-  if ((settings != mAxisSettings) || (ledEnabled != mLedEnabled)) {
+  if (settings != mAxisSettings) {
     mAxisSettings = settings;
-    mLedEnabled = ledEnabled;
     valueModified();
   }
 }
@@ -147,13 +135,10 @@ void WorkspaceSettingsItem_SpaceMouse::serializeImpl(SExpression& root) const {
     root.ensureLineBreak();
     SExpression& child = root.appendList("axis");
     child.appendChild(SExpression::createToken(axisToString(axis)));
-    child.appendChild(
-        "sensitivity",
+    child.appendChild("sensitivity",
         QString::number(s.sensitivity, 'f', kSensitivitySerializationDecimals));
     child.appendChild("invert", s.invert);
   }
-  root.ensureLineBreak();
-  root.appendChild("led_enabled", mLedEnabled);
   root.ensureLineBreak();
 }
 
