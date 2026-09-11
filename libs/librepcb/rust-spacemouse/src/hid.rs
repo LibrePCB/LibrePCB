@@ -138,12 +138,10 @@ fn capture_loop<M, C>(
   M: Fn(SpaceMouseMotion),
   C: Fn(bool),
 {
-  // The last LED state requested via `SpaceMouseBackend::set_led()`, is
-  // applied upon device (re)open, not just when the command arrives.  This
-  // ensures "enable LED on connection" holds across unplug/replug cycles. 
-  // The LED defaults to 'on'.  Note that the C++ side normally sends an 
-  // explicit command right after construction reflecting the user preference,
-  // so the default is only in effect for a short period of time.
+  // LED state is currently connection-bound, not a user setting. The 
+  // application sends an explicit `true` on every connect and an explicit 
+  // `false` right before app shutdown.  Regardless, we default the state
+  // here to `true` defensively.
   let mut desired_led = true;
 
   while !stop.load(Ordering::Relaxed) {

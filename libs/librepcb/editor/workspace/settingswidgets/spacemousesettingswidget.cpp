@@ -49,17 +49,17 @@ namespace {
 // [-kSliderRange, +kSliderRange] are first scaled by kSliderRange to result
 // in a final exponent in the range of [-1.0, 1.0].  The final multiplier
 // value is obtained from (kSensitivityCurveBase)^exponent. This gives the 
-// sliders a more natural feel than a linear mapping would, while 
+// sliders a more usable feel than a linear mapping would, while 
 // simultaneously keeping the nominal 1.0x multiplier in the middle.
 
 // Base of the exponential slider-to-sensitivity curve. This results in
-// a multiplier range of ~1/n..n (where n is the base) at full deflection.
+// a multiplier range of 1/n..n (where n is the base) at full deflection.
 constexpr double kSensitivityCurveBase = 3.0;
 
 // Slider range: each sensitivity slider spans [-kSliderRange, +kSliderRange],
-// leaving 0 (the nominal 1.0x multiplier) at the center.  This effectively
-// controls the granularity of the sensitivity setting.
-constexpr int kSliderRange = 100;
+// and is normalized to [-1.0, 1.0].  kSliderRange thus controls the 
+// granularity of the sensitivity setting.
+constexpr int kSliderRange = 100;   // Multipliers will be in hundredths
 
 // Convert a Space Mouse sensitivity slider position to a sensitivity
 // multiplier. See the block comment above for the curve this implements.
@@ -189,7 +189,6 @@ void SpaceMouseSettingsWidget::load() noexcept {
        mUi->chkSpaceMouseRollInvert, mSettings.get(Axis::RotationY));
   load(mUi->sldSpaceMouseYaw, mUi->lblSpaceMouseYawValue,
        mUi->chkSpaceMouseYawInvert, mSettings.get(Axis::RotationZ));
-  mUi->chkSpaceMouseEnableLed->setChecked(mSettings.getLedEnabled());
 #endif
 }
 
@@ -216,7 +215,6 @@ void SpaceMouseSettingsWidget::save() noexcept {
   settings[Axis::RotationZ] =
       save(mUi->sldSpaceMouseYaw, mUi->chkSpaceMouseYawInvert);
   mSettings.set(settings);
-  mSettings.setLedEnabled(mUi->chkSpaceMouseEnableLed->isChecked());
 #endif
 }
 

@@ -45,9 +45,7 @@ namespace librepcb {
  *
  * Stores a per-axis sensitivity multiplier and invert flag for each of the
  * six raw motion axes reported by ::librepcb::editor::IF_SpaceMouseInputBackend
- * (see ::librepcb::editor::SpaceMouseMotionEvent), plus a single
- * device-wide flag for whether the LED should be illuminated on
- * connection (::getLedEnabled()/::setLedEnabled()).
+ * (see ::librepcb::editor::SpaceMouseMotionEvent).
  */
 class WorkspaceSettingsItem_SpaceMouse final : public WorkspaceSettingsItem {
 public:
@@ -106,15 +104,6 @@ public:
    */
   const AxisSettingsMap& get() const noexcept { return mAxisSettings; }
 
-  /**
-   * @brief Get whether the device LED should be illuminated on connection
-   *
-   * @return Whether to turn the LED on (not all devices have one, in which
-   *         case this is silently a no-op - see
-   *         ::librepcb::editor::IF_SpaceMouseInputBackend::setLedEnabled()).
-   */
-  bool getLedEnabled() const noexcept { return mLedEnabled; }
-
   // Setters
 
   /**
@@ -132,13 +121,6 @@ public:
    *                   map are reset to their default settings.
    */
   void set(const AxisSettingsMap& settings) noexcept;
-
-  /**
-   * @brief Set whether the device LED should be illuminated on connection
-   *
-   * @param enabled  New value.
-   */
-  void setLedEnabled(bool enabled) noexcept;
 
   // Operator Overloadings
   WorkspaceSettingsItem_SpaceMouse& operator=(
@@ -165,13 +147,7 @@ private:  // Methods
   static AxisSettingsMap defaultAxisSettings() noexcept;
 
 private:
-  /**
-   * @brief Default value of ::getLedEnabled()
-   */
-  static constexpr bool sDefaultLedEnabled = true;
-
   AxisSettingsMap mAxisSettings;
-  bool mLedEnabled = sDefaultLedEnabled;
 };
 
 /*******************************************************************************

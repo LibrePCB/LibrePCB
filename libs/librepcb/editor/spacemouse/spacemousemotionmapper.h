@@ -61,7 +61,7 @@ constexpr qreal kSpaceMouseAxisSaturation = 350.0;
 constexpr qreal kSpaceMouseNominalZoomRatePerSec = 5.0;
 
 /**
- * @breif Nominal (1.0x) 2D pan sensitivity (pix per sec)
+ * @breif Nominal (1.0x) 2D pan sensitivity (pixels per sec)
  *
  * Expressed as real-world rates (pixels per second) rather than per-report 
  * multipliers. Tuned against real hardware feedback declared the "nominal" 
