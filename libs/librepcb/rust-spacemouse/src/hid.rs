@@ -182,11 +182,13 @@ fn capture_loop<M, C>(
     let mut motion = SpaceMouseMotion::default();
     let mut buf = [0u8; READ_BUF_LEN];
     loop {
-      if stop.load(Ordering::Relaxed) {
-        connected.store(false, Ordering::Relaxed);
-        on_connected_changed(false);
-        return;
-      }
+      // Drain (and apply) any pending LED command before honoring a `stop`
+      // request below. Ordering matters: if this were done after the `stop`
+      // check, a command sent just before shutdown (see `GuiApplication`'s
+      // destructor) could be left sitting in the channel forever, since the
+      // thread would already have returned by the time it would otherwise
+      // have been drained - silently leaving the LED lit until physical
+      // unplug instead of turning off at app shutdown as intended.
       let mut led_changed = false;
       while let Ok(enabled) = led_receiver.try_recv() {
         if enabled != desired_led {
@@ -196,6 +198,11 @@ fn capture_loop<M, C>(
       }
       if led_changed {
         write_led(&device, desired_led);
+      }
+      if stop.load(Ordering::Relaxed) {
+        connected.store(false, Ordering::Relaxed);
+        on_connected_changed(false);
+        return;
       }
       match device.read_timeout(&mut buf, READ_TIMEOUT_MS) {
         // Timed out without any data - just loop around to re-check `stop`.
