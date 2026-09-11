@@ -17,6 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// DISCLAIMER: Claude AI assisted in the writing of this file.
+// It was reviewed by a human.
+
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
@@ -33,11 +36,11 @@ namespace tests {
 /*******************************************************************************
  *  Test Methods
  *
- *  Note: The platform backends (e.g. SpaceMouseInputWin32) talk directly to
- *  OS-level raw HID input and thus need real hardware to exercise
- *  meaningfully; they are not unit-testable here. This file only covers the
- *  platform-independent SpaceMouseMotionEvent value type shared by all of
- *  them.
+ *  Note: The actual input backend (SpaceMouseInputRust, via the
+ *  cross-platform rust-spacemouse crate) talks directly to OS-level raw HID
+ *  input and thus needs real hardware to test meaningfully.  It is not
+ *  unit-testable here. This file only covers the platform-independent
+ *  SpaceMouseMotionEvent value type it produces.
  ******************************************************************************/
 
 TEST(SpaceMouseMotionEventTest, testDefaultConstructedIsAllZero) {
