@@ -37,6 +37,57 @@ namespace librepcb {
 namespace editor {
 
 /*******************************************************************************
+ *  Constants
+ ******************************************************************************/
+
+/**
+ * @brief Raw HID translation/rotation axis saturation
+ *
+ * Raw HID translation/rotation axes saturate at roughly +-350
+ * (device-dependent). Both ::toSpaceMouseMotion2d() and
+ * ::toSpaceMouseMotion3d() normalize against this before applying any
+ * sensitivity.
+ */
+constexpr qreal kSpaceMouseAxisSaturation = 350.0;
+
+/**
+ * @brief Nominal (1.0x) zoom rate, shared by the 2D and 3D mappings
+ *
+ * Expressed as a real-world rate (per second) rather than a per-report
+ * multiplier, see @p dtSeconds in ::toSpaceMouseMotion2d() /
+ * ::toSpaceMouseMotion3d(). Tuned against real hardware feedback and
+ * declared the "nominal" baseline for the sensitivity slider.
+ */
+constexpr qreal kSpaceMouseNominalZoomRatePerSec = 5.0;
+
+/**
+ * @breif Nominal (1.0x) 2D pan sensitivity (pix per sec)
+ *
+ * Expressed as real-world rates (pixels per second) rather than per-report 
+ * multipliers. Tuned against real hardware feedback declared the "nominal" 
+ * baseline for sensitivity sliders.
+ */
+constexpr qreal kNominalPanSpeedPxPerSec = 1500.0;
+
+
+/**
+ * @breif Nominal (1.0x) 3D pan sensitivity (3D units per sec)
+ *
+ * This constant is in the same model-space units ::SlintOpenGlView already
+ * uses for mouse-drag panning, not pixels like the 2D mapping.
+ */
+constexpr qreal kNominalPan3dUnitsPerSec = 5.0;
+
+/**
+ * @brief Nominal (1.0x) rotation sensitivity (deg per sec)
+ *
+ * Nominal rotation rate in degrees per second.  This is only used by the
+ * 3D view calculations due to the fact that rotation isn't applied in 2D
+ * views.
+ */
+constexpr qreal kNominalRotateDegPerSec = 90.0;
+
+/*******************************************************************************
  *  Struct SpaceMouseMotion2d
  ******************************************************************************/
 
@@ -74,28 +125,19 @@ struct SpaceMouseMotion2d {
  */
 inline SpaceMouseMotion2d toSpaceMouseMotion2d(const SpaceMouseMotionEvent& e,
                                                qreal dtSeconds) noexcept {
-  // Raw HID translation/rotation axes saturate at roughly +-350 (device-
-  // dependent). Normalize to [-1, 1] first so the sensitivity constants 
-  // below are independent of the raw device-specific scale.
-  constexpr qreal kAxisSaturation = 350.0;
-
-  // Nominal (1.0x) sensitivity, expressed as real-world rates (per
-  // second) rather than per-report multipliers, see the @p dtSeconds doc
-  // above. Tuned against real hardware feedback declared the "nominal" 
-  // baseline for sensitivity sliders.
-  constexpr qreal kNominalPanSpeedPxPerSec = 1500.0;
-  constexpr qreal kNominalZoomRatePerSec = 5.0;
-
-  const qreal nx = qBound(qreal(-1), qreal(e.translationX) / kAxisSaturation,
+  const qreal nx = qBound(qreal(-1),
+                          qreal(e.translationX) / kSpaceMouseAxisSaturation,
                           qreal(1));
-  const qreal ny = qBound(qreal(-1), qreal(e.translationY) / kAxisSaturation,
+  const qreal ny = qBound(qreal(-1),
+                          qreal(e.translationY) / kSpaceMouseAxisSaturation,
                           qreal(1));
-  const qreal nz = qBound(qreal(-1), qreal(e.translationZ) / kAxisSaturation,
+  const qreal nz = qBound(qreal(-1),
+                          qreal(e.translationZ) / kSpaceMouseAxisSaturation,
                           qreal(1));
 
   SpaceMouseMotion2d motion;
   motion.panDelta = QPointF(-nx, -ny) * kNominalPanSpeedPxPerSec * dtSeconds;
-  motion.zoomFactor = qPow(kNominalZoomRatePerSec, -nz * dtSeconds);
+  motion.zoomFactor = qPow(kSpaceMouseNominalZoomRatePerSec, -nz * dtSeconds);
   return motion;
 }
 
@@ -135,34 +177,28 @@ struct SpaceMouseMotion3d {
  */
 inline SpaceMouseMotion3d toSpaceMouseMotion3d(const SpaceMouseMotionEvent& e,
                                                qreal dtSeconds) noexcept {
-  // Same raw-axis saturation as ::toSpaceMouseMotion2d() - see its comment.
-  constexpr qreal kAxisSaturation = 350.0;
-
-  // Pan is in the same kind of model-space units ::SlintOpenGlView already 
-  // uses for mouse-drag panning (board/package outlines are typically on the 
-  // order of a few tens of mm), not pixels like the 2D mapping - hence a much
-  // smaller nominal value than ::toSpaceMouseMotion2d()'s pixel-based pan 
-  // rate.
-  constexpr qreal kNominalPanUnitsPerSec = 5.0;
-  constexpr qreal kNominalZoomRatePerSec = 5.0;
-  constexpr qreal kNominalRotateDegPerSec = 90.0;
-
-  const qreal nx = qBound(qreal(-1), qreal(e.translationX) / kAxisSaturation,
+  const qreal nx = qBound(qreal(-1),
+                          qreal(e.translationX) / kSpaceMouseAxisSaturation,
                           qreal(1));
-  const qreal ny = qBound(qreal(-1), qreal(e.translationY) / kAxisSaturation,
+  const qreal ny = qBound(qreal(-1),
+                          qreal(e.translationY) / kSpaceMouseAxisSaturation,
                           qreal(1));
-  const qreal nz = qBound(qreal(-1), qreal(e.translationZ) / kAxisSaturation,
+  const qreal nz = qBound(qreal(-1),
+                          qreal(e.translationZ) / kSpaceMouseAxisSaturation,
                           qreal(1));
-  const qreal nrx = qBound(qreal(-1), qreal(e.rotationX) / kAxisSaturation,
+  const qreal nrx = qBound(qreal(-1),
+                           qreal(e.rotationX) / kSpaceMouseAxisSaturation,
                            qreal(1));
-  const qreal nry = qBound(qreal(-1), qreal(e.rotationY) / kAxisSaturation,
+  const qreal nry = qBound(qreal(-1),
+                           qreal(e.rotationY) / kSpaceMouseAxisSaturation,
                            qreal(1));
-  const qreal nrz = qBound(qreal(-1), qreal(e.rotationZ) / kAxisSaturation,
+  const qreal nrz = qBound(qreal(-1),
+                           qreal(e.rotationZ) / kSpaceMouseAxisSaturation,
                            qreal(1));
 
   SpaceMouseMotion3d motion;
-  motion.panDelta = QPointF(nx, -ny) * kNominalPanUnitsPerSec * dtSeconds;
-  motion.zoomFactor = qPow(kNominalZoomRatePerSec, -nz * dtSeconds);
+  motion.panDelta = QPointF(nx, -ny) * kNominalPan3dUnitsPerSec * dtSeconds;
+  motion.zoomFactor = qPow(kSpaceMouseNominalZoomRatePerSec, -nz * dtSeconds);
   motion.rotateXDeg = nrx * kNominalRotateDegPerSec * dtSeconds;
   motion.rotateYDeg = -nry * kNominalRotateDegPerSec * dtSeconds;
   motion.rotateZDeg = -nrz * kNominalRotateDegPerSec * dtSeconds;
