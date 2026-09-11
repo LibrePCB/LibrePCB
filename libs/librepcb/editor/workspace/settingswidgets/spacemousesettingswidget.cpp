@@ -44,16 +44,28 @@ namespace editor {
 
 namespace {
 
+// The value the sensitivity sliders report is used as an *exponent* in the
+// sensitivity multiplier calculation.  Slider values in the range of
+// [-kSliderRange, +kSliderRange] are first scaled by kSliderRange to result
+// in a final exponent in the range of [-1.0, 1.0].  The final multiplier
+// value is obtained from (kSensitivityCurveBase)^exponent. This gives the 
+// sliders a more natural feel than a linear mapping would, while 
+// simultaneously keeping the nominal 1.0x multiplier in the middle.
+
+// Base of the exponential slider-to-sensitivity curve. This results in
+// a multiplier range of ~1/n..n (where n is the base) at full deflection.
+constexpr double kSensitivityCurveBase = 3.0;
+
+// Slider range: each sensitivity slider spans [-kSliderRange, +kSliderRange],
+// leaving 0 (the nominal 1.0x multiplier) at the center.  This effectively
+// controls the granularity of the sensitivity setting.
+constexpr int kSliderRange = 100;
+
 // Convert a Space Mouse sensitivity slider position to a sensitivity
-// multiplier.
-//
-// The slider reports an *exponent* in [-100, 100] (hundredths of [-1.0,
-// 1.0]), not the multiplier itself. The actual sensitivity multiplier is
-// 3^exponent, which gives a logarithmic ~0.33x..3.0x range while keeping
-// the nominal 1.0x exactly centered (slider at 0). This gives the sliders
-// a more natural look and feel.
+// multiplier. See the block comment above for the curve this implements.
 double spaceMouseSliderToSensitivity(int sliderValue) noexcept {
-  return std::pow(3.0, sliderValue / 100.0);
+  return std::pow(kSensitivityCurveBase,
+                  sliderValue / static_cast<double>(kSliderRange));
 }
 
 // Inverse of ::spaceMouseSliderToSensitivity().
@@ -63,8 +75,10 @@ int spaceMouseSensitivityToSlider(double sensitivity) noexcept {
     // only produce values > 0) - fall back to nominal (1.0x, slider at 0).
     return 0;
   }
-  return qBound(
-      -100, qRound(100.0 * std::log(sensitivity) / std::log(3.0)), 100);
+  return qBound(-kSliderRange,
+               qRound(kSliderRange * std::log(sensitivity) /
+                      std::log(kSensitivityCurveBase)),
+               kSliderRange);
 }
 
 // Format a sensitivity multiplier for display (e.g. "1.2x").
