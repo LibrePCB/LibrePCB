@@ -25,7 +25,7 @@
  ******************************************************************************/
 #include "spacemouseinputrust.h"
 
-#include <librepcb/rust-spacemouse/ffi.h>
+#include <librepcb/rust-core/ffi.h>
 
 #include <QtCore>
 
@@ -43,14 +43,14 @@ namespace {
 
 // These run on the Rust-owned background thread, *not* this object's own 
 // thread (see `hid.rs`). `userData` is the SpaceMouseInputRust* passed to 
-// rs::spacemouse::ffi_spacemouse_backend_new(), cast through `void*` since 
-// a plain C function pointer can't capture a `this`. This function does 
-// exactly one thing: post the actual work onto `self`'s own thread via a 
-// queued QMetaObject::invokeMethod() call, matching the idiom already used
-// elsewhere in the editor for cross-thread event delivery.
+// rs::ffi_spacemouse_backend_new(), cast through `void*` since a plain C 
+// function pointer can't capture a `this`. This function does exactly one 
+// thing: post the actual work onto `self`'s own thread via a  queued 
+// QMetaObject::invokeMethod() call, matching the idiom already used elsewhere
+// in the editor for cross-thread event delivery.
 
 extern "C" void spaceMouseInputRustOnMotion(
-    void* userData, rs::spacemouse::SpaceMouseMotionFfi motion) noexcept {
+    void* userData, rs::SpaceMouseMotionFfi motion) noexcept {
   auto* self = reinterpret_cast<SpaceMouseInputRust*>(userData);
   SpaceMouseMotionEvent event;
   event.translationX = motion.translation_x;
@@ -76,18 +76,17 @@ extern "C" void spaceMouseInputRustOnConnectedChanged(
 // initializer list (following the same pattern as e.g. ZipArchive's
 // `construct()` helper). Kept as a free function (rather than inline in the
 // initializer list) because it needs `self` to be usable as a `QObject*`.
-RustHandle<rs::spacemouse::FfiSpaceMouseBackend> construct(
+RustHandle<rs::FfiSpaceMouseBackend> construct(
     SpaceMouseInputRust* self) noexcept {
-  rs::spacemouse::FfiSpaceMouseBackend* obj =
-      rs::spacemouse::ffi_spacemouse_backend_new(
-          self, &spaceMouseInputRustOnMotion,
-          &spaceMouseInputRustOnConnectedChanged);
+  rs::FfiSpaceMouseBackend* obj = rs::ffi_spacemouse_backend_new(
+      self, &spaceMouseInputRustOnMotion,
+      &spaceMouseInputRustOnConnectedChanged);
   // Per ffi_spacemouse_backend_new()'s contract, this can't fail - only
   // finding/opening a device can fail, and that's reported later via
   // on_connected_changed(), not a null return here.
   Q_ASSERT(obj);
-  return RustHandle<rs::spacemouse::FfiSpaceMouseBackend>(
-      *obj, &rs::spacemouse::ffi_spacemouse_backend_free);
+  return RustHandle<rs::FfiSpaceMouseBackend>(
+      *obj, &rs::ffi_spacemouse_backend_free);
 }
 
 }  // namespace
@@ -110,7 +109,7 @@ bool SpaceMouseInputRust::isDeviceConnected() const noexcept {
 }
 
 void SpaceMouseInputRust::setLedEnabled(bool enabled) noexcept {
-  rs::spacemouse::ffi_spacemouse_backend_set_led(*mHandle, enabled);
+  rs::ffi_spacemouse_backend_set_led(*mHandle, enabled);
 }
 
 void SpaceMouseInputRust::handleMotion(

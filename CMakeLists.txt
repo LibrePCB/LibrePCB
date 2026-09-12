@@ -1,3 +1,6 @@
+# AI DISCLAIMER: This file was modified by Claude AI.
+# All modifications have been reviewed by a human.
+
 # CMake version configuration
 # (Note: The minimal version 3.22 is shipped with Ubuntu 22.04)
 cmake_minimum_required(VERSION 3.22)
@@ -173,15 +176,27 @@ if(BUILD_TESTS)
 endif()
 
 # Add rust-spacemouse before editor so the editor makefile can tell which
-# spacemouse backend it should build.
+# spacemouse backend it should build. TEMPORARY: rust-spacemouse is being
+# phased out (see librepcb_spacemouse_crate_extraction_plan project doc) -
+# its own corrosion_import_crate below is now unused by the rest of the
+# build (editor gets SpaceMouse support via rust-core instead, see below)
+# and this add_subdirectory() will be deleted once the crate is fully
+# extracted to its own repository.
 add_subdirectory(libs/librepcb/rust-spacemouse)
 
 # Add libs
 add_subdirectory(libs/librepcb/core)
+# rust-core must be added before editor: rust-core/CMakeLists.txt sets
+# LIBREPCB_SPACEMOUSE_AVAILABLE via PARENT_SCOPE (whether space mouse
+# support could be enabled, e.g. libudev found on Linux), and editor's
+# CMakeLists.txt reads that variable to decide which SpaceMouse backend to
+# build. PARENT_SCOPE variables are only visible to add_subdirectory()
+# calls that run *after* the one that set them - getting this order wrong
+# silently builds the no-op backend on every platform with no error.
+add_subdirectory(libs/librepcb/rust-core)
 add_subdirectory(libs/librepcb/editor)
 add_subdirectory(libs/librepcb/eagleimport)
 add_subdirectory(libs/librepcb/kicadimport)
-add_subdirectory(libs/librepcb/rust-core)
 add_subdirectory(libs/librepcb/ui)
 add_subdirectory(libs/parseagle)
 
