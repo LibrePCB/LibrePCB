@@ -1,5 +1,5 @@
-# AI DISCLAIMER: This file was modified by Claude AI.  All modifications
-# have been reviewed by a human.
+# AI DISCLAIMER: This file was modified by Claude AI.  
+# All modifications have been reviewed by a human.
 
 # Enable Qt MOC/UIC/RCC
 set(CMAKE_AUTOMOC ON)
@@ -1014,12 +1014,14 @@ add_library(
 )
 
 # Cross-platform 3D mouse (SpaceMouse) input backend, implemented by the
-# `librepcb-rust-spacemouse` Rust crate. Functionality will not be available
-# in this build if LIBREPCB_SPACEMOUSE_AVAILABLE came back false (most likely
-# because libudev is missing on a Linux build).  See also
-# rust-spacemouse/CMakeLists.txt. If the SpaceMouse is not available, a no-op
+# `spacemouse` Rust crate's FFI, which lives in rust-core. Functionality will
+# not be available in this build if LIBREPCB_SPACEMOUSE_AVAILABLE came back
+# false (most likely because libudev is missing on a Linux build). See also
+# rust-core/CMakeLists.txt. If the SpaceMouse is not available, a no-op
 # backend is built so the rest of the app can operate in spite of the missing
-# feature.
+# feature. No explicit target_link_libraries() for LibrePCB::RustCore is
+# needed here: librepcb_editor already links LibrePCB::Core PUBLIC-ly, which
+# itself links LibrePCB::RustCore PUBLIC-ly.
 target_sources(
   librepcb_editor
   PRIVATE spacemouse/spacemouseinputnull.h
@@ -1029,10 +1031,6 @@ if(LIBREPCB_SPACEMOUSE_AVAILABLE)
     librepcb_editor
     PRIVATE spacemouse/spacemouseinputrust.cpp
             spacemouse/spacemouseinputrust.h
-  )
-  target_link_libraries(
-    librepcb_editor
-    PRIVATE LibrePCB::RustSpaceMouse
   )
   target_compile_definitions(
     librepcb_editor
