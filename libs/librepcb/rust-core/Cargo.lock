@@ -296,18 +296,11 @@ dependencies = [
  "cbindgen",
  "interactive-html-bom",
  "libm",
- "librepcb-rust-spacemouse",
  "lz-str",
  "parameterized_test",
  "regex",
+ "spacemouse",
  "zip",
-]
-
-[[package]]
-name = "librepcb-rust-spacemouse"
-version = "0.1.0"
-dependencies = [
- "hidapi",
 ]
 
 [[package]]
@@ -488,6 +481,14 @@ name = "shlex"
 version = "2.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f8fadd59c855ef2080decdef8ff161eb6661b86933c9d82e5ba29dc602a55aba"
+
+[[package]]
+name = "spacemouse"
+version = "0.1.0"
+source = "git+https://github.com/AvetosDesign/spacemouse-rs?branch=main#146e46bae392fb2fbbdf5ef8bbf319f4b373b544"
+dependencies = [
+ "hidapi",
+]
 
 [[package]]
 name = "strsim"
