@@ -1,4 +1,5 @@
 # Claude AI assisted in the writing of this file.
+# It has been reviewed by a human.
 
 [package]
 name = "librepcb-rust-core"
@@ -27,11 +28,7 @@ libm = "0.2.16"
 lz-str = "0.2.1"  # Keep in sync with interactive-html-bom
 
 # Cross-platform SpaceMouse HID capture, from its own standalone repository
-# (see librepcb_spacemouse_crate_extraction_plan project doc). TEMPORARY: git
-# dependency tracking `main` while the repo is staged under a personal
-# account and crates.io publishing access is sorted out. Will become a plain
-# crates.io version dependency once published; consider pinning to a `rev`
-# instead of tracking `branch` if this stays a git dependency for long.
+# (see librepcb_spacemouse_crate_extraction_plan project doc).
 spacemouse = { git = "https://github.com/AvetosDesign/spacemouse-rs", branch = "main", optional = true }
 
 [dependencies.regex]
