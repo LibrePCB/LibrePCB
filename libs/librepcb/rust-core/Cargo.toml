@@ -1,3 +1,6 @@
+# Claude AI assisted in the writing of this file.
+# It has been reviewed by a human.
+
 [package]
 name = "librepcb-rust-core"
 version = "0.1.0"
@@ -10,6 +13,12 @@ crate-type = ["lib", "staticlib"]
 fail-on-warnings = []
 ffi = ["dep:cbindgen"]
 
+# Enables the SpaceMouse HID-capture FFI (src/ffi/spacemouse_ffi.rs). Gated
+# separately from `ffi` because the `spacemouse` crate it wraps is optional
+# (its `hidapi` dependency needs libudev on Linux, which isn't guaranteed to
+# be present - see rust-core/CMakeLists.txt).
+spacemouse-hid = ["dep:spacemouse"]
+
 [build-dependencies]
 cbindgen = { version = "0.27", optional = true }
 
@@ -17,6 +26,12 @@ cbindgen = { version = "0.27", optional = true }
 interactive-html-bom = "0.2.0"
 libm = "0.2.16"
 lz-str = "0.2.1"  # Keep in sync with interactive-html-bom
+
+# Cross-platform SpaceMouse HID capture. TEMPORARY: path dependency during
+# the FFI-extraction migration (see librepcb_spacemouse_crate_extraction_plan
+# project doc). Will become a `git` dependency once the crate has its own
+# LibrePCB-org repository, then a plain crates.io version once published.
+spacemouse = { package = "librepcb-rust-spacemouse", path = "../rust-spacemouse", optional = true }
 
 [dependencies.regex]
 version = "1.11"

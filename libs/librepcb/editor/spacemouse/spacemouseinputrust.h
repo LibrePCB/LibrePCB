@@ -40,9 +40,7 @@
 namespace librepcb {
 
 namespace rs {
-namespace spacemouse {
 struct FfiSpaceMouseBackend;
-}  // namespace spacemouse
 }  // namespace rs
 
 namespace editor {
@@ -53,8 +51,9 @@ namespace editor {
 
 /**
  * @brief Cross-platform (Windows/macOS/Linux) backend for
- *        ::IF_SpaceMouseInputBackend, backed by the `librepcb-rust-
- *        spacemouse` Rust crate (`hidapi`-based raw HID capture)
+ *        ::IF_SpaceMouseInputBackend, backed by the `spacemouse` Rust
+ *        crate (`hidapi`-based raw HID capture), via FFI glue that lives
+ *        in `librepcb-rust-core`
  *
  * Reads raw HID reports directly via `hidapi`, running on a background 
  * thread owned by the Rust side (see the crate's `hid.rs`). This class' 
@@ -94,7 +93,7 @@ public:
   SpaceMouseInputRust& operator=(const SpaceMouseInputRust& rhs) = delete;
 
 private:  // Data
-  RustHandle<rs::spacemouse::FfiSpaceMouseBackend> mHandle;
+  RustHandle<rs::FfiSpaceMouseBackend> mHandle;
 
   // Mirrors the Rust side's connection state so ::isDeviceConnected() can
   // be answered synchronously from any thread without waiting for the
