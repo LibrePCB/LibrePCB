@@ -1095,13 +1095,13 @@ void BoardEditorState_DrawTrace::updateClearanceCircleRadius() noexcept {
   Length radius(0);
   if (mShowClearanceCircle && mCurrentNetClass &&
       (mSubState == SubState_PositioningNetPoint)) {
-	  
+
     // The clearance circle radius is calculated from the applicable copper
-	// clearance plus half of the current trace width. The applicable 
-	// clearance is the larger of the net class' own clearance and the
-	// board's global DRC minimum copper clearance, mirroring how 
-	// BoardDesignRuleCheckData::getMinCopperCopperClearance() combines the
-	// two for the real DRC check.
+    // clearance plus half of the current trace width. The applicable 
+    // clearance is the larger of the net class' own clearance and the
+    // board's global DRC minimum copper clearance, mirroring how 
+    // BoardDesignRuleCheckData::getMinCopperCopperClearance() combines the
+    // two for the real DRC check.
     const UnsignedLength minClearance =
         std::max(mContext.board.getDrcSettings().getMinCopperCopperClearance(),
                   mCurrentNetClass->getMinCopperCopperClearance());
