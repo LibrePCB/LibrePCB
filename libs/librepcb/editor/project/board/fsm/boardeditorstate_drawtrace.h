@@ -102,9 +102,7 @@ public:
   void setLayer(const Layer& layer) noexcept;
   bool getAutoWidth() const noexcept { return mCurrentAutoWidth; }
   void setAutoWidth(bool autoWidth) noexcept;
-  bool getShowClearanceCircle() const noexcept {
-    return mShowClearanceCircle;
-  }
+  bool getShowClearanceCircle() const noexcept { return mShowClearanceCircle; }
   void setShowClearanceCircle(bool show) noexcept;
   const PositiveLength& getWidth() const noexcept { return mCurrentWidth; }
   void setWidth(const PositiveLength& width) noexcept;
@@ -236,7 +234,7 @@ private:
    * clearance known, actively positioning a trace) as well as calculating the
    * circle's size.  A radius of 0 tells the scene to not draw a clearance
    * circle at all, so this doubles as the circle's enable. This function is
-   * called from #updateNetpointPositions(),  #setWidth() and
+   * called from #updateNetpointPositions(), #setWidth() and
    * #updateNetClass().
    */
   void updateClearanceCircleRadius() noexcept;
