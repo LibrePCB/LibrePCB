@@ -27,6 +27,7 @@
 
 #include <librepcb/core/geometry/via.h>
 #include <librepcb/core/project/circuit/netclass.h>
+#include <librepcb/core/types/length.h>
 
 #include <QtCore>
 
@@ -101,6 +102,10 @@ public:
   void setLayer(const Layer& layer) noexcept;
   bool getAutoWidth() const noexcept { return mCurrentAutoWidth; }
   void setAutoWidth(bool autoWidth) noexcept;
+  bool getShowClearanceCircle() const noexcept {
+    return mShowClearanceCircle;
+  }
+  void setShowClearanceCircle(bool show) noexcept;
   const PositiveLength& getWidth() const noexcept { return mCurrentWidth; }
   void setWidth(const PositiveLength& width) noexcept;
   void saveWidthInBoard() noexcept;
@@ -128,6 +133,7 @@ signals:
   void wireModeChanged(WireMode mode);
   void layerChanged(const Layer& layer);
   void autoWidthChanged(bool autoWidth);
+  void showClearanceCircleChanged(bool show);
   void widthChanged(const PositiveLength& width);
   void viaDrillDiameterChanged(bool autoSize, const PositiveLength& diameter);
   void viaSizeChanged(bool autoSize, const PositiveLength& size);
@@ -223,6 +229,19 @@ private:
                            WireMode mode) const noexcept;
 
   /**
+   * @brief Recompute the clearance circle radius and push it to the
+   *        scene cursor overlay
+   *
+   * Evaluate whether the clearance circle should be visible (toggle enabled,
+   * clearance known, actively positioning a trace) as well as calculating the
+   * circle's size.  A radius of 0 tells the scene to not draw a clearance
+   * circle at all, so this doubles as the circle's enable. This function is
+   * called from #updateNetpointPositions(),  #setWidth() and
+   * #updateNetClass().
+   */
+  void updateClearanceCircleRadius() noexcept;
+
+  /**
    * @brief Update #mCurrentNetClass and emit #netClassChanged
    */
   void updateNetClass() noexcept;
@@ -243,6 +262,8 @@ private:
   Point mCursorPos;  ///< the current cursor position
   PositiveLength mCurrentWidth;  ///< the current wire width
   bool mCurrentAutoWidth;  ///< automatically adjust wire width
+  bool mShowClearanceCircle;  ///< show clearance circle at cursor while
+                              ///< drawing
   bool mCurrentSnapActive;  ///< the current active snap to target
   BI_NetLineAnchor* mFixedStartAnchor;  ///< the fixed netline anchor (start
                                         ///< point of the line)

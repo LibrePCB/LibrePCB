@@ -158,6 +158,8 @@ public:
       const std::optional<std::pair<Point, Point>>& pos) noexcept override;
   void fsmSetSceneCursor(const Point& pos, bool cross,
                          bool circle) noexcept override;
+  void fsmSetSceneCursorClearanceRadius(
+      const Length& radius) noexcept override;
   QPainterPath fsmCalcPosWithTolerance(
       const Point& pos, qreal multiplier) const noexcept override;
   Point fsmMapGlobalPosToScenePos(const QPoint& pos) const noexcept override;
@@ -195,6 +197,7 @@ signals:
   void layerRequested(const Layer& layer);
   void angleRequested(const Angle& angle);
   void filledRequested(bool filled);
+  void clearanceCircleRequested(bool show);
   void mirroredRequested(bool mirrored);
   void valueRequested(const QString& value);
   void componentSideRequested(Pad::ComponentSide side);
@@ -292,6 +295,7 @@ private:
   LengthEditContext mToolDrill;
   Angle mToolAngle;
   bool mToolFilled;  // Also used for auto width
+  bool mToolShowClearanceCircle;
   bool mToolMirrored;  // Also used for auto via size
   QString mToolValue;
   std::shared_ptr<slint::VectorModel<slint::SharedString>>
