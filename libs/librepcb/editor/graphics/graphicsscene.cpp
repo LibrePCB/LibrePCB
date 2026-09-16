@@ -412,9 +412,9 @@ void GraphicsScene::drawForeground(QPainter* painter,
   }
 
   // If enabled, draw a cursor at a specific position. This may consist of
-  // a crosshair, a "snapped to item" indicator (small circle), and/or a 
+  // a crosshair, a "snapped to item" indicator (small circle), and/or a
   // clearance circle (e.g. while routing a trace). The clearance circle
-  //  uses its radius to indicate whether or not it should be drawn.
+  // uses its radius to indicate whether or not it should be drawn.
   if (mSceneCursorCross || mSceneCursorCircle ||
       (mSceneCursorClearanceRadius > 0)) {
     const qreal scaleFactor =
