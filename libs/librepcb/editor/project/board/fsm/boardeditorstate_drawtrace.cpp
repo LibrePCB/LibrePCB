@@ -41,6 +41,7 @@
 #include <librepcb/core/library/pkg/footprintpad.h>
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/boarddesignrules.h>
+#include <librepcb/core/project/board/drc/boarddesignrulechecksettings.h>
 #include <librepcb/core/project/board/items/bi_netline.h>
 #include <librepcb/core/project/board/items/bi_netpoint.h>
 #include <librepcb/core/project/board/items/bi_netsegment.h>
@@ -85,6 +86,7 @@ BoardEditorState_DrawTrace::BoardEditorState_DrawTrace(
     mCursorPos(),
     mCurrentWidth(mContext.board.getDesignRules().getDefaultTraceWidth()),
     mCurrentAutoWidth(false),
+    mShowClearanceCircle(false),
     mCurrentSnapActive(true),
     mFixedStartAnchor(nullptr),
     mCurrentNetSegment(nullptr),
@@ -96,6 +98,8 @@ BoardEditorState_DrawTrace::BoardEditorState_DrawTrace(
   QSettings cs;
   mCurrentAutoWidth =
       cs.value("board_editor/draw_trace/width/auto", true).toBool();
+  mShowClearanceCircle =
+      cs.value("board_editor/draw_trace/clearance_circle", false).toBool();
 }
 
 BoardEditorState_DrawTrace::~BoardEditorState_DrawTrace() noexcept {
@@ -294,11 +298,27 @@ void BoardEditorState_DrawTrace::setAutoWidth(bool autoWidth) noexcept {
   }
 }
 
+void BoardEditorState_DrawTrace::setShowClearanceCircle(bool show) noexcept {
+  if (show != mShowClearanceCircle) {
+    mShowClearanceCircle = show;
+    emit showClearanceCircleChanged(mShowClearanceCircle);
+
+    // Save client settings.
+    QSettings cs;
+    cs.setValue("board_editor/draw_trace/clearance_circle", show);
+  }
+
+  if (mSubState == SubState_PositioningNetPoint) {
+    updateNetpointPositions();
+  }
+}
+
 void BoardEditorState_DrawTrace::setWidth(
     const PositiveLength& width) noexcept {
   if (width != mCurrentWidth) {
     mCurrentWidth = width;
     emit widthChanged(mCurrentWidth);
+    updateClearanceCircleRadius();
   }
 
   if (mSubState != SubState::SubState_PositioningNetPoint) return;
@@ -950,6 +970,13 @@ void BoardEditorState_DrawTrace::updateNetpointPositions() noexcept {
   mPositioningNetLine1->setWidth(mCurrentWidth);
   mPositioningNetLine2->setWidth(mCurrentWidth);
 
+  // Keep the shared cursor position updated so the clearance circle (if
+  // shown) follows the cursor. This tool doesn't use the crosshair/snap
+  // indicators, so both stay off. Also refresh the radius so that its
+  // size stays in sync with the current net's properties.
+  mAdapter.fsmSetSceneCursor(mTargetPos, false, false);
+  updateClearanceCircleRadius();
+
   // Force updating airwires immediately as they are important for creating
   // traces.
   scene->getBoard().triggerAirWiresRebuild();
@@ -1061,6 +1088,28 @@ Point BoardEditorState_DrawTrace::calcMiddlePointPos(
   }
 }
 
+void BoardEditorState_DrawTrace::updateClearanceCircleRadius() noexcept {
+  // A radius of 0 means "don't draw a clearance circle" (see
+  // GraphicsScene::drawForeground()), so this also gates on whether the
+  // circle should currently be visible at all.
+  Length radius(0);
+  if (mShowClearanceCircle && mCurrentNetClass &&
+      (mSubState == SubState_PositioningNetPoint)) {
+	  
+    // The clearance circle radius is calculated from the applicable copper
+	// clearance plus half of the current trace width. The applicable 
+	// clearance is the larger of the net class' own clearance and the
+	// board's global DRC minimum copper clearance, mirroring how 
+	// BoardDesignRuleCheckData::getMinCopperCopperClearance() combines the
+	// two for the real DRC check.
+    const UnsignedLength minClearance =
+        std::max(mContext.board.getDrcSettings().getMinCopperCopperClearance(),
+                  mCurrentNetClass->getMinCopperCopperClearance());
+    radius = minClearance + (mCurrentWidth / 2);
+  }
+  mAdapter.fsmSetSceneCursorClearanceRadius(radius);
+}
+
 void BoardEditorState_DrawTrace::updateNetClass() noexcept {
   NetClass* nc = nullptr;
   if (mCurrentNetSegment) {
@@ -1074,6 +1123,7 @@ void BoardEditorState_DrawTrace::updateNetClass() noexcept {
     mCurrentNetClass = nc;
     emit netClassChanged(mCurrentNetClass);
   }
+  updateClearanceCircleRadius();
 
   const PositiveLength newDrill = getViaDrillDiameter();
   if (newDrill != oldDrill) {

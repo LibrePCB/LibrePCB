@@ -179,6 +179,7 @@ Board2dTab::Board2dTab(GuiApplication& app, BoardEditor& editor,
     mToolSize(app.getWorkspace().getSettings()),
     mToolDrill(app.getWorkspace().getSettings()),
     mToolFilled(false),
+    mToolShowClearanceCircle(false),
     mToolMirrored(false),
     mToolValueSuggestions(
         std::make_shared<slint::VectorModel<slint::SharedString>>()),
@@ -423,6 +424,7 @@ ui::Board2dTabData Board2dTab::getDerivedUiData() const noexcept {
           false,  // Decrease
       },
       mToolFilled,  // Tool filled
+      mToolShowClearanceCircle,  // Tool show clearance circle
       mToolMirrored,  // Tool mirrored
       ui::LineEditData{
           // Tool value
@@ -555,6 +557,9 @@ void Board2dTab::setDerivedUiData(const ui::Board2dTabData& data) noexcept {
 
   // Tool filled / auto-width
   emit filledRequested(data.tool_filled);
+
+  // Tool show clearance circle
+  emit clearanceCircleRequested(data.tool_show_clearance_circle);
 
   // Tool mirrored / auto-size
   emit mirroredRequested(data.tool_mirrored);
@@ -1213,6 +1218,13 @@ void Board2dTab::fsmSetSceneCursor(const Point& pos, bool cross,
   }
 }
 
+void Board2dTab::fsmSetSceneCursorClearanceRadius(
+    const Length& radius) noexcept {
+  if (mScene) {
+    mScene->setSceneCursorClearanceRadius(radius);
+  }
+}
+
 QPainterPath Board2dTab::fsmCalcPosWithTolerance(
     const Point& pos, qreal multiplier) const noexcept {
   return mView->calcPosWithTolerance(pos, multiplier);
@@ -1325,6 +1337,19 @@ void Board2dTab::fsmToolEnter(BoardEditorState_DrawTrace& state) noexcept {
   mFsmStateConnections.append(
       connect(this, &Board2dTab::filledRequested, &state,
               &BoardEditorState_DrawTrace::setAutoWidth));
+
+  // Show clearance circle
+  auto setShowClearanceCircle = [this](bool show) {
+    mToolShowClearanceCircle = show;
+    onDerivedUiDataChanged.notify();
+  };
+  setShowClearanceCircle(state.getShowClearanceCircle());
+  mFsmStateConnections.append(connect(
+      &state, &BoardEditorState_DrawTrace::showClearanceCircleChanged, this,
+      setShowClearanceCircle));
+  mFsmStateConnections.append(
+      connect(this, &Board2dTab::clearanceCircleRequested, &state,
+              &BoardEditorState_DrawTrace::setShowClearanceCircle));
 
   // Layers
   mToolLayersQt = Layer::sorted(state.getAvailableLayers());
