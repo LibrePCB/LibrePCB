@@ -56,6 +56,7 @@ GraphicsScene::GraphicsScene(QObject* parent) noexcept
     mSceneCursorPos(),
     mSceneCursorCross(false),
     mSceneCursorCircle(false),
+    mSceneCursorClearanceRadius(0),
     mRulerGauges({
         {1, LengthUnit::millimeters(), " ", Length(100), Length(0)},
         {-1, LengthUnit::inches(), "", Length(254), Length(0)},
@@ -124,6 +125,14 @@ void GraphicsScene::setSceneCursor(const Point& pos, bool cross,
   mSceneCursorCross = cross;
   mSceneCursorCircle = circle;
   setForegroundBrush(foregroundBrush());  // this will repaint the foreground
+}
+
+void GraphicsScene::setSceneCursorClearanceRadius(
+    const Length& radius) noexcept {
+  if (radius != mSceneCursorClearanceRadius) {
+    mSceneCursorClearanceRadius = radius;
+    setForegroundBrush(foregroundBrush());  // this will repaint the foreground
+  }
 }
 
 /*******************************************************************************
@@ -402,8 +411,12 @@ void GraphicsScene::drawForeground(QPainter* painter,
     painter->restore();
   }
 
-  // If enabled, draw a cursor at a specific position.
-  if (mSceneCursorCross || mSceneCursorCircle) {
+  // If enabled, draw a cursor at a specific position. This may consist of
+  // a crosshair, a "snapped to item" indicator (small circle), and/or a 
+  // clearance circle (e.g. while routing a trace). The clearance circle
+  //  uses its radius to indicate whether or not it should be drawn.
+  if (mSceneCursorCross || mSceneCursorCircle ||
+      (mSceneCursorClearanceRadius > 0)) {
     const qreal scaleFactor =
         QStyleOptionGraphicsItem::levelOfDetailFromTransform(
             painter->worldTransform());
@@ -420,6 +433,16 @@ void GraphicsScene::drawForeground(QPainter* painter,
       painter->setPen(QPen(Qt::green, 2 / scaleFactor));
       painter->setBrush(Qt::NoBrush);
       painter->drawEllipse(pos, r / 2, r / 2);
+    }
+
+    if (mSceneCursorClearanceRadius > 0) {
+      // Unlike the indicators above, the clearance circle uses board-unit
+      // distance, so it scales with zoom just like any other board geometry.
+      // Its stroke width, however, is kept at a constant on-screen thickness.
+      painter->setPen(QPen(mOverlayContentColor, 1 / scaleFactor));
+      painter->setBrush(Qt::NoBrush);
+      const qreal clearanceRadiusPx = mSceneCursorClearanceRadius.toPx();
+      painter->drawEllipse(pos, clearanceRadiusPx, clearanceRadiusPx);
     }
   }
 }
