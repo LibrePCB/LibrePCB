@@ -17,6 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// Note: This file was modified with the assistance of Claude AI.
+// Modifications were reviewed by Avetos Design on 2026-09-19
+
 #ifndef LIBREPCB_EDITOR_CMDDRAGSELECTEDBOARDITEMS_H
 #define LIBREPCB_EDITOR_CMDDRAGSELECTEDBOARDITEMS_H
 
@@ -93,6 +96,9 @@ public:
 
 private:
   // Private Methods
+
+  /// Delete all unexecuted edit commands (reverting their changes)
+  void deleteAllCommands() noexcept;
 
   /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
   bool performExecute() override;

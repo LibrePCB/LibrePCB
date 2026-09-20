@@ -17,6 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// Note: This file was modified with the assistance of Claude AI.
+// All modifications were reviewed by Avetos Design on 2026-09-19.
+
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
@@ -321,6 +324,14 @@ bool SchematicEditorState_Select::processAbortCommand() noexcept {
       case SubState::PASTING: {
         Q_ASSERT(mSelectedItemsDragCommand);
         mContext.undoStack.abortCmdGroup();
+        mSelectedItemsDragCommand.reset();
+        mSubState = SubState::IDLE;
+        return true;
+      }
+      case SubState::MOVING: {
+        // Discard the drag command, which reverts all items to their original
+        // positions.
+        Q_ASSERT(mSelectedItemsDragCommand);
         mSelectedItemsDragCommand.reset();
         mSubState = SubState::IDLE;
         return true;
