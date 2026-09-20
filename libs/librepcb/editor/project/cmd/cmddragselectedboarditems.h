@@ -94,6 +94,9 @@ public:
 private:
   // Private Methods
 
+  /// Delete all unexecuted edit commands (reverting their changes)
+  void deleteAllCommands() noexcept;
+
   /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
   bool performExecute() override;
 

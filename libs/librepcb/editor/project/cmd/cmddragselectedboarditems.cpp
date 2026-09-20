@@ -190,6 +190,7 @@ CmdDragSelectedBoardItems::CmdDragSelectedBoardItems(
 }
 
 CmdDragSelectedBoardItems::~CmdDragSelectedBoardItems() noexcept {
+  deleteAllCommands();
 }
 
 /*******************************************************************************
@@ -254,10 +255,6 @@ void CmdDragSelectedBoardItems::snapToGrid() noexcept {
     cmd->snapToGrid(grid, true);
   }
   mSnappedToGrid = true;
-
-  // Force updating airwires immediately as they are important while moving
-  // items.
-  mScene.getBoard().triggerAirWiresRebuild();
 }
 
 void CmdDragSelectedBoardItems::setLocked(bool locked) noexcept {
@@ -342,10 +339,6 @@ void CmdDragSelectedBoardItems::setCurrentPosition(
       cmd->translate(delta - mDeltaPos, true);
     }
     mDeltaPos = delta;
-
-    // Force updating airwires immediately as they are important while moving
-    // items.
-    mScene.getBoard().triggerAirWiresRebuild();
   }
 }
 
@@ -385,10 +378,6 @@ void CmdDragSelectedBoardItems::rotate(const Angle& angle,
     cmd->rotate(angle, center, true);
   }
   mDeltaAngle += angle;
-
-  // Force updating airwires immediately as they are important while dragging
-  // items.
-  mScene.getBoard().triggerAirWiresRebuild();
 }
 
 /*******************************************************************************
@@ -400,28 +389,7 @@ bool CmdDragSelectedBoardItems::performExecute() {
       (!mSnappedToGrid) && (!mTextsReset) && (!mLockedChanged) &&
       (!mLineWidthChanged)) {
     // no movement required --> discard all commands
-    qDeleteAll(mDeviceEditCmds);
-    mDeviceEditCmds.clear();
-    qDeleteAll(mDeviceStrokeTextsResetCmds);
-    mDeviceStrokeTextsResetCmds.clear();
-    qDeleteAll(mPadEditCmds);
-    mPadEditCmds.clear();
-    qDeleteAll(mViaEditCmds);
-    mViaEditCmds.clear();
-    qDeleteAll(mNetPointEditCmds);
-    mNetPointEditCmds.clear();
-    qDeleteAll(mNetLineEditCmds);
-    mNetLineEditCmds.clear();
-    qDeleteAll(mPlaneEditCmds);
-    mPlaneEditCmds.clear();
-    qDeleteAll(mZoneEditCmds);
-    mZoneEditCmds.clear();
-    qDeleteAll(mPolygonEditCmds);
-    mPolygonEditCmds.clear();
-    qDeleteAll(mStrokeTextEditCmds);
-    mStrokeTextEditCmds.clear();
-    qDeleteAll(mHoleEditCmds);
-    mHoleEditCmds.clear();
+    deleteAllCommands();
     return false;
   }
 
@@ -430,42 +398,73 @@ bool CmdDragSelectedBoardItems::performExecute() {
     mDeviceStrokeTextsResetCmds.clear();
   }
 
-  foreach (CmdDeviceInstanceEdit* cmd, mDeviceEditCmds) {
-    appendChild(cmd);  // can throw
+  // Ownership of the undo commands must be handled by the base class,
+  // otherwise there would be a double-free (crash!) in the destructor.
+  while (!mDeviceEditCmds.isEmpty()) {
+    appendChild(mDeviceEditCmds.takeLast());  // can throw
   }
-  foreach (CmdDeviceStrokeTextsReset* cmd, mDeviceStrokeTextsResetCmds) {
-    appendChild(cmd);  // can throw
+  while (!mDeviceStrokeTextsResetCmds.isEmpty()) {
+    appendChild(mDeviceStrokeTextsResetCmds.takeLast());  // can throw
   }
-  foreach (CmdBoardPadEdit* cmd, mPadEditCmds) {
-    appendChild(cmd);  // can throw
+  while (!mPadEditCmds.isEmpty()) {
+    appendChild(mPadEditCmds.takeLast());  // can throw
   }
-  foreach (CmdBoardViaEdit* cmd, mViaEditCmds) {
-    appendChild(cmd);  // can throw
+  while (!mViaEditCmds.isEmpty()) {
+    appendChild(mViaEditCmds.takeLast());  // can throw
   }
-  foreach (CmdBoardNetPointEdit* cmd, mNetPointEditCmds) {
-    appendChild(cmd);  // can throw
+  while (!mNetPointEditCmds.isEmpty()) {
+    appendChild(mNetPointEditCmds.takeLast());  // can throw
   }
-  foreach (CmdBoardNetLineEdit* cmd, mNetLineEditCmds) {
-    appendChild(cmd);  // can throw
+  while (!mNetLineEditCmds.isEmpty()) {
+    appendChild(mNetLineEditCmds.takeLast());  // can throw
   }
-  foreach (CmdBoardPlaneEdit* cmd, mPlaneEditCmds) {
-    appendChild(cmd);  // can throw
+  while (!mPlaneEditCmds.isEmpty()) {
+    appendChild(mPlaneEditCmds.takeLast());  // can throw
   }
-  foreach (CmdBoardZoneEdit* cmd, mZoneEditCmds) {
-    appendChild(cmd);  // can throw
+  while (!mZoneEditCmds.isEmpty()) {
+    appendChild(mZoneEditCmds.takeLast());  // can throw
   }
-  foreach (CmdBoardPolygonEdit* cmd, mPolygonEditCmds) {
-    appendChild(cmd);  // can throw
+  while (!mPolygonEditCmds.isEmpty()) {
+    appendChild(mPolygonEditCmds.takeLast());  // can throw
   }
-  foreach (CmdBoardStrokeTextEdit* cmd, mStrokeTextEditCmds) {
-    appendChild(cmd);  // can throw
+  while (!mStrokeTextEditCmds.isEmpty()) {
+    appendChild(mStrokeTextEditCmds.takeLast());  // can throw
   }
-  foreach (CmdBoardHoleEdit* cmd, mHoleEditCmds) {
-    appendChild(cmd);  // can throw
+  while (!mHoleEditCmds.isEmpty()) {
+    appendChild(mHoleEditCmds.takeLast());  // can throw
   }
 
   // execute all child commands
   return UndoCommandGroup::performExecute();  // can throw
+}
+
+/*******************************************************************************
+ *  Private Methods
+ ******************************************************************************/
+
+void CmdDragSelectedBoardItems::deleteAllCommands() noexcept {
+  qDeleteAll(mDeviceEditCmds);
+  mDeviceEditCmds.clear();
+  qDeleteAll(mDeviceStrokeTextsResetCmds);
+  mDeviceStrokeTextsResetCmds.clear();
+  qDeleteAll(mPadEditCmds);
+  mPadEditCmds.clear();
+  qDeleteAll(mViaEditCmds);
+  mViaEditCmds.clear();
+  qDeleteAll(mNetPointEditCmds);
+  mNetPointEditCmds.clear();
+  qDeleteAll(mNetLineEditCmds);
+  mNetLineEditCmds.clear();
+  qDeleteAll(mPlaneEditCmds);
+  mPlaneEditCmds.clear();
+  qDeleteAll(mZoneEditCmds);
+  mZoneEditCmds.clear();
+  qDeleteAll(mPolygonEditCmds);
+  mPolygonEditCmds.clear();
+  qDeleteAll(mStrokeTextEditCmds);
+  mStrokeTextEditCmds.clear();
+  qDeleteAll(mHoleEditCmds);
+  mHoleEditCmds.clear();
 }
 
 /*******************************************************************************

@@ -181,6 +181,7 @@ CmdDragSelectedSchematicItems::CmdDragSelectedSchematicItems(
 }
 
 CmdDragSelectedSchematicItems::~CmdDragSelectedSchematicItems() noexcept {
+  deleteAllCommands();
 }
 
 /*******************************************************************************
@@ -331,24 +332,7 @@ bool CmdDragSelectedSchematicItems::performExecute() {
   if (mDeltaPos.isOrigin() && (mDeltaAngle == Angle::deg0()) &&
       (!mSnappedToGrid) && (!mMirrored) && (!mTextsReset)) {
     // no movement required --> discard all move commands
-    qDeleteAll(mSymbolEditCmds);
-    mSymbolEditCmds.clear();
-    qDeleteAll(mSymbolTextsResetCmds);
-    mSymbolTextsResetCmds.clear();
-    qDeleteAll(mBusJunctionEditCmds);
-    mBusJunctionEditCmds.clear();
-    qDeleteAll(mBusLabelEditCmds);
-    mBusLabelEditCmds.clear();
-    qDeleteAll(mNetPointEditCmds);
-    mNetPointEditCmds.clear();
-    qDeleteAll(mNetLabelEditCmds);
-    mNetLabelEditCmds.clear();
-    qDeleteAll(mPolygonEditCmds);
-    mPolygonEditCmds.clear();
-    qDeleteAll(mTextEditCmds);
-    mTextEditCmds.clear();
-    qDeleteAll(mImageEditCmds);
-    mImageEditCmds.clear();
+    deleteAllCommands();
     return false;
   }
 
@@ -357,39 +341,67 @@ bool CmdDragSelectedSchematicItems::performExecute() {
     mSymbolTextsResetCmds.clear();
   }
 
-  foreach (CmdSymbolInstanceEdit* cmd, mSymbolEditCmds) {
-    appendChild(cmd);  // can throw
+  // Ownership of the undo commands must be handled by the base class,
+  // otherwise there would be a double-free (crash!) in the destructor.
+  while (!mSymbolEditCmds.isEmpty()) {
+    appendChild(mSymbolEditCmds.takeLast());  // can throw
   }
-  foreach (CmdSymbolInstanceTextsReset* cmd, mSymbolTextsResetCmds) {
-    appendChild(cmd);  // can throw
+  while (!mSymbolTextsResetCmds.isEmpty()) {
+    appendChild(mSymbolTextsResetCmds.takeLast());  // can throw
   }
-  foreach (CmdSchematicBusJunctionEdit* cmd, mBusJunctionEditCmds) {
-    appendChild(cmd);  // can throw
+  while (!mBusJunctionEditCmds.isEmpty()) {
+    appendChild(mBusJunctionEditCmds.takeLast());  // can throw
   }
-  foreach (CmdSchematicBusLabelEdit* cmd, mBusLabelEditCmds) {
-    appendChild(cmd);  // can throw
+  while (!mBusLabelEditCmds.isEmpty()) {
+    appendChild(mBusLabelEditCmds.takeLast());  // can throw
   }
-  foreach (CmdSchematicNetPointEdit* cmd, mNetPointEditCmds) {
-    appendChild(cmd);  // can throw
+  while (!mNetPointEditCmds.isEmpty()) {
+    appendChild(mNetPointEditCmds.takeLast());  // can throw
   }
-  foreach (CmdSchematicNetLabelEdit* cmd, mNetLabelEditCmds) {
-    appendChild(cmd);  // can throw
+  while (!mNetLabelEditCmds.isEmpty()) {
+    appendChild(mNetLabelEditCmds.takeLast());  // can throw
   }
-  foreach (CmdPolygonEdit* cmd, mPolygonEditCmds) {
-    appendChild(cmd);  // can throw
+  while (!mPolygonEditCmds.isEmpty()) {
+    appendChild(mPolygonEditCmds.takeLast());  // can throw
   }
-  foreach (CmdTextEdit* cmd, mTextEditCmds) {
-    appendChild(cmd);  // can throw
+  while (!mTextEditCmds.isEmpty()) {
+    appendChild(mTextEditCmds.takeLast());  // can throw
   }
-  foreach (CmdImageEdit* cmd, mImageEditCmds) {
-    appendChild(cmd);  // can throw
+  while (!mImageEditCmds.isEmpty()) {
+    appendChild(mImageEditCmds.takeLast());  // can throw
   }
-  // execute all child commands
+
+  // Execute all child commands
   return UndoCommandGroup::performExecute();  // can throw
 }
 
 void CmdDragSelectedSchematicItems::performPostExecution() noexcept {
   mSchematic.updateAllLabelAnchors();
+}
+
+/*******************************************************************************
+ *  Private Methods
+ ******************************************************************************/
+
+void CmdDragSelectedSchematicItems::deleteAllCommands() noexcept {
+  qDeleteAll(mSymbolEditCmds);
+  mSymbolEditCmds.clear();
+  qDeleteAll(mSymbolTextsResetCmds);
+  mSymbolTextsResetCmds.clear();
+  qDeleteAll(mBusJunctionEditCmds);
+  mBusJunctionEditCmds.clear();
+  qDeleteAll(mBusLabelEditCmds);
+  mBusLabelEditCmds.clear();
+  qDeleteAll(mNetPointEditCmds);
+  mNetPointEditCmds.clear();
+  qDeleteAll(mNetLabelEditCmds);
+  mNetLabelEditCmds.clear();
+  qDeleteAll(mPolygonEditCmds);
+  mPolygonEditCmds.clear();
+  qDeleteAll(mTextEditCmds);
+  mTextEditCmds.clear();
+  qDeleteAll(mImageEditCmds);
+  mImageEditCmds.clear();
 }
 
 /*******************************************************************************
