@@ -17,6 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// AI DISCLAIMER: Claude AI assisted in the modification of this file.
+
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
@@ -238,70 +240,6 @@ void SchematicGraphicsScene::selectAll() noexcept {
   }
 }
 
-void SchematicGraphicsScene::selectItemsInRect(const Point& p1,
-                                               const Point& p2) noexcept {
-  GraphicsScene::setSelectionRect(p1, p2);
-  const QRectF rectPx = QRectF(p1.toPxQPointF(), p2.toPxQPointF()).normalized();
-  foreach (auto item, mSymbols) {
-    bool selectSymbol = item->mapToScene(item->shape()).intersects(rectPx);
-    // Locked symbol texts shall act as an extended grab area for the symbol.
-    if ((!selectSymbol) && (!mContext->ignorePlacementLocks)) {
-      for (SI_Text* text : item->getSymbol().getTexts()) {
-        if (text->getTextObj().isLocked()) {
-          if (auto textItem = mTexts.value(text)) {
-            if (textItem->mapToScene(textItem->shape()).intersects(rectPx)) {
-              selectSymbol = true;
-              break;
-            }
-          }
-        }
-      }
-    }
-    item->setSelected(selectSymbol);
-  }
-  foreach (auto item, mSymbolPins) {
-    bool symbolSelected = false;
-    if (auto symbol = item->getSymbolGraphicsItem().lock()) {
-      symbolSelected = symbol->isSelected();
-    }
-    item->setSelected(symbolSelected ||
-                      item->mapToScene(item->shape()).intersects(rectPx));
-  }
-  foreach (auto item, mBusJunctions) {
-    item->setSelected(item->mapToScene(item->shape()).intersects(rectPx));
-  }
-  foreach (auto item, mBusLines) {
-    item->setSelected(item->mapToScene(item->shape()).intersects(rectPx));
-  }
-  foreach (auto item, mBusLabels) {
-    item->setSelected(item->mapToScene(item->shape()).intersects(rectPx));
-  }
-  foreach (auto item, mNetPoints) {
-    item->setSelected(item->mapToScene(item->shape()).intersects(rectPx));
-  }
-  foreach (auto item, mNetLines) {
-    item->setSelected(item->mapToScene(item->shape()).intersects(rectPx));
-  }
-  foreach (auto item, mNetLabels) {
-    item->setSelected(item->mapToScene(item->shape()).intersects(rectPx));
-  }
-  foreach (auto item, mPolygons) {
-    item->setSelected(item->mapToScene(item->shape()).intersects(rectPx));
-  }
-  foreach (auto item, mTexts) {
-    auto symbol = item->getSymbolGraphicsItem().lock();
-    if (symbol && symbol->isSelected()) {
-      item->setSelected(true);
-    } else if ((!item->getText().getTextObj().isLocked()) ||
-               mContext->ignorePlacementLocks) {
-      item->setSelected(item->mapToScene(item->shape()).intersects(rectPx));
-    }
-  }
-  foreach (auto item, mImages) {
-    item->setSelected(item->mapToScene(item->shape()).intersects(rectPx));
-  }
-}
-
 void SchematicGraphicsScene::clearSelection() noexcept {
   foreach (auto item, mSymbols) {
     item->setSelected(false);
@@ -335,6 +273,72 @@ void SchematicGraphicsScene::clearSelection() noexcept {
   }
   foreach (auto item, mImages) {
     item->setSelected(false);
+  }
+}
+
+/*******************************************************************************
+ *  Protected Methods
+ ******************************************************************************/
+
+void SchematicGraphicsScene::applyRectSelection(
+    const RectSelection& selection) noexcept {
+  foreach (auto item, mSymbols) {
+    // Pins and field texts of a symbol cannot be selected independently
+    // from their symbol; They are always selected together with it. So the
+    // footprint of a symbol consists of its own visible geometry plus the
+    // visible geometry of all its pins and texts. Only visible items are
+    // included.  Hidden layers, empty texts and invisible padding of the
+    // click shapes are ignored completely.
+    QVector<QPainterPath> footprint{RectSelection::footprintOf(*item)};
+    for (SI_SymbolPin* pin : item->getSymbol().getPins()) {
+      if (auto pinItem = mSymbolPins.value(pin)) {
+        footprint.append(RectSelection::footprintOf(*pinItem));
+      }
+    }
+    for (SI_Text* text : item->getSymbol().getTexts()) {
+      if (auto textItem = mTexts.value(text)) {
+        footprint.append(RectSelection::footprintOf(*textItem));
+      }
+    }
+    item->setSelected(selection.hits(footprint));
+  }
+  foreach (auto item, mSymbolPins) {
+    // Pins are only selected together with their symbol.
+    auto symbol = item->getSymbolGraphicsItem().lock();
+    item->setSelected(symbol && symbol->isSelected());
+  }
+  foreach (auto item, mBusJunctions) {
+    item->setSelected(selection.hits(*item));
+  }
+  foreach (auto item, mBusLines) {
+    item->setSelected(selection.hits(*item));
+  }
+  foreach (auto item, mBusLabels) {
+    item->setSelected(selection.hitsVisible(*item));
+  }
+  foreach (auto item, mNetPoints) {
+    item->setSelected(selection.hits(*item));
+  }
+  foreach (auto item, mNetLines) {
+    item->setSelected(selection.hits(*item));
+  }
+  foreach (auto item, mNetLabels) {
+    item->setSelected(selection.hitsVisible(*item));
+  }
+  foreach (auto item, mPolygons) {
+    item->setSelected(selection.hits(*item));
+  }
+  foreach (auto item, mTexts) {
+    if (auto symbol = item->getSymbolGraphicsItem().lock()) {
+      // Field texts are only selected together with their symbol.
+      item->setSelected(symbol->isSelected());
+    } else if ((!item->getText().getTextObj().isLocked()) ||
+               mContext->ignorePlacementLocks) {
+      item->setSelected(selection.hitsVisible(*item));
+    }
+  }
+  foreach (auto item, mImages) {
+    item->setSelected(selection.hitsVisible(*item));
   }
 }
 
