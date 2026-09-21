@@ -17,6 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// AI DISCLAIMER: Claude AI assisted in the modification of this file.
+
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
@@ -364,7 +366,8 @@ bool SchematicEditorState_Select::processGraphicsSceneMouseMoved(
   switch (mSubState) {
     case SubState::SELECTING: {
       // Update selection rectangle.
-      scene->selectItemsInRect(mStartPos, e.scenePos);
+      scene->selectItemsInRect(mStartPos, e.scenePos,
+                               e.getRectSelectionMode());
       return true;
     }
 
