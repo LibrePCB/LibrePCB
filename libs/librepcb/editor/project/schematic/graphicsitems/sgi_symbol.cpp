@@ -17,6 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// AI DISCLAIMER: Claude AI assisted in the modification of this file.
+
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
@@ -67,8 +69,6 @@ SGI_Symbol::SGI_Symbol(
       layers.get(ColorRole::schematicReferences()));
   // https://github.com/LibrePCB/LibrePCB/issues/1725
   mOriginCrossGraphicsItem->setVisible(isSelected());
-  mShape.addRect(mOriginCrossGraphicsItem->boundingRect());
-
   for (const auto& obj : mSymbol.getLibSymbol().getCircles()) {
     auto i = std::make_shared<CircleGraphicsItem>(const_cast<Circle&>(obj),
                                                   layers, this);
@@ -78,7 +78,7 @@ SGI_Symbol::SGI_Symbol(
       const qreal r = (obj.getDiameter() + obj.getLineWidth())->toPx() / 2;
       QPainterPath path;
       path.addEllipse(obj.getCenter().toPxQPointF(), r, r);
-      mShape |= path;
+      mBodyShape |= path;
     }
     mCircleGraphicsItems.append(i);
   }
@@ -89,9 +89,9 @@ SGI_Symbol::SGI_Symbol(
     i->setFlag(QGraphicsItem::ItemIsSelectable, true);
     i->setFlag(QGraphicsItem::ItemStacksBehindParent, true);
     if (obj.isGrabArea()) {
-      mShape |= Toolbox::shapeFromPath(obj.getPath().toQPainterPathPx(),
-                                       Qt::SolidLine, Qt::SolidPattern,
-                                       obj.getLineWidth());
+      mBodyShape |= Toolbox::shapeFromPath(
+          obj.getPath().toQPainterPathPx(), Qt::SolidLine, Qt::SolidPattern,
+          obj.getLineWidth());
     }
     mPolygonGraphicsItems.append(i);
   }
@@ -102,8 +102,16 @@ SGI_Symbol::SGI_Symbol(
         mSymbol.getLibSymbol().getDirectory(), obj, layers, this);
     i->setFlag(QGraphicsItem::ItemIsSelectable, true);
     i->setFlag(QGraphicsItem::ItemStacksBehindParent, true);
-    mShape |= i->mapToParent(i->shape());
+    mBodyShape |= i->mapToParent(i->getVisibleShape());
     mImageGraphicsItems.append(i);
+  }
+
+  // The clickable shape additionally covers the origin cross area.
+  QPainterPath originPath;
+  originPath.addRect(mOriginCrossGraphicsItem->boundingRect());
+  mShape = mBodyShape | originPath;
+  foreach (const auto& i, mImageGraphicsItems) {
+    mShape |= i->mapToParent(i->shape());  // Includes the image origin cross.
   }
 
   updateContext();
@@ -131,6 +139,19 @@ void SGI_Symbol::updateContext() noexcept {
   // foreach (const auto& i, mImageGraphicsItems) {
   //   i->setState(state); // Not supported yet
   // }
+}
+
+QPainterPath SGI_Symbol::getVisibleShape() const noexcept {
+  QPainterPath path;
+  path.setFillRule(Qt::WindingFill);
+  path.addPath(mBodyShape);
+  for (const auto& i : mCircleGraphicsItems) {
+    path.addPath(i->mapToParent(i->shape()));
+  }
+  for (const auto& i : mPolygonGraphicsItems) {
+    path.addPath(i->mapToParent(i->shape()));
+  }
+  return path;
 }
 
 /*******************************************************************************
