@@ -17,6 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// AI DISCLAIMER: Claude AI assisted in the modification of this file.
+
 #ifndef LIBREPCB_EDITOR_TEXTGRAPHICSITEM_H
 #define LIBREPCB_EDITOR_TEXTGRAPHICSITEM_H
 
@@ -59,6 +61,18 @@ public:
 
   // Getters
   Text& getObj() noexcept { return mText; }
+
+  /**
+   * @brief Get the visible geometry, used for rubber-band selection
+   *
+   * Used during rubber-band selection, "visible geometry" includes the
+   * rendered text glyphs only. Neither the origin cross nor the padding of
+   * the (click) #shape() are included.
+   *
+   * @return Path in item coordinates, empty if the text is not visible (layer
+   *         hidden or disabled, or no content).
+   */
+  QPainterPath getVisibleShape() const noexcept;
 
   // Setters
   void setOriginCrossVisible(bool visible) noexcept;

@@ -17,6 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// AI DISCLAIMER: Claude AI assisted in the modification of this file.
+
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
@@ -74,6 +76,15 @@ TextGraphicsItem::TextGraphicsItem(Text& text, const GraphicsLayerList& layers,
 }
 
 TextGraphicsItem::~TextGraphicsItem() noexcept {
+}
+
+/*******************************************************************************
+ *  Getters
+ ******************************************************************************/
+
+QPainterPath TextGraphicsItem::getVisibleShape() const noexcept {
+  Q_ASSERT(mTextGraphicsItem);
+  return mTextGraphicsItem->mapToParent(mTextGraphicsItem->getVisibleShape());
 }
 
 /*******************************************************************************
