@@ -17,6 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// AI DISCLAIMER: Claude AI assisted in the modification of this file.
+
 #ifndef LIBREPCB_EDITOR_BOARDGRAPHICSSCENE_H
 #define LIBREPCB_EDITOR_BOARDGRAPHICSSCENE_H
 
@@ -183,7 +185,6 @@ public:
   void setFlipped(bool flip) noexcept;
   bool isFlipped() const noexcept { return mContext->flipView; }
   void selectAll() noexcept;
-  void selectItemsInRect(const Point& p1, const Point& p2) noexcept;
   void selectNetSegment(BI_NetSegment& netSegment) noexcept;
   void clearSelection() noexcept;
   static qreal getZValueOfCopperLayer(const Layer& layer, bool flip) noexcept;
@@ -191,6 +192,9 @@ public:
 
   // Operator Overloadings
   BoardGraphicsScene& operator=(const BoardGraphicsScene& rhs) = delete;
+
+protected:  // Methods
+  void applyRectSelection(const RectSelection& selection) noexcept override;
 
 private:  // Methods
   void updateContext() noexcept;

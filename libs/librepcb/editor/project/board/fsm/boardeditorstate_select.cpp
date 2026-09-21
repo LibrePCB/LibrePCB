@@ -17,6 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// AI DISCLAIMER: Claude AI assisted in the modification of this file.
+
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
@@ -574,7 +576,8 @@ bool BoardEditorState_Select::processGraphicsSceneMouseMoved(
     return true;
   } else if (e.buttons.testFlag(Qt::LeftButton)) {
     // Draw selection rectangle
-    scene->selectItemsInRect(e.downPos, e.scenePos);
+    scene->selectItemsInRect(e.downPos, e.scenePos,
+                             e.getRectSelectionMode());
     return true;
   }
 
