@@ -17,6 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// AI DISCLAIMER: Claude AI assisted in the modification of this file.
+
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
@@ -94,6 +96,10 @@ void BGI_StrokeText::updateContext() noexcept {
   mPathGraphicsItem->setState(state);
   mOriginCrossGraphicsItem->setState(state);
   updateLayer();
+}
+
+QPainterPath BGI_StrokeText::getVisibleShape() const noexcept {
+  return mPathGraphicsItem->mapToParent(mPathGraphicsItem->shape());
 }
 
 /*******************************************************************************

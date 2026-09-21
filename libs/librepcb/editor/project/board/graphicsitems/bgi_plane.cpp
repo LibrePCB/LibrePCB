@@ -17,6 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// AI DISCLAIMER: Claude AI assisted in the modification of this file.
+
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
@@ -123,6 +125,10 @@ void BGI_Plane::updateContext() noexcept {
   update();
 }
 
+QPainterPath BGI_Plane::getVisibleShape() const noexcept {
+  return (mLayer && mLayer->isVisible()) ? mShape : QPainterPath();
+}
+
 /*******************************************************************************
  *  Inherited from QGraphicsItem
  ******************************************************************************/
@@ -136,18 +142,14 @@ QVariant BGI_Plane::itemChange(GraphicsItemChange change,
 }
 
 QPainterPath BGI_Plane::shape() const noexcept {
-  if ((!mLayer) || (!mLayer->isVisible())) {
-    return QPainterPath();
-  }
-
   const Length vertexHandleSize = Length::fromPx(mVertexHandleRadiusPx * 2);
-  if ((vertexHandleSize > 0) && (isSelected())) {
+  if (mLayer && mLayer->isVisible() && (vertexHandleSize > 0) &&
+      isSelected()) {
     // Extend shape by vertex handles.
     return Toolbox::shapeFromPath(mOutline, QPen(Length::fromMm(0.3).toPx()),
                                   QBrush(), UnsignedLength(vertexHandleSize));
-  } else {
-    return mShape;
   }
+  return getVisibleShape();
 }
 
 void BGI_Plane::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,

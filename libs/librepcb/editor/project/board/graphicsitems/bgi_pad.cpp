@@ -17,6 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// AI DISCLAIMER: Claude AI assisted in the modification of this file.
+
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
@@ -99,6 +101,10 @@ void BGI_Pad::updateContext() noexcept {
   }
   mGraphicsItem->setState(state);
   mGraphicsItem->setTextMirrored(mContext->flipView);
+}
+
+QPainterPath BGI_Pad::getVisibleShape() const noexcept {
+  return mGraphicsItem->mapToParent(mGraphicsItem->getVisibleShape());
 }
 
 /*******************************************************************************
