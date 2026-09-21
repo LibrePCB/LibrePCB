@@ -17,6 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// AI DISCLAIMER: Claude AI assisted in the modification of this file.
+
 #ifndef LIBREPCB_EDITOR_GRAPHICSSCENE_H
 #define LIBREPCB_EDITOR_GRAPHICSSCENE_H
 
@@ -39,6 +41,109 @@ namespace librepcb {
 namespace editor {
 
 /*******************************************************************************
+ *  Class RectSelection
+ ******************************************************************************/
+
+/**
+ * @brief Parameters of a rubber-band (rectangle) selection
+ *
+ * Decides whether a piece of geometry is selected by a selection rectangle.
+ * There are two modes:
+ *
+ *  - Crossing: Geometry is selected if any part of it touches the rectangle.
+ *  - Window: Geometry is selected only if it is entirely within the rectangle.
+ *
+ * Items are tested with their footprint. This is the visible geometry of an
+ * item (see \c getVisibleShape() of the item classes) or, for items without
+ * such a method, just their shape. Composite items add the footprints of their
+ * parts, e.g. a symbol adds its pins and fields, a device adds its pads. Both
+ * modes use the same footprint.
+ */
+class RectSelection {
+public:
+  enum class Mode {
+    Crossing,  ///< Select items which touch the rectangle.
+    Window,  ///< Select items which are completely enclosed by the rectangle.
+  };
+
+  // Constructors / Destructor
+  RectSelection() = delete;
+  RectSelection(const QRectF& rect, Mode mode) noexcept
+    : mRect(rect), mMode(mode) {}
+
+  // Getters
+  const QRectF& getRect() const noexcept { return mRect; }
+  Mode getMode() const noexcept { return mMode; }
+
+  // General Methods
+
+  /**
+   * @brief Check if a footprint is hit by the selection rectangle
+   *
+   * @param scenePath   The footprint in scene coordinates (in pixels). An
+   *                    empty path (e.g. of an item on a hidden layer) is
+   *                    never hit, in any mode.
+   * @retval true   The footprint is selected by the rectangle.
+   * @retval false  The footprint is not selected by the rectangle.
+   */
+  bool hits(const QPainterPath& scenePath) const noexcept;
+
+  /**
+   * @brief Check if the shape of an item is hit by the selection rectangle
+   *
+   * @param item    The item whose shape() is used as its footprint.
+   * @retval true   The item is selected by the rectangle.
+   * @retval false  The item is not selected by the rectangle.
+   */
+  bool hits(const QGraphicsItem& item) const noexcept;
+
+  /**
+   * @brief Check if a composite footprint is hit by the selection rectangle
+   *
+   * The footprint consists of several parts, e.g. a symbol plus its pins
+   * and fields. In crossing mode it is hit if any part is
+   * touched by the rectangle, in window mode it is hit only if all parts are
+   * entirely inside the rectangle. Empty parts are ignored, and a footprint
+   * without any geometry is never hit.
+   *
+   * @param scenePaths  The parts of the footprint in scene coordinates.
+   * @retval true   The footprint is selected by the rectangle.
+   * @retval false  The footprint is not selected by the rectangle.
+   */
+  bool hits(const QVector<QPainterPath>& scenePaths) const noexcept;
+
+  /**
+   * @brief Get the footprint of an item in scene coordinates
+   *
+   * @tparam T      Item type providing `getVisibleShape()`.
+   * @param item    The item whose visible shape is used as its footprint.
+   * @return The footprint (or one of its parts), to be passed to #hits().
+   */
+  template <typename T>
+  static QPainterPath footprintOf(const T& item) noexcept {
+    return item.mapToScene(item.getVisibleShape());
+  }
+
+  /**
+   * @brief Check if the visible shape of an item is hit by the selection
+   *        rectangle
+   *
+   * @tparam T      Item type providing `getVisibleShape()`.
+   * @param item    The item whose visible shape is used as its footprint.
+   * @retval true   The item is selected by the rectangle.
+   * @retval false  The item is not selected by the rectangle.
+   */
+  template <typename T>
+  bool hitsVisible(const T& item) const noexcept {
+    return hits(footprintOf(item));
+  }
+
+private:
+  QRectF mRect;
+  Mode mMode;
+};
+
+/*******************************************************************************
  *  Event Data Structs
  ******************************************************************************/
 
@@ -47,6 +152,27 @@ struct GraphicsSceneMouseEvent {
   Point downPos;
   Qt::MouseButtons buttons = Qt::MouseButtons();
   Qt::KeyboardModifiers modifiers = Qt::KeyboardModifiers();
+
+  // In order to tell if the mouse is moving left or right, we need to know if
+  // the current view is mirrored or not.
+  bool mirrored = false;  ///< Whether the view is mirrored horizontally.
+
+  /**
+   * @brief Get the rubber-band selection mode of the current mouse drag
+   *
+   * Dragging to the right on the screen (from #downPos to #scenePos) gives a
+   * window selection, dragging to the left (or straight up/down) gives a
+   * crossing selection. The direction is evaluated in screen space, so it
+   * also works for mirrored views.
+   *
+   * @return The selection mode.
+   */
+  RectSelection::Mode getRectSelectionMode() const noexcept {
+    const bool draggedRight = mirrored ? (scenePos.getX() < downPos.getX())
+                                       : (scenePos.getX() >= downPos.getX());
+    return draggedRight ? RectSelection::Mode::Window
+                        : RectSelection::Mode::Crossing;
+  }
 };
 
 struct GraphicsSceneKeyEvent {
@@ -86,7 +212,25 @@ public:
 
   // General Methods
   void setSelectionRect(const Point& p1, const Point& p2) noexcept;
+  void setSelectionRect(const Point& p1, const Point& p2,
+                        RectSelection::Mode mode) noexcept;
   void clearSelectionRect() noexcept;
+
+  /**
+   * @brief Update the selection state of items during a rubber-band selection
+   *
+   * Shows the selection rectangle (dashed for crossing, solid for window
+   * mode) and lets the derived scene select or deselect its items by calling
+   * #applyRectSelection().
+   *
+   * @param p1    One corner of the selection rectangle.
+   * @param p2    The opposite corner of the selection rectangle.
+   * @param mode  Whether to select touched (crossing) or enclosed (window)
+   *              items.
+   */
+  void selectItemsInRect(const Point& p1, const Point& p2,
+                         RectSelection::Mode mode) noexcept;
+
   /**
    * @brief Setup the marker for a specific scene rect
    *
@@ -110,6 +254,18 @@ public:
                    const QColor& background = Qt::transparent) noexcept;
 
 protected:
+  /**
+   * @brief Select or deselect the items of the scene by a selection rectangle
+   *
+   * Called by #selectItemsInRect(). Derived scenes which support rubber-band
+   * selection must set the selection state of all their items, using
+   * RectSelection::hits() to test them. The default implementation does
+   * nothing.
+   *
+   * @param selection   The rubber-band selection to apply.
+   */
+  virtual void applyRectSelection(const RectSelection& selection) noexcept;
+
   void drawBackground(QPainter* painter, const QRectF& rect) noexcept override;
   void drawForeground(QPainter* painter, const QRectF& rect) noexcept override;
 

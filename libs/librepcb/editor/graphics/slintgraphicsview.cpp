@@ -17,6 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// AI DISCLAIMER: Claude AI assisted in the modification of this file.
+
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
@@ -229,6 +231,7 @@ void SlintGraphicsView::pointerEvent(
   const QPointF scenePosPx = mapToScenePosPx(pos, 1);
   mMouseEvent.scenePos = Point::fromPx(scenePosPx);
   mMouseEvent.modifiers = s2q(e.modifiers);
+  mMouseEvent.mirrored = mMirror;
 
   bool isDoubleClick = false;
   if (e.kind == PointerEventKind::Down) {
