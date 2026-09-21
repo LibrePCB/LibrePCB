@@ -17,6 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// AI DISCLAIMER: Claude AI assisted in the modification of this file.
+
 #ifndef LIBREPCB_EDITOR_IMAGEGRAPHICSITEM_H
 #define LIBREPCB_EDITOR_IMAGEGRAPHICSITEM_H
 
@@ -82,6 +84,16 @@ public:
    */
   void setEditable(bool editable) noexcept;
 
+  /**
+   * @brief Get the visible geometry
+   *
+   * This is used during rubber-band selection.  "Visible geometry"
+   * includes only the geometry itself, not the origin cross.
+   *
+   * @return Path in item coordinates.
+   */
+  QPainterPath getVisibleShape() const noexcept { return mVisibleShape; }
+
   // Inherited from QGraphicsItem
   QRectF boundingRect() const noexcept override { return mBoundingRect; }
   QPainterPath shape() const noexcept override { return mShape; }
@@ -109,6 +121,7 @@ private:  // Data
   QPixmap mPixmap;
   QRectF mImageRectPx;
   QRectF mBoundingRect;
+  QPainterPath mVisibleShape;
   QPainterPath mShape;
   qreal mVertexHandleRadiusPx;
   bool mInvalidImage;

@@ -17,6 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// AI DISCLAIMER: Claude AI assisted in the modification of this file.
+
 #ifndef LIBREPCB_EDITOR_PRIMITIVEFOOTPRINTPADGRAPHICSITEM_H
 #define LIBREPCB_EDITOR_PRIMITIVEFOOTPRINTPADGRAPHICSITEM_H
 
@@ -76,6 +78,17 @@ public:
   void setState(GraphicsLayer::State state) noexcept;
   void setGeometries(const QHash<const Layer*, QList<PadGeometry>>& geometries,
                      const Length& clearance) noexcept;
+
+  /**
+   * @brief Get the visible geometry, used for rubber-band selection
+   *
+   * This is used during rubber-band selection.  "Visible geometry" includes
+   * only what is drawn, not the origin cross nor the padding of the
+   * (click) #shape().
+   *
+   * @return Path in item coordinates, empty if nothing is visible.
+   */
+  QPainterPath getVisibleShape() const noexcept;
 
   // Inherited from QGraphicsItem
   QPainterPath shape() const noexcept override;

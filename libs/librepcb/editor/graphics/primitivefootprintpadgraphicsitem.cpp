@@ -17,6 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// AI DISCLAIMER: Claude AI assisted in the modification of this file.
+
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
@@ -212,9 +214,9 @@ void PrimitiveFootprintPadGraphicsItem::setGeometries(
  *  Inherited from QGraphicsItem
  ******************************************************************************/
 
-QPainterPath PrimitiveFootprintPadGraphicsItem::shape() const noexcept {
-  Q_ASSERT(mOriginCrossGraphicsItem);
-  QPainterPath p = mOriginCrossGraphicsItem->shape();
+QPainterPath PrimitiveFootprintPadGraphicsItem::getVisibleShape()
+    const noexcept {
+  QPainterPath p;
   if (mCopperLayer && mCopperLayer->isVisible()) {
     for (auto it = mShapes.begin(); it != mShapes.end(); it++) {
       if (it.key()->isVisible()) {
@@ -226,6 +228,11 @@ QPainterPath PrimitiveFootprintPadGraphicsItem::shape() const noexcept {
     }
   }
   return p;
+}
+
+QPainterPath PrimitiveFootprintPadGraphicsItem::shape() const noexcept {
+  Q_ASSERT(mOriginCrossGraphicsItem);
+  return mOriginCrossGraphicsItem->shape() | getVisibleShape();
 }
 
 QVariant PrimitiveFootprintPadGraphicsItem::itemChange(
