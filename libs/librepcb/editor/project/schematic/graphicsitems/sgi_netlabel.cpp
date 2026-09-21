@@ -17,6 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// AI DISCLAIMER: Claude AI assisted in the modification of this file.
+
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
@@ -101,6 +103,10 @@ void SGI_NetLabel::updateContext() noexcept {
   mTextGraphicsItem->setState(state);
   mOriginCrossGraphicsItem->setState(state);
   mAnchorGraphicsItem->setState(state);
+}
+
+QPainterPath SGI_NetLabel::getVisibleShape() const noexcept {
+  return mTextGraphicsItem->mapToParent(mTextGraphicsItem->getVisibleShape());
 }
 
 /*******************************************************************************

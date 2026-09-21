@@ -17,6 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// AI DISCLAIMER: Claude AI assisted in the modification of this file.
+
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
@@ -153,6 +155,23 @@ QVariant SGI_SymbolPin::itemChange(GraphicsItemChange change,
   return QGraphicsItem::itemChange(change, value);
 }
 
+QPainterPath SGI_SymbolPin::getVisibleShape() const noexcept {
+  QPainterPath path;
+  path.setFillRule(Qt::WindingFill);
+  if (mLineGraphicsItem->isVisible()) {
+    // The rotation is applied to the line item itself.
+    path.addPath(mLineGraphicsItem->mapToParent(mLineShape));
+  }
+  // Empty if neither line nor fill layer of the circle is visible.
+  const QPainterPath circle = mCircleGraphicsItem->shape();
+  path.addPath(mCircleGraphicsItem->mapToParent(circle));
+  const QPainterPath name = mNameGraphicsItem->getVisibleShape();
+  path.addPath(mNameGraphicsItem->mapToParent(name));
+  const QPainterPath numbers = mNumbersGraphicsItem->getVisibleShape();
+  path.addPath(mNumbersGraphicsItem->mapToParent(numbers));
+  return path;
+}
+
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
@@ -252,6 +271,15 @@ void SGI_SymbolPin::updateJunction() noexcept {
     length /= 2;
   }
   mLineGraphicsItem->setLine(Point(0, 0), Point(length, 0));
+
+  // The line item does not provide a shape, so calculate it here. A line with
+  // round caps is just a rounded rectangle.
+  const qreal lineWidthPx = UnsignedLength(158750)->toPx();
+  mLineShape = QPainterPath();
+  mLineShape.addRoundedRect(
+      QRectF(-lineWidthPx / 2, -lineWidthPx / 2, length.toPx() + lineWidthPx,
+             lineWidthPx),
+      lineWidthPx / 2, lineWidthPx / 2);
 }
 
 void SGI_SymbolPin::updateName() noexcept {

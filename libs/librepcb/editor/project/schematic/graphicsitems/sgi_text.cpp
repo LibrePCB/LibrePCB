@@ -17,6 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// AI DISCLAIMER: Claude AI assisted in the modification of this file.
+
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
@@ -83,6 +85,11 @@ void SGI_Text::updateContext() noexcept {
   const GraphicsLayer::State state = mContext->getLayerState(false);
   mTextGraphicsItem->setState(state);
   mAnchorGraphicsItem->setState(state);
+}
+
+QPainterPath SGI_Text::getVisibleShape() const noexcept {
+  Q_ASSERT(mTextGraphicsItem);
+  return mTextGraphicsItem->mapToParent(mTextGraphicsItem->getVisibleShape());
 }
 
 /*******************************************************************************

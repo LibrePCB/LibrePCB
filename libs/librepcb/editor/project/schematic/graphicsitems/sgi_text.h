@@ -17,6 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// AI DISCLAIMER: Claude AI assisted in the modification of this file.
+
 #ifndef LIBREPCB_EDITOR_SGI_TEXT_H
 #define LIBREPCB_EDITOR_SGI_TEXT_H
 
@@ -64,6 +66,13 @@ public:
     return mSymbolGraphicsItem;
   }
   void updateContext() noexcept;
+
+  /**
+   * @brief Get the visible geometry, used for rubber-band selection
+   *
+   * @return Path in item coordinates, empty if the text is not visible.
+   */
+  QPainterPath getVisibleShape() const noexcept;
 
   // Inherited from QGraphicsItem
   QPainterPath shape() const noexcept override;
