@@ -24,7 +24,6 @@ jobs:
         include:
           - name: Ubuntu 22.04 Qt6.11 GCC
             image: librepcb/librepcb-dev:ubuntu-22.04-qt6.11-1
-            has_llvm_cov: true
             deploy: true
           - name: Ubuntu 24.04 Clang
             image: librepcb/librepcb-dev:ubuntu-24.04-5
@@ -37,7 +36,6 @@ jobs:
             cmake_options: '-DCMAKE_CXX_FLAGS="-DQT_FORCE_ASSERTS=1" -DUNBUNDLE_DXFLIB=1 -DUNBUNDLE_GTEST=1 -DUNBUNDLE_MUPARSER=1 -DUNBUNDLE_POLYCLIPPING=1'
             unbundle: true
             extend_ld_library_path: true
-            has_llvm_cov: true
     steps:
       # Clone Repository
       - uses: actions/checkout@v6
@@ -106,9 +104,6 @@ jobs:
         if: ${{ (steps.build.outcome == 'success') && matrix.deploy && (!cancelled()) }}
 
       # Test
-      - name: Run rust-core Tests (Without Coverage)
-        run: cd libs/librepcb/rust-core && cargo test --features=fail-on-warnings
-        if: ${{ (steps.build.outcome == 'success') && (!matrix.has_llvm_cov) && (!cancelled()) }}
       - name: Run rust-core Tests (With Coverage)
         run: >
           cd libs/librepcb/rust-core &&
@@ -118,7 +113,7 @@ jobs:
           --fail-uncovered-regions 0
           --fail-uncovered-functions 0
           --show-missing-lines
-        if: ${{ (steps.build.outcome == 'success') && matrix.has_llvm_cov && (!cancelled()) }}
+        if: ${{ (steps.build.outcome == 'success') && (!cancelled()) }}
       - name: Run LibrePCB Unittests
         run: xvfb-run -a ./build/tests/unittests/librepcb-unittests
         if: ${{ (steps.build.outcome == 'success') && (!cancelled()) }}

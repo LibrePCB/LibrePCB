@@ -91,8 +91,16 @@ jobs:
         run: docker exec ci bash ./ci/build_windows_installer.sh
 
       # Test
-      - name: Run rust-core tests
-        run: docker exec -w C:/work/libs/librepcb/rust-core ci cargo test --features=fail-on-warnings
+      - name: Run rust-core Tests (With Coverage)
+        run: >
+          docker exec -w C:/work/libs/librepcb/rust-core ci
+            cargo llvm-cov --features=fail-on-warnings --html &&
+          docker exec -w C:/work/libs/librepcb/rust-core ci
+            cargo llvm-cov report
+            --fail-uncovered-lines 0
+            --fail-uncovered-regions 0
+            --fail-uncovered-functions 0
+            --show-missing-lines
         if: ${{ (steps.build.outcome == 'success') && (!cancelled()) }}
       - name: Run LibrePCB Unittests
         run: docker exec ci build\\tests\\unittests\\librepcb-unittests.exe
