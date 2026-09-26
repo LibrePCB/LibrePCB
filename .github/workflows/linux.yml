@@ -27,7 +27,7 @@ jobs:
             has_llvm_cov: true
             deploy: true
           - name: Ubuntu 24.04 Clang
-            image: librepcb/librepcb-dev:ubuntu-24.04-4
+            image: librepcb/librepcb-dev:ubuntu-24.04-5
             cc: clang
             cxx: clang++
             cmake_options: '-DCMAKE_CXX_FLAGS="-DQT_FORCE_ASSERTS=1"'

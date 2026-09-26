@@ -6,10 +6,10 @@ jobs:
     name: Windows x86_64
     runs-on: windows-2025
     env:
-      # Docker image tag: windowsservercore-ltsc2025-qt6.10-64bit-1
+      # Docker image tag: windowsservercore-ltsc2025-qt6.10-64bit-2
       # Using digest for easier verification of the transparent build chain.
-      # https://github.com/LibrePCB/docker-librepcb-dev/actions/runs/20745227440/job/59560845499
-      IMAGE_DIGEST: f78cc56d8c863317e44d20ab5a14080e20c0f13af8cab20533d2a6437a2437c9
+      # https://github.com/LibrePCB/docker-librepcb-dev/actions/runs/36190748247/job/108255004579
+      IMAGE_DIGEST: 6506175767928ce6fc80abc6b61d75640458830b21369b0484f27ea9af5944bd
       LIBREPCB_BUILD_AUTHOR: "LibrePCB CI"
     steps:
       # Clone Repository
