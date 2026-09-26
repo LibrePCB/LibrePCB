@@ -68,7 +68,7 @@ public:
                                      const Point& startPos = Point()) noexcept;
   ~CmdDragSelectedBoardItems() noexcept override;
 
-  // Getters
+          // Getters
   bool hasAnythingSelected() const noexcept { return mItemCount > 0; }
   bool hasTracesSelected() const noexcept {
     return !mNetLineEditCmds.isEmpty();
@@ -82,22 +82,22 @@ public:
   bool selectDevicesOfPads() noexcept;
   UnsignedLength getMedianLineWidth() const noexcept;
 
-  // General Methods
+          // General Methods
   void snapToGrid() noexcept;
   void setLocked(bool locked) noexcept;
   void setLineWidth(const UnsignedLength& width) noexcept;
   void resetAllTexts() noexcept;
-  void setCurrentPosition(const Point& pos,
-                          const bool gridIncrement = true) noexcept;
+  void setCurrentPosition(const Point& pos, const bool gridIncrement = true,
+                          const bool freeMovement = false) noexcept;
   void rotate(const Angle& angle, bool aroundCurrentPosition) noexcept;
 
 private:
   // Private Methods
 
-  /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
+          /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
   bool performExecute() override;
 
-  // Private Member Variables
+          // Private Member Variables
   BoardGraphicsScene& mScene;
   int mItemCount;
   Point mStartPos;
@@ -109,10 +109,43 @@ private:
   bool mLineWidthChanged;
   bool mTextsReset;
 
-  /// Auto-selected devices used for #selectDevicesOfPads()
+          /// Auto-selected devices used for #selectDevicesOfPads()
   QSet<BI_Device*> mAutoSelectedDevices;
 
-  // Move commands
+  /**
+   * @brief Per-point info needed for the KiCad/Eagle-style "trombone" drag.
+   *
+   * The point tries to stay on a line through a "driving" anchor (which is
+   * either the point's own original position offset by the global drag
+   * delta - if the point itself was explicitly selected/dragged -, or a
+   * moving pad/via of a dragged device/via - if this point is merely a
+   * stub connected to it, see #mCascadedFromDeviceDrag) with a fixed
+   * direction (#direction). If the point also has a fixed (non-dragged)
+   * neighbor trace, that neighbor must keep its own original angle - only
+   * its length may change - so the point's new position is the
+   * intersection of both lines. This way *all* affected segments keep
+   * their exact original angle; only lengths adapt - exactly like in
+   * KiCad or Eagle, whether you drag a trace directly or drag a component
+   * (or via) that traces are connected to.
+   */
+  struct NetPointConstraint {
+    CmdBoardNetPointEdit* cmd;
+    Point originalPos;
+    bool hasDirection = false;
+    Point anchorOriginalPos;  ///< position of the driving anchor
+    QPointF direction;  ///< normalized, only valid if #hasDirection
+    bool hasNeighborRay = false;
+    QPointF neighborFixedPoint;
+    QPointF neighborDirection;  ///< normalized
+  };
+
+  Point computeNetPointPosition(const NetPointConstraint& c,
+                                const Point& delta,
+                                const Point& rawDelta) const noexcept;
+
+  QVector<NetPointConstraint> mNetPointConstraints;
+
+          // Move commands
   QList<CmdDeviceInstanceEdit*> mDeviceEditCmds;
   QList<CmdDeviceStrokeTextsReset*> mDeviceStrokeTextsResetCmds;
   QList<CmdBoardPadEdit*> mPadEditCmds;  // Only board pads.
