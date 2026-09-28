@@ -325,6 +325,14 @@ bool SchematicEditorState_Select::processAbortCommand() noexcept {
         mSubState = SubState::IDLE;
         return true;
       }
+      case SubState::MOVING: {
+        // Discard the drag command, which reverts all items to their original
+        // positions.
+        Q_ASSERT(mSelectedItemsDragCommand);
+        mSelectedItemsDragCommand.reset();
+        mSubState = SubState::IDLE;
+        return true;
+      }
       case SubState::MOVING_POLYGON_VERTICES: {
         mCmdPolygonEdit.reset();
         mSelectedPolygon = nullptr;

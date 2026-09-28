@@ -536,6 +536,9 @@ bool BoardEditorState_Select::processGraphicsSceneMouseMoved(
     }
     // Move selected elements to cursor position
     mSelectedItemsDragCommand->setCurrentPosition(e.scenePos);
+    // Force updating airwires immediately as they are important while
+    // dragging items.
+    scene->getBoard().triggerAirWiresRebuild();
     return true;
   } else if (mSelectedPolygon && mCmdPolygonEdit) {
     // Move polygon vertices
@@ -1307,6 +1310,9 @@ bool BoardEditorState_Select::rotateSelectedItems(const Angle& angle) noexcept {
   try {
     if (mSelectedItemsDragCommand) {
       mSelectedItemsDragCommand->rotate(angle, true);
+      // Force updating airwires immediately as they are important while
+      // dragging items.
+      scene->getBoard().triggerAirWiresRebuild();
     } else {
       std::unique_ptr<CmdDragSelectedBoardItems> cmd(
           new CmdDragSelectedBoardItems(*scene, getIgnoreLocks()));
@@ -1690,8 +1696,17 @@ bool BoardEditorState_Select::abortCommand(bool showErrMsgBox) noexcept {
     mSelectedZone = nullptr;
     mSelectedZoneVertices.clear();
 
-    // Delete the current undo command
-    mSelectedItemsDragCommand.reset();
+    // Delete the current undo command, reverting all items to their
+    // original positions.
+    if (mSelectedItemsDragCommand) {
+      mSelectedItemsDragCommand.reset();
+
+      // Since this doesn't modify the undo stack, the air wires
+      // (which were rebuilt while moving) need to be rebuilt manually.
+      if (BoardGraphicsScene* scene = getActiveBoardScene()) {
+        scene->getBoard().triggerAirWiresRebuild();
+      }
+    }
 
     // Abort the undo command
     if (mIsUndoCmdActive) {
