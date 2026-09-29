@@ -234,8 +234,8 @@ private:
    * clearance known, actively positioning a trace) as well as calculating the
    * circle's size.  A radius of 0 tells the scene to not draw a clearance
    * circle at all, so this doubles as the circle's enable. This function is
-   * called from #updateNetpointPositions(), #setWidth() and
-   * #updateNetClass().
+   * called from #updateNetpointPositions(), #setWidth(),
+   * #updateNetClass() and #setShowClearanceCircle().
    */
   void updateClearanceCircleRadius() noexcept;
 

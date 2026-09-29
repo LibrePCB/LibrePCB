@@ -302,14 +302,11 @@ void BoardEditorState_DrawTrace::setShowClearanceCircle(bool show) noexcept {
   if (show != mShowClearanceCircle) {
     mShowClearanceCircle = show;
     emit showClearanceCircleChanged(mShowClearanceCircle);
+    updateClearanceCircleRadius();
 
     // Save client settings.
     QSettings cs;
     cs.setValue("board_editor/draw_trace/clearance_circle", show);
-  }
-
-  if (mSubState == SubState_PositioningNetPoint) {
-    updateNetpointPositions();
   }
 }
 
