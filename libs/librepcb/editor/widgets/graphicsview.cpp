@@ -17,6 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// AI DISCLAIMER: Claude AI assisted in the modification of this file.
+// Reviewed 2026-09-29
+
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
@@ -306,6 +309,8 @@ bool GraphicsView::eventFilter(QObject* obj, QEvent* event) {
             Point::fromPx(e->buttonDownScenePos(Qt::LeftButton)),
             e->buttons(),
             e->modifiers(),
+            QPointF(e->screenPos()),
+            QPointF(e->buttonDownScreenPos(Qt::LeftButton)),
         };
         mEventHandlerObject->graphicsSceneLeftMouseButtonPressed(gsme);
       }
@@ -330,6 +335,8 @@ bool GraphicsView::eventFilter(QObject* obj, QEvent* event) {
             Point::fromPx(e->buttonDownScenePos(e->button())),
             e->buttons(),
             e->modifiers(),
+            QPointF(e->screenPos()),
+            QPointF(e->buttonDownScreenPos(e->button())),
         };
         if (e->button() == Qt::LeftButton) {
           mEventHandlerObject->graphicsSceneLeftMouseButtonReleased(gsme);
@@ -361,6 +368,8 @@ bool GraphicsView::eventFilter(QObject* obj, QEvent* event) {
             Point::fromPx(e->buttonDownScenePos(Qt::LeftButton)),
             e->buttons(),
             e->modifiers(),
+            QPointF(e->screenPos()),
+            QPointF(e->buttonDownScreenPos(Qt::LeftButton)),
         };
         mEventHandlerObject->graphicsSceneMouseMoved(gsme);
       }
@@ -376,6 +385,8 @@ bool GraphicsView::eventFilter(QObject* obj, QEvent* event) {
             Point::fromPx(e->buttonDownScenePos(Qt::LeftButton)),
             e->buttons(),
             e->modifiers(),
+            QPointF(e->screenPos()),
+            QPointF(e->buttonDownScreenPos(Qt::LeftButton)),
         };
         return mEventHandlerObject->graphicsSceneLeftMouseButtonDoubleClicked(
             gsme);

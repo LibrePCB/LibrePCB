@@ -18,6 +18,7 @@
  */
 
 // AI DISCLAIMER: Claude AI assisted in the modification of this file.
+// Reviewed 2026-09-29
 
 #ifndef LIBREPCB_EDITOR_GRAPHICSSCENE_H
 #define LIBREPCB_EDITOR_GRAPHICSSCENE_H
@@ -56,8 +57,8 @@ namespace editor {
  * Items are tested with their footprint. This is the visible geometry of an
  * item (see \c getVisibleShape() of the item classes) or, for items without
  * such a method, just their shape. Composite items add the footprints of their
- * parts, e.g. a symbol adds its pins and fields, a device adds its pads. Both
- * modes use the same footprint.
+ * parts (i.e., a symbol adds its pins and fields; a device adds its pads).
+ * Both modes use the same footprint.
  */
 class RectSelection {
 public:
@@ -153,23 +154,25 @@ struct GraphicsSceneMouseEvent {
   Qt::MouseButtons buttons = Qt::MouseButtons();
   Qt::KeyboardModifiers modifiers = Qt::KeyboardModifiers();
 
-  // In order to tell if the mouse is moving left or right, we need to know if
-  // the current view is mirrored or not.
-  bool mirrored = false;  ///< Whether the view is mirrored horizontally.
+  // Raw, pre-mirror screen-space (widget pixel) positions. Kept separately
+  // from #scenePos/#downPos because the scene position already has the
+  // mirror flip applied, which makes it unusable for telling left/right
+  // drags apart; the raw screen position needs no such correction.
+  QPointF screenPos;
+  QPointF downScreenPos;
 
   /**
    * @brief Get the rubber-band selection mode of the current mouse drag
    *
-   * Dragging to the right on the screen (from #downPos to #scenePos) gives a
-   * window selection, dragging to the left (or straight up/down) gives a
-   * crossing selection. The direction is evaluated in screen space, so it
-   * also works for mirrored views.
+   * Dragging to the right on the screen (from #downScreenPos to #screenPos)
+   * gives a window selection, dragging to the left (or straight up/down)
+   * gives a crossing selection. Evaluated directly in screen space, which is
+   * mirror-independent by construction.
    *
    * @return The selection mode.
    */
   RectSelection::Mode getRectSelectionMode() const noexcept {
-    const bool draggedRight = mirrored ? (scenePos.getX() < downPos.getX())
-                                       : (scenePos.getX() >= downPos.getX());
+    const bool draggedRight = screenPos.x() >= downScreenPos.x();
     return draggedRight ? RectSelection::Mode::Window
                         : RectSelection::Mode::Crossing;
   }

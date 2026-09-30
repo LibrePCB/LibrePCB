@@ -18,6 +18,7 @@
  */
 
 // AI DISCLAIMER: Claude AI assisted in the modification of this file.
+// Reviewed 2026-09-29
 
 /*******************************************************************************
  *  Includes
@@ -284,7 +285,7 @@ void SchematicGraphicsScene::applyRectSelection(
     const RectSelection& selection) noexcept {
   foreach (auto item, mSymbols) {
     // Pins and field texts of a symbol cannot be selected independently
-    // from their symbol; They are always selected together with it. So the
+    // from their symbol; They are always selected together with it. Thus, the
     // footprint of a symbol consists of its own visible geometry plus the
     // visible geometry of all its pins and texts. Only visible items are
     // included.  Hidden layers, empty texts and invisible padding of the

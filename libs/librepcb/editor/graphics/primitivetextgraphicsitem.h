@@ -18,6 +18,7 @@
  */
 
 // AI DISCLAIMER: Claude AI assisted in the modification of this file.
+// Reviewed 2026-09-29
 
 #ifndef LIBREPCB_EDITOR_PRIMITIVETEXTGRAPHICSITEM_H
 #define LIBREPCB_EDITOR_PRIMITIVETEXTGRAPHICSITEM_H
