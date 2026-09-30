@@ -230,14 +230,14 @@ void ImageGraphicsItem::updateBoundingRectAndShape() noexcept {
           mImageRectPx.height() / std::max(mPixmap.height(), 1));
   const QBitmap mask = mPixmap.mask().transformed(t);
 
-  mShape = QPainterPath();
+  mVisibleShape = QPainterPath();
   if (!mask.isNull()) {
-    mShape.addRegion(mask);
-    mShape.translate(0, -mImageRectPx.height());
+    mVisibleShape.addRegion(mask);
+    mVisibleShape.translate(0, -mImageRectPx.height());
   } else {
-    mShape.addRect(mImageRectPx);
+    mVisibleShape.addRect(mImageRectPx);
   }
-  mShape |= mOriginCrossGraphicsItem->shape();
+  mShape = mVisibleShape | mOriginCrossGraphicsItem->shape();
 
   update();
 }

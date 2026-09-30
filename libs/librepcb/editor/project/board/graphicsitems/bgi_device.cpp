@@ -145,6 +145,28 @@ void BGI_Device::updateContext() noexcept {
   updateBoardSide();
 }
 
+QPainterPath BGI_Device::getVisibleShape() const noexcept {
+  QPainterPath path;
+  path.setFillRule(Qt::WindingFill);
+  if (mGrabAreaLayer && mGrabAreaLayer->isVisible()) {
+    path.addPath(mShape);
+  }
+  // The shapes of the primitive items are empty if their layers are hidden.
+  for (const auto& i : mCircleGraphicsItems) {
+    path.addPath(i->mapToParent(i->shape()));
+  }
+  for (const auto& i : mPolygonGraphicsItems) {
+    path.addPath(i->mapToParent(i->shape()));
+  }
+  for (const auto& i : mZoneGraphicsItems) {
+    path.addPath(i->mapToParent(i->shape()));
+  }
+  for (const auto& i : mHoleGraphicsItems) {
+    path.addPath(i->mapToParent(i->shape()));
+  }
+  return path;
+}
+
 /*******************************************************************************
  *  Inherited from QGraphicsItem
  ******************************************************************************/

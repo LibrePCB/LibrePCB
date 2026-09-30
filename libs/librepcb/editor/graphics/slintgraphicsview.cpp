@@ -228,6 +228,7 @@ void SlintGraphicsView::pointerEvent(
 
   const QPointF scenePosPx = mapToScenePosPx(pos, 1);
   mMouseEvent.scenePos = Point::fromPx(scenePosPx);
+  mMouseEvent.screenPos = pos;
   mMouseEvent.modifiers = s2q(e.modifiers);
 
   bool isDoubleClick = false;
@@ -238,6 +239,7 @@ void SlintGraphicsView::pointerEvent(
           (mMouseEvent.scenePos == mMouseEvent.downPos);
       mLeftMouseButtonDoubleClickTimer.setRemainingTime(500);
       mMouseEvent.downPos = mMouseEvent.scenePos;
+      mMouseEvent.downScreenPos = mMouseEvent.screenPos;
     }
   } else if ((e.kind == PointerEventKind::Up) ||
              (e.kind == PointerEventKind::Cancel)) {

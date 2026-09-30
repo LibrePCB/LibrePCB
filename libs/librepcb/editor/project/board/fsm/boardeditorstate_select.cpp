@@ -118,6 +118,7 @@ BoardEditorState_Select::BoardEditorState_Select(
     const Context& context) noexcept
   : BoardEditorState(context),
     mIsUndoCmdActive(false),
+    mSuppressRubberBandUntilRelease(false),
     mSelectedPolygon(nullptr),
     mSelectedPolygonVertices(),
     mCmdPolygonEdit(),
@@ -528,6 +529,14 @@ bool BoardEditorState_Select::processGraphicsSceneMouseMoved(
   BoardGraphicsScene* scene = getActiveBoardScene();
   if (!scene) return false;
 
+  if (mSuppressRubberBandUntilRelease) {
+    // A drag/edit command was just aborted (e.g. Esc pressed) while the left
+    // button is still held down; ignore further moves until it is released,
+    // instead of starting a new rubber-band selection from the stale
+    // #GraphicsSceneMouseEvent::downPos of the aborted drag.
+    return true;
+  }
+
   if (mSelectedItemsDragCommand) {
     // If any individual footprint pads were selected, expand the selection
     // to their devices now to allow dragging devices by their pads.
@@ -574,7 +583,7 @@ bool BoardEditorState_Select::processGraphicsSceneMouseMoved(
     return true;
   } else if (e.buttons.testFlag(Qt::LeftButton)) {
     // Draw selection rectangle
-    scene->selectItemsInRect(e.downPos, e.scenePos);
+    scene->selectItemsInRect(e.downPos, e.scenePos, e.getRectSelectionMode());
     return true;
   }
 
@@ -584,6 +593,7 @@ bool BoardEditorState_Select::processGraphicsSceneMouseMoved(
 bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
     const GraphicsSceneMouseEvent& e) noexcept {
   scheduleUpdateAvailableFeatures();
+  mSuppressRubberBandUntilRelease = false;
 
   // Discard any temporary changes and release undo stack.
   abortBlockingToolsInOtherEditors();
@@ -681,6 +691,7 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
 bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
     const GraphicsSceneMouseEvent& e) noexcept {
   scheduleUpdateAvailableFeatures();
+  mSuppressRubberBandUntilRelease = false;
 
   BoardGraphicsScene* scene = getActiveBoardScene();
   if (!scene) return false;
@@ -1681,6 +1692,15 @@ bool BoardEditorState_Select::startPaste(
 
 bool BoardEditorState_Select::abortCommand(bool showErrMsgBox) noexcept {
   try {
+    // If a drag/edit command is currently active, cancelling it can occur
+    // with the left mouse button still physically held down (e.g. this is
+    // reached via Esc mid-drag); suppress the next mouse-move(s) from being
+    // misinterpreted as the start of a new rubber-band selection.
+    if (mSelectedItemsDragCommand || mCmdPolygonEdit || mCmdPlaneEdit ||
+        mCmdZoneEdit) {
+      mSuppressRubberBandUntilRelease = true;
+    }
+
     // Stop editing polygons
     mCmdPolygonEdit.reset();
     mSelectedPolygon = nullptr;

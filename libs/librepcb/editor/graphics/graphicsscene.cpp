@@ -38,6 +38,49 @@ namespace librepcb {
 namespace editor {
 
 /*******************************************************************************
+ *  Class RectSelection
+ ******************************************************************************/
+
+bool RectSelection::hits(const QPainterPath& scenePath) const noexcept {
+  // An empty footprint (e.g. of an item on a hidden layer) has no geometry
+  // and must never be hit, in any mode. Check this explicitly instead of
+  // relying on how empty geometry behaves in the tests below.
+  if (scenePath.isEmpty()) {
+    return false;
+  }
+
+  switch (mMode) {
+    case Mode::Window:
+      return mRect.contains(scenePath.boundingRect());
+    case Mode::Crossing:
+    default:
+      return scenePath.intersects(mRect);
+  }
+}
+
+bool RectSelection::hits(const QGraphicsItem& item) const noexcept {
+  return hits(item.mapToScene(item.shape()));
+}
+
+bool RectSelection::hits(
+    const QVector<QPainterPath>& scenePaths) const noexcept {
+  bool hasGeometry = false;
+  for (const QPainterPath& path : scenePaths) {
+    if (path.isEmpty()) {
+      continue;
+    }
+    hasGeometry = true;
+    const bool partHit = hits(path);
+    if ((mMode == Mode::Crossing) && partHit) {
+      return true;  // Touching any part is sufficient.
+    } else if ((mMode == Mode::Window) && (!partHit)) {
+      return false;  // All parts must be enclosed.
+    }
+  }
+  return hasGeometry && (mMode == Mode::Window);
+}
+
+/*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
 
@@ -157,8 +200,25 @@ void GraphicsScene::setSelectionRect(const Point& p1,
   mSelectionRectItem->setRect(rectPx);
 }
 
+void GraphicsScene::setSelectionRect(const Point& p1, const Point& p2,
+                                     RectSelection::Mode mode) noexcept {
+  // Dashed rectangle for crossing selection, solid one for window selection.
+  QPen pen = mSelectionRectItem->pen();
+  pen.setStyle((mode == RectSelection::Mode::Window) ? Qt::SolidLine
+                                                     : Qt::DashLine);
+  mSelectionRectItem->setPen(pen);
+  setSelectionRect(p1, p2);
+}
+
 void GraphicsScene::clearSelectionRect() noexcept {
   mSelectionRectItem->setRect(QRectF());
+}
+
+void GraphicsScene::selectItemsInRect(const Point& p1, const Point& p2,
+                                      RectSelection::Mode mode) noexcept {
+  setSelectionRect(p1, p2, mode);
+  applyRectSelection(RectSelection(
+      QRectF(p1.toPxQPointF(), p2.toPxQPointF()).normalized(), mode));
 }
 
 void GraphicsScene::setRulerPositions(
@@ -189,6 +249,13 @@ QPixmap GraphicsScene::toPixmap(const QSize& size,
 /*******************************************************************************
  *  Protected Methods
  ******************************************************************************/
+
+void GraphicsScene::applyRectSelection(
+    const RectSelection& selection) noexcept {
+  // Nothing to do by default. Only derived scenes with selectable items
+  // support using a selection rectangle.
+  Q_UNUSED(selection);
+}
 
 void GraphicsScene::drawBackground(QPainter* painter,
                                    const QRectF& rect) noexcept {

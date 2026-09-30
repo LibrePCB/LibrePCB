@@ -60,6 +60,18 @@ public:
   // Getters
   Text& getObj() noexcept { return mText; }
 
+  /**
+   * @brief Get the visible geometry, used for rubber-band selection
+   *
+   * Used during rubber-band selection, "visible geometry" includes the
+   * rendered text glyphs only. Neither the origin cross nor the padding of
+   * the (click) #shape() are included.
+   *
+   * @return Path in item coordinates, empty if the text is not visible (layer
+   *         hidden or disabled, or no content).
+   */
+  QPainterPath getVisibleShape() const noexcept;
+
   // Setters
   void setOriginCrossVisible(bool visible) noexcept;
   void setTextOverride(const std::optional<QString>& text) noexcept;

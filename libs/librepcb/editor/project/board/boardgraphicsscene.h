@@ -183,7 +183,6 @@ public:
   void setFlipped(bool flip) noexcept;
   bool isFlipped() const noexcept { return mContext->flipView; }
   void selectAll() noexcept;
-  void selectItemsInRect(const Point& p1, const Point& p2) noexcept;
   void selectNetSegment(BI_NetSegment& netSegment) noexcept;
   void clearSelection() noexcept;
   static qreal getZValueOfCopperLayer(const Layer& layer, bool flip) noexcept;
@@ -191,6 +190,9 @@ public:
 
   // Operator Overloadings
   BoardGraphicsScene& operator=(const BoardGraphicsScene& rhs) = delete;
+
+protected:  // Methods
+  void applyRectSelection(const RectSelection& selection) noexcept override;
 
 private:  // Methods
   void updateContext() noexcept;

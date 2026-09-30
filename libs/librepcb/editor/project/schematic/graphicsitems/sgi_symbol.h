@@ -73,6 +73,17 @@ public:
   SI_Symbol& getSymbol() noexcept { return mSymbol; }
   void updateContext() noexcept;
 
+  /**
+   * @brief Get the visible geometry, used for rubber-band selection
+   *
+   * Covers the grab areas, images and the visible circles and polygons of the
+   * symbol, but neither the origin cross nor pins or texts, and not the
+   * padding of the (click) #shape().
+   *
+   * @return Path in item coordinates.
+   */
+  QPainterPath getVisibleShape() const noexcept;
+
   // Inherited from QGraphicsItem
   QPainterPath shape() const noexcept override { return mShape; }
 
@@ -94,6 +105,7 @@ private:  // Data
   QVector<std::shared_ptr<PolygonGraphicsItem>> mPolygonGraphicsItems;
   QVector<std::shared_ptr<ImageGraphicsItem>> mImageGraphicsItems;
   QPainterPath mShape;
+  QPainterPath mBodyShape;
 
   // Slots
   SI_Symbol::OnEditedSlot mOnEditedSlot;
