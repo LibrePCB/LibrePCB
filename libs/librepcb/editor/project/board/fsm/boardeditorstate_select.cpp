@@ -576,8 +576,7 @@ bool BoardEditorState_Select::processGraphicsSceneMouseMoved(
     return true;
   } else if (e.buttons.testFlag(Qt::LeftButton)) {
     // Draw selection rectangle
-    scene->selectItemsInRect(e.downPos, e.scenePos,
-                             e.getRectSelectionMode());
+    scene->selectItemsInRect(e.downPos, e.scenePos, e.getRectSelectionMode());
     return true;
   }
 

@@ -89,9 +89,9 @@ SGI_Symbol::SGI_Symbol(
     i->setFlag(QGraphicsItem::ItemIsSelectable, true);
     i->setFlag(QGraphicsItem::ItemStacksBehindParent, true);
     if (obj.isGrabArea()) {
-      mBodyShape |= Toolbox::shapeFromPath(
-          obj.getPath().toQPainterPathPx(), Qt::SolidLine, Qt::SolidPattern,
-          obj.getLineWidth());
+      mBodyShape |= Toolbox::shapeFromPath(obj.getPath().toQPainterPathPx(),
+                                           Qt::SolidLine, Qt::SolidPattern,
+                                           obj.getLineWidth());
     }
     mPolygonGraphicsItems.append(i);
   }

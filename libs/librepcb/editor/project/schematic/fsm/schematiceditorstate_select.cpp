@@ -366,8 +366,7 @@ bool SchematicEditorState_Select::processGraphicsSceneMouseMoved(
   switch (mSubState) {
     case SubState::SELECTING: {
       // Update selection rectangle.
-      scene->selectItemsInRect(mStartPos, e.scenePos,
-                               e.getRectSelectionMode());
+      scene->selectItemsInRect(mStartPos, e.scenePos, e.getRectSelectionMode());
       return true;
     }
 
