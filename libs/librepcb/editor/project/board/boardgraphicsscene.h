@@ -17,8 +17,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// AI DISCLAIMER: Claude AI assisted in the modification of this file.
-// Reviewed 2026-09-29
 
 #ifndef LIBREPCB_EDITOR_BOARDGRAPHICSSCENE_H
 #define LIBREPCB_EDITOR_BOARDGRAPHICSSCENE_H
