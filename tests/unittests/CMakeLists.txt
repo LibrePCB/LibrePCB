@@ -114,6 +114,7 @@ add_executable(
   eagleimport/eagletypeconvertertest.cpp
   editor/dialogs/dxfimportdialogtest.cpp
   editor/dialogs/graphicsexportdialogtest.cpp
+  editor/graphics/rectselectiontest.cpp
   editor/library/cat/categorytreebuildertest.cpp
   editor/library/cmd/cmdpackagereloadtest.cpp
   editor/library/cmd/cmdsymbolreloadtest.cpp
