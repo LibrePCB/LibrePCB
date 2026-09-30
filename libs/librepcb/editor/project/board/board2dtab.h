@@ -158,8 +158,7 @@ public:
       const std::optional<std::pair<Point, Point>>& pos) noexcept override;
   void fsmSetSceneCursor(const Point& pos, bool cross,
                          bool circle) noexcept override;
-  void fsmSetSceneCursorClearanceRadius(
-      const Length& radius) noexcept override;
+  void fsmSetSceneCursorClearanceRadius(const Length& radius) noexcept override;
   QPainterPath fsmCalcPosWithTolerance(
       const Point& pos, qreal multiplier) const noexcept override;
   Point fsmMapGlobalPosToScenePos(const QPoint& pos) const noexcept override;
