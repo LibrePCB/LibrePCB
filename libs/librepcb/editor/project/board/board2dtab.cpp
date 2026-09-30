@@ -1344,9 +1344,9 @@ void Board2dTab::fsmToolEnter(BoardEditorState_DrawTrace& state) noexcept {
     onDerivedUiDataChanged.notify();
   };
   setShowClearanceCircle(state.getShowClearanceCircle());
-  mFsmStateConnections.append(connect(
-      &state, &BoardEditorState_DrawTrace::showClearanceCircleChanged, this,
-      setShowClearanceCircle));
+  mFsmStateConnections.append(
+      connect(&state, &BoardEditorState_DrawTrace::showClearanceCircleChanged,
+              this, setShowClearanceCircle));
   mFsmStateConnections.append(
       connect(this, &Board2dTab::clearanceCircleRequested, &state,
               &BoardEditorState_DrawTrace::setShowClearanceCircle));
