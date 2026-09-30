@@ -143,8 +143,7 @@ QVariant BGI_Plane::itemChange(GraphicsItemChange change,
 
 QPainterPath BGI_Plane::shape() const noexcept {
   const Length vertexHandleSize = Length::fromPx(mVertexHandleRadiusPx * 2);
-  if (mLayer && mLayer->isVisible() && (vertexHandleSize > 0) &&
-      isSelected()) {
+  if (mLayer && mLayer->isVisible() && (vertexHandleSize > 0) && isSelected()) {
     // Extend shape by vertex handles.
     return Toolbox::shapeFromPath(mOutline, QPen(Length::fromMm(0.3).toPx()),
                                   QBrush(), UnsignedLength(vertexHandleSize));

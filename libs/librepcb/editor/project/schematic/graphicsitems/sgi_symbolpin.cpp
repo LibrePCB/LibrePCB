@@ -291,10 +291,9 @@ void SGI_SymbolPin::updateShape() noexcept {
   // The line item does not provide a shape, so calculate it here. A line with
   // round caps is just a rounded rectangle (in coordinates of the line item).
   mLineShape = QPainterPath();
-  mLineShape.addRoundedRect(
-      QRectF(-lineWidthPx / 2, -lineWidthPx / 2, mLineLengthPx + lineWidthPx,
-             lineWidthPx),
-      lineWidthPx / 2, lineWidthPx / 2);
+  mLineShape.addRoundedRect(QRectF(-lineWidthPx / 2, -lineWidthPx / 2,
+                                   mLineLengthPx + lineWidthPx, lineWidthPx),
+                            lineWidthPx / 2, lineWidthPx / 2);
 
   // Grab area: The circle at the end of the pin plus a rectangle of the same
   // width along the pin line.  This enables grabbing the pin at any point.
