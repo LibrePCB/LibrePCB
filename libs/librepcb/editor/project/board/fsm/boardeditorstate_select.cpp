@@ -532,7 +532,7 @@ bool BoardEditorState_Select::processGraphicsSceneMouseMoved(
   if (mSuppressRubberBandUntilRelease) {
     // A drag/edit command was just aborted (e.g. Esc pressed) while the left
     // button is still held down; ignore further moves until it is released,
-    // instead of (mis)starting a new rubber-band selection from the stale
+    // instead of starting a new rubber-band selection from the stale
     // #GraphicsSceneMouseEvent::downPos of the aborted drag.
     return true;
   }
@@ -1695,7 +1695,7 @@ bool BoardEditorState_Select::abortCommand(bool showErrMsgBox) noexcept {
     // If a drag/edit command is currently active, cancelling it can occur
     // with the left mouse button still physically held down (e.g. this is
     // reached via Esc mid-drag); suppress the next mouse-move(s) from being
-    // (mis)interpreted as the start of a new rubber-band selection.
+    // misinterpreted as the start of a new rubber-band selection.
     if (mSelectedItemsDragCommand || mCmdPolygonEdit || mCmdPlaneEdit ||
         mCmdZoneEdit) {
       mSuppressRubberBandUntilRelease = true;
