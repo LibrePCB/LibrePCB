@@ -17,7 +17,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef LIBREPCB_EDITOR_SGI_TEXT_H
 #define LIBREPCB_EDITOR_SGI_TEXT_H
 
