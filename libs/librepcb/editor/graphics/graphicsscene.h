@@ -24,6 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include <librepcb/core/types/enums.h>
+#include <librepcb/core/types/length.h>
 #include <librepcb/core/types/lengthunit.h>
 #include <librepcb/core/types/point.h>
 
@@ -98,6 +99,7 @@ public:
    */
   void setSceneRectMarker(const QRectF& rect) noexcept;
   void setSceneCursor(const Point& pos, bool cross, bool circle) noexcept;
+  void setSceneCursorClearanceRadius(const Length& radius) noexcept;
   void setRulerPositions(
       const std::optional<std::pair<Point, Point>>& pos) noexcept;
 
@@ -130,6 +132,8 @@ private:
   Point mSceneCursorPos;
   bool mSceneCursorCross;
   bool mSceneCursorCircle;
+  Length mSceneCursorClearanceRadius;  ///< Real-world radius; 0 means no
+                                       ///< clearance circle is drawn
 
   // Configuration for the ruler overlay
   struct RulerGauge {
