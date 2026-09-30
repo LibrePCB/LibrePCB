@@ -43,7 +43,7 @@ namespace tests {
 class RectSelectionTestItem : public QGraphicsRectItem {
 public:
   explicit RectSelectionTestItem(const QRectF& clickRect,
-                                  const QRectF& visibleRect) noexcept
+                                 const QRectF& visibleRect) noexcept
     : QGraphicsRectItem(clickRect), mVisibleRect(visibleRect) {}
 
   QPainterPath getVisibleShape() const noexcept {
@@ -149,9 +149,9 @@ TEST(RectSelectionTest, testHitsItemUsesShape) {
 
 TEST(RectSelectionTest, testHitsCompositeEmptyVector) {
   const QVector<QPainterPath> parts;
-  EXPECT_FALSE(RectSelection(QRectF(-100, -100, 200, 200),
-                            RectSelection::Mode::Crossing)
-                   .hits(parts));
+  EXPECT_FALSE(
+      RectSelection(QRectF(-100, -100, 200, 200), RectSelection::Mode::Crossing)
+          .hits(parts));
   EXPECT_FALSE(
       RectSelection(QRectF(-100, -100, 200, 200), RectSelection::Mode::Window)
           .hits(parts));
@@ -159,9 +159,9 @@ TEST(RectSelectionTest, testHitsCompositeEmptyVector) {
 
 TEST(RectSelectionTest, testHitsCompositeAllPartsEmpty) {
   QVector<QPainterPath> parts{QPainterPath(), QPainterPath()};
-  EXPECT_FALSE(RectSelection(QRectF(-100, -100, 200, 200),
-                            RectSelection::Mode::Crossing)
-                   .hits(parts));
+  EXPECT_FALSE(
+      RectSelection(QRectF(-100, -100, 200, 200), RectSelection::Mode::Crossing)
+          .hits(parts));
   EXPECT_FALSE(
       RectSelection(QRectF(-100, -100, 200, 200), RectSelection::Mode::Window)
           .hits(parts));
