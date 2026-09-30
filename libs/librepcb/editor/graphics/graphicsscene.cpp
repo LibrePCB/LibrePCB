@@ -18,6 +18,7 @@
  */
 
 // AI DISCLAIMER: Claude AI assisted in the modification of this file.
+// Reviewed 2026-09-29
 
 /*******************************************************************************
  *  Includes
@@ -254,8 +255,8 @@ QPixmap GraphicsScene::toPixmap(const QSize& size,
 
 void GraphicsScene::applyRectSelection(
     const RectSelection& selection) noexcept {
-  // Nothing to do by default, only derived scenes with selectable items
-  // support selecting them with a selection rectangle.
+  // Nothing to do by default. Only derived scenes with selectable items
+  // support using a selection rectangle.
   Q_UNUSED(selection);
 }
 

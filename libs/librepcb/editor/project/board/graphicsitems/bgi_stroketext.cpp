@@ -18,6 +18,7 @@
  */
 
 // AI DISCLAIMER: Claude AI assisted in the modification of this file.
+// Reviewed 2026-09-29
 
 /*******************************************************************************
  *  Includes
@@ -99,6 +100,7 @@ void BGI_StrokeText::updateContext() noexcept {
 }
 
 QPainterPath BGI_StrokeText::getVisibleShape() const noexcept {
+  Q_ASSERT(mPathGraphicsItem);
   return mPathGraphicsItem->mapToParent(mPathGraphicsItem->shape());
 }
 
@@ -107,9 +109,8 @@ QPainterPath BGI_StrokeText::getVisibleShape() const noexcept {
  ******************************************************************************/
 
 QPainterPath BGI_StrokeText::shape() const noexcept {
-  Q_ASSERT(mPathGraphicsItem && mOriginCrossGraphicsItem);
-  return mPathGraphicsItem->mapToParent(mPathGraphicsItem->shape()) |
-      mOriginCrossGraphicsItem->shape();
+  Q_ASSERT(mOriginCrossGraphicsItem);
+  return getVisibleShape() | mOriginCrossGraphicsItem->shape();
 }
 
 QVariant BGI_StrokeText::itemChange(GraphicsItemChange change,

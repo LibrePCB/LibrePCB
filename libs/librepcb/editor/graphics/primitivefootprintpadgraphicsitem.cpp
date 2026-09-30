@@ -18,6 +18,7 @@
  */
 
 // AI DISCLAIMER: Claude AI assisted in the modification of this file.
+// Reviewed 2026-09-29
 
 /*******************************************************************************
  *  Includes
@@ -216,6 +217,7 @@ void PrimitiveFootprintPadGraphicsItem::setGeometries(
 
 QPainterPath PrimitiveFootprintPadGraphicsItem::getVisibleShape()
     const noexcept {
+  Q_ASSERT(mOriginCrossGraphicsItem);
   QPainterPath p;
   if (mCopperLayer && mCopperLayer->isVisible()) {
     for (auto it = mShapes.begin(); it != mShapes.end(); it++) {

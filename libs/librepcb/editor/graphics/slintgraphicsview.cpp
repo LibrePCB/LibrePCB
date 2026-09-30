@@ -18,6 +18,7 @@
  */
 
 // AI DISCLAIMER: Claude AI assisted in the modification of this file.
+// Reviewed 2026-09-29
 
 /*******************************************************************************
  *  Includes
@@ -230,8 +231,8 @@ void SlintGraphicsView::pointerEvent(
 
   const QPointF scenePosPx = mapToScenePosPx(pos, 1);
   mMouseEvent.scenePos = Point::fromPx(scenePosPx);
+  mMouseEvent.screenPos = pos;
   mMouseEvent.modifiers = s2q(e.modifiers);
-  mMouseEvent.mirrored = mMirror;
 
   bool isDoubleClick = false;
   if (e.kind == PointerEventKind::Down) {
@@ -241,6 +242,7 @@ void SlintGraphicsView::pointerEvent(
           (mMouseEvent.scenePos == mMouseEvent.downPos);
       mLeftMouseButtonDoubleClickTimer.setRemainingTime(500);
       mMouseEvent.downPos = mMouseEvent.scenePos;
+      mMouseEvent.downScreenPos = mMouseEvent.screenPos;
     }
   } else if ((e.kind == PointerEventKind::Up) ||
              (e.kind == PointerEventKind::Cancel)) {

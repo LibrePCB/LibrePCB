@@ -18,6 +18,7 @@
  */
 
 // AI DISCLAIMER: Claude AI assisted in the modification of this file.
+// Reviewed 2026-09-29
 
 /*******************************************************************************
  *  Includes
@@ -104,6 +105,7 @@ void BGI_Pad::updateContext() noexcept {
 }
 
 QPainterPath BGI_Pad::getVisibleShape() const noexcept {
+  Q_ASSERT(mGraphicsItem);
   return mGraphicsItem->mapToParent(mGraphicsItem->getVisibleShape());
 }
 
