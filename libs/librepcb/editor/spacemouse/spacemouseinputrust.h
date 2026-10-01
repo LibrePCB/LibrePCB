@@ -55,8 +55,8 @@ namespace editor {
  *        crate (`hidapi`-based raw HID capture), via FFI glue that lives
  *        in `librepcb-rust-core`
  *
- * Reads raw HID reports directly via `hidapi`, running on a background 
- * thread owned by the Rust side (see the crate's `hid.rs`). This class' 
+ * Reads raw HID reports directly via `hidapi`, running on a background
+ * thread owned by the Rust side (see the crate's `hid.rs`). This class'
  * job is narrow and mechanical:
  *
  * - Marshal the Rust-side callbacks (which fire on that background
@@ -81,13 +81,10 @@ public:
   bool isDeviceConnected() const noexcept override;
   void setLedEnabled(bool enabled) noexcept override;
 
-  // These functions are only called (by QMetaObject::invokeMethod()) on this
-  // object's own thread in response to a Rust-side callback. These need to
-  // be Public rather than private+friend because the trampolines are plain, 
-  // non-member `extern "C"` functions.  The C++ access control has no clean 
-  // way to grant just those specific functions access without also exposing 
-  // them to unqualified name lookup.
-  void handleMotion(const SpaceMouseMotionEvent& event) noexcept;
+  // Only called (by QMetaObject::invokeMethod()) on this object's own thread
+  // in response to a Rust-side callback. Needs to be public rather than
+  // private+friend because the trampoline is a plain, non-member
+  // `extern "C"` function.
   void handleConnectedChanged(bool connected) noexcept;
 
   SpaceMouseInputRust& operator=(const SpaceMouseInputRust& rhs) = delete;

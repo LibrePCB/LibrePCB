@@ -43,11 +43,11 @@ namespace editor {
  *
  * Values are the *raw*, unscaled 16-bit signed integers as reported by the
  * device's translation/rotation HID reports.  Typical report values span the
- * range of -350..+350 at rest-to-full-deflection, but are device-dependent. 
- * Any sensitivity scaling, dead-zone handling or dominant-axis snapping is 
+ * range of -350..+350 at rest-to-full-deflection, but are device-dependent.
+ * Any sensitivity scaling, dead-zone handling or dominant-axis snapping is
  * intentionally *not* done here, but left to the consumer.  Thus, this struct
- * remains a faithful, backend-independent representation of "what the device 
- * just reported".  Data is shared by every platform backend, as well as both 
+ * remains a faithful, backend-independent representation of "what the device
+ * just reported".  Data is shared by every platform backend, as well as both
  * the 2D and 3D views.
  */
 struct SpaceMouseMotionEvent {
@@ -76,13 +76,13 @@ struct SpaceMouseMotionEvent {
 /**
  * @brief Interface for a 3D mouse (SpaceMouse) input backend
  *
- * Implementors own whatever OS-level plumbing is needed to receive raw motion 
+ * Implementors own whatever OS-level plumbing is needed to receive raw motion
  * reports from a connected 3Dconnexion (or compatible) device and re-emit them
- * as a ::motionEvent(). A backend is expected to do nothing (and never emit) 
- * until a compatible device is actually detected, so simply instantiating one 
+ * as a ::motionEvent(). A backend is expected to do nothing (and never emit)
+ * until a compatible device is actually detected, so simply instantiating one
  * is a safe no-op on a machine without a 3D mouse connected.
  *
- * Because there is usually only one physical device, only one instance is 
+ * Because there is usually only one physical device, only one instance is
  * expected to exist per process.
  */
 class IF_SpaceMouseInputBackend : public QObject {
@@ -102,18 +102,18 @@ public:
   /**
    * @brief Set whether the device's LED should be lit
    *
-   * This is a one-shot command, not a continuously-applied setting.  The 
-   * caller (see ::librepcb::editor::GuiApplication) is responsible for 
-   * invoking this function again after a reconnect if the desired state 
-   * should persist across unplug/replug. Not all devices have an LED; 
+   * This is a one-shot command, not a continuously-applied setting.  The
+   * caller (see ::librepcb::editor::GuiApplication) is responsible for
+   * invoking this function again after a reconnect if the desired state
+   * should persist across unplug/replug. Not all devices have an LED;
    * implementations are expected to silently ignore the call in that case.
    *
    * @param enabled  Whether the LED should be on.
    */
   virtual void setLedEnabled(bool enabled) noexcept = 0;
 
-  IF_SpaceMouseInputBackend& operator=(
-      const IF_SpaceMouseInputBackend& rhs) = delete;
+  IF_SpaceMouseInputBackend& operator=(const IF_SpaceMouseInputBackend& rhs) =
+      delete;
 
 signals:
   /**

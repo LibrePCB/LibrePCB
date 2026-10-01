@@ -102,7 +102,7 @@ public:
   bool processSceneKeyReleased(
       const slint::language::KeyEvent& e) noexcept override;
   void processSpaceMouseEvent(const SpaceMouseMotionEvent& e,
-                             qreal dtSeconds) noexcept override;
+                              qreal dtSeconds) noexcept override;
 
   // IF_GraphicsViewEventHandler
   bool graphicsSceneKeyPressed(
