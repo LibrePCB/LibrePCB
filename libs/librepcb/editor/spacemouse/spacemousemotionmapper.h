@@ -45,8 +45,8 @@ namespace editor {
  * @brief Raw HID translation/rotation axis saturation
  *
  * Raw HID translation/rotation axes saturate at roughly +-350
- * (device-dependent). Both ::toSpaceMouseMotion2d() and
- * ::toSpaceMouseMotion3d() normalize against this before applying any
+ * (device-dependent). Both toSpaceMouseMotion2d() and
+ * toSpaceMouseMotion3d() normalize against this before applying any
  * sensitivity.
  */
 constexpr qreal kSmAxisSaturation = 350.0;
@@ -55,8 +55,8 @@ constexpr qreal kSmAxisSaturation = 350.0;
  * @brief Nominal (1.0x) zoom rate, shared by the 2D and 3D mappings
  *
  * Expressed as a real-world rate (per second) rather than a per-report
- * multiplier, see @p dtSeconds in ::toSpaceMouseMotion2d() /
- * ::toSpaceMouseMotion3d(). Tuned against real hardware feedback and
+ * multiplier, see dtSeconds in toSpaceMouseMotion2d() /
+ * toSpaceMouseMotion3d(). Tuned against real hardware feedback and
  * declared the "nominal" baseline for the sensitivity slider.
  */
 constexpr qreal kSmNominalZoomRatePerSec = 5.0;
@@ -73,7 +73,7 @@ constexpr qreal kSmNominalPanPxPerSec = 1500.0;
 /**
  * @brief Nominal (1.0x) 3D pan sensitivity (3D units per sec)
  *
- * This constant is in the same model-space units ::SlintOpenGlView already
+ * This constant is in the same model-space units SlintOpenGlView already
  * uses for mouse-drag panning, not pixels like the 2D mapping.
  */
 constexpr qreal kSmNominalPan3dUnitsPerSec = 5.0;
@@ -93,8 +93,8 @@ constexpr qreal kSmNominalRotateDegPerSec = 90.0;
 /**
  * @brief Normalize a raw axis value to the range -1..1
  *
- * @param raw  Raw axis value, see ::SpaceMouseMotionEvent.
- * @return Value divided by ::kSmAxisSaturation, clamped to -1..1.
+ * @param raw  Raw axis value, see SpaceMouseMotionEvent.
+ * @return Value divided by kSmAxisSaturation, clamped to -1..1.
  */
 inline qreal normalizeSpaceMouseAxis(qint16 raw) noexcept {
   return qBound(qreal(-1), qreal(raw) / kSmAxisSaturation, qreal(1));
@@ -107,7 +107,7 @@ inline qreal normalizeSpaceMouseAxis(qint16 raw) noexcept {
  * deflection) zooms in, pulling it up zooms out.
  *
  * @param normalized  Normalized Z translation, see
- *                    ::normalizeSpaceMouseAxis().
+ *                    normalizeSpaceMouseAxis().
  * @param dtSeconds   Elapsed real time in seconds.
  */
 inline qreal spaceMouseZoomFactor(qreal normalized, qreal dtSeconds) noexcept {
@@ -117,8 +117,8 @@ inline qreal spaceMouseZoomFactor(qreal normalized, qreal dtSeconds) noexcept {
 /**
  * @brief Apply the per-axis sensitivity & invert settings to a raw event
  *
- * Applying these here (upstream of ::toSpaceMouseMotion2d() and
- * ::toSpaceMouseMotion3d()) means neither the mapping functions, the
+ * Applying these here (upstream of toSpaceMouseMotion2d() and
+ * toSpaceMouseMotion3d()) means neither the mapping functions, the
  * dispatch chain nor the capture layer need to know about the settings.
  *
  * Sensitivity is applied to the *raw* (pre-normalization) axis value, so a
@@ -162,10 +162,10 @@ inline SpaceMouseMotionEvent applySpaceMouseSettings(
  ******************************************************************************/
 
 /**
- * @brief A ::SpaceMouseMotionEvent already translated into 2D pan/zoom
+ * @brief A SpaceMouseMotionEvent already translated into 2D pan/zoom
  *
  * Ready to be passed straight into
- * ::SlintGraphicsView::applyContinuousMotion().
+ * SlintGraphicsView::applyContinuousMotion().
  */
 struct SpaceMouseMotion2d {
   QPointF panDelta;
@@ -177,7 +177,7 @@ struct SpaceMouseMotion2d {
  ******************************************************************************/
 
 /**
- * @brief Translate a raw ::SpaceMouseMotionEvent into a ::SpaceMouseMotion2d
+ * @brief Translate a raw SpaceMouseMotionEvent into a SpaceMouseMotion2d
  *
  * X/Y translation axes become the pan delta and the Z (up/down) translation
  * axis becomes the zoom factor; rotation is ignored since it's not
@@ -188,7 +188,7 @@ struct SpaceMouseMotion2d {
  *                   last called for the active tab. This is essential to
  *                   avoid spurious or overly aggressive motion due to the
  *                   frequency of the sent HID reports. Scaling by
- *                   @p dtSeconds makes the result rate-independent: holding
+ *                   dtSeconds makes the result rate-independent: holding
  *                   the cap at a given deflection for one second always
  *                   produces the same total pan/zoom, regardless of report
  *                   frequency.
@@ -210,10 +210,10 @@ inline SpaceMouseMotion2d toSpaceMouseMotion2d(const SpaceMouseMotionEvent& e,
  ******************************************************************************/
 
 /**
- * @brief A ::SpaceMouseMotionEvent already translated into 3D pan/zoom/rotate
+ * @brief A SpaceMouseMotionEvent already translated into 3D pan/zoom/rotate
  *
  * Ready to be passed straight into
- * ::SlintOpenGlView::applyContinuousMotion().
+ * SlintOpenGlView::applyContinuousMotion().
  */
 struct SpaceMouseMotion3d {
   QPointF panDelta;
@@ -228,9 +228,9 @@ struct SpaceMouseMotion3d {
  ******************************************************************************/
 
 /**
- * @brief Translate a raw ::SpaceMouseMotionEvent into a ::SpaceMouseMotion3d
+ * @brief Translate a raw SpaceMouseMotionEvent into a SpaceMouseMotion3d
  *
- * The counterpart of ::toSpaceMouseMotion2d(). Here all six axes are
+ * The counterpart of toSpaceMouseMotion2d(). Here all six axes are
  * meaningful: X/Y translation becomes pan (in the view's model-space units),
  * Z translation becomes zoom, and all three rotation axes drive the
  * corresponding view rotation.

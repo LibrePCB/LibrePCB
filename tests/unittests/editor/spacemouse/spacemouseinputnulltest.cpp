@@ -17,49 +17,66 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_SPACEMOUSEINPUTBACKENDFACTORY_H
-#define LIBREPCB_EDITOR_SPACEMOUSEINPUTBACKENDFACTORY_H
-
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <QtCore>
+#include <gtest/gtest.h>
+#include <librepcb/editor/spacemouse/spacemouseinputnull.h>
 
-#include <memory>
+#include <QtCore>
+#include <QtTest>
 
 /*******************************************************************************
- *  Namespace / Forward Declarations
+ *  Namespace
  ******************************************************************************/
 namespace librepcb {
 namespace editor {
-
-class IF_SpaceMouseInputBackend;
+namespace tests {
 
 /*******************************************************************************
- *  Function createSpaceMouseInputBackend()
+ *  Test Methods
+ *
+ *  Note: SpaceMouseInputNull is the backend used when SpaceMouse support is
+ *  not available in a build, so it is the only backend which can be tested
+ *  without real hardware.
  ******************************************************************************/
 
-/**
- * @brief Create the IF_SpaceMouseInputBackend implementation for the
- *        platform LibrePCB is currently running on
- *
- * Kept as a free function (rather than e.g. a static factory method on the
- * interface) so callers (currently just GuiApplication) don't need to
- * know or care which backend implementations exist, avoiding an `#ifdef`
- * per build configuration anywhere outside this one file.
- *
- * @return The backend for this build. Never `nullptr`: if SpaceMouse
- *         support is not available in this build, a no-op backend which
- *         never reports a device is returned instead.
- */
-std::unique_ptr<IF_SpaceMouseInputBackend> createSpaceMouseInputBackend(
-    QObject* parent = nullptr) noexcept;
+TEST(SpaceMouseInputNullTest, testNeverConnected) {
+  SpaceMouseInputNull backend;
+  EXPECT_FALSE(backend.isDeviceConnected());
+}
+
+TEST(SpaceMouseInputNullTest, testSetLedEnabledIsNoOp) {
+  SpaceMouseInputNull backend;
+  QSignalSpy motionSpy(&backend, &IF_SpaceMouseInputBackend::motionEvent);
+  QSignalSpy connectedSpy(&backend,
+                          &IF_SpaceMouseInputBackend::deviceConnectedChanged);
+
+  backend.setLedEnabled(true);
+  backend.setLedEnabled(false);
+
+  EXPECT_FALSE(backend.isDeviceConnected());
+  EXPECT_EQ(0, motionSpy.count());
+  EXPECT_EQ(0, connectedSpy.count());
+}
+
+TEST(SpaceMouseInputNullTest, testNeverEmitsSignals) {
+  SpaceMouseInputNull backend;
+  QSignalSpy motionSpy(&backend, &IF_SpaceMouseInputBackend::motionEvent);
+  QSignalSpy connectedSpy(&backend,
+                          &IF_SpaceMouseInputBackend::deviceConnectedChanged);
+
+  // Let any (unexpectedly) queued events get delivered.
+  QCoreApplication::processEvents();
+
+  EXPECT_EQ(0, motionSpy.count());
+  EXPECT_EQ(0, connectedSpy.count());
+}
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
+}  // namespace tests
 }  // namespace editor
 }  // namespace librepcb
-
-#endif

@@ -32,7 +32,7 @@ namespace librepcb {
 namespace editor {
 
 /**
- * @brief No-op ::IF_SpaceMouseInputBackend implementation
+ * @brief No-op IF_SpaceMouseInputBackend implementation
  *
  * Used when SpaceMouse support is not available in this build (see
  * `LIBREPCB_SPACEMOUSE_AVAILABLE`). Always reports "not connected" and never
