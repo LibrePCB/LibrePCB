@@ -405,8 +405,14 @@ void SlintGraphicsView::applyContinuousMotion(const QPointF& panDelta,
   projection.autoFitInView = false;
 
   // Pan, using the same view-pixels-to-scene-units conversion that scroll()
-  // uses (scrollEvent(), scrollLeft/Right/Up/Down()).
-  projection.offset += panDelta / projection.scale;
+  // uses (scrollEvent(), scrollLeft/Right/Up/Down()). Note that the delta is
+  // in screen space, so we need to invert the X component if the Board is
+  // flipped to move in the direction the user expects on screen.
+  QPointF delta = panDelta;
+  if (mMirror) {
+    delta.setX(-delta.x());
+  }
+  projection.offset += delta / projection.scale;
 
   // Zoom around the center of the view: unlike a mouse wheel event, this
   // input has no on-screen cursor position to anchor to.
