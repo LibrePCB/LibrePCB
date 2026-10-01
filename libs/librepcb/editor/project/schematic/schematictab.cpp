@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// AI DISCLAIMER: Claude AI was used to author the functions for 3D mouse 
+// AI DISCLAIMER: Claude AI was used to author the functions for 3D mouse
 // (SpaceMouse) support.  All modifications have been reviewed by a human.
 
 /*******************************************************************************
@@ -797,7 +797,7 @@ bool SchematicTab::processSceneKeyReleased(
 }
 
 void SchematicTab::processSpaceMouseEvent(const SpaceMouseMotionEvent& e,
-                                         qreal dtSeconds) noexcept {
+                                          qreal dtSeconds) noexcept {
   const SpaceMouseMotion2d motion = toSpaceMouseMotion2d(e, dtSeconds);
   mView->applyContinuousMotion(motion.panDelta, motion.zoomFactor);
 }

@@ -110,7 +110,7 @@ public:
                             slint::private_api::PointerScrollEvent e,
                             int scene) noexcept override;
   void processSpaceMouseEvent(const SpaceMouseMotionEvent& e,
-                             qreal dtSeconds) noexcept override;
+                              qreal dtSeconds) noexcept override;
   bool processSceneKeyPressed(
       const slint::language::KeyEvent& e) noexcept override;
   bool processSceneKeyReleased(

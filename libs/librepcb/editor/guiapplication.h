@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
+
 // AI DISCLAIMER: Claude AI was used to modify this file for 3D mouse support.
 // It was reviewed and edited by a human.
 
