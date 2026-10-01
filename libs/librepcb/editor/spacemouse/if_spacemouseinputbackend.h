@@ -17,9 +17,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// AI DISCLAIMER:  Claude AI was used in the authoring of this file.
-// It has been reviewed and subsequently edited by a human.
-
 #ifndef LIBREPCB_EDITOR_IF_SPACEMOUSEINPUTBACKEND_H
 #define LIBREPCB_EDITOR_IF_SPACEMOUSEINPUTBACKEND_H
 

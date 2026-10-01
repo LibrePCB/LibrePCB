@@ -17,9 +17,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// AI DISCLAIMER: This file was authored and/or modified by Claude AI.
-// It was fully reviewed by a human.
-
 #ifndef LIBREPCB_EDITOR_SPACEMOUSESETTINGSWIDGET_H
 #define LIBREPCB_EDITOR_SPACEMOUSESETTINGSWIDGET_H
 
