@@ -67,6 +67,29 @@ TEST_F(SlintGraphicsViewTest, applyContinuousMotionPansAtDefaultScale) {
   EXPECT_EQ(QPointF(20, -10), after - before);
 }
 
+// If the view is mirrored (e.g. board "Flip View"), the scene is rendered
+// flipped horizontally. The pan delta is in view (screen) space, so its X
+// component must be inverted in scene space while Y is unaffected.
+TEST_F(SlintGraphicsViewTest,
+       applyContinuousMotionPansInScreenSpaceIfMirrored) {
+  SlintGraphicsView view(SlintGraphicsView::defaultSchematicSceneRect(),
+                         SlintGraphicsView::defaultMargins());
+  GraphicsScene scene;
+  view.setMirror(true);
+  view.render(scene, 200, 150);
+
+  const QPointF before = view.mapToScenePosPx(QPointF(0, 0), 1);
+  view.applyContinuousMotion(QPointF(20, -10), 1);
+  const QPointF after = view.mapToScenePosPx(QPointF(0, 0), 1);
+
+  // The magnitude depends on the auto-fit scale, so only check the direction
+  // and that the 20:10 ratio of the pan components is preserved.
+  const QPointF delta = after - before;
+  EXPECT_LT(delta.x(), 0);
+  EXPECT_LT(delta.y(), 0);
+  EXPECT_NEAR(2.0, delta.x() / delta.y(), 1e-6);
+}
+
 // A no-op call (no pan, no zoom) must not change the projection at all, i.e.
 // it must not emit transformChanged() -- otherwise a polled input device
 // sending idle/zero frames would cause continuous unnecessary repaints.
