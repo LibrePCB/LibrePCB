@@ -304,11 +304,11 @@ struct SpaceMouseMotionFfi {
    */
   int16_t rotation_x;
   /**
-   * Tilt (yaw)
+   * Tilt (roll)
    */
   int16_t rotation_y;
   /**
-   * Twist (roll)
+   * Twist (yaw)
    */
   int16_t rotation_z;
 };

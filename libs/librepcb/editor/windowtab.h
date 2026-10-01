@@ -86,13 +86,13 @@ public:
   /**
    * @brief Apply a motion event from a connected 3D mouse (SpaceMouse)
    *
-   * Only relevant for tabs owning a ::SlintGraphicsView (or, from a later
-   * phase, a ::SlintOpenGlView) - the default implementation does nothing.
+   * Only relevant for tabs owning a ::SlintGraphicsView or a
+   * ::SlintOpenGlView - the default implementation does nothing.
    * Only called for the tab that is current in the current window's
    * current section - see ::GuiApplication::handleSpaceMouseMotion().
    */
   virtual void processSpaceMouseEvent(const SpaceMouseMotionEvent& e,
-                                     qreal dtSeconds) noexcept {
+                                      qreal dtSeconds) noexcept {
     Q_UNUSED(e);
     Q_UNUSED(dtSeconds);
   }

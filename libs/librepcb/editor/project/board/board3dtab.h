@@ -85,7 +85,7 @@ public:
                             slint::private_api::PointerScrollEvent e,
                             int scene) noexcept override;
   void processSpaceMouseEvent(const SpaceMouseMotionEvent& e,
-                             qreal dtSeconds) noexcept override;
+                              qreal dtSeconds) noexcept override;
 
   // Operator Overloadings
   Board3dTab& operator=(const Board3dTab& rhs) = delete;

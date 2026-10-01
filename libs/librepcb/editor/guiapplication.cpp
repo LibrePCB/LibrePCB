@@ -39,6 +39,7 @@
 #include "project/projecteditor.h"
 #include "spacemouse/if_spacemouseinputbackend.h"
 #include "spacemouse/spacemouseinputbackendfactory.h"
+#include "spacemouse/spacemousemotionmapper.h"
 #include "utils/editortoolbox.h"
 #include "utils/slinthelpers.h"
 #include "utils/slintkeyeventtextbuilder.h"
@@ -68,7 +69,6 @@
 #include <QtCore>
 
 #include <algorithm>
-#include <limits>
 #include <memory>
 #include <optional>
 
@@ -162,25 +162,22 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
   connect(mQuickAccessModel.get(), &QuickAccessModel::openFileTriggered, this,
           [this](const FilePath& fp) { openFile(fp, qApp->activeWindow()); });
 
-  // Forward 3D mouse (SpaceMouse) motion to the active tab
-  // Motion events are applied directly inside the motion-event handler,
-  // and scaled by real elapsed time since the previous report.
-  if (mSpaceMouseInput) {
-    connect(mSpaceMouseInput.get(), &IF_SpaceMouseInputBackend::motionEvent,
-            this, &GuiApplication::handleSpaceMouseMotion);
+  // Forward 3D mouse (SpaceMouse) motion to the active tab. Motion events are
+  // applied directly inside the motion-event handler, and scaled by real
+  // elapsed time since the previous report.
+  connect(mSpaceMouseInput.get(), &IF_SpaceMouseInputBackend::motionEvent, this,
+          &GuiApplication::handleSpaceMouseMotion);
 
-    // LED control is currently connection-bound rather than a user 
-	// preference. Turn it on whenever a device is connected (covering both 
-	// app startup and device unplug/replug), and off explicitly at app 
-	// shutdown (see the destructor).
-    connect(mSpaceMouseInput.get(),
-            &IF_SpaceMouseInputBackend::deviceConnectedChanged, this,
-            [this](bool connected) {
-              if (connected) {
-                mSpaceMouseInput->setLedEnabled(true);
-              }
-            });
-  }
+  // LED control is connection-bound rather than a user preference. Turn it on
+  // whenever a device is connected (covering both app startup and device
+  // unplug/replug), and off explicitly at app shutdown (see the destructor).
+  connect(mSpaceMouseInput.get(),
+          &IF_SpaceMouseInputBackend::deviceConnectedChanged, this,
+          [this](bool connected) {
+            if (connected) {
+              mSpaceMouseInput->setLedEnabled(true);
+            }
+          });
 
   // Connect notification signals.
   const qint64 startupTime = QDateTime::currentMSecsSinceEpoch();
@@ -380,13 +377,11 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
 }
 
 GuiApplication::~GuiApplication() noexcept {
-  // Since the SpaceMouse LED is connection bound, explicitly turn it off 
-  // before the backend (and its background capture thread) gets torn down. 
-  // Safe to call even if no device is currently connected - it's a 
+  // Since the SpaceMouse LED is connection bound, explicitly turn it off
+  // before the backend (and its background capture thread) gets torn down.
+  // Safe to call even if no device is currently connected - it's a
   // best-effort HID write, silently ignored either way.
-  if (mSpaceMouseInput) {
-    mSpaceMouseInput->setLedEnabled(false);
-  }
+  mSpaceMouseInput->setLedEnabled(false);
 
   mProjectLibraryUpdater.reset();
 }
@@ -1215,47 +1210,6 @@ std::shared_ptr<MainWindow> GuiApplication::getWindowById(int id) noexcept {
   return nullptr;
 }
 
-namespace {
-
-/* Apply per-axis sensitivity & invert settings to raw motion events
- *
- * Applying sensitivity & invert here avoids modifying the mapper 
- * functions, the dispatch chain, or the Rust capture layer.
- *
- * Sensitivity is applied to the *raw* (pre-normalization) axis value. A
- * sensitivity above 1.0x results in faster, "touchier" motion while  a 
- * sensitivity below 1.0x results in slower motion. The result is clamped to 
- * qint16's range to avoid overflow at high sensitivity as a safety measure.
- */
-SpaceMouseMotionEvent applySpaceMouseSettings(
-    const SpaceMouseMotionEvent& raw,
-    const WorkspaceSettingsItem_SpaceMouse& settings) noexcept {
-  using Axis = WorkspaceSettingsItem_SpaceMouse::Axis;
-
-  auto apply = [&settings](qint16 value, Axis axis) noexcept -> qint16 {
-    const WorkspaceSettingsItem_SpaceMouse::AxisSettings& s =
-        settings.get(axis);
-    qreal scaled = qreal(value) * s.sensitivity;
-    if (s.invert) {
-      scaled = -scaled;
-    }
-    scaled = qBound<qreal>(std::numeric_limits<qint16>::min(), scaled,
-                            std::numeric_limits<qint16>::max());
-    return static_cast<qint16>(qRound(scaled));
-  };
-
-  SpaceMouseMotionEvent out;
-  out.translationX = apply(raw.translationX, Axis::TranslationX);
-  out.translationY = apply(raw.translationY, Axis::TranslationY);
-  out.translationZ = apply(raw.translationZ, Axis::TranslationZ);
-  out.rotationX = apply(raw.rotationX, Axis::RotationX);
-  out.rotationY = apply(raw.rotationY, Axis::RotationY);
-  out.rotationZ = apply(raw.rotationZ, Axis::RotationZ);
-  return out;
-}
-
-}  // namespace
-
 void GuiApplication::handleSpaceMouseMotion(
     const SpaceMouseMotionEvent& e) noexcept {
   // The very first report has no previous timestamp to measure against,
@@ -1274,7 +1228,7 @@ void GuiApplication::handleSpaceMouseMotion(
   const qreal dtSeconds =
       qMin(mSpaceMouseElapsedTimer.restart() / qreal(1000), kMaxDtSeconds);
 
-  // Dispatch to the OS's current window/section/tab, mirroring the 
+  // Dispatch to the OS's current window/section/tab, mirroring the
   // window -> section -> tab chain ::processScenePointerEvent() walks.
   if (auto win = getCurrentWindow()) {
     const SpaceMouseMotionEvent adjusted =

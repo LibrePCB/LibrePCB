@@ -55,9 +55,9 @@ class MainWindowTestAdapter;
 class ProjectEditor;
 class ProjectReadmeRenderer;
 class SchematicTab;
-struct SpaceMouseMotionEvent;
 class WindowSection;
 class WindowTab;
+struct SpaceMouseMotionEvent;
 
 /*******************************************************************************
  *  Class MainWindow

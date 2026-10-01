@@ -23,6 +23,8 @@
 #include <gtest/gtest.h>
 #include <librepcb/editor/spacemouse/spacemousemotionmapper.h>
 
+#include <limits>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -60,9 +62,7 @@ TEST(SpaceMouseMotionMapperTest, testTranslationXyMapsToPan) {
   e.translationY = 50;
   const SpaceMouseMotion2d motion = toSpaceMouseMotion2d(e, 1.0);
 
-  // Both X and Y are inverted (tuned against real hardware, see the doc
-  // comment on toSpaceMouseMotion2d() - X/Z were correct on the first
-  // hardware test, Y was flipped after a follow-up test), both scaled by
+  // Both X and Y are inverted (tuned against real hardware), both scaled by
   // the same sensitivity - so the ratio between them stays 2:1 regardless.
   EXPECT_LT(motion.panDelta.x(), 0);
   EXPECT_LT(motion.panDelta.y(), 0);
@@ -90,8 +90,10 @@ TEST(SpaceMouseMotionMapperTest, testTranslationZMapsToZoom) {
   SpaceMouseMotionEvent negativeZ;
   negativeZ.translationZ = -200;
 
-  const SpaceMouseMotion2d positiveZMotion = toSpaceMouseMotion2d(positiveZ, 1.0);
-  const SpaceMouseMotion2d negativeZMotion = toSpaceMouseMotion2d(negativeZ, 1.0);
+  const SpaceMouseMotion2d positiveZMotion =
+      toSpaceMouseMotion2d(positiveZ, 1.0);
+  const SpaceMouseMotion2d negativeZMotion =
+      toSpaceMouseMotion2d(negativeZ, 1.0);
 
   EXPECT_EQ(QPointF(0, 0), positiveZMotion.panDelta);  // Unaffected by Z.
   EXPECT_LT(positiveZMotion.zoomFactor, 1.0);
@@ -99,7 +101,7 @@ TEST(SpaceMouseMotionMapperTest, testTranslationZMapsToZoom) {
 
   // Symmetric deflection should give a reciprocal zoom factor.
   EXPECT_NEAR(1.0, positiveZMotion.zoomFactor * negativeZMotion.zoomFactor,
-             1e-9);
+              1e-9);
 }
 
 TEST(SpaceMouseMotionMapperTest, testRotationIsIgnored) {
@@ -111,6 +113,128 @@ TEST(SpaceMouseMotionMapperTest, testRotationIsIgnored) {
 
   EXPECT_EQ(QPointF(0, 0), motion.panDelta);
   EXPECT_DOUBLE_EQ(1.0, motion.zoomFactor);
+}
+
+TEST(SpaceMouseMotionMapperTest, testDeflectionIsSaturated) {
+  // Anything beyond the saturation value must not move any faster.
+  SpaceMouseMotionEvent atSaturation;
+  atSaturation.translationX = qRound(kSmAxisSaturation);
+  SpaceMouseMotionEvent beyondSaturation;
+  beyondSaturation.translationX = 30000;
+  EXPECT_EQ(toSpaceMouseMotion2d(atSaturation, 1.0).panDelta,
+            toSpaceMouseMotion2d(beyondSaturation, 1.0).panDelta);
+}
+
+/*******************************************************************************
+ *  Test Methods: toSpaceMouseMotion3d()
+ ******************************************************************************/
+
+// The axis signs of the 3D mapping were tuned against real hardware, so pin
+// them here to catch accidental changes.
+TEST(SpaceMouseMotionMapperTest, test3dAllZeroIsNoOp) {
+  const SpaceMouseMotion3d motion =
+      toSpaceMouseMotion3d(SpaceMouseMotionEvent(), 1.0);
+  EXPECT_EQ(QPointF(0, 0), motion.panDelta);
+  EXPECT_DOUBLE_EQ(1.0, motion.zoomFactor);
+  EXPECT_DOUBLE_EQ(0.0, motion.rotateXDeg);
+  EXPECT_DOUBLE_EQ(0.0, motion.rotateYDeg);
+  EXPECT_DOUBLE_EQ(0.0, motion.rotateZDeg);
+}
+
+TEST(SpaceMouseMotionMapperTest, test3dZeroDtIsNoOp) {
+  SpaceMouseMotionEvent e;
+  e.translationX = 350;
+  e.translationY = 350;
+  e.translationZ = 350;
+  e.rotationX = 350;
+  e.rotationY = 350;
+  e.rotationZ = 350;
+  const SpaceMouseMotion3d motion = toSpaceMouseMotion3d(e, 0.0);
+  EXPECT_EQ(QPointF(0, 0), motion.panDelta);
+  EXPECT_DOUBLE_EQ(1.0, motion.zoomFactor);
+  EXPECT_DOUBLE_EQ(0.0, motion.rotateXDeg);
+  EXPECT_DOUBLE_EQ(0.0, motion.rotateYDeg);
+  EXPECT_DOUBLE_EQ(0.0, motion.rotateZDeg);
+}
+
+TEST(SpaceMouseMotionMapperTest, test3dAxisSigns) {
+  SpaceMouseMotionEvent e;
+  e.translationX = 100;
+  e.translationY = 100;
+  e.translationZ = 100;
+  e.rotationX = 100;
+  e.rotationY = 100;
+  e.rotationZ = 100;
+  const SpaceMouseMotion3d motion = toSpaceMouseMotion3d(e, 1.0);
+  EXPECT_GT(motion.panDelta.x(), 0);
+  EXPECT_LT(motion.panDelta.y(), 0);
+  EXPECT_LT(motion.zoomFactor, 1.0);
+  EXPECT_GT(motion.rotateXDeg, 0);
+  EXPECT_LT(motion.rotateYDeg, 0);
+  EXPECT_LT(motion.rotateZDeg, 0);
+}
+
+TEST(SpaceMouseMotionMapperTest, test3dScalesLinearlyWithDt) {
+  SpaceMouseMotionEvent e;
+  e.translationX = 100;
+  e.rotationZ = 200;
+  const SpaceMouseMotion3d at1s = toSpaceMouseMotion3d(e, 1.0);
+  const SpaceMouseMotion3d at2s = toSpaceMouseMotion3d(e, 2.0);
+  EXPECT_DOUBLE_EQ(2 * at1s.panDelta.x(), at2s.panDelta.x());
+  EXPECT_DOUBLE_EQ(2 * at1s.rotateZDeg, at2s.rotateZDeg);
+}
+
+TEST(SpaceMouseMotionMapperTest, test3dZoomMatches2dZoom) {
+  SpaceMouseMotionEvent e;
+  e.translationZ = -120;
+  EXPECT_DOUBLE_EQ(toSpaceMouseMotion2d(e, 0.5).zoomFactor,
+                   toSpaceMouseMotion3d(e, 0.5).zoomFactor);
+}
+
+/*******************************************************************************
+ *  Test Methods: applySpaceMouseSettings()
+ ******************************************************************************/
+
+TEST(SpaceMouseMotionMapperTest, testSettingsDefaultsLeaveEventUnchanged) {
+  const WorkspaceSettingsItem_SpaceMouse settings(nullptr);
+  SpaceMouseMotionEvent e;
+  e.translationX = 12;
+  e.translationY = -34;
+  e.translationZ = 56;
+  e.rotationX = -78;
+  e.rotationY = 90;
+  e.rotationZ = -123;
+  EXPECT_EQ(e, applySpaceMouseSettings(e, settings));
+}
+
+TEST(SpaceMouseMotionMapperTest, testSettingsSensitivityAndInvertPerAxis) {
+  using Axis = WorkspaceSettingsItem_SpaceMouse::Axis;
+  WorkspaceSettingsItem_SpaceMouse settings(nullptr);
+  settings.set(Axis::TranslationX, {2.0, false});
+  settings.set(Axis::RotationY, {0.5, true});
+
+  SpaceMouseMotionEvent e;
+  e.translationX = 100;
+  e.translationY = 100;  // Untouched axis.
+  e.rotationY = 100;
+  const SpaceMouseMotionEvent out = applySpaceMouseSettings(e, settings);
+  EXPECT_EQ(200, out.translationX);
+  EXPECT_EQ(100, out.translationY);
+  EXPECT_EQ(-50, out.rotationY);
+}
+
+TEST(SpaceMouseMotionMapperTest, testSettingsResultIsClampedToInt16) {
+  using Axis = WorkspaceSettingsItem_SpaceMouse::Axis;
+  WorkspaceSettingsItem_SpaceMouse settings(nullptr);
+  settings.set(Axis::TranslationX, {1000.0, false});
+  settings.set(Axis::TranslationY, {1000.0, true});
+
+  SpaceMouseMotionEvent e;
+  e.translationX = 30000;
+  e.translationY = 30000;
+  const SpaceMouseMotionEvent out = applySpaceMouseSettings(e, settings);
+  EXPECT_EQ(std::numeric_limits<qint16>::max(), out.translationX);
+  EXPECT_EQ(std::numeric_limits<qint16>::min(), out.translationY);
 }
 
 /*******************************************************************************

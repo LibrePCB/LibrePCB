@@ -50,16 +50,15 @@ class SpaceMouseSettingsWidget;
  *
  * Shown as the "Space Mouse" tab of ::WorkspaceSettingsDialog. Extracted out
  * of that dialog into its own widget since the Space Mouse controls (six
- * axis sliders/checkboxes, LED toggle, and the "unavailable" fallback page)
- * made up a disproportionate share of the dialog's code.
+ * axis sliders/checkboxes and the "unavailable" fallback page) made up a
+ * disproportionate share of the dialog's code.
  *
  * Mirrors the existing `*OutputJobWidget` family in
  * `editor/project/outputjobsdialog/`: constructed directly (no Designer
  * promotion) and dropped into a placeholder container in the parent's
  * `.ui`. Unlike that family, this widget does not write through to its
- * settings object live - Space Mouse settings (like the LED checkbox) are
- * deliberately applied only on the dialog's Apply/OK, so the caller must
- * explicitly call ::save().
+ * settings object live - Space Mouse settings are deliberately applied
+ * only on the dialog's Apply/OK, so the caller must explicitly call ::save().
  */
 class SpaceMouseSettingsWidget final : public QWidget {
   Q_OBJECT
@@ -68,9 +67,8 @@ public:
   // Constructors / Destructor
   SpaceMouseSettingsWidget() = delete;
   SpaceMouseSettingsWidget(const SpaceMouseSettingsWidget& other) = delete;
-  explicit SpaceMouseSettingsWidget(
-      WorkspaceSettingsItem_SpaceMouse& settings,
-      QWidget* parent = nullptr) noexcept;
+  explicit SpaceMouseSettingsWidget(WorkspaceSettingsItem_SpaceMouse& settings,
+                                    QWidget* parent = nullptr) noexcept;
   ~SpaceMouseSettingsWidget() noexcept override;
 
   // General Methods
@@ -97,13 +95,24 @@ public:
   SpaceMouseSettingsWidget& operator=(const SpaceMouseSettingsWidget& rhs) =
       delete;
 
+private:  // Types
+  /// The widgets belonging to one motion axis
+  struct AxisWidgets {
+    WorkspaceSettingsItem_SpaceMouse::Axis axis;
+    QLabel* icon;
+    QString iconPath;
+    QSlider* slider;
+    QLabel* valueLabel;
+    QCheckBox* invert;
+  };
+
 private:  // Methods
   bool eventFilter(QObject* watched, QEvent* event) noexcept override;
 
 private:  // Data
   WorkspaceSettingsItem_SpaceMouse& mSettings;
   QScopedPointer<Ui::SpaceMouseSettingsWidget> mUi;
-  QVector<QSlider*> mSliders;
+  QVector<AxisWidgets> mAxes;  ///< Empty if support is not available
 };
 
 /*******************************************************************************

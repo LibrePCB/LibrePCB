@@ -45,8 +45,8 @@ namespace editor {
 
 class GuiApplication;
 class MainWindow;
-struct SpaceMouseMotionEvent;
 class WindowTab;
+struct SpaceMouseMotionEvent;
 
 /*******************************************************************************
  *  Class WindowSection

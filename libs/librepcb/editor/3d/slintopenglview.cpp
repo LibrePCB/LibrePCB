@@ -293,9 +293,10 @@ void SlintOpenGlView::zoomOut() noexcept {
   zoom(center, 1 / 1.3);
 }
 
-void SlintOpenGlView::applyContinuousMotion(
-    const QPointF& panDelta, qreal zoomFactor, qreal rotateXDeg,
-    qreal rotateYDeg, qreal rotateZDeg) noexcept {
+void SlintOpenGlView::applyContinuousMotion(const QPointF& panDelta,
+                                            qreal zoomFactor, qreal rotateXDeg,
+                                            qreal rotateYDeg,
+                                            qreal rotateZDeg) noexcept {
   mAnimation->stop();
 
   OpenGlProjection projection = mProjection;

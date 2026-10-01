@@ -318,7 +318,8 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
   // Initialize Space Mouse widget (self-contained; see
   // settingswidgets/spacemousesettingswidget.h).
   {
-    mSpaceMouseWidget = new SpaceMouseSettingsWidget(mSettings.spaceMouse, this);
+    mSpaceMouseWidget =
+        new SpaceMouseSettingsWidget(mSettings.spaceMouse, this);
     mUi->spaceMouseTab->layout()->addWidget(mSpaceMouseWidget);
   }
 
