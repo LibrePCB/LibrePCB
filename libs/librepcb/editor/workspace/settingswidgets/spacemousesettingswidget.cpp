@@ -148,7 +148,7 @@ SpaceMouseSettingsWidget::~SpaceMouseSettingsWidget() noexcept {
 void SpaceMouseSettingsWidget::load() noexcept {
   // Setting the slider value also updates the value label (see constructor).
   // The axes list is empty if Space Mouse support is not available.
-  for (const AxisWidgets& w : mAxes) {
+  for (const AxisWidgets& w : std::as_const(mAxes)) {
     const WorkspaceSettingsItem_SpaceMouse::AxisSettings& s =
         mSettings.get(w.axis);
     w.slider->setValue(sensitivityToSlider(s.sensitivity));
@@ -158,7 +158,7 @@ void SpaceMouseSettingsWidget::load() noexcept {
 
 void SpaceMouseSettingsWidget::save() noexcept {
   WorkspaceSettingsItem_SpaceMouse::AxisSettingsMap settings;
-  for (const AxisWidgets& w : mAxes) {
+  for (const AxisWidgets& w : std::as_const(mAxes)) {
     WorkspaceSettingsItem_SpaceMouse::AxisSettings s;
     s.sensitivity = sliderToSensitivity(w.slider->value());
     s.invert = w.invert->isChecked();

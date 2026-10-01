@@ -14,14 +14,19 @@ set(LIBREPCB_SPACEMOUSE_AVAILABLE TRUE)
 if(NOT WIN32 AND NOT APPLE)
   find_library(UDEV_LIBRARY udev)
   if(NOT UDEV_LIBRARY)
-    message(WARNING
-      "libudev not found. Space mouse support will not be available in "
-      "the build. If space mouse support is desired, install libudev and "
-      "repeat the build.")
+    message(
+      WARNING
+        "libudev not found. Space mouse support will not be available in "
+        "the build. If space mouse support is desired, install libudev and "
+        "repeat the build."
+    )
     set(LIBREPCB_SPACEMOUSE_AVAILABLE FALSE)
   endif()
 endif()
-set(LIBREPCB_SPACEMOUSE_AVAILABLE ${LIBREPCB_SPACEMOUSE_AVAILABLE} PARENT_SCOPE)
+set(LIBREPCB_SPACEMOUSE_AVAILABLE
+    ${LIBREPCB_SPACEMOUSE_AVAILABLE}
+    PARENT_SCOPE
+)
 
 # Determine Cargo features
 set(CARGO_FEATURES)
@@ -45,11 +50,11 @@ target_link_libraries(
   librepcb_rust_core
   INTERFACE ${QT}::Core
 )
-if(LIBREPCB_SPACEMOUSE_AVAILABLE AND NOT WIN32 AND NOT APPLE)
-  target_link_libraries(
-    librepcb_rust_core
-    INTERFACE ${UDEV_LIBRARY}
-  )
+if(LIBREPCB_SPACEMOUSE_AVAILABLE
+   AND NOT WIN32
+   AND NOT APPLE
+)
+  target_link_libraries(librepcb_rust_core INTERFACE ${UDEV_LIBRARY})
 endif()
 
 # Add C++ sources

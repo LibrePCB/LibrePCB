@@ -1,15 +1,15 @@
 # udev rule granting non-root read/write access to 3Dconnexion SpaceMouse
-# and related 3D-mouse HID devices.  This allows LibrePCB (which reads raw 
-# HID reports directly via the `hidapi` crate) can use them without running 
+# and related 3D-mouse HID devices.  This allows LibrePCB (which reads raw
+# HID reports directly via the `hidapi` crate) can use them without running
 # as root.
 #
 # Matches on:
 #   - 0x256F: 3Dconnexion's own USB vendor ID. Matched solely by VID
 #     because 3Dconnexion doesn't ship non-3D-input hardware.
 #   - 0x046D: Logitech's vendor ID, used by older/legacy 3Dconnexion
-#     devices (Logitech owns 3Dconnexion). Because Logitech also makes 
+#     devices (Logitech owns 3Dconnexion). Because Logitech also makes
 #     unrelated peripherals (keyboards, webcams, headsets, mice) under
-#     this same ID, we must include *specific* PIDs in the check to 
+#     this same ID, we must include *specific* PIDs in the check to
 #     avoid granting access to unrelated devices.
 #
 # Product IDs verified directly against the USB ID Database

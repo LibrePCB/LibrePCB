@@ -45,17 +45,17 @@ class SpaceMouseSettingsWidget;
 /**
  * @brief Widget (GUI) to view and modify the Space Mouse settings
  *
- * Shown as the "Space Mouse" tab of ::WorkspaceSettingsDialog. Extracted out
+ * Shown as the "Space Mouse" tab of WorkspaceSettingsDialog. Extracted out
  * of that dialog into its own widget since the Space Mouse controls (six
  * axis sliders/checkboxes and the "unavailable" fallback page) made up a
  * disproportionate share of the dialog's code.
  *
- * Mirrors the existing `*OutputJobWidget` family in
- * `editor/project/outputjobsdialog/`: constructed directly (no Designer
+ * Mirrors the existing *OutputJobWidget family in
+ * editor/project/outputjobsdialog/: constructed directly (no Designer
  * promotion) and dropped into a placeholder container in the parent's
- * `.ui`. Unlike that family, this widget does not write through to its
+ * .ui. Unlike that family, this widget does not write through to its
  * settings object live - Space Mouse settings are deliberately applied
- * only on the dialog's Apply/OK, so the caller must explicitly call ::save().
+ * only on the dialog's Apply/OK, so the caller must explicitly call save().
  */
 class SpaceMouseSettingsWidget final : public QWidget {
   Q_OBJECT
