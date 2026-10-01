@@ -1,6 +1,3 @@
-# AI Disclaimer: This file was originally authored by Claude AI.  It has
-# subsequently been reviewed and edited by a human.
-#
 # udev rule granting non-root read/write access to 3Dconnexion SpaceMouse
 # and related 3D-mouse HID devices.  This allows LibrePCB (which reads raw 
 # HID reports directly via the `hidapi` crate) can use them without running 
