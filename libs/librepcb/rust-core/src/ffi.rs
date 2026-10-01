@@ -1,6 +1,3 @@
-// Claude AI assisted in modifications to this file.
-// It was reviewed by a human.
-
 //! FFI for Rust modules, to be used from C++ through cbindgen.
 
 mod angle_ffi;

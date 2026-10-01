@@ -1,6 +1,3 @@
-# AI DISCLAIMER: This file was modified by Claude AI.
-# All modifications have been reviewed by a human.
-
 # CMake version configuration
 # (Note: The minimal version 3.22 is shipped with Ubuntu 22.04)
 cmake_minimum_required(VERSION 3.22)

@@ -17,10 +17,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// AI DISCLAIMER: Claude AI assisted in the authoring of functions and
-// modifications related to Space Mouse support.  All changes were reviewed
-// and edited by a human.
-
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
