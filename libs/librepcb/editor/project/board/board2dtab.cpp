@@ -17,9 +17,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// AI DISCLAIMER: Claude AI was used to author the functions for 3D mouse
-// (SpaceMouse) support.  All modifications have been reviewed by a human.
-
 /*******************************************************************************
  *  Includes
  ******************************************************************************/

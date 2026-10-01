@@ -17,9 +17,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// AI DISCLAIMER: This file was modified by Claude AI.  All modifications have
-// been reviewed by a human.
-
 #ifndef LIBREPCB_EDITOR_SLINTGRAPHICSVIEW_H
 #define LIBREPCB_EDITOR_SLINTGRAPHICSVIEW_H
 

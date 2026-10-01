@@ -1,6 +1,3 @@
-# Claude AI assisted in the writing of this file.
-# It has been reviewed by a human.
-
 # Enable Qt MOC/UIC/RCC
 set(CMAKE_AUTOMOC OFF)
 set(CMAKE_AUTOUIC OFF)
