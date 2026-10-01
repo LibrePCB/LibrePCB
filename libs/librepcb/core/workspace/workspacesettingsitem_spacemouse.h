@@ -74,7 +74,7 @@ public:
   };
 
   /**
-   * @brief All six axes settings, keyed by ::Axis
+   * @brief All six axes settings, keyed by Axis
    */
   using AxisSettingsMap = QMap<Axis, AxisSettings>;
 

@@ -48,22 +48,22 @@ namespace editor {
 
 /**
  * @brief Cross-platform (Windows/macOS/Linux) backend for
- *        ::IF_SpaceMouseInputBackend, backed by the `spacemouse` Rust
- *        crate (`hidapi`-based raw HID capture), via FFI glue that lives
- *        in `librepcb-rust-core`
+ *        IF_SpaceMouseInputBackend, backed by the spacemouse Rust
+ *        crate (hidapi-based raw HID capture), via FFI glue that lives
+ *        in librepcb-rust-core
  *
- * Reads raw HID reports directly via `hidapi`, running on a background
- * thread owned by the Rust side (see the crate's `hid.rs`). This class'
+ * Reads raw HID reports directly via hidapi, running on a background
+ * thread owned by the Rust side (see the crate's hid.rs). This class'
  * job is narrow and mechanical:
  *
  * - Marshal the Rust-side callbacks (which fire on that background
  *   thread, *not* this object's thread) onto this object's own thread
  *   before emitting any Qt signal (see the trampolines in the .cpp file).
  * - Do a trivial field-by-field copy from the FFI motion struct into
- *   ::SpaceMouseMotionEvent.
+ *   SpaceMouseMotionEvent.
  *
  * No sensitivity scaling, dead-zone handling, or calibration happens here
- * or in the Rust crate - see `spacemousemotionmapper.h` for where that's
+ * or in the Rust crate - see spacemousemotionmapper.h for where that's
  * applied, downstream of this class.
  */
 class SpaceMouseInputRust final : public IF_SpaceMouseInputBackend {
@@ -89,9 +89,9 @@ public:
 private:  // Data
   RustHandle<rs::FfiSpaceMouseBackend> mHandle;
 
-  // Mirrors the Rust side's connection state so ::isDeviceConnected() can
+  // Mirrors the Rust side's connection state so isDeviceConnected() can
   // be answered synchronously from any thread without waiting for the
-  // queued signal to be processed. Only ::handleConnectedChanged() (this
+  // queued signal to be processed. Only handleConnectedChanged() (this
   // object's own thread) and the trampoline (the Rust background thread)
   // touch this - both do so via the atomic, so no additional locking is
   // needed.
