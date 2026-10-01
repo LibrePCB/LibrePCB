@@ -142,8 +142,6 @@ private:  // Methods
    */
   void serializeImpl(SExpression& root) const override;
 
-  static QString axisToString(Axis axis) noexcept;
-  static std::optional<Axis> axisFromString(const QString& str) noexcept;
   static AxisSettingsMap defaultAxisSettings() noexcept;
 
 private:

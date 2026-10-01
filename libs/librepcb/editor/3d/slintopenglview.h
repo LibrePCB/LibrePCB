@@ -126,9 +126,9 @@ public:
   /**
    * @brief Apply a continuous pan/zoom/rotate delta (e.g. from a SpaceMouse)
    *
-   * The 3D counterpart of ::SlintGraphicsView::applyContinuousMotion(). 
-   * @p panDelta and @p zoomFactor use the same conventions as there; the 
-   * three rotation angles are applied around the view's own current local 
+   * The 3D counterpart of ::SlintGraphicsView::applyContinuousMotion().
+   * @p panDelta and @p zoomFactor use the same conventions as there; the
+   * three rotation angles are applied around the view's own current local
    * X/Y/Z axes (the same convention already used by ::rotate()).  Both
    * inputs have already been scaled by whatever elapsed time the caller is
    * normalizing against.

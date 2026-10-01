@@ -24,9 +24,9 @@ pub struct SpaceMouseMotionFfi {
   pub translation_z: i16,
   /// Tilt (pitch)
   pub rotation_x: i16,
-  /// Tilt (yaw)
+  /// Tilt (roll)
   pub rotation_y: i16,
-  /// Twist (roll)
+  /// Twist (yaw)
   pub rotation_z: i16,
 }
 
@@ -94,7 +94,7 @@ pub struct FfiSpaceMouseBackend {
 /// `user_data` is passed back unmodified as the first argument of every
 /// callback invocation; Rust never dereferences it. The caller must keep
 /// whatever it points to alive until after [`ffi_spacemouse_backend_free`]
-/// returns, and must not call back into Rust synchronously from within a 
+/// returns, and must not call back into Rust synchronously from within a
 /// callback (there is no re-entrancy protection).
 ///
 /// Never returns null: Unlike opening a specific device, constructing the
@@ -127,7 +127,7 @@ extern "C" fn ffi_spacemouse_backend_is_connected(
 ///
 /// A one-shot command: applied immediately if a device is currently open,
 /// and (re-)applied automatically any time the device connects.  Devices
-/// without an LED, and any transient write failure, are both silently 
+/// without an LED, and any transient write failure, are both silently
 /// ignored.  See [`SpaceMouseBackend::set_led`] for additional info.
 #[no_mangle]
 extern "C" fn ffi_spacemouse_backend_set_led(

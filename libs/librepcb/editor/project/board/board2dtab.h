@@ -130,7 +130,7 @@ public:
   bool processSceneKeyReleased(
       const slint::language::KeyEvent& e) noexcept override;
   void processSpaceMouseEvent(const SpaceMouseMotionEvent& e,
-                             qreal dtSeconds) noexcept override;
+                              qreal dtSeconds) noexcept override;
   QSet<const Layer*> getVisibleCopperLayers() const noexcept;
 
   // IF_GraphicsViewEventHandler

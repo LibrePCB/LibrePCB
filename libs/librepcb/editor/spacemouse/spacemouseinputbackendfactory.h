@@ -49,11 +49,11 @@ class IF_SpaceMouseInputBackend;
  * Kept as a free function (rather than e.g. a static factory method on the
  * interface) so callers (currently just ::GuiApplication) don't need to
  * know or care which backend implementations exist, avoiding an `#ifdef`
- * per platform anywhere outside this one file.
+ * per build configuration anywhere outside this one file.
  *
- * @return The platform backend, or `nullptr` if none is available (yet) for
- *         the current platform. A `nullptr` return is a perfectly normal, 
- *         expected outcome, not an error.
+ * @return The backend for this build. Never `nullptr`: if SpaceMouse
+ *         support is not available in this build, a no-op backend which
+ *         never reports a device is returned instead.
  */
 std::unique_ptr<IF_SpaceMouseInputBackend> createSpaceMouseInputBackend(
     QObject* parent = nullptr) noexcept;

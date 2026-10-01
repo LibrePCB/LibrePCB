@@ -107,6 +107,7 @@ add_executable(
   core/utils/toolboxtest.cpp
   core/utils/transformtest.cpp
   core/workspace/workspacelibrarydbtest.cpp
+  core/workspace/workspacesettingsitem_spacemousetest.cpp
   core/workspace/workspacesettingstest.cpp
   core/workspace/workspacetest.cpp
   eagleimport/eaglelibraryimporttest.cpp

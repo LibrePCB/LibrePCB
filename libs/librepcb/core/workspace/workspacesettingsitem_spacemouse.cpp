@@ -27,6 +27,9 @@
 
 #include <QtCore>
 
+#include <cmath>
+#include <optional>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -35,10 +38,35 @@ namespace librepcb {
 namespace {
 
 // Decimal digits of precision used when serializing a Space Mouse axis
-// sensitivity multiplier to the settings file.  Since multipliers are
-// presently in units of 1/100, six decimal places is overkill.
-// (see kSliderRange in spacemousesettingswidget.cpp)
+// sensitivity multiplier to the settings file. Since the settings UI only
+// offers multipliers in steps of 1/100, six decimal places is plenty.
 constexpr int kSensitivitySerializationDecimals = 6;
+
+using Axis = WorkspaceSettingsItem_SpaceMouse::Axis;
+
+// All axes with their identifiers in the settings file. The order of this
+// table is also the (fixed) order in which axes are serialized.
+struct AxisInfo {
+  Axis axis;
+  const char* name;
+};
+constexpr AxisInfo kAxes[] = {
+    {Axis::TranslationX, "translation_x"},
+    {Axis::TranslationY, "translation_y"},
+    {Axis::TranslationZ, "translation_z"},
+    {Axis::RotationX, "rotation_x"},
+    {Axis::RotationY, "rotation_y"},
+    {Axis::RotationZ, "rotation_z"},
+};
+
+std::optional<Axis> axisFromString(const QString& str) noexcept {
+  for (const AxisInfo& info : kAxes) {
+    if (str == QLatin1String(info.name)) {
+      return info.axis;
+    }
+  }
+  return std::nullopt;
+}
 
 }  // namespace
 
@@ -113,7 +141,14 @@ void WorkspaceSettingsItem_SpaceMouse::loadImpl(const SExpression& root) {
       continue;  // Unknown axis identifier, ignore (e.g. future file format).
     }
     AxisSettings s;
-    s.sensitivity = child->getChild("sensitivity/@0").getValue().toDouble();
+    // Ignore invalid values (zero, negative, NaN, ...) to avoid ending up
+    // with a dead axis due to a corrupted settings file.
+    bool ok = false;
+    const double sensitivity =
+        child->getChild("sensitivity/@0").getValue().toDouble(&ok);
+    if (ok && std::isfinite(sensitivity) && (sensitivity > 0)) {
+      s.sensitivity = sensitivity;
+    }
     s.invert = deserialize<bool>(child->getChild("invert/@0"));
     settings[*axis] = s;
   }
@@ -125,63 +160,25 @@ void WorkspaceSettingsItem_SpaceMouse::loadImpl(const SExpression& root) {
 }
 
 void WorkspaceSettingsItem_SpaceMouse::serializeImpl(SExpression& root) const {
-  // Iterate in a fixed, deterministic order for a clean file format.
-  const QList<Axis> orderedAxes = {
-      Axis::TranslationX, Axis::TranslationY, Axis::TranslationZ,
-      Axis::RotationX,    Axis::RotationY,    Axis::RotationZ,
-  };
-  foreach (Axis axis, orderedAxes) {
-    const AxisSettings& s = mAxisSettings.value(axis);
+  for (const AxisInfo& info : kAxes) {
+    const AxisSettings& s = mAxisSettings.value(info.axis);
     root.ensureLineBreak();
     SExpression& child = root.appendList("axis");
-    child.appendChild(SExpression::createToken(axisToString(axis)));
-    child.appendChild("sensitivity",
+    child.appendChild(SExpression::createToken(info.name));
+    child.appendChild(
+        "sensitivity",
         QString::number(s.sensitivity, 'f', kSensitivitySerializationDecimals));
     child.appendChild("invert", s.invert);
   }
   root.ensureLineBreak();
 }
 
-QString WorkspaceSettingsItem_SpaceMouse::axisToString(Axis axis) noexcept {
-  switch (axis) {
-    case Axis::TranslationX:
-      return "translation_x";
-    case Axis::TranslationY:
-      return "translation_y";
-    case Axis::TranslationZ:
-      return "translation_z";
-    case Axis::RotationX:
-      return "rotation_x";
-    case Axis::RotationY:
-      return "rotation_y";
-    case Axis::RotationZ:
-      return "rotation_z";
-    default:
-      return QString();
-  }
-}
-
-std::optional<WorkspaceSettingsItem_SpaceMouse::Axis>
-    WorkspaceSettingsItem_SpaceMouse::axisFromString(
-        const QString& str) noexcept {
-  if (str == QLatin1String("translation_x")) return Axis::TranslationX;
-  if (str == QLatin1String("translation_y")) return Axis::TranslationY;
-  if (str == QLatin1String("translation_z")) return Axis::TranslationZ;
-  if (str == QLatin1String("rotation_x")) return Axis::RotationX;
-  if (str == QLatin1String("rotation_y")) return Axis::RotationY;
-  if (str == QLatin1String("rotation_z")) return Axis::RotationZ;
-  return std::nullopt;
-}
-
 WorkspaceSettingsItem_SpaceMouse::AxisSettingsMap
     WorkspaceSettingsItem_SpaceMouse::defaultAxisSettings() noexcept {
   AxisSettingsMap defaults;
-  defaults[Axis::TranslationX] = AxisSettings();
-  defaults[Axis::TranslationY] = AxisSettings();
-  defaults[Axis::TranslationZ] = AxisSettings();
-  defaults[Axis::RotationX] = AxisSettings();
-  defaults[Axis::RotationY] = AxisSettings();
-  defaults[Axis::RotationZ] = AxisSettings();
+  for (const AxisInfo& info : kAxes) {
+    defaults[info.axis] = AxisSettings();
+  }
   return defaults;
 }
 
