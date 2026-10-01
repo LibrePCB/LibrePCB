@@ -1019,19 +1019,14 @@ add_library(
 # feature. No explicit target_link_libraries() for LibrePCB::RustCore is
 # needed here: librepcb_editor already links LibrePCB::Core PUBLIC-ly, which
 # itself links LibrePCB::RustCore PUBLIC-ly.
-target_sources(
-  librepcb_editor
-  PRIVATE spacemouse/spacemouseinputnull.h
-)
+target_sources(librepcb_editor PRIVATE spacemouse/spacemouseinputnull.h)
 if(LIBREPCB_SPACEMOUSE_AVAILABLE)
   target_sources(
-    librepcb_editor
-    PRIVATE spacemouse/spacemouseinputrust.cpp
-            spacemouse/spacemouseinputrust.h
+    librepcb_editor PRIVATE spacemouse/spacemouseinputrust.cpp
+                            spacemouse/spacemouseinputrust.h
   )
   target_compile_definitions(
-    librepcb_editor
-    PRIVATE LIBREPCB_SPACEMOUSE_AVAILABLE
+    librepcb_editor PRIVATE LIBREPCB_SPACEMOUSE_AVAILABLE
   )
 endif()
 

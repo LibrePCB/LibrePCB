@@ -171,6 +171,12 @@
         <file>places/project_folder.png</file>
         <file>resistor-eu.svg</file>
         <file>schematic.svg</file>
+        <file>settings/spacemouse-panx.svg</file>
+        <file>settings/spacemouse-pany.svg</file>
+        <file>settings/spacemouse-panz.svg</file>
+        <file>settings/spacemouse-pitch.svg</file>
+        <file>settings/spacemouse-roll.svg</file>
+        <file>settings/spacemouse-yaw.svg</file>
         <file>show-pin-numbers.svg</file>
         <file>status/dialog_error.png</file>
         <file>status/dialog_warning.png</file>
@@ -181,12 +187,6 @@
         <file>wizards/eagle_watermark.png</file>
         <file>wizards/kicad_watermark.png</file>
         <file>wizards/watermark.jpg</file>
-        <file>settings/spacemouse-panx.svg</file>
-        <file>settings/spacemouse-pany.svg</file>
-        <file>settings/spacemouse-panz.svg</file>
-        <file>settings/spacemouse-pitch.svg</file>
-        <file>settings/spacemouse-roll.svg</file>
-        <file>settings/spacemouse-yaw.svg</file>
         <file>zoom-fit.svg</file>
     </qresource>
 </RCC>

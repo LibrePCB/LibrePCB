@@ -75,7 +75,7 @@ struct SpaceMouseMotionEvent {
  *
  * Implementors own whatever OS-level plumbing is needed to receive raw motion
  * reports from a connected 3Dconnexion (or compatible) device and re-emit them
- * as a ::motionEvent(). A backend is expected to do nothing (and never emit)
+ * as a motionEvent(). A backend is expected to do nothing (and never emit)
  * until a compatible device is actually detected, so simply instantiating one
  * is a safe no-op on a machine without a 3D mouse connected.
  *

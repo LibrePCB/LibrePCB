@@ -40,11 +40,11 @@ class IF_SpaceMouseInputBackend;
  ******************************************************************************/
 
 /**
- * @brief Create the ::IF_SpaceMouseInputBackend implementation for the
+ * @brief Create the IF_SpaceMouseInputBackend implementation for the
  *        platform LibrePCB is currently running on
  *
  * Kept as a free function (rather than e.g. a static factory method on the
- * interface) so callers (currently just ::GuiApplication) don't need to
+ * interface) so callers (currently just GuiApplication) don't need to
  * know or care which backend implementations exist, avoiding an `#ifdef`
  * per build configuration anywhere outside this one file.
  *
