@@ -306,8 +306,9 @@ bool GraphicsView::eventFilter(QObject* obj, QEvent* event) {
             Point::fromPx(e->buttonDownScenePos(Qt::LeftButton)),
             e->buttons(),
             e->modifiers(),
-            QPointF(e->screenPos()),
-            QPointF(e->buttonDownScreenPos(Qt::LeftButton)),
+            rectSelectionModeFromScreenDrag(
+                QPointF(e->buttonDownScreenPos(Qt::LeftButton)),
+                QPointF(e->screenPos())),
         };
         mEventHandlerObject->graphicsSceneLeftMouseButtonPressed(gsme);
       }
@@ -332,8 +333,9 @@ bool GraphicsView::eventFilter(QObject* obj, QEvent* event) {
             Point::fromPx(e->buttonDownScenePos(e->button())),
             e->buttons(),
             e->modifiers(),
-            QPointF(e->screenPos()),
-            QPointF(e->buttonDownScreenPos(e->button())),
+            rectSelectionModeFromScreenDrag(
+                QPointF(e->buttonDownScreenPos(e->button())),
+                QPointF(e->screenPos())),
         };
         if (e->button() == Qt::LeftButton) {
           mEventHandlerObject->graphicsSceneLeftMouseButtonReleased(gsme);
@@ -365,8 +367,9 @@ bool GraphicsView::eventFilter(QObject* obj, QEvent* event) {
             Point::fromPx(e->buttonDownScenePos(Qt::LeftButton)),
             e->buttons(),
             e->modifiers(),
-            QPointF(e->screenPos()),
-            QPointF(e->buttonDownScreenPos(Qt::LeftButton)),
+            rectSelectionModeFromScreenDrag(
+                QPointF(e->buttonDownScreenPos(Qt::LeftButton)),
+                QPointF(e->screenPos())),
         };
         mEventHandlerObject->graphicsSceneMouseMoved(gsme);
       }
@@ -382,8 +385,9 @@ bool GraphicsView::eventFilter(QObject* obj, QEvent* event) {
             Point::fromPx(e->buttonDownScenePos(Qt::LeftButton)),
             e->buttons(),
             e->modifiers(),
-            QPointF(e->screenPos()),
-            QPointF(e->buttonDownScreenPos(Qt::LeftButton)),
+            rectSelectionModeFromScreenDrag(
+                QPointF(e->buttonDownScreenPos(Qt::LeftButton)),
+                QPointF(e->screenPos())),
         };
         return mEventHandlerObject->graphicsSceneLeftMouseButtonDoubleClicked(
             gsme);

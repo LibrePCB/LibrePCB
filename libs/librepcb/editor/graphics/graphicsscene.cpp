@@ -202,10 +202,14 @@ void GraphicsScene::setSelectionRect(const Point& p1,
 
 void GraphicsScene::setSelectionRect(const Point& p1, const Point& p2,
                                      RectSelection::Mode mode) noexcept {
-  // Dashed rectangle for crossing selection, solid one for window selection.
   QPen pen = mSelectionRectItem->pen();
-  pen.setStyle((mode == RectSelection::Mode::Window) ? Qt::SolidLine
-                                                     : Qt::DashLine);
+  if (mode == RectSelection::Mode::Window) {
+    pen.setStyle(Qt::SolidLine);
+  } else {
+    // A custom dash is clearer than Qt::DashLine
+    pen.setStyle(Qt::CustomDashLine);
+    pen.setDashPattern({12, 6});
+  }
   mSelectionRectItem->setPen(pen);
   setSelectionRect(p1, p2);
 }
