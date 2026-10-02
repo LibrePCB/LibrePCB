@@ -39,7 +39,7 @@ namespace librepcb {
 namespace editor {
 
 /*******************************************************************************
- *  Class RectSelection
+ *  Struct RectSelection
  ******************************************************************************/
 
 /**
@@ -57,89 +57,82 @@ namespace editor {
  * parts (i.e., a symbol adds its pins and fields; a device adds its pads).
  * Both modes use the same footprint.
  */
-class RectSelection {
-public:
+struct RectSelection {
   enum class Mode {
     Crossing,  ///< Select items which touch the rectangle.
     Window,  ///< Select items which are completely enclosed by the rectangle.
   };
 
-  // Constructors / Destructor
-  RectSelection() = delete;
-  RectSelection(const QRectF& rect, Mode mode) noexcept
-    : mRect(rect), mMode(mode) {}
-
-  // Getters
-  const QRectF& getRect() const noexcept { return mRect; }
-  Mode getMode() const noexcept { return mMode; }
-
-  // General Methods
-
-  /**
-   * @brief Check if a footprint is hit by the selection rectangle
-   *
-   * @param scenePath   The footprint in scene coordinates (in pixels). An
-   *                    empty path (e.g. of an item on a hidden layer) is
-   *                    never hit, in any mode.
-   * @retval true   The footprint is selected by the rectangle.
-   * @retval false  The footprint is not selected by the rectangle.
-   */
-  bool hits(const QPainterPath& scenePath) const noexcept;
-
-  /**
-   * @brief Check if the shape of an item is hit by the selection rectangle
-   *
-   * @param item    The item whose shape() is used as its footprint.
-   * @retval true   The item is selected by the rectangle.
-   * @retval false  The item is not selected by the rectangle.
-   */
-  bool hits(const QGraphicsItem& item) const noexcept;
-
-  /**
-   * @brief Check if a composite footprint is hit by the selection rectangle
-   *
-   * The footprint consists of several parts, e.g. a symbol plus its pins
-   * and fields. In crossing mode it is hit if any part is
-   * touched by the rectangle, in window mode it is hit only if all parts are
-   * entirely inside the rectangle. Empty parts are ignored, and a footprint
-   * without any geometry is never hit.
-   *
-   * @param scenePaths  The parts of the footprint in scene coordinates.
-   * @retval true   The footprint is selected by the rectangle.
-   * @retval false  The footprint is not selected by the rectangle.
-   */
-  bool hits(const QVector<QPainterPath>& scenePaths) const noexcept;
-
-  /**
-   * @brief Get the footprint of an item in scene coordinates
-   *
-   * @tparam T      Item type providing `getVisibleShape()`.
-   * @param item    The item whose visible shape is used as its footprint.
-   * @return The footprint (or one of its parts), to be passed to #hits().
-   */
-  template <typename T>
-  static QPainterPath footprintOf(const T& item) noexcept {
-    return item.mapToScene(item.getVisibleShape());
-  }
-
-  /**
-   * @brief Check if the visible shape of an item is hit by the selection
-   *        rectangle
-   *
-   * @tparam T      Item type providing `getVisibleShape()`.
-   * @param item    The item whose visible shape is used as its footprint.
-   * @retval true   The item is selected by the rectangle.
-   * @retval false  The item is not selected by the rectangle.
-   */
-  template <typename T>
-  bool hitsVisible(const T& item) const noexcept {
-    return hits(footprintOf(item));
-  }
-
-private:
-  QRectF mRect;
-  Mode mMode;
+  QRectF rect;
+  Mode mode;
 };
+
+/**
+ * @brief Check if a footprint is hit by a selection rectangle
+ *
+ * @param selection   The selection rectangle and mode to test against.
+ * @param scenePath   The footprint in scene coordinates (in pixels). An
+ *                    empty path (e.g. of an item on a hidden layer) is
+ *                    never hit, in any mode.
+ * @retval true   The footprint is selected by the rectangle.
+ * @retval false  The footprint is not selected by the rectangle.
+ */
+bool hits(const RectSelection& selection,
+          const QPainterPath& scenePath) noexcept;
+
+/**
+ * @brief Check if the shape of an item is hit by a selection rectangle
+ *
+ * @param selection   The selection rectangle and mode to test against.
+ * @param item        The item whose shape() is used as its footprint.
+ * @retval true   The item is selected by the rectangle.
+ * @retval false  The item is not selected by the rectangle.
+ */
+bool hits(const RectSelection& selection, const QGraphicsItem& item) noexcept;
+
+/**
+ * @brief Check if a composite footprint is hit by a selection rectangle
+ *
+ * The footprint consists of several parts, e.g. a symbol plus its pins
+ * and fields. In crossing mode it is hit if any part is
+ * touched by the rectangle, in window mode it is hit only if all parts are
+ * entirely inside the rectangle. Empty parts are ignored, and a footprint
+ * without any geometry is never hit.
+ *
+ * @param selection   The selection rectangle and mode to test against.
+ * @param scenePaths  The parts of the footprint in scene coordinates.
+ * @retval true   The footprint is selected by the rectangle.
+ * @retval false  The footprint is not selected by the rectangle.
+ */
+bool hits(const RectSelection& selection,
+          const QVector<QPainterPath>& scenePaths) noexcept;
+
+/**
+ * @brief Get the footprint of an item in scene coordinates
+ *
+ * @tparam T      Item type providing `getVisibleShape()`.
+ * @param item    The item whose visible shape is used as its footprint.
+ * @return The footprint (or one of its parts), to be passed to #hits().
+ */
+template <typename T>
+QPainterPath footprintOf(const T& item) noexcept {
+  return item.mapToScene(item.getVisibleShape());
+}
+
+/**
+ * @brief Check if the visible shape of an item is hit by a selection
+ *        rectangle
+ *
+ * @tparam T      Item type providing `getVisibleShape()`.
+ * @param selection   The selection rectangle and mode to test against.
+ * @param item    The item whose visible shape is used as its footprint.
+ * @retval true   The item is selected by the rectangle.
+ * @retval false  The item is not selected by the rectangle.
+ */
+template <typename T>
+bool hitsVisible(const RectSelection& selection, const T& item) noexcept {
+  return hits(selection, footprintOf(item));
+}
 
 /**
  * @brief Resolve the rubber-band selection mode from raw screen-space drag

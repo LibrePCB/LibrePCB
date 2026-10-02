@@ -68,52 +68,52 @@ class RectSelectionTest : public ::testing::Test {};
 
 TEST(RectSelectionTest, testHitsPathEmptyNeverHits) {
   const QPainterPath empty;
-  EXPECT_FALSE(
-      RectSelection(QRectF(-100, -100, 200, 200), RectSelection::Mode::Crossing)
-          .hits(empty));
-  EXPECT_FALSE(
-      RectSelection(QRectF(-100, -100, 200, 200), RectSelection::Mode::Window)
-          .hits(empty));
+  EXPECT_FALSE(hits(RectSelection{QRectF(-100, -100, 200, 200),
+                                  RectSelection::Mode::Crossing},
+                    empty));
+  EXPECT_FALSE(hits(
+      RectSelection{QRectF(-100, -100, 200, 200), RectSelection::Mode::Window},
+      empty));
 }
 
 TEST(RectSelectionTest, testHitsPathCrossingOnOverlap) {
   QPainterPath path;
   path.addRect(QRectF(0, 0, 10, 10));
-  const RectSelection selection(QRectF(5, 5, 10, 10),
-                                RectSelection::Mode::Crossing);
-  EXPECT_TRUE(selection.hits(path));
+  const RectSelection selection{QRectF(5, 5, 10, 10),
+                                RectSelection::Mode::Crossing};
+  EXPECT_TRUE(hits(selection, path));
 }
 
 TEST(RectSelectionTest, testHitsPathCrossingNotTouching) {
   QPainterPath path;
   path.addRect(QRectF(0, 0, 10, 10));
-  const RectSelection selection(QRectF(100, 100, 10, 10),
-                                RectSelection::Mode::Crossing);
-  EXPECT_FALSE(selection.hits(path));
+  const RectSelection selection{QRectF(100, 100, 10, 10),
+                                RectSelection::Mode::Crossing};
+  EXPECT_FALSE(hits(selection, path));
 }
 
 TEST(RectSelectionTest, testHitsPathWindowEnclosed) {
   QPainterPath path;
   path.addRect(QRectF(1, 1, 8, 8));
-  const RectSelection selection(QRectF(0, 0, 10, 10),
-                                RectSelection::Mode::Window);
-  EXPECT_TRUE(selection.hits(path));
+  const RectSelection selection{QRectF(0, 0, 10, 10),
+                                RectSelection::Mode::Window};
+  EXPECT_TRUE(hits(selection, path));
 }
 
 TEST(RectSelectionTest, testHitsPathWindowPartialOverlap) {
   QPainterPath path;
   path.addRect(QRectF(5, 5, 10, 10));
-  const RectSelection selection(QRectF(0, 0, 10, 10),
-                                RectSelection::Mode::Window);
-  EXPECT_FALSE(selection.hits(path));
+  const RectSelection selection{QRectF(0, 0, 10, 10),
+                                RectSelection::Mode::Window};
+  EXPECT_FALSE(hits(selection, path));
 }
 
 TEST(RectSelectionTest, testHitsPathWindowNotTouching) {
   QPainterPath path;
   path.addRect(QRectF(100, 100, 10, 10));
-  const RectSelection selection(QRectF(0, 0, 10, 10),
-                                RectSelection::Mode::Window);
-  EXPECT_FALSE(selection.hits(path));
+  const RectSelection selection{QRectF(0, 0, 10, 10),
+                                RectSelection::Mode::Window};
+  EXPECT_FALSE(hits(selection, path));
 }
 
 /*******************************************************************************
@@ -130,17 +130,17 @@ TEST(RectSelectionTest, testHitsItemUsesShape) {
   item.setPen(Qt::NoPen);
   item.setPos(100, 100);  // Shape in scene coords is now (100,100,10,10).
 
-  const RectSelection crossingAtOrigin(QRectF(0, 0, 10, 10),
-                                       RectSelection::Mode::Crossing);
-  EXPECT_FALSE(crossingAtOrigin.hits(item));
+  const RectSelection crossingAtOrigin{QRectF(0, 0, 10, 10),
+                                       RectSelection::Mode::Crossing};
+  EXPECT_FALSE(hits(crossingAtOrigin, item));
 
-  const RectSelection crossingAtItem(QRectF(105, 105, 10, 10),
-                                     RectSelection::Mode::Crossing);
-  EXPECT_TRUE(crossingAtItem.hits(item));
+  const RectSelection crossingAtItem{QRectF(105, 105, 10, 10),
+                                     RectSelection::Mode::Crossing};
+  EXPECT_TRUE(hits(crossingAtItem, item));
 
-  const RectSelection windowAroundItem(QRectF(100, 100, 10, 10),
-                                       RectSelection::Mode::Window);
-  EXPECT_TRUE(windowAroundItem.hits(item));
+  const RectSelection windowAroundItem{QRectF(100, 100, 10, 10),
+                                       RectSelection::Mode::Window};
+  EXPECT_TRUE(hits(windowAroundItem, item));
 }
 
 /*******************************************************************************
@@ -149,22 +149,22 @@ TEST(RectSelectionTest, testHitsItemUsesShape) {
 
 TEST(RectSelectionTest, testHitsCompositeEmptyVector) {
   const QVector<QPainterPath> parts;
-  EXPECT_FALSE(
-      RectSelection(QRectF(-100, -100, 200, 200), RectSelection::Mode::Crossing)
-          .hits(parts));
-  EXPECT_FALSE(
-      RectSelection(QRectF(-100, -100, 200, 200), RectSelection::Mode::Window)
-          .hits(parts));
+  EXPECT_FALSE(hits(RectSelection{QRectF(-100, -100, 200, 200),
+                                  RectSelection::Mode::Crossing},
+                    parts));
+  EXPECT_FALSE(hits(
+      RectSelection{QRectF(-100, -100, 200, 200), RectSelection::Mode::Window},
+      parts));
 }
 
 TEST(RectSelectionTest, testHitsCompositeAllPartsEmpty) {
   QVector<QPainterPath> parts{QPainterPath(), QPainterPath()};
-  EXPECT_FALSE(
-      RectSelection(QRectF(-100, -100, 200, 200), RectSelection::Mode::Crossing)
-          .hits(parts));
-  EXPECT_FALSE(
-      RectSelection(QRectF(-100, -100, 200, 200), RectSelection::Mode::Window)
-          .hits(parts));
+  EXPECT_FALSE(hits(RectSelection{QRectF(-100, -100, 200, 200),
+                                  RectSelection::Mode::Crossing},
+                    parts));
+  EXPECT_FALSE(hits(
+      RectSelection{QRectF(-100, -100, 200, 200), RectSelection::Mode::Window},
+      parts));
 }
 
 TEST(RectSelectionTest, testHitsCompositeCrossingAnyPart) {
@@ -174,9 +174,9 @@ TEST(RectSelectionTest, testHitsCompositeCrossingAnyPart) {
   touched.addRect(QRectF(0, 0, 10, 10));
   const QVector<QPainterPath> parts{farAway, touched};
 
-  const RectSelection selection(QRectF(5, 5, 10, 10),
-                                RectSelection::Mode::Crossing);
-  EXPECT_TRUE(selection.hits(parts));
+  const RectSelection selection{QRectF(5, 5, 10, 10),
+                                RectSelection::Mode::Crossing};
+  EXPECT_TRUE(hits(selection, parts));
 }
 
 TEST(RectSelectionTest, testHitsCompositeCrossingNoPart) {
@@ -186,9 +186,9 @@ TEST(RectSelectionTest, testHitsCompositeCrossingNoPart) {
   b.addRect(QRectF(2000, 2000, 10, 10));
   const QVector<QPainterPath> parts{a, b};
 
-  const RectSelection selection(QRectF(5, 5, 10, 10),
-                                RectSelection::Mode::Crossing);
-  EXPECT_FALSE(selection.hits(parts));
+  const RectSelection selection{QRectF(5, 5, 10, 10),
+                                RectSelection::Mode::Crossing};
+  EXPECT_FALSE(hits(selection, parts));
 }
 
 TEST(RectSelectionTest, testHitsCompositeWindowAllParts) {
@@ -198,14 +198,14 @@ TEST(RectSelectionTest, testHitsCompositeWindowAllParts) {
   b.addRect(QRectF(5, 5, 2, 2));
   const QVector<QPainterPath> allEnclosed{a, b};
 
-  const RectSelection selection(QRectF(0, 0, 10, 10),
-                                RectSelection::Mode::Window);
-  EXPECT_TRUE(selection.hits(allEnclosed));
+  const RectSelection selection{QRectF(0, 0, 10, 10),
+                                RectSelection::Mode::Window};
+  EXPECT_TRUE(hits(selection, allEnclosed));
 
   QPainterPath outside;
   outside.addRect(QRectF(100, 100, 2, 2));
   const QVector<QPainterPath> oneOutside{a, outside};
-  EXPECT_FALSE(selection.hits(oneOutside));
+  EXPECT_FALSE(hits(selection, oneOutside));
 }
 
 TEST(RectSelectionTest, testHitsCompositeWindowIgnoresEmpty) {
@@ -215,9 +215,9 @@ TEST(RectSelectionTest, testHitsCompositeWindowIgnoresEmpty) {
   enclosed.addRect(QRectF(1, 1, 2, 2));
   const QVector<QPainterPath> parts{enclosed, QPainterPath()};
 
-  const RectSelection selection(QRectF(0, 0, 10, 10),
-                                RectSelection::Mode::Window);
-  EXPECT_TRUE(selection.hits(parts));
+  const RectSelection selection{QRectF(0, 0, 10, 10),
+                                RectSelection::Mode::Window};
+  EXPECT_TRUE(hits(selection, parts));
 }
 
 /*******************************************************************************
@@ -229,7 +229,7 @@ TEST(RectSelectionTest, testFootprintOfUsesVisibleShape) {
   RectSelectionTestItem item(QRectF(0, 0, 100, 100), QRectF(40, 40, 5, 5));
   item.setPos(0, 0);
 
-  const QPainterPath footprint = RectSelection::footprintOf(item);
+  const QPainterPath footprint = footprintOf(item);
   EXPECT_EQ(QRectF(40, 40, 5, 5), footprint.boundingRect());
 }
 
@@ -239,13 +239,13 @@ TEST(RectSelectionTest, testHitsVisibleUsesVisibleShape) {
   RectSelectionTestItem item(QRectF(0, 0, 100, 100), QRectF(90, 90, 5, 5));
   item.setPos(0, 0);
 
-  const RectSelection crossingNearOrigin(QRectF(0, 0, 10, 10),
-                                         RectSelection::Mode::Crossing);
-  EXPECT_FALSE(crossingNearOrigin.hitsVisible(item));
+  const RectSelection crossingNearOrigin{QRectF(0, 0, 10, 10),
+                                         RectSelection::Mode::Crossing};
+  EXPECT_FALSE(hitsVisible(crossingNearOrigin, item));
 
-  const RectSelection crossingOverVisible(QRectF(85, 85, 15, 15),
-                                          RectSelection::Mode::Crossing);
-  EXPECT_TRUE(crossingOverVisible.hitsVisible(item));
+  const RectSelection crossingOverVisible{QRectF(85, 85, 15, 15),
+                                          RectSelection::Mode::Crossing};
+  EXPECT_TRUE(hitsVisible(crossingOverVisible, item));
 }
 
 /*******************************************************************************
