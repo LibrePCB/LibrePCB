@@ -73,9 +73,8 @@ public:
   /**
    * @brief Get the visible geometry, used for rubber-band selection
    *
-   * Covers the pin line, the junction/marker circle (only if it is drawn) and
-   * the visible name and number texts, but not the padding of the (click)
-   * #shape().
+   * Covers the pin line and the junction/marker circle (only if it is
+   * drawn), but not the padding of the (click) #shape().
    *
    * @return Path in item coordinates.
    */

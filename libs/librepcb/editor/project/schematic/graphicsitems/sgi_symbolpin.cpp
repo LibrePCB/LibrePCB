@@ -167,10 +167,6 @@ QPainterPath SGI_SymbolPin::getVisibleShape() const noexcept {
   // Empty if neither line nor fill layer of the circle is visible.
   const QPainterPath circle = mCircleGraphicsItem->shape();
   path.addPath(mCircleGraphicsItem->mapToParent(circle));
-  const QPainterPath name = mNameGraphicsItem->getVisibleShape();
-  path.addPath(mNameGraphicsItem->mapToParent(name));
-  const QPainterPath numbers = mNumbersGraphicsItem->getVisibleShape();
-  path.addPath(mNumbersGraphicsItem->mapToParent(numbers));
   return path;
 }
 
