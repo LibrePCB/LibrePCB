@@ -551,7 +551,7 @@ void Board::invalidatePlanes(const Layer* layer) noexcept {
 }
 
 void Board::invalidatePlanes(const QSet<const Layer*>& layers) noexcept {
-#if defined(QT_NO_DEBUG)
+#if defined(QT_DEBUG)
   foreach (const Layer* layer, layers) {
     Q_ASSERT(layer && layer->isCopper());
   }
