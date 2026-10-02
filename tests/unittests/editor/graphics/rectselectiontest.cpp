@@ -249,41 +249,31 @@ TEST(RectSelectionTest, testHitsVisibleUsesVisibleShape) {
 }
 
 /*******************************************************************************
- *  Test Methods: GraphicsSceneMouseEvent::getRectSelectionMode()
+ *  Test Methods: rectSelectionModeFromScreenDrag()
  ******************************************************************************/
 
-TEST(RectSelectionTest, testGetRectSelectionModeDragRight) {
-  GraphicsSceneMouseEvent e;
-  e.downScreenPos = QPointF(0, 0);
-  e.screenPos = QPointF(10, 0);
-  EXPECT_EQ(RectSelection::Mode::Window, e.getRectSelectionMode());
+TEST(RectSelectionTest, testRectSelectionModeFromScreenDragDragRight) {
+  EXPECT_EQ(RectSelection::Mode::Window,
+            rectSelectionModeFromScreenDrag(QPointF(0, 0), QPointF(10, 0)));
 }
 
-TEST(RectSelectionTest, testGetRectSelectionModeDragLeft) {
-  GraphicsSceneMouseEvent e;
-  e.downScreenPos = QPointF(10, 0);
-  e.screenPos = QPointF(0, 0);
-  EXPECT_EQ(RectSelection::Mode::Crossing, e.getRectSelectionMode());
+TEST(RectSelectionTest, testRectSelectionModeFromScreenDragDragLeft) {
+  EXPECT_EQ(RectSelection::Mode::Crossing,
+            rectSelectionModeFromScreenDrag(QPointF(10, 0), QPointF(0, 0)));
 }
 
-TEST(RectSelectionTest, testGetRectSelectionModeVerticalDrag) {
-  // x() >= downScreenPos.x() with equal x -> Window, per the documented
-  // ">=" comparison (a purely vertical drag is treated as Window).
-  GraphicsSceneMouseEvent e;
-  e.downScreenPos = QPointF(5, 0);
-  e.screenPos = QPointF(5, 50);
-  EXPECT_EQ(RectSelection::Mode::Window, e.getRectSelectionMode());
+TEST(RectSelectionTest, testRectSelectionModeFromScreenDragVerticalDrag) {
+  // A purely vertical drag is treated as a crossing selection.
+  EXPECT_EQ(RectSelection::Mode::Crossing,
+            rectSelectionModeFromScreenDrag(QPointF(5, 0), QPointF(5, 50)));
 }
 
-TEST(RectSelectionTest, testGetRectSelectionModeMirrorIndependent) {
+TEST(RectSelectionTest, testRectSelectionModeFromScreenDragMirrorIndependent) {
   // The whole point of using raw screen coordinates instead of scene
-  // coordinates: the same screenPos/downScreenPos pair yields the same mode
-  // regardless of whether the underlying view is mirrored, since mirroring
-  // is never applied to these fields in the first place.
-  GraphicsSceneMouseEvent e;
-  e.downScreenPos = QPointF(20, 20);
-  e.screenPos = QPointF(50, 20);
-  EXPECT_EQ(RectSelection::Mode::Window, e.getRectSelectionMode());
+  // coordinates: the same downScreenPos/screenPos pair yields the same mode
+  // regardless of whether the underlying view is mirrored.
+  EXPECT_EQ(RectSelection::Mode::Window,
+            rectSelectionModeFromScreenDrag(QPointF(20, 20), QPointF(50, 20)));
 }
 
 /*******************************************************************************

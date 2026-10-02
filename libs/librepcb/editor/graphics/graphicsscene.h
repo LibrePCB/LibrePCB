@@ -141,6 +141,26 @@ private:
   Mode mMode;
 };
 
+/**
+ * @brief Resolve the rubber-band selection mode from raw screen-space drag
+ *        positions
+ *
+ * Dragging to the right (from \p downScreenPos to \p screenPos) gives a
+ * window selection. Dragging to the left (or a purely vertical drag) gives a
+ * crossing selection. Evaluated directly in screen space.
+ *
+ * @param downScreenPos   Raw, pre-mirror screen-space position of the
+ *                        initial left mouse button press.
+ * @param screenPos       Raw, pre-mirror screen-space position of the
+ *                        current mouse event.
+ * @return  The resolved selection mode.
+ */
+inline RectSelection::Mode rectSelectionModeFromScreenDrag(
+    const QPointF& downScreenPos, const QPointF& screenPos) noexcept {
+  return (screenPos.x() > downScreenPos.x()) ? RectSelection::Mode::Window
+                                             : RectSelection::Mode::Crossing;
+}
+
 /*******************************************************************************
  *  Event Data Structs
  ******************************************************************************/
@@ -151,28 +171,7 @@ struct GraphicsSceneMouseEvent {
   Qt::MouseButtons buttons = Qt::MouseButtons();
   Qt::KeyboardModifiers modifiers = Qt::KeyboardModifiers();
 
-  // Raw, pre-mirror screen-space (widget pixel) positions. Kept separately
-  // from #scenePos/#downPos because the scene position already has the
-  // mirror flip applied, which makes it unusable for telling left/right
-  // drags apart; the raw screen position needs no such correction.
-  QPointF screenPos;
-  QPointF downScreenPos;
-
-  /**
-   * @brief Get the rubber-band selection mode of the current mouse drag
-   *
-   * Dragging to the right on the screen (from #downScreenPos to #screenPos)
-   * gives a window selection, dragging to the left (or straight up/down)
-   * gives a crossing selection. Evaluated directly in screen space, which is
-   * mirror-independent by construction.
-   *
-   * @return The selection mode.
-   */
-  RectSelection::Mode getRectSelectionMode() const noexcept {
-    const bool draggedRight = screenPos.x() >= downScreenPos.x();
-    return draggedRight ? RectSelection::Mode::Window
-                        : RectSelection::Mode::Crossing;
-  }
+  RectSelection::Mode rectSelectionMode = RectSelection::Mode::Crossing;
 };
 
 struct GraphicsSceneKeyEvent {
