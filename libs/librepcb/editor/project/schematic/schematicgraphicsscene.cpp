@@ -287,18 +287,18 @@ void SchematicGraphicsScene::applyRectSelection(
     // visible geometry of all its pins and texts. Only visible items are
     // included.  Hidden layers, empty texts and invisible padding of the
     // click shapes are ignored completely.
-    QVector<QPainterPath> footprint{RectSelection::footprintOf(*item)};
+    QVector<QPainterPath> footprint{footprintOf(*item)};
     for (SI_SymbolPin* pin : item->getSymbol().getPins()) {
       if (auto pinItem = mSymbolPins.value(pin)) {
-        footprint.append(RectSelection::footprintOf(*pinItem));
+        footprint.append(footprintOf(*pinItem));
       }
     }
     for (SI_Text* text : item->getSymbol().getTexts()) {
       if (auto textItem = mTexts.value(text)) {
-        footprint.append(RectSelection::footprintOf(*textItem));
+        footprint.append(footprintOf(*textItem));
       }
     }
-    item->setSelected(selection.hits(footprint));
+    item->setSelected(hits(selection, footprint));
   }
   foreach (auto item, mSymbolPins) {
     // Pins are only selected together with their symbol.
@@ -306,25 +306,25 @@ void SchematicGraphicsScene::applyRectSelection(
     item->setSelected(symbol && symbol->isSelected());
   }
   foreach (auto item, mBusJunctions) {
-    item->setSelected(selection.hits(*item));
+    item->setSelected(hits(selection, *item));
   }
   foreach (auto item, mBusLines) {
-    item->setSelected(selection.hits(*item));
+    item->setSelected(hits(selection, *item));
   }
   foreach (auto item, mBusLabels) {
-    item->setSelected(selection.hitsVisible(*item));
+    item->setSelected(hitsVisible(selection, *item));
   }
   foreach (auto item, mNetPoints) {
-    item->setSelected(selection.hits(*item));
+    item->setSelected(hits(selection, *item));
   }
   foreach (auto item, mNetLines) {
-    item->setSelected(selection.hits(*item));
+    item->setSelected(hits(selection, *item));
   }
   foreach (auto item, mNetLabels) {
-    item->setSelected(selection.hitsVisible(*item));
+    item->setSelected(hitsVisible(selection, *item));
   }
   foreach (auto item, mPolygons) {
-    item->setSelected(selection.hits(*item));
+    item->setSelected(hits(selection, *item));
   }
   foreach (auto item, mTexts) {
     if (auto symbol = item->getSymbolGraphicsItem().lock()) {
@@ -332,11 +332,11 @@ void SchematicGraphicsScene::applyRectSelection(
       item->setSelected(symbol->isSelected());
     } else if ((!item->getText().getTextObj().isLocked()) ||
                mContext->ignorePlacementLocks) {
-      item->setSelected(selection.hitsVisible(*item));
+      item->setSelected(hitsVisible(selection, *item));
     }
   }
   foreach (auto item, mImages) {
-    item->setSelected(selection.hitsVisible(*item));
+    item->setSelected(hitsVisible(selection, *item));
   }
 }
 

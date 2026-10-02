@@ -38,10 +38,11 @@ namespace librepcb {
 namespace editor {
 
 /*******************************************************************************
- *  Class RectSelection
+ *  Struct RectSelection
  ******************************************************************************/
 
-bool RectSelection::hits(const QPainterPath& scenePath) const noexcept {
+bool hits(const RectSelection& selection,
+          const QPainterPath& scenePath) noexcept {
   // An empty footprint (e.g. of an item on a hidden layer) has no geometry
   // and must never be hit, in any mode. Check this explicitly instead of
   // relying on how empty geometry behaves in the tests below.
@@ -49,35 +50,35 @@ bool RectSelection::hits(const QPainterPath& scenePath) const noexcept {
     return false;
   }
 
-  switch (mMode) {
-    case Mode::Window:
-      return mRect.contains(scenePath.boundingRect());
-    case Mode::Crossing:
+  switch (selection.mode) {
+    case RectSelection::Mode::Window:
+      return selection.rect.contains(scenePath.boundingRect());
+    case RectSelection::Mode::Crossing:
     default:
-      return scenePath.intersects(mRect);
+      return scenePath.intersects(selection.rect);
   }
 }
 
-bool RectSelection::hits(const QGraphicsItem& item) const noexcept {
-  return hits(item.mapToScene(item.shape()));
+bool hits(const RectSelection& selection, const QGraphicsItem& item) noexcept {
+  return hits(selection, item.mapToScene(item.shape()));
 }
 
-bool RectSelection::hits(
-    const QVector<QPainterPath>& scenePaths) const noexcept {
+bool hits(const RectSelection& selection,
+          const QVector<QPainterPath>& scenePaths) noexcept {
   bool hasGeometry = false;
   for (const QPainterPath& path : scenePaths) {
     if (path.isEmpty()) {
       continue;
     }
     hasGeometry = true;
-    const bool partHit = hits(path);
-    if ((mMode == Mode::Crossing) && partHit) {
+    const bool partHit = hits(selection, path);
+    if ((selection.mode == RectSelection::Mode::Crossing) && partHit) {
       return true;  // Touching any part is sufficient.
-    } else if ((mMode == Mode::Window) && (!partHit)) {
+    } else if ((selection.mode == RectSelection::Mode::Window) && (!partHit)) {
       return false;  // All parts must be enclosed.
     }
   }
-  return hasGeometry && (mMode == Mode::Window);
+  return hasGeometry && (selection.mode == RectSelection::Mode::Window);
 }
 
 /*******************************************************************************
@@ -221,8 +222,8 @@ void GraphicsScene::clearSelectionRect() noexcept {
 void GraphicsScene::selectItemsInRect(const Point& p1, const Point& p2,
                                       RectSelection::Mode mode) noexcept {
   setSelectionRect(p1, p2, mode);
-  applyRectSelection(RectSelection(
-      QRectF(p1.toPxQPointF(), p2.toPxQPointF()).normalized(), mode));
+  applyRectSelection(RectSelection{
+      QRectF(p1.toPxQPointF(), p2.toPxQPointF()).normalized(), mode});
 }
 
 void GraphicsScene::setRulerPositions(

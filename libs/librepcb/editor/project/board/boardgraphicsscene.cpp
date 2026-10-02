@@ -339,12 +339,10 @@ static bool isReferenceDesignator(const BI_StrokeText& text) noexcept {
 
 void BoardGraphicsScene::applyRectSelection(
     const RectSelection& selection) noexcept {
-  // Pads belonging to devices are not selected on their own (they are always
-  // selected together with their device). Only pads without a device are
-  // selected here.
+  // Only pads without a device are selected here.
   foreach (auto item, mPads) {
     if (!item->getDeviceGraphicsItem().lock()) {
-      item->setSelected(selection.hitsVisible(*item));
+      item->setSelected(hitsVisible(selection, *item));
     }
   }
   // The footprint of a device consists of its visible geometry, including its
@@ -352,39 +350,39 @@ void BoardGraphicsScene::applyRectSelection(
   // https://github.com/LibrePCB/LibrePCB/pull/1533). If this turns out to be
   // problematic in some cases, we may reconsider.
   foreach (auto item, mDevices) {
-    QVector<QPainterPath> footprint{RectSelection::footprintOf(*item)};
+    QVector<QPainterPath> footprint{footprintOf(*item)};
     for (BI_Pad* pad : item->getDevice().getPads()) {
       if (auto padItem = mPads.value(pad)) {
-        footprint.append(RectSelection::footprintOf(*padItem));
+        footprint.append(footprintOf(*padItem));
       }
     }
     foreach (BI_StrokeText* text, item->getDevice().getStrokeTexts()) {
       if (isReferenceDesignator(*text)) {
         if (auto textItem = mStrokeTexts.value(text)) {
-          footprint.append(RectSelection::footprintOf(*textItem));
+          footprint.append(footprintOf(*textItem));
         }
       }
     }
-    item->setSelected(selection.hits(footprint));
+    item->setSelected(hits(selection, footprint));
   }
   foreach (auto item, mVias) {
-    item->setSelected(selection.hits(*item));
+    item->setSelected(hits(selection, *item));
   }
   foreach (auto item, mNetPoints) {
-    item->setSelected(selection.hits(*item));
+    item->setSelected(hits(selection, *item));
   }
   foreach (auto item, mNetLines) {
-    item->setSelected(selection.hits(*item));
+    item->setSelected(hits(selection, *item));
   }
   foreach (auto item, mPlanes) {
     // Do not use the click shape (its size depends on the selection state).
-    item->setSelected(selection.hitsVisible(*item));
+    item->setSelected(hitsVisible(selection, *item));
   }
   foreach (auto item, mZones) {
-    item->setSelected(selection.hits(*item));
+    item->setSelected(hits(selection, *item));
   }
   foreach (auto item, mPolygons) {
-    item->setSelected(selection.hits(*item));
+    item->setSelected(hits(selection, *item));
   }
   foreach (auto item, mStrokeTexts) {
     // Propagate device selection to their stroke texts. Reference designators
@@ -396,11 +394,11 @@ void BoardGraphicsScene::applyRectSelection(
     if (isReferenceDesignator(item->getStrokeText())) {
       item->setSelected(deviceSelected);
     } else {
-      item->setSelected(deviceSelected || selection.hitsVisible(*item));
+      item->setSelected(deviceSelected || hitsVisible(selection, *item));
     }
   }
   foreach (auto item, mHoles) {
-    item->setSelected(selection.hits(*item));
+    item->setSelected(hits(selection, *item));
   }
 }
 
