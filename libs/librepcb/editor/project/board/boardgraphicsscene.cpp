@@ -332,11 +332,6 @@ qreal BoardGraphicsScene::getFlippedZValue(ItemZValue value,
  *  Protected Methods
  ******************************************************************************/
 
-static bool isReferenceDesignator(const BI_StrokeText& text) noexcept {
-  return text.getDevice() &&
-      text.getData().getText().contains(QStringLiteral("{{NAME}}"));
-}
-
 void BoardGraphicsScene::applyRectSelection(
     const RectSelection& selection) noexcept {
   // Only pads without a device are selected here.
@@ -345,22 +340,13 @@ void BoardGraphicsScene::applyRectSelection(
       item->setSelected(hitsVisible(selection, *item));
     }
   }
-  // The footprint of a device consists of its visible geometry, including its
-  // pads and reference designators (see
-  // https://github.com/LibrePCB/LibrePCB/pull/1533). If this turns out to be
-  // problematic in some cases, we may reconsider.
+  // The footprint of a device consists of its visible geometry, including
+  // its pads (see https://github.com/LibrePCB/LibrePCB/pull/1533).
   foreach (auto item, mDevices) {
     QVector<QPainterPath> footprint{footprintOf(*item)};
     for (BI_Pad* pad : item->getDevice().getPads()) {
       if (auto padItem = mPads.value(pad)) {
         footprint.append(footprintOf(*padItem));
-      }
-    }
-    foreach (BI_StrokeText* text, item->getDevice().getStrokeTexts()) {
-      if (isReferenceDesignator(*text)) {
-        if (auto textItem = mStrokeTexts.value(text)) {
-          footprint.append(footprintOf(*textItem));
-        }
       }
     }
     item->setSelected(hits(selection, footprint));
@@ -385,17 +371,12 @@ void BoardGraphicsScene::applyRectSelection(
     item->setSelected(hits(selection, *item));
   }
   foreach (auto item, mStrokeTexts) {
-    // Propagate device selection to their stroke texts. Reference designators
-    // are part of the device footprint, so they are never selected on their
-    // own. Other texts are selected on their own if they are within the
-    // selection rect.
+    // Stroke texts (including reference designators) are always selected
+    // together with their device, but can also be selected independently of
+    // it.
     auto device = item->getDeviceGraphicsItem().lock();
     const bool deviceSelected = device && device->isSelected();
-    if (isReferenceDesignator(item->getStrokeText())) {
-      item->setSelected(deviceSelected);
-    } else {
-      item->setSelected(deviceSelected || hitsVisible(selection, *item));
-    }
+    item->setSelected(deviceSelected || hitsVisible(selection, *item));
   }
   foreach (auto item, mHoles) {
     item->setSelected(hits(selection, *item));

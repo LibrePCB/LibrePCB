@@ -281,21 +281,11 @@ void SchematicGraphicsScene::clearSelection() noexcept {
 void SchematicGraphicsScene::applyRectSelection(
     const RectSelection& selection) noexcept {
   foreach (auto item, mSymbols) {
-    // Pins and field texts of a symbol cannot be selected independently
-    // from their symbol; They are always selected together with it. Thus, the
-    // footprint of a symbol consists of its own visible geometry plus the
-    // visible geometry of all its pins and texts. Only visible items are
-    // included.  Hidden layers, empty texts and invisible padding of the
-    // click shapes are ignored completely.
+    // Pins cannot be selected independently from their symbol.
     QVector<QPainterPath> footprint{footprintOf(*item)};
     for (SI_SymbolPin* pin : item->getSymbol().getPins()) {
       if (auto pinItem = mSymbolPins.value(pin)) {
         footprint.append(footprintOf(*pinItem));
-      }
-    }
-    for (SI_Text* text : item->getSymbol().getTexts()) {
-      if (auto textItem = mTexts.value(text)) {
-        footprint.append(footprintOf(*textItem));
       }
     }
     item->setSelected(hits(selection, footprint));
@@ -327,12 +317,15 @@ void SchematicGraphicsScene::applyRectSelection(
     item->setSelected(hits(selection, *item));
   }
   foreach (auto item, mTexts) {
-    if (auto symbol = item->getSymbolGraphicsItem().lock()) {
-      // Field texts are only selected together with their symbol.
-      item->setSelected(symbol->isSelected());
-    } else if ((!item->getText().getTextObj().isLocked()) ||
-               mContext->ignorePlacementLocks) {
-      item->setSelected(hitsVisible(selection, *item));
+    // Field texts are always selected together with their symbol, but can
+    // also be selected independently of it.
+    auto symbol = item->getSymbolGraphicsItem().lock();
+    const bool symbolSelected = symbol && symbol->isSelected();
+    if ((!item->getText().getTextObj().isLocked()) ||
+        mContext->ignorePlacementLocks) {
+      item->setSelected(symbolSelected || hitsVisible(selection, *item));
+    } else {
+      item->setSelected(symbolSelected);
     }
   }
   foreach (auto item, mImages) {
