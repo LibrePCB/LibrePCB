@@ -879,9 +879,9 @@ add_library(
   project/schematic/symbolinstancepropertiesdialog.ui
   rulecheck/rulecheckmessagesmodel.cpp
   rulecheck/rulecheckmessagesmodel.h
-  spacemouse/if_spacemouseinputbackend.h
-  spacemouse/spacemouseinputbackendfactory.cpp
-  spacemouse/spacemouseinputbackendfactory.h
+  spacemouse/spacemouseinput.cpp
+  spacemouse/spacemouseinput.h
+  spacemouse/spacemousemotionevent.h
   spacemouse/spacemousemotionmapper.h
   undocommand.cpp
   undocommand.h
@@ -1009,26 +1009,6 @@ add_library(
   workspace/workspacesettingsdialog.h
   workspace/workspacesettingsdialog.ui
 )
-
-# Cross-platform 3D mouse (SpaceMouse) input backend, implemented by the
-# `spacemouse` Rust crate's FFI, which lives in rust-core. Functionality will
-# not be available in this build if LIBREPCB_SPACEMOUSE_AVAILABLE came back
-# false (most likely because libudev is missing on a Linux build). See also
-# rust-core/CMakeLists.txt. If the SpaceMouse is not available, a no-op
-# backend is built so the rest of the app can operate in spite of the missing
-# feature. No explicit target_link_libraries() for LibrePCB::RustCore is
-# needed here: librepcb_editor already links LibrePCB::Core PUBLIC-ly, which
-# itself links LibrePCB::RustCore PUBLIC-ly.
-target_sources(librepcb_editor PRIVATE spacemouse/spacemouseinputnull.h)
-if(LIBREPCB_SPACEMOUSE_AVAILABLE)
-  target_sources(
-    librepcb_editor PRIVATE spacemouse/spacemouseinputrust.cpp
-                            spacemouse/spacemouseinputrust.h
-  )
-  target_compile_definitions(
-    librepcb_editor PRIVATE LIBREPCB_SPACEMOUSE_AVAILABLE
-  )
-endif()
 
 target_include_directories(
   librepcb_editor

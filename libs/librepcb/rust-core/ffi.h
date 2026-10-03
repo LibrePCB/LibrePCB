@@ -321,7 +321,7 @@ struct SpaceMouseMotionFfi {
  * that called [`ffi_spacemouse_backend_new`]. The C++ side is responsible
  * for hopping onto whatever thread it needs before touching anything not
  * safe to call from an arbitrary thread (e.g. before emitting a Qt
- * signal).  Also see `spacemouseinputrust.cpp`.
+ * signal).  Also see `spacemouseinput.cpp`.
  * </div>
  */
 using MotionCallback = void(*)(void *user_data, SpaceMouseMotionFfi motion);

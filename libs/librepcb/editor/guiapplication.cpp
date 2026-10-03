@@ -33,8 +33,7 @@
 #include "notificationsmodel.h"
 #include "project/newprojectwizard/newprojectwizard.h"
 #include "project/projecteditor.h"
-#include "spacemouse/if_spacemouseinputbackend.h"
-#include "spacemouse/spacemouseinputbackendfactory.h"
+#include "spacemouse/spacemouseinput.h"
 #include "spacemouse/spacemousemotionmapper.h"
 #include "utils/editortoolbox.h"
 #include "utils/slinthelpers.h"
@@ -118,7 +117,7 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
     mProjects(new UiObjectList<ProjectEditor, ui::ProjectData>()),
     mLibraries(new UiObjectList<LibraryEditor, ui::LibraryData>()),
     mWindows(new UiObjectList<MainWindow, int>()),
-    mSpaceMouseInput(createSpaceMouseInputBackend(this)) {
+    mSpaceMouseInput(new SpaceMouseInput(this)) {
   QSettings cs;
 
   // Check if this is the first run with this application version. This can
@@ -158,18 +157,13 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
   connect(mQuickAccessModel.get(), &QuickAccessModel::openFileTriggered, this,
           [this](const FilePath& fp) { openFile(fp, qApp->activeWindow()); });
 
-  // Forward 3D mouse (SpaceMouse) motion to the active tab. Motion events are
-  // applied directly inside the motion-event handler, and scaled by real
-  // elapsed time since the previous report.
-  connect(mSpaceMouseInput.get(), &IF_SpaceMouseInputBackend::motionEvent, this,
+  // Forward 3D mouse (SpaceMouse) motion to the active tab
+  connect(mSpaceMouseInput.get(), &SpaceMouseInput::motionEvent, this,
           &GuiApplication::handleSpaceMouseMotion);
 
-  // LED control is connection-bound rather than a user preference. Turn it on
-  // whenever a device is connected (covering both app startup and device
-  // unplug/replug), and off explicitly at app shutdown (see the destructor).
-  connect(mSpaceMouseInput.get(),
-          &IF_SpaceMouseInputBackend::deviceConnectedChanged, this,
-          [this](bool connected) {
+  // LED control is connection-bound rather than a user preference
+  connect(mSpaceMouseInput.get(), &SpaceMouseInput::deviceConnectedChanged,
+          this, [this](bool connected) {
             if (connected) {
               mSpaceMouseInput->setLedEnabled(true);
             }
