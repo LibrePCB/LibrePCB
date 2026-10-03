@@ -21,7 +21,7 @@
  *  Includes
  ******************************************************************************/
 #include <gtest/gtest.h>
-#include <librepcb/editor/spacemouse/if_spacemouseinputbackend.h>
+#include <librepcb/editor/spacemouse/spacemousemotionevent.h>
 
 /*******************************************************************************
  *  Namespace
@@ -33,7 +33,7 @@ namespace tests {
 /*******************************************************************************
  *  Test Methods
  *
- *  Note: The actual input backend (SpaceMouseInputRust, via the
+ *  Note: The actual input backend (SpaceMouseInput, via the
  *  cross-platform rust-spacemouse crate) talks directly to OS-level raw HID
  *  input and thus needs real hardware to test meaningfully.  It is not
  *  unit-testable here. This file only covers the platform-independent

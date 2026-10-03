@@ -128,7 +128,6 @@ add_executable(
   editor/project/board/cmdboardspecctraimporttest.cpp
   editor/project/schematic/cmddragselectedschematicitemstest.cpp
   editor/project/schematic/schematicclipboarddatatest.cpp
-  editor/spacemouse/spacemouseinputnulltest.cpp
   editor/spacemouse/spacemousemotioneventtest.cpp
   editor/spacemouse/spacemousemotionmappertest.cpp
   editor/utils/shortcutsreferencegeneratortest.cpp

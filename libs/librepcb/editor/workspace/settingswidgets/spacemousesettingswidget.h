@@ -46,9 +46,8 @@ class SpaceMouseSettingsWidget;
  * @brief Widget (GUI) to view and modify the Space Mouse settings
  *
  * Shown as the "Space Mouse" tab of WorkspaceSettingsDialog. Extracted out
- * of that dialog into its own widget since the Space Mouse controls (six
- * axis sliders/checkboxes and the "unavailable" fallback page) made up a
- * disproportionate share of the dialog's code.
+ * into its own widget since the Space Mouse controls (six axis sliders &
+ * checkboxes) made up a disproportionate share of the dialog's code.
  *
  * Mirrors the existing *OutputJobWidget family in
  * editor/project/outputjobsdialog/: constructed directly (no Designer
@@ -109,7 +108,7 @@ private:  // Methods
 private:  // Data
   WorkspaceSettingsItem_SpaceMouse& mSettings;
   QScopedPointer<Ui::SpaceMouseSettingsWidget> mUi;
-  QVector<AxisWidgets> mAxes;  ///< Empty if support is not available
+  QVector<AxisWidgets> mAxes;
 };
 
 /*******************************************************************************

@@ -174,17 +174,10 @@ endif()
 
 # Add libs
 add_subdirectory(libs/librepcb/core)
-
-# rust-core must be added before editor: rust-core/CMakeLists.txt sets
-# LIBREPCB_SPACEMOUSE_AVAILABLE via PARENT_SCOPE, and CMakeLists.txt
-# reads that variable to decide which SpaceMouse backend to build.
-# PARENT_SCOPE variables are only visible to add_subdirectory() calls
-# that run *after* the one that set them - getting this order wrong
-# silently builds the no-op backend on every platform with no error.
-add_subdirectory(libs/librepcb/rust-core)
 add_subdirectory(libs/librepcb/editor)
 add_subdirectory(libs/librepcb/eagleimport)
 add_subdirectory(libs/librepcb/kicadimport)
+add_subdirectory(libs/librepcb/rust-core)
 add_subdirectory(libs/librepcb/ui)
 add_subdirectory(libs/parseagle)
 

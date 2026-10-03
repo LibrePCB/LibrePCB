@@ -23,7 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "if_spacemouseinputbackend.h"
+#include "spacemousemotionevent.h"
 
 #include <librepcb/core/workspace/workspacesettingsitem_spacemouse.h>
 

@@ -95,10 +95,6 @@ SpaceMouseSettingsWidget::SpaceMouseSettingsWidget(
     mUi(new Ui::SpaceMouseSettingsWidget) {
   mUi->setupUi(this);
 
-  // Availability is decided at compile time by LIBREPCB_SPACEMOUSE_AVAILABLE.
-#ifdef LIBREPCB_SPACEMOUSE_AVAILABLE
-  mUi->stkSpaceMouse->setCurrentWidget(mUi->pageSpaceMouseControls);
-
   using Axis = WorkspaceSettingsItem_SpaceMouse::Axis;
   mAxes = {
       {Axis::TranslationX, mUi->lblSpaceMouseIconPanH,
@@ -120,7 +116,7 @@ SpaceMouseSettingsWidget::SpaceMouseSettingsWidget(
        ":/img/settings/spacemouse-yaw.svg", mUi->sldSpaceMouseYaw,
        mUi->lblSpaceMouseYawValue, mUi->chkSpaceMouseYawInvert},
   };
-  for (const AxisWidgets& w : mAxes) {
+  for (const AxisWidgets& w : std::as_const(mAxes)) {
     w.icon->setPixmap(QIcon(w.iconPath).pixmap(20, 20));
     // The raw slider value is converted into a sensitivity multiplier
     // prior to being displayed by the label.
@@ -131,9 +127,6 @@ SpaceMouseSettingsWidget::SpaceMouseSettingsWidget(
     connect(w.slider, &QSlider::valueChanged, w.valueLabel, updateLabel);
     w.slider->installEventFilter(this);
   }
-#else
-  mUi->stkSpaceMouse->setCurrentWidget(mUi->pageSpaceMouseUnavailable);
-#endif
 
   load();
 }
@@ -147,7 +140,6 @@ SpaceMouseSettingsWidget::~SpaceMouseSettingsWidget() noexcept {
 
 void SpaceMouseSettingsWidget::load() noexcept {
   // Setting the slider value also updates the value label (see constructor).
-  // The axes list is empty if Space Mouse support is not available.
   for (const AxisWidgets& w : std::as_const(mAxes)) {
     const WorkspaceSettingsItem_SpaceMouse::AxisSettings& s =
         mSettings.get(w.axis);

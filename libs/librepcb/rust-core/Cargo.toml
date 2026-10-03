@@ -10,12 +10,6 @@ crate-type = ["lib", "staticlib"]
 fail-on-warnings = []
 ffi = ["dep:cbindgen"]
 
-# Enables the SpaceMouse HID-capture FFI (src/ffi/spacemouse_ffi.rs). Gated
-# separately from `ffi` because the `spacemouse` crate it wraps is optional
-# (its `hidapi` dependency needs libudev on Linux, which isn't guaranteed to
-# be present - see rust-core/CMakeLists.txt).
-spacemouse-hid = ["dep:spacemouse"]
-
 [build-dependencies]
 cbindgen = { version = "0.27", optional = true }
 
@@ -26,7 +20,7 @@ lz-str = "0.2.1"  # Keep in sync with interactive-html-bom
 
 # Cross-platform SpaceMouse HID capture, from its own standalone repository
 # (see librepcb_spacemouse_crate_extraction_plan project doc).
-spacemouse = { git = "https://github.com/AvetosDesign/spacemouse-rs", branch = "main", optional = true }
+spacemouse = { git = "https://github.com/AvetosDesign/spacemouse-rs", branch = "main" }
 
 [dependencies.regex]
 version = "1.11"

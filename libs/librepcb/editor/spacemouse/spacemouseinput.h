@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_SPACEMOUSEINPUTRUST_H
-#define LIBREPCB_EDITOR_SPACEMOUSEINPUTRUST_H
+#ifndef LIBREPCB_EDITOR_SPACEMOUSEINPUT_H
+#define LIBREPCB_EDITOR_SPACEMOUSEINPUT_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "if_spacemouseinputbackend.h"
+#include "spacemousemotionevent.h"
 
 #include <librepcb/core/utils/rusthandle.h>
 
@@ -43,14 +43,20 @@ struct FfiSpaceMouseBackend;
 namespace editor {
 
 /*******************************************************************************
- *  Class SpaceMouseInputRust
+ *  Class SpaceMouseInput
  ******************************************************************************/
 
 /**
- * @brief Cross-platform (Windows/macOS/Linux) backend for
- *        IF_SpaceMouseInputBackend, backed by the spacemouse Rust
- *        crate (hidapi-based raw HID capture), via FFI glue that lives
- *        in librepcb-rust-core
+ * @brief Cross-platform (Windows/macOS/Linux) 3D mouse (SpaceMouse) input,
+ *        backed by the `spacemouse` Rust crate (hidapi-based raw HID capture)
+ *        via FFI glue that lives in librepcb-rust-core
+ *
+ * Owns whatever plumbing is needed to receive raw motion reports from a
+ * connected 3Dconnexion (or compatible) device and re-emits them as
+ * motionEvent(). It does nothing (and never emits) until a compatible device
+ * is actually detected, so simply instantiating it is a safe no-op on a
+ * machine without a 3D mouse connected. Because there is usually only one
+ * physical device, only one instance is expected to exist per process.
  *
  * Reads raw HID reports directly via hidapi, running on a background
  * thread owned by the Rust side (see the crate's hid.rs). This class'
@@ -66,17 +72,31 @@ namespace editor {
  * or in the Rust crate - see spacemousemotionmapper.h for where that's
  * applied, downstream of this class.
  */
-class SpaceMouseInputRust final : public IF_SpaceMouseInputBackend {
+class SpaceMouseInput final : public QObject {
   Q_OBJECT
 
 public:
-  explicit SpaceMouseInputRust(QObject* parent = nullptr) noexcept;
-  SpaceMouseInputRust(const SpaceMouseInputRust& other) = delete;
-  ~SpaceMouseInputRust() noexcept override;
+  explicit SpaceMouseInput(QObject* parent = nullptr) noexcept;
+  SpaceMouseInput(const SpaceMouseInput& other) = delete;
+  ~SpaceMouseInput() noexcept override;
 
-  // IF_SpaceMouseInputBackend
-  bool isDeviceConnected() const noexcept override;
-  void setLedEnabled(bool enabled) noexcept override;
+  /**
+   * @brief Whether a compatible device is currently detected as connected
+   */
+  bool isDeviceConnected() const noexcept;
+
+  /**
+   * @brief Set whether the device's LED should be lit
+   *
+   * This is a one-shot command, not a continuously-applied setting.  The
+   * caller (see ::librepcb::editor::GuiApplication) is responsible for
+   * invoking this function again after a reconnect if the desired state
+   * should persist across unplug/replug. Not all devices have an LED;
+   * the call is silently ignored in that case.
+   *
+   * @param enabled  Whether the LED should be on.
+   */
+  void setLedEnabled(bool enabled) noexcept;
 
   // Only called (by QMetaObject::invokeMethod()) on this object's own thread
   // in response to a Rust-side callback. Needs to be public rather than
@@ -84,7 +104,18 @@ public:
   // `extern "C"` function.
   void handleConnectedChanged(bool connected) noexcept;
 
-  SpaceMouseInputRust& operator=(const SpaceMouseInputRust& rhs) = delete;
+  SpaceMouseInput& operator=(const SpaceMouseInput& rhs) = delete;
+
+signals:
+  /**
+   * @brief Emitted whenever the device reports new motion data
+   */
+  void motionEvent(librepcb::editor::SpaceMouseMotionEvent event);
+
+  /**
+   * @brief Emitted when a compatible device gets connected or disconnected
+   */
+  void deviceConnectedChanged(bool connected);
 
 private:  // Data
   RustHandle<rs::FfiSpaceMouseBackend> mHandle;
