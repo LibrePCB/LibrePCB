@@ -20,7 +20,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "spacemouseinputrust.h"
+#include "spacemouseinput.h"
 
 #include <librepcb/rust-core/ffi.h>
 
@@ -39,16 +39,16 @@ namespace {
  ******************************************************************************/
 
 // These run on the Rust-owned background thread, *not* this object's own
-// thread (see `hid.rs`). `userData` is the SpaceMouseInputRust* passed to
+// thread (see `hid.rs`). `userData` is the SpaceMouseInput* passed to
 // rs::ffi_spacemouse_backend_new(), cast through `void*` since a plain C
 // function pointer can't capture a `this`. This function does exactly one
 // thing: post the actual work onto `self`'s own thread via a queued
 // QMetaObject::invokeMethod() call, matching the idiom already used elsewhere
 // in the editor for cross-thread event delivery.
 
-extern "C" void spaceMouseInputRustOnMotion(
+extern "C" void spaceMouseInputOnMotion(
     void* userData, rs::SpaceMouseMotionFfi motion) noexcept {
-  auto* self = reinterpret_cast<SpaceMouseInputRust*>(userData);
+  auto* self = reinterpret_cast<SpaceMouseInput*>(userData);
   SpaceMouseMotionEvent event;
   event.translationX = motion.translation_x;
   event.translationY = motion.translation_y;
@@ -61,23 +61,21 @@ extern "C" void spaceMouseInputRustOnMotion(
       Qt::QueuedConnection);
 }
 
-extern "C" void spaceMouseInputRustOnConnectedChanged(void* userData,
-                                                      bool connected) noexcept {
-  auto* self = reinterpret_cast<SpaceMouseInputRust*>(userData);
+extern "C" void spaceMouseInputOnConnectedChanged(void* userData,
+                                                  bool connected) noexcept {
+  auto* self = reinterpret_cast<SpaceMouseInput*>(userData);
   QMetaObject::invokeMethod(
       self, [self, connected]() { self->handleConnectedChanged(connected); },
       Qt::QueuedConnection);
 }
 
-// Constructs the Rust-side backend for use in SpaceMouseInputRust's member
+// Constructs the Rust-side backend for use in SpaceMouseInput's member
 // initializer list (following the same pattern as e.g. ZipArchive's
 // `construct()` helper). Kept as a free function (rather than inline in the
 // initializer list) because it needs `self` to be usable as a `QObject*`.
-RustHandle<rs::FfiSpaceMouseBackend> construct(
-    SpaceMouseInputRust* self) noexcept {
-  rs::FfiSpaceMouseBackend* obj =
-      rs::ffi_spacemouse_backend_new(self, &spaceMouseInputRustOnMotion,
-                                     &spaceMouseInputRustOnConnectedChanged);
+RustHandle<rs::FfiSpaceMouseBackend> construct(SpaceMouseInput* self) noexcept {
+  rs::FfiSpaceMouseBackend* obj = rs::ffi_spacemouse_backend_new(
+      self, &spaceMouseInputOnMotion, &spaceMouseInputOnConnectedChanged);
   // Per ffi_spacemouse_backend_new()'s contract, this can't fail - only
   // finding/opening a device can fail, and that's reported later via
   // on_connected_changed(), not a null return here.
@@ -89,27 +87,25 @@ RustHandle<rs::FfiSpaceMouseBackend> construct(
 }  // namespace
 
 /*******************************************************************************
- *  Class SpaceMouseInputRust
+ *  Class SpaceMouseInput
  ******************************************************************************/
 
-SpaceMouseInputRust::SpaceMouseInputRust(QObject* parent) noexcept
-  : IF_SpaceMouseInputBackend(parent),
-    mHandle(construct(this)),
-    mConnected(false) {
+SpaceMouseInput::SpaceMouseInput(QObject* parent) noexcept
+  : QObject(parent), mHandle(construct(this)), mConnected(false) {
 }
 
-SpaceMouseInputRust::~SpaceMouseInputRust() noexcept {
+SpaceMouseInput::~SpaceMouseInput() noexcept {
 }
 
-bool SpaceMouseInputRust::isDeviceConnected() const noexcept {
+bool SpaceMouseInput::isDeviceConnected() const noexcept {
   return mConnected.load(std::memory_order_relaxed);
 }
 
-void SpaceMouseInputRust::setLedEnabled(bool enabled) noexcept {
+void SpaceMouseInput::setLedEnabled(bool enabled) noexcept {
   rs::ffi_spacemouse_backend_set_led(*mHandle, enabled);
 }
 
-void SpaceMouseInputRust::handleConnectedChanged(bool connected) noexcept {
+void SpaceMouseInput::handleConnectedChanged(bool connected) noexcept {
   mConnected.store(connected, std::memory_order_relaxed);
   emit deviceConnectedChanged(connected);
 }

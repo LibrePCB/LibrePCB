@@ -6,7 +6,6 @@ mod ibom_ffi;
 mod length_ffi;
 mod math_ffi;
 mod renumber_components_ffi;
-#[cfg(feature = "spacemouse-hid")]
 mod spacemouse_ffi;
 mod toolbox_ffi;
 mod zip_archive_ffi;

@@ -598,20 +598,6 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="pageSpaceMouseUnavailable">
-      <layout class="QVBoxLayout" name="verticalLayoutSpaceMouseUnavailable">
-       <item>
-        <widget class="QLabel" name="lblSpaceMouseUnavailable">
-         <property name="text">
-          <string>Space Mouse support is not available in this build. On Linux, this is usually because the libudev development package was not found when the application was built. Rebuilding with libudev available (or using an official prebuilt package) will enable this feature.</string>
-         </property>
-         <property name="wordWrap">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
     </widget>
    </item>
    <item>
