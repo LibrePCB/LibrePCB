@@ -879,6 +879,10 @@ add_library(
   project/schematic/symbolinstancepropertiesdialog.ui
   rulecheck/rulecheckmessagesmodel.cpp
   rulecheck/rulecheckmessagesmodel.h
+  spacemouse/spacemouseinput.cpp
+  spacemouse/spacemouseinput.h
+  spacemouse/spacemousemotionevent.h
+  spacemouse/spacemousemotionmapper.h
   undocommand.cpp
   undocommand.h
   undocommandgroup.cpp
@@ -998,10 +1002,14 @@ add_library(
   workspace/projectlibraryupdater/projectlibraryupdater.ui
   workspace/quickaccessmodel.cpp
   workspace/quickaccessmodel.h
+  workspace/settingswidgets/spacemousesettingswidget.cpp
+  workspace/settingswidgets/spacemousesettingswidget.h
+  workspace/settingswidgets/spacemousesettingswidget.ui
   workspace/workspacesettingsdialog.cpp
   workspace/workspacesettingsdialog.h
   workspace/workspacesettingsdialog.ui
 )
+
 target_include_directories(
   librepcb_editor
   PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../.."

@@ -57,6 +57,7 @@ class ProjectReadmeRenderer;
 class SchematicTab;
 class WindowSection;
 class WindowTab;
+struct SpaceMouseMotionEvent;
 
 /*******************************************************************************
  *  Class MainWindow
@@ -93,6 +94,8 @@ public:
   std::shared_ptr<WindowTab> removeTab(
       int section, int tab, bool* wasCurrentTab = nullptr,
       bool* wasCurrentSection = nullptr) noexcept;
+  void processSpaceMouseEvent(const SpaceMouseMotionEvent& e,
+                              qreal dtSeconds) noexcept;
   void showPanelPage(ui::PanelPage page) noexcept;
   void popUpNotifications() noexcept;
   void showStatusBarMessage(const QString& message, int timeoutMs);

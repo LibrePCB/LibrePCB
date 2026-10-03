@@ -27,6 +27,7 @@
 #include "../../graphics/slintgraphicsview.h"
 #include "../../guiapplication.h"
 #include "../../rulecheck/rulecheckmessagesmodel.h"
+#include "../../spacemouse/spacemousemotionmapper.h"
 #include "../../undostack.h"
 #include "../../utils/editortoolbox.h"
 #include "../../utils/imagehelpers.h"
@@ -790,6 +791,12 @@ bool SchematicTab::processSceneKeyReleased(
     const slint::language::KeyEvent& e) noexcept {
   mProjectEditor.setCurrentTab(this);
   return mView->keyReleased(e);
+}
+
+void SchematicTab::processSpaceMouseEvent(const SpaceMouseMotionEvent& e,
+                                          qreal dtSeconds) noexcept {
+  const SpaceMouseMotion2d motion = toSpaceMouseMotion2d(e, dtSeconds);
+  mView->applyContinuousMotion(motion.panDelta, motion.zoomFactor);
 }
 
 /*******************************************************************************

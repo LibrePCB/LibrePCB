@@ -107,6 +107,7 @@ add_executable(
   core/utils/toolboxtest.cpp
   core/utils/transformtest.cpp
   core/workspace/workspacelibrarydbtest.cpp
+  core/workspace/workspacesettingsitem_spacemousetest.cpp
   core/workspace/workspacesettingstest.cpp
   core/workspace/workspacetest.cpp
   eagleimport/eaglelibraryimporttest.cpp
@@ -114,6 +115,7 @@ add_executable(
   eagleimport/eagletypeconvertertest.cpp
   editor/dialogs/dxfimportdialogtest.cpp
   editor/dialogs/graphicsexportdialogtest.cpp
+  editor/graphics/slintgraphicsviewtest.cpp
   editor/library/cat/categorytreebuildertest.cpp
   editor/library/cmd/cmdpackagereloadtest.cpp
   editor/library/cmd/cmdsymbolreloadtest.cpp
@@ -126,6 +128,8 @@ add_executable(
   editor/project/board/cmdboardspecctraimporttest.cpp
   editor/project/schematic/cmddragselectedschematicitemstest.cpp
   editor/project/schematic/schematicclipboarddatatest.cpp
+  editor/spacemouse/spacemousemotioneventtest.cpp
+  editor/spacemouse/spacemousemotionmappertest.cpp
   editor/utils/shortcutsreferencegeneratortest.cpp
   editor/utils/slinthelperstest.cpp
   editor/widgets/editabletablewidgetreceiver.h
