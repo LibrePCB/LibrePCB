@@ -44,7 +44,6 @@ struct UiTheme;
 namespace editor {
 
 class GraphicsLayerList;
-class IF_SpaceMouseInputBackend;
 class LibrariesModel;
 class LibraryEditor;
 class LibraryElementCache;
@@ -56,6 +55,7 @@ class ProjectEditor;
 class ProjectLibraryUpdater;
 class QuickAccessModel;
 class SlintKeyEventTextBuilder;
+class SpaceMouseInput;
 struct SpaceMouseMotionEvent;
 
 /*******************************************************************************
@@ -183,7 +183,7 @@ private:
   std::unique_ptr<ProjectLibraryUpdater> mProjectLibraryUpdater;
   std::shared_ptr<UiObjectList<MainWindow, int>> mWindows;
   QTimer mSaveOpenedWindowsCountdown;
-  std::unique_ptr<IF_SpaceMouseInputBackend> mSpaceMouseInput;
+  std::unique_ptr<SpaceMouseInput> mSpaceMouseInput;
   // Time since the previous processed motion report
   QElapsedTimer mSpaceMouseElapsedTimer;
 

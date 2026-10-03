@@ -41,8 +41,7 @@ namespace librepcb {
  *        SpaceMouse (3Dconnexion/3Dx input device) settings
  *
  * Stores a per-axis sensitivity multiplier and invert flag for each of the
- * six raw motion axes reported by ::librepcb::editor::IF_SpaceMouseInputBackend
- * (see ::librepcb::editor::SpaceMouseMotionEvent).
+ * six raw motion axes reported by ::librepcb::editor::SpaceMouseMotionEvent.
  */
 class WorkspaceSettingsItem_SpaceMouse final : public WorkspaceSettingsItem {
 public:

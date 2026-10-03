@@ -2,8 +2,8 @@
 //!
 //! Deliberately tiny: an opaque handle, a constructor taking two C-ABI
 //! callbacks, an `is_connected()` query, and a destructor. Everything else
-//! (motion mapping, sensitivity, calibration, dispatch) is a C++-side
-//! concern.  See the crate-level docs for more information.
+//! (motion mapping, sensitivity, calibration, dispatch) is a C++ concern.
+//! See the crate-level docs for more information.
 
 use spacemouse::{SpaceMouseBackend, SpaceMouseMotion};
 use std::os::raw::c_void;
@@ -47,7 +47,7 @@ impl From<SpaceMouseMotion> for SpaceMouseMotionFfi {
 /// that called [`ffi_spacemouse_backend_new`]. The C++ side is responsible
 /// for hopping onto whatever thread it needs before touching anything not
 /// safe to call from an arbitrary thread (e.g. before emitting a Qt
-/// signal).  Also see `spacemouseinputrust.cpp`.
+/// signal).  Also see `spacemouseinput.cpp`.
 /// </div>
 pub type MotionCallback =
   extern "C" fn(user_data: *mut c_void, motion: SpaceMouseMotionFfi);
@@ -68,7 +68,7 @@ unsafe impl Send for SendPtr {}
 impl SendPtr {
   /// Get the wrapped pointer back out.
   ///
-  /// Deliberately a method rather than exposing the field directly: with
+  /// Deliberately a method rather than exposing the field directly. With
   /// Rust 2021's disjoint closure captures, a closure that writes `ptr.0`
   /// instead of `ptr.get()` would capture just that `*mut c_void` field on
   /// its own (bypassing the `SendPtr` wrapper's `unsafe impl Send`
