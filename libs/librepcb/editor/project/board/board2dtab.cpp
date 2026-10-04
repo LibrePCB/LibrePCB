@@ -424,7 +424,6 @@ ui::Board2dTabData Board2dTab::getDerivedUiData() const noexcept {
           false,  // Decrease
       },
       mToolFilled,  // Tool filled
-      mToolShowClearanceCircle,  // Tool show clearance circle
       mToolMirrored,  // Tool mirrored
       ui::LineEditData{
           // Tool value
@@ -451,6 +450,7 @@ ui::Board2dTabData Board2dTab::getDerivedUiData() const noexcept {
       mToolZoneRules.testFlag(Zone::Rule::NoPlanes),  // Tool no planes
       mToolZoneRules.testFlag(Zone::Rule::NoExposure),  // Tool no exposure
       mToolZoneRules.testFlag(Zone::Rule::NoDevices),  // Tool no devices
+      mToolShowClearanceCircle,  // Tool show clearance circle
       q2s(mSceneImagePos),  // Scene image position
       mFrameIndex,  // Frame index
       slint::SharedString(),  // Set design rules organization/rules
@@ -1211,17 +1211,11 @@ void Board2dTab::fsmSetViewRuler(
   }
 }
 
-void Board2dTab::fsmSetSceneCursor(const Point& pos, bool cross,
-                                   bool circle) noexcept {
+void Board2dTab::fsmSetSceneCursor(
+    const Point& pos, bool cross, bool circle,
+    const std::optional<UnsignedLength>& clearanceRadius) noexcept {
   if (mScene) {
-    mScene->setSceneCursor(pos, cross, circle);
-  }
-}
-
-void Board2dTab::fsmSetSceneCursorClearanceRadius(
-    const Length& radius) noexcept {
-  if (mScene) {
-    mScene->setSceneCursorClearanceRadius(radius);
+    mScene->setSceneCursor(pos, cross, circle, clearanceRadius);
   }
 }
 

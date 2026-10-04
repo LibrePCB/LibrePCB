@@ -102,8 +102,6 @@ public:
   void setLayer(const Layer& layer) noexcept;
   bool getAutoWidth() const noexcept { return mCurrentAutoWidth; }
   void setAutoWidth(bool autoWidth) noexcept;
-  bool getShowClearanceCircle() const noexcept { return mShowClearanceCircle; }
-  void setShowClearanceCircle(bool show) noexcept;
   const PositiveLength& getWidth() const noexcept { return mCurrentWidth; }
   void setWidth(const PositiveLength& width) noexcept;
   void saveWidthInBoard() noexcept;
@@ -121,6 +119,8 @@ public:
   }
   PositiveLength getViaSize() const noexcept;
   void setViaSize(const std::optional<PositiveLength>& size) noexcept;
+  bool getShowClearanceCircle() const noexcept { return mShowClearanceCircle; }
+  void setShowClearanceCircle(bool show) noexcept;
 
   // Operator Overloadings
   BoardEditorState_DrawTrace& operator=(const BoardEditorState_DrawTrace& rhs) =
@@ -131,10 +131,10 @@ signals:
   void wireModeChanged(WireMode mode);
   void layerChanged(const Layer& layer);
   void autoWidthChanged(bool autoWidth);
-  void showClearanceCircleChanged(bool show);
   void widthChanged(const PositiveLength& width);
   void viaDrillDiameterChanged(bool autoSize, const PositiveLength& diameter);
   void viaSizeChanged(bool autoSize, const PositiveLength& size);
+  void showClearanceCircleChanged(bool show);
 
 private:
   /// Internal FSM States (substates)
@@ -227,15 +227,17 @@ private:
                            WireMode mode) const noexcept;
 
   /**
-   * @brief Recompute the clearance circle radius and push it to the
-   *        scene cursor overlay
+   * @brief Recompute the clearance circle radius and push it, together
+   *        with the current cursor position, to the scene cursor overlay
    *
    * Evaluate whether the clearance circle should be visible (toggle enabled,
-   * clearance known, actively positioning a trace) as well as calculating the
-   * circle's size.  A radius of 0 tells the scene to not draw a clearance
-   * circle at all, so this doubles as the circle's enable. This function is
-   * called from #updateNetpointPositions(), #setWidth(),
-   * #updateNetClass() and #setShowClearanceCircle().
+   * actively positioning a trace) as well as calculating the circle's size.
+   * `std::nullopt` tells the scene to not draw a clearance circle at all, so
+   * this doubles as the circle's enable. Circle size is established from the
+   * board's global DRC min copper clearance and the net class' own clearance
+   * (if a net class is known). This function is called from #setWidth(),
+   * #updateNetpointPositions(), #setShowClearanceCircle(), and
+   * #updateNetClass().
    */
   void updateClearanceCircleRadius() noexcept;
 
