@@ -103,11 +103,11 @@ public:
    * @brief Set (or clear) the overlay cursor drawn at a specific position
    *
    * @param pos             Scene position of the cursor.
-   * @param cross           If true, draw a crosshair at #pos.
+   * @param cross           If true, draw a crosshair at pos.
    * @param circle          If true, draw a small "snapped to item" circle
-   *                        at #pos.
+   *                        at pos.
    * @param clearanceRadius If set, draw a clearance circle with this radius
-   *                        at #pos (e.g. while routing a trace). Pass
+   *                        at pos (e.g. while routing a trace). Pass
    *                        `std::nullopt` to hide it.
    */
   void setSceneCursor(const Point& pos, bool cross, bool circle,
