@@ -121,6 +121,9 @@ bool BoardEditorState_DrawTrace::exit() noexcept {
   // Abort the currently active command
   if (!abortPositioning(true, true)) return false;
 
+  // Explicitly clear the overlay cursor
+  mAdapter.fsmSetSceneCursor(Point(), false, false, std::nullopt);
+
   mAdapter.fsmSetViewCursor(std::nullopt);
   mAdapter.fsmToolLeave();
   return true;
@@ -967,11 +970,7 @@ void BoardEditorState_DrawTrace::updateNetpointPositions() noexcept {
   mPositioningNetLine1->setWidth(mCurrentWidth);
   mPositioningNetLine2->setWidth(mCurrentWidth);
 
-  // Keep the shared cursor position updated so the clearance circle (if
-  // shown) follows the cursor. This tool doesn't use the crosshair/snap
-  // indicators, so both stay off. Also refresh the radius so that its
-  // size stays in sync with the current net's properties.
-  mAdapter.fsmSetSceneCursor(mTargetPos, false, false);
+  // Keep the cursor in sync with the current net's properties.
   updateClearanceCircleRadius();
 
   // Force updating airwires immediately as they are important for creating
@@ -1086,24 +1085,22 @@ Point BoardEditorState_DrawTrace::calcMiddlePointPos(
 }
 
 void BoardEditorState_DrawTrace::updateClearanceCircleRadius() noexcept {
-  // A radius of 0 means "don't draw a clearance circle" (see
-  // GraphicsScene::drawForeground()), so this also gates on whether the
-  // circle should currently be visible at all.
-  Length radius(0);
-  if (mShowClearanceCircle && mCurrentNetClass &&
-      (mSubState == SubState_PositioningNetPoint)) {
-    // The clearance circle radius is calculated from the applicable copper
-    // clearance plus half of the current trace width. The applicable
-    // clearance is the larger of the net class' own clearance and the
-    // board's global DRC minimum copper clearance, mirroring how
-    // BoardDesignRuleCheckData::getMinCopperCopperClearance() combines the
-    // two for the real DRC check.
-    const UnsignedLength minClearance =
-        std::max(mContext.board.getDrcSettings().getMinCopperCopperClearance(),
-                 mCurrentNetClass->getMinCopperCopperClearance());
-    radius = minClearance + (mCurrentWidth / 2);
+  // std::nullopt means "don't draw a clearance circle" (see
+  // GraphicsScene::drawForeground()).
+  std::optional<UnsignedLength> radius;
+  if (mShowClearanceCircle && (mSubState == SubState_PositioningNetPoint)) {
+    // The clearance circle radius is the applicable copper clearance plus
+    // half of the current trace width.
+    UnsignedLength minClearance =
+        mContext.board.getDrcSettings().getMinCopperCopperClearance();
+    if (mCurrentNetClass) {
+      minClearance = std::max(minClearance,
+                              mCurrentNetClass->getMinCopperCopperClearance());
+    }
+    radius = UnsignedLength(minClearance + (mCurrentWidth / 2));
   }
-  mAdapter.fsmSetSceneCursorClearanceRadius(radius);
+  // This tool never uses the crosshair/snap indicators, so both stay off.
+  mAdapter.fsmSetSceneCursor(mTargetPos, false, false, radius);
 }
 
 void BoardEditorState_DrawTrace::updateNetClass() noexcept {
