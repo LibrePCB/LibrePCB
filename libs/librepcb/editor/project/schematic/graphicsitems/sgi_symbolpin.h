@@ -85,6 +85,7 @@ private:  // Methods
   void updatePosition() noexcept;
   void updateRotation() noexcept;
   void updateJunction() noexcept;
+  void updateShape() noexcept;
   void updateName() noexcept;
   void updateNumbers() noexcept;
   void updateNumbersPosition() noexcept;
@@ -102,6 +103,7 @@ private:  // Data
 
   // Cache
   QPainterPath mShape;
+  qreal mLineLengthPx = 0;
 
   // Slots
   SI_SymbolPin::OnEditedSlot mOnPinEditedSlot;
