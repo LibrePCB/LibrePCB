@@ -184,7 +184,7 @@ void MeasureTool::leave() noexcept {
   // same distance again.
 
   if (mScene) {
-    mScene->setSceneCursor(Point(), false, false);
+    mScene->setSceneCursor(Point());
     mScene->setRulerPositions(std::nullopt);
     mScene->setGrayOut(false);
   }
@@ -365,7 +365,8 @@ void MeasureTool::updateRulerPositions() noexcept {
     return;
   }
 
-  mScene->setSceneCursor(mCursorPos, (!mStartPos) || mEndPos, mCursorSnapped);
+  mScene->setSceneCursor(
+      mCursorPos, GraphicsSceneCursor{(!mStartPos) || mEndPos, mCursorSnapped});
 
   const Point startPos = mStartPos ? *mStartPos : mCursorPos;
   const Point endPos = mEndPos ? *mEndPos : mCursorPos;

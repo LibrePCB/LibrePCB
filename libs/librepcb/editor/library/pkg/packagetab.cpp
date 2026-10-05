@@ -1193,7 +1193,7 @@ void PackageTab::fsmSetViewRuler(
 void PackageTab::fsmSetSceneCursor(const Point& pos, bool cross,
                                    bool circle) noexcept {
   if (mScene) {
-    mScene->setSceneCursor(pos, cross, circle);
+    mScene->setSceneCursor(pos, GraphicsSceneCursor{cross, circle});
   }
 }
 
