@@ -55,7 +55,7 @@ PrimitiveTextGraphicsItem::PrimitiveTextGraphicsItem(
     mRotate180(false),
     mFont(Application::getDefaultSansSerifFont()),
     mTextFlags(0),
-    mShapeEnabled(true),
+    mInkRectValid(false),
     mLevelOfDetailToPixelate(2.5),
     mLevelOfDetailToHide(1),
     mOnLayerEditedSlot(*this, &PrimitiveTextGraphicsItem::layerEdited) {
@@ -160,8 +160,19 @@ void PrimitiveTextGraphicsItem::setState(GraphicsLayer::State state) noexcept {
  ******************************************************************************/
 
 QPainterPath PrimitiveTextGraphicsItem::shape() const noexcept {
-  return (mShapeEnabled && mLayer && mLayer->isVisible()) ? mShape
-                                                          : QPainterPath();
+  QPainterPath path;
+  if (mLayer && mLayer->isVisible()) {
+    // Calculating the tight bounds is rather expensive, so do it only once
+    // after each change and only if really needed.
+    if (!mInkRectValid) {
+      mInkRect = calcInkRect();
+      mInkRectValid = true;
+    }
+    if (!mInkRect.isEmpty()) {
+      path.addRect(mInkRect);
+    }
+  }
+  return path;
 }
 
 void PrimitiveTextGraphicsItem::paint(QPainter* painter,
@@ -240,12 +251,41 @@ void PrimitiveTextGraphicsItem::updateBoundingRectAndShape() noexcept {
     mBoundingRect = fm.boundingRect(QRectF(), mTextFlags, mText);
   }
 
-  mShape = QPainterPath();
-  mShape.addRect(mBoundingRect);
+  mInkRectValid = false;
   if (mHeight) {
     setScale((*mHeight)->toPx() / fm.height());
   }
   update();
+}
+
+QRectF PrimitiveTextGraphicsItem::calcInkRect() const noexcept {
+  // Tight bounds of the rendered glyphs. Position each line manually.
+  const QFontMetricsF fm(mFont);
+  QRectF ink;
+  const QStringList lines = mDisplayText.split(QLatin1Char('\n'));
+  for (int i = 0; i < lines.count(); ++i) {
+    QRectF r = fm.tightBoundingRect(lines.at(i));
+    if (r.isEmpty()) {
+      continue;
+    }
+    qreal x = mBoundingRect.left();
+    const qreal advance = fm.horizontalAdvance(lines.at(i));
+    if (mTextFlags & Qt::AlignRight) {
+      x += mBoundingRect.width() - advance;
+    } else if (mTextFlags & Qt::AlignHCenter) {
+      x += (mBoundingRect.width() - advance) / 2;
+    }
+    r.translate(x, mBoundingRect.top() + fm.ascent() + i * fm.lineSpacing());
+    ink = ink.united(r);
+  }
+  const qreal lineMargin = fm.height() / 30;
+  for (const QLineF& line : mOverlines) {
+    ink = ink.united(
+        QRectF(line.p1(), line.p2())
+            .normalized()
+            .adjusted(-lineMargin, -lineMargin, lineMargin, lineMargin));
+  }
+  return ink;
 }
 
 /*******************************************************************************
