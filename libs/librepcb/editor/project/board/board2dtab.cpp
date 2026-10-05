@@ -1211,11 +1211,10 @@ void Board2dTab::fsmSetViewRuler(
   }
 }
 
-void Board2dTab::fsmSetSceneCursor(
-    const Point& pos, bool cross, bool circle,
-    const std::optional<UnsignedLength>& clearanceRadius) noexcept {
+void Board2dTab::fsmSetSceneCursor(const Point& pos,
+                                   const GraphicsSceneCursor& cursor) noexcept {
   if (mScene) {
-    mScene->setSceneCursor(pos, cross, circle, clearanceRadius);
+    mScene->setSceneCursor(pos, cursor);
   }
 }
 

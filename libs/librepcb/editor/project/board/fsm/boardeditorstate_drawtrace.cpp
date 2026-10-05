@@ -122,7 +122,7 @@ bool BoardEditorState_DrawTrace::exit() noexcept {
   if (!abortPositioning(true, true)) return false;
 
   // Explicitly clear the overlay cursor
-  mAdapter.fsmSetSceneCursor(Point(), false, false, std::nullopt);
+  mAdapter.fsmSetSceneCursor(Point());
 
   mAdapter.fsmSetViewCursor(std::nullopt);
   mAdapter.fsmToolLeave();
@@ -1087,7 +1087,8 @@ Point BoardEditorState_DrawTrace::calcMiddlePointPos(
 void BoardEditorState_DrawTrace::updateClearanceCircleRadius() noexcept {
   // std::nullopt means "don't draw a clearance circle" (see
   // GraphicsScene::drawForeground()).
-  std::optional<UnsignedLength> radius;
+  GraphicsSceneCursor
+      cursor;  // cross/circle default false - unused by this tool
   if (mShowClearanceCircle && (mSubState == SubState_PositioningNetPoint)) {
     // The clearance circle radius is the applicable copper clearance plus
     // half of the current trace width.
@@ -1097,10 +1098,9 @@ void BoardEditorState_DrawTrace::updateClearanceCircleRadius() noexcept {
       minClearance = std::max(minClearance,
                               mCurrentNetClass->getMinCopperCopperClearance());
     }
-    radius = UnsignedLength(minClearance + (mCurrentWidth / 2));
+    cursor.clearanceRadius = UnsignedLength(minClearance + (mCurrentWidth / 2));
   }
-  // This tool never uses the crosshair/snap indicators, so both stay off.
-  mAdapter.fsmSetSceneCursor(mTargetPos, false, false, radius);
+  mAdapter.fsmSetSceneCursor(mTargetPos, cursor);
 }
 
 void BoardEditorState_DrawTrace::updateNetClass() noexcept {
