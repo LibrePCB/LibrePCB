@@ -73,8 +73,9 @@ public:
   /**
    * @brief Get the visible geometry, used for rubber-band selection
    *
-   * Covers the pin line and the junction/marker circle (only if it is
-   * drawn), but not the padding of the (click) #shape().
+   * Covers the pin's grab area (the same expanded rectangle along the pin
+   * line used by the (click) #shape(), not the line's actual drawn width)
+   * plus the junction/marker circle (only if it is drawn).
    *
    * @return Path in item coordinates.
    */
@@ -113,7 +114,7 @@ private:  // Data
 
   // Cache
   QPainterPath mShape;
-  QPainterPath mLineShape;
+  QPainterPath mLineGrabShape;
   qreal mLineLengthPx = 0;
 
   // Slots

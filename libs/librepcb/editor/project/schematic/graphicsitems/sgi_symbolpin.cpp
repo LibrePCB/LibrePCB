@@ -161,8 +161,10 @@ QPainterPath SGI_SymbolPin::getVisibleShape() const noexcept {
   QPainterPath path;
   path.setFillRule(Qt::WindingFill);
   if (mLineGraphicsItem->isVisible()) {
-    // The rotation is applied to the line item itself.
-    path.addPath(mLineGraphicsItem->mapToParent(mLineShape));
+    // The rotation is applied to the line item itself. Uses the same
+    // (expanded) grab area as the (click) #shape(), not the line's actual
+    // drawn width.
+    path.addPath(mLineGraphicsItem->mapToParent(mLineGrabShape));
   }
   // Empty if neither line nor fill layer of the circle is visible.
   const QPainterPath circle = mCircleGraphicsItem->shape();
@@ -279,25 +281,19 @@ void SGI_SymbolPin::updateJunction() noexcept {
 void SGI_SymbolPin::updateShape() noexcept {
   Q_ASSERT(mLineGraphicsItem);
 
-  const qreal lineWidthPx = UnsignedLength(158750)->toPx();
   const qreal grabSizePx = UnsignedLength(kGrabAreaSizeNm)->toPx();
-
-  // The line item does not provide a shape, so calculate it here. A line with
-  // round caps is just a rounded rectangle (in coordinates of the line item).
-  mLineShape = QPainterPath();
-  mLineShape.addRoundedRect(QRectF(-lineWidthPx / 2, -lineWidthPx / 2,
-                                   mLineLengthPx + lineWidthPx, lineWidthPx),
-                            lineWidthPx / 2, lineWidthPx / 2);
 
   // Grab area: The circle at the end of the pin plus a rectangle of the same
   // width along the pin line.  This enables grabbing the pin at any point.
   // Note that the rotation is applied to the line item, not to the pin itself.
-  QPainterPath lineArea;
-  lineArea.addRect(QRectF(0, -grabSizePx / 2, mLineLengthPx, grabSizePx));
+  // Used for both the (click) #shape() and the rubber-band
+  // #getVisibleShape(), so the two agree on the pin's grab area.
+  mLineGrabShape = QPainterPath();
+  mLineGrabShape.addRect(QRectF(0, -grabSizePx / 2, mLineLengthPx, grabSizePx));
   mShape = QPainterPath();
   mShape.setFillRule(Qt::WindingFill);
   mShape.addEllipse(Toolbox::boundingRectFromRadius(grabSizePx / 2));
-  mShape.addPath(mLineGraphicsItem->mapToParent(lineArea));
+  mShape.addPath(mLineGraphicsItem->mapToParent(mLineGrabShape));
 }
 
 void SGI_SymbolPin::updateName() noexcept {
