@@ -23,6 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "graphicsscenecursor.h"
+
 #include <librepcb/core/types/enums.h>
 #include <librepcb/core/types/length.h>
 #include <librepcb/core/types/lengthunit.h>
@@ -102,17 +104,14 @@ public:
   /**
    * @brief Set (or clear) the overlay cursor drawn at a specific position
    *
-   * @param pos             Scene position of the cursor.
-   * @param cross           If true, draw a crosshair at pos.
-   * @param circle          If true, draw a small "snapped to item" circle
-   *                        at pos.
-   * @param clearanceRadius If set, draw a clearance circle with this radius
-   *                        at pos (e.g. while routing a trace). Pass
-   *                        `std::nullopt` to hide it.
+   * @param pos     Scene position of the cursor.
+   * @param cursor  Appearance of the cursor at pos (crosshair, "snapped to
+   *                item" circle, clearance circle). Defaults to fully
+   *                hidden.
    */
-  void setSceneCursor(const Point& pos, bool cross, bool circle,
-                      const std::optional<UnsignedLength>& clearanceRadius =
-                          std::nullopt) noexcept;
+  void setSceneCursor(
+      const Point& pos,
+      const GraphicsSceneCursor& cursor = GraphicsSceneCursor()) noexcept;
   void setRulerPositions(
       const std::optional<std::pair<Point, Point>>& pos) noexcept;
 
@@ -143,12 +142,7 @@ private:
 
   // Overlay scene cursor
   Point mSceneCursorPos;
-  bool mSceneCursorCross;
-  bool mSceneCursorCircle;
-  std::optional<UnsignedLength>
-      mSceneCursorClearanceRadius;  ///< Real-world
-                                    ///< radius; `std::nullopt` means no
-                                    ///< clearance circle is drawn
+  GraphicsSceneCursor mSceneCursor;
 
   // Configuration for the ruler overlay
   struct RulerGauge {

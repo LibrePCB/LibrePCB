@@ -54,9 +54,7 @@ GraphicsScene::GraphicsScene(QObject* parent) noexcept
     mGrayOut(false),
     mSelectionRectItem(new QGraphicsRectItem()),
     mSceneCursorPos(),
-    mSceneCursorCross(false),
-    mSceneCursorCircle(false),
-    mSceneCursorClearanceRadius(std::nullopt),
+    mSceneCursor(),
     mRulerGauges({
         {1, LengthUnit::millimeters(), " ", Length(100), Length(0)},
         {-1, LengthUnit::inches(), "", Length(254), Length(0)},
@@ -119,18 +117,13 @@ void GraphicsScene::setSceneRectMarker(const QRectF& rect) noexcept {
   }
 }
 
-void GraphicsScene::setSceneCursor(
-    const Point& pos, bool cross, bool circle,
-    const std::optional<UnsignedLength>& clearanceRadius) noexcept {
-  if ((pos == mSceneCursorPos) && (cross == mSceneCursorCross) &&
-      (circle == mSceneCursorCircle) &&
-      (clearanceRadius == mSceneCursorClearanceRadius)) {
+void GraphicsScene::setSceneCursor(const Point& pos,
+                                   const GraphicsSceneCursor& cursor) noexcept {
+  if ((pos == mSceneCursorPos) && (cursor == mSceneCursor)) {
     return;
   }
   mSceneCursorPos = pos;
-  mSceneCursorCross = cross;
-  mSceneCursorCircle = circle;
-  mSceneCursorClearanceRadius = clearanceRadius;
+  mSceneCursor = cursor;
   setForegroundBrush(foregroundBrush());  // this will repaint the foreground
 }
 
@@ -414,33 +407,34 @@ void GraphicsScene::drawForeground(QPainter* painter,
   // a crosshair, a "snapped to item" indicator (small circle), and/or a
   // clearance circle (e.g. while routing a trace). The clearance circle
   // uses its radius to indicate whether or not it should be drawn.
-  if (mSceneCursorCross || mSceneCursorCircle || mSceneCursorClearanceRadius) {
+  if (mSceneCursor.cross || mSceneCursor.circle ||
+      mSceneCursor.clearanceRadius) {
     const qreal scaleFactor =
         QStyleOptionGraphicsItem::levelOfDetailFromTransform(
             painter->worldTransform());
     const qreal r = 20 / scaleFactor;
     const QPointF pos = mSceneCursorPos.toPxQPointF();
 
-    if (mSceneCursorCross) {
+    if (mSceneCursor.cross) {
       painter->setPen(QPen(mOverlayContentColor, 0));
       painter->drawLine(pos + QPointF(0, -r), pos + QPointF(0, r));
       painter->drawLine(pos + QPointF(-r, 0), pos + QPointF(r, 0));
     }
 
-    if (mSceneCursorCircle) {
+    if (mSceneCursor.circle) {
       painter->setPen(QPen(Qt::green, 2 / scaleFactor));
       painter->setBrush(Qt::NoBrush);
       painter->drawEllipse(pos, r / 2, r / 2);
     }
 
-    if (mSceneCursorClearanceRadius) {
+    if (mSceneCursor.clearanceRadius) {
       // The clearance circle uses board-unit distance, so it scales with zoom
       // just like any other board geometry. Its stroke width is kept at a
       // constant on-screen thickness by using a width of 0 (which Qt always
       // renders as 1px).
       painter->setPen(QPen(mOverlayContentColor, 0));
       painter->setBrush(Qt::NoBrush);
-      const qreal clearanceRadiusPx = (*mSceneCursorClearanceRadius)->toPx();
+      const qreal clearanceRadiusPx = (*mSceneCursor.clearanceRadius)->toPx();
       painter->drawEllipse(pos, clearanceRadiusPx, clearanceRadiusPx);
     }
   }
