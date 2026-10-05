@@ -154,8 +154,10 @@ QPainterPath SGI_SymbolPin::getVisibleShape() const noexcept {
   QPainterPath path;
   path.setFillRule(Qt::WindingFill);
   if (mLineGraphicsItem->isVisible()) {
-    // The rotation is applied to the line item itself.
-    path.addPath(mLineGraphicsItem->mapToParent(mLineShape));
+    // The rotation is applied to the line item itself. Uses the same
+    // (expanded) grab area as the (click) #shape(), not the line's actual
+    // drawn width.
+    path.addPath(mLineGraphicsItem->mapToParent(mLineGrabShape));
   }
   // Empty if neither line nor fill layer of the circle is visible.
   const QPainterPath circle = mCircleGraphicsItem->shape();
@@ -263,15 +265,6 @@ void SGI_SymbolPin::updateJunction() noexcept {
     length /= 2;
   }
   mLineGraphicsItem->setLine(Point(0, 0), Point(length, 0));
-
-  // The line item does not provide a shape, so calculate it here. A line with
-  // round caps is just a rounded rectangle.
-  const qreal lineWidthPx = UnsignedLength(158750)->toPx();
-  mLineShape = QPainterPath();
-  mLineShape.addRoundedRect(
-      QRectF(-lineWidthPx / 2, -lineWidthPx / 2, length.toPx() + lineWidthPx,
-             lineWidthPx),
-      lineWidthPx / 2, lineWidthPx / 2);
 }
 
 void SGI_SymbolPin::updateShape() noexcept {
@@ -282,13 +275,14 @@ void SGI_SymbolPin::updateShape() noexcept {
   const qreal lengthPx = mPin.getLibPin().getLength()->toPx();
 
   // Grab area: A circle at the end of the pin plus a rectangle of the same
-  // width along the pin line.
+  // width along the pin line. The rectangle is also used for the rubber-band
+  // #getVisibleShape(), in the coordinates of the line item.
+  mLineGrabShape = QPainterPath();
+  mLineGrabShape.addRect(QRectF(0, -grabSizePx / 2, lengthPx, grabSizePx));
   mShape = QPainterPath();
   mShape.setFillRule(Qt::WindingFill);
   mShape.addEllipse(Toolbox::boundingRectFromRadius(grabSizePx / 2));
-  mShape.addPolygon(mLineGraphicsItem->mapToParent(
-      QRectF(0, -grabSizePx / 2, lengthPx, grabSizePx)));
-  mShape.closeSubpath();
+  mShape.addPath(mLineGraphicsItem->mapToParent(mLineGrabShape));
 }
 
 void SGI_SymbolPin::updateName() noexcept {
