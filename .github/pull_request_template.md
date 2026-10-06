@@ -1,7 +1,7 @@
 <!--
 IMPORTANT: Using this PR template is mandatory, do not delete it.
-TIP:       Don't check the checkboxes in markdown. Just submit the PR, then
-           check the relevant checkboxes by clicking in the rendered preview.
+TIP: Don't check the checkboxes in markdown. Just submit the PR, then
+     check the relevant checkboxes by clicking in the rendered preview.
 -->
 
 ## Description
@@ -17,18 +17,19 @@ reminder for yourself what *might* make sense to do, and also helps us to
 understand the tasks you already have done.
 -->
 
-- [ ] I am aware of the [contributing guidelines](/CONTRIBUTING.md)
-- [ ] I manually tested the changes extensively and am sure they work perfectly
+- [ ] I am aware of the [contributing guidelines](https://github.com/LibrePCB/LibrePCB/blob/master/CONTRIBUTING.md)
+- [ ] I manually tested the changes thoroughly
   - [ ] I tested on Windows
   - [ ] I tested on macOS
   - [ ] I tested on Linux
-- [ ] I am sure the changes do not affect any other features (no regressions)
+- [ ] I also verified that those changes do not break existing functionality
+- [ ] I considered to add automated tests to verify the changes
 
 ## Usage of AI/LLM/Agents
 <!-- MANDATORY: Declare how LLMs were used to create this pull request. -->
 
 - [ ] No LLM was used at all to create this PR
-- [ ] For research
+- [ ] For research/brainstorming
 - [ ] For code/tests/documentation
 - [ ] For something else (specify):
 - [ ] I reviewed **all** of the generated content in detail with my human
