@@ -365,6 +365,7 @@ component SymbolEditorTab inherits TouchArea {
 
     if tabs[index].tool == EditorTool.select: VerticalLayout {
         width: min(self.preferred-width, 0.7 * parent.width, 550px);
+        alignment: start;
         padding: 20px;
         spacing: 10px;
 
