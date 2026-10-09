@@ -3,6 +3,7 @@ import {
     LengthEdit,
     MenuItem,
     MenuPopup,
+    ToolBarButton,
     WireModeSelector,
 } from "../../widgets.slint";
 import {
@@ -194,6 +195,18 @@ export component DrawTraceToolBar inherits HorizontalLayout {
 
         wire-mode-clicked(mode) => {
             tabs[section.current-tab-index].tool-wire-mode = mode;
+        }
+    }
+
+    clearance-circle-btn := ToolBarButton {
+        icon: @image-url("../../../../bootstrap-icons/icons/record-circle.svg");
+        tooltip: @tr("Show Clearance Circle");
+        status-tip: @tr("Show a circle around the cursor sized to the current net's copper clearance while drawing");
+        checked: tabs[section.current-tab-index].tool-show-clearance-circle;
+        checkable: true;
+
+        clicked => {
+            tabs[section.current-tab-index].tool-show-clearance-circle = !self.checked;
         }
     }
 }

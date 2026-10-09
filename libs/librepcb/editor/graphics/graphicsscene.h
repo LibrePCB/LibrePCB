@@ -23,7 +23,10 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "graphicsscenecursor.h"
+
 #include <librepcb/core/types/enums.h>
+#include <librepcb/core/types/length.h>
 #include <librepcb/core/types/lengthunit.h>
 #include <librepcb/core/types/point.h>
 
@@ -97,7 +100,18 @@ public:
    * @param rect    The rect to mark. Pass an empty rect to clear the marker.
    */
   void setSceneRectMarker(const QRectF& rect) noexcept;
-  void setSceneCursor(const Point& pos, bool cross, bool circle) noexcept;
+
+  /**
+   * @brief Set (or clear) the overlay cursor drawn at a specific position
+   *
+   * @param pos     Scene position of the cursor.
+   * @param cursor  Appearance of the cursor at pos (crosshair, "snapped to
+   *                item" circle, clearance circle). Defaults to fully
+   *                hidden.
+   */
+  void setSceneCursor(
+      const Point& pos,
+      const GraphicsSceneCursor& cursor = GraphicsSceneCursor()) noexcept;
   void setRulerPositions(
       const std::optional<std::pair<Point, Point>>& pos) noexcept;
 
@@ -128,8 +142,7 @@ private:
 
   // Overlay scene cursor
   Point mSceneCursorPos;
-  bool mSceneCursorCross;
-  bool mSceneCursorCircle;
+  GraphicsSceneCursor mSceneCursor;
 
   // Configuration for the ruler overlay
   struct RulerGauge {
