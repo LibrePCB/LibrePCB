@@ -141,8 +141,7 @@ double SpaceMouseSettingsWidget::sliderToSensitivity(int sliderValue) noexcept {
                   sliderValue / static_cast<double>(sSliderRange));
 }
 
-int SpaceMouseSettingsWidget::sensitivityToSlider(
-    double sensitivity) noexcept {
+int SpaceMouseSettingsWidget::sensitivityToSlider(double sensitivity) noexcept {
   return qBound(-sSliderRange,
                 qRound(sSliderRange * std::log(sensitivity) /
                        std::log(sSensitivityCurveBase)),
