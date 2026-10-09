@@ -290,6 +290,35 @@ void SlintOpenGlView::zoomOut() noexcept {
   zoom(center, 1 / 1.3);
 }
 
+void SlintOpenGlView::applyContinuousMotion(const QPointF& panDelta,
+                                            qreal zoomFactor, qreal rotateXDeg,
+                                            qreal rotateYDeg,
+                                            qreal rotateZDeg) noexcept {
+  mAnimation->stop();
+
+  OpenGlProjection projection = mProjection;
+  projection.center += panDelta;
+  if (rotateXDeg != 0) {
+    projection.transform.rotate(rotateXDeg, 1, 0, 0);
+  }
+  if (rotateYDeg != 0) {
+    projection.transform.rotate(rotateYDeg, 0, 1, 0);
+  }
+  if (rotateZDeg != 0) {
+    projection.transform.rotate(rotateZDeg, 0, 0, 1);
+  }
+
+  if (zoomFactor != 1) {
+    // Zooming operates on (and notifies about) the current projection, so
+    // adopt the panned/rotated one first to get away with a single update.
+    mProjection = projection;
+    const QPointF center(mViewSize.width() / 2, mViewSize.height() / 2);
+    zoom(center, zoomFactor);
+  } else {
+    applyOpenGlProjection(projection);
+  }
+}
+
 void SlintOpenGlView::zoomAll() noexcept {
   // If the transform is already reset, flip to the other board side. A bit
   // ugly implemented, could be improved a bit...

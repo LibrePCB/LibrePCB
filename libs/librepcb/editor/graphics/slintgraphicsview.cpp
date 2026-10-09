@@ -394,6 +394,37 @@ void SlintGraphicsView::zoomToSceneRect(const QRectF& r,
   smoothTo(projection);
 }
 
+void SlintGraphicsView::applyContinuousMotion(const QPointF& panDelta,
+                                              qreal zoomFactor) noexcept {
+  // Skip the refresh if a no-op motion (no pan, no zoom) is received.
+  if ((panDelta == QPointF(0, 0)) && (zoomFactor == qreal(1))) {
+    return;
+  }
+
+  Projection projection = mProjection;
+  projection.autoFitInView = false;
+
+  // Pan, using the same view-pixels-to-scene-units conversion that scroll()
+  // uses (scrollEvent(), scrollLeft/Right/Up/Down()). Note that the delta is
+  // in screen space, so we need to invert the X component if the Board is
+  // flipped to move in the direction the user expects on screen.
+  QPointF delta = panDelta;
+  if (mMirror) {
+    delta.setX(-delta.x());
+  }
+  projection.offset += delta / projection.scale;
+
+  // Zoom around the center of the view: unlike a mouse wheel event, this
+  // input has no on-screen cursor position to anchor to. The center is
+  // invariant under mirroring, so no flip is needed (unlike in zoom()).
+  if (zoomFactor != qreal(1)) {
+    const QPointF center(mViewSize.width() / 2, mViewSize.height() / 2);
+    applyZoomAroundPoint(projection, center, zoomFactor);
+  }
+
+  applyProjection(projection);
+}
+
 /*******************************************************************************
  *  Static Methods
  ******************************************************************************/
@@ -438,14 +469,14 @@ void SlintGraphicsView::scroll(const QPointF& delta) noexcept {
   applyProjection(projection);
 }
 
-void SlintGraphicsView::zoom(QPointF center, qreal factor) noexcept {
-  if (mMirror && (mViewSize.width() > 0)) {
-    center.setX(mViewSize.width() - center.x());
-  }
-
-  Projection projection = mProjection;
-  projection.autoFitInView = false;
-
+void SlintGraphicsView::applyZoomAroundPoint(Projection& projection,
+                                             const QPointF& center,
+                                             qreal factor) noexcept {
+  // Keeps `center` (in view-pixel coordinates) stationary on screen while
+  // changing the projection's scale. Shared by zoom() (mouse wheel /
+  // discrete shortcuts) and applyContinuousMotion() (space mouse),
+  // which are otherwise the only two places that need to translate
+  // a "zoom around this point" request into an offset/scale pair.
   QTransform tf;
   tf.translate(projection.offset.x(), projection.offset.y());
   tf.scale(1 / projection.scale, 1 / projection.scale);
@@ -457,7 +488,16 @@ void SlintGraphicsView::zoom(QPointF center, qreal factor) noexcept {
   tf2.scale(1 / projection.scale, 1 / projection.scale);
   const QPointF scenePos2 = tf2.map(center);
   projection.offset -= scenePos2 - scenePos0;
+}
 
+void SlintGraphicsView::zoom(QPointF center, qreal factor) noexcept {
+  if (mMirror && (mViewSize.width() > 0)) {
+    center.setX(mViewSize.width() - center.x());
+  }
+
+  Projection projection = mProjection;
+  projection.autoFitInView = false;
+  applyZoomAroundPoint(projection, center, factor);
   applyProjection(projection);
 }
 

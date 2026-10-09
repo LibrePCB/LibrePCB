@@ -18,6 +18,10 @@ interactive-html-bom = "0.2.0"
 libm = "0.2.16"
 lz-str = "0.2.1"  # Keep in sync with interactive-html-bom
 
+# Cross-platform SpaceMouse HID capture, from its own standalone repository
+# (see librepcb_spacemouse_crate_extraction_plan project doc).
+spacemouse = { git = "https://github.com/AvetosDesign/spacemouse-rs", branch = "main" }
+
 [dependencies.regex]
 version = "1.11"
 default-features = false

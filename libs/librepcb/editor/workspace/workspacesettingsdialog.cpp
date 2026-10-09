@@ -35,6 +35,7 @@
 #include "../utils/uihelpers.h"
 #include "desktopintegration.h"
 #include "desktopservices.h"
+#include "settingswidgets/spacemousesettingswidget.h"
 #include "ui_workspacesettingsdialog.h"
 
 #include <librepcb/core/application.h>
@@ -73,6 +74,7 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
     mKeyboardShortcutsModel(new KeyboardShortcutsModel(this)),
     mKeyboardShortcutsFilterModel(new QSortFilterProxyModel(this)),
     mUi(new Ui::WorkspaceSettingsDialog),
+    mSpaceMouseWidget(nullptr),
     mOldSchematicGridStyle(mSettings.schematicGridStyle.get()),
     mOldBoardGridStyle(mSettings.boardGridStyle.get()),
     mOldSchColorSchemeActive(mSettings.schematicColorSchemes.getActiveUuid()),
@@ -307,6 +309,14 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
         this, this,
         [this]() { mUi->edtCommandFilter->setFocus(Qt::ShortcutFocusReason); },
         EditorCommand::ActionFlag::WidgetShortcut));
+  }
+
+  // Initialize Space Mouse widget (self-contained; see
+  // settingswidgets/spacemousesettingswidget.h).
+  {
+    mSpaceMouseWidget =
+        new SpaceMouseSettingsWidget(mSettings.spaceMouse, this);
+    mUi->spaceMouseTab->layout()->addWidget(mSpaceMouseWidget);
   }
 
   // Initialize color schemes widgets.
@@ -769,6 +779,9 @@ void WorkspaceSettingsDialog::loadSettings() noexcept {
   mKeyboardShortcutsModel->setOverrides(mSettings.keyboardShortcuts.get());
   mUi->treeKeyboardShortcuts->expandAll();
 
+  // Space Mouse
+  mSpaceMouseWidget->load();
+
   // Color Schemes
   updateColorSchemes();
 
@@ -835,6 +848,9 @@ void WorkspaceSettingsDialog::saveSettings() noexcept {
 
     // Keyboard shortcuts
     mSettings.keyboardShortcuts.set(mKeyboardShortcutsModel->getOverrides());
+
+    // Space Mouse
+    mSpaceMouseWidget->save();
 
     // Themes were applied immediately.
 

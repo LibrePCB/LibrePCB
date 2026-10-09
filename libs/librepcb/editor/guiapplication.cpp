@@ -33,10 +33,13 @@
 #include "notificationsmodel.h"
 #include "project/newprojectwizard/newprojectwizard.h"
 #include "project/projecteditor.h"
+#include "spacemouse/spacemouseinput.h"
+#include "spacemouse/spacemousemotionmapper.h"
 #include "utils/editortoolbox.h"
 #include "utils/slinthelpers.h"
 #include "utils/slintkeyeventtextbuilder.h"
 #include "utils/uihelpers.h"
+#include "windowtab.h"
 #include "workspace/desktopintegration.h"
 #include "workspace/desktopservices.h"
 #include "workspace/initializeworkspacewizard/initializeworkspacewizard.h"
@@ -113,7 +116,8 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
     mLibrariesFilter(new SlintKeyEventTextBuilder()),
     mProjects(new UiObjectList<ProjectEditor, ui::ProjectData>()),
     mLibraries(new UiObjectList<LibraryEditor, ui::LibraryData>()),
-    mWindows(new UiObjectList<MainWindow, int>()) {
+    mWindows(new UiObjectList<MainWindow, int>()),
+    mSpaceMouseInput(new SpaceMouseInput(this)) {
   QSettings cs;
 
   // Check if this is the first run with this application version. This can
@@ -152,6 +156,18 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
   // Setup quick access.
   connect(mQuickAccessModel.get(), &QuickAccessModel::openFileTriggered, this,
           [this](const FilePath& fp) { openFile(fp, qApp->activeWindow()); });
+
+  // Forward 3D mouse (SpaceMouse) motion to the active tab
+  connect(mSpaceMouseInput.get(), &SpaceMouseInput::motionEvent, this,
+          &GuiApplication::handleSpaceMouseMotion);
+
+  // LED control is connection-bound rather than a user preference
+  connect(mSpaceMouseInput.get(), &SpaceMouseInput::deviceConnectedChanged,
+          this, [this](bool connected) {
+            if (connected) {
+              mSpaceMouseInput->setLedEnabled(true);
+            }
+          });
 
   // Connect notification signals.
   const qint64 startupTime = QDateTime::currentMSecsSinceEpoch();
@@ -351,6 +367,12 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
 }
 
 GuiApplication::~GuiApplication() noexcept {
+  // Since the SpaceMouse LED is connection bound, explicitly turn it off
+  // before the backend (and its background capture thread) gets torn down.
+  // Safe to call even if no device is currently connected - it's a
+  // best-effort HID write, silently ignored either way.
+  mSpaceMouseInput->setLedEnabled(false);
+
   mProjectLibraryUpdater.reset();
 }
 
@@ -1176,6 +1198,33 @@ std::shared_ptr<MainWindow> GuiApplication::getWindowById(int id) noexcept {
     }
   }
   return nullptr;
+}
+
+void GuiApplication::handleSpaceMouseMotion(
+    const SpaceMouseMotionEvent& e) noexcept {
+  // The very first report has no previous timestamp to measure against,
+  // so it's dropped rather than guessed at (starting the timer here means
+  // subsequent reports get a sensible, usually sub-frame, dtSeconds).
+  if (!mSpaceMouseElapsedTimer.isValid()) {
+    mSpaceMouseElapsedTimer.start();
+    return;
+  }
+
+  // Clamp dtSeconds: if the device (or this handler) was stalled for a
+  // while - e.g. no reports arrived because the cap was centered, or the
+  // app was busy - the next report's elapsed time could otherwise produce
+  // one oversized, disorienting jump.
+  constexpr qreal maxDtSeconds = 0.25;
+  const qreal dtSeconds =
+      qMin(mSpaceMouseElapsedTimer.restart() / qreal(1000), maxDtSeconds);
+
+  // Dispatch to the OS's current window/section/tab, mirroring the
+  // window -> section -> tab chain ::processScenePointerEvent() walks.
+  if (auto win = getCurrentWindow()) {
+    const SpaceMouseMotionEvent adjusted =
+        SpaceMouseMotionMapper::applySettings(e, mWorkspace.getSettings().spaceMouse);
+    win->processSpaceMouseEvent(adjusted, dtSeconds);
+  }
 }
 
 /*******************************************************************************

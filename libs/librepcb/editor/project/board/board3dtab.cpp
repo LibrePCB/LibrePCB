@@ -25,6 +25,7 @@
 #include "../../3d/openglscenebuilder.h"
 #include "../../3d/slintopenglview.h"
 #include "../../guiapplication.h"
+#include "../../spacemouse/spacemousemotionmapper.h"
 #include "../../undostack.h"
 #include "../../utils/slinthelpers.h"
 #include "../../utils/uihelpers.h"
@@ -305,6 +306,15 @@ bool Board3dTab::processSceneScrolled(const QPointF& pos,
                                       int scene) noexcept {
   Q_UNUSED(scene);
   return mView ? mView->scrollEvent(pos, e) : false;
+}
+
+void Board3dTab::processSpaceMouseEvent(const SpaceMouseMotionEvent& e,
+                                        qreal dtSeconds) noexcept {
+  if (!mView) return;
+  const SpaceMouseMotion3d motion = SpaceMouseMotionMapper::toMotion3d(e, dtSeconds);
+  mView->applyContinuousMotion(motion.panDelta, motion.zoomFactor,
+                               motion.rotateXDeg, motion.rotateYDeg,
+                               motion.rotateZDeg);
 }
 
 /*******************************************************************************

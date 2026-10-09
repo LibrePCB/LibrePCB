@@ -31,6 +31,7 @@
 #include "../../guiapplication.h"
 #include "../../library/libraryelementcache.h"
 #include "../../library/pkg/footprintgraphicsitem.h"
+#include "../../spacemouse/spacemousemotionmapper.h"
 #include "../../undostack.h"
 #include "../../utils/editortoolbox.h"
 #include "../../utils/slinthelpers.h"
@@ -1100,6 +1101,12 @@ bool Board2dTab::processSceneKeyReleased(
     return true;
   }
   return false;
+}
+
+void Board2dTab::processSpaceMouseEvent(const SpaceMouseMotionEvent& e,
+                                        qreal dtSeconds) noexcept {
+  const SpaceMouseMotion2d motion = SpaceMouseMotionMapper::toMotion2d(e, dtSeconds);
+  mView->applyContinuousMotion(motion.panDelta, motion.zoomFactor);
 }
 
 QSet<const Layer*> Board2dTab::getVisibleCopperLayers() const noexcept {
