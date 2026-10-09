@@ -69,7 +69,7 @@ SGI_SymbolPin::SGI_SymbolPin(
   setZValue(SchematicGraphicsScene::ZValue_SymbolPins);
 
   // Setup circle.
-  const UnsignedLength circleDiameter(1200000);
+  const UnsignedLength circleDiameter(sGrabAreaSizeNm);
   mCircleGraphicsItem->setDiameter(circleDiameter);
   mCircleGraphicsItem->setShapeMode(
       PrimitiveCircleGraphicsItem::ShapeMode::FilledOutline);
@@ -105,14 +105,11 @@ SGI_SymbolPin::SGI_SymbolPin(
   updatePosition();
   updateRotation();
   updateJunction();
+  updateShape();
   updateName();
   updateNumbers();
   updateNumbersPosition();
   updateNumbersAlignment();
-
-  // Shape is always a circle.
-  mShape.addEllipse(
-      Toolbox::boundingRectFromRadius(circleDiameter->toPx() / 2));
 
   mPin.onEdited.attach(mOnPinEditedSlot);
   if (auto ptr = mSymbolGraphicsItem.lock()) {
@@ -167,6 +164,7 @@ void SGI_SymbolPin::pinEdited(const SI_SymbolPin& obj,
     case SI_SymbolPin::Event::RotationChanged:
       updateRotation();
       updateNumbersPosition();
+      updateShape();
       break;
     case SI_SymbolPin::Event::JunctionChanged:
     case SI_SymbolPin::Event::NetNameChanged:
@@ -252,6 +250,23 @@ void SGI_SymbolPin::updateJunction() noexcept {
     length /= 2;
   }
   mLineGraphicsItem->setLine(Point(0, 0), Point(length, 0));
+}
+
+void SGI_SymbolPin::updateShape() noexcept {
+  Q_ASSERT(mLineGraphicsItem);
+
+  // Note: We ignore shortened pin lines (i.e., if the pin has an error)
+  const qreal grabSizePx = Length(sGrabAreaSizeNm).toPx();
+  const qreal lengthPx = mPin.getLibPin().getLength()->toPx();
+
+  // Grab area: A circle at the end of the pin plus a rectangle of the same
+  // width along the pin line.
+  mShape = QPainterPath();
+  mShape.setFillRule(Qt::WindingFill);
+  mShape.addEllipse(Toolbox::boundingRectFromRadius(grabSizePx / 2));
+  mShape.addPolygon(mLineGraphicsItem->mapToParent(
+      QRectF(0, -grabSizePx / 2, lengthPx, grabSizePx)));
+  mShape.closeSubpath();
 }
 
 void SGI_SymbolPin::updateName() noexcept {

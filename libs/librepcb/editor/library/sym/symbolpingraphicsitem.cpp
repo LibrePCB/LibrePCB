@@ -27,6 +27,7 @@
 #include "../../graphics/linegraphicsitem.h"
 #include "../../graphics/primitivecirclegraphicsitem.h"
 #include "../../graphics/primitivetextgraphicsitem.h"
+#include "../../project/schematic/graphicsitems/sgi_symbolpin.h"
 
 #include <librepcb/core/types/angle.h>
 #include <librepcb/core/types/point.h>
@@ -69,7 +70,8 @@ SymbolPinGraphicsItem::SymbolPinGraphicsItem(
   setZValue(10);
 
   // circle
-  mCircleGraphicsItem->setDiameter(UnsignedLength(1200000));
+  mCircleGraphicsItem->setDiameter(
+      UnsignedLength(SGI_SymbolPin::sGrabAreaSizeNm));
   mCircleGraphicsItem->setLineLayer(
       layers.get(ColorRole::schematicOptionalPins()));
   mCircleGraphicsItem->setShapeMode(
@@ -101,6 +103,7 @@ SymbolPinGraphicsItem::SymbolPinGraphicsItem(
   // pin properties
   setPos(mPin->getPosition().toPxQPointF());
   setLength(mPin->getLength());
+  updateShape();
 
   // Register to the pin to get notified about any modifications.
   mPin->onEdited.attach(mOnEditedSlot);
@@ -171,11 +174,6 @@ void SymbolPinGraphicsItem::setOverridePinNumber(
  *  Inherited from QGraphicsItem
  ******************************************************************************/
 
-QPainterPath SymbolPinGraphicsItem::shape() const noexcept {
-  Q_ASSERT(mCircleGraphicsItem);
-  return mCircleGraphicsItem->shape();
-}
-
 QVariant SymbolPinGraphicsItem::itemChange(GraphicsItemChange change,
                                            const QVariant& value) noexcept {
   if ((change == ItemSelectedHasChanged) && mCircleGraphicsItem &&
@@ -206,6 +204,7 @@ void SymbolPinGraphicsItem::pinEdited(const SymbolPin& pin,
     case SymbolPin::Event::LengthChanged:
       setLength(pin.getLength());
       updateNumbersTransform();
+      updateShape();
       break;
     case SymbolPin::Event::RotationChanged:
       mLineGraphicsItem->setRotation(pin.getRotation());
@@ -213,6 +212,7 @@ void SymbolPinGraphicsItem::pinEdited(const SymbolPin& pin,
       updateNamePosition();
       mNumbersGraphicsItem->setRotation(pin.getRotation());
       updateNumbersTransform();
+      updateShape();
       break;
     case SymbolPin::Event::NamePositionChanged:
       updateNamePosition();
@@ -236,6 +236,19 @@ void SymbolPinGraphicsItem::pinEdited(const SymbolPin& pin,
 
 void SymbolPinGraphicsItem::setLength(const UnsignedLength& length) noexcept {
   mLineGraphicsItem->setLine(Point(0, 0), Point(*length, 0));
+}
+
+void SymbolPinGraphicsItem::updateShape() noexcept {
+  // Grab area: A circle at the end of the pin plus a rectangle of the same
+  // width along the pin line.
+  const qreal grabSizePx = Length(SGI_SymbolPin::sGrabAreaSizeNm).toPx();
+  const qreal lengthPx = mPin->getLength()->toPx();
+  mShape = QPainterPath();
+  mShape.setFillRule(Qt::WindingFill);
+  mShape.addEllipse(Toolbox::boundingRectFromRadius(grabSizePx / 2));
+  mShape.addPolygon(mLineGraphicsItem->mapToParent(
+      QRectF(0, -grabSizePx / 2, lengthPx, grabSizePx)));
+  mShape.closeSubpath();
 }
 
 void SymbolPinGraphicsItem::updateNamePosition() noexcept {
