@@ -120,7 +120,10 @@ void NetClass::setDefaultViaDrill(
 
 void NetClass::setMinCopperCopperClearance(
     const UnsignedLength& value) noexcept {
-  mMinCopperCopperClearance = value;
+  if (value != mMinCopperCopperClearance) {
+    mMinCopperCopperClearance = value;
+    emit designRulesModified();
+  }
 }
 
 void NetClass::setMinCopperWidth(const UnsignedLength& value) noexcept {
