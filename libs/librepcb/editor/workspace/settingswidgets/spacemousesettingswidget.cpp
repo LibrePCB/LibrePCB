@@ -36,55 +36,6 @@ namespace librepcb {
 namespace editor {
 
 /*******************************************************************************
- *  Helper Functions
- ******************************************************************************/
-namespace {
-
-// The value the sensitivity sliders report is used as an *exponent* in the
-// sensitivity multiplier calculation.  Slider values in the range of
-// [-kSliderRange, +kSliderRange] are first scaled by kSliderRange to result
-// in a final exponent in the range of [-1.0, 1.0].  The final multiplier
-// value is obtained from (kSensitivityCurveBase)^exponent. This gives the
-// sliders a more usable feel than a linear mapping would, while
-// simultaneously keeping the nominal 1.0x multiplier in the middle.
-
-// Base of the exponential slider-to-sensitivity curve. This results in
-// a multiplier range of 1/n..n (where n is the base) at full deflection.
-constexpr double kSensitivityCurveBase = 3.0;
-
-// Slider range: each sensitivity slider spans [-kSliderRange, +kSliderRange],
-// and is normalized to [-1.0, 1.0].  kSliderRange thus controls the
-// granularity of the sensitivity setting.
-constexpr int kSliderRange = 100;  // Multipliers will be in hundredths
-
-// Convert a Space Mouse sensitivity slider position to a sensitivity
-// multiplier. See the block comment above for the curve this implements.
-double sliderToSensitivity(int sliderValue) noexcept {
-  return std::pow(kSensitivityCurveBase,
-                  sliderValue / static_cast<double>(kSliderRange));
-}
-
-// Inverse of ::sliderToSensitivity().
-int sensitivityToSlider(double sensitivity) noexcept {
-  if (sensitivity <= 0) {
-    // Not a valid sensitivity (shouldn't normally happen since the UI can
-    // only produce values > 0) - fall back to nominal (1.0x, slider at 0).
-    return 0;
-  }
-  return qBound(-kSliderRange,
-                qRound(kSliderRange * std::log(sensitivity) /
-                       std::log(kSensitivityCurveBase)),
-                kSliderRange);
-}
-
-// Format a sensitivity multiplier for display (e.g. "1.2x").
-[[maybe_unused]] QString sensitivityLabel(double sensitivity) noexcept {
-  return QString("%1x").arg(sensitivity, 0, 'f', 1);
-}
-
-}  // namespace
-
-/*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
 
@@ -179,6 +130,28 @@ bool SpaceMouseSettingsWidget::eventFilter(QObject* watched,
     }
   }
   return QWidget::eventFilter(watched, event);
+}
+
+/*******************************************************************************
+ *  Static Methods
+ ******************************************************************************/
+
+double SpaceMouseSettingsWidget::sliderToSensitivity(int sliderValue) noexcept {
+  return std::pow(sSensitivityCurveBase,
+                  sliderValue / static_cast<double>(sSliderRange));
+}
+
+int SpaceMouseSettingsWidget::sensitivityToSlider(
+    double sensitivity) noexcept {
+  return qBound(-sSliderRange,
+                qRound(sSliderRange * std::log(sensitivity) /
+                       std::log(sSensitivityCurveBase)),
+                sSliderRange);
+}
+
+QString SpaceMouseSettingsWidget::sensitivityLabel(
+    double sensitivity) noexcept {
+  return QString("%1x").arg(sensitivity, 0, 'f', 1);
 }
 
 /*******************************************************************************

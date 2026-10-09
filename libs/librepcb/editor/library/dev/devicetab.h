@@ -58,6 +58,7 @@ class LibraryElementCategoriesModel;
 class MeasureTool;
 class PartListModel;
 class SlintGraphicsView;
+struct SpaceMouseMotionEvent;
 class SymbolGraphicsItem;
 
 /*******************************************************************************
@@ -103,6 +104,8 @@ public:
       const slint::language::KeyEvent& e) noexcept override;
   bool processSceneKeyReleased(
       const slint::language::KeyEvent& e) noexcept override;
+  void processSpaceMouseEvent(const SpaceMouseMotionEvent& e,
+                              qreal dtSeconds) noexcept override;
   bool requestClose() noexcept override;
 
   // IF_GraphicsViewEventHandler
@@ -174,6 +177,10 @@ private:
   bool mChooseCategory;
   bool mElementDuplicated;
   int mFrameIndex;
+
+  // The SpaceMouse only drives one view at a time.  Track the last view our
+  // cursor was over so that we know where to send the events.
+  int mLastPointerScene;
 
   // Library metadata to be applied
   slint::SharedString mName;

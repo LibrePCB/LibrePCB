@@ -105,10 +105,40 @@ private:  // Types
 private:  // Methods
   bool eventFilter(QObject* watched, QEvent* event) noexcept override;
 
+  // Convert a sensitivity slider position to a sensitivity multiplier. See
+  // the comment on sSensitivityCurveBase for the curve this implements.
+  static double sliderToSensitivity(int sliderValue) noexcept;
+
+  // Inverse of sliderToSensitivity().
+  static int sensitivityToSlider(double sensitivity) noexcept;
+
+  // Format a sensitivity multiplier for display (e.g. "1.2x").
+  static QString sensitivityLabel(double sensitivity) noexcept;
+
 private:  // Data
   WorkspaceSettingsItem_SpaceMouse& mSettings;
   QScopedPointer<Ui::SpaceMouseSettingsWidget> mUi;
   QVector<AxisWidgets> mAxes;
+
+  // Static Variables
+
+  // The value the sensitivity sliders report is used as an *exponent* in the
+  // sensitivity multiplier calculation.  Slider values in the range of
+  // [-sSliderRange, +sSliderRange] are first scaled by sSliderRange to
+  // result in a final exponent in the range of [-1.0, 1.0].  The final
+  // multiplier value is obtained from (sSensitivityCurveBase)^exponent. This
+  // gives the sliders a more usable feel than a linear mapping would, while
+  // simultaneously keeping the nominal 1.0x multiplier in the middle.
+
+  // Base of the exponential slider-to-sensitivity curve. This results in
+  // a multiplier range of 1/n..n (where n is the base) at full deflection.
+  static constexpr double sSensitivityCurveBase = 3.0;
+
+  // Slider range: each sensitivity slider spans [-sSliderRange,
+  // +sSliderRange], and is normalized to [-1.0, 1.0].  sSliderRange thus
+  // controls the granularity of the sensitivity setting (multipliers will
+  // be in hundredths).
+  static constexpr int sSliderRange = 100;
 };
 
 /*******************************************************************************

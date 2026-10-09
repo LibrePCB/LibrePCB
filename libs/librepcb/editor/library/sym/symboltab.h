@@ -54,6 +54,7 @@ class GraphicsLayerList;
 class GraphicsScene;
 class LibraryElementCategoriesModel;
 class SlintGraphicsView;
+struct SpaceMouseMotionEvent;
 class SymbolEditorFsm;
 class SymbolGraphicsItem;
 
@@ -103,6 +104,8 @@ public:
       const slint::language::KeyEvent& e) noexcept override;
   bool processSceneKeyReleased(
       const slint::language::KeyEvent& e) noexcept override;
+  void processSpaceMouseEvent(const SpaceMouseMotionEvent& e,
+                              qreal dtSeconds) noexcept override;
   bool requestClose() noexcept override;
 
   // IF_GraphicsViewEventHandler
