@@ -1214,15 +1214,15 @@ void GuiApplication::handleSpaceMouseMotion(
   // while - e.g. no reports arrived because the cap was centered, or the
   // app was busy - the next report's elapsed time could otherwise produce
   // one oversized, disorienting jump.
-  constexpr qreal kMaxDtSeconds = 0.25;
+  constexpr qreal maxDtSeconds = 0.25;
   const qreal dtSeconds =
-      qMin(mSpaceMouseElapsedTimer.restart() / qreal(1000), kMaxDtSeconds);
+      qMin(mSpaceMouseElapsedTimer.restart() / qreal(1000), maxDtSeconds);
 
   // Dispatch to the OS's current window/section/tab, mirroring the
   // window -> section -> tab chain ::processScenePointerEvent() walks.
   if (auto win = getCurrentWindow()) {
     const SpaceMouseMotionEvent adjusted =
-        applySpaceMouseSettings(e, mWorkspace.getSettings().spaceMouse);
+        SpaceMouseMotionMapper::applySettings(e, mWorkspace.getSettings().spaceMouse);
     win->processSpaceMouseEvent(adjusted, dtSeconds);
   }
 }

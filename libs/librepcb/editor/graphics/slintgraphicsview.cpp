@@ -415,12 +415,10 @@ void SlintGraphicsView::applyContinuousMotion(const QPointF& panDelta,
   projection.offset += delta / projection.scale;
 
   // Zoom around the center of the view: unlike a mouse wheel event, this
-  // input has no on-screen cursor position to anchor to.
+  // input has no on-screen cursor position to anchor to. The center is
+  // invariant under mirroring, so no flip is needed (unlike in zoom()).
   if (zoomFactor != qreal(1)) {
-    QPointF center(mViewSize.width() / 2, mViewSize.height() / 2);
-    if (mMirror && (mViewSize.width() > 0)) {
-      center.setX(mViewSize.width() - center.x());
-    }
+    const QPointF center(mViewSize.width() / 2, mViewSize.height() / 2);
     applyZoomAroundPoint(projection, center, zoomFactor);
   }
 

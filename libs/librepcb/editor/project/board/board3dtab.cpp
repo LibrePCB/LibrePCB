@@ -311,7 +311,7 @@ bool Board3dTab::processSceneScrolled(const QPointF& pos,
 void Board3dTab::processSpaceMouseEvent(const SpaceMouseMotionEvent& e,
                                         qreal dtSeconds) noexcept {
   if (!mView) return;
-  const SpaceMouseMotion3d motion = toSpaceMouseMotion3d(e, dtSeconds);
+  const SpaceMouseMotion3d motion = SpaceMouseMotionMapper::toMotion3d(e, dtSeconds);
   mView->applyContinuousMotion(motion.panDelta, motion.zoomFactor,
                                motion.rotateXDeg, motion.rotateYDeg,
                                motion.rotateZDeg);

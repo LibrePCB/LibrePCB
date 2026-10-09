@@ -1058,12 +1058,12 @@ bool PackageTab::processSceneScrolled(const QPointF& pos,
 void PackageTab::processSpaceMouseEvent(const SpaceMouseMotionEvent& e,
                                         qreal dtSeconds) noexcept {
   if (mView3d && mOpenGlView) {
-    const SpaceMouseMotion3d motion = toSpaceMouseMotion3d(e, dtSeconds);
+    const SpaceMouseMotion3d motion = SpaceMouseMotionMapper::toMotion3d(e, dtSeconds);
     mOpenGlView->applyContinuousMotion(motion.panDelta, motion.zoomFactor,
                                        motion.rotateXDeg, motion.rotateYDeg,
                                        motion.rotateZDeg);
   } else {
-    const SpaceMouseMotion2d motion = toSpaceMouseMotion2d(e, dtSeconds);
+    const SpaceMouseMotion2d motion = SpaceMouseMotionMapper::toMotion2d(e, dtSeconds);
     mView->applyContinuousMotion(motion.panDelta, motion.zoomFactor);
   }
 }
