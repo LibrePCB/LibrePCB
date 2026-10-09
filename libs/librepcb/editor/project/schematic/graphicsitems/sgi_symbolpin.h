@@ -54,6 +54,9 @@ class SGI_SymbolPin final : public QGraphicsItemGroup {
   Q_DECLARE_TR_FUNCTIONS(SGI_SymbolPin)
 
 public:
+  /// Width/diameter of the pin grab area in nanometers
+  static constexpr int64_t sGrabAreaSizeNm = 1200000;
+
   // Constructors / Destructor
   SGI_SymbolPin() = delete;
   SGI_SymbolPin(const SGI_SymbolPin& other) = delete;
@@ -103,7 +106,6 @@ private:  // Data
 
   // Cache
   QPainterPath mShape;
-  qreal mLineLengthPx = 0;
 
   // Slots
   SI_SymbolPin::OnEditedSlot mOnPinEditedSlot;

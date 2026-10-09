@@ -45,13 +45,6 @@
 namespace librepcb {
 namespace editor {
 
-namespace {
-
-// Width/Diameter of the pin grab area
-constexpr int kGrabAreaSizeNm = 1200000;
-
-}  // namespace
-
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
@@ -76,7 +69,7 @@ SGI_SymbolPin::SGI_SymbolPin(
   setZValue(SchematicGraphicsScene::ZValue_SymbolPins);
 
   // Setup circle.
-  const UnsignedLength circleDiameter(kGrabAreaSizeNm);
+  const UnsignedLength circleDiameter(sGrabAreaSizeNm);
   mCircleGraphicsItem->setDiameter(circleDiameter);
   mCircleGraphicsItem->setShapeMode(
       PrimitiveCircleGraphicsItem::ShapeMode::FilledOutline);
@@ -112,6 +105,7 @@ SGI_SymbolPin::SGI_SymbolPin(
   updatePosition();
   updateRotation();
   updateJunction();
+  updateShape();
   updateName();
   updateNumbers();
   updateNumbersPosition();
@@ -170,6 +164,7 @@ void SGI_SymbolPin::pinEdited(const SI_SymbolPin& obj,
     case SI_SymbolPin::Event::RotationChanged:
       updateRotation();
       updateNumbersPosition();
+      updateShape();
       break;
     case SI_SymbolPin::Event::JunctionChanged:
     case SI_SymbolPin::Event::NetNameChanged:
@@ -227,8 +222,6 @@ void SGI_SymbolPin::updateRotation() noexcept {
   mNameGraphicsItem->setAlignment(nameAlignment);
 
   mNumbersGraphicsItem->setRotation(mPin.getRotation());
-
-  updateShape();
 }
 
 void SGI_SymbolPin::updateJunction() noexcept {
@@ -257,24 +250,23 @@ void SGI_SymbolPin::updateJunction() noexcept {
     length /= 2;
   }
   mLineGraphicsItem->setLine(Point(0, 0), Point(length, 0));
-
-  mLineLengthPx = length.toPx();
-  updateShape();
 }
 
 void SGI_SymbolPin::updateShape() noexcept {
   Q_ASSERT(mLineGraphicsItem);
 
-  const qreal grabSizePx = UnsignedLength(kGrabAreaSizeNm)->toPx();
+  // Note: We ignore shortened pin lines (i.e., if the pin has an error)
+  const qreal grabSizePx = Length(sGrabAreaSizeNm).toPx();
+  const qreal lengthPx = mPin.getLibPin().getLength()->toPx();
 
   // Grab area: A circle at the end of the pin plus a rectangle of the same
   // width along the pin line.
-  QPainterPath lineArea;
-  lineArea.addRect(QRectF(0, -grabSizePx / 2, mLineLengthPx, grabSizePx));
   mShape = QPainterPath();
   mShape.setFillRule(Qt::WindingFill);
   mShape.addEllipse(Toolbox::boundingRectFromRadius(grabSizePx / 2));
-  mShape.addPath(mLineGraphicsItem->mapToParent(lineArea));
+  mShape.addPolygon(mLineGraphicsItem->mapToParent(
+      QRectF(0, -grabSizePx / 2, lengthPx, grabSizePx)));
+  mShape.closeSubpath();
 }
 
 void SGI_SymbolPin::updateName() noexcept {
