@@ -882,6 +882,7 @@ add_library(
   spacemouse/spacemouseinput.cpp
   spacemouse/spacemouseinput.h
   spacemouse/spacemousemotionevent.h
+  spacemouse/spacemousemotionmapper.cpp
   spacemouse/spacemousemotionmapper.h
   undocommand.cpp
   undocommand.h

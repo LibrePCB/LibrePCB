@@ -1,6 +1,6 @@
 # udev rule granting non-root read/write access to 3Dconnexion SpaceMouse
 # and related 3D-mouse HID devices.  This allows LibrePCB (which reads raw
-# HID reports directly via the `hidapi` crate) can use them without running
+# HID reports directly via the `hidapi` crate) to use them without running
 # as root.
 #
 # Matches on:
@@ -13,7 +13,7 @@
 #     avoid granting access to unrelated devices.
 #
 # Product IDs verified directly against the USB ID Database
-# (https://the-sz.com/products/usbid/) on 2026-09-09. Not necessarily
+# (https://the-sz.com/products/usbid/). Not necessarily
 # exhaustive - add further product IDs here as new/older models are
 # confirmed, rather than widening the 046d match to the whole vendor.
 #
@@ -21,7 +21,7 @@
 # deliberate.  This avoids having to adjust the user's group membership,
 # and skirts a root-level install step that would be necessary otherwise.
 
-# 3Dconnexion SAM (native vendor ID) - broad vendor match, see above.
+# 3Dconnexion devices (native vendor ID) - broad vendor match, see above.
 SUBSYSTEM=="hidraw", ATTRS{idVendor}=="256f", MODE="0666"
 
 # Legacy Logitech-era 3Dconnexion devices (Logitech vendor ID) -
@@ -37,4 +37,4 @@ SUBSYSTEM=="hidraw", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="c626", MODE="06
 SUBSYSTEM=="hidraw", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="c627", MODE="0666" # SpaceExplorer 3D Mouse
 SUBSYSTEM=="hidraw", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="c628", MODE="0666" # SpaceNavigator for Notebooks
 SUBSYSTEM=="hidraw", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="c629", MODE="0666" # SpacePilot Pro 3D Mouse
-SUBSYSTEM=="hidraw", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="c62b", MODE="0666" # SpaceMouse Pro (hardware-confirmed working, 2026-09-09)
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="c62b", MODE="0666" # SpaceMouse Pro

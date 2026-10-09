@@ -38,6 +38,7 @@ namespace librepcb {
 
 namespace rs {
 struct FfiSpaceMouseBackend;
+struct SpaceMouseMotionFfi;
 }  // namespace rs
 
 namespace editor {
@@ -98,12 +99,6 @@ public:
    */
   void setLedEnabled(bool enabled) noexcept;
 
-  // Only called (by QMetaObject::invokeMethod()) on this object's own thread
-  // in response to a Rust-side callback. Needs to be public rather than
-  // private+friend because the trampoline is a plain, non-member
-  // `extern "C"` function.
-  void handleConnectedChanged(bool connected) noexcept;
-
   SpaceMouseInput& operator=(const SpaceMouseInput& rhs) = delete;
 
 signals:
@@ -116,6 +111,21 @@ signals:
    * @brief Emitted when a compatible device gets connected or disconnected
    */
   void deviceConnectedChanged(bool connected);
+
+private:  // Methods
+  // Only called (by QMetaObject::invokeMethod()) on this object's own thread
+  // in response to a Rust-side callback.
+  void handleConnectedChanged(bool connected) noexcept;
+
+  // Rust -> C++ callback trampolines. They run on the Rust-owned background
+  // thread, *not* on this object's own thread. `userData` is the
+  // SpaceMouseInput* passed to rs::ffi_spacemouse_backend_new().
+  static void onMotion(void* userData, rs::SpaceMouseMotionFfi motion) noexcept;
+  static void onConnectedChanged(void* userData, bool connected) noexcept;
+
+  // Constructs the Rust-side backend for use in the member initializer list.
+  static RustHandle<rs::FfiSpaceMouseBackend> construct(
+      SpaceMouseInput* self) noexcept;
 
 private:  // Data
   RustHandle<rs::FfiSpaceMouseBackend> mHandle;

@@ -28,6 +28,7 @@
 #include "../../guiapplication.h"
 #include "../../mainwindow.h"
 #include "../../rulecheck/rulecheckmessagesmodel.h"
+#include "../../spacemouse/spacemousemotionmapper.h"
 #include "../../undostack.h"
 #include "../../utils/editortoolbox.h"
 #include "../../utils/imagehelpers.h"
@@ -703,6 +704,12 @@ bool SymbolTab::processSceneKeyPressed(
 bool SymbolTab::processSceneKeyReleased(
     const slint::language::KeyEvent& e) noexcept {
   return mView->keyReleased(e);
+}
+
+void SymbolTab::processSpaceMouseEvent(const SpaceMouseMotionEvent& e,
+                                       qreal dtSeconds) noexcept {
+  const SpaceMouseMotion2d motion = SpaceMouseMotionMapper::toMotion2d(e, dtSeconds);
+  mView->applyContinuousMotion(motion.panDelta, motion.zoomFactor);
 }
 
 bool SymbolTab::requestClose() noexcept {

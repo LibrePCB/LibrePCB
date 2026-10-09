@@ -27,6 +27,7 @@
 #include "../../mainwindow.h"
 #include "../../modelview/attributelistmodel.h"
 #include "../../rulecheck/rulecheckmessagesmodel.h"
+#include "../../spacemouse/spacemousemotionmapper.h"
 #include "../../undocommandgroup.h"
 #include "../../undostack.h"
 #include "../../utils/editortoolbox.h"
@@ -106,6 +107,7 @@ DeviceTab::DeviceTab(LibraryEditor& editor, std::unique_ptr<Device> dev,
     mChooseCategory(false),
     mElementDuplicated(false),
     mFrameIndex(0),
+    mLastPointerScene(1),
     mNameParsed(mDevice->getNames().getDefaultValue()),
     mVersionParsed(mDevice->getVersion()),
     mCategories(new LibraryElementCategoriesModel(
@@ -602,6 +604,9 @@ slint::Image DeviceTab::renderScene(float width, float height,
 void DeviceTab::processScenePointerEvent(const QPointF& pos,
                                          slint::private_api::PointerEvent e,
                                          int scene) noexcept {
+  if ((scene == 0) || (scene == 1)) {
+    mLastPointerScene = scene;
+  }
   if (scene == 0) {
     mComponentView->pointerEvent(pos, e);
   } else if (scene == 1) {
@@ -629,6 +634,14 @@ bool DeviceTab::processSceneKeyPressed(
 bool DeviceTab::processSceneKeyReleased(
     const slint::language::KeyEvent& e) noexcept {
   return mPackageView->keyReleased(e);
+}
+
+void DeviceTab::processSpaceMouseEvent(const SpaceMouseMotionEvent& e,
+                                       qreal dtSeconds) noexcept {
+  const SpaceMouseMotion2d motion = SpaceMouseMotionMapper::toMotion2d(e, dtSeconds);
+  SlintGraphicsView& view =
+      (mLastPointerScene == 0) ? *mComponentView : *mPackageView;
+  view.applyContinuousMotion(motion.panDelta, motion.zoomFactor);
 }
 
 bool DeviceTab::requestClose() noexcept {

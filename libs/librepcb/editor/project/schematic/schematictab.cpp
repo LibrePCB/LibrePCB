@@ -795,7 +795,7 @@ bool SchematicTab::processSceneKeyReleased(
 
 void SchematicTab::processSpaceMouseEvent(const SpaceMouseMotionEvent& e,
                                           qreal dtSeconds) noexcept {
-  const SpaceMouseMotion2d motion = toSpaceMouseMotion2d(e, dtSeconds);
+  const SpaceMouseMotion2d motion = SpaceMouseMotionMapper::toMotion2d(e, dtSeconds);
   mView->applyContinuousMotion(motion.panDelta, motion.zoomFactor);
 }
 

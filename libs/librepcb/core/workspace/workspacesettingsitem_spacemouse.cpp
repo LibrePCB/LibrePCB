@@ -32,41 +32,6 @@
  ******************************************************************************/
 namespace librepcb {
 
-namespace {
-
-// Decimal digits of precision used when serializing a Space Mouse axis
-// sensitivity multiplier to the settings file. Since the settings UI only
-// offers multipliers in steps of 1/100, six decimal places is plenty.
-constexpr int kSensitivitySerializationDecimals = 6;
-
-using Axis = WorkspaceSettingsItem_SpaceMouse::Axis;
-
-// All axes with their identifiers in the settings file. The order of this
-// table is also the (fixed) order in which axes are serialized.
-struct AxisInfo {
-  Axis axis;
-  const char* name;
-};
-constexpr AxisInfo kAxes[] = {
-    {Axis::TranslationX, "translation_x"},
-    {Axis::TranslationY, "translation_y"},
-    {Axis::TranslationZ, "translation_z"},
-    {Axis::RotationX, "rotation_x"},
-    {Axis::RotationY, "rotation_y"},
-    {Axis::RotationZ, "rotation_z"},
-};
-
-std::optional<Axis> axisFromString(const QString& str) noexcept {
-  for (const AxisInfo& info : kAxes) {
-    if (str == QLatin1String(info.name)) {
-      return info.axis;
-    }
-  }
-  return std::nullopt;
-}
-
-}  // namespace
-
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
@@ -157,14 +122,14 @@ void WorkspaceSettingsItem_SpaceMouse::loadImpl(const SExpression& root) {
 }
 
 void WorkspaceSettingsItem_SpaceMouse::serializeImpl(SExpression& root) const {
-  for (const AxisInfo& info : kAxes) {
+  for (const AxisInfo& info : sAxes) {
     const AxisSettings& s = mAxisSettings.value(info.axis);
     root.ensureLineBreak();
     SExpression& child = root.appendList("axis");
     child.appendChild(SExpression::createToken(info.name));
     child.appendChild(
         "sensitivity",
-        QString::number(s.sensitivity, 'f', kSensitivitySerializationDecimals));
+        QString::number(s.sensitivity, 'f', sSensitivitySerializationDecimals));
     child.appendChild("invert", s.invert);
   }
   root.ensureLineBreak();
@@ -173,10 +138,21 @@ void WorkspaceSettingsItem_SpaceMouse::serializeImpl(SExpression& root) const {
 WorkspaceSettingsItem_SpaceMouse::AxisSettingsMap
     WorkspaceSettingsItem_SpaceMouse::defaultAxisSettings() noexcept {
   AxisSettingsMap defaults;
-  for (const AxisInfo& info : kAxes) {
+  for (const AxisInfo& info : sAxes) {
     defaults[info.axis] = AxisSettings();
   }
   return defaults;
+}
+
+std::optional<WorkspaceSettingsItem_SpaceMouse::Axis>
+    WorkspaceSettingsItem_SpaceMouse::axisFromString(
+        const QString& str) noexcept {
+  for (const AxisInfo& info : sAxes) {
+    if (str == QLatin1String(info.name)) {
+      return info.axis;
+    }
+  }
+  return std::nullopt;
 }
 
 /*******************************************************************************
