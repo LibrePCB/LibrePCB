@@ -74,8 +74,10 @@ TEST(SpaceMouseMotionMapperTest, testPanScalesLinearlyWithDt) {
   SpaceMouseMotionEvent e;
   e.translationX = 100;
   e.translationY = 50;
-  const SpaceMouseMotion2d motionAt1s = SpaceMouseMotionMapper::toMotion2d(e, 1.0);
-  const SpaceMouseMotion2d motionAt2s = SpaceMouseMotionMapper::toMotion2d(e, 2.0);
+  const SpaceMouseMotion2d motionAt1s =
+      SpaceMouseMotionMapper::toMotion2d(e, 1.0);
+  const SpaceMouseMotion2d motionAt2s =
+      SpaceMouseMotionMapper::toMotion2d(e, 2.0);
 
   // Twice the elapsed time (at the same held deflection) must mean exactly
   // twice the pan distance - this is the whole point of taking dtSeconds
@@ -217,7 +219,8 @@ TEST(SpaceMouseMotionMapperTest, testSettingsSensitivityAndInvertPerAxis) {
   e.translationX = 100;
   e.translationY = 100;  // Untouched axis.
   e.rotationY = 100;
-  const SpaceMouseMotionEvent out = SpaceMouseMotionMapper::applySettings(e, settings);
+  const SpaceMouseMotionEvent out =
+      SpaceMouseMotionMapper::applySettings(e, settings);
   EXPECT_EQ(200, out.translationX);
   EXPECT_EQ(100, out.translationY);
   EXPECT_EQ(-50, out.rotationY);
@@ -232,7 +235,8 @@ TEST(SpaceMouseMotionMapperTest, testSettingsResultIsClampedToInt16) {
   SpaceMouseMotionEvent e;
   e.translationX = 30000;
   e.translationY = 30000;
-  const SpaceMouseMotionEvent out = SpaceMouseMotionMapper::applySettings(e, settings);
+  const SpaceMouseMotionEvent out =
+      SpaceMouseMotionMapper::applySettings(e, settings);
   EXPECT_EQ(std::numeric_limits<qint16>::max(), out.translationX);
   EXPECT_EQ(std::numeric_limits<qint16>::min(), out.translationY);
 }

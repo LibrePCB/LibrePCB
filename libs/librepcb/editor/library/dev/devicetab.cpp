@@ -638,7 +638,8 @@ bool DeviceTab::processSceneKeyReleased(
 
 void DeviceTab::processSpaceMouseEvent(const SpaceMouseMotionEvent& e,
                                        qreal dtSeconds) noexcept {
-  const SpaceMouseMotion2d motion = SpaceMouseMotionMapper::toMotion2d(e, dtSeconds);
+  const SpaceMouseMotion2d motion =
+      SpaceMouseMotionMapper::toMotion2d(e, dtSeconds);
   SlintGraphicsView& view =
       (mLastPointerScene == 0) ? *mComponentView : *mPackageView;
   view.applyContinuousMotion(motion.panDelta, motion.zoomFactor);

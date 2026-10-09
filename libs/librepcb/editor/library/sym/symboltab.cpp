@@ -708,7 +708,8 @@ bool SymbolTab::processSceneKeyReleased(
 
 void SymbolTab::processSpaceMouseEvent(const SpaceMouseMotionEvent& e,
                                        qreal dtSeconds) noexcept {
-  const SpaceMouseMotion2d motion = SpaceMouseMotionMapper::toMotion2d(e, dtSeconds);
+  const SpaceMouseMotion2d motion =
+      SpaceMouseMotionMapper::toMotion2d(e, dtSeconds);
   mView->applyContinuousMotion(motion.panDelta, motion.zoomFactor);
 }
 

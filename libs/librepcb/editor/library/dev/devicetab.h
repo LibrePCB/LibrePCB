@@ -58,8 +58,8 @@ class LibraryElementCategoriesModel;
 class MeasureTool;
 class PartListModel;
 class SlintGraphicsView;
-struct SpaceMouseMotionEvent;
 class SymbolGraphicsItem;
+struct SpaceMouseMotionEvent;
 
 /*******************************************************************************
  *  Class DeviceTab

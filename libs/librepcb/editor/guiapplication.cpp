@@ -1222,7 +1222,8 @@ void GuiApplication::handleSpaceMouseMotion(
   // window -> section -> tab chain ::processScenePointerEvent() walks.
   if (auto win = getCurrentWindow()) {
     const SpaceMouseMotionEvent adjusted =
-        SpaceMouseMotionMapper::applySettings(e, mWorkspace.getSettings().spaceMouse);
+        SpaceMouseMotionMapper::applySettings(
+            e, mWorkspace.getSettings().spaceMouse);
     win->processSpaceMouseEvent(adjusted, dtSeconds);
   }
 }

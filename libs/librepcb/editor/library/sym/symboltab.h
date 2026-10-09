@@ -54,9 +54,9 @@ class GraphicsLayerList;
 class GraphicsScene;
 class LibraryElementCategoriesModel;
 class SlintGraphicsView;
-struct SpaceMouseMotionEvent;
 class SymbolEditorFsm;
 class SymbolGraphicsItem;
+struct SpaceMouseMotionEvent;
 
 /*******************************************************************************
  *  Class SymbolTab
