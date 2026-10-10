@@ -1173,7 +1173,7 @@ void DeviceTab::updateHighlightedPadsAndPins() noexcept {
 
 void DeviceTab::setHighlightedPad(const std::optional<Uuid>& pad) noexcept {
   if (!mFootprintGraphicsItem) return;
-  mFootprintGraphicsItem->setSelectionRect(QRectF());
+  mFootprintGraphicsItem->setSelectionRect(QRectF(), RectSelection::Mode::Crossing);
   if ((!pad) || (!mPackage) || (!mFootprint)) return;
   for (const auto& fptPad :
        std::const_pointer_cast<Footprint>(mFootprint)->getPads().values()) {
@@ -1191,7 +1191,7 @@ void DeviceTab::setHighlightedSignalPins(
   for (int i = 0; i < mSymbols.count(); ++i) {
     auto symbol = std::const_pointer_cast<Symbol>(mSymbols.at(i));
     auto graphicsItem = mSymbolGraphicsItems.at(i);
-    graphicsItem->setSelectionRect(QRectF());
+    graphicsItem->setSelectionRect(QRectF(), RectSelection::Mode::Crossing);
     if ((!signal) || (!symbol) || (!mComponent) || (!mSymbolVariant) ||
         (mSymbolVariant->getSymbolItems().count() != mSymbols.count())) {
       continue;

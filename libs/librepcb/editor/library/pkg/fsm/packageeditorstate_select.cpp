@@ -382,7 +382,8 @@ bool PackageEditorState_Select::processSelectAll() noexcept {
       // rect to get all items selected.
       auto bounds = scene->itemsBoundingRect();
       bounds.adjust(-100, -100, 100, 100);
-      mContext.currentGraphicsItem->setSelectionRect(bounds);
+      mContext.currentGraphicsItem->setSelectionRect(
+          bounds, RectSelection::Mode::Crossing);
       scheduleUpdateAvailableFeatures();  // Selection might have changed.
       return true;
     }
@@ -1621,7 +1622,7 @@ void PackageEditorState_Select::setSelectionRect(
     scene->setSelectionRect(p1, p2, mode);
   }
   if (auto item = mContext.currentGraphicsItem) {
-    item->setSelectionRect(QRectF(p1.toPxQPointF(), p2.toPxQPointF()));
+    item->setSelectionRect(QRectF(p1.toPxQPointF(), p2.toPxQPointF()), mode);
   }
 }
 

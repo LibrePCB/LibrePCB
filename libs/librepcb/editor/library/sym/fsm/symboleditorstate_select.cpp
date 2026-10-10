@@ -379,7 +379,7 @@ bool SymbolEditorState_Select::processSelectAll() noexcept {
       // rect to get all items selected.
       auto bounds = scene->itemsBoundingRect();
       bounds.adjust(-100, -100, 100, 100);
-      item->setSelectionRect(bounds);
+      item->setSelectionRect(bounds, RectSelection::Mode::Crossing);
       scheduleUpdateAvailableFeatures();  // Selection might have changed.
       return true;
     }
@@ -1025,7 +1025,7 @@ void SymbolEditorState_Select::setSelectionRect(
     scene->setSelectionRect(p1, p2, mode);
   }
   if (auto item = getGraphicsItem()) {
-    item->setSelectionRect(QRectF(p1.toPxQPointF(), p2.toPxQPointF()));
+    item->setSelectionRect(QRectF(p1.toPxQPointF(), p2.toPxQPointF()), mode);
   }
 }
 
