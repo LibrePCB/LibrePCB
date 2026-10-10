@@ -59,7 +59,7 @@ namespace tests {
 // (the pad) or a simple filled primitive with a known nominal size. The stroke
 // text's shape is the actual stroked glyph outline from the StrokeFont, whose
 // exact ink extents are font/glyph dependent.  Thus, only the unambiguous
-// enclosed/disjoint cases are asserted for it (see 
+// enclosed/disjoint cases are asserted for it (see
 // testSetSelectionRectStrokeTextFullyEnclosedSelectsInBothModes).
 class FootprintGraphicsItemTest : public ::testing::Test {
 protected:
