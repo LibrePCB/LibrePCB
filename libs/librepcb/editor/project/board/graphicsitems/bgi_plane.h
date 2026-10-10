@@ -85,6 +85,16 @@ public:
   BI_Plane& getPlane() noexcept { return mPlane; }
   void updateContext() noexcept;
 
+  /**
+   * @brief Get the visible geometry, used for rubber-band selection
+   *
+   * Unlike #shape(), this does not depend on the selection state (the vertex
+   * handles of a selected plane are not part of it).
+   *
+   * @return Path in item coordinates, empty if the layer is hidden.
+   */
+  QPainterPath getVisibleShape() const noexcept;
+
   // Inherited from QGraphicsItem
   QVariant itemChange(GraphicsItemChange change,
                       const QVariant& value) noexcept override;

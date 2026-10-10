@@ -70,6 +70,17 @@ public:
   }
   void updateContext() noexcept;
 
+  /**
+   * @brief Get the visible geometry, used for rubber-band selection
+   *
+   * Covers the pin's grab area (the same expanded rectangle along the pin
+   * line used by the (click) #shape(), not the line's actual drawn width)
+   * plus the junction/marker circle (only if it is drawn).
+   *
+   * @return Path in item coordinates.
+   */
+  QPainterPath getVisibleShape() const noexcept;
+
   // Inherited from QGraphicsItem
   QPainterPath shape() const noexcept override { return mShape; }
 
@@ -85,6 +96,7 @@ private:  // Methods
   void updatePosition() noexcept;
   void updateRotation() noexcept;
   void updateJunction() noexcept;
+  void updateShape() noexcept;
   void updateName() noexcept;
   void updateNumbers() noexcept;
   void updateNumbersPosition() noexcept;
@@ -102,6 +114,8 @@ private:  // Data
 
   // Cache
   QPainterPath mShape;
+  QPainterPath mLineGrabShape;
+  qreal mLineLengthPx = 0;
 
   // Slots
   SI_SymbolPin::OnEditedSlot mOnPinEditedSlot;

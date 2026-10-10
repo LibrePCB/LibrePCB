@@ -103,6 +103,10 @@ void SGI_NetLabel::updateContext() noexcept {
   mAnchorGraphicsItem->setState(state);
 }
 
+QPainterPath SGI_NetLabel::getVisibleShape() const noexcept {
+  return mTextGraphicsItem->mapToParent(mTextGraphicsItem->getVisibleShape());
+}
+
 /*******************************************************************************
  *  Inherited from QGraphicsItem
  ******************************************************************************/

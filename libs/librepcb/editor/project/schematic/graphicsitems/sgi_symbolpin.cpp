@@ -45,6 +45,14 @@
 namespace librepcb {
 namespace editor {
 
+namespace {
+
+// Diameter of the circle at the end of the pin. This is also the width of the
+// area where the pin can be grabbed with the mouse.
+constexpr int kGrabAreaSizeNm = 1200000;
+
+}  // namespace
+
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
@@ -69,7 +77,7 @@ SGI_SymbolPin::SGI_SymbolPin(
   setZValue(SchematicGraphicsScene::ZValue_SymbolPins);
 
   // Setup circle.
-  const UnsignedLength circleDiameter(1200000);
+  const UnsignedLength circleDiameter(kGrabAreaSizeNm);
   mCircleGraphicsItem->setDiameter(circleDiameter);
   mCircleGraphicsItem->setShapeMode(
       PrimitiveCircleGraphicsItem::ShapeMode::FilledOutline);
@@ -110,10 +118,6 @@ SGI_SymbolPin::SGI_SymbolPin(
   updateNumbersPosition();
   updateNumbersAlignment();
 
-  // Shape is always a circle.
-  mShape.addEllipse(
-      Toolbox::boundingRectFromRadius(circleDiameter->toPx() / 2));
-
   mPin.onEdited.attach(mOnPinEditedSlot);
   if (auto ptr = mSymbolGraphicsItem.lock()) {
     ptr->onEdited.attach(mOnSymbolEditedSlot);
@@ -151,6 +155,21 @@ QVariant SGI_SymbolPin::itemChange(GraphicsItemChange change,
     mNumbersGraphicsItem->setSelected(value.toBool());
   }
   return QGraphicsItem::itemChange(change, value);
+}
+
+QPainterPath SGI_SymbolPin::getVisibleShape() const noexcept {
+  QPainterPath path;
+  path.setFillRule(Qt::WindingFill);
+  if (mLineGraphicsItem->isVisible()) {
+    // The rotation is applied to the line item itself. Uses the same
+    // (expanded) grab area as the (click) #shape(), not the line's actual
+    // drawn width.
+    path.addPath(mLineGraphicsItem->mapToParent(mLineGrabShape));
+  }
+  // Empty if neither line nor fill layer of the circle is visible.
+  const QPainterPath circle = mCircleGraphicsItem->shape();
+  path.addPath(mCircleGraphicsItem->mapToParent(circle));
+  return path;
 }
 
 /*******************************************************************************
@@ -224,6 +243,8 @@ void SGI_SymbolPin::updateRotation() noexcept {
   mNameGraphicsItem->setAlignment(nameAlignment);
 
   mNumbersGraphicsItem->setRotation(mPin.getRotation());
+
+  updateShape();
 }
 
 void SGI_SymbolPin::updateJunction() noexcept {
@@ -252,6 +273,27 @@ void SGI_SymbolPin::updateJunction() noexcept {
     length /= 2;
   }
   mLineGraphicsItem->setLine(Point(0, 0), Point(length, 0));
+
+  mLineLengthPx = length.toPx();
+  updateShape();
+}
+
+void SGI_SymbolPin::updateShape() noexcept {
+  Q_ASSERT(mLineGraphicsItem);
+
+  const qreal grabSizePx = UnsignedLength(kGrabAreaSizeNm)->toPx();
+
+  // Grab area: The circle at the end of the pin plus a rectangle of the same
+  // width along the pin line.  This enables grabbing the pin at any point.
+  // Note that the rotation is applied to the line item, not to the pin itself.
+  // Used for both the (click) #shape() and the rubber-band
+  // #getVisibleShape(), so the two agree on the pin's grab area.
+  mLineGrabShape = QPainterPath();
+  mLineGrabShape.addRect(QRectF(0, -grabSizePx / 2, mLineLengthPx, grabSizePx));
+  mShape = QPainterPath();
+  mShape.setFillRule(Qt::WindingFill);
+  mShape.addEllipse(Toolbox::boundingRectFromRadius(grabSizePx / 2));
+  mShape.addPath(mLineGraphicsItem->mapToParent(mLineGrabShape));
 }
 
 void SGI_SymbolPin::updateName() noexcept {

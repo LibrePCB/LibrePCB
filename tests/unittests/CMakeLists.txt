@@ -114,12 +114,15 @@ add_executable(
   eagleimport/eagletypeconvertertest.cpp
   editor/dialogs/dxfimportdialogtest.cpp
   editor/dialogs/graphicsexportdialogtest.cpp
+  editor/graphics/rectselectiontest.cpp
   editor/library/cat/categorytreebuildertest.cpp
   editor/library/cmd/cmdpackagereloadtest.cpp
   editor/library/cmd/cmdsymbolreloadtest.cpp
   editor/library/librarydownloadtest.cpp
   editor/library/pkg/footprintclipboarddatatest.cpp
+  editor/library/pkg/footprintgraphicsitemtest.cpp
   editor/library/sym/symbolclipboarddatatest.cpp
+  editor/library/sym/symbolgraphicsitemtest.cpp
   editor/modelview/pathmodeltest.cpp
   editor/project/addcomponentdialogtest.cpp
   editor/project/board/boardclipboarddatatest.cpp

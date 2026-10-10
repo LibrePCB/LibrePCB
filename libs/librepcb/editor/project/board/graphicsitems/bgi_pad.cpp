@@ -101,6 +101,11 @@ void BGI_Pad::updateContext() noexcept {
   mGraphicsItem->setTextMirrored(mContext->flipView);
 }
 
+QPainterPath BGI_Pad::getVisibleShape() const noexcept {
+  Q_ASSERT(mGraphicsItem);
+  return mGraphicsItem->mapToParent(mGraphicsItem->getVisibleShape());
+}
+
 /*******************************************************************************
  *  Inherited from QGraphicsItem
  ******************************************************************************/

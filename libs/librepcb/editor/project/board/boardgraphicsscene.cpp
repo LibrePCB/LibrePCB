@@ -243,61 +243,6 @@ void BoardGraphicsScene::selectAll() noexcept {
   }
 }
 
-void BoardGraphicsScene::selectItemsInRect(const Point& p1,
-                                           const Point& p2) noexcept {
-  GraphicsScene::setSelectionRect(p1, p2);
-  const QRectF rectPx = QRectF(p1.toPxQPointF(), p2.toPxQPointF()).normalized();
-  // For now we select the shole device if one of its pads is within the
-  // selection rect, see https://github.com/LibrePCB/LibrePCB/pull/1533.
-  // In case this turns out to be problematic in some cases, we should
-  // reconsider this.
-  QSet<std::shared_ptr<BGI_Device>> selectedDevices;
-  foreach (auto item, mPads) {
-    if (auto device = item->getDeviceGraphicsItem().lock()) {
-      if ((!selectedDevices.contains(device)) &&
-          item->mapToScene(item->shape()).intersects(rectPx)) {
-        selectedDevices.insert(device);
-      }
-    } else {
-      item->setSelected(item->mapToScene(item->shape()).intersects(rectPx));
-    }
-  }
-  foreach (auto item, mDevices) {
-    item->setSelected(selectedDevices.contains(item) ||
-                      item->mapToScene(item->shape()).intersects(rectPx));
-  }
-  foreach (auto item, mVias) {
-    item->setSelected(item->mapToScene(item->shape()).intersects(rectPx));
-  }
-  foreach (auto item, mNetPoints) {
-    item->setSelected(item->mapToScene(item->shape()).intersects(rectPx));
-  }
-  foreach (auto item, mNetLines) {
-    item->setSelected(item->mapToScene(item->shape()).intersects(rectPx));
-  }
-  foreach (auto item, mPlanes) {
-    item->setSelected(item->mapToScene(item->shape()).intersects(rectPx));
-  }
-  foreach (auto item, mZones) {
-    item->setSelected(item->mapToScene(item->shape()).intersects(rectPx));
-  }
-  foreach (auto item, mPolygons) {
-    item->setSelected(item->mapToScene(item->shape()).intersects(rectPx));
-  }
-  foreach (auto item, mStrokeTexts) {
-    // Propagate selection of devices to their stroke texts to allow moving
-    // selected devices including their texts. But also select just the text
-    // if it is within the selection rect, e.g. to allow selecting all texts
-    // on the values layer to delete them.
-    auto device = item->getDeviceGraphicsItem().lock();
-    item->setSelected((device && device->isSelected()) ||
-                      item->mapToScene(item->shape()).intersects(rectPx));
-  }
-  foreach (auto item, mHoles) {
-    item->setSelected(item->mapToScene(item->shape()).intersects(rectPx));
-  }
-}
-
 void BoardGraphicsScene::selectNetSegment(BI_NetSegment& netSegment) noexcept {
   foreach (BI_Via* obj, netSegment.getVias()) {
     if (auto item = mVias.value(obj)) {
@@ -380,6 +325,61 @@ qreal BoardGraphicsScene::getFlippedZValue(ItemZValue value,
     return static_cast<qreal>(ZValue_Top + ZValue_Bottom - value);
   } else {
     return static_cast<qreal>(value);
+  }
+}
+
+/*******************************************************************************
+ *  Protected Methods
+ ******************************************************************************/
+
+void BoardGraphicsScene::applyRectSelection(
+    const RectSelection& selection) noexcept {
+  // Only pads without a device are selected here.
+  foreach (auto item, mPads) {
+    if (!item->getDeviceGraphicsItem().lock()) {
+      item->setSelected(hitsVisible(selection, *item));
+    }
+  }
+  // The footprint of a device consists of its visible geometry, including
+  // its pads (see https://github.com/LibrePCB/LibrePCB/pull/1533).
+  foreach (auto item, mDevices) {
+    QVector<QPainterPath> footprint{footprintOf(*item)};
+    for (BI_Pad* pad : item->getDevice().getPads()) {
+      if (auto padItem = mPads.value(pad)) {
+        footprint.append(footprintOf(*padItem));
+      }
+    }
+    item->setSelected(hits(selection, footprint));
+  }
+  foreach (auto item, mVias) {
+    item->setSelected(hits(selection, *item));
+  }
+  foreach (auto item, mNetPoints) {
+    item->setSelected(hits(selection, *item));
+  }
+  foreach (auto item, mNetLines) {
+    item->setSelected(hits(selection, *item));
+  }
+  foreach (auto item, mPlanes) {
+    // Do not use the click shape (its size depends on the selection state).
+    item->setSelected(hitsVisible(selection, *item));
+  }
+  foreach (auto item, mZones) {
+    item->setSelected(hits(selection, *item));
+  }
+  foreach (auto item, mPolygons) {
+    item->setSelected(hits(selection, *item));
+  }
+  foreach (auto item, mStrokeTexts) {
+    // Stroke texts (including reference designators) are always selected
+    // together with their device, but can also be selected independently of
+    // it.
+    auto device = item->getDeviceGraphicsItem().lock();
+    const bool deviceSelected = device && device->isSelected();
+    item->setSelected(deviceSelected || hitsVisible(selection, *item));
+  }
+  foreach (auto item, mHoles) {
+    item->setSelected(hits(selection, *item));
   }
 }
 

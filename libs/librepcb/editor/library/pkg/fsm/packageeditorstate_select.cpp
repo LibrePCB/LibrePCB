@@ -139,7 +139,7 @@ bool PackageEditorState_Select::processGraphicsSceneMouseMoved(
 
   switch (mState) {
     case SubState::SELECTING: {
-      setSelectionRect(mStartPos, currentPos);
+      setSelectionRect(mStartPos, currentPos, e.rectSelectionMode);
       scheduleUpdateAvailableFeatures();  // Selection might have changed.
       return true;
     }
@@ -382,7 +382,8 @@ bool PackageEditorState_Select::processSelectAll() noexcept {
       // rect to get all items selected.
       auto bounds = scene->itemsBoundingRect();
       bounds.adjust(-100, -100, 100, 100);
-      mContext.currentGraphicsItem->setSelectionRect(bounds);
+      mContext.currentGraphicsItem->setSelectionRect(
+          bounds, RectSelection::Mode::Crossing);
       scheduleUpdateAvailableFeatures();  // Selection might have changed.
       return true;
     }
@@ -1615,20 +1616,20 @@ void PackageEditorState_Select::startAddingZoneVertex(
   }
 }
 
-void PackageEditorState_Select::setSelectionRect(const Point& p1,
-                                                 const Point& p2) noexcept {
+void PackageEditorState_Select::setSelectionRect(
+    const Point& p1, const Point& p2, RectSelection::Mode mode) noexcept {
   if (auto scene = getGraphicsScene()) {
-    scene->setSelectionRect(p1, p2);
+    scene->setSelectionRect(p1, p2, mode);
   }
   if (auto item = mContext.currentGraphicsItem) {
-    item->setSelectionRect(QRectF(p1.toPxQPointF(), p2.toPxQPointF()));
+    item->setSelectionRect(QRectF(p1.toPxQPointF(), p2.toPxQPointF()), mode);
   }
 }
 
 void PackageEditorState_Select::clearSelectionRect(
     bool updateItemsSelectionState) noexcept {
   if (auto scene = getGraphicsScene()) {
-    scene->setSelectionRect(Point(), Point());
+    scene->clearSelectionRect();
     if (updateItemsSelectionState) {
       scene->setSelectionArea(QPainterPath());
     }

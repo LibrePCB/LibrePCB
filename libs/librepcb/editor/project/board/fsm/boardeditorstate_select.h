@@ -200,6 +200,10 @@ private:  // Data
   /// An undo command will be active while dragging pasted items
   bool mIsUndoCmdActive;
 
+  /// This flag is used to suppress the automatic start of a rubber-band
+  /// select when a drag move or vertex edit is aborted using the ESC key.
+  bool mSuppressRubberBandUntilRelease;
+
   /// When dragging items, this undo command will be active
   std::unique_ptr<CmdDragSelectedBoardItems> mSelectedItemsDragCommand;
 

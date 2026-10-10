@@ -33,7 +33,7 @@ export component ScrollBar inherits Rectangle {
     }
 
     ta := TouchArea {
-        property <{ pressed-value: length, maximum: length, x: length, y: length}> saved-values;
+        property <{ pressed-value: length, maximum: length, x: length, y: length }> saved-values;
 
         x: horizontal ? 0 : parent.width - self.width + 4px;
         y: (!horizontal) ? 0 : parent.height - self.height + 4px;
