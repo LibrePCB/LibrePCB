@@ -124,7 +124,8 @@ private:  // Methods
                              const QVector<int> vertices) noexcept;
   void startAddingPolygonVertex(std::shared_ptr<Polygon> polygon, int vertex,
                                 const Point& pos) noexcept;
-  void setSelectionRect(const Point& p1, const Point& p2) noexcept;
+  void setSelectionRect(const Point& p1, const Point& p2,
+                        RectSelection::Mode mode) noexcept;
   void clearSelectionRect(bool updateItemsSelectionState) noexcept;
   QList<std::shared_ptr<QGraphicsItem>> findItemsAtPosition(
       const Point& pos) noexcept;
