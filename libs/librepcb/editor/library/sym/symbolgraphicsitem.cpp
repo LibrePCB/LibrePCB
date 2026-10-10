@@ -226,8 +226,8 @@ void SymbolGraphicsItem::updateAllTexts() noexcept {
   }
 }
 
-void SymbolGraphicsItem::setSelectionRect(
-    const QRectF rect, RectSelection::Mode mode) noexcept {
+void SymbolGraphicsItem::setSelectionRect(const QRectF rect,
+                                          RectSelection::Mode mode) noexcept {
   const RectSelection selection{rect, mode};
   foreach (const auto& ptr, mPinGraphicsItems) {
     ptr->setSelected(hits(selection, *ptr));

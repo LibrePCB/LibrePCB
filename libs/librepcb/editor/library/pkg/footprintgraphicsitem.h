@@ -134,8 +134,7 @@ public:
 
   // General Methods
   void updateAllTexts() noexcept;
-  void setSelectionRect(const QRectF rect,
-                        RectSelection::Mode mode) noexcept;
+  void setSelectionRect(const QRectF rect, RectSelection::Mode mode) noexcept;
 
   // Operator Overloadings
   FootprintGraphicsItem& operator=(const FootprintGraphicsItem& rhs) = delete;

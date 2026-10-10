@@ -116,8 +116,7 @@ public:
 
   // General Methods
   void updateAllTexts() noexcept;
-  void setSelectionRect(const QRectF rect,
-                        RectSelection::Mode mode) noexcept;
+  void setSelectionRect(const QRectF rect, RectSelection::Mode mode) noexcept;
 
   // Operator Overloadings
   SymbolGraphicsItem& operator=(const SymbolGraphicsItem& rhs) = delete;
