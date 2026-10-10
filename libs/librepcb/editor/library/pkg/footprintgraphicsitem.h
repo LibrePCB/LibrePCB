@@ -23,6 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../graphics/graphicsscene.h"
+
 #include <librepcb/core/library/pkg/footprint.h>
 #include <librepcb/core/library/pkg/packagepad.h>
 
@@ -132,7 +134,8 @@ public:
 
   // General Methods
   void updateAllTexts() noexcept;
-  void setSelectionRect(const QRectF rect) noexcept;
+  void setSelectionRect(const QRectF rect,
+                        RectSelection::Mode mode) noexcept;
 
   // Operator Overloadings
   FootprintGraphicsItem& operator=(const FootprintGraphicsItem& rhs) = delete;
