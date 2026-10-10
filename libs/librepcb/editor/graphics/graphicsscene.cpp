@@ -195,12 +195,6 @@ void GraphicsScene::setSelectionRectColors(const QColor& line,
   mSelectionRectItem->setBrush(fill);
 }
 
-void GraphicsScene::setSelectionRect(const Point& p1,
-                                     const Point& p2) noexcept {
-  QRectF rectPx = QRectF(p1.toPxQPointF(), p2.toPxQPointF()).normalized();
-  mSelectionRectItem->setRect(rectPx);
-}
-
 void GraphicsScene::setSelectionRect(const Point& p1, const Point& p2,
                                      RectSelection::Mode mode) noexcept {
   QPen pen = mSelectionRectItem->pen();
@@ -212,7 +206,9 @@ void GraphicsScene::setSelectionRect(const Point& p1, const Point& p2,
     pen.setDashPattern({12, 6});
   }
   mSelectionRectItem->setPen(pen);
-  setSelectionRect(p1, p2);
+
+  const QRectF rectPx = QRectF(p1.toPxQPointF(), p2.toPxQPointF()).normalized();
+  mSelectionRectItem->setRect(rectPx);
 }
 
 void GraphicsScene::clearSelectionRect() noexcept {

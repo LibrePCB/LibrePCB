@@ -132,7 +132,7 @@ bool SymbolEditorState_Select::processGraphicsSceneMouseMoved(
 
   switch (mState) {
     case SubState::SELECTING: {
-      setSelectionRect(mStartPos, currentPos);
+      setSelectionRect(mStartPos, currentPos, e.rectSelectionMode);
       scheduleUpdateAvailableFeatures();  // Selection might have changed.
       return true;
     }
@@ -1019,10 +1019,10 @@ void SymbolEditorState_Select::startAddingPolygonVertex(
   }
 }
 
-void SymbolEditorState_Select::setSelectionRect(const Point& p1,
-                                                const Point& p2) noexcept {
+void SymbolEditorState_Select::setSelectionRect(
+    const Point& p1, const Point& p2, RectSelection::Mode mode) noexcept {
   if (auto scene = getGraphicsScene()) {
-    scene->setSelectionRect(p1, p2);
+    scene->setSelectionRect(p1, p2, mode);
   }
   if (auto item = getGraphicsItem()) {
     item->setSelectionRect(QRectF(p1.toPxQPointF(), p2.toPxQPointF()));
@@ -1032,7 +1032,7 @@ void SymbolEditorState_Select::setSelectionRect(const Point& p1,
 void SymbolEditorState_Select::clearSelectionRect(
     bool updateItemsSelectionState) noexcept {
   if (auto scene = getGraphicsScene()) {
-    scene->setSelectionRect(Point(), Point());
+    scene->clearSelectionRect();
     if (updateItemsSelectionState) {
       scene->setSelectionArea(QPainterPath());
     }

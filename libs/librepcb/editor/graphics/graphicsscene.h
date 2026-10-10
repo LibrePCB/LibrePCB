@@ -203,7 +203,6 @@ public:
   void setGrayOut(bool grayOut) noexcept;
 
   // General Methods
-  void setSelectionRect(const Point& p1, const Point& p2) noexcept;
   void setSelectionRect(const Point& p1, const Point& p2,
                         RectSelection::Mode mode) noexcept;
   void clearSelectionRect() noexcept;
