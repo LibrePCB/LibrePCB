@@ -68,7 +68,7 @@ public:
   void setOverridePinNumber(const QString& number) noexcept;
 
   // Inherited from QGraphicsItem
-  QPainterPath shape() const noexcept override;
+  QPainterPath shape() const noexcept override { return mShape; }
 
   // Operator Overloadings
   SymbolPinGraphicsItem& operator=(const SymbolPinGraphicsItem& rhs) = delete;
@@ -78,6 +78,7 @@ private:  // Methods
   QVariant itemChange(GraphicsItemChange change,
                       const QVariant& value) noexcept override;
   void setLength(const UnsignedLength& length) noexcept;
+  void updateShape() noexcept;
   void updateNamePosition() noexcept;
   void updateNumbersTransform() noexcept;
 
@@ -91,6 +92,9 @@ private:  // Data
   QScopedPointer<LineGraphicsItem> mLineGraphicsItem;
   QScopedPointer<PrimitiveTextGraphicsItem> mNameGraphicsItem;
   QScopedPointer<PrimitiveTextGraphicsItem> mNumbersGraphicsItem;
+
+  // Cache
+  QPainterPath mShape;
 
   // Slots
   SymbolPin::OnEditedSlot mOnEditedSlot;
