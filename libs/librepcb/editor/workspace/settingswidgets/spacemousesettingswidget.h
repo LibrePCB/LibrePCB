@@ -43,18 +43,10 @@ class SpaceMouseSettingsWidget;
  ******************************************************************************/
 
 /**
- * @brief Widget (GUI) to view and modify the Space Mouse settings
+ * @brief Widget (GUI) to view and modify the SpaceMouse settings
  *
- * Shown as the "Space Mouse" tab of WorkspaceSettingsDialog. Extracted out
- * into its own widget since the Space Mouse controls (six axis sliders &
- * checkboxes) made up a disproportionate share of the dialog's code.
- *
- * Mirrors the existing *OutputJobWidget family in
- * editor/project/outputjobsdialog/: constructed directly (no Designer
- * promotion) and dropped into a placeholder container in the parent's
- * .ui. Unlike that family, this widget does not write through to its
- * settings object live - Space Mouse settings are deliberately applied
- * only on the dialog's Apply/OK, so the caller must explicitly call save().
+ * Shown as the "Space Mouse" tab of WorkspaceSettingsDialog. Changes are
+ * only applied to the settings object by calling save().
  */
 class SpaceMouseSettingsWidget final : public QWidget {
   Q_OBJECT
@@ -70,20 +62,12 @@ public:
   // General Methods
 
   /**
-   * @brief Reload all widgets from the current values of the settings object
-   *
-   * Called once by the constructor, and callable again if the parent
-   * dialog needs to reset the tab back to the persisted values (e.g. when
-   * the user discards unsaved changes).
+   * @brief Reload all widgets from the settings object
    */
   void load() noexcept;
 
   /**
-   * @brief Write the current state of all widgets back into the settings
-   *        object passed to the constructor
-   *
-   * Not called automatically - the parent dialog decides when settings are
-   * actually persisted (on Apply/OK), same as before this widget existed.
+   * @brief Write the state of all widgets to the settings object
    */
   void save() noexcept;
 
@@ -105,14 +89,13 @@ private:  // Types
 private:  // Methods
   bool eventFilter(QObject* watched, QEvent* event) noexcept override;
 
-  // Convert a sensitivity slider position to a sensitivity multiplier. See
-  // the comment on sSensitivityCurveBase for the curve this implements.
+  // Maps a slider position to a sensitivity multiplier.
   static double sliderToSensitivity(int sliderValue) noexcept;
 
   // Inverse of sliderToSensitivity().
   static int sensitivityToSlider(double sensitivity) noexcept;
 
-  // Format a sensitivity multiplier for display (e.g. "1.2x").
+  // Formats a multiplier for display, e.g. "1.2x".
   static QString sensitivityLabel(double sensitivity) noexcept;
 
 private:  // Data
@@ -122,22 +105,13 @@ private:  // Data
 
   // Static Variables
 
-  // The value the sensitivity sliders report is used as an *exponent* in the
-  // sensitivity multiplier calculation.  Slider values in the range of
-  // [-sSliderRange, +sSliderRange] are first scaled by sSliderRange to
-  // result in a final exponent in the range of [-1.0, 1.0].  The final
-  // multiplier value is obtained from (sSensitivityCurveBase)^exponent. This
-  // gives the sliders a more usable feel than a linear mapping would, while
-  // simultaneously keeping the nominal 1.0x multiplier in the middle.
+  // Slider positions in [-sSliderRange, +sSliderRange] map to a multiplier of
+  // sSensitivityCurveBase^(position / sSliderRange), which keeps 1.0x centered.
 
-  // Base of the exponential slider-to-sensitivity curve. This results in
-  // a multiplier range of 1/n..n (where n is the base) at full deflection.
+  // Multiplier range at full deflection is 1/base..base.
   static constexpr double sSensitivityCurveBase = 3.0;
 
-  // Slider range: each sensitivity slider spans [-sSliderRange,
-  // +sSliderRange], and is normalized to [-1.0, 1.0].  sSliderRange thus
-  // controls the granularity of the sensitivity setting (multipliers will
-  // be in hundredths).
+  // Slider extent in each direction. Sets the granularity (hundredths).
   static constexpr int sSliderRange = 100;
 };
 

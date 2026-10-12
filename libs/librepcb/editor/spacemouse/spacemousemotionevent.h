@@ -38,13 +38,8 @@ namespace editor {
 /**
  * @brief Raw motion values reported by a 3D mouse (SpaceMouse) device
  *
- * Values are the *raw*, unscaled 16-bit signed integers as reported by the
- * device's translation/rotation HID reports.  Typical report values span the
- * range of -350..+350 at rest-to-full-deflection, but are device-dependent.
- * Any sensitivity scaling, dead-zone handling or dominant-axis snapping is
- * intentionally *not* done here, but left to the consumer.  Thus, this struct
- * remains a faithful, device-independent representation of "what the device
- * just reported".  Data is shared by both the 2D and 3D views.
+ * Unscaled 16-bit values as reported by the device, typically within
+ * -350..+350. Scaling and dead-zone handling are left to the consumer.
  */
 struct SpaceMouseMotionEvent {
   qint16 translationX = 0;  ///< Pan left(-)/right(+)

@@ -64,14 +64,7 @@ void SpaceMouseInput::handleConnectedChanged(bool connected) noexcept {
  *  Static Methods
  ******************************************************************************/
 
-// These run on the Rust-owned background thread, *not* this object's own
-// thread (see `hid.rs`). `userData` is the SpaceMouseInput* passed to
-// rs::ffi_spacemouse_backend_new(), cast through `void*` since a plain C
-// function pointer can't capture a `this`. These functions do exactly one
-// thing: post the actual work onto `self`'s own thread via a queued
-// QMetaObject::invokeMethod() call, matching the idiom found elsewhere in
-// the editor for cross-thread event delivery.
-
+// Called on the Rust thread. Forwards to this object's thread.
 void SpaceMouseInput::onMotion(void* userData,
                                rs::SpaceMouseMotionFfi motion) noexcept {
   auto* self = reinterpret_cast<SpaceMouseInput*>(userData);
@@ -95,14 +88,11 @@ void SpaceMouseInput::onConnectedChanged(void* userData,
       Qt::QueuedConnection);
 }
 
-// Following the same pattern as e.g. ZipArchive's `construct()` helper.
 RustHandle<rs::FfiSpaceMouseBackend> SpaceMouseInput::construct(
     SpaceMouseInput* self) noexcept {
   rs::FfiSpaceMouseBackend* obj = rs::ffi_spacemouse_backend_new(
       self, &SpaceMouseInput::onMotion, &SpaceMouseInput::onConnectedChanged);
-  // Per ffi_spacemouse_backend_new()'s contract, this can't fail - only
-  // finding/opening a device can fail, and that's reported later via
-  // on_connected_changed(), not a null return here.
+  // Cannot fail. Device errors are reported via onConnectedChanged().
   Q_ASSERT(obj);
   return RustHandle<rs::FfiSpaceMouseBackend>(*obj,
                                               &rs::ffi_spacemouse_backend_free);

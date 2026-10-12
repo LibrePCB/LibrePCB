@@ -1,9 +1,5 @@
 //! FFI for [`spacemouse::SpaceMouseBackend`].
 //!
-//! Deliberately tiny: an opaque handle, a constructor taking two C-ABI
-//! callbacks, an `is_connected()` query, and a destructor. Everything else
-//! (motion mapping, sensitivity, calibration, dispatch) is a C++ concern.
-//! See the crate-level docs for more information.
 
 use spacemouse::{SpaceMouseBackend, SpaceMouseMotion};
 use std::os::raw::c_void;
@@ -44,10 +40,7 @@ impl From<SpaceMouseMotion> for SpaceMouseMotionFfi {
 ///
 /// <div class="warning">
 /// Fires on a background thread owned by the Rust side, *not* the thread
-/// that called [`ffi_spacemouse_backend_new`]. The C++ side is responsible
-/// for hopping onto whatever thread it needs before touching anything not
-/// safe to call from an arbitrary thread (e.g. before emitting a Qt
-/// signal).  Also see `spacemouseinput.cpp`.
+/// that called [`ffi_spacemouse_backend_new`].
 /// </div>
 pub type MotionCallback =
   extern "C" fn(user_data: *mut c_void, motion: SpaceMouseMotionFfi);
@@ -57,24 +50,17 @@ pub type MotionCallback =
 pub type ConnectedCallback =
   extern "C" fn(user_data: *mut c_void, connected: bool);
 
-/// Wraps a raw `*mut c_void` so it can be moved into the background thread
-/// spawned by [`SpaceMouseBackend::new`]. Safe because Rust never
-/// dereferences it.  It's only ever handed back, unmodified, to the C++
-/// callbacks that gave it to us.
+/// Wraps the user data pointer so it can be moved into the background thread.
+/// Rust never dereferences it.
 #[derive(Clone, Copy)]
 struct SendPtr(*mut c_void);
 unsafe impl Send for SendPtr {}
 
 impl SendPtr {
-  /// Get the wrapped pointer back out.
+  /// Get the wrapped pointer.
   ///
-  /// Deliberately a method rather than exposing the field directly. With
-  /// Rust 2021's disjoint closure captures, a closure that writes `ptr.0`
-  /// instead of `ptr.get()` would capture just that `*mut c_void` field on
-  /// its own (bypassing the `SendPtr` wrapper's `unsafe impl Send`
-  /// entirely) instead of the whole `Send`-able `SendPtr`, and fail to
-  /// compile with a "`*mut c_void` cannot be sent between threads safely"
-  /// error.
+  /// Closures must use this instead of `.0` to capture the whole wrapper,
+  /// and thus its `Send` impl, rather than the bare pointer field.
   fn get(self) -> *mut c_void {
     self.0
   }
@@ -88,16 +74,12 @@ pub struct FfiSpaceMouseBackend {
 
 /// Create a new backend and start capturing device input in the background.
 ///
-/// `user_data` is passed back unmodified as the first argument of every
-/// callback invocation; Rust never dereferences it. The caller must keep
-/// whatever it points to alive until after [`ffi_spacemouse_backend_free`]
-/// returns, and must not call back into Rust synchronously from within a
-/// callback (there is no re-entrancy protection).
+/// `user_data` is passed back unmodified to every callback. It must stay
+/// valid until [`ffi_spacemouse_backend_free`] returns. Callbacks must not
+/// call back into Rust synchronously.
 ///
-/// Never returns null: Unlike opening a specific device, constructing the
-/// backend itself cannot fail.  "No compatible device found (yet)" is not
-/// an error, it's the normal state before `on_connected_changed(true)` is
-/// ever invoked.
+/// Never returns null. Finding no device is not an error, it is reported
+/// through `on_connected_changed`.
 #[no_mangle]
 extern "C" fn ffi_spacemouse_backend_new(
   user_data: *mut c_void,
@@ -122,10 +104,9 @@ extern "C" fn ffi_spacemouse_backend_is_connected(
 
 /// Set whether the device's LED (if it has one) should be lit.
 ///
-/// A one-shot command: applied immediately if a device is currently open,
-/// and (re-)applied automatically any time the device connects.  Devices
-/// without an LED, and any transient write failure, are both silently
-/// ignored.  See [`SpaceMouseBackend::set_led`] for additional info.
+/// Applied immediately if a device is open, and again on every connect.
+/// Devices without an LED and write failures are ignored. See
+/// [`SpaceMouseBackend::set_led`] for details.
 #[no_mangle]
 extern "C" fn ffi_spacemouse_backend_set_led(
   backend: &FfiSpaceMouseBackend,

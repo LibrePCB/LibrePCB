@@ -104,8 +104,7 @@ qreal SpaceMouseMotionMapper::normalizeAxis(qint16 raw) noexcept {
 
 qreal SpaceMouseMotionMapper::zoomFactor(qreal normalized,
                                          qreal dtSeconds) noexcept {
-  // Pushing the cap down (positive deflection) zooms in, pulling it up
-  // zooms out.
+  // Positive deflection zooms in.
   return qPow(sNominalZoomRatePerSec, -normalized * dtSeconds);
 }
 

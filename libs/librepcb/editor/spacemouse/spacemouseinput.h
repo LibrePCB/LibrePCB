@@ -48,30 +48,10 @@ namespace editor {
  ******************************************************************************/
 
 /**
- * @brief Cross-platform (Windows/macOS/Linux) 3D mouse (SpaceMouse) input,
- *        backed by the `spacemouse` Rust crate (hidapi-based raw HID capture)
- *        via FFI glue that lives in librepcb-rust-core
+ * @brief Receives SpaceMouse (3D mouse) motion from the `spacemouse` crate
  *
- * Owns whatever plumbing is needed to receive raw motion reports from a
- * connected 3Dconnexion (or compatible) device and re-emits them as
- * motionEvent(). It does nothing (and never emits) until a compatible device
- * is actually detected, so simply instantiating it is a safe no-op on a
- * machine without a 3D mouse connected. Because there is usually only one
- * physical device, only one instance is expected to exist per process.
- *
- * Reads raw HID reports directly via hidapi, running on a background
- * thread owned by the Rust side (see the crate's hid.rs). This class'
- * job is narrow and mechanical:
- *
- * - Marshal the Rust-side callbacks (which fire on that background
- *   thread, *not* this object's thread) onto this object's own thread
- *   before emitting any Qt signal (see the trampolines in the .cpp file).
- * - Do a trivial field-by-field copy from the FFI motion struct into
- *   SpaceMouseMotionEvent.
- *
- * No sensitivity scaling, dead-zone handling, or calibration happens here
- * or in the Rust crate - see spacemousemotionmapper.h for where that's
- * applied, downstream of this class.
+ * Emits nothing until a compatible device is connected. Rust-side callbacks
+ * are marshalled onto this object's thread before any signal is emitted.
  */
 class SpaceMouseInput final : public QObject {
   Q_OBJECT
@@ -87,13 +67,9 @@ public:
   bool isDeviceConnected() const noexcept;
 
   /**
-   * @brief Set whether the device's LED should be lit
+   * @brief Set whether the device's LED is lit
    *
-   * This is a one-shot command, not a continuously-applied setting.  The
-   * caller (see ::librepcb::editor::GuiApplication) is responsible for
-   * invoking this function again after a reconnect if the desired state
-   * should persist across unplug/replug. Not all devices have an LED;
-   * the call is silently ignored in that case.
+   * Ignored by devices without an LED.
    *
    * @param enabled  Whether the LED should be on.
    */
@@ -113,30 +89,18 @@ signals:
   void deviceConnectedChanged(bool connected);
 
 private:  // Methods
-  // Only called (by QMetaObject::invokeMethod()) on this object's own thread
-  // in response to a Rust-side callback.
   void handleConnectedChanged(bool connected) noexcept;
 
-  // Rust -> C++ callback trampolines. They run on the Rust-owned background
-  // thread, *not* on this object's own thread. `userData` is the
-  // SpaceMouseInput* passed to rs::ffi_spacemouse_backend_new().
+  // Called on the Rust thread.
   static void onMotion(void* userData, rs::SpaceMouseMotionFfi motion) noexcept;
   static void onConnectedChanged(void* userData, bool connected) noexcept;
 
-  // Constructs the Rust-side backend for use in the member initializer list.
   static RustHandle<rs::FfiSpaceMouseBackend> construct(
       SpaceMouseInput* self) noexcept;
 
 private:  // Data
   RustHandle<rs::FfiSpaceMouseBackend> mHandle;
-
-  // Mirrors the Rust side's connection state so isDeviceConnected() can
-  // be answered synchronously from any thread without waiting for the
-  // queued signal to be processed. Only handleConnectedChanged() (this
-  // object's own thread) and the trampoline (the Rust background thread)
-  // touch this - both do so via the atomic, so no additional locking is
-  // needed.
-  std::atomic<bool> mConnected;
+  std::atomic<bool> mConnected;  // Written on this thread, read from any.
 };
 
 /*******************************************************************************

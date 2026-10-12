@@ -84,12 +84,9 @@ public:
       const slint::language::KeyEvent& e) noexcept;
 
   /**
-   * @brief Apply a motion event from a connected 3D mouse (SpaceMouse)
+   * @brief Apply a motion event from a 3D mouse (SpaceMouse)
    *
-   * Only relevant for tabs owning a SlintGraphicsView or a
-   * SlintOpenGlView - the default implementation does nothing.
-   * Only called for the tab that is current in the current window's
-   * current section - see GuiApplication::handleSpaceMouseMotion().
+   * Only relevant for tabs showing a view. Does nothing by default.
    */
   virtual void processSpaceMouseEvent(const SpaceMouseMotionEvent& e,
                                       qreal dtSeconds) noexcept {

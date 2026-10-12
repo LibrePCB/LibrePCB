@@ -178,8 +178,7 @@ private:
   bool mElementDuplicated;
   int mFrameIndex;
 
-  // The SpaceMouse only drives one view at a time.  Track the last view our
-  // cursor was over so that we know where to send the events.
+  // View last hovered by the cursor, which the SpaceMouse drives.
   int mLastPointerScene;
 
   // Library metadata to be applied

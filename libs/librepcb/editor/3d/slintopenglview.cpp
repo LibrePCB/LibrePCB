@@ -309,8 +309,7 @@ void SlintOpenGlView::applyContinuousMotion(const QPointF& panDelta,
   }
 
   if (zoomFactor != 1) {
-    // Zooming operates on (and notifies about) the current projection, so
-    // adopt the panned/rotated one first to get away with a single update.
+    // zoom() applies mProjection, so adopt the new one first.
     mProjection = projection;
     const QPointF center(mViewSize.width() / 2, mViewSize.height() / 2);
     zoom(center, zoomFactor);
