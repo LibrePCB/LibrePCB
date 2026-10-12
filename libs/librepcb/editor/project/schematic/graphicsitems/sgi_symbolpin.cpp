@@ -154,9 +154,7 @@ QPainterPath SGI_SymbolPin::getVisibleShape() const noexcept {
   QPainterPath path;
   path.setFillRule(Qt::WindingFill);
   if (mLineGraphicsItem->isVisible()) {
-    // The rotation is applied to the line item itself. Uses the same
-    // (expanded) grab area as the (click) #shape(), not the line's actual
-    // drawn width.
+    // Rotation is applied to the line item itself; map through it.
     path.addPath(mLineGraphicsItem->mapToParent(mLineGrabShape));
   }
   // Empty if neither line nor fill layer of the circle is visible.

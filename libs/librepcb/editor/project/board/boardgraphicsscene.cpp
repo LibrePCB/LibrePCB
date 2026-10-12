@@ -361,7 +361,7 @@ void BoardGraphicsScene::applyRectSelection(
     item->setSelected(hits(selection, *item));
   }
   foreach (auto item, mPlanes) {
-    // Do not use the click shape (its size depends on the selection state).
+    // Uses the visible shape, not the click shape, for planes.
     item->setSelected(hitsVisible(selection, *item));
   }
   foreach (auto item, mZones) {
