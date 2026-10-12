@@ -50,9 +50,10 @@ namespace tests {
 // polygon, and text are spaced 15mm apart along the X axis so each can be
 // targeted in isolation.
 //
-// The pin's shape() is an exact 1.2mm Qt::FilledOutline circle (see
-// SymbolPinGraphicsItem), so it gets the full enclosed/partial/disjoint
-// treatment with tight confidence. Circle & polygon use a simple filled
+// The pin's shape() is its grab area (see SymbolPinGraphicsItem): a 1.2mm
+// circle at the pin's position plus a 1.2mm wide strip along the pin's
+// length, so it gets the full enclosed/partial/disjoint treatment with tight
+// confidence. Circle & polygon use a simple filled
 // primitive with a known nominal size, so a rect offset by roughly a
 // millimeter from their true extents is safely inside/outside either way.
 // The text's shape() is a PrimitiveTextGraphicsItem font-metrics box, whose
@@ -72,8 +73,8 @@ protected:
         Uuid::createRandom(), Version::fromString("0.1"), "Test",
         QDateTime::currentDateTime(), ElementName("Symbol"), "", "");
 
-    // Pin: 2.54mm long, positioned at X=0. Its shape() is just the 1.2mm
-    // circle at the pin's own position (see class comment above).
+    // Pin: 2.54mm long, positioned at X=0. Its shape() covers the pin's full
+    // length (see class comment above).
     mSymbol->getPins().append(std::make_shared<SymbolPin>(
         Uuid::createRandom(), CircuitIdentifier("1"), Point(0, 5000000),
         UnsignedLength(2540000), Angle::deg0(), Point(3000000, 5000000),
@@ -136,7 +137,7 @@ TEST_F(SymbolGraphicsItemTest, testSetSelectionRectFarAwayRectSelectsNothing) {
 TEST_F(SymbolGraphicsItemTest, testSetSelectionRectReplacesPreviousSelection) {
   // Selection is replace, not additive: re-calling with a non-matching rect
   // must deselect whatever the previous call selected.
-  mItem->setSelectionRect(rect(Point(-1200000, 3800000), Point(1200000, 6200000)),
+  mItem->setSelectionRect(rect(Point(-1200000, 3800000), Point(3000000, 6200000)),
                           RectSelection::Mode::Window);
   EXPECT_EQ(1, mItem->getSelectedPins().size());
 
@@ -149,7 +150,7 @@ TEST_F(SymbolGraphicsItemTest, testSetSelectionRectReplacesPreviousSelection) {
  ******************************************************************************/
 
 TEST_F(SymbolGraphicsItemTest, testSetSelectionRectPinFullyEnclosedSelectsInBothModes) {
-  const QRectF r = rect(Point(-1200000, 3800000), Point(1200000, 6200000));
+  const QRectF r = rect(Point(-1200000, 3800000), Point(3000000, 6200000));
   mItem->setSelectionRect(r, RectSelection::Mode::Window);
   EXPECT_EQ(1, mItem->getSelectedPins().size());
   mItem->setSelectionRect(r, RectSelection::Mode::Crossing);
@@ -157,8 +158,8 @@ TEST_F(SymbolGraphicsItemTest, testSetSelectionRectPinFullyEnclosedSelectsInBoth
 }
 
 TEST_F(SymbolGraphicsItemTest, testSetSelectionRectPinPartialOverlapSelectsOnlyInCrossingMode) {
-  // Covers only the right half of the pin's 1.2mm circle, missing its left
-  // half entirely.
+  // Covers only the right part of the pin's grab area, missing its left
+  // half of the end circle.
   const QRectF r = rect(Point(0, 3800000), Point(1200000, 6200000));
   mItem->setSelectionRect(r, RectSelection::Mode::Window);
   EXPECT_TRUE(mItem->getSelectedPins().isEmpty());
