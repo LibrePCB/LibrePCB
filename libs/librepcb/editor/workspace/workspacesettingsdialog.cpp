@@ -311,8 +311,7 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
         EditorCommand::ActionFlag::WidgetShortcut));
   }
 
-  // Initialize Space Mouse widget (self-contained; see
-  // settingswidgets/spacemousesettingswidget.h).
+  // Initialize Space Mouse widget.
   {
     mSpaceMouseWidget =
         new SpaceMouseSettingsWidget(mSettings.spaceMouse, this);

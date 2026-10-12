@@ -40,11 +40,9 @@ namespace librepcb {
 
 /**
  * @brief Implementation of ::librepcb::WorkspaceSettingsItem to store
- *        SpaceMouse (3Dconnexion/3Dx input device) settings
+ *        SpaceMouse settings
  *
- * Stores a per-axis sensitivity multiplier and invert flag for each of the
- * six raw motion axes (translation and rotation around X, Y and Z) reported by
- * the device.
+ * Stores a sensitivity multiplier and invert flag for each motion axis.
  */
 class WorkspaceSettingsItem_SpaceMouse final : public WorkspaceSettingsItem {
 public:
@@ -93,8 +91,7 @@ public:
    * @brief Get the settings for a single axis
    *
    * @param axis  The axis to query.
-   * @return Sensitivity & invert settings for that axis (defaults if not
-   *         explicitly configured).
+   * @return The settings of that axis.
    */
   const AxisSettings& get(Axis axis) const noexcept;
 
@@ -156,13 +153,10 @@ private:  // Data
 
   // Static Variables
 
-  // Decimal digits of precision used when serializing a Space Mouse axis
-  // sensitivity multiplier to the settings file. Since the settings UI only
-  // offers multipliers in steps of 1/100, six decimal places is plenty.
+  // Decimal digits used when serializing a sensitivity multiplier.
   static constexpr int sSensitivitySerializationDecimals = 6;
 
-  // All axes with their identifiers in the settings file. The order of this
-  // table is also the (fixed) order in which axes are serialized.
+  // Axes with their identifiers in the settings file, in serialization order.
   static constexpr AxisInfo sAxes[] = {
       {Axis::TranslationX, "translation_x"},
       {Axis::TranslationY, "translation_y"},

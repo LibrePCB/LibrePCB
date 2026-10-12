@@ -323,10 +323,7 @@ public:
   WorkspaceSettingsItem_KeyboardShortcuts keyboardShortcuts;
 
   /**
-   * @brief SpaceMouse (3Dconnexion/3Dx input device) settings
-   *
-   * Per-axis sensitivity & invert settings. Only relevant if SpaceMouse
-   * support is available in this build.
+   * @brief SpaceMouse (3D mouse) settings
    *
    * @see ::librepcb::WorkspaceSettingsItem_SpaceMouse
    */

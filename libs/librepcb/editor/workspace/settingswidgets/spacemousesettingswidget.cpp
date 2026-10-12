@@ -69,8 +69,7 @@ SpaceMouseSettingsWidget::SpaceMouseSettingsWidget(
   };
   for (const AxisWidgets& w : std::as_const(mAxes)) {
     w.icon->setPixmap(QIcon(w.iconPath).pixmap(20, 20));
-    // The raw slider value is converted into a sensitivity multiplier
-    // prior to being displayed by the label.
+    // Display the sensitivity multiplier, not the raw slider value.
     auto updateLabel = [w](int value) {
       w.valueLabel->setText(sensitivityLabel(sliderToSensitivity(value)));
     };
@@ -90,7 +89,7 @@ SpaceMouseSettingsWidget::~SpaceMouseSettingsWidget() noexcept {
  ******************************************************************************/
 
 void SpaceMouseSettingsWidget::load() noexcept {
-  // Setting the slider value also updates the value label (see constructor).
+  // Setting the slider also updates its label.
   for (const AxisWidgets& w : std::as_const(mAxes)) {
     const WorkspaceSettingsItem_SpaceMouse::AxisSettings& s =
         mSettings.get(w.axis);
@@ -118,14 +117,11 @@ void SpaceMouseSettingsWidget::save() noexcept {
 
 bool SpaceMouseSettingsWidget::eventFilter(QObject* watched,
                                            QEvent* event) noexcept {
-  // Double-clicking a Space Mouse sensitivity slider resets it to nominal
-  // (1.0x, slider position 0) - QSlider has no dedicated double-click
-  // signal of its own, so we use an event filter to watch for it. The filter
-  // is only installed on the sensitivity sliders.
+  // Double-clicking a sensitivity slider resets it to nominal (1.0x).
   if (event->type() == QEvent::MouseButtonDblClick) {
     if (QSlider* slider = qobject_cast<QSlider*>(watched)) {
       slider->setValue(0);
-      // Consume the event so QSlider doesn't act on it as well.
+      // Consume the event so QSlider doesn't handle it.
       return true;
     }
   }

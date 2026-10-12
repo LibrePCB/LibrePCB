@@ -318,10 +318,7 @@ struct SpaceMouseMotionFfi {
  *
  * <div class="warning">
  * Fires on a background thread owned by the Rust side, *not* the thread
- * that called [`ffi_spacemouse_backend_new`]. The C++ side is responsible
- * for hopping onto whatever thread it needs before touching anything not
- * safe to call from an arbitrary thread (e.g. before emitting a Qt
- * signal).  Also see `spacemouseinput.cpp`.
+ * that called [`ffi_spacemouse_backend_new`].
  * </div>
  */
 using MotionCallback = void(*)(void *user_data, SpaceMouseMotionFfi motion);
@@ -585,16 +582,12 @@ double ffi_math_arc_radius_and_center(double dx,
 /**
  * Create a new backend and start capturing device input in the background.
  *
- * `user_data` is passed back unmodified as the first argument of every
- * callback invocation; Rust never dereferences it. The caller must keep
- * whatever it points to alive until after [`ffi_spacemouse_backend_free`]
- * returns, and must not call back into Rust synchronously from within a
- * callback (there is no re-entrancy protection).
+ * `user_data` is passed back unmodified to every callback. It must stay
+ * valid until [`ffi_spacemouse_backend_free`] returns. Callbacks must not
+ * call back into Rust synchronously.
  *
- * Never returns null: Unlike opening a specific device, constructing the
- * backend itself cannot fail.  "No compatible device found (yet)" is not
- * an error, it's the normal state before `on_connected_changed(true)` is
- * ever invoked.
+ * Never returns null. Finding no device is not an error, it is reported
+ * through `on_connected_changed`.
  */
 FfiSpaceMouseBackend *ffi_spacemouse_backend_new(void *user_data,
                                                  MotionCallback on_motion,
@@ -608,10 +601,9 @@ bool ffi_spacemouse_backend_is_connected(const FfiSpaceMouseBackend * NONNULL ba
 /**
  * Set whether the device's LED (if it has one) should be lit.
  *
- * A one-shot command: applied immediately if a device is currently open,
- * and (re-)applied automatically any time the device connects.  Devices
- * without an LED, and any transient write failure, are both silently
- * ignored.  See [`SpaceMouseBackend::set_led`] for additional info.
+ * Applied immediately if a device is open, and again on every connect.
+ * Devices without an LED and write failures are ignored. See
+ * [`SpaceMouseBackend::set_led`] for details.
  */
 void ffi_spacemouse_backend_set_led(const FfiSpaceMouseBackend * NONNULL backend,
                                     bool enabled);

@@ -44,9 +44,7 @@ TEST(SpaceMouseMotionMapperTest, testAllZeroIsNoOp) {
 }
 
 TEST(SpaceMouseMotionMapperTest, testZeroDtIsNoOpRegardlessOfDeflection) {
-  // No elapsed time must mean no motion at all, no matter how hard the
-  // device is deflected - this is what keeps the result rate-independent
-  // (see the doc comment on SpaceMouseMotionMapper::toMotion2d()).
+  // Zero elapsed time must yield no motion at any deflection.
   SpaceMouseMotionEvent e;
   e.translationX = 350;
   e.translationY = 350;
@@ -62,8 +60,7 @@ TEST(SpaceMouseMotionMapperTest, testTranslationXyMapsToPan) {
   e.translationY = 50;
   const SpaceMouseMotion2d motion = SpaceMouseMotionMapper::toMotion2d(e, 1.0);
 
-  // Both X and Y are inverted (tuned against real hardware), both scaled by
-  // the same sensitivity - so the ratio between them stays 2:1 regardless.
+  // X and Y are inverted and scaled equally, preserving their 2:1 ratio.
   EXPECT_LT(motion.panDelta.x(), 0);
   EXPECT_LT(motion.panDelta.y(), 0);
   EXPECT_DOUBLE_EQ(motion.panDelta.x(), 2 * motion.panDelta.y());
@@ -79,9 +76,7 @@ TEST(SpaceMouseMotionMapperTest, testPanScalesLinearlyWithDt) {
   const SpaceMouseMotion2d motionAt2s =
       SpaceMouseMotionMapper::toMotion2d(e, 2.0);
 
-  // Twice the elapsed time (at the same held deflection) must mean exactly
-  // twice the pan distance - this is the whole point of taking dtSeconds
-  // as a parameter instead of applying a fixed step per raw HID report.
+  // The pan distance is proportional to the elapsed time.
   EXPECT_DOUBLE_EQ(2 * motionAt1s.panDelta.x(), motionAt2s.panDelta.x());
   EXPECT_DOUBLE_EQ(2 * motionAt1s.panDelta.y(), motionAt2s.panDelta.y());
 }
@@ -131,8 +126,7 @@ TEST(SpaceMouseMotionMapperTest, testDeflectionIsSaturated) {
  *  Test Methods: SpaceMouseMotionMapper::toMotion3d()
  ******************************************************************************/
 
-// The axis signs of the 3D mapping were tuned against real hardware, so pin
-// them here to catch accidental changes.
+// Pins the axis signs of the 3D mapping.
 TEST(SpaceMouseMotionMapperTest, test3dAllZeroIsNoOp) {
   const SpaceMouseMotion3d motion =
       SpaceMouseMotionMapper::toMotion3d(SpaceMouseMotionEvent(), 1.0);

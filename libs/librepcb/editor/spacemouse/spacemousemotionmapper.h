@@ -40,10 +40,7 @@ namespace editor {
  ******************************************************************************/
 
 /**
- * @brief A SpaceMouseMotionEvent already translated into 2D pan/zoom
- *
- * Ready to be passed straight into
- * SlintGraphicsView::applyContinuousMotion().
+ * @brief A motion event translated into 2D pan/zoom
  */
 struct SpaceMouseMotion2d {
   QPointF panDelta;
@@ -55,10 +52,7 @@ struct SpaceMouseMotion2d {
  ******************************************************************************/
 
 /**
- * @brief A SpaceMouseMotionEvent already translated into 3D pan/zoom/rotate
- *
- * Ready to be passed straight into
- * SlintOpenGlView::applyContinuousMotion().
+ * @brief A motion event translated into 3D pan/zoom/rotate
  */
 struct SpaceMouseMotion3d {
   QPointF panDelta;
@@ -73,10 +67,7 @@ struct SpaceMouseMotion3d {
  ******************************************************************************/
 
 /**
- * @brief Translates raw SpaceMouse motion events into view motion
- *
- * Purely static helper without any state, so the mapping is easy to test
- * without a device, a window or a view.
+ * @brief Translates raw SpaceMouse events into view motion
  */
 class SpaceMouseMotionMapper final {
 public:
@@ -88,60 +79,40 @@ public:
   // General Methods
 
   /**
-   * @brief Apply the per-axis sensitivity & invert settings to a raw event
+   * @brief Apply per-axis sensitivity and invert settings to a raw event
    *
-   * Applying these here (upstream of toMotion2d() and toMotion3d()) means
-   * neither the mapping methods, the dispatch chain nor the capture layer
-   * need to know about the settings.
+   * Scales each raw axis by its sensitivity and applies invert. The result
+   * is clamped to `qint16`.
    *
-   * Sensitivity is applied to the *raw* (pre-normalization) axis value, so a
-   * sensitivity above 1.0x results in faster, "touchier" motion while a
-   * sensitivity below 1.0x results in slower motion. The result is clamped
-   * to the range of `qint16` as a safety measure against overflow.
-   *
-   * @param raw       Raw motion event, as reported by the device.
-   * @param settings  Per-axis sensitivity & invert settings.
-   * @return The adjusted motion event.
+   * @param raw       Raw event.
+   * @param settings  Per-axis settings.
+   * @return The adjusted event.
    */
   static SpaceMouseMotionEvent applySettings(
       const SpaceMouseMotionEvent& raw,
       const WorkspaceSettingsItem_SpaceMouse& settings) noexcept;
 
   /**
-   * @brief Translate a raw event into a SpaceMouseMotion2d
+   * @brief Translate a raw event into 2D pan/zoom
    *
-   * X/Y translation axes become the pan delta and the Z (up/down)
-   * translation axis becomes the zoom factor; rotation is ignored since it's
-   * not meaningful for a flat 2D view.
+   * X/Y translation pans, Z translation zooms. Rotation is ignored.
    *
-   * @param e          Raw motion event, as last reported by the device.
-   * @param dtSeconds  Elapsed real time (in seconds) since this method was
-   *                   last called for the active tab. This is essential to
-   *                   avoid spurious or overly aggressive motion due to the
-   *                   frequency of the sent HID reports. Scaling by
-   *                   dtSeconds makes the result rate-independent: holding
-   *                   the cap at a given deflection for one second always
-   *                   produces the same total pan/zoom, regardless of
-   *                   report frequency.
+   * @param e          Raw event.
+   * @param dtSeconds  Time since the previous event for this tab. Makes the
+   *                   result independent of the report rate.
    */
   static SpaceMouseMotion2d toMotion2d(const SpaceMouseMotionEvent& e,
                                        qreal dtSeconds) noexcept;
 
   /**
-   * @brief Translate a raw event into a SpaceMouseMotion3d
+   * @brief Translate a raw event into 3D pan/zoom/rotate
    *
-   * The counterpart of toMotion2d(). Here all six axes are meaningful: X/Y
-   * translation becomes pan (in the view's model-space units), Z translation
-   * becomes zoom, and all three rotation axes drive the corresponding view
-   * rotation.
+   * X/Y translation pans, Z translation zooms, and the rotation axes rotate
+   * the view.
    *
-   * The axis signs differ from the 2D mapping since they were tuned
-   * independently against real hardware (the 3D view pans the model, the 2D
-   * view pans the scene).
-   *
-   * @param e          Raw motion event, as last reported by the device.
-   * @param dtSeconds  Elapsed real time (in seconds) since this method was
-   *                   last called for the active tab.
+   * @param e          Raw event.
+   * @param dtSeconds  Time since the previous event for this tab. Makes the
+   *                   result independent of the report rate.
    */
   static SpaceMouseMotion3d toMotion3d(const SpaceMouseMotionEvent& e,
                                        qreal dtSeconds) noexcept;
@@ -151,11 +122,7 @@ public:
 
 public:  // Static Variables
   /**
-   * @brief Raw HID translation/rotation axis saturation
-   *
-   * Raw HID translation/rotation axes saturate at roughly +-350
-   * (device-dependent). Both toMotion2d() and toMotion3d() normalize against
-   * this before applying any sensitivity.
+   * @brief Raw axis value at full deflection
    */
   static constexpr qreal sAxisSaturation = 350.0;
 
@@ -165,36 +132,22 @@ private:  // Methods
 
 private:  // Static Variables
   /**
-   * @brief Nominal (1.0x) zoom rate, shared by the 2D and 3D mappings
-   *
-   * Expressed as a real-world rate (per second) rather than a per-report
-   * multiplier. Tuned against real hardware feedback and declared the
-   * "nominal" baseline for the sensitivity slider.
+   * @brief Zoom rate at 1.0x sensitivity (factor per second)
    */
   static constexpr qreal sNominalZoomRatePerSec = 5.0;
 
   /**
-   * @brief Nominal (1.0x) 2D pan sensitivity (pixels per sec)
-   *
-   * Expressed as a real-world rate (pixels per second) rather than a
-   * per-report multiplier. Tuned against real hardware feedback and declared
-   * the "nominal" baseline for the sensitivity sliders.
+   * @brief 2D pan speed at 1.0x sensitivity (pixels per second)
    */
   static constexpr qreal sNominalPanPxPerSec = 1500.0;
 
   /**
-   * @brief Nominal (1.0x) 3D pan sensitivity (3D units per sec)
-   *
-   * In the same model-space units SlintOpenGlView already uses for
-   * mouse-drag panning, not pixels like the 2D mapping.
+   * @brief 3D pan speed at 1.0x sensitivity (3D units per second)
    */
   static constexpr qreal sNominalPan3dUnitsPerSec = 5.0;
 
   /**
-   * @brief Nominal (1.0x) rotation sensitivity (deg per sec)
-   *
-   * Only used by the 3D view calculations since rotation isn't applied in 2D
-   * views.
+   * @brief Rotation speed at 1.0x sensitivity (degrees per second)
    */
   static constexpr qreal sNominalRotateDegPerSec = 90.0;
 };

@@ -157,7 +157,7 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
   connect(mQuickAccessModel.get(), &QuickAccessModel::openFileTriggered, this,
           [this](const FilePath& fp) { openFile(fp, qApp->activeWindow()); });
 
-  // Forward 3D mouse (SpaceMouse) motion to the active tab
+  // Forward SpaceMouse motion to the active tab.
   connect(mSpaceMouseInput.get(), &SpaceMouseInput::motionEvent, this,
           &GuiApplication::handleSpaceMouseMotion);
 
@@ -367,10 +367,7 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
 }
 
 GuiApplication::~GuiApplication() noexcept {
-  // Since the SpaceMouse LED is connection bound, explicitly turn it off
-  // before the backend (and its background capture thread) gets torn down.
-  // Safe to call even if no device is currently connected - it's a
-  // best-effort HID write, silently ignored either way.
+  // Turn the SpaceMouse LED off before the backend gets torn down.
   mSpaceMouseInput->setLedEnabled(false);
 
   mProjectLibraryUpdater.reset();
@@ -1202,24 +1199,18 @@ std::shared_ptr<MainWindow> GuiApplication::getWindowById(int id) noexcept {
 
 void GuiApplication::handleSpaceMouseMotion(
     const SpaceMouseMotionEvent& e) noexcept {
-  // The very first report has no previous timestamp to measure against,
-  // so it's dropped rather than guessed at (starting the timer here means
-  // subsequent reports get a sensible, usually sub-frame, dtSeconds).
+  // Drop the first report, there is no previous timestamp to measure.
   if (!mSpaceMouseElapsedTimer.isValid()) {
     mSpaceMouseElapsedTimer.start();
     return;
   }
 
-  // Clamp dtSeconds: if the device (or this handler) was stalled for a
-  // while - e.g. no reports arrived because the cap was centered, or the
-  // app was busy - the next report's elapsed time could otherwise produce
-  // one oversized, disorienting jump.
+  // Limit dtSeconds to avoid a jump after a stall.
   constexpr qreal maxDtSeconds = 0.25;
   const qreal dtSeconds =
       qMin(mSpaceMouseElapsedTimer.restart() / qreal(1000), maxDtSeconds);
 
-  // Dispatch to the OS's current window/section/tab, mirroring the
-  // window -> section -> tab chain ::processScenePointerEvent() walks.
+  // Dispatch to the current window's current tab.
   if (auto win = getCurrentWindow()) {
     const SpaceMouseMotionEvent adjusted =
         SpaceMouseMotionMapper::applySettings(

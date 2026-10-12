@@ -100,11 +100,10 @@ void WorkspaceSettingsItem_SpaceMouse::loadImpl(const SExpression& root) {
     const std::optional<Axis> axis =
         axisFromString(child->getChild("@0").getValue());
     if (!axis) {
-      continue;  // Unknown axis identifier, ignore (e.g. future file format).
+      continue;  // Unknown axis.
     }
     AxisSettings s;
-    // Ignore invalid values (zero, negative, NaN, ...) to avoid ending up
-    // with a dead axis due to a corrupted settings file.
+    // Ignore invalid values to avoid a dead axis.
     bool ok = false;
     const double sensitivity =
         child->getChild("sensitivity/@0").getValue().toDouble(&ok);
