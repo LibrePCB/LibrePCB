@@ -27,6 +27,7 @@
 
 #include <librepcb/core/geometry/via.h>
 #include <librepcb/core/project/circuit/netclass.h>
+#include <librepcb/core/types/length.h>
 
 #include <QtCore>
 
@@ -118,6 +119,8 @@ public:
   }
   PositiveLength getViaSize() const noexcept;
   void setViaSize(const std::optional<PositiveLength>& size) noexcept;
+  bool getShowClearanceCircle() const noexcept { return mShowClearanceCircle; }
+  void setShowClearanceCircle(bool show) noexcept;
 
   // Operator Overloadings
   BoardEditorState_DrawTrace& operator=(const BoardEditorState_DrawTrace& rhs) =
@@ -131,6 +134,7 @@ signals:
   void widthChanged(const PositiveLength& width);
   void viaDrillDiameterChanged(bool autoSize, const PositiveLength& diameter);
   void viaSizeChanged(bool autoSize, const PositiveLength& size);
+  void showClearanceCircleChanged(bool show);
 
 private:
   /// Internal FSM States (substates)
@@ -223,6 +227,15 @@ private:
                            WireMode mode) const noexcept;
 
   /**
+   * @brief Update the clearance circle radius.
+   *
+   * Calculate the size of the clearance circle and evaluate whether the
+   * circle should be visible (toggle enabled, actively positioning a trace).
+   * Setting the radius to `std::nullopt` disables drawing the circle.
+   */
+  void updateClearanceCircleRadius() noexcept;
+
+  /**
    * @brief Update #mCurrentNetClass and emit #netClassChanged
    */
   void updateNetClass() noexcept;
@@ -243,6 +256,8 @@ private:
   Point mCursorPos;  ///< the current cursor position
   PositiveLength mCurrentWidth;  ///< the current wire width
   bool mCurrentAutoWidth;  ///< automatically adjust wire width
+  bool mShowClearanceCircle;  ///< show clearance circle at cursor while
+                              ///< drawing
   bool mCurrentSnapActive;  ///< the current active snap to target
   BI_NetLineAnchor* mFixedStartAnchor;  ///< the fixed netline anchor (start
                                         ///< point of the line)

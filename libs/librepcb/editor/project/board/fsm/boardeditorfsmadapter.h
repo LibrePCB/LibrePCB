@@ -24,6 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include "../../../graphics/graphicslayer.h"
+#include "../../../graphics/graphicsscenecursor.h"
 
 #include <librepcb/core/types/point.h>
 
@@ -96,8 +97,9 @@ public:
   virtual void fsmSetViewInfoBoxText(const QString& text) noexcept = 0;
   virtual void fsmSetViewRuler(
       const std::optional<std::pair<Point, Point>>& pos) noexcept = 0;
-  virtual void fsmSetSceneCursor(const Point& pos, bool cross,
-                                 bool circle) noexcept = 0;
+  virtual void fsmSetSceneCursor(
+      const Point& pos,
+      const GraphicsSceneCursor& cursor = GraphicsSceneCursor()) noexcept = 0;
   virtual QPainterPath fsmCalcPosWithTolerance(
       const Point& pos, qreal multiplier) const noexcept = 0;
   virtual Point fsmMapGlobalPosToScenePos(const QPoint& pos) const noexcept = 0;
