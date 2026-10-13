@@ -105,9 +105,7 @@ public:
    * @brief Set (or clear) the overlay cursor drawn at a specific position
    *
    * @param pos     Scene position of the cursor.
-   * @param cursor  Appearance of the cursor at pos (crosshair, "snapped to
-   *                item" circle, clearance circle). Defaults to fully
-   *                hidden.
+   * @param cursor  Describes the appearance of the cursor.
    */
   void setSceneCursor(
       const Point& pos,

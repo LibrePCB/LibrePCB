@@ -403,12 +403,8 @@ void GraphicsScene::drawForeground(QPainter* painter,
     painter->restore();
   }
 
-  // If enabled, draw a cursor at a specific position. This may consist of
-  // a crosshair, a "snapped to item" indicator (small circle), and/or a
-  // clearance circle (e.g. while routing a trace). The clearance circle
-  // uses its radius to indicate whether or not it should be drawn.
-  if (mSceneCursor.cross || mSceneCursor.circle ||
-      mSceneCursor.clearanceRadius) {
+  // Draw the scene cursor.
+  if (!mSceneCursor.isEmpty()) {
     const qreal scaleFactor =
         QStyleOptionGraphicsItem::levelOfDetailFromTransform(
             painter->worldTransform());
@@ -428,8 +424,8 @@ void GraphicsScene::drawForeground(QPainter* painter,
     }
 
     if (mSceneCursor.clearanceRadius) {
-      // The clearance circle uses board-unit distance, so it scales with zoom
-      // just like any other board geometry. Its stroke width is kept at a
+      // The clearance circle is drawn using board-unit distance, so it scales
+      // with zoom like any other board geometry. Its stroke width is kept at a
       // constant on-screen thickness by using a width of 0 (which Qt always
       // renders as 1px).
       painter->setPen(QPen(mOverlayContentColor, 0));

@@ -53,6 +53,12 @@ struct GraphicsSceneCursor {
   /// `std::nullopt` means no clearance circle is drawn.
   std::optional<UnsignedLength> clearanceRadius = std::nullopt;
 
+  /// A cursor is considered "empty" if none of its constituents are visible.
+  inline bool isEmpty() {
+    return (cross == false && circle == false &&
+            clearanceRadius == std::nullopt);
+  }
+
   bool operator==(const GraphicsSceneCursor& rhs) const noexcept = default;
 };
 
