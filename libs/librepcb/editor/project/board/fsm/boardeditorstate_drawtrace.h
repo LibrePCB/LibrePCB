@@ -227,17 +227,11 @@ private:
                            WireMode mode) const noexcept;
 
   /**
-   * @brief Recompute the clearance circle radius and push it, together
-   *        with the current cursor position, to the scene cursor overlay
+   * @brief Update the clearance circle radius.
    *
-   * Evaluate whether the clearance circle should be visible (toggle enabled,
-   * actively positioning a trace) as well as calculating the circle's size.
-   * `std::nullopt` tells the scene to not draw a clearance circle at all, so
-   * this doubles as the circle's enable. Circle size is established from the
-   * board's global DRC min copper clearance and the net class' own clearance
-   * (if a net class is known). This function is called from #setWidth(),
-   * #updateNetpointPositions(), #setShowClearanceCircle(), and
-   * #updateNetClass().
+   * Calculate the size of the clearance circle and evaluate whether the
+   * circle should be visible (toggle enabled, actively positioning a trace).
+   * Setting the radius to `std::nullopt` disables drawing the circle.
    */
   void updateClearanceCircleRadius() noexcept;
 
