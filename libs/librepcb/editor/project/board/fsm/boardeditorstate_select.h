@@ -224,6 +224,10 @@ private:  // Data
   /// The zone edit command (nullptr if not editing)
   std::unique_ptr<CmdBoardZoneEdit> mCmdZoneEdit;
 
+  /// Prevent a rubber band selection from starting out of an aborted
+  /// gesture.  Reset upon left mouse button release.
+  bool mSuppressRubberBand;
+
   /// Signal/slot connections only when in this state
   QList<QMetaObject::Connection> mConnections;
 
