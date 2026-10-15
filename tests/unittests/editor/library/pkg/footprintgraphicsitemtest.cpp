@@ -70,8 +70,8 @@ protected:
   void SetUp() override {
     mLayers = GraphicsLayerList::libraryLayers(nullptr);
 
-    mFootprint = std::make_shared<Footprint>(
-        Uuid::createRandom(), ElementName("Footprint"), "");
+    mFootprint = std::make_shared<Footprint>(Uuid::createRandom(),
+                                             ElementName("Footprint"), "");
 
     // Pad: 1x1mm rounded rect, centered at X=0.
     mFootprint->getPads().append(std::make_shared<FootprintPad>(
@@ -110,7 +110,7 @@ protected:
     mFootprint->getHoles().append(std::make_shared<Hole>(
         Uuid::createRandom(), PositiveLength(500000),
         NonEmptyPath(Path::circle(PositiveLength(500000))
-                        .translated(Point(75000000, 0))),
+                         .translated(Point(75000000, 0))),
         MaskConfig::off()));
 
     mItem = std::make_unique<FootprintGraphicsItem>(
@@ -144,7 +144,8 @@ TEST_F(FootprintGraphicsItemTest, testSetSelectionRectEmptyRectSelectsNothing) {
   EXPECT_TRUE(mItem->getSelectedHoles().isEmpty());
 }
 
-TEST_F(FootprintGraphicsItemTest, testSetSelectionRectFarAwayRectSelectsNothing) {
+TEST_F(FootprintGraphicsItemTest,
+       testSetSelectionRectFarAwayRectSelectsNothing) {
   // Crossing is the more inclusive mode, so proving it selects nothing here
   // also proves Window would select nothing.
   mItem->setSelectionRect(disjointRect(), RectSelection::Mode::Crossing);
@@ -156,11 +157,13 @@ TEST_F(FootprintGraphicsItemTest, testSetSelectionRectFarAwayRectSelectsNothing)
   EXPECT_TRUE(mItem->getSelectedHoles().isEmpty());
 }
 
-TEST_F(FootprintGraphicsItemTest, testSetSelectionRectReplacesPreviousSelection) {
+TEST_F(FootprintGraphicsItemTest,
+       testSetSelectionRectReplacesPreviousSelection) {
   // Selection is replace, not additive: re-calling with a non-matching rect
   // must deselect whatever the previous call selected.
-  mItem->setSelectionRect(rect(Point(-1500000, 3500000), Point(1500000, 6500000)),
-                          RectSelection::Mode::Window);
+  mItem->setSelectionRect(
+      rect(Point(-1500000, 3500000), Point(1500000, 6500000)),
+      RectSelection::Mode::Window);
   EXPECT_EQ(1, mItem->getSelectedPads().size());
 
   mItem->setSelectionRect(QRectF(), RectSelection::Mode::Crossing);
@@ -171,7 +174,8 @@ TEST_F(FootprintGraphicsItemTest, testSetSelectionRectReplacesPreviousSelection)
  *  Test Methods: pad
  ******************************************************************************/
 
-TEST_F(FootprintGraphicsItemTest, testSetSelectionRectPadFullyEnclosedSelectsInBothModes) {
+TEST_F(FootprintGraphicsItemTest,
+       testSetSelectionRectPadFullyEnclosedSelectsInBothModes) {
   const QRectF r = rect(Point(-1500000, 3500000), Point(1500000, 6500000));
   mItem->setSelectionRect(r, RectSelection::Mode::Window);
   EXPECT_EQ(1, mItem->getSelectedPads().size());
@@ -179,7 +183,8 @@ TEST_F(FootprintGraphicsItemTest, testSetSelectionRectPadFullyEnclosedSelectsInB
   EXPECT_EQ(1, mItem->getSelectedPads().size());
 }
 
-TEST_F(FootprintGraphicsItemTest, testSetSelectionRectPadPartialOverlapSelectsOnlyInCrossingMode) {
+TEST_F(FootprintGraphicsItemTest,
+       testSetSelectionRectPadPartialOverlapSelectsOnlyInCrossingMode) {
   // Covers only the right half of the pad (plus margin), missing its left
   // half entirely.
   const QRectF r = rect(Point(0, 3500000), Point(1500000, 6500000));
@@ -193,7 +198,8 @@ TEST_F(FootprintGraphicsItemTest, testSetSelectionRectPadPartialOverlapSelectsOn
  *  Test Methods: circle
  ******************************************************************************/
 
-TEST_F(FootprintGraphicsItemTest, testSetSelectionRectCircleFullyEnclosedSelectsInBothModes) {
+TEST_F(FootprintGraphicsItemTest,
+       testSetSelectionRectCircleFullyEnclosedSelectsInBothModes) {
   const QRectF r = rect(Point(13500000, -1500000), Point(16500000, 1500000));
   mItem->setSelectionRect(r, RectSelection::Mode::Window);
   EXPECT_EQ(1, mItem->getSelectedCircles().size());
@@ -201,7 +207,8 @@ TEST_F(FootprintGraphicsItemTest, testSetSelectionRectCircleFullyEnclosedSelects
   EXPECT_EQ(1, mItem->getSelectedCircles().size());
 }
 
-TEST_F(FootprintGraphicsItemTest, testSetSelectionRectCirclePartialOverlapSelectsOnlyInCrossingMode) {
+TEST_F(FootprintGraphicsItemTest,
+       testSetSelectionRectCirclePartialOverlapSelectsOnlyInCrossingMode) {
   const QRectF r = rect(Point(15000000, -1500000), Point(16500000, 1500000));
   mItem->setSelectionRect(r, RectSelection::Mode::Window);
   EXPECT_TRUE(mItem->getSelectedCircles().isEmpty());
@@ -213,7 +220,8 @@ TEST_F(FootprintGraphicsItemTest, testSetSelectionRectCirclePartialOverlapSelect
  *  Test Methods: polygon
  ******************************************************************************/
 
-TEST_F(FootprintGraphicsItemTest, testSetSelectionRectPolygonFullyEnclosedSelectsInBothModes) {
+TEST_F(FootprintGraphicsItemTest,
+       testSetSelectionRectPolygonFullyEnclosedSelectsInBothModes) {
   const QRectF r = rect(Point(28500000, -1500000), Point(31500000, 1500000));
   mItem->setSelectionRect(r, RectSelection::Mode::Window);
   EXPECT_EQ(1, mItem->getSelectedPolygons().size());
@@ -221,7 +229,8 @@ TEST_F(FootprintGraphicsItemTest, testSetSelectionRectPolygonFullyEnclosedSelect
   EXPECT_EQ(1, mItem->getSelectedPolygons().size());
 }
 
-TEST_F(FootprintGraphicsItemTest, testSetSelectionRectPolygonPartialOverlapSelectsOnlyInCrossingMode) {
+TEST_F(FootprintGraphicsItemTest,
+       testSetSelectionRectPolygonPartialOverlapSelectsOnlyInCrossingMode) {
   const QRectF r = rect(Point(30000000, -1500000), Point(31500000, 1500000));
   mItem->setSelectionRect(r, RectSelection::Mode::Window);
   EXPECT_TRUE(mItem->getSelectedPolygons().isEmpty());
@@ -233,7 +242,8 @@ TEST_F(FootprintGraphicsItemTest, testSetSelectionRectPolygonPartialOverlapSelec
  *  Test Methods: stroke text
  ******************************************************************************/
 
-TEST_F(FootprintGraphicsItemTest, testSetSelectionRectStrokeTextFullyEnclosedSelectsInBothModes) {
+TEST_F(FootprintGraphicsItemTest,
+       testSetSelectionRectStrokeTextFullyEnclosedSelectsInBothModes) {
   // Generous margin around the anchor position: see the class comment above
   // for why only the enclosed/disjoint cases are asserted for stroke text.
   const QRectF r = rect(Point(42000000, -3000000), Point(48000000, 3000000));
@@ -247,7 +257,8 @@ TEST_F(FootprintGraphicsItemTest, testSetSelectionRectStrokeTextFullyEnclosedSel
  *  Test Methods: zone
  ******************************************************************************/
 
-TEST_F(FootprintGraphicsItemTest, testSetSelectionRectZoneFullyEnclosedSelectsInBothModes) {
+TEST_F(FootprintGraphicsItemTest,
+       testSetSelectionRectZoneFullyEnclosedSelectsInBothModes) {
   const QRectF r = rect(Point(58500000, -1500000), Point(61500000, 1500000));
   mItem->setSelectionRect(r, RectSelection::Mode::Window);
   EXPECT_EQ(1, mItem->getSelectedZones().size());
@@ -255,7 +266,8 @@ TEST_F(FootprintGraphicsItemTest, testSetSelectionRectZoneFullyEnclosedSelectsIn
   EXPECT_EQ(1, mItem->getSelectedZones().size());
 }
 
-TEST_F(FootprintGraphicsItemTest, testSetSelectionRectZonePartialOverlapSelectsOnlyInCrossingMode) {
+TEST_F(FootprintGraphicsItemTest,
+       testSetSelectionRectZonePartialOverlapSelectsOnlyInCrossingMode) {
   const QRectF r = rect(Point(60000000, -1500000), Point(61500000, 1500000));
   mItem->setSelectionRect(r, RectSelection::Mode::Window);
   EXPECT_TRUE(mItem->getSelectedZones().isEmpty());
@@ -267,7 +279,8 @@ TEST_F(FootprintGraphicsItemTest, testSetSelectionRectZonePartialOverlapSelectsO
  *  Test Methods: hole
  ******************************************************************************/
 
-TEST_F(FootprintGraphicsItemTest, testSetSelectionRectHoleFullyEnclosedSelectsInBothModes) {
+TEST_F(FootprintGraphicsItemTest,
+       testSetSelectionRectHoleFullyEnclosedSelectsInBothModes) {
   const QRectF r = rect(Point(73500000, -1500000), Point(76500000, 1500000));
   mItem->setSelectionRect(r, RectSelection::Mode::Window);
   EXPECT_EQ(1, mItem->getSelectedHoles().size());
@@ -275,7 +288,8 @@ TEST_F(FootprintGraphicsItemTest, testSetSelectionRectHoleFullyEnclosedSelectsIn
   EXPECT_EQ(1, mItem->getSelectedHoles().size());
 }
 
-TEST_F(FootprintGraphicsItemTest, testSetSelectionRectHolePartialOverlapSelectsOnlyInCrossingMode) {
+TEST_F(FootprintGraphicsItemTest,
+       testSetSelectionRectHolePartialOverlapSelectsOnlyInCrossingMode) {
   const QRectF r = rect(Point(75000000, -1500000), Point(76500000, 1500000));
   mItem->setSelectionRect(r, RectSelection::Mode::Window);
   EXPECT_TRUE(mItem->getSelectedHoles().isEmpty());

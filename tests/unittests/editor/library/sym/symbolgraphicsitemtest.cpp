@@ -82,24 +82,22 @@ protected:
 
     // Circle: 1mm diameter, filled, centered at X=15mm.
     mSymbol->getCircles().append(std::make_shared<Circle>(
-        Uuid::createRandom(), Layer::symbolOutlines(), UnsignedLength(0),
-        true, false, Point(15000000, 0), PositiveLength(1000000)));
+        Uuid::createRandom(), Layer::symbolOutlines(), UnsignedLength(0), true,
+        false, Point(15000000, 0), PositiveLength(1000000)));
 
     // Polygon: 1x1mm filled square, centered at X=30mm.
     mSymbol->getPolygons().append(std::make_shared<Polygon>(
-        Uuid::createRandom(), Layer::symbolOutlines(), UnsignedLength(0),
-        true, false,
-        Path::rect(Point(29500000, -500000), Point(30500000, 500000))));
+        Uuid::createRandom(), Layer::symbolOutlines(), UnsignedLength(0), true,
+        false, Path::rect(Point(29500000, -500000), Point(30500000, 500000))));
 
     // Text: anchored at X=45mm.
     mSymbol->getTexts().append(std::make_shared<Text>(
-        Uuid::createRandom(), Layer::symbolOutlines(), "A",
-        Point(45000000, 0), Angle::deg0(), PositiveLength(1000000),
-        Alignment(), false));
+        Uuid::createRandom(), Layer::symbolOutlines(), "A", Point(45000000, 0),
+        Angle::deg0(), PositiveLength(1000000), Alignment(), false));
 
-    mItem = std::make_unique<SymbolGraphicsItem>(
-        *mSymbol, *mLayers, QPointer<const Component>(), nullptr,
-        QStringList(), false);
+    mItem = std::make_unique<SymbolGraphicsItem>(*mSymbol, *mLayers,
+                                                 QPointer<const Component>(),
+                                                 nullptr, QStringList(), false);
   }
 
   static QRectF rect(const Point& p1, const Point& p2) noexcept {
@@ -137,8 +135,9 @@ TEST_F(SymbolGraphicsItemTest, testSetSelectionRectFarAwayRectSelectsNothing) {
 TEST_F(SymbolGraphicsItemTest, testSetSelectionRectReplacesPreviousSelection) {
   // Selection is replace, not additive: re-calling with a non-matching rect
   // must deselect whatever the previous call selected.
-  mItem->setSelectionRect(rect(Point(-1200000, 3800000), Point(3000000, 6200000)),
-                          RectSelection::Mode::Window);
+  mItem->setSelectionRect(
+      rect(Point(-1200000, 3800000), Point(3000000, 6200000)),
+      RectSelection::Mode::Window);
   EXPECT_EQ(1, mItem->getSelectedPins().size());
 
   mItem->setSelectionRect(QRectF(), RectSelection::Mode::Crossing);
@@ -149,7 +148,8 @@ TEST_F(SymbolGraphicsItemTest, testSetSelectionRectReplacesPreviousSelection) {
  *  Test Methods: pin
  ******************************************************************************/
 
-TEST_F(SymbolGraphicsItemTest, testSetSelectionRectPinFullyEnclosedSelectsInBothModes) {
+TEST_F(SymbolGraphicsItemTest,
+       testSetSelectionRectPinFullyEnclosedSelectsInBothModes) {
   const QRectF r = rect(Point(-1200000, 3800000), Point(3000000, 6200000));
   mItem->setSelectionRect(r, RectSelection::Mode::Window);
   EXPECT_EQ(1, mItem->getSelectedPins().size());
@@ -157,7 +157,8 @@ TEST_F(SymbolGraphicsItemTest, testSetSelectionRectPinFullyEnclosedSelectsInBoth
   EXPECT_EQ(1, mItem->getSelectedPins().size());
 }
 
-TEST_F(SymbolGraphicsItemTest, testSetSelectionRectPinPartialOverlapSelectsOnlyInCrossingMode) {
+TEST_F(SymbolGraphicsItemTest,
+       testSetSelectionRectPinPartialOverlapSelectsOnlyInCrossingMode) {
   // Covers only the right part of the pin's grab area, missing its left
   // half of the end circle.
   const QRectF r = rect(Point(0, 3800000), Point(1200000, 6200000));
@@ -171,7 +172,8 @@ TEST_F(SymbolGraphicsItemTest, testSetSelectionRectPinPartialOverlapSelectsOnlyI
  *  Test Methods: circle
  ******************************************************************************/
 
-TEST_F(SymbolGraphicsItemTest, testSetSelectionRectCircleFullyEnclosedSelectsInBothModes) {
+TEST_F(SymbolGraphicsItemTest,
+       testSetSelectionRectCircleFullyEnclosedSelectsInBothModes) {
   const QRectF r = rect(Point(13500000, -1500000), Point(16500000, 1500000));
   mItem->setSelectionRect(r, RectSelection::Mode::Window);
   EXPECT_EQ(1, mItem->getSelectedCircles().size());
@@ -179,7 +181,8 @@ TEST_F(SymbolGraphicsItemTest, testSetSelectionRectCircleFullyEnclosedSelectsInB
   EXPECT_EQ(1, mItem->getSelectedCircles().size());
 }
 
-TEST_F(SymbolGraphicsItemTest, testSetSelectionRectCirclePartialOverlapSelectsOnlyInCrossingMode) {
+TEST_F(SymbolGraphicsItemTest,
+       testSetSelectionRectCirclePartialOverlapSelectsOnlyInCrossingMode) {
   const QRectF r = rect(Point(15000000, -1500000), Point(16500000, 1500000));
   mItem->setSelectionRect(r, RectSelection::Mode::Window);
   EXPECT_TRUE(mItem->getSelectedCircles().isEmpty());
@@ -191,7 +194,8 @@ TEST_F(SymbolGraphicsItemTest, testSetSelectionRectCirclePartialOverlapSelectsOn
  *  Test Methods: polygon
  ******************************************************************************/
 
-TEST_F(SymbolGraphicsItemTest, testSetSelectionRectPolygonFullyEnclosedSelectsInBothModes) {
+TEST_F(SymbolGraphicsItemTest,
+       testSetSelectionRectPolygonFullyEnclosedSelectsInBothModes) {
   const QRectF r = rect(Point(28500000, -1500000), Point(31500000, 1500000));
   mItem->setSelectionRect(r, RectSelection::Mode::Window);
   EXPECT_EQ(1, mItem->getSelectedPolygons().size());
@@ -199,7 +203,8 @@ TEST_F(SymbolGraphicsItemTest, testSetSelectionRectPolygonFullyEnclosedSelectsIn
   EXPECT_EQ(1, mItem->getSelectedPolygons().size());
 }
 
-TEST_F(SymbolGraphicsItemTest, testSetSelectionRectPolygonPartialOverlapSelectsOnlyInCrossingMode) {
+TEST_F(SymbolGraphicsItemTest,
+       testSetSelectionRectPolygonPartialOverlapSelectsOnlyInCrossingMode) {
   const QRectF r = rect(Point(30000000, -1500000), Point(31500000, 1500000));
   mItem->setSelectionRect(r, RectSelection::Mode::Window);
   EXPECT_TRUE(mItem->getSelectedPolygons().isEmpty());
@@ -211,7 +216,8 @@ TEST_F(SymbolGraphicsItemTest, testSetSelectionRectPolygonPartialOverlapSelectsO
  *  Test Methods: text
  ******************************************************************************/
 
-TEST_F(SymbolGraphicsItemTest, testSetSelectionRectTextFullyEnclosedSelectsInBothModes) {
+TEST_F(SymbolGraphicsItemTest,
+       testSetSelectionRectTextFullyEnclosedSelectsInBothModes) {
   // Generous margin around the anchor position: see the class comment above
   // for why only the enclosed/disjoint cases are asserted for text.
   const QRectF r = rect(Point(42000000, -3000000), Point(48000000, 3000000));
