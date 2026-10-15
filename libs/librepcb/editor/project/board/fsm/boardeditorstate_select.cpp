@@ -118,7 +118,6 @@ BoardEditorState_Select::BoardEditorState_Select(
     const Context& context) noexcept
   : BoardEditorState(context),
     mIsUndoCmdActive(false),
-    mSuppressRubberBandUntilRelease(false),
     mSelectedPolygon(nullptr),
     mSelectedPolygonVertices(),
     mCmdPolygonEdit(),
@@ -529,11 +528,6 @@ bool BoardEditorState_Select::processGraphicsSceneMouseMoved(
   BoardGraphicsScene* scene = getActiveBoardScene();
   if (!scene) return false;
 
-  if (mSuppressRubberBandUntilRelease) {
-    // See #mSuppressRubberBandUntilRelease.
-    return true;
-  }
-
   if (mSelectedItemsDragCommand) {
     // If any individual footprint pads were selected, expand the selection
     // to their devices now to allow dragging devices by their pads.
@@ -590,7 +584,6 @@ bool BoardEditorState_Select::processGraphicsSceneMouseMoved(
 bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
     const GraphicsSceneMouseEvent& e) noexcept {
   scheduleUpdateAvailableFeatures();
-  mSuppressRubberBandUntilRelease = false;
 
   // Discard any temporary changes and release undo stack.
   abortBlockingToolsInOtherEditors();
@@ -688,7 +681,6 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
 bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
     const GraphicsSceneMouseEvent& e) noexcept {
   scheduleUpdateAvailableFeatures();
-  mSuppressRubberBandUntilRelease = false;
 
   BoardGraphicsScene* scene = getActiveBoardScene();
   if (!scene) return false;
@@ -1689,12 +1681,6 @@ bool BoardEditorState_Select::startPaste(
 
 bool BoardEditorState_Select::abortCommand(bool showErrMsgBox) noexcept {
   try {
-    // Arm #mSuppressRubberBandUntilRelease if a drag/edit command is active.
-    if (mSelectedItemsDragCommand || mCmdPolygonEdit || mCmdPlaneEdit ||
-        mCmdZoneEdit) {
-      mSuppressRubberBandUntilRelease = true;
-    }
-
     // Stop editing polygons
     mCmdPolygonEdit.reset();
     mSelectedPolygon = nullptr;
