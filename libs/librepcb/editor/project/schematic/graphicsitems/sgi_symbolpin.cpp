@@ -150,6 +150,19 @@ QVariant SGI_SymbolPin::itemChange(GraphicsItemChange change,
   return QGraphicsItem::itemChange(change, value);
 }
 
+QPainterPath SGI_SymbolPin::getVisibleShape() const noexcept {
+  QPainterPath path;
+  path.setFillRule(Qt::WindingFill);
+  if (mLineGraphicsItem->isVisible()) {
+    // Rotation is applied to the line item itself; map through it.
+    path.addPath(mLineGraphicsItem->mapToParent(mLineGrabShape));
+  }
+  // Empty if neither line nor fill layer of the circle is visible.
+  const QPainterPath circle = mCircleGraphicsItem->shape();
+  path.addPath(mCircleGraphicsItem->mapToParent(circle));
+  return path;
+}
+
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
@@ -260,13 +273,14 @@ void SGI_SymbolPin::updateShape() noexcept {
   const qreal lengthPx = mPin.getLibPin().getLength()->toPx();
 
   // Grab area: A circle at the end of the pin plus a rectangle of the same
-  // width along the pin line.
+  // width along the pin line. The rectangle is also used for the rubber-band
+  // #getVisibleShape(), in the coordinates of the line item.
+  mLineGrabShape = QPainterPath();
+  mLineGrabShape.addRect(QRectF(0, -grabSizePx / 2, lengthPx, grabSizePx));
   mShape = QPainterPath();
   mShape.setFillRule(Qt::WindingFill);
   mShape.addEllipse(Toolbox::boundingRectFromRadius(grabSizePx / 2));
-  mShape.addPolygon(mLineGraphicsItem->mapToParent(
-      QRectF(0, -grabSizePx / 2, lengthPx, grabSizePx)));
-  mShape.closeSubpath();
+  mShape.addPath(mLineGraphicsItem->mapToParent(mLineGrabShape));
 }
 
 void SGI_SymbolPin::updateName() noexcept {

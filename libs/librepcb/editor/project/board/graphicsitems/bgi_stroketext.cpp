@@ -96,14 +96,18 @@ void BGI_StrokeText::updateContext() noexcept {
   updateLayer();
 }
 
+QPainterPath BGI_StrokeText::getVisibleShape() const noexcept {
+  Q_ASSERT(mPathGraphicsItem);
+  return mPathGraphicsItem->mapToParent(mPathGraphicsItem->shape());
+}
+
 /*******************************************************************************
  *  Inherited from QGraphicsItem
  ******************************************************************************/
 
 QPainterPath BGI_StrokeText::shape() const noexcept {
-  Q_ASSERT(mPathGraphicsItem && mOriginCrossGraphicsItem);
-  return mPathGraphicsItem->mapToParent(mPathGraphicsItem->shape()) |
-      mOriginCrossGraphicsItem->shape();
+  Q_ASSERT(mOriginCrossGraphicsItem);
+  return getVisibleShape() | mOriginCrossGraphicsItem->shape();
 }
 
 QVariant BGI_StrokeText::itemChange(GraphicsItemChange change,

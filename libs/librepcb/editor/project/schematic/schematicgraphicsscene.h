@@ -180,11 +180,13 @@ public:
   // General Methods
   void setSelfProbedState(GraphicsLayer::State state) noexcept;
   void selectAll() noexcept;
-  void selectItemsInRect(const Point& p1, const Point& p2) noexcept;
   void clearSelection() noexcept;
 
   // Operator Overloadings
   SchematicGraphicsScene& operator=(const SchematicGraphicsScene& rhs) = delete;
+
+protected:  // Methods
+  void applyRectSelection(const RectSelection& selection) noexcept override;
 
 private:  // Methods
   void updateCrossProbe() noexcept;
