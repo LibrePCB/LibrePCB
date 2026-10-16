@@ -300,6 +300,13 @@ void SlintGraphicsView::setRenderCacheEnabled(bool enable) noexcept {
   }
 }
 
+void SlintGraphicsView::releaseRenderCache() noexcept {
+  if (mGlSurface && mGlContext && mGlError.isEmpty()) {
+    mGlContext->makeCurrent(mGlSurface.get());
+  }
+  invalidateRenderCache();
+}
+
 void SlintGraphicsView::setEventHandler(
     IF_GraphicsViewEventHandler* obj) noexcept {
   mEventHandler = obj;

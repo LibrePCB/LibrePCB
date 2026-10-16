@@ -665,6 +665,7 @@ void Board2dTab::activate() noexcept {
 }
 
 void Board2dTab::deactivate() noexcept {
+  mView->releaseRenderCache();
   mInputIdleTimer.reset();
   mBoardEditor.unregisterActiveTab(this);
   while (!mActiveConnections.isEmpty()) {

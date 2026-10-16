@@ -109,6 +109,13 @@ public:
    * @param enable  Whether to enable the cache.
    */
   void setRenderCacheEnabled(bool enable) noexcept;
+
+  /**
+   * @brief Release all memory held by the pan cache
+   *
+   * The cache is rebuilt on the next ::render() call.
+   */
+  void releaseRenderCache() noexcept;
   void setEventHandler(IF_GraphicsViewEventHandler* obj) noexcept;
   void setMirror(bool mirror) noexcept;
   slint::Image render(GraphicsScene& scene, float width, float height) noexcept;

@@ -84,7 +84,7 @@ void GraphicsScene::setBackgroundColors(const QColor& fill,
   mBackgroundColor = fill;
   mBackgroundColor.setAlpha(255);  // Transparency makes no sense here
   mGridColor = grid;
-  setBackgroundBrush(backgroundBrush());  // this will repaint the background
+  notifyBackgroundChanged();
 }
 
 void GraphicsScene::setOverlayColors(const QColor& fill,
@@ -97,14 +97,14 @@ void GraphicsScene::setOverlayColors(const QColor& fill,
 void GraphicsScene::setGridStyle(GridStyle style) noexcept {
   if (style != mGridStyle) {
     mGridStyle = style;
-    setBackgroundBrush(backgroundBrush());  // this will repaint the background
+    notifyBackgroundChanged();
   }
 }
 
 void GraphicsScene::setGridInterval(const PositiveLength& interval) noexcept {
   if (interval != mGridInterval) {
     mGridInterval = interval;
-    setBackgroundBrush(backgroundBrush());  // this will repaint the background
+    notifyBackgroundChanged();
   }
 }
 
@@ -469,6 +469,13 @@ QList<QRectF> GraphicsScene::takeDirtyRects() noexcept {
   QList<QRectF> rects = std::move(mDirtyRects);
   mDirtyRects.clear();
   return rects;
+}
+
+void GraphicsScene::notifyBackgroundChanged() noexcept {
+  // The background covers the area outside of the scene rect as well, which
+  // is not reported by the change notification.
+  setBackgroundBrush(backgroundBrush());
+  mDirtyRects = {QRectF(-1e9, -1e9, 2e9, 2e9)};
 }
 
 void GraphicsScene::handleChanged(const QList<QRectF>& region) noexcept {

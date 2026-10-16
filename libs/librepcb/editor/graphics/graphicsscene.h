@@ -142,6 +142,7 @@ protected:
 private:
   void handleChanged(const QList<QRectF>& region) noexcept;
   void notifyForegroundChanged() noexcept;
+  void notifyBackgroundChanged() noexcept;
 
 private:
   QList<QRectF> mDirtyRects;
