@@ -110,12 +110,16 @@ public:
                    const QColor& background = Qt::transparent) noexcept;
 
   /**
-   * @brief Get a counter incremented on every change of the scene content
+   * @brief Take the scene regions changed since the last call
    *
    * Changes of the foreground layer (see ::renderForeground()) are not
-   * counted.
+   * reported. Intended for a single consumer.
+   *
+   * Regions may be merged into larger ones if many changes are pending.
+   *
+   * @return  The changed regions in scene coordinates.
    */
-  quint64 getContentRevision() const noexcept { return mContentRevision; }
+  QList<QRectF> takeDirtyRects() noexcept;
 
   /**
    * @brief Render the scene content without the foreground layer
@@ -140,7 +144,7 @@ private:
   void notifyForegroundChanged() noexcept;
 
 private:
-  quint64 mContentRevision;
+  QList<QRectF> mDirtyRects;
   bool mSkipForeground;
   bool mForegroundChangePending;
   GridStyle mGridStyle;

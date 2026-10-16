@@ -46,7 +46,7 @@ static const QRectF sForegroundRegion(-0.125, -0.125, 0.25, 0.25);
 
 GraphicsScene::GraphicsScene(QObject* parent) noexcept
   : QGraphicsScene(parent),
-    mContentRevision(0),
+    mDirtyRects(),
     mSkipForeground(false),
     mForegroundChangePending(false),
     mGridStyle(GridStyle::None),
@@ -465,9 +465,23 @@ void GraphicsScene::drawForeground(QPainter* painter,
  *  Private Methods
  ******************************************************************************/
 
+QList<QRectF> GraphicsScene::takeDirtyRects() noexcept {
+  QList<QRectF> rects = std::move(mDirtyRects);
+  mDirtyRects.clear();
+  return rects;
+}
+
 void GraphicsScene::handleChanged(const QList<QRectF>& region) noexcept {
-  if ((region.count() != 1) || (region.first() != sForegroundRegion)) {
-    ++mContentRevision;
+  if ((region.count() == 1) && (region.first() == sForegroundRegion)) {
+    return;
+  }
+  mDirtyRects += region;
+  if (mDirtyRects.count() > 4096) {
+    QRectF bounds;
+    for (const QRectF& r : mDirtyRects) {
+      bounds |= r;
+    }
+    mDirtyRects = {bounds};
   }
 }
 

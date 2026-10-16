@@ -156,7 +156,6 @@ private:  // Types
     qreal scale = 0;
     bool mirror = false;
     bool openGl = false;
-    quint64 revision = 0;
   };
 
 private:  // Methods
@@ -166,6 +165,8 @@ private:  // Methods
   QImage renderRegion(GraphicsScene& scene, const QRect& region) noexcept;
   void storeRegion(const QRect& region, QImage img) noexcept;
   void cropRegion(const QRect& region, QImage& out) const noexcept;
+  void applyDirtyRects(GraphicsScene& scene,
+                       const QList<QRectF>& dirty) noexcept;
   void invalidateRenderCache() noexcept;
   void fitProjection(GraphicsScene& scene, const QSize& size) noexcept;
   void scroll(const QPointF& delta) noexcept;
