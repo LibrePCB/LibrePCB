@@ -17,7 +17,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
@@ -132,92 +131,6 @@ static QRect mergeValid(const QRect& old, const QRect& view) noexcept {
   }
   return best;
 }
-
-// Temporary statistics, enabled with LPCB_RENDER_CACHE_LOG=1.
-namespace {
-struct CacheStats {
-  int frames = 0;
-  int cold = 0;
-  int partial = 0;
-  int chunks = 0;
-  qint64 renderNs = 0;
-  qint64 composeNs = 0;
-  qint64 coldNs = 0;
-  qint64 partialNs = 0;
-  qint64 chunkNs = 0;
-  int regions = 0;
-  qint64 drawNs = 0;
-  qint64 readNs = 0;
-  qint64 convNs = 0;
-  qint64 storeNs = 0;
-  int previews = 0;
-  qint64 previewNs = 0;
-  int dirtyUpdates = 0;
-  int dirtyRects = 0;
-  int dirtyFallbacks = 0;
-  qint64 dirtyNs = 0;
-  int moveCalls = 0;
-  qint64 moveNs = 0;
-  QElapsedTimer since;
-
-  void flush(const QRect& valid, const QSize& ring) {
-    if (!since.isValid()) {
-      since.start();
-    }
-    if (since.elapsed() < 1000) {
-      return;
-    }
-    auto avg = [](qint64 ns, int n) { return n ? ns * 1e-6 / n : 0.0; };
-    qInfo().noquote() << QString(
-                             "RENDER-CACHE frames %1 (cold %2, partial %3), "
-                             "avg ms: render() %4, compose %5, cold %6, "
-                             "partial %7; refill chunks %8 avg %9 ms; valid "
-                             "%10x%11 of %12x%13")
-                             .arg(frames)
-                             .arg(cold)
-                             .arg(partial)
-                             .arg(avg(renderNs, frames), 0, 'f', 2)
-                             .arg(avg(composeNs, frames), 0, 'f', 2)
-                             .arg(avg(coldNs, cold), 0, 'f', 2)
-                             .arg(avg(partialNs, partial), 0, 'f', 2)
-                             .arg(chunks)
-                             .arg(avg(chunkNs, chunks), 0, 'f', 2)
-                             .arg(valid.width())
-                             .arg(valid.height())
-                             .arg(ring.width())
-                             .arg(ring.height());
-    qInfo().noquote()
-        << QString(
-               "RENDER-CACHE phases per region (n=%1), avg ms: draw %2, "
-               "readback %3, convert %4, store %5")
-               .arg(regions)
-               .arg(avg(drawNs, regions), 0, 'f', 2)
-               .arg(avg(readNs, regions), 0, 'f', 2)
-               .arg(avg(convNs, regions), 0, 'f', 2)
-               .arg(avg(storeNs, regions), 0, 'f', 2);
-    qInfo().noquote()
-        << QString(
-               "RENDER-CACHE dirty updates %1 (rects %2, fallbacks %3), "
-               "avg ms per update: %4")
-               .arg(dirtyUpdates)
-               .arg(dirtyRects)
-               .arg(dirtyFallbacks)
-               .arg(avg(dirtyNs, dirtyUpdates), 0, 'f', 2);
-    qInfo().noquote() << QString("RENDER-CACHE zoom previews %1, avg ms %2")
-                             .arg(previews)
-                             .arg(avg(previewNs, previews), 0, 'f', 2);
-    qInfo().noquote()
-        << QString("RENDER-CACHE mouse-move handler calls %1, avg ms %2")
-               .arg(moveCalls)
-               .arg(avg(moveNs, moveCalls), 0, 'f', 2);
-    *this = CacheStats();
-    since.start();
-  }
-};
-}  // namespace
-static CacheStats sCacheStats;
-static const bool sCacheLog =
-    qEnvironmentVariableIntValue("LPCB_RENDER_CACHE_LOG") != 0;
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -506,13 +419,7 @@ void SlintGraphicsView::pointerEvent(
       projection.offset -= scenePosPx - mPanningStartScenePos;
       applyProjection(projection);
     } else if (mEventHandler) {
-      QElapsedTimer moveTimer;
-      moveTimer.start();
       mEventHandler->graphicsSceneMouseMoved(mMouseEvent);
-      if (sCacheLog) {
-        sCacheStats.moveCalls++;
-        sCacheStats.moveNs += moveTimer.nsecsElapsed();
-      }
     }
   }
 }
@@ -643,9 +550,6 @@ QMarginsF SlintGraphicsView::defaultEditorMargins() noexcept {
 
 bool SlintGraphicsView::renderCached(GraphicsScene& scene, const QSize& size,
                                      slint::Image& result) noexcept {
-  QElapsedTimer timer;
-  timer.start();
-
   const bool openGl = mGlSurface && mGlContext;
   if (openGl &&
       ((!mGlError.isEmpty()) || (!mGlContext->makeCurrent(mGlSurface.get())))) {
@@ -689,8 +593,6 @@ bool SlintGraphicsView::renderCached(GraphicsScene& scene, const QSize& size,
   }
   const bool preview = (previewSrc.width() >= 1) && (previewSrc.height() >= 1);
 
-  bool cold = false;
-  bool partial = false;
   if (preview) {
     mRefillTimer->stop();
     mZoomSettleTimer->start(sZoomSettleMs);
@@ -714,11 +616,9 @@ bool SlintGraphicsView::renderCached(GraphicsScene& scene, const QSize& size,
     applyDirtyRects(scene, dirty);
     if (!mCache.valid.contains(view)) {
       if (!mCache.valid.intersects(view)) {
-        cold = true;
         storeRegion(view, renderRegion(scene, view));
         mCache.valid = view;
       } else {
-        partial = true;
         const QRect old = mCache.valid;
         for (const QRect& piece : subtractRect(view, old)) {
           storeRegion(piece, renderRegion(scene, piece));
@@ -727,7 +627,6 @@ bool SlintGraphicsView::renderCached(GraphicsScene& scene, const QSize& size,
       }
     }
   }
-  const qint64 renderNs = timer.nsecsElapsed();
 
   // The foreground layer is drawn on top of the cached content every frame.
   slint::SharedPixelBuffer<slint::Rgba8Pixel> buffer(
@@ -759,23 +658,6 @@ bool SlintGraphicsView::renderCached(GraphicsScene& scene, const QSize& size,
   if ((!preview) && (mCache.valid != window) && (!mRefillTimer->isActive())) {
     mRefillTimer->start(1);
   }
-
-  if (sCacheLog) {
-    sCacheStats.frames++;
-    sCacheStats.renderNs += renderNs;
-    sCacheStats.composeNs += timer.nsecsElapsed() - renderNs;
-    if (preview) {
-      sCacheStats.previews++;
-      sCacheStats.previewNs += timer.nsecsElapsed();
-    } else if (cold) {
-      sCacheStats.cold++;
-      sCacheStats.coldNs += renderNs;
-    } else if (partial) {
-      sCacheStats.partial++;
-      sCacheStats.partialNs += renderNs;
-    }
-    sCacheStats.flush(mCache.valid, ringSize);
-  }
   return true;
 }
 
@@ -796,8 +678,6 @@ void SlintGraphicsView::refillRenderCache() noexcept {
     return;
   }
 
-  QElapsedTimer timer;
-  timer.start();
   const int margin = sCacheMargin;
   const QRect window = mCache.view.adjusted(-margin, -margin, margin, margin);
   const QRect v = mCache.valid;
@@ -830,10 +710,6 @@ void SlintGraphicsView::refillRenderCache() noexcept {
   storeRegion(chunk, renderRegion(*scene, chunk));
   mCache.valid = v.united(chunk);
 
-  if (sCacheLog) {
-    sCacheStats.chunks++;
-    sCacheStats.chunkNs += timer.nsecsElapsed();
-  }
   if (mCache.valid != window) {
     mRefillTimer->start(1);
   }
@@ -859,8 +735,6 @@ QImage SlintGraphicsView::renderRegion(GraphicsScene& scene,
     scene.renderContent(&painter, target, source);
   };
 
-  QElapsedTimer timer;
-  timer.start();
   QImage img;
   if (mCache.openGl) {
     const QPair<int, int> key(size.width(), size.height());
@@ -881,36 +755,24 @@ QImage SlintGraphicsView::renderRegion(GraphicsScene& scene,
         draw(&device);
       }
       fbo->release();
-      sCacheStats.drawNs += sCacheLog ? timer.nsecsElapsed() : 0;
-      timer.restart();
       img = fbo->toImage();
-      sCacheStats.readNs += sCacheLog ? timer.nsecsElapsed() : 0;
     }
   }
   if (img.isNull()) {
     img = QImage(size, QImage::Format_RGBA8888_Premultiplied);
     draw(&img);
-    sCacheStats.drawNs += sCacheLog ? timer.nsecsElapsed() : 0;
   }
   return img;
 }
 
 void SlintGraphicsView::storeRegion(const QRect& region, QImage img) noexcept {
-  QElapsedTimer timer;
-  timer.start();
   if (img.format() != QImage::Format_RGBA8888_Premultiplied) {
     img.convertTo(QImage::Format_RGBA8888_Premultiplied);
   }
-  const qint64 convNs = timer.nsecsElapsed();
   forEachRingSegment(region, mCache.ring.size(),
                      [&](const QRect& segment, const QPoint& pos) {
                        copyRows(img, segment, mCache.ring, pos);
                      });
-  if (sCacheLog) {
-    sCacheStats.regions++;
-    sCacheStats.convNs += convNs;
-    sCacheStats.storeNs += timer.nsecsElapsed() - convNs;
-  }
 }
 
 void SlintGraphicsView::cropRegion(const QRect& region,
@@ -928,8 +790,6 @@ void SlintGraphicsView::applyDirtyRects(GraphicsScene& scene,
     return;
   }
 
-  QElapsedTimer timer;
-  timer.start();
   const qreal scale = mCache.scale;
   const qreal limit = 1e8;
   const int pad = 2;
@@ -1009,17 +869,11 @@ void SlintGraphicsView::applyDirtyRects(GraphicsScene& scene,
   }
   if (area > (sDirtyAreaLimit * viewArea)) {
     mCache.valid = QRect();
-    sCacheStats.dirtyFallbacks += sCacheLog ? 1 : 0;
     return;
   }
 
   for (const QRect& r : rects) {
     storeRegion(r, renderRegion(scene, r));
-  }
-  if (sCacheLog) {
-    sCacheStats.dirtyUpdates++;
-    sCacheStats.dirtyRects += rects.count();
-    sCacheStats.dirtyNs += timer.nsecsElapsed();
   }
 }
 
@@ -1032,7 +886,7 @@ void SlintGraphicsView::drawZoomPreview(const GraphicsScene& scene,
   QImage tmp(srcPx.size(), QImage::Format_RGBA8888_Premultiplied);
   cropRegion(srcPx, tmp);
 
-  out.fill(scene.backgroundBrush().color());
+  out.fill(scene.getBackgroundColor());
   QPainter painter(&out);
   painter.setRenderHint(QPainter::SmoothPixmapTransform);
   const QRectF target(src.x() / ratio - view.x(), src.y() / ratio - view.y(),

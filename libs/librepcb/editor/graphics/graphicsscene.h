@@ -75,6 +75,11 @@ public:
   }
   GridStyle getGridStyle() const noexcept { return mGridStyle; }
 
+  /**
+   * @brief Get the opaque fill color painted behind the scene content
+   */
+  const QColor& getBackgroundColor() const noexcept { return mBackgroundColor; }
+
   // Setters
   void setBackgroundColors(const QColor& fill, const QColor& grid) noexcept;
   void setOverlayColors(const QColor& fill, const QColor& content) noexcept;
