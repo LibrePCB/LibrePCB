@@ -45,9 +45,17 @@ static qreal boundedScaleFactor(qreal scale) noexcept {
   return qBound(qreal(0.001), scale, qreal(5000));
 }
 
-
 static constexpr int sCacheMargin = 256;
 static constexpr int sCacheQuantum = 64;
+
+// Estimated cost model to choose between rendering separate dirty regions or
+// their bounding box.
+static constexpr double sDirtyRegionOverheadMs = 1.5;
+static constexpr double sFullViewRenderMs = 50.0;
+
+// Fraction of the view above which dirty regions are not worth rendering
+// separately from the full view.
+static constexpr double sDirtyAreaLimit = 0.8;
 
 static int wrapIndex(int value, int size) noexcept {
   const int m = value % size;
@@ -172,16 +180,18 @@ struct CacheStats {
                              .arg(ring.width())
                              .arg(ring.height());
     qInfo().noquote()
-        << QString("RENDER-CACHE phases per region (n=%1), avg ms: draw %2, "
-                   "readback %3, convert %4, store %5")
+        << QString(
+               "RENDER-CACHE phases per region (n=%1), avg ms: draw %2, "
+               "readback %3, convert %4, store %5")
                .arg(regions)
                .arg(avg(drawNs, regions), 0, 'f', 2)
                .arg(avg(readNs, regions), 0, 'f', 2)
                .arg(avg(convNs, regions), 0, 'f', 2)
                .arg(avg(storeNs, regions), 0, 'f', 2);
     qInfo().noquote()
-        << QString("RENDER-CACHE dirty updates %1 (rects %2, fallbacks %3), "
-                   "avg ms per update: %4")
+        << QString(
+               "RENDER-CACHE dirty updates %1 (rects %2, fallbacks %3), "
+               "avg ms per update: %4")
                .arg(dirtyUpdates)
                .arg(dirtyRects)
                .arg(dirtyFallbacks)
@@ -641,9 +651,8 @@ bool SlintGraphicsView::renderCached(GraphicsScene& scene, const QSize& size,
   const QPoint pos(qRound(mProjection.offset.x() * scale),
                    qRound(mProjection.offset.y() * scale));
   const QPointF offset(pos.x() / scale, pos.y() / scale);
-  const QRect view(QPoint(mMirror ? (-pos.x() - size.width()) : pos.x(),
-                          pos.y()),
-                   size);
+  const QRect view(
+      QPoint(mMirror ? (-pos.x() - size.width()) : pos.x(), pos.y()), size);
   const int margin = sCacheMargin;
   const QSize ringSize(size.width() + 2 * margin, size.height() + 2 * margin);
   const QRect window = view.adjusted(-margin, -margin, margin, margin);
@@ -685,7 +694,8 @@ bool SlintGraphicsView::renderCached(GraphicsScene& scene, const QSize& size,
 
   // The foreground layer is drawn on top of the cached content every frame.
   slint::SharedPixelBuffer<slint::Rgba8Pixel> buffer(
-      static_cast<uint32_t>(size.width()), static_cast<uint32_t>(size.height()));
+      static_cast<uint32_t>(size.width()),
+      static_cast<uint32_t>(size.height()));
   {
     QImage out(reinterpret_cast<uchar*>(buffer.begin()), size.width(),
                size.height(), size.width() * 4,
@@ -745,8 +755,7 @@ void SlintGraphicsView::refillRenderCache() noexcept {
   QElapsedTimer timer;
   timer.start();
   const int margin = sCacheMargin;
-  const QRect window =
-      mCache.view.adjusted(-margin, -margin, margin, margin);
+  const QRect window = mCache.view.adjusted(-margin, -margin, margin, margin);
   const QRect v = mCache.valid;
   const int gaps[4] = {
       v.left() - window.left(),  // Left.
@@ -791,10 +800,10 @@ QImage SlintGraphicsView::renderRegion(GraphicsScene& scene,
   const qreal scale = mCache.scale;
   const QSize size = region.size();
   const QRectF target(QPointF(0, 0), size);
-  const QRectF source(
-      mCache.mirror ? (-(region.x() + region.width()) / scale)
-                    : (region.x() / scale),
-      region.y() / scale, region.width() / scale, region.height() / scale);
+  const QRectF source(mCache.mirror ? (-(region.x() + region.width()) / scale)
+                                    : (region.x() / scale),
+                      region.y() / scale, region.width() / scale,
+                      region.height() / scale);
   auto draw = [&](QPaintDevice* device) {
     QPainter painter(device);
     painter.setRenderHints(QPainter::Antialiasing |
@@ -869,8 +878,8 @@ void SlintGraphicsView::cropRegion(const QRect& region,
                      });
 }
 
-void SlintGraphicsView::applyDirtyRects(
-    GraphicsScene& scene, const QList<QRectF>& dirty) noexcept {
+void SlintGraphicsView::applyDirtyRects(GraphicsScene& scene,
+                                        const QList<QRectF>& dirty) noexcept {
   if (mCache.valid.isEmpty() || dirty.isEmpty()) {
     return;
   }
@@ -881,22 +890,43 @@ void SlintGraphicsView::applyDirtyRects(
   const qreal limit = 1e8;
   const int pad = 2;
   const int align = 32;
-  QRegion region;
-  for (const QRectF& r : dirty) {
-    const qreal x0 = qBound(-limit, (mCache.mirror ? -r.right() : r.left()) *
-                                        scale, limit);
-    const qreal x1 = qBound(-limit, (mCache.mirror ? -r.left() : r.right()) *
-                                        scale, limit);
+  auto toDevice = [&](const QRectF& r) {
+    const qreal x0 =
+        qBound(-limit, (mCache.mirror ? -r.right() : r.left()) * scale, limit);
+    const qreal x1 =
+        qBound(-limit, (mCache.mirror ? -r.left() : r.right()) * scale, limit);
     const qreal y0 = qBound(-limit, r.top() * scale, limit);
     const qreal y1 = qBound(-limit, r.bottom() * scale, limit);
     const int ix0 = (qFloor((x0 - pad) / align)) * align;
     const int iy0 = (qFloor((y0 - pad) / align)) * align;
     const int ix1 = (qCeil((x1 + pad) / align)) * align;
     const int iy1 = (qCeil((y1 + pad) / align)) * align;
-    region += QRect(ix0, iy0, ix1 - ix0, iy1 - iy0).intersected(mCache.valid);
+    return QRect(ix0, iy0, ix1 - ix0, iy1 - iy0).intersected(mCache.valid);
+  };
+
+  QRectF sceneBounds;
+  for (const QRectF& r : dirty) {
+    sceneBounds |= r;
   }
-  if (region.isEmpty()) {
+  const QRect bounds = toDevice(sceneBounds);
+  if (bounds.isEmpty()) {
     return;
+  }
+
+  // Beyond this count the overhead of the separate regions alone exceeds the
+  // cost of a full view render.
+  const int maxSeparate =
+      static_cast<int>(sFullViewRenderMs / sDirtyRegionOverheadMs);
+  QList<QRect> rects;
+  if ((dirty.count() > 1) && (dirty.count() <= maxSeparate)) {
+    for (const QRectF& r : dirty) {
+      const QRect rect = toDevice(r);
+      if (!rect.isEmpty()) {
+        rects.append(rect);
+      }
+    }
+  } else {
+    rects.append(bounds);
   }
 
   // Render either the separate regions or their bounding box, whichever is
@@ -904,25 +934,36 @@ void SlintGraphicsView::applyDirtyRects(
   const qint64 viewArea =
       static_cast<qint64>(mCache.view.width()) * mCache.view.height();
   auto cost = [viewArea](qint64 area) {
-    return 1.5 + (50.0 * area / viewArea);
+    return sDirtyRegionOverheadMs + (sFullViewRenderMs * area / viewArea);
   };
-  QList<QRect> rects;
-  qint64 area = 0;
-  double separateCost = 0;
-  for (const QRect& r : region) {
-    const qint64 a = static_cast<qint64>(r.width()) * r.height();
-    rects.append(r);
-    area += a;
-    separateCost += cost(a);
+  qint64 area = static_cast<qint64>(bounds.width()) * bounds.height();
+  if (rects.count() > 1) {
+    // Collapse the longer list of rects into a region of unique rects
+    QRegion region;
+    for (const QRect& r : rects) {
+      region += r;
+    }
+
+    // Sum the costs for the unique rects
+    QList<QRect> separate;
+    qint64 separateArea = 0;
+    double separateCost = 0;
+    for (const QRect& r : region) {
+      const qint64 a = static_cast<qint64>(r.width()) * r.height();
+      separate.append(r);
+      separateArea += a;
+      separateCost += cost(a);
+    }
+
+    // Select the cheaper option
+    if (separateCost <= cost(area)) {
+      rects = separate;
+      area = separateArea;
+    } else {
+      rects = {bounds};
+    }
   }
-  const QRect bounds = region.boundingRect();
-  const qint64 boundsArea =
-      static_cast<qint64>(bounds.width()) * bounds.height();
-  if ((rects.count() > 1) && (cost(boundsArea) < separateCost)) {
-    rects = {bounds};
-    area = boundsArea;
-  }
-  if (area * 2 > viewArea) {
+  if (area > (sDirtyAreaLimit * viewArea)) {
     mCache.valid = QRect();
     sCacheStats.dirtyFallbacks += sCacheLog ? 1 : 0;
     return;

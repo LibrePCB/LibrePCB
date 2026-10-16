@@ -99,6 +99,7 @@ public:
 
   // General Methods
   void setUseOpenGl(bool use) noexcept;
+
   /**
    * @brief Enable the pan cache of this view
    *
@@ -116,6 +117,7 @@ public:
    * The cache is rebuilt on the next ::render() call.
    */
   void releaseRenderCache() noexcept;
+
   void setEventHandler(IF_GraphicsViewEventHandler* obj) noexcept;
   void setMirror(bool mirror) noexcept;
   slint::Image render(GraphicsScene& scene, float width, float height) noexcept;
@@ -194,8 +196,7 @@ private:  // Data
   RenderCache mCache;
   QPointer<GraphicsScene> mCacheScene;
   std::unique_ptr<QTimer> mRefillTimer;
-  QMap<QPair<int, int>, std::shared_ptr<QOpenGLFramebufferObject>>
-      mCacheFbos;
+  QMap<QPair<int, int>, std::shared_ptr<QOpenGLFramebufferObject>> mCacheFbos;
   Projection mProjection;
   QSizeF mViewSize;
   bool mMirror;
