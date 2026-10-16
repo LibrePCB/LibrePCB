@@ -27,6 +27,8 @@
 
 #include <QtCore>
 
+#include <algorithm>
+#include <cstring>
 #include <memory>
 
 /*******************************************************************************
@@ -43,6 +45,143 @@ static qreal boundedScaleFactor(qreal scale) noexcept {
   return qBound(qreal(0.001), scale, qreal(5000));
 }
 
+
+static constexpr int sCacheMargin = 256;
+static constexpr int sCacheQuantum = 64;
+
+static int wrapIndex(int value, int size) noexcept {
+  const int m = value % size;
+  return (m < 0) ? (m + size) : m;
+}
+
+// Splits a rect of the wrapped device space into contiguous ring segments and
+// calls f(segment relative to rect, ring position) for each of them.
+template <typename F>
+static void forEachRingSegment(const QRect& rect, const QSize& ring, F&& f) {
+  for (int y = 0; y < rect.height();) {
+    const int ry = wrapIndex(rect.y() + y, ring.height());
+    const int h = std::min(rect.height() - y, ring.height() - ry);
+    for (int x = 0; x < rect.width();) {
+      const int rx = wrapIndex(rect.x() + x, ring.width());
+      const int w = std::min(rect.width() - x, ring.width() - rx);
+      f(QRect(x, y, w, h), QPoint(rx, ry));
+      x += w;
+    }
+    y += h;
+  }
+}
+
+static void copyRows(const QImage& src, const QRect& srcRect, QImage& dst,
+                     const QPoint& dstPos) noexcept {
+  for (int row = 0; row < srcRect.height(); ++row) {
+    std::memcpy(dst.scanLine(dstPos.y() + row) + dstPos.x() * 4,
+                src.constScanLine(srcRect.y() + row) + srcRect.x() * 4,
+                static_cast<size_t>(srcRect.width()) * 4);
+  }
+}
+
+// Parts of outer which are not covered by inner.
+static QList<QRect> subtractRect(const QRect& outer,
+                                 const QRect& inner) noexcept {
+  const QRect i = outer.intersected(inner);
+  QList<QRect> pieces;
+  if (i.isEmpty()) {
+    pieces.append(outer);
+    return pieces;
+  }
+  const int x0 = outer.x(), x1 = outer.x() + outer.width();
+  const int y0 = outer.y(), y1 = outer.y() + outer.height();
+  const int ix0 = i.x(), ix1 = i.x() + i.width();
+  const int iy0 = i.y(), iy1 = i.y() + i.height();
+  if (iy0 > y0) pieces.append(QRect(x0, y0, x1 - x0, iy0 - y0));
+  if (y1 > iy1) pieces.append(QRect(x0, iy1, x1 - x0, y1 - iy1));
+  if (ix0 > x0) pieces.append(QRect(x0, iy0, ix0 - x0, iy1 - iy0));
+  if (x1 > ix1) pieces.append(QRect(ix1, iy0, x1 - ix1, iy1 - iy0));
+  return pieces;
+}
+
+// Largest rect covered by the union of two overlapping rects which contains
+// the second one.
+static QRect mergeValid(const QRect& old, const QRect& view) noexcept {
+  QRect best = view;
+  auto area = [](const QRect& r) {
+    return static_cast<qint64>(r.width()) * r.height();
+  };
+  if ((view.top() >= old.top()) && (view.bottom() <= old.bottom())) {
+    const QRect r(QPoint(std::min(old.left(), view.left()), view.top()),
+                  QPoint(std::max(old.right(), view.right()), view.bottom()));
+    if (area(r) > area(best)) best = r;
+  }
+  if ((view.left() >= old.left()) && (view.right() <= old.right())) {
+    const QRect r(QPoint(view.left(), std::min(old.top(), view.top())),
+                  QPoint(view.right(), std::max(old.bottom(), view.bottom())));
+    if (area(r) > area(best)) best = r;
+  }
+  return best;
+}
+
+// Temporary statistics, enabled with LPCB_RENDER_CACHE_LOG=1.
+namespace {
+struct CacheStats {
+  int frames = 0;
+  int cold = 0;
+  int partial = 0;
+  int chunks = 0;
+  qint64 renderNs = 0;
+  qint64 composeNs = 0;
+  qint64 coldNs = 0;
+  qint64 partialNs = 0;
+  qint64 chunkNs = 0;
+  int regions = 0;
+  qint64 drawNs = 0;
+  qint64 readNs = 0;
+  qint64 convNs = 0;
+  qint64 storeNs = 0;
+  QElapsedTimer since;
+
+  void flush(const QRect& valid, const QSize& ring) {
+    if (!since.isValid()) {
+      since.start();
+    }
+    if (since.elapsed() < 1000) {
+      return;
+    }
+    auto avg = [](qint64 ns, int n) { return n ? ns * 1e-6 / n : 0.0; };
+    qInfo().noquote() << QString(
+                             "RENDER-CACHE frames %1 (cold %2, partial %3), "
+                             "avg ms: render() %4, compose %5, cold %6, "
+                             "partial %7; refill chunks %8 avg %9 ms; valid "
+                             "%10x%11 of %12x%13")
+                             .arg(frames)
+                             .arg(cold)
+                             .arg(partial)
+                             .arg(avg(renderNs, frames), 0, 'f', 2)
+                             .arg(avg(composeNs, frames), 0, 'f', 2)
+                             .arg(avg(coldNs, cold), 0, 'f', 2)
+                             .arg(avg(partialNs, partial), 0, 'f', 2)
+                             .arg(chunks)
+                             .arg(avg(chunkNs, chunks), 0, 'f', 2)
+                             .arg(valid.width())
+                             .arg(valid.height())
+                             .arg(ring.width())
+                             .arg(ring.height());
+    qInfo().noquote()
+        << QString("RENDER-CACHE phases per region (n=%1), avg ms: draw %2, "
+                   "readback %3, convert %4, store %5")
+               .arg(regions)
+               .arg(avg(drawNs, regions), 0, 'f', 2)
+               .arg(avg(readNs, regions), 0, 'f', 2)
+               .arg(avg(convNs, regions), 0, 'f', 2)
+               .arg(avg(storeNs, regions), 0, 'f', 2);
+    *this = CacheStats();
+    since.start();
+  }
+};
+}  // namespace
+static CacheStats sCacheStats;
+static const bool sCacheLog =
+    qEnvironmentVariableIntValue("LPCB_RENDER_CACHE_LOG") != 0;
+
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
@@ -54,8 +193,13 @@ SlintGraphicsView::SlintGraphicsView(const QRectF& defaultSceneRect,
     mDefaultSceneRect(defaultSceneRect),
     mDefaultMargins(defaultMargins),
     mEventHandler(nullptr),
+    mRenderCacheEnabled(false),
+    mRefillTimer(new QTimer(this)),
     mMirror(false),
     mAnimation(new QVariantAnimation(this)) {
+  mRefillTimer->setSingleShot(true);
+  connect(mRefillTimer.get(), &QTimer::timeout, this,
+          [this]() { refillRenderCache(); });
   mAnimation->setDuration(500);
   mAnimation->setEasingCurve(QEasingCurve::InOutCubic);
   connect(mAnimation.get(), &QVariantAnimation::valueChanged, this,
@@ -118,13 +262,24 @@ void SlintGraphicsView::setUseOpenGl(bool use) noexcept {
     // Keep objects.
     mGlSurface = std::move(surface);
     mGlContext = std::move(context);
+    invalidateRenderCache();
     emit transformChanged();
   } else if ((!use) && mGlSurface) {
+    invalidateRenderCache();
     mGlFbo.reset();
     mGlContext.reset();
     mGlSurface.reset();
     mGlError.clear();
     emit transformChanged();
+  }
+}
+
+void SlintGraphicsView::setRenderCacheEnabled(bool enable) noexcept {
+  bool ok = false;
+  const int envValue = qEnvironmentVariableIntValue("LPCB_RENDER_CACHE", &ok);
+  mRenderCacheEnabled = enable && (!(ok && (envValue == 0)));
+  if (!mRenderCacheEnabled) {
+    invalidateRenderCache();
   }
 }
 
@@ -145,6 +300,13 @@ slint::Image SlintGraphicsView::render(GraphicsScene& scene, float width,
   const QSize size(qCeil(width), qCeil(height));
   if ((size.width() < 2) || (size.height() < 2)) {
     return slint::Image();
+  }
+
+  if (mRenderCacheEnabled) {
+    slint::Image cached;
+    if (renderCached(scene, size, cached)) {
+      return cached;
+    }
   }
 
   // If OpenGL is activated, enable context and prepare FBO.
@@ -176,16 +338,7 @@ slint::Image SlintGraphicsView::render(GraphicsScene& scene, float width,
     painter.setRenderHints(QPainter::Antialiasing |
                            QPainter::SmoothPixmapTransform);
     const QRectF targetRect(QPoint(0, 0), size);
-    if ((mViewSize != targetRect.size()) &&
-        (mProjection.autoFitInView || mViewSize.isEmpty())) {
-      const QRectF target = targetRect.marginsRemoved(mDefaultMargins);
-      const QRectF initialRect = validateSceneRect(scene.itemsBoundingRect());
-      mProjection.scale =
-          boundedScaleFactor(std::min(target.width() / initialRect.width(),
-                                      target.height() / initialRect.height()));
-      mProjection.offset =
-          initialRect.center() - target.center() / mProjection.scale;
-    }
+    fitProjection(scene, size);
     QRectF sceneRect(0, 0, size.width() / mProjection.scale,
                      size.height() / mProjection.scale);
     sceneRect.translate(mProjection.offset);
@@ -430,6 +583,281 @@ QMarginsF SlintGraphicsView::defaultEditorMargins() noexcept {
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
+
+bool SlintGraphicsView::renderCached(GraphicsScene& scene, const QSize& size,
+                                     slint::Image& result) noexcept {
+  QElapsedTimer timer;
+  timer.start();
+
+  const bool openGl = mGlSurface && mGlContext;
+  if (openGl &&
+      ((!mGlError.isEmpty()) || (!mGlContext->makeCurrent(mGlSurface.get())))) {
+    return false;
+  }
+
+  // Deliver pending scene change notifications to get the current revision.
+  QCoreApplication::sendPostedEvents(&scene, QEvent::MetaCall);
+  fitProjection(scene, size);
+
+  const qreal scale = mProjection.scale;
+  if ((qAbs(mProjection.offset.x() * scale) > 1e9) ||
+      (qAbs(mProjection.offset.y() * scale) > 1e9)) {
+    return false;
+  }
+
+  // Snap the offset to whole device pixels, so cached pixels stay reusable.
+  const QPoint pos(qRound(mProjection.offset.x() * scale),
+                   qRound(mProjection.offset.y() * scale));
+  const QPointF offset(pos.x() / scale, pos.y() / scale);
+  const QRect view(QPoint(mMirror ? (-pos.x() - size.width()) : pos.x(),
+                          pos.y()),
+                   size);
+  const int margin = sCacheMargin;
+  const QSize ringSize(size.width() + 2 * margin, size.height() + 2 * margin);
+  const QRect window = view.adjusted(-margin, -margin, margin, margin);
+
+  const bool match = (mCache.ring.size() == ringSize) &&
+      (mCache.scale == scale) && (mCache.mirror == mMirror) &&
+      (mCache.openGl == openGl) &&
+      (mCache.revision == scene.getContentRevision()) &&
+      (mCacheScene == &scene);
+  if (!match) {
+    if (mCache.ring.size() != ringSize) {
+      mCache.ring = QImage(ringSize, QImage::Format_RGBA8888_Premultiplied);
+    }
+    mCache.valid = QRect();
+    mCache.scale = scale;
+    mCache.mirror = mMirror;
+    mCache.openGl = openGl;
+    mCache.revision = scene.getContentRevision();
+    mCacheScene = &scene;
+  }
+
+  bool cold = false;
+  bool partial = false;
+  mCache.valid = mCache.valid.intersected(window);
+  mCache.view = view;
+  if (!mCache.valid.contains(view)) {
+    if (!mCache.valid.intersects(view)) {
+      cold = true;
+      storeRegion(view, renderRegion(scene, view));
+      mCache.valid = view;
+    } else {
+      partial = true;
+      const QRect old = mCache.valid;
+      for (const QRect& piece : subtractRect(view, old)) {
+        storeRegion(piece, renderRegion(scene, piece));
+      }
+      mCache.valid = mergeValid(old, view);
+    }
+  }
+  const qint64 renderNs = timer.nsecsElapsed();
+
+  // The foreground layer is drawn on top of the cached content every frame.
+  slint::SharedPixelBuffer<slint::Rgba8Pixel> buffer(
+      static_cast<uint32_t>(size.width()), static_cast<uint32_t>(size.height()));
+  {
+    QImage out(reinterpret_cast<uchar*>(buffer.begin()), size.width(),
+               size.height(), size.width() * 4,
+               QImage::Format_RGBA8888_Premultiplied);
+    cropRegion(view, out);
+    QPainter painter(&out);
+    painter.setRenderHints(QPainter::Antialiasing |
+                           QPainter::SmoothPixmapTransform);
+    if (mMirror) {
+      painter.translate(size.width(), 0);
+      painter.scale(-1, 1);
+    }
+    QRectF sceneRect(0, 0, size.width() / scale, size.height() / scale);
+    sceneRect.translate(offset);
+    scene.renderForeground(&painter, QRectF(QPoint(0, 0), size), sceneRect);
+  }
+  mViewSize = size;
+  result = slint::Image(buffer);
+
+  if ((mCache.valid != window) && (!mRefillTimer->isActive())) {
+    mRefillTimer->start(1);
+  }
+
+  if (sCacheLog) {
+    sCacheStats.frames++;
+    sCacheStats.renderNs += renderNs;
+    sCacheStats.composeNs += timer.nsecsElapsed() - renderNs;
+    if (cold) {
+      sCacheStats.cold++;
+      sCacheStats.coldNs += renderNs;
+    } else if (partial) {
+      sCacheStats.partial++;
+      sCacheStats.partialNs += renderNs;
+    }
+    sCacheStats.flush(mCache.valid, ringSize);
+  }
+  return true;
+}
+
+void SlintGraphicsView::refillRenderCache() noexcept {
+  GraphicsScene* scene = mCacheScene.data();
+  if ((!scene) || (!mRenderCacheEnabled) || mCache.valid.isEmpty()) {
+    return;
+  }
+  if (mGlSurface && mGlContext &&
+      ((!mGlError.isEmpty()) || (!mGlContext->makeCurrent(mGlSurface.get())))) {
+    return;
+  }
+  QCoreApplication::sendPostedEvents(scene, QEvent::MetaCall);
+  if (mCache.revision != scene->getContentRevision()) {
+    mCache.valid = QRect();
+    return;
+  }
+
+  QElapsedTimer timer;
+  timer.start();
+  const int margin = sCacheMargin;
+  const QRect window =
+      mCache.view.adjusted(-margin, -margin, margin, margin);
+  const QRect v = mCache.valid;
+  const int gaps[4] = {
+      v.left() - window.left(),  // Left.
+      window.right() - v.right(),  // Right.
+      v.top() - window.top(),  // Top.
+      window.bottom() - v.bottom(),  // Bottom.
+  };
+  const int side = static_cast<int>(std::max_element(gaps, gaps + 4) - gaps);
+  const int thickness = std::min(gaps[side], sCacheQuantum);
+  if (thickness <= 0) {
+    return;
+  }
+  QRect chunk;
+  switch (side) {
+    case 0:
+      chunk = QRect(v.left() - thickness, v.top(), thickness, v.height());
+      break;
+    case 1:
+      chunk = QRect(v.right() + 1, v.top(), thickness, v.height());
+      break;
+    case 2:
+      chunk = QRect(v.left(), v.top() - thickness, v.width(), thickness);
+      break;
+    default:
+      chunk = QRect(v.left(), v.bottom() + 1, v.width(), thickness);
+      break;
+  }
+  storeRegion(chunk, renderRegion(*scene, chunk));
+  mCache.valid = v.united(chunk);
+
+  if (sCacheLog) {
+    sCacheStats.chunks++;
+    sCacheStats.chunkNs += timer.nsecsElapsed();
+  }
+  if (mCache.valid != window) {
+    mRefillTimer->start(1);
+  }
+}
+
+QImage SlintGraphicsView::renderRegion(GraphicsScene& scene,
+                                       const QRect& region) noexcept {
+  const qreal scale = mCache.scale;
+  const QSize size = region.size();
+  const QRectF target(QPointF(0, 0), size);
+  const QRectF source(
+      mCache.mirror ? (-(region.x() + region.width()) / scale)
+                    : (region.x() / scale),
+      region.y() / scale, region.width() / scale, region.height() / scale);
+  auto draw = [&](QPaintDevice* device) {
+    QPainter painter(device);
+    painter.setRenderHints(QPainter::Antialiasing |
+                           QPainter::SmoothPixmapTransform);
+    if (mCache.mirror) {
+      painter.translate(size.width(), 0);
+      painter.scale(-1, 1);
+    }
+    scene.renderContent(&painter, target, source);
+  };
+
+  QElapsedTimer timer;
+  timer.start();
+  QImage img;
+  if (mCache.openGl) {
+    const QPair<int, int> key(size.width(), size.height());
+    std::shared_ptr<QOpenGLFramebufferObject> fbo = mCacheFbos.value(key);
+    if (!fbo) {
+      if (mCacheFbos.count() >= 8) {
+        mCacheFbos.clear();
+      }
+      QOpenGLFramebufferObjectFormat format;
+      format.setAttachment(QOpenGLFramebufferObject::CombinedDepthStencil);
+      format.setSamples(4);
+      fbo = std::make_shared<QOpenGLFramebufferObject>(size, format);
+      mCacheFbos.insert(key, fbo);
+    }
+    if (fbo->bind()) {
+      {
+        QOpenGLPaintDevice device(size);
+        draw(&device);
+      }
+      fbo->release();
+      sCacheStats.drawNs += sCacheLog ? timer.nsecsElapsed() : 0;
+      timer.restart();
+      img = fbo->toImage();
+      sCacheStats.readNs += sCacheLog ? timer.nsecsElapsed() : 0;
+    }
+  }
+  if (img.isNull()) {
+    img = QImage(size, QImage::Format_RGBA8888_Premultiplied);
+    draw(&img);
+    sCacheStats.drawNs += sCacheLog ? timer.nsecsElapsed() : 0;
+  }
+  return img;
+}
+
+void SlintGraphicsView::storeRegion(const QRect& region, QImage img) noexcept {
+  QElapsedTimer timer;
+  timer.start();
+  if (img.format() != QImage::Format_RGBA8888_Premultiplied) {
+    img.convertTo(QImage::Format_RGBA8888_Premultiplied);
+  }
+  const qint64 convNs = timer.nsecsElapsed();
+  forEachRingSegment(region, mCache.ring.size(),
+                     [&](const QRect& segment, const QPoint& pos) {
+                       copyRows(img, segment, mCache.ring, pos);
+                     });
+  if (sCacheLog) {
+    sCacheStats.regions++;
+    sCacheStats.convNs += convNs;
+    sCacheStats.storeNs += timer.nsecsElapsed() - convNs;
+  }
+}
+
+void SlintGraphicsView::cropRegion(const QRect& region,
+                                   QImage& out) const noexcept {
+  forEachRingSegment(region, mCache.ring.size(),
+                     [&](const QRect& segment, const QPoint& pos) {
+                       copyRows(mCache.ring, QRect(pos, segment.size()), out,
+                                segment.topLeft());
+                     });
+}
+
+void SlintGraphicsView::invalidateRenderCache() noexcept {
+  mRefillTimer->stop();
+  mCache = RenderCache();
+  mCacheScene.clear();
+  mCacheFbos.clear();
+}
+
+void SlintGraphicsView::fitProjection(GraphicsScene& scene,
+                                      const QSize& size) noexcept {
+  const QRectF targetRect(QPoint(0, 0), size);
+  if ((mViewSize != targetRect.size()) &&
+      (mProjection.autoFitInView || mViewSize.isEmpty())) {
+    const QRectF target = targetRect.marginsRemoved(mDefaultMargins);
+    const QRectF initialRect = validateSceneRect(scene.itemsBoundingRect());
+    mProjection.scale =
+        boundedScaleFactor(std::min(target.width() / initialRect.width(),
+                                    target.height() / initialRect.height()));
+    mProjection.offset =
+        initialRect.center() - target.center() / mProjection.scale;
+  }
+}
 
 void SlintGraphicsView::scroll(const QPointF& delta) noexcept {
   Projection projection = mProjection;

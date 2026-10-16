@@ -211,6 +211,7 @@ Board2dTab::Board2dTab(GuiApplication& app, BoardEditor& editor,
 
   // Setup graphics view.
   mView->setEventHandler(this);
+  mView->setRenderCacheEnabled(true);
   mView->setUseOpenGl(mApp.getWorkspace().getSettings().useOpenGl.get());
   connect(
       &mApp.getWorkspace().getSettings().useOpenGl,

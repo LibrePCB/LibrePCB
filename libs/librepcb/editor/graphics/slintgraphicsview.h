@@ -99,6 +99,16 @@ public:
 
   // General Methods
   void setUseOpenGl(bool use) noexcept;
+  /**
+   * @brief Enable the pan cache of this view
+   *
+   * The cache keeps the rendered scene content of the view plus a surrounding
+   * margin, so panning only needs to render the newly exposed areas. Disable
+   * by setting the environment variable `LPCB_RENDER_CACHE` to `0`.
+   *
+   * @param enable  Whether to enable the cache.
+   */
+  void setRenderCacheEnabled(bool enable) noexcept;
   void setEventHandler(IF_GraphicsViewEventHandler* obj) noexcept;
   void setMirror(bool mirror) noexcept;
   slint::Image render(GraphicsScene& scene, float width, float height) noexcept;
@@ -131,7 +141,33 @@ signals:
   void stateChanged();
   void transformChanged();
 
+private:  // Types
+  /**
+   * @brief Pan cache storage
+   *
+   * The image is addressed with wrapped device coordinates (device pixels at
+   * the cached scale, independent of the pan offset), so panning never moves
+   * pixels in memory.
+   */
+  struct RenderCache {
+    QImage ring;  ///< Wrapped storage, size of the view plus margins.
+    QRect valid;  ///< Rendered device rect, always inside ::view plus margins.
+    QRect view;  ///< Device rect of the view at the last frame.
+    qreal scale = 0;
+    bool mirror = false;
+    bool openGl = false;
+    quint64 revision = 0;
+  };
+
 private:  // Methods
+  bool renderCached(GraphicsScene& scene, const QSize& size,
+                    slint::Image& result) noexcept;
+  void refillRenderCache() noexcept;
+  QImage renderRegion(GraphicsScene& scene, const QRect& region) noexcept;
+  void storeRegion(const QRect& region, QImage img) noexcept;
+  void cropRegion(const QRect& region, QImage& out) const noexcept;
+  void invalidateRenderCache() noexcept;
+  void fitProjection(GraphicsScene& scene, const QSize& size) noexcept;
   void scroll(const QPointF& delta) noexcept;
   void zoom(QPointF center, qreal factor) noexcept;
   void smoothTo(const Projection& projection) noexcept;
@@ -146,6 +182,12 @@ private:  // Data
   std::unique_ptr<QOpenGLContext> mGlContext;
   std::unique_ptr<QOpenGLFramebufferObject> mGlFbo;
   QString mGlError;
+  bool mRenderCacheEnabled;
+  RenderCache mCache;
+  QPointer<GraphicsScene> mCacheScene;
+  std::unique_ptr<QTimer> mRefillTimer;
+  QMap<QPair<int, int>, std::shared_ptr<QOpenGLFramebufferObject>>
+      mCacheFbos;
   Projection mProjection;
   QSizeF mViewSize;
   bool mMirror;

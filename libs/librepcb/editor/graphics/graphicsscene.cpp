@@ -37,12 +37,18 @@
 namespace librepcb {
 namespace editor {
 
+// Region reported by changes of the foreground layer only.
+static const QRectF sForegroundRegion(-0.125, -0.125, 0.25, 0.25);
+
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
 
 GraphicsScene::GraphicsScene(QObject* parent) noexcept
   : QGraphicsScene(parent),
+    mContentRevision(0),
+    mSkipForeground(false),
+    mForegroundChangePending(false),
     mGridStyle(GridStyle::None),
     mGridInterval(2540000),
     mBackgroundColor(Qt::white),
@@ -52,7 +58,9 @@ GraphicsScene::GraphicsScene(QObject* parent) noexcept
     mSceneRectMarker(),
     mOriginCrossVisible(true),
     mGrayOut(false),
-    mSelectionRectItem(new QGraphicsRectItem()),
+    mSelectionRect(),
+    mSelectionRectPen(QColor(120, 170, 255, 255), 0),
+    mSelectionRectBrush(QColor(150, 200, 255, 80)),
     mSceneCursorPos(),
     mSceneCursorCross(false),
     mSceneCursorCircle(false),
@@ -61,14 +69,10 @@ GraphicsScene::GraphicsScene(QObject* parent) noexcept
         {-1, LengthUnit::inches(), "", Length(254), Length(0)},
     }),
     mRulerPositions() {
-  mSelectionRectItem->setPen(QPen(QColor(120, 170, 255, 255), 0));
-  mSelectionRectItem->setBrush(QColor(150, 200, 255, 80));
-  mSelectionRectItem->setZValue(1000);
-  QGraphicsScene::addItem(mSelectionRectItem.get());
+  connect(this, &QGraphicsScene::changed, this, &GraphicsScene::handleChanged);
 }
 
 GraphicsScene::~GraphicsScene() noexcept {
-  QGraphicsScene::removeItem(mSelectionRectItem.get());
 }
 
 /*******************************************************************************
@@ -87,7 +91,7 @@ void GraphicsScene::setOverlayColors(const QColor& fill,
                                      const QColor& content) noexcept {
   mOverlayFillColor = fill;
   mOverlayContentColor = content;
-  setForegroundBrush(foregroundBrush());  // this will repaint the foreground
+  notifyForegroundChanged();
 }
 
 void GraphicsScene::setGridStyle(GridStyle style) noexcept {
@@ -107,14 +111,14 @@ void GraphicsScene::setGridInterval(const PositiveLength& interval) noexcept {
 void GraphicsScene::setOriginCrossVisible(bool visible) noexcept {
   if (visible != mOriginCrossVisible) {
     mOriginCrossVisible = visible;
-    setForegroundBrush(foregroundBrush());  // this will repaint the foreground
+    notifyForegroundChanged();
   }
 }
 
 void GraphicsScene::setSceneRectMarker(const QRectF& rect) noexcept {
   if (rect != mSceneRectMarker) {
     mSceneRectMarker = rect;
-    setForegroundBrush(foregroundBrush());  // this will repaint the foreground
+    notifyForegroundChanged();
   }
 }
 
@@ -123,7 +127,7 @@ void GraphicsScene::setSceneCursor(const Point& pos, bool cross,
   mSceneCursorPos = pos;
   mSceneCursorCross = cross;
   mSceneCursorCircle = circle;
-  setForegroundBrush(foregroundBrush());  // this will repaint the foreground
+  notifyForegroundChanged();
 }
 
 /*******************************************************************************
@@ -142,29 +146,32 @@ void GraphicsScene::removeItem(QGraphicsItem& item) noexcept {
 
 void GraphicsScene::setGrayOut(bool grayOut) noexcept {
   mGrayOut = grayOut;
-  update();
+  notifyForegroundChanged();
 }
 
 void GraphicsScene::setSelectionRectColors(const QColor& line,
                                            const QColor& fill) noexcept {
-  mSelectionRectItem->setPen(QPen(line, 0));
-  mSelectionRectItem->setBrush(fill);
+  mSelectionRectPen = QPen(line, 0);
+  mSelectionRectBrush = fill;
+  notifyForegroundChanged();
 }
 
 void GraphicsScene::setSelectionRect(const Point& p1,
                                      const Point& p2) noexcept {
   QRectF rectPx = QRectF(p1.toPxQPointF(), p2.toPxQPointF()).normalized();
-  mSelectionRectItem->setRect(rectPx);
+  mSelectionRect = rectPx;
+  notifyForegroundChanged();
 }
 
 void GraphicsScene::clearSelectionRect() noexcept {
-  mSelectionRectItem->setRect(QRectF());
+  mSelectionRect = QRectF();
+  notifyForegroundChanged();
 }
 
 void GraphicsScene::setRulerPositions(
     const std::optional<std::pair<Point, Point>>& pos) noexcept {
   mRulerPositions = pos;
-  update();
+  notifyForegroundChanged();
 }
 
 QPixmap GraphicsScene::toPixmap(int dpi, const QColor& background) noexcept {
@@ -184,6 +191,26 @@ QPixmap GraphicsScene::toPixmap(const QSize& size,
                          QPainter::SmoothPixmapTransform);
   render(&painter, QRectF(), rect, Qt::KeepAspectRatio);
   return pixmap;
+}
+
+void GraphicsScene::renderContent(QPainter* painter, const QRectF& target,
+                                  const QRectF& source) noexcept {
+  mSkipForeground = true;
+  render(painter, target, source, Qt::KeepAspectRatio);
+  mSkipForeground = false;
+}
+
+void GraphicsScene::renderForeground(QPainter* painter, const QRectF& target,
+                                     const QRectF& source) noexcept {
+  QTransform tf;
+  tf.translate(target.left(), target.top());
+  tf.scale(target.width() / source.width(), target.height() / source.height());
+  tf.translate(-source.left(), -source.top());
+  painter->save();
+  painter->setClipRect(target, Qt::IntersectClip);
+  painter->setWorldTransform(tf, true);
+  drawForeground(painter, source);
+  painter->restore();
 }
 
 /*******************************************************************************
@@ -274,6 +301,10 @@ void GraphicsScene::drawBackground(QPainter* painter,
 
 void GraphicsScene::drawForeground(QPainter* painter,
                                    const QRectF& rect) noexcept {
+  if (mSkipForeground) {
+    return;
+  }
+
   QPen originPen(mGridColor);
   originPen.setWidth(0);
   painter->setPen(originPen);
@@ -292,6 +323,12 @@ void GraphicsScene::drawForeground(QPainter* painter,
     painter->setPen(QPen(mOverlayContentColor, 0));
     painter->drawRect(mSceneRectMarker);
     painter->drawLine(rect.topLeft(), mSceneRectMarker.topLeft());
+  }
+
+  if (!mSelectionRect.isNull()) {
+    painter->setPen(mSelectionRectPen);
+    painter->setBrush(mSelectionRectBrush);
+    painter->drawRect(mSelectionRect);
   }
 
   // If enabled, gray out the whole scene content to improve readability of
@@ -422,6 +459,30 @@ void GraphicsScene::drawForeground(QPainter* painter,
       painter->drawEllipse(pos, r / 2, r / 2);
     }
   }
+}
+
+/*******************************************************************************
+ *  Private Methods
+ ******************************************************************************/
+
+void GraphicsScene::handleChanged(const QList<QRectF>& region) noexcept {
+  if ((region.count() != 1) || (region.first() != sForegroundRegion)) {
+    ++mContentRevision;
+  }
+}
+
+void GraphicsScene::notifyForegroundChanged() noexcept {
+  if (mForegroundChangePending) {
+    return;
+  }
+  mForegroundChangePending = true;
+  QMetaObject::invokeMethod(
+      this,
+      [this]() {
+        mForegroundChangePending = false;
+        emit changed(QList<QRectF>{sForegroundRegion});
+      },
+      Qt::QueuedConnection);
 }
 
 /*******************************************************************************

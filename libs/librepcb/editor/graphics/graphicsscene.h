@@ -109,11 +109,40 @@ public:
   QPixmap toPixmap(const QSize& size,
                    const QColor& background = Qt::transparent) noexcept;
 
+  /**
+   * @brief Get a counter incremented on every change of the scene content
+   *
+   * Changes of the foreground layer (see ::renderForeground()) are not
+   * counted.
+   */
+  quint64 getContentRevision() const noexcept { return mContentRevision; }
+
+  /**
+   * @brief Render the scene content without the foreground layer
+   */
+  void renderContent(QPainter* painter, const QRectF& target,
+                     const QRectF& source) noexcept;
+
+  /**
+   * @brief Render only the foreground layer
+   *
+   * Uses the same source to target mapping as ::renderContent().
+   */
+  void renderForeground(QPainter* painter, const QRectF& target,
+                        const QRectF& source) noexcept;
+
 protected:
   void drawBackground(QPainter* painter, const QRectF& rect) noexcept override;
   void drawForeground(QPainter* painter, const QRectF& rect) noexcept override;
 
 private:
+  void handleChanged(const QList<QRectF>& region) noexcept;
+  void notifyForegroundChanged() noexcept;
+
+private:
+  quint64 mContentRevision;
+  bool mSkipForeground;
+  bool mForegroundChangePending;
   GridStyle mGridStyle;
   PositiveLength mGridInterval;
   QColor mBackgroundColor;
@@ -124,7 +153,10 @@ private:
   bool mOriginCrossVisible;
   bool mGrayOut;
 
-  std::unique_ptr<QGraphicsRectItem> mSelectionRectItem;
+  // Selection rectangle, drawn as part of the foreground layer
+  QRectF mSelectionRect;
+  QPen mSelectionRectPen;
+  QBrush mSelectionRectBrush;
 
   // Overlay scene cursor
   Point mSceneCursorPos;
