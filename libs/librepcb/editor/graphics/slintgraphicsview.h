@@ -104,8 +104,10 @@ public:
    * @brief Enable the pan cache of this view
    *
    * The cache keeps the rendered scene content of the view plus a surrounding
-   * margin, so panning only needs to render the newly exposed areas. Disable
-   * by setting the environment variable `LPCB_RENDER_CACHE` to `0`.
+   * margin, so panning only needs to render the newly exposed areas. While
+   * zooming, the cached pixels are shown scaled until the zoom has settled and
+   * the scene is rendered at the new scale. Disable by setting the environment
+   * variable `LPCB_RENDER_CACHE` to `0`.
    *
    * @param enable  Whether to enable the cache.
    */
@@ -176,6 +178,20 @@ private:  // Methods
   void cropRegion(const QRect& region, QImage& out) const noexcept;
   void applyDirtyRects(GraphicsScene& scene,
                        const QList<QRectF>& dirty) noexcept;
+
+  /**
+   * @brief Draw cached pixels of a different scale as a zoom preview
+   *
+   * @param scene   Scene providing the background color for uncovered areas.
+   * @param view    Device rect of the view at the new scale.
+   * @param scale   New scale.
+   * @param src     Part of ::mCache covering the view, in device pixels at the
+   *                cached scale.
+   * @param out     Image of the view's size to draw into.
+   */
+  void drawZoomPreview(const GraphicsScene& scene, const QRect& view,
+                       qreal scale, const QRectF& src,
+                       QImage& out) const noexcept;
   void invalidateRenderCache() noexcept;
   void fitProjection(GraphicsScene& scene, const QSize& size) noexcept;
   void scroll(const QPointF& delta) noexcept;
@@ -196,6 +212,8 @@ private:  // Data
   RenderCache mCache;
   QPointer<GraphicsScene> mCacheScene;
   std::unique_ptr<QTimer> mRefillTimer;
+  std::unique_ptr<QTimer> mZoomSettleTimer;
+  bool mZoomSettled;
   QMap<QPair<int, int>, std::shared_ptr<QOpenGLFramebufferObject>> mCacheFbos;
   Projection mProjection;
   QSizeF mViewSize;

@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
@@ -56,6 +57,10 @@ static constexpr double sFullViewRenderMs = 50.0;
 // Fraction of the view above which dirty regions are not worth rendering
 // separately from the full view.
 static constexpr double sDirtyAreaLimit = 0.8;
+
+// Idle time after the last zoom step before the scene is rendered at the new
+// scale.
+static constexpr int sZoomSettleMs = 50;
 
 static int wrapIndex(int value, int size) noexcept {
   const int m = value % size;
@@ -145,6 +150,8 @@ struct CacheStats {
   qint64 readNs = 0;
   qint64 convNs = 0;
   qint64 storeNs = 0;
+  int previews = 0;
+  qint64 previewNs = 0;
   int dirtyUpdates = 0;
   int dirtyRects = 0;
   int dirtyFallbacks = 0;
@@ -196,6 +203,9 @@ struct CacheStats {
                .arg(dirtyRects)
                .arg(dirtyFallbacks)
                .arg(avg(dirtyNs, dirtyUpdates), 0, 'f', 2);
+    qInfo().noquote() << QString("RENDER-CACHE zoom previews %1, avg ms %2")
+                             .arg(previews)
+                             .arg(avg(previewNs, previews), 0, 'f', 2);
     qInfo().noquote()
         << QString("RENDER-CACHE mouse-move handler calls %1, avg ms %2")
                .arg(moveCalls)
@@ -222,11 +232,18 @@ SlintGraphicsView::SlintGraphicsView(const QRectF& defaultSceneRect,
     mEventHandler(nullptr),
     mRenderCacheEnabled(false),
     mRefillTimer(new QTimer(this)),
+    mZoomSettleTimer(new QTimer(this)),
+    mZoomSettled(false),
     mMirror(false),
     mAnimation(new QVariantAnimation(this)) {
   mRefillTimer->setSingleShot(true);
   connect(mRefillTimer.get(), &QTimer::timeout, this,
           [this]() { refillRenderCache(); });
+  mZoomSettleTimer->setSingleShot(true);
+  connect(mZoomSettleTimer.get(), &QTimer::timeout, this, [this]() {
+    mZoomSettled = true;
+    emit transformChanged();
+  });
   mAnimation->setDuration(500);
   mAnimation->setEasingCurve(QEasingCurve::InOutCubic);
   connect(mAnimation.get(), &QVariantAnimation::valueChanged, this,
@@ -657,37 +674,57 @@ bool SlintGraphicsView::renderCached(GraphicsScene& scene, const QSize& size,
   const QSize ringSize(size.width() + 2 * margin, size.height() + 2 * margin);
   const QRect window = view.adjusted(-margin, -margin, margin, margin);
 
-  const bool match = (mCache.ring.size() == ringSize) &&
-      (mCache.scale == scale) && (mCache.mirror == mMirror) &&
-      (mCache.openGl == openGl) && (mCacheScene == &scene);
-  if (!match) {
-    if (mCache.ring.size() != ringSize) {
-      mCache.ring = QImage(ringSize, QImage::Format_RGBA8888_Premultiplied);
-    }
-    mCache.valid = QRect();
-    mCache.scale = scale;
-    mCache.mirror = mMirror;
-    mCache.openGl = openGl;
-    mCacheScene = &scene;
+  const bool sameLayout = (mCache.ring.size() == ringSize) &&
+      (mCache.mirror == mMirror) && (mCache.openGl == openGl) &&
+      (mCacheScene == &scene);
+
+  // While zooming, the cached pixels are shown scaled instead of rendering the
+  // scene at every step.
+  QRectF previewSrc;
+  if (sameLayout && (mCache.scale != scale) && (!mZoomSettled)) {
+    const qreal ratio = mCache.scale / scale;
+    previewSrc = QRectF(view.x() * ratio, view.y() * ratio,
+                        view.width() * ratio, view.height() * ratio)
+                     .intersected(QRectF(mCache.valid));
   }
+  const bool preview = (previewSrc.width() >= 1) && (previewSrc.height() >= 1);
 
   bool cold = false;
   bool partial = false;
-  mCache.valid = mCache.valid.intersected(window);
-  mCache.view = view;
-  applyDirtyRects(scene, dirty);
-  if (!mCache.valid.contains(view)) {
-    if (!mCache.valid.intersects(view)) {
-      cold = true;
-      storeRegion(view, renderRegion(scene, view));
-      mCache.valid = view;
-    } else {
-      partial = true;
-      const QRect old = mCache.valid;
-      for (const QRect& piece : subtractRect(view, old)) {
-        storeRegion(piece, renderRegion(scene, piece));
+  if (preview) {
+    mRefillTimer->stop();
+    mZoomSettleTimer->start(sZoomSettleMs);
+  } else {
+    mZoomSettled = false;
+    mZoomSettleTimer->stop();
+    const bool match = sameLayout && (mCache.scale == scale);
+    if (!match) {
+      if (mCache.ring.size() != ringSize) {
+        mCache.ring = QImage(ringSize, QImage::Format_RGBA8888_Premultiplied);
       }
-      mCache.valid = mergeValid(old, view);
+      mCache.valid = QRect();
+      mCache.scale = scale;
+      mCache.mirror = mMirror;
+      mCache.openGl = openGl;
+      mCacheScene = &scene;
+    }
+
+    mCache.valid = mCache.valid.intersected(window);
+    mCache.view = view;
+    applyDirtyRects(scene, dirty);
+    if (!mCache.valid.contains(view)) {
+      if (!mCache.valid.intersects(view)) {
+        cold = true;
+        storeRegion(view, renderRegion(scene, view));
+        mCache.valid = view;
+      } else {
+        partial = true;
+        const QRect old = mCache.valid;
+        for (const QRect& piece : subtractRect(view, old)) {
+          storeRegion(piece, renderRegion(scene, piece));
+        }
+        mCache.valid = mergeValid(old, view);
+      }
     }
   }
   const qint64 renderNs = timer.nsecsElapsed();
@@ -700,7 +737,11 @@ bool SlintGraphicsView::renderCached(GraphicsScene& scene, const QSize& size,
     QImage out(reinterpret_cast<uchar*>(buffer.begin()), size.width(),
                size.height(), size.width() * 4,
                QImage::Format_RGBA8888_Premultiplied);
-    cropRegion(view, out);
+    if (preview) {
+      drawZoomPreview(scene, view, scale, previewSrc, out);
+    } else {
+      cropRegion(view, out);
+    }
     QPainter painter(&out);
     painter.setRenderHints(QPainter::Antialiasing |
                            QPainter::SmoothPixmapTransform);
@@ -715,7 +756,7 @@ bool SlintGraphicsView::renderCached(GraphicsScene& scene, const QSize& size,
   mViewSize = size;
   result = slint::Image(buffer);
 
-  if ((mCache.valid != window) && (!mRefillTimer->isActive())) {
+  if ((!preview) && (mCache.valid != window) && (!mRefillTimer->isActive())) {
     mRefillTimer->start(1);
   }
 
@@ -723,7 +764,10 @@ bool SlintGraphicsView::renderCached(GraphicsScene& scene, const QSize& size,
     sCacheStats.frames++;
     sCacheStats.renderNs += renderNs;
     sCacheStats.composeNs += timer.nsecsElapsed() - renderNs;
-    if (cold) {
+    if (preview) {
+      sCacheStats.previews++;
+      sCacheStats.previewNs += timer.nsecsElapsed();
+    } else if (cold) {
       sCacheStats.cold++;
       sCacheStats.coldNs += renderNs;
     } else if (partial) {
@@ -979,8 +1023,27 @@ void SlintGraphicsView::applyDirtyRects(GraphicsScene& scene,
   }
 }
 
+void SlintGraphicsView::drawZoomPreview(const GraphicsScene& scene,
+                                        const QRect& view, qreal scale,
+                                        const QRectF& src,
+                                        QImage& out) const noexcept {
+  const qreal ratio = mCache.scale / scale;
+  const QRect srcPx = src.toAlignedRect();
+  QImage tmp(srcPx.size(), QImage::Format_RGBA8888_Premultiplied);
+  cropRegion(srcPx, tmp);
+
+  out.fill(scene.backgroundBrush().color());
+  QPainter painter(&out);
+  painter.setRenderHint(QPainter::SmoothPixmapTransform);
+  const QRectF target(src.x() / ratio - view.x(), src.y() / ratio - view.y(),
+                      src.width() / ratio, src.height() / ratio);
+  painter.drawImage(target, tmp, src.translated(-srcPx.topLeft()));
+}
+
 void SlintGraphicsView::invalidateRenderCache() noexcept {
   mRefillTimer->stop();
+  mZoomSettleTimer->stop();
+  mZoomSettled = false;
   mCache = RenderCache();
   mCacheScene.clear();
   mCacheFbos.clear();
