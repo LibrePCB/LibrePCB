@@ -242,14 +242,18 @@ void SchematicGraphicsScene::selectItemsInRect(const Point& p1,
                                                const Point& p2) noexcept {
   GraphicsScene::setSelectionRect(p1, p2);
   const QRectF rectPx = QRectF(p1.toPxQPointF(), p2.toPxQPointF()).normalized();
+  const QSet<const QGraphicsItem*> candidates =
+      getRectSelectionCandidates(rectPx);
   foreach (auto item, mSymbols) {
-    bool selectSymbol = item->mapToScene(item->shape()).intersects(rectPx);
+    bool selectSymbol = candidates.contains(item.get()) &&
+        item->mapToScene(item->shape()).intersects(rectPx);
     // Locked symbol texts shall act as an extended grab area for the symbol.
     if ((!selectSymbol) && (!mContext->ignorePlacementLocks)) {
       for (SI_Text* text : item->getSymbol().getTexts()) {
         if (text->getTextObj().isLocked()) {
           if (auto textItem = mTexts.value(text)) {
-            if (textItem->mapToScene(textItem->shape()).intersects(rectPx)) {
+            if (candidates.contains(textItem.get()) &&
+                textItem->mapToScene(textItem->shape()).intersects(rectPx)) {
               selectSymbol = true;
               break;
             }
@@ -265,28 +269,36 @@ void SchematicGraphicsScene::selectItemsInRect(const Point& p1,
       symbolSelected = symbol->isSelected();
     }
     item->setSelected(symbolSelected ||
-                      item->mapToScene(item->shape()).intersects(rectPx));
+                      (candidates.contains(item.get()) &&
+                       item->mapToScene(item->shape()).intersects(rectPx)));
   }
   foreach (auto item, mBusJunctions) {
-    item->setSelected(item->mapToScene(item->shape()).intersects(rectPx));
+    item->setSelected(candidates.contains(item.get()) &&
+                      item->mapToScene(item->shape()).intersects(rectPx));
   }
   foreach (auto item, mBusLines) {
-    item->setSelected(item->mapToScene(item->shape()).intersects(rectPx));
+    item->setSelected(candidates.contains(item.get()) &&
+                      item->mapToScene(item->shape()).intersects(rectPx));
   }
   foreach (auto item, mBusLabels) {
-    item->setSelected(item->mapToScene(item->shape()).intersects(rectPx));
+    item->setSelected(candidates.contains(item.get()) &&
+                      item->mapToScene(item->shape()).intersects(rectPx));
   }
   foreach (auto item, mNetPoints) {
-    item->setSelected(item->mapToScene(item->shape()).intersects(rectPx));
+    item->setSelected(candidates.contains(item.get()) &&
+                      item->mapToScene(item->shape()).intersects(rectPx));
   }
   foreach (auto item, mNetLines) {
-    item->setSelected(item->mapToScene(item->shape()).intersects(rectPx));
+    item->setSelected(candidates.contains(item.get()) &&
+                      item->mapToScene(item->shape()).intersects(rectPx));
   }
   foreach (auto item, mNetLabels) {
-    item->setSelected(item->mapToScene(item->shape()).intersects(rectPx));
+    item->setSelected(candidates.contains(item.get()) &&
+                      item->mapToScene(item->shape()).intersects(rectPx));
   }
   foreach (auto item, mPolygons) {
-    item->setSelected(item->mapToScene(item->shape()).intersects(rectPx));
+    item->setSelected(candidates.contains(item.get()) &&
+                      item->mapToScene(item->shape()).intersects(rectPx));
   }
   foreach (auto item, mTexts) {
     auto symbol = item->getSymbolGraphicsItem().lock();
@@ -294,11 +306,13 @@ void SchematicGraphicsScene::selectItemsInRect(const Point& p1,
       item->setSelected(true);
     } else if ((!item->getText().getTextObj().isLocked()) ||
                mContext->ignorePlacementLocks) {
-      item->setSelected(item->mapToScene(item->shape()).intersects(rectPx));
+      item->setSelected(candidates.contains(item.get()) &&
+                        item->mapToScene(item->shape()).intersects(rectPx));
     }
   }
   foreach (auto item, mImages) {
-    item->setSelected(item->mapToScene(item->shape()).intersects(rectPx));
+    item->setSelected(candidates.contains(item.get()) &&
+                      item->mapToScene(item->shape()).intersects(rectPx));
   }
 }
 

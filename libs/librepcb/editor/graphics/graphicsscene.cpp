@@ -190,6 +190,20 @@ QPixmap GraphicsScene::toPixmap(const QSize& size,
  *  Protected Methods
  ******************************************************************************/
 
+QSet<const QGraphicsItem*> GraphicsScene::getRectSelectionCandidates(
+    const QRectF& rectPx) const noexcept {
+  QSet<const QGraphicsItem*> candidates;
+  foreach (const QGraphicsItem* item,
+           items(rectPx, Qt::IntersectsItemBoundingRect)) {
+    // Group items don't report the bounds of their children, so every
+    // ancestor of a hit item is a candidate as well.
+    for (; item && (!candidates.contains(item)); item = item->parentItem()) {
+      candidates.insert(item);
+    }
+  }
+  return candidates;
+}
+
 void GraphicsScene::drawBackground(QPainter* painter,
                                    const QRectF& rect) noexcept {
   QPen gridPen(mGridColor);
