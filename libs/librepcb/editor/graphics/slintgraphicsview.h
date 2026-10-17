@@ -155,11 +155,12 @@ signals:
   void transformChanged();
 
 private:  // Methods
-  bool renderCached(GraphicsScene& scene, const QSize& size,
-                    slint::Image& result) noexcept;
-  QImage renderCacheRegion(GraphicsScene& scene,
-                           const QTransform& sceneToDevice,
-                           const QSize& size) noexcept;
+  QImage renderContentSurface(GraphicsScene& scene,
+                              const QTransform& sceneToDevice,
+                              const QSize& size,
+                              QString* error = nullptr) noexcept;
+  std::shared_ptr<QOpenGLFramebufferObject> acquireFbo(
+      const QSize& size) noexcept;
   void invalidateRenderCache() noexcept;
   void fitProjection(GraphicsScene& scene, const QSize& size) noexcept;
   void scroll(const QPointF& delta) noexcept;
@@ -174,11 +175,10 @@ private:  // Data
   IF_GraphicsViewEventHandler* mEventHandler;
   std::unique_ptr<QOffscreenSurface> mGlSurface;
   std::unique_ptr<QOpenGLContext> mGlContext;
-  std::unique_ptr<QOpenGLFramebufferObject> mGlFbo;
   QString mGlError;
   bool mRenderCacheEnabled;
   std::unique_ptr<RenderCache> mRenderCache;
-  QMap<QPair<int, int>, std::shared_ptr<QOpenGLFramebufferObject>> mCacheFbos;
+  QMap<QPair<int, int>, std::shared_ptr<QOpenGLFramebufferObject>> mFbos;
   Projection mProjection;
   QSizeF mViewSize;
   bool mMirror;

@@ -55,6 +55,18 @@ static QTransform viewTransform(qreal scale, const QPointF& offset, bool mirror,
   return tf;
 }
 
+// Limits of the surfaces kept for rendering, both by count and total size.
+static const int sMaxFbos = 32;
+static const qint64 sMaxFboPixels = 12 * 1000 * 1000;
+
+static void paintContent(QPaintDevice* device, GraphicsScene& scene,
+                         const QSize& size,
+                         const QTransform& sceneToDevice) noexcept {
+  QPainter painter(device);
+  painter.setRenderHints(sRenderHints);
+  scene.renderContent(&painter, size, sceneToDevice);
+}
+
 static std::unique_ptr<QOpenGLFramebufferObject> createFbo(const QSize& size) {
   QOpenGLFramebufferObjectFormat format;
   format.setAttachment(QOpenGLFramebufferObject::CombinedDepthStencil);
@@ -83,7 +95,7 @@ SlintGraphicsView::SlintGraphicsView(const QRectF& defaultSceneRect,
     mRenderCache(new RenderCache(
         [this](GraphicsScene& scene, const QTransform& sceneToDevice,
                const QSize& size) {
-          return renderCacheRegion(scene, sceneToDevice, size);
+          return renderContentSurface(scene, sceneToDevice, size);
         },
         [this]() {
           // The owner renders again in response to this signal.
@@ -157,7 +169,8 @@ void SlintGraphicsView::setUseOpenGl(bool use) noexcept {
     emit transformChanged();
   } else if ((!use) && mGlSurface) {
     invalidateRenderCache();
-    mGlFbo.reset();
+    mGlContext->makeCurrent(mGlSurface.get());
+    mFbos.clear();
     mGlContext.reset();
     mGlSurface.reset();
     mGlError.clear();
@@ -179,6 +192,7 @@ void SlintGraphicsView::releaseResources() noexcept {
     mGlContext->makeCurrent(mGlSurface.get());
   }
   invalidateRenderCache();
+  mFbos.clear();
 }
 
 void SlintGraphicsView::setEventHandler(
@@ -200,62 +214,66 @@ slint::Image SlintGraphicsView::render(GraphicsScene& scene, float width,
     return slint::Image();
   }
 
-  if (mRenderCacheEnabled) {
-    slint::Image cached;
-    if (renderCached(scene, size, cached)) {
-      return cached;
-    }
-  }
+  fitProjection(scene, size);
+  const qreal scale = mProjection.scale;
 
-  // If OpenGL is activated, enable context and prepare FBO.
-  QString openGlError = mGlError;
-  if (mGlSurface && mGlContext && openGlError.isEmpty()) {
-    if (!mGlContext->makeCurrent(mGlSurface.get())) {
-      openGlError = "Failed to make OpenGL context current.";
-    }
-    if (openGlError.isEmpty() && ((!mGlFbo) || (mGlFbo->size() != size))) {
-      mGlFbo.reset();  // Release memory first.
-      mGlFbo = createFbo(size);
-    }
-    if (openGlError.isEmpty() && (!mGlFbo->bind())) {
-      openGlError = "Failed to bind OpenGL FBO.";
-    }
-  }
-
-  QPixmap pixmap(size);
+  slint::SharedPixelBuffer<slint::Rgba8Pixel> buffer(
+      static_cast<uint32_t>(size.width()),
+      static_cast<uint32_t>(size.height()));
   {
-    std::unique_ptr<QOpenGLPaintDevice> glDev;
-    if (mGlFbo && openGlError.isEmpty()) {
-      glDev = std::make_unique<QOpenGLPaintDevice>(size);
+    QImage out(reinterpret_cast<uchar*>(buffer.begin()), size.width(),
+               size.height(), size.width() * 4,
+               QImage::Format_RGBA8888_Premultiplied);
+
+    // Get the scene content, preferably from the cache.
+    QPointF offset = mProjection.offset;
+    QString error = mGlError;
+    bool rendered = false;
+    QPoint pos;
+    if (mRenderCacheEnabled && RenderCache::snapPos(offset * scale, pos)) {
+      const QTransform sceneToCache =
+          QTransform::fromScale(mMirror ? -scale : scale, scale);
+      const QRect viewRect(
+          QPoint(mMirror ? (-pos.x() - size.width()) : pos.x(), pos.y()),
+          size);
+      rendered = mRenderCache->render(scene, sceneToCache, viewRect,
+                                      scene.getBackgroundColor(), out);
+      if (rendered) {
+        offset = QPointF(pos) / scale;
+      }
     }
-    QPainter painter(glDev ? static_cast<QPaintDevice*>(glDev.get())
-                           : static_cast<QPaintDevice*>(&pixmap));
+    if (!rendered) {
+      const QTransform tf =
+          viewTransform(scale, offset, mMirror, size.width());
+      QImage content = renderContentSurface(scene, tf, size, &error);
+      if (content.isNull()) {
+        content = QImage(size, QImage::Format_RGBA8888_Premultiplied);
+        paintContent(&content, scene, size, tf);
+      }
+      if (content.format() != QImage::Format_RGBA8888_Premultiplied) {
+        content.convertTo(QImage::Format_RGBA8888_Premultiplied);
+      }
+      QPainter painter(&out);
+      painter.setCompositionMode(QPainter::CompositionMode_Source);
+      painter.drawImage(0, 0, content);
+    }
+
+    // The foreground layer is drawn on top of the content every frame.
+    QPainter painter(&out);
     painter.setRenderHints(sRenderHints);
-    const QRectF targetRect(QPoint(0, 0), size);
-    fitProjection(scene, size);
-    const QTransform tf = viewTransform(mProjection.scale, mProjection.offset,
-                                        mMirror, size.width());
-    scene.renderContent(&painter, size, tf);
-    scene.renderForeground(&painter, size, tf);
+    scene.renderForeground(&painter, size,
+                           viewTransform(scale, offset, mMirror, size.width()));
 
     // If there was an OpenGL error, print it at the bottom right.
-    if (!openGlError.isEmpty()) {
+    if (!error.isEmpty()) {
       painter.setPen(Qt::red);
       painter.drawText(size.width() - 5, size.height() - 5, 0, 0,
                        Qt::AlignRight | Qt::AlignBottom | Qt::TextDontClip,
-                       openGlError);
+                       error);
     }
-
-    mViewSize = targetRect.size();
   }
-
-  // OpenGl mode: Release FBO and fetch framebuffer content.
-  if (mGlFbo && openGlError.isEmpty()) {
-    mGlFbo->release();
-    pixmap = QPixmap::fromImage(mGlFbo->toImage());
-  }
-
-  return q2s(pixmap);
+  mViewSize = size;
+  return slint::Image(buffer);
 }
 
 void SlintGraphicsView::pointerEvent(
@@ -468,94 +486,60 @@ QMarginsF SlintGraphicsView::defaultEditorMargins() noexcept {
  *  Private Methods
  ******************************************************************************/
 
-bool SlintGraphicsView::renderCached(GraphicsScene& scene, const QSize& size,
-                                     slint::Image& result) noexcept {
-  const bool openGl = mGlSurface && mGlContext;
-  if (openGl &&
-      ((!mGlError.isEmpty()) || (!mGlContext->makeCurrent(mGlSurface.get())))) {
-    return false;
-  }
-
-  fitProjection(scene, size);
-
-  const qreal scale = mProjection.scale;
-  QPoint pos;
-  if (!RenderCache::snapPos(mProjection.offset * scale, pos)) {
-    return false;
-  }
-  const QPointF offset(pos.x() / scale, pos.y() / scale);
-
-  // Cache space is the scaled and optionally mirrored scene, without panning.
-  const QTransform sceneToCache =
-      QTransform::fromScale(mMirror ? -scale : scale, scale);
-  const QRect viewRect(
-      QPoint(mMirror ? (-pos.x() - size.width()) : pos.x(), pos.y()), size);
-
-  slint::SharedPixelBuffer<slint::Rgba8Pixel> buffer(
-      static_cast<uint32_t>(size.width()),
-      static_cast<uint32_t>(size.height()));
-  {
-    QImage out(reinterpret_cast<uchar*>(buffer.begin()), size.width(),
-               size.height(), size.width() * 4,
-               QImage::Format_RGBA8888_Premultiplied);
-    if (!mRenderCache->render(scene, sceneToCache, viewRect,
-                              scene.getBackgroundColor(), out)) {
-      return false;
-    }
-
-    // The foreground layer is drawn on top of the cached content every frame.
-    QPainter painter(&out);
-    painter.setRenderHints(sRenderHints);
-    scene.renderForeground(&painter, size,
-                           viewTransform(scale, offset, mMirror, size.width()));
-  }
-  mViewSize = size;
-  result = slint::Image(buffer);
-  return true;
-}
-
-QImage SlintGraphicsView::renderCacheRegion(GraphicsScene& scene,
-                                            const QTransform& sceneToDevice,
-                                            const QSize& size) noexcept {
-  auto paint = [&](QPaintDevice* device) {
-    QPainter painter(device);
-    painter.setRenderHints(sRenderHints);
-    scene.renderContent(&painter, size, sceneToDevice);
-  };
-
-  QImage img;
+QImage SlintGraphicsView::renderContentSurface(
+    GraphicsScene& scene, const QTransform& sceneToDevice, const QSize& size,
+    QString* error) noexcept {
   if (mGlSurface && mGlContext) {
-    if ((!mGlError.isEmpty()) || (!mGlContext->makeCurrent(mGlSurface.get()))) {
+    QString glError = mGlError;
+    if (glError.isEmpty() && (!mGlContext->makeCurrent(mGlSurface.get()))) {
+      glError = "Failed to make OpenGL context current.";
+    }
+    std::shared_ptr<QOpenGLFramebufferObject> fbo;
+    if (glError.isEmpty()) {
+      fbo = acquireFbo(size);
+      if (!fbo->bind()) {
+        glError = "Failed to bind OpenGL FBO.";
+      }
+    }
+    if (!glError.isEmpty()) {
+      if (error) {
+        *error = glError;
+      }
       return QImage();
     }
-    const QPair<int, int> key(size.width(), size.height());
-    std::shared_ptr<QOpenGLFramebufferObject> fbo = mCacheFbos.value(key);
-    if (!fbo) {
-      if (mCacheFbos.count() >= 32) {
-        mCacheFbos.clear();
-      }
-      fbo = createFbo(size);
-      mCacheFbos.insert(key, fbo);
+    {
+      QOpenGLPaintDevice device(size);
+      paintContent(&device, scene, size, sceneToDevice);
     }
-    if (fbo->bind()) {
-      {
-        QOpenGLPaintDevice device(size);
-        paint(&device);
-      }
-      fbo->release();
-      img = fbo->toImage();
-    }
+    fbo->release();
+    return fbo->toImage();
   }
-  if (img.isNull()) {
-    img = QImage(size, QImage::Format_RGBA8888_Premultiplied);
-    paint(&img);
-  }
+
+  QImage img(size, QImage::Format_RGBA8888_Premultiplied);
+  paintContent(&img, scene, size, sceneToDevice);
   return img;
+}
+
+std::shared_ptr<QOpenGLFramebufferObject> SlintGraphicsView::acquireFbo(
+    const QSize& size) noexcept {
+  const QPair<int, int> key(size.width(), size.height());
+  std::shared_ptr<QOpenGLFramebufferObject> fbo = mFbos.value(key);
+  if (!fbo) {
+    qint64 pixels = static_cast<qint64>(size.width()) * size.height();
+    for (const auto& f : mFbos) {
+      pixels += static_cast<qint64>(f->width()) * f->height();
+    }
+    if ((mFbos.count() >= sMaxFbos) || (pixels > sMaxFboPixels)) {
+      mFbos.clear();  // Release memory first.
+    }
+    fbo = createFbo(size);
+    mFbos.insert(key, fbo);
+  }
+  return fbo;
 }
 
 void SlintGraphicsView::invalidateRenderCache() noexcept {
   mRenderCache->invalidate();
-  mCacheFbos.clear();
 }
 
 void SlintGraphicsView::fitProjection(GraphicsScene& scene,

@@ -218,6 +218,10 @@ void GraphicsScene::renderForeground(QPainter* painter, const QSize& size,
   painter->restore();
 }
 
+/*******************************************************************************
+ *  Protected Methods
+ ******************************************************************************/
+
 void GraphicsScene::drawBackground(QPainter* painter,
                                    const QRectF& rect) noexcept {
   QPen gridPen(mGridColor);
@@ -238,7 +242,7 @@ void GraphicsScene::drawBackground(QPainter* painter,
   while (gridIntervalPixels * lod < 7) {
     gridIntervalPixels *= 10;
   }
-  // Cover grid points just outside the rect whose extent reaches into it.
+  // Cover grid points just outside the rect to avoid partial dots at seams
   const qreal margin = 2 / lod;
   qreal left, right, top, bottom;
   left =
