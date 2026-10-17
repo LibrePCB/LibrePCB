@@ -24,6 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include "graphicsscene.h"
+#include "rendercache.h"
 
 #include <librepcb/core/types/point.h>
 
@@ -152,46 +153,11 @@ signals:
   void stateChanged();
   void transformChanged();
 
-private:  // Types
-  /**
-   * @brief Pan cache storage
-   *
-   * The image is addressed with wrapped device coordinates (device pixels at
-   * the cached scale, independent of the pan offset), so panning never moves
-   * pixels in memory.
-   */
-  struct RenderCache {
-    QImage ring;  ///< Wrapped storage, size of the view plus margins.
-    QRect valid;  ///< Rendered device rect, always inside ::view plus margins.
-    QRect view;  ///< Device rect of the view at the last frame.
-    qreal scale = 0;
-    bool mirror = false;
-    bool openGl = false;
-  };
-
 private:  // Methods
   bool renderCached(GraphicsScene& scene, const QSize& size,
                     slint::Image& result) noexcept;
-  void refillRenderCache() noexcept;
-  QImage renderRegion(GraphicsScene& scene, const QRect& region) noexcept;
-  void storeRegion(const QRect& region, QImage img) noexcept;
-  void cropRegion(const QRect& region, QImage& out) const noexcept;
-  void applyDirtyRects(GraphicsScene& scene,
-                       const QList<QRectF>& dirty) noexcept;
-
-  /**
-   * @brief Draw cached pixels of a different scale as a zoom preview
-   *
-   * @param scene   Scene providing the background color for uncovered areas.
-   * @param view    Device rect of the view at the new scale.
-   * @param scale   New scale.
-   * @param src     Part of ::mCache covering the view, in device pixels at the
-   *                cached scale.
-   * @param out     Image of the view's size to draw into.
-   */
-  void drawZoomPreview(const GraphicsScene& scene, const QRect& view,
-                       qreal scale, const QRectF& src,
-                       QImage& out) const noexcept;
+  QImage renderCacheSurface(const QSize& size,
+                            const RenderCache::PaintFunction& paint) noexcept;
   void invalidateRenderCache() noexcept;
   void fitProjection(GraphicsScene& scene, const QSize& size) noexcept;
   void scroll(const QPointF& delta) noexcept;
@@ -209,11 +175,7 @@ private:  // Data
   std::unique_ptr<QOpenGLFramebufferObject> mGlFbo;
   QString mGlError;
   bool mRenderCacheEnabled;
-  RenderCache mCache;
-  QPointer<GraphicsScene> mCacheScene;
-  std::unique_ptr<QTimer> mRefillTimer;
-  std::unique_ptr<QTimer> mZoomSettleTimer;
-  bool mZoomSettled;
+  std::unique_ptr<RenderCache> mRenderCache;
   QMap<QPair<int, int>, std::shared_ptr<QOpenGLFramebufferObject>> mCacheFbos;
   Projection mProjection;
   QSizeF mViewSize;

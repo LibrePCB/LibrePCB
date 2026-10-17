@@ -28,7 +28,6 @@
 #include <QtCore>
 
 #include <algorithm>
-#include <cstring>
 #include <memory>
 
 /*******************************************************************************
@@ -45,93 +44,6 @@ static qreal boundedScaleFactor(qreal scale) noexcept {
   return qBound(qreal(0.001), scale, qreal(5000));
 }
 
-static constexpr int sCacheMargin = 256;
-static constexpr int sCacheQuantum = 64;
-
-// Estimated cost model to choose between rendering separate dirty regions or
-// their bounding box.
-static constexpr double sDirtyRegionOverheadMs = 1.5;
-static constexpr double sFullViewRenderMs = 50.0;
-
-// Fraction of the view above which dirty regions are not worth rendering
-// separately from the full view.
-static constexpr double sDirtyAreaLimit = 0.8;
-
-// Idle time after the last zoom step before the scene is rendered at the new
-// scale.
-static constexpr int sZoomSettleMs = 50;
-
-static int wrapIndex(int value, int size) noexcept {
-  const int m = value % size;
-  return (m < 0) ? (m + size) : m;
-}
-
-// Splits a rect of the wrapped device space into contiguous ring segments and
-// calls f(segment relative to rect, ring position) for each of them.
-template <typename F>
-static void forEachRingSegment(const QRect& rect, const QSize& ring, F&& f) {
-  for (int y = 0; y < rect.height();) {
-    const int ry = wrapIndex(rect.y() + y, ring.height());
-    const int h = std::min(rect.height() - y, ring.height() - ry);
-    for (int x = 0; x < rect.width();) {
-      const int rx = wrapIndex(rect.x() + x, ring.width());
-      const int w = std::min(rect.width() - x, ring.width() - rx);
-      f(QRect(x, y, w, h), QPoint(rx, ry));
-      x += w;
-    }
-    y += h;
-  }
-}
-
-static void copyRows(const QImage& src, const QRect& srcRect, QImage& dst,
-                     const QPoint& dstPos) noexcept {
-  for (int row = 0; row < srcRect.height(); ++row) {
-    std::memcpy(dst.scanLine(dstPos.y() + row) + dstPos.x() * 4,
-                src.constScanLine(srcRect.y() + row) + srcRect.x() * 4,
-                static_cast<size_t>(srcRect.width()) * 4);
-  }
-}
-
-// Parts of outer which are not covered by inner.
-static QList<QRect> subtractRect(const QRect& outer,
-                                 const QRect& inner) noexcept {
-  const QRect i = outer.intersected(inner);
-  QList<QRect> pieces;
-  if (i.isEmpty()) {
-    pieces.append(outer);
-    return pieces;
-  }
-  const int x0 = outer.x(), x1 = outer.x() + outer.width();
-  const int y0 = outer.y(), y1 = outer.y() + outer.height();
-  const int ix0 = i.x(), ix1 = i.x() + i.width();
-  const int iy0 = i.y(), iy1 = i.y() + i.height();
-  if (iy0 > y0) pieces.append(QRect(x0, y0, x1 - x0, iy0 - y0));
-  if (y1 > iy1) pieces.append(QRect(x0, iy1, x1 - x0, y1 - iy1));
-  if (ix0 > x0) pieces.append(QRect(x0, iy0, ix0 - x0, iy1 - iy0));
-  if (x1 > ix1) pieces.append(QRect(ix1, iy0, x1 - ix1, iy1 - iy0));
-  return pieces;
-}
-
-// Largest rect covered by the union of two overlapping rects which contains
-// the second one.
-static QRect mergeValid(const QRect& old, const QRect& view) noexcept {
-  QRect best = view;
-  auto area = [](const QRect& r) {
-    return static_cast<qint64>(r.width()) * r.height();
-  };
-  if ((view.top() >= old.top()) && (view.bottom() <= old.bottom())) {
-    const QRect r(QPoint(std::min(old.left(), view.left()), view.top()),
-                  QPoint(std::max(old.right(), view.right()), view.bottom()));
-    if (area(r) > area(best)) best = r;
-  }
-  if ((view.left() >= old.left()) && (view.right() <= old.right())) {
-    const QRect r(QPoint(view.left(), std::min(old.top(), view.top())),
-                  QPoint(view.right(), std::max(old.bottom(), view.bottom())));
-    if (area(r) > area(best)) best = r;
-  }
-  return best;
-}
-
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
@@ -144,19 +56,13 @@ SlintGraphicsView::SlintGraphicsView(const QRectF& defaultSceneRect,
     mDefaultMargins(defaultMargins),
     mEventHandler(nullptr),
     mRenderCacheEnabled(false),
-    mRefillTimer(new QTimer(this)),
-    mZoomSettleTimer(new QTimer(this)),
-    mZoomSettled(false),
+    mRenderCache(new RenderCache(
+        [this](const QSize& size, const RenderCache::PaintFunction& paint) {
+          return renderCacheSurface(size, paint);
+        },
+        [this]() { emit transformChanged(); })),
     mMirror(false),
     mAnimation(new QVariantAnimation(this)) {
-  mRefillTimer->setSingleShot(true);
-  connect(mRefillTimer.get(), &QTimer::timeout, this,
-          [this]() { refillRenderCache(); });
-  mZoomSettleTimer->setSingleShot(true);
-  connect(mZoomSettleTimer.get(), &QTimer::timeout, this, [this]() {
-    mZoomSettled = true;
-    emit transformChanged();
-  });
   mAnimation->setDuration(500);
   mAnimation->setEasingCurve(QEasingCurve::InOutCubic);
   connect(mAnimation.get(), &QVariantAnimation::valueChanged, this,
@@ -556,10 +462,6 @@ bool SlintGraphicsView::renderCached(GraphicsScene& scene, const QSize& size,
     return false;
   }
 
-  // Deliver pending scene change notifications to get the current changes.
-  QCoreApplication::sendPostedEvents(&scene, QEvent::MetaCall);
-  QList<QRectF> dirty;
-  dirty = scene.takeDirtyRects();
   fitProjection(scene, size);
 
   const qreal scale = mProjection.scale;
@@ -572,63 +474,7 @@ bool SlintGraphicsView::renderCached(GraphicsScene& scene, const QSize& size,
   const QPoint pos(qRound(mProjection.offset.x() * scale),
                    qRound(mProjection.offset.y() * scale));
   const QPointF offset(pos.x() / scale, pos.y() / scale);
-  const QRect view(
-      QPoint(mMirror ? (-pos.x() - size.width()) : pos.x(), pos.y()), size);
-  const int margin = sCacheMargin;
-  const QSize ringSize(size.width() + 2 * margin, size.height() + 2 * margin);
-  const QRect window = view.adjusted(-margin, -margin, margin, margin);
 
-  const bool sameLayout = (mCache.ring.size() == ringSize) &&
-      (mCache.mirror == mMirror) && (mCache.openGl == openGl) &&
-      (mCacheScene == &scene);
-
-  // While zooming, the cached pixels are shown scaled instead of rendering the
-  // scene at every step.
-  QRectF previewSrc;
-  if (sameLayout && (mCache.scale != scale) && (!mZoomSettled)) {
-    const qreal ratio = mCache.scale / scale;
-    previewSrc = QRectF(view.x() * ratio, view.y() * ratio,
-                        view.width() * ratio, view.height() * ratio)
-                     .intersected(QRectF(mCache.valid));
-  }
-  const bool preview = (previewSrc.width() >= 1) && (previewSrc.height() >= 1);
-
-  if (preview) {
-    mRefillTimer->stop();
-    mZoomSettleTimer->start(sZoomSettleMs);
-  } else {
-    mZoomSettled = false;
-    mZoomSettleTimer->stop();
-    const bool match = sameLayout && (mCache.scale == scale);
-    if (!match) {
-      if (mCache.ring.size() != ringSize) {
-        mCache.ring = QImage(ringSize, QImage::Format_RGBA8888_Premultiplied);
-      }
-      mCache.valid = QRect();
-      mCache.scale = scale;
-      mCache.mirror = mMirror;
-      mCache.openGl = openGl;
-      mCacheScene = &scene;
-    }
-
-    mCache.valid = mCache.valid.intersected(window);
-    mCache.view = view;
-    applyDirtyRects(scene, dirty);
-    if (!mCache.valid.contains(view)) {
-      if (!mCache.valid.intersects(view)) {
-        storeRegion(view, renderRegion(scene, view));
-        mCache.valid = view;
-      } else {
-        const QRect old = mCache.valid;
-        for (const QRect& piece : subtractRect(view, old)) {
-          storeRegion(piece, renderRegion(scene, piece));
-        }
-        mCache.valid = mergeValid(old, view);
-      }
-    }
-  }
-
-  // The foreground layer is drawn on top of the cached content every frame.
   slint::SharedPixelBuffer<slint::Rgba8Pixel> buffer(
       static_cast<uint32_t>(size.width()),
       static_cast<uint32_t>(size.height()));
@@ -636,11 +482,11 @@ bool SlintGraphicsView::renderCached(GraphicsScene& scene, const QSize& size,
     QImage out(reinterpret_cast<uchar*>(buffer.begin()), size.width(),
                size.height(), size.width() * 4,
                QImage::Format_RGBA8888_Premultiplied);
-    if (preview) {
-      drawZoomPreview(scene, view, scale, previewSrc, out);
-    } else {
-      cropRegion(view, out);
+    if (!mRenderCache->render(scene, pos, size, scale, mMirror, out)) {
+      return false;
     }
+
+    // The foreground layer is drawn on top of the cached content every frame.
     QPainter painter(&out);
     painter.setRenderHints(QPainter::Antialiasing |
                            QPainter::SmoothPixmapTransform);
@@ -654,89 +500,16 @@ bool SlintGraphicsView::renderCached(GraphicsScene& scene, const QSize& size,
   }
   mViewSize = size;
   result = slint::Image(buffer);
-
-  if ((!preview) && (mCache.valid != window) && (!mRefillTimer->isActive())) {
-    mRefillTimer->start(1);
-  }
   return true;
 }
 
-void SlintGraphicsView::refillRenderCache() noexcept {
-  GraphicsScene* scene = mCacheScene.data();
-  if ((!scene) || (!mRenderCacheEnabled) || mCache.valid.isEmpty()) {
-    return;
-  }
-  if (mGlSurface && mGlContext &&
-      ((!mGlError.isEmpty()) || (!mGlContext->makeCurrent(mGlSurface.get())))) {
-    return;
-  }
-  QCoreApplication::sendPostedEvents(scene, QEvent::MetaCall);
-  QList<QRectF> dirty;
-  dirty = scene->takeDirtyRects();
-  applyDirtyRects(*scene, dirty);
-  if (mCache.valid.isEmpty()) {
-    return;
-  }
-
-  const int margin = sCacheMargin;
-  const QRect window = mCache.view.adjusted(-margin, -margin, margin, margin);
-  const QRect v = mCache.valid;
-  const int gaps[4] = {
-      v.left() - window.left(),  // Left.
-      window.right() - v.right(),  // Right.
-      v.top() - window.top(),  // Top.
-      window.bottom() - v.bottom(),  // Bottom.
-  };
-  const int side = static_cast<int>(std::max_element(gaps, gaps + 4) - gaps);
-  const int thickness = std::min(gaps[side], sCacheQuantum);
-  if (thickness <= 0) {
-    return;
-  }
-  QRect chunk;
-  switch (side) {
-    case 0:
-      chunk = QRect(v.left() - thickness, v.top(), thickness, v.height());
-      break;
-    case 1:
-      chunk = QRect(v.right() + 1, v.top(), thickness, v.height());
-      break;
-    case 2:
-      chunk = QRect(v.left(), v.top() - thickness, v.width(), thickness);
-      break;
-    default:
-      chunk = QRect(v.left(), v.bottom() + 1, v.width(), thickness);
-      break;
-  }
-  storeRegion(chunk, renderRegion(*scene, chunk));
-  mCache.valid = v.united(chunk);
-
-  if (mCache.valid != window) {
-    mRefillTimer->start(1);
-  }
-}
-
-QImage SlintGraphicsView::renderRegion(GraphicsScene& scene,
-                                       const QRect& region) noexcept {
-  const qreal scale = mCache.scale;
-  const QSize size = region.size();
-  const QRectF target(QPointF(0, 0), size);
-  const QRectF source(mCache.mirror ? (-(region.x() + region.width()) / scale)
-                                    : (region.x() / scale),
-                      region.y() / scale, region.width() / scale,
-                      region.height() / scale);
-  auto draw = [&](QPaintDevice* device) {
-    QPainter painter(device);
-    painter.setRenderHints(QPainter::Antialiasing |
-                           QPainter::SmoothPixmapTransform);
-    if (mCache.mirror) {
-      painter.translate(size.width(), 0);
-      painter.scale(-1, 1);
-    }
-    scene.renderContent(&painter, target, source);
-  };
-
+QImage SlintGraphicsView::renderCacheSurface(
+    const QSize& size, const RenderCache::PaintFunction& paint) noexcept {
   QImage img;
-  if (mCache.openGl) {
+  if (mGlSurface && mGlContext) {
+    if ((!mGlError.isEmpty()) || (!mGlContext->makeCurrent(mGlSurface.get()))) {
+      return QImage();
+    }
     const QPair<int, int> key(size.width(), size.height());
     std::shared_ptr<QOpenGLFramebufferObject> fbo = mCacheFbos.value(key);
     if (!fbo) {
@@ -752,7 +525,7 @@ QImage SlintGraphicsView::renderRegion(GraphicsScene& scene,
     if (fbo->bind()) {
       {
         QOpenGLPaintDevice device(size);
-        draw(&device);
+        paint(&device);
       }
       fbo->release();
       img = fbo->toImage();
@@ -760,146 +533,13 @@ QImage SlintGraphicsView::renderRegion(GraphicsScene& scene,
   }
   if (img.isNull()) {
     img = QImage(size, QImage::Format_RGBA8888_Premultiplied);
-    draw(&img);
+    paint(&img);
   }
   return img;
 }
 
-void SlintGraphicsView::storeRegion(const QRect& region, QImage img) noexcept {
-  if (img.format() != QImage::Format_RGBA8888_Premultiplied) {
-    img.convertTo(QImage::Format_RGBA8888_Premultiplied);
-  }
-  forEachRingSegment(region, mCache.ring.size(),
-                     [&](const QRect& segment, const QPoint& pos) {
-                       copyRows(img, segment, mCache.ring, pos);
-                     });
-}
-
-void SlintGraphicsView::cropRegion(const QRect& region,
-                                   QImage& out) const noexcept {
-  forEachRingSegment(region, mCache.ring.size(),
-                     [&](const QRect& segment, const QPoint& pos) {
-                       copyRows(mCache.ring, QRect(pos, segment.size()), out,
-                                segment.topLeft());
-                     });
-}
-
-void SlintGraphicsView::applyDirtyRects(GraphicsScene& scene,
-                                        const QList<QRectF>& dirty) noexcept {
-  if (mCache.valid.isEmpty() || dirty.isEmpty()) {
-    return;
-  }
-
-  const qreal scale = mCache.scale;
-  const qreal limit = 1e8;
-  const int pad = 2;
-  const int align = 32;
-  auto toDevice = [&](const QRectF& r) {
-    const qreal x0 =
-        qBound(-limit, (mCache.mirror ? -r.right() : r.left()) * scale, limit);
-    const qreal x1 =
-        qBound(-limit, (mCache.mirror ? -r.left() : r.right()) * scale, limit);
-    const qreal y0 = qBound(-limit, r.top() * scale, limit);
-    const qreal y1 = qBound(-limit, r.bottom() * scale, limit);
-    const int ix0 = (qFloor((x0 - pad) / align)) * align;
-    const int iy0 = (qFloor((y0 - pad) / align)) * align;
-    const int ix1 = (qCeil((x1 + pad) / align)) * align;
-    const int iy1 = (qCeil((y1 + pad) / align)) * align;
-    return QRect(ix0, iy0, ix1 - ix0, iy1 - iy0).intersected(mCache.valid);
-  };
-
-  QRectF sceneBounds;
-  for (const QRectF& r : dirty) {
-    sceneBounds |= r;
-  }
-  const QRect bounds = toDevice(sceneBounds);
-  if (bounds.isEmpty()) {
-    return;
-  }
-
-  // Beyond this count the overhead of the separate regions alone exceeds the
-  // cost of a full view render.
-  const int maxSeparate =
-      static_cast<int>(sFullViewRenderMs / sDirtyRegionOverheadMs);
-  QList<QRect> rects;
-  if ((dirty.count() > 1) && (dirty.count() <= maxSeparate)) {
-    for (const QRectF& r : dirty) {
-      const QRect rect = toDevice(r);
-      if (!rect.isEmpty()) {
-        rects.append(rect);
-      }
-    }
-  } else {
-    rects.append(bounds);
-  }
-
-  // Render either the separate regions or their bounding box, whichever is
-  // estimated to be cheaper.
-  const qint64 viewArea =
-      static_cast<qint64>(mCache.view.width()) * mCache.view.height();
-  auto cost = [viewArea](qint64 area) {
-    return sDirtyRegionOverheadMs + (sFullViewRenderMs * area / viewArea);
-  };
-  qint64 area = static_cast<qint64>(bounds.width()) * bounds.height();
-  if (rects.count() > 1) {
-    // Collapse the longer list of rects into a region of unique rects
-    QRegion region;
-    for (const QRect& r : rects) {
-      region += r;
-    }
-
-    // Sum the costs for the unique rects
-    QList<QRect> separate;
-    qint64 separateArea = 0;
-    double separateCost = 0;
-    for (const QRect& r : region) {
-      const qint64 a = static_cast<qint64>(r.width()) * r.height();
-      separate.append(r);
-      separateArea += a;
-      separateCost += cost(a);
-    }
-
-    // Select the cheaper option
-    if (separateCost <= cost(area)) {
-      rects = separate;
-      area = separateArea;
-    } else {
-      rects = {bounds};
-    }
-  }
-  if (area > (sDirtyAreaLimit * viewArea)) {
-    mCache.valid = QRect();
-    return;
-  }
-
-  for (const QRect& r : rects) {
-    storeRegion(r, renderRegion(scene, r));
-  }
-}
-
-void SlintGraphicsView::drawZoomPreview(const GraphicsScene& scene,
-                                        const QRect& view, qreal scale,
-                                        const QRectF& src,
-                                        QImage& out) const noexcept {
-  const qreal ratio = mCache.scale / scale;
-  const QRect srcPx = src.toAlignedRect();
-  QImage tmp(srcPx.size(), QImage::Format_RGBA8888_Premultiplied);
-  cropRegion(srcPx, tmp);
-
-  out.fill(scene.getBackgroundColor());
-  QPainter painter(&out);
-  painter.setRenderHint(QPainter::SmoothPixmapTransform);
-  const QRectF target(src.x() / ratio - view.x(), src.y() / ratio - view.y(),
-                      src.width() / ratio, src.height() / ratio);
-  painter.drawImage(target, tmp, src.translated(-srcPx.topLeft()));
-}
-
 void SlintGraphicsView::invalidateRenderCache() noexcept {
-  mRefillTimer->stop();
-  mZoomSettleTimer->stop();
-  mZoomSettled = false;
-  mCache = RenderCache();
-  mCacheScene.clear();
+  mRenderCache->invalidate();
   mCacheFbos.clear();
 }
 
