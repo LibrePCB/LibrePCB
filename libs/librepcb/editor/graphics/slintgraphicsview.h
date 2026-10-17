@@ -115,11 +115,12 @@ public:
   void setRenderCacheEnabled(bool enable) noexcept;
 
   /**
-   * @brief Release all memory held by the pan cache
+   * @brief Release resources which are only needed while rendering
    *
-   * The cache is rebuilt on the next ::render() call.
+   * Intended for views which are not shown, such as rendering cache.
+   * Everything is recreated by the next ::render() call.
    */
-  void releaseRenderCache() noexcept;
+  void releaseResources() noexcept;
 
   void setEventHandler(IF_GraphicsViewEventHandler* obj) noexcept;
   void setMirror(bool mirror) noexcept;

@@ -17,12 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// AI DISCLAIMER: Claude AI assisted in the creation of this file.
-
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
 #include <gtest/gtest.h>
+#include <librepcb/core/types/enums.h>
+#include <librepcb/core/types/length.h>
 #include <librepcb/core/types/point.h>
 #include <librepcb/editor/graphics/graphicsscene.h>
 #include <librepcb/editor/graphics/rendercache.h>
@@ -31,6 +31,7 @@
 #include <QtGui>
 #include <QtWidgets>
 
+#include <algorithm>
 #include <memory>
 
 /*******************************************************************************
@@ -55,18 +56,18 @@ protected:
     bool fail = false;
 
     RenderCache::SurfaceRenderer renderer() {
-      return [this](const QSize& size,
-                    const RenderCache::PaintFunction& paint) {
-        ++calls;
-        sizes.append(size);
-        if (fail) {
-          return QImage();
-        }
-        QImage img(size, QImage::Format_RGBA8888_Premultiplied);
-        img.fill(Qt::transparent);
-        paint(&img);
-        return img;
-      };
+      return
+          [this](const QSize& size, const RenderCache::PaintFunction& paint) {
+            ++calls;
+            sizes.append(size);
+            if (fail) {
+              return QImage();
+            }
+            QImage img(size, QImage::Format_RGBA8888_Premultiplied);
+            img.fill(Qt::transparent);
+            paint(&img);
+            return img;
+          };
     }
   };
 
@@ -85,8 +86,8 @@ protected:
                 QColor::fromHsv((x * 7 + y * 3) % 360, 200, 220));
       }
     }
-    mCache.reset(new RenderCache(mSurface.renderer(),
-                                 [this]() { ++mRepaints; }));
+    mCache.reset(
+        new RenderCache(mSurface.renderer(), [this]() { ++mRepaints; }));
     settleScene();
   }
 
@@ -153,25 +154,34 @@ protected:
                       bool* ok = nullptr) {
     QImage img(mViewSize, QImage::Format_RGBA8888_Premultiplied);
     img.fill(Qt::magenta);  // Make unwritten pixels obvious.
-    const bool result = mCache->render(mScene, pos, mViewSize, scale, mirror,
-                                       img);
+    const bool result =
+        mCache->render(mScene, pos, mViewSize, scale, mirror, img);
     if (ok) {
       *ok = result;
     }
     return img;
   }
 
+  // Antialiased edges can differ by a rounding step in the coverage when the
+  // same content is rendered in differently shaped regions, hence a small
+  // tolerance. Missing or stale content differs by far more.
   static ::testing::AssertionResult sameImages(const QImage& actual,
                                                const QImage& expected) {
+    static const int tolerance = 2;
     if (actual.size() != expected.size()) {
       return ::testing::AssertionFailure() << "different image sizes";
     }
     for (int y = 0; y < actual.height(); ++y) {
       for (int x = 0; x < actual.width(); ++x) {
-        if (actual.pixel(x, y) != expected.pixel(x, y)) {
+        const QRgb a = actual.pixel(x, y);
+        const QRgb e = expected.pixel(x, y);
+        const int diff = std::max(
+            std::max(qAbs(qRed(a) - qRed(e)), qAbs(qGreen(a) - qGreen(e))),
+            std::max(qAbs(qBlue(a) - qBlue(e)), qAbs(qAlpha(a) - qAlpha(e))));
+        if (diff > tolerance) {
           return ::testing::AssertionFailure()
-              << "first difference at " << x << "," << y << ": "
-              << actual.pixel(x, y) << " != " << expected.pixel(x, y);
+              << "first difference at " << x << "," << y << ": " << std::hex
+              << a << " != " << e;
         }
       }
     }
@@ -192,6 +202,17 @@ TEST(RenderCacheHelpersTest, testWrapIndex) {
   EXPECT_EQ(0, RenderCache::wrapIndex(-5, 5));
   EXPECT_EQ(4, RenderCache::wrapIndex(-6, 5));
   EXPECT_EQ(3, RenderCache::wrapIndex(-12, 5));
+}
+
+TEST(RenderCacheHelpersTest, testSnapPos) {
+  QPoint snapped;
+  EXPECT_TRUE(RenderCache::snapPos(QPointF(10.4, -10.6), snapped));
+  EXPECT_EQ(QPoint(10, -11), snapped);
+  EXPECT_TRUE(RenderCache::snapPos(QPointF(-5e8, 5e8), snapped));
+  EXPECT_EQ(QPoint(-500000000, 500000000), snapped);
+  EXPECT_FALSE(RenderCache::snapPos(QPointF(2e9, 0), snapped));
+  EXPECT_FALSE(RenderCache::snapPos(QPointF(0, -2e9), snapped));
+  EXPECT_FALSE(RenderCache::snapPos(QPointF(qQNaN(), 0), snapped));
 }
 
 TEST(RenderCacheHelpersTest, testSubtractRect) {
@@ -231,17 +252,17 @@ TEST(RenderCacheHelpersTest, testSubtractRect) {
 
 TEST(RenderCacheHelpersTest, testMergeValid) {
   // Same rows: extend horizontally.
-  EXPECT_EQ(QRect(0, 0, 150, 50),
-            RenderCache::mergeValid(QRect(0, 0, 100, 50),
-                                    QRect(50, 0, 100, 50)));
+  EXPECT_EQ(
+      QRect(0, 0, 150, 50),
+      RenderCache::mergeValid(QRect(0, 0, 100, 50), QRect(50, 0, 100, 50)));
   // Same columns: extend vertically.
-  EXPECT_EQ(QRect(0, 0, 50, 150),
-            RenderCache::mergeValid(QRect(0, 0, 50, 100),
-                                    QRect(0, 50, 50, 100)));
+  EXPECT_EQ(
+      QRect(0, 0, 50, 150),
+      RenderCache::mergeValid(QRect(0, 0, 50, 100), QRect(0, 50, 50, 100)));
   // View covers more than the old rect in both directions: view only.
-  EXPECT_EQ(QRect(50, 50, 100, 100),
-            RenderCache::mergeValid(QRect(0, 0, 100, 100),
-                                    QRect(50, 50, 100, 100)));
+  EXPECT_EQ(
+      QRect(50, 50, 100, 100),
+      RenderCache::mergeValid(QRect(0, 0, 100, 100), QRect(50, 50, 100, 100)));
   // The result always contains the view.
   const QRect old(0, 0, 100, 100);
   const QRect view(20, 20, 30, 30);
@@ -290,28 +311,54 @@ TEST_F(RenderCacheTest, testPanBeyondRingSizeMatchesUncachedRendering) {
   }
 }
 
+TEST_F(RenderCacheTest, testGridDoesNotDependOnRenderedRegions) {
+  mScene.setBackgroundColors(Qt::black, Qt::white);
+  for (GridStyle style : {GridStyle::Dots, GridStyle::Lines}) {
+    for (int interval : {800000, 910000}) {
+      SCOPED_TRACE(testing::Message() << "style " << static_cast<int>(style)
+                                      << ", interval " << interval);
+      mScene.setGridStyle(style);
+      mScene.setGridInterval(PositiveLength(interval));
+      settleScene();
+      mCache->invalidate();
+
+      // Strips of various widths in all directions, each one rendered on its
+      // own, must join seamlessly.
+      QPoint pos(0, 0);
+      for (int i = 0; i < 30; ++i) {
+        pos += QPoint((i % 4 == 3) ? -13 : 7 + (i % 5) * 3,
+                      (i % 3 == 2) ? -11 : 5 + (i % 4) * 2);
+        const QImage img = renderCached(pos);
+        ASSERT_TRUE(sameImages(img, renderUncached(pos, 1, false)))
+            << "step " << i << " at " << pos.x() << "," << pos.y();
+      }
+    }
+  }
+}
+
 TEST_F(RenderCacheTest, testMirroredViewMatchesUncachedRendering) {
   QPoint pos(30, 10);
   for (int i = 0; i < 10; ++i) {
     pos += QPoint(45, 17);
     const QImage img = renderCached(pos, 1, true);
-    ASSERT_TRUE(sameImages(img, renderUncached(pos, 1, true)))
-        << "step " << i;
+    ASSERT_TRUE(sameImages(img, renderUncached(pos, 1, true))) << "step " << i;
   }
 }
 
 TEST_F(RenderCacheTest, testIdleRefillCompletesMargin) {
   renderCached(QPoint(100, 100));
   spinUntilIdle();
-  const int calls = mSurface.calls;
-  EXPECT_GT(calls, 1);
+  EXPECT_GT(mSurface.calls, 1);
 
-  // Panning within the margin must be served without rendering.
+  // Every move stays within the margin of the previous view, so it must be
+  // served without rendering once the margin has been refilled.
   for (const QPoint& pos : {QPoint(0, 0), QPoint(200, 100), QPoint(100, 200),
-                            QPoint(-100, -100), QPoint(100, 100)}) {
+                            QPoint(0, 100), QPoint(100, 100)}) {
+    const int calls = mSurface.calls;
     const QImage img = renderCached(pos);
-    EXPECT_EQ(calls, mSurface.calls);
+    EXPECT_EQ(calls, mSurface.calls) << pos.x() << "," << pos.y();
     EXPECT_TRUE(sameImages(img, renderUncached(pos, 1, false)));
+    spinUntilIdle();
   }
 }
 

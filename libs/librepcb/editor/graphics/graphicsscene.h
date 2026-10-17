@@ -117,8 +117,9 @@ public:
   /**
    * @brief Take the scene regions changed since the last call
    *
-   * Changes of the foreground layer (see ::renderForeground()) are not
-   * reported. Intended for a single consumer.
+   * Pending change notifications are delivered first. Changes of the
+   * foreground layer (see ::renderForeground()) are not reported. Intended
+   * for a single consumer.
    *
    * Regions may be merged into larger ones if many changes are pending.
    *

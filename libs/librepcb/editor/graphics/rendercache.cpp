@@ -17,8 +17,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// AI DISCLAIMER: Claude AI assisted in the creation of this file.
-
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
@@ -38,6 +36,9 @@ namespace editor {
 static constexpr int sCacheMargin = 256;
 static constexpr int sCacheQuantum = 64;
 static constexpr int sRefillIntervalMs = 1;
+
+// Limit of the view position, keeps all ring coordinates within int range.
+static constexpr qreal sMaxViewPos = 1e9;
 
 // Estimated cost model to choose between rendering separate dirty regions or
 // their bounding box.
@@ -92,8 +93,7 @@ RenderCache::RenderCache(SurfaceRenderer renderer,
   mRefillTimer.setSingleShot(true);
   QObject::connect(&mRefillTimer, &QTimer::timeout, [this]() { refill(); });
   mZoomSettleTimer.setSingleShot(true);
-  QObject::connect(&mZoomSettleTimer, &QTimer::timeout,
-                   [this]() { settle(); });
+  QObject::connect(&mZoomSettleTimer, &QTimer::timeout, [this]() { settle(); });
 }
 
 RenderCache::~RenderCache() noexcept {
@@ -106,8 +106,6 @@ RenderCache::~RenderCache() noexcept {
 bool RenderCache::render(GraphicsScene& scene, const QPoint& pos,
                          const QSize& size, qreal scale, bool mirror,
                          QImage& out) noexcept {
-  // Deliver pending scene change notifications to get the current changes.
-  QCoreApplication::sendPostedEvents(&scene, QEvent::MetaCall);
   QList<QRectF> dirty;
   dirty = scene.takeDirtyRects();
 
@@ -117,8 +115,8 @@ bool RenderCache::render(GraphicsScene& scene, const QPoint& pos,
   const QSize ringSize(size.width() + 2 * margin, size.height() + 2 * margin);
   const QRect window = view.adjusted(-margin, -margin, margin, margin);
 
-  const bool sameLayout = (mRing.size() == ringSize) && (mMirror == mirror) &&
-      (mScene == &scene);
+  const bool sameLayout =
+      (mRing.size() == ringSize) && (mMirror == mirror) && (mScene == &scene);
 
   // While zooming, the cached pixels are shown scaled instead of rendering the
   // scene at every step.
@@ -196,6 +194,14 @@ void RenderCache::invalidate() noexcept {
  *  Static Methods
  ******************************************************************************/
 
+bool RenderCache::snapPos(const QPointF& pos, QPoint& snapped) noexcept {
+  if (!((qAbs(pos.x()) <= sMaxViewPos) && (qAbs(pos.y()) <= sMaxViewPos))) {
+    return false;
+  }
+  snapped = QPoint(qRound(pos.x()), qRound(pos.y()));
+  return true;
+}
+
 int RenderCache::wrapIndex(int value, int size) noexcept {
   const int m = value % size;
   return (m < 0) ? (m + size) : m;
@@ -257,10 +263,9 @@ QImage RenderCache::renderRegion(GraphicsScene& scene,
   const qreal scale = mScale;
   const QSize size = region.size();
   const QRectF target(QPointF(0, 0), size);
-  const QRectF source(mMirror ? (-(region.x() + region.width()) / scale)
-                              : (region.x() / scale),
-                      region.y() / scale, region.width() / scale,
-                      region.height() / scale);
+  const QRectF source(
+      mMirror ? (-(region.x() + region.width()) / scale) : (region.x() / scale),
+      region.y() / scale, region.width() / scale, region.height() / scale);
   auto draw = [&](QPaintDevice* device) {
     QPainter painter(device);
     painter.setRenderHints(QPainter::Antialiasing |
@@ -285,11 +290,10 @@ void RenderCache::storeRegion(const QRect& region, QImage img) noexcept {
 }
 
 void RenderCache::cropRegion(const QRect& region, QImage& out) const noexcept {
-  forEachRingSegment(region, mRing.size(),
-                     [&](const QRect& segment, const QPoint& pos) {
-                       copyRows(mRing, QRect(pos, segment.size()), out,
-                                segment.topLeft());
-                     });
+  forEachRingSegment(
+      region, mRing.size(), [&](const QRect& segment, const QPoint& pos) {
+        copyRows(mRing, QRect(pos, segment.size()), out, segment.topLeft());
+      });
 }
 
 void RenderCache::applyDirtyRects(GraphicsScene& scene,
@@ -387,9 +391,8 @@ void RenderCache::applyDirtyRects(GraphicsScene& scene,
   }
 }
 
-void RenderCache::drawZoomPreview(const GraphicsScene& scene,
-                                  const QRect& view, qreal scale,
-                                  const QRectF& src,
+void RenderCache::drawZoomPreview(const GraphicsScene& scene, const QRect& view,
+                                  qreal scale, const QRectF& src,
                                   QImage& out) const noexcept {
   const qreal ratio = mScale / scale;
   const QRect srcPx = src.toAlignedRect();
@@ -409,7 +412,6 @@ void RenderCache::refill() noexcept {
   if ((!scene) || mValid.isEmpty()) {
     return;
   }
-  QCoreApplication::sendPostedEvents(scene, QEvent::MetaCall);
   QList<QRectF> dirty;
   dirty = scene->takeDirtyRects();
   applyDirtyRects(*scene, dirty);

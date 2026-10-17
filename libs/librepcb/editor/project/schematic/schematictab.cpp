@@ -487,7 +487,7 @@ void SchematicTab::activate() noexcept {
 }
 
 void SchematicTab::deactivate() noexcept {
-  mView->releaseRenderCache();
+  mView->releaseResources();
   mProjectEditor.unregisterActiveSchematicTab(this);
   mSearchContext.deinit();
   mErcLocationGraphicsItem.reset();

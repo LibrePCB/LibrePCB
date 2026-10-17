@@ -38,6 +38,13 @@ namespace editor {
 
 static const qreal sScrollFactor = 0.07;
 
+static std::unique_ptr<QOpenGLFramebufferObject> createFbo(const QSize& size) {
+  QOpenGLFramebufferObjectFormat format;
+  format.setAttachment(QOpenGLFramebufferObject::CombinedDepthStencil);
+  format.setSamples(4);
+  return std::make_unique<QOpenGLFramebufferObject>(size, format);
+}
+
 static qreal boundedScaleFactor(qreal scale) noexcept {
   // Limit zoom factor to avoid crashes due to numerical issues when zooming
   // extensively (e.g. possible with free running scroll wheels).
@@ -60,7 +67,10 @@ SlintGraphicsView::SlintGraphicsView(const QRectF& defaultSceneRect,
         [this](const QSize& size, const RenderCache::PaintFunction& paint) {
           return renderCacheSurface(size, paint);
         },
-        [this]() { emit transformChanged(); })),
+        [this]() {
+          // The owner renders again in response to this signal.
+          emit transformChanged();
+        })),
     mMirror(false),
     mAnimation(new QVariantAnimation(this)) {
   mAnimation->setDuration(500);
@@ -146,7 +156,7 @@ void SlintGraphicsView::setRenderCacheEnabled(bool enable) noexcept {
   }
 }
 
-void SlintGraphicsView::releaseRenderCache() noexcept {
+void SlintGraphicsView::releaseResources() noexcept {
   if (mGlSurface && mGlContext && mGlError.isEmpty()) {
     mGlContext->makeCurrent(mGlSurface.get());
   }
@@ -187,10 +197,7 @@ slint::Image SlintGraphicsView::render(GraphicsScene& scene, float width,
     }
     if (openGlError.isEmpty() && ((!mGlFbo) || (mGlFbo->size() != size))) {
       mGlFbo.reset();  // Release memory first.
-      QOpenGLFramebufferObjectFormat format;
-      format.setAttachment(QOpenGLFramebufferObject::CombinedDepthStencil);
-      format.setSamples(4);
-      mGlFbo = std::make_unique<QOpenGLFramebufferObject>(size, format);
+      mGlFbo = createFbo(size);
     }
     if (openGlError.isEmpty() && (!mGlFbo->bind())) {
       openGlError = "Failed to bind OpenGL FBO.";
@@ -465,14 +472,10 @@ bool SlintGraphicsView::renderCached(GraphicsScene& scene, const QSize& size,
   fitProjection(scene, size);
 
   const qreal scale = mProjection.scale;
-  if ((qAbs(mProjection.offset.x() * scale) > 1e9) ||
-      (qAbs(mProjection.offset.y() * scale) > 1e9)) {
+  QPoint pos;
+  if (!RenderCache::snapPos(mProjection.offset * scale, pos)) {
     return false;
   }
-
-  // Snap the offset to whole device pixels, so cached pixels stay reusable.
-  const QPoint pos(qRound(mProjection.offset.x() * scale),
-                   qRound(mProjection.offset.y() * scale));
   const QPointF offset(pos.x() / scale, pos.y() / scale);
 
   slint::SharedPixelBuffer<slint::Rgba8Pixel> buffer(
@@ -516,10 +519,7 @@ QImage SlintGraphicsView::renderCacheSurface(
       if (mCacheFbos.count() >= 32) {
         mCacheFbos.clear();
       }
-      QOpenGLFramebufferObjectFormat format;
-      format.setAttachment(QOpenGLFramebufferObject::CombinedDepthStencil);
-      format.setSamples(4);
-      fbo = std::make_shared<QOpenGLFramebufferObject>(size, format);
+      fbo = createFbo(size);
       mCacheFbos.insert(key, fbo);
     }
     if (fbo->bind()) {

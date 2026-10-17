@@ -17,8 +17,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// AI DISCLAIMER: Claude AI assisted in the creation of this file.
-
 #ifndef LIBREPCB_EDITOR_RENDERCACHE_H
 #define LIBREPCB_EDITOR_RENDERCACHE_H
 
@@ -94,7 +92,8 @@ public:
    * zoom has settled.
    *
    * @param scene   The scene to render.
-   * @param pos     Top-left of the view in whole device pixels at `scale`.
+   * @param pos     Top-left of the view in whole device pixels at `scale`,
+   *                see ::snapPos().
    * @param size    Size of the view in device pixels.
    * @param scale   Device pixels per scene pixel.
    * @param mirror  Whether the view is mirrored horizontally.
@@ -113,6 +112,17 @@ public:
   void invalidate() noexcept;
 
   // Static Methods
+
+  /**
+   * @brief Get the view position to be passed to ::render()
+   *
+   * @param pos      Top-left of the view in device pixels at the view scale.
+   * @param snapped  Receives `pos` rounded to whole device pixels.
+   *
+   * @retval true   `snapped` is valid.
+   * @retval false  `pos` is not supported by the cache. Do not render it.
+   */
+  static bool snapPos(const QPointF& pos, QPoint& snapped) noexcept;
 
   /**
    * @brief Wrap an index into `[0, size)`

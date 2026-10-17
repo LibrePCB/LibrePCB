@@ -237,13 +237,17 @@ void GraphicsScene::drawBackground(QPainter* painter,
   while (gridIntervalPixels * lod < 7) {
     gridIntervalPixels *= 10;
   }
+  // Cover grid points just outside the rect whose extent reaches into it.
+  const qreal margin = 2 / lod;
   qreal left, right, top, bottom;
-  left = qFloor(rect.left() / gridIntervalPixels) * gridIntervalPixels;
-  right = rect.right();
-  top = rect.top();
-  bottom = qFloor(rect.bottom() / gridIntervalPixels) * gridIntervalPixels;
-  int xIndex = qFloor(rect.left() / gridIntervalPixels);
-  int yIndex = -qFloor(rect.bottom() / gridIntervalPixels);
+  left =
+      qFloor((rect.left() - margin) / gridIntervalPixels) * gridIntervalPixels;
+  right = rect.right() + margin;
+  top = rect.top() - margin;
+  bottom = qFloor((rect.bottom() + margin) / gridIntervalPixels) *
+      gridIntervalPixels;
+  int xIndex = qFloor((rect.left() - margin) / gridIntervalPixels);
+  int yIndex = -qFloor((rect.bottom() + margin) / gridIntervalPixels);
   switch (mGridStyle) {
     case GridStyle::Lines: {
       QVarLengthArray<QLineF, 450> minorLines;
@@ -276,7 +280,7 @@ void GraphicsScene::drawBackground(QPainter* painter,
       QVarLengthArray<QPointF, 1800> minorDots;
       QVarLengthArray<QPointF, 200> majorDots;
       for (qreal x = left; x < right; x += gridIntervalPixels) {  // NOLINT
-        yIndex = -qFloor(rect.bottom() / gridIntervalPixels);
+        yIndex = -qFloor((rect.bottom() + margin) / gridIntervalPixels);
         for (qreal y = bottom; y > top; y -= gridIntervalPixels) {  // NOLINT
           if ((xIndex % 10) || (yIndex % 10)) {
             minorDots.append(QPointF(x, y));
@@ -466,6 +470,8 @@ void GraphicsScene::drawForeground(QPainter* painter,
  ******************************************************************************/
 
 QList<QRectF> GraphicsScene::takeDirtyRects() noexcept {
+  // Deliver the pending change notification to get the current changes.
+  QCoreApplication::sendPostedEvents(this, QEvent::MetaCall);
   QList<QRectF> rects = std::move(mDirtyRects);
   mDirtyRects.clear();
   return rects;
