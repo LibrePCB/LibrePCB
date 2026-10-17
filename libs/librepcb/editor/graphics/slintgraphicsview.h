@@ -24,6 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include "graphicsscene.h"
+#include "rendercache.h"
 
 #include <librepcb/core/types/point.h>
 
@@ -99,6 +100,28 @@ public:
 
   // General Methods
   void setUseOpenGl(bool use) noexcept;
+
+  /**
+   * @brief Enable the pan cache of this view
+   *
+   * The cache keeps the rendered scene content of the view plus a surrounding
+   * margin, so panning only needs to render the newly exposed areas. While
+   * zooming, the cached pixels are shown scaled until the zoom has settled and
+   * the scene is rendered at the new scale. Disable by setting the environment
+   * variable `LPCB_RENDER_CACHE` to `0`.
+   *
+   * @param enable  Whether to enable the cache.
+   */
+  void setRenderCacheEnabled(bool enable) noexcept;
+
+  /**
+   * @brief Release resources which are only needed while rendering
+   *
+   * Intended for views which are not shown, such as rendering cache.
+   * Everything is recreated by the next ::render() call.
+   */
+  void releaseResources() noexcept;
+
   void setEventHandler(IF_GraphicsViewEventHandler* obj) noexcept;
   void setMirror(bool mirror) noexcept;
   slint::Image render(GraphicsScene& scene, float width, float height) noexcept;
@@ -132,6 +155,14 @@ signals:
   void transformChanged();
 
 private:  // Methods
+  QImage renderContentSurface(GraphicsScene& scene,
+                              const QTransform& sceneToDevice,
+                              const QSize& size,
+                              QString* error = nullptr) noexcept;
+  std::shared_ptr<QOpenGLFramebufferObject> acquireFbo(
+      const QSize& size) noexcept;
+  void invalidateRenderCache() noexcept;
+  void fitProjection(GraphicsScene& scene, const QSize& size) noexcept;
   void scroll(const QPointF& delta) noexcept;
   void zoom(QPointF center, qreal factor) noexcept;
   void smoothTo(const Projection& projection) noexcept;
@@ -144,8 +175,10 @@ private:  // Data
   IF_GraphicsViewEventHandler* mEventHandler;
   std::unique_ptr<QOffscreenSurface> mGlSurface;
   std::unique_ptr<QOpenGLContext> mGlContext;
-  std::unique_ptr<QOpenGLFramebufferObject> mGlFbo;
   QString mGlError;
+  bool mRenderCacheEnabled;
+  std::unique_ptr<RenderCache> mRenderCache;
+  QMap<QPair<int, int>, std::shared_ptr<QOpenGLFramebufferObject>> mFbos;
   Projection mProjection;
   QSizeF mViewSize;
   bool mMirror;

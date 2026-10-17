@@ -153,6 +153,7 @@ SchematicTab::SchematicTab(GuiApplication& app, SchematicEditor& editor,
 
   // Setup graphics view.
   mView->setEventHandler(this);
+  mView->setRenderCacheEnabled(true);
   mView->setUseOpenGl(mApp.getWorkspace().getSettings().useOpenGl.get());
   connect(
       &mApp.getWorkspace().getSettings().useOpenGl,
@@ -486,6 +487,7 @@ void SchematicTab::activate() noexcept {
 }
 
 void SchematicTab::deactivate() noexcept {
+  mView->releaseResources();
   mProjectEditor.unregisterActiveSchematicTab(this);
   mSearchContext.deinit();
   mErcLocationGraphicsItem.reset();

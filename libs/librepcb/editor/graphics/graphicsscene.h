@@ -75,6 +75,11 @@ public:
   }
   GridStyle getGridStyle() const noexcept { return mGridStyle; }
 
+  /**
+   * @brief Get the opaque fill color painted behind the scene content
+   */
+  const QColor& getBackgroundColor() const noexcept { return mBackgroundColor; }
+
   // Setters
   void setBackgroundColors(const QColor& fill, const QColor& grid) noexcept;
   void setOverlayColors(const QColor& fill, const QColor& content) noexcept;
@@ -109,11 +114,52 @@ public:
   QPixmap toPixmap(const QSize& size,
                    const QColor& background = Qt::transparent) noexcept;
 
+  /**
+   * @brief Take the scene regions changed since the last call
+   *
+   * Pending change notifications are delivered first. Changes of the
+   * foreground layer (see ::renderForeground()) are not reported. Intended
+   * for a single consumer.
+   *
+   * Regions may be merged into larger ones if many changes are pending.
+   *
+   * @return  The changed regions in scene coordinates.
+   */
+  QList<QRectF> takeDirtyRects() noexcept;
+
+  /**
+   * @brief Render the scene content without the foreground layer
+   *
+   * @param painter        Painter to draw with.
+   * @param size           Size of the target area, starting at the origin.
+   * @param sceneToDevice  Maps scene coordinates to the target area. Only a
+   *                       uniform scale with an optional horizontal flip and
+   *                       a translation is supported.
+   */
+  void renderContent(QPainter* painter, const QSize& size,
+                     const QTransform& sceneToDevice) noexcept;
+
+  /**
+   * @brief Render only the foreground layer
+   *
+   * Takes the same arguments as ::renderContent().
+   */
+  void renderForeground(QPainter* painter, const QSize& size,
+                        const QTransform& sceneToDevice) noexcept;
+
 protected:
   void drawBackground(QPainter* painter, const QRectF& rect) noexcept override;
   void drawForeground(QPainter* painter, const QRectF& rect) noexcept override;
 
 private:
+  void handleChanged(const QList<QRectF>& region) noexcept;
+  void notifyForegroundChanged() noexcept;
+  void notifyBackgroundChanged() noexcept;
+
+private:
+  QList<QRectF> mDirtyRects;
+  bool mSkipForeground;
+  bool mForegroundChangePending;
   GridStyle mGridStyle;
   PositiveLength mGridInterval;
   QColor mBackgroundColor;
@@ -124,7 +170,10 @@ private:
   bool mOriginCrossVisible;
   bool mGrayOut;
 
-  std::unique_ptr<QGraphicsRectItem> mSelectionRectItem;
+  // Selection rectangle, drawn as part of the foreground layer
+  QRectF mSelectionRect;
+  QPen mSelectionRectPen;
+  QBrush mSelectionRectBrush;
 
   // Overlay scene cursor
   Point mSceneCursorPos;
