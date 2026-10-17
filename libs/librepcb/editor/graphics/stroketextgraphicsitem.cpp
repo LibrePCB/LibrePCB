@@ -89,7 +89,11 @@ void StrokeTextGraphicsItem::setTextOverride(
 
 QPainterPath StrokeTextGraphicsItem::shape() const noexcept {
   Q_ASSERT(mPathGraphicsItem && mOriginCrossGraphicsItem);
-  return mPathGraphicsItem->shape() | mOriginCrossGraphicsItem->shape();
+  // Path concatenation is faster than a boolean union here.
+  QPainterPath p = mPathGraphicsItem->shape();
+  p.setFillRule(Qt::WindingFill);
+  p.addPath(mOriginCrossGraphicsItem->shape());
+  return p;
 }
 
 QVariant StrokeTextGraphicsItem::itemChange(GraphicsItemChange change,
