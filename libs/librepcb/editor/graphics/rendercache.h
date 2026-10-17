@@ -44,33 +44,36 @@ class GraphicsScene;
  * @brief Pan and zoom cache for the rendered content of a graphics scene
  *
  * The scene content of the view plus a surrounding margin is kept in a 2D ring
- * buffer addressed by wrapped device coordinates (device pixels at the cached
- * scale, independent of the pan offset). Panning therefore never moves cached
- * pixels; newly exposed strips overwrite the area which has left the view.
+ * buffer addressed by wrapped coordinates. Panning therefore never moves
+ * cached pixels; areas newly exposed by the pan overwrite the area which has
+ * left the view. The margin is rendered in idle time.
  *
- * Content changes reported by the scene are re-rendered in place. While the
- * scale differs from the cached one, a scaled preview of the cached pixels is
- * provided until the zoom has settled, after which the cache is rebuilt at
- * the new scale. The margin is completed in idle time.
+ * Rendered areas are transformed using a caller-provided transform to account
+ * for mirror and scaling operations performed by the view itself.
+ *
+ * Content changes reported by the scene are re-rendered in place. During zoom
+ * operations, a scaled preview of the cached pixels is used until the zoom has
+ * settled, after which the cache is rebuilt at the new zoom level.
  *
  * The scene's foreground layer is not part of the cache; the owner draws it
  * over the returned content.
  */
 class RenderCache final {
 public:
-  /// Draws into the given paint device.
-  using PaintFunction = std::function<void(QPaintDevice*)>;
-
   /**
-   * @brief Provides the surface for rendering a region
+   * @brief Render scene content into a new image
    *
-   * Runs the paint function on a paint device of the given size and returns
-   * the result, or a null image on failure. Called from ::render() and from
-   * the idle refill, so it must make any required rendering context current
-   * itself.
+   * Called from ::render() and from the idle refill.
+   *
+   * @param scene          The scene to render.
+   * @param sceneToDevice  Maps scene coordinates to pixels of the image.
+   * @param size           Size of the image in pixels.
+   *
+   * @return The rendered content, or a null image on failure.
    */
-  using SurfaceRenderer =
-      std::function<QImage(const QSize& size, const PaintFunction& paint)>;
+  using RegionRenderer =
+      std::function<QImage(GraphicsScene& scene,
+                           const QTransform& sceneToDevice, const QSize& size)>;
 
   /// Requests the owner to trigger a repaint, i.e. call ::render() again.
   using RepaintRequest = std::function<void()>;
@@ -78,33 +81,35 @@ public:
   // Constructors / Destructor
   RenderCache() = delete;
   RenderCache(const RenderCache& other) = delete;
-  RenderCache(SurfaceRenderer renderer, RepaintRequest repaint) noexcept;
+  RenderCache(RegionRenderer renderer, RepaintRequest repaint) noexcept;
   ~RenderCache() noexcept;
 
   // General Methods
 
   /**
-   * @brief Get the scene content of the view
+   * @brief Render view content
    *
    * Renders whatever is missing or dirty, then copies the view from the cache.
-   * While the scale differs from the cached one, a scaled preview of the
-   * cached pixels is drawn instead and the repaint request is issued once the
-   * zoom has settled.
+   * During zoom operations, a scaled preview of the cached pixels is drawn. A
+   * repaint request is issued once the zoom has settled.
    *
-   * @param scene   The scene to render.
-   * @param pos     Top-left of the view in whole device pixels at `scale`,
-   *                see ::snapPos().
-   * @param size    Size of the view in device pixels.
-   * @param scale   Device pixels per scene pixel.
-   * @param mirror  Whether the view is mirrored horizontally.
-   * @param out     Image of `size` in format `Format_RGBA8888_Premultiplied`
-   *                to be filled with the scene content (no foreground).
+   * @param scene          The scene to render.
+   * @param sceneToCache   Maps scene coordinates to cache space. Only a
+   *                       uniform scale with an optional horizontal flip is
+   *                       supported, without any translation.
+   * @param view           Rect of the view in cache space, in whole pixels
+   *                       (see ::snapPos()).
+   * @param backdrop       Color shown where a preview has no cached pixels.
+   * @param out            Image of the size of `view` in format
+   *                       `Format_RGBA8888_Premultiplied` to be filled with
+   *                       the scene content.
    *
    * @retval true   `out` contains the view.
-   * @retval false  The surface renderer failed; `out` is undefined.
+   * @retval false  The transform is not supported or the region renderer
+   *                failed; `out` is undefined.
    */
-  bool render(GraphicsScene& scene, const QPoint& pos, const QSize& size,
-              qreal scale, bool mirror, QImage& out) noexcept;
+  bool render(GraphicsScene& scene, const QTransform& sceneToCache,
+              const QRect& view, const QColor& backdrop, QImage& out) noexcept;
 
   /**
    * @brief Drop all cached pixels and cancel pending work
@@ -114,9 +119,14 @@ public:
   // Static Methods
 
   /**
-   * @brief Get the view position to be passed to ::render()
+   * @brief Check whether ::render() supports a scene-to-cache transform
+   */
+  static bool isSupported(const QTransform& transform) noexcept;
+
+  /**
+   * @brief Get the view position to be used for ::render()
    *
-   * @param pos      Top-left of the view in device pixels at the view scale.
+   * @param pos      Top-left of the view in pixels of the cache space.
    * @param snapped  Receives `pos` rounded to whole device pixels.
    *
    * @retval true   `snapped` is valid.
@@ -163,20 +173,18 @@ private:  // Methods
   void cropRegion(const QRect& region, QImage& out) const noexcept;
   void applyDirtyRects(GraphicsScene& scene,
                        const QList<QRectF>& dirty) noexcept;
-  void drawZoomPreview(const GraphicsScene& scene, const QRect& view,
-                       qreal scale, const QRectF& src,
-                       QImage& out) const noexcept;
+  void drawZoomPreview(const QColor& backdrop, const QRect& view, qreal scale,
+                       const QRectF& src, QImage& out) const noexcept;
   void refill() noexcept;
   void settle() noexcept;
 
 private:  // Data
-  const SurfaceRenderer mRenderer;
+  const RegionRenderer mRenderer;
   const RepaintRequest mRepaint;
   QImage mRing;  ///< Wrapped storage, size of the view plus margins.
   QRect mValid;  ///< Rendered device rect, always inside ::mView plus margins.
   QRect mView;  ///< Device rect of the view at the last frame.
-  qreal mScale;
-  bool mMirror;
+  QTransform mTransform;  ///< Maps pixels from scene- to cache-space.
   QPointer<GraphicsScene> mScene;
   QTimer mRefillTimer;
   QTimer mZoomSettleTimer;

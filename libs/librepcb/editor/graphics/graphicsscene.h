@@ -129,17 +129,23 @@ public:
 
   /**
    * @brief Render the scene content without the foreground layer
+   *
+   * @param painter        Painter to draw with.
+   * @param size           Size of the target area, starting at the origin.
+   * @param sceneToDevice  Maps scene coordinates to the target area. Only a
+   *                       uniform scale with an optional horizontal flip and
+   *                       a translation is supported.
    */
-  void renderContent(QPainter* painter, const QRectF& target,
-                     const QRectF& source) noexcept;
+  void renderContent(QPainter* painter, const QSize& size,
+                     const QTransform& sceneToDevice) noexcept;
 
   /**
    * @brief Render only the foreground layer
    *
-   * Uses the same source to target mapping as ::renderContent().
+   * Takes the same arguments as ::renderContent().
    */
-  void renderForeground(QPainter* painter, const QRectF& target,
-                        const QRectF& source) noexcept;
+  void renderForeground(QPainter* painter, const QSize& size,
+                        const QTransform& sceneToDevice) noexcept;
 
 protected:
   void drawBackground(QPainter* painter, const QRectF& rect) noexcept override;

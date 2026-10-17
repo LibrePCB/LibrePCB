@@ -193,29 +193,30 @@ QPixmap GraphicsScene::toPixmap(const QSize& size,
   return pixmap;
 }
 
-void GraphicsScene::renderContent(QPainter* painter, const QRectF& target,
-                                  const QRectF& source) noexcept {
+void GraphicsScene::renderContent(QPainter* painter, const QSize& size,
+                                  const QTransform& sceneToDevice) noexcept {
+  const QRectF target(QPointF(0, 0), size);
+  const QRectF source = sceneToDevice.inverted().mapRect(target);
+  painter->save();
+  if (sceneToDevice.m11() < 0) {
+    painter->translate(size.width(), 0);
+    painter->scale(-1, 1);
+  }
   mSkipForeground = true;
   render(painter, target, source, Qt::KeepAspectRatio);
   mSkipForeground = false;
-}
-
-void GraphicsScene::renderForeground(QPainter* painter, const QRectF& target,
-                                     const QRectF& source) noexcept {
-  QTransform tf;
-  tf.translate(target.left(), target.top());
-  tf.scale(target.width() / source.width(), target.height() / source.height());
-  tf.translate(-source.left(), -source.top());
-  painter->save();
-  painter->setClipRect(target, Qt::IntersectClip);
-  painter->setWorldTransform(tf, true);
-  drawForeground(painter, source);
   painter->restore();
 }
 
-/*******************************************************************************
- *  Protected Methods
- ******************************************************************************/
+void GraphicsScene::renderForeground(QPainter* painter, const QSize& size,
+                                     const QTransform& sceneToDevice) noexcept {
+  const QRectF target(QPointF(0, 0), size);
+  painter->save();
+  painter->setClipRect(target, Qt::IntersectClip);
+  painter->setWorldTransform(sceneToDevice, true);
+  drawForeground(painter, sceneToDevice.inverted().mapRect(target));
+  painter->restore();
+}
 
 void GraphicsScene::drawBackground(QPainter* painter,
                                    const QRectF& rect) noexcept {

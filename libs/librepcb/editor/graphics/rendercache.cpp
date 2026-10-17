@@ -83,13 +83,9 @@ static void copyRows(const QImage& src, const QRect& srcRect, QImage& dst,
  *  Constructors / Destructor
  ******************************************************************************/
 
-RenderCache::RenderCache(SurfaceRenderer renderer,
+RenderCache::RenderCache(RegionRenderer renderer,
                          RepaintRequest repaint) noexcept
-  : mRenderer(renderer),
-    mRepaint(repaint),
-    mScale(0),
-    mMirror(false),
-    mZoomSettled(false) {
+  : mRenderer(renderer), mRepaint(repaint), mZoomSettled(false) {
   mRefillTimer.setSingleShot(true);
   QObject::connect(&mRefillTimer, &QTimer::timeout, [this]() { refill(); });
   mZoomSettleTimer.setSingleShot(true);
@@ -103,26 +99,30 @@ RenderCache::~RenderCache() noexcept {
  *  General Methods
  ******************************************************************************/
 
-bool RenderCache::render(GraphicsScene& scene, const QPoint& pos,
-                         const QSize& size, qreal scale, bool mirror,
+bool RenderCache::render(GraphicsScene& scene, const QTransform& sceneToCache,
+                         const QRect& view, const QColor& backdrop,
                          QImage& out) noexcept {
+  if (!isSupported(sceneToCache)) {
+    return false;
+  }
+  const qreal scale = sceneToCache.m22();
+  const bool mirror = sceneToCache.m11() < 0;
+
   QList<QRectF> dirty;
   dirty = scene.takeDirtyRects();
 
-  const QRect view(
-      QPoint(mirror ? (-pos.x() - size.width()) : pos.x(), pos.y()), size);
   const int margin = sCacheMargin;
-  const QSize ringSize(size.width() + 2 * margin, size.height() + 2 * margin);
+  const QSize ringSize(view.width() + 2 * margin, view.height() + 2 * margin);
   const QRect window = view.adjusted(-margin, -margin, margin, margin);
 
-  const bool sameLayout =
-      (mRing.size() == ringSize) && (mMirror == mirror) && (mScene == &scene);
+  const bool sameLayout = (mRing.size() == ringSize) &&
+      ((mTransform.m11() < 0) == mirror) && (mScene == &scene);
 
   // While zooming, the cached pixels are shown scaled instead of rendering the
   // scene at every step.
   QRectF previewSrc;
-  if (sameLayout && (mScale != scale) && (!mZoomSettled)) {
-    const qreal ratio = mScale / scale;
+  if (sameLayout && (mTransform != sceneToCache) && (!mZoomSettled)) {
+    const qreal ratio = mTransform.m22() / scale;
     previewSrc = QRectF(view.x() * ratio, view.y() * ratio,
                         view.width() * ratio, view.height() * ratio)
                      .intersected(QRectF(mValid));
@@ -132,20 +132,19 @@ bool RenderCache::render(GraphicsScene& scene, const QPoint& pos,
   if (preview) {
     mRefillTimer.stop();
     mZoomSettleTimer.start(sZoomSettleMs);
-    drawZoomPreview(scene, view, scale, previewSrc, out);
+    drawZoomPreview(backdrop, view, scale, previewSrc, out);
     return true;
   }
 
   mZoomSettled = false;
   mZoomSettleTimer.stop();
-  const bool match = sameLayout && (mScale == scale);
+  const bool match = sameLayout && (mTransform == sceneToCache);
   if (!match) {
     if (mRing.size() != ringSize) {
       mRing = QImage(ringSize, QImage::Format_RGBA8888_Premultiplied);
     }
     mValid = QRect();
-    mScale = scale;
-    mMirror = mirror;
+    mTransform = sceneToCache;
     mScene = &scene;
   }
 
@@ -185,14 +184,19 @@ void RenderCache::invalidate() noexcept {
   mRing = QImage();
   mValid = QRect();
   mView = QRect();
-  mScale = 0;
-  mMirror = false;
+  mTransform = QTransform();
   mScene.clear();
 }
 
 /*******************************************************************************
  *  Static Methods
  ******************************************************************************/
+
+bool RenderCache::isSupported(const QTransform& transform) noexcept {
+  return (transform.type() <= QTransform::TxScale) && (transform.dx() == 0) &&
+      (transform.dy() == 0) && (transform.m22() > 0) &&
+      (qAbs(transform.m11()) == transform.m22());
+}
 
 bool RenderCache::snapPos(const QPointF& pos, QPoint& snapped) noexcept {
   if (!((qAbs(pos.x()) <= sMaxViewPos) && (qAbs(pos.y()) <= sMaxViewPos))) {
@@ -260,23 +264,9 @@ bool RenderCache::renderAndStore(GraphicsScene& scene,
 
 QImage RenderCache::renderRegion(GraphicsScene& scene,
                                  const QRect& region) noexcept {
-  const qreal scale = mScale;
-  const QSize size = region.size();
-  const QRectF target(QPointF(0, 0), size);
-  const QRectF source(
-      mMirror ? (-(region.x() + region.width()) / scale) : (region.x() / scale),
-      region.y() / scale, region.width() / scale, region.height() / scale);
-  auto draw = [&](QPaintDevice* device) {
-    QPainter painter(device);
-    painter.setRenderHints(QPainter::Antialiasing |
-                           QPainter::SmoothPixmapTransform);
-    if (mMirror) {
-      painter.translate(size.width(), 0);
-      painter.scale(-1, 1);
-    }
-    scene.renderContent(&painter, target, source);
-  };
-  return mRenderer(size, draw);
+  QTransform sceneToRegion = mTransform;
+  sceneToRegion *= QTransform::fromTranslate(-region.x(), -region.y());
+  return mRenderer(scene, sceneToRegion, region.size());
 }
 
 void RenderCache::storeRegion(const QRect& region, QImage img) noexcept {
@@ -302,17 +292,15 @@ void RenderCache::applyDirtyRects(GraphicsScene& scene,
     return;
   }
 
-  const qreal scale = mScale;
   const qreal limit = 1e8;
   const int pad = 2;
   const int align = 32;
   auto toDevice = [&](const QRectF& r) {
-    const qreal x0 =
-        qBound(-limit, (mMirror ? -r.right() : r.left()) * scale, limit);
-    const qreal x1 =
-        qBound(-limit, (mMirror ? -r.left() : r.right()) * scale, limit);
-    const qreal y0 = qBound(-limit, r.top() * scale, limit);
-    const qreal y1 = qBound(-limit, r.bottom() * scale, limit);
+    const QRectF d = mTransform.mapRect(r);
+    const qreal x0 = qBound(-limit, d.left(), limit);
+    const qreal x1 = qBound(-limit, d.right(), limit);
+    const qreal y0 = qBound(-limit, d.top(), limit);
+    const qreal y1 = qBound(-limit, d.bottom(), limit);
     const int ix0 = (qFloor((x0 - pad) / align)) * align;
     const int iy0 = (qFloor((y0 - pad) / align)) * align;
     const int ix1 = (qCeil((x1 + pad) / align)) * align;
@@ -391,15 +379,15 @@ void RenderCache::applyDirtyRects(GraphicsScene& scene,
   }
 }
 
-void RenderCache::drawZoomPreview(const GraphicsScene& scene, const QRect& view,
+void RenderCache::drawZoomPreview(const QColor& backdrop, const QRect& view,
                                   qreal scale, const QRectF& src,
                                   QImage& out) const noexcept {
-  const qreal ratio = mScale / scale;
+  const qreal ratio = mTransform.m22() / scale;
   const QRect srcPx = src.toAlignedRect();
   QImage tmp(srcPx.size(), QImage::Format_RGBA8888_Premultiplied);
   cropRegion(srcPx, tmp);
 
-  out.fill(scene.getBackgroundColor());
+  out.fill(backdrop);
   QPainter painter(&out);
   painter.setRenderHint(QPainter::SmoothPixmapTransform);
   const QRectF target(src.x() / ratio - view.x(), src.y() / ratio - view.y(),

@@ -55,19 +55,24 @@ protected:
     QList<QSize> sizes;
     bool fail = false;
 
-    RenderCache::SurfaceRenderer renderer() {
-      return
-          [this](const QSize& size, const RenderCache::PaintFunction& paint) {
-            ++calls;
-            sizes.append(size);
-            if (fail) {
-              return QImage();
-            }
-            QImage img(size, QImage::Format_RGBA8888_Premultiplied);
-            img.fill(Qt::transparent);
-            paint(&img);
-            return img;
-          };
+    RenderCache::RegionRenderer renderer() {
+      return [this](GraphicsScene& scene, const QTransform& sceneToDevice,
+                    const QSize& size) {
+        ++calls;
+        sizes.append(size);
+        if (fail) {
+          return QImage();
+        }
+        QImage img(size, QImage::Format_RGBA8888_Premultiplied);
+        img.fill(Qt::transparent);
+        {
+          QPainter painter(&img);
+          painter.setRenderHints(QPainter::Antialiasing |
+                                 QPainter::SmoothPixmapTransform);
+          scene.renderContent(&painter, size, sceneToDevice);
+        }
+        return img;
+      };
     }
   };
 
@@ -136,26 +141,28 @@ protected:
   QImage renderUncached(const QPoint& pos, qreal scale, bool mirror) {
     QImage img(mViewSize, QImage::Format_RGBA8888_Premultiplied);
     img.fill(Qt::transparent);
-    QPainter painter(&img);
-    painter.setRenderHints(QPainter::Antialiasing |
-                           QPainter::SmoothPixmapTransform);
-    if (mirror) {
-      painter.translate(mViewSize.width(), 0);
-      painter.scale(-1, 1);
+    {
+      QPainter painter(&img);
+      painter.setRenderHints(QPainter::Antialiasing |
+                             QPainter::SmoothPixmapTransform);
+      QTransform sceneToView = QTransform::fromScale(scale, scale);
+      sceneToView *= QTransform::fromTranslate(-pos.x(), -pos.y());
+      mScene.renderContent(&painter, mViewSize, sceneToView);
     }
-    mScene.renderContent(
-        &painter, QRectF(QPointF(0, 0), mViewSize),
-        QRectF(pos.x() / scale, pos.y() / scale, mViewSize.width() / scale,
-               mViewSize.height() / scale));
-    return img;
+    return mirror ? img.mirrored(true, false) : img;
   }
 
   QImage renderCached(const QPoint& pos, qreal scale = 1, bool mirror = false,
                       bool* ok = nullptr) {
     QImage img(mViewSize, QImage::Format_RGBA8888_Premultiplied);
     img.fill(Qt::magenta);  // Make unwritten pixels obvious.
-    const bool result =
-        mCache->render(mScene, pos, mViewSize, scale, mirror, img);
+    const QTransform sceneToCache =
+        QTransform::fromScale(mirror ? -scale : scale, scale);
+    const QRect view(
+        QPoint(mirror ? (-pos.x() - mViewSize.width()) : pos.x(), pos.y()),
+        mViewSize);
+    const bool result = mCache->render(mScene, sceneToCache, view,
+                                       mScene.getBackgroundColor(), img);
     if (ok) {
       *ok = result;
     }
@@ -364,6 +371,7 @@ TEST_F(RenderCacheTest, testIdleRefillCompletesMargin) {
 
 TEST_F(RenderCacheTest, testChangedItemRerendersOnlyItsRegion) {
   renderCached(QPoint(0, 0));
+  spinUntilIdle();  // Let the margin refill finish.
   const int calls = mSurface.calls;
 
   mItems.front()->setBrush(Qt::red);
@@ -382,6 +390,7 @@ TEST_F(RenderCacheTest, testChangedItemRerendersOnlyItsRegion) {
 
 TEST_F(RenderCacheTest, testChangeCoveringMostOfViewRerendersView) {
   renderCached(QPoint(0, 0));
+  spinUntilIdle();  // Let the margin refill finish.
   const int calls = mSurface.calls;
 
   addRect(QRectF(-100, -100, 600, 600), Qt::green);
@@ -394,6 +403,7 @@ TEST_F(RenderCacheTest, testChangeCoveringMostOfViewRerendersView) {
 
 TEST_F(RenderCacheTest, testForegroundOnlyChangeDoesNotRender) {
   renderCached(QPoint(0, 0));
+  spinUntilIdle();  // Let the margin refill finish.
   const int calls = mSurface.calls;
 
   mScene.setSelectionRect(Point::fromPx(QPointF(10, 10)),
@@ -446,6 +456,20 @@ TEST_F(RenderCacheTest, testScaleChangeWithoutCacheRendersImmediately) {
   EXPECT_EQ(1, mSurface.calls);
   EXPECT_EQ(mViewSize, mSurface.sizes.first());
   EXPECT_EQ(0, mRepaints);
+}
+
+TEST_F(RenderCacheTest, testUnsupportedTransformIsRejected) {
+  const QRect view(QPoint(0, 0), mViewSize);
+  QImage img(mViewSize, QImage::Format_RGBA8888_Premultiplied);
+  QTransform rotated = QTransform::fromScale(1, 1);
+  rotated.rotate(10);
+  QTransform translated = QTransform::fromTranslate(5, 0);
+  for (const QTransform& tf :
+       {rotated, translated, QTransform::fromScale(1, 2),
+        QTransform::fromScale(1, -1), QTransform::fromScale(0, 0)}) {
+    EXPECT_FALSE(mCache->render(mScene, tf, view, Qt::white, img));
+  }
+  EXPECT_EQ(0, mSurface.calls);
 }
 
 TEST_F(RenderCacheTest, testInvalidateDropsCache) {

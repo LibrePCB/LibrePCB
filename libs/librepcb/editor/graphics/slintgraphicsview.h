@@ -157,8 +157,9 @@ signals:
 private:  // Methods
   bool renderCached(GraphicsScene& scene, const QSize& size,
                     slint::Image& result) noexcept;
-  QImage renderCacheSurface(const QSize& size,
-                            const RenderCache::PaintFunction& paint) noexcept;
+  QImage renderCacheRegion(GraphicsScene& scene,
+                           const QTransform& sceneToDevice,
+                           const QSize& size) noexcept;
   void invalidateRenderCache() noexcept;
   void fitProjection(GraphicsScene& scene, const QSize& size) noexcept;
   void scroll(const QPointF& delta) noexcept;

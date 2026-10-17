@@ -38,6 +38,23 @@ namespace editor {
 
 static const qreal sScrollFactor = 0.07;
 
+static const QPainter::RenderHints sRenderHints =
+    QPainter::Antialiasing | QPainter::SmoothPixmapTransform;
+
+// Maps scene coordinates to a view of the given width, optionally mirrored.
+static QTransform viewTransform(qreal scale, const QPointF& offset, bool mirror,
+                                int width) noexcept {
+  QTransform tf;
+  if (mirror) {
+    tf.translate(width, 0);
+    tf.scale(-scale, scale);
+  } else {
+    tf.scale(scale, scale);
+  }
+  tf.translate(-offset.x(), -offset.y());
+  return tf;
+}
+
 static std::unique_ptr<QOpenGLFramebufferObject> createFbo(const QSize& size) {
   QOpenGLFramebufferObjectFormat format;
   format.setAttachment(QOpenGLFramebufferObject::CombinedDepthStencil);
@@ -64,8 +81,9 @@ SlintGraphicsView::SlintGraphicsView(const QRectF& defaultSceneRect,
     mEventHandler(nullptr),
     mRenderCacheEnabled(false),
     mRenderCache(new RenderCache(
-        [this](const QSize& size, const RenderCache::PaintFunction& paint) {
-          return renderCacheSurface(size, paint);
+        [this](GraphicsScene& scene, const QTransform& sceneToDevice,
+               const QSize& size) {
+          return renderCacheRegion(scene, sceneToDevice, size);
         },
         [this]() {
           // The owner renders again in response to this signal.
@@ -212,24 +230,13 @@ slint::Image SlintGraphicsView::render(GraphicsScene& scene, float width,
     }
     QPainter painter(glDev ? static_cast<QPaintDevice*>(glDev.get())
                            : static_cast<QPaintDevice*>(&pixmap));
-    painter.setRenderHints(QPainter::Antialiasing |
-                           QPainter::SmoothPixmapTransform);
+    painter.setRenderHints(sRenderHints);
     const QRectF targetRect(QPoint(0, 0), size);
     fitProjection(scene, size);
-    QRectF sceneRect(0, 0, size.width() / mProjection.scale,
-                     size.height() / mProjection.scale);
-    sceneRect.translate(mProjection.offset);
-
-    // Render the scene, either mirrored or not.
-    if (mMirror) {
-      painter.save();
-      painter.translate(size.width(), 0);
-      painter.scale(-1, 1);
-    }
-    scene.render(&painter, targetRect, sceneRect);
-    if (mMirror) {
-      painter.restore();
-    }
+    const QTransform tf = viewTransform(mProjection.scale, mProjection.offset,
+                                        mMirror, size.width());
+    scene.renderContent(&painter, size, tf);
+    scene.renderForeground(&painter, size, tf);
 
     // If there was an OpenGL error, print it at the bottom right.
     if (!openGlError.isEmpty()) {
@@ -478,6 +485,12 @@ bool SlintGraphicsView::renderCached(GraphicsScene& scene, const QSize& size,
   }
   const QPointF offset(pos.x() / scale, pos.y() / scale);
 
+  // Cache space is the scaled and optionally mirrored scene, without panning.
+  const QTransform sceneToCache =
+      QTransform::fromScale(mMirror ? -scale : scale, scale);
+  const QRect viewRect(
+      QPoint(mMirror ? (-pos.x() - size.width()) : pos.x(), pos.y()), size);
+
   slint::SharedPixelBuffer<slint::Rgba8Pixel> buffer(
       static_cast<uint32_t>(size.width()),
       static_cast<uint32_t>(size.height()));
@@ -485,29 +498,31 @@ bool SlintGraphicsView::renderCached(GraphicsScene& scene, const QSize& size,
     QImage out(reinterpret_cast<uchar*>(buffer.begin()), size.width(),
                size.height(), size.width() * 4,
                QImage::Format_RGBA8888_Premultiplied);
-    if (!mRenderCache->render(scene, pos, size, scale, mMirror, out)) {
+    if (!mRenderCache->render(scene, sceneToCache, viewRect,
+                              scene.getBackgroundColor(), out)) {
       return false;
     }
 
     // The foreground layer is drawn on top of the cached content every frame.
     QPainter painter(&out);
-    painter.setRenderHints(QPainter::Antialiasing |
-                           QPainter::SmoothPixmapTransform);
-    if (mMirror) {
-      painter.translate(size.width(), 0);
-      painter.scale(-1, 1);
-    }
-    QRectF sceneRect(0, 0, size.width() / scale, size.height() / scale);
-    sceneRect.translate(offset);
-    scene.renderForeground(&painter, QRectF(QPoint(0, 0), size), sceneRect);
+    painter.setRenderHints(sRenderHints);
+    scene.renderForeground(&painter, size,
+                           viewTransform(scale, offset, mMirror, size.width()));
   }
   mViewSize = size;
   result = slint::Image(buffer);
   return true;
 }
 
-QImage SlintGraphicsView::renderCacheSurface(
-    const QSize& size, const RenderCache::PaintFunction& paint) noexcept {
+QImage SlintGraphicsView::renderCacheRegion(GraphicsScene& scene,
+                                            const QTransform& sceneToDevice,
+                                            const QSize& size) noexcept {
+  auto paint = [&](QPaintDevice* device) {
+    QPainter painter(device);
+    painter.setRenderHints(sRenderHints);
+    scene.renderContent(&painter, size, sceneToDevice);
+  };
+
   QImage img;
   if (mGlSurface && mGlContext) {
     if ((!mGlError.isEmpty()) || (!mGlContext->makeCurrent(mGlSurface.get()))) {
