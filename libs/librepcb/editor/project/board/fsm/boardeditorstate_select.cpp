@@ -126,7 +126,8 @@ BoardEditorState_Select::BoardEditorState_Select(
     mCmdPlaneEdit(),
     mSelectedZone(nullptr),
     mSelectedZoneVertices(),
-    mCmdZoneEdit() {
+    mCmdZoneEdit(),
+    mSuppressRubberBand(false) {
 }
 
 BoardEditorState_Select::~BoardEditorState_Select() noexcept {
@@ -517,6 +518,7 @@ bool BoardEditorState_Select::processEditProperties() noexcept {
 bool BoardEditorState_Select::processAbortCommand() noexcept {
   scheduleUpdateAvailableFeatures();
   abortCommand(true);
+  mSuppressRubberBand = true;
   if (BoardGraphicsScene* scene = getActiveBoardScene()) {
     scene->clearSelection();
   }
@@ -574,15 +576,19 @@ bool BoardEditorState_Select::processGraphicsSceneMouseMoved(
     return true;
   } else if (e.buttons.testFlag(Qt::LeftButton)) {
     // Draw selection rectangle
-    scene->selectItemsInRect(e.downPos, e.scenePos);
+    if (!mSuppressRubberBand) {
+      scene->selectItemsInRect(e.downPos, e.scenePos);
+    }
     return true;
   }
 
+  mSuppressRubberBand = false;
   return false;
 }
 
 bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
     const GraphicsSceneMouseEvent& e) noexcept {
+  mSuppressRubberBand = false;
   scheduleUpdateAvailableFeatures();
 
   // Discard any temporary changes and release undo stack.
@@ -680,6 +686,7 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
 
 bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
     const GraphicsSceneMouseEvent& e) noexcept {
+  mSuppressRubberBand = false;
   scheduleUpdateAvailableFeatures();
 
   BoardGraphicsScene* scene = getActiveBoardScene();
