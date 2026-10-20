@@ -113,6 +113,8 @@ add_library(
   graphics/primitivetextgraphicsitem.h
   graphics/primitivezonegraphicsitem.cpp
   graphics/primitivezonegraphicsitem.h
+  graphics/rendercache.cpp
+  graphics/rendercache.h
   graphics/slintgraphicsview.cpp
   graphics/slintgraphicsview.h
   graphics/stroketextgraphicsitem.cpp
