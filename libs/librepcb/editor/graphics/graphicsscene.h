@@ -110,6 +110,19 @@ public:
                    const QColor& background = Qt::transparent) noexcept;
 
 protected:
+  /**
+   * @brief Return the items potentially affected by a rubber-band selection
+   *
+   * Uses Qt's spatial index, so calls are quick.  Items are considered
+   * candidates if they, or any of their children, are intersecting the
+   * window.
+   *
+   * @param rectPx  Selection rectangle in scene pixels.
+   * @return  Candidate items.
+   */
+  QSet<const QGraphicsItem*> getRectSelectionCandidates(
+      const QRectF& rectPx) const noexcept;
+
   void drawBackground(QPainter* painter, const QRectF& rect) noexcept override;
   void drawForeground(QPainter* painter, const QRectF& rect) noexcept override;
 
