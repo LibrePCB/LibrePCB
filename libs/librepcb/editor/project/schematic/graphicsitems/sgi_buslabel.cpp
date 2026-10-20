@@ -103,6 +103,10 @@ void SGI_BusLabel::updateContext() noexcept {
   mAnchorGraphicsItem->setState(state);
 }
 
+QPainterPath SGI_BusLabel::getVisibleShape() const noexcept {
+  return mTextGraphicsItem->mapToParent(mTextGraphicsItem->getVisibleShape());
+}
+
 /*******************************************************************************
  *  Inherited from QGraphicsItem
  ******************************************************************************/

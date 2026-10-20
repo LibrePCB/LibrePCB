@@ -226,28 +226,23 @@ void SymbolGraphicsItem::updateAllTexts() noexcept {
   }
 }
 
-void SymbolGraphicsItem::setSelectionRect(const QRectF rect) noexcept {
-  QPainterPath path;
-  path.addRect(rect);
+void SymbolGraphicsItem::setSelectionRect(const QRectF rect,
+                                          RectSelection::Mode mode) noexcept {
+  const RectSelection selection{rect, mode};
   foreach (const auto& ptr, mPinGraphicsItems) {
-    QPainterPath mappedPath = mapToItem(ptr.get(), path);
-    ptr->setSelected(ptr->shape().intersects(mappedPath));
+    ptr->setSelected(hits(selection, *ptr));
   }
   foreach (const auto& ptr, mCircleGraphicsItems) {
-    QPainterPath mappedPath = mapToItem(ptr.get(), path);
-    ptr->setSelected(ptr->shape().intersects(mappedPath));
+    ptr->setSelected(hits(selection, *ptr));
   }
   foreach (const auto& ptr, mPolygonGraphicsItems) {
-    QPainterPath mappedPath = mapToItem(ptr.get(), path);
-    ptr->setSelected(ptr->shape().intersects(mappedPath));
+    ptr->setSelected(hits(selection, *ptr));
   }
   foreach (const auto& ptr, mTextGraphicsItems) {
-    QPainterPath mappedPath = mapToItem(ptr.get(), path);
-    ptr->setSelected(ptr->shape().intersects(mappedPath));
+    ptr->setSelected(hits(selection, *ptr));
   }
   foreach (const auto& ptr, mImageGraphicsItems) {
-    QPainterPath mappedPath = mapToItem(ptr.get(), path);
-    ptr->setSelected(ptr->shape().intersects(mappedPath));
+    ptr->setSelected(hits(selection, *ptr));
   }
 }
 

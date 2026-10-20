@@ -85,6 +85,11 @@ void SGI_Text::updateContext() noexcept {
   mAnchorGraphicsItem->setState(state);
 }
 
+QPainterPath SGI_Text::getVisibleShape() const noexcept {
+  Q_ASSERT(mTextGraphicsItem);
+  return mTextGraphicsItem->mapToParent(mTextGraphicsItem->getVisibleShape());
+}
+
 /*******************************************************************************
  *  Inherited from QGraphicsItem
  ******************************************************************************/
