@@ -41,6 +41,7 @@
 #include <librepcb/core/library/pkg/footprintpad.h>
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/boarddesignrules.h>
+#include <librepcb/core/project/board/drc/boarddesignrulechecksettings.h>
 #include <librepcb/core/project/board/items/bi_netline.h>
 #include <librepcb/core/project/board/items/bi_netpoint.h>
 #include <librepcb/core/project/board/items/bi_netsegment.h>
@@ -85,6 +86,7 @@ BoardEditorState_DrawTrace::BoardEditorState_DrawTrace(
     mCursorPos(),
     mCurrentWidth(mContext.board.getDesignRules().getDefaultTraceWidth()),
     mCurrentAutoWidth(false),
+    mShowClearanceCircle(false),
     mCurrentSnapActive(true),
     mFixedStartAnchor(nullptr),
     mCurrentNetSegment(nullptr),
@@ -96,6 +98,8 @@ BoardEditorState_DrawTrace::BoardEditorState_DrawTrace(
   QSettings cs;
   mCurrentAutoWidth =
       cs.value("board_editor/draw_trace/width/auto", true).toBool();
+  mShowClearanceCircle =
+      cs.value("board_editor/draw_trace/clearance_circle", false).toBool();
 }
 
 BoardEditorState_DrawTrace::~BoardEditorState_DrawTrace() noexcept {
@@ -116,6 +120,9 @@ bool BoardEditorState_DrawTrace::entry() noexcept {
 bool BoardEditorState_DrawTrace::exit() noexcept {
   // Abort the currently active command
   if (!abortPositioning(true, true)) return false;
+
+  // Explicitly clear the overlay cursor
+  mAdapter.fsmSetSceneCursor(Point());
 
   mAdapter.fsmSetViewCursor(std::nullopt);
   mAdapter.fsmToolLeave();
@@ -294,11 +301,24 @@ void BoardEditorState_DrawTrace::setAutoWidth(bool autoWidth) noexcept {
   }
 }
 
+void BoardEditorState_DrawTrace::setShowClearanceCircle(bool show) noexcept {
+  if (show != mShowClearanceCircle) {
+    mShowClearanceCircle = show;
+    emit showClearanceCircleChanged(mShowClearanceCircle);
+    updateClearanceCircleRadius();
+
+    // Save client settings.
+    QSettings cs;
+    cs.setValue("board_editor/draw_trace/clearance_circle", show);
+  }
+}
+
 void BoardEditorState_DrawTrace::setWidth(
     const PositiveLength& width) noexcept {
   if (width != mCurrentWidth) {
     mCurrentWidth = width;
     emit widthChanged(mCurrentWidth);
+    updateClearanceCircleRadius();
   }
 
   if (mSubState != SubState::SubState_PositioningNetPoint) return;
@@ -950,6 +970,9 @@ void BoardEditorState_DrawTrace::updateNetpointPositions() noexcept {
   mPositioningNetLine1->setWidth(mCurrentWidth);
   mPositioningNetLine2->setWidth(mCurrentWidth);
 
+  // Keep the cursor in sync with the current net's properties.
+  updateClearanceCircleRadius();
+
   // Force updating airwires immediately as they are important for creating
   // traces.
   scene->getBoard().triggerAirWiresRebuild();
@@ -1061,6 +1084,25 @@ Point BoardEditorState_DrawTrace::calcMiddlePointPos(
   }
 }
 
+void BoardEditorState_DrawTrace::updateClearanceCircleRadius() noexcept {
+  // std::nullopt means "don't draw a clearance circle" (see
+  // GraphicsScene::drawForeground()).
+  GraphicsSceneCursor
+      cursor;  // cross/circle default false - unused by this tool
+  if (mShowClearanceCircle && (mSubState == SubState_PositioningNetPoint)) {
+    // The clearance circle radius is the applicable copper clearance plus
+    // half of the current trace width.
+    UnsignedLength minClearance =
+        mContext.board.getDrcSettings().getMinCopperCopperClearance();
+    if (mCurrentNetClass) {
+      minClearance = std::max(minClearance,
+                              mCurrentNetClass->getMinCopperCopperClearance());
+    }
+    cursor.clearanceRadius = UnsignedLength(minClearance + (mCurrentWidth / 2));
+  }
+  mAdapter.fsmSetSceneCursor(mTargetPos, cursor);
+}
+
 void BoardEditorState_DrawTrace::updateNetClass() noexcept {
   NetClass* nc = nullptr;
   if (mCurrentNetSegment) {
@@ -1074,6 +1116,7 @@ void BoardEditorState_DrawTrace::updateNetClass() noexcept {
     mCurrentNetClass = nc;
     emit netClassChanged(mCurrentNetClass);
   }
+  updateClearanceCircleRadius();
 
   const PositiveLength newDrill = getViaDrillDiameter();
   if (newDrill != oldDrill) {
