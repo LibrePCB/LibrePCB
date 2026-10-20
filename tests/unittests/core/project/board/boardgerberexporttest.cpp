@@ -28,6 +28,7 @@
 #include <librepcb/core/project/board/boardgerberexport.h>
 #include <librepcb/core/project/board/boardplanefragmentsbuilder.h>
 #include <librepcb/core/project/circuit/circuit.h>
+#include <librepcb/core/project/circuit/netclass.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectloader.h>
 
@@ -78,6 +79,14 @@ TEST(BoardGerberExportTest, test) {
       loader.open(std::make_unique<TransactionalDirectory>(projectFs),
                   projectFp.getFilename());
   Board* board = project->getBoards().first();
+
+  // Keep this legacy Gerber snapshot focused on export serialization. Plane
+  // geometry with netclass-specific clearance has dedicated coverage in
+  // BoardPlaneFragmentsBuilderTest.
+  NetClass* specialNetClass =
+      project->getCircuit().getNetClassByName(ElementName("special"));
+  ASSERT_NE(nullptr, specialNetClass);
+  specialNetClass->setMinCopperCopperClearance(UnsignedLength(0));
 
   // force planes rebuild
   BoardPlaneFragmentsBuilder builder;
