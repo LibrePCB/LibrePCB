@@ -47,6 +47,7 @@ namespace editor {
 
 class ApiEndpointListModelLegacy;
 class KeyboardShortcutsModel;
+class SpaceMouseSettingsWidget;
 
 namespace Ui {
 class WorkspaceSettingsDialog;
@@ -117,6 +118,7 @@ private:
   QScopedPointer<KeyboardShortcutsModel> mKeyboardShortcutsModel;
   QScopedPointer<QSortFilterProxyModel> mKeyboardShortcutsFilterModel;
   QScopedPointer<Ui::WorkspaceSettingsDialog> mUi;
+  SpaceMouseSettingsWidget* mSpaceMouseWidget;
   std::optional<slint::ComponentHandle<ui::ColorSchemeDialog>>
       mColorSchemeDialog;
 
