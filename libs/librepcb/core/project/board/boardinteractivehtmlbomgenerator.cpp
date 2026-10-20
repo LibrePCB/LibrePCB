@@ -231,7 +231,7 @@ std::shared_ptr<InteractiveHtmlBom> BoardInteractiveHtmlBomGenerator::generate(
     QList<InteractiveHtmlBom::Pad> pads;
     for (const auto& p : d->getPads()) {
       const NetSignal* net = p->getNetSignal();
-      const bool pin1 = (d->getPads().count() > 1) &&
+      const bool pin1 = (d->getPads().count() > 1) && p->getLibPackagePad() &&
           (QStringList{"1", "A"}.contains(*p->getLibPackagePad()->getName()));
       pads.append(InteractiveHtmlBom::Pad{
           p->isOnLayer(Layer::topCopper()),
