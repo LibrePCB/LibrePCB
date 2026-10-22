@@ -38,6 +38,7 @@
 #include <librepcb/core/project/board/boardnetsegmentsplitter.h>
 #include <librepcb/core/project/board/items/bi_device.h>
 #include <librepcb/core/project/board/items/bi_hole.h>
+#include <librepcb/core/project/board/items/bi_netline.h>
 #include <librepcb/core/project/board/items/bi_netpoint.h>
 #include <librepcb/core/project/board/items/bi_netsegment.h>
 #include <librepcb/core/project/board/items/bi_pad.h>
@@ -229,9 +230,11 @@ void CmdRemoveBoardItems::removeNetSegmentItems(
       viaMap.insert(via.getUuid(), newVia);
     }
     QHash<Uuid, BI_NetLineAnchor*> junctionMap;
+    // Keeping the UUIDs is safe since the old segment is removed already,
+    // and it keeps references to the remaining items valid.
     for (const Junction& junction : segment.junctions) {
-      BI_NetPoint* newNetPoint =
-          cmdAddElements->addNetPoint(junction.getPosition());
+      BI_NetPoint* newNetPoint = cmdAddElements->addNetPoint(*new BI_NetPoint(
+          *newNetSegment, junction.getUuid(), junction.getPosition()));
       junctionMap.insert(junction.getUuid(), newNetPoint);
     }
     for (const Trace& trace : segment.traces) {
@@ -265,7 +268,8 @@ void CmdRemoveBoardItems::removeNetSegmentItems(
         throw LogicError(__FILE__, __LINE__);
       }
       BI_NetLine* newNetLine = cmdAddElements->addNetLine(
-          *p1, *p2, trace.getLayer(), trace.getWidth());
+          *new BI_NetLine(*newNetSegment, trace.getUuid(), *p1, *p2,
+                          trace.getLayer(), trace.getWidth()));
       Q_ASSERT(newNetLine);
       Q_UNUSED(newNetLine);
     }
