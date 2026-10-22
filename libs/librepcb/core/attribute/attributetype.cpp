@@ -87,16 +87,22 @@ bool AttributeType::isUnitAvailable(const AttributeUnit* unit) const noexcept {
 
 const AttributeUnit* AttributeType::tryExtractUnitFromValue(
     QString& value) const noexcept {
+  // The longest suffix wins, e.g. "MHz" must not be taken as "Hz".
+  const AttributeUnit* result = nullptr;
+  int length = 0;
   foreach (const AttributeUnit* unit, mAvailableUnits) {
     foreach (const QString& suffix, unit->getUserInputSuffixes()) {
-      if (value.endsWith(suffix)) {
-        value.chop(suffix.length());
-        value = value.trimmed();
-        return unit;
+      if (value.endsWith(suffix) && (suffix.length() > length)) {
+        result = unit;
+        length = suffix.length();
       }
     }
   }
-  return nullptr;
+  if (result) {
+    value.chop(length);
+    value = value.trimmed();
+  }
+  return result;
 }
 
 /*******************************************************************************
