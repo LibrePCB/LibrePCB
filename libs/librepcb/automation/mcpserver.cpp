@@ -62,8 +62,9 @@ static void validate(const QJsonValue& value, const QJsonObject& schema,
                      const QString& path) {
   const QJsonValue typeValue = schema.value("type");
   QStringList types;
-  for (const QJsonValue& t :
-       typeValue.isArray() ? typeValue.toArray() : QJsonArray{typeValue}) {
+  const QJsonArray typeValues =
+      typeValue.isArray() ? typeValue.toArray() : QJsonArray{typeValue};
+  for (const QJsonValue& t : typeValues) {
     if (t.isString()) types.append(t.toString());
   }
   if ((!types.isEmpty()) &&
@@ -128,7 +129,8 @@ static void validate(const QJsonValue& value, const QJsonObject& schema,
                                .arg(subPath, properties.keys().join(", ")));
       }
     }
-    for (const QJsonValue& key : schema.value("required").toArray()) {
+    const QJsonArray requiredKeys = schema.value("required").toArray();
+    for (const QJsonValue& key : requiredKeys) {
       if (!obj.contains(key.toString())) {
         throw RuntimeError(
             __FILE__, __LINE__,
@@ -234,7 +236,7 @@ std::optional<QJsonObject> McpServer::handleMessage(
     return makeResult(id, listTools());
   } else if (method == "tools/call") {
     const QString name = params.value("name").toString();
-    for (const McpTool& tool : mTools) {
+    for (const McpTool& tool : std::as_const(mTools)) {
       if (tool.name == name) {
         return makeResult(id, callTool(params));
       }

@@ -73,7 +73,8 @@ static std::pair<QJsonArray, int> searchElements(const WorkspaceLibraryDb& db,
                                                  int offset, int limit) {
   QList<Uuid> uuids = findLibraryElements<ElementType>(db, query);  // can throw
   if constexpr (std::is_same_v<ElementType, Device>) {
-    for (const Uuid& uuid : db.findDevicesOfParts(query)) {  // can throw
+    const auto partDevices = db.findDevicesOfParts(query);  // can throw
+    for (const Uuid& uuid : partDevices) {
       if (!uuids.contains(uuid)) uuids.append(uuid);
     }
   }
@@ -88,7 +89,8 @@ static std::pair<QJsonArray, int> searchElements(const WorkspaceLibraryDb& db,
     return std::get<0>(a).compare(std::get<0>(b), Qt::CaseInsensitive) < 0;
   });
   QJsonArray results;
-  for (const auto& [name, uuid, fp] : matches.mid(offset, limit)) {
+  const auto page = matches.mid(offset, limit);
+  for (const auto& [name, uuid, fp] : page) {
     QString description;
     db.getTranslations<ElementType>(fp, {}, nullptr, &description);
     QJsonObject obj{
@@ -167,7 +169,8 @@ template <typename ElementType>
 static QSet<Uuid> findCategories(const WorkspaceLibraryDb& db,
                                  const QJsonValue& value) {
   QSet<Uuid> uuids;
-  for (const QJsonValue& category : value.toArray()) {
+  const QJsonArray categoryValues = value.toArray();
+  for (const QJsonValue& category : categoryValues) {
     uuids.insert(
         findLibraryElement<ElementType>(db, category.toString()).first);
   }
@@ -238,7 +241,8 @@ static QJsonObject componentDetails(const WorkspaceLibraryDb& db,
     });
   }
   QJsonArray devices;
-  for (const Uuid& uuid : db.getComponentDevices(cmp.getUuid())) {
+  const auto deviceUuids = db.getComponentDevices(cmp.getUuid());
+  for (const Uuid& uuid : deviceUuids) {
     const FilePath fp = db.getLatest<Device>(uuid);  // can throw
     if (!fp.isValid()) continue;
     devices.append(QJsonObject{
@@ -431,7 +435,8 @@ void addLibraryTools(McpServer& server, DesignSession& session) noexcept {
         Workspace& ws = session.getWorkspace();
         session.startNetworking();
         QJsonArray array;
-        for (const ApiEndpoint::Library& lib : fetchRemoteLibraries(ws)) {
+        const auto libraries = fetchRemoteLibraries(ws);
+        for (const ApiEndpoint::Library& lib : libraries) {
           array.append(QJsonObject{
               {"name", lib.name},
               {"description", lib.description},
@@ -473,7 +478,8 @@ void addLibraryTools(McpServer& server, DesignSession& session) noexcept {
                 }
               }
             };
-        for (const QJsonValue& name : args.value("names").toArray()) {
+        const QJsonArray nameValues = args.value("names").toArray();
+        for (const QJsonValue& name : nameValues) {
           bool found = false;
           for (const ApiEndpoint::Library& lib : remoteLibs) {
             if (lib.name.compare(name.toString(), Qt::CaseInsensitive) == 0) {
@@ -658,7 +664,9 @@ void addLibraryTools(McpServer& server, DesignSession& session) noexcept {
                                  .arg(dir.toNative()));
         }
         QSet<Uuid> dependencies;
-        for (const QJsonValue& dep : args.value("dependencies").toArray()) {
+        const QJsonArray dependencyValues =
+            args.value("dependencies").toArray();
+        for (const QJsonValue& dep : dependencyValues) {
           dependencies.insert(
               findLibraryElement<Library>(ws.getLibraryDb(), dep.toString())
                   .first);
@@ -719,7 +727,8 @@ void addLibraryTools(McpServer& server, DesignSession& session) noexcept {
                    args.value("description").toString(), QString());
         sym.setCategories(findCategories<ComponentCategory>(
             ws.getLibraryDb(), args.value("categories")));
-        for (const QJsonValue& value : args.value("pins").toArray()) {
+        const QJsonArray pinValues = args.value("pins").toArray();
+        for (const QJsonValue& value : pinValues) {
           const QJsonObject pin = value.toObject();
           const QJsonValue lengthValue = pin.value("length");
           const UnsignedLength length(lengthValue.isUndefined()
@@ -844,7 +853,8 @@ void addLibraryTools(McpServer& server, DesignSession& session) noexcept {
         };
         bool hasTht = false, hasSmt = false;
         std::optional<Point> pin1;
-        for (const QJsonValue& value : args.value("pads").toArray()) {
+        const QJsonArray padValues = args.value("pads").toArray();
+        for (const QJsonValue& value : padValues) {
           const QJsonObject obj = value.toObject();
           const CircuitIdentifier name(requiredString(obj, "name"));
           if (pkg.getPads().contains(*name)) {
@@ -920,7 +930,8 @@ void addLibraryTools(McpServer& server, DesignSession& session) noexcept {
           extend(pos, Length::fromPx(rect.width()).toMm(),
                  Length::fromPx(rect.height()).toMm());
         }
-        for (const QJsonValue& value : args.value("holes").toArray()) {
+        const QJsonArray holeValues = args.value("holes").toArray();
+        for (const QJsonValue& value : holeValues) {
           const QJsonObject obj = value.toObject();
           const Point pos = pointMm(obj.value("position"), "position");
           const PositiveLength diameter(
@@ -978,7 +989,8 @@ void addLibraryTools(McpServer& server, DesignSession& session) noexcept {
             PositiveLength(1000000), UnsignedLength(200000),
             StrokeTextSpacing(), StrokeTextSpacing(),
             Alignment(HAlign::center(), VAlign::top()), false, true, false));
-        for (const QJsonValue& value : args.value("keepouts").toArray()) {
+        const QJsonArray keepoutValues = args.value("keepouts").toArray();
+        for (const QJsonValue& value : keepoutValues) {
           const QJsonObject obj = value.toObject();
           const QString layers = obj.value("layers").toString("top");
           Zone::Layers flags;
@@ -1091,7 +1103,7 @@ void addLibraryTools(McpServer& server, DesignSession& session) noexcept {
         };
         QList<Gate> gateList;
         QHash<QString, int> pinCount;
-        for (const QJsonValue& value : gates) {
+        for (const QJsonValue& value : std::as_const(gates)) {
           const QJsonObject obj = value.toObject();
           const auto found =
               findLibraryElement<Symbol>(db, requiredString(obj, "symbol"));
@@ -1236,7 +1248,8 @@ void addLibraryTools(McpServer& server, DesignSession& session) noexcept {
           dev.getPadSignalMap().append(
               std::make_shared<DevicePadSignalMapItem>(pad.getUuid(), signal));
         }
-        for (const QJsonValue& value : args.value("parts").toArray()) {
+        const QJsonArray partValues = args.value("parts").toArray();
+        for (const QJsonValue& value : partValues) {
           const QJsonObject part = value.toObject();
           dev.getParts().append(std::make_shared<Part>(
               SimpleString(cleanSimpleString(requiredString(part, "mpn"))),

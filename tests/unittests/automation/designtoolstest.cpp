@@ -144,7 +144,7 @@ public:
     ok("project_create",
        {{"path", mTmpDir.getPathTo("project/test.lpp").toStr()},
         {"name", "Test"}});
-    for (const QString value : {"1k", "47k"}) {
+    for (const char* value : {"1k", "47k"}) {
       structured("schematic_add_part",
                  {{"component", "Resistor"},
                   {"device", "R-0805"},
@@ -159,10 +159,11 @@ public:
 
   QMap<QString, QStringList> netlist() {
     QMap<QString, QStringList> result;
-    for (const QJsonValue& net :
-         structured("netlist_get").value("nets").toArray()) {
+    const QJsonArray nets = structured("netlist_get").value("nets").toArray();
+    for (const QJsonValue& net : nets) {
       QStringList pins;
-      for (const QJsonValue& pin : net.toObject().value("pins").toArray()) {
+      const QJsonArray pinValues = net.toObject().value("pins").toArray();
+      for (const QJsonValue& pin : pinValues) {
         pins.append(pin.toString());
       }
       result.insert(net.toObject().value("name").toString(), pins);
@@ -396,7 +397,7 @@ TEST_F(DesignToolsTest, testBoardPlaceRouteAndPlane) {
      {{"from", "R1.1"},
       {"to", "R2.1"},
       {"layer", "top"},
-      {"points", QJsonArray{QJsonArray{5, 10}}}});
+      {"points", QJsonArray{QJsonValue(QJsonArray{5, 10})}}});
   EXPECT_EQ(1, unroutedCount());
   EXPECT_TRUE(
       error("board_route", {{"from", "R1.1"}, {"to", "R2.2"}, {"layer", "top"}})
@@ -529,12 +530,9 @@ TEST_F(DesignToolsTest, testMovePartMovesNetLabels) {
                                        {"position", QJsonArray{80, 50}},
                                        {"rotation", 90}});
   Schematic& schematic = mSession->getSchematic(0);
-  for (const QJsonValue& value : part.value("symbols")
-                                     .toArray()
-                                     .at(0)
-                                     .toObject()
-                                     .value("pins")
-                                     .toArray()) {
+  const QJsonArray positions =
+      part.value("symbols").toArray().at(0).toObject().value("pins").toArray();
+  for (const QJsonValue& value : positions) {
     const Point pin = Point::fromMm(
         value.toObject().value("position").toArray().at(0).toDouble(),
         value.toObject().value("position").toArray().at(1).toDouble());
@@ -615,7 +613,8 @@ TEST_F(DesignToolsTest, testRenderBoardReturnsImageTransform) {
   EXPECT_NEAR(info.value("height").toDouble() / 2,
               (topLeft.at(1).toDouble() - 10) * 10, 2.0);
   bool hasImage = false;
-  for (const QJsonValue& content : result.value("content").toArray()) {
+  const QJsonArray contents = result.value("content").toArray();
+  for (const QJsonValue& content : contents) {
     hasImage |= (content.toObject().value("type").toString() == "image");
   }
   EXPECT_TRUE(hasImage);
@@ -749,7 +748,7 @@ TEST_F(DesignToolsTest, testBoardTexts) {
   };
   ASSERT_TRUE(deviceTexts().contains("{{NAME}}"));
   EXPECT_FALSE(deviceTexts().contains("{{VALUE}}"));
-  const BoardStrokeTextData& name = deviceTexts()["{{NAME}}"]->getData();
+  const BoardStrokeTextData& name = deviceTexts().value("{{NAME}}")->getData();
   EXPECT_EQ(Point::fromMm(10, 8), name.getPosition());
   EXPECT_EQ(Angle::deg90(), name.getRotation());
   EXPECT_EQ(PositiveLength(800000), name.getHeight());
@@ -777,7 +776,8 @@ TEST_F(DesignToolsTest, testCreateSmtPackage) {
                    QJsonArray{pad("1", -1.5, -0.5), pad("2", 1.5, -0.5),
                               pad("3", 1.5, 0.5), pad("4", -1.5, 0.5)}},
                   {"body", QJsonArray{3, 3}}});
-  for (const QJsonValue& msg : result.value("messages").toArray()) {
+  const QJsonArray messages = result.value("messages").toArray();
+  for (const QJsonValue& msg : messages) {
     EXPECT_NE("error", msg.toObject().value("severity").toString())
         << msg.toObject().value("message").toString().toStdString();
   }
@@ -860,7 +860,8 @@ TEST_F(DesignToolsTest, testApproveDrcMessages) {
   const QJsonObject after = structured("drc_run");
   EXPECT_EQ(before.value("nonApprovedCount").toInt() - 1,
             after.value("nonApprovedCount").toInt());
-  for (const QJsonValue& msg : after.value("messages").toArray()) {
+  const QJsonArray afterMessages = after.value("messages").toArray();
+  for (const QJsonValue& msg : afterMessages) {
     EXPECT_EQ(msg.toObject().value("id").toString() == id,
               msg.toObject().value("approved").toBool());
   }
@@ -877,7 +878,8 @@ TEST_F(DesignToolsTest, testApproveErcMessages) {
   const QJsonObject before = structured("erc_run");
   ASSERT_GT(before.value("nonApprovedCount").toInt(), 0);
   QJsonArray ids;
-  for (const QJsonValue& msg : before.value("messages").toArray()) {
+  const QJsonArray messages = before.value("messages").toArray();
+  for (const QJsonValue& msg : messages) {
     ids.append(msg.toObject().value("id"));
   }
   ok("erc_approve", {{"ids", ids}});
@@ -898,15 +900,15 @@ TEST_F(DesignToolsTest, testDrcReportsEveryLocationOfAMessage) {
             {10, 20},
             {0, 20}})}});
   QJsonArray locations;
-  for (const QJsonValue& msg :
-       structured("drc_run").value("messages").toArray()) {
+  const QJsonArray messages = structured("drc_run").value("messages").toArray();
+  for (const QJsonValue& msg : messages) {
     if (msg.toObject().value("message").toString().contains("inner radius")) {
       locations = msg.toObject().value("locations").toArray();
     }
   }
   ASSERT_EQ(2, locations.count());
   QList<qreal> xs;
-  for (const QJsonValue& location : locations) {
+  for (const QJsonValue& location : std::as_const(locations)) {
     const QJsonArray center = location.toObject().value("center").toArray();
     EXPECT_NEAR(10, center.at(1).toDouble(), 1.0);
     xs.append(center.at(0).toDouble());
@@ -999,7 +1001,8 @@ TEST_F(DesignToolsTest, testNumberLimitsAreInSchema) {
 }
 
 static Point padPosition(const QJsonObject& device, const QString& pad) {
-  for (const QJsonValue& value : device.value("pads").toArray()) {
+  const QJsonArray pads = device.value("pads").toArray();
+  for (const QJsonValue& value : pads) {
     if (value.toObject().value("pad").toString() == pad) {
       const QJsonArray pos = value.toObject().value("position").toArray();
       return Point::fromMm(pos.at(0).toDouble(), pos.at(1).toDouble());
@@ -1076,7 +1079,8 @@ TEST_F(DesignToolsTest, testListBoardItems) {
               trace.value("to").toObject().contains("pad"));
   EXPECT_EQ(QStringList{via}, ids(all.value("vias").toArray()));
   QStringList boardTexts;
-  for (const QJsonValue& t : all.value("texts").toArray()) {
+  const QJsonArray texts = all.value("texts").toArray();
+  for (const QJsonValue& t : texts) {
     if (!t.toObject().contains("part")) {
       boardTexts.append(t.toObject().value("id").toString());
     }
@@ -1249,7 +1253,8 @@ TEST_F(DesignToolsTest, testRouteToPointOnTrace) {
      {{"from", "R1.1"},
       {"to", "R2.1"},
       {"layer", "top"},
-      {"points", QJsonArray{toArray(Point(a1.getX(), a2.getY()))}}});
+      {"points",
+       QJsonArray{QJsonValue(toArray(Point(a1.getX(), a2.getY())))}}});
   EXPECT_EQ(2, unroutedCount());  // R3.1 and net B.
   ok("board_route",
      {{"from", "R3.1"},
@@ -1368,7 +1373,8 @@ TEST_F(DesignToolsTest, testFootprintGeometryOfPlacedPart) {
   const QJsonObject courtyard =
       part.value("courtyard").toArray().at(0).toObject();
   EXPECT_EQ("bottom", courtyard.value("side").toString());
-  for (const QJsonValue& v : courtyard.value("vertices").toArray()) {
+  const QJsonArray vertices = courtyard.value("vertices").toArray();
+  for (const QJsonValue& v : vertices) {
     // Body 6x2 and the hole up to y=2, rotated by 90°.
     EXPECT_NEAR(10, v.toArray().at(0).toDouble(), 2.3);
     EXPECT_NEAR(10, v.toArray().at(1).toDouble(), 3.6);
@@ -1411,7 +1417,8 @@ TEST_F(DesignToolsTest, testPackageWithCustomPadSlotAndLegend) {
                         {"paste", false}}}},
        {"body", QJsonArray{6, 3}},
        {"legend", true}});
-  for (const QJsonValue& msg : result.value("messages").toArray()) {
+  const QJsonArray messages = result.value("messages").toArray();
+  for (const QJsonValue& msg : messages) {
     const QString text = msg.toObject().value("message").toString();
     if (!text.contains("categories")) {
       EXPECT_NE("error", msg.toObject().value("severity").toString())
@@ -1512,8 +1519,9 @@ TEST_F(DesignToolsTest, testNetClass) {
       {"minClearance", 0.3},
       {"nets", QJsonArray{"A"}}});
   QJsonObject power;
-  for (const QJsonValue& nc :
-       structured("board_get_settings").value("netClasses").toArray()) {
+  const QJsonArray netClasses =
+      structured("board_get_settings").value("netClasses").toArray();
+  for (const QJsonValue& nc : netClasses) {
     if (nc.toObject().value("name") == "Power") power = nc.toObject();
   }
   EXPECT_EQ(QJsonArray{"A"}, power.value("nets").toArray());
@@ -1528,8 +1536,9 @@ TEST_F(DesignToolsTest, testNetClass) {
           .value("width")
           .toDouble());  // Net B is in the default class.
   auto defaultClass = [this]() {
-    for (const QJsonValue& nc :
-         structured("board_get_settings").value("netClasses").toArray()) {
+    const QJsonArray classes =
+        structured("board_get_settings").value("netClasses").toArray();
+    for (const QJsonValue& nc : classes) {
       if (nc.toObject().value("name") == "default") return nc.toObject();
     }
     return QJsonObject();
@@ -1748,7 +1757,8 @@ TEST_F(DesignToolsTest, testMultiGateComponent) {
                                         {"gate", "B"},
                                         {"position", QJsonArray{100, 100}}});
   int atNewPosition = 0;
-  for (const QJsonValue& symbol : moved.value("symbols").toArray()) {
+  const QJsonArray symbols = moved.value("symbols").toArray();
+  for (const QJsonValue& symbol : symbols) {
     if (symbol.toObject().value("position") == QJsonArray({100, 100})) {
       EXPECT_EQ("B", symbol.toObject().value("gate").toString());
       ++atNewPosition;
@@ -1757,8 +1767,8 @@ TEST_F(DesignToolsTest, testMultiGateComponent) {
   EXPECT_EQ(1, atNewPosition);
   // The required power pin is not connected.
   bool required = false;
-  for (const QJsonValue& msg :
-       structured("erc_run").value("messages").toArray()) {
+  const QJsonArray messages = structured("erc_run").value("messages").toArray();
+  for (const QJsonValue& msg : messages) {
     required |= msg.toObject().value("message").toString().contains("V+");
   }
   EXPECT_TRUE(required);
@@ -1824,7 +1834,8 @@ TEST_F(DesignToolsTest, testQueryBoardArea) {
   EXPECT_EQ("R1", parts.at(0).toObject().value("designator").toString());
   EXPECT_EQ(2, parts.at(0).toObject().value("pads").toArray().count());
   EXPECT_TRUE(parts.at(0).toObject().contains("box"));
-  for (const QJsonValue& text : result.value("texts").toArray()) {
+  const QJsonArray texts = result.value("texts").toArray();
+  for (const QJsonValue& text : texts) {
     EXPECT_TRUE(text.toObject().contains("box"));
   }
 
@@ -1863,10 +1874,11 @@ TEST_F(DesignToolsTest, testPartTextIdsAddressTheirPart) {
              {{"designator", "R2"}, {"position", QJsonArray{10, 15}}});
   auto nameTexts = [this]() {
     QMap<QString, QJsonObject> texts;
-    for (const QJsonValue& value :
-         structured("board_list_items", {{"types", QJsonArray{"texts"}}})
-             .value("texts")
-             .toArray()) {
+    const QJsonArray textItems =
+        structured("board_list_items", {{"types", QJsonArray{"texts"}}})
+            .value("texts")
+            .toArray();
+    for (const QJsonValue& value : textItems) {
       const QJsonObject text = value.toObject();
       if (text.value("text") == "{{NAME}}") {
         texts.insert(text.value("part").toString(), text);
@@ -1918,7 +1930,9 @@ TEST_F(DesignToolsTest, testSupplySymbolNamesTheNetOfAWire) {
   const QMap<QString, QStringList> nets = netlist();
   EXPECT_EQ((QStringList{"GND3.Net", "GND4.Net", "R3.1", "R4.1"}),
             nets.value("GND"));
-  EXPECT_EQ(QStringList(), nets.keys().filter(QRegularExpression("^N\\d")));
+  EXPECT_EQ(QStringList(),
+            QStringList(nets.keyBegin(), nets.keyEnd())
+                .filter(QRegularExpression("^N\\d")));
   structured("schematic_connect",
              {{"pins", QJsonArray{"R3.2", "R4.2"}}, {"net", "B"}});
   EXPECT_EQ(0, structured("erc_run").value("messages").toArray().count());

@@ -118,7 +118,7 @@ static const Layer& copperLayer(const QJsonValue& value, const Board& board) {
     return Layer::botCopper();
   } else if (name.startsWith("inner")) {
     bool ok = false;
-    const int number = name.mid(5).toInt(&ok);
+    const int number = QStringView(name).mid(5).toInt(&ok);
     if (ok && (number >= 1) && (number <= innerCount)) {
       return *Layer::innerCopper(number);
     }
@@ -399,7 +399,7 @@ static QJsonArray layerNames(const QSet<const Layer*>& layers) noexcept {
     return a->getCopperNumber() < b->getCopperNumber();
   });
   QJsonArray array;
-  for (const Layer* layer : sorted) {
+  for (const Layer* layer : std::as_const(sorted)) {
     array.append(layerName(*layer));
   }
   return array;
@@ -732,9 +732,10 @@ static QList<std::tuple<QString, FilePath, Uuid>> drcPresets(
     DesignSession& session) {
   QList<std::tuple<QString, FilePath, Uuid>> presets;
   if (!session.hasWorkspace()) return presets;
-  for (const WorkspaceLibraryDb::Organization& org :
-       session.getWorkspace().getLibraryDb().getAllLatestOrganizations(
-           {}, true, false)) {  // can throw
+  const auto organizations =
+      session.getWorkspace().getLibraryDb().getAllLatestOrganizations(
+          {}, true, false);  // can throw
+  for (const WorkspaceLibraryDb::Organization& org : organizations) {
     for (const WorkspaceLibraryDb::PcbDesignRules& rules : org.pcbDesignRules) {
       presets.append(std::make_tuple(org.name % ": " % rules.name, org.elemDir,
                                      rules.uuid));
@@ -889,12 +890,13 @@ void addBoardTools(McpServer& server, DesignSession& session) noexcept {
             deviceUuid = dev->getLibDevice().getUuid();
             devFp = db.getLatest<Device>(*deviceUuid);
           } else if (!cmp.getCompatibleDevices().isEmpty()) {
-            deviceUuid = *cmp.getCompatibleDevices().begin();
+            deviceUuid = *cmp.getCompatibleDevices().constBegin();
             devFp = db.getLatest<Device>(*deviceUuid);
           } else {
             QStringList names;
-            for (const Uuid& uuid :
-                 db.getComponentDevices(cmp.getLibComponent().getUuid())) {
+            const auto componentDevices =
+                db.getComponentDevices(cmp.getLibComponent().getUuid());
+            for (const Uuid& uuid : componentDevices) {
               QString name;
               db.getTranslations<Device>(db.getLatest<Device>(uuid), {}, &name);
               names.append("'" % name % "'");
@@ -1018,11 +1020,6 @@ void addBoardTools(McpServer& server, DesignSession& session) noexcept {
         const Layer& layer = copperLayer(layerValue, board);
         const QJsonValue fromValue = args.value("from");
         const QJsonValue toValue = args.value("to");
-        if (fromValue.isArray() && toValue.isArray()) {
-          throw RuntimeError(__FILE__, __LINE__,
-                             "At least one end must be a pad, via or "
-                             "junction.");
-        }
         UndoStackTransaction transaction(session.getUndoStack(),
                                          "MCP: board_route");
         std::optional<Anchor> a, b;
@@ -1031,6 +1028,11 @@ void addBoardTools(McpServer& server, DesignSession& session) noexcept {
         }
         if (toValue.isString()) {
           b = findAnchor(board, requiredString(args, "to"), layer);
+        }
+        if ((!a) && (!b)) {
+          throw RuntimeError(__FILE__, __LINE__,
+                             "At least one end must be a pad, via or "
+                             "junction.");
         }
         NetSignal* net = a ? a->net : b->net;
         if ((!net) || (a && b && (!b->net))) {
@@ -1064,7 +1066,8 @@ void addBoardTools(McpServer& server, DesignSession& session) noexcept {
             a->segment && b->segment && (a->segment != b->segment);
         auto* cmdAdd = new editor::CmdBoardNetSegmentAddElements(*segment);
         BI_NetLineAnchor* previous = a->anchor;
-        for (const QJsonValue& value : args.value("points").toArray()) {
+        const QJsonArray pointValues = args.value("points").toArray();
+        for (const QJsonValue& value : pointValues) {
           BI_NetPoint* point = cmdAdd->addNetPoint(pointMm(value, "points"));
           cmdAdd->addNetLine(*previous, *point, layer, width);
           previous = point;
@@ -1362,9 +1365,10 @@ void addBoardTools(McpServer& server, DesignSession& session) noexcept {
         Board& board = session.getBoard(args.value("board"));
         const QJsonValue designators = args.value("designator");
         QList<BI_Device*> devices;
-        for (const QJsonValue& designator : designators.isArray()
-                 ? designators.toArray()
-                 : QJsonArray{designators}) {
+        const QJsonArray designatorValues = designators.isArray()
+            ? designators.toArray()
+            : QJsonArray{designators};
+        for (const QJsonValue& designator : designatorValues) {
           ComponentInstance& cmp = findComponentInstance(session.getProject(),
                                                          designator.toString());
           BI_Device* dev =
@@ -1494,7 +1498,8 @@ void addBoardTools(McpServer& server, DesignSession& session) noexcept {
       [&session, listTypes](const QJsonObject& args) {
         Board& board = session.getBoard(args.value("board"));
         QSet<QString> types;
-        for (const QJsonValue& type : args.value("types").toArray()) {
+        const QJsonArray typeValues = args.value("types").toArray();
+        for (const QJsonValue& type : typeValues) {
           types.insert(type.toString());
         }
         if (types.isEmpty()) {
@@ -1641,7 +1646,7 @@ void addBoardTools(McpServer& server, DesignSession& session) noexcept {
           }
         }
         QJsonObject result;
-        for (const QString& type : types) {
+        for (const QString& type : std::as_const(types)) {
           result.insert(type, items.value(type));
         }
         return McpToolResult::json(result);
@@ -1811,7 +1816,9 @@ void addBoardTools(McpServer& server, DesignSession& session) noexcept {
               start = &otherEnd(*previous, *start);
               first = previous;
             }
-            QJsonArray points{toJson(start->getPosition())};
+            // Without QJsonValue, older Clang copies the array instead of
+            // nesting it (CWG 2137).
+            QJsonArray points{QJsonValue(toJson(start->getPosition()))};
             QJsonArray traces;
             const BI_NetLine* line = first;
             const BI_NetLineAnchor* end = start;
@@ -1981,7 +1988,8 @@ void addBoardTools(McpServer& server, DesignSession& session) noexcept {
         QSet<BI_StrokeText*> texts;
         QSet<BI_Hole*> holes;
         int count = 0;
-        for (const QJsonValue& value : args.value("ids").toArray()) {
+        const QJsonArray idValues = args.value("ids").toArray();
+        for (const QJsonValue& value : idValues) {
           const QString id = value.toString();
           if (id.startsWith("net:")) {
             const NetSignal* net =
@@ -2252,7 +2260,8 @@ void addBoardTools(McpServer& server, DesignSession& session) noexcept {
           });
         }
         QJsonArray presets{"default"};
-        for (const auto& preset : drcPresets(session)) {
+        const auto allPresets = drcPresets(session);
+        for (const auto& preset : allPresets) {
           presets.append(std::get<0>(preset));
         }
         return McpToolResult::json(QJsonObject{
@@ -2314,8 +2323,8 @@ void addBoardTools(McpServer& server, DesignSession& session) noexcept {
           if (found) {
             drc = DrcSettings();
           }
-          for (const auto& [presetName, orgDir, rulesUuid] :
-               drcPresets(session)) {
+          const auto allPresets = drcPresets(session);
+          for (const auto& [presetName, orgDir, rulesUuid] : allPresets) {
             names.append("'" % presetName % "'");
             if ((!found) &&
                 (presetName.compare(name, Qt::CaseInsensitive) == 0)) {
@@ -2398,7 +2407,8 @@ void addBoardTools(McpServer& server, DesignSession& session) noexcept {
           }
         }
         QJsonArray airWires;
-        for (const BI_AirWire* airWire : board.getAirWires()) {
+        const auto boardAirWires = board.getAirWires();
+        for (const BI_AirWire* airWire : boardAirWires) {
           airWires.append(QJsonObject{
               {"net", *airWire->getNetSignal().getName()},
               {"from", anchorToJson(airWire->getP1())},

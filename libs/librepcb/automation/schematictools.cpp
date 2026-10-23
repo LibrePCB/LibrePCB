@@ -764,7 +764,8 @@ void addSchematicTools(McpServer& server, DesignSession& session) noexcept {
         Project& project = session.getProject();
         Circuit& circuit = project.getCircuit();
         QList<SI_SymbolPin*> pins;
-        for (const QJsonValue& ref : args.value("pins").toArray()) {
+        const QJsonArray pinRefs = args.value("pins").toArray();
+        for (const QJsonValue& ref : pinRefs) {
           SI_SymbolPin* pin = &findSymbolPin(project, ref.toString());
           if (!pins.contains(pin)) {
             pins.append(pin);
@@ -793,7 +794,7 @@ void addSchematicTools(McpServer& server, DesignSession& session) noexcept {
             net = cmd->getNetSignal();
           }
         }
-        for (SI_SymbolPin* pin : pins) {
+        for (SI_SymbolPin* pin : std::as_const(pins)) {
           if (pin->getNetLines().isEmpty()) {
             addStub(*pin, *net, transaction);  // can throw
           }
@@ -824,7 +825,8 @@ void addSchematicTools(McpServer& server, DesignSession& session) noexcept {
         SI_SymbolPin* a = &findSymbolPin(project, requiredString(args, "from"));
         SI_SymbolPin* b = &findSymbolPin(project, requiredString(args, "to"));
         QList<Point> points;
-        for (const QJsonValue& value : args.value("points").toArray()) {
+        const QJsonArray pointValues = args.value("points").toArray();
+        for (const QJsonValue& value : pointValues) {
           points.append(pointMm(value, "points"));
         }
         if (a == b) {
@@ -1019,7 +1021,8 @@ void addSchematicTools(McpServer& server, DesignSession& session) noexcept {
         Project& project = session.getProject();
         UndoStackTransaction transaction(session.getUndoStack(),
                                          "MCP: schematic_disconnect");
-        for (const QJsonValue& ref : args.value("pins").toArray()) {
+        const QJsonArray pinRefs = args.value("pins").toArray();
+        for (const QJsonValue& ref : pinRefs) {
           SI_SymbolPin& pin = findSymbolPin(project, ref.toString());
           removeWires(pin, transaction);  // can throw
           if (pin.getCompSigInstNetSignal()) {
@@ -1132,7 +1135,8 @@ void addSchematicTools(McpServer& server, DesignSession& session) noexcept {
         transaction.append(rules.release());  // can throw
         // The net class of a net cannot change, so the net is replaced by a
         // new one in the class.
-        for (const QJsonValue& value : args.value("nets").toArray()) {
+        const QJsonArray netValues = args.value("nets").toArray();
+        for (const QJsonValue& value : netValues) {
           NetSignal* net = circuit.getNetSignalByName(value.toString());
           if (!net) {
             throw RuntimeError(
