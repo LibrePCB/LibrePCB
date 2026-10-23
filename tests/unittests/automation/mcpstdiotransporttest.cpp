@@ -85,8 +85,8 @@ protected:
     transport.start();
     loop.exec();
     QList<QJsonObject> responses;
-    for (const QByteArray& line :
-         QByteArray::fromStdString(out.str()).split('\n')) {
+    const auto lines = QByteArray::fromStdString(out.str()).split('\n');
+    for (const QByteArray& line : lines) {
       if (!line.isEmpty()) {
         responses.append(QJsonDocument::fromJson(line).object());
       }

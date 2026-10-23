@@ -119,7 +119,7 @@ TEST_F(McpServerTest, testInitializeWithUnsupportedVersion) {
       request("initialize", {{"protocolVersion", "1999-01-01"}})
           .value("result")
           .toObject();
-  EXPECT_EQ(McpServer::getSupportedProtocolVersions().first(),
+  EXPECT_EQ(McpServer::getSupportedProtocolVersions().constFirst(),
             result.value("protocolVersion").toString());
 }
 

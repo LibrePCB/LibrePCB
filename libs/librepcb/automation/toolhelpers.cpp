@@ -142,7 +142,8 @@ QStringList zoneRuleNames() noexcept {
 
 Zone::Rules zoneRules(const QJsonValue& value) {
   Zone::Rules rules;
-  for (const QJsonValue& rule : value.toArray()) {
+  const QJsonArray ruleValues = value.toArray();
+  for (const QJsonValue& rule : ruleValues) {
     if (rule == "noCopper") rules |= Zone::Rule::NoCopper;
     if (rule == "noPlanes") rules |= Zone::Rule::NoPlanes;
     if (rule == "noExposure") rules |= Zone::Rule::NoExposure;
@@ -285,7 +286,8 @@ QJsonObject toJson(const RuleCheckMessageList& messages,
       descriptions.insert(msg->getDescription());
     }
     QJsonArray locations;
-    for (const Path& location : msg->getLocations().mid(0, maxLocations)) {
+    const auto shownLocations = msg->getLocations().mid(0, maxLocations);
+    for (const Path& location : shownLocations) {
       locations.append(locationToJson(location));
     }
     if (!locations.isEmpty()) {
@@ -312,7 +314,8 @@ int approveMessages(const RuleCheckMessageList& messages,
     byId.insert(messageId(*msg), msg.get());
   }
   QList<const RuleCheckMessage*> found;
-  for (const QJsonValue& id : ids.toArray()) {
+  const QJsonArray idValues = ids.toArray();
+  for (const QJsonValue& id : idValues) {
     const RuleCheckMessage* msg = byId.value(id.toString());
     if (!msg) {
       throw RuntimeError(__FILE__, __LINE__,

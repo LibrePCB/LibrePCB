@@ -315,7 +315,7 @@ void addProjectTools(McpServer& server, DesignSession& session) noexcept {
               return collator(*a->getName(), *b->getName());
             });
         QJsonArray parts;
-        for (const ComponentInstance* cmp : components) {
+        for (const ComponentInstance* cmp : std::as_const(components)) {
           QJsonArray symbols;
           for (const SI_Symbol* symbol : cmp->getSymbols()) {
             symbols.append(QJsonObject{
@@ -370,7 +370,7 @@ void addProjectTools(McpServer& server, DesignSession& session) noexcept {
                                return collator(*a->getName(), *b->getName());
                              });
         QJsonArray array;
-        for (const NetSignal* net : nets) {
+        for (const NetSignal* net : std::as_const(nets)) {
           QStringList pins;
           for (const ComponentSignalInstance* sig :
                net->getComponentSignals()) {
@@ -581,7 +581,8 @@ void addProjectTools(McpServer& server, DesignSession& session) noexcept {
               ColorRole::boardPackageOutlinesBot().getId(),
           };
           QMap<QString, QColor> layers;
-          for (const QJsonValue& value : args.value("layers").toArray()) {
+          const QJsonArray layerValues = args.value("layers").toArray();
+          for (const QJsonValue& value : layerValues) {
             const QString id = value.toString();
             if (content.layers.contains(id)) {
               layers.insert(id, content.layers.value(id));
@@ -591,7 +592,11 @@ void addProjectTools(McpServer& server, DesignSession& session) noexcept {
               throw RuntimeError(
                   __FILE__, __LINE__,
                   QString("Unknown layer '%1'. Available: %2")
-                      .arg(id, (content.layers.keys() + extras).join(", ")));
+                      .arg(id,
+                           (QStringList(content.layers.keyBegin(),
+                                        content.layers.keyEnd()) +
+                            extras)
+                               .join(", ")));
             }
           }
           content.layers = layers;
