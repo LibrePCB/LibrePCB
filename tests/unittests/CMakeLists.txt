@@ -13,6 +13,11 @@ find_package(Threads REQUIRED)
 # Main executable
 add_executable(
   librepcb_unittests
+  automation/designtoolstest.cpp
+  automation/mcpservertest.cpp
+  automation/mcpstdiotransporttest.cpp
+  automation/projecttoolstest.cpp
+  automation/toolhelperstest.cpp
   core/3d/occmodeltest.cpp
   core/algorithm/airwiresbuildertest.cpp
   core/algorithm/netsegmentsimplifiertest.cpp
@@ -124,6 +129,8 @@ add_executable(
   editor/project/addcomponentdialogtest.cpp
   editor/project/board/boardclipboarddatatest.cpp
   editor/project/board/cmdboardspecctraimporttest.cpp
+  editor/project/board/cmdcombineboardnetsegmentstest.cpp
+  editor/project/board/cmdremoveboarditemstest.cpp
   editor/project/schematic/cmddragselectedschematicitemstest.cpp
   editor/project/schematic/schematicclipboarddatatest.cpp
   editor/utils/shortcutsreferencegeneratortest.cpp
@@ -148,6 +155,7 @@ target_link_libraries(
   librepcb_unittests
   PRIVATE common
           # LibrePCB
+          LibrePCB::Automation
           LibrePCB::Editor
           LibrePCB::Core
           # Third party

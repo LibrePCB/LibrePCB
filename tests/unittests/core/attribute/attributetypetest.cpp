@@ -21,6 +21,8 @@
  *  Includes
  ******************************************************************************/
 #include <gtest/gtest.h>
+#include <librepcb/core/attribute/attributeunit.h>
+#include <librepcb/core/attribute/attrtypefrequency.h>
 #include <librepcb/core/attribute/attrtypevoltage.h>
 #include <librepcb/core/serialization/sexpression.h>
 
@@ -43,6 +45,20 @@ class AttributeTypeTest : public ::testing::Test {};
 TEST_F(AttributeTypeTest, testSerialize) {
   const AttributeType& type = AttrTypeVoltage::instance();
   EXPECT_EQ("voltage\n", serialize(type)->toByteArray());
+}
+
+TEST_F(AttributeTypeTest, testTryExtractUnitPrefersLongestSuffix) {
+  const AttributeType& type = AttrTypeFrequency::instance();
+  for (const auto& [input, unit] :
+       {std::make_pair("12MHz", "megahertz"),
+        std::make_pair("32kHz", "kilohertz"),
+        std::make_pair("1GHz", "gigahertz"), std::make_pair("50Hz", "hertz")}) {
+    QString value = input;
+    const AttributeUnit* extracted = type.tryExtractUnitFromValue(value);
+    ASSERT_NE(nullptr, extracted) << input;
+    EXPECT_EQ(unit, extracted->getName().toStdString()) << input;
+    EXPECT_TRUE(type.isValueValid(value)) << input;
+  }
 }
 
 /*******************************************************************************
