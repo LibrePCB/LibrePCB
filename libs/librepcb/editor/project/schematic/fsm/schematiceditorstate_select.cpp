@@ -610,9 +610,17 @@ bool SchematicEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
   if (!scene) return false;
   if (mSubState != SubState::IDLE) return false;
 
-  // handle item selection
+  // Handle item selection.
+  // Important: Only find object types which do support context menus. Otherwise
+  // an object without menu (e.g. symbol pin) may prevent opening the menu on
+  // an object which has a menu (e.g. symbol).
+  constexpr FindFlags flags = FindFlag::Symbols | FindFlag::NetLabels |
+      FindFlag::Polygons | FindFlag::Texts | FindFlag::AcceptNearMatch;
+  // Sanity check for a known bug where symbol pins prevented opening the menu
+  // on symbols (observed with the GND symbol).
+  static_assert(!flags.testFlag(FindFlag::SymbolPins));
   QList<std::shared_ptr<QGraphicsItem>> items =
-      findItemsAtPos(e.scenePos, FindFlag::All | FindFlag::AcceptNearMatch);
+      findItemsAtPos(e.scenePos, flags);
   if (items.isEmpty()) return false;
   std::shared_ptr<QGraphicsItem> selectedItem;
   foreach (auto item, items) {

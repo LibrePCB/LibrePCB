@@ -152,9 +152,9 @@ QList<std::shared_ptr<QGraphicsItem>> SchematicEditorState::findItemsAtPos(
   //   30: netlabels
   //   34: bus lines
   //   36: bus labels
-  //   40: pins
-  //   50: symbols with origin close to cursor
-  //   60: texts
+  //   40: symbols with origin close to cursor (*)
+  //   50: pins (*)
+  //   60: texts (*)
   //   70: symbols with any grab area below cursor
   //   80: polygons
   //   90: images
@@ -163,11 +163,17 @@ QList<std::shared_ptr<QGraphicsItem>> SchematicEditorState::findItemsAtPos(
   // add +1000. For items not under the cursor, but on the next grid interval,
   // add +2000.
   //
-  // Note regarding priority of symbols and texts: Although texts are drawn on
-  // top of symbols, selection order must be the other way around when clicking
-  // on the origin of a symbol. Otherwise "zero-area" symbols like GND or VCC
-  // with a text at position (0,0) can't be selected because the text gets
-  // selected instead (which is very cumbersome).
+  // *) Note regarding priority of symbols and texts: Although texts are drawn
+  // on top of symbols, selection order must be the other way around when
+  // clicking on the origin of a symbol. Otherwise "zero-area" symbols like GND
+  // or VCC with a text at position (0,0) can't be selected because the text
+  // gets selected instead (which is very cumbersome).
+  //
+  // *) Note regarding priority of symbols and pins: Their priority used to be
+  // swapped until LibrePCB 2.1, but due to adding grab areas to pins, it
+  // prevented the selection of symbols like GND or VCC. Reducing pins priority
+  // below symbols priority avoids the issue, but if any negative consequences
+  // are observed, this needs to be reconsidered.
   QMultiMap<std::pair<int, int>, std::shared_ptr<QGraphicsItem>> items;
   std::optional<std::pair<int, int>> lowestPriority;
   auto addItem = [&items, &lowestPriority](
@@ -292,7 +298,7 @@ QList<std::shared_ptr<QGraphicsItem>> SchematicEditorState::findItemsAtPos(
          it++) {
       // Higher priority if origin cross is below cursor. Required for
       // https://github.com/LibrePCB/LibrePCB/issues/1319.
-      if (!processItem(it.value(), it.value(), it.key()->getPosition(), 50,
+      if (!processItem(it.value(), it.value(), it.key()->getPosition(), 40,
                        false, UnsignedLength(700000))) {
         processItem(it.value(), it.value(), it.key()->getPosition(), 70, false,
                     std::nullopt);
@@ -303,7 +309,9 @@ QList<std::shared_ptr<QGraphicsItem>> SchematicEditorState::findItemsAtPos(
   if (flags.testFlag(FindFlag::SymbolPins)) {
     for (auto it = scene->getSymbolPins().begin();
          it != scene->getSymbolPins().end(); it++) {
-      processItem(it.value(), it.value(), it.key()->getPosition(), 40, false,
+      // Important: Priority needs to be lower than for symbols, otherwise it
+      // will be hard to select small symbols like GND or VCC!
+      processItem(it.value(), it.value(), it.key()->getPosition(), 50, false,
                   std::nullopt);
     }
   }
