@@ -78,6 +78,17 @@ public:
   BI_Device& getDevice() noexcept { return mDevice; }
   void updateContext() noexcept;
 
+  /**
+   * @brief Get the visible geometry, used for rubber-band selection
+   *
+   * Covers everything the footprint draws on visible layers (grab area,
+   * circles, polygons, zones, holes), but neither the origin cross nor the
+   * pads or texts, which are separate items.
+   *
+   * @return Path in item coordinates.
+   */
+  QPainterPath getVisibleShape() const noexcept;
+
   // Inherited from QGraphicsItem
   QPainterPath shape() const noexcept override;
 

@@ -77,6 +77,15 @@ TextGraphicsItem::~TextGraphicsItem() noexcept {
 }
 
 /*******************************************************************************
+ *  Getters
+ ******************************************************************************/
+
+QPainterPath TextGraphicsItem::getVisibleShape() const noexcept {
+  Q_ASSERT(mTextGraphicsItem);
+  return mTextGraphicsItem->mapToParent(mTextGraphicsItem->getVisibleShape());
+}
+
+/*******************************************************************************
  *  Setters
  ******************************************************************************/
 

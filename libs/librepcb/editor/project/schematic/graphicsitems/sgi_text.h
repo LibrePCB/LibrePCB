@@ -65,6 +65,13 @@ public:
   }
   void updateContext() noexcept;
 
+  /**
+   * @brief Get the visible geometry, used for rubber-band selection
+   *
+   * @return Path in item coordinates, empty if the text is not visible.
+   */
+  QPainterPath getVisibleShape() const noexcept;
+
   // Inherited from QGraphicsItem
   QPainterPath shape() const noexcept override;
 

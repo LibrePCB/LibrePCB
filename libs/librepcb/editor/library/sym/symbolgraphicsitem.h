@@ -23,6 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../graphics/graphicsscene.h"
+
 #include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/library/cmp/componentsymbolvariantitem.h>
 #include <librepcb/core/library/sym/symbol.h>
@@ -114,7 +116,7 @@ public:
 
   // General Methods
   void updateAllTexts() noexcept;
-  void setSelectionRect(const QRectF rect) noexcept;
+  void setSelectionRect(const QRectF rect, RectSelection::Mode mode) noexcept;
 
   // Operator Overloadings
   SymbolGraphicsItem& operator=(const SymbolGraphicsItem& rhs) = delete;

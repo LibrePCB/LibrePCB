@@ -151,6 +151,7 @@ private:  // Data
   bool mMirror;
 
   GraphicsSceneMouseEvent mMouseEvent;
+  QPointF mLeftButtonDownScreenPos;
   QDeadlineTimer mLeftMouseButtonDoubleClickTimer;
 
   bool mPanning = false;

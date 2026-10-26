@@ -78,6 +78,18 @@ public:
     mLevelOfDetailToHide = lod;
   }
 
+  // Getters
+  /**
+   * @brief Get the tight outline of the rendered text
+   *
+   * Unlike #shape(), which uses the padded font metrics box, this only covers
+   * the area actually covered by glyphs and overlines.
+   *
+   * @return Ink area in item coordinates, empty if the text is hidden
+   *         (layer hidden or disabled) or has no visible content.
+   */
+  QPainterPath getVisibleShape() const noexcept;
+
   // Inherited from QGraphicsItem
   QRectF boundingRect() const noexcept override { return mBoundingRect; }
   QPainterPath shape() const noexcept override;
@@ -92,6 +104,7 @@ private:  // Methods
   void layerEdited(const GraphicsLayer& layer,
                    GraphicsLayer::Event event) noexcept;
   void updateBoundingRectAndShape() noexcept;
+  QRectF calcInkRect() const noexcept;
 
 private:  // Data
   std::shared_ptr<const GraphicsLayer> mLayer;
@@ -106,6 +119,8 @@ private:  // Data
   QFont mFont;
   int mTextFlags;
   QRectF mBoundingRect;
+  mutable QRectF mInkRect;  // Calculated on demand, see mInkRectValid.
+  mutable bool mInkRectValid;
   QPainterPath mShape;
   bool mShapeEnabled;
   qreal mLevelOfDetailToPixelate;
