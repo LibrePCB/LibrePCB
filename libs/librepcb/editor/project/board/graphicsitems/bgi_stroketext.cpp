@@ -102,8 +102,11 @@ void BGI_StrokeText::updateContext() noexcept {
 
 QPainterPath BGI_StrokeText::shape() const noexcept {
   Q_ASSERT(mPathGraphicsItem && mOriginCrossGraphicsItem);
-  return mPathGraphicsItem->mapToParent(mPathGraphicsItem->shape()) |
-      mOriginCrossGraphicsItem->shape();
+  // Path concatenation is faster than a boolean union here.
+  QPainterPath p = mPathGraphicsItem->mapToParent(mPathGraphicsItem->shape());
+  p.setFillRule(Qt::WindingFill);
+  p.addPath(mOriginCrossGraphicsItem->shape());
+  return p;
 }
 
 QVariant BGI_StrokeText::itemChange(GraphicsItemChange change,
