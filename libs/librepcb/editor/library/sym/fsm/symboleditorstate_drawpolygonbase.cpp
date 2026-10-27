@@ -23,6 +23,7 @@
 #include "symboleditorstate_drawpolygonbase.h"
 
 #include "../../../cmd/cmdpolygonedit.h"
+#include "../../../graphics/graphicsscene.h"
 #include "../../../graphics/polygongraphicsitem.h"
 #include "../../../undostack.h"
 #include "../../../utils/editortoolbox.h"

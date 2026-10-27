@@ -23,6 +23,7 @@
 #include "packageeditorstate_drawzone.h"
 
 #include "../../../cmd/cmdzoneedit.h"
+#include "../../../graphics/graphicsscene.h"
 #include "../../../graphics/zonegraphicsitem.h"
 #include "../../../undostack.h"
 #include "../../../utils/editortoolbox.h"
