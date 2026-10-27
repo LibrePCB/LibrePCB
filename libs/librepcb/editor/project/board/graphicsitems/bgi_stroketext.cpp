@@ -61,14 +61,13 @@ BGI_StrokeText::BGI_StrokeText(
   setFlag(QGraphicsItem::ItemHasNoContents, true);
   setFlag(QGraphicsItem::ItemIsSelectable, true);
 
-  mOriginCrossGraphicsItem->setSize(UnsignedLength(1000000));
-
   updateContext();
   updatePosition();
   updateTransform();
   updateLayer();
   updateStrokeWidth();
   updatePaths();
+  updateOriginCrossSize();
   updateAnchorLayer();
   updateAnchorLine();
 
@@ -148,6 +147,9 @@ void BGI_StrokeText::strokeTextEdited(const BI_StrokeText& obj,
       updateLayer();
       updateAnchorLayer();
       break;
+    case BI_StrokeText::Event::HeightChanged:
+      updateOriginCrossSize();
+      break;
     case BI_StrokeText::Event::StrokeWidthChanged:
       updateStrokeWidth();
       break;
@@ -217,6 +219,13 @@ void BGI_StrokeText::updateStrokeWidth() noexcept {
 void BGI_StrokeText::updatePaths() noexcept {
   Q_ASSERT(mPathGraphicsItem);
   mPathGraphicsItem->setPath(Path::toQPainterPathPx(mText.getPaths(), false));
+}
+
+void BGI_StrokeText::updateOriginCrossSize() noexcept {
+  Q_ASSERT(mOriginCrossGraphicsItem);
+  mOriginCrossGraphicsItem->setSize(
+      std::min(UnsignedLength(1000000),
+               positiveToUnsigned(mText.getData().getHeight())));
 }
 
 void BGI_StrokeText::updateAnchorLayer() noexcept {

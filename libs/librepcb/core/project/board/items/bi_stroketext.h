@@ -56,7 +56,8 @@ public:
     PositionChanged,
     RotationChanged,
     MirroredChanged,
-    StrokeWidthChanged,
+    HeightChanged,  ///< Will also emit PathsChanged!
+    StrokeWidthChanged,  ///< *May* also emit PathsChanged
     PathsChanged,
   };
   Signal<BI_StrokeText, Event> onEdited;

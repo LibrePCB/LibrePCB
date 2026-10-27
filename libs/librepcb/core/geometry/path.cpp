@@ -132,6 +132,32 @@ qreal Path::calcAreaOfStraightSegments() const noexcept {
   return std::abs(area / 2);
 }
 
+std::optional<std::pair<Point, Point>> Path::calcVerticesBoundingRect()
+    const noexcept {
+  if (mVertices.isEmpty()) {
+    return std::nullopt;
+  }
+
+  Point topLeft = mVertices.first().getPos();
+  Point botRight = topLeft;
+  for (int i = 1; i < mVertices.count(); ++i) {
+    const Point p = mVertices.at(i).getPos();
+    if (p.getX() < topLeft.getX()) {
+      topLeft.setX(p.getX());
+    }
+    if (p.getX() > botRight.getX()) {
+      botRight.setX(p.getX());
+    }
+    if (p.getY() > topLeft.getY()) {
+      topLeft.setY(p.getY());
+    }
+    if (p.getY() < botRight.getY()) {
+      botRight.setY(p.getY());
+    }
+  }
+  return std::make_pair(topLeft, botRight);
+}
+
 Point Path::calcNearestPointBetweenVertices(const Point& p) const noexcept {
   if (!mVertices.isEmpty()) {
     // Note: Does not take arcs into account yet.

@@ -82,6 +82,22 @@ public:
   UnsignedLength getTotalStraightLength() const noexcept;
   qreal calcAreaOfStraightSegments() const noexcept;
   Point calcNearestPointBetweenVertices(const Point& p) const noexcept;
+
+  /**
+   * @brief Calculate the bounding rect containing all vertices
+   *
+   * @note For paths with only straight lines, the returned bounding rect
+   *       corresponds to the bounding rect of the whole path line. But for
+   *       paths containing arc segments, those arcs may be partially *outside*
+   *       of the returned bounding rect. For the bounding rect of the whole
+   *       path line (not just its vertices), a more expensive calculation
+   *       will be needed.
+   *
+   * @return Top left and bottom right edges (`std::nullopt` if no vertices)
+   */
+  std::optional<std::pair<Point, Point>> calcVerticesBoundingRect()
+      const noexcept;
+
   Path cleaned() const noexcept;
   Path toClosedPath() const noexcept;
   Path toOpenPath() const noexcept;
