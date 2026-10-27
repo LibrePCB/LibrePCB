@@ -58,13 +58,14 @@ class SymbolClipboardData;
 class SymbolEditorState_Select final : public SymbolEditorState {
   Q_OBJECT
 
+  /// All possible FSM substates
   enum class SubState {
-    IDLE,
-    SELECTING,
-    MOVING,
-    PASTING,
-    MOVING_POLYGON_VERTEX,
-    RESIZING_IMAGE,
+    Idle,  ///< Left mouse button is not pressed (default state)
+    Selecting,  ///< Left mouse button pressed to draw selection rect
+    Moving,  ///< Left mouse button pressed to move selected items
+    MovingPolygonVertices,  ///< Left mouse butten pressed to move vertices
+    ResizingImage,  ///< Left mouts butten pressed to resize image
+    Pasting,  ///< Move pasted items
   };
 
 public:
@@ -134,9 +135,11 @@ private:  // Methods
   void scheduleUpdateAvailableFeatures() noexcept;
   SymbolEditorFsmAdapter::Features updateAvailableFeatures() noexcept;
 
-private:  // Types / Data
-  SubState mState;
-  Point mStartPos;
+private:
+  SubState mSubState;  ///< Current FSM substate
+  Point mStartPos;  ///< Start position of the current substate
+
+  /// When dragging items, this undo command will be active
   std::unique_ptr<CmdDragSelectedSymbolItems> mCmdDragSelectedItems;
 
   /// The current polygon selected for editing (nullptr if none)

@@ -66,7 +66,7 @@ namespace editor {
 SymbolEditorState_Select::SymbolEditorState_Select(
     const Context& context) noexcept
   : SymbolEditorState(context),
-    mState(SubState::IDLE),
+    mSubState(SubState::Idle),
     mStartPos(),
     mSelectedPolygon(nullptr),
     mSelectedPolygonVertices(),
@@ -130,14 +130,14 @@ bool SymbolEditorState_Select::processGraphicsSceneMouseMoved(
 
   Point currentPos = e.scenePos;
 
-  switch (mState) {
-    case SubState::SELECTING: {
+  switch (mSubState) {
+    case SubState::Selecting: {
       setSelectionRect(mStartPos, currentPos);
       scheduleUpdateAvailableFeatures();  // Selection might have changed.
       return true;
     }
-    case SubState::MOVING:
-    case SubState::PASTING: {
+    case SubState::Moving:
+    case SubState::Pasting: {
       if (!mCmdDragSelectedItems) {
         mCmdDragSelectedItems = std::make_unique<CmdDragSelectedSymbolItems>(
             *item, getGridInterval());
@@ -147,7 +147,7 @@ bool SymbolEditorState_Select::processGraphicsSceneMouseMoved(
       mCmdDragSelectedItems->setDeltaToStartPos(delta);
       return true;
     }
-    case SubState::MOVING_POLYGON_VERTEX: {
+    case SubState::MovingPolygonVertices: {
       if (!mSelectedPolygon) {
         return false;
       }
@@ -164,7 +164,7 @@ bool SymbolEditorState_Select::processGraphicsSceneMouseMoved(
       mCmdPolygonEdit->setPath(Path(vertices), true);
       return true;
     }
-    case SubState::RESIZING_IMAGE: {
+    case SubState::ResizingImage: {
       if (!mSelectedImage) {
         return false;
       }
@@ -195,8 +195,8 @@ bool SymbolEditorState_Select::processGraphicsSceneMouseMoved(
 
 bool SymbolEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
     const GraphicsSceneMouseEvent& e) noexcept {
-  switch (mState) {
-    case SubState::IDLE: {
+  switch (mSubState) {
+    case SubState::Idle: {
       // update start position of selection or movement
       mStartPos = e.scenePos;
       // get items under cursor
@@ -204,14 +204,14 @@ bool SymbolEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
           findItemsAtPosition(mStartPos);
       if (findPolygonVerticesAtPosition(mStartPos) &&
           mAdapter.fsmIsWritable()) {
-        setState(SubState::MOVING_POLYGON_VERTEX);
+        setState(SubState::MovingPolygonVertices);
       } else if (findImageHandleAtPosition(mStartPos) &&
                  mAdapter.fsmIsWritable()) {
-        setState(SubState::RESIZING_IMAGE);
+        setState(SubState::ResizingImage);
       } else if (items.isEmpty()) {
         // start selecting
         clearSelectionRect(true);
-        setState(SubState::SELECTING);
+        setState(SubState::Selecting);
       } else {
         // Check if there's already an item selected.
         std::shared_ptr<QGraphicsItem> selectedItem;
@@ -266,17 +266,17 @@ bool SymbolEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
         // Start moving, if not read only.
         if (mAdapter.fsmIsWritable()) {
           Q_ASSERT(!mCmdDragSelectedItems);
-          setState(SubState::MOVING);
+          setState(SubState::Moving);
         }
       }
       return true;
     }
-    case SubState::PASTING: {
+    case SubState::Pasting: {
       try {
         Q_ASSERT(mCmdDragSelectedItems);
         mContext.undoStack.appendToCmdGroup(mCmdDragSelectedItems.release());
         mContext.undoStack.commitCmdGroup();
-        setState(SubState::IDLE);
+        setState(SubState::Idle);
         clearSelectionRect(true);
       } catch (const Exception& e) {
         QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
@@ -292,13 +292,13 @@ bool SymbolEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
 bool SymbolEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
     const GraphicsSceneMouseEvent& e) noexcept {
   Q_UNUSED(e);
-  switch (mState) {
-    case SubState::SELECTING: {
+  switch (mSubState) {
+    case SubState::Selecting: {
       clearSelectionRect(false);
-      setState(SubState::IDLE);
+      setState(SubState::Idle);
       return true;
     }
-    case SubState::MOVING: {
+    case SubState::Moving: {
       if (mCmdDragSelectedItems) {
         try {
           mContext.undoStack.execCmd(mCmdDragSelectedItems.release());
@@ -306,10 +306,10 @@ bool SymbolEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
           QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
         }
       }
-      setState(SubState::IDLE);
+      setState(SubState::Idle);
       return true;
     }
-    case SubState::MOVING_POLYGON_VERTEX: {
+    case SubState::MovingPolygonVertices: {
       if (mCmdPolygonEdit) {
         try {
           mContext.undoStack.execCmd(mCmdPolygonEdit.release());
@@ -317,10 +317,10 @@ bool SymbolEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
           QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
         }
       }
-      setState(SubState::IDLE);
+      setState(SubState::Idle);
       return true;
     }
-    case SubState::RESIZING_IMAGE: {
+    case SubState::ResizingImage: {
       if (mCmdImageEdit) {
         try {
           mContext.undoStack.execCmd(mCmdImageEdit.release());
@@ -328,7 +328,7 @@ bool SymbolEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
           QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
         }
       }
-      setState(SubState::IDLE);
+      setState(SubState::Idle);
       return true;
     }
     default: {
@@ -345,7 +345,7 @@ bool SymbolEditorState_Select::processGraphicsSceneLeftMouseButtonDoubleClicked(
     return processGraphicsSceneLeftMouseButtonPressed(e);
   }
 
-  if (mState == SubState::IDLE) {
+  if (mSubState == SubState::Idle) {
     return openPropertiesDialogOfItemAtPos(e.scenePos);
   } else {
     return false;
@@ -354,12 +354,12 @@ bool SymbolEditorState_Select::processGraphicsSceneLeftMouseButtonDoubleClicked(
 
 bool SymbolEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
     const GraphicsSceneMouseEvent& e) noexcept {
-  switch (mState) {
-    case SubState::IDLE: {
+  switch (mSubState) {
+    case SubState::Idle: {
       return openContextMenuAtPos(e.scenePos);
     }
-    case SubState::MOVING:
-    case SubState::PASTING: {
+    case SubState::Moving:
+    case SubState::Pasting: {
       return rotateSelectedItems(Angle::deg90());
     }
     default: {
@@ -373,8 +373,8 @@ bool SymbolEditorState_Select::processSelectAll() noexcept {
   SymbolGraphicsItem* item = getGraphicsItem();
   if ((!scene) || (!item)) return false;
 
-  switch (mState) {
-    case SubState::IDLE: {
+  switch (mSubState) {
+    case SubState::Idle: {
       // Set a selection rect slightly larger than the total items bounding
       // rect to get all items selected.
       auto bounds = scene->itemsBoundingRect();
@@ -390,8 +390,8 @@ bool SymbolEditorState_Select::processSelectAll() noexcept {
 }
 
 bool SymbolEditorState_Select::processCut() noexcept {
-  switch (mState) {
-    case SubState::IDLE: {
+  switch (mSubState) {
+    case SubState::Idle: {
       if (copySelectedItemsToClipboard()) {
         return removeSelectedItems();
       } else {
@@ -405,8 +405,8 @@ bool SymbolEditorState_Select::processCut() noexcept {
 }
 
 bool SymbolEditorState_Select::processCopy() noexcept {
-  switch (mState) {
-    case SubState::IDLE: {
+  switch (mSubState) {
+    case SubState::Idle: {
       return copySelectedItemsToClipboard();
     }
     default: {
@@ -417,8 +417,8 @@ bool SymbolEditorState_Select::processCopy() noexcept {
 
 bool SymbolEditorState_Select::processPaste(
     std::unique_ptr<SymbolClipboardData> data) noexcept {
-  switch (mState) {
-    case SubState::IDLE: {
+  switch (mSubState) {
+    case SubState::Idle: {
       try {
         // Get footprint items from clipboard, if none provided.
         if (!data) {
@@ -446,8 +446,8 @@ bool SymbolEditorState_Select::processMove(const Point& delta) noexcept {
   SymbolGraphicsItem* item = getGraphicsItem();
   if (!item) return false;
 
-  switch (mState) {
-    case SubState::IDLE: {
+  switch (mSubState) {
+    case SubState::Idle: {
       try {
         std::unique_ptr<CmdDragSelectedSymbolItems> cmd(
             new CmdDragSelectedSymbolItems(*item, getGridInterval()));
@@ -465,10 +465,10 @@ bool SymbolEditorState_Select::processMove(const Point& delta) noexcept {
 }
 
 bool SymbolEditorState_Select::processRotate(const Angle& rotation) noexcept {
-  switch (mState) {
-    case SubState::IDLE:
-    case SubState::MOVING:
-    case SubState::PASTING: {
+  switch (mSubState) {
+    case SubState::Idle:
+    case SubState::Moving:
+    case SubState::Pasting: {
       return rotateSelectedItems(rotation);
     }
     default: {
@@ -479,10 +479,10 @@ bool SymbolEditorState_Select::processRotate(const Angle& rotation) noexcept {
 
 bool SymbolEditorState_Select::processMirror(
     Qt::Orientation orientation) noexcept {
-  switch (mState) {
-    case SubState::IDLE:
-    case SubState::MOVING:
-    case SubState::PASTING: {
+  switch (mSubState) {
+    case SubState::Idle:
+    case SubState::Moving:
+    case SubState::Pasting: {
       return mirrorSelectedItems(orientation);
     }
     default: {
@@ -492,10 +492,10 @@ bool SymbolEditorState_Select::processMirror(
 }
 
 bool SymbolEditorState_Select::processSnapToGrid() noexcept {
-  switch (mState) {
-    case SubState::IDLE:
-    case SubState::MOVING:
-    case SubState::PASTING: {
+  switch (mSubState) {
+    case SubState::Idle:
+    case SubState::Moving:
+    case SubState::Pasting: {
       return snapSelectedItemsToGrid();
     }
     default: {
@@ -505,8 +505,8 @@ bool SymbolEditorState_Select::processSnapToGrid() noexcept {
 }
 
 bool SymbolEditorState_Select::processRemove() noexcept {
-  switch (mState) {
-    case SubState::IDLE: {
+  switch (mSubState) {
+    case SubState::Idle: {
       return removeSelectedItems();
     }
     default: {
@@ -519,8 +519,8 @@ bool SymbolEditorState_Select::processEditProperties() noexcept {
   SymbolGraphicsItem* item = getGraphicsItem();
   if (!item) return false;
 
-  switch (mState) {
-    case SubState::IDLE: {
+  switch (mSubState) {
+    case SubState::Idle: {
       foreach (auto ptr, item->getSelectedPins()) {
         return openPropertiesDialogOfItem(ptr);
       }
@@ -601,38 +601,46 @@ bool SymbolEditorState_Select::processImportDxf() noexcept {
 }
 
 bool SymbolEditorState_Select::processAbortCommand() noexcept {
-  switch (mState) {
-    case SubState::MOVING: {
-      mCmdDragSelectedItems.reset();
-      setState(SubState::IDLE);
-      return true;
-    }
-    case SubState::MOVING_POLYGON_VERTEX: {
-      mCmdPolygonEdit.reset();
-      setState(SubState::IDLE);
-      return true;
-    }
-    case SubState::RESIZING_IMAGE: {
-      mCmdImageEdit.reset();
-      setState(SubState::IDLE);
-      return true;
-    }
-    case SubState::PASTING: {
-      try {
-        mCmdDragSelectedItems.reset();
-        mContext.undoStack.abortCmdGroup();
-        setState(SubState::IDLE);
+  try {
+    switch (mSubState) {
+      case SubState::Idle:
+      case SubState::Selecting: {
+        clearSelectionRect(true);
+        mSubState = SubState::Idle;
         return true;
-      } catch (const Exception& e) {
-        QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
-        return false;
+      }
+      case SubState::Moving: {
+        mCmdDragSelectedItems.reset();
+        setState(SubState::Idle);
+        return true;
+      }
+      case SubState::MovingPolygonVertices: {
+        mCmdPolygonEdit.reset();
+        mSelectedPolygon = nullptr;
+        mSelectedPolygonVertices.clear();
+        setState(SubState::Idle);
+        return true;
+      }
+      case SubState::ResizingImage: {
+        mCmdImageEdit.reset();
+        mSelectedImage = nullptr;
+        setState(SubState::Idle);
+        return true;
+      }
+      case SubState::Pasting: {
+        mContext.undoStack.abortCmdGroup();  // can throw
+        mCmdDragSelectedItems.reset();
+        setState(SubState::Idle);
+        return true;
+      }
+      default: {
+        break;
       }
     }
-    default: {
-      clearSelectionRect(true);  // Clear selection, if any.
-      return true;
-    }
+  } catch (const Exception& e) {
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
   }
+  return false;
 }
 
 bool SymbolEditorState_Select::processGridIntervalChanged(
@@ -647,7 +655,7 @@ bool SymbolEditorState_Select::processGridIntervalChanged(
  ******************************************************************************/
 
 bool SymbolEditorState_Select::openContextMenuAtPos(const Point& pos) noexcept {
-  if (mState != SubState::IDLE) return false;
+  if (mSubState != SubState::Idle) return false;
 
   // handle item selection
   std::shared_ptr<QGraphicsItem> selectedItem;
@@ -875,7 +883,7 @@ bool SymbolEditorState_Select::startPaste(
   // Start undo command group.
   clearSelectionRect(true);
   mContext.undoStack.beginCmdGroup(tr("Paste Symbol Elements"));
-  setState(SubState::PASTING);
+  setState(SubState::Pasting);
 
   // Paste items.
   mStartPos = mAdapter.fsmMapGlobalPosToScenePos(QCursor::pos());
@@ -888,7 +896,7 @@ bool SymbolEditorState_Select::startPaste(
     if (fixedPosition) {
       // Fixed position provided (no interactive placement), finish tool.
       mContext.undoStack.commitCmdGroup();
-      setState(SubState::IDLE);
+      setState(SubState::Idle);
       clearSelectionRect(true);
     } else {
       // Start moving the selected items.
@@ -899,7 +907,7 @@ bool SymbolEditorState_Select::startPaste(
   } else {
     // No items pasted -> abort.
     mContext.undoStack.abortCmdGroup();  // can throw
-    setState(SubState::IDLE);
+    setState(SubState::Idle);
     return false;
   }
 }
@@ -1013,7 +1021,7 @@ void SymbolEditorState_Select::startAddingPolygonVertex(
     mSelectedPolygon = polygon;
     mSelectedPolygonVertices = {vertex};
     mStartPos = pos;
-    setState(SubState::MOVING_POLYGON_VERTEX);
+    setState(SubState::MovingPolygonVertices);
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
   }
@@ -1093,8 +1101,8 @@ bool SymbolEditorState_Select::findImageHandleAtPosition(
 }
 
 void SymbolEditorState_Select::setState(SubState state) noexcept {
-  if (state != mState) {
-    mState = state;
+  if (state != mSubState) {
+    mSubState = state;
     scheduleUpdateAvailableFeatures();
   }
 }
@@ -1107,7 +1115,7 @@ SymbolEditorFsmAdapter::Features
     SymbolEditorState_Select::updateAvailableFeatures() noexcept {
   SymbolEditorFsmAdapter::Features features;
 
-  if (mState != SubState::PASTING) {
+  if (mSubState != SubState::Pasting) {
     features |= SymbolEditorFsmAdapter::Feature::Select;
     if (mAdapter.fsmIsWritable()) {
       features |= SymbolEditorFsmAdapter::Feature::ImportGraphics;

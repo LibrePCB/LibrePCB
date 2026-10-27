@@ -52,6 +52,7 @@ namespace editor {
 class CmdDragSelectedSchematicItems;
 class CmdImageEdit;
 class CmdPolygonEdit;
+class SchematicClipboardData;
 class SchematicSelectionQuery;
 
 /*******************************************************************************
@@ -63,6 +64,16 @@ class SchematicSelectionQuery;
  */
 class SchematicEditorState_Select final : public SchematicEditorState {
   Q_OBJECT
+
+  /// All possible FSM substates
+  enum class SubState {
+    Idle,  ///< Left mouse button is not pressed (default state)
+    Selecting,  ///< Left mouse button pressed to draw selection rect
+    Moving,  ///< Left mouse button pressed to move selected items
+    MovingPolygonVertices,  ///< Left mouse butten pressed to move vertices
+    ResizingImage,  ///< Left mouts butten pressed to resize image
+    Pasting,  ///< Move pasted items
+  };
 
 public:
   // Constructors / Destructor
@@ -119,7 +130,8 @@ private:  // Methods
   void startAddingPolygonVertex(SI_Polygon& polygon, int vertex,
                                 const Point& pos) noexcept;
   bool copySelectedItemsToClipboard() noexcept;
-  bool pasteFromClipboard() noexcept;
+  bool startPaste(SchematicGraphicsScene& scene,
+                  std::unique_ptr<SchematicClipboardData> data);
   bool findPolygonVerticesAtPosition(const Point& pos) noexcept;
   bool findImageHandleAtPosition(const Point& pos) noexcept;
   bool openPropertiesDialog(std::shared_ptr<QGraphicsItem> item) noexcept;
@@ -133,20 +145,12 @@ private:  // Methods
   QString processSelection(const SchematicSelectionQuery& query,
                            bool doCrossProbe) const noexcept;
 
-private:  // Data
-  /// enum for all possible substates
-  enum class SubState {
-    IDLE,  ///< left mouse button is not pressed (default state)
-    SELECTING,  ///< left mouse button pressed to draw selection rect
-    MOVING,  ///< left mouse button pressed to move items
-    MOVING_POLYGON_VERTICES,  ///< left mouts butten pressed to move vertices
-    RESIZING_IMAGE,  ///< left mouts butten pressed to resize image
-    PASTING,  ///< move pasted items
-  };
+private:
+  SubState mSubState;  ///< Current FSM substate
+  Point mStartPos;  ///< Start position of the current substate
 
-  SubState mSubState;  ///< the current substate
-  Point mStartPos;
-  std::unique_ptr<CmdDragSelectedSchematicItems> mSelectedItemsDragCommand;
+  /// When dragging items, this undo command will be active
+  std::unique_ptr<CmdDragSelectedSchematicItems> mCmdDragSelectedItems;
 
   /// The current polygon selected for editing (nullptr if none)
   SI_Polygon* mSelectedPolygon;
