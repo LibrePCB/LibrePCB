@@ -423,15 +423,11 @@ void GraphicsScene::drawForeground(QPainter* painter,
       painter->drawEllipse(pos, r / 2, r / 2);
     }
 
-    if (mSceneCursor.clearanceRadius) {
-      // The clearance circle is drawn using board-unit distance, so it scales
-      // with zoom like any other board geometry. Its stroke width is kept at a
-      // constant on-screen thickness by using a width of 0 (which Qt always
-      // renders as 1px).
+    if (auto radius = mSceneCursor.clearanceRadius) {
       painter->setPen(QPen(mOverlayContentColor, 0));
       painter->setBrush(Qt::NoBrush);
-      const qreal clearanceRadiusPx = (*mSceneCursor.clearanceRadius)->toPx();
-      painter->drawEllipse(pos, clearanceRadiusPx, clearanceRadiusPx);
+      const qreal radiusPx = (*radius)->toPx();
+      painter->drawEllipse(pos, radiusPx, radiusPx);
     }
   }
 }

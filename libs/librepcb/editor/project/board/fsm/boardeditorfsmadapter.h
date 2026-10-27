@@ -24,7 +24,6 @@
  *  Includes
  ******************************************************************************/
 #include "../../../graphics/graphicslayer.h"
-#include "../../../graphics/graphicsscenecursor.h"
 
 #include <librepcb/core/types/point.h>
 
@@ -58,6 +57,7 @@ class BoardEditorState_DrawZone;
 class BoardEditorState_Measure;
 class BoardEditorState_Select;
 class BoardGraphicsScene;
+struct GraphicsSceneCursor;
 
 /*******************************************************************************
  *  Class BoardEditorFsmAdapter
@@ -98,8 +98,7 @@ public:
   virtual void fsmSetViewRuler(
       const std::optional<std::pair<Point, Point>>& pos) noexcept = 0;
   virtual void fsmSetSceneCursor(
-      const Point& pos,
-      const GraphicsSceneCursor& cursor = GraphicsSceneCursor()) noexcept = 0;
+      const Point& pos, const GraphicsSceneCursor& cursor) noexcept = 0;
   virtual QPainterPath fsmCalcPosWithTolerance(
       const Point& pos, qreal multiplier) const noexcept = 0;
   virtual Point fsmMapGlobalPosToScenePos(const QPoint& pos) const noexcept = 0;

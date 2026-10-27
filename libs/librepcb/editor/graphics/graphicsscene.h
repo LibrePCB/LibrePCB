@@ -23,8 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "graphicsscenecursor.h"
-
 #include <librepcb/core/types/enums.h>
 #include <librepcb/core/types/length.h>
 #include <librepcb/core/types/lengthunit.h>
@@ -55,6 +53,35 @@ struct GraphicsSceneMouseEvent {
 struct GraphicsSceneKeyEvent {
   Qt::Key key = Qt::Key(0);
   Qt::KeyboardModifiers modifiers = Qt::KeyboardModifiers();
+};
+
+/*******************************************************************************
+ *  Struct GraphicsSceneCursor
+ ******************************************************************************/
+
+/**
+ * @brief Appearance of the overlay cursor drawn by
+ * librepcb::editor::GraphicsScene
+ *
+ * Describes the visibility of the various scene cursor overlay parts (see
+ * GraphicsScene::setSceneCursor()). This includes a crosshair and/or a small
+ * "snapped to item" circle, and the radius of an optional clearance circle.
+ */
+struct GraphicsSceneCursor {
+  bool cross = false;
+  bool circle = false;
+
+  /// If set, draw a clearance circle with this real-world radius.
+  /// `std::nullopt` means no clearance circle is drawn.
+  std::optional<UnsignedLength> clearanceRadius = std::nullopt;
+
+  /// A cursor is considered "empty" if none of its constituents are visible.
+  inline bool isEmpty() {
+    return (cross == false && circle == false &&
+            clearanceRadius == std::nullopt);
+  }
+
+  bool operator==(const GraphicsSceneCursor& rhs) const noexcept = default;
 };
 
 /*******************************************************************************
@@ -107,9 +134,8 @@ public:
    * @param pos     Scene position of the cursor.
    * @param cursor  Describes the appearance of the cursor.
    */
-  void setSceneCursor(
-      const Point& pos,
-      const GraphicsSceneCursor& cursor = GraphicsSceneCursor()) noexcept;
+  void setSceneCursor(const Point& pos,
+                      const GraphicsSceneCursor& cursor) noexcept;
   void setRulerPositions(
       const std::optional<std::pair<Point, Point>>& pos) noexcept;
 

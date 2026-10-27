@@ -227,6 +227,11 @@ private:
                            WireMode mode) const noexcept;
 
   /**
+   * @brief Update #mCurrentNetClass and emit #netClassChanged
+   */
+  void updateNetClass() noexcept;
+
+  /**
    * @brief Update the clearance circle radius.
    *
    * Calculate the size of the clearance circle and evaluate whether the
@@ -234,11 +239,6 @@ private:
    * Setting the radius to `std::nullopt` disables drawing the circle.
    */
   void updateClearanceCircleRadius() noexcept;
-
-  /**
-   * @brief Update #mCurrentNetClass and emit #netClassChanged
-   */
-  void updateNetClass() noexcept;
 
   // State
   SubState mSubState;  ///< the current substate

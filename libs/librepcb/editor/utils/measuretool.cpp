@@ -184,7 +184,7 @@ void MeasureTool::leave() noexcept {
   // same distance again.
 
   if (mScene) {
-    mScene->setSceneCursor(Point());
+    mScene->setSceneCursor(Point(), GraphicsSceneCursor());
     mScene->setRulerPositions(std::nullopt);
     mScene->setGrayOut(false);
   }

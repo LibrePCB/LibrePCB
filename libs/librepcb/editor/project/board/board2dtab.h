@@ -195,7 +195,6 @@ signals:
   void layerRequested(const Layer& layer);
   void angleRequested(const Angle& angle);
   void filledRequested(bool filled);
-  void clearanceCircleRequested(bool show);
   void mirroredRequested(bool mirrored);
   void valueRequested(const QString& value);
   void componentSideRequested(Pad::ComponentSide side);
@@ -203,6 +202,7 @@ signals:
   void ratioRequested(const UnsignedLimitedRatio& ratio);
   void pressFitRequested(bool pressFit);
   void zoneRuleRequested(Zone::Rule rule, bool enable);
+  void clearanceCircleRequested(bool show);
   void saveTraceWidthInBoardRequested();
   void saveTraceWidthInNetClassRequested();
   void saveViaDrillInBoardRequested();
@@ -293,7 +293,6 @@ private:
   LengthEditContext mToolDrill;
   Angle mToolAngle;
   bool mToolFilled;  // Also used for auto width
-  bool mToolShowClearanceCircle;
   bool mToolMirrored;  // Also used for auto via size
   QString mToolValue;
   std::shared_ptr<slint::VectorModel<slint::SharedString>>
@@ -304,6 +303,7 @@ private:
   bool mToolFiducial;
   bool mToolPressFit;  // Also used for auto via drill
   Zone::Rules mToolZoneRules;
+  bool mToolShowClearanceCircle;
 
   // Unplaced components
   QList<Uuid> mUnplacedComponents;

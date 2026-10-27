@@ -121,10 +121,8 @@ bool BoardEditorState_DrawTrace::exit() noexcept {
   // Abort the currently active command
   if (!abortPositioning(true, true)) return false;
 
-  // Explicitly clear the overlay cursor
-  mAdapter.fsmSetSceneCursor(Point());
-
   mAdapter.fsmSetViewCursor(std::nullopt);
+  mAdapter.fsmSetSceneCursor(Point(), GraphicsSceneCursor());
   mAdapter.fsmToolLeave();
   return true;
 }
@@ -301,18 +299,6 @@ void BoardEditorState_DrawTrace::setAutoWidth(bool autoWidth) noexcept {
   }
 }
 
-void BoardEditorState_DrawTrace::setShowClearanceCircle(bool show) noexcept {
-  if (show != mShowClearanceCircle) {
-    mShowClearanceCircle = show;
-    emit showClearanceCircleChanged(mShowClearanceCircle);
-    updateClearanceCircleRadius();
-
-    // Save client settings.
-    QSettings cs;
-    cs.setValue("board_editor/draw_trace/clearance_circle", show);
-  }
-}
-
 void BoardEditorState_DrawTrace::setWidth(
     const PositiveLength& width) noexcept {
   if (width != mCurrentWidth) {
@@ -477,6 +463,18 @@ void BoardEditorState_DrawTrace::setViaSize(
   }
 
   updateNetpointPositions();
+}
+
+void BoardEditorState_DrawTrace::setShowClearanceCircle(bool show) noexcept {
+  if (show != mShowClearanceCircle) {
+    mShowClearanceCircle = show;
+    emit showClearanceCircleChanged(mShowClearanceCircle);
+    updateClearanceCircleRadius();
+
+    // Save client settings.
+    QSettings cs;
+    cs.setValue("board_editor/draw_trace/clearance_circle", show);
+  }
 }
 
 /*******************************************************************************
@@ -1084,25 +1082,6 @@ Point BoardEditorState_DrawTrace::calcMiddlePointPos(
   }
 }
 
-void BoardEditorState_DrawTrace::updateClearanceCircleRadius() noexcept {
-  // std::nullopt means "don't draw a clearance circle" (see
-  // GraphicsScene::drawForeground()).
-  GraphicsSceneCursor
-      cursor;  // cross/circle default false - unused by this tool
-  if (mShowClearanceCircle && (mSubState == SubState_PositioningNetPoint)) {
-    // The clearance circle radius is the applicable copper clearance plus
-    // half of the current trace width.
-    UnsignedLength minClearance =
-        mContext.board.getDrcSettings().getMinCopperCopperClearance();
-    if (mCurrentNetClass) {
-      minClearance = std::max(minClearance,
-                              mCurrentNetClass->getMinCopperCopperClearance());
-    }
-    cursor.clearanceRadius = UnsignedLength(minClearance + (mCurrentWidth / 2));
-  }
-  mAdapter.fsmSetSceneCursor(mTargetPos, cursor);
-}
-
 void BoardEditorState_DrawTrace::updateNetClass() noexcept {
   NetClass* nc = nullptr;
   if (mCurrentNetSegment) {
@@ -1125,6 +1104,20 @@ void BoardEditorState_DrawTrace::updateNetClass() noexcept {
     emit viaSizeChanged(!mCurrentViaProperties.getSize().has_value(),
                         getViaSize());
   }
+}
+
+void BoardEditorState_DrawTrace::updateClearanceCircleRadius() noexcept {
+  GraphicsSceneCursor cursor;
+  if (mShowClearanceCircle && (mSubState == SubState_PositioningNetPoint)) {
+    UnsignedLength minClearance =
+        mContext.board.getDrcSettings().getMinCopperCopperClearance();
+    if (mCurrentNetClass) {
+      minClearance = std::max(minClearance,
+                              mCurrentNetClass->getMinCopperCopperClearance());
+    }
+    cursor.clearanceRadius = UnsignedLength(minClearance + (mCurrentWidth / 2));
+  }
+  mAdapter.fsmSetSceneCursor(mTargetPos, cursor);
 }
 
 /*******************************************************************************

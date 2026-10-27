@@ -179,7 +179,6 @@ Board2dTab::Board2dTab(GuiApplication& app, BoardEditor& editor,
     mToolSize(app.getWorkspace().getSettings()),
     mToolDrill(app.getWorkspace().getSettings()),
     mToolFilled(false),
-    mToolShowClearanceCircle(false),
     mToolMirrored(false),
     mToolValueSuggestions(
         std::make_shared<slint::VectorModel<slint::SharedString>>()),
@@ -189,6 +188,7 @@ Board2dTab::Board2dTab(GuiApplication& app, BoardEditor& editor,
     mToolFiducial(false),
     mToolPressFit(false),
     mToolZoneRules(),
+    mToolShowClearanceCircle(false),
     mUnplacedComponentIndex(0),
     mUnplacedComponentDeviceIndex(0),
     mUnplacedComponentPackageOwned(false),
@@ -558,9 +558,6 @@ void Board2dTab::setDerivedUiData(const ui::Board2dTabData& data) noexcept {
   // Tool filled / auto-width
   emit filledRequested(data.tool_filled);
 
-  // Tool show clearance circle
-  emit clearanceCircleRequested(data.tool_show_clearance_circle);
-
   // Tool mirrored / auto-size
   emit mirroredRequested(data.tool_mirrored);
 
@@ -597,6 +594,9 @@ void Board2dTab::setDerivedUiData(const ui::Board2dTabData& data) noexcept {
   emit zoneRuleRequested(Zone::Rule::NoPlanes, data.tool_no_planes);
   emit zoneRuleRequested(Zone::Rule::NoExposure, data.tool_no_exposures);
   emit zoneRuleRequested(Zone::Rule::NoDevices, data.tool_no_devices);
+
+  // Tool show clearance circle
+  emit clearanceCircleRequested(data.tool_show_clearance_circle);
 
   // Set design rules
   if (!data.set_design_rules.empty()) {
@@ -1331,19 +1331,6 @@ void Board2dTab::fsmToolEnter(BoardEditorState_DrawTrace& state) noexcept {
       connect(this, &Board2dTab::filledRequested, &state,
               &BoardEditorState_DrawTrace::setAutoWidth));
 
-  // Show clearance circle
-  auto setShowClearanceCircle = [this](bool show) {
-    mToolShowClearanceCircle = show;
-    onDerivedUiDataChanged.notify();
-  };
-  setShowClearanceCircle(state.getShowClearanceCircle());
-  mFsmStateConnections.append(
-      connect(&state, &BoardEditorState_DrawTrace::showClearanceCircleChanged,
-              this, setShowClearanceCircle));
-  mFsmStateConnections.append(
-      connect(this, &Board2dTab::clearanceCircleRequested, &state,
-              &BoardEditorState_DrawTrace::setShowClearanceCircle));
-
   // Layers
   mToolLayersQt = Layer::sorted(state.getAvailableLayers());
   mToolLayers->clear();
@@ -1399,6 +1386,19 @@ void Board2dTab::fsmToolEnter(BoardEditorState_DrawTrace& state) noexcept {
   mFsmStateConnections.append(connect(this, &Board2dTab::viaSizeRequested,
                                       &state,
                                       &BoardEditorState_DrawTrace::setViaSize));
+
+  // Show clearance circle
+  auto setShowClearanceCircle = [this](bool show) {
+    mToolShowClearanceCircle = show;
+    onDerivedUiDataChanged.notify();
+  };
+  setShowClearanceCircle(state.getShowClearanceCircle());
+  mFsmStateConnections.append(
+      connect(&state, &BoardEditorState_DrawTrace::showClearanceCircleChanged,
+              this, setShowClearanceCircle));
+  mFsmStateConnections.append(
+      connect(this, &Board2dTab::clearanceCircleRequested, &state,
+              &BoardEditorState_DrawTrace::setShowClearanceCircle));
 
   onDerivedUiDataChanged.notify();
 }

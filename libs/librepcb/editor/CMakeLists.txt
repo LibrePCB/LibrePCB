@@ -91,7 +91,6 @@ add_library(
   graphics/graphicslayersmodel.h
   graphics/graphicsscene.cpp
   graphics/graphicsscene.h
-  graphics/graphicsscenecursor.h
   graphics/holegraphicsitem.cpp
   graphics/holegraphicsitem.h
   graphics/imagegraphicsitem.cpp

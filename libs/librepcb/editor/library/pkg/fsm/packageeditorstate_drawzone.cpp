@@ -82,7 +82,7 @@ bool PackageEditorState_DrawZone::exit() noexcept {
   }
 
   mAdapter.fsmSetViewCursor(std::nullopt);
-  mAdapter.fsmSetSceneCursor(Point(), false, false);
+  mAdapter.fsmSetSceneCursor(Point(), GraphicsSceneCursor());
   mAdapter.fsmSetViewInfoBoxText(QString());
   mAdapter.fsmSetStatusBarMessage(QString());
   mAdapter.fsmToolLeave();
@@ -303,7 +303,7 @@ void PackageEditorState_DrawZone::updateCursorPosition(
   if (!modifiers.testFlag(Qt::ShiftModifier)) {
     mCursorPos.mapToGrid(getGridInterval());
   }
-  mAdapter.fsmSetSceneCursor(mCursorPos, true, false);
+  mAdapter.fsmSetSceneCursor(mCursorPos, GraphicsSceneCursor(true, false));
 
   if (mCurrentZone && mCurrentEditCmd) {
     updateOutline();

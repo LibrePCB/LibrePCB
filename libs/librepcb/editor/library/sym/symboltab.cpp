@@ -835,10 +835,10 @@ void SymbolTab::fsmSetViewRuler(
   }
 }
 
-void SymbolTab::fsmSetSceneCursor(const Point& pos, bool cross,
-                                  bool circle) noexcept {
+void SymbolTab::fsmSetSceneCursor(const Point& pos,
+                                  const GraphicsSceneCursor& cursor) noexcept {
   if (mScene) {
-    mScene->setSceneCursor(pos, GraphicsSceneCursor{cross, circle});
+    mScene->setSceneCursor(pos, cursor);
   }
 }
 

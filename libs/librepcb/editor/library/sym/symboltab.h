@@ -133,8 +133,8 @@ public:
   void fsmSetViewInfoBoxText(const QString& text) noexcept override;
   void fsmSetViewRuler(
       const std::optional<std::pair<Point, Point>>& pos) noexcept override;
-  void fsmSetSceneCursor(const Point& pos, bool cross,
-                         bool circle) noexcept override;
+  void fsmSetSceneCursor(const Point& pos,
+                         const GraphicsSceneCursor& cursor) noexcept override;
   QPainterPath fsmCalcPosWithTolerance(
       const Point& pos, qreal multiplier) const noexcept override;
   Point fsmMapGlobalPosToScenePos(const QPoint& pos) const noexcept override;
