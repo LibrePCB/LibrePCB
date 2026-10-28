@@ -211,6 +211,7 @@ Board2dTab::Board2dTab(GuiApplication& app, BoardEditor& editor,
 
   // Setup graphics view.
   mView->setEventHandler(this);
+  mView->setRenderCacheEnabled(true);
   mView->setUseOpenGl(mApp.getWorkspace().getSettings().useOpenGl.get());
   connect(
       &mApp.getWorkspace().getSettings().useOpenGl,
@@ -664,6 +665,7 @@ void Board2dTab::activate() noexcept {
 }
 
 void Board2dTab::deactivate() noexcept {
+  mView->releaseResources();
   mInputIdleTimer.reset();
   mBoardEditor.unregisterActiveTab(this);
   while (!mActiveConnections.isEmpty()) {
