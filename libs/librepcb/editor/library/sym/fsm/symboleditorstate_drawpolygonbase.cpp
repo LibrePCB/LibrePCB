@@ -371,7 +371,7 @@ void SymbolEditorState_DrawPolygonBase::updateCursorPosition(
   } else if (!modifiers.testFlag(Qt::ControlModifier)) {
     mCursorPos.mapToGrid(getGridInterval());
   }
-  mAdapter.fsmSetSceneCursor(mCursorPos, GraphicsSceneCursor(true, snapped));
+  mAdapter.fsmSetSceneCursor(mCursorPos, GraphicsSceneCursor{true, snapped});
 
   if (mCurrentPolygon && mCurrentEditCmd) {
     updatePolygonPath();

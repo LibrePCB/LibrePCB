@@ -304,7 +304,7 @@ void PackageEditorState_DrawZone::updateCursorPosition(
   if (!modifiers.testFlag(Qt::ShiftModifier)) {
     mCursorPos.mapToGrid(getGridInterval());
   }
-  mAdapter.fsmSetSceneCursor(mCursorPos, GraphicsSceneCursor(true, false));
+  mAdapter.fsmSetSceneCursor(mCursorPos, GraphicsSceneCursor{true, false});
 
   if (mCurrentZone && mCurrentEditCmd) {
     updateOutline();
