@@ -17,5 +17,7 @@ BINARY_NAME=$(basename "$ARGV0")
 case $BINARY_NAME in
   *cli*) exec "$HERE/usr/bin/librepcb-cli" "$@";;
   *CLI*) exec "$HERE/usr/bin/librepcb-cli" "$@";;
+  *mcp*) exec "$HERE/usr/bin/librepcb-mcp" "$@";;
+  *MCP*) exec "$HERE/usr/bin/librepcb-mcp" "$@";;
   *) exec "$HERE/usr/bin/librepcb" "$@";;
 esac
