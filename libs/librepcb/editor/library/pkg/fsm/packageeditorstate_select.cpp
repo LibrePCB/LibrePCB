@@ -75,7 +75,7 @@ namespace editor {
 
 PackageEditorState_Select::PackageEditorState_Select(Context& context) noexcept
   : PackageEditorState(context),
-    mState(SubState::IDLE),
+    mSubState(SubState::Idle),
     mStartPos(),
     mSelectedPolygon(nullptr),
     mSelectedPolygonVertices(),
@@ -137,14 +137,14 @@ bool PackageEditorState_Select::processGraphicsSceneMouseMoved(
 
   Point currentPos = e.scenePos;
 
-  switch (mState) {
-    case SubState::SELECTING: {
+  switch (mSubState) {
+    case SubState::Selecting: {
       setSelectionRect(mStartPos, currentPos);
       scheduleUpdateAvailableFeatures();  // Selection might have changed.
       return true;
     }
-    case SubState::MOVING:
-    case SubState::PASTING: {
+    case SubState::Moving:
+    case SubState::Pasting: {
       if (!mCmdDragSelectedItems) {
         mCmdDragSelectedItems = std::make_unique<CmdDragSelectedFootprintItems>(
             *mContext.currentGraphicsItem, getGridInterval());
@@ -154,7 +154,7 @@ bool PackageEditorState_Select::processGraphicsSceneMouseMoved(
       mCmdDragSelectedItems->setDeltaToStartPos(delta);
       return true;
     }
-    case SubState::MOVING_POLYGON_VERTEX: {
+    case SubState::MovingPolygonVertices: {
       if (!mSelectedPolygon) {
         return false;
       }
@@ -171,7 +171,7 @@ bool PackageEditorState_Select::processGraphicsSceneMouseMoved(
       mCmdPolygonEdit->setPath(Path(vertices), true);
       return true;
     }
-    case SubState::MOVING_ZONE_VERTEX: {
+    case SubState::MovingZoneVertices: {
       if (!mSelectedZone) {
         return false;
       }
@@ -196,8 +196,8 @@ bool PackageEditorState_Select::processGraphicsSceneMouseMoved(
 
 bool PackageEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
     const GraphicsSceneMouseEvent& e) noexcept {
-  switch (mState) {
-    case SubState::IDLE: {
+  switch (mSubState) {
+    case SubState::Idle: {
       // update start position of selection or movement
       mStartPos = e.scenePos;
       // get items under cursor
@@ -205,14 +205,14 @@ bool PackageEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
           findItemsAtPosition(mStartPos);
       if (findPolygonVerticesAtPosition(mStartPos) &&
           mAdapter.fsmIsWritable()) {
-        setState(SubState::MOVING_POLYGON_VERTEX);
+        setState(SubState::MovingPolygonVertices);
       } else if (findZoneVerticesAtPosition(mStartPos) &&
                  mAdapter.fsmIsWritable()) {
-        setState(SubState::MOVING_ZONE_VERTEX);
+        setState(SubState::MovingZoneVertices);
       } else if (items.isEmpty()) {
         // start selecting
         clearSelectionRect(true);
-        setState(SubState::SELECTING);
+        setState(SubState::Selecting);
       } else {
         // Check if there's already an item selected.
         std::shared_ptr<QGraphicsItem> selectedItem;
@@ -269,17 +269,17 @@ bool PackageEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
         // Start moving, if not read only.
         if (mAdapter.fsmIsWritable()) {
           Q_ASSERT(!mCmdDragSelectedItems);
-          setState(SubState::MOVING);
+          setState(SubState::Moving);
         }
       }
       return true;
     }
-    case SubState::PASTING: {
+    case SubState::Pasting: {
       try {
         Q_ASSERT(mCmdDragSelectedItems);
         mContext.undoStack.appendToCmdGroup(mCmdDragSelectedItems.release());
         mContext.undoStack.commitCmdGroup();
-        setState(SubState::IDLE);
+        setState(SubState::Idle);
         clearSelectionRect(true);
       } catch (const Exception& e) {
         QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
@@ -295,13 +295,13 @@ bool PackageEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
 bool PackageEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
     const GraphicsSceneMouseEvent& e) noexcept {
   Q_UNUSED(e);
-  switch (mState) {
-    case SubState::SELECTING: {
+  switch (mSubState) {
+    case SubState::Selecting: {
       clearSelectionRect(false);
-      setState(SubState::IDLE);
+      setState(SubState::Idle);
       return true;
     }
-    case SubState::MOVING: {
+    case SubState::Moving: {
       if (mCmdDragSelectedItems) {
         try {
           mContext.undoStack.execCmd(mCmdDragSelectedItems.release());
@@ -309,10 +309,10 @@ bool PackageEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
           QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
         }
       }
-      setState(SubState::IDLE);
+      setState(SubState::Idle);
       return true;
     }
-    case SubState::MOVING_POLYGON_VERTEX: {
+    case SubState::MovingPolygonVertices: {
       if (mCmdPolygonEdit) {
         try {
           mContext.undoStack.execCmd(mCmdPolygonEdit.release());
@@ -320,10 +320,10 @@ bool PackageEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
           QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
         }
       }
-      setState(SubState::IDLE);
+      setState(SubState::Idle);
       return true;
     }
-    case SubState::MOVING_ZONE_VERTEX: {
+    case SubState::MovingZoneVertices: {
       if (mCmdZoneEdit) {
         try {
           mContext.undoStack.execCmd(mCmdZoneEdit.release());
@@ -331,7 +331,7 @@ bool PackageEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
           QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
         }
       }
-      setState(SubState::IDLE);
+      setState(SubState::Idle);
       return true;
     }
     default: {
@@ -349,7 +349,7 @@ bool PackageEditorState_Select::
     return processGraphicsSceneLeftMouseButtonPressed(e);
   }
 
-  if (mState == SubState::IDLE) {
+  if (mSubState == SubState::Idle) {
     return openPropertiesDialogOfItemAtPos(e.scenePos);
   } else {
     return false;
@@ -358,12 +358,12 @@ bool PackageEditorState_Select::
 
 bool PackageEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
     const GraphicsSceneMouseEvent& e) noexcept {
-  switch (mState) {
-    case SubState::IDLE: {
+  switch (mSubState) {
+    case SubState::Idle: {
       return openContextMenuAtPos(e.scenePos);
     }
-    case SubState::MOVING:
-    case SubState::PASTING: {
+    case SubState::Moving:
+    case SubState::Pasting: {
       return rotateSelectedItems(Angle::deg90());
     }
     default: {
@@ -376,8 +376,8 @@ bool PackageEditorState_Select::processSelectAll() noexcept {
   GraphicsScene* scene = getGraphicsScene();
   if ((!scene) || (!mContext.currentGraphicsItem)) return false;
 
-  switch (mState) {
-    case SubState::IDLE: {
+  switch (mSubState) {
+    case SubState::Idle: {
       // Set a selection rect slightly larger than the total items bounding
       // rect to get all items selected.
       auto bounds = scene->itemsBoundingRect();
@@ -393,8 +393,8 @@ bool PackageEditorState_Select::processSelectAll() noexcept {
 }
 
 bool PackageEditorState_Select::processCut() noexcept {
-  switch (mState) {
-    case SubState::IDLE: {
+  switch (mSubState) {
+    case SubState::Idle: {
       if (copySelectedItemsToClipboard()) {
         return removeSelectedItems();
       } else {
@@ -408,8 +408,8 @@ bool PackageEditorState_Select::processCut() noexcept {
 }
 
 bool PackageEditorState_Select::processCopy() noexcept {
-  switch (mState) {
-    case SubState::IDLE: {
+  switch (mSubState) {
+    case SubState::Idle: {
       return copySelectedItemsToClipboard();
     }
     default: {
@@ -419,8 +419,8 @@ bool PackageEditorState_Select::processCopy() noexcept {
 }
 
 bool PackageEditorState_Select::processPaste() noexcept {
-  switch (mState) {
-    case SubState::IDLE: {
+  switch (mSubState) {
+    case SubState::Idle: {
       try {
         // Get footprint items from clipboard, if none provided.
         std::unique_ptr<FootprintClipboardData> data =
@@ -453,8 +453,8 @@ bool PackageEditorState_Select::processPaste() noexcept {
 bool PackageEditorState_Select::processMove(const Point& delta) noexcept {
   if (!mContext.currentGraphicsItem) return false;
 
-  switch (mState) {
-    case SubState::IDLE: {
+  switch (mSubState) {
+    case SubState::Idle: {
       try {
         std::unique_ptr<CmdDragSelectedFootprintItems> cmd(
             new CmdDragSelectedFootprintItems(*mContext.currentGraphicsItem,
@@ -473,10 +473,10 @@ bool PackageEditorState_Select::processMove(const Point& delta) noexcept {
 }
 
 bool PackageEditorState_Select::processRotate(const Angle& rotation) noexcept {
-  switch (mState) {
-    case SubState::IDLE:
-    case SubState::MOVING:
-    case SubState::PASTING: {
+  switch (mSubState) {
+    case SubState::Idle:
+    case SubState::Moving:
+    case SubState::Pasting: {
       return rotateSelectedItems(rotation);
     }
     default: {
@@ -487,10 +487,10 @@ bool PackageEditorState_Select::processRotate(const Angle& rotation) noexcept {
 
 bool PackageEditorState_Select::processMirror(
     Qt::Orientation orientation) noexcept {
-  switch (mState) {
-    case SubState::IDLE:
-    case SubState::MOVING:
-    case SubState::PASTING: {
+  switch (mSubState) {
+    case SubState::Idle:
+    case SubState::Moving:
+    case SubState::Pasting: {
       return mirrorSelectedItems(orientation, false);
     }
     default: {
@@ -501,10 +501,10 @@ bool PackageEditorState_Select::processMirror(
 
 bool PackageEditorState_Select::processFlip(
     Qt::Orientation orientation) noexcept {
-  switch (mState) {
-    case SubState::IDLE:
-    case SubState::MOVING:
-    case SubState::PASTING: {
+  switch (mSubState) {
+    case SubState::Idle:
+    case SubState::Moving:
+    case SubState::Pasting: {
       return mirrorSelectedItems(orientation, true);
     }
     default: {
@@ -514,8 +514,8 @@ bool PackageEditorState_Select::processFlip(
 }
 
 bool PackageEditorState_Select::processMoveAlign() noexcept {
-  switch (mState) {
-    case SubState::IDLE: {
+  switch (mSubState) {
+    case SubState::Idle: {
       return moveAlignSelectedItems();
     }
     default: {
@@ -525,10 +525,10 @@ bool PackageEditorState_Select::processMoveAlign() noexcept {
 }
 
 bool PackageEditorState_Select::processSnapToGrid() noexcept {
-  switch (mState) {
-    case SubState::IDLE:
-    case SubState::MOVING:
-    case SubState::PASTING: {
+  switch (mSubState) {
+    case SubState::Idle:
+    case SubState::Moving:
+    case SubState::Pasting: {
       return snapSelectedItemsToGrid();
     }
     default: {
@@ -538,8 +538,8 @@ bool PackageEditorState_Select::processSnapToGrid() noexcept {
 }
 
 bool PackageEditorState_Select::processRemove() noexcept {
-  switch (mState) {
-    case SubState::IDLE: {
+  switch (mSubState) {
+    case SubState::Idle: {
       return removeSelectedItems();
     }
     default: {
@@ -549,8 +549,8 @@ bool PackageEditorState_Select::processRemove() noexcept {
 }
 
 bool PackageEditorState_Select::processEditProperties() noexcept {
-  switch (mState) {
-    case SubState::IDLE: {
+  switch (mSubState) {
+    case SubState::Idle: {
       if (auto graphicsItem = mContext.currentGraphicsItem) {
         foreach (auto ptr, graphicsItem->getSelectedPads()) {
           return openPropertiesDialogOfItem(ptr);
@@ -581,8 +581,8 @@ bool PackageEditorState_Select::processEditProperties() noexcept {
 }
 
 bool PackageEditorState_Select::processGenerateOutline() noexcept {
-  switch (mState) {
-    case SubState::IDLE: {
+  switch (mSubState) {
+    case SubState::Idle: {
       return generateOutline();
     }
     default: {
@@ -592,8 +592,8 @@ bool PackageEditorState_Select::processGenerateOutline() noexcept {
 }
 
 bool PackageEditorState_Select::processGenerateCourtyard() noexcept {
-  switch (mState) {
-    case SubState::IDLE: {
+  switch (mSubState) {
+    case SubState::Idle: {
       return generateCourtyard();
     }
     default: {
@@ -673,38 +673,47 @@ bool PackageEditorState_Select::processImportDxf() noexcept {
 }
 
 bool PackageEditorState_Select::processAbortCommand() noexcept {
-  switch (mState) {
-    case SubState::MOVING: {
-      mCmdDragSelectedItems.reset();
-      setState(SubState::IDLE);
-      return true;
-    }
-    case SubState::MOVING_POLYGON_VERTEX: {
-      mCmdPolygonEdit.reset();
-      setState(SubState::IDLE);
-      return true;
-    }
-    case SubState::MOVING_ZONE_VERTEX: {
-      mCmdZoneEdit.reset();
-      setState(SubState::IDLE);
-      return true;
-    }
-    case SubState::PASTING: {
-      try {
-        mCmdDragSelectedItems.reset();
-        mContext.undoStack.abortCmdGroup();
-        setState(SubState::IDLE);
+  try {
+    switch (mSubState) {
+      case SubState::Idle:
+      case SubState::Selecting: {
+        clearSelectionRect(true);
+        mSubState = SubState::Idle;
         return true;
-      } catch (const Exception& e) {
-        QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
-        return false;
+      }
+      case SubState::Moving: {
+        mCmdDragSelectedItems.reset();
+        setState(SubState::Idle);
+        return true;
+      }
+      case SubState::MovingPolygonVertices: {
+        mCmdPolygonEdit.reset();
+        mSelectedPolygon = nullptr;
+        mSelectedPolygonVertices.clear();
+        setState(SubState::Idle);
+        return true;
+      }
+      case SubState::MovingZoneVertices: {
+        mCmdZoneEdit.reset();
+        mSelectedZone = nullptr;
+        mSelectedZoneVertices.clear();
+        setState(SubState::Idle);
+        return true;
+      }
+      case SubState::Pasting: {
+        mContext.undoStack.abortCmdGroup();  // can throw
+        mCmdDragSelectedItems.reset();
+        setState(SubState::Idle);
+        return true;
+      }
+      default: {
+        break;
       }
     }
-    default: {
-      clearSelectionRect(true);  // Clear selection, if any.
-      return true;
-    }
+  } catch (const Exception& e) {
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
   }
+  return false;
 }
 
 bool PackageEditorState_Select::processGridIntervalChanged(
@@ -720,7 +729,7 @@ bool PackageEditorState_Select::processGridIntervalChanged(
 
 bool PackageEditorState_Select::openContextMenuAtPos(
     const Point& pos) noexcept {
-  if (mState != SubState::IDLE) return false;
+  if (mSubState != SubState::Idle) return false;
 
   // handle item selection
   std::shared_ptr<QGraphicsItem> selectedItem;
@@ -1178,7 +1187,7 @@ bool PackageEditorState_Select::startPaste(
   // Start undo command group.
   clearSelectionRect(true);
   mContext.undoStack.beginCmdGroup(tr("Paste Footprint Elements"));
-  setState(SubState::PASTING);
+  setState(SubState::Pasting);
 
   // Paste items.
   mStartPos = mAdapter.fsmMapGlobalPosToScenePos(QCursor::pos());
@@ -1192,7 +1201,7 @@ bool PackageEditorState_Select::startPaste(
     if (fixedPosition) {
       // Fixed position provided (no interactive placement), finish tool.
       mContext.undoStack.commitCmdGroup();
-      setState(SubState::IDLE);
+      setState(SubState::Idle);
       clearSelectionRect(true);
     } else {
       // Start moving the selected items.
@@ -1203,7 +1212,7 @@ bool PackageEditorState_Select::startPaste(
   } else {
     // No items pasted -> abort.
     mContext.undoStack.abortCmdGroup();  // can throw
-    setState(SubState::IDLE);
+    setState(SubState::Idle);
     return false;
   }
 }
@@ -1567,7 +1576,7 @@ void PackageEditorState_Select::startAddingPolygonVertex(
     mSelectedPolygon = polygon;
     mSelectedPolygonVertices = {vertex};
     mStartPos = pos;
-    setState(SubState::MOVING_POLYGON_VERTEX);
+    setState(SubState::MovingPolygonVertices);
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
   }
@@ -1609,7 +1618,7 @@ void PackageEditorState_Select::startAddingZoneVertex(
     mSelectedZone = zone;
     mSelectedZoneVertices = {vertex};
     mStartPos = pos;
-    setState(SubState::MOVING_ZONE_VERTEX);
+    setState(SubState::MovingZoneVertices);
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
   }
@@ -1692,8 +1701,8 @@ bool PackageEditorState_Select::findZoneVerticesAtPosition(
 }
 
 void PackageEditorState_Select::setState(SubState state) noexcept {
-  if (state != mState) {
-    mState = state;
+  if (state != mSubState) {
+    mSubState = state;
     scheduleUpdateAvailableFeatures();
   }
 }
@@ -1707,7 +1716,7 @@ PackageEditorFsmAdapter::Features
   PackageEditorFsmAdapter::Features features;
 
   if (mContext.currentFootprint) {
-    if (mState != SubState::PASTING) {
+    if (mSubState != SubState::Pasting) {
       features |= PackageEditorFsmAdapter::Feature::Select;
       if (mAdapter.fsmIsWritable()) {
         features |= PackageEditorFsmAdapter::Feature::ImportGraphics;

@@ -92,7 +92,7 @@ namespace editor {
 SchematicEditorState_Select::SchematicEditorState_Select(
     const Context& context) noexcept
   : SchematicEditorState(context),
-    mSubState(SubState::IDLE),
+    mSubState(SubState::Idle),
     mSelectedPolygon(nullptr),
     mSelectedPolygonVertices(),
     mCmdPolygonEdit(),
@@ -102,7 +102,7 @@ SchematicEditorState_Select::SchematicEditorState_Select(
 }
 
 SchematicEditorState_Select::~SchematicEditorState_Select() noexcept {
-  Q_ASSERT(!mSelectedItemsDragCommand);
+  Q_ASSERT(!mCmdDragSelectedItems);
 }
 
 /*******************************************************************************
@@ -110,7 +110,7 @@ SchematicEditorState_Select::~SchematicEditorState_Select() noexcept {
  ******************************************************************************/
 
 bool SchematicEditorState_Select::entry() noexcept {
-  Q_ASSERT(mSubState == SubState::IDLE);
+  Q_ASSERT(mSubState == SubState::Idle);
   mAdapter.fsmToolEnter(*this);
 
   mUpdateAvailableFeaturesTimer = std::make_unique<QTimer>();
@@ -131,18 +131,13 @@ bool SchematicEditorState_Select::entry() noexcept {
 }
 
 bool SchematicEditorState_Select::exit() noexcept {
-  if (mSubState == SubState::PASTING) {
-    try {
-      mContext.undoStack.abortCmdGroup();
-    } catch (...) {
-      return false;
-    }
-  }
+  processAbortCommand();
 
   mUpdateAvailableFeaturesTimer.reset();
-  mSelectedItemsDragCommand.reset();
+  mCmdDragSelectedItems.reset();
   mCmdPolygonEdit.reset();
-  mSubState = SubState::IDLE;
+  mCmdImageEdit.reset();
+  mSubState = SubState::Idle;
 
   // Avoid propagating the selection to other, non-selectable tools, thus
   // clearing the selection.
@@ -165,7 +160,7 @@ bool SchematicEditorState_Select::exit() noexcept {
  ******************************************************************************/
 
 bool SchematicEditorState_Select::processSelectAll() noexcept {
-  if (mSubState == SubState::IDLE) {
+  if (mSubState == SubState::Idle) {
     if (SchematicGraphicsScene* scene = getActiveSchematicScene()) {
       scene->selectAll();
       scheduleUpdateAvailableFeatures();
@@ -179,7 +174,7 @@ bool SchematicEditorState_Select::processCut() noexcept {
   // Discard any temporary changes and release undo stack.
   abortBlockingToolsInOtherEditors();
 
-  if (mSubState == SubState::IDLE) {
+  if (mSubState == SubState::Idle) {
     return copySelectedItemsToClipboard() && removeSelectedItems();
   }
   return false;
@@ -189,7 +184,7 @@ bool SchematicEditorState_Select::processCopy() noexcept {
   // Discard any temporary changes and release undo stack.
   abortBlockingToolsInOtherEditors();
 
-  if (mSubState == SubState::IDLE) {
+  if (mSubState == SubState::Idle) {
     return copySelectedItemsToClipboard();
   }
   return false;
@@ -199,8 +194,61 @@ bool SchematicEditorState_Select::processPaste() noexcept {
   // Discard any temporary changes and release undo stack.
   abortBlockingToolsInOtherEditors();
 
-  if (mSubState == SubState::IDLE) {
-    return pasteFromClipboard();
+  SchematicGraphicsScene* scene = getActiveSchematicScene();
+  if ((!scene) || (mSubState != SubState::Idle)) {
+    return false;
+  }
+
+  try {
+    // Get schematic data from clipboard.
+    const QMimeData* mimeData = qApp->clipboard()->mimeData();
+    std::unique_ptr<SchematicClipboardData> data =
+        SchematicClipboardData::fromMimeData(mimeData);  // can throw
+
+    // If there is no schematic data, get symbol data from clipboard to allow
+    // pasting graphical elements from the symbol editor.
+    if (!data) {
+      if (std::unique_ptr<const SymbolClipboardData> symbolData =
+              SymbolClipboardData::fromMimeData(mimeData)) {  // can throw
+        data = std::make_unique<SchematicClipboardData>(
+            symbolData->getSymbolUuid(), symbolData->getCursorPos(),
+            AssemblyVariantList());
+        std::unique_ptr<TransactionalDirectory> dir = data->getDirectory();
+        std::unique_ptr<const TransactionalDirectory> symbolDir =
+            const_cast<SymbolClipboardData&>(*symbolData).getDirectory();
+        for (const auto& polygon : symbolData->getPolygons()) {
+          data->getPolygons().append(std::make_shared<Polygon>(polygon));
+        }
+        for (const auto& text : symbolData->getTexts()) {
+          // If the texts consist of a placeholder (e.g. "{{NAME}}"), they
+          // might evaluate to an empty string in the schematic, making them
+          // almost invisible. To avoid that, we remove "{" and "}" from those.
+          auto copy = std::make_shared<Text>(text);
+          QString textValue = text.getText();
+          ProjectAttributeLookup lookup(scene->getSchematic(), nullptr);
+          if (AttributeSubstitutor::substitute(textValue, lookup)
+                  .trimmed()
+                  .isEmpty()) {
+            textValue.replace("{", "");
+            textValue.replace("}", "");
+            copy->setText(textValue);
+          }
+          data->getTexts().append(copy);
+        }
+        for (const auto& image : symbolData->getImages()) {
+          dir->write(*image.getFileName(),
+                     symbolDir->read(*image.getFileName()));
+          data->getImages().append(std::make_shared<Image>(image));
+        }
+      }
+    }
+
+    // If there is something to paste, start the paste tool.
+    if (data) {
+      return startPaste(*scene, std::move(data));  // can throw
+    }
+  } catch (const Exception& e) {
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
   }
   return false;
 }
@@ -209,7 +257,7 @@ bool SchematicEditorState_Select::processMove(const Point& delta) noexcept {
   // Discard any temporary changes and release undo stack.
   abortBlockingToolsInOtherEditors();
 
-  if (mSubState == SubState::IDLE) {
+  if (mSubState == SubState::Idle) {
     return moveSelectedItems(delta);
   }
   return false;
@@ -220,7 +268,8 @@ bool SchematicEditorState_Select::processRotate(
   // Discard any temporary changes and release undo stack.
   abortBlockingToolsInOtherEditors();
 
-  if (!mCmdPolygonEdit) {
+  if ((mSubState == SubState::Idle) || (mSubState == SubState::Moving) ||
+      (mSubState == SubState::Pasting)) {
     return rotateSelectedItems(rotation);
   }
   return false;
@@ -231,7 +280,8 @@ bool SchematicEditorState_Select::processMirror(
   // Discard any temporary changes and release undo stack.
   abortBlockingToolsInOtherEditors();
 
-  if (!mCmdPolygonEdit) {
+  if ((mSubState == SubState::Idle) || (mSubState == SubState::Moving) ||
+      (mSubState == SubState::Pasting)) {
     return mirrorSelectedItems(orientation);
   }
   return false;
@@ -241,7 +291,8 @@ bool SchematicEditorState_Select::processSnapToGrid() noexcept {
   // Discard any temporary changes and release undo stack.
   abortBlockingToolsInOtherEditors();
 
-  if (!mCmdPolygonEdit) {
+  if ((mSubState == SubState::Idle) || (mSubState == SubState::Moving) ||
+      (mSubState == SubState::Pasting)) {
     return snapSelectedItemsToGrid();
   }
   return false;
@@ -251,7 +302,7 @@ bool SchematicEditorState_Select::processResetAllTexts() noexcept {
   // Discard any temporary changes and release undo stack.
   abortBlockingToolsInOtherEditors();
 
-  if (mSubState == SubState::IDLE) {
+  if (mSubState == SubState::Idle) {
     return resetAllTextsOfSelectedItems();
   }
   return false;
@@ -261,7 +312,7 @@ bool SchematicEditorState_Select::processRemove() noexcept {
   // Discard any temporary changes and release undo stack.
   abortBlockingToolsInOtherEditors();
 
-  if (mSubState == SubState::IDLE) {
+  if (mSubState == SubState::Idle) {
     removeSelectedItems();
     return true;
   }
@@ -273,7 +324,7 @@ bool SchematicEditorState_Select::processEditProperties() noexcept {
   abortBlockingToolsInOtherEditors();
 
   SchematicGraphicsScene* scene = getActiveSchematicScene();
-  if ((!scene) || (mSubState != SubState::IDLE)) {
+  if ((!scene) || (mSubState != SubState::Idle)) {
     return false;
   }
 
@@ -312,38 +363,37 @@ bool SchematicEditorState_Select::processAbortCommand() noexcept {
 
   try {
     switch (mSubState) {
-      case SubState::IDLE: {
+      case SubState::Idle:
+      case SubState::Selecting: {
         if (SchematicGraphicsScene* scene = getActiveSchematicScene()) {
+          scene->clearSelectionRect();
           scene->clearSelection();
         }
+        mSubState = SubState::Idle;
         return true;
       }
-      case SubState::PASTING: {
-        Q_ASSERT(mSelectedItemsDragCommand);
-        mContext.undoStack.abortCmdGroup();
-        mSelectedItemsDragCommand.reset();
-        mSubState = SubState::IDLE;
+      case SubState::Moving: {
+        mCmdDragSelectedItems.reset();
+        mSubState = SubState::Idle;
         return true;
       }
-      case SubState::MOVING: {
-        // Discard the drag command, which reverts all items to their original
-        // positions.
-        Q_ASSERT(mSelectedItemsDragCommand);
-        mSelectedItemsDragCommand.reset();
-        mSubState = SubState::IDLE;
-        return true;
-      }
-      case SubState::MOVING_POLYGON_VERTICES: {
+      case SubState::MovingPolygonVertices: {
         mCmdPolygonEdit.reset();
         mSelectedPolygon = nullptr;
         mSelectedPolygonVertices.clear();
-        mSubState = SubState::IDLE;
+        mSubState = SubState::Idle;
         return true;
       }
-      case SubState::RESIZING_IMAGE: {
+      case SubState::ResizingImage: {
         mCmdImageEdit.reset();
         mSelectedImage = nullptr;
-        mSubState = SubState::IDLE;
+        mSubState = SubState::Idle;
+        return true;
+      }
+      case SubState::Pasting: {
+        mContext.undoStack.abortCmdGroup();  // can throw
+        mCmdDragSelectedItems.reset();
+        mSubState = SubState::Idle;
         return true;
       }
       default: {
@@ -362,21 +412,21 @@ bool SchematicEditorState_Select::processGraphicsSceneMouseMoved(
   if (!scene) return false;
 
   switch (mSubState) {
-    case SubState::SELECTING: {
+    case SubState::Selecting: {
       // Update selection rectangle.
       scene->selectItemsInRect(mStartPos, e.scenePos);
       return true;
     }
 
-    case SubState::MOVING:
-    case SubState::PASTING: {
-      Q_ASSERT(mSelectedItemsDragCommand);
-      mSelectedItemsDragCommand->setCurrentPosition(e.scenePos);
+    case SubState::Moving:
+    case SubState::Pasting: {
+      Q_ASSERT(mCmdDragSelectedItems);
+      mCmdDragSelectedItems->setCurrentPosition(e.scenePos);
       return true;
     }
 
-    case SubState::MOVING_POLYGON_VERTICES: {
-      // Move polygon vertices
+    case SubState::MovingPolygonVertices: {
+      // Move polygon vertices.
       QVector<Vertex> vertices =
           mSelectedPolygon->getPolygon().getPath().getVertices();
       foreach (int i, mSelectedPolygonVertices) {
@@ -388,7 +438,7 @@ bool SchematicEditorState_Select::processGraphicsSceneMouseMoved(
       return true;
     }
 
-    case SubState::RESIZING_IMAGE: {
+    case SubState::ResizingImage: {
       if (!mSelectedImage) {
         return false;
       }
@@ -426,27 +476,27 @@ bool SchematicEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
   SchematicGraphicsScene* scene = getActiveSchematicScene();
   if (!scene) return false;
 
-  if (mSubState == SubState::IDLE) {
+  if (mSubState == SubState::Idle) {
     if (findPolygonVerticesAtPosition(e.scenePos)) {
-      // start moving polygon vertex
+      // Start moving polygon vertices.
       mCmdPolygonEdit =
           std::make_unique<CmdPolygonEdit>(mSelectedPolygon->getPolygon());
-      mSubState = SubState::MOVING_POLYGON_VERTICES;
+      mSubState = SubState::MovingPolygonVertices;
       return true;
     } else if (findImageHandleAtPosition(e.scenePos)) {
       mCmdImageEdit =
           std::make_unique<CmdImageEdit>(*mSelectedImage->getImage());
-      mSubState = SubState::RESIZING_IMAGE;
+      mSubState = SubState::ResizingImage;
       return true;
     } else {
-      // handle items selection
+      // Handle items selection.
       const QList<std::shared_ptr<QGraphicsItem>> items =
           findItemsAtPos(e.scenePos, FindFlag::All | FindFlag::AcceptNearMatch);
       if (items.isEmpty()) {
-        // no items under mouse --> start drawing a selection rectangle
+        // No items under mouse --> start drawing a selection rectangle.
         scene->clearSelection();
         mStartPos = e.scenePos;
-        mSubState = SubState::SELECTING;
+        mSubState = SubState::Selecting;
         return true;
       }
 
@@ -472,7 +522,7 @@ bool SchematicEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
         auto item = selectedItem ? selectedItem : items.first();
         item->setSelected(!item->isSelected());
       } else if (e.modifiers & Qt::ShiftModifier) {
-        // Cycle Selection, when holding shift.
+        // Cycle selection, when holding shift.
         const int nextSelectionIndex =
             (items.indexOf(selectedItem) + 1) % items.count();
         Q_ASSERT((nextSelectionIndex >= 0) &&
@@ -490,19 +540,19 @@ bool SchematicEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
         return true;
       }
     }
-  } else if (mSubState == SubState::PASTING) {
-    // stop moving items (set position of all selected elements permanent)
-    Q_ASSERT(mSelectedItemsDragCommand);
-    mSelectedItemsDragCommand->setCurrentPosition(e.scenePos);
+  } else if (mSubState == SubState::Pasting) {
+    // Stop moving items (set position of all selected elements permanent).
+    Q_ASSERT(mCmdDragSelectedItems);
+    mCmdDragSelectedItems->setCurrentPosition(e.scenePos);
     try {
       mContext.undoStack.appendToCmdGroup(
-          mSelectedItemsDragCommand.release());  // can throw
+          mCmdDragSelectedItems.release());  // can throw
       mContext.undoStack.commitCmdGroup();
     } catch (Exception& e) {
       QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     }
-    mSelectedItemsDragCommand.reset();
-    mSubState = SubState::IDLE;
+    mCmdDragSelectedItems.reset();
+    mSubState = SubState::Idle;
   }
 
   return false;
@@ -518,21 +568,21 @@ bool SchematicEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
   SchematicGraphicsScene* scene = getActiveSchematicScene();
   if (!scene) return false;
 
-  if (mSubState == SubState::SELECTING) {
-    // remove selection rectangle and keep the selection state of all items
+  if (mSubState == SubState::Selecting) {
+    // Remove selection rectangle and keep the selection state of all items.
     scene->clearSelectionRect();
-    mSubState = SubState::IDLE;
+    mSubState = SubState::Idle;
     return true;
-  } else if (mSubState == SubState::MOVING) {
-    // stop moving items (set position of all selected elements permanent)
-    Q_ASSERT(mSelectedItemsDragCommand);
-    mSelectedItemsDragCommand->setCurrentPosition(e.scenePos);
+  } else if (mSubState == SubState::Moving) {
+    // Stop moving items (set position of all selected elements permanent).
+    Q_ASSERT(mCmdDragSelectedItems);
+    mCmdDragSelectedItems->setCurrentPosition(e.scenePos);
     try {
       const QSet<SI_NetSegment*> netSegments =
-          mSelectedItemsDragCommand->getModifiedNetSegments();
+          mCmdDragSelectedItems->getModifiedNetSegments();
       const QSet<SI_BusSegment*> busSegments =
-          mSelectedItemsDragCommand->getModifiedBusSegments();
-      if (execCmd(mSelectedItemsDragCommand.release()) &&
+          mCmdDragSelectedItems->getModifiedBusSegments();
+      if (execCmd(mCmdDragSelectedItems.release()) &&
           ((!netSegments.isEmpty()) || (!busSegments.isEmpty()))) {
         try {
           execCmd(new CmdSimplifySchematicSegments(netSegments,
@@ -544,26 +594,26 @@ bool SchematicEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
     } catch (const Exception& e) {
       QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     }
-    mSelectedItemsDragCommand.reset();
-    mSubState = SubState::IDLE;
-  } else if (mSubState == SubState::MOVING_POLYGON_VERTICES) {
-    // Stop moving polygon vertices
+    mCmdDragSelectedItems.reset();
+    mSubState = SubState::Idle;
+  } else if (mSubState == SubState::MovingPolygonVertices) {
+    // Stop moving polygon vertices.
     try {
-      mContext.undoStack.execCmd(mCmdPolygonEdit.release());
+      execCmd(mCmdPolygonEdit.release());
     } catch (const Exception& e) {
       QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     }
     mSelectedPolygon = nullptr;
     mSelectedPolygonVertices.clear();
-    mSubState = SubState::IDLE;
-  } else if (mSubState == SubState::RESIZING_IMAGE) {
+    mSubState = SubState::Idle;
+  } else if (mSubState == SubState::ResizingImage) {
     try {
-      mContext.undoStack.execCmd(mCmdImageEdit.release());
+      execCmd(mCmdImageEdit.release());
     } catch (const Exception& e) {
       QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     }
     mSelectedImage = nullptr;
-    mSubState = SubState::IDLE;
+    mSubState = SubState::Idle;
   }
 
   return false;
@@ -581,7 +631,7 @@ bool SchematicEditorState_Select::
   // Discard any temporary changes and release undo stack.
   abortBlockingToolsInOtherEditors();
 
-  if (mSubState == SubState::IDLE) {
+  if (mSubState == SubState::Idle) {
     // Open the properties editor dialog of the selected item, if any.
     const QList<std::shared_ptr<QGraphicsItem>> items =
         findItemsAtPos(e.scenePos, FindFlag::All | FindFlag::AcceptNearMatch);
@@ -602,13 +652,13 @@ bool SchematicEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
   // Discard any temporary changes and release undo stack.
   abortBlockingToolsInOtherEditors();
 
-  if (mSelectedItemsDragCommand) {
+  if (mCmdDragSelectedItems) {
     return rotateSelectedItems(Angle::deg90());
   }
 
   SchematicGraphicsScene* scene = getActiveSchematicScene();
   if (!scene) return false;
-  if (mSubState != SubState::IDLE) return false;
+  if (mSubState != SubState::Idle) return false;
 
   // Handle item selection.
   // Important: Only find object types which do support context menus. Otherwise
@@ -636,7 +686,7 @@ bool SchematicEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
   Q_ASSERT(selectedItem);
   Q_ASSERT(selectedItem->isSelected());
 
-  // build the context menu
+  // Build the context menu.
   QMenu menu;
   MenuBuilder mb(&menu);
   const EditorCommandSet& cmd = EditorCommandSet::instance();
@@ -798,7 +848,7 @@ bool SchematicEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
     return false;
   }
 
-  // execute the context menu
+  // Execute the context menu.
   menu.exec(QCursor::pos());
   return true;
 }
@@ -819,17 +869,17 @@ bool SchematicEditorState_Select::processChangedSelection() noexcept {
 
 bool SchematicEditorState_Select::startMovingSelectedItems(
     SchematicGraphicsScene& scene, const Point& startPos) noexcept {
-  Q_ASSERT(!mSelectedItemsDragCommand);
-  mSelectedItemsDragCommand =
+  Q_ASSERT(!mCmdDragSelectedItems);
+  mCmdDragSelectedItems =
       std::make_unique<CmdDragSelectedSchematicItems>(scene, startPos);
-  mSubState = SubState::MOVING;
+  mSubState = SubState::Moving;
   return true;
 }
 
 bool SchematicEditorState_Select::moveSelectedItems(
     const Point& delta) noexcept {
   SchematicGraphicsScene* scene = getActiveSchematicScene();
-  if ((!scene) || (mSelectedItemsDragCommand)) return false;
+  if ((!scene) || (mCmdDragSelectedItems)) return false;
 
   try {
     std::unique_ptr<CmdDragSelectedSchematicItems> cmd(
@@ -848,8 +898,8 @@ bool SchematicEditorState_Select::rotateSelectedItems(
   if (!scene) return false;
 
   try {
-    if (mSelectedItemsDragCommand) {
-      mSelectedItemsDragCommand->rotate(angle, true);
+    if (mCmdDragSelectedItems) {
+      mCmdDragSelectedItems->rotate(angle, true);
     } else {
       std::unique_ptr<CmdDragSelectedSchematicItems> cmd(
           new CmdDragSelectedSchematicItems(*scene));
@@ -869,8 +919,8 @@ bool SchematicEditorState_Select::mirrorSelectedItems(
   if (!scene) return false;
 
   try {
-    if (mSelectedItemsDragCommand) {
-      mSelectedItemsDragCommand->mirror(orientation, true);
+    if (mCmdDragSelectedItems) {
+      mCmdDragSelectedItems->mirror(orientation, true);
     } else {
       std::unique_ptr<CmdDragSelectedSchematicItems> cmd(
           new CmdDragSelectedSchematicItems(*scene));
@@ -889,8 +939,8 @@ bool SchematicEditorState_Select::snapSelectedItemsToGrid() noexcept {
   if (!scene) return false;
 
   try {
-    if (mSelectedItemsDragCommand) {
-      mSelectedItemsDragCommand->snapToGrid();
+    if (mCmdDragSelectedItems) {
+      mCmdDragSelectedItems->snapToGrid();
     } else {
       std::unique_ptr<CmdDragSelectedSchematicItems> cmd(
           new CmdDragSelectedSchematicItems(*scene));
@@ -912,7 +962,7 @@ bool SchematicEditorState_Select::resetAllTextsOfSelectedItems() noexcept {
     std::unique_ptr<CmdDragSelectedSchematicItems> cmd(
         new CmdDragSelectedSchematicItems(*scene));
     cmd->resetAllTexts();
-    mContext.undoStack.execCmd(cmd.release());
+    execCmd(cmd.release());
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
@@ -958,7 +1008,7 @@ void SchematicEditorState_Select::removePolygonVertices(
     }
     std::unique_ptr<CmdPolygonEdit> cmd(new CmdPolygonEdit(polygon));
     cmd->setPath(path, false);
-    mContext.undoStack.execCmd(cmd.release());
+    execCmd(cmd.release());
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
   }
@@ -977,7 +1027,7 @@ void SchematicEditorState_Select::startAddingPolygonVertex(
     mSelectedPolygonVertices = {vertex};
     mCmdPolygonEdit = std::make_unique<CmdPolygonEdit>(polygon.getPolygon());
     mCmdPolygonEdit->setPath(path, true);
-    mSubState = SubState::MOVING_POLYGON_VERTICES;
+    mSubState = SubState::MovingPolygonVertices;
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
   }
@@ -999,93 +1049,43 @@ bool SchematicEditorState_Select::copySelectedItemsToClipboard() noexcept {
   return true;
 }
 
-bool SchematicEditorState_Select::pasteFromClipboard() noexcept {
-  SchematicGraphicsScene* scene = getActiveSchematicScene();
-  if (!scene) return false;
+bool SchematicEditorState_Select::startPaste(
+    SchematicGraphicsScene& scene,
+    std::unique_ptr<SchematicClipboardData> data) {
+  Q_ASSERT(data);
+
+  // Update cursor position.
+  mStartPos = mAdapter.fsmMapGlobalPosToScenePos(QCursor::pos());
+
+  // Start undo command group.
+  scene.clearSelection();
+  mContext.undoStack.beginCmdGroup(tr("Paste Schematic Elements"));
+  mSubState = SubState::Pasting;
 
   try {
-    // Get schematic data from clipboard.
-    const QMimeData* mimeData = qApp->clipboard()->mimeData();
-    std::unique_ptr<SchematicClipboardData> data =
-        SchematicClipboardData::fromMimeData(mimeData);  // can throw
-
-    // If there is no schematic data, get symbol data from clipboard to allow
-    // pasting graphical elements from the symbol editor.
-    if (!data) {
-      if (std::unique_ptr<const SymbolClipboardData> symbolData =
-              SymbolClipboardData::fromMimeData(mimeData)) {  // can throw
-        data = std::make_unique<SchematicClipboardData>(
-            symbolData->getSymbolUuid(), symbolData->getCursorPos(),
-            AssemblyVariantList());
-        std::unique_ptr<TransactionalDirectory> dir = data->getDirectory();
-        std::unique_ptr<const TransactionalDirectory> symbolDir =
-            const_cast<SymbolClipboardData&>(*symbolData).getDirectory();
-        for (const auto& polygon : symbolData->getPolygons()) {
-          data->getPolygons().append(std::make_shared<Polygon>(polygon));
-        }
-        for (const auto& text : symbolData->getTexts()) {
-          // If the texts consist of a placeholder (e.g. "{{NAME}}"), they
-          // might evaluate to an empty string in the schematic, making them
-          // almost invisible. To avoid that, we remove "{" and "}" from those.
-          auto copy = std::make_shared<Text>(text);
-          QString textValue = text.getText();
-          ProjectAttributeLookup lookup(scene->getSchematic(), nullptr);
-          if (AttributeSubstitutor::substitute(textValue, lookup)
-                  .trimmed()
-                  .isEmpty()) {
-            textValue.replace("{", "");
-            textValue.replace("}", "");
-            copy->setText(textValue);
-          }
-          data->getTexts().append(copy);
-        }
-        for (const auto& image : symbolData->getImages()) {
-          dir->write(*image.getFileName(),
-                     symbolDir->read(*image.getFileName()));
-          data->getImages().append(std::make_shared<Image>(image));
-        }
-      }
-    }
-
-    // If there is nothing to paste, abort.
-    if (!data) {
-      return false;
-    }
-
-    // update cursor position
-    mStartPos = mAdapter.fsmMapGlobalPosToScenePos(QCursor::pos());
-
-    // start undo command group
-    scene->clearSelection();
-    mContext.undoStack.beginCmdGroup(tr("Paste Schematic Elements"));
-    mSubState = SubState::PASTING;
-
-    // paste items from clipboard
-    Point offset =
+    // Paste items.
+    const Point offset =
         (mStartPos - data->getCursorPos()).mappedToGrid(getGridInterval());
-    std::unique_ptr<CmdPasteSchematicItems> cmd(
-        new CmdPasteSchematicItems(*scene, std::move(data), offset));
+    const bool addedSomething =
+        mContext.undoStack.appendToCmdGroup(new CmdPasteSchematicItems(
+            scene, std::move(data), offset));  // can throw
 
-    if (mContext.undoStack.appendToCmdGroup(cmd.release())) {  // can throw
-      // start moving the selected items
-      mSelectedItemsDragCommand =
-          std::make_unique<CmdDragSelectedSchematicItems>(*scene, mStartPos);
+    // Start moving the selected items, or abort if nothing was pasted.
+    if (addedSomething) {
+      mCmdDragSelectedItems =
+          std::make_unique<CmdDragSelectedSchematicItems>(scene, mStartPos);
       return true;
     } else {
-      // no items pasted -> abort
       mContext.undoStack.abortCmdGroup();  // can throw
-      mSubState = SubState::IDLE;
+      mSubState = SubState::Idle;
     }
   } catch (const Exception& e) {
-    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
-    mSelectedItemsDragCommand.reset();
-    if (mSubState == SubState::PASTING) {
-      try {
-        mContext.undoStack.abortCmdGroup();
-      } catch (...) {
-      }
-      mSubState = SubState::IDLE;
+    mCmdDragSelectedItems.reset();
+    if (mSubState == SubState::Pasting) {
+      mSubState = SubState::Idle;
+      mContext.undoStack.abortCmdGroup();
     }
+    throw;
   }
   return false;
 }
@@ -1221,11 +1221,11 @@ void SchematicEditorState_Select::updateAvailableFeatures(
     bool doCrossProbe) noexcept {
   std::optional<SchematicEditorFsmAdapter::Features> features;
   QString infoText;
-  if (mSubState == SubState::PASTING) {
+  if (mSubState == SubState::Pasting) {
     features = SchematicEditorFsmAdapter::Features();
     *features |= SchematicEditorFsmAdapter::Feature::Rotate;
     *features |= SchematicEditorFsmAdapter::Feature::Mirror;
-  } else if ((mSubState == SubState::IDLE) || (mSubState == SubState::MOVING)) {
+  } else if ((mSubState == SubState::Idle) || (mSubState == SubState::Moving)) {
     features = SchematicEditorFsmAdapter::Features();
     *features |= SchematicEditorFsmAdapter::Feature::Select;
 

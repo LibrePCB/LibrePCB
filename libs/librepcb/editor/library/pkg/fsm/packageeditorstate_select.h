@@ -58,13 +58,14 @@ class FootprintClipboardData;
 class PackageEditorState_Select final : public PackageEditorState {
   Q_OBJECT
 
+  /// All possible FSM substates
   enum class SubState {
-    IDLE,
-    SELECTING,
-    MOVING,
-    PASTING,
-    MOVING_POLYGON_VERTEX,
-    MOVING_ZONE_VERTEX,
+    Idle,  ///< Left mouse button is not pressed (default state)
+    Selecting,  ///< Left mouse button pressed to draw selection rect
+    Moving,  ///< Left mouse button pressed to move selected items
+    MovingPolygonVertices,  ///< Left mouse butten pressed to move vertices
+    MovingZoneVertices,  ///< Left mouse butten pressed to move vertices
+    Pasting,  ///< Move pasted items
   };
 
 public:
@@ -149,9 +150,11 @@ private:  // Methods
   void scheduleUpdateAvailableFeatures() noexcept;
   PackageEditorFsmAdapter::Features updateAvailableFeatures() noexcept;
 
-private:  // Types / Data
-  SubState mState;
-  Point mStartPos;
+private:
+  SubState mSubState;  ///< Current FSM substate
+  Point mStartPos;  ///< Start position of the current substate
+
+  /// When dragging items, this undo command will be active
   std::unique_ptr<CmdDragSelectedFootprintItems> mCmdDragSelectedItems;
 
   /// The current polygon selected for editing (nullptr if none)

@@ -71,6 +71,17 @@ class UndoCommandGroup;
 class BoardEditorState_Select final : public BoardEditorState {
   Q_OBJECT
 
+  /// All possible FSM substates
+  enum class SubState {
+    Idle,  ///< Left mouse button is not pressed (default state)
+    Selecting,  ///< Left mouse button pressed to draw selection rect
+    Moving,  ///< Left mouse button pressed to move selected items
+    MovingPolygonVertices,  ///< Left mouse butten pressed to move vertices
+    MovingPlaneVertices,  ///< Left mouse butten pressed to move vertices
+    MovingZoneVertices,  ///< Left mouse butten pressed to move vertices
+    Pasting,  ///< Move pasted items
+  };
+
   struct DeviceMenuItem {
     QString name;
     Uuid uuid;
@@ -145,7 +156,6 @@ private:  // Methods
   bool startPaste(BoardGraphicsScene& scene,
                   std::unique_ptr<BoardClipboardData> data,
                   const std::optional<Point>& fixedPosition);
-  bool abortCommand(bool showErrMsgBox) noexcept;
   bool findPolygonVerticesAtPosition(const Point& pos) noexcept;
   bool findPlaneVerticesAtPosition(const Point& pos) noexcept;
   bool findZoneVerticesAtPosition(const Point& pos) noexcept;
@@ -196,12 +206,12 @@ private:  // Methods
   QString processSelection(const BoardSelectionQuery& query,
                            bool doCrossProbe) const noexcept;
 
-private:  // Data
-  /// An undo command will be active while dragging pasted items
-  bool mIsUndoCmdActive;
+private:
+  SubState mSubState;  ///< Current FSM substate
+  Point mStartPos;  ///< Start position of the current substate
 
   /// When dragging items, this undo command will be active
-  std::unique_ptr<CmdDragSelectedBoardItems> mSelectedItemsDragCommand;
+  std::unique_ptr<CmdDragSelectedBoardItems> mCmdDragSelectedItems;
 
   /// The current polygon selected for editing (nullptr if none)
   BI_Polygon* mSelectedPolygon;
