@@ -67,6 +67,7 @@ TEST_F(CmdRemoveBoardItemsTest, testRemainingTraceAndJunctionUuidsAreKept) {
   for (BI_NetSegment* s : board.getNetSegments()) {
     if (s->getNetLines().count() >= 2) {
       segment = s;
+      break;
     }
   }
   ASSERT_TRUE(segment);
@@ -84,6 +85,7 @@ TEST_F(CmdRemoveBoardItemsTest, testRemainingTraceAndJunctionUuidsAreKept) {
   cmd.removeNetLines({line});
   ASSERT_TRUE(cmd.execute());
 
+  // Verify that the UUIDs have not changed.
   QSet<Uuid> lines;
   QSet<Uuid> points;
   for (BI_NetSegment* s : board.getNetSegments()) {

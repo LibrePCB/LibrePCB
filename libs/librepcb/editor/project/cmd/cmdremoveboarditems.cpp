@@ -216,7 +216,11 @@ void CmdRemoveBoardItems::removeNetSegmentItems(
     BI_NetSegment* newNetSegment = cmdAddNetSegment->getNetSegment();
     Q_ASSERT(newNetSegment);
 
-    // Add new pads, vias, netpoints, netlines
+    // Add new pads, vias, netpoints, netlines.
+    // Important: Keep the UUIDs of all elements so references to them stay
+    // valid (e.g. for an MCP server) and to keep the file changes minimal. This
+    // is safe because the old segment gets removed before adding the new
+    // elements.
     CmdBoardNetSegmentAddElements* cmdAddElements =
         new CmdBoardNetSegmentAddElements(*newNetSegment);
     QHash<Uuid, BI_NetLineAnchor*> padMap;
@@ -230,11 +234,10 @@ void CmdRemoveBoardItems::removeNetSegmentItems(
       viaMap.insert(via.getUuid(), newVia);
     }
     QHash<Uuid, BI_NetLineAnchor*> junctionMap;
-    // Keeping the UUIDs is safe since the old segment is removed already,
-    // and it keeps references to the remaining items valid.
     for (const Junction& junction : segment.junctions) {
-      BI_NetPoint* newNetPoint = cmdAddElements->addNetPoint(*new BI_NetPoint(
-          *newNetSegment, junction.getUuid(), junction.getPosition()));
+      BI_NetPoint* newNetPoint = new BI_NetPoint(
+          *newNetSegment, junction.getUuid(), junction.getPosition());
+      cmdAddElements->addNetPoint(*newNetPoint);
       junctionMap.insert(junction.getUuid(), newNetPoint);
     }
     for (const Trace& trace : segment.traces) {
@@ -267,11 +270,10 @@ void CmdRemoveBoardItems::removeNetSegmentItems(
       if ((!p1) || (!p2)) {
         throw LogicError(__FILE__, __LINE__);
       }
-      BI_NetLine* newNetLine = cmdAddElements->addNetLine(
-          *new BI_NetLine(*newNetSegment, trace.getUuid(), *p1, *p2,
-                          trace.getLayer(), trace.getWidth()));
-      Q_ASSERT(newNetLine);
-      Q_UNUSED(newNetLine);
+      BI_NetLine* newNetLine =
+          new BI_NetLine(*newNetSegment, trace.getUuid(), *p1, *p2,
+                         trace.getLayer(), trace.getWidth());
+      cmdAddElements->addNetLine(*newNetLine);
     }
     execNewChildCmd(cmdAddElements);  // can throw
     mModifiedNetSegments.append(newNetSegment);

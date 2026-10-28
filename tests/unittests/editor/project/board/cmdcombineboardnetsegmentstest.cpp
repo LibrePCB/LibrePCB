@@ -88,10 +88,11 @@ TEST_F(CmdCombineBoardNetSegmentsTest, testUuidsAreKept) {
                                  *result->getVias().first());
   ASSERT_TRUE(cmd.execute());
 
+  // Verify that the UUIDs have not changed.
   for (const Uuid& uuid : vias) {
     EXPECT_TRUE(result->getVias().contains(uuid)) << uuid.toStr().toStdString();
   }
-  for (const Uuid& uuid : netPoints) {
+  for (const Uuid& uuid : std::as_const(netPoints)) {
     EXPECT_TRUE(result->getNetPoints().contains(uuid))
         << uuid.toStr().toStdString();
   }

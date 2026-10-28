@@ -71,12 +71,13 @@ bool CmdCombineBoardNetSegments::performExecute() {
   if (mOldSegment.getNetSignal() != mNewSegment.getNetSignal())
     throw LogicError(__FILE__, __LINE__);
 
-  // move all required vias/netpoints/netlines to the resulting netsegment
+  // Move all required vias/netpoints/netlines to the resulting netsegment.
+  // Important: Keep the UUIDs of all elements so references to them stay valid
+  // (e.g. for an MCP server) and to keep the file changes minimal. This is
+  // safe because the old segment gets removed before adding the new elements.
   std::unique_ptr<CmdBoardNetSegmentAddElements> cmdAdd(
       new CmdBoardNetSegmentAddElements(mNewSegment));
   QHash<BI_NetLineAnchor*, BI_NetLineAnchor*> anchorMap;
-  // Keep the UUIDs of all elements so references to them stay valid. This is
-  // safe because the old segment gets removed before adding the new elements.
   foreach (BI_Pad* pad, mOldSegment.getPads()) {
     if (pad == &mOldAnchor) {
       anchorMap.insert(pad, &mNewAnchor);
@@ -97,9 +98,9 @@ bool CmdCombineBoardNetSegments::performExecute() {
     if (netpoint == &mOldAnchor) {
       anchorMap.insert(netpoint, &mNewAnchor);
     } else {
-      BI_NetPoint* newNetPoint = cmdAdd->addNetPoint(*new BI_NetPoint(
-          mNewSegment, netpoint->getUuid(), netpoint->getPosition()));
-      Q_ASSERT(newNetPoint);
+      BI_NetPoint* newNetPoint = new BI_NetPoint(
+          mNewSegment, netpoint->getUuid(), netpoint->getPosition());
+      cmdAdd->addNetPoint(*newNetPoint);
       anchorMap.insert(netpoint, newNetPoint);
     }
   }
@@ -110,11 +111,10 @@ bool CmdCombineBoardNetSegments::performExecute() {
     BI_NetLineAnchor* p2 =
         anchorMap.value(&netline->getP2(), &netline->getP2());
     Q_ASSERT(p2);
-    BI_NetLine* newNetLine = cmdAdd->addNetLine(
-        *new BI_NetLine(mNewSegment, netline->getUuid(), *p1, *p2,
-                        netline->getLayer(), netline->getWidth()));
-    Q_ASSERT(newNetLine);
-    Q_UNUSED(newNetLine);
+    BI_NetLine* newNetLine =
+        new BI_NetLine(mNewSegment, netline->getUuid(), *p1, *p2,
+                       netline->getLayer(), netline->getWidth());
+    cmdAdd->addNetLine(*newNetLine);
   }
   execNewChildCmd(new CmdBoardNetSegmentRemove(mOldSegment));  // can throw
   execNewChildCmd(cmdAdd.release());  // can throw
