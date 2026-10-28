@@ -106,6 +106,7 @@ bool BI_StrokeText::setRotation(const Angle& rotation) noexcept {
 
 bool BI_StrokeText::setHeight(const PositiveLength& height) noexcept {
   if (mData.setHeight(height)) {
+    onEdited.notify(Event::HeightChanged);
     updatePaths();
     return true;
   } else {

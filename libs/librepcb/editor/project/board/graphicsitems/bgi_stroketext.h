@@ -85,6 +85,7 @@ private:  // Methods
   void updateLayer() noexcept;
   void updateStrokeWidth() noexcept;
   void updatePaths() noexcept;
+  void updateOriginCrossSize() noexcept;
   void updateAnchorLayer() noexcept;
   void updateAnchorLine() noexcept;
 

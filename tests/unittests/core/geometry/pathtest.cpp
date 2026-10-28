@@ -147,6 +147,23 @@ TEST_F(PathTest, testGetTotalStraightLength) {
   EXPECT_EQ(UnsignedLength(20), Path(vertices).getTotalStraightLength());
 }
 
+TEST_F(PathTest, testCalcVerticesBoundingRect) {
+  QVector<Vertex> vertices;
+  EXPECT_EQ(std::nullopt, Path(vertices).calcVerticesBoundingRect());
+  vertices.append(Vertex(Point(-10, -11)));
+  EXPECT_EQ(std::make_pair(Point(-10, -11), Point(-10, -11)),
+            Path(vertices).calcVerticesBoundingRect());
+  vertices.append(Vertex(Point(10, -9)));
+  EXPECT_EQ(std::make_pair(Point(-10, -9), Point(10, -11)),
+            Path(vertices).calcVerticesBoundingRect());
+  vertices.append(Vertex(Point(12, 12)));
+  EXPECT_EQ(std::make_pair(Point(-10, 12), Point(12, -11)),
+            Path(vertices).calcVerticesBoundingRect());
+  vertices.append(Vertex(Point(-8, 8)));
+  EXPECT_EQ(std::make_pair(Point(-10, 12), Point(12, -11)),
+            Path(vertices).calcVerticesBoundingRect());
+}
+
 TEST_F(PathTest, testToSvgPathEmpty) {
   const Path input = Path();
   const QString expected = "";

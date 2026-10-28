@@ -47,6 +47,19 @@
 namespace librepcb {
 namespace editor {
 
+static std::optional<UnsignedLength> calcMaxCrossSize(
+    const Path& outline) noexcept {
+  // Approximate only (ignoring arc segments) for performance reasons.
+  if (auto boundingRect = outline.calcVerticesBoundingRect()) {
+    const Point delta = boundingRect->second - boundingRect->first;
+    const Length size = std::min(delta.getX().abs(), delta.getY().abs());
+    if (size > 0) {
+      return UnsignedLength(size * 12 / 10);  // Extend +20% to device outlines
+    }
+  }
+  return std::nullopt;
+}
+
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
@@ -65,8 +78,7 @@ BGI_Device::BGI_Device(
   setFlag(QGraphicsItem::ItemHasNoContents, true);
   setFlag(QGraphicsItem::ItemIsSelectable, true);
 
-  mOriginCrossGraphicsItem = std::make_shared<OriginCrossGraphicsItem>(this);
-  mOriginCrossGraphicsItem->setSize(UnsignedLength(1400000));
+  UnsignedLength crossSize(1400000);
 
   for (auto& obj : mDevice.getLibFootprint().getCircles()) {
     auto i = std::make_shared<PrimitiveCircleGraphicsItem>(this);
@@ -80,6 +92,11 @@ BGI_Device::BGI_Device(
       path.addEllipse(obj.getCenter().toPxQPointF(), r, r);
       mShape |= path;
     }
+    // Avoid origin cross larger than the footprint, see
+    // https://github.com/LibrePCB/LibrePCB/issues/1851
+    if (obj.getLayer() == Layer::topPackageOutlines()) {
+      crossSize = std::min(crossSize, positiveToUnsigned(obj.getDiameter()));
+    }
     mCircleGraphicsItems.append(i);
   }
 
@@ -92,6 +109,14 @@ BGI_Device::BGI_Device(
       mShape |= Toolbox::shapeFromPath(obj.getPath().toQPainterPathPx(),
                                        QPen(Qt::SolidPattern, 0),
                                        Qt::SolidPattern, obj.getLineWidth());
+    }
+    // Avoid origin cross larger than the footprint, see
+    // https://github.com/LibrePCB/LibrePCB/issues/1851
+    if ((obj.getLayer() == Layer::topPackageOutlines()) &&
+        (obj.getPath().getVertices().count() < 20)) {
+      if (auto size = calcMaxCrossSize(obj.getPath())) {
+        crossSize = std::min(crossSize, *size);
+      }
     }
     mPolygonGraphicsItems.append(i);
   }
@@ -109,6 +134,9 @@ BGI_Device::BGI_Device(
     i->setFlag(QGraphicsItem::ItemStacksBehindParent, true);
     mHoleGraphicsItems.append(i);
   }
+
+  mOriginCrossGraphicsItem = std::make_shared<OriginCrossGraphicsItem>(this);
+  mOriginCrossGraphicsItem->setSize(crossSize);
 
   updateContext();
   updatePosition();

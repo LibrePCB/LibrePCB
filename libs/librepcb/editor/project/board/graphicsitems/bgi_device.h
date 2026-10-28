@@ -103,11 +103,11 @@ private:  // Data
   const GraphicsLayerList& mLayers;
   std::shared_ptr<const BoardGraphicsScene::Context> mContext;
   std::shared_ptr<const GraphicsLayer> mGrabAreaLayer;
-  std::shared_ptr<OriginCrossGraphicsItem> mOriginCrossGraphicsItem;
   QVector<std::shared_ptr<PrimitiveCircleGraphicsItem>> mCircleGraphicsItems;
   QVector<std::shared_ptr<PrimitivePathGraphicsItem>> mPolygonGraphicsItems;
   QVector<std::shared_ptr<PrimitiveZoneGraphicsItem>> mZoneGraphicsItems;
   QVector<std::shared_ptr<PrimitiveHoleGraphicsItem>> mHoleGraphicsItems;
+  std::shared_ptr<OriginCrossGraphicsItem> mOriginCrossGraphicsItem;
   QPainterPath mShape;
 
   // Slots
