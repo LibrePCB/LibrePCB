@@ -884,10 +884,10 @@ void SchematicTab::fsmSetViewRuler(
   }
 }
 
-void SchematicTab::fsmSetSceneCursor(const Point& pos, bool cross,
-                                     bool circle) noexcept {
+void SchematicTab::fsmSetSceneCursor(
+    const Point& pos, const GraphicsSceneCursor& cursor) noexcept {
   if (mScene) {
-    mScene->setSceneCursor(pos, cross, circle);
+    mScene->setSceneCursor(pos, cursor);
   }
 }
 

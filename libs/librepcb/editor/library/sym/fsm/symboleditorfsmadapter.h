@@ -51,6 +51,7 @@ class SymbolEditorState_DrawText;
 class SymbolEditorState_Measure;
 class SymbolEditorState_Select;
 class SymbolGraphicsItem;
+struct GraphicsSceneCursor;
 
 /*******************************************************************************
  *  Class SymbolEditorFsmAdapter
@@ -87,8 +88,8 @@ public:
   virtual void fsmSetViewInfoBoxText(const QString& text) noexcept = 0;
   virtual void fsmSetViewRuler(
       const std::optional<std::pair<Point, Point>>& pos) noexcept = 0;
-  virtual void fsmSetSceneCursor(const Point& pos, bool cross,
-                                 bool circle) noexcept = 0;
+  virtual void fsmSetSceneCursor(
+      const Point& pos, const GraphicsSceneCursor& cursor) noexcept = 0;
   virtual QPainterPath fsmCalcPosWithTolerance(
       const Point& pos, qreal multiplier) const noexcept = 0;
   virtual Point fsmMapGlobalPosToScenePos(const QPoint& pos) const noexcept = 0;

@@ -41,6 +41,7 @@
 #include <librepcb/core/library/pkg/footprintpad.h>
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/boarddesignrules.h>
+#include <librepcb/core/project/board/drc/boarddesignrulechecksettings.h>
 #include <librepcb/core/project/board/items/bi_netline.h>
 #include <librepcb/core/project/board/items/bi_netpoint.h>
 #include <librepcb/core/project/board/items/bi_netsegment.h>
@@ -85,6 +86,7 @@ BoardEditorState_DrawTrace::BoardEditorState_DrawTrace(
     mCursorPos(),
     mCurrentWidth(mContext.board.getDesignRules().getDefaultTraceWidth()),
     mCurrentAutoWidth(false),
+    mShowClearanceCircle(false),
     mCurrentSnapActive(true),
     mFixedStartAnchor(nullptr),
     mCurrentNetSegment(nullptr),
@@ -96,6 +98,8 @@ BoardEditorState_DrawTrace::BoardEditorState_DrawTrace(
   QSettings cs;
   mCurrentAutoWidth =
       cs.value("board_editor/draw_trace/width/auto", true).toBool();
+  mShowClearanceCircle =
+      cs.value("board_editor/draw_trace/clearance_circle", false).toBool();
 }
 
 BoardEditorState_DrawTrace::~BoardEditorState_DrawTrace() noexcept {
@@ -118,6 +122,7 @@ bool BoardEditorState_DrawTrace::exit() noexcept {
   if (!abortPositioning(true, true)) return false;
 
   mAdapter.fsmSetViewCursor(std::nullopt);
+  mAdapter.fsmSetSceneCursor(Point(), GraphicsSceneCursor());
   mAdapter.fsmToolLeave();
   return true;
 }
@@ -299,6 +304,7 @@ void BoardEditorState_DrawTrace::setWidth(
   if (width != mCurrentWidth) {
     mCurrentWidth = width;
     emit widthChanged(mCurrentWidth);
+    updateClearanceCircleRadius();
   }
 
   if (mSubState != SubState::SubState_PositioningNetPoint) return;
@@ -457,6 +463,18 @@ void BoardEditorState_DrawTrace::setViaSize(
   }
 
   updateNetpointPositions();
+}
+
+void BoardEditorState_DrawTrace::setShowClearanceCircle(bool show) noexcept {
+  if (show != mShowClearanceCircle) {
+    mShowClearanceCircle = show;
+    emit showClearanceCircleChanged(mShowClearanceCircle);
+    updateClearanceCircleRadius();
+
+    // Save client settings.
+    QSettings cs;
+    cs.setValue("board_editor/draw_trace/clearance_circle", show);
+  }
 }
 
 /*******************************************************************************
@@ -950,6 +968,9 @@ void BoardEditorState_DrawTrace::updateNetpointPositions() noexcept {
   mPositioningNetLine1->setWidth(mCurrentWidth);
   mPositioningNetLine2->setWidth(mCurrentWidth);
 
+  // Keep the cursor in sync with the current net's properties.
+  updateClearanceCircleRadius();
+
   // Force updating airwires immediately as they are important for creating
   // traces.
   scene->getBoard().triggerAirWiresRebuild();
@@ -1074,6 +1095,7 @@ void BoardEditorState_DrawTrace::updateNetClass() noexcept {
     mCurrentNetClass = nc;
     emit netClassChanged(mCurrentNetClass);
   }
+  updateClearanceCircleRadius();
 
   const PositiveLength newDrill = getViaDrillDiameter();
   if (newDrill != oldDrill) {
@@ -1082,6 +1104,20 @@ void BoardEditorState_DrawTrace::updateNetClass() noexcept {
     emit viaSizeChanged(!mCurrentViaProperties.getSize().has_value(),
                         getViaSize());
   }
+}
+
+void BoardEditorState_DrawTrace::updateClearanceCircleRadius() noexcept {
+  GraphicsSceneCursor cursor;
+  if (mShowClearanceCircle && (mSubState == SubState_PositioningNetPoint)) {
+    UnsignedLength minClearance =
+        mContext.board.getDrcSettings().getMinCopperCopperClearance();
+    if (mCurrentNetClass) {
+      minClearance = std::max(minClearance,
+                              mCurrentNetClass->getMinCopperCopperClearance());
+    }
+    cursor.clearanceRadius = UnsignedLength(minClearance + (mCurrentWidth / 2));
+  }
+  mAdapter.fsmSetSceneCursor(mTargetPos, cursor);
 }
 
 /*******************************************************************************

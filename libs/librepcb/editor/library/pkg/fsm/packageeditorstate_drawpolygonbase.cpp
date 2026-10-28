@@ -23,6 +23,7 @@
 #include "packageeditorstate_drawpolygonbase.h"
 
 #include "../../../cmd/cmdpolygonedit.h"
+#include "../../../graphics/graphicsscene.h"
 #include "../../../graphics/polygongraphicsitem.h"
 #include "../../../undostack.h"
 #include "../../../utils/editortoolbox.h"
@@ -88,7 +89,7 @@ bool PackageEditorState_DrawPolygonBase::exit() noexcept {
   }
 
   mAdapter.fsmSetViewCursor(std::nullopt);
-  mAdapter.fsmSetSceneCursor(Point(), false, false);
+  mAdapter.fsmSetSceneCursor(Point(), GraphicsSceneCursor());
   mAdapter.fsmSetViewInfoBoxText(QString());
   mAdapter.fsmSetStatusBarMessage(QString());
   mAdapter.fsmToolLeave();
@@ -381,7 +382,7 @@ void PackageEditorState_DrawPolygonBase::updateCursorPosition(
   } else if (!modifiers.testFlag(Qt::ControlModifier)) {
     mCursorPos.mapToGrid(getGridInterval());
   }
-  mAdapter.fsmSetSceneCursor(mCursorPos, true, snapped);
+  mAdapter.fsmSetSceneCursor(mCursorPos, GraphicsSceneCursor{true, snapped});
 
   if (mCurrentPolygon && mCurrentEditCmd) {
     updatePolygonPath();
