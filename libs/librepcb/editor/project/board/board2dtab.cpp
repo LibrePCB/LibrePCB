@@ -493,7 +493,13 @@ void Board2dTab::setDerivedUiData(const ui::Board2dTabData& data) noexcept {
   mBackgroundImageGraphicsItem->setOpacity(data.background_image_alpha);
 
   // Placement locks
-  mIgnorePlacementLocks = data.ignore_placement_locks;
+  if (data.ignore_placement_locks != mIgnorePlacementLocks) {
+    mIgnorePlacementLocks = data.ignore_placement_locks;
+    // If a single, locked polygon/plane/zone is selected, we should trigger
+    // re-evaluating the selection to enable/disable the vertex handles when
+    // lock ignoring has changed.
+    mFsm->processChangedSelection();
+  }
 
   // Messages
   mMsgEmptySchematics.setUiData(data.empty_schematics_msg);

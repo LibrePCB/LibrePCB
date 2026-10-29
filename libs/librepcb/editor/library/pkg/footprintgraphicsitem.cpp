@@ -322,6 +322,23 @@ void FootprintGraphicsItem::setSelectionRect(const QRectF rect) noexcept {
   }
 }
 
+void FootprintGraphicsItem::updateVerticesEditMode(bool enter) noexcept {
+  foreach (auto item, mPolygonGraphicsItems) {
+    if (enter && item->isSelected()) {
+      item->enterEditMode();
+    } else {
+      item->leaveEditMode();
+    }
+  }
+  foreach (auto item, mZoneGraphicsItems) {
+    if (enter && item->isSelected()) {
+      item->enterEditMode();
+    } else {
+      item->leaveEditMode();
+    }
+  }
+}
+
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
@@ -390,7 +407,6 @@ void FootprintGraphicsItem::syncPolygons() noexcept {
     if (!mPolygonGraphicsItems.contains(obj)) {
       Q_ASSERT(obj);
       auto i = std::make_shared<PolygonGraphicsItem>(*obj, mLayers, this);
-      i->setEditable(true);
       mPolygonGraphicsItems.insert(obj, i);
     }
   }
@@ -438,7 +454,6 @@ void FootprintGraphicsItem::syncZones() noexcept {
     if (!mZoneGraphicsItems.contains(obj)) {
       Q_ASSERT(obj);
       auto i = std::make_shared<ZoneGraphicsItem>(*obj, mLayers, this);
-      i->setEditable(true);
       mZoneGraphicsItems.insert(obj, i);
     }
   }

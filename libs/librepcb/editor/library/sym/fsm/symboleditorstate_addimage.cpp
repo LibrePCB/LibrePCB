@@ -122,7 +122,7 @@ bool SymbolEditorState_AddImage::processGraphicsSceneLeftMouseButtonPressed(
     }
     if (mState == State::Positioning) {
       mCurrentEditCmd->setPosition(currentPos, true);
-      mCurrentGraphicsItem->setEditable(true);
+      mCurrentGraphicsItem->enterEditMode();
       mState = State::Resizing;
     } else {
       finish(currentPos);
@@ -225,7 +225,6 @@ bool SymbolEditorState_AddImage::start(const Point& pos, QByteArray data,
     mCurrentGraphicsItem = item->getGraphicsItem(mCurrentImage);
     Q_ASSERT(mCurrentGraphicsItem);
     mCurrentGraphicsItem->setSelected(true);
-    mCurrentGraphicsItem->setEditable(false);
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
@@ -255,7 +254,6 @@ bool SymbolEditorState_AddImage::finish(const Point& pos) noexcept {
   try {
     updateSize(pos);
     mCurrentGraphicsItem->setSelected(false);
-    mCurrentGraphicsItem->setEditable(true);
     mCurrentGraphicsItem.reset();
     mCurrentImage.reset();
     mContext.undoStack.appendToCmdGroup(mCurrentEditCmd.release());
@@ -274,7 +272,6 @@ bool SymbolEditorState_AddImage::abort(bool showErrMsgBox) noexcept {
   try {
     if (mCurrentGraphicsItem) {
       mCurrentGraphicsItem->setSelected(false);
-      mCurrentGraphicsItem->setEditable(true);
       mCurrentGraphicsItem.reset();
     }
     mCurrentEditCmd.reset();

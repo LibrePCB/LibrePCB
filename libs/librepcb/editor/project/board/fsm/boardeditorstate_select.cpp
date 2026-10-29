@@ -1737,7 +1737,7 @@ bool BoardEditorState_Select::findPolygonVerticesAtPosition(
   if (BoardGraphicsScene* scene = getActiveBoardScene()) {
     for (auto it = scene->getPolygons().begin();
          it != scene->getPolygons().end(); it++) {
-      if (it.value()->isSelected() &&
+      if (it.value()->isInEditMode() && it.value()->isSelected() &&
           ((!it.key()->getData().isLocked()) || getIgnoreLocks())) {
         mSelectedPolygonVertices =
             it.value()->getGraphicsItem().getVertexIndicesAtPosition(pos);
@@ -1759,7 +1759,7 @@ bool BoardEditorState_Select::findPlaneVerticesAtPosition(
   if (BoardGraphicsScene* scene = getActiveBoardScene()) {
     for (auto it = scene->getPlanes().begin(); it != scene->getPlanes().end();
          it++) {
-      if (it.value()->isSelected() &&
+      if (it.value()->isInEditMode() && it.value()->isSelected() &&
           ((!it.key()->isLocked()) || getIgnoreLocks())) {
         mSelectedPlaneVertices = it.value()->getVertexIndicesAtPosition(pos);
         if (!mSelectedPlaneVertices.isEmpty()) {
@@ -1780,7 +1780,7 @@ bool BoardEditorState_Select::findZoneVerticesAtPosition(
   if (BoardGraphicsScene* scene = getActiveBoardScene()) {
     for (auto it = scene->getZones().begin(); it != scene->getZones().end();
          it++) {
-      if (it.value()->isSelected() &&
+      if (it.value()->isInEditMode() && it.value()->isSelected() &&
           ((!it.key()->getData().isLocked()) || getIgnoreLocks())) {
         mSelectedZoneVertices = it.value()->getVertexIndicesAtPosition(pos);
         if (!mSelectedZoneVertices.isEmpty()) {
@@ -2195,7 +2195,7 @@ void BoardEditorState_Select::updateAvailableFeatures(
         (!query.getStrokeTexts().isEmpty()) || (!query.getHoles().isEmpty())) {
       *features |= BoardEditorFsmAdapter::Feature::Properties;
     }
-    infoText = processSelection(query, doCrossProbe);
+    infoText = processSelection(*scene, query, doCrossProbe);
   } else {
     // Do not update features in other states.
   }
@@ -2227,8 +2227,16 @@ private:
 };
 
 QString BoardEditorState_Select::processSelection(
-    const BoardSelectionQuery& query, bool doCrossProbe) const noexcept {
+    BoardGraphicsScene& scene, const BoardSelectionQuery& query,
+    bool doCrossProbe) const noexcept {
   const int totalCount = query.getResultCount();
+
+  // Enter vertices edit mode if exactly one element is selected.
+  if (totalCount > 0) {
+    scene.updateVerticesEditMode(totalCount == 1, getIgnoreLocks());
+  }
+
+  // Abort early if no element is selected.
   if (totalCount == 0) {
     if (doCrossProbe) {
       mAdapter.fsmCrossProbe();

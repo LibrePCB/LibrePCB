@@ -56,6 +56,7 @@ public:
 
   // Getters
   Polygon& getObj() noexcept { return mPolygon; }
+  bool isInEditMode() const noexcept { return mInEditMode; }
 
   /// Get the line segment at a specific position
   ///
@@ -72,18 +73,27 @@ public:
   /// @return       All indices of the vertices at the specified position.
   QVector<int> getVertexIndicesAtPosition(const Point& pos) const noexcept;
 
-  // Setters
+  // General Methods
 
   /**
-   * Enable/disable editing mode when selected
+   * Enable edit mode
    *
-   * If the item is editable and selected, vertex handles will be shown to
-   * indicate that they can be moved. If not editable, handles will not be
-   * shown.
+   * When the item is in edit mode, vertex handles will be shown to indicate
+   * that they can be moved. If not in edit mode, handles will not be shown.
    *
-   * @param editable  Whether the polygon is (visually) editable or not.
+   * @note  Edit mode is automatically left when the item gets deselected.
+   *        And when calling this method while the item is not selected,
+   *        it has no effect.
    */
-  void setEditable(bool editable) noexcept;
+  void enterEditMode() noexcept;
+
+  /**
+   * @brief Disable edit mode
+   *
+   * Only needs to be called while the item is selected, as edit mode is
+   * left automatically when the item is deselected.
+   */
+  void leaveEditMode() noexcept;
 
   // Inherited Methods
   QVariant itemChange(GraphicsItemChange change,
@@ -104,7 +114,7 @@ private:  // Methods
 private:  // Data
   Polygon& mPolygon;
   const GraphicsLayerList& mLayers;
-  bool mEditable;
+  bool mInEditMode;
 
   // Cached attributes
   qreal mVertexHandleRadiusPx;

@@ -1661,10 +1661,9 @@ bool PackageEditorState_Select::findPolygonVerticesAtPosition(
 
   if (mContext.currentFootprint) {
     for (const auto& ptr : mContext.currentFootprint->getPolygons().values()) {
-      auto graphicsItem = mContext.currentGraphicsItem->getGraphicsItem(ptr);
-      if (graphicsItem && graphicsItem->isSelected()) {
-        mSelectedPolygonVertices =
-            graphicsItem->getVertexIndicesAtPosition(pos);
+      auto gItem = mContext.currentGraphicsItem->getGraphicsItem(ptr);
+      if (gItem && gItem->isInEditMode() && gItem->isSelected()) {
+        mSelectedPolygonVertices = gItem->getVertexIndicesAtPosition(pos);
         if (!mSelectedPolygonVertices.isEmpty()) {
           mSelectedPolygon = ptr;
           return true;
@@ -1684,9 +1683,9 @@ bool PackageEditorState_Select::findZoneVerticesAtPosition(
 
   if (mContext.currentFootprint) {
     for (const auto& ptr : mContext.currentFootprint->getZones().values()) {
-      auto graphicsItem = mContext.currentGraphicsItem->getGraphicsItem(ptr);
-      if (graphicsItem && graphicsItem->isSelected()) {
-        mSelectedZoneVertices = graphicsItem->getVertexIndicesAtPosition(pos);
+      auto gItem = mContext.currentGraphicsItem->getGraphicsItem(ptr);
+      if (gItem && gItem->isInEditMode() && gItem->isSelected()) {
+        mSelectedZoneVertices = gItem->getVertexIndicesAtPosition(pos);
         if (!mSelectedZoneVertices.isEmpty()) {
           mSelectedZone = ptr;
           return true;
@@ -1728,7 +1727,8 @@ PackageEditorFsmAdapter::Features
 
     if (auto item = mContext.currentGraphicsItem) {
       CmdDragSelectedFootprintItems cmd(*item, getGridInterval());
-      if (cmd.getSelectedItemsCount() > 0) {
+      const int count = cmd.getSelectedItemsCount();
+      if (count > 0) {
         features |= PackageEditorFsmAdapter::Feature::Copy;
         features |= PackageEditorFsmAdapter::Feature::Properties;
         if (mAdapter.fsmIsWritable()) {
@@ -1743,6 +1743,10 @@ PackageEditorFsmAdapter::Features
           if (cmd.hasOffTheGridElements()) {
             features |= PackageEditorFsmAdapter::Feature::SnapToGrid;
           }
+        }
+        // Enter vertices edit mode if exactly one element is selected.
+        if (count > 0) {
+          item->updateVerticesEditMode(count == 1);
         }
       }
     }

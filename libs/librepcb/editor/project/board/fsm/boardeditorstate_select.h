@@ -203,7 +203,8 @@ private:  // Methods
       const ComponentInstance& cmpInst) const noexcept;
   void scheduleUpdateAvailableFeatures() noexcept;
   void updateAvailableFeatures(bool doCrossProbe = true) noexcept;
-  QString processSelection(const BoardSelectionQuery& query,
+  QString processSelection(BoardGraphicsScene& scene,
+                           const BoardSelectionQuery& query,
                            bool doCrossProbe) const noexcept;
 
 private:

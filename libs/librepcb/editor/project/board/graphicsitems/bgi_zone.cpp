@@ -58,7 +58,6 @@ BGI_Zone::BGI_Zone(
 
   updateContext();
   updateZValue();
-  updateEditable();
 
   mZone.onEdited.attach(mOnEditedSlot);
 }
@@ -67,8 +66,12 @@ BGI_Zone::~BGI_Zone() noexcept {
 }
 
 /*******************************************************************************
- *  Getters
+ *  Public Methods
  ******************************************************************************/
+
+bool BGI_Zone::isInEditMode() const noexcept {
+  return mGraphicsItem->isInEditMode();
+}
 
 int BGI_Zone::getLineIndexAtPosition(const Point& pos) const noexcept {
   return mGraphicsItem->getLineIndexAtPosition(pos);
@@ -79,14 +82,18 @@ QVector<int> BGI_Zone::getVertexIndicesAtPosition(
   return mGraphicsItem->getVertexIndicesAtPosition(pos);
 }
 
-/*******************************************************************************
- *  General Methods
- ******************************************************************************/
-
 void BGI_Zone::updateContext() noexcept {
   const GraphicsLayer::State state = mContext->getLayerState(false);
   mGraphicsItem->setState(state);
   updateZValue();
+}
+
+void BGI_Zone::enterEditMode() noexcept {
+  mGraphicsItem->enterEditMode();
+}
+
+void BGI_Zone::leaveEditMode() noexcept {
+  mGraphicsItem->leaveEditMode();
 }
 
 /*******************************************************************************
@@ -124,7 +131,6 @@ void BGI_Zone::zoneEdited(const BI_Zone& obj, BI_Zone::Event event) noexcept {
       mGraphicsItem->setOutline(obj.getData().getOutline());
       break;
     case BI_Zone::Event::IsLockedChanged:
-      updateEditable();
       break;
     default:
       qWarning() << "Unhandled switch-case in BGI_Zone::zoneEdited():"
@@ -139,10 +145,6 @@ void BGI_Zone::updateZValue() noexcept {
     setZValue(BoardGraphicsScene::getZValueOfCopperLayer(*layers.first(),
                                                          mContext->flipView));
   }
-}
-
-void BGI_Zone::updateEditable() noexcept {
-  mGraphicsItem->setEditable(!mZone.getData().isLocked());
 }
 
 /*******************************************************************************

@@ -357,6 +357,34 @@ void BoardGraphicsScene::clearSelection() noexcept {
   }
 }
 
+void BoardGraphicsScene::updateVerticesEditMode(bool enter,
+                                                bool ignoreLocks) noexcept {
+  foreach (auto item, mPolygons) {
+    if (enter && item->isSelected() &&
+        (ignoreLocks || (!item->getPolygon().getData().isLocked()))) {
+      item->enterEditMode();
+    } else {
+      item->leaveEditMode();
+    }
+  }
+  foreach (auto item, mPlanes) {
+    if (enter && item->isSelected() &&
+        (ignoreLocks || (!item->getPlane().isLocked()))) {
+      item->enterEditMode();
+    } else {
+      item->leaveEditMode();
+    }
+  }
+  foreach (auto item, mZones) {
+    if (enter && item->isSelected() &&
+        (ignoreLocks || (!item->getZone().getData().isLocked()))) {
+      item->enterEditMode();
+    } else {
+      item->leaveEditMode();
+    }
+  }
+}
+
 qreal BoardGraphicsScene::getZValueOfCopperLayer(const Layer& layer,
                                                  bool flip) noexcept {
   if (layer.isTop()) {
