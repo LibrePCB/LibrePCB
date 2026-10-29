@@ -124,6 +124,8 @@ add_executable(
   editor/project/addcomponentdialogtest.cpp
   editor/project/board/boardclipboarddatatest.cpp
   editor/project/board/cmdboardspecctraimporttest.cpp
+  editor/project/board/cmdcombineboardnetsegmentstest.cpp
+  editor/project/board/cmdremoveboarditemstest.cpp
   editor/project/schematic/cmddragselectedschematicitemstest.cpp
   editor/project/schematic/schematicclipboarddatatest.cpp
   editor/utils/shortcutsreferencegeneratortest.cpp
