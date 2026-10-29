@@ -309,10 +309,19 @@ QList<std::shared_ptr<QGraphicsItem>> SchematicEditorState::findItemsAtPos(
   if (flags.testFlag(FindFlag::SymbolPins)) {
     for (auto it = scene->getSymbolPins().begin();
          it != scene->getSymbolPins().end(); it++) {
-      // Important: Priority needs to be lower than for symbols, otherwise it
-      // will be hard to select small symbols like GND or VCC!
-      processItem(it.value(), it.value(), it.key()->getPosition(), 50, false,
-                  std::nullopt);
+      std::shared_ptr<QGraphicsItem> itemToAdd;
+      if (flags.testFlag(FindFlag::SymbolsOfPins)) {
+        // See https://github.com/LibrePCB/LibrePCB/issues/1531.
+        itemToAdd = it.value()->getSymbolGraphicsItem().lock();
+      } else {
+        itemToAdd = it.value();
+      }
+      if (itemToAdd) {
+        // Important: Priority needs to be lower than for symbols, otherwise it
+        // will be hard to select small symbols like GND or VCC!
+        processItem(it.value(), itemToAdd, it.key()->getPosition(), 50, false,
+                    std::nullopt);
+      }
     }
   }
 

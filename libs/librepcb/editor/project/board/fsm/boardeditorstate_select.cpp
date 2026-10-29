@@ -822,6 +822,9 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
   if (mSubState != SubState::Idle) return false;
 
   // Handle item selection.
+  // Pads have no context menu, thus open the context menu of their footprint
+  // (FindFlag::DevicesOfPads).
+  // Fixes https://github.com/LibrePCB/LibrePCB/issues/1060.
   QList<std::shared_ptr<QGraphicsItem>> items = findItemsAtPos(
       e.scenePos,
       FindFlag::All | FindFlag::DevicesOfPads | FindFlag::AcceptNearMatch);
@@ -841,14 +844,6 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
     selectedItem = items.first();
     scene->clearSelection();
     selectedItem->setSelected(true);
-  }
-  if (auto pad = std::dynamic_pointer_cast<BGI_Pad>(selectedItem)) {
-    // Pads have no context menu, thus open the context menu of its footprint.
-    // Fixes https://github.com/LibrePCB/LibrePCB/issues/1060.
-    if (auto fpt = scene->getDevices().value(pad->getPad().getDevice())) {
-      selectedItem = fpt;
-      selectedItem->setSelected(true);
-    }
   }
   Q_ASSERT(selectedItem);
   Q_ASSERT(selectedItem->isSelected());

@@ -41,6 +41,7 @@
 #include "../graphicsitems/sgi_buslabel.h"
 #include "../graphicsitems/sgi_netlabel.h"
 #include "../graphicsitems/sgi_symbol.h"
+#include "../graphicsitems/sgi_symbolpin.h"
 #include "../graphicsitems/sgi_text.h"
 #include "../renamebussegmentdialog.h"
 #include "../renamenetsegmentdialog.h"
@@ -490,8 +491,14 @@ bool SchematicEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
       return true;
     } else {
       // Handle items selection.
+      FindFlags findFlags = FindFlag::All | FindFlag::AcceptNearMatch;
+      if (e.modifiers.testAnyFlags(Qt::ControlModifier)) {
+        // For multi-selection, individual pins make no sense, so we select
+        // their symbol.
+        findFlags |= FindFlag::SymbolsOfPins;
+      }
       const QList<std::shared_ptr<QGraphicsItem>> items =
-          findItemsAtPos(e.scenePos, FindFlag::All | FindFlag::AcceptNearMatch);
+          findItemsAtPos(e.scenePos, findFlags);
       if (items.isEmpty()) {
         // No items under mouse --> start drawing a selection rectangle.
         scene->clearSelection();
@@ -633,10 +640,15 @@ bool SchematicEditorState_Select::
 
   if (mSubState == SubState::Idle) {
     // Open the properties editor dialog of the selected item, if any.
-    const QList<std::shared_ptr<QGraphicsItem>> items =
-        findItemsAtPos(e.scenePos, FindFlag::All | FindFlag::AcceptNearMatch);
+    const QList<std::shared_ptr<QGraphicsItem>> items = findItemsAtPos(
+        e.scenePos,
+        FindFlag::All | FindFlag::SymbolsOfPins | FindFlag::AcceptNearMatch);
     foreach (auto item, items) {
       if (item->isSelected() && openPropertiesDialog(item)) {
+        return true;
+      } else if (auto symItem = std::dynamic_pointer_cast<SGI_Symbol>(item)) {
+        // Select the symbol by double-clicking on one of its pins.
+        symItem->setSelected(true);
         return true;
       }
     }
@@ -661,16 +673,12 @@ bool SchematicEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
   if (mSubState != SubState::Idle) return false;
 
   // Handle item selection.
-  // Important: Only find object types which do support context menus. Otherwise
-  // an object without menu (e.g. symbol pin) may prevent opening the menu on
-  // an object which has a menu (e.g. symbol).
-  constexpr FindFlags flags = FindFlag::Symbols | FindFlag::NetLabels |
-      FindFlag::Polygons | FindFlag::Texts | FindFlag::AcceptNearMatch;
-  // Sanity check for a known bug where symbol pins prevented opening the menu
-  // on symbols (observed with the GND symbol).
-  static_assert(!flags.testFlag(FindFlag::SymbolPins));
-  QList<std::shared_ptr<QGraphicsItem>> items =
-      findItemsAtPos(e.scenePos, flags);
+  // Pins have no context menu, thus open the context menu of their symbol
+  // (FindFlag::SymbolsOfPins).
+  // Avoids https://github.com/LibrePCB/LibrePCB/issues/1060.
+  const QList<std::shared_ptr<QGraphicsItem>> items = findItemsAtPos(
+      e.scenePos,
+      FindFlag::All | FindFlag::SymbolsOfPins | FindFlag::AcceptNearMatch);
   if (items.isEmpty()) return false;
   std::shared_ptr<QGraphicsItem> selectedItem;
   foreach (auto item, items) {
@@ -845,7 +853,10 @@ bool SchematicEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
         !item->getText().getPosition().isOnGrid(getGridInterval()));
     mb.addAction(aSnap);
   } else {
-    return false;
+    // Do not handle the right click anymore if clicked on a selected item
+    // although it doesn't provide a context menu.
+    // Fixes https://github.com/LibrePCB/LibrePCB/issues/1060.
+    return true;
   }
 
   // Execute the context menu.

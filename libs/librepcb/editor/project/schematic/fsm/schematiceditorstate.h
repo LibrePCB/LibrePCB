@@ -84,6 +84,9 @@ public:
 
     // Performance options
     SkipLowerPriorityMatches = (1 << 15),
+
+    // Other options
+    SymbolsOfPins = (1 << 20),  // Don't return pins, but their symbol.
   };
   Q_DECLARE_FLAGS(FindFlags, FindFlag)
 
