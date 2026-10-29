@@ -48,12 +48,3 @@ if(APPLE)
                            "${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in"
   )
 endif()
-
-# Windows executable configuration
-if(WIN32)
-  # Add icon
-  set(WINDOWS_APP_ICON_RESOURCE
-      "${CMAKE_SOURCE_DIR}/cmake/WindowsExecutableResource.rc"
-  )
-  target_sources(librepcb PUBLIC "${WINDOWS_APP_ICON_RESOURCE}")
-endif()
