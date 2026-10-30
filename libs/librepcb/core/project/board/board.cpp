@@ -160,7 +160,10 @@ Board::Board(Project& project,
 
   // Emit the "designRulesModified" signal when net class rules have changed.
   connect(&mProject.getCircuit(), &Circuit::netClassDesignRulesModified, this,
-          &Board::designRulesModified);
+          [this]() {
+            invalidatePlanes();
+            emit designRulesModified();
+          });
 }
 
 Board::~Board() noexcept {
