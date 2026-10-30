@@ -14,6 +14,8 @@ fi
 # Merge GUI application and CLI (https://github.com/LibrePCB/LibrePCB/issues/1358)
 cp "./build/install/bin/librepcb-cli.app/Contents/MacOS/librepcb-cli" \
    "./build/install/bin/librepcb.app/Contents/MacOS/"
+cp "./build/install/bin/librepcb-mcp.app/Contents/MacOS/librepcb-mcp" \
+   "./build/install/bin/librepcb.app/Contents/MacOS/"
 
 # Replace "bin" and "share" directories with the single *.app directory
 cp -r "./build/install/bin/librepcb.app" "./build/install/LibrePCB.app"
@@ -34,6 +36,7 @@ pushd "./build/install/"  # Avoid having path in DMG name
 dylibbundler -ns -od -b \
   -x LibrePCB.app/Contents/MacOS/librepcb \
   -x LibrePCB.app/Contents/MacOS/librepcb-cli \
+  -x LibrePCB.app/Contents/MacOS/librepcb-mcp \
   -x lib/liblibrepcbslint.dylib \
   -d LibrePCB.app/Contents/Frameworks/ \
   -p @executable_path/../Frameworks/ \
@@ -47,9 +50,11 @@ then
   macdeployqt "LibrePCB.app" -always-overwrite \
     -executable="./LibrePCB.app/Contents/MacOS/librepcb" \
     -executable="./LibrePCB.app/Contents/MacOS/librepcb-cli" \
+    -executable="./LibrePCB.app/Contents/MacOS/librepcb-mcp" \
     -executable="./LibrePCB.app/Contents/Frameworks/liblibrepcbslint.dylib"
   codesign --force --deep -s - ./LibrePCB.app/Contents/MacOS/librepcb
   codesign --force --deep -s - ./LibrePCB.app/Contents/MacOS/librepcb-cli
+  codesign --force --deep -s - ./LibrePCB.app/Contents/MacOS/librepcb-mcp
 else
   # On x86_64, directly create the *.dmg with macdeployqt.
   fix_macdeployqt "/usr/local/lib"
@@ -59,6 +64,7 @@ else
       macdeployqt "LibrePCB.app" -dmg -always-overwrite \
         -executable="./LibrePCB.app/Contents/MacOS/librepcb" \
         -executable="./LibrePCB.app/Contents/MacOS/librepcb-cli" \
+        -executable="./LibrePCB.app/Contents/MacOS/librepcb-mcp" \
         -executable="./LibrePCB.app/Contents/Frameworks/liblibrepcbslint.dylib"
       sleep 5
     fi
@@ -66,6 +72,7 @@ else
 
   # Test if the bundles are working (hopefully catching deployment issues).
   ./LibrePCB.app/Contents/MacOS/librepcb-cli --version
+  ./LibrePCB.app/Contents/MacOS/librepcb-mcp --version
   ./LibrePCB.app/Contents/MacOS/librepcb --exit-after-startup
 
   # Print checksums to allow fully transparent public verification.

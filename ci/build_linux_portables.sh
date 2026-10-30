@@ -43,6 +43,7 @@ mv "./build/AppDir/usr" "./build/install"
 # Test if the bundles are working (hopefully catching deployment issues).
 # Doesn't work for AppImages unfortunately because of missing fuse on CI.
 ./build/install/bin/librepcb-cli --version
+./build/install/bin/librepcb-mcp --version
 xvfb-run -a ./build/install/bin/librepcb --exit-after-startup
 
 # Print checksums to allow fully transparent public verification.
