@@ -221,6 +221,7 @@ export component OrganizationTab inherits Tab {
 
                     priority-slider := HorizontalSlider {
                         value: tabs[index].priority / 200;
+                        enabled: !read-only;
 
                         value-changed(value) => {
                             tabs[index].priority = value * 200;
