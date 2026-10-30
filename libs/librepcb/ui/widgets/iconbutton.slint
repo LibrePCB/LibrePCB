@@ -32,6 +32,7 @@ export component IconButton inherits Rectangle {
     in property <color> background-color-hovered: (style == IconButtonStyle.standard) ? Data.theme.control-hovered : background-color;
     in property <color> background-color-checked: ((style == IconButtonStyle.standard) || (style == IconButtonStyle.read-only)) ? Data.theme.control-checked : background-color;
     in property <string> tooltip: cmd.text;
+    in property <string> tooltip-shortcut: cmd.shortcut;
     in property <bool> tooltip-delayed: style != IconButtonStyle.read-only;
     in property <ToolTipPosition> tooltip-position: bottom;
     in property <string> status-tip: cmd.status-tip;
@@ -119,6 +120,7 @@ export component IconButton inherits Rectangle {
                 }
             };
             text: tooltip;
+            shortcut: tooltip-shortcut;
             delayed: tooltip-delayed;
         }
 
