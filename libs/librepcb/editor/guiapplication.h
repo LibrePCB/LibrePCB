@@ -55,6 +55,8 @@ class ProjectEditor;
 class ProjectLibraryUpdater;
 class QuickAccessModel;
 class SlintKeyEventTextBuilder;
+class SpaceMouseInput;
+struct SpaceMouseMotionEvent;
 
 /*******************************************************************************
  *  Class GuiApplication
@@ -162,6 +164,7 @@ private:
                int dstWindowId, int dstSectionIndex, int dstTabIndex,
                bool forceSwitchToTab) noexcept;
   std::shared_ptr<MainWindow> getWindowById(int id) noexcept;
+  void handleSpaceMouseMotion(const SpaceMouseMotionEvent& e) noexcept;
 
   Workspace& mWorkspace;
   const UiTheme* const& mTheme;
@@ -180,6 +183,9 @@ private:
   std::unique_ptr<ProjectLibraryUpdater> mProjectLibraryUpdater;
   std::shared_ptr<UiObjectList<MainWindow, int>> mWindows;
   QTimer mSaveOpenedWindowsCountdown;
+  std::unique_ptr<SpaceMouseInput> mSpaceMouseInput;
+  // Time since the previous processed motion report
+  QElapsedTimer mSpaceMouseElapsedTimer;
 
   // Cache
   std::weak_ptr<OrganizationsDbModel> mOrganizationsWithPcbDesignRules;
