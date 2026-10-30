@@ -186,6 +186,7 @@ public:
   void selectItemsInRect(const Point& p1, const Point& p2) noexcept;
   void selectNetSegment(BI_NetSegment& netSegment) noexcept;
   void clearSelection() noexcept;
+  void updateVerticesEditMode(bool enter, bool ignoreLocks) noexcept;
   static qreal getZValueOfCopperLayer(const Layer& layer, bool flip) noexcept;
   static qreal getFlippedZValue(ItemZValue value, bool flip) noexcept;
 

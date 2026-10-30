@@ -46,7 +46,7 @@ PolygonGraphicsItem::PolygonGraphicsItem(Polygon& polygon,
   : PrimitivePathGraphicsItem(parent),
     mPolygon(polygon),
     mLayers(layers),
-    mEditable(false),
+    mInEditMode(false),
     mVertexHandleRadiusPx(0),
     mVertexHandles(),
     mOnEditedSlot(*this, &PolygonGraphicsItem::polygonEdited) {
@@ -107,15 +107,26 @@ QVector<int> PolygonGraphicsItem::getVertexIndicesAtPosition(
   return indices.values(indices.uniqueKeys().value(0)).toVector();
 }
 
-void PolygonGraphicsItem::setEditable(bool editable) noexcept {
-  mEditable = editable;
-  updateBoundingRectMargin();
+void PolygonGraphicsItem::enterEditMode() noexcept {
+  if ((!mInEditMode) && isSelected()) {
+    mInEditMode = true;
+    updateBoundingRectMargin();
+  }
+}
+
+void PolygonGraphicsItem::leaveEditMode() noexcept {
+  if (mInEditMode) {
+    mInEditMode = false;
+    updateBoundingRectMargin();
+  }
 }
 
 QVariant PolygonGraphicsItem::itemChange(GraphicsItemChange change,
                                          const QVariant& value) noexcept {
   if (change == ItemSelectedHasChanged) {
-    updateBoundingRectMargin();
+    if (!value.toBool()) {
+      leaveEditMode();
+    }
   }
   return PrimitivePathGraphicsItem::itemChange(change, value);
 }
@@ -135,7 +146,7 @@ void PolygonGraphicsItem::paint(QPainter* painter,
   }
 
   // Draw vertex handles, if editable and selected.
-  if (mEditable && selected && mLineLayer) {
+  if (mInEditMode && selected && mLineLayer) {
     const qreal radius = 20 / lod;
     mVertexHandleRadiusPx =
         std::min(std::max(radius, mPolygon.getLineWidth()->toPx() / 2),
@@ -244,7 +255,7 @@ void PolygonGraphicsItem::updateBoundingRectMargin() noexcept {
   // graphics scene (e.g. leading to wrong zoom-all or graphics export scaling).
   prepareGeometryChange();
   mBoundingRectMarginPx = 0;
-  if (mEditable && isSelected()) {
+  if (mInEditMode && isSelected()) {
     foreach (const VertexHandle& handle, mVertexHandles) {
       mBoundingRectMarginPx =
           std::max(handle.maxGlowRadiusPx, mBoundingRectMarginPx);

@@ -182,6 +182,7 @@ public:
   void selectAll() noexcept;
   void selectItemsInRect(const Point& p1, const Point& p2) noexcept;
   void clearSelection() noexcept;
+  void updateVerticesEditMode(bool enter) noexcept;
 
   // Operator Overloadings
   SchematicGraphicsScene& operator=(const SchematicGraphicsScene& rhs) = delete;

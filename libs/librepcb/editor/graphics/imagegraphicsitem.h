@@ -60,8 +60,9 @@ public:
                     QGraphicsItem* parent = nullptr) noexcept;
   ~ImageGraphicsItem() noexcept override;
 
-  // Getters
+  // General Methods
   const std::shared_ptr<Image>& getObj() noexcept { return mImage; }
+  bool isInEditMode() const noexcept { return mInEditMode; }
 
   /// Check if the resize handle is at a specific position
   ///
@@ -69,18 +70,15 @@ public:
   /// @return       True if there is a handle, false if not.
   bool isResizeHandleAtPosition(const Point& pos) const noexcept;
 
-  // Setters
+  /**
+   * @copydoc ::librepcb::editor::PolygonGraphicsItem::enterEditMode()
+   */
+  void enterEditMode() noexcept;
 
   /**
-   * Enable/disable editing mode when selected
-   *
-   * If the item is editable and selected, vertex handles will be shown to
-   * indicate that they can be moved. If not editable, handles will not be
-   * shown.
-   *
-   * @param editable  Whether the image is (visually) editable or not.
+   * @copydoc ::librepcb::editor::PolygonGraphicsItem::leaveEditMode()
    */
-  void setEditable(bool editable) noexcept;
+  void leaveEditMode() noexcept;
 
   // Inherited from QGraphicsItem
   QRectF boundingRect() const noexcept override { return mBoundingRect; }
@@ -101,7 +99,7 @@ private:  // Methods
 private:  // Data
   const TransactionalDirectory& mDir;
   std::shared_ptr<Image> mImage;
-  bool mEditable;
+  bool mInEditMode;
   std::shared_ptr<const GraphicsLayer> mBordersLayer;
   std::unique_ptr<OriginCrossGraphicsItem> mOriginCrossGraphicsItem;
 

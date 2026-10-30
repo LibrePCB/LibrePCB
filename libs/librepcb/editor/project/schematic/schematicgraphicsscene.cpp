@@ -338,6 +338,23 @@ void SchematicGraphicsScene::clearSelection() noexcept {
   }
 }
 
+void SchematicGraphicsScene::updateVerticesEditMode(bool enter) noexcept {
+  foreach (auto item, mPolygons) {
+    if (enter && (item->isSelected())) {
+      item->enterEditMode();
+    } else {
+      item->leaveEditMode();
+    }
+  }
+  foreach (auto item, mImages) {
+    if (enter && (item->isSelected())) {
+      item->enterEditMode();
+    } else {
+      item->leaveEditMode();
+    }
+  }
+}
+
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
@@ -655,7 +672,6 @@ void SchematicGraphicsScene::addPolygon(SI_Polygon& polygon) noexcept {
   Q_ASSERT(!mPolygons.contains(&polygon));
   std::shared_ptr<PolygonGraphicsItem> item =
       std::make_shared<PolygonGraphicsItem>(polygon.getPolygon(), mLayers);
-  item->setEditable(true);
   addItem(*item);
   mPolygons.insert(&polygon, item);
 }
@@ -689,7 +705,6 @@ void SchematicGraphicsScene::addImage(SI_Image& image) noexcept {
   std::shared_ptr<ImageGraphicsItem> item = std::make_shared<ImageGraphicsItem>(
       mSchematic.getDirectory(), image.getImage(), mLayers);
   item->setZValue(ZValue_Images);
-  item->setEditable(true);
   addItem(*item);
   mImages.insert(&image, item);
 }

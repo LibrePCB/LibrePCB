@@ -58,6 +58,7 @@ public:
   ~PrimitiveZoneGraphicsItem() noexcept override;
 
   // Getters
+  bool isInEditMode() const noexcept { return mInEditMode; }
 
   /// Get the line segment at a specific position
   ///
@@ -82,16 +83,17 @@ public:
   void setOutline(const Path& path) noexcept;
   void setState(GraphicsLayer::State state) noexcept;
 
+  // General Methods
+
   /**
-   * Enable/disable editing mode when selected
-   *
-   * If the item is editable and selected, vertex handles will be shown to
-   * indicate that they can be moved. If not editable, handles will not be
-   * shown.
-   *
-   * @param editable  Whether the polygon is (visually) editable or not.
+   * @copydoc ::librepcb::editor::PolygonGraphicsItem::enterEditMode()
    */
-  void setEditable(bool editable) noexcept;
+  void enterEditMode() noexcept;
+
+  /**
+   * @copydoc ::librepcb::editor::PolygonGraphicsItem::leaveEditMode()
+   */
+  void leaveEditMode() noexcept;
 
   // Inherited Methods
   QVariant itemChange(GraphicsItemChange change,
@@ -123,7 +125,7 @@ private:  // Data
   QVector<std::shared_ptr<const GraphicsLayer>> mAllGraphicsLayers;
   QVector<std::shared_ptr<const GraphicsLayer>> mEnabledGraphicsLayers;
   Path mOutline;
-  bool mEditable;
+  bool mInEditMode;
 
   // Cached attributes
   std::shared_ptr<const GraphicsLayer> mLayer;

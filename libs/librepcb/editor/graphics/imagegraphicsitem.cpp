@@ -48,7 +48,7 @@ ImageGraphicsItem::ImageGraphicsItem(const TransactionalDirectory& dir,
   : QGraphicsItem(parent),
     mDir(dir),
     mImage(text),
-    mEditable(false),
+    mInEditMode(false),
     mBordersLayer(layers.get(ColorRole::schematicImageBorders())),
     mOriginCrossGraphicsItem(new OriginCrossGraphicsItem(this)),
     mVertexHandleRadiusPx(0),
@@ -96,9 +96,18 @@ bool ImageGraphicsItem::isResizeHandleAtPosition(
   return (distance.toPx() <= mVertexHandleRadiusPx);
 }
 
-void ImageGraphicsItem::setEditable(bool editable) noexcept {
-  mEditable = editable;
-  update();
+void ImageGraphicsItem::enterEditMode() noexcept {
+  if ((!mInEditMode) && isSelected()) {
+    mInEditMode = true;
+    update();
+  }
+}
+
+void ImageGraphicsItem::leaveEditMode() noexcept {
+  if (mInEditMode) {
+    mInEditMode = false;
+    update();
+  }
 }
 
 /*******************************************************************************
@@ -109,6 +118,9 @@ QVariant ImageGraphicsItem::itemChange(GraphicsItemChange change,
                                        const QVariant& value) noexcept {
   if ((change == ItemSelectedHasChanged) && mOriginCrossGraphicsItem) {
     mOriginCrossGraphicsItem->setSelected(value.toBool());
+    if (!value.toBool()) {
+      leaveEditMode();
+    }
   }
   return QGraphicsItem::itemChange(change, value);
 }
@@ -136,7 +148,7 @@ void ImageGraphicsItem::paint(QPainter* painter,
     painter->drawRect(mImageRectPx);
   } else if (mBordersLayer) {
     std::optional<UnsignedLength> borderWidth = mImage->getBorderWidth();
-    if ((!borderWidth) && mEditable && selected) {
+    if ((!borderWidth) && mInEditMode && selected) {
       borderWidth = UnsignedLength(0);
     }
     if (borderWidth) {
@@ -148,8 +160,8 @@ void ImageGraphicsItem::paint(QPainter* painter,
     }
   }
 
-  // Draw resize handle if selected and editable.
-  if (mEditable && selected && mBordersLayer) {
+  // Draw resize handle if editable and selected.
+  if (mInEditMode && selected && mBordersLayer) {
     QColor color = mBordersLayer->getColor(state);
     color.setAlpha(color.alpha() / 3);
     painter->setBrush(Qt::NoBrush);

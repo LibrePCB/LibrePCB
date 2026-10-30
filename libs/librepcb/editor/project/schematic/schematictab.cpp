@@ -395,7 +395,13 @@ void SchematicTab::setDerivedUiData(const ui::SchematicTabData& data) noexcept {
   }
 
   // Placement locks
-  mIgnorePlacementLocks = data.ignore_placement_locks;
+  if (data.ignore_placement_locks != mIgnorePlacementLocks) {
+    mIgnorePlacementLocks = data.ignore_placement_locks;
+    // If a single, locked polygon is selected, we should trigger re-evaluating
+    // the selection to enable/disable the vertex handles when lock ignoring
+    // has changed.
+    mFsm->processChangedSelection();
+  }
 
   // Messages
   mMsgInstallLibraries.setUiData(data.install_libraries_msg);

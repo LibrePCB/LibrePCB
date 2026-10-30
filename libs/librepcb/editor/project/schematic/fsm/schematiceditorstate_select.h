@@ -142,7 +142,8 @@ private:  // Methods
   void openTextPropertiesDialog(Text& text) noexcept;
   void scheduleUpdateAvailableFeatures() noexcept;
   void updateAvailableFeatures(bool doCrossProbe = true) noexcept;
-  QString processSelection(const SchematicSelectionQuery& query,
+  QString processSelection(SchematicGraphicsScene& scene,
+                           const SchematicSelectionQuery& query,
                            bool doCrossProbe) const noexcept;
 
 private:

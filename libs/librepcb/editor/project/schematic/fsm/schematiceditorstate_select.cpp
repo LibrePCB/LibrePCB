@@ -1095,7 +1095,7 @@ bool SchematicEditorState_Select::findPolygonVerticesAtPosition(
   if (SchematicGraphicsScene* scene = getActiveSchematicScene()) {
     for (auto it = scene->getPolygons().begin();
          it != scene->getPolygons().end(); it++) {
-      if (it.value()->isSelected()) {
+      if (it.value()->isInEditMode() && it.value()->isSelected()) {
         mSelectedPolygonVertices = it.value()->getVertexIndicesAtPosition(pos);
         if (!mSelectedPolygonVertices.isEmpty()) {
           mSelectedPolygon = it.key();
@@ -1115,7 +1115,7 @@ bool SchematicEditorState_Select::findImageHandleAtPosition(
   if (SchematicGraphicsScene* scene = getActiveSchematicScene()) {
     for (auto it = scene->getImages().begin(); it != scene->getImages().end();
          it++) {
-      if (it.value()->isSelected() &&
+      if (it.value()->isInEditMode() && it.value()->isSelected() &&
           it.value()->isResizeHandleAtPosition(pos)) {
         mSelectedImage = it.key();
         mSelectedImageAspectRatio = it.key()->getImage()->getWidth()->toMm() /
@@ -1285,7 +1285,7 @@ void SchematicEditorState_Select::updateAvailableFeatures(
           (!query.getTexts().isEmpty())) {
         *features |= SchematicEditorFsmAdapter::Feature::Properties;
       }
-      infoText = processSelection(query, doCrossProbe);
+      infoText = processSelection(*scene, query, doCrossProbe);
     }
   } else {
     // Do not update features in other states.
@@ -1297,8 +1297,17 @@ void SchematicEditorState_Select::updateAvailableFeatures(
 }
 
 QString SchematicEditorState_Select::processSelection(
-    const SchematicSelectionQuery& query, bool doCrossProbe) const noexcept {
-  if (query.getResultCount() == 0) {
+    SchematicGraphicsScene& scene, const SchematicSelectionQuery& query,
+    bool doCrossProbe) const noexcept {
+  const int totalCount = query.getResultCount();
+
+  // Enter vertices edit mode if exactly one element is selected.
+  if (totalCount > 0) {
+    scene.updateVerticesEditMode(totalCount == 1);
+  }
+
+  // Abort early if no element is selected.
+  if (totalCount == 0) {
     if (doCrossProbe) {
       mAdapter.fsmCrossProbe();
     }

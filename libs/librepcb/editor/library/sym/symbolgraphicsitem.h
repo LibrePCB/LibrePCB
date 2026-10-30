@@ -115,6 +115,7 @@ public:
   // General Methods
   void updateAllTexts() noexcept;
   void setSelectionRect(const QRectF rect) noexcept;
+  void updateVerticesEditMode(bool enter) noexcept;
 
   // Operator Overloadings
   SymbolGraphicsItem& operator=(const SymbolGraphicsItem& rhs) = delete;

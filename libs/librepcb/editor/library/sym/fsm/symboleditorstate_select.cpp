@@ -1065,9 +1065,9 @@ bool SymbolEditorState_Select::findPolygonVerticesAtPosition(
   if (!item) return false;
 
   for (const auto& ptr : mContext.symbol.getPolygons().values()) {
-    auto graphicsItem = item->getGraphicsItem(ptr);
-    if (graphicsItem && graphicsItem->isSelected()) {
-      mSelectedPolygonVertices = graphicsItem->getVertexIndicesAtPosition(pos);
+    auto gItem = item->getGraphicsItem(ptr);
+    if (gItem && gItem->isInEditMode() && gItem->isSelected()) {
+      mSelectedPolygonVertices = gItem->getVertexIndicesAtPosition(pos);
       if (!mSelectedPolygonVertices.isEmpty()) {
         mSelectedPolygon = ptr;
         return true;
@@ -1086,9 +1086,9 @@ bool SymbolEditorState_Select::findImageHandleAtPosition(
   if (!item) return false;
 
   for (const auto& ptr : mContext.symbol.getImages().values()) {
-    auto graphicsItem = item->getGraphicsItem(ptr);
-    if (graphicsItem && graphicsItem->isSelected() &&
-        graphicsItem->isResizeHandleAtPosition(pos)) {
+    auto gItem = item->getGraphicsItem(ptr);
+    if (gItem && gItem->isInEditMode() && gItem->isSelected() &&
+        gItem->isResizeHandleAtPosition(pos)) {
       mSelectedImage = ptr;
       mSelectedImageAspectRatio =
           ptr->getWidth()->toMm() / ptr->getHeight()->toMm();
@@ -1128,7 +1128,8 @@ SymbolEditorFsmAdapter::Features
 
   if (auto item = mAdapter.fsmGetGraphicsItem()) {
     CmdDragSelectedSymbolItems cmd(*item, getGridInterval());
-    if (cmd.getSelectedItemsCount() > 0) {
+    const int count = cmd.getSelectedItemsCount();
+    if (count > 0) {
       features |= SymbolEditorFsmAdapter::Feature::Copy;
       features |= SymbolEditorFsmAdapter::Feature::Properties;
       if (mAdapter.fsmIsWritable()) {
@@ -1139,6 +1140,10 @@ SymbolEditorFsmAdapter::Features
         if (cmd.hasOffTheGridElements()) {
           features |= SymbolEditorFsmAdapter::Feature::SnapToGrid;
         }
+      }
+      // Enter vertices edit mode if exactly one element is selected.
+      if (count > 0) {
+        item->updateVerticesEditMode(count == 1);
       }
     }
   }

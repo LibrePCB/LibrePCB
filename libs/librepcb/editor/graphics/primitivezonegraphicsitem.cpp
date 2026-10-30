@@ -47,7 +47,7 @@ PrimitiveZoneGraphicsItem::PrimitiveZoneGraphicsItem(
   : QGraphicsItem(parent),
     mLayers(layers),
     mOutline(),
-    mEditable(false),
+    mInEditMode(false),
     mLayer(layers.get(ColorRole::boardZones())),
     mState(GraphicsLayer::State::Enabled),
     mBoundingRectMarginPx(0),
@@ -69,7 +69,7 @@ PrimitiveZoneGraphicsItem::~PrimitiveZoneGraphicsItem() noexcept {
 }
 
 /*******************************************************************************
- *  Getters
+ *  Public Methods
  ******************************************************************************/
 
 int PrimitiveZoneGraphicsItem::getLineIndexAtPosition(
@@ -111,10 +111,6 @@ QVector<int> PrimitiveZoneGraphicsItem::getVertexIndicesAtPosition(
   }
   return indices.values(indices.uniqueKeys().value(0)).toVector();
 }
-
-/*******************************************************************************
- *  Setters
- ******************************************************************************/
 
 void PrimitiveZoneGraphicsItem::setPosition(const Point& pos) noexcept {
   QGraphicsItem::setPos(pos.toPxQPointF());
@@ -182,14 +178,23 @@ void PrimitiveZoneGraphicsItem::setOutline(const Path& path) noexcept {
   updateBoundingRectMargin();
 }
 
-void PrimitiveZoneGraphicsItem::setEditable(bool editable) noexcept {
-  mEditable = editable;
-  updateBoundingRectMargin();
-}
-
 void PrimitiveZoneGraphicsItem::setState(GraphicsLayer::State state) noexcept {
   mState = state;
   update();
+}
+
+void PrimitiveZoneGraphicsItem::enterEditMode() noexcept {
+  if ((!mInEditMode) && isSelected()) {
+    mInEditMode = true;
+    updateBoundingRectMargin();
+  }
+}
+
+void PrimitiveZoneGraphicsItem::leaveEditMode() noexcept {
+  if (mInEditMode) {
+    mInEditMode = false;
+    updateBoundingRectMargin();
+  }
 }
 
 /*******************************************************************************
@@ -199,7 +204,9 @@ void PrimitiveZoneGraphicsItem::setState(GraphicsLayer::State state) noexcept {
 QVariant PrimitiveZoneGraphicsItem::itemChange(GraphicsItemChange change,
                                                const QVariant& value) noexcept {
   if (change == ItemSelectedHasChanged) {
-    updateBoundingRectMargin();
+    if (!value.toBool()) {
+      leaveEditMode();
+    }
   }
   return QGraphicsItem::itemChange(change, value);
 }
@@ -228,7 +235,7 @@ void PrimitiveZoneGraphicsItem::paint(QPainter* painter,
   painter->drawPath(mPainterPath);
 
   // Draw vertex handles, if editable and selected.
-  if (mEditable && selected && mLayer) {
+  if (mInEditMode && selected && mLayer) {
     const qreal radius = 20 / lod;
     mVertexHandleRadiusPx = std::min(radius, mBoundingRectMarginPx);
     QColor color = mLayer->getColor(state);
@@ -288,7 +295,7 @@ void PrimitiveZoneGraphicsItem::updateBoundingRectMargin() noexcept {
   // graphics scene (e.g. leading to wrong zoom-all or graphics export scaling).
   prepareGeometryChange();
   mBoundingRectMarginPx = 0;
-  if (mEditable && isSelected()) {
+  if (mInEditMode && isSelected()) {
     foreach (const VertexHandle& handle, mVertexHandles) {
       mBoundingRectMarginPx =
           std::max(handle.maxGlowRadiusPx, mBoundingRectMarginPx);

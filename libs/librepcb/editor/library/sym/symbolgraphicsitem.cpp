@@ -251,6 +251,23 @@ void SymbolGraphicsItem::setSelectionRect(const QRectF rect) noexcept {
   }
 }
 
+void SymbolGraphicsItem::updateVerticesEditMode(bool enter) noexcept {
+  foreach (auto item, mPolygonGraphicsItems) {
+    if (enter && item->isSelected()) {
+      item->enterEditMode();
+    } else {
+      item->leaveEditMode();
+    }
+  }
+  foreach (auto item, mImageGraphicsItems) {
+    if (enter && item->isSelected()) {
+      item->enterEditMode();
+    } else {
+      item->leaveEditMode();
+    }
+  }
+}
+
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
@@ -319,7 +336,6 @@ void SymbolGraphicsItem::syncPolygons() noexcept {
     if (!mPolygonGraphicsItems.contains(obj)) {
       Q_ASSERT(obj);
       auto i = std::make_shared<PolygonGraphicsItem>(*obj, mLayers, this);
-      i->setEditable(true);
       mPolygonGraphicsItems.insert(obj, i);
     }
   }
@@ -367,7 +383,6 @@ void SymbolGraphicsItem::syncImages() noexcept {
       Q_ASSERT(obj);
       auto i = std::make_shared<ImageGraphicsItem>(mSymbol.getDirectory(), obj,
                                                    mLayers, this);
-      i->setEditable(true);
       mImageGraphicsItems.insert(obj, i);
     }
   }

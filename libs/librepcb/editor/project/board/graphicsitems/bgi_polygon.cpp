@@ -54,7 +54,6 @@ BGI_Polygon::BGI_Polygon(
 
   updateContext();
   updateZValue();
-  updateEditable();
 
   mPolygon.onEdited.attach(mOnEditedSlot);
 }
@@ -63,12 +62,24 @@ BGI_Polygon::~BGI_Polygon() noexcept {
 }
 
 /*******************************************************************************
- *  General Methods
+ *  Public Methods
  ******************************************************************************/
+
+bool BGI_Polygon::isInEditMode() const noexcept {
+  return mGraphicsItem->isInEditMode();
+}
 
 void BGI_Polygon::updateContext() noexcept {
   mGraphicsItem->setState(mContext->getLayerState(false));
   updateZValue();
+}
+
+void BGI_Polygon::enterEditMode() noexcept {
+  mGraphicsItem->enterEditMode();
+}
+
+void BGI_Polygon::leaveEditMode() noexcept {
+  mGraphicsItem->leaveEditMode();
 }
 
 /*******************************************************************************
@@ -108,7 +119,6 @@ void BGI_Polygon::polygonEdited(const BI_Polygon& obj,
       mPolygonObj.setIsGrabArea(obj.getData().isGrabArea());
       break;
     case BI_Polygon::Event::IsLockedChanged:
-      updateEditable();
       break;
     case BI_Polygon::Event::PathChanged:
       mPolygonObj.setPath(obj.getData().getPath());
@@ -126,10 +136,6 @@ void BGI_Polygon::updateZValue() noexcept {
           ? BoardGraphicsScene::ZValue_PolygonsBottom
           : BoardGraphicsScene::ZValue_PolygonsTop,
       mContext->flipView));
-}
-
-void BGI_Polygon::updateEditable() noexcept {
-  mGraphicsItem->setEditable(!mPolygon.getData().isLocked());
 }
 
 /*******************************************************************************

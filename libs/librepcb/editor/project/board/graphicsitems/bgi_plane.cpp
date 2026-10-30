@@ -51,6 +51,7 @@ BGI_Plane::BGI_Plane(
     mPlane(plane),
     mLayers(layers),
     mContext(context),
+    mInEditMode(false),
     mLayer(nullptr),
     mBoundingRectMarginPx(0),
     mLineWidthPx(0),
@@ -123,6 +124,20 @@ void BGI_Plane::updateContext() noexcept {
   update();
 }
 
+void BGI_Plane::enterEditMode() noexcept {
+  if ((!mInEditMode) && isSelected()) {
+    mInEditMode = true;
+    updateBoundingRectMargin();
+  }
+}
+
+void BGI_Plane::leaveEditMode() noexcept {
+  if (mInEditMode) {
+    mInEditMode = false;
+    updateBoundingRectMargin();
+  }
+}
+
 /*******************************************************************************
  *  Inherited from QGraphicsItem
  ******************************************************************************/
@@ -130,7 +145,9 @@ void BGI_Plane::updateContext() noexcept {
 QVariant BGI_Plane::itemChange(GraphicsItemChange change,
                                const QVariant& value) noexcept {
   if (change == ItemSelectedHasChanged) {
-    updateBoundingRectMargin();
+    if (!value.toBool()) {
+      leaveEditMode();
+    }
   }
   return QGraphicsItem::itemChange(change, value);
 }
@@ -171,8 +188,8 @@ void BGI_Plane::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
   painter->setBrush(Qt::NoBrush);
   painter->drawPath(mOutline);
 
-  // If the plane is selected, draw vertex handles.
-  if ((!mPlane.isLocked()) && selected) {
+  // Draw vertex handles, if editable and selected.
+  if (mInEditMode && selected) {
     const qreal radius = 20 / lod;
     mVertexHandleRadiusPx = std::min(radius, mBoundingRectMarginPx);
     QColor color = mLayer->getColor(state);
@@ -310,7 +327,7 @@ void BGI_Plane::updateBoundingRectMargin() noexcept {
   // graphics scene (e.g. leading to wrong zoom-all or graphics export scaling).
   prepareGeometryChange();
   mBoundingRectMarginPx = 0;
-  if ((!mPlane.isLocked()) && isSelected()) {
+  if (mInEditMode && isSelected()) {
     foreach (const VertexHandle& handle, mVertexHandles) {
       mBoundingRectMarginPx =
           std::max(handle.maxGlowRadiusPx, mBoundingRectMarginPx);

@@ -143,7 +143,7 @@ bool SchematicEditorState_AddImage::processGraphicsSceneLeftMouseButtonPressed(
     }
     if (mState == State::Positioning) {
       mCurrentEditCmd->setPosition(currentPos, true);
-      mCurrentGraphicsItem->setEditable(true);
+      mCurrentGraphicsItem->enterEditMode();
       mState = State::Resizing;
     } else {
       finish(currentPos);
@@ -243,7 +243,6 @@ bool SchematicEditorState_AddImage::start(const Point& pos, QByteArray data,
     mCurrentGraphicsItem = scene->getImages().value(mCurrentImage);
     Q_ASSERT(mCurrentGraphicsItem);
     mCurrentGraphicsItem->setSelected(true);
-    mCurrentGraphicsItem->setEditable(false);
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
@@ -273,7 +272,6 @@ bool SchematicEditorState_AddImage::finish(const Point& pos) noexcept {
   try {
     updateSize(pos);
     mCurrentGraphicsItem->setSelected(false);
-    mCurrentGraphicsItem->setEditable(true);
     mCurrentGraphicsItem.reset();
     mCurrentImage = nullptr;
     mContext.undoStack.appendToCmdGroup(mCurrentEditCmd.release());

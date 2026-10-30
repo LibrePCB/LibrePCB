@@ -61,6 +61,7 @@ public:
   const PrimitiveZoneGraphicsItem& getGraphicsItem() const noexcept {
     return *mGraphicsItem;
   }
+  bool isInEditMode() const noexcept;
 
   /// Get the line segment at a specific position
   ///
@@ -79,6 +80,16 @@ public:
 
   void updateContext() noexcept;
 
+  /**
+   * @copydoc ::librepcb::editor::PolygonGraphicsItem::enterEditMode()
+   */
+  void enterEditMode() noexcept;
+
+  /**
+   * @copydoc ::librepcb::editor::PolygonGraphicsItem::leaveEditMode()
+   */
+  void leaveEditMode() noexcept;
+
   // Inherited from QGraphicsItem
   QPainterPath shape() const noexcept override;
 
@@ -90,7 +101,6 @@ private:  // Methods
   QVariant itemChange(GraphicsItemChange change,
                       const QVariant& value) noexcept override;
   void updateZValue() noexcept;
-  void updateEditable() noexcept;
 
 private:  // Data
   BI_Zone& mZone;

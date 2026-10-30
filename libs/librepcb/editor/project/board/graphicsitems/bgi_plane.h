@@ -65,6 +65,7 @@ public:
   ~BGI_Plane() noexcept override;
 
   // Getters
+  bool isInEditMode() const noexcept { return mInEditMode; }
 
   /// Get the line segment at a specific position
   ///
@@ -84,6 +85,16 @@ public:
   // General Methods
   BI_Plane& getPlane() noexcept { return mPlane; }
   void updateContext() noexcept;
+
+  /**
+   * @copydoc ::librepcb::editor::PolygonGraphicsItem::enterEditMode()
+   */
+  void enterEditMode() noexcept;
+
+  /**
+   * @copydoc ::librepcb::editor::PolygonGraphicsItem::leaveEditMode()
+   */
+  void leaveEditMode() noexcept;
 
   // Inherited from QGraphicsItem
   QVariant itemChange(GraphicsItemChange change,
@@ -114,6 +125,7 @@ private:  // Data
   BI_Plane& mPlane;
   const GraphicsLayerList& mLayers;
   std::shared_ptr<const BoardGraphicsScene::Context> mContext;
+  bool mInEditMode;
 
   // Cached Attributes
   std::shared_ptr<const GraphicsLayer> mLayer;
