@@ -171,6 +171,7 @@ component ProjectSection inherits Rectangle {
                     cmd: Cmd.save;
                     icon-scale: 60%;
                     color-enabled: Data.theme.base-text-warning;
+                    tooltip-position: bottom-left; // Avoid cutting off by flickable.
 
                     clicked => {
                         Backend.trigger-project(project-index, ProjectAction.save);
@@ -180,6 +181,7 @@ component ProjectSection inherits Rectangle {
                 if self.max-buttons >= 4: new-sheet-btn := IconButton {
                     cmd: Cmd.sheet-new;
                     icon-scale: 60%;
+                    tooltip-position: bottom-left; // Avoid cutting off by flickable.
 
                     clicked => {
                         Data.set-panel-page(PanelPage.documents); // Avoid auto-switching.
@@ -191,6 +193,7 @@ component ProjectSection inherits Rectangle {
                     cmd: Cmd.board-new;
                     icon: @image-url("../../bootstrap-icons/icons/motherboard.svg");
                     icon-scale: 60%;
+                    tooltip-position: bottom-left; // Avoid cutting off by flickable.
 
                     clicked => {
                         Data.set-panel-page(PanelPage.documents); // Avoid auto-switching.
@@ -201,6 +204,7 @@ component ProjectSection inherits Rectangle {
                 if self.max-buttons >= 2: setup-dialog-btn := IconButton {
                     cmd: Cmd.project-setup;
                     icon-scale: 60%;
+                    tooltip-position: bottom-left; // Avoid cutting off by flickable.
 
                     clicked => {
                         Backend.trigger-project(project-index, ProjectAction.open-setup-dialog);
@@ -210,6 +214,7 @@ component ProjectSection inherits Rectangle {
                 if self.max-buttons >= 1: close-btn := IconButton {
                     cmd: Cmd.project-close;
                     icon-scale: 60%;
+                    tooltip-position: bottom-left; // Avoid cutting off by flickable.
 
                     clicked => {
                         Data.set-panel-page(PanelPage.documents); // Avoid auto-switching.
@@ -280,6 +285,7 @@ component LibrarySection inherits Rectangle {
 
                 close-btn := IconButton {
                     tooltip: @tr("Close Library");
+                    tooltip-position: bottom-left; // Avoid cutting off by flickable.
                     status-tip: @tr("Close this library and all its opened tabs");
                     icon: @image-url("../../font-awesome/svgs/solid/xmark.svg");
                     icon-scale: 60%;
