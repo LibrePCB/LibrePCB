@@ -24,6 +24,8 @@ understand the tasks you already have done.
   - [ ] I tested on Linux
 - [ ] I also verified that those changes do not break existing functionality
 - [ ] I considered to add automated tests to verify the changes
+- [ ] I considered to implement new code in Rust, where possible
+- [ ] I reviewed new/modified UI elements in both dark and light themes
 
 ## Usage of AI/LLM/Agents
 <!-- MANDATORY: Declare how LLMs were used to create this pull request. -->
