@@ -330,6 +330,21 @@ export component SideBar {
             }
         }
 
+        property <bool> can-renumber-components: Data.current-project.valid;
+        changed can-renumber-components => {
+            button-enable-changed(can-renumber-components, Data.panel-page == PanelPage.renumber-components);
+        }
+        if Data.panel-page == PanelPage.renumber-components: renumber-components-btn := SideBarButton {
+            icon: Cmd.renumber-components.icon;
+            tooltip: Cmd.renumber-components.text;
+            shortcut: Cmd.renumber-components.shortcut;
+            checked: true;
+
+            clicked => {
+                button-clicked(PanelPage.renumber-components);
+            }
+        }
+
         Rectangle {
             vertical-stretch: 1;
         }

@@ -50,6 +50,7 @@ namespace editor {
 class BoardEditor;
 class GuiApplication;
 class ProjectCrossProbe;
+class RenumberComponentsModel;
 class RuleCheckMessagesModel;
 class SchematicEditor;
 class SchematicTab;
@@ -241,6 +242,9 @@ private:
   QSet<SExpression> mDisappearedErcApprovals;
   QString mErcExecutionError;
   QTimer mErcTimer;
+
+  // Renumber components
+  std::shared_ptr<RenumberComponentsModel> mRenumberComponentsModel;
 
   /// Modifications bypassing the undo stack
   bool mManualModificationsMade;

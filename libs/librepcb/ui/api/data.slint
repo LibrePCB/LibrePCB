@@ -1613,6 +1613,28 @@ export global Data {
                 unapproved: 42,
                 execution-error: "",
             },
+            renumber-components: [
+                {
+                    name: "U1",
+                    new-name: "U5",
+                    value: "NE555",
+                },
+                {
+                    name: "U2",
+                    new-name: "U1",
+                    value: "STM32F407VET6",
+                },
+                {
+                    name: "R3",
+                    new-name: "R27",
+                    value: "100k",
+                },
+                {
+                    name: "R12",
+                    new-name: "R13",
+                    value: "1k",
+                },
+            ],
         },
         {
             valid: true,
@@ -1759,6 +1781,10 @@ export global Data {
                 previous-board-2d-panel-page = page;
             }
         } else if page == PanelPage.order {
+            previous-project-panel-page = page;
+            previous-board-2d-panel-page = page;
+            previous-board-3d-panel-page = page;
+        } else if page == PanelPage.renumber-components {
             previous-project-panel-page = page;
             previous-board-2d-panel-page = page;
             previous-board-3d-panel-page = page;
