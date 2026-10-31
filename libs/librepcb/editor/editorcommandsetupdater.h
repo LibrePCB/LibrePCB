@@ -34,6 +34,7 @@ public:
     out.set_project_setup(l2s(cmd.projectSetup, out.get_project_setup()));
     out.set_project_library_manager(l2s(cmd.projectLibraryManager, out.get_project_library_manager()));
     out.set_grid_properties(l2s(cmd.gridProperties, out.get_grid_properties()));
+    out.set_renumber_components(l2s(cmd.renumberComponents, out.get_renumber_components()));
     out.set_board_setup(l2s(cmd.boardSetup, out.get_board_setup()));
     out.set_run_quick_check(l2s(cmd.runQuickCheck, out.get_run_quick_check()));
     out.set_run_design_rule_check(l2s(cmd.runDesignRuleCheck, out.get_run_design_rule_check()));
