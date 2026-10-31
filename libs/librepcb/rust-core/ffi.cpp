@@ -79,6 +79,11 @@ extern "C" const QString* ffi_qstringlist_at(const QStringList* obj,
   return &obj->at(index);
 }
 
+extern "C" void ffi_qstringlist_append(QStringList* obj, const char* s,
+                                       std::size_t len) {
+  obj->append(QString::fromUtf8(s, len));
+}
+
 /*******************************************************************************
  *  End of File
  ******************************************************************************/

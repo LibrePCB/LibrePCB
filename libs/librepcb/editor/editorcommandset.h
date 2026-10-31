@@ -271,6 +271,15 @@ public:
       {QKeySequence(Qt::Key_F4)},
       &categoryEditor,
   };
+  EditorCommand renumberComponents{
+      "renumber_components",  // clang-format break
+      QT_TR_NOOP("Renumber Components"),
+      QT_TR_NOOP("Automatically assign new designators to all components"),
+      ":/bi/sort-down.svg",
+      EditorCommand::Flag::OpensPopup,
+      {QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_R)},
+      &categoryEditor,
+  };
   EditorCommand boardSetup{
       "board_setup",  // clang-format break
       QT_TR_NOOP("Board Setup"),
@@ -1227,7 +1236,7 @@ public:
   };
   EditorCommand toolReNumberPads{
       "tool_renumber_pads",  // clang-format break
-      QT_TR_NOOP("Re-Number Pads"),
+      QT_TR_NOOP("Renumber Pads"),
       QT_TR_NOOP("Helper tool to interactively change pad numbers"),
       ":/fa/solid/wand-magic-sparkles.svg",
       EditorCommand::Flag::OpensPopup,

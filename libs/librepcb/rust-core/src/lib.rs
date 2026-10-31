@@ -13,6 +13,7 @@ mod ffi;
 
 // Modules
 pub mod math;
+pub mod renumber_components;
 pub mod toolbox;
 mod types;
 

@@ -43,6 +43,7 @@
 #include "outputjobsdialog/outputjobsdialog.h"
 #include "projectcrossprobe.h"
 #include "projectsetupdialog.h"
+#include "renumbercomponentsmodel.cpp"
 #include "schematic/schematiceditor.h"
 #include "schematic/schematictab.h"
 
@@ -97,6 +98,7 @@ ProjectEditor::ProjectEditor(
     mActiveSchematicTabs(),
     mErcMessages(),
     mErcExecutionError(),
+    mRenumberComponentsModel(new RenumberComponentsModel(*this)),
     mManualModificationsMade(false),
     mLastAutosaveStateId(mUndoStack->getUniqueStateId()),
     mAutoSaveTimer() {
@@ -307,6 +309,7 @@ ui::ProjectData ProjectEditor::getUiData() const noexcept {
           q2s(mErcExecutionError),  // Execution error
           !mProject->getDirectory().isWritable(),  // Read-only
       },
+      mRenumberComponentsModel,  // Renumber components
   };
 }
 
@@ -347,6 +350,11 @@ void ProjectEditor::trigger(ui::ProjectAction a) noexcept {
 
     case ui::ProjectAction::OpenSetupDialog: {
       execSetupDialog();
+      break;
+    }
+
+    case ui::ProjectAction::RenumberComponents: {
+      mRenumberComponentsModel->apply(qApp->activeWindow());
       break;
     }
 

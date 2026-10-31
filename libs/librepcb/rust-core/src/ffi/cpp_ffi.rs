@@ -171,6 +171,17 @@ pub struct QStringList;
 extern "C" {
   fn ffi_qstringlist_len(obj: &QStringList) -> usize;
   fn ffi_qstringlist_at(obj: &QStringList, index: usize) -> *const QString;
+  fn ffi_qstringlist_append(
+    obj: &mut QStringList,
+    s: *const c_char,
+    len: usize,
+  );
+}
+
+/// Append a [`&str`] to a `QStringList`
+#[allow(dead_code)]
+pub fn qstringlist_append(obj: &mut QStringList, s: &str) {
+  unsafe { ffi_qstringlist_append(obj, s.as_ptr().cast(), s.len()) }
 }
 
 /// Convert `QStringList` to [`Vec<String>`]

@@ -1485,6 +1485,16 @@ export component MainMenuBar {
                     }
                 }
 
+                renumber-components-item := MenuItem {
+                    cmd: Cmd.renumber-components;
+                    enabled: Data.current-project.valid;
+
+                    clicked => {
+                        Data.set-panel-page(PanelPage.renumber-components);
+                        close-menu();
+                    }
+                }
+
                 erc-item := MenuItem {
                     cmd: Cmd.dock-erc;
                     enabled: Data.current-project.valid;
