@@ -815,6 +815,8 @@ add_library(
   project/projectsetupdialog.cpp
   project/projectsetupdialog.h
   project/projectsetupdialog.ui
+  project/renumbercomponentsmodel.cpp
+  project/renumbercomponentsmodel.h
   project/schematic/fsm/schematiceditorfsm.cpp
   project/schematic/fsm/schematiceditorfsm.h
   project/schematic/fsm/schematiceditorfsmadapter.h

@@ -1,0 +1,109 @@
+import { NameRowHeader } from "../library/metadatawidgets.slint";
+import {
+    Button,
+    IconButton,
+    ListScrollView,
+    PanelHeader,
+} from "../widgets.slint";
+import {
+    Data,
+    EditorCommandSet as Cmd,
+    Helpers,
+    PanelPage,
+    ProjectAction,
+    RenumberComponentsItemData,
+} from "../api.slint";
+
+export component RenumberComponentsPanel inherits FocusScope {
+    property <[RenumberComponentsItemData]> model: Data.current-project.renumber-components;
+    property <length> item-height: 22px;
+
+    // Set focus when panel is shown. Not sure if it's always desired(?).
+    init => {
+        root.focus();
+    }
+
+    VerticalLayout {
+        alignment: start;
+
+        header := PanelHeader {
+            z: 10;  // For the tooltip.
+            title: @tr("Renumber Components").to-uppercase();
+            highlight: root.has-focus;
+
+            close-btn := IconButton {
+                icon: Cmd.project-close.icon;
+                icon-scale: 60%;
+                tooltip: @tr("Close Panel");
+
+                clicked => {
+                    Data.set-panel-page(PanelPage.documents);
+                }
+            }
+        }
+
+        VerticalLayout {
+            padding: 8px;
+            spacing: 10px;
+
+            Text {
+                color: Data.theme.control-text;
+                wrap: word-wrap;
+                text: @tr("The following components will be renamed to put them into a natural order in the schematics:");
+            }
+
+            if model.length > 0: view := ListScrollView {
+                vertical-stretch: 0;
+                force-show-scrollbars: root.has-focus;
+
+                GridLayout {
+                    spacing-horizontal: 8px;
+
+                    for item[index] in model: Row {
+                        rename-txt := Text {
+                            vertical-alignment: center;
+                            color: Data.theme.control-text;
+                            text: item.name + " → " + item.new-name;
+                        }
+
+                        Text {
+                            horizontal-stretch: 1;
+                            vertical-alignment: center;
+                            color: Data.theme.control-text;
+                            text: item.value;
+                            overflow: elide;
+                            accessible-role: none;
+                        }
+                    }
+                }
+            }
+
+            if model.length > 0: apply-btn := Button {
+                text: @tr("Apply");
+                primary: true;
+
+                clicked => {
+                    Helpers.trigger-current-project-action(ProjectAction.renumber-components);
+                }
+            }
+
+            if model.length == 0: success-txt := Text {
+                color: Data.theme.base-text-success;
+                font-italic: true;
+                wrap: word-wrap;
+                text: "✓ " + @tr("All components are numbered nicely.");
+            }
+        }
+    }
+
+    key-pressed(event) => {
+        if event.text == Key.Return {
+            Helpers.trigger-current-project-action(ProjectAction.renumber-components);
+            return accept;
+        } else if event.text == Key.Escape {
+            close-btn.clicked();
+            return accept;
+        }
+        reject
+    }
+}

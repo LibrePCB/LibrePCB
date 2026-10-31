@@ -42,6 +42,7 @@ export enum PanelPage {
     documents,
     layers,
     place-devices,
+    renumber-components,
     rule-check,
     order,
     about,
@@ -1568,6 +1569,12 @@ export struct BusData {
     name: string,
 }
 
+export struct RenumberComponentsItemData {
+    name: string,
+    new-name: string,
+    value: string,
+}
+
 export enum ProjectAction {
     close,
     save,
@@ -1579,6 +1586,7 @@ export enum ProjectAction {
     open-library-manager,
     new-sheet,
     new-board,
+    renumber-components,
 }
 
 export struct ProjectData {
@@ -1592,6 +1600,7 @@ export struct ProjectData {
     unsaved-changes: bool,
     buses: [BusData],
     erc: RuleCheckData,
+    renumber-components: [RenumberComponentsItemData],
 }
 
 ////////////////////////////////////////////////////////////////////////////////
