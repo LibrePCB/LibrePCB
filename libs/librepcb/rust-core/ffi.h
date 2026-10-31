@@ -277,6 +277,28 @@ struct InteractiveHtmlBomRefMap {
   size_t id;
 };
 
+/**
+ * Symbol data for [ffi_renumber_components].
+ */
+struct RenumberComponentsSymbolData {
+  /**
+   * Index of the component this symbol belongs to.
+   */
+  size_t component;
+  /**
+   * Index of the schematic containing this symbol.
+   */
+  size_t schematic;
+  /**
+   * X position in nanometers.
+   */
+  int64_t x;
+  /**
+   * Y position in nanometers.
+   */
+  int64_t y;
+};
+
 extern "C" {
 
 /**
@@ -339,6 +361,10 @@ extern size_t ffi_qstringlist_len(const QStringList * NONNULL obj);
 
 extern const QString *ffi_qstringlist_at(const QStringList * NONNULL obj,
                                          size_t index);
+
+extern void ffi_qstringlist_append(QStringList * NONNULL obj,
+                                   const char *s,
+                                   size_t len);
 
 /**
  * Create a new [InteractiveHtmlBom] object
@@ -526,6 +552,20 @@ double ffi_math_arc_radius_and_center(double dx,
                                       double angle,
                                       double * NONNULL x,
                                       double * NONNULL y);
+
+/**
+ * Wrapper for [renumber_components].
+ *
+ * Connections are passed as `(symbol index, net segment ID)` pairs, i.e.
+ * `connections_len` must be a multiple of 2. The new designators (parallel
+ * to `names`) are appended to `out`.
+ */
+void ffi_renumber_components(const QStringList * NONNULL names,
+                             const RenumberComponentsSymbolData *symbols,
+                             size_t symbols_len,
+                             const size_t *connections,
+                             size_t connections_len,
+                             QStringList * NONNULL out);
 
 /**
  * Wrapper for [increment_number_in_string]

@@ -23,6 +23,7 @@
         <file alias="/bi/question-circle.svg">../libs/bootstrap-icons/icons/question-circle.svg</file>
         <file alias="/bi/record-circle-fill.svg">../libs/bootstrap-icons/icons/record-circle-fill.svg</file>
         <file alias="/bi/sign-stop.svg">../libs/bootstrap-icons/icons/sign-stop.svg</file>
+        <file alias="/bi/sort-down.svg">../libs/bootstrap-icons/icons/sort-down.svg</file>
         <file alias="/bi/window-plus.svg">../libs/bootstrap-icons/icons/window-plus.svg</file>
         <file alias="/bi/window-x.svg">../libs/bootstrap-icons/icons/window-x.svg</file>
         <file alias="/bi/zoom-in.svg">../libs/bootstrap-icons/icons/zoom-in.svg</file>

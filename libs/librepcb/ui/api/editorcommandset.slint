@@ -184,6 +184,16 @@ export global EditorCommandSet {
         key: Key.F4,
     };
 
+    in property <EditorCommand> renumber-components: {
+        id: "renumber_components",
+        icon: @image-url("../../../bootstrap-icons/icons/sort-down.svg"),
+        text: "Renumber Components...",
+        status-tip: "Automatically assign new designators to all components",
+        shortcut: "Ctrl+Alt+R",
+        modifiers: { alt: true, control: true, shift: false, meta: false },
+        key: "r",
+    };
+
     in property <EditorCommand> board-setup: {
         id: "board_setup",
         icon: @image-url("../../../font-awesome/svgs/solid/sliders.svg"),
@@ -1167,7 +1177,7 @@ export global EditorCommandSet {
     in property <EditorCommand> tool-renumber-pads: {
         id: "tool_renumber_pads",
         icon: @image-url("../../../font-awesome/svgs/solid/wand-magic-sparkles.svg"),
-        text: "Re-Number Pads...",
+        text: "Renumber Pads...",
         status-tip: "Helper tool to interactively change pad numbers",
         shortcut: "",
         modifiers: { alt: false, control: false, shift: false, meta: false },
