@@ -128,6 +128,24 @@ enum class InteractiveHtmlBomViewMode {
 };
 
 /**
+ * Wrapper for [AnchorKind]
+ */
+enum class OrthogonalWireDragAnchorKind {
+  /**
+   * Anchor moved by the caller.
+   */
+  Moving,
+  /**
+   * Stationary anchor which may be moved by the algorithm.
+   */
+  Movable,
+  /**
+   * Stationary anchor which must stay fixed.
+   */
+  Fixed,
+};
+
+/**
  * Interactive HTML BOM structure
  *
  * The top-level structure to build & generate a HTML BOM.
@@ -204,6 +222,11 @@ enum class InteractiveHtmlBomViewMode {
 struct InteractiveHtmlBom;
 
 /**
+ * Wrapper for [DragResult]
+ */
+struct OrthogonalWireDragOutput;
+
+/**
  * Wrapper type for [Archive]
  */
 struct ZipArchive;
@@ -275,6 +298,94 @@ struct InteractiveHtmlBomRefMap {
    * Footprint ID
    */
   size_t id;
+};
+
+/**
+ * Wrapper for [Anchor]
+ */
+struct OrthogonalWireDragAnchor {
+  /**
+   * X coordinate in nanometers.
+   */
+  int64_t x;
+  /**
+   * Y coordinate in nanometers.
+   */
+  int64_t y;
+  /**
+   * Drag role.
+   */
+  OrthogonalWireDragAnchorKind kind;
+};
+
+/**
+ * Wrapper for [Wire]
+ */
+struct OrthogonalWireDragWire {
+  /**
+   * First anchor index.
+   */
+  size_t p1;
+  /**
+   * Second anchor index.
+   */
+  size_t p2;
+};
+
+/**
+ * Wrapper for [AnchorMovement]
+ */
+struct OrthogonalWireDragAnchorMovement {
+  /**
+   * Anchor index.
+   */
+  size_t anchor;
+  /**
+   * Apply the drag's X delta.
+   */
+  bool stretch_x;
+  /**
+   * Apply the drag's Y delta.
+   */
+  bool stretch_y;
+};
+
+/**
+ * Wrapper for [WireSplit]
+ */
+struct OrthogonalWireDragWireSplit {
+  /**
+   * Wire index.
+   */
+  size_t wire;
+  /**
+   * Endpoint which follows the drag or propagated stretch.
+   */
+  size_t moving_anchor;
+  /**
+   * Endpoint which stays fixed.
+   */
+  size_t fixed_anchor;
+  /**
+   * Apply the drag's X delta only to decide whether this split is needed.
+   */
+  bool trigger_x;
+  /**
+   * Apply the drag's Y delta only to decide whether this split is needed.
+   */
+  bool trigger_y;
+  /**
+   * Apply the drag's X delta to the inserted bend point.
+   *
+   * This follows the original wire axis, not the perpendicular split trigger.
+   */
+  bool stretch_x;
+  /**
+   * Apply the drag's Y delta to the inserted bend point.
+   *
+   * This follows the original wire axis, not the perpendicular split trigger.
+   */
+  bool stretch_y;
 };
 
 extern "C" {
@@ -526,6 +637,41 @@ double ffi_math_arc_radius_and_center(double dx,
                                       double angle,
                                       double * NONNULL x,
                                       double * NONNULL y);
+
+/**
+ * Wrapper for [calculate_orthogonal_drag]
+ */
+OrthogonalWireDragOutput *ffi_orthogonal_wire_drag_new(const OrthogonalWireDragAnchor *anchors_array,
+                                                       size_t anchors_size,
+                                                       const OrthogonalWireDragWire *wires_array,
+                                                       size_t wires_size);
+
+/**
+ * Delete an [OrthogonalWireDragOutput]
+ */
+void ffi_orthogonal_wire_drag_delete(OrthogonalWireDragOutput *obj);
+
+/**
+ * Get number of anchor movements in an [OrthogonalWireDragOutput]
+ */
+size_t ffi_orthogonal_wire_drag_anchor_movement_count(const OrthogonalWireDragOutput * NONNULL obj);
+
+/**
+ * Get an anchor movement from an [OrthogonalWireDragOutput]
+ */
+OrthogonalWireDragAnchorMovement ffi_orthogonal_wire_drag_anchor_movement(const OrthogonalWireDragOutput * NONNULL obj,
+                                                                          size_t index);
+
+/**
+ * Get number of wire splits in an [OrthogonalWireDragOutput]
+ */
+size_t ffi_orthogonal_wire_drag_wire_split_count(const OrthogonalWireDragOutput * NONNULL obj);
+
+/**
+ * Get a wire split from an [OrthogonalWireDragOutput]
+ */
+OrthogonalWireDragWireSplit ffi_orthogonal_wire_drag_wire_split(const OrthogonalWireDragOutput * NONNULL obj,
+                                                                size_t index);
 
 /**
  * Wrapper for [increment_number_in_string]
