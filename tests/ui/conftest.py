@@ -17,6 +17,11 @@ TESTS_DIR = os.path.dirname(ROOT_DIR)
 REPO_DIR = os.path.dirname(TESTS_DIR)
 DATA_DIR = os.path.join(TESTS_DIR, "data")
 
+# Force large enough window size because UI elements are only visible
+# if there is enough space for them. However, on the macOS CI runner, there
+# seems to be only 1600x653 available (observed 2026-11-01 on macos-15).
+WINDOW_SIZE = (1024, 640)
+
 
 def pytest_addoption(parser):
     parser.addoption(
@@ -477,9 +482,8 @@ class LibrePcbFixture(object):
         self.env["LIBREPCB_CACHE_DIR"] = os.path.join(self.tmpdir, "cache")
         # Use a neutral username
         self.env["USERNAME"] = "testuser"
-        # Force large enough window size because UI elements are only visible
-        # if there is enough space for them.
-        self.env["LIBREPCB_WINDOW_SIZE"] = "1600x900"
+        # Force window size for reproducible tests
+        self.env["LIBREPCB_WINDOW_SIZE"] = "{}x{}".format(*WINDOW_SIZE)
         # Force LibrePCB to use Qt-style file dialogs because native dialogs don't work
         self.env["LIBREPCB_DISABLE_NATIVE_DIALOGS"] = "1"
         # Disable warning about unstable file format, since tests are run also
@@ -681,11 +685,10 @@ def check_resolution(request, tmp_path_factory):
     """
     path = tmp_path_factory.mktemp("check_resolution")
     with LibrePcbFixture(request.config, path).open() as app:
-        min_size = (1024, 720)
         win_size = app.first_window.size
-        if (win_size[0] < min_size[0]) or (win_size[1] < min_size[1]):
+        if (win_size[0] < WINDOW_SIZE[0]) or (win_size[1] < WINDOW_SIZE[1]):
             pytest.exit(
-                f"Screen resolution is {win_size}, requires minimum {min_size}.",
+                f"Screen resolution is {win_size}, requires minimum {WINDOW_SIZE}.",
                 returncode=1,
             )
 
