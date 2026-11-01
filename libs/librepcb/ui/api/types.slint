@@ -219,7 +219,8 @@ export struct TreeViewItemData {
     level: int,  // 0 = top level items
     icon: image,
     text: string,
-    hint: string,
+    comment: string,
+    status-tip: string,
     user-data: string,  // User data to uniquely reference this item
     is-project-file-or-folder: bool,
     has-children: bool,

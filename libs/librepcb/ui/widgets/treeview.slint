@@ -59,7 +59,7 @@ export component TreeView inherits FocusScope {
 
             // Accessibility
             accessible-role: list-item;
-            accessible-description: item.hint;
+            accessible-description: item.comment + " " + item.status-tip;
             accessible-enabled: self.enabled;
             accessible-expandable: item.has-children;
             accessible-expanded: item.expanded;
@@ -147,6 +147,23 @@ export component TreeView inherits FocusScope {
                         overflow: TextOverflow.elide;
                         vertical-alignment: center;
                         text: item.text;
+                        accessible-role: none;
+                    }
+
+                    if !item.comment.is-empty: item-comment-txt := Text {
+                        horizontal-stretch: 100;
+                        color: {
+                            if is-enabled {
+                                Data.theme.control-text-muted
+                            } else {
+                                Data.theme.control-text-disabled
+                            }
+                        };
+                        font-size: font-size;
+                        font-weight: 300;
+                        overflow: TextOverflow.elide;
+                        vertical-alignment: center;
+                        text: item.comment;
                         accessible-role: none;
                     }
 

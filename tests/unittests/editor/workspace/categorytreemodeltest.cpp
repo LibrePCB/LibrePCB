@@ -78,21 +78,21 @@ public:
 
   std::string str(const std::optional<ui::TreeViewItemData>& data) {
     if (data) {
-      return QString("{level=%1, text='%2', hint='%3', user_data='%4'}")
+      return QString("{level=%1, text='%2', comment='%3', user_data='%4'}")
           .arg(data->level)
-          .arg(s2q(data->text), s2q(data->hint), s2q(data->user_data))
+          .arg(s2q(data->text), s2q(data->comment), s2q(data->user_data))
           .toStdString();
     } else {
       return std::string("{nullopt}");
     }
   }
 
-  std::string str(int level, const QString& text, const QString& hint,
+  std::string str(int level, const QString& text, const QString& comment,
                   const QString& userData) {
     ui::TreeViewItemData item = {};
     item.level = level;
     item.text = q2s(text);
-    item.hint = q2s(hint);
+    item.comment = q2s(comment);
     item.user_data = q2s(userData);
     return str(item);
   }
@@ -187,7 +187,7 @@ TEST_F(CategoryTreeModelTest, testData) {
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 2"),
                                              std::nullopt, std::nullopt);
 
-  // Note: Currently we don't show the description as hint.
+  // Note: Currently we don't show the description as comment.
   CategoryTreeModel model(*mWsDb, *mSettings,
                           CategoryTreeModel::Filter::CmpCat);
   EXPECT_EQ(str(0, "Root Category", "", "null"), str(model.row_data(0)));

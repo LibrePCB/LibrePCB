@@ -84,7 +84,8 @@ void CategoryTreeModel::refresh() noexcept {
         0,  // Level
         mIcon,  // Icon
         q2s(tr("Root Category")),  // Text
-        slint::SharedString(),  // Hint
+        {},  // Comment
+        {},  // Status tip
         "null",  // User data
         false,  // Is project file or folder
         false,  // Has children
@@ -133,7 +134,8 @@ void CategoryTreeModel::loadChildren(const std::optional<Uuid>& parent,
         level,  // Level
         mIcon,  // Icon
         q2s(pair.second.isEmpty() ? pair.first.toStr() : pair.second),  // Text
-        slint::SharedString(),  // Hint
+        {},  // Comment
+        {},  // Status tip
         q2s(pair.first.toStr()),  // User data
         false,  // Is project file or folder
         false,  // Has children

@@ -3,6 +3,8 @@ import { Data } from "../api.slint";
 
 export component OverlayDialog inherits Rectangle {
     in property <bool> ok-button: false;
+    in property <bool> close-button: false;
+    in property <length> max-inner-width: 500px;
 
     background: black.with-alpha(0.3 - Data.theme.base.to-hsv().value * 0.2);
     forward-focus: fs;
@@ -48,7 +50,7 @@ export component OverlayDialog inherits Rectangle {
         focus-on-tab-navigation: false;
 
         Rectangle {
-            width: min(0.8 * root.width, max(self.preferred-width, 500px));
+            width: min(0.8 * root.width, max(self.preferred-width, max-inner-width));
             height: min(0.8 * root.height, max(self.preferred-height, 50px));
             background: Data.theme.base;
             border-radius: 10px;
@@ -65,8 +67,18 @@ export component OverlayDialog inherits Rectangle {
 
                 @children
 
-                if ok-button: HorizontalLayout {
+                if ok-button || close-button: HorizontalLayout {
                     alignment: end;
+
+                    if close-button: close-btn := Button {
+                        width: max(self.preferred-width, 100px);
+                        text: ok-button ? @tr("Cancel") : @tr("Close");
+                        primary: !ok-button;
+
+                        clicked => {
+                            rejected();
+                        }
+                    }
 
                     if ok-button: ok-btn := Button {
                         width: max(self.preferred-width, 100px);
