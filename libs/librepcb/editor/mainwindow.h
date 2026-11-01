@@ -186,6 +186,8 @@ private:
   std::unique_ptr<ProjectReadmeRenderer> mProjectPreviewRenderer;
   std::unique_ptr<MainWindowTestAdapter> mTestAdapter;
 
+  QHash<ui::TabType, QVector<ui::PanelPage>> mPanelPageStack;
+
   friend class MainWindowTestAdapter;
 };
 

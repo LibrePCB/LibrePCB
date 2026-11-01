@@ -159,16 +159,6 @@ export component SideBar {
         }
     }
 
-    function button-enable-changed(enabled: bool, checked: bool) {
-        if checked && (!enabled) {
-            if documents-btn.enabled {
-                Data.panel-page = PanelPage.documents;
-            } else {
-                Data.panel-page = PanelPage.home;
-            }
-        }
-    }
-
     VerticalLayout {
         spacing: 0px;
 
@@ -191,10 +181,6 @@ export component SideBar {
             clicked => {
                 button-clicked(PanelPage.documents);
             }
-
-            changed enabled => {
-                button-enable-changed(self.enabled, self.checked);
-            }
         }
 
         layers-btn := SideBarButton {
@@ -206,10 +192,6 @@ export component SideBar {
 
             clicked => {
                 button-clicked(PanelPage.layers);
-            }
-
-            changed enabled => {
-                button-enable-changed(self.enabled, self.checked);
             }
         }
 
@@ -240,10 +222,6 @@ export component SideBar {
 
             clicked => {
                 button-clicked(PanelPage.place-devices);
-            }
-
-            changed enabled => {
-                button-enable-changed(self.enabled, self.checked);
             }
         }
 
@@ -297,10 +275,6 @@ export component SideBar {
             clicked => {
                 button-clicked(PanelPage.rule-check);
             }
-
-            changed enabled => {
-                button-enable-changed(self.enabled, self.checked);
-            }
         }
 
         output-jobs-btn := SideBarButton {
@@ -324,16 +298,10 @@ export component SideBar {
             clicked => {
                 button-clicked(PanelPage.order);
             }
-
-            changed enabled => {
-                button-enable-changed(self.enabled, self.checked);
-            }
         }
 
-        property <bool> can-renumber-components: Data.current-project.valid;
-        changed can-renumber-components => {
-            button-enable-changed(can-renumber-components, Data.panel-page == PanelPage.renumber-components);
-        }
+        // This is a temporary panel, i.e. the panel button is only shown while
+        // that panel is opened.
         if Data.panel-page == PanelPage.renumber-components: renumber-components-btn := SideBarButton {
             icon: Cmd.renumber-components.icon;
             tooltip: Cmd.renumber-components.text;

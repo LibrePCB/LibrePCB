@@ -264,6 +264,99 @@ MainWindow::MainWindow(GuiApplication& app,
         this, [this, project, board, a]() { triggerBoard(project, board, a); },
         Qt::QueuedConnection);
   });
+  b.on_push_tab_panel_page([this](ui::TabType tab, ui::PanelPage page) {
+    /*static const QSet<ui::TabType> sLibraryTabs{
+        ui::TabType::Library,         ui::TabType::ComponentCategory,
+        ui::TabType::PackageCategory, ui::TabType::Symbol,
+        ui::TabType::Package,         ui::TabType::Component,
+        ui::TabType::Device,          ui::TabType::Organization,
+    };
+    static const QSet<ui::TabType> sProjectTabs{
+        ui::TabType::ProjectLibrary,
+        ui::TabType::Schematic,
+        ui::TabType::Board2d,
+        ui::TabType::Board3d,
+    };
+
+    static const QSet<ui::PanelPage> sPersistentPages{
+        ui::PanelPage::Home,
+        ui::PanelPage::Documents,
+        ui::PanelPage::Libraries,
+        ui::PanelPage::About,
+    };*/
+
+    static const QMap<QSet<ui::PanelPage>, QVector<QSet<ui::TabType>>> sGroups{
+        {{ui::PanelPage::Layers},
+         {
+             {
+                 ui::TabType::Board2d,
+             },
+         }},
+        {{ui::PanelPage::PlaceDevices},
+         {
+             {
+                 ui::TabType::Board2d,
+             },
+         }},
+        {{ui::PanelPage::RuleCheck},
+         {
+             {
+                 ui::TabType::Library,
+                 ui::TabType::ComponentCategory,
+                 ui::TabType::PackageCategory,
+                 ui::TabType::Symbol,
+                 ui::TabType::Package,
+                 ui::TabType::Component,
+                 ui::TabType::Device,
+                 ui::TabType::Organization,
+             },
+             {
+                 ui::TabType::Schematic,
+                 ui::TabType::Board2d,
+             },
+         }},
+        {{ui::PanelPage::Order},
+         {
+             {
+                 ui::TabType::ProjectLibrary,
+                 ui::TabType::Schematic,
+                 ui::TabType::Board2d,
+                 ui::TabType::Board3d,
+             },
+         }},
+    };
+
+    auto set = [this](ui::TabType tab, ui::PanelPage page) {
+      auto& stack = mPanelPageStack[tab];
+      stack.removeAll(page);
+      stack.append(page);
+    };
+    for (auto it = sGroups.begin(); it != sGroups.end(); it++) {
+      if (it.key().contains(page)) {
+        for (const auto& group : it.value()) {
+          if (group.contains(tab)) {
+            for (const auto& t : group) {
+              set(t, page);
+            }
+          }
+        }
+      }
+    }
+    set(tab, page);
+  });
+  b.on_pop_tab_panel_page([this](ui::TabType tab) {
+    ui::PanelPage page = ui::PanelPage::Documents;
+    auto& stack = mPanelPageStack[tab];
+    if (!stack.isEmpty()) {
+      page = stack.last();
+    }
+    // Documents panel shall only be opened if there are any open documents.
+    if ((page == ui::PanelPage::Documents) && mApp.getLibraries().isEmpty() &&
+        mApp.getProjects().isEmpty()) {
+      page = ui::PanelPage::Home;
+    }
+    return page;
+  });
   b.on_render_scene([this](int sectionIndex, float width, float height,
                            int scene, int frameIndex) {
     Q_UNUSED(frameIndex);

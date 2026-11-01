@@ -10,14 +10,15 @@ import {
     LibraryAction,
     LibraryElementAction,
     OrganizationDbData,
+    PanelPage,
     ProjectAction,
     RatioEditParseResult,
     SchematicAction,
     TabAction,
+    TabType,
     WindowSectionAction,
 } from "types.slint";
 import { Theme } from "themes.slint";
-import { Data } from "data.slint";
 
 // Note: The callback implementations are just for the live preview, they will
 // be overridden by the backend in the real use-case.
@@ -58,7 +59,7 @@ export global Backend {
     // guarantee there are no side effects changing the UI from within the
     // callback.
     callback trigger-tab(section: int, tab: int, action: TabAction);
-    trigger-tab(section, tab, action) => {
+    /*trigger-tab(section, tab, action) => {
         debug("Trigger tab action:", section, tab, action);
 
         if action == TabAction.tool-select {
@@ -138,7 +139,7 @@ export global Backend {
             Data.sections[section].schematic-tabs[tab].tool = EditorTool.select;
             Data.sections[section].board-2d-tabs[tab].tool = EditorTool.select;
         }
-    }
+    }*/
 
     // Trigger some library action
     //
@@ -203,6 +204,9 @@ export global Backend {
     // of -1 will create a new section for the moved tab.
     pure callback drop-tab(src-data: data-transfer, dst-data: data-transfer, force-switch-to-tab: bool);
 
+    pure callback push-tab-panel-page(tab: TabType, page: PanelPage);
+    pure callback pop-tab-panel-page(tab: TabType) -> PanelPage;
+
     // Open an URL by an external application (usually the web browser)
     //
     // The return value indicates whether the operation was successful or not.
@@ -216,22 +220,22 @@ export global Backend {
     //
     // The return value indicates whether the operation was successful or not.
     pure callback copy-to-clipboard(s: string) -> bool;
-    copy-to-clipboard(s) => {
+    /*copy-to-clipboard(s) => {
         Data.preview-mode  // Make it fail if callback not bound in backend.
-    }
+    }*/
 
     // Key pressed event on the libraries list
     //
     // Used for the filtering feature in the libraries panel.
     callback libraries-key-pressed(event: KeyEvent) -> EventResult;
-    libraries-key-pressed(event) => {
+    /*libraries-key-pressed(event) => {
         if event.text == Key.Escape {
             Data.libraries-panel-filter = "";
         } else {
             Data.libraries-panel-filter += event.text;
         }
         reject
-    }
+    }*/
 
     // Render a graphics scene image
     pure callback render-scene(section: int, width: length, height: length, scene: int, frame-dummy: int) -> image;
