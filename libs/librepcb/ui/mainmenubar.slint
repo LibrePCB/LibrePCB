@@ -10,6 +10,7 @@ import {
     Action,
     Backend,
     BoardAction,
+    PushPanelPageScope,
     Constants,
     Data,
     EditorCommandSet as Cmd,
@@ -1490,7 +1491,7 @@ export component MainMenuBar {
                     enabled: Data.current-project.valid;
 
                     clicked => {
-                        Data.set-panel-page(PanelPage.renumber-components);
+                        Data.set-panel-page(PanelPage.renumber-components, PushPanelPageScope.related-tabs);
                         close-menu();
                     }
                 }

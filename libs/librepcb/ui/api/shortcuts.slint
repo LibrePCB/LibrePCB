@@ -8,6 +8,7 @@ import {
     PanelPage,
     ProjectAction,
     SchematicAction,
+    PushPanelPageScope,
     TabAction,
     TabType,
     WireMode,
@@ -35,7 +36,7 @@ export global Shortcuts {
             Backend.trigger-project(project, ProjectAction.open-library-manager);
             return true;
         } else if Backend.is-shortcut(event, Cmd.renumber-components) {
-            Data.set-panel-page(PanelPage.renumber-components);
+            Data.set-panel-page(PanelPage.renumber-components, PushPanelPageScope.related-tabs);
             return true;
         } else if Backend.is-shortcut(event, Cmd.sheet-new) {
             Backend.trigger-project(project, ProjectAction.new-sheet);
@@ -91,11 +92,11 @@ export global Shortcuts {
             return true;
         } else if Backend.is-shortcut(event, Cmd.run-quick-check) {
             Backend.trigger-board(project, board, BoardAction.run-quick-check);
-            Data.set-panel-page(PanelPage.rule-check);
+            Data.set-panel-page(PanelPage.rule-check, PushPanelPageScope.related-tabs);
             return true;
         } else if Backend.is-shortcut(event, Cmd.run-design-rule-check) {
             Backend.trigger-board(project, board, BoardAction.run-drc);
-            Data.set-panel-page(PanelPage.rule-check);
+            Data.set-panel-page(PanelPage.rule-check, PushPanelPageScope.related-tabs);
             return true;
         }
         false
@@ -1299,7 +1300,7 @@ export global Shortcuts {
             Backend.trigger(Action.workspace-libraries-rescan);
             return true;
         } else if Backend.is-shortcut(event, Cmd.library-manager) {
-            Data.set-panel-page(PanelPage.libraries);
+            Data.set-panel-page(PanelPage.libraries, PushPanelPageScope.related-tabs);
             return true;
         } else if Backend.is-shortcut(event, Cmd.project-new) {
             Backend.trigger(Action.project-new);
@@ -1315,19 +1316,19 @@ export global Shortcuts {
             return true;
         } else if Backend.is-shortcut(event, Cmd.dock-erc) && Data.current-project.valid {
             Data.current-rule-check-board-index = -1;
-            Data.set-panel-page(PanelPage.rule-check);
+            Data.set-panel-page(PanelPage.rule-check, PushPanelPageScope.related-tabs);
             return true;
         } else if Backend.is-shortcut(event, Cmd.dock-drc) && Data.current-tab.type == TabType.board-2d {
             Data.current-rule-check-board-index = Data.current-board-2d-tab.board-index;
-            Data.set-panel-page(PanelPage.rule-check);
+            Data.set-panel-page(PanelPage.rule-check, PushPanelPageScope.related-tabs);
             return true;
         } else if Backend.is-shortcut(event, Cmd.dock-layers) && (Data.current-tab.layers.length > 0) {
-            Data.set-panel-page(PanelPage.layers);
+            Data.set-panel-page(PanelPage.layers, PushPanelPageScope.related-tabs);
             return true;
         } else if Backend.is-shortcut(event, Cmd.dock-place-devices) && (Data.current-tab.type == TabType.board-2d) {
-            Data.set-panel-page(PanelPage.place-devices);
+            Data.set-panel-page(PanelPage.place-devices, PushPanelPageScope.related-tabs);
         } else if Backend.is-shortcut(event, Cmd.order-pcb) && Data.current-project.valid {
-            Data.set-panel-page(PanelPage.order);
+            Data.set-panel-page(PanelPage.order, PushPanelPageScope.related-tabs);
         } else if Backend.is-shortcut(event, Cmd.window-new) {
             Backend.trigger(Action.window-new);
             return true;
@@ -1338,7 +1339,7 @@ export global Shortcuts {
             Backend.trigger(Action.quit);
             return true;
         } else if Backend.is-shortcut(event, Cmd.about-librepcb) {
-            Data.set-panel-page(PanelPage.about);
+            Data.set-panel-page(PanelPage.about, PushPanelPageScope.related-tabs);
             return true;
         } else if Backend.is-shortcut(event, Cmd.website) {
             Backend.open-url(Constants.website-url);

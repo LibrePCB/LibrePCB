@@ -10,6 +10,7 @@ import {
     EditorCommandSet as Cmd,
     Helpers,
     PanelPage,
+    PushPanelPageScope,
     ProjectAction,
     RenumberComponentsItemData,
 } from "../api.slint";
@@ -37,7 +38,8 @@ export component RenumberComponentsPanel inherits FocusScope {
                 tooltip: @tr("Close Panel");
 
                 clicked => {
-                    Data.set-panel-page(PanelPage.documents);
+                    Data.set-panel-page(PanelPage.documents,
+                        PushPanelPageScope.related-tabs);
                 }
             }
         }

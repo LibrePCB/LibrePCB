@@ -9,6 +9,7 @@ import {
     LengthUnit,
     LibraryAction,
     LibraryElementAction,
+    PushPanelPageScope,
     OrganizationDbData,
     PanelPage,
     ProjectAction,
@@ -204,8 +205,8 @@ export global Backend {
     // of -1 will create a new section for the moved tab.
     pure callback drop-tab(src-data: data-transfer, dst-data: data-transfer, force-switch-to-tab: bool);
 
-    pure callback push-tab-panel-page(tab: TabType, page: PanelPage);
-    pure callback pop-tab-panel-page(tab: TabType) -> PanelPage;
+    pure callback push-panel-page(tab: TabType, page: PanelPage, scope: PushPanelPageScope);
+    pure callback pop-panel-page(tab: TabType, current-page: PanelPage) -> PanelPage;
 
     // Open an URL by an external application (usually the web browser)
     //

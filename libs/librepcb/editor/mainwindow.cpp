@@ -84,6 +84,13 @@
 namespace librepcb {
 namespace editor {
 
+static const QSet<ui::PanelPage> sPersistentPages{
+    ui::PanelPage::Home,
+    ui::PanelPage::Documents,
+    ui::PanelPage::Libraries,
+    ui::PanelPage::About,
+};
+
 // Detect window size enforced by environment variable (required for testing).
 static std::optional<QSize> getOverrideWindowSize() noexcept {
   static const QString value =
@@ -276,29 +283,26 @@ MainWindow::MainWindow(GuiApplication& app,
         ui::TabType::Schematic,
         ui::TabType::Board2d,
         ui::TabType::Board3d,
-    };
-
-    static const QSet<ui::PanelPage> sPersistentPages{
-        ui::PanelPage::Home,
-        ui::PanelPage::Documents,
-        ui::PanelPage::Libraries,
-        ui::PanelPage::About,
     };*/
 
-    static const QMap<QSet<ui::PanelPage>, QVector<QSet<ui::TabType>>> sGroups{
-        {{ui::PanelPage::Layers},
+    if (sPersistentPages.contains(page)) {
+      return;
+    }
+
+    static const QHash<ui::PanelPage, QVector<QSet<ui::TabType>>> sGroups{
+        {ui::PanelPage::Layers,
          {
              {
                  ui::TabType::Board2d,
              },
          }},
-        {{ui::PanelPage::PlaceDevices},
+        {ui::PanelPage::PlaceDevices,
          {
              {
                  ui::TabType::Board2d,
              },
          }},
-        {{ui::PanelPage::RuleCheck},
+        {ui::PanelPage::RuleCheck,
          {
              {
                  ui::TabType::Library,
@@ -315,7 +319,7 @@ MainWindow::MainWindow(GuiApplication& app,
                  ui::TabType::Board2d,
              },
          }},
-        {{ui::PanelPage::Order},
+        {ui::PanelPage::Order,
          {
              {
                  ui::TabType::ProjectLibrary,
@@ -331,20 +335,35 @@ MainWindow::MainWindow(GuiApplication& app,
       stack.removeAll(page);
       stack.append(page);
     };
-    for (auto it = sGroups.begin(); it != sGroups.end(); it++) {
-      if (it.key().contains(page)) {
-        for (const auto& group : it.value()) {
-          if (group.contains(tab)) {
-            for (const auto& t : group) {
-              set(t, page);
-            }
-          }
+
+    for (const auto& group : sGroups.value(page)) {
+      if (group.contains(tab)) {
+        for (const auto& t : group) {
+          set(t, page);
         }
       }
     }
     set(tab, page);
   });
-  b.on_pop_tab_panel_page([this](ui::TabType tab) {
+  b.on_pop_tab_panel_page([this](ui::TabType tab, ui::PanelPage currentPage) {
+    if (sPersistentPages.contains(currentPage)) {
+      return currentPage;
+    }
+
+    /*static const QSet<ui::PanelPage> sSupportedProjectPages{
+        ui::PanelPage::Order,
+    };
+    static const QHash<ui::TabType, QSet<ui::PanelPage>> sSupportedPages{
+        {
+            ui::TabType::Board2d,
+            sPersistentPages +
+                QSet<ui::PanelPage>{
+                    ui::PanelPage::Layers,
+                    ui::PanelPage::PlaceDevices,
+                },
+        },
+    };*/
+
     ui::PanelPage page = ui::PanelPage::Documents;
     auto& stack = mPanelPageStack[tab];
     if (!stack.isEmpty()) {

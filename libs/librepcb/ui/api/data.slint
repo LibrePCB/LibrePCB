@@ -21,6 +21,7 @@ import {
     PackageTabData,
     PanelPage,
     ProjectData,
+    PushPanelPageScope,
     ProjectLibraryTabData,
     RuleCheckData,
     RuleCheckState,
@@ -1733,12 +1734,16 @@ export global Data {
         }
     };
 
-    public function set-panel-page(page: PanelPage) {
+    public function set-panel-page(page: PanelPage, scope: PushPanelPageScope) {
         panel-page = page;
         if (page != PanelPage.none) {
-            Backend.push-tab-panel-page(current-tab.type, page);
+            Backend.push-panel-page(current-tab.type, page, scope);
         }
     }
+
+    //public function set-panel-page-for-tab(tab: TabType, page: PanelPage, scope: PushPanelPageScope) {
+    //    Backend.push-panel-page(tab, page, scope);
+    //}
 
     public function current-tab-changed() {
         if current-tab.type == TabType.library {
@@ -1807,7 +1812,7 @@ export global Data {
         }
         // Only restore panel page if panel is shown (keep hidden state).
         if panel-page != PanelPage.none {
-            panel-page = Backend.pop-tab-panel-page(current-tab.type);
+            panel-page = Backend.pop-panel-page(current-tab.type, panel-page);
         }
     }
 

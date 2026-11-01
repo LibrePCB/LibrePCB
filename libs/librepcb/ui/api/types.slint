@@ -49,6 +49,12 @@ export enum PanelPage {
     none,
 }
 
+export enum PushPanelPageScope {
+    current-tab,
+    related-tabs,
+    all-tabs,
+}
+
 // Dynamic information about editor commands, e.g. used in menus
 export struct EditorCommand {
     id: string,

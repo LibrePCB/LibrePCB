@@ -10,6 +10,7 @@ import {
     ProjectAction,
     RuleCheckData,
     RuleCheckState,
+    PushPanelPageScope,
     RuleCheckType,
     TabType,
 } from "api.slint";
@@ -153,9 +154,9 @@ component SideBarButton inherits Rectangle {
 export component SideBar {
     function button-clicked(page: PanelPage) {
         if Data.panel-page == page {
-            Data.set-panel-page(PanelPage.none);
+            Data.set-panel-page(PanelPage.none, PushPanelPageScope.related-tabs);
         } else {
-            Data.set-panel-page(page);
+            Data.set-panel-page(page, PushPanelPageScope.related-tabs);
         }
     }
 

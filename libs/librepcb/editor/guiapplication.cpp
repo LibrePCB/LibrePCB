@@ -440,9 +440,9 @@ std::shared_ptr<LibraryEditor> GuiApplication::getLibrary(
 std::shared_ptr<LibraryEditor> GuiApplication::openLibrary(
     const FilePath& libDir) noexcept {
   auto switchToLibrary = [this](int index) {
-    for (auto win : mWindows->values()) {
+    if (auto win =  getCurrentWindow()) {
       win->setCurrentLibrary(index);
-      win->showPanelPage(ui::PanelPage::Documents);
+     // win->showPanelPage(ui::PanelPage::Documents);
     }
   };
 
@@ -491,6 +491,9 @@ std::shared_ptr<LibraryEditor> GuiApplication::openLibrary(
         [this, libDir]() { closeLibrary(libDir); }, Qt::QueuedConnection);
     mLibraries->insert(index, editor);
     switchToLibrary(index);
+     if (auto win =  getCurrentWindow()) {
+    win->showPanelPage(ui::PanelPage::Documents);
+    }
     return editor;
   } catch (const UserCanceled& e) {
   } catch (const Exception& e) {
