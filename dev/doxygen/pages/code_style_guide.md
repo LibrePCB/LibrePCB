@@ -46,13 +46,18 @@ This page describes the code style guide for LibrePCB developers.
 - Use `nullptr` instead of `NULL` or `0`
 - Use keywords like `const`, `constexpr`, `final`, `override`, ... whenever
   possible
-- Use noexcept specifier in method declarations that never throw exceptions:
+- Use `noexcept` specifier in method declarations that never throw exceptions:
 
       void foo() noexcept;    // this method never throws exceptions
 
 - Use smart pointers `std::unique_ptr` or `std::shared_ptr` for object
   ownership (instead of raw pointers). But never use `QSharedPointer`
   and try to avoid `QScopedPointer` for new code.
+- In conditionals, use explicit parentheses for operator precedence:
+  `if ((!foo) || (foo == bar))`
+- Prefer range-based `for` over `foreach`
+- Prefer `QVector` over `QList` (unless high-mutation large collections)
+- Every source file must include the standard GPL license header (copy&paste)
 
 
 # Header Files {#doc_code_style_guide_header_files}
@@ -71,7 +76,7 @@ This page describes the code style guide for LibrePCB developers.
 - File Names: Exactly same naming as classes, but all characters lowercase.
   Example: `lengthunit.cpp`, `lengthunit.h`
 - Namespaces: lowercase (with underline as separator if needed).
-- Classes: UpperCamelCase (for common prefixes, use the underline as separator.
+- Classes: PascalCase (for common prefixes, use the underline as separator.
   Example: `librepcb::project::editor::SchematicEditorState_Select`)
 - Interfaces: Like classes, but with prefix `IF_`.
   Example: `librepcb::IF_GraphicsViewEventHandler`
@@ -82,6 +87,7 @@ This page describes the code style guide for LibrePCB developers.
   Example: `sSomeStaticVariable`
 - Function Parameters: lowerCamelCase
 - Local Variables: lowerCamelCase
+- Enum values: PascalCase (consider UPPER_CASE enum values as legacy).
 - Macros: uppercase, with underline as separator
 
 
