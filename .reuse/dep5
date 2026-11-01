@@ -37,6 +37,7 @@ Files:
  .rustfmt.toml
  .tx/*
  .typos.toml
+ AGENTS.md
  AUTHORS.md
  ci/*
  CONTRIBUTING.md
