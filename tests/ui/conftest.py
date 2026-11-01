@@ -476,6 +476,7 @@ class LibrePcbFixture(object):
         self.env = deepcopy(os.environ)
         # Make GUI independent from the system's language
         self.env["LC_ALL"] = "C"
+        self.env["LANGUAGE"] = ""  # Make sure only LC_ALL is used
         # Override configuration location to make tests independent of existing configs
         self.env["LIBREPCB_CONFIG_DIR"] = os.path.join(self.tmpdir, "config")
         # Override cache location to make each test indepotent
