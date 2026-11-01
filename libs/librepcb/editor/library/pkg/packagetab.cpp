@@ -447,10 +447,13 @@ ui::PackageTabData PackageTab::getDerivedUiData() const noexcept {
       mToolZoneRules.testFlag(Zone::Rule::NoPlanes),  // Tool no planes
       mToolZoneRules.testFlag(Zone::Rule::NoExposure),  // Tool no exposure
       mToolZoneRules.testFlag(Zone::Rule::NoDevices),  // Tool no devices
+      mUsagesModel != nullptr,  // Show usages
+      mUsagesModel,  // Usages
       q2s(mSceneImagePos),  // Scene image position
       mFrameIndex,  // Frame index
-      slint::SharedString(),  // New category
-      slint::SharedString(),  // New footprint
+      {},  // New category
+      {},  // New footprint
+      {},  // Open device
   };
 }
 
@@ -600,6 +603,14 @@ void PackageTab::setDerivedUiData(const ui::PackageTabData& data) noexcept {
   emit zoneRuleRequested(Zone::Rule::NoPlanes, data.tool_no_planes);
   emit zoneRuleRequested(Zone::Rule::NoExposure, data.tool_no_exposures);
   emit zoneRuleRequested(Zone::Rule::NoDevices, data.tool_no_devices);
+
+  // Find usages
+  if (!data.show_usages) {
+    mUsagesModel.reset();
+  }
+  if ((!data.open_device.empty()) && mWindow) {
+    mWindow->requestDeviceTab(FilePath(s2q(data.open_device)));
+  }
 
   requestRepaint();
 }
@@ -767,6 +778,68 @@ void PackageTab::trigger(ui::TabAction a) noexcept {
     }
     case ui::TabAction::SelectAll: {
       mFsm->processSelectAll();
+      break;
+    }
+    case ui::TabAction::FindUsages: {
+      try {
+        std::vector<ui::TreeViewItemData> items;
+        QHash<FilePath, std::pair<slint::Image, QString>> libraries;
+        const auto& db = mApp.getWorkspace().getLibraryDb();
+        const auto& localeOrder =
+            mApp.getWorkspace().getSettings().libraryLocaleOrder.get();
+        const auto devices = db.getPackageDevices(mPackage->getUuid());
+        for (const Uuid& dev : devices) {
+          const FilePath fp = db.getLatest<Device>(dev);
+          if (!fp.isValid()) continue;
+          QString name, description;
+          if (!db.getTranslations<Device>(fp, localeOrder, &name,
+                                          &description)) {
+            continue;
+          }
+          const FilePath libFp = fp.getParentDir().getParentDir();
+          auto libIt = libraries.find(libFp);
+          if (libIt == libraries.end()) {
+            QPixmap icon;
+            QString name;
+            if (!mPackage->getDirectory().getAbsPath().isLocatedInDir(libFp)) {
+              db.getTranslations<Library>(libFp, localeOrder, &name);
+            }
+            db.getLibraryMetadata(libFp, &icon);
+            libIt = libraries.insert(libFp, std::make_pair(q2s(icon), name));
+          }
+          QString comment = description.split('\n').first().left(200);
+          if ((!libIt->second.isEmpty()) && (!name.contains(libIt->second))) {
+            if (!comment.isEmpty()) {
+              comment.prepend(" | ");
+            }
+            comment.prepend(libIt->second);
+          }
+          ui::TreeViewItemData item = {};
+          item.icon = libIt->first;
+          item.text = q2s(name);
+          item.comment = q2s(comment);
+          item.status_tip = q2s(libIt->second);
+          item.user_data = q2s(fp.toStr());
+          items.push_back(item);
+        }
+        Toolbox::sortNumeric(
+            items,
+            [](const QCollator& collator, const ui::TreeViewItemData& lhs,
+               const ui::TreeViewItemData& rhs) {
+              if (lhs.status_tip.empty() != rhs.status_tip.empty()) {
+                return lhs.status_tip.empty();
+              } else if (lhs.status_tip != rhs.status_tip) {
+                return collator(s2q(lhs.status_tip), s2q(rhs.status_tip));
+              } else {
+                return collator(s2q(lhs.text), s2q(rhs.text));
+              }
+            });
+        mUsagesModel =
+            std::make_shared<slint::VectorModel<ui::TreeViewItemData>>(items);
+        onDerivedUiDataChanged.notify();
+      } catch (const Exception& e) {
+        QMessageBox::critical(getWindow(), tr("Error"), e.getMsg());
+      }
       break;
     }
     case ui::TabAction::Abort: {

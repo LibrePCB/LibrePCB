@@ -1223,6 +1223,9 @@ void MainWindow::openLibraryElementTab(LibraryEditor& editor,
                                        const FilePath& fp) noexcept {
   if (!switchToLibraryElementTab<Tab>(fp)) {
     try {
+      if (!fp.isLocatedInDir(editor.getFilePath())) {
+        throw LogicError(__FILE__, __LINE__);
+      }
       auto fs = TransactionalFileSystem::open(
           fp, editor.isWritable(), &askForRestoringBackup,
           DirectoryLockHandlerDialog::createDirectoryLockCallback());

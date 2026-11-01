@@ -1198,6 +1198,15 @@ export component MainMenuBar {
                         close-menu();
                     }
                 }
+
+                find-package-usages-item := MenuItem {
+                    cmd: Cmd.find-usages;
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.find-usages);
+                        close-menu();
+                    }
+                }
             }
         }
 
