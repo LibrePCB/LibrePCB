@@ -84,9 +84,9 @@
 namespace librepcb {
 namespace editor {
 
-static const QSet<ui::PanelPage> sPersistentPages{
+static const QSet<ui::PanelPage> sExcludedPanelPages{
     ui::PanelPage::Home,
-    ui::PanelPage::Documents,
+    //ui::PanelPage::Documents,
     ui::PanelPage::Libraries,
     ui::PanelPage::About,
 };
@@ -271,84 +271,13 @@ MainWindow::MainWindow(GuiApplication& app,
         this, [this, project, board, a]() { triggerBoard(project, board, a); },
         Qt::QueuedConnection);
   });
-  b.on_push_tab_panel_page([this](ui::TabType tab, ui::PanelPage page) {
-    /*static const QSet<ui::TabType> sLibraryTabs{
-        ui::TabType::Library,         ui::TabType::ComponentCategory,
-        ui::TabType::PackageCategory, ui::TabType::Symbol,
-        ui::TabType::Package,         ui::TabType::Component,
-        ui::TabType::Device,          ui::TabType::Organization,
-    };
-    static const QSet<ui::TabType> sProjectTabs{
-        ui::TabType::ProjectLibrary,
-        ui::TabType::Schematic,
-        ui::TabType::Board2d,
-        ui::TabType::Board3d,
-    };*/
-
-    if (sPersistentPages.contains(page)) {
-      return;
-    }
-
-    static const QHash<ui::PanelPage, QVector<QSet<ui::TabType>>> sGroups{
-        {ui::PanelPage::Layers,
-         {
-             {
-                 ui::TabType::Board2d,
-             },
-         }},
-        {ui::PanelPage::PlaceDevices,
-         {
-             {
-                 ui::TabType::Board2d,
-             },
-         }},
-        {ui::PanelPage::RuleCheck,
-         {
-             {
-                 ui::TabType::Library,
-                 ui::TabType::ComponentCategory,
-                 ui::TabType::PackageCategory,
-                 ui::TabType::Symbol,
-                 ui::TabType::Package,
-                 ui::TabType::Component,
-                 ui::TabType::Device,
-                 ui::TabType::Organization,
-             },
-             {
-                 ui::TabType::Schematic,
-                 ui::TabType::Board2d,
-             },
-         }},
-        {ui::PanelPage::Order,
-         {
-             {
-                 ui::TabType::ProjectLibrary,
-                 ui::TabType::Schematic,
-                 ui::TabType::Board2d,
-                 ui::TabType::Board3d,
-             },
-         }},
-    };
-
-    auto set = [this](ui::TabType tab, ui::PanelPage page) {
-      auto& stack = mPanelPageStack[tab];
-      stack.removeAll(page);
-      stack.append(page);
-    };
-
-    for (const auto& group : sGroups.value(page)) {
-      if (group.contains(tab)) {
-        for (const auto& t : group) {
-          set(t, page);
-        }
-      }
-    }
-    set(tab, page);
-  });
-  b.on_pop_tab_panel_page([this](ui::TabType tab, ui::PanelPage currentPage) {
-    if (sPersistentPages.contains(currentPage)) {
-      return currentPage;
-    }
+  b.on_push_panel_page(std::bind(&MainWindow::pushPanelPage, this,
+                                 std::placeholders::_1, std::placeholders::_2,
+                                 std::placeholders::_3));
+  b.on_pop_panel_page([this](ui::TabType tab, ui::PanelPage currentPage) {
+    // if (sPersistentPages.contains(currentPage)) {
+    //   return currentPage;
+    // }
 
     /*static const QSet<ui::PanelPage> sSupportedProjectPages{
         ui::PanelPage::Order,
@@ -602,8 +531,88 @@ std::shared_ptr<WindowTab> MainWindow::removeTab(
   return nullptr;
 }
 
-void MainWindow::showPanelPage(ui::PanelPage page) noexcept {
-  mWindow->global<ui::Data>().invoke_set_panel_page(page);
+void MainWindow::showPanelPage(ui::PanelPage page,
+                               ui::PushPanelPageScope scope) noexcept {
+  mWindow->global<ui::Data>().invoke_set_panel_page(page, scope);
+}
+
+void MainWindow::pushPanelPage(ui::TabType tab, ui::PanelPage page,
+                               ui::PushPanelPageScope scope) noexcept {
+  /*static const QSet<ui::TabType> sLibraryTabs{
+      ui::TabType::Library,         ui::TabType::ComponentCategory,
+      ui::TabType::PackageCategory, ui::TabType::Symbol,
+      ui::TabType::Package,         ui::TabType::Component,
+      ui::TabType::Device,          ui::TabType::Organization,
+  };
+  static const QSet<ui::TabType> sProjectTabs{
+      ui::TabType::ProjectLibrary,
+      ui::TabType::Schematic,
+      ui::TabType::Board2d,
+      ui::TabType::Board3d,
+  };*/
+
+  if (sExcludedPanelPages.contains(page)) {
+    return;
+  }
+
+  static const QHash<ui::PanelPage, QVector<QSet<ui::TabType>>> sGroups{
+      {ui::PanelPage::Layers,
+       {
+           {
+               ui::TabType::Board2d,
+           },
+       }},
+      {ui::PanelPage::PlaceDevices,
+       {
+           {
+               ui::TabType::Board2d,
+           },
+       }},
+      {ui::PanelPage::RuleCheck,
+       {
+           {
+               ui::TabType::Library,
+               ui::TabType::ComponentCategory,
+               ui::TabType::PackageCategory,
+               ui::TabType::Symbol,
+               ui::TabType::Package,
+               ui::TabType::Component,
+               ui::TabType::Device,
+               ui::TabType::Organization,
+           },
+           {
+               ui::TabType::Schematic,
+               ui::TabType::Board2d,
+           },
+       }},
+      {ui::PanelPage::Order,
+       {
+           {
+               ui::TabType::ProjectLibrary,
+               ui::TabType::Schematic,
+               ui::TabType::Board2d,
+               ui::TabType::Board3d,
+           },
+       }},
+  };
+
+  auto set = [this](ui::TabType tab, ui::PanelPage page) {
+    auto& stack = mPanelPageStack[tab];
+    stack.removeAll(page);
+    stack.append(page);
+  };
+
+  if ((scope == ui::PushPanelPageScope::RelatedTabs) ||
+      (scope == ui::PushPanelPageScope::AllTabs)) {
+    for (const auto& group : sGroups.value(page)) {
+      if ((scope == ui::PushPanelPageScope::AllTabs) || group.contains(tab)) {
+        for (const auto& t : group) {
+          set(t, page);
+        }
+      }
+    }
+  }
+  set(tab, page);
 }
 
 void MainWindow::popUpNotifications() noexcept {

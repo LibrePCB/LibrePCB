@@ -227,7 +227,8 @@ void DownloadLibraryTab::downloadFinished(bool success,
   if (success) {
     // Highlight the new library in the libraries tab.
     if (mWindow) {
-      mWindow->showPanelPage(ui::PanelPage::Libraries);
+      mWindow->showPanelPage(ui::PanelPage::Libraries,
+                             ui::PushPanelPageScope::CurrentTab);
       mApp.getLocalLibraries().highlightLibraryOnNextRescan(mDirectory);
     }
 

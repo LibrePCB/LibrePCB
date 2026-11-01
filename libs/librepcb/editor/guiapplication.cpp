@@ -215,7 +215,8 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
   connect(mNotificationNoLibrariesInstalled.get(), &Notification::buttonClicked,
           this, [this]() {
             if (auto win = getCurrentWindow()) {
-              win->showPanelPage(ui::PanelPage::Libraries);
+              win->showPanelPage(ui::PanelPage::Libraries,
+                                 ui::PushPanelPageScope::CurrentTab);
             }
           });
   connect(&mWorkspace.getLibraryDb(),
@@ -305,7 +306,8 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
   connect(mRemoteLibraries.get(), &LibrariesModel::panelPageRequested, this,
           [this]() {
             if (auto win = getCurrentWindow()) {
-              win->showPanelPage(ui::PanelPage::Libraries);
+              win->showPanelPage(ui::PanelPage::Libraries,
+                                 ui::PushPanelPageScope::CurrentTab);
             }
           });
   connect(mRemoteLibraries.get(), &LibrariesModel::notificationEmitted,
@@ -440,9 +442,9 @@ std::shared_ptr<LibraryEditor> GuiApplication::getLibrary(
 std::shared_ptr<LibraryEditor> GuiApplication::openLibrary(
     const FilePath& libDir) noexcept {
   auto switchToLibrary = [this](int index) {
-    if (auto win =  getCurrentWindow()) {
+    if (auto win = getCurrentWindow()) {
       win->setCurrentLibrary(index);
-     // win->showPanelPage(ui::PanelPage::Documents);
+      // win->showPanelPage(ui::PanelPage::Documents);
     }
   };
 
@@ -479,6 +481,14 @@ std::shared_ptr<LibraryEditor> GuiApplication::openLibrary(
         DirectoryLockHandlerDialog::createDirectoryLockCallback());  // can
                                                                      // throw
 
+    // Make sure the UI switched to the documents panel when opening the
+    // new tab.
+    //if (auto win = getCurrentWindow()) {
+    //  win->pushPanelPage(ui::TabType::Library,
+    //                     ui::PanelPage::Documents,
+    //                     ui::PushPanelPageScope::CurrentTab);
+    //}
+
     // Open library.
     auto lib = Library::open(
         std::make_unique<TransactionalDirectory>(fs));  // can throw
@@ -491,9 +501,6 @@ std::shared_ptr<LibraryEditor> GuiApplication::openLibrary(
         [this, libDir]() { closeLibrary(libDir); }, Qt::QueuedConnection);
     mLibraries->insert(index, editor);
     switchToLibrary(index);
-     if (auto win =  getCurrentWindow()) {
-    win->showPanelPage(ui::PanelPage::Documents);
-    }
     return editor;
   } catch (const UserCanceled& e) {
   } catch (const Exception& e) {
@@ -567,9 +574,10 @@ std::shared_ptr<ProjectEditor> GuiApplication::openProject(
   }
 
   auto switchToProject = [this](int index) {
-    for (auto win : mWindows->values()) {
+    if (auto win = getCurrentWindow()) {
       win->setCurrentProject(index);
-      win->showPanelPage(ui::PanelPage::Documents);
+      win->showPanelPage(ui::PanelPage::Documents,
+                         ui::PushPanelPageScope::RelatedTabs);
     }
   };
 

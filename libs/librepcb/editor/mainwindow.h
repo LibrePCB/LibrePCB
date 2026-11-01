@@ -93,7 +93,9 @@ public:
   std::shared_ptr<WindowTab> removeTab(
       int section, int tab, bool* wasCurrentTab = nullptr,
       bool* wasCurrentSection = nullptr) noexcept;
-  void showPanelPage(ui::PanelPage page) noexcept;
+  void showPanelPage(ui::PanelPage page, ui::PushPanelPageScope scope) noexcept;
+  void pushPanelPage(ui::TabType tab, ui::PanelPage page,
+                     ui::PushPanelPageScope scope) noexcept;
   void popUpNotifications() noexcept;
   void showStatusBarMessage(const QString& message, int timeoutMs);
   void highlightErcMessage(ProjectEditor& prjEditor,
