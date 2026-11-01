@@ -31,7 +31,7 @@ jobs:
       matrix:
         include:
           - name: MacOS ARM64
-            runner: macos-14  # Must be an ARM64 CPU: https://github.com/actions/runner-images
+            runner: macos-15  # Must be an ARM64 CPU: https://github.com/actions/runner-images
             arch: arm64
             deployment_target: '11'
             uv_url: 'https://github.com/astral-sh/uv/releases/download/0.12.10/uv-aarch64-apple-darwin.tar.gz'
