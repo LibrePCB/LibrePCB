@@ -94,6 +94,14 @@ FileSystemModel::~FileSystemModel() noexcept {
 }
 
 /*******************************************************************************
+ *  General Methods
+ ******************************************************************************/
+
+void FileSystemModel::createNewFolder() noexcept {
+  createFolder(mRoot);
+}
+
+/*******************************************************************************
  *  Implementations
  ******************************************************************************/
 
@@ -272,18 +280,22 @@ void FileSystemModel::trigger(const FilePath& fp,
   if (a == ui::TreeViewItemAction::Open) {
     emit openFileTriggered(fp);
   } else if (a == ui::TreeViewItemAction::NewFolder) {
-    QString n = QInputDialog::getText(qApp->activeWindow(), tr("New Folder"),
-                                      tr("Name:"));
-    n = FilePath::cleanFileName(n, FilePath::CleanFileNameOption::Default);
-    if (!n.isEmpty()) {
-      QDir(fp.toStr()).mkdir(n);
-    }
+    createFolder(fp);
   } else if (a == ui::TreeViewItemAction::NewProject) {
     emit newProjectTriggered(fp);
   } else if (a == ui::TreeViewItemAction::Delete) {
     removeFileOrDirectory(fp);
   } else {
     qWarning() << "Unhandled action in FileSystemModel:" << static_cast<int>(a);
+  }
+}
+
+void FileSystemModel::createFolder(const FilePath& parentDir) noexcept {
+  QString name = QInputDialog::getText(qApp->activeWindow(), tr("New Folder"),
+                                       tr("Name:"));
+  name = FilePath::cleanFileName(name, FilePath::CleanFileNameOption::Default);
+  if (!name.isEmpty()) {
+    QDir(parentDir.toStr()).mkdir(name);
   }
 }
 

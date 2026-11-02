@@ -148,10 +148,7 @@ component WorkspaceFolderTreeView inherits TreeView {
         }
 
         if !context-menu-item.is-project-file-or-folder: new-folder-item := MenuItem {
-            text: @tr("New Folder") + "...";
-            icon: @image-url("../../font-awesome/svgs/solid/folder-plus.svg");
-            status-tip: @tr("Create a new folder");
-            // shortcuts: "Ctrl+N";  // Conflicts with "new project".
+            cmd: Cmd.folder-new;
 
             clicked => {
                 root.model[context-menu-item-index].action = TreeViewItemAction.new-folder;
@@ -202,7 +199,6 @@ component WorkspaceFolderTreeView inherits TreeView {
 }
 
 component NewProjectButton inherits IconButton {
-    width: self.height;
     cmd: Cmd.project-new;
     icon-scale: 0.6;
 
@@ -212,7 +208,6 @@ component NewProjectButton inherits IconButton {
 }
 
 component OpenProjectButton inherits IconButton {
-    width: self.height;
     cmd: Cmd.project-open;
     icon-scale: 0.6;
 
@@ -253,6 +248,15 @@ export component HomePanel inherits VerticalLayout {
         if Data.quick-access-items.length == 0: new-project-btn-2 := NewProjectButton { }
 
         if Data.quick-access-items.length == 0: open-project-btn-2 := OpenProjectButton { }
+
+        new-folder-btn := IconButton {
+            cmd: Cmd.folder-new;
+            icon-scale: 0.6;
+
+            clicked => {
+                Backend.trigger(Action.workspace-new-root-folder);
+            }
+        }
     }
 
     workspace-projects-view := WorkspaceFolderTreeView { }

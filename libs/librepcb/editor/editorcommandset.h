@@ -1760,15 +1760,14 @@ public:
 
   EditorCommandCategory categoryContextMenu{
       "categoryContextMenu", QT_TR_NOOP("Context Menu"), false, &categoryRoot};
-  // Not used anymore, just kept here to not loose the translations.
-  EditorCommand _folderNew{
+  EditorCommand folderNew{
       "folder_new",  // clang-format break
       QT_TR_NOOP("New Folder"),
       QT_TR_NOOP("Create a new folder"),
-      ":/img/actions/new_folder.png",
-      EditorCommand::Flags(),
+      ":/fa/solid/folder-plus.svg",
+      EditorCommand::Flag::OpensPopup,
       {},
-      nullptr,  // &categoryContextMenu,
+      &categoryContextMenu,
   };
   // Not used anymore, just kept here to not loose the translations.
   EditorCommand _favoriteAdd{
