@@ -1,12 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import http.server
 import os
 import platform
 import pytest
 import re
 import shutil
 import slint_testing
+import socket
+import socketserver
+import threading
 import time
 from copy import deepcopy
 from typing import Iterable
@@ -647,28 +651,88 @@ class Helpers(object):
             time.sleep(0.02)
 
 
+class ApiServerMock(object):
+    """
+    Controller for the test API server, allowing tests to customize the
+    response of any endpoint (see the `api_server` fixture below)
+    """
+
+    def __init__(self):
+        self._responses = {}  # path -> (status, headers, body)
+
+    def set_response(self, path, status=200, headers=None, body=b""):
+        """
+        Make the endpoint with the given path respond with the given HTTP
+        status code, response headers and response body
+        """
+        self._responses[path] = (status, headers or {}, body)
+
+    def get_response(self, path):
+        """Get the custom response for the given path, or None"""
+        return self._responses.get(path)
+
+
+class ApiServerHandler(http.server.SimpleHTTPRequestHandler, object):
+    """
+    HTTP request handler for the test server, serving the static files from
+    "tests/data/server", optionally customized by an `ApiServerMock`
+    """
+
+    # Never modified, only exchanged as a whole (see `api_server` fixture)
+    api_mock = ApiServerMock()
+
+    def translate_path(self, path):
+        path = super(ApiServerHandler, self).translate_path(path)
+        relpath = os.path.relpath(path, os.curdir)
+        return os.path.join(DATA_DIR, "server", relpath)
+
+    def do_GET(self):
+        if not self._respond_from_mock():
+            super(ApiServerHandler, self).do_GET()
+
+    def do_POST(self):
+        content_length = int(self.headers.get("Content-Length", 0))
+        self.rfile.read(content_length)
+        if self._respond_from_mock():
+            return
+        if self.path == "/api/v1/order/upload":
+            # Default: Let uploads succeed, redirecting to this URL
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            self.wfile.write(b'{"redirect_url": "https://example.com/order/123"}')
+        else:
+            super(ApiServerHandler, self).do_POST()
+
+    def _respond_from_mock(self):
+        """Respond with the custom response for this path, if one is set"""
+        response = self.api_mock.get_response(self.path)
+        if response is None:
+            return False
+        status, headers, body = response
+        if status >= 400:
+            self.send_error(status)
+        else:
+            self.send_response(status)
+            for key, value in headers.items():
+                self.send_header(key, value)
+            self.end_headers()
+            self.wfile.write(body)
+        return True
+
+
 @pytest.fixture(scope="session")
 def librepcb_server():
     """
-    Fixture which provides a HTTP server at localhost:8080
+    Fixture which provides a HTTP server at localhost:50080
 
     All tests should use this server instead of the official LibrePCB API server
     or GitHub for downloading libraries.
     """
-    import time
-    import threading
-    import socket
-    import socketserver
-    import http.server
-
-    class Handler(http.server.SimpleHTTPRequestHandler, object):
-        def translate_path(self, path):
-            path = super(Handler, self).translate_path(path)
-            relpath = os.path.relpath(path, os.curdir)
-            return os.path.join(DATA_DIR, "server", relpath)
-
     # Set SO_REUSEADDR option to avoid "port already in use" errors
-    httpd = socketserver.TCPServer(("", 50080), Handler, bind_and_activate=False)
+    httpd = socketserver.TCPServer(
+        ("", 50080), ApiServerHandler, bind_and_activate=False
+    )
     httpd.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     httpd.server_bind()
     httpd.server_activate()
@@ -676,6 +740,17 @@ def librepcb_server():
     thread.daemon = True
     thread.start()
     time.sleep(0.2)  # wait a bit to make sure the server is ready
+
+
+@pytest.fixture
+def api_server(librepcb_server):
+    """
+    Fixture providing an `ApiServerMock` to control the endpoints of the
+    test server (gets reset to the default behavior after the test)
+    """
+    ApiServerHandler.api_mock = ApiServerMock()
+    yield ApiServerHandler.api_mock
+    ApiServerHandler.api_mock = ApiServerMock()
 
 
 @pytest.fixture(scope="session")
