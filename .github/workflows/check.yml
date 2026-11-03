@@ -28,6 +28,16 @@ jobs:
       - name: Find Unused Code
         run: python3 ./dev/find_unused_code.py
         if: ${{ !cancelled() }}
+      # Make sure tests/data is based on master so it can be fast-forward merged.
+      - name: Check Submodule Base of tests/data
+        run: |
+          git -C tests/data fetch -- origin master
+          git -C tests/data merge-base --is-ancestor origin/master HEAD
+      # Sanity check so we don't forget to merge submodule changes to master
+      # after merging the corresponding LibrePCB branch.
+      - name: Check Submodule Branch of tests/data
+        run: git -C tests/data merge-base --is-ancestor HEAD origin/master
+        if: ${{ github.ref == 'refs/heads/master' }}
 
   clang-tidy:
     name: Clang Tidy
