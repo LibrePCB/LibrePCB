@@ -394,6 +394,32 @@ void SlintGraphicsView::zoomToSceneRect(const QRectF& r,
   smoothTo(projection);
 }
 
+void SlintGraphicsView::applyContinuousMotion(const QPointF& panDelta,
+                                              qreal zoomFactor) noexcept {
+  // Ignore no-op motion.
+  if ((panDelta == QPointF(0, 0)) && (zoomFactor == qreal(1))) {
+    return;
+  }
+
+  Projection projection = mProjection;
+  projection.autoFitInView = false;
+
+  // The delta is in screen space, so flip X if the view is mirrored.
+  QPointF delta = panDelta;
+  if (mMirror) {
+    delta.setX(-delta.x());
+  }
+  projection.offset += delta / projection.scale;
+
+  // Zoom around the view center, which is unaffected by mirroring.
+  if (zoomFactor != qreal(1)) {
+    const QPointF center(mViewSize.width() / 2, mViewSize.height() / 2);
+    applyZoomAroundPoint(projection, center, zoomFactor);
+  }
+
+  applyProjection(projection);
+}
+
 /*******************************************************************************
  *  Static Methods
  ******************************************************************************/
@@ -438,14 +464,10 @@ void SlintGraphicsView::scroll(const QPointF& delta) noexcept {
   applyProjection(projection);
 }
 
-void SlintGraphicsView::zoom(QPointF center, qreal factor) noexcept {
-  if (mMirror && (mViewSize.width() > 0)) {
-    center.setX(mViewSize.width() - center.x());
-  }
-
-  Projection projection = mProjection;
-  projection.autoFitInView = false;
-
+void SlintGraphicsView::applyZoomAroundPoint(Projection& projection,
+                                             const QPointF& center,
+                                             qreal factor) noexcept {
+  // Zooms around `center` (view pixels), keeping it stationary on screen.
   QTransform tf;
   tf.translate(projection.offset.x(), projection.offset.y());
   tf.scale(1 / projection.scale, 1 / projection.scale);
@@ -457,7 +479,16 @@ void SlintGraphicsView::zoom(QPointF center, qreal factor) noexcept {
   tf2.scale(1 / projection.scale, 1 / projection.scale);
   const QPointF scenePos2 = tf2.map(center);
   projection.offset -= scenePos2 - scenePos0;
+}
 
+void SlintGraphicsView::zoom(QPointF center, qreal factor) noexcept {
+  if (mMirror && (mViewSize.width() > 0)) {
+    center.setX(mViewSize.width() - center.x());
+  }
+
+  Projection projection = mProjection;
+  projection.autoFitInView = false;
+  applyZoomAroundPoint(projection, center, factor);
   applyProjection(projection);
 }
 

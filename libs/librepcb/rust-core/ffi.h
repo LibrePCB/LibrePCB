@@ -128,6 +128,11 @@ enum class InteractiveHtmlBomViewMode {
 };
 
 /**
+ * Opaque handle exposed to C++, wrapping a [`SpaceMouseBackend`].
+ */
+struct FfiSpaceMouseBackend;
+
+/**
  * Interactive HTML BOM structure
  *
  * The top-level structure to build & generate a HTML BOM.
@@ -276,6 +281,53 @@ struct InteractiveHtmlBomRefMap {
    */
   size_t id;
 };
+
+/**
+ * Plain-old-data mirror of [`SpaceMouseMotion`] with a stable `#[repr(C)]`
+ * layout for use across the FFI boundary.
+ */
+struct SpaceMouseMotionFfi {
+  /**
+   * Pan left(-)/right(+)
+   */
+  int16_t translation_x;
+  /**
+   * Pan away(-)/towards(+) the user
+   */
+  int16_t translation_y;
+  /**
+   * Pan/zoom down(-)/up(+)
+   */
+  int16_t translation_z;
+  /**
+   * Tilt (pitch)
+   */
+  int16_t rotation_x;
+  /**
+   * Tilt (roll)
+   */
+  int16_t rotation_y;
+  /**
+   * Twist (yaw)
+   */
+  int16_t rotation_z;
+};
+
+/**
+ * C ABI callback invoked whenever the device reports new motion.
+ *
+ * <div class="warning">
+ * Fires on a background thread owned by the Rust side, *not* the thread
+ * that called [`ffi_spacemouse_backend_new`].
+ * </div>
+ */
+using MotionCallback = void(*)(void *user_data, SpaceMouseMotionFfi motion);
+
+/**
+ * C ABI callback invoked whenever a compatible device is connected or
+ * disconnected. Same threading caveat as [`MotionCallback`].
+ */
+using ConnectedCallback = void(*)(void *user_data, bool connected);
 
 extern "C" {
 
@@ -526,6 +578,44 @@ double ffi_math_arc_radius_and_center(double dx,
                                       double angle,
                                       double * NONNULL x,
                                       double * NONNULL y);
+
+/**
+ * Create a new backend and start capturing device input in the background.
+ *
+ * `user_data` is passed back unmodified to every callback. It must stay
+ * valid until [`ffi_spacemouse_backend_free`] returns. Callbacks must not
+ * call back into Rust synchronously.
+ *
+ * Never returns null. Finding no device is not an error, it is reported
+ * through `on_connected_changed`.
+ */
+FfiSpaceMouseBackend *ffi_spacemouse_backend_new(void *user_data,
+                                                 MotionCallback on_motion,
+                                                 ConnectedCallback on_connected_changed);
+
+/**
+ * Whether a compatible device is currently detected as connected.
+ */
+bool ffi_spacemouse_backend_is_connected(const FfiSpaceMouseBackend * NONNULL backend);
+
+/**
+ * Set whether the device's LED (if it has one) should be lit.
+ *
+ * Applied immediately if a device is open, and again on every connect.
+ * Devices without an LED and write failures are ignored. See
+ * [`SpaceMouseBackend::set_led`] for details.
+ */
+void ffi_spacemouse_backend_set_led(const FfiSpaceMouseBackend * NONNULL backend,
+                                    bool enabled);
+
+/**
+ * Stop capturing, join the background thread, and free the backend.
+ *
+ * # Safety (from the C++ side)
+ * `backend` must be a non-null pointer previously returned by
+ * [`ffi_spacemouse_backend_new`] and not already freed.
+ */
+void ffi_spacemouse_backend_free(FfiSpaceMouseBackend *backend);
 
 /**
  * Wrapper for [increment_number_in_string]

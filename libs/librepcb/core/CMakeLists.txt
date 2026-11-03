@@ -569,6 +569,8 @@ add_library(
   workspace/workspacesettingsitem_genericvaluelist.h
   workspace/workspacesettingsitem_keyboardshortcuts.cpp
   workspace/workspacesettingsitem_keyboardshortcuts.h
+  workspace/workspacesettingsitem_spacemouse.cpp
+  workspace/workspacesettingsitem_spacemouse.h
 )
 target_include_directories(
   librepcb_core

@@ -59,6 +59,7 @@ class MeasureTool;
 class PartListModel;
 class SlintGraphicsView;
 class SymbolGraphicsItem;
+struct SpaceMouseMotionEvent;
 
 /*******************************************************************************
  *  Class DeviceTab
@@ -103,6 +104,8 @@ public:
       const slint::language::KeyEvent& e) noexcept override;
   bool processSceneKeyReleased(
       const slint::language::KeyEvent& e) noexcept override;
+  void processSpaceMouseEvent(const SpaceMouseMotionEvent& e,
+                              qreal dtSeconds) noexcept override;
   bool requestClose() noexcept override;
 
   // IF_GraphicsViewEventHandler
@@ -174,6 +177,9 @@ private:
   bool mChooseCategory;
   bool mElementDuplicated;
   int mFrameIndex;
+
+  // View last hovered by the cursor, which the SpaceMouse drives.
+  int mLastPointerScene;
 
   // Library metadata to be applied
   slint::SharedString mName;
