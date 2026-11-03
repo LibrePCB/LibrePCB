@@ -136,7 +136,7 @@ export component OrderPanel inherits FocusScope {
     property <bool> api-error: board-selected && board.order-info-url.is-empty && (!board.order-status.is-empty);
     property <bool> api-ready: board-selected && (!board.order-info-url.is-empty);
     property <bool> uploading: board-selected && board.order-upload-progress >= 0;
-    property <bool> is-enabled: api-ready && (!uploading) && ((!clicked) || board.order-upload-url.is-empty);
+    property <bool> is-enabled: api-ready && (!uploading) && (retry-delay-seconds == 0);
     property <bool> erc-good: (project.erc.state == RuleCheckState.up-to-date) && (project.erc.unapproved == 0);
     property <bool> drc-good: (board.drc.state == RuleCheckState.up-to-date) && (board.drc.unapproved == 0);
     property <string> error-text: {
@@ -150,7 +150,20 @@ export component OrderPanel inherits FocusScope {
             ""
         }
     };
-    property <bool> clicked: false;
+
+    // Do not allow to upload too many times in a short time period. After the
+    // upload is completed, keep the button disabled for a few more seconds.
+    // However, afterwards we have to re-enable it again to avoid issue
+    // https://github.com/LibrePCB/LibrePCB/issues/1864.
+    property <int> retry-delay-seconds: 0;
+    Timer {
+        interval: 1s;
+        running: (retry-delay-seconds > 0) && (!uploading);
+
+        triggered => {
+            retry-delay-seconds -= 1;
+        }
+    }
 
     // Request updating API status information.
     function request-info() {
@@ -263,12 +276,19 @@ export component OrderPanel inherits FocusScope {
             }
 
             upload-btn := Button {
+                property <string> suffix: {
+                    if (retry-delay-seconds > 0) && (!uploading) {
+                        " (\{retry-delay-seconds}s)"
+                    } else {
+                        ""
+                    }
+                }
                 primary: is-enabled && erc-good && drc-good;
                 enabled: is-enabled;
-                text: @tr("Upload Project");
+                text: @tr("Upload Project") + suffix;
 
                 clicked => {
-                    clicked = true;
+                    retry-delay-seconds = 7;
                     Backend.trigger-board(project-index, board-index, BoardAction.start-order);
                 }
             }
