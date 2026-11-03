@@ -34,6 +34,9 @@ export global Shortcuts {
         } else if Backend.is-shortcut(event, Cmd.project-library-manager) {
             Backend.trigger-project(project, ProjectAction.open-library-manager);
             return true;
+        } else if Backend.is-shortcut(event, Cmd.renumber-components) {
+            Data.set-panel-page(PanelPage.renumber-components);
+            return true;
         } else if Backend.is-shortcut(event, Cmd.sheet-new) {
             Backend.trigger-project(project, ProjectAction.new-sheet);
             return true;
