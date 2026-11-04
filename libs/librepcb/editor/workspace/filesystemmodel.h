@@ -61,6 +61,9 @@ public:
                            QObject* parent = nullptr) noexcept;
   ~FileSystemModel() noexcept override;
 
+  // General Methods
+  void createNewFolder() noexcept;
+
   // Implementations
   std::size_t row_count() const override;
   std::optional<ui::TreeViewItemData> row_data(std::size_t i) const override;
@@ -80,6 +83,7 @@ private:
   void directoryChanged(const QString& dir) noexcept;
   void favoriteProjectChanged(const FilePath& fp, bool favorite) noexcept;
   void trigger(const FilePath& fp, ui::TreeViewItemAction a) noexcept;
+  void createFolder(const FilePath& parentDir) noexcept;
   void removeFileOrDirectory(const FilePath& fp) noexcept;
 
   const Workspace& mWorkspace;

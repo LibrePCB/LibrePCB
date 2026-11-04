@@ -5,6 +5,11 @@
 mainWindow = mainWindow
 mainWindowTestAdapter = {mainWindow}::testAdapter
 
+# New folder input dialog
+mainWindowNewFolderDialog = {mainWindow}::QInputDialog
+mainWindowNewFolderDialogNameEdit = {mainWindowNewFolderDialog}::QLineEdit
+mainWindowNewFolderDialogOkButton = {mainWindowNewFolderDialog}::QDialogButtonBox::QPushButton
+
 
 ################################################################################
 # Library Editor

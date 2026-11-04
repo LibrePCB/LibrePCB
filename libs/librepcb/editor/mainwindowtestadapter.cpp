@@ -67,6 +67,8 @@ MainWindowTestAdapter::~MainWindowTestAdapter() noexcept {
 QVariant MainWindowTestAdapter::trigger(QVariant action) noexcept {
   if (action == "workspace-switch") {
     emit actionTriggered(ui::Action::WorkspaceSwitch);
+  } else if (action == "workspace-new-root-folder") {
+    emit actionTriggered(ui::Action::WorkspaceNewRootFolder);
   } else if (action == "workspace-settings") {
     emit actionTriggered(ui::Action::WorkspaceSettings);
   } else if (action == "project-new") {

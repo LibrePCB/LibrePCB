@@ -166,12 +166,12 @@ MainWindow::MainWindow(GuiApplication& app,
       std::bind(&MainWindow::closeRequested, this));
 
   // Prepare file system model.
-  auto fileSystemModel = std::make_shared<FileSystemModel>(
+  mFileSystemModel = std::make_shared<FileSystemModel>(
       mApp.getWorkspace(), mApp.getWorkspace().getProjectsPath(),
       mSettingsPrefix % "/workspace_tree", &mApp.getQuickAccess());
-  connect(fileSystemModel.get(), &FileSystemModel::openFileTriggered, &mApp,
+  connect(mFileSystemModel.get(), &FileSystemModel::openFileTriggered, &mApp,
           [this](const FilePath& fp) { mApp.openFile(fp, mWidget); });
-  connect(fileSystemModel.get(), &FileSystemModel::newProjectTriggered, &mApp,
+  connect(mFileSystemModel.get(), &FileSystemModel::newProjectTriggered, &mApp,
           [this](const FilePath& parentDir) {
             mApp.createProject(parentDir, false, mWidget);
           });
@@ -182,7 +182,7 @@ MainWindow::MainWindow(GuiApplication& app,
   d.set_sections(mSections);
   d.set_current_section_index(0);
   d.set_cursor_coordinates(slint::SharedString());
-  d.set_workspace_folder_tree(fileSystemModel);
+  d.set_workspace_folder_tree(mFileSystemModel);
   d.set_notifications_unread(
       mApp.getNotifications().getUnreadNotificationsCount());
   d.set_notifications_progress_index(
@@ -823,6 +823,10 @@ void MainWindow::trigger(ui::Action a) noexcept {
     }
 
     // Workspace
+    case ui::Action::WorkspaceNewRootFolder: {
+      mFileSystemModel->createNewFolder();
+      break;
+    }
     case ui::Action::WorkspaceOpenFolder: {
       StandardEditorCommandHandler handler(mApp.getWorkspace().getSettings(),
                                            mWidget);

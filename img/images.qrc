@@ -57,6 +57,7 @@
         <file alias="/fa/solid/file-pdf.svg">../libs/font-awesome/svgs/solid/file-pdf.svg</file>
         <file alias="/fa/solid/file-zipper.svg">../libs/font-awesome/svgs/solid/file-zipper.svg</file>
         <file alias="/fa/solid/folder-open.svg">../libs/font-awesome/svgs/solid/folder-open.svg</file>
+        <file alias="/fa/solid/folder-plus.svg">../libs/font-awesome/svgs/solid/folder-plus.svg</file>
         <file alias="/fa/solid/font.svg">../libs/font-awesome/svgs/solid/font.svg</file>
         <file alias="/fa/solid/globe.svg">../libs/font-awesome/svgs/solid/globe.svg</file>
         <file alias="/fa/solid/heart.svg">../libs/font-awesome/svgs/solid/heart.svg</file>

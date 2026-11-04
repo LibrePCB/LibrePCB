@@ -49,6 +49,7 @@ class Symbol;
 
 namespace editor {
 
+class FileSystemModel;
 class GuiApplication;
 class LibraryEditor;
 class MainWindowTestAdapter;
@@ -183,6 +184,7 @@ private:
   slint::ComponentHandle<ui::AppWindow> mWindow;
   QWidget* mWidget;
   std::shared_ptr<UiObjectList<WindowSection, ui::WindowSectionData>> mSections;
+  std::shared_ptr<FileSystemModel> mFileSystemModel;
   std::unique_ptr<ProjectReadmeRenderer> mProjectPreviewRenderer;
   std::unique_ptr<MainWindowTestAdapter> mTestAdapter;
 

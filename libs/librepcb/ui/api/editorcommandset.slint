@@ -1694,6 +1694,16 @@ export global EditorCommandSet {
         key: Key.F1,
     };
 
+    in property <EditorCommand> folder-new: {
+        id: "folder_new",
+        icon: @image-url("../../../font-awesome/svgs/solid/folder-plus.svg"),
+        text: "New Folder...",
+        status-tip: "Create a new folder",
+        shortcut: "",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "",
+    };
+
     in property <EditorCommand> vertex-add: {
         id: "vertex_add",
         icon: @image-url(""),
