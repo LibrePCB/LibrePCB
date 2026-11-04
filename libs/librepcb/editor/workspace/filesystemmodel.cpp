@@ -157,8 +157,25 @@ void FileSystemModel::expandDir(const FilePath& fp, std::size_t index,
 
   QDir dir(fp.toStr());
   dir.setFilter(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot);
-  dir.setSorting(QDir::Name | QDir::DirsFirst);
-  foreach (const QFileInfo& info, dir.entryInfoList()) {
+  dir.setSorting(QDir::NoSort);
+  auto entries = dir.entryInfoList();
+
+  // Sort numerically, see https://github.com/LibrePCB/LibrePCB/issues/1923.
+  // But list folders before files, as usual.
+  QCollator collator;
+  collator.setNumericMode(true);
+  collator.setCaseSensitivity(Qt::CaseInsensitive);
+  collator.setIgnorePunctuation(false);  // Make '_' moving item to top
+  std::sort(entries.begin(), entries.end(),
+            [&](const QFileInfo& i1, const QFileInfo& i2) {
+              if (i1.isDir() != i2.isDir()) {
+                return i1.isDir();
+              } else {
+                return collator(i1.fileName(), i2.fileName());
+              }
+            });
+
+  for (const QFileInfo& info : std::as_const(entries)) {
     const FilePath itemFp(info.absoluteFilePath());
     const bool expand = info.isDir() && mExpandedDirs.contains(itemFp);
     if (expand) {
