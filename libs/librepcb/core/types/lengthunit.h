@@ -181,6 +181,18 @@ public:
   int getReasonableNumberOfDecimals() const noexcept;
 
   /**
+   * @brief Get the number of decimals required for the full precision
+   *
+   * Returns the number of decimals which will be required at maximum to
+   * display the number with the full precision. That is 6 decimals for
+   * #millimeters() (due to the Nanometers precision), but 9 decimals for
+   * #inches().
+   *
+   * @return Maximum required number of decimals.
+   */
+  int getMaxNumberOfDecimals() const noexcept;
+
+  /**
    * @brief Get user input suffixes
    *
    * Returns a list of suffixes the user might use to represent this unit. For
