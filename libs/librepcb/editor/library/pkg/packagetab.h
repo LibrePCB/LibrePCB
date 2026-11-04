@@ -313,6 +313,9 @@ private:
   bool mIsInterfaceBroken;
   QSet<Uuid> mOriginalPackagePadUuids;
   FootprintList mOriginalFootprints;
+
+  /// Find usages
+  std::shared_ptr<slint::VectorModel<ui::TreeViewItemData>> mUsagesModel;
 };
 
 /*******************************************************************************

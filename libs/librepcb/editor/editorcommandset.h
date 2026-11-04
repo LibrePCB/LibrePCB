@@ -153,6 +153,15 @@ public:
       {QKeySequence(Qt::SHIFT | Qt::Key_F3)},
       &categoryEditor,
   };
+  EditorCommand findUsages{
+      "find_usages",  // clang-format break
+      QT_TR_NOOP("Find Usages"),
+      QT_TR_NOOP("Find all library elements which reference this element"),
+      ":/fa/solid/binoculars.svg",
+      EditorCommand::Flag::OpensPopup,
+      {},
+      &categoryEditor,
+  };
   EditorCommand fileManager{
       "file_manager",  // clang-format break
       QT_TR_NOOP("Show in File Manager"),

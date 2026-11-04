@@ -9,7 +9,6 @@ import {
     LinkText,
     ListViewItemButton,
     OverlayDialog,
-    TreeView,
 } from "../widgets.slint";
 import {
     Backend,
@@ -21,7 +20,6 @@ import {
     PanelPage,
     RuleCheckData,
     TabAction,
-    TreeViewItemData,
 } from "../api.slint";
 
 component RowHeaderText inherits Text {
@@ -390,28 +388,6 @@ export component CategoriesRowCell inherits HorizontalLayout {
                 add-triggered();
             }
         }
-    }
-}
-
-export component CategoriesChooserDialog inherits OverlayDialog {
-    in property <[TreeViewItemData]> model;
-
-    callback item-picked(index: int, item: TreeViewItemData);
-
-    ok-button: false;
-
-    view := TreeView {
-        model: model;
-        supports-expand: false;
-        icons-color: Data.theme.base-text;
-
-        item-selected(idx, item) => {
-            item-picked(idx, item);
-        }
-    }
-
-    init => {
-        self.focus();
     }
 }
 

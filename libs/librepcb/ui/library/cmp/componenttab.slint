@@ -4,7 +4,6 @@ import { Tab } from "../../tab.slint";
 import {
     AttributesRowHeader,
     AuthorRowHeader,
-    CategoriesChooserDialog,
     CategoriesRowCell,
     CategoriesRowHeader,
     DatasheetRowCell,
@@ -25,6 +24,7 @@ import {
     CheckErrorsMessageBanner,
     ElementDuplicatedMessageBanner,
 } from "../messagebanners.slint";
+import { TreeViewDialog } from "../treeviewdialog.slint";
 import {
     WizardHeaderPanel,
     WizardHeaderText,
@@ -647,7 +647,7 @@ export component ComponentTab inherits Tab {
         }
     }
 
-    if tabs[index].choose-category: add-category-dialog := CategoriesChooserDialog {
+    if tabs[index].choose-category: add-category-dialog := TreeViewDialog {
         width: parent.width;
         height: parent.height;
         model: tabs[index].categories-tree;

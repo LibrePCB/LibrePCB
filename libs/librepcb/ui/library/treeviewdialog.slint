@@ -1,0 +1,42 @@
+import { OverlayDialog, TreeView } from "../widgets.slint";
+import { TreeViewItemData, Data } from "../api.slint";
+
+export component TreeViewDialog inherits OverlayDialog {
+    in property <[TreeViewItemData]> model;
+    in property <string> caption;
+    in property <string> placeholder-text: @tr("No entries.");
+    in property <color> icons-color: Data.theme.base-text;
+
+    callback item-picked(index: int, item: TreeViewItemData);
+
+    ok-button: false;
+    close-button: true;
+
+    if model.length > 0: caption-txt := Text {
+        text: caption;
+        color: Data.theme.control-text;
+        wrap: word-wrap;
+    }
+
+    if model.length > 0: view := TreeView {
+        model: model;
+        supports-expand: false;
+        icons-color: icons-color;
+
+        item-selected(idx, item) => {
+            item-picked(idx, item);
+        }
+    }
+
+    if model.length == 0: placeholder-txt := Text {
+        width: 100%;
+        horizontal-alignment: center;
+        text: placeholder-text;
+        color: Data.theme.control-text;
+        wrap: word-wrap;
+    }
+
+    init => {
+        self.focus();
+    }
+}

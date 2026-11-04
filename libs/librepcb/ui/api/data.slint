@@ -914,6 +914,20 @@ export global Data {
                         items: ["(unconnected)", "Pad 1", "Pad 2"],
                         current-index: 1,
                     },
+                    show-usages: true,
+                    usages: [
+                        {
+                            level: 0,
+                            icon: @image-url("../../../../img/app/librepcb.svg"),
+                            text: "NE555P",
+                        },
+                        {
+                            level: 0,
+                            icon: @image-url("../../../../img/app/librepcb.svg"),
+                            text: "ADM12345X",
+                            comment: "Foo bar 1234",
+                        },
+                    ],
                 },
             ],
             component-tabs: [
@@ -1301,7 +1315,7 @@ export global Data {
         {
             icon: @image-url("../../../../img/app/librepcb.svg"),
             text: "project-1.lpp",
-            hint: "foo/bar/project-1.lpp",
+            status-tip: "foo/bar/project-1.lpp",
             user-data: "foo/bar/project-1.lpp",
             supports-pinning: true,
             pinned: false,
@@ -1309,7 +1323,7 @@ export global Data {
         {
             icon: @image-url("../../../../img/app/librepcb.svg"),
             text: "project-2.lpp",
-            hint: "fooooooooooo/baaaaaaaaaaaaaaaaaaaaaaaar/project-2.lpp",
+            status-tip: "fooooooooooo/baaaaaaaaaaaaaaaaaaaaaaaar/project-2.lpp",
             user-data: "fooooooooooo/baaaaaaaaaaaaaaaaaaaaaaaar/project-2.lpp",
             supports-pinning: true,
             pinned: false,
@@ -1317,7 +1331,7 @@ export global Data {
         {
             icon: @image-url("../../../../img/app/librepcb.svg"),
             text: "project-3.lpp",
-            hint: "foo/bar/project-3.lpp",
+            status-tip: "foo/bar/project-3.lpp",
             user-data: "foo/bar/project-3.lpp",
             supports-pinning: true,
             pinned: true,
