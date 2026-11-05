@@ -72,6 +72,7 @@ public:
   void snapToGrid() noexcept;
   void resetAllTexts() noexcept;
   void setCurrentPosition(const Point& pos) noexcept;
+  void setOrthogonalWiresEnabled(bool enabled) noexcept;
   void rotate(const Angle& angle, bool aroundCurrentPosition) noexcept;
   void mirror(Qt::Orientation orientation, bool aroundCurrentPosition) noexcept;
   const QSet<SI_NetSegment*>& getModifiedNetSegments() const noexcept {
@@ -103,6 +104,13 @@ private:
   bool mSnappedToGrid;
   bool mMirrored;
   bool mTextsReset;
+
+  /// Whether connected wires are kept orthogonal (can be disabled temporarily,
+  /// e.g. while the user holds a modifier key)
+  bool mOrthogonalWires;
+
+  /// Delta currently applied to the orthogonal stretch edits
+  Point mStretchDeltaPos;
 
   // Segments whose geometry might have been modified by the drag.
   QSet<SI_NetSegment*> mModifiedNetSegments;
@@ -148,6 +156,8 @@ private:
     SI_NetLine* line;
     SI_NetLineAnchor* movingAnchor;
     SI_NetLineAnchor* fixedAnchor;
+    /// Position of the moving anchor before the drag.
+    Point movingAnchorStartPos;
     /// Axes of the drag which make this split necessary.
     StretchAxisMask triggerMask;
     /// Axes to apply to the inserted bend point. This follows the moving anchor
@@ -158,6 +168,9 @@ private:
   };
   QList<SplitNetLineEdit> mSplitNetLineEdits;
 
+  /// Apply the orthogonal wire adjustment for the current drag delta, or
+  /// revert it if it is disabled.
+  void updateStretchEdits() noexcept;
   void activateNeededSplitNetLineEdits(const Point& delta) noexcept;
   void deactivateUnneededSplitNetLineEdits(const Point& delta) noexcept;
   void discardSplitNetLineEdits() noexcept;

@@ -400,6 +400,118 @@ TEST_F(CmdDragSelectedSchematicItemsTest, testDragMovesNetLabelOnShiftedWire) {
   EXPECT_TRUE(allNetLinesOrthogonal(segment));
 }
 
+TEST_F(CmdDragSelectedSchematicItemsTest,
+       testDragMovesDanglingWireWithNetLabelAsAWhole) {
+  createProject();
+  ComponentInstance& c1 = addComponentInstance(CircuitIdentifier("U1"));
+  NetSignal& net = addNetSignal(CircuitIdentifier("N"));
+  connect(c1, net);
+  SI_Symbol& s1 = addSymbol(c1, point(0, 0));
+  SI_NetSegment& segment = addNetSegment(net);
+  SI_NetPoint* netPoint = new SI_NetPoint(segment, uuid(), point(-5, 0));
+  SI_NetLine* line = new SI_NetLine(segment, uuid(), pin(s1), *netPoint,
+                                    SI_NetLine::getDefaultWidth());
+  segment.addNetPointsAndNetLines({netPoint}, {line});
+  SI_NetLabel* label = new SI_NetLabel(
+      segment, NetLabel(uuid(), point(-5, 1), Angle::deg0(), false));
+  segment.addNetLabel(*label);
+  createScene();
+  select(s1);
+
+  CmdDragSelectedSchematicItems cmd(*mScene, Point());
+  cmd.setCurrentPosition(point(10.16, 5.08));
+  EXPECT_TRUE(cmd.execute());
+
+  EXPECT_EQ(1, segment.getNetPoints().count());
+  EXPECT_EQ(1, segment.getNetLines().count());
+  EXPECT_EQ(point(5.16, 5.08), netPoint->getPosition());
+  EXPECT_EQ(point(5.16, 6.08), label->getPosition());
+
+  cmd.undo();
+  EXPECT_EQ(point(-5, 0), netPoint->getPosition());
+  EXPECT_EQ(point(-5, 1), label->getPosition());
+
+  cmd.redo();
+  EXPECT_EQ(point(5.16, 5.08), netPoint->getPosition());
+  EXPECT_EQ(point(5.16, 6.08), label->getPosition());
+}
+
+TEST_F(CmdDragSelectedSchematicItemsTest,
+       testDragWithDisabledOrthogonalWiresKeepsWiresUnchanged) {
+  createProject();
+  ComponentInstance& c1 = addComponentInstance(CircuitIdentifier("U1"));
+  ComponentInstance& c2 = addComponentInstance(CircuitIdentifier("U2"));
+  NetSignal& net = addNetSignal(CircuitIdentifier("N"));
+  connect(c1, net);
+  connect(c2, net);
+  SI_Symbol& s1 = addSymbol(c1, point(0, 0));
+  SI_Symbol& s2 = addSymbol(c2, point(20, 0));
+  SI_NetSegment& segment = addNetSegment(net);
+  SI_NetPoint* netPoint = new SI_NetPoint(segment, uuid(), point(10, 0));
+  SI_NetLine* firstLine = new SI_NetLine(segment, uuid(), pin(s1), *netPoint,
+                                         SI_NetLine::getDefaultWidth());
+  SI_NetLine* secondLine = new SI_NetLine(segment, uuid(), *netPoint, pin(s2),
+                                          SI_NetLine::getDefaultWidth());
+  segment.addNetPointsAndNetLines({netPoint}, {firstLine, secondLine});
+  createScene();
+  select(s1);
+
+  CmdDragSelectedSchematicItems cmd(*mScene, Point());
+  cmd.setOrthogonalWiresEnabled(false);
+  cmd.setCurrentPosition(point(0, 5.08));
+  EXPECT_TRUE(cmd.execute());
+
+  EXPECT_EQ(1, segment.getNetPoints().count());
+  EXPECT_EQ(2, segment.getNetLines().count());
+  EXPECT_EQ(point(10, 0), netPoint->getPosition());
+  EXPECT_FALSE(isOrthogonal(*firstLine));
+}
+
+TEST_F(CmdDragSelectedSchematicItemsTest, testToggleOrthogonalWiresDuringDrag) {
+  createProject();
+  ComponentInstance& c1 = addComponentInstance(CircuitIdentifier("U1"));
+  ComponentInstance& c2 = addComponentInstance(CircuitIdentifier("U2"));
+  NetSignal& net = addNetSignal(CircuitIdentifier("N"));
+  connect(c1, net);
+  connect(c2, net);
+  SI_Symbol& s1 = addSymbol(c1, point(0, 0));
+  SI_Symbol& s2 = addSymbol(c2, point(10, 0));
+  SI_NetSegment& segment = addNetSegment(net);
+  SI_NetLine* line = new SI_NetLine(segment, uuid(), pin(s1), pin(s2),
+                                    SI_NetLine::getDefaultWidth());
+  segment.addNetPointsAndNetLines({}, {line});
+  createScene();
+  select(s1);
+
+  CmdDragSelectedSchematicItems cmd(*mScene, Point());
+  cmd.setCurrentPosition(point(2.54, 5.08));
+  EXPECT_EQ(1, netPointCountAt(segment, point(2.54, 0)));
+  EXPECT_TRUE(allNetLinesOrthogonal(segment));
+
+  // Disabling reverts the bend.
+  cmd.setOrthogonalWiresEnabled(false);
+  EXPECT_EQ(0, segment.getNetPoints().count());
+  EXPECT_EQ(1, segment.getNetLines().count());
+
+  // Moving while disabled keeps the direct wire.
+  cmd.setCurrentPosition(point(5.08, 7.62));
+  EXPECT_EQ(0, segment.getNetPoints().count());
+
+  // Re-enabling restores the bend at the correct position.
+  cmd.setOrthogonalWiresEnabled(true);
+  EXPECT_EQ(1, segment.getNetPoints().count());
+  EXPECT_EQ(1, netPointCountAt(segment, point(5.08, 0)));
+  EXPECT_TRUE(allNetLinesOrthogonal(segment));
+
+  EXPECT_TRUE(cmd.execute());
+  EXPECT_EQ(1, netPointCountAt(segment, point(5.08, 0)));
+  EXPECT_TRUE(allNetLinesOrthogonal(segment));
+
+  cmd.undo();
+  EXPECT_EQ(0, segment.getNetPoints().count());
+  EXPECT_EQ(1, segment.getNetLines().count());
+}
+
 TEST_F(CmdDragSelectedSchematicItemsTest, testNoDragDiscardsCleanly) {
   createProject();
   ComponentInstance& c1 = addComponentInstance(CircuitIdentifier("U1"));

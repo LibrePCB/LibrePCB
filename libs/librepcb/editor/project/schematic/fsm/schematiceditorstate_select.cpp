@@ -407,6 +407,25 @@ bool SchematicEditorState_Select::processAbortCommand() noexcept {
   return false;
 }
 
+bool SchematicEditorState_Select::processKeyPressed(
+    const GraphicsSceneKeyEvent& e) noexcept {
+  if ((e.key == Qt::Key_Control) && mCmdDragSelectedItems) {
+    // Holding CTRL temporarily disables keeping wires orthogonal.
+    mCmdDragSelectedItems->setOrthogonalWiresEnabled(false);
+    return true;
+  }
+  return false;
+}
+
+bool SchematicEditorState_Select::processKeyReleased(
+    const GraphicsSceneKeyEvent& e) noexcept {
+  if ((e.key == Qt::Key_Control) && mCmdDragSelectedItems) {
+    mCmdDragSelectedItems->setOrthogonalWiresEnabled(true);
+    return true;
+  }
+  return false;
+}
+
 bool SchematicEditorState_Select::processGraphicsSceneMouseMoved(
     const GraphicsSceneMouseEvent& e) noexcept {
   SchematicGraphicsScene* scene = getActiveSchematicScene();
@@ -422,6 +441,8 @@ bool SchematicEditorState_Select::processGraphicsSceneMouseMoved(
     case SubState::Moving:
     case SubState::Pasting: {
       Q_ASSERT(mCmdDragSelectedItems);
+      mCmdDragSelectedItems->setOrthogonalWiresEnabled(
+          !e.modifiers.testFlag(Qt::ControlModifier));
       mCmdDragSelectedItems->setCurrentPosition(e.scenePos);
       return true;
     }
@@ -550,6 +571,8 @@ bool SchematicEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
   } else if (mSubState == SubState::Pasting) {
     // Stop moving items (set position of all selected elements permanent).
     Q_ASSERT(mCmdDragSelectedItems);
+    mCmdDragSelectedItems->setOrthogonalWiresEnabled(
+        !e.modifiers.testFlag(Qt::ControlModifier));
     mCmdDragSelectedItems->setCurrentPosition(e.scenePos);
     try {
       mContext.undoStack.appendToCmdGroup(
@@ -583,6 +606,8 @@ bool SchematicEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
   } else if (mSubState == SubState::Moving) {
     // Stop moving items (set position of all selected elements permanent).
     Q_ASSERT(mCmdDragSelectedItems);
+    mCmdDragSelectedItems->setOrthogonalWiresEnabled(
+        !e.modifiers.testFlag(Qt::ControlModifier));
     mCmdDragSelectedItems->setCurrentPosition(e.scenePos);
     try {
       const QSet<SI_NetSegment*> netSegments =

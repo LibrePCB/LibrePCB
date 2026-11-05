@@ -74,12 +74,12 @@ namespace {
 class CmdSchematicNetLineSplit final : public UndoCommand {
 public:
   CmdSchematicNetLineSplit(SI_NetLine& line, SI_NetLineAnchor& movingAnchor,
-                           SI_NetLineAnchor& fixedAnchor)
+                           SI_NetLineAnchor& fixedAnchor, const Point& bendPos)
     : UndoCommand(QObject::tr("Split netline")),
       mNetSegment(line.getNetSegment()),
       mOldLine(line),
-      mBendNetPoint(new SI_NetPoint(mNetSegment, Uuid::createRandom(),
-                                    movingAnchor.getPosition())),
+      mBendNetPoint(
+          new SI_NetPoint(mNetSegment, Uuid::createRandom(), bendPos)),
       mLineToMoving(new SI_NetLine(mNetSegment, Uuid::createRandom(),
                                    movingAnchor, *mBendNetPoint,
                                    line.getWidth())),
@@ -163,6 +163,10 @@ rs::OrthogonalWireDragAnchorKind getAnchorKind(
   return rs::OrthogonalWireDragAnchorKind::Fixed;
 }
 
+Point maskedDelta(bool x, bool y, const Point& delta) noexcept {
+  return Point(x ? delta.getX() : Length(0), y ? delta.getY() : Length(0));
+}
+
 bool pointOnOrthogonalSegment(const Point& point, const Point& p1,
                               const Point& p2) noexcept {
   if (p1.getX() == p2.getX()) {
@@ -195,7 +199,9 @@ CmdDragSelectedSchematicItems::CmdDragSelectedSchematicItems(
     mDeltaAngle(0),
     mSnappedToGrid(false),
     mMirrored(false),
-    mTextsReset(false) {
+    mTextsReset(false),
+    mOrthogonalWires(true),
+    mStretchDeltaPos(0, 0) {
   // get all selected items
   SchematicSelectionQuery query(scene);
   query.addSelectedSymbols();
@@ -432,6 +438,7 @@ CmdDragSelectedSchematicItems::CmdDragSelectedSchematicItems(
       mSplitNetLineEdits.append({lines.at(split.wire),
                                  anchors.at(split.moving_anchor),
                                  anchors.at(split.fixed_anchor),
+                                 anchors.at(split.moving_anchor)->getPosition(),
                                  {split.trigger_x, split.trigger_y},
                                  {split.stretch_x, split.stretch_y}});
     }
@@ -510,10 +517,6 @@ void CmdDragSelectedSchematicItems::setCurrentPosition(
   delta.mapToGrid(mSchematic.getGridInterval());
 
   if (delta != mDeltaPos) {
-    // Split first so any newly inserted bend point receives the same preview
-    // movement as propagated netpoints below.
-    activateNeededSplitNetLineEdits(delta);
-
     // move selected elements
     foreach (CmdSymbolInstanceEdit* cmd, mSymbolEditCmds) {
       cmd->translate(delta - mDeltaPos, true);
@@ -539,31 +542,16 @@ void CmdDragSelectedSchematicItems::setCurrentPosition(
     foreach (CmdImageEdit* cmd, mImageEditCmds) {
       cmd->translate(delta - mDeltaPos, true);
     }
-    const Point increment = delta - mDeltaPos;
-    foreach (const StretchNetPointEdit& s, mStretchEdits) {
-      // Apply only the propagated axes. The selected items still follow the
-      // full cursor delta, while stationary wire geometry moves just enough to
-      // stay orthogonal.
-      const Point masked(s.mask.stretchX ? increment.getX() : Length(0),
-                         s.mask.stretchY ? increment.getY() : Length(0));
-      if (!masked.isOrigin()) {
-        s.cmd->translate(masked, true);
-      }
-    }
-    foreach (const StretchNetLabelEdit& s, mStretchNetLabelEdits) {
-      // Labels are not anchors in the wire graph, so mirror the movement of
-      // the wire portion they were attached to at drag start.
-      const Point masked(s.mask.stretchX ? increment.getX() : Length(0),
-                         s.mask.stretchY ? increment.getY() : Length(0));
-      if (!masked.isOrigin()) {
-        s.cmd->translate(masked, true);
-      }
-    }
     mDeltaPos = delta;
+    updateStretchEdits();
+  }
+}
 
-    // If the drag returned to the original line axis, drop preview bends so a
-    // temporary perpendicular excursion does not leave extra netpoints behind.
-    deactivateUnneededSplitNetLineEdits(delta);
+void CmdDragSelectedSchematicItems::setOrthogonalWiresEnabled(
+    bool enabled) noexcept {
+  if (enabled != mOrthogonalWires) {
+    mOrthogonalWires = enabled;
+    updateStretchEdits();
   }
 }
 
@@ -749,6 +737,43 @@ void CmdDragSelectedSchematicItems::deleteAllCommands() noexcept {
   mImageEditCmds.clear();
 }
 
+void CmdDragSelectedSchematicItems::updateStretchEdits() noexcept {
+  const Point delta = mOrthogonalWires ? mDeltaPos : Point(0, 0);
+  if (delta == mStretchDeltaPos) {
+    return;
+  }
+
+  // Split first so any newly inserted bend point receives the same preview
+  // movement as propagated netpoints below.
+  activateNeededSplitNetLineEdits(delta);
+
+  const Point increment = delta - mStretchDeltaPos;
+  foreach (const StretchNetPointEdit& s, mStretchEdits) {
+    // Apply only the propagated axes. The selected items still follow the
+    // full cursor delta, while stationary wire geometry moves just enough to
+    // stay orthogonal.
+    const Point masked =
+        maskedDelta(s.mask.stretchX, s.mask.stretchY, increment);
+    if (!masked.isOrigin()) {
+      s.cmd->translate(masked, true);
+    }
+  }
+  foreach (const StretchNetLabelEdit& s, mStretchNetLabelEdits) {
+    // Labels are not anchors in the wire graph, so mirror the movement of
+    // the wire portion they were attached to at drag start.
+    const Point masked =
+        maskedDelta(s.mask.stretchX, s.mask.stretchY, increment);
+    if (!masked.isOrigin()) {
+      s.cmd->translate(masked, true);
+    }
+  }
+  mStretchDeltaPos = delta;
+
+  // If the drag returned to the original line axis, drop preview bends so a
+  // temporary perpendicular excursion does not leave extra netpoints behind.
+  deactivateUnneededSplitNetLineEdits(delta);
+}
+
 void CmdDragSelectedSchematicItems::activateNeededSplitNetLineEdits(
     const Point& delta) noexcept {
   for (SplitNetLineEdit& s : mSplitNetLineEdits) {
@@ -758,8 +783,12 @@ void CmdDragSelectedSchematicItems::activateNeededSplitNetLineEdits(
       continue;
     }
 
+    // Place the bend where the stretch edits applied so far would have moved
+    // it; the remaining increment is applied by the caller.
+    const Point bendPos = s.movingAnchorStartPos +
+        maskedDelta(s.bendMask.stretchX, s.bendMask.stretchY, mStretchDeltaPos);
     CmdSchematicNetLineSplit* splitCmd = new CmdSchematicNetLineSplit(
-        *s.line, *s.movingAnchor, *s.fixedAnchor);  // can throw
+        *s.line, *s.movingAnchor, *s.fixedAnchor, bendPos);  // can throw
     // Mutate the live scene for preview. If the drag is committed,
     // performExecute transfers this already-applied command into the undo
     // group.

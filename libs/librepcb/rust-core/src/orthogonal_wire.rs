@@ -181,6 +181,10 @@ impl<'a> CalculationState<'a> {
 /// adjacent wire would otherwise become diagonal, the caller can split it when
 /// the trigger mask is active and move the inserted bend point with the returned
 /// bend mask.
+///
+/// Movable anchors which are not connected to any fixed anchor (i.e. dangling
+/// wires attached only to moving anchors) follow the drag on both axes, so
+/// such wires keep their shape and length.
 pub(crate) fn calculate_orthogonal_drag(
   anchors: &[Anchor],
   wires: &[Wire],
@@ -199,6 +203,12 @@ pub(crate) fn calculate_orthogonal_drag(
       let mask = initial_mask(anchors[anchor_index], anchors[*other_index]);
       state.add_anchor_movement(*other_index, mask);
     }
+  }
+
+  // Dangling wire portions (e.g. short wires to net labels) are not attached
+  // to anything stationary, so move them as a whole instead of stretching.
+  for anchor_index in floating_anchors(anchors, &adjacency) {
+    state.add_anchor_movement(anchor_index, AxisMask::new(true, true));
   }
 
   for &(wire_index, wire) in &wires {
@@ -253,6 +263,46 @@ fn moving_anchors(anchors: &[Anchor]) -> impl Iterator<Item = usize> + '_ {
     .enumerate()
     .filter(|(_, anchor)| anchor.kind == AnchorKind::Moving)
     .map(|(index, _)| index)
+}
+
+/// Return all movable anchors which are connected to moving anchors, but not
+/// (even indirectly through other movable anchors) to any fixed anchor.
+fn floating_anchors(
+  anchors: &[Anchor],
+  adjacency: &[Vec<(usize, usize)>],
+) -> Vec<usize> {
+  let mut result = Vec::new();
+  let mut visited = vec![false; anchors.len()];
+  for start in 0..anchors.len() {
+    if visited[start] || (anchors[start].kind != AnchorKind::Movable) {
+      continue;
+    }
+    // Collect the connected group of movable anchors.
+    let mut group = Vec::new();
+    let mut stack = vec![start];
+    let mut has_fixed = false;
+    let mut has_moving = false;
+    visited[start] = true;
+    while let Some(index) = stack.pop() {
+      group.push(index);
+      for &(_, other) in &adjacency[index] {
+        match anchors[other].kind {
+          AnchorKind::Moving => has_moving = true,
+          AnchorKind::Fixed => has_fixed = true,
+          AnchorKind::Movable => {
+            if !visited[other] {
+              visited[other] = true;
+              stack.push(other);
+            }
+          }
+        }
+      }
+    }
+    if has_moving && !has_fixed {
+      result.extend(group);
+    }
+  }
+  result
 }
 
 /// Determine the first stretch mask from a moving anchor to its neighbour.
@@ -384,6 +434,23 @@ mod tests {
 
   #[test]
   fn direct_pin_to_netpoint_moves_netpoint() {
+    let result = calculate_orthogonal_drag(
+      &[moving(0, 0), movable(10, 0), fixed(10, 10)],
+      &[wire(0, 1), wire(1, 2)],
+    );
+
+    assert_eq!(
+      result.anchor_movements,
+      vec![AnchorMovement {
+        anchor: 1,
+        mask: axes(false, true),
+      }]
+    );
+    assert_eq!(result.wire_splits, vec![]);
+  }
+
+  #[test]
+  fn dangling_wire_moves_as_a_whole() {
     let result =
       calculate_orthogonal_drag(&[moving(0, 0), movable(10, 0)], &[wire(0, 1)]);
 
@@ -391,7 +458,56 @@ mod tests {
       result.anchor_movements,
       vec![AnchorMovement {
         anchor: 1,
-        mask: axes(false, true),
+        mask: axes(true, true),
+      }]
+    );
+    assert_eq!(result.wire_splits, vec![]);
+  }
+
+  #[test]
+  fn dangling_wire_tree_moves_as_a_whole() {
+    let result = calculate_orthogonal_drag(
+      &[
+        moving(0, 0),
+        movable(10, 0),
+        movable(10, 10),
+        movable(20, 0),
+      ],
+      &[wire(0, 1), wire(1, 2), wire(1, 3)],
+    );
+
+    assert_eq!(
+      result.anchor_movements,
+      vec![
+        AnchorMovement {
+          anchor: 1,
+          mask: axes(true, true),
+        },
+        AnchorMovement {
+          anchor: 2,
+          mask: axes(true, true),
+        },
+        AnchorMovement {
+          anchor: 3,
+          mask: axes(true, true),
+        },
+      ]
+    );
+    assert_eq!(result.wire_splits, vec![]);
+  }
+
+  #[test]
+  fn wire_between_moving_anchors_moves_as_a_whole() {
+    let result = calculate_orthogonal_drag(
+      &[moving(0, 0), movable(10, 0), moving(10, 10)],
+      &[wire(0, 1), wire(1, 2)],
+    );
+
+    assert_eq!(
+      result.anchor_movements,
+      vec![AnchorMovement {
+        anchor: 1,
+        mask: axes(true, true),
       }]
     );
     assert_eq!(result.wire_splits, vec![]);
@@ -504,8 +620,8 @@ mod tests {
   #[test]
   fn diagonal_wires_are_left_unchanged() {
     let result = calculate_orthogonal_drag(
-      &[moving(0, 0), movable(10, 10)],
-      &[wire(0, 1)],
+      &[moving(0, 0), movable(10, 10), fixed(20, 10)],
+      &[wire(0, 1), wire(1, 2)],
     );
 
     assert_eq!(result.anchor_movements, vec![]);
