@@ -784,20 +784,31 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonDoubleClicked(
     return processGraphicsSceneLeftMouseButtonPressed(e);
   }
 
+  BoardGraphicsScene* scene = getActiveBoardScene();
+  if (!scene) return false;
+
   // Discard any temporary changes and release undo stack.
   abortBlockingToolsInOtherEditors();
 
   if (mSubState == SubState::Idle) {
     // Open the properties editor dialog of the selected item, if any.
+    // Process selected items first, to keep the current selection.
     const QList<std::shared_ptr<QGraphicsItem>> items = findItemsAtPos(
         e.scenePos,
-        FindFlag::All | FindFlag::DevicesOfPads | FindFlag::AcceptNearMatch);
+        FindFlag::All | FindFlag::DevicesOfPads | FindFlag::AcceptNearMatch |
+            FindFlag::SelectedItemsFirst);
     foreach (auto item, items) {
       if (item->isSelected() && openPropertiesDialog(item)) {
         return true;
       } else if (auto devItem = std::dynamic_pointer_cast<BGI_Device>(item)) {
         // Select the device by double-clicking on one of its pads.
         devItem->setSelected(true);
+        return true;
+        // Traces don't have a properties dialog (yet), so let's make double-
+        // click selecting the whole trace segment. That's an alternative
+        // solution for https://github.com/LibrePCB/LibrePCB/issues/1847.
+      } else if (auto nlItem = std::dynamic_pointer_cast<BGI_NetLine>(item)) {
+        scene->selectNetSegment(nlItem->getNetLine().getNetSegment());
         return true;
       }
     }
@@ -981,10 +992,12 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
           removeSelectedItems();
         }));
     mb.addSeparator();
-    mb.addAction(
-        cmd.traceSelectWhole.createAction(&menu, this, [scene, netline]() {
+    mb.addAction(cmd.traceSelectWhole.createAction(
+        &menu, this,
+        [scene, netline]() {
           scene->selectNetSegment(netline->getNetLine().getNetSegment());
-        }));
+        },
+        EditorCommand::ActionFlag::DoubleClickShortcut));
     mb.addSeparator();
     mb.addAction(
         cmd.traceMeasureLength.createAction(&menu, this, [this, netline]() {

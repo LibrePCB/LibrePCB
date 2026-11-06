@@ -59,6 +59,7 @@ public:
     ApplicationShortcut = (1 << 2),  ///< Make the shortcut application global.
     QueuedConnection = (1 << 3),  ///< Create a queued signal/slot connection.
     ReactOnToggle = (1 << 4),  ///< React on toggled() instead of triggered().
+    DoubleClickShortcut = (1 << 5),  ///< Render shortcut as 'Double-click'.
   };
   Q_DECLARE_FLAGS(ActionFlags, ActionFlag)
 
