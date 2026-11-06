@@ -137,6 +137,7 @@ add_executable(
   editor/widgets/unsignedlengthedittest.cpp
   editor/workspace/categorytreemodellegacytest.cpp
   editor/workspace/categorytreemodeltest.cpp
+  editor/workspace/filesystemmodeltest.cpp
   kicadimport/kicadlibraryimporttest.cpp
   main.cpp
   testhelpers.cpp
