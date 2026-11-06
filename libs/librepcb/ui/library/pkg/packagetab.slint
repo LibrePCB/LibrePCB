@@ -427,7 +427,6 @@ component PackageEditorTab inherits TouchArea {
 
             overlay-txt := TextInput {
                 horizontal-alignment: left;
-                vertical-alignment: top;
                 font-family: "Noto Sans Mono";
                 color: Data.theme.control-text;
                 text: tabs[index].tool-overlay-text;
@@ -826,9 +825,9 @@ component PackageEditorTab inherits TouchArea {
         x: parent.width - self.preferred-width - 10px;
         y: toolbutton-offset-y + 10px;
         width: self.preferred-width;
+        cross-axis-alignment: end;
 
         zoom-fit-btn := SceneButton {
-            x: parent.width - self.width;
             icon: @image-url("../../../../../img/zoom-fit.svg");
             base-color: tabs[index].background-color;
             base-text-color: tabs[index].foreground-color;
@@ -840,7 +839,6 @@ component PackageEditorTab inherits TouchArea {
         }
 
         zoom-in-btn := SceneButton {
-            x: parent.width - self.width;
             icon: @image-url("../../../../bootstrap-icons/icons/zoom-in.svg");
             base-color: tabs[index].background-color;
             base-text-color: tabs[index].foreground-color;
@@ -852,7 +850,6 @@ component PackageEditorTab inherits TouchArea {
         }
 
         zoom-out-btn := SceneButton {
-            x: parent.width - self.width;
             icon: @image-url("../../../../bootstrap-icons/icons/zoom-out.svg");
             base-color: tabs[index].background-color;
             base-text-color: tabs[index].foreground-color;
@@ -864,7 +861,6 @@ component PackageEditorTab inherits TouchArea {
         }
 
         if !view-3d: background-image-btn := SliderSceneButton {
-            x: parent.width - self.width;
             style: self.slider-enabled ? checkbox : button;
             icon-scale: self.slider-enabled ? 0.8 : 0.9;
             icon: Cmd.toggle-background-image.icon;
@@ -885,7 +881,6 @@ component PackageEditorTab inherits TouchArea {
         }
 
         if view-3d: devices-alpha-ta := SliderSceneButton {
-            x: parent.width - self.width;
             icon: @image-url("../../../../bootstrap-icons/icons/cpu.svg");
             tooltip: @tr("Devices");
             value: tabs[index].devices-alpha;
@@ -898,7 +893,6 @@ component PackageEditorTab inherits TouchArea {
         }
 
         if view-3d: solderpaste-alpha-ta := SliderSceneButton {
-            x: parent.width - self.width;
             icon: @image-url("../../../../font-awesome/svgs/solid/highlighter.svg");
             tooltip: @tr("Solder Paste");
             value: tabs[index].solderpaste-alpha;
@@ -911,7 +905,6 @@ component PackageEditorTab inherits TouchArea {
         }
 
         if view-3d: silkscreen-alpha-ta := SliderSceneButton {
-            x: parent.width - self.width;
             icon: @image-url("../../../../font-awesome/svgs/solid/font.svg");
             tooltip: @tr("Silkscreen");
             value: tabs[index].silkscreen-alpha;
@@ -924,7 +917,6 @@ component PackageEditorTab inherits TouchArea {
         }
 
         if view-3d: solderresist-alpha-ta := SliderSceneButton {
-            x: parent.width - self.width;
             icon: @image-url("../../../../font-awesome/svgs/solid/fill.svg");
             tooltip: @tr("Solder Resist");
             value: tabs[index].solderresist-alpha;
@@ -937,7 +929,6 @@ component PackageEditorTab inherits TouchArea {
         }
 
         toggle-3d-btn := SceneButton {
-            x: parent.width - self.width;
             text: view-3d ? "2D" : "3D";
             base-color: tabs[index].background-color;
             base-text-color: tabs[index].foreground-color;
@@ -958,9 +949,8 @@ component PackageEditorTab inherits TouchArea {
         }
 
         if tabs[index].refreshing: spinner := Spinner {
-            x: toggle-3d-btn.x + (toggle-3d-btn.width - self.width) / 2;
-            width: 20px;
-            height: self.width;
+            width: toggle-3d-btn.width;
+            height: 20px;
             foreground-color: tabs[index].foreground-color;
             indeterminate: true;
         }

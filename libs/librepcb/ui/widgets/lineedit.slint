@@ -129,7 +129,6 @@ export component LineEdit inherits Rectangle {
         font-italic: true;
         color: enabled ? Data.theme.control-text-muted : Data.theme.control-text-disabled;
         text: placeholder-text;
-        wrap: no-wrap;
         overflow: elide;
         visible: edt.text.is-empty && (!placeholder-text.is-empty);
         accessible-role: none;
@@ -162,8 +161,6 @@ export component LineEdit inherits Rectangle {
                     font-weight: font-weight;
                     enabled: enabled;
                     read-only: read-only;
-                    single-line: true;
-                    wrap: no-wrap;
                     text: text;
                     accessible-role: none;
 

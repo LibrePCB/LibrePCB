@@ -347,7 +347,6 @@ export component RuleCheckPanel inherits FocusScope {
         }
 
         view := ListScrollView {
-            vertical-stretch: 1;
             preferred-height: model.length * item-height;
             content-height: model.length * item-height;
             visible: model.length > 0;

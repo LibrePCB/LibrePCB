@@ -170,8 +170,6 @@ export component SideBar {
     }
 
     VerticalLayout {
-        spacing: 0px;
-
         home-btn := SideBarButton {
             icon: @image-url("../../bootstrap-icons/icons/house-fill.svg");
             tooltip: @tr("Home");
@@ -397,7 +395,6 @@ export component SideBar {
             icon: @image-url("../../bootstrap-icons/icons/sliders.svg");
             tooltip: Cmd.workspace-settings.text;
             shortcut: Cmd.workspace-settings.shortcut;
-            checked: false;
 
             clicked => {
                 Backend.trigger(Action.workspace-settings);

@@ -140,7 +140,6 @@ export component AddPadToolBar inherits HorizontalLayout {
         data: tabs[section.current-tab-index].tool-ratio;
         icon: @image-url("../../../../font-awesome/svgs/solid/border-top-left.svg");
         tooltip: @tr("Corner Radius");
-        min-width-text: "12.345 %";
         read-only: (shape != PadShape.rounded-rect) && (shape != PadShape.octagon);
 
         value-changed(v) => {

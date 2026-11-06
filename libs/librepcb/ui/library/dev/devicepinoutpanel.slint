@@ -335,7 +335,6 @@ export component DevicePinoutPanel inherits Rectangle {
                 padding-bottom: 8px;
 
                 if interactive: interactive-view := DeviceInteractiveSignalListView {
-                    vertical-stretch: 1;
                     model: tabs[index].interactive-pinout-signals;
                     current-index: tabs[index].interactive-pinout-signal-index;
                     read-only: read-only;

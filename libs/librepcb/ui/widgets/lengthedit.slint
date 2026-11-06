@@ -118,8 +118,6 @@ export component LengthEdit inherits Rectangle {
         width: 0;
         height: 0;
         font-size: 13px;
-        single-line: true;
-        wrap: no-wrap;
         text: min-width-text;
         visible: false;
         accessible-role: none;
@@ -211,7 +209,6 @@ export component LengthEdit inherits Rectangle {
             edt := TextInput {
                 min-width: max(self.preferred-width, metrics-edt.preferred-width);
                 font-size: 13px;
-                single-line: true;
                 horizontal-alignment: right;
                 vertical-alignment: center;
                 color: {
