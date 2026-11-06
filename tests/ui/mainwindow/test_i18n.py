@@ -22,6 +22,11 @@ LOCALES = [
 ]
 
 
+def _set_workspace_settings_language(librepcb, language):
+    with open(librepcb.get_workspace_path("data/settings.lp"), mode="w") as f:
+        f.write(f'(librepcb_workspace_settings (application_locale "{language}"))')
+
+
 @pytest.mark.skipif(platform.system() != "Linux", reason="LC_ALL only works on Linux")
 @pytest.mark.parametrize("language, expected", LANGUAGES)
 def test_system_language(librepcb, language, expected):
@@ -29,6 +34,7 @@ def test_system_language(librepcb, language, expected):
     Test if the system locale is respected for the translations.
     """
     librepcb.env["LC_ALL"] = language
+    _set_workspace_settings_language(librepcb, "")  # Use system language
     with librepcb.open() as app:
         assert app.get(LANGUAGE_ELEMENT_ID).label == expected
 
@@ -40,6 +46,7 @@ def test_system_locale(librepcb, locale, expected):
     Test if the system locale is respected for number formatting.
     """
     librepcb.env["LC_ALL"] = locale
+    _set_workspace_settings_language(librepcb, "")  # Use system language
     with librepcb.open() as app:
         assert app.get(LOCALE_ELEMENT_ID).value == expected
 
@@ -58,8 +65,7 @@ def test_workspace_language(
     but not the locale. See https://github.com/LibrePCB/LibrePCB/pull/1723.
     """
     librepcb.env["LC_ALL"] = locale
-    with open(librepcb.get_workspace_path("data/settings.lp"), mode="w") as f:
-        f.write(f'(librepcb_workspace_settings (application_locale "{language}"))')
+    _set_workspace_settings_language(librepcb, language)
     with librepcb.open() as app:
         assert app.get(LANGUAGE_ELEMENT_ID).label == expected_translation
         if platform.system() == "Linux":
