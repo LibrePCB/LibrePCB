@@ -130,6 +130,24 @@ public:
     return result;
   }
 
+  void expandAll(CategoryTreeModel& model) {
+    for (std::size_t i = 0; i < model.row_count(); ++i) {
+      auto item = model.row_data(i);
+      if (item && item->has_children && (!item->expanded)) {
+        item->expanded = true;
+        model.set_row_data(i, *item);
+      }
+    }
+  }
+
+  void setExpanded(CategoryTreeModel& model, std::size_t index, bool expanded) {
+    auto item = model.row_data(index);
+    ASSERT_TRUE(item);
+    ASSERT_NE(item->expanded, expanded);
+    item->expanded = expanded;
+    model.set_row_data(index, *item);
+  }
+
   FilePath toAbs(const QString& fp) { return mWsDir.getPathTo(fp); }
 
   Uuid uuid(int index = -1) {
@@ -158,18 +176,20 @@ TEST_F(CategoryTreeModelTest, testDatabaseError) {
   mDb->exec("DROP TABLE component_categories");
   mDb->exec("DROP TABLE package_categories");
 
-  CategoryTreeModel model(*mWsDb, *mSettings,
-                          CategoryTreeModel::Filter::CmpCat);
-  QVector<Item> expected = {
+  CategoryTreeModel model(*mWsDb, *mSettings, CategoryTreeModel::Filter::CmpCat,
+                          true);
+  expandAll(model);
+  const QVector<Item> expected = {
       {"Root Category", {}},
   };
   EXPECT_EQ(str(expected), str(getItems(model)));
 }
 
 TEST_F(CategoryTreeModelTest, testEmptyDb) {
-  CategoryTreeModel model(*mWsDb, *mSettings,
-                          CategoryTreeModel::Filter::CmpCat);
-  QVector<Item> expected = {
+  CategoryTreeModel model(*mWsDb, *mSettings, CategoryTreeModel::Filter::CmpCat,
+                          true);
+  expandAll(model);
+  const QVector<Item> expected = {
       {"Root Category", {}},
   };
   EXPECT_EQ(str(expected), str(getItems(model)));
@@ -188,8 +208,10 @@ TEST_F(CategoryTreeModelTest, testData) {
                                              std::nullopt, std::nullopt);
 
   // Note: Currently we don't show the description as comment.
-  CategoryTreeModel model(*mWsDb, *mSettings,
-                          CategoryTreeModel::Filter::CmpCat);
+  CategoryTreeModel model(*mWsDb, *mSettings, CategoryTreeModel::Filter::CmpCat,
+                          true);
+  expandAll(model);
+  EXPECT_EQ(3u, model.row_count());
   EXPECT_EQ(str(0, "Root Category", "", "null"), str(model.row_data(0)));
   EXPECT_EQ(str(1, "cat 1", "", uuid(1).toStr()), str(model.row_data(1)));
   EXPECT_EQ(str(2, "cat 2", "", uuid(2).toStr()), str(model.row_data(2)));
@@ -217,9 +239,10 @@ TEST_F(CategoryTreeModelTest, testComponentCategories) {
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 4"),
                                              std::nullopt, std::nullopt);
 
-  CategoryTreeModel model(*mWsDb, *mSettings,
-                          CategoryTreeModel::Filter::CmpCat);
-  QVector<Item> expected = {
+  CategoryTreeModel model(*mWsDb, *mSettings, CategoryTreeModel::Filter::CmpCat,
+                          true);
+  expandAll(model);
+  const QVector<Item> expected = {
       {"Root Category",
        {
            {"cat 1",
@@ -257,22 +280,185 @@ TEST_F(CategoryTreeModelTest, testPackageCategories) {
   mWriter->addTranslation<PackageCategory>(cat, "", ElementName("cat 4"),
                                            std::nullopt, std::nullopt);
 
-  CategoryTreeModel model(*mWsDb, *mSettings,
-                          CategoryTreeModel::Filter::PkgCat);
-  QVector<Item> expected = {
-      {"Root Category",
+  CategoryTreeModel model(*mWsDb, *mSettings, CategoryTreeModel::Filter::PkgCat,
+                          false);
+  expandAll(model);
+  const QVector<Item> expected = {
+      {"cat 1",
        {
-           {"cat 1",
+           {"cat 2",
             {
-                {"cat 2",
-                 {
-                     {"cat 3", {}},
-                     {"cat 4", {}},
-                 }},
+                {"cat 3", {}},
+                {"cat 4", {}},
             }},
        }},
   };
   EXPECT_EQ(str(expected), str(getItems(model)));
+}
+
+TEST_F(CategoryTreeModelTest, testExpandCollapse) {
+  // - cat 1
+  //   - cat 2
+  //     - cat 3
+  //   - cat 4
+  int cat = mWriter->addCategory<ComponentCategory>(
+      0, toAbs("cat1"), uuid(1), version("0.1"), false, std::nullopt);
+  mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 1"),
+                                             std::nullopt, std::nullopt);
+  cat = mWriter->addCategory<ComponentCategory>(0, toAbs("cat2"), uuid(2),
+                                                version("0.1"), false, uuid(1));
+  mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 2"),
+                                             std::nullopt, std::nullopt);
+  cat = mWriter->addCategory<ComponentCategory>(0, toAbs("cat3"), uuid(3),
+                                                version("0.1"), false, uuid(2));
+  mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 3"),
+                                             std::nullopt, std::nullopt);
+  cat = mWriter->addCategory<ComponentCategory>(0, toAbs("cat4"), uuid(4),
+                                                version("0.1"), false, uuid(1));
+  mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 4"),
+                                             std::nullopt, std::nullopt);
+
+  CategoryTreeModel model(*mWsDb, *mSettings, CategoryTreeModel::Filter::CmpCat,
+                          false);
+
+  // By default only the top-level categories are shown, all collapsed.
+  ASSERT_EQ(1u, model.row_count());
+  EXPECT_EQ(str(0, "cat 1", "", uuid(1).toStr()), str(model.row_data(0)));
+  EXPECT_TRUE(model.row_data(0)->has_children);
+  EXPECT_FALSE(model.row_data(0)->expanded);
+
+  // Expanding "cat 1" makes its child categories visible.
+  setExpanded(model, 0, true);
+  ASSERT_EQ(3u, model.row_count());
+  EXPECT_EQ(str(0, "cat 1", "", uuid(1).toStr()), str(model.row_data(0)));
+  EXPECT_EQ(str(1, "cat 2", "", uuid(2).toStr()), str(model.row_data(1)));
+  EXPECT_EQ(str(1, "cat 4", "", uuid(4).toStr()), str(model.row_data(2)));
+  EXPECT_TRUE(model.row_data(0)->expanded);
+  EXPECT_FALSE(model.row_data(1)->expanded);
+  EXPECT_TRUE(model.row_data(1)->has_children);
+  EXPECT_FALSE(model.row_data(2)->has_children);
+
+  // Expanding "cat 2" makes "cat 3" visible.
+  setExpanded(model, 1, true);
+  ASSERT_EQ(4u, model.row_count());
+  EXPECT_EQ(str(2, "cat 3", "", uuid(3).toStr()), str(model.row_data(2)));
+  EXPECT_TRUE(model.row_data(1)->expanded);
+  EXPECT_FALSE(model.row_data(2)->has_children);
+
+  // Collapsing "cat 1" hides all its descendants.
+  setExpanded(model, 0, false);
+  ASSERT_EQ(1u, model.row_count());
+  EXPECT_EQ(str(0, "cat 1", "", uuid(1).toStr()), str(model.row_data(0)));
+  EXPECT_FALSE(model.row_data(0)->expanded);
+
+  // Expanding "cat 1" again restores the expanded state of "cat 2".
+  setExpanded(model, 0, true);
+  ASSERT_EQ(4u, model.row_count());
+  EXPECT_EQ(str(0, "cat 1", "", uuid(1).toStr()), str(model.row_data(0)));
+  EXPECT_EQ(str(1, "cat 2", "", uuid(2).toStr()), str(model.row_data(1)));
+  EXPECT_EQ(str(2, "cat 3", "", uuid(3).toStr()), str(model.row_data(2)));
+  EXPECT_EQ(str(1, "cat 4", "", uuid(4).toStr()), str(model.row_data(3)));
+
+  // Collapsing "cat 2" hides "cat 3", but keeps "cat 1" expanded.
+  setExpanded(model, 1, false);
+  ASSERT_EQ(3u, model.row_count());
+  EXPECT_EQ(str(1, "cat 2", "", uuid(2).toStr()), str(model.row_data(1)));
+  EXPECT_FALSE(model.row_data(1)->expanded);
+}
+
+TEST_F(CategoryTreeModelTest, testExpandCollapseRootCategory) {
+  // - cat 1
+  int cat = mWriter->addCategory<ComponentCategory>(
+      0, toAbs("cat1"), uuid(1), version("0.1"), false, std::nullopt);
+  mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 1"),
+                                             std::nullopt, std::nullopt);
+
+  CategoryTreeModel model(*mWsDb, *mSettings, CategoryTreeModel::Filter::CmpCat,
+                          true);
+
+  // The root category is expanded by default, all others are collapsed.
+  EXPECT_EQ(2u, model.row_count());
+  EXPECT_EQ(str(0, "Root Category", "", "null"), str(model.row_data(0)));
+  EXPECT_TRUE(model.row_data(0)->has_children);
+  EXPECT_TRUE(model.row_data(0)->expanded);
+  EXPECT_EQ(str(1, "cat 1", "", uuid(1).toStr()), str(model.row_data(1)));
+  EXPECT_FALSE(model.row_data(1)->has_children);
+  EXPECT_FALSE(model.row_data(1)->expanded);
+
+  // Collapsing the root category hides all categories.
+  setExpanded(model, 0, false);
+  EXPECT_EQ(1u, model.row_count());
+  EXPECT_EQ(str(0, "Root Category", "", "null"), str(model.row_data(0)));
+  EXPECT_FALSE(model.row_data(0)->expanded);
+
+  // Expanding the root category again makes its child categories visible.
+  setExpanded(model, 0, true);
+  EXPECT_EQ(2u, model.row_count());
+  EXPECT_EQ(str(1, "cat 1", "", uuid(1).toStr()), str(model.row_data(1)));
+}
+
+TEST_F(CategoryTreeModelTest, testFilter) {
+  // - cat 1
+  //   - cat 2
+  //     - cat 3
+  //   - cat 4
+  int cat = mWriter->addCategory<ComponentCategory>(
+      0, toAbs("cat1"), uuid(1), version("0.1"), false, std::nullopt);
+  mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 1"),
+                                             std::nullopt, std::nullopt);
+  cat = mWriter->addCategory<ComponentCategory>(0, toAbs("cat2"), uuid(2),
+                                                version("0.1"), false, uuid(1));
+  mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 2"),
+                                             std::nullopt, "keyword2");
+  cat = mWriter->addCategory<ComponentCategory>(0, toAbs("cat3"), uuid(3),
+                                                version("0.1"), false, uuid(2));
+  mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 3"),
+                                             std::nullopt, std::nullopt);
+  cat = mWriter->addCategory<ComponentCategory>(0, toAbs("cat4"), uuid(4),
+                                                version("0.1"), false, uuid(1));
+  mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 4"),
+                                             std::nullopt, std::nullopt);
+
+  CategoryTreeModel model(*mWsDb, *mSettings, CategoryTreeModel::Filter::CmpCat,
+                          false);
+
+  // Even with all categories collapsed, the filter makes the matching
+  // categories and all their parents visible.
+  model.setFilterTerm("cat 3");
+  EXPECT_EQ(3u, model.row_count());
+  EXPECT_EQ(str(0, "cat 1", "", uuid(1).toStr()), str(model.row_data(0)));
+  EXPECT_EQ(str(1, "cat 2", "", uuid(2).toStr()), str(model.row_data(1)));
+  EXPECT_EQ(str(2, "cat 3", "", uuid(3).toStr()), str(model.row_data(2)));
+
+  // Searching by keyword works as well.
+  model.setFilterTerm("keyword2");
+  EXPECT_EQ(2u, model.row_count());
+  EXPECT_EQ(str(0, "cat 1", "", uuid(1).toStr()), str(model.row_data(0)));
+  EXPECT_EQ(str(1, "cat 2", "", uuid(2).toStr()), str(model.row_data(1)));
+
+  // While a filter is active, expanding/collapsing is not possible.
+  EXPECT_FALSE(model.row_data(0)->has_children);
+  EXPECT_FALSE(model.row_data(1)->has_children);
+
+  // Clearing the filter restores the expanded state.
+  model.setFilterTerm("");
+  EXPECT_EQ(1u, model.row_count());
+  EXPECT_EQ(str(0, "cat 1", "", uuid(1).toStr()), str(model.row_data(0)));
+  EXPECT_TRUE(model.row_data(0)->has_children);
+  EXPECT_FALSE(model.row_data(0)->expanded);
+
+  // Also while a category is expanded, the filter finds categories even
+  // within collapsed ones. The expanded state is preserved while filtering.
+  setExpanded(model, 0, true);  // Expand "cat 1".
+  model.setFilterTerm("cat 4");
+  EXPECT_EQ(2u, model.row_count());
+  EXPECT_EQ(str(0, "cat 1", "", uuid(1).toStr()), str(model.row_data(0)));
+  EXPECT_EQ(str(1, "cat 4", "", uuid(4).toStr()), str(model.row_data(1)));
+  model.setFilterTerm("");
+  EXPECT_EQ(3u, model.row_count());
+  EXPECT_EQ(str(0, "cat 1", "", uuid(1).toStr()), str(model.row_data(0)));
+  EXPECT_EQ(str(1, "cat 2", "", uuid(2).toStr()), str(model.row_data(1)));
+  EXPECT_EQ(str(1, "cat 4", "", uuid(4).toStr()), str(model.row_data(2)));
 }
 
 TEST_F(CategoryTreeModelTest, testSort) {
@@ -292,9 +478,10 @@ TEST_F(CategoryTreeModelTest, testSort) {
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 9"),
                                              std::nullopt, std::nullopt);
 
-  CategoryTreeModel model(*mWsDb, *mSettings,
-                          CategoryTreeModel::Filter::CmpCat);
-  QVector<Item> expected = {
+  CategoryTreeModel model(*mWsDb, *mSettings, CategoryTreeModel::Filter::CmpCat,
+                          true);
+  expandAll(model);
+  const QVector<Item> expected = {
       {"Root Category",
        {
            {"cat 9", {}},
@@ -314,9 +501,10 @@ TEST_F(CategoryTreeModelTest, testRecursionDirect) {
 
   // Note: Currently such a category is just not listed in the tree.
   // In future, we may consider to list it anyway in some way.
-  CategoryTreeModel model(*mWsDb, *mSettings,
-                          CategoryTreeModel::Filter::CmpCat);
-  QVector<Item> expected = {{"Root Category", {}}};
+  CategoryTreeModel model(*mWsDb, *mSettings, CategoryTreeModel::Filter::CmpCat,
+                          true);
+  expandAll(model);
+  const QVector<Item> expected = {{"Root Category", {}}};
   EXPECT_EQ(str(expected), str(getItems(model)));
 }
 
@@ -334,15 +522,17 @@ TEST_F(CategoryTreeModelTest, testRecursionIndirect) {
 
   // Note: Currently such a category is just not listed in the tree.
   // In future, we may consider to list it anyway in some way.
-  CategoryTreeModel model(*mWsDb, *mSettings,
-                          CategoryTreeModel::Filter::CmpCat);
-  QVector<Item> expected = {{"Root Category", {}}};
+  CategoryTreeModel model(*mWsDb, *mSettings, CategoryTreeModel::Filter::CmpCat,
+                          true);
+  expandAll(model);
+  const QVector<Item> expected = {{"Root Category", {}}};
   EXPECT_EQ(str(expected), str(getItems(model)));
 }
 
 TEST_F(CategoryTreeModelTest, testLiveUpdateAllNew) {
-  CategoryTreeModel model(*mWsDb, *mSettings,
-                          CategoryTreeModel::Filter::CmpCat);
+  CategoryTreeModel model(*mWsDb, *mSettings, CategoryTreeModel::Filter::CmpCat,
+                          true);
+  expandAll(model);
   QVector<Item> expected = {{"Root Category", {}}};
   EXPECT_EQ(str(expected), str(getItems(model)));
 
@@ -371,6 +561,15 @@ TEST_F(CategoryTreeModelTest, testLiveUpdateAllNew) {
   qApp->processEvents();
   qApp->processEvents();
   qApp->processEvents();
+  expected = {
+      {"Root Category",
+       {
+           {"cat 1", {}},
+       }},
+  };
+  EXPECT_EQ(str(expected), str(getItems(model)));
+
+  expandAll(model);
   expected = {
       {"Root Category",
        {
@@ -409,8 +608,9 @@ TEST_F(CategoryTreeModelTest, testLiveUpdateAllRemoved) {
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 4"),
                                              std::nullopt, std::nullopt);
 
-  CategoryTreeModel model(*mWsDb, *mSettings,
-                          CategoryTreeModel::Filter::CmpCat);
+  CategoryTreeModel model(*mWsDb, *mSettings, CategoryTreeModel::Filter::CmpCat,
+                          true);
+  expandAll(model);
   QVector<Item> expected = {
       {"Root Category",
        {
@@ -457,8 +657,9 @@ TEST_F(CategoryTreeModelTest, testLiveUpdateVariousModifications) {
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 4"),
                                              std::nullopt, std::nullopt);
 
-  CategoryTreeModel model(*mWsDb, *mSettings,
-                          CategoryTreeModel::Filter::CmpCat);
+  CategoryTreeModel model(*mWsDb, *mSettings, CategoryTreeModel::Filter::CmpCat,
+                          true);
+  expandAll(model);
   QVector<Item> expected = {
       {"Root Category",
        {
@@ -500,6 +701,7 @@ TEST_F(CategoryTreeModelTest, testLiveUpdateVariousModifications) {
   qApp->processEvents();
   qApp->processEvents();
   qApp->processEvents();
+  expandAll(model);
   expected = {
       {"Root Category",
        {
@@ -530,8 +732,9 @@ TEST_F(CategoryTreeModelTest, testSetLocaleOrder) {
   mWriter->addTranslation<ComponentCategory>(cat, "de_CH", ElementName("cat 0"),
                                              std::nullopt, std::nullopt);
 
-  CategoryTreeModel model(*mWsDb, *mSettings,
-                          CategoryTreeModel::Filter::CmpCat);
+  CategoryTreeModel model(*mWsDb, *mSettings, CategoryTreeModel::Filter::CmpCat,
+                          true);
+  expandAll(model);
   QVector<Item> expected = {
       {"Root Category",
        {

@@ -79,6 +79,7 @@ export component LineEdit inherits Rectangle {
 
     preferred-width: max(l.preferred-width, placeholder-txt.preferred-width + l.preferred-width - view.preferred-width, 100px);
     preferred-height: 25px;
+    min-height: 22px;
     horizontal-stretch: 1;
     background: {
         if !enabled {

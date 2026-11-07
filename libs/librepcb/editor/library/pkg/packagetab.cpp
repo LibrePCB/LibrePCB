@@ -125,7 +125,8 @@ PackageTab::PackageTab(LibraryEditor& editor, std::unique_ptr<Package> pkg,
         LibraryElementCategoriesModel::Type::PackageCategory)),
     mCategoriesTree(new CategoryTreeModel(editor.getWorkspace().getLibraryDb(),
                                           editor.getWorkspace().getSettings(),
-                                          CategoryTreeModel::Filter::PkgCat)),
+                                          CategoryTreeModel::Filter::PkgCat,
+                                          false)),
     mAssemblyType(mPackage->getAssemblyType(false)),
     mMinCopperClearance(mApp.getWorkspace().getSettings()),
     mPads(new PackagePadListModel()),
@@ -352,6 +353,7 @@ ui::PackageTabData PackageTab::getDerivedUiData() const noexcept {
       mCategories,  // Categories
       mCategoriesTree,  // Categories tree
       mChooseCategory,  // Choose category
+      {},  // Choose category filter term (not needed in this direction)
       l2s(mAssemblyType),  // Assembly type
       mMinCopperClearance.getUiData(),  // Min. copper clearance
       mPadsSorted,  // Package pads
@@ -492,6 +494,7 @@ void PackageTab::setDerivedUiData(const ui::PackageTabData& data) noexcept {
     mCategories->add(*uuid);
   }
   mChooseCategory = data.choose_category;
+  mCategoriesTree->setFilterTerm(s2q(data.choose_category_filter_term));
   if (auto at = s2assemblyType(data.assembly_type)) {
     mAssemblyType = *at;
   }

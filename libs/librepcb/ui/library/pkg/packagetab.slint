@@ -1167,6 +1167,16 @@ export component PackageTab inherits Tab {
         width: parent.width;
         height: parent.height;
         model: tabs[index].categories-tree;
+        supports-filtering: true;
+        supports-expand: true;
+
+        init => {
+            tabs[index].choose-category-filter-term = "";
+        }
+
+        filter-changed(term) => {
+            tabs[index].choose-category-filter-term = term;
+        }
 
         item-picked(idx, item) => {
             root.focus();  // Keep keyboard shortcuts working.
@@ -1188,8 +1198,7 @@ export component PackageTab inherits Tab {
         model: tabs[index].usages;
         icons-color: transparent;  // Do not colorize.
         caption: @tr("This package is used by the following devices:");
-        placeholder-text: @tr("This package is not used by any device.");
-        max-inner-width: 800px;  // Because of long item comments.
+        empty-model-text: @tr("This package is not used by any device.");
 
         item-picked(idx, item) => {
             tabs[index].open-device = item.user-data;

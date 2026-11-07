@@ -107,7 +107,8 @@ SymbolTab::SymbolTab(LibraryEditor& editor, std::unique_ptr<Symbol> sym,
         LibraryElementCategoriesModel::Type::ComponentCategory)),
     mCategoriesTree(new CategoryTreeModel(editor.getWorkspace().getLibraryDb(),
                                           editor.getWorkspace().getSettings(),
-                                          CategoryTreeModel::Filter::CmpCat)),
+                                          CategoryTreeModel::Filter::CmpCat,
+                                          false)),
     mToolFeatures(),
     mTool(ui::EditorTool::Select),
     mToolCursorShape(Qt::ArrowCursor),
@@ -273,6 +274,7 @@ ui::SymbolTabData SymbolTab::getDerivedUiData() const noexcept {
       mCategories,  // Categories
       mCategoriesTree,  // Categories tree
       mChooseCategory,  // Choose category
+      {},  // Choose category filter term (not needed in this direction)
       ui::RuleCheckData{
           ui::RuleCheckType::SymbolCheck,  // Check type
           ui::RuleCheckState::UpToDate,  // Check state
@@ -357,6 +359,7 @@ void SymbolTab::setDerivedUiData(const ui::SymbolTabData& data) noexcept {
     mCategories->add(*uuid);
   }
   mChooseCategory = data.choose_category;
+  mCategoriesTree->setFilterTerm(s2q(data.choose_category_filter_term));
 
   // View
   const GridStyle gridStyle = s2l(data.grid_style);

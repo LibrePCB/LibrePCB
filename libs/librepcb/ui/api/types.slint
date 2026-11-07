@@ -991,6 +991,7 @@ export struct CategoryTabData {
     parents: [string],
     parents-tree: [TreeViewItemData],
     choose-parent: bool,  // If true, the dialog is shown
+    choose-parent-filter-term: string,  // Parents filter
 
     // Checks
     checks: RuleCheckData,
@@ -1020,6 +1021,7 @@ export struct SymbolTabData {
     categories: [LibraryElementCategoryData],
     categories-tree: [TreeViewItemData],
     choose-category: bool,  // If true, the dialog is shown
+    choose-category-filter-term: string,  // Categories filter
 
     // Checks
     checks: RuleCheckData,
@@ -1084,6 +1086,7 @@ export struct PackageTabData {
     categories: [LibraryElementCategoryData],
     categories-tree: [TreeViewItemData],
     choose-category: bool,  // If true, the dialog is shown
+    choose-category-filter-term: string,  // Categories filter
     assembly-type: int,
     min-copper-clearance: LengthEditData,
     pads: [PackagePadData],
@@ -1182,6 +1185,7 @@ export struct ComponentTabData {
     categories: [LibraryElementCategoryData],
     categories-tree: [TreeViewItemData],
     choose-category: bool,  // If true, the dialog is shown
+    choose-category-filter-term: string,  // Categories filter
     datasheet-url: string,
     datasheet-url-error: string,
     schematic-only: bool,
@@ -1231,6 +1235,7 @@ export struct DeviceTabData {
     categories: [LibraryElementCategoryData],
     categories-tree: [TreeViewItemData],
     choose-category: bool,  // If true, the dialog is shown
+    choose-category-filter-term: string,  // Categories filter
     datasheet-url: string,
     datasheet-url-error: string,
     attributes: [AttributeData],

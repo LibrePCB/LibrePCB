@@ -4,7 +4,8 @@ import { Data } from "../api.slint";
 export component OverlayDialog inherits Rectangle {
     in property <bool> ok-button: false;
     in property <bool> close-button: false;
-    in property <length> max-inner-width: 500px;
+    in property <length> preferred-inner-width: 0;
+    in property <length> preferred-inner-height: 0;
 
     background: black.with-alpha(0.3 - Data.theme.base.to-hsv().value * 0.2);
     forward-focus: fs;
@@ -50,8 +51,8 @@ export component OverlayDialog inherits Rectangle {
         focus-on-tab-navigation: false;
 
         Rectangle {
-            width: min(0.8 * root.width, max(self.preferred-width, max-inner-width));
-            height: min(0.8 * root.height, max(self.preferred-height, 50px));
+            width: min(preferred-inner-width > 0 ? preferred-inner-width : self.preferred-width, 0.8 * root.width);
+            height: min(max(preferred-inner-height > 0 ? preferred-inner-height : self.preferred-height, 50px), 0.8 * root.height);
             background: Data.theme.base;
             border-radius: 10px;
             border-width: 1px;
