@@ -551,7 +551,8 @@ void SchematicTab::trigger(ui::TabAction a) noexcept {
       QByteArray data;
       QString basename;
       QString format;
-      if (ImageHelpers::getImageFromClipboard(data, format, basename)) {
+      if (ImageHelpers::getImageFromClipboard(qApp->clipboard()->mimeData(),
+                                              data, format, basename)) {
         mFsm->processAddImage(data, format, basename);
       } else {
         mFsm->processPaste();

@@ -211,15 +211,16 @@ std::optional<FileProofName> ImageHelpers::findExistingOrAskForNewImageFileName(
   return getUnusedFileName(dir, dlg.textValue(), format);
 }
 
-bool ImageHelpers::isImageInClipboard() noexcept {
-  const QMimeData* d = qApp->clipboard()->mimeData();
+bool ImageHelpers::isImageInClipboard(const QMimeData* mime) noexcept {
+  // Clipboard is not always available, leading to nullptr mime data.
+  if (!mime) return false;
 
   // Important: If there is any LibrePCB data in the clipboard, do *NOT*
   // consider it as an image! LibrePCB does sometimes put image data into
   // the clipboard when copying things (e.g. in the symbol editor). But
   // when pasting, we want that *data* to be pasted, not the image.
   bool hasImageData = false;
-  for (const QString& format : d->formats()) {  // NOLINT
+  for (const QString& format : mime->formats()) {  // NOLINT
     if (format.startsWith("application/x-librepcb-clipboard")) {
       return false;
     } else if (format.startsWith("image/")) {
@@ -231,36 +232,38 @@ bool ImageHelpers::isImageInClipboard() noexcept {
   }
 
   // Check if we have an image file path in the clipboard.
-  if (tryGetImageFilePathFromClipboard(d)) {
+  if (tryGetImageFilePathFromClipboard(mime)) {
     return true;
   }
 
   return false;
 }
 
-bool ImageHelpers::getImageFromClipboard(QByteArray& data, QString& format,
+bool ImageHelpers::getImageFromClipboard(const QMimeData* mime,
+                                         QByteArray& data, QString& format,
                                          QString& basename) noexcept {
-  const QMimeData* d = qApp->clipboard()->mimeData();
+  // Clipboard is not always available, leading to nullptr mime data.
+  if (!mime) return false;
 
   // Important: If there is any LibrePCB data in the clipboard, do *NOT*
   // consider it as an image! LibrePCB does sometimes put image data into
   // the clipboard when copying things (e.g. in the symbol editor). But
   // when pasting, we want that *data* to be pasted, not the image.
-  for (const QString& format : d->formats()) {  // NOLINT
+  for (const QString& format : mime->formats()) {  // NOLINT
     if (format.startsWith("application/x-librepcb-clipboard")) {
       return false;
     }
   }
 
   // If there is an SVG, we should prioritize it over the pixmap formats.
-  data = d->data("image/svg+xml");
+  data = mime->data("image/svg+xml");
   if (!data.isEmpty()) {
     format = "svg";
     return true;
   }
 
   // Heuristic to choose between PNG or JPEG.
-  const QImage img = qApp->clipboard()->image();
+  const QImage img = qvariant_cast<QImage>(mime->imageData());
   auto choosePngOrJpg = [&data, &format, &img](const QByteArray& png,
                                                const QByteArray& jpg) noexcept {
     auto hasTransparency = [&img]() {
@@ -297,8 +300,8 @@ bool ImageHelpers::getImageFromClipboard(QByteArray& data, QString& format,
 
   // If both PNG and JPEG are provided (which seems to be the case often),
   // we choose the most reasonable depending on their size and alpha channel.
-  QByteArray png = d->data("image/png");
-  QByteArray jpg = d->data("image/jpeg");
+  QByteArray png = mime->data("image/png");
+  QByteArray jpg = mime->data("image/jpeg");
   if ((!png.isEmpty()) && (!jpg.isEmpty())) {
     choosePngOrJpg(png, jpg);
     return true;
@@ -332,7 +335,7 @@ bool ImageHelpers::getImageFromClipboard(QByteArray& data, QString& format,
   }
 
   // Try local file path (only if a single file is in clipboard).
-  if (auto fp = tryGetImageFilePathFromClipboard(d)) {
+  if (auto fp = tryGetImageFilePathFromClipboard(mime)) {
     QFile file(fp->toStr());
     if (file.open(QIODevice::ReadOnly)) {
       data = file.readAll();
