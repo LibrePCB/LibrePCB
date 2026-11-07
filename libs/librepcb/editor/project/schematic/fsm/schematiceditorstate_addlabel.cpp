@@ -55,6 +55,8 @@ SchematicEditorState_AddLabel::SchematicEditorState_AddLabel(
     const Context& context) noexcept
   : SchematicEditorState(context),
     mUndoCmdActive(false),
+    mCurrentRotation(Angle::deg0()),
+    mCurrentMirrored(false),
     mCurrentNetLabel(nullptr),
     mNetLabelEditCmd(nullptr),
     mCurrentBusLabel(nullptr),
@@ -97,9 +99,11 @@ bool SchematicEditorState_AddLabel::processRotate(
     const Angle& rotation) noexcept {
   if (mUndoCmdActive && mCurrentNetLabel && mNetLabelEditCmd) {
     mNetLabelEditCmd->rotate(rotation, mCurrentNetLabel->getPosition(), true);
+    mCurrentRotation = mCurrentNetLabel->getRotation();
     return true;
   } else if (mUndoCmdActive && mCurrentBusLabel && mBusLabelEditCmd) {
     mBusLabelEditCmd->rotate(rotation, mCurrentBusLabel->getPosition(), true);
+    mCurrentRotation = mCurrentBusLabel->getRotation();
     return true;
   }
 
@@ -111,10 +115,14 @@ bool SchematicEditorState_AddLabel::processMirror(
   if (mUndoCmdActive && mCurrentNetLabel && mNetLabelEditCmd) {
     mNetLabelEditCmd->mirror(orientation, mCurrentNetLabel->getPosition(),
                              true);
+    mCurrentRotation = mCurrentNetLabel->getRotation();
+    mCurrentMirrored = mCurrentNetLabel->getMirrored();
     return true;
   } else if (mUndoCmdActive && mCurrentBusLabel && mBusLabelEditCmd) {
     mBusLabelEditCmd->mirror(orientation, mCurrentBusLabel->getPosition(),
                              true);
+    mCurrentRotation = mCurrentBusLabel->getRotation();
+    mCurrentMirrored = mCurrentBusLabel->getMirrored();
     return true;
   }
 
@@ -155,10 +163,12 @@ bool SchematicEditorState_AddLabel::
   if (mUndoCmdActive && mCurrentNetLabel && mNetLabelEditCmd) {
     mNetLabelEditCmd->rotate(Angle::deg90(), mCurrentNetLabel->getPosition(),
                              true);
+    mCurrentRotation = mCurrentNetLabel->getRotation();
     return true;
   } else if (mUndoCmdActive && mCurrentBusLabel && mBusLabelEditCmd) {
     mBusLabelEditCmd->rotate(Angle::deg90(), mCurrentBusLabel->getPosition(),
                              true);
+    mCurrentRotation = mCurrentBusLabel->getRotation();
     return true;
   }
 
@@ -184,7 +194,7 @@ bool SchematicEditorState_AddLabel::addLabel(const Point& pos) noexcept {
       SI_BusLabel* busLabel = new SI_BusLabel(
           line->getBusLine().getBusSegment(),
           NetLabel(Uuid::createRandom(), pos.mappedToGrid(getGridInterval()),
-                   Angle::deg0(), false));
+                   mCurrentRotation, mCurrentMirrored));
       CmdSchematicBusLabelAdd* cmdAdd = new CmdSchematicBusLabelAdd(*busLabel);
       mContext.undoStack.appendToCmdGroup(cmdAdd);
       mCurrentBusLabel = busLabel;
@@ -198,7 +208,7 @@ bool SchematicEditorState_AddLabel::addLabel(const Point& pos) noexcept {
       SI_NetLabel* netLabel = new SI_NetLabel(
           line->getNetLine().getNetSegment(),
           NetLabel(Uuid::createRandom(), pos.mappedToGrid(getGridInterval()),
-                   Angle::deg0(), false));
+                   mCurrentRotation, mCurrentMirrored));
       CmdSchematicNetLabelAdd* cmdAdd = new CmdSchematicNetLabelAdd(*netLabel);
       mContext.undoStack.appendToCmdGroup(cmdAdd);
       mCurrentNetLabel = netLabel;
