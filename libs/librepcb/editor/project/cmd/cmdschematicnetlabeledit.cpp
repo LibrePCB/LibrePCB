@@ -87,6 +87,13 @@ void CmdSchematicNetLabelEdit::setRotation(const Angle& angle,
   if (immediate) mNetLabel.setRotation(mNewRotation);
 }
 
+void CmdSchematicNetLabelEdit::setMirrored(bool mirrored,
+                                           bool immediate) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewMirrored = mirrored;
+  if (immediate) mNetLabel.setMirrored(mNewMirrored);
+}
+
 void CmdSchematicNetLabelEdit::rotate(const Angle& angle, const Point& center,
                                       bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());

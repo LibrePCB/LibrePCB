@@ -287,6 +287,8 @@ slint::SharedString q2s(Qt::Key k) noexcept {
       return slint::platform::key_codes::CapsLock;
     case Qt::Key::Key_Meta:
       return slint::platform::key_codes::Meta;
+    case Qt::Key::Key_Space:
+      return slint::platform::key_codes::Space;
     case Qt::Key::Key_Up:
       return slint::platform::key_codes::UpArrow;
     case Qt::Key::Key_Down:
@@ -398,6 +400,8 @@ Qt::Key s2key(const slint::SharedString& k) noexcept {
     return Qt::Key::Key_CapsLock;
   } else if (k == slint::platform::key_codes::Meta) {
     return Qt::Key::Key_Meta;
+  } else if (k == slint::platform::key_codes::Space) {
+    return Qt::Key::Key_Space;
   } else if (k == slint::platform::key_codes::UpArrow) {
     return Qt::Key::Key_Up;
   } else if (k == slint::platform::key_codes::DownArrow) {

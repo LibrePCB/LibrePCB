@@ -1444,6 +1444,16 @@ export global EditorCommandSet {
         key: "5",
     };
 
+    in property <EditorCommand> auto-orientation: {
+        id: "auto_orientation",
+        icon: @image-url("../../../../img/auto.svg"),
+        text: "Auto-Orientation",
+        status-tip: "Automatically align labels with the wire they are attached to",
+        shortcut: "Space",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: Key.Space,
+    };
+
     in property <EditorCommand> shape-round: {
         id: "shape_round",
         icon: @image-url("../../../font-awesome/svgs/solid/circle.svg"),

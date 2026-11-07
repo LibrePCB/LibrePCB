@@ -1,0 +1,52 @@
+import {
+    AngleSelector,
+    ToolBarButton,
+} from "../../widgets.slint";
+import {
+    EditorCommandSet as Cmd,
+    SchematicTabData,
+    WindowSectionData,
+} from "../../api.slint";
+
+export component AddLabelToolBar inherits HorizontalLayout {
+    in property <int> section-index;
+    in-out property <WindowSectionData> section;
+    property <[SchematicTabData]> tabs: section.schematic-tabs;
+
+    spacing: 2px;
+
+    angle-selector := AngleSelector {
+        angle: tabs[section.current-tab-index].tool-angle;
+
+        angle-clicked(a) => {
+            tabs[section.current-tab-index].tool-auto-orientation = false;
+            tabs[section.current-tab-index].tool-angle = a;
+        }
+    }
+
+    mirror-btn := ToolBarButton {
+        icon: @image-url("../../../../bootstrap-icons/icons/symmetry-vertical.svg");
+        tooltip: @tr("Mirror");
+        tooltip-shortcut: Cmd.mirror-horizontal.shortcut;
+        checked: tabs[section.current-tab-index].tool-mirrored;
+        checkable: true;
+
+        clicked => {
+            tabs[section.current-tab-index].tool-auto-orientation = false;
+            tabs[section.current-tab-index].tool-mirrored = !self.checked;
+        }
+    }
+
+    auto-orientation-btn := ToolBarButton {
+        icon: Cmd.auto-orientation.icon;
+        tooltip: Cmd.auto-orientation.text;
+        tooltip-shortcut: Cmd.auto-orientation.shortcut;
+        status-tip: Cmd.auto-orientation.status-tip;
+        checked: tabs[section.current-tab-index].tool-auto-orientation;
+        checkable: true;
+
+        clicked => {
+            tabs[section.current-tab-index].tool-auto-orientation = !self.checked;
+        }
+    }
+}

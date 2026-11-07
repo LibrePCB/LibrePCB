@@ -32,6 +32,8 @@
 #include "fsm/schematiceditorstate_drawwire.h"
 #include "windowtab.h"
 
+#include <librepcb/core/types/angle.h>
+
 #include <QtCore>
 
 /*******************************************************************************
@@ -161,6 +163,9 @@ public:
 
 signals:
   void wireModeRequested(SchematicEditorState_DrawWire::WireMode mode);
+  void angleRequested(const Angle& angle);
+  void mirroredRequested(bool mirrored);
+  void autoOrientationRequested(bool enabled);
   void layerRequested(const Layer& layer);
   void filledRequested(bool filled);
   void valueRequested(const QString& value);
@@ -202,6 +207,9 @@ private:
   Qt::CursorShape mToolCursorShape;
   QString mToolOverlayText;
   SchematicEditorState_DrawWire::WireMode mToolWireMode;
+  Angle mToolAngle;
+  bool mToolMirrored;
+  bool mToolAutoOrientation;
   QVector<const Layer*> mToolLayersQt;
   std::shared_ptr<slint::VectorModel<slint::SharedString>> mToolLayers;
   const Layer* mToolLayer;

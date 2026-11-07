@@ -160,6 +160,7 @@ public:
     out.set_wire_mode_90_45(l2s(cmd.wireMode9045, out.get_wire_mode_90_45()));
     out.set_wire_mode_45_90(l2s(cmd.wireMode4590, out.get_wire_mode_45_90()));
     out.set_wire_mode_straight(l2s(cmd.wireModeStraight, out.get_wire_mode_straight()));
+    out.set_auto_orientation(l2s(cmd.autoOrientation, out.get_auto_orientation()));
     out.set_shape_round(l2s(cmd.shapeRound, out.get_shape_round()));
     out.set_shape_rounded_rect(l2s(cmd.shapeRoundedRect, out.get_shape_rounded_rect()));
     out.set_shape_rect(l2s(cmd.shapeRect, out.get_shape_rect()));
