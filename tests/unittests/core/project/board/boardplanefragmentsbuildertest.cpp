@@ -27,6 +27,8 @@
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/boardplanefragmentsbuilder.h>
 #include <librepcb/core/project/board/items/bi_plane.h>
+#include <librepcb/core/project/circuit/circuit.h>
+#include <librepcb/core/project/circuit/netclass.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectloader.h>
 #include <librepcb/core/serialization/sexpression.h>
@@ -76,6 +78,13 @@ TEST(BoardPlaneFragmentsBuilderTest, testFragments) {
                   projectFp.getFilename());  // can throw
   Board* board = project->getBoards().first();
 
+  // This snapshot predates netclass-specific plane clearances. Keep it focused
+  // on its original plane geometry scenarios; dedicated coverage is below.
+  NetClass* specialNetClass =
+      project->getCircuit().getNetClassByName(ElementName("special"));
+  ASSERT_NE(nullptr, specialNetClass);
+  specialNetClass->setMinCopperCopperClearance(UnsignedLength(0));
+
   // force planes rebuild
   BoardPlaneFragmentsBuilder builder;
   const QHash<Uuid, QVector<Path>> result =
@@ -107,6 +116,50 @@ TEST(BoardPlaneFragmentsBuilderTest, testFragments) {
   FilePath expectedFp = testDataDir.getPathTo("expected.lp");
   QByteArray expected = FileUtils::readFile(expectedFp);
   EXPECT_EQ(expected.toStdString(), actual.toStdString());
+}
+
+TEST(BoardPlaneFragmentsBuilderTest, testNetClassClearance) {
+  FilePath projectFp(TEST_DATA_DIR "/projects/Nested Planes/project.lpp");
+  std::shared_ptr<TransactionalFileSystem> projectFs =
+      TransactionalFileSystem::openRO(projectFp.getParentDir());
+  ProjectLoader loader;
+  std::unique_ptr<Project> project =
+      loader.open(std::make_unique<TransactionalDirectory>(projectFs),
+                  projectFp.getFilename());  // can throw
+  Board* board = project->getBoards().first();
+  NetClass* specialNetClass =
+      project->getCircuit().getNetClassByName(ElementName("special"));
+  ASSERT_NE(nullptr, specialNetClass);
+
+  const Uuid planeUuid =
+      Uuid::fromString("a3d619a3-eb5c-44f8-8956-53cc5a5d0dd2");
+  const Point testPoint(70000000, 39000000);
+  auto containsPoint = [&testPoint](const QVector<Path>& fragments) {
+    for (const Path& fragment : fragments) {
+      if (fragment.toQPainterPathPx().contains(testPoint.toPxQPointF())) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  // With no netclass rule, the plane's 1mm clearance leaves this point in
+  // copper (3mm away from the center of a 2mm via).
+  specialNetClass->setMinCopperCopperClearance(UnsignedLength(0));
+  BoardPlaneFragmentsBuilder builder;
+  QHash<Uuid, QVector<Path>> result = builder.runAndApply(*board);
+  ASSERT_TRUE(result.contains(planeUuid));
+  EXPECT_TRUE(containsPoint(result.value(planeUuid)));
+
+  // A 3.33mm netclass clearance must invalidate the planes and enlarge the
+  // same via cutout, removing the test point from copper.
+  specialNetClass->setMinCopperCopperClearance(UnsignedLength(3330000));
+  EXPECT_TRUE(
+      board->takeScheduledLayersForPlanesRebuild(board->getCopperLayers())
+          .contains(&Layer::topCopper()));
+  result = builder.runAndApply(*board);
+  ASSERT_TRUE(result.contains(planeUuid));
+  EXPECT_FALSE(containsPoint(result.value(planeUuid)));
 }
 
 TEST(BoardPlaneFragmentsBuilderTest, testManyThreads) {

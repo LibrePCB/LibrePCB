@@ -215,6 +215,14 @@ private:  // Methods
     QList<std::tuple<Transform, PositiveLength, NonEmptyPath>> holes;
     QList<TraceData> traces;  // Converted to polygons after preprocessing.
     std::shared_ptr<ClipperLib::Paths> boardArea;  // Populated in preprocessing
+    QHash<Uuid, UnsignedLength> netSignalClearances;
+
+    UnsignedLength getNetClassClearance(
+        const std::optional<Uuid>& netSignalUuid) const noexcept {
+      return netSignalUuid
+          ? netSignalClearances.value(*netSignalUuid, UnsignedLength(0))
+          : UnsignedLength(0);
+    }
   };
 
   struct LayerJobResult {
