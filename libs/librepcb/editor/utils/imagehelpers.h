@@ -154,10 +154,12 @@ public:
    * Call this method for a lightweight check if theres is any data
    * #getImageFromClipboard() is able to load.
    *
-   * @retval true    The clipboard contains an image.
-   * @retval false   There's no image in the clipboard.
+   * @param mime    Clipboard mime data, or `nullptr` if not available.
+   *                Typically from `qApp->clipboard()->mimeData()`.
+   * @retval true   The clipboard contains an image.
+   * @retval false  There's no image in the clipboard.
    */
-  static bool isImageInClipboard() noexcept;
+  static bool isImageInClipboard(const QMimeData* mime) noexcept;
 
   /**
    * @brief Try to get the image from the clipboard
@@ -170,6 +172,8 @@ public:
    *        the supported formats, this method does not validate the file.
    *        Always call ::librepcb::Image::tryLoad() afterwards to do so.
    *
+   * @param mime        Clipboard mime data, or `nullptr` if not available.
+   *                    Typically from `qApp->clipboard()->mimeData()`.
    * @param data        Content of the image (may have been converted
    *                    into a supported image format).
    * @param format      Image format of `data` (e.g. "png").
@@ -177,7 +181,8 @@ public:
    * @retval true       Successfully fetched the image.
    * @retval false      No image in the clipboard, or failed to fetch it.
    */
-  static bool getImageFromClipboard(QByteArray& data, QString& format,
+  static bool getImageFromClipboard(const QMimeData* mime, QByteArray& data,
+                                    QString& format,
                                     QString& basename) noexcept;
 };
 

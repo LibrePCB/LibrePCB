@@ -1240,9 +1240,10 @@ void SchematicEditorState_Select::updateAvailableFeatures(
     features = SchematicEditorFsmAdapter::Features();
     *features |= SchematicEditorFsmAdapter::Feature::Select;
 
-    if (SchematicClipboardData::isValid(qApp->clipboard()->mimeData()) ||
-        SymbolClipboardData::isValid(qApp->clipboard()->mimeData()) ||
-        ImageHelpers::isImageInClipboard()) {
+    const QMimeData* mimeData = qApp->clipboard()->mimeData();
+    if (SchematicClipboardData::isValid(mimeData) ||
+        SymbolClipboardData::isValid(mimeData) ||
+        ImageHelpers::isImageInClipboard(mimeData)) {
       *features |= SchematicEditorFsmAdapter::Feature::Paste;
     }
 
