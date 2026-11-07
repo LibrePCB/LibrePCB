@@ -41,5 +41,10 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL GNU AND CMAKE_CXX_COMPILER_VERSION
   target_compile_options(Slint INTERFACE -Wno-nonnull)
 endif()
 
+# Suppress compiler warning (https://github.com/realm/realm-core/issues/4732)
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  target_compile_options(Slint INTERFACE -Wno-dtor-name)
+endif()
+
 # Suppress compiler warning (https://github.com/slint-ui/slint/issues/7795)
 target_compile_options(Slint INTERFACE -Wno-extra-semi)

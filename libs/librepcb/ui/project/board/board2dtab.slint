@@ -114,7 +114,6 @@ export component Board2dTab inherits Tab {
 
                 overlay-txt := TextInput {
                     horizontal-alignment: left;
-                    vertical-alignment: top;
                     font-family: "Noto Sans Mono";
                     color: Data.theme.control-text;
                     text: tabs[index].tool-overlay-text;
@@ -587,9 +586,9 @@ export component Board2dTab inherits Tab {
             x: parent.width - self.preferred-width - 7px;
             y: toolbutton-offset-y + 7px;
             width: self.preferred-width;
+            cross-axis-alignment: end;
 
             zoom-fit-btn := SceneButton {
-                x: parent.width - self.width;
                 icon: @image-url("../../../../../img/zoom-fit.svg");
                 base-color: tabs[index].background-color;
                 base-text-color: tabs[index].foreground-color;
@@ -600,7 +599,6 @@ export component Board2dTab inherits Tab {
             }
 
             zoom-in-btn := SceneButton {
-                x: parent.width - self.width;
                 icon: @image-url("../../../../bootstrap-icons/icons/zoom-in.svg");
                 base-color: tabs[index].background-color;
                 base-text-color: tabs[index].foreground-color;
@@ -611,7 +609,6 @@ export component Board2dTab inherits Tab {
             }
 
             zoom-out-btn := SceneButton {
-                x: parent.width - self.width;
                 icon: @image-url("../../../../bootstrap-icons/icons/zoom-out.svg");
                 base-color: tabs[index].background-color;
                 base-text-color: tabs[index].foreground-color;
@@ -622,7 +619,6 @@ export component Board2dTab inherits Tab {
             }
 
             flip-btn := SceneButton {
-                x: parent.width - self.width;
                 style: self.checked ? checkbox : button;
                 icon-scale: self.checked ? 1.0 : 1.1;
                 icon: Cmd.flip-view.icon;
@@ -637,7 +633,6 @@ export component Board2dTab inherits Tab {
             }
 
             background-image-btn := SliderSceneButton {
-                x: parent.width - self.width;
                 style: self.slider-enabled ? checkbox : button;
                 icon-scale: self.slider-enabled ? 0.8 : 0.9;
                 icon: Cmd.toggle-background-image.icon;
@@ -657,7 +652,6 @@ export component Board2dTab inherits Tab {
             }
 
             toggle-3d-btn := SceneButton {
-                x: parent.width - self.width;
                 text: "3D";
                 base-color: tabs[index].background-color;
                 base-text-color: tabs[index].foreground-color;
@@ -672,9 +666,8 @@ export component Board2dTab inherits Tab {
             }
 
             if tabs[index].refreshing: spinner := Spinner {
-                x: toggle-3d-btn.x + (toggle-3d-btn.width - self.width) / 2;
-                width: 20px;
-                height: self.width;
+                width: toggle-3d-btn.width;
+                height: 20px;
                 foreground-color: tabs[index].foreground-color;
                 indeterminate: true;
             }

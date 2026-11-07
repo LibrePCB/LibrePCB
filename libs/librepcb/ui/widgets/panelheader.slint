@@ -30,9 +30,9 @@ export component PanelHeader inherits Rectangle {
             padding-left: 5px;
             padding-right: 1px;
             spacing: 3px;
+            cross-axis-alignment: stretch;
 
             title-txt := Text {
-                y: 2px;
                 font-weight: 700;
                 overflow: elide;
                 vertical-alignment: center;
@@ -42,7 +42,6 @@ export component PanelHeader inherits Rectangle {
             }
 
             if !note.is-empty: note-txt := Text {
-                y: 2px;
                 horizontal-stretch: 1;
                 font-size: 11px;
                 font-italic: true;

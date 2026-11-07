@@ -186,9 +186,9 @@ export component NotificationsPopup inherits Rectangle {
         }
 
         for notification[i] in Data.notifications: VerticalLayout {
+            cross-axis-alignment: stretch;
+
             if i > 0: Rectangle {
-                x: 0;
-                width: 100%;
                 height: 3px;
 
                 Rectangle {
