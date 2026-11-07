@@ -25,6 +25,8 @@
  ******************************************************************************/
 #include "schematiceditorstate.h"
 
+#include <librepcb/core/types/angle.h>
+
 #include <QtCore>
 
 /*******************************************************************************
@@ -88,6 +90,13 @@ private:  // Methods
 
 private:  // Data
   bool mUndoCmdActive;
+
+  // Current tool settings
+  Angle mCurrentNetLabelRotation;
+  bool mCurrentNetLabelMirrored;
+  Angle mCurrentBusLabelRotation;
+  bool mCurrentBusLabelMirrored;
+
   SI_NetLabel* mCurrentNetLabel;
   CmdSchematicNetLabelEdit* mNetLabelEditCmd;
   SI_BusLabel* mCurrentBusLabel;
