@@ -78,25 +78,43 @@ public:
   bool processGraphicsSceneRightMouseButtonReleased(
       const GraphicsSceneMouseEvent& e) noexcept override;
 
+  // Connection to UI
+  Angle getRotation() const noexcept;
+  void setRotation(const Angle& rotation) noexcept;
+  bool getMirrored() const noexcept;
+  void setMirrored(bool mirrored) noexcept;
+  bool getAutoOrientation() const noexcept { return mAutoOrientation; }
+  void setAutoOrientation(bool enabled) noexcept;
+
   // Operator Overloadings
   SchematicEditorState_AddLabel& operator=(
       const SchematicEditorState_AddLabel& rhs) = delete;
+
+signals:
+  void rotationChanged(const Angle& rotation);
+  void mirroredChanged(bool mirrored);
+  void autoOrientationChanged(bool enabled);
 
 private:  // Methods
   bool addLabel(const Point& pos) noexcept;
   bool updateLabel(const Point& pos) noexcept;
   bool fixLabel(const Point& pos) noexcept;
   bool abortCommand(bool showErrMsgBox) noexcept;
+  void updateLabelAutoOrientation() noexcept;
+  std::optional<std::pair<Angle, bool>> calcAutoOrientation(
+      const Point& pos, const QVector<std::pair<Point, Point>>& lines) noexcept;
 
 private:  // Data
   bool mUndoCmdActive;
 
   // Current tool settings
+  bool mAutoOrientation;
   Angle mCurrentNetLabelRotation;
   bool mCurrentNetLabelMirrored;
   Angle mCurrentBusLabelRotation;
   bool mCurrentBusLabelMirrored;
 
+  // Information about the current label to place
   SI_NetLabel* mCurrentNetLabel;
   CmdSchematicNetLabelEdit* mNetLabelEditCmd;
   SI_BusLabel* mCurrentBusLabel;

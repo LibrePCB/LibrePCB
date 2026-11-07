@@ -1444,6 +1444,16 @@ export global EditorCommandSet {
         key: "5",
     };
 
+    in property <EditorCommand> auto-orientation-toggle: {
+        id: "auto_orientation_toggle",
+        icon: @image-url("../../../../img/auto.svg"),
+        text: "Toggle Auto-Orientation",
+        status-tip: "Toggle the auto-orientation mode for new labels",
+        shortcut: "A",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "a",
+    };
+
     in property <EditorCommand> shape-round: {
         id: "shape_round",
         icon: @image-url("../../../font-awesome/svgs/solid/circle.svg"),

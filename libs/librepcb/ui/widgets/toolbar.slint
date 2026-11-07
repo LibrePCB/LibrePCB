@@ -62,6 +62,7 @@ export component ToolBarWidget inherits FocusScope {
 export component ToolBarButton inherits ToolBarWidget {
     in property <image> icon;
     in property <string> tooltip;
+    in property <string> tooltip-shortcut;
     in property <string> status-tip;
     in property <bool> checkable: false;
     in-out property <bool> checked: false;
@@ -86,6 +87,7 @@ export component ToolBarButton inherits ToolBarWidget {
         width: self.height;
         icon: icon;
         tooltip: tooltip;
+        tooltip-shortcut: tooltip-shortcut;
         status-tip: status-tip;
         background-color-hovered: transparent;
         background-color-checked: Data.theme.control-checked;

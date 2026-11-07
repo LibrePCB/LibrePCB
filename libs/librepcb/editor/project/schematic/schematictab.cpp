@@ -37,6 +37,7 @@
 #include "../projecteditor.h"
 #include "fsm/schematiceditorfsm.h"
 #include "fsm/schematiceditorstate_addcomponent.h"
+#include "fsm/schematiceditorstate_addlabel.h"
 #include "fsm/schematiceditorstate_addtext.h"
 #include "fsm/schematiceditorstate_drawbus.h"
 #include "fsm/schematiceditorstate_drawpolygon.h"
@@ -139,6 +140,9 @@ SchematicTab::SchematicTab(GuiApplication& app, SchematicEditor& editor,
     mTool(ui::EditorTool::Select),
     mToolCursorShape(Qt::ArrowCursor),
     mToolWireMode(SchematicEditorState_DrawWire::WireMode::HV),
+    mToolAngle(Angle::deg0()),
+    mToolMirrored(false),
+    mToolAutoOrientation(false),
     mToolLayers(std::make_shared<slint::VectorModel<slint::SharedString>>()),
     mToolLayer(nullptr),
     mToolLineWidth(app.getWorkspace().getSettings()),
@@ -324,6 +328,9 @@ ui::SchematicTabData SchematicTab::getDerivedUiData() const noexcept {
                              : mToolCursorShape),  // Tool cursor
       q2s(mToolOverlayText),  // Tool overlay text
       l2s(mToolWireMode),  // Tool wire mode
+      static_cast<int>(mToolAngle.mappedTo0_360deg().toDeg()),  // Tool angle
+      mToolMirrored,  // Tool mirrored
+      mToolAutoOrientation,  // Tool auto orientation
       ui::ComboBoxData{
           // Tool layer
           mToolLayers,  // Items
@@ -407,14 +414,43 @@ void SchematicTab::setDerivedUiData(const ui::SchematicTabData& data) noexcept {
   mMsgInstallLibraries.setUiData(data.install_libraries_msg);
   mMsgAddDrawingFrame.setUiData(data.add_drawing_frame_msg);
 
+  // Tool layer
   if (const Layer* layer = mToolLayersQt.value(data.tool_layer.current_index)) {
     emit layerRequested(*layer);
   }
+
+  // Tool wire mode
   emit wireModeRequested(s2l(data.tool_wire_mode));
+
+  // Tool angle (conditionally, to avoid disabling auto-orientation)
+  const Angle angle = Angle::fromDeg(data.tool_angle);
+  if (angle != mToolAngle) {
+    emit angleRequested(angle);
+  }
+
+  // Tool mirrored (conditionally, to avoid disabling auto-orientation)
+  if (data.tool_mirrored != mToolMirrored) {
+    emit mirroredRequested(data.tool_mirrored);
+  }
+
+  // Tool auto-orientation (conditionally, to avoid preventing auto-disable)
+  if (data.tool_auto_orientation != mToolAutoOrientation) {
+    emit autoOrientationRequested(data.tool_auto_orientation);
+  }
+
+  // Tool filled
   emit filledRequested(data.tool_filled);
+
+  // Tool line width
   mToolLineWidth.setUiData(data.tool_line_width);
+
+  // Tool size
   mToolSize.setUiData(data.tool_size);
+
+  // Tool value
   emit valueRequested(EditorToolbox::toMultiLine(s2q(data.tool_value.text)));
+
+  // Tool attribute unit & value.
   // Unit must be set before value, because value may override the unit!
   emit attributeUnitRequested(
       mToolAttributeUnitsQt.value(data.tool_attribute_unit.current_index));
@@ -1003,9 +1039,46 @@ void SchematicTab::fsmToolEnter(SchematicEditorState_DrawBus& state) noexcept {
 }
 
 void SchematicTab::fsmToolEnter(SchematicEditorState_AddLabel& state) noexcept {
-  Q_UNUSED(state);
-
   mTool = ui::EditorTool::Label;
+
+  // Rotation
+  auto setAngle = [this](const Angle& angle) {
+    mToolAngle = angle;
+    onDerivedUiDataChanged.notify();
+  };
+  setAngle(state.getRotation());
+  mFsmStateConnections.append(connect(
+      &state, &SchematicEditorState_AddLabel::rotationChanged, this, setAngle));
+  mFsmStateConnections.append(
+      connect(this, &SchematicTab::angleRequested, &state,
+              &SchematicEditorState_AddLabel::setRotation));
+
+  // Mirrored
+  auto setMirrored = [this](bool mirrored) {
+    mToolMirrored = mirrored;
+    onDerivedUiDataChanged.notify();
+  };
+  setMirrored(state.getMirrored());
+  mFsmStateConnections.append(
+      connect(&state, &SchematicEditorState_AddLabel::mirroredChanged, this,
+              setMirrored));
+  mFsmStateConnections.append(
+      connect(this, &SchematicTab::mirroredRequested, &state,
+              &SchematicEditorState_AddLabel::setMirrored));
+
+  // Auto orientation
+  auto setAutoOrientation = [this](bool enabled) {
+    mToolAutoOrientation = enabled;
+    onDerivedUiDataChanged.notify();
+  };
+  setAutoOrientation(state.getAutoOrientation());
+  mFsmStateConnections.append(
+      connect(&state, &SchematicEditorState_AddLabel::autoOrientationChanged,
+              this, setAutoOrientation));
+  mFsmStateConnections.append(
+      connect(this, &SchematicTab::autoOrientationRequested, &state,
+              &SchematicEditorState_AddLabel::setAutoOrientation));
+
   onDerivedUiDataChanged.notify();
 }
 

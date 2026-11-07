@@ -1482,6 +1482,15 @@ public:
       {QKeySequence(Qt::Key_5)},
       &categoryCommands,
   };
+  EditorCommand autoOrientationToggle{
+      "auto_orientation_toggle",  // clang-format break
+      QT_TR_NOOP("Toggle Auto-Orientation"),
+      QT_TR_NOOP("Toggle the auto-orientation mode for new labels"),
+      ":/img/auto.svg",
+      EditorCommand::Flags(),
+      {QKeySequence(Qt::Key_A)},
+      &categoryCommands,
+  };
   EditorCommand shapeRound{
       "shape_round",  // clang-format break
       QT_TR_NOOP("Round"),

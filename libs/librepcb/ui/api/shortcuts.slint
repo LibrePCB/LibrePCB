@@ -865,6 +865,11 @@ export global Shortcuts {
                 Data.current-section.schematic-tabs[tab].tool-wire-mode = WireMode.straight;
                 return true;
             }
+        } else if Data.current-section.schematic-tabs[tab].tool == EditorTool.label {
+            if Backend.is-shortcut(event, Cmd.auto-orientation-toggle) {
+                Data.current-section.schematic-tabs[tab].tool-auto-orientation = !Data.current-section.schematic-tabs[tab].tool-auto-orientation;
+                return true;
+            }
         } else if Data.current-section.schematic-tabs[tab].tool == EditorTool.polygon {
             if Backend.is-shortcut(event, Cmd.layer-up) && (Data.current-section.schematic-tabs[tab].tool-layer.current-index > 0) {
                 Data.current-section.schematic-tabs[tab].tool-layer.current-index -= 1;

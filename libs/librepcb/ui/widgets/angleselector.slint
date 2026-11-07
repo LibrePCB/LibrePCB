@@ -1,0 +1,65 @@
+import { ToolBarWidget, ToolBarSelectorButton } from "toolbar.slint";
+import { Helpers } from "../api.slint";
+
+export component AngleSelector inherits ToolBarWidget {
+    in-out property <int> angle;  // In degrees
+
+    callback angle-clicked(int);
+    angle-clicked(a) => {
+        angle = a;
+    }
+
+    ToolBarSelectorButton {
+        icon: @image-url("../../../bootstrap-icons/icons/align-start.svg");
+        checked: angle == 0;
+
+        clicked => {
+            angle-clicked(0);
+        }
+    }
+
+    ToolBarSelectorButton {
+        icon: @image-url("../../../bootstrap-icons/icons/align-start.svg");
+        icon-rotation: 270deg;
+        checked: angle == 90;
+
+        clicked => {
+            angle-clicked(90);
+        }
+    }
+
+    ToolBarSelectorButton {
+        icon: @image-url("../../../bootstrap-icons/icons/align-start.svg");
+        icon-rotation: 180deg;
+        checked: angle == 180;
+
+        clicked => {
+            angle-clicked(180);
+        }
+    }
+
+    ToolBarSelectorButton {
+        icon: @image-url("../../../bootstrap-icons/icons/align-start.svg");
+        icon-rotation: 90deg;
+        checked: angle == 270;
+
+        clicked => {
+            angle-clicked(270);
+        }
+    }
+
+    key-pressed(event) => {
+        if event.text == Key.LeftArrow {
+            if angle >= 90 {
+                angle-clicked(angle - 90);
+            }
+            return accept;
+        } else if event.text == Key.RightArrow {
+            if angle <= 180 {
+                angle-clicked(angle + 90);
+            }
+            return accept;
+        }
+        reject
+    }
+}

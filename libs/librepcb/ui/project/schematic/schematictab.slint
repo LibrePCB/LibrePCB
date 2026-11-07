@@ -2,6 +2,7 @@ import { DrawWireToolBar } from "drawwiretoolbar.slint";
 import { DrawPolygonToolBar } from "drawpolygontoolbar.slint";
 import { AddTextToolBar } from "addtexttoolbar.slint";
 import { AddComponentToolBar } from "addcomponenttoolbar.slint";
+import { AddLabelToolBar } from "addlabeltoolbar.slint";
 import { Tab } from "../../tab.slint";
 import {
     Button,
@@ -125,6 +126,11 @@ export component SchematicTab inherits Tab {
             }
 
             if tabs[index].tool == EditorTool.bus: bus-toolbar := DrawWireToolBar {
+                section-index: section-index;
+                section: section;
+            }
+
+            if tabs[index].tool == EditorTool.label: label-toolbar := AddLabelToolBar {
                 section-index: section-index;
                 section: section;
             }
