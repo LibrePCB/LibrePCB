@@ -183,6 +183,13 @@ export component StatusBar inherits Rectangle {
                         padding: 1px;
 
                         for unit in Helpers.all-length-units: unit-item-ta := TouchArea {
+                            // Accessibility
+                            accessible-role: button;
+                            accessible-label: Helpers.get-unit-accessibility-label(unit);
+                            accessible-action-default => {
+                                self.clicked();
+                            }
+
                             Rectangle {
                                 preferred-width: unit-item-txt.preferred-width + 8px;
                                 preferred-height: unit-item-txt.preferred-height + 8px;
@@ -222,7 +229,8 @@ export component StatusBar inherits Rectangle {
                 enabled: Data.current-tab.features.grid == FeatureState.enabled;
 
                 grid-interval-edt := TextInput {
-                    property <string> data-text: Backend.format-length(current-grid-interval, current-unit);
+                    // Always print all decimals, see https://github.com/LibrePCB/LibrePCB/issues/1853.
+                    property <string> data-text: Backend.format-length(current-grid-interval, current-unit, true);
                     property <LengthEditParseResult> parse-result;
 
                     x: 5px;

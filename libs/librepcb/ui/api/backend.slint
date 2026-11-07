@@ -319,8 +319,9 @@ export global Backend {
     // Format a Length value as a string
     //
     // Used by LengthEdit to convert a Length value to a string in the specified
-    // unit.
-    pure callback format-length(value: Int64, unit: LengthUnit) -> string;
+    // unit. In full precision mode, no rounding will be performed, i.e. all
+    // decimal places will be printed.
+    pure callback format-length(value: Int64, unit: LengthUnit, full-precision: bool) -> string;
     format-length => {
         return "123.456789";
     }

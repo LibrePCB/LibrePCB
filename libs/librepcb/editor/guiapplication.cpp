@@ -857,12 +857,15 @@ std::shared_ptr<MainWindow> GuiApplication::createNewWindow(
     }
     return model;
   });
-  b.on_format_length([](const ui::Int64& value, ui::LengthUnit unit) {
-    const LengthUnit lpUnit = s2l(unit);
-    return q2s(Toolbox::floatToString(lpUnit.convertToUnit(s2l(value)),
-                                      lpUnit.getReasonableNumberOfDecimals(),
-                                      QLocale()));
-  });
+  b.on_format_length(
+      [](const ui::Int64& value, ui::LengthUnit unit, bool fullPrecision) {
+        const LengthUnit lpUnit = s2l(unit);
+        return q2s(Toolbox::floatToString(
+            lpUnit.convertToUnit(s2l(value)),
+            fullPrecision ? lpUnit.getMaxNumberOfDecimals()
+                          : lpUnit.getReasonableNumberOfDecimals(),
+            QLocale()));
+      });
   b.on_parse_length_input(
       [](slint::SharedString text, ui::LengthUnit unit, ui::Int64 minimum) {
         ui::LengthEditParseResult res{false, ui::Int64{0, 0}, unit};

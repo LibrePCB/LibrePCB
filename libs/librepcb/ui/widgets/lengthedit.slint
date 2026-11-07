@@ -59,7 +59,7 @@ export component LengthEdit inherits Rectangle {
     }
 
     function update-text-from-value() {
-        edt.text = Backend.format-length(root.value, root.unit);
+        edt.text = Backend.format-length(root.value, root.unit, false);
         parse-result.valid = true;
     }
 

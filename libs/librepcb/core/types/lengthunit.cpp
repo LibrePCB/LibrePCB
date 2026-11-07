@@ -128,6 +128,27 @@ int LengthUnit::getReasonableNumberOfDecimals() const noexcept {
   }
 }
 
+int LengthUnit::getMaxNumberOfDecimals() const noexcept {
+  switch (mUnit) {
+    case LengthUnit_t::Millimeters:
+      return 6;
+    case LengthUnit_t::Micrometers:
+      return 3;
+    case LengthUnit_t::Nanometers:
+      return 0;
+    case LengthUnit_t::Inches:
+      return 9;
+    case LengthUnit_t::Mils:
+      return 6;
+    default:
+      qCritical() << "Unhandled switch-case in "
+                     "LengthUnit::getFullNumberOfDecimals():"
+                  << static_cast<int>(mUnit);
+      Q_ASSERT(false);
+      return 6;
+  }
+}
+
 QStringList LengthUnit::getUserInputSuffixes() const noexcept {
   switch (mUnit) {
     case LengthUnit_t::Millimeters:
