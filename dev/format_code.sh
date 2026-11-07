@@ -111,6 +111,12 @@ file_not_modified() {
 # Note: Do NOT use in-place edition of the tools because these causes "make"
 # to detect the files as changed every time, even if the content was not
 # modified! So we only overwrite the files here if their content has changed.
+#
+# Note: Call this function only when the formatting tool exited successfully,
+# checked by its exit status! Otherwise a failing tool (e.g. a tool which is
+# not installed) would destroy files by writing its empty output into them.
+# Since the exit status of a process substitution is not visible to the
+# caller, the new content has to be captured in a variable instead.
 update_file() {
   NEW_CONTENT=$(cat)
   OLD_CONTENT=$(cat "$1")
@@ -139,7 +145,8 @@ clang_format_failed() {
 echo "Formatting sources with $CLANGFORMAT and Python..."
 for dir in apps/ libs/librepcb/ tests/unittests/ share/; do
   for file in $(search_files "${dir}**.cpp" "${dir}**.hpp" "${dir}**.h" "${dir}**.js"); do
-    update_file "$file" < <($CLANGFORMAT -style=file "$file" | "$REPO_ROOT/dev/format_code_helper.py" "$file" || clang_format_failed)
+    new_content=$($CLANGFORMAT -style=file "$file" | "$REPO_ROOT/dev/format_code_helper.py" "$file") || clang_format_failed
+    update_file "$file" <<< "$new_content"
   done
 done
 
@@ -178,7 +185,8 @@ slintlsp_failed() {
 echo "Formatting Slint sources with slint-lsp..."
 for dir in apps/ libs/librepcb/; do
   for file in $(search_files "${dir}**.slint"); do
-    update_file "$file" < <(slint-lsp format "$file" | "$REPO_ROOT/dev/format_code_helper.py" "$file" || slintlsp_failed)
+    new_content=$(slint-lsp format "$file" | "$REPO_ROOT/dev/format_code_helper.py" "$file") || slintlsp_failed
+    update_file "$file" <<< "$new_content"
   done
 done
 
@@ -194,7 +202,8 @@ ui_format_failed() {
 echo "Formatting UI files with Python..."
 for dir in apps/ libs/librepcb/ tests/unittests/; do
   for file in $(search_files "${dir}**.ui"); do
-    update_file "$file" < <(cat "$file" | "$REPO_ROOT/dev/format_code_helper.py" "$file" || ui_format_failed)
+    new_content=$(cat "$file" | "$REPO_ROOT/dev/format_code_helper.py" "$file") || ui_format_failed
+    update_file "$file" <<< "$new_content"
   done
 done
 
@@ -209,7 +218,8 @@ cmake_format_failed() {
 }
 echo "Formatting CMake files with cmake-format..."
 for file in $(search_files "**CMakeLists.txt" "*.cmake"); do
-  update_file "$file" < <(cmake-format "$file" || cmake_format_failed)
+  new_content=$(cmake-format "$file") || cmake_format_failed
+  update_file "$file" <<< "$new_content"
 done
 
 # Format *.qrc files with xmlsort.
@@ -223,7 +233,8 @@ xmlsort_failed() {
 }
 echo "Formatting resource files with xmlsort..."
 for file in $(search_files "**.qrc"); do
-  update_file "$file" < <(xmlsort -r "RCC/qresource/file" -i -s "$file" | tr "'" '"' || xmlsort_failed)
+  new_content=$(xmlsort -r "RCC/qresource/file" -i -s "$file" | tr "'" '"') || xmlsort_failed
+  update_file "$file" <<< "$new_content"
 done
 
 # Format .reuse/dep5 files with debian-copyright-sorter.
@@ -237,7 +248,8 @@ dcs_failed() {
 if command -v debian-copyright-sorter 2>&1 >/dev/null; then
   echo "Formatting license files with debian-copyright-sorter..."
   for file in $(search_files "**/dep5"); do
-    update_file "$file" < <(debian-copyright-sorter --iml -s casefold "$file" || dcs_failed)
+    new_content=$(debian-copyright-sorter --iml -s casefold "$file") || dcs_failed
+    update_file "$file" <<< "$new_content"
   done
 else
   echo "Formatting license files with debian-copyright-sorter DISABLED ..."
