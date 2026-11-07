@@ -89,6 +89,7 @@ public:
 
     // Other options
     DevicesOfPads = (1 << 20),  // Don't return pads, but their device.
+    SelectedItemsFirst = (1 << 21),  // Return selected items first.
   };
   Q_DECLARE_FLAGS(FindFlags, FindFlag)
 
