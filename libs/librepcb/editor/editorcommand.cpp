@@ -124,7 +124,12 @@ QAction* EditorCommand::setupAction(QAction* action,
   } else if (mFlags.testFlag(Flag::QuitRole)) {
     action->setMenuRole(QAction::QuitRole);
   }
-  if (!flags.testFlag(ActionFlag::NoShortcuts)) {
+  if (flags.testFlag(ActionFlag::DoubleClickShortcut)) {
+    // This is not directly supported by Qt, but it seems we can render a
+    // custom shortcut text after a tabulator in the action text. But the
+    // shortcut handling must be done in user code.
+    action->setText(text % "\t" % tr("Double-click"));
+  } else if (!flags.testFlag(ActionFlag::NoShortcuts)) {
     action->setShortcuts(mKeySequences);
     if (flags.testFlag(ActionFlag::WidgetShortcut)) {
       action->setShortcutContext(Qt::WidgetShortcut);

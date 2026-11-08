@@ -427,7 +427,17 @@ QList<std::shared_ptr<QGraphicsItem>> BoardEditorState::findItemsAtPos(
     }
   }
 
-  return items.values();
+  // If requested, sort by selection state.
+  QList<std::shared_ptr<QGraphicsItem>> result = items.values();
+  if (flags.testFlag(FindFlag::SelectedItemsFirst)) {
+    std::stable_sort(result.begin(), result.end(),
+                     [](const std::shared_ptr<QGraphicsItem>& a,
+                        const std::shared_ptr<QGraphicsItem>& b) {
+                       return (a->isSelected() != b->isSelected()) &&
+                           a->isSelected();
+                     });
+  }
+  return result;
 }
 
 /*******************************************************************************
