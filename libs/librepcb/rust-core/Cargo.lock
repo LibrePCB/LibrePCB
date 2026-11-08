@@ -511,7 +511,7 @@ checksum = "f8fadd59c855ef2080decdef8ff161eb6661b86933c9d82e5ba29dc602a55aba"
 [[package]]
 name = "spacemouse"
 version = "0.1.0"
-source = "git+https://github.com/AvetosDesign/spacemouse-rs?branch=main#d34d3ee156a50bddc3e2d8a33e5e75b481f92e63"
+source = "git+https://github.com/AvetosDesign/spacemouse-rs?branch=main#3a2dfa3ce9c526afe7af36984c88f775024f8999"
 dependencies = [
  "hidapi",
 ]

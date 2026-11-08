@@ -37,7 +37,7 @@
 namespace librepcb {
 
 namespace rs {
-struct FfiSpaceMouseBackend;
+struct FfiSpaceMouseLoop;
 struct SpaceMouseMotionFfi;
 }  // namespace rs
 
@@ -95,11 +95,11 @@ private:  // Methods
   static void onMotion(void* userData, rs::SpaceMouseMotionFfi motion) noexcept;
   static void onConnectedChanged(void* userData, bool connected) noexcept;
 
-  static RustHandle<rs::FfiSpaceMouseBackend> construct(
+  static RustHandle<rs::FfiSpaceMouseLoop> construct(
       SpaceMouseInput* self) noexcept;
 
 private:  // Data
-  RustHandle<rs::FfiSpaceMouseBackend> mHandle;
+  RustHandle<rs::FfiSpaceMouseLoop> mHandle;
   std::atomic<bool> mConnected;  // Written on this thread, read from any.
 };
 

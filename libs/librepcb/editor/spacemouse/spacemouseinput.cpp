@@ -48,7 +48,7 @@ bool SpaceMouseInput::isDeviceConnected() const noexcept {
 }
 
 void SpaceMouseInput::setLedEnabled(bool enabled) noexcept {
-  rs::ffi_spacemouse_backend_set_led(*mHandle, enabled);
+  rs::ffi_spacemouse_loop_set_led(*mHandle, enabled);
 }
 
 /*******************************************************************************
@@ -88,14 +88,13 @@ void SpaceMouseInput::onConnectedChanged(void* userData,
       Qt::QueuedConnection);
 }
 
-RustHandle<rs::FfiSpaceMouseBackend> SpaceMouseInput::construct(
+RustHandle<rs::FfiSpaceMouseLoop> SpaceMouseInput::construct(
     SpaceMouseInput* self) noexcept {
-  rs::FfiSpaceMouseBackend* obj = rs::ffi_spacemouse_backend_new(
+  rs::FfiSpaceMouseLoop* obj = rs::ffi_spacemouse_loop_new(
       self, &SpaceMouseInput::onMotion, &SpaceMouseInput::onConnectedChanged);
   // Cannot fail. Device errors are reported via onConnectedChanged().
   Q_ASSERT(obj);
-  return RustHandle<rs::FfiSpaceMouseBackend>(*obj,
-                                              &rs::ffi_spacemouse_backend_free);
+  return RustHandle<rs::FfiSpaceMouseLoop>(*obj, &rs::ffi_spacemouse_loop_free);
 }
 
 /*******************************************************************************
