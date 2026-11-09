@@ -302,6 +302,44 @@ void SchematicGraphicsScene::selectItemsInRect(const Point& p1,
   }
 }
 
+void SchematicGraphicsScene::selectNetSegment(
+    SI_NetSegment& netSegment) noexcept {
+  foreach (SI_NetPoint* obj, netSegment.getNetPoints()) {
+    if (auto item = mNetPoints.value(obj)) {
+      item->setSelected(true);
+    }
+  }
+  foreach (SI_NetLine* obj, netSegment.getNetLines()) {
+    if (auto item = mNetLines.value(obj)) {
+      item->setSelected(true);
+    }
+  }
+  foreach (SI_NetLabel* obj, netSegment.getNetLabels()) {
+    if (auto item = mNetLabels.value(obj)) {
+      item->setSelected(true);
+    }
+  }
+}
+
+void SchematicGraphicsScene::selectBusSegment(
+    SI_BusSegment& busSegment) noexcept {
+  foreach (SI_BusJunction* obj, busSegment.getJunctions()) {
+    if (auto item = mBusJunctions.value(obj)) {
+      item->setSelected(true);
+    }
+  }
+  foreach (SI_BusLine* obj, busSegment.getLines()) {
+    if (auto item = mBusLines.value(obj)) {
+      item->setSelected(true);
+    }
+  }
+  foreach (SI_BusLabel* obj, busSegment.getLabels()) {
+    if (auto item = mBusLabels.value(obj)) {
+      item->setSelected(true);
+    }
+  }
+}
+
 void SchematicGraphicsScene::clearSelection() noexcept {
   foreach (auto item, mSymbols) {
     item->setSelected(false);

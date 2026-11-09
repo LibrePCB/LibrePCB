@@ -181,6 +181,8 @@ public:
   void setSelfProbedState(GraphicsLayer::State state) noexcept;
   void selectAll() noexcept;
   void selectItemsInRect(const Point& p1, const Point& p2) noexcept;
+  void selectNetSegment(SI_NetSegment& netSegment) noexcept;
+  void selectBusSegment(SI_BusSegment& busSegment) noexcept;
   void clearSelection() noexcept;
   void updateVerticesEditMode(bool enter) noexcept;
 

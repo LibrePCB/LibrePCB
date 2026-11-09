@@ -804,10 +804,10 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonDoubleClicked(
         // Select the device by double-clicking on one of its pads.
         devItem->setSelected(true);
         return true;
+      } else if (auto nlItem = std::dynamic_pointer_cast<BGI_NetLine>(item)) {
         // Traces don't have a properties dialog (yet), so let's make double-
         // click selecting the whole trace segment. That's an alternative
         // solution for https://github.com/LibrePCB/LibrePCB/issues/1847.
-      } else if (auto nlItem = std::dynamic_pointer_cast<BGI_NetLine>(item)) {
         scene->selectNetSegment(nlItem->getNetLine().getNetSegment());
         return true;
       }

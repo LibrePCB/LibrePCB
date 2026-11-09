@@ -87,6 +87,7 @@ public:
 
     // Other options
     SymbolsOfPins = (1 << 20),  // Don't return pins, but their symbol.
+    SelectedItemsFirst = (1 << 21),  // Return selected items first.
   };
   Q_DECLARE_FLAGS(FindFlags, FindFlag)
 
