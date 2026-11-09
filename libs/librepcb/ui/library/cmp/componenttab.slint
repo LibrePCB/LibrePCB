@@ -651,6 +651,16 @@ export component ComponentTab inherits Tab {
         width: parent.width;
         height: parent.height;
         model: tabs[index].categories-tree;
+        supports-filtering: true;
+        supports-expand: true;
+
+        init => {
+            tabs[index].choose-category-filter-term = "";
+        }
+
+        filter-changed(term) => {
+            tabs[index].choose-category-filter-term = term;
+        }
 
         item-picked(idx, item) => {
             root.focus();  // Keep keyboard shortcuts working.

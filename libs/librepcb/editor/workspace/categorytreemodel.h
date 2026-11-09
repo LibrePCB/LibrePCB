@@ -50,6 +50,14 @@ class CategoryTreeModel : public QObject,
                           public slint::Model<ui::TreeViewItemData> {
   Q_OBJECT
 
+  struct Item {
+    int level = 0;
+    std::optional<Uuid> uuid;  // Root item is `std::nullopt`
+    QString name;
+    QString keywords;
+    bool visible = false;  // If true, it will end up in mFilteredItems
+  };
+
 public:
   // Types
   enum class Filter {
@@ -65,13 +73,19 @@ public:
   CategoryTreeModel(const CategoryTreeModel& other) = delete;
   explicit CategoryTreeModel(
       const WorkspaceLibraryDb& db, const WorkspaceSettings& ws,
-      Filters filters, const std::optional<Uuid>& hiddenCategory = std::nullopt,
+      Filters filters, bool showRootCategory,
+      const std::optional<Uuid>& hiddenCategory = std::nullopt,
       QObject* parent = nullptr) noexcept;
   ~CategoryTreeModel() noexcept override;
+
+  // General Methods
+  void setFilterTerm(const QString& term) noexcept;
 
   // Implementations
   std::size_t row_count() const override;
   std::optional<ui::TreeViewItemData> row_data(std::size_t i) const override;
+  void set_row_data(std::size_t i,
+                    const ui::TreeViewItemData& data) noexcept override;
 
   // Operator Overloadings
   CategoryTreeModel& operator=(const CategoryTreeModel& rhs) = delete;
@@ -80,14 +94,20 @@ private:  // Methods
   void refresh() noexcept;
   template <typename T>
   void loadChildren(const std::optional<Uuid>& parent, int level);
+  void applyFilter() noexcept;
 
 private:  // Data
   const WorkspaceLibraryDb& mDb;
   const WorkspaceSettings& mSettings;
   const Filters mFilters;
+  const bool mShowRootCategory;
   const std::optional<Uuid> mHiddenCategory;
   const slint::Image mIcon;
-  std::vector<ui::TreeViewItemData> mItems;
+  QVector<Item> mItems;
+
+  QString mFilterTerm;
+  QSet<QString> mExpandedCategories;
+  std::vector<ui::TreeViewItemData> mFilteredItems;
 };
 
 /*******************************************************************************

@@ -9,6 +9,7 @@ import {
 export component TreeView inherits FocusScope {
     in-out property <[TreeViewItemData]> model;
     in property <bool> supports-expand: true;
+    in property <bool> trigger-by-single-click: false;
     in property <color> icons-color: transparent;  // Not colorized by default
     in property <length> font-size: 14px;
     in property <length> item-height: font-size + 8px;  // 22px
@@ -30,19 +31,50 @@ export component TreeView inherits FocusScope {
     accessible-role: list;
     accessible-item-count: model.length;
 
-    function set-current-index(index: int) {
-        if ((index + 1) * item-height) > (view.height - view.content-y) {
-            view.content-y = -(index + 1) * item-height + view.height;
-        } else if (index * item-height) < -(view.content-y) {
-            view.content-y = -(index * item-height);
+    public function handle-key-pressed(event: KeyEvent) -> EventResult {
+        if event.text == Key.DownArrow {
+            // Always clamp to both sides, in case current-index is off.
+            set-current-index(clamp(current-index + 1, 0, model.length - 1));
+            return accept;
+        } else if event.text == Key.UpArrow {
+            // Always clamp to both sides, in case current-index is off.
+            set-current-index(clamp(current-index - 1, 0, model.length - 1));
+            return accept;
+        } else if (current-index >= 0) && (current-index < model.length) {
+            if event.text == Key.Return {
+                if !item-triggered(current-index, model[current-index]) {
+                    model[current-index].action = TreeViewItemAction.open;
+                }
+                return accept;
+            } else if (event.text == Key.Space) && (model[current-index].has-children) {
+                model[current-index].expanded = !model[current-index].expanded;
+                return accept;
+            } else if event.text == Key.Delete {
+                if !item-deleted(current-index, model[current-index]) {
+                    model[current-index].action = TreeViewItemAction.delete;
+                }
+                return accept;
+            } else if event.text == Key.Menu {
+                item-right-clicked(current-index, model[current-index], 0, item-height * (current-index + 1) + view.content-y);
+                return accept;
+            }
         }
+        item-key-pressed(current-index, model[current-index], event)
+    }
+
+    public function set-current-index(index: int) {
         current-index = index;
-        item-selected(index, model[index]);
+        if (index >= 0) && (index < model.length) {
+            if ((index + 1) * item-height) > (view.height - view.content-y) {
+                view.content-y = -(index + 1) * item-height + view.height;
+            } else if (index * item-height) < -(view.content-y) {
+                view.content-y = -(index * item-height);
+            }
+            item-selected(index, model[index]);
+        }
     }
 
     view := ListScrollView {
-        x: 0;
-        y: 0;
         width: 100%;
         height: 100%;
         preferred-height: model.length * item-height;
@@ -53,7 +85,6 @@ export component TreeView inherits FocusScope {
             property <bool> is-enabled: item.action == TreeViewItemAction.none;
             property <bool> show-pin: item.supports-pinning && (item.pinned || self.has-hover || (current-index == index));
 
-            width: parent.width;
             height: item-height;
             enabled: is-enabled;
 
@@ -187,7 +218,11 @@ export component TreeView inherits FocusScope {
 
             clicked => {
                 root.focus();
-                set-current-index(index);
+                if trigger-by-single-click {
+                    item-triggered(index, item);
+                } else {
+                    set-current-index(index);
+                }
             }
 
             double-clicked => {
@@ -200,7 +235,8 @@ export component TreeView inherits FocusScope {
 
             pointer-event(event) => {
                 if (event.button == PointerEventButton.right) && (event.kind == PointerEventKind.up) {
-                    self.clicked(); // Handle focus & selection
+                    root.focus();
+                    set-current-index(index);
                     item-right-clicked(index, item, self.absolute-position.x - root.absolute-position.x + self.mouse-x, self.absolute-position.y - root.absolute-position.y + self.mouse-y);
                 }
             }
@@ -208,31 +244,6 @@ export component TreeView inherits FocusScope {
     }
 
     key-pressed(event) => {
-        if event.text == Key.DownArrow {
-            set-current-index(min(current-index + 1, model.length - 1));
-            return accept;
-        } else if event.text == Key.UpArrow {
-            set-current-index(max(current-index - 1, 0));
-            return accept;
-        } else if (current-index >= 0) && (current-index < model.length) {
-            if event.text == Key.Return {
-                if !item-triggered(current-index, model[current-index]) {
-                    model[current-index].action = TreeViewItemAction.open;
-                }
-                return accept;
-            } else if (event.text == Key.Space) && (model[current-index].has-children) {
-                model[current-index].expanded = !model[current-index].expanded;
-                return accept;
-            } else if event.text == Key.Delete {
-                if !item-deleted(current-index, model[current-index]) {
-                    model[current-index].action = TreeViewItemAction.delete;
-                }
-                return accept;
-            } else if event.text == Key.Menu {
-                item-right-clicked(current-index, model[current-index], 0, item-height * (current-index + 1) + view.content-y);
-                return accept;
-            }
-        }
-        item-key-pressed(current-index, model[current-index], event)
+        handle-key-pressed(event)
     }
 }

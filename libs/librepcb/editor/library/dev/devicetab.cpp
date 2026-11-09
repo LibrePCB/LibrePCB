@@ -113,7 +113,8 @@ DeviceTab::DeviceTab(LibraryEditor& editor, std::unique_ptr<Device> dev,
         LibraryElementCategoriesModel::Type::ComponentCategory)),
     mCategoriesTree(new CategoryTreeModel(editor.getWorkspace().getLibraryDb(),
                                           editor.getWorkspace().getSettings(),
-                                          CategoryTreeModel::Filter::CmpCat)),
+                                          CategoryTreeModel::Filter::CmpCat,
+                                          false)),
     mAttributes(new AttributeListModel()),
     mPinout(new DevicePinoutListModel()),
     mPinoutSorted(new slint::SortModel<ui::DevicePinoutData>(
@@ -311,6 +312,7 @@ ui::DeviceTabData DeviceTab::getDerivedUiData() const noexcept {
       mCategories,  // Categories
       mCategoriesTree,  // Categories tree
       mChooseCategory,  // Choose category
+      {},  // Choose category filter term (not needed in this direction)
       mDatasheetUrl,  // Datasheet URL
       mDatasheetUrlError,  // Datasheet URL error
       mAttributes,  // Attributes
@@ -379,6 +381,7 @@ void DeviceTab::setDerivedUiData(const ui::DeviceTabData& data) noexcept {
     mCategories->add(*uuid);
   }
   mChooseCategory = data.choose_category;
+  mCategoriesTree->setFilterTerm(s2q(data.choose_category_filter_term));
   mDatasheetUrl = data.datasheet_url;
   validateUrl(s2q(mDatasheetUrl), mDatasheetUrlError, true);
 

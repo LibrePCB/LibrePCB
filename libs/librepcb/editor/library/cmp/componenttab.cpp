@@ -83,7 +83,8 @@ ComponentTab::ComponentTab(LibraryEditor& editor,
         LibraryElementCategoriesModel::Type::ComponentCategory)),
     mCategoriesTree(new CategoryTreeModel(editor.getWorkspace().getLibraryDb(),
                                           editor.getWorkspace().getSettings(),
-                                          CategoryTreeModel::Filter::CmpCat)),
+                                          CategoryTreeModel::Filter::CmpCat,
+                                          false)),
     mSchematicOnly(false),
     mPrefixParsed(mComponent->getPrefixes().getDefaultValue()),
     mAttributes(new AttributeListModel()),
@@ -197,6 +198,7 @@ ui::ComponentTabData ComponentTab::getDerivedUiData() const noexcept {
       mCategories,  // Categories
       mCategoriesTree,  // Categories tree
       mChooseCategory,  // Choose category
+      {},  // Choose category filter term (not needed in this direction)
       mDatasheetUrl,  // Datasheet URL
       mDatasheetUrlError,  // Datasheet URL error
       mSchematicOnly,  // Schematic-only
@@ -250,6 +252,7 @@ void ComponentTab::setDerivedUiData(const ui::ComponentTabData& data) noexcept {
     mCategories->add(*uuid);
   }
   mChooseCategory = data.choose_category;
+  mCategoriesTree->setFilterTerm(s2q(data.choose_category_filter_term));
   mDatasheetUrl = data.datasheet_url;
   validateUrl(s2q(mDatasheetUrl), mDatasheetUrlError, true);
   mSchematicOnly = data.schematic_only;

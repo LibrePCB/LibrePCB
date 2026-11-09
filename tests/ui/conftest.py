@@ -159,6 +159,9 @@ class Element:
     def trigger(self):
         self._element.invoke_accessible_default_action()
 
+    def expand(self):
+        self._element.invoke_accessible_expand_action()
+
     def click(self):
         self._element.single_click(slint_testing.PointerEventButton.Left)
 
@@ -297,6 +300,23 @@ class ElementQuery:
                 self.save_screenshot()
                 raise TimeoutError(
                     f"Waiting for item timed out: {self._query} "
+                    + "-- Screenshot saved."
+                )
+            time.sleep(0.01)
+
+    def wait_for_no_item(self, test, timeout=10.0):
+        """
+        Wait until no result of the query matches the given test
+        """
+        start = time.time()
+        while True:
+            self.refresh()
+            if not any(test(result) for result in self._results):
+                return
+            if time.time() - start > timeout:
+                self.save_screenshot()
+                raise TimeoutError(
+                    f"Waiting for no item timed out: {self._query} "
                     + "-- Screenshot saved."
                 )
             time.sleep(0.01)
@@ -440,6 +460,15 @@ class Application(slint_testing.Application):
             win.dispatch_event(slint_testing.KeyPressedEvent(key))
         for key in keys:
             win.dispatch_event(slint_testing.KeyReleasedEvent(key))
+
+    def hover(self, pos, window=0):
+        """
+        Move the pointer to the given absolute position (in logical window
+        coordinates), e.g. to trigger hover effects
+        """
+        self.windows[window].dispatch_event(
+            slint_testing.PointerMoveEvent(slint_testing.LogicalPosition(*pos))
+        )
 
     def drag_and_drop(
         self,

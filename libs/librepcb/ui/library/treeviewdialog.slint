@@ -1,42 +1,87 @@
-import { OverlayDialog, TreeView } from "../widgets.slint";
+import { OverlayDialog, TreeView, LineEdit } from "../widgets.slint";
 import { TreeViewItemData, Data } from "../api.slint";
 
 export component TreeViewDialog inherits OverlayDialog {
     in property <[TreeViewItemData]> model;
     in property <string> caption;
-    in property <string> placeholder-text: @tr("No entries.");
+    in property <string> empty-model-text: @tr("No entries.");
+    in property <string> empty-filtered-model-text: @tr("No entries matching the filter.");
     in property <color> icons-color: Data.theme.base-text;
+    in property <bool> supports-filtering: false;
+    in property <bool> supports-expand: false;
+    property <string> filter-term;
+    property <bool> is-empty: (model.length == 0) && filter-term.is-empty;
 
+    callback filter-changed(term: string);
     callback item-picked(index: int, item: TreeViewItemData);
 
     ok-button: false;
     close-button: true;
 
-    if model.length > 0: caption-txt := Text {
+    // Avoid layout jumping when model changes (e.g. due to filtering).
+    preferred-inner-width: is-empty ? 0 : 400px;
+    preferred-inner-height: is-empty ? 0 : 500px;
+
+    init => {
+        self.focus();
+    }
+
+    // Note: Currently we don't have any case where we want to show the
+    // caption if the model is empty. However, if we have such cases in
+    // future, we will need to remove the (!is-empty) condition here and
+    // find another way to hide the caption when it is not desired.
+    if (!is-empty) && (!caption.is-empty): caption-txt := Text {
         text: caption;
         color: Data.theme.control-text;
         wrap: word-wrap;
     }
 
-    if model.length > 0: view := TreeView {
-        model: model;
-        supports-expand: false;
-        icons-color: icons-color;
+    if supports-filtering && (!is-empty): filter-edt := LineEdit {
+        text <=> filter-term;
+        height: self.preferred-height;
+        placeholder-text: @tr("Type to filter...");
 
-        item-selected(idx, item) => {
-            item-picked(idx, item);
+        changed text => {
+            view.set-current-index(-1);  // Avoid getting it off the view.
+            filter-changed(self.text);
+        }
+
+        init => {
+            self.focus();
+        }
+
+        key-pressed(event) => {
+            if (event.text == Key.Escape) && (!self.text.is-empty) {
+                self.text = "";
+                return accept;
+            } else if (event.text == Key.Return) && (model.length == 1) {
+                item-picked(0, model[0]);
+                return accept;
+            } else if (event.text == Key.DownArrow) || (event.text == Key.UpArrow) || (event.text == Key.Return) || (event.modifiers.control && (event.text == Key.Space)) {
+                return view.handle-key-pressed(event);
+            }
+            reject
         }
     }
 
-    if model.length == 0: placeholder-txt := Text {
-        width: 100%;
-        horizontal-alignment: center;
-        text: placeholder-text;
-        color: Data.theme.control-text;
-        wrap: word-wrap;
-    }
+    Rectangle {
+        view := TreeView {
+            model: model;
+            supports-expand: supports-expand;
+            trigger-by-single-click: true;
+            icons-color: icons-color;
 
-    init => {
-        self.focus();
+            item-triggered(idx, item) => {
+                item-picked(idx, item);
+                return true;
+            }
+        }
+
+        if model.length == 0: empty-model-txt := Text {
+            horizontal-alignment: center;
+            text: filter-term.is-empty ? empty-model-text : empty-filtered-model-text;
+            color: Data.theme.control-text;
+            wrap: word-wrap;
+        }
     }
 }

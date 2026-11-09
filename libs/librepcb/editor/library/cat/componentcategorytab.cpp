@@ -67,7 +67,7 @@ ComponentCategoryTab::ComponentCategoryTab(
     mParents(new slint::VectorModel<slint::SharedString>()),
     mParentsModel(new CategoryTreeModel(editor.getWorkspace().getLibraryDb(),
                                         editor.getWorkspace().getSettings(),
-                                        CategoryTreeModel::Filter::CmpCat,
+                                        CategoryTreeModel::Filter::CmpCat, true,
                                         mCategory->getUuid())) {
   // Connect undo stack.
   connect(mUndoStack.get(), &UndoStack::stateModified, this,
@@ -146,6 +146,7 @@ ui::CategoryTabData ComponentCategoryTab::getDerivedUiData() const noexcept {
       mParents,  // Parents
       mParentsModel,  // Parents tree
       mChooseParent,  // Choose parent
+      {},  // Choose parent filter term (not needed in this direction)
       ui::RuleCheckData{
           ui::RuleCheckType::ComponentCategoryCheck,  // Check type
           ui::RuleCheckState::UpToDate,  // Check state
@@ -175,6 +176,7 @@ void ComponentCategoryTab::setDerivedUiData(
   mDeprecated = data.deprecated;
 
   mChooseParent = data.choose_parent;
+  mParentsModel->setFilterTerm(s2q(data.choose_parent_filter_term));
   const QString newParent = s2q(data.new_parent);
   if (!newParent.isEmpty()) {
     mParent = Uuid::tryFromString(newParent);
