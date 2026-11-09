@@ -8,6 +8,14 @@ set -euv -o pipefail
 # we adjust PATH.
 export PATH="/usr/bin:$PATH"
 
+# Sanity check: On Windows, any DLLs must be installed into the "bin"
+# directory, so the "lib" directory must not be created at all.
+if [ -d ./build/install/lib ]; then
+  echo "ERROR: ./build/install/lib exists but should not. Contents:" >&2
+  find ./build/install/lib >&2
+  exit 1
+fi
+
 # Copy VC Runtime DLLs (no idea what I'm doing here, but it seems to work...)
 cp -v C:/Windows/System32/vc*140.dll ./build/install/bin/
 cp -v C:/Windows/System32/msvcp140*.dll ./build/install/bin/
@@ -23,11 +31,6 @@ cp -v C:/OpenCascade/win64/gcc/bin/libTK*.dll ./build/install/bin/
 
 # Copy MinGW DLLs
 cp -v "`qmake -query QT_INSTALL_PREFIX`"/bin/lib*.dll ./build/install/bin/
-
-# Copy/move Slint DLL
-cp -v ./build/install/lib/librepcbslint.dll ./build/install/bin/
-cp -v ./build/install/lib/librepcbslint.dll ./build/tests/unittests/
-rm -rfv ./build/install/lib
 
 # Copy Qt DLLs
 windeployqt --compiler-runtime --force ./build/install/bin/librepcb.exe

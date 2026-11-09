@@ -71,7 +71,12 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# Include GNU install dirs variables
+# Include GNU install dirs variables.
+# On Windows, shared libraries (DLLs) must be located next to the executables,
+# so we change the LIB target directory before including GNUInstallDirs.
+if(WIN32)
+  set(CMAKE_INSTALL_LIBDIR "bin")
+endif()
 include(GNUInstallDirs)
 
 # Create "common" interface library which is used for DRY configuration of

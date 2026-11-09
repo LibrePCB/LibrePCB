@@ -190,3 +190,16 @@ set_source_files_properties(
 qt6_add_translation(UNITTESTS_QM_FILES ${UNITTESTS_TS_FILES} OPTIONS -silent)
 add_custom_target(librepcb_unittests_translations DEPENDS ${UNITTESTS_QM_FILES})
 add_dependencies(librepcb_unittests librepcb_unittests_translations)
+
+# On Windows, copy the Slint shared library (librepcbslint.dll) into the
+# directory of the executable, since the DLL is needed to run the executable.
+if(WIN32)
+  add_custom_command(
+    TARGET librepcb_unittests
+    POST_BUILD
+    COMMAND
+      "${CMAKE_COMMAND}" -E copy_if_different
+      "$<TARGET_FILE:librepcbslint-shared>"
+      "$<TARGET_FILE_DIR:librepcb_unittests>"
+  )
+endif()

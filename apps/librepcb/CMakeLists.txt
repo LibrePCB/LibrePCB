@@ -62,3 +62,14 @@ if(WIN32)
   )
   target_sources(librepcb PUBLIC "${WINDOWS_APP_ICON_RESOURCE}")
 endif()
+
+# On Windows, copy the Slint shared library (librepcbslint.dll) into the
+# directory of the executable, since the DLL is needed to run the executable.
+if(WIN32)
+  add_custom_command(
+    TARGET librepcb
+    POST_BUILD
+    COMMAND "${CMAKE_COMMAND}" -E copy_if_different
+            "$<TARGET_FILE:librepcbslint-shared>" "$<TARGET_FILE_DIR:librepcb>"
+  )
+endif()
