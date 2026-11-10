@@ -1727,6 +1727,16 @@ export component MainMenuBar {
                 common-buttons-l := HorizontalLayout {
                     spacing: 5px;
 
+                    // Board tabs have "board setup", schematic tabs have "project setup". See
+                    // https://librepcb.discourse.group/t/board-editor-schematic-editor-settings/1128
+                    if Data.current-tab.type == TabType.schematic: project-setup-btn := MenuBarButton {
+                        cmd: Cmd.project-setup;
+
+                        clicked => {
+                            Backend.trigger-project(Data.current-schematic-tab.project-index, ProjectAction.open-setup-dialog);
+                        }
+                    }
+
                     if (Data.current-tab.type == TabType.board-2d) || (Data.current-tab.type == TabType.board-3d): board-setup-btn := MenuBarButton {
                         cmd: Cmd.board-setup;
 
