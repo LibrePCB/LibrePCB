@@ -39,7 +39,9 @@
 #include "../../cmd/cmdremoveselectedschematicitems.h"
 #include "../../cmd/cmdsimplifyschematicsegments.h"
 #include "../graphicsitems/sgi_buslabel.h"
+#include "../graphicsitems/sgi_busline.h"
 #include "../graphicsitems/sgi_netlabel.h"
+#include "../graphicsitems/sgi_netline.h"
 #include "../graphicsitems/sgi_symbol.h"
 #include "../graphicsitems/sgi_symbolpin.h"
 #include "../graphicsitems/sgi_text.h"
@@ -635,20 +637,37 @@ bool SchematicEditorState_Select::
     return processGraphicsSceneLeftMouseButtonPressed(e);
   }
 
+  SchematicGraphicsScene* scene = getActiveSchematicScene();
+  if (!scene) return false;
+
   // Discard any temporary changes and release undo stack.
   abortBlockingToolsInOtherEditors();
 
   if (mSubState == SubState::Idle) {
     // Open the properties editor dialog of the selected item, if any.
+    // Process selected items first, to keep the current selection.
     const QList<std::shared_ptr<QGraphicsItem>> items = findItemsAtPos(
         e.scenePos,
-        FindFlag::All | FindFlag::SymbolsOfPins | FindFlag::AcceptNearMatch);
+        FindFlag::All | FindFlag::SymbolsOfPins | FindFlag::AcceptNearMatch |
+            FindFlag::SelectedItemsFirst);
     foreach (auto item, items) {
       if (item->isSelected() && openPropertiesDialog(item)) {
         return true;
       } else if (auto symItem = std::dynamic_pointer_cast<SGI_Symbol>(item)) {
         // Select the symbol by double-clicking on one of its pins.
         symItem->setSelected(true);
+        return true;
+      } else if (auto nlItem = std::dynamic_pointer_cast<SGI_NetLine>(item)) {
+        // Wires don't have a properties dialog (yet), so let's make
+        // double-click selecting the whole segment. That's an alternative
+        // solution for https://github.com/LibrePCB/LibrePCB/issues/1847.
+        scene->selectNetSegment(nlItem->getNetLine().getNetSegment());
+        return true;
+      } else if (auto blItem = std::dynamic_pointer_cast<SGI_BusLine>(item)) {
+        // Buses don't have a properties dialog (yet), so let's make
+        // double-click selecting the whole segment. That's an alternative
+        // solution for https://github.com/LibrePCB/LibrePCB/issues/1847.
+        scene->selectBusSegment(blItem->getBusLine().getBusSegment());
         return true;
       }
     }
