@@ -1482,6 +1482,16 @@ public:
       {QKeySequence(Qt::Key_5)},
       &categoryCommands,
   };
+  EditorCommand autoOrientation{
+      "auto_orientation",  // clang-format break
+      QT_TR_NOOP("Auto-Orientation"),
+      QT_TR_NOOP(
+          "Automatically align labels with the wire they are attached to"),
+      ":/img/auto.svg",
+      EditorCommand::Flags(),
+      {QKeySequence(Qt::Key_Space)},
+      &categoryCommands,
+  };
   EditorCommand shapeRound{
       "shape_round",  // clang-format break
       QT_TR_NOOP("Round"),

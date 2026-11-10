@@ -30,13 +30,16 @@
 #include "../graphicsitems/sgi_busline.h"
 #include "../graphicsitems/sgi_netline.h"
 
+#include <librepcb/core/project/schematic/items/si_busjunction.h>
 #include <librepcb/core/project/schematic/items/si_buslabel.h>
 #include <librepcb/core/project/schematic/items/si_busline.h>
 #include <librepcb/core/project/schematic/items/si_bussegment.h>
 #include <librepcb/core/project/schematic/items/si_netlabel.h>
 #include <librepcb/core/project/schematic/items/si_netline.h>
+#include <librepcb/core/project/schematic/items/si_netpoint.h>
 #include <librepcb/core/project/schematic/items/si_netsegment.h>
 #include <librepcb/core/project/schematic/schematic.h>
+#include <librepcb/core/utils/toolbox.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -55,10 +58,17 @@ SchematicEditorState_AddLabel::SchematicEditorState_AddLabel(
     const Context& context) noexcept
   : SchematicEditorState(context),
     mUndoCmdActive(false),
+    mCurrentRotation(Angle::deg0()),
+    mCurrentMirrored(false),
+    mAutoOrientation(false),
     mCurrentNetLabel(nullptr),
     mNetLabelEditCmd(nullptr),
     mCurrentBusLabel(nullptr),
     mBusLabelEditCmd(nullptr) {
+  // Restore client settings.
+  QSettings cs;
+  mAutoOrientation =
+      cs.value("schematic_editor/add_label/auto_orientation", true).toBool();
 }
 
 SchematicEditorState_AddLabel::~SchematicEditorState_AddLabel() noexcept {
@@ -73,7 +83,9 @@ bool SchematicEditorState_AddLabel::entry() noexcept {
   Q_ASSERT(mUndoCmdActive == false);
 
   mAdapter.fsmToolEnter(*this);
-  mAdapter.fsmSetFeatures(SchematicEditorFsmAdapter::Features());
+  mAdapter.fsmSetFeatures(SchematicEditorFsmAdapter::Features(
+      SchematicEditorFsmAdapter::Feature::Rotate |
+      SchematicEditorFsmAdapter::Feature::Mirror));
   mAdapter.fsmSetViewCursor(Qt::CrossCursor);
   return true;
 }
@@ -95,30 +107,41 @@ bool SchematicEditorState_AddLabel::exit() noexcept {
 
 bool SchematicEditorState_AddLabel::processRotate(
     const Angle& rotation) noexcept {
+  setAutoOrientation(false);  // Switch back to manual mode.
   if (mUndoCmdActive && mCurrentNetLabel && mNetLabelEditCmd) {
     mNetLabelEditCmd->rotate(rotation, mCurrentNetLabel->getPosition(), true);
-    return true;
+    mCurrentRotation = mCurrentNetLabel->getRotation();
   } else if (mUndoCmdActive && mCurrentBusLabel && mBusLabelEditCmd) {
     mBusLabelEditCmd->rotate(rotation, mCurrentBusLabel->getPosition(), true);
-    return true;
+    mCurrentRotation = mCurrentBusLabel->getRotation();
+  } else {
+    mCurrentRotation += rotation;  // Memorize for the next label.
+    mCurrentRotation = mCurrentRotation.mappedTo0_360deg();
   }
-
-  return false;
+  emit rotationChanged(mCurrentRotation);
+  return true;
 }
 
 bool SchematicEditorState_AddLabel::processMirror(
     Qt::Orientation orientation) noexcept {
+  setAutoOrientation(false);  // Switch back to manual mode.
   if (mUndoCmdActive && mCurrentNetLabel && mNetLabelEditCmd) {
     mNetLabelEditCmd->mirror(orientation, mCurrentNetLabel->getPosition(),
                              true);
-    return true;
+    mCurrentRotation = mCurrentNetLabel->getRotation();
+    mCurrentMirrored = mCurrentNetLabel->getMirrored();
+    emit rotationChanged(mCurrentRotation);
   } else if (mUndoCmdActive && mCurrentBusLabel && mBusLabelEditCmd) {
     mBusLabelEditCmd->mirror(orientation, mCurrentBusLabel->getPosition(),
                              true);
-    return true;
+    mCurrentRotation = mCurrentBusLabel->getRotation();
+    mCurrentMirrored = mCurrentBusLabel->getMirrored();
+    emit rotationChanged(mCurrentRotation);
+  } else {
+    mCurrentMirrored = !mCurrentMirrored;  // Memorize for the next label.
   }
-
-  return false;
+  emit mirroredChanged(mCurrentMirrored);
+  return true;
 }
 
 bool SchematicEditorState_AddLabel::processGraphicsSceneMouseMoved(
@@ -150,19 +173,70 @@ bool SchematicEditorState_AddLabel::
         const GraphicsSceneMouseEvent& e) noexcept {
   Q_UNUSED(e);
 
-  // Note: Always accept the event if we are placing a net label! When ignoring
-  // the event, the state machine will abort the tool by a right click!
-  if (mUndoCmdActive && mCurrentNetLabel && mNetLabelEditCmd) {
-    mNetLabelEditCmd->rotate(Angle::deg90(), mCurrentNetLabel->getPosition(),
-                             true);
-    return true;
-  } else if (mUndoCmdActive && mCurrentBusLabel && mBusLabelEditCmd) {
-    mBusLabelEditCmd->rotate(Angle::deg90(), mCurrentBusLabel->getPosition(),
-                             true);
-    return true;
+  if (mUndoCmdActive) {
+    return processRotate(Angle::deg90());
+  } else {
+    return false;  // Let the FSM exit this tool.
+  }
+}
+
+/*******************************************************************************
+ *  Connection to UI
+ ******************************************************************************/
+
+Angle SchematicEditorState_AddLabel::getRotation() const noexcept {
+  return mCurrentRotation;
+}
+
+void SchematicEditorState_AddLabel::setRotation(
+    const Angle& rotation) noexcept {
+  if (rotation == mCurrentRotation) {
+    return;
   }
 
-  return false;
+  setAutoOrientation(false);  // Switch back to manual mode.
+  mCurrentRotation = rotation;
+  emit rotationChanged(mCurrentRotation);
+
+  if (mUndoCmdActive && mNetLabelEditCmd) {
+    mNetLabelEditCmd->setRotation(mCurrentRotation, true);
+  } else if (mUndoCmdActive && mBusLabelEditCmd) {
+    mBusLabelEditCmd->setRotation(mCurrentRotation, true);
+  }
+}
+
+bool SchematicEditorState_AddLabel::getMirrored() const noexcept {
+  return mCurrentMirrored;
+}
+
+void SchematicEditorState_AddLabel::setMirrored(bool mirrored) noexcept {
+  if (mirrored == mCurrentMirrored) {
+    return;
+  }
+
+  setAutoOrientation(false);  // Switch back to manual mode.
+  mCurrentMirrored = mirrored;
+  emit mirroredChanged(mCurrentMirrored);
+
+  if (mUndoCmdActive && mNetLabelEditCmd) {
+    mNetLabelEditCmd->setMirrored(mCurrentMirrored, true);
+  } else if (mUndoCmdActive && mBusLabelEditCmd) {
+    mBusLabelEditCmd->setMirrored(mCurrentMirrored, true);
+  }
+}
+
+void SchematicEditorState_AddLabel::setAutoOrientation(bool enabled) noexcept {
+  if (enabled == mAutoOrientation) {
+    return;
+  }
+
+  mAutoOrientation = enabled;
+  emit autoOrientationChanged(mAutoOrientation);
+  updateLabelAutoOrientation();
+
+  // Save client settings.
+  QSettings cs;
+  cs.setValue("schematic_editor/add_label/auto_orientation", mAutoOrientation);
 }
 
 /*******************************************************************************
@@ -184,7 +258,7 @@ bool SchematicEditorState_AddLabel::addLabel(const Point& pos) noexcept {
       SI_BusLabel* busLabel = new SI_BusLabel(
           line->getBusLine().getBusSegment(),
           NetLabel(Uuid::createRandom(), pos.mappedToGrid(getGridInterval()),
-                   Angle::deg0(), false));
+                   mCurrentRotation, mCurrentMirrored));
       CmdSchematicBusLabelAdd* cmdAdd = new CmdSchematicBusLabelAdd(*busLabel);
       mContext.undoStack.appendToCmdGroup(cmdAdd);
       mCurrentBusLabel = busLabel;
@@ -198,7 +272,7 @@ bool SchematicEditorState_AddLabel::addLabel(const Point& pos) noexcept {
       SI_NetLabel* netLabel = new SI_NetLabel(
           line->getNetLine().getNetSegment(),
           NetLabel(Uuid::createRandom(), pos.mappedToGrid(getGridInterval()),
-                   Angle::deg0(), false));
+                   mCurrentRotation, mCurrentMirrored));
       CmdSchematicNetLabelAdd* cmdAdd = new CmdSchematicNetLabelAdd(*netLabel);
       mContext.undoStack.appendToCmdGroup(cmdAdd);
       mCurrentNetLabel = netLabel;
@@ -211,10 +285,8 @@ bool SchematicEditorState_AddLabel::addLabel(const Point& pos) noexcept {
       return false;
     }
 
-    // Allow some actions.
-    mAdapter.fsmSetFeatures(SchematicEditorFsmAdapter::Features(
-        SchematicEditorFsmAdapter::Feature::Rotate |
-        SchematicEditorFsmAdapter::Feature::Mirror));
+    // Apply auto-orientation, if enabled.
+    updateLabelAutoOrientation();
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
@@ -226,9 +298,11 @@ bool SchematicEditorState_AddLabel::addLabel(const Point& pos) noexcept {
 bool SchematicEditorState_AddLabel::updateLabel(const Point& pos) noexcept {
   if (mUndoCmdActive && mNetLabelEditCmd) {
     mNetLabelEditCmd->setPosition(pos.mappedToGrid(getGridInterval()), true);
+    updateLabelAutoOrientation();
     return true;
   } else if (mUndoCmdActive && mBusLabelEditCmd) {
     mBusLabelEditCmd->setPosition(pos.mappedToGrid(getGridInterval()), true);
+    updateLabelAutoOrientation();
     return true;
   } else {
     return false;
@@ -252,7 +326,6 @@ bool SchematicEditorState_AddLabel::fixLabel(const Point& pos) noexcept {
     mNetLabelEditCmd = nullptr;
     mCurrentBusLabel = nullptr;
     mBusLabelEditCmd = nullptr;
-    mAdapter.fsmSetFeatures(SchematicEditorFsmAdapter::Features());
     mAdapter.fsmCrossProbe();
     return true;
   } catch (const Exception& e) {
@@ -262,9 +335,100 @@ bool SchematicEditorState_AddLabel::fixLabel(const Point& pos) noexcept {
   }
 }
 
+void SchematicEditorState_AddLabel::updateLabelAutoOrientation() noexcept {
+  if (!mAutoOrientation) {
+    return;
+  }
+
+  // Note: In auto-orientation mode, Align the label with the lines it is
+  // attached to (if any). This should be consistent to what the wire and bus
+  // tools do when automatically placing a label while drawing a line.
+  if (mCurrentNetLabel && mNetLabelEditCmd) {
+    const Point pos = mCurrentNetLabel->getNetSegment().calcNearestPoint(
+        mCurrentNetLabel->getPosition());
+    QVector<std::pair<Point, Point>> lines;
+    const QList<std::shared_ptr<QGraphicsItem>> items =
+        findItemsAtPos(pos, FindFlag::NetLines);
+    for (const auto& item : items) {
+      if (const auto line = std::dynamic_pointer_cast<SGI_NetLine>(item)) {
+        if (line->getNetLine().getNetSegment() ==
+            mCurrentNetLabel->getNetSegment()) {
+          lines.append({line->getNetLine().getP1().getPosition(),
+                        line->getNetLine().getP2().getPosition()});
+        }
+      }
+    }
+    if (const auto orientation = calcAutoOrientation(pos, lines)) {
+      if (orientation->first != mCurrentRotation) {
+        mNetLabelEditCmd->setRotation(orientation->first, true);
+        mCurrentRotation = orientation->first;
+        emit rotationChanged(orientation->first);
+      }
+      if (orientation->second != mCurrentMirrored) {
+        mNetLabelEditCmd->setMirrored(orientation->second, true);
+        mCurrentMirrored = orientation->second;
+        emit mirroredChanged(orientation->second);
+      }
+    }
+  } else if (mCurrentBusLabel && mBusLabelEditCmd) {
+    const Point pos = mCurrentBusLabel->getBusSegment().calcNearestPoint(
+        mCurrentBusLabel->getPosition());
+    QVector<std::pair<Point, Point>> lines;
+    const QList<std::shared_ptr<QGraphicsItem>> items =
+        findItemsAtPos(pos, FindFlag::BusLines);
+    for (const auto& item : items) {
+      if (const auto line = std::dynamic_pointer_cast<SGI_BusLine>(item)) {
+        if (line->getBusLine().getBusSegment() ==
+            mCurrentBusLabel->getBusSegment()) {
+          lines.append({line->getBusLine().getP1().getPosition(),
+                        line->getBusLine().getP2().getPosition()});
+        }
+      }
+    }
+    if (const auto orientation = calcAutoOrientation(pos, lines)) {
+      if (orientation->first != mCurrentRotation) {
+        mBusLabelEditCmd->setRotation(orientation->first, true);
+        mCurrentRotation = orientation->first;
+        emit rotationChanged(orientation->first);
+      }
+      if (orientation->second != mCurrentMirrored) {
+        mBusLabelEditCmd->setMirrored(orientation->second, true);
+        mCurrentMirrored = orientation->second;
+        emit mirroredChanged(orientation->second);
+      }
+    }
+  }
+}
+
+std::optional<std::pair<Angle, bool>>
+    SchematicEditorState_AddLabel::calcAutoOrientation(
+        const Point& pos,
+        const QVector<std::pair<Point, Point>>& lines) noexcept {
+  std::optional<std::pair<Angle, bool>> result;
+  for (const auto& [p1, p2] : lines) {
+    // Determine the direction from the label position towards the line
+    // endpoint which is farther away.
+    const Point dirPos =
+        ((p1 - pos).getLength() >= (p2 - pos).getLength()) ? p1 : p2;
+    const Angle dir =
+        Toolbox::angleBetweenPoints(pos, dirPos).rounded(Angle::deg90());
+    const bool mirror = dir.mappedTo0_360deg() >= Angle::deg180();
+    const std::pair<Angle, bool> candidate = {
+        mirror ? (dir + Angle::deg180()) : dir,
+        mirror,
+    };
+    // If there are multiple lines, prefer those with horizontal direction.
+    if (candidate.first.mappedTo180deg() == Angle::deg0()) {
+      return candidate;
+    } else if (!result) {
+      result = candidate;
+    }
+  }
+  return result;
+}
+
 bool SchematicEditorState_AddLabel::abortCommand(bool showErrMsgBox) noexcept {
   try {
-    mAdapter.fsmSetFeatures(SchematicEditorFsmAdapter::Features());
     mAdapter.fsmCrossProbe();
     if (mUndoCmdActive) {
       mContext.undoStack.abortCmdGroup();  // can throw

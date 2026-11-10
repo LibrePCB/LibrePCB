@@ -86,6 +86,13 @@ void CmdSchematicBusLabelEdit::setRotation(const Angle& angle,
   if (immediate) mLabel.setRotation(mNewRotation);
 }
 
+void CmdSchematicBusLabelEdit::setMirrored(bool mirrored,
+                                           bool immediate) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewMirrored = mirrored;
+  if (immediate) mLabel.setMirrored(mNewMirrored);
+}
+
 void CmdSchematicBusLabelEdit::rotate(const Angle& angle, const Point& center,
                                       bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());

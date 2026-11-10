@@ -58,6 +58,7 @@ public:
   void translate(const Point& deltaPos, bool immediate) noexcept;
   void snapToGrid(const PositiveLength& gridInterval, bool immediate) noexcept;
   void setRotation(const Angle& angle, bool immediate) noexcept;
+  void setMirrored(bool mirrored, bool immediate) noexcept;
   void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
   void mirror(Qt::Orientation orientation, const Point& center,
               bool immediate) noexcept;
