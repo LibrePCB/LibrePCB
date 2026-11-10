@@ -175,6 +175,7 @@ struct BoardDesignRuleCheckData final {
     Point position;
     Angle rotation;
     bool mirror;
+    bool suppressCopperClearanceErrors;  // Allow internal short-circuits
     QHash<Uuid, Pad> pads;  // With absolute transform.
     QList<Polygon> polygons;  // From library footprint.
     QList<Circle> circles;  // From library footprint.

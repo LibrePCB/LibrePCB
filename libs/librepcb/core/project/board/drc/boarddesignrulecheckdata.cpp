@@ -28,6 +28,7 @@
 #include "../../../library/cmp/component.h"
 #include "../../../library/pkg/footprint.h"
 #include "../../../library/pkg/footprintpad.h"
+#include "../../../library/pkg/package.h"
 #include "../../../library/pkg/packagepad.h"
 #include "../../../utils/clipperhelpers.h"
 #include "../../circuit/circuit.h"
@@ -200,6 +201,7 @@ BoardDesignRuleCheckData::BoardDesignRuleCheckData(
         dev->getPosition(),
         dev->getRotation(),
         dev->getMirrored(),
+        dev->getLibPackage().getMinCopperClearance() == 0,  // Allow shorts
         {},
         {},
         {},

@@ -617,6 +617,13 @@ RuleCheckMessageList BoardDesignRuleCheck::checkCopperCopperClearances(
     }
   }
 
+  // Helper to check for suppressed package-internal clearanceErrors.
+  auto suppressInternalClearanceErrors =
+      [](const BoardDesignRuleCheckData::Device* dev1,
+         const BoardDesignRuleCheckData::Device* dev2) {
+        return dev1 && (dev1 == dev2) && (dev1->suppressCopperClearanceErrors);
+      };
+
   // Helper to check for overlapping layer spans.
   QSet<const Layer*> overlappingLayers;
   auto layersOverlap = [&data, &overlappingLayers](
@@ -676,6 +683,7 @@ RuleCheckMessageList BoardDesignRuleCheck::checkCopperCopperClearances(
     for (auto it2 = it1 + 1; it2 != items.end(); it2++) {
       if (((it1->clearance > 0) || (it2->clearance > 0)) &&
           ((it1->net != it2->net) || (!it1->net) || (!it2->net)) &&
+          (!suppressInternalClearanceErrors(it1->object.getDevice(), it2->object.getDevice())) &&
           layersOverlap(it1->startLayer, it1->endLayer, it2->startLayer,
                         it2->endLayer)) {
         QVector<Path> locations;

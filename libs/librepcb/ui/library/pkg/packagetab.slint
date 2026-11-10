@@ -536,6 +536,69 @@ component PackageEditorTab inherits TouchArea {
         }
     }
 
+    property <length> polygons-popup-x;
+    property <length> polygons-popup-y;
+    property <image> polygons-popup-icon;
+
+    polygons-popup := MenuPopup {
+        x: polygons-popup-x;
+        y: polygons-popup-y;
+
+        tool-polygon-documentation-item := MenuItem {
+            text: @tr("Draw Documentation");
+            icon: polygons-popup-icon;
+
+            clicked => {
+                //Backend.trigger-tab(section-index, index, TabAction.tool-pad-thermal);
+            }
+        }
+
+        tool-polygon-legend-item := MenuItem {
+            text: @tr("Draw Legend");
+            icon: polygons-popup-icon;
+
+            clicked => {
+                //Backend.trigger-tab(section-index, index, TabAction.tool-pad-thermal);
+            }
+        }
+
+        tool-polygon-outlines-item := MenuItem {
+            text: @tr("Draw Package Outlines");
+            icon: polygons-popup-icon;
+
+            clicked => {
+                //Backend.trigger-tab(section-index, index, TabAction.tool-pad-thermal);
+            }
+        }
+
+        tool-polygon-courtyard-item := MenuItem {
+            text: @tr("Draw Package Courtyard");
+            icon: polygons-popup-icon;
+
+            clicked => {
+                //Backend.trigger-tab(section-index, index, TabAction.tool-pad-thermal);
+            }
+        }
+
+        tool-polygon-copper-area-item := MenuItem {
+            text: @tr("Draw Copper Area");
+            icon: polygons-popup-icon;
+
+            clicked => {
+                //Backend.trigger-tab(section-index, index, TabAction.tool-pad-thermal);
+            }
+        }
+
+        tool-polygon-cutout-item := MenuItem {
+            text: @tr("Draw Board Cutout");
+            icon: polygons-popup-icon;
+
+            clicked => {
+                //Backend.trigger-tab(section-index, index, TabAction.tool-pad-thermal);
+            }
+        }
+    }
+
     toolbuttons-l := VerticalLayout {
         x: 7px;
         y: 7px + toolbutton-offset-y;
@@ -571,11 +634,19 @@ component PackageEditorTab inherits TouchArea {
                 cmd: Cmd.tool-rect;
                 checked: tabs[index].tool == EditorTool.rect;
                 enabled: footprint-selected && (!read-only);
+                has-menu: true;
                 is-first: false;
                 is-last: false;
 
                 clicked => {
                     tool-triggered(TabAction.tool-rect);
+                }
+
+                right-clicked => {
+                    polygons-popup-x = toolbuttons-l.x + toolbuttons-l.width + 5px;
+                    polygons-popup-y = toolbuttons-l.y + parent.y + self.y;
+                    polygons-popup-icon = Cmd.tool-rect.icon;
+                    polygons-popup.show();
                 }
             }
 
@@ -583,11 +654,19 @@ component PackageEditorTab inherits TouchArea {
                 cmd: Cmd.tool-polygon;
                 checked: tabs[index].tool == EditorTool.polygon;
                 enabled: footprint-selected && (!read-only);
+                has-menu: true;
                 is-first: false;
                 is-last: false;
 
                 clicked => {
                     tool-triggered(TabAction.tool-polygon);
+                }
+
+                right-clicked => {
+                    polygons-popup-x = toolbuttons-l.x + toolbuttons-l.width + 5px;
+                    polygons-popup-y = toolbuttons-l.y + parent.y + self.y;
+                    polygons-popup-icon = Cmd.tool-polygon.icon;
+                    polygons-popup.show();
                 }
             }
 
@@ -966,6 +1045,7 @@ component PackageEditorTab inherits TouchArea {
     }
 
     property <bool> panels-vertical-layout: transform-panel.visible && (self.width - footprints-panel.width - transform-panel.width < 24px);
+
     footprints-panel := PackageEditorFootprintsPanel {
         property <length> offset-x: (self.y - toolbuttons-l.y - toolbuttons-l.height < 8px) ? (toolbuttons-l.x + toolbuttons-l.width) : 0;
 

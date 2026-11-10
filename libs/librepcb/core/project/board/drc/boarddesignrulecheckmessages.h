@@ -609,6 +609,8 @@ public:
       return obj;
     }
 
+    const Data::Device* getDevice() const noexcept {return mDevice;}
+
     bool operator==(const Object& rhs) const {
       std::unique_ptr<SExpression> obj1 = SExpression::createList("object");
       serialize(*obj1);
