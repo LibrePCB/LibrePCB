@@ -396,7 +396,7 @@ export component MainMenuBar {
                 y: parent.height;
                 opening-width: parent.width;
 
-                undo-item := MenuItem {
+                if Data.current-tab.features.undo != FeatureState.not-supported: undo-item := MenuItem {
                     cmd: Cmd.undo;
                     text: undo-text;
                     enabled: Data.current-tab.features.undo == FeatureState.enabled;
@@ -407,7 +407,7 @@ export component MainMenuBar {
                     }
                 }
 
-                redo-item := MenuItem {
+                if Data.current-tab.features.redo != FeatureState.not-supported: redo-item := MenuItem {
                     cmd: Cmd.redo;
                     text: redo-text;
                     enabled: Data.current-tab.features.redo == FeatureState.enabled;
@@ -420,7 +420,7 @@ export component MainMenuBar {
 
                 MenuSeparator { }
 
-                select-all-item := MenuItem {
+                if Data.current-tab.features.select != FeatureState.not-supported: select-all-item := MenuItem {
                     cmd: Cmd.select-all;
                     enabled: Data.current-tab.features.select == FeatureState.enabled;
 
@@ -430,7 +430,7 @@ export component MainMenuBar {
                     }
                 }
 
-                cut-item := MenuItem {
+                if Data.current-tab.features.cut != FeatureState.not-supported: cut-item := MenuItem {
                     cmd: Cmd.clipboard-cut;
                     icon: @image-url("../../font-awesome/svgs/solid/scissors.svg");
                     enabled: Data.current-tab.features.cut == FeatureState.enabled;
@@ -441,7 +441,7 @@ export component MainMenuBar {
                     }
                 }
 
-                copy-item := MenuItem {
+                if Data.current-tab.features.copy != FeatureState.not-supported: copy-item := MenuItem {
                     cmd: Cmd.clipboard-copy;
                     icon: @image-url("../../font-awesome/svgs/regular/copy.svg");
                     enabled: Data.current-tab.features.copy == FeatureState.enabled;
@@ -452,7 +452,7 @@ export component MainMenuBar {
                     }
                 }
 
-                paste-item := MenuItem {
+                if Data.current-tab.features.paste != FeatureState.not-supported: paste-item := MenuItem {
                     cmd: Cmd.clipboard-paste;
                     icon: @image-url("../../font-awesome/svgs/solid/paste.svg");
                     enabled: Data.current-tab.features.paste == FeatureState.enabled;
@@ -463,7 +463,7 @@ export component MainMenuBar {
                     }
                 }
 
-                remove-item := MenuItem {
+                if Data.current-tab.features.remove != FeatureState.not-supported: remove-item := MenuItem {
                     cmd: Cmd.remove;
                     icon: @image-url("../../font-awesome/svgs/solid/trash-can.svg");
                     enabled: Data.current-tab.features.remove == FeatureState.enabled;
@@ -474,7 +474,7 @@ export component MainMenuBar {
                     }
                 }
 
-                rotate-ccw-item := MenuItem {
+                if Data.current-tab.features.rotate != FeatureState.not-supported: rotate-ccw-item := MenuItem {
                     cmd: Cmd.rotate-ccw;
                     icon: @image-url("../../font-awesome/svgs/solid/rotate-left.svg");
                     enabled: Data.current-tab.features.rotate == FeatureState.enabled;
@@ -485,7 +485,7 @@ export component MainMenuBar {
                     }
                 }
 
-                rotate-cw-item := MenuItem {
+                if Data.current-tab.features.rotate != FeatureState.not-supported: rotate-cw-item := MenuItem {
                     cmd: Cmd.rotate-cw;
                     icon: @image-url("../../font-awesome/svgs/solid/rotate-right.svg");
                     enabled: Data.current-tab.features.rotate == FeatureState.enabled;
@@ -496,7 +496,7 @@ export component MainMenuBar {
                     }
                 }
 
-                flip-h-item := MenuItem {
+                if Data.current-tab.features.flip != FeatureState.not-supported: flip-h-item := MenuItem {
                     cmd: Cmd.flip-horizontal;
                     enabled: Data.current-tab.features.flip == FeatureState.enabled;
 
@@ -506,7 +506,7 @@ export component MainMenuBar {
                     }
                 }
 
-                flip-v-item := MenuItem {
+                if Data.current-tab.features.flip != FeatureState.not-supported: flip-v-item := MenuItem {
                     cmd: Cmd.flip-vertical;
                     enabled: Data.current-tab.features.flip == FeatureState.enabled;
 
@@ -516,7 +516,7 @@ export component MainMenuBar {
                     }
                 }
 
-                mirror-h-item := MenuItem {
+                if Data.current-tab.features.mirror != FeatureState.not-supported: mirror-h-item := MenuItem {
                     cmd: Cmd.mirror-horizontal;
                     icon: @image-url("../../bootstrap-icons/icons/symmetry-vertical.svg");
                     enabled: Data.current-tab.features.mirror == FeatureState.enabled;
@@ -527,7 +527,7 @@ export component MainMenuBar {
                     }
                 }
 
-                mirror-v-item := MenuItem {
+                if Data.current-tab.features.mirror != FeatureState.not-supported: mirror-v-item := MenuItem {
                     cmd: Cmd.mirror-vertical;
                     icon: @image-url("../../bootstrap-icons/icons/symmetry-horizontal.svg");
                     enabled: Data.current-tab.features.mirror == FeatureState.enabled;
@@ -538,7 +538,7 @@ export component MainMenuBar {
                     }
                 }
 
-                snap-to-grid-item := MenuItem {
+                if Data.current-tab.features.snap-to-grid != FeatureState.not-supported: snap-to-grid-item := MenuItem {
                     cmd: Cmd.snap-to-grid;
                     enabled: Data.current-tab.features.snap-to-grid == FeatureState.enabled;
 
@@ -548,7 +548,7 @@ export component MainMenuBar {
                     }
                 }
 
-                lock-item := MenuItem {
+                if Data.current-tab.features.lock != FeatureState.not-supported: lock-item := MenuItem {
                     cmd: Cmd.lock;
                     enabled: Data.current-tab.features.lock == FeatureState.enabled;
 
@@ -558,7 +558,7 @@ export component MainMenuBar {
                     }
                 }
 
-                unlock-item := MenuItem {
+                if Data.current-tab.features.unlock != FeatureState.not-supported: unlock-item := MenuItem {
                     cmd: Cmd.unlock;
                     enabled: Data.current-tab.features.unlock == FeatureState.enabled;
 
@@ -568,7 +568,7 @@ export component MainMenuBar {
                     }
                 }
 
-                reset-rexts-item := MenuItem {
+                if Data.current-tab.features.reset-texts != FeatureState.not-supported: reset-rexts-item := MenuItem {
                     cmd: Cmd.device-reset-text-all;
                     enabled: Data.current-tab.features.reset-texts == FeatureState.enabled;
 
@@ -647,7 +647,7 @@ export component MainMenuBar {
 
                 MenuSeparator { }
 
-                properties-item := MenuItem {
+                if Data.current-tab.features.edit-properties != FeatureState.not-supported: properties-item := MenuItem {
                     cmd: Cmd.properties;
                     icon: @image-url("../../font-awesome/svgs/solid/pen-to-square.svg");
                     enabled: Data.current-tab.features.edit-properties == FeatureState.enabled;
