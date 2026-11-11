@@ -31,7 +31,10 @@ The authoritative coding style is documented in the Doxygen pages:
 Follow those documents. In addition, **consistency is crucial**: match the
 naming conventions, comment style, commit style, file organization and general
 idioms of the surrounding code. When in doubt, imitate the existing code in
-the same directory instead of introducing a new pattern.
+the same directory instead of introducing a new pattern. In addition, keep
+code in a logical order, consistent across files. For example, keep methods in
+*.cpp files in the same order as in their *.h file. But also between *.slint
+files and corresponding C++ code.
 
 To format modified files, run `./dev/format_code.sh`; to check styling,
 run `./ci/stylecheck.sh` (though the required tools may not be available on
