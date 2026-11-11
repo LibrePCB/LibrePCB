@@ -287,8 +287,7 @@ ui::TabData PackageTab::getUiData() const noexcept {
     features.grid = toFs(writable);
     features.zoom = toFs(true);
     features.background_image = toFs(true);
-    features.import_graphics =
-        toFs(mToolFeatures.testFlag(Feature::ImportGraphics));
+    features.import_graphics = toFs(writable);
     features.export_graphics = toFs(mTool == ui::EditorTool::Select);
     features.select = toFs(mToolFeatures.testFlag(Feature::Select));
     features.cut = toFs(mToolFeatures.testFlag(Feature::Cut));
@@ -652,6 +651,9 @@ void PackageTab::activate() noexcept {
   connect(mOpenGlSceneRebuildTimer.get(), &QTimer::timeout, this,
           &PackageTab::updateOpenGlScene);
 
+  // Force updating available features, as this depends on the scene.
+  mFsm->processGridIntervalChanged(mPackage->getGridInterval());
+
   applyWorkspaceSettings();
   scheduleOpenGlSceneUpdate();
   updateOpenGlScene();
@@ -676,6 +678,9 @@ void PackageTab::deactivate() noexcept {
     mScene->removeItem(*mBackgroundImageGraphicsItem);
   }
   mScene.reset();
+
+  // Force updating available features, as this depends on the scene.
+  mFsm->processGridIntervalChanged(mPackage->getGridInterval());
 }
 
 void PackageTab::trigger(ui::TabAction a) noexcept {

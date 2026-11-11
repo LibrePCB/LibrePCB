@@ -1118,7 +1118,6 @@ SymbolEditorFsmAdapter::Features
   if (mSubState != SubState::Pasting) {
     features |= SymbolEditorFsmAdapter::Feature::Select;
     if (mAdapter.fsmIsWritable()) {
-      features |= SymbolEditorFsmAdapter::Feature::ImportGraphics;
       const QMimeData* mimeData = qApp->clipboard()->mimeData();
       if (SymbolClipboardData::isValid(mimeData) ||
           ImageHelpers::isImageInClipboard(mimeData)) {

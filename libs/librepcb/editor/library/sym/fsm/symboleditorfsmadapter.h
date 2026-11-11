@@ -72,7 +72,6 @@ public:
     Mirror = (1 << 6),
     SnapToGrid = (1 << 7),
     Properties = (1 << 8),
-    ImportGraphics = (1 << 9),
   };
   Q_DECLARE_FLAGS(Features, Feature)
 

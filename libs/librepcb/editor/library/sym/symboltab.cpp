@@ -220,8 +220,7 @@ ui::TabData SymbolTab::getUiData() const noexcept {
   if ((!mWizardMode) && ((!mCompactLayout) || (mCurrentPageIndex == 1))) {
     features.grid = toFs(writable);
     features.zoom = toFs(true);
-    features.import_graphics =
-        toFs(mToolFeatures.testFlag(Feature::ImportGraphics));
+    features.import_graphics = toFs(writable);
     features.export_graphics = toFs(mTool == ui::EditorTool::Select);
     features.select = toFs(mToolFeatures.testFlag(Feature::Select));
     features.cut = toFs(mToolFeatures.testFlag(Feature::Cut));
@@ -421,6 +420,9 @@ void SymbolTab::activate() noexcept {
       false);
   mScene->addItem(*mGraphicsItem);
 
+  // Force updating available features, as this depends on the scene.
+  mFsm->processGridIntervalChanged(mSymbol->getGridInterval());
+
   applyWorkspaceSettings();
   requestRepaint();
 }
@@ -428,6 +430,9 @@ void SymbolTab::activate() noexcept {
 void SymbolTab::deactivate() noexcept {
   mGraphicsItem.reset();
   mScene.reset();
+
+  // Force updating available features, as this depends on the scene.
+  mFsm->processGridIntervalChanged(mSymbol->getGridInterval());
 }
 
 void SymbolTab::trigger(ui::TabAction a) noexcept {

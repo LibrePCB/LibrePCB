@@ -2048,7 +2048,6 @@ void BoardEditorState_Select::updateAvailableFeatures(
 
     if (!mCmdDragSelectedItems) {
       *features |= BoardEditorFsmAdapter::Feature::Select;
-      *features |= BoardEditorFsmAdapter::Feature::ImportGraphics;
     }
 
     if (BoardClipboardData::isValid(qApp->clipboard()->mimeData()) ||

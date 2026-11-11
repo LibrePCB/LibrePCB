@@ -327,8 +327,8 @@ ui::TabData Board2dTab::getUiData() const noexcept {
   features.redo = toFs(mProjectEditor.getUndoStack().canRedo());
   features.grid = toFs(mProject.getDirectory().isWritable());
   features.zoom = toFs(true);
-  features.import_graphics =
-      toFs(mToolFeatures.testFlag(Feature::ImportGraphics));
+  features.background_image = toFs(true);
+  features.import_graphics = toFs(true);
   features.export_graphics = toFs(mTool == ui::EditorTool::Select);
   features.select = toFs(mTool == ui::EditorTool::Select);
   features.cut = toFs(mToolFeatures.testFlag(Feature::Cut));
@@ -383,7 +383,7 @@ ui::Board2dTabData Board2dTab::getDerivedUiData() const noexcept {
       l2s(mApp.getWorkspace().getSettings().boardGridStyle.get()),  // Grid
       l2s(*mBoard.getGridInterval()),  // Grid interval
       l2s(mBoard.getGridUnit()),  // Length unit
-      mScene->isFlipped(),  // Flip view (view from bottom)
+      mScene && mScene->isFlipped(),  // Flip view (view from bottom)
       mBackgroundImageGraphicsItem->isVisible(),  // Background image set
       static_cast<float>(mBackgroundImageGraphicsItem->opacity()),  // BG alpha
       mIgnorePlacementLocks,  // Ignore placement locks
@@ -486,7 +486,9 @@ void Board2dTab::setDerivedUiData(const ui::Board2dTabData& data) noexcept {
   }
 
   // Flip view (view from bottom)
-  mScene->setFlipped(data.flip_view);
+  if (mScene) {
+    mScene->setFlipped(data.flip_view);
+  }
   mView->setMirror(data.flip_view);
 
   // Background image
@@ -669,6 +671,9 @@ void Board2dTab::activate() noexcept {
   connect(mInputIdleTimer.get(), &QTimer::timeout, &mBoardEditor,
           &BoardEditor::schedulePlanesRebuild);
 
+  // Force updating available features, as this depends on the scene.
+  mFsm->processChangedSelection();
+
   applyWorkspaceSettings();
   mBoardEditor.registerActiveTab(this);
   requestRepaint();
@@ -692,6 +697,9 @@ void Board2dTab::deactivate() noexcept {
   }
   mScene.reset();
   mLayersModel.reset();
+
+  // Force updating available features, as this depends on the scene.
+  mFsm->processChangedSelection();
 }
 
 void Board2dTab::trigger(ui::TabAction a) noexcept {

@@ -76,7 +76,6 @@ public:
     MoveAlign = (1 << 8),
     SnapToGrid = (1 << 9),
     Properties = (1 << 10),
-    ImportGraphics = (1 << 11),
   };
   Q_DECLARE_FLAGS(Features, Feature)
 

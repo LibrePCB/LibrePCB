@@ -524,6 +524,9 @@ void SchematicTab::activate() noexcept {
   // Initialize search context.
   mSearchContext.init();
 
+  // Force updating available features, as this depends on the scene.
+  mFsm->processChangedSelection();
+
   applyWorkspaceSettings();
   mProjectEditor.registerActiveSchematicTab(this);
   requestRepaint();
@@ -534,6 +537,9 @@ void SchematicTab::deactivate() noexcept {
   mSearchContext.deinit();
   mErcLocationGraphicsItem.reset();
   mScene.reset();
+
+  // Force updating available features, as this depends on the scene.
+  mFsm->processChangedSelection();
 }
 
 void SchematicTab::trigger(ui::TabAction a) noexcept {

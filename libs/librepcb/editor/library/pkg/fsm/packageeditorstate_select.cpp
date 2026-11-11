@@ -1718,7 +1718,6 @@ PackageEditorFsmAdapter::Features
     if (mSubState != SubState::Pasting) {
       features |= PackageEditorFsmAdapter::Feature::Select;
       if (mAdapter.fsmIsWritable()) {
-        features |= PackageEditorFsmAdapter::Feature::ImportGraphics;
         if (FootprintClipboardData::isValid(qApp->clipboard()->mimeData())) {
           features |= PackageEditorFsmAdapter::Feature::Paste;
         }
