@@ -35,6 +35,7 @@ cp -v "`qmake -query QT_INSTALL_PREFIX`"/bin/lib*.dll ./build/install/bin/
 # Copy Qt DLLs
 windeployqt --compiler-runtime --force ./build/install/bin/librepcb.exe
 windeployqt --compiler-runtime --force ./build/install/bin/librepcb-cli.exe
+windeployqt --compiler-runtime --force ./build/install/bin/librepcb-mcp.exe
 
 # Print checksums of executables *before signing* to allow public verification.
 sha256sum ./build/install/bin/*.exe
@@ -43,9 +44,11 @@ sha256sum ./build/install/bin/*.exe
 # the call is correct even if signing is disabled for nightly builds).
 powershell.exe -File ci/sign.ps1 $(cygpath -aw ./build/install/bin/librepcb.exe)
 powershell.exe -File ci/sign.ps1 $(cygpath -aw ./build/install/bin/librepcb-cli.exe)
+powershell.exe -File ci/sign.ps1 $(cygpath -aw ./build/install/bin/librepcb-mcp.exe)
 
 # Test if the bundles are working (hopefully catching deployment issues).
 ./build/install/bin/librepcb-cli.exe --version
+./build/install/bin/librepcb-mcp.exe --version
 ./build/install/bin/librepcb.exe --exit-after-startup
 
 # Print checksums to allow fully transparent public verification.
