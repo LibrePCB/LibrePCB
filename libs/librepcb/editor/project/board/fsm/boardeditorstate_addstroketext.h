@@ -86,6 +86,10 @@ public:
     return mCurrentProperties.getHeight();
   }
   void setHeight(const PositiveLength& height) noexcept;
+  const UnsignedLength& getStrokeWidth() const noexcept {
+    return mCurrentProperties.getStrokeWidth();
+  }
+  void setStrokeWidth(const UnsignedLength& strokeWidth) noexcept;
   const QString& getText() const noexcept {
     return mCurrentProperties.getText();
   }
@@ -101,6 +105,7 @@ public:
 signals:
   void layerChanged(const Layer& layer);
   void heightChanged(const PositiveLength& height);
+  void strokeWidthChanged(const UnsignedLength& strokeWidth);
   void textChanged(const QString& text);
   void mirroredChanged(bool mirrored);
 
