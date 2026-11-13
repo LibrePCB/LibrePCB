@@ -19,7 +19,7 @@ libm = "0.2.16"
 lz-str = "0.2.1"  # Keep in sync with interactive-html-bom
 
 # Cross-platform SpaceMouse HID capture.
-spacemouse = { git = "https://github.com/AvetosDesign/spacemouse-rs", branch = "main" }
+spacemouse = "0.1.0"
 
 [dependencies.regex]
 version = "1.11"

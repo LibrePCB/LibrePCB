@@ -1,7 +1,7 @@
-//! FFI for [`spacemouse::SpaceMouseLoop`].
+//! FFI for [`spacemouse::SpaceMouseThread`].
 //!
 
-use spacemouse::{SpaceMouseEvent, SpaceMouseLoop};
+use spacemouse::{SpaceMouseEvent, SpaceMouseThread};
 use std::cell::Cell;
 use std::os::raw::c_void;
 
@@ -28,7 +28,7 @@ pub struct SpaceMouseMotionFfi {
 ///
 /// <div class="warning">
 /// Fires on a background thread owned by the Rust side, *not* the thread
-/// that called [`ffi_spacemouse_loop_new`].
+/// that called [`ffi_spacemouse_thread_new`].
 /// </div>
 pub type MotionCallback =
   extern "C" fn(user_data: *mut c_void, motion: SpaceMouseMotionFfi);
@@ -54,31 +54,31 @@ impl SendPtr {
   }
 }
 
-/// Opaque handle exposed to C++, wrapping a [`SpaceMouseLoop`].
-pub struct FfiSpaceMouseLoop {
-  /// The wrapped loop.
-  inner: SpaceMouseLoop,
+/// Opaque handle exposed to C++, wrapping a [`SpaceMouseThread`].
+pub struct FfiSpaceMouseThread {
+  /// The wrapped thread handle.
+  inner: SpaceMouseThread,
 }
 
-/// Create a new loop and start capturing device input in the background.
+/// Create a new capture thread and start capturing in the background.
 ///
 /// `user_data` is passed back unmodified to every callback. It must stay
-/// valid until [`ffi_spacemouse_loop_free`] returns. Callbacks must not
+/// valid until [`ffi_spacemouse_thread_free`] returns. Callbacks must not
 /// call back into Rust synchronously.
 ///
 /// Never returns null. Finding no device is not an error, it is reported
 /// through `on_connected_changed`.
 #[no_mangle]
-extern "C" fn ffi_spacemouse_loop_new(
+extern "C" fn ffi_spacemouse_thread_new(
   user_data: *mut c_void,
   on_motion: MotionCallback,
   on_connected_changed: ConnectedCallback,
-) -> *mut FfiSpaceMouseLoop {
+) -> *mut FfiSpaceMouseThread {
   let ptr = SendPtr(user_data);
   // The C++ side expects the state of all six axes with every motion, but
   // the crate reports translation and rotation separately.
   let motion = Cell::new(SpaceMouseMotionFfi::default());
-  let inner = SpaceMouseLoop::new(move |event| match event {
+  let inner = SpaceMouseThread::new(move |event| match event {
     SpaceMouseEvent::Connected => {
       motion.set(SpaceMouseMotionFfi::default());
       on_connected_changed(ptr.get(), true);
@@ -105,13 +105,13 @@ extern "C" fn ffi_spacemouse_loop_new(
     }
     _ => {}
   });
-  Box::into_raw(Box::new(FfiSpaceMouseLoop { inner }))
+  Box::into_raw(Box::new(FfiSpaceMouseThread { inner }))
 }
 
 /// Whether a compatible device is currently detected as connected.
 #[no_mangle]
-extern "C" fn ffi_spacemouse_loop_is_connected(
-  handle: &FfiSpaceMouseLoop,
+extern "C" fn ffi_spacemouse_thread_is_connected(
+  handle: &FfiSpaceMouseThread,
 ) -> bool {
   handle.inner.is_connected()
 }
@@ -120,22 +120,22 @@ extern "C" fn ffi_spacemouse_loop_is_connected(
 ///
 /// Applied immediately if a device is open, and again on every connect.
 /// Devices without an LED and write failures are ignored. See
-/// [`SpaceMouseLoop::set_led`] for details.
+/// [`SpaceMouseThread::set_led`] for details.
 #[no_mangle]
-extern "C" fn ffi_spacemouse_loop_set_led(
-  handle: &FfiSpaceMouseLoop,
+extern "C" fn ffi_spacemouse_thread_set_led(
+  handle: &FfiSpaceMouseThread,
   enabled: bool,
 ) {
   handle.inner.set_led(enabled);
 }
 
-/// Stop capturing, join the background thread, and free the loop.
+/// Stop capturing, join the background thread, and free the handle.
 ///
 /// # Safety (from the C++ side)
 /// `handle` must be a non-null pointer previously returned by
-/// [`ffi_spacemouse_loop_new`] and not already freed.
+/// [`ffi_spacemouse_thread_new`] and not already freed.
 #[no_mangle]
-extern "C" fn ffi_spacemouse_loop_free(handle: *mut FfiSpaceMouseLoop) {
+extern "C" fn ffi_spacemouse_thread_free(handle: *mut FfiSpaceMouseThread) {
   assert!(!handle.is_null());
   unsafe { drop(Box::from_raw(handle)) };
 }

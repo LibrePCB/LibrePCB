@@ -128,9 +128,9 @@ enum class InteractiveHtmlBomViewMode {
 };
 
 /**
- * Opaque handle exposed to C++, wrapping a [`SpaceMouseLoop`].
+ * Opaque handle exposed to C++, wrapping a [`SpaceMouseThread`].
  */
-struct FfiSpaceMouseLoop;
+struct FfiSpaceMouseThread;
 
 /**
  * Interactive HTML BOM structure
@@ -340,7 +340,7 @@ struct SpaceMouseMotionFfi {
  *
  * <div class="warning">
  * Fires on a background thread owned by the Rust side, *not* the thread
- * that called [`ffi_spacemouse_loop_new`].
+ * that called [`ffi_spacemouse_thread_new`].
  * </div>
  */
 using MotionCallback = void(*)(void *user_data, SpaceMouseMotionFfi motion);
@@ -620,42 +620,42 @@ void ffi_renumber_components(const QStringList * NONNULL names,
                              QStringList * NONNULL out);
 
 /**
- * Create a new loop and start capturing device input in the background.
+ * Create a new capture thread and start capturing in the background.
  *
  * `user_data` is passed back unmodified to every callback. It must stay
- * valid until [`ffi_spacemouse_loop_free`] returns. Callbacks must not
+ * valid until [`ffi_spacemouse_thread_free`] returns. Callbacks must not
  * call back into Rust synchronously.
  *
  * Never returns null. Finding no device is not an error, it is reported
  * through `on_connected_changed`.
  */
-FfiSpaceMouseLoop *ffi_spacemouse_loop_new(void *user_data,
-                                           MotionCallback on_motion,
-                                           ConnectedCallback on_connected_changed);
+FfiSpaceMouseThread *ffi_spacemouse_thread_new(void *user_data,
+                                               MotionCallback on_motion,
+                                               ConnectedCallback on_connected_changed);
 
 /**
  * Whether a compatible device is currently detected as connected.
  */
-bool ffi_spacemouse_loop_is_connected(const FfiSpaceMouseLoop * NONNULL handle);
+bool ffi_spacemouse_thread_is_connected(const FfiSpaceMouseThread * NONNULL handle);
 
 /**
  * Set whether the device's LED (if it has one) should be lit.
  *
  * Applied immediately if a device is open, and again on every connect.
  * Devices without an LED and write failures are ignored. See
- * [`SpaceMouseLoop::set_led`] for details.
+ * [`SpaceMouseThread::set_led`] for details.
  */
-void ffi_spacemouse_loop_set_led(const FfiSpaceMouseLoop * NONNULL handle,
-                                 bool enabled);
+void ffi_spacemouse_thread_set_led(const FfiSpaceMouseThread * NONNULL handle,
+                                   bool enabled);
 
 /**
- * Stop capturing, join the background thread, and free the loop.
+ * Stop capturing, join the background thread, and free the handle.
  *
  * # Safety (from the C++ side)
  * `handle` must be a non-null pointer previously returned by
- * [`ffi_spacemouse_loop_new`] and not already freed.
+ * [`ffi_spacemouse_thread_new`] and not already freed.
  */
-void ffi_spacemouse_loop_free(FfiSpaceMouseLoop *handle);
+void ffi_spacemouse_thread_free(FfiSpaceMouseThread *handle);
 
 /**
  * Wrapper for [increment_number_in_string]
