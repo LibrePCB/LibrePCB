@@ -74,6 +74,9 @@ ui::Theme l2s(const UiTheme& v) noexcept;
 ui::GridStyle l2s(GridStyle v) noexcept;
 GridStyle s2l(ui::GridStyle v) noexcept;
 
+ui::WireMode l2s(WireMode v) noexcept;
+WireMode s2l(ui::WireMode v) noexcept;
+
 ui::LengthUnit l2s(const LengthUnit& v) noexcept;
 LengthUnit s2l(ui::LengthUnit v) noexcept;
 

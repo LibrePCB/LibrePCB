@@ -1880,6 +1880,15 @@ public:
       {},
       &categoryContextMenu,
   };
+  EditorCommand resetToDefault{
+      "reset_to_default",  // clang-format break
+      QT_TR_NOOP("Reset to Default"),
+      QT_TR_NOOP("Restore default value"),
+      ":/bi/bootstrap-reboot.svg",
+      EditorCommand::Flags(),
+      {},
+      &categoryContextMenu,
+  };
   EditorCommand copyMpnToClipboard{
       "copy_mpn_to_clipboard",  // clang-format break
       QT_TR_NOOP("Copy MPN to Clipboard"),

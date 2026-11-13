@@ -15,6 +15,8 @@ add_library(
   3d/slintopenglview.h
   backgroundimagesettings.cpp
   backgroundimagesettings.h
+  clientsettings.cpp
+  clientsettings.h
   cmd/cmdattributeedit.cpp
   cmd/cmdattributeedit.h
   cmd/cmdcircleedit.cpp

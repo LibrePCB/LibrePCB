@@ -230,6 +230,17 @@ public:
   /**
    * @brief Try to get an Angle object from radians
    *
+   * Same as #fromDeg(), but returns `std::nullopt` on invalid argument.
+   *
+   * @param degrees  See setAngleDeg(const QString&)
+   *
+   * @return ::librepcb::Angle if valid, `std::nullopt` if invalid.
+   */
+  static std::optional<Angle> tryFromDeg(const QString& degrees) noexcept;
+
+  /**
+   * @brief Try to get an Angle object from radians
+   *
    * Same as #fromRad(), but returns `std::nullopt` on invalid argument.
    *
    * @param radians  See setAngleRad()

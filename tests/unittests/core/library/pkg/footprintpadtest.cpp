@@ -23,6 +23,7 @@
 #include <gtest/gtest.h>
 #include <librepcb/core/application.h>
 #include <librepcb/core/library/pkg/footprintpad.h>
+#include <librepcb/core/serialization/serialization.h>
 #include <librepcb/core/serialization/sexpression.h>
 #include <librepcb/core/types/version.h>
 
@@ -74,6 +75,89 @@ TEST_F(FootprintPadTest, testFunctionsSerialization) {
   } else {
     EXPECT_THROW(deserialize<Pad::Function>(*sexpr), Exception);
   }
+}
+
+TEST_F(FootprintPadTest, testFunctionsSerializationAllValues) {
+  // Iterate through all enum values to verify that every value is handled
+  // by the serialization functions. Note that casting the `_COUNT` sentinel
+  // to an invalid value must not be passed to serializeToString() since
+  // it would hit Q_ASSERT(false) in its `default` branch.
+  QSet<QString> strings;
+  for (int i = 0; i < static_cast<int>(Pad::Function::_COUNT); ++i) {
+    const Pad::Function function = static_cast<Pad::Function>(i);
+
+    // Plain string round-trip
+    const QString str = serializeToString(function);
+    EXPECT_FALSE(str.isEmpty());
+    EXPECT_FALSE(strings.contains(str));  // Strings must be unique.
+    strings.insert(str);
+    const auto parsed = deserialize<Pad::Function>(str);
+    ASSERT_TRUE(parsed.has_value());
+    EXPECT_EQ(function, *parsed);
+
+    // Translated description must be available as well.
+    EXPECT_FALSE(Pad::getFunctionDescriptionTr(function).isEmpty());
+
+    // SExpression round-trip
+    auto sexpr = serialize(function);
+    ASSERT_TRUE(sexpr != nullptr);
+    EXPECT_EQ(str, sexpr->getValue());
+    EXPECT_EQ(function, deserialize<Pad::Function>(*sexpr));
+  }
+  EXPECT_EQ(static_cast<int>(Pad::Function::_COUNT), strings.count());
+}
+
+TEST_F(FootprintPadTest, testShapesSerializationAllValues) {
+  // Iterate through all enum values registered to the Qt metatype system
+  // to verify that every value is handled by the serialization functions.
+  const QMetaEnum metaEnum = QMetaEnum::fromType<Pad::Shape>();
+  QSet<QString> strings;
+  for (int i = 0; i < metaEnum.keyCount(); ++i) {
+    const Pad::Shape shape = static_cast<Pad::Shape>(metaEnum.value(i));
+
+    // Plain string round-trip
+    const QString str = serializeToString(shape);
+    EXPECT_FALSE(str.isEmpty());
+    EXPECT_FALSE(strings.contains(str));  // Strings must be unique.
+    strings.insert(str);
+    const auto parsed = deserialize<Pad::Shape>(str);
+    ASSERT_TRUE(parsed.has_value());
+    EXPECT_EQ(shape, *parsed);
+
+    // SExpression round-trip
+    auto sexpr = serialize(shape);
+    ASSERT_TRUE(sexpr != nullptr);
+    EXPECT_EQ(str, sexpr->getValue());
+    EXPECT_EQ(shape, deserialize<Pad::Shape>(*sexpr));
+  }
+  EXPECT_EQ(metaEnum.keyCount(), strings.count());
+}
+
+TEST_F(FootprintPadTest, testComponentSidesSerializationAllValues) {
+  // Iterate through all enum values registered to the Qt metatype system
+  // to verify that every value is handled by the serialization functions.
+  const QMetaEnum metaEnum = QMetaEnum::fromType<Pad::ComponentSide>();
+  QSet<QString> strings;
+  for (int i = 0; i < metaEnum.keyCount(); ++i) {
+    const Pad::ComponentSide side =
+        static_cast<Pad::ComponentSide>(metaEnum.value(i));
+
+    // Plain string round-trip
+    const QString str = serializeToString(side);
+    EXPECT_FALSE(str.isEmpty());
+    EXPECT_FALSE(strings.contains(str));  // Strings must be unique.
+    strings.insert(str);
+    const auto parsed = deserialize<Pad::ComponentSide>(str);
+    ASSERT_TRUE(parsed.has_value());
+    EXPECT_EQ(side, *parsed);
+
+    // SExpression round-trip
+    auto sexpr = serialize(side);
+    ASSERT_TRUE(sexpr != nullptr);
+    EXPECT_EQ(str, sexpr->getValue());
+    EXPECT_EQ(side, deserialize<Pad::ComponentSide>(*sexpr));
+  }
+  EXPECT_EQ(metaEnum.keyCount(), strings.count());
 }
 
 TEST_F(FootprintPadTest, testConstructFromSExpressionConnected) {

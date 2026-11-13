@@ -49,16 +49,17 @@ namespace editor {
 
 BoardEditorState_DrawZone::BoardEditorState_DrawZone(
     const Context& context) noexcept
-  : BoardEditorState(context),
+  : BoardEditorState(context, "draw_zone"),
     mIsUndoCmdActive(false),
     mLastVertexPos(),
     mLastAngle(0),
-    mCurrentProperties(Uuid::createRandom(),  // UUID is not relevant here
-                       {&Layer::topCopper()},  // Layers
-                       Zone::Rule::All,  // Rules
-                       Path(),  // Path will be set later
-                       false  // Locked
-                       ),
+    mCurrentProperties(
+        Uuid::createRandom(),  // UUID is not relevant here
+        {&Layer::topCopper()},  // Layers
+        mSettings.get<Zone::Rules>("rules").value_or(Zone::Rule::All),  // Rules
+        Path(),  // Path will be set later
+        false  // Locked
+        ),
     mCurrentZone(nullptr) {
 }
 
@@ -147,6 +148,7 @@ void BoardEditorState_DrawZone::setRule(Zone::Rule rule, bool enable) noexcept {
   rules.setFlag(rule, enable);
 
   if (mCurrentProperties.setRules(rules)) {
+    mSettings.set("rules", mCurrentProperties.getRules());
     emit rulesChanged(mCurrentProperties.getRules());
   }
 

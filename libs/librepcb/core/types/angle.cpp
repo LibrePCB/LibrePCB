@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "angle.h"
 
+#include "../serialization/serialization.h"
 #include "../serialization/sexpression.h"
 #include "../utils/qtmetatyperegistration.h"
 #include "../utils/toolbox.h"
@@ -100,6 +101,15 @@ Angle Angle::fromRad(qreal radians) {
                    std::numeric_limits<int64_t>::max());
 }
 
+std::optional<Angle> Angle::tryFromDeg(const QString& degrees) noexcept {
+  // Not a nice implementation, but will be obsolete after Rust migration.
+  try {
+    return fromDeg(degrees);
+  } catch (const Exception& e) {
+    return std::nullopt;
+  }
+}
+
 std::optional<Angle> Angle::tryFromRad(qreal radians) noexcept {
   int64_t udeg;
   if (rs::ffi_angle_from_rad_f(radians, &udeg)) {
@@ -132,6 +142,16 @@ Angle3D deserialize(const SExpression& node) {
   return std::make_tuple(deserialize<Angle>(node.getChild("@0")),
                          deserialize<Angle>(node.getChild("@1")),
                          deserialize<Angle>(node.getChild("@2")));
+}
+
+template <>
+QString serializeToString(const Angle& obj) noexcept {
+  return obj.toDegString();
+}
+
+template <>
+std::optional<Angle> deserialize(const QString& str) noexcept {
+  return Angle::tryFromDeg(str);
 }
 
 QDebug operator<<(QDebug stream, const Angle3D& obj) {

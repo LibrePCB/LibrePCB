@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "pad.h"
 
+#include "../serialization/serialization.h"
 #include "../types/layer.h"
 
 #include <QtCore>
@@ -36,22 +37,23 @@ namespace librepcb {
  ******************************************************************************/
 
 template <>
-std::unique_ptr<SExpression> serialize(const Pad::Shape& obj) {
+QString serializeToString(const Pad::Shape& obj) noexcept {
   switch (obj) {
     case Pad::Shape::RoundedRect:
-      return SExpression::createToken("roundrect");
+      return "roundrect";
     case Pad::Shape::RoundedOctagon:
-      return SExpression::createToken("octagon");
+      return "octagon";
     case Pad::Shape::Custom:
-      return SExpression::createToken("custom");
+      return "custom";
     default:
-      throw LogicError(__FILE__, __LINE__);
+      qCritical() << "Unknown pad shape:" << static_cast<int>(obj);
+      Q_ASSERT(false);
+      return QString();
   }
 }
 
 template <>
-Pad::Shape deserialize(const SExpression& node) {
-  const QString str = node.getValue();
+std::optional<Pad::Shape> deserialize(const QString& str) noexcept {
   if (str == QLatin1String("roundrect")) {
     return Pad::Shape::RoundedRect;
   } else if (str == QLatin1String("octagon")) {
@@ -59,66 +61,97 @@ Pad::Shape deserialize(const SExpression& node) {
   } else if (str == QLatin1String("custom")) {
     return Pad::Shape::Custom;
   } else {
-    throw RuntimeError(__FILE__, __LINE__,
-                       QString("Unknown footprint pad shape: '%1'").arg(str));
+    return std::nullopt;
   }
 }
 
 template <>
-std::unique_ptr<SExpression> serialize(const Pad::ComponentSide& obj) {
+std::unique_ptr<SExpression> serialize(const Pad::Shape& obj) {
+  return SExpression::createToken(serializeToString(obj));
+}
+
+template <>
+Pad::Shape deserialize(const SExpression& node) {
+  if (auto shape = deserialize<Pad::Shape>(node.getValue())) {
+    return *shape;
+  } else {
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        QString("Unknown footprint pad shape: '%1'").arg(node.getValue()));
+  }
+}
+
+template <>
+QString serializeToString(const Pad::ComponentSide& obj) noexcept {
   switch (obj) {
     case Pad::ComponentSide::Top:
-      return SExpression::createToken("top");
+      return "top";
     case Pad::ComponentSide::Bottom:
-      return SExpression::createToken("bottom");
+      return "bottom";
     default:
-      throw LogicError(__FILE__, __LINE__);
+      qCritical() << "Unknown component side:" << static_cast<int>(obj);
+      Q_ASSERT(false);
+      return QString();
   }
 }
 
 template <>
-Pad::ComponentSide deserialize(const SExpression& node) {
-  const QString str = node.getValue();
+std::optional<Pad::ComponentSide> deserialize(const QString& str) noexcept {
   if (str == QLatin1String("top")) {
     return Pad::ComponentSide::Top;
   } else if (str == QLatin1String("bottom")) {
     return Pad::ComponentSide::Bottom;
   } else {
-    throw RuntimeError(
-        __FILE__, __LINE__,
-        QString("Unknown footprint pad component side: '%1'").arg(str));
+    return std::nullopt;
   }
 }
 
 template <>
-std::unique_ptr<SExpression> serialize(const Pad::Function& obj) {
+std::unique_ptr<SExpression> serialize(const Pad::ComponentSide& obj) {
+  return SExpression::createToken(serializeToString(obj));
+}
+
+template <>
+Pad::ComponentSide deserialize(const SExpression& node) {
+  if (auto side = deserialize<Pad::ComponentSide>(node.getValue())) {
+    return *side;
+  } else {
+    throw RuntimeError(__FILE__, __LINE__,
+                       QString("Unknown footprint pad component side: '%1'")
+                           .arg(node.getValue()));
+  }
+}
+
+template <>
+QString serializeToString(const Pad::Function& obj) noexcept {
   switch (obj) {
     case Pad::Function::Unspecified:
-      return SExpression::createToken("unspecified");
+      return "unspecified";
     case Pad::Function::StandardPad:
-      return SExpression::createToken("standard");
+      return "standard";
     case Pad::Function::PressFitPad:
-      return SExpression::createToken("pressfit");
+      return "pressfit";
     case Pad::Function::ThermalPad:
-      return SExpression::createToken("thermal");
+      return "thermal";
     case Pad::Function::BgaPad:
-      return SExpression::createToken("bga");
+      return "bga";
     case Pad::Function::EdgeConnectorPad:
-      return SExpression::createToken("edge_connector");
+      return "edge_connector";
     case Pad::Function::TestPad:
-      return SExpression::createToken("test");
+      return "test";
     case Pad::Function::LocalFiducial:
-      return SExpression::createToken("local_fiducial");
+      return "local_fiducial";
     case Pad::Function::GlobalFiducial:
-      return SExpression::createToken("global_fiducial");
+      return "global_fiducial";
     default:
-      throw LogicError(__FILE__, __LINE__);
+      qCritical() << "Unknown pad function:" << static_cast<int>(obj);
+      Q_ASSERT(false);
+      return QString();
   }
 }
 
 template <>
-Pad::Function deserialize(const SExpression& node) {
-  const QString str = node.getValue();
+std::optional<Pad::Function> deserialize(const QString& str) noexcept {
   if (str == QLatin1String("unspecified")) {
     return Pad::Function::Unspecified;
   } else if (str == QLatin1String("standard")) {
@@ -138,10 +171,23 @@ Pad::Function deserialize(const SExpression& node) {
   } else if (str == QLatin1String("global_fiducial")) {
     return Pad::Function::GlobalFiducial;
   } else {
-    throw RuntimeError(
-        __FILE__, __LINE__,
-        QString("Unknown footprint pad function: '%1'").arg(str));
+    return std::nullopt;
   }
+}
+
+template <>
+std::unique_ptr<SExpression> serialize(const Pad::Function& obj) {
+  return SExpression::createToken(serializeToString(obj));
+}
+
+template <>
+Pad::Function deserialize(const SExpression& node) {
+  if (auto function = deserialize<Pad::Function>(node.getValue())) {
+    return *function;
+  }
+  throw RuntimeError(
+      __FILE__, __LINE__,
+      QString("Unknown footprint pad function: '%1'").arg(node.getValue()));
 }
 
 /*******************************************************************************

@@ -108,38 +108,6 @@
 namespace librepcb {
 namespace editor {
 
-static ui::WireMode l2s(BoardEditorState_DrawTrace::WireMode v) noexcept {
-  if (v == BoardEditorState_DrawTrace::WireMode::HV) {
-    return ui::WireMode::HV;
-  } else if (v == BoardEditorState_DrawTrace::WireMode::VH) {
-    return ui::WireMode::VH;
-  } else if (v == BoardEditorState_DrawTrace::WireMode::Deg9045) {
-    return ui::WireMode::Deg9045;
-  } else if (v == BoardEditorState_DrawTrace::WireMode::Deg4590) {
-    return ui::WireMode::Deg4590;
-  } else if (v == BoardEditorState_DrawTrace::WireMode::Straight) {
-    return ui::WireMode::Straight;
-  } else {
-    return ui::WireMode::HV;
-  }
-}
-
-static BoardEditorState_DrawTrace::WireMode s2l(ui::WireMode v) noexcept {
-  if (v == ui::WireMode::HV) {
-    return BoardEditorState_DrawTrace::WireMode::HV;
-  } else if (v == ui::WireMode::VH) {
-    return BoardEditorState_DrawTrace::WireMode::VH;
-  } else if (v == ui::WireMode::Deg9045) {
-    return BoardEditorState_DrawTrace::WireMode::Deg9045;
-  } else if (v == ui::WireMode::Deg4590) {
-    return BoardEditorState_DrawTrace::WireMode::Deg4590;
-  } else if (v == ui::WireMode::Straight) {
-    return BoardEditorState_DrawTrace::WireMode::Straight;
-  } else {
-    return BoardEditorState_DrawTrace::WireMode::HV;
-  }
-}
-
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
@@ -170,7 +138,7 @@ Board2dTab::Board2dTab(GuiApplication& app, BoardEditor& editor,
     mToolFeatures(),
     mTool(ui::EditorTool::Select),
     mToolCursorShape(Qt::ArrowCursor),
-    mToolWireMode(BoardEditorState_DrawTrace::WireMode::HV),
+    mToolWireMode(WireMode::HV),
     mToolNets(std::make_shared<slint::VectorModel<slint::SharedString>>()),
     mToolNet({true, std::nullopt}),
     mToolLayers(std::make_shared<slint::VectorModel<slint::SharedString>>()),
@@ -253,6 +221,14 @@ Board2dTab::Board2dTab(GuiApplication& app, BoardEditor& editor,
           [this]() { onUiDataChanged.notify(); });
   connect(&mProjectEditor, &ProjectEditor::manualModificationsMade, this,
           [this]() { onUiDataChanged.notify(); });
+
+  // Connect tool values.
+  connect(&mToolLineWidth, &LengthEditContext::uiDataChanged, this,
+          [this]() { onDerivedUiDataChanged.notify(); });
+  connect(&mToolSize, &LengthEditContext::uiDataChanged, this,
+          [this]() { onDerivedUiDataChanged.notify(); });
+  connect(&mToolDrill, &LengthEditContext::uiDataChanged, this,
+          [this]() { onDerivedUiDataChanged.notify(); });
 
   // Connect search context.
   connect(&mSearchContext, &SearchContext::goToTriggered, this,
@@ -520,93 +496,160 @@ void Board2dTab::setDerivedUiData(const ui::Board2dTabData& data) noexcept {
         data.unplaced_components_footprints_index);
   }
 
+  // Tool properties
+  // Attention: Applying some tool properties can have side effects on other
+  // tool properties (e.g. changing pad size will trigger a radius change). To
+  // avoid those side effects to be overridden here, we have to collect all
+  // changed properties first, before any of them are actually applied.
+  QVector<std::function<void()>> actions;
+
   // Tool net
-  const auto netCfg = mToolNetsQt.value(data.tool_net.current_index);
-  emit netRequested(netCfg.first, netCfg.second);
+  {
+    const auto v = mToolNetsQt.value(data.tool_net.current_index);
+    if (v != mToolNet) {
+      actions.append([this, v]() { emit netRequested(v.first, v.second); });
+    }
+  }
 
   // Tool layer
-  if (const Layer* layer = mToolLayersQt.value(data.tool_layer.current_index)) {
-    emit layerRequested(*layer);
+  if (const Layer* v = mToolLayersQt.value(data.tool_layer.current_index)) {
+    if (v != mToolLayer) {
+      actions.append([this, v]() { emit layerRequested(*v); });
+    }
   }
 
   // Tool wire mode
-  emit wireModeRequested(s2l(data.tool_wire_mode));
+  {
+    const WireMode v = s2l(data.tool_wire_mode);
+    if (v != mToolWireMode) {
+      actions.append([this, v]() { emit wireModeRequested(v); });
+    }
+  }
 
   // Tool line width
-  mToolLineWidth.setUiData(data.tool_line_width);
+  if (data.tool_line_width != mToolLineWidth.getUiData()) {
+    actions.append(
+        [this, &data]() { mToolLineWidth.setUiData(data.tool_line_width); });
+  }
 
-  // Tool size
-  mToolSize.setUiData(data.tool_size);
-
-  // Tool via size
-  // Note: We set the via size before (via) drill to let the FSM increase the
-  // size if drill is set to a larger value. This clipping does not work in both
-  //  directions yet because we don't know if the user edited the drill or size.
-  const Length size = mToolSize.getValue();
-  emit viaSizeRequested(((size > 0) && (!data.tool_mirrored))
-                            ? std::make_optional(PositiveLength(size))
-                            : std::nullopt);
+  // Tool size / via size
+  if (data.tool_size != mToolSize.getUiData()) {
+    actions.append([this, &data]() {
+      mToolSize.setUiData(data.tool_size);
+      emit viaSizeRequested(
+          ((mToolSize.getValue() > 0) && (!data.tool_mirrored))
+              ? std::make_optional(PositiveLength(mToolSize.getValue()))
+              : std::nullopt);
+    });
+  }
 
   // Tool drill
-  mToolDrill.setUiData(data.tool_drill);
-  emit viaDrillRequested(
-      ((mToolDrill.getValue() > 0) && (!data.tool_pressfit))
-          ? std::make_optional(PositiveLength(mToolDrill.getValue()))
-          : std::nullopt);
+  if (data.tool_drill != mToolDrill.getUiData()) {
+    actions.append([this, &data]() {
+      mToolDrill.setUiData(data.tool_drill);
+      emit viaDrillRequested(
+          ((mToolDrill.getValue() > 0) && (!data.tool_pressfit))
+              ? std::make_optional(PositiveLength(mToolDrill.getValue()))
+              : std::nullopt);
+    });
+  }
 
   // Tool angle
-  if (data.tool_angle.increase) {
-    emit angleRequested(mToolAngle + Angle::deg45());
-  } else if (data.tool_angle.decrease) {
-    emit angleRequested(mToolAngle - Angle::deg45());
-  } else {
-    emit angleRequested(s2angle(data.tool_angle.value));
+  {
+    Angle v;
+    if (data.tool_angle.increase) {
+      v = mToolAngle + Angle::deg45();
+    } else if (data.tool_angle.decrease) {
+      v = mToolAngle - Angle::deg45();
+    } else {
+      v = s2angle(data.tool_angle.value);
+    }
+    if (v != mToolAngle) {
+      actions.append([this, v]() { emit angleRequested(v); });
+    }
   }
 
   // Tool filled / auto-width
-  emit filledRequested(data.tool_filled);
+  if (data.tool_filled != mToolFilled) {
+    actions.append([this, v = data.tool_filled]() { emit filledRequested(v); });
+  }
 
   // Tool mirrored / auto-size
-  emit mirroredRequested(data.tool_mirrored);
+  if (data.tool_mirrored != mToolMirrored) {
+    actions.append(
+        [this, v = data.tool_mirrored]() { emit mirroredRequested(v); });
+  }
 
   // Tool value
-  emit valueRequested(EditorToolbox::toMultiLine(s2q(data.tool_value.text)));
+  if (data.tool_value.enabled) {
+    const QString v = EditorToolbox::toMultiLine(s2q(data.tool_value.text));
+    if (v != mToolValue) {
+      actions.append([this, v]() { emit valueRequested(v); });
+    }
+  }
 
   // Tool component side
-  emit componentSideRequested(data.tool_bottom ? Pad::ComponentSide::Bottom
-                                               : Pad::ComponentSide::Top);
-
-  // Tool ratio (must be emiteed *before* the shape!)
-  if (data.tool_ratio.increase) {
-    emit ratioRequested(UnsignedLimitedRatio(std::min(
-        *mToolRatio + Ratio::fromPercent(1), Ratio::fromPercent(100))));
-  } else if (data.tool_ratio.decrease) {
-    emit ratioRequested(UnsignedLimitedRatio(
-        std::max(*mToolRatio - Ratio::fromPercent(1), Ratio::fromPercent(0))));
-  } else {
-    const Ratio ratio = s2ratio(data.tool_ratio.value);
-    if ((ratio >= Ratio::fromPercent(0)) &&
-        (ratio <= Ratio::fromPercent(100))) {
-      emit ratioRequested(UnsignedLimitedRatio(ratio));
+  {
+    const Pad::ComponentSide v =
+        data.tool_bottom ? Pad::ComponentSide::Bottom : Pad::ComponentSide::Top;
+    if (v != mToolComponentSide) {
+      actions.append([this, v]() { emit componentSideRequested(v); });
     }
   }
 
   // Tool shape
-  emit shapeRequested(data.tool_shape);
+  if (data.tool_shape != mToolShape) {
+    actions.append([this, v = data.tool_shape]() { emit shapeRequested(v); });
+  }
+
+  // Tool ratio
+  {
+    Ratio v;
+    if (data.tool_ratio.increase) {
+      v = *mToolRatio + Ratio::fromPercent(1);
+    } else if (data.tool_ratio.decrease) {
+      v = *mToolRatio - Ratio::fromPercent(1);
+    } else {
+      v = s2ratio(data.tool_ratio.value);
+    }
+    if ((v != *mToolRatio) && (v >= Ratio::fromPercent(0)) &&
+        (v <= Ratio::fromPercent(100))) {
+      actions.append(
+          [this, v]() { emit ratioRequested(UnsignedLimitedRatio(v)); });
+    }
+  }
 
   // Tool press-fit
-  emit pressFitRequested(data.tool_pressfit);
+  if (data.tool_pressfit != mToolPressFit) {
+    actions.append(
+        [this, v = data.tool_pressfit]() { emit pressFitRequested(v); });
+  }
 
   // Tool zone rules
-  emit zoneRuleRequested(Zone::Rule::NoCopper, data.tool_no_copper);
-  emit zoneRuleRequested(Zone::Rule::NoPlanes, data.tool_no_planes);
-  emit zoneRuleRequested(Zone::Rule::NoExposure, data.tool_no_exposures);
-  emit zoneRuleRequested(Zone::Rule::NoDevices, data.tool_no_devices);
+  for (const auto& [r, v] : std::initializer_list<std::pair<Zone::Rule, bool>>{
+           {Zone::Rule::NoCopper, data.tool_no_copper},
+           {Zone::Rule::NoPlanes, data.tool_no_planes},
+           {Zone::Rule::NoExposure, data.tool_no_exposures},
+           {Zone::Rule::NoDevices, data.tool_no_devices},
+       }) {
+    if (v != mToolZoneRules.testFlag(r)) {
+      actions.append([this, r, v]() { emit zoneRuleRequested(r, v); });
+    }
+  }
 
   // Tool show clearance circle
-  emit clearanceCircleRequested(data.tool_show_clearance_circle);
+  if (data.tool_show_clearance_circle != mToolShowClearanceCircle) {
+    actions.append([this, v = data.tool_show_clearance_circle]() {
+      emit clearanceCircleRequested(v);
+    });
+  }
 
-  // Set design rules
+  // Apply changed tool properties.
+  for (const auto& action : actions) {
+    action();
+  }
+
+  // Actions
   if (!data.set_design_rules.empty()) {
     loadDesignRules(s2q(data.set_design_rules));
   }
@@ -1037,6 +1080,14 @@ void Board2dTab::trigger(ui::TabAction a) noexcept {
       mFsm->processMeasure();
       break;
     }
+    case ui::TabAction::ToolbarLineWidthReset: {
+      emit lineWidthResetRequested();
+      break;
+    }
+    case ui::TabAction::ToolbarSizeReset: {
+      emit sizeResetRequested();
+      break;
+    }
     case ui::TabAction::ToolbarTraceWidthSaveInBoard: {
       emit saveTraceWidthInBoardRequested();
       break;
@@ -1304,7 +1355,7 @@ void Board2dTab::fsmToolEnter(BoardEditorState_DrawTrace& state) noexcept {
       &state, &BoardEditorState_DrawTrace::netClassChanged, this, setNetClass));
 
   // Wire mode
-  auto setWireMode = [this](BoardEditorState_DrawTrace::WireMode m) {
+  auto setWireMode = [this](WireMode m) {
     mToolWireMode = m;
     onDerivedUiDataChanged.notify();
   };
@@ -1379,6 +1430,12 @@ void Board2dTab::fsmToolEnter(BoardEditorState_DrawTrace& state) noexcept {
   mFsmStateConnections.append(
       connect(this, &Board2dTab::viaDrillRequested, &state,
               &BoardEditorState_DrawTrace::setViaDrillDiameter));
+  mFsmStateConnections.append(connect(
+      this, &Board2dTab::pressFitRequested, &state, [&state](bool autoDrill) {
+        state.setViaDrillDiameter(
+            autoDrill ? std::nullopt
+                      : std::make_optional(state.getViaDrillDiameter()));
+      }));
   mFsmStateConnections.append(
       connect(this, &Board2dTab::saveViaDrillInBoardRequested, &state,
               &BoardEditorState_DrawTrace::saveViaDrillDiameterInBoard));
@@ -1400,6 +1457,11 @@ void Board2dTab::fsmToolEnter(BoardEditorState_DrawTrace& state) noexcept {
   mFsmStateConnections.append(connect(this, &Board2dTab::viaSizeRequested,
                                       &state,
                                       &BoardEditorState_DrawTrace::setViaSize));
+  mFsmStateConnections.append(connect(
+      this, &Board2dTab::mirroredRequested, &state, [&state](bool autoSize) {
+        state.setViaSize(autoSize ? std::nullopt
+                                  : std::make_optional(state.getViaSize()));
+      }));
 
   // Show clearance circle
   auto setShowClearanceCircle = [this](bool show) {
@@ -1436,6 +1498,12 @@ void Board2dTab::fsmToolEnter(BoardEditorState_AddVia& state) noexcept {
   mFsmStateConnections.append(
       connect(this, &Board2dTab::viaDrillRequested, &state,
               &BoardEditorState_AddVia::setDrillDiameter));
+  mFsmStateConnections.append(connect(
+      this, &Board2dTab::pressFitRequested, &state, [&state](bool autoDrill) {
+        state.setDrillDiameter(
+            autoDrill ? std::nullopt
+                      : std::make_optional(state.getDrillDiameter()));
+      }));
   mFsmStateConnections.append(
       connect(this, &Board2dTab::saveViaDrillInBoardRequested, &state,
               &BoardEditorState_AddVia::saveDrillDiameterInBoard));
@@ -1457,14 +1525,19 @@ void Board2dTab::fsmToolEnter(BoardEditorState_AddVia& state) noexcept {
   mFsmStateConnections.append(connect(this, &Board2dTab::viaSizeRequested,
                                       &state,
                                       &BoardEditorState_AddVia::setSize));
+  mFsmStateConnections.append(connect(
+      this, &Board2dTab::mirroredRequested, &state, [&state](bool autoSize) {
+        state.setSize(autoSize ? std::nullopt
+                               : std::make_optional(state.getSize()));
+      }));
 
   // Nets
   mToolNetsQt.clear();
   mToolNets->clear();
   mToolNetsQt.append(std::make_pair(true, std::nullopt));
-  mToolNets->push_back(q2s("[" % tr("Auto") % "]"));
+  mToolNets->push_back(q2s("[" % tr("Auto Net") % "]"));
   mToolNetsQt.append(std::make_pair(false, std::nullopt));
-  mToolNets->push_back(q2s("[" % tr("None") % "]"));
+  mToolNets->push_back(q2s("[" % tr("No Net") % "]"));
   for (const auto& item : state.getAvailableNets()) {
     mToolNetsQt.append(std::make_pair(false, item.first));
     mToolNets->push_back(q2s(item.second));
@@ -1502,7 +1575,7 @@ void Board2dTab::fsmToolEnter(BoardEditorState_AddPad& state) noexcept {
   mToolNetsQt.clear();
   mToolNets->clear();
   mToolNetsQt.append(std::make_pair(false, std::nullopt));
-  mToolNets->push_back(q2s("[" % tr("None") % "]"));
+  mToolNets->push_back(q2s("[" % tr("No Net") % "]"));
   for (const auto& item : state.getAvailableNets()) {
     mToolNetsQt.append(std::make_pair(false, item.first));
     mToolNets->push_back(q2s(item.second));
@@ -1704,6 +1777,9 @@ void Board2dTab::fsmToolEnter(BoardEditorState_DrawPolygon& state) noexcept {
   mFsmStateConnections.append(
       connect(&mToolLineWidth, &LengthEditContext::valueChangedUnsigned, &state,
               &BoardEditorState_DrawPolygon::setLineWidth));
+  mFsmStateConnections.append(
+      connect(this, &Board2dTab::lineWidthResetRequested, &state,
+              &BoardEditorState_DrawPolygon::resetLineWidth));
 
   // Angle
   auto setAngle = [this](const Angle& angle) {
@@ -1755,13 +1831,16 @@ void Board2dTab::fsmToolEnter(BoardEditorState_AddStrokeText& state) noexcept {
 
   // Height
   mToolSize.configure(state.getHeight(), LengthEditContext::Steps::textHeight(),
-                      "board_editor/add_text/size");
+                      "board_editor/add_text/height");
   mFsmStateConnections.append(
       connect(&state, &BoardEditorState_AddStrokeText::heightChanged,
               &mToolSize, &LengthEditContext::setValuePositive));
   mFsmStateConnections.append(
       connect(&mToolSize, &LengthEditContext::valueChangedPositive, &state,
               &BoardEditorState_AddStrokeText::setHeight));
+  mFsmStateConnections.append(
+      connect(this, &Board2dTab::sizeResetRequested, &state,
+              &BoardEditorState_AddStrokeText::resetHeight));
 
   // Stroke width
   mToolLineWidth.configure(state.getStrokeWidth(),
@@ -1773,6 +1852,9 @@ void Board2dTab::fsmToolEnter(BoardEditorState_AddStrokeText& state) noexcept {
   mFsmStateConnections.append(
       connect(&mToolLineWidth, &LengthEditContext::valueChangedUnsigned, &state,
               &BoardEditorState_AddStrokeText::setStrokeWidth));
+  mFsmStateConnections.append(
+      connect(this, &Board2dTab::lineWidthResetRequested, &state,
+              &BoardEditorState_AddStrokeText::resetStrokeWidth));
 
   // Text
   auto setText = [this](const QString& text) {
@@ -1815,7 +1897,7 @@ void Board2dTab::fsmToolEnter(BoardEditorState_DrawPlane& state) noexcept {
   mToolNetsQt.clear();
   mToolNets->clear();
   mToolNetsQt.append(std::make_pair(false, std::nullopt));
-  mToolNets->push_back(q2s("[" % tr("None") % "]"));
+  mToolNets->push_back(q2s("[" % tr("No Net") % "]"));
   for (const auto& item : state.getAvailableNets()) {
     mToolNetsQt.append(std::make_pair(false, item.first));
     mToolNets->push_back(q2s(item.second));

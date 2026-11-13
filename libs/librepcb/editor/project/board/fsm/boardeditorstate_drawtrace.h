@@ -27,6 +27,7 @@
 
 #include <librepcb/core/geometry/via.h>
 #include <librepcb/core/project/circuit/netclass.h>
+#include <librepcb/core/types/enums.h>
 #include <librepcb/core/types/length.h>
 
 #include <QtCore>
@@ -58,18 +59,6 @@ class BoardEditorState_DrawTrace final : public BoardEditorState {
   Q_OBJECT
 
 public:
-  /**
-   * @brief All available wire modes
-   */
-  enum class WireMode {
-    HV,  ///< horizontal - vertical [default]
-    VH,  ///< vertical - horizontal
-    Deg9045,  ///< 90° - 45°
-    Deg4590,  ///< 45° - 90°
-    Straight,  ///< straight
-    _COUNT,
-  };
-
   // Constructors / Destructor
   BoardEditorState_DrawTrace() = delete;
   BoardEditorState_DrawTrace(const BoardEditorState_DrawTrace& other) = delete;

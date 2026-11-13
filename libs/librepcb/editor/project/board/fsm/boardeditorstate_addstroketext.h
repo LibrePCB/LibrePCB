@@ -86,10 +86,12 @@ public:
     return mCurrentProperties.getHeight();
   }
   void setHeight(const PositiveLength& height) noexcept;
+  void resetHeight() noexcept;
   const UnsignedLength& getStrokeWidth() const noexcept {
     return mCurrentProperties.getStrokeWidth();
   }
   void setStrokeWidth(const UnsignedLength& strokeWidth) noexcept;
+  void resetStrokeWidth() noexcept;
   const QString& getText() const noexcept {
     return mCurrentProperties.getText();
   }
@@ -116,6 +118,9 @@ private:  // Methods
   bool updatePosition(const Point& pos) noexcept;
   bool fixPosition(const Point& pos) noexcept;
   bool abortCommand(bool showErrMsgBox) noexcept;
+  void loadLayerSpecificClientSettings() noexcept;
+  static PositiveLength getDefaultHeight() noexcept;
+  static UnsignedLength getDefaultStrokeWidth() noexcept;
 
 private:  // Data
   // State

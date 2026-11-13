@@ -51,6 +51,7 @@ class Layer;
  * @brief Base class for pads, extended in derived classes
  */
 class Pad {
+  Q_GADGET
   Q_DECLARE_TR_FUNCTIONS(Pad)
 
 public:
@@ -60,11 +61,13 @@ public:
     RoundedOctagon,
     Custom,
   };
+  Q_ENUM(Shape)
 
   enum class ComponentSide {
     Top,
     Bottom,
   };
+  Q_ENUM(ComponentSide)
 
   enum class Function {
     Unspecified = 0,

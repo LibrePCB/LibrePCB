@@ -47,24 +47,26 @@ namespace editor {
 
 BoardEditorState_AddStrokeText::BoardEditorState_AddStrokeText(
     const Context& context) noexcept
-  : BoardEditorState(context),
+  : BoardEditorState(context, "add_text"),
     mIsUndoCmdActive(false),
     mCurrentProperties(
         Uuid::createRandom(),  // UUID is not relevant here
-        Layer::boardDocumentation(),  // Layer
+        *mSettings.get("layer", getAvailableLayers())
+             .value_or(&Layer::boardDocumentation()),  // Layer
         "{{PROJECT}}",  // Text
         Point(),  // Position is not relevant here
-        Angle::deg0(),  // Rotation
-        PositiveLength(1500000),  // Height
-        UnsignedLength(200000),  // Stroke width
+        mSettings.get<Angle>("rotation").value_or(Angle::deg0()),  // Rotation
+        getDefaultHeight(),  // Height
+        getDefaultStrokeWidth(),  // Stroke width
         StrokeTextSpacing(),  // Letter spacing
         StrokeTextSpacing(),  // Line spacing
         Alignment(HAlign::left(), VAlign::bottom()),  // Alignment
-        false,  // Mirror
+        mSettings.get<bool>("mirror").value_or(false),  // Mirror
         true,  // Auto rotate
         false  // Locked
         ),
     mCurrentTextToPlace(nullptr) {
+  loadLayerSpecificClientSettings();
 }
 
 BoardEditorState_AddStrokeText::~BoardEditorState_AddStrokeText() noexcept {
@@ -159,7 +161,9 @@ QSet<const Layer*>
 
 void BoardEditorState_AddStrokeText::setLayer(const Layer& layer) noexcept {
   if (mCurrentProperties.setLayer(layer)) {
+    mSettings.set("layer", mCurrentProperties.getLayer());
     emit layerChanged(mCurrentProperties.getLayer());
+    loadLayerSpecificClientSettings();
   }
 
   if (mCurrentTextEditCmd) {
@@ -171,6 +175,8 @@ void BoardEditorState_AddStrokeText::setLayer(const Layer& layer) noexcept {
 void BoardEditorState_AddStrokeText::setHeight(
     const PositiveLength& height) noexcept {
   if (mCurrentProperties.setHeight(height)) {
+    mSettings.set("height/by_layer/" % mCurrentProperties.getLayer().getId(),
+                  mCurrentProperties.getHeight());
     emit heightChanged(mCurrentProperties.getHeight());
   }
 
@@ -179,9 +185,16 @@ void BoardEditorState_AddStrokeText::setHeight(
   }
 }
 
+void BoardEditorState_AddStrokeText::resetHeight() noexcept {
+  setHeight(getDefaultHeight());
+}
+
 void BoardEditorState_AddStrokeText::setStrokeWidth(
     const UnsignedLength& strokeWidth) noexcept {
   if (mCurrentProperties.setStrokeWidth(strokeWidth)) {
+    mSettings.set(
+        "stroke_width/by_layer/" % mCurrentProperties.getLayer().getId(),
+        mCurrentProperties.getStrokeWidth());
     emit strokeWidthChanged(mCurrentProperties.getStrokeWidth());
   }
 
@@ -189,6 +202,10 @@ void BoardEditorState_AddStrokeText::setStrokeWidth(
     mCurrentTextEditCmd->setStrokeWidth(mCurrentProperties.getStrokeWidth(),
                                         true);
   }
+}
+
+void BoardEditorState_AddStrokeText::resetStrokeWidth() noexcept {
+  setStrokeWidth(getDefaultStrokeWidth());
 }
 
 const QStringList BoardEditorState_AddStrokeText::getTextSuggestions()
@@ -213,6 +230,7 @@ void BoardEditorState_AddStrokeText::setText(const QString& text) noexcept {
 
 void BoardEditorState_AddStrokeText::setMirrored(bool mirrored) noexcept {
   if (mCurrentProperties.setMirrored(mirrored)) {
+    mSettings.set("mirror", mCurrentProperties.getMirrored());
     emit mirroredChanged(mCurrentProperties.getMirrored());
   }
 
@@ -257,6 +275,7 @@ bool BoardEditorState_AddStrokeText::rotateText(const Angle& angle) noexcept {
   mCurrentTextEditCmd->rotate(
       angle, mCurrentTextToPlace->getData().getPosition(), true);
   mCurrentProperties = mCurrentTextToPlace->getData();
+  mSettings.set("rotation", mCurrentProperties.getRotation());
 
   return true;  // Event handled
 }
@@ -270,6 +289,8 @@ bool BoardEditorState_AddStrokeText::flipText(
   mCurrentTextEditCmd->mirrorLayer(
       mCurrentTextToPlace->getBoard().getInnerLayerCount(), true);
   mCurrentProperties = mCurrentTextToPlace->getData();
+  mSettings.set("rotation", mCurrentProperties.getRotation());
+  mSettings.set("mirror", mCurrentProperties.getMirrored());
 
   emit layerChanged(mCurrentProperties.getLayer());
   emit mirroredChanged(mCurrentProperties.getMirrored());
@@ -325,6 +346,27 @@ bool BoardEditorState_AddStrokeText::abortCommand(bool showErrMsgBox) noexcept {
     }
     return false;
   }
+}
+
+void BoardEditorState_AddStrokeText::
+    loadLayerSpecificClientSettings() noexcept {
+  setHeight(mSettings
+                .get<PositiveLength>("height/by_layer/" %
+                                     mCurrentProperties.getLayer().getId())
+                .value_or(mCurrentProperties.getHeight()));
+  setStrokeWidth(mSettings
+                     .get<UnsignedLength>("stroke_width/by_layer/" %
+                                          mCurrentProperties.getLayer().getId())
+                     .value_or(mCurrentProperties.getStrokeWidth()));
+}
+
+PositiveLength BoardEditorState_AddStrokeText::getDefaultHeight() noexcept {
+  return PositiveLength(1500000);
+}
+
+UnsignedLength
+    BoardEditorState_AddStrokeText::getDefaultStrokeWidth() noexcept {
+  return UnsignedLength(200000);
 }
 
 /*******************************************************************************

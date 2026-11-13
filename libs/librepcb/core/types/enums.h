@@ -54,6 +54,18 @@ enum class GridStyle : int {
   Lines,
 };
 
+/**
+ * @brief Mode for routing wires / traces in the schematic or board editor
+ */
+enum class WireMode : int {
+  HV,  ///< horizontal - vertical
+  VH,  ///< vertical - horizontal
+  Deg9045,  ///< 90° - 45°
+  Deg4590,  ///< 45° - 90°
+  Straight,  ///< straight
+  _COUNT,  ///< count of wire modes, must be the last entry of the enum
+};
+
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
@@ -62,5 +74,6 @@ enum class GridStyle : int {
 
 Q_DECLARE_METATYPE(librepcb::AutoUpdateMode)
 Q_DECLARE_METATYPE(librepcb::GridStyle)
+Q_DECLARE_METATYPE(librepcb::WireMode)
 
 #endif

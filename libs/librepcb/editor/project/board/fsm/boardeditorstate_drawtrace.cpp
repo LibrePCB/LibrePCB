@@ -66,10 +66,11 @@ namespace editor {
 
 BoardEditorState_DrawTrace::BoardEditorState_DrawTrace(
     const Context& context) noexcept
-  : BoardEditorState(context),
+  : BoardEditorState(context, "draw_trace"),
     mSubState(SubState_Idle),
     mCurrentNetClass(nullptr),
-    mCurrentWireMode(WireMode::HV),
+    mCurrentWireMode(
+        mSettings.get<WireMode>("wire_mode").value_or(WireMode::Deg9045)),
     mCurrentLayer(&Layer::topCopper()),
     mAddVia(false),
     mTempVia(nullptr),
@@ -77,16 +78,17 @@ BoardEditorState_DrawTrace::BoardEditorState_DrawTrace(
                           Layer::topCopper(),  // Start layer
                           Layer::botCopper(),  // End layer
                           Point(),  // Position is not relevant here
-                          std::nullopt,  // Drill
-                          std::nullopt,  // Auto size
+                          std::nullopt,  // Drill = auto
+                          std::nullopt,  // Size = auto
                           MaskConfig::off()  // Exposure
                           ),
     mViaLayer(nullptr),
     mTargetPos(),
     mCursorPos(),
     mCurrentWidth(mContext.board.getDesignRules().getDefaultTraceWidth()),
-    mCurrentAutoWidth(false),
-    mShowClearanceCircle(false),
+    mCurrentAutoWidth(mSettings.get<bool>("width/auto").value_or(true)),
+    mShowClearanceCircle(
+        mSettings.get<bool>("clearance_circle").value_or(false)),
     mCurrentSnapActive(true),
     mFixedStartAnchor(nullptr),
     mCurrentNetSegment(nullptr),
@@ -94,12 +96,25 @@ BoardEditorState_DrawTrace::BoardEditorState_DrawTrace(
     mPositioningNetPoint1(nullptr),
     mPositioningNetLine2(nullptr),
     mPositioningNetPoint2(nullptr) {
-  // Restore client settings.
-  QSettings cs;
-  mCurrentAutoWidth =
-      cs.value("board_editor/draw_trace/width/auto", true).toBool();
-  mShowClearanceCircle =
-      cs.value("board_editor/draw_trace/clearance_circle", false).toBool();
+  // Restore client settings. Note: The drill diameter must be restored
+  // *before* the size because the drill diameter is the leading property
+  // (when restoring a drill larger than the size, the size is automatically
+  // increased, but not vice versa).
+  if (!mSettings.get<bool>("via_drill/auto").value_or(true)) {
+    if (auto drill = mSettings.get<PositiveLength>("via_drill")) {
+      setViaDrillDiameter(*drill);
+    }
+  }
+  if (!mSettings.get<bool>("via_size/auto").value_or(true)) {
+    if (auto size = mSettings.get<PositiveLength>("via_size")) {
+      setViaSize(*size);
+    }
+  }
+  if (!mCurrentAutoWidth) {
+    if (auto width = mSettings.get<PositiveLength>("trace_width")) {
+      setWidth(*width);
+    }
+  }
 }
 
 BoardEditorState_DrawTrace::~BoardEditorState_DrawTrace() noexcept {
@@ -241,10 +256,13 @@ bool BoardEditorState_DrawTrace::processGraphicsSceneRightMouseButtonReleased(
  ******************************************************************************/
 
 void BoardEditorState_DrawTrace::setWireMode(WireMode mode) noexcept {
-  if (mode != mCurrentWireMode) {
-    mCurrentWireMode = mode;
-    emit wireModeChanged(mCurrentWireMode);
+  if (mode == mCurrentWireMode) {
+    return;
   }
+
+  mCurrentWireMode = mode;
+  mSettings.set("wire_mode", mCurrentWireMode);
+  emit wireModeChanged(mCurrentWireMode);
 
   if (mSubState == SubState_PositioningNetPoint) {
     updateNetpointPositions();
@@ -291,24 +309,25 @@ void BoardEditorState_DrawTrace::setLayer(const Layer& layer) noexcept {
 void BoardEditorState_DrawTrace::setAutoWidth(bool autoWidth) noexcept {
   if (autoWidth != mCurrentAutoWidth) {
     mCurrentAutoWidth = autoWidth;
+    mSettings.set("width/auto", mCurrentAutoWidth);
     emit autoWidthChanged(mCurrentAutoWidth);
-
-    // Save client settings.
-    QSettings cs;
-    cs.setValue("board_editor/draw_trace/width/auto", autoWidth);
   }
 }
 
 void BoardEditorState_DrawTrace::setWidth(
     const PositiveLength& width) noexcept {
-  if (width != mCurrentWidth) {
-    mCurrentWidth = width;
-    emit widthChanged(mCurrentWidth);
-    updateClearanceCircleRadius();
+  if (width == mCurrentWidth) {
+    return;
   }
 
-  if (mSubState != SubState::SubState_PositioningNetPoint) return;
-  updateNetpointPositions();
+  mCurrentWidth = width;
+  mSettings.set("trace_width", mCurrentWidth);
+  emit widthChanged(mCurrentWidth);
+  updateClearanceCircleRadius();
+
+  if (mSubState == SubState::SubState_PositioningNetPoint) {
+    updateNetpointPositions();
+  }
 }
 
 void BoardEditorState_DrawTrace::saveWidthInBoard() noexcept {
@@ -378,12 +397,20 @@ void BoardEditorState_DrawTrace::setViaDrillDiameter(
   }
 
   const PositiveLength oldSize = getViaSize();
-  if (mCurrentViaProperties.setDrillAndSize(diameter,
-                                            mCurrentViaProperties.getSize())) {
-    emit viaDrillDiameterChanged(
-        !mCurrentViaProperties.getDrillDiameter().has_value(),
-        getViaDrillDiameter());
+  if (!mCurrentViaProperties.setDrillAndSize(diameter,
+                                             mCurrentViaProperties.getSize())) {
+    return;
   }
+
+  if (auto drill = mCurrentViaProperties.getDrillDiameter()) {
+    mSettings.set("via_drill/auto", false);
+    mSettings.set("via_drill", *drill);
+  } else {
+    mSettings.set("via_drill/auto", true);
+  }
+  emit viaDrillDiameterChanged(
+      !mCurrentViaProperties.getDrillDiameter().has_value(),
+      getViaDrillDiameter());
 
   const PositiveLength newSize = getViaSize();
   if (newSize != oldSize) {
@@ -456,11 +483,19 @@ void BoardEditorState_DrawTrace::setViaSize(
     setViaDrillDiameter(*size);
   }
 
-  if (mCurrentViaProperties.setDrillAndSize(
+  if (!mCurrentViaProperties.setDrillAndSize(
           mCurrentViaProperties.getDrillDiameter(), size)) {
-    emit viaSizeChanged(!mCurrentViaProperties.getSize().has_value(),
-                        getViaSize());
+    return;
   }
+
+  if (auto value = mCurrentViaProperties.getSize()) {
+    mSettings.set("via_size/auto", false);
+    mSettings.set("via_size/value", *value);
+  } else {
+    mSettings.set("via_size/auto", true);
+  }
+  emit viaSizeChanged(!mCurrentViaProperties.getSize().has_value(),
+                      getViaSize());
 
   updateNetpointPositions();
 }
@@ -468,12 +503,9 @@ void BoardEditorState_DrawTrace::setViaSize(
 void BoardEditorState_DrawTrace::setShowClearanceCircle(bool show) noexcept {
   if (show != mShowClearanceCircle) {
     mShowClearanceCircle = show;
+    mSettings.set("clearance_circle", mShowClearanceCircle);
     emit showClearanceCircleChanged(mShowClearanceCircle);
     updateClearanceCircleRadius();
-
-    // Save client settings.
-    QSettings cs;
-    cs.setValue("board_editor/draw_trace/clearance_circle", show);
   }
 }
 
@@ -644,6 +676,7 @@ bool BoardEditorState_DrawTrace::startPositioning(
         }
       }
       if (autoWidth != mCurrentWidth) {
+        // Note: Not updating client settings for automatic width changes.
         mCurrentWidth = autoWidth;
         emit widthChanged(mCurrentWidth);
       }

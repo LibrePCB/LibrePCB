@@ -41,6 +41,7 @@
 #include "fsm/schematiceditorstate_addtext.h"
 #include "fsm/schematiceditorstate_drawbus.h"
 #include "fsm/schematiceditorstate_drawpolygon.h"
+#include "fsm/schematiceditorstate_drawwire.h"
 #include "graphicsitems/sgi_netlabel.h"
 #include "graphicsitems/sgi_netline.h"
 #include "graphicsitems/sgi_symbol.h"
@@ -71,6 +72,7 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <functional>
 #include <memory>
 
 /*******************************************************************************
@@ -81,38 +83,6 @@ namespace librepcb {
 class Library;
 
 namespace editor {
-
-static ui::WireMode l2s(SchematicEditorState_DrawWire::WireMode v) noexcept {
-  if (v == SchematicEditorState_DrawWire::WireMode::HV) {
-    return ui::WireMode::HV;
-  } else if (v == SchematicEditorState_DrawWire::WireMode::VH) {
-    return ui::WireMode::VH;
-  } else if (v == SchematicEditorState_DrawWire::WireMode::Deg9045) {
-    return ui::WireMode::Deg9045;
-  } else if (v == SchematicEditorState_DrawWire::WireMode::Deg4590) {
-    return ui::WireMode::Deg4590;
-  } else if (v == SchematicEditorState_DrawWire::WireMode::Straight) {
-    return ui::WireMode::Straight;
-  } else {
-    return ui::WireMode::HV;
-  }
-}
-
-static SchematicEditorState_DrawWire::WireMode s2l(ui::WireMode v) noexcept {
-  if (v == ui::WireMode::HV) {
-    return SchematicEditorState_DrawWire::WireMode::HV;
-  } else if (v == ui::WireMode::VH) {
-    return SchematicEditorState_DrawWire::WireMode::VH;
-  } else if (v == ui::WireMode::Deg9045) {
-    return SchematicEditorState_DrawWire::WireMode::Deg9045;
-  } else if (v == ui::WireMode::Deg4590) {
-    return SchematicEditorState_DrawWire::WireMode::Deg4590;
-  } else if (v == ui::WireMode::Straight) {
-    return SchematicEditorState_DrawWire::WireMode::Straight;
-  } else {
-    return SchematicEditorState_DrawWire::WireMode::HV;
-  }
-}
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -139,7 +109,7 @@ SchematicTab::SchematicTab(GuiApplication& app, SchematicEditor& editor,
     mToolFeatures(),
     mTool(ui::EditorTool::Select),
     mToolCursorShape(Qt::ArrowCursor),
-    mToolWireMode(SchematicEditorState_DrawWire::WireMode::HV),
+    mToolWireMode(WireMode::HV),
     mToolAngle(Angle::deg0()),
     mToolMirrored(false),
     mToolAutoOrientation(false),
@@ -197,6 +167,8 @@ SchematicTab::SchematicTab(GuiApplication& app, SchematicEditor& editor,
 
   // Connect tool values.
   connect(&mToolLineWidth, &LengthEditContext::uiDataChanged, this,
+          [this]() { onDerivedUiDataChanged.notify(); });
+  connect(&mToolSize, &LengthEditContext::uiDataChanged, this,
           [this]() { onDerivedUiDataChanged.notify(); });
 
   // Connect search context.
@@ -414,50 +386,96 @@ void SchematicTab::setDerivedUiData(const ui::SchematicTabData& data) noexcept {
   mMsgInstallLibraries.setUiData(data.install_libraries_msg);
   mMsgAddDrawingFrame.setUiData(data.add_drawing_frame_msg);
 
+  // Tool properties
+  // Attention: Applying some tool properties can have side effects on other
+  // tool properties (e.g. enable label auto-ratation will update rotation and
+  // mirrored properties). To avoid those side effects to be overridden here,
+  // we have to collect all changed properties first, before any of them are
+  // actually applied.
+  QVector<std::function<void()>> actions;
+
   // Tool layer
-  if (const Layer* layer = mToolLayersQt.value(data.tool_layer.current_index)) {
-    emit layerRequested(*layer);
+  if (const Layer* v = mToolLayersQt.value(data.tool_layer.current_index)) {
+    if (v != mToolLayer) {
+      actions.append([this, v]() { emit layerRequested(*v); });
+    }
   }
 
   // Tool wire mode
-  emit wireModeRequested(s2l(data.tool_wire_mode));
+  {
+    const WireMode v = s2l(data.tool_wire_mode);
+    if (v != mToolWireMode) {
+      actions.append([this, v]() { emit wireModeRequested(v); });
+    }
+  }
 
-  // Tool angle / mirrored / auto-orientation. Note: Evaluate all conditions
-  // before emitting, because emitting an angle/mirror change may disable
-  // auto-orientation in the tool, which must not be overridden afterwards.
-  const Angle angle = Angle::fromDeg(data.tool_angle);
-  const bool angleChanged = (angle != mToolAngle);
-  const bool mirroredChanged = (data.tool_mirrored != mToolMirrored);
-  const bool autoOrientationChanged =
-      (data.tool_auto_orientation != mToolAutoOrientation);
-  if (angleChanged) {
-    emit angleRequested(angle);
+  // Tool angle
+  {
+    const Angle v = Angle::fromDeg(data.tool_angle);
+    if (v != mToolAngle) {
+      actions.append([this, v]() { emit angleRequested(v); });
+    }
   }
-  if (mirroredChanged) {
-    emit mirroredRequested(data.tool_mirrored);
+
+  // Tool mirrored
+  if (data.tool_mirrored != mToolMirrored) {
+    actions.append(
+        [this, v = data.tool_mirrored]() { emit mirroredRequested(v); });
   }
-  if (autoOrientationChanged) {
-    emit autoOrientationRequested(data.tool_auto_orientation);
+
+  // Tool auto-orientation
+  if (data.tool_auto_orientation != mToolAutoOrientation) {
+    actions.append([this, v = data.tool_auto_orientation]() {
+      emit autoOrientationRequested(v);
+    });
   }
 
   // Tool filled
-  emit filledRequested(data.tool_filled);
+  if (data.tool_filled != mToolFilled) {
+    actions.append([this, v = data.tool_filled]() { emit filledRequested(v); });
+  }
 
   // Tool line width
-  mToolLineWidth.setUiData(data.tool_line_width);
+  if (data.tool_line_width != mToolLineWidth.getUiData()) {
+    actions.append(
+        [this, &data]() { mToolLineWidth.setUiData(data.tool_line_width); });
+  }
 
   // Tool size
-  mToolSize.setUiData(data.tool_size);
+  if (data.tool_size != mToolSize.getUiData()) {
+    actions.append([this, &data]() { mToolSize.setUiData(data.tool_size); });
+  }
 
   // Tool value
-  emit valueRequested(EditorToolbox::toMultiLine(s2q(data.tool_value.text)));
+  if (data.tool_value.enabled) {
+    const QString v = EditorToolbox::toMultiLine(s2q(data.tool_value.text));
+    if (v != mToolValue) {
+      actions.append([this, v]() { emit valueRequested(v); });
+    }
+  }
 
-  // Tool attribute unit & value.
-  // Unit must be set before value, because value may override the unit!
-  emit attributeUnitRequested(
-      mToolAttributeUnitsQt.value(data.tool_attribute_unit.current_index));
-  emit attributeValueRequested(
-      EditorToolbox::toMultiLine(s2q(data.tool_attribute_value.text)));
+  // Tool attribute unit
+  {
+    const AttributeUnit* v =
+        mToolAttributeUnitsQt.value(data.tool_attribute_unit.current_index);
+    if (v != mToolAttributeUnit) {
+      actions.append([this, v]() { emit attributeUnitRequested(v); });
+    }
+  }
+
+  // Tool attribute value
+  if (data.tool_attribute_value.enabled) {
+    const QString v =
+        EditorToolbox::toMultiLine(s2q(data.tool_attribute_value.text));
+    if (v != mToolAttributeValue) {
+      actions.append([this, v]() { emit attributeValueRequested(v); });
+    }
+  }
+
+  // Apply changed tool properties.
+  for (const auto& action : actions) {
+    action();
+  }
 
   // Actions
   if (!data.new_bus_uuid.empty()) {
@@ -799,6 +817,14 @@ void SchematicTab::trigger(ui::TabAction a) noexcept {
       mFsm->processMeasure();
       break;
     }
+    case ui::TabAction::ToolbarLineWidthReset: {
+      emit lineWidthResetRequested();
+      break;
+    }
+    case ui::TabAction::ToolbarSizeReset: {
+      emit sizeResetRequested();
+      break;
+    }
     default: {
       WindowTab::trigger(a);
       break;
@@ -1013,7 +1039,7 @@ void SchematicTab::fsmToolEnter(SchematicEditorState_DrawWire& state) noexcept {
   mTool = ui::EditorTool::Wire;
 
   // Wire mode
-  auto setWireMode = [this](SchematicEditorState_DrawWire::WireMode m) {
+  auto setWireMode = [this](WireMode m) {
     mToolWireMode = m;
     onDerivedUiDataChanged.notify();
   };
@@ -1032,7 +1058,7 @@ void SchematicTab::fsmToolEnter(SchematicEditorState_DrawBus& state) noexcept {
   mTool = ui::EditorTool::Bus;
 
   // Wire mode
-  auto setWireMode = [this](SchematicEditorState_DrawWire::WireMode m) {
+  auto setWireMode = [this](WireMode m) {
     mToolWireMode = m;
     onDerivedUiDataChanged.notify();
   };
@@ -1216,6 +1242,9 @@ void SchematicTab::fsmToolEnter(
   mFsmStateConnections.append(
       connect(&mToolLineWidth, &LengthEditContext::valueChangedUnsigned, &state,
               &SchematicEditorState_DrawPolygon::setLineWidth));
+  mFsmStateConnections.append(
+      connect(this, &SchematicTab::lineWidthResetRequested, &state,
+              &SchematicEditorState_DrawPolygon::resetLineWidth));
 
   // Filled
   auto setFilled = [this](bool filled) {
@@ -1257,13 +1286,16 @@ void SchematicTab::fsmToolEnter(SchematicEditorState_AddText& state) noexcept {
 
   // Height
   mToolSize.configure(state.getHeight(), LengthEditContext::Steps::textHeight(),
-                      "schematic_editor/add_text/size");
+                      "schematic_editor/add_text/height");
   mFsmStateConnections.append(
       connect(&state, &SchematicEditorState_AddText::heightChanged, &mToolSize,
               &LengthEditContext::setValuePositive));
   mFsmStateConnections.append(
       connect(&mToolSize, &LengthEditContext::valueChangedPositive, &state,
               &SchematicEditorState_AddText::setHeight));
+  mFsmStateConnections.append(
+      connect(this, &SchematicTab::sizeResetRequested, &state,
+              &SchematicEditorState_AddText::resetHeight));
 
   // Text
   auto setText = [this](const QString& text) {

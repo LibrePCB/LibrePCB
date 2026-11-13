@@ -40,7 +40,7 @@ namespace editor {
 
 BoardEditorState_Measure::BoardEditorState_Measure(
     const Context& context) noexcept
-  : BoardEditorState(context), mTool(new MeasureTool()) {
+  : BoardEditorState(context, "measure"), mTool(new MeasureTool()) {
   connect(
       mTool.data(), &MeasureTool::infoBoxTextChanged, this,
       [this](const QString& text) { mAdapter.fsmSetViewInfoBoxText(text); });

@@ -39,6 +39,7 @@
 #include <librepcb/core/project/schematic/items/si_netpoint.h>
 #include <librepcb/core/project/schematic/items/si_netsegment.h>
 #include <librepcb/core/project/schematic/schematic.h>
+#include <librepcb/core/serialization/serialization.h>
 #include <librepcb/core/utils/toolbox.h>
 
 #include <QtCore>
@@ -56,19 +57,18 @@ namespace editor {
 
 SchematicEditorState_AddLabel::SchematicEditorState_AddLabel(
     const Context& context) noexcept
-  : SchematicEditorState(context),
+  : SchematicEditorState(context, "add_label"),
     mUndoCmdActive(false),
-    mCurrentRotation(Angle::deg0()),
-    mCurrentMirrored(false),
-    mAutoOrientation(false),
+    mCurrentRotation(
+        mSettings
+            .get("rotation", Angle::deg0(), Angle::deg270(), Angle::deg90())
+            .value_or(Angle::deg0())),
+    mCurrentMirrored(mSettings.get<bool>("mirror").value_or(false)),
+    mAutoOrientation(mSettings.get<bool>("auto_orientation").value_or(true)),
     mCurrentNetLabel(nullptr),
     mNetLabelEditCmd(nullptr),
     mCurrentBusLabel(nullptr),
     mBusLabelEditCmd(nullptr) {
-  // Restore client settings.
-  QSettings cs;
-  mAutoOrientation =
-      cs.value("schematic_editor/add_label/auto_orientation", true).toBool();
 }
 
 SchematicEditorState_AddLabel::~SchematicEditorState_AddLabel() noexcept {
@@ -110,15 +110,14 @@ bool SchematicEditorState_AddLabel::processRotate(
   setAutoOrientation(false);  // Switch back to manual mode.
   if (mUndoCmdActive && mCurrentNetLabel && mNetLabelEditCmd) {
     mNetLabelEditCmd->rotate(rotation, mCurrentNetLabel->getPosition(), true);
-    mCurrentRotation = mCurrentNetLabel->getRotation();
+    storeRotation(mCurrentNetLabel->getRotation());
   } else if (mUndoCmdActive && mCurrentBusLabel && mBusLabelEditCmd) {
     mBusLabelEditCmd->rotate(rotation, mCurrentBusLabel->getPosition(), true);
-    mCurrentRotation = mCurrentBusLabel->getRotation();
+    storeRotation(mCurrentBusLabel->getRotation());
   } else {
-    mCurrentRotation += rotation;  // Memorize for the next label.
-    mCurrentRotation = mCurrentRotation.mappedTo0_360deg();
+    // Memorize for the next label.
+    storeRotation((mCurrentRotation + rotation).mappedTo0_360deg());
   }
-  emit rotationChanged(mCurrentRotation);
   return true;
 }
 
@@ -128,19 +127,17 @@ bool SchematicEditorState_AddLabel::processMirror(
   if (mUndoCmdActive && mCurrentNetLabel && mNetLabelEditCmd) {
     mNetLabelEditCmd->mirror(orientation, mCurrentNetLabel->getPosition(),
                              true);
-    mCurrentRotation = mCurrentNetLabel->getRotation();
-    mCurrentMirrored = mCurrentNetLabel->getMirrored();
-    emit rotationChanged(mCurrentRotation);
+    storeRotation(mCurrentNetLabel->getRotation());
+    storeMirrored(mCurrentNetLabel->getMirrored());
   } else if (mUndoCmdActive && mCurrentBusLabel && mBusLabelEditCmd) {
     mBusLabelEditCmd->mirror(orientation, mCurrentBusLabel->getPosition(),
                              true);
-    mCurrentRotation = mCurrentBusLabel->getRotation();
-    mCurrentMirrored = mCurrentBusLabel->getMirrored();
-    emit rotationChanged(mCurrentRotation);
+    storeRotation(mCurrentBusLabel->getRotation());
+    storeMirrored(mCurrentBusLabel->getMirrored());
   } else {
-    mCurrentMirrored = !mCurrentMirrored;  // Memorize for the next label.
+    // Memorize for the next label.
+    storeMirrored(!mCurrentMirrored);
   }
-  emit mirroredChanged(mCurrentMirrored);
   return true;
 }
 
@@ -190,18 +187,13 @@ Angle SchematicEditorState_AddLabel::getRotation() const noexcept {
 
 void SchematicEditorState_AddLabel::setRotation(
     const Angle& rotation) noexcept {
-  if (rotation == mCurrentRotation) {
-    return;
-  }
-
-  setAutoOrientation(false);  // Switch back to manual mode.
-  mCurrentRotation = rotation;
-  emit rotationChanged(mCurrentRotation);
-
-  if (mUndoCmdActive && mNetLabelEditCmd) {
-    mNetLabelEditCmd->setRotation(mCurrentRotation, true);
-  } else if (mUndoCmdActive && mBusLabelEditCmd) {
-    mBusLabelEditCmd->setRotation(mCurrentRotation, true);
+  if (storeRotation(rotation)) {
+    setAutoOrientation(false);  // Switch back to manual mode.
+    if (mUndoCmdActive && mNetLabelEditCmd) {
+      mNetLabelEditCmd->setRotation(mCurrentRotation, true);
+    } else if (mUndoCmdActive && mBusLabelEditCmd) {
+      mBusLabelEditCmd->setRotation(mCurrentRotation, true);
+    }
   }
 }
 
@@ -210,33 +202,20 @@ bool SchematicEditorState_AddLabel::getMirrored() const noexcept {
 }
 
 void SchematicEditorState_AddLabel::setMirrored(bool mirrored) noexcept {
-  if (mirrored == mCurrentMirrored) {
-    return;
-  }
-
-  setAutoOrientation(false);  // Switch back to manual mode.
-  mCurrentMirrored = mirrored;
-  emit mirroredChanged(mCurrentMirrored);
-
-  if (mUndoCmdActive && mNetLabelEditCmd) {
-    mNetLabelEditCmd->setMirrored(mCurrentMirrored, true);
-  } else if (mUndoCmdActive && mBusLabelEditCmd) {
-    mBusLabelEditCmd->setMirrored(mCurrentMirrored, true);
+  if (storeMirrored(mirrored)) {
+    setAutoOrientation(false);  // Switch back to manual mode.
+    if (mUndoCmdActive && mNetLabelEditCmd) {
+      mNetLabelEditCmd->setMirrored(mCurrentMirrored, true);
+    } else if (mUndoCmdActive && mBusLabelEditCmd) {
+      mBusLabelEditCmd->setMirrored(mCurrentMirrored, true);
+    }
   }
 }
 
-void SchematicEditorState_AddLabel::setAutoOrientation(bool enabled) noexcept {
-  if (enabled == mAutoOrientation) {
-    return;
+void SchematicEditorState_AddLabel::setAutoOrientation(bool enable) noexcept {
+  if (storeAutoOrientation(enable)) {
+    updateLabelAutoOrientation();
   }
-
-  mAutoOrientation = enabled;
-  emit autoOrientationChanged(mAutoOrientation);
-  updateLabelAutoOrientation();
-
-  // Save client settings.
-  QSettings cs;
-  cs.setValue("schematic_editor/add_label/auto_orientation", mAutoOrientation);
 }
 
 /*******************************************************************************
@@ -335,6 +314,26 @@ bool SchematicEditorState_AddLabel::fixLabel(const Point& pos) noexcept {
   }
 }
 
+bool SchematicEditorState_AddLabel::abortCommand(bool showErrMsgBox) noexcept {
+  try {
+    mAdapter.fsmCrossProbe();
+    if (mUndoCmdActive) {
+      mContext.undoStack.abortCmdGroup();  // can throw
+      mUndoCmdActive = false;
+    }
+    mCurrentNetLabel = nullptr;
+    mNetLabelEditCmd = nullptr;
+    mCurrentBusLabel = nullptr;
+    mBusLabelEditCmd = nullptr;
+    return true;
+  } catch (const Exception& e) {
+    if (showErrMsgBox) {
+      QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
+    }
+    return false;
+  }
+}
+
 void SchematicEditorState_AddLabel::updateLabelAutoOrientation() noexcept {
   if (!mAutoOrientation) {
     return;
@@ -359,15 +358,11 @@ void SchematicEditorState_AddLabel::updateLabelAutoOrientation() noexcept {
       }
     }
     if (const auto orientation = calcAutoOrientation(pos, lines)) {
-      if (orientation->first != mCurrentRotation) {
+      if (storeRotation(orientation->first)) {
         mNetLabelEditCmd->setRotation(orientation->first, true);
-        mCurrentRotation = orientation->first;
-        emit rotationChanged(orientation->first);
       }
-      if (orientation->second != mCurrentMirrored) {
+      if (storeMirrored(orientation->second)) {
         mNetLabelEditCmd->setMirrored(orientation->second, true);
-        mCurrentMirrored = orientation->second;
-        emit mirroredChanged(orientation->second);
       }
     }
   } else if (mCurrentBusLabel && mBusLabelEditCmd) {
@@ -386,15 +381,11 @@ void SchematicEditorState_AddLabel::updateLabelAutoOrientation() noexcept {
       }
     }
     if (const auto orientation = calcAutoOrientation(pos, lines)) {
-      if (orientation->first != mCurrentRotation) {
+      if (storeRotation(orientation->first)) {
         mBusLabelEditCmd->setRotation(orientation->first, true);
-        mCurrentRotation = orientation->first;
-        emit rotationChanged(orientation->first);
       }
-      if (orientation->second != mCurrentMirrored) {
+      if (storeMirrored(orientation->second)) {
         mBusLabelEditCmd->setMirrored(orientation->second, true);
-        mCurrentMirrored = orientation->second;
-        emit mirroredChanged(orientation->second);
       }
     }
   }
@@ -427,24 +418,35 @@ std::optional<std::pair<Angle, bool>>
   return result;
 }
 
-bool SchematicEditorState_AddLabel::abortCommand(bool showErrMsgBox) noexcept {
-  try {
-    mAdapter.fsmCrossProbe();
-    if (mUndoCmdActive) {
-      mContext.undoStack.abortCmdGroup();  // can throw
-      mUndoCmdActive = false;
-    }
-    mCurrentNetLabel = nullptr;
-    mNetLabelEditCmd = nullptr;
-    mCurrentBusLabel = nullptr;
-    mBusLabelEditCmd = nullptr;
+bool SchematicEditorState_AddLabel::storeRotation(
+    const Angle& rotation) noexcept {
+  if (rotation != mCurrentRotation) {
+    mCurrentRotation = rotation;
+    mSettings.set("rotation", mCurrentRotation);
+    emit rotationChanged(mCurrentRotation);
     return true;
-  } catch (const Exception& e) {
-    if (showErrMsgBox) {
-      QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
-    }
-    return false;
   }
+  return false;
+}
+
+bool SchematicEditorState_AddLabel::storeMirrored(bool mirrored) noexcept {
+  if (mirrored != mCurrentMirrored) {
+    mCurrentMirrored = mirrored;
+    mSettings.set("mirror", mCurrentMirrored);
+    emit mirroredChanged(mCurrentMirrored);
+    return true;
+  }
+  return false;
+}
+
+bool SchematicEditorState_AddLabel::storeAutoOrientation(bool enable) noexcept {
+  if (enable != mAutoOrientation) {
+    mAutoOrientation = enable;
+    mSettings.set("auto_orientation", mAutoOrientation);
+    emit autoOrientationChanged(mAutoOrientation);
+    return true;
+  }
+  return false;
 }
 
 /*******************************************************************************

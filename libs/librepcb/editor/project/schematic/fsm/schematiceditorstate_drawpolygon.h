@@ -87,6 +87,7 @@ public:
     return mCurrentProperties.getLineWidth();
   }
   void setLineWidth(const UnsignedLength& width) noexcept;
+  void resetLineWidth() noexcept;
   bool getFilled() const noexcept { return mCurrentProperties.isFilled(); }
   void setFilled(bool filled) noexcept;
 
@@ -104,6 +105,8 @@ private:  // Methods
   bool addSegment(const Point& pos) noexcept;
   bool updateLastVertexPosition(const Point& pos) noexcept;
   bool abortCommand(bool showErrMsgBox) noexcept;
+  void loadLayerSpecificClientSettings() noexcept;
+  static UnsignedLength getDefaultLineWidth() noexcept;
 
 private:  // Data
   // State

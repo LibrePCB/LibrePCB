@@ -48,19 +48,21 @@ namespace editor {
 
 SchematicEditorState_AddText::SchematicEditorState_AddText(
     const Context& context) noexcept
-  : SchematicEditorState(context),
+  : SchematicEditorState(context, "add_text"),
     mIsUndoCmdActive(false),
     mCurrentProperties(
         Uuid::createRandom(),  // UUID is not relevant here
-        Layer::schematicComments(),  // Layer
+        *mSettings.get("layer", getAvailableLayers())
+             .value_or(&Layer::schematicComments()),  // Layer
         "{{PROJECT}}",  // Text
         Point(),  // Position is not relevant here
         Angle::deg0(),  // Rotation
-        PositiveLength(2500000),  // Height
+        getDefaultHeight(),  // Height
         Alignment(HAlign::left(), VAlign::bottom()),  // Alignment
         false  // Locked
         ),
     mCurrentTextToPlace(nullptr) {
+  loadLayerSpecificClientSettings();
 }
 
 SchematicEditorState_AddText::~SchematicEditorState_AddText() noexcept {
@@ -157,7 +159,9 @@ QSet<const Layer*> SchematicEditorState_AddText::getAvailableLayers()
 
 void SchematicEditorState_AddText::setLayer(const Layer& layer) noexcept {
   if (mCurrentProperties.setLayer(layer)) {
+    mSettings.set("layer", mCurrentProperties.getLayer());
     emit layerChanged(mCurrentProperties.getLayer());
+    loadLayerSpecificClientSettings();
   }
 
   if (mCurrentTextEditCmd) {
@@ -168,12 +172,18 @@ void SchematicEditorState_AddText::setLayer(const Layer& layer) noexcept {
 void SchematicEditorState_AddText::setHeight(
     const PositiveLength& height) noexcept {
   if (mCurrentProperties.setHeight(height)) {
+    mSettings.set("height/by_layer/" % mCurrentProperties.getLayer().getId(),
+                  mCurrentProperties.getHeight());
     emit heightChanged(mCurrentProperties.getHeight());
   }
 
   if (mCurrentTextEditCmd) {
     mCurrentTextEditCmd->setHeight(mCurrentProperties.getHeight(), true);
   }
+}
+
+void SchematicEditorState_AddText::resetHeight() noexcept {
+  setHeight(getDefaultHeight());
 }
 
 const QStringList SchematicEditorState_AddText::getTextSuggestions()
@@ -285,6 +295,17 @@ bool SchematicEditorState_AddText::abortCommand(bool showErrMsgBox) noexcept {
     }
     return false;
   }
+}
+
+void SchematicEditorState_AddText::loadLayerSpecificClientSettings() noexcept {
+  setHeight(mSettings
+                .get<PositiveLength>("height/by_layer/" %
+                                     mCurrentProperties.getLayer().getId())
+                .value_or(mCurrentProperties.getHeight()));
+}
+
+PositiveLength SchematicEditorState_AddText::getDefaultHeight() noexcept {
+  return PositiveLength(2500000);
 }
 
 /*******************************************************************************

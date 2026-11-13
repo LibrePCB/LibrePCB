@@ -29,6 +29,8 @@
 
 #include <QtCore>
 
+#include <optional>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -205,6 +207,20 @@ public:
    * thrown
    */
   static Ratio fromNormalized(const QString& normalized);
+
+  /**
+   * @brief Try to get a Ratio object with a specific ratio
+   *
+   * Like #fromNormalized(const QString&), but returns std::nullopt instead of
+   * throwing an exception if the argument is invalid.
+   *
+   * @param normalized   See #setRatioNormalized(const QString&)
+   *
+   * @return A new Ratio object with the specified ratio, or std::nullopt if
+   *         the string does not represent a valid normalized ratio.
+   */
+  static std::optional<Ratio> tryFromNormalized(
+      const QString& normalized) noexcept;
 
   // Operators
   Ratio& operator=(const Ratio& rhs) {

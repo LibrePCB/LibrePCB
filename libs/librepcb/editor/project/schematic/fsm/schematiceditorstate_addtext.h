@@ -90,6 +90,7 @@ public:
     return mCurrentProperties.getHeight();
   }
   void setHeight(const PositiveLength& height) noexcept;
+  void resetHeight() noexcept;
   const QString& getText() const noexcept {
     return mCurrentProperties.getText();
   }
@@ -111,9 +112,8 @@ private:  // Methods
   bool updatePosition(const Point& pos) noexcept;
   bool fixPosition(const Point& pos) noexcept;
   bool abortCommand(bool showErrMsgBox) noexcept;
-  void layerComboBoxLayerChanged(const Layer& layer) noexcept;
-  void textComboBoxValueChanged(const QString& value) noexcept;
-  void heightEditValueChanged(const PositiveLength& value) noexcept;
+  void loadLayerSpecificClientSettings() noexcept;
+  static PositiveLength getDefaultHeight() noexcept;
 
 private:  // Data
   // State

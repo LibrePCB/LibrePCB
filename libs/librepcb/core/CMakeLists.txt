@@ -480,6 +480,8 @@ add_library(
   serialization/fileformatmigrationv1.h
   serialization/serializablekeyvaluemap.h
   serialization/serializableobjectlist.h
+  serialization/serialization.cpp
+  serialization/serialization.h
   serialization/sexpression.cpp
   serialization/sexpression.h
   sqlitedatabase.cpp

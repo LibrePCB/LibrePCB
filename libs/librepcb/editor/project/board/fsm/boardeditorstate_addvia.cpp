@@ -69,20 +69,34 @@ namespace editor {
 
 BoardEditorState_AddVia::BoardEditorState_AddVia(
     const Context& context) noexcept
-  : BoardEditorState(context),
+  : BoardEditorState(context, "add_via"),
     mIsUndoCmdActive(false),
     mCurrentProperties(Uuid::createRandom(),  // UUID is not relevant here
                        Layer::topCopper(),  // Start layer
                        Layer::botCopper(),  // End layer
                        Point(),  // Position is not relevant here
-                       std::nullopt,  // Drill
-                       std::nullopt,  // Auto size
+                       std::nullopt,  // Drill = auto
+                       std::nullopt,  // Size = auto
                        MaskConfig::off()  // Exposure
                        ),
     mUseAutoNetSignal(true),
     mCurrentNetSignal(std::nullopt),
     mClosestNetSignalIsUpToDate(false),
     mCurrentViaToPlace(nullptr) {
+  // Restore client settings. Note: The drill diameter must be restored
+  // *before* the size because the drill diameter is the leading property
+  // (when restoring a drill larger than the size, the size is automatically
+  // increased, but not vice versa).
+  if (!mSettings.get<bool>("drill/auto").value_or(true)) {
+    if (auto drill = mSettings.get<PositiveLength>("drill")) {
+      setDrillDiameter(*drill);
+    }
+  }
+  if (!mSettings.get<bool>("size/auto").value_or(true)) {
+    if (auto size = mSettings.get<PositiveLength>("size")) {
+      setSize(*size);
+    }
+  }
 }
 
 BoardEditorState_AddVia::~BoardEditorState_AddVia() noexcept {
@@ -171,11 +185,19 @@ void BoardEditorState_AddVia::setDrillDiameter(
   }
 
   const PositiveLength oldSize = getSize();
-  if (mCurrentProperties.setDrillAndSize(diameter,
-                                         mCurrentProperties.getSize())) {
-    emit drillDiameterChanged(
-        !mCurrentProperties.getDrillDiameter().has_value(), getDrillDiameter());
+  if (!mCurrentProperties.setDrillAndSize(diameter,
+                                          mCurrentProperties.getSize())) {
+    return;
   }
+
+  if (auto drill = mCurrentProperties.getDrillDiameter()) {
+    mSettings.set("drill/auto", false);
+    mSettings.set("drill", *drill);
+  } else {
+    mSettings.set("drill/auto", true);
+  }
+  emit drillDiameterChanged(!mCurrentProperties.getDrillDiameter().has_value(),
+                            getDrillDiameter());
 
   if (mCurrentViaEditCmd) {
     mCurrentViaEditCmd->setDrillAndSize(mCurrentProperties.getDrillDiameter(),
@@ -250,10 +272,18 @@ void BoardEditorState_AddVia::setSize(
     setDrillDiameter(*size);
   }
 
-  if (mCurrentProperties.setDrillAndSize(mCurrentProperties.getDrillDiameter(),
-                                         size)) {
-    emit sizeChanged(!mCurrentProperties.getSize().has_value(), getSize());
+  if (!mCurrentProperties.setDrillAndSize(mCurrentProperties.getDrillDiameter(),
+                                          size)) {
+    return;
   }
+
+  if (auto value = mCurrentProperties.getSize()) {
+    mSettings.set("size/auto", false);
+    mSettings.set("size/value", *value);
+  } else {
+    mSettings.set("size/auto", true);
+  }
+  emit sizeChanged(!mCurrentProperties.getSize().has_value(), getSize());
 
   if (mCurrentViaEditCmd) {
     mCurrentViaEditCmd->setDrillAndSize(mCurrentProperties.getDrillDiameter(),

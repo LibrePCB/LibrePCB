@@ -145,6 +145,42 @@ GridStyle s2l(ui::GridStyle v) noexcept {
   }
 }
 
+ui::WireMode l2s(WireMode v) noexcept {
+  switch (v) {
+    case WireMode::HV:
+      return ui::WireMode::HV;
+    case WireMode::VH:
+      return ui::WireMode::VH;
+    case WireMode::Deg9045:
+      return ui::WireMode::Deg9045;
+    case WireMode::Deg4590:
+      return ui::WireMode::Deg4590;
+    case WireMode::Straight:
+      return ui::WireMode::Straight;
+    default:
+      qCritical() << "Unhandled value in WireMode conversion.";
+      return ui::WireMode::HV;
+  }
+}
+
+WireMode s2l(ui::WireMode v) noexcept {
+  switch (v) {
+    case ui::WireMode::HV:
+      return WireMode::HV;
+    case ui::WireMode::VH:
+      return WireMode::VH;
+    case ui::WireMode::Deg9045:
+      return WireMode::Deg9045;
+    case ui::WireMode::Deg4590:
+      return WireMode::Deg4590;
+    case ui::WireMode::Straight:
+      return WireMode::Straight;
+    default:
+      qCritical() << "Unhandled value in WireMode conversion.";
+      return WireMode::HV;
+  }
+}
+
 ui::LengthUnit l2s(const LengthUnit& v) noexcept {
   if (v == LengthUnit::millimeters()) {
     return ui::LengthUnit::Millimeters;

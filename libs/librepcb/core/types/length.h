@@ -273,6 +273,15 @@ public:
   static Length fromMm(qreal millimeters);
 
   /**
+   * @brief Same as #fromMm(), but without exception
+   *
+   * @param millimeters See #fromMm().
+   *
+   * @return #Length object if string is valid, `std::nullopt` otherwise.
+   */
+  static std::optional<Length> tryFromMm(const QString& millimeters);
+
+  /**
    * @brief Get a Length object with a specific length
    *
    * This method can be used to create a Length object from a QString which

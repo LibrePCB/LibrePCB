@@ -23,7 +23,6 @@
 #include "schematiceditorstate_drawpolygon.h"
 
 #include "../../../cmd/cmdpolygonedit.h"
-#include "../../../editorcommandset.h"
 #include "../../../undostack.h"
 #include "../../cmd/cmdschematicpolygonadd.h"
 
@@ -48,18 +47,20 @@ namespace editor {
 
 SchematicEditorState_DrawPolygon::SchematicEditorState_DrawPolygon(
     const Context& context) noexcept
-  : SchematicEditorState(context),
+  : SchematicEditorState(context, "draw_polygon"),
     mIsUndoCmdActive(false),
     mLastSegmentPos(),
     mCurrentProperties(Uuid::createRandom(),  // UUID is not relevant here
-                       Layer::schematicGuide(),  // Layer
-                       UnsignedLength(300000),  // Line width
+                       *mSettings.get("layer", getAvailableLayers())
+                            .value_or(&Layer::schematicGuide()),  // Layer
+                       getDefaultLineWidth(),  // Line width
                        false,  // Is filled
                        false,  // Is grab area
                        Path()  // Path is not relevant here
                        ),
     mCurrentPolygon(nullptr),
     mCurrentPolygonEditCmd(nullptr) {
+  loadLayerSpecificClientSettings();
 }
 
 SchematicEditorState_DrawPolygon::~SchematicEditorState_DrawPolygon() noexcept {
@@ -135,7 +136,9 @@ QSet<const Layer*> SchematicEditorState_DrawPolygon::getAvailableLayers()
 
 void SchematicEditorState_DrawPolygon::setLayer(const Layer& layer) noexcept {
   if (mCurrentProperties.setLayer(layer)) {
+    mSettings.set("layer", mCurrentProperties.getLayer());
     emit layerChanged(mCurrentProperties.getLayer());
+    loadLayerSpecificClientSettings();
   }
 
   if (mCurrentPolygonEditCmd) {
@@ -146,6 +149,9 @@ void SchematicEditorState_DrawPolygon::setLayer(const Layer& layer) noexcept {
 void SchematicEditorState_DrawPolygon::setLineWidth(
     const UnsignedLength& width) noexcept {
   if (mCurrentProperties.setLineWidth(width)) {
+    mSettings.set(
+        "line_width/by_layer/" % mCurrentProperties.getLayer().getId(),
+        mCurrentProperties.getLineWidth());
     emit lineWidthChanged(mCurrentProperties.getLineWidth());
   }
 
@@ -155,8 +161,14 @@ void SchematicEditorState_DrawPolygon::setLineWidth(
   }
 }
 
+void SchematicEditorState_DrawPolygon::resetLineWidth() noexcept {
+  setLineWidth(getDefaultLineWidth());
+}
+
 void SchematicEditorState_DrawPolygon::setFilled(bool filled) noexcept {
   if (mCurrentProperties.setIsFilled(filled)) {
+    mSettings.set("fill/by_layer/" % mCurrentProperties.getLayer().getId(),
+                  mCurrentProperties.isFilled());
     emit filledChanged(mCurrentProperties.isFilled());
   }
 
@@ -276,6 +288,23 @@ bool SchematicEditorState_DrawPolygon::abortCommand(
     }
     return false;
   }
+}
+
+void SchematicEditorState_DrawPolygon::
+    loadLayerSpecificClientSettings() noexcept {
+  setLineWidth(mSettings
+                   .get<UnsignedLength>("line_width/by_layer/" %
+                                        mCurrentProperties.getLayer().getId())
+                   .value_or(mCurrentProperties.getLineWidth()));
+  setFilled(
+      mSettings
+          .get<bool>("fill/by_layer/" % mCurrentProperties.getLayer().getId())
+          .value_or(mCurrentProperties.isFilled()));
+}
+
+UnsignedLength
+    SchematicEditorState_DrawPolygon::getDefaultLineWidth() noexcept {
+  return UnsignedLength(300000);
 }
 
 /*******************************************************************************

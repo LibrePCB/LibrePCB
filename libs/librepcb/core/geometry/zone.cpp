@@ -22,12 +22,116 @@
  ******************************************************************************/
 #include "zone.h"
 
+#include "../serialization/serialization.h"
+
 #include <QtCore>
+
+#include <bit>
 
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
+
+/*******************************************************************************
+ *  Non-Member Functions
+ ******************************************************************************/
+
+template <>
+QString serializeToString(const Zone::Rule& obj) noexcept {
+  switch (obj) {
+    case Zone::Rule::NoCopper:
+      return "no_copper";
+    case Zone::Rule::NoPlanes:
+      return "no_planes";
+    case Zone::Rule::NoExposure:
+      return "no_exposure";
+    case Zone::Rule::NoDevices:
+      return "no_devices";
+    default:
+      qCritical() << "Unknown zone rule:" << static_cast<int>(obj);
+      Q_ASSERT(false);
+      return QString();
+  }
+}
+
+template <>
+std::optional<Zone::Rule> deserialize(const QString& str) noexcept {
+  if (str == QLatin1String("no_copper")) {
+    return Zone::Rule::NoCopper;
+  } else if (str == QLatin1String("no_planes")) {
+    return Zone::Rule::NoPlanes;
+  } else if (str == QLatin1String("no_exposure")) {
+    return Zone::Rule::NoExposure;
+  } else if (str == QLatin1String("no_devices")) {
+    return Zone::Rule::NoDevices;
+  } else {
+    return std::nullopt;
+  }
+}
+
+template <>
+std::unique_ptr<SExpression> serialize(const Zone::Rule& obj) {
+  return SExpression::createToken(serializeToString(obj));
+}
+
+template <>
+Zone::Rule deserialize(const SExpression& node) {
+  if (auto rule = deserialize<Zone::Rule>(node.getValue())) {
+    return *rule;
+  } else {
+    throw RuntimeError(__FILE__, __LINE__,
+                       QString("Unknown zone rule: '%1'").arg(node.getValue()));
+  }
+}
+
+template <>
+QString serializeToString(const Zone::Rules& obj) noexcept {
+  const QMetaEnum metaEnum = QMetaEnum::fromType<Zone::Rule>();
+  QStringList serialized;
+  for (int i = 0; i < metaEnum.keyCount(); ++i) {
+    // Skip composite values (normal flags have exactly one bit set).
+    if (std::popcount(static_cast<uint>(metaEnum.value(i))) != 1) {
+      continue;
+    }
+    const auto rule = static_cast<Zone::Rule>(metaEnum.value(i));
+    if (obj.testFlag(rule)) {
+      serialized.append(serializeToString(rule));
+    }
+  }
+  return serialized.join(',');
+}
+
+template <>
+std::optional<Zone::Rules> deserialize(const QString& str) noexcept {
+  Zone::Rules rules;
+  if (!str.isEmpty()) {
+    for (const QString& part : str.split(',')) {
+      if (auto rule = deserialize<Zone::Rule>(part)) {
+        rules |= *rule;
+      } else {
+        return std::nullopt;
+      }
+    }
+  }
+  return rules;
+}
+
+template <>
+std::unique_ptr<SExpression> serialize(const Zone::Rules& obj) {
+  return SExpression::createToken(serializeToString(obj));
+}
+
+template <>
+Zone::Rules deserialize(const SExpression& node) {
+  if (auto rules = deserialize<Zone::Rules>(node.getValue())) {
+    return *rules;
+  } else {
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        QString("Unknown zone rules: '%1'").arg(node.getValue()));
+  }
+}
 
 /*******************************************************************************
  *  Constructors / Destructor

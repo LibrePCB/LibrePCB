@@ -278,6 +278,15 @@ public:
   static const Layer& get(const QString& id);
 
   /**
+   * @brief Find a layer by its identifier
+   *
+   * @param id  Layer identifier.
+   *
+   * @return Pointer to layer if found, `nullptr` if not found.
+   */
+  static const Layer* find(const QString& id);
+
+  /**
    * @brief Comparison for sorting layers by function
    *
    * @param a   First layer to compare.

@@ -3,9 +3,14 @@ import {
     IconButton,
     LengthEdit,
     LineEdit,
+    MenuItem,
+    MenuPopup,
 } from "../../widgets.slint";
 import {
+    Backend,
+    EditorCommandSet as Cmd,
     SchematicTabData,
+    TabAction,
     WindowSectionData,
 } from "../../api.slint";
 
@@ -41,6 +46,7 @@ export component AddTextToolBar inherits HorizontalLayout {
         icon: @image-url("../../../../font-awesome/svgs/solid/text-height.svg");
         tooltip: @tr("Text Height");
         min-width-text: "1.234";
+        has-dropdown: true;
 
         value-changed(v) => {
             tabs[section.current-tab-index].tool-size.value = v;
@@ -56,6 +62,23 @@ export component AddTextToolBar inherits HorizontalLayout {
 
         decrease-triggered => {
             tabs[section.current-tab-index].tool-size.decrease = true;
+        }
+
+        dropdown-triggered => {
+            height-popup.show();
+        }
+
+        height-popup := MenuPopup {
+            x: 0;
+            y: parent.height;
+
+            height-reset-item := MenuItem {
+                cmd: Cmd.reset-to-default;
+
+                clicked => {
+                    Backend.trigger-tab(section-index, section.current-tab-index, TabAction.toolbar-size-reset);
+                }
+            }
         }
     }
 }

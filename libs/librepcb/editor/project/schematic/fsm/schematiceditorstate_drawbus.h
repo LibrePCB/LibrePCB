@@ -24,8 +24,8 @@
  *  Includes
  ******************************************************************************/
 #include "schematiceditorstate.h"
-#include "schematiceditorstate_drawwire.h"
 
+#include <librepcb/core/types/enums.h>
 #include <librepcb/core/types/point.h>
 #include <librepcb/core/types/uuid.h>
 
@@ -63,8 +63,6 @@ class SchematicEditorState_DrawBus final : public SchematicEditorState {
   };
 
 public:
-  using WireMode = SchematicEditorState_DrawWire::WireMode;
-
   // Constructors / Destructor
   SchematicEditorState_DrawBus() = delete;
   SchematicEditorState_DrawBus(const SchematicEditorState_DrawBus& other) =

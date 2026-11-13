@@ -22,12 +22,12 @@
  ******************************************************************************/
 #include "length.h"
 
+#include "../serialization/serialization.h"
 #include "../serialization/sexpression.h"
 #include "../utils/qtmetatyperegistration.h"
 #include "../utils/toolbox.h"
 
 #include <librepcb/rust-core/ffi.h>
-#include <type_traits>
 
 #include <QtCore>
 
@@ -122,6 +122,15 @@ Length Length::fromMm(qreal millimeters) {
   return fromNm(millimeters * 1e6);
 }
 
+std::optional<Length> Length::tryFromMm(const QString& millimeters) {
+  // Not a nice implementation, but will be obsolete after Rust migration.
+  try {
+    return fromMm(millimeters);
+  } catch (const Exception& e) {
+    return std::nullopt;
+  }
+}
+
 Length Length::fromMm(const QString& millimeters) {
   return Length(Toolbox::decimalFixedPointFromString<int64_t>(millimeters, 6));
 }
@@ -185,6 +194,46 @@ Point3D deserialize(const SExpression& node) {
   return std::make_tuple(deserialize<Length>(node.getChild("@0")),
                          deserialize<Length>(node.getChild("@1")),
                          deserialize<Length>(node.getChild("@2")));
+}
+
+template <>
+QString serializeToString(const Length& obj) noexcept {
+  return obj.toMmString();
+}
+
+template <>
+QString serializeToString(const UnsignedLength& obj) noexcept {
+  return serializeToString(*obj);
+}
+
+template <>
+QString serializeToString(const PositiveLength& obj) noexcept {
+  return serializeToString(*obj);
+}
+
+template <>
+std::optional<Length> deserialize(const QString& str) noexcept {
+  return Length::tryFromMm(str);
+}
+
+template <>
+std::optional<UnsignedLength> deserialize(const QString& str) noexcept {
+  if (auto l = deserialize<Length>(str)) {
+    if (UnsignedLengthConstraint()(*l)) {
+      return UnsignedLength(*l);
+    }
+  }
+  return std::nullopt;
+}
+
+template <>
+std::optional<PositiveLength> deserialize(const QString& str) noexcept {
+  if (auto l = deserialize<Length>(str)) {
+    if (PositiveLengthConstraint()(*l)) {
+      return PositiveLength(*l);
+    }
+  }
+  return std::nullopt;
 }
 
 QDebug operator<<(QDebug stream, const Point3D& obj) {

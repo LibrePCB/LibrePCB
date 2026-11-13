@@ -59,10 +59,11 @@ namespace editor {
 
 SchematicEditorState_DrawBus::SchematicEditorState_DrawBus(
     const Context& context) noexcept
-  : SchematicEditorState(context),
+  : SchematicEditorState(context, "draw_bus"),
     mCircuit(context.project.getCircuit()),
     mSubState(SubState::IDLE),
-    mCurrentWireMode(WireMode::HV),
+    mCurrentWireMode(
+        mSettings.get<WireMode>("wire_mode").value_or(WireMode::HV)),
     mCursorPos(),
     mFixedStartAnchor(nullptr),
     mCurrentSegment(nullptr),
@@ -232,6 +233,7 @@ void SchematicEditorState_DrawBus::selectBus(
 void SchematicEditorState_DrawBus::setWireMode(WireMode mode) noexcept {
   if (mode != mCurrentWireMode) {
     mCurrentWireMode = mode;
+    mSettings.set("wire_mode", mCurrentWireMode);
     emit wireModeChanged(mCurrentWireMode);
   }
 

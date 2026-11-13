@@ -1784,6 +1784,16 @@ export global EditorCommandSet {
         key: "",
     };
 
+    in property <EditorCommand> reset-to-default: {
+        id: "reset_to_default",
+        icon: @image-url("../../../bootstrap-icons/icons/bootstrap-reboot.svg"),
+        text: "Reset to Default",
+        status-tip: "Restore default value",
+        shortcut: "",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "",
+    };
+
     in property <EditorCommand> copy-mpn-to-clipboard: {
         id: "copy_mpn_to_clipboard",
         icon: @image-url("../../../font-awesome/svgs/regular/copy.svg"),

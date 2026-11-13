@@ -23,6 +23,7 @@
 #include "layer.h"
 
 #include "../exceptions.h"
+#include "../serialization/serialization.h"
 #include "../serialization/sexpression.h"
 #include "../workspace/colorrole.h"
 
@@ -448,12 +449,19 @@ const QVector<const Layer*>& Layer::all() noexcept {
 }
 
 const Layer& Layer::get(const QString& id) {
-  foreach (const Layer* layer, all()) {
-    if (layer->getId() == id) {
-      return *layer;
-    }
+  if (auto l = find(id)) {
+    return *l;
   }
   throw RuntimeError(__FILE__, __LINE__, tr("Unknown layer: '%1'").arg(id));
+}
+
+const Layer* Layer::find(const QString& id) {
+  foreach (const Layer* layer, all()) {
+    if (layer->getId() == id) {
+      return layer;
+    }
+  }
+  return nullptr;
 }
 
 bool Layer::lessThan(const Layer* a, const Layer* b) noexcept {
@@ -485,6 +493,19 @@ const Layer* deserialize(const SExpression& node) {
 template <>
 const Layer& deserialize(const SExpression& node) {
   return Layer::get(node.getValue());
+}
+
+template <>
+QString serializeToString(const Layer& obj) noexcept {
+  return obj.getId();
+}
+
+template <>
+std::optional<const Layer*> deserialize(const QString& str) noexcept {
+  if (auto l = Layer::find(str)) {
+    return l;
+  }
+  return std::nullopt;
 }
 
 /*******************************************************************************

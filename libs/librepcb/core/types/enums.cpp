@@ -23,6 +23,7 @@
 #include "enums.h"
 
 #include "../exceptions.h"
+#include "../serialization/serialization.h"
 #include "../serialization/sexpression.h"
 
 #include <QString>
@@ -95,6 +96,43 @@ GridStyle deserialize(const SExpression& sexpr) {
   } else {
     throw RuntimeError(__FILE__, __LINE__,
                        QString("Unknown grid style: '%1'").arg(str));
+  }
+}
+
+template <>
+QString serializeToString(const WireMode& obj) noexcept {
+  switch (obj) {
+    case WireMode::HV:
+      return "h_v";
+    case WireMode::VH:
+      return "v_h";
+    case WireMode::Deg9045:
+      return "90_45";
+    case WireMode::Deg4590:
+      return "45_90";
+    case WireMode::Straight:
+      return "straight";
+    default:
+      qCritical() << "Unknown wire mode:" << static_cast<int>(obj);
+      Q_ASSERT(false);
+      return QString();
+  }
+}
+
+template <>
+std::optional<WireMode> deserialize(const QString& str) noexcept {
+  if (str == "h_v") {
+    return WireMode::HV;
+  } else if (str == "v_h") {
+    return WireMode::VH;
+  } else if (str == "90_45") {
+    return WireMode::Deg9045;
+  } else if (str == "45_90") {
+    return WireMode::Deg4590;
+  } else if (str == "straight") {
+    return WireMode::Straight;
+  } else {
+    return std::nullopt;
   }
 }
 

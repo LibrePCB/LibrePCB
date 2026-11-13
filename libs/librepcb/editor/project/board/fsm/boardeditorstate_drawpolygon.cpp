@@ -47,13 +47,14 @@ namespace editor {
 
 BoardEditorState_DrawPolygon::BoardEditorState_DrawPolygon(
     const Context& context) noexcept
-  : BoardEditorState(context),
+  : BoardEditorState(context, "draw_polygon"),
     mIsUndoCmdActive(false),
     mLastSegmentPos(),
     mLastAngle(0),
     mCurrentProperties(Uuid::createRandom(),  // UUID is not relevant here
-                       Layer::boardOutlines(),  // Layer
-                       UnsignedLength(0),  // Line width
+                       *mSettings.get("layer", getAvailableLayers())
+                            .value_or(&Layer::boardOutlines()),  // Layer
+                       UnsignedLength(0),  // Line width (will be loaded later)
                        Path(),  // Path is not relevant here
                        false,  // Is filled
                        false,  // Is grab area
@@ -61,6 +62,7 @@ BoardEditorState_DrawPolygon::BoardEditorState_DrawPolygon(
                        ),
     mCurrentPolygon(nullptr),
     mCurrentEditCmd(nullptr) {
+  loadLayerSpecificClientSettings(nullptr);
 }
 
 BoardEditorState_DrawPolygon::~BoardEditorState_DrawPolygon() noexcept {
@@ -133,32 +135,42 @@ QSet<const Layer*> BoardEditorState_DrawPolygon::getAvailableLayers() noexcept {
 }
 
 void BoardEditorState_DrawPolygon::setLayer(const Layer& layer) noexcept {
-  if (mCurrentProperties.setLayer(layer)) {
-    emit layerChanged(mCurrentProperties.getLayer());
+  const Layer* previousLayer = &mCurrentProperties.getLayer();
+  if (!mCurrentProperties.setLayer(layer)) {
+    return;
   }
+
+  mSettings.set("layer", mCurrentProperties.getLayer());
+  emit layerChanged(mCurrentProperties.getLayer());
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setLayer(mCurrentProperties.getLayer(), true);
     makeLayerVisible(mCurrentProperties.getLayer().getColorRole());
   }
+
+  loadLayerSpecificClientSettings(previousLayer);
 }
 
 void BoardEditorState_DrawPolygon::setLineWidth(
     const UnsignedLength& width) noexcept {
-  if (mCurrentProperties.setLineWidth(width)) {
-    emit lineWidthChanged(mCurrentProperties.getLineWidth());
-  }
-
-  if (mCurrentEditCmd) {
-    mCurrentEditCmd->setLineWidth(mCurrentProperties.getLineWidth(), true);
+  if (applyLineWidth(width)) {
+    mSettings.set(
+        "line_width/by_layer/" % mCurrentProperties.getLayer().getId(),
+        mCurrentProperties.getLineWidth());
   }
 }
 
+void BoardEditorState_DrawPolygon::resetLineWidth() noexcept {
+  setLineWidth(getDefaultLineWidth(mCurrentProperties.getLayer()));
+}
+
 void BoardEditorState_DrawPolygon::setAngle(const Angle& angle) noexcept {
-  if (angle != mLastAngle) {
-    mLastAngle = angle;
-    emit angleChanged(mLastAngle);
+  if (angle == mLastAngle) {
+    return;
   }
+
+  mLastAngle = angle;
+  emit angleChanged(mLastAngle);
 
   if (mCurrentPolygon && mCurrentEditCmd) {
     Path path = mCurrentPolygon->getData().getPath();
@@ -170,13 +182,9 @@ void BoardEditorState_DrawPolygon::setAngle(const Angle& angle) noexcept {
 }
 
 void BoardEditorState_DrawPolygon::setFilled(bool filled) noexcept {
-  if (mCurrentProperties.setIsFilled(filled)) {
-    emit filledChanged(mCurrentProperties.isFilled());
-  }
-
-  if (mCurrentEditCmd) {
-    mCurrentEditCmd->setIsFilled(mCurrentProperties.isFilled(), true);
-    mCurrentEditCmd->setIsGrabArea(mCurrentProperties.isFilled(), true);
+  if (applyFilled(filled)) {
+    mSettings.set("fill/by_layer/" % mCurrentProperties.getLayer().getId(),
+                  mCurrentProperties.isFilled());
   }
 }
 
@@ -289,6 +297,99 @@ bool BoardEditorState_DrawPolygon::abortCommand(bool showErrMsgBox) noexcept {
       QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     }
     return false;
+  }
+}
+
+bool BoardEditorState_DrawPolygon::applyLineWidth(
+    const UnsignedLength& width) noexcept {
+  if (!mCurrentProperties.setLineWidth(width)) {
+    return false;
+  }
+
+  emit lineWidthChanged(mCurrentProperties.getLineWidth());
+  if (mCurrentEditCmd) {
+    mCurrentEditCmd->setLineWidth(mCurrentProperties.getLineWidth(), true);
+  }
+  return true;
+}
+
+bool BoardEditorState_DrawPolygon::applyFilled(bool filled) noexcept {
+  if (!mCurrentProperties.setIsFilled(filled)) {
+    return false;
+  }
+
+  emit filledChanged(mCurrentProperties.isFilled());
+  if (mCurrentEditCmd) {
+    mCurrentEditCmd->setIsFilled(mCurrentProperties.isFilled(), true);
+    mCurrentEditCmd->setIsGrabArea(mCurrentProperties.isFilled(), true);
+  }
+  return true;
+}
+
+void BoardEditorState_DrawPolygon::loadLayerSpecificClientSettings(
+    const Layer* previousLayer) noexcept {
+  // If a value is stored in the client settings for the current layer, apply
+  // it. If nothing is stored, apply the current layer's default value, but
+  // only if the default differs from the default of the previous layer. If the
+  // defaults are equal, just keep the current value.
+
+  if (auto v = mSettings.get<UnsignedLength>(
+          "line_width/by_layer/" % mCurrentProperties.getLayer().getId())) {
+    applyLineWidth(*v);
+  } else {
+    const UnsignedLength defaultValue =
+        getDefaultLineWidth(mCurrentProperties.getLayer());
+    if ((!previousLayer) ||
+        (defaultValue != getDefaultLineWidth(*previousLayer))) {
+      applyLineWidth(defaultValue);
+    }
+  }
+
+  if (auto v = mSettings.get<bool>("fill/by_layer/" %
+                                   mCurrentProperties.getLayer().getId())) {
+    applyFilled(*v);
+  } else {
+    const bool defaultValue = getDefaultFilled(mCurrentProperties.getLayer());
+    if ((!previousLayer) ||
+        (defaultValue != getDefaultFilled(*previousLayer))) {
+      applyFilled(defaultValue);
+    }
+  }
+}
+
+UnsignedLength BoardEditorState_DrawPolygon::getDefaultLineWidth(
+    const Layer& layer) noexcept {
+  static const QHash<const Layer*, UnsignedLength> lookup = {
+      {&Layer::boardOutlines(), UnsignedLength(0)},
+      {&Layer::boardCutouts(), UnsignedLength(0)},
+      {&Layer::boardPlatedCutouts(), UnsignedLength(0)},
+      {&Layer::boardMeasures(), UnsignedLength(0)},
+      {&Layer::boardAlignment(), UnsignedLength(0)},
+      {&Layer::topGlue(), UnsignedLength(0)},
+      {&Layer::topSolderPaste(), UnsignedLength(0)},
+      {&Layer::topStopMask(), UnsignedLength(0)},
+      {&Layer::botGlue(), UnsignedLength(0)},
+      {&Layer::botSolderPaste(), UnsignedLength(0)},
+      {&Layer::botStopMask(), UnsignedLength(0)},
+  };
+  if (layer.isCopper()) {
+    return UnsignedLength(0);
+  } else {
+    return lookup.value(&layer, UnsignedLength(200000));
+  }
+}
+
+bool BoardEditorState_DrawPolygon::getDefaultFilled(
+    const Layer& layer) noexcept {
+  static const QHash<const Layer*, bool> lookup = {
+      {&Layer::topGlue(), true},        {&Layer::topSolderPaste(), true},
+      {&Layer::topStopMask(), true},    {&Layer::botGlue(), true},
+      {&Layer::botSolderPaste(), true}, {&Layer::botStopMask(), true},
+  };
+  if (layer.isCopper()) {
+    return true;
+  } else {
+    return lookup.value(&layer, false);
   }
 }
 

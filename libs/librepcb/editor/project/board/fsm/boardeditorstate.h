@@ -23,6 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../../clientsettings.h"
 #include "../../../graphics/graphicsscene.h"
 #include "boardeditorfsm.h"
 #include "boardeditorfsmadapter.h"
@@ -32,7 +33,6 @@
 #include <QtCore>
 
 #include <memory>
-#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -97,6 +97,7 @@ public:
   BoardEditorState() = delete;
   BoardEditorState(const BoardEditorState& other) = delete;
   explicit BoardEditorState(const Context& context,
+                            const QString& settingsGroup,
                             QObject* parent = nullptr) noexcept;
   ~BoardEditorState() noexcept override;
 
@@ -224,6 +225,7 @@ protected:  // Methods
 protected:  // Data
   Context mContext;
   BoardEditorFsmAdapter& mAdapter;
+  ClientSettings mSettings;  ///< Scoped to the current FSM state / editor tool
 };
 
 }  // namespace editor

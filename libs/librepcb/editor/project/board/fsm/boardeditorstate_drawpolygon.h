@@ -83,6 +83,7 @@ public:
     return mCurrentProperties.getLineWidth();
   }
   void setLineWidth(const UnsignedLength& width) noexcept;
+  void resetLineWidth() noexcept;
   const Angle& getAngle() const noexcept { return mLastAngle; }
   void setAngle(const Angle& angle) noexcept;
   bool getFilled() const noexcept { return mCurrentProperties.isFilled(); }
@@ -103,6 +104,11 @@ private:  // Methods
   bool addSegment(const Point& pos) noexcept;
   bool updateLastVertexPosition(const Point& pos) noexcept;
   bool abortCommand(bool showErrMsgBox) noexcept;
+  bool applyLineWidth(const UnsignedLength& width) noexcept;
+  bool applyFilled(bool filled) noexcept;
+  void loadLayerSpecificClientSettings(const Layer* previousLayer) noexcept;
+  static UnsignedLength getDefaultLineWidth(const Layer& layer) noexcept;
+  static bool getDefaultFilled(const Layer& layer) noexcept;
 
 private:
   // State

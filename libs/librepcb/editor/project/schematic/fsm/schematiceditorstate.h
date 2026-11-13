@@ -23,6 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../../clientsettings.h"
 #include "../../../graphics/graphicsscene.h"
 #include "schematiceditorfsm.h"
 #include "schematiceditorfsmadapter.h"
@@ -95,6 +96,7 @@ public:
   SchematicEditorState() = delete;
   SchematicEditorState(const SchematicEditorState& other) = delete;
   explicit SchematicEditorState(const Context& context,
+                                const char* settingsGroup,
                                 QObject* parent = nullptr) noexcept;
   ~SchematicEditorState() noexcept override;
 
@@ -226,6 +228,7 @@ protected:  // Methods
 protected:  // Data
   Context mContext;
   SchematicEditorFsmAdapter& mAdapter;
+  ClientSettings mSettings;  ///< Scoped to the current FSM state / editor tool
 };
 
 }  // namespace editor

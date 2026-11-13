@@ -41,6 +41,7 @@ namespace librepcb {
  * @brief The Zone class
  */
 class Zone final {
+  Q_GADGET
   Q_DECLARE_TR_FUNCTIONS(Zone)
 
 public:
@@ -58,6 +59,7 @@ public:
     NoDevices = (1 << 3),
     All = NoCopper | NoPlanes | NoExposure | NoDevices,
   };
+  Q_ENUM(Rule)
   Q_DECLARE_FLAGS(Rules, Rule)
 
   // Signals

@@ -68,8 +68,12 @@ namespace editor {
  ******************************************************************************/
 
 BoardEditorState::BoardEditorState(const Context& context,
+                                   const QString& settingsGroup,
                                    QObject* parent) noexcept
-  : QObject(parent), mContext(context), mAdapter(context.adapter) {
+  : QObject(parent),
+    mContext(context),
+    mAdapter(context.adapter),
+    mSettings({"board_editor", settingsGroup}) {
 }
 
 BoardEditorState::~BoardEditorState() noexcept {

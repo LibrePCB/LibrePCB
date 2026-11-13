@@ -53,7 +53,7 @@ namespace editor {
 
 BoardEditorState_DrawPlane::BoardEditorState_DrawPlane(
     const Context& context) noexcept
-  : BoardEditorState(context),
+  : BoardEditorState(context, "draw_plane"),
     mIsUndoCmdActive(false),
     mAutoNetSignal(true),
     mLastVertexPos(),

@@ -72,7 +72,7 @@ namespace editor {
 
 SchematicEditorState_DrawWire::SchematicEditorState_DrawWire(
     const Context& context) noexcept
-  : SchematicEditorState(context),
+  : SchematicEditorState(context, "draw_wire"),
     mCircuit(context.project.getCircuit()),
     mSubState(SubState::IDLE),
     mCurrentWireMode(WireMode::HV),
@@ -84,6 +84,9 @@ SchematicEditorState_DrawWire::SchematicEditorState_DrawWire(
     mPositioningNetLine2(nullptr),
     mPositioningNetPoint2(nullptr),
     mPositioningNetLabel(nullptr) {
+  // Restore client settings.
+  mCurrentWireMode =
+      mSettings.get<WireMode>("wire_mode").value_or(mCurrentWireMode);
 }
 
 SchematicEditorState_DrawWire::~SchematicEditorState_DrawWire() noexcept {
@@ -241,6 +244,7 @@ bool SchematicEditorState_DrawWire::
 void SchematicEditorState_DrawWire::setWireMode(WireMode mode) noexcept {
   if (mode != mCurrentWireMode) {
     mCurrentWireMode = mode;
+    mSettings.set("wire_mode", mode);
     emit wireModeChanged(mCurrentWireMode);
   }
 

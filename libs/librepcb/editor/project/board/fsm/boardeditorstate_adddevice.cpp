@@ -46,7 +46,7 @@ namespace editor {
 
 BoardEditorState_AddDevice::BoardEditorState_AddDevice(
     const Context& context) noexcept
-  : BoardEditorState(context),
+  : BoardEditorState(context, "add_device"),
     mIsUndoCmdActive(false),
     mCurrentDeviceToPlace(nullptr) {
 }

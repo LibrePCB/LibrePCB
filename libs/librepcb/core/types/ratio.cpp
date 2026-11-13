@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "ratio.h"
 
+#include "../serialization/serialization.h"
 #include "../serialization/sexpression.h"
 #include "../utils/toolbox.h"
 
@@ -66,6 +67,16 @@ Ratio Ratio::fromNormalized(const QString& normalized) {
   return ratio;
 }
 
+std::optional<Ratio> Ratio::tryFromNormalized(
+    const QString& normalized) noexcept {
+  // Not a nice implementation, but will be obsolete after Rust migration.
+  try {
+    return fromNormalized(normalized);
+  } catch (const Exception& e) {
+    return std::nullopt;
+  }
+}
+
 // Private Static Methods
 
 qint32 Ratio::normalizedStringToPpm(const QString& normalized) {
@@ -102,6 +113,46 @@ UnsignedRatio deserialize(const SExpression& node) {
 template <>
 UnsignedLimitedRatio deserialize(const SExpression& node) {
   return UnsignedLimitedRatio(deserialize<Ratio>(node));  // can throw
+}
+
+template <>
+QString serializeToString(const Ratio& obj) noexcept {
+  return obj.toNormalizedString();
+}
+
+template <>
+QString serializeToString(const UnsignedRatio& obj) noexcept {
+  return serializeToString(*obj);
+}
+
+template <>
+QString serializeToString(const UnsignedLimitedRatio& obj) noexcept {
+  return serializeToString(*obj);
+}
+
+template <>
+std::optional<Ratio> deserialize(const QString& str) noexcept {
+  return Ratio::tryFromNormalized(str);
+}
+
+template <>
+std::optional<UnsignedRatio> deserialize(const QString& str) noexcept {
+  if (auto r = deserialize<Ratio>(str)) {
+    if (UnsignedRatioConstraint()(*r)) {
+      return UnsignedRatio(*r);
+    }
+  }
+  return std::nullopt;
+}
+
+template <>
+std::optional<UnsignedLimitedRatio> deserialize(const QString& str) noexcept {
+  if (auto r = deserialize<Ratio>(str)) {
+    if (UnsignedLimitedRatioConstraint()(*r)) {
+      return UnsignedLimitedRatio(*r);
+    }
+  }
+  return std::nullopt;
 }
 
 /*******************************************************************************
