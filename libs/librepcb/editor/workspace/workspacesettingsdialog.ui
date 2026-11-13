@@ -794,6 +794,19 @@
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="spaceMouseTab">
+      <attribute name="title">
+       <string>Space Mouse</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_spaceMouse">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="leftMargin">
+        <number>15</number>
+       </property>
+      </layout>
+     </widget>
      <widget class="QWidget" name="internetAccessTab">
       <attribute name="title">
        <string>Internet Access</string>
