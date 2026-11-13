@@ -49,23 +49,23 @@ SpaceMouseSettingsWidget::SpaceMouseSettingsWidget(
   using Axis = WorkspaceSettingsItem_SpaceMouse::Axis;
   mAxes = {
       {Axis::TranslationX, mUi->lblSpaceMouseIconPanH,
-       ":/img/settings/spacemouse-panx.svg", mUi->sldSpaceMousePanH,
+       ":/img/spacemouse-xlatx.svg", mUi->sldSpaceMousePanH,
        mUi->lblSpaceMousePanHValue, mUi->chkSpaceMousePanHInvert},
       {Axis::TranslationY, mUi->lblSpaceMouseIconPanV,
-       ":/img/settings/spacemouse-pany.svg", mUi->sldSpaceMousePanV,
+       ":/img/spacemouse-xlaty.svg", mUi->sldSpaceMousePanV,
        mUi->lblSpaceMousePanVValue, mUi->chkSpaceMousePanVInvert},
       {Axis::TranslationZ, mUi->lblSpaceMouseIconZoom,
-       ":/img/settings/spacemouse-panz.svg", mUi->sldSpaceMouseZoom,
+       ":/img/spacemouse-xlatz.svg", mUi->sldSpaceMouseZoom,
        mUi->lblSpaceMouseZoomValue, mUi->chkSpaceMouseZoomInvert},
       {Axis::RotationX, mUi->lblSpaceMouseIconPitch,
-       ":/img/settings/spacemouse-pitch.svg", mUi->sldSpaceMousePitch,
+       ":/img/spacemouse-pitch.svg", mUi->sldSpaceMousePitch,
        mUi->lblSpaceMousePitchValue, mUi->chkSpaceMousePitchInvert},
-      {Axis::RotationY, mUi->lblSpaceMouseIconRoll,
-       ":/img/settings/spacemouse-roll.svg", mUi->sldSpaceMouseRoll,
-       mUi->lblSpaceMouseRollValue, mUi->chkSpaceMouseRollInvert},
-      {Axis::RotationZ, mUi->lblSpaceMouseIconYaw,
-       ":/img/settings/spacemouse-yaw.svg", mUi->sldSpaceMouseYaw,
-       mUi->lblSpaceMouseYawValue, mUi->chkSpaceMouseYawInvert},
+      {Axis::RotationY, mUi->lblSpaceMouseIconRoll, ":/img/spacemouse-roll.svg",
+       mUi->sldSpaceMouseRoll, mUi->lblSpaceMouseRollValue,
+       mUi->chkSpaceMouseRollInvert},
+      {Axis::RotationZ, mUi->lblSpaceMouseIconYaw, ":/img/spacemouse-yaw.svg",
+       mUi->sldSpaceMouseYaw, mUi->lblSpaceMouseYawValue,
+       mUi->chkSpaceMouseYawInvert},
   };
   for (const AxisWidgets& w : std::as_const(mAxes)) {
     w.icon->setPixmap(QIcon(w.iconPath).pixmap(20, 20));

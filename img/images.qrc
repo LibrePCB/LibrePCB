@@ -175,13 +175,13 @@
         <file>places/project_folder.png</file>
         <file>resistor-eu.svg</file>
         <file>schematic.svg</file>
-        <file>settings/spacemouse-panx.svg</file>
-        <file>settings/spacemouse-pany.svg</file>
-        <file>settings/spacemouse-panz.svg</file>
-        <file>settings/spacemouse-pitch.svg</file>
-        <file>settings/spacemouse-roll.svg</file>
-        <file>settings/spacemouse-yaw.svg</file>
         <file>show-pin-numbers.svg</file>
+        <file>spacemouse-pitch.svg</file>
+        <file>spacemouse-roll.svg</file>
+        <file>spacemouse-xlatx.svg</file>
+        <file>spacemouse-xlaty.svg</file>
+        <file>spacemouse-xlatz.svg</file>
+        <file>spacemouse-yaw.svg</file>
         <file>status/dialog_error.png</file>
         <file>status/dialog_warning.png</file>
         <file>status/info.png</file>
