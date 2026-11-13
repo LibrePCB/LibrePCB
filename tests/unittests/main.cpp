@@ -47,13 +47,21 @@ int main(int argc, char* argv[]) {
   // initialize a common locale for all tests
   QLocale::setDefault(QLocale(QLocale::English, QLocale::UnitedStates));
 
-  // many classes rely on a QApplication instance, so we create it here
+  // Many classes rely on a QApplication instance, so we create it here.
   QApplication app(argc, argv);
   QApplication::setOrganizationName("LibrePCB");
   QApplication::setOrganizationDomain("librepcb.org");
   QApplication::setApplicationName("LibrePCB-UnitTests");
 
-  // disable the whole debug output (we want only the output from gtest)
+  // Store the client settings in a random temporary directory to make sure
+  // that the configuration of the real user is never touched and that each
+  // test run starts with clean settings (reproducible results).
+  QTemporaryDir tempConfigDir;
+  QSettings::setDefaultFormat(QSettings::IniFormat);
+  QSettings::setPath(QSettings::IniFormat, QSettings::UserScope,
+                     tempConfigDir.path());
+
+  // Disable the whole debug output (we want only the output from gtest).
   Debug::instance()->setDebugLevelLogFile(Debug::DebugLevel_t::Nothing);
   Debug::instance()->setDebugLevelStderr(Debug::DebugLevel_t::Nothing);
 
