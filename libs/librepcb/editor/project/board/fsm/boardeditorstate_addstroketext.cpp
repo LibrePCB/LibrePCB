@@ -179,6 +179,18 @@ void BoardEditorState_AddStrokeText::setHeight(
   }
 }
 
+void BoardEditorState_AddStrokeText::setStrokeWidth(
+    const UnsignedLength& strokeWidth) noexcept {
+  if (mCurrentProperties.setStrokeWidth(strokeWidth)) {
+    emit strokeWidthChanged(mCurrentProperties.getStrokeWidth());
+  }
+
+  if (mCurrentTextEditCmd) {
+    mCurrentTextEditCmd->setStrokeWidth(mCurrentProperties.getStrokeWidth(),
+                                        true);
+  }
+}
+
 const QStringList BoardEditorState_AddStrokeText::getTextSuggestions()
     const noexcept {
   return {

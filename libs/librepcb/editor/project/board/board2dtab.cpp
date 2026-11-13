@@ -1763,6 +1763,17 @@ void Board2dTab::fsmToolEnter(BoardEditorState_AddStrokeText& state) noexcept {
       connect(&mToolSize, &LengthEditContext::valueChangedPositive, &state,
               &BoardEditorState_AddStrokeText::setHeight));
 
+  // Stroke width
+  mToolLineWidth.configure(state.getStrokeWidth(),
+                           LengthEditContext::Steps::generic(),
+                           "board_editor/add_text/stroke_width");
+  mFsmStateConnections.append(
+      connect(&state, &BoardEditorState_AddStrokeText::strokeWidthChanged,
+              &mToolLineWidth, &LengthEditContext::setValueUnsigned));
+  mFsmStateConnections.append(
+      connect(&mToolLineWidth, &LengthEditContext::valueChangedUnsigned, &state,
+              &BoardEditorState_AddStrokeText::setStrokeWidth));
+
   // Text
   auto setText = [this](const QString& text) {
     mToolValue = text;
