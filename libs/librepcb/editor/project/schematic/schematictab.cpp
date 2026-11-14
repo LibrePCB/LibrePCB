@@ -328,7 +328,12 @@ ui::SchematicTabData SchematicTab::getDerivedUiData() const noexcept {
                              : mToolCursorShape),  // Tool cursor
       q2s(mToolOverlayText),  // Tool overlay text
       l2s(mToolWireMode),  // Tool wire mode
-      static_cast<int>(mToolAngle.mappedTo0_360deg().toDeg()),  // Tool angle
+      ui::AngleEditData{
+          // Tool angle
+          l2s(mToolAngle),  // Angle
+          false,  // Increase
+          false,  // Decrease
+      },
       mToolMirrored,  // Tool mirrored
       mToolAutoOrientation,  // Tool auto orientation
       ui::ComboBoxData{
@@ -425,7 +430,12 @@ void SchematicTab::setDerivedUiData(const ui::SchematicTabData& data) noexcept {
   // Tool angle / mirrored / auto-orientation. Note: Evaluate all conditions
   // before emitting, because emitting an angle/mirror change may disable
   // auto-orientation in the tool, which must not be overridden afterwards.
-  const Angle angle = Angle::fromDeg(data.tool_angle);
+  Angle angle = s2angle(data.tool_angle.value);
+  if (data.tool_angle.increase) {
+    angle = mToolAngle + Angle::deg45();
+  } else if (data.tool_angle.decrease) {
+    angle = mToolAngle - Angle::deg45();
+  }
   const bool angleChanged = (angle != mToolAngle);
   const bool mirroredChanged = (data.tool_mirrored != mToolMirrored);
   const bool autoOrientationChanged =
@@ -1216,6 +1226,18 @@ void SchematicTab::fsmToolEnter(
   mFsmStateConnections.append(
       connect(&mToolLineWidth, &LengthEditContext::valueChangedUnsigned, &state,
               &SchematicEditorState_DrawPolygon::setLineWidth));
+
+  // Angle
+  auto setAngle = [this](const Angle& angle) {
+    mToolAngle = angle;
+    onDerivedUiDataChanged.notify();
+  };
+  setAngle(state.getAngle());
+  mFsmStateConnections.append(connect(
+      &state, &SchematicEditorState_DrawPolygon::angleChanged, this, setAngle));
+  mFsmStateConnections.append(
+      connect(this, &SchematicTab::angleRequested, &state,
+              &SchematicEditorState_DrawPolygon::setAngle));
 
   // Filled
   auto setFilled = [this](bool filled) {

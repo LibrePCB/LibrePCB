@@ -51,6 +51,7 @@ SchematicEditorState_DrawPolygon::SchematicEditorState_DrawPolygon(
   : SchematicEditorState(context),
     mIsUndoCmdActive(false),
     mLastSegmentPos(),
+    mLastAngle(0),
     mCurrentProperties(Uuid::createRandom(),  // UUID is not relevant here
                        Layer::schematicGuide(),  // Layer
                        UnsignedLength(300000),  // Line width
@@ -59,7 +60,7 @@ SchematicEditorState_DrawPolygon::SchematicEditorState_DrawPolygon(
                        Path()  // Path is not relevant here
                        ),
     mCurrentPolygon(nullptr),
-    mCurrentPolygonEditCmd(nullptr) {
+    mCurrentEditCmd(nullptr) {
 }
 
 SchematicEditorState_DrawPolygon::~SchematicEditorState_DrawPolygon() noexcept {
@@ -138,8 +139,8 @@ void SchematicEditorState_DrawPolygon::setLayer(const Layer& layer) noexcept {
     emit layerChanged(mCurrentProperties.getLayer());
   }
 
-  if (mCurrentPolygonEditCmd) {
-    mCurrentPolygonEditCmd->setLayer(mCurrentProperties.getLayer(), true);
+  if (mCurrentEditCmd) {
+    mCurrentEditCmd->setLayer(mCurrentProperties.getLayer(), true);
   }
 }
 
@@ -149,9 +150,23 @@ void SchematicEditorState_DrawPolygon::setLineWidth(
     emit lineWidthChanged(mCurrentProperties.getLineWidth());
   }
 
-  if (mCurrentPolygonEditCmd) {
-    mCurrentPolygonEditCmd->setLineWidth(mCurrentProperties.getLineWidth(),
-                                         true);
+  if (mCurrentEditCmd) {
+    mCurrentEditCmd->setLineWidth(mCurrentProperties.getLineWidth(), true);
+  }
+}
+
+void SchematicEditorState_DrawPolygon::setAngle(const Angle& angle) noexcept {
+  if (angle != mLastAngle) {
+    mLastAngle = angle;
+    emit angleChanged(mLastAngle);
+  }
+
+  if (mCurrentPolygon && mCurrentEditCmd) {
+    Path path = mCurrentPolygon->getPolygon().getPath();
+    if (path.getVertices().count() > 1) {
+      path.getVertices()[path.getVertices().count() - 2].setAngle(mLastAngle);
+      mCurrentEditCmd->setPath(path, true);
+    }
   }
 }
 
@@ -160,9 +175,9 @@ void SchematicEditorState_DrawPolygon::setFilled(bool filled) noexcept {
     emit filledChanged(mCurrentProperties.isFilled());
   }
 
-  if (mCurrentPolygonEditCmd) {
-    mCurrentPolygonEditCmd->setIsFilled(mCurrentProperties.isFilled(), true);
-    mCurrentPolygonEditCmd->setIsGrabArea(mCurrentProperties.isFilled(), true);
+  if (mCurrentEditCmd) {
+    mCurrentEditCmd->setIsFilled(mCurrentProperties.isFilled(), true);
+    mCurrentEditCmd->setIsGrabArea(mCurrentProperties.isFilled(), true);
   }
 }
 
@@ -183,14 +198,14 @@ bool SchematicEditorState_DrawPolygon::startAddPolygon(
     mIsUndoCmdActive = true;
 
     // Add polygon with two vertices
-    mCurrentProperties.setPath(Path({Vertex(pos), Vertex(pos)}));
+    mCurrentProperties.setPath(Path({Vertex(pos, mLastAngle), Vertex(pos)}));
     mCurrentPolygon = new SI_Polygon(
         mContext.schematic, Polygon(Uuid::createRandom(), mCurrentProperties));
     mContext.undoStack.appendToCmdGroup(
         new CmdSchematicPolygonAdd(*mCurrentPolygon));
 
     // Start undo command
-    mCurrentPolygonEditCmd =
+    mCurrentEditCmd =
         std::make_unique<CmdPolygonEdit>(mCurrentPolygon->getPolygon());
     mLastSegmentPos = pos;
     return true;
@@ -212,8 +227,8 @@ bool SchematicEditorState_DrawPolygon::addSegment(const Point& pos) noexcept {
 
   try {
     // Finish undo command to allow reverting segment by segment
-    if (mCurrentPolygonEditCmd) {
-      mContext.undoStack.appendToCmdGroup(mCurrentPolygonEditCmd.release());
+    if (mCurrentEditCmd) {
+      mContext.undoStack.appendToCmdGroup(mCurrentEditCmd.release());
     }
     mContext.undoStack.commitCmdGroup();
     mIsUndoCmdActive = false;
@@ -227,13 +242,15 @@ bool SchematicEditorState_DrawPolygon::addSegment(const Point& pos) noexcept {
     // Start a new undo command
     mContext.undoStack.beginCmdGroup(tr("Draw schematic polygon"));
     mIsUndoCmdActive = true;
-    mCurrentPolygonEditCmd =
+    mCurrentEditCmd =
         std::make_unique<CmdPolygonEdit>(mCurrentPolygon->getPolygon());
 
     // Add new vertex
-    Path newPath = mCurrentPolygon->getPolygon().getPath();
-    newPath.addVertex(pos, Angle::deg0());
-    mCurrentPolygonEditCmd->setPath(newPath, true);
+    QVector<Vertex> vertices =
+        mCurrentPolygon->getPolygon().getPath().getVertices();
+    vertices.last().setAngle(mLastAngle);
+    vertices.append(Vertex(pos, Angle::deg0()));
+    mCurrentEditCmd->setPath(Path(vertices), true);
     mLastSegmentPos = pos;
     return true;
   } catch (const Exception& e) {
@@ -245,10 +262,10 @@ bool SchematicEditorState_DrawPolygon::addSegment(const Point& pos) noexcept {
 
 bool SchematicEditorState_DrawPolygon::updateLastVertexPosition(
     const Point& pos) noexcept {
-  if (mCurrentPolygonEditCmd) {
+  if (mCurrentEditCmd) {
     Path newPath = mCurrentPolygon->getPolygon().getPath();
     newPath.getVertices().last().setPos(pos);
-    mCurrentPolygonEditCmd->setPath(newPath, true);
+    mCurrentEditCmd->setPath(newPath, true);
     return true;
   } else {
     return false;
@@ -259,7 +276,7 @@ bool SchematicEditorState_DrawPolygon::abortCommand(
     bool showErrMsgBox) noexcept {
   try {
     // Delete the current edit command
-    mCurrentPolygonEditCmd.reset();
+    mCurrentEditCmd.reset();
 
     // Abort the undo command
     if (mIsUndoCmdActive) {

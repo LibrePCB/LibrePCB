@@ -16,11 +16,11 @@ export component AddLabelToolBar inherits HorizontalLayout {
     spacing: 2px;
 
     angle-selector := AngleSelector {
-        angle: tabs[section.current-tab-index].tool-angle;
+        angle: tabs[section.current-tab-index].tool-angle.value / 1000000;
 
         angle-clicked(a) => {
             tabs[section.current-tab-index].tool-auto-orientation = false;
-            tabs[section.current-tab-index].tool-angle = a;
+            tabs[section.current-tab-index].tool-angle.value = a * 1000000;
         }
     }
 
