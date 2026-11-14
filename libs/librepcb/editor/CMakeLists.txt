@@ -910,8 +910,6 @@ add_library(
   utils/slintkeyeventtextbuilder.h
   utils/standardeditorcommandhandler.cpp
   utils/standardeditorcommandhandler.h
-  utils/toolbarproxy.cpp
-  utils/toolbarproxy.h
   utils/uihelpers.cpp
   utils/uihelpers.h
   utils/uiobjectlist.h

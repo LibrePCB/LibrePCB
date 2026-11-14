@@ -24,7 +24,6 @@
  *  Includes
  ******************************************************************************/
 #include "../../../graphics/graphicsscene.h"
-#include "../../../utils/toolbarproxy.h"
 #include "symboleditorfsm.h"
 #include "symboleditorfsmadapter.h"
 
