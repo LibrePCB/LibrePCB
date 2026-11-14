@@ -92,15 +92,15 @@ private:  // Methods
                    GraphicsLayer::Event event) noexcept;
   void updateBoundingRectAndShape() noexcept;
   /**
-   * @brief Calculate the bounds of the rendered text
+   * @brief Calculate the shape of the rendered text
    *
    * Unlike #mBoundingRect, which is the padded layout rectangle based on the
-   * font metrics, the ink rect only includes the area covered by glyphs and
+   * font metrics, the shape only includes the area covered by glyphs and
    * overlines.
    *
-   * @return Tight bounds in item coordinates (empty if nothing is drawn).
+   * @return Tight shape in item coordinates (empty if nothing is drawn).
    */
-  QRectF calcInkRect() const noexcept;
+  QPainterPath calcShape() const noexcept;
 
 private:  // Data
   std::shared_ptr<const GraphicsLayer> mLayer;
@@ -115,8 +115,7 @@ private:  // Data
   QFont mFont;
   int mTextFlags;
   QRectF mBoundingRect;
-  mutable QRectF mInkRect;  // Calculated on demand, see mInkRectValid.
-  mutable bool mInkRectValid;
+  mutable std::optional<QPainterPath> mShape;  // Calculated on demand.
   qreal mLevelOfDetailToPixelate;
   qreal mLevelOfDetailToHide;
 

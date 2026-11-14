@@ -55,7 +55,7 @@ PrimitiveTextGraphicsItem::PrimitiveTextGraphicsItem(
     mRotate180(false),
     mFont(Application::getDefaultSansSerifFont()),
     mTextFlags(0),
-    mInkRectValid(false),
+    mShape(std::nullopt),
     mLevelOfDetailToPixelate(2.5),
     mLevelOfDetailToHide(1),
     mOnLayerEditedSlot(*this, &PrimitiveTextGraphicsItem::layerEdited) {
@@ -160,19 +160,15 @@ void PrimitiveTextGraphicsItem::setState(GraphicsLayer::State state) noexcept {
  ******************************************************************************/
 
 QPainterPath PrimitiveTextGraphicsItem::shape() const noexcept {
-  QPainterPath path;
-  if (mLayer && mLayer->isVisible()) {
-    // Calculating the tight bounds is rather expensive, so do it only once
-    // after each change and only if really needed.
-    if (!mInkRectValid) {
-      mInkRect = calcInkRect();
-      mInkRectValid = true;
-    }
-    if (!mInkRect.isEmpty()) {
-      path.addRect(mInkRect);
-    }
+  if (!mLayer || !mLayer->isVisible()) {
+    return QPainterPath();
   }
-  return path;
+  // Calculating the tight shape is rather expensive, so do it only once
+  // after each change and only if really needed.
+  if (!mShape) {
+    mShape = calcShape();
+  }
+  return *mShape;
 }
 
 void PrimitiveTextGraphicsItem::paint(QPainter* painter,
@@ -251,17 +247,17 @@ void PrimitiveTextGraphicsItem::updateBoundingRectAndShape() noexcept {
     mBoundingRect = fm.boundingRect(QRectF(), mTextFlags, mText);
   }
 
-  mInkRectValid = false;
+  mShape = std::nullopt;
   if (mHeight) {
     setScale((*mHeight)->toPx() / fm.height());
   }
   update();
 }
 
-QRectF PrimitiveTextGraphicsItem::calcInkRect() const noexcept {
+QPainterPath PrimitiveTextGraphicsItem::calcShape() const noexcept {
   // Tight bounds of the rendered glyphs. Position each line manually.
   const QFontMetricsF fm(mFont);
-  QRectF ink;
+  QRectF bounds;
   const QStringList lines = mDisplayText.split(QLatin1Char('\n'));
   for (int i = 0; i < lines.count(); ++i) {
     QRectF r = fm.tightBoundingRect(lines.at(i));
@@ -276,16 +272,20 @@ QRectF PrimitiveTextGraphicsItem::calcInkRect() const noexcept {
       x += (mBoundingRect.width() - advance) / 2;
     }
     r.translate(x, mBoundingRect.top() + fm.ascent() + i * fm.lineSpacing());
-    ink = ink.united(r);
+    bounds = bounds.united(r);
   }
   const qreal lineMargin = fm.height() / 30;
   for (const QLineF& line : mOverlines) {
-    ink = ink.united(
+    bounds = bounds.united(
         QRectF(line.p1(), line.p2())
             .normalized()
             .adjusted(-lineMargin, -lineMargin, lineMargin, lineMargin));
   }
-  return ink;
+  QPainterPath path;
+  if (!bounds.isEmpty()) {
+    path.addRect(bounds);
+  }
+  return path;
 }
 
 /*******************************************************************************
