@@ -167,9 +167,11 @@ QSet<const Layer*> SymbolEditorState_DrawTextBase::getAvailableLayers()
 }
 
 void SymbolEditorState_DrawTextBase::setLayer(const Layer& layer) noexcept {
-  if (mCurrentProperties.setLayer(layer)) {
-    emit layerChanged(mCurrentProperties.getLayer());
+  if (!mCurrentProperties.setLayer(layer)) {
+    return;
   }
+
+  emit layerChanged(mCurrentProperties.getLayer());
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setLayer(mCurrentProperties.getLayer(), true);
@@ -177,9 +179,11 @@ void SymbolEditorState_DrawTextBase::setLayer(const Layer& layer) noexcept {
 }
 
 void SymbolEditorState_DrawTextBase::setText(const QString& text) noexcept {
-  if (mCurrentProperties.setText(text)) {
-    emit textChanged(mCurrentProperties.getText());
+  if (!mCurrentProperties.setText(text)) {
+    return;
   }
+
+  emit textChanged(mCurrentProperties.getText());
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setText(mCurrentProperties.getText(), true);
@@ -207,9 +211,11 @@ const QStringList SymbolEditorState_DrawTextBase::getTextSuggestions()
 
 void SymbolEditorState_DrawTextBase::setHeight(
     const PositiveLength& height) noexcept {
-  if (mCurrentProperties.setHeight(height)) {
-    emit heightChanged(mCurrentProperties.getHeight());
+  if (!mCurrentProperties.setHeight(height)) {
+    return;
   }
+
+  emit heightChanged(mCurrentProperties.getHeight());
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setHeight(mCurrentProperties.getHeight(), true);
@@ -217,10 +223,12 @@ void SymbolEditorState_DrawTextBase::setHeight(
 }
 
 void SymbolEditorState_DrawTextBase::setHAlign(const HAlign& align) noexcept {
-  if (mCurrentProperties.setAlign(
+  if (!mCurrentProperties.setAlign(
           Alignment(align, mCurrentProperties.getAlign().getV()))) {
-    emit hAlignChanged(mCurrentProperties.getAlign().getH());
+    return;
   }
+
+  emit hAlignChanged(mCurrentProperties.getAlign().getH());
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setAlignment(mCurrentProperties.getAlign(), true);
@@ -228,10 +236,12 @@ void SymbolEditorState_DrawTextBase::setHAlign(const HAlign& align) noexcept {
 }
 
 void SymbolEditorState_DrawTextBase::setVAlign(const VAlign& align) noexcept {
-  if (mCurrentProperties.setAlign(
+  if (!mCurrentProperties.setAlign(
           Alignment(mCurrentProperties.getAlign().getH(), align))) {
-    emit vAlignChanged(mCurrentProperties.getAlign().getV());
+    return;
   }
+
+  emit vAlignChanged(mCurrentProperties.getAlign().getV());
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setAlignment(mCurrentProperties.getAlign(), true);

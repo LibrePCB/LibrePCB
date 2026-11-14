@@ -115,9 +115,11 @@ bool PackageEditorState_AddHoles::processGraphicsSceneLeftMouseButtonPressed(
 
 void PackageEditorState_AddHoles::setDiameter(
     const PositiveLength& diameter) noexcept {
-  if (mCurrentProperties.setDiameter(diameter)) {
-    emit diameterChanged(mCurrentProperties.getDiameter());
+  if (!mCurrentProperties.setDiameter(diameter)) {
+    return;
   }
+
+  emit diameterChanged(mCurrentProperties.getDiameter());
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setDiameter(mCurrentProperties.getDiameter(), true);

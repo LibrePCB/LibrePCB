@@ -163,9 +163,11 @@ QSet<const Layer*> PackageEditorState_DrawPolygonBase::getAvailableLayers()
 }
 
 void PackageEditorState_DrawPolygonBase::setLayer(const Layer& layer) noexcept {
-  if (mCurrentProperties.setLayer(layer)) {
-    emit layerChanged(mCurrentProperties.getLayer());
+  if (!mCurrentProperties.setLayer(layer)) {
+    return;
   }
+
+  emit layerChanged(mCurrentProperties.getLayer());
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setLayer(mCurrentProperties.getLayer(), true);
@@ -186,9 +188,11 @@ void PackageEditorState_DrawPolygonBase::setLayer(const Layer& layer) noexcept {
 
 void PackageEditorState_DrawPolygonBase::setLineWidth(
     const UnsignedLength& width) noexcept {
-  if (mCurrentProperties.setLineWidth(width)) {
-    emit lineWidthChanged(mCurrentProperties.getLineWidth());
+  if (!mCurrentProperties.setLineWidth(width)) {
+    return;
   }
+
+  emit lineWidthChanged(mCurrentProperties.getLineWidth());
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setLineWidth(mCurrentProperties.getLineWidth(), true);
@@ -198,9 +202,11 @@ void PackageEditorState_DrawPolygonBase::setLineWidth(
 }
 
 void PackageEditorState_DrawPolygonBase::setFilled(bool filled) noexcept {
-  if (mCurrentProperties.setIsFilled(filled)) {
-    emit filledChanged(mCurrentProperties.isFilled());
+  if (!mCurrentProperties.setIsFilled(filled)) {
+    return;
   }
+
+  emit filledChanged(mCurrentProperties.isFilled());
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setIsFilled(mCurrentProperties.isFilled(), true);
@@ -208,9 +214,11 @@ void PackageEditorState_DrawPolygonBase::setFilled(bool filled) noexcept {
 }
 
 void PackageEditorState_DrawPolygonBase::setGrabArea(bool grabArea) noexcept {
-  if (mCurrentProperties.setIsGrabArea(grabArea)) {
-    emit grabAreaChanged(mCurrentProperties.isGrabArea());
+  if (!mCurrentProperties.setIsGrabArea(grabArea)) {
+    return;
   }
+
+  emit grabAreaChanged(mCurrentProperties.isGrabArea());
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setIsGrabArea(mCurrentProperties.isGrabArea(), true);
@@ -218,10 +226,12 @@ void PackageEditorState_DrawPolygonBase::setGrabArea(bool grabArea) noexcept {
 }
 
 void PackageEditorState_DrawPolygonBase::setAngle(const Angle& angle) noexcept {
-  if (angle != mLastAngle) {
-    mLastAngle = angle;
-    emit angleChanged(mLastAngle);
+  if (angle == mLastAngle) {
+    return;
   }
+
+  mLastAngle = angle;
+  emit angleChanged(mLastAngle);
 
   if (mCurrentPolygon && mCurrentEditCmd) {
     Path path = mCurrentPolygon->getPath();

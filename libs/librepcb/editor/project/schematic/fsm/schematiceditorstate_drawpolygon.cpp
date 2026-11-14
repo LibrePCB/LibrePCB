@@ -135,25 +135,29 @@ QSet<const Layer*> SchematicEditorState_DrawPolygon::getAvailableLayers()
 }
 
 void SchematicEditorState_DrawPolygon::setLayer(const Layer& layer) noexcept {
-  if (mCurrentProperties.setLayer(layer)) {
-    mSettings.set("layer", mCurrentProperties.getLayer());
-    emit layerChanged(mCurrentProperties.getLayer());
-    loadLayerSpecificClientSettings();
+  if (!mCurrentProperties.setLayer(layer)) {
+    return;
   }
+
+  mSettings.set("layer", mCurrentProperties.getLayer());
+  emit layerChanged(mCurrentProperties.getLayer());
 
   if (mCurrentPolygonEditCmd) {
     mCurrentPolygonEditCmd->setLayer(mCurrentProperties.getLayer(), true);
   }
+
+  loadLayerSpecificClientSettings();
 }
 
 void SchematicEditorState_DrawPolygon::setLineWidth(
     const UnsignedLength& width) noexcept {
-  if (mCurrentProperties.setLineWidth(width)) {
-    mSettings.set(
-        "line_width/by_layer/" % mCurrentProperties.getLayer().getId(),
-        mCurrentProperties.getLineWidth());
-    emit lineWidthChanged(mCurrentProperties.getLineWidth());
+  if (!mCurrentProperties.setLineWidth(width)) {
+    return;
   }
+
+  mSettings.set("line_width/by_layer/" % mCurrentProperties.getLayer().getId(),
+                mCurrentProperties.getLineWidth());
+  emit lineWidthChanged(mCurrentProperties.getLineWidth());
 
   if (mCurrentPolygonEditCmd) {
     mCurrentPolygonEditCmd->setLineWidth(mCurrentProperties.getLineWidth(),
@@ -166,11 +170,13 @@ void SchematicEditorState_DrawPolygon::resetLineWidth() noexcept {
 }
 
 void SchematicEditorState_DrawPolygon::setFilled(bool filled) noexcept {
-  if (mCurrentProperties.setIsFilled(filled)) {
-    mSettings.set("fill/by_layer/" % mCurrentProperties.getLayer().getId(),
-                  mCurrentProperties.isFilled());
-    emit filledChanged(mCurrentProperties.isFilled());
+  if (!mCurrentProperties.setIsFilled(filled)) {
+    return;
   }
+
+  mSettings.set("fill/by_layer/" % mCurrentProperties.getLayer().getId(),
+                mCurrentProperties.isFilled());
+  emit filledChanged(mCurrentProperties.isFilled());
 
   if (mCurrentPolygonEditCmd) {
     mCurrentPolygonEditCmd->setIsFilled(mCurrentProperties.isFilled(), true);

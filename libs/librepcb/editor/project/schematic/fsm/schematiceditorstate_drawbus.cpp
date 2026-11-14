@@ -231,11 +231,13 @@ void SchematicEditorState_DrawBus::selectBus(
 }
 
 void SchematicEditorState_DrawBus::setWireMode(WireMode mode) noexcept {
-  if (mode != mCurrentWireMode) {
-    mCurrentWireMode = mode;
-    mSettings.set("wire_mode", mCurrentWireMode);
-    emit wireModeChanged(mCurrentWireMode);
+  if (mode == mCurrentWireMode) {
+    return;
   }
+
+  mCurrentWireMode = mode;
+  mSettings.set("wire_mode", mCurrentWireMode);
+  emit wireModeChanged(mCurrentWireMode);
 
   if (mSubState == SubState::POSITIONING_JUNCTION) {
     updateJunctionPositions(true);

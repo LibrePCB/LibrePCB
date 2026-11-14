@@ -268,20 +268,24 @@ const QVector<std::pair<Uuid, QString>>
 }
 
 void BoardEditorState_AddPad::setNet(const std::optional<Uuid>& net) noexcept {
-  if (net != mCurrentNetSignal) {
-    mCurrentNetSignal = net;
-    emit netChanged(mCurrentNetSignal);
+  if (net == mCurrentNetSignal) {
+    return;
   }
+
+  mCurrentNetSignal = net;
+  emit netChanged(mCurrentNetSignal);
 
   applySelectedNetSignal();
 }
 
 void BoardEditorState_AddPad::setComponentSide(
     Pad::ComponentSide side) noexcept {
-  if (mCurrentProperties.setComponentSide(side)) {
-    mSettings.set("component_side", mCurrentProperties.getComponentSide());
-    emit componentSideChanged(mCurrentProperties.getComponentSide());
+  if (!mCurrentProperties.setComponentSide(side)) {
+    return;
   }
+
+  mSettings.set("component_side", mCurrentProperties.getComponentSide());
+  emit componentSideChanged(mCurrentProperties.getComponentSide());
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setComponentSideAndHoles(
@@ -293,11 +297,13 @@ void BoardEditorState_AddPad::setComponentSide(
 }
 
 void BoardEditorState_AddPad::setShape(Pad::Shape shape) noexcept {
-  if (mCurrentProperties.setShape(shape)) {
-    mSettings.set("shape", mCurrentProperties.getShape());
-    emit shapeChanged(mCurrentProperties.getShape());
-    applyRecommendedRoundedRectRadius();
+  if (!mCurrentProperties.setShape(shape)) {
+    return;
   }
+
+  mSettings.set("shape", mCurrentProperties.getShape());
+  emit shapeChanged(mCurrentProperties.getShape());
+  applyRecommendedRoundedRectRadius();
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setShape(mCurrentProperties.getShape(), true);
@@ -305,11 +311,13 @@ void BoardEditorState_AddPad::setShape(Pad::Shape shape) noexcept {
 }
 
 void BoardEditorState_AddPad::setWidth(const PositiveLength& width) noexcept {
-  if (mCurrentProperties.setWidth(width)) {
-    mSettings.set("width", mCurrentProperties.getWidth());
-    emit widthChanged(mCurrentProperties.getWidth());
-    applyRecommendedRoundedRectRadius();
+  if (!mCurrentProperties.setWidth(width)) {
+    return;
   }
+
+  mSettings.set("width", mCurrentProperties.getWidth());
+  emit widthChanged(mCurrentProperties.getWidth());
+  applyRecommendedRoundedRectRadius();
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setWidth(mCurrentProperties.getWidth(), true);
@@ -324,11 +332,13 @@ void BoardEditorState_AddPad::setWidth(const PositiveLength& width) noexcept {
 }
 
 void BoardEditorState_AddPad::setHeight(const PositiveLength& height) noexcept {
-  if (mCurrentProperties.setHeight(height)) {
-    mSettings.set("height", mCurrentProperties.getHeight());
-    emit heightChanged(mCurrentProperties.getHeight());
-    applyRecommendedRoundedRectRadius();
+  if (!mCurrentProperties.setHeight(height)) {
+    return;
   }
+
+  mSettings.set("height", mCurrentProperties.getHeight());
+  emit heightChanged(mCurrentProperties.getHeight());
+  applyRecommendedRoundedRectRadius();
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setHeight(mCurrentProperties.getHeight(), true);
@@ -344,10 +354,12 @@ void BoardEditorState_AddPad::setHeight(const PositiveLength& height) noexcept {
 
 void BoardEditorState_AddPad::setRadius(
     const UnsignedLimitedRatio& radius) noexcept {
-  if (mCurrentProperties.setRadius(radius)) {
-    mSettings.set("radius", mCurrentProperties.getRadius());
-    emit radiusChanged(mCurrentProperties.getRadius());
+  if (!mCurrentProperties.setRadius(radius)) {
+    return;
   }
+
+  mSettings.set("radius", mCurrentProperties.getRadius());
+  emit radiusChanged(mCurrentProperties.getRadius());
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setRadius(mCurrentProperties.getRadius(), true);
@@ -356,35 +368,38 @@ void BoardEditorState_AddPad::setRadius(
 
 void BoardEditorState_AddPad::setDrillDiameter(
     const PositiveLength& diameter) noexcept {
-  if (std::shared_ptr<PadHole> hole = mCurrentProperties.getHoles().value(0)) {
-    if (hole->getDiameter() != diameter) {
-      hole->setDiameter(diameter);
-      mSettings.set("drill_diameter", diameter);
-      emit drillDiameterChanged(diameter);
-    }
+  std::shared_ptr<PadHole> hole = mCurrentProperties.getHoles().value(0);
+  if ((!hole) || (hole->getDiameter() == diameter)) {
+    return;
+  }
 
-    if (mCurrentEditCmd) {
-      mCurrentEditCmd->setComponentSideAndHoles(
-          mCurrentProperties.getComponentSide(), mCurrentProperties.getHoles(),
-          true);
-    }
+  hole->setDiameter(diameter);
+  mSettings.set("drill_diameter", diameter);
+  emit drillDiameterChanged(diameter);
 
-    // Avoid creating pads with a drill larger than width or height.
-    if (diameter > mCurrentProperties.getWidth()) {
-      setWidth(diameter);
-    }
-    if (diameter > mCurrentProperties.getHeight()) {
-      setHeight(diameter);
-    }
+  if (mCurrentEditCmd) {
+    mCurrentEditCmd->setComponentSideAndHoles(
+        mCurrentProperties.getComponentSide(), mCurrentProperties.getHoles(),
+        true);
+  }
+
+  // Avoid creating pads with a drill larger than width or height.
+  if (diameter > mCurrentProperties.getWidth()) {
+    setWidth(diameter);
+  }
+  if (diameter > mCurrentProperties.getHeight()) {
+    setHeight(diameter);
   }
 }
 
 void BoardEditorState_AddPad::setCopperClearance(
     const UnsignedLength& clearance) noexcept {
-  if (mCurrentProperties.setCopperClearance(clearance)) {
-    mSettings.set("copper_clearance", mCurrentProperties.getCopperClearance());
-    emit copperClearanceChanged(mCurrentProperties.getCopperClearance());
+  if (!mCurrentProperties.setCopperClearance(clearance)) {
+    return;
   }
+
+  mSettings.set("copper_clearance", mCurrentProperties.getCopperClearance());
+  emit copperClearanceChanged(mCurrentProperties.getCopperClearance());
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setCopperClearance(mCurrentProperties.getCopperClearance(),
@@ -394,9 +409,11 @@ void BoardEditorState_AddPad::setCopperClearance(
 
 void BoardEditorState_AddPad::setStopMaskConfig(
     const MaskConfig& cfg) noexcept {
-  if (mCurrentProperties.setStopMaskConfig(cfg)) {
-    emit stopMaskConfigChanged(mCurrentProperties.getStopMaskConfig());
+  if (!mCurrentProperties.setStopMaskConfig(cfg)) {
+    return;
   }
+
+  emit stopMaskConfigChanged(mCurrentProperties.getStopMaskConfig());
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setStopMaskConfig(mCurrentProperties.getStopMaskConfig(),
@@ -405,9 +422,11 @@ void BoardEditorState_AddPad::setStopMaskConfig(
 }
 
 void BoardEditorState_AddPad::setFunction(Pad::Function function) noexcept {
-  if (mCurrentProperties.setFunction(function)) {
-    emit functionChanged(mCurrentProperties.getFunction());
+  if (!mCurrentProperties.setFunction(function)) {
+    return;
   }
+
+  emit functionChanged(mCurrentProperties.getFunction());
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setFunction(mCurrentProperties.getFunction(), true);

@@ -111,9 +111,11 @@ bool SymbolEditorState_AddPins::exit() noexcept {
 
 void SymbolEditorState_AddPins::setName(
     const CircuitIdentifier& name) noexcept {
-  if (mCurrentProperties.setName(name)) {
-    emit nameChanged(mCurrentProperties.getName());
+  if (!mCurrentProperties.setName(name)) {
+    return;
   }
+
+  emit nameChanged(mCurrentProperties.getName());
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setName(mCurrentProperties.getName(), true);
@@ -122,9 +124,11 @@ void SymbolEditorState_AddPins::setName(
 
 void SymbolEditorState_AddPins::setLength(
     const UnsignedLength& length) noexcept {
-  if (mCurrentProperties.setLength(length)) {
-    emit lengthChanged(mCurrentProperties.getLength());
+  if (!mCurrentProperties.setLength(length)) {
+    return;
   }
+
+  emit lengthChanged(mCurrentProperties.getLength());
 
   mCurrentProperties.setNamePosition(
       SymbolPin::getDefaultNamePosition(mCurrentProperties.getLength()));

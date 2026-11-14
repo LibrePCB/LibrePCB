@@ -128,9 +128,11 @@ QSet<const Layer*> PackageEditorState_DrawCircle::getAvailableLayers()
 }
 
 void PackageEditorState_DrawCircle::setLayer(const Layer& layer) noexcept {
-  if (mCurrentProperties.setLayer(layer)) {
-    emit layerChanged(mCurrentProperties.getLayer());
+  if (!mCurrentProperties.setLayer(layer)) {
+    return;
   }
+
+  emit layerChanged(mCurrentProperties.getLayer());
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setLayer(mCurrentProperties.getLayer(), true);
@@ -149,9 +151,11 @@ void PackageEditorState_DrawCircle::setLayer(const Layer& layer) noexcept {
 
 void PackageEditorState_DrawCircle::setLineWidth(
     const UnsignedLength& width) noexcept {
-  if (mCurrentProperties.setLineWidth(width)) {
-    emit lineWidthChanged(mCurrentProperties.getLineWidth());
+  if (!mCurrentProperties.setLineWidth(width)) {
+    return;
   }
+
+  emit lineWidthChanged(mCurrentProperties.getLineWidth());
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setLineWidth(mCurrentProperties.getLineWidth(), true);
@@ -161,9 +165,11 @@ void PackageEditorState_DrawCircle::setLineWidth(
 }
 
 void PackageEditorState_DrawCircle::setFilled(bool filled) noexcept {
-  if (mCurrentProperties.setIsFilled(filled)) {
-    emit filledChanged(mCurrentProperties.isFilled());
+  if (!mCurrentProperties.setIsFilled(filled)) {
+    return;
   }
+
+  emit filledChanged(mCurrentProperties.isFilled());
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setIsFilled(mCurrentProperties.isFilled(), true);
@@ -171,9 +177,11 @@ void PackageEditorState_DrawCircle::setFilled(bool filled) noexcept {
 }
 
 void PackageEditorState_DrawCircle::setGrabArea(bool grabArea) noexcept {
-  if (mCurrentProperties.setIsGrabArea(grabArea)) {
-    emit grabAreaChanged(mCurrentProperties.isGrabArea());
+  if (!mCurrentProperties.setIsGrabArea(grabArea)) {
+    return;
   }
+
+  emit grabAreaChanged(mCurrentProperties.isGrabArea());
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setIsGrabArea(mCurrentProperties.isGrabArea(), true);

@@ -197,9 +197,11 @@ bool PackageEditorState_AddPads::processRotate(const Angle& rotation) noexcept {
 
 void PackageEditorState_AddPads::setPackagePad(
     const std::optional<Uuid>& pad) noexcept {
-  if (mCurrentProperties.setPackagePadUuid(pad)) {
-    emit packagePadChanged(mCurrentProperties.getPackagePadUuid());
+  if (!mCurrentProperties.setPackagePadUuid(pad)) {
+    return;
   }
+
+  emit packagePadChanged(mCurrentProperties.getPackagePadUuid());
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setPackagePadUuid(mCurrentProperties.getPackagePadUuid(),
@@ -209,9 +211,11 @@ void PackageEditorState_AddPads::setPackagePad(
 
 void PackageEditorState_AddPads::setComponentSide(
     Pad::ComponentSide side) noexcept {
-  if (mCurrentProperties.setComponentSide(side)) {
-    emit componentSideChanged(mCurrentProperties.getComponentSide());
+  if (!mCurrentProperties.setComponentSide(side)) {
+    return;
   }
+
+  emit componentSideChanged(mCurrentProperties.getComponentSide());
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setComponentSide(mCurrentProperties.getComponentSide(),
@@ -220,10 +224,12 @@ void PackageEditorState_AddPads::setComponentSide(
 }
 
 void PackageEditorState_AddPads::setShape(Pad::Shape shape) noexcept {
-  if (mCurrentProperties.setShape(shape)) {
-    emit shapeChanged(mCurrentProperties.getShape());
-    applyRecommendedRoundedRectRadius();
+  if (!mCurrentProperties.setShape(shape)) {
+    return;
   }
+
+  emit shapeChanged(mCurrentProperties.getShape());
+  applyRecommendedRoundedRectRadius();
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setShape(mCurrentProperties.getShape(), true);
@@ -232,10 +238,12 @@ void PackageEditorState_AddPads::setShape(Pad::Shape shape) noexcept {
 
 void PackageEditorState_AddPads::setWidth(
     const PositiveLength& width) noexcept {
-  if (mCurrentProperties.setWidth(width)) {
-    emit widthChanged(mCurrentProperties.getWidth());
-    applyRecommendedRoundedRectRadius();
+  if (!mCurrentProperties.setWidth(width)) {
+    return;
   }
+
+  emit widthChanged(mCurrentProperties.getWidth());
+  applyRecommendedRoundedRectRadius();
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setWidth(mCurrentProperties.getWidth(), true);
@@ -251,10 +259,12 @@ void PackageEditorState_AddPads::setWidth(
 
 void PackageEditorState_AddPads::setHeight(
     const PositiveLength& height) noexcept {
-  if (mCurrentProperties.setHeight(height)) {
-    emit heightChanged(mCurrentProperties.getHeight());
-    applyRecommendedRoundedRectRadius();
+  if (!mCurrentProperties.setHeight(height)) {
+    return;
   }
+
+  emit heightChanged(mCurrentProperties.getHeight());
+  applyRecommendedRoundedRectRadius();
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setHeight(mCurrentProperties.getHeight(), true);
@@ -270,9 +280,11 @@ void PackageEditorState_AddPads::setHeight(
 
 void PackageEditorState_AddPads::setRadius(
     const UnsignedLimitedRatio& radius) noexcept {
-  if (mCurrentProperties.setRadius(radius)) {
-    emit radiusChanged(mCurrentProperties.getRadius());
+  if (!mCurrentProperties.setRadius(radius)) {
+    return;
   }
+
+  emit radiusChanged(mCurrentProperties.getRadius());
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setRadius(mCurrentProperties.getRadius(), true);
@@ -281,31 +293,34 @@ void PackageEditorState_AddPads::setRadius(
 
 void PackageEditorState_AddPads::setDrillDiameter(
     const PositiveLength& diameter) noexcept {
-  if (std::shared_ptr<PadHole> hole = mCurrentProperties.getHoles().value(0)) {
-    if (hole->getDiameter() != diameter) {
-      hole->setDiameter(diameter);
-      emit drillDiameterChanged(diameter);
-    }
+  std::shared_ptr<PadHole> hole = mCurrentProperties.getHoles().value(0);
+  if ((!hole) || (hole->getDiameter() == diameter)) {
+    return;
+  }
 
-    if (mCurrentEditCmd) {
-      mCurrentEditCmd->setHoles(mCurrentProperties.getHoles(), true);
-    }
+  hole->setDiameter(diameter);
+  emit drillDiameterChanged(diameter);
 
-    // Avoid creating pads with a drill larger than width or height.
-    if (diameter > mCurrentProperties.getWidth()) {
-      setWidth(diameter);
-    }
-    if (diameter > mCurrentProperties.getHeight()) {
-      setHeight(diameter);
-    }
+  if (mCurrentEditCmd) {
+    mCurrentEditCmd->setHoles(mCurrentProperties.getHoles(), true);
+  }
+
+  // Avoid creating pads with a drill larger than width or height.
+  if (diameter > mCurrentProperties.getWidth()) {
+    setWidth(diameter);
+  }
+  if (diameter > mCurrentProperties.getHeight()) {
+    setHeight(diameter);
   }
 }
 
 void PackageEditorState_AddPads::setCopperClearance(
     const UnsignedLength& clearance) noexcept {
-  if (mCurrentProperties.setCopperClearance(clearance)) {
-    emit copperClearanceChanged(mCurrentProperties.getCopperClearance());
+  if (!mCurrentProperties.setCopperClearance(clearance)) {
+    return;
   }
+
+  emit copperClearanceChanged(mCurrentProperties.getCopperClearance());
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setCopperClearance(mCurrentProperties.getCopperClearance(),
@@ -315,9 +330,11 @@ void PackageEditorState_AddPads::setCopperClearance(
 
 void PackageEditorState_AddPads::setStopMaskConfig(
     const MaskConfig& cfg) noexcept {
-  if (mCurrentProperties.setStopMaskConfig(cfg)) {
-    emit stopMaskConfigChanged(mCurrentProperties.getStopMaskConfig());
+  if (!mCurrentProperties.setStopMaskConfig(cfg)) {
+    return;
   }
+
+  emit stopMaskConfigChanged(mCurrentProperties.getStopMaskConfig());
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setStopMaskConfig(mCurrentProperties.getStopMaskConfig(),
@@ -326,9 +343,11 @@ void PackageEditorState_AddPads::setStopMaskConfig(
 }
 
 void PackageEditorState_AddPads::setFunction(Pad::Function function) noexcept {
-  if (mCurrentProperties.setFunction(function)) {
-    emit functionChanged(mCurrentProperties.getFunction());
+  if (!mCurrentProperties.setFunction(function)) {
+    return;
   }
+
+  emit functionChanged(mCurrentProperties.getFunction());
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setFunction(mCurrentProperties.getFunction(), true);

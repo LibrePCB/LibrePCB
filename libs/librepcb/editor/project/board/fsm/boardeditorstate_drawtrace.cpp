@@ -307,11 +307,13 @@ void BoardEditorState_DrawTrace::setLayer(const Layer& layer) noexcept {
 }
 
 void BoardEditorState_DrawTrace::setAutoWidth(bool autoWidth) noexcept {
-  if (autoWidth != mCurrentAutoWidth) {
-    mCurrentAutoWidth = autoWidth;
-    mSettings.set("width/auto", mCurrentAutoWidth);
-    emit autoWidthChanged(mCurrentAutoWidth);
+  if (autoWidth == mCurrentAutoWidth) {
+    return;
   }
+
+  mCurrentAutoWidth = autoWidth;
+  mSettings.set("width/auto", mCurrentAutoWidth);
+  emit autoWidthChanged(mCurrentAutoWidth);
 }
 
 void BoardEditorState_DrawTrace::setWidth(
@@ -501,12 +503,14 @@ void BoardEditorState_DrawTrace::setViaSize(
 }
 
 void BoardEditorState_DrawTrace::setShowClearanceCircle(bool show) noexcept {
-  if (show != mShowClearanceCircle) {
-    mShowClearanceCircle = show;
-    mSettings.set("clearance_circle", mShowClearanceCircle);
-    emit showClearanceCircleChanged(mShowClearanceCircle);
-    updateClearanceCircleRadius();
+  if (show == mShowClearanceCircle) {
+    return;
   }
+
+  mShowClearanceCircle = show;
+  mSettings.set("clearance_circle", mShowClearanceCircle);
+  emit showClearanceCircleChanged(mShowClearanceCircle);
+  updateClearanceCircleRadius();
 }
 
 /*******************************************************************************

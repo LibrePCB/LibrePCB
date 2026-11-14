@@ -158,24 +158,29 @@ QSet<const Layer*> SchematicEditorState_AddText::getAvailableLayers()
 }
 
 void SchematicEditorState_AddText::setLayer(const Layer& layer) noexcept {
-  if (mCurrentProperties.setLayer(layer)) {
-    mSettings.set("layer", mCurrentProperties.getLayer());
-    emit layerChanged(mCurrentProperties.getLayer());
-    loadLayerSpecificClientSettings();
+  if (!mCurrentProperties.setLayer(layer)) {
+    return;
   }
+
+  mSettings.set("layer", mCurrentProperties.getLayer());
+  emit layerChanged(mCurrentProperties.getLayer());
 
   if (mCurrentTextEditCmd) {
     mCurrentTextEditCmd->setLayer(mCurrentProperties.getLayer(), true);
   }
+
+  loadLayerSpecificClientSettings();
 }
 
 void SchematicEditorState_AddText::setHeight(
     const PositiveLength& height) noexcept {
-  if (mCurrentProperties.setHeight(height)) {
-    mSettings.set("height/by_layer/" % mCurrentProperties.getLayer().getId(),
-                  mCurrentProperties.getHeight());
-    emit heightChanged(mCurrentProperties.getHeight());
+  if (!mCurrentProperties.setHeight(height)) {
+    return;
   }
+
+  mSettings.set("height/by_layer/" % mCurrentProperties.getLayer().getId(),
+                mCurrentProperties.getHeight());
+  emit heightChanged(mCurrentProperties.getHeight());
 
   if (mCurrentTextEditCmd) {
     mCurrentTextEditCmd->setHeight(mCurrentProperties.getHeight(), true);
@@ -200,9 +205,11 @@ const QStringList SchematicEditorState_AddText::getTextSuggestions()
 }
 
 void SchematicEditorState_AddText::setText(const QString& text) noexcept {
-  if (mCurrentProperties.setText(text)) {
-    emit textChanged(mCurrentProperties.getText());
+  if (!mCurrentProperties.setText(text)) {
+    return;
   }
+
+  emit textChanged(mCurrentProperties.getText());
 
   if (mCurrentTextEditCmd) {
     mCurrentTextEditCmd->setText(mCurrentProperties.getText(), true);

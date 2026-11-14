@@ -194,9 +194,11 @@ QSet<const Layer*> PackageEditorState_DrawTextBase::getAvailableLayers()
 }
 
 void PackageEditorState_DrawTextBase::setLayer(const Layer& layer) noexcept {
-  if (mCurrentProperties.setLayer(layer)) {
-    emit layerChanged(mCurrentProperties.getLayer());
+  if (!mCurrentProperties.setLayer(layer)) {
+    return;
   }
+
+  emit layerChanged(mCurrentProperties.getLayer());
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setLayer(mCurrentProperties.getLayer(), true);
@@ -204,9 +206,11 @@ void PackageEditorState_DrawTextBase::setLayer(const Layer& layer) noexcept {
 }
 
 void PackageEditorState_DrawTextBase::setText(const QString& text) noexcept {
-  if (mCurrentProperties.setText(text)) {
-    emit textChanged(mCurrentProperties.getText());
+  if (!mCurrentProperties.setText(text)) {
+    return;
   }
+
+  emit textChanged(mCurrentProperties.getText());
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setText(mCurrentProperties.getText(), true);
@@ -233,9 +237,11 @@ const QStringList PackageEditorState_DrawTextBase::getTextSuggestions()
 
 void PackageEditorState_DrawTextBase::setHeight(
     const PositiveLength& height) noexcept {
-  if (mCurrentProperties.setHeight(height)) {
-    emit heightChanged(mCurrentProperties.getHeight());
+  if (!mCurrentProperties.setHeight(height)) {
+    return;
   }
+
+  emit heightChanged(mCurrentProperties.getHeight());
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setHeight(mCurrentProperties.getHeight(), true);
@@ -244,9 +250,11 @@ void PackageEditorState_DrawTextBase::setHeight(
 
 void PackageEditorState_DrawTextBase::setStrokeWidth(
     const UnsignedLength& width) noexcept {
-  if (mCurrentProperties.setStrokeWidth(width)) {
-    emit strokeWidthChanged(mCurrentProperties.getStrokeWidth());
+  if (!mCurrentProperties.setStrokeWidth(width)) {
+    return;
   }
+
+  emit strokeWidthChanged(mCurrentProperties.getStrokeWidth());
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setStrokeWidth(mCurrentProperties.getStrokeWidth(), true);
@@ -254,10 +262,12 @@ void PackageEditorState_DrawTextBase::setStrokeWidth(
 }
 
 void PackageEditorState_DrawTextBase::setHAlign(const HAlign& align) noexcept {
-  if (mCurrentProperties.setAlign(
+  if (!mCurrentProperties.setAlign(
           Alignment(align, mCurrentProperties.getAlign().getV()))) {
-    emit hAlignChanged(mCurrentProperties.getAlign().getH());
+    return;
   }
+
+  emit hAlignChanged(mCurrentProperties.getAlign().getH());
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setAlignment(mCurrentProperties.getAlign(), true);
@@ -265,10 +275,12 @@ void PackageEditorState_DrawTextBase::setHAlign(const HAlign& align) noexcept {
 }
 
 void PackageEditorState_DrawTextBase::setVAlign(const VAlign& align) noexcept {
-  if (mCurrentProperties.setAlign(
+  if (!mCurrentProperties.setAlign(
           Alignment(mCurrentProperties.getAlign().getH(), align))) {
-    emit vAlignChanged(mCurrentProperties.getAlign().getV());
+    return;
   }
+
+  emit vAlignChanged(mCurrentProperties.getAlign().getV());
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setAlignment(mCurrentProperties.getAlign(), true);

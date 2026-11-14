@@ -242,11 +242,13 @@ bool SchematicEditorState_DrawWire::
  ******************************************************************************/
 
 void SchematicEditorState_DrawWire::setWireMode(WireMode mode) noexcept {
-  if (mode != mCurrentWireMode) {
-    mCurrentWireMode = mode;
-    mSettings.set("wire_mode", mode);
-    emit wireModeChanged(mCurrentWireMode);
+  if (mode == mCurrentWireMode) {
+    return;
   }
+
+  mCurrentWireMode = mode;
+  mSettings.set("wire_mode", mode);
+  emit wireModeChanged(mCurrentWireMode);
 
   if (mSubState == SubState::POSITIONING_NETPOINT) {
     updateNetpointPositions(true);

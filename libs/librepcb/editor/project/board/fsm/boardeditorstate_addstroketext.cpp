@@ -160,25 +160,30 @@ QSet<const Layer*>
 }
 
 void BoardEditorState_AddStrokeText::setLayer(const Layer& layer) noexcept {
-  if (mCurrentProperties.setLayer(layer)) {
-    mSettings.set("layer", mCurrentProperties.getLayer());
-    emit layerChanged(mCurrentProperties.getLayer());
-    loadLayerSpecificClientSettings();
+  if (!mCurrentProperties.setLayer(layer)) {
+    return;
   }
+
+  mSettings.set("layer", mCurrentProperties.getLayer());
+  emit layerChanged(mCurrentProperties.getLayer());
 
   if (mCurrentTextEditCmd) {
     mCurrentTextEditCmd->setLayer(mCurrentProperties.getLayer(), true);
     makeLayerVisible(layer.getColorRole());
   }
+
+  loadLayerSpecificClientSettings();
 }
 
 void BoardEditorState_AddStrokeText::setHeight(
     const PositiveLength& height) noexcept {
-  if (mCurrentProperties.setHeight(height)) {
-    mSettings.set("height/by_layer/" % mCurrentProperties.getLayer().getId(),
-                  mCurrentProperties.getHeight());
-    emit heightChanged(mCurrentProperties.getHeight());
+  if (!mCurrentProperties.setHeight(height)) {
+    return;
   }
+
+  mSettings.set("height/by_layer/" % mCurrentProperties.getLayer().getId(),
+                mCurrentProperties.getHeight());
+  emit heightChanged(mCurrentProperties.getHeight());
 
   if (mCurrentTextEditCmd) {
     mCurrentTextEditCmd->setHeight(mCurrentProperties.getHeight(), true);
@@ -191,12 +196,14 @@ void BoardEditorState_AddStrokeText::resetHeight() noexcept {
 
 void BoardEditorState_AddStrokeText::setStrokeWidth(
     const UnsignedLength& strokeWidth) noexcept {
-  if (mCurrentProperties.setStrokeWidth(strokeWidth)) {
-    mSettings.set(
-        "stroke_width/by_layer/" % mCurrentProperties.getLayer().getId(),
-        mCurrentProperties.getStrokeWidth());
-    emit strokeWidthChanged(mCurrentProperties.getStrokeWidth());
+  if (!mCurrentProperties.setStrokeWidth(strokeWidth)) {
+    return;
   }
+
+  mSettings.set(
+      "stroke_width/by_layer/" % mCurrentProperties.getLayer().getId(),
+      mCurrentProperties.getStrokeWidth());
+  emit strokeWidthChanged(mCurrentProperties.getStrokeWidth());
 
   if (mCurrentTextEditCmd) {
     mCurrentTextEditCmd->setStrokeWidth(mCurrentProperties.getStrokeWidth(),
@@ -219,9 +226,11 @@ const QStringList BoardEditorState_AddStrokeText::getTextSuggestions()
 }
 
 void BoardEditorState_AddStrokeText::setText(const QString& text) noexcept {
-  if (mCurrentProperties.setText(text)) {
-    emit textChanged(mCurrentProperties.getText());
+  if (!mCurrentProperties.setText(text)) {
+    return;
   }
+
+  emit textChanged(mCurrentProperties.getText());
 
   if (mCurrentTextEditCmd) {
     mCurrentTextEditCmd->setText(mCurrentProperties.getText(), true);
@@ -229,10 +238,12 @@ void BoardEditorState_AddStrokeText::setText(const QString& text) noexcept {
 }
 
 void BoardEditorState_AddStrokeText::setMirrored(bool mirrored) noexcept {
-  if (mCurrentProperties.setMirrored(mirrored)) {
-    mSettings.set("mirror", mCurrentProperties.getMirrored());
-    emit mirroredChanged(mCurrentProperties.getMirrored());
+  if (!mCurrentProperties.setMirrored(mirrored)) {
+    return;
   }
+
+  mSettings.set("mirror", mCurrentProperties.getMirrored());
+  emit mirroredChanged(mCurrentProperties.getMirrored());
 
   if (mCurrentTextEditCmd) {
     mCurrentTextEditCmd->setMirrored(mCurrentProperties.getMirrored(), true);
