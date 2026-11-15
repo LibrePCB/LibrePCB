@@ -87,23 +87,27 @@ DirectoryLock::LockStatus DirectoryLock::getStatus(
     return LockStatus::Unlocked;
   }
 
-  // read the content of the lock file
-  QString content =
+  // Read the content of the lock file and extract metadata.
+  const QString content =
       QString::fromUtf8(FileUtils::readFile(mLockFilePath));  // can throw
-  QStringList lines = content.split("\n", Qt::KeepEmptyParts);
-  // check count of lines
-  if (lines.count() < 6) {
-    throw RuntimeError(__FILE__, __LINE__,
-                       tr("The lock file \"%1\" has too few lines.")
-                           .arg(mLockFilePath.toNative()));
-  }
-  // read lock metadata
-  QString lockUser = lines.at(1);
-  QString lockHost = lines.at(2);
-  qint64 lockPid = lines.at(3).toLongLong();
-  QString lockAppName = lines.at(4);
+  const QStringList lines = content.split("\n", Qt::KeepEmptyParts);
+  QString lockUser = lines.value(1);
+  QString lockHost = lines.value(2);
+  qint64 lockPid = lines.value(3).toLongLong();
+  QString lockAppName = lines.value(4);
   if (lockedByUser) {
     *lockedByUser = lockUser % "@" % lockHost;
+  }
+
+  // If the file didn't contain enough lines, abort here in a deterministic
+  // way instead of deciding on corrupted data. But do this *after* setting
+  // lockedByUser, as it would be left unset otherwise.
+  // Note: Don't throw an exception here since this would be a dead-end for the
+  // user - only a manual file deletion would recover from this situation,
+  // which is bad UX. Better threat this as an unknown lock, so the UI will
+  // provide an option to override the lock.
+  if (lines.count() < 6) {
+    return LockStatus::LockedByUnknownApp;
   }
 
   // read metadata about this application instance
@@ -131,17 +135,27 @@ DirectoryLock::LockStatus DirectoryLock::getStatus(
     }
   }
 
-  // the lock file was created with another application instance on this
+  // The lock file was created with another application instance on this
   // computer, now check if that process is still running (if not, the lock is
-  // considered as stale)
-  if (SystemInfo::isProcessRunning(lockPid) &&
-      (SystemInfo::getProcessNameByPid(lockPid) == lockAppName)) {
-    // The application which holds the lock is still running.
-    return LockStatus::LockedByOtherApp;
-  } else {
-    // The process which created the lock is no longer running.
-    return LockStatus::StaleLock;
+  // considered as stale).
+  if (const std::optional<bool> runs = SystemInfo::isProcessRunning(lockPid)) {
+    if (!(*runs)) {
+      // The process which created the lock is no longer running.
+      return LockStatus::StaleLock;
+    }
+    const std::optional<QString> app = SystemInfo::getProcessNameByPid(lockPid);
+    if (app == lockAppName) {
+      // The application which holds the lock is still running.
+      return LockStatus::LockedByOtherApp;
+    } else if (app) {
+      // The process which created the lock is no longer running.
+      return LockStatus::StaleLock;
+    }
   }
+  // Failed to determine if the process which holds the lock is still running.
+  // This can happen in a sandboxed environment (e.g. Flatpak). Unfortunately
+  // in this case we are not able to detect whether the lock is stale or not.
+  return LockStatus::LockedByUnknownApp;
 }
 
 /*******************************************************************************
@@ -200,7 +214,11 @@ void DirectoryLock::lock() {
   lines.append(SystemInfo::getUsername());
   lines.append(SystemInfo::getHostname());
   lines.append(QString::number(QCoreApplication::applicationPid()));
-  lines.append(SystemInfo::getProcessNameByPid(qApp->applicationPid()));
+  lines.append(SystemInfo::getProcessNameByPid(qApp->applicationPid())
+                   .value_or(qApp->applicationFilePath()
+                                 .replace("\\", "/")
+                                 .split("/")
+                                 .last()));
   lines.append(QDateTime::currentDateTimeUtc().toString(Qt::ISODate));
   QByteArray utf8content = lines.join('\n').toUtf8();
 

@@ -261,9 +261,12 @@ public:
    * @param lockedByUser  If not nullptr and the directory is locked, the
    *                      username of the current lock is written into this
    *                      string.
-   * @return  The current lock status (see #LockStatus)
+   * @return  The current lock status (see #LockStatus). If any underlying
+   *          function from ::librepcb::SystemInfo failed (as it might happen
+   *          in a sandboxed environment), or an existing lock file is
+   *          corrupted, this function returns #LockStatus::LockedByUnknownApp.
    *
-   * @throw   Exception on error (e.g. invalid filepath, no access rights, ...)
+   * @throw   Exception on fatal errors only (e.g. invalid file path).
    */
   LockStatus getStatus(QString* lockedByUser = nullptr) const;
 
@@ -284,7 +287,7 @@ public:
    *                    should be overridden or not. If not supplied and the
    *                    directory is locked, an exception will be thrown.
    *
-   * @throw   Exception on error (e.g. already locked, no access rights, ...)
+   * @throw   Exception on error (e.g. already locked, or invalid file path).
    */
   void tryLock(const LockHandlerCallback& lockHandler = nullptr);
 

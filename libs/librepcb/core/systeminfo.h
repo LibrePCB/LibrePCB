@@ -86,11 +86,11 @@ public:
    *
    * @param pid   The process ID to query
    *
-   * @return  True if the process is running, false if not
-   *
-   * @throw  Exception    In case of an error.
+   * @return  True if the process is running, false if not. If it could not
+   *          be determined (e.g. in a sandboxed environment like Flatpak),
+   *          `std::nullopt` is returned.
    */
-  static bool isProcessRunning(qint64 pid);
+  static std::optional<bool> isProcessRunning(qint64 pid) noexcept;
 
   /**
    * @brief Get the process name of a given PID
@@ -98,11 +98,11 @@ public:
    * @param pid   The process ID (may be a running process or not)
    *
    * @return  The name of the given process ID, or an empty string if no process
-   *          with the given PID exists.
-   *
-   * @throw  Exception    In case of an error.
+   *          with the given PID exists. If it could not be determined (e.g.
+   *          in a sandboxed environment like Flatpak), `std::nullopt` is
+   *          returned.
    */
-  static QString getProcessNameByPid(qint64 pid);
+  static std::optional<QString> getProcessNameByPid(qint64 pid) noexcept;
 };
 
 /*******************************************************************************

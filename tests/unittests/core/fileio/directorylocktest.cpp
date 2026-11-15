@@ -321,7 +321,7 @@ TEST_F(DirectoryLockTest, testLockedByOtherApp) {
 
   // Create a lock file with the PID/name of the other process.
   lines[3] = QString::number(process.processId());
-  lines[4] = SystemInfo::getProcessNameByPid(process.processId());
+  lines[4] = SystemInfo::getProcessNameByPid(process.processId()).value();
   FileUtils::writeFile(mTempLockFilePath, lines.join('\n').toUtf8());
 
   // Check lock status.

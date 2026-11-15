@@ -22,7 +22,6 @@
  ******************************************************************************/
 #include "systeminfo.h"
 
-#include "exceptions.h"
 #include "fileio/filepath.h"
 
 #include <QHostInfo>
@@ -206,7 +205,7 @@ QString SystemInfo::detectRuntime() noexcept {
   return runtimes.join(", ");
 }
 
-bool SystemInfo::isProcessRunning(qint64 pid) {
+std::optional<bool> SystemInfo::isProcessRunning(qint64 pid) noexcept {
 #if defined(Q_OS_UNIX)  // Mac OS X / Linux / UNIX
   // From:
   // http://code.qt.io/cgit/qt/qtbase.git/tree/src/corelib/io/qlockfile_unix.cpp
@@ -217,12 +216,11 @@ bool SystemInfo::isProcessRunning(qint64 pid) {
   } else if ((ret == -1) &&
              (errno == static_cast<int>(std::errc::no_such_process))) {
     return false;
-  } else {
-    qDebug() << "errno:" << errno;
-    throw RuntimeError(
-        __FILE__, __LINE__,
-        tr("Could not determine if another process is running."));
   }
+  qCritical().nospace() << "Could not determine if the process with PID " << pid
+                        << " is running: kill() failed with errno " << errno
+                        << ".";
+  return std::nullopt;
 #elif defined(Q_OS_WIN32) || defined(Q_OS_WIN64)  // Windows
   // From:
   // http://code.qt.io/cgit/qt/qtbase.git/tree/src/corelib/io/qlockfile_win.cpp
@@ -235,26 +233,20 @@ bool SystemInfo::isProcessRunning(qint64 pid) {
       return true;
     } else if (success) {
       return false;
-    } else {
-      qDebug() << "GetLastError():" << GetLastError();
-      throw RuntimeError(
-          __FILE__, __LINE__,
-          tr("Could not determine if another process is running."));
     }
   } else if (GetLastError() == ERROR_INVALID_PARAMETER) {
     return false;
-  } else {
-    qDebug() << "GetLastError():" << GetLastError();
-    throw RuntimeError(
-        __FILE__, __LINE__,
-        tr("Could not determine if another process is running."));
   }
+  qCritical().nospace() << "Could not determine if the process with PID " << pid
+                        << " is running: GetLastError() returned "
+                        << GetLastError() << ".";
+  return std::nullopt;
 #else
 #error "Unknown operating system!"
 #endif
 }
 
-QString SystemInfo::getProcessNameByPid(qint64 pid) {
+std::optional<QString> SystemInfo::getProcessNameByPid(qint64 pid) noexcept {
   QString processName;
 #if defined(Q_OS_MACOS)  // macOS
   // From:
@@ -268,8 +260,10 @@ QString SystemInfo::getProcessNameByPid(qint64 pid) {
              (errno == static_cast<int>(std::errc::no_such_process))) {
     return QString();  // process not running
   } else {
-    throw RuntimeError(__FILE__, __LINE__,
-                       tr("proc_name() failed with error %1.").arg(errno));
+    qCritical().nospace() << "Could not determine the process name of PID "
+                          << pid << ": proc_name() failed with errno " << errno
+                          << ".";
+    return std::nullopt;
   }
 #elif defined(Q_OS_FREEBSD)
   char pathbuf[PATH_MAX] = {
@@ -291,10 +285,11 @@ QString SystemInfo::getProcessNameByPid(qint64 pid) {
         // Should 512 not be enough, the error string returned by strerror_r()
         // will be truncated but still be nul-terminated.
         strerror_r(saved_errno, errbuf, sizeof(errbuf));
-        throw RuntimeError(__FILE__, __LINE__,
-                           tr("sysctl() failed with errno=%1 (%2).")
-                               .arg(saved_errno)
-                               .arg(QString::fromLocal8Bit(errbuf)));
+        qCritical().nospace()
+            << "Could not determine the process name of PID " << pid
+            << ": sysctl() failed with errno " << saved_errno << " ("
+            << QString::fromLocal8Bit(errbuf) << ").";
+        return std::nullopt;
       }
     }
   }
@@ -309,10 +304,10 @@ QString SystemInfo::getProcessNameByPid(qint64 pid) {
                 sizeof(proc), 1};
   int retval = sysctl(mib, 6, &proc, &procSize, NULL, 0);
   if (retval != 0) {
-    throw RuntimeError(__FILE__, __LINE__,
-                       tr("sysctl() failed with retval=%1 and errno=%2.")
-                           .arg(retval)
-                           .arg(errno));
+    qCritical().nospace() << "Could not determine the process name of PID "
+                          << pid << ": sysctl() failed with retval " << retval
+                          << " and errno " << errno << ".";
+    return std::nullopt;
   }
   if (procSize < sizeof(proc)) {
     return QString();  // process not running
@@ -320,27 +315,35 @@ QString SystemInfo::getProcessNameByPid(qint64 pid) {
   processName = QString::fromLocal8Bit(proc.p_comm, sizeof(proc.p_comm))
                     .section('\0', 0, 0);
 #elif defined(Q_OS_LINUX)
-
   // From:
   // http://code.qt.io/cgit/qt/qtbase.git/tree/src/corelib/io/qlockfile_unix.cpp
+  // And added more precise error handling.
   if (!FilePath("/proc/version").isExistingFile()) {
-    throw RuntimeError(__FILE__, __LINE__,
-                       tr("Could not find the file \"/proc/version\"."));
+    qCritical().nospace() << "Could not determine the process name of PID "
+                          << pid << ": '/proc/version' does not exist.";
+    return std::nullopt;
   }
   char exePath[64];
   char buf[PATH_MAX + 1];
   sprintf(exePath, "/proc/%lld/exe", pid);
-  size_t len = (size_t)readlink(exePath, buf, sizeof(buf));
-  if (len >= sizeof(buf)) {
+  ssize_t len = readlink(exePath, buf, sizeof(buf));
+  if ((len < 0) &&
+      (errno == static_cast<int>(std::errc::no_such_file_or_directory))) {
     return QString();  // process not running
+  }
+  if ((len < 0) || (static_cast<size_t>(len) >= sizeof(buf))) {
+    qCritical() << "Could not determine the process name of PID " << pid
+                << ": readlink() failed with errno " << errno << ".";
+    return std::nullopt;
   }
   buf[len] = 0;
   processName = QFileInfo(QFile::decodeName(buf)).fileName();
   // If the executable does no longer exist, the string " (deleted)" is added to
   // the end of the symlink, so we need to remove that to get the naked process
   // name.
-  if (processName.endsWith(" (deleted)"))
+  if (processName.endsWith(" (deleted)")) {
     processName.chop(strlen(" (deleted)"));
+  }
 #elif defined(Q_OS_WIN32) || defined(Q_OS_WIN64)  // Windows
   // Originally from:
   // http://code.qt.io/cgit/qt/qtbase.git/tree/src/corelib/io/qlockfile_win.cpp
@@ -353,18 +356,21 @@ QString SystemInfo::getProcessNameByPid(qint64 pid) {
   if ((!hProcess) && (GetLastError() == ERROR_INVALID_PARAMETER)) {
     return QString();  // process not running
   } else if (!hProcess) {
-    throw RuntimeError(
-        __FILE__, __LINE__,
-        tr("OpenProcess() failed with error %1.").arg(GetLastError()));
+    qCritical().nospace() << "Could not determine the process name of PID "
+                          << pid << ": OpenProcess() failed with error "
+                          << GetLastError() << ".";
+    return std::nullopt;
   }
   wchar_t buf[MAX_PATH];
   DWORD length = MAX_PATH;
   BOOL success = QueryFullProcessImageNameW(hProcess, 0, buf, &length);
   CloseHandle(hProcess);
   if ((!success) || (!length)) {
-    throw RuntimeError(__FILE__, __LINE__,
-                       tr("QueryFullProcessImageNameW() failed with error %1.")
-                           .arg(GetLastError()));
+    qCritical().nospace() << "Could not determine the process name of PID "
+                          << pid
+                          << ": QueryFullProcessImageNameW() failed with error "
+                          << GetLastError() << ".";
+    return std::nullopt;
   }
   processName = QString::fromWCharArray(buf, length);
   int i = processName.lastIndexOf(QLatin1Char('\\'));
@@ -385,11 +391,11 @@ QString SystemInfo::getProcessNameByPid(qint64 pid) {
 #error "Unknown operating system!"
 #endif
 
-  // check if the process name is not empty
+  // Check if the process name is not empty.
   if (processName.isEmpty()) {
-    throw RuntimeError(
-        __FILE__, __LINE__,
-        tr("Could not determine the process name of another process."));
+    qCritical().nospace() << "Could not determine the process name of PID "
+                          << pid << ".";
+    return std::nullopt;
   }
 
   return processName;

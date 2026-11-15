@@ -93,7 +93,10 @@ TEST_F(SystemInfoTest, testGetHostname) {
 
 TEST_F(SystemInfoTest, testIsProcessRunning) {
   // check this process
-  { EXPECT_TRUE(SystemInfo::isProcessRunning(qApp->applicationPid())); }
+  {
+    EXPECT_EQ(std::make_optional(true),
+              SystemInfo::isProcessRunning(qApp->applicationPid()));
+  }
 
   // check another running process
   {
@@ -102,23 +105,26 @@ TEST_F(SystemInfoTest, testIsProcessRunning) {
     bool success = process.waitForStarted();
     ASSERT_TRUE(success) << qPrintable(process.errorString());
     qint64 pid = process.processId();
-    EXPECT_TRUE(SystemInfo::isProcessRunning(pid));
+    EXPECT_EQ(std::make_optional(true), SystemInfo::isProcessRunning(pid));
     process.kill();
     success = process.waitForFinished();
     ASSERT_TRUE(success) << qPrintable(process.errorString());
-    EXPECT_FALSE(SystemInfo::isProcessRunning(pid));
+    EXPECT_EQ(std::make_optional(false), SystemInfo::isProcessRunning(pid));
   }
 
   // check an invalid process
-  { EXPECT_FALSE(SystemInfo::isProcessRunning(999999)); }
+  {
+    EXPECT_EQ(std::make_optional(false), SystemInfo::isProcessRunning(999999));
+  }
 }
 
 TEST_F(SystemInfoTest, testGetProcessNameByPid) {
   // check this process
   {
-    QString processName =
+    const std::optional<QString> processName =
         SystemInfo::getProcessNameByPid(qApp->applicationPid());
-    EXPECT_EQ(getOwnProcessExeName(), processName) << qPrintable(processName);
+    EXPECT_EQ(getOwnProcessExeName(), processName)
+        << qPrintable(processName.value_or("nullopt"));
   }
 
   // check another running process
@@ -133,8 +139,9 @@ TEST_F(SystemInfoTest, testGetProcessNameByPid) {
     // OS X
     QThread::msleep(200);
     QThread::yieldCurrentThread();
-    QString processName = SystemInfo::getProcessNameByPid(pid);
-    EXPECT_EQ(getTestProcessExeName(), processName) << qPrintable(processName);
+    std::optional<QString> processName = SystemInfo::getProcessNameByPid(pid);
+    EXPECT_EQ(getTestProcessExeName(), processName)
+        << qPrintable(processName.value_or("nullopt"));
     process.kill();
     success = process.waitForFinished();
     ASSERT_TRUE(success) << qPrintable(process.errorString());
@@ -143,13 +150,16 @@ TEST_F(SystemInfoTest, testGetProcessNameByPid) {
     QThread::msleep(200);
     QThread::yieldCurrentThread();
     processName = SystemInfo::getProcessNameByPid(pid);
-    EXPECT_EQ(QString(), processName) << qPrintable(processName);
+    EXPECT_EQ(QString(), processName)
+        << qPrintable(processName.value_or("nullopt"));
   }
 
   // check an invalid process
   {
-    QString processName = SystemInfo::getProcessNameByPid(999999);
-    EXPECT_EQ(QString(), processName) << qPrintable(processName);
+    const std::optional<QString> processName =
+        SystemInfo::getProcessNameByPid(999999);
+    EXPECT_EQ(QString(), processName)
+        << qPrintable(processName.value_or("nullopt"));
   }
 }
 
