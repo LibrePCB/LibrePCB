@@ -255,32 +255,31 @@ void PrimitiveTextGraphicsItem::updateBoundingRectAndShape() noexcept {
 }
 
 QPainterPath PrimitiveTextGraphicsItem::calcShape() const noexcept {
+  if (mDisplayText.isEmpty() && mOverlines.isEmpty()) {
+    return QPainterPath();
+  }
+
   // Use the unhinted glyph outlines since the font metrics are rounded to
   // whole pixels at the unscaled font size.
   const QFontMetricsF fm(mFont);
-  QRectF bounds;
   const QStringList lines = mDisplayText.split(QLatin1Char('\n'));
   // Take the line pitch from the layout used for drawing.
   const qreal linePitch = (lines.count() > 1)
       ? ((mBoundingRect.height() - fm.height()) / (lines.count() - 1))
       : fm.lineSpacing();
+  QPainterPath textPath;
   for (int i = 0; i < lines.count(); ++i) {
     qreal x = mBoundingRect.left();
-    const qreal advance = fm.horizontalAdvance(lines.at(i));
     if (mTextFlags & Qt::AlignRight) {
-      x += mBoundingRect.width() - advance;
+      x += mBoundingRect.width() - fm.horizontalAdvance(lines.at(i));
     } else if (mTextFlags & Qt::AlignHCenter) {
-      x += (mBoundingRect.width() - advance) / 2;
+      x += (mBoundingRect.width() - fm.horizontalAdvance(lines.at(i))) / 2;
     }
-    QPainterPath textPath;
     textPath.addText(
         QPointF(x, mBoundingRect.top() + fm.ascent() + i * linePitch), mFont,
         lines.at(i));
-    const QRectF r = textPath.boundingRect();
-    if (!r.isEmpty()) {
-      bounds = bounds.united(r);
-    }
   }
+  QRectF bounds = textPath.boundingRect();
   const qreal lineMargin = fm.height() / 30;
   for (const QLineF& line : mOverlines) {
     bounds = bounds.united(
