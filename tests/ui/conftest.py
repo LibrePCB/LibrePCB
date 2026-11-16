@@ -95,7 +95,10 @@ class Rect:
         For example (0, 0) to get the top left, (1, 1) to get the bottom
         right position of the UI element.
         """
-        return (self.pos[0] + self.size[0] * rel_x, self.pos[1] + self.size[1] * rel_y)
+        return (
+            self.pos.x + self.size.width * rel_x,
+            self.pos.y + self.size.height * rel_y,
+        )
 
     @property
     def center_abs(self):
@@ -250,16 +253,25 @@ class ElementQuery:
         """
         return ElementQuery(self._app, self._window, self._query + path.split(" "))
 
-    def refresh(self):
+    def refresh(self, timeout=10.0):
         """
-        Re-execute the query once (e.g. after the UI has changed)
+        Re-execute the query (e.g. after the UI has changed)
         """
-        root = self.window.root_element
-        if not self._query:
-            self._results = [root]
-        else:
-            self._results = list(_flatten(_query_children(root, self._query)))
-        self._results = [Element(x) for x in self._results]
+        start = time.time()
+        while True:
+            try:
+                root = self.window.root_element
+                if not self._query:
+                    self._results = [root]
+                else:
+                    self._results = list(_flatten(_query_children(root, self._query)))
+                self._results = [Element(x) for x in self._results]
+                return
+            except slint_testing.RequestError:
+                # Element got invalidated during this call -> just try again
+                # until reaching the timeout.
+                if time.time() > (start + timeout):
+                    raise
 
     def wait(self, min=1, max=-1, timeout=10.0):
         """
@@ -372,10 +384,18 @@ class ElementQuery:
             # due to model resets). This would invalidate element handles,
             # so we regularly have to re-evaluate the query.
             self.refresh()
-            actual_props = self.read(properties.keys(), indices)
-            if all([_compare(v, properties[k]) for k, v in actual_props.items()]):
-                return
+            error = None
+            try:
+                actual_props = self.read(properties.keys(), indices)
+                if all([_compare(v, properties[k]) for k, v in actual_props.items()]):
+                    return
+            except slint_testing.RequestError as e:
+                # Element got invalidated between refresh() and reading the
+                # properties -> just try again, but memorize the exception.
+                error = e
             if time.time() > (start + timeout):
+                if error is not None:
+                    raise error
                 self.save_screenshot()
                 raise TimeoutError(
                     f"Timeout while waiting for {properties}, actual {actual_props}: "
@@ -791,7 +811,7 @@ def check_resolution(request, tmp_path_factory):
     path = tmp_path_factory.mktemp("check_resolution")
     with LibrePcbFixture(request.config, path).open() as app:
         win_size = app.first_window.size
-        if (win_size[0] < WINDOW_SIZE[0]) or (win_size[1] < WINDOW_SIZE[1]):
+        if (win_size.width < WINDOW_SIZE[0]) or (win_size.height < WINDOW_SIZE[1]):
             pytest.exit(
                 f"Screen resolution is {win_size}, requires minimum {WINDOW_SIZE}.",
                 returncode=1,
