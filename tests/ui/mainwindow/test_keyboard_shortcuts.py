@@ -1,11 +1,9 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 """
 Test keyboard shortcuts
 """
 
 import platform
+
 import pytest
 from slint_testing import keys
 

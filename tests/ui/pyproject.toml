@@ -29,3 +29,8 @@ py-modules = []
 
 [tool.pytest.ini_options]
 addopts = "-v --librepcb-executable=../../build/apps/librepcb/librepcb"
+
+[tool.ruff.lint]
+ignore = [
+    "TRY002",  # Create your own exception
+]

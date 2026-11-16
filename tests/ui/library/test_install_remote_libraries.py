@@ -1,15 +1,12 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
-import os
-import platform
-import pytest
-from slint_testing import keys, KeyPressedEvent, KeyReleasedEvent
-
-
 """
 Test installing remote libraries with the library manager
 """
+
+import os
+import platform
+
+import pytest
+from slint_testing import KeyPressedEvent, KeyReleasedEvent, keys
 
 REMOTE_LIBRARY_COUNT = 3  # The dummy API provides 3 libraries
 

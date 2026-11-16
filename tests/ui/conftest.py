@@ -1,20 +1,19 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 import http.server
 import os
 import platform
-import pytest
 import re
 import shutil
-import slint_testing
 import socket
 import socketserver
 import threading
 import time
+from collections.abc import Iterable
 from copy import deepcopy
-from typing import Iterable
 
+import pytest
+import slint_testing
 
 ROOT_DIR = os.path.dirname(__file__)
 TESTS_DIR = os.path.dirname(ROOT_DIR)
@@ -50,8 +49,7 @@ def _long_path(path):
 def _flatten(items):
     for x in items:
         if isinstance(x, Iterable) and not isinstance(x, (str, bytes)):
-            for sub_x in _flatten(x):
-                yield sub_x
+            yield from _flatten(x)
         else:
             yield x
 
@@ -341,7 +339,7 @@ class ElementQuery:
             filtered_results = self._results
         else:
             filtered_results = [self._results[i] for i in indices]
-        props = dict()
+        props = {}
         for key in keys:
             match key:
                 case "valid":
@@ -371,7 +369,7 @@ class ElementQuery:
             if isinstance(expected, list):
                 return actual == expected
             else:
-                return all([a == expected for a in actual])
+                return all(a == expected for a in actual)
 
         if ("valid" in properties) and (len(properties) > 1):
             raise ValueError(
@@ -387,7 +385,7 @@ class ElementQuery:
             error = None
             try:
                 actual_props = self.read(properties.keys(), indices)
-                if all([_compare(v, properties[k]) for k, v in actual_props.items()]):
+                if all(_compare(v, properties[k]) for k, v in actual_props.items()):
                     return
             except slint_testing.RequestError as e:
                 # Element got invalidated between refresh() and reading the
@@ -506,14 +504,14 @@ class Application(slint_testing.Application):
         )
 
 
-class LibrePcbFixture(object):
+class LibrePcbFixture:
     def __init__(self, config, tmpdir):
-        super(LibrePcbFixture, self).__init__()
+        super().__init__()
         self.executable = os.path.abspath(config.getoption("--librepcb-executable"))
         if not os.path.exists(self.executable):
             raise Exception(
-                "Executable '{}' not found. Please pass it with "
-                "'--librepcb-executable'.".format(self.executable)
+                f"Executable '{self.executable}' not found. Please pass it with "
+                "'--librepcb-executable'."
             )
         self.tmpdir = tmpdir
         # Copy test data to temporary directory to avoid modifications in original data
@@ -658,7 +656,7 @@ class LibrePcbFixture(object):
         return args
 
 
-class Helpers(object):
+class Helpers:
     @staticmethod
     def wait_for_file_exists(path, timeout=10.0):
         start = time.time()
@@ -700,7 +698,7 @@ class Helpers(object):
             time.sleep(0.02)
 
 
-class ApiServerMock(object):
+class ApiServerMock:
     """
     Controller for the test API server, allowing tests to customize the
     response of any endpoint (see the `api_server` fixture below)
@@ -721,7 +719,7 @@ class ApiServerMock(object):
         return self._responses.get(path)
 
 
-class ApiServerHandler(http.server.SimpleHTTPRequestHandler, object):
+class ApiServerHandler(http.server.SimpleHTTPRequestHandler):
     """
     HTTP request handler for the test server, serving the static files from
     "tests/data/server", optionally customized by an `ApiServerMock`
@@ -731,13 +729,13 @@ class ApiServerHandler(http.server.SimpleHTTPRequestHandler, object):
     api_mock = ApiServerMock()
 
     def translate_path(self, path):
-        path = super(ApiServerHandler, self).translate_path(path)
+        path = super().translate_path(path)
         relpath = os.path.relpath(path, os.curdir)
         return os.path.join(DATA_DIR, "server", relpath)
 
     def do_GET(self):
         if not self._respond_from_mock():
-            super(ApiServerHandler, self).do_GET()
+            super().do_GET()
 
     def do_POST(self):
         content_length = int(self.headers.get("Content-Length", 0))
@@ -751,7 +749,7 @@ class ApiServerHandler(http.server.SimpleHTTPRequestHandler, object):
             self.end_headers()
             self.wfile.write(b'{"redirect_url": "https://example.com/order/123"}')
         else:
-            super(ApiServerHandler, self).do_POST()
+            super().do_POST()
 
     def _respond_from_mock(self):
         """Respond with the custom response for this path, if one is set"""

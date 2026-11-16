@@ -1,12 +1,9 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
-import os
-import time
-
 """
 Test creating local libraries
 """
+
+import os
+import time
 
 
 def test_default_values(librepcb, helpers):

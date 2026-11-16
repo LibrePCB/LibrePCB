@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 """
 Test switching tabs
 """
@@ -50,48 +47,48 @@ def test_new_library_element_tabs(librepcb):
 def test_existing_library_element_tabs(librepcb):
     librepcb.add_local_library_to_workspace("libraries/Populated Library.lplib")
     elements = [
-        dict(
-            items="LibraryContentTab::categories-view LibraryTreeView::item-ta *",
-            category=0,
-            index=3,
-            name="Capacitors",  # Component category
-        ),
-        dict(
-            items="LibraryContentTab::categories-view LibraryTreeView::item-ta *",
-            category=0,
-            index=19,
-            name="R-SMT",  # Package category
-        ),
-        dict(
-            items="LibraryContentTab::elements-view LibraryTreeView::item-ta *",
-            category=3,  # Capacitors
-            index=1,
-            name="C-0805",  # Device
-        ),
-        dict(
-            items="LibraryContentTab::elements-view LibraryTreeView::item-ta *",
-            category=3,  # Capacitors
-            index=3,
-            name="Capacitor Bipolar",  # Component
-        ),
-        dict(
-            items="LibraryContentTab::elements-view LibraryTreeView::item-ta *",
-            category=3,  # Capacitors
-            index=6,
-            name="Capacitor Bipolar EU",  # Symbol
-        ),
-        dict(
-            items="LibraryContentTab::elements-view LibraryTreeView::item-ta *",
-            category=19,  # R-SMT
-            index=2,
-            name="R-0603",  # Package
-        ),
-        dict(
-            items="LibraryContentTab::elements-view LibraryTreeView::item-ta *",
-            category=22,  # Organizations
-            index=1,
-            name="AISLER",  # Organization
-        ),
+        {
+            "items": "LibraryContentTab::categories-view LibraryTreeView::item-ta *",
+            "category": 0,
+            "index": 3,
+            "name": "Capacitors",  # Component category
+        },
+        {
+            "items": "LibraryContentTab::categories-view LibraryTreeView::item-ta *",
+            "category": 0,
+            "index": 19,
+            "name": "R-SMT",  # Package category
+        },
+        {
+            "items": "LibraryContentTab::elements-view LibraryTreeView::item-ta *",
+            "category": 3,  # Capacitors
+            "index": 1,
+            "name": "C-0805",  # Device
+        },
+        {
+            "items": "LibraryContentTab::elements-view LibraryTreeView::item-ta *",
+            "category": 3,  # Capacitors
+            "index": 3,
+            "name": "Capacitor Bipolar",  # Component
+        },
+        {
+            "items": "LibraryContentTab::elements-view LibraryTreeView::item-ta *",
+            "category": 3,  # Capacitors
+            "index": 6,
+            "name": "Capacitor Bipolar EU",  # Symbol
+        },
+        {
+            "items": "LibraryContentTab::elements-view LibraryTreeView::item-ta *",
+            "category": 19,  # R-SMT
+            "index": 2,
+            "name": "R-0603",  # Package
+        },
+        {
+            "items": "LibraryContentTab::elements-view LibraryTreeView::item-ta *",
+            "category": 22,  # Organizations
+            "index": 1,
+            "name": "AISLER",  # Organization
+        },
     ]
 
     with librepcb.open() as app:
