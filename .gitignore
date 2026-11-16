@@ -21,7 +21,6 @@ Thumbs.db
 .~lock.*
 
 # Directories
-dev/doxygen/output/
 build/
 
 # Translation Files

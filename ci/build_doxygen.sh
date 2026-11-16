@@ -11,11 +11,11 @@ popd
 # Build Rust documentation
 files=$(git ls-files -- '**Cargo.toml')
 for f in $files; do
-  cargo doc --manifest-path="$f" --target-dir="./dev/doxygen/output/rust/" \
+  cargo doc --manifest-path="$f" --target-dir="./dev/doxygen/build/rust/" \
     --no-deps --document-private-items --features="fail-on-warnings,ffi"
-  cp -rf ./dev/doxygen/output/rust/doc/* ./dev/doxygen/output/html/
-  rm -rf ./dev/doxygen/output/rust
+  cp -rf ./dev/doxygen/build/rust/doc/* ./dev/doxygen/build/html/
+  rm -rf ./dev/doxygen/build/rust
 done
 
 mkdir -p ./artifacts
-cp -r ./dev/doxygen/output/. ./artifacts/doxygen/
+cp -r ./dev/doxygen/build/. ./artifacts/doxygen/
