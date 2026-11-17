@@ -1,12 +1,10 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
-import platform
-import pytest
-
 """
 Test if the UI is translated according to the configured language
 """
+
+import platform
+
+import pytest
 
 LANGUAGE_ELEMENT_ID = "MainMenuBar::file-menu-item"
 LANGUAGES = [

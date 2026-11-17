@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 """
 Test if the side panel automatically switches to the previously memorized
 page when the current tab changes.

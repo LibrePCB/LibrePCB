@@ -1,12 +1,8 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
-import time
-
-
 """
 Test the various library update modes
 """
+
+import time
 
 REMOTE_LIBRARY_COUNT = 3  # The dummy API provides 3 libraries
 

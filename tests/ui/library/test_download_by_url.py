@@ -1,12 +1,9 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
-import os
-import time
-
 """
 Test downloading local libraries by URL
 """
+
+import os
+import time
 
 URL = "http://localhost:50080/blobs/LibrePCB_Base.zip"
 
