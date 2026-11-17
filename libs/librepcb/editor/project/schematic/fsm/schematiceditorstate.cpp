@@ -70,8 +70,12 @@ namespace editor {
  ******************************************************************************/
 
 SchematicEditorState::SchematicEditorState(const Context& context,
+                                           QAnyStringView settingsGroup,
                                            QObject* parent) noexcept
-  : QObject(parent), mContext(context), mAdapter(context.adapter) {
+  : QObject(parent),
+    mContext(context),
+    mAdapter(context.adapter),
+    mSettings({"schematic_editor", settingsGroup}) {
 }
 
 SchematicEditorState::~SchematicEditorState() noexcept {

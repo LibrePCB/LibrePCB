@@ -275,7 +275,16 @@ public:
    *
    * @throw Exception if the layer was not found.
    */
-  static const Layer& get(const QString& id);
+  static const Layer& get(QStringView id);
+
+  /**
+   * @brief Find a layer by its identifier
+   *
+   * @param id  Layer identifier.
+   *
+   * @return Pointer to layer if found, `nullptr` if not found.
+   */
+  static const Layer* find(QStringView id);
 
   /**
    * @brief Comparison for sorting layers by function

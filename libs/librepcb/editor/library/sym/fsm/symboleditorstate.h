@@ -23,6 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../../clientsettings.h"
 #include "../../../graphics/graphicsscene.h"
 #include "symboleditorfsm.h"
 #include "symboleditorfsmadapter.h"
@@ -51,6 +52,14 @@ class SymbolClipboardData;
 /**
  * @brief The SymbolEditorState class is the base class of all symbol editor FSM
  * states
+ *
+ * @note  In contrast to the schematic/board editors, the library editors
+ *        usually don't persist toolbar settings. This is by intention to
+ *        enforce a consistent look&feel of library elements, the tools always
+ *        start with the recommended settings (possibly depending on the
+ *        chosen layer, e.g. for polygon tools). If this is not desired by
+ *        some people (who don't use the official libraries), we should provide
+ *        a way to *change* the default values by users.
  */
 class SymbolEditorState : public QObject {
   Q_OBJECT
@@ -61,7 +70,9 @@ public:
   // Constructors / Destructor
   SymbolEditorState() = delete;
   SymbolEditorState(const SymbolEditorState& other) = delete;
-  explicit SymbolEditorState(const Context& context) noexcept;
+  explicit SymbolEditorState(const Context& context,
+                             QAnyStringView settingsGroup,
+                             QObject* parent = nullptr) noexcept;
   ~SymbolEditorState() noexcept override;
 
   // General Methods
@@ -159,12 +170,32 @@ protected:  // Methods
   static const QSet<const Layer*>& getAllowedTextLayers() noexcept;
   static const QSet<const Layer*>& getAllowedCircleAndPolygonLayers() noexcept;
 
+  /**
+   * @brief Get default line settings per layer
+   *
+   * @param layer Layer to consider.
+   *
+   * @return Default line width.
+   */
+  static UnsignedLength getDefaultLineWidth(const Layer& layer) noexcept;
+
+  /**
+   * @brief Get default polygon/circle settings per layer
+   *
+   * @param layer Layer to consider.
+   *
+   * @return Default line width, filled, and grab-area properties.
+   */
+  static std::tuple<UnsignedLength, bool, bool> getDefaultPolygonSettings(
+      const Layer& layer) noexcept;
+
 private:  // Data
   std::unique_ptr<SymbolClipboardData> mDataToPaste;
 
 protected:  // Data
   Context mContext;
   SymbolEditorFsmAdapter& mAdapter;
+  ClientSettings mSettings;  ///< Scoped to the current FSM state / editor tool
 };
 
 /*******************************************************************************

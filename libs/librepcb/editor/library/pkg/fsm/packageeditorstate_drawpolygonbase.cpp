@@ -46,21 +46,21 @@ namespace editor {
  ******************************************************************************/
 
 PackageEditorState_DrawPolygonBase::PackageEditorState_DrawPolygonBase(
-    Context& context, Mode mode) noexcept
-  : PackageEditorState(context),
+    Context& context, QAnyStringView settingsGroup, Mode mode) noexcept
+  : PackageEditorState(context, settingsGroup),
     mMode(mode),
     mIsUndoCmdActive(false),
     mArcInSecondState(false),
-    mCurrentProperties(
-        Uuid::createRandom(),  // UUID is not relevant here
-        Layer::topLegend(),  // Most important layer
-        UnsignedLength(200000),  // Typical width according library conventions
-        false,  // Fill is needed very rarely
-        false,  // Avoid creating annoying grab areas "by accident"
-        Path()  // Path is not relevant here
-        ),
+    mCurrentProperties(Uuid::createRandom(),  // UUID is not relevant here
+                       Layer::topLegend(),  // Most important layer
+                       UnsignedLength(0),  // Width will be overridden later
+                       false,  // Filled will be overridden later
+                       false,  // Grab area will be overridden later
+                       Path()  // Path is not relevant here
+                       ),
     mCurrentPolygon(nullptr),
     mCurrentEditCmd(nullptr) {
+  loadLayerSpecificSettings();
 }
 
 PackageEditorState_DrawPolygonBase::
@@ -163,65 +163,79 @@ QSet<const Layer*> PackageEditorState_DrawPolygonBase::getAvailableLayers()
 }
 
 void PackageEditorState_DrawPolygonBase::setLayer(const Layer& layer) noexcept {
-  if (mCurrentProperties.setLayer(layer)) {
-    emit layerChanged(mCurrentProperties.getLayer());
+  if (!mCurrentProperties.setLayer(layer)) {
+    return;
   }
+
+  emit layerChanged(mCurrentProperties.getLayer());
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setLayer(mCurrentProperties.getLayer(), true);
   }
 
-  if (mUsedLineWidths.contains(&layer)) {
-    setLineWidth(*mUsedLineWidths.find(&layer));
-  } else if (layer.getPolygonsRepresentAreas()) {
-    // Zero-width polygons.
-    setLineWidth(UnsignedLength(0));
-  } else {
-    // Typical width according library conventions.
-    setLineWidth(UnsignedLength(200000));
-  }
-
+  loadLayerSpecificSettings();
   updateSnapCandidates();
 }
 
 void PackageEditorState_DrawPolygonBase::setLineWidth(
     const UnsignedLength& width) noexcept {
-  if (mCurrentProperties.setLineWidth(width)) {
-    emit lineWidthChanged(mCurrentProperties.getLineWidth());
+  if (!mCurrentProperties.setLineWidth(width)) {
+    return;
   }
+
+  emit lineWidthChanged(mCurrentProperties.getLineWidth());
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setLineWidth(mCurrentProperties.getLineWidth(), true);
   }
 
-  mUsedLineWidths.insert(&mCurrentProperties.getLayer(), width);
+  memorizeCurrentSettings();
+}
+
+void PackageEditorState_DrawPolygonBase::resetLineWidth() noexcept {
+  if ((mMode == Mode::LINE) || (mMode == Mode::ARC)) {
+    setLineWidth(getDefaultLineWidth(mCurrentProperties.getLayer()));
+  } else {
+    setLineWidth(
+        std::get<0>(getDefaultPolygonSettings(mCurrentProperties.getLayer())));
+  }
 }
 
 void PackageEditorState_DrawPolygonBase::setFilled(bool filled) noexcept {
-  if (mCurrentProperties.setIsFilled(filled)) {
-    emit filledChanged(mCurrentProperties.isFilled());
+  if (!mCurrentProperties.setIsFilled(filled)) {
+    return;
   }
+
+  emit filledChanged(mCurrentProperties.isFilled());
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setIsFilled(mCurrentProperties.isFilled(), true);
   }
+
+  memorizeCurrentSettings();
 }
 
 void PackageEditorState_DrawPolygonBase::setGrabArea(bool grabArea) noexcept {
-  if (mCurrentProperties.setIsGrabArea(grabArea)) {
-    emit grabAreaChanged(mCurrentProperties.isGrabArea());
+  if (!mCurrentProperties.setIsGrabArea(grabArea)) {
+    return;
   }
+
+  emit grabAreaChanged(mCurrentProperties.isGrabArea());
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setIsGrabArea(mCurrentProperties.isGrabArea(), true);
   }
+
+  memorizeCurrentSettings();
 }
 
 void PackageEditorState_DrawPolygonBase::setAngle(const Angle& angle) noexcept {
-  if (angle != mLastAngle) {
-    mLastAngle = angle;
-    emit angleChanged(mLastAngle);
+  if (angle == mLastAngle) {
+    return;
   }
+
+  mLastAngle = angle;
+  emit angleChanged(mLastAngle);
 
   if (mCurrentPolygon && mCurrentEditCmd) {
     Path path = mCurrentPolygon->getPath();
@@ -590,6 +604,33 @@ void PackageEditorState_DrawPolygonBase::updateSnapCandidates() noexcept {
       }
     }
   }
+}
+
+void PackageEditorState_DrawPolygonBase::loadLayerSpecificSettings() noexcept {
+  auto it = mUsedSettings.find(&mCurrentProperties.getLayer());
+  if (it != mUsedSettings.end()) {
+    const auto [width, filled, grabArea] = *it;
+    setLineWidth(width);
+    setFilled(filled);
+    setGrabArea(grabArea);
+  } else if ((mMode == Mode::LINE) || (mMode == Mode::ARC)) {
+    setLineWidth(getDefaultLineWidth(mCurrentProperties.getLayer()));
+    setFilled(false);
+    setGrabArea(false);
+  } else {
+    const auto [width, filled, grabArea] =
+        getDefaultPolygonSettings(mCurrentProperties.getLayer());
+    setLineWidth(width);
+    setFilled(filled);
+    setGrabArea(grabArea);
+  }
+}
+
+void PackageEditorState_DrawPolygonBase::memorizeCurrentSettings() noexcept {
+  mUsedSettings.insert(&mCurrentProperties.getLayer(),
+                       std::make_tuple(mCurrentProperties.getLineWidth(),
+                                       mCurrentProperties.isFilled(),
+                                       mCurrentProperties.isGrabArea()));
 }
 
 /*******************************************************************************

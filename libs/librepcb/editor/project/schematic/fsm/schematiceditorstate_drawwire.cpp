@@ -22,7 +22,6 @@
  ******************************************************************************/
 #include "schematiceditorstate_drawwire.h"
 
-#include "../../../editorcommandset.h"
 #include "../../../undostack.h"
 #include "../../../utils/editortoolbox.h"
 #include "../../cmd/cmdchangenetsignalofschematicnetsegment.h"
@@ -72,10 +71,11 @@ namespace editor {
 
 SchematicEditorState_DrawWire::SchematicEditorState_DrawWire(
     const Context& context) noexcept
-  : SchematicEditorState(context),
+  : SchematicEditorState(context, "draw_wire"),
     mCircuit(context.project.getCircuit()),
     mSubState(SubState::IDLE),
-    mCurrentWireMode(WireMode::HV),
+    mCurrentWireMode(
+        mSettings.get<WireMode>("wire_mode").value_or(WireMode::HV)),
     mCursorPos(),
     mFixedStartAnchor(nullptr),
     mCurrentNetSegment(nullptr),
@@ -239,10 +239,13 @@ bool SchematicEditorState_DrawWire::
  ******************************************************************************/
 
 void SchematicEditorState_DrawWire::setWireMode(WireMode mode) noexcept {
-  if (mode != mCurrentWireMode) {
-    mCurrentWireMode = mode;
-    emit wireModeChanged(mCurrentWireMode);
+  if (mode == mCurrentWireMode) {
+    return;
   }
+
+  mCurrentWireMode = mode;
+  mSettings.set("wire_mode", mode);
+  emit wireModeChanged(mCurrentWireMode);
 
   if (mSubState == SubState::POSITIONING_NETPOINT) {
     updateNetpointPositions(true);

@@ -46,18 +46,18 @@ namespace editor {
 
 PackageEditorState_DrawCircle::PackageEditorState_DrawCircle(
     Context& context) noexcept
-  : PackageEditorState(context),
-    mCurrentProperties(
-        Uuid::createRandom(),  // Not relevant
-        Layer::topLegend(),  // Most important layer
-        UnsignedLength(200000),  // Typical width according library conventions
-        false,  // Fill is needed very rarely
-        false,  // Avoid creating annoying grab areas "by accident"
-        Point(),  // Center is not relevant
-        PositiveLength(1)  // Diameter is not relevant
-        ),
+  : PackageEditorState(context, "draw_circle"),
+    mCurrentProperties(Uuid::createRandom(),  // Not relevant
+                       Layer::topLegend(),  // Most important layer
+                       UnsignedLength(0),  // Width will be overridden later
+                       false,  // Filled will be overridden later
+                       false,  // Grab area will be overridden later
+                       Point(),  // Center is not relevant
+                       PositiveLength(1)  // Diameter is not relevant
+                       ),
     mCurrentCircle(nullptr),
     mCurrentGraphicsItem(nullptr) {
+  loadLayerSpecificSettings();
 }
 
 PackageEditorState_DrawCircle::~PackageEditorState_DrawCircle() noexcept {
@@ -128,56 +128,65 @@ QSet<const Layer*> PackageEditorState_DrawCircle::getAvailableLayers()
 }
 
 void PackageEditorState_DrawCircle::setLayer(const Layer& layer) noexcept {
-  if (mCurrentProperties.setLayer(layer)) {
-    emit layerChanged(mCurrentProperties.getLayer());
+  if (!mCurrentProperties.setLayer(layer)) {
+    return;
   }
+
+  emit layerChanged(mCurrentProperties.getLayer());
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setLayer(mCurrentProperties.getLayer(), true);
   }
 
-  if (mUsedLineWidths.contains(&layer)) {
-    setLineWidth(*mUsedLineWidths.find(&layer));
-  } else if (layer.getPolygonsRepresentAreas()) {
-    // Zero-width circles.
-    setLineWidth(UnsignedLength(0));
-  } else {
-    // Typical width according library conventions.
-    setLineWidth(UnsignedLength(200000));
-  }
+  loadLayerSpecificSettings();
 }
 
 void PackageEditorState_DrawCircle::setLineWidth(
     const UnsignedLength& width) noexcept {
-  if (mCurrentProperties.setLineWidth(width)) {
-    emit lineWidthChanged(mCurrentProperties.getLineWidth());
+  if (!mCurrentProperties.setLineWidth(width)) {
+    return;
   }
+
+  emit lineWidthChanged(mCurrentProperties.getLineWidth());
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setLineWidth(mCurrentProperties.getLineWidth(), true);
   }
 
-  mUsedLineWidths.insert(&mCurrentProperties.getLayer(), width);
+  memorizeCurrentSettings();
+}
+
+void PackageEditorState_DrawCircle::resetLineWidth() noexcept {
+  setLineWidth(
+      std::get<0>(getDefaultPolygonSettings(mCurrentProperties.getLayer())));
 }
 
 void PackageEditorState_DrawCircle::setFilled(bool filled) noexcept {
-  if (mCurrentProperties.setIsFilled(filled)) {
-    emit filledChanged(mCurrentProperties.isFilled());
+  if (!mCurrentProperties.setIsFilled(filled)) {
+    return;
   }
+
+  emit filledChanged(mCurrentProperties.isFilled());
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setIsFilled(mCurrentProperties.isFilled(), true);
   }
+
+  memorizeCurrentSettings();
 }
 
 void PackageEditorState_DrawCircle::setGrabArea(bool grabArea) noexcept {
-  if (mCurrentProperties.setIsGrabArea(grabArea)) {
-    emit grabAreaChanged(mCurrentProperties.isGrabArea());
+  if (!mCurrentProperties.setIsGrabArea(grabArea)) {
+    return;
   }
+
+  emit grabAreaChanged(mCurrentProperties.isGrabArea());
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setIsGrabArea(mCurrentProperties.isGrabArea(), true);
   }
+
+  memorizeCurrentSettings();
 }
 
 /*******************************************************************************
@@ -262,6 +271,29 @@ void PackageEditorState_DrawCircle::updateSnapCandidates() noexcept {
       mSnapCandidates.insert(c.getCenter());
     }
   }
+}
+
+void PackageEditorState_DrawCircle::loadLayerSpecificSettings() noexcept {
+  auto it = mUsedSettings.find(&mCurrentProperties.getLayer());
+  if (it != mUsedSettings.end()) {
+    const auto [width, filled, grabArea] = *it;
+    setLineWidth(width);
+    setFilled(filled);
+    setGrabArea(grabArea);
+  } else {
+    const auto [width, filled, grabArea] =
+        getDefaultPolygonSettings(mCurrentProperties.getLayer());
+    setLineWidth(width);
+    setFilled(filled);
+    setGrabArea(grabArea);
+  }
+}
+
+void PackageEditorState_DrawCircle::memorizeCurrentSettings() noexcept {
+  mUsedSettings.insert(&mCurrentProperties.getLayer(),
+                       std::make_tuple(mCurrentProperties.getLineWidth(),
+                                       mCurrentProperties.isFilled(),
+                                       mCurrentProperties.isGrabArea()));
 }
 
 /*******************************************************************************

@@ -25,6 +25,7 @@
  ******************************************************************************/
 #include "schematiceditorstate.h"
 
+#include <librepcb/core/types/enums.h>
 #include <librepcb/core/types/point.h>
 
 #include <QtCore>
@@ -62,18 +63,6 @@ class SchematicEditorState_DrawWire final : public SchematicEditorState {
   };
 
 public:
-  /**
-   * @brief All available wire modes
-   */
-  enum class WireMode {
-    HV,  ///< horizontal - vertical [default]
-    VH,  ///< vertical - horizontal
-    Deg9045,  ///< 90° - 45°
-    Deg4590,  ///< 45° - 90°
-    Straight,  ///< straight
-    _COUNT,
-  };
-
   // Constructors / Destructor
   SchematicEditorState_DrawWire() = delete;
   SchematicEditorState_DrawWire(const SchematicEditorState_DrawWire& other) =

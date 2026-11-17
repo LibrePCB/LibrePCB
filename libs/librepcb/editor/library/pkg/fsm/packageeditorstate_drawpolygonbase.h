@@ -58,7 +58,9 @@ public:
   PackageEditorState_DrawPolygonBase() = delete;
   PackageEditorState_DrawPolygonBase(
       const PackageEditorState_DrawPolygonBase& other) = delete;
-  PackageEditorState_DrawPolygonBase(Context& context, Mode mode) noexcept;
+  PackageEditorState_DrawPolygonBase(Context& context,
+                                     QAnyStringView settingsGroup,
+                                     Mode mode) noexcept;
   ~PackageEditorState_DrawPolygonBase() noexcept override;
 
   // General Methods
@@ -86,6 +88,7 @@ public:
     return mCurrentProperties.getLineWidth();
   }
   void setLineWidth(const UnsignedLength& width) noexcept;
+  void resetLineWidth() noexcept;
   bool getFilled() const noexcept { return mCurrentProperties.isFilled(); }
   void setFilled(bool filled) noexcept;
   bool getGrabArea() const noexcept { return mCurrentProperties.isGrabArea(); }
@@ -116,12 +119,8 @@ private:  // Methods
   void updateOverlayText() noexcept;
   void updateStatusBarMessage() noexcept;
   void updateSnapCandidates() noexcept;
-
-  void layerComboBoxValueChanged(const Layer& layer) noexcept;
-  void lineWidthEditValueChanged(const UnsignedLength& value) noexcept;
-  void angleEditValueChanged(const Angle& value) noexcept;
-  void fillCheckBoxCheckedChanged(bool checked) noexcept;
-  void grabAreaCheckBoxCheckedChanged(bool checked) noexcept;
+  void loadLayerSpecificSettings() noexcept;
+  void memorizeCurrentSettings() noexcept;
 
 private:
   const Mode mMode;
@@ -137,7 +136,7 @@ private:
 
   // Current tool settings
   Polygon mCurrentProperties;
-  QHash<const Layer*, UnsignedLength> mUsedLineWidths;
+  QHash<const Layer*, std::tuple<UnsignedLength, bool, bool>> mUsedSettings;
 
   // Information about the current polygon to place. Only valid if
   // mIsUndoCmdActive == true.

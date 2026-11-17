@@ -37,7 +37,6 @@ export component AddViaToolBar inherits HorizontalLayout {
         has-dropdown: true;
 
         value-changed(v) => {
-            tabs[section.current-tab-index].tool-pressfit = false;
             tabs[section.current-tab-index].tool-drill.value = v;
         }
 
@@ -46,12 +45,10 @@ export component AddViaToolBar inherits HorizontalLayout {
         }
 
         increase-triggered => {
-            tabs[section.current-tab-index].tool-pressfit = false;
             tabs[section.current-tab-index].tool-drill.increase = true;
         }
 
         decrease-triggered => {
-            tabs[section.current-tab-index].tool-pressfit = false;
             tabs[section.current-tab-index].tool-drill.decrease = true;
         }
 
@@ -97,10 +94,8 @@ export component AddViaToolBar inherits HorizontalLayout {
         min-width-text: "1.234";
         auto-supported: true;
         auto-checked: tabs[section.current-tab-index].tool-mirrored;
-        enabled: !via-drill-edt.auto-checked;
 
         value-changed(v) => {
-            tabs[section.current-tab-index].tool-mirrored = false;
             tabs[section.current-tab-index].tool-size.value = v;
         }
 
@@ -109,12 +104,10 @@ export component AddViaToolBar inherits HorizontalLayout {
         }
 
         increase-triggered => {
-            tabs[section.current-tab-index].tool-mirrored = false;
             tabs[section.current-tab-index].tool-size.increase = true;
         }
 
         decrease-triggered => {
-            tabs[section.current-tab-index].tool-mirrored = false;
             tabs[section.current-tab-index].tool-size.decrease = true;
         }
 

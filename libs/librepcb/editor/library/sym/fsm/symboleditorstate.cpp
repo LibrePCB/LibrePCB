@@ -39,8 +39,13 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-SymbolEditorState::SymbolEditorState(const Context& context) noexcept
-  : QObject(nullptr), mContext(context), mAdapter(mContext.adapter) {
+SymbolEditorState::SymbolEditorState(const Context& context,
+                                     QAnyStringView settingsGroup,
+                                     QObject* parent) noexcept
+  : QObject(parent),
+    mContext(context),
+    mAdapter(mContext.adapter),
+    mSettings({"symbol_editor", settingsGroup}) {
 }
 
 SymbolEditorState::~SymbolEditorState() noexcept {
@@ -108,6 +113,25 @@ const QSet<const Layer*>&
       &Layer::schematicComments(),    &Layer::schematicGuide(),
   };
   return layers;
+}
+
+UnsignedLength SymbolEditorState::getDefaultLineWidth(
+    const Layer& layer) noexcept {
+  // Typical properties according library conventions.
+  Q_UNUSED(layer);  // Currently independent of layer.
+  return UnsignedLength(200000);
+}
+
+std::tuple<UnsignedLength, bool, bool>
+    SymbolEditorState::getDefaultPolygonSettings(const Layer& layer) noexcept {
+  // Typical properties according library conventions.
+  if (layer == Layer::symbolOutlines()) {
+    return std::make_tuple(UnsignedLength(200000), false, true);
+  } else if (layer == Layer::symbolHiddenGrabAreas()) {
+    return std::make_tuple(UnsignedLength(0), true, true);
+  } else {
+    return std::make_tuple(UnsignedLength(200000), false, false);
+  }
 }
 
 /*******************************************************************************

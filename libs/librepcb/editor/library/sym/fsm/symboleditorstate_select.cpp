@@ -65,7 +65,7 @@ namespace editor {
 
 SymbolEditorState_Select::SymbolEditorState_Select(
     const Context& context) noexcept
-  : SymbolEditorState(context),
+  : SymbolEditorState(context, "select"),
     mSubState(SubState::Idle),
     mStartPos(),
     mSelectedPolygon(nullptr),

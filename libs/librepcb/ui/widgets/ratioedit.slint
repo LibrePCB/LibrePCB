@@ -44,7 +44,8 @@ export component RatioEdit inherits Rectangle {
     accessible-role: spinbox;
     accessible-description: tooltip.is-empty ? "ratio" : tooltip;
     accessible-enabled: enabled;
-    accessible-value: edt.text + " percent";
+    accessible-read-only: read-only;
+    accessible-value: edt.text;
     accessible-action-increment => {
         up-btn.clicked();
     }
@@ -52,8 +53,11 @@ export component RatioEdit inherits Rectangle {
         down-btn.clicked();
     }
     accessible-action-set-value(s) => {
-        edt.text = s;
-        edt.edited();
+        if enabled && (!read-only) {
+            edt.text = s;
+            edt.edited();
+            edt.accepted();
+        }
     }
 
     changed value => {
@@ -152,13 +156,13 @@ export component RatioEdit inherits Rectangle {
 
                 key-pressed(event) => {
                     if event.text == Key.UpArrow {
-                        if can-increase {
+                        if can-increase && (!read-only) {
                             disable-update = false;
                             increase-triggered();
                         }
                         return accept;
                     } else if event.text == Key.DownArrow {
-                        if can-decrease {
+                        if can-decrease && (!read-only) {
                             disable-update = false;
                             decrease-triggered();
                         }
@@ -175,7 +179,7 @@ export component RatioEdit inherits Rectangle {
             VerticalLayout {
                 up-btn := ControlIconButton {
                     width: 15px;
-                    enabled: enabled && can-increase;
+                    enabled: enabled && (!read-only) && can-increase;
                     background-color: transparent;
                     icon: @image-url("../../../font-awesome/svgs/solid/caret-up.svg");
                     icon-offset-y: 1px;
@@ -189,7 +193,7 @@ export component RatioEdit inherits Rectangle {
 
                 down-btn := ControlIconButton {
                     width: 15px;
-                    enabled: enabled && can-decrease;
+                    enabled: enabled && (!read-only) && can-decrease;
                     background-color: transparent;
                     icon: @image-url("../../../font-awesome/svgs/solid/caret-down.svg");
                     icon-offset-y: -1px;
@@ -204,14 +208,16 @@ export component RatioEdit inherits Rectangle {
         }
 
         scroll-event(event) => {
-            if event.delta-y > 0 {
-                disable-update = false;
-                increase-triggered();
-                return accept;
-            } else if event.delta-y < 0 {
-                disable-update = false;
-                decrease-triggered();
-                return accept;
+            if (!read-only) {
+                if event.delta-y > 0 {
+                    disable-update = false;
+                    increase-triggered();
+                    return accept;
+                } else if event.delta-y < 0 {
+                    disable-update = false;
+                    decrease-triggered();
+                    return accept;
+                }
             }
             reject
         }

@@ -89,6 +89,7 @@ add_executable(
   core/types/angletest.cpp
   core/types/busnametest.cpp
   core/types/circuitidentifiertest.cpp
+  core/types/enumstest.cpp
   core/types/fileproofnametest.cpp
   core/types/lengthtest.cpp
   core/types/pointtest.cpp
@@ -112,6 +113,7 @@ add_executable(
   eagleimport/eaglelibraryimporttest.cpp
   eagleimport/eagleprojectimporttest.cpp
   eagleimport/eagletypeconvertertest.cpp
+  editor/clientsettingstest.cpp
   editor/dialogs/dxfimportdialogtest.cpp
   editor/dialogs/graphicsexportdialogtest.cpp
   editor/library/cat/categorytreebuildertest.cpp

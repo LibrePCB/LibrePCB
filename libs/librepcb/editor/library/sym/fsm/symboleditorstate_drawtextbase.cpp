@@ -41,27 +41,62 @@
 namespace librepcb {
 namespace editor {
 
+static Text getInitialProperties(SymbolEditorState_DrawTextBase::Mode mode,
+                                 const ClientSettings& settings,
+                                 const QSet<const Layer*>& layers) noexcept {
+  switch (mode) {
+    case SymbolEditorState_DrawTextBase::Mode::NAME:
+      // Set all properties according library conventions
+      return Text{
+          Uuid::createRandom(),  // Not relevant
+          Layer::symbolNames(),  // Layer
+          "{{NAME}}",  // Text
+          Point(),  // Position
+          Angle::deg0(),  // Rotation
+          SymbolEditorState_DrawTextBase::getDefaultHeight(),  // Height
+          Alignment(HAlign::left(), VAlign::bottom()),  // Alignment
+          false  // Locked
+      };
+    case SymbolEditorState_DrawTextBase::Mode::VALUE:
+      // Set all properties according library conventions
+      return Text{
+          Uuid::createRandom(),  // Not relevant
+          Layer::symbolValues(),  // Layer
+          "{{VALUE}}",  // Text
+          Point(),  // Position
+          Angle::deg0(),  // Rotation
+          SymbolEditorState_DrawTextBase::getDefaultHeight(),  // Height
+          Alignment(HAlign::left(), VAlign::top()),  // Alignment
+          false  // Locked
+      };
+    default:
+      return Text{
+          Uuid::createRandom(),  // Not relevant
+          *settings.get("layer", layers)
+               .value_or(&Layer::symbolOutlines()),  // Layer
+          "Text",  // Non-empty to avoid invisible graphics item
+          Point(),  // Position
+          Angle::deg0(),  // Rotation
+          SymbolEditorState_DrawTextBase::getDefaultHeight(),  // Height
+          Alignment(HAlign::left(), VAlign::bottom()),  // Alignment
+          true  // Locked
+      };
+  }
+}
+
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
 
 SymbolEditorState_DrawTextBase::SymbolEditorState_DrawTextBase(
-    const Context& context, Mode mode) noexcept
-  : SymbolEditorState(context),
+    const Context& context, QAnyStringView settingsGroup, Mode mode) noexcept
+  : SymbolEditorState(context, settingsGroup),
     mMode(mode),
     mCurrentProperties(
-        Uuid::createRandom(),  // Not relevant
-        Layer::symbolNames(),  // Layer
-        QString(),  // Text
-        Point(),  // Position
-        Angle::deg0(),  // Rotation
-        PositiveLength(1),  // Height
-        Alignment(HAlign::left(), VAlign::bottom()),  // Alignment
-        false  // Locked
-        ),
+        getInitialProperties(mode, mSettings, getAvailableLayers())),
     mCurrentText(nullptr),
     mCurrentGraphicsItem(nullptr) {
-  resetToDefaultParameters();
+  loadLayerSpecificClientSettings();
 }
 
 SymbolEditorState_DrawTextBase::~SymbolEditorState_DrawTextBase() noexcept {
@@ -73,10 +108,6 @@ SymbolEditorState_DrawTextBase::~SymbolEditorState_DrawTextBase() noexcept {
  ******************************************************************************/
 
 bool SymbolEditorState_DrawTextBase::entry() noexcept {
-  if (mMode != Mode::TEXT) {
-    resetToDefaultParameters();
-  }
-
   const Point pos = mAdapter.fsmMapGlobalPosToScenePos(QCursor::pos())
                         .mappedToGrid(getGridInterval());
   if (!startAddText(pos)) {
@@ -148,8 +179,7 @@ bool SymbolEditorState_DrawTextBase::processMirror(
     mCurrentEditCmd->mirror(orientation, mCurrentText->getPosition(), true);
     mCurrentProperties.setRotation(mCurrentText->getRotation());
     if (mCurrentProperties.setAlign(mCurrentText->getAlign())) {
-      emit hAlignChanged(mCurrentProperties.getAlign().getH());
-      emit vAlignChanged(mCurrentProperties.getAlign().getV());
+      emit alignmentChanged(mCurrentProperties.getAlign());
     }
     return true;
   } else {
@@ -167,19 +197,26 @@ QSet<const Layer*> SymbolEditorState_DrawTextBase::getAvailableLayers()
 }
 
 void SymbolEditorState_DrawTextBase::setLayer(const Layer& layer) noexcept {
-  if (mCurrentProperties.setLayer(layer)) {
-    emit layerChanged(mCurrentProperties.getLayer());
+  if (!mCurrentProperties.setLayer(layer)) {
+    return;
   }
+
+  mSettings.set("layer", mCurrentProperties.getLayer());
+  emit layerChanged(mCurrentProperties.getLayer());
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setLayer(mCurrentProperties.getLayer(), true);
   }
+
+  loadLayerSpecificClientSettings();
 }
 
 void SymbolEditorState_DrawTextBase::setText(const QString& text) noexcept {
-  if (mCurrentProperties.setText(text)) {
-    emit textChanged(mCurrentProperties.getText());
+  if (!mCurrentProperties.setText(text)) {
+    return;
   }
+
+  emit textChanged(mCurrentProperties.getText());
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setText(mCurrentProperties.getText(), true);
@@ -205,33 +242,37 @@ const QStringList SymbolEditorState_DrawTextBase::getTextSuggestions()
   }
 }
 
+PositiveLength SymbolEditorState_DrawTextBase::getDefaultHeight() noexcept {
+  // According library conventions - do not change if the conventions have
+  // not changed!
+  return PositiveLength(2500000);
+}
+
 void SymbolEditorState_DrawTextBase::setHeight(
     const PositiveLength& height) noexcept {
-  if (mCurrentProperties.setHeight(height)) {
-    emit heightChanged(mCurrentProperties.getHeight());
+  if (!mCurrentProperties.setHeight(height)) {
+    return;
   }
+
+  mSettings.set("height/by_layer/" % mCurrentProperties.getLayer().getId(),
+                mCurrentProperties.getHeight());
+  emit heightChanged(mCurrentProperties.getHeight());
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setHeight(mCurrentProperties.getHeight(), true);
   }
 }
 
-void SymbolEditorState_DrawTextBase::setHAlign(const HAlign& align) noexcept {
-  if (mCurrentProperties.setAlign(
-          Alignment(align, mCurrentProperties.getAlign().getV()))) {
-    emit hAlignChanged(mCurrentProperties.getAlign().getH());
-  }
-
-  if (mCurrentEditCmd) {
-    mCurrentEditCmd->setAlignment(mCurrentProperties.getAlign(), true);
-  }
+void SymbolEditorState_DrawTextBase::resetHeight() noexcept {
+  setHeight(getDefaultHeight());
 }
 
-void SymbolEditorState_DrawTextBase::setVAlign(const VAlign& align) noexcept {
-  if (mCurrentProperties.setAlign(
-          Alignment(mCurrentProperties.getAlign().getH(), align))) {
-    emit vAlignChanged(mCurrentProperties.getAlign().getV());
+void SymbolEditorState_DrawTextBase::setAlign(const Alignment& align) noexcept {
+  if (!mCurrentProperties.setAlign(align)) {
+    return;
   }
+
+  emit alignmentChanged(mCurrentProperties.getAlign());
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setAlignment(mCurrentProperties.getAlign(), true);
@@ -301,36 +342,13 @@ bool SymbolEditorState_DrawTextBase::abortAddText() noexcept {
   }
 }
 
-void SymbolEditorState_DrawTextBase::resetToDefaultParameters() noexcept {
-  mCurrentProperties.setRotation(Angle::deg0());
-  switch (mMode) {
-    case Mode::NAME:
-      // Set all properties according library conventions
-      setLayer(Layer::symbolNames());
-      setHeight(PositiveLength(2500000));
-      setHAlign(HAlign::left());
-      setVAlign(VAlign::bottom());
-      setText("{{NAME}}");
-      mCurrentProperties.setLocked(false);
-      break;
-    case Mode::VALUE:
-      // Set all properties according library conventions
-      setLayer(Layer::symbolValues());
-      setHeight(PositiveLength(2500000));
-      setHAlign(HAlign::left());
-      setVAlign(VAlign::top());
-      setText("{{VALUE}}");
-      mCurrentProperties.setLocked(false);
-      break;
-    default:
-      // Set properties to something reasonable
-      setLayer(Layer::symbolOutlines());
-      setHeight(PositiveLength(2500000));
-      setHAlign(HAlign::left());
-      setVAlign(VAlign::bottom());
-      setText("Text");  // Non-empty to avoid invisible graphics item
-      mCurrentProperties.setLocked(true);
-      break;
+void SymbolEditorState_DrawTextBase::
+    loadLayerSpecificClientSettings() noexcept {
+  if (mMode == Mode::TEXT) {
+    if (auto v = mSettings.get<PositiveLength>(
+            "height/by_layer/" % mCurrentProperties.getLayer().getId())) {
+      setHeight(*v);
+    }
   }
 }
 

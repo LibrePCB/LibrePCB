@@ -36,7 +36,7 @@ namespace editor {
 
 PackageEditorState_AddNames::PackageEditorState_AddNames(
     Context& context) noexcept
-  : PackageEditorState_DrawTextBase(context, Mode::NAME) {
+  : PackageEditorState_DrawTextBase(context, "add_name", Mode::NAME) {
 }
 
 PackageEditorState_AddNames::~PackageEditorState_AddNames() noexcept {

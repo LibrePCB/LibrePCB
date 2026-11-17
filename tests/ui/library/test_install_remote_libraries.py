@@ -6,15 +6,12 @@ import os
 import platform
 
 import pytest
-from slint_testing import KeyPressedEvent, KeyReleasedEvent, keys
+from slint_testing import keys
 
 REMOTE_LIBRARY_COUNT = 3  # The dummy API provides 3 libraries
 
 
-@pytest.mark.skipif(
-    (os.name == "nt") or (platform.system() == "Darwin"),
-    reason="strange error in Windows container and flaky on macOS",
-)
+@pytest.mark.skipif(platform.system() == "Darwin", reason="flaky on macOS")
 def test_click(librepcb, helpers):
     with librepcb.open() as app:
         # Open libraries panel
@@ -87,12 +84,7 @@ def test_shortcut(librepcb, helpers):
         switches.wait_for(checked=[True, True, False])
 
         # Install selected libraries
-        panel = app.get("LibrariesPanel::remote-libs")
-        panel.click()  # Set focus
-        panel.window.dispatch_event(KeyPressedEvent(keys.Control))
-        panel.window.dispatch_event(KeyPressedEvent(keys.Return))
-        panel.window.dispatch_event(KeyReleasedEvent(keys.Return))
-        panel.window.dispatch_event(KeyReleasedEvent(keys.Control))
+        app.trigger_shortcut([keys.Control, keys.Return])
 
         # Verify that the libraries have been installed
         path = os.path.join(librepcb.workspace_path, "data/libraries/remote")

@@ -81,6 +81,7 @@ public:
     return mCurrentProperties.getLength();
   }
   void setLength(const UnsignedLength& length) noexcept;
+  void resetLength() noexcept;
 
   // Operator Overloadings
   SymbolEditorState_AddPins& operator=(const SymbolEditorState_AddPins& rhs) =
@@ -94,6 +95,7 @@ private:  // Methods
   bool addNextPin(const Point& pos) noexcept;
   CircuitIdentifier determineNextPinName() const noexcept;
   bool hasPin(const QString& name) const noexcept;
+  static UnsignedLength getDefaultLength() noexcept;
 
 private:
   SymbolPin mCurrentProperties;

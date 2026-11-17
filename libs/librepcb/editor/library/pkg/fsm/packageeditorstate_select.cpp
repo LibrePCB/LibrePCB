@@ -74,7 +74,7 @@ namespace editor {
  ******************************************************************************/
 
 PackageEditorState_Select::PackageEditorState_Select(Context& context) noexcept
-  : PackageEditorState(context),
+  : PackageEditorState(context, "select"),
     mSubState(SubState::Idle),
     mStartPos(),
     mSelectedPolygon(nullptr),

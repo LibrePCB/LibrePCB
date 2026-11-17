@@ -49,7 +49,7 @@ namespace editor {
 
 SchematicEditorState_AddImage::SchematicEditorState_AddImage(
     const Context& context) noexcept
-  : SchematicEditorState(context),
+  : SchematicEditorState(context, "add_image"),
     mUndoCmdActive(false),
     mCurrentProperties(Uuid::createRandom(),  // Not relevant
                        FileProofName("image.png"),  // Not relevant

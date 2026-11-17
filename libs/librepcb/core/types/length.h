@@ -130,7 +130,7 @@ public:
    * @note This method is useful to store lengths in files. The problem with
    * decreased precision does NOT exist by using this method!
    *
-   * @see #fromMm(const QString&)
+   * @see #fromMm(QStringView)
    */
   QString toMmString() const noexcept;
 
@@ -294,7 +294,16 @@ public:
    *
    * @see #toMmString()
    */
-  static Length fromMm(const QString& millimeters);
+  static Length fromMm(QStringView millimeters);
+
+  /**
+   * @brief Same as #fromMm(), but without exception
+   *
+   * @param millimeters See #fromMm().
+   *
+   * @return #Length object if string is valid, `std::nullopt` otherwise.
+   */
+  static std::optional<Length> tryFromMm(QStringView millimeters);
 
   /**
    * @brief Get a Length object with a specific length

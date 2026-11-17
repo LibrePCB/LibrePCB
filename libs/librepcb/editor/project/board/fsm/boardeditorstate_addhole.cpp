@@ -46,9 +46,10 @@ namespace editor {
 
 BoardEditorState_AddHole::BoardEditorState_AddHole(
     const Context& context) noexcept
-  : BoardEditorState(context),
+  : BoardEditorState(context, "add_hole"),
     mIsUndoCmdActive(false),
-    mCurrentDiameter(1000000),
+    mCurrentDiameter(mSettings.get<PositiveLength>("diameter")
+                         .value_or(PositiveLength(1000000))),
     mCurrentHoleToPlace(nullptr) {
 }
 
@@ -112,10 +113,13 @@ bool BoardEditorState_AddHole::processGraphicsSceneLeftMouseButtonDoubleClicked(
 
 void BoardEditorState_AddHole::setDiameter(
     const PositiveLength& diameter) noexcept {
-  if (diameter != mCurrentDiameter) {
-    mCurrentDiameter = diameter;
-    emit diameterChanged(mCurrentDiameter);
+  if (diameter == mCurrentDiameter) {
+    return;
   }
+
+  mCurrentDiameter = diameter;
+  mSettings.set("diameter", mCurrentDiameter);
+  emit diameterChanged(mCurrentDiameter);
 
   if (mCurrentHoleEditCmd) {
     mCurrentHoleEditCmd->setDiameter(mCurrentDiameter, true);

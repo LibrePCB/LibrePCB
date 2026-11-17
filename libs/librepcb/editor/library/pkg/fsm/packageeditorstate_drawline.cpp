@@ -36,7 +36,7 @@ namespace editor {
 
 PackageEditorState_DrawLine::PackageEditorState_DrawLine(
     Context& context) noexcept
-  : PackageEditorState_DrawPolygonBase(context, Mode::LINE) {
+  : PackageEditorState_DrawPolygonBase(context, "draw_line", Mode::LINE) {
 }
 
 PackageEditorState_DrawLine::~PackageEditorState_DrawLine() noexcept {

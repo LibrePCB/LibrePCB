@@ -164,8 +164,9 @@ BoardPadPropertiesDialog::BoardPadPropertiesDialog(
           mUi->edtSolderPasteOffset, &LengthEdit::setEnabled);
 
   // Populate functions.
-  for (int i = 0; i < static_cast<int>(Pad::Function::_COUNT); ++i) {
-    const Pad::Function value = static_cast<Pad::Function>(i);
+  const QMetaEnum functions = QMetaEnum::fromType<Pad::Function>();
+  for (int i = 0; i < functions.keyCount(); ++i) {
+    const Pad::Function value = static_cast<Pad::Function>(functions.value(i));
     mUi->cbxFunction->addItem(Pad::getFunctionDescriptionTr(value),
                               QVariant::fromValue(value));
   }

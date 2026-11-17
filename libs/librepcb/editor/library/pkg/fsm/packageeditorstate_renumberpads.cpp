@@ -51,7 +51,7 @@ namespace editor {
 
 PackageEditorState_ReNumberPads::PackageEditorState_ReNumberPads(
     Context& context) noexcept
-  : PackageEditorState(context) {
+  : PackageEditorState(context, "renumber_pads") {
 }
 
 PackageEditorState_ReNumberPads::~PackageEditorState_ReNumberPads() noexcept {

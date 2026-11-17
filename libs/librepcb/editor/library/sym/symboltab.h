@@ -160,12 +160,13 @@ public:
 
 signals:
   void layerRequested(const Layer& layer);
+  void lineWidthResetRequested();
+  void sizeResetRequested();
   void angleRequested(const Angle& angle);
   void filledRequested(bool filled);
   void grabAreaRequested(bool grabArea);
   void valueRequested(const QString& value);
-  void hAlignRequested(const HAlign& align);
-  void vAlignRequested(const VAlign& align);
+  void alignmentRequested(const Alignment& align);
 
 protected:
   void watchedFilesModifiedChanged() noexcept override;

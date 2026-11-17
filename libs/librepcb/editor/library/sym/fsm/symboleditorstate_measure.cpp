@@ -38,7 +38,7 @@ namespace editor {
 
 SymbolEditorState_Measure::SymbolEditorState_Measure(
     const Context& context) noexcept
-  : SymbolEditorState(context), mTool(new MeasureTool()) {
+  : SymbolEditorState(context, "measure"), mTool(new MeasureTool()) {
   connect(
       mTool.data(), &MeasureTool::infoBoxTextChanged, this,
       [this](const QString& text) { mAdapter.fsmSetViewInfoBoxText(text); });

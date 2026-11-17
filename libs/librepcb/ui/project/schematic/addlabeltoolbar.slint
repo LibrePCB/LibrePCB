@@ -19,7 +19,6 @@ export component AddLabelToolBar inherits HorizontalLayout {
         angle: tabs[section.current-tab-index].tool-angle.value / 1000000;
 
         angle-clicked(a) => {
-            tabs[section.current-tab-index].tool-auto-orientation = false;
             tabs[section.current-tab-index].tool-angle.value = a * 1000000;
         }
     }
@@ -32,7 +31,6 @@ export component AddLabelToolBar inherits HorizontalLayout {
         checkable: true;
 
         clicked => {
-            tabs[section.current-tab-index].tool-auto-orientation = false;
             tabs[section.current-tab-index].tool-mirrored = !self.checked;
         }
     }

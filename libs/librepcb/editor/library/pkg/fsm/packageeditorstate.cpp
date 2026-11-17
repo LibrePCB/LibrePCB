@@ -36,8 +36,13 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-PackageEditorState::PackageEditorState(Context& context) noexcept
-  : QObject(nullptr), mContext(context), mAdapter(mContext.adapter) {
+PackageEditorState::PackageEditorState(Context& context,
+                                       QAnyStringView settingsGroup,
+                                       QObject* parent) noexcept
+  : QObject(parent),
+    mContext(context),
+    mAdapter(mContext.adapter),
+    mSettings({"package_editor", settingsGroup}) {
 }
 
 PackageEditorState::~PackageEditorState() noexcept {
@@ -134,6 +139,62 @@ const QSet<const Layer*>&
       &Layer::botStopMask(),
   };
   return layers;
+}
+
+UnsignedLength PackageEditorState::getDefaultLineWidth(
+    const Layer& layer) noexcept {
+  // Typical properties according library conventions.
+  static const QSet<const Layer*> zeroWidthLayers = {
+      &Layer::boardOutlines(),      &Layer::boardCutouts(),
+      &Layer::boardPlatedCutouts(), &Layer::boardAlignment(),
+      &Layer::topPackageOutlines(), &Layer::botPackageOutlines(),
+      &Layer::topCourtyard(),       &Layer::botCourtyard(),
+  };
+  return UnsignedLength(zeroWidthLayers.contains(&layer) ? 0 : 200000);
+}
+
+std::tuple<UnsignedLength, bool, bool>
+    PackageEditorState::getDefaultPolygonSettings(const Layer& layer) noexcept {
+  if (layer.isCopper()) {
+    return std::make_tuple(UnsignedLength(0), true, false);
+  }
+
+  // Typical properties according library conventions.
+  static const QSet<const Layer*> zeroWidthLayers = {
+      &Layer::boardOutlines(),
+      &Layer::boardCutouts(),
+      &Layer::boardPlatedCutouts(),
+      &Layer::boardAlignment(),
+      &Layer::topPackageOutlines(),
+      &Layer::botPackageOutlines(),
+      &Layer::topCourtyard(),
+      &Layer::botCourtyard(),
+      &Layer::topHiddenGrabAreas(),
+      &Layer::botHiddenGrabAreas(),
+      &Layer::topStopMask(),
+      &Layer::botStopMask(),
+      &Layer::topSolderPaste(),
+      &Layer::botSolderPaste(),
+      &Layer::topGlue(),
+      &Layer::botGlue(),
+  };
+  static const QSet<const Layer*> filledLayers = {
+      &Layer::topHiddenGrabAreas(),
+      &Layer::botHiddenGrabAreas(),
+      &Layer::topStopMask(),
+      &Layer::botStopMask(),
+      &Layer::topSolderPaste(),
+      &Layer::botSolderPaste(),
+      &Layer::topGlue(),
+      &Layer::botGlue(),
+  };
+  static const QSet<const Layer*> grabAreaLayers = {
+      &Layer::topHiddenGrabAreas(),
+      &Layer::botHiddenGrabAreas(),
+  };
+  return std::make_tuple(
+      UnsignedLength(zeroWidthLayers.contains(&layer) ? 0 : 200000),
+      filledLayers.contains(&layer), grabAreaLayers.contains(&layer));
 }
 
 /*******************************************************************************

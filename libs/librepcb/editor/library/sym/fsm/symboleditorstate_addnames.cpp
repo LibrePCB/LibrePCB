@@ -36,7 +36,7 @@ namespace editor {
 
 SymbolEditorState_AddNames::SymbolEditorState_AddNames(
     const Context& context) noexcept
-  : SymbolEditorState_DrawTextBase(context, Mode::NAME) {
+  : SymbolEditorState_DrawTextBase(context, "add_name", Mode::NAME) {
 }
 
 SymbolEditorState_AddNames::~SymbolEditorState_AddNames() noexcept {

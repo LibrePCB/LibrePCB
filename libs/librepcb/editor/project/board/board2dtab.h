@@ -31,11 +31,11 @@
 #include "../../widgets/if_graphicsvieweventhandler.h"
 #include "boardgraphicsscene.h"
 #include "fsm/boardeditorfsmadapter.h"
-#include "fsm/boardeditorstate_drawtrace.h"
 #include "windowtab.h"
 
 #include <librepcb/core/geometry/pad.h>
 #include <librepcb/core/geometry/zone.h>
+#include <librepcb/core/types/enums.h>
 
 #include <QtCore>
 
@@ -47,6 +47,7 @@
 namespace librepcb {
 
 class Package;
+class Project;
 class RuleCheckMessage;
 
 namespace editor {
@@ -188,11 +189,13 @@ public:
   Board2dTab& operator=(const Board2dTab& rhs) = delete;
 
 signals:
-  void wireModeRequested(BoardEditorState_DrawTrace::WireMode mode);
+  void wireModeRequested(WireMode mode);
   void netRequested(bool autoNet, const std::optional<Uuid>& net);
   void viaDrillRequested(const std::optional<PositiveLength>& drill);
   void viaSizeRequested(const std::optional<PositiveLength>& size);
   void layerRequested(const Layer& layer);
+  void lineWidthResetRequested();
+  void sizeResetRequested();
   void angleRequested(const Angle& angle);
   void filledRequested(bool filled);
   void mirroredRequested(bool mirrored);
@@ -280,7 +283,7 @@ private:
   ui::EditorTool mTool;
   Qt::CursorShape mToolCursorShape;
   QString mToolOverlayText;
-  BoardEditorState_DrawTrace::WireMode mToolWireMode;
+  WireMode mToolWireMode;
   QVector<std::pair<bool, std::optional<Uuid>>> mToolNetsQt;
   std::shared_ptr<slint::VectorModel<slint::SharedString>> mToolNets;
   std::pair<bool, std::optional<Uuid>> mToolNet;

@@ -29,6 +29,8 @@
 
 #include <QtCore>
 
+#include <optional>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -117,12 +119,12 @@ public:
    *
    * This method is useful to read ratios from files (deserialization).
    *
-   * @param normalized    See fromNormalized(const QString&)
+   * @param normalized    See fromNormalized(QStringView)
    *
    * @throw Exception     If the argument is invalid, an Exception will be
    * thrown
    */
-  void setRatioNormalized(const QString& normalized) {
+  void setRatioNormalized(QStringView normalized) {
     mPpm = normalizedStringToPpm(normalized);
   }
 
@@ -197,14 +199,28 @@ public:
    * maximum count of decimals after the decimal point is 6, because the 6th
    * decimal represents one ppm.
    *
-   * @param normalized   See #setRatioNormalized(const QString&)
+   * @param normalized   See #setRatioNormalized(QStringView)
    *
    * @return A new Ratio object with the specified ratio
    *
    * @throw Exception     If the argument is invalid, an Exception will be
    * thrown
    */
-  static Ratio fromNormalized(const QString& normalized);
+  static Ratio fromNormalized(QStringView normalized);
+
+  /**
+   * @brief Try to get a Ratio object with a specific ratio
+   *
+   * Like #fromNormalized(QStringView), but returns std::nullopt instead of
+   * throwing an exception if the argument is invalid.
+   *
+   * @param normalized   See #setRatioNormalized(QStringView)
+   *
+   * @return A new Ratio object with the specified ratio, or std::nullopt if
+   *         the string does not represent a valid normalized ratio.
+   */
+  static std::optional<Ratio> tryFromNormalized(
+      QStringView normalized) noexcept;
 
   // Operators
   Ratio& operator=(const Ratio& rhs) {
@@ -264,16 +280,16 @@ private:
    * @brief Convert a normalized ratio from a QString to an integer (in PPM)
    *
    * This is a helper function for Ratio(const QString&) and
-   * fromNormalized(const QString&));.
+   * fromNormalized(QStringView));.
    *
-   * @param normalized    A QString which contains a floating point number with
+   * @param normalized    A string which contains a floating point number with
    *                      maximum six decimals after the decimal point. The
    * locale of the string have to be "C"! Example: QString("-0.1234") for -12.34
    * percent.
    *
    * @return The ratio in PPM
    */
-  static qint32 normalizedStringToPpm(const QString& normalized);
+  static qint32 normalizedStringToPpm(QStringView normalized);
 
   // Private Member Variables
   qint32 mPpm;  ///< the ratio in PPM

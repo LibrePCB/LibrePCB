@@ -47,24 +47,28 @@ namespace editor {
 
 BoardEditorState_AddStrokeText::BoardEditorState_AddStrokeText(
     const Context& context) noexcept
-  : BoardEditorState(context),
+  : BoardEditorState(context, "add_text"),
     mIsUndoCmdActive(false),
     mCurrentProperties(
         Uuid::createRandom(),  // UUID is not relevant here
-        Layer::boardDocumentation(),  // Layer
+        *mSettings.get("layer", getAvailableLayers())
+             .value_or(&Layer::topLegend()),  // Layer
         "{{PROJECT}}",  // Text
         Point(),  // Position is not relevant here
-        Angle::deg0(),  // Rotation
-        PositiveLength(1500000),  // Height
-        UnsignedLength(200000),  // Stroke width
+        mSettings.get<Angle>("rotation")
+            .value_or(Angle::deg0())
+            .mappedTo0_360deg(),  // Rotation
+        getDefaultHeight(),  // Height
+        getDefaultStrokeWidth(),  // Stroke width
         StrokeTextSpacing(),  // Letter spacing
         StrokeTextSpacing(),  // Line spacing
         Alignment(HAlign::left(), VAlign::bottom()),  // Alignment
-        false,  // Mirror
+        mSettings.get<bool>("mirror").value_or(false),  // Mirror
         true,  // Auto rotate
         false  // Locked
         ),
     mCurrentTextToPlace(nullptr) {
+  loadLayerSpecificClientSettings();
 }
 
 BoardEditorState_AddStrokeText::~BoardEditorState_AddStrokeText() noexcept {
@@ -158,37 +162,59 @@ QSet<const Layer*>
 }
 
 void BoardEditorState_AddStrokeText::setLayer(const Layer& layer) noexcept {
-  if (mCurrentProperties.setLayer(layer)) {
-    emit layerChanged(mCurrentProperties.getLayer());
+  if (!mCurrentProperties.setLayer(layer)) {
+    return;
   }
+
+  mSettings.set("layer", mCurrentProperties.getLayer());
+  emit layerChanged(mCurrentProperties.getLayer());
 
   if (mCurrentTextEditCmd) {
     mCurrentTextEditCmd->setLayer(mCurrentProperties.getLayer(), true);
     makeLayerVisible(layer.getColorRole());
   }
+
+  loadLayerSpecificClientSettings();
 }
 
 void BoardEditorState_AddStrokeText::setHeight(
     const PositiveLength& height) noexcept {
-  if (mCurrentProperties.setHeight(height)) {
-    emit heightChanged(mCurrentProperties.getHeight());
+  if (!mCurrentProperties.setHeight(height)) {
+    return;
   }
+
+  mSettings.set("height/by_layer/" % mCurrentProperties.getLayer().getId(),
+                mCurrentProperties.getHeight());
+  emit heightChanged(mCurrentProperties.getHeight());
 
   if (mCurrentTextEditCmd) {
     mCurrentTextEditCmd->setHeight(mCurrentProperties.getHeight(), true);
   }
 }
 
+void BoardEditorState_AddStrokeText::resetHeight() noexcept {
+  setHeight(getDefaultHeight());
+}
+
 void BoardEditorState_AddStrokeText::setStrokeWidth(
     const UnsignedLength& strokeWidth) noexcept {
-  if (mCurrentProperties.setStrokeWidth(strokeWidth)) {
-    emit strokeWidthChanged(mCurrentProperties.getStrokeWidth());
+  if (!mCurrentProperties.setStrokeWidth(strokeWidth)) {
+    return;
   }
+
+  mSettings.set(
+      "stroke_width/by_layer/" % mCurrentProperties.getLayer().getId(),
+      mCurrentProperties.getStrokeWidth());
+  emit strokeWidthChanged(mCurrentProperties.getStrokeWidth());
 
   if (mCurrentTextEditCmd) {
     mCurrentTextEditCmd->setStrokeWidth(mCurrentProperties.getStrokeWidth(),
                                         true);
   }
+}
+
+void BoardEditorState_AddStrokeText::resetStrokeWidth() noexcept {
+  setStrokeWidth(getDefaultStrokeWidth());
 }
 
 const QStringList BoardEditorState_AddStrokeText::getTextSuggestions()
@@ -202,9 +228,11 @@ const QStringList BoardEditorState_AddStrokeText::getTextSuggestions()
 }
 
 void BoardEditorState_AddStrokeText::setText(const QString& text) noexcept {
-  if (mCurrentProperties.setText(text)) {
-    emit textChanged(mCurrentProperties.getText());
+  if (!mCurrentProperties.setText(text)) {
+    return;
   }
+
+  emit textChanged(mCurrentProperties.getText());
 
   if (mCurrentTextEditCmd) {
     mCurrentTextEditCmd->setText(mCurrentProperties.getText(), true);
@@ -212,9 +240,12 @@ void BoardEditorState_AddStrokeText::setText(const QString& text) noexcept {
 }
 
 void BoardEditorState_AddStrokeText::setMirrored(bool mirrored) noexcept {
-  if (mCurrentProperties.setMirrored(mirrored)) {
-    emit mirroredChanged(mCurrentProperties.getMirrored());
+  if (!mCurrentProperties.setMirrored(mirrored)) {
+    return;
   }
+
+  mSettings.set("mirror", mCurrentProperties.getMirrored());
+  emit mirroredChanged(mCurrentProperties.getMirrored());
 
   if (mCurrentTextEditCmd) {
     mCurrentTextEditCmd->setMirrored(mCurrentProperties.getMirrored(), true);
@@ -257,6 +288,7 @@ bool BoardEditorState_AddStrokeText::rotateText(const Angle& angle) noexcept {
   mCurrentTextEditCmd->rotate(
       angle, mCurrentTextToPlace->getData().getPosition(), true);
   mCurrentProperties = mCurrentTextToPlace->getData();
+  mSettings.set("rotation", mCurrentProperties.getRotation());
 
   return true;  // Event handled
 }
@@ -270,6 +302,8 @@ bool BoardEditorState_AddStrokeText::flipText(
   mCurrentTextEditCmd->mirrorLayer(
       mCurrentTextToPlace->getBoard().getInnerLayerCount(), true);
   mCurrentProperties = mCurrentTextToPlace->getData();
+  mSettings.set("rotation", mCurrentProperties.getRotation());
+  mSettings.set("mirror", mCurrentProperties.getMirrored());
 
   emit layerChanged(mCurrentProperties.getLayer());
   emit mirroredChanged(mCurrentProperties.getMirrored());
@@ -325,6 +359,27 @@ bool BoardEditorState_AddStrokeText::abortCommand(bool showErrMsgBox) noexcept {
     }
     return false;
   }
+}
+
+void BoardEditorState_AddStrokeText::
+    loadLayerSpecificClientSettings() noexcept {
+  if (auto v = mSettings.get<PositiveLength>(
+          "height/by_layer/" % mCurrentProperties.getLayer().getId())) {
+    setHeight(*v);
+  }
+  if (auto v = mSettings.get<UnsignedLength>(
+          "stroke_width/by_layer/" % mCurrentProperties.getLayer().getId())) {
+    setStrokeWidth(*v);
+  }
+}
+
+PositiveLength BoardEditorState_AddStrokeText::getDefaultHeight() noexcept {
+  return PositiveLength(1500000);
+}
+
+UnsignedLength
+    BoardEditorState_AddStrokeText::getDefaultStrokeWidth() noexcept {
+  return UnsignedLength(200000);
 }
 
 /*******************************************************************************

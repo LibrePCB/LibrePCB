@@ -79,6 +79,7 @@ public:
     return mCurrentProperties.getLineWidth();
   }
   void setLineWidth(const UnsignedLength& width) noexcept;
+  void resetLineWidth() noexcept;
   bool getFilled() const noexcept { return mCurrentProperties.isFilled(); }
   void setFilled(bool filled) noexcept;
   bool getGrabArea() const noexcept { return mCurrentProperties.isGrabArea(); }
@@ -100,11 +101,13 @@ private:  // Methods
   bool finishAddCircle(const Point& pos) noexcept;
   bool abortAddCircle() noexcept;
   void updateSnapCandidates() noexcept;
+  void loadLayerSpecificSettings() noexcept;
+  void memorizeCurrentSettings() noexcept;
 
 private:
   QSet<Point> mSnapCandidates;
   Circle mCurrentProperties;
-  QHash<const Layer*, UnsignedLength> mUsedLineWidths;
+  QHash<const Layer*, std::tuple<UnsignedLength, bool, bool>> mUsedSettings;
 
   std::unique_ptr<CmdCircleEdit> mCurrentEditCmd;
   std::shared_ptr<Circle> mCurrentCircle;

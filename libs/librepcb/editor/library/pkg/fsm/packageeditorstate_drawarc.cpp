@@ -36,7 +36,7 @@ namespace editor {
 
 PackageEditorState_DrawArc::PackageEditorState_DrawArc(
     Context& context) noexcept
-  : PackageEditorState_DrawPolygonBase(context, Mode::ARC) {
+  : PackageEditorState_DrawPolygonBase(context, "draw_arc", Mode::ARC) {
 }
 
 PackageEditorState_DrawArc::~PackageEditorState_DrawArc() noexcept {
