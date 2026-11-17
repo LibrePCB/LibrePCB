@@ -280,7 +280,7 @@ QPainterPath PrimitiveTextGraphicsItem::calcShape() const noexcept {
         lines.at(i));
   }
   QRectF bounds = textPath.boundingRect();
-  const qreal lineMargin = fm.height() / 30;
+  const qreal lineMargin = OverlineMarkupParser::getLineWidth(fm.height()) / 2;
   for (const QLineF& line : mOverlines) {
     bounds = bounds.united(
         QRectF(line.p1(), line.p2())
