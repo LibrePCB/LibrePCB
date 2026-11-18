@@ -33,6 +33,7 @@
 #include "notificationsmodel.h"
 #include "project/newprojectwizard/newprojectwizard.h"
 #include "project/projecteditor.h"
+#include "rpc/rpcserver.h"
 #include "utils/editortoolbox.h"
 #include "utils/slinthelpers.h"
 #include "utils/slintkeyeventtextbuilder.h"
@@ -113,6 +114,7 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
     mLibrariesFilter(new SlintKeyEventTextBuilder()),
     mProjects(new UiObjectList<ProjectEditor, ui::ProjectData>()),
     mLibraries(new UiObjectList<LibraryEditor, ui::LibraryData>()),
+    mRpcServer(nullptr),
     mWindows(new UiObjectList<MainWindow, int>()) {
   QSettings cs;
 
@@ -346,11 +348,22 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
   // To allow opening files by the MacOS Finder, install event filter.
   qApp->installEventFilter(this);
 
+  // Start the RPC server (for external tools like MCP servers, plugins or
+  // scripting), if enabled in the workspace settings or forced with the
+  // environment variable "LIBREPCB_ENABLE_RPC_SERVER" (for testing).
+  if (mWorkspace.getSettings().enableRpcServer.get() ||
+      (qgetenv("LIBREPCB_ENABLE_RPC_SERVER") == "1")) {
+    mRpcServer = std::make_unique<RpcServer>(*this);
+  }
+
   // Start library rescan.
   mWorkspace.getLibraryDb().startLibraryRescan();
 }
 
 GuiApplication::~GuiApplication() noexcept {
+  // Stop the RPC server first since its command handlers need access to
+  // the projects and windows (which are teared down below).
+  mRpcServer.reset();
   mProjectLibraryUpdater.reset();
 }
 

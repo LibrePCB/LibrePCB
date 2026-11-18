@@ -54,6 +54,7 @@ class OrganizationsDbModel;
 class ProjectEditor;
 class ProjectLibraryUpdater;
 class QuickAccessModel;
+class RpcServer;
 class SlintKeyEventTextBuilder;
 
 /*******************************************************************************
@@ -178,6 +179,7 @@ private:
   std::shared_ptr<UiObjectList<ProjectEditor, ui::ProjectData>> mProjects;
   std::shared_ptr<UiObjectList<LibraryEditor, ui::LibraryData>> mLibraries;
   std::unique_ptr<ProjectLibraryUpdater> mProjectLibraryUpdater;
+  std::unique_ptr<RpcServer> mRpcServer;
   std::shared_ptr<UiObjectList<MainWindow, int>> mWindows;
   QTimer mSaveOpenedWindowsCountdown;
 

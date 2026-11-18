@@ -86,6 +86,7 @@ WorkspaceSettings::WorkspaceSettings(QObject* parent)
     defaultLengthUnit("default_length_unit", LengthUnit::millimeters(), this),
     projectAutosaveIntervalSeconds("project_autosave_interval", 600U, this),
     useOpenGl("use_opengl", false, this),
+    enableRpcServer("enable_rpc_server", false, this),
     userName("user", "", this),
     libraryLocaleOrder("library_locale_order", "locale", QStringList(), this),
     libraryNormOrder("library_norm_order", "norm", QStringList(), this),

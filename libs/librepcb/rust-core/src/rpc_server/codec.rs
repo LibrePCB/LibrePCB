@@ -40,7 +40,11 @@ pub fn read_message(reader: &mut impl BufRead) -> io::Result<Option<String>> {
       // EOF. A message which was not terminated by a newline is still
       // returned (and thus processed) to stay lenient.
       let message = line.trim_end().to_string();
-      return Ok(if message.is_empty() { None } else { Some(message) });
+      return Ok(if message.is_empty() {
+        None
+      } else {
+        Some(message)
+      });
     }
     if line.ends_with('\n') {
       let message = line.trim_end();

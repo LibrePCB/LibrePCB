@@ -253,10 +253,17 @@ mod tests {
   #[test]
   fn test_classify_notification() {
     let value = json!({"jsonrpc": "2.0", "method": "event/changed"});
-    assert!(matches!(classify_message(&value), ParsedMessage::Notification));
+    assert!(matches!(
+      classify_message(&value),
+      ParsedMessage::Notification
+    ));
     // Also with params:
-    let value = json!({"jsonrpc": "2.0", "method": "event/changed", "params": 7});
-    assert!(matches!(classify_message(&value), ParsedMessage::Notification));
+    let value =
+      json!({"jsonrpc": "2.0", "method": "event/changed", "params": 7});
+    assert!(matches!(
+      classify_message(&value),
+      ParsedMessage::Notification
+    ));
   }
 
   #[test]
@@ -266,7 +273,9 @@ mod tests {
       ParsedMessage::Response
     ));
     assert!(matches!(
-      classify_message(&json!({"jsonrpc": "2.0", "error": {"code": 1}, "id": 1})),
+      classify_message(
+        &json!({"jsonrpc": "2.0", "error": {"code": 1}, "id": 1})
+      ),
       ParsedMessage::Response
     ));
   }
@@ -313,7 +322,8 @@ mod tests {
   #[test]
   fn test_build_result_response() {
     let response: Value =
-      serde_json::from_str(&build_result_response(json!(5), json!({"x": 1}))).unwrap();
+      serde_json::from_str(&build_result_response(json!(5), json!({"x": 1})))
+        .unwrap();
     assert_eq!(response.get("jsonrpc"), Some(&json!("2.0")));
     assert_eq!(response.get("id"), Some(&json!(5)));
     assert_eq!(response.get("result"), Some(&json!({"x": 1})));
@@ -339,7 +349,8 @@ mod tests {
   #[test]
   fn test_build_notification() {
     let notification: Value =
-      serde_json::from_str(&build_notification("event/x", &json!({"a": 1}))).unwrap();
+      serde_json::from_str(&build_notification("event/x", &json!({"a": 1})))
+        .unwrap();
     assert_eq!(notification.get("jsonrpc"), Some(&json!("2.0")));
     assert_eq!(notification.get("method"), Some(&json!("event/x")));
     assert_eq!(notification.get("params"), Some(&json!({"a": 1})));

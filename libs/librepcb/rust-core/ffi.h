@@ -204,6 +204,20 @@ enum class InteractiveHtmlBomViewMode {
 struct InteractiveHtmlBom;
 
 /**
+ * The RPC server.
+ *
+ * Usage: Create it with [RpcServer::new], optionally set the API schema with
+ * [RpcServer::set_api_schema], then call [RpcServer::start] to make it listen on
+ * 127.0.0.1 (the OS assigns the port, which is returned). Push events to
+ * all connected clients with [RpcServer::notify], and shut the server down
+ * with [RpcServer::stop] (or just drop it, which does the same).
+ *
+ * All methods can be called from any thread. The dispatch callback is
+ * invoked on the connection's reader thread.
+ */
+struct RpcServer;
+
+/**
  * Wrapper type for [Archive]
  */
 struct ZipArchive;
@@ -299,6 +313,29 @@ struct RenumberComponentsSymbolData {
   int64_t y;
 };
 
+/**
+ * Callback which dispatches a command request from the Rust server to C++.
+ *
+ * It is invoked on the connection's reader thread, i.e. possibly
+ * concurrently from multiple threads, but strictly sequentially per
+ * connection. The C++ implementation is responsible for marshalling the
+ * command to the GUI thread (it must never block or deadlock it!).
+ *
+ * - `ctx`: The context pointer passed to [ffi_rpc_server_new].
+ * - `method`: The method name, e.g. "project/list".
+ * - `params`: The raw JSON of the request params (a valid JSON document,
+ *   or `"null"` if the request contained no params).
+ * - `response`: The serialized response, see the return value.
+ *
+ * Returns `true` if the command succeeded, with `response` containing the
+ * raw JSON of the result value. Returns `false` if the command failed, with
+ * `response` containing a JSON error object `{"code":..,"message":..}`.
+ */
+using RpcDispatchFn = bool(*)(void *ctx,
+                              const QString * NONNULL method,
+                              const QString * NONNULL params,
+                              QString * NONNULL response);
+
 extern "C" {
 
 /**
@@ -356,6 +393,10 @@ extern size_t ffi_qstring_len(const QString * NONNULL obj);
 extern const uint16_t *ffi_qstring_utf16(const QString * NONNULL obj);
 
 extern void ffi_qstring_set(QString * NONNULL obj, const char *s, size_t len);
+
+extern QString *ffi_qstring_new();
+
+extern void ffi_qstring_delete(QString *obj);
 
 extern size_t ffi_qstringlist_len(const QStringList * NONNULL obj);
 
@@ -566,6 +607,55 @@ void ffi_renumber_components(const QStringList * NONNULL names,
                              const size_t *connections,
                              size_t connections_len,
                              QStringList * NONNULL out);
+
+/**
+ * Create a new [RpcServer] object.
+ *
+ * - `token`: The authentication token (must not be empty).
+ * - `protocol_version`: The protocol version, reported by `initialize`.
+ * - `info`: A raw JSON object with application information (e.g. the
+ *   application version, the PID and the workspace path) which is merged
+ *   into the `initialize` response. If it is not a JSON object, it is
+ *   ignored.
+ * - `dispatch`/`ctx`: The command dispatcher (see [RpcDispatchFn]).
+ */
+RpcServer *ffi_rpc_server_new(const QString * NONNULL token,
+                              const QString * NONNULL protocol_version,
+                              const QString * NONNULL info,
+                              RpcDispatchFn dispatch,
+                              void *ctx);
+
+/**
+ * Set the OpenRPC API schema document served by the `rpc.discover` method.
+ */
+void ffi_rpc_server_set_api_schema(RpcServer * NONNULL s,
+                                   const QString * NONNULL schema);
+
+/**
+ * Start listening on 127.0.0.1 on the given port (0 = OS-assigned).
+ *
+ * Returns `false` on failure, otherwise `*out_port` contains the actual
+ * port the server is listening on.
+ */
+bool ffi_rpc_server_start(RpcServer * NONNULL s,
+                          uint16_t port,
+                          uint16_t * NONNULL out_port);
+
+/**
+ * Push an event (a JSON-RPC notification) to all connected clients.
+ *
+ * This function never blocks, thus it is safe to be called from the GUI
+ * thread. The `params` must be a valid JSON document (or empty, which is
+ * treated as `null`).
+ */
+void ffi_rpc_server_notify(RpcServer * NONNULL s,
+                           const QString * NONNULL method,
+                           const QString * NONNULL params);
+
+/**
+ * Delete [RpcServer] object (stops the server and joins its threads).
+ */
+void ffi_rpc_server_delete(RpcServer *s);
 
 /**
  * Wrapper for [increment_number_in_string]

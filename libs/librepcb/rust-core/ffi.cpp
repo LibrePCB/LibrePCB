@@ -69,6 +69,14 @@ extern "C" void ffi_qstring_set(QString* obj, const char* s, std::size_t len) {
   *obj = QString::fromUtf8(s, len);
 }
 
+extern "C" QString* ffi_qstring_new() {
+  return new QString();
+}
+
+extern "C" void ffi_qstring_delete(QString* obj) {
+  delete obj;
+}
+
 extern "C" std::size_t ffi_qstringlist_len(const QStringList* obj) {
   return static_cast<std::size_t>(obj->size());
 }

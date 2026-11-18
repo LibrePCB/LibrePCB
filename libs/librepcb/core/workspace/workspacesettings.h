@@ -214,6 +214,17 @@ public:
   WorkspaceSettingsItem_GenericValue<bool> useOpenGl;
 
   /**
+   * @brief Enable the RPC server for external tools (MCP, plugins, ...)
+   *
+   * If enabled, the application accepts JSON-RPC commands on a local TCP
+   * socket, which allows external tools to control the running application.
+   * See `dev/plans/rpc-server.md` for details.
+   *
+   * Default: False
+   */
+  WorkspaceSettingsItem_GenericValue<bool> enableRpcServer;
+
+  /**
    * @brief User name
    *
    * Used when creating new library elements or projects.

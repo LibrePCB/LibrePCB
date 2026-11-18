@@ -14,8 +14,8 @@ use serde_json::{Map, Value};
 
 use super::codec::{read_message, write_message};
 use super::protocol::{
-  build_error_response, build_result_response, classify_message, error_code, ParsedMessage,
-  RpcError, METHOD_INITIALIZE, METHOD_PING, METHOD_RPC_DISCOVER,
+  build_error_response, build_result_response, classify_message, error_code,
+  ParsedMessage, RpcError, METHOD_INITIALIZE, METHOD_PING, METHOD_RPC_DISCOVER,
 };
 use super::{lock, Connection, Inner};
 
@@ -102,8 +102,7 @@ fn handle_connection(inner: Arc<Inner>, stream: TcpStream, conn_id: u64) {
           break;
         }
       }
-    })
-  {
+    }) {
     Ok(handle) => handle,
     Err(e) => {
       eprintln!("librepcb-rust: Spawning writer thread failed: {e}");
@@ -118,7 +117,8 @@ fn handle_connection(inner: Arc<Inner>, stream: TcpStream, conn_id: u64) {
     match read_message(&mut reader) {
       Ok(None) => break, // Clean EOF.
       Ok(Some(message)) => {
-        let (response, close) = process_message(&inner, &message, &mut authenticated);
+        let (response, close) =
+          process_message(&inner, &message, &mut authenticated);
         if let Some(response) = response {
           if tx.send(response).is_err() {
             break; // The writer thread is gone, so the connection is dead.
@@ -159,7 +159,8 @@ fn process_message(
     Err(_) => {
       // Not valid JSON at all, so the request ID is unknown. Per
       // specification, the error response then must use the ID `null`.
-      let response = build_error_response(Value::Null, &RpcError::parse_error());
+      let response =
+        build_error_response(Value::Null, &RpcError::parse_error());
       // An unauthenticated connection is dropped immediately.
       return (Some(response), !*authenticated);
     }
@@ -184,7 +185,10 @@ fn process_message(
         );
         (Some(build_error_response(id, &error)), true)
       } else if method == METHOD_PING {
-        (Some(build_result_response(id, Value::Object(Map::new()))), false)
+        (
+          Some(build_result_response(id, Value::Object(Map::new()))),
+          false,
+        )
       } else if method == METHOD_RPC_DISCOVER {
         (Some(handle_rpc_discover(inner, id)), false)
       } else {
@@ -202,8 +206,10 @@ fn process_message(
     }
     ParsedMessage::Invalid { id } => {
       // Per specification, the ID is `null` if it could not be detected.
-      let response =
-        build_error_response(id.unwrap_or(Value::Null), &RpcError::invalid_request());
+      let response = build_error_response(
+        id.unwrap_or(Value::Null),
+        &RpcError::invalid_request(),
+      );
       // After authentication, the connection is kept open. Before, it is
       // dropped.
       (Some(response), !*authenticated)
@@ -214,17 +220,23 @@ fn process_message(
 /// Handle an `initialize` request: Check the token and build the response.
 ///
 /// Returns the serialized response and whether the token was valid.
-fn handle_initialize(inner: &Inner, params: &Option<Value>, id: Value) -> (String, bool) {
+fn handle_initialize(
+  inner: &Inner,
+  params: &Option<Value>,
+  id: Value,
+) -> (String, bool) {
   let token = match params {
     Some(Value::Object(map)) => map.get("token").and_then(Value::as_str),
     _ => None,
   };
   match token {
-    Some(token) if token == inner.config.token => {
-      (build_result_response(id, build_initialize_result(inner)), true)
-    }
+    Some(token) if token == inner.config.token => (
+      build_result_response(id, build_initialize_result(inner)),
+      true,
+    ),
     _ => {
-      let error = RpcError::new(error_code::UNAUTHENTICATED, "Invalid or missing token");
+      let error =
+        RpcError::new(error_code::UNAUTHENTICATED, "Invalid or missing token");
       (build_error_response(id, &error), false)
     }
   }
@@ -252,21 +264,31 @@ fn handle_rpc_discover(inner: &Inner, id: Value) -> String {
       Ok(value) => build_result_response(id, value),
       Err(e) => {
         eprintln!("librepcb-rust: The API schema is not valid JSON: {e}");
-        let error = RpcError::internal_error().with_data(Value::from("invalid API schema"));
+        let error = RpcError::internal_error()
+          .with_data(Value::from("invalid API schema"));
         build_error_response(id, &error)
       }
     },
     None => {
-      let error = RpcError::new(error_code::METHOD_NOT_FOUND, "API schema not available");
+      let error =
+        RpcError::new(error_code::METHOD_NOT_FOUND, "API schema not available");
       build_error_response(id, &error)
     }
   }
 }
 
 /// Handle a request by forwarding it to the dispatch callback.
-fn dispatch_request(inner: &Inner, id: Value, method: &str, params: Option<Value>) -> String {
+fn dispatch_request(
+  inner: &Inner,
+  id: Value,
+  method: &str,
+  params: Option<Value>,
+) -> String {
   if !inner.running.load(Ordering::SeqCst) {
-    let error = RpcError::new(error_code::SERVER_SHUTTING_DOWN, "The server is shutting down");
+    let error = RpcError::new(
+      error_code::SERVER_SHUTTING_DOWN,
+      "The server is shutting down",
+    );
     return build_error_response(id, &error);
   }
   // The dispatch callback receives the params as raw JSON. Forwarding the
@@ -276,18 +298,22 @@ fn dispatch_request(inner: &Inner, id: Value, method: &str, params: Option<Value
   let params = params.map(|p| p.to_string()).unwrap_or("null".to_string());
   // A panicking callback (e.g. a C++ integration bug) must not kill the
   // connection thread.
-  let result = catch_unwind(AssertUnwindSafe(|| (inner.config.dispatch)(method, &params)))
-    .unwrap_or_else(|_| {
-      Err(RpcError::new(
-        error_code::INTERNAL_ERROR,
-        "Command handler panicked",
-      ))
-    });
+  let result = catch_unwind(AssertUnwindSafe(|| {
+    (inner.config.dispatch)(method, &params)
+  }))
+  .unwrap_or_else(|_| {
+    Err(RpcError::new(
+      error_code::INTERNAL_ERROR,
+      "Command handler panicked",
+    ))
+  });
   match result {
     Ok(result) => match serde_json::from_str::<Value>(&result) {
       Ok(value) => build_result_response(id, value),
       Err(e) => {
-        eprintln!("librepcb-rust: Command '{method}' returned invalid JSON: {e}");
+        eprintln!(
+          "librepcb-rust: Command '{method}' returned invalid JSON: {e}"
+        );
         let error = RpcError::new(
           error_code::INTERNAL_ERROR,
           "Command handler returned invalid JSON",

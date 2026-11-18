@@ -60,8 +60,12 @@ newlines, so line framing is safe. Debuggable with `nc 127.0.0.1 <port>`.
   connection immediately.
 - Success result:
   ```json
-  {"jsonrpc":"2.0","id":1,"result":{"protocolVersion":"1","appVersion":"<App version>","pid":1234,"workspace":"<path>","openProjects":["<uuid>"]}}
+  {"jsonrpc":"2.0","id":1,"result":{"protocolVersion":"1","appVersion":"<App version>","pid":1234,"workspace":"<path>"}}
   ```
+
+  The info is a startup snapshot provided by C++; live data (e.g. open
+  projects) is available through commands like `project/list` after
+  connecting.
 
 ### Protocol-level methods (handled in Rust, no C++ involved)
 
@@ -169,12 +173,29 @@ pub type RpcDispatchFn = extern "C" fn(
                            // ok=false: JSON error object {"code":..,"message":..}
 ) -> bool;
 
-ffi_rpc_server_new(token: &QString, dispatch: RpcDispatchFn, ctx: *mut c_void) -> *mut RpcServer;
+ffi_rpc_server_new(token: &QString, protocol_version: &QString, info: &QString,
+                   dispatch: RpcDispatchFn, ctx: *mut c_void) -> *mut RpcServer;
 ffi_rpc_server_set_api_schema(s: &mut RpcServer, schema: &QString);
-ffi_rpc_server_start(s: &mut RpcServer, out_port: &mut u16) -> bool;
+ffi_rpc_server_start(s: &mut RpcServer, port: u16, out_port: &mut u16) -> bool;
 ffi_rpc_server_notify(s: &mut RpcServer, method: &QString, params: &QString);
 ffi_rpc_server_delete(s: *mut RpcServer);
 ```
+
+Notes:
+- `protocol_version` and `info` (a raw JSON object, merged into the
+  `initialize` result) are passed at creation time.
+- `port` in `ffi_rpc_server_start()` is the desired port (0 = OS-assigned);
+  the actual port is reported through `out_port`.
+- Rust calls back into C++ for `QString` allocation
+  (`ffi_qstring_new`/`ffi_qstring_delete` in `ffi.cpp`).
+- The dispatch callback runs on the Rust connection threads. Since raw
+  function pointers are not `Send`/`Sync` when their signature contains raw
+  pointers, the Rust FFI wraps callback + context in a `CppDispatch`
+  newtype, and calls it through a helper function to force the closure to
+  capture the struct as a whole (Rust's disjoint closure captures would
+  otherwise capture the raw fields individually).
+- Implemented in milestone 2; cbindgen generates the `RpcDispatchFn`
+  function-pointer typedef and an opaque `RpcServer` handle.
 
 Note: the `token` parameter stays in the FFI surface even after the
 ProcessFile registry is implemented (C++ reads the token from the instance
@@ -221,8 +242,9 @@ Responsibilities:
      per-session lifetime means stale entries never accumulate across
      reboots. On Windows (no sandbox) the Qt fallback is a per-user temp
      location, which is fine.
-3. **API schema**: read `libs/librepcb/editor/rpc/api.json` (located via
-   source dir / installed share dir, `FilePath`), pass content via
+3. **API schema**: read `share/librepcb/rpc/api.json` via
+   `Application::getResourcesDir()` (handles dev builds, installed
+   `share/` and the `LIBREPCB_SHARE_DIR` override), pass content via
    `ffi_rpc_server_set_api_schema`.
 4. **Dispatch callback** (runs on Rust connection threads!): marshal to the
    main thread with
@@ -254,8 +276,16 @@ appear in the user's undo history; the GUI stays the single source of truth.
 
 ### Workspace setting
 
-`WorkspaceSettings`: checkbox "Enable RPC server" (default off
-for now). Where the setting lives in code follows existing settings patterns.
+`WorkspaceSettings`: setting `enable_rpc_server` (default off), following
+the existing `WorkspaceSettingsItem_GenericValue<bool>` pattern. **Status:**
+load/save implemented; the checkbox in the workspace settings dialog is
+still missing (to be added together with the random token, when the
+feature becomes user-facing).
+
+For testing, the server can also be forced with the environment variable
+`LIBREPCB_ENABLE_RPC_SERVER=1` (following the pattern of
+`LIBREPCB_ENABLE_TEST_ADAPTER`), and `LIBREPCB_RPC_PORT` forces a specific
+port (otherwise the OS assigns one).
 
 ### Shutdown ordering (deadlock safety — the one real hazard)
 
@@ -278,7 +308,13 @@ event loop still runs):
 
 ### Single source of truth
 
-`libs/librepcb/editor/rpc/api.json` — OpenRPC 1.2.x document:
+`share/librepcb/rpc/api.json` — OpenRPC 1.2.x document:
+
+- Located in the `share/` directory on purpose: the existing
+  `Application::getResourcesDir()` mechanism resolves it both for
+  developer builds and installed packages (the `share/*` glob install
+  rule picks it up automatically), and `LIBREPCB_SHARE_DIR` can override
+  the location for tests.
 
 - `info`: title, `protocolVersion` (matches `initialize` result), app version
 - `methods[]`: name, summary/description, params (JSON Schema + description),
@@ -331,8 +367,13 @@ api.json ──> dev/generate_rpc_api_docs.py (stdlib-only, ~150 lines)
 2. **FFI + C++ skeleton** — `ffi/rpc_server_ffi.rs`, cbindgen integration,
    C++ `RpcServer`, workspace setting, hardcoded token (instance registry
    deferred, see section 9), `api.json` with first commands (`project/list`,
-   `undostack/*`), docs generator + generated `rpc_api.md` + CI
-   stale-check, registry/schema unit test, funq smoke test.
+   `project/get`, `undostack/*`), docs generator + generated `rpc_api.md` +
+   CI stale-check, registry/schema unit test, funq smoke test.
+   **Status: Done.** Implemented and verified: 166 Rust tests pass, clippy
+   clean, 2598 C++ unittests pass (incl. the new registry-vs-schema test),
+   and an end-to-end smoke test against the real (offscreen) application
+   passed all protocol and command checks (handshake, ping, project/list,
+   error codes, schema discovery, wrong-token disconnect, clean shutdown).
 3. **Events + `editor/executeCommand`** — notification wiring,
    pass-through command, documented in `api.json`.
 4. **`apps/librepcb-mcp`** (separate PR) — stdio MCP server: instance

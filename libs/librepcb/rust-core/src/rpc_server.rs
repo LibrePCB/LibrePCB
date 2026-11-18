@@ -90,7 +90,8 @@ const STOP_TIMEOUT: Duration = Duration::from_secs(5);
 /// The callback is invoked on the connection's reader thread, i.e. possibly
 /// concurrently from multiple threads, but strictly sequentially per
 /// connection.
-pub type DispatchFn = Arc<dyn Fn(&str, &str) -> Result<String, RpcError> + Send + Sync>;
+pub type DispatchFn =
+  Arc<dyn Fn(&str, &str) -> Result<String, RpcError> + Send + Sync>;
 
 /// Configuration for creating a [RpcServer].
 pub struct RpcServerConfig {
@@ -187,6 +188,15 @@ impl RpcServer {
   /// discoverable for clients. Returns an error if the server is already
   /// running or if the token is empty.
   pub fn start(&self) -> io::Result<u16> {
+    self.start_on_port(0)
+  }
+
+  /// Start listening on 127.0.0.1 on the given port (0 = OS-assigned).
+  ///
+  /// Returns the chosen port, which the caller needs to make the server
+  /// discoverable for clients. Returns an error if the server is already
+  /// running or if the token is empty.
+  pub fn start_on_port(&self, port: u16) -> io::Result<u16> {
     if self.inner.config.token.is_empty() {
       return Err(io::Error::new(io::ErrorKind::InvalidInput, "empty token"));
     }
@@ -196,7 +206,7 @@ impl RpcServer {
         "server is already running",
       ));
     }
-    let listener = TcpListener::bind(("127.0.0.1", 0))?;
+    let listener = TcpListener::bind(("127.0.0.1", port))?;
     listener.set_nonblocking(true)?;
     let port = listener.local_addr()?.port();
     self.inner.running.store(true, Ordering::SeqCst);
@@ -268,7 +278,9 @@ impl RpcServer {
     let deadline = Instant::now() + STOP_TIMEOUT;
     while self.inner.active_connections.load(Ordering::SeqCst) > 0 {
       if Instant::now() >= deadline {
-        eprintln!("librepcb-rust: Detaching connection threads which are still busy");
+        eprintln!(
+          "librepcb-rust: Detaching connection threads which are still busy"
+        );
         break;
       }
       thread::sleep(Duration::from_millis(10));
@@ -309,7 +321,9 @@ mod tests {
       let stream = TcpStream::connect(("127.0.0.1", port)).unwrap();
       // Timeout to avoid hanging forever (and thus blocking CI) if the
       // server does not respond.
-      stream.set_read_timeout(Some(Duration::from_secs(10))).unwrap();
+      stream
+        .set_read_timeout(Some(Duration::from_secs(10)))
+        .unwrap();
       Self {
         reader: BufReader::new(stream.try_clone().unwrap()),
         writer: stream,
@@ -553,7 +567,10 @@ mod tests {
   #[test]
   fn test_dispatch_error() {
     let dispatch: DispatchFn = Arc::new(|_, _| {
-      Err(RpcError::new(error_code::COMMAND_FAILED, "boom").with_data(json!({"details": 7})))
+      Err(
+        RpcError::new(error_code::COMMAND_FAILED, "boom")
+          .with_data(json!({"details": 7})),
+      )
     });
     let (_server, port) = spawn_server_with_dispatch(dispatch);
     let mut client = TestClient::new(port);

@@ -143,6 +143,8 @@ extern "C" {
   fn ffi_qstring_len(obj: &QString) -> usize;
   fn ffi_qstring_utf16(obj: &QString) -> *const u16;
   fn ffi_qstring_set(obj: &mut QString, s: *const c_char, len: usize);
+  fn ffi_qstring_new() -> *mut QString;
+  fn ffi_qstring_delete(obj: *mut QString);
 }
 
 /// Convert `QString` to [String]
@@ -161,6 +163,23 @@ pub fn from_qstring(obj: &QString) -> String {
 #[allow(dead_code)]
 pub fn qstring_set(obj: &mut QString, s: &str) {
   unsafe { ffi_qstring_set(obj, s.as_ptr().cast(), s.len()) }
+}
+
+/// Allocate a new empty `QString` (to be freed with [qstring_delete])
+///
+/// <div class="warning">
+/// The returned object is owned by the caller and must not be freed by
+/// C++ (e.g. with `delete`) since it was allocated by C++ through the FFI.
+/// </div>
+#[allow(dead_code)]
+pub fn qstring_new() -> *mut QString {
+  unsafe { ffi_qstring_new() }
+}
+
+/// Delete a `QString` allocated with [qstring_new]
+#[allow(dead_code)]
+pub fn qstring_delete(obj: *mut QString) {
+  unsafe { ffi_qstring_delete(obj) }
 }
 
 /// cbindgen:no-export
