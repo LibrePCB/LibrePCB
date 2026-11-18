@@ -147,11 +147,47 @@ public:
   QPixmap toPixmap(const QSize& size,
                    const QColor& background = Qt::transparent) noexcept;
 
+  /**
+   * @brief Render the scene without its foreground layer
+   *
+   * Draws the background and the scene items (components, pads, etc.) only.
+   *
+   * @param painter        Painter to draw with.
+   * @param size           Size of the target area, starting at the origin.
+   * @param sceneToDevice  Maps scene coordinates to the target area. Only a
+   *                       uniform scale with an optional horizontal flip and
+   *                       a translation is supported.
+   */
+  void renderContent(QPainter* painter, const QSize& size,
+                     const QTransform& sceneToDevice) noexcept;
+
+  /**
+   * @brief Render only the foreground layer of the scene
+   *
+   * Draws the foreground layer, independent of the scene content. This
+   * includes cursors, rulers, etc. Takes the same arguments as
+   * ::renderContent().
+   */
+  void renderForeground(QPainter* painter, const QSize& size,
+                        const QTransform& sceneToDevice) noexcept;
+
 protected:
   void drawBackground(QPainter* painter, const QRectF& rect) noexcept override;
+
+  /**
+   * @brief Callback function to draw the foreground layer
+   *
+   * Called by QGraphicsScene after drawing the scene items. Also called
+   * directly by ::renderForeground(). Draws nothing when rendering with
+   * ::renderContent().
+   *
+   * @param painter  Painter with the scene-to-device transform applied.
+   * @param rect     The scene area to draw.
+   */
   void drawForeground(QPainter* painter, const QRectF& rect) noexcept override;
 
 private:
+  bool mSkipForeground;  ///< Whether ::drawForeground() draws nothing.
   GridStyle mGridStyle;
   PositiveLength mGridInterval;
   QColor mBackgroundColor;

@@ -43,6 +43,7 @@ namespace editor {
 
 GraphicsScene::GraphicsScene(QObject* parent) noexcept
   : QGraphicsScene(parent),
+    mSkipForeground(false),
     mGridStyle(GridStyle::None),
     mGridInterval(2540000),
     mBackgroundColor(Qt::white),
@@ -187,6 +188,38 @@ QPixmap GraphicsScene::toPixmap(const QSize& size,
   return pixmap;
 }
 
+void GraphicsScene::renderContent(QPainter* painter, const QSize& size,
+                                  const QTransform& sceneToDevice) noexcept {
+  // Source rect is the area of the scene visible in the target.
+  const QRectF target(QPointF(0, 0), size);
+  const QRectF source = sceneToDevice.inverted().mapRect(target);
+  painter->save();
+
+  // QGraphicsScene::render() cannot flip, so mirror the painter instead.
+  if (sceneToDevice.m11() < 0) {
+    painter->translate(size.width(), 0);
+    painter->scale(-1, 1);
+  }
+
+  // The foreground is drawn by renderForeground().
+  mSkipForeground = true;
+  render(painter, target, source, Qt::KeepAspectRatio);
+  mSkipForeground = false;
+  painter->restore();
+}
+
+void GraphicsScene::renderForeground(QPainter* painter, const QSize& size,
+                                     const QTransform& sceneToDevice) noexcept {
+  // Call drawForeground() directly, with the painter transform and the scene
+  // area which QGraphicsScene::render() would provide.
+  const QRectF target(QPointF(0, 0), size);
+  painter->save();
+  painter->setClipRect(target, Qt::IntersectClip);
+  painter->setWorldTransform(sceneToDevice, true);
+  drawForeground(painter, sceneToDevice.inverted().mapRect(target));
+  painter->restore();
+}
+
 /*******************************************************************************
  *  Protected Methods
  ******************************************************************************/
@@ -275,6 +308,11 @@ void GraphicsScene::drawBackground(QPainter* painter,
 
 void GraphicsScene::drawForeground(QPainter* painter,
                                    const QRectF& rect) noexcept {
+  // Skip while rendering the content only.
+  if (mSkipForeground) {
+    return;
+  }
+
   QPen originPen(mGridColor);
   originPen.setWidth(0);
   painter->setPen(originPen);
