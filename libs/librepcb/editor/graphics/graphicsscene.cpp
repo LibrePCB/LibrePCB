@@ -43,7 +43,7 @@ namespace editor {
 
 GraphicsScene::GraphicsScene(QObject* parent) noexcept
   : QGraphicsScene(parent),
-    mSkipForeground(false),
+    mContentOnly(false),
     mGridStyle(GridStyle::None),
     mGridInterval(2540000),
     mBackgroundColor(Qt::white),
@@ -188,6 +188,18 @@ QPixmap GraphicsScene::toPixmap(const QSize& size,
   return pixmap;
 }
 
+void GraphicsScene::renderBackground(QPainter* painter, const QSize& size,
+                                     const QTransform& sceneToDevice) noexcept {
+  // Call drawBackground() directly, with the painter transform and the scene
+  // area which QGraphicsScene::render() would provide.
+  const QRectF target(QPointF(0, 0), size);
+  painter->save();
+  painter->setClipRect(target, Qt::IntersectClip);
+  painter->setWorldTransform(sceneToDevice, true);
+  drawBackground(painter, sceneToDevice.inverted().mapRect(target));
+  painter->restore();
+}
+
 void GraphicsScene::renderContent(QPainter* painter, const QSize& size,
                                   const QTransform& sceneToDevice) noexcept {
   // Source rect is the area of the scene visible in the target.
@@ -201,10 +213,10 @@ void GraphicsScene::renderContent(QPainter* painter, const QSize& size,
     painter->scale(-1, 1);
   }
 
-  // The foreground is drawn by renderForeground().
-  mSkipForeground = true;
+  // Skip the background and foreground layers.
+  mContentOnly = true;
   render(painter, target, source, Qt::KeepAspectRatio);
-  mSkipForeground = false;
+  mContentOnly = false;
   painter->restore();
 }
 
@@ -226,6 +238,11 @@ void GraphicsScene::renderForeground(QPainter* painter, const QSize& size,
 
 void GraphicsScene::drawBackground(QPainter* painter,
                                    const QRectF& rect) noexcept {
+  // Skip while rendering the content only.
+  if (mContentOnly) {
+    return;
+  }
+
   QPen gridPen(mGridColor);
   gridPen.setCosmetic(true);
 
@@ -309,7 +326,7 @@ void GraphicsScene::drawBackground(QPainter* painter,
 void GraphicsScene::drawForeground(QPainter* painter,
                                    const QRectF& rect) noexcept {
   // Skip while rendering the content only.
-  if (mSkipForeground) {
+  if (mContentOnly) {
     return;
   }
 

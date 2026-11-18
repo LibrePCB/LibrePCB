@@ -17,8 +17,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// AI DISCLAIMER: Claude AI assisted in the creation/modification of this file.
-
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
@@ -55,6 +53,7 @@ protected:
     addRect(QRectF(-20, -10, 60, 40), Qt::red);
     addRect(QRectF(10, 20, 50, 30), Qt::blue);
     addRect(QRectF(50, -5, 30, 60), Qt::green);
+    mScene.setGridStyle(GridStyle::Lines);
     showForeground(true);
   }
 
@@ -63,6 +62,12 @@ protected:
     mItems.back()->setBrush(color);
     mItems.back()->setPen(QPen(Qt::black, 0));
     mScene.addItem(*mItems.back());
+  }
+
+  void showItems(bool show) {
+    for (auto& item : mItems) {
+      item->setVisible(show);
+    }
   }
 
   void showForeground(bool show) {
@@ -91,7 +96,7 @@ protected:
   }
 
   /// Render the whole scene in one go, the way it was done before the
-  /// foreground layer could be rendered separately.
+  /// layers could be rendered separately.
   QImage renderAtOnce(bool mirror) {
     QImage img = newImage();
     QPainter painter(&img);
@@ -104,6 +109,15 @@ protected:
       painter.scale(-1, 1);
     }
     mScene.render(&painter, QRectF(QPointF(0, 0), mSize), source);
+    return img;
+  }
+
+  QImage renderBackground(bool mirror) {
+    QImage img = newImage();
+    QPainter painter(&img);
+    painter.setRenderHints(QPainter::Antialiasing |
+                           QPainter::SmoothPixmapTransform);
+    mScene.renderBackground(&painter, mSize, sceneToDevice(mirror));
     return img;
   }
 
@@ -157,18 +171,40 @@ protected:
  *  Test Methods
  ******************************************************************************/
 
-TEST_F(GraphicsSceneTest, testContentAndForegroundMatchRenderAtOnce) {
+TEST_F(GraphicsSceneTest, testLayersMatchRenderAtOnce) {
   for (bool mirror : {false, true}) {
-    QImage img = renderContent(mirror);
+    QImage img = renderBackground(mirror);
     {
       QPainter painter(&img);
       painter.setRenderHints(QPainter::Antialiasing |
                              QPainter::SmoothPixmapTransform);
+      mScene.renderContent(&painter, mSize, sceneToDevice(mirror));
       mScene.renderForeground(&painter, mSize, sceneToDevice(mirror));
     }
     const int diff = maxDifference(img, renderAtOnce(mirror));
     EXPECT_GE(diff, 0) << "mirror: " << mirror;
     EXPECT_LE(diff, 2) << "mirror: " << mirror;
+  }
+}
+
+TEST_F(GraphicsSceneTest, testBackgroundExcludesContent) {
+  for (bool mirror : {false, true}) {
+    const QImage withItems = renderBackground(mirror);
+    showItems(false);
+    const QImage withoutItems = renderBackground(mirror);
+    showItems(true);
+    EXPECT_FALSE(isTransparent(withItems)) << "mirror: " << mirror;
+    EXPECT_EQ(0, maxDifference(withItems, withoutItems))
+        << "mirror: " << mirror;
+  }
+}
+
+TEST_F(GraphicsSceneTest, testContentExcludesBackground) {
+  for (bool mirror : {false, true}) {
+    EXPECT_FALSE(isTransparent(renderContent(mirror))) << "mirror: " << mirror;
+    showItems(false);
+    EXPECT_TRUE(isTransparent(renderContent(mirror))) << "mirror: " << mirror;
+    showItems(true);
   }
 }
 

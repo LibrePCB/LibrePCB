@@ -201,9 +201,10 @@ slint::Image SlintGraphicsView::render(GraphicsScene& scene, float width,
           initialRect.center() - target.center() / mProjection.scale;
     }
 
-    // Render the scene content and the foreground layer on top of it.
+    // Render the background, the scene content and the foreground layer.
     const QTransform tf = viewTransform(mProjection.scale, mProjection.offset,
                                         mMirror, size.width());
+    scene.renderBackground(&painter, size, tf);
     scene.renderContent(&painter, size, tf);
     scene.renderForeground(&painter, size, tf);
 

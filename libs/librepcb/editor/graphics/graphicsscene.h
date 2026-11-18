@@ -148,9 +148,19 @@ public:
                    const QColor& background = Qt::transparent) noexcept;
 
   /**
-   * @brief Render the scene without its foreground layer
+   * @brief Render only the background layer of the scene
    *
-   * Draws the background and the scene items (components, pads, etc.) only.
+   * Draws the background fill and the grid, independent of the scene
+   * content. Takes the same arguments as ::renderContent().
+   */
+  void renderBackground(QPainter* painter, const QSize& size,
+                        const QTransform& sceneToDevice) noexcept;
+
+  /**
+   * @brief Render the scene content only
+   *
+   * Draws the scene items (components, pads, etc.) without the background
+   * and foreground layers.
    *
    * @param painter        Painter to draw with.
    * @param size           Size of the target area, starting at the origin.
@@ -172,6 +182,16 @@ public:
                         const QTransform& sceneToDevice) noexcept;
 
 protected:
+  /**
+   * @brief Callback function to draw the background layer
+   *
+   * Called by QGraphicsScene before drawing the scene items. Also called
+   * directly by ::renderBackground(). Draws nothing when rendering with
+   * ::renderContent().
+   *
+   * @param painter  Painter with the scene-to-device transform applied.
+   * @param rect     The scene area to draw.
+   */
   void drawBackground(QPainter* painter, const QRectF& rect) noexcept override;
 
   /**
@@ -187,7 +207,7 @@ protected:
   void drawForeground(QPainter* painter, const QRectF& rect) noexcept override;
 
 private:
-  bool mSkipForeground;  ///< Whether ::drawForeground() draws nothing.
+  bool mContentOnly;  ///< Whether the background and foreground draw nothing.
   GridStyle mGridStyle;
   PositiveLength mGridInterval;
   QColor mBackgroundColor;
