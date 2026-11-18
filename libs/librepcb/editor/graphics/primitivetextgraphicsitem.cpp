@@ -55,7 +55,7 @@ PrimitiveTextGraphicsItem::PrimitiveTextGraphicsItem(
     mRotate180(false),
     mFont(Application::getDefaultSansSerifFont()),
     mTextFlags(0),
-    mShapeEnabled(true),
+    mShape(std::nullopt),
     mLevelOfDetailToPixelate(2.5),
     mLevelOfDetailToHide(1),
     mOnLayerEditedSlot(*this, &PrimitiveTextGraphicsItem::layerEdited) {
@@ -160,8 +160,15 @@ void PrimitiveTextGraphicsItem::setState(GraphicsLayer::State state) noexcept {
  ******************************************************************************/
 
 QPainterPath PrimitiveTextGraphicsItem::shape() const noexcept {
-  return (mShapeEnabled && mLayer && mLayer->isVisible()) ? mShape
-                                                          : QPainterPath();
+  if (!mLayer || !mLayer->isVisible()) {
+    return QPainterPath();
+  }
+  // Calculating the tight shape is rather expensive, so do it only once
+  // after each change and only if really needed.
+  if (!mShape) {
+    mShape = calcShape();
+  }
+  return *mShape;
 }
 
 void PrimitiveTextGraphicsItem::paint(QPainter* painter,
@@ -240,12 +247,51 @@ void PrimitiveTextGraphicsItem::updateBoundingRectAndShape() noexcept {
     mBoundingRect = fm.boundingRect(QRectF(), mTextFlags, mText);
   }
 
-  mShape = QPainterPath();
-  mShape.addRect(mBoundingRect);
+  mShape = std::nullopt;
   if (mHeight) {
     setScale((*mHeight)->toPx() / fm.height());
   }
   update();
+}
+
+QPainterPath PrimitiveTextGraphicsItem::calcShape() const noexcept {
+  if (mDisplayText.isEmpty() && mOverlines.isEmpty()) {
+    return QPainterPath();
+  }
+
+  // Use the unhinted glyph outlines since the font metrics are rounded to
+  // whole pixels at the unscaled font size.
+  const QFontMetricsF fm(mFont);
+  const QStringList lines = mDisplayText.split(QLatin1Char('\n'));
+  // Take the line pitch from the layout used for drawing.
+  const qreal linePitch = (lines.count() > 1)
+      ? ((mBoundingRect.height() - fm.height()) / (lines.count() - 1))
+      : fm.lineSpacing();
+  QPainterPath textPath;
+  for (int i = 0; i < lines.count(); ++i) {
+    qreal x = mBoundingRect.left();
+    if (mTextFlags & Qt::AlignRight) {
+      x += mBoundingRect.width() - fm.horizontalAdvance(lines.at(i));
+    } else if (mTextFlags & Qt::AlignHCenter) {
+      x += (mBoundingRect.width() - fm.horizontalAdvance(lines.at(i))) / 2;
+    }
+    textPath.addText(
+        QPointF(x, mBoundingRect.top() + fm.ascent() + i * linePitch), mFont,
+        lines.at(i));
+  }
+  QRectF bounds = textPath.boundingRect();
+  const qreal lineMargin = OverlineMarkupParser::getLineWidth(fm.height()) / 2;
+  for (const QLineF& line : mOverlines) {
+    bounds = bounds.united(
+        QRectF(line.p1(), line.p2())
+            .normalized()
+            .adjusted(-lineMargin, -lineMargin, lineMargin, lineMargin));
+  }
+  QPainterPath path;
+  if (!bounds.isEmpty()) {
+    path.addRect(bounds);
+  }
+  return path;
 }
 
 /*******************************************************************************

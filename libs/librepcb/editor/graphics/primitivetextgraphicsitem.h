@@ -69,7 +69,6 @@ public:
   void setAlignment(const Alignment& align) noexcept;
   void setFont(Font font) noexcept;
   void setLayer(const std::shared_ptr<const GraphicsLayer>& layer) noexcept;
-  void setShapeEnabled(bool enabled) noexcept { mShapeEnabled = enabled; }
   void setState(GraphicsLayer::State state) noexcept;
   void setLevelOfDetailToPixelate(qreal lod) noexcept {
     mLevelOfDetailToPixelate = lod;
@@ -92,6 +91,16 @@ private:  // Methods
   void layerEdited(const GraphicsLayer& layer,
                    GraphicsLayer::Event event) noexcept;
   void updateBoundingRectAndShape() noexcept;
+  /**
+   * @brief Calculate the shape of the rendered text
+   *
+   * Unlike #mBoundingRect, which is the padded layout rectangle based on the
+   * font metrics, the shape only includes the area covered by glyphs and
+   * overlines.
+   *
+   * @return Tight shape in item coordinates (empty if nothing is drawn).
+   */
+  QPainterPath calcShape() const noexcept;
 
 private:  // Data
   std::shared_ptr<const GraphicsLayer> mLayer;
@@ -106,8 +115,7 @@ private:  // Data
   QFont mFont;
   int mTextFlags;
   QRectF mBoundingRect;
-  QPainterPath mShape;
-  bool mShapeEnabled;
+  mutable std::optional<QPainterPath> mShape;  // Calculated on demand.
   qreal mLevelOfDetailToPixelate;
   qreal mLevelOfDetailToHide;
 
