@@ -270,6 +270,7 @@ dependencies = [
  "lz-str",
  "parameterized_test",
  "regex",
+ "serde_json",
  "zip",
 ]
 

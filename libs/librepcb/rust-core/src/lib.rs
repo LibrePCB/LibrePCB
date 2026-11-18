@@ -14,6 +14,7 @@ mod ffi;
 // Modules
 pub mod math;
 pub mod renumber_components;
+pub mod rpc_server;
 pub mod toolbox;
 mod types;
 
