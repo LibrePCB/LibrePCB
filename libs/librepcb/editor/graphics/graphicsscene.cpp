@@ -321,14 +321,17 @@ void GraphicsScene::drawForeground(QPainter* painter,
     painter->rotate(90 - angle.toDeg());
 
     // Determine text rotation.
+    const bool isViewMirrored = (painter->worldTransform().determinant() < 0);
     Angle textRotation = Angle::deg0();
-    Alignment textAlign(HAlign::left(), VAlign::center());
+    Alignment textAlign(isViewMirrored ? HAlign::right() : HAlign::left(),
+                        VAlign::center());
     qreal xScale = 1;
     if (Toolbox::isTextUpsideDown(angle - Angle::deg90())) {
       textRotation = Angle::deg180();
       textAlign.mirrorH();
       xScale = -1;
     }
+    const qreal tickScale = isViewMirrored ? -xScale : xScale;
 
     // Use GraphicsPainter to get a simpler painting API.
     GraphicsPainter p(*painter);
@@ -360,11 +363,11 @@ void GraphicsScene::drawForeground(QPainter* painter,
       tickCount += 1;  // For the end value.
       gauge.currentTickInterval = tickInterval;
       const Length shortTickX =
-          Length::fromPx(10 / scaleFactor) * gauge.xScale * xScale;
+          Length::fromPx(10 / scaleFactor) * gauge.xScale * tickScale;
       const Length longTickX =
-          Length::fromPx(20 / scaleFactor) * gauge.xScale * xScale;
+          Length::fromPx(20 / scaleFactor) * gauge.xScale * tickScale;
       const Length textOffset =
-          Length::fromPx(25 / scaleFactor) * gauge.xScale * xScale;
+          Length::fromPx(25 / scaleFactor) * gauge.xScale * tickScale;
       for (int i = 0; i <= tickCount; ++i) {
         const bool isEnd = (i == tickCount);
         const Length tickPos = isEnd ? distance : (tickInterval * i);
@@ -389,7 +392,7 @@ void GraphicsScene::drawForeground(QPainter* painter,
                 Point(textOffset, tickPos), textRotation, textHeight,
                 (gauge.xScale != xScale) ? textAlign.mirroredH() : textAlign,
                 text, Application::getDefaultMonospaceFont(),
-                mOverlayContentColor, false, false, false, 10);
+                mOverlayContentColor, false, isViewMirrored, false, 10);
           }
         } else {
           // Draw short tick.
