@@ -178,6 +178,7 @@ if(BUILD_TESTS)
 endif()
 
 # Add libs
+add_subdirectory(libs/librepcb/automation)
 add_subdirectory(libs/librepcb/core)
 add_subdirectory(libs/librepcb/editor)
 add_subdirectory(libs/librepcb/eagleimport)
@@ -189,6 +190,7 @@ add_subdirectory(libs/parseagle)
 # Add apps
 add_subdirectory(apps/librepcb)
 add_subdirectory(apps/librepcb-cli)
+add_subdirectory(apps/librepcb-mcp)
 
 # Add unittests
 if(BUILD_TESTS)
