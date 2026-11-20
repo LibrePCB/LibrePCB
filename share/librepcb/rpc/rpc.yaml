@@ -1,0 +1,223 @@
+# LibrePCB RPC API specification (single source of truth)
+#
+# This file describes the RPC API of the LibrePCB RPC server, i.e. the
+# classes (with their methods), the involved data types and the error
+# types. The wire protocol (msgpack, framing, envelope, handshake) is
+# specified in dev/plans/rpc-server.md and in the generated documentation
+# (dev/doxygen/pages/rpc_api.md).
+#
+# Consumers:
+# - The documentation generator (dev/generate_rpc_api_docs.py).
+# - Client authors: Read this file to know which methods exist, and compare
+#   each method's `added_in_version` with the `appVersion` reported by the
+#   server's `initialize` method to know which ones are available on a
+#   given server (functions added after the revision of your spec file are
+#   unknown to you, which is fine — calling them results in error -32601).
+#
+# Schema notes:
+# - Types are from the protocol's value domain: null, bool, int (i64),
+#   float (f64), string, binary, array, map (with string keys). A struct
+#   is a map with the listed fields.
+# - The params of every method are a map. The reserved key "obj" carries
+#   the receiver handle for non-static methods — it is NOT listed in the
+#   params below.
+# - Numeric conventions: Lengths are in nanometers (i64), angles in
+#   microdegrees (i64), if not stated otherwise.
+
+spec_version: 1
+protocol_version: 1
+
+# ---------------------------------------------------------------------------
+# Global error types. The server sends them as a map {"code": <int>,
+# "message": <string>, ...properties}. Each method lists which of these
+# error types it may return.
+# ---------------------------------------------------------------------------
+
+error_types:
+  - name: CommandFailed
+    code: -32002
+    message: "Command failed"
+    description: >-
+      The command could not be executed, e.g. because it threw an
+      exception. The message contains details about the failure.
+
+  - name: ProjectNotOpen
+    code: -32003
+    message: "Project not open"
+    description: >-
+      The requested project is not opened in the application.
+    properties:
+      - name: project
+        type: string
+        description: The requested project handle (UUID).
+
+# ---------------------------------------------------------------------------
+# Structs (maps with the listed fields).
+# ---------------------------------------------------------------------------
+
+structs:
+  - name: ProjectSummary
+    description: A summary of an open project.
+    fields:
+      - name: uuid
+        type: string
+        description: The project UUID (null if the project file contains an invalid UUID).
+      - name: name
+        type: string
+        description: The project name.
+      - name: author
+        type: string
+        description: The project author.
+      - name: version
+        type: string
+        description: The project version.
+      - name: path
+        type: string
+        description: The absolute path of the project file.
+      - name: modified
+        type: bool
+        description: Whether the project was modified since the last save.
+
+  - name: ProjectDetails
+    description: Details about an open project.
+    fields:
+      - name: uuid
+        type: string
+        description: The project UUID.
+      - name: name
+        type: string
+        description: The project name.
+      - name: author
+        type: string
+        description: The project author.
+      - name: version
+        type: string
+        description: The project version.
+      - name: path
+        type: string
+        description: The absolute path of the project file.
+      - name: modified
+        type: bool
+        description: Whether the project was modified since the last save.
+      - name: sheets
+        type: array
+        items: SchematicSummary
+        description: All schematic sheets of the project.
+      - name: boards
+        type: array
+        items: BoardSummary
+        description: All boards of the project.
+
+  - name: SchematicSummary
+    description: A summary of a schematic sheet.
+    fields:
+      - name: uuid
+        type: string
+        description: The schematic UUID.
+      - name: name
+        type: string
+        description: The schematic name.
+
+  - name: BoardSummary
+    description: A summary of a board.
+    fields:
+      - name: uuid
+        type: string
+        description: The board UUID.
+      - name: name
+        type: string
+        description: The board name.
+
+  - name: UndoStackStatus
+    description: The state of a project's undo stack.
+    fields:
+      - name: canUndo
+        type: bool
+        description: Whether undo is currently possible.
+      - name: canRedo
+        type: bool
+        description: Whether redo is currently possible.
+      - name: undoText
+        type: string
+        description: The text of the undo command (empty if N/A).
+      - name: redoText
+        type: string
+        description: The text of the redo command (empty if N/A).
+      - name: clean
+        type: bool
+        description: Whether the stack is in the clean state (the state of the last save).
+
+# ---------------------------------------------------------------------------
+# Enums. Values are transferred as strings (exactly as listed below).
+# ---------------------------------------------------------------------------
+
+enums: []
+
+# ---------------------------------------------------------------------------
+# Classes with their methods. The full method name on the wire is
+# "ClassName.method_name". Non-static methods require the receiver handle
+# in the reserved "obj" key of the params.
+# ---------------------------------------------------------------------------
+
+classes:
+  - name: Project
+    description: A project opened in the application.
+    handle: The UUID of the open project (as returned by Project.list).
+    methods:
+      - name: list
+        static: true
+        description: List all open projects.
+        params: []
+        result:
+          type: map
+          fields:
+            - name: projects
+              type: array
+              items: ProjectSummary
+              description: All open projects, in the order of their editor tabs.
+        errors: []
+        added_in_version: "2.1.2"
+
+      - name: get
+        description: Get details about an open project.
+        params: []
+        result: ProjectDetails
+        errors: [ProjectNotOpen]
+        added_in_version: "2.1.2"
+
+  - name: UndoStack
+    description: The undo stack of an open project.
+    handle: The UUID of the project whose undo stack to use.
+    methods:
+      - name: get_status
+        description: Get the state of the project's undo stack.
+        params: []
+        result: UndoStackStatus
+        errors: [ProjectNotOpen]
+        added_in_version: "2.1.2"
+
+      - name: undo
+        description: >-
+          Undo the last command of the project's undo stack, i.e. the same
+          as pressing Ctrl+Z in the GUI. The command stays on the redo
+          stack, so the user can redo it in the GUI.
+        params: []
+        result: UndoStackStatus
+        errors: [ProjectNotOpen, CommandFailed]
+        added_in_version: "2.1.2"
+
+      - name: redo
+        description: >-
+          Redo the last undone command of the project's undo stack, i.e.
+          the same as pressing Ctrl+Shift+Z in the GUI.
+        params: []
+        result: UndoStackStatus
+        errors: [ProjectNotOpen, CommandFailed]
+        added_in_version: "2.1.2"
+
+# ---------------------------------------------------------------------------
+# Events (notifications which the server broadcasts to all clients). None
+# yet — to be added together with the milestone which introduces them.
+# ---------------------------------------------------------------------------
+
+events: []

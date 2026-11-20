@@ -30,9 +30,6 @@
 #include <librepcb/core/project/schematic/schematic.h>
 #include <librepcb/core/types/uuid.h>
 
-#include <QJsonArray>
-#include <QJsonObject>
-
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -45,58 +42,56 @@ namespace editor {
 namespace {
 
 /**
- * @brief Serialize a project to a JSON object
+ * @brief Serialize a project to a map
  *
  * @param editor  The project editor of the project to serialize.
  */
-QJsonObject projectToJson(ProjectEditor& editor) {
+QVariantMap projectToVariant(ProjectEditor& editor) {
   const Project& project = editor.getProject();
-  return QJsonObject{
-      {"uuid", project.getUuid().toStr()},
-      {"name", *project.getName()},
-      {"author", project.getAuthor()},
-      {"version", *project.getVersion()},
-      {"path", project.getFilepath().toStr()},
-      {"modified", !editor.getUndoStack().isClean()},
-  };
+  QVariantMap map;
+  map.insert("uuid", project.getUuid().toStr());
+  map.insert("name", *project.getName());
+  map.insert("author", project.getAuthor());
+  map.insert("version", *project.getVersion());
+  map.insert("path", project.getFilepath().toStr());
+  map.insert("modified", !editor.getUndoStack().isClean());
+  return map;
 }
 
 /**
- * @brief Serialize the state of a project's undo stack to a JSON object
+ * @brief Serialize the state of a project's undo stack to a map
  *
  * @param stack  The undo stack to serialize.
  */
-QJsonObject undoStackToJson(const UndoStack& stack) {
-  return QJsonObject{
-      {"canUndo", stack.canUndo()},
-      {"canRedo", stack.canRedo()},
-      {"undoText", stack.getUndoCmdText()},
-      {"redoText", stack.getRedoCmdText()},
-      {"clean", stack.isClean()},
-  };
+QVariantMap undoStackToVariant(const UndoStack& stack) {
+  QVariantMap map;
+  map.insert("canUndo", stack.canUndo());
+  map.insert("canRedo", stack.canRedo());
+  map.insert("undoText", stack.getUndoCmdText());
+  map.insert("redoText", stack.getRedoCmdText());
+  map.insert("clean", stack.isClean());
+  return map;
 }
 
 /**
  * @brief Find the project editor of an open project
  *
- * @param app     The application to look up the project in.
- * @param params  The request params, containing the project UUID in the
- *                key "project".
+ * @param app   The application to look up the project in.
+ * @param obj   The project handle (the "obj" key of the request params).
  *
  * @return The requested project editor, or nullptr if there is no such
- *         project open (or the UUID is missing/invalid).
+ *         project open (or the handle is missing/invalid).
  */
-ProjectEditor* findProject(GuiApplication& app,
-                           const QJsonObject& params) noexcept {
+ProjectEditor* findProject(GuiApplication& app, const QString& obj) noexcept {
   try {
-    const Uuid uuid = Uuid::fromString(params.value("project").toString());
+    const Uuid uuid = Uuid::fromString(obj);
     for (const auto& editor : app.getProjects()) {
       if (editor->getProject().getUuid() == uuid) {
         return editor.get();
       }
     }
   } catch (const Exception&) {
-    // Missing or invalid project parameter → considered "not open".
+    // Missing or invalid project handle → considered "not open".
   }
   return nullptr;
 }
@@ -109,88 +104,96 @@ ProjectEditor* findProject(GuiApplication& app,
 
 QHash<QString, RpcServer::RpcHandler>
     RpcServer::buildCommandRegistry() noexcept {
+  using Request = RpcServer::Request;
   QHash<QString, RpcHandler> registry;
 
   // List all open projects.
-  registry.insert("project/list", [](GuiApplication& app, const QJsonObject&) {
-    QJsonArray projects;
-    for (const auto& editor : app.getProjects()) {
-      projects.append(projectToJson(*editor));
-    }
-    return RpcResult::success(QJsonObject{{"projects", projects}});
-  });
+  registry.insert("Project.list",
+                  [](const QSharedPointer<Request>& request, const QString&,
+                     const QVariantMap&) {
+                    QVariantList projects;
+                    for (const auto& editor : request->getApp().getProjects()) {
+                      projects.append(QVariant(projectToVariant(*editor)));
+                    }
+                    QVariantMap result;
+                    result.insert("projects", projects);
+                    request->replySuccess(result);
+                  });
 
-  // Get details about one open project.
-  registry.insert("project/get",
-                  [](GuiApplication& app, const QJsonObject& params) {
-                    ProjectEditor* editor = findProject(app, params);
+  // Get details about an open project.
+  registry.insert("Project.get",
+                  [](const QSharedPointer<Request>& request, const QString& obj,
+                     const QVariantMap&) {
+                    ProjectEditor* editor = findProject(request->getApp(), obj);
                     if (!editor) {
-                      return RpcResult::failure(
-                          ProjectNotOpen,
-                          QString("Project not open: %1")
-                              .arg(params.value("project").toString()));
+                      request->replyError(
+                          RpcServer::ProjectNotOpen, "Project not open",
+                          QVariantMap{{"project", QVariant(obj)}});
+                      return;
                     }
-                    QJsonObject result = projectToJson(*editor);
+                    QVariantMap result = projectToVariant(*editor);
                     const Project& project = editor->getProject();
-                    QJsonArray sheets;
+                    QVariantList sheets;
                     for (const Schematic* schematic : project.getSchematics()) {
-                      sheets.append(QJsonObject{
-                          {"uuid", schematic->getUuid().toStr()},
-                          {"name", *schematic->getName()},
-                      });
+                      QVariantMap sheet;
+                      sheet.insert("uuid", schematic->getUuid().toStr());
+                      sheet.insert("name", *schematic->getName());
+                      sheets.append(QVariant(sheet));
                     }
-                    result["sheets"] = sheets;
-                    QJsonArray boards;
+                    result.insert("sheets", sheets);
+                    QVariantList boards;
                     for (const Board* board : project.getBoards()) {
-                      boards.append(QJsonObject{
-                          {"uuid", board->getUuid().toStr()},
-                          {"name", *board->getName()},
-                      });
+                      QVariantMap item;
+                      item.insert("uuid", board->getUuid().toStr());
+                      item.insert("name", *board->getName());
+                      boards.append(QVariant(item));
                     }
-                    result["boards"] = boards;
-                    return RpcResult::success(result);
+                    result.insert("boards", boards);
+                    request->replySuccess(result);
                   });
 
   // Get the state of a project's undo stack.
   registry.insert(
-      "undostack/getStatus",
-      [](GuiApplication& app, const QJsonObject& params) {
-        ProjectEditor* editor = findProject(app, params);
+      "UndoStack.get_status",
+      [](const QSharedPointer<Request>& request, const QString& obj,
+         const QVariantMap&) {
+        ProjectEditor* editor = findProject(request->getApp(), obj);
         if (!editor) {
-          return RpcResult::failure(
-              ProjectNotOpen,
-              QString("Project not open: %1")
-                  .arg(params.value("project").toString()));
+          request->replyError(RpcServer::ProjectNotOpen, "Project not open",
+                              QVariantMap{{"project", QVariant(obj)}});
+          return;
         }
-        return RpcResult::success(undoStackToJson(editor->getUndoStack()));
+        request->replySuccess(undoStackToVariant(editor->getUndoStack()));
       });
 
   // Undo the last command of a project's undo stack.
   registry.insert(
-      "undostack/undo", [](GuiApplication& app, const QJsonObject& params) {
-        ProjectEditor* editor = findProject(app, params);
+      "UndoStack.undo",
+      [](const QSharedPointer<Request>& request, const QString& obj,
+         const QVariantMap&) {
+        ProjectEditor* editor = findProject(request->getApp(), obj);
         if (!editor) {
-          return RpcResult::failure(
-              ProjectNotOpen,
-              QString("Project not open: %1")
-                  .arg(params.value("project").toString()));
+          request->replyError(RpcServer::ProjectNotOpen, "Project not open",
+                              QVariantMap{{"project", QVariant(obj)}});
+          return;
         }
         editor->getUndoStack().undo();  // Can throw.
-        return RpcResult::success(undoStackToJson(editor->getUndoStack()));
+        request->replySuccess(undoStackToVariant(editor->getUndoStack()));
       });
 
   // Redo the last undone command of a project's undo stack.
   registry.insert(
-      "undostack/redo", [](GuiApplication& app, const QJsonObject& params) {
-        ProjectEditor* editor = findProject(app, params);
+      "UndoStack.redo",
+      [](const QSharedPointer<Request>& request, const QString& obj,
+         const QVariantMap&) {
+        ProjectEditor* editor = findProject(request->getApp(), obj);
         if (!editor) {
-          return RpcResult::failure(
-              ProjectNotOpen,
-              QString("Project not open: %1")
-                  .arg(params.value("project").toString()));
+          request->replyError(RpcServer::ProjectNotOpen, "Project not open",
+                              QVariantMap{{"project", QVariant(obj)}});
+          return;
         }
         editor->getUndoStack().redo();  // Can throw.
-        return RpcResult::success(undoStackToJson(editor->getUndoStack()));
+        request->replySuccess(undoStackToVariant(editor->getUndoStack()));
       });
 
   return registry;

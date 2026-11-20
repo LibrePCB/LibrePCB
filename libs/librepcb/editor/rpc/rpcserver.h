@@ -25,10 +25,10 @@
  ******************************************************************************/
 #include <librepcb/core/exceptions.h>
 
-#include <QJsonObject>
+#include <QHash>
+#include <QSharedPointer>
 #include <QtCore>
 
-#include <atomic>
 #include <functional>
 
 /*******************************************************************************
@@ -51,13 +51,24 @@ class ProjectEditor;
 /// the #librepcb::editor::RpcServer object passed as context.
 ///
 /// @param ctx      The RpcServer object (as passed to ffi_rpc_server_new()).
-/// @param method   The method name, e.g. "project/list".
-/// @param params   The raw JSON of the request params.
-/// @param response The serialized response (result or error).
+/// @param connId   The connection the request arrived on.
+/// @param msgid    The msgid of the request (to be used for the reply).
+/// @param method   The method name, e.g. "Project.list".
+/// @param params   The whole params map (including the reserved "obj" key,
+///                 which is extracted by the C++ dispatch layer).
 ///
-/// @return Whether the command succeeded.
-extern "C" bool rpcServerDispatch(void* ctx, const QString* method,
-                                  const QString* params, QString* response);
+/// @return Whether the request was accepted (a response will be sent).
+extern "C" bool rpcServerDispatch(void* ctx, uint64_t connId, uint32_t msgid,
+                                  const QString* method,
+                                  const QVariant* params);
+
+/// FFI trampoline which notifies the RpcServer that a client cancelled a
+/// pending request.
+///
+/// @param ctx    The RpcServer object (as passed to ffi_rpc_server_new()).
+/// @param connId The connection the request arrived on.
+/// @param msgid  The msgid of the request to cancel.
+extern "C" void rpcServerCancel(void* ctx, uint64_t connId, uint32_t msgid);
 
 /*******************************************************************************
  *  Class RpcServer
@@ -66,25 +77,23 @@ extern "C" bool rpcServerDispatch(void* ctx, const QString* method,
 /**
  * @brief The RPC server to control the application with external tools
  *
- * This class integrates the Rust JSON-RPC server (rust-core module
- * `rpc_server`) into the LibrePCB application:
+ * This class integrates the Rust RPC server (rust-core module `rpc_server`)
+ * into the LibrePCB application:
  *
  * - It starts and stops the (Rust implemented) server, which listens on
- *   127.0.0.1 for JSON-RPC 2.0 commands (see `dev/plans/rpc-server.md`).
+ *   127.0.0.1 for msgpack-encoded RPC commands (see the specification
+ *   in `dev/plans/rpc-server.md` and `share/librepcb/rpc/rpc.yaml`).
  * - It provides the command dispatcher which marshals incoming commands to
- *   the GUI thread (via `Qt::BlockingQueuedConnection`) and dispatches them
- *   to the command handlers registered in `commands.cpp`.
- * - It serves the OpenRPC API schema (from `share/librepcb/rpc/api.json`)
- *   via the `rpc.discover` method.
+ *   the GUI thread (via `Qt::QueuedConnection`, asynchronously!) and
+ *   dispatches them to the command handlers registered in `commands.cpp`.
+ * - Commands may reply synchronously (from within the handler) or later
+ *   (e.g. after a long-running task finished), optionally emitting
+ *   request-scoped messages (e.g. progress) in the meantime.
+ * - It pushes application events (e.g. "project_opened") to all clients.
  *
  * @note The token is currently hardcoded (development only!) and thus the
  *       server accepts any local process. To be replaced by a random token
  *       together with the instance registry, see the plan section 9.
- *
- * @warning Code running on the GUI thread must never synchronously call back
- *          into this server (that would deadlock)! #notifyEvent() is safe
- *          since it is non-blocking. All other interaction must happen
- *          through the command handlers.
  */
 class RpcServer final : public QObject {
   Q_OBJECT
@@ -93,48 +102,115 @@ public:
   // Types
 
   /**
-   * @brief Application-specific JSON-RPC error codes
+   * @brief Application-specific RPC error codes
    *
    * @note Keep in sync with the `error_code` module in
    *       `rust-core/src/rpc_server/protocol.rs`!
    */
   enum ErrorCode {
-    Unauthenticated = -32001,
+    MethodNotFound = -32601,
+    InvalidParams = -32602,
+    InternalError = -32603,
     CommandFailed = -32002,
     ProjectNotOpen = -32003,
-    ServerShuttingDown = -32004,
+    Cancelled = -32005,
   };
-
-  /// JSON-RPC error codes defined by the specification
-  enum StandardErrorCode { MethodNotFound = -32601, InvalidParams = -32602 };
 
   /**
-   * @brief The result of a command handler
+   * @brief A command request, as handed to the command handlers
+   *
+   * A request object is created on the GUI thread when a command is
+   * dispatched. The handler must ensure that it is replied exactly once,
+   * either synchronously (by calling #replySuccess() or #replyError()) or
+   * asynchronously (by keeping the object alive and calling one of these
+   * methods later). As a safety net, the destructor replies with an error
+   * if the handler forgot to reply.
    */
-  struct RpcResult final {
-    /// Whether the command succeeded
-    bool ok = false;
-    /// The result value (only valid if #ok is `true`)
-    QJsonObject result;
-    /// The error code (only valid if #ok is `false`)
-    int errorCode = 0;
-    /// The error message (only valid if #ok is `false`)
-    QString errorMessage;
+  class Request final {
+  public:
+    // Constructors / Destructor
+    Request() = delete;
+    Request(const Request& other) = delete;
+    Request& operator=(const Request& rhs) = delete;
+    Request(GuiApplication& app, RpcServer& server, uint64_t connId,
+            uint32_t msgid, QString method) noexcept;
+    ~Request() noexcept;
 
-    /// Create a successful result
-    static RpcResult success(QJsonObject result = QJsonObject()) noexcept {
-      return RpcResult{true, result, 0, QString()};
-    }
+    // Getters
+    GuiApplication& getApp() noexcept { return mApp; }
+    const QString& getMethod() const noexcept { return mMethod; }
 
-    /// Create a failed result
-    static RpcResult failure(int code, const QString& message) noexcept {
-      return RpcResult{false, QJsonObject(), code, message};
-    }
+    /**
+     * @brief Check whether the client cancelled this request
+     *
+     * @note Cancellation is cooperative: The handler may poll this flag
+     *       during long-running work and stop early (replying with the
+     *       "cancelled" error). If it doesn't, the normal result is sent
+     *       as usual — the client must handle both cases.
+     */
+    bool isCancelled() const noexcept { return mCancelled; }
+
+    // General Methods
+
+    /**
+     * @brief Reply with a result (finishes the request)
+     *
+     * @param result  The result value (any type of the protocol's value
+     *                domain, usually a map). Gets normalized, i.e. plain
+     *                C++ types like `int` are converted automatically.
+     */
+    void replySuccess(const QVariant& result = QVariant()) noexcept;
+
+    /**
+     * @brief Reply with an error (finishes the request)
+     *
+     * @param code        An error code (see #ErrorCode).
+     * @param message     A human-readable error message.
+     * @param properties  Additional error properties, sent next to
+     *                    "code" and "message" (see the error types in the
+     *                    API specification).
+     */
+    void replyError(int code, const QString& message,
+                    const QVariantMap& properties = QVariantMap()) noexcept;
+
+    /**
+     * @brief Send a request-scoped message to the client (e.g. progress)
+     *
+     * May be called any number of times while the request is pending, i.e.
+     * before it is replied. Never blocks, thus safe to call from the GUI
+     * thread.
+     *
+     * @param payload  The message payload (e.g. a progress map).
+     */
+    void emitMessage(const QVariant& payload) noexcept;
+
+  private:  // Methods
+    /// Mark the request as cancelled (called by the server).
+    void setCancelled() noexcept { mCancelled = true; }
+
+    /// Suppress the safety-net reply in the destructor (server teardown).
+    void invalidate() noexcept { mServer = nullptr; }
+
+    /// Send the response through the FFI (does nothing if invalidated).
+    void sendReply(bool ok, const QVariant& value) noexcept;
+
+    friend class RpcServer;
+
+  private:  // Data
+    GuiApplication& mApp;
+    RpcServer* mServer;  ///< Null once the server is being destroyed.
+    uint64_t mConnId;
+    uint32_t mMsgid;
+    QString mMethod;
+    bool mReplied;
+    bool mCancelled;
   };
 
-  /// A command handler, executed on the GUI thread
+  /// A command handler, executed on the GUI thread. It must reply the
+  /// request (synchronously or asynchronously, see #Request).
   using RpcHandler =
-      std::function<RpcResult(GuiApplication&, const QJsonObject&)>;
+      std::function<void(const QSharedPointer<Request>& request,
+                         const QString& obj, const QVariantMap& args)>;
 
   // Constructors / Destructor
   RpcServer() = delete;
@@ -155,67 +231,52 @@ public:
   ~RpcServer() noexcept override;
 
   /**
-   * @brief Push an event (a JSON-RPC notification) to all connected clients
-   *
-   * This is safe to be called from the GUI thread since it never blocks.
-   *
-   * @param method    The event name, e.g. "event/projectOpened".
-   * @param params    The raw JSON of the event params (may be empty).
-   */
-  void notifyEvent(const QString& method, const QString& params) noexcept;
-
-  /**
    * @brief Get all registered command handlers, by method name
    *
    * @note This is a static method on purpose, i.e. it does not require an
-   *       application or a running server. It is used by a unit test to
-   *       verify that the methods are in sync with the API schema.
+   *       application or a running server. It allows testing the registry
+   *       without launching the whole application.
    */
   static QHash<QString, RpcHandler> buildCommandRegistry() noexcept;
 
+private:  // Types
+  /// Key for a pending request in the registry.
+  static QString requestKey(uint64_t connId, uint32_t msgid) noexcept {
+    return QString::fromLatin1("%1:%2").arg(connId).arg(msgid);
+  }
+
 private:  // Methods
-  /// @brief The FFI trampoline needs access to the private dispatch methods
-  friend bool rpcServerDispatch(void* ctx, const QString* method,
-                                const QString* params, QString* response);
+  /// @brief The FFI trampolines need access to the private methods.
+  friend bool rpcServerDispatch(void* ctx, uint64_t connId, uint32_t msgid,
+                                const QString* method, const QVariant* params);
+  friend void rpcServerCancel(void* ctx, uint64_t connId, uint32_t msgid);
 
-  /**
-   * @brief Dispatch a command request (on the calling thread)
-   *
-   * Called by the FFI trampoline, i.e. on one of the Rust connection
-   * threads. Marshals the command to the GUI thread, blocking until the
-   * command was executed (or the server is shutting down).
-   *
-   * @param method    The method name, e.g. "project/list".
-   * @param params    The raw JSON of the request params.
-   * @param response  The serialized response (result or error, see
-   *                  `RpcDispatchFn` in `ffi/rpc_server_ffi.rs`).
-   *
-   * @return Whether the command succeeded.
-   */
-  bool dispatchFromWorkerThread(const QString& method, const QString& params,
-                                QString& response) noexcept;
+  /// Called on a Rust connection thread: Marshal the request to the GUI
+  /// thread (asynchronously).
+  bool dispatchFromWorkerThread(uint64_t connId, uint32_t msgid,
+                                const QString& method,
+                                const QVariant& params) noexcept;
 
-  /**
-   * @brief Execute a command request (on the GUI thread)
-   *
-   * @param method    The method name.
-   * @param params    The raw JSON of the request params.
-   * @param response  The serialized response (result or error).
-   *
-   * @return Whether the command succeeded.
-   */
-  bool dispatch(const QString& method, const QString& params,
-                QString& response) noexcept;
+  /// Called on a Rust connection thread: Marshal the cancel notification
+  /// to the GUI thread (asynchronously).
+  void cancelFromWorkerThread(uint64_t connId, uint32_t msgid) noexcept;
 
-  /**
-   * @brief Serialize an error response
-   *
-   * @param response  The resulting JSON object (as serialized string).
-   * @param code      The error code.
-   * @param message   The error message.
-   */
-  static void writeErrorResponse(QString& response, int code,
-                                 const QString& message) noexcept;
+  /// Called on the GUI thread: Extract the "obj" key, look up the command
+  /// handler and execute it (or reply with an error).
+  void handleRequest(uint64_t connId, uint32_t msgid, const QString& method,
+                     const QVariant& params) noexcept;
+
+  /// Called on the GUI thread: Mark a pending request as cancelled.
+  void handleCancel(uint64_t connId, uint32_t msgid) noexcept;
+
+  /// Reply an error directly, without creating a #Request object (e.g. for
+  /// invalid params or an unknown method). Exactly-once is enforced by the
+  /// Rust server, so this is safe even if the request was already replied.
+  void replyError(uint64_t connId, uint32_t msgid, int code,
+                  const QString& message) noexcept;
+
+  /// Push an event (a notification) to all connected clients.
+  void notifyEvent(const QString& method, const QVariant& params) noexcept;
 
 private:  // Data
   /// The application to dispatch the commands to
@@ -227,9 +288,8 @@ private:  // Data
   /// All registered command handlers, by method name
   QHash<QString, RpcHandler> mCommands;
 
-  /// Whether the server is currently shutting down (new commands are
-  /// rejected instead of being marshalled to the GUI thread)
-  std::atomic<bool> mShuttingDown;
+  /// Pending (dispatched, not yet replied) requests, by connection+msgid
+  QHash<QString, QSharedPointer<Request>> mPendingRequests;
 };
 
 /*******************************************************************************

@@ -186,6 +186,10 @@ pub fn qstring_delete(obj: *mut QString) {
 #[doc(hidden)]
 pub struct QStringList;
 
+/// cbindgen:no-export
+#[doc(hidden)]
+pub struct QVariant;
+
 #[allow(improper_ctypes)]
 extern "C" {
   fn ffi_qstringlist_len(obj: &QStringList) -> usize;
@@ -215,4 +219,91 @@ pub fn from_qstringlist(obj: &QStringList) -> Vec<String> {
     }
   }
   vec
+}
+
+/// Qt metatype IDs (`QMetaType::Type` values) as returned by
+/// [ffi_qvariant_type].
+///
+/// <div class="warning">
+/// Keep in sync with the `QMetaType::Type` enum in `QtCore/QMetaType`!
+/// The values are part of Qt's stable ABI. Only the IDs of the RPC
+/// protocol's value domain are declared here — any other metatype is
+/// rejected by the caller.
+/// </div>
+pub mod qmetatype {
+  /// `QMetaType::UnknownType` — an invalid QVariant (represents nil).
+  pub const UNKNOWN: i32 = 0;
+  /// `QMetaType::Bool`
+  pub const BOOL: i32 = 1;
+  /// `QMetaType::LongLong`
+  pub const LONGLONG: i32 = 4;
+  /// `QMetaType::Double`
+  pub const DOUBLE: i32 = 6;
+  /// `QMetaType::QVariantMap`
+  pub const QVARIANTMAP: i32 = 8;
+  /// `QMetaType::QVariantList`
+  pub const QVARIANTLIST: i32 = 9;
+  /// `QMetaType::QString`
+  pub const QSTRING: i32 = 10;
+  /// `QMetaType::QByteArray`
+  pub const QBYTEARRAY: i32 = 12;
+}
+
+#[allow(improper_ctypes)]
+extern "C" {
+  pub fn ffi_qvariant_new() -> *mut QVariant;
+  pub fn ffi_qvariant_delete(obj: *mut QVariant);
+  pub fn ffi_qvariant_set_nil(obj: &mut QVariant);
+  pub fn ffi_qvariant_set_bool(obj: &mut QVariant, value: bool);
+  pub fn ffi_qvariant_set_i64(obj: &mut QVariant, value: i64);
+  pub fn ffi_qvariant_set_f64(obj: &mut QVariant, value: f64);
+  pub fn ffi_qvariant_set_str(obj: &mut QVariant, s: *const c_char, len: usize);
+  pub fn ffi_qvariant_set_bytearray(
+    obj: &mut QVariant,
+    data: *const u8,
+    len: usize,
+  );
+  pub fn ffi_qvariant_set_empty_map(obj: &mut QVariant);
+  pub fn ffi_qvariant_set_empty_list(obj: &mut QVariant);
+  pub fn ffi_qvariant_map_insert(
+    obj: &mut QVariant,
+    key: *const c_char,
+    key_len: usize,
+    value: &QVariant,
+  ) -> bool;
+  pub fn ffi_qvariant_list_append(obj: &mut QVariant, value: &QVariant)
+    -> bool;
+  pub fn ffi_qvariant_type(obj: &QVariant) -> i32;
+  pub fn ffi_qvariant_get_bool(obj: &QVariant) -> bool;
+  pub fn ffi_qvariant_get_i64(obj: &QVariant) -> i64;
+  pub fn ffi_qvariant_get_f64(obj: &QVariant) -> f64;
+  pub fn ffi_qvariant_get_str(obj: &QVariant, out: &mut QString);
+  pub fn ffi_qvariant_get_bytearray_len(obj: &QVariant) -> usize;
+  pub fn ffi_qvariant_get_bytearray_data(obj: &QVariant, out: *mut u8);
+  pub fn ffi_qvariant_list_len(obj: &QVariant) -> usize;
+  pub fn ffi_qvariant_list_at(obj: &QVariant, index: usize, out: &mut QVariant);
+  pub fn ffi_qvariant_map_len(obj: &QVariant) -> usize;
+  pub fn ffi_qvariant_map_at(
+    obj: &QVariant,
+    index: usize,
+    key: &mut QString,
+    value: &mut QVariant,
+  );
+}
+
+/// Allocate a new (nil) `QVariant` (to be freed with [qvariant_delete])
+///
+/// <div class="warning">
+/// The returned object is owned by the caller and must be freed with
+/// [qvariant_delete] (it was allocated by C++ through the FFI).
+/// </div>
+#[allow(dead_code)]
+pub fn qvariant_new() -> *mut QVariant {
+  unsafe { ffi_qvariant_new() }
+}
+
+/// Delete a `QVariant` allocated with [qvariant_new]
+#[allow(dead_code)]
+pub fn qvariant_delete(obj: *mut QVariant) {
+  unsafe { ffi_qvariant_delete(obj) }
 }

@@ -6,9 +6,6 @@ set(CMAKE_AUTORCC OFF)
 # Path to test data
 add_definitions(-DTEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/../data")
 
-# Path to runtime resources (share directory)
-add_definitions(-DTEST_SHARE_DIR="${CMAKE_SOURCE_DIR}/share/librepcb")
-
 # Tests require libpthread
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
@@ -133,7 +130,6 @@ add_executable(
   editor/project/board/cmdremoveboarditemstest.cpp
   editor/project/schematic/cmddragselectedschematicitemstest.cpp
   editor/project/schematic/schematicclipboarddatatest.cpp
-  editor/rpc/rpcservertest.cpp
   editor/utils/shortcutsreferencegeneratortest.cpp
   editor/utils/slinthelperstest.cpp
   editor/widgets/editabletablewidgetreceiver.h

@@ -1,23 +1,22 @@
-//! Connection handling for the TCP RPC server: The accept loop and the
+//! Connection handling for the RPC server: The accept loop and the
 //! per-connection reader/writer threads.
 
-use std::io::{self, BufReader};
+use std::io::{self, BufReader, Write};
 use std::net::{TcpListener, TcpStream};
-use std::panic::{catch_unwind, AssertUnwindSafe};
 use std::sync::atomic::Ordering;
 use std::sync::mpsc;
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::Duration;
 
-use serde_json::{Map, Value};
+use rmpv::Value;
 
-use super::codec::{read_message, write_message};
+use super::codec::{self, read_message};
 use super::protocol::{
-  build_error_response, build_result_response, classify_message, error_code,
-  ParsedMessage, RpcError, METHOD_INITIALIZE, METHOD_PING, METHOD_RPC_DISCOVER,
+  self, build_response, classify_message, error_code, extract_token,
+  ParsedMessage, RpcError, METHOD_INITIALIZE, METHOD_PING,
 };
-use super::{lock, Connection, Inner};
+use super::{lock, Connection, DispatchOutcome, Inner};
 
 /// Poll interval of the non-blocking accept loop.
 const ACCEPT_POLL_INTERVAL: Duration = Duration::from_millis(10);
@@ -85,20 +84,22 @@ fn handle_connection(inner: Arc<Inner>, stream: TcpStream, conn_id: u64) {
   // Register the connection. The registry keeps a clone of the sender
   // until this thread removes the entry, which (together with dropping
   // our own clone below) closes the writer thread's channel.
-  let (tx, rx) = mpsc::channel::<String>();
+  let (tx, rx) = mpsc::channel::<Vec<u8>>();
+  let pending = Arc::new(Mutex::new(std::collections::HashSet::new()));
   lock(&inner.clients).insert(
     conn_id,
     Connection {
       tx: tx.clone(),
       stream,
+      pending: Arc::clone(&pending),
     },
   );
   let writer_thread = match thread::Builder::new()
     .name(format!("rpc-conn-{conn_id}-writer"))
     .spawn(move || {
       let mut write_half = write_half;
-      while let Ok(message) = rx.recv() {
-        if write_message(&mut write_half, &message).is_err() {
+      while let Ok(bytes) = rx.recv() {
+        if write_half.write_all(&bytes).is_err() {
           break;
         }
       }
@@ -115,13 +116,20 @@ fn handle_connection(inner: Arc<Inner>, stream: TcpStream, conn_id: u64) {
   let mut reader = BufReader::new(read_half);
   loop {
     match read_message(&mut reader) {
-      Ok(None) => break, // Clean EOF.
+      Ok(None) => break, // Clean EOF between messages.
       Ok(Some(message)) => {
-        let (response, close) =
-          process_message(&inner, &message, &mut authenticated);
+        let (response, close) = process_message(
+          &inner,
+          conn_id,
+          &pending,
+          &message,
+          &mut authenticated,
+        );
         if let Some(response) = response {
-          if tx.send(response).is_err() {
-            break; // The writer thread is gone, so the connection is dead.
+          if let Ok(bytes) = codec::encode_message(&response) {
+            if tx.send(bytes).is_err() {
+              break; // The writer thread is gone, so the connection is dead.
+            }
           }
         }
         if close {
@@ -129,8 +137,9 @@ fn handle_connection(inner: Arc<Inner>, stream: TcpStream, conn_id: u64) {
         }
       }
       Err(e) => {
-        // The framing is broken (oversized or non-UTF-8 message). Drop
-        // the connection instead of trying to recover.
+        // The stream framing is desynchronized (invalid msgpack, a
+        // truncated message or an oversized message), so the connection
+        // must be dropped instead of trying to recover.
         eprintln!("librepcb-rust: Dropping broken connection: {e}");
         break;
       }
@@ -147,28 +156,24 @@ fn handle_connection(inner: Arc<Inner>, stream: TcpStream, conn_id: u64) {
 
 /// Process one incoming message.
 ///
-/// Returns the serialized response (if any) and whether the connection must
-/// be closed afterwards.
+/// Returns the response (if any) and whether the connection must be
+/// closed afterwards. The response is returned as a [Value] and encoded
+/// by the caller — the writer thread only deals with bytes.
 fn process_message(
   inner: &Inner,
-  message: &str,
+  conn_id: u64,
+  pending: &Arc<Mutex<std::collections::HashSet<u32>>>,
+  message: &Value,
   authenticated: &mut bool,
-) -> (Option<String>, bool) {
-  let value = match serde_json::from_str::<Value>(message) {
-    Ok(value) => value,
-    Err(_) => {
-      // Not valid JSON at all, so the request ID is unknown. Per
-      // specification, the error response then must use the ID `null`.
-      let response =
-        build_error_response(Value::Null, &RpcError::parse_error());
-      // An unauthenticated connection is dropped immediately.
-      return (Some(response), !*authenticated);
-    }
-  };
-  match classify_message(&value) {
-    ParsedMessage::Request { id, method, params } => {
+) -> (Option<Value>, bool) {
+  match classify_message(message) {
+    ParsedMessage::Request {
+      msgid,
+      method,
+      params,
+    } => {
       if method == METHOD_INITIALIZE {
-        let (response, token_ok) = handle_initialize(inner, &params, id);
+        let (response, token_ok) = handle_initialize(inner, &params, msgid);
         if token_ok {
           *authenticated = true;
         }
@@ -183,35 +188,48 @@ fn process_message(
           "This connection is not authenticated, the first message must be \
            an 'initialize' request",
         );
-        (Some(build_error_response(id, &error)), true)
+        (
+          Some(build_response(msgid, Some(&error.to_value()), &Value::Nil)),
+          true,
+        )
       } else if method == METHOD_PING {
         (
-          Some(build_result_response(id, Value::Object(Map::new()))),
+          Some(build_response(msgid, None, &Value::Map(Vec::new()))),
           false,
         )
-      } else if method == METHOD_RPC_DISCOVER {
-        (Some(handle_rpc_discover(inner, id)), false)
       } else {
-        (Some(dispatch_request(inner, id, &method, params)), false)
+        (
+          dispatch_request(inner, conn_id, pending, msgid, method, params),
+          false,
+        )
       }
     }
-    ParsedMessage::Notification => {
-      // The protocol does not define any client->server notifications,
-      // so they are ignored (per JSON-RPC, no response must be sent).
+    ParsedMessage::Cancel { msgid } => {
+      // The cancel handler is only invoked for pending requests, i.e.
+      // ones which were dispatched but not yet replied. It is responsible
+      // for eventually sending exactly one response (typically a
+      // "cancelled" error).
+      if lock(pending).contains(&msgid) {
+        (inner.config.cancel)(conn_id, msgid);
+      } else {
+        eprintln!("librepcb-rust: Ignoring cancel for unknown msgid {msgid}");
+      }
+      (None, false)
+    }
+    ParsedMessage::Ignored => {
+      // Wrong direction or unknown message type: ignored for forward
+      // compatibility. Before authentication, the connection is dropped.
       (None, !*authenticated)
     }
-    ParsedMessage::Response => {
-      // A client must never send a response, so it is just ignored.
-      (None, !*authenticated)
-    }
-    ParsedMessage::Invalid { id } => {
-      // Per specification, the ID is `null` if it could not be detected.
-      let response = build_error_response(
-        id.unwrap_or(Value::Null),
-        &RpcError::invalid_request(),
+    ParsedMessage::Invalid { msgid } => {
+      // A request which doesn't conform to the envelope: answered with an
+      // error (the stream is still in sync). Before authentication, the
+      // connection is dropped.
+      let response = build_response(
+        msgid.unwrap_or(0),
+        Some(&RpcError::invalid_request().to_value()),
+        &Value::Nil,
       );
-      // After authentication, the connection is kept open. Before, it is
-      // dropped.
       (Some(response), !*authenticated)
     }
   }
@@ -219,109 +237,64 @@ fn process_message(
 
 /// Handle an `initialize` request: Check the token and build the response.
 ///
-/// Returns the serialized response and whether the token was valid.
+/// Returns the response and whether the token was valid.
 fn handle_initialize(
   inner: &Inner,
-  params: &Option<Value>,
-  id: Value,
-) -> (String, bool) {
-  let token = match params {
-    Some(Value::Object(map)) => map.get("token").and_then(Value::as_str),
-    _ => None,
-  };
-  match token {
+  params: &Value,
+  msgid: u32,
+) -> (Value, bool) {
+  match extract_token(params) {
     Some(token) if token == inner.config.token => (
-      build_result_response(id, build_initialize_result(inner)),
+      build_response(
+        msgid,
+        None,
+        &protocol::build_initialize_result(
+          &inner.config.info,
+          &inner.config.protocol_version,
+        ),
+      ),
       true,
     ),
     _ => {
       let error =
         RpcError::new(error_code::UNAUTHENTICATED, "Invalid or missing token");
-      (build_error_response(id, &error), false)
+      (
+        build_response(msgid, Some(&error.to_value()), &Value::Nil),
+        false,
+      )
     }
   }
 }
 
-/// Build the `initialize` result: The configured info, plus the protocol
-/// version.
-fn build_initialize_result(inner: &Inner) -> Value {
-  let mut map = match &inner.config.info {
-    Value::Object(map) => map.clone(),
-    _ => Map::new(), // Not an object: Ignore it (should never happen).
-  };
-  map.insert(
-    "protocolVersion".to_string(),
-    Value::String(inner.config.protocol_version.clone()),
-  );
-  Value::Object(map)
-}
-
-/// Handle the `rpc.discover` request (returns the API schema, if set).
-fn handle_rpc_discover(inner: &Inner, id: Value) -> String {
-  let schema = lock(&inner.api_schema).clone();
-  match schema {
-    Some(schema) => match serde_json::from_str::<Value>(&schema) {
-      Ok(value) => build_result_response(id, value),
-      Err(e) => {
-        eprintln!("librepcb-rust: The API schema is not valid JSON: {e}");
-        let error = RpcError::internal_error()
-          .with_data(Value::from("invalid API schema"));
-        build_error_response(id, &error)
-      }
-    },
-    None => {
-      let error =
-        RpcError::new(error_code::METHOD_NOT_FOUND, "API schema not available");
-      build_error_response(id, &error)
-    }
-  }
-}
-
-/// Handle a request by forwarding it to the dispatch callback.
+/// Handle a request by handing it over to the dispatch callback.
+///
+/// The request's msgid is marked as pending *before* the callback is
+/// invoked (so that a synchronous reply from within the callback works),
+/// and the callback decides how to proceed:
+/// [DispatchOutcome::Dispatched] means the response will be sent
+/// asynchronously, [DispatchOutcome::ReplyNow] answers immediately.
 fn dispatch_request(
   inner: &Inner,
-  id: Value,
-  method: &str,
-  params: Option<Value>,
-) -> String {
-  if !inner.running.load(Ordering::SeqCst) {
+  conn_id: u64,
+  pending: &Arc<Mutex<std::collections::HashSet<u32>>>,
+  msgid: u32,
+  method: String,
+  params: Value,
+) -> Option<Value> {
+  if !lock(pending).insert(msgid) {
+    // A msgid must not be reused while the request is still pending.
     let error = RpcError::new(
-      error_code::SERVER_SHUTTING_DOWN,
-      "The server is shutting down",
+      error_code::INVALID_REQUEST,
+      "The msgid is already in use by a pending request",
     );
-    return build_error_response(id, &error);
+    return Some(build_response(msgid, Some(&error.to_value()), &Value::Nil));
   }
-  // The dispatch callback receives the params as raw JSON. Forwarding the
-  // original substring of the received message would be more efficient,
-  // but serializing the (already parsed) value is much simpler and cheap
-  // compared to any command execution.
-  let params = params.map(|p| p.to_string()).unwrap_or("null".to_string());
-  // A panicking callback (e.g. a C++ integration bug) must not kill the
-  // connection thread.
-  let result = catch_unwind(AssertUnwindSafe(|| {
-    (inner.config.dispatch)(method, &params)
-  }))
-  .unwrap_or_else(|_| {
-    Err(RpcError::new(
-      error_code::INTERNAL_ERROR,
-      "Command handler panicked",
-    ))
-  });
-  match result {
-    Ok(result) => match serde_json::from_str::<Value>(&result) {
-      Ok(value) => build_result_response(id, value),
-      Err(e) => {
-        eprintln!(
-          "librepcb-rust: Command '{method}' returned invalid JSON: {e}"
-        );
-        let error = RpcError::new(
-          error_code::INTERNAL_ERROR,
-          "Command handler returned invalid JSON",
-        );
-        build_error_response(id, &error)
-      }
-    },
-    Err(error) => build_error_response(id, &error),
+  match (inner.config.dispatch)(conn_id, msgid, &method, &params) {
+    DispatchOutcome::Dispatched => None,
+    DispatchOutcome::ReplyNow(error) => {
+      lock(pending).remove(&msgid);
+      Some(build_response(msgid, Some(&error.to_value()), &Value::Nil))
+    }
   }
 }
 

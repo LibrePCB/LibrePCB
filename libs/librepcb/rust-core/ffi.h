@@ -16,6 +16,119 @@ namespace librepcb {
 namespace rs {
 
 /**
+ * `QMetaType::UnknownType` — an invalid QVariant (represents nil).
+ */
+constexpr static const int32_t UNKNOWN = 0;
+
+/**
+ * `QMetaType::Bool`
+ */
+constexpr static const int32_t BOOL = 1;
+
+/**
+ * `QMetaType::LongLong`
+ */
+constexpr static const int32_t LONGLONG = 4;
+
+/**
+ * `QMetaType::Double`
+ */
+constexpr static const int32_t DOUBLE = 6;
+
+/**
+ * `QMetaType::QVariantMap`
+ */
+constexpr static const int32_t QVARIANTMAP = 8;
+
+/**
+ * `QMetaType::QVariantList`
+ */
+constexpr static const int32_t QVARIANTLIST = 9;
+
+/**
+ * `QMetaType::QString`
+ */
+constexpr static const int32_t QSTRING = 10;
+
+/**
+ * `QMetaType::QByteArray`
+ */
+constexpr static const int32_t QBYTEARRAY = 12;
+
+/**
+ * Maximum accepted size of a single message (32 MiB), as protection
+ * against memory exhaustion caused by misbehaving clients. Enforced
+ * mid-parse (see module documentation).
+ */
+constexpr static const size_t MAX_MESSAGE_SIZE = ((32 * 1024) * 1024);
+
+/**
+ * Message type of a request (client → server).
+ */
+constexpr static const int64_t MESSAGE_TYPE_REQUEST = 0;
+
+/**
+ * Message type of a response (server → client).
+ */
+constexpr static const int64_t MESSAGE_TYPE_RESPONSE = 1;
+
+/**
+ * Message type of a notification/event (server → all clients).
+ */
+constexpr static const int64_t MESSAGE_TYPE_NOTIFICATION = 2;
+
+/**
+ * Message type of a request-scoped message (server → client, e.g.
+ * progress or streamed data while a request is pending).
+ */
+constexpr static const int64_t MESSAGE_TYPE_REQUEST_MESSAGE = 3;
+
+/**
+ * Message type of a cancel request (client → server).
+ */
+constexpr static const int64_t MESSAGE_TYPE_CANCEL = 4;
+
+/**
+ * The JSON sent is not a valid request (envelope doesn't conform).
+ */
+constexpr static const int64_t INVALID_REQUEST = -32600;
+
+/**
+ * The method does not exist or is not available.
+ */
+constexpr static const int64_t METHOD_NOT_FOUND = -32601;
+
+/**
+ * Invalid method parameter(s).
+ */
+constexpr static const int64_t INVALID_PARAMS = -32602;
+
+/**
+ * Internal error.
+ */
+constexpr static const int64_t INTERNAL_ERROR = -32603;
+
+/**
+ * The connection is not authenticated (or the token is wrong).
+ */
+constexpr static const int64_t UNAUTHENTICATED = -32001;
+
+/**
+ * A command failed (application-specific error).
+ */
+constexpr static const int64_t COMMAND_FAILED = -32002;
+
+/**
+ * The requested project is not open (application-specific error).
+ */
+constexpr static const int64_t PROJECT_NOT_OPEN = -32003;
+
+/**
+ * The request was cancelled by the client.
+ */
+constexpr static const int64_t CANCELLED = -32005;
+
+/**
  * Wrapper for [DrawingKind]
  */
 enum class InteractiveHtmlBomDrawingKind {
@@ -206,14 +319,14 @@ struct InteractiveHtmlBom;
 /**
  * The RPC server.
  *
- * Usage: Create it with [RpcServer::new], optionally set the API schema with
- * [RpcServer::set_api_schema], then call [RpcServer::start] to make it listen on
- * 127.0.0.1 (the OS assigns the port, which is returned). Push events to
- * all connected clients with [RpcServer::notify], and shut the server down
- * with [RpcServer::stop] (or just drop it, which does the same).
+ * Usage: Create it with [RpcServer::new], then call [RpcServer::start] to
+ * make it listen on 127.0.0.1 (the OS assigns the port, which is
+ * returned). Push events to all connected clients with
+ * [RpcServer::notify_all], and shut the server down with
+ * [RpcServer::stop] (or just drop it, which does the same).
  *
- * All methods can be called from any thread. The dispatch callback is
- * invoked on the connection's reader thread.
+ * All methods can be called from any thread. The dispatch and cancel
+ * callbacks are invoked on the connection's reader threads.
  */
 struct RpcServer;
 
@@ -316,25 +429,37 @@ struct RenumberComponentsSymbolData {
 /**
  * Callback which dispatches a command request from the Rust server to C++.
  *
- * It is invoked on the connection's reader thread, i.e. possibly
- * concurrently from multiple threads, but strictly sequentially per
- * connection. The C++ implementation is responsible for marshalling the
- * command to the GUI thread (it must never block or deadlock it!).
+ * It is invoked on the connection's reader thread with
+ * `(ctx, conn_id, msgid, method, params)`, where `params` is the whole
+ * params map (including the reserved `obj` key, which is a documented
+ * convention and extracted by the C++ dispatch layer, not by Rust).
  *
- * - `ctx`: The context pointer passed to [ffi_rpc_server_new].
- * - `method`: The method name, e.g. "project/list".
- * - `params`: The raw JSON of the request params (a valid JSON document,
- *   or `"null"` if the request contained no params).
- * - `response`: The serialized response, see the return value.
+ * The call is fire-and-forget: The C++ implementation marshals the request
+ * to the GUI thread (it must never block the calling thread!) and must
+ * eventually respond exactly once via `ffi_rpc_server_reply()`, from any
+ * thread. It may send request-scoped messages (e.g. progress) via
+ * `ffi_rpc_server_notify_conn()` in the meantime.
  *
- * Returns `true` if the command succeeded, with `response` containing the
- * raw JSON of the result value. Returns `false` if the command failed, with
- * `response` containing a JSON error object `{"code":..,"message":..}`.
+ * Returns `true` if the request was accepted (i.e. a response will be
+ * sent), or `false` if it could not be dispatched (the server then
+ * responds with an internal error).
  */
 using RpcDispatchFn = bool(*)(void *ctx,
+                              uint64_t conn_id,
+                              uint32_t msgid,
                               const QString * NONNULL method,
-                              const QString * NONNULL params,
-                              QString * NONNULL response);
+                              const QVariant * NONNULL params);
+
+/**
+ * Callback which is invoked when a client cancels a pending request
+ * (message `[4, msgid]`).
+ *
+ * It is invoked on the connection's reader thread. The C++ implementation
+ * must eventually make sure the request is replied exactly once
+ * (typically with a "cancelled" error, or with the normal result if the
+ * work already completed).
+ */
+using RpcCancelFn = void(*)(void *ctx, uint64_t conn_id, uint32_t msgid);
 
 extern "C" {
 
@@ -406,6 +531,67 @@ extern const QString *ffi_qstringlist_at(const QStringList * NONNULL obj,
 extern void ffi_qstringlist_append(QStringList * NONNULL obj,
                                    const char *s,
                                    size_t len);
+
+extern QVariant *ffi_qvariant_new();
+
+extern void ffi_qvariant_delete(QVariant *obj);
+
+extern void ffi_qvariant_set_nil(QVariant * NONNULL obj);
+
+extern void ffi_qvariant_set_bool(QVariant * NONNULL obj, bool value);
+
+extern void ffi_qvariant_set_i64(QVariant * NONNULL obj, int64_t value);
+
+extern void ffi_qvariant_set_f64(QVariant * NONNULL obj, double value);
+
+extern void ffi_qvariant_set_str(QVariant * NONNULL obj,
+                                 const char *s,
+                                 size_t len);
+
+extern void ffi_qvariant_set_bytearray(QVariant * NONNULL obj,
+                                       const uint8_t *data,
+                                       size_t len);
+
+extern void ffi_qvariant_set_empty_map(QVariant * NONNULL obj);
+
+extern void ffi_qvariant_set_empty_list(QVariant * NONNULL obj);
+
+extern bool ffi_qvariant_map_insert(QVariant * NONNULL obj,
+                                    const char *key,
+                                    size_t key_len,
+                                    const QVariant * NONNULL value);
+
+extern bool ffi_qvariant_list_append(QVariant * NONNULL obj,
+                                     const QVariant * NONNULL value);
+
+extern int32_t ffi_qvariant_type(const QVariant * NONNULL obj);
+
+extern bool ffi_qvariant_get_bool(const QVariant * NONNULL obj);
+
+extern int64_t ffi_qvariant_get_i64(const QVariant * NONNULL obj);
+
+extern double ffi_qvariant_get_f64(const QVariant * NONNULL obj);
+
+extern void ffi_qvariant_get_str(const QVariant * NONNULL obj,
+                                 QString * NONNULL out);
+
+extern size_t ffi_qvariant_get_bytearray_len(const QVariant * NONNULL obj);
+
+extern void ffi_qvariant_get_bytearray_data(const QVariant * NONNULL obj,
+                                            uint8_t *out);
+
+extern size_t ffi_qvariant_list_len(const QVariant * NONNULL obj);
+
+extern void ffi_qvariant_list_at(const QVariant * NONNULL obj,
+                                 size_t index,
+                                 QVariant * NONNULL out);
+
+extern size_t ffi_qvariant_map_len(const QVariant * NONNULL obj);
+
+extern void ffi_qvariant_map_at(const QVariant * NONNULL obj,
+                                size_t index,
+                                QString * NONNULL key,
+                                QVariant * NONNULL value);
 
 /**
  * Create a new [InteractiveHtmlBom] object
@@ -613,23 +799,17 @@ void ffi_renumber_components(const QStringList * NONNULL names,
  *
  * - `token`: The authentication token (must not be empty).
  * - `protocol_version`: The protocol version, reported by `initialize`.
- * - `info`: A raw JSON object with application information (e.g. the
- *   application version, the PID and the workspace path) which is merged
- *   into the `initialize` response. If it is not a JSON object, it is
- *   ignored.
- * - `dispatch`/`ctx`: The command dispatcher (see [RpcDispatchFn]).
+ * - `info`: Application information (a map, e.g. the application version,
+ *   the PID and the workspace path) which is merged into the `initialize`
+ *   response. Values outside the protocol's value domain are ignored.
+ * - `dispatch`/`cancel`/`ctx`: The command dispatcher and cancel callback.
  */
 RpcServer *ffi_rpc_server_new(const QString * NONNULL token,
                               const QString * NONNULL protocol_version,
-                              const QString * NONNULL info,
+                              const QVariant * NONNULL info,
                               RpcDispatchFn dispatch,
+                              RpcCancelFn cancel,
                               void *ctx);
-
-/**
- * Set the OpenRPC API schema document served by the `rpc.discover` method.
- */
-void ffi_rpc_server_set_api_schema(RpcServer * NONNULL s,
-                                   const QString * NONNULL schema);
 
 /**
  * Start listening on 127.0.0.1 on the given port (0 = OS-assigned).
@@ -642,15 +822,48 @@ bool ffi_rpc_server_start(RpcServer * NONNULL s,
                           uint16_t * NONNULL out_port);
 
 /**
- * Push an event (a JSON-RPC notification) to all connected clients.
+ * Send the response for a pending request (thread-safe, never blocks).
  *
- * This function never blocks, thus it is safe to be called from the GUI
- * thread. The `params` must be a valid JSON document (or empty, which is
- * treated as `null`).
+ * Exactly one of result/error is sent, enforced by the server: A second
+ * response for the same msgid, or a response for an unknown or already
+ * closed connection, is silently dropped (returns `false`).
+ *
+ * - `ok == true`: `value` is the result.
+ * - `ok == false`: `value` is an error map `{"code": <int>,
+ *   "message": <string>, "data"?: <any>}`.
+ *
+ * If `value` contains types outside the protocol's value domain, an
+ * internal error is sent instead.
  */
-void ffi_rpc_server_notify(RpcServer * NONNULL s,
-                           const QString * NONNULL method,
-                           const QString * NONNULL params);
+bool ffi_rpc_server_reply(RpcServer * NONNULL s,
+                          uint64_t conn_id,
+                          uint32_t msgid,
+                          bool ok,
+                          const QVariant * NONNULL value);
+
+/**
+ * Push an event (a notification) to all connected clients (never blocks).
+ *
+ * If `params` contains types outside the protocol's value domain, the
+ * notification is dropped with a warning.
+ */
+void ffi_rpc_server_notify_all(RpcServer * NONNULL s,
+                               const QString * NONNULL method,
+                               const QVariant * NONNULL params);
+
+/**
+ * Send a request-scoped message (e.g. a progress report) to the client
+ * which sent the request (never blocks).
+ *
+ * The message is only delivered while the request is pending, i.e. before
+ * its response was sent (returns `false` otherwise). If `payload`
+ * contains types outside the protocol's value domain, it is dropped with
+ * a warning.
+ */
+bool ffi_rpc_server_notify_conn(RpcServer * NONNULL s,
+                                uint64_t conn_id,
+                                uint32_t msgid,
+                                const QVariant * NONNULL payload);
 
 /**
  * Delete [RpcServer] object (stops the server and joins its threads).

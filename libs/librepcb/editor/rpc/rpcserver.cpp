@@ -25,13 +25,12 @@
 #include "../guiapplication.h"
 
 #include <librepcb/core/application.h>
-#include <librepcb/core/fileio/filepath.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/rust-core/ffi.h>
 
-#include <QJsonDocument>
-#include <QJsonObject>
 #include <QThread>
+
+#include <limits>
 
 /*******************************************************************************
  *  Namespace
@@ -40,7 +39,7 @@ namespace librepcb {
 namespace editor {
 
 /*******************************************************************************
- *  Local Data
+ *  Local Functions
  ******************************************************************************/
 namespace {
 
@@ -52,17 +51,109 @@ namespace {
 ///       section 9 of dev/plans/rpc-server.md.
 const char* sDevToken = "librepcb-dev-token";
 
+/// Normalize a QVariant to the protocol's restricted value domain
+/// (nil, bool, i64, f64, string, bytearray, list, map with string keys).
+///
+/// Plain C++ numeric types (int, uint, float, ...) are converted to the
+/// corresponding protocol types. Anything outside the domain (e.g.
+/// QDateTime or QColor) makes the normalization fail — such a result would
+/// be unrepresentable on the wire, so the command would reply with an
+/// internal error.
+bool normalizeVariant(const QVariant& value, QVariant* out) {
+  switch (value.userType()) {
+    case QMetaType::UnknownType:  // An invalid QVariant is nil.
+      *out = QVariant();
+      return true;
+    case QMetaType::Bool:
+    case QMetaType::QString:
+    case QMetaType::QByteArray:
+    case QMetaType::LongLong:
+    case QMetaType::Double:
+      *out = value;
+      return true;
+    case QMetaType::Int:
+    case QMetaType::Short:
+    case QMetaType::SChar:
+      *out = QVariant(static_cast<qlonglong>(value.toLongLong()));
+      return true;
+    case QMetaType::UInt:
+    case QMetaType::UShort:
+    case QMetaType::UChar:
+      *out = QVariant(static_cast<qlonglong>(value.toUInt()));
+      return true;
+    case QMetaType::ULongLong:
+    case QMetaType::ULong: {
+      const qulonglong v = value.toULongLong();
+      if (v > static_cast<qulonglong>(std::numeric_limits<qlonglong>::max())) {
+        return false;  // Not representable as i64.
+      }
+      *out = QVariant(static_cast<qlonglong>(v));
+      return true;
+    }
+    case QMetaType::Long:
+      *out = QVariant(static_cast<qlonglong>(value.toLongLong()));
+      return true;
+    case QMetaType::Float:
+      *out = QVariant(static_cast<double>(value.toFloat()));
+      return true;
+    case QMetaType::QVariantList: {
+      QVariantList list;
+      for (const QVariant& item : value.toList()) {
+        QVariant normalized;
+        if (!normalizeVariant(item, &normalized)) {
+          return false;
+        }
+        list.append(normalized);
+      }
+      *out = list;
+      return true;
+    }
+    case QMetaType::QVariantMap: {
+      QVariantMap map;
+      const QVariantMap src = value.toMap();
+      for (auto it = src.constBegin(); it != src.constEnd(); ++it) {
+        QVariant normalized;
+        if (!normalizeVariant(it.value(), &normalized)) {
+          return false;
+        }
+        map.insert(it.key(), normalized);
+      }
+      *out = map;
+      return true;
+    }
+    default:
+      return false;  // Not representable in the protocol.
+  }
+}
+
+/// Serialize an error into a map of the protocol's value domain.
+QVariantMap errorToVariant(int code, const QString& message,
+                           const QVariantMap& properties) noexcept {
+  QVariantMap error;
+  error.insert("code", QVariant(static_cast<qlonglong>(code)));
+  error.insert("message", QVariant(message));
+  for (auto it = properties.constBegin(); it != properties.constEnd(); ++it) {
+    error.insert(it.key(), it.value());
+  }
+  return error;
+}
+
 }  // namespace
 
 /*******************************************************************************
- *  FFI Callback
+ *  FFI Trampolines
  ******************************************************************************/
 
-bool rpcServerDispatch(void* ctx, const QString* method, const QString* params,
-                       QString* response) {
-  Q_ASSERT(ctx && method && params && response);
+bool rpcServerDispatch(void* ctx, uint64_t connId, uint32_t msgid,
+                       const QString* method, const QVariant* params) {
+  Q_ASSERT(ctx && method && params);
   return static_cast<RpcServer*>(ctx)->dispatchFromWorkerThread(
-      *method, *params, *response);
+      connId, msgid, *method, *params);
+}
+
+void rpcServerCancel(void* ctx, uint64_t connId, uint32_t msgid) {
+  Q_ASSERT(ctx);
+  static_cast<RpcServer*>(ctx)->cancelFromWorkerThread(connId, msgid);
 }
 
 /*******************************************************************************
@@ -70,39 +161,26 @@ bool rpcServerDispatch(void* ctx, const QString* method, const QString* params,
  ******************************************************************************/
 
 RpcServer::RpcServer(GuiApplication& app) noexcept
-  : QObject(&app), mApp(app), mServer(nullptr), mShuttingDown(false) {
+  : QObject(&app), mApp(app), mServer(nullptr) {
   mCommands = buildCommandRegistry();
 
   // Application information to be included in the `initialize` response.
-  QJsonObject info;
-  info["appVersion"] = Application::getVersion();
-  info["pid"] = static_cast<qint64>(QCoreApplication::applicationPid());
-  info["workspace"] = mApp.getWorkspace().getPath().toStr();
-  const QJsonDocument infoDoc(info);
+  QVariantMap info;
+  info.insert("appVersion", Application::getVersion());
+  info.insert("pid",
+              static_cast<qlonglong>(QCoreApplication::applicationPid()));
+  info.insert("workspace", mApp.getWorkspace().getPath().toStr());
+  QVariant infoVariant = info;
 
   // Create the server. Note that the token is hardcoded for now (see
   // sDevToken above).
   const QString token = sDevToken;
   const QString protocolVersion = "1";
-  const QString infoStr =
-      QString::fromUtf8(infoDoc.toJson(QJsonDocument::Compact));
-  mServer = rs::ffi_rpc_server_new(&token, &protocolVersion, &infoStr,
-                                   &rpcServerDispatch, this);
+  mServer = rs::ffi_rpc_server_new(&token, &protocolVersion, &infoVariant,
+                                   &rpcServerDispatch, &rpcServerCancel, this);
   if (!mServer) {
     qCritical() << "Failed to create the RPC server.";
     return;
-  }
-
-  // Provide the API schema for the `rpc.discover` method. If it is not
-  // found, the server still works but does not expose its API.
-  const FilePath schemaFp =
-      Application::getResourcesDir().getPathTo("rpc/api.json");
-  QFile schemaFile(schemaFp.toStr());
-  if (schemaFile.open(QIODevice::ReadOnly)) {
-    const QString schema = QString::fromUtf8(schemaFile.readAll());
-    rs::ffi_rpc_server_set_api_schema(mServer, &schema);
-  } else {
-    qWarning() << "RPC API schema not found:" << schemaFp.toNative();
   }
 
   // Start listening on 127.0.0.1. A specific port can be forced with the
@@ -120,13 +198,13 @@ RpcServer::RpcServer(GuiApplication& app) noexcept
 }
 
 RpcServer::~RpcServer() noexcept {
-  mShuttingDown.store(true);
-
-  // Let any in-flight dispatch complete before the members are destroyed.
-  // Without this, a command which was marshalled to the GUI thread right
-  // before would block on the (already stopped) event loop forever.
-  QCoreApplication::sendPostedEvents(nullptr, QEvent::MetaCall);
-
+  // Invalidate all pending requests first: They must not call into the
+  // (about to be deleted) Rust server anymore. The safety net in their
+  // destructors is suppressed, i.e. clients just see the connection close.
+  for (const auto& request : mPendingRequests) {
+    request->invalidate();
+  }
+  mPendingRequests.clear();
   if (mServer) {
     rs::ffi_rpc_server_delete(mServer);  // Stops the server & joins threads.
     mServer = nullptr;
@@ -134,98 +212,207 @@ RpcServer::~RpcServer() noexcept {
 }
 
 /*******************************************************************************
- *  General Methods
+ *  Request Handling
  ******************************************************************************/
+
+RpcServer::Request::Request(GuiApplication& app, RpcServer& server,
+                            uint64_t connId, uint32_t msgid,
+                            QString method) noexcept
+  : mApp(app),
+    mServer(&server),
+    mConnId(connId),
+    mMsgid(msgid),
+    mMethod(std::move(method)),
+    mReplied(false),
+    mCancelled(false) {
+}
+
+RpcServer::Request::~Request() noexcept {
+  // Safety net to guarantee the "exactly one response per request" invariant
+  // even if a handler forgot to reply.
+  if (!mReplied) {
+    if (mServer) {
+      qWarning() << "RPC command" << mMethod
+                 << "did not reply, answering with an error.";
+      sendReply(false,
+                errorToVariant(InternalError, "The command did not reply.",
+                               QVariantMap()));
+    } else {
+      qWarning() << "RPC command" << mMethod
+                 << "did not reply, but the RPC server is already destroyed.";
+    }
+  }
+}
+
+void RpcServer::Request::replySuccess(const QVariant& result) noexcept {
+  if (mReplied) {
+    return;  // A second reply is a bug in the command handler, ignore it.
+  }
+  QVariant normalized;
+  if (!normalizeVariant(result, &normalized)) {
+    qWarning() << "RPC command" << mMethod
+               << "returned a value of an unsupported type.";
+    replyError(InternalError,
+               "The command returned an unsupported value type.");
+    return;
+  }
+  sendReply(true, normalized);
+}
+
+void RpcServer::Request::replyError(int code, const QString& message,
+                                    const QVariantMap& properties) noexcept {
+  if (mReplied) {
+    return;
+  }
+  QVariant error = errorToVariant(code, message, properties);
+  QVariant normalized;
+  if (!normalizeVariant(error, &normalized)) {
+    normalized = errorToVariant(InternalError, message,
+                                QVariantMap());  // Cannot fail.
+  }
+  sendReply(false, normalized);
+}
+
+void RpcServer::Request::emitMessage(const QVariant& payload) noexcept {
+  if (!mServer || mReplied) {
+    return;
+  }
+  QVariant normalized;
+  if (!normalizeVariant(payload, &normalized)) {
+    qWarning() << "RPC command" << mMethod
+               << "emitted a message of an unsupported type.";
+    return;
+  }
+  if (rs::RpcServer* rust = mServer->mServer) {
+    rs::ffi_rpc_server_notify_conn(rust, mConnId, mMsgid, &normalized);
+  }
+}
+
+void RpcServer::Request::sendReply(bool ok, const QVariant& value) noexcept {
+  mReplied = true;
+  if (mServer) {
+    // Remove the request from the registry (the Rust server enforces the
+    // "exactly one response" invariant anyway, but this keeps the registry
+    // small).
+    mServer->mPendingRequests.remove(requestKey(mConnId, mMsgid));
+    if (rs::RpcServer* rust = mServer->mServer) {
+      rs::ffi_rpc_server_reply(rust, mConnId, mMsgid, ok, &value);
+    }
+  }
+}
+
+bool RpcServer::dispatchFromWorkerThread(uint64_t connId, uint32_t msgid,
+                                         const QString& method,
+                                         const QVariant& params) noexcept {
+  // Marshal the request to the GUI thread, asynchronously. Note that all
+  // the values are captured by copy (cheap due to Qt's implicit sharing),
+  // so they stay valid even if this thread continues right away.
+  const bool invoked = QMetaObject::invokeMethod(
+      this,
+      [this, connId, msgid, method, params]() {
+        handleRequest(connId, msgid, method, params);
+      },
+      Qt::QueuedConnection);
+  if (!invoked) {
+    qWarning() << "Failed to marshal RPC request to the GUI thread:" << method;
+  }
+  return invoked;
+}
+
+void RpcServer::cancelFromWorkerThread(uint64_t connId,
+                                       uint32_t msgid) noexcept {
+  const bool invoked = QMetaObject::invokeMethod(
+      this, [this, connId, msgid]() { handleCancel(connId, msgid); },
+      Qt::QueuedConnection);
+  if (!invoked) {
+    qWarning()
+        << "Failed to marshal RPC cancel notification to the GUI thread.";
+  }
+}
+
+void RpcServer::handleRequest(uint64_t connId, uint32_t msgid,
+                              const QString& method,
+                              const QVariant& params) noexcept {
+  // The Rust server guarantees that params is either a map or nil.
+  QVariantMap args;
+  if (params.userType() == QMetaType::QVariantMap) {
+    args = params.toMap();
+  }
+
+  // Extract the receiver handle ("obj" is a documented convention, see the
+  // API spec). It is passed to the handlers separately, so they never see
+  // it in their arguments.
+  QString obj;
+  const auto objIt = args.constFind("obj");
+  if (objIt != args.constEnd()) {
+    if (objIt.value().userType() == QMetaType::QString) {
+      obj = objIt.value().toString();
+    } else {
+      replyError(connId, msgid, InvalidParams,
+                 "The 'obj' parameter must be a string.");
+      return;
+    }
+    args.erase(objIt);
+  }
+
+  // Look up the command handler.
+  const auto handler = mCommands.constFind(method);
+  if (handler == mCommands.constEnd()) {
+    replyError(connId, msgid, MethodNotFound,
+               QString("Method not found: %1").arg(method));
+    return;
+  }
+
+  // Create the request context and register it as pending.
+  const auto request =
+      QSharedPointer<Request>::create(mApp, *this, connId, msgid, method);
+  mPendingRequests.insert(requestKey(connId, msgid), request);
+  try {
+    handler.value()(request, obj, args);
+  } catch (const Exception& e) {
+    request->replyError(CommandFailed,
+                        QString("Command failed: %1").arg(e.getMsg()));
+  } catch (const std::exception& e) {
+    request->replyError(CommandFailed,
+                        QString("Command failed: %1").arg(e.what()));
+  } catch (...) {
+    request->replyError(CommandFailed, "Command failed with unknown error.");
+  }
+}
+
+void RpcServer::handleCancel(uint64_t connId, uint32_t msgid) noexcept {
+  // Note: The Rust server only forwards cancels for requests which are
+  // still pending, but the request might have been replied in the
+  // meantime (between marshalling and executing this call), so the lookup
+  // may just fail — that's fine, then the work is already done.
+  const auto request = mPendingRequests.constFind(requestKey(connId, msgid));
+  if (request == mPendingRequests.constEnd()) {
+    return;
+  }
+  request.value()->setCancelled();
+}
 
 void RpcServer::notifyEvent(const QString& method,
-                            const QString& params) noexcept {
+                            const QVariant& params) noexcept {
   if (mServer) {
-    rs::ffi_rpc_server_notify(mServer, &method, &params);
+    rs::ffi_rpc_server_notify_all(mServer, &method, &params);
   }
 }
 
-/*******************************************************************************
- *  Private Methods
- ******************************************************************************/
-
-bool RpcServer::dispatchFromWorkerThread(const QString& method,
-                                         const QString& params,
-                                         QString& response) noexcept {
-  if (mShuttingDown.load()) {
-    // The event loop is already stopped, so marshalling would deadlock.
-    writeErrorResponse(response, ServerShuttingDown,
-                       "The server is shutting down");
-    return false;
-  }
-  if (QThread::currentThread() == thread()) {
-    // Just a safety net, commands are never dispatched from the GUI thread.
-    return dispatch(method, params, response);
-  }
-
-  // Marshal the command to the GUI thread, blocking until it was executed.
-  // Note: This can never deadlock with the GUI thread waiting for this
-  // server, since GUI-thread code must never synchronously call into this
-  // server (see class documentation).
-  bool ok = false;
-  if (!QMetaObject::invokeMethod(
-          this, [&]() { ok = dispatch(method, params, response); },
-          Qt::BlockingQueuedConnection)) {
-    writeErrorResponse(response, CommandFailed,
-                       "Failed to dispatch the command");
-    return false;
-  }
-  return ok;
-}
-
-bool RpcServer::dispatch(const QString& method, const QString& params,
-                         QString& response) noexcept {
-  try {
-    const auto handler = mCommands.constFind(method);
-    if (handler == mCommands.constEnd()) {
-      writeErrorResponse(response, MethodNotFound,
-                         QString("Method not found: %1").arg(method));
-      return false;
+void RpcServer::replyError(uint64_t connId, uint32_t msgid, int code,
+                           const QString& message) noexcept {
+  // Reply directly (e.g. for invalid requests which don't have a Request
+  // object). Exactly-once is enforced by the Rust server, so this is safe
+  // even if a request was already answered.
+  if (mServer) {
+    QVariant error = errorToVariant(code, message, QVariantMap());
+    QVariant normalized;
+    if (!normalizeVariant(error, &normalized)) {
+      normalized = errorToVariant(InternalError, message,
+                                  QVariantMap());  // Cannot fail.
     }
-
-    // Note: The params were already validated by the Rust server, so
-    // parsing them can't fail. We're still defensive to never pass
-    // garbage to the command handlers.
-    QJsonParseError parseError;
-    const QJsonDocument doc =
-        QJsonDocument::fromJson(params.toUtf8(), &parseError);
-    if (parseError.error != QJsonParseError::NoError) {
-      writeErrorResponse(response, InvalidParams, "Invalid params");
-      return false;
-    }
-
-    const RpcResult result = handler.value()(mApp, doc.object());
-    if (result.ok) {
-      response = QString::fromUtf8(
-          QJsonDocument(result.result).toJson(QJsonDocument::Compact));
-      return true;
-    }
-    writeErrorResponse(response, result.errorCode, result.errorMessage);
-    return false;
-  } catch (const Exception& e) {
-    writeErrorResponse(response, CommandFailed,
-                       QString("Command failed: %1").arg(e.getMsg()));
-    return false;
-  } catch (const std::exception& e) {
-    writeErrorResponse(response, CommandFailed,
-                       QString("Command failed: %1").arg(e.what()));
-    return false;
-  } catch (...) {
-    writeErrorResponse(response, CommandFailed,
-                       "Command failed with unknown error");
-    return false;
+    rs::ffi_rpc_server_reply(mServer, connId, msgid, false, &normalized);
   }
-}
-
-void RpcServer::writeErrorResponse(QString& response, int code,
-                                   const QString& message) noexcept {
-  const QJsonObject error{{"code", code}, {"message", message}};
-  response =
-      QString::fromUtf8(QJsonDocument(error).toJson(QJsonDocument::Compact));
 }
 
 /*******************************************************************************

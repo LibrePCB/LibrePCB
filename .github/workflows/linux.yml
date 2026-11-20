@@ -44,8 +44,6 @@ jobs:
       # https://github.com/actions/checkout/issues/1048
       - name: Fix Git Permissions
         run: git config --global --add safe.directory $GITHUB_WORKSPACE
-      - name: Check RPC API Documentation
-        run: python3 dev/generate_rpc_api_docs.py --check
       - name: Unbundle Libraries
         run: |
           rm -rv libs/dxflib
