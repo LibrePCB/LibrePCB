@@ -36,6 +36,8 @@
 namespace librepcb {
 
 class SI_BusSegment;
+class SI_NetLine;
+class SI_NetLineAnchor;
 class SI_NetSegment;
 class Schematic;
 
@@ -70,6 +72,7 @@ public:
   void snapToGrid() noexcept;
   void resetAllTexts() noexcept;
   void setCurrentPosition(const Point& pos) noexcept;
+  void setOrthogonalWiresEnabled(bool enabled) noexcept;
   void rotate(const Angle& angle, bool aroundCurrentPosition) noexcept;
   void mirror(Qt::Orientation orientation, bool aroundCurrentPosition) noexcept;
   const QSet<SI_NetSegment*>& getModifiedNetSegments() const noexcept {
@@ -102,6 +105,13 @@ private:
   bool mMirrored;
   bool mTextsReset;
 
+  /// Whether connected wires are kept orthogonal (can be disabled temporarily,
+  /// e.g. while the user holds a modifier key)
+  bool mOrthogonalWires;
+
+  /// Delta currently applied to the orthogonal stretch edits
+  Point mStretchDeltaPos;
+
   // Segments whose geometry might have been modified by the drag.
   QSet<SI_NetSegment*> mModifiedNetSegments;
   QSet<SI_BusSegment*> mModifiedBusSegments;
@@ -116,6 +126,62 @@ private:
   QList<CmdPolygonEdit*> mPolygonEditCmds;
   QList<CmdTextEdit*> mTextEditCmds;
   QList<CmdImageEdit*> mImageEditCmds;
+
+  struct StretchAxisMask {
+    bool stretchX = false;
+    bool stretchY = false;
+  };
+
+  /// Netpoints that should follow a moving pin along a single axis so the
+  /// connecting wire stretches orthogonally during preview. stretchX/stretchY
+  /// indicate which components of the drag delta apply to this netpoint.
+  struct StretchNetPointEdit {
+    CmdSchematicNetPointEdit* cmd;
+    StretchAxisMask mask;
+  };
+  QList<StretchNetPointEdit> mStretchEdits;
+
+  /// Net labels attached to wire portions which are moved by the orthogonal
+  /// adjustment. They follow the same masked delta to stay visually attached
+  /// to the wire they describe.
+  struct StretchNetLabelEdit {
+    CmdSchematicNetLabelEdit* cmd;
+    StretchAxisMask mask;
+  };
+  QList<StretchNetLabelEdit> mStretchNetLabelEdits;
+
+  /// Fixed-anchor netlines which need a temporary bend point once the drag
+  /// moves perpendicular to their original orientation.
+  struct SplitNetLineEdit {
+    SI_NetLine* line;
+    SI_NetLineAnchor* movingAnchor;
+    SI_NetLineAnchor* fixedAnchor;
+    /// Position of the moving anchor before the drag.
+    Point movingAnchorStartPos;
+    /// Axes of the drag which make this split necessary.
+    StretchAxisMask triggerMask;
+    /// Axes to apply to the inserted bend point. This follows the moving anchor
+    /// only along the original netline axis, leaving the far side in place.
+    StretchAxisMask bendMask;
+    UndoCommand* splitCmd = nullptr;
+    CmdSchematicNetPointEdit* stretchCmd = nullptr;
+  };
+  QList<SplitNetLineEdit> mSplitNetLineEdits;
+
+  /// Apply the orthogonal wire adjustment for the current drag delta, or
+  /// revert it if it is disabled.
+  void updateStretchEdits() noexcept;
+  void activateNeededSplitNetLineEdits(const Point& delta) noexcept;
+  void deactivateUnneededSplitNetLineEdits(const Point& delta) noexcept;
+  void discardSplitNetLineEdits() noexcept;
+
+  /// Drop the live stretch cmds and roll any preview shifts back to the
+  /// pre-drag netpoint positions. Used both for the no-op-drag discard path
+  /// and to invalidate the stretch heuristic when rotate/mirror happens
+  /// mid-drag.
+  void discardStretchEdit(CmdSchematicNetPointEdit* cmd) noexcept;
+  void discardStretchEdits() noexcept;
+  void discardStretchNetLabelEdits() noexcept;
 };
 
 /*******************************************************************************
