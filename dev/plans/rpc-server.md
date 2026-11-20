@@ -340,8 +340,8 @@ libs/librepcb/editor/rpc/commands.cpp         (reworked: QVariant handlers)
 
 ### 4.2 `RpcServer` (QObject, created by `GuiApplication`)
 
-- **Lifecycle:** created if the workspace setting `enable_rpc_server` is
-  on (or `LIBREPCB_ENABLE_RPC_SERVER=1`); torn down early in
+- **Lifecycle:** started/stopped **reactively** according to the
+  workspace setting `enable_rpc_server` (see 4.4); torn down early in
   `GuiApplication`'s destructor.
 - **Dispatch:** the FFI trampoline runs on Rust connection threads and
   marshals to the GUI thread with `QMetaObject::invokeMethod(...,
@@ -391,8 +391,20 @@ undo history; the GUI stays the single source of truth.
 `enable_rpc_server` (default off), following the existing
 `WorkspaceSettingsItem_GenericValue<bool>` pattern. The settings-dialog
 checkbox is still missing (to be added when the feature becomes
-user-facing, together with the random token). Test env vars:
-`LIBREPCB_ENABLE_RPC_SERVER`, `LIBREPCB_RPC_PORT`.
+user-facing, together with the random token).
+
+The GuiApplication starts/stops the server **reactively**: an
+`updateRpcServerEnabled` lambda (connected to the setting's `edited`
+signal) starts the server when the setting turns on and stops it when it
+turns off — i.e. the server can be toggled at runtime from the settings
+dialog, without restarting the application. There is no env var
+fallback.
+
+For the system tests, the setting is enabled in the **demo workspace
+settings file** (`tests/data/workspaces/Empty Workspace/data/settings.lp`
+— note that the settings file the application reads lives in the *data*
+directory, not in the version directories). Only `LIBREPCB_RPC_PORT`
+remains as a test env var (to pin the otherwise OS-assigned port).
 
 ## 5. API spec (YAML) & documentation
 
@@ -488,13 +500,14 @@ classes/methods/events. No CI stale-check.
   themselves); the dispatch layer's normalization could be unit-tested
   later if it grows.
 - **Python system test** (`tests/ui/rpc/`, *not* funq — funq tests are
-  legacy): launch the app with `LIBREPCB_ENABLE_RPC_SERVER=1` + a fixed
-  port, connect a msgpack socket client from the test, `initialize`, call
-  commands, assert results — and thus implicitly verify the whole
-  msgpack↔QVariant conversion, the async dispatch and the GUI-thread
-  marshalling. The test implements a minimal msgpack codec inline (no
-  new dependency on the `msgpack` Python package, and it proves the
-  protocol is implementable from the spec alone).
+  legacy): launch the app (the demo workspace settings enable the RPC
+  server) with a pinned port (`LIBREPCB_RPC_PORT`), connect a msgpack
+  socket client from the test, `initialize`, call commands, assert
+  results — and thus implicitly verify the whole msgpack↔QVariant
+  conversion, the async dispatch and the GUI-thread marshalling. The test
+  implements a minimal msgpack codec inline (no new dependency on the
+  `msgpack` Python package, and it proves the protocol is implementable
+  from the spec alone).
 
 ## 7. Milestones
 

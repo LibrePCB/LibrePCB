@@ -14,17 +14,17 @@
 
 use rmpv::Value;
 
-/// Message type of a request (client → server).
-pub const MESSAGE_TYPE_REQUEST: i64 = 0;
-/// Message type of a response (server → client).
-pub const MESSAGE_TYPE_RESPONSE: i64 = 1;
-/// Message type of a notification/event (server → all clients).
-pub const MESSAGE_TYPE_NOTIFICATION: i64 = 2;
-/// Message type of a request-scoped message (server → client, e.g.
+/// The message type of a request (client → server).
+const MESSAGE_TYPE_REQUEST: i64 = 0;
+/// The message type of a response (server → client).
+const MESSAGE_TYPE_RESPONSE: i64 = 1;
+/// The message type of a notification/event (server → all clients).
+const MESSAGE_TYPE_NOTIFICATION: i64 = 2;
+/// The message type of a request-scoped message (server → client, e.g.
 /// progress or streamed data while a request is pending).
-pub const MESSAGE_TYPE_REQUEST_MESSAGE: i64 = 3;
-/// Message type of a cancel request (client → server).
-pub const MESSAGE_TYPE_CANCEL: i64 = 4;
+const MESSAGE_TYPE_REQUEST_MESSAGE: i64 = 3;
+/// The message type of a cancel request (client → server).
+const MESSAGE_TYPE_CANCEL: i64 = 4;
 
 /// Name of the method which authenticates a connection. Must be the first
 /// message of every connection, carrying the authentication token.
@@ -33,11 +33,15 @@ pub const METHOD_INITIALIZE: &str = "initialize";
 /// Name of the protocol-level ping method (returns an empty map).
 pub const METHOD_PING: &str = "ping";
 
+/// cbindgen:ignore
+///
 /// RPC error codes.
 ///
 /// The codes -32700..=-32600 follow the JSON-RPC 2.0 convention (reserved
 /// protocol errors), the range -32000..=-32099 is reserved for
 /// implementation defined server-errors (the application-specific codes).
+/// They are not exported to the C++ side, which has its own error code
+/// enum in `editor/rpc/rpcserver.h` instead.
 pub mod error_code {
   /// The JSON sent is not a valid request (envelope doesn't conform).
   pub const INVALID_REQUEST: i64 = -32600;

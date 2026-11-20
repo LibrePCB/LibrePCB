@@ -221,6 +221,8 @@ pub fn from_qstringlist(obj: &QStringList) -> Vec<String> {
   vec
 }
 
+/// cbindgen:ignore
+///
 /// Qt metatype IDs (`QMetaType::Type` values) as returned by
 /// [ffi_qvariant_type].
 ///

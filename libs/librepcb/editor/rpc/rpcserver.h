@@ -47,29 +47,6 @@ namespace editor {
 class GuiApplication;
 class ProjectEditor;
 
-/// FFI trampoline which dispatches commands from the Rust RPC server to
-/// the #librepcb::editor::RpcServer object passed as context.
-///
-/// @param ctx      The RpcServer object (as passed to ffi_rpc_server_new()).
-/// @param connId   The connection the request arrived on.
-/// @param msgid    The msgid of the request (to be used for the reply).
-/// @param method   The method name, e.g. "Project.list".
-/// @param params   The whole params map (including the reserved "obj" key,
-///                 which is extracted by the C++ dispatch layer).
-///
-/// @return Whether the request was accepted (a response will be sent).
-extern "C" bool rpcServerDispatch(void* ctx, uint64_t connId, uint32_t msgid,
-                                  const QString* method,
-                                  const QVariant* params);
-
-/// FFI trampoline which notifies the RpcServer that a client cancelled a
-/// pending request.
-///
-/// @param ctx    The RpcServer object (as passed to ffi_rpc_server_new()).
-/// @param connId The connection the request arrived on.
-/// @param msgid  The msgid of the request to cancel.
-extern "C" void rpcServerCancel(void* ctx, uint64_t connId, uint32_t msgid);
-
 /*******************************************************************************
  *  Class RpcServer
  ******************************************************************************/

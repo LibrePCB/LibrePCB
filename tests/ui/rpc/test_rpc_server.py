@@ -308,7 +308,8 @@ def test_rpc_server(librepcb):
     """
     librepcb.add_project("Empty Project")
     librepcb.set_project("Empty Project/Empty Project.lpp")
-    librepcb.env["LIBREPCB_ENABLE_RPC_SERVER"] = "1"
+    # Note: The RPC server is enabled by the demo workspace settings file
+    # (tests/data/workspaces/Empty Workspace), no env var needed.
     # Let the OS pick a free port which we then tell the application to use.
     sock = socket.socket()
     sock.bind(("127.0.0.1", 0))

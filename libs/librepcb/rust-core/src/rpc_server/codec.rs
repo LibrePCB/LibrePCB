@@ -25,7 +25,7 @@ use rmpv::Value;
 /// Maximum accepted size of a single message (32 MiB), as protection
 /// against memory exhaustion caused by misbehaving clients. Enforced
 /// mid-parse (see module documentation).
-pub const MAX_MESSAGE_SIZE: usize = 32 * 1024 * 1024;
+const MAX_MESSAGE_SIZE: usize = 32 * 1024 * 1024;
 
 /// Read a single message (one msgpack value) from `reader`.
 ///
