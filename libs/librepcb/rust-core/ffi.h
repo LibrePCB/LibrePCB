@@ -128,6 +128,11 @@ enum class InteractiveHtmlBomViewMode {
 };
 
 /**
+ * Opaque handle exposed to C++, wrapping a [`SpaceMouseThread`].
+ */
+struct FfiSpaceMouseThread;
+
+/**
  * Interactive HTML BOM structure
  *
  * The top-level structure to build & generate a HTML BOM.
@@ -298,6 +303,53 @@ struct RenumberComponentsSymbolData {
    */
   int64_t y;
 };
+
+/**
+ * Plain-old-data state of all six axes with a stable `#[repr(C)]` layout
+ * for use across the FFI boundary.
+ */
+struct SpaceMouseMotionFfi {
+  /**
+   * Translate left(-)/right(+)
+   */
+  int16_t translation_x;
+  /**
+   * Translate away(-)/towards(+) the user
+   */
+  int16_t translation_y;
+  /**
+   * Translate down(-)/up(+)
+   */
+  int16_t translation_z;
+  /**
+   * Tilt (pitch)
+   */
+  int16_t rotation_x;
+  /**
+   * Tilt (roll)
+   */
+  int16_t rotation_y;
+  /**
+   * Twist (yaw)
+   */
+  int16_t rotation_z;
+};
+
+/**
+ * C ABI callback invoked whenever the device reports new motion.
+ *
+ * <div class="warning">
+ * Fires on a background thread owned by the Rust side, *not* the thread
+ * that called [`ffi_spacemouse_thread_new`].
+ * </div>
+ */
+using MotionCallback = void(*)(void *user_data, SpaceMouseMotionFfi motion);
+
+/**
+ * C ABI callback invoked whenever a compatible device is connected or
+ * disconnected. Same threading caveat as [`MotionCallback`].
+ */
+using ConnectedCallback = void(*)(void *user_data, bool connected);
 
 extern "C" {
 
@@ -566,6 +618,44 @@ void ffi_renumber_components(const QStringList * NONNULL names,
                              const size_t *connections,
                              size_t connections_len,
                              QStringList * NONNULL out);
+
+/**
+ * Create a new capture thread and start capturing in the background.
+ *
+ * `user_data` is passed back unmodified to every callback. It must stay
+ * valid until [`ffi_spacemouse_thread_free`] returns. Callbacks must not
+ * call back into Rust synchronously.
+ *
+ * Never returns null. Finding no device is not an error, it is reported
+ * through `on_connected_changed`.
+ */
+FfiSpaceMouseThread *ffi_spacemouse_thread_new(void *user_data,
+                                               MotionCallback on_motion,
+                                               ConnectedCallback on_connected_changed);
+
+/**
+ * Whether a compatible device is currently detected as connected.
+ */
+bool ffi_spacemouse_thread_is_connected(const FfiSpaceMouseThread * NONNULL handle);
+
+/**
+ * Set whether the device's LED (if it has one) should be lit.
+ *
+ * Applied immediately if a device is open, and again on every connect.
+ * Devices without an LED and write failures are ignored. See
+ * [`SpaceMouseThread::set_led`] for details.
+ */
+void ffi_spacemouse_thread_set_led(const FfiSpaceMouseThread * NONNULL handle,
+                                   bool enabled);
+
+/**
+ * Stop capturing, join the background thread, and free the handle.
+ *
+ * # Safety (from the C++ side)
+ * `handle` must be a non-null pointer previously returned by
+ * [`ffi_spacemouse_thread_new`] and not already freed.
+ */
+void ffi_spacemouse_thread_free(FfiSpaceMouseThread *handle);
 
 /**
  * Wrapper for [increment_number_in_string]

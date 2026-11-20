@@ -108,6 +108,7 @@ WorkspaceSettings::WorkspaceSettings(QObject* parent)
     externalPdfReaderCommands("external_pdf_reader", "command", QStringList(),
                               this),
     keyboardShortcuts(this),
+    spaceMouse(this),
     schematicGridStyle("schematic_grid_style", GridStyle::Lines, this),
     boardGridStyle("board_grid_style", GridStyle::Lines, this),
     schematicColorSchemes(WorkspaceSettingsItem_ColorSchemes::Kind::sSchematic,

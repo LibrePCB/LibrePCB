@@ -41,6 +41,7 @@ namespace editor {
 
 class GuiApplication;
 class MainWindow;
+struct SpaceMouseMotionEvent;
 
 /*******************************************************************************
  *  Class WindowTab
@@ -81,6 +82,17 @@ public:
       const slint::language::KeyEvent& e) noexcept;
   virtual bool processSceneKeyReleased(
       const slint::language::KeyEvent& e) noexcept;
+
+  /**
+   * @brief Apply a motion event from a 3D mouse (SpaceMouse)
+   *
+   * Only relevant for tabs showing a view. Does nothing by default.
+   */
+  virtual void processSpaceMouseEvent(const SpaceMouseMotionEvent& e,
+                                      qreal dtSeconds) noexcept {
+    Q_UNUSED(e);
+    Q_UNUSED(dtSeconds);
+  }
 
   /**
    * @brief Request to close the tab

@@ -1,0 +1,42 @@
+# Grant non-root access to 3Dconnexion SpaceMouse and related 3D mouse HID
+# devices, so applications can read them without running as root.
+#
+# 0x256F is 3Dconnexion's own vendor ID and is matched by vendor only.
+# 0x046D is Logitech's vendor ID, used by legacy 3Dconnexion devices. It also
+# covers unrelated Logitech peripherals, so only specific product IDs are
+# matched.
+
+################################################################################
+## 3Dconnexion Devices
+################################################################################
+
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="256f", MODE="0660", TAG+="uaccess"
+
+################################################################################
+## Legacy Logitech-era Devices
+################################################################################
+
+# SpaceMouse Plus XT
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="c603", MODE="0660", TAG+="uaccess"
+# CADman
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="c605", MODE="0660", TAG+="uaccess"
+# SpaceMouse Classic
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="c606", MODE="0660", TAG+="uaccess"
+# Spaceball 5000
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="c621", MODE="0660", TAG+="uaccess"
+# Space Traveller 3D Mouse
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="c623", MODE="0660", TAG+="uaccess"
+# SpacePilot 3D Mouse
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="c625", MODE="0660", TAG+="uaccess"
+# SpaceNavigator 3D Mouse
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="c626", MODE="0660", TAG+="uaccess"
+# SpaceExplorer 3D Mouse
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="c627", MODE="0660", TAG+="uaccess"
+# SpaceNavigator for Notebooks
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="c628", MODE="0660", TAG+="uaccess"
+# SpacePilot Pro 3D Mouse
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="c629", MODE="0660", TAG+="uaccess"
+# SpaceMouse Pro
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="c62b", MODE="0660", TAG+="uaccess"
+
+
