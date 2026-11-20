@@ -36,7 +36,7 @@ namespace editor {
 
 SymbolEditorState_AddValues::SymbolEditorState_AddValues(
     const Context& context) noexcept
-  : SymbolEditorState_DrawTextBase(context, Mode::VALUE) {
+  : SymbolEditorState_DrawTextBase(context, "add_value", Mode::VALUE) {
 }
 
 SymbolEditorState_AddValues::~SymbolEditorState_AddValues() noexcept {

@@ -36,7 +36,7 @@ namespace editor {
 
 PackageEditorState_DrawPolygon::PackageEditorState_DrawPolygon(
     Context& context) noexcept
-  : PackageEditorState_DrawPolygonBase(context, Mode::POLYGON) {
+  : PackageEditorState_DrawPolygonBase(context, "draw_polygon", Mode::POLYGON) {
 }
 
 PackageEditorState_DrawPolygon::~PackageEditorState_DrawPolygon() noexcept {

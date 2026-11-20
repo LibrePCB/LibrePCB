@@ -23,6 +23,7 @@
 #include "layer.h"
 
 #include "../exceptions.h"
+#include "../serialization/serialization.h"
 #include "../serialization/sexpression.h"
 #include "../workspace/colorrole.h"
 
@@ -447,13 +448,21 @@ const QVector<const Layer*>& Layer::all() noexcept {
   return list;
 }
 
-const Layer& Layer::get(const QString& id) {
+const Layer& Layer::get(QStringView id) {
+  if (auto l = find(id)) {
+    return *l;
+  }
+  throw RuntimeError(__FILE__, __LINE__,
+                     QString("Unknown layer: '%1'").arg(id));
+}
+
+const Layer* Layer::find(QStringView id) {
   foreach (const Layer* layer, all()) {
     if (layer->getId() == id) {
-      return *layer;
+      return layer;
     }
   }
-  throw RuntimeError(__FILE__, __LINE__, tr("Unknown layer: '%1'").arg(id));
+  return nullptr;
 }
 
 bool Layer::lessThan(const Layer* a, const Layer* b) noexcept {
@@ -471,6 +480,19 @@ QVector<const Layer*> Layer::sorted(const QSet<const Layer*>& set) noexcept {
 /*******************************************************************************
  *  Non-Member Functions
  ******************************************************************************/
+
+template <>
+QString serializeToString(const Layer& obj) noexcept {
+  return obj.getId();
+}
+
+template <>
+std::optional<const Layer*> deserialize(QStringView str) noexcept {
+  if (auto l = Layer::find(str)) {
+    return l;
+  }
+  return std::nullopt;
+}
 
 template <>
 std::unique_ptr<SExpression> serialize(const Layer& obj) {

@@ -23,6 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../../clientsettings.h"
 #include "../../../graphics/graphicsscene.h"
 #include "packageeditorfsm.h"
 #include "packageeditorfsmadapter.h"
@@ -48,6 +49,14 @@ namespace editor {
 /**
  * @brief The PackageEditorState class is the base class of all package editor
  * FSM states
+ *
+ * @note  In contrast to the schematic/board editors, the library editors
+ *        usually don't persist toolbar settings. This is by intention to
+ *        enforce a consistent look&feel of library elements, the tools always
+ *        start with the recommended settings (possibly depending on the
+ *        chosen layer, e.g. for polygon tools). If this is not desired by
+ *        some people (who don't use the official libraries), we should provide
+ *        a way to *change* the default values by users.
  */
 class PackageEditorState : public QObject {
   Q_OBJECT
@@ -58,7 +67,8 @@ public:
   // Constructors / Destructor
   PackageEditorState() = delete;
   PackageEditorState(const PackageEditorState& other) = delete;
-  explicit PackageEditorState(Context& context) noexcept;
+  explicit PackageEditorState(Context& context, QAnyStringView settingsGroup,
+                              QObject* parent = nullptr) noexcept;
   ~PackageEditorState() noexcept override;
 
   // General Methods
@@ -148,9 +158,29 @@ protected:  // Methods
   static const QSet<const Layer*>& getAllowedTextLayers() noexcept;
   static const QSet<const Layer*>& getAllowedCircleAndPolygonLayers() noexcept;
 
+  /**
+   * @brief Get default line settings per layer
+   *
+   * @param layer Layer to consider.
+   *
+   * @return Default line width.
+   */
+  static UnsignedLength getDefaultLineWidth(const Layer& layer) noexcept;
+
+  /**
+   * @brief Get default polygon/circle settings per layer
+   *
+   * @param layer Layer to consider.
+   *
+   * @return Default line width, filled, and grab-area properties.
+   */
+  static std::tuple<UnsignedLength, bool, bool> getDefaultPolygonSettings(
+      const Layer& layer) noexcept;
+
 protected:  // Data
   Context& mContext;
   PackageEditorFsmAdapter& mAdapter;
+  ClientSettings mSettings;  ///< Scoped to the current FSM state / editor tool
 };
 
 /*******************************************************************************

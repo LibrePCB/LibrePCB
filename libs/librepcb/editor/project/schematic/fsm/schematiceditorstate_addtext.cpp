@@ -23,7 +23,6 @@
 #include "schematiceditorstate_addtext.h"
 
 #include "../../../cmd/cmdtextedit.h"
-#include "../../../editorcommandset.h"
 #include "../../../undostack.h"
 #include "../../cmd/cmdschematictextadd.h"
 
@@ -48,19 +47,23 @@ namespace editor {
 
 SchematicEditorState_AddText::SchematicEditorState_AddText(
     const Context& context) noexcept
-  : SchematicEditorState(context),
+  : SchematicEditorState(context, "add_text"),
     mIsUndoCmdActive(false),
     mCurrentProperties(
         Uuid::createRandom(),  // UUID is not relevant here
-        Layer::schematicComments(),  // Layer
+        *mSettings.get("layer", getAvailableLayers())
+             .value_or(&Layer::schematicComments()),  // Layer
         "{{PROJECT}}",  // Text
         Point(),  // Position is not relevant here
-        Angle::deg0(),  // Rotation
-        PositiveLength(2500000),  // Height
+        mSettings.get<Angle>("rotation")
+            .value_or(Angle::deg0())
+            .mappedTo0_360deg(),  // Rotation
+        getDefaultHeight(),  // Height
         Alignment(HAlign::left(), VAlign::bottom()),  // Alignment
         false  // Locked
         ),
     mCurrentTextToPlace(nullptr) {
+  loadLayerSpecificClientSettings();
 }
 
 SchematicEditorState_AddText::~SchematicEditorState_AddText() noexcept {
@@ -156,24 +159,37 @@ QSet<const Layer*> SchematicEditorState_AddText::getAvailableLayers()
 }
 
 void SchematicEditorState_AddText::setLayer(const Layer& layer) noexcept {
-  if (mCurrentProperties.setLayer(layer)) {
-    emit layerChanged(mCurrentProperties.getLayer());
+  if (!mCurrentProperties.setLayer(layer)) {
+    return;
   }
+
+  mSettings.set("layer", mCurrentProperties.getLayer());
+  emit layerChanged(mCurrentProperties.getLayer());
 
   if (mCurrentTextEditCmd) {
     mCurrentTextEditCmd->setLayer(mCurrentProperties.getLayer(), true);
   }
+
+  loadLayerSpecificClientSettings();
 }
 
 void SchematicEditorState_AddText::setHeight(
     const PositiveLength& height) noexcept {
-  if (mCurrentProperties.setHeight(height)) {
-    emit heightChanged(mCurrentProperties.getHeight());
+  if (!mCurrentProperties.setHeight(height)) {
+    return;
   }
+
+  mSettings.set("height/by_layer/" % mCurrentProperties.getLayer().getId(),
+                mCurrentProperties.getHeight());
+  emit heightChanged(mCurrentProperties.getHeight());
 
   if (mCurrentTextEditCmd) {
     mCurrentTextEditCmd->setHeight(mCurrentProperties.getHeight(), true);
   }
+}
+
+void SchematicEditorState_AddText::resetHeight() noexcept {
+  setHeight(getDefaultHeight());
 }
 
 const QStringList SchematicEditorState_AddText::getTextSuggestions()
@@ -190,9 +206,11 @@ const QStringList SchematicEditorState_AddText::getTextSuggestions()
 }
 
 void SchematicEditorState_AddText::setText(const QString& text) noexcept {
-  if (mCurrentProperties.setText(text)) {
-    emit textChanged(mCurrentProperties.getText());
+  if (!mCurrentProperties.setText(text)) {
+    return;
   }
+
+  emit textChanged(mCurrentProperties.getText());
 
   if (mCurrentTextEditCmd) {
     mCurrentTextEditCmd->setText(mCurrentProperties.getText(), true);
@@ -233,6 +251,7 @@ bool SchematicEditorState_AddText::rotateText(const Angle& angle) noexcept {
 
   mCurrentTextEditCmd->rotate(angle, mCurrentTextToPlace->getPosition(), true);
   mCurrentProperties = mCurrentTextToPlace->getTextObj();
+  mSettings.set("rotation", mCurrentProperties.getRotation());
 
   return true;  // Event handled
 }
@@ -285,6 +304,17 @@ bool SchematicEditorState_AddText::abortCommand(bool showErrMsgBox) noexcept {
     }
     return false;
   }
+}
+
+void SchematicEditorState_AddText::loadLayerSpecificClientSettings() noexcept {
+  if (auto v = mSettings.get<PositiveLength>(
+          "height/by_layer/" % mCurrentProperties.getLayer().getId())) {
+    setHeight(*v);
+  }
+}
+
+PositiveLength SchematicEditorState_AddText::getDefaultHeight() noexcept {
+  return PositiveLength(2500000);
 }
 
 /*******************************************************************************

@@ -29,10 +29,10 @@
 #include "../../utils/searchcontext.h"
 #include "../../widgets/if_graphicsvieweventhandler.h"
 #include "fsm/schematiceditorfsmadapter.h"
-#include "fsm/schematiceditorstate_drawwire.h"
 #include "windowtab.h"
 
 #include <librepcb/core/types/angle.h>
+#include <librepcb/core/types/enums.h>
 
 #include <QtCore>
 
@@ -43,6 +43,8 @@ namespace librepcb {
 
 class AttributeUnit;
 class ErcMsgBase;
+class Project;
+class Uuid;
 
 namespace editor {
 
@@ -162,11 +164,13 @@ public:
   SchematicTab& operator=(const SchematicTab& rhs) = delete;
 
 signals:
-  void wireModeRequested(SchematicEditorState_DrawWire::WireMode mode);
+  void wireModeRequested(WireMode mode);
   void angleRequested(const Angle& angle);
   void mirroredRequested(bool mirrored);
   void autoOrientationRequested(bool enabled);
   void layerRequested(const Layer& layer);
+  void lineWidthResetRequested();
+  void sizeResetRequested();
   void filledRequested(bool filled);
   void valueRequested(const QString& value);
   void attributeValueRequested(const QString& value);
@@ -206,7 +210,7 @@ private:
   ui::EditorTool mTool;
   Qt::CursorShape mToolCursorShape;
   QString mToolOverlayText;
-  SchematicEditorState_DrawWire::WireMode mToolWireMode;
+  WireMode mToolWireMode;
   Angle mToolAngle;
   bool mToolMirrored;
   bool mToolAutoOrientation;

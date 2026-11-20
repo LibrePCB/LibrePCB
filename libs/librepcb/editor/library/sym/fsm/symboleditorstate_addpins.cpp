@@ -48,13 +48,12 @@ namespace editor {
 
 SymbolEditorState_AddPins::SymbolEditorState_AddPins(
     const Context& context) noexcept
-  : SymbolEditorState(context),
+  : SymbolEditorState(context, "add_pin"),
     mCurrentProperties(
         Uuid::createRandom(),  // Not relevant
         CircuitIdentifier("1"),  // Name
         Point(),  // Not relevant
-        UnsignedLength(
-            2540000),  // Default length according library conventions
+        mSettings.get<UnsignedLength>("length").value_or(getDefaultLength()),
         Angle::deg0(),  // Default rotation
         Point(),  // Will be set later
         Angle::deg0(),  // Default name rotation
@@ -111,9 +110,11 @@ bool SymbolEditorState_AddPins::exit() noexcept {
 
 void SymbolEditorState_AddPins::setName(
     const CircuitIdentifier& name) noexcept {
-  if (mCurrentProperties.setName(name)) {
-    emit nameChanged(mCurrentProperties.getName());
+  if (!mCurrentProperties.setName(name)) {
+    return;
   }
+
+  emit nameChanged(mCurrentProperties.getName());
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setName(mCurrentProperties.getName(), true);
@@ -122,10 +123,14 @@ void SymbolEditorState_AddPins::setName(
 
 void SymbolEditorState_AddPins::setLength(
     const UnsignedLength& length) noexcept {
-  if (mCurrentProperties.setLength(length)) {
-    emit lengthChanged(mCurrentProperties.getLength());
+  if (!mCurrentProperties.setLength(length)) {
+    return;
   }
 
+  mSettings.set("length", mCurrentProperties.getLength());
+  emit lengthChanged(mCurrentProperties.getLength());
+
+  // Update name position.
   mCurrentProperties.setNamePosition(
       SymbolPin::getDefaultNamePosition(mCurrentProperties.getLength()));
 
@@ -134,6 +139,10 @@ void SymbolEditorState_AddPins::setLength(
     mCurrentEditCmd->setNamePosition(mCurrentProperties.getNamePosition(),
                                      true);
   }
+}
+
+void SymbolEditorState_AddPins::resetLength() noexcept {
+  setLength(getDefaultLength());
 }
 
 /*******************************************************************************
@@ -258,6 +267,11 @@ CircuitIdentifier SymbolEditorState_AddPins::determineNextPinName()
 
 bool SymbolEditorState_AddPins::hasPin(const QString& name) const noexcept {
   return mContext.symbol.getPins().contains(name);
+}
+
+UnsignedLength SymbolEditorState_AddPins::getDefaultLength() noexcept {
+  // Default length according library conventions.
+  return UnsignedLength(2540000);
 }
 
 /*******************************************************************************

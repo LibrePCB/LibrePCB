@@ -22,12 +22,12 @@
  ******************************************************************************/
 #include "length.h"
 
+#include "../serialization/serialization.h"
 #include "../serialization/sexpression.h"
 #include "../utils/qtmetatyperegistration.h"
 #include "../utils/toolbox.h"
 
 #include <librepcb/rust-core/ffi.h>
-#include <type_traits>
 
 #include <QtCore>
 
@@ -122,8 +122,17 @@ Length Length::fromMm(qreal millimeters) {
   return fromNm(millimeters * 1e6);
 }
 
-Length Length::fromMm(const QString& millimeters) {
+Length Length::fromMm(QStringView millimeters) {
   return Length(Toolbox::decimalFixedPointFromString<int64_t>(millimeters, 6));
+}
+
+std::optional<Length> Length::tryFromMm(QStringView millimeters) {
+  // Not a nice implementation, but will be obsolete after Rust migration.
+  try {
+    return fromMm(millimeters);
+  } catch (const Exception& e) {
+    return std::nullopt;
+  }
 }
 
 Length Length::fromInch(qreal inches) {
@@ -149,6 +158,46 @@ Length Length::max() noexcept {
 /*******************************************************************************
  *  Non-Member Functions
  ******************************************************************************/
+
+template <>
+QString serializeToString(const Length& obj) noexcept {
+  return obj.toMmString();
+}
+
+template <>
+QString serializeToString(const UnsignedLength& obj) noexcept {
+  return serializeToString(*obj);
+}
+
+template <>
+QString serializeToString(const PositiveLength& obj) noexcept {
+  return serializeToString(*obj);
+}
+
+template <>
+std::optional<Length> deserialize(QStringView str) noexcept {
+  return Length::tryFromMm(str);
+}
+
+template <>
+std::optional<UnsignedLength> deserialize(QStringView str) noexcept {
+  if (auto l = deserialize<Length>(str)) {
+    if (UnsignedLengthConstraint()(*l)) {
+      return UnsignedLength(*l);
+    }
+  }
+  return std::nullopt;
+}
+
+template <>
+std::optional<PositiveLength> deserialize(QStringView str) noexcept {
+  if (auto l = deserialize<Length>(str)) {
+    if (PositiveLengthConstraint()(*l)) {
+      return PositiveLength(*l);
+    }
+  }
+  return std::nullopt;
+}
 
 template <>
 std::unique_ptr<SExpression> serialize(const Length& obj) {

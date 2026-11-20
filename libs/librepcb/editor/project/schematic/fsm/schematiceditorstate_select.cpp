@@ -94,7 +94,7 @@ namespace editor {
 
 SchematicEditorState_Select::SchematicEditorState_Select(
     const Context& context) noexcept
-  : SchematicEditorState(context),
+  : SchematicEditorState(context, "select"),
     mSubState(SubState::Idle),
     mSelectedPolygon(nullptr),
     mSelectedPolygonVertices(),

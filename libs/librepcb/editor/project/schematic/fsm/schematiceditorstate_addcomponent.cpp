@@ -59,7 +59,7 @@ namespace editor {
 
 SchematicEditorState_AddComponent::SchematicEditorState_AddComponent(
     const Context& context) noexcept
-  : SchematicEditorState(context),
+  : SchematicEditorState(context, "add_component"),
     mIsUndoCmdActive(false),
     mUseAddComponentDialog(true),
     mAbortAfterCurrentGate(false),

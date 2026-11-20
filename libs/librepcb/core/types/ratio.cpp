@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "ratio.h"
 
+#include "../serialization/serialization.h"
 #include "../serialization/sexpression.h"
 #include "../utils/toolbox.h"
 
@@ -60,19 +61,68 @@ Ratio Ratio::fromNormalized(qreal normalized) noexcept {
   return ratio;
 }
 
-Ratio Ratio::fromNormalized(const QString& normalized) {
+Ratio Ratio::fromNormalized(QStringView normalized) {
   Ratio ratio;
   ratio.setRatioNormalized(normalized);
   return ratio;
 }
 
+std::optional<Ratio> Ratio::tryFromNormalized(QStringView normalized) noexcept {
+  // Not a nice implementation, but will be obsolete after Rust migration.
+  try {
+    return fromNormalized(normalized);
+  } catch (const Exception& e) {
+    return std::nullopt;
+  }
+}
+
 // Private Static Methods
 
-qint32 Ratio::normalizedStringToPpm(const QString& normalized) {
+qint32 Ratio::normalizedStringToPpm(QStringView normalized) {
   return Toolbox::decimalFixedPointFromString<qint32>(normalized, 6);
 }
 
 // Non-Member Functions
+
+template <>
+QString serializeToString(const Ratio& obj) noexcept {
+  return obj.toNormalizedString();
+}
+
+template <>
+QString serializeToString(const UnsignedRatio& obj) noexcept {
+  return serializeToString(*obj);
+}
+
+template <>
+QString serializeToString(const UnsignedLimitedRatio& obj) noexcept {
+  return serializeToString(*obj);
+}
+
+template <>
+std::optional<Ratio> deserialize(QStringView str) noexcept {
+  return Ratio::tryFromNormalized(str);
+}
+
+template <>
+std::optional<UnsignedRatio> deserialize(QStringView str) noexcept {
+  if (auto r = deserialize<Ratio>(str)) {
+    if (UnsignedRatioConstraint()(*r)) {
+      return UnsignedRatio(*r);
+    }
+  }
+  return std::nullopt;
+}
+
+template <>
+std::optional<UnsignedLimitedRatio> deserialize(QStringView str) noexcept {
+  if (auto r = deserialize<Ratio>(str)) {
+    if (UnsignedLimitedRatioConstraint()(*r)) {
+      return UnsignedLimitedRatio(*r);
+    }
+  }
+  return std::nullopt;
+}
 
 template <>
 std::unique_ptr<SExpression> serialize(const Ratio& obj) {

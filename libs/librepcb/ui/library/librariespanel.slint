@@ -280,6 +280,7 @@ component LibraryListViewItem inherits Rectangle {
                 ]
 
                 toggled(checked) => {
+                    root.clicked();  // Set focus to view, for Ctrl+Enter to work!
                     model[index].checked = checked;
                 }
             }

@@ -36,7 +36,7 @@ namespace editor {
 
 PackageEditorState_DrawText::PackageEditorState_DrawText(
     Context& context) noexcept
-  : PackageEditorState_DrawTextBase(context, Mode::TEXT) {
+  : PackageEditorState_DrawTextBase(context, "add_text", Mode::TEXT) {
 }
 
 PackageEditorState_DrawText::~PackageEditorState_DrawText() noexcept {

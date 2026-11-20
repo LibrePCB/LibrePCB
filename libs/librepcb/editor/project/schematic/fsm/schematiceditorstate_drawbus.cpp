@@ -22,7 +22,6 @@
  ******************************************************************************/
 #include "schematiceditorstate_drawbus.h"
 
-#include "../../../editorcommandset.h"
 #include "../../../undocommandgroup.h"
 #include "../../../undostack.h"
 #include "../../cmd/cmdbusadd.h"
@@ -59,10 +58,11 @@ namespace editor {
 
 SchematicEditorState_DrawBus::SchematicEditorState_DrawBus(
     const Context& context) noexcept
-  : SchematicEditorState(context),
+  : SchematicEditorState(context, "draw_bus"),
     mCircuit(context.project.getCircuit()),
     mSubState(SubState::IDLE),
-    mCurrentWireMode(WireMode::HV),
+    mCurrentWireMode(
+        mSettings.get<WireMode>("wire_mode").value_or(WireMode::HV)),
     mCursorPos(),
     mFixedStartAnchor(nullptr),
     mCurrentSegment(nullptr),
@@ -230,10 +230,13 @@ void SchematicEditorState_DrawBus::selectBus(
 }
 
 void SchematicEditorState_DrawBus::setWireMode(WireMode mode) noexcept {
-  if (mode != mCurrentWireMode) {
-    mCurrentWireMode = mode;
-    emit wireModeChanged(mCurrentWireMode);
+  if (mode == mCurrentWireMode) {
+    return;
   }
+
+  mCurrentWireMode = mode;
+  mSettings.set("wire_mode", mCurrentWireMode);
+  emit wireModeChanged(mCurrentWireMode);
 
   if (mSubState == SubState::POSITIONING_JUNCTION) {
     updateJunctionPositions(true);

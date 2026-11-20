@@ -170,13 +170,14 @@ public:
 
 signals:
   void layerRequested(const Layer& layer);
+  void lineWidthResetRequested();
+  void sizeResetRequested();
   void angleRequested(const Angle& angle);
   void ratioRequested(const UnsignedLimitedRatio& ratio);
   void filledRequested(bool filled);
   void grabAreaRequested(bool grabArea);
   void valueRequested(const QString& value);
-  void hAlignRequested(const HAlign& align);
-  void vAlignRequested(const VAlign& align);
+  void alignmentRequested(const Alignment& align);
   void packagePadRequested(const std::optional<Uuid>& pad);
   void componentSideRequested(Pad::ComponentSide side);
   void shapeRequested(const ui::PadShape shape);

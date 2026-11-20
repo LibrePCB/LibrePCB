@@ -47,7 +47,7 @@ namespace editor {
 
 SymbolEditorState_AddImage::SymbolEditorState_AddImage(
     const Context& context) noexcept
-  : SymbolEditorState(context),
+  : SymbolEditorState(context, "add_image"),
     mState(State::Positioning),
     mUndoCmdActive(false),
     mCurrentProperties(Uuid::createRandom(),  // Not relevant

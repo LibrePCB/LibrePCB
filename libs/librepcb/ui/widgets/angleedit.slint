@@ -41,7 +41,7 @@ export component AngleEdit inherits Rectangle {
     accessible-role: spinbox;
     accessible-description: tooltip.is-empty ? "angle" : tooltip;
     accessible-enabled: enabled;
-    accessible-value: edt.text + " degrees";
+    accessible-value: edt.text;
     accessible-action-increment => {
         up-btn.clicked();
     }
@@ -51,6 +51,7 @@ export component AngleEdit inherits Rectangle {
     accessible-action-set-value(s) => {
         edt.text = s;
         edt.edited();
+        edt.accepted();
     }
 
     changed value => {

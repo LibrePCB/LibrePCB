@@ -45,9 +45,10 @@ namespace editor {
 
 PackageEditorState_AddHoles::PackageEditorState_AddHoles(
     Context& context) noexcept
-  : PackageEditorState(context),
+  : PackageEditorState(context, "add_hole"),
     mCurrentProperties(Uuid::createRandom(),  // Not relevant
-                       PositiveLength(1000000),  // Commonly used drill diameter
+                       mSettings.get<PositiveLength>("diameter")
+                           .value_or(PositiveLength(1000000)),
                        makeNonEmptyPath(Point()),  // Not relevant
                        MaskConfig::automatic()  // Default
                        ),
@@ -115,9 +116,12 @@ bool PackageEditorState_AddHoles::processGraphicsSceneLeftMouseButtonPressed(
 
 void PackageEditorState_AddHoles::setDiameter(
     const PositiveLength& diameter) noexcept {
-  if (mCurrentProperties.setDiameter(diameter)) {
-    emit diameterChanged(mCurrentProperties.getDiameter());
+  if (!mCurrentProperties.setDiameter(diameter)) {
+    return;
   }
+
+  mSettings.set("diameter", mCurrentProperties.getDiameter());
+  emit diameterChanged(mCurrentProperties.getDiameter());
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setDiameter(mCurrentProperties.getDiameter(), true);

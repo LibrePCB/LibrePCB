@@ -39,32 +39,78 @@
 namespace librepcb {
 namespace editor {
 
+static StrokeText getInitialProperties(
+    PackageEditorState_DrawTextBase::Mode mode, const ClientSettings& settings,
+    const QSet<const Layer*>& layers) noexcept {
+  switch (mode) {
+    case PackageEditorState_DrawTextBase::Mode::NAME:
+      // Set all properties according library conventions
+      return StrokeText{
+          Uuid::createRandom(),  // Not relevant
+          Layer::topNames(),  // Layer
+          "{{NAME}}",  // Text
+          Point(),  // Position
+          Angle::deg0(),  // Rotation
+          PackageEditorState_DrawTextBase::getDefaultHeight(Layer::topNames()),
+          PackageEditorState_DrawTextBase::getDefaultStrokeWidth(),  // Stroke
+          StrokeTextSpacing(),  // Letter spacing
+          StrokeTextSpacing(),  // Line spacing
+          Alignment(HAlign::center(), VAlign::bottom()),  // Alignment
+          false,  // Mirror
+          true,  // Auto rotate
+          false  // Locked
+      };
+    case PackageEditorState_DrawTextBase::Mode::VALUE:
+      // Set all properties according library conventions
+      return StrokeText{
+          Uuid::createRandom(),  // Not relevant
+          Layer::topValues(),  // Layer
+          "{{VALUE}}",  // Text
+          Point(),  // Position
+          Angle::deg0(),  // Rotation
+          PackageEditorState_DrawTextBase::getDefaultHeight(Layer::topValues()),
+          PackageEditorState_DrawTextBase::getDefaultStrokeWidth(),  // Stroke
+          StrokeTextSpacing(),  // Letter spacing
+          StrokeTextSpacing(),  // Line spacing
+          Alignment(HAlign::center(), VAlign::top()),  // Alignment
+          false,  // Mirror
+          true,  // Auto rotate
+          false  // Locked
+      };
+    default:
+      const Layer& layer =
+          *settings.get("layer", layers).value_or(&Layer::topLegend());
+      return StrokeText{
+          Uuid::createRandom(),  // Not relevant
+          layer,  // Layer
+          "Text",  // Non-empty to avoid invisible graphics item
+          Point(),  // Position
+          Angle::deg0(),  // Rotation
+          PackageEditorState_DrawTextBase::getDefaultHeight(layer),  // Height
+          PackageEditorState_DrawTextBase::getDefaultStrokeWidth(),  // Stroke
+          StrokeTextSpacing(),  // Letter spacing
+          StrokeTextSpacing(),  // Line spacing
+          Alignment(HAlign::left(), VAlign::bottom()),  // Alignment
+          false,  // Mirror
+          true,  // Auto rotate
+          true  // Locked
+      };
+  }
+}
+
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
 
 PackageEditorState_DrawTextBase::PackageEditorState_DrawTextBase(
-    Context& context, Mode mode) noexcept
-  : PackageEditorState(context),
+    Context& context, QAnyStringView settingsGroup, Mode mode) noexcept
+  : PackageEditorState(context, settingsGroup),
     mMode(mode),
     mCurrentProperties(
-        Uuid::createRandom(),  // Not relevant
-        Layer::topNames(),  // Layer
-        QString(),  // Text
-        Point(),  // Position
-        Angle::deg0(),  // Rotation
-        PositiveLength(1),  // Height
-        UnsignedLength(0),  // Stroke width
-        StrokeTextSpacing(),  // Letter spacing
-        StrokeTextSpacing(),  // Line spacing
-        Alignment(HAlign::left(), VAlign::bottom()),  // Alignment
-        false,  // Mirror
-        true,  // Auto rotate
-        false  // Locked
-        ),
+        getInitialProperties(mode, mSettings, getAvailableLayers())),
     mCurrentText(nullptr),
     mCurrentGraphicsItem(nullptr) {
-  resetToDefaultParameters();
+  loadLayerSpecificClientSettings();
 }
 
 PackageEditorState_DrawTextBase::~PackageEditorState_DrawTextBase() noexcept {
@@ -76,10 +122,6 @@ PackageEditorState_DrawTextBase::~PackageEditorState_DrawTextBase() noexcept {
  ******************************************************************************/
 
 bool PackageEditorState_DrawTextBase::entry() noexcept {
-  if (mMode != Mode::TEXT) {
-    resetToDefaultParameters();
-  }
-
   const Point pos = mAdapter.fsmMapGlobalPosToScenePos(QCursor::pos())
                         .mappedToGrid(getGridInterval());
   if (!startAddText(pos)) {
@@ -154,8 +196,7 @@ bool PackageEditorState_DrawTextBase::processMirror(
                                     true);
     mCurrentProperties.setRotation(mCurrentText->getRotation());
     if (mCurrentProperties.setAlign(mCurrentText->getAlign())) {
-      emit hAlignChanged(mCurrentProperties.getAlign().getH());
-      emit vAlignChanged(mCurrentProperties.getAlign().getV());
+      emit alignmentChanged(mCurrentProperties.getAlign());
     }
     return true;
   } else {
@@ -174,8 +215,7 @@ bool PackageEditorState_DrawTextBase::processFlip(
     }
     mCurrentProperties.setRotation(mCurrentText->getRotation());
     if (mCurrentProperties.setAlign(mCurrentText->getAlign())) {
-      emit hAlignChanged(mCurrentProperties.getAlign().getH());
-      emit vAlignChanged(mCurrentProperties.getAlign().getV());
+      emit alignmentChanged(mCurrentProperties.getAlign());
     }
     mCurrentProperties.setMirrored(mCurrentText->getMirrored());
     return true;
@@ -194,19 +234,26 @@ QSet<const Layer*> PackageEditorState_DrawTextBase::getAvailableLayers()
 }
 
 void PackageEditorState_DrawTextBase::setLayer(const Layer& layer) noexcept {
-  if (mCurrentProperties.setLayer(layer)) {
-    emit layerChanged(mCurrentProperties.getLayer());
+  if (!mCurrentProperties.setLayer(layer)) {
+    return;
   }
+
+  mSettings.set("layer", mCurrentProperties.getLayer());
+  emit layerChanged(mCurrentProperties.getLayer());
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setLayer(mCurrentProperties.getLayer(), true);
   }
+
+  loadLayerSpecificClientSettings();
 }
 
 void PackageEditorState_DrawTextBase::setText(const QString& text) noexcept {
-  if (mCurrentProperties.setText(text)) {
-    emit textChanged(mCurrentProperties.getText());
+  if (!mCurrentProperties.setText(text)) {
+    return;
   }
+
+  emit textChanged(mCurrentProperties.getText());
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setText(mCurrentProperties.getText(), true);
@@ -231,44 +278,67 @@ const QStringList PackageEditorState_DrawTextBase::getTextSuggestions()
   }
 }
 
+PositiveLength PackageEditorState_DrawTextBase::getDefaultHeight(
+    const Layer& layer) noexcept {
+  if ((layer == Layer::topNames()) || (layer == Layer::botNames()) ||
+      (layer == Layer::topValues()) || (layer == Layer::botValues())) {
+    return PositiveLength(1000000);  // According library conventions
+  } else {
+    return PositiveLength(2000000);  // Something reasonable
+  }
+}
+
 void PackageEditorState_DrawTextBase::setHeight(
     const PositiveLength& height) noexcept {
-  if (mCurrentProperties.setHeight(height)) {
-    emit heightChanged(mCurrentProperties.getHeight());
+  if (!mCurrentProperties.setHeight(height)) {
+    return;
   }
+
+  mSettings.set("height/by_layer/" % mCurrentProperties.getLayer().getId(),
+                mCurrentProperties.getHeight());
+  emit heightChanged(mCurrentProperties.getHeight());
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setHeight(mCurrentProperties.getHeight(), true);
   }
 }
 
+void PackageEditorState_DrawTextBase::resetHeight() noexcept {
+  setHeight(getDefaultHeight(mCurrentProperties.getLayer()));
+}
+
+UnsignedLength
+    PackageEditorState_DrawTextBase::getDefaultStrokeWidth() noexcept {
+  return UnsignedLength(200000);
+}
+
 void PackageEditorState_DrawTextBase::setStrokeWidth(
     const UnsignedLength& width) noexcept {
-  if (mCurrentProperties.setStrokeWidth(width)) {
-    emit strokeWidthChanged(mCurrentProperties.getStrokeWidth());
+  if (!mCurrentProperties.setStrokeWidth(width)) {
+    return;
   }
+
+  mSettings.set(
+      "stroke_width/by_layer/" % mCurrentProperties.getLayer().getId(),
+      mCurrentProperties.getStrokeWidth());
+  emit strokeWidthChanged(mCurrentProperties.getStrokeWidth());
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setStrokeWidth(mCurrentProperties.getStrokeWidth(), true);
   }
 }
 
-void PackageEditorState_DrawTextBase::setHAlign(const HAlign& align) noexcept {
-  if (mCurrentProperties.setAlign(
-          Alignment(align, mCurrentProperties.getAlign().getV()))) {
-    emit hAlignChanged(mCurrentProperties.getAlign().getH());
-  }
-
-  if (mCurrentEditCmd) {
-    mCurrentEditCmd->setAlignment(mCurrentProperties.getAlign(), true);
-  }
+void PackageEditorState_DrawTextBase::resetStrokeWidth() noexcept {
+  setStrokeWidth(getDefaultStrokeWidth());
 }
 
-void PackageEditorState_DrawTextBase::setVAlign(const VAlign& align) noexcept {
-  if (mCurrentProperties.setAlign(
-          Alignment(mCurrentProperties.getAlign().getH(), align))) {
-    emit vAlignChanged(mCurrentProperties.getAlign().getV());
+void PackageEditorState_DrawTextBase::setAlign(
+    const Alignment& align) noexcept {
+  if (!mCurrentProperties.setAlign(align)) {
+    return;
   }
+
+  emit alignmentChanged(mCurrentProperties.getAlign());
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setAlignment(mCurrentProperties.getAlign(), true);
@@ -338,38 +408,17 @@ bool PackageEditorState_DrawTextBase::abortAddText() noexcept {
   }
 }
 
-void PackageEditorState_DrawTextBase::resetToDefaultParameters() noexcept {
-  mCurrentProperties.setRotation(Angle::deg0());
-  mCurrentProperties.setMirrored(false);  // TODO
-  switch (mMode) {
-    case Mode::NAME:
-      // Set all properties according library conventions
-      setLayer(Layer::topNames());
-      setHeight(PositiveLength(1000000));
-      setStrokeWidth(UnsignedLength(200000));
-      setHAlign(HAlign::center());
-      setVAlign(VAlign::bottom());
-      mCurrentProperties.setText("{{NAME}}");
-      break;
-    case Mode::VALUE:
-      // Set all properties according library conventions
-      setLayer(Layer::topValues());
-      setHeight(PositiveLength(1000000));
-      setStrokeWidth(UnsignedLength(200000));
-      setHAlign(HAlign::center());
-      setVAlign(VAlign::top());
-      mCurrentProperties.setText("{{VALUE}}");
-      break;
-    default:
-      // Set properties to something reasonable
-      setLayer(Layer::topLegend());
-      setHeight(PositiveLength(2000000));
-      setStrokeWidth(UnsignedLength(200000));
-      setHAlign(HAlign::left());
-      setVAlign(VAlign::bottom());
-      mCurrentProperties.setText(
-          "Text");  // Non-empty to avoid invisible graphics item
-      break;
+void PackageEditorState_DrawTextBase::
+    loadLayerSpecificClientSettings() noexcept {
+  if (mMode == Mode::TEXT) {
+    if (auto v = mSettings.get<PositiveLength>(
+            "height/by_layer/" % mCurrentProperties.getLayer().getId())) {
+      setHeight(*v);
+    }
+    if (auto v = mSettings.get<UnsignedLength>(
+            "stroke_width/by_layer/" % mCurrentProperties.getLayer().getId())) {
+      setStrokeWidth(*v);
+    }
   }
 }
 

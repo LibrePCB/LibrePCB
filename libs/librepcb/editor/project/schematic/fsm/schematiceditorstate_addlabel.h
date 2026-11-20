@@ -84,7 +84,7 @@ public:
   bool getMirrored() const noexcept;
   void setMirrored(bool mirrored) noexcept;
   bool getAutoOrientation() const noexcept { return mAutoOrientation; }
-  void setAutoOrientation(bool enabled) noexcept;
+  void setAutoOrientation(bool enable) noexcept;
 
   // Operator Overloadings
   SchematicEditorState_AddLabel& operator=(
@@ -103,6 +103,9 @@ private:  // Methods
   void updateLabelAutoOrientation() noexcept;
   std::optional<std::pair<Angle, bool>> calcAutoOrientation(
       const Point& pos, const QVector<std::pair<Point, Point>>& lines) noexcept;
+  bool storeRotation(const Angle& rotation) noexcept;
+  bool storeMirrored(bool mirrored) noexcept;
+  bool storeAutoOrientation(bool enable) noexcept;
 
 private:  // Data
   bool mUndoCmdActive;

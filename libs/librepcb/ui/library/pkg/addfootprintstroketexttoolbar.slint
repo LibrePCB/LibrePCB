@@ -3,10 +3,15 @@ import {
     HAlignSelector,
     LengthEdit,
     LineEdit,
+    MenuItem,
+    MenuPopup,
     VAlignSelector,
 } from "../../widgets.slint";
 import {
+    Backend,
+    EditorCommandSet as Cmd,
     PackageTabData,
+    TabAction,
     WindowSectionData,
 } from "../../api.slint";
 
@@ -45,6 +50,7 @@ export component AddFootprintStrokeTextToolBar inherits HorizontalLayout {
         icon: @image-url("../../../../font-awesome/svgs/solid/text-height.svg");
         tooltip: @tr("Text Height");
         min-width-text: "1.234";
+        has-dropdown: true;
 
         value-changed(v) => {
             tabs[section.current-tab-index].tool-size.value = v;
@@ -61,6 +67,23 @@ export component AddFootprintStrokeTextToolBar inherits HorizontalLayout {
         decrease-triggered => {
             tabs[section.current-tab-index].tool-size.decrease = true;
         }
+
+        dropdown-triggered => {
+            height-popup.show();
+        }
+
+        height-popup := MenuPopup {
+            x: 0;
+            y: parent.height;
+
+            height-reset-item := MenuItem {
+                cmd: Cmd.reset-to-default;
+
+                clicked => {
+                    Backend.trigger-tab(section-index, section.current-tab-index, TabAction.toolbar-size-reset);
+                }
+            }
+        }
     }
 
     stroke-width-edt := LengthEdit {
@@ -68,6 +91,7 @@ export component AddFootprintStrokeTextToolBar inherits HorizontalLayout {
         icon: @image-url("../../../../bootstrap-icons/icons/border-width.svg");
         tooltip: @tr("Stroke Width");
         min-width-text: "1.234";
+        has-dropdown: true;
 
         value-changed(v) => {
             tabs[section.current-tab-index].tool-line-width.value = v;
@@ -83,6 +107,23 @@ export component AddFootprintStrokeTextToolBar inherits HorizontalLayout {
 
         decrease-triggered => {
             tabs[section.current-tab-index].tool-line-width.decrease = true;
+        }
+
+        dropdown-triggered => {
+            stroke-width-popup.show();
+        }
+
+        stroke-width-popup := MenuPopup {
+            x: 0;
+            y: parent.height;
+
+            stroke-width-reset-item := MenuItem {
+                cmd: Cmd.reset-to-default;
+
+                clicked => {
+                    Backend.trigger-tab(section-index, section.current-tab-index, TabAction.toolbar-line-width-reset);
+                }
+            }
         }
     }
 

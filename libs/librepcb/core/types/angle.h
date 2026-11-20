@@ -143,7 +143,7 @@ public:
   // General Methods
 
   /**
-   * @brief Get an Angle object with absolute value (mMicrodegrees >= 0)
+   * @brief Get an Angle object with absolute value (#mMicrodegrees >= 0)
    *
    * @return A new Angle object with absolute value
    */
@@ -191,7 +191,7 @@ public:
   /**
    * @brief Get an Angle object with a specific angle
    *
-   * @param degrees   See setAngleDeg(qreal)
+   * @param degrees   Angle in degrees.
    *
    * @return A new Angle object with the specified angle
    */
@@ -207,19 +207,19 @@ public:
    * maximum count of decimals after the decimal point is 6, because the 6th
    * decimal represents one microdegree.
    *
-   * @param degrees   See setAngleDeg(const QString&)
+   * @param degrees   Angle as a string in degrees.
    *
    * @return A new Angle object with the specified angle
    *
    * @throw Exception     If the argument is invalid, an Exception will be
    * thrown
    */
-  static Angle fromDeg(const QString& degrees);
+  static Angle fromDeg(QStringView degrees);
 
   /**
    * @brief Get an Angle object with a specific angle
    *
-   * @param radians   See setAngleRad()
+   * @param radians   Angle in radians.
    *
    * @return A new Angle object with the specified angle
    *
@@ -230,9 +230,20 @@ public:
   /**
    * @brief Try to get an Angle object from radians
    *
+   * Same as #fromDeg(), but returns `std::nullopt` on invalid argument.
+   *
+   * @param degrees  See #fromDeg(QStringView).
+   *
+   * @return ::librepcb::Angle if valid, `std::nullopt` if invalid.
+   */
+  static std::optional<Angle> tryFromDeg(QStringView degrees) noexcept;
+
+  /**
+   * @brief Try to get an Angle object from radians
+   *
    * Same as #fromRad(), but returns `std::nullopt` on invalid argument.
    *
-   * @param radians  See setAngleRad()
+   * @param radians  See #fromRad(qreal).
    *
    * @return ::librepcb::Angle if valid, `std::nullopt` if invalid.
    */
@@ -312,7 +323,8 @@ private:
    * @brief Convert an angle from a QString (in degrees) to an integer (in
    * microdegrees)
    *
-   * This is a helper function for Angle(const QString&) and setAngleDeg().
+   * This is a helper function for #fromDeg(QStringView) and
+   * #tryFromDeg(QStringView).
    *
    * @param degrees   A QString which contains a floating point number with
    * maximum six decimals after the decimal point. The locale of the string have
@@ -320,7 +332,7 @@ private:
    *
    * @return The angle in microdegrees
    */
-  static qint32 degStringToMicrodeg(const QString& degrees);
+  static qint32 degStringToMicrodeg(QStringView degrees);
 
   // Private Member Variables
   qint32 mMicrodegrees;  ///< the angle in microdegrees

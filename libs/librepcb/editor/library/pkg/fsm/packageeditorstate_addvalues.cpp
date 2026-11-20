@@ -36,7 +36,7 @@ namespace editor {
 
 PackageEditorState_AddValues::PackageEditorState_AddValues(
     Context& context) noexcept
-  : PackageEditorState_DrawTextBase(context, Mode::VALUE) {
+  : PackageEditorState_DrawTextBase(context, "add_value", Mode::VALUE) {
 }
 
 PackageEditorState_AddValues::~PackageEditorState_AddValues() noexcept {

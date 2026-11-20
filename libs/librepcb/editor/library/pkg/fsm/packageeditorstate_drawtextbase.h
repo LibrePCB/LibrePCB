@@ -60,6 +60,7 @@ public:
   PackageEditorState_DrawTextBase(
       const PackageEditorState_DrawTextBase& other) = delete;
   explicit PackageEditorState_DrawTextBase(Context& context,
+                                           QAnyStringView settingsGroup,
                                            Mode mode) noexcept;
   ~PackageEditorState_DrawTextBase() noexcept override;
 
@@ -89,22 +90,22 @@ public:
   }
   void setText(const QString& text) noexcept;
   const QStringList getTextSuggestions() const noexcept;
+  static PositiveLength getDefaultHeight(const Layer& layer) noexcept;
   const PositiveLength& getHeight() const noexcept {
     return mCurrentProperties.getHeight();
   }
   void setHeight(const PositiveLength& height) noexcept;
+  void resetHeight() noexcept;
+  static UnsignedLength getDefaultStrokeWidth() noexcept;
   const UnsignedLength& getStrokeWidth() const noexcept {
     return mCurrentProperties.getStrokeWidth();
   }
   void setStrokeWidth(const UnsignedLength& width) noexcept;
-  const HAlign& getHAlign() const noexcept {
-    return mCurrentProperties.getAlign().getH();
+  void resetStrokeWidth() noexcept;
+  const Alignment& getAlign() const noexcept {
+    return mCurrentProperties.getAlign();
   }
-  void setHAlign(const HAlign& align) noexcept;
-  const VAlign& getVAlign() const noexcept {
-    return mCurrentProperties.getAlign().getV();
-  }
-  void setVAlign(const VAlign& align) noexcept;
+  void setAlign(const Alignment& align) noexcept;
 
   // Operator Overloadings
   PackageEditorState_DrawTextBase& operator=(
@@ -115,8 +116,7 @@ signals:
   void textChanged(const QString& text);
   void heightChanged(const PositiveLength& height);
   void strokeWidthChanged(const UnsignedLength& width);
-  void hAlignChanged(const HAlign& align);
-  void vAlignChanged(const VAlign& align);
+  void alignmentChanged(const Alignment& align);
 
 protected:
   virtual void notifyToolEnter() noexcept = 0;
@@ -125,7 +125,7 @@ private:  // Methods
   bool startAddText(const Point& pos) noexcept;
   bool finishAddText(const Point& pos) noexcept;
   bool abortAddText() noexcept;
-  void resetToDefaultParameters() noexcept;
+  void loadLayerSpecificClientSettings() noexcept;
 
 private:
   Mode mMode;

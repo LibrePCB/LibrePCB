@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "angle.h"
 
+#include "../serialization/serialization.h"
 #include "../serialization/sexpression.h"
 #include "../utils/qtmetatyperegistration.h"
 #include "../utils/toolbox.h"
@@ -86,7 +87,7 @@ Angle Angle::fromDeg(qreal degrees) {
                    std::numeric_limits<int64_t>::max());
 }
 
-Angle Angle::fromDeg(const QString& degrees) {
+Angle Angle::fromDeg(QStringView degrees) {
   return Angle(degStringToMicrodeg(degrees));
 }
 
@@ -100,6 +101,15 @@ Angle Angle::fromRad(qreal radians) {
                    std::numeric_limits<int64_t>::max());
 }
 
+std::optional<Angle> Angle::tryFromDeg(QStringView degrees) noexcept {
+  // Not a nice implementation, but will be obsolete after Rust migration.
+  try {
+    return fromDeg(degrees);
+  } catch (const Exception& e) {
+    return std::nullopt;
+  }
+}
+
 std::optional<Angle> Angle::tryFromRad(qreal radians) noexcept {
   int64_t udeg;
   if (rs::ffi_angle_from_rad_f(radians, &udeg)) {
@@ -111,11 +121,21 @@ std::optional<Angle> Angle::tryFromRad(qreal radians) noexcept {
 
 // Private Static Methods
 
-qint32 Angle::degStringToMicrodeg(const QString& degrees) {
+qint32 Angle::degStringToMicrodeg(QStringView degrees) {
   return Toolbox::decimalFixedPointFromString<qint32>(degrees, 6);
 }
 
 // Non-Member Functions
+
+template <>
+QString serializeToString(const Angle& obj) noexcept {
+  return obj.toDegString();
+}
+
+template <>
+std::optional<Angle> deserialize(QStringView str) noexcept {
+  return Angle::tryFromDeg(str);
+}
 
 template <>
 std::unique_ptr<SExpression> serialize(const Angle& obj) {

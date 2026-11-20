@@ -115,7 +115,7 @@ namespace editor {
 
 BoardEditorState_Select::BoardEditorState_Select(
     const Context& context) noexcept
-  : BoardEditorState(context),
+  : BoardEditorState(context, "select"),
     mSubState(SubState::Idle),
     mSelectedPolygon(nullptr),
     mSelectedPolygonVertices(),

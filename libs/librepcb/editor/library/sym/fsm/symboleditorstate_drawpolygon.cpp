@@ -36,7 +36,7 @@ namespace editor {
 
 SymbolEditorState_DrawPolygon::SymbolEditorState_DrawPolygon(
     const Context& context) noexcept
-  : SymbolEditorState_DrawPolygonBase(context, Mode::POLYGON) {
+  : SymbolEditorState_DrawPolygonBase(context, "draw_polygon", Mode::POLYGON) {
 }
 
 SymbolEditorState_DrawPolygon::~SymbolEditorState_DrawPolygon() noexcept {

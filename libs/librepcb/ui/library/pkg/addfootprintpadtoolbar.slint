@@ -37,6 +37,8 @@ export component AddFootprintPadToolBar inherits HorizontalLayout {
 
     if show-side-selector: side-selector := ToolBarButton {
         property <bool> bottom: tabs[section.current-tab-index].tool-bottom;
+        checkable: true;
+        checked: bottom;
 
         icon: {
             if bottom {

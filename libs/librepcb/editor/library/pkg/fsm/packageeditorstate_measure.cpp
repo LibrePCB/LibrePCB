@@ -38,7 +38,7 @@ namespace editor {
 
 PackageEditorState_Measure::PackageEditorState_Measure(
     Context& context) noexcept
-  : PackageEditorState(context), mTool(new MeasureTool()) {
+  : PackageEditorState(context, "measure"), mTool(new MeasureTool()) {
   connect(
       mTool.data(), &MeasureTool::infoBoxTextChanged, this,
       [this](const QString& text) { mAdapter.fsmSetViewInfoBoxText(text); });

@@ -53,7 +53,7 @@ namespace editor {
 
 BoardEditorState_DrawPlane::BoardEditorState_DrawPlane(
     const Context& context) noexcept
-  : BoardEditorState(context),
+  : BoardEditorState(context, "draw_plane"),
     mIsUndoCmdActive(false),
     mAutoNetSignal(true),
     mLastVertexPos(),
@@ -158,13 +158,14 @@ std::optional<Uuid> BoardEditorState_DrawPlane::getNet() const noexcept {
 
 void BoardEditorState_DrawPlane::setNet(
     const std::optional<Uuid>& net) noexcept {
-  if (net != getNet()) {
-    mCurrentNetSignal = net
-        ? mContext.project.getCircuit().getNetSignals().value(*net)
-        : nullptr;
-    mAutoNetSignal = false;
-    emit netChanged(getNet());
+  if (net == getNet()) {
+    return;
   }
+
+  mCurrentNetSignal =
+      net ? mContext.project.getCircuit().getNetSignals().value(*net) : nullptr;
+  mAutoNetSignal = false;
+  emit netChanged(getNet());
 
   if (mCurrentPlaneEditCmd) {
     mCurrentPlaneEditCmd->setNetSignal(mCurrentNetSignal);
@@ -178,10 +179,12 @@ QSet<const Layer*> BoardEditorState_DrawPlane::getAvailableLayers() noexcept {
 }
 
 void BoardEditorState_DrawPlane::setLayer(const Layer& layer) noexcept {
-  if (&layer != mCurrentLayer) {
-    mCurrentLayer = &layer;
-    emit layerChanged(*mCurrentLayer);
+  if (&layer == mCurrentLayer) {
+    return;
   }
+
+  mCurrentLayer = &layer;
+  emit layerChanged(*mCurrentLayer);
 
   if (mCurrentPlaneEditCmd) {
     mCurrentPlaneEditCmd->setLayer(*mCurrentLayer, true);

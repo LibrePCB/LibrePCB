@@ -49,13 +49,14 @@ namespace editor {
 
 BoardEditorState_DrawZone::BoardEditorState_DrawZone(
     const Context& context) noexcept
-  : BoardEditorState(context),
+  : BoardEditorState(context, "draw_zone"),
     mIsUndoCmdActive(false),
     mLastVertexPos(),
     mLastAngle(0),
     mCurrentProperties(Uuid::createRandom(),  // UUID is not relevant here
                        {&Layer::topCopper()},  // Layers
-                       Zone::Rule::All,  // Rules
+                       mSettings.get("rules", Zone::Rules())
+                           .value_or(Zone::Rule::All),  // Rules
                        Path(),  // Path will be set later
                        false  // Locked
                        ),
@@ -133,9 +134,11 @@ QSet<const Layer*> BoardEditorState_DrawZone::getAvailableLayers() noexcept {
 
 void BoardEditorState_DrawZone::setLayers(
     const QSet<const Layer*>& layers) noexcept {
-  if (mCurrentProperties.setLayers(layers)) {
-    emit layersChanged(mCurrentProperties.getLayers());
+  if (!mCurrentProperties.setLayers(layers)) {
+    return;
   }
+
+  emit layersChanged(mCurrentProperties.getLayers());
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setLayers(mCurrentProperties.getLayers(), true);
@@ -145,10 +148,12 @@ void BoardEditorState_DrawZone::setLayers(
 void BoardEditorState_DrawZone::setRule(Zone::Rule rule, bool enable) noexcept {
   Zone::Rules rules = mCurrentProperties.getRules();
   rules.setFlag(rule, enable);
-
-  if (mCurrentProperties.setRules(rules)) {
-    emit rulesChanged(mCurrentProperties.getRules());
+  if (!mCurrentProperties.setRules(rules)) {
+    return;
   }
+
+  mSettings.set("rules", mCurrentProperties.getRules());
+  emit rulesChanged(mCurrentProperties.getRules());
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setRules(mCurrentProperties.getRules(), true);
@@ -156,10 +161,12 @@ void BoardEditorState_DrawZone::setRule(Zone::Rule rule, bool enable) noexcept {
 }
 
 void BoardEditorState_DrawZone::setAngle(const Angle& angle) noexcept {
-  if (angle != mLastAngle) {
-    mLastAngle = angle;
-    emit angleChanged(mLastAngle);
+  if (angle == mLastAngle) {
+    return;
   }
+
+  mLastAngle = angle;
+  emit angleChanged(mLastAngle);
 
   if (mCurrentZone && mCurrentEditCmd) {
     Path path = mCurrentZone->getData().getOutline();

@@ -194,6 +194,7 @@ public:
     out.set_trace_remove_whole(l2s(cmd.traceRemoveWhole, out.get_trace_remove_whole()));
     out.set_locked(l2s(cmd.locked, out.get_locked()));
     out.set_visible(l2s(cmd.visible, out.get_visible()));
+    out.set_reset_to_default(l2s(cmd.resetToDefault, out.get_reset_to_default()));
     out.set_copy_mpn_to_clipboard(l2s(cmd.copyMpnToClipboard, out.get_copy_mpn_to_clipboard()));
     out.set_place_remaining_gates(l2s(cmd.placeRemainingGates, out.get_place_remaining_gates()));
     out.set_open_product_website(l2s(cmd.openProductWebsite, out.get_open_product_website()));

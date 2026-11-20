@@ -68,6 +68,11 @@ export component LengthEdit inherits Rectangle {
     accessible-description: tooltip;
     accessible-enabled: enabled;
     accessible-value: edt.text + " " + Helpers.get-unit-accessibility-label(root.unit);
+    accessible-action-default => {
+        if has-dropdown {
+            dropdown-triggered();
+        }
+    }
     accessible-action-increment => {
         disable-update = false;
         increase-triggered();
@@ -79,6 +84,7 @@ export component LengthEdit inherits Rectangle {
     accessible-action-set-value(s) => {
         edt.text = s;
         edt.edited();
+        edt.accepted();
     }
 
     changed value => {
@@ -198,6 +204,10 @@ export component LengthEdit inherits Rectangle {
                         text-color-hovered: Data.theme.control-text;
                         text: "AUTO";
                         enabled: enabled;
+
+                        // Accessibility
+                        accessible-checkable: true;
+                        accessible-checked: auto-checked;
 
                         clicked => {
                             root.auto-toggled(!auto-checked);

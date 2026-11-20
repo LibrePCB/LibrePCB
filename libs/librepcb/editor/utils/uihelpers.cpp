@@ -117,32 +117,41 @@ ui::Theme l2s(const UiTheme& v) noexcept {
   };
 }
 
+static_assert(static_cast<int>(GridStyle::Lines) ==
+              static_cast<int>(ui::GridStyle::Lines));
+static_assert(static_cast<int>(GridStyle::Dots) ==
+              static_cast<int>(ui::GridStyle::Dots));
+static_assert(static_cast<int>(GridStyle::None) ==
+              static_cast<int>(ui::GridStyle::None));
+
 ui::GridStyle l2s(GridStyle v) noexcept {
-  switch (v) {
-    case GridStyle::Lines:
-      return ui::GridStyle::Lines;
-    case GridStyle::Dots:
-      return ui::GridStyle::Dots;
-    case GridStyle::None:
-      return ui::GridStyle::None;
-    default:
-      qCritical() << "Unhandled value in GridStyle conversion.";
-      return ui::GridStyle::None;
-  }
+  return static_cast<ui::GridStyle>(v);
 }
 
 GridStyle s2l(ui::GridStyle v) noexcept {
-  switch (v) {
-    case ui::GridStyle::Lines:
-      return GridStyle::Lines;
-    case ui::GridStyle::Dots:
-      return GridStyle::Dots;
-    case ui::GridStyle::None:
-      return GridStyle::None;
-    default:
-      qCritical() << "Unhandled value in GridStyle conversion.";
-      return GridStyle::None;
-  }
+  return static_cast<GridStyle>(v);
+}
+
+static_assert(static_cast<int>(WireMode::_COUNT) == 5);
+static_assert(static_cast<int>(WireMode::HV) ==
+              static_cast<int>(ui::WireMode::HV));
+static_assert(static_cast<int>(WireMode::VH) ==
+              static_cast<int>(ui::WireMode::VH));
+static_assert(static_cast<int>(WireMode::Deg9045) ==
+              static_cast<int>(ui::WireMode::Deg9045));
+static_assert(static_cast<int>(WireMode::Deg4590) ==
+              static_cast<int>(ui::WireMode::Deg4590));
+static_assert(static_cast<int>(WireMode::Straight) ==
+              static_cast<int>(ui::WireMode::Straight));
+
+ui::WireMode l2s(WireMode v) noexcept {
+  Q_ASSERT(static_cast<int>(v) < static_cast<int>(WireMode::_COUNT));
+  return static_cast<ui::WireMode>(v);
+}
+
+WireMode s2l(ui::WireMode v) noexcept {
+  Q_ASSERT(static_cast<int>(v) < static_cast<int>(WireMode::_COUNT));
+  return static_cast<WireMode>(v);
 }
 
 ui::LengthUnit l2s(const LengthUnit& v) noexcept {

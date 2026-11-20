@@ -23,6 +23,7 @@
 #include "enums.h"
 
 #include "../exceptions.h"
+#include "../serialization/serialization.h"
 #include "../serialization/sexpression.h"
 
 #include <QString>
@@ -95,6 +96,43 @@ GridStyle deserialize(const SExpression& sexpr) {
   } else {
     throw RuntimeError(__FILE__, __LINE__,
                        QString("Unknown grid style: '%1'").arg(str));
+  }
+}
+
+template <>
+QString serializeToString(const WireMode& obj) noexcept {
+  switch (obj) {
+    case WireMode::HV:
+      return QStringLiteral("h_v");
+    case WireMode::VH:
+      return QStringLiteral("v_h");
+    case WireMode::Deg9045:
+      return QStringLiteral("90_45");
+    case WireMode::Deg4590:
+      return QStringLiteral("45_90");
+    case WireMode::Straight:
+      return QStringLiteral("straight");
+    default:
+      qCritical() << "Unknown wire mode:" << static_cast<int>(obj);
+      Q_ASSERT(false);
+      return QString();
+  }
+}
+
+template <>
+std::optional<WireMode> deserialize(QStringView str) noexcept {
+  if (str == QStringLiteral("h_v")) {
+    return WireMode::HV;
+  } else if (str == QStringLiteral("v_h")) {
+    return WireMode::VH;
+  } else if (str == QStringLiteral("90_45")) {
+    return WireMode::Deg9045;
+  } else if (str == QStringLiteral("45_90")) {
+    return WireMode::Deg4590;
+  } else if (str == QStringLiteral("straight")) {
+    return WireMode::Straight;
+  } else {
+    return std::nullopt;
   }
 }
 

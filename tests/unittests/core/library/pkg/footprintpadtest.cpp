@@ -23,6 +23,7 @@
 #include <gtest/gtest.h>
 #include <librepcb/core/application.h>
 #include <librepcb/core/library/pkg/footprintpad.h>
+#include <librepcb/core/serialization/serialization.h>
 #include <librepcb/core/serialization/sexpression.h>
 #include <librepcb/core/types/version.h>
 
@@ -44,6 +45,65 @@ class FootprintPadTest : public ::testing::Test {};
  *  Test Methods
  ******************************************************************************/
 
+TEST_F(FootprintPadTest, testShapesSerialization) {
+  const std::vector<std::pair<Pad::Shape, QString>> items = {
+      {Pad::Shape::RoundedRect, "roundrect"},
+      {Pad::Shape::RoundedOctagon, "octagon"},
+      {Pad::Shape::Custom, "custom"},
+  };
+
+  // Make sure we covered all values.
+  const QMetaEnum metaEnum = QMetaEnum::fromType<Pad::Shape>();
+  EXPECT_EQ(metaEnum.keyCount(), items.size());
+
+  for (const auto& item : items) {
+    // Serialize to SExpression
+    auto sexpr = serialize(item.first);
+    ASSERT_TRUE(sexpr != nullptr);
+    EXPECT_EQ(item.second.toStdString(), sexpr->getValue().toStdString());
+
+    // Deserialize from SExpression
+    sexpr = SExpression::createToken(item.second);
+    EXPECT_EQ(item.first, deserialize<Pad::Shape>(*sexpr));
+
+    // Serialize to QString
+    const QString str = serializeToString(item.first);
+    EXPECT_EQ(item.second.toStdString(), str.toStdString());
+
+    // Deserialize from QString
+    EXPECT_EQ(item.first, deserialize<Pad::Shape>(str));
+  }
+}
+
+TEST_F(FootprintPadTest, testComponentSideSerialization) {
+  const std::vector<std::pair<Pad::ComponentSide, QString>> items = {
+      {Pad::ComponentSide::Top, "top"},
+      {Pad::ComponentSide::Bottom, "bottom"},
+  };
+
+  // Make sure we covered all values.
+  const QMetaEnum metaEnum = QMetaEnum::fromType<Pad::ComponentSide>();
+  EXPECT_EQ(metaEnum.keyCount(), items.size());
+
+  for (const auto& item : items) {
+    // Serialize to SExpression
+    auto sexpr = serialize(item.first);
+    ASSERT_TRUE(sexpr != nullptr);
+    EXPECT_EQ(item.second.toStdString(), sexpr->getValue().toStdString());
+
+    // Deserialize from SExpression
+    sexpr = SExpression::createToken(item.second);
+    EXPECT_EQ(item.first, deserialize<Pad::ComponentSide>(*sexpr));
+
+    // Serialize to QString
+    const QString str = serializeToString(item.first);
+    EXPECT_EQ(item.second.toStdString(), str.toStdString());
+
+    // Deserialize from QString
+    EXPECT_EQ(item.first, deserialize<Pad::ComponentSide>(str));
+  }
+}
+
 TEST_F(FootprintPadTest, testFunctionsSerialization) {
   const std::vector<std::pair<Pad::Function, QString>> items = {
       {Pad::Function::Unspecified, "unspecified"},
@@ -56,15 +116,27 @@ TEST_F(FootprintPadTest, testFunctionsSerialization) {
       {Pad::Function::LocalFiducial, "local_fiducial"},
       {Pad::Function::GlobalFiducial, "global_fiducial"},
   };
+
+  // Make sure we covered all values.
+  const QMetaEnum metaEnum = QMetaEnum::fromType<Pad::Function>();
+  EXPECT_EQ(metaEnum.keyCount(), items.size());
+
   for (const auto& item : items) {
-    // Serialize
+    // Serialize to SExpression
     auto sexpr = serialize(item.first);
     ASSERT_TRUE(sexpr != nullptr);
     EXPECT_EQ(item.second.toStdString(), sexpr->getValue().toStdString());
 
-    // Deserialize
+    // Deserialize from SExpression
     sexpr = SExpression::createToken(item.second);
     EXPECT_EQ(item.first, deserialize<Pad::Function>(*sexpr));
+
+    // Serialize to QString
+    const QString str = serializeToString(item.first);
+    EXPECT_EQ(item.second.toStdString(), str.toStdString());
+
+    // Deserialize from QString
+    EXPECT_EQ(item.first, deserialize<Pad::Function>(str));
   }
 
   // In LibrePCB 1.x, "press_fit" shall also be deserializable.

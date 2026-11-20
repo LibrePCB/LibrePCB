@@ -69,6 +69,7 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <functional>
 #include <memory>
 
 /*******************************************************************************
@@ -141,6 +142,12 @@ SymbolTab::SymbolTab(LibraryEditor& editor, std::unique_ptr<Symbol> sym,
     scheduleChecks();
     refreshUiData();
   });
+
+  // Connect tool values.
+  connect(&mToolLineWidth, &LengthEditContext::uiDataChanged, this,
+          [this]() { onDerivedUiDataChanged.notify(); });
+  connect(&mToolSize, &LengthEditContext::uiDataChanged, this,
+          [this]() { onDerivedUiDataChanged.notify(); });
 
   // Connect models.
   connect(mCategories.get(), &LibraryElementCategoriesModel::modified, this,
@@ -386,24 +393,78 @@ void SymbolTab::setDerivedUiData(const ui::SymbolTabData& data) noexcept {
     mElementDuplicated = false;
   }
 
-  // Tool
-  if (const Layer* layer = mToolLayersQt.value(data.tool_layer.current_index)) {
-    emit layerRequested(*layer);
+  // Tool properties
+  // Attention: Applying some tool properties can have side effects on other
+  // tool properties (e.g. enable label auto-ratation will update rotation and
+  // mirrored properties). To avoid those side effects to be overridden here,
+  // we have to collect all changed properties first, before any of them are
+  // actually applied.
+  QVector<std::function<void()>> actions;
+
+  // Tool layer
+  if (const Layer* v = mToolLayersQt.value(data.tool_layer.current_index)) {
+    if (v != mToolLayer) {
+      actions.append([this, v]() { emit layerRequested(*v); });
+    }
   }
-  if (data.tool_angle.increase) {
-    emit angleRequested(mToolAngle + Angle::deg45());
-  } else if (data.tool_angle.decrease) {
-    emit angleRequested(mToolAngle - Angle::deg45());
-  } else {
-    emit angleRequested(s2angle(data.tool_angle.value));
+
+  // Tool angle
+  {
+    Angle v;
+    if (data.tool_angle.increase) {
+      v = mToolAngle + Angle::deg45();
+    } else if (data.tool_angle.decrease) {
+      v = mToolAngle - Angle::deg45();
+    } else {
+      v = s2angle(data.tool_angle.value);
+    }
+    if (v != mToolAngle) {
+      actions.append([this, v]() { emit angleRequested(v); });
+    }
   }
-  emit filledRequested(data.tool_filled);
-  emit grabAreaRequested(data.tool_grab_area);
-  mToolLineWidth.setUiData(data.tool_line_width);
-  mToolSize.setUiData(data.tool_size);
-  emit valueRequested(EditorToolbox::toMultiLine(s2q(data.tool_value.text)));
-  emit hAlignRequested(s2l(data.tool_halign));
-  emit vAlignRequested(s2l(data.tool_valign));
+
+  // Tool filled
+  if (data.tool_filled != mToolFilled) {
+    actions.append([this, v = data.tool_filled]() { emit filledRequested(v); });
+  }
+
+  // Tool grab area
+  if (data.tool_grab_area != mToolGrabArea) {
+    actions.append(
+        [this, v = data.tool_grab_area]() { emit grabAreaRequested(v); });
+  }
+
+  // Tool line width
+  if (data.tool_line_width != mToolLineWidth.getUiData()) {
+    actions.append(
+        [this, &data]() { mToolLineWidth.setUiData(data.tool_line_width); });
+  }
+
+  // Tool size
+  if (data.tool_size != mToolSize.getUiData()) {
+    actions.append([this, &data]() { mToolSize.setUiData(data.tool_size); });
+  }
+
+  // Tool value
+  if (data.tool_value.enabled) {
+    const QString v = EditorToolbox::toMultiLine(s2q(data.tool_value.text));
+    if (v != mToolValue) {
+      actions.append([this, v]() { emit valueRequested(v); });
+    }
+  }
+
+  // Tool alignment
+  {
+    const Alignment v(s2l(data.tool_halign), s2l(data.tool_valign));
+    if (v != mToolAlign) {
+      actions.append([this, v]() { emit alignmentRequested(v); });
+    }
+  }
+
+  // Apply changed tool properties.
+  for (const auto& action : actions) {
+    action();
+  }
 
   requestRepaint();
 }
@@ -674,6 +735,14 @@ void SymbolTab::trigger(ui::TabAction a) noexcept {
       mFsm->processStartMeasure();
       break;
     }
+    case ui::TabAction::ToolbarLineWidthReset: {
+      emit lineWidthResetRequested();
+      break;
+    }
+    case ui::TabAction::ToolbarSizeReset: {
+      emit sizeResetRequested();
+      break;
+    }
     default: {
       WindowTab::trigger(a);
       break;
@@ -925,6 +994,9 @@ void SymbolTab::fsmToolEnter(SymbolEditorState_DrawLine& state) noexcept {
   mFsmStateConnections.append(
       connect(&mToolLineWidth, &LengthEditContext::valueChangedUnsigned, &state,
               &SymbolEditorState_DrawLine::setLineWidth));
+  mFsmStateConnections.append(
+      connect(this, &SymbolTab::lineWidthResetRequested, &state,
+              &SymbolEditorState_DrawLine::resetLineWidth));
 
   // Angle
   auto setAngle = [this](const Angle& angle) {
@@ -971,6 +1043,9 @@ void SymbolTab::fsmToolEnter(SymbolEditorState_DrawRect& state) noexcept {
   mFsmStateConnections.append(
       connect(&mToolLineWidth, &LengthEditContext::valueChangedUnsigned, &state,
               &SymbolEditorState_DrawRect::setLineWidth));
+  mFsmStateConnections.append(
+      connect(this, &SymbolTab::lineWidthResetRequested, &state,
+              &SymbolEditorState_DrawRect::resetLineWidth));
 
   // Filled
   auto setFilled = [this](bool filled) {
@@ -1030,6 +1105,9 @@ void SymbolTab::fsmToolEnter(SymbolEditorState_DrawPolygon& state) noexcept {
   mFsmStateConnections.append(
       connect(&mToolLineWidth, &LengthEditContext::valueChangedUnsigned, &state,
               &SymbolEditorState_DrawPolygon::setLineWidth));
+  mFsmStateConnections.append(
+      connect(this, &SymbolTab::lineWidthResetRequested, &state,
+              &SymbolEditorState_DrawPolygon::resetLineWidth));
 
   // Angle
   auto setAngle = [this](const Angle& angle) {
@@ -1102,6 +1180,9 @@ void SymbolTab::fsmToolEnter(SymbolEditorState_DrawCircle& state) noexcept {
   mFsmStateConnections.append(
       connect(&mToolLineWidth, &LengthEditContext::valueChangedUnsigned, &state,
               &SymbolEditorState_DrawCircle::setLineWidth));
+  mFsmStateConnections.append(
+      connect(this, &SymbolTab::lineWidthResetRequested, &state,
+              &SymbolEditorState_DrawCircle::resetLineWidth));
 
   // Filled
   auto setFilled = [this](bool filled) {
@@ -1162,6 +1243,9 @@ void SymbolTab::fsmToolEnter(SymbolEditorState_DrawArc& state) noexcept {
   mFsmStateConnections.append(
       connect(&mToolLineWidth, &LengthEditContext::valueChangedUnsigned, &state,
               &SymbolEditorState_DrawArc::setLineWidth));
+  mFsmStateConnections.append(
+      connect(this, &SymbolTab::lineWidthResetRequested, &state,
+              &SymbolEditorState_DrawArc::resetLineWidth));
 
   onDerivedUiDataChanged.notify();
 }
@@ -1171,35 +1255,28 @@ void SymbolTab::fsmToolEnter(SymbolEditorState_AddNames& state) noexcept {
 
   // Height
   mToolSize.configure(state.getHeight(), LengthEditContext::Steps::textHeight(),
-                      "symbol_editor/draw_text/height");
+                      "symbol_editor/add_text/height");
   mFsmStateConnections.append(
       connect(&state, &SymbolEditorState_DrawText::heightChanged, &mToolSize,
               &LengthEditContext::setValuePositive));
   mFsmStateConnections.append(
       connect(&mToolSize, &LengthEditContext::valueChangedPositive, &state,
               &SymbolEditorState_DrawText::setHeight));
+  mFsmStateConnections.append(
+      connect(this, &SymbolTab::sizeResetRequested, &state,
+              &SymbolEditorState_DrawText::resetHeight));
 
-  // Horizontal alignment
-  auto setHAlign = [this](const HAlign& align) {
-    mToolAlign.setH(align);
+  // Alignment
+  auto setAlign = [this](const Alignment& align) {
+    mToolAlign = align;
     onDerivedUiDataChanged.notify();
   };
-  setHAlign(state.getHAlign());
+  setAlign(state.getAlign());
   mFsmStateConnections.append(connect(
-      &state, &SymbolEditorState_DrawText::hAlignChanged, this, setHAlign));
-  mFsmStateConnections.append(connect(this, &SymbolTab::hAlignRequested, &state,
-                                      &SymbolEditorState_DrawText::setHAlign));
-
-  // Vertical alignment
-  auto setVAlign = [this](const VAlign& align) {
-    mToolAlign.setV(align);
-    onDerivedUiDataChanged.notify();
-  };
-  setVAlign(state.getVAlign());
-  mFsmStateConnections.append(connect(
-      &state, &SymbolEditorState_DrawText::vAlignChanged, this, setVAlign));
-  mFsmStateConnections.append(connect(this, &SymbolTab::vAlignRequested, &state,
-                                      &SymbolEditorState_DrawText::setVAlign));
+      &state, &SymbolEditorState_DrawText::alignmentChanged, this, setAlign));
+  mFsmStateConnections.append(connect(this, &SymbolTab::alignmentRequested,
+                                      &state,
+                                      &SymbolEditorState_DrawText::setAlign));
 
   onDerivedUiDataChanged.notify();
 }
@@ -1209,35 +1286,28 @@ void SymbolTab::fsmToolEnter(SymbolEditorState_AddValues& state) noexcept {
 
   // Height
   mToolSize.configure(state.getHeight(), LengthEditContext::Steps::textHeight(),
-                      "symbol_editor/draw_text/height");
+                      "symbol_editor/add_text/height");
   mFsmStateConnections.append(
       connect(&state, &SymbolEditorState_DrawText::heightChanged, &mToolSize,
               &LengthEditContext::setValuePositive));
   mFsmStateConnections.append(
       connect(&mToolSize, &LengthEditContext::valueChangedPositive, &state,
               &SymbolEditorState_DrawText::setHeight));
+  mFsmStateConnections.append(
+      connect(this, &SymbolTab::sizeResetRequested, &state,
+              &SymbolEditorState_DrawText::resetHeight));
 
-  // Horizontal alignment
-  auto setHAlign = [this](const HAlign& align) {
-    mToolAlign.setH(align);
+  // Alignment
+  auto setAlign = [this](const Alignment& align) {
+    mToolAlign = align;
     onDerivedUiDataChanged.notify();
   };
-  setHAlign(state.getHAlign());
+  setAlign(state.getAlign());
   mFsmStateConnections.append(connect(
-      &state, &SymbolEditorState_DrawText::hAlignChanged, this, setHAlign));
-  mFsmStateConnections.append(connect(this, &SymbolTab::hAlignRequested, &state,
-                                      &SymbolEditorState_DrawText::setHAlign));
-
-  // Vertical alignment
-  auto setVAlign = [this](const VAlign& align) {
-    mToolAlign.setV(align);
-    onDerivedUiDataChanged.notify();
-  };
-  setVAlign(state.getVAlign());
-  mFsmStateConnections.append(connect(
-      &state, &SymbolEditorState_DrawText::vAlignChanged, this, setVAlign));
-  mFsmStateConnections.append(connect(this, &SymbolTab::vAlignRequested, &state,
-                                      &SymbolEditorState_DrawText::setVAlign));
+      &state, &SymbolEditorState_DrawText::alignmentChanged, this, setAlign));
+  mFsmStateConnections.append(connect(this, &SymbolTab::alignmentRequested,
+                                      &state,
+                                      &SymbolEditorState_DrawText::setAlign));
 
   onDerivedUiDataChanged.notify();
 }
@@ -1265,13 +1335,16 @@ void SymbolTab::fsmToolEnter(SymbolEditorState_DrawText& state) noexcept {
 
   // Height
   mToolSize.configure(state.getHeight(), LengthEditContext::Steps::textHeight(),
-                      "symbol_editor/draw_text/height");
+                      "symbol_editor/add_text/height");
   mFsmStateConnections.append(
       connect(&state, &SymbolEditorState_DrawText::heightChanged, &mToolSize,
               &LengthEditContext::setValuePositive));
   mFsmStateConnections.append(
       connect(&mToolSize, &LengthEditContext::valueChangedPositive, &state,
               &SymbolEditorState_DrawText::setHeight));
+  mFsmStateConnections.append(
+      connect(this, &SymbolTab::sizeResetRequested, &state,
+              &SymbolEditorState_DrawText::resetHeight));
 
   // Text
   auto setText = [this](const QString& text) {
@@ -1290,27 +1363,17 @@ void SymbolTab::fsmToolEnter(SymbolEditorState_DrawText& state) noexcept {
     mToolValueSuggestions->push_back(q2s(v));
   }
 
-  // Horizontal alignment
-  auto setHAlign = [this](const HAlign& align) {
-    mToolAlign.setH(align);
+  // Alignment
+  auto setAlign = [this](const Alignment& align) {
+    mToolAlign = align;
     onDerivedUiDataChanged.notify();
   };
-  setHAlign(state.getHAlign());
+  setAlign(state.getAlign());
   mFsmStateConnections.append(connect(
-      &state, &SymbolEditorState_DrawText::hAlignChanged, this, setHAlign));
-  mFsmStateConnections.append(connect(this, &SymbolTab::hAlignRequested, &state,
-                                      &SymbolEditorState_DrawText::setHAlign));
-
-  // Vertical alignment
-  auto setVAlign = [this](const VAlign& align) {
-    mToolAlign.setV(align);
-    onDerivedUiDataChanged.notify();
-  };
-  setVAlign(state.getVAlign());
-  mFsmStateConnections.append(connect(
-      &state, &SymbolEditorState_DrawText::vAlignChanged, this, setVAlign));
-  mFsmStateConnections.append(connect(this, &SymbolTab::vAlignRequested, &state,
-                                      &SymbolEditorState_DrawText::setVAlign));
+      &state, &SymbolEditorState_DrawText::alignmentChanged, this, setAlign));
+  mFsmStateConnections.append(connect(this, &SymbolTab::alignmentRequested,
+                                      &state,
+                                      &SymbolEditorState_DrawText::setAlign));
 
   onDerivedUiDataChanged.notify();
 }
@@ -1349,6 +1412,9 @@ void SymbolTab::fsmToolEnter(SymbolEditorState_AddPins& state) noexcept {
   mFsmStateConnections.append(
       connect(&mToolSize, &LengthEditContext::valueChangedUnsigned, &state,
               &SymbolEditorState_AddPins::setLength));
+  mFsmStateConnections.append(connect(this, &SymbolTab::sizeResetRequested,
+                                      &state,
+                                      &SymbolEditorState_AddPins::resetLength));
 
   onDerivedUiDataChanged.notify();
 }

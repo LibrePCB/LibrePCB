@@ -157,17 +157,30 @@ class Element:
     def readonly(self):
         return self._element.accessible_read_only
 
+    @property
+    def item_index(self):
+        return self._element.accessible_item_index
+
     def trigger(self):
         self._element.invoke_accessible_default_action()
 
     def expand(self):
         self._element.invoke_accessible_expand_action()
 
+    def increment(self):
+        self._element.invoke_accessible_increment_action()
+
+    def decrement(self):
+        self._element.invoke_accessible_decrement_action()
+
     def click(self):
         self._element.single_click(slint_testing.PointerEventButton.Left)
 
     def mclick(self):
-        self._element.double_click(slint_testing.PointerEventButton.Middle)
+        self._element.single_click(slint_testing.PointerEventButton.Middle)
+
+    def rclick(self):
+        self._element.single_click(slint_testing.PointerEventButton.Right)
 
     def dclick(self):
         self._element.double_click(slint_testing.PointerEventButton.Left)
@@ -356,6 +369,8 @@ class ElementQuery:
                     props[key] = [r.enabled for r in filtered_results]
                 case "readonly":
                     props[key] = [r.readonly for r in filtered_results]
+                case "item_index":
+                    props[key] = [r.item_index for r in filtered_results]
                 case _:
                     raise ValueError(f"Unknown property: '{key}'")
         return props
@@ -386,7 +401,7 @@ class ElementQuery:
             try:
                 actual_props = self.read(properties.keys(), indices)
                 if all(_compare(v, properties[k]) for k, v in actual_props.items()):
-                    return
+                    return self  # Allow method chaining
             except slint_testing.RequestError as e:
                 # Element got invalidated between refresh() and reading the
                 # properties -> just try again, but memorize the exception.
@@ -429,29 +444,43 @@ class ElementQuery:
     def enabled(self):
         return self._flatten([x.enabled for x in self._results])
 
+    @property
+    def readonly(self):
+        return self._flatten([x.readonly for x in self._results])
+
+    @property
+    def item_index(self):
+        return self._flatten([x.item_index for x in self._results])
+
     def trigger(self):
-        for x in self._results:
-            x.trigger()
+        self._call_on_elements(Element.trigger)
+
+    def expand(self):
+        self._call_on_elements(Element.expand)
+
+    def increment(self):
+        self._call_on_elements(Element.increment)
+
+    def decrement(self):
+        self._call_on_elements(Element.decrement)
 
     def click(self):
-        for x in self._results:
-            x.click()
+        self._call_on_elements(Element.click)
 
     def mclick(self):
-        for x in self._results:
-            x.mclick()
+        self._call_on_elements(Element.mclick)
+
+    def rclick(self):
+        self._call_on_elements(Element.rclick)
 
     def dclick(self):
-        for x in self._results:
-            x.dclick()
+        self._call_on_elements(Element.dclick)
 
     def set_value(self, value):
-        for x in self._results:
-            x.set_value(value)
+        self._call_on_elements(Element.set_value, value)
 
     def set_checked(self, checked):
-        for x in self._results:
-            x.set_checked(checked)
+        self._call_on_elements(Element.set_checked, checked)
 
     def save_screenshot(self, fname="screenshot.png"):
         path = os.path.join(ROOT_DIR, fname)
@@ -463,6 +492,18 @@ class ElementQuery:
             return result
         else:
             return result[0]
+
+    def _call_on_elements(self, func, *args):
+        count = len(self._results)
+        for i in range(count):
+            func(self._results[i], *args)
+            # If there are multiple elements matching the query, an action on
+            # one of them can/will invalidate the handles to the other elements.
+            # Therefore we have to refresh the results. But if only one element
+            # was queried, we cannot do that, since an action may intentionally
+            # delete that element.
+            if count > 1:
+                self.wait(count)
 
 
 class Application(slint_testing.Application):

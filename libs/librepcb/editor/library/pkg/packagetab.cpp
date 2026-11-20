@@ -86,6 +86,7 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <functional>
 #include <memory>
 
 /*******************************************************************************
@@ -186,6 +187,14 @@ PackageTab::PackageTab(LibraryEditor& editor, std::unique_ptr<Package> pkg,
     scheduleOpenGlSceneUpdate();
     refreshUiData();
   });
+
+  // Connect tool values.
+  connect(&mToolLineWidth, &LengthEditContext::uiDataChanged, this,
+          [this]() { onDerivedUiDataChanged.notify(); });
+  connect(&mToolSize, &LengthEditContext::uiDataChanged, this,
+          [this]() { onDerivedUiDataChanged.notify(); });
+  connect(&mToolDrill, &LengthEditContext::uiDataChanged, this,
+          [this]() { onDerivedUiDataChanged.notify(); });
 
   // Connect models.
   mPads->setReferences(&mPackage->getPads(), mUndoStack.get());
@@ -556,55 +565,152 @@ void PackageTab::setDerivedUiData(const ui::PackageTabData& data) noexcept {
     mElementDuplicated = false;
   }
 
-  // Tool
-  if (const Layer* layer = mToolLayersQt.value(data.tool_layer.current_index)) {
-    emit layerRequested(*layer);
-  }
-  if (data.tool_angle.increase) {
-    emit angleRequested(mToolAngle + Angle::deg45());
-  } else if (data.tool_angle.decrease) {
-    emit angleRequested(mToolAngle - Angle::deg45());
-  } else {
-    emit angleRequested(s2angle(data.tool_angle.value));
-  }
-  if (data.tool_ratio.increase) {
-    emit ratioRequested(UnsignedLimitedRatio(std::min(
-        *mToolRatio + Ratio::fromPercent(1), Ratio::fromPercent(100))));
-  } else if (data.tool_ratio.decrease) {
-    emit ratioRequested(UnsignedLimitedRatio(
-        std::max(*mToolRatio - Ratio::fromPercent(1), Ratio::fromPercent(0))));
-  } else {
-    const Ratio ratio = s2ratio(data.tool_ratio.value);
-    if ((ratio >= Ratio::fromPercent(0)) &&
-        (ratio <= Ratio::fromPercent(100))) {
-      emit ratioRequested(UnsignedLimitedRatio(ratio));
+  // Tool properties
+  // Attention: Applying some tool properties can have side effects on other
+  // tool properties (e.g. enable label auto-ratation will update rotation and
+  // mirrored properties). To avoid those side effects to be overridden here,
+  // we have to collect all changed properties first, before any of them are
+  // actually applied.
+  QVector<std::function<void()>> actions;
+
+  // Tool layer
+  if (const Layer* v = mToolLayersQt.value(data.tool_layer.current_index)) {
+    if (v != mToolLayer) {
+      actions.append([this, v]() { emit layerRequested(*v); });
     }
   }
-  emit filledRequested(data.tool_filled);
-  emit grabAreaRequested(data.tool_grab_area);
-  // Note: We set the drill before width/height to let the FSM decrease the
-  // drill if width or height are set to a smaller value. This clipping does
-  // not work in both directions yet because we don't know if the user edited
-  // the drill or width/height.
-  mToolDrill.setUiData(data.tool_drill);
-  mToolLineWidth.setUiData(data.tool_line_width);
-  mToolSize.setUiData(data.tool_size);
-  emit valueRequested(EditorToolbox::toMultiLine(s2q(data.tool_value.text)));
-  emit hAlignRequested(s2l(data.tool_halign));
-  emit vAlignRequested(s2l(data.tool_valign));
-  emit packagePadRequested(
-      mToolPackagePadsQt.value(data.tool_package_pad.current_index));
-  emit componentSideRequested(data.tool_bottom ? Pad::ComponentSide::Bottom
-                                               : Pad::ComponentSide::Top);
-  emit shapeRequested(data.tool_shape);
-  emit pressFitRequested(data.tool_pressfit);
-  emit zoneLayerRequested(Zone::Layer::Top, data.tool_layer_top);
-  emit zoneLayerRequested(Zone::Layer::Inner, data.tool_layer_inner);
-  emit zoneLayerRequested(Zone::Layer::Bottom, data.tool_layer_bottom);
-  emit zoneRuleRequested(Zone::Rule::NoCopper, data.tool_no_copper);
-  emit zoneRuleRequested(Zone::Rule::NoPlanes, data.tool_no_planes);
-  emit zoneRuleRequested(Zone::Rule::NoExposure, data.tool_no_exposures);
-  emit zoneRuleRequested(Zone::Rule::NoDevices, data.tool_no_devices);
+
+  // Tool angle
+  {
+    Angle v;
+    if (data.tool_angle.increase) {
+      v = mToolAngle + Angle::deg45();
+    } else if (data.tool_angle.decrease) {
+      v = mToolAngle - Angle::deg45();
+    } else {
+      v = s2angle(data.tool_angle.value);
+    }
+    if (v != mToolAngle) {
+      actions.append([this, v]() { emit angleRequested(v); });
+    }
+  }
+
+  // Tool ratio
+  {
+    Ratio v;
+    if (data.tool_ratio.increase) {
+      v = *mToolRatio + Ratio::fromPercent(1);
+    } else if (data.tool_ratio.decrease) {
+      v = *mToolRatio - Ratio::fromPercent(1);
+    } else {
+      v = s2ratio(data.tool_ratio.value);
+    }
+    if ((v != *mToolRatio) && (v >= Ratio::fromPercent(0)) &&
+        (v <= Ratio::fromPercent(100))) {
+      actions.append(
+          [this, v]() { emit ratioRequested(UnsignedLimitedRatio(v)); });
+    }
+  }
+
+  // Tool filled
+  if (data.tool_filled != mToolFilled) {
+    actions.append([this, v = data.tool_filled]() { emit filledRequested(v); });
+  }
+
+  // Tool grab area
+  if (data.tool_grab_area != mToolGrabArea) {
+    actions.append(
+        [this, v = data.tool_grab_area]() { emit grabAreaRequested(v); });
+  }
+
+  // Tool drill
+  if (data.tool_drill != mToolDrill.getUiData()) {
+    actions.append([this, &data]() { mToolDrill.setUiData(data.tool_drill); });
+  }
+
+  // Tool line width
+  if (data.tool_line_width != mToolLineWidth.getUiData()) {
+    actions.append(
+        [this, &data]() { mToolLineWidth.setUiData(data.tool_line_width); });
+  }
+
+  // Tool size
+  if (data.tool_size != mToolSize.getUiData()) {
+    actions.append([this, &data]() { mToolSize.setUiData(data.tool_size); });
+  }
+
+  // Tool value
+  if (data.tool_value.enabled) {
+    const QString v = EditorToolbox::toMultiLine(s2q(data.tool_value.text));
+    if (v != mToolValue) {
+      actions.append([this, v]() { emit valueRequested(v); });
+    }
+  }
+
+  // Tool alignment
+  {
+    const Alignment v(s2l(data.tool_halign), s2l(data.tool_valign));
+    if (v != mToolAlign) {
+      actions.append([this, v]() { emit alignmentRequested(v); });
+    }
+  }
+
+  // Tool package pad
+  {
+    const std::optional<Uuid> v =
+        mToolPackagePadsQt.value(data.tool_package_pad.current_index);
+    if (v != mToolPackagePad) {
+      actions.append([this, v]() { emit packagePadRequested(v); });
+    }
+  }
+
+  // Tool component side
+  {
+    const Pad::ComponentSide v =
+        data.tool_bottom ? Pad::ComponentSide::Bottom : Pad::ComponentSide::Top;
+    if (v != mToolComponentSide) {
+      actions.append([this, v]() { emit componentSideRequested(v); });
+    }
+  }
+
+  // Tool shape
+  if (data.tool_shape != mToolShape) {
+    actions.append([this, v = data.tool_shape]() { emit shapeRequested(v); });
+  }
+
+  // Tool press-fit
+  if (data.tool_pressfit != mToolPressFit) {
+    actions.append(
+        [this, v = data.tool_pressfit]() { emit pressFitRequested(v); });
+  }
+
+  // Tool layer
+  for (const auto& [l, v] : std::initializer_list<std::pair<Zone::Layer, bool>>{
+           {Zone::Layer::Top, data.tool_layer_top},
+           {Zone::Layer::Inner, data.tool_layer_inner},
+           {Zone::Layer::Bottom, data.tool_layer_bottom},
+       }) {
+    if (v != mToolZoneLayers.testFlag(l)) {
+      actions.append([this, l, v]() { emit zoneLayerRequested(l, v); });
+    }
+  }
+
+  // Tool zone rules
+  for (const auto& [r, v] : std::initializer_list<std::pair<Zone::Rule, bool>>{
+           {Zone::Rule::NoCopper, data.tool_no_copper},
+           {Zone::Rule::NoPlanes, data.tool_no_planes},
+           {Zone::Rule::NoExposure, data.tool_no_exposures},
+           {Zone::Rule::NoDevices, data.tool_no_devices},
+       }) {
+    if (v != mToolZoneRules.testFlag(r)) {
+      actions.append([this, r, v]() { emit zoneRuleRequested(r, v); });
+    }
+  }
+
+  // Apply changed tool properties.
+  for (const auto& action : actions) {
+    action();
+  }
 
   // Find usages
   if (!data.show_usages) {
@@ -1095,6 +1201,14 @@ void PackageTab::trigger(ui::TabAction a) noexcept {
       mFsm->processStartMeasure();
       break;
     }
+    case ui::TabAction::ToolbarLineWidthReset: {
+      emit lineWidthResetRequested();
+      break;
+    }
+    case ui::TabAction::ToolbarSizeReset: {
+      emit sizeResetRequested();
+      break;
+    }
     default: {
       WindowTab::trigger(a);
       break;
@@ -1352,6 +1466,9 @@ void PackageTab::fsmToolEnter(PackageEditorState_DrawLine& state) noexcept {
   mFsmStateConnections.append(
       connect(&mToolLineWidth, &LengthEditContext::valueChangedUnsigned, &state,
               &PackageEditorState_DrawLine::setLineWidth));
+  mFsmStateConnections.append(
+      connect(this, &PackageTab::lineWidthResetRequested, &state,
+              &PackageEditorState_DrawLine::resetLineWidth));
 
   // Angle
   auto setAngle = [this](const Angle& angle) {
@@ -1398,6 +1515,9 @@ void PackageTab::fsmToolEnter(PackageEditorState_DrawRect& state) noexcept {
   mFsmStateConnections.append(
       connect(&mToolLineWidth, &LengthEditContext::valueChangedUnsigned, &state,
               &PackageEditorState_DrawRect::setLineWidth));
+  mFsmStateConnections.append(
+      connect(this, &PackageTab::lineWidthResetRequested, &state,
+              &PackageEditorState_DrawRect::resetLineWidth));
 
   // Filled
   auto setFilled = [this](bool filled) {
@@ -1459,6 +1579,9 @@ void PackageTab::fsmToolEnter(PackageEditorState_DrawPolygon& state) noexcept {
   mFsmStateConnections.append(
       connect(&mToolLineWidth, &LengthEditContext::valueChangedUnsigned, &state,
               &PackageEditorState_DrawPolygon::setLineWidth));
+  mFsmStateConnections.append(
+      connect(this, &PackageTab::lineWidthResetRequested, &state,
+              &PackageEditorState_DrawPolygon::resetLineWidth));
 
   // Angle
   auto setAngle = [this](const Angle& angle) {
@@ -1532,6 +1655,9 @@ void PackageTab::fsmToolEnter(PackageEditorState_DrawCircle& state) noexcept {
   mFsmStateConnections.append(
       connect(&mToolLineWidth, &LengthEditContext::valueChangedUnsigned, &state,
               &PackageEditorState_DrawCircle::setLineWidth));
+  mFsmStateConnections.append(
+      connect(this, &PackageTab::lineWidthResetRequested, &state,
+              &PackageEditorState_DrawCircle::resetLineWidth));
 
   // Filled
   auto setFilled = [this](bool filled) {
@@ -1592,6 +1718,9 @@ void PackageTab::fsmToolEnter(PackageEditorState_DrawArc& state) noexcept {
   mFsmStateConnections.append(
       connect(&mToolLineWidth, &LengthEditContext::valueChangedUnsigned, &state,
               &PackageEditorState_DrawArc::setLineWidth));
+  mFsmStateConnections.append(
+      connect(this, &PackageTab::lineWidthResetRequested, &state,
+              &PackageEditorState_DrawArc::resetLineWidth));
 
   onDerivedUiDataChanged.notify();
 }
@@ -1601,48 +1730,42 @@ void PackageTab::fsmToolEnter(PackageEditorState_AddNames& state) noexcept {
 
   // Height
   mToolSize.configure(state.getHeight(), LengthEditContext::Steps::textHeight(),
-                      "package_editor/draw_text/height");
+                      "package_editor/add_text/height");
   mFsmStateConnections.append(
       connect(&state, &PackageEditorState_DrawText::heightChanged, &mToolSize,
               &LengthEditContext::setValuePositive));
   mFsmStateConnections.append(
       connect(&mToolSize, &LengthEditContext::valueChangedPositive, &state,
               &PackageEditorState_DrawText::setHeight));
+  mFsmStateConnections.append(
+      connect(this, &PackageTab::sizeResetRequested, &state,
+              &PackageEditorState_DrawText::resetHeight));
 
   // Stroke width
   mToolLineWidth.configure(state.getStrokeWidth(),
                            LengthEditContext::Steps::generic(),
-                           "package_editor/draw_text/stroke_width");
+                           "package_editor/add_text/stroke_width");
   mFsmStateConnections.append(
       connect(&state, &PackageEditorState_AddNames::strokeWidthChanged,
               &mToolLineWidth, &LengthEditContext::setValueUnsigned));
   mFsmStateConnections.append(
       connect(&mToolLineWidth, &LengthEditContext::valueChangedUnsigned, &state,
               &PackageEditorState_AddNames::setStrokeWidth));
+  mFsmStateConnections.append(
+      connect(this, &PackageTab::lineWidthResetRequested, &state,
+              &PackageEditorState_DrawText::resetStrokeWidth));
 
-  // Horizontal alignment
-  auto setHAlign = [this](const HAlign& align) {
-    mToolAlign.setH(align);
+  // Alignment
+  auto setAlign = [this](const Alignment& align) {
+    mToolAlign = align;
     onDerivedUiDataChanged.notify();
   };
-  setHAlign(state.getHAlign());
+  setAlign(state.getAlign());
   mFsmStateConnections.append(connect(
-      &state, &PackageEditorState_DrawText::hAlignChanged, this, setHAlign));
-  mFsmStateConnections.append(connect(this, &PackageTab::hAlignRequested,
+      &state, &PackageEditorState_DrawText::alignmentChanged, this, setAlign));
+  mFsmStateConnections.append(connect(this, &PackageTab::alignmentRequested,
                                       &state,
-                                      &PackageEditorState_DrawText::setHAlign));
-
-  // Vertical alignment
-  auto setVAlign = [this](const VAlign& align) {
-    mToolAlign.setV(align);
-    onDerivedUiDataChanged.notify();
-  };
-  setVAlign(state.getVAlign());
-  mFsmStateConnections.append(connect(
-      &state, &PackageEditorState_DrawText::vAlignChanged, this, setVAlign));
-  mFsmStateConnections.append(connect(this, &PackageTab::vAlignRequested,
-                                      &state,
-                                      &PackageEditorState_DrawText::setVAlign));
+                                      &PackageEditorState_DrawText::setAlign));
 
   onDerivedUiDataChanged.notify();
 }
@@ -1652,48 +1775,42 @@ void PackageTab::fsmToolEnter(PackageEditorState_AddValues& state) noexcept {
 
   // Height
   mToolSize.configure(state.getHeight(), LengthEditContext::Steps::textHeight(),
-                      "package_editor/draw_text/height");
+                      "package_editor/add_text/height");
   mFsmStateConnections.append(
       connect(&state, &PackageEditorState_DrawText::heightChanged, &mToolSize,
               &LengthEditContext::setValuePositive));
   mFsmStateConnections.append(
       connect(&mToolSize, &LengthEditContext::valueChangedPositive, &state,
               &PackageEditorState_DrawText::setHeight));
+  mFsmStateConnections.append(
+      connect(this, &PackageTab::sizeResetRequested, &state,
+              &PackageEditorState_DrawText::resetHeight));
 
   // Stroke width
   mToolLineWidth.configure(state.getStrokeWidth(),
                            LengthEditContext::Steps::generic(),
-                           "package_editor/draw_text/stroke_width");
+                           "package_editor/add_text/stroke_width");
   mFsmStateConnections.append(
       connect(&state, &PackageEditorState_AddValues::strokeWidthChanged,
               &mToolLineWidth, &LengthEditContext::setValueUnsigned));
   mFsmStateConnections.append(
       connect(&mToolLineWidth, &LengthEditContext::valueChangedUnsigned, &state,
               &PackageEditorState_AddValues::setStrokeWidth));
+  mFsmStateConnections.append(
+      connect(this, &PackageTab::lineWidthResetRequested, &state,
+              &PackageEditorState_DrawText::resetStrokeWidth));
 
-  // Horizontal alignment
-  auto setHAlign = [this](const HAlign& align) {
-    mToolAlign.setH(align);
+  // Alignment
+  auto setAlign = [this](const Alignment& align) {
+    mToolAlign = align;
     onDerivedUiDataChanged.notify();
   };
-  setHAlign(state.getHAlign());
+  setAlign(state.getAlign());
   mFsmStateConnections.append(connect(
-      &state, &PackageEditorState_DrawText::hAlignChanged, this, setHAlign));
-  mFsmStateConnections.append(connect(this, &PackageTab::hAlignRequested,
+      &state, &PackageEditorState_DrawText::alignmentChanged, this, setAlign));
+  mFsmStateConnections.append(connect(this, &PackageTab::alignmentRequested,
                                       &state,
-                                      &PackageEditorState_DrawText::setHAlign));
-
-  // Vertical alignment
-  auto setVAlign = [this](const VAlign& align) {
-    mToolAlign.setV(align);
-    onDerivedUiDataChanged.notify();
-  };
-  setVAlign(state.getVAlign());
-  mFsmStateConnections.append(connect(
-      &state, &PackageEditorState_DrawText::vAlignChanged, this, setVAlign));
-  mFsmStateConnections.append(connect(this, &PackageTab::vAlignRequested,
-                                      &state,
-                                      &PackageEditorState_DrawText::setVAlign));
+                                      &PackageEditorState_DrawText::setAlign));
 
   onDerivedUiDataChanged.notify();
 }
@@ -1721,24 +1838,30 @@ void PackageTab::fsmToolEnter(PackageEditorState_DrawText& state) noexcept {
 
   // Height
   mToolSize.configure(state.getHeight(), LengthEditContext::Steps::textHeight(),
-                      "package_editor/draw_text/height");
+                      "package_editor/add_text/height");
   mFsmStateConnections.append(
       connect(&state, &PackageEditorState_DrawText::heightChanged, &mToolSize,
               &LengthEditContext::setValuePositive));
   mFsmStateConnections.append(
       connect(&mToolSize, &LengthEditContext::valueChangedPositive, &state,
               &PackageEditorState_DrawText::setHeight));
+  mFsmStateConnections.append(
+      connect(this, &PackageTab::sizeResetRequested, &state,
+              &PackageEditorState_DrawText::resetHeight));
 
   // Stroke width
   mToolLineWidth.configure(state.getStrokeWidth(),
                            LengthEditContext::Steps::generic(),
-                           "package_editor/draw_text/stroke_width");
+                           "package_editor/add_text/stroke_width");
   mFsmStateConnections.append(
       connect(&state, &PackageEditorState_DrawText::strokeWidthChanged,
               &mToolLineWidth, &LengthEditContext::setValueUnsigned));
   mFsmStateConnections.append(
       connect(&mToolLineWidth, &LengthEditContext::valueChangedUnsigned, &state,
               &PackageEditorState_DrawText::setStrokeWidth));
+  mFsmStateConnections.append(
+      connect(this, &PackageTab::lineWidthResetRequested, &state,
+              &PackageEditorState_DrawText::resetStrokeWidth));
 
   // Text
   auto setText = [this](const QString& text) {
@@ -1757,29 +1880,17 @@ void PackageTab::fsmToolEnter(PackageEditorState_DrawText& state) noexcept {
     mToolValueSuggestions->push_back(q2s(v));
   }
 
-  // Horizontal alignment
-  auto setHAlign = [this](const HAlign& align) {
-    mToolAlign.setH(align);
+  // Alignment
+  auto setAlign = [this](const Alignment& align) {
+    mToolAlign = align;
     onDerivedUiDataChanged.notify();
   };
-  setHAlign(state.getHAlign());
+  setAlign(state.getAlign());
   mFsmStateConnections.append(connect(
-      &state, &PackageEditorState_DrawText::hAlignChanged, this, setHAlign));
-  mFsmStateConnections.append(connect(this, &PackageTab::hAlignRequested,
+      &state, &PackageEditorState_DrawText::alignmentChanged, this, setAlign));
+  mFsmStateConnections.append(connect(this, &PackageTab::alignmentRequested,
                                       &state,
-                                      &PackageEditorState_DrawText::setHAlign));
-
-  // Vertical alignment
-  auto setVAlign = [this](const VAlign& align) {
-    mToolAlign.setV(align);
-    onDerivedUiDataChanged.notify();
-  };
-  setVAlign(state.getVAlign());
-  mFsmStateConnections.append(connect(
-      &state, &PackageEditorState_DrawText::vAlignChanged, this, setVAlign));
-  mFsmStateConnections.append(connect(this, &PackageTab::vAlignRequested,
-                                      &state,
-                                      &PackageEditorState_DrawText::setVAlign));
+                                      &PackageEditorState_DrawText::setAlign));
 
   onDerivedUiDataChanged.notify();
 }
@@ -2448,8 +2559,9 @@ bool PackageTab::fixPadFunction(const MessageType& msg) {
   QAction* aAll = menu.addAction(tr("Apply to all unspecified pads"));
   aAll->setCheckable(true);
   menu.addSeparator();
-  for (int i = 0; i < static_cast<int>(Pad::Function::_COUNT); ++i) {
-    const Pad::Function value = static_cast<Pad::Function>(i);
+  const QMetaEnum functions = QMetaEnum::fromType<Pad::Function>();
+  for (int i = 0; i < functions.keyCount(); ++i) {
+    const Pad::Function value = static_cast<Pad::Function>(functions.value(i));
     if (value != Pad::Function::Unspecified) {
       QAction* action =
           menu.addAction(FootprintPad::getFunctionDescriptionTr(value));

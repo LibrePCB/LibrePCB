@@ -40,7 +40,7 @@ namespace editor {
 
 SchematicEditorState_Measure::SchematicEditorState_Measure(
     const Context& context) noexcept
-  : SchematicEditorState(context), mTool(new MeasureTool()) {
+  : SchematicEditorState(context, "measure"), mTool(new MeasureTool()) {
   connect(
       mTool.data(), &MeasureTool::infoBoxTextChanged, this,
       [this](const QString& text) { mAdapter.fsmSetViewInfoBoxText(text); });

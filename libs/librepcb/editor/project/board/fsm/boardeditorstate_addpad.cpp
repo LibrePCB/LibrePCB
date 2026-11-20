@@ -49,85 +49,132 @@
 namespace librepcb {
 namespace editor {
 
+static QString getSettingsScope(BoardEditorState_AddPad::PadType type,
+                                Pad::Function function) noexcept {
+  const char* typeStr =
+      (type == BoardEditorState_AddPad::PadType::THT) ? "tht" : "smt";
+  return QString("add_%1_%2_pad").arg(typeStr, serializeToString(function));
+}
+
+static BoardPadData getInitialProperties(
+    BoardEditorState_AddPad::PadType type, Pad::Function function,
+    const ClientSettings& settings) noexcept {
+  // Default properties
+  BoardPadData data(
+      Uuid::createRandom(),  // UUID is not relevant here
+      Point(0, 0),  // Position
+      Angle::deg0(),  // Rotation
+      Pad::Shape::RoundedRect,  // Commonly used pad shape
+      PositiveLength(2500000),  // There is no default/recommended pad size
+      PositiveLength(1300000),  // -> choose reasonable multiple of 0.1mm
+      UnsignedLimitedRatio(Ratio::fromPercent(100)),  // Rounded pad
+      Path(),  // Custom shape outline
+      MaskConfig::automatic(),  // Stop mask
+      MaskConfig::off(),  // Solder paste
+      UnsignedLength(0),  // Copper clearance
+      Pad::ComponentSide::Top,  // Default side
+      function,  // Supplied by library editor
+      PadHoleList{},  // Holes
+      false  // Locked
+  );
+  if (type == BoardEditorState_AddPad::PadType::THT) {
+    data.getHoles().append(std::make_shared<PadHole>(
+        Uuid::createRandom(),
+        PositiveLength(800000),  // Commonly used drill diameter
+        makeNonEmptyPath(Point())));
+  } else {
+    data.setRadius(UnsignedLimitedRatio(Ratio::fromPercent(50)));
+    data.setWidth(PositiveLength(1500000));
+    data.setHeight(PositiveLength(700000));
+    data.setSolderPasteConfig(MaskConfig::automatic());
+    switch (function) {
+      case Pad::Function::ThermalPad:
+        data.setRadius(UnsignedLimitedRatio(Ratio::fromPercent(0)));
+        data.setWidth(PositiveLength(2000000));
+        data.setHeight(PositiveLength(2000000));
+        break;
+      case Pad::Function::BgaPad:
+        data.setRadius(UnsignedLimitedRatio(Ratio::fromPercent(100)));
+        data.setWidth(PositiveLength(300000));
+        data.setHeight(PositiveLength(300000));
+        break;
+      case Pad::Function::EdgeConnectorPad:
+        data.setRadius(UnsignedLimitedRatio(Ratio::fromPercent(0)));
+        data.setSolderPasteConfig(MaskConfig::off());
+        break;
+      case Pad::Function::TestPad:
+        data.setRadius(UnsignedLimitedRatio(Ratio::fromPercent(100)));
+        data.setWidth(PositiveLength(700000));
+        data.setHeight(PositiveLength(700000));
+        data.setSolderPasteConfig(MaskConfig::off());
+        break;
+      case Pad::Function::LocalFiducial:
+      case Pad::Function::GlobalFiducial:
+        data.setRadius(UnsignedLimitedRatio(Ratio::fromPercent(100)));
+        data.setWidth(PositiveLength(1000000));
+        data.setHeight(PositiveLength(1000000));
+        data.setCopperClearance(UnsignedLength(500000));
+        data.setStopMaskConfig(MaskConfig::manual(*data.getCopperClearance()));
+        data.setSolderPasteConfig(MaskConfig::off());
+        break;
+      default:
+        break;
+    }
+  }
+
+  // Now load client settings.
+  if (auto v = settings.get<Angle>("rotation")) {
+    data.setRotation(v->mappedTo0_360deg());
+  }
+  if (auto v = settings.get<Pad::Shape>("shape")) {
+    data.setShape(*v);
+  }
+  if (auto v = settings.get<PositiveLength>("width")) {
+    data.setWidth(*v);
+  }
+  if (auto v = settings.get<PositiveLength>("height")) {
+    data.setHeight(*v);
+  }
+  if (auto v = settings.get<UnsignedLimitedRatio>("radius")) {
+    data.setRadius(*v);
+  } else if ((*data.getRadius() > Ratio::fromPercent(0)) &&
+             (*data.getRadius() < Ratio::fromPercent(100))) {
+    data.setRadius(
+        Pad::getRecommendedRadius(data.getWidth(), data.getHeight()));
+  }
+  if (data.getCopperClearance() > 0) {  // Only for fiducials
+    if (auto v = settings.get<UnsignedLength>("copper_clearance")) {
+      data.setCopperClearance(*v);
+      data.setStopMaskConfig(MaskConfig::manual(**v));
+    }
+  }
+  if (type == BoardEditorState_AddPad::PadType::SMT) {
+    if (auto v = settings.get<Pad::ComponentSide>("component_side")) {
+      data.setComponentSide(*v);
+    }
+  }
+  if (type == BoardEditorState_AddPad::PadType::THT) {
+    if (std::shared_ptr<PadHole> hole = data.getHoles().value(0)) {
+      if (auto v = settings.get<PositiveLength>("drill_diameter")) {
+        hole->setDiameter(*v);
+      }
+    }
+  }
+  return data;
+}
+
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
 
 BoardEditorState_AddPad::BoardEditorState_AddPad(
     const Context& context, PadType type, Pad::Function function) noexcept
-  : BoardEditorState(context),
+  : BoardEditorState(context, getSettingsScope(type, function)),
     mPadType(type),
     mIsUndoCmdActive(false),
-    mCurrentProperties(
-        Uuid::createRandom(),  // UUID is not relevant here
-        Point(0, 0),  // Position
-        Angle::deg0(),  // Rotation
-        Pad::Shape::RoundedRect,  // Commonly used pad shape
-        PositiveLength(2500000),  // There is no default/recommended pad size
-        PositiveLength(1300000),  // -> choose reasonable multiple of 0.1mm
-        UnsignedLimitedRatio(Ratio::fromPercent(100)),  // Rounded pad
-        Path(),  // Custom shape outline
-        MaskConfig::automatic(),  // Stop mask
-        MaskConfig::off(),  // Solder paste
-        UnsignedLength(0),  // Copper clearance
-        Pad::ComponentSide::Top,  // Default side
-        function,  // Supplied by library editor
-        PadHoleList{},  // Holes
-        false  // Locked
-        ),
+    mCurrentProperties(getInitialProperties(type, function, mSettings)),
     mCurrentNetSignal(std::nullopt),
     mCurrentPad(nullptr) {
-  if (mPadType == PadType::SMT) {
-    mCurrentProperties.setRadius(UnsignedLimitedRatio(Ratio::fromPercent(50)));
-    mCurrentProperties.setWidth(PositiveLength(1500000));
-    mCurrentProperties.setHeight(PositiveLength(700000));
-    mCurrentProperties.setSolderPasteConfig(MaskConfig::automatic());
-    switch (function) {
-      case Pad::Function::ThermalPad:
-        mCurrentProperties.setRadius(
-            UnsignedLimitedRatio(Ratio::fromPercent(0)));
-        mCurrentProperties.setWidth(PositiveLength(2000000));
-        mCurrentProperties.setHeight(PositiveLength(2000000));
-        break;
-      case Pad::Function::BgaPad:
-        mCurrentProperties.setRadius(
-            UnsignedLimitedRatio(Ratio::fromPercent(100)));
-        mCurrentProperties.setWidth(PositiveLength(300000));
-        mCurrentProperties.setHeight(PositiveLength(300000));
-        break;
-      case Pad::Function::EdgeConnectorPad:
-        mCurrentProperties.setRadius(
-            UnsignedLimitedRatio(Ratio::fromPercent(0)));
-        mCurrentProperties.setSolderPasteConfig(MaskConfig::off());
-        break;
-      case Pad::Function::TestPad:
-        mCurrentProperties.setRadius(
-            UnsignedLimitedRatio(Ratio::fromPercent(100)));
-        mCurrentProperties.setWidth(PositiveLength(700000));
-        mCurrentProperties.setHeight(PositiveLength(700000));
-        mCurrentProperties.setSolderPasteConfig(MaskConfig::off());
-        break;
-      case Pad::Function::LocalFiducial:
-      case Pad::Function::GlobalFiducial:
-        mCurrentProperties.setRadius(
-            UnsignedLimitedRatio(Ratio::fromPercent(100)));
-        mCurrentProperties.setWidth(PositiveLength(1000000));
-        mCurrentProperties.setHeight(PositiveLength(1000000));
-        mCurrentProperties.setCopperClearance(UnsignedLength(500000));
-        mCurrentProperties.setStopMaskConfig(
-            MaskConfig::manual(*mCurrentProperties.getCopperClearance()));
-        mCurrentProperties.setSolderPasteConfig(MaskConfig::off());
-        break;
-      default:
-        break;
-    }
-  } else {
-    mCurrentProperties.getHoles().append(std::make_shared<PadHole>(
-        Uuid::createRandom(),
-        PositiveLength(800000),  // Commonly used drill diameter
-        makeNonEmptyPath(Point())));
-  }
-  applyRecommendedRoundedRectRadius();
 }
 
 BoardEditorState_AddPad::~BoardEditorState_AddPad() noexcept {
@@ -170,7 +217,7 @@ bool BoardEditorState_AddPad::processGraphicsSceneMouseMoved(
   BoardGraphicsScene* scene = getActiveBoardScene();
   if (!scene) return false;
 
-  Point pos = e.scenePos.mappedToGrid(getGridInterval());
+  const Point pos = e.scenePos.mappedToGrid(getGridInterval());
   return updatePosition(*scene, pos);
 }
 
@@ -197,6 +244,7 @@ bool BoardEditorState_AddPad::processRotate(const Angle& rotation) noexcept {
   if (mCurrentPad && mCurrentEditCmd) {
     mCurrentEditCmd->rotate(rotation, mCurrentPad->getPosition(), true);
     mCurrentProperties.setRotation(mCurrentPad->getRotation());
+    mSettings.set("rotation", mCurrentProperties.getRotation());
     return true;
   } else {
     return false;
@@ -224,19 +272,24 @@ const QVector<std::pair<Uuid, QString>>
 }
 
 void BoardEditorState_AddPad::setNet(const std::optional<Uuid>& net) noexcept {
-  if (net != mCurrentNetSignal) {
-    mCurrentNetSignal = net;
-    emit netChanged(mCurrentNetSignal);
+  if (net == mCurrentNetSignal) {
+    return;
   }
+
+  mCurrentNetSignal = net;
+  emit netChanged(mCurrentNetSignal);
 
   applySelectedNetSignal();
 }
 
 void BoardEditorState_AddPad::setComponentSide(
     Pad::ComponentSide side) noexcept {
-  if (mCurrentProperties.setComponentSide(side)) {
-    emit componentSideChanged(mCurrentProperties.getComponentSide());
+  if (!mCurrentProperties.setComponentSide(side)) {
+    return;
   }
+
+  mSettings.set("component_side", mCurrentProperties.getComponentSide());
+  emit componentSideChanged(mCurrentProperties.getComponentSide());
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setComponentSideAndHoles(
@@ -248,57 +301,72 @@ void BoardEditorState_AddPad::setComponentSide(
 }
 
 void BoardEditorState_AddPad::setShape(Pad::Shape shape) noexcept {
-  if (mCurrentProperties.setShape(shape)) {
-    emit shapeChanged(mCurrentProperties.getShape());
-    applyRecommendedRoundedRectRadius();
+  if (!mCurrentProperties.setShape(shape)) {
+    return;
   }
+
+  mSettings.set("shape", mCurrentProperties.getShape());
+  emit shapeChanged(mCurrentProperties.getShape());
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setShape(mCurrentProperties.getShape(), true);
   }
+
+  applyRecommendedRoundedRectRadius();
 }
 
 void BoardEditorState_AddPad::setWidth(const PositiveLength& width) noexcept {
-  if (mCurrentProperties.setWidth(width)) {
-    emit widthChanged(mCurrentProperties.getWidth());
-    applyRecommendedRoundedRectRadius();
-  }
-
-  if (mCurrentEditCmd) {
-    mCurrentEditCmd->setWidth(mCurrentProperties.getWidth(), true);
-  }
-
   // Avoid creating pads with a drill larger than width or height.
   if (auto drill = getDrillDiameter()) {
     if (*drill > width) {
       setDrillDiameter(width);
     }
   }
+
+  if (!mCurrentProperties.setWidth(width)) {
+    return;
+  }
+
+  mSettings.set("width", mCurrentProperties.getWidth());
+  emit widthChanged(mCurrentProperties.getWidth());
+
+  if (mCurrentEditCmd) {
+    mCurrentEditCmd->setWidth(mCurrentProperties.getWidth(), true);
+  }
+
+  applyRecommendedRoundedRectRadius();
 }
 
 void BoardEditorState_AddPad::setHeight(const PositiveLength& height) noexcept {
-  if (mCurrentProperties.setHeight(height)) {
-    emit heightChanged(mCurrentProperties.getHeight());
-    applyRecommendedRoundedRectRadius();
-  }
-
-  if (mCurrentEditCmd) {
-    mCurrentEditCmd->setHeight(mCurrentProperties.getHeight(), true);
-  }
-
   // Avoid creating pads with a drill larger than width or height.
   if (auto drill = getDrillDiameter()) {
     if (*drill > height) {
       setDrillDiameter(height);
     }
   }
+
+  if (!mCurrentProperties.setHeight(height)) {
+    return;
+  }
+
+  mSettings.set("height", mCurrentProperties.getHeight());
+  emit heightChanged(mCurrentProperties.getHeight());
+
+  if (mCurrentEditCmd) {
+    mCurrentEditCmd->setHeight(mCurrentProperties.getHeight(), true);
+  }
+
+  applyRecommendedRoundedRectRadius();
 }
 
 void BoardEditorState_AddPad::setRadius(
     const UnsignedLimitedRatio& radius) noexcept {
-  if (mCurrentProperties.setRadius(radius)) {
-    emit radiusChanged(mCurrentProperties.getRadius());
+  if (!mCurrentProperties.setRadius(radius)) {
+    return;
   }
+
+  mSettings.set("radius", mCurrentProperties.getRadius());
+  emit radiusChanged(mCurrentProperties.getRadius());
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setRadius(mCurrentProperties.getRadius(), true);
@@ -307,33 +375,38 @@ void BoardEditorState_AddPad::setRadius(
 
 void BoardEditorState_AddPad::setDrillDiameter(
     const PositiveLength& diameter) noexcept {
-  if (std::shared_ptr<PadHole> hole = mCurrentProperties.getHoles().value(0)) {
-    if (hole->getDiameter() != diameter) {
-      hole->setDiameter(diameter);
-      emit drillDiameterChanged(diameter);
-    }
+  // Avoid creating pads with a drill larger than width or height.
+  if (diameter > mCurrentProperties.getWidth()) {
+    setWidth(diameter);
+  }
+  if (diameter > mCurrentProperties.getHeight()) {
+    setHeight(diameter);
+  }
 
-    if (mCurrentEditCmd) {
-      mCurrentEditCmd->setComponentSideAndHoles(
-          mCurrentProperties.getComponentSide(), mCurrentProperties.getHoles(),
-          true);
-    }
+  std::shared_ptr<PadHole> hole = mCurrentProperties.getHoles().value(0);
+  if ((!hole) || (hole->getDiameter() == diameter)) {
+    return;
+  }
 
-    // Avoid creating pads with a drill larger than width or height.
-    if (diameter > mCurrentProperties.getWidth()) {
-      setWidth(diameter);
-    }
-    if (diameter > mCurrentProperties.getHeight()) {
-      setHeight(diameter);
-    }
+  hole->setDiameter(diameter);
+  mSettings.set("drill_diameter", diameter);
+  emit drillDiameterChanged(diameter);
+
+  if (mCurrentEditCmd) {
+    mCurrentEditCmd->setComponentSideAndHoles(
+        mCurrentProperties.getComponentSide(), mCurrentProperties.getHoles(),
+        true);
   }
 }
 
 void BoardEditorState_AddPad::setCopperClearance(
     const UnsignedLength& clearance) noexcept {
-  if (mCurrentProperties.setCopperClearance(clearance)) {
-    emit copperClearanceChanged(mCurrentProperties.getCopperClearance());
+  if (!mCurrentProperties.setCopperClearance(clearance)) {
+    return;
   }
+
+  mSettings.set("copper_clearance", mCurrentProperties.getCopperClearance());
+  emit copperClearanceChanged(mCurrentProperties.getCopperClearance());
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setCopperClearance(mCurrentProperties.getCopperClearance(),
@@ -343,9 +416,11 @@ void BoardEditorState_AddPad::setCopperClearance(
 
 void BoardEditorState_AddPad::setStopMaskConfig(
     const MaskConfig& cfg) noexcept {
-  if (mCurrentProperties.setStopMaskConfig(cfg)) {
-    emit stopMaskConfigChanged(mCurrentProperties.getStopMaskConfig());
+  if (!mCurrentProperties.setStopMaskConfig(cfg)) {
+    return;
   }
+
+  emit stopMaskConfigChanged(mCurrentProperties.getStopMaskConfig());
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setStopMaskConfig(mCurrentProperties.getStopMaskConfig(),
@@ -354,9 +429,11 @@ void BoardEditorState_AddPad::setStopMaskConfig(
 }
 
 void BoardEditorState_AddPad::setFunction(Pad::Function function) noexcept {
-  if (mCurrentProperties.setFunction(function)) {
-    emit functionChanged(mCurrentProperties.getFunction());
+  if (!mCurrentProperties.setFunction(function)) {
+    return;
   }
+
+  emit functionChanged(mCurrentProperties.getFunction());
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setFunction(mCurrentProperties.getFunction(), true);

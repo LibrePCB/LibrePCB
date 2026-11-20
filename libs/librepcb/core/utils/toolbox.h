@@ -420,12 +420,12 @@ public:
   /**
    * @brief Convert a fixed point decimal number from a QString to an integer.
    *
-   * @param str      A QString that represents the number
+   * @param str      A string that represents the number.
    * @param pointPos Number of decimal positions. If the number has more
-   *                 decimal digits, this function will throw
+   *                 decimal digits, this function will throw.
    */
   template <typename T>
-  static T decimalFixedPointFromString(const QString& str, qint32 pointPos) {
+  static T decimalFixedPointFromString(QStringView str, qint32 pointPos) {
     using UnsignedT = typename std::make_unsigned<T>::type;
 
     const T min = std::numeric_limits<T>::min();
