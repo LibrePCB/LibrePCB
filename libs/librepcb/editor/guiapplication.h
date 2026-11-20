@@ -179,8 +179,8 @@ private:
   std::shared_ptr<UiObjectList<ProjectEditor, ui::ProjectData>> mProjects;
   std::shared_ptr<UiObjectList<LibraryEditor, ui::LibraryData>> mLibraries;
   std::unique_ptr<ProjectLibraryUpdater> mProjectLibraryUpdater;
-  std::unique_ptr<RpcServer> mRpcServer;
   std::shared_ptr<UiObjectList<MainWindow, int>> mWindows;
+  std::unique_ptr<RpcServer> mRpcServer;
   QTimer mSaveOpenedWindowsCountdown;
 
   // Cache

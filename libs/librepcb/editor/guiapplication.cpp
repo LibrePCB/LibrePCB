@@ -114,8 +114,8 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
     mLibrariesFilter(new SlintKeyEventTextBuilder()),
     mProjects(new UiObjectList<ProjectEditor, ui::ProjectData>()),
     mLibraries(new UiObjectList<LibraryEditor, ui::LibraryData>()),
-    mRpcServer(nullptr),
-    mWindows(new UiObjectList<MainWindow, int>()) {
+    mWindows(new UiObjectList<MainWindow, int>()),
+    mRpcServer(nullptr) {
   QSettings cs;
 
   // Check if this is the first run with this application version. This can
@@ -348,22 +348,25 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
   // To allow opening files by the MacOS Finder, install event filter.
   qApp->installEventFilter(this);
 
-  // Start the RPC server (for external tools like MCP servers, plugins or
-  // scripting), if enabled in the workspace settings or forced with the
-  // environment variable "LIBREPCB_ENABLE_RPC_SERVER" (for testing).
-  if (mWorkspace.getSettings().enableRpcServer.get() ||
-      (qgetenv("LIBREPCB_ENABLE_RPC_SERVER") == "1")) {
-    mRpcServer = std::make_unique<RpcServer>(*this);
-  }
+  // Start/stop RPC server according configuration in workspace settings.
+  auto updateRpcServerEnabled = [this]() {
+    const bool enable = mWorkspace.getSettings().enableRpcServer.get();
+    if (enable && (!mRpcServer)) {
+      mRpcServer = std::make_unique<RpcServer>(*this);
+    } else if ((!enable) && mRpcServer) {
+      mRpcServer.reset();
+    }
+  };
+  updateRpcServerEnabled();
+  connect(&mWorkspace.getSettings().enableRpcServer,
+          &WorkspaceSettingsItem::edited, this, updateRpcServerEnabled);
 
   // Start library rescan.
   mWorkspace.getLibraryDb().startLibraryRescan();
 }
 
 GuiApplication::~GuiApplication() noexcept {
-  // Stop the RPC server first since its command handlers need access to
-  // the projects and windows (which are teared down below).
-  mRpcServer.reset();
+  mRpcServer.reset();  // Blocks until RPC server is stopped.
   mProjectLibraryUpdater.reset();
 }
 
