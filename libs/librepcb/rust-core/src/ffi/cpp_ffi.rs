@@ -249,6 +249,8 @@ pub mod qmetatype {
   pub const QSTRING: i32 = 10;
   /// `QMetaType::QByteArray`
   pub const QBYTEARRAY: i32 = 12;
+  /// `QMetaType::Float`
+  pub const FLOAT: i32 = 38;
 }
 
 #[allow(improper_ctypes)]

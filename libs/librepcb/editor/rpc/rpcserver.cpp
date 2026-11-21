@@ -136,7 +136,7 @@ void RpcServer::handleInitialize(RpcRequest& request) noexcept {
     }
 
     QVariantMap result;
-    result.insert("format", qlonglong(1));
+    result.insert("format", "1.0");
     result.insert("server", "librepcb");
     result.insert("version", Application::getVersion());
     result.insert("session", session.toStr());
@@ -157,7 +157,7 @@ void RpcServer::handleInitialize(RpcRequest& request) noexcept {
     }
   } else {
     auto notification = std::make_shared<Notification>(
-        ui::NotificationType::Warning, tr("External RPC Connection Request"),
+        ui::NotificationType::Warning, tr("RPC Connection Request"),
         tr("An external application, which identifies itself as '%1', wants to "
            "connect through the RPC interface to this process for the first "
            "time. Only accept this if you trust that application and the "
@@ -165,13 +165,15 @@ void RpcServer::handleInitialize(RpcRequest& request) noexcept {
             .arg(clientName),
         tr("Accept Connection"), QString(), true);
     connect(notification.get(), &Notification::buttonClicked, &request,
-            [&request, createResponse]() {
+            [this, &request, createResponse]() {
+              rs::ffi_rpc_server_set_authenticated(*mHandle,
+                                                   request.getConnId(), true);
               request.sendSuccess(createResponse(QString()));
             });
     connect(notification.get(), &Notification::destroyed, &request,
             [&request]() {
               request.sendError(rs::RpcErrorCode::AccessDenied,
-                                "Access request denied.");
+                                "Access request rejected or dismissed.");
             });
     connect(&request, &RpcRequest::cancelled, notification.get(),
             &Notification::dismiss);

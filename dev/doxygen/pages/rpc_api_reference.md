@@ -3,7 +3,7 @@ RPC API Reference {#doc_rpc_api_reference}
 
 [TOC]
 
-This reference documents the commands (data types, error types, classes with their methods and events) which the RPC server offers. It is generated from `share/librepcb/rpc/rpc.yaml`, the single source of truth of the API. The transport protocol (framing, handshake, conventions) is described in @ref doc_rpc_api.
+This reference documents the commands (data types, error types, classes with their methods and events) which the RPC server offers. It is generated from `share/librepcb/rpc/rpc.yml`, the single source of truth of the API. The transport protocol (framing, handshake, conventions) is described in @ref doc_rpc_api.
 
 > Note: This reference is about controlling a *running* LibrePCB application. For the *online* REST API used to fetch libraries, see @ref doc_server_api.
 
@@ -98,7 +98,8 @@ The `error` element of a response is a map with the keys `code` and `message` (a
 | `MessageDecodingFailed` {#doc_rpc_api_error_MessageDecodingFailed} | 10 | Message decoding failed |
 | `MessageTooLarge` {#doc_rpc_api_error_MessageTooLarge} | 11 | Message too large |
 | `InvalidRequest` {#doc_rpc_api_error_InvalidRequest} | 20 | Invalid Request |
-| `Unauthenticated` {#doc_rpc_api_error_Unauthenticated} | 21 | Invalid token. |
+| `Unauthenticated` {#doc_rpc_api_error_Unauthenticated} | 21 | This connection is not authenticated, the first message must be an 'initialize' request |
+| `AccessDenied` {#doc_rpc_api_error_AccessDenied} | 25 | Invalid or revoked access token. |
 | `MethodNotFound` {#doc_rpc_api_error_MethodNotFound} | 22 | Method not found |
 | `InvalidParams` {#doc_rpc_api_error_InvalidParams} | 23 | Invalid params |
 | `InternalError` {#doc_rpc_api_error_InternalError} | 24 | Internal error |
@@ -112,7 +113,9 @@ The `error` element of a response is a map with the keys `code` and `message` (a
 
 **`InvalidRequest`:** The request doesn't conform to the message envelope.
 
-**`Unauthenticated`:** The connection is not authenticated. The first message of a connection must be an `initialize` request, either carrying the correct token or being accepted by the user interactively.
+**`Unauthenticated`:** A request other than `initialize` was sent on a connection which is not authenticated yet. The first message of a connection must be an `initialize` request.
+
+**`AccessDenied`:** Authentication failed. Either the provided token was not issued by this application instance (or is no longer valid), or an interactive connection request was denied by the user.
 
 **`MethodNotFound`:** The method does not exist or is not available, e.g. because it was added in a newer application version than the running one.
 
@@ -155,6 +158,28 @@ None.
 **Errors:**
 
 None (besides protocol-level errors).
+
+**Added in version:** 2.1.2
+
+---
+
+### Project.open {#doc_rpc_api_method_Project_open}
+
+Open a project by file path. If the project is already open, nothing is changed and the summary of the already open project is returned.
+
+**Params:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `path` | string | The absolute path of the project file (*.lpp or *.lppz). |
+
+**Result:** `ProjectSummary`
+
+**Errors:**
+
+| Error | Code | Message |
+|-------|------|---------|
+| `CommandFailed` | 100 | Command failed |
 
 **Added in version:** 2.1.2
 
@@ -235,6 +260,28 @@ None.
 |-------|------|---------|
 | `ProjectNotOpen` | 101 | Project not open |
 | `CommandFailed` | 100 | Command failed |
+
+**Added in version:** 2.1.2
+
+---
+
+## Class WorkspaceDb {#doc_rpc_api_class_WorkspaceDb}
+
+The library database of the currently opened workspace.
+
+### WorkspaceDb.watch {#doc_rpc_api_method_WorkspaceDb_watch}
+
+Watch the library database: While the request is pending, request messages (type 3) about library scans are sent, with the payload `{"progress": <int 0..100>}` (100 means no scan is running). The request stays pending until the client cancels it (message type 4), which stops the watch and finishes the request with the error type `Cancelled`.
+
+None.
+
+None.
+
+**Errors:**
+
+| Error | Code | Message |
+|-------|------|---------|
+| `Cancelled` | 102 | Request cancelled |
 
 **Added in version:** 2.1.2
 

@@ -9,7 +9,7 @@ describes the transport protocol of the server; the available commands
 (data types, error types, classes with their methods) are documented in
 \subpage doc_rpc_api_reference.
 
-The reference is generated from `share/librepcb/rpc/rpc.yaml`, the single
+The reference is generated from `share/librepcb/rpc/rpc.yml`, the single
 source of truth of the API.
 
 > Note: This page is about controlling a *running* LibrePCB application.
@@ -38,25 +38,42 @@ Handshake {#doc_rpc_api_handshake}
 
 The first message of a connection must be an `initialize` request. Any
 other first message is answered with an error response (without being
-dispatched). There are two ways to authenticate:
+dispatched) and the connection stays open, but stays unauthenticated.
+There are two ways to authenticate:
 
-- **With a token:** The params carry a `token` string. If it matches the
-  token known to the application, the connection is authenticated.
-  Otherwise the request is answered with an error (code 21) and the
-  connection stays open, but stays unauthenticated.
+- **With a token:** The params carry a `token` string. If the token was
+  issued by this application instance (see below) and is still valid, the
+  connection is authenticated. Otherwise the request is answered with an
+  error (code 25) and the connection stays open, but stays
+  unauthenticated.
 - **Interactively:** The params carry a `name` string identifying the
   client. The application asks the user whether to accept the connection
-  (via a notification). Only if the user accepts it, the connection is
-  authenticated. As long as the user has not answered, the request stays
-  pending without a response — the client may cancel it in the meantime
-  (which dismisses the user prompt) or just wait for the answer.
+  (via a notification). If the user accepts it, the connection is
+  authenticated and a new token is issued, which the client shall store
+  for future connections. If the user denies the request (or the client
+  cancels it), the request is answered with an error (code 25).
 
 The success result is a map with some application information:
 
 ~~~{.msgpack}
-[1, 1, nil, {"server": "librepcb", "version": "2.1.2",
+[1, 1, nil, {"format": "1.0", "server": "librepcb", "session":
+"783ea436-b2bc-4a1e-95a1-d5600c4a26d6", "token":
+"0f0e7d09-457c-4924-a21f-d8d5341f8d55", "version": "2.1.2",
 "workspace": "~/LibrePCB-Workspace"}]
 ~~~
+
+The fields have the following meaning:
+
+- `format`: The RPC interface format version (currently `"1.0"`).
+  Clients must verify the major version and reject other major versions;
+  a higher minor version means additive, backward-compatible changes.
+- `server`: Always `"librepcb"` (so clients can verify the server).
+- `version`: The application version.
+- `session`: A UUID identifying the application *process*: It changes
+  whenever the application is restarted, so clients can detect that.
+- `token`: The access token for this connection — either the one provided
+  in the request, or a freshly issued one (see above).
+- `workspace`: The path of the currently opened workspace.
 
 Clients use `version` together with the per-method `added_in_version`
 from the specification file to determine which methods the server

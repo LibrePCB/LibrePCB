@@ -138,7 +138,7 @@ enum class InteractiveHtmlBomViewMode {
  *   the transport failure modes.
  * * **20–29: Protocol errors.** The connection stays open.
  * * **100–: Application errors.** Open-ended, defined by the API
- *   specification (`rpc.yaml`).
+ *   specification (`rpc.yml`).
  */
 enum class RpcErrorCode : int32_t {
   /**

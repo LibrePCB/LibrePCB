@@ -124,6 +124,8 @@ public:
    */
   void cancel() noexcept;
 
+  void sendProgress(float percent) noexcept;
+
   /**
    * @brief Send a request-scoped message to the client (e.g. progress)
    *
@@ -152,7 +154,7 @@ public:
    *                    "code" and "message" (see the error types in
    *                    the API specification).
    */
-  void sendError(rs::RpcErrorCode code, const QString& message,
+  void sendError(rs::RpcErrorCode code, const QString& message = QString(),
                  const QVariantMap& properties = QVariantMap()) noexcept;
 
 signals:

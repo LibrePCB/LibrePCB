@@ -1,6 +1,7 @@
 import {
     Button,
     LineEdit,
+    ProgressIndicator,
     Spinner,
     VerticalBox,
     HorizontalBox,
@@ -15,10 +16,14 @@ export component AppWindow inherits Window {
     in property <bool> connected;
     in property <bool> pending;
     in-out property <string> token;
+    in-out property <string> project-path;
     in property <string> log: "Foo\nBar";
+    in property <int> progress;
 
     callback connect_clicked();
     callback init_clicked();
+    callback open_project();
+    callback watch_clicked();
 
     VerticalBox {
         HorizontalBox {
@@ -41,6 +46,33 @@ export component AppWindow inherits Window {
             Spinner {
                 indeterminate: true;
                 visible: root.pending;
+            }
+        }
+
+        HorizontalBox {
+            LineEdit {
+                horizontal-stretch: 1;
+                text <=> root.project-path;
+                placeholder-text: "Project File Path";
+            }
+
+            Button {
+                text: "Open Project";
+                enabled: root.connected;
+                clicked => { root.open_project(); }
+            }
+        }
+
+        HorizontalBox {
+            ProgressIndicator {
+                horizontal-stretch: 1;
+                progress: root.progress / 100;
+            }
+
+            Button {
+                text: "Watch Libraries";
+                enabled: root.connected;
+                clicked => { root.watch_clicked(); }
             }
         }
 

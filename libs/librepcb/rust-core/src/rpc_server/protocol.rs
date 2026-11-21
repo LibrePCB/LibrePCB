@@ -47,7 +47,7 @@ pub const METHOD_PING: &str = "ping";
 ///   the transport failure modes.
 /// * **20–29: Protocol errors.** The connection stays open.
 /// * **100–: Application errors.** Open-ended, defined by the API
-///   specification (`rpc.yaml`).
+///   specification (`rpc.yml`).
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 #[repr(i32)]
 pub enum RpcErrorCode {

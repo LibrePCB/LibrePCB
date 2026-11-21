@@ -50,8 +50,8 @@ Build directory: `build/agent` (per CLAUDE.md). No commits unless asked.
 | Params | String-keyed map with a reserved `"obj"` key carrying the receiver handle — an *opaque* value (see section 2.4) |
 | Domain types | Plain integers (`Length` in nm, `Angle` in µdeg, …) and f64 — **forever**, no msgpack `ext` types |
 | Enums | Strings (self-describing; clients don't need the spec to display them) |
-| Spec / discovery | YAML spec file (`share/librepcb/rpc/rpc.yaml`) shipped with the app; **no `rpc.discover` method** — clients read the spec file and compare per-function `added_in_version` with the `version` from `initialize` |
-| Auth | Token handshake in `initialize` (hardcoded dev token until the instance registry lands, see section 9) |
+| Spec / discovery | YAML spec file (`share/librepcb/rpc/rpc.yml`) shipped with the app; **no `rpc.discover` method** — clients read the spec file and compare per-function `added_in_version` with the `version` from `initialize` |
+| Auth | `initialize` handshake: first-time clients are approved interactively by the user (notification); approval issues an access token which clients use for later connections (see 2.5) |
 | Concurrency | std threads only, reader/writer thread pair per connection (no tokio, no mio) |
 | Events | Type-2 notifications broadcast to all clients (v2: `project_opened`, `project_closed`, `selection_changed`) |
 | Scope | GUI-attached only; no headless/CLI support; no Python driver in v2 |
@@ -167,17 +167,26 @@ A request's `params` is a **string-keyed msgpack map**:
 ### 2.5 Handshake & protocol-level methods
 
 - First message of a connection **must** be an `initialize` request. Any
-  other first message → error response, connection stays open but stays
-  unauthenticated. Two ways to authenticate:
-  - **With a token:** params `{"token": "<string>"}`. A wrong token →
-    error response (code 21), connection stays open.
+  other first message → error response (code 21), connection stays open
+  but stays unauthenticated. Two ways to authenticate:
+  - **With a token:** params `{"token": "<string>"}`. The token must have
+    been issued by this application instance (kept in memory, i.e. valid
+    for the lifetime of the process). Otherwise → error response (code 25
+    `AccessDenied`), connection stays open.
   - **Interactively:** params `{"name": "<client name>"}`. The app shows
-    a notification asking the user to accept the connection; only on
-    accept the request is replied (success). Until then the request stays
-    pending without a response — the client may cancel it (type 4), which
-    dismisses the user prompt.
-- Success result (a map): `{"server": "librepcb", "version": "<app
-  version>", "workspace": "<path>"}`.
+    a notification asking the user to accept the connection. On accept,
+    the request is replied (success) and a fresh access token is issued
+    (returned in the response, to be stored by the client). If the user
+    dismisses the prompt or the client cancels the request (type 4), the
+    request is replied with `AccessDenied`.
+- Success result (a map): `{"format": "1.0", "server": "librepcb",
+  "version": "<app version>", "session": "<uuid>", "workspace": "<path>",
+  "token": "<token>"}`.
+  - `format` is the RPC interface format version (currently `"1.0"`).
+    Clients must verify the major version; a higher minor version means
+    additive, backward-compatible changes.
+  - `session` is a per-process UUID: It changes when the application is
+    restarted, so clients can detect that.
   - Clients use `version` + the spec's per-function `added_in_version`
     to determine availability: functions added after the revision of the
     client's spec are unknown to the client, which is fine (unknown
@@ -430,7 +439,7 @@ anymore).
 
 ### 5.1 Spec file
 
-`share/librepcb/rpc/rpc.yaml` — the single source of truth for the API.
+`share/librepcb/rpc/rpc.yml` — the single source of truth for the API.
 Shipped with the app (picked up by the existing `share/*` install rule);
 local tools read the spec matching their installed server. Clients
 compare per-function `added_in_version` with the `appVersion` from
@@ -502,7 +511,7 @@ The documentation consists of **two Doxygen pages**:
   `\subpage` mechanism.
 - `dev/doxygen/pages/rpc_api_reference.md` — **generated** by
   `dev/generate_rpc_api_docs.py` (stdlib + **PyYAML**, dev-only
-  dependency) from `rpc.yaml`: data types, error types, classes with
+  dependency) from `rpc.yml`: data types, error types, classes with
   their methods and events. Committed, so the Doxygen build needs no
   Python.
 
@@ -543,7 +552,7 @@ plain hand-written page. No CI stale-check.
    converts msgpack ↔ QVariant directly, without an intermediate value
    type — the conversion rules are covered by the system test).
 4. **Protocol v2 C++ integration** — async `RpcServer` (QueuedConnection,
-   request context), QVariantMap handlers, `rpc.yaml` (classes `Project`,
+   request context), QVariantMap handlers, `rpc.yml` (classes `Project`,
    `UndoStack`; enums/error types as needed), docs pipeline (hand-written
    protocol page + generated reference page), Python system test in
    `tests/ui/rpc/`.
@@ -666,3 +675,23 @@ only, see risks). The following is the agreed design for the follow-up.
   their own PID namespace).
 - If `new()` fails (e.g. no writable runtime directory), disable the RPC
   server feature with a log message instead of running undiscoverable.
+
+### Server verification (follow-up)
+
+The current design leaves the client unable to authenticate the server:
+an attacker (other local user) can squat the RPC port before the app
+starts and harvest an access token by relaying the `initialize` request
+to the real app (the user approves the prompt, believing it's their own
+client), or impersonate the app. To be fixed with:
+
+- The instance file carries a random per-process `secret` (file mode 0600,
+  so other users cannot read it).
+- `initialize` becomes two-phase: phase 1 carries a fresh client `nonce`
+  and the server response proves knowledge of the secret with
+  `HMAC-SHA256(secret, nonce)`; the client disconnects on mismatch. The
+  token is only sent in phase 2, on a verified connection — phase 2 is
+  the existing token/approval logic, unchanged.
+
+Details (file layout, fallbacks, tests, GUI tool) to be worked out when
+implementing. Until then, clients connecting by port are unsafe in
+multi-user environments.

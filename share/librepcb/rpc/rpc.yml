@@ -31,7 +31,7 @@
 #   microdegrees (i64), if not stated otherwise.
 
 spec_version: 1
-protocol_version: 1
+protocol_version: "1.0"
 
 # ---------------------------------------------------------------------------
 # Global error types. The server sends them as a map {"code": <int>,
@@ -69,11 +69,19 @@ error_types:
 
   - name: Unauthenticated
     code: 21
-    message: "Invalid token."
+    message: "This connection is not authenticated, the first message must be an 'initialize' request"
     description: >-
-      The connection is not authenticated. The first message of a
-      connection must be an `initialize` request, either carrying the
-      correct token or being accepted by the user interactively.
+      A request other than `initialize` was sent on a connection which is
+      not authenticated yet. The first message of a connection must be an
+      `initialize` request.
+
+  - name: AccessDenied
+    code: 25
+    message: "Invalid or revoked access token."
+    description: >-
+      Authentication failed. Either the provided token was not issued by
+      this application instance (or is no longer valid), or an interactive
+      connection request was denied by the user.
 
   - name: MethodNotFound
     code: 22
@@ -252,6 +260,20 @@ classes:
         errors: []
         added_in_version: "2.1.2"
 
+      - name: open
+        static: true
+        description: >-
+          Open a project by file path. If the project is already open,
+          nothing is changed and the summary of the already open project
+          is returned.
+        params:
+          - name: path
+            type: string
+            description: The absolute path of the project file (*.lpp or *.lppz).
+        result: ProjectSummary
+        errors: [CommandFailed]
+        added_in_version: "2.1.2"
+
       - name: get
         description: Get details about an open project.
         params: []
@@ -287,6 +309,23 @@ classes:
         params: []
         result: UndoStackStatus
         errors: [ProjectNotOpen, CommandFailed]
+        added_in_version: "2.1.2"
+
+  - name: WorkspaceDb
+    description: The library database of the currently opened workspace.
+    methods:
+      - name: watch
+        static: true
+        description: >-
+          Watch the library database: While the request is pending,
+          request messages (type 3) about library scans are sent, with
+          the payload `{"progress": <int 0..100>}` (100 means no scan is
+          running). The request stays pending until the client cancels it
+          (message type 4), which stops the watch and finishes the request
+          with the error type `Cancelled`.
+        params: []
+        result: null
+        errors: [Cancelled]
         added_in_version: "2.1.2"
 
 # ---------------------------------------------------------------------------

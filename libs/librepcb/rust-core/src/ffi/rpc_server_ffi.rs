@@ -154,6 +154,7 @@ fn qvariant_to_msgpack(obj: &QVariant) -> Result<Value, ()> {
       qmetatype::UNKNOWN => Value::Nil,
       qmetatype::BOOL => Value::from(ffi_qvariant_get_bool(obj)),
       qmetatype::LONGLONG => Value::from(ffi_qvariant_get_i64(obj)),
+      qmetatype::FLOAT => Value::from(ffi_qvariant_get_f64(obj) as f32),
       qmetatype::DOUBLE => Value::from(ffi_qvariant_get_f64(obj)),
       qmetatype::QSTRING => {
         let out = qstring_new();

@@ -5,7 +5,7 @@
 
 This script generates the *generated* part of the RPC server documentation
 (`dev/doxygen/pages/rpc_api_reference.md`) from the RPC API specification
-`share/librepcb/rpc/rpc.yaml` (the single source of truth): data types,
+`share/librepcb/rpc/rpc.yml` (the single source of truth): data types,
 error types, classes with their methods and events. The generated file is
 committed to the repository, so building the documentation does not
 require Python. The transport protocol is described by hand in
@@ -29,7 +29,7 @@ from pathlib import Path
 import yaml
 
 REPO_DIR = Path(__file__).resolve().parent.parent
-SPEC_FILE = REPO_DIR / "share" / "librepcb" / "rpc" / "rpc.yaml"
+SPEC_FILE = REPO_DIR / "share" / "librepcb" / "rpc" / "rpc.yml"
 DOCS_FILE = REPO_DIR / "dev" / "doxygen" / "pages" / "rpc_api_reference.md"
 
 def render_type(type_spec):
@@ -130,7 +130,7 @@ def generate():
     lines.append(
         "This reference documents the commands (data types, error types, "
         "classes with their methods and events) which the RPC server offers. "
-        "It is generated from `share/librepcb/rpc/rpc.yaml`, the single "
+        "It is generated from `share/librepcb/rpc/rpc.yml`, the single "
         "source of truth of the API. The transport protocol (framing, "
         "handshake, conventions) is described in @ref doc_rpc_api.\n"
     )

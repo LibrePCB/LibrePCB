@@ -26,10 +26,13 @@
 #include "rpcrequest.h"
 #include "rpcserver.h"
 
+#include <librepcb/core/fileio/filepath.h>
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/schematic/schematic.h>
 #include <librepcb/core/types/uuid.h>
+#include <librepcb/core/workspace/workspace.h>
+#include <librepcb/core/workspace/workspacelibrarydb.h>
 
 /*******************************************************************************
  *  Namespace
@@ -125,6 +128,24 @@ QHash<QString, RpcServer::RpcHandler>
     request.sendSuccess(result);
   });
 
+  // Open a project by file path. If it's already open, nothing is changed
+  // and the summary of the already open project is returned.
+  registry.insert("Project.open", [](Request& request) {
+    const FilePath fp(request.getArgs().value("path").toString());
+    if (!fp.isExistingFile()) {
+      request.sendError(rs::RpcErrorCode::CommandFailed,
+                        "The project file does not exist.");
+      return;
+    }
+    auto editor = request.getApp().openProject(fp, nullptr);
+    if (!editor) {
+      request.sendError(rs::RpcErrorCode::CommandFailed,
+                        "Could not open the project.");
+      return;
+    }
+    request.sendSuccess(projectToVariant(*editor));
+  });
+
   // Get details about an open project.
   registry.insert("Project.get", [](Request& request) {
     ProjectEditor* editor = findProject(request);
@@ -183,6 +204,24 @@ QHash<QString, RpcServer::RpcHandler>
     }
     editor->getUndoStack().redo();  // Can throw.
     request.sendSuccess(undoStackToVariant(editor->getUndoStack()));
+  });
+
+  // Watch the workspace library database: While the request is pending,
+  // progress messages about library scans are sent. Cancelling the request
+  // stops the watch and finishes it (with a "cancelled" error reply).
+  registry.insert("WorkspaceDb.watch", [](Request& request) {
+    WorkspaceLibraryDb& db = request.getApp().getWorkspace().getLibraryDb();
+    request.sendProgress(db.getScanProgressPercent());
+    QObject::connect(&db, &WorkspaceLibraryDb::scanStarted, &request,
+                     [&request]() { request.sendProgress(0); });
+    QObject::connect(
+        &db, &WorkspaceLibraryDb::scanProgressUpdate, &request,
+        [&request](int percent) { request.sendProgress(percent); });
+    QObject::connect(&db, &WorkspaceLibraryDb::scanFinished, &request,
+                     [&request]() { request.sendProgress(100); });
+    QObject::connect(&request, &RpcRequest::cancelled, &request, [&request]() {
+      request.sendError(rs::RpcErrorCode::Cancelled);
+    });
   });
 
   return registry;

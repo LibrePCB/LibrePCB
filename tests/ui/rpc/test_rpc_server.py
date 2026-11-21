@@ -12,8 +12,6 @@ import time
 
 import umsgpack
 
-TOKEN = "librepcb-dev-token"
-
 # The default RPC server port (the letters "LP" interpreted as a
 # hexadecimal number: 0x4C50 = 19536). Keep in sync with DEFAULT_PORT in
 # `rust-core/src/rpc_server.rs`.
@@ -72,10 +70,11 @@ class RpcClient:
 # --- The tests --------------------------------------------------------------
 
 
-def test_rpc_server(librepcb):
+def test_rpc_server(librepcb, helpers):
     """
-    Smoke test for the RPC server: handshake, protocol-level methods,
-    commands with a real open project, error handling and pipelining.
+    Smoke test for the RPC server: handshake (interactive authentication
+    and token issuance), protocol-level methods, commands with a real open
+    project, error handling and pipelining.
     """
     librepcb.add_project("Empty Project")
     librepcb.set_project("Empty Project/Empty Project.lpp")
@@ -86,16 +85,69 @@ def test_rpc_server(librepcb):
         rpc = RpcClient(PORT)
         try:
             # --- Handshake -----------------------------------------------
-            error, result = rpc.request(1, "initialize", {"token": TOKEN})
-            assert error is None, f"initialize failed: {error!r}"
-            assert result["server"] == "librepcb" and type(result["server"])
-            assert isinstance(result["version"], str)
+            # The first connection has no token yet, so the user has to
+            # accept the connection interactively: The response is only
+            # sent after clicking the notification button.
+            rpc.send([0, 1, "initialize", {"name": "RPC Test"}])
+            notification = helpers.wait_for_notification(
+                app, "External RPC Connection Request"
+            )
+            notification.trigger()
+            message = rpc.receive()
+            assert message[0:2] == [1, 1], message
+            assert message[2] is None, message
+            result = message[3]
+            assert result["format"] == "1.0", result
+            assert result["server"] == "librepcb", result
+            assert isinstance(result["version"], str), result
             # Verify that we're connected to the expected application
             # instance (the port fallback could have chosen a different
             # port if a stale instance was still listening).
             assert result["workspace"] == librepcb.workspace_path.replace(
                 "\\", "/"
-            )
+            ), result
+            # A token was issued, to be used for future connections.
+            token = result["token"]
+            assert isinstance(token, str) and len(token) > 10, result
+
+            # A second connection can authenticate with the issued token,
+            # without any user interaction.
+            rpc2 = RpcClient(PORT)
+            try:
+                error, result = rpc2.request(2, "initialize", {"token": token})
+                assert error is None, f"initialize failed: {error!r}"
+                assert result["format"] == "1.0", result
+                assert result["server"] == "librepcb", result
+                assert result["token"] == token, result
+            finally:
+                rpc2.close()
+
+            # A token which was not issued by this application instance is
+            # rejected, and the connection stays unauthenticated.
+            rpc3 = RpcClient(PORT)
+            try:
+                rpc3.expect_error(1, "initialize", {"token": "invalid"}, 25)
+                error, result = rpc3.request(2, "ping", None)
+                assert error is not None and error["code"] == 21, error
+            finally:
+                rpc3.close()
+
+            # Cancelling a pending connection request denies access.
+            rpc4 = RpcClient(PORT)
+            try:
+                rpc4.send([0, 1, "initialize", {"name": "RPC Test"}])
+                helpers.wait_for_notification(
+                    app, "External RPC Connection Request"
+                )
+                rpc4.send([4, 1])
+                message = rpc4.receive()
+                assert message[0:2] == [1, 1], message
+                assert message[2]["code"] == 25, message
+                assert (
+                    message[2]["message"] == "Access request rejected or dismissed."
+                ), message
+            finally:
+                rpc4.close()
 
             # --- Protocol-level methods ----------------------------------
             error, result = rpc.request(2, "ping", None)

@@ -76,6 +76,12 @@ void RpcRequest::cancel() noexcept {
   }
 }
 
+void RpcRequest::sendProgress(float percent) noexcept {
+  QVariantMap value;
+  value["progress"] = std::clamp(percent / 100, float(0), float(1));
+  sendNotification(value);
+}
+
 void RpcRequest::sendNotification(const QVariant& payload) noexcept {
   if (!mReplied) {
     onNotification.notify(payload);

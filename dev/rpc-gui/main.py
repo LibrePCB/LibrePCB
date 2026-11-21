@@ -89,6 +89,28 @@ class Gui(ns.AppWindow):
         except OSError as e:
             self._log(f"Connection failed: {e}")
 
+    @slint.callback
+    def open_project(self):
+        if not self.client:
+            return
+        path = self.project_path.strip()
+        if not path:
+            self._log("No project path given.")
+            return
+        try:
+            self.client.call("Project.open", {"path": path})
+        except OSError as e:
+            self._log(f"Connection failed: {e}")
+
+    @slint.callback
+    def watch_clicked(self):
+        if not self.client:
+            return
+        try:
+            self.client.call("WorkspaceDb.watch", {})
+        except OSError as e:
+            self._log(f"Connection failed: {e}")
+
     def _log(self, msg):
         self._log_lines.append(msg)
         self._log_lines = self._log_lines[-100:]
@@ -108,6 +130,11 @@ class Gui(ns.AppWindow):
                 self.pending = False
                 self._log("Connection closed.")
                 return
+            if isinstance(msg, list) and len(msg) == 3 and msg[0] == 3:
+                payload = msg[2]
+                self.progress = payload.get("progress", 0) * 100
+                self._log(f"Progress: {self.progress}%")
+                continue
             if isinstance(msg, list) and len(msg) == 4 and msg[0] == 1:
                 msgid, error, result = msg[1], msg[2], msg[3]
                 if msgid == self.client.pending_msgid:
