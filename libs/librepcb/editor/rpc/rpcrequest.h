@@ -55,8 +55,18 @@ class RpcServer;
  *       request-scoped messages are sent through its public API, and the
  *       server is notified about the reply through the #onFinished signal
  *       (it removes the request from its pending-request registry then).
+ *
+ * @note The QObject base class does not serve the RPC internals, but
+ *       allows connecting asynchronous tasks (e.g. a long-running
+ *       operation which reports its progress) to a request: Qt signal/slot
+ *       connections then automatically marshal emissions from worker
+ *       threads to the GUI thread, and are dropped when the request is
+ *       destroyed. Since the request is created and also destroyed on the
+ *       GUI thread, Qt's thread affinity rules are fulfilled.
  */
-class RpcRequest final {
+class RpcRequest final : public QObject {
+  Q_OBJECT
+
 public:
   // Signals
 
@@ -67,9 +77,17 @@ public:
    * response was sent. The #RpcServer uses this to remove the request from
    * its pending-request registry, which may drop the last reference to
    * this object, destroying it.
+   *
+   * @note This is not a Qt signal, but uses our lightweight signal/slot
+   *       mechanism since it is a purely internal, same-thread
+   *       notification. Qt signal/slot is meant to be used only for
+   *       connections to external, asynchronous tasks.
    */
-  Signal<RpcRequest> onFinished;
-  typedef Slot<RpcRequest> OnFinishedSlot;
+  Signal<RpcRequest, bool, const QVariant&> onFinished;
+  typedef Slot<RpcRequest, bool, const QVariant&> OnFinishedSlot;
+
+  Signal<RpcRequest, const QVariant&> onNotification;
+  typedef Slot<RpcRequest, const QVariant&> OnNotificationSlot;
 
   // Constructors / Destructor
   RpcRequest() = delete;
@@ -104,7 +122,7 @@ public:
    * Called by the #RpcServer when the client cancelled this request. See
    * #isCancelled() for the cooperative cancellation semantics.
    */
-  void setCancelled() noexcept { mCancelled = true; }
+  void cancel() noexcept;
 
   /**
    * @brief Send a request-scoped message to the client (e.g. progress)
@@ -136,6 +154,9 @@ public:
    */
   void sendError(rs::RpcErrorCode code, const QString& message,
                  const QVariantMap& properties = QVariantMap()) noexcept;
+
+signals:
+  void cancelled();
 
 private:  // Methods
   /// Send the response and emit #onFinished (finishes the request).

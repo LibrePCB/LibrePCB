@@ -23,6 +23,8 @@
 #include "rpcserver.h"
 
 #include "../guiapplication.h"
+#include "../notification.h"
+#include "../notificationsmodel.h"
 
 #include <librepcb/core/application.h>
 #include <librepcb/core/exceptions.h>
@@ -60,6 +62,7 @@ RpcServer::RpcServer(GuiApplication& app) noexcept
     mApp(app),
     mPort(0),  // Will be initialized by construct()
     mHandle(construct(&onRequestCallback, &onCancelCallback, this, mPort)),
+    mRequestNotificationSlot(*this, &RpcServer::requestNotification),
     mRequestFinishedSlot(*this, &RpcServer::requestFinished) {
   mCommands.insert(
       "initialize",
@@ -67,6 +70,9 @@ RpcServer::RpcServer(GuiApplication& app) noexcept
   mCommands.insert(buildCommandRegistry());
   qInfo().nospace() << "RPC server is listening on 127.0.0.1, port " << mPort
                     << ".";
+}
+
+RpcServer::~RpcServer() noexcept {
 }
 
 /*******************************************************************************
@@ -80,20 +86,21 @@ void RpcServer::handleRequest(uint32_t connId, uint32_t msgId,
   // Note: The Rust server guarantees that params is either a map or nil.
   const auto request = std::make_shared<RpcRequest>(mApp, *this, connId, msgId,
                                                     method, args.toMap());
+  request->onNotification.attach(mRequestNotificationSlot);
   request->onFinished.attach(mRequestFinishedSlot);
   mPendingRequests.insert(requestKey(connId, msgId), request);
 
   // Look up the command handler.
-  const auto handler = mCommands.constFind(method);
-  if (handler == mCommands.constEnd()) {
+  const auto handler = mCommands.value(method);
+  if (!handler) {
     request->sendError(rs::RpcErrorCode::MethodNotFound,
                        QString("Method not found: %1").arg(method));
-    return;  // Do not keep request object.
+    return;
   }
 
   // Run the command handler.
   try {
-    handler.value()(*request);
+    handler(*request);
   } catch (const std::exception& e) {
     request->sendError(rs::RpcErrorCode::CommandFailed,
                        QString("Command failed: %1").arg(e.what()));
@@ -109,45 +116,63 @@ void RpcServer::handleCancel(uint32_t connId, uint32_t msgId) noexcept {
   // meantime (between marshalling and executing this call), so the lookup
   // may just fail — that's fine, then the work is already done.
   if (auto request = mPendingRequests.value(requestKey(connId, msgId))) {
-    request->setCancelled();
+    request->cancel();
   }
 }
 
 void RpcServer::handleInitialize(RpcRequest& request) noexcept {
-  const QVariant token = request.getArgs().value("token");
-  const bool authenticated = (token.toString() == "librepcb-dev-token");
-  rs::ffi_rpc_server_set_authenticated(*mHandle, request.getConnId(),
-                                       authenticated);
-  if (!authenticated) {
-    request.sendError(rs::RpcErrorCode::Unauthenticated,
-                      "Invalid or missing token");
-    return;
+  auto createResponse = [this]() {
+    QVariantMap result;
+    result.insert("server", "librepcb");
+    result.insert("version", Application::getVersion());
+    result.insert("workspace", mApp.getWorkspace().getPath().toStr());
+    return result;
+  };
+
+  if (request.getArgs().contains("token")) {
+    const QVariant token = request.getArgs().value("token");
+    const bool authenticated = (token.toString() == "librepcb-dev-token");
+    rs::ffi_rpc_server_set_authenticated(*mHandle, request.getConnId(),
+                                         authenticated);
+    if (authenticated) {
+      request.sendSuccess(createResponse());
+    } else {
+      request.sendError(rs::RpcErrorCode::Unauthenticated, "Invalid token.");
+    }
+  } else {
+    const QString clientName = request.getArgs().value("name").toString();
+    auto notification = std::make_shared<Notification>(
+        ui::NotificationType::Warning,
+        tr("External Application Wants to Connect"),
+        tr("An unknown external application, which identifies itself as '%1', "
+           "wants to connect through the RPC interface to this process for the "
+           "first time. Only accept this if this was invoked by yourself and "
+           "you trust that external application.")
+            .arg(clientName),
+        tr("Accept Connection"), QString(), true);
+    connect(notification.get(), &Notification::buttonClicked, &request,
+            [&request, createResponse]() {
+              request.sendSuccess(createResponse());
+            });
+    connect(&request, &RpcRequest::cancelled, notification.get(),
+            &Notification::dismiss);
+    connect(&request, &RpcRequest::destroyed, notification.get(),
+            &Notification::dismiss);
+    mApp.getNotifications().push(notification);
   }
-
-  QVariantMap result;
-  result.insert("server", "librepcb");
-  result.insert("version", Application::getVersion());
-  result.insert("workspace", mApp.getWorkspace().getPath().toStr());
-  request.sendSuccess(result);
 }
 
-void RpcServer::requestFinished(const RpcRequest& request) noexcept {
-  // Copy the IDs first: Removing the request from the registry drops the
-  // server's reference to it, which might be the last one, destroying the
-  // object while this method is still running.
-  const uint32_t connId = request.getConnId();
-  const uint32_t msgId = request.getMsgId();
-  mPendingRequests.remove(requestKey(connId, msgId));
+void RpcServer::requestNotification(const RpcRequest& request,
+                                    const QVariant& value) noexcept {
+  rs::ffi_rpc_server_notify(*mHandle, request.getConnId(), request.getMsgId(),
+                            &value);
 }
 
-void RpcServer::sendResponse(uint32_t connId, uint32_t msgId, bool ok,
-                             const QVariant& value) noexcept {
-  rs::ffi_rpc_server_reply(*mHandle, connId, msgId, ok, &value);
-}
-
-void RpcServer::sendNotification(uint32_t connId, uint32_t msgId,
-                                 const QVariant& payload) noexcept {
-  rs::ffi_rpc_server_notify(*mHandle, connId, msgId, &payload);
+void RpcServer::requestFinished(const RpcRequest& request, bool ok,
+                                const QVariant& value) noexcept {
+  rs::ffi_rpc_server_reply(*mHandle, request.getConnId(), request.getMsgId(),
+                           ok, &value);
+  mPendingRequests.remove(requestKey(request.getConnId(), request.getMsgId()));
 }
 
 // ATTENTION: This function is called from other threads (from Rust side)!

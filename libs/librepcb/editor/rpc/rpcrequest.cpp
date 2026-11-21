@@ -54,6 +54,7 @@ RpcRequest::RpcRequest(GuiApplication& app, RpcServer& server, uint32_t connId,
                        uint32_t msgId, const QString& method,
                        const QVariantMap& args) noexcept
   : onFinished(*this),
+    onNotification(*this),
     mApp(app),
     mServer(server),
     mConnId(connId),
@@ -68,36 +69,35 @@ RpcRequest::RpcRequest(GuiApplication& app, RpcServer& server, uint32_t connId,
  *  General Methods
  ******************************************************************************/
 
-void RpcRequest::sendNotification(const QVariant& payload) noexcept {
-  if (mReplied) {
-    return;
+void RpcRequest::cancel() noexcept {
+  if (!mReplied) {
+    mCancelled = true;
+    emit cancelled();
   }
-  mServer.sendNotification(mConnId, mMsgid, payload);
+}
+
+void RpcRequest::sendNotification(const QVariant& payload) noexcept {
+  if (!mReplied) {
+    onNotification.notify(payload);
+  }
 }
 
 void RpcRequest::sendSuccess(const QVariant& result) noexcept {
-  if (mReplied) {
-    return;  // A second reply is a bug in the command handler, ignore it.
-  }
   sendReply(true, result);
 }
 
 void RpcRequest::sendError(rs::RpcErrorCode code, const QString& message,
                            const QVariantMap& properties) noexcept {
-  if (mReplied) {
-    return;
-  }
   sendReply(false, errorToVariant(code, message, properties));
 }
 
 void RpcRequest::sendReply(bool ok, const QVariant& value) noexcept {
-  mReplied = true;
-  mServer.sendResponse(mConnId, mMsgid, ok, value);
-  // Note: The server removes its reference to this object when handling
-  // this signal, but the caller of sendSuccess()/sendError() always holds
-  // a reference too, so this object is never destroyed here. Anyway,
-  // nothing must be done after this call to keep this robust.
-  onFinished.notify();
+  if (!mReplied) {
+    mReplied = true;
+    onFinished.notify(ok, value);
+  } else {
+    qCritical() << "Attempted to respond multiple times to RPC request.";
+  }
 }
 
 /*******************************************************************************

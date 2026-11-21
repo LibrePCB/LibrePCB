@@ -77,14 +77,13 @@ class RpcServer final : public QObject {
 public:
   // Types
 
-  // Note: The RPC error codes are defined by the Rust server (see
-  // `RpcErrorCode` in `rust-core/src/rpc_server/protocol.rs`, exposed
-  // through `ffi.h` as `rs::RpcErrorCode`) and are used directly from
-  // there — no duplication.
-
   /// A command handler, executed on the GUI thread. It must reply the
   /// request (synchronously or asynchronously, see #RpcRequest).
   using RpcHandler = std::function<void(RpcRequest& request)>;
+
+  // Constructors / Destructor
+  RpcServer() = delete;
+  RpcServer(const RpcServer& other) = delete;
 
   /**
    * @brief Start the RPC server (listening on 127.0.0.1)
@@ -97,31 +96,7 @@ public:
    * @brief Stop the RPC server (must be called while the application is
    *        still fully alive, i.e. as the first step of the teardown)
    */
-  ~RpcServer() noexcept override = default;
-
-  /**
-   * @brief Get all registered command handlers, by method name
-   *
-   * @note This is a static method on purpose, i.e. it does not require an
-   *       application or a running server. It allows testing the registry
-   *       without launching the whole application.
-   */
-  static QHash<QString, RpcHandler> buildCommandRegistry() noexcept;
-
-  /**
-   * @brief Send the response for a request to the client
-   *
-   * Called by the #RpcRequest when it is replied. Never blocks. If the
-   * request is unknown or already replied, the response is silently
-   * dropped by the Rust server.
-   *
-   * @param connId  The connection ID of the request.
-   * @param msgId   The msg_id of the request.
-   * @param ok      Whether the value is a result or an error map.
-   * @param value   The result or error map.
-   */
-  void sendResponse(uint32_t connId, uint32_t msgId, bool ok,
-                    const QVariant& value) noexcept;
+  ~RpcServer() noexcept override;
 
   /**
    * @brief Send a request-scoped message (e.g. progress) to the client
@@ -151,9 +126,22 @@ private:  // Methods
   /// and reply with the application information.
   void handleInitialize(RpcRequest& request) noexcept;
 
+  void requestNotification(const RpcRequest& request,
+                           const QVariant& value) noexcept;
+
   /// Called by an #RpcRequest when it was replied: Remove it from the
   /// pending-request registry.
-  void requestFinished(const RpcRequest& request) noexcept;
+  void requestFinished(const RpcRequest& request, bool ok,
+                       const QVariant& value) noexcept;
+
+  /**
+   * @brief Get all registered command handlers, by method name
+   *
+   * @note This is a static method on purpose, i.e. it does not require an
+   *       application or a running server. It allows testing the registry
+   *       without launching the whole application.
+   */
+  static QHash<QString, RpcHandler> buildCommandRegistry() noexcept;
 
   /// Key for a pending request in the registry.
   static uint64_t requestKey(uint32_t connId, uint32_t msgId) noexcept {
@@ -177,11 +165,14 @@ private:  // Data
   /// The FFI handle of the (Rust implemented) server
   RustHandle<rs::RpcServer> mHandle;
 
-  /// Reacts on replied requests (removes them from the registry)
-  RpcRequest::OnFinishedSlot mRequestFinishedSlot;
-
   /// Pending (dispatched, not yet replied) requests, by connection+msgId
   QHash<uint64_t, std::shared_ptr<RpcRequest>> mPendingRequests;
+
+  // Slots
+  /// Reacts on pending request notifications
+  RpcRequest::OnNotificationSlot mRequestNotificationSlot;
+  /// Reacts on replied requests (removes them from the registry)
+  RpcRequest::OnFinishedSlot mRequestFinishedSlot;
 };
 
 /*******************************************************************************
