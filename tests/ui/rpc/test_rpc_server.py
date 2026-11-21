@@ -3,245 +3,16 @@
 
 """
 Test the RPC server (msgpack protocol, async dispatch)
+
+Uses the `u-msgpack-python` package for the MessagePack encoding.
 """
 
 import socket
-import struct
 import time
 
+import umsgpack
+
 TOKEN = "librepcb-dev-token"
-
-
-# --- Minimal MessagePack codec -------------------------------------------
-#
-# Intentionally implemented inline instead of depending on the `msgpack`
-# package: This way the test suite needs no additional dependency, and it
-# proves that the protocol is implementable from the specification alone.
-# Only the subset needed by the RPC protocol is supported.
-
-
-class _Incomplete(Exception):
-    """Raised when a buffer does not contain a complete msgpack value yet."""
-
-
-def _pack(value, out):
-    """Append the msgpack encoding of a value to a bytearray."""
-    if value is None:
-        out.append(0xC0)
-    elif value is True:
-        out.append(0xC3)
-    elif value is False:
-        out.append(0xC2)
-    elif isinstance(value, int):
-        if 0 <= value < 0x80:
-            out.append(value)
-        elif -0x20 <= value < 0:
-            out.append(0xE0 + 0x20 + value)
-        elif 0 <= value < 0x100:
-            out.append(0xCC)
-            out.append(value)
-        elif 0 <= value < 0x10000:
-            out.append(0xCD)
-            out.extend(value.to_bytes(2, "big"))
-        elif 0 <= value < 0x100000000:
-            out.append(0xCE)
-            out.extend(value.to_bytes(4, "big"))
-        elif 0 <= value < 0x10000000000000000:
-            out.append(0xCF)
-            out.extend(value.to_bytes(8, "big"))
-        elif -0x80 <= value < 0x80:
-            out.append(0xD0)
-            out.extend(value.to_bytes(1, "big", signed=True))
-        elif -0x8000 <= value < 0x8000:
-            out.append(0xD1)
-            out.extend(value.to_bytes(2, "big", signed=True))
-        elif -0x80000000 <= value < 0x80000000:
-            out.append(0xD2)
-            out.extend(value.to_bytes(4, "big", signed=True))
-        else:
-            out.append(0xD3)
-            out.extend(value.to_bytes(8, "big", signed=True))
-    elif isinstance(value, float):
-        out.append(0xCB)
-        out.extend(struct.pack(">d", value))
-    elif isinstance(value, str):
-        _pack_bytes(out, value.encode("utf-8"), 0xA0, 0x1F, 0xD9, 0xDA, 0xDB)
-    elif isinstance(value, bytes):
-        _pack_bytes(out, value, 0xC4, 0xFF, 0xC4, 0xC5, 0xC6)
-    elif isinstance(value, list):
-        if len(value) < 0x10:
-            out.append(0x90 | len(value))
-        elif len(value) < 0x10000:
-            out.append(0xDC)
-            out.extend(len(value).to_bytes(2, "big"))
-        else:
-            out.append(0xDD)
-            out.extend(len(value).to_bytes(4, "big"))
-        for item in value:
-            _pack(item, out)
-    elif isinstance(value, dict):
-        if len(value) < 0x10:
-            out.append(0x80 | len(value))
-        elif len(value) < 0x10000:
-            out.append(0xDE)
-            out.extend(len(value).to_bytes(2, "big"))
-        else:
-            out.append(0xDF)
-            out.extend(len(value).to_bytes(4, "big"))
-        for key, item in value.items():
-            _pack(key, out)
-            _pack(item, out)
-    else:
-        raise NotImplementedError(f"cannot pack {type(value)}")
-
-
-def _pack_bytes(out, data, fix_marker, fix_mask, m8, m16, m32):
-    """Pack a str or bytes value (fixstr/strN or binN)."""
-    if isinstance(data, str):
-        data = data.encode("utf-8")
-    if len(data) <= fix_mask:
-        out.append(fix_marker | len(data))
-        out.extend(data)
-    elif len(data) < 0x100:
-        out.append(m8)
-        out.append(len(data))
-        out.extend(data)
-    elif len(data) < 0x10000:
-        out.append(m16)
-        out.extend(len(data).to_bytes(2, "big"))
-        out.extend(data)
-    else:
-        out.append(m32)
-        out.extend(len(data).to_bytes(4, "big"))
-        out.extend(data)
-
-
-def _unpack(buf, pos):
-    """Decode one msgpack value, returning (value, new_pos)."""
-    if pos >= len(buf):
-        raise _Incomplete()
-    marker = buf[pos]
-    pos += 1
-    if marker <= 0x7F:  # positive fixint
-        return marker, pos
-    if marker >= 0xE0:  # negative fixint
-        return marker - 0x100, pos
-    if marker <= 0x8F:  # fixmap
-        return _unpack_map(buf, pos, marker & 0x0F)
-    if marker <= 0x9F:  # fixarray
-        return _unpack_array(buf, pos, marker & 0x0F)
-    if marker <= 0xBF:  # fixstr
-        return _unpack_str(buf, pos, marker & 0x1F)
-    if marker == 0xC0:
-        return None, pos
-    if marker == 0xC2:
-        return False, pos
-    if marker == 0xC3:
-        return True, pos
-    if marker == 0xC4:  # bin8
-        return _unpack_bin(buf, pos, _unpack_u8(buf, pos))
-    if marker == 0xC5:  # bin16
-        return _unpack_bin(buf, pos + 2, _unpack_u16(buf, pos))
-    if marker == 0xC6:  # bin32
-        return _unpack_bin(buf, pos + 4, _unpack_u32(buf, pos))
-    if marker == 0xCA:  # float32
-        data, pos = _unpack_raw(buf, pos, 4)
-        return struct.unpack(">f", data)[0], pos
-    if marker == 0xCB:  # float64
-        data, pos = _unpack_raw(buf, pos, 8)
-        return struct.unpack(">d", data)[0], pos
-    if marker == 0xCC:
-        return _unpack_u8(buf, pos), pos + 1
-    if marker == 0xCD:
-        return _unpack_u16(buf, pos), pos + 2
-    if marker == 0xCE:
-        return _unpack_u32(buf, pos), pos + 4
-    if marker == 0xCF:
-        return _unpack_u64(buf, pos), pos + 8
-    if marker == 0xD0:
-        data, _ = _unpack_raw(buf, pos, 1)
-        return struct.unpack(">b", data)[0], pos + 1
-    if marker == 0xD1:
-        data, _ = _unpack_raw(buf, pos, 2)
-        return struct.unpack(">h", data)[0], pos + 2
-    if marker == 0xD2:
-        data, _ = _unpack_raw(buf, pos, 4)
-        return struct.unpack(">i", data)[0], pos + 4
-    if marker == 0xD3:
-        data, _ = _unpack_raw(buf, pos, 8)
-        return struct.unpack(">q", data)[0], pos + 8
-    if marker == 0xD9:
-        return _unpack_str(buf, pos + 1, _unpack_u8(buf, pos))
-    if marker == 0xDA:
-        return _unpack_str(buf, pos + 2, _unpack_u16(buf, pos))
-    if marker == 0xDB:
-        return _unpack_str(buf, pos + 4, _unpack_u32(buf, pos))
-    if marker == 0xDC:
-        return _unpack_array(buf, pos + 2, _unpack_u16(buf, pos))
-    if marker == 0xDD:
-        return _unpack_array(buf, pos + 4, _unpack_u32(buf, pos))
-    if marker == 0xDE:
-        return _unpack_map(buf, pos + 2, _unpack_u16(buf, pos))
-    if marker == 0xDF:
-        return _unpack_map(buf, pos + 4, _unpack_u32(buf, pos))
-    raise ValueError(f"unsupported msgpack marker 0x{marker:02X}")
-
-
-def _unpack_raw(buf, pos, count):
-    if pos + count > len(buf):
-        raise _Incomplete()
-    return buf[pos : pos + count], pos + count
-
-
-def _unpack_u8(buf, pos):
-    if pos + 1 > len(buf):
-        raise _Incomplete()
-    return buf[pos]
-
-
-def _unpack_u16(buf, pos):
-    if pos + 2 > len(buf):
-        raise _Incomplete()
-    return int.from_bytes(buf[pos : pos + 2], "big")
-
-
-def _unpack_u32(buf, pos):
-    if pos + 4 > len(buf):
-        raise _Incomplete()
-    return int.from_bytes(buf[pos : pos + 4], "big")
-
-
-def _unpack_u64(buf, pos):
-    if pos + 8 > len(buf):
-        raise _Incomplete()
-    return int.from_bytes(buf[pos : pos + 8], "big")
-
-
-def _unpack_str(buf, pos, length):
-    data, pos = _unpack_raw(buf, pos, length)
-    return data.decode("utf-8"), pos
-
-
-def _unpack_bin(buf, pos, length):
-    data, pos = _unpack_raw(buf, pos, length)
-    return data, pos
-
-
-def _unpack_array(buf, pos, count):
-    items = []
-    for _ in range(count):
-        value, pos = _unpack(buf, pos)
-        items.append(value)
-    return items, pos
-
-
-def _unpack_map(buf, pos, count):
-    result = {}
-    for _ in range(count):
-        key, pos = _unpack(buf, pos)
-        value, pos = _unpack(buf, pos)
-        result[key] = value
-    return result, pos
 
 
 # --- A minimal RPC client ---------------------------------------------------
@@ -258,28 +29,23 @@ class RpcClient:
                 if time.time() > deadline:
                     raise
                 time.sleep(0.1)
-        self._buf = b""
+        self._file = self._sock.makefile("rb")
 
     def close(self):
+        self._file.close()
         self._sock.close()
 
     def send(self, value):
-        out = bytearray()
-        _pack(value, out)
-        self._sock.sendall(bytes(out))
+        self._sock.sendall(umsgpack.packb(value))
 
     def receive(self):
         """Read one message (blocking). Returns None on EOF."""
-        while True:
-            try:
-                value, pos = _unpack(self._buf, 0)
-                self._buf = self._buf[pos:]
-                return value
-            except _Incomplete:
-                chunk = self._sock.recv(4096)
-                if not chunk:
-                    return None
-                self._buf += chunk
+        if not self._file.peek(1):
+            return None
+        try:
+            return umsgpack.unpack(self._file)
+        except umsgpack.InsufficientDataException as e:
+            raise AssertionError(f"truncated message: {e}")
 
     def request(self, msgid, method, params):
         self.send([0, msgid, method, params])
@@ -352,21 +118,22 @@ def test_rpc_server(librepcb):
             assert len(projects) == 1
             project = projects[0]
             assert project["name"] == "Empty Project"
-            assert isinstance(project["uuid"], str)
-            for key in ["author", "version", "path", "modified"]:
+            # The object handle is opaque: it's taken from the response as-is
+            # and passed back unchanged, without inspecting it.
+            handle = project["obj"]
+            for key in ["uuid", "author", "version", "path", "modified"]:
                 assert key in project, f"missing key {key} in {project!r}"
-            uuid = project["uuid"]
 
             # Project.get → details with sheets & boards.
-            error, result = rpc.request(4, "Project.get", {"obj": uuid})
+            error, result = rpc.request(4, "Project.get", {"obj": handle})
             assert error is None
-            assert result["uuid"] == uuid
+            assert result["obj"] == handle
             assert isinstance(result["sheets"], list)
             assert isinstance(result["boards"], list)
 
             # UndoStack.get_status → the project was just opened, so the
             # stack is clean and there's nothing to undo.
-            error, result = rpc.request(5, "UndoStack.get_status", {"obj": uuid})
+            error, result = rpc.request(5, "UndoStack.get_status", {"obj": handle})
             assert error is None
             assert result == {
                 "canUndo": False,
@@ -377,7 +144,7 @@ def test_rpc_server(librepcb):
             }
 
             # UndoStack.undo on an empty stack → no-op, still a success.
-            error, result = rpc.request(6, "UndoStack.undo", {"obj": uuid})
+            error, result = rpc.request(6, "UndoStack.undo", {"obj": handle})
             assert error is None
             assert result["clean"] is True
 
@@ -399,7 +166,7 @@ def test_rpc_server(librepcb):
             message = rpc.receive()
             assert message[0:2] == [1, 9], message
             assert message[2]["code"] == 101, message
-            assert message[2]["project"] == "invalid-uuid", message
+            assert message[2]["message"] == "Project not open", message
             assert message[3] is None, message
 
             # Params outside the protocol's value domain (u64 > i64::MAX

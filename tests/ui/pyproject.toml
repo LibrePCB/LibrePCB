@@ -7,6 +7,7 @@ requires-python = ">=3.13"
 dependencies = [
     "pytest",
     "slint-testing",
+    "u-msgpack-python",
 ]
 
 # slint-testing is not public, see https://testing.slint.dev/

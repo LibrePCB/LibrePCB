@@ -101,7 +101,16 @@ Params & Conventions {#doc_rpc_api_params}
 The `params` of a request are a map (or nil, which means an empty map):
 The arguments are passed as named fields, plus the reserved key `"obj"`
 which carries the receiver handle for non-static methods (an argument may
-never be named `obj`). The handle type is documented per class.
+never be named `obj`).
+
+Object handles are **opaque values**: Clients obtain them from responses
+(embedded under the reserved key `"obj"` in maps which represent objects)
+and must pass them back unchanged where a receiver handle is required.
+Clients must not make any assumptions about the type or value of handles
+— the server may use any MessagePack type to represent an object, and the
+representation may change from command to command and from app version to
+app version. In the specification file, handles have the special type
+`handle`.
 
 Values are from the restricted MessagePack domain: null, bool, int (i64),
 float (f64), string, binary, array and map (with string keys). Enums are

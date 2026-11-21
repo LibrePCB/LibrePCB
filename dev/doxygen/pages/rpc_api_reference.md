@@ -17,6 +17,7 @@ A summary of an open project.
 
 | Name | Type | Description |
 |------|------|-------------|
+| `obj` | handle | The opaque handle of the project (to be passed back in the "obj" key of requests targeting this project). |
 | `uuid` | string | The project UUID (null if the project file contains an invalid UUID). |
 | `name` | string | The project name. |
 | `author` | string | The project author. |
@@ -34,6 +35,7 @@ Details about an open project.
 
 | Name | Type | Description |
 |------|------|-------------|
+| `obj` | handle | The opaque handle of the project (to be passed back in the "obj" key of requests targeting this project). |
 | `uuid` | string | The project UUID. |
 | `name` | string | The project name. |
 | `author` | string | The project author. |
@@ -120,13 +122,7 @@ The `error` element of a response is a map with the keys `code` and `message` (a
 
 **`CommandFailed`:** The command could not be executed, e.g. because it threw an exception. The message contains details about the failure.
 
-**`ProjectNotOpen`:** The requested project is not opened in the application.
-
-**Properties:**
-
-| Name | Type | Description |
-|------|------|-------------|
-| `project` | string | The requested project handle (UUID). |
+**`ProjectNotOpen`:** The requested project is not opened in the application (or the receiver handle is missing/invalid).
 
 **`Cancelled`:** The request was cancelled by the client and the command stopped its work when it could. Note that if the work already completed, the normal result is sent instead (exactly one response per request).
 
@@ -140,7 +136,7 @@ All commands below are dispatched to the application and executed on its GUI thr
 
 A project opened in the application.
 
-**Handle (obj):** The UUID of the open project (as returned by Project.list).
+**Handle (obj):** An opaque object handle for the project (as embedded in the responses).
 
 ### Project.list {#doc_rpc_api_method_Project_list}
 
@@ -186,7 +182,7 @@ None.
 
 The undo stack of an open project.
 
-**Handle (obj):** The UUID of the project whose undo stack to use.
+**Handle (obj):** An opaque object handle for the project whose undo stack to use (as embedded in the responses).
 
 ### UndoStack.get_status {#doc_rpc_api_method_UndoStack_get_status}
 

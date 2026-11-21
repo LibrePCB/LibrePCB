@@ -348,18 +348,13 @@ void RpcServer::handleRequest(uint64_t connId, uint32_t msgid,
   }
 
   // Extract the receiver handle ("obj" is a documented convention, see the
-  // API spec). It is passed to the handlers separately, so they never see
-  // it in their arguments.
-  QString obj;
+  // API spec). It is an *opaque* value which is passed to the handlers
+  // separately (so they never see it in their arguments) — only the
+  // handlers know how to interpret it.
+  QVariant obj;
   const auto objIt = args.constFind("obj");
   if (objIt != args.constEnd()) {
-    if (objIt.value().userType() == QMetaType::QString) {
-      obj = objIt.value().toString();
-    } else {
-      replyError(connId, msgid, rs::RpcErrorCode::InvalidParams,
-                 "The 'obj' parameter must be a string.");
-      return;
-    }
+    obj = objIt.value();
     args.erase(objIt);
   }
 

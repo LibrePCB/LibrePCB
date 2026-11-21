@@ -174,7 +174,7 @@ public:
   /// request (synchronously or asynchronously, see #Request).
   using RpcHandler =
       std::function<void(const QSharedPointer<Request>& request,
-                         const QString& obj, const QVariantMap& args)>;
+                         const QVariant& obj, const QVariantMap& args)>;
 
   // Constructors / Destructor
   RpcServer() = delete;

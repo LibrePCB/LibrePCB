@@ -18,10 +18,15 @@
 # Schema notes:
 # - Types are from the protocol's value domain: null, bool, int (i64),
 #   float (f64), string, binary, array, map (with string keys). A struct
-#   is a map with the listed fields.
+#   is a map with the listed fields. `handle` is a special type: an
+#   *opaque* object handle (see the class descriptions).
 # - The params of every method are a map. The reserved key "obj" carries
 #   the receiver handle for non-static methods — it is NOT listed in the
-#   params below.
+#   params below. Handles are opaque values: Clients obtain them from
+#   responses (embedded under the reserved "obj" key) and must pass them
+#   back unchanged, without making any assumptions about their type or
+#   value. The representation may change from command to command and from
+#   app version to app version.
 # - Numeric conventions: Lengths are in nanometers (i64), angles in
 #   microdegrees (i64), if not stated otherwise.
 
@@ -103,11 +108,8 @@ error_types:
     code: 101
     message: "Project not open"
     description: >-
-      The requested project is not opened in the application.
-    properties:
-      - name: project
-        type: string
-        description: The requested project handle (UUID).
+      The requested project is not opened in the application (or the
+      receiver handle is missing/invalid).
 
   - name: Cancelled
     code: 102
@@ -125,6 +127,9 @@ structs:
   - name: ProjectSummary
     description: A summary of an open project.
     fields:
+      - name: obj
+        type: handle
+        description: The opaque handle of the project (to be passed back in the "obj" key of requests targeting this project).
       - name: uuid
         type: string
         description: The project UUID (null if the project file contains an invalid UUID).
@@ -147,6 +152,9 @@ structs:
   - name: ProjectDetails
     description: Details about an open project.
     fields:
+      - name: obj
+        type: handle
+        description: The opaque handle of the project (to be passed back in the "obj" key of requests targeting this project).
       - name: uuid
         type: string
         description: The project UUID.
@@ -228,7 +236,7 @@ enums: []
 classes:
   - name: Project
     description: A project opened in the application.
-    handle: The UUID of the open project (as returned by Project.list).
+    handle: An opaque object handle for the project (as embedded in the responses).
     methods:
       - name: list
         static: true
@@ -253,7 +261,7 @@ classes:
 
   - name: UndoStack
     description: The undo stack of an open project.
-    handle: The UUID of the project whose undo stack to use.
+    handle: An opaque object handle for the project whose undo stack to use (as embedded in the responses).
     methods:
       - name: get_status
         description: Get the state of the project's undo stack.

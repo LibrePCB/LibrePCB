@@ -45,10 +45,15 @@ namespace {
  * @brief Serialize a project to a map
  *
  * @param editor  The project editor of the project to serialize.
+ *
+ * @note The map includes the reserved "obj" key with the object handle
+ *       of the project (an opaque value for clients, see the protocol
+ *       conventions).
  */
 QVariantMap projectToVariant(ProjectEditor& editor) {
   const Project& project = editor.getProject();
   QVariantMap map;
+  map.insert("obj", project.getUuid().toStr());
   map.insert("uuid", project.getUuid().toStr());
   map.insert("name", *project.getName());
   map.insert("author", project.getAuthor());
@@ -82,9 +87,9 @@ QVariantMap undoStackToVariant(const UndoStack& stack) {
  * @return The requested project editor, or nullptr if there is no such
  *         project open (or the handle is missing/invalid).
  */
-ProjectEditor* findProject(GuiApplication& app, const QString& obj) noexcept {
+ProjectEditor* findProject(GuiApplication& app, const QVariant& obj) noexcept {
   try {
-    const Uuid uuid = Uuid::fromString(obj);
+    const Uuid uuid = Uuid::fromString(obj.toString());
     for (const auto& editor : app.getProjects()) {
       if (editor->getProject().getUuid() == uuid) {
         return editor.get();
@@ -109,7 +114,7 @@ QHash<QString, RpcServer::RpcHandler>
 
   // List all open projects.
   registry.insert("Project.list",
-                  [](const QSharedPointer<Request>& request, const QString&,
+                  [](const QSharedPointer<Request>& request, const QVariant&,
                      const QVariantMap&) {
                     QVariantList projects;
                     for (const auto& editor : request->getApp().getProjects()) {
@@ -122,13 +127,12 @@ QHash<QString, RpcServer::RpcHandler>
 
   // Get details about an open project.
   registry.insert("Project.get",
-                  [](const QSharedPointer<Request>& request, const QString& obj,
-                     const QVariantMap&) {
+                  [](const QSharedPointer<Request>& request,
+                     const QVariant& obj, const QVariantMap&) {
                     ProjectEditor* editor = findProject(request->getApp(), obj);
                     if (!editor) {
-                      request->replyError(
-                          rs::RpcErrorCode::ProjectNotOpen, "Project not open",
-                          QVariantMap{{"project", QVariant(obj)}});
+                      request->replyError(rs::RpcErrorCode::ProjectNotOpen,
+                                          "Project not open");
                       return;
                     }
                     QVariantMap result = projectToVariant(*editor);
@@ -155,13 +159,12 @@ QHash<QString, RpcServer::RpcHandler>
   // Get the state of a project's undo stack.
   registry.insert(
       "UndoStack.get_status",
-      [](const QSharedPointer<Request>& request, const QString& obj,
+      [](const QSharedPointer<Request>& request, const QVariant& obj,
          const QVariantMap&) {
         ProjectEditor* editor = findProject(request->getApp(), obj);
         if (!editor) {
           request->replyError(rs::RpcErrorCode::ProjectNotOpen,
-                              "Project not open",
-                              QVariantMap{{"project", QVariant(obj)}});
+                              "Project not open");
           return;
         }
         request->replySuccess(undoStackToVariant(editor->getUndoStack()));
@@ -170,13 +173,12 @@ QHash<QString, RpcServer::RpcHandler>
   // Undo the last command of a project's undo stack.
   registry.insert(
       "UndoStack.undo",
-      [](const QSharedPointer<Request>& request, const QString& obj,
+      [](const QSharedPointer<Request>& request, const QVariant& obj,
          const QVariantMap&) {
         ProjectEditor* editor = findProject(request->getApp(), obj);
         if (!editor) {
           request->replyError(rs::RpcErrorCode::ProjectNotOpen,
-                              "Project not open",
-                              QVariantMap{{"project", QVariant(obj)}});
+                              "Project not open");
           return;
         }
         editor->getUndoStack().undo();  // Can throw.
@@ -186,13 +188,12 @@ QHash<QString, RpcServer::RpcHandler>
   // Redo the last undone command of a project's undo stack.
   registry.insert(
       "UndoStack.redo",
-      [](const QSharedPointer<Request>& request, const QString& obj,
+      [](const QSharedPointer<Request>& request, const QVariant& obj,
          const QVariantMap&) {
         ProjectEditor* editor = findProject(request->getApp(), obj);
         if (!editor) {
           request->replyError(rs::RpcErrorCode::ProjectNotOpen,
-                              "Project not open",
-                              QVariantMap{{"project", QVariant(obj)}});
+                              "Project not open");
           return;
         }
         editor->getUndoStack().redo();  // Can throw.

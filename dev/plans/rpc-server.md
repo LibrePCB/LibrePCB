@@ -47,7 +47,7 @@ Build directory: `build/agent` (per CLAUDE.md). No commits unless asked.
 | C++ boundary | Rust converts msgpack ↔ `QVariant` and passes values through the FFI (C++ never sees msgpack; ~18 trivial FFI helpers in `ffi.cpp`) |
 | Dispatch | **Asynchronous**: requests are handed off to the GUI thread via `Qt::QueuedConnection`; the GUI thread replies (and may emit progress) whenever it is ready |
 | Method naming | `ClassName.method_name` (classes are first-class entities in the spec; see section 2.3) |
-| Params | String-keyed map with a reserved `"obj"` key carrying the receiver handle (see section 2.4) |
+| Params | String-keyed map with a reserved `"obj"` key carrying the receiver handle — an *opaque* value (see section 2.4) |
 | Domain types | Plain integers (`Length` in nm, `Angle` in µdeg, …) and f64 — **forever**, no msgpack `ext` types |
 | Enums | Strings (self-describing; clients don't need the spec to display them) |
 | Spec / discovery | YAML spec file (`share/librepcb/rpc/rpc.yaml`) shipped with the app; **no `rpc.discover` method** — clients read the spec file and compare per-function `added_in_version` with the `appVersion` from `initialize` |
@@ -141,8 +141,15 @@ A request's `params` is a **string-keyed msgpack map**:
 - **Reserved key `"obj"`:** the receiver handle for member methods (the
   "this" pointer). For static methods it is absent. An argument may never
   be named `obj`.
-- The handle's type is defined per class in the spec (for now: the UUID
-  string of an open project).
+- **Handles are opaque:** The handle is an arbitrary value from the
+  protocol's value domain. Clients obtain handles from responses
+  (embedded under the reserved key `"obj"` in maps which represent
+  objects) and must pass them back unchanged, without making any
+  assumptions about their type or value — the representation may change
+  from command to command and from app version to app version. Neither
+  the documentation nor client libraries know anything about the handle
+  contents. In the specification file, handles have the special type
+  `handle`.
 - **`"obj"` is a *documented convention only*** — there is no code for it
   on the Rust side. The whole params map crosses the FFI as one `QVariant`
   (Rust never parses command content at all, not even `obj`); the C++
@@ -431,19 +438,13 @@ enums:
 
 error_types:
   - name: ProjectNotOpen
-    code: -32003
+    code: 101
     message: "Project not open"
-    properties:                # optional extra properties carried in
-      - name: project          # the error map next to code/message
-        type: string
-        description: The requested project UUID
 
 classes:
   - name: Project
     description: An open project
-    handle:
-      type: string
-      description: The UUID of the project
+    handle: An opaque object handle (embedded in the responses under the "obj" key).
     methods:
       - name: list             # static → no obj
         static: true
@@ -452,7 +453,7 @@ classes:
         result: {type: array, items: {type: ProjectSummary}}
         errors: []
         added_in_version: 2.1.0
-      - name: get              # member → obj = project UUID
+      - name: get              # member → obj = the project handle
         description: Get project details
         params: []
         result: {type: ProjectDetails}
@@ -514,9 +515,7 @@ plain hand-written page. No CI stale-check.
   socket client from the test, `initialize`, call commands, assert
   results — and thus implicitly verify the whole msgpack↔QVariant
   conversion, the async dispatch and the GUI-thread marshalling. The test
-  implements a minimal msgpack codec inline (no new dependency on the
-  `msgpack` Python package, and it proves the protocol is implementable
-  from the spec alone).
+  uses the `u-msgpack-python` package for the MessagePack encoding.
 
 ## 7. Milestones
 
