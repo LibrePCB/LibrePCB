@@ -1,0 +1,58 @@
+import {
+    Button,
+    LineEdit,
+    Spinner,
+    VerticalBox,
+    HorizontalBox,
+    TextEdit,
+} from "std-widgets.slint";
+
+export component AppWindow inherits Window {
+    title: "LibrePCB RPC GUI";
+    preferred-width: 1024px;
+    preferred-height: 800px;
+
+    in property <bool> connected;
+    in property <bool> pending;
+    in-out property <string> token;
+    in property <string> log: "Foo\nBar";
+
+    callback connect_clicked();
+    callback init_clicked();
+
+    VerticalBox {
+        HorizontalBox {
+            Button {
+                text: root.connected ? "Disconnect" : "Connect";
+                clicked => { root.connect_clicked(); }
+            }
+
+            LineEdit {
+                text <=> root.token;
+                placeholder-text: "Access Token";
+            }
+
+            Button {
+                text: root.pending ? "Cancel" : "Initialize";
+                enabled: root.connected;
+                clicked => { root.init_clicked(); }
+            }
+
+            Spinner {
+                indeterminate: true;
+                visible: root.pending;
+            }
+        }
+
+        TextEdit {
+            text: log;
+            font-family: "DejaVu Sans Mono";
+            font-size: 12px;
+            read-only: true;
+
+            changed text => {
+                self.viewport-y = self.visible-height - self.viewport-height
+            }
+        }
+    }
+}

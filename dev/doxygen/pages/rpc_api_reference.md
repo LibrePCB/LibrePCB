@@ -98,7 +98,7 @@ The `error` element of a response is a map with the keys `code` and `message` (a
 | `MessageDecodingFailed` {#doc_rpc_api_error_MessageDecodingFailed} | 10 | Message decoding failed |
 | `MessageTooLarge` {#doc_rpc_api_error_MessageTooLarge} | 11 | Message too large |
 | `InvalidRequest` {#doc_rpc_api_error_InvalidRequest} | 20 | Invalid Request |
-| `Unauthenticated` {#doc_rpc_api_error_Unauthenticated} | 21 | Invalid or missing token |
+| `Unauthenticated` {#doc_rpc_api_error_Unauthenticated} | 21 | Invalid token. |
 | `MethodNotFound` {#doc_rpc_api_error_MethodNotFound} | 22 | Method not found |
 | `InvalidParams` {#doc_rpc_api_error_InvalidParams} | 23 | Invalid params |
 | `InternalError` {#doc_rpc_api_error_InternalError} | 24 | Internal error |
@@ -112,7 +112,7 @@ The `error` element of a response is a map with the keys `code` and `message` (a
 
 **`InvalidRequest`:** The request doesn't conform to the message envelope.
 
-**`Unauthenticated`:** The connection is not authenticated. The first message of a connection must be an `initialize` request carrying the correct token.
+**`Unauthenticated`:** The connection is not authenticated. The first message of a connection must be an `initialize` request, either carrying the correct token or being accepted by the user interactively.
 
 **`MethodNotFound`:** The method does not exist or is not available, e.g. because it was added in a newer application version than the running one.
 

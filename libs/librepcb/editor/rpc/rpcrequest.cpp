@@ -95,8 +95,6 @@ void RpcRequest::sendReply(bool ok, const QVariant& value) noexcept {
   if (!mReplied) {
     mReplied = true;
     onFinished.notify(ok, value);
-  } else {
-    qCritical() << "Attempted to respond multiple times to RPC request.";
   }
 }
 

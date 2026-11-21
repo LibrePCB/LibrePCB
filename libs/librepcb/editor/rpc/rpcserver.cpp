@@ -28,6 +28,7 @@
 
 #include <librepcb/core/application.h>
 #include <librepcb/core/exceptions.h>
+#include <librepcb/core/types/uuid.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/rust-core/ffi.h>
 
@@ -121,39 +122,56 @@ void RpcServer::handleCancel(uint32_t connId, uint32_t msgId) noexcept {
 }
 
 void RpcServer::handleInitialize(RpcRequest& request) noexcept {
-  auto createResponse = [this]() {
+  const QString clientName =
+      request.getArgs().value("name").toString().simplified().left(32);
+  const QVariant token = request.getArgs().value("token");
+
+  auto createResponse = [this, clientName](QString token) {
+    static const Uuid session = Uuid::createRandom();
+
+    if (token.isEmpty()) {
+      token = Uuid::createRandom().toStr();
+      mAuthenticatedTokens.insert(token);
+      qInfo() << "RPC client" << clientName << "connected.";
+    }
+
     QVariantMap result;
+    result.insert("format", qlonglong(1));
     result.insert("server", "librepcb");
     result.insert("version", Application::getVersion());
+    result.insert("session", session.toStr());
     result.insert("workspace", mApp.getWorkspace().getPath().toStr());
+    result.insert("token", token);
     return result;
   };
 
-  if (request.getArgs().contains("token")) {
-    const QVariant token = request.getArgs().value("token");
-    const bool authenticated = (token.toString() == "librepcb-dev-token");
+  if (!token.isNull()) {
+    const bool authenticated = mAuthenticatedTokens.contains(token.toString());
     rs::ffi_rpc_server_set_authenticated(*mHandle, request.getConnId(),
                                          authenticated);
     if (authenticated) {
-      request.sendSuccess(createResponse());
+      request.sendSuccess(createResponse(token.toString()));
     } else {
-      request.sendError(rs::RpcErrorCode::Unauthenticated, "Invalid token.");
+      request.sendError(rs::RpcErrorCode::AccessDenied,
+                        "Invalid or revoked access token.");
     }
   } else {
-    const QString clientName =
-        request.getArgs().value("name").toString().simplified().left(32);
     auto notification = std::make_shared<Notification>(
-        ui::NotificationType::Warning,
-        tr("External Application Wants to Connect"),
-        tr("An unknown external application, which identifies itself as '%1', "
-           "wants to connect through the RPC interface to this process for the "
-           "first time. Only accept this if it was invoked by yourself and "
-           "you trust that external application.")
+        ui::NotificationType::Warning, tr("External RPC Connection Request"),
+        tr("An external application, which identifies itself as '%1', wants to "
+           "connect through the RPC interface to this process for the first "
+           "time. Only accept this if you trust that application and the "
+           "request was triggered by yourself.")
             .arg(clientName),
         tr("Accept Connection"), QString(), true);
     connect(notification.get(), &Notification::buttonClicked, &request,
             [&request, createResponse]() {
-              request.sendSuccess(createResponse());
+              request.sendSuccess(createResponse(QString()));
+            });
+    connect(notification.get(), &Notification::destroyed, &request,
+            [&request]() {
+              request.sendError(rs::RpcErrorCode::AccessDenied,
+                                "Access request denied.");
             });
     connect(&request, &RpcRequest::cancelled, notification.get(),
             &Notification::dismiss);

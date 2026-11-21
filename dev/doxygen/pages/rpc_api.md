@@ -36,20 +36,29 @@ response.
 Handshake {#doc_rpc_api_handshake}
 ---------
 
-The first message of a connection must be an `initialize` request carrying
-the authentication token. Any other first message leads to an error
-response (without being dispatched) and a wrong token is rejected as well
-— in both cases the connection stays open, but it stays unauthenticated.
+The first message of a connection must be an `initialize` request. Any
+other first message is answered with an error response (without being
+dispatched). There are two ways to authenticate:
 
-The success result is a map which contains the protocol version and some
-application information:
+- **With a token:** The params carry a `token` string. If it matches the
+  token known to the application, the connection is authenticated.
+  Otherwise the request is answered with an error (code 21) and the
+  connection stays open, but stays unauthenticated.
+- **Interactively:** The params carry a `name` string identifying the
+  client. The application asks the user whether to accept the connection
+  (via a notification). Only if the user accepts it, the connection is
+  authenticated. As long as the user has not answered, the request stays
+  pending without a response — the client may cancel it in the meantime
+  (which dismisses the user prompt) or just wait for the answer.
+
+The success result is a map with some application information:
 
 ~~~{.msgpack}
-[1, 1, nil, {"appVersion": "2.1.2", "pid": 1234,
-"protocolVersion": "1", "workspace": "~/LibrePCB-Workspace"}]
+[1, 1, nil, {"server": "librepcb", "version": "2.1.2",
+"workspace": "~/LibrePCB-Workspace"}]
 ~~~
 
-Clients use `appVersion` together with the per-method `added_in_version`
+Clients use `version` together with the per-method `added_in_version`
 from the specification file to determine which methods the server
 supports: Methods added after the revision of the client's specification
 are unknown to the client (calling them results in error code 22,

@@ -69,6 +69,8 @@ pub enum RpcErrorCode {
   InvalidParams = 23,
   /// Internal error.
   InternalError = 24,
+  /// Access denied.
+  AccessDenied = 25,
 
   // Application errors (100–).
   /// A command failed (application-specific error).

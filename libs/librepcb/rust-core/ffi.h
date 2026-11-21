@@ -171,6 +171,10 @@ enum class RpcErrorCode : int32_t {
    */
   InternalError = 24,
   /**
+   * Access denied.
+   */
+  AccessDenied = 25,
+  /**
    * A command failed (application-specific error).
    */
   CommandFailed = 100,

@@ -165,6 +165,8 @@ private:  // Data
   /// The FFI handle of the (Rust implemented) server
   RustHandle<rs::RpcServer> mHandle;
 
+  QSet<QString> mAuthenticatedTokens;
+
   /// Pending (dispatched, not yet replied) requests, by connection+msgId
   QHash<uint64_t, std::shared_ptr<RpcRequest>> mPendingRequests;
 

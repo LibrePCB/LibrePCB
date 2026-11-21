@@ -1,0 +1,42 @@
+version = 1
+revision = 3
+requires-python = ">=3.12"
+
+[[package]]
+name = "librepcb-rpc-gui"
+version = "0.1.0"
+source = { virtual = "." }
+dependencies = [
+    { name = "slint" },
+    { name = "u-msgpack-python" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "slint", specifier = "==1.17.1b2" },
+    { name = "u-msgpack-python", specifier = ">=2.8" },
+]
+
+[[package]]
+name = "slint"
+version = "1.17.1b2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/74/1a/24d2b224e72c26d70c2bcca1ca188657abcc8c4c19635a3ae60c628a199c/slint-1.17.1b2.tar.gz", hash = "sha256:de126057b48983cdf8527d7a7217738ba3bdfb0b01deb1681e2ec1d315c0ea56", size = 2629964, upload-time = "2026-07-15T15:20:31.955Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/cb/f2/562f29f13627efc1f495797b8f4097928cc6a5e4f416b60fe4d778d5e36d/slint-1.17.1b2-cp311-abi3-ios_13_0_arm64_iphoneos.whl", hash = "sha256:cb8e7977be7d063da245f1cdc91c19db32cd3c93ae92df70fd5b2ff4e0fef397", size = 13298303, upload-time = "2026-07-15T15:19:52.606Z" },
+    { url = "https://files.pythonhosted.org/packages/2e/8f/4871d2acc8c56c0df684904e4e383293f70d5a2abbd4b304c161787e6094/slint-1.17.1b2-cp311-abi3-ios_13_0_arm64_iphonesimulator.whl", hash = "sha256:f711b40c53d5c85db19bca767c3de198441141cfd8cf90879204de9b3e603b30", size = 13539678, upload-time = "2026-07-15T15:19:55.708Z" },
+    { url = "https://files.pythonhosted.org/packages/b0/ac/3bedfd3400572b7d341036f7e89e7ab353a7caf96cb1c0e206f4b4ed6d6d/slint-1.17.1b2-cp311-abi3-macosx_11_0_arm64.whl", hash = "sha256:2db83b5d7639e830c0d782e5e3b7f93ae8cf48d8849ed738fdcc05f544e25d72", size = 10659801, upload-time = "2026-07-15T15:19:58.679Z" },
+    { url = "https://files.pythonhosted.org/packages/30/74/0ad0941bbf734bc381f9d21053fb7a0413998f8489feb008e4e0422cb9db/slint-1.17.1b2-cp311-abi3-manylinux_2_31_aarch64.whl", hash = "sha256:a4b0d411e5f26ee590efb6723d289985db7d3fc803d2b020367149ab69ced48b", size = 15387449, upload-time = "2026-07-15T15:20:01.628Z" },
+    { url = "https://files.pythonhosted.org/packages/ae/9e/7d0c98389833d99c1c5dab7cb1d909f73ac4acab252153cdf53f42ed38f9/slint-1.17.1b2-cp311-abi3-manylinux_2_31_armv7l.whl", hash = "sha256:cccaf1a0f8f4363fee8a2ecb3b7f82df10b618c92393633a7b4eb6d1691ff147", size = 15204700, upload-time = "2026-07-15T15:20:05.902Z" },
+    { url = "https://files.pythonhosted.org/packages/78/a9/a6d304677abe466ecd3ec973fecb81e7c84180290d2f304e026770680f44/slint-1.17.1b2-cp311-abi3-manylinux_2_35_x86_64.whl", hash = "sha256:ac004b4c653d8dff00d68b075657b26fb1310fafd2559cbab659d2dbcdbadbdd", size = 15940834, upload-time = "2026-07-15T15:20:09.238Z" },
+    { url = "https://files.pythonhosted.org/packages/e8/21/03be49a3a9d99b7f4e440c723f717d74071987f5b4b777ff4996ff700db1/slint-1.17.1b2-cp311-abi3-win_amd64.whl", hash = "sha256:68cbb5365a69b28b70e354e98fdc541f6584f3a41be79b336b4b70e8f280db29", size = 11909411, upload-time = "2026-07-15T15:20:12.592Z" },
+]
+
+[[package]]
+name = "u-msgpack-python"
+version = "2.9.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/cc/c2/8a6d3a0427d5d46aca3b617fa2ca1672d4b490555bd4bfd1375b5f84fe0d/u_msgpack_python-2.9.0.tar.gz", hash = "sha256:3f632940c2db108d71210795463e249b47e89a08eec0d54a5cdc1a202505ede9", size = 19659, upload-time = "2026-11-13T20:34:02.099Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/5b/41/c4e873946d95bbf0f52026c02872f6b50e09181889343b21d57801d83352/u_msgpack_python-2.9.0-py2.py3-none-any.whl", hash = "sha256:5e2d8b0dc37d03d1820d18326438dadd3b974954b03a03f7524f5ba1ed9213ff", size = 11896, upload-time = "2026-11-13T20:34:01.227Z" },
+]

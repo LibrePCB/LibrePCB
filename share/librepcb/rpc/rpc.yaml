@@ -10,7 +10,7 @@
 # Consumers:
 # - The documentation generator (dev/generate_rpc_api_docs.py).
 # - Client authors: Read this file to know which methods exist, and compare
-#   each method's `added_in_version` with the `appVersion` reported by the
+#   each method's `added_in_version` with the `version` reported by the
 #   server's `initialize` method to know which ones are available on a
 #   given server (functions added after the revision of your spec file are
 #   unknown to you, which is fine — calling them results in error -32601).
@@ -69,11 +69,11 @@ error_types:
 
   - name: Unauthenticated
     code: 21
-    message: "Invalid or missing token"
+    message: "Invalid token."
     description: >-
       The connection is not authenticated. The first message of a
-      connection must be an `initialize` request carrying the correct
-      token.
+      connection must be an `initialize` request, either carrying the
+      correct token or being accepted by the user interactively.
 
   - name: MethodNotFound
     code: 22

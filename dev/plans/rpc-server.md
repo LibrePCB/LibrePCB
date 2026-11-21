@@ -50,7 +50,7 @@ Build directory: `build/agent` (per CLAUDE.md). No commits unless asked.
 | Params | String-keyed map with a reserved `"obj"` key carrying the receiver handle — an *opaque* value (see section 2.4) |
 | Domain types | Plain integers (`Length` in nm, `Angle` in µdeg, …) and f64 — **forever**, no msgpack `ext` types |
 | Enums | Strings (self-describing; clients don't need the spec to display them) |
-| Spec / discovery | YAML spec file (`share/librepcb/rpc/rpc.yaml`) shipped with the app; **no `rpc.discover` method** — clients read the spec file and compare per-function `added_in_version` with the `appVersion` from `initialize` |
+| Spec / discovery | YAML spec file (`share/librepcb/rpc/rpc.yaml`) shipped with the app; **no `rpc.discover` method** — clients read the spec file and compare per-function `added_in_version` with the `version` from `initialize` |
 | Auth | Token handshake in `initialize` (hardcoded dev token until the instance registry lands, see section 9) |
 | Concurrency | std threads only, reader/writer thread pair per connection (no tokio, no mio) |
 | Events | Type-2 notifications broadcast to all clients (v2: `project_opened`, `project_closed`, `selection_changed`) |
@@ -166,18 +166,24 @@ A request's `params` is a **string-keyed msgpack map**:
 
 ### 2.5 Handshake & protocol-level methods
 
-- First message of a connection **must** be an `initialize` request:
-  params `{"token": "<opaque string>"}`. Wrong/missing token, or any other
-  first message → error response + immediate disconnect (a wrong token
-  after successful auth also disconnects).
-- Success result (a map): `{"protocolVersion": "1", "appVersion": "<app
-  version>", "pid": <int>, "workspace": "<path>"}`.
-  - `protocolVersion` is `"1"` — the msgpack protocol is the first
-    *released* protocol (the JSON-RPC implementation was never shipped).
-  - Clients use `appVersion` + the spec's per-function `added_in_version`
+- First message of a connection **must** be an `initialize` request. Any
+  other first message → error response, connection stays open but stays
+  unauthenticated. Two ways to authenticate:
+  - **With a token:** params `{"token": "<string>"}`. A wrong token →
+    error response (code 21), connection stays open.
+  - **Interactively:** params `{"name": "<client name>"}`. The app shows
+    a notification asking the user to accept the connection; only on
+    accept the request is replied (success). Until then the request stays
+    pending without a response — the client may cancel it (type 4), which
+    dismisses the user prompt.
+- Success result (a map): `{"server": "librepcb", "version": "<app
+  version>", "workspace": "<path>"}`.
+  - Clients use `version` + the spec's per-function `added_in_version`
     to determine availability: functions added after the revision of the
     client's spec are unknown to the client, which is fine (unknown
     method → RPC error).
+- `ping` is a protocol-level method (handled by the Rust server, no
+  dispatch): returns `{}`.
 - `ping` → empty map result.
 - **No `rpc.discover`** (dropped): the spec is a file, not a method.
 
