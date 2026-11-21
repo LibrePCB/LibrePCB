@@ -140,13 +140,14 @@ void RpcServer::handleInitialize(RpcRequest& request) noexcept {
       request.sendError(rs::RpcErrorCode::Unauthenticated, "Invalid token.");
     }
   } else {
-    const QString clientName = request.getArgs().value("name").toString();
+    const QString clientName =
+        request.getArgs().value("name").toString().simplified().left(32);
     auto notification = std::make_shared<Notification>(
         ui::NotificationType::Warning,
         tr("External Application Wants to Connect"),
         tr("An unknown external application, which identifies itself as '%1', "
            "wants to connect through the RPC interface to this process for the "
-           "first time. Only accept this if this was invoked by yourself and "
+           "first time. Only accept this if it was invoked by yourself and "
            "you trust that external application.")
             .arg(clientName),
         tr("Accept Connection"), QString(), true);
