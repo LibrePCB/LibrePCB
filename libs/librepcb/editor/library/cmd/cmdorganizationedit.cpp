@@ -65,7 +65,7 @@ void CmdOrganizationEdit::setLogoPng(const QByteArray& png) noexcept {
   mNewLogo = png;
 }
 
-void CmdOrganizationEdit::setUrl(const QUrl& url) noexcept {
+void CmdOrganizationEdit::setUrl(const std::optional<Url>& url) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewUrl = url;
 }

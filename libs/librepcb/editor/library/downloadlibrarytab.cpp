@@ -120,7 +120,7 @@ void DownloadLibraryTab::trigger(ui::TabAction a) noexcept {
         onDerivedUiDataChanged.notify();
 
         mDownload = std::make_unique<LibraryDownload>(
-            *mUrl, mDirectory, std::make_shared<QSemaphore>(1));
+            mUrl->toQUrl(), mDirectory, std::make_shared<QSemaphore>(1));
         connect(mDownload.get(), &LibraryDownload::progressState, this,
                 [this](const QString& state) {
                   mUiData.download_status = q2s(state);
@@ -165,9 +165,9 @@ void DownloadLibraryTab::validate() noexcept {
   mUrl = validateUrl(urlStr, mUiData.url_error, false);
 
   mUiData.url_suggestion = slint::SharedString();
-  if (mUrl && (!mUrl->toString().endsWith(".zip"))) {
+  if (mUrl && (!mUrl->toStr().endsWith(".zip"))) {
     auto urlWithSuffix = [this](const QString& suffix) {
-      QString url = mUrl->toString();
+      QString url = mUrl->toStr();
       while ((!url.isEmpty()) && (url.endsWith("/"))) {
         url.chop(1);
       }
@@ -175,10 +175,11 @@ void DownloadLibraryTab::validate() noexcept {
     };
 
     QString suggestion;
-    if (mUrl->host().toLower().contains("github")) {
+    if (mUrl->toQUrl().host().toLower().contains("github")) {
       suggestion = urlWithSuffix("/archive/refs/heads/master.zip");
-    } else if (mUrl->host().toLower().contains("gitlab")) {
-      const QString repo = mUrl->path().split("/", Qt::SkipEmptyParts).last();
+    } else if (mUrl->toQUrl().host().toLower().contains("gitlab")) {
+      const QString repo =
+          mUrl->toQUrl().path().split("/", Qt::SkipEmptyParts).last();
       suggestion = urlWithSuffix("/-/archive/master/" % repo % "-master.zip");
     }
     mUiData.url_suggestion = q2s(QUrl(suggestion).toString());
@@ -187,7 +188,7 @@ void DownloadLibraryTab::validate() noexcept {
   QString left = urlStr.left(urlStr.indexOf(SUFFIX, Qt::CaseInsensitive));
   QString libName = left.right(left.length() - left.lastIndexOf("/"));
   if (libName == urlStr) {
-    libName = mUrl ? mUrl->fileName() : QString();
+    libName = mUrl ? mUrl->toQUrl().fileName() : QString();
   }
   libName.remove("-master");
   libName.remove("-main");

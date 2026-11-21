@@ -27,10 +27,13 @@
 #include "../attribute/attributetype.h"
 #include "../fileio/filepath.h"
 #include "../library/resource.h"
+#include "../types/url.h"
 #include "../types/uuid.h"
 #include "../types/version.h"
 
 #include <QtCore>
+
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -106,7 +109,7 @@ public:
     Uuid uuid;
     QString name;
     QString description;
-    QUrl url;
+    std::optional<Url> url;
     int maxLayerCount;
   };
   enum class OutputJobKind : int {
@@ -128,7 +131,7 @@ public:
     QString description;
     Version version;
     QPixmap logo;
-    QUrl url;
+    std::optional<Url> url;
     QString country;
     QStringList fabs;
     QStringList shipping;

@@ -167,16 +167,16 @@ void PartInformationProvider::PartInformation::serialize(
     root.appendChild("availability", *availability);
     root.ensureLineBreak();
   }
-  if (!productUrl.isEmpty()) {
-    root.appendChild("product_url", productUrl);
+  if (productUrl) {
+    root.appendChild("product_url", *productUrl);
     root.ensureLineBreak();
   }
-  if (!pictureUrl.isEmpty()) {
-    root.appendChild("picture_url", pictureUrl);
+  if (pictureUrl) {
+    root.appendChild("picture_url", *pictureUrl);
     root.ensureLineBreak();
   }
-  if (!pricingUrl.isEmpty()) {
-    root.appendChild("pricing_url", pricingUrl);
+  if (pricingUrl) {
+    root.appendChild("pricing_url", *pricingUrl);
     root.ensureLineBreak();
   }
   for (auto it = prices.begin(); it != prices.end(); it++) {
@@ -211,13 +211,13 @@ void PartInformationProvider::PartInformation::load(const SExpression& node) {
     results = deserialize<int>(*e);
   }
   if (const SExpression* e = node.tryGetChild("product_url/@0")) {
-    productUrl = deserialize<QUrl>(*e);
+    productUrl = Url::tryFromString(e->getValue(), QUrl::TolerantMode, true);
   }
   if (const SExpression* e = node.tryGetChild("picture_url/@0")) {
-    pictureUrl = deserialize<QUrl>(*e);
+    pictureUrl = Url::tryFromString(e->getValue(), QUrl::TolerantMode, true);
   }
   if (const SExpression* e = node.tryGetChild("pricing_url/@0")) {
-    pricingUrl = deserialize<QUrl>(*e);
+    pricingUrl = Url::tryFromString(e->getValue(), QUrl::TolerantMode, true);
   }
   if (const SExpression* e = node.tryGetChild("status/@0")) {
     status = e->getValue();
@@ -230,10 +230,12 @@ void PartInformationProvider::PartInformation::load(const SExpression& node) {
                   deserialize<Length>(child->getChild("price/@0")).toMm());
   }
   foreach (const SExpression* child, node.getChildren("resource")) {
-    resources.append(
-        PartResource{child->getChild("name/@0").getValue(),
-                     child->getChild("media_type/@0").getValue(),
-                     deserialize<QUrl>(child->getChild("url/@0"))});
+    if (const auto url = Url::tryFromString(
+            child->getChild("url/@0").getValue(), QUrl::TolerantMode, true)) {
+      resources.append(PartResource{child->getChild("name/@0").getValue(),
+                                    child->getChild("media_type/@0").getValue(),
+                                    *url});
+    }
   }
 }
 
@@ -479,9 +481,12 @@ void PartInformationProvider::partsInformationReceived(
     info->mpn = part.mpn;
     info->manufacturer = part.manufacturer;
     info->results = partObj["results"].toInt();
-    info->productUrl = partObj["product_url"].toString();
-    info->pictureUrl = partObj["picture_url"].toString();
-    info->pricingUrl = partObj["pricing_url"].toString();
+    info->productUrl = Url::tryFromString(partObj["product_url"].toString(),
+                                          QUrl::TolerantMode, true);
+    info->pictureUrl = Url::tryFromString(partObj["picture_url"].toString(),
+                                          QUrl::TolerantMode, true);
+    info->pricingUrl = Url::tryFromString(partObj["pricing_url"].toString(),
+                                          QUrl::TolerantMode, true);
     info->status = partObj["status"].toString();
     const int availability = partObj["availability"].toInt(INT_MIN);
     if (availability != INT_MIN) {
@@ -494,11 +499,14 @@ void PartInformationProvider::partsInformationReceived(
     }
     const auto resourcesArray = partJson["resources"].toArray();
     for (const QJsonValue& resJson : resourcesArray) {
-      info->resources.append(PartResource{
-          resJson["name"].toString(),
-          resJson["mediatype"].toString(),
-          resJson["url"].toString(),
-      });
+      if (const auto url = Url::tryFromString(resJson["url"].toString(),
+                                              QUrl::TolerantMode, true)) {
+        info->resources.append(PartResource{
+            resJson["name"].toString(),
+            resJson["mediatype"].toString(),
+            *url,
+        });
+      }
     }
     mCache[part][info->source] = info;
     mCacheModified = true;

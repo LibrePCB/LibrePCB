@@ -577,12 +577,9 @@ std::optional<CircuitIdentifier> validateCircuitIdentifier(
   return val;
 }
 
-std::optional<QUrl> validateUrl(const QString& input,
-                                slint::SharedString& error,
-                                bool allowEmpty) noexcept {
-  const QUrl url = QUrl::fromUserInput(input.trimmed());
-  const std::optional<QUrl> val =
-      url.isValid() ? std::make_optional(url) : std::nullopt;
+std::optional<Url> validateUrl(const QString& input, slint::SharedString& error,
+                               bool allowEmpty) noexcept {
+  const std::optional<Url> val = Url::tryFromUserInput(input);
   if (val || (allowEmpty && input.trimmed().isEmpty())) {
     error = slint::SharedString();
     return val;

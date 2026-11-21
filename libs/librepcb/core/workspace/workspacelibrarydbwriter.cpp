@@ -468,7 +468,7 @@ int WorkspaceLibraryDbWriter::addPartAttribute(int partId,
 
 int WorkspaceLibraryDbWriter::addOrganization(
     int libId, const FilePath& fp, const Uuid& uuid, const Version& version,
-    bool deprecated, const QByteArray& logoPng, const QUrl& url,
+    bool deprecated, const QByteArray& logoPng, const std::optional<Url>& url,
     const QString& country, const QStringList& fabs,
     const QStringList& shipping, bool isSponsor, int priority) {
   QSqlQuery query = mDb.prepareQuery(
@@ -483,7 +483,7 @@ int WorkspaceLibraryDbWriter::addOrganization(
   query.bindValue(":version", version.toStr());
   query.bindValue(":deprecated", deprecated);
   query.bindValue(":logo_png", logoPng);
-  query.bindValue(":url", url);
+  query.bindValue(":url", url ? url->toStr() : QString());
   query.bindValue(":country", nonNull(country));
   query.bindValue(":fabs", nonNull(fabs.join(",")));
   query.bindValue(":shipping", nonNull(shipping.join(",")));
@@ -494,7 +494,7 @@ int WorkspaceLibraryDbWriter::addOrganization(
 
 int WorkspaceLibraryDbWriter::addOrganizationPcbDesignRules(
     int orgId, const Uuid& uuid, const QString& name,
-    const QString& description, const QUrl& url, int maxLayers) {
+    const QString& description, const std::optional<Url>& url, int maxLayers) {
   QSqlQuery query = mDb.prepareQuery(
       "INSERT INTO organization_pcb_design_rules "
       "(organization_id, uuid, name, description, url, max_layers) VALUES "
@@ -503,7 +503,7 @@ int WorkspaceLibraryDbWriter::addOrganizationPcbDesignRules(
   query.bindValue(":uuid", uuid.toStr());
   query.bindValue(":name", nonNull(name));
   query.bindValue(":description", nonNull(description));
-  query.bindValue(":url", url);
+  query.bindValue(":url", url ? url->toStr() : QString());
   query.bindValue(":max_layers", maxLayers);
   return mDb.insert(query);
 }
@@ -707,7 +707,7 @@ int WorkspaceLibraryDbWriter::addToCategory(const QString& elementsTable,
 int WorkspaceLibraryDbWriter::addResource(const QString& elementsTable,
                                           int elementId, const QString& name,
                                           const QString& mediaType,
-                                          const QUrl& url) {
+                                          const Url& url) {
   QSqlQuery query = mDb.prepareQuery(
       "INSERT INTO %elements_res "
       "(element_id, name, media_type, url) VALUES "
@@ -718,7 +718,7 @@ int WorkspaceLibraryDbWriter::addResource(const QString& elementsTable,
   query.bindValue(":element_id", elementId);
   query.bindValue(":name", nonNull(name));
   query.bindValue(":media_type", nonNull(mediaType));
-  query.bindValue(":url", url);
+  query.bindValue(":url", url.toStr());
   return mDb.insert(query);
 }
 

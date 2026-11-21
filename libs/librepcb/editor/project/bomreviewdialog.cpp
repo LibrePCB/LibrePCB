@@ -206,9 +206,9 @@ void BomReviewDialog::tableCellDoubleClicked(int row, int column) noexcept {
   if (auto item = mUi->tableWidget->item(row, column)) {
     const auto data =
         item->data(Qt::UserRole).value<PartInformationDelegate::Data>();
-    if (data.info && data.info->pricingUrl.isValid()) {
+    if (data.info && data.info->pricingUrl) {
       DesktopServices ds(mSettings);
-      ds.openWebUrl(data.info->pricingUrl);
+      ds.openWebUrl(data.info->pricingUrl->toQUrl());
     }
   }
 }

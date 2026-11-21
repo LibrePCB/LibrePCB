@@ -97,6 +97,7 @@ add_executable(
   core/types/signalroletest.cpp
   core/types/simplestringtest.cpp
   core/types/tagtest.cpp
+  core/types/urltest.cpp
   core/types/uuidtest.cpp
   core/types/versiontest.cpp
   core/utils/clipperhelperstest.cpp

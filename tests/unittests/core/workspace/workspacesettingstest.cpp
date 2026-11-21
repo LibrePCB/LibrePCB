@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include <gtest/gtest.h>
 #include <librepcb/core/application.h>
+#include <librepcb/core/types/url.h>
 #include <librepcb/core/types/version.h>
 #include <librepcb/core/utils/toolbox.h>
 #include <librepcb/core/workspace/colorrole.h>
@@ -94,11 +95,12 @@ TEST_F(WorkspaceSettingsTest, testLoadFromSExpression) {
   EXPECT_EQ(true, obj.useOpenGl.get());
   EXPECT_EQ(QStringList{"de_DE"}, obj.libraryLocaleOrder.get());
   EXPECT_EQ(QStringList{"IEC 60617"}, obj.libraryNormOrder.get());
-  EXPECT_EQ(
-      (QList<ApiEndpoint>{
-          ApiEndpoint{QUrl("https://api.librepcb.org"), true, false, true},
-      }),
-      obj.apiEndpoints.get());
+  EXPECT_EQ((QList<ApiEndpoint>{
+                ApiEndpoint{Url::fromString("https://api.librepcb.org",
+                                            QUrl::StrictMode, false),
+                            true, false, true},
+            }),
+            obj.apiEndpoints.get());
   EXPECT_EQ(QStringList{"firefox \"{{URL}}\""},
             obj.externalWebBrowserCommands.get());
   EXPECT_EQ(QStringList{"nautilus \"{{FILEPATH}}\""},
@@ -123,8 +125,10 @@ TEST_F(WorkspaceSettingsTest, testStoreAndLoad) {
   obj1.libraryLocaleOrder.set({"de_CH", "en_US"});
   obj1.libraryNormOrder.set({"foo", "bar"});
   obj1.apiEndpoints.set({
-      ApiEndpoint{QUrl("https://foo"), true, false, true},
-      ApiEndpoint{QUrl("https://bar"), false, true, false},
+      ApiEndpoint{Url::fromString("https://foo", QUrl::StrictMode, false),  //
+                  true, false, true},
+      ApiEndpoint{Url::fromString("https://bar", QUrl::StrictMode, false),  //
+                  false, true, false},
   });
   obj1.externalWebBrowserCommands.set({"foo", "bar"});
   obj1.externalFileManagerCommands.set({"file", "manager"});

@@ -33,6 +33,7 @@
 #include <librepcb/core/library/sym/symbolpin.h>
 #include <librepcb/core/types/alignment.h>
 #include <librepcb/core/types/layer.h>
+#include <librepcb/core/types/url.h>
 #include <librepcb/core/utils/clipperhelpers.h>
 #include <librepcb/core/utils/messagelogger.h>
 #include <librepcb/core/utils/tangentpathjoiner.h>
@@ -85,10 +86,11 @@ ResourceList KiCadTypeConverter::convertResources(
     const QList<KiCadProperty>& props) {
   ResourceList ret;
   if (auto prop = findProperty(props, "datasheet")) {
-    const QUrl url = prop->value.trimmed();
-    if (url.isValid() && (prop->value.length() > 1)) {  // Ignore "~"
+    const auto url =
+        Url::tryFromString(prop->value.trimmed(), QUrl::TolerantMode, true);
+    if (url && (prop->value.length() > 1)) {  // Ignore "~"
       ret.append(std::make_shared<Resource>(ElementName("Datasheet"),
-                                            "application/pdf", url));
+                                            "application/pdf", *url));
     }
   }
   return ret;

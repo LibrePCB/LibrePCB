@@ -25,6 +25,7 @@
  ******************************************************************************/
 #include "../serialization/serializableobjectlist.h"
 #include "../types/elementname.h"
+#include "../types/url.h"
 
 #include <QtCore>
 
@@ -60,18 +61,18 @@ public:
   Resource(const Resource& other) noexcept;
   explicit Resource(const SExpression& node);
   Resource(const ElementName& name, const QString& mimeType,
-           const QUrl& url) noexcept;
+           const Url& url) noexcept;
   ~Resource() noexcept;
 
   // Getters
   const ElementName& getName() const noexcept { return mName; }
   const QString& getMediaType() const noexcept { return mMediaType; }
-  const QUrl& getUrl() const noexcept { return mUrl; }
+  const Url& getUrl() const noexcept { return mUrl; }
 
   // Setters
   void setName(const ElementName& name) noexcept;
   void setMediaType(const QString& type) noexcept;
-  void setUrl(const QUrl& url) noexcept;
+  void setUrl(const Url& url) noexcept;
 
   // General Methods
 
@@ -92,7 +93,7 @@ public:
 private:  // Data
   ElementName mName;
   QString mMediaType;
-  QUrl mUrl;
+  Url mUrl;
 };
 
 /*******************************************************************************

@@ -88,7 +88,8 @@ void OrganizationsDbModel::refresh() noexcept {
         designRules->push_back(ui::OrganizationPcbDesignRulesDbData{
             q2s(rules.uuid.toStr()),  // UUID
             q2s(rules.name),  // Name
-            q2s(rules.url.toString()),  // URL
+            rules.url ? q2s(rules.url->toPrettyStr())
+                      : slint::SharedString(),  // URL
         });
       }
       mItems.push_back(ui::OrganizationDbData{

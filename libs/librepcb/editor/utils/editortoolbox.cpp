@@ -326,10 +326,10 @@ ResourceList EditorToolbox::getComponentResources(
     const std::optional<Uuid>& filterDev) noexcept {
   // Helper to skip duplicate URLs.
   ResourceList resources;
-  QSet<QUrl> urls;
+  QSet<Url> urls;
   auto addResources = [&](const ResourceList& list) {
     for (const Resource& res : list) {
-      if (res.getUrl().isValid() && (!urls.contains(res.getUrl()))) {
+      if (!urls.contains(res.getUrl())) {
         resources.append(std::make_shared<Resource>(res));
         urls.insert(res.getUrl());
       }
@@ -410,7 +410,7 @@ void EditorToolbox::addResourcesToMenu(const Workspace& ws, MenuBuilder& mb,
   for (const Resource& res : resources) {
     QString name = *res.getName();
     if (names.count(name) > 1) {
-      name += " (" % res.getUrl().fileName() % ")";
+      name += " (" % res.getUrl().toQUrl().fileName() % ")";
     }
     if (name.length() > 100) {
       name = name.left(97) + "…";
@@ -419,8 +419,8 @@ void EditorToolbox::addResourcesToMenu(const Workspace& ws, MenuBuilder& mb,
         new QAction(svgIcon(":/fa/solid/file-pdf.svg"), name % "...", &root);
     QObject::connect(a, &QAction::triggered, editor, [&ws, res, editor]() {
       DesktopServices::downloadAndOpenResourceAsync(
-          ws.getSettings(), *res.getName(), res.getMediaType(), res.getUrl(),
-          editor);
+          ws.getSettings(), *res.getName(), res.getMediaType(),
+          res.getUrl().toQUrl(), editor);
     });
     actions.append(a);
   }
@@ -436,7 +436,7 @@ void EditorToolbox::addResourcesToMenu(const Workspace& ws, MenuBuilder& mb,
                                               *part.getManufacturer()});
         if ((!part.getMpn()->isEmpty()) &&
             (!part.getManufacturer()->isEmpty()) &&
-            ((!info) || (info->resources.value(0).url.isValid())) &&
+            ((!info) || (!info->resources.isEmpty())) &&
             (!parts.contains(part)) && (actions.count() < 20)) {
           QAction* a = new QAction(
               svgIcon(":/fa/solid/magnifying-glass.svg"),
@@ -520,11 +520,10 @@ void EditorToolbox::searchAndOpenDatasheet(const Workspace& ws,
   auto openPartDatasheet =
       [&ws,
        parent](std::shared_ptr<PartInformationProvider::PartInformation> info) {
-        if (info && (!info->resources.isEmpty()) &&
-            (info->resources[0].url.isValid())) {
+        if (info && (!info->resources.isEmpty())) {
           DesktopServices::downloadAndOpenResourceAsync(
               ws.getSettings(), info->mpn, info->resources[0].mediaType,
-              info->resources[0].url, parent);
+              info->resources[0].url.toQUrl(), parent);
         } else {
           QMessageBox::information(
               parent, tr("No datasheet found"),

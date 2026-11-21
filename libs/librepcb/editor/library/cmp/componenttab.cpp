@@ -367,7 +367,7 @@ void ComponentTab::trigger(ui::TabAction a) noexcept {
       if (auto dbRes = mComponent->getResources().value(0)) {
         DesktopServices::downloadAndOpenResourceAsync(
             mApp.getWorkspace().getSettings(), *dbRes->getName(),
-            dbRes->getMediaType(), dbRes->getUrl(), getWindow());
+            dbRes->getMediaType(), dbRes->getUrl().toQUrl(), getWindow());
       }
       break;
     }
@@ -647,7 +647,7 @@ void ComponentTab::refreshUiData() noexcept {
   updateAgeDays(mComponent->getCreated());
 
   if (auto dbRes = mComponent->getResources().value(0)) {
-    mDatasheetUrl = q2s(dbRes->getUrl().toString());
+    mDatasheetUrl = q2s(dbRes->getUrl().toPrettyStr());
   } else {
     mDatasheetUrl = slint::SharedString();
   }
@@ -694,17 +694,16 @@ void ComponentTab::commitUiData() noexcept {
       const ElementName name(
           cleanElementName("Datasheet " % s2q(mName).trimmed()));
       const QString dbUrlStr = s2q(mDatasheetUrl).trimmed();
-      const QUrl dbUrl(dbUrlStr, QUrl::TolerantMode);
+      const auto dbUrl = Url::tryFromUserInput(dbUrlStr);
       std::shared_ptr<Resource> res = resources.value(0);
-      if ((dbUrl.isValid()) && (!res)) {
+      if (dbUrl && (!res)) {
         resources.append(
-            std::make_shared<Resource>(name, "application/pdf", dbUrl));
-      } else if ((!dbUrl.isValid()) && res) {
+            std::make_shared<Resource>(name, "application/pdf", *dbUrl));
+      } else if ((!dbUrl) && res) {
         resources.remove(res.get());
-      } else if ((dbUrl.isValid()) && res &&
-                 (dbUrlStr != res->getUrl().toString())) {
+      } else if (dbUrl && res && (dbUrlStr != res->getUrl().toPrettyStr())) {
         res->setName(name);
-        res->setUrl(dbUrl);
+        res->setUrl(*dbUrl);
       }
       cmd->setResources(resources);
     } catch (const Exception& e) {

@@ -25,8 +25,11 @@
  ******************************************************************************/
 #include "../../project/board/drc/boarddesignrulechecksettings.h"
 #include "../../serialization/serializablekeyvaluemap.h"
+#include "../../types/url.h"
 
 #include <QtCore>
+
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -46,7 +49,8 @@ public:
   OrganizationPcbDesignRules() noexcept = delete;
   OrganizationPcbDesignRules(
       const Uuid& uuid, const ElementName& name, const QString& description,
-      const QUrl& url, const BoardDesignRuleCheckSettings& settings) noexcept;
+      const std::optional<Url>& url,
+      const BoardDesignRuleCheckSettings& settings) noexcept;
   OrganizationPcbDesignRules(const OrganizationPcbDesignRules& other) noexcept;
   explicit OrganizationPcbDesignRules(const SExpression& node);
   ~OrganizationPcbDesignRules() noexcept;
@@ -57,7 +61,7 @@ public:
   const LocalizedDescriptionMap& getDescriptions() const noexcept {
     return mDescriptions;
   }
-  const QUrl& getUrl() const noexcept { return mUrl; }
+  const std::optional<Url>& getUrl() const noexcept { return mUrl; }
   BoardDesignRuleCheckSettings getDrcSettings(bool cleanOptions) const noexcept;
 
   // Setters
@@ -91,7 +95,7 @@ private:  // Data
   Uuid mUuid;
   LocalizedNameMap mNames;
   LocalizedDescriptionMap mDescriptions;
-  QUrl mUrl;
+  std::optional<Url> mUrl;
 
   // This dependency from the "library" sources to "project" sources is actually
   // violating our software architecture. It's not critical, but it would be

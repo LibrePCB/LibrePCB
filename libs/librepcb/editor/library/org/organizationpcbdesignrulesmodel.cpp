@@ -87,7 +87,7 @@ void OrganizationPcbDesignRulesModel::addItem() noexcept {
     auto list = mOrganization->getPcbDesignRules();
     list.append(OrganizationPcbDesignRules(
         Uuid::createRandom(), ElementName(cleanElementName(name)), QString(),
-        QUrl(), BoardDesignRuleCheckSettings()));
+        std::optional<Url>(), BoardDesignRuleCheckSettings()));
     setList(list);
   } catch (const Exception& e) {
     QMessageBox::critical(qApp->activeWindow(), "Error", e.getMsg());

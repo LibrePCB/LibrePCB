@@ -44,12 +44,11 @@ Resource::Resource(const SExpression& node)
   : onEdited(*this),
     mName(deserialize<ElementName>(node.getChild("@0"))),
     mMediaType(node.getChild("mediatype/@0").getValue()),
-    // Don't use deserialize<QUrl>() to avoid any exception thrown.
-    mUrl(node.getChild("url/@0").getValue(), QUrl::StrictMode) {
+    mUrl(deserialize<Url>(node.getChild("url/@0"))) {
 }
 
 Resource::Resource(const ElementName& name, const QString& mimeType,
-                   const QUrl& url) noexcept
+                   const Url& url) noexcept
   : onEdited(*this), mName(name), mMediaType(mimeType), mUrl(url) {
 }
 
@@ -74,7 +73,7 @@ void Resource::setMediaType(const QString& type) noexcept {
   }
 }
 
-void Resource::setUrl(const QUrl& url) noexcept {
+void Resource::setUrl(const Url& url) noexcept {
   if (url != mUrl) {
     mUrl = url;
     onEdited.notify(Event::UrlChanged);
@@ -89,7 +88,7 @@ void Resource::serialize(SExpression& root) const {
   root.appendChild(mName);
   root.appendChild("mediatype", mMediaType);
   root.ensureLineBreak();
-  root.appendChild("url", mUrl.toString(QUrl::PrettyDecoded));
+  root.appendChild("url", mUrl);
   root.ensureLineBreak();
 }
 

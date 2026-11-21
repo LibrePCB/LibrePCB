@@ -620,12 +620,6 @@ std::unique_ptr<SExpression> serialize(const QColor& obj) {
 }
 
 template <>
-std::unique_ptr<SExpression> serialize(const QUrl& obj) {
-  return SExpression::createString(
-      obj.isValid() ? obj.toString(QUrl::PrettyDecoded) : "");
-}
-
-template <>
 std::unique_ptr<SExpression> serialize(const QDateTime& obj) {
   if (!obj.isValid()) throw LogicError(__FILE__, __LINE__);
   return SExpression::createToken(obj.toUTC().toString(Qt::ISODate));
@@ -673,17 +667,6 @@ QColor deserialize(const SExpression& node) {
   } else {
     throw RuntimeError(__FILE__, __LINE__,
                        QString("Invalid color: '%1'").arg(node.getValue()));
-  }
-}
-
-template <>
-QUrl deserialize(const SExpression& node) {
-  const QUrl obj(node.getValue(), QUrl::StrictMode);
-  if (obj.isValid()) {
-    return obj;
-  } else {
-    throw RuntimeError(__FILE__, __LINE__,
-                       QString("Invalid URL: '%1'").arg(node.getValue()));
   }
 }
 

@@ -27,6 +27,7 @@
 
 #include <librepcb/core/fileio/filepath.h>
 #include <librepcb/core/types/elementname.h>
+#include <librepcb/core/types/url.h>
 #include <librepcb/core/types/version.h>
 
 #include <QtCore>
@@ -80,7 +81,7 @@ private:
   ui::CreateLibraryTabData mUiData;
   std::optional<ElementName> mName;
   std::optional<Version> mVersion;
-  std::optional<QUrl> mUrl;
+  std::optional<Url> mUrl;
   FilePath mDirectory;
 };
 

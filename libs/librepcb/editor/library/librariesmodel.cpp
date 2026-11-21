@@ -472,8 +472,9 @@ void LibrariesModel::requestOnlineLibraries(bool forceNoCache) noexcept {
   mOnlineLibsErrors.clear();
   for (const WorkspaceSettings::ApiEndpoint& ep :
        mWorkspace.getSettings().apiEndpoints.get()) {
-    if (ep.url.isValid() && ep.useForLibraries) {
-      std::shared_ptr<ApiEndpoint> repo = std::make_shared<ApiEndpoint>(ep.url);
+    if (ep.useForLibraries) {
+      std::shared_ptr<ApiEndpoint> repo =
+          std::make_shared<ApiEndpoint>(ep.url.toQUrl());
       connect(repo.get(), &ApiEndpoint::libraryListReceived, this,
               &LibrariesModel::onlineLibraryListReceived);
       connect(repo.get(), &ApiEndpoint::errorWhileFetchingLibraryList, this,

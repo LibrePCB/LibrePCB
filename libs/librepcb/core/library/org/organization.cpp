@@ -63,10 +63,7 @@ Organization::Organization(std::unique_ptr<TransactionalDirectory> directory,
   : LibraryBaseElement(getShortElementName(), getLongElementName(), true,
                        std::move(directory), root),
     mLogoPng(),  // Initialized below.
-    // Note: Don't use SExpression::getValueByPath<QUrl>() because it would
-    // throw an exception if the URL is empty, which is actually legal in this
-    // case.
-    mUrl(root.getChild("url/@0").getValue(), QUrl::StrictMode),
+    mUrl(deserialize<std::optional<Url>>(root.getChild("url/@0"))),
     mCountry(root.getChild("country/@0").getValue()),
     mFabs(root.getChild("fabs/@0").getValue().split(",")),
     mShipping(root.getChild("shipping/@0").getValue().split(",")),

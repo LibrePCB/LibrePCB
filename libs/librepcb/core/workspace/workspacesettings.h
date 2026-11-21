@@ -26,6 +26,7 @@
 #include "../exceptions.h"
 #include "../types/enums.h"
 #include "../types/lengthunit.h"
+#include "../types/url.h"
 #include "workspacesettingsitem_colorschemes.h"
 #include "workspacesettingsitem_genericvalue.h"
 #include "workspacesettingsitem_genericvaluelist.h"
@@ -64,7 +65,7 @@ class WorkspaceSettings final : public QObject {
 public:
   // Types
   struct ApiEndpoint {
-    QUrl url;
+    Url url;
     bool useForLibraries = false;  ///< Can be set on 0..n endpoints
     bool useForPartsInfo = false;  ///< Can be set on 0..1 endpoints
     bool useForOrder = false;  ///< Can be set on 0..1 endpoints

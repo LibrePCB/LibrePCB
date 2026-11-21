@@ -169,7 +169,8 @@ void PartInformationToolTip::showPart(
         QString(
             "<span style=\"font-size:large\"><b><a href=\"%1\" "
             "style=\"color:black\">%2</a></b></span>")
-            .arg(info->productUrl.toString(), info->mpn.toHtmlEscaped());
+            .arg(info->productUrl ? info->productUrl->toStr() : QString(),
+                 info->mpn.toHtmlEscaped());
     if (!info->manufacturer.isEmpty()) {
       header +=
           QString("&nbsp;&nbsp;%1").arg(info->manufacturer.toHtmlEscaped());
@@ -202,11 +203,11 @@ void PartInformationToolTip::showPart(
     foreach (const auto& resource, info->resources.mid(0, 2)) {
       details +=
           QString("<div>➤ <a href=\"%1\" style=\"color:black\">%2</a></div>")
-              .arg(resource.url.toString(), resource.name.toHtmlEscaped());
+              .arg(resource.url.toStr(), resource.name.toHtmlEscaped());
     }
     mUi->lblDetails->setText(details);
 
-    if (info->pricingUrl.isValid()) {
+    if (info->pricingUrl) {
       mUi->lblProviderLogo->setCursor(Qt::PointingHandCursor);
     } else {
       mUi->lblProviderLogo->unsetCursor();
@@ -243,8 +244,8 @@ bool PartInformationToolTip::eventFilter(QObject* watched,
     if ((watched == mUi->lblExpand) || (watched == mUi->lblSource)) {
       setSourceDetailsExpanded(mUi->lblSourceDetails->height() == 0, true);
     } else if ((watched == mUi->lblProviderLogo) && mPartInfo &&
-               mPartInfo->pricingUrl.isValid()) {
-      openUrl(mPartInfo->pricingUrl);
+               mPartInfo->pricingUrl) {
+      openUrl(mPartInfo->pricingUrl->toQUrl());
     }
   }
   if ((watched == parentWidget()) &&
@@ -276,8 +277,7 @@ void PartInformationToolTip::hideEvent(QHideEvent* e) noexcept {
  ******************************************************************************/
 
 void PartInformationToolTip::scheduleLoadPicture() noexcept {
-  if (mPartInfo && mPartInfo->pictureUrl.isValid() &&
-      (!mUi->lblPicture->isVisible())) {
+  if (mPartInfo && mPartInfo->pictureUrl && (!mUi->lblPicture->isVisible())) {
     mWaitingSpinner->show();
     startLoadPicture(true);
     mPictureDelayTimer->start(1000);
@@ -285,9 +285,9 @@ void PartInformationToolTip::scheduleLoadPicture() noexcept {
 }
 
 void PartInformationToolTip::startLoadPicture(bool onlyCache) noexcept {
-  if (mPartInfo && mPartInfo->pictureUrl.isValid() &&
-      (!mUi->lblPicture->isVisible())) {
-    NetworkRequest* request = new NetworkRequest(mPartInfo->pictureUrl);
+  if (mPartInfo && mPartInfo->pictureUrl && (!mUi->lblPicture->isVisible())) {
+    NetworkRequest* request =
+        new NetworkRequest(mPartInfo->pictureUrl->toQUrl());
     if (onlyCache) {
       // Immediately after showing the tooltip, only load the image from cache
       // to avoid extensive network load!
@@ -295,7 +295,7 @@ void PartInformationToolTip::startLoadPicture(bool onlyCache) noexcept {
     }
     request->setMinimumCacheTime(14 * 24 * 3600);  // 14 days
     const QString format =
-        mPartInfo->pictureUrl.fileName().split('.').last().toLower();
+        mPartInfo->pictureUrl->toQUrl().fileName().split('.').last().toLower();
     connect(
         request, &NetworkRequest::dataReceived, this,
         [this, onlyCache, format](const QByteArray& data) {
