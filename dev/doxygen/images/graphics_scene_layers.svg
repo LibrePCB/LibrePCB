@@ -1,0 +1,177 @@
+<?xml version='1.0' encoding='utf-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1030" viewBox="0 0 1440 1030">
+  <defs>
+    <pattern id="dots" width="20" height="20" patternUnits="userSpaceOnUse">
+      <circle cx="10" cy="10" r="2.2" fill="#7f93ad" />
+    </pattern>
+    <pattern id="checker" width="16" height="16" patternUnits="userSpaceOnUse">
+      <rect width="16" height="16" fill="#f6f8fb" />
+      <rect width="8" height="8" fill="#e4e9f0" />
+      <rect x="8" y="8" width="8" height="8" fill="#e4e9f0" />
+    </pattern>
+    <marker id="arrInk" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#222831" />
+    </marker>
+  </defs>
+  <rect width="1440" height="1030" fill="#ffffff" />
+  <text x="24.00" y="34.00" font-family="Segoe UI, Helvetica, Arial, DejaVu Sans, sans-serif" font-size="22" fill="#222831" font-weight="bold" text-anchor="start">Render layers: background, content and foreground</text>
+  <text x="24.00" y="56.00" font-family="Segoe UI, Helvetica, Arial, DejaVu Sans, sans-serif" font-size="13" fill="#555d6b" font-weight="normal" text-anchor="start">Exploded view of one frame. Numbers give the draw order. Checkerboard marks transparent pixels. Only the content layer is held in the pan cache.</text>
+  <line x1="250.00" y1="128.00" x2="250.00" y2="345.00" stroke="#aab4c3" stroke-width="1.1" stroke-dasharray="4 5" />
+  <line x1="770.00" y1="128.00" x2="770.00" y2="345.00" stroke="#aab4c3" stroke-width="1.1" stroke-dasharray="4 5" />
+  <line x1="620.00" y1="308.00" x2="620.00" y2="525.00" stroke="#aab4c3" stroke-width="1.1" stroke-dasharray="4 5" />
+  <line x1="100.00" y1="308.00" x2="100.00" y2="525.00" stroke="#aab4c3" stroke-width="1.1" stroke-dasharray="4 5" />
+  <line x1="250.00" y1="353.00" x2="250.00" y2="570.00" stroke="#aab4c3" stroke-width="1.1" stroke-dasharray="4 5" />
+  <line x1="770.00" y1="353.00" x2="770.00" y2="570.00" stroke="#aab4c3" stroke-width="1.1" stroke-dasharray="4 5" />
+  <line x1="620.00" y1="533.00" x2="620.00" y2="750.00" stroke="#aab4c3" stroke-width="1.1" stroke-dasharray="4 5" />
+  <line x1="100.00" y1="533.00" x2="100.00" y2="750.00" stroke="#aab4c3" stroke-width="1.1" stroke-dasharray="4 5" />
+  <polygon points="100.00,750.00 620.00,750.00 620.00,758.00 100.00,758.00" fill="#1c2531" stroke="#14202e" stroke-width="1.2" stroke-linejoin="round" />
+  <polygon points="250.00,570.00 100.00,750.00 100.00,758.00 250.00,578.00" fill="#232e3c" stroke="#14202e" stroke-width="1.2" stroke-linejoin="round" />
+  <g transform="matrix(1 0 -0.5 0.6 250 570)">
+    <rect width="520" height="300" fill="#2b3646" />
+    <rect width="520" height="300" fill="url(#dots)" />
+  </g>
+  <polygon points="250.00,570.00 770.00,570.00 620.00,750.00 100.00,750.00" fill="none" stroke="#14202e" stroke-width="2.2" stroke-linejoin="round" />
+  <polygon points="100.00,525.00 620.00,525.00 620.00,533.00 100.00,533.00" fill="#b9c5d6" stroke="#1f5fbf" stroke-width="1.2" stroke-linejoin="round" />
+  <polygon points="250.00,345.00 100.00,525.00 100.00,533.00 250.00,353.00" fill="#c7d1df" stroke="#1f5fbf" stroke-width="1.2" stroke-linejoin="round" />
+  <g transform="matrix(1 0 -0.5 0.6 250 345)">
+    <rect width="520" height="300" fill="url(#checker)" />
+    <polygon points="300,170 500,170 500,285 300,285" fill="#e0504a" fill-opacity="0.30" stroke="#e0504a" stroke-width="1.5" />
+    <polyline points="70,92 70,160 115,200 150,205" fill="none" stroke="#e0504a" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" />
+    <polyline points="155,80 205,80 215,70 256,70" fill="none" stroke="#e0504a" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" />
+    <polyline points="270,123 270,155 325,155 325,123" fill="none" stroke="#e0504a" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" />
+    <polyline points="150,205 235,205 262,232 380,232" fill="none" stroke="#3d7fd9" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" />
+    <rect x="55.0" y="68.0" width="30" height="24" rx="3" fill="#e0504a" stroke="#8f2a26" stroke-width="1" />
+    <rect x="125.0" y="68.0" width="30" height="24" rx="3" fill="#e0504a" stroke="#8f2a26" stroke-width="1" />
+    <rect x="256.0" y="59.0" width="28" height="22" rx="3" fill="#e0504a" stroke="#8f2a26" stroke-width="1" />
+    <rect x="256.0" y="101.0" width="28" height="22" rx="3" fill="#e0504a" stroke="#8f2a26" stroke-width="1" />
+    <rect x="311.0" y="59.0" width="28" height="22" rx="3" fill="#e0504a" stroke="#8f2a26" stroke-width="1" />
+    <rect x="311.0" y="101.0" width="28" height="22" rx="3" fill="#e0504a" stroke="#8f2a26" stroke-width="1" />
+    <circle cx="150.00" cy="205.00" r="12" fill="#f2c14e" />
+    <circle cx="150.00" cy="205.00" r="4.5" fill="#2b3646" />
+    <text x="105" y="52" font-family="Segoe UI, Helvetica, Arial, DejaVu Sans, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="#f2d675" stroke="#2b3646" stroke-width="3" paint-order="stroke" stroke-linejoin="round">R1</text>
+    <text x="297" y="42" font-family="Segoe UI, Helvetica, Arial, DejaVu Sans, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="#f2d675" stroke="#2b3646" stroke-width="3" paint-order="stroke" stroke-linejoin="round">U1</text>
+  </g>
+  <polygon points="250.00,345.00 770.00,345.00 620.00,525.00 100.00,525.00" fill="none" stroke="#1f5fbf" stroke-width="2.2" stroke-linejoin="round" />
+  <polygon points="100.00,300.00 620.00,300.00 620.00,308.00 100.00,308.00" fill="#d8c2a4" stroke="#d9801a" stroke-width="1.2" stroke-linejoin="round" />
+  <polygon points="250.00,120.00 100.00,300.00 100.00,308.00 250.00,128.00" fill="#e2cfb6" stroke="#d9801a" stroke-width="1.2" stroke-linejoin="round" />
+  <g transform="matrix(1 0 -0.5 0.6 250 120)">
+    <rect width="520" height="300" fill="url(#checker)" />
+    <line x1="19.00" y1="255.00" x2="71.00" y2="255.00" stroke="#6d7b90" stroke-width="2" />
+    <line x1="45.00" y1="229.00" x2="45.00" y2="281.00" stroke="#6d7b90" stroke-width="2" />
+    <rect x="40.5" y="250.5" width="9" height="9" fill="none" stroke="#6d7b90" stroke-width="2" />
+    <rect x="195" y="35" width="190" height="115" fill="#ffd84a" fill-opacity="0.30" stroke="#d9a800" stroke-width="2" stroke-dasharray="6 4" />
+    <line x1="373.00" y1="150.00" x2="397.00" y2="150.00" stroke="#ffffff" stroke-width="4.5" />
+    <line x1="385.00" y1="138.00" x2="385.00" y2="162.00" stroke="#ffffff" stroke-width="4.5" />
+    <line x1="373.00" y1="150.00" x2="397.00" y2="150.00" stroke="#1b2330" stroke-width="1.6" />
+    <line x1="385.00" y1="138.00" x2="385.00" y2="162.00" stroke="#1b2330" stroke-width="1.6" />
+    <line x1="200.00" y1="268.00" x2="470.00" y2="268.00" stroke="#f0a030" stroke-width="2.5" />
+    <line x1="200.00" y1="259.00" x2="200.00" y2="277.00" stroke="#f0a030" stroke-width="2" />
+    <line x1="227.00" y1="263.50" x2="227.00" y2="272.50" stroke="#f0a030" stroke-width="1.4" />
+    <line x1="254.00" y1="263.50" x2="254.00" y2="272.50" stroke="#f0a030" stroke-width="1.4" />
+    <line x1="281.00" y1="263.50" x2="281.00" y2="272.50" stroke="#f0a030" stroke-width="1.4" />
+    <line x1="308.00" y1="263.50" x2="308.00" y2="272.50" stroke="#f0a030" stroke-width="1.4" />
+    <line x1="335.00" y1="263.50" x2="335.00" y2="272.50" stroke="#f0a030" stroke-width="1.4" />
+    <line x1="362.00" y1="263.50" x2="362.00" y2="272.50" stroke="#f0a030" stroke-width="1.4" />
+    <line x1="389.00" y1="263.50" x2="389.00" y2="272.50" stroke="#f0a030" stroke-width="1.4" />
+    <line x1="416.00" y1="263.50" x2="416.00" y2="272.50" stroke="#f0a030" stroke-width="1.4" />
+    <line x1="443.00" y1="263.50" x2="443.00" y2="272.50" stroke="#f0a030" stroke-width="1.4" />
+    <line x1="470.00" y1="259.00" x2="470.00" y2="277.00" stroke="#f0a030" stroke-width="2" />
+    <circle cx="335" cy="268" r="5" fill="none" stroke="#f0a030" stroke-width="1.6" />
+    <text x="335.00" y="254.00" font-family="Segoe UI, Helvetica, Arial, DejaVu Sans, sans-serif" font-size="12" fill="#a35f00" font-weight="bold" text-anchor="middle" stroke="#ffffff" stroke-width="3.5" paint-order="stroke" stroke-linejoin="round">10.0 mm</text>
+  </g>
+  <polygon points="250.00,120.00 770.00,120.00 620.00,300.00 100.00,300.00" fill="none" stroke="#d9801a" stroke-width="2.2" stroke-linejoin="round" />
+  <circle cx="149.0" cy="210.0" r="12" fill="#d9801a" />
+  <text x="149.00" y="215.00" font-family="Segoe UI, Helvetica, Arial, DejaVu Sans, sans-serif" font-size="14" fill="#ffffff" font-weight="bold" text-anchor="middle">3</text>
+  <circle cx="149.0" cy="435.0" r="12" fill="#1f5fbf" />
+  <text x="149.00" y="440.00" font-family="Segoe UI, Helvetica, Arial, DejaVu Sans, sans-serif" font-size="14" fill="#ffffff" font-weight="bold" text-anchor="middle">2</text>
+  <circle cx="149.0" cy="660.0" r="12" fill="#37506f" />
+  <text x="149.00" y="665.00" font-family="Segoe UI, Helvetica, Arial, DejaVu Sans, sans-serif" font-size="14" fill="#ffffff" font-weight="bold" text-anchor="middle">1</text>
+  <circle cx="851" cy="151" r="11" fill="#d9801a" />
+  <text x="851.00" y="156.00" font-family="Segoe UI, Helvetica, Arial, DejaVu Sans, sans-serif" font-size="13" fill="#ffffff" font-weight="bold" text-anchor="middle">3</text>
+  <text x="870" y="156" font-family="'Segoe UI', Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="14.5px" fill="#222831" font-weight="bold" text-anchor="start" style="font-weight:bold;font-size:14.5px;font-family:'Segoe UI', Helvetica, Arial, 'DejaVu Sans', sans-serif;text-anchor:start;fill:#222831">Foreground (<tspan style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:14.5px;font-family:'Courier New';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal">renderForeground</tspan>)</text>
+  <text x="870" y="177" font-family="'Segoe UI', Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="12.5px" fill="#333a45" font-weight="normal" text-anchor="start">
+    <tspan x="870" y="177">Includes overlays painted directly each frame, over the cached content: origin cross,</tspan>
+    <tspan x="870" y="192.625">ruler, selection rectangle, cursor, scene rect marker and the optional gray-out</tspan>
+    <tspan x="870" y="208.25">tint. They follow the mouse and tool state, so they are never cached.</tspan>
+  </text>
+  <line x1="830.00" y1="151.00" x2="689.00" y2="210.00" stroke="#d9801a" stroke-width="1.6" />
+  <circle cx="689.00" cy="210.00" r="3.4" fill="#d9801a" />
+  <circle cx="851" cy="376" r="11" fill="#1f5fbf" />
+  <text x="851.00" y="381.00" font-family="Segoe UI, Helvetica, Arial, DejaVu Sans, sans-serif" font-size="13" fill="#ffffff" font-weight="bold" text-anchor="middle">2</text>
+  <text x="870" y="381" font-family="'Segoe UI', Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="14.5px" fill="#222831" font-weight="bold" text-anchor="start" style="font-weight:bold;font-size:14.5px;font-family:'Segoe UI', Helvetica, Arial, 'DejaVu Sans', sans-serif;text-anchor:start;fill:#222831">Content (<tspan style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:14.5px;font-family:'Courier New';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal">renderContent</tspan>)</text>
+  <text x="870" y="402" font-family="'Segoe UI', Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="12.5px" fill="#333a45" font-weight="normal" text-anchor="start">
+    <tspan x="870" y="402">Scene items: traces, pads, vias, planes, text and so on. These are rendered onto</tspan>
+    <tspan x="870" y="417.625">transparent pixels and stored in the cache ring. A pan reuses these pixels;</tspan>
+    <tspan x="870" y="433.25">zoom and content changes re-render them. This is the only layer the cache</tspan>
+    <tspan x="870" y="448.875">holds.</tspan>
+  </text>
+  <line x1="830.00" y1="376.00" x2="689.00" y2="435.00" stroke="#1f5fbf" stroke-width="1.6" />
+  <circle cx="689.00" cy="435.00" r="3.4" fill="#1f5fbf" />
+  <circle cx="851" cy="601" r="11" fill="#37506f" />
+  <text x="851.00" y="606.00" font-family="Segoe UI, Helvetica, Arial, DejaVu Sans, sans-serif" font-size="13" fill="#ffffff" font-weight="bold" text-anchor="middle">1</text>
+  <text x="870" y="606" font-family="'Segoe UI', Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="14.5px" fill="#222831" font-weight="bold" text-anchor="start" style="font-weight:bold;font-size:14.5px;font-family:'Segoe UI', Helvetica, Arial, 'DejaVu Sans', sans-serif;text-anchor:start;fill:#222831">Background (<tspan style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:14.5px;font-family:'Courier New';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal">renderBackground</tspan>)</text>
+  <text x="870" y="627" font-family="'Segoe UI', Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="12.5px" fill="#333a45" font-weight="normal" text-anchor="start">
+    <tspan x="870" y="627">Includes the background color and grid. Painted each frame from the view and grid</tspan>
+    <tspan x="870" y="642.625">settings, so changing them never invalidates the cache. Areas the cache has not</tspan>
+    <tspan x="870" y="658.25">rendered yet will show background and grid only.</tspan>
+  </text>
+  <line x1="830.00" y1="601.00" x2="689.00" y2="660.00" stroke="#37506f" stroke-width="1.6" />
+  <circle cx="689.00" cy="660.00" r="3.4" fill="#37506f" />
+  <text x="100.00" y="788.00" font-family="Segoe UI, Helvetica, Arial, DejaVu Sans, sans-serif" font-size="14" fill="#222831" font-weight="bold" text-anchor="start">Composed frame</text>
+  <g transform="translate(100 800) scale(0.62)">
+    <rect width="520" height="300" fill="#2b3646" />
+    <rect width="520" height="300" fill="url(#dots)" />
+    <polygon points="300,170 500,170 500,285 300,285" fill="#e0504a" fill-opacity="0.30" stroke="#e0504a" stroke-width="1.5" />
+    <polyline points="70,92 70,160 115,200 150,205" fill="none" stroke="#e0504a" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" />
+    <polyline points="155,80 205,80 215,70 256,70" fill="none" stroke="#e0504a" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" />
+    <polyline points="270,123 270,155 325,155 325,123" fill="none" stroke="#e0504a" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" />
+    <polyline points="150,205 235,205 262,232 380,232" fill="none" stroke="#3d7fd9" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" />
+    <rect x="55.0" y="68.0" width="30" height="24" rx="3" fill="#e0504a" stroke="#8f2a26" stroke-width="1" />
+    <rect x="125.0" y="68.0" width="30" height="24" rx="3" fill="#e0504a" stroke="#8f2a26" stroke-width="1" />
+    <rect x="256.0" y="59.0" width="28" height="22" rx="3" fill="#e0504a" stroke="#8f2a26" stroke-width="1" />
+    <rect x="256.0" y="101.0" width="28" height="22" rx="3" fill="#e0504a" stroke="#8f2a26" stroke-width="1" />
+    <rect x="311.0" y="59.0" width="28" height="22" rx="3" fill="#e0504a" stroke="#8f2a26" stroke-width="1" />
+    <rect x="311.0" y="101.0" width="28" height="22" rx="3" fill="#e0504a" stroke="#8f2a26" stroke-width="1" />
+    <circle cx="150.00" cy="205.00" r="12" fill="#f2c14e" />
+    <circle cx="150.00" cy="205.00" r="4.5" fill="#2b3646" />
+    <text x="105" y="52" font-family="Segoe UI, Helvetica, Arial, DejaVu Sans, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="#f2d675" stroke="#2b3646" stroke-width="3" paint-order="stroke" stroke-linejoin="round">R1</text>
+    <text x="297" y="42" font-family="Segoe UI, Helvetica, Arial, DejaVu Sans, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="#f2d675" stroke="#2b3646" stroke-width="3" paint-order="stroke" stroke-linejoin="round">U1</text>
+    <line x1="19.00" y1="255.00" x2="71.00" y2="255.00" stroke="#6d7b90" stroke-width="2" />
+    <line x1="45.00" y1="229.00" x2="45.00" y2="281.00" stroke="#6d7b90" stroke-width="2" />
+    <rect x="40.5" y="250.5" width="9" height="9" fill="none" stroke="#6d7b90" stroke-width="2" />
+    <rect x="195" y="35" width="190" height="115" fill="#ffd84a" fill-opacity="0.30" stroke="#d9a800" stroke-width="2" stroke-dasharray="6 4" />
+    <line x1="373.00" y1="150.00" x2="397.00" y2="150.00" stroke="#ffffff" stroke-width="4.5" />
+    <line x1="385.00" y1="138.00" x2="385.00" y2="162.00" stroke="#ffffff" stroke-width="4.5" />
+    <line x1="373.00" y1="150.00" x2="397.00" y2="150.00" stroke="#1b2330" stroke-width="1.6" />
+    <line x1="385.00" y1="138.00" x2="385.00" y2="162.00" stroke="#1b2330" stroke-width="1.6" />
+    <line x1="200.00" y1="268.00" x2="470.00" y2="268.00" stroke="#f0a030" stroke-width="2.5" />
+    <line x1="200.00" y1="259.00" x2="200.00" y2="277.00" stroke="#f0a030" stroke-width="2" />
+    <line x1="227.00" y1="263.50" x2="227.00" y2="272.50" stroke="#f0a030" stroke-width="1.4" />
+    <line x1="254.00" y1="263.50" x2="254.00" y2="272.50" stroke="#f0a030" stroke-width="1.4" />
+    <line x1="281.00" y1="263.50" x2="281.00" y2="272.50" stroke="#f0a030" stroke-width="1.4" />
+    <line x1="308.00" y1="263.50" x2="308.00" y2="272.50" stroke="#f0a030" stroke-width="1.4" />
+    <line x1="335.00" y1="263.50" x2="335.00" y2="272.50" stroke="#f0a030" stroke-width="1.4" />
+    <line x1="362.00" y1="263.50" x2="362.00" y2="272.50" stroke="#f0a030" stroke-width="1.4" />
+    <line x1="389.00" y1="263.50" x2="389.00" y2="272.50" stroke="#f0a030" stroke-width="1.4" />
+    <line x1="416.00" y1="263.50" x2="416.00" y2="272.50" stroke="#f0a030" stroke-width="1.4" />
+    <line x1="443.00" y1="263.50" x2="443.00" y2="272.50" stroke="#f0a030" stroke-width="1.4" />
+    <line x1="470.00" y1="259.00" x2="470.00" y2="277.00" stroke="#f0a030" stroke-width="2" />
+    <circle cx="335" cy="268" r="5" fill="none" stroke="#f0a030" stroke-width="1.6" />
+    <text x="335.00" y="254.00" font-family="Segoe UI, Helvetica, Arial, DejaVu Sans, sans-serif" font-size="12" fill="#a35f00" font-weight="bold" text-anchor="middle" stroke="#ffffff" stroke-width="3.5" paint-order="stroke" stroke-linejoin="round">10.0 mm</text>
+  </g>
+  <rect x="100" y="800" width="322.4" height="186.0" fill="none" stroke="#222831" stroke-width="2.2" />
+  <path d="M 300.0,762.0 V 796" stroke="#222831" stroke-width="2" fill="none" marker-end="url(#arrInk)" stroke-dasharray="7 4" />
+  <text x="314.00" y="792.00" font-family="Segoe UI, Helvetica, Arial, DejaVu Sans, sans-serif" font-size="12.5" fill="#333a45" font-weight="normal" text-anchor="start" font-style="italic">composed each frame</text>
+  <rect x="482.4" y="800" width="933.6" height="186.0" fill="#f6f8fb" stroke="#c5ced9" stroke-width="1.2" />
+  <text x="498.40" y="826.00" font-family="Segoe UI, Helvetica, Arial, DejaVu Sans, sans-serif" font-size="14" fill="#222831" font-weight="bold" text-anchor="start">Per frame</text>
+  <circle cx="508.4" cy="850" r="9" fill="#37506f" />
+  <text x="508.40" y="854.00" font-family="Segoe UI, Helvetica, Arial, DejaVu Sans, sans-serif" font-size="12" fill="#ffffff" font-weight="bold" text-anchor="middle">1</text>
+  <text x="528.40" y="854.00" font-family="Segoe UI, Helvetica, Arial, DejaVu Sans, sans-serif" font-size="13" fill="#333a45" font-weight="normal" text-anchor="start">Background is painted first.</text>
+  <circle cx="508.4" cy="876" r="9" fill="#1f5fbf" />
+  <text x="508.40" y="880.00" font-family="Segoe UI, Helvetica, Arial, DejaVu Sans, sans-serif" font-size="12" fill="#ffffff" font-weight="bold" text-anchor="middle">2</text>
+  <text x="528.40" y="880.00" font-family="Segoe UI, Helvetica, Arial, DejaVu Sans, sans-serif" font-size="13" fill="#333a45" font-weight="normal" text-anchor="start">Cached content is blended over it.</text>
+  <circle cx="508.4" cy="902" r="9" fill="#d9801a" />
+  <text x="508.40" y="906.00" font-family="Segoe UI, Helvetica, Arial, DejaVu Sans, sans-serif" font-size="12" fill="#ffffff" font-weight="bold" text-anchor="middle">3</text>
+  <text x="528.40" y="906.00" font-family="Segoe UI, Helvetica, Arial, DejaVu Sans, sans-serif" font-size="13" fill="#333a45" font-weight="normal" text-anchor="start">Foreground is painted last.</text>
+  <text x="498.40" y="936.00" font-family="Segoe UI, Helvetica, Arial, DejaVu Sans, sans-serif" font-size="12.5" fill="#333a45" font-weight="normal" text-anchor="start">All three layers use the same scene-to-device transform. The result is the Slint pixel buffer.</text>
+</svg>

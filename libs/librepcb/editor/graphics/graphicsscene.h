@@ -90,6 +90,11 @@ struct GraphicsSceneCursor {
 
 /**
  * @brief The GraphicsScene class
+ *
+ * Each rendered frame consists of three layers, in order: the Background, the
+ * Content, and the Foreground. 
+ *
+ * @see @ref doc_render_cache_layers
  */
 class GraphicsScene : public QGraphicsScene {
   Q_OBJECT
