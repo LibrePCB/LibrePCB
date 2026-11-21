@@ -88,8 +88,8 @@ def test_rpc_server(librepcb):
             # --- Handshake -----------------------------------------------
             error, result = rpc.request(1, "initialize", {"token": TOKEN})
             assert error is None, f"initialize failed: {error!r}"
-            assert isinstance(result["appVersion"], str)
-            assert isinstance(result["pid"], int)
+            assert result["server"] == "librepcb" and type(result["server"])
+            assert isinstance(result["version"], str)
             # Verify that we're connected to the expected application
             # instance (the port fallback could have chosen a different
             # port if a stale instance was still listening).

@@ -25,7 +25,7 @@
  ******************************************************************************/
 #include <librepcb/core/utils/rusthandle.h>
 #include <librepcb/rust-core/ffi.h>
-
+#include <librepcb/core/utils/signalslot.h>
 #include <QtCore>
 
 #include <functional>
@@ -96,12 +96,15 @@ public:
     Request(const Request& other) = delete;
     Request& operator=(const Request& rhs) = delete;
     Request(GuiApplication& app, RpcServer& server, uint32_t connId,
-            uint32_t msgId, QString method) noexcept;
+            uint32_t msgId, const QString& method,
+            const QVariantMap& args) noexcept;
     ~Request() noexcept;
 
     // Getters
     GuiApplication& getApp() noexcept { return mApp; }
+    uint32_t getConnId() const noexcept { return mConnId; }
     const QString& getMethod() const noexcept { return mMethod; }
+    const QVariantMap& getArgs() const noexcept { return mArgs; }
 
     /**
      * @brief Check whether the client cancelled this request
@@ -162,17 +165,17 @@ public:
   private:  // Data
     GuiApplication& mApp;
     RpcServer* mServer;  ///< Null once the server is being destroyed.
-    uint32_t mConnId;
-    uint32_t mMsgid;
-    QString mMethod;
+    const uint32_t mConnId;
+    const uint32_t mMsgid;
+    const QString mMethod;
+    const QVariantMap mArgs;
     bool mReplied;
     bool mCancelled;
   };
 
   /// A command handler, executed on the GUI thread. It must reply the
   /// request (synchronously or asynchronously, see #Request).
-  using RpcHandler =
-      std::function<void(Request& request, const QVariantMap& args)>;
+  using RpcHandler = std::function<void(Request& request)>;
 
   // Constructors / Destructor
   RpcServer() = delete;
@@ -207,25 +210,13 @@ private:  // Methods
   void handleRequest(uint32_t connId, uint32_t msgId, const QString& method,
                      const QVariant& args) noexcept;
 
-  /// Called on the GUI thread: Handle an `initialize` request — validate
-  /// the token, mark the connection as (un)authenticated on the Rust side
-  /// and reply with the application information.
-  void handleInitialize(uint32_t connId, uint32_t msgId,
-                        const QVariantMap& args) noexcept;
-
   /// Called on the GUI thread: Mark a pending request as cancelled.
   void handleCancel(uint32_t connId, uint32_t msgId) noexcept;
 
-  /// Reply a result directly, without creating a #Request object (used for
-  /// `initialize`). Normalizes the value first.
-  void replySuccess(uint32_t connId, uint32_t msgId,
-                    const QVariant& result) noexcept;
-
-  /// Reply an error directly, without creating a #Request object (e.g. for
-  /// invalid params or an unknown method). Exactly-once is enforced by the
-  /// Rust server, so this is safe even if the request was already replied.
-  void replyError(uint32_t connId, uint32_t msgId, rs::RpcErrorCode code,
-                  const QString& message) noexcept;
+  /// Called on the GUI thread: Handle an `initialize` request — validate
+  /// the token, mark the connection as (un)authenticated on the Rust side
+  /// and reply with the application information.
+  void handleInitialize(Request& request) noexcept;
 
   /// Key for a pending request in the registry.
   static uint64_t requestKey(uint32_t connId, uint32_t msgId) noexcept {

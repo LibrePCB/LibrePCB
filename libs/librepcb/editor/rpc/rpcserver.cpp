@@ -72,7 +72,10 @@ RpcServer::RpcServer(GuiApplication& app) noexcept
     mApp(app),
     mPort(0),  // Will be initialized by construct()
     mHandle(construct(&onRequestCallback, &onCancelCallback, this, mPort)) {
-  mCommands = buildCommandRegistry();
+  mCommands.insert(
+      "initialize",
+      std::bind(&RpcServer::handleInitialize, this, std::placeholders::_1));
+  mCommands.insert(buildCommandRegistry());
   qInfo().nospace() << "RPC server is listening on 127.0.0.1, port " << mPort
                     << ".";
 }
@@ -93,12 +96,14 @@ RpcServer::~RpcServer() noexcept {
 
 RpcServer::Request::Request(GuiApplication& app, RpcServer& server,
                             uint32_t connId, uint32_t msgId,
-                            QString method) noexcept
+                            const QString& method,
+                            const QVariantMap& args) noexcept
   : mApp(app),
     mServer(&server),
     mConnId(connId),
     mMsgid(msgId),
-    mMethod(std::move(method)),
+    mMethod(method),
+    mArgs(args),
     mReplied(false),
     mCancelled(false) {
 }
@@ -157,33 +162,23 @@ void RpcServer::Request::sendReply(bool ok, const QVariant& value) noexcept {
 void RpcServer::handleRequest(uint32_t connId, uint32_t msgId,
                               const QString& method,
                               const QVariant& args) noexcept {
-  const auto request =
-      std::make_shared<Request>(mApp, *this, connId, msgId, method);
-
-  // The `initialize` request is handled right here (not through the
-  // command registry, since it's a protocol-level method).
-  if (method == "initialize") {
-    handleInitialize(connId, msgId, args.toMap());
-    return;
-  }
+  // Create the request context and register it as pending.
+  // Note: The Rust server guarantees that params is either a map or nil.
+  const auto request = std::make_shared<Request>(mApp, *this, connId, msgId,
+                                                 method, args.toMap());
+  mPendingRequests.insert(requestKey(connId, msgId), request);
 
   // Look up the command handler.
   const auto handler = mCommands.constFind(method);
   if (handler == mCommands.constEnd()) {
-    replyError(connId, msgId, rs::RpcErrorCode::MethodNotFound,
-               QString("Method not found: %1").arg(method));
-    return;
+    request->sendError(rs::RpcErrorCode::MethodNotFound,
+                       QString("Method not found: %1").arg(method));
+    return; // Do not keep request object.
   }
 
-  // Create the request context and register it as pending.
-
-  mPendingRequests.insert(requestKey(connId, msgId), request);
+  // Run the command handler.
   try {
-    // The Rust server guarantees that params is either a map or nil.
-    handler.value()(*request, args.toMap());
-  } catch (const Exception& e) {
-    request->sendError(rs::RpcErrorCode::CommandFailed,
-                       QString("Command failed: %1").arg(e.getMsg()));
+    handler.value()(*request);
   } catch (const std::exception& e) {
     request->sendError(rs::RpcErrorCode::CommandFailed,
                        QString("Command failed: %1").arg(e.what()));
@@ -193,49 +188,32 @@ void RpcServer::handleRequest(uint32_t connId, uint32_t msgId,
   }
 }
 
-void RpcServer::handleInitialize(uint32_t connId, uint32_t msgId,
-                                 const QVariantMap& args) noexcept {
-  // Validate the token.
-  const QVariant token = args.value("token");
-  const bool authenticated = (token.userType() == QMetaType::QString) &&
-      (token.toString() == "librepcb-dev-token");
-  rs::ffi_rpc_server_set_authenticated(*mHandle, connId, authenticated);
-  if (authenticated) {
-    QVariantMap result;
-    result.insert("appVersion", Application::getVersion());
-    result.insert("pid",
-                  static_cast<qlonglong>(QCoreApplication::applicationPid()));
-    result.insert("workspace", mApp.getWorkspace().getPath().toStr());
-    replySuccess(connId, msgId, result);
-  } else {
-    replyError(connId, msgId, rs::RpcErrorCode::Unauthenticated,
-               "Invalid or missing token");
-  }
-}
-
 void RpcServer::handleCancel(uint32_t connId, uint32_t msgId) noexcept {
   // Note: The Rust server only forwards cancels for requests which are
   // still pending, but the request might have been replied in the
   // meantime (between marshalling and executing this call), so the lookup
   // may just fail — that's fine, then the work is already done.
-  const auto request = mPendingRequests.constFind(requestKey(connId, msgId));
-  if (request == mPendingRequests.constEnd()) {
+  if (auto request = mPendingRequests.value(requestKey(connId, msgId))) {
+    request->setCancelled();
+  }
+}
+
+void RpcServer::handleInitialize(Request& request) noexcept {
+  const QVariant token = request.getArgs().value("token");
+  const bool authenticated = (token.toString() == "librepcb-dev-token");
+  rs::ffi_rpc_server_set_authenticated(*mHandle, request.getConnId(),
+                                       authenticated);
+  if (!authenticated) {
+    request.sendError(rs::RpcErrorCode::Unauthenticated,
+                      "Invalid or missing token");
     return;
   }
-  request.value()->setCancelled();
-}
 
-void RpcServer::replySuccess(uint32_t connId, uint32_t msgId,
-                             const QVariant& result) noexcept {
-  // Reply directly, without a #Request object (used for `initialize`).
-  rs::ffi_rpc_server_reply(*mHandle, connId, msgId, true, &result);
-}
-
-void RpcServer::replyError(uint32_t connId, uint32_t msgId,
-                           rs::RpcErrorCode code,
-                           const QString& message) noexcept {
-  QVariant error = errorToVariant(code, message, QVariantMap());
-  rs::ffi_rpc_server_reply(*mHandle, connId, msgId, false, &error);
+  QVariantMap result;
+  result.insert("server", "librepcb");
+  result.insert("version", Application::getVersion());
+  result.insert("workspace", mApp.getWorkspace().getPath().toStr());
+  request.sendSuccess(result);
 }
 
 // ATTENTION: This function is called from other threads (from Rust side)!

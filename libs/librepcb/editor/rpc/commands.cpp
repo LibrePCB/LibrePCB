@@ -87,11 +87,11 @@ QVariantMap undoStackToVariant(const UndoStack& stack) {
  * @return The requested project editor, or nullptr if there is no such
  *         project open (or the handle is missing/invalid).
  */
-ProjectEditor* findProject(GuiApplication& app,
-                           const QVariantMap& args) noexcept {
+ProjectEditor* findProject(RpcServer::Request& request) noexcept {
   try {
-    const Uuid uuid = Uuid::fromString(args.value("obj").toString());
-    for (const auto& editor : app.getProjects()) {
+    const Uuid uuid =
+        Uuid::fromString(request.getArgs().value("obj").toString());
+    for (const auto& editor : request.getApp().getProjects()) {
       if (editor->getProject().getUuid() == uuid) {
         return editor.get();
       }
@@ -114,7 +114,7 @@ QHash<QString, RpcServer::RpcHandler>
   QHash<QString, RpcHandler> registry;
 
   // List all open projects.
-  registry.insert("Project.list", [](Request& request, const QVariantMap&) {
+  registry.insert("Project.list", [](Request& request) {
     QVariantList projects;
     for (const auto& editor : request.getApp().getProjects()) {
       projects.append(QVariant(projectToVariant(*editor)));
@@ -125,8 +125,8 @@ QHash<QString, RpcServer::RpcHandler>
   });
 
   // Get details about an open project.
-  registry.insert("Project.get", [](Request& request, const QVariantMap& args) {
-    ProjectEditor* editor = findProject(request.getApp(), args);
+  registry.insert("Project.get", [](Request& request) {
+    ProjectEditor* editor = findProject(request);
     if (!editor) {
       request.sendError(rs::RpcErrorCode::ProjectNotOpen, "Project not open");
       return;
@@ -153,42 +153,36 @@ QHash<QString, RpcServer::RpcHandler>
   });
 
   // Get the state of a project's undo stack.
-  registry.insert(
-      "UndoStack.get_status", [](Request& request, const QVariantMap& args) {
-        ProjectEditor* editor = findProject(request.getApp(), args);
-        if (!editor) {
-          request.sendError(rs::RpcErrorCode::ProjectNotOpen,
-                            "Project not open");
-          return;
-        }
-        request.sendSuccess(undoStackToVariant(editor->getUndoStack()));
-      });
+  registry.insert("UndoStack.get_status", [](Request& request) {
+    ProjectEditor* editor = findProject(request);
+    if (!editor) {
+      request.sendError(rs::RpcErrorCode::ProjectNotOpen, "Project not open");
+      return;
+    }
+    request.sendSuccess(undoStackToVariant(editor->getUndoStack()));
+  });
 
   // Undo the last command of a project's undo stack.
-  registry.insert(
-      "UndoStack.undo", [](Request& request, const QVariantMap& args) {
-        ProjectEditor* editor = findProject(request.getApp(), args);
-        if (!editor) {
-          request.sendError(rs::RpcErrorCode::ProjectNotOpen,
-                            "Project not open");
-          return;
-        }
-        editor->getUndoStack().undo();  // Can throw.
-        request.sendSuccess(undoStackToVariant(editor->getUndoStack()));
-      });
+  registry.insert("UndoStack.undo", [](Request& request) {
+    ProjectEditor* editor = findProject(request);
+    if (!editor) {
+      request.sendError(rs::RpcErrorCode::ProjectNotOpen, "Project not open");
+      return;
+    }
+    editor->getUndoStack().undo();  // Can throw.
+    request.sendSuccess(undoStackToVariant(editor->getUndoStack()));
+  });
 
   // Redo the last undone command of a project's undo stack.
-  registry.insert(
-      "UndoStack.redo", [](Request& request, const QVariantMap& args) {
-        ProjectEditor* editor = findProject(request.getApp(), args);
-        if (!editor) {
-          request.sendError(rs::RpcErrorCode::ProjectNotOpen,
-                            "Project not open");
-          return;
-        }
-        editor->getUndoStack().redo();  // Can throw.
-        request.sendSuccess(undoStackToVariant(editor->getUndoStack()));
-      });
+  registry.insert("UndoStack.redo", [](Request& request) {
+    ProjectEditor* editor = findProject(request);
+    if (!editor) {
+      request.sendError(rs::RpcErrorCode::ProjectNotOpen, "Project not open");
+      return;
+    }
+    editor->getUndoStack().redo();  // Can throw.
+    request.sendSuccess(undoStackToVariant(editor->getUndoStack()));
+  });
 
   return registry;
 }
