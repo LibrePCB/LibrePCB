@@ -430,7 +430,7 @@ void BoardEditor::prepareOrderPcb() noexcept {
   }
 
   // Prepare network request.
-  mOrderRequest = std::make_unique<OrderPcbApiRequest>(ep->url);
+  mOrderRequest = std::make_unique<OrderPcbApiRequest>(ep->url.toQUrl());
   connect(mOrderRequest.get(), &OrderPcbApiRequest::infoRequestSucceeded, this,
           [this]() { onUiDataChanged.notify(); });
   connect(mOrderRequest.get(), &OrderPcbApiRequest::infoRequestFailed, this,

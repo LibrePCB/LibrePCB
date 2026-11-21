@@ -37,7 +37,8 @@ namespace librepcb {
 
 OrganizationPcbDesignRules::OrganizationPcbDesignRules(
     const Uuid& uuid, const ElementName& name, const QString& description,
-    const QUrl& url, const BoardDesignRuleCheckSettings& settings) noexcept
+    const std::optional<Url>& url,
+    const BoardDesignRuleCheckSettings& settings) noexcept
   : mUuid(uuid),
     mNames(name),
     mDescriptions(description),
@@ -58,10 +59,7 @@ OrganizationPcbDesignRules::OrganizationPcbDesignRules(const SExpression& node)
   : mUuid(deserialize<Uuid>(node.getChild("@0"))),
     mNames(node),
     mDescriptions(node),
-    // Note: Don't use SExpression::getValueByPath<QUrl>() because it would
-    // throw an exception if the URL is empty, which is actually legal in this
-    // case.
-    mUrl(node.getChild("url/@0").getValue(), QUrl::StrictMode),
+    mUrl(deserialize<std::optional<Url>>(node.getChild("url/@0"))),
     mDrcSettings(node) {
   mDrcSettings.setSources({});  // Not supported in this context.
 }

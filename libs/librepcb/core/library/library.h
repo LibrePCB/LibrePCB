@@ -24,12 +24,14 @@
  *  Includes
  ******************************************************************************/
 #include "../types/simplestring.h"
+#include "../types/url.h"
 #include "../types/uuid.h"
 #include "librarybaseelement.h"
 
 #include <QtCore>
 
 #include <memory>
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -58,14 +60,14 @@ public:
   // Getters
   template <typename ElementType>
   QString getElementsDirectoryName() const noexcept;
-  const QUrl& getUrl() const noexcept { return mUrl; }
+  const std::optional<Url>& getUrl() const noexcept { return mUrl; }
   const QSet<Uuid>& getDependencies() const noexcept { return mDependencies; }
   const QByteArray& getIcon() const noexcept { return mIcon; }
   QPixmap getIconAsPixmap() const noexcept;
   const SimpleString& getManufacturer() const noexcept { return mManufacturer; }
 
   // Setters
-  void setUrl(const QUrl& url) noexcept { mUrl = url; }
+  void setUrl(const std::optional<Url>& url) noexcept { mUrl = url; }
   void setDependencies(const QSet<Uuid>& deps) noexcept {
     mDependencies = deps;
   }
@@ -108,7 +110,7 @@ private:  // Methods
           const SExpression& root);
 
 private:  // Data
-  QUrl mUrl;
+  std::optional<Url> mUrl;
   QSet<Uuid> mDependencies;
   QByteArray mIcon;
   SimpleString mManufacturer;

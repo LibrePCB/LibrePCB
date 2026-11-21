@@ -24,6 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include <librepcb/core/fileio/filepath.h>
+#include <librepcb/core/types/url.h>
 
 #include <QtCore>
 #include <QtGui>
@@ -72,7 +73,7 @@ public:
   struct PartResource {
     QString name;
     QString mediaType;
-    QUrl url;
+    Url url;
   };
   struct PartInformation {
     QString source;  // API server URL; Empty for entries from LibrePCB < 2.0
@@ -80,11 +81,11 @@ public:
     QString mpn;
     QString manufacturer;
     int results;
-    QUrl productUrl;  // Empty if N/A
-    QUrl pictureUrl;  // Empty if N/A
-    QUrl pricingUrl;  // Empty if N/A
+    std::optional<Url> productUrl;  // std::nullopt if N/A
+    std::optional<Url> pictureUrl;  // std::nullopt if N/A
+    std::optional<Url> pricingUrl;  // std::nullopt if N/A
     QString status;  // Empty if N/A
-    std::optional<int> availability;  // nullopt if N/A
+    std::optional<int> availability;  // std::nullopt if N/A
     QMap<int, qreal> prices;  // Empty if N/A
     QVector<PartResource> resources;  // Empty if N/A
 

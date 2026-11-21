@@ -26,6 +26,7 @@
 #include "../fileio/filepath.h"
 #include "../types/elementname.h"
 #include "../types/simplestring.h"
+#include "../types/url.h"
 #include "workspacelibrarydb.h"
 
 #include <QtCore>
@@ -212,7 +213,7 @@ public:
    */
   int addOrganization(int libId, const FilePath& fp, const Uuid& uuid,
                       const Version& version, bool deprecated,
-                      const QByteArray& logoPng, const QUrl& url,
+                      const QByteArray& logoPng, const std::optional<Url>& url,
                       const QString& country, const QStringList& fabs,
                       const QStringList& shipping, bool isSponsor,
                       int priority);
@@ -230,7 +231,8 @@ public:
    */
   int addOrganizationPcbDesignRules(int orgId, const Uuid& uuid,
                                     const QString& name,
-                                    const QString& description, const QUrl& url,
+                                    const QString& description,
+                                    const std::optional<Url>& url,
                                     int maxLayers);
 
   /**
@@ -335,7 +337,7 @@ public:
    */
   template <typename ElementType>
   int addResource(int elementId, const QString& name, const QString& mediaType,
-                  const QUrl& url) {
+                  const Url& url) {
     static_assert(std::is_same<ElementType, Component>::value ||
                       std::is_same<ElementType, Device>::value,
                   "Unsupported ElementType");
@@ -398,7 +400,7 @@ private:  // Methods
                     const Uuid& category);
   int addResource(const QString& elementsTable, int elementId,
                   const QString& name, const QString& mediaType,
-                  const QUrl& url);
+                  const Url& url);
   QString filePathToString(const FilePath& fp) const noexcept;
   static QString nonEmptyOrNull(const QString& s) noexcept;
   static QString nonNull(const QString& s) noexcept;

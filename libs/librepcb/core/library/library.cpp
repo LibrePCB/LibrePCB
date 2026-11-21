@@ -60,10 +60,7 @@ Library::Library(std::unique_ptr<TransactionalDirectory> directory,
                  const SExpression& root)
   : LibraryBaseElement(getShortElementName(), getLongElementName(), false,
                        std::move(directory), root),
-    // Note: Don't use SExpression::getValueByPath<QUrl>() because it would
-    // throw an exception if the URL is empty, which is actually legal in this
-    // case.
-    mUrl(root.getChild("url/@0").getValue(), QUrl::StrictMode),
+    mUrl(deserialize<std::optional<Url>>(root.getChild("url/@0"))),
     mDependencies(),  // Initialized below.
     mIcon(),  // Initialized below.
     mManufacturer(deserialize<SimpleString>(root.getChild("manufacturer/@0"))) {

@@ -123,9 +123,7 @@ void CreateLibraryTab::trigger(ui::TabAction a) noexcept {
             QDateTime::currentDateTime(), *mName,
             s2q(mUiData.description).trimmed(),
             QString("")));  // can throw
-        if (mUrl) {
-          lib->setUrl(*mUrl);
-        }
+        lib->setUrl(mUrl);
         try {
           lib->setIcon(
               FileUtils::readFile(Application::getResourcesDir().getPathTo(

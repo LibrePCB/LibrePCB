@@ -56,7 +56,7 @@ public:
 
   // Setters
   void setLogoPng(const QByteArray& png) noexcept;
-  void setUrl(const QUrl& url) noexcept;
+  void setUrl(const std::optional<Url>& url) noexcept;
   void setPriority(int priority) noexcept;
   void setPcbDesignRules(
       const QVector<OrganizationPcbDesignRules>& list) noexcept;
@@ -81,8 +81,8 @@ private:  // Data
 
   QByteArray mOldLogo;
   QByteArray mNewLogo;
-  QUrl mOldUrl;
-  QUrl mNewUrl;
+  std::optional<Url> mOldUrl;
+  std::optional<Url> mNewUrl;
   int mOldPriority;
   int mNewPriority;
   QVector<OrganizationPcbDesignRules> mOldPcbDesignRules;

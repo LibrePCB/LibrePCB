@@ -26,6 +26,7 @@
 #include "windowtab.h"
 
 #include <librepcb/core/fileio/filepath.h>
+#include <librepcb/core/types/url.h>
 
 #include <QtCore>
 
@@ -77,7 +78,7 @@ private:
   void downloadFinished(bool success, const QString& errMsg) noexcept;
 
   ui::DownloadLibraryTabData mUiData;
-  std::optional<QUrl> mUrl;
+  std::optional<Url> mUrl;
   FilePath mDirectory;
   std::unique_ptr<LibraryDownload> mDownload;
 };

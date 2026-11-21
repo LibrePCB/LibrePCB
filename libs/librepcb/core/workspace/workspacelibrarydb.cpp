@@ -313,7 +313,8 @@ QList<WorkspaceLibraryDb::Organization>
         QString(),  // description (filled later)
         Version::fromString(query.value(3).toString()),  // can throw
         logo,
-        QUrl(query.value(5).toString(), QUrl::StrictMode),  // url
+        Url::tryFromString(query.value(5).toString(), QUrl::TolerantMode,
+                           false),  // url
         query.value(6).toString(),  // country
         query.value(7).toString().split(","),  // fabs
         query.value(8).toString().split(","),  // shipping
@@ -359,7 +360,8 @@ QList<WorkspaceLibraryDb::Organization>
             Uuid::fromString(query.value(0).toString()),  // can throw
             query.value(1).toString(),  // name
             query.value(2).toString(),  // description
-            QUrl(query.value(3).toString(), QUrl::StrictMode),  // url
+            Url::tryFromString(query.value(3).toString(), QUrl::TolerantMode,
+                               false),  // url
             query.value(4).toInt(),  // max_layers
         });
       }
@@ -773,8 +775,10 @@ ResourceList WorkspaceLibraryDb::getResources(const QString& elementsTable,
   while (query.next()) {
     const ElementName name(query.value(0).toString());  // can throw
     const QString mediaType = query.value(1).toString();
-    const QUrl url(query.value(2).toString());
-    res.append(std::make_shared<Resource>(name, mediaType, url));
+    res.append(std::make_shared<Resource>(
+        name, mediaType,
+        Url::fromString(query.value(2).toString(), QUrl::TolerantMode,
+                        false)));  // can throw
   }
   return res;
 }
