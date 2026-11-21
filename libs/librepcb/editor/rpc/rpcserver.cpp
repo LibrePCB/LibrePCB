@@ -154,52 +154,16 @@ void RpcServer::Request::sendReply(bool ok, const QVariant& value) noexcept {
   }
 }
 
-void RpcServer::processRequest(uint32_t connId, uint32_t msgId,
-                                         const QString& method,
-                                         const QVariant& params) noexcept {
-  // Marshal the request to the GUI thread, asynchronously. Note that all
-  // the values are captured by copy (cheap due to Qt's implicit sharing),
-  // so they stay valid even if this thread continues right away.
-  if (!QMetaObject::invokeMethod(
-          this,
-          [this, connId, msgId, method, params]() {
-            handleRequest(connId, msgId, method, params);
-          },
-          Qt::QueuedConnection)) {
-    // Unreachable in practice: The functor overload of invokeMethod() only
-    // fails if the context object is null, which it never is here. If it
-    // ever happened anyway, the request would stay pending and the client
-    // would eventually time out.
-    qWarning() << "Failed to marshal RPC request to the GUI thread:" << method;
-  }
-}
-
-void RpcServer::processCancel(uint32_t connId,
-                                       uint32_t msgId) noexcept {
-  const bool invoked = QMetaObject::invokeMethod(
-      this, [this, connId, msgId]() { handleCancel(connId, msgId); },
-      Qt::QueuedConnection);
-  if (!invoked) {
-    qWarning()
-        << "Failed to marshal RPC cancel notification to the GUI thread.";
-  }
-}
-
 void RpcServer::handleRequest(uint32_t connId, uint32_t msgId,
                               const QString& method,
-                              const QVariant& params) noexcept {
-  // The Rust server guarantees that params is either a map or nil.
-  QVariantMap args;
-  if (params.userType() == QMetaType::QVariantMap) {
-    args = params.toMap();
-  }
+                              const QVariant& args) noexcept {
+  const auto request =
+      std::make_shared<Request>(mApp, *this, connId, msgId, method);
 
   // The `initialize` request is handled right here (not through the
-  // command registry, since it's a protocol-level method): Validate the
-  // token, mark the connection as (un)authenticated on the Rust side and
-  // reply with the application information.
+  // command registry, since it's a protocol-level method).
   if (method == "initialize") {
-    handleInitialize(connId, msgId, args);
+    handleInitialize(connId, msgId, args.toMap());
     return;
   }
 
@@ -212,11 +176,11 @@ void RpcServer::handleRequest(uint32_t connId, uint32_t msgId,
   }
 
   // Create the request context and register it as pending.
-  const auto request =
-      std::make_shared<Request>(mApp, *this, connId, msgId, method);
+
   mPendingRequests.insert(requestKey(connId, msgId), request);
   try {
-    handler.value()(*request, args);
+    // The Rust server guarantees that params is either a map or nil.
+    handler.value()(*request, args.toMap());
   } catch (const Exception& e) {
     request->sendError(rs::RpcErrorCode::CommandFailed,
                        QString("Command failed: %1").arg(e.getMsg()));
@@ -274,17 +238,32 @@ void RpcServer::replyError(uint32_t connId, uint32_t msgId,
   rs::ffi_rpc_server_reply(*mHandle, connId, msgId, false, &error);
 }
 
+// ATTENTION: This function is called from other threads (from Rust side)!
 void RpcServer::onRequestCallback(void* ctx, uint32_t connId, uint32_t msgId,
                                   const QString* method,
                                   const QVariant* params) {
   Q_ASSERT(ctx && method && params);
-  static_cast<RpcServer*>(ctx)->processRequest(connId, msgId, *method,
-                                                        *params);
+  auto* server = static_cast<RpcServer*>(ctx);
+  if (!QMetaObject::invokeMethod(
+          server,
+          [server, connId, msgId, method = *method, params = *params]() {
+            server->handleRequest(connId, msgId, method, params);
+          },
+          Qt::QueuedConnection)) {
+    qCritical() << "Failed to marshal RPC request to the GUI thread.";
+  }
 }
 
+// ATTENTION: This function is called from other threads (from Rust side)!
 void RpcServer::onCancelCallback(void* ctx, uint32_t connId, uint32_t msgId) {
   Q_ASSERT(ctx);
-  static_cast<RpcServer*>(ctx)->processCancel(connId, msgId);
+  auto* server = static_cast<RpcServer*>(ctx);
+  if (!QMetaObject::invokeMethod(
+          server,
+          [server, connId, msgId]() { server->handleCancel(connId, msgId); },
+          Qt::QueuedConnection)) {
+    qCritical() << "Failed to marshal RPC cancel request to the GUI thread.";
+  }
 }
 
 /*******************************************************************************

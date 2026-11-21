@@ -202,20 +202,10 @@ public:
   static QHash<QString, RpcHandler> buildCommandRegistry() noexcept;
 
 private:  // Methods
-  /// Called on a Rust connection thread: Marshal the request to the GUI
-  /// thread (asynchronously).
-  void processRequest(uint32_t connId, uint32_t msgId,
-                                const QString& method,
-                                const QVariant& params) noexcept;
-
-  /// Called on a Rust connection thread: Marshal the cancel notification
-  /// to the GUI thread (asynchronously).
-  void processCancel(uint32_t connId, uint32_t msgId) noexcept;
-
   /// Called on the GUI thread: Extract the "obj" key, look up the command
   /// handler and execute it (or reply with an error).
   void handleRequest(uint32_t connId, uint32_t msgId, const QString& method,
-                     const QVariant& params) noexcept;
+                     const QVariant& args) noexcept;
 
   /// Called on the GUI thread: Handle an `initialize` request — validate
   /// the token, mark the connection as (un)authenticated on the Rust side
@@ -237,14 +227,14 @@ private:  // Methods
   void replyError(uint32_t connId, uint32_t msgId, rs::RpcErrorCode code,
                   const QString& message) noexcept;
 
-  static void onRequestCallback(void* ctx, uint32_t connId, uint32_t msgId,
-                                const QString* method, const QVariant* params);
-  static void onCancelCallback(void* ctx, uint32_t connId, uint32_t msgId);
-
   /// Key for a pending request in the registry.
   static uint64_t requestKey(uint32_t connId, uint32_t msgId) noexcept {
     return (static_cast<uint64_t>(connId) << 32) | msgId;
   }
+
+  static void onRequestCallback(void* ctx, uint32_t connId, uint32_t msgId,
+                                const QString* method, const QVariant* params);
+  static void onCancelCallback(void* ctx, uint32_t connId, uint32_t msgId);
 
 private:  // Data
   /// The application to dispatch the commands to
