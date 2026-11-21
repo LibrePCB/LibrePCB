@@ -383,14 +383,14 @@ def test_rpc_server(librepcb):
 
             # --- Error handling -------------------------------------------
             # Unknown method → -32601, the connection stays open.
-            rpc.expect_error(7, "Foo.bar", {}, -32601)
+            rpc.expect_error(7, "Foo.bar", {}, 22)
 
             # Invalid envelope (method not a string) → -32600, the
             # connection stays open.
             rpc.send([0, 8, 42, {}])
             message = rpc.receive()
             assert message[0:2] == [1, 8], message
-            assert message[2]["code"] == -32600, message
+            assert message[2]["code"] == 20, message
             assert message[3] is None, message
 
             # Unknown project handle → ProjectNotOpen (-32003), with the
@@ -398,7 +398,7 @@ def test_rpc_server(librepcb):
             rpc.send([0, 9, "UndoStack.get_status", {"obj": "invalid-uuid"}])
             message = rpc.receive()
             assert message[0:2] == [1, 9], message
-            assert message[2]["code"] == -32003, message
+            assert message[2]["code"] == 101, message
             assert message[2]["project"] == "invalid-uuid", message
             assert message[3] is None, message
 
@@ -408,12 +408,12 @@ def test_rpc_server(librepcb):
             rpc.send([0, 10, "Project.list", {"key": 0x8000000000000000}])
             message = rpc.receive()
             assert message[0:2] == [1, 10], message
-            assert message[2]["code"] == -32602, message
+            assert message[2]["code"] == 23, message
 
             rpc.send([0, 11, "Project.list", {1: "x"}])  # Non-string map key.
             message = rpc.receive()
             assert message[0:2] == [1, 11], message
-            assert message[2]["code"] == -32602, message
+            assert message[2]["code"] == 23, message
 
             # A cancel for an unknown msgid is ignored (no response).
             rpc.send([4, 999])

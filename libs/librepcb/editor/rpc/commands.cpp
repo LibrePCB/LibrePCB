@@ -127,7 +127,7 @@ QHash<QString, RpcServer::RpcHandler>
                     ProjectEditor* editor = findProject(request->getApp(), obj);
                     if (!editor) {
                       request->replyError(
-                          RpcServer::ProjectNotOpen, "Project not open",
+                          rs::RpcErrorCode::ProjectNotOpen, "Project not open",
                           QVariantMap{{"project", QVariant(obj)}});
                       return;
                     }
@@ -159,7 +159,8 @@ QHash<QString, RpcServer::RpcHandler>
          const QVariantMap&) {
         ProjectEditor* editor = findProject(request->getApp(), obj);
         if (!editor) {
-          request->replyError(RpcServer::ProjectNotOpen, "Project not open",
+          request->replyError(rs::RpcErrorCode::ProjectNotOpen,
+                              "Project not open",
                               QVariantMap{{"project", QVariant(obj)}});
           return;
         }
@@ -173,7 +174,8 @@ QHash<QString, RpcServer::RpcHandler>
          const QVariantMap&) {
         ProjectEditor* editor = findProject(request->getApp(), obj);
         if (!editor) {
-          request->replyError(RpcServer::ProjectNotOpen, "Project not open",
+          request->replyError(rs::RpcErrorCode::ProjectNotOpen,
+                              "Project not open",
                               QVariantMap{{"project", QVariant(obj)}});
           return;
         }
@@ -188,7 +190,8 @@ QHash<QString, RpcServer::RpcHandler>
          const QVariantMap&) {
         ProjectEditor* editor = findProject(request->getApp(), obj);
         if (!editor) {
-          request->replyError(RpcServer::ProjectNotOpen, "Project not open",
+          request->replyError(rs::RpcErrorCode::ProjectNotOpen,
+                              "Project not open",
                               QVariantMap{{"project", QVariant(obj)}});
           return;
         }

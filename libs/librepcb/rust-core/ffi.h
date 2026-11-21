@@ -128,6 +128,63 @@ enum class InteractiveHtmlBomViewMode {
 };
 
 /**
+ *
+ * Error codes for the RPC protocol.
+ *
+ * The codes are grouped by category:
+ *
+ * * **10–19: Transport errors.** The connection is closed instead of
+ *   responding, so these codes are currently never sent — they document
+ *   the transport failure modes.
+ * * **20–29: Protocol errors.** The connection stays open.
+ * * **100–: Application errors.** Open-ended, defined by the API
+ *   specification (`rpc.yaml`).
+ */
+enum class RpcErrorCode : int32_t {
+  /**
+   * A message could not be decoded (invalid MessagePack or truncated
+   * value), so the stream framing is broken.
+   */
+  MessageDecodingFailed = 10,
+  /**
+   * A message exceeded the maximum size (32 MiB).
+   */
+  MessageTooLarge = 11,
+  /**
+   * A request doesn't conform to the message envelope.
+   */
+  InvalidRequest = 20,
+  /**
+   * The connection is not authenticated (or the token is wrong).
+   */
+  Unauthenticated = 21,
+  /**
+   * The method does not exist or is not available.
+   */
+  MethodNotFound = 22,
+  /**
+   * Invalid method parameter(s).
+   */
+  InvalidParams = 23,
+  /**
+   * Internal error.
+   */
+  InternalError = 24,
+  /**
+   * A command failed (application-specific error).
+   */
+  CommandFailed = 100,
+  /**
+   * The requested project is not open (application-specific error).
+   */
+  ProjectNotOpen = 101,
+  /**
+   * The request was cancelled by the client.
+   */
+  Cancelled = 102,
+};
+
+/**
  * Interactive HTML BOM structure
  *
  * The top-level structure to build & generate a HTML BOM.
@@ -684,19 +741,25 @@ void ffi_renumber_components(const QStringList * NONNULL names,
 /**
  * Create a new [RpcServer] object.
  *
- * - `token`: The authentication token (must not be empty).
- * - `protocol_version`: The protocol version, reported by `initialize`.
- * - `info`: Application information (a map, e.g. the application version,
- *   the PID and the workspace path) which is merged into the `initialize`
- *   response. Values outside the protocol's value domain are ignored.
  * - `dispatch`/`cancel`/`ctx`: The command dispatcher and cancel callback.
+ *   The `initialize` request (authentication) is dispatched through the
+ *   dispatcher as well — the C++ side validates the token and calls
+ *   `ffi_rpc_server_set_authenticated()`.
  */
-RpcServer *ffi_rpc_server_new(const QString * NONNULL token,
-                              const QString * NONNULL protocol_version,
-                              const QVariant * NONNULL info,
-                              RpcDispatchFn dispatch,
+RpcServer *ffi_rpc_server_new(RpcDispatchFn dispatch,
                               RpcCancelFn cancel,
                               void *ctx);
+
+/**
+ * Mark a connection as (un)authenticated.
+ *
+ * Called by the C++ side after it validated the authentication token of
+ * an `initialize` request (the token handling lives on the C++ side).
+ * Calls for unknown or already closed connections are ignored.
+ */
+void ffi_rpc_server_set_authenticated(RpcServer * NONNULL s,
+                                      uint64_t conn_id,
+                                      bool authenticated);
 
 /**
  * Start listening on 127.0.0.1 on the given port (0 = OS-assigned).

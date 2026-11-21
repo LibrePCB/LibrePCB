@@ -480,11 +480,20 @@ events:
 
 ### 5.2 Docs pipeline
 
-`dev/generate_rpc_api_docs.py` (stdlib + **PyYAML**, dev-only dependency)
-reads `rpc.yaml` → generates `dev/doxygen/pages/rpc_api.md` (committed, so
-the Doxygen build needs no Python), documenting the transport protocol
-(static intro), message types, data encoding, error model, and all
-classes/methods/events. No CI stale-check.
+The documentation consists of **two Doxygen pages**:
+
+- `dev/doxygen/pages/rpc_api.md` — **hand-written**, documents the
+  transport protocol (framing, envelope, handshake, conventions, error
+  handling semantics) and embeds the reference page via Doxygen's
+  `\subpage` mechanism.
+- `dev/doxygen/pages/rpc_api_reference.md` — **generated** by
+  `dev/generate_rpc_api_docs.py` (stdlib + **PyYAML**, dev-only
+  dependency) from `rpc.yaml`: data types, error types, classes with
+  their methods and events. Committed, so the Doxygen build needs no
+  Python.
+
+Only the generated content is generated; the protocol description is a
+plain hand-written page. No CI stale-check.
 
 ## 6. Testing
 
@@ -523,8 +532,9 @@ classes/methods/events. No CI stale-check.
    type — the conversion rules are covered by the system test).
 4. **Protocol v2 C++ integration** — async `RpcServer` (QueuedConnection,
    request context), QVariantMap handlers, `rpc.yaml` (classes `Project`,
-   `UndoStack`; enums/error types as needed), docs generator +
-   `rpc_api.md`, Python system test in `tests/ui/rpc/`.
+   `UndoStack`; enums/error types as needed), docs pipeline (hand-written
+   protocol page + generated reference page), Python system test in
+   `tests/ui/rpc/`.
    **Status: Done.** Verified: 2606 C++ unittests pass, and the system
    test passes against the real application (with an open project,
    covering handshake, ping, `Project.list`/`get`, the full

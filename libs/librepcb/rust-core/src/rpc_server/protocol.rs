@@ -26,46 +26,64 @@ const MESSAGE_TYPE_REQUEST_MESSAGE: i64 = 3;
 /// The message type of a cancel request (client → server).
 const MESSAGE_TYPE_CANCEL: i64 = 4;
 
-/// Name of the method which authenticates a connection. Must be the first
-/// message of every connection, carrying the authentication token.
+/// Name of the method which authenticates a connection. It is dispatched
+/// to the C++ side like any other command (the token handling lives
+/// there), but — unlike all other methods — it is dispatched even while
+/// the connection is not authenticated yet (otherwise it could never be
+/// authenticated).
 pub const METHOD_INITIALIZE: &str = "initialize";
 
 /// Name of the protocol-level ping method (returns an empty map).
 pub const METHOD_PING: &str = "ping";
 
-/// cbindgen:ignore
+/// cbindgen::export — also used by the C++ side (see `rpcserver.h`).
 ///
-/// RPC error codes.
+/// Error codes for the RPC protocol.
 ///
-/// The codes -32700..=-32600 follow the JSON-RPC 2.0 convention (reserved
-/// protocol errors), the range -32000..=-32099 is reserved for
-/// implementation defined server-errors (the application-specific codes).
-/// They are not exported to the C++ side, which has its own error code
-/// enum in `editor/rpc/rpcserver.h` instead.
-pub mod error_code {
-  /// The JSON sent is not a valid request (envelope doesn't conform).
-  pub const INVALID_REQUEST: i64 = -32600;
-  /// The method does not exist or is not available.
-  pub const METHOD_NOT_FOUND: i64 = -32601;
-  /// Invalid method parameter(s).
-  pub const INVALID_PARAMS: i64 = -32602;
-  /// Internal error.
-  pub const INTERNAL_ERROR: i64 = -32603;
+/// The codes are grouped by category:
+///
+/// * **10–19: Transport errors.** The connection is closed instead of
+///   responding, so these codes are currently never sent — they document
+///   the transport failure modes.
+/// * **20–29: Protocol errors.** The connection stays open.
+/// * **100–: Application errors.** Open-ended, defined by the API
+///   specification (`rpc.yaml`).
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[repr(i32)]
+pub enum RpcErrorCode {
+  // Transport errors (10–19).
+  /// A message could not be decoded (invalid MessagePack or truncated
+  /// value), so the stream framing is broken.
+  MessageDecodingFailed = 10,
+  /// A message exceeded the maximum size (32 MiB).
+  MessageTooLarge = 11,
+
+  // Protocol errors (20–29).
+  /// A request doesn't conform to the message envelope.
+  InvalidRequest = 20,
   /// The connection is not authenticated (or the token is wrong).
-  pub const UNAUTHENTICATED: i64 = -32001;
+  Unauthenticated = 21,
+  /// The method does not exist or is not available.
+  MethodNotFound = 22,
+  /// Invalid method parameter(s).
+  InvalidParams = 23,
+  /// Internal error.
+  InternalError = 24,
+
+  // Application errors (100–).
   /// A command failed (application-specific error).
-  pub const COMMAND_FAILED: i64 = -32002;
+  CommandFailed = 100,
   /// The requested project is not open (application-specific error).
-  pub const PROJECT_NOT_OPEN: i64 = -32003;
+  ProjectNotOpen = 101,
   /// The request was cancelled by the client.
-  pub const CANCELLED: i64 = -32005;
+  Cancelled = 102,
 }
 
 /// An RPC error, as sent in a response.
 #[derive(Clone, Debug)]
 pub struct RpcError {
-  /// Numeric error code (see [error_code]).
-  code: i64,
+  /// Numeric error code (see [ErrorCode]).
+  code: RpcErrorCode,
   /// Short human-readable error description.
   message: String,
   /// Optional additional data, e.g. error details.
@@ -74,7 +92,7 @@ pub struct RpcError {
 
 impl RpcError {
   /// Create an error with a code and a message.
-  pub fn new(code: i64, message: impl Into<String>) -> Self {
+  pub fn new(code: RpcErrorCode, message: impl Into<String>) -> Self {
     Self {
       code,
       message: message.into(),
@@ -88,29 +106,28 @@ impl RpcError {
     self
   }
 
-  /// Create an error for a message which doesn't conform to the envelope
-  /// (`-32600`).
+  /// Create an error for a message which doesn't conform to the envelope.
   pub fn invalid_request() -> Self {
-    Self::new(error_code::INVALID_REQUEST, "Invalid Request")
+    Self::new(RpcErrorCode::InvalidRequest, "Invalid Request")
   }
 
-  /// Create an error for an unknown method (`-32601`).
+  /// Create an error for an unknown method.
   pub fn method_not_found() -> Self {
-    Self::new(error_code::METHOD_NOT_FOUND, "Method not found")
+    Self::new(RpcErrorCode::MethodNotFound, "Method not found")
   }
 
-  /// Create an error for invalid params (`-32602`).
+  /// Create an error for invalid params.
   pub fn invalid_params() -> Self {
-    Self::new(error_code::INVALID_PARAMS, "Invalid params")
+    Self::new(RpcErrorCode::InvalidParams, "Invalid params")
   }
 
-  /// Create an internal error (`-32603`).
+  /// Create an internal error.
   pub fn internal_error() -> Self {
-    Self::new(error_code::INTERNAL_ERROR, "Internal error")
+    Self::new(RpcErrorCode::InternalError, "Internal error")
   }
 
   /// Get the error code.
-  pub fn code(&self) -> i64 {
+  pub fn code(&self) -> RpcErrorCode {
     self.code
   }
 
@@ -122,7 +139,7 @@ impl RpcError {
   /// Serialize to a msgpack value (the `error` element of a response).
   pub fn to_value(&self) -> Value {
     let mut pairs = vec![
-      (Value::from("code"), Value::from(self.code)),
+      (Value::from("code"), Value::from(self.code as i32)),
       (Value::from("message"), Value::from(self.message.as_str())),
     ];
     if let Some(data) = &self.data {
@@ -280,36 +297,6 @@ pub fn build_request_message(msgid: u32, payload: &Value) -> Value {
   ])
 }
 
-/// Extract the authentication token from the params of an `initialize`
-/// request.
-pub fn extract_token(params: &Value) -> Option<&str> {
-  let pairs = match params {
-    Value::Map(pairs) => pairs,
-    _ => return None,
-  };
-  for (key, value) in pairs {
-    if key.as_str() == Some("token") {
-      return value.as_str();
-    }
-  }
-  None
-}
-
-/// Build the `initialize` result: the configured application info (a map),
-/// with the protocol version added/overridden.
-pub fn build_initialize_result(info: &Value, protocol_version: &str) -> Value {
-  let mut pairs = match info {
-    Value::Map(pairs) => pairs.clone(),
-    _ => Vec::new(), // Not a map: Ignore it (should never happen).
-  };
-  pairs.retain(|(key, _)| key.as_str() != Some("protocolVersion"));
-  pairs.push((
-    Value::from("protocolVersion"),
-    Value::from(protocol_version),
-  ));
-  Value::Map(pairs)
-}
-
 #[cfg(test)]
 mod tests {
   use super::*;
@@ -449,9 +436,12 @@ mod tests {
 
   #[test]
   fn test_error_to_value() {
-    let error = RpcError::new(error_code::COMMAND_FAILED, "boom");
+    let error = RpcError::new(RpcErrorCode::CommandFailed, "boom");
     let value = error.to_value();
-    assert_eq!(field(&value, "code"), Some(&Value::from(-32002i64)));
+    assert_eq!(
+      field(&value, "code"),
+      Some(&Value::from(RpcErrorCode::CommandFailed as i64))
+    );
     assert_eq!(field(&value, "message"), Some(&Value::from("boom")));
     assert_eq!(field(&value, "data"), None);
     let error = error.with_data(Value::from(7));
@@ -471,13 +461,16 @@ mod tests {
 
   #[test]
   fn test_build_response_error() {
-    let error = RpcError::new(-32003, "nope");
+    let error = RpcError::new(RpcErrorCode::ProjectNotOpen, "nope");
     let response =
       build_response(5, Some(&error.to_value()), &Value::from(true));
     let items = response.as_array().unwrap();
     assert_eq!(items[0], Value::from(1));
     assert_eq!(items[1], Value::from(5));
-    assert_eq!(field(&items[2], "code"), Some(&Value::from(-32003)));
+    assert_eq!(
+      field(&items[2], "code"),
+      Some(&Value::from(RpcErrorCode::ProjectNotOpen as i64))
+    );
     assert_eq!(items[3], Value::Nil); // Result is nil on error.
   }
 
@@ -500,29 +493,5 @@ mod tests {
     assert_eq!(items[0], Value::from(3));
     assert_eq!(items[1], Value::from(3));
     assert_eq!(field(&items[2], "percent"), Some(&Value::from(50)));
-  }
-
-  #[test]
-  fn test_extract_token() {
-    let params =
-      Value::Map(vec![(Value::from("token"), Value::from("the-token"))]);
-    assert_eq!(extract_token(&params), Some("the-token"));
-    assert_eq!(extract_token(&Value::Map(Vec::new())), None);
-    assert_eq!(extract_token(&Value::Nil), None);
-  }
-
-  #[test]
-  fn test_build_initialize_result() {
-    let info = Value::Map(vec![
-      (Value::from("appVersion"), Value::from("1.2.3")),
-      (Value::from("protocolVersion"), Value::from("old")), // Overridden.
-    ]);
-    let result = build_initialize_result(&info, "1");
-    assert_eq!(field(&result, "appVersion"), Some(&Value::from("1.2.3")));
-    assert_eq!(field(&result, "protocolVersion"), Some(&Value::from("1")));
-    // Non-map info is ignored:
-    let result = build_initialize_result(&Value::Nil, "1");
-    assert_eq!(field(&result, "protocolVersion"), Some(&Value::from("1")));
-    assert_eq!(result.as_map().unwrap().len(), 1);
   }
 }

@@ -11,8 +11,7 @@
 
 use super::cpp_ffi::*;
 use crate::rpc_server::{
-  error_code, CancelFn, DispatchFn, DispatchOutcome, RpcError, RpcServer,
-  RpcServerConfig,
+  CancelFn, DispatchFn, DispatchOutcome, RpcError, RpcErrorCode, RpcServer,
 };
 use std::ffi::c_void;
 use std::sync::Arc;
@@ -245,37 +244,26 @@ fn map_field<'a>(value: &'a Value, key: &str) -> Option<&'a Value> {
     .map(|(_, v)| v)
 }
 
-/// Build an RPC error from a msgpack map, as produced by the C++ dispatch
-/// layer: `{"code": <int>, "message": <string>, "data"?: <any>, ...}`.
-///
-/// Returns `None` if the value is not a valid error object, in which case
-/// the caller should fall back to a generic internal error. Additional
-/// fields next to "code" and "message" (error properties, see the API
-/// specification) are not extracted here — the whole error map is passed
-/// to the client unchanged.
-fn rpc_error_from_value(value: &Value) -> Option<RpcError> {
-  let code = map_field(value, "code")?.as_i64()?;
-  let message = map_field(value, "message")?.as_str()?;
-  let mut error = RpcError::new(code, message);
-  if let Some(data) = map_field(value, "data") {
-    error = error.with_data(data.clone());
-  }
-  Some(error)
+/// Check whether a msgpack value is a valid error object, as produced by
+/// the C++ dispatch layer: `{"code": <int>, "message": <string>,
+/// "data"?: <any>, ...}`. Additional fields next to "code" and "message"
+/// (error properties, see the API specification) are allowed — the whole
+/// error map is passed to the client unchanged.
+fn is_error_object(value: &Value) -> bool {
+  map_field(value, "code").and_then(Value::as_i64).is_some()
+    && map_field(value, "message")
+      .and_then(Value::as_str)
+      .is_some()
 }
 
 /// Create a new [RpcServer] object.
 ///
-/// - `token`: The authentication token (must not be empty).
-/// - `protocol_version`: The protocol version, reported by `initialize`.
-/// - `info`: Application information (a map, e.g. the application version,
-///   the PID and the workspace path) which is merged into the `initialize`
-///   response. Values outside the protocol's value domain are ignored.
 /// - `dispatch`/`cancel`/`ctx`: The command dispatcher and cancel callback.
+///   The `initialize` request (authentication) is dispatched through the
+///   dispatcher as well — the C++ side validates the token and calls
+///   `ffi_rpc_server_set_authenticated()`.
 #[no_mangle]
 extern "C" fn ffi_rpc_server_new(
-  token: &QString,
-  protocol_version: &QString,
-  info: &QVariant,
   dispatch: RpcDispatchFn,
   cancel: RpcCancelFn,
   ctx: *mut c_void,
@@ -286,7 +274,7 @@ extern "C" fn ffi_rpc_server_new(
       match call_dispatch(&dispatch_callback, conn_id, msgid, method, params) {
         Ok(true) => DispatchOutcome::Dispatched,
         Ok(false) => DispatchOutcome::ReplyNow(RpcError::new(
-          error_code::INTERNAL_ERROR,
+          RpcErrorCode::InternalError,
           "Failed to dispatch the command",
         )),
         Err(()) => {
@@ -305,14 +293,21 @@ extern "C" fn ffi_rpc_server_new(
   let cancel: CancelFn = Arc::new(move |conn_id, msgid| {
     call_cancel(&cancel_callback, conn_id, msgid)
   });
-  let config = RpcServerConfig {
-    token: from_qstring(token),
-    protocol_version: from_qstring(protocol_version),
-    info: qvariant_to_msgpack(info).unwrap_or(Value::Nil),
-    dispatch,
-    cancel,
-  };
-  Box::into_raw(Box::new(RpcServer::new(config)))
+  Box::into_raw(Box::new(RpcServer::new(dispatch, cancel)))
+}
+
+/// Mark a connection as (un)authenticated.
+///
+/// Called by the C++ side after it validated the authentication token of
+/// an `initialize` request (the token handling lives on the C++ side).
+/// Calls for unknown or already closed connections are ignored.
+#[no_mangle]
+extern "C" fn ffi_rpc_server_set_authenticated(
+  s: &mut RpcServer,
+  conn_id: u64,
+  authenticated: bool,
+) {
+  s.set_authenticated(conn_id, authenticated)
 }
 
 /// Start listening on 127.0.0.1 on the given port (0 = OS-assigned).
@@ -363,7 +358,7 @@ extern "C" fn ffi_rpc_server_reply(
         conn_id,
         msgid,
         Some(&RpcError::new(
-          error_code::INTERNAL_ERROR,
+          RpcErrorCode::InternalError,
           "The command returned an unsupported value type",
         )),
         &Value::Nil,
@@ -377,18 +372,19 @@ extern "C" fn ffi_rpc_server_reply(
     // additional error properties next to "code" and "message" (see the
     // error types in the API specification). Only if it is not even a
     // valid error object, fall back to a generic internal error.
-    match rpc_error_from_value(&value) {
-      Some(_) => s.reply_error(conn_id, msgid, &value),
-      None => {
-        eprintln!("librepcb-rust: A command returned an invalid error object.");
-        s.reply(
-          conn_id,
-          msgid,
-          Some(&RpcError::internal_error()),
-          &Value::Nil,
-        )
-      }
+    if !is_error_object(&value) {
+      eprintln!("librepcb-rust: A command returned an invalid error object.");
+      return s.reply(
+        conn_id,
+        msgid,
+        Some(&RpcError::new(
+          RpcErrorCode::InternalError,
+          "The command returned an invalid error object",
+        )),
+        &Value::Nil,
+      );
     }
+    s.reply_error(conn_id, msgid, &value)
   }
 }
 

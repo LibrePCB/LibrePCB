@@ -24,6 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include <librepcb/core/exceptions.h>
+#include <librepcb/rust-core/ffi.h>
 
 #include <QHash>
 #include <QSharedPointer>
@@ -37,10 +38,6 @@
 namespace librepcb {
 
 class Project;
-
-namespace rs {
-struct RpcServer;
-}
 
 namespace editor {
 
@@ -78,20 +75,10 @@ class RpcServer final : public QObject {
 public:
   // Types
 
-  /**
-   * @brief Application-specific RPC error codes
-   *
-   * @note Keep in sync with the `error_code` module in
-   *       `rust-core/src/rpc_server/protocol.rs`!
-   */
-  enum ErrorCode {
-    MethodNotFound = -32601,
-    InvalidParams = -32602,
-    InternalError = -32603,
-    CommandFailed = -32002,
-    ProjectNotOpen = -32003,
-    Cancelled = -32005,
-  };
+  // Note: The RPC error codes are defined by the Rust server (see
+  // `RpcErrorCode` in `rust-core/src/rpc_server/protocol.rs`, exposed
+  // through `ffi.h` as `rs::RpcErrorCode`) and are used directly from
+  // there — no duplication.
 
   /**
    * @brief A command request, as handed to the command handlers
@@ -147,7 +134,7 @@ public:
      *                    "code" and "message" (see the error types in the
      *                    API specification).
      */
-    void replyError(int code, const QString& message,
+    void replyError(rs::RpcErrorCode code, const QString& message,
                     const QVariantMap& properties = QVariantMap()) noexcept;
 
     /**
@@ -243,13 +230,24 @@ private:  // Methods
   void handleRequest(uint64_t connId, uint32_t msgid, const QString& method,
                      const QVariant& params) noexcept;
 
+  /// Called on the GUI thread: Handle an `initialize` request — validate
+  /// the token, mark the connection as (un)authenticated on the Rust side
+  /// and reply with the application information.
+  void handleInitialize(uint64_t connId, uint32_t msgid,
+                        const QVariantMap& args) noexcept;
+
   /// Called on the GUI thread: Mark a pending request as cancelled.
   void handleCancel(uint64_t connId, uint32_t msgid) noexcept;
+
+  /// Reply a result directly, without creating a #Request object (used for
+  /// `initialize`). Normalizes the value first.
+  void replySuccess(uint64_t connId, uint32_t msgid,
+                    const QVariant& result) noexcept;
 
   /// Reply an error directly, without creating a #Request object (e.g. for
   /// invalid params or an unknown method). Exactly-once is enforced by the
   /// Rust server, so this is safe even if the request was already replied.
-  void replyError(uint64_t connId, uint32_t msgid, int code,
+  void replyError(uint64_t connId, uint32_t msgid, rs::RpcErrorCode code,
                   const QString& message) noexcept;
 
   /// Push an event (a notification) to all connected clients.

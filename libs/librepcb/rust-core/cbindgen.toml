@@ -10,6 +10,9 @@ sys_includes = ["QtCore"]
 trailer = "// clang-format on"
 usize_is_size_t = true
 
+[export]
+include = ["RpcErrorCode"]
+
 [parse]
 parse_deps = true
 include = ["interactive-html-bom"]

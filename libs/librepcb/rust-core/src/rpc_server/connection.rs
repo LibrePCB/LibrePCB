@@ -3,7 +3,7 @@
 
 use std::io::{self, BufReader, Write};
 use std::net::{TcpListener, TcpStream};
-use std::sync::atomic::Ordering;
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::mpsc;
 use std::sync::{Arc, Mutex};
 use std::thread;
@@ -13,8 +13,8 @@ use rmpv::Value;
 
 use super::codec::{self, read_message};
 use super::protocol::{
-  self, build_response, classify_message, error_code, extract_token,
-  ParsedMessage, RpcError, METHOD_INITIALIZE, METHOD_PING,
+  build_response, classify_message, ParsedMessage, RpcError, RpcErrorCode,
+  METHOD_INITIALIZE, METHOD_PING,
 };
 use super::{lock, Connection, DispatchOutcome, Inner};
 
@@ -86,12 +86,14 @@ fn handle_connection(inner: Arc<Inner>, stream: TcpStream, conn_id: u64) {
   // our own clone below) closes the writer thread's channel.
   let (tx, rx) = mpsc::channel::<Vec<u8>>();
   let pending = Arc::new(Mutex::new(std::collections::HashSet::new()));
+  let authenticated = Arc::new(AtomicBool::new(false));
   lock(&inner.clients).insert(
     conn_id,
     Connection {
       tx: tx.clone(),
       stream,
       pending: Arc::clone(&pending),
+      authenticated: Arc::clone(&authenticated),
     },
   );
   let writer_thread = match thread::Builder::new()
@@ -112,28 +114,21 @@ fn handle_connection(inner: Arc<Inner>, stream: TcpStream, conn_id: u64) {
       return;
     }
   };
-  let mut authenticated = false;
   let mut reader = BufReader::new(read_half);
   loop {
     match read_message(&mut reader) {
       Ok(None) => break, // Clean EOF between messages.
       Ok(Some(message)) => {
-        let (response, close) = process_message(
-          &inner,
-          conn_id,
-          &pending,
-          &message,
-          &mut authenticated,
-        );
-        if let Some(response) = response {
+        // Note: Connections are never closed because of a received message
+        // — only decode errors (framing is broken) close the connection.
+        if let Some(response) =
+          process_message(&inner, conn_id, &pending, &authenticated, &message)
+        {
           if let Ok(bytes) = codec::encode_message(&response) {
             if tx.send(bytes).is_err() {
               break; // The writer thread is gone, so the connection is dead.
             }
           }
-        }
-        if close {
-          break;
         }
       }
       Err(e) => {
@@ -156,53 +151,43 @@ fn handle_connection(inner: Arc<Inner>, stream: TcpStream, conn_id: u64) {
 
 /// Process one incoming message.
 ///
-/// Returns the response (if any) and whether the connection must be
-/// closed afterwards. The response is returned as a [Value] and encoded
-/// by the caller — the writer thread only deals with bytes.
+/// Returns the response (if any), which is encoded and sent by the
+/// caller — the writer thread only deals with bytes.
 fn process_message(
   inner: &Inner,
   conn_id: u64,
   pending: &Arc<Mutex<std::collections::HashSet<u32>>>,
+  authenticated: &Arc<AtomicBool>,
   message: &Value,
-  authenticated: &mut bool,
-) -> (Option<Value>, bool) {
+) -> Option<Value> {
   match classify_message(message) {
     ParsedMessage::Request {
       msgid,
       method,
       params,
     } => {
-      if method == METHOD_INITIALIZE {
-        let (response, token_ok) = handle_initialize(inner, &params, msgid);
-        if token_ok {
-          *authenticated = true;
-        }
-        // A wrong token always drops the connection, even if it was
-        // previously authenticated (this looks like a hijacking attempt).
-        (Some(response), !token_ok)
-      } else if !*authenticated {
-        // Before authentication, any request other than `initialize` is
-        // rejected and the connection is dropped.
+      // The `initialize` request is always dispatched (that's how a
+      // connection gets authenticated — the token validation lives on the
+      // C++ side). All other requests are only dispatched while the
+      // connection is authenticated.
+      if (method != METHOD_INITIALIZE)
+        && (!authenticated.load(Ordering::SeqCst))
+      {
         let error = RpcError::new(
-          error_code::UNAUTHENTICATED,
+          RpcErrorCode::Unauthenticated,
           "This connection is not authenticated, the first message must be \
            an 'initialize' request",
         );
-        (
-          Some(build_response(msgid, Some(&error.to_value()), &Value::Nil)),
-          true,
-        )
-      } else if method == METHOD_PING {
-        (
-          Some(build_response(msgid, None, &Value::Map(Vec::new()))),
-          false,
-        )
-      } else {
-        (
-          dispatch_request(inner, conn_id, pending, msgid, method, params),
-          false,
-        )
+        return Some(build_response(
+          msgid,
+          Some(&error.to_value()),
+          &Value::Nil,
+        ));
       }
+      if method == METHOD_PING {
+        return Some(build_response(msgid, None, &Value::Map(Vec::new())));
+      }
+      dispatch_request(inner, conn_id, pending, msgid, method, params)
     }
     ParsedMessage::Cancel { msgid } => {
       // The cancel handler is only invoked for pending requests, i.e.
@@ -210,58 +195,26 @@ fn process_message(
       // for eventually sending exactly one response (typically a
       // "cancelled" error).
       if lock(pending).contains(&msgid) {
-        (inner.config.cancel)(conn_id, msgid);
+        (inner.cancel)(conn_id, msgid);
       } else {
         eprintln!("librepcb-rust: Ignoring cancel for unknown msgid {msgid}");
       }
-      (None, false)
+      None
     }
     ParsedMessage::Ignored => {
       // Wrong direction or unknown message type: ignored for forward
-      // compatibility. Before authentication, the connection is dropped.
-      (None, !*authenticated)
+      // compatibility (the stream is still in sync).
+      None
     }
     ParsedMessage::Invalid { msgid } => {
       // A request which doesn't conform to the envelope: answered with an
-      // error (the stream is still in sync). Before authentication, the
-      // connection is dropped.
-      let response = build_response(
+      // error (the stream is still in sync).
+      let error = RpcError::invalid_request();
+      Some(build_response(
         msgid.unwrap_or(0),
-        Some(&RpcError::invalid_request().to_value()),
+        Some(&error.to_value()),
         &Value::Nil,
-      );
-      (Some(response), !*authenticated)
-    }
-  }
-}
-
-/// Handle an `initialize` request: Check the token and build the response.
-///
-/// Returns the response and whether the token was valid.
-fn handle_initialize(
-  inner: &Inner,
-  params: &Value,
-  msgid: u32,
-) -> (Value, bool) {
-  match extract_token(params) {
-    Some(token) if token == inner.config.token => (
-      build_response(
-        msgid,
-        None,
-        &protocol::build_initialize_result(
-          &inner.config.info,
-          &inner.config.protocol_version,
-        ),
-      ),
-      true,
-    ),
-    _ => {
-      let error =
-        RpcError::new(error_code::UNAUTHENTICATED, "Invalid or missing token");
-      (
-        build_response(msgid, Some(&error.to_value()), &Value::Nil),
-        false,
-      )
+      ))
     }
   }
 }
@@ -284,12 +237,12 @@ fn dispatch_request(
   if !lock(pending).insert(msgid) {
     // A msgid must not be reused while the request is still pending.
     let error = RpcError::new(
-      error_code::INVALID_REQUEST,
+      RpcErrorCode::InvalidRequest,
       "The msgid is already in use by a pending request",
     );
     return Some(build_response(msgid, Some(&error.to_value()), &Value::Nil));
   }
-  match (inner.config.dispatch)(conn_id, msgid, &method, &params) {
+  match (inner.dispatch)(conn_id, msgid, &method, &params) {
     DispatchOutcome::Dispatched => None,
     DispatchOutcome::ReplyNow(error) => {
       lock(pending).remove(&msgid);
