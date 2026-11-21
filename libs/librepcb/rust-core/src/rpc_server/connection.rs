@@ -56,7 +56,7 @@ pub(super) fn accept_loop(inner: Arc<Inner>, listener: TcpListener) {
 /// Handle one client connection: Set up the writer thread, then run the
 /// reader loop until the connection is closed. Runs on the connection's
 /// reader thread.
-fn handle_connection(inner: Arc<Inner>, stream: TcpStream, conn_id: u64) {
+fn handle_connection(inner: Arc<Inner>, stream: TcpStream, conn_id: u32) {
   // If the server was stopped in the moment this connection was accepted,
   // drop the connection right away.
   if !inner.running.load(Ordering::SeqCst) {
@@ -155,7 +155,7 @@ fn handle_connection(inner: Arc<Inner>, stream: TcpStream, conn_id: u64) {
 /// caller — the writer thread only deals with bytes.
 fn process_message(
   inner: &Inner,
-  conn_id: u64,
+  conn_id: u32,
   pending: &Arc<Mutex<std::collections::HashSet<u32>>>,
   authenticated: &Arc<AtomicBool>,
   message: &Value,
@@ -228,7 +228,7 @@ fn process_message(
 /// asynchronously, [DispatchOutcome::ReplyNow] answers immediately.
 fn dispatch_request(
   inner: &Inner,
-  conn_id: u64,
+  conn_id: u32,
   pending: &Arc<Mutex<std::collections::HashSet<u32>>>,
   msgid: u32,
   method: String,

@@ -14,6 +14,11 @@ import umsgpack
 
 TOKEN = "librepcb-dev-token"
 
+# The default RPC server port (the letters "LP" interpreted as a
+# hexadecimal number: 0x4C50 = 19536). Keep in sync with DEFAULT_PORT in
+# `rust-core/src/rpc_server.rs`.
+PORT = 19536
+
 
 # --- A minimal RPC client ---------------------------------------------------
 
@@ -75,24 +80,22 @@ def test_rpc_server(librepcb):
     librepcb.add_project("Empty Project")
     librepcb.set_project("Empty Project/Empty Project.lpp")
     # Note: The RPC server is enabled by the demo workspace settings file
-    # (tests/data/workspaces/Empty Workspace), no env var needed.
-    # Let the OS pick a free port which we then tell the application to use.
-    sock = socket.socket()
-    sock.bind(("127.0.0.1", 0))
-    port = sock.getsockname()[1]
-    sock.close()
-    librepcb.env["LIBREPCB_RPC_PORT"] = str(port)
+    # (tests/data/workspaces/Empty Workspace).
 
     with librepcb.open() as app:  # noqa: F841
-        rpc = RpcClient(port)
+        rpc = RpcClient(PORT)
         try:
             # --- Handshake -----------------------------------------------
             error, result = rpc.request(1, "initialize", {"token": TOKEN})
             assert error is None, f"initialize failed: {error!r}"
-            assert result["protocolVersion"] == "1"
             assert isinstance(result["appVersion"], str)
             assert isinstance(result["pid"], int)
-            assert isinstance(result["workspace"], str)
+            # Verify that we're connected to the expected application
+            # instance (the port fallback could have chosen a different
+            # port if a stale instance was still listening).
+            assert result["workspace"] == librepcb.workspace_path.replace(
+                "\\", "/"
+            )
 
             # --- Protocol-level methods ----------------------------------
             error, result = rpc.request(2, "ping", None)

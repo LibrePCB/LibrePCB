@@ -19,9 +19,13 @@ source of truth of the API.
 Transport & Framing {#doc_rpc_api_transport}
 -------------------
 
-The RPC server listens on a local TCP socket (`127.0.0.1`, port assigned by
-the operating system) and accepts an unlimited number of connections. The
-wire format is [MessagePack](https://msgpack.org), decoded directly from
+The RPC server listens on a local TCP socket (`127.0.0.1`) on a fixed
+default port: 19536, which is the letters "LP" (for LibrePCB)
+interpreted as a hexadecimal number (0x4C50; unassigned in the IANA
+registry and below the ephemeral port ranges of all major platforms). If
+the port is already in use (e.g. by another LibrePCB instance), the next
+higher port is used.
+The wire format is [MessagePack](https://msgpack.org), decoded directly from
 the stream (self-delimiting, like the official MessagePack-RPC protocol,
 no length prefix). A decoder which blocks mid-value until more bytes
 arrive never re-parses partial data. The size of a single message is

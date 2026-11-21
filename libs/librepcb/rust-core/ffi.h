@@ -374,7 +374,7 @@ struct RenumberComponentsSymbolData {
  * Callback which dispatches a command request from the Rust server to C++.
  *
  * It is invoked on the connection's reader thread with
- * `(ctx, conn_id, msgid, method, params)`, where `params` is the whole
+ * `(ctx, conn_id, msg_id, method, params)`, where `params` is the whole
  * params map (including the reserved `obj` key, which is a documented
  * convention and extracted by the C++ dispatch layer, not by Rust).
  *
@@ -388,22 +388,22 @@ struct RenumberComponentsSymbolData {
  * sent), or `false` if it could not be dispatched (the server then
  * responds with an internal error).
  */
-using RpcDispatchFn = bool(*)(void *ctx,
-                              uint64_t conn_id,
-                              uint32_t msgid,
-                              const QString * NONNULL method,
-                              const QVariant * NONNULL params);
+using RpcOnRequestCallback = bool(*)(void *ctx,
+                                     uint32_t conn_id,
+                                     uint32_t msg_id,
+                                     const QString * NONNULL method,
+                                     const QVariant * NONNULL params);
 
 /**
  * Callback which is invoked when a client cancels a pending request
- * (message `[4, msgid]`).
+ * (message `[4, msg_id]`).
  *
  * It is invoked on the connection's reader thread. The C++ implementation
  * must eventually make sure the request is replied exactly once
  * (typically with a "cancelled" error, or with the normal result if the
  * work already completed).
  */
-using RpcCancelFn = void(*)(void *ctx, uint64_t conn_id, uint32_t msgid);
+using RpcOnCancelCallback = void(*)(void *ctx, uint32_t conn_id, uint32_t msg_id);
 
 extern "C" {
 
@@ -739,16 +739,27 @@ void ffi_renumber_components(const QStringList * NONNULL names,
                              QStringList * NONNULL out);
 
 /**
- * Create a new [RpcServer] object.
+ * Create a new [RpcServer] object, which immediately starts listening on
+ * 127.0.0.1 (see `DEFAULT_PORT` / `MAX_PORT_ATTEMPTS` in
+ * `rpc_server.rs` for the port selection).
  *
  * - `dispatch`/`cancel`/`ctx`: The command dispatcher and cancel callback.
  *   The `initialize` request (authentication) is dispatched through the
  *   dispatcher as well — the C++ side validates the token and calls
  *   `ffi_rpc_server_set_authenticated()`.
+ *
+ * Returns null if the server could not be started (no free port / thread
+ * spawning failed).
  */
-RpcServer *ffi_rpc_server_new(RpcDispatchFn dispatch,
-                              RpcCancelFn cancel,
-                              void *ctx);
+RpcServer *ffi_rpc_server_new(RpcOnRequestCallback on_request,
+                              RpcOnCancelCallback on_cancel,
+                              void *ctx,
+                              uint16_t * NONNULL port);
+
+/**
+ * Delete [RpcServer] object (stops the server and joins its threads).
+ */
+void ffi_rpc_server_delete(RpcServer *s);
 
 /**
  * Mark a connection as (un)authenticated.
@@ -758,48 +769,8 @@ RpcServer *ffi_rpc_server_new(RpcDispatchFn dispatch,
  * Calls for unknown or already closed connections are ignored.
  */
 void ffi_rpc_server_set_authenticated(RpcServer * NONNULL s,
-                                      uint64_t conn_id,
+                                      uint32_t conn_id,
                                       bool authenticated);
-
-/**
- * Start listening on 127.0.0.1 on the given port (0 = OS-assigned).
- *
- * Returns `false` on failure, otherwise `*out_port` contains the actual
- * port the server is listening on.
- */
-bool ffi_rpc_server_start(RpcServer * NONNULL s,
-                          uint16_t port,
-                          uint16_t * NONNULL out_port);
-
-/**
- * Send the response for a pending request (thread-safe, never blocks).
- *
- * Exactly one of result/error is sent, enforced by the server: A second
- * response for the same msgid, or a response for an unknown or already
- * closed connection, is silently dropped (returns `false`).
- *
- * - `ok == true`: `value` is the result.
- * - `ok == false`: `value` is an error map `{"code": <int>,
- *   "message": <string>, "data"?: <any>}`.
- *
- * If `value` contains types outside the protocol's value domain, an
- * internal error is sent instead.
- */
-bool ffi_rpc_server_reply(RpcServer * NONNULL s,
-                          uint64_t conn_id,
-                          uint32_t msgid,
-                          bool ok,
-                          const QVariant * NONNULL value);
-
-/**
- * Push an event (a notification) to all connected clients (never blocks).
- *
- * If `params` contains types outside the protocol's value domain, the
- * notification is dropped with a warning.
- */
-void ffi_rpc_server_notify_all(RpcServer * NONNULL s,
-                               const QString * NONNULL method,
-                               const QVariant * NONNULL params);
 
 /**
  * Send a request-scoped message (e.g. a progress report) to the client
@@ -810,15 +781,30 @@ void ffi_rpc_server_notify_all(RpcServer * NONNULL s,
  * contains types outside the protocol's value domain, it is dropped with
  * a warning.
  */
-bool ffi_rpc_server_notify_conn(RpcServer * NONNULL s,
-                                uint64_t conn_id,
-                                uint32_t msgid,
-                                const QVariant * NONNULL payload);
+bool ffi_rpc_server_notify(RpcServer * NONNULL s,
+                           uint32_t conn_id,
+                           uint32_t msg_id,
+                           const QVariant * NONNULL payload);
 
 /**
- * Delete [RpcServer] object (stops the server and joins its threads).
+ * Send the response for a pending request (thread-safe, never blocks).
+ *
+ * Exactly one of result/error is sent, enforced by the server: A second
+ * response for the same msg_id, or a response for an unknown or already
+ * closed connection, is silently dropped (returns `false`).
+ *
+ * - `ok == true`: `value` is the result.
+ * - `ok == false`: `value` is an error map `{"code": <int>,
+ *   "message": <string>, "data"?: <any>}`.
+ *
+ * If `value` contains types outside the protocol's value domain, an
+ * internal error is sent instead.
  */
-void ffi_rpc_server_delete(RpcServer *s);
+bool ffi_rpc_server_reply(RpcServer * NONNULL s,
+                          uint32_t conn_id,
+                          uint32_t msg_id,
+                          bool ok,
+                          const QVariant * NONNULL payload);
 
 /**
  * Wrapper for [increment_number_in_string]

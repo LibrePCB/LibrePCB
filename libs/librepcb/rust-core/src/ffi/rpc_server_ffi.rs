@@ -21,7 +21,7 @@ use rmpv::Value;
 /// Callback which dispatches a command request from the Rust server to C++.
 ///
 /// It is invoked on the connection's reader thread with
-/// `(ctx, conn_id, msgid, method, params)`, where `params` is the whole
+/// `(ctx, conn_id, msg_id, method, params)`, where `params` is the whole
 /// params map (including the reserved `obj` key, which is a documented
 /// convention and extracted by the C++ dispatch layer, not by Rust).
 ///
@@ -34,23 +34,23 @@ use rmpv::Value;
 /// Returns `true` if the request was accepted (i.e. a response will be
 /// sent), or `false` if it could not be dispatched (the server then
 /// responds with an internal error).
-pub type RpcDispatchFn = extern "C" fn(
+pub type RpcOnRequestCallback = extern "C" fn(
   ctx: *mut c_void,
-  conn_id: u64,
-  msgid: u32,
+  conn_id: u32,
+  msg_id: u32,
   method: &QString,
   params: &QVariant,
 ) -> bool;
 
 /// Callback which is invoked when a client cancels a pending request
-/// (message `[4, msgid]`).
+/// (message `[4, msg_id]`).
 ///
 /// It is invoked on the connection's reader thread. The C++ implementation
 /// must eventually make sure the request is replied exactly once
 /// (typically with a "cancelled" error, or with the normal result if the
 /// work already completed).
-pub type RpcCancelFn =
-  extern "C" fn(ctx: *mut c_void, conn_id: u64, msgid: u32);
+pub type RpcOnCancelCallback =
+  extern "C" fn(ctx: *mut c_void, conn_id: u32, msg_id: u32);
 
 /// A C++ callback (function pointer + context).
 ///
@@ -84,9 +84,9 @@ unsafe impl<F> Sync for CppCallback<F> {}
 /// capture the individual (raw) fields of [CppCallback], which would make
 /// the closure not [Send]/[Sync] although the struct itself is.
 fn call_dispatch(
-  callback: &CppCallback<RpcDispatchFn>,
-  conn_id: u64,
-  msgid: u32,
+  callback: &CppCallback<RpcOnRequestCallback>,
+  conn_id: u32,
+  msg_id: u32,
   method: &str,
   params: &Value,
 ) -> Result<bool, ()> {
@@ -101,7 +101,7 @@ fn call_dispatch(
     }
   };
   let ok = unsafe {
-    (callback.f)(callback.ctx, conn_id, msgid, &*method_q, &*params_q)
+    (callback.f)(callback.ctx, conn_id, msg_id, &*method_q, &*params_q)
   };
   qstring_delete(method_q);
   qvariant_delete(params_q);
@@ -109,8 +109,12 @@ fn call_dispatch(
 }
 
 /// Call the C++ cancel callback (same pattern as [call_dispatch]).
-fn call_cancel(callback: &CppCallback<RpcCancelFn>, conn_id: u64, msgid: u32) {
-  (callback.f)(callback.ctx, conn_id, msgid);
+fn call_cancel(
+  callback: &CppCallback<RpcOnCancelCallback>,
+  conn_id: u32,
+  msg_id: u32,
+) {
+  (callback.f)(callback.ctx, conn_id, msg_id);
 }
 
 /// Build a QVariant tree from a msgpack value (recursively). The returned
@@ -256,22 +260,28 @@ fn is_error_object(value: &Value) -> bool {
       .is_some()
 }
 
-/// Create a new [RpcServer] object.
+/// Create a new [RpcServer] object, which immediately starts listening on
+/// 127.0.0.1 (see `DEFAULT_PORT` / `MAX_PORT_ATTEMPTS` in
+/// `rpc_server.rs` for the port selection).
 ///
 /// - `dispatch`/`cancel`/`ctx`: The command dispatcher and cancel callback.
 ///   The `initialize` request (authentication) is dispatched through the
 ///   dispatcher as well — the C++ side validates the token and calls
 ///   `ffi_rpc_server_set_authenticated()`.
+///
+/// Returns null if the server could not be started (no free port / thread
+/// spawning failed).
 #[no_mangle]
 extern "C" fn ffi_rpc_server_new(
-  dispatch: RpcDispatchFn,
-  cancel: RpcCancelFn,
+  on_request: RpcOnRequestCallback,
+  on_cancel: RpcOnCancelCallback,
   ctx: *mut c_void,
+  port: &mut u16,
 ) -> *mut RpcServer {
-  let dispatch_callback = CppCallback { f: dispatch, ctx };
+  let dispatch_callback = CppCallback { f: on_request, ctx };
   let dispatch: DispatchFn = Arc::new(
-    move |conn_id: u64, msgid: u32, method: &str, params: &Value| {
-      match call_dispatch(&dispatch_callback, conn_id, msgid, method, params) {
+    move |conn_id: u32, msg_id: u32, method: &str, params: &Value| {
+      match call_dispatch(&dispatch_callback, conn_id, msg_id, method, params) {
         Ok(true) => DispatchOutcome::Dispatched,
         Ok(false) => DispatchOutcome::ReplyNow(RpcError::new(
           RpcErrorCode::InternalError,
@@ -289,11 +299,24 @@ extern "C" fn ffi_rpc_server_new(
       }
     },
   );
-  let cancel_callback = CppCallback { f: cancel, ctx };
-  let cancel: CancelFn = Arc::new(move |conn_id, msgid| {
-    call_cancel(&cancel_callback, conn_id, msgid)
+  let cancel_callback = CppCallback { f: on_cancel, ctx };
+  let cancel: CancelFn = Arc::new(move |conn_id, msg_id| {
+    call_cancel(&cancel_callback, conn_id, msg_id)
   });
-  Box::into_raw(Box::new(RpcServer::new(dispatch, cancel)))
+  match RpcServer::new(dispatch, cancel, port) {
+    Ok(server) => Box::into_raw(Box::new(server)),
+    Err(e) => {
+      eprintln!("librepcb-rust: Failed to start the RPC server: {e}");
+      std::ptr::null_mut()
+    }
+  }
+}
+
+/// Delete [RpcServer] object (stops the server and joins its threads).
+#[no_mangle]
+extern "C" fn ffi_rpc_server_delete(s: *mut RpcServer) {
+  assert!(!s.is_null());
+  unsafe { drop(Box::from_raw(s)) };
 }
 
 /// Mark a connection as (un)authenticated.
@@ -304,36 +327,37 @@ extern "C" fn ffi_rpc_server_new(
 #[no_mangle]
 extern "C" fn ffi_rpc_server_set_authenticated(
   s: &mut RpcServer,
-  conn_id: u64,
+  conn_id: u32,
   authenticated: bool,
 ) {
   s.set_authenticated(conn_id, authenticated)
 }
 
-/// Start listening on 127.0.0.1 on the given port (0 = OS-assigned).
+/// Send a request-scoped message (e.g. a progress report) to the client
+/// which sent the request (never blocks).
 ///
-/// Returns `false` on failure, otherwise `*out_port` contains the actual
-/// port the server is listening on.
+/// The message is only delivered while the request is pending, i.e. before
+/// its response was sent (returns `false` otherwise). If `payload`
+/// contains types outside the protocol's value domain, it is dropped with
+/// a warning.
 #[no_mangle]
-extern "C" fn ffi_rpc_server_start(
+extern "C" fn ffi_rpc_server_notify(
   s: &mut RpcServer,
-  port: u16,
-  out_port: &mut u16,
+  conn_id: u32,
+  msg_id: u32,
+  payload: &QVariant,
 ) -> bool {
-  *out_port = 0;
-  match s.start_on_port(port) {
-    Ok(port) => {
-      *out_port = port;
-      true
-    }
-    Err(_) => false,
-  }
+  let Ok(payload) = qvariant_to_msgpack(payload) else {
+    eprintln!("librepcb-rust: Ignoring request message with invalid payload.");
+    return false;
+  };
+  s.notify_conn(conn_id, msg_id, &payload)
 }
 
 /// Send the response for a pending request (thread-safe, never blocks).
 ///
 /// Exactly one of result/error is sent, enforced by the server: A second
-/// response for the same msgid, or a response for an unknown or already
+/// response for the same msg_id, or a response for an unknown or already
 /// closed connection, is silently dropped (returns `false`).
 ///
 /// - `ok == true`: `value` is the result.
@@ -345,18 +369,18 @@ extern "C" fn ffi_rpc_server_start(
 #[no_mangle]
 extern "C" fn ffi_rpc_server_reply(
   s: &mut RpcServer,
-  conn_id: u64,
-  msgid: u32,
+  conn_id: u32,
+  msg_id: u32,
   ok: bool,
-  value: &QVariant,
+  payload: &QVariant,
 ) -> bool {
-  let value = match qvariant_to_msgpack(value) {
-    Ok(value) => value,
+  let payload = match qvariant_to_msgpack(payload) {
+    Ok(payload) => payload,
     Err(()) => {
       eprintln!("librepcb-rust: A command returned an unsupported value type.");
       return s.reply(
         conn_id,
-        msgid,
+        msg_id,
         Some(&RpcError::new(
           RpcErrorCode::InternalError,
           "The command returned an unsupported value type",
@@ -366,17 +390,17 @@ extern "C" fn ffi_rpc_server_reply(
     }
   };
   if ok {
-    s.reply(conn_id, msgid, None, &value)
+    s.reply(conn_id, msg_id, None, &payload)
   } else {
     // Pass the error map from C++ through unchanged — it may carry
     // additional error properties next to "code" and "message" (see the
     // error types in the API specification). Only if it is not even a
     // valid error object, fall back to a generic internal error.
-    if !is_error_object(&value) {
+    if !is_error_object(&payload) {
       eprintln!("librepcb-rust: A command returned an invalid error object.");
       return s.reply(
         conn_id,
-        msgid,
+        msg_id,
         Some(&RpcError::new(
           RpcErrorCode::InternalError,
           "The command returned an invalid error object",
@@ -384,52 +408,6 @@ extern "C" fn ffi_rpc_server_reply(
         &Value::Nil,
       );
     }
-    s.reply_error(conn_id, msgid, &value)
+    s.reply_error(conn_id, msg_id, &payload)
   }
-}
-
-/// Push an event (a notification) to all connected clients (never blocks).
-///
-/// If `params` contains types outside the protocol's value domain, the
-/// notification is dropped with a warning.
-#[no_mangle]
-extern "C" fn ffi_rpc_server_notify_all(
-  s: &mut RpcServer,
-  method: &QString,
-  params: &QVariant,
-) {
-  let method = from_qstring(method);
-  let Ok(value) = qvariant_to_msgpack(params) else {
-    eprintln!("librepcb-rust: Ignoring event with invalid params: {method}");
-    return;
-  };
-  s.notify_all(&method, &value);
-}
-
-/// Send a request-scoped message (e.g. a progress report) to the client
-/// which sent the request (never blocks).
-///
-/// The message is only delivered while the request is pending, i.e. before
-/// its response was sent (returns `false` otherwise). If `payload`
-/// contains types outside the protocol's value domain, it is dropped with
-/// a warning.
-#[no_mangle]
-extern "C" fn ffi_rpc_server_notify_conn(
-  s: &mut RpcServer,
-  conn_id: u64,
-  msgid: u32,
-  payload: &QVariant,
-) -> bool {
-  let Ok(value) = qvariant_to_msgpack(payload) else {
-    eprintln!("librepcb-rust: Ignoring request message with invalid payload.");
-    return false;
-  };
-  s.notify_conn(conn_id, msgid, &value)
-}
-
-/// Delete [RpcServer] object (stops the server and joins its threads).
-#[no_mangle]
-extern "C" fn ffi_rpc_server_delete(s: *mut RpcServer) {
-  assert!(!s.is_null());
-  unsafe { drop(Box::from_raw(s)) };
 }

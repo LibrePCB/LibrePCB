@@ -122,7 +122,7 @@ QHash<QString, RpcServer::RpcHandler>
                     }
                     QVariantMap result;
                     result.insert("projects", projects);
-                    request->replySuccess(result);
+                    request->sendSuccess(result);
                   });
 
   // Get details about an open project.
@@ -131,8 +131,8 @@ QHash<QString, RpcServer::RpcHandler>
                      const QVariant& obj, const QVariantMap&) {
                     ProjectEditor* editor = findProject(request->getApp(), obj);
                     if (!editor) {
-                      request->replyError(rs::RpcErrorCode::ProjectNotOpen,
-                                          "Project not open");
+                      request->sendError(rs::RpcErrorCode::ProjectNotOpen,
+                                         "Project not open");
                       return;
                     }
                     QVariantMap result = projectToVariant(*editor);
@@ -153,7 +153,7 @@ QHash<QString, RpcServer::RpcHandler>
                       boards.append(QVariant(item));
                     }
                     result.insert("boards", boards);
-                    request->replySuccess(result);
+                    request->sendSuccess(result);
                   });
 
   // Get the state of a project's undo stack.
@@ -163,11 +163,11 @@ QHash<QString, RpcServer::RpcHandler>
          const QVariantMap&) {
         ProjectEditor* editor = findProject(request->getApp(), obj);
         if (!editor) {
-          request->replyError(rs::RpcErrorCode::ProjectNotOpen,
-                              "Project not open");
+          request->sendError(rs::RpcErrorCode::ProjectNotOpen,
+                             "Project not open");
           return;
         }
-        request->replySuccess(undoStackToVariant(editor->getUndoStack()));
+        request->sendSuccess(undoStackToVariant(editor->getUndoStack()));
       });
 
   // Undo the last command of a project's undo stack.
@@ -177,12 +177,12 @@ QHash<QString, RpcServer::RpcHandler>
          const QVariantMap&) {
         ProjectEditor* editor = findProject(request->getApp(), obj);
         if (!editor) {
-          request->replyError(rs::RpcErrorCode::ProjectNotOpen,
-                              "Project not open");
+          request->sendError(rs::RpcErrorCode::ProjectNotOpen,
+                             "Project not open");
           return;
         }
         editor->getUndoStack().undo();  // Can throw.
-        request->replySuccess(undoStackToVariant(editor->getUndoStack()));
+        request->sendSuccess(undoStackToVariant(editor->getUndoStack()));
       });
 
   // Redo the last undone command of a project's undo stack.
@@ -192,12 +192,12 @@ QHash<QString, RpcServer::RpcHandler>
          const QVariantMap&) {
         ProjectEditor* editor = findProject(request->getApp(), obj);
         if (!editor) {
-          request->replyError(rs::RpcErrorCode::ProjectNotOpen,
-                              "Project not open");
+          request->sendError(rs::RpcErrorCode::ProjectNotOpen,
+                             "Project not open");
           return;
         }
         editor->getUndoStack().redo();  // Can throw.
-        request->replySuccess(undoStackToVariant(editor->getUndoStack()));
+        request->sendSuccess(undoStackToVariant(editor->getUndoStack()));
       });
 
   return registry;

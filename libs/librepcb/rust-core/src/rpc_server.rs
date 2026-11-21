@@ -21,7 +21,7 @@
 //! * The whole protocol handling (framing, envelope) is done here in pure
 //!   Rust, without any dependency to Qt or the C++ part of LibrePCB.
 //! * Commands are dispatched through a [DispatchFn] callback, which is
-//!   invoked with `(conn_id, msgid, method, params)` and returns
+//!   invoked with `(conn_id, msg_id, method, params)` and returns
 //!   immediately — the response is sent later through [RpcServer::reply].
 //!   In the LibrePCB application the callback is implemented in C++
 //!   (through the FFI, see `ffi/rpc_server_ffi.rs`) and marshals each
@@ -34,8 +34,8 @@
 //!   connection is authenticated. While a connection is not
 //!   authenticated, requests other than `initialize` are rejected with an
 //!   error instead of being dispatched.
-//! * The msgid is only unique per connection, so all reply functions
-//!   require the connection ID in addition to the msgid.
+//! * The msg_id is only unique per connection, so all reply functions
+//!   require the connection ID in addition to the msg_id.
 //! * The server tracks pending requests (dispatched, but not yet replied)
 //!   per connection and enforces the protocol invariants: exactly one
 //!   response per request, and request messages ([RpcServer::notify_conn])
@@ -62,7 +62,7 @@
 //!   reader thread continues reading (and dispatching) further requests
 //!   while previous ones are still being processed, and responses may be
 //!   sent in any order (pipelining, as in the official msgpack-rpc spec).
-//!   All bookkeeping (pending msgids) is synchronized internally.
+//!   All bookkeeping (pending msg_ids) is synchronized internally.
 //!
 //! [MessagePack-RPC]: https://github.com/msgpack-rpc/msgpack-rpc/blob/master/spec.md
 
@@ -76,14 +76,29 @@ pub use protocol::{RpcError, RpcErrorCode};
 use std::collections::{HashMap, HashSet};
 use std::io;
 use std::net::{Shutdown, TcpListener, TcpStream};
-use std::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicU32, AtomicUsize, Ordering};
 use std::sync::mpsc::Sender;
 use std::sync::{Arc, Mutex, MutexGuard};
 use std::thread::{self, JoinHandle};
 use std::time::{Duration, Instant};
 
-use protocol::{build_notification, build_response};
+use protocol::build_response;
 use rmpv::Value;
+
+/// The default TCP port of the RPC server: The letters "LP" (for
+/// LibrePCB) interpreted as a hexadecimal number: 0x4C50 = 19536.
+///
+/// If the port is already in use (e.g. by another LibrePCB instance), the
+/// server binds the next higher port instead (see [MAX_PORT_ATTEMPTS]).
+/// The port is in the IANA registered range, but (to the best of our
+/// knowledge) unassigned, and it's below the ephemeral port ranges of
+/// all major platforms, so it doesn't collide with outgoing connections.
+const DEFAULT_PORT: u16 = 19536; // "LP" = 0x4C50
+
+/// Maximum number of port binding attempts: The default port plus this
+/// many successors (see [DEFAULT_PORT]). Binding is a cheap syscall, so
+/// trying many ports is negligible.
+const MAX_PORT_ATTEMPTS: u16 = 100;
 
 /// Maximum time [RpcServer::stop] waits for connection threads to finish.
 /// They cannot be interrupted while blocked inside a dispatch callback, so
@@ -105,7 +120,7 @@ pub enum DispatchOutcome {
 
 /// Callback which handles a command request (fire-and-forget).
 ///
-/// It receives the connection ID, the msgid, the method name (e.g.
+/// It receives the connection ID, the msg_id, the method name (e.g.
 /// `"Project.list"`) and the raw msgpack params (a map, opaque to this
 /// server module — its content is only interpreted by the command
 /// handlers). If the request can be processed, the callback returns
@@ -123,15 +138,15 @@ pub enum DispatchOutcome {
 /// C++ side, which then calls [RpcServer::set_authenticated] to let the
 /// server know whether the connection is authenticated now.
 pub type DispatchFn =
-  Arc<dyn Fn(u64, u32, &str, &Value) -> DispatchOutcome + Send + Sync>;
+  Arc<dyn Fn(u32, u32, &str, &Value) -> DispatchOutcome + Send + Sync>;
 
 /// Callback which is invoked when a client cancels a pending request
-/// (`[4, msgid]`).
+/// (`[4, msg_id]`).
 ///
 /// The callback must eventually make sure the request is replied exactly
 /// once (typically with a "cancelled" error, or with the normal result if
 /// the work already completed).
-pub type CancelFn = Arc<dyn Fn(u64, u32) + Send + Sync>;
+pub type CancelFn = Arc<dyn Fn(u32, u32) + Send + Sync>;
 
 /// Internal shared state of the [RpcServer], used by all its threads.
 struct Inner {
@@ -140,13 +155,13 @@ struct Inner {
   /// The cancel callback (see [CancelFn]).
   cancel: CancelFn,
   /// Registered connections, by connection ID.
-  clients: Mutex<HashMap<u64, Connection>>,
+  clients: Mutex<HashMap<u32, Connection>>,
   /// Whether the server is running (set to `false` by [RpcServer::stop]).
   running: AtomicBool,
   /// Number of currently active connections (reader threads).
   active_connections: AtomicUsize,
   /// Generator for connection IDs.
-  next_conn_id: AtomicU64,
+  next_conn_id: AtomicU32,
   /// The handle of the accept loop thread, if the server was started.
   accept_thread: Mutex<Option<JoinHandle<()>>>,
 }
@@ -160,7 +175,7 @@ struct Connection {
   /// Clone of the connection's socket, used to shut it down when stopping
   /// the server (which unblocks both the reader and the writer thread).
   stream: TcpStream,
-  /// The msgids of requests which were dispatched but not yet replied.
+  /// The msg_ids of requests which were dispatched but not yet replied.
   pending: Arc<Mutex<HashSet<u32>>>,
   /// Whether the connection is authenticated. Set by the C++ side through
   /// [RpcServer::set_authenticated] (the token validation lives there).
@@ -185,59 +200,66 @@ pub struct RpcServer {
 }
 
 impl RpcServer {
-  /// Create a new server (not started yet).
-  pub fn new(dispatch: DispatchFn, cancel: CancelFn) -> Self {
-    Self {
-      inner: Arc::new(Inner {
-        dispatch,
-        cancel,
-        clients: Mutex::new(HashMap::new()),
-        running: AtomicBool::new(false),
-        active_connections: AtomicUsize::new(0),
-        next_conn_id: AtomicU64::new(0),
-        accept_thread: Mutex::new(None),
-      }),
-    }
-  }
-
-  /// Start listening on 127.0.0.1, with the port assigned by the OS.
+  /// Create a new server, which immediately starts listening on 127.0.0.1.
   ///
-  /// Returns the chosen port, which the caller needs to make the server
-  /// discoverable for clients. Returns an error if the server is already
-  /// running.
-  pub fn start(&self) -> io::Result<u16> {
-    self.start_on_port(0)
-  }
-
-  /// Start listening on 127.0.0.1 on the given port (0 = OS-assigned).
+  /// The default port ([DEFAULT_PORT]) is used if possible; if it's
+  /// already in use (e.g. by another LibrePCB instance), the next higher
+  /// ports are tried ([MAX_PORT_ATTEMPTS] attempts). Binding a port is a
+  /// cheap syscall, so the fallback logic is negligible.
   ///
-  /// Returns the chosen port, which the caller needs to make the server
-  /// discoverable for clients. Returns an error if the server is already
-  /// running.
-  pub fn start_on_port(&self, port: u16) -> io::Result<u16> {
-    if self.inner.running.load(Ordering::SeqCst) {
-      return Err(io::Error::new(
-        io::ErrorKind::InvalidInput,
-        "server is already running",
-      ));
+  /// Returns an error only if none of the attempted ports could be bound
+  /// (or if spawning the accept loop thread failed).
+  pub fn new(
+    dispatch: DispatchFn,
+    cancel: CancelFn,
+    port: &mut u16,
+  ) -> io::Result<Self> {
+    let mut listener = None;
+    let mut last_error: Option<io::Error> = None;
+    *port = DEFAULT_PORT;
+    for _ in 0..MAX_PORT_ATTEMPTS {
+      match TcpListener::bind(("127.0.0.1", *port)) {
+        Ok(l) => {
+          listener = Some(l);
+          break;
+        }
+        // The port is already in use → try the next higher one.
+        Err(e) if e.kind() == io::ErrorKind::AddrInUse => {
+          last_error = Some(e);
+          *port += 1;
+        }
+        Err(e) => return Err(e),
+      }
     }
-    let listener = TcpListener::bind(("127.0.0.1", port))?;
+    let listener = listener.ok_or_else(|| {
+      last_error.unwrap_or_else(|| {
+        io::Error::new(io::ErrorKind::AddrInUse, "no free port available")
+      })
+    })?;
     listener.set_nonblocking(true)?;
-    let port = listener.local_addr()?.port();
-    self.inner.running.store(true, Ordering::SeqCst);
-    let inner = self.inner.clone();
+
+    let inner = Arc::new(Inner {
+      dispatch,
+      cancel,
+      clients: Mutex::new(HashMap::new()),
+      running: AtomicBool::new(true),
+      active_connections: AtomicUsize::new(0),
+      next_conn_id: AtomicU32::new(0),
+      accept_thread: Mutex::new(None),
+    });
+    let accept_inner = inner.clone();
     let handle = thread::Builder::new()
       .name("rpc-accept".to_string())
-      .spawn(move || connection::accept_loop(inner, listener))?;
-    *lock(&self.inner.accept_thread) = Some(handle);
-    Ok(port)
+      .spawn(move || connection::accept_loop(accept_inner, listener))?;
+    *lock(&inner.accept_thread) = Some(handle);
+    Ok(Self { inner })
   }
 
   /// Send the response for a pending request.
   ///
   /// Exactly one of `error`/`result` is sent (with an error, the result is
   /// nil, and vice versa, as the protocol requires). A second response for
-  /// the same msgid is silently dropped (returning `false`), as is a reply
+  /// the same msg_id is silently dropped (returning `false`), as is a reply
   /// for an unknown or already closed connection — this enforces the
   /// "exactly one response per request" protocol invariant.
   ///
@@ -248,14 +270,14 @@ impl RpcServer {
   /// actually pending.
   pub fn reply(
     &self,
-    conn_id: u64,
-    msgid: u32,
+    conn_id: u32,
+    msg_id: u32,
     error: Option<&RpcError>,
     result: &Value,
   ) -> bool {
     let error = error.map(|e| e.to_value());
-    let message = build_response(msgid, error.as_ref(), result);
-    self.send_response(conn_id, msgid, &message)
+    let message = build_response(msg_id, error.as_ref(), result);
+    self.send_response(conn_id, msg_id, &message)
   }
 
   /// Send the response for a pending request, passing a raw error map
@@ -265,14 +287,14 @@ impl RpcServer {
   /// map may carry additional error properties next to "code" and
   /// "message" (see the error types in the API specification), so it is
   /// forwarded as-is instead of being rebuilt from an [RpcError].
-  pub fn reply_error(&self, conn_id: u64, msgid: u32, error: &Value) -> bool {
-    let message = build_response(msgid, Some(error), &Value::Nil);
-    self.send_response(conn_id, msgid, &message)
+  pub fn reply_error(&self, conn_id: u32, msg_id: u32, error: &Value) -> bool {
+    let message = build_response(msg_id, Some(error), &Value::Nil);
+    self.send_response(conn_id, msg_id, &message)
   }
 
-  /// Look up the connection, remove the msgid from the pending set and
+  /// Look up the connection, remove the msg_id from the pending set and
   /// queue the encoded message on its writer thread (see [RpcServer::reply]).
-  fn send_response(&self, conn_id: u64, msgid: u32, message: &Value) -> bool {
+  fn send_response(&self, conn_id: u32, msg_id: u32, message: &Value) -> bool {
     let conn = {
       let clients = lock(&self.inner.clients);
       clients
@@ -282,11 +304,11 @@ impl RpcServer {
     let Some((tx, pending)) = conn else {
       return false;
     };
-    // Removing the msgid from the pending set must happen atomically with
+    // Removing the msg_id from the pending set must happen atomically with
     // the response being queued, so that no request message (type 3) can
     // slip in between (see notify_conn).
     let mut pending = lock(&pending);
-    if !pending.remove(&msgid) {
+    if !pending.remove(&msg_id) {
       return false; // Already replied (or never dispatched).
     }
     drop(pending);
@@ -306,7 +328,12 @@ impl RpcServer {
   /// before its response was sent (returns `false` otherwise). Like
   /// [RpcServer::reply], this never blocks and may be called from any
   /// thread.
-  pub fn notify_conn(&self, conn_id: u64, msgid: u32, payload: &Value) -> bool {
+  pub fn notify_conn(
+    &self,
+    conn_id: u32,
+    msg_id: u32,
+    payload: &Value,
+  ) -> bool {
     let conn = {
       let clients = lock(&self.inner.clients);
       clients
@@ -320,40 +347,16 @@ impl RpcServer {
     // no response can be sent concurrently (which would make this message
     // arrive after the response, violating the protocol).
     let pending = lock(&pending);
-    if !pending.contains(&msgid) {
+    if !pending.contains(&msg_id) {
       return false; // Not (or no longer) pending.
     }
-    let message = protocol::build_request_message(msgid, payload);
+    let message = protocol::build_request_message(msg_id, payload);
     match codec::encode_message(&message) {
       Ok(bytes) => tx.send(bytes).is_ok(),
       Err(e) => {
         eprintln!("librepcb-rust: Failed to encode a request message: {e}");
         false
       }
-    }
-  }
-
-  /// Push an event (a notification, message type 2) to all connected
-  /// clients.
-  ///
-  /// This method never blocks (the message is just queued on each
-  /// connection) and thus may safely be called while a command dispatch is
-  /// in progress.
-  pub fn notify_all(&self, method: &str, params: &Value) {
-    let message = build_notification(method, params);
-    let Ok(bytes) = codec::encode_message(&message) else {
-      eprintln!("librepcb-rust: Failed to encode a notification");
-      return;
-    };
-    let mut clients = lock(&self.inner.clients);
-    let mut dead = Vec::new();
-    for (id, client) in clients.iter() {
-      if client.tx.send(bytes.clone()).is_err() {
-        dead.push(*id);
-      }
-    }
-    for id in dead {
-      clients.remove(&id);
     }
   }
 
@@ -365,7 +368,7 @@ impl RpcServer {
   /// `initialize` are rejected with an error instead of being dispatched.
   ///
   /// Calls for unknown or already closed connections are ignored.
-  pub fn set_authenticated(&self, conn_id: u64, authenticated: bool) {
+  pub fn set_authenticated(&self, conn_id: u32, authenticated: bool) {
     let clients = lock(&self.inner.clients);
     if let Some(conn) = clients.get(&conn_id) {
       conn.authenticated.store(authenticated, Ordering::SeqCst);
@@ -499,18 +502,18 @@ mod tests {
     }
 
     /// Build a request message.
-    fn request_value(msgid: u32, method: &str, params: Value) -> Value {
+    fn request_value(msg_id: u32, method: &str, params: Value) -> Value {
       Value::Array(vec![
         Value::from(0),
-        Value::from(msgid),
+        Value::from(msg_id),
         Value::from(method),
         params,
       ])
     }
 
     /// Send a request.
-    fn request(&mut self, msgid: u32, method: &str, params: Value) {
-      self.send(&Self::request_value(msgid, method, params));
+    fn request(&mut self, msg_id: u32, method: &str, params: Value) {
+      self.send(&Self::request_value(msg_id, method, params));
     }
 
     /// Read one message (blocking, with timeout). Returns `None` on EOF,
@@ -521,23 +524,23 @@ mod tests {
     }
 
     /// Read a response, asserting that it is a response for the given
-    /// msgid. Returns `(error, result)` — exactly one of them is non-nil.
-    fn read_response(&mut self, msgid: u32) -> (Value, Value) {
+    /// msg_id. Returns `(error, result)` — exactly one of them is non-nil.
+    fn read_response(&mut self, msg_id: u32) -> (Value, Value) {
       let message = self.read().expect("connection closed unexpectedly");
       let items = message.as_array().unwrap();
       assert_eq!(items[0], Value::from(1), "not a response: {message:?}");
       assert_eq!(
         items[1],
-        Value::from(msgid),
-        "unexpected msgid: {message:?}"
+        Value::from(msg_id),
+        "unexpected msg_id: {message:?}"
       );
       assert_eq!(items.len(), 4, "invalid response: {message:?}");
       (items[2].clone(), items[3].clone())
     }
 
     /// Read a response, asserting that it contains the given error code.
-    fn read_error(&mut self, msgid: u32, code: RpcErrorCode) {
-      let (error, result) = self.read_response(msgid);
+    fn read_error(&mut self, msg_id: u32, code: RpcErrorCode) {
+      let (error, result) = self.read_response(msg_id);
       assert!(result.is_nil(), "expected an error, got a result");
       assert_eq!(
         error.as_map().unwrap()[0],
@@ -548,7 +551,7 @@ mod tests {
 
   /// A dispatch handler which forwards all requests into a channel (to be
   /// replied by the test code, just like the C++ integration would).
-  type TestDispatch = mpsc::Receiver<(u64, u32, String, Value)>;
+  type TestDispatch = mpsc::Receiver<(u32, u32, String, Value)>;
 
   /// Create a dispatch + cancel callback pair which forward the calls
   /// into channels.
@@ -556,21 +559,21 @@ mod tests {
     DispatchFn,
     CancelFn,
     TestDispatch,
-    mpsc::Receiver<(u64, u32)>,
+    mpsc::Receiver<(u32, u32)>,
   ) {
     let (dispatch_tx, dispatch_rx) = mpsc::channel();
     let (cancel_tx, cancel_rx) = mpsc::channel();
     (
       Arc::new(
-        move |conn_id: u64, msgid: u32, method: &str, params: &Value| {
+        move |conn_id: u32, msg_id: u32, method: &str, params: &Value| {
           dispatch_tx
-            .send((conn_id, msgid, method.to_string(), params.clone()))
+            .send((conn_id, msg_id, method.to_string(), params.clone()))
             .unwrap();
           DispatchOutcome::Dispatched
         },
       ),
-      Arc::new(move |conn_id: u64, msgid: u32| {
-        cancel_tx.send((conn_id, msgid)).unwrap();
+      Arc::new(move |conn_id: u32, msg_id: u32| {
+        cancel_tx.send((conn_id, msg_id)).unwrap();
       }),
       dispatch_rx,
       cancel_rx,
@@ -582,13 +585,13 @@ mod tests {
     dispatch: DispatchFn,
     cancel: CancelFn,
   ) -> (RpcServer, u16) {
-    let server = RpcServer::new(dispatch, cancel);
-    let port = server.start().unwrap();
+    let server = RpcServer::new(dispatch, cancel).unwrap();
+    let port = server.port();
     (server, port)
   }
 
   /// Create a started test server with forwarding handlers.
-  fn spawn_server() -> (RpcServer, u16, TestDispatch, mpsc::Receiver<(u64, u32)>)
+  fn spawn_server() -> (RpcServer, u16, TestDispatch, mpsc::Receiver<(u32, u32)>)
   {
     let (dispatch, cancel, dispatch_rx, cancel_rx) = forwarding_handlers();
     let (server, port) = spawn_server_with_handlers(dispatch, cancel);
@@ -603,7 +606,7 @@ mod tests {
     dispatch: &TestDispatch,
     expected_token: &str,
   ) -> bool {
-    let (conn_id, msgid, method, params) =
+    let (conn_id, msg_id, method, params) =
       dispatch.recv_timeout(Duration::from_secs(10)).unwrap();
     assert_eq!(method, METHOD_INITIALIZE);
     let token = params
@@ -615,11 +618,11 @@ mod tests {
     let authenticated = token.as_deref() == Some(expected_token);
     server.set_authenticated(conn_id, authenticated);
     if authenticated {
-      server.reply(conn_id, msgid, None, &Value::Map(Vec::new()));
+      server.reply(conn_id, msg_id, None, &Value::Map(Vec::new()));
     } else {
       server.reply(
         conn_id,
-        msgid,
+        msg_id,
         Some(&RpcError::new(
           RpcErrorCode::Unauthenticated,
           "Invalid or missing token",
@@ -646,14 +649,14 @@ mod tests {
     client.send_initialize(TOKEN);
     // The request is dispatched to the handler, with the token in the
     // params (the whole authentication is up to the C++ side):
-    let (conn_id, msgid, method, params) =
+    let (conn_id, msg_id, method, params) =
       dispatch.recv_timeout(Duration::from_secs(10)).unwrap();
     assert_eq!(method, METHOD_INITIALIZE);
     assert_eq!(field(&params, "token"), Some(&Value::from(TOKEN)));
     // The C++ side validates the token, marks the connection as
     // authenticated and replies with the application information:
     server.set_authenticated(conn_id, true);
-    server.reply(conn_id, msgid, None, &Value::Map(Vec::new()));
+    server.reply(conn_id, msg_id, None, &Value::Map(Vec::new()));
     let (error, _) = client.read_response(1);
     assert!(error.is_nil());
     // The connection is now usable:
@@ -735,15 +738,15 @@ mod tests {
     ]);
     client.request(42, "Project.get", params.clone());
     // The dispatch handler received the request...
-    let (conn_id, msgid, method, received_params) =
+    let (conn_id, msg_id, method, received_params) =
       dispatch.recv_timeout(Duration::from_secs(10)).unwrap();
-    assert_eq!(msgid, 42);
+    assert_eq!(msg_id, 42);
     assert_eq!(method, "Project.get");
     assert_eq!(received_params, params);
     // ...and we reply asynchronously, just like the C++ integration does:
     assert!(server.reply(
       conn_id,
-      msgid,
+      msg_id,
       None,
       &Value::Map(vec![(Value::from("name"), Value::from("Test"))])
     ));
@@ -773,11 +776,11 @@ mod tests {
     let (server, port, dispatch, _cancel) = spawn_server();
     let mut client = TestClient::new(port, &server, &dispatch);
     client.request(1, "Project.list", Value::Map(Vec::new()));
-    let (conn_id, msgid, _, _) =
+    let (conn_id, msg_id, _, _) =
       dispatch.recv_timeout(Duration::from_secs(10)).unwrap();
-    // The first reply is sent, a second one for the same msgid is dropped:
-    assert!(server.reply(conn_id, msgid, None, &Value::Nil));
-    assert!(!server.reply(conn_id, msgid, None, &Value::Nil));
+    // The first reply is sent, a second one for the same msg_id is dropped:
+    assert!(server.reply(conn_id, msg_id, None, &Value::Nil));
+    assert!(!server.reply(conn_id, msg_id, None, &Value::Nil));
     let (error, _) = client.read_response(1);
     assert!(error.is_nil());
     // No second response arrives, i.e. the next message is the ping
@@ -787,18 +790,18 @@ mod tests {
   }
 
   #[test]
-  fn test_reply_for_unknown_msgid() {
+  fn test_reply_for_unknown_msg_id() {
     let (server, port, dispatch, _cancel) = spawn_server();
     let mut client = TestClient::new(port, &server, &dispatch);
-    // A reply for a msgid which was never dispatched:
-    assert!(!server.reply(u64::MAX, 123, None, &Value::Nil));
-    // A reply for a valid connection, but an unknown msgid:
+    // A reply for a msg_id which was never dispatched:
+    assert!(!server.reply(u32::MAX, 123, None, &Value::Nil));
+    // A reply for a valid connection, but an unknown msg_id:
     client.request(1, "Project.list", Value::Map(Vec::new()));
-    let (conn_id, msgid, _, _) =
+    let (conn_id, msg_id, _, _) =
       dispatch.recv_timeout(Duration::from_secs(10)).unwrap();
-    assert!(!server.reply(conn_id, msgid + 100, None, &Value::Nil));
+    assert!(!server.reply(conn_id, msg_id + 100, None, &Value::Nil));
     // The pending request is still pending, i.e. it can be replied:
-    assert!(server.reply(conn_id, msgid, None, &Value::Nil));
+    assert!(server.reply(conn_id, msg_id, None, &Value::Nil));
     let (error, _) = client.read_response(1);
     assert!(error.is_nil());
   }
@@ -808,13 +811,13 @@ mod tests {
     let (server, port, dispatch, _cancel) = spawn_server();
     let mut client = TestClient::new(port, &server, &dispatch);
     client.request(1, "Project.list", Value::Map(Vec::new()));
-    let (conn_id, msgid, _, _) =
+    let (conn_id, msg_id, _, _) =
       dispatch.recv_timeout(Duration::from_secs(10)).unwrap();
     drop(client); // Close the connection.
                   // Give the server a moment to process the disconnect.
     thread::sleep(Duration::from_millis(100));
     // The reply is silently dropped instead of panicking:
-    assert!(!server.reply(conn_id, msgid, None, &Value::Nil));
+    assert!(!server.reply(conn_id, msg_id, None, &Value::Nil));
   }
 
   #[test]
@@ -822,22 +825,22 @@ mod tests {
     let (server, port, dispatch, _cancel) = spawn_server();
     let mut client = TestClient::new(port, &server, &dispatch);
     client.request(1, "Project.list", Value::Map(Vec::new()));
-    let (conn_id, msgid, _, _) =
+    let (conn_id, msg_id, _, _) =
       dispatch.recv_timeout(Duration::from_secs(10)).unwrap();
     // While the request is pending, request messages (type 3) arrive:
     let progress = Value::Map(vec![
       (Value::from("percent"), Value::from(50)),
       (Value::from("message"), Value::from("Working")),
     ]);
-    assert!(server.notify_conn(conn_id, msgid, &progress));
+    assert!(server.notify_conn(conn_id, msg_id, &progress));
     let message = client.read().unwrap();
     let items = message.as_array().unwrap();
     assert_eq!(items[0], Value::from(3));
     assert_eq!(items[1], Value::from(1));
     assert_eq!(field(&items[2], "percent"), Some(&Value::from(50)));
     // After the response was sent, no further messages are accepted:
-    assert!(server.reply(conn_id, msgid, None, &Value::Nil));
-    assert!(!server.notify_conn(conn_id, msgid, &progress));
+    assert!(server.reply(conn_id, msg_id, None, &Value::Nil));
+    assert!(!server.notify_conn(conn_id, msg_id, &progress));
     client.read_response(1);
   }
 
@@ -871,17 +874,17 @@ mod tests {
     let (server, port, dispatch, cancel) = spawn_server();
     let mut client = TestClient::new(port, &server, &dispatch);
     client.request(1, "Project.list", Value::Map(Vec::new()));
-    let (conn_id, msgid, _, _) =
+    let (conn_id, msg_id, _, _) =
       dispatch.recv_timeout(Duration::from_secs(10)).unwrap();
     // Cancel the pending request → the cancel handler is invoked...
     client.send(&Value::Array(vec![Value::from(4), Value::from(1)]));
-    let (cancelled_conn, cancelled_msgid) =
+    let (cancelled_conn, cancelled_msg_id) =
       cancel.recv_timeout(Duration::from_secs(10)).unwrap();
-    assert_eq!((cancelled_conn, cancelled_msgid), (conn_id, msgid));
+    assert_eq!((cancelled_conn, cancelled_msg_id), (conn_id, msg_id));
     // ...and we reply with a "cancelled" error, as the C++ side would:
     assert!(server.reply(
       conn_id,
-      msgid,
+      msg_id,
       Some(&RpcError::new(RpcErrorCode::Cancelled, "cancelled")),
       &Value::Nil
     ));
@@ -889,10 +892,10 @@ mod tests {
   }
 
   #[test]
-  fn test_cancel_for_unknown_msgid_is_ignored() {
+  fn test_cancel_for_unknown_msg_id_is_ignored() {
     let (server, port, dispatch, cancel) = spawn_server();
     let mut client = TestClient::new(port, &server, &dispatch);
-    // Cancel a msgid which was never dispatched: ignored (no cancel
+    // Cancel a msg_id which was never dispatched: ignored (no cancel
     // callback, no response) — the next message is the ping response.
     client.send(&Value::Array(vec![Value::from(4), Value::from(123)]));
     client.request(2, METHOD_PING, Value::Map(Vec::new()));
@@ -906,38 +909,38 @@ mod tests {
     let mut client = TestClient::new(port, &server, &dispatch);
     // Send three requests without waiting for responses. Since dispatch
     // is asynchronous, all of them are dispatched before any reply:
-    for msgid in 1..=3u32 {
-      client.request(msgid, "Project.list", Value::Map(Vec::new()));
+    for msg_id in 1..=3u32 {
+      client.request(msg_id, "Project.list", Value::Map(Vec::new()));
     }
     let mut requests = Vec::new();
     for _ in 0..3 {
       requests.push(dispatch.recv_timeout(Duration::from_secs(10)).unwrap());
     }
     // Reply in reverse order — responses may arrive in any order:
-    for (conn_id, msgid, _, _) in requests.iter().rev() {
-      assert!(server.reply(*conn_id, *msgid, None, &Value::from(*msgid)));
+    for (conn_id, msg_id, _, _) in requests.iter().rev() {
+      assert!(server.reply(*conn_id, *msg_id, None, &Value::from(*msg_id)));
     }
-    for msgid in (1..=3u32).rev() {
-      let (error, result) = client.read_response(msgid);
+    for msg_id in (1..=3u32).rev() {
+      let (error, result) = client.read_response(msg_id);
       assert!(error.is_nil());
-      assert_eq!(result, Value::from(msgid));
+      assert_eq!(result, Value::from(msg_id));
     }
   }
 
   #[test]
-  fn test_duplicate_msgid_is_rejected() {
+  fn test_duplicate_msg_id_is_rejected() {
     let (server, port, dispatch, _cancel) = spawn_server();
     let mut client = TestClient::new(port, &server, &dispatch);
     client.request(1, "Project.list", Value::Map(Vec::new()));
-    let (conn_id, msgid, _, _) =
+    let (conn_id, msg_id, _, _) =
       dispatch.recv_timeout(Duration::from_secs(10)).unwrap();
-    // A second request with the same msgid while the first one is still
+    // A second request with the same msg_id while the first one is still
     // pending is a protocol violation and answered with an error, without
     // being dispatched:
     client.request(1, "Project.list", Value::Map(Vec::new()));
     client.read_error(1, RpcErrorCode::InvalidRequest);
     // The first request is still pending and can be replied:
-    assert!(server.reply(conn_id, msgid, None, &Value::Nil));
+    assert!(server.reply(conn_id, msg_id, None, &Value::Nil));
     let (error, _) = client.read_response(1);
     assert!(error.is_nil());
   }
@@ -946,8 +949,8 @@ mod tests {
   fn test_set_authenticated_for_unknown_connection() {
     let (server, _port, _dispatch, _cancel) = spawn_server();
     // Calls for unknown connections are ignored (must not panic):
-    server.set_authenticated(u64::MAX, true);
-    server.set_authenticated(u64::MAX, false);
+    server.set_authenticated(u32::MAX, true);
+    server.set_authenticated(u32::MAX, false);
   }
 
   #[test]
@@ -961,10 +964,14 @@ mod tests {
   }
 
   #[test]
-  fn test_stop_without_start() {
-    let (dispatch, cancel, _dispatch_rx, _cancel_rx) = forwarding_handlers();
-    let server = RpcServer::new(dispatch, cancel);
-    server.stop(); // Must be a no-op.
+  fn test_two_servers_get_different_ports() {
+    let (server1, port1, _dispatch1, _cancel1) = spawn_server();
+    let (server2, port2, _dispatch2, _cancel2) = spawn_server();
+    // The second server can't bind the port of the first one, so the
+    // fallback logic assigns a different port.
+    assert_ne!(port1, port2);
+    assert_eq!(port1, server1.port());
+    assert_eq!(port2, server2.port());
   }
 
   #[test]
@@ -976,11 +983,5 @@ mod tests {
       // The server is dropped here (at the end of the block).
     }
     assert!(client.as_mut().unwrap().read().is_none());
-  }
-
-  #[test]
-  fn test_start_twice_is_rejected() {
-    let (server, _port, _dispatch, _cancel) = spawn_server();
-    assert!(server.start().is_err());
   }
 }

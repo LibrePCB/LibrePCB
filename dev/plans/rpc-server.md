@@ -40,7 +40,7 @@ Build directory: `build/agent` (per CLAUDE.md). No commits unless asked.
 
 | Topic | Decision |
 |---|---|
-| Transport | TCP bound to `127.0.0.1`, OS-assigned port (or `LIBREPCB_RPC_PORT`); WebSocket *maybe* later, as a first-class endpoint or just a proxy plugin (to be decided when web clients materialize) |
+| Transport | TCP bound to `127.0.0.1`, fixed default port 19536 ("LP" = 0x4C50) with fallback to higher ports; WebSocket *maybe* later, as a first-class endpoint or just a proxy plugin (to be decided when web clients materialize) |
 | Wire format | MessagePack (`rmp` + `rmpv` on the Rust side; no `rmp-serde`, the envelope is built manually as values) |
 | Envelope | Custom, msgpack-rpc-inspired arrays, extended with first-class request-scoped messages (progress/streaming, cancel); see section 2 |
 | Framing | Self-delimiting msgpack stream decoding (like the official msgpack-rpc spec), no length prefix |
@@ -68,8 +68,11 @@ by debug tooling (explicitly not wanted).
 
 ### 2.1 Transport & framing
 
-TCP on 127.0.0.1, OS-assigned ephemeral port (configurable via
-`LIBREPCB_RPC_PORT` for tests). Messages are **msgpack values decoded
+TCP on 127.0.0.1 on the fixed default port 19536 ("LP" = 0x4C50); if it's
+already in use, the next higher port is tried (up to 100 attempts —
+binding is a cheap syscall, so the fallback logic is negligible). The
+Rust server binds the port and starts listening right in its constructor,
+there is no separate start step. Messages are **msgpack values decoded
 directly from the stream** (self-delimiting, like the official msgpack-rpc
 spec): the reader blocks mid-value until more bytes arrive — no length
 prefix, no re-parsing of partial data (the decoder consumes each byte
@@ -249,7 +252,8 @@ libs/librepcb/rust-core/src/ffi/rpc_server_ffi.rs   (rewritten: QVariant
 
 - **Kept (conceptually):** threading model (polling accept loop,
   reader/writer pair per connection, non-blocking notify), lifecycle
-  (`start_on_port`/`stop`/`Drop` with bounded thread drain), token
+  (`new` binds immediately with port fallback / `stop` / `Drop` with
+bounded thread drain),
   handshake flow, sequential-connection registration, `CppDispatch`
   Send/Sync pattern in the FFI.
 - **Rewritten:** envelope (JSON-RPC objects → msgpack arrays), codec
@@ -410,8 +414,9 @@ fallback.
 For the system tests, the setting is enabled in the **demo workspace
 settings file** (`tests/data/workspaces/Empty Workspace/data/settings.lp`
 — note that the settings file the application reads lives in the *data*
-directory, not in the version directories). Only `LIBREPCB_RPC_PORT`
-remains as a test env var (to pin the otherwise OS-assigned port).
+directory, not in the version directories). The server listens on its
+fixed default port 19536 ("LP" = 0x4C50; no test env var for the port
+anymore).
 
 ## 5. API spec (YAML) & documentation
 

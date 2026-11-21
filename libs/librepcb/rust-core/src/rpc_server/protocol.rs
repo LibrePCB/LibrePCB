@@ -19,7 +19,7 @@ const MESSAGE_TYPE_REQUEST: i64 = 0;
 /// The message type of a response (server → client).
 const MESSAGE_TYPE_RESPONSE: i64 = 1;
 /// The message type of a notification/event (server → all clients).
-const MESSAGE_TYPE_NOTIFICATION: i64 = 2;
+//const MESSAGE_TYPE_NOTIFICATION: i64 = 2;
 /// The message type of a request-scoped message (server → client, e.g.
 /// progress or streamed data while a request is pending).
 const MESSAGE_TYPE_REQUEST_MESSAGE: i64 = 3;
@@ -277,16 +277,6 @@ pub fn build_response(
   }
 }
 
-/// Serialize a notification (an event broadcast to all clients):
-/// `[2, method, params]`.
-pub fn build_notification(method: &str, params: &Value) -> Value {
-  Value::Array(vec![
-    Value::from(MESSAGE_TYPE_NOTIFICATION),
-    Value::from(method),
-    params.clone(),
-  ])
-}
-
 /// Serialize a request-scoped message (e.g. progress, or streamed partial
 /// data): `[3, msgid, payload]`.
 pub fn build_request_message(msgid: u32, payload: &Value) -> Value {
@@ -472,15 +462,6 @@ mod tests {
       Some(&Value::from(RpcErrorCode::ProjectNotOpen as i64))
     );
     assert_eq!(items[3], Value::Nil); // Result is nil on error.
-  }
-
-  #[test]
-  fn test_build_notification() {
-    let notification = build_notification("project_opened", &Value::Nil);
-    let items = notification.as_array().unwrap();
-    assert_eq!(items[0], Value::from(2));
-    assert_eq!(items[1], Value::from("project_opened"));
-    assert_eq!(items[2], Value::Nil);
   }
 
   #[test]

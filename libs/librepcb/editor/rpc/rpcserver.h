@@ -94,8 +94,8 @@ public:
     Request() = delete;
     Request(const Request& other) = delete;
     Request& operator=(const Request& rhs) = delete;
-    Request(GuiApplication& app, RpcServer& server, uint64_t connId,
-            uint32_t msgid, QString method) noexcept;
+    Request(GuiApplication& app, RpcServer& server, uint32_t connId,
+            uint32_t msgId, QString method) noexcept;
     ~Request() noexcept;
 
     // Getters
@@ -115,13 +115,24 @@ public:
     // General Methods
 
     /**
+     * @brief Send a request-scoped message to the client (e.g. progress)
+     *
+     * May be called any number of times while the request is pending, i.e.
+     * before it is replied. Never blocks, thus safe to call from the GUI
+     * thread.
+     *
+     * @param payload  The message payload (e.g. a progress map).
+     */
+    void sendNotification(const QVariant& payload) noexcept;
+
+    /**
      * @brief Reply with a result (finishes the request)
      *
      * @param result  The result value (any type of the protocol's value
      *                domain, usually a map). Gets normalized, i.e. plain
      *                C++ types like `int` are converted automatically.
      */
-    void replySuccess(const QVariant& result = QVariant()) noexcept;
+    void sendSuccess(const QVariant& result = QVariant()) noexcept;
 
     /**
      * @brief Reply with an error (finishes the request)
@@ -132,19 +143,8 @@ public:
      *                    "code" and "message" (see the error types in the
      *                    API specification).
      */
-    void replyError(rs::RpcErrorCode code, const QString& message,
-                    const QVariantMap& properties = QVariantMap()) noexcept;
-
-    /**
-     * @brief Send a request-scoped message to the client (e.g. progress)
-     *
-     * May be called any number of times while the request is pending, i.e.
-     * before it is replied. Never blocks, thus safe to call from the GUI
-     * thread.
-     *
-     * @param payload  The message payload (e.g. a progress map).
-     */
-    void emitMessage(const QVariant& payload) noexcept;
+    void sendError(rs::RpcErrorCode code, const QString& message,
+                   const QVariantMap& properties = QVariantMap()) noexcept;
 
   private:  // Methods
     /// Mark the request as cancelled (called by the server).
@@ -161,7 +161,7 @@ public:
   private:  // Data
     GuiApplication& mApp;
     RpcServer* mServer;  ///< Null once the server is being destroyed.
-    uint64_t mConnId;
+    uint32_t mConnId;
     uint32_t mMsgid;
     QString mMethod;
     bool mReplied;
@@ -203,57 +203,56 @@ public:
 
 private:  // Types
   /// Key for a pending request in the registry.
-  static QString requestKey(uint64_t connId, uint32_t msgid) noexcept {
-    return QString::fromLatin1("%1:%2").arg(connId).arg(msgid);
+  static QString requestKey(uint32_t connId, uint32_t msgId) noexcept {
+    return QString::fromLatin1("%1:%2").arg(connId).arg(msgId);
   }
 
 private:  // Methods
-  /// @brief The FFI trampolines need access to the private methods.
-  friend bool rpcServerDispatch(void* ctx, uint64_t connId, uint32_t msgid,
-                                const QString* method, const QVariant* params);
-  friend void rpcServerCancel(void* ctx, uint64_t connId, uint32_t msgid);
-
   /// Called on a Rust connection thread: Marshal the request to the GUI
   /// thread (asynchronously).
-  bool dispatchFromWorkerThread(uint64_t connId, uint32_t msgid,
+  bool dispatchFromWorkerThread(uint32_t connId, uint32_t msgId,
                                 const QString& method,
                                 const QVariant& params) noexcept;
 
   /// Called on a Rust connection thread: Marshal the cancel notification
   /// to the GUI thread (asynchronously).
-  void cancelFromWorkerThread(uint64_t connId, uint32_t msgid) noexcept;
+  void cancelFromWorkerThread(uint32_t connId, uint32_t msgId) noexcept;
 
   /// Called on the GUI thread: Extract the "obj" key, look up the command
   /// handler and execute it (or reply with an error).
-  void handleRequest(uint64_t connId, uint32_t msgid, const QString& method,
+  void handleRequest(uint32_t connId, uint32_t msgId, const QString& method,
                      const QVariant& params) noexcept;
 
   /// Called on the GUI thread: Handle an `initialize` request — validate
   /// the token, mark the connection as (un)authenticated on the Rust side
   /// and reply with the application information.
-  void handleInitialize(uint64_t connId, uint32_t msgid,
+  void handleInitialize(uint32_t connId, uint32_t msgId,
                         const QVariantMap& args) noexcept;
 
   /// Called on the GUI thread: Mark a pending request as cancelled.
-  void handleCancel(uint64_t connId, uint32_t msgid) noexcept;
+  void handleCancel(uint32_t connId, uint32_t msgId) noexcept;
 
   /// Reply a result directly, without creating a #Request object (used for
   /// `initialize`). Normalizes the value first.
-  void replySuccess(uint64_t connId, uint32_t msgid,
+  void replySuccess(uint32_t connId, uint32_t msgId,
                     const QVariant& result) noexcept;
 
   /// Reply an error directly, without creating a #Request object (e.g. for
   /// invalid params or an unknown method). Exactly-once is enforced by the
   /// Rust server, so this is safe even if the request was already replied.
-  void replyError(uint64_t connId, uint32_t msgid, rs::RpcErrorCode code,
+  void replyError(uint32_t connId, uint32_t msgId, rs::RpcErrorCode code,
                   const QString& message) noexcept;
 
-  /// Push an event (a notification) to all connected clients.
-  void notifyEvent(const QString& method, const QVariant& params) noexcept;
+  static bool onRequestCallback(void* ctx, uint32_t connId, uint32_t msgId,
+                                const QString* method, const QVariant* params);
+  static void onCancelCallback(void* ctx, uint32_t connId, uint32_t msgId);
 
 private:  // Data
   /// The application to dispatch the commands to
   GuiApplication& mApp;
+
+  /// The TCP port the server is listening on (coming from Rust side)
+  uint16_t mPort;
 
   /// The FFI handle of the (Rust implemented) server
   RustHandle<rs::RpcServer> mHandle;
@@ -261,7 +260,7 @@ private:  // Data
   /// All registered command handlers, by method name
   QHash<QString, RpcHandler> mCommands;
 
-  /// Pending (dispatched, not yet replied) requests, by connection+msgid
+  /// Pending (dispatched, not yet replied) requests, by connection+msgId
   QHash<QString, QSharedPointer<Request>> mPendingRequests;
 };
 
