@@ -154,25 +154,27 @@ void RpcServer::Request::sendReply(bool ok, const QVariant& value) noexcept {
   }
 }
 
-bool RpcServer::dispatchFromWorkerThread(uint32_t connId, uint32_t msgId,
+void RpcServer::processRequest(uint32_t connId, uint32_t msgId,
                                          const QString& method,
                                          const QVariant& params) noexcept {
   // Marshal the request to the GUI thread, asynchronously. Note that all
   // the values are captured by copy (cheap due to Qt's implicit sharing),
   // so they stay valid even if this thread continues right away.
-  const bool invoked = QMetaObject::invokeMethod(
-      this,
-      [this, connId, msgId, method, params]() {
-        handleRequest(connId, msgId, method, params);
-      },
-      Qt::QueuedConnection);
-  if (!invoked) {
+  if (!QMetaObject::invokeMethod(
+          this,
+          [this, connId, msgId, method, params]() {
+            handleRequest(connId, msgId, method, params);
+          },
+          Qt::QueuedConnection)) {
+    // Unreachable in practice: The functor overload of invokeMethod() only
+    // fails if the context object is null, which it never is here. If it
+    // ever happened anyway, the request would stay pending and the client
+    // would eventually time out.
     qWarning() << "Failed to marshal RPC request to the GUI thread:" << method;
   }
-  return invoked;
 }
 
-void RpcServer::cancelFromWorkerThread(uint32_t connId,
+void RpcServer::processCancel(uint32_t connId,
                                        uint32_t msgId) noexcept {
   const bool invoked = QMetaObject::invokeMethod(
       this, [this, connId, msgId]() { handleCancel(connId, msgId); },
@@ -272,17 +274,17 @@ void RpcServer::replyError(uint32_t connId, uint32_t msgId,
   rs::ffi_rpc_server_reply(*mHandle, connId, msgId, false, &error);
 }
 
-bool RpcServer::onRequestCallback(void* ctx, uint32_t connId, uint32_t msgId,
+void RpcServer::onRequestCallback(void* ctx, uint32_t connId, uint32_t msgId,
                                   const QString* method,
                                   const QVariant* params) {
   Q_ASSERT(ctx && method && params);
-  return static_cast<RpcServer*>(ctx)->dispatchFromWorkerThread(
-      connId, msgId, *method, *params);
+  static_cast<RpcServer*>(ctx)->processRequest(connId, msgId, *method,
+                                                        *params);
 }
 
 void RpcServer::onCancelCallback(void* ctx, uint32_t connId, uint32_t msgId) {
   Q_ASSERT(ctx);
-  static_cast<RpcServer*>(ctx)->cancelFromWorkerThread(connId, msgId);
+  static_cast<RpcServer*>(ctx)->processCancel(connId, msgId);
 }
 
 /*******************************************************************************

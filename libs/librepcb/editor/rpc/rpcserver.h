@@ -204,13 +204,13 @@ public:
 private:  // Methods
   /// Called on a Rust connection thread: Marshal the request to the GUI
   /// thread (asynchronously).
-  bool dispatchFromWorkerThread(uint32_t connId, uint32_t msgId,
+  void processRequest(uint32_t connId, uint32_t msgId,
                                 const QString& method,
                                 const QVariant& params) noexcept;
 
   /// Called on a Rust connection thread: Marshal the cancel notification
   /// to the GUI thread (asynchronously).
-  void cancelFromWorkerThread(uint32_t connId, uint32_t msgId) noexcept;
+  void processCancel(uint32_t connId, uint32_t msgId) noexcept;
 
   /// Called on the GUI thread: Extract the "obj" key, look up the command
   /// handler and execute it (or reply with an error).
@@ -237,7 +237,7 @@ private:  // Methods
   void replyError(uint32_t connId, uint32_t msgId, rs::RpcErrorCode code,
                   const QString& message) noexcept;
 
-  static bool onRequestCallback(void* ctx, uint32_t connId, uint32_t msgId,
+  static void onRequestCallback(void* ctx, uint32_t connId, uint32_t msgId,
                                 const QString* method, const QVariant* params);
   static void onCancelCallback(void* ctx, uint32_t connId, uint32_t msgId);
 

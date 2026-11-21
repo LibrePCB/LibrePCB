@@ -384,11 +384,10 @@ struct RenumberComponentsSymbolData {
  * thread. It may send request-scoped messages (e.g. progress) via
  * `ffi_rpc_server_notify_conn()` in the meantime.
  *
- * Returns `true` if the request was accepted (i.e. a response will be
- * sent), or `false` if it could not be dispatched (the server then
- * responds with an internal error).
+ * Marshalling to the GUI thread cannot fail in practice (the context
+ * object is always valid), so the callback has no return value.
  */
-using RpcOnRequestCallback = bool(*)(void *ctx,
+using RpcOnRequestCallback = void(*)(void *ctx,
                                      uint32_t conn_id,
                                      uint32_t msg_id,
                                      const QString * NONNULL method,

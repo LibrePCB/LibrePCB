@@ -31,16 +31,15 @@ use rmpv::Value;
 /// thread. It may send request-scoped messages (e.g. progress) via
 /// `ffi_rpc_server_notify_conn()` in the meantime.
 ///
-/// Returns `true` if the request was accepted (i.e. a response will be
-/// sent), or `false` if it could not be dispatched (the server then
-/// responds with an internal error).
+/// Marshalling to the GUI thread cannot fail in practice (the context
+/// object is always valid), so the callback has no return value.
 pub type RpcOnRequestCallback = extern "C" fn(
   ctx: *mut c_void,
   conn_id: u32,
   msg_id: u32,
   method: &QString,
   params: &QVariant,
-) -> bool;
+);
 
 /// Callback which is invoked when a client cancels a pending request
 /// (message `[4, msg_id]`).
@@ -256,19 +255,15 @@ extern "C" fn ffi_rpc_server_new(
           return Err(RpcError::invalid_params());
         }
       };
-      let ok = unsafe {
+      // Marshalling in the callback cannot fail (see the
+      // [RpcOnRequestCallback] documentation), so the request is accepted
+      // unconditionally once the params were converted.
+      unsafe {
         (callback.f)(callback.ctx, conn_id, msg_id, &*method_q, &*params_q)
       };
       qstring_delete(method_q);
       qvariant_delete(params_q);
-      if ok {
-        Ok(())
-      } else {
-        Err(RpcError::new(
-          RpcErrorCode::InternalError,
-          "Failed to dispatch the command",
-        ))
-      }
+      Ok(())
     },
   );
   let cancel_callback = CppCallback { f: on_cancel, ctx };
