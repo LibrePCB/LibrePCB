@@ -882,6 +882,8 @@ add_library(
   project/schematic/symbolinstancepropertiesdialog.h
   project/schematic/symbolinstancepropertiesdialog.ui
   rpc/commands.cpp
+  rpc/rpcrequest.cpp
+  rpc/rpcrequest.h
   rpc/rpcserver.cpp
   rpc/rpcserver.h
   rulecheck/rulecheckmessagesmodel.cpp

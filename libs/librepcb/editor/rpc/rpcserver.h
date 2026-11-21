@@ -23,9 +23,12 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "rpcrequest.h"
+
 #include <librepcb/core/utils/rusthandle.h>
-#include <librepcb/rust-core/ffi.h>
 #include <librepcb/core/utils/signalslot.h>
+#include <librepcb/rust-core/ffi.h>
+
 #include <QtCore>
 
 #include <functional>
@@ -79,108 +82,9 @@ public:
   // through `ffi.h` as `rs::RpcErrorCode`) and are used directly from
   // there — no duplication.
 
-  /**
-   * @brief A command request, as handed to the command handlers
-   *
-   * A request object is created on the GUI thread when a command is
-   * dispatched. The handler must ensure that it is replied exactly once,
-   * either synchronously (by calling #replySuccess() or #replyError()) or
-   * asynchronously (by keeping the object alive and calling one of these
-   * methods later). As a safety net, the destructor replies with an error
-   * if the handler forgot to reply.
-   */
-  class Request final {
-  public:
-    // Constructors / Destructor
-    Request() = delete;
-    Request(const Request& other) = delete;
-    Request& operator=(const Request& rhs) = delete;
-    Request(GuiApplication& app, RpcServer& server, uint32_t connId,
-            uint32_t msgId, const QString& method,
-            const QVariantMap& args) noexcept;
-    ~Request() noexcept;
-
-    // Getters
-    GuiApplication& getApp() noexcept { return mApp; }
-    uint32_t getConnId() const noexcept { return mConnId; }
-    const QString& getMethod() const noexcept { return mMethod; }
-    const QVariantMap& getArgs() const noexcept { return mArgs; }
-
-    /**
-     * @brief Check whether the client cancelled this request
-     *
-     * @note Cancellation is cooperative: The handler may poll this flag
-     *       during long-running work and stop early (replying with the
-     *       "cancelled" error). If it doesn't, the normal result is sent
-     *       as usual — the client must handle both cases.
-     */
-    bool isCancelled() const noexcept { return mCancelled; }
-
-    // General Methods
-
-    /**
-     * @brief Send a request-scoped message to the client (e.g. progress)
-     *
-     * May be called any number of times while the request is pending, i.e.
-     * before it is replied. Never blocks, thus safe to call from the GUI
-     * thread.
-     *
-     * @param payload  The message payload (e.g. a progress map).
-     */
-    void sendNotification(const QVariant& payload) noexcept;
-
-    /**
-     * @brief Reply with a result (finishes the request)
-     *
-     * @param result  The result value (any type of the protocol's value
-     *                domain, usually a map). Gets normalized, i.e. plain
-     *                C++ types like `int` are converted automatically.
-     */
-    void sendSuccess(const QVariant& result = QVariant()) noexcept;
-
-    /**
-     * @brief Reply with an error (finishes the request)
-     *
-     * @param code        An error code (see #ErrorCode).
-     * @param message     A human-readable error message.
-     * @param properties  Additional error properties, sent next to
-     *                    "code" and "message" (see the error types in the
-     *                    API specification).
-     */
-    void sendError(rs::RpcErrorCode code, const QString& message,
-                   const QVariantMap& properties = QVariantMap()) noexcept;
-
-  private:  // Methods
-    /// Mark the request as cancelled (called by the server).
-    void setCancelled() noexcept { mCancelled = true; }
-
-    /// Suppress the safety-net reply in the destructor (server teardown).
-    void invalidate() noexcept { mServer = nullptr; }
-
-    /// Send the response through the FFI (does nothing if invalidated).
-    void sendReply(bool ok, const QVariant& value) noexcept;
-
-    friend class RpcServer;
-
-  private:  // Data
-    GuiApplication& mApp;
-    RpcServer* mServer;  ///< Null once the server is being destroyed.
-    const uint32_t mConnId;
-    const uint32_t mMsgid;
-    const QString mMethod;
-    const QVariantMap mArgs;
-    bool mReplied;
-    bool mCancelled;
-  };
-
   /// A command handler, executed on the GUI thread. It must reply the
-  /// request (synchronously or asynchronously, see #Request).
-  using RpcHandler = std::function<void(Request& request)>;
-
-  // Constructors / Destructor
-  RpcServer() = delete;
-  RpcServer(const RpcServer& other) = delete;
-  RpcServer& operator=(const RpcServer& rhs) = delete;
+  /// request (synchronously or asynchronously, see #RpcRequest).
+  using RpcHandler = std::function<void(RpcRequest& request)>;
 
   /**
    * @brief Start the RPC server (listening on 127.0.0.1)
@@ -193,7 +97,7 @@ public:
    * @brief Stop the RPC server (must be called while the application is
    *        still fully alive, i.e. as the first step of the teardown)
    */
-  ~RpcServer() noexcept override;
+  ~RpcServer() noexcept override = default;
 
   /**
    * @brief Get all registered command handlers, by method name
@@ -203,6 +107,35 @@ public:
    *       without launching the whole application.
    */
   static QHash<QString, RpcHandler> buildCommandRegistry() noexcept;
+
+  /**
+   * @brief Send the response for a request to the client
+   *
+   * Called by the #RpcRequest when it is replied. Never blocks. If the
+   * request is unknown or already replied, the response is silently
+   * dropped by the Rust server.
+   *
+   * @param connId  The connection ID of the request.
+   * @param msgId   The msg_id of the request.
+   * @param ok      Whether the value is a result or an error map.
+   * @param value   The result or error map.
+   */
+  void sendResponse(uint32_t connId, uint32_t msgId, bool ok,
+                    const QVariant& value) noexcept;
+
+  /**
+   * @brief Send a request-scoped message (e.g. progress) to the client
+   *
+   * Called by the #RpcRequest while it is pending. Never blocks. The
+   * message is silently dropped by the Rust server if the request is not
+   * (or no longer) pending.
+   *
+   * @param connId  The connection ID of the request.
+   * @param msgId   The msg_id of the request.
+   * @param payload The message payload.
+   */
+  void sendNotification(uint32_t connId, uint32_t msgId,
+                        const QVariant& payload) noexcept;
 
 private:  // Methods
   /// Called on the GUI thread: Extract the "obj" key, look up the command
@@ -216,7 +149,11 @@ private:  // Methods
   /// Called on the GUI thread: Handle an `initialize` request — validate
   /// the token, mark the connection as (un)authenticated on the Rust side
   /// and reply with the application information.
-  void handleInitialize(Request& request) noexcept;
+  void handleInitialize(RpcRequest& request) noexcept;
+
+  /// Called by an #RpcRequest when it was replied: Remove it from the
+  /// pending-request registry.
+  void requestFinished(const RpcRequest& request) noexcept;
 
   /// Key for a pending request in the registry.
   static uint64_t requestKey(uint32_t connId, uint32_t msgId) noexcept {
@@ -240,8 +177,11 @@ private:  // Data
   /// The FFI handle of the (Rust implemented) server
   RustHandle<rs::RpcServer> mHandle;
 
+  /// Reacts on replied requests (removes them from the registry)
+  RpcRequest::OnFinishedSlot mRequestFinishedSlot;
+
   /// Pending (dispatched, not yet replied) requests, by connection+msgId
-  QHash<uint64_t, std::shared_ptr<Request>> mPendingRequests;
+  QHash<uint64_t, std::shared_ptr<RpcRequest>> mPendingRequests;
 };
 
 /*******************************************************************************

@@ -41,18 +41,6 @@ namespace editor {
  *  Local Functions
  ******************************************************************************/
 
-/// Serialize an error into a map of the protocol's value domain.
-static QVariantMap errorToVariant(rs::RpcErrorCode code, const QString& message,
-                                  const QVariantMap& properties) noexcept {
-  QVariantMap error;
-  error.insert("code", QVariant::fromValue(static_cast<qlonglong>(code)));
-  error.insert("message", QVariant(message));
-  for (auto it = properties.constBegin(); it != properties.constEnd(); ++it) {
-    error.insert(it.key(), it.value());
-  }
-  return error;
-}
-
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
@@ -71,7 +59,8 @@ RpcServer::RpcServer(GuiApplication& app) noexcept
   : QObject(&app),
     mApp(app),
     mPort(0),  // Will be initialized by construct()
-    mHandle(construct(&onRequestCallback, &onCancelCallback, this, mPort)) {
+    mHandle(construct(&onRequestCallback, &onCancelCallback, this, mPort)),
+    mRequestFinishedSlot(*this, &RpcServer::requestFinished) {
   mCommands.insert(
       "initialize",
       std::bind(&RpcServer::handleInitialize, this, std::placeholders::_1));
@@ -80,92 +69,18 @@ RpcServer::RpcServer(GuiApplication& app) noexcept
                     << ".";
 }
 
-RpcServer::~RpcServer() noexcept {
-  // Invalidate all pending requests first: They must not call into the
-  // (about to be deleted) Rust server anymore. The safety net in their
-  // destructors is suppressed, i.e. clients just see the connection close.
-  for (const auto& request : mPendingRequests) {
-    request->invalidate();
-  }
-  mPendingRequests.clear();
-}
-
 /*******************************************************************************
- *  Request Handling
+ *  Command Handling
  ******************************************************************************/
-
-RpcServer::Request::Request(GuiApplication& app, RpcServer& server,
-                            uint32_t connId, uint32_t msgId,
-                            const QString& method,
-                            const QVariantMap& args) noexcept
-  : mApp(app),
-    mServer(&server),
-    mConnId(connId),
-    mMsgid(msgId),
-    mMethod(method),
-    mArgs(args),
-    mReplied(false),
-    mCancelled(false) {
-}
-
-RpcServer::Request::~Request() noexcept {
-  // Safety net to guarantee the "exactly one response per request" invariant
-  // even if a handler forgot to reply.
-  if (!mReplied) {
-    if (mServer) {
-      qWarning() << "RPC command" << mMethod
-                 << "did not reply, answering with an error.";
-      sendReply(false,
-                errorToVariant(rs::RpcErrorCode::InternalError,
-                               "The command did not reply.", QVariantMap()));
-    } else {
-      qWarning() << "RPC command" << mMethod
-                 << "did not reply, but the RPC server is already destroyed.";
-    }
-  }
-}
-
-void RpcServer::Request::sendNotification(const QVariant& payload) noexcept {
-  if (!mServer || mReplied) {
-    return;
-  }
-  rs::ffi_rpc_server_notify(*mServer->mHandle, mConnId, mMsgid, &payload);
-}
-
-void RpcServer::Request::sendSuccess(const QVariant& result) noexcept {
-  if (mReplied) {
-    return;  // A second reply is a bug in the command handler, ignore it.
-  }
-  sendReply(true, result);
-}
-
-void RpcServer::Request::sendError(rs::RpcErrorCode code,
-                                   const QString& message,
-                                   const QVariantMap& properties) noexcept {
-  if (mReplied) {
-    return;
-  }
-  sendReply(false, errorToVariant(code, message, properties));
-}
-
-void RpcServer::Request::sendReply(bool ok, const QVariant& value) noexcept {
-  mReplied = true;
-  if (mServer) {
-    // Remove the request from the registry (the Rust server enforces the
-    // "exactly one response" invariant anyway, but this keeps the registry
-    // small).
-    mServer->mPendingRequests.remove(requestKey(mConnId, mMsgid));
-    rs::ffi_rpc_server_reply(*mServer->mHandle, mConnId, mMsgid, ok, &value);
-  }
-}
 
 void RpcServer::handleRequest(uint32_t connId, uint32_t msgId,
                               const QString& method,
                               const QVariant& args) noexcept {
   // Create the request context and register it as pending.
   // Note: The Rust server guarantees that params is either a map or nil.
-  const auto request = std::make_shared<Request>(mApp, *this, connId, msgId,
-                                                 method, args.toMap());
+  const auto request = std::make_shared<RpcRequest>(mApp, *this, connId, msgId,
+                                                    method, args.toMap());
+  request->onFinished.attach(mRequestFinishedSlot);
   mPendingRequests.insert(requestKey(connId, msgId), request);
 
   // Look up the command handler.
@@ -173,7 +88,7 @@ void RpcServer::handleRequest(uint32_t connId, uint32_t msgId,
   if (handler == mCommands.constEnd()) {
     request->sendError(rs::RpcErrorCode::MethodNotFound,
                        QString("Method not found: %1").arg(method));
-    return; // Do not keep request object.
+    return;  // Do not keep request object.
   }
 
   // Run the command handler.
@@ -198,7 +113,7 @@ void RpcServer::handleCancel(uint32_t connId, uint32_t msgId) noexcept {
   }
 }
 
-void RpcServer::handleInitialize(Request& request) noexcept {
+void RpcServer::handleInitialize(RpcRequest& request) noexcept {
   const QVariant token = request.getArgs().value("token");
   const bool authenticated = (token.toString() == "librepcb-dev-token");
   rs::ffi_rpc_server_set_authenticated(*mHandle, request.getConnId(),
@@ -214,6 +129,25 @@ void RpcServer::handleInitialize(Request& request) noexcept {
   result.insert("version", Application::getVersion());
   result.insert("workspace", mApp.getWorkspace().getPath().toStr());
   request.sendSuccess(result);
+}
+
+void RpcServer::requestFinished(const RpcRequest& request) noexcept {
+  // Copy the IDs first: Removing the request from the registry drops the
+  // server's reference to it, which might be the last one, destroying the
+  // object while this method is still running.
+  const uint32_t connId = request.getConnId();
+  const uint32_t msgId = request.getMsgId();
+  mPendingRequests.remove(requestKey(connId, msgId));
+}
+
+void RpcServer::sendResponse(uint32_t connId, uint32_t msgId, bool ok,
+                             const QVariant& value) noexcept {
+  rs::ffi_rpc_server_reply(*mHandle, connId, msgId, ok, &value);
+}
+
+void RpcServer::sendNotification(uint32_t connId, uint32_t msgId,
+                                 const QVariant& payload) noexcept {
+  rs::ffi_rpc_server_notify(*mHandle, connId, msgId, &payload);
 }
 
 // ATTENTION: This function is called from other threads (from Rust side)!

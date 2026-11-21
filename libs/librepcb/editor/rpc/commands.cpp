@@ -23,6 +23,7 @@
 #include "../guiapplication.h"
 #include "../project/projecteditor.h"
 #include "../undostack.h"
+#include "rpcrequest.h"
 #include "rpcserver.h"
 
 #include <librepcb/core/project/board/board.h>
@@ -87,7 +88,7 @@ QVariantMap undoStackToVariant(const UndoStack& stack) {
  * @return The requested project editor, or nullptr if there is no such
  *         project open (or the handle is missing/invalid).
  */
-ProjectEditor* findProject(RpcServer::Request& request) noexcept {
+ProjectEditor* findProject(RpcRequest& request) noexcept {
   try {
     const Uuid uuid =
         Uuid::fromString(request.getArgs().value("obj").toString());
@@ -110,7 +111,7 @@ ProjectEditor* findProject(RpcServer::Request& request) noexcept {
 
 QHash<QString, RpcServer::RpcHandler>
     RpcServer::buildCommandRegistry() noexcept {
-  using Request = RpcServer::Request;
+  using Request = RpcRequest;
   QHash<QString, RpcHandler> registry;
 
   // List all open projects.
