@@ -87,9 +87,10 @@ QVariantMap undoStackToVariant(const UndoStack& stack) {
  * @return The requested project editor, or nullptr if there is no such
  *         project open (or the handle is missing/invalid).
  */
-ProjectEditor* findProject(GuiApplication& app, const QVariant& obj) noexcept {
+ProjectEditor* findProject(GuiApplication& app,
+                           const QVariantMap& args) noexcept {
   try {
-    const Uuid uuid = Uuid::fromString(obj.toString());
+    const Uuid uuid = Uuid::fromString(args.value("obj").toString());
     for (const auto& editor : app.getProjects()) {
       if (editor->getProject().getUuid() == uuid) {
         return editor.get();
@@ -113,91 +114,80 @@ QHash<QString, RpcServer::RpcHandler>
   QHash<QString, RpcHandler> registry;
 
   // List all open projects.
-  registry.insert("Project.list",
-                  [](const QSharedPointer<Request>& request, const QVariant&,
-                     const QVariantMap&) {
-                    QVariantList projects;
-                    for (const auto& editor : request->getApp().getProjects()) {
-                      projects.append(QVariant(projectToVariant(*editor)));
-                    }
-                    QVariantMap result;
-                    result.insert("projects", projects);
-                    request->sendSuccess(result);
-                  });
+  registry.insert("Project.list", [](Request& request, const QVariantMap&) {
+    QVariantList projects;
+    for (const auto& editor : request.getApp().getProjects()) {
+      projects.append(QVariant(projectToVariant(*editor)));
+    }
+    QVariantMap result;
+    result.insert("projects", projects);
+    request.sendSuccess(result);
+  });
 
   // Get details about an open project.
-  registry.insert("Project.get",
-                  [](const QSharedPointer<Request>& request,
-                     const QVariant& obj, const QVariantMap&) {
-                    ProjectEditor* editor = findProject(request->getApp(), obj);
-                    if (!editor) {
-                      request->sendError(rs::RpcErrorCode::ProjectNotOpen,
-                                         "Project not open");
-                      return;
-                    }
-                    QVariantMap result = projectToVariant(*editor);
-                    const Project& project = editor->getProject();
-                    QVariantList sheets;
-                    for (const Schematic* schematic : project.getSchematics()) {
-                      QVariantMap sheet;
-                      sheet.insert("uuid", schematic->getUuid().toStr());
-                      sheet.insert("name", *schematic->getName());
-                      sheets.append(QVariant(sheet));
-                    }
-                    result.insert("sheets", sheets);
-                    QVariantList boards;
-                    for (const Board* board : project.getBoards()) {
-                      QVariantMap item;
-                      item.insert("uuid", board->getUuid().toStr());
-                      item.insert("name", *board->getName());
-                      boards.append(QVariant(item));
-                    }
-                    result.insert("boards", boards);
-                    request->sendSuccess(result);
-                  });
+  registry.insert("Project.get", [](Request& request, const QVariantMap& args) {
+    ProjectEditor* editor = findProject(request.getApp(), args);
+    if (!editor) {
+      request.sendError(rs::RpcErrorCode::ProjectNotOpen, "Project not open");
+      return;
+    }
+    QVariantMap result = projectToVariant(*editor);
+    const Project& project = editor->getProject();
+    QVariantList sheets;
+    for (const Schematic* schematic : project.getSchematics()) {
+      QVariantMap sheet;
+      sheet.insert("uuid", schematic->getUuid().toStr());
+      sheet.insert("name", *schematic->getName());
+      sheets.append(QVariant(sheet));
+    }
+    result.insert("sheets", sheets);
+    QVariantList boards;
+    for (const Board* board : project.getBoards()) {
+      QVariantMap item;
+      item.insert("uuid", board->getUuid().toStr());
+      item.insert("name", *board->getName());
+      boards.append(QVariant(item));
+    }
+    result.insert("boards", boards);
+    request.sendSuccess(result);
+  });
 
   // Get the state of a project's undo stack.
   registry.insert(
-      "UndoStack.get_status",
-      [](const QSharedPointer<Request>& request, const QVariant& obj,
-         const QVariantMap&) {
-        ProjectEditor* editor = findProject(request->getApp(), obj);
+      "UndoStack.get_status", [](Request& request, const QVariantMap& args) {
+        ProjectEditor* editor = findProject(request.getApp(), args);
         if (!editor) {
-          request->sendError(rs::RpcErrorCode::ProjectNotOpen,
-                             "Project not open");
+          request.sendError(rs::RpcErrorCode::ProjectNotOpen,
+                            "Project not open");
           return;
         }
-        request->sendSuccess(undoStackToVariant(editor->getUndoStack()));
+        request.sendSuccess(undoStackToVariant(editor->getUndoStack()));
       });
 
   // Undo the last command of a project's undo stack.
   registry.insert(
-      "UndoStack.undo",
-      [](const QSharedPointer<Request>& request, const QVariant& obj,
-         const QVariantMap&) {
-        ProjectEditor* editor = findProject(request->getApp(), obj);
+      "UndoStack.undo", [](Request& request, const QVariantMap& args) {
+        ProjectEditor* editor = findProject(request.getApp(), args);
         if (!editor) {
-          request->sendError(rs::RpcErrorCode::ProjectNotOpen,
-                             "Project not open");
+          request.sendError(rs::RpcErrorCode::ProjectNotOpen,
+                            "Project not open");
           return;
         }
         editor->getUndoStack().undo();  // Can throw.
-        request->sendSuccess(undoStackToVariant(editor->getUndoStack()));
+        request.sendSuccess(undoStackToVariant(editor->getUndoStack()));
       });
 
   // Redo the last undone command of a project's undo stack.
   registry.insert(
-      "UndoStack.redo",
-      [](const QSharedPointer<Request>& request, const QVariant& obj,
-         const QVariantMap&) {
-        ProjectEditor* editor = findProject(request->getApp(), obj);
+      "UndoStack.redo", [](Request& request, const QVariantMap& args) {
+        ProjectEditor* editor = findProject(request.getApp(), args);
         if (!editor) {
-          request->sendError(rs::RpcErrorCode::ProjectNotOpen,
-                             "Project not open");
+          request.sendError(rs::RpcErrorCode::ProjectNotOpen,
+                            "Project not open");
           return;
         }
         editor->getUndoStack().redo();  // Can throw.
-        request->sendSuccess(undoStackToVariant(editor->getUndoStack()));
+        request.sendSuccess(undoStackToVariant(editor->getUndoStack()));
       });
 
   return registry;

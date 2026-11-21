@@ -29,6 +29,7 @@
 #include <QtCore>
 
 #include <functional>
+#include <memory>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -171,8 +172,7 @@ public:
   /// A command handler, executed on the GUI thread. It must reply the
   /// request (synchronously or asynchronously, see #Request).
   using RpcHandler =
-      std::function<void(const QSharedPointer<Request>& request,
-                         const QVariant& obj, const QVariantMap& args)>;
+      std::function<void(Request& request, const QVariantMap& args)>;
 
   // Constructors / Destructor
   RpcServer() = delete;
@@ -200,12 +200,6 @@ public:
    *       without launching the whole application.
    */
   static QHash<QString, RpcHandler> buildCommandRegistry() noexcept;
-
-private:  // Types
-  /// Key for a pending request in the registry.
-  static QString requestKey(uint32_t connId, uint32_t msgId) noexcept {
-    return QString::fromLatin1("%1:%2").arg(connId).arg(msgId);
-  }
 
 private:  // Methods
   /// Called on a Rust connection thread: Marshal the request to the GUI
@@ -247,9 +241,17 @@ private:  // Methods
                                 const QString* method, const QVariant* params);
   static void onCancelCallback(void* ctx, uint32_t connId, uint32_t msgId);
 
+  /// Key for a pending request in the registry.
+  static uint64_t requestKey(uint32_t connId, uint32_t msgId) noexcept {
+    return (static_cast<uint64_t>(connId) << 32) | msgId;
+  }
+
 private:  // Data
   /// The application to dispatch the commands to
   GuiApplication& mApp;
+
+  /// All registered command handlers, by method name
+  QHash<QString, RpcHandler> mCommands;
 
   /// The TCP port the server is listening on (coming from Rust side)
   uint16_t mPort;
@@ -257,11 +259,8 @@ private:  // Data
   /// The FFI handle of the (Rust implemented) server
   RustHandle<rs::RpcServer> mHandle;
 
-  /// All registered command handlers, by method name
-  QHash<QString, RpcHandler> mCommands;
-
   /// Pending (dispatched, not yet replied) requests, by connection+msgId
-  QHash<QString, QSharedPointer<Request>> mPendingRequests;
+  QHash<uint64_t, std::shared_ptr<Request>> mPendingRequests;
 };
 
 /*******************************************************************************

@@ -201,17 +201,6 @@ void RpcServer::handleRequest(uint32_t connId, uint32_t msgId,
     return;
   }
 
-  // Extract the receiver handle ("obj" is a documented convention, see the
-  // API spec). It is an *opaque* value which is passed to the handlers
-  // separately (so they never see it in their arguments) — only the
-  // handlers know how to interpret it.
-  QVariant obj;
-  const auto objIt = args.constFind("obj");
-  if (objIt != args.constEnd()) {
-    obj = objIt.value();
-    args.erase(objIt);
-  }
-
   // Look up the command handler.
   const auto handler = mCommands.constFind(method);
   if (handler == mCommands.constEnd()) {
@@ -222,10 +211,10 @@ void RpcServer::handleRequest(uint32_t connId, uint32_t msgId,
 
   // Create the request context and register it as pending.
   const auto request =
-      QSharedPointer<Request>::create(mApp, *this, connId, msgId, method);
+      std::make_shared<Request>(mApp, *this, connId, msgId, method);
   mPendingRequests.insert(requestKey(connId, msgId), request);
   try {
-    handler.value()(request, obj, args);
+    handler.value()(*request, args);
   } catch (const Exception& e) {
     request->sendError(rs::RpcErrorCode::CommandFailed,
                        QString("Command failed: %1").arg(e.getMsg()));

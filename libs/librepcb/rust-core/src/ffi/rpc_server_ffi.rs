@@ -373,7 +373,9 @@ extern "C" fn ffi_rpc_server_reply(
     // error types in the API specification). Only if it is not even a
     // valid error object (an int "code" and a string "message"), fall
     // back to a generic internal error.
-    let valid = map_field(&payload, "code").and_then(Value::as_i64).is_some()
+    let valid = map_field(&payload, "code")
+      .and_then(Value::as_i64)
+      .is_some()
       && map_field(&payload, "message")
         .and_then(Value::as_str)
         .is_some();
