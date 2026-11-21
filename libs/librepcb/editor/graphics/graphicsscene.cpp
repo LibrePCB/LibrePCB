@@ -308,6 +308,7 @@ void GraphicsScene::drawForeground(QPainter* painter,
     const qreal scaleFactor =
         QStyleOptionGraphicsItem::levelOfDetailFromTransform(
             painter->worldTransform());
+    const bool mirrored = (painter->worldTransform().determinant() < 0);
     const Point diff = mRulerPositions->second - mRulerPositions->first;
     const Length distance = *diff.getLength();
     const Angle angle = (!diff.isOrigin())
@@ -319,15 +320,20 @@ void GraphicsScene::drawForeground(QPainter* painter,
     painter->save();
     painter->translate(mRulerPositions->first.toPxQPointF());
     painter->rotate(90 - angle.toDeg());
+    if (mirrored) {
+      painter->scale(-1, 1);
+    }
 
     // Determine text rotation.
-    Angle textRotation = Angle::deg0();
+    Angle textRotation = angle - Angle::deg90();
     Alignment textAlign(HAlign::left(), VAlign::center());
     qreal xScale = 1;
-    if (Toolbox::isTextUpsideDown(angle - Angle::deg90())) {
+    if (Toolbox::isTextUpsideDown(mirrored ? -textRotation : textRotation)) {
       textRotation = Angle::deg180();
       textAlign.mirrorH();
       xScale = -1;
+    } else {
+      textRotation = Angle::deg0();
     }
 
     // Use GraphicsPainter to get a simpler painting API.
