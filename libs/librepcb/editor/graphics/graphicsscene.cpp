@@ -308,6 +308,7 @@ void GraphicsScene::drawForeground(QPainter* painter,
     const qreal scaleFactor =
         QStyleOptionGraphicsItem::levelOfDetailFromTransform(
             painter->worldTransform());
+    const bool mirrored = (painter->worldTransform().determinant() < 0);
     const Point diff = mRulerPositions->second - mRulerPositions->first;
     const Length distance = *diff.getLength();
     const Angle angle = (!diff.isOrigin())
@@ -319,19 +320,21 @@ void GraphicsScene::drawForeground(QPainter* painter,
     painter->save();
     painter->translate(mRulerPositions->first.toPxQPointF());
     painter->rotate(90 - angle.toDeg());
+    if (mirrored) {
+      painter->scale(-1, 1);
+    }
 
     // Determine text rotation.
-    const bool isViewMirrored = (painter->worldTransform().determinant() < 0);
-    Angle textRotation = Angle::deg0();
-    Alignment textAlign(isViewMirrored ? HAlign::right() : HAlign::left(),
-                        VAlign::center());
+    Angle textRotation = angle - Angle::deg90();
+    Alignment textAlign(HAlign::left(), VAlign::center());
     qreal xScale = 1;
-    if (Toolbox::isTextUpsideDown(angle - Angle::deg90())) {
+    if (Toolbox::isTextUpsideDown(mirrored ? -textRotation : textRotation)) {
       textRotation = Angle::deg180();
       textAlign.mirrorH();
       xScale = -1;
+    } else {
+      textRotation = Angle::deg0();
     }
-    const qreal tickScale = isViewMirrored ? -xScale : xScale;
 
     // Use GraphicsPainter to get a simpler painting API.
     GraphicsPainter p(*painter);
@@ -363,11 +366,11 @@ void GraphicsScene::drawForeground(QPainter* painter,
       tickCount += 1;  // For the end value.
       gauge.currentTickInterval = tickInterval;
       const Length shortTickX =
-          Length::fromPx(10 / scaleFactor) * gauge.xScale * tickScale;
+          Length::fromPx(10 / scaleFactor) * gauge.xScale * xScale;
       const Length longTickX =
-          Length::fromPx(20 / scaleFactor) * gauge.xScale * tickScale;
+          Length::fromPx(20 / scaleFactor) * gauge.xScale * xScale;
       const Length textOffset =
-          Length::fromPx(25 / scaleFactor) * gauge.xScale * tickScale;
+          Length::fromPx(25 / scaleFactor) * gauge.xScale * xScale;
       for (int i = 0; i <= tickCount; ++i) {
         const bool isEnd = (i == tickCount);
         const Length tickPos = isEnd ? distance : (tickInterval * i);
@@ -392,7 +395,7 @@ void GraphicsScene::drawForeground(QPainter* painter,
                 Point(textOffset, tickPos), textRotation, textHeight,
                 (gauge.xScale != xScale) ? textAlign.mirroredH() : textAlign,
                 text, Application::getDefaultMonospaceFont(),
-                mOverlayContentColor, false, isViewMirrored, false, 10);
+                mOverlayContentColor, false, false, false, 10);
           }
         } else {
           // Draw short tick.
