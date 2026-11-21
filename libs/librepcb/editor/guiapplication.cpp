@@ -352,7 +352,11 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
   auto updateRpcServerEnabled = [this]() {
     const bool enable = mWorkspace.getSettings().enableRpcServer.get();
     if (enable && (!mRpcServer)) {
-      mRpcServer = std::make_unique<RpcServer>(*this);
+      try {
+        mRpcServer = std::make_unique<RpcServer>(*this);
+      } catch (const Exception& e) {
+        qCritical() << "Failed to start RPC server:" << e.getMsg();
+      }
     } else if ((!enable) && mRpcServer) {
       mRpcServer.reset();
     }

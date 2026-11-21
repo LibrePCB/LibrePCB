@@ -23,11 +23,9 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/core/exceptions.h>
+#include <librepcb/core/utils/rusthandle.h>
 #include <librepcb/rust-core/ffi.h>
 
-#include <QHash>
-#include <QSharedPointer>
 #include <QtCore>
 
 #include <functional>
@@ -257,8 +255,8 @@ private:  // Data
   /// The application to dispatch the commands to
   GuiApplication& mApp;
 
-  /// The FFI handle of the (Rust implemented) server, if running
-  rs::RpcServer* mServer;
+  /// The FFI handle of the (Rust implemented) server
+  RustHandle<rs::RpcServer> mHandle;
 
   /// All registered command handlers, by method name
   QHash<QString, RpcHandler> mCommands;

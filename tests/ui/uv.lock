@@ -39,6 +39,7 @@ dev = [
 requires-dist = [
     { name = "pytest" },
     { name = "slint-testing", index = "https://testing.slint.dev/simple/" },
+    { name = "u-msgpack-python" },
 ]
 
 [package.metadata.requires-dev]
@@ -142,7 +143,7 @@ wheels = [
 name = "u-msgpack-python"
 version = "2.9.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/cc/c2/8a6d3a0427d5d46aca3b617fa2ca1672d4b490555bd4bfd1375b5f84fe0d/u_msgpack_python-2.9.0.tar.gz", hash = "sha256:3f632940c2db108d71210795463e249b47e89a08eec0d54a5cdc1a202505ede9", size = 19659, upload-time = "2026-11-13T20:34:02.090Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/cc/c2/8a6d3a0427d5d46aca3b617fa2ca1672d4b490555bd4bfd1375b5f84fe0d/u_msgpack_python-2.9.0.tar.gz", hash = "sha256:3f632940c2db108d71210795463e249b47e89a08eec0d54a5cdc1a202505ede9", size = 19659, upload-time = "2026-11-13T20:34:02.099Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/5b/41/c4e873946d95bbf0f52026c02872f6b50e09181889343b21d57801d83352/u_msgpack_python-2.9.0-py2.py3-none-any.whl", hash = "sha256:5e2d8b0dc37d03d1820d18326438dadd3b974954b03a03f7524f5ba1ed9213ff", size = 11896, upload-time = "2026-11-13T20:34:01.480Z" },
+    { url = "https://files.pythonhosted.org/packages/5b/41/c4e873946d95bbf0f52026c02872f6b50e09181889343b21d57801d83352/u_msgpack_python-2.9.0-py2.py3-none-any.whl", hash = "sha256:5e2d8b0dc37d03d1820d18326438dadd3b974954b03a03f7524f5ba1ed9213ff", size = 11896, upload-time = "2026-11-13T20:34:01.227Z" },
 ]

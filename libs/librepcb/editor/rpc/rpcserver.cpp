@@ -25,6 +25,7 @@
 #include "../guiapplication.h"
 
 #include <librepcb/core/application.h>
+#include <librepcb/core/exceptions.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/rust-core/ffi.h>
 
@@ -169,29 +170,30 @@ void rpcServerCancel(void* ctx, uint64_t connId, uint32_t msgid) {
  *  Constructors / Destructor
  ******************************************************************************/
 
-RpcServer::RpcServer(GuiApplication& app) noexcept
-  : QObject(&app), mApp(app), mServer(nullptr) {
-  mCommands = buildCommandRegistry();
-
-  // Create the server. Note that the token is hardcoded for now (see
-  // sDevToken above) and validated by the C++ side in #handleInitialize.
-  mServer = rs::ffi_rpc_server_new(&rpcServerDispatch, &rpcServerCancel, this);
-  if (!mServer) {
-    qCritical() << "Failed to create the RPC server.";
-    return;
+static RustHandle<rs::RpcServer> construct(rs::RpcDispatchFn dispatch,
+                                           rs::RpcCancelFn cancel, void* ctx) {
+  if (auto obj = rs::ffi_rpc_server_new(dispatch, cancel, ctx)) {
+    return RustHandle<rs::RpcServer>(*obj, &rs::ffi_rpc_server_delete);
+  } else {
+    throw RuntimeError(__FILE__, __LINE__, "Failed to create RpcServer");
   }
+}
+
+RpcServer::RpcServer(GuiApplication& app) noexcept
+  : QObject(&app),
+    mApp(app),
+    mHandle(construct(&rpcServerDispatch, &rpcServerCancel, this)) {
+  mCommands = buildCommandRegistry();
 
   // Start listening on 127.0.0.1. A specific port can be forced with the
   // environment variable "LIBREPCB_RPC_PORT" (useful for testing).
   const quint16 port =
       static_cast<quint16>(qEnvironmentVariableIntValue("LIBREPCB_RPC_PORT"));
   quint16 actualPort = 0;
-  if (rs::ffi_rpc_server_start(mServer, port, &actualPort)) {
+  if (rs::ffi_rpc_server_start(*mHandle, port, &actualPort)) {
     qInfo() << "RPC server now listening on 127.0.0.1, port" << actualPort;
   } else {
     qCritical() << "Failed to start the RPC server.";
-    rs::ffi_rpc_server_delete(mServer);
-    mServer = nullptr;
   }
 }
 
@@ -203,10 +205,6 @@ RpcServer::~RpcServer() noexcept {
     request->invalidate();
   }
   mPendingRequests.clear();
-  if (mServer) {
-    rs::ffi_rpc_server_delete(mServer);  // Stops the server & joins threads.
-    mServer = nullptr;
-  }
 }
 
 /*******************************************************************************
@@ -282,9 +280,8 @@ void RpcServer::Request::emitMessage(const QVariant& payload) noexcept {
                << "emitted a message of an unsupported type.";
     return;
   }
-  if (rs::RpcServer* rust = mServer->mServer) {
-    rs::ffi_rpc_server_notify_conn(rust, mConnId, mMsgid, &normalized);
-  }
+  rs::ffi_rpc_server_notify_conn(*mServer->mHandle, mConnId, mMsgid,
+                                 &normalized);
 }
 
 void RpcServer::Request::sendReply(bool ok, const QVariant& value) noexcept {
@@ -294,9 +291,7 @@ void RpcServer::Request::sendReply(bool ok, const QVariant& value) noexcept {
     // "exactly one response" invariant anyway, but this keeps the registry
     // small).
     mServer->mPendingRequests.remove(requestKey(mConnId, mMsgid));
-    if (rs::RpcServer* rust = mServer->mServer) {
-      rs::ffi_rpc_server_reply(rust, mConnId, mMsgid, ok, &value);
-    }
+    rs::ffi_rpc_server_reply(*mServer->mHandle, mConnId, mMsgid, ok, &value);
   }
 }
 
@@ -390,9 +385,7 @@ void RpcServer::handleInitialize(uint64_t connId, uint32_t msgid,
   const QVariant token = args.value("token");
   const bool authenticated = (token.userType() == QMetaType::QString) &&
       (token.toString() == QString::fromUtf8(sDevToken));
-  if (mServer) {
-    rs::ffi_rpc_server_set_authenticated(mServer, connId, authenticated);
-  }
+  rs::ffi_rpc_server_set_authenticated(*mHandle, connId, authenticated);
   if (authenticated) {
     QVariantMap result;
     result.insert("protocolVersion", QString::fromUtf8(sProtocolVersion));
@@ -421,38 +414,32 @@ void RpcServer::handleCancel(uint64_t connId, uint32_t msgid) noexcept {
 
 void RpcServer::notifyEvent(const QString& method,
                             const QVariant& params) noexcept {
-  if (mServer) {
-    rs::ffi_rpc_server_notify_all(mServer, &method, &params);
-  }
+  rs::ffi_rpc_server_notify_all(*mHandle, &method, &params);
 }
 
 void RpcServer::replySuccess(uint64_t connId, uint32_t msgid,
                              const QVariant& result) noexcept {
   // Reply directly, without a #Request object (used for `initialize`).
-  if (mServer) {
-    QVariant normalized;
-    if (!normalizeVariant(result, &normalized)) {
-      qWarning() << "RPC initialize returned a value of an unsupported type.";
-      replyError(connId, msgid, rs::RpcErrorCode::InternalError,
-                 "The command returned an unsupported value type.");
-      return;
-    }
-    rs::ffi_rpc_server_reply(mServer, connId, msgid, true, &normalized);
+  QVariant normalized;
+  if (!normalizeVariant(result, &normalized)) {
+    qWarning() << "RPC initialize returned a value of an unsupported type.";
+    replyError(connId, msgid, rs::RpcErrorCode::InternalError,
+               "The command returned an unsupported value type.");
+    return;
   }
+  rs::ffi_rpc_server_reply(*mHandle, connId, msgid, true, &normalized);
 }
 
 void RpcServer::replyError(uint64_t connId, uint32_t msgid,
                            rs::RpcErrorCode code,
                            const QString& message) noexcept {
-  if (mServer) {
-    QVariant error = errorToVariant(code, message, QVariantMap());
-    QVariant normalized;
-    if (!normalizeVariant(error, &normalized)) {
-      normalized = errorToVariant(rs::RpcErrorCode::InternalError, message,
-                                  QVariantMap());  // Cannot fail.
-    }
-    rs::ffi_rpc_server_reply(mServer, connId, msgid, false, &normalized);
+  QVariant error = errorToVariant(code, message, QVariantMap());
+  QVariant normalized;
+  if (!normalizeVariant(error, &normalized)) {
+    normalized = errorToVariant(rs::RpcErrorCode::InternalError, message,
+                                QVariantMap());  // Cannot fail.
   }
+  rs::ffi_rpc_server_reply(*mHandle, connId, msgid, false, &normalized);
 }
 
 /*******************************************************************************
