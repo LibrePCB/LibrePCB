@@ -318,9 +318,11 @@ ffi_rpc_server_start(s: &mut RpcServer, port: u16, out_port: &mut u16) -> bool;
 /// is the result. ok=false: value is the error map — which is forwarded to
 /// the client *unchanged*, so it may carry additional error properties
 /// next to "code" and "message" (see the error types in the API spec).
-/// Returns false if the connection/msgid is unknown or already replied.
+/// No return value: If the connection/msgid is unknown or already replied,
+/// the response is silently dropped; if the value is not convertible, an
+/// internal error is sent instead (the caller does not care).
 ffi_rpc_server_reply(s: &mut RpcServer, conn_id: u64, msgid: u32,
-                     ok: bool, value: &QVariant) -> bool;
+                     ok: bool, value: &QVariant);
 /// Broadcast an event (type 2) to all clients; never blocks.
 ffi_rpc_server_notify_all(s: &mut RpcServer, method: &QString, params: &QVariant);
 /// Send a request-scoped message (type 3, e.g. progress) while the

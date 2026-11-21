@@ -40,9 +40,6 @@
 //!   per connection and enforces the protocol invariants: exactly one
 //!   response per request, and request messages ([RpcServer::notify_conn])
 //!   only while the request is pending.
-//! * Events can be broadcast to all connected clients with
-//!   [RpcServer::notify_all], as notifications.
-//!
 //! # Threading Model
 //!
 //! No async runtime is used, just plain std threads (the number of local
@@ -106,28 +103,16 @@ const MAX_PORT_ATTEMPTS: u16 = 100;
 /// during application teardown).
 const STOP_TIMEOUT: Duration = Duration::from_secs(5);
 
-/// The outcome of a [DispatchFn] call.
-#[derive(Debug)]
-pub enum DispatchOutcome {
-  /// The request was handed over to the command handler; the response will
-  /// be sent asynchronously via [RpcServer::reply].
-  Dispatched,
-  /// The request could not be dispatched (e.g. the params could not be
-  /// converted at the FFI boundary); the connection code replies with this
-  /// error immediately.
-  ReplyNow(RpcError),
-}
-
 /// Callback which handles a command request (fire-and-forget).
 ///
 /// It receives the connection ID, the msg_id, the method name (e.g.
 /// `"Project.list"`) and the raw msgpack params (a map, opaque to this
 /// server module — its content is only interpreted by the command
-/// handlers). If the request can be processed, the callback returns
-/// [DispatchOutcome::Dispatched] and ensures that
-/// [RpcServer::reply] is called exactly once, at any time, from any
-/// thread. Otherwise it returns [DispatchOutcome::ReplyNow] to let the
-/// connection code answer with an error.
+/// handlers). If the callback returns `Ok(())`, the request was accepted
+/// and [RpcServer::reply] will be called exactly once, at any time, from
+/// any thread. Otherwise it returns the error which the connection code
+/// answers with immediately (e.g. for params which could not be converted
+/// at the FFI boundary).
 ///
 /// The callback is invoked on the connection's reader thread, i.e.
 /// possibly concurrently from multiple threads, but strictly sequentially
@@ -138,7 +123,7 @@ pub enum DispatchOutcome {
 /// C++ side, which then calls [RpcServer::set_authenticated] to let the
 /// server know whether the connection is authenticated now.
 pub type DispatchFn =
-  Arc<dyn Fn(u32, u32, &str, &Value) -> DispatchOutcome + Send + Sync>;
+  Arc<dyn Fn(u32, u32, &str, &Value) -> Result<(), RpcError> + Send + Sync>;
 
 /// Callback which is invoked when a client cancels a pending request
 /// (`[4, msg_id]`).
@@ -186,11 +171,11 @@ struct Connection {
 
 /// The RPC server.
 ///
-/// Usage: Create it with [RpcServer::new], then call [RpcServer::start] to
-/// make it listen on 127.0.0.1 (the OS assigns the port, which is
-/// returned). Push events to all connected clients with
-/// [RpcServer::notify_all], and shut the server down with
-/// [RpcServer::stop] (or just drop it, which does the same).
+/// Usage: Create it with [RpcServer::new], which immediately starts
+/// listening on 127.0.0.1 (the port is returned via the out-parameter).
+/// Send request-scoped messages with [RpcServer::notify_conn] and shut the
+/// server down with [RpcServer::stop] (or just drop it, which does the
+/// same).
 ///
 /// All methods can be called from any thread. The dispatch and cancel
 /// callbacks are invoked on the connection's reader threads.
@@ -569,7 +554,7 @@ mod tests {
           dispatch_tx
             .send((conn_id, msg_id, method.to_string(), params.clone()))
             .unwrap();
-          DispatchOutcome::Dispatched
+          Ok(())
         },
       ),
       Arc::new(move |conn_id: u32, msg_id: u32| {
@@ -585,8 +570,8 @@ mod tests {
     dispatch: DispatchFn,
     cancel: CancelFn,
   ) -> (RpcServer, u16) {
-    let server = RpcServer::new(dispatch, cancel).unwrap();
-    let port = server.port();
+    let mut port = 0;
+    let server = RpcServer::new(dispatch, cancel, &mut port).unwrap();
     (server, port)
   }
 
@@ -756,14 +741,13 @@ mod tests {
   }
 
   #[test]
-  fn test_dispatch_reply_now_error() {
-    // A handler which rejects every request with ReplyNow (e.g. params
+  fn test_dispatch_immediate_error() {
+    // A handler which rejects every request with an error (e.g. params
     // conversion failures at the FFI boundary). Since `initialize` is
     // rejected as well, the connection can't be authenticated — which is
     // fine for this test.
-    let dispatch: DispatchFn = Arc::new(|_, _, _, _| {
-      DispatchOutcome::ReplyNow(RpcError::invalid_params())
-    });
+    let dispatch: DispatchFn =
+      Arc::new(|_, _, _, _| Err(RpcError::invalid_params()));
     let cancel: CancelFn = Arc::new(|_, _| {});
     let (_server, port) = spawn_server_with_handlers(dispatch, cancel);
     let mut client = TestClient::new_unauthenticated(port);
@@ -842,31 +826,6 @@ mod tests {
     assert!(server.reply(conn_id, msg_id, None, &Value::Nil));
     assert!(!server.notify_conn(conn_id, msg_id, &progress));
     client.read_response(1);
-  }
-
-  #[test]
-  fn test_notify_all() {
-    let (server, port, dispatch, _cancel) = spawn_server();
-    let mut client1 = TestClient::new(port, &server, &dispatch);
-    let mut client2 = TestClient::new(port, &server, &dispatch);
-    let params = Value::Map(vec![(Value::from("a"), Value::from(1))]);
-    server.notify_all("project_opened", &params);
-    for client in [&mut client1, &mut client2] {
-      let message = client.read().unwrap();
-      let items = message.as_array().unwrap();
-      assert_eq!(items[0], Value::from(2));
-      assert_eq!(items[1], Value::from("project_opened"));
-      assert_eq!(field(&items[2], "a"), Some(&Value::from(1)));
-    }
-  }
-
-  #[test]
-  fn test_notify_all_with_nil_params() {
-    let (server, port, dispatch, _cancel) = spawn_server();
-    let mut client = TestClient::new(port, &server, &dispatch);
-    server.notify_all("event", &Value::Nil);
-    let message = client.read().unwrap();
-    assert_eq!(message.as_array().unwrap()[2], Value::Nil);
   }
 
   #[test]
@@ -970,8 +929,6 @@ mod tests {
     // The second server can't bind the port of the first one, so the
     // fallback logic assigns a different port.
     assert_ne!(port1, port2);
-    assert_eq!(port1, server1.port());
-    assert_eq!(port2, server2.port());
   }
 
   #[test]

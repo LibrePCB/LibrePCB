@@ -263,11 +263,11 @@ struct InteractiveHtmlBom;
 /**
  * The RPC server.
  *
- * Usage: Create it with [RpcServer::new], then call [RpcServer::start] to
- * make it listen on 127.0.0.1 (the OS assigns the port, which is
- * returned). Push events to all connected clients with
- * [RpcServer::notify_all], and shut the server down with
- * [RpcServer::stop] (or just drop it, which does the same).
+ * Usage: Create it with [RpcServer::new], which immediately starts
+ * listening on 127.0.0.1 (the port is returned via the out-parameter).
+ * Send request-scoped messages with [RpcServer::notify_conn] and shut the
+ * server down with [RpcServer::stop] (or just drop it, which does the
+ * same).
  *
  * All methods can be called from any thread. The dispatch and cancel
  * callbacks are invoked on the connection's reader threads.
@@ -791,16 +791,17 @@ bool ffi_rpc_server_notify(RpcServer * NONNULL s,
  *
  * Exactly one of result/error is sent, enforced by the server: A second
  * response for the same msg_id, or a response for an unknown or already
- * closed connection, is silently dropped (returns `false`).
+ * closed connection, is silently dropped.
  *
  * - `ok == true`: `value` is the result.
  * - `ok == false`: `value` is an error map `{"code": <int>,
  *   "message": <string>, "data"?: <any>}`.
  *
- * If `value` contains types outside the protocol's value domain, an
- * internal error is sent instead.
+ * If `value` contains types outside the protocol's value domain (or is
+ * not a valid error object), an internal error is sent instead — the
+ * caller does not need to care about failure cases.
  */
-bool ffi_rpc_server_reply(RpcServer * NONNULL s,
+void ffi_rpc_server_reply(RpcServer * NONNULL s,
                           uint32_t conn_id,
                           uint32_t msg_id,
                           bool ok,

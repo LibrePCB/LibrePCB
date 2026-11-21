@@ -16,7 +16,7 @@ use super::protocol::{
   build_response, classify_message, ParsedMessage, RpcError, RpcErrorCode,
   METHOD_INITIALIZE, METHOD_PING,
 };
-use super::{lock, Connection, DispatchOutcome, Inner};
+use super::{lock, Connection, Inner};
 
 /// Poll interval of the non-blocking accept loop.
 const ACCEPT_POLL_INTERVAL: Duration = Duration::from_millis(10);
@@ -222,10 +222,9 @@ fn process_message(
 /// Handle a request by handing it over to the dispatch callback.
 ///
 /// The request's msgid is marked as pending *before* the callback is
-/// invoked (so that a synchronous reply from within the callback works),
-/// and the callback decides how to proceed:
-/// [DispatchOutcome::Dispatched] means the response will be sent
-/// asynchronously, [DispatchOutcome::ReplyNow] answers immediately.
+/// invoked (so that a synchronous reply from within the callback works).
+/// If the callback returns `Ok(())`, the response will be sent
+/// asynchronously; otherwise the returned error is answered immediately.
 fn dispatch_request(
   inner: &Inner,
   conn_id: u32,
@@ -243,8 +242,8 @@ fn dispatch_request(
     return Some(build_response(msgid, Some(&error.to_value()), &Value::Nil));
   }
   match (inner.dispatch)(conn_id, msgid, &method, &params) {
-    DispatchOutcome::Dispatched => None,
-    DispatchOutcome::ReplyNow(error) => {
+    Ok(()) => None,
+    Err(error) => {
       lock(pending).remove(&msgid);
       Some(build_response(msgid, Some(&error.to_value()), &Value::Nil))
     }

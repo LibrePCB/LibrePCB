@@ -11,7 +11,7 @@
 
 use super::cpp_ffi::*;
 use crate::rpc_server::{
-  CancelFn, DispatchFn, DispatchOutcome, RpcError, RpcErrorCode, RpcServer,
+  CancelFn, DispatchFn, RpcError, RpcErrorCode, RpcServer,
 };
 use std::ffi::c_void;
 use std::sync::Arc;
@@ -68,54 +68,21 @@ struct CppCallback<F> {
   ctx: *mut c_void,
 }
 
+// SAFETY: See the warning on [CppCallback]. Copy is implemented (instead
+// of capturing by reference) so that closures can copy the whole struct
+// per call, which keeps the whole-struct capture (see the dispatch
+// closure below).
+impl<F: Copy> Copy for CppCallback<F> {}
+impl<F: Copy> Clone for CppCallback<F> {
+  fn clone(&self) -> Self {
+    *self
+  }
+}
+
 // SAFETY: See the warning on [CppCallback].
 unsafe impl<F> Send for CppCallback<F> {}
 // SAFETY: See the warning on [CppCallback].
 unsafe impl<F> Sync for CppCallback<F> {}
-
-/// Call the C++ dispatch callback with the given request.
-///
-/// Returns `Ok(true)` if the request was accepted, `Ok(false)` if the C++
-/// side rejected it, or `Err` if the params are outside the protocol's
-/// value domain (payload-level error, answered with "invalid params").
-///
-/// This is a separate function (instead of inlining it into the closure
-/// below) on purpose: Rust's disjoint closure captures would otherwise
-/// capture the individual (raw) fields of [CppCallback], which would make
-/// the closure not [Send]/[Sync] although the struct itself is.
-fn call_dispatch(
-  callback: &CppCallback<RpcOnRequestCallback>,
-  conn_id: u32,
-  msg_id: u32,
-  method: &str,
-  params: &Value,
-) -> Result<bool, ()> {
-  let method_q = qstring_new();
-  assert!(!method_q.is_null());
-  unsafe { qstring_set(&mut *method_q, method) };
-  let params_q = match qvariant_from_msgpack(params) {
-    Ok(obj) => obj,
-    Err(()) => {
-      qstring_delete(method_q);
-      return Err(());
-    }
-  };
-  let ok = unsafe {
-    (callback.f)(callback.ctx, conn_id, msg_id, &*method_q, &*params_q)
-  };
-  qstring_delete(method_q);
-  qvariant_delete(params_q);
-  Ok(ok)
-}
-
-/// Call the C++ cancel callback (same pattern as [call_dispatch]).
-fn call_cancel(
-  callback: &CppCallback<RpcOnCancelCallback>,
-  conn_id: u32,
-  msg_id: u32,
-) {
-  (callback.f)(callback.ctx, conn_id, msg_id);
-}
 
 /// Build a QVariant tree from a msgpack value (recursively). The returned
 /// object must be freed with [qvariant_delete].
@@ -248,18 +215,6 @@ fn map_field<'a>(value: &'a Value, key: &str) -> Option<&'a Value> {
     .map(|(_, v)| v)
 }
 
-/// Check whether a msgpack value is a valid error object, as produced by
-/// the C++ dispatch layer: `{"code": <int>, "message": <string>,
-/// "data"?: <any>, ...}`. Additional fields next to "code" and "message"
-/// (error properties, see the API specification) are allowed — the whole
-/// error map is passed to the client unchanged.
-fn is_error_object(value: &Value) -> bool {
-  map_field(value, "code").and_then(Value::as_i64).is_some()
-    && map_field(value, "message")
-      .and_then(Value::as_str)
-      .is_some()
-}
-
 /// Create a new [RpcServer] object, which immediately starts listening on
 /// 127.0.0.1 (see `DEFAULT_PORT` / `MAX_PORT_ATTEMPTS` in
 /// `rpc_server.rs` for the port selection).
@@ -281,27 +236,46 @@ extern "C" fn ffi_rpc_server_new(
   let dispatch_callback = CppCallback { f: on_request, ctx };
   let dispatch: DispatchFn = Arc::new(
     move |conn_id: u32, msg_id: u32, method: &str, params: &Value| {
-      match call_dispatch(&dispatch_callback, conn_id, msg_id, method, params) {
-        Ok(true) => DispatchOutcome::Dispatched,
-        Ok(false) => DispatchOutcome::ReplyNow(RpcError::new(
-          RpcErrorCode::InternalError,
-          "Failed to dispatch the command",
-        )),
+      // Capture the callback struct as a whole: Capturing its fields
+      // individually would capture the raw function pointer and context
+      // pointer instead, which are not [Send]/[Sync] (see [CppCallback]).
+      let callback = dispatch_callback;
+      let method_q = qstring_new();
+      assert!(!method_q.is_null());
+      unsafe { qstring_set(&mut *method_q, method) };
+      let params_q = match qvariant_from_msgpack(params) {
+        Ok(params_q) => params_q,
         Err(()) => {
+          qstring_delete(method_q);
           // Values outside the protocol's value domain are payload-level
           // errors: The message was decoded fine, so the connection stays
           // open and the request is answered with "invalid params".
           eprintln!(
             "librepcb-rust: Rejecting params of '{method}': outside the value domain"
           );
-          DispatchOutcome::ReplyNow(RpcError::invalid_params())
+          return Err(RpcError::invalid_params());
         }
+      };
+      let ok = unsafe {
+        (callback.f)(callback.ctx, conn_id, msg_id, &*method_q, &*params_q)
+      };
+      qstring_delete(method_q);
+      qvariant_delete(params_q);
+      if ok {
+        Ok(())
+      } else {
+        Err(RpcError::new(
+          RpcErrorCode::InternalError,
+          "Failed to dispatch the command",
+        ))
       }
     },
   );
   let cancel_callback = CppCallback { f: on_cancel, ctx };
-  let cancel: CancelFn = Arc::new(move |conn_id, msg_id| {
-    call_cancel(&cancel_callback, conn_id, msg_id)
+  let cancel: CancelFn = Arc::new(move |conn_id: u32, msg_id: u32| {
+    // Capture the callback struct as a whole (see the dispatch closure).
+    let callback = cancel_callback;
+    (callback.f)(callback.ctx, conn_id, msg_id)
   });
   match RpcServer::new(dispatch, cancel, port) {
     Ok(server) => Box::into_raw(Box::new(server)),
@@ -358,14 +332,15 @@ extern "C" fn ffi_rpc_server_notify(
 ///
 /// Exactly one of result/error is sent, enforced by the server: A second
 /// response for the same msg_id, or a response for an unknown or already
-/// closed connection, is silently dropped (returns `false`).
+/// closed connection, is silently dropped.
 ///
 /// - `ok == true`: `value` is the result.
 /// - `ok == false`: `value` is an error map `{"code": <int>,
 ///   "message": <string>, "data"?: <any>}`.
 ///
-/// If `value` contains types outside the protocol's value domain, an
-/// internal error is sent instead.
+/// If `value` contains types outside the protocol's value domain (or is
+/// not a valid error object), an internal error is sent instead — the
+/// caller does not need to care about failure cases.
 #[no_mangle]
 extern "C" fn ffi_rpc_server_reply(
   s: &mut RpcServer,
@@ -373,12 +348,12 @@ extern "C" fn ffi_rpc_server_reply(
   msg_id: u32,
   ok: bool,
   payload: &QVariant,
-) -> bool {
+) {
   let payload = match qvariant_to_msgpack(payload) {
     Ok(payload) => payload,
     Err(()) => {
       eprintln!("librepcb-rust: A command returned an unsupported value type.");
-      return s.reply(
+      s.reply(
         conn_id,
         msg_id,
         Some(&RpcError::new(
@@ -387,18 +362,24 @@ extern "C" fn ffi_rpc_server_reply(
         )),
         &Value::Nil,
       );
+      return;
     }
   };
   if ok {
-    s.reply(conn_id, msg_id, None, &payload)
+    s.reply(conn_id, msg_id, None, &payload);
   } else {
     // Pass the error map from C++ through unchanged — it may carry
     // additional error properties next to "code" and "message" (see the
     // error types in the API specification). Only if it is not even a
-    // valid error object, fall back to a generic internal error.
-    if !is_error_object(&payload) {
+    // valid error object (an int "code" and a string "message"), fall
+    // back to a generic internal error.
+    let valid = map_field(&payload, "code").and_then(Value::as_i64).is_some()
+      && map_field(&payload, "message")
+        .and_then(Value::as_str)
+        .is_some();
+    if !valid {
       eprintln!("librepcb-rust: A command returned an invalid error object.");
-      return s.reply(
+      s.reply(
         conn_id,
         msg_id,
         Some(&RpcError::new(
@@ -407,7 +388,8 @@ extern "C" fn ffi_rpc_server_reply(
         )),
         &Value::Nil,
       );
+      return;
     }
-    s.reply_error(conn_id, msg_id, &payload)
+    s.reply_error(conn_id, msg_id, &payload);
   }
 }
