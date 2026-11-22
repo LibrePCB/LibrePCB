@@ -63,14 +63,14 @@
 //!
 //! [MessagePack-RPC]: https://github.com/msgpack-rpc/msgpack-rpc/blob/master/spec.md
 
-mod api_gen;
 mod codec;
 mod connection;
 mod protocol;
+mod rpc_api;
 
 // Re-Exports
-pub use api_gen::RpcErrorCode;
 pub use protocol::RpcError;
+pub use rpc_api::RpcErrorCode;
 
 use std::collections::{HashMap, HashSet};
 use std::io;

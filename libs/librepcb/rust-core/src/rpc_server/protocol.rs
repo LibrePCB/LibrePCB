@@ -12,7 +12,7 @@
 //! derive, which gives full control over the exact structure without any
 //! serialization error handling.
 
-use super::api_gen::RpcErrorCode;
+use super::rpc_api::RpcErrorCode;
 use rmpv::Value;
 
 /// The message type of a request (client → server).

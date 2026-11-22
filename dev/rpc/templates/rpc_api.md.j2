@@ -1,0 +1,162 @@
+{% macro type_ref(t) -%}
+{{- t.type if t is mapping else t -}}
+{%- endmacro -%}
+
+{% macro fields_table(fields, heading="Fields:") -%}
+{% if fields %}
+**{{ heading }}**
+
+| Name | Type | Description |
+|------|------|-------------|
+{% for field in fields %}
+| `{{ field.name }}` | {{ type_ref(field.type) }}{% if field.get("items") %} of {{ type_ref(field.get("items")) }}{% endif %} | {{ field.description or "" }} |
+{% endfor %}
+{% endif %}
+{%- endmacro -%}
+
+{% macro result_block(result) -%}
+{% if result is none %}
+None.
+{% else %}
+{% if result.description %}
+
+{{ result.description }}
+
+{% endif %}
+**Result:** `{{ type_ref(result) }}`
+{% if result is mapping and result.fields %}
+
+{{ fields_table(result.fields) }}{% endif %}
+{% if result is mapping and result.get("items") %}
+
+Array items: `{{ type_ref(result.get("items")) }}`
+{% endif %}
+{% endif %}
+{%- endmacro -%}
+
+{% macro errors_block(err_names) -%}
+{% if not err_names %}
+None (besides protocol-level errors).
+{% else %}
+| Error | Code | Message |
+|-------|------|---------|
+{% for name in err_names %}
+{% set error = errors.get(name, {}) %}
+| `{{ name }}` | {{ error.get("code", "?") }} | {{ error.get("message", "") }} |
+{% endfor %}
+{% endif %}
+{%- endmacro -%}
+
+RPC API Reference {{ "{" }}#doc_rpc_api_reference}
+==================
+
+[TOC]
+
+This reference documents the commands (data types, error types, classes with their methods and events) which the RPC server offers. It is generated from `dev/rpc/rpc.yml`, the single source of truth of the API. The transport protocol (framing, handshake, conventions) is described in @ref doc_rpc_api.
+
+> Note: This reference is about controlling a *running* LibrePCB application. For the *online* REST API used to fetch libraries, see @ref doc_server_api.
+
+# Data Types {{ "{" }}#doc_rpc_api_types}
+
+{% for struct in spec.structs %}
+## {{ struct.name }} {{ "{" }}#doc_rpc_api_type_{{ struct.name }}}
+{% if struct.description %}
+
+{{ struct.description }}
+
+{% endif %}
+{{ fields_table(struct.fields) }}
+---
+
+{% endfor %}
+{% for enum in spec.enums %}
+## {{ enum.name }} (Enum) {{ "{" }}#doc_rpc_api_type_{{ enum.name }}}
+{% if enum.description %}
+
+{{ enum.description }}
+
+{% endif %}
+| Value | Description |
+|-------|-------------|
+{% for value in enum.values %}
+| `{{ value.name }}` | {{ value.description or "" }} |
+{% endfor %}
+
+---
+{% endfor %}
+# Error Types {{ "{" }}#doc_rpc_api_errors}
+
+The `error` element of a response is a map with the keys `code` and `message` (and possibly additional properties, listed below):
+
+| Error | Code | Message |
+|-------|------|---------|
+{% for error in spec.errors %}
+| `{{ error.name }}` {{ "{" }}#doc_rpc_api_error_{{ error.name }}} | {{ error.code }} | {{ error.message }} |
+{% endfor %}
+
+{% for error in spec.errors %}
+{% if error.description %}
+**`{{ error.name }}`:** {{ error.description }}
+
+{% endif %}
+{% if error.properties %}
+{{ fields_table(error.properties, heading="Properties:") }}
+{% endif %}
+{% endfor %}
+---
+
+# Commands {{ "{" }}#doc_rpc_api_commands}
+
+All commands below are dispatched to the application and executed on its GUI thread. Method names are `ClassName.method_name`. Non-static methods receive their receiver handle in the reserved `obj` key of the params.
+
+{% for cls in spec.classes %}
+## Class {{ cls.name }} {{ "{" }}#doc_rpc_api_class_{{ cls.name }}}
+{% if cls.description %}
+
+{{ cls.description }}
+
+{% endif %}
+{% if not cls.static and cls.handle %}
+**Handle (obj):** {{ cls.handle }}
+
+{% endif %}
+{% for method in cls.methods %}
+### {{ cls.name }}.{{ method.name }} {{ "{" }}#doc_rpc_api_method_{{ cls.name }}_{{ method.name }}}
+{% if method.description %}
+
+{{ method.description }}
+
+{% endif %}
+{% if method.params %}
+{{ fields_table(method.params, heading="Params:") }}
+{% else %}
+None.
+
+{% endif %}
+{{ result_block(method.result) }}
+**Errors:**
+
+{{ errors_block(method.errors) }}
+{% if method.added_in_version %}
+**Added in version:** {{ method.added_in_version }}
+
+{% endif %}
+---
+
+{% endfor %}
+{% endfor %}
+{% if spec.events %}
+# Events {{ "{" }}#doc_rpc_api_events}
+
+{% for event in spec.events %}
+## {{ event.name }} {{ "{" }}#doc_rpc_api_event_{{ event.name }}}
+{% if event.description %}
+
+{{ event.description }}
+
+{% endif %}
+{{ result_block(event.params) }}
+
+---
+{% endfor %}
+{% endif %}

@@ -40,7 +40,7 @@ protocol: "1.0"
 # errors, 20–29 protocol errors, 100– application errors.
 # ---------------------------------------------------------------------------
 
-error_types:
+errors:
   # Transport errors
 
   - code: 10
@@ -105,7 +105,7 @@ error_types:
     message: Invalid method arguments
     description: >-
       The method arguments are invalid, e.g. wrong value types, missing required
-      arguments, or invalid values.
+      arguments, invalid values, or unknown enum values.
 
   - code: 35
     name: InvalidHandle
