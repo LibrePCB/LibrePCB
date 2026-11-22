@@ -94,8 +94,7 @@ void RpcServer::handleRequest(uint32_t connId, uint32_t msgId,
   // Look up the command handler.
   const auto handler = mCommands.value(method);
   if (!handler) {
-    request->sendError(rs::RpcErrorCode::MethodNotFound,
-                       QString("Method not found: %1").arg(method));
+    request->sendError(rs::RpcErrorCode::MethodNotFound, method);
     return;
   }
 
@@ -152,8 +151,7 @@ void RpcServer::handleInitialize(RpcRequest& request) noexcept {
     if (authenticated) {
       request.sendSuccess(createResponse(token.toString()));
     } else {
-      request.sendError(rs::RpcErrorCode::AccessDenied,
-                        "Invalid or revoked access token.");
+      request.sendError(rs::RpcErrorCode::AccessDenied);
     }
   } else {
     auto notification = std::make_shared<Notification>(
@@ -170,11 +168,9 @@ void RpcServer::handleInitialize(RpcRequest& request) noexcept {
                                                    request.getConnId(), true);
               request.sendSuccess(createResponse(QString()));
             });
-    connect(notification.get(), &Notification::destroyed, &request,
-            [&request]() {
-              request.sendError(rs::RpcErrorCode::AccessDenied,
-                                "Access request rejected or dismissed.");
-            });
+    connect(
+        notification.get(), &Notification::destroyed, &request,
+        [&request]() { request.sendError(rs::RpcErrorCode::AccessDenied); });
     connect(&request, &RpcRequest::cancelled, notification.get(),
             &Notification::dismiss);
     connect(&request, &RpcRequest::destroyed, notification.get(),

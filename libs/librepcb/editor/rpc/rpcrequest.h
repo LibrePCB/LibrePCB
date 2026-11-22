@@ -148,8 +148,14 @@ public:
   /**
    * @brief Reply with an error (finishes the request)
    *
+   * The message sent on the wire is the canonical message of the error
+   * code (see the error types in the API specification), followed by the
+   * optional application-provided detail (separated by a colon).
+   *
    * @param code        An error code (see #ErrorCode).
-   * @param message     A human-readable error message.
+   * @param message     Optional application-specific detail message,
+   *                    e.g. the reason of the failure. If empty, only
+   *                    the canonical message is sent.
    * @param properties  Additional error properties, sent next to
    *                    "code" and "message" (see the error types in
    *                    the API specification).

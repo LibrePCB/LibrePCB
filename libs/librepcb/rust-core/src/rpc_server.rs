@@ -63,12 +63,14 @@
 //!
 //! [MessagePack-RPC]: https://github.com/msgpack-rpc/msgpack-rpc/blob/master/spec.md
 
+mod api_gen;
 mod codec;
 mod connection;
 mod protocol;
 
 // Re-Exports
-pub use protocol::{RpcError, RpcErrorCode};
+pub use api_gen::RpcErrorCode;
+pub use protocol::RpcError;
 
 use std::collections::{HashMap, HashSet};
 use std::io;
@@ -608,10 +610,7 @@ mod tests {
       server.reply(
         conn_id,
         msg_id,
-        Some(&RpcError::new(
-          RpcErrorCode::Unauthenticated,
-          "Invalid or missing token",
-        )),
+        Some(&RpcError::canonical(RpcErrorCode::Unauthenticated)),
         &Value::Nil,
       );
     }
@@ -746,13 +745,14 @@ mod tests {
     // conversion failures at the FFI boundary). Since `initialize` is
     // rejected as well, the connection can't be authenticated — which is
     // fine for this test.
-    let dispatch: DispatchFn =
-      Arc::new(|_, _, _, _| Err(RpcError::invalid_params()));
+    let dispatch: DispatchFn = Arc::new(|_, _, _, _| {
+      Err(RpcError::canonical(RpcErrorCode::InvalidArgs))
+    });
     let cancel: CancelFn = Arc::new(|_, _| {});
     let (_server, port) = spawn_server_with_handlers(dispatch, cancel);
     let mut client = TestClient::new_unauthenticated(port);
     client.send_initialize(TOKEN);
-    client.read_error(1, RpcErrorCode::InvalidParams);
+    client.read_error(1, RpcErrorCode::InvalidArgs);
   }
 
   #[test]

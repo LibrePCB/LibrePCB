@@ -253,7 +253,7 @@ extern "C" fn ffi_rpc_server_new(
           eprintln!(
             "librepcb-rust: Rejecting params of '{method}': outside the value domain"
           );
-          return Err(RpcError::invalid_params());
+          return Err(RpcError::canonical(RpcErrorCode::InvalidArgs));
         }
       };
       // Marshalling in the callback cannot fail (see the
@@ -364,18 +364,19 @@ extern "C" fn ffi_rpc_server_reply(
   if ok {
     s.reply(conn_id, msg_id, None, &payload);
   } else {
-    // Pass the error map from C++ through unchanged — it may carry
-    // additional error properties next to "code" and "message" (see the
-    // error types in the API specification). Only if it is not even a
-    // valid error object (an int "code" and a string "message"), fall
-    // back to a generic internal error.
-    let valid = map_field(&payload, "code")
+    // Compose the error message: The map from C++ may carry additional
+    // error properties next to "code" and "message" (see the error types
+    // in the API specification) — they are passed through unchanged. The
+    // "message" entry contains the optional application-provided detail
+    // and is replaced by the canonical message of the error code (see the
+    // API specification), followed by the detail (if non-empty). Only if
+    // the map is not even a valid error object (a known int "code" and a
+    // string "message"), fall back to a generic internal error.
+    let error = map_field(&payload, "code")
       .and_then(Value::as_i64)
-      .is_some()
-      && map_field(&payload, "message")
-        .and_then(Value::as_str)
-        .is_some();
-    if !valid {
+      .and_then(|code| RpcErrorCode::try_from(code as i32).ok())
+      .zip(map_field(&payload, "message").and_then(Value::as_str));
+    let Some((code, detail)) = error else {
       eprintln!("librepcb-rust: A command returned an invalid error object.");
       s.reply(
         conn_id,
@@ -387,7 +388,25 @@ extern "C" fn ffi_rpc_server_reply(
         &Value::Nil,
       );
       return;
-    }
-    s.reply_error(conn_id, msg_id, &payload);
+    };
+    let message = if detail.is_empty() {
+      code.message().to_string()
+    } else {
+      format!("{}: {detail}", code.message())
+    };
+    let pairs = match &payload {
+      Value::Map(pairs) => pairs
+        .iter()
+        .map(|(key, value)| {
+          if key.as_str() == Some("message") {
+            (key.clone(), Value::from(message.as_str()))
+          } else {
+            (key.clone(), value.clone())
+          }
+        })
+        .collect(),
+      _ => unreachable!("validated above"),
+    };
+    s.reply_error(conn_id, msg_id, &Value::Map(pairs));
   }
 }

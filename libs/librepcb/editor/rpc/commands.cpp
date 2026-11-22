@@ -150,7 +150,7 @@ QHash<QString, RpcServer::RpcHandler>
   registry.insert("Project.get", [](Request& request) {
     ProjectEditor* editor = findProject(request);
     if (!editor) {
-      request.sendError(rs::RpcErrorCode::ProjectNotOpen, "Project not open");
+      request.sendError(rs::RpcErrorCode::InvalidHandle);
       return;
     }
     QVariantMap result = projectToVariant(*editor);
@@ -178,7 +178,7 @@ QHash<QString, RpcServer::RpcHandler>
   registry.insert("UndoStack.get_status", [](Request& request) {
     ProjectEditor* editor = findProject(request);
     if (!editor) {
-      request.sendError(rs::RpcErrorCode::ProjectNotOpen, "Project not open");
+      request.sendError(rs::RpcErrorCode::InvalidHandle);
       return;
     }
     request.sendSuccess(undoStackToVariant(editor->getUndoStack()));
@@ -188,7 +188,7 @@ QHash<QString, RpcServer::RpcHandler>
   registry.insert("UndoStack.undo", [](Request& request) {
     ProjectEditor* editor = findProject(request);
     if (!editor) {
-      request.sendError(rs::RpcErrorCode::ProjectNotOpen, "Project not open");
+      request.sendError(rs::RpcErrorCode::InvalidHandle);
       return;
     }
     editor->getUndoStack().undo();  // Can throw.
@@ -199,7 +199,7 @@ QHash<QString, RpcServer::RpcHandler>
   registry.insert("UndoStack.redo", [](Request& request) {
     ProjectEditor* editor = findProject(request);
     if (!editor) {
-      request.sendError(rs::RpcErrorCode::ProjectNotOpen, "Project not open");
+      request.sendError(rs::RpcErrorCode::InvalidHandle);
       return;
     }
     editor->getUndoStack().redo();  // Can throw.

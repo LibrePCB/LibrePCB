@@ -128,64 +128,78 @@ enum class InteractiveHtmlBomViewMode {
 };
 
 /**
- *
- * Error codes for the RPC protocol.
- *
- * The codes are grouped by category:
- *
- * * **10–19: Transport errors.** The connection is closed instead of
- *   responding, so these codes are currently never sent — they document
- *   the transport failure modes.
- * * **20–29: Protocol errors.** The connection stays open.
- * * **100–: Application errors.** Open-ended, defined by the API
- *   specification (`rpc.yml`).
+ * Error codes for the RPC protocol, as listed in the error types section of
+ * the API specification. The codes are grouped: 10-19 transport errors, 20-29
+ * protocol errors, 30-39 command errors, 100- command execution errors. Also
+ * used by the C++ side (see `rpcserver.h`).
  */
 enum class RpcErrorCode : int32_t {
   /**
-   * A message could not be decoded (invalid MessagePack or truncated
-   * value), so the stream framing is broken.
+   * The received message could not be decoded (invalid MessagePack or a
+   * truncated value), so the stream framing is broken and the connection is
+   * closed without a response.
    */
-  MessageDecodingFailed = 10,
+  InvalidMessage = 10,
   /**
-   * A message exceeded the maximum size (32 MiB).
+   * The received message exceeded the maximum size of 32 MiB, so the connection
+   * is closed without a response.
    */
   MessageTooLarge = 11,
   /**
-   * A request doesn't conform to the message envelope.
+   * The request doesn't conform to the message envelope.
    */
   InvalidRequest = 20,
   /**
-   * The connection is not authenticated (or the token is wrong).
+   * A request other than `initialize` was sent on a connection which is not
+   * authenticated yet. The first message of a connection must be an `initialize`
+   * request.
    */
-  Unauthenticated = 21,
+  Unauthenticated = 30,
   /**
-   * The method does not exist or is not available.
+   * The provided access token doesn't have the permissions to execute the
+   * command. If this error is returned by the 'initialize' method, it means that
+   * either the provided token is invalid or has expired, or an interactive
+   * connection request was denied by the user.
    */
-  MethodNotFound = 22,
+  AccessDenied = 31,
   /**
-   * Invalid method parameter(s).
+   * The method does not exist or is not available, e.g. because it was added in
+   * a newer application version than the running one.
    */
-  InvalidParams = 23,
+  MethodNotFound = 32,
   /**
-   * Internal error.
+   * The method exists, but is currently not available. This may be the case if
+   * the application is in a state where the requested functionality does not
+   * exist.
    */
-  InternalError = 24,
+  MethodNotAvailable = 33,
   /**
-   * Access denied.
+   * The method arguments are invalid, e.g. wrong value types, missing required
+   * arguments, or invalid values.
    */
-  AccessDenied = 25,
+  InvalidArgs = 34,
   /**
-   * A command failed (application-specific error).
+   * The provided object handle is invalid or has expired (e.g. object was
+   * deleted in the mean time). For example, this error is returned when
+   * accessing a project after it has been closed.
+   */
+  InvalidHandle = 35,
+  /**
+   * An unexpected internal error occurred, e.g. a command handler returned
+   * invalid data. This is a bug in LibrePCB, please open an issue on GitHub.
+   */
+  InternalError = 38,
+  /**
+   * The request was cancelled by the client and the command stopped its work
+   * when it could. Note that if the work already completed, the normal result is
+   * sent instead (exactly one response per request).
+   */
+  Cancelled = 39,
+  /**
+   * The command execution failed in an unspecified way, i.e. none of the
+   * specific error codes fit. The message contains details about the failure.
    */
   CommandFailed = 100,
-  /**
-   * The requested project is not open (application-specific error).
-   */
-  ProjectNotOpen = 101,
-  /**
-   * The request was cancelled by the client.
-   */
-  Cancelled = 102,
 };
 
 /**

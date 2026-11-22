@@ -153,15 +153,18 @@ Error Handling {#doc_rpc_api_error_handling}
 
 The `error` element of a response is a map with the keys `code` and
 `message`, plus optionally additional properties. The error codes are
-grouped: 10–19 transport errors, 20–29 protocol errors, 100– application
-errors. All codes are listed in the \ref doc_rpc_api_errors "error types"
-section of the reference.
+grouped: 10–19 transport errors, 20–29 protocol errors, 30–39 command
+errors, 100– command execution errors. All codes are listed in the
+\ref doc_rpc_api_errors "error types" section of the reference.
 
 - Transport errors (10–19) are never *sent*: When one of them occurs, the
   stream framing is broken and the connection is closed without a
   response.
 - Protocol errors (20–29) keep the connection open.
-- Application errors (100–) are specific to the executed command.
+- Command errors (30–39) and command execution errors (100–) are specific
+  to the executed command. The canonical message of an error code is
+  sent on the wire, optionally followed by an application-specific
+  detail message (separated by a colon).
 
 The specification file is the authoritative list of error types with
 their codes, messages and additional properties.

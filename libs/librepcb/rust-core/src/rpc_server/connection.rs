@@ -13,10 +13,10 @@ use rmpv::Value;
 
 use super::codec::{self, read_message};
 use super::protocol::{
-  build_response, classify_message, ParsedMessage, RpcError, RpcErrorCode,
-  METHOD_INITIALIZE, METHOD_PING,
+  build_response, classify_message, ParsedMessage, RpcError, METHOD_INITIALIZE,
+  METHOD_PING,
 };
-use super::{lock, Connection, Inner};
+use super::{lock, Connection, Inner, RpcErrorCode};
 
 /// Poll interval of the non-blocking accept loop.
 const ACCEPT_POLL_INTERVAL: Duration = Duration::from_millis(10);
@@ -173,11 +173,7 @@ fn process_message(
       if (method != METHOD_INITIALIZE)
         && (!authenticated.load(Ordering::SeqCst))
       {
-        let error = RpcError::new(
-          RpcErrorCode::Unauthenticated,
-          "This connection is not authenticated, the first message must be \
-           an 'initialize' request",
-        );
+        let error = RpcError::canonical(RpcErrorCode::Unauthenticated);
         return Some(build_response(
           msgid,
           Some(&error.to_value()),
@@ -209,7 +205,7 @@ fn process_message(
     ParsedMessage::Invalid { msgid } => {
       // A request which doesn't conform to the envelope: answered with an
       // error (the stream is still in sync).
-      let error = RpcError::invalid_request();
+      let error = RpcError::canonical(RpcErrorCode::InvalidRequest);
       Some(build_response(
         msgid.unwrap_or(0),
         Some(&error.to_value()),

@@ -95,19 +95,20 @@ The `error` element of a response is a map with the keys `code` and `message` (a
 
 | Error | Code | Message |
 |-------|------|---------|
-| `MessageDecodingFailed` {#doc_rpc_api_error_MessageDecodingFailed} | 10 | Message decoding failed |
+| `InvalidMessage` {#doc_rpc_api_error_InvalidMessage} | 10 | Message decoding failed |
 | `MessageTooLarge` {#doc_rpc_api_error_MessageTooLarge} | 11 | Message too large |
-| `InvalidRequest` {#doc_rpc_api_error_InvalidRequest} | 20 | Invalid Request |
-| `Unauthenticated` {#doc_rpc_api_error_Unauthenticated} | 21 | This connection is not authenticated, the first message must be an 'initialize' request |
-| `AccessDenied` {#doc_rpc_api_error_AccessDenied} | 25 | Invalid or revoked access token. |
-| `MethodNotFound` {#doc_rpc_api_error_MethodNotFound} | 22 | Method not found |
-| `InvalidParams` {#doc_rpc_api_error_InvalidParams} | 23 | Invalid params |
-| `InternalError` {#doc_rpc_api_error_InternalError} | 24 | Internal error |
+| `InvalidRequest` {#doc_rpc_api_error_InvalidRequest} | 20 | Invalid request |
+| `Unauthenticated` {#doc_rpc_api_error_Unauthenticated} | 30 | Connection is not authenticated |
+| `AccessDenied` {#doc_rpc_api_error_AccessDenied} | 31 | Access denied |
+| `MethodNotFound` {#doc_rpc_api_error_MethodNotFound} | 32 | Method not found |
+| `MethodNotAvailable` {#doc_rpc_api_error_MethodNotAvailable} | 33 | Method not available |
+| `InvalidArgs` {#doc_rpc_api_error_InvalidArgs} | 34 | Invalid method arguments |
+| `InvalidHandle` {#doc_rpc_api_error_InvalidHandle} | 35 | Invalid object handle |
+| `InternalError` {#doc_rpc_api_error_InternalError} | 38 | Internal error |
+| `Cancelled` {#doc_rpc_api_error_Cancelled} | 39 | Request cancelled |
 | `CommandFailed` {#doc_rpc_api_error_CommandFailed} | 100 | Command failed |
-| `ProjectNotOpen` {#doc_rpc_api_error_ProjectNotOpen} | 101 | Project not open |
-| `Cancelled` {#doc_rpc_api_error_Cancelled} | 102 | Request cancelled |
 
-**`MessageDecodingFailed`:** The received message could not be decoded (invalid MessagePack or a truncated value), so the stream framing is broken and the connection is closed without a response.
+**`InvalidMessage`:** The received message could not be decoded (invalid MessagePack or a truncated value), so the stream framing is broken and the connection is closed without a response.
 
 **`MessageTooLarge`:** The received message exceeded the maximum size of 32 MiB, so the connection is closed without a response.
 
@@ -115,19 +116,21 @@ The `error` element of a response is a map with the keys `code` and `message` (a
 
 **`Unauthenticated`:** A request other than `initialize` was sent on a connection which is not authenticated yet. The first message of a connection must be an `initialize` request.
 
-**`AccessDenied`:** Authentication failed. Either the provided token was not issued by this application instance (or is no longer valid), or an interactive connection request was denied by the user.
+**`AccessDenied`:** The provided access token doesn't have the permissions to execute the command. If this error is returned by the 'initialize' method, it means that either the provided token is invalid or has expired, or an interactive connection request was denied by the user.
 
 **`MethodNotFound`:** The method does not exist or is not available, e.g. because it was added in a newer application version than the running one.
 
-**`InvalidParams`:** The request parameters are invalid, e.g. values outside the protocol's value domain or a missing/invalid receiver handle.
+**`MethodNotAvailable`:** The method exists, but is currently not available. This may be the case if the application is in a state where the requested functionality does not exist.
 
-**`InternalError`:** An unexpected internal error occurred, e.g. a command handler panicked or returned invalid data.
+**`InvalidArgs`:** The method arguments are invalid, e.g. wrong value types, missing required arguments, or invalid values.
 
-**`CommandFailed`:** The command could not be executed, e.g. because it threw an exception. The message contains details about the failure.
+**`InvalidHandle`:** The provided object handle is invalid or has expired (e.g. object was deleted in the mean time). For example, this error is returned when accessing a project after it has been closed.
 
-**`ProjectNotOpen`:** The requested project is not opened in the application (or the receiver handle is missing/invalid).
+**`InternalError`:** An unexpected internal error occurred, e.g. a command handler returned invalid data. This is a bug in LibrePCB, please open an issue on GitHub.
 
 **`Cancelled`:** The request was cancelled by the client and the command stopped its work when it could. Note that if the work already completed, the normal result is sent instead (exactly one response per request).
+
+**`CommandFailed`:** The command execution failed in an unspecified way, i.e. none of the specific error codes fit. The message contains details about the failure.
 
 ---
 
@@ -197,7 +200,7 @@ None.
 
 | Error | Code | Message |
 |-------|------|---------|
-| `ProjectNotOpen` | 101 | Project not open |
+| `ProjectNotOpen` | ? |  |
 
 **Added in version:** 2.1.2
 
@@ -221,7 +224,7 @@ None.
 
 | Error | Code | Message |
 |-------|------|---------|
-| `ProjectNotOpen` | 101 | Project not open |
+| `ProjectNotOpen` | ? |  |
 
 **Added in version:** 2.1.2
 
@@ -239,7 +242,7 @@ None.
 
 | Error | Code | Message |
 |-------|------|---------|
-| `ProjectNotOpen` | 101 | Project not open |
+| `ProjectNotOpen` | ? |  |
 | `CommandFailed` | 100 | Command failed |
 
 **Added in version:** 2.1.2
@@ -258,7 +261,7 @@ None.
 
 | Error | Code | Message |
 |-------|------|---------|
-| `ProjectNotOpen` | 101 | Project not open |
+| `ProjectNotOpen` | ? |  |
 | `CommandFailed` | 100 | Command failed |
 
 **Added in version:** 2.1.2
@@ -281,7 +284,7 @@ None.
 
 | Error | Code | Message |
 |-------|------|---------|
-| `Cancelled` | 102 | Request cancelled |
+| `Cancelled` | 39 | Request cancelled |
 
 **Added in version:** 2.1.2
 

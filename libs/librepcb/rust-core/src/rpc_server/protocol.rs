@@ -12,6 +12,7 @@
 //! derive, which gives full control over the exact structure without any
 //! serialization error handling.
 
+use super::api_gen::RpcErrorCode;
 use rmpv::Value;
 
 /// The message type of a request (client → server).
@@ -36,51 +37,6 @@ pub const METHOD_INITIALIZE: &str = "initialize";
 /// Name of the protocol-level ping method (returns an empty map).
 pub const METHOD_PING: &str = "ping";
 
-/// cbindgen::export — also used by the C++ side (see `rpcserver.h`).
-///
-/// Error codes for the RPC protocol.
-///
-/// The codes are grouped by category:
-///
-/// * **10–19: Transport errors.** The connection is closed instead of
-///   responding, so these codes are currently never sent — they document
-///   the transport failure modes.
-/// * **20–29: Protocol errors.** The connection stays open.
-/// * **100–: Application errors.** Open-ended, defined by the API
-///   specification (`rpc.yml`).
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-#[repr(i32)]
-pub enum RpcErrorCode {
-  // Transport errors (10–19).
-  /// A message could not be decoded (invalid MessagePack or truncated
-  /// value), so the stream framing is broken.
-  MessageDecodingFailed = 10,
-  /// A message exceeded the maximum size (32 MiB).
-  MessageTooLarge = 11,
-
-  // Protocol errors (20–29).
-  /// A request doesn't conform to the message envelope.
-  InvalidRequest = 20,
-  /// The connection is not authenticated (or the token is wrong).
-  Unauthenticated = 21,
-  /// The method does not exist or is not available.
-  MethodNotFound = 22,
-  /// Invalid method parameter(s).
-  InvalidParams = 23,
-  /// Internal error.
-  InternalError = 24,
-  /// Access denied.
-  AccessDenied = 25,
-
-  // Application errors (100–).
-  /// A command failed (application-specific error).
-  CommandFailed = 100,
-  /// The requested project is not open (application-specific error).
-  ProjectNotOpen = 101,
-  /// The request was cancelled by the client.
-  Cancelled = 102,
-}
-
 /// An RPC error, as sent in a response.
 #[derive(Clone, Debug)]
 pub struct RpcError {
@@ -93,39 +49,31 @@ pub struct RpcError {
 }
 
 impl RpcError {
-  /// Create an error with a code and a message.
-  pub fn new(code: RpcErrorCode, message: impl Into<String>) -> Self {
+  /// Create an error with a code and an optional application-specific
+  /// detail message. The message sent on the wire is the canonical
+  /// message of the error code (see the API specification), followed by
+  /// the detail (if non-empty), separated by a colon.
+  pub fn new(code: RpcErrorCode, detail: impl Into<String>) -> Self {
     Self {
       code,
-      message: message.into(),
+      message: match detail.into() {
+        detail if detail.is_empty() => code.message().to_string(),
+        detail => format!("{}: {detail}", code.message()),
+      },
       data: None,
     }
+  }
+
+  /// Create an error without an application-specific detail message, i.e.
+  /// only the canonical message of the error code is sent.
+  pub fn canonical(code: RpcErrorCode) -> Self {
+    Self::new(code, "")
   }
 
   /// Attach additional data to the error.
   pub fn with_data(mut self, data: Value) -> Self {
     self.data = Some(data);
     self
-  }
-
-  /// Create an error for a message which doesn't conform to the envelope.
-  pub fn invalid_request() -> Self {
-    Self::new(RpcErrorCode::InvalidRequest, "Invalid Request")
-  }
-
-  /// Create an error for an unknown method.
-  pub fn method_not_found() -> Self {
-    Self::new(RpcErrorCode::MethodNotFound, "Method not found")
-  }
-
-  /// Create an error for invalid params.
-  pub fn invalid_params() -> Self {
-    Self::new(RpcErrorCode::InvalidParams, "Invalid params")
-  }
-
-  /// Create an internal error.
-  pub fn internal_error() -> Self {
-    Self::new(RpcErrorCode::InternalError, "Internal error")
   }
 
   /// Get the error code.
@@ -434,7 +382,10 @@ mod tests {
       field(&value, "code"),
       Some(&Value::from(RpcErrorCode::CommandFailed as i64))
     );
-    assert_eq!(field(&value, "message"), Some(&Value::from("boom")));
+    assert_eq!(
+      field(&value, "message"),
+      Some(&Value::from("Command failed: boom"))
+    );
     assert_eq!(field(&value, "data"), None);
     let error = error.with_data(Value::from(7));
     let value = error.to_value();
@@ -453,7 +404,7 @@ mod tests {
 
   #[test]
   fn test_build_response_error() {
-    let error = RpcError::new(RpcErrorCode::ProjectNotOpen, "nope");
+    let error = RpcError::new(RpcErrorCode::InvalidHandle, "nope");
     let response =
       build_response(5, Some(&error.to_value()), &Value::from(true));
     let items = response.as_array().unwrap();
@@ -461,7 +412,7 @@ mod tests {
     assert_eq!(items[1], Value::from(5));
     assert_eq!(
       field(&items[2], "code"),
-      Some(&Value::from(RpcErrorCode::ProjectNotOpen as i64))
+      Some(&Value::from(RpcErrorCode::InvalidHandle as i64))
     );
     assert_eq!(items[3], Value::Nil); // Result is nil on error.
   }

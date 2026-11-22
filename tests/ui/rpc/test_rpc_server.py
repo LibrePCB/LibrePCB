@@ -90,7 +90,7 @@ def test_rpc_server(librepcb, helpers):
             # sent after clicking the notification button.
             rpc.send([0, 1, "initialize", {"name": "RPC Test"}])
             notification = helpers.wait_for_notification(
-                app, "External RPC Connection Request"
+                app, "RPC Connection Request"
             )
             notification.trigger()
             message = rpc.receive()
@@ -126,9 +126,9 @@ def test_rpc_server(librepcb, helpers):
             # rejected, and the connection stays unauthenticated.
             rpc3 = RpcClient(PORT)
             try:
-                rpc3.expect_error(1, "initialize", {"token": "invalid"}, 25)
+                rpc3.expect_error(1, "initialize", {"token": "invalid"}, 31)
                 error, result = rpc3.request(2, "ping", None)
-                assert error is not None and error["code"] == 21, error
+                assert error is not None and error["code"] == 30, error
             finally:
                 rpc3.close()
 
@@ -137,15 +137,13 @@ def test_rpc_server(librepcb, helpers):
             try:
                 rpc4.send([0, 1, "initialize", {"name": "RPC Test"}])
                 helpers.wait_for_notification(
-                    app, "External RPC Connection Request"
+                    app, "RPC Connection Request"
                 )
                 rpc4.send([4, 1])
                 message = rpc4.receive()
                 assert message[0:2] == [1, 1], message
-                assert message[2]["code"] == 25, message
-                assert (
-                    message[2]["message"] == "Access request rejected or dismissed."
-                ), message
+                assert message[2]["code"] == 31, message
+                assert message[2]["message"] == "Access denied", message
             finally:
                 rpc4.close()
 
@@ -204,38 +202,38 @@ def test_rpc_server(librepcb, helpers):
             assert result["clean"] is True
 
             # --- Error handling -------------------------------------------
-            # Unknown method → -32601, the connection stays open.
-            rpc.expect_error(7, "Foo.bar", {}, 22)
+            # Unknown method → MethodNotFound (32), the connection
+            # stays open.
+            rpc.expect_error(7, "Foo.bar", {}, 32)
 
-            # Invalid envelope (method not a string) → -32600, the
-            # connection stays open.
+            # Invalid envelope (method not a string) → InvalidRequest
+            # (20), the connection stays open.
             rpc.send([0, 8, 42, {}])
             message = rpc.receive()
             assert message[0:2] == [1, 8], message
             assert message[2]["code"] == 20, message
             assert message[3] is None, message
 
-            # Unknown project handle → ProjectNotOpen (-32003), with the
-            # requested handle as error property.
+            # Unknown project handle → InvalidHandle (35).
             rpc.send([0, 9, "UndoStack.get_status", {"obj": "invalid-uuid"}])
             message = rpc.receive()
             assert message[0:2] == [1, 9], message
-            assert message[2]["code"] == 101, message
-            assert message[2]["message"] == "Project not open", message
+            assert message[2]["code"] == 35, message
+            assert message[2]["message"] == "Invalid object handle", message
             assert message[3] is None, message
 
             # Params outside the protocol's value domain (u64 > i64::MAX
-            # and non-string map keys) → -32602 "invalid params", the
-            # connection stays open (unlike a decode error!).
+            # and non-string map keys) → InvalidArgs (34), the connection
+            # stays open (unlike a decode error!).
             rpc.send([0, 10, "Project.list", {"key": 0x8000000000000000}])
             message = rpc.receive()
             assert message[0:2] == [1, 10], message
-            assert message[2]["code"] == 23, message
+            assert message[2]["code"] == 34, message
 
             rpc.send([0, 11, "Project.list", {1: "x"}])  # Non-string map key.
             message = rpc.receive()
             assert message[0:2] == [1, 11], message
-            assert message[2]["code"] == 23, message
+            assert message[2]["code"] == 34, message
 
             # A cancel for an unknown msgid is ignored (no response).
             rpc.send([4, 999])
