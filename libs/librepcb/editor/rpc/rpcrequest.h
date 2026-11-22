@@ -123,14 +123,22 @@ public:
    * @brief Read an enum value from a request argument
    *
    * Returns the default value of the enum (from the specification) if the
-   * argument is not provided.
+   * argument is not provided. Enums without a default value are mandatory
+   * arguments.
    *
    * @throws RpcInvalidArgs  If the argument is provided but is not nil or
-   *                         a valid enum value.
+   *                         a valid enum value, or if it is not provided
+   *                         and the enum has no default value.
    */
   template <typename E>
   E getArg(const QString& argName) const {
-    return tryGetArg<E>(argName).value_or(rpc::RpcEnumTraits<E>::DEFAULT);
+    if (auto value = tryGetArg<E>(argName)) {
+      return *value;
+    } else if (auto fallback = rpc::RpcEnumTraits<E>::DEFAULT) {
+      return *fallback;
+    } else {
+      throwMissingArgs(argName, rpc::RpcEnumTraits<E>::NAME);
+    }
   }
 
   /**
@@ -150,10 +158,10 @@ public:
     const QString value = argIt->toString();
     const auto& map = rpc::RpcEnumTraits<E>::mapFromString();
     const auto mapIt = map.constFind(value);
-    if (mapIt == map.constEnd()) {
-      throwInvalidArgs(value, argName, rpc::RpcEnumTraits<E>::NAME);
+    if (mapIt != map.constEnd()) {
+      return *mapIt;
     }
-    return *mapIt;
+    throwInvalidArgs(value, argName, rpc::RpcEnumTraits<E>::NAME, map.keys());
   }
 
   /**
@@ -216,6 +224,11 @@ private:  // Methods
   /// the generated error classes).
   [[noreturn]] static void throwInvalidArgs(const QString& value,
                                             const QString& argName,
+                                            const char* enumName,
+                                            const QStringList& values);
+
+  /// Throw an InvalidArgs error for a missing mandatory enum argument.
+  [[noreturn]] static void throwMissingArgs(const QString& argName,
                                             const char* enumName);
 
 private:  // Data

@@ -30,6 +30,8 @@
 #include "rpcerrors.h"
 #include "rpctypes.h"
 
+#include <librepcb/core/attribute/attributetype.h>
+#include <librepcb/core/attribute/attributeunit.h>
 #include <librepcb/core/fileio/filepath.h>
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/project.h>
@@ -49,14 +51,48 @@ using namespace rpc;
  *  Local Functions
  ******************************************************************************/
 
-static QVariantMap summary(ProjectEditor& editor, RpcObjectRegistry& registry) {
-  const Project& project = editor.getProject();
+static QVariantMap summary(ProjectEditor& obj, RpcObjectRegistry& registry) {
+  const Project& project = obj.getProject();
 
   QVariantMap result;
-  result.insert("obj", registry.getHandle(editor));
+  result.insert("obj", registry.getHandle(obj));
   result.insert("name", *project.getName());
   result.insert("path", project.getFilepath().toStr());
-  result.insert("dirty", !editor.getUndoStack().isClean());
+  result.insert("dirty", !obj.getUndoStack().isClean());
+  return result;
+}
+
+static QVariantMap summary(Attribute& obj) {
+  QVariantMap result;
+  result.insert("name", *obj.getKey());
+  result.insert("type", obj.getType().getName());
+  result.insert("value", obj.getValue());
+  result.insert("unit", obj.getUnit() ? obj.getUnit()->getName() : QVariant());
+  return result;
+}
+
+static QVariantMap summary(Schematic& obj, RpcObjectRegistry& registry) {
+  QVariantMap result;
+  result.insert("obj", registry.getHandle(obj));
+  result.insert("uuid", obj.getUuid().toStr());
+  result.insert("name", *obj.getName());
+  return result;
+}
+
+static QVariantMap summary(Board& obj, RpcObjectRegistry& registry) {
+  QVariantMap result;
+  result.insert("obj", registry.getHandle(obj));
+  result.insert("uuid", obj.getUuid().toStr());
+  result.insert("name", *obj.getName());
+  return result;
+}
+
+template <typename T>
+static QVariantList summaryList(const T& list, RpcObjectRegistry& registry) {
+  QVariantList result;
+  for (auto obj : list) {
+    result.append(summary(*obj, registry));
+  }
   return result;
 }
 
@@ -66,26 +102,11 @@ static QVariantMap details(ProjectEditor& editor, RpcObjectRegistry& registry) {
   QVariantMap result = summary(editor, registry);
   result.insert("author", project.getAuthor());
   result.insert("version", *project.getVersion());
-  {
-    QVariantList list;
-    for (const Schematic* schematic : project.getSchematics()) {
-      QVariantMap sheet;
-      sheet.insert("uuid", schematic->getUuid().toStr());
-      sheet.insert("name", *schematic->getName());
-      list.append(sheet);
-    }
-    result.insert("sheets", list);
-  }
-  {
-    QVariantList list;
-    for (const Board* board : project.getBoards()) {
-      QVariantMap item;
-      item.insert("uuid", board->getUuid().toStr());
-      item.insert("name", *board->getName());
-      list.append(item);
-    }
-    result.insert("boards", list);
-  }
+  result.insert("attributes", summaryList(project.getAttributes(), registry));
+  result.insert("locale_order", project.getLocaleOrder());
+  result.insert("norm_order", project.getNormOrder());
+  result.insert("sheets", summaryList(project.getSchematics(), registry));
+  result.insert("boards", summaryList(project.getBoards(), registry));
   return result;
 }
 
@@ -107,30 +128,29 @@ void ProjectRpc::list(GuiApplication& app, RpcObjectRegistry& registry,
 void ProjectRpc::open(GuiApplication& app, RpcObjectRegistry& registry,
                       RpcRequest& request) {
   const FilePath fp(request.getArg("path").toString());
-  const BackupRestoreMode backup = request.getArg<BackupRestoreMode>("backup");
-  auto askForRestoringBackup = [&backup](const FilePath&) {
-    switch (backup) {
+  const auto backupRestoreMode = request.getArg<BackupRestoreMode>("backup");
+  auto askForRestoringBackup = [backupRestoreMode](const FilePath&) {
+    switch (backupRestoreMode) {
       case BackupRestoreMode::Restore:
         return true;
       case BackupRestoreMode::Discard:
         return false;
       case BackupRestoreMode::Abort:
         throw RpcCommandFailed(
-            "The project directory contains an auto-save backup.");
+            "The project directory contains an auto-save backup (possibly from "
+            "a previous application crash while having unsaved changes). Pass "
+            "the 'backup' argument to specify how to proceed in this case.");
     }
-    Q_UNREACHABLE();
   };
   auto editor = app.openProjectNonInteractive(fp, askForRestoringBackup);
-  if (!editor) {
-    throw RpcInternalError();
-  }
+  if (!editor) throw RpcInternalError();
   request.sendSuccess(details(*editor, registry));
 }
 
 void ProjectRpc::get(GuiApplication& app, RpcObjectRegistry& registry,
                      RpcRequest& request) {
   Q_UNUSED(app);
-  ProjectEditor& editor = registry.getAs<ProjectEditor>(request.getArg("obj"));
+  auto& editor = registry.getAs<ProjectEditor>(request.getArg("obj"));
   request.sendSuccess(details(editor, registry));
 }
 

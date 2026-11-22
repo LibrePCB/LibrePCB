@@ -29,6 +29,8 @@
  ******************************************************************************/
 #include <QtCore>
 
+#include <optional>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -70,9 +72,11 @@ struct RpcEnumTraits<{{ enum.name }}> {
   /// The enum name (used in error messages).
   static constexpr const char* NAME = "{{ enum.name }}";
 
-  /// The default value (returned for arguments which are not provided).
-  static constexpr {{ enum.name }} DEFAULT =
-      {{ enum.name }}::{{ enum["default"] | cpp_pascal }};
+  /// The default value (returned for arguments which are not provided),
+  /// or std::nullopt if the argument is mandatory (no default in the
+  /// specification).
+  static constexpr std::optional<{{ enum.name }}> DEFAULT =
+      {% if enum.get("default") %}{{ enum.name }}::{{ enum["default"] | cpp_pascal }}{% else %}std::nullopt{% endif %};
 
   /// The map from wire strings to enum values.
   static const QHash<QString, {{ enum.name }}>& mapFromString() noexcept {

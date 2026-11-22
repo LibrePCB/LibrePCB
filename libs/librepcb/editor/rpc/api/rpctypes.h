@@ -29,6 +29,8 @@
  ******************************************************************************/
 #include <QtCore>
 
+#include <optional>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -69,8 +71,11 @@ struct RpcEnumTraits<BackupRestoreMode> {
   /// The enum name (used in error messages).
   static constexpr const char* NAME = "BackupRestoreMode";
 
-  /// The default value (returned for arguments which are not provided).
-  static constexpr BackupRestoreMode DEFAULT = BackupRestoreMode::Abort;
+  /// The default value (returned for arguments which are not provided),
+  /// or std::nullopt if the argument is mandatory (no default in the
+  /// specification).
+  static constexpr std::optional<BackupRestoreMode> DEFAULT =
+      BackupRestoreMode::Abort;
 
   /// The map from wire strings to enum values.
   static const QHash<QString, BackupRestoreMode>& mapFromString() noexcept {
