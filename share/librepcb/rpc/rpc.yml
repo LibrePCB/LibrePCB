@@ -30,8 +30,8 @@
 # - Numeric conventions: Lengths are in nanometers (i64), angles in
 #   microdegrees (i64), if not stated otherwise.
 
-spec_version: 1
-protocol_version: "1.0"
+format: "1.0"
+protocol: "1.0"
 
 # ---------------------------------------------------------------------------
 # Global error types. The server sends them as a map {"code": <int>,
@@ -41,91 +41,104 @@ protocol_version: "1.0"
 # ---------------------------------------------------------------------------
 
 error_types:
-  # Note: The transport error types below are never *sent* — when one of
-  # them occurs, the connection is closed without a response. They are
-  # listed here for completeness of the code registry.
+  # Transport errors
 
-  - name: MessageDecodingFailed
-    code: 10
-    message: "Message decoding failed"
+  - code: 10
+    name: InvalidMessage
+    message: Message decoding failed
     description: >-
       The received message could not be decoded (invalid MessagePack or a
       truncated value), so the stream framing is broken and the connection
       is closed without a response.
 
-  - name: MessageTooLarge
-    code: 11
-    message: "Message too large"
+  - code: 11
+    name: MessageTooLarge
+    message: Message too large
     description: >-
       The received message exceeded the maximum size of 32 MiB, so the
       connection is closed without a response.
 
-  # Protocol errors: The connection stays open.
-  - name: InvalidRequest
-    code: 20
-    message: "Invalid Request"
+  # Protocol errors
+
+  - code: 20
+    name: InvalidRequest
+    message: Invalid request
     description: >-
       The request doesn't conform to the message envelope.
 
-  - name: Unauthenticated
-    code: 21
-    message: "This connection is not authenticated, the first message must be an 'initialize' request"
+  # Command errors
+
+  - code: 30
+    name: Unauthenticated
+    message: Connection is not authenticated
     description: >-
       A request other than `initialize` was sent on a connection which is
       not authenticated yet. The first message of a connection must be an
       `initialize` request.
 
-  - name: AccessDenied
-    code: 25
-    message: "Invalid or revoked access token."
+  - code: 31
+    name: AccessDenied
+    message: Access denied
     description: >-
-      Authentication failed. Either the provided token was not issued by
-      this application instance (or is no longer valid), or an interactive
-      connection request was denied by the user.
+      The provided access token doesn't have the permissions to execute the
+      command. If this error is returned by the 'initialize' method, it means
+      that either the provided token is invalid or has expired, or an
+      interactive connection request was denied by the user.
 
-  - name: MethodNotFound
-    code: 22
-    message: "Method not found"
+  - code: 32
+    name: MethodNotFound
+    message: Method not found
     description: >-
       The method does not exist or is not available, e.g. because it was
       added in a newer application version than the running one.
 
-  - name: InvalidParams
-    code: 23
-    message: "Invalid params"
+  - code: 33
+    name: MethodNotAvailable
+    message: Method not available
     description: >-
-      The request parameters are invalid, e.g. values outside the
-      protocol's value domain or a missing/invalid receiver handle.
+      The method exists, but is currently not available. This may be the case
+      if the application is in a state where the requested functionality does
+      not exist.
 
-  - name: InternalError
-    code: 24
-    message: "Internal error"
+  - code: 34
+    name: InvalidArgs
+    message: Invalid method arguments
+    description: >-
+      The method arguments are invalid, e.g. wrong value types, missing required
+      arguments, or invalid values.
+
+  - code: 35
+    name: InvalidHandle
+    message: Invalid object handle
+    description: >-
+      The provided object handle is invalid or has expired (e.g. object was
+      deleted in the mean time). For example, this error is returned when
+      accessing a project after it has been closed.
+
+  - code: 38
+    name: InternalError
+    message: Internal error
     description: >-
       An unexpected internal error occurred, e.g. a command handler
-      panicked or returned invalid data.
+      returned invalid data. This is a bug in LibrePCB, please open an issue
+      on GitHub.
 
-  # Application errors.
-  - name: CommandFailed
-    code: 100
-    message: "Command failed"
-    description: >-
-      The command could not be executed, e.g. because it threw an
-      exception. The message contains details about the failure.
-
-  - name: ProjectNotOpen
-    code: 101
-    message: "Project not open"
-    description: >-
-      The requested project is not opened in the application (or the
-      receiver handle is missing/invalid).
-
-  - name: Cancelled
-    code: 102
-    message: "Request cancelled"
+  - code: 39
+    name: Cancelled
+    message: Request cancelled
     description: >-
       The request was cancelled by the client and the command stopped its
       work when it could. Note that if the work already completed, the
       normal result is sent instead (exactly one response per request).
+
+  # Command execution errors
+
+  - code: 100
+    name: CommandFailed
+    message: Command failed
+    description: >-
+      The command execution failed in an unspecified way, i.e. none of the
+      specific error codes fit. The message contains details about the failure.
 
 # ---------------------------------------------------------------------------
 # Structs (maps with the listed fields).
