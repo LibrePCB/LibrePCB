@@ -175,7 +175,7 @@ enum class RpcErrorCode : int32_t {
   MethodNotAvailable = 33,
   /**
    * The method arguments are invalid, e.g. wrong value types, missing required
-   * arguments, or invalid values.
+   * arguments, invalid values, or unknown enum values.
    */
   InvalidArgs = 34,
   /**

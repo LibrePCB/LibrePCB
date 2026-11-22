@@ -34,10 +34,7 @@ format: "1.0"
 protocol: "1.0"
 
 # ---------------------------------------------------------------------------
-# Global error types. The server sends them as a map {"code": <int>,
-# "message": <string>, ...properties}. Each method lists which of these
-# error types it may return. The codes are grouped: 10–19 transport
-# errors, 20–29 protocol errors, 100– application errors.
+# Errors
 # ---------------------------------------------------------------------------
 
 errors:
@@ -89,8 +86,9 @@ errors:
     name: MethodNotFound
     message: Method not found
     description: >-
-      The method does not exist or is not available, e.g. because it was
-      added in a newer application version than the running one.
+      The method was not found, e.g. because it was added in a newer
+      application version than the running one, or the method has been removed
+      from the application and is no longer available.
 
   - code: 33
     name: MethodNotAvailable
@@ -141,7 +139,7 @@ errors:
       specific error codes fit. The message contains details about the failure.
 
 # ---------------------------------------------------------------------------
-# Structs (maps with the listed fields).
+# Structs
 # ---------------------------------------------------------------------------
 
 structs:
@@ -264,14 +262,11 @@ classes:
         description: List all open projects.
         params: []
         result:
-          type: map
-          fields:
-            - name: projects
-              type: array
-              items: ProjectSummary
-              description: All open projects, in the order of their editor tabs.
-        errors: []
-        added_in_version: "2.1.2"
+          - name: projects
+            type: array
+            items: ProjectSummary
+            description: All open projects, in the order of their editor tabs.
+        since: "2.2.0"
 
       - name: open
         static: true
@@ -284,15 +279,13 @@ classes:
             type: string
             description: The absolute path of the project file (*.lpp or *.lppz).
         result: ProjectSummary
-        errors: [CommandFailed]
-        added_in_version: "2.1.2"
+        since: "2.2.0"
 
       - name: get
         description: Get details about an open project.
         params: []
         result: ProjectDetails
-        errors: [ProjectNotOpen]
-        added_in_version: "2.1.2"
+        since: "2.2.0"
 
   - name: UndoStack
     description: The undo stack of an open project.
@@ -302,8 +295,7 @@ classes:
         description: Get the state of the project's undo stack.
         params: []
         result: UndoStackStatus
-        errors: [ProjectNotOpen]
-        added_in_version: "2.1.2"
+        since: "2.2.0"
 
       - name: undo
         description: >-
@@ -312,8 +304,7 @@ classes:
           stack, so the user can redo it in the GUI.
         params: []
         result: UndoStackStatus
-        errors: [ProjectNotOpen, CommandFailed]
-        added_in_version: "2.1.2"
+        since: "2.2.0"
 
       - name: redo
         description: >-
@@ -321,8 +312,7 @@ classes:
           the same as pressing Ctrl+Shift+Z in the GUI.
         params: []
         result: UndoStackStatus
-        errors: [ProjectNotOpen, CommandFailed]
-        added_in_version: "2.1.2"
+        since: "2.2.0"
 
   - name: WorkspaceDb
     description: The library database of the currently opened workspace.
@@ -337,9 +327,8 @@ classes:
           (message type 4), which stops the watch and finishes the request
           with the error type `Cancelled`.
         params: []
-        result: null
-        errors: [Cancelled]
-        added_in_version: "2.1.2"
+        result: []
+        since: "2.2.0"
 
 # ---------------------------------------------------------------------------
 # Events (notifications which the server broadcasts to all clients). None
