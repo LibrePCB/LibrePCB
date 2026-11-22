@@ -14,6 +14,11 @@ templates from `dev/rpc/templates/`:
 - `libs/librepcb/rust-core/src/rpc_server/rpc_api.rs` — generated Rust
   code. For now it contains only the error codes with their canonical
   messages; more parts of the API may follow later.
+- `libs/librepcb/editor/rpc/{classname}rpc.h` — the C++ command
+  declarations, one static-only class per spec class (the method
+  implementations are hand-written in the corresponding .cpp files).
+- `libs/librepcb/editor/rpc/commands.cpp` — the generated command
+  dispatcher (see the RPC server documentation).
 
 Both files are committed to the repository, so building does not require
 Python. Later, this script will also validate the specification file.
@@ -41,6 +46,8 @@ SPEC_FILE = DIR / "rpc.yml"
 TEMPLATES_DIR = DIR / "templates"
 DOCS_FILE = REPO_DIR / "dev" / "doxygen" / "pages" / "rpc_api.md"
 RUST_FILE = REPO_DIR / "libs" / "librepcb" / "rust-core" / "src" / "rpc_server" / "rpc_api.rs"
+EDITOR_RPC_DIR = REPO_DIR / "libs" / "librepcb" / "editor" / "rpc"
+COMMANDS_FILE = EDITOR_RPC_DIR / "commands.cpp"
 
 ENUM_DOC = (
     "Error codes for the RPC protocol, as listed in the error types"
@@ -65,6 +72,21 @@ def rust_comment(text, prefix="///"):
     return "\n".join(lines)
 
 
+def cpp_brief(text):
+    """Wrap a text into the lines of a C++ doxygen @brief block."""
+    text = re.sub(r"\s+", " ", text).strip()
+    lines = []
+    line = ""
+    for word in text.split(" "):
+        if len(line) + 1 + len(word) > 72:
+            lines.append(line)
+            line = ""
+        line += (" " if line else "") + word
+    if line:
+        lines.append(line)
+    return "\n   *        ".join(lines)
+
+
 def rust_string(s):
     """Escape a string into a Rust string literal."""
     return '"{}"'.format(s.replace("\\", "\\\\").replace('"', '\\"'))
@@ -76,6 +98,7 @@ def make_environment():
         trim_blocks=True,
         lstrip_blocks=True,
     )
+    env.filters["cpp_brief"] = cpp_brief
     env.filters["rust_comment"] = rust_comment
     env.filters["rust_string"] = rust_string
     return env
@@ -103,6 +126,20 @@ def main():
         spec=spec, enum_doc=ENUM_DOC,
     ), encoding="utf-8")
     print(f"Generated {RUST_FILE}")
+
+    for cls in spec.get("classes", []):
+        path = EDITOR_RPC_DIR / f"{cls['name'].lower()}rpc.h"
+        path.write_text(env.get_template("command_class.h.j2").render(
+            class_name=cls["name"],
+            class_description=re.sub(r"\s+", " ", cls.get("description", "")),
+            rpc_class=cls,
+        ), encoding="utf-8")
+        print(f"Generated {path}")
+
+    COMMANDS_FILE.write_text(env.get_template("commands.cpp.j2").render(
+        spec=spec,
+    ), encoding="utf-8")
+    print(f"Generated {COMMANDS_FILE}")
     return 0
 
 

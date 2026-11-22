@@ -34,9 +34,6 @@
 namespace librepcb {
 namespace editor {
 
-class GuiApplication;
-class RpcServer;
-
 /*******************************************************************************
  *  Class RpcRequest
  ******************************************************************************/
@@ -93,12 +90,10 @@ public:
   RpcRequest() = delete;
   RpcRequest(const RpcRequest& other) = delete;
   RpcRequest& operator=(const RpcRequest& rhs) = delete;
-  RpcRequest(GuiApplication& app, RpcServer& server, uint32_t connId,
-             uint32_t msgId, const QString& method,
+  RpcRequest(uint32_t connId, uint32_t msgId, const QString& method,
              const QVariantMap& args) noexcept;
 
   // Getters
-  GuiApplication& getApp() noexcept { return mApp; }
   uint32_t getConnId() const noexcept { return mConnId; }
   uint32_t getMsgId() const noexcept { return mMsgid; }
   const QString& getMethod() const noexcept { return mMethod; }
@@ -171,8 +166,6 @@ private:  // Methods
   void sendReply(bool ok, const QVariant& value) noexcept;
 
 private:  // Data
-  GuiApplication& mApp;
-  RpcServer& mServer;
   const uint32_t mConnId;
   const uint32_t mMsgid;
   const QString mMethod;

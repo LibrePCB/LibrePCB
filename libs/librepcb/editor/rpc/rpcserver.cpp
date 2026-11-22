@@ -65,16 +65,18 @@ RpcServer::RpcServer(GuiApplication& app) noexcept
     mHandle(construct(&onRequestCallback, &onCancelCallback, this, mPort)),
     mRequestNotificationSlot(*this, &RpcServer::requestNotification),
     mRequestFinishedSlot(*this, &RpcServer::requestFinished) {
-  mCommands.insert(
-      "initialize",
-      std::bind(&RpcServer::handleInitialize, this, std::placeholders::_1));
-  mCommands.insert(buildCommandRegistry());
   qInfo().nospace() << "RPC server is listening on 127.0.0.1, port " << mPort
                     << ".";
 }
 
 RpcServer::~RpcServer() noexcept {
 }
+
+// Defined in commands.cpp (a generated file): Dispatches an RPC command
+// by its method name to the corresponding generated command class. Returns
+// whether the method was found.
+bool rpcDispatchCommand(GuiApplication& app, const QString& method,
+                        RpcRequest& request);
 
 /*******************************************************************************
  *  Command Handling
@@ -85,29 +87,34 @@ void RpcServer::handleRequest(uint32_t connId, uint32_t msgId,
                               const QVariant& args) noexcept {
   // Create the request context and register it as pending.
   // Note: The Rust server guarantees that params is either a map or nil.
-  const auto request = std::make_shared<RpcRequest>(mApp, *this, connId, msgId,
-                                                    method, args.toMap());
+  const auto request =
+      std::make_shared<RpcRequest>(connId, msgId, method, args.toMap());
   request->onNotification.attach(mRequestNotificationSlot);
   request->onFinished.attach(mRequestFinishedSlot);
   mPendingRequests.insert(requestKey(connId, msgId), request);
 
-  // Look up the command handler.
-  const auto handler = mCommands.value(method);
-  if (!handler) {
-    request->sendError(rs::RpcErrorCode::MethodNotFound, method);
+  // The `initialize` method is a protocol-level method handled by the
+  // server itself (the token handling needs access to the server).
+  if (method == "initialize") {
+    handleInitialize(*request);
     return;
   }
 
-  // Run the command handler.
+  // Dispatch the command to its handler (generated code, see commands.cpp).
   try {
-    handler(*request);
+    if (rpcDispatchCommand(mApp, method, *request)) {
+      return;
+    }
   } catch (const std::exception& e) {
-    request->sendError(rs::RpcErrorCode::CommandFailed,
-                       QString("Command failed: %1").arg(e.what()));
+    request->sendError(rs::RpcErrorCode::CommandFailed, e.what());
+    return;
   } catch (...) {
-    request->sendError(rs::RpcErrorCode::CommandFailed,
-                       "Command failed with unknown error.");
+    request->sendError(rs::RpcErrorCode::CommandFailed);
+    return;
   }
+
+  // The method is not known to the server.
+  request->sendError(rs::RpcErrorCode::MethodNotFound, method);
 }
 
 void RpcServer::handleCancel(uint32_t connId, uint32_t msgId) noexcept {

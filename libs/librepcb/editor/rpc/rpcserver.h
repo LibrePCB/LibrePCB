@@ -61,7 +61,7 @@ class ProjectEditor;
  *   in `dev/plans/rpc-server.md` and `dev/rpc/rpc.yml`).
  * - It provides the command dispatcher which marshals incoming commands to
  *   the GUI thread (via `Qt::QueuedConnection`, asynchronously!) and
- *   dispatches them to the command handlers registered in `commands.cpp`.
+ *   dispatches them to the generated command classes (see `commands.cpp`).
  * - Commands may reply synchronously (from within the handler) or later
  *   (e.g. after a long-running task finished), optionally emitting
  *   request-scoped messages (e.g. progress) in the meantime.
@@ -76,10 +76,6 @@ class RpcServer final : public QObject {
 
 public:
   // Types
-
-  /// A command handler, executed on the GUI thread. It must reply the
-  /// request (synchronously or asynchronously, see #RpcRequest).
-  using RpcHandler = std::function<void(RpcRequest& request)>;
 
   // Constructors / Destructor
   RpcServer() = delete;
@@ -134,15 +130,6 @@ private:  // Methods
   void requestFinished(const RpcRequest& request, bool ok,
                        const QVariant& value) noexcept;
 
-  /**
-   * @brief Get all registered command handlers, by method name
-   *
-   * @note This is a static method on purpose, i.e. it does not require an
-   *       application or a running server. It allows testing the registry
-   *       without launching the whole application.
-   */
-  static QHash<QString, RpcHandler> buildCommandRegistry() noexcept;
-
   /// Key for a pending request in the registry.
   static uint64_t requestKey(uint32_t connId, uint32_t msgId) noexcept {
     return (static_cast<uint64_t>(connId) << 32) | msgId;
@@ -155,9 +142,6 @@ private:  // Methods
 private:  // Data
   /// The application to dispatch the commands to
   GuiApplication& mApp;
-
-  /// All registered command handlers, by method name
-  QHash<QString, RpcHandler> mCommands;
 
   /// The TCP port the server is listening on (coming from Rust side)
   uint16_t mPort;

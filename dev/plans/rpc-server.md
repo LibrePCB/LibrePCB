@@ -129,7 +129,8 @@ extended with request-scoped message types:
   object instance — its **handle type** (see 2.4).
 - Static methods (no receiver) and member methods (receiver required) are
   both declared under their class; the spec marks which is which.
-- C++ dispatch registry is keyed by the full `"ClassName.method_name"`
+- The C++ command surface is generated per spec class (see 4.2a),
+  dispatched by the full `"ClassName.method_name"`
   string.
 - Event names (type 2) are not class methods; they are listed as separate
   top-level entities in the spec, in `lower_snake_case` (e.g.
@@ -370,8 +371,12 @@ Notes:
 ### 4.1 Files
 
 ```
-libs/librepcb/editor/rpc/rpcserver.{h,cpp}    (reworked from v1)
-libs/librepcb/editor/rpc/commands.cpp         (reworked: QVariant handlers)
+libs/librepcb/editor/rpc/rpcserver.{h,cpp}    (hand-written)
+libs/librepcb/editor/rpc/rpcrequest.{h,cpp}   (hand-written)
+libs/librepcb/editor/rpc/projectrpc.{h,cpp}   (.h generated, .cpp hand-written)
+libs/librepcb/editor/rpc/undostackrpc.{h,cpp} (.h generated, .cpp hand-written)
+libs/librepcb/editor/rpc/workspacedbrpc.{h,cpp} (ditto)
+libs/librepcb/editor/rpc/commands.cpp         (100% generated dispatcher)
 ```
 
 ### 4.2 `RpcServer` (QObject, created by `GuiApplication`)
@@ -388,20 +393,52 @@ libs/librepcb/editor/rpc/commands.cpp         (reworked: QVariant handlers)
   and rejects non-string values; unknown methods are answered with a
   `-32601` error reply directly from the reader thread (the reply path is
   thread-safe).
-- **Request context:** handlers receive a context object
-  (`ctx.reply(result)`, `ctx.fail(code, message)`, `ctx.emit(payload)`)
-  wrapping `(conn_id, msgid)`, so handlers don't deal with raw ids.
-- **Exceptions:** all exceptions are caught in the dispatch layer and
-  converted to error replies (`-32002`) — exceptions never cross the FFI.
-- **Command registry:** `QHash<QString, RpcHandler>` keyed by
-  `"ClassName.method_name"`, handlers take the context + `(handle,
-  QVariantMap args)`. Built without an app instance where possible.
+- **Request context:** handlers receive `RpcRequest` (see 4.2a), which
+  does *not* hold references to the application or the server anymore —
+  it only wraps `(conn_id, msgid, method, args)` plus the reply/cancel
+  signals. Handlers get the application as an explicit parameter.
+- **Exceptions:** all exceptions are caught in `handleRequest` and
+  converted to `CommandFailed` error replies — exceptions never cross
+  the FFI. The generated dispatcher stays exception-neutral.
+- **Command dispatch (generated):** see 4.2a below; there is no runtime
+  command registry with lambdas anymore.
 - **Events:** connect existing `GuiApplication`/`ProjectEditor` signals →
   `ffi_rpc_server_notify_all(...)` (type 2), e.g. `project_opened`,
   `project_closed`, `selection_changed`.
 - **Cancel:** the cancel callback looks up the request context registry on
   the GUI thread (queued) and cancels if the handler supports it; minimal
   in v2 (ignore + still reply, e.g. with the result or a cancelled error).
+
+### 4.2a Generated command surface (per spec class)
+
+The C++ command surface is **generated from the spec** by `dev/rpc/gen.py`
+(like the docs and `rpc_api.rs`; generated files are committed):
+
+- For each class in the spec, a header
+  `libs/librepcb/editor/rpc/{classname}rpc.h` with a static-only class
+  `{ClassName}Rpc` (default constructor deleted → no instantiation):
+  one `static void {method}(GuiApplication& app, RpcRequest& request)`
+  per spec method, with the spec description as doc comment. Static vs.
+  non-static (`obj` handle) does not change the generated signature —
+  handle extraction stays in the hand-written implementation (e.g. the
+  `findProject()` helper lives in `projectrpc.cpp`).
+- One generated file `commands.cpp` (no header, 100% generated): defines
+  the free function
+  `bool rpcDispatchCommand(GuiApplication& app, const QString& method,
+  RpcRequest& request)`, which looks the method up in a static
+  function-pointer map (`{"Project.list", &ProjectRpc::list}`, ...) —
+  defined right inside the dispatcher function — and calls it, passing
+  the application. Returns whether the method was found.
+- The declaration (with a short comment) of `rpcDispatchCommand()` is
+  hand-written in `rpcserver.cpp`; `handleRequest` calls it inside its
+  try/catch and replies `MethodNotFound` if it returns `false`.
+- The `.cpp` implementations of the command methods are **hand-written**
+  (the generator does not create them; they are created manually during
+  implementation). `initialize`/`ping` remain protocol-level methods
+  handled by `RpcServer` itself (initialize needs `mHandle`).
+- Handlers take `(GuiApplication& app, RpcRequest& request)` — non-const
+  app, since commands mutate application state (e.g. `openProject()`).
+  If a handler needs nothing but the request, it just ignores the app.
 
 ### 4.3 v2 command set (illustrative mapping from v1)
 

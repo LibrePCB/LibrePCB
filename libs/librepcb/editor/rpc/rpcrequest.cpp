@@ -22,8 +22,6 @@
  ******************************************************************************/
 #include "rpcrequest.h"
 
-#include "rpcserver.h"
-
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -50,13 +48,10 @@ static QVariantMap errorToVariant(rs::RpcErrorCode code, const QString& message,
  *  Constructors / Destructor
  ******************************************************************************/
 
-RpcRequest::RpcRequest(GuiApplication& app, RpcServer& server, uint32_t connId,
-                       uint32_t msgId, const QString& method,
+RpcRequest::RpcRequest(uint32_t connId, uint32_t msgId, const QString& method,
                        const QVariantMap& args) noexcept
   : onFinished(*this),
     onNotification(*this),
-    mApp(app),
-    mServer(server),
     mConnId(connId),
     mMsgid(msgId),
     mMethod(method),

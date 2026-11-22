@@ -882,10 +882,16 @@ add_library(
   project/schematic/symbolinstancepropertiesdialog.h
   project/schematic/symbolinstancepropertiesdialog.ui
   rpc/commands.cpp
+  rpc/projectrpc.cpp
+  rpc/projectrpc.h
   rpc/rpcrequest.cpp
   rpc/rpcrequest.h
   rpc/rpcserver.cpp
   rpc/rpcserver.h
+  rpc/undostackrpc.cpp
+  rpc/undostackrpc.h
+  rpc/workspacedbrpc.cpp
+  rpc/workspacedbrpc.h
   rulecheck/rulecheckmessagesmodel.cpp
   rulecheck/rulecheckmessagesmodel.h
   undocommand.cpp
