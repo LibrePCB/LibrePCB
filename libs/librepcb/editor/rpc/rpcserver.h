@@ -23,6 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "rpcobjectregistry.h"
 #include "rpcrequest.h"
 
 #include <librepcb/core/utils/rusthandle.h>
@@ -95,6 +96,14 @@ public:
   ~RpcServer() noexcept override;
 
   /**
+   * @brief Get the registry of RPC object handles
+   *
+   * Its lifetime is bound to the server, i.e. all handles become invalid
+   * when the server is stopped (but handle values are never reused).
+   */
+  RpcObjectRegistry& getObjectRegistry() noexcept { return mObjectRegistry; }
+
+  /**
    * @brief Send a request-scoped message (e.g. progress) to the client
    *
    * Called by the #RpcRequest while it is pending. Never blocks. The
@@ -148,6 +157,9 @@ private:  // Data
 
   /// The FFI handle of the (Rust implemented) server
   RustHandle<rs::RpcServer> mHandle;
+
+  /// The registry of RPC object handles
+  RpcObjectRegistry mObjectRegistry;
 
   QSet<QString> mAuthenticatedTokens;
 

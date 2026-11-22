@@ -4,10 +4,10 @@
 //! world: Command params cross the FFI as `QVariant` trees (built from
 //! msgpack values), and responses/notifications cross back as `QVariant`
 //! trees (read back into msgpack values). The conversion only accepts the
-//! protocol's restricted value domain (nil, bool, i64, f64, string,
-//! bytearray, list, map with string keys) — values outside that domain
-//! (msgpack `ext`, u64 > i64::MAX, non-string map keys, invalid UTF-8)
-//! are rejected as payload-level errors.
+//! protocol's restricted value domain (nil, bool, int (i64 and u64), f64,
+//! string, bytearray, list, map with string keys) — values outside that
+//! domain (msgpack `ext`, non-string map keys, invalid UTF-8) are
+//! rejected as payload-level errors.
 
 use super::cpp_ffi::*;
 use crate::rpc_server::{
@@ -105,8 +105,14 @@ fn build_variant(obj: *mut QVariant, value: &Value) -> Result<(), ()> {
       Value::Nil => ffi_qvariant_set_nil(&mut *obj),
       Value::Boolean(b) => ffi_qvariant_set_bool(&mut *obj, *b),
       Value::Integer(i) => {
-        let i = i.as_i64().ok_or(())?; // u64 > i64::MAX is rejected.
-        ffi_qvariant_set_i64(&mut *obj, i);
+        if let Some(v) = i.as_i64() {
+          ffi_qvariant_set_i64(&mut *obj, v);
+        } else if let Some(v) = i.as_u64() {
+          // u64 > i64::MAX: stored as QVariant::ULongLong.
+          ffi_qvariant_set_u64(&mut *obj, v);
+        } else {
+          return Err(()); // Unreachable: integers are i64 or u64.
+        }
       }
       Value::F32(f) => ffi_qvariant_set_f64(&mut *obj, *f as f64), // Widened exactly.
       Value::F64(f) => ffi_qvariant_set_f64(&mut *obj, *f),
@@ -153,7 +159,10 @@ fn qvariant_to_msgpack(obj: &QVariant) -> Result<Value, ()> {
     Ok(match ffi_qvariant_type(obj) {
       qmetatype::UNKNOWN => Value::Nil,
       qmetatype::BOOL => Value::from(ffi_qvariant_get_bool(obj)),
+      qmetatype::INT => Value::from(ffi_qvariant_get_i64(obj)),
+      qmetatype::UINT => Value::from(ffi_qvariant_get_i64(obj)),
       qmetatype::LONGLONG => Value::from(ffi_qvariant_get_i64(obj)),
+      qmetatype::ULONGLONG => Value::from(ffi_qvariant_get_u64(obj)),
       qmetatype::FLOAT => Value::from(ffi_qvariant_get_f64(obj) as f32),
       qmetatype::DOUBLE => Value::from(ffi_qvariant_get_f64(obj)),
       qmetatype::QSTRING => {

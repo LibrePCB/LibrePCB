@@ -142,7 +142,14 @@ representation may change from command to command and from app version to
 app version. In the specification file, handles have the special type
 `handle`.
 
-Values are from the restricted MessagePack domain: null, bool, int (i64),
+A handle is valid as long as the referenced object exists and the RPC
+server keeps running: It survives renames, moves and UUID changes of the
+object, but it becomes invalid when the object is deleted, and a server
+restart invalidates all handles (re-discover objects after
+reconnecting). Handle values are never reused.
+
+Values are from the restricted MessagePack domain: null, bool, int (i64
+or u64),
 float (f64), string, binary, array and map (with string keys). Enums are
 transferred as strings (see the specification file for the allowed
 values). Numeric conventions: Lengths in nanometers, angles in

@@ -222,14 +222,16 @@ def test_rpc_server(librepcb, helpers):
             assert message[2]["message"] == "Invalid object handle", message
             assert message[3] is None, message
 
-            # Params outside the protocol's value domain (u64 > i64::MAX
-            # and non-string map keys) → InvalidArgs (34), the connection
-            # stays open (unlike a decode error!).
+            # Large u64 values are valid integers (native msgpack):
             rpc.send([0, 10, "Project.list", {"key": 0x8000000000000000}])
             message = rpc.receive()
             assert message[0:2] == [1, 10], message
-            assert message[2]["code"] == 34, message
+            assert message[2] is None, message
+            assert isinstance(message[3], dict), message
 
+            # Params outside the protocol's value domain (non-string map
+            # keys) → InvalidArgs (34), the connection stays open (unlike
+            # a decode error!).
             rpc.send([0, 11, "Project.list", {1: "x"}])  # Non-string map key.
             message = rpc.receive()
             assert message[0:2] == [1, 11], message

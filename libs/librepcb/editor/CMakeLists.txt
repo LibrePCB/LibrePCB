@@ -890,6 +890,8 @@ add_library(
   rpc/api/workspacedbrpc.h
   rpc/commands.cpp
   rpc/rpcerror.h
+  rpc/rpcobjectregistry.cpp
+  rpc/rpcobjectregistry.h
   rpc/rpcrequest.cpp
   rpc/rpcrequest.h
   rpc/rpcserver.cpp

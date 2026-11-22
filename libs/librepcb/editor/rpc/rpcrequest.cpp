@@ -36,7 +36,7 @@ namespace editor {
 static QVariantMap errorToVariant(RpcErrorCode code, const QString& message,
                                   const QVariantMap& properties) noexcept {
   QVariantMap error;
-  error.insert("code", QVariant::fromValue(static_cast<qlonglong>(code)));
+  error.insert("code", static_cast<int>(code));
   error.insert("message", QVariant(message));
   for (auto it = properties.constBegin(); it != properties.constEnd(); ++it) {
     error.insert(it.key(), it.value());

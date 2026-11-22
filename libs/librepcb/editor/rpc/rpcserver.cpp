@@ -76,8 +76,8 @@ RpcServer::~RpcServer() noexcept {
 // Defined in commands.cpp (a generated file): Dispatches an RPC command
 // by its method name to the corresponding generated command class. Throws
 // an RpcError if the method was not found.
-void rpcDispatchCommand(GuiApplication& app, const QString& method,
-                        RpcRequest& request);
+void rpcDispatchCommand(GuiApplication& app, RpcObjectRegistry& objects,
+                        const QString& method, RpcRequest& request);
 
 /*******************************************************************************
  *  Command Handling
@@ -104,7 +104,7 @@ void RpcServer::handleRequest(uint32_t connId, uint32_t msgId,
   // Dispatch the command to its handler (generated code, see commands.cpp)
   // and translate thrown errors into error responses.
   try {
-    rpcDispatchCommand(mApp, method, *request);
+    rpcDispatchCommand(mApp, mObjectRegistry, method, *request);
   } catch (const RpcError& e) {
     request->sendError(e);
   } catch (const std::exception& e) {

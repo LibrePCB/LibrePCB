@@ -42,9 +42,9 @@ namespace editor {
  *  Command Dispatching
  ******************************************************************************/
 
-void rpcDispatchCommand(GuiApplication& app, const QString& method,
-                        RpcRequest& request) {
-  using RpcCommand = void (*)(GuiApplication&, RpcRequest&);
+void rpcDispatchCommand(GuiApplication& app, RpcObjectRegistry& registry,
+                        const QString& method, RpcRequest& request) {
+  using RpcCommand = void (*)(GuiApplication&, RpcObjectRegistry&, RpcRequest&);
   static const QHash<QString, RpcCommand> commands = {
       {"Project.list", &ProjectRpc::list},
       {"Project.open", &ProjectRpc::open},
@@ -58,7 +58,7 @@ void rpcDispatchCommand(GuiApplication& app, const QString& method,
   if (it == commands.constEnd()) {
     throw RpcMethodNotFound(method);
   }
-  (*it)(app, request);
+  (*it)(app, registry, request);
 }
 
 /*******************************************************************************

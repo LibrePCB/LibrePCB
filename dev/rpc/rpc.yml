@@ -16,7 +16,8 @@
 #   unknown to you, which is fine — calling them results in error -32601).
 #
 # Schema notes:
-# - Types are from the protocol's value domain: null, bool, int (i64),
+# - Types are from the protocol's value domain: null, bool, int (i64 or
+#   u64),
 #   float (f64), string, binary, array, map (with string keys). A struct
 #   is a map with the listed fields. `handle` is a special type: an
 #   *opaque* object handle (see the class descriptions).

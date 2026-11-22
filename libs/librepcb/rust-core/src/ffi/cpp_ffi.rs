@@ -237,8 +237,14 @@ pub mod qmetatype {
   pub const UNKNOWN: i32 = 0;
   /// `QMetaType::Bool`
   pub const BOOL: i32 = 1;
+  /// `QMetaType::Int`
+  pub const INT: i32 = 2;
+  /// `QMetaType::UInt`
+  pub const UINT: i32 = 3;
   /// `QMetaType::LongLong`
   pub const LONGLONG: i32 = 4;
+  /// `QMetaType::ULongLong`
+  pub const ULONGLONG: i32 = 5;
   /// `QMetaType::Double`
   pub const DOUBLE: i32 = 6;
   /// `QMetaType::QVariantMap`
@@ -260,6 +266,7 @@ extern "C" {
   pub fn ffi_qvariant_set_nil(obj: &mut QVariant);
   pub fn ffi_qvariant_set_bool(obj: &mut QVariant, value: bool);
   pub fn ffi_qvariant_set_i64(obj: &mut QVariant, value: i64);
+  pub fn ffi_qvariant_set_u64(obj: &mut QVariant, value: u64);
   pub fn ffi_qvariant_set_f64(obj: &mut QVariant, value: f64);
   pub fn ffi_qvariant_set_str(obj: &mut QVariant, s: *const c_char, len: usize);
   pub fn ffi_qvariant_set_bytearray(
@@ -280,6 +287,7 @@ extern "C" {
   pub fn ffi_qvariant_type(obj: &QVariant) -> i32;
   pub fn ffi_qvariant_get_bool(obj: &QVariant) -> bool;
   pub fn ffi_qvariant_get_i64(obj: &QVariant) -> i64;
+  pub fn ffi_qvariant_get_u64(obj: &QVariant) -> u64;
   pub fn ffi_qvariant_get_f64(obj: &QVariant) -> f64;
   pub fn ffi_qvariant_get_str(obj: &QVariant, out: &mut QString);
   pub fn ffi_qvariant_get_bytearray_len(obj: &QVariant) -> usize;

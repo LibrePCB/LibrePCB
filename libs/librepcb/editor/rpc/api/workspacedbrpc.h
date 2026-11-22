@@ -32,6 +32,7 @@ namespace librepcb {
 namespace editor {
 
 class GuiApplication;
+class RpcObjectRegistry;
 class RpcRequest;
 
 /*******************************************************************************
@@ -58,7 +59,8 @@ public:
    *        4), which stops the watch and finishes the request with the error
    *        type `Cancelled`.
    */
-  static void watch(GuiApplication& app, RpcRequest& request);
+  static void watch(GuiApplication& app, RpcObjectRegistry& registry,
+                    RpcRequest& request);
 };
 
 /*******************************************************************************

@@ -428,6 +428,8 @@ extern void ffi_qvariant_set_bool(QVariant * NONNULL obj, bool value);
 
 extern void ffi_qvariant_set_i64(QVariant * NONNULL obj, int64_t value);
 
+extern void ffi_qvariant_set_u64(QVariant * NONNULL obj, uint64_t value);
+
 extern void ffi_qvariant_set_f64(QVariant * NONNULL obj, double value);
 
 extern void ffi_qvariant_set_str(QVariant * NONNULL obj,
@@ -455,6 +457,8 @@ extern int32_t ffi_qvariant_type(const QVariant * NONNULL obj);
 extern bool ffi_qvariant_get_bool(const QVariant * NONNULL obj);
 
 extern int64_t ffi_qvariant_get_i64(const QVariant * NONNULL obj);
+
+extern uint64_t ffi_qvariant_get_u64(const QVariant * NONNULL obj);
 
 extern double ffi_qvariant_get_f64(const QVariant * NONNULL obj);
 

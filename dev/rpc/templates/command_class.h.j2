@@ -32,6 +32,7 @@ namespace librepcb {
 namespace editor {
 
 class GuiApplication;
+class RpcObjectRegistry;
 class RpcRequest;
 
 /*******************************************************************************
@@ -57,7 +58,8 @@ public:
   /**
    * @brief {{ method.description | cpp_brief }}
    */
-  static void {{ method.name }}(GuiApplication& app, RpcRequest& request);
+  static void {{ method.name }}(GuiApplication& app, RpcObjectRegistry& registry,
+                      RpcRequest& request);
 {% endfor %}
 };
 

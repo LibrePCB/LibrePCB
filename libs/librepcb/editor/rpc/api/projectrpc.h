@@ -32,6 +32,7 @@ namespace librepcb {
 namespace editor {
 
 class GuiApplication;
+class RpcObjectRegistry;
 class RpcRequest;
 
 /*******************************************************************************
@@ -53,19 +54,22 @@ public:
   /**
    * @brief List all open projects.
    */
-  static void list(GuiApplication& app, RpcRequest& request);
+  static void list(GuiApplication& app, RpcObjectRegistry& registry,
+                   RpcRequest& request);
 
   /**
    * @brief Open a project by file path. If the project is already open,
    *        nothing is changed and the summary of the already open project is
    *        returned.
    */
-  static void open(GuiApplication& app, RpcRequest& request);
+  static void open(GuiApplication& app, RpcObjectRegistry& registry,
+                   RpcRequest& request);
 
   /**
    * @brief Get details about an open project.
    */
-  static void get(GuiApplication& app, RpcRequest& request);
+  static void get(GuiApplication& app, RpcObjectRegistry& registry,
+                  RpcRequest& request);
 };
 
 /*******************************************************************************

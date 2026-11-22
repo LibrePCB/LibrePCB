@@ -186,8 +186,16 @@ extern "C" bool ffi_qvariant_get_bool(const QVariant* obj) {
   return obj->toBool();
 }
 
+extern "C" void ffi_qvariant_set_u64(QVariant* obj, uint64_t value) {
+  *obj = QVariant::fromValue(static_cast<qulonglong>(value));
+}
+
 extern "C" int64_t ffi_qvariant_get_i64(const QVariant* obj) {
   return obj->toLongLong();
+}
+
+extern "C" uint64_t ffi_qvariant_get_u64(const QVariant* obj) {
+  return obj->toULongLong();
 }
 
 extern "C" double ffi_qvariant_get_f64(const QVariant* obj) {

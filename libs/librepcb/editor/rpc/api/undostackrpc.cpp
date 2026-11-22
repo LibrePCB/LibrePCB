@@ -25,12 +25,8 @@
 #include "../../guiapplication.h"
 #include "../../project/projecteditor.h"
 #include "../../undostack.h"
+#include "../rpcobjectregistry.h"
 #include "../rpcrequest.h"
-#include "rpcerrors.h"
-
-#include <librepcb/core/exceptions.h>
-#include <librepcb/core/project/project.h>
-#include <librepcb/core/types/uuid.h>
 
 /*******************************************************************************
  *  Namespace
@@ -52,34 +48,29 @@ static QVariantMap undoStackToVariant(const UndoStack& stack) {
   return map;
 }
 
-static ProjectEditor& findProject(GuiApplication& app, RpcRequest& request) {
-  if (auto uuid = Uuid::tryFromString(request.getArg("obj").toString())) {
-    for (const auto& editor : app.getProjects()) {
-      if (editor->getProject().getUuid() == uuid) {
-        return *editor;
-      }
-    }
-  }
-  throw RpcInvalidHandle();
-}
-
 /*******************************************************************************
  *  Command Handlers
  ******************************************************************************/
 
-void UndoStackRpc::get_status(GuiApplication& app, RpcRequest& request) {
-  ProjectEditor& editor = findProject(app, request);
+void UndoStackRpc::get_status(GuiApplication& app, RpcObjectRegistry& registry,
+                              RpcRequest& request) {
+  Q_UNUSED(app);
+  ProjectEditor& editor = registry.getAs<ProjectEditor>(request.getArg("obj"));
   request.sendSuccess(undoStackToVariant(editor.getUndoStack()));
 }
 
-void UndoStackRpc::undo(GuiApplication& app, RpcRequest& request) {
-  ProjectEditor& editor = findProject(app, request);
+void UndoStackRpc::undo(GuiApplication& app, RpcObjectRegistry& registry,
+                        RpcRequest& request) {
+  Q_UNUSED(app);
+  ProjectEditor& editor = registry.getAs<ProjectEditor>(request.getArg("obj"));
   editor.getUndoStack().undo();  // Can throw.
   request.sendSuccess(undoStackToVariant(editor.getUndoStack()));
 }
 
-void UndoStackRpc::redo(GuiApplication& app, RpcRequest& request) {
-  ProjectEditor& editor = findProject(app, request);
+void UndoStackRpc::redo(GuiApplication& app, RpcObjectRegistry& registry,
+                        RpcRequest& request) {
+  Q_UNUSED(app);
+  ProjectEditor& editor = registry.getAs<ProjectEditor>(request.getArg("obj"));
   editor.getUndoStack().redo();  // Can throw.
   request.sendSuccess(undoStackToVariant(editor.getUndoStack()));
 }

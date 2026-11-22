@@ -25,6 +25,7 @@
 #include "../../guiapplication.h"
 #include "../../project/projecteditor.h"
 #include "../../undostack.h"
+#include "../rpcobjectregistry.h"
 #include "../rpcrequest.h"
 #include "rpcerrors.h"
 
@@ -32,7 +33,6 @@
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/schematic/schematic.h>
-#include <librepcb/core/types/uuid.h>
 
 /*******************************************************************************
  *  Namespace
@@ -44,10 +44,11 @@ namespace editor {
  *  Local Functions
  ******************************************************************************/
 
-static QVariantMap projectToVariant(ProjectEditor& editor) {
+static QVariantMap projectToVariant(RpcObjectRegistry& registry,
+                                    ProjectEditor& editor) {
   const Project& project = editor.getProject();
   QVariantMap map;
-  map.insert("obj", project.getUuid().toStr());
+  map.insert("obj", registry.getHandle(editor));
   map.insert("uuid", project.getUuid().toStr());
   map.insert("name", *project.getName());
   map.insert("author", project.getAuthor());
@@ -57,32 +58,23 @@ static QVariantMap projectToVariant(ProjectEditor& editor) {
   return map;
 }
 
-static ProjectEditor& findProject(GuiApplication& app, RpcRequest& request) {
-  if (auto uuid = Uuid::tryFromString(request.getArg("obj").toString())) {
-    for (const auto& editor : app.getProjects()) {
-      if (editor->getProject().getUuid() == uuid) {
-        return *editor;
-      }
-    }
-  }
-  throw RpcInvalidHandle();
-}
-
 /*******************************************************************************
  *  Command Handlers
  ******************************************************************************/
 
-void ProjectRpc::list(GuiApplication& app, RpcRequest& request) {
+void ProjectRpc::list(GuiApplication& app, RpcObjectRegistry& registry,
+                      RpcRequest& request) {
   QVariantList projects;
   for (const auto& editor : app.getProjects()) {
-    projects.append(QVariant(projectToVariant(*editor)));
+    projects.append(QVariant(projectToVariant(registry, *editor)));
   }
   QVariantMap result;
   result.insert("projects", projects);
   request.sendSuccess(result);
 }
 
-void ProjectRpc::open(GuiApplication& app, RpcRequest& request) {
+void ProjectRpc::open(GuiApplication& app, RpcObjectRegistry& registry,
+                      RpcRequest& request) {
   const FilePath fp(request.getArg("path").toString());
   if (!fp.isExistingFile()) {
     throw RpcCommandFailed("The project file does not exist.");
@@ -91,12 +83,14 @@ void ProjectRpc::open(GuiApplication& app, RpcRequest& request) {
   if (!editor) {
     throw RpcCommandFailed("Could not open the project.");
   }
-  request.sendSuccess(projectToVariant(*editor));
+  request.sendSuccess(projectToVariant(registry, *editor));
 }
 
-void ProjectRpc::get(GuiApplication& app, RpcRequest& request) {
-  ProjectEditor& editor = findProject(app, request);
-  QVariantMap result = projectToVariant(editor);
+void ProjectRpc::get(GuiApplication& app, RpcObjectRegistry& registry,
+                     RpcRequest& request) {
+  Q_UNUSED(app);
+  ProjectEditor& editor = registry.getAs<ProjectEditor>(request.getArg("obj"));
+  QVariantMap result = projectToVariant(registry, editor);
   const Project& project = editor.getProject();
   QVariantList sheets;
   for (const Schematic* schematic : project.getSchematics()) {

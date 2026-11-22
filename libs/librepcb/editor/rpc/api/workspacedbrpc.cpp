@@ -39,7 +39,9 @@ namespace editor {
  *  Command Handlers
  ******************************************************************************/
 
-void WorkspaceDbRpc::watch(GuiApplication& app, RpcRequest& request) {
+void WorkspaceDbRpc::watch(GuiApplication& app, RpcObjectRegistry& registry,
+                           RpcRequest& request) {
+  Q_UNUSED(registry);
   WorkspaceLibraryDb& db = app.getWorkspace().getLibraryDb();
   request.sendProgress(db.getScanProgressPercent());
   QObject::connect(&db, &WorkspaceLibraryDb::scanStarted, &request,

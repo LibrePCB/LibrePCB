@@ -85,7 +85,7 @@ exactly once).
   desynchronize the stream → the connection is **closed** (no resync
   possible with stream framing).
 - **Payload-level errors** (a fully decoded value that doesn't conform:
-  wrong envelope shape, non-string map keys, `ext` types, u64 > i64::MAX,
+  wrong envelope shape, non-string map keys, `ext` types,
   params not a map, non-string `"obj"`, unknown method, …) keep the stream
   in sync → answered with a **normal RPC error response**; the connection
   stays open. (Proper error handling is intentionally minimal for now and
@@ -374,7 +374,8 @@ Notes:
 libs/librepcb/editor/rpc/rpcserver.{h,cpp}    (hand-written)
 libs/librepcb/editor/rpc/rpcrequest.{h,cpp}   (hand-written)
 libs/librepcb/editor/rpc/rpcerror.h          (hand-written error base class)
-libs/librepcb/editor/rpc/rpcerrors.h         (generated error classes)
+libs/librepcb/editor/rpc/rpcobjectregistry.{h,cpp} (hand-written)
+libs/librepcb/editor/rpc/api/rpcerrors.h     (generated error classes)
 libs/librepcb/editor/rpc/projectrpc.{h,cpp}   (.h generated, .cpp hand-written)
 libs/librepcb/editor/rpc/undostackrpc.{h,cpp} (.h generated, .cpp hand-written)
 libs/librepcb/editor/rpc/workspacedbrpc.{h,cpp} (ditto)
@@ -419,11 +420,10 @@ The C++ command surface is **generated from the spec** by `dev/rpc/gen.py`
 - For each class in the spec, a header
   `libs/librepcb/editor/rpc/{classname}rpc.h` with a static-only class
   `{ClassName}Rpc` (default constructor deleted → no instantiation):
-  one `static void {method}(GuiApplication& app, RpcRequest& request)`
-  per spec method, with the spec description as doc comment. Static vs.
+  one `static void {method}(GuiApplication`static void {method}(GuiApplication& app, RpcObjectRegistry& objects, app, RpcObjectRegistry`static void {method}(GuiApplication& app, RpcObjectRegistry& objects, registry,
+  RpcRequest& request)` per spec method, with the spec description as doc comment. Static vs.
   non-static (`obj` handle) does not change the generated signature —
-  handle extraction stays in the hand-written implementation (e.g. the
-  `findProject()` helper lives in `projectrpc.cpp`).
+  handle extraction stays in the hand-written implementation.
 - One generated file `commands.cpp` (no header, 100% generated): defines
   the free function
   `void rpcDispatchCommand(GuiApplication& app, const QString& method,
@@ -466,6 +466,30 @@ The C++ command surface is **generated from the spec** by `dev/rpc/gen.py`
   GUI event loop, so exceptions must never escape into it.
 - Helper functions like `findProject()` throw instead of returning
   nullptr.
+
+### 4.2c Object handles (registry)
+
+Handles are **identity-based, not value-based**: a handle is an opaque
+number referring to a registered QObject, so it survives renames, moves
+and UUID changes of the object, and it dies with the object (no
+stale-handle traps like UUID or file path handles would have).
+
+- `rpc/rpcobjectregistry.{h,cpp}` (framework): `RpcObjectRegistry`, a
+  QObject member of `RpcServer` — its lifetime is the server's, so a
+  server restart clears all handles, while the static, monotonic handle
+  counter survives restarts so handle values are never reused.
+- Registration is lazy at serialization time (bidirectional maps → the
+  same object always yields the same handle; `destroyed()` removes the
+  entries automatically). Handle 0 is reserved (null). On the wire,
+  integers are encoded minimally by the msgpack encoder, so handles and
+  other small numbers are as compact as possible (the value domain is
+  i64, but that only defines the guaranteed round-trip range, not the
+  encoding).
+- The registry is passed to the command handlers directly (as generated
+  dispatcher parameter). Typed lookup: `getAs<T>(const QVariant& handle)`
+  returns a `T&` and throws `RpcInvalidHandle` if the handle is unknown
+  or of the wrong type (`qobject_cast`) — so handlers are one-liners.
+- GUI-thread only (no locking needed).
 
 ### 4.3 v2 command set (illustrative mapping from v1)
 
