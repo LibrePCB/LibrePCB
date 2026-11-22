@@ -884,6 +884,8 @@ add_library(
   rpc/commands.cpp
   rpc/projectrpc.cpp
   rpc/projectrpc.h
+  rpc/rpcerror.h
+  rpc/rpcerrors.h
   rpc/rpcrequest.cpp
   rpc/rpcrequest.h
   rpc/rpcserver.cpp

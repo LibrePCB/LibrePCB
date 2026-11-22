@@ -23,8 +23,9 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "rpcerror.h"
+
 #include <librepcb/core/utils/signalslot.h>
-#include <librepcb/rust-core/ffi.h>
 
 #include <QtCore>
 
@@ -98,6 +99,10 @@ public:
   uint32_t getMsgId() const noexcept { return mMsgid; }
   const QString& getMethod() const noexcept { return mMethod; }
   const QVariantMap& getArgs() const noexcept { return mArgs; }
+  QVariant getArg(const QString& key,
+                  const QVariant& defaultValue = QVariant()) const noexcept {
+    return mArgs.value(key, defaultValue);
+  }
 
   /**
    * @brief Check whether the client cancelled this request
@@ -141,22 +146,11 @@ public:
   void sendSuccess(const QVariant& result = QVariant()) noexcept;
 
   /**
-   * @brief Reply with an error (finishes the request)
+   * @brief Reply with an error thrown by a command implementation
    *
-   * The message sent on the wire is the canonical message of the error
-   * code (see the error types in the API specification), followed by the
-   * optional application-provided detail (separated by a colon).
-   *
-   * @param code        An error code (see #ErrorCode).
-   * @param message     Optional application-specific detail message,
-   *                    e.g. the reason of the failure. If empty, only
-   *                    the canonical message is sent.
-   * @param properties  Additional error properties, sent next to
-   *                    "code" and "message" (see the error types in
-   *                    the API specification).
+   * @param error  The error which was thrown (see rpcerrors.h).
    */
-  void sendError(rs::RpcErrorCode code, const QString& message = QString(),
-                 const QVariantMap& properties = QVariantMap()) noexcept;
+  void sendError(const RpcError& error) noexcept;
 
 signals:
   void cancelled();

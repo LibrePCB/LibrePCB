@@ -53,8 +53,9 @@ public:
    * @brief Watch the library database: While the request is pending, request
    *        messages (type 3) about library scans are sent, with the payload
    *        `{"progress": <int 0..100>}` (100 means no scan is running). The
-   * request stays pending until the client cancels it (message type 4), which
-   * stops the watch and finishes the request with the error type `Cancelled`.
+   *        request stays pending until the client cancels it (message type
+   *        4), which stops the watch and finishes the request with the error
+   *        type `Cancelled`.
    */
   static void watch(GuiApplication& app, RpcRequest& request);
 };

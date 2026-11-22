@@ -6,8 +6,9 @@
 
 /// Error codes for the RPC protocol, as listed in the error types section of
 /// the API specification. The codes are grouped: 10-19 transport errors, 20-29
-/// protocol errors, 30-39 command errors, 100- command execution errors. Also
-/// used by the C++ side (see `rpcserver.h`).
+/// protocol errors, 30-39 command errors, 100- command execution errors. The
+/// C++ side has its own enum, generated from the same specification (see
+/// `editor/rpc/rpcerrors.h`).
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 #[repr(i32)]
 pub enum RpcErrorCode {

@@ -23,6 +23,7 @@
 #include "workspacedbrpc.h"
 
 #include "../guiapplication.h"
+#include "rpcerrors.h"
 #include "rpcrequest.h"
 
 #include <librepcb/core/workspace/workspace.h>
@@ -48,9 +49,8 @@ void WorkspaceDbRpc::watch(GuiApplication& app, RpcRequest& request) {
       [&request](float percent) { request.sendProgress(percent); });
   QObject::connect(&db, &WorkspaceLibraryDb::scanFinished, &request,
                    [&request]() { request.sendProgress(100); });
-  QObject::connect(&request, &RpcRequest::cancelled, &request, [&request]() {
-    request.sendError(rs::RpcErrorCode::Cancelled);
-  });
+  QObject::connect(&request, &RpcRequest::cancelled, &request,
+                   [&request]() { request.sendError(RpcCancelled()); });
 }
 
 /*******************************************************************************

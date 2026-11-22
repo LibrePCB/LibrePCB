@@ -17,6 +17,8 @@ templates from `dev/rpc/templates/`:
 - `libs/librepcb/editor/rpc/{classname}rpc.h` — the C++ command
   declarations, one static-only class per spec class (the method
   implementations are hand-written in the corresponding .cpp files).
+- `libs/librepcb/editor/rpc/rpcerrors.h` — the error codes and one
+  exception class per error code (the C++ error handling).
 - `libs/librepcb/editor/rpc/commands.cpp` — the generated command
   dispatcher (see the RPC server documentation).
 
@@ -48,13 +50,15 @@ DOCS_FILE = REPO_DIR / "dev" / "doxygen" / "pages" / "rpc_api.md"
 RUST_FILE = REPO_DIR / "libs" / "librepcb" / "rust-core" / "src" / "rpc_server" / "rpc_api.rs"
 EDITOR_RPC_DIR = REPO_DIR / "libs" / "librepcb" / "editor" / "rpc"
 COMMANDS_FILE = EDITOR_RPC_DIR / "commands.cpp"
+RPCERRORS_FILE = EDITOR_RPC_DIR / "rpcerrors.h"
 
 ENUM_DOC = (
     "Error codes for the RPC protocol, as listed in the error types"
     " section of the API specification. The codes are grouped: 10-19"
     " transport errors, 20-29 protocol errors, 30-39 command errors,"
-    " 100- command execution errors. Also used by the C++ side (see"
-    " `rpcserver.h`)."
+    " 100- command execution errors. The C++ side has its own enum,"
+    " generated from the same specification (see"
+    " `editor/rpc/rpcerrors.h`)."
 )
 
 
@@ -78,7 +82,7 @@ def cpp_brief(text):
     lines = []
     line = ""
     for word in text.split(" "):
-        if len(line) + 1 + len(word) > 72:
+        if len(line) + 1 + len(word) > 66:
             lines.append(line)
             line = ""
         line += (" " if line else "") + word
@@ -135,6 +139,11 @@ def main():
             rpc_class=cls,
         ), encoding="utf-8")
         print(f"Generated {path}")
+
+    RPCERRORS_FILE.write_text(env.get_template("rpcerrors.h.j2").render(
+        spec=spec,
+    ), encoding="utf-8")
+    print(f"Generated {RPCERRORS_FILE}")
 
     COMMANDS_FILE.write_text(env.get_template("commands.cpp.j2").render(
         spec=spec,

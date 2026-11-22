@@ -54,14 +54,14 @@ public:
    */
   static void get_status(GuiApplication& app, RpcRequest& request);
   /**
-   * @brief Undo the last command of the project's undo stack, i.e. the same as
-   *        pressing Ctrl+Z in the GUI. The command stays on the redo stack, so
-   * the user can redo it in the GUI.
+   * @brief Undo the last command of the project's undo stack, i.e. the same
+   *        as pressing Ctrl+Z in the GUI. The command stays on the redo
+   *        stack, so the user can redo it in the GUI.
    */
   static void undo(GuiApplication& app, RpcRequest& request);
   /**
    * @brief Redo the last undone command of the project's undo stack, i.e. the
-   * same as pressing Ctrl+Shift+Z in the GUI.
+   *        same as pressing Ctrl+Shift+Z in the GUI.
    */
   static void redo(GuiApplication& app, RpcRequest& request);
 };

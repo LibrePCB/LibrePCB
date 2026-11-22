@@ -54,8 +54,9 @@ public:
    */
   static void list(GuiApplication& app, RpcRequest& request);
   /**
-   * @brief Open a project by file path. If the project is already open, nothing
-   * is changed and the summary of the already open project is returned.
+   * @brief Open a project by file path. If the project is already open,
+   *        nothing is changed and the summary of the already open project is
+   *        returned.
    */
   static void open(GuiApplication& app, RpcRequest& request);
   /**

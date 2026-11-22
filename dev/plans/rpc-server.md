@@ -373,6 +373,8 @@ Notes:
 ```
 libs/librepcb/editor/rpc/rpcserver.{h,cpp}    (hand-written)
 libs/librepcb/editor/rpc/rpcrequest.{h,cpp}   (hand-written)
+libs/librepcb/editor/rpc/rpcerror.h          (hand-written error base class)
+libs/librepcb/editor/rpc/rpcerrors.h         (generated error classes)
 libs/librepcb/editor/rpc/projectrpc.{h,cpp}   (.h generated, .cpp hand-written)
 libs/librepcb/editor/rpc/undostackrpc.{h,cpp} (.h generated, .cpp hand-written)
 libs/librepcb/editor/rpc/workspacedbrpc.{h,cpp} (ditto)
@@ -424,11 +426,12 @@ The C++ command surface is **generated from the spec** by `dev/rpc/gen.py`
   `findProject()` helper lives in `projectrpc.cpp`).
 - One generated file `commands.cpp` (no header, 100% generated): defines
   the free function
-  `bool rpcDispatchCommand(GuiApplication& app, const QString& method,
+  `void rpcDispatchCommand(GuiApplication& app, const QString& method,
   RpcRequest& request)`, which looks the method up in a static
   function-pointer map (`{"Project.list", &ProjectRpc::list}`, ...) —
   defined right inside the dispatcher function — and calls it, passing
-  the application. Returns whether the method was found.
+  the application. Unknown methods are reported by throwing
+  `RpcMethodNotFound` (see 4.2b).
 - The declaration (with a short comment) of `rpcDispatchCommand()` is
   hand-written in `rpcserver.cpp`; `handleRequest` calls it inside its
   try/catch and replies `MethodNotFound` if it returns `false`.
@@ -439,6 +442,30 @@ The C++ command surface is **generated from the spec** by `dev/rpc/gen.py`
 - Handlers take `(GuiApplication& app, RpcRequest& request)` — non-const
   app, since commands mutate application state (e.g. `openProject()`).
   If a handler needs nothing but the request, it just ignores the app.
+
+### 4.2b Error handling (exceptions)
+
+- Hand-written base class `rpcerror.h`: `RpcError : std::exception`,
+  wrapping `(code, detail, properties)`; `what()` returns the detail.
+- Generated `rpcerrors.h` (by `gen.py`, from the spec): the error code
+  enum `RpcErrorCode : int` — **replacing the cbindgen-exported enum**,
+  so no `*.h` file needs to include `ffi.h` for the codes anymore (both
+  the Rust and the C++ enum are generated from the same spec) — plus
+  one exception class per error code (`RpcInvalidHandle`,
+  `RpcCommandFailed`, ...), each final and fixing its code in its
+  constructor.
+- Command implementations just *throw* (e.g. `throw RpcInvalidHandle();`
+  or `throw RpcCommandFailed("The project file does not exist.");`) —
+  no `sendError()` calls and no early returns needed.
+  `RpcServer::handleRequest` contains the single catch ladder:
+  `RpcError` → its code and detail; `std::exception` → `CommandFailed`
+  with `what()` as detail; catch-all → `CommandFailed`.
+- Asynchronous errors (a handler which replies later) use the same
+  classes, but the continuation catches and calls
+  `request.sendError(e)` itself — there is no framework catch on the
+  GUI event loop, so exceptions must never escape into it.
+- Helper functions like `findProject()` throw instead of returning
+  nullptr.
 
 ### 4.3 v2 command set (illustrative mapping from v1)
 

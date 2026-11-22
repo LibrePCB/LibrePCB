@@ -25,6 +25,7 @@
 #include "../guiapplication.h"
 #include "../project/projecteditor.h"
 #include "../undostack.h"
+#include "rpcerrors.h"
 #include "rpcrequest.h"
 
 #include <librepcb/core/fileio/filepath.h>
@@ -42,18 +43,8 @@ namespace editor {
 /*******************************************************************************
  *  Local Functions
  ******************************************************************************/
-namespace {
 
-/**
- * @brief Serialize a project to a map
- *
- * @param editor  The project editor of the project to serialize.
- *
- * @note The map includes the reserved "obj" key with the object handle
- *       of the project (an opaque value for clients, see the protocol
- *       conventions).
- */
-QVariantMap projectToVariant(ProjectEditor& editor) {
+static QVariantMap projectToVariant(ProjectEditor& editor) {
   const Project& project = editor.getProject();
   QVariantMap map;
   map.insert("obj", project.getUuid().toStr());
@@ -66,31 +57,16 @@ QVariantMap projectToVariant(ProjectEditor& editor) {
   return map;
 }
 
-/**
- * @brief Find the project editor of an open project
- *
- * @param app   The application to look up the project in.
- * @param obj   The project handle (the "obj" key of the request params).
- *
- * @return The requested project editor, or nullptr if there is no such
- *         project open (or the handle is missing/invalid).
- */
-ProjectEditor* findProject(GuiApplication& app, RpcRequest& request) noexcept {
-  try {
-    const Uuid uuid =
-        Uuid::fromString(request.getArgs().value("obj").toString());
+static ProjectEditor& findProject(GuiApplication& app, RpcRequest& request) {
+  if (auto uuid = Uuid::tryFromString(request.getArg("obj").toString())) {
     for (const auto& editor : app.getProjects()) {
       if (editor->getProject().getUuid() == uuid) {
-        return editor.get();
+        return *editor;
       }
     }
-  } catch (const Exception&) {
-    // Missing or invalid project handle → considered "not open".
   }
-  return nullptr;
+  throw RpcInvalidHandle();
 }
-
-}  // namespace
 
 /*******************************************************************************
  *  Command Handlers
@@ -107,29 +83,21 @@ void ProjectRpc::list(GuiApplication& app, RpcRequest& request) {
 }
 
 void ProjectRpc::open(GuiApplication& app, RpcRequest& request) {
-  const FilePath fp(request.getArgs().value("path").toString());
+  const FilePath fp(request.getArg("path").toString());
   if (!fp.isExistingFile()) {
-    request.sendError(rs::RpcErrorCode::CommandFailed,
-                      "The project file does not exist.");
-    return;
+    throw RpcCommandFailed("The project file does not exist.");
   }
   auto editor = app.openProject(fp, nullptr);
   if (!editor) {
-    request.sendError(rs::RpcErrorCode::CommandFailed,
-                      "Could not open the project.");
-    return;
+    throw RpcCommandFailed("Could not open the project.");
   }
   request.sendSuccess(projectToVariant(*editor));
 }
 
 void ProjectRpc::get(GuiApplication& app, RpcRequest& request) {
-  ProjectEditor* editor = findProject(app, request);
-  if (!editor) {
-    request.sendError(rs::RpcErrorCode::InvalidHandle);
-    return;
-  }
-  QVariantMap result = projectToVariant(*editor);
-  const Project& project = editor->getProject();
+  ProjectEditor& editor = findProject(app, request);
+  QVariantMap result = projectToVariant(editor);
+  const Project& project = editor.getProject();
   QVariantList sheets;
   for (const Schematic* schematic : project.getSchematics()) {
     QVariantMap sheet;

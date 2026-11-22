@@ -24,9 +24,10 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-{%- for cls in spec.classes %}
+{% for cls in spec.classes %}
 #include "{{ cls.name | lower }}rpc.h"
 {% endfor %}
+#include "rpcerrors.h"
 #include "rpcrequest.h"
 
 #include <QtCore>
@@ -41,7 +42,7 @@ namespace editor {
  *  Command Dispatching
  ******************************************************************************/
 
-bool rpcDispatchCommand(GuiApplication& app, const QString& method,
+void rpcDispatchCommand(GuiApplication& app, const QString& method,
                         RpcRequest& request) {
   using RpcCommand = void (*)(GuiApplication&, RpcRequest&);
   static const QHash<QString, RpcCommand> commands = {
@@ -53,10 +54,9 @@ bool rpcDispatchCommand(GuiApplication& app, const QString& method,
   };
   const auto it = commands.constFind(method);
   if (it == commands.constEnd()) {
-    return false;  // Method not found.
+    throw RpcMethodNotFound(method);
   }
   (*it)(app, request);
-  return true;
 }
 
 /*******************************************************************************

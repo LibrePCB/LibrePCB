@@ -25,6 +25,7 @@
 #include "../guiapplication.h"
 #include "../project/projecteditor.h"
 #include "../undostack.h"
+#include "rpcerrors.h"
 #include "rpcrequest.h"
 
 #include <librepcb/core/exceptions.h>
@@ -40,14 +41,8 @@ namespace editor {
 /*******************************************************************************
  *  Local Functions
  ******************************************************************************/
-namespace {
 
-/**
- * @brief Serialize the state of a project's undo stack to a map
- *
- * @param stack  The undo stack to serialize.
- */
-QVariantMap undoStackToVariant(const UndoStack& stack) {
+static QVariantMap undoStackToVariant(const UndoStack& stack) {
   QVariantMap map;
   map.insert("canUndo", stack.canUndo());
   map.insert("canRedo", stack.canRedo());
@@ -57,63 +52,36 @@ QVariantMap undoStackToVariant(const UndoStack& stack) {
   return map;
 }
 
-/**
- * @brief Find the project editor of an open project (by its handle)
- *
- * @param app   The application to look up the project in.
- * @param obj   The project handle (the "obj" key of the request params).
- *
- * @return The requested project editor, or nullptr if there is no such
- *         project open (or the handle is missing/invalid).
- */
-ProjectEditor* findProject(GuiApplication& app, RpcRequest& request) noexcept {
-  try {
-    const Uuid uuid =
-        Uuid::fromString(request.getArgs().value("obj").toString());
+static ProjectEditor& findProject(GuiApplication& app, RpcRequest& request) {
+  if (auto uuid = Uuid::tryFromString(request.getArg("obj").toString())) {
     for (const auto& editor : app.getProjects()) {
       if (editor->getProject().getUuid() == uuid) {
-        return editor.get();
+        return *editor;
       }
     }
-  } catch (const Exception&) {
-    // Missing or invalid project handle → considered "not open".
   }
-  return nullptr;
+  throw RpcInvalidHandle();
 }
-
-}  // namespace
 
 /*******************************************************************************
  *  Command Handlers
  ******************************************************************************/
 
 void UndoStackRpc::get_status(GuiApplication& app, RpcRequest& request) {
-  ProjectEditor* editor = findProject(app, request);
-  if (!editor) {
-    request.sendError(rs::RpcErrorCode::InvalidHandle);
-    return;
-  }
-  request.sendSuccess(undoStackToVariant(editor->getUndoStack()));
+  ProjectEditor& editor = findProject(app, request);
+  request.sendSuccess(undoStackToVariant(editor.getUndoStack()));
 }
 
 void UndoStackRpc::undo(GuiApplication& app, RpcRequest& request) {
-  ProjectEditor* editor = findProject(app, request);
-  if (!editor) {
-    request.sendError(rs::RpcErrorCode::InvalidHandle);
-    return;
-  }
-  editor->getUndoStack().undo();  // Can throw.
-  request.sendSuccess(undoStackToVariant(editor->getUndoStack()));
+  ProjectEditor& editor = findProject(app, request);
+  editor.getUndoStack().undo();  // Can throw.
+  request.sendSuccess(undoStackToVariant(editor.getUndoStack()));
 }
 
 void UndoStackRpc::redo(GuiApplication& app, RpcRequest& request) {
-  ProjectEditor* editor = findProject(app, request);
-  if (!editor) {
-    request.sendError(rs::RpcErrorCode::InvalidHandle);
-    return;
-  }
-  editor->getUndoStack().redo();  // Can throw.
-  request.sendSuccess(undoStackToVariant(editor->getUndoStack()));
+  ProjectEditor& editor = findProject(app, request);
+  editor.getUndoStack().redo();  // Can throw.
+  request.sendSuccess(undoStackToVariant(editor.getUndoStack()));
 }
 
 /*******************************************************************************

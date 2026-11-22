@@ -33,7 +33,7 @@ namespace editor {
  ******************************************************************************/
 
 /// Serialize an error into a map of the protocol's value domain.
-static QVariantMap errorToVariant(rs::RpcErrorCode code, const QString& message,
+static QVariantMap errorToVariant(RpcErrorCode code, const QString& message,
                                   const QVariantMap& properties) noexcept {
   QVariantMap error;
   error.insert("code", QVariant::fromValue(static_cast<qlonglong>(code)));
@@ -87,9 +87,10 @@ void RpcRequest::sendSuccess(const QVariant& result) noexcept {
   sendReply(true, result);
 }
 
-void RpcRequest::sendError(rs::RpcErrorCode code, const QString& message,
-                           const QVariantMap& properties) noexcept {
-  sendReply(false, errorToVariant(code, message, properties));
+void RpcRequest::sendError(const RpcError& error) noexcept {
+  sendReply(false,
+            errorToVariant(error.getCode(), error.getDetail(),
+                           error.getProperties()));
 }
 
 void RpcRequest::sendReply(bool ok, const QVariant& value) noexcept {

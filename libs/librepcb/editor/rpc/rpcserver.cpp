@@ -25,6 +25,7 @@
 #include "../guiapplication.h"
 #include "../notification.h"
 #include "../notificationsmodel.h"
+#include "rpcerrors.h"
 
 #include <librepcb/core/application.h>
 #include <librepcb/core/exceptions.h>
@@ -73,9 +74,9 @@ RpcServer::~RpcServer() noexcept {
 }
 
 // Defined in commands.cpp (a generated file): Dispatches an RPC command
-// by its method name to the corresponding generated command class. Returns
-// whether the method was found.
-bool rpcDispatchCommand(GuiApplication& app, const QString& method,
+// by its method name to the corresponding generated command class. Throws
+// an RpcError if the method was not found.
+void rpcDispatchCommand(GuiApplication& app, const QString& method,
                         RpcRequest& request);
 
 /*******************************************************************************
@@ -100,21 +101,17 @@ void RpcServer::handleRequest(uint32_t connId, uint32_t msgId,
     return;
   }
 
-  // Dispatch the command to its handler (generated code, see commands.cpp).
+  // Dispatch the command to its handler (generated code, see commands.cpp)
+  // and translate thrown errors into error responses.
   try {
-    if (rpcDispatchCommand(mApp, method, *request)) {
-      return;
-    }
+    rpcDispatchCommand(mApp, method, *request);
+  } catch (const RpcError& e) {
+    request->sendError(e);
   } catch (const std::exception& e) {
-    request->sendError(rs::RpcErrorCode::CommandFailed, e.what());
-    return;
+    request->sendError(RpcCommandFailed(e.what()));
   } catch (...) {
-    request->sendError(rs::RpcErrorCode::CommandFailed);
-    return;
+    request->sendError(RpcCommandFailed());
   }
-
-  // The method is not known to the server.
-  request->sendError(rs::RpcErrorCode::MethodNotFound, method);
 }
 
 void RpcServer::handleCancel(uint32_t connId, uint32_t msgId) noexcept {
@@ -129,8 +126,8 @@ void RpcServer::handleCancel(uint32_t connId, uint32_t msgId) noexcept {
 
 void RpcServer::handleInitialize(RpcRequest& request) noexcept {
   const QString clientName =
-      request.getArgs().value("name").toString().simplified().left(32);
-  const QVariant token = request.getArgs().value("token");
+      request.getArg("name").toString().simplified().left(32);
+  const QVariant token = request.getArg("token");
 
   auto createResponse = [this, clientName](QString token) {
     static const Uuid session = Uuid::createRandom();
@@ -158,7 +155,7 @@ void RpcServer::handleInitialize(RpcRequest& request) noexcept {
     if (authenticated) {
       request.sendSuccess(createResponse(token.toString()));
     } else {
-      request.sendError(rs::RpcErrorCode::AccessDenied);
+      request.sendError(RpcAccessDenied());
     }
   } else {
     auto notification = std::make_shared<Notification>(
@@ -175,9 +172,8 @@ void RpcServer::handleInitialize(RpcRequest& request) noexcept {
                                                    request.getConnId(), true);
               request.sendSuccess(createResponse(QString()));
             });
-    connect(
-        notification.get(), &Notification::destroyed, &request,
-        [&request]() { request.sendError(rs::RpcErrorCode::AccessDenied); });
+    connect(notification.get(), &Notification::destroyed, &request,
+            [&request]() { request.sendError(RpcAccessDenied()); });
     connect(&request, &RpcRequest::cancelled, notification.get(),
             &Notification::dismiss);
     connect(&request, &RpcRequest::destroyed, notification.get(),

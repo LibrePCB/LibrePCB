@@ -21,11 +21,11 @@
 // from `dev/rpc/rpc.yml`. Regenerate and commit this file after changing
 // the specification.
 
-/******************************************************************************* \
- *  Includes \
- ******************************************************************************/ \
+/*******************************************************************************
+ *  Includes
+ ******************************************************************************/
 #include "projectrpc.h"
-#include "rpcrequest.h"
+#include "rpcerrors.h"
 #include "undostackrpc.h"
 #include "workspacedbrpc.h"
 
@@ -41,7 +41,7 @@ namespace editor {
  *  Command Dispatching
  ******************************************************************************/
 
-bool rpcDispatchCommand(GuiApplication& app, const QString& method,
+void rpcDispatchCommand(GuiApplication& app, const QString& method,
                         RpcRequest& request) {
   using RpcCommand = void (*)(GuiApplication&, RpcRequest&);
   static const QHash<QString, RpcCommand> commands = {
@@ -53,12 +53,11 @@ bool rpcDispatchCommand(GuiApplication& app, const QString& method,
       {"UndoStack.redo", &UndoStackRpc::redo},
       {"WorkspaceDb.watch", &WorkspaceDbRpc::watch},
   };
-  const auto it = commands.constFind(method);
-  if (it == commands.constEnd()) {
-    return false;  // Method not found.
+  if (auto cmd = commands.value(method, nullptr)) {
+    (*cmd)(app, request);
+  } else {
+    throw RpcMethodNotFound(method);
   }
-  (*it)(app, request);
-  return true;
 }
 
 /*******************************************************************************
