@@ -22,6 +22,8 @@
  ******************************************************************************/
 #include "rpcobjectregistry.h"
 
+#include "api/rpcerrors.h"
+
 #include <QtCore>
 
 /*******************************************************************************
@@ -63,6 +65,10 @@ uint32_t RpcObjectRegistry::getHandle(QObject& obj) noexcept {
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
+
+void RpcObjectRegistry::throwInvalidHandle() {
+  throw rpc::RpcInvalidHandle();
+}
 
 void RpcObjectRegistry::removeObject(QObject* obj) noexcept {
   const auto handle = mHandles.constFind(obj);

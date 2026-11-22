@@ -27,8 +27,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../rpcrequest.h"
-
 #include <QtCore>
 
 /*******************************************************************************
@@ -36,6 +34,13 @@
  ******************************************************************************/
 namespace librepcb {
 namespace editor {
+namespace rpc {
+
+// Primary declaration of the per-enum conversion traits (the
+// specializations below are generated; also declared in rpcrequest.h,
+// where the generic argument readers live).
+template <typename T>
+struct RpcEnumTraits;
 
 /*******************************************************************************
  *  Enum Types
@@ -43,6 +48,10 @@ namespace editor {
 
 /**
  * @brief The BackupRestoreMode enum (see the API specification)
+ *
+ * The values are transferred as strings in lower_snake_case (the C++
+ * identifiers are derived from them). Use `RpcRequest::getArg<E>()` /
+ * `RpcRequest::tryGetArg<E>()` to read them from request arguments.
  */
 enum class BackupRestoreMode {
   Abort,
@@ -51,48 +60,36 @@ enum class BackupRestoreMode {
 };
 
 /**
- * @brief Conversion helpers for the BackupRestoreMode enum
+ * @brief Conversion data for the BackupRestoreMode enum
  *
- * Used by `RpcRequest::getArg<E>()` / `RpcRequest::tryGetArg<E>()` to read
- * values of this enum from request arguments.
+ * Used by `RpcRequest::getArg<E>()` / `RpcRequest::tryGetArg<E>()`.
  */
 template <>
 struct RpcEnumTraits<BackupRestoreMode> {
-  /// The name of the enum (for error messages).
-  static constexpr const char* enumName = "BackupRestoreMode";
+  /// The enum name (used in error messages).
+  static constexpr const char* NAME = "BackupRestoreMode";
 
   /// The default value (returned for arguments which are not provided).
-  static constexpr BackupRestoreMode defaultValue = BackupRestoreMode::Abort;
+  static constexpr BackupRestoreMode DEFAULT = BackupRestoreMode::Abort;
 
-  /**
-   * @brief Convert a string (from the wire) into an enum value
-   *
-   * @return The value, or std::nullopt if the string is not a valid value.
-   */
-  static std::optional<BackupRestoreMode> fromString(
-      const QString& name) noexcept {
-    if (name == "Abort") {
-      return BackupRestoreMode::Abort;
-    }
-    if (name == "Discard") {
-      return BackupRestoreMode::Discard;
-    }
-    if (name == "Restore") {
-      return BackupRestoreMode::Restore;
-    }
-    return std::nullopt;
+  /// The map from wire strings to enum values.
+  static const QHash<QString, BackupRestoreMode>& mapFromString() noexcept {
+    static const QHash<QString, BackupRestoreMode> map = {
+        {"abort", BackupRestoreMode::Abort},
+        {"discard", BackupRestoreMode::Discard},
+        {"restore", BackupRestoreMode::Restore},
+    };
+    return map;
   }
 
-  /**
-   * @brief Throw an InvalidArgs error for an invalid enum value
-   *
-   * @param value    The invalid value as string ("nil" for nil).
-   * @param argName  The name of the argument.
-   */
-  [[noreturn]] static void throwInvalid(const QString& value,
-                                        const QString& argName) {
-    throw RpcInvalidArgs(QString("Unknown value '%1' for argument '%2' (%3).")
-                             .arg(value, argName, enumName));
+  /// The map from enum values to wire strings.
+  static const QHash<BackupRestoreMode, QString>& mapToString() noexcept {
+    static const QHash<BackupRestoreMode, QString> map = {
+        {BackupRestoreMode::Abort, "abort"},
+        {BackupRestoreMode::Discard, "discard"},
+        {BackupRestoreMode::Restore, "restore"},
+    };
+    return map;
   }
 };
 
@@ -100,6 +97,7 @@ struct RpcEnumTraits<BackupRestoreMode> {
  *  End of File
  ******************************************************************************/
 
+}  // namespace rpc
 }  // namespace editor
 }  // namespace librepcb
 

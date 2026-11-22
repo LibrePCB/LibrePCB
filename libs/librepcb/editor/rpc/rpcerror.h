@@ -32,9 +32,12 @@
  ******************************************************************************/
 namespace librepcb {
 namespace editor {
+namespace rpc {
 
-// Defined in rpcerrors.h (a generated file).
+// Defined in rpc/api/rpcerrors.h (a generated file).
 enum class RpcErrorCode : int;
+
+}  // namespace rpc
 
 /*******************************************************************************
  *  Class RpcError
@@ -66,17 +69,17 @@ public:
   RpcError& operator=(const RpcError& rhs) = delete;
 
   // Getters
-  RpcErrorCode getCode() const noexcept { return mCode; }
+  rpc::RpcErrorCode getCode() const noexcept { return mCode; }
   const QString& getDetail() const noexcept { return mDetail; }
   const QVariantMap& getProperties() const noexcept { return mProperties; }
 
 protected:
-  RpcError(RpcErrorCode code, const QString& detail = QString(),
+  RpcError(rpc::RpcErrorCode code, const QString& detail = QString(),
            const QVariantMap& properties = QVariantMap()) noexcept
     : mCode(code), mDetail(detail), mProperties(properties) {}
 
 private:  // Data
-  const RpcErrorCode mCode;
+  const rpc::RpcErrorCode mCode;
   const QString mDetail;
   const QVariantMap mProperties;
 };

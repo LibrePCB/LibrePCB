@@ -23,8 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "api/rpcerrors.h"
-
 #include <QtCore>
 
 /*******************************************************************************
@@ -89,11 +87,16 @@ public:
     if (T* obj = qobject_cast<T*>(mObjects.value(value))) {
       return *obj;
     }
-    throw RpcInvalidHandle();
+    throwInvalidHandle();
   }
 
 private:  // Methods
   void removeObject(QObject* obj) noexcept;
+
+  /// Throw an InvalidHandle error for an unknown or expired handle.
+  /// Defined in rpcobjectregistry.cpp (the only place allowed to include
+  /// the generated error classes).
+  [[noreturn]] static void throwInvalidHandle();
 
 private:  // Data
   /// All registered objects, by handle.

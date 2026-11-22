@@ -64,10 +64,14 @@ namespace editor {
  *       destroyed. Since the request is created and also destroyed on the
  *       GUI thread, Qt's thread affinity rules are fulfilled.
  */
+namespace rpc {
+
 // Traits for enum types, generated in rpc/api/rpctypes.h (specialized
 // per enum of the specification). See getArg<E>()/tryGetArg<E>() below.
 template <typename T>
 struct RpcEnumTraits;
+
+}  // namespace rpc
 
 /*******************************************************************************
  *  Class RpcRequest
@@ -126,7 +130,7 @@ public:
    */
   template <typename E>
   E getArg(const QString& argName) const {
-    return tryGetArg<E>(argName).value_or(RpcEnumTraits<E>::defaultValue);
+    return tryGetArg<E>(argName).value_or(rpc::RpcEnumTraits<E>::DEFAULT);
   }
 
   /**
@@ -139,17 +143,17 @@ public:
    */
   template <typename E>
   std::optional<E> tryGetArg(const QString& argName) const {
-    if (!mArgs.contains(argName)) {
+    auto argIt = mArgs.find(argName);
+    if (argIt == mArgs.constEnd()) {
       return std::nullopt;  // Argument not provided.
     }
-    const QVariant value = getArg(argName);
-    if (auto v = RpcEnumTraits<E>::fromString(value.toString())) {
-      return v;
+    const QString value = argIt->toString();
+    const auto& map = rpc::RpcEnumTraits<E>::mapFromString();
+    const auto mapIt = map.constFind(value);
+    if (mapIt == map.constEnd()) {
+      throwInvalidArgs(value, argName, rpc::RpcEnumTraits<E>::NAME);
     }
-    // Nil or an unknown string are invalid values (an explicit nil is a
-    // client bug, not an implicit default).
-    RpcEnumTraits<E>::throwInvalid(value.isNull() ? "nil" : value.toString(),
-                                   argName);
+    return *mapIt;
   }
 
   /**
@@ -206,6 +210,13 @@ signals:
 private:  // Methods
   /// Send the response and emit #onFinished (finishes the request).
   void sendReply(bool ok, const QVariant& value) noexcept;
+
+  /// Throw an InvalidArgs error for an invalid enum argument value.
+  /// Defined in rpcrequest.cpp (the only place allowed to include
+  /// the generated error classes).
+  [[noreturn]] static void throwInvalidArgs(const QString& value,
+                                            const QString& argName,
+                                            const char* enumName);
 
 private:  // Data
   const uint32_t mConnId;

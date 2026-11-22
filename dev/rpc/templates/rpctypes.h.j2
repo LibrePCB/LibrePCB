@@ -27,8 +27,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../rpcrequest.h"
-
 #include <QtCore>
 
 /*******************************************************************************
@@ -36,6 +34,13 @@
  ******************************************************************************/
 namespace librepcb {
 namespace editor {
+namespace rpc {
+
+// Primary declaration of the per-enum conversion traits (the
+// specializations below are generated; also declared in rpcrequest.h,
+// where the generic argument readers live).
+template <typename T>
+struct RpcEnumTraits;
 
 /*******************************************************************************
  *  Enum Types
@@ -44,51 +49,49 @@ namespace editor {
 {% for enum in spec.enums %}
 /**
  * @brief The {{ enum.name }} enum (see the API specification)
+ *
+ * The values are transferred as strings in lower_snake_case (the C++
+ * identifiers are derived from them). Use `RpcRequest::getArg<E>()` /
+ * `RpcRequest::tryGetArg<E>()` to read them from request arguments.
  */
 enum class {{ enum.name }} {
 {% for value in enum.get("values") %}
-  {{ value.name }},
+  {{ value.name | cpp_pascal }},
 {% endfor %}
 };
 
 /**
- * @brief Conversion helpers for the {{ enum.name }} enum
+ * @brief Conversion data for the {{ enum.name }} enum
  *
- * Used by `RpcRequest::getArg<E>()` / `RpcRequest::tryGetArg<E>()` to read
- * values of this enum from request arguments.
+ * Used by `RpcRequest::getArg<E>()` / `RpcRequest::tryGetArg<E>()`.
  */
 template <>
 struct RpcEnumTraits<{{ enum.name }}> {
-  /// The name of the enum (for error messages).
-  static constexpr const char* enumName = "{{ enum.name }}";
+  /// The enum name (used in error messages).
+  static constexpr const char* NAME = "{{ enum.name }}";
 
   /// The default value (returned for arguments which are not provided).
-  static constexpr {{ enum.name }} defaultValue = {{ enum.name }}::{{ enum["default"] }};
+  static constexpr {{ enum.name }} DEFAULT =
+      {{ enum.name }}::{{ enum["default"] | cpp_pascal }};
 
-  /**
-   * @brief Convert a string (from the wire) into an enum value
-   *
-   * @return The value, or std::nullopt if the string is not a valid value.
-   */
-  static std::optional<{{ enum.name }}> fromString(const QString& name) noexcept {
+  /// The map from wire strings to enum values.
+  static const QHash<QString, {{ enum.name }}>& mapFromString() noexcept {
+    static const QHash<QString, {{ enum.name }}> map = {
 {% for value in enum.get("values") %}
-    if (name == "{{ value.name }}") {
-      return {{ enum.name }}::{{ value.name }};
-    }
+        {"{{ value.name }}", {{ enum.name }}::{{ value.name | cpp_pascal }}},
 {% endfor %}
-    return std::nullopt;
+    };
+    return map;
   }
 
-  /**
-   * @brief Throw an InvalidArgs error for an invalid enum value
-   *
-   * @param value    The invalid value as string ("nil" for nil).
-   * @param argName  The name of the argument.
-   */
-  [[noreturn]] static void throwInvalid(const QString& value,
-                                        const QString& argName) {
-    throw RpcInvalidArgs(QString("Unknown value '%1' for argument '%2' (%3).")
-                             .arg(value, argName, enumName));
+  /// The map from enum values to wire strings.
+  static const QHash<{{ enum.name }}, QString>& mapToString() noexcept {
+    static const QHash<{{ enum.name }}, QString> map = {
+{% for value in enum.get("values") %}
+        { {{ enum.name }}::{{ value.name | cpp_pascal }}, "{{ value.name }}"},
+{% endfor %}
+    };
+    return map;
   }
 };
 
@@ -97,6 +100,7 @@ struct RpcEnumTraits<{{ enum.name }}> {
  *  End of File
  ******************************************************************************/
 
+}  // namespace rpc
 }  // namespace editor
 }  // namespace librepcb
 

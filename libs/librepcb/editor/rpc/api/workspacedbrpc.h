@@ -35,6 +35,8 @@ class GuiApplication;
 class RpcObjectRegistry;
 class RpcRequest;
 
+namespace rpc {
+
 /*******************************************************************************
  *  Class WorkspaceDbRpc
  ******************************************************************************/
@@ -67,6 +69,7 @@ public:
  *  End of File
  ******************************************************************************/
 
+}  // namespace rpc
 }  // namespace editor
 }  // namespace librepcb
 

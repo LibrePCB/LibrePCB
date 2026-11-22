@@ -36,6 +36,7 @@
  ******************************************************************************/
 namespace librepcb {
 namespace editor {
+namespace rpc {
 
 /**
  * @brief The error codes of the RPC API (see the API specification)
@@ -208,6 +209,7 @@ public:
  *  End of File
  ******************************************************************************/
 
+}  // namespace rpc
 }  // namespace editor
 }  // namespace librepcb
 

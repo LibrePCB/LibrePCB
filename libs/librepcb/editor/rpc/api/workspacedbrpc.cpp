@@ -35,6 +35,10 @@
 namespace librepcb {
 namespace editor {
 
+// The generated RPC types live in their own namespace; open it here to
+// avoid qualified names in the command implementations.
+using namespace rpc;
+
 /*******************************************************************************
  *  Command Handlers
  ******************************************************************************/

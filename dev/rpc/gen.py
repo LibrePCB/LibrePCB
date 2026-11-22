@@ -66,6 +66,11 @@ ENUM_DOC = (
 )
 
 
+def cpp_pascal(name):
+    """Convert a lower_snake_case wire name into a PascalCase identifier."""
+    return "".join(part.capitalize() for part in name.split("_"))
+
+
 def rust_comment(text, prefix="///"):
     """Wrap a text into a Rust doc comment (ca. 80 columns)."""
     text = re.sub(r"\s+", " ", text).strip()
@@ -107,6 +112,7 @@ def make_environment():
         lstrip_blocks=True,
     )
     env.filters["cpp_brief"] = cpp_brief
+    env.filters["cpp_pascal"] = cpp_pascal
     env.filters["rust_comment"] = rust_comment
     env.filters["rust_string"] = rust_string
     return env

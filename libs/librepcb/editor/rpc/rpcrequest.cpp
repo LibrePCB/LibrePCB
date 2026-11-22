@@ -22,6 +22,8 @@
  ******************************************************************************/
 #include "rpcrequest.h"
 
+#include "api/rpcerrors.h"
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -33,7 +35,8 @@ namespace editor {
  ******************************************************************************/
 
 /// Serialize an error into a map of the protocol's value domain.
-static QVariantMap errorToVariant(RpcErrorCode code, const QString& message,
+static QVariantMap errorToVariant(rpc::RpcErrorCode code,
+                                  const QString& message,
                                   const QVariantMap& properties) noexcept {
   QVariantMap error;
   error.insert("code", static_cast<int>(code));
@@ -91,6 +94,13 @@ void RpcRequest::sendError(const RpcError& error) noexcept {
   sendReply(false,
             errorToVariant(error.getCode(), error.getDetail(),
                            error.getProperties()));
+}
+
+void RpcRequest::throwInvalidArgs(const QString& value, const QString& argName,
+                                  const char* enumName) {
+  throw rpc::RpcInvalidArgs(
+      QString("Unknown value '%1' for argument '%2' of enum %3.")
+          .arg(value, argName, QString::fromLatin1(enumName)));
 }
 
 void RpcRequest::sendReply(bool ok, const QVariant& value) noexcept {

@@ -247,16 +247,16 @@ structs:
 
 enums:
   - name: BackupRestoreMode
-    default: Abort
+    default: abort
     values:
-      - name: Abort
+      - name: abort
         description: >-
           Do not attempt to open a file which has an auto-save backup. Abort
           with an error instead.
-      - name: Discard
+      - name: discard
         description: >-
           Discard the backup, restore and load the last saved state.
-      - name: Restore
+      - name: restore
         description: >-
           Restore the auto-save backup, if available.
 
@@ -294,7 +294,7 @@ classes:
             description: The absolute path of the project file (*.lpp or *.lppz).
           - name: backup
             type: BackupRestoreMode
-            default: Abort
+            default: abort
             description: >-
               If the project directory contains an auto-save backup (i.e. the
               application crashed while the project was open and had unsaved

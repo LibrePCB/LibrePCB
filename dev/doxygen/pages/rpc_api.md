@@ -90,13 +90,13 @@ The state of a project's undo stack.
 ---
 
 ## BackupRestoreMode (Enum) {#doc_rpc_api_type_BackupRestoreMode}
-**Default value:** `Abort`
+**Default value:** `abort`
 
 | Value | Description |
 |-------|-------------|
-| `Abort` | Do not attempt to open a file which has an auto-save backup. Abort with an error instead. |
-| `Discard` | Discard the backup, restore and load the last saved state. |
-| `Restore` | Restore the auto-save backup, if available. |
+| `abort` | Do not attempt to open a file which has an auto-save backup. Abort with an error instead. |
+| `discard` | Discard the backup, restore and load the last saved state. |
+| `restore` | Restore the auto-save backup, if available. |
 
 ---
 # Error Types {#doc_rpc_api_errors}

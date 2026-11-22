@@ -42,6 +42,8 @@ class GuiApplication;
 class RpcObjectRegistry;
 class RpcRequest;
 
+namespace rpc {
+
 /*******************************************************************************
  *  Command Dispatching
  ******************************************************************************/
@@ -69,5 +71,6 @@ void rpcDispatchCommand(GuiApplication& app, RpcObjectRegistry& registry,
  *  End of File
  ******************************************************************************/
 
+}  // namespace rpc
 }  // namespace editor
 }  // namespace librepcb
