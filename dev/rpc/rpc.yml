@@ -10,7 +10,7 @@
 # Consumers:
 # - The documentation generator (dev/generate_rpc_api_docs.py).
 # - Client authors: Read this file to know which methods exist, and compare
-#   each method's `added_in_version` with the `version` reported by the
+#   each method's `since` with the `version` reported by the
 #   server's `initialize` method to know which ones are available on a
 #   given server (functions added after the revision of your spec file are
 #   unknown to you, which is fine — calling them results in error -32601).

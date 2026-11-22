@@ -15,35 +15,13 @@
 {%- endmacro -%}
 
 {% macro result_block(result) -%}
-{% if result is none %}
-None.
+{% if result is none or (result is sequence and result is not string and not result) %}
+**Result:** `null`
 {% else %}
-{% if result.description %}
+**Result:** `{{ result if result is string else "map" }}`
+{% if result is not string and result %}
 
-{{ result.description }}
-
-{% endif %}
-**Result:** `{{ type_ref(result) }}`
-{% if result is mapping and result.fields %}
-
-{{ fields_table(result.fields) }}{% endif %}
-{% if result is mapping and result.get("items") %}
-
-Array items: `{{ type_ref(result.get("items")) }}`
-{% endif %}
-{% endif %}
-{%- endmacro -%}
-
-{% macro errors_block(err_names) -%}
-{% if not err_names %}
-None (besides protocol-level errors).
-{% else %}
-| Error | Code | Message |
-|-------|------|---------|
-{% for name in err_names %}
-{% set error = errors.get(name, {}) %}
-| `{{ name }}` | {{ error.get("code", "?") }} | {{ error.get("message", "") }} |
-{% endfor %}
+{{ fields_table(result) }}{% endif %}
 {% endif %}
 {%- endmacro -%}
 
@@ -134,11 +112,8 @@ None.
 
 {% endif %}
 {{ result_block(method.result) }}
-**Errors:**
-
-{{ errors_block(method.errors) }}
-{% if method.added_in_version %}
-**Added in version:** {{ method.added_in_version }}
+{% if method.since %}
+**Since:** {{ method.since }}
 
 {% endif %}
 ---

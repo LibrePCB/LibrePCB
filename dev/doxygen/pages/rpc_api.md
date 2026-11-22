@@ -118,7 +118,7 @@ The `error` element of a response is a map with the keys `code` and `message` (a
 
 **`AccessDenied`:** The provided access token doesn't have the permissions to execute the command. If this error is returned by the 'initialize' method, it means that either the provided token is invalid or has expired, or an interactive connection request was denied by the user.
 
-**`MethodNotFound`:** The method does not exist or is not available, e.g. because it was added in a newer application version than the running one.
+**`MethodNotFound`:** The method was not found, e.g. because it was added in a newer application version than the running one, or the method has been removed from the application and is no longer available.
 
 **`MethodNotAvailable`:** The method exists, but is currently not available. This may be the case if the application is in a state where the requested functionality does not exist.
 
@@ -158,11 +158,7 @@ None.
 |------|------|-------------|
 | `projects` | array of ProjectSummary | All open projects, in the order of their editor tabs. |
 
-**Errors:**
-
-None (besides protocol-level errors).
-
-**Added in version:** 2.1.2
+**Since:** 2.2.0
 
 ---
 
@@ -178,13 +174,7 @@ Open a project by file path. If the project is already open, nothing is changed 
 
 **Result:** `ProjectSummary`
 
-**Errors:**
-
-| Error | Code | Message |
-|-------|------|---------|
-| `CommandFailed` | 100 | Command failed |
-
-**Added in version:** 2.1.2
+**Since:** 2.2.0
 
 ---
 
@@ -196,13 +186,7 @@ None.
 
 **Result:** `ProjectDetails`
 
-**Errors:**
-
-| Error | Code | Message |
-|-------|------|---------|
-| `ProjectNotOpen` | ? |  |
-
-**Added in version:** 2.1.2
+**Since:** 2.2.0
 
 ---
 
@@ -220,13 +204,7 @@ None.
 
 **Result:** `UndoStackStatus`
 
-**Errors:**
-
-| Error | Code | Message |
-|-------|------|---------|
-| `ProjectNotOpen` | ? |  |
-
-**Added in version:** 2.1.2
+**Since:** 2.2.0
 
 ---
 
@@ -238,14 +216,7 @@ None.
 
 **Result:** `UndoStackStatus`
 
-**Errors:**
-
-| Error | Code | Message |
-|-------|------|---------|
-| `ProjectNotOpen` | ? |  |
-| `CommandFailed` | 100 | Command failed |
-
-**Added in version:** 2.1.2
+**Since:** 2.2.0
 
 ---
 
@@ -257,14 +228,7 @@ None.
 
 **Result:** `UndoStackStatus`
 
-**Errors:**
-
-| Error | Code | Message |
-|-------|------|---------|
-| `ProjectNotOpen` | ? |  |
-| `CommandFailed` | 100 | Command failed |
-
-**Added in version:** 2.1.2
+**Since:** 2.2.0
 
 ---
 
@@ -278,13 +242,7 @@ Watch the library database: While the request is pending, request messages (type
 
 None.
 
-None.
+**Result:** `null`
 
-**Errors:**
-
-| Error | Code | Message |
-|-------|------|---------|
-| `Cancelled` | 39 | Request cancelled |
-
-**Added in version:** 2.1.2
+**Since:** 2.2.0
 

@@ -150,7 +150,7 @@ def test_rpc_server(librepcb, helpers):
             # --- Protocol-level methods ----------------------------------
             error, result = rpc.request(2, "ping", None)
             assert error is None
-            assert result == {}
+            assert result is None
 
             # --- Commands -------------------------------------------------
             # Project.list → exactly the project opened via the CLI. Since
@@ -239,7 +239,7 @@ def test_rpc_server(librepcb, helpers):
             rpc.send([4, 999])
             error, result = rpc.request(13, "ping", None)
             assert error is None
-            assert result == {}
+            assert result is None
 
             # --- Pipelining -----------------------------------------------
             # Send three requests without waiting for responses; exactly
@@ -250,6 +250,6 @@ def test_rpc_server(librepcb, helpers):
                 message = rpc.receive()
                 assert message[0:2] == [1, msgid], message
                 assert message[2] is None, message
-                assert message[3] == {}, message
+                assert message[3] is None, message
         finally:
             rpc.close()

@@ -50,7 +50,7 @@ Build directory: `build/agent` (per CLAUDE.md). No commits unless asked.
 | Params | String-keyed map with a reserved `"obj"` key carrying the receiver handle — an *opaque* value (see section 2.4) |
 | Domain types | Plain integers (`Length` in nm, `Angle` in µdeg, …) and f64 — **forever**, no msgpack `ext` types |
 | Enums | Strings (self-describing; clients don't need the spec to display them) |
-| Spec / discovery | YAML spec file (`dev/rpc/rpc.yml`, dev tool, not shipped); **no `rpc.discover` method** — clients read the spec file and compare per-function `added_in_version` with the `version` from `initialize` |
+| Spec / discovery | YAML spec file (`dev/rpc/rpc.yml`, dev tool, not shipped); **no `rpc.discover` method** — clients read the spec file and compare per-function `since` with the `version` from `initialize` |
 | Auth | `initialize` handshake: first-time clients are approved interactively by the user (notification); approval issues an access token which clients use for later connections (see 2.5) |
 | Concurrency | std threads only, reader/writer thread pair per connection (no tokio, no mio) |
 | Events | Type-2 notifications broadcast to all clients (v2: `project_opened`, `project_closed`, `selection_changed`) |
@@ -99,7 +99,7 @@ extended with request-scoped message types:
 | Type | Message      | Direction | Shape                        | Meaning |
 |------|--------------|-----------|------------------------------|---------|
 | 0    | Request      | C→S       | `[0, msgid, method, params]` | Call a function |
-| 1    | Response     | S→C       | `[1, msgid, error, result]`  | Exactly one per request; `error` is nil or a map, `result` is nil iff error |
+| 1    | Response     | S→C       | `[1, msgid, error, result]`  | Exactly one per request; `error` is nil or a map; `result` is a map or nil (nil iff error, or if the command has no result) |
 | 2    | Notification | S→C       | `[2, method, params]`        | Broadcast event (e.g. `project_opened`) |
 | 3    | Request message | S→C   | `[3, msgid, payload]`        | Per-request channel: progress reports and/or streamed partial data; only while the request is pending |
 | 4    | Cancel       | C→S       | `[4, msgid]`                 | Client asks to cancel a pending request |
@@ -187,13 +187,13 @@ A request's `params` is a **string-keyed msgpack map**:
     additive, backward-compatible changes.
   - `session` is a per-process UUID: It changes when the application is
     restarted, so clients can detect that.
-  - Clients use `version` + the spec's per-function `added_in_version`
+  - Clients use `version` + the spec's per-function `since`
     to determine availability: functions added after the revision of the
     client's spec are unknown to the client, which is fine (unknown
     method → RPC error).
 - `ping` is a protocol-level method (handled by the Rust server, no
   dispatch): returns `{}`.
-- `ping` → empty map result.
+- `ping` → nil result.
 - **No `rpc.discover`** (dropped): the spec is a file, not a method.
 
 ### 2.6 Asynchronous request semantics
@@ -234,9 +234,8 @@ A request's `params` is a **string-keyed msgpack map**:
 The response `error` is a map `{"code": <int>, "message": <string>}` (+
 optional extra properties, see the error types in the spec). The codes
 are grouped: 10–19 transport, 20–29 protocol, 30–39 command, 100–
-command execution. The spec's global `error_types` define code, message
-and optional additional properties; each function lists which error
-types it may return.
+command execution. The spec's `errors` section defines code, message
+and optional additional properties for each error type.
 
 The canonical `message` of an error code (from the spec) is always
 sent on the wire, optionally followed by an application-provided detail
@@ -451,7 +450,11 @@ anymore).
 `dev/rpc/rpc.yml` — the single source of truth for the API. It lives
 in the dev tools (not shipped with the app); local tools read the spec
 matching their installed server. Clients compare per-function
-`added_in_version` with the `version` from `initialize`.
+`since` with the `version` from `initialize`.
+
+Results are **map-or-nil**: A method's `result` is either a struct
+name or the list of the map's fields; an empty field list (or null)
+declares that the command returns nil on the wire.
 
 Structure sketch:
 
@@ -466,10 +469,10 @@ enums:
       - name: dots             # wire value = the string itself
         description: ...
 
-error_types:
-  - name: ProjectNotOpen
-    code: 101
-    message: "Project not open"
+errors:
+  - name: InvalidHandle
+    code: 35
+    message: "Invalid object handle"
 
 classes:
   - name: Project
@@ -480,21 +483,23 @@ classes:
         static: true
         description: List all open projects
         params: []
-        result: {type: array, items: {type: ProjectSummary}}
-        errors: []
-        added_in_version: 2.1.0
+        result:
+          - name: projects
+            type: array
+            items: ProjectSummary
+            description: All open projects
+        since: "2.2.0"
       - name: get              # member → obj = the project handle
         description: Get project details
         params: []
-        result: {type: ProjectDetails}
-        errors: [ProjectNotOpen]
-        added_in_version: 2.1.0
+        result: ProjectDetails
+        since: "2.2.0"
 
 events:
   - name: project_opened
     description: A project was opened
     params: {type: ProjectSummary}
-    added_in_version: 2.1.0
+    since: "2.2.0"
 
 # + top-level type definitions (structs) for reuse in params/results
 ```
@@ -504,7 +509,7 @@ events:
   documented on the fields (e.g. "length in nanometers").
 - **Enums are strings on the wire**; the spec lists the allowed values and
   is the validation reference. Unknown enum string → payload-level error.
-- Per-function `added_in_version`: compared against `appVersion`
+- Per-function `since`: compared against `appVersion`
   (suffix-tolerant semver comparison, e.g. "2.1.2-unstable" → "2.1.2").
 - **No automated spec-vs-implementation check** (deliberately dropped;
   tests are written manually).

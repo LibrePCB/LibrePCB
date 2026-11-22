@@ -75,7 +75,7 @@ The fields have the following meaning:
   in the request, or a freshly issued one (see above).
 - `workspace`: The path of the currently opened workspace.
 
-Clients use `version` together with the per-method `added_in_version`
+Clients use `version` together with the per-method `since`
 from the specification file to determine which methods the server
 supports: Methods added after the revision of the client's specification
 are unknown to the client (calling them results in error code 22,
@@ -90,7 +90,7 @@ part of the class-based command API:
 | Method       | Description                                    |
 |--------------|------------------------------------------------|
 | `initialize` | Handshake & authentication (see above).        |
-| `ping`       | Returns an empty map, useful to test a client.  |
+| `ping`       | Returns nil, useful to test a client.           |
 
 Messages {#doc_rpc_api_messages}
 --------

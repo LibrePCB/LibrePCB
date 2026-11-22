@@ -181,7 +181,7 @@ fn process_message(
         ));
       }
       if method == METHOD_PING {
-        return Some(build_response(msgid, None, &Value::Map(Vec::new())));
+        return Some(build_response(msgid, None, &Value::Nil));
       }
       dispatch_request(inner, conn_id, pending, msgid, method, params)
     }

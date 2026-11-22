@@ -163,8 +163,9 @@ enum class RpcErrorCode : int32_t {
    */
   AccessDenied = 31,
   /**
-   * The method does not exist or is not available, e.g. because it was added in
-   * a newer application version than the running one.
+   * The method was not found, e.g. because it was added in a newer application
+   * version than the running one, or the method has been removed from the
+   * application and is no longer available.
    */
   MethodNotFound = 32,
   /**

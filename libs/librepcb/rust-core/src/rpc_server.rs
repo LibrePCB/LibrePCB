@@ -647,7 +647,7 @@ mod tests {
     client.request(2, METHOD_PING, Value::Map(Vec::new()));
     let (error, result) = client.read_response(2);
     assert!(error.is_nil());
-    assert_eq!(result, Value::Map(Vec::new()));
+    assert!(result.is_nil());
   }
 
   #[test]
@@ -709,7 +709,7 @@ mod tests {
     client.request(5, METHOD_PING, Value::Map(Vec::new()));
     let (error, result) = client.read_response(5);
     assert!(error.is_nil());
-    assert_eq!(result, Value::Map(Vec::new()));
+    assert!(result.is_nil());
   }
 
   #[test]

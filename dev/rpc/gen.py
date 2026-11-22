@@ -92,13 +92,11 @@ def strip_trailing_separators(content):
 
 def main():
     spec = yaml.safe_load(SPEC_FILE.read_text(encoding="utf-8"))
-    errors = {e["name"]: e for e in spec.get("errors", [])}
     env = make_environment()
 
     DOCS_FILE.write_text(strip_trailing_separators(
-        env.get_template("rpc_api.md.j2").render(
-            spec=spec, errors=errors,
-        )), encoding="utf-8")
+        env.get_template("rpc_api.md.j2").render(spec=spec),
+    ), encoding="utf-8")
     print(f"Generated {DOCS_FILE}")
 
     RUST_FILE.write_text(env.get_template("rpc_api.rs.j2").render(

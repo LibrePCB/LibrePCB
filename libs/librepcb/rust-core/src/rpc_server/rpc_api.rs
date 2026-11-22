@@ -23,8 +23,9 @@ pub enum RpcErrorCode {/// The received message could not be decoded (invalid Me
 /// command. If this error is returned by the 'initialize' method, it means that
 /// either the provided token is invalid or has expired, or an interactive
 /// connection request was denied by the user.
-  AccessDenied = 31,/// The method does not exist or is not available, e.g. because it was added in
-/// a newer application version than the running one.
+  AccessDenied = 31,/// The method was not found, e.g. because it was added in a newer application
+/// version than the running one, or the method has been removed from the
+/// application and is no longer available.
   MethodNotFound = 32,/// The method exists, but is currently not available. This may be the case if
 /// the application is in a state where the requested functionality does not
 /// exist.
