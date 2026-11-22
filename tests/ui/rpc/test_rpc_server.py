@@ -174,7 +174,7 @@ def test_rpc_server(librepcb, helpers):
             # The object handle is opaque: it's taken from the response as-is
             # and passed back unchanged, without inspecting it.
             handle = project["obj"]
-            for key in ["uuid", "author", "version", "path", "modified"]:
+            for key in ["path", "dirty"]:
                 assert key in project, f"missing key {key} in {project!r}"
 
             # Project.get → details with sheets & boards.

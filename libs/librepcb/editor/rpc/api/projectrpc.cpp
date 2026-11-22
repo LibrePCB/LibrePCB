@@ -44,18 +44,44 @@ namespace editor {
  *  Local Functions
  ******************************************************************************/
 
-static QVariantMap projectToVariant(RpcObjectRegistry& registry,
-                                    ProjectEditor& editor) {
+static QVariantMap summary(ProjectEditor& editor, RpcObjectRegistry& registry) {
   const Project& project = editor.getProject();
-  QVariantMap map;
-  map.insert("obj", registry.getHandle(editor));
-  map.insert("uuid", project.getUuid().toStr());
-  map.insert("name", *project.getName());
-  map.insert("author", project.getAuthor());
-  map.insert("version", *project.getVersion());
-  map.insert("path", project.getFilepath().toStr());
-  map.insert("modified", !editor.getUndoStack().isClean());
-  return map;
+
+  QVariantMap result;
+  result.insert("obj", registry.getHandle(editor));
+  result.insert("name", *project.getName());
+  result.insert("path", project.getFilepath().toStr());
+  result.insert("dirty", !editor.getUndoStack().isClean());
+  return result;
+}
+
+static QVariantMap details(ProjectEditor& editor, RpcObjectRegistry& registry) {
+  const Project& project = editor.getProject();
+
+  QVariantMap result = summary(editor, registry);
+  result.insert("author", project.getAuthor());
+  result.insert("version", *project.getVersion());
+  {
+    QVariantList list;
+    for (const Schematic* schematic : project.getSchematics()) {
+      QVariantMap sheet;
+      sheet.insert("uuid", schematic->getUuid().toStr());
+      sheet.insert("name", *schematic->getName());
+      list.append(sheet);
+    }
+    result.insert("sheets", list);
+  }
+  {
+    QVariantList list;
+    for (const Board* board : project.getBoards()) {
+      QVariantMap item;
+      item.insert("uuid", board->getUuid().toStr());
+      item.insert("name", *board->getName());
+      list.append(item);
+    }
+    result.insert("boards", list);
+  }
+  return result;
 }
 
 /*******************************************************************************
@@ -66,7 +92,7 @@ void ProjectRpc::list(GuiApplication& app, RpcObjectRegistry& registry,
                       RpcRequest& request) {
   QVariantList projects;
   for (const auto& editor : app.getProjects()) {
-    projects.append(QVariant(projectToVariant(registry, *editor)));
+    projects.append(summary(*editor, registry));
   }
   QVariantMap result;
   result.insert("projects", projects);
@@ -76,39 +102,22 @@ void ProjectRpc::list(GuiApplication& app, RpcObjectRegistry& registry,
 void ProjectRpc::open(GuiApplication& app, RpcObjectRegistry& registry,
                       RpcRequest& request) {
   const FilePath fp(request.getArg("path").toString());
-  if (!fp.isExistingFile()) {
-    throw RpcCommandFailed("The project file does not exist.");
-  }
-  auto editor = app.openProject(fp, nullptr);
+  auto askForRestoringBackup = [](const FilePath&) {
+    return false;
+  };
+
+  auto editor = app.openProjectNonInteractive(fp, askForRestoringBackup);
   if (!editor) {
-    throw RpcCommandFailed("Could not open the project.");
+    throw RpcInternalError();
   }
-  request.sendSuccess(projectToVariant(registry, *editor));
+  request.sendSuccess(details(*editor, registry));
 }
 
 void ProjectRpc::get(GuiApplication& app, RpcObjectRegistry& registry,
                      RpcRequest& request) {
   Q_UNUSED(app);
   ProjectEditor& editor = registry.getAs<ProjectEditor>(request.getArg("obj"));
-  QVariantMap result = projectToVariant(registry, editor);
-  const Project& project = editor.getProject();
-  QVariantList sheets;
-  for (const Schematic* schematic : project.getSchematics()) {
-    QVariantMap sheet;
-    sheet.insert("uuid", schematic->getUuid().toStr());
-    sheet.insert("name", *schematic->getName());
-    sheets.append(QVariant(sheet));
-  }
-  result.insert("sheets", sheets);
-  QVariantList boards;
-  for (const Board* board : project.getBoards()) {
-    QVariantMap item;
-    item.insert("uuid", board->getUuid().toStr());
-    item.insert("name", *board->getName());
-    boards.append(QVariant(item));
-  }
-  result.insert("boards", boards);
-  request.sendSuccess(result);
+  request.sendSuccess(details(editor, registry));
 }
 
 /*******************************************************************************

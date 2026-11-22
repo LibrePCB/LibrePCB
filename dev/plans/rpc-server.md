@@ -308,8 +308,9 @@ bounded thread drain),
   type enum. The Rust side (`qmetatype` constants in `ffi/cpp_ffi.rs`,
   kept in sync with the ABI-stable `QMetaType::Type` values) matches the
   IDs of the value domain and rejects everything else.
-- u64 values > i64::MAX, `ext` types, non-string map keys and invalid
-  UTF-8 strings → payload-level errors ("invalid params").
+- `ext` types, non-string map keys and invalid UTF-8 strings →
+  payload-level errors ("invalid params"). Large u64 values are
+  supported (stored as `QVariant::ULongLong`).
 - The C++ dispatch layer *normalizes* command results into the domain
   (plain `int`/`uint`/`float` are converted, anything else like
   `QDateTime` is rejected with an internal error).
@@ -491,6 +492,10 @@ stale-handle traps like UUID or file path handles would have).
   or of the wrong type (`qobject_cast`) — so handlers are one-liners.
 - GUI-thread only (no locking needed).
 
+The response payload and enumeration conventions (summary vs. details,
+one enumeration point per collection, depth via classes, ...) are
+documented in the doxygen guidelines page (see 5.2).
+
 ### 4.3 v2 command set (illustrative mapping from v1)
 
 | v1 name | v2 name | Kind |
@@ -612,6 +617,10 @@ there; run the generator with `uv run gen.py`):
 - `gen.py` — generates, from the spec and the templates:
   - `dev/doxygen/pages/rpc_api.md` — the generated API reference (data
     types, error types, classes with their methods and events).
+- `dev/doxygen/pages/rpc_guidelines.md` — **hand-written** guidelines for
+    RPC interface developers (payload/enumeration conventions, handler
+    rules, error handling, object handles). The conventions live here
+    (moved out of this plan) and are referenced from sections 4.2/4.3.
   - `src/rpc_server/rpc_api.rs` — generated Rust code (for now only the
     error codes with their canonical messages).
 

@@ -7,7 +7,9 @@ The RPC server allows external tools (e.g. MCP servers, plugins or
 scripting libraries) to control a running LibrePCB application. This page
 describes the transport protocol of the server; the available commands
 (data types, error types, classes with their methods) are documented in
-\subpage doc_rpc_api_reference.
+\subpage doc_rpc_api_reference. Guidelines for **developers** of the RPC
+interface (payload conventions, object handle handling, ...) are
+described in \subpage doc_rpc_guidelines.
 
 The reference is generated from `dev/rpc/rpc.yml`, the single
 source of truth of the API.

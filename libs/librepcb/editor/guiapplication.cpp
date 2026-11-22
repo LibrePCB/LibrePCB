@@ -583,6 +583,35 @@ std::shared_ptr<ProjectEditor> GuiApplication::openProject(
     cs.setValue("controlpanel/last_open_project", fp.toNative());
   }
 
+  // Callback to ask for restoring backup.
+  auto askForRestoringBackup = [parent](const FilePath&) {
+    QMessageBox::StandardButton btn = QMessageBox::question(
+        parent, tr("Restore autosave backup?"),
+        tr("It seems that the application crashed the last time you opened "
+           "this project. Do you want to restore the last autosave backup?"),
+        QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
+        QMessageBox::Cancel);
+    switch (btn) {
+      case QMessageBox::Yes:
+        return true;
+      case QMessageBox::No:
+        return false;
+      default:
+        throw UserCanceled(__FILE__, __LINE__);
+    }
+  };
+
+  try {
+    return openProjectNonInteractive(fp, askForRestoringBackup);
+  } catch (const Exception& e) {
+    QMessageBox::critical(parent, tr("Error"), e.getMsg());
+    return nullptr;
+  }
+}
+
+std::shared_ptr<ProjectEditor> GuiApplication::openProjectNonInteractive(
+    const FilePath& fp,
+    TransactionalFileSystem::RestoreCallback restoreCallback) {
   auto switchToProject = [this](int index) {
     for (auto win : mWindows->values()) {
       win->setCurrentProject(index);
@@ -606,88 +635,65 @@ std::shared_ptr<ProjectEditor> GuiApplication::openProject(
   auto cursorScopeGuard =
       scopeGuard([]() { QApplication::restoreOverrideCursor(); });
 
-  // Callback to ask for restoring backup.
-  auto askForRestoringBackup = [parent](const FilePath&) {
-    QMessageBox::StandardButton btn = QMessageBox::question(
-        parent, tr("Restore autosave backup?"),
-        tr("It seems that the application crashed the last time you opened "
-           "this project. Do you want to restore the last autosave backup?"),
-        QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
-        QMessageBox::Cancel);
-    switch (btn) {
-      case QMessageBox::Yes:
-        return true;
-      case QMessageBox::No:
-        return false;
-      default:
-        throw UserCanceled(__FILE__, __LINE__);
-    }
-  };
-
-  try {
-    // Open file system.
-    std::shared_ptr<TransactionalFileSystem> fs;
-    QString projectFileName = fp.getFilename();
-    if (fp.getSuffix() == "lppz") {
-      fs = TransactionalFileSystem::openRO(
-          Application::getRandomTempPath(),
-          &TransactionalFileSystem::RestoreMode::no);
-      fs->removeDirRecursively();  // 1) Get a clean initial state.
-      fs->loadFromZip(fp);  // 2) Load files from ZIP.
-      foreach (const QString& fn, fs->getFiles()) {
-        if (fn.endsWith(".lpp")) {
-          projectFileName = fn;
-        }
-      }
-    } else {
-      fs = TransactionalFileSystem::openRW(
-          fp.getParentDir(), askForRestoringBackup,
-          DirectoryLockHandlerDialog::createDirectoryLockCallback());
-    }
-
-    // Open project.
-    ProjectLoader loader;
-    std::unique_ptr<Project> project =
-        loader.open(std::make_unique<TransactionalDirectory>(fs),
-                    projectFileName);  // can throw
-
-    // Open editor & keep handle.
-    const int index = mProjects->count();
-    auto editor = std::make_shared<ProjectEditor>(
-        *this, std::move(project), index, loader.getMigrationLog());
-    connect(editor.get(), &ProjectEditor::statusBarMessageChanged, this,
-            &GuiApplication::statusBarMessageChanged);
-    connect(editor.get(), &ProjectEditor::ercMessageHighlightRequested, this,
-            &GuiApplication::highlightErcMessage);
-    mProjects->append(editor);
-
-    // Switch to documents tab.
-    switchToProject(index);
-
-    // Open the first schematic and board to get immediate feedback that the
-    // project has been opened. In future we should restore the tabs which were
-    // opened the last time, so this is just a temporary solution.
-    if (auto win = getCurrentWindow()) {
-      bool tabOpened = false;
-      if (!editor->getProject().getSchematics().isEmpty()) {
-        win->openSchematicTab(index, 0);
-        tabOpened = true;
-      }
-      if (!editor->getProject().getBoards().isEmpty()) {
-        win->openBoard2dTab(index, 0, !tabOpened);
+  // Open file system.
+  std::shared_ptr<TransactionalFileSystem> fs;
+  QString projectFileName = fp.getFilename();
+  if (fp.getSuffix() == "lppz") {
+    fs = TransactionalFileSystem::openRO(
+        Application::getRandomTempPath(),
+        &TransactionalFileSystem::RestoreMode::no);
+    fs->removeDirRecursively();  // 1) Get a clean initial state.
+    fs->loadFromZip(fp);  // 2) Load files from ZIP.
+    foreach (const QString& fn, fs->getFiles()) {
+      if (fn.endsWith(".lpp")) {
+        projectFileName = fn;
       }
     }
-
-    // Delay updating the last opened project to avoid an issue when
-    // double-clicking: https://github.com/LibrePCB/LibrePCB/issues/293
-    QTimer::singleShot(
-        500, this, [this, fp]() { mQuickAccessModel->pushRecentProject(fp); });
-
-    return editor;
-  } catch (const Exception& e) {
-    QMessageBox::critical(parent, tr("Error"), e.getMsg());
-    return nullptr;
+  } else {
+    fs = TransactionalFileSystem::openRW(
+        fp.getParentDir(), restoreCallback,
+        DirectoryLockHandlerDialog::createDirectoryLockCallback());
   }
+
+  // Open project.
+  ProjectLoader loader;
+  std::unique_ptr<Project> project =
+      loader.open(std::make_unique<TransactionalDirectory>(fs),
+                  projectFileName);  // can throw
+
+  // Open editor & keep handle.
+  const int index = mProjects->count();
+  auto editor = std::make_shared<ProjectEditor>(
+      *this, std::move(project), index, loader.getMigrationLog());
+  connect(editor.get(), &ProjectEditor::statusBarMessageChanged, this,
+          &GuiApplication::statusBarMessageChanged);
+  connect(editor.get(), &ProjectEditor::ercMessageHighlightRequested, this,
+          &GuiApplication::highlightErcMessage);
+  mProjects->append(editor);
+
+  // Switch to documents tab.
+  switchToProject(index);
+
+  // Open the first schematic and board to get immediate feedback that the
+  // project has been opened. In future we should restore the tabs which were
+  // opened the last time, so this is just a temporary solution.
+  if (auto win = getCurrentWindow()) {
+    bool tabOpened = false;
+    if (!editor->getProject().getSchematics().isEmpty()) {
+      win->openSchematicTab(index, 0);
+      tabOpened = true;
+    }
+    if (!editor->getProject().getBoards().isEmpty()) {
+      win->openBoard2dTab(index, 0, !tabOpened);
+    }
+  }
+
+  // Delay updating the last opened project to avoid an issue when
+  // double-clicking: https://github.com/LibrePCB/LibrePCB/issues/293
+  QTimer::singleShot(
+      500, this, [this, fp]() { mQuickAccessModel->pushRecentProject(fp); });
+
+  return editor;
 }
 
 void GuiApplication::closeProject(int index) noexcept {

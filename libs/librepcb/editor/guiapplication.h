@@ -27,6 +27,7 @@
 #include "utils/uiobjectlist.h"
 
 #include <librepcb/core/fileio/filepath.h>
+#include <librepcb/core/fileio/transactionalfilesystem.h>
 
 #include <QtCore>
 
@@ -122,6 +123,9 @@ public:
    */
   std::shared_ptr<ProjectEditor> openProject(FilePath fp,
                                              QWidget* parent) noexcept;
+  std::shared_ptr<ProjectEditor> openProjectNonInteractive(
+      const FilePath& fp,
+      TransactionalFileSystem::RestoreCallback restoreCallback);
   void closeProject(int index) noexcept;
   bool requestClosingAllProjects() noexcept;
   void openProjectLibraryUpdater(const FilePath& project) noexcept;

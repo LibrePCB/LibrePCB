@@ -23,7 +23,7 @@ A summary of an open project.
 | `author` | string | The project author. |
 | `version` | string | The project version. |
 | `path` | string | The absolute path of the project file. |
-| `modified` | bool | Whether the project was modified since the last save. |
+| `dirty` | bool | Whether the project has unsaved changes (i.e. its undo stack is not clean). |
 
 ---
 
@@ -41,7 +41,7 @@ Details about an open project.
 | `author` | string | The project author. |
 | `version` | string | The project version. |
 | `path` | string | The absolute path of the project file. |
-| `modified` | bool | Whether the project was modified since the last save. |
+| `dirty` | bool | Whether the project has unsaved changes (i.e. its undo stack is not clean). |
 | `sheets` | array of SchematicSummary | All schematic sheets of the project. |
 | `boards` | array of BoardSummary | All boards of the project. |
 

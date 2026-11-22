@@ -165,9 +165,9 @@ structs:
       - name: path
         type: string
         description: The absolute path of the project file.
-      - name: modified
+      - name: dirty
         type: bool
-        description: Whether the project was modified since the last save.
+        description: Whether the project has unsaved changes (i.e. its undo stack is not clean).
 
   - name: ProjectDetails
     description: Details about an open project.
@@ -190,9 +190,9 @@ structs:
       - name: path
         type: string
         description: The absolute path of the project file.
-      - name: modified
+      - name: dirty
         type: bool
-        description: Whether the project was modified since the last save.
+        description: Whether the project has unsaved changes (i.e. its undo stack is not clean).
       - name: sheets
         type: array
         items: SchematicSummary
@@ -245,7 +245,19 @@ structs:
 # Enums. Values are transferred as strings (exactly as listed below).
 # ---------------------------------------------------------------------------
 
-enums: []
+enums:
+  - name: BackupRestoreMode
+    values:
+      - name: Abort
+        description: >-
+          Do not attempt to open a file which has an auto-save backup. Abort
+          with an error instead.
+      - name: Discard
+        description: >-
+          Discard the backup, restore and load the last saved state.
+      - name: Restore
+        description: >-
+          Restore the auto-save backup, if available.
 
 # ---------------------------------------------------------------------------
 # Classes with their methods. The full method name on the wire is
@@ -279,6 +291,13 @@ classes:
           - name: path
             type: string
             description: The absolute path of the project file (*.lpp or *.lppz).
+          - name: backup
+            type: BackupRestoreMode
+            default: Abort
+            description: >-
+              If the project directory contains an auto-save backup (i.e. the
+              application crashed while the project was open and had unsaved
+              modifications), this flag specifies how to proceed in that case.
         result: ProjectSummary
         since: "2.2.0"
 
