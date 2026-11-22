@@ -29,6 +29,8 @@
 
 #include <QtCore>
 
+#include <optional>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -62,6 +64,15 @@ namespace editor {
  *       destroyed. Since the request is created and also destroyed on the
  *       GUI thread, Qt's thread affinity rules are fulfilled.
  */
+// Traits for enum types, generated in rpc/api/rpctypes.h (specialized
+// per enum of the specification). See getArg<E>()/tryGetArg<E>() below.
+template <typename T>
+struct RpcEnumTraits;
+
+/*******************************************************************************
+ *  Class RpcRequest
+ ******************************************************************************/
+
 class RpcRequest final : public QObject {
   Q_OBJECT
 
@@ -102,6 +113,43 @@ public:
   QVariant getArg(const QString& key,
                   const QVariant& defaultValue = QVariant()) const noexcept {
     return mArgs.value(key, defaultValue);
+  }
+
+  /**
+   * @brief Read an enum value from a request argument
+   *
+   * Returns the default value of the enum (from the specification) if the
+   * argument is not provided.
+   *
+   * @throws RpcInvalidArgs  If the argument is provided but is not nil or
+   *                         a valid enum value.
+   */
+  template <typename E>
+  E getArg(const QString& argName) const {
+    return tryGetArg<E>(argName).value_or(RpcEnumTraits<E>::defaultValue);
+  }
+
+  /**
+   * @brief Read an optional enum value from a request argument
+   *
+   * @return std::nullopt if the argument is not provided at all.
+   *
+   * @throws RpcInvalidArgs  If the argument is provided but is nil or not
+   *                         a valid enum value.
+   */
+  template <typename E>
+  std::optional<E> tryGetArg(const QString& argName) const {
+    if (!mArgs.contains(argName)) {
+      return std::nullopt;  // Argument not provided.
+    }
+    const QVariant value = getArg(argName);
+    if (auto v = RpcEnumTraits<E>::fromString(value.toString())) {
+      return v;
+    }
+    // Nil or an unknown string are invalid values (an explicit nil is a
+    // client bug, not an implicit default).
+    RpcEnumTraits<E>::throwInvalid(value.isNull() ? "nil" : value.toString(),
+                                   argName);
   }
 
   /**

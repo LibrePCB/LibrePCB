@@ -884,6 +884,7 @@ add_library(
   rpc/api/projectrpc.cpp
   rpc/api/projectrpc.h
   rpc/api/rpcerrors.h
+  rpc/api/rpctypes.h
   rpc/api/undostackrpc.cpp
   rpc/api/undostackrpc.h
   rpc/api/workspacedbrpc.cpp

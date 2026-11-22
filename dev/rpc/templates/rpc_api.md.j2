@@ -54,9 +54,13 @@ This reference documents the commands (data types, error types, classes with the
 {{ enum.description }}
 
 {% endif %}
+{% if enum.get("default") %}
+**Default value:** `{{ enum["default"] }}`
+
+{% endif %}
 | Value | Description |
 |-------|-------------|
-{% for value in enum.values %}
+{% for value in enum.get("values") %}
 | `{{ value.name }}` | {{ value.description or "" }} |
 {% endfor %}
 

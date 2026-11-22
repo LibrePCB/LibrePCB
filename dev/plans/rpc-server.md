@@ -425,6 +425,12 @@ The C++ command surface is **generated from the spec** by `dev/rpc/gen.py`
   RpcRequest& request)` per spec method, with the spec description as doc comment. Static vs.
   non-static (`obj` handle) does not change the generated signature —
   handle extraction stays in the hand-written implementation.
+- One generated file `rpc/api/rpctypes.h`: the spec enums as C++ enum
+  classes, with generated argument readers
+  (per-enum traits with the string→value mapping, the default value and
+  the enum name — consumed by the generic request members
+  `getArg<E>(name)` / `tryGetArg<E>(name)`: nil → the enum's default
+  from the spec; invalid values throw `RpcInvalidArgs`).
 - One generated file `commands.cpp` (no header, 100% generated): defines
   the free function
   `void rpcDispatchCommand(GuiApplication& app, const QString& method,

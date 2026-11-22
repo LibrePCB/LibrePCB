@@ -19,6 +19,8 @@ templates from `dev/rpc/templates/`:
   implementations are hand-written in the corresponding .cpp files).
 - `libs/librepcb/editor/rpc/api/rpcerrors.h` — the error codes and one
   exception class per error code (the C++ error handling).
+- `libs/librepcb/editor/rpc/api/rpctypes.h` — the enum types with helpers
+  to read them from request arguments (`get`/`tryGet`).
 - `libs/librepcb/editor/rpc/commands.cpp` — the generated command
   dispatcher (see the RPC server documentation).
 
@@ -52,6 +54,7 @@ EDITOR_RPC_DIR = REPO_DIR / "libs" / "librepcb" / "editor" / "rpc"
 EDITOR_API_DIR = EDITOR_RPC_DIR / "api"
 COMMANDS_FILE = EDITOR_RPC_DIR / "commands.cpp"
 RPCERRORS_FILE = EDITOR_API_DIR / "rpcerrors.h"
+RPCTYPES_FILE = EDITOR_API_DIR / "rpctypes.h"
 
 ENUM_DOC = (
     "Error codes for the RPC protocol, as listed in the error types"
@@ -145,6 +148,11 @@ def main():
         spec=spec,
     ), encoding="utf-8")
     print(f"Generated {RPCERRORS_FILE}")
+
+    RPCTYPES_FILE.write_text(env.get_template("rpctypes.h.j2").render(
+        spec=spec,
+    ), encoding="utf-8")
+    print(f"Generated {RPCTYPES_FILE}")
 
     COMMANDS_FILE.write_text(env.get_template("commands.cpp.j2").render(
         spec=spec,

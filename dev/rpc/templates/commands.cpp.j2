@@ -33,10 +33,14 @@
 #include <QtCore>
 
 /*******************************************************************************
- *  Namespace
+ *  Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 namespace editor {
+
+class GuiApplication;
+class RpcObjectRegistry;
+class RpcRequest;
 
 /*******************************************************************************
  *  Command Dispatching

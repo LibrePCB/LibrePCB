@@ -247,6 +247,7 @@ structs:
 
 enums:
   - name: BackupRestoreMode
+    default: Abort
     values:
       - name: Abort
         description: >-

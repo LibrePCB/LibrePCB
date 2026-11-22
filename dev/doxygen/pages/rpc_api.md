@@ -89,6 +89,16 @@ The state of a project's undo stack.
 
 ---
 
+## BackupRestoreMode (Enum) {#doc_rpc_api_type_BackupRestoreMode}
+**Default value:** `Abort`
+
+| Value | Description |
+|-------|-------------|
+| `Abort` | Do not attempt to open a file which has an auto-save backup. Abort with an error instead. |
+| `Discard` | Discard the backup, restore and load the last saved state. |
+| `Restore` | Restore the auto-save backup, if available. |
+
+---
 # Error Types {#doc_rpc_api_errors}
 
 The `error` element of a response is a map with the keys `code` and `message` (and possibly additional properties, listed below):
@@ -171,6 +181,7 @@ Open a project by file path. If the project is already open, nothing is changed 
 | Name | Type | Description |
 |------|------|-------------|
 | `path` | string | The absolute path of the project file (*.lpp or *.lppz). |
+| `backup` | BackupRestoreMode | If the project directory contains an auto-save backup (i.e. the application crashed while the project was open and had unsaved modifications), this flag specifies how to proceed in that case. |
 
 **Result:** `ProjectSummary`
 

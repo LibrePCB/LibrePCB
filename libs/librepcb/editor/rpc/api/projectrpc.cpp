@@ -28,6 +28,7 @@
 #include "../rpcobjectregistry.h"
 #include "../rpcrequest.h"
 #include "rpcerrors.h"
+#include "rpctypes.h"
 
 #include <librepcb/core/fileio/filepath.h>
 #include <librepcb/core/project/board/board.h>
@@ -102,10 +103,19 @@ void ProjectRpc::list(GuiApplication& app, RpcObjectRegistry& registry,
 void ProjectRpc::open(GuiApplication& app, RpcObjectRegistry& registry,
                       RpcRequest& request) {
   const FilePath fp(request.getArg("path").toString());
-  auto askForRestoringBackup = [](const FilePath&) {
-    return false;
+  const BackupRestoreMode backup = request.getArg<BackupRestoreMode>("backup");
+  auto askForRestoringBackup = [&backup](const FilePath&) {
+    switch (backup) {
+      case BackupRestoreMode::Restore:
+        return true;
+      case BackupRestoreMode::Discard:
+        return false;
+      case BackupRestoreMode::Abort:
+        throw RpcCommandFailed(
+            "The project directory contains an auto-save backup.");
+    }
+    Q_UNREACHABLE();
   };
-
   auto editor = app.openProjectNonInteractive(fp, askForRestoringBackup);
   if (!editor) {
     throw RpcInternalError();
