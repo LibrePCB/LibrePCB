@@ -881,19 +881,19 @@ add_library(
   project/schematic/symbolinstancepropertiesdialog.cpp
   project/schematic/symbolinstancepropertiesdialog.h
   project/schematic/symbolinstancepropertiesdialog.ui
+  rpc/api/projectrpc.cpp
+  rpc/api/projectrpc.h
+  rpc/api/rpcerrors.h
+  rpc/api/undostackrpc.cpp
+  rpc/api/undostackrpc.h
+  rpc/api/workspacedbrpc.cpp
+  rpc/api/workspacedbrpc.h
   rpc/commands.cpp
-  rpc/projectrpc.cpp
-  rpc/projectrpc.h
   rpc/rpcerror.h
-  rpc/rpcerrors.h
   rpc/rpcrequest.cpp
   rpc/rpcrequest.h
   rpc/rpcserver.cpp
   rpc/rpcserver.h
-  rpc/undostackrpc.cpp
-  rpc/undostackrpc.h
-  rpc/workspacedbrpc.cpp
-  rpc/workspacedbrpc.h
   rulecheck/rulecheckmessagesmodel.cpp
   rulecheck/rulecheckmessagesmodel.h
   undocommand.cpp

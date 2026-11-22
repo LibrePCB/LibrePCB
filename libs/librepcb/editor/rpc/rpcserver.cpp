@@ -25,7 +25,7 @@
 #include "../guiapplication.h"
 #include "../notification.h"
 #include "../notificationsmodel.h"
-#include "rpcerrors.h"
+#include "api/rpcerrors.h"
 
 #include <librepcb/core/application.h>
 #include <librepcb/core/exceptions.h>

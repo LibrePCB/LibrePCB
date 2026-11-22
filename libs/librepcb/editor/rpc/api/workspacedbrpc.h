@@ -49,6 +49,7 @@ public:
   WorkspaceDbRpc() = delete;
 
   // General Methods
+
   /**
    * @brief Watch the library database: While the request is pending, request
    *        messages (type 3) about library scans are sent, with the payload

@@ -25,9 +25,9 @@
  *  Includes
  ******************************************************************************/
 {% for cls in spec.classes %}
-#include "{{ cls.name | lower }}rpc.h"
+#include "api/{{ cls.name | lower }}rpc.h"
 {% endfor %}
-#include "rpcerrors.h"
+#include "api/rpcerrors.h"
 #include "rpcrequest.h"
 
 #include <QtCore>

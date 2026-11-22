@@ -20,18 +20,16 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "projectrpc.h"
+#include "undostackrpc.h"
 
-#include "../guiapplication.h"
-#include "../project/projecteditor.h"
-#include "../undostack.h"
+#include "../../guiapplication.h"
+#include "../../project/projecteditor.h"
+#include "../../undostack.h"
+#include "../rpcrequest.h"
 #include "rpcerrors.h"
-#include "rpcrequest.h"
 
-#include <librepcb/core/fileio/filepath.h>
-#include <librepcb/core/project/board/board.h>
+#include <librepcb/core/exceptions.h>
 #include <librepcb/core/project/project.h>
-#include <librepcb/core/project/schematic/schematic.h>
 #include <librepcb/core/types/uuid.h>
 
 /*******************************************************************************
@@ -44,16 +42,13 @@ namespace editor {
  *  Local Functions
  ******************************************************************************/
 
-static QVariantMap projectToVariant(ProjectEditor& editor) {
-  const Project& project = editor.getProject();
+static QVariantMap undoStackToVariant(const UndoStack& stack) {
   QVariantMap map;
-  map.insert("obj", project.getUuid().toStr());
-  map.insert("uuid", project.getUuid().toStr());
-  map.insert("name", *project.getName());
-  map.insert("author", project.getAuthor());
-  map.insert("version", *project.getVersion());
-  map.insert("path", project.getFilepath().toStr());
-  map.insert("modified", !editor.getUndoStack().isClean());
+  map.insert("canUndo", stack.canUndo());
+  map.insert("canRedo", stack.canRedo());
+  map.insert("undoText", stack.getUndoCmdText());
+  map.insert("redoText", stack.getRedoCmdText());
+  map.insert("clean", stack.isClean());
   return map;
 }
 
@@ -72,49 +67,21 @@ static ProjectEditor& findProject(GuiApplication& app, RpcRequest& request) {
  *  Command Handlers
  ******************************************************************************/
 
-void ProjectRpc::list(GuiApplication& app, RpcRequest& request) {
-  QVariantList projects;
-  for (const auto& editor : app.getProjects()) {
-    projects.append(QVariant(projectToVariant(*editor)));
-  }
-  QVariantMap result;
-  result.insert("projects", projects);
-  request.sendSuccess(result);
-}
-
-void ProjectRpc::open(GuiApplication& app, RpcRequest& request) {
-  const FilePath fp(request.getArg("path").toString());
-  if (!fp.isExistingFile()) {
-    throw RpcCommandFailed("The project file does not exist.");
-  }
-  auto editor = app.openProject(fp, nullptr);
-  if (!editor) {
-    throw RpcCommandFailed("Could not open the project.");
-  }
-  request.sendSuccess(projectToVariant(*editor));
-}
-
-void ProjectRpc::get(GuiApplication& app, RpcRequest& request) {
+void UndoStackRpc::get_status(GuiApplication& app, RpcRequest& request) {
   ProjectEditor& editor = findProject(app, request);
-  QVariantMap result = projectToVariant(editor);
-  const Project& project = editor.getProject();
-  QVariantList sheets;
-  for (const Schematic* schematic : project.getSchematics()) {
-    QVariantMap sheet;
-    sheet.insert("uuid", schematic->getUuid().toStr());
-    sheet.insert("name", *schematic->getName());
-    sheets.append(QVariant(sheet));
-  }
-  result.insert("sheets", sheets);
-  QVariantList boards;
-  for (const Board* board : project.getBoards()) {
-    QVariantMap item;
-    item.insert("uuid", board->getUuid().toStr());
-    item.insert("name", *board->getName());
-    boards.append(QVariant(item));
-  }
-  result.insert("boards", boards);
-  request.sendSuccess(result);
+  request.sendSuccess(undoStackToVariant(editor.getUndoStack()));
+}
+
+void UndoStackRpc::undo(GuiApplication& app, RpcRequest& request) {
+  ProjectEditor& editor = findProject(app, request);
+  editor.getUndoStack().undo();  // Can throw.
+  request.sendSuccess(undoStackToVariant(editor.getUndoStack()));
+}
+
+void UndoStackRpc::redo(GuiApplication& app, RpcRequest& request) {
+  ProjectEditor& editor = findProject(app, request);
+  editor.getUndoStack().redo();  // Can throw.
+  request.sendSuccess(undoStackToVariant(editor.getUndoStack()));
 }
 
 /*******************************************************************************

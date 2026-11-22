@@ -24,10 +24,11 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "projectrpc.h"
-#include "rpcerrors.h"
-#include "undostackrpc.h"
-#include "workspacedbrpc.h"
+#include "api/projectrpc.h"
+#include "api/rpcerrors.h"
+#include "api/undostackrpc.h"
+#include "api/workspacedbrpc.h"
+#include "rpcrequest.h"
 
 #include <QtCore>
 
@@ -53,11 +54,11 @@ void rpcDispatchCommand(GuiApplication& app, const QString& method,
       {"UndoStack.redo", &UndoStackRpc::redo},
       {"WorkspaceDb.watch", &WorkspaceDbRpc::watch},
   };
-  if (auto cmd = commands.value(method, nullptr)) {
-    (*cmd)(app, request);
-  } else {
+  const auto it = commands.constFind(method);
+  if (it == commands.constEnd()) {
     throw RpcMethodNotFound(method);
   }
+  (*it)(app, request);
 }
 
 /*******************************************************************************

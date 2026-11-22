@@ -14,10 +14,10 @@ templates from `dev/rpc/templates/`:
 - `libs/librepcb/rust-core/src/rpc_server/rpc_api.rs` — generated Rust
   code. For now it contains only the error codes with their canonical
   messages; more parts of the API may follow later.
-- `libs/librepcb/editor/rpc/{classname}rpc.h` — the C++ command
+- `libs/librepcb/editor/rpc/api/{classname}rpc.h` — the C++ command
   declarations, one static-only class per spec class (the method
   implementations are hand-written in the corresponding .cpp files).
-- `libs/librepcb/editor/rpc/rpcerrors.h` — the error codes and one
+- `libs/librepcb/editor/rpc/api/rpcerrors.h` — the error codes and one
   exception class per error code (the C++ error handling).
 - `libs/librepcb/editor/rpc/commands.cpp` — the generated command
   dispatcher (see the RPC server documentation).
@@ -49,8 +49,9 @@ TEMPLATES_DIR = DIR / "templates"
 DOCS_FILE = REPO_DIR / "dev" / "doxygen" / "pages" / "rpc_api.md"
 RUST_FILE = REPO_DIR / "libs" / "librepcb" / "rust-core" / "src" / "rpc_server" / "rpc_api.rs"
 EDITOR_RPC_DIR = REPO_DIR / "libs" / "librepcb" / "editor" / "rpc"
+EDITOR_API_DIR = EDITOR_RPC_DIR / "api"
 COMMANDS_FILE = EDITOR_RPC_DIR / "commands.cpp"
-RPCERRORS_FILE = EDITOR_RPC_DIR / "rpcerrors.h"
+RPCERRORS_FILE = EDITOR_API_DIR / "rpcerrors.h"
 
 ENUM_DOC = (
     "Error codes for the RPC protocol, as listed in the error types"
@@ -132,7 +133,7 @@ def main():
     print(f"Generated {RUST_FILE}")
 
     for cls in spec.get("classes", []):
-        path = EDITOR_RPC_DIR / f"{cls['name'].lower()}rpc.h"
+        path = EDITOR_API_DIR / f"{cls['name'].lower()}rpc.h"
         path.write_text(env.get_template("command_class.h.j2").render(
             class_name=cls["name"],
             class_description=re.sub(r"\s+", " ", cls.get("description", "")),

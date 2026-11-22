@@ -22,8 +22,8 @@
 // the specification. The method implementations are hand-written in the
 // corresponding .cpp file.
 
-#ifndef LIBREPCB_EDITOR_UNDOSTACKRPC_H
-#define LIBREPCB_EDITOR_UNDOSTACKRPC_H
+#ifndef LIBREPCB_EDITOR_PROJECTRPC_H
+#define LIBREPCB_EDITOR_PROJECTRPC_H
 
 /*******************************************************************************
  *  Forward Declarations
@@ -35,35 +35,37 @@ class GuiApplication;
 class RpcRequest;
 
 /*******************************************************************************
- *  Class UndoStackRpc
+ *  Class ProjectRpc
  ******************************************************************************/
 
 /**
- * @brief The UndoStack RPC API (see the RPC server documentation)
+ * @brief The Project RPC API (see the RPC server documentation)
  *
- * The undo stack of an open project.
+ * A project opened in the application.
  */
-class UndoStackRpc final {
+class ProjectRpc final {
 public:
   // Constructors / Destructor
-  UndoStackRpc() = delete;
+  ProjectRpc() = delete;
 
   // General Methods
+
   /**
-   * @brief Get the state of the project's undo stack.
+   * @brief List all open projects.
    */
-  static void get_status(GuiApplication& app, RpcRequest& request);
+  static void list(GuiApplication& app, RpcRequest& request);
+
   /**
-   * @brief Undo the last command of the project's undo stack, i.e. the same
-   *        as pressing Ctrl+Z in the GUI. The command stays on the redo
-   *        stack, so the user can redo it in the GUI.
+   * @brief Open a project by file path. If the project is already open,
+   *        nothing is changed and the summary of the already open project is
+   *        returned.
    */
-  static void undo(GuiApplication& app, RpcRequest& request);
+  static void open(GuiApplication& app, RpcRequest& request);
+
   /**
-   * @brief Redo the last undone command of the project's undo stack, i.e. the
-   *        same as pressing Ctrl+Shift+Z in the GUI.
+   * @brief Get details about an open project.
    */
-  static void redo(GuiApplication& app, RpcRequest& request);
+  static void get(GuiApplication& app, RpcRequest& request);
 };
 
 /*******************************************************************************

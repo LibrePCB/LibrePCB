@@ -49,7 +49,11 @@ public:
   {{ class_name }}Rpc() = delete;
 
   // General Methods
+
 {% for method in rpc_class.methods %}
+{% if not loop.first %}
+
+{% endif %}
   /**
    * @brief {{ method.description | cpp_brief }}
    */
