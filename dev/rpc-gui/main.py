@@ -1,42 +1,33 @@
+"""LibrePCB RPC GUI — a manual testing tool for the RPC server.
+
+The window consists of a connection toolbar, a sidebar with the RPC
+classes (generated list, see api.py), the page of the selected class and
+a log. The logic per class lives in pages/*.py, one module per page.
+"""
+
 import queue
-import socket
-import threading
+import time
 from datetime import timedelta
 
 import slint
-import umsgpack
 
-PORT = 19536
+import api
+from client import RpcClient, fmt_value
+from pages.protocol import ProtocolPage
+from pages.project_editor import ProjectEditorPage
+from pages.undo_stack import UndoStackPage
+from pages.remote_library import RemoteLibraryPage
+from pages.workspace_db import WorkspaceDbPage
 
-
-class RpcClient:
-    def __init__(self):
-        self.sock = socket.create_connection(("127.0.0.1", PORT))
-        self.file = self.sock.makefile("rb")
-        self.msgid = 0
-        self.pending_msgid = None
-        self.responses = queue.Queue()
-        threading.Thread(target=self.read_loop, daemon=True).start()
-
-    def read_loop(self):
-        while True:
-            try:
-                msg = umsgpack.unpack(self.file)
-            except Exception:
-                msg = None
-            self.responses.put(msg)
-            if msg is None:
-                break
-
-    def call(self, method, params):
-        self.msgid += 1
-        msgid = self.msgid
-        self.sock.sendall(umsgpack.packb([0, msgid, method, params]))
-        return msgid
-
-    def cancel(self, msgid):
-        self.sock.sendall(umsgpack.packb([4, msgid]))
-
+# The page index for each class of api.CLASSES (unknown classes get the
+# "no page yet" placeholder).
+PAGES = {
+    "Protocol": 0,
+    "ProjectEditor": 1,
+    "UndoStack": 2,
+    "RemoteLibrary": 3,
+    "WorkspaceDb": 4,
+}
 
 ns = slint.load_file("app.slint")
 
@@ -44,28 +35,41 @@ ns = slint.load_file("app.slint")
 class Gui(ns.AppWindow):
     def __init__(self):
         super().__init__()
+        self.classes = slint.ListModel(api.CLASSES)
+        self.current_page = PAGES["ProjectEditor"]
+        self.client = None
         self._log_lines = []
         self.log = ""
-        self._project_handles = []
-        self.client = None
+        self.projects = slint.ListModel([])
+        self.libraries = slint.ListModel([])
+        self._pages = {
+            "Protocol": ProtocolPage(self),
+            "ProjectEditor": ProjectEditorPage(self),
+            "UndoStack": UndoStackPage(self),
+            "RemoteLibrary": RemoteLibraryPage(self),
+            "WorkspaceDb": WorkspaceDbPage(self),
+        }
         self.timer = slint.Timer()
         self.timer.start(
             slint.TimerMode.Repeated, timedelta(milliseconds=50), self.poll
         )
 
+    # --- Toolbar -----------------------------------------------------------
+
     @slint.callback
     def connect_clicked(self):
         if self.client:
-            self.client.sock.close()
+            self.client.close()
             self.client = None
             self.connected = False
+            self.authenticated = False
             self.pending = False
             self._log("Disconnected.")
             return
         try:
             self.client = RpcClient()
             self.connected = True
-            self._log("Connected.")
+            self._log("Connected. Now initialize to authenticate.")
         except OSError as e:
             self._log(f"Connection failed: {e}")
 
@@ -85,104 +89,145 @@ class Gui(ns.AppWindow):
         if token:
             params["token"] = token
         try:
-            self.client.pending_msgid = self.client.call("initialize", params)
+            self.client.pending_msgid = self.client.call(
+                "initialize", params
+            )
             self.pending = True
         except OSError as e:
-            self._log(f"Connection failed: {e}")
+            self._log(f"Send failed: {e}")
 
     @slint.callback
-    def open_project(self):
-        if not self.client:
-            return
-        path = self.project_path.strip()
-        if not path:
-            self._log("No project path given.")
-            return
-        try:
-            self.client.call("ProjectEditor.open", {"path": path})
-        except OSError as e:
-            self._log(f"Connection failed: {e}")
+    def select_class(self, index):
+        self.current_page = PAGES.get(api.CLASSES[index], -1)
+
+    # --- Protocol page ----------------------------------------------------
 
     @slint.callback
-    def list_projects(self):
-        if not self.client:
-            return
-        try:
-            self.client.call("ProjectEditor.list", {})
-        except OSError as e:
-            self._log(f"Connection failed: {e}")
+    def ping_clicked(self):
+        self._pages["Protocol"].ping_clicked()
+
+    # --- ProjectEditor page -----------------------------------------------
 
     @slint.callback
-    def close_project(self, index):
-        if not self.client:
-            return
-        try:
-            obj = self._project_handles[index]
-        except IndexError:
-            return
-        try:
-            self.client.call("ProjectEditor.close", {"obj": obj})
-        except OSError as e:
-            self._log(f"Connection failed: {e}")
+    def pe_open_clicked(self):
+        self._pages["ProjectEditor"].open_clicked()
 
     @slint.callback
-    def watch_clicked(self):
+    def pe_list_clicked(self):
+        self._pages["ProjectEditor"].list_clicked()
+
+    @slint.callback
+    def pe_get_clicked(self, index):
+        self._pages["ProjectEditor"].get_clicked(index)
+
+    @slint.callback
+    def pe_save_clicked(self, index):
+        self._pages["ProjectEditor"].save_clicked(index)
+
+    @slint.callback
+    def pe_close_clicked(self, index):
+        self._pages["ProjectEditor"].close_clicked(index)
+
+    # --- UndoStack page ----------------------------------------------------
+
+    @slint.callback
+    def undo_get_clicked(self):
+        self._pages["UndoStack"].get_clicked()
+
+    @slint.callback
+    def undo_undo_clicked(self):
+        self._pages["UndoStack"].undo_clicked()
+
+    @slint.callback
+    def undo_redo_clicked(self):
+        self._pages["UndoStack"].redo_clicked()
+
+    # --- RemoteLibrary page ------------------------------------------------
+
+    @slint.callback
+    def rl_list_clicked(self):
+        self._pages["RemoteLibrary"].list_clicked()
+
+    @slint.callback
+    def rl_check_toggled(self, index, checked):
+        self._pages["RemoteLibrary"].check_toggled(index, checked)
+
+    @slint.callback
+    def rl_install_clicked(self):
+        self._pages["RemoteLibrary"].install_clicked()
+
+    @slint.callback
+    def rl_uninstall_clicked(self):
+        self._pages["RemoteLibrary"].uninstall_clicked()
+
+    @slint.callback
+    def rl_get_clicked(self, index):
+        self._pages["RemoteLibrary"].get_clicked(index)
+
+    # --- WorkspaceDb page --------------------------------------------------
+
+    @slint.callback
+    def db_wait_clicked(self):
+        self._pages["WorkspaceDb"].wait_clicked()
+
+    # --- RPC plumbing --------------------------------------------------------
+
+    def call(self, method, params, handler=None):
+        """Send a request (only if connected). The response is routed to
+        the handler and logged either way."""
         if not self.client:
             return
         try:
-            self.client.call("WorkspaceDb.watch", {})
+            self.client.call(method, params, handler)
         except OSError as e:
-            self._log(f"Connection failed: {e}")
-
-    def _log(self, msg):
-        self._log_lines.append(msg)
-        self._log_lines = self._log_lines[-100:]
-        self.log = "\n".join(self._log_lines)
+            self._log(f"Send failed: {e}")
+        else:
+            self._log(f"→ {method}")
 
     def poll(self):
         if not self.client:
             return
         while True:
             try:
-                msg = self.client.responses.get_nowait()
+                msg = self.client.received.get_nowait()
             except queue.Empty:
                 return
             if msg is None:
                 self.client = None
                 self.connected = False
+                self.authenticated = False
                 self.pending = False
                 self._log("Connection closed.")
                 return
             if isinstance(msg, list) and len(msg) == 3 and msg[0] == 3:
-                payload = msg[2]
-                self.progress = payload.get("progress", 0) * 100
-                self._log(f"Progress: {self.progress}%")
+                self.progress = msg[2].get("progress", 0) * 100
                 continue
             if isinstance(msg, list) and len(msg) == 4 and msg[0] == 1:
-                msgid, error, result = msg[1], msg[2], msg[3]
-                if msgid == self.client.pending_msgid:
-                    self.client.pending_msgid = None
-                    self.pending = False
-                if error is None:
-                    self._log(f"Result: {result}")
-                    if 'projects' in result:
-                        self._project_handles = [
-                            project['obj'] for project in result['projects']
-                        ]
-                        self.projects = slint.ListModel([
-                            {
-                                'name': project['name'],
-                                'path': project['path'],
-                                'dirty': project['dirty'],
-                            }
-                            for project in result['projects']
-                        ])
-                    if 'token' in result:
-                        self.token = str(result['token'])
-                else:
-                    self._log(
-                        f"Error {error.get('code')}: {error.get('message')}"
-                    )
+                self._handle_response(msg[1], msg[2], msg[3])
+            elif isinstance(msg, list) and len(msg) == 3 and msg[0] == 2:
+                self._log(f"⇐ notification: {fmt_value(msg[2])}")
+
+    def _handle_response(self, msgid, error, result):
+        method, handler = self.client.handlers.pop(msgid, (None, None))
+        if msgid == self.client.pending_msgid:
+            # The initialize reply (success/error) (un-)authenticates.
+            self.client.pending_msgid = None
+            self.pending = False
+            self.authenticated = error is None
+            if error is None and "token" in result:
+                self.token = str(result["token"])
+        if error is None:
+            self._log(f"← {method}: {fmt_value(result)}")
+        else:
+            self._log(f"← ⚠ {method}: {error.get('code')} {error.get('message')}")
+        if handler:
+            handler(error, result)
+
+    def _log(self, text):
+        line = f"{time.strftime('%H:%M:%S')}  {text}"
+        self._log_lines.append(line)
+        self._log_lines = self._log_lines[-200:]
+        self.log = "\n".join(self._log_lines)
 
 
 if __name__ == "__main__":

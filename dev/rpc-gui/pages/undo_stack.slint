@@ -1,0 +1,49 @@
+import { Button, LineEdit, TextEdit } from "std-widgets.slint";
+
+export component UndoStackPage {
+    in property <bool> authenticated;
+    in-out property <string> handle;
+    in property <string> details;
+    callback get-clicked();
+    callback undo-clicked();
+    callback redo-clicked();
+
+    VerticalLayout {
+        alignment: start;
+        spacing: 6px;
+
+        LineEdit {
+            text <=> root.handle;
+            placeholder-text: "Object Handle (auto-filled by ProjectEditor)";
+        }
+
+        HorizontalLayout {
+            spacing: 6px;
+
+            Button {
+                text: "Get";
+                enabled: root.authenticated && root.handle != "";
+                clicked => { root.get-clicked(); }
+            }
+
+            Button {
+                text: "Undo";
+                enabled: root.authenticated && root.handle != "";
+                clicked => { root.undo-clicked(); }
+            }
+
+            Button {
+                text: "Redo";
+                enabled: root.authenticated && root.handle != "";
+                clicked => { root.redo-clicked(); }
+            }
+        }
+
+        TextEdit {
+            text: root.details;
+            read-only: true;
+            font-family: "DejaVu Sans Mono";
+            font-size: 12px;
+        }
+    }
+}

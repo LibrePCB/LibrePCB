@@ -1,0 +1,16 @@
+import { Button } from "std-widgets.slint";
+
+export component ProtocolPage {
+    in property <bool> authenticated;
+    callback ping-clicked();
+
+    VerticalLayout {
+        alignment: start;
+
+        Button {
+            text: "Ping";
+            enabled: root.authenticated;
+            clicked => { root.ping-clicked(); }
+        }
+    }
+}

@@ -1,0 +1,23 @@
+import { Button, ProgressIndicator } from "std-widgets.slint";
+
+export component WorkspaceDbPage {
+    in property <bool> authenticated;
+    in property <int> progress;
+    callback wait-clicked();
+
+    VerticalLayout {
+        alignment: start;
+        spacing: 12px;
+
+        Button {
+            text: "Wait For Library Scan";
+            enabled: root.authenticated;
+            clicked => { root.wait-clicked(); }
+        }
+
+        ProgressIndicator {
+            progress: root.progress / 100;
+            visible: root.progress > 0;
+        }
+    }
+}

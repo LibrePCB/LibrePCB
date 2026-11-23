@@ -56,6 +56,7 @@ CMAKELISTS_FILE = REPO_DIR / "libs" / "librepcb" / "editor" / "CMakeLists.txt"
 COMMANDS_FILE = EDITOR_API_DIR / "commands.cpp"
 RPCERRORS_FILE = EDITOR_API_DIR / "rpcerrors.h"
 RPCTYPES_FILE = EDITOR_API_DIR / "rpctypes.h"
+RPCGUI_API_FILE = REPO_DIR / "dev" / "rpc-gui" / "api.py"
 
 CPP_STUB = """/*
  * LibrePCB - Professional EDA for everyone!
@@ -235,6 +236,11 @@ def main():
         spec=spec,
     ), encoding="utf-8")
     print(f"Generated {COMMANDS_FILE}")
+
+    RPCGUI_API_FILE.write_text(env.get_template("api.py.j2").render(
+        spec=spec,
+    ), encoding="utf-8")
+    print(f"Generated {RPCGUI_API_FILE}")
     return 0
 
 

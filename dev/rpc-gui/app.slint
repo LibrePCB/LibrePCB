@@ -1,143 +1,195 @@
 import {
     Button,
     LineEdit,
-    ProgressIndicator,
     Spinner,
-    VerticalBox,
-    HorizontalBox,
     TextEdit,
-    ListView,
 } from "std-widgets.slint";
-
-struct ProjectData {
-    name: string,
-    path: string,
-    dirty: bool,
-}
+import { ProtocolPage } from "pages/protocol.slint";
+import {
+    ProjectEditorPage,
+    ProjectRowData,
+} from "pages/project_editor.slint";
+import { UndoStackPage } from "pages/undo_stack.slint";
+import {
+    RemoteLibraryPage,
+    LibraryRowData,
+} from "pages/remote_library.slint";
+import { WorkspaceDbPage } from "pages/workspace_db.slint";
 
 export component AppWindow inherits Window {
     title: "LibrePCB RPC GUI";
-    preferred-width: 1024px;
+    preferred-width: 1100px;
     preferred-height: 800px;
 
+    // --- Connection state (toolbar) ---------------------------------------
     in property <bool> connected;
+    in property <bool> authenticated;
     in property <bool> pending;
     in-out property <string> token;
+
+    // --- Navigation (sidebar) ---------------------------------------------
+    in property <[string]> classes;
+    in property <int> current-page: -1;
+    callback select-class(int);
+
+    // --- Log (bottom) ------------------------------------------------------
+    in property <string> log;
+
+    // --- Protocol page ----------------------------------------------------
+    callback ping-clicked();
+
+    // --- ProjectEditor page -----------------------------------------------
     in-out property <string> project-path;
-    in property <string> log: "Foo\nBar";
+    in property <[ProjectRowData]> projects;
+    in property <string> project-details;
+    callback pe-open-clicked();
+    callback pe-list-clicked();
+    callback pe-get-clicked(int);
+    callback pe-save-clicked(int);
+    callback pe-close-clicked(int);
+
+    // --- UndoStack page ----------------------------------------------------
+    in-out property <string> undo-handle;
+    in property <string> undo-details;
+    callback undo-get-clicked();
+    callback undo-undo-clicked();
+    callback undo-redo-clicked();
+
+    // --- RemoteLibrary page ------------------------------------------------
+    in property <[LibraryRowData]> libraries;
+    in property <string> library-details;
+    callback rl-list-clicked();
+    callback rl-check-toggled(int, bool);
+    callback rl-install-clicked();
+    callback rl-uninstall-clicked();
+    callback rl-get-clicked(int);
+
+    // --- WorkspaceDb page --------------------------------------------------
     in property <int> progress;
-    in property <[ProjectData]> projects;
+    callback db-wait-clicked();
 
-    callback connect_clicked();
-    callback init_clicked();
-    callback open_project();
-    callback watch_clicked();
-    callback list_projects();
-    callback close_project(int);
+    // --- Toolbar callbacks ---------------------------------------------------
+    callback connect-clicked();
+    callback init-clicked();
 
-    VerticalBox {
-        HorizontalBox {
-            Button {
-                text: root.connected ? "Disconnect" : "Connect";
-                clicked => { root.connect_clicked(); }
-            }
+    HorizontalLayout {
+        // Sidebar with the class list.
+        VerticalLayout {
+            width: 170px;
+            padding: 8px;
+            spacing: 4px;
+            alignment: start;
 
-            LineEdit {
-                text <=> root.token;
-                placeholder-text: "Access Token";
-            }
-
-            Button {
-                text: root.pending ? "Cancel" : "Initialize";
-                enabled: root.connected;
-                clicked => { root.init_clicked(); }
-            }
-
-            Spinner {
-                indeterminate: true;
-                visible: root.pending;
+            for class-name[i] in root.classes: Button {
+                text: class-name;
+                primary: i == root.current-page;
+                clicked => { root.select-class(i); }
             }
         }
 
-        HorizontalBox {
-            LineEdit {
-                horizontal-stretch: 1;
-                text <=> root.project-path;
-                placeholder-text: "Project File Path";
-            }
+        VerticalLayout {
+            // Toolbar: connection state (left) and indicator (right).
+            HorizontalLayout {
+                padding: 8px;
+                spacing: 6px;
 
-            Button {
-                text: "Open Project";
-                enabled: root.connected;
-                clicked => { root.open_project(); }
-            }
-        }
+                Button {
+                    text: root.connected ? "Disconnect" : "Connect";
+                    clicked => { root.connect-clicked(); }
+                }
 
-        HorizontalBox {
-            Button {
-                text: "List Projects";
-                enabled: root.connected;
-                clicked => { root.list-projects(); }
-            }
-        }
+                LineEdit {
+                    text <=> root.token;
+                    placeholder-text: "Access Token";
+                    horizontal-stretch: 1;
+                }
 
-        ListView {
-            vertical-stretch: 2;
+                Button {
+                    text: root.pending ? "Cancel" : "Initialize";
+                    enabled: root.connected;
+                    clicked => { root.init-clicked(); }
+                }
 
-            for project[i] in root.projects: HorizontalLayout {
-                spacing: 8px;
+                Spinner {
+                    indeterminate: true;
+                    visible: root.pending;
+                }
 
                 VerticalLayout {
-                    horizontal-stretch: 1;
+                    alignment: center;
 
-                    Text {
-                        text: project.name;
-                        font-weight: 700;
-                    }
-
-                    Text {
-                        text: project.path;
-                        font-size: 10px;
-                        color: #808080;
-                        overflow: elide;
+                    Rectangle {
+                        width: 10px;
+                        height: 10px;
+                        border-radius: 5px;
+                        background: !root.connected ? #c04040
+                            : root.authenticated ? #40a040 : #e0a020;
                     }
                 }
 
                 Text {
-                    text: project.dirty ? "● dirty" : "";
-                    color: #d08000;
-                    font-size: 10px;
+                    text: !root.connected ? "Disconnected"
+                        : root.authenticated ? "Authenticated" : "Connected";
+                    color: !root.connected ? #c04040
+                        : root.authenticated ? #40a040 : #e0a020;
                     vertical-alignment: center;
                 }
+            }
 
-                Button {
-                    text: "✕";
-                    clicked => { root.close-project(i); }
+            // The page of the selected class.
+            if root.current-page == 0 : ProtocolPage {
+                authenticated: root.authenticated;
+                ping-clicked => { root.ping-clicked(); }
+            }
+            if root.current-page == 1 : ProjectEditorPage {
+                authenticated: root.authenticated;
+                path <=> root.project-path;
+                projects: root.projects;
+                details: root.project-details;
+                open-clicked => { root.pe-open-clicked(); }
+                list-clicked => { root.pe-list-clicked(); }
+                get-clicked(i) => { root.pe-get-clicked(i); }
+                save-clicked(i) => { root.pe-save-clicked(i); }
+                close-clicked(i) => { root.pe-close-clicked(i); }
+            }
+            if root.current-page == 2 : UndoStackPage {
+                authenticated: root.authenticated;
+                handle <=> root.undo-handle;
+                details: root.undo-details;
+                get-clicked => { root.undo-get-clicked(); }
+                undo-clicked => { root.undo-undo-clicked(); }
+                redo-clicked => { root.undo-redo-clicked(); }
+            }
+            if root.current-page == 3 : RemoteLibraryPage {
+                authenticated: root.authenticated;
+                libraries: root.libraries;
+                details: root.library-details;
+                list-clicked => { root.rl-list-clicked(); }
+                check-toggled(i, checked) => { root.rl-check-toggled(i, checked); }
+                install-clicked => { root.rl-install-clicked(); }
+                uninstall-clicked => { root.rl-uninstall-clicked(); }
+                get-clicked(i) => { root.rl-get-clicked(i); }
+            }
+            if root.current-page == 4 : WorkspaceDbPage {
+                authenticated: root.authenticated;
+                progress: root.progress;
+                wait-clicked => { root.db-wait-clicked(); }
+            }
+            if root.current-page < 0 : Text {
+                text: "No page for this class (yet).";
+                color: #808080;
+            }
+
+            // Log at the bottom.
+            TextEdit {
+                text: root.log;
+                read-only: true;
+                font-family: "DejaVu Sans Mono";
+                font-size: 12px;
+
+                changed text => {
+                    self.viewport-y = self.visible-height - self.viewport-height
                 }
-            }
-        }
-
-        HorizontalBox {
-            ProgressIndicator {
-                horizontal-stretch: 1;
-                progress: root.progress / 100;
-            }
-
-            Button {
-                text: "Watch Libraries";
-                enabled: root.connected;
-                clicked => { root.watch_clicked(); }
-            }
-        }
-
-        TextEdit {
-            text: log;
-            font-family: "DejaVu Sans Mono";
-            font-size: 12px;
-            read-only: true;
-
-            changed text => {
-                self.viewport-y = self.visible-height - self.viewport-height
             }
         }
     }

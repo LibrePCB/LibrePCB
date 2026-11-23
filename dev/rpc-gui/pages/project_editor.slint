@@ -1,0 +1,99 @@
+import { Button, LineEdit, ListView, TextEdit } from "std-widgets.slint";
+
+export struct ProjectRowData {
+    name: string,
+    path: string,
+    dirty: bool,
+}
+
+export component ProjectEditorPage {
+    in property <bool> authenticated;
+    in-out property <string> path;
+    in property <[ProjectRowData]> projects;
+    in property <string> details;
+    callback open-clicked();
+    callback list-clicked();
+    callback get-clicked(int);
+    callback save-clicked(int);
+    callback close-clicked(int);
+
+    VerticalLayout {
+        HorizontalLayout {
+            spacing: 6px;
+
+            LineEdit {
+                text <=> root.path;
+                placeholder-text: "Project File Path";
+                horizontal-stretch: 1;
+            }
+
+            Button {
+                text: "Open";
+                enabled: root.authenticated;
+                clicked => { root.open-clicked(); }
+            }
+
+            Button {
+                text: "List";
+                enabled: root.authenticated;
+                clicked => { root.list-clicked(); }
+            }
+        }
+
+        ListView {
+            vertical-stretch: 3;
+
+            for project[i] in root.projects: HorizontalLayout {
+                spacing: 6px;
+
+                VerticalLayout {
+                    horizontal-stretch: 1;
+
+                    Text {
+                        text: project.name;
+                        font-weight: 700;
+                    }
+
+                    Text {
+                        text: project.path;
+                        font-size: 10px;
+                        color: #808080;
+                        overflow: elide;
+                    }
+                }
+
+                Text {
+                    text: project.dirty ? "● dirty" : "";
+                    color: #d08000;
+                    font-size: 10px;
+                    vertical-alignment: center;
+                }
+
+                Button {
+                    text: "Get";
+                    enabled: root.authenticated;
+                    clicked => { root.get-clicked(i); }
+                }
+
+                Button {
+                    text: "Save";
+                    enabled: root.authenticated;
+                    clicked => { root.save-clicked(i); }
+                }
+
+                Button {
+                    text: "✕";
+                    enabled: root.authenticated;
+                    clicked => { root.close-clicked(i); }
+                }
+            }
+        }
+
+        TextEdit {
+            text: root.details;
+            read-only: true;
+            font-family: "DejaVu Sans Mono";
+            font-size: 12px;
+        }
+    }
+}
