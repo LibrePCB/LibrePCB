@@ -6,7 +6,14 @@ import {
     VerticalBox,
     HorizontalBox,
     TextEdit,
+    ListView,
 } from "std-widgets.slint";
+
+struct ProjectData {
+    name: string,
+    path: string,
+    dirty: bool,
+}
 
 export component AppWindow inherits Window {
     title: "LibrePCB RPC GUI";
@@ -19,11 +26,14 @@ export component AppWindow inherits Window {
     in-out property <string> project-path;
     in property <string> log: "Foo\nBar";
     in property <int> progress;
+    in property <[ProjectData]> projects;
 
     callback connect_clicked();
     callback init_clicked();
     callback open_project();
     callback watch_clicked();
+    callback list_projects();
+    callback close_project(int);
 
     VerticalBox {
         HorizontalBox {
@@ -60,6 +70,50 @@ export component AppWindow inherits Window {
                 text: "Open Project";
                 enabled: root.connected;
                 clicked => { root.open_project(); }
+            }
+        }
+
+        HorizontalBox {
+            Button {
+                text: "List Projects";
+                enabled: root.connected;
+                clicked => { root.list-projects(); }
+            }
+        }
+
+        ListView {
+            vertical-stretch: 2;
+
+            for project[i] in root.projects: HorizontalLayout {
+                spacing: 8px;
+
+                VerticalLayout {
+                    horizontal-stretch: 1;
+
+                    Text {
+                        text: project.name;
+                        font-weight: 700;
+                    }
+
+                    Text {
+                        text: project.path;
+                        font-size: 10px;
+                        color: #808080;
+                        overflow: elide;
+                    }
+                }
+
+                Text {
+                    text: project.dirty ? "● dirty" : "";
+                    color: #d08000;
+                    font-size: 10px;
+                    vertical-alignment: center;
+                }
+
+                Button {
+                    text: "✕";
+                    clicked => { root.close-project(i); }
+                }
             }
         }
 

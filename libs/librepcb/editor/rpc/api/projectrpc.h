@@ -57,7 +57,7 @@ public:
    * @brief List all open projects.
    */
   static void list(GuiApplication& app, RpcObjectRegistry& registry,
-                   RpcRequest& request);
+                      RpcRequest& request);
 
   /**
    * @brief Open a project by file path. If the project is already open,
@@ -65,13 +65,26 @@ public:
    *        returned.
    */
   static void open(GuiApplication& app, RpcObjectRegistry& registry,
-                   RpcRequest& request);
+                      RpcRequest& request);
 
   /**
    * @brief Get details about an open project.
    */
   static void get(GuiApplication& app, RpcObjectRegistry& registry,
-                  RpcRequest& request);
+                      RpcRequest& request);
+
+  /**
+   * @brief Save project to disk.
+   */
+  static void save(GuiApplication& app, RpcObjectRegistry& registry,
+                      RpcRequest& request);
+
+  /**
+   * @brief Close project. Attention: If there were unsaved changes in the
+   *        project, they will be discarded. Call `save` first, if desired.
+   */
+  static void close(GuiApplication& app, RpcObjectRegistry& registry,
+                      RpcRequest& request);
 };
 
 /*******************************************************************************

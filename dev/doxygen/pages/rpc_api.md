@@ -23,7 +23,7 @@ A summary of an open project.
 | `author` | string | The project author. |
 | `version` | string | The project version. |
 | `path` | string | The absolute path of the project file. |
-| `dirty` | bool | Whether the project has unsaved changes (i.e. its undo stack is not clean). |
+| `dirty` | bool | Whether the project has unsaved changes (i.e. its undo stack is not clean, or any manual, untracked changes have been made). |
 
 ---
 
@@ -35,7 +35,6 @@ Details about an open project.
 
 | Name | Type | Description |
 |------|------|-------------|
-| `obj` | handle | The opaque handle of the project (to be passed back in the "obj" key of requests targeting this project). |
 | `uuid` | string | The project UUID. |
 | `name` | string | The project name. |
 | `author` | string | The project author. |
@@ -73,19 +72,25 @@ A summary of a board.
 
 ---
 
-## UndoStackStatus {#doc_rpc_api_type_UndoStackStatus}
+## UndoStackDetails {#doc_rpc_api_type_UndoStackDetails}
 
-The state of a project's undo stack.
+The state of a document's undo stack.
 
 **Fields:**
 
 | Name | Type | Description |
 |------|------|-------------|
-| `canUndo` | bool | Whether undo is currently possible. |
-| `canRedo` | bool | Whether redo is currently possible. |
-| `undoText` | string | The text of the undo command (empty if N/A). |
-| `redoText` | string | The text of the redo command (empty if N/A). |
+| `id` | any | An opaque identifier which uniquely identifies the current state. This can be used for example to detect if there were any changes made between two different points in time. |
 | `clean` | bool | Whether the stack is in the clean state (the state of the last save). |
+| `prev` | string | nil | The text of the previously executed command, i.e. the command which will be reverted by `undo()`. If there is no command to undo, this is `nil`. |
+| `next` | string | nil | The text of the previously undone command, i.e. the command which will be executed by `redo()`. If there is no command to redo, this is `nil`. |
+
+---
+
+## WorkspaceDbDetails {#doc_rpc_api_type_WorkspaceDbDetails}
+
+Information about the workspace library database.
+
 
 ---
 
@@ -152,8 +157,6 @@ All commands below are dispatched to the application and executed on its GUI thr
 
 A project opened in the application.
 
-**Handle (obj):** An opaque object handle for the project (as embedded in the responses).
-
 ### Project.list {#doc_rpc_api_method_Project_list}
 
 List all open projects.
@@ -167,8 +170,6 @@ None.
 | Name | Type | Description |
 |------|------|-------------|
 | `projects` | array of ProjectSummary | All open projects, in the order of their editor tabs. |
-
-**Since:** 2.2.0
 
 ---
 
@@ -185,8 +186,6 @@ Open a project by file path. If the project is already open, nothing is changed 
 
 **Result:** `ProjectSummary`
 
-**Since:** 2.2.0
-
 ---
 
 ### Project.get {#doc_rpc_api_method_Project_get}
@@ -197,63 +196,131 @@ None.
 
 **Result:** `ProjectDetails`
 
-**Since:** 2.2.0
+---
+
+### Project.save {#doc_rpc_api_method_Project_save}
+
+Save project to disk.
+
+None.
+
+**Result:** `null`
+
+---
+
+### Project.close {#doc_rpc_api_method_Project_close}
+
+Close project. Attention: If there were unsaved changes in the project, they will be discarded. Call `save` first, if desired.
+
+None.
+
+**Result:** `null`
 
 ---
 
 ## Class UndoStack {#doc_rpc_api_class_UndoStack}
 
-The undo stack of an open project.
+The undo stack of an open document. The handle may point to a project or a library element.
 
-**Handle (obj):** An opaque object handle for the project whose undo stack to use (as embedded in the responses).
+### UndoStack.get {#doc_rpc_api_method_UndoStack_get}
 
-### UndoStack.get_status {#doc_rpc_api_method_UndoStack_get_status}
-
-Get the state of the project's undo stack.
+Get the state of the undo stack.
 
 None.
 
-**Result:** `UndoStackStatus`
-
-**Since:** 2.2.0
+**Result:** `UndoStackDetails`
 
 ---
 
 ### UndoStack.undo {#doc_rpc_api_method_UndoStack_undo}
 
-Undo the last command of the project's undo stack, i.e. the same as pressing Ctrl+Z in the GUI. The command stays on the redo stack, so the user can redo it in the GUI.
+Undo the last command, then return the new state. If there is nothing to undo, the command fails with an error.
 
 None.
 
-**Result:** `UndoStackStatus`
-
-**Since:** 2.2.0
+**Result:** `UndoStackDetails`
 
 ---
 
 ### UndoStack.redo {#doc_rpc_api_method_UndoStack_redo}
 
-Redo the last undone command of the project's undo stack, i.e. the same as pressing Ctrl+Shift+Z in the GUI.
+Redo the last undone the last command, then return the new state. If there is nothing to redo, the command fails with an error.
 
 None.
 
-**Result:** `UndoStackStatus`
+**Result:** `UndoStackDetails`
 
-**Since:** 2.2.0
+---
+
+## Class RemoteLibrary {#doc_rpc_api_class_RemoteLibrary}
+
+Allows to list, install, update and uninstall remote libraries.
+
+### RemoteLibrary.list {#doc_rpc_api_method_RemoteLibrary_list}
+
+Fetch all remote libraries. If the application already has the list ready, this method immediately returns all of them at once. If the list needs to be fetched from the configured servers first, this method streams the libraries in notifications.
+
+None.
+
+**Result:** `map`
+
+**Fields:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `libraries` | array of RemoteLibrarySummary | All remote libraries, in an unspecified (but stable) order. |
+
+---
+
+### RemoteLibrary.install {#doc_rpc_api_method_RemoteLibrary_install}
+
+Install or update remote libraries in one batch. Note that dependent libraries will automatically be installed/updated too.
+
+**Params:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `libraries` | array of uuid | UUID of libraries to install. |
+
+**Result:** `null`
+
+---
+
+### RemoteLibrary.uninstall {#doc_rpc_api_method_RemoteLibrary_uninstall}
+
+Uninstall remote libraries in one batch. Note that dependent libraries will automatically be uninstalled too.
+ATTENTION: Be careful with uninstalling libraries which are currently not available in any online repository, since this may lead to data loss which cannot be undone!
+
+**Params:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `libraries` | array of uuid | UUID of libraries to uninstall. |
+
+**Result:** `null`
+
+---
+
+### RemoteLibrary.get {#doc_rpc_api_method_RemoteLibrary_get}
+
+Get details about a remote library.
+
+None.
+
+**Result:** `RemoteLibraryDetails`
 
 ---
 
 ## Class WorkspaceDb {#doc_rpc_api_class_WorkspaceDb}
 
 The library database of the currently opened workspace.
+IMPORTANT: After the app startup, and after each modification of the local or remote libraries (install/remove/create/edit), call `wait()` before accessing the database again. Otherwise, the database may not reflect the changes yet, i.e. returns outdated information.
 
-### WorkspaceDb.watch {#doc_rpc_api_method_WorkspaceDb_watch}
+### WorkspaceDb.wait {#doc_rpc_api_method_WorkspaceDb_wait}
 
-Watch the library database: While the request is pending, request messages (type 3) about library scans are sent, with the payload `{"progress": <int 0..100>}` (100 means no scan is running). The request stays pending until the client cancels it (message type 4), which stops the watch and finishes the request with the error type `Cancelled`.
+Wait for the library rescan to complete. If the database is already up-to-date, this method returns immediately. If a scan is currently in progress or scheduled, the method blocks until the scan finished. During the scan, progress notifications will be emitted.
 
 None.
 
-**Result:** `null`
-
-**Since:** 2.2.0
+**Result:** `WorkspaceDbDetails`
 

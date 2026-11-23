@@ -44,7 +44,7 @@ namespace rpc {
 /**
  * @brief The UndoStack RPC API (see the RPC server documentation)
  *
- * The undo stack of an open project.
+ * The undo stack of an open document. The handle may point to a project or a library element.
  */
 class UndoStackRpc final {
 public:
@@ -54,25 +54,24 @@ public:
   // General Methods
 
   /**
-   * @brief Get the state of the project's undo stack.
+   * @brief Get the state of the undo stack.
    */
-  static void get_status(GuiApplication& app, RpcObjectRegistry& registry,
-                         RpcRequest& request);
+  static void get(GuiApplication& app, RpcObjectRegistry& registry,
+                      RpcRequest& request);
 
   /**
-   * @brief Undo the last command of the project's undo stack, i.e. the same
-   *        as pressing Ctrl+Z in the GUI. The command stays on the redo
-   *        stack, so the user can redo it in the GUI.
+   * @brief Undo the last command, then return the new state. If there is
+   *        nothing to undo, the command fails with an error.
    */
   static void undo(GuiApplication& app, RpcObjectRegistry& registry,
-                   RpcRequest& request);
+                      RpcRequest& request);
 
   /**
-   * @brief Redo the last undone command of the project's undo stack, i.e. the
-   *        same as pressing Ctrl+Shift+Z in the GUI.
+   * @brief Redo the last undone the last command, then return the new state.
+   *        If there is nothing to redo, the command fails with an error.
    */
   static void redo(GuiApplication& app, RpcObjectRegistry& registry,
-                   RpcRequest& request);
+                      RpcRequest& request);
 };
 
 /*******************************************************************************

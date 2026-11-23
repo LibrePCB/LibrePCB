@@ -46,6 +46,7 @@ class Gui(ns.AppWindow):
         super().__init__()
         self._log_lines = []
         self.log = ""
+        self._project_handles = []
         self.client = None
         self.timer = slint.Timer()
         self.timer.start(
@@ -103,6 +104,28 @@ class Gui(ns.AppWindow):
             self._log(f"Connection failed: {e}")
 
     @slint.callback
+    def list_projects(self):
+        if not self.client:
+            return
+        try:
+            self.client.call("Project.list", {})
+        except OSError as e:
+            self._log(f"Connection failed: {e}")
+
+    @slint.callback
+    def close_project(self, index):
+        if not self.client:
+            return
+        try:
+            obj = self._project_handles[index]
+        except IndexError:
+            return
+        try:
+            self.client.call("Project.close", {"obj": obj})
+        except OSError as e:
+            self._log(f"Connection failed: {e}")
+
+    @slint.callback
     def watch_clicked(self):
         if not self.client:
             return
@@ -142,6 +165,18 @@ class Gui(ns.AppWindow):
                     self.pending = False
                 if error is None:
                     self._log(f"Result: {result}")
+                    if 'projects' in result:
+                        self._project_handles = [
+                            project['obj'] for project in result['projects']
+                        ]
+                        self.projects = slint.ListModel([
+                            {
+                                'name': project['name'],
+                                'path': project['path'],
+                                'dirty': project['dirty'],
+                            }
+                            for project in result['projects']
+                        ])
                     if 'token' in result:
                         self.token = str(result['token'])
                 else:

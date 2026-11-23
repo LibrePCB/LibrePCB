@@ -44,7 +44,7 @@ namespace rpc {
 /**
  * @brief The WorkspaceDb RPC API (see the RPC server documentation)
  *
- * The library database of the currently opened workspace.
+ * The library database of the currently opened workspace. IMPORTANT: After the app startup, and after each modification of the local or remote libraries (install/remove/create/edit), call `wait()` before accessing the database again. Otherwise, the database may not reflect the changes yet, i.e. returns outdated information.
  */
 class WorkspaceDbRpc final {
 public:
@@ -54,15 +54,14 @@ public:
   // General Methods
 
   /**
-   * @brief Watch the library database: While the request is pending, request
-   *        messages (type 3) about library scans are sent, with the payload
-   *        `{"progress": <int 0..100>}` (100 means no scan is running). The
-   *        request stays pending until the client cancels it (message type
-   *        4), which stops the watch and finishes the request with the error
-   *        type `Cancelled`.
+   * @brief Wait for the library rescan to complete. If the database is
+   *        already up-to-date, this method returns immediately. If a scan is
+   *        currently in progress or scheduled, the method blocks until the
+   *        scan finished. During the scan, progress notifications will be
+   *        emitted.
    */
-  static void watch(GuiApplication& app, RpcObjectRegistry& registry,
-                    RpcRequest& request);
+  static void wait(GuiApplication& app, RpcObjectRegistry& registry,
+                      RpcRequest& request);
 };
 
 /*******************************************************************************

@@ -130,6 +130,8 @@ public:
    */
   bool saveProject() noexcept;
 
+  void saveProjectNonInteractive();
+
   /**
    * @brief Make a automatic backup of the project (save to temporary files)
    *

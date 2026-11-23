@@ -25,9 +25,10 @@
  *  Includes
  ******************************************************************************/
 #include "api/projectrpc.h"
-#include "api/rpcerrors.h"
 #include "api/undostackrpc.h"
+#include "api/remotelibraryrpc.h"
 #include "api/workspacedbrpc.h"
+#include "api/rpcerrors.h"
 #include "rpcrequest.h"
 
 #include <QtCore>
@@ -50,15 +51,22 @@ namespace rpc {
 
 void rpcDispatchCommand(GuiApplication& app, RpcObjectRegistry& registry,
                         const QString& method, RpcRequest& request) {
-  using RpcCommand = void (*)(GuiApplication&, RpcObjectRegistry&, RpcRequest&);
+  using RpcCommand = void (*)(GuiApplication&, RpcObjectRegistry&,
+                              RpcRequest&);
   static const QHash<QString, RpcCommand> commands = {
       {"Project.list", &ProjectRpc::list},
       {"Project.open", &ProjectRpc::open},
       {"Project.get", &ProjectRpc::get},
-      {"UndoStack.get_status", &UndoStackRpc::get_status},
+      {"Project.save", &ProjectRpc::save},
+      {"Project.close", &ProjectRpc::close},
+      {"UndoStack.get", &UndoStackRpc::get},
       {"UndoStack.undo", &UndoStackRpc::undo},
       {"UndoStack.redo", &UndoStackRpc::redo},
-      {"WorkspaceDb.watch", &WorkspaceDbRpc::watch},
+      {"RemoteLibrary.list", &RemoteLibraryRpc::list},
+      {"RemoteLibrary.install", &RemoteLibraryRpc::install},
+      {"RemoteLibrary.uninstall", &RemoteLibraryRpc::uninstall},
+      {"RemoteLibrary.get", &RemoteLibraryRpc::get},
+      {"WorkspaceDb.wait", &WorkspaceDbRpc::wait},
   };
   const auto it = commands.constFind(method);
   if (it == commands.constEnd()) {

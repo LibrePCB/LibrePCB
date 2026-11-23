@@ -140,6 +140,25 @@ errors:
       specific error codes fit. The message contains details about the failure.
 
 # ---------------------------------------------------------------------------
+# Enums
+# ---------------------------------------------------------------------------
+
+enums:
+  - name: BackupRestoreMode
+    default: abort
+    values:
+      - name: abort
+        description: >-
+          Do not attempt to open a file which has an auto-save backup. Abort
+          with an error instead.
+      - name: discard
+        description: >-
+          Discard the backup, restore and load the last saved state.
+      - name: restore
+        description: >-
+          Restore the auto-save backup, if available.
+
+# ---------------------------------------------------------------------------
 # Structs
 # ---------------------------------------------------------------------------
 
@@ -167,14 +186,13 @@ structs:
         description: The absolute path of the project file.
       - name: dirty
         type: bool
-        description: Whether the project has unsaved changes (i.e. its undo stack is not clean).
+        description: >-
+          Whether the project has unsaved changes (i.e. its undo stack is not
+          clean, or any manual, untracked changes have been made).
 
   - name: ProjectDetails
     description: Details about an open project.
     fields:
-      - name: obj
-        type: handle
-        description: The opaque handle of the project (to be passed back in the "obj" key of requests targeting this project).
       - name: uuid
         type: string
         description: The project UUID.
@@ -222,72 +240,61 @@ structs:
         type: string
         description: The board name.
 
-  - name: UndoStackStatus
-    description: The state of a project's undo stack.
+  - name: UndoStackDetails
+    description: The state of a document's undo stack.
     fields:
-      - name: canUndo
-        type: bool
-        description: Whether undo is currently possible.
-      - name: canRedo
-        type: bool
-        description: Whether redo is currently possible.
-      - name: undoText
-        type: string
-        description: The text of the undo command (empty if N/A).
-      - name: redoText
-        type: string
-        description: The text of the redo command (empty if N/A).
+      - name: id
+        type: any
+        description: >-
+          An opaque identifier which uniquely identifies the current state.
+          This can be used for example to detect if there were any changes made
+          between two different points in time.
       - name: clean
         type: bool
-        description: Whether the stack is in the clean state (the state of the last save).
+        description: >-
+          Whether the stack is in the clean state (the state of the last save).
+      - name: prev
+        type: string | nil
+        description: >-
+          The text of the previously executed command, i.e. the command which
+          will be reverted by `undo()`. If there is no command to undo, this is
+          `nil`.
+      - name: next
+        type: string | nil
+        description: >-
+          The text of the previously undone command, i.e. the command which
+          will be executed by `redo()`. If there is no command to redo, this is
+          `nil`.
+
+  - name: WorkspaceDbDetails
+    description: Information about the workspace library database.
+    fields: []
 
 # ---------------------------------------------------------------------------
-# Enums. Values are transferred as strings (exactly as listed below).
-# ---------------------------------------------------------------------------
-
-enums:
-  - name: BackupRestoreMode
-    default: abort
-    values:
-      - name: abort
-        description: >-
-          Do not attempt to open a file which has an auto-save backup. Abort
-          with an error instead.
-      - name: discard
-        description: >-
-          Discard the backup, restore and load the last saved state.
-      - name: restore
-        description: >-
-          Restore the auto-save backup, if available.
-
-# ---------------------------------------------------------------------------
-# Classes with their methods. The full method name on the wire is
-# "ClassName.method_name". Non-static methods require the receiver handle
-# in the reserved "obj" key of the params.
+# Classes and their methods
 # ---------------------------------------------------------------------------
 
 classes:
   - name: Project
     description: A project opened in the application.
-    handle: An opaque object handle for the project (as embedded in the responses).
+    since: "2.2.0"
     methods:
       - name: list
-        static: true
         description: List all open projects.
+        static: true
         params: []
         result:
           - name: projects
             type: array
             items: ProjectSummary
             description: All open projects, in the order of their editor tabs.
-        since: "2.2.0"
 
       - name: open
-        static: true
         description: >-
           Open a project by file path. If the project is already open,
           nothing is changed and the summary of the already open project
           is returned.
+        static: true
         params:
           - name: path
             type: string
@@ -300,60 +307,111 @@ classes:
               application crashed while the project was open and had unsaved
               modifications), this flag specifies how to proceed in that case.
         result: ProjectSummary
-        since: "2.2.0"
 
       - name: get
         description: Get details about an open project.
         params: []
         result: ProjectDetails
-        since: "2.2.0"
+
+      - name: save
+        description: Save project to disk.
+        params: []
+        result: []
+
+      - name: close
+        description: >-
+          Close project. Attention: If there were unsaved changes in the
+          project, they will be discarded. Call `save` first, if desired.
+        params: []
+        result: []
 
   - name: UndoStack
-    description: The undo stack of an open project.
-    handle: An opaque object handle for the project whose undo stack to use (as embedded in the responses).
+    description: >-
+      The undo stack of an open document. The handle may point to a project or
+      a library element.
+    since: "2.2.0"
     methods:
-      - name: get_status
-        description: Get the state of the project's undo stack.
+      - name: get
+        description: Get the state of the undo stack.
         params: []
-        result: UndoStackStatus
-        since: "2.2.0"
+        result: UndoStackDetails
 
       - name: undo
         description: >-
-          Undo the last command of the project's undo stack, i.e. the same
-          as pressing Ctrl+Z in the GUI. The command stays on the redo
-          stack, so the user can redo it in the GUI.
+          Undo the last command, then return the new state. If there is nothing
+          to undo, the command fails with an error.
         params: []
-        result: UndoStackStatus
-        since: "2.2.0"
+        result: UndoStackDetails
 
       - name: redo
         description: >-
-          Redo the last undone command of the project's undo stack, i.e.
-          the same as pressing Ctrl+Shift+Z in the GUI.
+          Redo the last undone the last command, then return the new state.
+          If there is nothing to redo, the command fails with an error.
         params: []
-        result: UndoStackStatus
-        since: "2.2.0"
+        result: UndoStackDetails
+
+  - name: RemoteLibrary
+    description: Allows to list, install, update and uninstall remote libraries.
+    methods:
+      - name: list
+        description: >-
+          Fetch all remote libraries. If the application already has the list
+          ready, this method immediately returns all of them at once. If the
+          list needs to be fetched from the configured servers first, this
+          method streams the libraries in notifications.
+        static: true
+        params: []
+        result:
+          - name: libraries
+            type: array
+            items: RemoteLibrarySummary
+            description: >-
+              All remote libraries, in an unspecified (but stable) order.
+
+      - name: install
+        description: >-
+          Install or update remote libraries in one batch. Note that dependent
+          libraries will automatically be installed/updated too.
+        params:
+          - name: libraries
+            type: array
+            items: uuid
+            description: UUID of libraries to install.
+
+      - name: uninstall
+        description: >-
+          Uninstall remote libraries in one batch. Note that dependent
+          libraries will automatically be uninstalled too.
+
+          ATTENTION: Be careful with uninstalling libraries which are currently
+          not available in any online repository, since this may lead to data
+          loss which cannot be undone!
+        params:
+          - name: libraries
+            type: array
+            items: uuid
+            description: UUID of libraries to uninstall.
+
+      - name: get
+        description: Get details about a remote library.
+        params: []
+        result: RemoteLibraryDetails
 
   - name: WorkspaceDb
-    description: The library database of the currently opened workspace.
+    description: >-
+      The library database of the currently opened workspace.
+
+      IMPORTANT: After the app startup, and after each modification of the
+      local or remote libraries (install/remove/create/edit), call `wait()`
+      before accessing the database again. Otherwise, the database may not
+      reflect the changes yet, i.e. returns outdated information.
     methods:
-      - name: watch
-        static: true
+      - name: wait
         description: >-
-          Watch the library database: While the request is pending,
-          request messages (type 3) about library scans are sent, with
-          the payload `{"progress": <int 0..100>}` (100 means no scan is
-          running). The request stays pending until the client cancels it
-          (message type 4), which stops the watch and finishes the request
-          with the error type `Cancelled`.
+          Wait for the library rescan to complete. If the database is already
+          up-to-date, this method returns immediately. If a scan is currently
+          in progress or scheduled, the method blocks until the scan finished.
+          During the scan, progress notifications will be emitted.
+        static: true
         params: []
-        result: []
-        since: "2.2.0"
-
-# ---------------------------------------------------------------------------
-# Events (notifications which the server broadcasts to all clients). None
-# yet — to be added together with the milestone which introduces them.
-# ---------------------------------------------------------------------------
-
-events: []
+        result: WorkspaceDbDetails

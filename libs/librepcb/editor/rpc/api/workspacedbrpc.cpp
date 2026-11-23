@@ -35,26 +35,36 @@
 namespace librepcb {
 namespace editor {
 
-// The generated RPC types live in their own namespace; open it here to
-// avoid qualified names in the command implementations.
 using namespace rpc;
+
+/*******************************************************************************
+ *  Helper Functions
+ ******************************************************************************/
+
+static QVariantMap details(WorkspaceLibraryDb& obj) {
+  Q_UNUSED(obj);
+  QVariantMap result;
+  return result;
+}
 
 /*******************************************************************************
  *  Command Handlers
  ******************************************************************************/
 
-void WorkspaceDbRpc::watch(GuiApplication& app, RpcObjectRegistry& registry,
-                           RpcRequest& request) {
+void WorkspaceDbRpc::wait(GuiApplication& app, RpcObjectRegistry& registry,
+                          RpcRequest& request) {
   Q_UNUSED(registry);
   WorkspaceLibraryDb& db = app.getWorkspace().getLibraryDb();
+  if (!db.isScanInProgress()) {
+    request.sendSuccess(details(db));
+    return;
+  }
+
   request.sendProgress(db.getScanProgressPercent());
-  QObject::connect(&db, &WorkspaceLibraryDb::scanStarted, &request,
-                   [&request]() { request.sendProgress(0); });
-  QObject::connect(
-      &db, &WorkspaceLibraryDb::scanProgressUpdate, &request,
-      [&request](float percent) { request.sendProgress(percent); });
+  QObject::connect(&db, &WorkspaceLibraryDb::scanProgressUpdate, &request,
+                   &RpcRequest::sendProgress);
   QObject::connect(&db, &WorkspaceLibraryDb::scanFinished, &request,
-                   [&request]() { request.sendProgress(100); });
+                   [&db, &request]() { request.sendSuccess(details(db)); });
   QObject::connect(&request, &RpcRequest::cancelled, &request,
                    [&request]() { request.sendError(RpcCancelled()); });
 }

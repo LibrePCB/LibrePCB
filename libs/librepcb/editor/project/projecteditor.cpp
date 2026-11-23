@@ -420,42 +420,46 @@ bool ProjectEditor::requestClose() noexcept {
 
 bool ProjectEditor::saveProject() noexcept {
   try {
-    // Show waiting cursor during operation for immediate feedback even though
-    // the operation can take some time.
-    QGuiApplication::setOverrideCursor(Qt::WaitCursor);
-    auto csg = scopeGuard([]() { QGuiApplication::restoreOverrideCursor(); });
-
-    // Save project.
-    qDebug() << "Save project...";
-    emit projectAboutToBeSaved();
-    mProject->save();  // can throw
-    mProject->getDirectory().getFileSystem()->save();  // can throw
-    mLastAutosaveStateId = mUndoStack->getUniqueStateId();
-    if (mManualModificationsMade) {
-      mManualModificationsMade = false;
-      onUiDataChanged.notify();
-      emit manualModificationsMade();
-    }
-
-    // Saving was successful --> clean the undo stack.
-    mUndoStack->setClean();
-    if (mMigrationLog) {
-      mMigrationLog = std::nullopt;  // Not needed anymore.
-      // It's a bit ugly, but if no changes were made to the project, the UI
-      // remains in "modified" state so we manually emit the stateModified()
-      // signal here to ensure it gets updated.
-      emit mUndoStack->stateModified();
-    }
-    emit projectSavedToDisk();
-    emit statusBarMessageChanged(tr("Project saved!"), 2000);
-    qDebug() << "Successfully saved project.";
-    onUiDataChanged.notify();
+    saveProjectNonInteractive();
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(qApp->activeWindow(),
                           tr("Error while saving the project"), e.getMsg());
     return false;
   }
+}
+
+void ProjectEditor::saveProjectNonInteractive() {
+  // Show waiting cursor during operation for immediate feedback even though
+  // the operation can take some time.
+  QGuiApplication::setOverrideCursor(Qt::WaitCursor);
+  auto csg = scopeGuard([]() { QGuiApplication::restoreOverrideCursor(); });
+
+  // Save project.
+  qDebug() << "Save project...";
+  emit projectAboutToBeSaved();
+  mProject->save();  // can throw
+  mProject->getDirectory().getFileSystem()->save();  // can throw
+  mLastAutosaveStateId = mUndoStack->getUniqueStateId();
+  if (mManualModificationsMade) {
+    mManualModificationsMade = false;
+    onUiDataChanged.notify();
+    emit manualModificationsMade();
+  }
+
+  // Saving was successful --> clean the undo stack.
+  mUndoStack->setClean();
+  if (mMigrationLog) {
+    mMigrationLog = std::nullopt;  // Not needed anymore.
+    // It's a bit ugly, but if no changes were made to the project, the UI
+    // remains in "modified" state so we manually emit the stateModified()
+    // signal here to ensure it gets updated.
+    emit mUndoStack->stateModified();
+  }
+  emit projectSavedToDisk();
+  emit statusBarMessageChanged(tr("Project saved!"), 2000);
+  qDebug() << "Successfully saved project.";
+  onUiDataChanged.notify();
 }
 
 bool ProjectEditor::autosaveProject() noexcept {

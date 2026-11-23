@@ -27,6 +27,7 @@
 #include "../../undostack.h"
 #include "../rpcobjectregistry.h"
 #include "../rpcrequest.h"
+#include "rpcerrors.h"
 
 /*******************************************************************************
  *  Namespace
@@ -34,49 +35,57 @@
 namespace librepcb {
 namespace editor {
 
-// The generated RPC types live in their own namespace; open it here to
-// avoid qualified names in the command implementations.
 using namespace rpc;
 
 /*******************************************************************************
- *  Local Functions
+ *  Helper Functions
  ******************************************************************************/
 
-static QVariantMap undoStackToVariant(const UndoStack& stack) {
-  QVariantMap map;
-  map.insert("canUndo", stack.canUndo());
-  map.insert("canRedo", stack.canRedo());
-  map.insert("undoText", stack.getUndoCmdText());
-  map.insert("redoText", stack.getRedoCmdText());
-  map.insert("clean", stack.isClean());
-  return map;
+static UndoStack& getObj(RpcObjectRegistry& registry, RpcRequest& request) {
+  ProjectEditor& editor = registry.getAs<ProjectEditor>(request.getArg("obj"));
+  return editor.getUndoStack();
+}
+
+static QVariantMap details(UndoStack& obj) {
+  QVariantMap result;
+  result.insert("id", obj.getUniqueStateId());
+  result.insert("clean", obj.isClean());
+  result.insert("prev", obj.canUndo() ? obj.getUndoCmdText() : QVariant());
+  result.insert("next", obj.canRedo() ? obj.getRedoCmdText() : QVariant());
+  return result;
 }
 
 /*******************************************************************************
  *  Command Handlers
  ******************************************************************************/
 
-void UndoStackRpc::get_status(GuiApplication& app, RpcObjectRegistry& registry,
-                              RpcRequest& request) {
+void UndoStackRpc::get(GuiApplication& app, RpcObjectRegistry& registry,
+                       RpcRequest& request) {
   Q_UNUSED(app);
-  ProjectEditor& editor = registry.getAs<ProjectEditor>(request.getArg("obj"));
-  request.sendSuccess(undoStackToVariant(editor.getUndoStack()));
+  auto& obj = getObj(registry, request);
+  request.sendSuccess(details(obj));
 }
 
 void UndoStackRpc::undo(GuiApplication& app, RpcObjectRegistry& registry,
                         RpcRequest& request) {
   Q_UNUSED(app);
-  ProjectEditor& editor = registry.getAs<ProjectEditor>(request.getArg("obj"));
-  editor.getUndoStack().undo();  // Can throw.
-  request.sendSuccess(undoStackToVariant(editor.getUndoStack()));
+  auto& obj = getObj(registry, request);
+  if (!obj.canUndo()) {
+    throw RpcMethodNotAvailable();
+  }
+  obj.undo();  // Can throw.
+  request.sendSuccess(details(obj));
 }
 
 void UndoStackRpc::redo(GuiApplication& app, RpcObjectRegistry& registry,
                         RpcRequest& request) {
   Q_UNUSED(app);
-  ProjectEditor& editor = registry.getAs<ProjectEditor>(request.getArg("obj"));
-  editor.getUndoStack().redo();  // Can throw.
-  request.sendSuccess(undoStackToVariant(editor.getUndoStack()));
+  auto& obj = getObj(registry, request);
+  if (!obj.canRedo()) {
+    throw RpcMethodNotAvailable();
+  }
+  obj.redo();  // Can throw.
+  request.sendSuccess(details(obj));
 }
 
 /*******************************************************************************

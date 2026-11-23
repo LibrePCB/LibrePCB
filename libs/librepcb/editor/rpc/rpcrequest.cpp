@@ -74,9 +74,9 @@ void RpcRequest::cancel() noexcept {
   }
 }
 
-void RpcRequest::sendProgress(float percent) noexcept {
+void RpcRequest::sendProgress(int percent) noexcept {
   QVariantMap value;
-  value["progress"] = std::clamp(percent / 100, float(0), float(1));
+  value["progress"] = std::clamp(percent, 0, 100);
   sendNotification(value);
 }
 

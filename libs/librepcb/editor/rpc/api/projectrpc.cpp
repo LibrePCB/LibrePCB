@@ -25,11 +25,13 @@
 #include "../../guiapplication.h"
 #include "../../project/projecteditor.h"
 #include "../../undostack.h"
+#include "../rpchelpers.h"
 #include "../rpcobjectregistry.h"
 #include "../rpcrequest.h"
 #include "rpcerrors.h"
 #include "rpctypes.h"
 
+#include <librepcb/core/attribute/attribute.h>
 #include <librepcb/core/attribute/attributetype.h>
 #include <librepcb/core/attribute/attributeunit.h>
 #include <librepcb/core/fileio/filepath.h>
@@ -43,26 +45,14 @@
 namespace librepcb {
 namespace editor {
 
-// The generated RPC types live in their own namespace; open it here to
-// avoid qualified names in the command implementations.
 using namespace rpc;
 
 /*******************************************************************************
- *  Local Functions
+ *  Helper Functions
  ******************************************************************************/
 
-static QVariantMap summary(ProjectEditor& obj, RpcObjectRegistry& registry) {
-  const Project& project = obj.getProject();
-
-  QVariantMap result;
-  result.insert("obj", registry.getHandle(obj));
-  result.insert("name", *project.getName());
-  result.insert("path", project.getFilepath().toStr());
-  result.insert("dirty", !obj.getUndoStack().isClean());
-  return result;
-}
-
-static QVariantMap summary(Attribute& obj) {
+static QVariantMap summary(const Attribute& obj, RpcObjectRegistry& registry) {
+  Q_UNUSED(registry);
   QVariantMap result;
   result.insert("name", *obj.getKey());
   result.insert("type", obj.getType().getName());
@@ -87,24 +77,29 @@ static QVariantMap summary(Board& obj, RpcObjectRegistry& registry) {
   return result;
 }
 
-template <typename T>
-static QVariantList summaryList(const T& list, RpcObjectRegistry& registry) {
-  QVariantList result;
-  for (auto obj : list) {
-    result.append(summary(*obj, registry));
-  }
+static QVariantMap summary(ProjectEditor& obj, RpcObjectRegistry& registry) {
+  const Project& project = obj.getProject();
+
+  QVariantMap result;
+  result.insert("obj", registry.getHandle(obj));
+  result.insert("name", *project.getName());
+  result.insert("path", project.getFilepath().toStr());
+  result.insert("dirty", !obj.hasUnsavedChanges());
   return result;
 }
 
-static QVariantMap details(ProjectEditor& editor, RpcObjectRegistry& registry) {
-  const Project& project = editor.getProject();
+static QVariantMap details(ProjectEditor& obj, RpcObjectRegistry& registry) {
+  const Project& project = obj.getProject();
 
-  QVariantMap result = summary(editor, registry);
+  QVariantMap result;
+  result.insert("name", *project.getName());
+  result.insert("path", project.getFilepath().toStr());
+  result.insert("dirty", !obj.hasUnsavedChanges());
   result.insert("author", project.getAuthor());
   result.insert("version", *project.getVersion());
   result.insert("attributes", summaryList(project.getAttributes(), registry));
-  result.insert("locale_order", project.getLocaleOrder());
-  result.insert("norm_order", project.getNormOrder());
+  result.insert("locale_order", variantList(project.getLocaleOrder()));
+  result.insert("norm_order", variantList(project.getNormOrder()));
   result.insert("sheets", summaryList(project.getSchematics(), registry));
   result.insert("boards", summaryList(project.getBoards(), registry));
   return result;
@@ -152,6 +147,28 @@ void ProjectRpc::get(GuiApplication& app, RpcObjectRegistry& registry,
   Q_UNUSED(app);
   auto& editor = registry.getAs<ProjectEditor>(request.getArg("obj"));
   request.sendSuccess(details(editor, registry));
+}
+
+void ProjectRpc::save(GuiApplication& app, RpcObjectRegistry& registry,
+                      RpcRequest& request) {
+  Q_UNUSED(app);
+  auto& editor = registry.getAs<ProjectEditor>(request.getArg("obj"));
+  editor.saveProjectNonInteractive();  // can throw
+  request.sendSuccess();
+}
+
+void ProjectRpc::close(GuiApplication& app, RpcObjectRegistry& registry,
+                       RpcRequest& request) {
+  auto& editor = registry.getAs<ProjectEditor>(request.getArg("obj"));
+  const auto& projects = app.getProjects();
+  for (int i = 0; i < projects.count(); ++i) {
+    if (projects.at(i).get() == &editor) {
+      app.closeProject(i);
+      request.sendSuccess();
+      return;
+    }
+  }
+  throw RpcInternalError();
 }
 
 /*******************************************************************************

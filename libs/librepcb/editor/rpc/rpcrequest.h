@@ -184,7 +184,7 @@ public:
    */
   void cancel() noexcept;
 
-  void sendProgress(float percent) noexcept;
+  void sendProgress(int percent) noexcept;
 
   /**
    * @brief Send a request-scoped message to the client (e.g. progress)
