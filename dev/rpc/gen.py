@@ -21,7 +21,7 @@ templates from `dev/rpc/templates/`:
   exception class per error code (the C++ error handling).
 - `libs/librepcb/editor/rpc/api/rpctypes.h` — the enum types with helpers
   to read them from request arguments (`get`/`tryGet`).
-- `libs/librepcb/editor/rpc/commands.cpp` — the generated command
+- `libs/librepcb/editor/rpc/api/commands.cpp` — the generated command
   dispatcher (see the RPC server documentation).
 
 Both files are committed to the repository, so building does not require
@@ -53,7 +53,7 @@ RUST_FILE = REPO_DIR / "libs" / "librepcb" / "rust-core" / "src" / "rpc_server" 
 EDITOR_RPC_DIR = REPO_DIR / "libs" / "librepcb" / "editor" / "rpc"
 EDITOR_API_DIR = EDITOR_RPC_DIR / "api"
 CMAKELISTS_FILE = REPO_DIR / "libs" / "librepcb" / "editor" / "CMakeLists.txt"
-COMMANDS_FILE = EDITOR_RPC_DIR / "commands.cpp"
+COMMANDS_FILE = EDITOR_API_DIR / "commands.cpp"
 RPCERRORS_FILE = EDITOR_API_DIR / "rpcerrors.h"
 RPCTYPES_FILE = EDITOR_API_DIR / "rpctypes.h"
 

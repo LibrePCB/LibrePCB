@@ -26,6 +26,11 @@
 #define LIBREPCB_EDITOR_WORKSPACEDBRPC_H
 
 /*******************************************************************************
+ *  Includes
+ ******************************************************************************/
+#include <QtCore>
+
+/*******************************************************************************
  *  Forward Declarations
  ******************************************************************************/
 namespace librepcb {
@@ -53,6 +58,9 @@ namespace rpc {
 class WorkspaceDbRpc final {
 public:
   // Constructors / Destructor
+  Q_DECLARE_TR_FUNCTIONS(WorkspaceDbRpc)
+
+public:
   WorkspaceDbRpc() = delete;
 
   // General Methods

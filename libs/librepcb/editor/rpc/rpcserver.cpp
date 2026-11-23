@@ -94,13 +94,6 @@ void RpcServer::handleRequest(uint32_t connId, uint32_t msgId,
   request->onEvent.attach(mRequestEventSlot);
   mPendingRequests.insert(requestKey(connId, msgId), request);
 
-  // The `initialize` method is a protocol-level method handled by the
-  // server itself (the token handling needs access to the server).
-  if (method == "initialize") {
-    handleInitialize(*request);
-    return;
-  }
-
   // Dispatch the command to its handler (generated code, see commands.cpp)
   // and translate thrown errors into error responses.
   try {
@@ -121,64 +114,6 @@ void RpcServer::handleCancel(uint32_t connId, uint32_t msgId) noexcept {
   // may just fail — that's fine, then the work is already done.
   if (auto request = mPendingRequests.value(requestKey(connId, msgId))) {
     request->cancel();
-  }
-}
-
-void RpcServer::handleInitialize(RpcRequest& request) noexcept {
-  const QString clientName =
-      request.getArg("name").toString().simplified().left(32);
-  const QVariant token = request.getArg("token");
-
-  auto createResponse = [this, clientName](QString token) {
-    static const Uuid session = Uuid::createRandom();
-
-    if (token.isEmpty()) {
-      token = Uuid::createRandom().toStr();
-      mAuthenticatedTokens.insert(token);
-      qInfo() << "RPC client" << clientName << "connected.";
-    }
-
-    QVariantMap result;
-    result.insert("format", "1.0");
-    result.insert("server", "librepcb");
-    result.insert("version", Application::getVersion());
-    result.insert("session", session.toStr());
-    result.insert("workspace", mApp.getWorkspace().getPath().toStr());
-    result.insert("token", token);
-    return result;
-  };
-
-  if (!token.isNull()) {
-    const bool authenticated = mAuthenticatedTokens.contains(token.toString());
-    rs::ffi_rpc_server_set_authenticated(*mHandle, request.getConnId(),
-                                         authenticated);
-    if (authenticated) {
-      request.sendSuccess(createResponse(token.toString()));
-    } else {
-      request.sendError(rpc::RpcAccessDenied());
-    }
-  } else {
-    auto notification = std::make_shared<Notification>(
-        ui::NotificationType::Warning, tr("RPC Connection Request"),
-        tr("An external application, which identifies itself as '%1', wants to "
-           "connect through the RPC interface to this process for the first "
-           "time. Only accept this if you trust that application and the "
-           "request was triggered by yourself.")
-            .arg(clientName),
-        tr("Accept Connection"), QString(), true);
-    connect(notification.get(), &Notification::buttonClicked, &request,
-            [this, &request, createResponse]() {
-              rs::ffi_rpc_server_set_authenticated(*mHandle,
-                                                   request.getConnId(), true);
-              request.sendSuccess(createResponse(QString()));
-            });
-    connect(notification.get(), &Notification::destroyed, &request,
-            [&request]() { request.sendError(rpc::RpcAccessDenied()); });
-    connect(&request, &RpcRequest::cancelled, notification.get(),
-            &Notification::dismiss);
-    connect(&request, &RpcRequest::destroyed, notification.get(),
-            &Notification::dismiss);
-    mApp.getNotifications().push(notification);
   }
 }
 

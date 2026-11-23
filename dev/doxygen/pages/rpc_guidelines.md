@@ -19,7 +19,7 @@ New commands are added in four steps:
    are always a map (declared as field list or struct name) or nil.
 2. **Run the generator** (`uv run gen.py` in `dev/rpc/`): it regenerates
    the C++ command headers (`rpc/api/{classname}rpc.h`), the dispatcher
-   (`rpc/commands.cpp`), the error classes (`rpc/api/rpcerrors.h`) and
+   (`rpc/api/commands.cpp`), the error classes (`rpc/api/rpcerrors.h`) and
    this documentation. Commit the regenerated files.
 3. **Implement the method** in the hand-written
    `rpc/api/{classname}rpc.cpp`: a static method with the signature

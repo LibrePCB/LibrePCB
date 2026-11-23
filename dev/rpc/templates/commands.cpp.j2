@@ -24,11 +24,11 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-{% for cls in spec.classes if cls.name %}
-#include "api/{{ cls.name | lower }}rpc.h"
+{% for cls in spec.classes %}
+#include "{{ (cls.name or "Protocol") | lower }}rpc.h"
 {% endfor %}
-#include "api/rpcerrors.h"
-#include "rpcrequest.h"
+#include "rpcerrors.h"
+#include "../rpcrequest.h"
 
 #include <QtCore>
 
@@ -53,17 +53,17 @@ void rpcDispatchCommand(GuiApplication& app, RpcObjectRegistry& registry,
   using RpcCommand = void (*)(GuiApplication&, RpcObjectRegistry&,
                               RpcRequest&);
   static const QHash<QString, RpcCommand> commands = {
-{% for cls in spec.classes if cls.name %}
+{% for cls in spec.classes %}
 {%- for method in cls.methods %}
-      {"{{ cls.name }}.{{ method.name }}", &{{ cls.name }}Rpc::{{ method.name }}},
+      {"{% if cls.name %}{{ cls.name }}.{% endif %}{{ method.name }}", &{{ cls.name or "Protocol" }}Rpc::{{ method.name }}},
 {% endfor %}
 {%- endfor %}
   };
-  const auto it = commands.constFind(method);
-  if (it == commands.constEnd()) {
-    throw RpcMethodNotFound(method);
+  if (auto func = commands.value(method, nullptr)) {
+    func(app, registry, request);
+    return;
   }
-  (*it)(app, registry, request);
+  throw RpcMethodNotFound(method);
 }
 
 /*******************************************************************************

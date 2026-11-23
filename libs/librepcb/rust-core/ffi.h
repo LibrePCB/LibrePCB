@@ -703,8 +703,8 @@ void ffi_renumber_components(const QStringList * NONNULL names,
  *
  * - `dispatch`/`cancel`/`ctx`: The command dispatcher and cancel callback.
  *   The `initialize` request (authentication) is dispatched through the
- *   dispatcher as well — the C++ side validates the token and calls
- *   `ffi_rpc_server_set_authenticated()`.
+ *   dispatcher as well — the C++ side validates the token, and the reply
+ *   to the request implicitly (un-)authenticates the connection.
  *
  * Returns null if the server could not be started (no free port / thread
  * spawning failed).
@@ -718,17 +718,6 @@ RpcServer *ffi_rpc_server_new(RpcOnRequestCallback on_request,
  * Delete [RpcServer] object (stops the server and joins its threads).
  */
 void ffi_rpc_server_delete(RpcServer *s);
-
-/**
- * Mark a connection as (un)authenticated.
- *
- * Called by the C++ side after it validated the authentication token of
- * an `initialize` request (the token handling lives on the C++ side).
- * Calls for unknown or already closed connections are ignored.
- */
-void ffi_rpc_server_set_authenticated(RpcServer * NONNULL s,
-                                      uint32_t conn_id,
-                                      bool authenticated);
 
 /**
  * Send a request-scoped message (e.g. a progress report) to the client

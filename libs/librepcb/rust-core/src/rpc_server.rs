@@ -29,11 +29,11 @@
 //!   editor state, and long-running commands can report progress with
 //!   [RpcServer::notify_conn] before finally replying.
 //! * This includes the `initialize` request: The authentication (token
-//!   validation) is implemented on the C++ side, which then calls
-//!   [RpcServer::set_authenticated] to let the server know whether the
-//!   connection is authenticated. While a connection is not
-//!   authenticated, requests other than `initialize` are rejected with an
-//!   error instead of being dispatched.
+//!   validation) is implemented on the C++ side, and the reply to an
+//!   `initialize` request implicitly (un-)authenticates the connection
+//!   (success/error). While a connection is not authenticated, requests
+//!   other than `initialize` are rejected with an error instead of being
+//!   dispatched.
 //! * The msg_id is only unique per connection, so all reply functions
 //!   require the connection ID in addition to the msg_id.
 //! * The server tracks pending requests (dispatched, but not yet replied)
@@ -122,8 +122,8 @@ const STOP_TIMEOUT: Duration = Duration::from_secs(5);
 ///
 /// Note that the `initialize` request is dispatched through this callback
 /// as well: The authentication (token validation) is implemented on the
-/// C++ side, which then calls [RpcServer::set_authenticated] to let the
-/// server know whether the connection is authenticated now.
+/// C++ side, and the reply to the request implicitly (un-)authenticates
+/// the connection (success/error).
 pub type DispatchFn =
   Arc<dyn Fn(u32, u32, &str, &Value) -> Result<(), RpcError> + Send + Sync>;
 
@@ -164,10 +164,14 @@ struct Connection {
   stream: TcpStream,
   /// The msg_ids of requests which were dispatched but not yet replied.
   pending: Arc<Mutex<HashSet<u32>>>,
-  /// Whether the connection is authenticated. Set by the C++ side through
-  /// [RpcServer::set_authenticated] (the token validation lives there).
-  /// While this is `false`, requests other than `initialize` are rejected
-  /// with an error instead of being dispatched.
+  /// The msg_ids of dispatched `initialize` requests which were not yet
+  /// replied. The reply to such a request authenticates the connection
+  /// (success) or un-authenticates it (error) — see the reply path.
+  pending_initializes: Arc<Mutex<HashSet<u32>>>,
+  /// Whether the connection is authenticated. Updated when a reply to an
+  /// `initialize` request is sent (see the reply path). While this is
+  /// `false`, requests other than `initialize` are rejected with an error
+  /// instead of being dispatched.
   authenticated: Arc<AtomicBool>,
 }
 
@@ -264,7 +268,7 @@ impl RpcServer {
   ) -> bool {
     let error = error.map(|e| e.to_value());
     let message = build_response(msg_id, error.as_ref(), result);
-    self.send_response(conn_id, msg_id, &message)
+    self.send_response(conn_id, msg_id, &message, Some(error.is_none()))
   }
 
   /// Send the response for a pending request, passing a raw error map
@@ -276,19 +280,37 @@ impl RpcServer {
   /// forwarded as-is instead of being rebuilt from an [RpcError].
   pub fn reply_error(&self, conn_id: u32, msg_id: u32, error: &Value) -> bool {
     let message = build_response(msg_id, Some(error), &Value::Nil);
-    self.send_response(conn_id, msg_id, &message)
+    self.send_response(conn_id, msg_id, &message, Some(false))
   }
 
   /// Look up the connection, remove the msg_id from the pending set and
   /// queue the encoded message on its writer thread (see [RpcServer::reply]).
-  fn send_response(&self, conn_id: u32, msg_id: u32, message: &Value) -> bool {
+  ///
+  /// `initialize_result` is the outcome of the replied command: If the
+  /// replied msg_id belongs to a dispatched `initialize` request (see
+  /// [Connection::pending_initializes]), the connection is authenticated
+  /// (success) or un-authenticated (error). The state update happens under
+  /// the same lock as queueing the response, so the ordering of
+  /// concurrent `initialize` replies is preserved.
+  fn send_response(
+    &self,
+    conn_id: u32,
+    msg_id: u32,
+    message: &Value,
+    initialize_result: Option<bool>,
+  ) -> bool {
     let conn = {
       let clients = lock(&self.inner.clients);
-      clients
-        .get(&conn_id)
-        .map(|conn| (conn.tx.clone(), Arc::clone(&conn.pending)))
+      clients.get(&conn_id).map(|conn| {
+        (
+          conn.tx.clone(),
+          Arc::clone(&conn.pending),
+          Arc::clone(&conn.pending_initializes),
+          Arc::clone(&conn.authenticated),
+        )
+      })
     };
-    let Some((tx, pending)) = conn else {
+    let Some((tx, pending, pending_initializes, authenticated)) = conn else {
       return false;
     };
     // Removing the msg_id from the pending set must happen atomically with
@@ -297,6 +319,11 @@ impl RpcServer {
     let mut pending = lock(&pending);
     if !pending.remove(&msg_id) {
       return false; // Already replied (or never dispatched).
+    }
+    if let Some(result) = initialize_result {
+      if lock(&pending_initializes).remove(&msg_id) {
+        authenticated.store(result, Ordering::SeqCst);
+      }
     }
     drop(pending);
     match codec::encode_message(message) {
@@ -344,21 +371,6 @@ impl RpcServer {
         eprintln!("librepcb-rust: Failed to encode a request message: {e}");
         false
       }
-    }
-  }
-
-  /// Mark a connection as (un)authenticated.
-  ///
-  /// Called by the C++ side after it validated the authentication token of
-  /// an `initialize` request (the token handling lives on the C++ side).
-  /// While a connection is not authenticated, requests other than
-  /// `initialize` are rejected with an error instead of being dispatched.
-  ///
-  /// Calls for unknown or already closed connections are ignored.
-  pub fn set_authenticated(&self, conn_id: u32, authenticated: bool) {
-    let clients = lock(&self.inner.clients);
-    if let Some(conn) = clients.get(&conn_id) {
-      conn.authenticated.store(authenticated, Ordering::SeqCst);
     }
   }
 
@@ -416,12 +428,16 @@ fn lock<T>(mutex: &Mutex<T>) -> MutexGuard<'_, T> {
 #[cfg(test)]
 mod tests {
   use super::*;
-  use protocol::{METHOD_INITIALIZE, METHOD_PING};
+  use protocol::METHOD_INITIALIZE;
   use std::io::{BufReader, Write};
   use std::sync::mpsc;
 
   /// The token the test's emulated C++ initialize handler accepts.
   const TOKEN: &str = "0123456789abcdef0123456789abcdef";
+
+  /// The name of the ping method (a normal dispatched command, emulated
+  /// by the test like the C++ side does).
+  const METHOD_PING: &str = "ping";
 
   /// A TCP client connected to the test server, speaking the msgpack
   /// protocol.
@@ -586,7 +602,8 @@ mod tests {
   }
 
   /// Emulate the C++ initialize handler on a forwarded request: Validate
-  /// the token, mark the connection as (un)authenticated and reply.
+  /// the token and reply. The server authenticates the connection
+  /// implicitly from the reply (success/error).
   /// Returns whether the token was accepted.
   fn emulate_cpp_initialize(
     server: &RpcServer,
@@ -603,7 +620,6 @@ mod tests {
       .find(|(k, _)| k.as_str() == Some("token"))
       .map(|(_, v)| v.as_str().unwrap().to_string());
     let authenticated = token.as_deref() == Some(expected_token);
-    server.set_authenticated(conn_id, authenticated);
     if authenticated {
       server.reply(conn_id, msg_id, None, &Value::Map(Vec::new()));
     } else {
@@ -615,6 +631,14 @@ mod tests {
       );
     }
     authenticated
+  }
+
+  /// Emulate the C++ ping handler on a forwarded request (reply nil).
+  fn emulate_cpp_ping(server: &RpcServer, dispatch: &TestDispatch) {
+    let (conn_id, msg_id, method, _params) =
+      dispatch.recv_timeout(Duration::from_secs(10)).unwrap();
+    assert_eq!(method, METHOD_PING);
+    server.reply(conn_id, msg_id, None, &Value::Nil);
   }
 
   /// Get a field of a map value.
@@ -637,14 +661,14 @@ mod tests {
       dispatch.recv_timeout(Duration::from_secs(10)).unwrap();
     assert_eq!(method, METHOD_INITIALIZE);
     assert_eq!(field(&params, "token"), Some(&Value::from(TOKEN)));
-    // The C++ side validates the token, marks the connection as
-    // authenticated and replies with the application information:
-    server.set_authenticated(conn_id, true);
+    // The C++ side validates the token and replies with the application
+    // information — the reply itself authenticates the connection:
     server.reply(conn_id, msg_id, None, &Value::Map(Vec::new()));
     let (error, _) = client.read_response(1);
     assert!(error.is_nil());
     // The connection is now usable:
     client.request(2, METHOD_PING, Value::Map(Vec::new()));
+    emulate_cpp_ping(&server, &dispatch);
     let (error, result) = client.read_response(2);
     assert!(error.is_nil());
     assert!(result.is_nil());
@@ -707,6 +731,7 @@ mod tests {
     let (server, port, dispatch, _cancel) = spawn_server();
     let mut client = TestClient::new(port, &server, &dispatch);
     client.request(5, METHOD_PING, Value::Map(Vec::new()));
+    emulate_cpp_ping(&server, &dispatch);
     let (error, result) = client.read_response(5);
     assert!(error.is_nil());
     assert!(result.is_nil());
@@ -770,6 +795,7 @@ mod tests {
     // No second response arrives, i.e. the next message is the ping
     // response:
     client.request(2, METHOD_PING, Value::Map(Vec::new()));
+    emulate_cpp_ping(&server, &dispatch);
     client.read_response(2);
   }
 
@@ -858,6 +884,7 @@ mod tests {
     // callback, no response) — the next message is the ping response.
     client.send(&Value::Array(vec![Value::from(4), Value::from(123)]));
     client.request(2, METHOD_PING, Value::Map(Vec::new()));
+    emulate_cpp_ping(&server, &dispatch);
     client.read_response(2);
     assert!(cancel.try_recv().is_err());
   }
@@ -902,14 +929,6 @@ mod tests {
     assert!(server.reply(conn_id, msg_id, None, &Value::Nil));
     let (error, _) = client.read_response(1);
     assert!(error.is_nil());
-  }
-
-  #[test]
-  fn test_set_authenticated_for_unknown_connection() {
-    let (server, _port, _dispatch, _cancel) = spawn_server();
-    // Calls for unknown connections are ignored (must not panic):
-    server.set_authenticated(u32::MAX, true);
-    server.set_authenticated(u32::MAX, false);
   }
 
   #[test]

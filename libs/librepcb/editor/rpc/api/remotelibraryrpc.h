@@ -26,6 +26,11 @@
 #define LIBREPCB_EDITOR_REMOTELIBRARYRPC_H
 
 /*******************************************************************************
+ *  Includes
+ ******************************************************************************/
+#include <QtCore>
+
+/*******************************************************************************
  *  Forward Declarations
  ******************************************************************************/
 namespace librepcb {
@@ -49,6 +54,9 @@ namespace rpc {
 class RemoteLibraryRpc final {
 public:
   // Constructors / Destructor
+  Q_DECLARE_TR_FUNCTIONS(RemoteLibraryRpc)
+
+public:
   RemoteLibraryRpc() = delete;
 
   // General Methods

@@ -126,11 +126,6 @@ private:  // Methods
   /// Called on the GUI thread: Mark a pending request as cancelled.
   void handleCancel(uint32_t connId, uint32_t msgId) noexcept;
 
-  /// Called on the GUI thread: Handle an `initialize` request — validate
-  /// the token, mark the connection as (un)authenticated on the Rust side
-  /// and reply with the application information.
-  void handleInitialize(RpcRequest& request) noexcept;
-
   /// Called by an #RpcRequest on any event
   void requestEvent(const RpcRequest& request, RpcRequest::Event event,
                     const QVariant& value) noexcept;
@@ -156,8 +151,6 @@ private:  // Data
 
   /// The registry of RPC object handles
   RpcObjectRegistry mObjectRegistry;
-
-  QSet<QString> mAuthenticatedTokens;
 
   /// Pending (dispatched, not yet replied) requests, by connection+msgId
   QHash<uint64_t, std::shared_ptr<RpcRequest>> mPendingRequests;

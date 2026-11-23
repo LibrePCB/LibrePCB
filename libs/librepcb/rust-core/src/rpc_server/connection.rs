@@ -14,7 +14,6 @@ use rmpv::Value;
 use super::codec::{self, read_message};
 use super::protocol::{
   build_response, classify_message, ParsedMessage, RpcError, METHOD_INITIALIZE,
-  METHOD_PING,
 };
 use super::{lock, Connection, Inner, RpcErrorCode};
 
@@ -86,6 +85,8 @@ fn handle_connection(inner: Arc<Inner>, stream: TcpStream, conn_id: u32) {
   // our own clone below) closes the writer thread's channel.
   let (tx, rx) = mpsc::channel::<Vec<u8>>();
   let pending = Arc::new(Mutex::new(std::collections::HashSet::new()));
+  let pending_initializes =
+    Arc::new(Mutex::new(std::collections::HashSet::new()));
   let authenticated = Arc::new(AtomicBool::new(false));
   lock(&inner.clients).insert(
     conn_id,
@@ -93,6 +94,7 @@ fn handle_connection(inner: Arc<Inner>, stream: TcpStream, conn_id: u32) {
       tx: tx.clone(),
       stream,
       pending: Arc::clone(&pending),
+      pending_initializes: Arc::clone(&pending_initializes),
       authenticated: Arc::clone(&authenticated),
     },
   );
@@ -121,9 +123,14 @@ fn handle_connection(inner: Arc<Inner>, stream: TcpStream, conn_id: u32) {
       Ok(Some(message)) => {
         // Note: Connections are never closed because of a received message
         // — only decode errors (framing is broken) close the connection.
-        if let Some(response) =
-          process_message(&inner, conn_id, &pending, &authenticated, &message)
-        {
+        if let Some(response) = process_message(
+          &inner,
+          conn_id,
+          &pending,
+          &pending_initializes,
+          &authenticated,
+          &message,
+        ) {
           if let Ok(bytes) = codec::encode_message(&response) {
             if tx.send(bytes).is_err() {
               break; // The writer thread is gone, so the connection is dead.
@@ -157,6 +164,7 @@ fn process_message(
   inner: &Inner,
   conn_id: u32,
   pending: &Arc<Mutex<std::collections::HashSet<u32>>>,
+  pending_initializes: &Arc<Mutex<std::collections::HashSet<u32>>>,
   authenticated: &Arc<AtomicBool>,
   message: &Value,
 ) -> Option<Value> {
@@ -167,9 +175,10 @@ fn process_message(
       params,
     } => {
       // The `initialize` request is always dispatched (that's how a
-      // connection gets authenticated — the token validation lives on the
-      // C++ side). All other requests are only dispatched while the
-      // connection is authenticated.
+      // connection gets authenticated — the token validation and the
+      // reply live on the C++ side, which authenticates the connection
+      // implicitly by its reply). All other requests are only dispatched
+      // while the connection is authenticated.
       if (method != METHOD_INITIALIZE)
         && (!authenticated.load(Ordering::SeqCst))
       {
@@ -180,10 +189,15 @@ fn process_message(
           &Value::Nil,
         ));
       }
-      if method == METHOD_PING {
-        return Some(build_response(msgid, None, &Value::Nil));
-      }
-      dispatch_request(inner, conn_id, pending, msgid, method, params)
+      dispatch_request(
+        inner,
+        conn_id,
+        pending,
+        pending_initializes,
+        msgid,
+        method,
+        params,
+      )
     }
     ParsedMessage::Cancel { msgid } => {
       // The cancel handler is only invoked for pending requests, i.e.
@@ -225,6 +239,7 @@ fn dispatch_request(
   inner: &Inner,
   conn_id: u32,
   pending: &Arc<Mutex<std::collections::HashSet<u32>>>,
+  pending_initializes: &Arc<Mutex<std::collections::HashSet<u32>>>,
   msgid: u32,
   method: String,
   params: Value,
@@ -237,10 +252,16 @@ fn dispatch_request(
     );
     return Some(build_response(msgid, Some(&error.to_value()), &Value::Nil));
   }
+  // The reply to an `initialize` request authenticates the connection
+  // (see the reply path in the server), so the msgid must be known there.
+  if method == METHOD_INITIALIZE {
+    lock(pending_initializes).insert(msgid);
+  }
   match (inner.dispatch)(conn_id, msgid, &method, &params) {
     Ok(()) => None,
     Err(error) => {
       lock(pending).remove(&msgid);
+      lock(pending_initializes).remove(&msgid);
       Some(build_response(msgid, Some(&error.to_value()), &Value::Nil))
     }
   }

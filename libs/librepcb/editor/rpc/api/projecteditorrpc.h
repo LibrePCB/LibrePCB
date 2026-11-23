@@ -26,6 +26,11 @@
 #define LIBREPCB_EDITOR_PROJECTEDITORRPC_H
 
 /*******************************************************************************
+ *  Includes
+ ******************************************************************************/
+#include <QtCore>
+
+/*******************************************************************************
  *  Forward Declarations
  ******************************************************************************/
 namespace librepcb {
@@ -49,6 +54,9 @@ namespace rpc {
 class ProjectEditorRpc final {
 public:
   // Constructors / Destructor
+  Q_DECLARE_TR_FUNCTIONS(ProjectEditorRpc)
+
+public:
   ProjectEditorRpc() = delete;
 
   // General Methods

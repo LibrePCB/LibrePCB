@@ -34,9 +34,6 @@ const MESSAGE_TYPE_CANCEL: i64 = 4;
 /// authenticated).
 pub const METHOD_INITIALIZE: &str = "initialize";
 
-/// Name of the protocol-level ping method (returns an empty map).
-pub const METHOD_PING: &str = "ping";
-
 /// An RPC error, as sent in a response.
 #[derive(Clone, Debug)]
 pub struct RpcError {

@@ -380,7 +380,7 @@ libs/librepcb/editor/rpc/api/rpcerrors.h     (generated error classes)
 libs/librepcb/editor/rpc/api/projecteditorrpc.{h,cpp}   (.h generated, .cpp hand-written)
 libs/librepcb/editor/rpc/undostackrpc.{h,cpp} (.h generated, .cpp hand-written)
 libs/librepcb/editor/rpc/workspacedbrpc.{h,cpp} (ditto)
-libs/librepcb/editor/rpc/commands.cpp         (100% generated dispatcher)
+libs/librepcb/editor/rpc/api/commands.cpp         (100% generated dispatcher)
 ```
 
 ### 4.2 `RpcServer` (QObject, created by `GuiApplication`)

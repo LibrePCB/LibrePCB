@@ -26,6 +26,11 @@
 #define LIBREPCB_EDITOR_UNDOSTACKRPC_H
 
 /*******************************************************************************
+ *  Includes
+ ******************************************************************************/
+#include <QtCore>
+
+/*******************************************************************************
  *  Forward Declarations
  ******************************************************************************/
 namespace librepcb {
@@ -50,6 +55,9 @@ namespace rpc {
 class UndoStackRpc final {
 public:
   // Constructors / Destructor
+  Q_DECLARE_TR_FUNCTIONS(UndoStackRpc)
+
+public:
   UndoStackRpc() = delete;
 
   // General Methods

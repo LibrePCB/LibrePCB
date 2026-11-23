@@ -126,7 +126,7 @@ def test_rpc_server(librepcb, helpers):
             # rejected, and the connection stays unauthenticated.
             rpc3 = RpcClient(PORT)
             try:
-                rpc3.expect_error(1, "initialize", {"token": "invalid"}, 31)
+                rpc3.expect_error(1, "initialize", {"token": "invalid"}, 33)
                 error, result = rpc3.request(2, "ping", None)
                 assert error is not None and error["code"] == 30, error
             finally:
@@ -142,7 +142,7 @@ def test_rpc_server(librepcb, helpers):
                 rpc4.send([4, 1])
                 message = rpc4.receive()
                 assert message[0:2] == [1, 1], message
-                assert message[2]["code"] == 31, message
+                assert message[2]["code"] == 33, message
                 assert message[2]["message"] == "Access denied", message
             finally:
                 rpc4.close()
@@ -191,13 +191,13 @@ def test_rpc_server(librepcb, helpers):
             assert result["prev"] is None and result["next"] is None, result
             assert isinstance(result["id"], int), result
 
-            # UndoStack.undo on an empty stack → MethodNotAvailable.
-            rpc.expect_error(6, "UndoStack.undo", {"obj": handle}, 33)
+            # UndoStack.undo on an empty stack → UnexpectedState.
+            rpc.expect_error(6, "UndoStack.undo", {"obj": handle}, 50)
 
             # --- Error handling -------------------------------------------
-            # Unknown method → MethodNotFound (32), the connection
+            # Unknown method → MethodNotFound (31), the connection
             # stays open.
-            rpc.expect_error(7, "Foo.bar", {}, 32)
+            rpc.expect_error(7, "Foo.bar", {}, 31)
 
             # Invalid envelope (method not a string) → InvalidRequest
             # (20), the connection stays open.
@@ -207,11 +207,11 @@ def test_rpc_server(librepcb, helpers):
             assert message[2]["code"] == 20, message
             assert message[3] is None, message
 
-            # Unknown project handle → InvalidHandle (35).
+            # Unknown project handle → InvalidHandle (41).
             rpc.send([0, 9, "UndoStack.get", {"obj": "invalid-uuid"}])
             message = rpc.receive()
             assert message[0:2] == [1, 9], message
-            assert message[2]["code"] == 35, message
+            assert message[2]["code"] == 41, message
             assert message[2]["message"] == "Invalid object handle", message
             assert message[3] is None, message
 
@@ -223,12 +223,12 @@ def test_rpc_server(librepcb, helpers):
             assert isinstance(message[3], dict), message
 
             # Params outside the protocol's value domain (non-string map
-            # keys) → InvalidArgs (34), the connection stays open (unlike
+            # keys) → InvalidArgs (40), the connection stays open (unlike
             # a decode error!).
             rpc.send([0, 11, "ProjectEditor.list", {1: "x"}])  # Non-string map key.
             message = rpc.receive()
             assert message[0:2] == [1, 11], message
-            assert message[2]["code"] == 34, message
+            assert message[2]["code"] == 40, message
 
             # A cancel for an unknown msgid is ignored (no response).
             rpc.send([4, 999])

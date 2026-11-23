@@ -24,12 +24,13 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "api/projecteditorrpc.h"
-#include "api/remotelibraryrpc.h"
-#include "api/rpcerrors.h"
-#include "api/undostackrpc.h"
-#include "api/workspacedbrpc.h"
-#include "rpcrequest.h"
+#include "../rpcrequest.h"
+#include "projecteditorrpc.h"
+#include "protocolrpc.h"
+#include "remotelibraryrpc.h"
+#include "rpcerrors.h"
+#include "undostackrpc.h"
+#include "workspacedbrpc.h"
 
 #include <QtCore>
 
@@ -53,6 +54,8 @@ void rpcDispatchCommand(GuiApplication& app, RpcObjectRegistry& registry,
                         const QString& method, RpcRequest& request) {
   using RpcCommand = void (*)(GuiApplication&, RpcObjectRegistry&, RpcRequest&);
   static const QHash<QString, RpcCommand> commands = {
+      {"initialize", &ProtocolRpc::initialize},
+      {"ping", &ProtocolRpc::ping},
       {"ProjectEditor.list", &ProjectEditorRpc::list},
       {"ProjectEditor.open", &ProjectEditorRpc::open},
       {"ProjectEditor.get", &ProjectEditorRpc::get},
@@ -67,11 +70,11 @@ void rpcDispatchCommand(GuiApplication& app, RpcObjectRegistry& registry,
       {"RemoteLibrary.get", &RemoteLibraryRpc::get},
       {"WorkspaceDb.wait", &WorkspaceDbRpc::wait},
   };
-  const auto it = commands.constFind(method);
-  if (it == commands.constEnd()) {
-    throw RpcMethodNotFound(method);
+  if (auto func = commands.value(method, nullptr)) {
+    func(app, registry, request);
+    return;
   }
-  (*it)(app, registry, request);
+  throw RpcMethodNotFound(method);
 }
 
 /*******************************************************************************

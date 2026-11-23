@@ -246,8 +246,8 @@ fn map_field<'a>(value: &'a Value, key: &str) -> Option<&'a Value> {
 ///
 /// - `dispatch`/`cancel`/`ctx`: The command dispatcher and cancel callback.
 ///   The `initialize` request (authentication) is dispatched through the
-///   dispatcher as well — the C++ side validates the token and calls
-///   `ffi_rpc_server_set_authenticated()`.
+///   dispatcher as well — the C++ side validates the token, and the reply
+///   to the request implicitly (un-)authenticates the connection.
 ///
 /// Returns null if the server could not be started (no free port / thread
 /// spawning failed).
@@ -312,20 +312,6 @@ extern "C" fn ffi_rpc_server_new(
 extern "C" fn ffi_rpc_server_delete(s: *mut RpcServer) {
   assert!(!s.is_null());
   unsafe { drop(Box::from_raw(s)) };
-}
-
-/// Mark a connection as (un)authenticated.
-///
-/// Called by the C++ side after it validated the authentication token of
-/// an `initialize` request (the token handling lives on the C++ side).
-/// Calls for unknown or already closed connections are ignored.
-#[no_mangle]
-extern "C" fn ffi_rpc_server_set_authenticated(
-  s: &mut RpcServer,
-  conn_id: u32,
-  authenticated: bool,
-) {
-  s.set_authenticated(conn_id, authenticated)
 }
 
 /// Send a request-scoped message (e.g. a progress report) to the client

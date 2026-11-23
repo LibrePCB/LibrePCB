@@ -26,6 +26,11 @@
 #define LIBREPCB_EDITOR_{{ class_name | upper }}RPC_H
 
 /*******************************************************************************
+ *  Includes
+ ******************************************************************************/
+#include <QtCore>
+
+/*******************************************************************************
  *  Forward Declarations
  ******************************************************************************/
 namespace librepcb {
@@ -49,6 +54,9 @@ namespace rpc {
 class {{ class_name }}Rpc final {
 public:
   // Constructors / Destructor
+  Q_DECLARE_TR_FUNCTIONS({{ class_name }}Rpc)
+
+public:
   {{ class_name }}Rpc() = delete;
 
   // General Methods

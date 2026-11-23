@@ -881,8 +881,11 @@ add_library(
   project/schematic/symbolinstancepropertiesdialog.cpp
   project/schematic/symbolinstancepropertiesdialog.h
   project/schematic/symbolinstancepropertiesdialog.ui
+  rpc/api/commands.cpp
   rpc/api/projecteditorrpc.cpp
   rpc/api/projecteditorrpc.h
+  rpc/api/protocolrpc.cpp
+  rpc/api/protocolrpc.h
   rpc/api/remotelibraryrpc.cpp
   rpc/api/remotelibraryrpc.h
   rpc/api/rpcerrors.h
@@ -892,7 +895,6 @@ add_library(
   rpc/api/undostackrpc.h
   rpc/api/workspacedbrpc.cpp
   rpc/api/workspacedbrpc.h
-  rpc/commands.cpp
   rpc/rpcerror.h
   rpc/rpcobjectregistry.cpp
   rpc/rpcobjectregistry.h

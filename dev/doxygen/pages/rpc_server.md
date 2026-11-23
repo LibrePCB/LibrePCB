@@ -47,7 +47,7 @@ There are two ways to authenticate:
 - **With a token:** The params carry a `token` string. If the token was
   issued by this application instance (see below) and is still valid, the
   connection is authenticated. Otherwise the request is answered with an
-  error ([code 31](@ref doc_rpc_api_errors)) and the connection stays
+  error ([code 33](@ref doc_rpc_api_errors)) and the connection stays
   open, but stays unauthenticated.
 - **Interactively:** The params carry a `name` string identifying the
   client. The application asks the user whether to accept the connection
@@ -55,7 +55,7 @@ There are two ways to authenticate:
   authenticated and a new token is issued, which the client shall store
   for future connections. If the user denies the request (or the client
   cancels it), the request is answered with an error
-  ([code 31](@ref doc_rpc_api_errors)).
+  ([code 33](@ref doc_rpc_api_errors)).
 
 The success result is a map with some application information:
 
@@ -83,7 +83,7 @@ Clients use `version` together with the per-method `since`
 from the specification file to determine which methods the server
 supports: Methods added after the revision of the client's specification
 are unknown to the client (calling them results in
-[error code 32](@ref doc_rpc_api_errors)).
+[error code 31](@ref doc_rpc_api_errors)).
 
 Messages {#doc_rpc_api_messages}
 --------
