@@ -24,11 +24,10 @@
 
 #include "../../guiapplication.h"
 #include "../../project/projecteditor.h"
-#include "../../undostack.h"
-#include "../rpchelpers.h"
 #include "../rpcobjectregistry.h"
 #include "../rpcrequest.h"
 #include "rpcerrors.h"
+#include "rpchelpers.h"
 #include "rpctypes.h"
 
 #include <librepcb/core/attribute/attribute.h>
@@ -83,7 +82,7 @@ static QVariantMap summary(ProjectEditor& obj, RpcObjectRegistry& registry) {
   result.insert("obj", registry.getHandle(obj));
   result.insert("name", *project.getName());
   result.insert("path", project.getFilepath().toStr());
-  result.insert("dirty", !obj.hasUnsavedChanges());
+  result.insert("dirty", obj.hasUnsavedChanges());
   return result;
 }
 
@@ -93,14 +92,22 @@ static QVariantMap details(ProjectEditor& obj, RpcObjectRegistry& registry) {
   QVariantMap result;
   result.insert("name", *project.getName());
   result.insert("path", project.getFilepath().toStr());
-  result.insert("dirty", !obj.hasUnsavedChanges());
+  result.insert("dirty", obj.hasUnsavedChanges());
   result.insert("author", project.getAuthor());
   result.insert("version", *project.getVersion());
-  result.insert("attributes", summaryList(project.getAttributes(), registry));
-  result.insert("locale_order", variantList(project.getLocaleOrder()));
-  result.insert("norm_order", variantList(project.getNormOrder()));
-  result.insert("sheets", summaryList(project.getSchematics(), registry));
-  result.insert("boards", summaryList(project.getBoards(), registry));
+  result.insert("attributes",
+                toVariant(project.getAttributes(), [&](const Attribute& obj) {
+                  return summary(obj, registry);
+                }));
+  result.insert("locale_order", toVariant(project.getLocaleOrder()));
+  result.insert("norm_order", toVariant(project.getNormOrder()));
+  result.insert("sheets",
+                toVariant(project.getSchematics(), [&](Schematic& obj) {
+                  return summary(obj, registry);
+                }));
+  result.insert("boards", toVariant(project.getBoards(), [&](Board& obj) {
+                  return summary(obj, registry);
+                }));
   return result;
 }
 

@@ -30,8 +30,7 @@
  ******************************************************************************/
 namespace librepcb {
 namespace editor {
-
-class RpcObjectRegistry;
+namespace rpc {
 
 /*******************************************************************************
  *  RPC Helpers
@@ -40,18 +39,18 @@ class RpcObjectRegistry;
 /// Convert a string list into the protocol's list-of-strings
 /// representation (QStringList is not part of the protocol's value
 /// domain, see the RPC API specification).
-inline QVariant variantList(const QStringList& list) noexcept {
+inline QVariant toVariant(const QStringList& list) noexcept {
   return QVariant(list).value<QVariantList>();
 }
 
-template <typename T>
-inline QVariantList summaryList(const T& list, RpcObjectRegistry& registry) {
+template <typename T, typename F>
+inline QVariantList toVariant(const T& list, F convertItem) {
   QVariantList result;
   for (const auto& obj : list) {
     if constexpr (std::is_pointer_v<std::remove_reference_t<decltype(obj)>>) {
-      result.append(summary(*obj, registry));
+      result.append(convertItem(*obj));
     } else {
-      result.append(summary(obj, registry));
+      result.append(convertItem(obj));
     }
   }
   return result;
@@ -61,6 +60,7 @@ inline QVariantList summaryList(const T& list, RpcObjectRegistry& registry) {
  *  End of File
  ******************************************************************************/
 
+}  // namespace rpc
 }  // namespace editor
 }  // namespace librepcb
 
