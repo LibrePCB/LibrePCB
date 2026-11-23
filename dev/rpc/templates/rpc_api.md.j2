@@ -66,6 +66,24 @@ This reference documents the commands (data types, error types, classes with the
 
 ---
 {% endfor %}
+{% if spec.ext_types %}
+# Extension Types {{ "{" }}#doc_rpc_api_ext_types}
+
+MessagePack extension types: Tagged raw bytes which are opaque to the transport layer (only the ext code and the raw payload cross the wire). Their interpretation is up to the client/server.
+
+{% for ext in spec.ext_types %}
+## {{ ext.name }} (ext code {{ ext.code }}) {{ "{" }}#doc_rpc_api_ext_type_{{ ext.name }}}
+{% if ext.description %}
+
+{{ ext.description }}
+
+{% endif %}
+**Ext code:** `{{ ext.code }}`
+
+---
+{% endfor %}
+{% endif %}
+
 # Error Types {{ "{" }}#doc_rpc_api_errors}
 
 The `error` element of a response is a map with the keys `code` and `message` (and possibly additional properties, listed below):

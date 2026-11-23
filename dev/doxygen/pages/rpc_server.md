@@ -124,8 +124,22 @@ type:
 - Unknown message types are ignored for forward compatibility. A request
   which doesn't conform to the envelope (e.g. a non-string method) is
   answered with error code 20 (`InvalidRequest`) and the connection stays
-  open. However, values outside the protocol's value domain (e.g. `ext`
-  values) result in error code 23 (`InvalidParams`).
+  open. However, values outside the protocol's value domain result in
+  error code 23 (`InvalidParams`).
+
+Values {#doc_rpc_api_values}
+------
+
+The protocol's value domain is a subset of MessagePack: `nil`, `bool`,
+integers (i64 or u64), `float` (f64), `str` (UTF-8), `bin`, `array`, maps
+(with `str` keys), and `ext`. Any other value (e.g. a map with non-string
+keys or invalid UTF-8 in a string) is rejected with error code 23
+(`InvalidParams`).
+
+`ext` values are tagged raw bytes which are opaque to the transport
+layer: Only the ext code and the payload cross the wire, uninterpreted.
+Their interpretation is specified per ext code in the API reference (see
+@ref doc_rpc_api_ext_types).
 
 Params & Conventions {#doc_rpc_api_params}
 --------------------

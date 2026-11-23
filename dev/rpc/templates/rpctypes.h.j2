@@ -101,6 +101,16 @@ struct RpcEnumTraits<{{ enum.name }}> {
 
 {% endfor %}
 /*******************************************************************************
+ *  Extension Types
+ ******************************************************************************/
+
+{% for ext in spec.ext_types %}
+/// The msgpack ext code of the "{{ ext.name }}" extension type (see the
+/// API specification). Used to build ext values on the wire.
+constexpr qint8 kMsgPackExtType{{ ext.name | cpp_pascal }} = {{ ext.code }};
+
+{% endfor %}
+/*******************************************************************************
  *  End of File
  ******************************************************************************/
 

@@ -62,7 +62,7 @@ static QVariantMap summary(const Attribute& obj, RpcObjectRegistry& registry) {
 static QVariantMap summary(Schematic& obj, RpcObjectRegistry& registry) {
   QVariantMap result;
   result.insert("obj", registry.getHandle(obj));
-  result.insert("uuid", obj.getUuid().toStr());
+  result.insert("uuid", toVariant(obj.getUuid()));
   result.insert("name", *obj.getName());
   return result;
 }
@@ -70,7 +70,7 @@ static QVariantMap summary(Schematic& obj, RpcObjectRegistry& registry) {
 static QVariantMap summary(Board& obj, RpcObjectRegistry& registry) {
   QVariantMap result;
   result.insert("obj", registry.getHandle(obj));
-  result.insert("uuid", obj.getUuid().toStr());
+  result.insert("uuid", toVariant(obj.getUuid()));
   result.insert("name", *obj.getName());
   return result;
 }
@@ -90,6 +90,7 @@ static QVariantMap details(ProjectEditor& obj, RpcObjectRegistry& registry) {
   const Project& project = obj.getProject();
 
   QVariantMap result;
+  result.insert("uuid", toVariant(project.getUuid()));
   result.insert("name", *project.getName());
   result.insert("path", project.getFilepath().toStr());
   result.insert("dirty", obj.hasUnsavedChanges());

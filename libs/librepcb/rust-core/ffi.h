@@ -483,6 +483,18 @@ extern void ffi_qvariant_map_at(const QVariant * NONNULL obj,
                                 QString * NONNULL key,
                                 QVariant * NONNULL value);
 
+extern void ffi_qvariant_set_ext(QVariant * NONNULL obj,
+                                 int8_t ext_type,
+                                 const uint8_t *data,
+                                 size_t len);
+
+extern bool ffi_qvariant_get_ext(const QVariant * NONNULL obj,
+                                 int8_t * NONNULL ext_type,
+                                 size_t * NONNULL len);
+
+extern void ffi_qvariant_get_ext_data(const QVariant * NONNULL obj,
+                                      uint8_t *out);
+
 /**
  * Create a new [InteractiveHtmlBom] object
  */

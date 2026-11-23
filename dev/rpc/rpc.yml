@@ -18,9 +18,11 @@
 # Schema notes:
 # - Types are from the protocol's value domain: null, bool, int (i64 or
 #   u64),
-#   float (f64), string, binary, array, map (with string keys). A struct
-#   is a map with the listed fields. `handle` is a special type: an
-#   *opaque* object handle (see the class descriptions).
+#   float (f64), string, binary, array, map (with string keys), ext (see
+#   the extension types below). A struct is a map with the listed
+#   fields. `handle` is a special type: an *opaque* object handle (see
+#   the class descriptions). `uuid` is an extension type, `uuid_str` the
+#   same UUID as a 36-character string.
 # - The params of every method are a map. The reserved key "obj" carries
 #   the receiver handle for non-static methods — it is NOT listed in the
 #   params below. Handles are opaque values: Clients obtain them from
@@ -159,6 +161,22 @@ enums:
           Restore the auto-save backup, if available.
 
 # ---------------------------------------------------------------------------
+# Extension Types
+# ---------------------------------------------------------------------------
+#
+# The MessagePack extension types used by this API, i.e. tagged raw bytes.
+# They are opaque to the transport layer: Only the ext code and the raw
+# payload cross the wire, their interpretation is up to the client/server.
+
+ext_types:
+  - name: uuid
+    code: "0x02"
+    description: >-
+      A UUID (RFC 4122), encoded as its 16 bytes in field order (network
+      byte order). This is equivalent to the string representation
+      (type "uuid_str"), but requires only half of the size on the wire.
+
+# ---------------------------------------------------------------------------
 # Structs
 # ---------------------------------------------------------------------------
 
@@ -194,7 +212,7 @@ structs:
     description: Details about an open project.
     fields:
       - name: uuid
-        type: string
+        type: uuid
         description: The project UUID.
       - name: name
         type: string
@@ -224,7 +242,7 @@ structs:
     description: A summary of a schematic sheet.
     fields:
       - name: uuid
-        type: string
+        type: uuid
         description: The schematic UUID.
       - name: name
         type: string
@@ -234,7 +252,7 @@ structs:
     description: A summary of a board.
     fields:
       - name: uuid
-        type: string
+        type: uuid
         description: The board UUID.
       - name: name
         type: string
@@ -375,7 +393,7 @@ classes:
         params:
           - name: libraries
             type: array
-            items: uuid
+            items: uuid_str
             description: UUID of libraries to install.
 
       - name: uninstall
@@ -389,7 +407,7 @@ classes:
         params:
           - name: libraries
             type: array
-            items: uuid
+            items: uuid_str
             description: UUID of libraries to uninstall.
 
       - name: get

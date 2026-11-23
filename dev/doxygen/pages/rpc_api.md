@@ -35,7 +35,7 @@ Details about an open project.
 
 | Name | Type | Description |
 |------|------|-------------|
-| `uuid` | string | The project UUID. |
+| `uuid` | uuid | The project UUID. |
 | `name` | string | The project name. |
 | `author` | string | The project author. |
 | `version` | string | The project version. |
@@ -54,7 +54,7 @@ A summary of a schematic sheet.
 
 | Name | Type | Description |
 |------|------|-------------|
-| `uuid` | string | The schematic UUID. |
+| `uuid` | uuid | The schematic UUID. |
 | `name` | string | The schematic name. |
 
 ---
@@ -67,7 +67,7 @@ A summary of a board.
 
 | Name | Type | Description |
 |------|------|-------------|
-| `uuid` | string | The board UUID. |
+| `uuid` | uuid | The board UUID. |
 | `name` | string | The board name. |
 
 ---
@@ -104,6 +104,18 @@ Information about the workspace library database.
 | `restore` | Restore the auto-save backup, if available. |
 
 ---
+# Extension Types {#doc_rpc_api_ext_types}
+
+MessagePack extension types: Tagged raw bytes which are opaque to the transport layer (only the ext code and the raw payload cross the wire). Their interpretation is up to the client/server.
+
+## uuid (ext code 0x02) {#doc_rpc_api_ext_type_uuid}
+
+A UUID (RFC 4122), encoded as its 16 bytes in field order (network byte order). This is equivalent to the string representation (type "uuid_str"), but requires only half of the size on the wire.
+
+**Ext code:** `0x02`
+
+---
+
 # Error Types {#doc_rpc_api_errors}
 
 The `error` element of a response is a map with the keys `code` and `message` (and possibly additional properties, listed below):
@@ -296,7 +308,7 @@ Install or update remote libraries in one batch. Note that dependent libraries w
 
 | Name | Type | Description |
 |------|------|-------------|
-| `libraries` | array of uuid | UUID of libraries to install. |
+| `libraries` | array of uuid_str | UUID of libraries to install. |
 
 **Result:** `null`
 
@@ -311,7 +323,7 @@ ATTENTION: Be careful with uninstalling libraries which are currently not availa
 
 | Name | Type | Description |
 |------|------|-------------|
-| `libraries` | array of uuid | UUID of libraries to uninstall. |
+| `libraries` | array of uuid_str | UUID of libraries to uninstall. |
 
 **Result:** `null`
 

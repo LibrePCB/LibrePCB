@@ -5,9 +5,12 @@
 //! msgpack values), and responses/notifications cross back as `QVariant`
 //! trees (read back into msgpack values). The conversion only accepts the
 //! protocol's restricted value domain (nil, bool, int (i64 and u64), f64,
-//! string, bytearray, list, map with string keys) — values outside that
-//! domain (msgpack `ext`, non-string map keys, invalid UTF-8) are
-//! rejected as payload-level errors.
+//! string, bytearray, list, map with string keys, ext values) — values
+//! outside that domain (non-string map keys, invalid UTF-8) are rejected
+//! as payload-level errors. Ext values are opaque: The generic
+//! `MsgPackExt` metatype carries just the ext code and the raw payload
+//! (see `rpcext.h`), neither the transport layer nor this module knows
+//! anything about their interpretation.
 
 use super::cpp_ffi::*;
 use crate::rpc_server::{
@@ -145,7 +148,9 @@ fn build_variant(obj: *mut QVariant, value: &Value) -> Result<(), ()> {
           qvariant_delete(child);
         }
       }
-      Value::Ext(..) => return Err(()), // Not part of the protocol.
+      Value::Ext(ext_type, data) => {
+        ffi_qvariant_set_ext(&mut *obj, *ext_type, data.as_ptr(), data.len())
+      }
     }
   }
   Ok(())
@@ -209,8 +214,19 @@ fn qvariant_to_msgpack(obj: &QVariant) -> Result<Value, ()> {
         }
         Value::Map(pairs)
       }
-      // Any other metatype is not part of the protocol's value domain.
-      _ => return Err(()),
+      // Any other metatype is not part of the protocol's value domain,
+      // with one exception: The generic ext value (see MsgPackExt),
+      // which is detected by the C++ side of the FFI.
+      _ => {
+        let mut ext_type: i8 = 0;
+        let mut ext_len: usize = 0;
+        if !ffi_qvariant_get_ext(obj, &mut ext_type, &mut ext_len) {
+          return Err(());
+        }
+        let mut data = vec![0u8; ext_len];
+        ffi_qvariant_get_ext_data(obj, data.as_mut_ptr());
+        Value::Ext(ext_type, data)
+      }
     })
   }
 }
