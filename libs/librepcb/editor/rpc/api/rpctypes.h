@@ -75,7 +75,7 @@ struct RpcEnumTraits<BackupRestoreMode> {
   /// or std::nullopt if the argument is mandatory (no default in the
   /// specification).
   static constexpr std::optional<BackupRestoreMode> DEFAULT =
-BackupRestoreMode::Abort;
+      BackupRestoreMode::Abort;
 
   /// The map from wire strings to enum values.
   static const QHash<QString, BackupRestoreMode>& mapFromString() noexcept {
@@ -90,9 +90,9 @@ BackupRestoreMode::Abort;
   /// The map from enum values to wire strings.
   static const QHash<BackupRestoreMode, QString>& mapToString() noexcept {
     static const QHash<BackupRestoreMode, QString> map = {
-        { BackupRestoreMode::Abort, "abort"},
-        { BackupRestoreMode::Discard, "discard"},
-        { BackupRestoreMode::Restore, "restore"},
+        {BackupRestoreMode::Abort, "abort"},
+        {BackupRestoreMode::Discard, "discard"},
+        {BackupRestoreMode::Restore, "restore"},
     };
     return map;
   }

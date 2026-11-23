@@ -11,44 +11,70 @@
 /// `editor/rpc/rpcerrors.h`).
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 #[repr(i32)]
-pub enum RpcErrorCode {/// The received message could not be decoded (invalid MessagePack or a
-/// truncated value), so the stream framing is broken and the connection is
-/// closed without a response.
-  InvalidMessage = 10,/// The received message exceeded the maximum size of 32 MiB, so the connection
-/// is closed without a response.
-  MessageTooLarge = 11,/// The request doesn't conform to the message envelope.
-  InvalidRequest = 20,/// A request other than `initialize` was sent on a connection which is not
-/// authenticated yet. The first message of a connection must be an `initialize`
-/// request.
-  Unauthenticated = 30,/// The provided access token doesn't have the permissions to execute the
-/// command. If this error is returned by the 'initialize' method, it means that
-/// either the provided token is invalid or has expired, or an interactive
-/// connection request was denied by the user.
-  AccessDenied = 31,/// The method was not found, e.g. because it was added in a newer application
-/// version than the running one, or the method has been removed from the
-/// application and is no longer available.
-  MethodNotFound = 32,/// The method exists, but is currently not available. This may be the case if
-/// the application is in a state where the requested functionality does not
-/// exist.
-  MethodNotAvailable = 33,/// The method arguments are invalid, e.g. wrong value types, missing required
-/// arguments, invalid values, or unknown enum values.
-  InvalidArgs = 34,/// The provided object handle is invalid or has expired (e.g. object was
-/// deleted in the mean time). For example, this error is returned when
-/// accessing a project after it has been closed.
-  InvalidHandle = 35,/// An unexpected internal error occurred, e.g. a command handler returned
-/// invalid data. This is a bug in LibrePCB, please open an issue on GitHub.
-  InternalError = 38,/// The request was cancelled by the client and the command stopped its work
-/// when it could. Note that if the work already completed, the normal result is
-/// sent instead (exactly one response per request).
-  Cancelled = 39,/// The command execution failed in an unspecified way, i.e. none of the
-/// specific error codes fit. The message contains details about the failure.
-  CommandFailed = 100,}
+pub enum RpcErrorCode {
+  /// The received message could not be decoded (invalid MessagePack or a
+  /// truncated value), so the stream framing is broken and the connection is
+  /// closed without a response.
+  InvalidMessage = 10,
+  /// The received message exceeded the maximum size of 32 MiB, so the connection
+  /// is closed without a response.
+  MessageTooLarge = 11,
+  /// The request doesn't conform to the message envelope.
+  InvalidRequest = 20,
+  /// A request other than `initialize` was sent on a connection which is not
+  /// authenticated yet. The first message of a connection must be an `initialize`
+  /// request.
+  Unauthenticated = 30,
+  /// The provided access token doesn't have the permissions to execute the
+  /// command. If this error is returned by the 'initialize' method, it means that
+  /// either the provided token is invalid or has expired, or an interactive
+  /// connection request was denied by the user.
+  AccessDenied = 31,
+  /// The method was not found, e.g. because it was added in a newer application
+  /// version than the running one, or the method has been removed from the
+  /// application and is no longer available.
+  MethodNotFound = 32,
+  /// The method exists, but is currently not available. This may be the case if
+  /// the application is in a state where the requested functionality does not
+  /// exist.
+  MethodNotAvailable = 33,
+  /// The method arguments are invalid, e.g. wrong value types, missing required
+  /// arguments, invalid values, or unknown enum values.
+  InvalidArgs = 34,
+  /// The provided object handle is invalid or has expired (e.g. object was
+  /// deleted in the mean time). For example, this error is returned when
+  /// accessing a project after it has been closed.
+  InvalidHandle = 35,
+  /// An unexpected internal error occurred, e.g. a command handler returned
+  /// invalid data. This is a bug in LibrePCB, please open an issue on GitHub.
+  InternalError = 38,
+  /// The request was cancelled by the client and the command stopped its work
+  /// when it could. Note that if the work already completed, the normal result is
+  /// sent instead (exactly one response per request).
+  Cancelled = 39,
+  /// The command execution failed in an unspecified way, i.e. none of the
+  /// specific error codes fit. The message contains details about the failure.
+  CommandFailed = 100,
+}
 
 impl RpcErrorCode {
   /// The canonical error message, as sent on the wire if
   /// the application does not provide a more specific one.
   pub const fn message(self) -> &'static str {
-    match self {      Self::InvalidMessage => "Message decoding failed",      Self::MessageTooLarge => "Message too large",      Self::InvalidRequest => "Invalid request",      Self::Unauthenticated => "Connection is not authenticated",      Self::AccessDenied => "Access denied",      Self::MethodNotFound => "Method not found",      Self::MethodNotAvailable => "Method not available",      Self::InvalidArgs => "Invalid method arguments",      Self::InvalidHandle => "Invalid object handle",      Self::InternalError => "Internal error",      Self::Cancelled => "Request cancelled",      Self::CommandFailed => "Command failed",    }
+    match self {
+      Self::InvalidMessage => "Message decoding failed",
+      Self::MessageTooLarge => "Message too large",
+      Self::InvalidRequest => "Invalid request",
+      Self::Unauthenticated => "Connection is not authenticated",
+      Self::AccessDenied => "Access denied",
+      Self::MethodNotFound => "Method not found",
+      Self::MethodNotAvailable => "Method not available",
+      Self::InvalidArgs => "Invalid method arguments",
+      Self::InvalidHandle => "Invalid object handle",
+      Self::InternalError => "Internal error",
+      Self::Cancelled => "Request cancelled",
+      Self::CommandFailed => "Command failed",
+    }
   }
 }
 
@@ -56,7 +82,20 @@ impl TryFrom<i32> for RpcErrorCode {
   type Error = ();
 
   fn try_from(code: i32) -> Result<Self, Self::Error> {
-    match code {      10 => Ok(Self::InvalidMessage),      11 => Ok(Self::MessageTooLarge),      20 => Ok(Self::InvalidRequest),      30 => Ok(Self::Unauthenticated),      31 => Ok(Self::AccessDenied),      32 => Ok(Self::MethodNotFound),      33 => Ok(Self::MethodNotAvailable),      34 => Ok(Self::InvalidArgs),      35 => Ok(Self::InvalidHandle),      38 => Ok(Self::InternalError),      39 => Ok(Self::Cancelled),      100 => Ok(Self::CommandFailed),      _ => Err(()),
+    match code {
+      10 => Ok(Self::InvalidMessage),
+      11 => Ok(Self::MessageTooLarge),
+      20 => Ok(Self::InvalidRequest),
+      30 => Ok(Self::Unauthenticated),
+      31 => Ok(Self::AccessDenied),
+      32 => Ok(Self::MethodNotFound),
+      33 => Ok(Self::MethodNotAvailable),
+      34 => Ok(Self::InvalidArgs),
+      35 => Ok(Self::InvalidHandle),
+      38 => Ok(Self::InternalError),
+      39 => Ok(Self::Cancelled),
+      100 => Ok(Self::CommandFailed),
+      _ => Err(()),
     }
   }
 }

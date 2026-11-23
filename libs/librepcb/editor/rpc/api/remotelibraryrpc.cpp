@@ -35,8 +35,7 @@
  ******************************************************************************/
 namespace librepcb {
 namespace editor {
-
-using namespace rpc;
+namespace rpc {
 
 /*******************************************************************************
  *  Command Handlers
@@ -116,5 +115,6 @@ void RemoteLibraryRpc::uninstall(GuiApplication& app,
  *  End of File
  ******************************************************************************/
 
+}  // namespace rpc
 }  // namespace editor
 }  // namespace librepcb

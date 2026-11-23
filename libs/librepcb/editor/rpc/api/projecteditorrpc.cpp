@@ -44,8 +44,7 @@
  ******************************************************************************/
 namespace librepcb {
 namespace editor {
-
-using namespace rpc;
+namespace rpc {
 
 /*******************************************************************************
  *  Helper Functions
@@ -110,7 +109,7 @@ static QVariantMap details(ProjectEditor& obj, RpcObjectRegistry& registry) {
  ******************************************************************************/
 
 void ProjectEditorRpc::list(GuiApplication& app, RpcObjectRegistry& registry,
-                      RpcRequest& request) {
+                            RpcRequest& request) {
   QVariantList projects;
   for (const auto& editor : app.getProjects()) {
     projects.append(summary(*editor, registry));
@@ -121,7 +120,7 @@ void ProjectEditorRpc::list(GuiApplication& app, RpcObjectRegistry& registry,
 }
 
 void ProjectEditorRpc::open(GuiApplication& app, RpcObjectRegistry& registry,
-                      RpcRequest& request) {
+                            RpcRequest& request) {
   const FilePath fp(request.getArg("path").toString());
   const auto backupRestoreMode = request.getArg<BackupRestoreMode>("backup");
   auto askForRestoringBackup = [backupRestoreMode](const FilePath&) {
@@ -143,14 +142,14 @@ void ProjectEditorRpc::open(GuiApplication& app, RpcObjectRegistry& registry,
 }
 
 void ProjectEditorRpc::get(GuiApplication& app, RpcObjectRegistry& registry,
-                     RpcRequest& request) {
+                           RpcRequest& request) {
   Q_UNUSED(app);
   auto& editor = registry.getAs<ProjectEditor>(request.getArg("obj"));
   request.sendSuccess(details(editor, registry));
 }
 
 void ProjectEditorRpc::save(GuiApplication& app, RpcObjectRegistry& registry,
-                      RpcRequest& request) {
+                            RpcRequest& request) {
   Q_UNUSED(app);
   auto& editor = registry.getAs<ProjectEditor>(request.getArg("obj"));
   editor.saveProjectNonInteractive();  // can throw
@@ -158,7 +157,7 @@ void ProjectEditorRpc::save(GuiApplication& app, RpcObjectRegistry& registry,
 }
 
 void ProjectEditorRpc::close(GuiApplication& app, RpcObjectRegistry& registry,
-                       RpcRequest& request) {
+                             RpcRequest& request) {
   auto& editor = registry.getAs<ProjectEditor>(request.getArg("obj"));
   const auto& projects = app.getProjects();
   for (int i = 0; i < projects.count(); ++i) {
@@ -175,5 +174,6 @@ void ProjectEditorRpc::close(GuiApplication& app, RpcObjectRegistry& registry,
  *  End of File
  ******************************************************************************/
 
+}  // namespace rpc
 }  // namespace editor
 }  // namespace librepcb

@@ -34,8 +34,7 @@
  ******************************************************************************/
 namespace librepcb {
 namespace editor {
-
-using namespace rpc;
+namespace rpc {
 
 /*******************************************************************************
  *  Helper Functions
@@ -92,5 +91,6 @@ void UndoStackRpc::redo(GuiApplication& app, RpcObjectRegistry& registry,
  *  End of File
  ******************************************************************************/
 
+}  // namespace rpc
 }  // namespace editor
 }  // namespace librepcb
