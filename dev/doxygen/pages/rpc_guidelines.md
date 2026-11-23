@@ -29,9 +29,11 @@ New commands are added in four steps:
 4. **Reply exactly once**: by returning normally after
    `request.sendSuccess()`, or by throwing an error (see below).
 
-Only the files listed in this page's sections are hand-written; everything
-else is generated. New *classes* additionally require adding their files
-to `libs/librepcb/editor/CMakeLists.txt`.
+Only the files listed in this page's sections are hand-written;
+everything else is generated. New *classes* additionally get an empty
+implementation file (created by the generator if it does not exist yet)
+and are registered in `libs/librepcb/editor/CMakeLists.txt`
+automatically.
 
 Handler Implementation
 ----------------------

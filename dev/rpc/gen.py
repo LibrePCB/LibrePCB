@@ -52,9 +52,34 @@ DOCS_FILE = REPO_DIR / "dev" / "doxygen" / "pages" / "rpc_api.md"
 RUST_FILE = REPO_DIR / "libs" / "librepcb" / "rust-core" / "src" / "rpc_server" / "rpc_api.rs"
 EDITOR_RPC_DIR = REPO_DIR / "libs" / "librepcb" / "editor" / "rpc"
 EDITOR_API_DIR = EDITOR_RPC_DIR / "api"
+CMAKELISTS_FILE = REPO_DIR / "libs" / "librepcb" / "editor" / "CMakeLists.txt"
 COMMANDS_FILE = EDITOR_RPC_DIR / "commands.cpp"
 RPCERRORS_FILE = EDITOR_API_DIR / "rpcerrors.h"
 RPCTYPES_FILE = EDITOR_API_DIR / "rpctypes.h"
+
+CPP_STUB = """/*
+ * LibrePCB - Professional EDA for everyone!
+ * Copyright (C) 2013 LibrePCB Developers, see AUTHORS.md for contributors.
+ * https://librepcb.org/
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+// TODO: Implement the RPC commands declared in the corresponding
+// generated header.
+"""
+
 
 ENUM_DOC = (
     "Error codes for the RPC protocol, as listed in the error types"
@@ -105,6 +130,23 @@ def rust_string(s):
     return '"{}"'.format(s.replace("\\", "\\\\").replace('"', '\\"'))
 
 
+def add_to_cmakelists(cmake, entry):
+    """Add a missing source file entry to the rpc block of CMakeLists.txt.
+
+    The entries are not sorted — the formatter takes care of that.
+    """
+    lines = cmake.splitlines(keepends=True)
+    if any(line.strip() == entry for line in lines):
+        return cmake
+    rpc_indices = [
+        i for i, line in enumerate(lines) if line.strip().startswith("rpc/")
+    ]
+    if not rpc_indices:
+        raise RuntimeError("Could not find the rpc sources in CMakeLists.txt")
+    lines.insert(rpc_indices[-1] + 1, f"  {entry}\n")
+    return "".join(lines)
+
+
 def make_environment():
     env = Environment(
         loader=FileSystemLoader(TEMPLATES_DIR),
@@ -149,6 +191,27 @@ def main():
             rpc_class=cls,
         ), encoding="utf-8")
         print(f"Generated {path}")
+
+    # Make sure the command implementation files exist and are registered
+    # in CMakeLists.txt (the headers are generated, the implementations
+    # are written by hand).
+    cmake = CMAKELISTS_FILE.read_text(encoding="utf-8")
+    cmake_changed = False
+    for cls in spec.get("classes", []):
+        base = EDITOR_API_DIR / f"{cls['name'].lower()}rpc"
+        if not base.with_suffix(".cpp").exists():
+            base.with_suffix(".cpp").write_text(CPP_STUB, encoding="utf-8")
+            print(f"Created {base.with_suffix('.cpp')}")
+        for filename in (f"{cls['name'].lower()}rpc.h",
+                         f"{cls['name'].lower()}rpc.cpp"):
+            entry = f"rpc/api/{filename}"
+            new_cmake = add_to_cmakelists(cmake, entry)
+            if new_cmake != cmake:
+                cmake = new_cmake
+                cmake_changed = True
+    if cmake_changed:
+        CMAKELISTS_FILE.write_text(cmake, encoding="utf-8")
+        print(f"Updated {CMAKELISTS_FILE}")
 
     RPCERRORS_FILE.write_text(env.get_template("rpcerrors.h.j2").render(
         spec=spec,
