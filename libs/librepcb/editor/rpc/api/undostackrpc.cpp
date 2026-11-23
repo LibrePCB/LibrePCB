@@ -54,6 +54,14 @@ static QVariantMap details(UndoStack& obj) {
   return result;
 }
 
+static void throwIfCmdGroupActive(UndoStack& obj) {
+  if (obj.isCommandGroupActive()) {
+    throw RpcUnexpectedState(
+        "There is currently a command active which blocks the undo stack. Exit "
+        "the current tool and try again.");
+  }
+}
+
 /*******************************************************************************
  *  Command Handlers
  ******************************************************************************/
@@ -69,8 +77,10 @@ void UndoStackRpc::undo(GuiApplication& app, RpcObjectRegistry& registry,
                         RpcRequest& request) {
   Q_UNUSED(app);
   auto& obj = getObj(registry, request);
+  throwIfCmdGroupActive(obj);
   if (!obj.canUndo()) {
-    throw RpcMethodNotAvailable();
+    throw RpcUnexpectedState(
+        "There is no command on the stack which can be undone.");
   }
   obj.undo();  // Can throw.
   request.sendSuccess(details(obj));
@@ -80,8 +90,10 @@ void UndoStackRpc::redo(GuiApplication& app, RpcObjectRegistry& registry,
                         RpcRequest& request) {
   Q_UNUSED(app);
   auto& obj = getObj(registry, request);
+  throwIfCmdGroupActive(obj);
   if (!obj.canRedo()) {
-    throw RpcMethodNotAvailable();
+    throw RpcUnexpectedState(
+        "There is no command on the stack which can be redone.");
   }
   obj.redo();  // Can throw.
   request.sendSuccess(details(obj));

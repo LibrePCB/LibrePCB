@@ -80,7 +80,7 @@ void RemoteLibraryRpc::get(GuiApplication& app, RpcObjectRegistry& registry,
   // object handle to look up. The handle handling for them needs to be
   // designed first (probably by passing the library UUID instead of a
   // handle).
-  throw RpcMethodNotAvailable(
+  throw RpcUnexpectedState(
       "Getting details about a remote library is not supported yet.");
 }
 
@@ -94,7 +94,7 @@ void RemoteLibraryRpc::install(GuiApplication& app, RpcObjectRegistry& registry,
   // `LibrariesModel::applyChanges()`), which cannot be used from here
   // without hijacking the GUI state. The installation machinery needs to be
   // decoupled from the GUI first.
-  throw RpcMethodNotAvailable(
+  throw RpcUnexpectedState(
       "Installing remote libraries is not supported through the RPC "
       "interface yet.");
 }
@@ -106,7 +106,7 @@ void RemoteLibraryRpc::uninstall(GuiApplication& app,
   Q_UNUSED(registry);
   Q_UNUSED(request);
   // TODO: See install().
-  throw RpcMethodNotAvailable(
+  throw RpcUnexpectedState(
       "Uninstalling remote libraries is not supported through the RPC "
       "interface yet.");
 }

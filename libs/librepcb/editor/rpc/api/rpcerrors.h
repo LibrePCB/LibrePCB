@@ -49,13 +49,13 @@ enum class RpcErrorCode : int {
   MessageTooLarge = 11,
   InvalidRequest = 20,
   Unauthenticated = 30,
-  AccessDenied = 31,
-  MethodNotFound = 32,
-  MethodNotAvailable = 33,
-  InvalidArgs = 34,
-  InvalidHandle = 35,
-  InternalError = 38,
-  Cancelled = 39,
+  MethodNotFound = 31,
+  AccessDenied = 33,
+  InternalError = 39,
+  InvalidArgs = 40,
+  InvalidHandle = 41,
+  UnexpectedState = 50,
+  Cancelled = 99,
   CommandFailed = 100,
 };
 
@@ -65,19 +65,19 @@ enum class RpcErrorCode : int {
 
 /**
  * @brief The received message could not be decoded (invalid MessagePack or
- *        a truncated value), so the stream framing is broken and the
- *        connection is closed without a response.
+   *        a truncated value), so the stream framing is broken and the
+   *        connection is closed without a response.
  */
 class RpcInvalidMessage final : public RpcError {
 public:
   RpcInvalidMessage(const QString& detail = QString(),
-                    const QVariantMap& properties = QVariantMap()) noexcept
+                     const QVariantMap& properties = QVariantMap()) noexcept
     : RpcError(RpcErrorCode::InvalidMessage, detail, properties) {}
 };
 
 /**
  * @brief The received message exceeded the maximum size of 32 MiB, so the
- *        connection is closed without a response.
+   *        connection is closed without a response.
  */
 class RpcMessageTooLarge final : public RpcError {
 public:
@@ -92,14 +92,14 @@ public:
 class RpcInvalidRequest final : public RpcError {
 public:
   RpcInvalidRequest(const QString& detail = QString(),
-                    const QVariantMap& properties = QVariantMap()) noexcept
+                     const QVariantMap& properties = QVariantMap()) noexcept
     : RpcError(RpcErrorCode::InvalidRequest, detail, properties) {}
 };
 
 /**
  * @brief A request other than `initialize` was sent on a connection which
- *        is not authenticated yet. The first message of a connection must
- *        be an `initialize` request.
+   *        is not authenticated yet. The first message of a connection must
+   *        be an `initialize` request.
  */
 class RpcUnauthenticated final : public RpcError {
 public:
@@ -109,99 +109,99 @@ public:
 };
 
 /**
- * @brief The provided access token doesn't have the permissions to execute
- *        the command. If this error is returned by the 'initialize' method,
- *        it means that either the provided token is invalid or has expired,
- *        or an interactive connection request was denied by the user.
- */
-class RpcAccessDenied final : public RpcError {
-public:
-  RpcAccessDenied(const QString& detail = QString(),
-                  const QVariantMap& properties = QVariantMap()) noexcept
-    : RpcError(RpcErrorCode::AccessDenied, detail, properties) {}
-};
-
-/**
  * @brief The method was not found, e.g. because it was added in a newer
- *        application version than the running one, or the method has been
- *        removed from the application and is no longer available.
+   *        application version than the running one, or the method has been
+   *        removed from the application and is no longer available.
  */
 class RpcMethodNotFound final : public RpcError {
 public:
   RpcMethodNotFound(const QString& detail = QString(),
-                    const QVariantMap& properties = QVariantMap()) noexcept
+                     const QVariantMap& properties = QVariantMap()) noexcept
     : RpcError(RpcErrorCode::MethodNotFound, detail, properties) {}
 };
 
 /**
- * @brief The method exists, but is currently not available. This may be the
- *        case if the application is in a state where the requested
- *        functionality does not exist.
+ * @brief The provided access token doesn't have the permissions to execute
+   *        the command. If this error is returned by the 'initialize' method,
+   *        it means that either the provided token is invalid or has expired,
+   *        or an interactive connection request was denied by the user.
  */
-class RpcMethodNotAvailable final : public RpcError {
+class RpcAccessDenied final : public RpcError {
 public:
-  RpcMethodNotAvailable(const QString& detail = QString(),
-                        const QVariantMap& properties = QVariantMap()) noexcept
-    : RpcError(RpcErrorCode::MethodNotAvailable, detail, properties) {}
+  RpcAccessDenied(const QString& detail = QString(),
+                     const QVariantMap& properties = QVariantMap()) noexcept
+    : RpcError(RpcErrorCode::AccessDenied, detail, properties) {}
+};
+
+/**
+ * @brief An unexpected internal error occurred, e.g. a command handler
+   *        returned invalid data. This is a bug in LibrePCB, please open an
+   *        issue on GitHub.
+ */
+class RpcInternalError final : public RpcError {
+public:
+  RpcInternalError(const QString& detail = QString(),
+                     const QVariantMap& properties = QVariantMap()) noexcept
+    : RpcError(RpcErrorCode::InternalError, detail, properties) {}
 };
 
 /**
  * @brief The method arguments are invalid, e.g. wrong value types, missing
- *        required arguments, invalid values, or unknown enum values.
+   *        required arguments, invalid values, or unknown enum values.
  */
 class RpcInvalidArgs final : public RpcError {
 public:
   RpcInvalidArgs(const QString& detail = QString(),
-                 const QVariantMap& properties = QVariantMap()) noexcept
+                     const QVariantMap& properties = QVariantMap()) noexcept
     : RpcError(RpcErrorCode::InvalidArgs, detail, properties) {}
 };
 
 /**
  * @brief The provided object handle is invalid or has expired (e.g. object
- *        was deleted in the mean time). For example, this error is returned
- *        when accessing a project after it has been closed.
+   *        was deleted in the mean time). For example, this error is returned
+   *        when accessing a project after it has been closed.
  */
 class RpcInvalidHandle final : public RpcError {
 public:
   RpcInvalidHandle(const QString& detail = QString(),
-                   const QVariantMap& properties = QVariantMap()) noexcept
+                     const QVariantMap& properties = QVariantMap()) noexcept
     : RpcError(RpcErrorCode::InvalidHandle, detail, properties) {}
 };
 
 /**
- * @brief An unexpected internal error occurred, e.g. a command handler
- *        returned invalid data. This is a bug in LibrePCB, please open an
- *        issue on GitHub.
+ * @brief The command is not valid for the current state of the application.
+   *        Check which preconditions need to be met for executing this
+   *        command.
  */
-class RpcInternalError final : public RpcError {
+class RpcUnexpectedState final : public RpcError {
 public:
-  RpcInternalError(const QString& detail = QString(),
-                   const QVariantMap& properties = QVariantMap()) noexcept
-    : RpcError(RpcErrorCode::InternalError, detail, properties) {}
+  RpcUnexpectedState(const QString& detail = QString(),
+                     const QVariantMap& properties = QVariantMap()) noexcept
+    : RpcError(RpcErrorCode::UnexpectedState, detail, properties) {}
 };
 
 /**
  * @brief The request was cancelled by the client and the command stopped
- *        its work when it could. Note that if the work already completed,
- *        the normal result is sent instead (exactly one response per
- *        request).
+   *        its work when it could. Note that if the work already completed,
+   *        the normal result is sent instead (exactly one response per
+   *        request).
  */
 class RpcCancelled final : public RpcError {
 public:
   RpcCancelled(const QString& detail = QString(),
-               const QVariantMap& properties = QVariantMap()) noexcept
+                     const QVariantMap& properties = QVariantMap()) noexcept
     : RpcError(RpcErrorCode::Cancelled, detail, properties) {}
 };
 
 /**
  * @brief The command execution failed in an unspecified way, i.e. none of
- *        the specific error codes fit. The message contains details about
- *        the failure.
+   *        the specific error codes fit. The message contains details about
+   *        the failure.
  */
 class RpcCommandFailed final : public RpcError {
 public:
   RpcCommandFailed(const QString& detail = QString(),
-                   const QVariantMap& properties = QVariantMap()) noexcept
+                     const QVariantMap& properties = QVariantMap()) noexcept
     : RpcError(RpcErrorCode::CommandFailed, detail, properties) {}
 };
 

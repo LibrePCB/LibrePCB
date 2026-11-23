@@ -44,8 +44,7 @@ namespace rpc {
 /**
  * @brief The UndoStack RPC API (see the RPC server documentation)
  *
- * The undo stack of an open document. The handle may point to a project or a
- * library element.
+ * The undo stack of an open document. The handle may point to a project or a library element.
  */
 class UndoStackRpc final {
 public:
@@ -58,21 +57,21 @@ public:
    * @brief Get the state of the undo stack.
    */
   static void get(GuiApplication& app, RpcObjectRegistry& registry,
-                  RpcRequest& request);
+                      RpcRequest& request);
 
   /**
    * @brief Undo the last command, then return the new state. If there is
    *        nothing to undo, the command fails with an error.
    */
   static void undo(GuiApplication& app, RpcObjectRegistry& registry,
-                   RpcRequest& request);
+                      RpcRequest& request);
 
   /**
    * @brief Redo the last undone the last command, then return the new state.
    *        If there is nothing to redo, the command fails with an error.
    */
   static void redo(GuiApplication& app, RpcObjectRegistry& registry,
-                   RpcRequest& request);
+                      RpcRequest& request);
 };
 
 /*******************************************************************************

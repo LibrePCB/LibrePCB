@@ -38,7 +38,8 @@ response.
 Handshake {#doc_rpc_api_handshake}
 ---------
 
-The first message of a connection must be an `initialize` request. Any
+The first message of a connection must be an
+[`initialize`](@ref doc_rpc_api_method_initialize) request. Any
 other first message is answered with an error response (without being
 dispatched) and the connection stays open, but stays unauthenticated.
 There are two ways to authenticate:
@@ -46,14 +47,15 @@ There are two ways to authenticate:
 - **With a token:** The params carry a `token` string. If the token was
   issued by this application instance (see below) and is still valid, the
   connection is authenticated. Otherwise the request is answered with an
-  error (code 25) and the connection stays open, but stays
-  unauthenticated.
+  error ([code 31](@ref doc_rpc_api_errors)) and the connection stays
+  open, but stays unauthenticated.
 - **Interactively:** The params carry a `name` string identifying the
   client. The application asks the user whether to accept the connection
   (via a notification). If the user accepts it, the connection is
   authenticated and a new token is issued, which the client shall store
   for future connections. If the user denies the request (or the client
-  cancels it), the request is answered with an error (code 25).
+  cancels it), the request is answered with an error
+  ([code 31](@ref doc_rpc_api_errors)).
 
 The success result is a map with some application information:
 
@@ -80,19 +82,8 @@ The fields have the following meaning:
 Clients use `version` together with the per-method `since`
 from the specification file to determine which methods the server
 supports: Methods added after the revision of the client's specification
-are unknown to the client (calling them results in error code 22,
-`MethodNotFound`).
-
-Protocol-Level Methods {#doc_rpc_api_protocol_methods}
-----------------------
-
-These methods are handled by the application itself, i.e. they are not
-part of the class-based command API:
-
-| Method       | Description                                    |
-|--------------|------------------------------------------------|
-| `initialize` | Handshake & authentication (see above).        |
-| `ping`       | Returns nil, useful to test a client.           |
+are unknown to the client (calling them results in
+[error code 32](@ref doc_rpc_api_errors)).
 
 Messages {#doc_rpc_api_messages}
 --------
@@ -123,31 +114,25 @@ type:
   result is sent. Either way, exactly one final response arrives.
 - Unknown message types are ignored for forward compatibility. A request
   which doesn't conform to the envelope (e.g. a non-string method) is
-  answered with error code 20 (`InvalidRequest`) and the connection stays
-  open. However, values outside the protocol's value domain result in
-  error code 23 (`InvalidParams`).
+  answered with [error code 20](@ref doc_rpc_api_errors) and the
+  connection stays open. However, values outside the protocol's value
+  domain result in [error code 23](@ref doc_rpc_api_errors).
 
-Values {#doc_rpc_api_values}
-------
-
-The protocol's value domain is a subset of MessagePack: `nil`, `bool`,
-integers (i64 or u64), `float` (f64), `str` (UTF-8), `bin`, `array`, maps
-(with `str` keys), and `ext`. Any other value (e.g. a map with non-string
-keys or invalid UTF-8 in a string) is rejected with error code 23
-(`InvalidParams`).
-
-`ext` values are tagged raw bytes which are opaque to the transport
-layer: Only the ext code and the payload cross the wire, uninterpreted.
-Their interpretation is specified per ext code in the API reference (see
-@ref doc_rpc_api_ext_types).
-
-Params & Conventions {#doc_rpc_api_params}
---------------------
+Params & Results {#doc_rpc_api_params}
+----------------
 
 The `params` of a request are a map (or nil, which means an empty map):
-The arguments are passed as named fields, plus the reserved key `"obj"`
-which carries the receiver handle for non-static methods (an argument may
-never be named `obj`).
+The arguments are passed as named fields. Non-static methods
+additionally receive their receiver handle in the reserved key `"obj"`
+(an argument may never be named `obj`).
+
+The result of a command is either nil (no result) or a map: The fields
+are documented per command in the reference. Structs are transferred as
+such maps (with the documented fields), so they never need a separate
+representation.
+
+Object Handles {#doc_rpc_api_handles}
+--------------
 
 Object handles are **opaque values**: Clients obtain them from responses
 (embedded under the reserved key `"obj"` in maps which represent objects)
@@ -163,31 +148,3 @@ server keeps running: It survives renames, moves and UUID changes of the
 object, but it becomes invalid when the object is deleted, and a server
 restart invalidates all handles (re-discover objects after
 reconnecting). Handle values are never reused.
-
-Values are from the restricted MessagePack domain: null, bool, int (i64
-or u64),
-float (f64), string, binary, array and map (with string keys). Enums are
-transferred as strings (see the specification file for the allowed
-values). Numeric conventions: Lengths in nanometers, angles in
-microdegrees.
-
-Error Handling {#doc_rpc_api_error_handling}
---------------
-
-The `error` element of a response is a map with the keys `code` and
-`message`, plus optionally additional properties. The error codes are
-grouped: 10–19 transport errors, 20–29 protocol errors, 30–39 command
-errors, 100– command execution errors. All codes are listed in the
-\ref doc_rpc_api_errors "error types" section of the reference.
-
-- Transport errors (10–19) are never *sent*: When one of them occurs, the
-  stream framing is broken and the connection is closed without a
-  response.
-- Protocol errors (20–29) keep the connection open.
-- Command errors (30–39) and command execution errors (100–) are specific
-  to the executed command. The canonical message of an error code is
-  sent on the wire, optionally followed by an application-specific
-  detail message (separated by a colon).
-
-The specification file is the authoritative list of error types with
-their codes, messages and additional properties.

@@ -44,11 +44,7 @@ namespace rpc {
 /**
  * @brief The WorkspaceDb RPC API (see the RPC server documentation)
  *
- * The library database of the currently opened workspace. IMPORTANT: After the
- * app startup, and after each modification of the local or remote libraries
- * (install/remove/create/edit), call `wait()` before accessing the database
- * again. Otherwise, the database may not reflect the changes yet, i.e. returns
- * outdated information.
+ * The library database of the currently opened workspace. IMPORTANT: After the app startup, and after each modification of the local or remote libraries (install/remove/create/edit), call `wait()` before accessing the database again. Otherwise, the database may not reflect the changes yet, i.e. returns outdated information.
  */
 class WorkspaceDbRpc final {
 public:
@@ -65,7 +61,7 @@ public:
    *        emitted.
    */
   static void wait(GuiApplication& app, RpcObjectRegistry& registry,
-                   RpcRequest& request);
+                      RpcRequest& request);
 };
 
 /*******************************************************************************

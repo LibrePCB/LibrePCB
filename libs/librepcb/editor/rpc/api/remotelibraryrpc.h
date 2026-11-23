@@ -60,7 +60,7 @@ public:
    *        this method streams the libraries in notifications.
    */
   static void list(GuiApplication& app, RpcObjectRegistry& registry,
-                   RpcRequest& request);
+                      RpcRequest& request);
 
   /**
    * @brief Install or update remote libraries in one batch. Note that
@@ -77,13 +77,13 @@ public:
    *        loss which cannot be undone!
    */
   static void uninstall(GuiApplication& app, RpcObjectRegistry& registry,
-                        RpcRequest& request);
+                      RpcRequest& request);
 
   /**
    * @brief Get details about a remote library.
    */
   static void get(GuiApplication& app, RpcObjectRegistry& registry,
-                  RpcRequest& request);
+                      RpcRequest& request);
 };
 
 /*******************************************************************************

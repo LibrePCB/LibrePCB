@@ -184,6 +184,8 @@ def main():
     print(f"Generated {RUST_FILE}")
 
     for cls in spec.get("classes", []):
+        if cls.get("name") is None:
+            continue  # Protocol-level methods: handled by the server itself.
         path = EDITOR_API_DIR / f"{cls['name'].lower()}rpc.h"
         path.write_text(env.get_template("command_class.h.j2").render(
             class_name=cls["name"],
@@ -198,6 +200,8 @@ def main():
     cmake = CMAKELISTS_FILE.read_text(encoding="utf-8")
     cmake_changed = False
     for cls in spec.get("classes", []):
+        if cls.get("name") is None:
+            continue  # Protocol-level methods: handled by the server itself.
         base = EDITOR_API_DIR / f"{cls['name'].lower()}rpc"
         if not base.with_suffix(".cpp").exists():
             base.with_suffix(".cpp").write_text(CPP_STUB, encoding="utf-8")

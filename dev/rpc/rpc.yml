@@ -4,11 +4,11 @@
 # classes (with their methods), the involved data types and the error
 # types. The wire protocol (msgpack, framing, envelope, handshake) is
 # specified in dev/plans/rpc-server.md and documented in
-# dev/doxygen/pages/rpc_api.md (protocol) and
-# dev/doxygen/pages/rpc_api_reference.md (generated API reference).
+# dev/doxygen/pages/rpc_server.md (protocol) and
+# dev/doxygen/pages/rpc_api.md (generated API reference).
 #
 # Consumers:
-# - The documentation generator (dev/generate_rpc_api_docs.py).
+# - The documentation generator (dev/rpc/gen.py).
 # - Client authors: Read this file to know which methods exist, and compare
 #   each method's `since` with the `version` reported by the
 #   server's `initialize` method to know which ones are available on a
@@ -66,7 +66,7 @@ errors:
     description: >-
       The request doesn't conform to the message envelope.
 
-  # Command errors
+  # Command dispatching errors
 
   - code: 30
     name: Unauthenticated
@@ -77,6 +77,22 @@ errors:
       `initialize` request.
 
   - code: 31
+    name: MethodNotFound
+    message: Method not found
+    description: >-
+      The method was not found, e.g. because it was added in a newer
+      application version than the running one, or the method has been removed
+      from the application and is no longer available.
+
+  #- code: 32
+  #  name: MethodNotAvailable
+  #  message: Method not available
+  #  description: >-
+  #    The method exists, but is currently not available. This may be the case
+  #    if the application is in a state where the requested functionality does
+  #    not exist.
+
+  - code: 33
     name: AccessDenied
     message: Access denied
     description: >-
@@ -85,38 +101,7 @@ errors:
       that either the provided token is invalid or has expired, or an
       interactive connection request was denied by the user.
 
-  - code: 32
-    name: MethodNotFound
-    message: Method not found
-    description: >-
-      The method was not found, e.g. because it was added in a newer
-      application version than the running one, or the method has been removed
-      from the application and is no longer available.
-
-  - code: 33
-    name: MethodNotAvailable
-    message: Method not available
-    description: >-
-      The method exists, but is currently not available. This may be the case
-      if the application is in a state where the requested functionality does
-      not exist.
-
-  - code: 34
-    name: InvalidArgs
-    message: Invalid method arguments
-    description: >-
-      The method arguments are invalid, e.g. wrong value types, missing required
-      arguments, invalid values, or unknown enum values.
-
-  - code: 35
-    name: InvalidHandle
-    message: Invalid object handle
-    description: >-
-      The provided object handle is invalid or has expired (e.g. object was
-      deleted in the mean time). For example, this error is returned when
-      accessing a project after it has been closed.
-
-  - code: 38
+  - code: 39
     name: InternalError
     message: Internal error
     description: >-
@@ -124,7 +109,33 @@ errors:
       returned invalid data. This is a bug in LibrePCB, please open an issue
       on GitHub.
 
-  - code: 39
+  # Command parsing errors
+
+  - code: 40
+    name: InvalidArgs
+    message: Invalid method arguments
+    description: >-
+      The method arguments are invalid, e.g. wrong value types, missing required
+      arguments, invalid values, or unknown enum values.
+
+  - code: 41
+    name: InvalidHandle
+    message: Invalid object handle
+    description: >-
+      The provided object handle is invalid or has expired (e.g. object was
+      deleted in the mean time). For example, this error is returned when
+      accessing a project after it has been closed.
+
+  # Generic command execution errors
+
+  - code: 50
+    name: UnexpectedState
+    message: Unexpected state
+    description: >-
+      The command is not valid for the current state of the application. Check
+      which preconditions need to be met for executing this command.
+
+  - code: 99
     name: Cancelled
     message: Request cancelled
     description: >-
@@ -132,7 +143,7 @@ errors:
       work when it could. Note that if the work already completed, the
       normal result is sent instead (exactly one response per request).
 
-  # Command execution errors
+  # Application-specific command execution errors
 
   - code: 100
     name: CommandFailed
@@ -272,13 +283,13 @@ structs:
         description: >-
           Whether the stack is in the clean state (the state of the last save).
       - name: prev
-        type: string | nil
+        type: string?
         description: >-
           The text of the previously executed command, i.e. the command which
           will be reverted by `undo()`. If there is no command to undo, this is
           `nil`.
       - name: next
-        type: string | nil
+        type: string?
         description: >-
           The text of the previously undone command, i.e. the command which
           will be executed by `redo()`. If there is no command to redo, this is
@@ -293,6 +304,62 @@ structs:
 # ---------------------------------------------------------------------------
 
 classes:
+  # The protocol-level methods are not part of any class, so the class
+  # name is null. They are handled before the class-based commands (see
+  # the transport protocol documentation) and do not generate any C++
+  # code (their handling lives in the RPC server implementation).
+  - name: null
+    description: >-
+      Protocol-level methods, handled by the server itself (before the
+      class-based commands).
+    since: "2.2.0"
+    methods:
+      - name: initialize
+        description: >-
+          Handshake and authentication. The first message of a connection
+          must be this request (see the transport protocol documentation).
+        params:
+          - name: name
+            type: string
+            description: An arbitrary name identifying the client application.
+          - name: token
+            type: string
+            description: >-
+              A token previously received by an initialize call of this
+              application instance. If not provided (or nil), the
+              connection request has to be confirmed by the user in the
+              application.
+        result:
+          - name: format
+            type: string
+            description: The handshake format version, currently always "1.0".
+          - name: server
+            type: string
+            description: Always "librepcb", so clients can verify the server.
+          - name: version
+            type: string
+            description: The application version.
+          - name: session
+            type: string
+            description: >-
+              A UUID identifying the running application process (changes
+              on every application restart).
+          - name: workspace
+            type: string
+            description: The absolute path of the currently opened workspace.
+          - name: token
+            type: string
+            description: >-
+              The token to be used for subsequent connections of this
+              client (see the transport protocol documentation).
+
+      - name: ping
+        description: >-
+          A request which is answered with a nil result by the server
+          itself, without any further processing. Useful to test a
+          client connection.
+        params: []
+
   - name: ProjectEditor
     description: A project opened in the application.
     since: "2.2.0"
