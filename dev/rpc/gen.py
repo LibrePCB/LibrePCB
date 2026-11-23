@@ -91,6 +91,12 @@ ENUM_DOC = (
 )
 
 
+def cpp_class_name(cls):
+    """The C++ class name for a yml class (null = the protocol-level
+    methods, which are generated as a pseudo class "ProtocolRpc")."""
+    return cls.get("name") or "Protocol"
+
+
 def cpp_pascal(name):
     """Convert a lower_snake_case wire name into a PascalCase identifier."""
     return "".join(part.capitalize() for part in name.split("_"))
@@ -184,11 +190,10 @@ def main():
     print(f"Generated {RUST_FILE}")
 
     for cls in spec.get("classes", []):
-        if cls.get("name") is None:
-            continue  # Protocol-level methods: handled by the server itself.
-        path = EDITOR_API_DIR / f"{cls['name'].lower()}rpc.h"
+        name = cpp_class_name(cls)
+        path = EDITOR_API_DIR / f"{name.lower()}rpc.h"
         path.write_text(env.get_template("command_class.h.j2").render(
-            class_name=cls["name"],
+            class_name=name,
             class_description=re.sub(r"\s+", " ", cls.get("description", "")),
             rpc_class=cls,
         ), encoding="utf-8")
@@ -200,14 +205,13 @@ def main():
     cmake = CMAKELISTS_FILE.read_text(encoding="utf-8")
     cmake_changed = False
     for cls in spec.get("classes", []):
-        if cls.get("name") is None:
-            continue  # Protocol-level methods: handled by the server itself.
-        base = EDITOR_API_DIR / f"{cls['name'].lower()}rpc"
+        name = cpp_class_name(cls)
+        base = EDITOR_API_DIR / f"{name.lower()}rpc"
         if not base.with_suffix(".cpp").exists():
             base.with_suffix(".cpp").write_text(CPP_STUB, encoding="utf-8")
             print(f"Created {base.with_suffix('.cpp')}")
-        for filename in (f"{cls['name'].lower()}rpc.h",
-                         f"{cls['name'].lower()}rpc.cpp"):
+        for filename in (f"{name.lower()}rpc.h",
+                         f"{name.lower()}rpc.cpp"):
             entry = f"rpc/api/{filename}"
             new_cmake = add_to_cmakelists(cmake, entry)
             if new_cmake != cmake:

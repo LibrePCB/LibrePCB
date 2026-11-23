@@ -64,8 +64,7 @@ RpcServer::RpcServer(GuiApplication& app) noexcept
     mApp(app),
     mPort(0),  // Will be initialized by construct()
     mHandle(construct(&onRequestCallback, &onCancelCallback, this, mPort)),
-    mRequestNotificationSlot(*this, &RpcServer::requestNotification),
-    mRequestFinishedSlot(*this, &RpcServer::requestFinished) {
+    mRequestEventSlot(*this, &RpcServer::requestEvent) {
   qInfo().nospace() << "RPC server is listening on 127.0.0.1, port " << mPort
                     << ".";
 }
@@ -92,8 +91,7 @@ void RpcServer::handleRequest(uint32_t connId, uint32_t msgId,
   // Note: The Rust server guarantees that params is either a map or nil.
   const auto request =
       std::make_shared<RpcRequest>(connId, msgId, method, args.toMap());
-  request->onNotification.attach(mRequestNotificationSlot);
-  request->onFinished.attach(mRequestFinishedSlot);
+  request->onEvent.attach(mRequestEventSlot);
   mPendingRequests.insert(requestKey(connId, msgId), request);
 
   // The `initialize` method is a protocol-level method handled by the
@@ -184,17 +182,26 @@ void RpcServer::handleInitialize(RpcRequest& request) noexcept {
   }
 }
 
-void RpcServer::requestNotification(const RpcRequest& request,
-                                    const QVariant& value) noexcept {
-  rs::ffi_rpc_server_notify(*mHandle, request.getConnId(), request.getMsgId(),
-                            &value);
-}
-
-void RpcServer::requestFinished(const RpcRequest& request, bool ok,
-                                const QVariant& value) noexcept {
-  rs::ffi_rpc_server_reply(*mHandle, request.getConnId(), request.getMsgId(),
-                           ok, &value);
-  mPendingRequests.remove(requestKey(request.getConnId(), request.getMsgId()));
+void RpcServer::requestEvent(const RpcRequest& request, RpcRequest::Event event,
+                             const QVariant& value) noexcept {
+  switch (event) {
+    case RpcRequest::Event::Notification:
+      rs::ffi_rpc_server_notify(*mHandle, request.getConnId(),
+                                request.getMsgId(), &value);
+      break;
+    case RpcRequest::Event::Succeeded:
+      rs::ffi_rpc_server_reply(*mHandle, request.getConnId(),
+                               request.getMsgId(), true, &value);
+      mPendingRequests.remove(
+          requestKey(request.getConnId(), request.getMsgId()));
+      break;
+    case RpcRequest::Event::Failed:
+      rs::ffi_rpc_server_reply(*mHandle, request.getConnId(),
+                               request.getMsgId(), false, &value);
+      mPendingRequests.remove(
+          requestKey(request.getConnId(), request.getMsgId()));
+      break;
+  }
 }
 
 // ATTENTION: This function is called from other threads (from Rust side)!

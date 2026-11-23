@@ -305,16 +305,15 @@ structs:
 
 classes:
   # The protocol-level methods are not part of any class, so the class
-  # name is null. They are handled before the class-based commands (see
-  # the transport protocol documentation) and do not generate any C++
-  # code (their handling lives in the RPC server implementation).
+  # name is null. The generator generates them as the pseudo class
+  # "ProtocolRpc".
   - name: null
     description: >-
-      Protocol-level methods, handled by the server itself (before the
-      class-based commands).
+      Protocol-level methods, which are not assigned to any other class.
     since: "2.2.0"
     methods:
       - name: initialize
+        static: true
         description: >-
           Handshake and authentication. The first message of a connection
           must be this request (see the transport protocol documentation).
@@ -354,6 +353,7 @@ classes:
               client (see the transport protocol documentation).
 
       - name: ping
+        static: true
         description: >-
           A request which is answered with a nil result by the server
           itself, without any further processing. Useful to test a

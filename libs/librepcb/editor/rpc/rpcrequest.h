@@ -82,25 +82,13 @@ class RpcRequest final : public QObject {
 
 public:
   // Signals
-
-  /**
-   * @brief Emitted when the request was replied
-   *
-   * Emitted at the very end of #sendSuccess() or #sendError(), after the
-   * response was sent. The #RpcServer uses this to remove the request from
-   * its pending-request registry, which may drop the last reference to
-   * this object, destroying it.
-   *
-   * @note This is not a Qt signal, but uses our lightweight signal/slot
-   *       mechanism since it is a purely internal, same-thread
-   *       notification. Qt signal/slot is meant to be used only for
-   *       connections to external, asynchronous tasks.
-   */
-  Signal<RpcRequest, bool, const QVariant&> onFinished;
-  typedef Slot<RpcRequest, bool, const QVariant&> OnFinishedSlot;
-
-  Signal<RpcRequest, const QVariant&> onNotification;
-  typedef Slot<RpcRequest, const QVariant&> OnNotificationSlot;
+  enum class Event {
+    Notification,
+    Succeeded,
+    Failed,
+  };
+  Signal<RpcRequest, Event, const QVariant&> onEvent;
+  typedef Slot<RpcRequest, Event, const QVariant&> OnEventSlot;
 
   // Constructors / Destructor
   RpcRequest() = delete;
@@ -216,9 +204,6 @@ signals:
   void cancelled();
 
 private:  // Methods
-  /// Send the response and emit #onFinished (finishes the request).
-  void sendReply(bool ok, const QVariant& value) noexcept;
-
   /// Throw an InvalidArgs error for an invalid enum argument value.
   /// Defined in rpcrequest.cpp (the only place allowed to include
   /// the generated error classes).

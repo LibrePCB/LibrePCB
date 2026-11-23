@@ -131,13 +131,9 @@ private:  // Methods
   /// and reply with the application information.
   void handleInitialize(RpcRequest& request) noexcept;
 
-  void requestNotification(const RpcRequest& request,
-                           const QVariant& value) noexcept;
-
-  /// Called by an #RpcRequest when it was replied: Remove it from the
-  /// pending-request registry.
-  void requestFinished(const RpcRequest& request, bool ok,
-                       const QVariant& value) noexcept;
+  /// Called by an #RpcRequest on any event
+  void requestEvent(const RpcRequest& request, RpcRequest::Event event,
+                    const QVariant& value) noexcept;
 
   /// Key for a pending request in the registry.
   static uint64_t requestKey(uint32_t connId, uint32_t msgId) noexcept {
@@ -167,10 +163,7 @@ private:  // Data
   QHash<uint64_t, std::shared_ptr<RpcRequest>> mPendingRequests;
 
   // Slots
-  /// Reacts on pending request notifications
-  RpcRequest::OnNotificationSlot mRequestNotificationSlot;
-  /// Reacts on replied requests (removes them from the registry)
-  RpcRequest::OnFinishedSlot mRequestFinishedSlot;
+  RpcRequest::OnEventSlot mRequestEventSlot;
 };
 
 /*******************************************************************************

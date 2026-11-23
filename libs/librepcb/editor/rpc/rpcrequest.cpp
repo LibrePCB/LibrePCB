@@ -53,8 +53,7 @@ static QVariantMap errorToVariant(rpc::RpcErrorCode code,
 
 RpcRequest::RpcRequest(uint32_t connId, uint32_t msgId, const QString& method,
                        const QVariantMap& args) noexcept
-  : onFinished(*this),
-    onNotification(*this),
+  : onEvent(*this),
     mConnId(connId),
     mMsgid(msgId),
     mMethod(method),
@@ -82,18 +81,24 @@ void RpcRequest::sendProgress(int percent) noexcept {
 
 void RpcRequest::sendNotification(const QVariant& payload) noexcept {
   if (!mReplied) {
-    onNotification.notify(payload);
+    onEvent.notify(Event::Notification, payload);
   }
 }
 
 void RpcRequest::sendSuccess(const QVariant& result) noexcept {
-  sendReply(true, result);
+  if (!mReplied) {
+    mReplied = true;
+    onEvent.notify(Event::Succeeded, result);
+  }
 }
 
 void RpcRequest::sendError(const RpcError& error) noexcept {
-  sendReply(false,
-            errorToVariant(error.getCode(), error.getDetail(),
-                           error.getProperties()));
+  if (!mReplied) {
+    mReplied = true;
+    onEvent.notify(Event::Failed,
+                   errorToVariant(error.getCode(), error.getDetail(),
+                                  error.getProperties()));
+  }
 }
 
 void RpcRequest::throwInvalidArgs(const QString& value, const QString& argName,
@@ -111,13 +116,6 @@ void RpcRequest::throwMissingArgs(const QString& argName,
   throw rpc::RpcInvalidArgs(
       QString("Missing value for argument '%1' of enum %2.")
           .arg(argName, QString::fromLatin1(enumName)));
-}
-
-void RpcRequest::sendReply(bool ok, const QVariant& value) noexcept {
-  if (!mReplied) {
-    mReplied = true;
-    onFinished.notify(ok, value);
-  }
 }
 
 /*******************************************************************************
