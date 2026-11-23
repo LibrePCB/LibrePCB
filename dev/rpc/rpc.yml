@@ -163,7 +163,7 @@ enums:
 # ---------------------------------------------------------------------------
 
 structs:
-  - name: ProjectSummary
+  - name: ProjectEditorSummary
     description: A summary of an open project.
     fields:
       - name: obj
@@ -190,7 +190,7 @@ structs:
           Whether the project has unsaved changes (i.e. its undo stack is not
           clean, or any manual, untracked changes have been made).
 
-  - name: ProjectDetails
+  - name: ProjectEditorDetails
     description: Details about an open project.
     fields:
       - name: uuid
@@ -275,7 +275,7 @@ structs:
 # ---------------------------------------------------------------------------
 
 classes:
-  - name: Project
+  - name: ProjectEditor
     description: A project opened in the application.
     since: "2.2.0"
     methods:
@@ -286,7 +286,7 @@ classes:
         result:
           - name: projects
             type: array
-            items: ProjectSummary
+            items: ProjectEditorSummary
             description: All open projects, in the order of their editor tabs.
 
       - name: open
@@ -306,12 +306,12 @@ classes:
               If the project directory contains an auto-save backup (i.e. the
               application crashed while the project was open and had unsaved
               modifications), this flag specifies how to proceed in that case.
-        result: ProjectSummary
+        result: ProjectEditorSummary
 
       - name: get
         description: Get details about an open project.
         params: []
-        result: ProjectDetails
+        result: ProjectEditorDetails
 
       - name: save
         description: Save project to disk.

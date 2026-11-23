@@ -99,7 +99,7 @@ class Gui(ns.AppWindow):
             self._log("No project path given.")
             return
         try:
-            self.client.call("Project.open", {"path": path})
+            self.client.call("ProjectEditor.open", {"path": path})
         except OSError as e:
             self._log(f"Connection failed: {e}")
 
@@ -108,7 +108,7 @@ class Gui(ns.AppWindow):
         if not self.client:
             return
         try:
-            self.client.call("Project.list", {})
+            self.client.call("ProjectEditor.list", {})
         except OSError as e:
             self._log(f"Connection failed: {e}")
 
@@ -121,7 +121,7 @@ class Gui(ns.AppWindow):
         except IndexError:
             return
         try:
-            self.client.call("Project.close", {"obj": obj})
+            self.client.call("ProjectEditor.close", {"obj": obj})
         except OSError as e:
             self._log(f"Connection failed: {e}")
 

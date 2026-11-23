@@ -123,7 +123,7 @@ extended with request-scoped message types:
 
 - Wire name: `"ClassName.method_name"` — classes in `UpperCamelCase`,
   methods in `lower_snake_case` (e.g. `"UndoStack.undo"`,
-  `"Project.list"`).
+  `"ProjectEditor.list"`).
 - **Classes are first-class entities in the YAML spec**, each with its
   methods, its description and — for classes whose methods operate on an
   object instance — its **handle type** (see 2.4).
@@ -377,7 +377,7 @@ libs/librepcb/editor/rpc/rpcrequest.{h,cpp}   (hand-written)
 libs/librepcb/editor/rpc/rpcerror.h          (hand-written error base class)
 libs/librepcb/editor/rpc/rpcobjectregistry.{h,cpp} (hand-written)
 libs/librepcb/editor/rpc/api/rpcerrors.h     (generated error classes)
-libs/librepcb/editor/rpc/projectrpc.{h,cpp}   (.h generated, .cpp hand-written)
+libs/librepcb/editor/rpc/api/projecteditorrpc.{h,cpp}   (.h generated, .cpp hand-written)
 libs/librepcb/editor/rpc/undostackrpc.{h,cpp} (.h generated, .cpp hand-written)
 libs/librepcb/editor/rpc/workspacedbrpc.{h,cpp} (ditto)
 libs/librepcb/editor/rpc/commands.cpp         (100% generated dispatcher)
@@ -435,7 +435,7 @@ The C++ command surface is **generated from the spec** by `dev/rpc/gen.py`
   the free function
   `void rpcDispatchCommand(GuiApplication& app, const QString& method,
   RpcRequest& request)`, which looks the method up in a static
-  function-pointer map (`{"Project.list", &ProjectRpc::list}`, ...) —
+  function-pointer map (`{"ProjectEditor.list", &ProjectEditorRpc::list}`, ...) —
   defined right inside the dispatcher function — and calls it, passing
   the application. Unknown methods are reported by throwing
   `RpcMethodNotFound` (see 4.2b).
@@ -506,14 +506,14 @@ documented in the doxygen guidelines page (see 5.2).
 
 | v1 name | v2 name | Kind |
 |---|---|---|
-| `project/list` | `Project.list` | static |
-| `project/get` | `Project.get` | member (obj = project UUID) |
-| `undostack/getStatus` | `UndoStack.get_status` | member (obj = project UUID) |
+| `project/list` | `ProjectEditor.list` | static |
+| `project/get` | `ProjectEditor.get` | member (obj) |
+| `undostack/getStatus` | `UndoStack.get` | member (obj) |
 | `undostack/undo` | `UndoStack.undo` | member |
 | `undostack/redo` | `UndoStack.redo` | member |
 
-(The handle type of `UndoStack` is the UUID of the project whose editor
-owns the stack — documented per class in the spec. The final API surface
+(Handles are opaque values, embedded in responses under the reserved
+"obj" key — see the schema notes in the spec. The final API surface
 is designed during implementation; classes are expected to grow, e.g.
 `Schematic`, `Board`, `Library`.)
 
@@ -574,9 +574,8 @@ errors:
     message: "Invalid object handle"
 
 classes:
-  - name: Project
+  - name: ProjectEditor
     description: An open project
-    handle: An opaque object handle (embedded in the responses under the "obj" key).
     methods:
       - name: list             # static → no obj
         static: true
@@ -585,19 +584,19 @@ classes:
         result:
           - name: projects
             type: array
-            items: ProjectSummary
+            items: ProjectEditorSummary
             description: All open projects
         since: "2.2.0"
       - name: get              # member → obj = the project handle
         description: Get project details
         params: []
-        result: ProjectDetails
+        result: ProjectEditorDetails
         since: "2.2.0"
 
 events:
   - name: project_opened
     description: A project was opened
-    params: {type: ProjectSummary}
+    params: {type: ProjectEditorSummary}
     since: "2.2.0"
 
 # + top-level type definitions (structs) for reuse in params/results
@@ -676,7 +675,7 @@ specification. No CI stale-check.
    `tests/ui/rpc/`.
    **Status: Done.** Verified: 2606 C++ unittests pass, and the system
    test passes against the real application (with an open project,
-   covering handshake, ping, `Project.list`/`get`, the full
+   covering handshake, ping, `ProjectEditor.list`/`get`, the full
    `UndoStack` API, unknown methods, invalid envelopes, value-domain
    rejections, error properties, unknown-cancel and pipelining).
    No C++ command unit tests (the user writes them themselves), and the

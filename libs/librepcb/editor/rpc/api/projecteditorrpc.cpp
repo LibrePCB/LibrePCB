@@ -20,7 +20,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "projectrpc.h"
+#include "projecteditorrpc.h"
 
 #include "../../guiapplication.h"
 #include "../../project/projecteditor.h"
@@ -109,7 +109,7 @@ static QVariantMap details(ProjectEditor& obj, RpcObjectRegistry& registry) {
  *  Command Handlers
  ******************************************************************************/
 
-void ProjectRpc::list(GuiApplication& app, RpcObjectRegistry& registry,
+void ProjectEditorRpc::list(GuiApplication& app, RpcObjectRegistry& registry,
                       RpcRequest& request) {
   QVariantList projects;
   for (const auto& editor : app.getProjects()) {
@@ -120,7 +120,7 @@ void ProjectRpc::list(GuiApplication& app, RpcObjectRegistry& registry,
   request.sendSuccess(result);
 }
 
-void ProjectRpc::open(GuiApplication& app, RpcObjectRegistry& registry,
+void ProjectEditorRpc::open(GuiApplication& app, RpcObjectRegistry& registry,
                       RpcRequest& request) {
   const FilePath fp(request.getArg("path").toString());
   const auto backupRestoreMode = request.getArg<BackupRestoreMode>("backup");
@@ -142,14 +142,14 @@ void ProjectRpc::open(GuiApplication& app, RpcObjectRegistry& registry,
   request.sendSuccess(details(*editor, registry));
 }
 
-void ProjectRpc::get(GuiApplication& app, RpcObjectRegistry& registry,
+void ProjectEditorRpc::get(GuiApplication& app, RpcObjectRegistry& registry,
                      RpcRequest& request) {
   Q_UNUSED(app);
   auto& editor = registry.getAs<ProjectEditor>(request.getArg("obj"));
   request.sendSuccess(details(editor, registry));
 }
 
-void ProjectRpc::save(GuiApplication& app, RpcObjectRegistry& registry,
+void ProjectEditorRpc::save(GuiApplication& app, RpcObjectRegistry& registry,
                       RpcRequest& request) {
   Q_UNUSED(app);
   auto& editor = registry.getAs<ProjectEditor>(request.getArg("obj"));
@@ -157,7 +157,7 @@ void ProjectRpc::save(GuiApplication& app, RpcObjectRegistry& registry,
   request.sendSuccess();
 }
 
-void ProjectRpc::close(GuiApplication& app, RpcObjectRegistry& registry,
+void ProjectEditorRpc::close(GuiApplication& app, RpcObjectRegistry& registry,
                        RpcRequest& request) {
   auto& editor = registry.getAs<ProjectEditor>(request.getArg("obj"));
   const auto& projects = app.getProjects();

@@ -24,11 +24,11 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "api/projectrpc.h"
-#include "api/remotelibraryrpc.h"
-#include "api/rpcerrors.h"
+#include "api/projecteditorrpc.h"
 #include "api/undostackrpc.h"
+#include "api/remotelibraryrpc.h"
 #include "api/workspacedbrpc.h"
+#include "api/rpcerrors.h"
 #include "rpcrequest.h"
 
 #include <QtCore>
@@ -51,13 +51,14 @@ namespace rpc {
 
 void rpcDispatchCommand(GuiApplication& app, RpcObjectRegistry& registry,
                         const QString& method, RpcRequest& request) {
-  using RpcCommand = void (*)(GuiApplication&, RpcObjectRegistry&, RpcRequest&);
+  using RpcCommand = void (*)(GuiApplication&, RpcObjectRegistry&,
+                              RpcRequest&);
   static const QHash<QString, RpcCommand> commands = {
-      {"Project.list", &ProjectRpc::list},
-      {"Project.open", &ProjectRpc::open},
-      {"Project.get", &ProjectRpc::get},
-      {"Project.save", &ProjectRpc::save},
-      {"Project.close", &ProjectRpc::close},
+      {"ProjectEditor.list", &ProjectEditorRpc::list},
+      {"ProjectEditor.open", &ProjectEditorRpc::open},
+      {"ProjectEditor.get", &ProjectEditorRpc::get},
+      {"ProjectEditor.save", &ProjectEditorRpc::save},
+      {"ProjectEditor.close", &ProjectEditorRpc::close},
       {"UndoStack.get", &UndoStackRpc::get},
       {"UndoStack.undo", &UndoStackRpc::undo},
       {"UndoStack.redo", &UndoStackRpc::redo},

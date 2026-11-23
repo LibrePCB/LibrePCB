@@ -9,7 +9,7 @@ This reference documents the commands (data types, error types, classes with the
 
 # Data Types {#doc_rpc_api_types}
 
-## ProjectSummary {#doc_rpc_api_type_ProjectSummary}
+## ProjectEditorSummary {#doc_rpc_api_type_ProjectEditorSummary}
 
 A summary of an open project.
 
@@ -27,7 +27,7 @@ A summary of an open project.
 
 ---
 
-## ProjectDetails {#doc_rpc_api_type_ProjectDetails}
+## ProjectEditorDetails {#doc_rpc_api_type_ProjectEditorDetails}
 
 Details about an open project.
 
@@ -153,11 +153,11 @@ The `error` element of a response is a map with the keys `code` and `message` (a
 
 All commands below are dispatched to the application and executed on its GUI thread. Method names are `ClassName.method_name`. Non-static methods receive their receiver handle in the reserved `obj` key of the params.
 
-## Class Project {#doc_rpc_api_class_Project}
+## Class ProjectEditor {#doc_rpc_api_class_ProjectEditor}
 
 A project opened in the application.
 
-### Project.list {#doc_rpc_api_method_Project_list}
+### ProjectEditor.list {#doc_rpc_api_method_ProjectEditor_list}
 
 List all open projects.
 
@@ -169,11 +169,13 @@ None.
 
 | Name | Type | Description |
 |------|------|-------------|
-| `projects` | array of ProjectSummary | All open projects, in the order of their editor tabs. |
+| `projects` | array of ProjectEditorSummary | All open projects, in the order of their editor tabs. |
+
+**Since:** 2.2.0
 
 ---
 
-### Project.open {#doc_rpc_api_method_Project_open}
+### ProjectEditor.open {#doc_rpc_api_method_ProjectEditor_open}
 
 Open a project by file path. If the project is already open, nothing is changed and the summary of the already open project is returned.
 
@@ -184,21 +186,25 @@ Open a project by file path. If the project is already open, nothing is changed 
 | `path` | string | The absolute path of the project file (*.lpp or *.lppz). |
 | `backup` | BackupRestoreMode | If the project directory contains an auto-save backup (i.e. the application crashed while the project was open and had unsaved modifications), this flag specifies how to proceed in that case. |
 
-**Result:** `ProjectSummary`
+**Result:** `ProjectEditorSummary`
+
+**Since:** 2.2.0
 
 ---
 
-### Project.get {#doc_rpc_api_method_Project_get}
+### ProjectEditor.get {#doc_rpc_api_method_ProjectEditor_get}
 
 Get details about an open project.
 
 None.
 
-**Result:** `ProjectDetails`
+**Result:** `ProjectEditorDetails`
+
+**Since:** 2.2.0
 
 ---
 
-### Project.save {#doc_rpc_api_method_Project_save}
+### ProjectEditor.save {#doc_rpc_api_method_ProjectEditor_save}
 
 Save project to disk.
 
@@ -206,15 +212,19 @@ None.
 
 **Result:** `null`
 
+**Since:** 2.2.0
+
 ---
 
-### Project.close {#doc_rpc_api_method_Project_close}
+### ProjectEditor.close {#doc_rpc_api_method_ProjectEditor_close}
 
 Close project. Attention: If there were unsaved changes in the project, they will be discarded. Call `save` first, if desired.
 
 None.
 
 **Result:** `null`
+
+**Since:** 2.2.0
 
 ---
 
@@ -230,6 +240,8 @@ None.
 
 **Result:** `UndoStackDetails`
 
+**Since:** 2.2.0
+
 ---
 
 ### UndoStack.undo {#doc_rpc_api_method_UndoStack_undo}
@@ -240,6 +252,8 @@ None.
 
 **Result:** `UndoStackDetails`
 
+**Since:** 2.2.0
+
 ---
 
 ### UndoStack.redo {#doc_rpc_api_method_UndoStack_redo}
@@ -249,6 +263,8 @@ Redo the last undone the last command, then return the new state. If there is no
 None.
 
 **Result:** `UndoStackDetails`
+
+**Since:** 2.2.0
 
 ---
 

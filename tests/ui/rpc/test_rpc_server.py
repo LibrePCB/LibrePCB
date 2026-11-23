@@ -153,14 +153,14 @@ def test_rpc_server(librepcb, helpers):
             assert result is None
 
             # --- Commands -------------------------------------------------
-            # Project.list → exactly the project opened via the CLI. Since
+            # ProjectEditor.list → exactly the project opened via the CLI. Since
             # the application opens command-line projects asynchronously
             # after startup, poll until it shows up (once the "project
             # opened" event exists, clients don't need to poll anymore).
             projects = []
             deadline = time.time() + 10
             while time.time() < deadline:
-                error, result = rpc.request(3, "Project.list", {})
+                error, result = rpc.request(3, "ProjectEditor.list", {})
                 assert error is None
                 assert isinstance(result, dict)
                 projects = result["projects"]
@@ -177,29 +177,22 @@ def test_rpc_server(librepcb, helpers):
             for key in ["path", "dirty"]:
                 assert key in project, f"missing key {key} in {project!r}"
 
-            # Project.get → details with sheets & boards.
-            error, result = rpc.request(4, "Project.get", {"obj": handle})
+            # ProjectEditor.get → details with sheets & boards.
+            error, result = rpc.request(4, "ProjectEditor.get", {"obj": handle})
             assert error is None
-            assert result["obj"] == handle
             assert isinstance(result["sheets"], list)
             assert isinstance(result["boards"], list)
 
-            # UndoStack.get_status → the project was just opened, so the
-            # stack is clean and there's nothing to undo.
-            error, result = rpc.request(5, "UndoStack.get_status", {"obj": handle})
+            # UndoStack.get → the project was just opened, so the stack is
+            # clean and there's nothing to undo/redo.
+            error, result = rpc.request(5, "UndoStack.get", {"obj": handle})
             assert error is None
-            assert result == {
-                "canUndo": False,
-                "canRedo": False,
-                "undoText": "",
-                "redoText": "",
-                "clean": True,
-            }
+            assert result["clean"] is True, result
+            assert result["prev"] is None and result["next"] is None, result
+            assert isinstance(result["id"], int), result
 
-            # UndoStack.undo on an empty stack → no-op, still a success.
-            error, result = rpc.request(6, "UndoStack.undo", {"obj": handle})
-            assert error is None
-            assert result["clean"] is True
+            # UndoStack.undo on an empty stack → MethodNotAvailable.
+            rpc.expect_error(6, "UndoStack.undo", {"obj": handle}, 33)
 
             # --- Error handling -------------------------------------------
             # Unknown method → MethodNotFound (32), the connection
@@ -215,7 +208,7 @@ def test_rpc_server(librepcb, helpers):
             assert message[3] is None, message
 
             # Unknown project handle → InvalidHandle (35).
-            rpc.send([0, 9, "UndoStack.get_status", {"obj": "invalid-uuid"}])
+            rpc.send([0, 9, "UndoStack.get", {"obj": "invalid-uuid"}])
             message = rpc.receive()
             assert message[0:2] == [1, 9], message
             assert message[2]["code"] == 35, message
@@ -223,7 +216,7 @@ def test_rpc_server(librepcb, helpers):
             assert message[3] is None, message
 
             # Large u64 values are valid integers (native msgpack):
-            rpc.send([0, 10, "Project.list", {"key": 0x8000000000000000}])
+            rpc.send([0, 10, "ProjectEditor.list", {"key": 0x8000000000000000}])
             message = rpc.receive()
             assert message[0:2] == [1, 10], message
             assert message[2] is None, message
@@ -232,7 +225,7 @@ def test_rpc_server(librepcb, helpers):
             # Params outside the protocol's value domain (non-string map
             # keys) → InvalidArgs (34), the connection stays open (unlike
             # a decode error!).
-            rpc.send([0, 11, "Project.list", {1: "x"}])  # Non-string map key.
+            rpc.send([0, 11, "ProjectEditor.list", {1: "x"}])  # Non-string map key.
             message = rpc.receive()
             assert message[0:2] == [1, 11], message
             assert message[2]["code"] == 34, message
