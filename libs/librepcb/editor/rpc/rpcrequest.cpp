@@ -58,6 +58,7 @@ RpcRequest::RpcRequest(uint32_t connId, uint32_t msgId, const QString& method,
     mMsgid(msgId),
     mMethod(method),
     mArgs(args),
+    mAsync(false),
     mReplied(false),
     mCancelled(false) {
 }
@@ -71,6 +72,17 @@ void RpcRequest::cancel() noexcept {
     mCancelled = true;
     emit cancelled();
   }
+}
+
+void RpcRequest::makeAsync(QObject& supervisor) noexcept {
+  mAsync = true;
+  connect(
+      &supervisor, &QObject::destroyed, this,
+      [this]() {
+        sendError(
+            rpc::RpcInternalError("Supervisor got deleted before responding."));
+      },
+      Qt::QueuedConnection);  // Not sure if queued makes sense or not.
 }
 
 void RpcRequest::sendProgress(int percent) noexcept {

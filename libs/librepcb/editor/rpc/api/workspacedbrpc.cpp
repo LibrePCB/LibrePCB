@@ -59,6 +59,7 @@ void WorkspaceDbRpc::wait(GuiApplication& app, RpcObjectRegistry& registry,
     return;
   }
 
+  request.makeAsync(db);
   request.sendProgress(db.getScanProgressPercent());
   QObject::connect(&db, &WorkspaceLibraryDb::scanProgressUpdate, &request,
                    &RpcRequest::sendProgress);

@@ -118,6 +118,7 @@ void ProtocolRpc::initialize(GuiApplication& app, RpcObjectRegistry& registry,
     QObject::connect(&request, &RpcRequest::destroyed, notification.get(),
                      &Notification::dismiss);
     app.getNotifications().push(notification);
+    request.makeAsync(*qApp);
   }
 }
 

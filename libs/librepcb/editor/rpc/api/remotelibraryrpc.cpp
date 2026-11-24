@@ -27,6 +27,7 @@
 #include "../../utils/slinthelpers.h"
 #include "../rpcrequest.h"
 #include "rpcerrors.h"
+#include "rpchelpers.h"
 
 #include <QtCore>
 
@@ -38,6 +39,40 @@ namespace editor {
 namespace rpc {
 
 /*******************************************************************************
+ *  Helper Functions
+ ******************************************************************************/
+
+static ui::LibraryInfoData getObj(const RpcRequest& request,
+                                  LibrariesModel& model) {
+  const auto uuid = toUuid(request.getArg("obj"));
+  for (std::size_t i = 0; i < model.row_count(); ++i) {
+    if (auto item = model.row_data(i)) {
+      if (item->uuid == uuid.toStr()) {
+        return *item;
+      }
+    }
+  }
+  throw RpcInvalidHandle();
+}
+
+static QVariantMap summary(const ui::LibraryInfoData& obj) {
+  QVariantMap result;
+  result.insert("uuid", s2q(obj.uuid));
+  result.insert("name", s2q(obj.name));
+  result.insert("description", s2q(obj.description));
+  result.insert("installed_version", s2q(obj.installed_version));
+  result.insert("online_version", s2q(obj.online_version));
+  result.insert("outdated", obj.outdated);
+  return result;
+}
+
+static QVariantMap details(const ui::LibraryInfoData& obj) {
+  QVariantMap result = summary(obj);
+  // TODO: Add more properties.
+  return result;
+}
+
+/*******************************************************************************
  *  Command Handlers
  ******************************************************************************/
 
@@ -45,43 +80,35 @@ void RemoteLibraryRpc::list(GuiApplication& app, RpcObjectRegistry& registry,
                             RpcRequest& request) {
   Q_UNUSED(registry);
 
-  // Make sure the data is available (fetching it from the configured
-  // servers happens asynchronously, see the method documentation). The
-  // returned list contains whatever is currently available; streaming the
-  // libraries as notifications is not implemented yet.
   auto& model = app.getRemoteLibraries();
   model.ensurePopulated(false);
 
-  QVariantList libraries;
-  const std::size_t count = model.row_count();
-  for (std::size_t i = 0; i < count; ++i) {
-    const auto info = model.row_data(i);
-    if (!info) continue;
-    QVariantMap library;
-    library.insert("uuid", s2q(info->uuid));
-    library.insert("name", s2q(info->name));
-    library.insert("description", s2q(info->description));
-    library.insert("installed_version", s2q(info->installed_version));
-    library.insert("online_version", s2q(info->online_version));
-    library.insert("outdated", info->outdated);
-    libraries.append(library);
-  }
-  QVariantMap result;
-  result.insert("libraries", libraries);
-  request.sendSuccess(result);
-}
+  auto createResponse = [&]() {
+    QVariantMap result;
+    result.insert("libraries",
+                  modelToVariant(model, [](const ui::LibraryInfoData& obj) {
+                    return summary(obj);
+                  }));
+    return result;
+  };
 
-void RemoteLibraryRpc::get(GuiApplication& app, RpcObjectRegistry& registry,
-                           RpcRequest& request) {
-  Q_UNUSED(app);
-  Q_UNUSED(registry);
-  Q_UNUSED(request);
-  // TODO: Remote libraries are not registered objects yet, so there is no
-  // object handle to look up. The handle handling for them needs to be
-  // designed first (probably by passing the library UUID instead of a
-  // handle).
-  throw RpcUnexpectedState(
-      "Getting details about a remote library is not supported yet.");
+  if (!model.isOnlineCheckInProgress()) {
+    // Synchronous response.
+    request.sendSuccess(createResponse());
+  } else {
+    // Asynchronous response.
+    // NOTE: The partial response streaming (through notifications) is not
+    // implemented yet. Also no real progress report yet. Just an immediate
+    // notification to show some activity, and the full response when ready.
+    // In addition, cancelling the remote library fetching currently cannot
+    // be distinguished from a complete fetching.
+    request.makeAsync(model);
+    request.sendProgress(50);
+    QObject::connect(&model, &LibrariesModel::allOnlineLibrariesFetched,
+                     &request, [&request, createResponse]() {
+                       request.sendSuccess(createResponse());
+                     });
+  }
 }
 
 void RemoteLibraryRpc::install(GuiApplication& app, RpcObjectRegistry& registry,
@@ -109,6 +136,16 @@ void RemoteLibraryRpc::uninstall(GuiApplication& app,
   throw RpcUnexpectedState(
       "Uninstalling remote libraries is not supported through the RPC "
       "interface yet.");
+}
+
+void RemoteLibraryRpc::get(GuiApplication& app, RpcObjectRegistry& registry,
+                           RpcRequest& request) {
+  Q_UNUSED(app);
+  Q_UNUSED(registry);
+
+  auto& model = app.getRemoteLibraries();
+  const auto obj = getObj(request, model);
+  request.sendSuccess(details(obj));
 }
 
 /*******************************************************************************

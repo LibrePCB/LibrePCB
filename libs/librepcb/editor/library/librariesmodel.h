@@ -74,6 +74,7 @@ public:
   void ensurePopulated(bool withIcons, bool isAutoCheck = false) noexcept;
   void highlightLibraryOnNextRescan(const FilePath& fp) noexcept;
   void checkForUpdates() noexcept;
+  bool isOnlineCheckInProgress() noexcept;
   void cancelUpdateCheck() noexcept;
   void toggleAll() noexcept;
   void applyChanges() noexcept;
@@ -91,6 +92,7 @@ public:
 signals:
   void uiDataChanged(ui::LibraryListData data);
   void onlineVersionsAvailable(const QHash<Uuid, Version>& versions);
+  void allOnlineLibrariesFetched();
   void aboutToUninstallLibrary(const FilePath& fp);
   void panelPageRequested(ui::PanelPage page);
   void notificationEmitted(std::shared_ptr<Notification> notification);

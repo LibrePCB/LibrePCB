@@ -118,6 +118,18 @@ helpers, and vice versa. Everything else (e.g. `QDateTime`, `ext` types,
 non-string map keys) is rejected. Numeric conventions: lengths in
 nanometers, angles in microdegrees (see \ref doc_rpc_api_params).
 
+Absent and nil values are treated differently — both forms are allowed by
+MessagePack and JSON alike, but they are *not* the same thing:
+
+- **Params:** An argument which is **absent** (the key is not in the
+  params map) falls back to its documented default, or is rejected as
+  invalid if the argument is mandatory. An argument which is **explicitly
+  `nil`** is always a value in itself: it is only valid where the
+  specification declares the type as `nil`, otherwise it is rejected like
+  any other value of the wrong type.
+- **Results:** All documented fields are always present in a result map.
+  A value which does not exist is `nil` — keys are never omitted.
+
 Payload Conventions
 -------------------
 

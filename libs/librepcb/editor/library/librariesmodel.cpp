@@ -195,6 +195,10 @@ void LibrariesModel::checkForUpdates() noexcept {
   requestOnlineLibraries(true);
 }
 
+bool LibrariesModel::isOnlineCheckInProgress() noexcept {
+  return !mApiEndpointsInProgress.isEmpty();
+}
+
 void LibrariesModel::cancelUpdateCheck() noexcept {
   if (mMode != Mode::RemoteLibs) return;
 
@@ -332,6 +336,7 @@ void LibrariesModel::cancel() noexcept {
   if (!mDownloadsInProgress.isEmpty()) {
     mDownloadsInProgress.clear();
     emit uiDataChanged(getUiData());
+    emit allOnlineLibrariesFetched();  // No error reporting yet :-/
   } else if (!mApiEndpointsInProgress.isEmpty()) {
     mApiEndpointsInProgress.clear();
     emit uiDataChanged(getUiData());
@@ -555,6 +560,7 @@ void LibrariesModel::apiEndpointOperationFinished() noexcept {
   if (mApiEndpointsInProgress.isEmpty()) {
     const auto uiData = getUiData();
     emit uiDataChanged(uiData);
+    emit allOnlineLibrariesFetched();
 
     // Show status bar message.
     qInfo() << "Remote libraries with update available:"

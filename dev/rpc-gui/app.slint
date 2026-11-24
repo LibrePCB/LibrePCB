@@ -21,7 +21,7 @@ export component AppWindow inherits Window {
     preferred-width: 1100px;
     preferred-height: 800px;
 
-    // --- Connection state (toolbar) ---------------------------------------
+    // --- Connection state (sidebar) ---------------------------------------
     in property <bool> connected;
     in property <bool> authenticated;
     in property <bool> pending;
@@ -49,8 +49,11 @@ export component AppWindow inherits Window {
     callback pe-close-clicked(int);
 
     // --- UndoStack page ----------------------------------------------------
-    in-out property <string> undo-handle;
+    in property <[string]> project-entries;
+    in-out property <int> undo-project-index: -1;
+    in property <bool> undo-handle-valid;
     in property <string> undo-details;
+    callback undo-select-project(string);
     callback undo-get-clicked();
     callback undo-undo-clicked();
     callback undo-redo-clicked();
@@ -68,40 +71,28 @@ export component AppWindow inherits Window {
     in property <int> progress;
     callback db-wait-clicked();
 
-    // --- Toolbar callbacks ---------------------------------------------------
+    // --- Connection callbacks ------------------------------------------------
     callback connect-clicked();
     callback init-clicked();
 
     HorizontalLayout {
-        // Sidebar with the class list.
+        // Sidebar: connection controls, then the class list.
         VerticalLayout {
-            width: 170px;
-            padding: 8px;
-            spacing: 4px;
-            alignment: start;
+            width: 200px;
 
-            for class-name[i] in root.classes: Button {
-                text: class-name;
-                primary: i == root.current-page;
-                clicked => { root.select-class(i); }
-            }
-        }
-
-        VerticalLayout {
-            // Toolbar: connection state (left) and indicator (right).
-            HorizontalLayout {
+            VerticalLayout {
                 padding: 8px;
+                padding-bottom: 4px;
                 spacing: 6px;
 
                 Button {
-                    text: root.connected ? "Disconnect" : "Connect";
+                    text: root.connected ? "✕ Disconnect" : "⚡ Connect";
                     clicked => { root.connect-clicked(); }
                 }
 
                 LineEdit {
                     text <=> root.token;
                     placeholder-text: "Access Token";
-                    horizontal-stretch: 1;
                 }
 
                 Button {
@@ -110,38 +101,84 @@ export component AppWindow inherits Window {
                     clicked => { root.init-clicked(); }
                 }
 
-                Spinner {
-                    indeterminate: true;
-                    visible: root.pending;
-                }
+                HorizontalLayout {
+                    spacing: 6px;
 
-                VerticalLayout {
-                    alignment: center;
+                    VerticalLayout {
+                        alignment: center;
+
+                        Rectangle {
+                            width: 10px;
+                            height: 10px;
+                            border-radius: 5px;
+                            background: !root.connected ? #c04040
+                                : root.authenticated ? #40a040 : #e0a020;
+                        }
+                    }
+
+                    Text {
+                        text: !root.connected ? "Disconnected"
+                            : root.authenticated ? "Authenticated"
+                            : "Connected";
+                        color: !root.connected ? #c04040
+                            : root.authenticated ? #40a040 : #e0a020;
+                        vertical-alignment: center;
+                    }
 
                     Rectangle {
-                        width: 10px;
-                        height: 10px;
-                        border-radius: 5px;
-                        background: !root.connected ? #c04040
-                            : root.authenticated ? #40a040 : #e0a020;
+                        horizontal-stretch: 1;
                     }
-                }
 
-                Text {
-                    text: !root.connected ? "Disconnected"
-                        : root.authenticated ? "Authenticated" : "Connected";
-                    color: !root.connected ? #c04040
-                        : root.authenticated ? #40a040 : #e0a020;
-                    vertical-alignment: center;
+                    Spinner {
+                        width: 16px;
+                        height: 16px;
+                        indeterminate: true;
+                        visible: root.pending;
+                    }
                 }
             }
 
-            // The page of the selected class.
+            // Visual separation between connection and navigation.
+            VerticalLayout {
+                padding-left: 8px;
+                padding-right: 8px;
+
+                Rectangle {
+                    height: 1px;
+                    background: #c0c0c0;
+                }
+            }
+
+            VerticalLayout {
+                padding: 8px;
+                padding-top: 4px;
+                spacing: 4px;
+                alignment: start;
+
+                for class-name[i] in root.classes: Button {
+                    text: class-name;
+                    primary: i == root.current-page;
+                    clicked => { root.select-class(i); }
+                }
+            }
+
+            Rectangle {
+                vertical-stretch: 1;
+            }
+        }
+
+        // The page of the selected class, plus the log at the bottom.
+        VerticalLayout {
+            padding: 8px;
+            spacing: 8px;
+
             if root.current-page == 0 : ProtocolPage {
+                vertical-stretch: 1;
                 authenticated: root.authenticated;
                 ping-clicked => { root.ping-clicked(); }
             }
             if root.current-page == 1 : ProjectEditorPage {
+                vertical-stretch: 1;
                 authenticated: root.authenticated;
                 path <=> root.project-path;
                 projects: root.projects;
@@ -153,14 +190,19 @@ export component AppWindow inherits Window {
                 close-clicked(i) => { root.pe-close-clicked(i); }
             }
             if root.current-page == 2 : UndoStackPage {
+                vertical-stretch: 1;
                 authenticated: root.authenticated;
-                handle <=> root.undo-handle;
+                project-entries: root.project-entries;
+                current-index <=> root.undo-project-index;
+                handle-valid: root.undo-handle-valid;
                 details: root.undo-details;
+                select-project(value) => { root.undo-select-project(value); }
                 get-clicked => { root.undo-get-clicked(); }
                 undo-clicked => { root.undo-undo-clicked(); }
                 redo-clicked => { root.undo-redo-clicked(); }
             }
             if root.current-page == 3 : RemoteLibraryPage {
+                vertical-stretch: 1;
                 authenticated: root.authenticated;
                 libraries: root.libraries;
                 details: root.library-details;
@@ -171,17 +213,20 @@ export component AppWindow inherits Window {
                 get-clicked(i) => { root.rl-get-clicked(i); }
             }
             if root.current-page == 4 : WorkspaceDbPage {
+                vertical-stretch: 1;
                 authenticated: root.authenticated;
                 progress: root.progress;
                 wait-clicked => { root.db-wait-clicked(); }
             }
             if root.current-page < 0 : Text {
+                vertical-stretch: 1;
                 text: "No page for this class (yet).";
                 color: #808080;
             }
 
-            // Log at the bottom.
+            // The log keeps a fixed height (no splitter in this Slint).
             TextEdit {
+                height: 160px;
                 text: root.log;
                 read-only: true;
                 font-family: "DejaVu Sans Mono";

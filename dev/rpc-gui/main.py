@@ -1,10 +1,11 @@
 """LibrePCB RPC GUI — a manual testing tool for the RPC server.
 
-The window consists of a connection toolbar, a sidebar with the RPC
-classes (generated list, see api.py), the page of the selected class and
-a log. The logic per class lives in pages/*.py, one module per page.
+The window consists of a sidebar with the connection controls and the
+RPC classes (generated list, see api.py), the page of the selected class
+and a log. The logic per class lives in pages/*.py, one module per page.
 """
 
+import os
 import queue
 import time
 from datetime import timedelta
@@ -18,6 +19,13 @@ from pages.project_editor import ProjectEditorPage
 from pages.undo_stack import UndoStackPage
 from pages.remote_library import RemoteLibraryPage
 from pages.workspace_db import WorkspaceDbPage
+
+# A project to pre-fill the project path edit with (developer comfort).
+DEFAULT_PROJECT_PATH = os.path.normpath(os.path.join(
+    os.path.dirname(os.path.abspath(__file__)),
+    "..", "..", "tests", "data", "projects", "Gerber Test",
+    "project.lpp",
+))
 
 # The page index for each class of api.CLASSES (unknown classes get the
 # "no page yet" placeholder).
@@ -37,11 +45,15 @@ class Gui(ns.AppWindow):
         super().__init__()
         self.classes = slint.ListModel(api.CLASSES)
         self.current_page = PAGES["ProjectEditor"]
+        if os.path.isfile(DEFAULT_PROJECT_PATH):
+            self.project_path = DEFAULT_PROJECT_PATH
         self.client = None
         self._log_lines = []
         self.log = ""
         self.projects = slint.ListModel([])
         self.libraries = slint.ListModel([])
+        self.project_entries = slint.ListModel([])
+        self.undo_handle_valid = False
         self._pages = {
             "Protocol": ProtocolPage(self),
             "ProjectEditor": ProjectEditorPage(self),
@@ -131,6 +143,10 @@ class Gui(ns.AppWindow):
     # --- UndoStack page ----------------------------------------------------
 
     @slint.callback
+    def undo_select_project(self, value):
+        self._pages["UndoStack"].select_project(value)
+
+    @slint.callback
     def undo_get_clicked(self):
         self._pages["UndoStack"].get_clicked()
 
@@ -189,7 +205,7 @@ class Gui(ns.AppWindow):
             return
         while True:
             try:
-                msg = self.client.received.get_nowait()
+                received_at, msg = self.client.received.get_nowait()
             except queue.Empty:
                 return
             if msg is None:
@@ -200,15 +216,18 @@ class Gui(ns.AppWindow):
                 self._log("Connection closed.")
                 return
             if isinstance(msg, list) and len(msg) == 3 and msg[0] == 3:
-                self.progress = msg[2].get("progress", 0) * 100
+                # A progress report (the payload carries the percent).
+                self.progress = msg[2].get("progress", 0)
                 continue
             if isinstance(msg, list) and len(msg) == 4 and msg[0] == 1:
-                self._handle_response(msg[1], msg[2], msg[3])
+                self._handle_response(received_at, msg[1], msg[2], msg[3])
             elif isinstance(msg, list) and len(msg) == 3 and msg[0] == 2:
                 self._log(f"⇐ notification: {fmt_value(msg[2])}")
 
-    def _handle_response(self, msgid, error, result):
-        method, handler = self.client.handlers.pop(msgid, (None, None))
+    def _handle_response(self, received_at, msgid, error, result):
+        method, handler, sent_at = self.client.handlers.pop(
+            msgid, (None, None, 0.0)
+        )
         if msgid == self.client.pending_msgid:
             # The initialize reply (success/error) (un-)authenticates.
             self.client.pending_msgid = None
@@ -216,10 +235,14 @@ class Gui(ns.AppWindow):
             self.authenticated = error is None
             if error is None and "token" in result:
                 self.token = str(result["token"])
+        duration = f" ({int((received_at - sent_at) * 1000)} ms)"
         if error is None:
-            self._log(f"← {method}: {fmt_value(result)}")
+            self._log(f"← {method}: {fmt_value(result)}{duration}")
         else:
-            self._log(f"← ⚠ {method}: {error.get('code')} {error.get('message')}")
+            self._log(
+                f"← ⚠ {method}: {error.get('code')} {error.get('message')}"
+                f"{duration}"
+            )
         if handler:
             handler(error, result)
 

@@ -18,6 +18,8 @@ export component ProjectEditorPage {
     callback close-clicked(int);
 
     VerticalLayout {
+        spacing: 8px;
+
         HorizontalLayout {
             spacing: 6px;
 
@@ -41,7 +43,7 @@ export component ProjectEditorPage {
         }
 
         ListView {
-            vertical-stretch: 3;
+            vertical-stretch: 2;
 
             for project[i] in root.projects: HorizontalLayout {
                 spacing: 6px;
@@ -90,6 +92,8 @@ export component ProjectEditorPage {
         }
 
         TextEdit {
+            vertical-stretch: 3;
+            min-height: 180px;
             text: root.details;
             read-only: true;
             font-family: "DejaVu Sans Mono";

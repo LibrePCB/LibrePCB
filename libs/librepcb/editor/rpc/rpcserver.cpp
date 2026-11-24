@@ -41,9 +41,13 @@
 namespace librepcb {
 namespace editor {
 
-/*******************************************************************************
- *  Local Functions
- ******************************************************************************/
+// Defined in commands.cpp (a generated file): Dispatches an RPC command
+// by its method name to the corresponding generated command class. Throws
+// an RpcError if the method was not found.
+namespace rpc {
+void rpcDispatchCommand(GuiApplication& app, RpcObjectRegistry& registry,
+                        const QString& method, RpcRequest& request);
+}
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -72,14 +76,6 @@ RpcServer::RpcServer(GuiApplication& app) noexcept
 RpcServer::~RpcServer() noexcept {
 }
 
-// Defined in commands.cpp (a generated file): Dispatches an RPC command
-// by its method name to the corresponding generated command class. Throws
-// an RpcError if the method was not found.
-namespace rpc {
-void rpcDispatchCommand(GuiApplication& app, RpcObjectRegistry& registry,
-                        const QString& method, RpcRequest& request);
-}
-
 /*******************************************************************************
  *  Command Handling
  ******************************************************************************/
@@ -104,6 +100,14 @@ void RpcServer::handleRequest(uint32_t connId, uint32_t msgId,
     request->sendError(rpc::RpcCommandFailed(e.what()));
   } catch (...) {
     request->sendError(rpc::RpcCommandFailed());
+  }
+
+  // Safety net: If the command handler did not respond, and did not make
+  // the request async (which requires a supervisor object to be registered),
+  // respond with an error now instead of risking the request to be hanging
+  // forever.
+  if ((!request->isFinished()) && (!request->isAsync())) {
+    request->sendError(rpc::RpcInternalError("No supervisor registered."));
   }
 }
 

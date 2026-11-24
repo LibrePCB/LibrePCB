@@ -23,12 +23,15 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "rpcerrors.h"
 #include "rpctypes.h"
 
 #include <librepcb/core/types/uuid.h>
 #include <librepcb/rust-core/rpcext.h>
 
 #include <QtCore>
+
+#include <slint.h>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -61,12 +64,33 @@ inline QVariantList toVariant(const T& list, F convertItem) {
   return result;
 }
 
+template <typename T, typename F>
+inline QVariantList modelToVariant(const slint::Model<T>& model,
+                                   F convertItem) {
+  QVariantList result;
+  for (std::size_t i = 0; i < model.row_count(); ++i) {
+    if (auto obj = model.row_data(i)) {
+      result.append(convertItem(*obj));
+    }
+  }
+  return result;
+}
+
 /// Convert a Uuid into the protocol's "uuid" extension type (see the API
 /// specification): An ext value with the 16 raw UUID bytes in RFC 4122
 /// field order.
 inline QVariant toVariant(const Uuid& uuid) noexcept {
   return QVariant::fromValue(
       rs::MsgPackExt(kMsgPackExtTypeUuid, QUuid(uuid.toStr()).toRfc4122()));
+}
+
+inline Uuid toUuid(const QVariant& value) {
+  const auto ext = value.value<rs::MsgPackExt>();
+  const QUuid uuid = QUuid::fromRfc4122(ext.getData());
+  if (uuid.isNull()) {
+    throw RpcInvalidArgs("Invalid UUID.");
+  }
+  return Uuid::fromString(uuid.toString(QUuid::WithoutBraces));
 }
 
 /*******************************************************************************

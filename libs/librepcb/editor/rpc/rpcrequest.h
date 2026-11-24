@@ -162,6 +162,10 @@ public:
    */
   bool isCancelled() const noexcept { return mCancelled; }
 
+  bool isFinished() const noexcept { return mReplied; }
+
+  bool isAsync() const noexcept { return mAsync; }
+
   // General Methods
 
   /**
@@ -171,6 +175,8 @@ public:
    * #isCancelled() for the cooperative cancellation semantics.
    */
   void cancel() noexcept;
+
+  void makeAsync(QObject& supervisor) noexcept;
 
   void sendProgress(int percent) noexcept;
 
@@ -221,6 +227,7 @@ private:  // Data
   const uint32_t mMsgid;
   const QString mMethod;
   const QVariantMap mArgs;
+  bool mAsync;
   bool mReplied;
   bool mCancelled;
 };

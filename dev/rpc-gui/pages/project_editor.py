@@ -14,7 +14,12 @@ class ProjectEditorPage:
         path = self.app.project_path.strip()
         if not path:
             return
-        self.app.call("ProjectEditor.open", {"path": path})
+        self.app.call("ProjectEditor.open", {"path": path}, self._on_opened)
+
+    def _on_opened(self, error, result):
+        # Opening changes the project list, so refresh it automatically.
+        if error is None:
+            self.list_clicked()
 
     def list_clicked(self):
         self.app.call("ProjectEditor.list", {}, self._on_list)
@@ -30,11 +35,17 @@ class ProjectEditorPage:
 
     def close_clicked(self, index):
         self._select(index)
-        self.app.call("ProjectEditor.close", {"obj": self._handles[index]})
+        self.app.call("ProjectEditor.close", {"obj": self._handles[index]},
+                      self._on_closed)
+
+    def _on_closed(self, error, result):
+        # Closing changes the project list, so refresh it automatically.
+        if error is None:
+            self.list_clicked()
 
     def _select(self, index):
         # Make the handle of the last used row available to other pages.
-        self.app.undo_handle = str(self._handles[index])
+        self.app._pages["UndoStack"].select(index)
 
     def _on_list(self, error, result):
         if error is not None:
@@ -49,6 +60,7 @@ class ProjectEditorPage:
             }
             for project in projects
         ])
+        self.app._pages["UndoStack"].set_projects(projects)
 
     def _on_details(self, error, result):
         if error is None:

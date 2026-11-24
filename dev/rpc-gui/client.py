@@ -8,6 +8,7 @@ Interpretation of the payloads is up to the pages.
 import queue
 import socket
 import threading
+import time
 
 import umsgpack
 
@@ -17,7 +18,7 @@ PORT = 19536
 def fmt_value(value):
     """Format a msgpack value into one compact line (for the log)."""
     text = _fmt(value)
-    return text if len(text) <= 160 else text[:157] + "..."
+    return text if len(text) <= 160 else text[:157] + "…"
 
 
 def fmt_details(value):
@@ -35,6 +36,8 @@ def _fmt(value):
         return "[" + ", ".join(_fmt(item) for item in value) + "]"
     if value is None:
         return "nil"
+    if isinstance(value, str) and len(value) > 32:
+        return value[:29] + "…"
     return str(value)
 
 
@@ -78,7 +81,7 @@ class RpcClient:
         self.file = self.sock.makefile("rb")
         self.msgid = 0
         self.pending_msgid = None  # The initialize request, for cancelling.
-        self.handlers = {}  # msgid -> (method, handler | None)
+        self.handlers = {}  # msgid -> (method, handler | None, sent_at)
         self.received = queue.Queue()
         threading.Thread(target=self.read_loop, daemon=True).start()
 
@@ -88,7 +91,7 @@ class RpcClient:
                 msg = umsgpack.unpack(self.file)
             except Exception:
                 msg = None
-            self.received.put(msg)
+            self.received.put((time.time(), msg))
             if msg is None:
                 break
 
@@ -96,7 +99,7 @@ class RpcClient:
         """Send a request and remember (method, handler) for its response."""
         self.msgid += 1
         msgid = self.msgid
-        self.handlers[msgid] = (method, handler)
+        self.handlers[msgid] = (method, handler, time.time())
         self.sock.sendall(umsgpack.packb([0, msgid, method, params]))
         return msgid
 

@@ -20,6 +20,8 @@ export component RemoteLibraryPage {
     callback get-clicked(int);
 
     VerticalLayout {
+        spacing: 8px;
+
         HorizontalLayout {
             spacing: 6px;
 
@@ -92,6 +94,7 @@ export component RemoteLibraryPage {
         }
 
         TextEdit {
+            vertical-stretch: 1;
             text: root.details;
             read-only: true;
             font-family: "DejaVu Sans Mono";

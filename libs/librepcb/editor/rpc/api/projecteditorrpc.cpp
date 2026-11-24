@@ -49,8 +49,7 @@ namespace rpc {
  *  Helper Functions
  ******************************************************************************/
 
-static QVariantMap summary(const Attribute& obj, RpcObjectRegistry& registry) {
-  Q_UNUSED(registry);
+static QVariantMap summary(const Attribute& obj) {
   QVariantMap result;
   result.insert("name", *obj.getKey());
   result.insert("type", obj.getType().getName());
@@ -97,9 +96,8 @@ static QVariantMap details(ProjectEditor& obj, RpcObjectRegistry& registry) {
   result.insert("author", project.getAuthor());
   result.insert("version", *project.getVersion());
   result.insert("attributes",
-                toVariant(project.getAttributes(), [&](const Attribute& obj) {
-                  return summary(obj, registry);
-                }));
+                toVariant(project.getAttributes(),
+                          [&](const Attribute& obj) { return summary(obj); }));
   result.insert("locale_order", toVariant(project.getLocaleOrder()));
   result.insert("norm_order", toVariant(project.getNormOrder()));
   result.insert("sheets",
