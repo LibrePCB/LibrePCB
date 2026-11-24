@@ -34,12 +34,12 @@ namespace editor {
  *  Local Functions
  ******************************************************************************/
 
-/// Serialize an error into a map of the protocol's value domain.
-static QVariantMap errorToVariant(rpc::RpcErrorCode code,
-                                  const QString& message,
-                                  const QVariantMap& properties) noexcept {
+/// Serialize an error into a map of the protocol's value domain. The
+/// error code is *not* part of the map — it is sent as the reply status
+/// instead (see the FFI call in `RpcServer::requestEvent()`).
+static QVariant errorToVariant(const QString& message,
+                               const QVariantMap& properties) noexcept {
   QVariantMap error;
-  error.insert("code", static_cast<int>(code));
   error.insert("message", QVariant(message));
   for (auto it = properties.constBegin(); it != properties.constEnd(); ++it) {
     error.insert(it.key(), it.value());
@@ -93,23 +93,23 @@ void RpcRequest::sendProgress(int percent) noexcept {
 
 void RpcRequest::sendNotification(const QVariant& payload) noexcept {
   if (!mReplied) {
-    onEvent.notify(Event::Notification, payload);
+    onEvent.notify(Event::Notification, mConnId, mMsgid, 0, payload);
   }
 }
 
 void RpcRequest::sendSuccess(const QVariant& result) noexcept {
   if (!mReplied) {
     mReplied = true;
-    onEvent.notify(Event::Succeeded, result);
+    onEvent.notify(Event::Reply, mConnId, mMsgid, 0, result);
   }
 }
 
 void RpcRequest::sendError(const RpcError& error) noexcept {
   if (!mReplied) {
     mReplied = true;
-    onEvent.notify(Event::Failed,
-                   errorToVariant(error.getCode(), error.getDetail(),
-                                  error.getProperties()));
+    onEvent.notify(Event::Reply, mConnId, mMsgid,
+                   static_cast<uint32_t>(error.getCode()),
+                   errorToVariant(error.getDetail(), error.getProperties()));
   }
 }
 

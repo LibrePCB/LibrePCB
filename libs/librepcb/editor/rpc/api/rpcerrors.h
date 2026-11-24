@@ -44,7 +44,7 @@ namespace rpc {
  * Keep in sync with the Rust enum in `rpc_api.rs` (both are generated
  * from the same specification).
  */
-enum class RpcErrorCode : int {
+enum class RpcErrorCode : uint32_t {
   InvalidMessage = 10,
   MessageTooLarge = 11,
   InvalidRequest = 20,

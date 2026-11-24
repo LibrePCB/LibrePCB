@@ -45,7 +45,7 @@ pub type RpcOnRequestCallback = extern "C" fn(
 );
 
 /// Callback which is invoked when a client cancels a pending request
-/// (message `[4, msg_id]`).
+/// (message `[3, msg_id]`).
 ///
 /// It is invoked on the connection's reader thread. The C++ implementation
 /// must eventually make sure the request is replied exactly once
@@ -409,13 +409,11 @@ extern "C" fn ffi_rpc_server_reply(
   let pairs = match &payload {
     Value::Map(pairs) => pairs
       .iter()
-      .filter_map(|(key, value)| {
-        if key.as_str() == Some("code") {
-          None // Sent as the response status instead.
-        } else if key.as_str() == Some("message") {
-          Some((key.clone(), Value::from(message.as_str())))
+      .map(|(key, value)| {
+        if key.as_str() == Some("message") {
+          (key.clone(), Value::from(message.as_str()))
         } else {
-          Some((key.clone(), value.clone()))
+          (key.clone(), value.clone())
         }
       })
       .collect(),

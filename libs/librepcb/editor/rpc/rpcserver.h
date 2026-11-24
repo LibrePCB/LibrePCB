@@ -128,6 +128,7 @@ private:  // Methods
 
   /// Called by an #RpcRequest on any event
   void requestEvent(const RpcRequest& request, RpcRequest::Event event,
+                    uint32_t connId, uint32_t msgId, uint32_t status,
                     const QVariant& value) noexcept;
 
   /// Key for a pending request in the registry.

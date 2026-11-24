@@ -25,7 +25,7 @@ Build directory: `build/agent` (per CLAUDE.md). No commits unless asked.
 │                              │ Qt::QueuedConnection (async!)  │ events       │
 │                              │                                │ (type-2      │
 │                              │                                │  broadcasts, │
-│                              │ replies / progress (types 1,3) │  non-block.) │
+│                              │ replies / progress (types 1,2) │  non-block.) │
 │                              │                                ▼              │
 │                        rust-core::rpc_server (std::net, own threads)         │
 │                        msgpack envelope · auth · stream codec · QVariant FFI │
@@ -53,7 +53,7 @@ Build directory: `build/agent` (per CLAUDE.md). No commits unless asked.
 | Spec / discovery | YAML spec file (`dev/rpc/rpc.yml`, dev tool, not shipped); **no `rpc.discover` method** — clients read the spec file and compare per-function `since` with the `version` from `initialize` |
 | Auth | `initialize` handshake: first-time clients are approved interactively by the user (notification); approval issues an access token which clients use for later connections (see 2.5) |
 | Concurrency | std threads only, reader/writer thread pair per connection (no tokio, no mio) |
-| Events | Type-2 notifications broadcast to all clients (v2: `project_opened`, `project_closed`, `selection_changed`) |
+| Events | Reserved: msgid-0 requests as notifications, broadcast by the application (e.g. `project_opened`) — not yet used |
 | Scope | GUI-attached only; no headless/CLI support; no Python driver in v2 |
 | Docs | Generated Doxygen-flavored Markdown page from the YAML spec (committed); no automated spec check / CI stale-check (tests are written manually) |
 
@@ -94,30 +94,39 @@ exactly once).
 ### 2.2 Envelope (message types)
 
 msgpack arrays, inspired by the (dormant) official msgpack-rpc spec,
-extended with request-scoped message types:
+extended with request-scoped message types. The protocol is
+*bidirectional*: Both sides can initiate calls in exactly the same way
+(e.g. the application calling methods provided by a plugin), with the
+following message types:
 
-| Type | Message      | Direction | Shape                        | Meaning |
-|------|--------------|-----------|------------------------------|---------|
-| 0    | Request      | C→S       | `[0, msgid, method, params]` | Call a function |
-| 1    | Response     | S→C       | `[1, msgid, status, payload]`  | Exactly one per request; `status` is 0 on success (payload = result) or the error code (payload = error map) |
-| 2    | Notification | S→C       | `[2, method, params]`        | Broadcast event (e.g. `project_opened`) |
-| 3    | Request message | S→C   | `[3, msgid, payload]`        | Per-request channel: progress reports and/or streamed partial data; only while the request is pending |
-| 4    | Cancel       | C→S       | `[4, msgid]`                 | Client asks to cancel a pending request |
+| Type | Message      | Direction     | Shape                        | Meaning |
+|------|--------------|---------------|------------------------------|---------|
+| 0    | Request      | both          | `[0, msgid, method, params]` | Call a function |
+| 1    | Response     | callee→caller | `[1, msgid, status, payload]`  | Exactly one per request; `status` is 0 on success (payload = result) or the error code (payload = error map) |
+| 2    | Request message | callee→caller | `[2, msgid, payload]`        | Per-request channel: progress reports and/or streamed partial data; only while the request is pending |
+| 3    | Cancel       | caller→callee | `[3, msgid]`                 | The caller asks to cancel a pending request |
 
-- `msgid` is a u32, unique per connection (per-connection, *not* global).
+- `msgid` is a u32, **unique per direction while pending** (a response
+  always travels in the opposite direction of its request, so msgids of
+  concurrent requests in both directions never collide).
+- The **msgid 0 is reserved** for future notifications, i.e. method calls
+  the sender is not interested in a response for (which MUST NOT be
+  replied to). Senders must not use msgid 0 yet, and it is rejected as an
+  invalid request. Malformed requests (e.g. with an undeterminable
+  msgid) are answered with an error response to msgid 0.
 - Responses may be sent **out of order** (pipelining is allowed, as in the
   official spec): the reader thread keeps reading while requests are being
   processed.
 - **Unknown message types are ignored + logged** (not closed) — forward
-  compatibility; the set of known types is gated by `protocolVersion`.
-- One emit primitive, two conventions: type-3 payloads are defined per
+  compatibility.
+- One emit primitive, two conventions: type-2 payloads are defined per
   method in the spec (e.g. progress: `{"percent": <int 0..100>,
   "message": <string>}`, or streamed chunks: `bin` data).
-- **Cancellation invariant:** on cancel, the server stops the work *when
+- **Cancellation invariant:** on cancel, the callee stops the work *when
   it can* and responds with a spec-defined "cancelled" error; if the work
   already completed or can't be interrupted, the normal result is sent.
-  Either way the client receives **exactly one final response** per
-  request. The server *enforces* this exactly-once property (see 2.6).
+  Either way the caller receives **exactly one final response** per
+  request. The callee *enforces* this exactly-once property (see 2.6).
 
 ### 2.3 Method naming: `ClassName.method_name`
 
@@ -178,7 +187,7 @@ A request's `params` is a **string-keyed msgpack map**:
     a notification asking the user to accept the connection. On accept,
     the request is replied (success) and a fresh access token is issued
     (returned in the response, to be stored by the client). If the user
-    dismisses the prompt or the client cancels the request (type 4), the
+    dismisses the prompt or the client cancels the request (type 3), the
     request is replied with `AccessDenied`.
 - Success result (a map): `{"format": "1.0", "server": "librepcb",
   "version": "<app version>", "session": "<uuid>", "workspace": "<path>",
@@ -206,17 +215,17 @@ A request's `params` is a **string-keyed msgpack map**:
   blocking!). The handler decides when to answer:
   - immediate result → `ffi_rpc_server_reply(conn_id, msgid, ok, value)`
   - long-running task → zero or more
-    `ffi_rpc_server_notify_conn(conn_id, msgid, payload)` (type 3, e.g.
+    `ffi_rpc_server_notify_conn(conn_id, msgid, payload)` (type 2, e.g.
     progress) → reply later
 - `conn_id` is needed because msgids are only unique per connection; two
   clients may use the same msgid.
 - **Server-side bookkeeping enforces the invariants:** the Rust server
   tracks per connection the set of pending (dispatched, not yet replied)
   msgids. `reply` removes it (a second reply for the same msgid is
-  ignored); `notify_conn` (type 3) is only delivered while pending;
+  ignored); `notify_conn` (type 2) is only delivered while pending;
   replies/emits to unknown or closed connections are silently ignored
   (covers "task finishes after the client disconnected").
-- Cancel `[4, msgid]`: forwarded to C++ via a cancel callback if the msgid
+- Cancel `[3, msgid]`: forwarded to C++ via a cancel callback if the msgid
   is pending; C++ stops the work when it can and must still reply exactly
   once (spec-defined "cancelled" error, or the normal result if it already
   completed). Wiring cancellation into real LibrePCB jobs is handler-level
@@ -331,7 +340,7 @@ pub type RpcDispatchFn = extern "C" fn(
     ctx: *mut c_void, conn_id: u64, msgid: u32,
     method: &QString, params: &QVariant);
 
-/// Cancel notification: a client sent [4, msgid] for a pending request.
+/// Cancel notification: the client sent [3, msgid] for a pending request.
 /// C++ must eventually reply exactly once (cancelled error or result).
 pub type RpcCancelFn = extern "C" fn(ctx: *mut c_void, conn_id: u64, msgid: u32);
 
@@ -350,7 +359,7 @@ ffi_rpc_server_reply(s: &mut RpcServer, conn_id: u64, msgid: u32,
                      ok: bool, value: &QVariant);
 /// Broadcast an event (type 2) to all clients; never blocks.
 ffi_rpc_server_notify_all(s: &mut RpcServer, method: &QString, params: &QVariant);
-/// Send a request-scoped message (type 3, e.g. progress) while the
+/// Send a request-scoped message (type 2, e.g. progress) while the
 /// request is pending; returns false otherwise.
 ffi_rpc_server_notify_conn(s: &mut RpcServer, conn_id: u64, msgid: u32,
                            payload: &QVariant) -> bool;

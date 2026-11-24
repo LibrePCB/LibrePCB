@@ -35,7 +35,7 @@ namespace editor {
 namespace rpc {
 
 // Defined in rpc/api/rpcerrors.h (a generated file).
-enum class RpcErrorCode : int;
+enum class RpcErrorCode : uint32_t;
 
 }  // namespace rpc
 

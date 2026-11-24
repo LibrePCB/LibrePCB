@@ -88,40 +88,53 @@ are unknown to the client (calling them results in
 Messages {#doc_rpc_api_messages}
 --------
 
+The protocol is *bidirectional*: Both sides of a connection can initiate
+method calls in exactly the same way, using the same message types (this
+is what will allow e.g. the application to call methods provided by
+plugins). Authentication (see above) applies to client-initiated
+requests only.
+
 All messages are MessagePack arrays whose first element is the message
 type:
 
-| Type | Message         | Direction | Shape                     |
-|------|-----------------|-----------|---------------------------|
-| 0    | Request         | C→S       | `[0, msgid, method, params]` |
-| 1    | Response        | S→C       | `[1, msgid, status, payload]` |
-| 2    | Notification    | S→C       | `[2, method, params]`        |
-| 3    | Request message | S→C       | `[3, msgid, payload]`       |
-| 4    | Cancel          | C→S       | `[4, msgid]`                |
+| Type | Message      | Direction     | Shape                         |
+|------|--------------|---------------|-------------------------------|
+| 0    | Request      | both          | `[0, msgid, method, params]`  |
+| 1    | Response     | callee→caller | `[1, msgid, status, payload]` |
+| 2    | Notification | callee→caller | `[2, msgid, payload]`         |
+| 3    | Cancel       | caller→callee | `[3, msgid]`                  |
 
 The `status` of a response is `0` on success (the payload carries the
 result, which may be nil) or the error code on failure (the payload is
 then a map carrying the error `message`, possibly with additional
 properties; see @ref doc_rpc_api_errors).
 
-- `msgid` is an unsigned 32-bit integer, unique per connection while
-  pending. Responses may be sent in any order (pipelining): The server
-  keeps reading requests while previous ones are being processed.
-- Exactly one response is sent per request, enforced by the server. A
+- `msgid` is an unsigned 32-bit integer, unique per direction while
+  pending (a response always travels in the opposite direction of its
+  request, so msgids of requests pending in both directions never
+  collide). Responses may be sent in any order (pipelining): Requests
+  are processed while previous ones are still being processed.
+- Exactly one response is sent per request, enforced by the callee. A
   second response (or a response for an unknown or closed connection) is
   silently dropped.
-- A request message (type 3) is only delivered while the request is
+- A notification (type 2) is only delivered while the request is
   pending, i.e. before its response. Commands may use it to report
   progress or to stream partial data (defined per method, none yet).
-- With `[4, msgid]` a client may cancel a pending request. Cancellation
-  is cooperative: The command stops its work when it can and responds
-  with a "cancelled" error; if the work already completed, the normal
-  result is sent. Either way, exactly one final response arrives.
+- With `[3, msgid]` the caller may cancel a pending request.
+  Cancellation is cooperative: The callee stops its work when it can and
+  responds with a "cancelled" error; if the work already completed, the
+  normal result is sent. Either way, exactly one final response arrives.
 - Unknown message types are ignored for forward compatibility. A request
   which doesn't conform to the envelope (e.g. a non-string method) is
-  answered with [error code 20](@ref doc_rpc_api_errors) and the
-  connection stays open. However, values outside the protocol's value
-  domain result in [error code 23](@ref doc_rpc_api_errors).
+  answered with an error response ([error code 20]
+  (@ref doc_rpc_api_errors)), echoed to the request's msgid — or to the
+  reserved msgid 0 if no valid msgid could be determined. The connection
+  stays open. However, values outside the protocol's value domain result
+  in [error code 40](@ref doc_rpc_api_errors).
+- The msgid 0 is reserved for future notifications, i.e. method calls the
+  sender is not interested in a response for (which MUST NOT be replied
+  to). Senders must not use msgid 0 yet, and it is currently rejected as
+  an invalid request.
 
 Params & Results {#doc_rpc_api_params}
 ----------------

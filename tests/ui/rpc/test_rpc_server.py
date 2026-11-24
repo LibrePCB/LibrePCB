@@ -139,7 +139,7 @@ def test_rpc_server(librepcb, helpers):
                 helpers.wait_for_notification(
                     app, "RPC Connection Request"
                 )
-                rpc4.send([4, 1])
+                rpc4.send([3, 1])
                 message = rpc4.receive()
                 assert message[0:2] == [1, 1], message
                 assert message[2] == 33, message  # Status: the error code.
@@ -199,6 +199,15 @@ def test_rpc_server(librepcb, helpers):
             # stays open.
             rpc.expect_error(7, "Foo.bar", {}, 31)
 
+            # The reserved msgid 0 is not a valid request msgid (yet): The
+            # request is rejected with an error response to msgid 0, the
+            # connection stays open.
+            rpc.send([0, 0, "ping", None])
+            message = rpc.receive()
+            assert message[0:2] == [1, 0], message
+            assert message[2] == 20, message  # Status: InvalidRequest.
+            assert message[3]["message"] == "Invalid request", message
+
             # Invalid envelope (method not a string) → InvalidRequest
             # (20), the connection stays open.
             rpc.send([0, 8, 42, {}])
@@ -230,7 +239,7 @@ def test_rpc_server(librepcb, helpers):
             assert message[2] == 40, message  # Status: the error code.
 
             # A cancel for an unknown msgid is ignored (no response).
-            rpc.send([4, 999])
+            rpc.send([3, 999])
             status, result = rpc.request(13, "ping", None)
             assert status == 0
             assert result is None

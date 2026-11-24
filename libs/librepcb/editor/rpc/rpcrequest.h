@@ -84,11 +84,12 @@ public:
   // Signals
   enum class Event {
     Notification,
-    Succeeded,
-    Failed,
+    Reply,
   };
-  Signal<RpcRequest, Event, const QVariant&> onEvent;
-  typedef Slot<RpcRequest, Event, const QVariant&> OnEventSlot;
+  Signal<RpcRequest, Event, uint32_t, uint32_t, uint32_t, const QVariant&>
+      onEvent;
+  typedef Slot<RpcRequest, Event, uint32_t, uint32_t, uint32_t, const QVariant&>
+      OnEventSlot;
 
   // Constructors / Destructor
   RpcRequest() = delete;
@@ -98,8 +99,6 @@ public:
              const QVariantMap& args) noexcept;
 
   // Getters
-  uint32_t getConnId() const noexcept { return mConnId; }
-  uint32_t getMsgId() const noexcept { return mMsgid; }
   const QString& getMethod() const noexcept { return mMethod; }
   const QVariantMap& getArgs() const noexcept { return mArgs; }
   QVariant getArg(const QString& key,

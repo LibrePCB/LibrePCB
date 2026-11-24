@@ -15,17 +15,21 @@
 use super::rpc_api::RpcErrorCode;
 use rmpv::Value;
 
-/// The message type of a request (client → server).
+/// The message type of a request (both directions).
 const MESSAGE_TYPE_REQUEST: i64 = 0;
-/// The message type of a response (server → client).
+/// The message type of a response (both directions).
 const MESSAGE_TYPE_RESPONSE: i64 = 1;
-/// The message type of a notification/event (server → all clients).
-//const MESSAGE_TYPE_NOTIFICATION: i64 = 2;
-/// The message type of a request-scoped message (server → client, e.g.
+/// The message type of a request-scoped message (callee → caller, e.g.
 /// progress or streamed data while a request is pending).
-const MESSAGE_TYPE_REQUEST_MESSAGE: i64 = 3;
-/// The message type of a cancel request (client → server).
-const MESSAGE_TYPE_CANCEL: i64 = 4;
+const MESSAGE_TYPE_REQUEST_MESSAGE: i64 = 2;
+/// The message type of a cancel request (caller → callee).
+const MESSAGE_TYPE_CANCEL: i64 = 3;
+
+/// The msgid which is reserved for future notifications (see the protocol
+/// documentation): It is not a valid request msgid, and it is used as the
+/// echo msgid of error responses for requests whose msgid could not be
+/// determined.
+pub const RESERVED_MSGID: u32 = 0;
 
 /// Name of the method which authenticates a connection. It is dispatched
 /// to the C++ side like any other command (the token handling lives
@@ -110,20 +114,22 @@ pub enum ParsedMessage {
     /// the content is only interpreted by the command handlers.
     params: Value,
   },
-  /// A cancel request: `[4, msgid]`.
+  /// A cancel request: `[3, msgid]`.
   Cancel {
     /// The ID of the request to cancel.
     msgid: u32,
   },
-  /// A decoded message which is not a valid client→server message: a
-  /// known message type in the wrong direction (1, 2 or 3) or an unknown
-  /// message type. Ignored (with a log message) for forward
-  /// compatibility — the stream is still in sync.
+  /// A decoded message which is not (yet) valid in this direction: a
+  /// known message type which cannot be handled (1 or 2, until the
+  /// protocol actually uses both directions) or an unknown message type.
+  /// Ignored for forward compatibility — the stream is still in sync.
   Ignored,
   /// A request which doesn't conform to the envelope (e.g. the method is
-  /// not a string, the params are not a map or the msgid is not a valid
-  /// u32). The stream is still in sync, so the connection stays open; if
-  /// a msgid is extractable, it is echoed in an error response.
+  /// not a string, the params are not a map, the msgid is not a valid
+  /// u32 or it is the reserved msgid 0). The stream is still in sync, so
+  /// the connection stays open; the request is answered with an error
+  /// response, echoed to the msgid if one could be extracted (otherwise
+  /// to the reserved msgid 0).
   Invalid {
     /// The request ID, if one could be extracted.
     msgid: Option<u32>,
@@ -134,8 +140,9 @@ pub enum ParsedMessage {
 /// as msgpack).
 ///
 /// Strictness: The envelope must be an array whose first element is an
-/// integer message type, the msgid must fit into u32, the method (for
-/// requests) must be a string and the params must be a map (or nil/absent,
+/// integer message type, the msgid must fit into u32 (and must not be the
+/// reserved msgid 0), the method (for requests) must be a string and the
+/// params must be a map (or nil/absent,
 /// both of which are normalized to an empty map). The *content* of the
 /// params is not validated at all, since that is up to the command
 /// handlers.
@@ -157,8 +164,10 @@ pub fn classify_message(value: &Value) -> ParsedMessage {
   match msg_type {
     MESSAGE_TYPE_REQUEST => {
       let msgid = match extract_msgid() {
-        Some(msgid) => msgid,
-        None => return ParsedMessage::Invalid { msgid: None },
+        Some(msgid) if msgid != RESERVED_MSGID => msgid,
+        // The reserved msgid 0 is echoed in the error response (it also
+        // covers the case where no msgid could be extracted).
+        _ => return ParsedMessage::Invalid { msgid: Some(0) },
       };
       let method = match items.get(2).and_then(Value::as_str) {
         Some(method) => method.to_string(),
@@ -178,9 +187,10 @@ pub fn classify_message(value: &Value) -> ParsedMessage {
       Some(msgid) => ParsedMessage::Cancel { msgid },
       None => ParsedMessage::Invalid { msgid: None },
     },
-    // Known message types in the wrong direction, and unknown message
-    // types: ignore for forward compatibility (the spec allows the
-    // protocol to gain new message types with a higher protocolVersion).
+    // Known message types which cannot be handled in this direction (1
+    // and 2, until the protocol actually uses both directions), and
+    // unknown message types: ignore for forward compatibility — the
+    // stream is still in sync.
     _ => ParsedMessage::Ignored,
   }
 }
@@ -289,7 +299,7 @@ mod tests {
 
   #[test]
   fn test_classify_cancel() {
-    let value = Value::Array(vec![Value::from(4), Value::from(7)]);
+    let value = Value::Array(vec![Value::from(3), Value::from(7)]);
     match classify_message(&value) {
       ParsedMessage::Cancel { msgid } => assert_eq!(msgid, 7),
       _ => panic!("expected a cancel"),
@@ -298,8 +308,10 @@ mod tests {
 
   #[test]
   fn test_classify_ignored() {
-    // Wrong direction (client sent a response/notification/request msg):
-    for msg_type in [1, 2, 3] {
+    // Types which cannot be handled in this direction (client sent a
+    // response / request-scoped message; until the protocol actually
+    // uses both directions):
+    for msg_type in [1, 2] {
       let value = Value::Array(vec![Value::from(msg_type), Value::from(1)]);
       assert!(matches!(classify_message(&value), ParsedMessage::Ignored));
     }
@@ -325,7 +337,8 @@ mod tests {
       classify_message(&Value::Array(vec![Value::from("0")])),
       ParsedMessage::Invalid { msgid: None }
     ));
-    // Request with an invalid msgid (u64 > u32::MAX).
+    // Request with an invalid msgid (u64 > u32::MAX): No valid msgid
+    // could be extracted, so the error response is echoed to msgid 0.
     let value = Value::Array(vec![
       Value::from(0),
       Value::from(u32::MAX as u64 + 1),
@@ -334,7 +347,7 @@ mod tests {
     ]);
     assert!(matches!(
       classify_message(&value),
-      ParsedMessage::Invalid { msgid: None }
+      ParsedMessage::Invalid { msgid: Some(0) }
     ));
     // Request with a non-string method, but the msgid is echoed.
     let value =
@@ -353,6 +366,17 @@ mod tests {
     assert!(matches!(
       classify_message(&value),
       ParsedMessage::Invalid { msgid: Some(9) }
+    ));
+    // The reserved msgid 0 is rejected, with the error echoed to msgid 0.
+    let value = Value::Array(vec![
+      Value::from(0),
+      Value::from(0),
+      Value::from("m"),
+      Value::Nil,
+    ]);
+    assert!(matches!(
+      classify_message(&value),
+      ParsedMessage::Invalid { msgid: Some(0) }
     ));
   }
 
@@ -402,7 +426,7 @@ mod tests {
       &Value::Map(vec![(Value::from("percent"), Value::from(50))]),
     );
     let items = message.as_array().unwrap();
-    assert_eq!(items[0], Value::from(3));
+    assert_eq!(items[0], Value::from(2));
     assert_eq!(items[1], Value::from(3));
     assert_eq!(field(&items[2], "percent"), Some(&Value::from(50)));
   }

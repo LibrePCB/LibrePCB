@@ -51,7 +51,7 @@ namespace rpc {
  ******************************************************************************/
 
 void rpcDispatchCommand(GuiApplication& app, RpcObjectRegistry& registry,
-                        const QString& method, RpcRequest& request) {
+                        RpcRequest& request) {
   using RpcCommand = void (*)(GuiApplication&, RpcObjectRegistry&, RpcRequest&);
   static const QHash<QString, RpcCommand> commands = {
       {"initialize", &ProtocolRpc::initialize},
@@ -70,11 +70,11 @@ void rpcDispatchCommand(GuiApplication& app, RpcObjectRegistry& registry,
       {"RemoteLibrary.get", &RemoteLibraryRpc::get},
       {"WorkspaceDb.wait", &WorkspaceDbRpc::wait},
   };
-  if (auto func = commands.value(method, nullptr)) {
+  if (auto func = commands.value(request.getMethod(), nullptr)) {
     func(app, registry, request);
     return;
   }
-  throw RpcMethodNotFound(method);
+  throw RpcMethodNotFound(request.getMethod());
 }
 
 /*******************************************************************************

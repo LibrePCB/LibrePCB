@@ -215,14 +215,12 @@ class Gui(ns.AppWindow):
                 self.pending = False
                 self._log("Connection closed.")
                 return
-            if isinstance(msg, list) and len(msg) == 3 and msg[0] == 3:
-                # A progress report (the payload carries the percent).
+            if isinstance(msg, list) and len(msg) == 3 and msg[0] == 2:
+                # A request-scoped message (the payload carries the percent).
                 self.progress = msg[2].get("progress", 0)
                 continue
             if isinstance(msg, list) and len(msg) == 4 and msg[0] == 1:
                 self._handle_response(received_at, msg[1], msg[2], msg[3])
-            elif isinstance(msg, list) and len(msg) == 3 and msg[0] == 2:
-                self._log(f"⇐ notification: {fmt_value(msg[2])}")
 
     def _handle_response(self, received_at, msgid, status, payload):
         method, handler, sent_at = self.client.handlers.pop(

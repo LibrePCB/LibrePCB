@@ -9,10 +9,11 @@
 //!
 //! # Protocol
 //!
-//! The wire protocol is a custom, [MessagePack-RPC]-inspired design:
-//! Messages are msgpack arrays `[type, ...]` with the message types
-//! request (0), response (1), notification (2), request message (3) and
-//! cancel (4), decoded directly from the TCP stream (self-delimiting, no
+//! The wire protocol is a custom, [MessagePack-RPC]-inspired design: It is
+//! *bidirectional* — both sides of a connection can initiate method calls
+//! in exactly the same way. Messages are msgpack arrays `[type, ...]` with
+//! the message types request (0), response (1), request message (2) and
+//! cancel (3), decoded directly from the TCP stream (self-delimiting, no
 //! length prefix). See `dev/plans/rpc-server.md` for the full
 //! specification.
 //!
@@ -128,7 +129,7 @@ pub type DispatchFn =
   Arc<dyn Fn(u32, u32, &str, &Value) -> Result<(), RpcError> + Send + Sync>;
 
 /// Callback which is invoked when a client cancels a pending request
-/// (`[4, msg_id]`).
+/// (`[3, msg_id]`).
 ///
 /// The callback must eventually make sure the request is replied exactly
 /// once (typically with a "cancelled" error, or with the normal result if
@@ -324,7 +325,7 @@ impl RpcServer {
       return false;
     };
     // Removing the msg_id from the pending set must happen atomically with
-    // the response being queued, so that no request message (type 3) can
+    // the response being queued, so that no request message (type 2) can
     // slip in between (see notify_conn).
     let mut pending = lock(&pending);
     if !pending.remove(&msg_id) {
@@ -343,7 +344,7 @@ impl RpcServer {
     }
   }
 
-  /// Send a request-scoped message (message type 3, e.g. a progress report
+  /// Send a request-scoped message (message type 2, e.g. a progress report
   /// or streamed partial data) to the client which sent the request.
   ///
   /// The message is only delivered while the request is pending, i.e.
@@ -845,7 +846,7 @@ mod tests {
     client.request(1, "Project.list", Value::Map(Vec::new()));
     let (conn_id, msg_id, _, _) =
       dispatch.recv_timeout(Duration::from_secs(10)).unwrap();
-    // While the request is pending, request messages (type 3) arrive:
+    // While the request is pending, request messages (type 2) arrive:
     let progress = Value::Map(vec![
       (Value::from("percent"), Value::from(50)),
       (Value::from("message"), Value::from("Working")),
@@ -853,7 +854,7 @@ mod tests {
     assert!(server.notify_conn(conn_id, msg_id, &progress));
     let message = client.read().unwrap();
     let items = message.as_array().unwrap();
-    assert_eq!(items[0], Value::from(3));
+    assert_eq!(items[0], Value::from(2));
     assert_eq!(items[1], Value::from(1));
     assert_eq!(field(&items[2], "percent"), Some(&Value::from(50)));
     // After the response was sent, no further messages are accepted:
@@ -870,7 +871,7 @@ mod tests {
     let (conn_id, msg_id, _, _) =
       dispatch.recv_timeout(Duration::from_secs(10)).unwrap();
     // Cancel the pending request → the cancel handler is invoked...
-    client.send(&Value::Array(vec![Value::from(4), Value::from(1)]));
+    client.send(&Value::Array(vec![Value::from(3), Value::from(1)]));
     let (cancelled_conn, cancelled_msg_id) =
       cancel.recv_timeout(Duration::from_secs(10)).unwrap();
     assert_eq!((cancelled_conn, cancelled_msg_id), (conn_id, msg_id));
@@ -889,7 +890,7 @@ mod tests {
     let mut client = TestClient::new(port, &server, &dispatch);
     // Cancel a msg_id which was never dispatched: ignored (no cancel
     // callback, no response) — the next message is the ping response.
-    client.send(&Value::Array(vec![Value::from(4), Value::from(123)]));
+    client.send(&Value::Array(vec![Value::from(3), Value::from(123)]));
     client.request(2, METHOD_PING, Value::Map(Vec::new()));
     emulate_cpp_ping(&server, &dispatch);
     client.read_response(2);

@@ -16,6 +16,14 @@ namespace librepcb {
 namespace rs {
 
 /**
+ * The msgid which is reserved for future notifications (see the protocol
+ * documentation): It is not a valid request msgid, and it is used as the
+ * echo msgid of error responses for requests whose msgid could not be
+ * determined.
+ */
+constexpr static const uint32_t RESERVED_MSGID = 0;
+
+/**
  * Wrapper for [DrawingKind]
  */
 enum class InteractiveHtmlBomDrawingKind {
@@ -338,7 +346,7 @@ using RpcOnRequestCallback = void(*)(void *ctx,
 
 /**
  * Callback which is invoked when a client cancels a pending request
- * (message `[4, msg_id]`).
+ * (message `[3, msg_id]`).
  *
  * It is invoked on the connection's reader thread. The C++ implementation
  * must eventually make sure the request is replied exactly once

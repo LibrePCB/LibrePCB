@@ -46,7 +46,7 @@ namespace editor {
 // an RpcError if the method was not found.
 namespace rpc {
 void rpcDispatchCommand(GuiApplication& app, RpcObjectRegistry& registry,
-                        const QString& method, RpcRequest& request);
+                        RpcRequest& request);
 }
 
 /*******************************************************************************
@@ -93,7 +93,7 @@ void RpcServer::handleRequest(uint32_t connId, uint32_t msgId,
   // Dispatch the command to its handler (generated code, see commands.cpp)
   // and translate thrown errors into error responses.
   try {
-    rpc::rpcDispatchCommand(mApp, mObjectRegistry, method, *request);
+    rpc::rpcDispatchCommand(mApp, mObjectRegistry, *request);
   } catch (const RpcError& e) {
     request->sendError(e);
   } catch (const std::exception& e) {
@@ -122,26 +122,16 @@ void RpcServer::handleCancel(uint32_t connId, uint32_t msgId) noexcept {
 }
 
 void RpcServer::requestEvent(const RpcRequest& request, RpcRequest::Event event,
+                             uint32_t connId, uint32_t msgId, uint32_t status,
                              const QVariant& value) noexcept {
+  Q_UNUSED(request);
   switch (event) {
     case RpcRequest::Event::Notification:
-      rs::ffi_rpc_server_notify(*mHandle, request.getConnId(),
-                                request.getMsgId(), &value);
+      rs::ffi_rpc_server_notify(*mHandle, connId, msgId, &value);
       break;
-    case RpcRequest::Event::Succeeded:
-      rs::ffi_rpc_server_reply(*mHandle, request.getConnId(),
-                               request.getMsgId(), 0, &value);
-      mPendingRequests.remove(
-          requestKey(request.getConnId(), request.getMsgId()));
-      break;
-    case RpcRequest::Event::Failed:
-      // The error map carries the code (see errorToVariant()), which is
-      // sent as the response status instead of being part of the payload.
-      rs::ffi_rpc_server_reply(*mHandle, request.getConnId(),
-                               request.getMsgId(),
-                               value.toMap().value("code").toUInt(), &value);
-      mPendingRequests.remove(
-          requestKey(request.getConnId(), request.getMsgId()));
+    case RpcRequest::Event::Reply:
+      rs::ffi_rpc_server_reply(*mHandle, connId, msgId, status, &value);
+      mPendingRequests.remove(requestKey(connId, msgId));
       break;
   }
 }
