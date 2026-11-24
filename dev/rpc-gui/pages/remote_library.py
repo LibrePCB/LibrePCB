@@ -22,11 +22,20 @@ class RemoteLibraryPage:
             self._checked.discard(uuid)
         self._update_model()
 
-    def install_clicked(self):
-        self._call_batch("RemoteLibrary.install")
-
-    def uninstall_clicked(self):
-        self._call_batch("RemoteLibrary.uninstall")
+    def apply_clicked(self):
+        """Apply the desired installation state of the checked libraries:
+        Checked libraries are installed, installed libraries which are
+        unchecked are uninstalled, everything else is left untouched."""
+        install = []
+        uninstall = []
+        for library in self._libraries:
+            uuid = library["uuid"]
+            if uuid in self._checked:
+                install.append(uuid)
+            elif library.get("installed_version"):
+                uninstall.append(uuid)
+        self.app.call("RemoteLibrary.apply",
+                      {"install": install, "uninstall": uninstall})
 
     def get_clicked(self, index):
         # Remote libraries are not registered objects, so there is no
@@ -34,15 +43,17 @@ class RemoteLibraryPage:
         uuid = self._libraries[index]["uuid"]
         self.app.call("RemoteLibrary.get", {"obj": uuid}, self._on_details)
 
-    def _call_batch(self, method):
-        if not self._checked:
-            return
-        self.app.call(method, {"libraries": sorted(self._checked)})
-
     def _on_list(self, status, payload):
         if status != 0:
             return
         self._libraries = payload.get("libraries", [])
+        # The checkboxes show the desired installation state, initialized
+        # with the current state (installed libraries are checked).
+        self._checked = {
+            library["uuid"]
+            for library in self._libraries
+            if library.get("installed_version")
+        }
         self._update_model()
 
     def _on_details(self, status, payload):

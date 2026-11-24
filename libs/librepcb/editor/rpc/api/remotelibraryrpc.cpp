@@ -71,9 +71,9 @@ static QVariantMap summary(const ui::LibraryInfoData& obj) {
   result.insert("uuid", toVariant(Uuid::fromString(s2q(obj.uuid))));
   result.insert("name", s2q(obj.name));
   result.insert("description", s2q(obj.description));
+  result.insert("path", toVariant(FilePath(s2q(obj.path))));
   result.insert("installed_version", s2q(obj.installed_version));
   result.insert("online_version", s2q(obj.online_version));
-  result.insert("outdated", obj.outdated);
   return result;
 }
 
@@ -145,9 +145,13 @@ void RemoteLibraryRpc::apply(GuiApplication& app, RpcObjectRegistry& registry,
     throw RpcInvalidArgs(QString("Conflict: %1").arg(lib.toStr()));
   }
 
-  // Select the libraries to install or uninstall.
+  // Discard any selections made by the user in the GUI. And make sure no
+  // operation is ongoing while we access the libraries model. Not nice at
+  // all, but should be good enough for now.
   model.cancel();
   qApp->processEvents();
+
+  // Select the libraries to install or uninstall.
   for (std::size_t i = 0; i < model.row_count(); ++i) {
     if (auto item = model.row_data(i)) {
       const auto uuid = Uuid::fromString(s2q(item->uuid));

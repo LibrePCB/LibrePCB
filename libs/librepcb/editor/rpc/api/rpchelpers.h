@@ -28,6 +28,7 @@
 #include "rpctypes.h"
 
 #include <librepcb/core/types/uuid.h>
+#include <librepcb/core/fileio/filepath.h>
 #include <librepcb/rust-core/rpcext.h>
 #include <type_traits>
 
@@ -67,6 +68,18 @@ inline QVariantList toVariant(const T& list, F convertItem) {
   return result;
 }
 
+/// Convert a Uuid into the protocol's "uuid" extension type (see the API
+/// specification): An ext value with the 16 raw UUID bytes in RFC 4122
+/// field order.
+inline QVariant toVariant(const Uuid& obj) noexcept {
+  return QVariant::fromValue(
+      rs::MsgPackExt(kMsgPackExtTypeUuid, QUuid(obj.toStr()).toRfc4122()));
+}
+
+inline QVariant toVariant(const FilePath& obj) noexcept {
+  return obj.isValid() ? obj.toStr() : QVariant();
+}
+
 template <typename T, typename F>
 inline QVariantList modelToVariant(const slint::Model<T>& model,
                                    F convertItem) {
@@ -77,14 +90,6 @@ inline QVariantList modelToVariant(const slint::Model<T>& model,
     }
   }
   return result;
-}
-
-/// Convert a Uuid into the protocol's "uuid" extension type (see the API
-/// specification): An ext value with the 16 raw UUID bytes in RFC 4122
-/// field order.
-inline QVariant toVariant(const Uuid& uuid) noexcept {
-  return QVariant::fromValue(
-      rs::MsgPackExt(kMsgPackExtTypeUuid, QUuid(uuid.toStr()).toRfc4122()));
 }
 
 /*******************************************************************************

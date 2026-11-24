@@ -285,9 +285,6 @@ structs:
       - name: online_version
         type: string
         description: The latest available version, if known.
-      - name: outdated
-        type: bool
-        description: Whether the installed version is outdated.
 
   - name: UndoStackDetails
     description: The state of a document's undo stack.

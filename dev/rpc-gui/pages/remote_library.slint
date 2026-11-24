@@ -15,8 +15,7 @@ export component RemoteLibraryPage {
     in property <string> details;
     callback list-clicked();
     callback check-toggled(int, bool);
-    callback install-clicked();
-    callback uninstall-clicked();
+    callback apply-clicked();
     callback get-clicked(int);
 
     VerticalLayout {
@@ -32,15 +31,9 @@ export component RemoteLibraryPage {
             }
 
             Button {
-                text: "Install Checked";
+                text: "Apply";
                 enabled: root.authenticated;
-                clicked => { root.install-clicked(); }
-            }
-
-            Button {
-                text: "Uninstall Checked";
-                enabled: root.authenticated;
-                clicked => { root.uninstall-clicked(); }
+                clicked => { root.apply-clicked(); }
             }
         }
 

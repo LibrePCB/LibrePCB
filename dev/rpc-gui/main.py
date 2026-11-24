@@ -169,12 +169,8 @@ class Gui(ns.AppWindow):
         self._pages["RemoteLibrary"].check_toggled(index, checked)
 
     @slint.callback
-    def rl_install_clicked(self):
-        self._pages["RemoteLibrary"].install_clicked()
-
-    @slint.callback
-    def rl_uninstall_clicked(self):
-        self._pages["RemoteLibrary"].uninstall_clicked()
+    def rl_apply_clicked(self):
+        self._pages["RemoteLibrary"].apply_clicked()
 
     @slint.callback
     def rl_get_clicked(self, index):

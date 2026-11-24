@@ -63,8 +63,7 @@ export component AppWindow inherits Window {
     in property <string> library-details;
     callback rl-list-clicked();
     callback rl-check-toggled(int, bool);
-    callback rl-install-clicked();
-    callback rl-uninstall-clicked();
+    callback rl-apply-clicked();
     callback rl-get-clicked(int);
 
     // --- WorkspaceDb page --------------------------------------------------
@@ -208,8 +207,7 @@ export component AppWindow inherits Window {
                 details: root.library-details;
                 list-clicked => { root.rl-list-clicked(); }
                 check-toggled(i, checked) => { root.rl-check-toggled(i, checked); }
-                install-clicked => { root.rl-install-clicked(); }
-                uninstall-clicked => { root.rl-uninstall-clicked(); }
+                apply-clicked => { root.rl-apply-clicked(); }
                 get-clicked(i) => { root.rl-get-clicked(i); }
             }
             if root.current-page == 4 : WorkspaceDbPage {
