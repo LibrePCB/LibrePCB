@@ -70,7 +70,7 @@ void UndoStackRpc::get(GuiApplication& app, RpcObjectRegistry& registry,
                        RpcRequest& request) {
   Q_UNUSED(app);
   auto& obj = getObj(registry, request);
-  request.sendSuccess(details(obj));
+  request.send(details(obj));
 }
 
 void UndoStackRpc::undo(GuiApplication& app, RpcObjectRegistry& registry,
@@ -83,7 +83,7 @@ void UndoStackRpc::undo(GuiApplication& app, RpcObjectRegistry& registry,
         "There is no command on the stack which can be undone.");
   }
   obj.undo();  // Can throw.
-  request.sendSuccess(details(obj));
+  request.send(details(obj));
 }
 
 void UndoStackRpc::redo(GuiApplication& app, RpcObjectRegistry& registry,
@@ -96,7 +96,7 @@ void UndoStackRpc::redo(GuiApplication& app, RpcObjectRegistry& registry,
         "There is no command on the stack which can be redone.");
   }
   obj.redo();  // Can throw.
-  request.sendSuccess(details(obj));
+  request.send(details(obj));
 }
 
 /*******************************************************************************

@@ -27,7 +27,7 @@ New commands are added in four steps:
    request)`. No registration is needed — the generated dispatcher
    already routes to it.
 4. **Reply exactly once**: by returning normally after
-   `request.sendSuccess()`, or by throwing an error (see below).
+   `request.send(...)`, or by throwing an error (see below).
 
 Only the files listed in this page's sections are hand-written;
 everything else is generated. New *classes* additionally get an empty
@@ -46,7 +46,7 @@ Handler Implementation
   happens eventually — otherwise the client runs into a timeout.
 - **Errors are thrown**: a handler just throws one of the error classes
   (see below); the server catches it and sends the response. No
-  `sendError()` calls and no early returns are needed in the happy path.
+  `send()` calls and no early returns are needed in the happy path.
 - **Cancellation is cooperative**: the client may cancel a pending
   request (which emits the `cancelled()` Qt signal and sets the
   `isCancelled()` flag). Long-running handlers should poll the flag or
@@ -54,8 +54,9 @@ Handler Implementation
   once (typically with the `Cancelled` error, or with the normal result
   if the work already completed).
 - **Request-scoped messages** (e.g. progress) can be sent any number of
-  times while the request is pending, via `request.sendProgress()`. They
-  are dropped automatically once the request is replied.
+  times while the request is pending, via
+  `request.send(RpcNotification()...)`. They are dropped automatically
+  once the request is replied.
 - When capturing the request *and* an application object for asynchronous
   work, prefer a `QPointer` for the application object: the user may close
   it while the work is running.
@@ -75,7 +76,7 @@ Error Handling
   implementations never catch RPC errors themselves — *except* in
   asynchronous continuations: there is no framework catch on the GUI
   event loop, so an async continuation must catch `RpcError` itself and
-  call `request.sendError(e)`.
+  call `request.send(e)`.
 
 Object Handles
 --------------

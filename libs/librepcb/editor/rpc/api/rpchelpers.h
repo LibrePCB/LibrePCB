@@ -86,11 +86,19 @@ inline QVariant toVariant(const Uuid& uuid) noexcept {
 
 inline Uuid toUuid(const QVariant& value) {
   const auto ext = value.value<rs::MsgPackExt>();
+  if (ext.getType() != kMsgPackExtTypeUuid) {
+    throw RpcInvalidArgs("Not a UUID extension type.");
+  }
   const QUuid uuid = QUuid::fromRfc4122(ext.getData());
   if (uuid.isNull()) {
     throw RpcInvalidArgs("Invalid UUID.");
   }
   return Uuid::fromString(uuid.toString(QUuid::WithoutBraces));
+}
+
+template <typename T>
+QList<T> toList(const QVariant& value) {
+  // TODO
 }
 
 /*******************************************************************************

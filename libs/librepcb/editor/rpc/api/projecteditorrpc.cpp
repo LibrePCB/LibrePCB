@@ -122,7 +122,7 @@ void ProjectEditorRpc::list(GuiApplication& app, RpcObjectRegistry& registry,
   }
   QVariantMap result;
   result.insert("projects", projects);
-  request.sendSuccess(result);
+  request.send(result);
 }
 
 void ProjectEditorRpc::open(GuiApplication& app, RpcObjectRegistry& registry,
@@ -144,14 +144,14 @@ void ProjectEditorRpc::open(GuiApplication& app, RpcObjectRegistry& registry,
   };
   auto editor = app.openProjectNonInteractive(fp, askForRestoringBackup);
   if (!editor) throw RpcInternalError();
-  request.sendSuccess(details(*editor, registry));
+  request.send(details(*editor, registry));
 }
 
 void ProjectEditorRpc::get(GuiApplication& app, RpcObjectRegistry& registry,
                            RpcRequest& request) {
   Q_UNUSED(app);
   auto& editor = registry.getAs<ProjectEditor>(request.getArg("obj"));
-  request.sendSuccess(details(editor, registry));
+  request.send(details(editor, registry));
 }
 
 void ProjectEditorRpc::save(GuiApplication& app, RpcObjectRegistry& registry,
@@ -159,7 +159,7 @@ void ProjectEditorRpc::save(GuiApplication& app, RpcObjectRegistry& registry,
   Q_UNUSED(app);
   auto& editor = registry.getAs<ProjectEditor>(request.getArg("obj"));
   editor.saveProjectNonInteractive();  // can throw
-  request.sendSuccess();
+  request.send();
 }
 
 void ProjectEditorRpc::close(GuiApplication& app, RpcObjectRegistry& registry,
@@ -169,7 +169,7 @@ void ProjectEditorRpc::close(GuiApplication& app, RpcObjectRegistry& registry,
   for (int i = 0; i < projects.count(); ++i) {
     if (projects.at(i).get() == &editor) {
       app.closeProject(i);
-      request.sendSuccess();
+      request.send();
       return;
     }
   }

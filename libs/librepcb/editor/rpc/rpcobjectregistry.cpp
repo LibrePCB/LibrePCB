@@ -32,6 +32,8 @@
 namespace librepcb {
 namespace editor {
 
+using namespace rpc;
+
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
@@ -67,7 +69,7 @@ uint32_t RpcObjectRegistry::getHandle(QObject& obj) noexcept {
  ******************************************************************************/
 
 void RpcObjectRegistry::throwInvalidHandle() {
-  throw rpc::RpcInvalidHandle();
+  throw RpcInvalidHandle();
 }
 
 void RpcObjectRegistry::removeObject(QObject* obj) noexcept {

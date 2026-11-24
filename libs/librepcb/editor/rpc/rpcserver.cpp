@@ -49,6 +49,8 @@ void rpcDispatchCommand(GuiApplication& app, RpcObjectRegistry& registry,
                         RpcRequest& request);
 }
 
+using namespace rpc;
+
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
@@ -93,13 +95,13 @@ void RpcServer::handleRequest(uint32_t connId, uint32_t msgId,
   // Dispatch the command to its handler (generated code, see commands.cpp)
   // and translate thrown errors into error responses.
   try {
-    rpc::rpcDispatchCommand(mApp, mObjectRegistry, *request);
+    rpcDispatchCommand(mApp, mObjectRegistry, *request);
   } catch (const RpcError& e) {
-    request->sendError(e);
+    request->send(e);
   } catch (const std::exception& e) {
-    request->sendError(rpc::RpcCommandFailed(e.what()));
+    request->send(RpcCommandFailed(e.what()));
   } catch (...) {
-    request->sendError(rpc::RpcCommandFailed());
+    request->send(RpcCommandFailed());
   }
 
   // Safety net: If the command handler did not respond, and did not make
@@ -107,7 +109,7 @@ void RpcServer::handleRequest(uint32_t connId, uint32_t msgId,
   // respond with an error now instead of risking the request to be hanging
   // forever.
   if ((!request->isFinished()) && (!request->isAsync())) {
-    request->sendError(rpc::RpcInternalError("No supervisor registered."));
+    request->send(RpcInternalError("No supervisor registered."));
   }
 }
 

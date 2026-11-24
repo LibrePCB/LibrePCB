@@ -25,6 +25,7 @@
 #include "../../guiapplication.h"
 #include "../../library/librariesmodel.h"
 #include "../../utils/slinthelpers.h"
+#include "../rpcnotification.h"
 #include "../rpcrequest.h"
 #include "rpcerrors.h"
 #include "rpchelpers.h"
@@ -93,21 +94,20 @@ void RemoteLibraryRpc::list(GuiApplication& app, RpcObjectRegistry& registry,
   };
 
   if (!model.isOnlineCheckInProgress()) {
-    // Synchronous response.
-    request.sendSuccess(createResponse());
+    // Libraries are available -> synchronous response.
+    request.send(createResponse());
   } else {
-    // Asynchronous response.
+    // Libraries are not available yet -> asynchronous response.
     // NOTE: The partial response streaming (through notifications) is not
     // implemented yet. Also no real progress report yet. Just an immediate
     // notification to show some activity, and the full response when ready.
     // In addition, cancelling the remote library fetching currently cannot
-    // be distinguished from a complete fetching.
+    // be distinguished from a completed fetching.
     request.makeAsync(model);
-    request.sendProgress(50);
-    QObject::connect(&model, &LibrariesModel::allOnlineLibrariesFetched,
-                     &request, [&request, createResponse]() {
-                       request.sendSuccess(createResponse());
-                     });
+    request.send(RpcNotification());
+    QObject::connect(
+        &model, &LibrariesModel::allOnlineLibrariesFetched, &request,
+        [&request, createResponse]() { request.send(createResponse()); });
   }
 }
 
@@ -116,11 +116,9 @@ void RemoteLibraryRpc::install(GuiApplication& app, RpcObjectRegistry& registry,
   Q_UNUSED(app);
   Q_UNUSED(registry);
   Q_UNUSED(request);
-  // TODO: The installation is currently driven by the checked state of the
-  // libraries model of the library manager GUI (see
-  // `LibrariesModel::applyChanges()`), which cannot be used from here
-  // without hijacking the GUI state. The installation machinery needs to be
-  // decoupled from the GUI first.
+
+  const auto uuids = toList<Uuid>(request.getArg("libraries"));
+
   throw RpcUnexpectedState(
       "Installing remote libraries is not supported through the RPC "
       "interface yet.");
@@ -145,7 +143,7 @@ void RemoteLibraryRpc::get(GuiApplication& app, RpcObjectRegistry& registry,
 
   auto& model = app.getRemoteLibraries();
   const auto obj = getObj(request, model);
-  request.sendSuccess(details(obj));
+  request.send(details(obj));
 }
 
 /*******************************************************************************

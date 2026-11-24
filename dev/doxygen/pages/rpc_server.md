@@ -117,9 +117,8 @@ properties; see @ref doc_rpc_api_errors).
 - Exactly one response is sent per request, enforced by the callee. A
   second response (or a response for an unknown or closed connection) is
   silently dropped.
-- A notification (type 2) is only delivered while the request is
-  pending, i.e. before its response. Commands may use it to report
-  progress or to stream partial data (defined per method, none yet).
+- A notification (type 2, see @ref doc_rpc_api_notifications) is only
+  delivered while the request is pending, i.e. before its response.
 - With `[3, msgid]` the caller may cancel a pending request.
   Cancellation is cooperative: The callee stops its work when it can and
   responds with a "cancelled" error; if the work already completed, the
@@ -135,6 +134,72 @@ properties; see @ref doc_rpc_api_errors).
   sender is not interested in a response for (which MUST NOT be replied
   to). Senders must not use msgid 0 yet, and it is currently rejected as
   an invalid request.
+
+Notifications {#doc_rpc_api_notifications}
+-------------
+
+While a request is pending, the callee may send notifications (type 2)
+to the caller, e.g. to report progress or to stream (partial) result
+data. Notifications are only delivered before the response — once the
+response (or an error) is sent, no further notifications arrive.
+
+The payload is a map built from the following members (all optional):
+
+| Member     | Type | Description |
+|------------|------|-------------|
+| `progress` | int (0–100) or float (0.0–100.0) | Progress in percent. It may **decrease** when the callee discovers more work — it is never a completion signal. |
+| `step`     | int | The current step of a fixed-step operation, 1-based (e.g. "copying the 3rd of 10 files"). |
+| `steps`    | int | The total number of steps (may grow while the operation runs). |
+| `message`  | string | An optional human-readable message line (e.g. "Copying can2usb.lpp…"). |
+| `result`   | map | Partial result data, see below. |
+
+The members `progress`, `step`, `steps` and `message` are *state*: The
+latest value replaces the previous one. The `result` member carries
+*result data*: Its layout shall be the same as the documented result of
+the method, with any subset of members present (data which is not known
+yet is simply omitted).
+
+Result data is delivered incrementally: The `result` member of every
+notification — as well as the response payload, which is not wrapped in
+a `result` member — is merged into a *rolling result*, using JSON Merge
+Patch semantics as defined in
+[RFC 7396](https://datatracker.ietf.org/doc/html/rfc7396), with these
+differences:
+
+- Arrays are *appended*: A fragment only carries the items which were
+  not delivered yet.
+- A `nil` value deletes the corresponding member from the rolling
+  result; a nil fragment (or a nil response payload) merges nothing.
+
+The response therefore only carries data which has not been delivered by
+notifications yet (a fully streamed response carries nil) — data is
+never transferred twice.
+
+~~~{.msgpack}
+# ── Generic shape ──────────────────────────────────────────────
+[2, <msgid>, {
+    "progress": 42,            # int: percent
+    # "progress": 42.5,        # …or float — handled the same way
+    "step": 3,                 # 1-based: processing the 3rd of 10 steps
+    "steps": 10,               # may grow while the operation runs
+    "message": "Copying can2usb.lpp…",
+    "result": { … },           # partial result data (see above)
+}]
+
+# ── Example: streaming parts of the result ─────────────────────
+[2, 7, { "progress": 10, "status": "Fetching libraries…" }]
+[2, 7, { "result": { "libraries": [ {…lib 1…} ] } }]
+[2, 7, { "result": { "libraries": [ {…lib 2…} ] } }]
+[2, 7, { "result": { "count": 5 } }]     # scalars may be refined later
+[2, 7, { "result": { "count": 9 } }]
+
+# ── Completion: the response carries only the remainder ────────
+[1, 7, 0, { "libraries": [ {…lib 3…} ] }]
+# → rolling result = {"libraries": [{…1…}, {…2…}, {…3…}], "count": 9}
+
+# ── Fully streamed response (nothing left to deliver) ──────────
+[1, 7, 0, nil]
+~~~
 
 Params & Results {#doc_rpc_api_params}
 ----------------

@@ -23,12 +23,15 @@
 #include "rpcrequest.h"
 
 #include "api/rpcerrors.h"
+#include "rpcnotification.h"
 
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
 namespace editor {
+
+using namespace rpc;
 
 /*******************************************************************************
  *  Local Functions
@@ -79,55 +82,51 @@ void RpcRequest::makeAsync(QObject& supervisor) noexcept {
   connect(
       &supervisor, &QObject::destroyed, this,
       [this]() {
-        sendError(
-            rpc::RpcInternalError("Supervisor got deleted before responding."));
+        send(RpcInternalError("Supervisor got deleted before responding."));
       },
       Qt::QueuedConnection);  // Not sure if queued makes sense or not.
 }
 
-void RpcRequest::sendProgress(int percent) noexcept {
-  QVariantMap value;
-  value["progress"] = std::clamp(percent, 0, 100);
-  sendNotification(value);
-}
-
-void RpcRequest::sendNotification(const QVariant& payload) noexcept {
+void RpcRequest::send(const RpcNotification& notification) noexcept {
   if (!mReplied) {
-    onEvent.notify(Event::Notification, mConnId, mMsgid, 0, payload);
+    onEvent.notify(Event::Notification, mConnId, mMsgid, 0,
+                   notification.toVariant());
   }
 }
 
-void RpcRequest::sendSuccess(const QVariant& result) noexcept {
-  if (!mReplied) {
-    mReplied = true;
-    onEvent.notify(Event::Reply, mConnId, mMsgid, 0, result);
-  }
+void RpcRequest::send() noexcept {
+  reply(0, QVariant());
 }
 
-void RpcRequest::sendError(const RpcError& error) noexcept {
+void RpcRequest::send(const QVariantMap& result) noexcept {
+  reply(0, QVariant(result));
+}
+
+void RpcRequest::send(const RpcError& error) noexcept {
+  reply(static_cast<uint32_t>(error.getCode()),
+        errorToVariant(error.getDetail(), error.getProperties()));
+}
+
+void RpcRequest::reply(uint32_t status, const QVariant& payload) noexcept {
   if (!mReplied) {
     mReplied = true;
-    onEvent.notify(Event::Reply, mConnId, mMsgid,
-                   static_cast<uint32_t>(error.getCode()),
-                   errorToVariant(error.getDetail(), error.getProperties()));
+    onEvent.notify(Event::Reply, mConnId, mMsgid, status, payload);
   }
 }
 
 void RpcRequest::throwInvalidArgs(const QString& value, const QString& argName,
                                   const char* enumName,
                                   const QStringList& values) {
-  throw rpc::RpcInvalidArgs(QString("Unknown value '%1' for argument '%2' of "
-                                    "enum %3. Supported values are [%4].")
-                                .arg(value, argName,
-                                     QString::fromLatin1(enumName),
-                                     values.join(", ")));
+  throw RpcInvalidArgs(QString("Unknown value '%1' for argument '%2' of "
+                               "enum %3. Supported values are [%4].")
+                           .arg(value, argName, QString::fromLatin1(enumName),
+                                values.join(", ")));
 }
 
 void RpcRequest::throwMissingArgs(const QString& argName,
                                   const char* enumName) {
-  throw rpc::RpcInvalidArgs(
-      QString("Missing value for argument '%1' of enum %2.")
-          .arg(argName, QString::fromLatin1(enumName)));
+  throw RpcInvalidArgs(QString("Missing value for argument '%1' of enum %2.")
+                           .arg(argName, QString::fromLatin1(enumName)));
 }
 
 /*******************************************************************************

@@ -23,6 +23,7 @@
 #include "workspacedbrpc.h"
 
 #include "../../guiapplication.h"
+#include "../rpcnotification.h"
 #include "../rpcrequest.h"
 #include "rpcerrors.h"
 
@@ -55,18 +56,20 @@ void WorkspaceDbRpc::wait(GuiApplication& app, RpcObjectRegistry& registry,
   Q_UNUSED(registry);
   WorkspaceLibraryDb& db = app.getWorkspace().getLibraryDb();
   if (!db.isScanInProgress()) {
-    request.sendSuccess(details(db));
+    request.send(details(db));
     return;
   }
 
   request.makeAsync(db);
-  request.sendProgress(db.getScanProgressPercent());
+  request.send(RpcNotification().progress(db.getScanProgressPercent()));
   QObject::connect(&db, &WorkspaceLibraryDb::scanProgressUpdate, &request,
-                   &RpcRequest::sendProgress);
+                   [&request](int percent) {
+                     request.send(RpcNotification().progress(percent));
+                   });
   QObject::connect(&db, &WorkspaceLibraryDb::scanFinished, &request,
-                   [&db, &request]() { request.sendSuccess(details(db)); });
+                   [&db, &request]() { request.send(details(db)); });
   QObject::connect(&request, &RpcRequest::cancelled, &request,
-                   [&request]() { request.sendError(RpcCancelled()); });
+                   [&request]() { request.send(RpcCancelled()); });
 }
 
 /*******************************************************************************

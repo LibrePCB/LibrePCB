@@ -93,9 +93,9 @@ void ProtocolRpc::initialize(GuiApplication& app, RpcObjectRegistry& registry,
     const bool authenticated =
         getAuthenticatedTokens().contains(token.toString());
     if (authenticated) {
-      request.sendSuccess(createResponse(token.toString()));
+      request.send(createResponse(token.toString()));
     } else {
-      request.sendError(rpc::RpcAccessDenied());
+      request.send(RpcAccessDenied());
     }
   } else {
     auto notification = std::make_shared<Notification>(
@@ -108,11 +108,10 @@ void ProtocolRpc::initialize(GuiApplication& app, RpcObjectRegistry& registry,
         tr("Accept Connection"), QString(), true);
     QObject::connect(notification.get(), &Notification::buttonClicked, &request,
                      [&request, createResponse]() {
-                       request.sendSuccess(createResponse(QString()));
+                       request.send(createResponse(QString()));
                      });
-    QObject::connect(
-        notification.get(), &Notification::destroyed, &request,
-        [&request]() { request.sendError(rpc::RpcAccessDenied()); });
+    QObject::connect(notification.get(), &Notification::destroyed, &request,
+                     [&request]() { request.send(RpcAccessDenied()); });
     QObject::connect(&request, &RpcRequest::cancelled, notification.get(),
                      &Notification::dismiss);
     QObject::connect(&request, &RpcRequest::destroyed, notification.get(),
@@ -126,7 +125,7 @@ void ProtocolRpc::ping(GuiApplication& app, RpcObjectRegistry& registry,
                        RpcRequest& request) {
   Q_UNUSED(app);
   Q_UNUSED(registry);
-  request.sendSuccess();
+  request.send();
 }
 
 /*******************************************************************************

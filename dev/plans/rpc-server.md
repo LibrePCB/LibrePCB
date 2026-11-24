@@ -103,7 +103,7 @@ following message types:
 |------|--------------|---------------|------------------------------|---------|
 | 0    | Request      | both          | `[0, msgid, method, params]` | Call a function |
 | 1    | Response     | callee→caller | `[1, msgid, status, payload]`  | Exactly one per request; `status` is 0 on success (payload = result) or the error code (payload = error map) |
-| 2    | Request message | callee→caller | `[2, msgid, payload]`        | Per-request channel: progress reports and/or streamed partial data; only while the request is pending |
+| 2    | Notification | callee→caller | `[2, msgid, payload]`        | Progress and/or streamed (partial) result data, merged JSON-Merge-Patch-style into a rolling result; only while the request is pending (see the protocol docs) |
 | 3    | Cancel       | caller→callee | `[3, msgid]`                 | The caller asks to cancel a pending request |
 
 - `msgid` is a u32, **unique per direction while pending** (a response
@@ -119,14 +119,14 @@ following message types:
   processed.
 - **Unknown message types are ignored + logged** (not closed) — forward
   compatibility.
-- One emit primitive, two conventions: type-2 payloads are defined per
-  method in the spec (e.g. progress: `{"percent": <int 0..100>,
-  "message": <string>}`, or streamed chunks: `bin` data).
-- **Cancellation invariant:** on cancel, the callee stops the work *when
-  it can* and responds with a spec-defined "cancelled" error; if the work
-  already completed or can't be interrupted, the normal result is sent.
-  Either way the caller receives **exactly one final response** per
-  request. The callee *enforces* this exactly-once property (see 2.6).
+- One emit primitive: The notification payload carries the reserved
+  state members (`progress`, `step`, `steps`, `message`) and/or a
+  `result` member with partial result data, which is merged
+  JSON-Merge-Patch-style (RFC 7396; arrays appended, nil deletes) into
+  a rolling result on the client side — the final response payload
+  merges into it as well and only carries data not delivered yet.
+  Notifications are only sent while the request is pending; progress
+  is not monotonic and never a completion signal.
 
 ### 2.3 Method naming: `ClassName.method_name`
 

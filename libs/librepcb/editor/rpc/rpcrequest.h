@@ -37,6 +37,8 @@
 namespace librepcb {
 namespace editor {
 
+class RpcNotification;
+
 /*******************************************************************************
  *  Class RpcRequest
  ******************************************************************************/
@@ -46,9 +48,9 @@ namespace editor {
  *
  * A request object is created by the #RpcServer (on the GUI thread) when a
  * command is dispatched. The handler must ensure that it is replied exactly
- * once, either synchronously (by calling #sendSuccess() or #sendError()) or
- * asynchronously (by keeping the object alive and calling one of these
- * methods later). If a handler forgets to reply, no response is sent at all
+ * once, either synchronously (by calling #send()) or asynchronously (by
+ * keeping the object alive and calling one of the #send() methods later).
+ * If a handler forgets to reply, no response is sent at all
  * — the request stays pending and the client will run into a timeout.
  *
  * @note The class is fully decoupled from the #RpcServer: Responses and
@@ -177,33 +179,34 @@ public:
 
   void makeAsync(QObject& supervisor) noexcept;
 
-  void sendProgress(int percent) noexcept;
-
   /**
-   * @brief Send a request-scoped message to the client (e.g. progress)
+   * @brief Send a notification to the client (e.g. progress)
    *
    * May be called any number of times while the request is pending, i.e.
    * before it is replied. Never blocks, thus safe to call from the GUI
    * thread.
-   *
-   * @param payload  The message payload (e.g. a progress map).
    */
-  void sendNotification(const QVariant& payload) noexcept;
+  void send(const RpcNotification& notification) noexcept;
+
+  /**
+   * @brief Reply with success and no result (finishes the request)
+   */
+  void send() noexcept;
 
   /**
    * @brief Reply with a result (finishes the request)
    *
-   * @param result  The result value (any type of the protocol's value
-   *                domain, usually a map).
+   * @param result  The result map, with the fields documented for the
+   *                method in the specification.
    */
-  void sendSuccess(const QVariant& result = QVariant()) noexcept;
+  void send(const QVariantMap& result) noexcept;
 
   /**
    * @brief Reply with an error thrown by a command implementation
    *
    * @param error  The error which was thrown (see rpcerrors.h).
    */
-  void sendError(const RpcError& error) noexcept;
+  void send(const RpcError& error) noexcept;
 
 signals:
   void cancelled();
@@ -220,6 +223,10 @@ private:  // Methods
   /// Throw an InvalidArgs error for a missing mandatory enum argument.
   [[noreturn]] static void throwMissingArgs(const QString& argName,
                                             const char* enumName);
+
+  /// Send the reply event (status 0 on success, otherwise the error code;
+  /// the payload carries the result or the error map respectively).
+  void reply(uint32_t status, const QVariant& payload) noexcept;
 
 private:  // Data
   const uint32_t mConnId;
