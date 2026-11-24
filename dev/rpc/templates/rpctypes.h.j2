@@ -53,8 +53,8 @@ struct RpcEnumTraits;
  * @brief The {{ enum.name }} enum (see the API specification)
  *
  * The values are transferred as strings in lower_snake_case (the C++
- * identifiers are derived from them). Use `RpcRequest::getArg<E>()` /
- * `RpcRequest::tryGetArg<E>()` to read them from request arguments.
+ * identifiers are derived from them). They are read from request
+ * arguments with the generic argument readers in rpchelpers.h.
  */
 enum class {{ enum.name }} {
 {% for value in enum.get("values") %}
@@ -65,18 +65,12 @@ enum class {{ enum.name }} {
 /**
  * @brief Conversion data for the {{ enum.name }} enum
  *
- * Used by `RpcRequest::getArg<E>()` / `RpcRequest::tryGetArg<E>()`.
+ * Used by the generic argument readers in rpchelpers.h.
  */
 template <>
 struct RpcEnumTraits<{{ enum.name }}> {
   /// The enum name (used in error messages).
   static constexpr const char* NAME = "{{ enum.name }}";
-
-  /// The default value (returned for arguments which are not provided),
-  /// or std::nullopt if the argument is mandatory (no default in the
-  /// specification).
-  static constexpr std::optional<{{ enum.name }}> DEFAULT =
-      {% if enum.get("default") %}{{ enum.name }}::{{ enum["default"] | cpp_pascal }}{% else %}std::nullopt{% endif %};
 
   /// The map from wire strings to enum values.
   static const QHash<QString, {{ enum.name }}>& mapFromString() noexcept {

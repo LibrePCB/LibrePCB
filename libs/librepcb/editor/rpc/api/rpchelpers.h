@@ -23,14 +23,16 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "rpcerrors.h"
+#include "../rpcrequest.h"
 #include "rpctypes.h"
 
 #include <librepcb/core/types/uuid.h>
 #include <librepcb/rust-core/rpcext.h>
+#include <type_traits>
 
 #include <QtCore>
 
+#include <optional>
 #include <slint.h>
 
 /*******************************************************************************
@@ -39,6 +41,23 @@
 namespace librepcb {
 namespace editor {
 namespace rpc {
+
+/*******************************************************************************
+ *  Local Functions (error messages, defined in rpchelpers.cpp)
+ ******************************************************************************/
+
+/// Throw an InvalidArgs error for a missing mandatory argument.
+[[noreturn]] void throwMissingArg(const QString& argName, const char* typeName);
+
+/// Throw an InvalidArgs error for an argument with an invalid value.
+[[noreturn]] void throwInvalidArg(const QString& argName, const QVariant& value,
+                                  const char* typeName);
+
+/// Throw an InvalidArgs error for an enum argument with an unknown value.
+[[noreturn]] void throwInvalidEnumArg(const QString& argName,
+                                      const QString& value,
+                                      const char* enumName,
+                                      const QString& values);
 
 /*******************************************************************************
  *  RPC Helpers
@@ -84,21 +103,159 @@ inline QVariant toVariant(const Uuid& uuid) noexcept {
       rs::MsgPackExt(kMsgPackExtTypeUuid, QUuid(uuid.toStr()).toRfc4122()));
 }
 
-inline Uuid toUuid(const QVariant& value) {
-  const auto ext = value.value<rs::MsgPackExt>();
-  if (ext.getType() != kMsgPackExtTypeUuid) {
-    throw RpcInvalidArgs("Not a UUID extension type.");
+/*******************************************************************************
+ *  Class RpcArgTraits
+ ******************************************************************************/
+
+/**
+ * @brief How to read an argument of type T from a request
+ *
+ * Specialized for every supported argument type (see the API
+ * specification). Arguments of any other type fail to compile.
+ */
+template <typename T>
+struct RpcArgTraits;
+
+template <>
+struct RpcArgTraits<QString> {
+  static constexpr const char* NAME = "string";
+  static std::optional<QString> tryFromVariant(const QVariant& v) noexcept {
+    if (v.userType() == QMetaType::QString) return v.toString();
+    return std::nullopt;
   }
-  const QUuid uuid = QUuid::fromRfc4122(ext.getData());
-  if (uuid.isNull()) {
-    throw RpcInvalidArgs("Invalid UUID.");
+};
+
+template <>
+struct RpcArgTraits<bool> {
+  static constexpr const char* NAME = "bool";
+  static std::optional<bool> tryFromVariant(const QVariant& v) noexcept {
+    if (v.userType() == QMetaType::Bool) return v.toBool();
+    return std::nullopt;
   }
-  return Uuid::fromString(uuid.toString(QUuid::WithoutBraces));
+};
+
+template <>
+struct RpcArgTraits<qint64> {
+  static constexpr const char* NAME = "int";
+  static std::optional<qint64> tryFromVariant(const QVariant& v) noexcept {
+    if (v.userType() == QMetaType::LongLong) return v.toLongLong();
+    return std::nullopt;
+  }
+};
+
+template <>
+struct RpcArgTraits<double> {
+  static constexpr const char* NAME = "float";
+  static std::optional<double> tryFromVariant(const QVariant& v) noexcept {
+    if (v.userType() == QMetaType::Double) return v.toDouble();
+    return std::nullopt;
+  }
+};
+
+template <>
+struct RpcArgTraits<QByteArray> {
+  static constexpr const char* NAME = "binary";
+  static std::optional<QByteArray> tryFromVariant(const QVariant& v) noexcept {
+    if (v.userType() == QMetaType::QByteArray) return v.toByteArray();
+    return std::nullopt;
+  }
+};
+
+template <>
+struct RpcArgTraits<QVariantMap> {
+  static constexpr const char* NAME = "map";
+  static std::optional<QVariantMap> tryFromVariant(const QVariant& v) noexcept {
+    if (v.userType() == QMetaType::QVariantMap) return v.toMap();
+    return std::nullopt;
+  }
+};
+
+/// The protocol's "uuid" extension type — strictly the ext value, i.e.
+/// a 36-character string is *not* accepted (see the API specification).
+template <>
+struct RpcArgTraits<Uuid> {
+  static constexpr const char* NAME = "uuid";
+  static std::optional<Uuid> tryFromVariant(const QVariant& v) noexcept {
+    if (v.userType() == QMetaType::fromType<rs::MsgPackExt>().id()) {
+      const auto ext = v.value<rs::MsgPackExt>();
+      if ((ext.getType() == kMsgPackExtTypeUuid) &&
+          (ext.getData().size() == 16)) {
+        const QUuid uuid = QUuid::fromRfc4122(ext.getData());
+        return Uuid::tryFromString(uuid.toString(QUuid::WithoutBraces));
+      }
+    }
+    return std::nullopt;
+  }
+};
+
+/// Any enum type — delegates to the generated RpcEnumTraits.
+template <typename T>
+  requires std::is_enum_v<T>
+struct RpcArgTraits<T> {
+  static constexpr const char* NAME = RpcEnumTraits<T>::NAME;
+  static std::optional<T> tryFromVariant(const QVariant& v) noexcept {
+    if (v.userType() == QMetaType::QString) {
+      const auto& map = RpcEnumTraits<T>::mapFromString();
+      const auto it = map.constFind(v.toString());
+      if (it != map.constEnd()) return *it;
+    }
+    return std::nullopt;
+  }
+};
+
+/// A list of any supported type.
+template <typename T>
+struct RpcArgTraits<QList<T>> {
+  static constexpr const char* NAME = "array";
+  static std::optional<QList<T>> tryFromVariant(const QVariant& v) noexcept {
+    if (v.userType() != QMetaType::QVariantList) return std::nullopt;
+    QList<T> result;
+    for (const auto& item : v.toList()) {
+      if (auto converted = RpcArgTraits<T>::tryFromVariant(item)) {
+        result.append(*converted);
+      } else {
+        return std::nullopt;
+      }
+    }
+    return result;
+  }
+};
+
+/*******************************************************************************
+ *  Typed Argument Reading
+ ******************************************************************************/
+
+/// Read an optional argument, returning std::nullopt if it is not
+/// provided at all. If it is provided but has an invalid value, an
+/// InvalidArgs error is thrown.
+template <typename T>
+std::optional<T> getOptionalArg(const RpcRequest& request,
+                                const QString& argName) {
+  const auto& args = request.getArgs();
+  const auto it = args.constFind(argName);
+  if (it == args.constEnd()) {
+    return std::nullopt;
+  }
+  if (auto converted = RpcArgTraits<T>::tryFromVariant(*it)) {
+    return *converted;
+  }
+  if constexpr (std::is_enum_v<T>) {
+    throwInvalidEnumArg(argName, it->toString(), RpcEnumTraits<T>::NAME,
+                        RpcEnumTraits<T>::mapFromString().keys().join(", "));
+  } else {
+    throwInvalidArg(argName, *it, RpcArgTraits<T>::NAME);
+  }
 }
 
+/// Read a mandatory argument. If it is not provided, an InvalidArgs error
+/// is thrown. If it is provided but has an invalid value (e.g. nil, or a
+/// wrong type), an InvalidArgs error is thrown as well.
 template <typename T>
-QList<T> toList(const QVariant& value) {
-  // TODO
+T getArg(const RpcRequest& request, const QString& argName) {
+  if (auto value = getOptionalArg<T>(request, argName)) {
+    return *value;
+  }
+  throwMissingArg(argName, RpcArgTraits<T>::NAME);
 }
 
 /*******************************************************************************

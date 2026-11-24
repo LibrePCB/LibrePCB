@@ -114,21 +114,6 @@ void RpcRequest::reply(uint32_t status, const QVariant& payload) noexcept {
   }
 }
 
-void RpcRequest::throwInvalidArgs(const QString& value, const QString& argName,
-                                  const char* enumName,
-                                  const QStringList& values) {
-  throw RpcInvalidArgs(QString("Unknown value '%1' for argument '%2' of "
-                               "enum %3. Supported values are [%4].")
-                           .arg(value, argName, QString::fromLatin1(enumName),
-                                values.join(", ")));
-}
-
-void RpcRequest::throwMissingArgs(const QString& argName,
-                                  const char* enumName) {
-  throw RpcInvalidArgs(QString("Missing value for argument '%1' of enum %2.")
-                           .arg(argName, QString::fromLatin1(enumName)));
-}
-
 /*******************************************************************************
  *  End of File
  ******************************************************************************/

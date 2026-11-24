@@ -66,14 +66,6 @@ class RpcNotification;
  *       destroyed. Since the request is created and also destroyed on the
  *       GUI thread, Qt's thread affinity rules are fulfilled.
  */
-namespace rpc {
-
-// Traits for enum types, generated in rpc/api/rpctypes.h (specialized
-// per enum of the specification). See getArg<E>()/tryGetArg<E>() below.
-template <typename T>
-struct RpcEnumTraits;
-
-}  // namespace rpc
 
 /*******************************************************************************
  *  Class RpcRequest
@@ -106,51 +98,6 @@ public:
   QVariant getArg(const QString& key,
                   const QVariant& defaultValue = QVariant()) const noexcept {
     return mArgs.value(key, defaultValue);
-  }
-
-  /**
-   * @brief Read an enum value from a request argument
-   *
-   * Returns the default value of the enum (from the specification) if the
-   * argument is not provided. Enums without a default value are mandatory
-   * arguments.
-   *
-   * @throws RpcInvalidArgs  If the argument is provided but is not nil or
-   *                         a valid enum value, or if it is not provided
-   *                         and the enum has no default value.
-   */
-  template <typename E>
-  E getArg(const QString& argName) const {
-    if (auto value = tryGetArg<E>(argName)) {
-      return *value;
-    } else if (auto fallback = rpc::RpcEnumTraits<E>::DEFAULT) {
-      return *fallback;
-    } else {
-      throwMissingArgs(argName, rpc::RpcEnumTraits<E>::NAME);
-    }
-  }
-
-  /**
-   * @brief Read an optional enum value from a request argument
-   *
-   * @return std::nullopt if the argument is not provided at all.
-   *
-   * @throws RpcInvalidArgs  If the argument is provided but is nil or not
-   *                         a valid enum value.
-   */
-  template <typename E>
-  std::optional<E> tryGetArg(const QString& argName) const {
-    auto argIt = mArgs.find(argName);
-    if (argIt == mArgs.constEnd()) {
-      return std::nullopt;  // Argument not provided.
-    }
-    const QString value = argIt->toString();
-    const auto& map = rpc::RpcEnumTraits<E>::mapFromString();
-    const auto mapIt = map.constFind(value);
-    if (mapIt != map.constEnd()) {
-      return *mapIt;
-    }
-    throwInvalidArgs(value, argName, rpc::RpcEnumTraits<E>::NAME, map.keys());
   }
 
   /**
@@ -212,18 +159,6 @@ signals:
   void cancelled();
 
 private:  // Methods
-  /// Throw an InvalidArgs error for an invalid enum argument value.
-  /// Defined in rpcrequest.cpp (the only place allowed to include
-  /// the generated error classes).
-  [[noreturn]] static void throwInvalidArgs(const QString& value,
-                                            const QString& argName,
-                                            const char* enumName,
-                                            const QStringList& values);
-
-  /// Throw an InvalidArgs error for a missing mandatory enum argument.
-  [[noreturn]] static void throwMissingArgs(const QString& argName,
-                                            const char* enumName);
-
   /// Send the reply event (status 0 on success, otherwise the error code;
   /// the payload carries the result or the error map respectively).
   void reply(uint32_t status, const QVariant& payload) noexcept;

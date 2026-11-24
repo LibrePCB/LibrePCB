@@ -52,8 +52,8 @@ struct RpcEnumTraits;
  * @brief The BackupRestoreMode enum (see the API specification)
  *
  * The values are transferred as strings in lower_snake_case (the C++
- * identifiers are derived from them). Use `RpcRequest::getArg<E>()` /
- * `RpcRequest::tryGetArg<E>()` to read them from request arguments.
+ * identifiers are derived from them). They are read from request
+ * arguments with the generic argument readers in rpchelpers.h.
  */
 enum class BackupRestoreMode {
   Abort,
@@ -64,18 +64,12 @@ enum class BackupRestoreMode {
 /**
  * @brief Conversion data for the BackupRestoreMode enum
  *
- * Used by `RpcRequest::getArg<E>()` / `RpcRequest::tryGetArg<E>()`.
+ * Used by the generic argument readers in rpchelpers.h.
  */
 template <>
 struct RpcEnumTraits<BackupRestoreMode> {
   /// The enum name (used in error messages).
   static constexpr const char* NAME = "BackupRestoreMode";
-
-  /// The default value (returned for arguments which are not provided),
-  /// or std::nullopt if the argument is mandatory (no default in the
-  /// specification).
-  static constexpr std::optional<BackupRestoreMode> DEFAULT =
-      BackupRestoreMode::Abort;
 
   /// The map from wire strings to enum values.
   static const QHash<QString, BackupRestoreMode>& mapFromString() noexcept {

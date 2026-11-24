@@ -889,6 +889,7 @@ add_library(
   rpc/api/remotelibraryrpc.cpp
   rpc/api/remotelibraryrpc.h
   rpc/api/rpcerrors.h
+  rpc/api/rpchelpers.cpp
   rpc/api/rpchelpers.h
   rpc/api/rpctypes.h
   rpc/api/undostackrpc.cpp

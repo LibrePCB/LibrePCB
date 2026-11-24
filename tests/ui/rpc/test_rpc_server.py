@@ -114,7 +114,8 @@ def test_rpc_server(librepcb, helpers):
             # without any user interaction.
             rpc2 = RpcClient(PORT)
             try:
-                status, result = rpc2.request(2, "initialize", {"token": token})
+                status, result = rpc2.request(
+                    2, "initialize", {"name": "RPC Test", "token": token})
                 assert status == 0, f"initialize failed: {result!r}"
                 assert result["format"] == "1.0", result
                 assert result["server"] == "librepcb", result
@@ -126,7 +127,8 @@ def test_rpc_server(librepcb, helpers):
             # rejected, and the connection stays unauthenticated.
             rpc3 = RpcClient(PORT)
             try:
-                rpc3.expect_error(1, "initialize", {"token": "invalid"}, 33)
+                rpc3.expect_error(
+                    1, "initialize", {"name": "RPC Test", "token": "invalid"}, 33)
                 status, payload = rpc3.request(2, "ping", None)
                 assert status == 30, payload
             finally:

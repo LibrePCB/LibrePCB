@@ -47,6 +47,18 @@ Handler Implementation
 - **Errors are thrown**: a handler just throws one of the error classes
   (see below); the server catches it and sends the response. No
   `send()` calls and no early returns are needed in the happy path.
+- **Arguments are read typed** (see `rpc/api/rpchelpers.h`):
+  `getArg<T>(request, name)` for mandatory arguments,
+  `getOptionalArg(request, name, defaultValue)` for optional arguments
+  with their documented default, and `getOptionalArg<T>(request, name)`
+  for optional arguments where the caller handles absence. Supported
+  types: `bool`, `qint64`, `double`, `QString`, `QByteArray`,
+  `QVariantMap`, `Uuid` (the "uuid" extension type — a string UUID is
+  *not* accepted), any enum of the specification, and `QList<T>` of any
+  of these. Invalid values (including an explicit nil) throw
+  `RpcInvalidArgs` instead of being silently coerced. The raw QVariant
+  access (`request.getArg(name)`) remains only for special cases (e.g.
+  object handles passed to the registry, or the initialize token).
 - **Cancellation is cooperative**: the client may cancel a pending
   request (which emits the `cancelled()` Qt signal and sets the
   `isCancelled()` flag). Long-running handlers should poll the flag or

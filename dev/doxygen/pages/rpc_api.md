@@ -13,7 +13,7 @@ MessagePack extension types: Tagged raw bytes which are opaque to the transport 
 
 | ID | Name | Description |
 |----|------|-------------|
-| 2 | `uuid` | A UUID (RFC 4122), encoded as its 16 bytes in field order (network byte order). This is equivalent to the string representation (type "uuid_str"), but requires only half of the size on the wire. |
+| 2 | `uuid` | A UUID (RFC 4122), encoded as its 16 bytes in field order (network byte order). This requires only half of the size of the 36-character string representation on the wire. |
 
 ---
 
@@ -110,6 +110,23 @@ A summary of a board.
 
 ---
 
+## RemoteLibrarySummary {#doc_rpc_api_type_RemoteLibrarySummary}
+
+A summary of a remote library.
+
+**Fields:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `uuid` | [`uuid`](@ref doc_rpc_api_ext_types) | The remote library UUID. |
+| `name` | `string` | The remote library name. |
+| `description` | `string` | The remote library description. |
+| `installed_version` | `string` | The installed version, if the library is installed. |
+| `online_version` | `string` | The latest available version, if known. |
+| `outdated` | `bool` | Whether the installed version is outdated. |
+
+---
+
 ## UndoStackDetails {#doc_rpc_api_type_UndoStackDetails}
 
 The state of a document's undo stack.
@@ -133,8 +150,6 @@ Information about the workspace library database.
 ---
 
 ## BackupRestoreMode (Enum) {#doc_rpc_api_type_BackupRestoreMode}
-**Default value:** `abort`
-
 | Value | Description |
 |-------|-------------|
 | `abort` | Do not attempt to open a file which has an auto-save backup. Abort with an error instead. |
@@ -224,7 +239,7 @@ Open a project by file path. If the project is already open, nothing is changed 
 | Name | Type | Description |
 |------|------|-------------|
 | `path` | `string` | The absolute path of the project file (*.lpp or *.lppz). |
-| `backup` | [`BackupRestoreMode`](@ref doc_rpc_api_type_BackupRestoreMode) | If the project directory contains an auto-save backup (i.e. the application crashed while the project was open and had unsaved modifications), this flag specifies how to proceed in that case. |
+| `backup` | [`BackupRestoreMode`](@ref doc_rpc_api_type_BackupRestoreMode) (default: `abort`) | If the project directory contains an auto-save backup (i.e. the application crashed while the project was open and had unsaved modifications), this flag specifies how to proceed in that case. |
 
 **Result:** [`ProjectEditorSummary`](@ref doc_rpc_api_type_ProjectEditorSummary)
 
@@ -324,7 +339,7 @@ Fetch all remote libraries. If the application already has the list ready, this 
 
 | Name | Type | Description |
 |------|------|-------------|
-| `libraries` | `array` of `RemoteLibrarySummary` | All remote libraries, in an unspecified (but stable) order. |
+| `libraries` | `array` of [`RemoteLibrarySummary`](@ref doc_rpc_api_type_RemoteLibrarySummary) | All remote libraries, in an unspecified (but stable) order. |
 
 
 ---
@@ -337,7 +352,7 @@ Install or update remote libraries in one batch. Note that dependent libraries w
 
 | Name | Type | Description |
 |------|------|-------------|
-| `libraries` | `array` of `uuid_str` | UUID of libraries to install. |
+| `libraries` | `array` of [`uuid`](@ref doc_rpc_api_ext_types) | UUID of libraries to install. |
 
 **Result:** None
 
@@ -352,7 +367,7 @@ ATTENTION: Be careful with uninstalling libraries which are currently not availa
 
 | Name | Type | Description |
 |------|------|-------------|
-| `libraries` | `array` of `uuid_str` | UUID of libraries to uninstall. |
+| `libraries` | `array` of [`uuid`](@ref doc_rpc_api_ext_types) | UUID of libraries to uninstall. |
 
 **Result:** None
 

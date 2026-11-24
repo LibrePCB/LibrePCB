@@ -45,7 +45,7 @@ namespace rpc {
 
 static ui::LibraryInfoData getObj(const RpcRequest& request,
                                   LibrariesModel& model) {
-  const auto uuid = toUuid(request.getArg("obj"));
+  const auto uuid = getArg<Uuid>(request, "obj");
   for (std::size_t i = 0; i < model.row_count(); ++i) {
     if (auto item = model.row_data(i)) {
       if (item->uuid == uuid.toStr()) {
@@ -58,7 +58,7 @@ static ui::LibraryInfoData getObj(const RpcRequest& request,
 
 static QVariantMap summary(const ui::LibraryInfoData& obj) {
   QVariantMap result;
-  result.insert("uuid", s2q(obj.uuid));
+  result.insert("uuid", toVariant(Uuid::fromString(s2q(obj.uuid))));
   result.insert("name", s2q(obj.name));
   result.insert("description", s2q(obj.description));
   result.insert("installed_version", s2q(obj.installed_version));
@@ -115,9 +115,7 @@ void RemoteLibraryRpc::install(GuiApplication& app, RpcObjectRegistry& registry,
                                RpcRequest& request) {
   Q_UNUSED(app);
   Q_UNUSED(registry);
-  Q_UNUSED(request);
-
-  const auto uuids = toList<Uuid>(request.getArg("libraries"));
+  const auto libraries = getArg<QList<Uuid>>(request, "libraries");
 
   throw RpcUnexpectedState(
       "Installing remote libraries is not supported through the RPC "
@@ -129,7 +127,8 @@ void RemoteLibraryRpc::uninstall(GuiApplication& app,
                                  RpcRequest& request) {
   Q_UNUSED(app);
   Q_UNUSED(registry);
-  Q_UNUSED(request);
+  const auto libraries = getArg<QList<Uuid>>(request, "libraries");
+
   // TODO: See install().
   throw RpcUnexpectedState(
       "Uninstalling remote libraries is not supported through the RPC "

@@ -21,8 +21,7 @@
 #   float (f64), string, binary, array, map (with string keys), ext (see
 #   the extension types below). A struct is a map with the listed
 #   fields. `handle` is a special type: an *opaque* object handle (see
-#   the class descriptions). `uuid` is an extension type, `uuid_str` the
-#   same UUID as a 36-character string.
+#   the class descriptions). `uuid` is an extension type.
 # - The params of every method are a map. The reserved key "obj" carries
 #   the receiver handle for non-static methods — it is NOT listed in the
 #   params below. Handles are opaque values: Clients obtain them from
@@ -158,7 +157,6 @@ errors:
 
 enums:
   - name: BackupRestoreMode
-    default: abort
     values:
       - name: abort
         description: >-
@@ -184,8 +182,8 @@ ext_types:
     code: "0x02"
     description: >-
       A UUID (RFC 4122), encoded as its 16 bytes in field order (network
-      byte order). This is equivalent to the string representation
-      (type "uuid_str"), but requires only half of the size on the wire.
+      byte order). This requires only half of the size of the 36-character
+      string representation on the wire.
 
 # ---------------------------------------------------------------------------
 # Structs
@@ -268,6 +266,28 @@ structs:
       - name: name
         type: string
         description: The board name.
+
+  - name: RemoteLibrarySummary
+    description: A summary of a remote library.
+    fields:
+      - name: uuid
+        type: uuid
+        description: The remote library UUID.
+      - name: name
+        type: string
+        description: The remote library name.
+      - name: description
+        type: string
+        description: The remote library description.
+      - name: installed_version
+        type: string
+        description: The installed version, if the library is installed.
+      - name: online_version
+        type: string
+        description: The latest available version, if known.
+      - name: outdated
+        type: bool
+        description: Whether the installed version is outdated.
 
   - name: UndoStackDetails
     description: The state of a document's undo stack.
@@ -460,7 +480,7 @@ classes:
         params:
           - name: libraries
             type: array
-            items: uuid_str
+            items: uuid
             description: UUID of libraries to install.
 
       - name: uninstall
@@ -474,7 +494,7 @@ classes:
         params:
           - name: libraries
             type: array
-            items: uuid_str
+            items: uuid
             description: UUID of libraries to uninstall.
 
       - name: get

@@ -27,6 +27,7 @@
 #include "../../notificationsmodel.h"
 #include "../rpcrequest.h"
 #include "rpcerrors.h"
+#include "rpchelpers.h"
 
 #include <librepcb/core/application.h>
 #include <librepcb/core/types/uuid.h>
@@ -67,7 +68,7 @@ void ProtocolRpc::initialize(GuiApplication& app, RpcObjectRegistry& registry,
   Q_UNUSED(registry);
 
   const QString clientName =
-      request.getArg("name").toString().simplified().left(32);
+      getArg<QString>(request, "name").simplified().left(32);
   const QVariant token = request.getArg("token");
 
   auto createResponse = [clientName, &app](QString token) {

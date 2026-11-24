@@ -127,8 +127,10 @@ void ProjectEditorRpc::list(GuiApplication& app, RpcObjectRegistry& registry,
 
 void ProjectEditorRpc::open(GuiApplication& app, RpcObjectRegistry& registry,
                             RpcRequest& request) {
-  const FilePath fp(request.getArg("path").toString());
-  const auto backupRestoreMode = request.getArg<BackupRestoreMode>("backup");
+  const FilePath fp(getArg<QString>(request, "path"));
+  const auto backupRestoreMode =
+      getOptionalArg<BackupRestoreMode>(request, "backup")
+          .value_or(BackupRestoreMode::Abort);
   auto askForRestoringBackup = [backupRestoreMode](const FilePath&) {
     switch (backupRestoreMode) {
       case BackupRestoreMode::Restore:

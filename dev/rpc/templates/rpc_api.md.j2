@@ -16,7 +16,7 @@
 | Name | Type | Description |
 |------|------|-------------|
 {% for field in fields %}
-| `{{ field.name }}` | {{ type_link(field.type) }}{% if field.get("items") %} of {{ type_link(field.get("items")) }}{% endif %} | {{ field.description or "" }} |
+| `{{ field.name }}` | {{ type_link(field.type) }}{% if field.get("items") %} of {{ type_link(field.get("items")) }}{% endif %}{% if field.get("default") %} (default: `{{ field["default"] }}`){% endif %} | {{ field.description or "" }} |
 {% endfor %}
 {% endif %}
 {%- endmacro -%}
@@ -91,10 +91,6 @@ to the executed command.
 {% if enum.description %}
 
 {{ enum.description }}
-
-{% endif %}
-{% if enum.get("default") %}
-**Default value:** `{{ enum["default"] }}`
 
 {% endif %}
 | Value | Description |
