@@ -66,54 +66,6 @@ static QSet<Uuid> getLibraryUuids(const LibrariesModel& model) {
   return set;
 }
 
-static void installOrUninstallHelper(GuiApplication& app, RpcRequest& request,
-                                     bool install) {
-  const auto libraries = getArg<QSet<Uuid>>(request, "libraries");
-  if (libraries.isEmpty()) {
-    request.send();
-    return;
-  }
-
-  auto& model = app.getRemoteLibraries();
-
-  // When installing, throw an error if any unknown library is passed.
-  if (install) {
-    for (const auto& lib : libraries - getLibraryUuids(model)) {
-      throw RpcInvalidArgs(QString("Unknown library: %1").arg(lib.toStr()));
-    }
-  }
-
-  // Select the libraries to install or uninstall.
-  model.cancel();
-  qApp->processEvents();
-  for (std::size_t i = 0; i < model.row_count(); ++i) {
-    if (auto item = model.row_data(i)) {
-      if (libraries.contains(Uuid::fromString(s2q(item->uuid)))) {
-        auto data = *item;
-        data.checked = install;
-        model.set_row_data(i, data);
-      }
-    }
-  }
-
-  // Apply the changes and wait for completion.
-  model.applyChanges();
-  qApp->processEvents();
-  if (!model.getUiData().operation_in_progress) {
-    request.send();
-    return;
-  }
-  request.makeAsync(model);
-  request.send(RpcNotification());
-  QObject::connect(&model, &LibrariesModel::uiDataChanged, &request,
-                   [&request](const ui::LibraryListData& data) {
-                     if (!data.operation_in_progress) {
-                       request.send();
-                       return;
-                     }
-                   });
-}
-
 static QVariantMap summary(const ui::LibraryInfoData& obj) {
   QVariantMap result;
   result.insert("uuid", toVariant(Uuid::fromString(s2q(obj.uuid))));
@@ -173,17 +125,62 @@ void RemoteLibraryRpc::list(GuiApplication& app, RpcObjectRegistry& registry,
   }
 }
 
-void RemoteLibraryRpc::install(GuiApplication& app, RpcObjectRegistry& registry,
-                               RpcRequest& request) {
+void RemoteLibraryRpc::apply(GuiApplication& app, RpcObjectRegistry& registry,
+                             RpcRequest& request) {
   Q_UNUSED(registry);
-  installOrUninstallHelper(app, request, true);
-}
+  auto& model = app.getRemoteLibraries();
+  const auto install = getArg<QSet<Uuid>>(request, "install");
+  const auto uninstall = getArg<QSet<Uuid>>(request, "uninstall");
+  if (install.isEmpty() && uninstall.isEmpty()) {
+    request.send();
+    return;
+  }
 
-void RemoteLibraryRpc::uninstall(GuiApplication& app,
-                                 RpcObjectRegistry& registry,
-                                 RpcRequest& request) {
-  Q_UNUSED(registry);
-  installOrUninstallHelper(app, request, false);
+  // Throw an error if any unknown library is requested to be installed,
+  // or if a library is contained in both sets.
+  for (const auto& lib : install - getLibraryUuids(model)) {
+    throw RpcInvalidArgs(QString("Unknown library: %1").arg(lib.toStr()));
+  }
+  for (const auto& lib : install& uninstall) {
+    throw RpcInvalidArgs(QString("Conflict: %1").arg(lib.toStr()));
+  }
+
+  // Select the libraries to install or uninstall.
+  model.cancel();
+  qApp->processEvents();
+  for (std::size_t i = 0; i < model.row_count(); ++i) {
+    if (auto item = model.row_data(i)) {
+      const auto uuid = Uuid::fromString(s2q(item->uuid));
+      std::optional<bool> requestedState;
+      if (install.contains(uuid)) {
+        requestedState = true;
+      } else if (uninstall.contains(uuid)) {
+        requestedState = false;
+      }
+      if (requestedState) {
+        auto data = *item;
+        data.checked = *requestedState;
+        model.set_row_data(i, data);
+      }
+    }
+  }
+
+  // Apply the changes and wait for completion.
+  model.applyChanges();
+  qApp->processEvents();
+  if (!model.getUiData().operation_in_progress) {
+    request.send();
+    return;
+  }
+  request.makeAsync(model);
+  request.send(RpcNotification());
+  QObject::connect(&model, &LibrariesModel::uiDataChanged, &request,
+                   [&request](const ui::LibraryListData& data) {
+                     if (!data.operation_in_progress) {
+                       request.send();
+                       return;
+                     }
+                   });
 }
 
 void RemoteLibraryRpc::get(GuiApplication& app, RpcObjectRegistry& registry,

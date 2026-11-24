@@ -344,30 +344,17 @@ Fetch all remote libraries. If the application already has the list ready, this 
 
 ---
 
-### RemoteLibrary.install {#doc_rpc_api_method_RemoteLibrary_install}
+### RemoteLibrary.apply {#doc_rpc_api_method_RemoteLibrary_apply}
 
-Install or update remote libraries in one batch. Note that dependent libraries will automatically be installed/updated too.
-
-**Params:**
-
-| Name | Type | Description |
-|------|------|-------------|
-| `libraries` | `array` of [`uuid`](@ref doc_rpc_api_ext_types) | UUID of libraries to install. |
-
-**Result:** None
-
----
-
-### RemoteLibrary.uninstall {#doc_rpc_api_method_RemoteLibrary_uninstall}
-
-Uninstall remote libraries in one batch. Note that dependent libraries will automatically be uninstalled too.
-ATTENTION: Be careful with uninstalling libraries which are currently not available in any online repository, since this may lead to data loss which cannot be undone!
+Install/update or uninstall remote libraries in one batch. Note that dependent libraries will automatically be installed/updated or uninstalled too. This behavior may change in future releases.
+IMPORTANT: After calling this method, use `WorkspaceDb.wait()` to wait for the library changes to appear in the database!
 
 **Params:**
 
 | Name | Type | Description |
 |------|------|-------------|
-| `libraries` | `array` of [`uuid`](@ref doc_rpc_api_ext_types) | UUID of libraries to uninstall. |
+| `install` | `array` of [`uuid`](@ref doc_rpc_api_ext_types) | UUID of libraries to install. |
+| `uninstall` | `array` of [`uuid`](@ref doc_rpc_api_ext_types) | UUID of libraries to uninstall. |
 
 **Result:** None
 

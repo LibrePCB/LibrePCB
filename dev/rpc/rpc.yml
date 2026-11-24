@@ -473,29 +473,25 @@ classes:
             description: >-
               All remote libraries, in an unspecified (but stable) order.
 
-      - name: install
+      - name: apply
         description: >-
-          Install or update remote libraries in one batch. Note that dependent
-          libraries will automatically be installed/updated too.
+          Install/update or uninstall remote libraries in one batch. Note that
+          dependent libraries will automatically be installed/updated or
+          uninstalled too. This behavior may change in future releases.
+
+          IMPORTANT: After calling this method, use `WorkspaceDb.wait()` to
+          wait for the library changes to appear in the database!
+        static: true
         params:
-          - name: libraries
+          - name: install
             type: array
             items: uuid
             description: UUID of libraries to install.
-
-      - name: uninstall
-        description: >-
-          Uninstall remote libraries in one batch. Note that dependent
-          libraries will automatically be uninstalled too.
-
-          ATTENTION: Be careful with uninstalling libraries which are currently
-          not available in any online repository, since this may lead to data
-          loss which cannot be undone!
-        params:
-          - name: libraries
+          - name: uninstall
             type: array
             items: uuid
             description: UUID of libraries to uninstall.
+        result: []
 
       - name: get
         description: Get details about a remote library.

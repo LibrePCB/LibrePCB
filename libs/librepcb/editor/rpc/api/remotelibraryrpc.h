@@ -71,21 +71,14 @@ public:
                    RpcRequest& request);
 
   /**
-   * @brief Install or update remote libraries in one batch. Note that
-   *        dependent libraries will automatically be installed/updated too.
+   * @brief Install/update or uninstall remote libraries in one batch. Note
+   *        that dependent libraries will automatically be installed/updated
+   *        or uninstalled too. This behavior may change in future releases.
+   *        IMPORTANT: After calling this method, use `WorkspaceDb.wait()` to
+   *        wait for the library changes to appear in the database!
    */
-  static void install(GuiApplication& app, RpcObjectRegistry& registry,
-                      RpcRequest& request);
-
-  /**
-   * @brief Uninstall remote libraries in one batch. Note that dependent
-   *        libraries will automatically be uninstalled too. ATTENTION: Be
-   *        careful with uninstalling libraries which are currently not
-   *        available in any online repository, since this may lead to data
-   *        loss which cannot be undone!
-   */
-  static void uninstall(GuiApplication& app, RpcObjectRegistry& registry,
-                        RpcRequest& request);
+  static void apply(GuiApplication& app, RpcObjectRegistry& registry,
+                    RpcRequest& request);
 
   /**
    * @brief Get details about a remote library.
