@@ -224,27 +224,25 @@ class Gui(ns.AppWindow):
             elif isinstance(msg, list) and len(msg) == 3 and msg[0] == 2:
                 self._log(f"⇐ notification: {fmt_value(msg[2])}")
 
-    def _handle_response(self, received_at, msgid, error, result):
+    def _handle_response(self, received_at, msgid, status, payload):
         method, handler, sent_at = self.client.handlers.pop(
             msgid, (None, None, 0.0)
         )
         if msgid == self.client.pending_msgid:
-            # The initialize reply (success/error) (un-)authenticates.
+            # The initialize reply (status 0 or error code) (un-)authenticates.
             self.client.pending_msgid = None
             self.pending = False
-            self.authenticated = error is None
-            if error is None and "token" in result:
-                self.token = str(result["token"])
+            self.authenticated = status == 0
+            if status == 0 and "token" in payload:
+                self.token = str(payload["token"])
         duration = f" ({int((received_at - sent_at) * 1000)} ms)"
-        if error is None:
-            self._log(f"← {method}: {fmt_value(result)}{duration}")
+        if status == 0:
+            self._log(f"← {method}: {fmt_value(payload)}{duration}")
         else:
-            self._log(
-                f"← ⚠ {method}: {error.get('code')} {error.get('message')}"
-                f"{duration}"
-            )
+            message = payload.get("message", "") if isinstance(payload, dict) else ""
+            self._log(f"← ⚠ {method}: {status} {message}{duration}")
         if handler:
-            handler(error, result)
+            handler(status, payload)
 
     def _log(self, text):
         line = f"{time.strftime('%H:%M:%S')}  {text}"

@@ -57,14 +57,14 @@ class RpcClient:
         assert message[0] == 1, f"not a response: {message!r}"
         assert message[1] == msgid, f"unexpected msgid: {message!r}"
         assert len(message) == 4, f"invalid response: {message!r}"
-        return message[2], message[3]  # (error, result)
+        return message[2], message[3]  # (status, payload)
 
     def expect_error(self, msgid, method, params, code):
-        error, result = self.request(msgid, method, params)
-        assert error is not None, f"expected error, got result: {result!r}"
-        assert result is None
-        assert error["code"] == code, f"unexpected error: {error!r}"
-        return error
+        status, payload = self.request(msgid, method, params)
+        assert status != 0, f"expected error, got result: {payload!r}"
+        assert isinstance(payload, dict) and "message" in payload, payload
+        assert status == code, f"unexpected error: {status}, {payload!r}"
+        return payload
 
 
 # --- The tests --------------------------------------------------------------
@@ -95,7 +95,7 @@ def test_rpc_server(librepcb, helpers):
             notification.trigger()
             message = rpc.receive()
             assert message[0:2] == [1, 1], message
-            assert message[2] is None, message
+            assert message[2] == 0, message  # Status: success.
             result = message[3]
             assert result["format"] == "1.0", result
             assert result["server"] == "librepcb", result
@@ -114,8 +114,8 @@ def test_rpc_server(librepcb, helpers):
             # without any user interaction.
             rpc2 = RpcClient(PORT)
             try:
-                error, result = rpc2.request(2, "initialize", {"token": token})
-                assert error is None, f"initialize failed: {error!r}"
+                status, result = rpc2.request(2, "initialize", {"token": token})
+                assert status == 0, f"initialize failed: {result!r}"
                 assert result["format"] == "1.0", result
                 assert result["server"] == "librepcb", result
                 assert result["token"] == token, result
@@ -127,8 +127,8 @@ def test_rpc_server(librepcb, helpers):
             rpc3 = RpcClient(PORT)
             try:
                 rpc3.expect_error(1, "initialize", {"token": "invalid"}, 33)
-                error, result = rpc3.request(2, "ping", None)
-                assert error is not None and error["code"] == 30, error
+                status, payload = rpc3.request(2, "ping", None)
+                assert status == 30, payload
             finally:
                 rpc3.close()
 
@@ -142,14 +142,14 @@ def test_rpc_server(librepcb, helpers):
                 rpc4.send([4, 1])
                 message = rpc4.receive()
                 assert message[0:2] == [1, 1], message
-                assert message[2]["code"] == 33, message
-                assert message[2]["message"] == "Access denied", message
+                assert message[2] == 33, message  # Status: the error code.
+                assert message[3]["message"] == "Access denied", message
             finally:
                 rpc4.close()
 
             # --- Protocol-level methods ----------------------------------
-            error, result = rpc.request(2, "ping", None)
-            assert error is None
+            status, result = rpc.request(2, "ping", None)
+            assert status == 0
             assert result is None
 
             # --- Commands -------------------------------------------------
@@ -160,8 +160,8 @@ def test_rpc_server(librepcb, helpers):
             projects = []
             deadline = time.time() + 10
             while time.time() < deadline:
-                error, result = rpc.request(3, "ProjectEditor.list", {})
-                assert error is None
+                status, result = rpc.request(3, "ProjectEditor.list", {})
+                assert status == 0
                 assert isinstance(result, dict)
                 projects = result["projects"]
                 assert isinstance(projects, list)
@@ -178,15 +178,15 @@ def test_rpc_server(librepcb, helpers):
                 assert key in project, f"missing key {key} in {project!r}"
 
             # ProjectEditor.get → details with sheets & boards.
-            error, result = rpc.request(4, "ProjectEditor.get", {"obj": handle})
-            assert error is None
+            status, result = rpc.request(4, "ProjectEditor.get", {"obj": handle})
+            assert status == 0
             assert isinstance(result["sheets"], list)
             assert isinstance(result["boards"], list)
 
             # UndoStack.get → the project was just opened, so the stack is
             # clean and there's nothing to undo/redo.
-            error, result = rpc.request(5, "UndoStack.get", {"obj": handle})
-            assert error is None
+            status, result = rpc.request(5, "UndoStack.get", {"obj": handle})
+            assert status == 0
             assert result["clean"] is True, result
             assert result["prev"] is None and result["next"] is None, result
             assert isinstance(result["id"], int), result
@@ -204,22 +204,21 @@ def test_rpc_server(librepcb, helpers):
             rpc.send([0, 8, 42, {}])
             message = rpc.receive()
             assert message[0:2] == [1, 8], message
-            assert message[2]["code"] == 20, message
-            assert message[3] is None, message
+            assert message[2] == 20, message  # Status: the error code.
+            assert message[3]["message"] == "Invalid request", message
 
             # Unknown project handle → InvalidHandle (41).
             rpc.send([0, 9, "UndoStack.get", {"obj": "invalid-uuid"}])
             message = rpc.receive()
             assert message[0:2] == [1, 9], message
-            assert message[2]["code"] == 41, message
-            assert message[2]["message"] == "Invalid object handle", message
-            assert message[3] is None, message
+            assert message[2] == 41, message  # Status: the error code.
+            assert message[3]["message"] == "Invalid object handle", message
 
             # Large u64 values are valid integers (native msgpack):
             rpc.send([0, 10, "ProjectEditor.list", {"key": 0x8000000000000000}])
             message = rpc.receive()
             assert message[0:2] == [1, 10], message
-            assert message[2] is None, message
+            assert message[2] == 0, message  # Status: success.
             assert isinstance(message[3], dict), message
 
             # Params outside the protocol's value domain (non-string map
@@ -228,12 +227,12 @@ def test_rpc_server(librepcb, helpers):
             rpc.send([0, 11, "ProjectEditor.list", {1: "x"}])  # Non-string map key.
             message = rpc.receive()
             assert message[0:2] == [1, 11], message
-            assert message[2]["code"] == 40, message
+            assert message[2] == 40, message  # Status: the error code.
 
             # A cancel for an unknown msgid is ignored (no response).
             rpc.send([4, 999])
-            error, result = rpc.request(13, "ping", None)
-            assert error is None
+            status, result = rpc.request(13, "ping", None)
+            assert status == 0
             assert result is None
 
             # --- Pipelining -----------------------------------------------
@@ -244,7 +243,7 @@ def test_rpc_server(librepcb, helpers):
             for msgid in (20, 21, 22):
                 message = rpc.receive()
                 assert message[0:2] == [1, msgid], message
-                assert message[2] is None, message
+                assert message[2] == 0, message  # Status: success.
                 assert message[3] is None, message
         finally:
             rpc.close()

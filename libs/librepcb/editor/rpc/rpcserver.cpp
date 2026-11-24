@@ -130,13 +130,16 @@ void RpcServer::requestEvent(const RpcRequest& request, RpcRequest::Event event,
       break;
     case RpcRequest::Event::Succeeded:
       rs::ffi_rpc_server_reply(*mHandle, request.getConnId(),
-                               request.getMsgId(), true, &value);
+                               request.getMsgId(), 0, &value);
       mPendingRequests.remove(
           requestKey(request.getConnId(), request.getMsgId()));
       break;
     case RpcRequest::Event::Failed:
+      // The error map carries the code (see errorToVariant()), which is
+      // sent as the response status instead of being part of the payload.
       rs::ffi_rpc_server_reply(*mHandle, request.getConnId(),
-                               request.getMsgId(), false, &value);
+                               request.getMsgId(),
+                               value.toMap().value("code").toUInt(), &value);
       mPendingRequests.remove(
           requestKey(request.getConnId(), request.getMsgId()));
       break;

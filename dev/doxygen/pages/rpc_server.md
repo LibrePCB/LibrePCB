@@ -60,7 +60,7 @@ There are two ways to authenticate:
 The success result is a map with some application information:
 
 ~~~{.msgpack}
-[1, 1, nil, {"format": "1.0", "server": "librepcb", "session":
+[1, 1, 0, {"format": "1.0", "server": "librepcb", "session":
 "783ea436-b2bc-4a1e-95a1-d5600c4a26d6", "token":
 "0f0e7d09-457c-4924-a21f-d8d5341f8d55", "version": "2.1.2",
 "workspace": "~/LibrePCB-Workspace"}]
@@ -94,10 +94,15 @@ type:
 | Type | Message         | Direction | Shape                     |
 |------|-----------------|-----------|---------------------------|
 | 0    | Request         | C→S       | `[0, msgid, method, params]` |
-| 1    | Response        | S→C       | `[1, msgid, error, result]`  |
+| 1    | Response        | S→C       | `[1, msgid, status, payload]` |
 | 2    | Notification    | S→C       | `[2, method, params]`        |
 | 3    | Request message | S→C       | `[3, msgid, payload]`       |
 | 4    | Cancel          | C→S       | `[4, msgid]`                |
+
+The `status` of a response is `0` on success (the payload carries the
+result, which may be nil) or the error code on failure (the payload is
+then a map carrying the error `message`, possibly with additional
+properties; see @ref doc_rpc_api_errors).
 
 - `msgid` is an unsigned 32-bit integer, unique per connection while
   pending. Responses may be sent in any order (pipelining): The server

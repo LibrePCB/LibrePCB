@@ -99,7 +99,7 @@ extended with request-scoped message types:
 | Type | Message      | Direction | Shape                        | Meaning |
 |------|--------------|-----------|------------------------------|---------|
 | 0    | Request      | C→S       | `[0, msgid, method, params]` | Call a function |
-| 1    | Response     | S→C       | `[1, msgid, error, result]`  | Exactly one per request; `error` is nil or a map; `result` is a map or nil (nil iff error, or if the command has no result) |
+| 1    | Response     | S→C       | `[1, msgid, status, payload]`  | Exactly one per request; `status` is 0 on success (payload = result) or the error code (payload = error map) |
 | 2    | Notification | S→C       | `[2, method, params]`        | Broadcast event (e.g. `project_opened`) |
 | 3    | Request message | S→C   | `[3, msgid, payload]`        | Per-request channel: progress reports and/or streamed partial data; only while the request is pending |
 | 4    | Cancel       | C→S       | `[4, msgid]`                 | Client asks to cancel a pending request |

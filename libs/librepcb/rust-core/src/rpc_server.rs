@@ -248,56 +248,66 @@ impl RpcServer {
 
   /// Send the response for a pending request.
   ///
-  /// Exactly one of `error`/`result` is sent (with an error, the result is
-  /// nil, and vice versa, as the protocol requires). A second response for
-  /// the same msg_id is silently dropped (returning `false`), as is a reply
-  /// for an unknown or already closed connection — this enforces the
-  /// "exactly one response per request" protocol invariant.
+  /// A second response for the same msg_id is silently dropped (returning
+  /// `false`), as is a reply for an unknown or already closed connection —
+  /// this enforces the "exactly one response per request" protocol
+  /// invariant.
   ///
   /// This method never blocks (the message is just queued on the
   /// connection's writer thread) and may be called from any thread.
   ///
   /// Returns whether the response was sent, i.e. whether the request was
   /// actually pending.
-  pub fn reply(
+  pub fn reply(&self, conn_id: u32, msg_id: u32, result: &Value) -> bool {
+    let message = build_response(msg_id, 0, result);
+    self.send_response(conn_id, msg_id, 0, &message)
+  }
+
+  /// Send an error response for a pending request: The error code is sent
+  /// as the status, the error message as the payload (see
+  /// [RpcError::to_payload]). See [RpcServer::reply].
+  pub fn reply_error(
     &self,
     conn_id: u32,
     msg_id: u32,
-    error: Option<&RpcError>,
-    result: &Value,
+    error: &RpcError,
   ) -> bool {
-    let error = error.map(|e| e.to_value());
-    let message = build_response(msg_id, error.as_ref(), result);
-    self.send_response(conn_id, msg_id, &message, Some(error.is_none()))
+    let status = error.code() as i64;
+    let message = build_response(msg_id, status, &error.to_payload());
+    self.send_response(conn_id, msg_id, status, &message)
   }
 
-  /// Send the response for a pending request, passing a raw error map
-  /// through unchanged.
-  ///
-  /// Used by the FFI for errors produced by the C++ dispatch layer: Their
-  /// map may carry additional error properties next to "code" and
-  /// "message" (see the error types in the API specification), so it is
-  /// forwarded as-is instead of being rebuilt from an [RpcError].
-  pub fn reply_error(&self, conn_id: u32, msg_id: u32, error: &Value) -> bool {
-    let message = build_response(msg_id, Some(error), &Value::Nil);
-    self.send_response(conn_id, msg_id, &message, Some(false))
+  /// Send an error response with a raw payload, as forwarded from the C++
+  /// dispatch layer: Its error map may carry additional error properties
+  /// next to "code" and "message" (see the error types in the API
+  /// specification), so it is forwarded as-is except that the code is sent
+  /// as the status instead of being part of the payload.
+  pub fn reply_error_raw(
+    &self,
+    conn_id: u32,
+    msg_id: u32,
+    status: i64,
+    payload: &Value,
+  ) -> bool {
+    let message = build_response(msg_id, status, payload);
+    self.send_response(conn_id, msg_id, status, &message)
   }
 
   /// Look up the connection, remove the msg_id from the pending set and
   /// queue the encoded message on its writer thread (see [RpcServer::reply]).
   ///
-  /// `initialize_result` is the outcome of the replied command: If the
-  /// replied msg_id belongs to a dispatched `initialize` request (see
+  /// `status` is the response status: If the replied msg_id belongs to a
+  /// dispatched `initialize` request (see
   /// [Connection::pending_initializes]), the connection is authenticated
-  /// (success) or un-authenticated (error). The state update happens under
-  /// the same lock as queueing the response, so the ordering of
+  /// (status 0) or un-authenticated (error code). The state update happens
+  /// under the same lock as queueing the response, so the ordering of
   /// concurrent `initialize` replies is preserved.
   fn send_response(
     &self,
     conn_id: u32,
     msg_id: u32,
+    status: i64,
     message: &Value,
-    initialize_result: Option<bool>,
   ) -> bool {
     let conn = {
       let clients = lock(&self.inner.clients);
@@ -320,10 +330,8 @@ impl RpcServer {
     if !pending.remove(&msg_id) {
       return false; // Already replied (or never dispatched).
     }
-    if let Some(result) = initialize_result {
-      if lock(&pending_initializes).remove(&msg_id) {
-        authenticated.store(result, Ordering::SeqCst);
-      }
+    if lock(&pending_initializes).remove(&msg_id) {
+      authenticated.store(status == 0, Ordering::SeqCst);
     }
     drop(pending);
     match codec::encode_message(message) {
@@ -472,8 +480,7 @@ mod tests {
         emulate_cpp_initialize(server, dispatch, TOKEN),
         "initialize failed"
       );
-      let (error, _) = client.read_response(1);
-      assert!(error.is_nil(), "initialize failed");
+      assert!(client.read_ok(1).is_map(), "initialize failed");
       client
     }
 
@@ -527,7 +534,8 @@ mod tests {
     }
 
     /// Read a response, asserting that it is a response for the given
-    /// msg_id. Returns `(error, result)` — exactly one of them is non-nil.
+    /// msg_id. Returns `(status, payload)` — the status is 0 on success,
+    /// otherwise the error code (the payload is then the error map).
     fn read_response(&mut self, msg_id: u32) -> (Value, Value) {
       let message = self.read().expect("connection closed unexpectedly");
       let items = message.as_array().unwrap();
@@ -541,13 +549,23 @@ mod tests {
       (items[2].clone(), items[3].clone())
     }
 
-    /// Read a response, asserting that it contains the given error code.
+    /// Read a response, asserting that it is a success response (status
+    /// 0). Returns the payload.
+    fn read_ok(&mut self, msg_id: u32) -> Value {
+      let (status, payload) = self.read_response(msg_id);
+      assert_eq!(status, Value::from(0), "expected success: {payload:?}");
+      payload
+    }
+
+    /// Read a response, asserting that it failed with the given error
+    /// code (and carries an error message in the payload).
     fn read_error(&mut self, msg_id: u32, code: RpcErrorCode) {
-      let (error, result) = self.read_response(msg_id);
-      assert!(result.is_nil(), "expected an error, got a result");
-      assert_eq!(
-        error.as_map().unwrap()[0],
-        (Value::from("code"), Value::from(code as i64)),
+      let (status, payload) = self.read_response(msg_id);
+      assert_eq!(status, Value::from(code as i64));
+      let pairs = payload.as_map().expect("expected an error payload");
+      assert!(
+        pairs.iter().any(|(key, _)| key.as_str() == Some("message")),
+        "error payload without a message: {payload:?}"
       );
     }
   }
@@ -621,13 +639,12 @@ mod tests {
       .map(|(_, v)| v.as_str().unwrap().to_string());
     let authenticated = token.as_deref() == Some(expected_token);
     if authenticated {
-      server.reply(conn_id, msg_id, None, &Value::Map(Vec::new()));
+      server.reply(conn_id, msg_id, &Value::Map(Vec::new()));
     } else {
-      server.reply(
+      server.reply_error(
         conn_id,
         msg_id,
-        Some(&RpcError::canonical(RpcErrorCode::Unauthenticated)),
-        &Value::Nil,
+        &RpcError::canonical(RpcErrorCode::Unauthenticated),
       );
     }
     authenticated
@@ -638,7 +655,7 @@ mod tests {
     let (conn_id, msg_id, method, _params) =
       dispatch.recv_timeout(Duration::from_secs(10)).unwrap();
     assert_eq!(method, METHOD_PING);
-    server.reply(conn_id, msg_id, None, &Value::Nil);
+    server.reply(conn_id, msg_id, &Value::Nil);
   }
 
   /// Get a field of a map value.
@@ -663,15 +680,12 @@ mod tests {
     assert_eq!(field(&params, "token"), Some(&Value::from(TOKEN)));
     // The C++ side validates the token and replies with the application
     // information — the reply itself authenticates the connection:
-    server.reply(conn_id, msg_id, None, &Value::Map(Vec::new()));
-    let (error, _) = client.read_response(1);
-    assert!(error.is_nil());
+    server.reply(conn_id, msg_id, &Value::Map(Vec::new()));
+    assert!(client.read_ok(1).is_map());
     // The connection is now usable:
     client.request(2, METHOD_PING, Value::Map(Vec::new()));
     emulate_cpp_ping(&server, &dispatch);
-    let (error, result) = client.read_response(2);
-    assert!(error.is_nil());
-    assert!(result.is_nil());
+    assert!(client.read_ok(2).is_nil());
   }
 
   #[test]
@@ -693,8 +707,7 @@ mod tests {
     let mut client = TestClient::new_unauthenticated(port);
     client.send_initialize(TOKEN);
     assert!(emulate_cpp_initialize(&server, &dispatch, TOKEN));
-    let (error, _) = client.read_response(1);
-    assert!(error.is_nil());
+    assert!(client.read_ok(1).is_map());
     // Re-initialize with a wrong token → the C++ side un-authenticates the
     // connection and replies with an error. The connection stays open, but
     // further (non-initialize) requests are rejected:
@@ -706,8 +719,7 @@ mod tests {
     // However, initializing correctly again works:
     client.send_initialize(TOKEN);
     assert!(emulate_cpp_initialize(&server, &dispatch, TOKEN));
-    let (error, _) = client.read_response(1);
-    assert!(error.is_nil());
+    assert!(client.read_ok(1).is_map());
   }
 
   #[test]
@@ -722,8 +734,7 @@ mod tests {
     // Initializing afterwards works:
     client.send_initialize(TOKEN);
     assert!(emulate_cpp_initialize(&server, &dispatch, TOKEN));
-    let (error, _) = client.read_response(1);
-    assert!(error.is_nil());
+    assert!(client.read_ok(1).is_map());
   }
 
   #[test]
@@ -732,9 +743,7 @@ mod tests {
     let mut client = TestClient::new(port, &server, &dispatch);
     client.request(5, METHOD_PING, Value::Map(Vec::new()));
     emulate_cpp_ping(&server, &dispatch);
-    let (error, result) = client.read_response(5);
-    assert!(error.is_nil());
-    assert!(result.is_nil());
+    assert!(client.read_ok(5).is_nil());
   }
 
   #[test]
@@ -753,15 +762,16 @@ mod tests {
     assert_eq!(method, "Project.get");
     assert_eq!(received_params, params);
     // ...and we reply asynchronously, just like the C++ integration does:
-    assert!(server.reply(
+    let result = server.reply(
       conn_id,
       msg_id,
-      None,
-      &Value::Map(vec![(Value::from("name"), Value::from("Test"))])
-    ));
-    let (error, result) = client.read_response(42);
-    assert!(error.is_nil());
-    assert_eq!(field(&result, "name"), Some(&Value::from("Test")));
+      &Value::Map(vec![(Value::from("name"), Value::from("Test"))]),
+    );
+    assert!(result);
+    assert_eq!(
+      field(&client.read_ok(42), "name"),
+      Some(&Value::from("Test"))
+    );
   }
 
   #[test]
@@ -788,10 +798,9 @@ mod tests {
     let (conn_id, msg_id, _, _) =
       dispatch.recv_timeout(Duration::from_secs(10)).unwrap();
     // The first reply is sent, a second one for the same msg_id is dropped:
-    assert!(server.reply(conn_id, msg_id, None, &Value::Nil));
-    assert!(!server.reply(conn_id, msg_id, None, &Value::Nil));
-    let (error, _) = client.read_response(1);
-    assert!(error.is_nil());
+    assert!(server.reply(conn_id, msg_id, &Value::Nil));
+    assert!(!server.reply(conn_id, msg_id, &Value::Nil));
+    assert!(client.read_ok(1).is_nil());
     // No second response arrives, i.e. the next message is the ping
     // response:
     client.request(2, METHOD_PING, Value::Map(Vec::new()));
@@ -804,16 +813,15 @@ mod tests {
     let (server, port, dispatch, _cancel) = spawn_server();
     let mut client = TestClient::new(port, &server, &dispatch);
     // A reply for a msg_id which was never dispatched:
-    assert!(!server.reply(u32::MAX, 123, None, &Value::Nil));
+    assert!(!server.reply(u32::MAX, 123, &Value::Nil));
     // A reply for a valid connection, but an unknown msg_id:
     client.request(1, "Project.list", Value::Map(Vec::new()));
     let (conn_id, msg_id, _, _) =
       dispatch.recv_timeout(Duration::from_secs(10)).unwrap();
-    assert!(!server.reply(conn_id, msg_id + 100, None, &Value::Nil));
+    assert!(!server.reply(conn_id, msg_id + 100, &Value::Nil));
     // The pending request is still pending, i.e. it can be replied:
-    assert!(server.reply(conn_id, msg_id, None, &Value::Nil));
-    let (error, _) = client.read_response(1);
-    assert!(error.is_nil());
+    assert!(server.reply(conn_id, msg_id, &Value::Nil));
+    assert!(client.read_ok(1).is_nil());
   }
 
   #[test]
@@ -827,7 +835,7 @@ mod tests {
                   // Give the server a moment to process the disconnect.
     thread::sleep(Duration::from_millis(100));
     // The reply is silently dropped instead of panicking:
-    assert!(!server.reply(conn_id, msg_id, None, &Value::Nil));
+    assert!(!server.reply(conn_id, msg_id, &Value::Nil));
   }
 
   #[test]
@@ -849,7 +857,7 @@ mod tests {
     assert_eq!(items[1], Value::from(1));
     assert_eq!(field(&items[2], "percent"), Some(&Value::from(50)));
     // After the response was sent, no further messages are accepted:
-    assert!(server.reply(conn_id, msg_id, None, &Value::Nil));
+    assert!(server.reply(conn_id, msg_id, &Value::Nil));
     assert!(!server.notify_conn(conn_id, msg_id, &progress));
     client.read_response(1);
   }
@@ -867,11 +875,10 @@ mod tests {
       cancel.recv_timeout(Duration::from_secs(10)).unwrap();
     assert_eq!((cancelled_conn, cancelled_msg_id), (conn_id, msg_id));
     // ...and we reply with a "cancelled" error, as the C++ side would:
-    assert!(server.reply(
+    assert!(server.reply_error(
       conn_id,
       msg_id,
-      Some(&RpcError::new(RpcErrorCode::Cancelled, "cancelled")),
-      &Value::Nil
+      &RpcError::new(RpcErrorCode::Cancelled, "cancelled")
     ));
     client.read_error(1, RpcErrorCode::Cancelled);
   }
@@ -904,12 +911,10 @@ mod tests {
     }
     // Reply in reverse order — responses may arrive in any order:
     for (conn_id, msg_id, _, _) in requests.iter().rev() {
-      assert!(server.reply(*conn_id, *msg_id, None, &Value::from(*msg_id)));
+      assert!(server.reply(*conn_id, *msg_id, &Value::from(*msg_id)));
     }
     for msg_id in (1..=3u32).rev() {
-      let (error, result) = client.read_response(msg_id);
-      assert!(error.is_nil());
-      assert_eq!(result, Value::from(msg_id));
+      assert_eq!(client.read_ok(msg_id), Value::from(msg_id));
     }
   }
 
@@ -926,9 +931,8 @@ mod tests {
     client.request(1, "Project.list", Value::Map(Vec::new()));
     client.read_error(1, RpcErrorCode::InvalidRequest);
     // The first request is still pending and can be replied:
-    assert!(server.reply(conn_id, msg_id, None, &Value::Nil));
-    let (error, _) = client.read_response(1);
-    assert!(error.is_nil());
+    assert!(server.reply(conn_id, msg_id, &Value::Nil));
+    assert!(client.read_ok(1).is_nil());
   }
 
   #[test]

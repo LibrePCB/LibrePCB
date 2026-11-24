@@ -736,22 +736,22 @@ bool ffi_rpc_server_notify(RpcServer * NONNULL s,
 /**
  * Send the response for a pending request (thread-safe, never blocks).
  *
- * Exactly one of result/error is sent, enforced by the server: A second
- * response for the same msg_id, or a response for an unknown or already
- * closed connection, is silently dropped.
+ * A second response for the same msg_id, or a response for an unknown or
+ * already closed connection, is silently dropped.
  *
- * - `ok == true`: `value` is the result.
- * - `ok == false`: `value` is an error map `{"code": <int>,
- *   "message": <string>, "data"?: <any>}`.
+ * - `status == 0`: `payload` is the result.
+ * - `status != 0`: `payload` is the error map for the error with the
+ *   given code, i.e. the (application-provided) `message` detail plus
+ *   possibly additional error properties.
  *
- * If `value` contains types outside the protocol's value domain (or is
+ * If `payload` contains types outside the protocol's value domain (or is
  * not a valid error object), an internal error is sent instead — the
  * caller does not need to care about failure cases.
  */
 void ffi_rpc_server_reply(RpcServer * NONNULL s,
                           uint32_t conn_id,
                           uint32_t msg_id,
-                          bool ok,
+                          uint32_t status,
                           const QVariant * NONNULL payload);
 
 /**

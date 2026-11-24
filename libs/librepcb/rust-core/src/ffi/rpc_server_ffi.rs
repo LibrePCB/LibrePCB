@@ -337,15 +337,15 @@ extern "C" fn ffi_rpc_server_notify(
 
 /// Send the response for a pending request (thread-safe, never blocks).
 ///
-/// Exactly one of result/error is sent, enforced by the server: A second
-/// response for the same msg_id, or a response for an unknown or already
-/// closed connection, is silently dropped.
+/// A second response for the same msg_id, or a response for an unknown or
+/// already closed connection, is silently dropped.
 ///
-/// - `ok == true`: `value` is the result.
-/// - `ok == false`: `value` is an error map `{"code": <int>,
-///   "message": <string>, "data"?: <any>}`.
+/// - `status == 0`: `payload` is the result.
+/// - `status != 0`: `payload` is the error map for the error with the
+///   given code, i.e. the (application-provided) `message` detail plus
+///   possibly additional error properties.
 ///
-/// If `value` contains types outside the protocol's value domain (or is
+/// If `payload` contains types outside the protocol's value domain (or is
 /// not a valid error object), an internal error is sent instead — the
 /// caller does not need to care about failure cases.
 #[no_mangle]
@@ -353,71 +353,73 @@ extern "C" fn ffi_rpc_server_reply(
   s: &mut RpcServer,
   conn_id: u32,
   msg_id: u32,
-  ok: bool,
+  status: u32,
   payload: &QVariant,
 ) {
   let payload = match qvariant_to_msgpack(payload) {
     Ok(payload) => payload,
     Err(()) => {
       eprintln!("librepcb-rust: A command returned an unsupported value type.");
-      s.reply(
-        conn_id,
-        msg_id,
-        Some(&RpcError::new(
-          RpcErrorCode::InternalError,
-          "The command returned an unsupported value type",
-        )),
-        &Value::Nil,
+      let error = RpcError::new(
+        RpcErrorCode::InternalError,
+        "The command returned an unsupported value type",
       );
+      s.reply_error(conn_id, msg_id, &error);
       return;
     }
   };
-  if ok {
-    s.reply(conn_id, msg_id, None, &payload);
-  } else {
-    // Compose the error message: The map from C++ may carry additional
-    // error properties next to "code" and "message" (see the error types
-    // in the API specification) — they are passed through unchanged. The
-    // "message" entry contains the optional application-provided detail
-    // and is replaced by the canonical message of the error code (see the
-    // API specification), followed by the detail (if non-empty). Only if
-    // the map is not even a valid error object (a known int "code" and a
-    // string "message"), fall back to a generic internal error.
-    let error = map_field(&payload, "code")
-      .and_then(Value::as_i64)
-      .and_then(|code| RpcErrorCode::try_from(code as i32).ok())
-      .zip(map_field(&payload, "message").and_then(Value::as_str));
-    let Some((code, detail)) = error else {
-      eprintln!("librepcb-rust: A command returned an invalid error object.");
-      s.reply(
-        conn_id,
-        msg_id,
-        Some(&RpcError::new(
-          RpcErrorCode::InternalError,
-          "The command returned an invalid error object",
-        )),
-        &Value::Nil,
-      );
-      return;
-    };
-    let message = if detail.is_empty() {
-      code.message().to_string()
-    } else {
-      format!("{}: {detail}", code.message())
-    };
-    let pairs = match &payload {
-      Value::Map(pairs) => pairs
-        .iter()
-        .map(|(key, value)| {
-          if key.as_str() == Some("message") {
-            (key.clone(), Value::from(message.as_str()))
-          } else {
-            (key.clone(), value.clone())
-          }
-        })
-        .collect(),
-      _ => unreachable!("validated above"),
-    };
-    s.reply_error(conn_id, msg_id, &Value::Map(pairs));
+  if status == 0 {
+    s.reply(conn_id, msg_id, &payload);
+    return;
   }
+  // Compose the error response: The error code is passed as the status,
+  // the map from C++ carries the application-provided detail message,
+  // plus possibly additional error properties (see the error types in
+  // the API specification), which are passed through unchanged. Only if
+  // the status is not a known error code (or the map is not even a valid
+  // error object, i.e. a map with a "message"), fall back to a generic
+  // internal error.
+  let code = match RpcErrorCode::try_from(status as i32) {
+    Ok(code) => code,
+    Err(()) => {
+      eprintln!("librepcb-rust: A command returned an unknown error code.");
+      let error = RpcError::new(
+        RpcErrorCode::InternalError,
+        "The command returned an unknown error code",
+      );
+      s.reply_error(conn_id, msg_id, &error);
+      return;
+    }
+  };
+  let detail = map_field(&payload, "message").and_then(Value::as_str);
+  let Some(detail) = detail else {
+    eprintln!("librepcb-rust: A command returned an invalid error object.");
+    let error = RpcError::new(
+      RpcErrorCode::InternalError,
+      "The command returned an invalid error object",
+    );
+    s.reply_error(conn_id, msg_id, &error);
+    return;
+  };
+  let message = if detail.is_empty() {
+    code.message().to_string()
+  } else {
+    format!("{}: {detail}", code.message())
+  };
+  let pairs = match &payload {
+    Value::Map(pairs) => pairs
+      .iter()
+      .filter_map(|(key, value)| {
+        if key.as_str() == Some("code") {
+          None // Sent as the response status instead.
+        } else if key.as_str() == Some("message") {
+          Some((key.clone(), Value::from(message.as_str())))
+        } else {
+          Some((key.clone(), value.clone()))
+        }
+      })
+      .collect(),
+    _ => unreachable!("validated above"),
+  };
+  s.reply_error_raw(conn_id, msg_id, status as i64, &Value::Map(pairs));
 }

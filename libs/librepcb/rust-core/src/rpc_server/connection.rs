@@ -185,8 +185,8 @@ fn process_message(
         let error = RpcError::canonical(RpcErrorCode::Unauthenticated);
         return Some(build_response(
           msgid,
-          Some(&error.to_value()),
-          &Value::Nil,
+          RpcErrorCode::Unauthenticated as i64,
+          &error.to_payload(),
         ));
       }
       dispatch_request(
@@ -222,8 +222,8 @@ fn process_message(
       let error = RpcError::canonical(RpcErrorCode::InvalidRequest);
       Some(build_response(
         msgid.unwrap_or(0),
-        Some(&error.to_value()),
-        &Value::Nil,
+        RpcErrorCode::InvalidRequest as i64,
+        &error.to_payload(),
       ))
     }
   }
@@ -250,7 +250,11 @@ fn dispatch_request(
       RpcErrorCode::InvalidRequest,
       "The msgid is already in use by a pending request",
     );
-    return Some(build_response(msgid, Some(&error.to_value()), &Value::Nil));
+    return Some(build_response(
+      msgid,
+      error.code() as i64,
+      &error.to_payload(),
+    ));
   }
   // The reply to an `initialize` request authenticates the connection
   // (see the reply path in the server), so the msgid must be known there.
@@ -262,7 +266,11 @@ fn dispatch_request(
     Err(error) => {
       lock(pending).remove(&msgid);
       lock(pending_initializes).remove(&msgid);
-      Some(build_response(msgid, Some(&error.to_value()), &Value::Nil))
+      Some(build_response(
+        msgid,
+        error.code() as i64,
+        &error.to_payload(),
+      ))
     }
   }
 }

@@ -16,9 +16,9 @@ class ProjectEditorPage:
             return
         self.app.call("ProjectEditor.open", {"path": path}, self._on_opened)
 
-    def _on_opened(self, error, result):
+    def _on_opened(self, status, payload):
         # Opening changes the project list, so refresh it automatically.
-        if error is None:
+        if status == 0:
             self.list_clicked()
 
     def list_clicked(self):
@@ -38,19 +38,19 @@ class ProjectEditorPage:
         self.app.call("ProjectEditor.close", {"obj": self._handles[index]},
                       self._on_closed)
 
-    def _on_closed(self, error, result):
+    def _on_closed(self, status, payload):
         # Closing changes the project list, so refresh it automatically.
-        if error is None:
+        if status == 0:
             self.list_clicked()
 
     def _select(self, index):
         # Make the handle of the last used row available to other pages.
         self.app._pages["UndoStack"].select(index)
 
-    def _on_list(self, error, result):
-        if error is not None:
+    def _on_list(self, status, payload):
+        if status != 0:
             return
-        projects = result.get("projects", [])
+        projects = payload.get("projects", [])
         self._handles = [project["obj"] for project in projects]
         self.app.projects = slint.ListModel([
             {
@@ -62,6 +62,6 @@ class ProjectEditorPage:
         ])
         self.app._pages["UndoStack"].set_projects(projects)
 
-    def _on_details(self, error, result):
-        if error is None:
-            self.app.project_details = fmt_details(result)
+    def _on_details(self, status, payload):
+        if status == 0:
+            self.app.project_details = fmt_details(payload)

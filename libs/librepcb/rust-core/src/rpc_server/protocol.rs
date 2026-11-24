@@ -83,12 +83,12 @@ impl RpcError {
     &self.message
   }
 
-  /// Serialize to a msgpack value (the `error` element of a response).
-  pub fn to_value(&self) -> Value {
-    let mut pairs = vec![
-      (Value::from("code"), Value::from(self.code as i32)),
-      (Value::from("message"), Value::from(self.message.as_str())),
-    ];
+  /// Serialize to the response payload of an error, i.e. a map with the
+  /// message (plus optional data). The error code is *not* part of the
+  /// payload — it is sent as the status of the response.
+  pub fn to_payload(&self) -> Value {
+    let mut pairs =
+      vec![(Value::from("message"), Value::from(self.message.as_str()))];
     if let Some(data) = &self.data {
       pairs.push((Value::from("data"), data.clone()));
     }
@@ -195,33 +195,18 @@ fn normalize_params(value: Option<&Value>) -> Option<Value> {
   }
 }
 
-/// Serialize a response: `[1, msgid, error, result]`.
+/// Serialize a response: `[1, msgid, status, payload]`.
 ///
-/// Exactly one of `error`/`result` is sent: With an error, the result is
-/// nil, and vice versa, as the protocol requires. The error is an
-/// *arbitrary* msgpack value (as the protocol allows) — the Rust side
-/// builds it with [RpcError::to_value], the FFI passes the error map
-/// from C++ through unchanged (it may carry additional error properties
-/// next to "code" and "message").
-pub fn build_response(
-  msgid: u32,
-  error: Option<&Value>,
-  result: &Value,
-) -> Value {
-  match error {
-    Some(error) => Value::Array(vec![
-      Value::from(MESSAGE_TYPE_RESPONSE),
-      Value::from(msgid),
-      error.clone(),
-      Value::Nil,
-    ]),
-    None => Value::Array(vec![
-      Value::from(MESSAGE_TYPE_RESPONSE),
-      Value::from(msgid),
-      Value::Nil,
-      result.clone(),
-    ]),
-  }
+/// The status is `0` on success (the payload carries the result, which
+/// may be nil), or the error code on failure (the payload is a map with
+/// the error message, see [RpcError::to_payload]).
+pub fn build_response(msgid: u32, status: i64, payload: &Value) -> Value {
+  Value::Array(vec![
+    Value::from(MESSAGE_TYPE_RESPONSE),
+    Value::from(msgid),
+    Value::from(status),
+    payload.clone(),
+  ])
 }
 
 /// Serialize a request-scoped message (e.g. progress, or streamed partial
@@ -372,46 +357,42 @@ mod tests {
   }
 
   #[test]
-  fn test_error_to_value() {
+  fn test_error_to_payload() {
     let error = RpcError::new(RpcErrorCode::CommandFailed, "boom");
-    let value = error.to_value();
-    assert_eq!(
-      field(&value, "code"),
-      Some(&Value::from(RpcErrorCode::CommandFailed as i64))
-    );
+    let value = error.to_payload();
+    assert_eq!(field(&value, "code"), None); // Sent as the status instead.
     assert_eq!(
       field(&value, "message"),
       Some(&Value::from("Command failed: boom"))
     );
     assert_eq!(field(&value, "data"), None);
     let error = error.with_data(Value::from(7));
-    let value = error.to_value();
+    let value = error.to_payload();
     assert_eq!(field(&value, "data"), Some(&Value::from(7)));
   }
 
   #[test]
   fn test_build_response_success() {
-    let response = build_response(5, None, &Value::from(true));
+    let response = build_response(5, 0, &Value::from(true));
     let items = response.as_array().unwrap();
     assert_eq!(items[0], Value::from(1));
     assert_eq!(items[1], Value::from(5));
-    assert_eq!(items[2], Value::Nil); // No error.
-    assert_eq!(items[3], Value::from(true)); // The result.
+    assert_eq!(items[2], Value::from(0)); // Status: success.
+    assert_eq!(items[3], Value::from(true)); // The payload.
   }
 
   #[test]
   fn test_build_response_error() {
     let error = RpcError::new(RpcErrorCode::InvalidHandle, "nope");
-    let response =
-      build_response(5, Some(&error.to_value()), &Value::from(true));
+    let response = build_response(5, error.code() as i64, &error.to_payload());
     let items = response.as_array().unwrap();
     assert_eq!(items[0], Value::from(1));
     assert_eq!(items[1], Value::from(5));
+    assert_eq!(items[2], Value::from(RpcErrorCode::InvalidHandle as i64)); // Status: the error code.
     assert_eq!(
-      field(&items[2], "code"),
-      Some(&Value::from(RpcErrorCode::InvalidHandle as i64))
-    );
-    assert_eq!(items[3], Value::Nil); // Result is nil on error.
+      field(&items[3], "message"),
+      Some(&Value::from("Invalid object handle: nope"))
+    ); // The payload.
   }
 
   #[test]

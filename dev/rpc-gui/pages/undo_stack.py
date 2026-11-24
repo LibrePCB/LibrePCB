@@ -52,9 +52,9 @@ class UndoStackPage:
             return
         self.app.call(method, {"obj": self._handle}, self._on_details)
 
-    def _on_details(self, error, result):
-        if error is None:
-            self.app.undo_details = fmt_details(result)
+    def _on_details(self, status, payload):
+        if status == 0:
+            self.app.undo_details = fmt_details(payload)
 
     def _update_state(self):
         index = -1

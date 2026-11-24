@@ -19,7 +19,14 @@ MessagePack extension types: Tagged raw bytes which are opaque to the transport 
 
 # Error Types {#doc_rpc_api_errors}
 
-The `error` element of a response is a map with the keys `code` and `message` (and possibly additional properties, listed below). The message is the canonical message of the error code, optionally followed by an application-specific detail (separated by a colon). The codes are grouped by category: Transport errors are never sent (the connection is closed instead), protocol errors keep the connection open, and command errors are specific to the executed command.
+A failed command responds with the error code as the response status; the
+response payload is a map with the keys `message` (and possibly additional
+properties, listed below). The message is the canonical
+message of the error code, optionally followed by an application-specific
+detail (separated by a colon). The codes are grouped by category:
+Transport errors are never sent (the connection is closed instead),
+protocol errors keep the connection open, and command errors are specific
+to the executed command.
 
 | Code | Type | Message | Description |
 |------|------|---------|-------------|

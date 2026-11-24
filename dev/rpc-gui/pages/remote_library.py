@@ -39,15 +39,15 @@ class RemoteLibraryPage:
             return
         self.app.call(method, {"libraries": sorted(self._checked)})
 
-    def _on_list(self, error, result):
-        if error is not None:
+    def _on_list(self, status, payload):
+        if status != 0:
             return
-        self._libraries = result.get("libraries", [])
+        self._libraries = payload.get("libraries", [])
         self._update_model()
 
-    def _on_details(self, error, result):
-        if error is None:
-            self.app.library_details = fmt_details(result)
+    def _on_details(self, status, payload):
+        if status == 0:
+            self.app.library_details = fmt_details(payload)
 
     def _update_model(self):
         self.app.libraries = slint.ListModel([
