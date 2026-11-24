@@ -27,7 +27,11 @@
 #include "rpcerrors.h"
 #include "rpctypes.h"
 
+#include <librepcb/core/attribute/attribute.h>
+#include <librepcb/core/attribute/attributetype.h>
 #include <librepcb/core/fileio/filepath.h>
+#include <librepcb/core/types/elementname.h>
+#include <librepcb/core/types/fileproofname.h>
 #include <librepcb/core/types/uuid.h>
 #include <librepcb/rust-core/rpcext.h>
 #include <type_traits>
@@ -163,7 +167,7 @@ struct RpcArgTraits<QVariantMap> {
 /// a 36-character string is *not* accepted (see the API specification).
 template <>
 struct RpcArgTraits<Uuid> {
-  static constexpr const char* NAME = "uuid";
+  static constexpr const char* NAME = "UUID";
   static std::optional<Uuid> tryFromVariant(const QVariant& v) noexcept {
     if (v.userType() == QMetaType::fromType<rs::MsgPackExt>().id()) {
       const auto ext = v.value<rs::MsgPackExt>();
@@ -174,6 +178,38 @@ struct RpcArgTraits<Uuid> {
       }
     }
     return std::nullopt;
+  }
+};
+
+template <>
+struct RpcArgTraits<ElementName> {
+  static constexpr const char* NAME = "ElementName";
+  static std::optional<ElementName> tryFromVariant(const QVariant& v) noexcept {
+    return parseElementName(v.toString());
+  }
+};
+
+template <>
+struct RpcArgTraits<FileProofName> {
+  static constexpr const char* NAME = "FileProofName";
+  static std::optional<FileProofName> tryFromVariant(
+      const QVariant& v) noexcept {
+    return parseFileProofName(v.toString());
+  }
+};
+
+template <>
+struct RpcArgTraits<std::shared_ptr<Attribute>> {
+  static constexpr const char* NAME = "AttributeKey";
+  static std::optional<std::shared_ptr<Attribute>> tryFromVariant(
+      const QVariant& v) noexcept {
+    // Very ugly!
+    const auto map = v.toMap();
+    const auto key = AttributeKey(map.value("name").toString());
+    const auto& type = AttributeType::fromString(map.value("type").toString());
+    const auto value = map.value("value").toString();
+    const auto unit = type.getUnitFromString(map.value("unit").toString());
+    return std::make_shared<Attribute>(key, type, value, unit);
   }
 };
 
@@ -220,6 +256,24 @@ struct RpcArgTraits<QSet<T>> {
       if (set.count() == list->count()) {
         return set;
       }
+    }
+    return std::nullopt;
+  }
+};
+
+template <>
+struct RpcArgTraits<AttributeList> {
+  static constexpr const char* NAME = "AttributeList";
+  static std::optional<AttributeList> tryFromVariant(
+      const QVariant& v) noexcept {
+    if (auto list =
+            RpcArgTraits<QList<std::shared_ptr<Attribute>>>::tryFromVariant(
+                v)) {
+      AttributeList l;
+      for (auto item : *list) {
+        l.append(item);
+      }
+      return l;
     }
     return std::nullopt;
   }

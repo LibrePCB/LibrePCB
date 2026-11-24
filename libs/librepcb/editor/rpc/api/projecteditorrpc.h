@@ -82,6 +82,12 @@ public:
                   RpcRequest& request);
 
   /**
+   * @brief Set project metadata and settings.
+   */
+  static void set(GuiApplication& app, RpcObjectRegistry& registry,
+                  RpcRequest& request);
+
+  /**
    * @brief Save project to disk.
    */
   static void save(GuiApplication& app, RpcObjectRegistry& registry,

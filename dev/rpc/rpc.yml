@@ -156,6 +156,16 @@ errors:
 # ---------------------------------------------------------------------------
 
 enums:
+  - name: AttributeType
+    values:
+      - name: string
+      - name: resistance
+      - name: capacitance
+      - name: inductance
+      - name: voltage
+      - name: current
+      - name: power
+      - name: frequency
   - name: BackupRestoreMode
     values:
       - name: abort
@@ -190,6 +200,24 @@ ext_types:
 # ---------------------------------------------------------------------------
 
 structs:
+  - name: Attribute
+    description: An attribute.
+    fields:
+      - name: name
+        type: string
+        description: Attribute name (key).
+      - name: type
+        type: AttributeType
+        description: Type of the attribute.
+      - name: value
+        type: string
+        description: >-
+          Value of the attribute. If type is not string, the value has to be
+          a valid number, otherwise it will be rejected.
+      - name: unit
+        type: AttributeUnit
+        description: TODO
+
   - name: ProjectEditorSummary
     description: A summary of an open project.
     fields:
@@ -415,6 +443,32 @@ classes:
         params: []
         result: ProjectEditorDetails
 
+      - name: set
+        description: Set project metadata and settings.
+        params:
+          - name: name
+            type: string
+            description: Project name.
+          - name: author
+            type: string
+            description: Project author.
+          - name: version
+            type: string
+            description: Project version.
+          - name: attributes
+            type: array
+            items: Attribute
+            description: Project attributes.
+          - name: locale_order
+            type: array
+            items: string
+            description: Locale order.
+          - name: norm_order
+            type: array
+            items: string
+            description: Norm order.
+        result: ProjectEditorDetails
+
       - name: save
         description: Save project to disk.
         params: []
@@ -426,6 +480,28 @@ classes:
           project, they will be discarded. Call `save` first, if desired.
         params: []
         result: []
+
+  - name: ElectricalRuleCheck
+    description: The ERC of a project.
+    since: "2.2.0"
+    methods:
+      - name: run
+        description: Runs the ERC and returns all emitted messages.
+        params: []
+        result:
+          - name: messages
+            type: array
+            items: ElectricalRuleCheckMessage
+
+      - name: set
+        description: Set properties on multiple ERC messages (bulk setter).
+        params:
+          - name: objs
+            type: string
+            description: Message object handles.
+          - name: approved
+            type: bool
+            description: The approved state.
 
   - name: UndoStack
     description: >-

@@ -23,7 +23,9 @@
 #include "projecteditorrpc.h"
 
 #include "../../guiapplication.h"
+#include "../../project/cmd/cmdprojectedit.h"
 #include "../../project/projecteditor.h"
+#include "../../undostack.h"
 #include "../rpcobjectregistry.h"
 #include "../rpcrequest.h"
 #include "rpcerrors.h"
@@ -153,6 +155,33 @@ void ProjectEditorRpc::get(GuiApplication& app, RpcObjectRegistry& registry,
                            RpcRequest& request) {
   Q_UNUSED(app);
   auto& editor = registry.getAs<ProjectEditor>(request.getArg("obj"));
+  request.send(details(editor, registry));
+}
+
+void ProjectEditorRpc::set(GuiApplication& app, RpcObjectRegistry& registry,
+                           RpcRequest& request) {
+  Q_UNUSED(app);
+  auto& editor = registry.getAs<ProjectEditor>(request.getArg("obj"));
+  auto cmd = std::make_unique<CmdProjectEdit>(editor.getProject());
+  if (auto v = getOptionalArg<ElementName>(request, "name")) {
+    cmd->setName(*v);
+  }
+  if (auto v = getOptionalArg<QString>(request, "author")) {
+    cmd->setAuthor(*v);
+  }
+  if (auto v = getOptionalArg<FileProofName>(request, "version")) {
+    cmd->setVersion(*v);
+  }
+  if (auto v = getOptionalArg<AttributeList>(request, "attributes")) {
+    cmd->setAttributes(*v);
+  }
+  if (auto v = getOptionalArg<QStringList>(request, "locale_order")) {
+    cmd->setLocaleOrder(*v);  // TODO: Some more validation?
+  }
+  if (auto v = getOptionalArg<QStringList>(request, "norm_order")) {
+    cmd->setNormOrder(*v);  // TODO: Some more validation?
+  }
+  editor.getUndoStack().execCmd(cmd.release());
   request.send(details(editor, registry));
 }
 

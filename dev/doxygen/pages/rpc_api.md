@@ -258,6 +258,27 @@ Get details about an open project.
 
 ---
 
+### ProjectEditor/set {#doc_rpc_api_method_ProjectEditor_set}
+
+Set project metadata and settings.
+
+**Params:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `name` | `string` | Project name. |
+| `author` | `string` | Project author. |
+| `version` | `string` | Project version. |
+| `attributes` | `array` of `Attribute` | Project attributes. |
+| `locale_order` | `array` of `string` | Locale order. |
+| `norm_order` | `array` of `string` | Norm order. |
+
+**Result:** None
+
+**Since:** 2.2.0
+
+---
+
 ### ProjectEditor/save {#doc_rpc_api_method_ProjectEditor_save}
 
 Save project to disk.
