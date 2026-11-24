@@ -2,11 +2,10 @@ import { Button, CheckBox, ListView, TextEdit } from "std-widgets.slint";
 
 export struct LibraryRowData {
     checked: bool,
-    uuid: string,
+    id: string,
     name: string,
     installed: string,
     online: string,
-    outdated: bool,
 }
 
 export component RemoteLibraryPage {
@@ -57,7 +56,7 @@ export component RemoteLibraryPage {
                     }
 
                     Text {
-                        text: library.uuid;
+                        text: library.id;
                         font-family: "DejaVu Sans Mono";
                         font-size: 10px;
                         color: #808080;
@@ -67,13 +66,6 @@ export component RemoteLibraryPage {
 
                 Text {
                     text: library.installed != "" ? library.installed : "not installed";
-                    font-size: 10px;
-                    vertical-alignment: center;
-                }
-
-                Text {
-                    text: library.outdated ? "outdated → " + library.online : "";
-                    color: #d08000;
                     font-size: 10px;
                     vertical-alignment: center;
                 }

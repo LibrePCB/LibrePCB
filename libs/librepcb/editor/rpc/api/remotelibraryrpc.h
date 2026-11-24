@@ -68,7 +68,7 @@ public:
    *        this method streams the libraries in notifications.
    */
   static void list(GuiApplication& app, RpcObjectRegistry& registry,
-                   RpcRequest& request);
+                      RpcRequest& request);
 
   /**
    * @brief Install/update or uninstall remote libraries in one batch. Note
@@ -78,13 +78,13 @@ public:
    *        wait for the library changes to appear in the database!
    */
   static void apply(GuiApplication& app, RpcObjectRegistry& registry,
-                    RpcRequest& request);
+                      RpcRequest& request);
 
   /**
    * @brief Get details about a remote library.
    */
   static void get(GuiApplication& app, RpcObjectRegistry& registry,
-                  RpcRequest& request);
+                      RpcRequest& request);
 };
 
 /*******************************************************************************

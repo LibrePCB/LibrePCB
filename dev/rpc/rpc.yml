@@ -280,10 +280,10 @@ structs:
         type: string
         description: The remote library description.
       - name: installed_version
-        type: string
+        type: string?
         description: The installed version, if the library is installed.
       - name: online_version
-        type: string
+        type: string?
         description: The latest available version, if known.
 
   - name: UndoStackDetails

@@ -16,9 +16,8 @@ PORT = 19536
 
 
 def fmt_value(value):
-    """Format a msgpack value into one compact line (for the log)."""
-    text = _fmt(value)
-    return text if len(text) <= 160 else text[:157] + "…"
+    """Format a msgpack value into one line (for the log)."""
+    return _fmt(value)
 
 
 def fmt_details(value):
@@ -36,8 +35,10 @@ def _fmt(value):
         return "[" + ", ".join(_fmt(item) for item in value) + "]"
     if value is None:
         return "nil"
-    if isinstance(value, str) and len(value) > 32:
-        return value[:29] + "…"
+    if isinstance(value, str):
+        # Strings are always printed with single quotes, so they can be
+        # distinguished from non-string objects (e.g. UUID ext values).
+        return "'" + value + "'"
     return str(value)
 
 
@@ -61,7 +62,7 @@ def _fmt_ext(ext):
     # The UUID ext type (see the API specification), rendered as string.
     if ext.type == 2 and len(ext.data) == 16:
         hexstr = ext.data.hex()
-        return "'%s-%s-%s-%s-%s'" % (
+        return "%s-%s-%s-%s-%s" % (
             hexstr[0:8], hexstr[8:12], hexstr[12:16], hexstr[16:20],
             hexstr[20:32],
         )

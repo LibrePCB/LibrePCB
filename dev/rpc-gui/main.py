@@ -76,14 +76,14 @@ class Gui(ns.AppWindow):
             self.connected = False
             self.authenticated = False
             self.pending = False
-            self._log("Disconnected.")
+            self._log("  Disconnected.")
             return
         try:
             self.client = RpcClient()
             self.connected = True
-            self._log("Connected. Now initialize to authenticate.")
+            self._log("  Connected. Now initialize to authenticate.")
         except OSError as e:
-            self._log(f"Connection failed: {e}")
+            self._log(f"  Connection failed: {e}")
 
     @slint.callback
     def init_clicked(self):
@@ -92,21 +92,19 @@ class Gui(ns.AppWindow):
                 self.client.cancel(self.client.pending_msgid)
             except OSError:
                 pass
+            self._log(f"⊗ cancel: {self.client.pending_msgid}")
             self.client.pending_msgid = None
             self.pending = False
-            self._log("Cancelled.")
             return
         params = {"name": "librepcb-rpc-gui"}
         token = self.token.strip()
         if token:
             params["token"] = token
         try:
-            self.client.pending_msgid = self.client.call(
-                "initialize", params
-            )
+            self.client.pending_msgid = self.call("initialize", params)
             self.pending = True
         except OSError as e:
-            self._log(f"Send failed: {e}")
+            self._log(f"  Send failed: {e}")
 
     @slint.callback
     def select_class(self, index):
@@ -186,15 +184,16 @@ class Gui(ns.AppWindow):
 
     def call(self, method, params, handler=None):
         """Send a request (only if connected). The response is routed to
-        the handler and logged either way."""
+        the handler and logged either way. Returns the msgid."""
         if not self.client:
-            return
+            return None
         try:
-            self.client.call(method, params, handler)
+            msgid = self.client.call(method, params, handler)
         except OSError as e:
-            self._log(f"Send failed: {e}")
-        else:
-            self._log(f"→ {method}")
+            self._log(f"  Send failed: {e}")
+            return None
+        self._log(f"▶ {method}: {fmt_value(params)}")
+        return msgid
 
     def poll(self):
         if not self.client:
@@ -209,14 +208,26 @@ class Gui(ns.AppWindow):
                 self.connected = False
                 self.authenticated = False
                 self.pending = False
-                self._log("Connection closed.")
+                self._log("  Connection closed.")
                 return
             if isinstance(msg, list) and len(msg) == 3 and msg[0] == 2:
-                # A request-scoped message (the payload carries the percent).
+                # A notification for a pending request (e.g. progress).
+                method = self.client.handlers.get(msg[1], (None,))[0]
+                if method:
+                    self._log(f"☼ {method}: {fmt_value(msg[2])}")
+                else:
+                    self._log(f"☼ {fmt_value(msg[2])}")
                 self.progress = msg[2].get("progress", 0)
                 continue
             if isinstance(msg, list) and len(msg) == 4 and msg[0] == 1:
                 self._handle_response(received_at, msg[1], msg[2], msg[3])
+            elif isinstance(msg, list) and len(msg) == 2 and msg[0] == 3:
+                # A cancel for one of our requests (sent by the callee).
+                self._log(f"⊗ cancel: {msg[1]}")
+            else:
+                # Any other message (e.g. a method call initiated by the
+                # application, which the GUI does not support yet).
+                self._log(f"? unhandled: {fmt_value(msg)}")
 
     def _handle_response(self, received_at, msgid, status, payload):
         method, handler, sent_at = self.client.handlers.pop(
@@ -231,15 +242,15 @@ class Gui(ns.AppWindow):
                 self.token = str(payload["token"])
         duration = f" ({int((received_at - sent_at) * 1000)} ms)"
         if status == 0:
-            self._log(f"← {method}: {fmt_value(payload)}{duration}")
+            self._log(f"✔ {method}: {fmt_value(payload)}{duration}")
         else:
             message = payload.get("message", "") if isinstance(payload, dict) else ""
-            self._log(f"← ⚠ {method}: {status} {message}{duration}")
+            self._log(f"✘ {method}: {status} {message}{duration}")
         if handler:
             handler(status, payload)
 
     def _log(self, text):
-        line = f"{time.strftime('%H:%M:%S')}  {text}"
+        line = f"[{time.strftime('%H:%M:%S')}] {text}"
         self._log_lines.append(line)
         self._log_lines = self._log_lines[-200:]
         self.log = "\n".join(self._log_lines)

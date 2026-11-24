@@ -84,9 +84,9 @@ struct RpcEnumTraits<BackupRestoreMode> {
   /// The map from enum values to wire strings.
   static const QHash<BackupRestoreMode, QString>& mapToString() noexcept {
     static const QHash<BackupRestoreMode, QString> map = {
-        {BackupRestoreMode::Abort, "abort"},
-        {BackupRestoreMode::Discard, "discard"},
-        {BackupRestoreMode::Restore, "restore"},
+        { BackupRestoreMode::Abort, "abort"},
+        { BackupRestoreMode::Discard, "discard"},
+        { BackupRestoreMode::Restore, "restore"},
     };
     return map;
   }

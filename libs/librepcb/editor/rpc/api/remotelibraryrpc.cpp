@@ -67,13 +67,17 @@ static QSet<Uuid> getLibraryUuids(const LibrariesModel& model) {
 }
 
 static QVariantMap summary(const ui::LibraryInfoData& obj) {
+  auto optionalString = [](const slint::SharedString& s){
+    return s.empty() ? QVariant() : QVariant::fromValue(s2q(s));
+  };
+
   QVariantMap result;
   result.insert("uuid", toVariant(Uuid::fromString(s2q(obj.uuid))));
   result.insert("name", s2q(obj.name));
   result.insert("description", s2q(obj.description));
   result.insert("path", toVariant(FilePath(s2q(obj.path))));
-  result.insert("installed_version", s2q(obj.installed_version));
-  result.insert("online_version", s2q(obj.online_version));
+  result.insert("installed_version", optionalString(obj.installed_version));
+  result.insert("online_version", optionalString(obj.online_version));
   return result;
 }
 

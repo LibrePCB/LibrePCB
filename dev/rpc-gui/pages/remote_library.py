@@ -64,11 +64,16 @@ class RemoteLibraryPage:
         self.app.libraries = slint.ListModel([
             {
                 "checked": library["uuid"] in self._checked,
-                "uuid": fmt_uuid(library["uuid"]),
+                "id": self._display_id(library),
                 "name": library.get("name", ""),
-                "installed": library.get("installed_version", ""),
-                "online": library.get("online_version", ""),
-                "outdated": library.get("outdated", False),
+                "installed": library.get("installed_version") or "",
+                "online": library.get("online_version") or "",
             }
             for library in self._libraries
         ])
+
+    def _display_id(self, library):
+        """The identifier shown in the list: The path if the library has
+        one, otherwise its UUID."""
+        path = library.get("path")
+        return path if path else fmt_uuid(library["uuid"])

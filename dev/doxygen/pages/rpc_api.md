@@ -121,9 +121,8 @@ A summary of a remote library.
 | `uuid` | [`uuid`](@ref doc_rpc_api_ext_types) | The remote library UUID. |
 | `name` | `string` | The remote library name. |
 | `description` | `string` | The remote library description. |
-| `installed_version` | `string` | The installed version, if the library is installed. |
-| `online_version` | `string` | The latest available version, if known. |
-| `outdated` | `bool` | Whether the installed version is outdated. |
+| `installed_version` | `string?` | The installed version, if the library is installed. |
+| `online_version` | `string?` | The latest available version, if known. |
 
 ---
 
