@@ -13,7 +13,7 @@ from datetime import timedelta
 import slint
 
 import api
-from client import RpcClient, fmt_value
+from client import RpcClient, fmt_value, fmt_uuid
 from pages.protocol import ProtocolPage
 from pages.project_editor import ProjectEditorPage
 from pages.undo_stack import UndoStackPage

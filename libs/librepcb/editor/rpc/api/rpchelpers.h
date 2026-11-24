@@ -24,6 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include "../rpcrequest.h"
+#include "rpcerrors.h"
 #include "rpctypes.h"
 
 #include <librepcb/core/types/uuid.h>
@@ -41,23 +42,6 @@
 namespace librepcb {
 namespace editor {
 namespace rpc {
-
-/*******************************************************************************
- *  Local Functions (error messages, defined in rpchelpers.cpp)
- ******************************************************************************/
-
-/// Throw an InvalidArgs error for a missing mandatory argument.
-[[noreturn]] void throwMissingArg(const QString& argName, const char* typeName);
-
-/// Throw an InvalidArgs error for an argument with an invalid value.
-[[noreturn]] void throwInvalidArg(const QString& argName, const QVariant& value,
-                                  const char* typeName);
-
-/// Throw an InvalidArgs error for an enum argument with an unknown value.
-[[noreturn]] void throwInvalidEnumArg(const QString& argName,
-                                      const QString& value,
-                                      const char* enumName,
-                                      const QString& values);
 
 /*******************************************************************************
  *  RPC Helpers
@@ -221,6 +205,21 @@ struct RpcArgTraits<QList<T>> {
   }
 };
 
+/// A set of any supported type.
+template <typename T>
+struct RpcArgTraits<QSet<T>> {
+  static constexpr const char* NAME = "array";
+  static std::optional<QSet<T>> tryFromVariant(const QVariant& v) noexcept {
+    if (auto list = RpcArgTraits<QList<T>>::tryFromVariant(v)) {
+      const QSet<T> set(list->begin(), list->end());
+      if (set.count() == list->count()) {
+        return set;
+      }
+    }
+    return std::nullopt;
+  }
+};
+
 /*******************************************************************************
  *  Typed Argument Reading
  ******************************************************************************/
@@ -240,10 +239,15 @@ std::optional<T> getOptionalArg(const RpcRequest& request,
     return *converted;
   }
   if constexpr (std::is_enum_v<T>) {
-    throwInvalidEnumArg(argName, it->toString(), RpcEnumTraits<T>::NAME,
-                        RpcEnumTraits<T>::mapFromString().keys().join(", "));
+    throw RpcInvalidArgs(
+        QString("Unknown value '%1' for argument '%2' of enum %3. "
+                "Supported values are [%4].")
+            .arg(it->toString(), argName, RpcEnumTraits<T>::NAME,
+                 RpcEnumTraits<T>::mapFromString().keys().join(", ")));
   } else {
-    throwInvalidArg(argName, *it, RpcArgTraits<T>::NAME);
+    throw RpcInvalidArgs(
+        QString("Invalid value '%1' for argument '%2' (expected %3).")
+            .arg(it->toString(), argName, RpcArgTraits<T>::NAME));
   }
 }
 
@@ -255,7 +259,8 @@ T getArg(const RpcRequest& request, const QString& argName) {
   if (auto value = getOptionalArg<T>(request, argName)) {
     return *value;
   }
-  throwMissingArg(argName, RpcArgTraits<T>::NAME);
+  throw RpcInvalidArgs(QString("Missing value for argument '%1' (expected %2).")
+                           .arg(argName, RpcArgTraits<T>::NAME));
 }
 
 /*******************************************************************************

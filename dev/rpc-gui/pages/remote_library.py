@@ -2,7 +2,7 @@
 
 import slint
 
-from client import fmt_details
+from client import fmt_details, fmt_uuid
 
 
 class RemoteLibraryPage:
@@ -53,7 +53,7 @@ class RemoteLibraryPage:
         self.app.libraries = slint.ListModel([
             {
                 "checked": library["uuid"] in self._checked,
-                "uuid": library.get("uuid", ""),
+                "uuid": fmt_uuid(library["uuid"]),
                 "name": library.get("name", ""),
                 "installed": library.get("installed_version", ""),
                 "online": library.get("online_version", ""),

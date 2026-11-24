@@ -41,6 +41,22 @@ def _fmt(value):
     return str(value)
 
 
+def fmt_uuid(value):
+    """Format a uuid ext value into its canonical string form (e.g. for
+    displaying it in the UI)."""
+    if (
+        isinstance(value, umsgpack.Ext)
+        and value.type == 2
+        and len(value.data) == 16
+    ):
+        hexstr = value.data.hex()
+        return "%s-%s-%s-%s-%s" % (
+            hexstr[0:8], hexstr[8:12], hexstr[12:16], hexstr[16:20],
+            hexstr[20:32],
+        )
+    return str(value)
+
+
 def _fmt_ext(ext):
     # The UUID ext type (see the API specification), rendered as string.
     if ext.type == 2 and len(ext.data) == 16:
