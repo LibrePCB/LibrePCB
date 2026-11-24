@@ -121,7 +121,7 @@ class RpcClient:
         return msgid
 
     def cancel(self, msgid):
-        self.sock.sendall(umsgpack.packb([4, msgid]))
+        self.sock.sendall(umsgpack.packb([3, msgid]))
 
     def close(self):
         try:

@@ -114,7 +114,7 @@ void ProtocolRpc::initialize(GuiApplication& app, RpcObjectRegistry& registry,
     QObject::connect(notification.get(), &Notification::destroyed, &request,
                      [&request]() { request.send(RpcAccessDenied()); });
     QObject::connect(&request, &RpcRequest::cancelled, notification.get(),
-                     &Notification::dismiss);
+                     [&request]() { request.send(RpcCancelled()); });
     QObject::connect(&request, &RpcRequest::destroyed, notification.get(),
                      &Notification::dismiss);
     app.getNotifications().push(notification);

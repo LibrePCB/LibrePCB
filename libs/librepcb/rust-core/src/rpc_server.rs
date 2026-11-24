@@ -109,7 +109,7 @@ const STOP_TIMEOUT: Duration = Duration::from_secs(5);
 /// Callback which handles a command request (fire-and-forget).
 ///
 /// It receives the connection ID, the msg_id, the method name (e.g.
-/// `"Project.list"`) and the raw msgpack params (a map, opaque to this
+/// `"Project/list"`) and the raw msgpack params (a map, opaque to this
 /// server module — its content is only interpreted by the command
 /// handlers). If the callback returns `Ok(())`, the request was accepted
 /// and [RpcServer::reply] will be called exactly once, at any time, from
@@ -755,12 +755,12 @@ mod tests {
       (Value::from("obj"), Value::from("some-uuid")),
       (Value::from("x"), Value::from(1)),
     ]);
-    client.request(42, "Project.get", params.clone());
+    client.request(42, "Project/get", params.clone());
     // The dispatch handler received the request...
     let (conn_id, msg_id, method, received_params) =
       dispatch.recv_timeout(Duration::from_secs(10)).unwrap();
     assert_eq!(msg_id, 42);
-    assert_eq!(method, "Project.get");
+    assert_eq!(method, "Project/get");
     assert_eq!(received_params, params);
     // ...and we reply asynchronously, just like the C++ integration does:
     let result = server.reply(
@@ -795,7 +795,7 @@ mod tests {
   fn test_exactly_one_reply() {
     let (server, port, dispatch, _cancel) = spawn_server();
     let mut client = TestClient::new(port, &server, &dispatch);
-    client.request(1, "Project.list", Value::Map(Vec::new()));
+    client.request(1, "Project/list", Value::Map(Vec::new()));
     let (conn_id, msg_id, _, _) =
       dispatch.recv_timeout(Duration::from_secs(10)).unwrap();
     // The first reply is sent, a second one for the same msg_id is dropped:
@@ -816,7 +816,7 @@ mod tests {
     // A reply for a msg_id which was never dispatched:
     assert!(!server.reply(u32::MAX, 123, &Value::Nil));
     // A reply for a valid connection, but an unknown msg_id:
-    client.request(1, "Project.list", Value::Map(Vec::new()));
+    client.request(1, "Project/list", Value::Map(Vec::new()));
     let (conn_id, msg_id, _, _) =
       dispatch.recv_timeout(Duration::from_secs(10)).unwrap();
     assert!(!server.reply(conn_id, msg_id + 100, &Value::Nil));
@@ -829,7 +829,7 @@ mod tests {
   fn test_reply_after_connection_closed() {
     let (server, port, dispatch, _cancel) = spawn_server();
     let mut client = TestClient::new(port, &server, &dispatch);
-    client.request(1, "Project.list", Value::Map(Vec::new()));
+    client.request(1, "Project/list", Value::Map(Vec::new()));
     let (conn_id, msg_id, _, _) =
       dispatch.recv_timeout(Duration::from_secs(10)).unwrap();
     drop(client); // Close the connection.
@@ -843,7 +843,7 @@ mod tests {
   fn test_notify_conn_only_while_pending() {
     let (server, port, dispatch, _cancel) = spawn_server();
     let mut client = TestClient::new(port, &server, &dispatch);
-    client.request(1, "Project.list", Value::Map(Vec::new()));
+    client.request(1, "Project/list", Value::Map(Vec::new()));
     let (conn_id, msg_id, _, _) =
       dispatch.recv_timeout(Duration::from_secs(10)).unwrap();
     // While the request is pending, request messages (type 2) arrive:
@@ -867,7 +867,7 @@ mod tests {
   fn test_cancel_is_forwarded() {
     let (server, port, dispatch, cancel) = spawn_server();
     let mut client = TestClient::new(port, &server, &dispatch);
-    client.request(1, "Project.list", Value::Map(Vec::new()));
+    client.request(1, "Project/list", Value::Map(Vec::new()));
     let (conn_id, msg_id, _, _) =
       dispatch.recv_timeout(Duration::from_secs(10)).unwrap();
     // Cancel the pending request → the cancel handler is invoked...
@@ -904,7 +904,7 @@ mod tests {
     // Send three requests without waiting for responses. Since dispatch
     // is asynchronous, all of them are dispatched before any reply:
     for msg_id in 1..=3u32 {
-      client.request(msg_id, "Project.list", Value::Map(Vec::new()));
+      client.request(msg_id, "Project/list", Value::Map(Vec::new()));
     }
     let mut requests = Vec::new();
     for _ in 0..3 {
@@ -923,13 +923,13 @@ mod tests {
   fn test_duplicate_msg_id_is_rejected() {
     let (server, port, dispatch, _cancel) = spawn_server();
     let mut client = TestClient::new(port, &server, &dispatch);
-    client.request(1, "Project.list", Value::Map(Vec::new()));
+    client.request(1, "Project/list", Value::Map(Vec::new()));
     let (conn_id, msg_id, _, _) =
       dispatch.recv_timeout(Duration::from_secs(10)).unwrap();
     // A second request with the same msg_id while the first one is still
     // pending is a protocol violation and answered with an error, without
     // being dispatched:
-    client.request(1, "Project.list", Value::Map(Vec::new()));
+    client.request(1, "Project/list", Value::Map(Vec::new()));
     client.read_error(1, RpcErrorCode::InvalidRequest);
     // The first request is still pending and can be replied:
     assert!(server.reply(conn_id, msg_id, &Value::Nil));

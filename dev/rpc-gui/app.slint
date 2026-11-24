@@ -84,9 +84,20 @@ export component AppWindow inherits Window {
                 padding-bottom: 4px;
                 spacing: 6px;
 
-                Button {
-                    text: root.connected ? "✕ Disconnect" : "⚡ Connect";
-                    clicked => { root.connect-clicked(); }
+                HorizontalLayout {
+                    spacing: 6px;
+
+                    Button {
+                        text: root.connected ? "✕" : "⚡";
+                        clicked => { root.connect-clicked(); }
+                    }
+
+                    Button {
+                        horizontal-stretch: 1;
+                        text: root.pending ? "Cancel" : "Initialize";
+                        enabled: root.connected;
+                        clicked => { root.init-clicked(); }
+                    }
                 }
 
                 LineEdit {
@@ -94,14 +105,9 @@ export component AppWindow inherits Window {
                     placeholder-text: "Access Token";
                 }
 
-                Button {
-                    text: root.pending ? "Cancel" : "Initialize";
-                    enabled: root.connected;
-                    clicked => { root.init-clicked(); }
-                }
-
                 HorizontalLayout {
                     spacing: 6px;
+                    padding-left: 5px;
 
                     VerticalLayout {
                         alignment: center;
@@ -139,8 +145,7 @@ export component AppWindow inherits Window {
 
             // Visual separation between connection and navigation.
             VerticalLayout {
-                padding-left: 8px;
-                padding-right: 8px;
+                padding: 8px;
 
                 Rectangle {
                     height: 1px;
@@ -171,12 +176,12 @@ export component AppWindow inherits Window {
             padding: 8px;
             spacing: 8px;
 
-            if root.current-page == 0 : ProtocolPage {
+            if root.current-page == 0: ProtocolPage {
                 vertical-stretch: 1;
                 authenticated: root.authenticated;
                 ping-clicked => { root.ping-clicked(); }
             }
-            if root.current-page == 1 : ProjectEditorPage {
+            if root.current-page == 1: ProjectEditorPage {
                 vertical-stretch: 1;
                 authenticated: root.authenticated;
                 path <=> root.project-path;
@@ -188,7 +193,7 @@ export component AppWindow inherits Window {
                 save-clicked(i) => { root.pe-save-clicked(i); }
                 close-clicked(i) => { root.pe-close-clicked(i); }
             }
-            if root.current-page == 2 : UndoStackPage {
+            if root.current-page == 2: UndoStackPage {
                 vertical-stretch: 1;
                 authenticated: root.authenticated;
                 project-entries: root.project-entries;
@@ -200,7 +205,7 @@ export component AppWindow inherits Window {
                 undo-clicked => { root.undo-undo-clicked(); }
                 redo-clicked => { root.undo-redo-clicked(); }
             }
-            if root.current-page == 3 : RemoteLibraryPage {
+            if root.current-page == 3: RemoteLibraryPage {
                 vertical-stretch: 1;
                 authenticated: root.authenticated;
                 libraries: root.libraries;
@@ -210,13 +215,13 @@ export component AppWindow inherits Window {
                 apply-clicked => { root.rl-apply-clicked(); }
                 get-clicked(i) => { root.rl-get-clicked(i); }
             }
-            if root.current-page == 4 : WorkspaceDbPage {
+            if root.current-page == 4: WorkspaceDbPage {
                 vertical-stretch: 1;
                 authenticated: root.authenticated;
                 progress: root.progress;
                 wait-clicked => { root.db-wait-clicked(); }
             }
-            if root.current-page < 0 : Text {
+            if root.current-page < 0: Text {
                 vertical-stretch: 1;
                 text: "No page for this class (yet).";
                 color: #808080;

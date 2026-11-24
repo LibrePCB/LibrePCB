@@ -39,13 +39,13 @@ class UndoStackPage:
                 return
 
     def get_clicked(self):
-        self._call("UndoStack.get")
+        self._call("UndoStack/get")
 
     def undo_clicked(self):
-        self._call("UndoStack.undo")
+        self._call("UndoStack/undo")
 
     def redo_clicked(self):
-        self._call("UndoStack.redo")
+        self._call("UndoStack/redo")
 
     def _call(self, method):
         if self._handle is None:

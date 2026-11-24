@@ -12,7 +12,7 @@ class RemoteLibraryPage:
         self._checked = set()  # UUIDs of the checked libraries.
 
     def list_clicked(self):
-        self.app.call("RemoteLibrary.list", {}, self._on_list)
+        self.app.call("RemoteLibrary/list", {}, self._on_list)
 
     def check_toggled(self, index, checked):
         uuid = self._libraries[index]["uuid"]
@@ -34,14 +34,14 @@ class RemoteLibraryPage:
                 install.append(uuid)
             elif library.get("installed_version"):
                 uninstall.append(uuid)
-        self.app.call("RemoteLibrary.apply",
+        self.app.call("RemoteLibrary/apply",
                       {"install": install, "uninstall": uninstall})
 
     def get_clicked(self, index):
         # Remote libraries are not registered objects, so there is no
         # handle (yet) — pass the UUID to at least test the error response.
         uuid = self._libraries[index]["uuid"]
-        self.app.call("RemoteLibrary.get", {"obj": uuid}, self._on_details)
+        self.app.call("RemoteLibrary/get", {"obj": uuid}, self._on_details)
 
     def _on_list(self, status, payload):
         if status != 0:

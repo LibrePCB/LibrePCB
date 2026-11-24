@@ -43,6 +43,7 @@ ns = slint.load_file("app.slint")
 class Gui(ns.AppWindow):
     def __init__(self):
         super().__init__()
+        self._auto_connect = True
         self.classes = slint.ListModel(api.CLASSES)
         self.current_page = PAGES["ProjectEditor"]
         if os.path.isfile(DEFAULT_PROJECT_PATH):
@@ -65,11 +66,33 @@ class Gui(ns.AppWindow):
         self.timer.start(
             slint.TimerMode.Repeated, timedelta(milliseconds=50), self.poll
         )
+        # Try to connect automatically every second (until the user clicks
+        # the connect button manually, which switches to manual mode).
+        self.connect_timer = slint.Timer()
+        self.connect_timer.start(
+            slint.TimerMode.Repeated, timedelta(seconds=1), self.auto_connect
+        )
 
     # --- Toolbar -----------------------------------------------------------
 
+    def auto_connect(self):
+        """Try to connect (silently) while the application is not
+        running. Skipped once the user clicked the connect button
+        manually, which switches to manual mode."""
+        if not self._auto_connect or self.client:
+            return
+        try:
+            self.client = RpcClient()
+        except OSError:
+            return  # The application is not running (yet).
+        self.connected = True
+        self._log("  Connected. Now initialize to authenticate.")
+
     @slint.callback
     def connect_clicked(self):
+        # Manual mode: no more automatic connection attempts.
+        self._auto_connect = False
+        self.connect_timer.stop()
         if self.client:
             self.client.close()
             self.client = None
@@ -93,8 +116,6 @@ class Gui(ns.AppWindow):
             except OSError:
                 pass
             self._log(f"⊗ cancel: {self.client.pending_msgid}")
-            self.client.pending_msgid = None
-            self.pending = False
             return
         params = {"name": "librepcb-rpc-gui"}
         token = self.token.strip()

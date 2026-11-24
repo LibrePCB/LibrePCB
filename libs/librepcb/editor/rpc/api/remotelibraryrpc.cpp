@@ -67,7 +67,7 @@ static QSet<Uuid> getLibraryUuids(const LibrariesModel& model) {
 }
 
 static QVariantMap summary(const ui::LibraryInfoData& obj) {
-  auto optionalString = [](const slint::SharedString& s){
+  auto optionalString = [](const slint::SharedString& s) {
     return s.empty() ? QVariant() : QVariant::fromValue(s2q(s));
   };
 

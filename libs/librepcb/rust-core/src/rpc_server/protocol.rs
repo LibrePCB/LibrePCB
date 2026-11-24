@@ -108,7 +108,7 @@ pub enum ParsedMessage {
     /// The request ID (unique per connection while pending), echoed back
     /// in the response.
     msgid: u32,
-    /// The method name, e.g. "Project.list".
+    /// The method name, e.g. "Project/list".
     method: String,
     /// The params (a map, possibly empty). Fully opaque to the server —
     /// the content is only interpreted by the command handlers.
@@ -249,7 +249,7 @@ mod tests {
     let value = Value::Array(vec![
       Value::from(0),
       Value::from(42u32),
-      Value::from("Project.list"),
+      Value::from("Project/list"),
       Value::Map(vec![(Value::from("x"), Value::from(1))]),
     ]);
     match classify_message(&value) {
@@ -259,7 +259,7 @@ mod tests {
         params,
       } => {
         assert_eq!(msgid, 42);
-        assert_eq!(method, "Project.list");
+        assert_eq!(method, "Project/list");
         assert_eq!(field(&params, "x"), Some(&Value::from(1)));
       }
       _ => panic!("expected a request"),
@@ -271,7 +271,7 @@ mod tests {
     let value = Value::Array(vec![
       Value::from(0),
       Value::from(1),
-      Value::from("Project.list"),
+      Value::from("Project/list"),
       Value::Nil,
     ]);
     match classify_message(&value) {
@@ -287,7 +287,7 @@ mod tests {
     let value = Value::Array(vec![
       Value::from(0),
       Value::from(1),
-      Value::from("Project.list"),
+      Value::from("Project/list"),
     ]);
     match classify_message(&value) {
       ParsedMessage::Request { params, .. } => {

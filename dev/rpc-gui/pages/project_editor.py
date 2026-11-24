@@ -14,7 +14,7 @@ class ProjectEditorPage:
         path = self.app.project_path.strip()
         if not path:
             return
-        self.app.call("ProjectEditor.open", {"path": path}, self._on_opened)
+        self.app.call("ProjectEditor/open", {"path": path}, self._on_opened)
 
     def _on_opened(self, status, payload):
         # Opening changes the project list, so refresh it automatically.
@@ -22,20 +22,20 @@ class ProjectEditorPage:
             self.list_clicked()
 
     def list_clicked(self):
-        self.app.call("ProjectEditor.list", {}, self._on_list)
+        self.app.call("ProjectEditor/list", {}, self._on_list)
 
     def get_clicked(self, index):
         self._select(index)
-        self.app.call("ProjectEditor.get", {"obj": self._handles[index]},
+        self.app.call("ProjectEditor/get", {"obj": self._handles[index]},
                       self._on_details)
 
     def save_clicked(self, index):
         self._select(index)
-        self.app.call("ProjectEditor.save", {"obj": self._handles[index]})
+        self.app.call("ProjectEditor/save", {"obj": self._handles[index]})
 
     def close_clicked(self, index):
         self._select(index)
-        self.app.call("ProjectEditor.close", {"obj": self._handles[index]},
+        self.app.call("ProjectEditor/close", {"obj": self._handles[index]},
                       self._on_closed)
 
     def _on_closed(self, status, payload):

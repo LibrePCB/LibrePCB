@@ -46,7 +46,7 @@ Build directory: `build/agent` (per CLAUDE.md). No commits unless asked.
 | Framing | Self-delimiting msgpack stream decoding (like the official msgpack-rpc spec), no length prefix |
 | C++ boundary | Rust converts msgpack ↔ `QVariant` and passes values through the FFI (C++ never sees msgpack; ~18 trivial FFI helpers in `ffi.cpp`) |
 | Dispatch | **Asynchronous**: requests are handed off to the GUI thread via `Qt::QueuedConnection`; the GUI thread replies (and may emit progress) whenever it is ready |
-| Method naming | `ClassName.method_name` (classes are first-class entities in the spec; see section 2.3) |
+| Method naming | `ClassName/method_name` (classes are first-class entities in the spec; see section 2.3) |
 | Params | String-keyed map with a reserved `"obj"` key carrying the receiver handle — an *opaque* value (see section 2.4) |
 | Domain types | Plain integers (`Length` in nm, `Angle` in µdeg, …) and f64 — **forever**, no msgpack `ext` types |
 | Enums | Strings (self-describing; clients don't need the spec to display them) |
@@ -128,18 +128,18 @@ following message types:
   Notifications are only sent while the request is pending; progress
   is not monotonic and never a completion signal.
 
-### 2.3 Method naming: `ClassName.method_name`
+### 2.3 Method naming: `ClassName/method_name`
 
-- Wire name: `"ClassName.method_name"` — classes in `UpperCamelCase`,
-  methods in `lower_snake_case` (e.g. `"UndoStack.undo"`,
-  `"ProjectEditor.list"`).
+- Wire name: `"ClassName/method_name"` — classes in `UpperCamelCase`,
+  methods in `lower_snake_case` (e.g. `"UndoStack/undo"`,
+  `"ProjectEditor/list"`).
 - **Classes are first-class entities in the YAML spec**, each with its
   methods, its description and — for classes whose methods operate on an
   object instance — its **handle type** (see 2.4).
 - Static methods (no receiver) and member methods (receiver required) are
   both declared under their class; the spec marks which is which.
 - The C++ command surface is generated per spec class (see 4.2a),
-  dispatched by the full `"ClassName.method_name"`
+  dispatched by the full `"ClassName/method_name"`
   string.
 - Event names (type 2) are not class methods; they are listed as separate
   top-level entities in the spec, in `lower_snake_case` (e.g.
@@ -444,7 +444,7 @@ The C++ command surface is **generated from the spec** by `dev/rpc/gen.py`
   the free function
   `void rpcDispatchCommand(GuiApplication& app, const QString& method,
   RpcRequest& request)`, which looks the method up in a static
-  function-pointer map (`{"ProjectEditor.list", &ProjectEditorRpc::list}`, ...) —
+  function-pointer map (`{"ProjectEditor/list", &ProjectEditorRpc::list}`, ...) —
   defined right inside the dispatcher function — and calls it, passing
   the application. Unknown methods are reported by throwing
   `RpcMethodNotFound` (see 4.2b).
@@ -515,9 +515,9 @@ documented in the doxygen guidelines page (see 5.2).
 
 | v1 name | v2 name | Kind |
 |---|---|---|
-| `project/list` | `ProjectEditor.list` | static |
+| `project/list` | `ProjectEditor/list` | static |
 | `project/get` | `ProjectEditor.get` | member (obj) |
-| `undostack/getStatus` | `UndoStack.get` | member (obj) |
+| `undostack/getStatus` | `UndoStack/get` | member (obj) |
 | `undostack/undo` | `UndoStack.undo` | member |
 | `undostack/redo` | `UndoStack.redo` | member |
 
@@ -684,7 +684,7 @@ specification. No CI stale-check.
    `tests/ui/rpc/`.
    **Status: Done.** Verified: 2606 C++ unittests pass, and the system
    test passes against the real application (with an open project,
-   covering handshake, ping, `ProjectEditor.list`/`get`, the full
+   covering handshake, ping, `ProjectEditor/list`/`get`, the full
    `UndoStack` API, unknown methods, invalid envelopes, value-domain
    rejections, error properties, unknown-cancel and pipelining).
    No C++ command unit tests (the user writes them themselves), and the

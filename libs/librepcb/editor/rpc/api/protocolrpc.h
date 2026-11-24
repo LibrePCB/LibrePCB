@@ -66,7 +66,7 @@ public:
    *        must be this request (see the transport protocol documentation).
    */
   static void initialize(GuiApplication& app, RpcObjectRegistry& registry,
-                      RpcRequest& request);
+                         RpcRequest& request);
 
   /**
    * @brief A request which is answered with a nil result by the server
@@ -74,7 +74,7 @@ public:
    *        connection.
    */
   static void ping(GuiApplication& app, RpcObjectRegistry& registry,
-                      RpcRequest& request);
+                   RpcRequest& request);
 };
 
 /*******************************************************************************

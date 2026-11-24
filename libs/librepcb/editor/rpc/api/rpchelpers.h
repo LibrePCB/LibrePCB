@@ -27,8 +27,8 @@
 #include "rpcerrors.h"
 #include "rpctypes.h"
 
-#include <librepcb/core/types/uuid.h>
 #include <librepcb/core/fileio/filepath.h>
+#include <librepcb/core/types/uuid.h>
 #include <librepcb/rust-core/rpcext.h>
 #include <type_traits>
 

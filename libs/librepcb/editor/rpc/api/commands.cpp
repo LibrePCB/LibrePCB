@@ -24,13 +24,13 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "protocolrpc.h"
-#include "projecteditorrpc.h"
-#include "undostackrpc.h"
-#include "remotelibraryrpc.h"
-#include "workspacedbrpc.h"
-#include "rpcerrors.h"
 #include "../rpcrequest.h"
+#include "projecteditorrpc.h"
+#include "protocolrpc.h"
+#include "remotelibraryrpc.h"
+#include "rpcerrors.h"
+#include "undostackrpc.h"
+#include "workspacedbrpc.h"
 
 #include <QtCore>
 
@@ -52,23 +52,22 @@ namespace rpc {
 
 void rpcDispatchCommand(GuiApplication& app, RpcObjectRegistry& registry,
                         RpcRequest& request) {
-  using RpcCommand = void (*)(GuiApplication&, RpcObjectRegistry&,
-                              RpcRequest&);
+  using RpcCommand = void (*)(GuiApplication&, RpcObjectRegistry&, RpcRequest&);
   static const QHash<QString, RpcCommand> commands = {
       {"initialize", &ProtocolRpc::initialize},
       {"ping", &ProtocolRpc::ping},
-      {"ProjectEditor.list", &ProjectEditorRpc::list},
-      {"ProjectEditor.open", &ProjectEditorRpc::open},
-      {"ProjectEditor.get", &ProjectEditorRpc::get},
-      {"ProjectEditor.save", &ProjectEditorRpc::save},
-      {"ProjectEditor.close", &ProjectEditorRpc::close},
-      {"UndoStack.get", &UndoStackRpc::get},
-      {"UndoStack.undo", &UndoStackRpc::undo},
-      {"UndoStack.redo", &UndoStackRpc::redo},
-      {"RemoteLibrary.list", &RemoteLibraryRpc::list},
-      {"RemoteLibrary.apply", &RemoteLibraryRpc::apply},
-      {"RemoteLibrary.get", &RemoteLibraryRpc::get},
-      {"WorkspaceDb.wait", &WorkspaceDbRpc::wait},
+      {"ProjectEditor/list", &ProjectEditorRpc::list},
+      {"ProjectEditor/open", &ProjectEditorRpc::open},
+      {"ProjectEditor/get", &ProjectEditorRpc::get},
+      {"ProjectEditor/save", &ProjectEditorRpc::save},
+      {"ProjectEditor/close", &ProjectEditorRpc::close},
+      {"UndoStack/get", &UndoStackRpc::get},
+      {"UndoStack/undo", &UndoStackRpc::undo},
+      {"UndoStack/redo", &UndoStackRpc::redo},
+      {"RemoteLibrary/list", &RemoteLibraryRpc::list},
+      {"RemoteLibrary/apply", &RemoteLibraryRpc::apply},
+      {"RemoteLibrary/get", &RemoteLibraryRpc::get},
+      {"WorkspaceDb/wait", &WorkspaceDbRpc::wait},
   };
   if (auto func = commands.value(request.getMethod(), nullptr)) {
     func(app, registry, request);

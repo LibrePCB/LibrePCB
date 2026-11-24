@@ -6,7 +6,7 @@ class WorkspaceDbPage:
         self.app = app
 
     def wait_clicked(self):
-        self.app.call("WorkspaceDb.wait", {}, self._on_done)
+        self.app.call("WorkspaceDb/wait", {}, self._on_done)
 
     def _on_done(self, status, payload):
         # Hide the progress bar again (it showed the scan progress).

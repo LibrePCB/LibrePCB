@@ -104,7 +104,7 @@ to the executed command.
 
 # Commands {{ "{" }}#doc_rpc_api_commands}
 
-All commands below are dispatched to the application and executed on its GUI thread. Method names are `ClassName.method_name` (the protocol-level methods are named without a class prefix). Non-static methods receive their receiver handle in the reserved `obj` key of the params.
+All commands below are dispatched to the application and executed on its GUI thread. Method names are `ClassName/method_name` (the protocol-level methods are named without a class prefix). Non-static methods receive their receiver handle in the reserved `obj` key of the params.
 
 {% for cls in spec.classes %}
 {% if cls.name %}
@@ -117,9 +117,9 @@ All commands below are dispatched to the application and executed on its GUI thr
 {{ cls.description }}
 
 {% endif %}
-{% set prefix = cls.name ~ "." if cls.name else "" %}
+{% set prefix = cls.name ~ "/" if cls.name else "" %}
 {% for method in cls.methods %}
-### {{ prefix }}{{ method.name }} {{ "{" }}#doc_rpc_api_method_{{ prefix | replace(".", "_") }}{{ method.name }}}
+### {{ prefix }}{{ method.name }} {{ "{" }}#doc_rpc_api_method_{{ prefix | replace("/", "_") }}{{ method.name }}}
 {% if method.description %}
 
 {{ method.description }}

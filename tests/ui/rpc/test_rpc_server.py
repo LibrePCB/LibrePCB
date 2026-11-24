@@ -162,7 +162,7 @@ def test_rpc_server(librepcb, helpers):
             projects = []
             deadline = time.time() + 10
             while time.time() < deadline:
-                status, result = rpc.request(3, "ProjectEditor.list", {})
+                status, result = rpc.request(3, "ProjectEditor/list", {})
                 assert status == 0
                 assert isinstance(result, dict)
                 projects = result["projects"]
@@ -180,26 +180,26 @@ def test_rpc_server(librepcb, helpers):
                 assert key in project, f"missing key {key} in {project!r}"
 
             # ProjectEditor.get → details with sheets & boards.
-            status, result = rpc.request(4, "ProjectEditor.get", {"obj": handle})
+            status, result = rpc.request(4, "ProjectEditor/get", {"obj": handle})
             assert status == 0
             assert isinstance(result["sheets"], list)
             assert isinstance(result["boards"], list)
 
             # UndoStack.get → the project was just opened, so the stack is
             # clean and there's nothing to undo/redo.
-            status, result = rpc.request(5, "UndoStack.get", {"obj": handle})
+            status, result = rpc.request(5, "UndoStack/get", {"obj": handle})
             assert status == 0
             assert result["clean"] is True, result
             assert result["prev"] is None and result["next"] is None, result
             assert isinstance(result["id"], int), result
 
             # UndoStack.undo on an empty stack → UnexpectedState.
-            rpc.expect_error(6, "UndoStack.undo", {"obj": handle}, 50)
+            rpc.expect_error(6, "UndoStack/undo", {"obj": handle}, 50)
 
             # --- Error handling -------------------------------------------
             # Unknown method → MethodNotFound (31), the connection
             # stays open.
-            rpc.expect_error(7, "Foo.bar", {}, 31)
+            rpc.expect_error(7, "Foo/bar", {}, 31)
 
             # The reserved msgid 0 is not a valid request msgid (yet): The
             # request is rejected with an error response to msgid 0, the
@@ -219,14 +219,14 @@ def test_rpc_server(librepcb, helpers):
             assert message[3]["message"] == "Invalid request", message
 
             # Unknown project handle → InvalidHandle (41).
-            rpc.send([0, 9, "UndoStack.get", {"obj": "invalid-uuid"}])
+            rpc.send([0, 9, "UndoStack/get", {"obj": "invalid-uuid"}])
             message = rpc.receive()
             assert message[0:2] == [1, 9], message
             assert message[2] == 41, message  # Status: the error code.
             assert message[3]["message"] == "Invalid object handle", message
 
             # Large u64 values are valid integers (native msgpack):
-            rpc.send([0, 10, "ProjectEditor.list", {"key": 0x8000000000000000}])
+            rpc.send([0, 10, "ProjectEditor/list", {"key": 0x8000000000000000}])
             message = rpc.receive()
             assert message[0:2] == [1, 10], message
             assert message[2] == 0, message  # Status: success.
@@ -235,7 +235,7 @@ def test_rpc_server(librepcb, helpers):
             # Params outside the protocol's value domain (non-string map
             # keys) → InvalidArgs (40), the connection stays open (unlike
             # a decode error!).
-            rpc.send([0, 11, "ProjectEditor.list", {1: "x"}])  # Non-string map key.
+            rpc.send([0, 11, "ProjectEditor/list", {1: "x"}])  # Non-string map key.
             message = rpc.receive()
             assert message[0:2] == [1, 11], message
             assert message[2] == 40, message  # Status: the error code.

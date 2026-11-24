@@ -159,7 +159,7 @@ Information about the workspace library database.
 
 # Commands {#doc_rpc_api_commands}
 
-All commands below are dispatched to the application and executed on its GUI thread. Method names are `ClassName.method_name` (the protocol-level methods are named without a class prefix). Non-static methods receive their receiver handle in the reserved `obj` key of the params.
+All commands below are dispatched to the application and executed on its GUI thread. Method names are `ClassName/method_name` (the protocol-level methods are named without a class prefix). Non-static methods receive their receiver handle in the reserved `obj` key of the params.
 
 ## Protocol-Level Methods {#doc_rpc_api_class_protocol_methods}
 
@@ -210,7 +210,7 @@ A request which is answered with a nil result by the server itself, without any 
 
 A project opened in the application.
 
-### ProjectEditor.list {#doc_rpc_api_method_ProjectEditor_list}
+### ProjectEditor/list {#doc_rpc_api_method_ProjectEditor_list}
 
 List all open projects.
 
@@ -229,7 +229,7 @@ List all open projects.
 
 ---
 
-### ProjectEditor.open {#doc_rpc_api_method_ProjectEditor_open}
+### ProjectEditor/open {#doc_rpc_api_method_ProjectEditor_open}
 
 Open a project by file path. If the project is already open, nothing is changed and the summary of the already open project is returned.
 
@@ -246,7 +246,7 @@ Open a project by file path. If the project is already open, nothing is changed 
 
 ---
 
-### ProjectEditor.get {#doc_rpc_api_method_ProjectEditor_get}
+### ProjectEditor/get {#doc_rpc_api_method_ProjectEditor_get}
 
 Get details about an open project.
 
@@ -258,7 +258,7 @@ Get details about an open project.
 
 ---
 
-### ProjectEditor.save {#doc_rpc_api_method_ProjectEditor_save}
+### ProjectEditor/save {#doc_rpc_api_method_ProjectEditor_save}
 
 Save project to disk.
 
@@ -270,7 +270,7 @@ Save project to disk.
 
 ---
 
-### ProjectEditor.close {#doc_rpc_api_method_ProjectEditor_close}
+### ProjectEditor/close {#doc_rpc_api_method_ProjectEditor_close}
 
 Close project. Attention: If there were unsaved changes in the project, they will be discarded. Call `save` first, if desired.
 
@@ -286,7 +286,7 @@ Close project. Attention: If there were unsaved changes in the project, they wil
 
 The undo stack of an open document. The handle may point to a project or a library element.
 
-### UndoStack.get {#doc_rpc_api_method_UndoStack_get}
+### UndoStack/get {#doc_rpc_api_method_UndoStack_get}
 
 Get the state of the undo stack.
 
@@ -298,7 +298,7 @@ Get the state of the undo stack.
 
 ---
 
-### UndoStack.undo {#doc_rpc_api_method_UndoStack_undo}
+### UndoStack/undo {#doc_rpc_api_method_UndoStack_undo}
 
 Undo the last command, then return the new state. If there is nothing to undo, the command fails with an error.
 
@@ -310,7 +310,7 @@ Undo the last command, then return the new state. If there is nothing to undo, t
 
 ---
 
-### UndoStack.redo {#doc_rpc_api_method_UndoStack_redo}
+### UndoStack/redo {#doc_rpc_api_method_UndoStack_redo}
 
 Redo the last undone the last command, then return the new state. If there is nothing to redo, the command fails with an error.
 
@@ -326,7 +326,7 @@ Redo the last undone the last command, then return the new state. If there is no
 
 Allows to list, install, update and uninstall remote libraries.
 
-### RemoteLibrary.list {#doc_rpc_api_method_RemoteLibrary_list}
+### RemoteLibrary/list {#doc_rpc_api_method_RemoteLibrary_list}
 
 Fetch all remote libraries. If the application already has the list ready, this method immediately returns all of them at once. If the list needs to be fetched from the configured servers first, this method streams the libraries in notifications.
 
@@ -343,7 +343,7 @@ Fetch all remote libraries. If the application already has the list ready, this 
 
 ---
 
-### RemoteLibrary.apply {#doc_rpc_api_method_RemoteLibrary_apply}
+### RemoteLibrary/apply {#doc_rpc_api_method_RemoteLibrary_apply}
 
 Install/update or uninstall remote libraries in one batch. Note that dependent libraries will automatically be installed/updated or uninstalled too. This behavior may change in future releases.
 IMPORTANT: After calling this method, use `WorkspaceDb.wait()` to wait for the library changes to appear in the database!
@@ -359,7 +359,7 @@ IMPORTANT: After calling this method, use `WorkspaceDb.wait()` to wait for the l
 
 ---
 
-### RemoteLibrary.get {#doc_rpc_api_method_RemoteLibrary_get}
+### RemoteLibrary/get {#doc_rpc_api_method_RemoteLibrary_get}
 
 Get details about a remote library.
 
@@ -374,7 +374,7 @@ Get details about a remote library.
 The library database of the currently opened workspace.
 IMPORTANT: After the app startup, and after each modification of the local or remote libraries (install/remove/create/edit), call `wait()` before accessing the database again. Otherwise, the database may not reflect the changes yet, i.e. returns outdated information.
 
-### WorkspaceDb.wait {#doc_rpc_api_method_WorkspaceDb_wait}
+### WorkspaceDb/wait {#doc_rpc_api_method_WorkspaceDb_wait}
 
 Wait for the library rescan to complete. If the database is already up-to-date, this method returns immediately. If a scan is currently in progress or scheduled, the method blocks until the scan finished. During the scan, progress notifications will be emitted.
 
