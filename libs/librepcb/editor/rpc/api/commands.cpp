@@ -25,6 +25,7 @@
  *  Includes
  ******************************************************************************/
 #include "../rpcrequest.h"
+#include "graphicsexportrpc.h"
 #include "projecteditorrpc.h"
 #include "protocolrpc.h"
 #include "remotelibraryrpc.h"
@@ -65,6 +66,7 @@ void rpcDispatchCommand(GuiApplication& app, RpcObjectRegistry& registry,
       {"ProjectEditor/close", &ProjectEditorRpc::close},
       {"RuleCheck/run", &RuleCheckRpc::run},
       {"RuleCheck/set", &RuleCheckRpc::set},
+      {"GraphicsExport/render", &GraphicsExportRpc::render},
       {"UndoStack/get", &UndoStackRpc::get},
       {"UndoStack/undo", &UndoStackRpc::undo},
       {"UndoStack/redo", &UndoStackRpc::redo},

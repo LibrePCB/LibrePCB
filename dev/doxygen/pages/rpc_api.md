@@ -391,6 +391,39 @@ Set the approved state of multiple messages (bulk setter). The handles of a prev
 
 ---
 
+## Class GraphicsExport {#doc_rpc_api_class_GraphicsExport}
+
+Provides access to 2D renderings.
+
+### GraphicsExport/render {#doc_rpc_api_method_GraphicsExport_render}
+
+Render a single graphics scene to an image and return it.
+
+**Params:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `format` | `string` (default: `png`) | Image format. |
+| `dpi` | `integer` (default: `100`) | Resolution. |
+| `region` | `array` of `Point` | Region to render (top_left/bottom_right). If omitted, the whole scene is rendered. |
+| `flip` | `bool` | If true, the rendering will be flipped to the bottom side. Only supported for boards. |
+| `layers` | `map` of `map` | Layers to render. Map key is the layer ID, value may contain 'color' to specify the color. If omitted, default values will be used. |
+| `realistic` | `bool` | If true, a realistic rendering will be done. Only supported for boards. |
+
+**Result:**
+
+**Fields:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `image` | `binary` | Rendered image in the requested format as a binary blob. |
+| `region` | `array` of `Point` | Region represented by the image (coordinates of pixels at [0,0] and [N,N]). |
+
+
+**Since:** 2.2.0
+
+---
+
 ## Class UndoStack {#doc_rpc_api_class_UndoStack}
 
 The undo stack of an open document. The handle may point to a project or a library element.

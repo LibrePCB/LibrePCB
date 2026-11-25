@@ -542,6 +542,65 @@ classes:
             type: bool
             description: The approved state to set on all given messages.
 
+  - name: GraphicsExport
+    description: Provides access to 2D renderings.
+    since: "2.2.0"
+    methods:
+      - name: render
+        description: Render a single graphics scene to an image and return it.
+        params:
+          - name: format
+            type: string
+            default: png
+            description: Image format.
+          - name: dpi
+            type: integer
+            default: 100
+            description: Resolution.
+          - name: region
+            type: array
+            items: Point
+            description: >-
+              Region to render (top_left/bottom_right). If omitted, the whole
+              scene is rendered.
+          - name: flip
+            type: bool
+            default: false
+            description: >-
+              If true, the rendering will be flipped to the bottom side. Only
+              supported for boards.
+          - name: layers
+            type: map
+            items: map
+            description: >-
+              Layers to render. Map key is the layer ID, value may contain
+              'color' to specify the color. If omitted, default values will
+              be used.
+          - name: realistic
+            type: bool
+            default: false
+            description: >-
+              If true, a realistic rendering will be done. Only supported for
+              boards.
+        result:
+          - name: image
+            type: binary
+            description: >-
+              Rendered image in the requested format as a binary blob.
+          - name: region
+            type: array
+            items: Point
+            description: >-
+              Region represented by the image (coordinates of pixels at [0,0]
+              and [N,N]).
+          - name: errors
+            type: array
+            items: string
+            description: >-
+              Any occurred rendering errors if the image could be rendered
+              partially. If the image could not be rendered at all, an RPC
+              error is returned instead.
+
   - name: UndoStack
     description: >-
       The undo stack of an open document. The handle may point to a project or
