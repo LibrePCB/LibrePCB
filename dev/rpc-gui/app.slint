@@ -82,6 +82,7 @@ export component AppWindow inherits Window {
     in-out property <bool> quick;
     in property <[RuleCheckMessageData]> check-messages;
     callback rc-select-check(string);
+    callback rc-refresh-clicked();
     callback rc-run-clicked();
     callback rc-cancel-clicked();
     callback rc-check-toggled(int, bool);
@@ -208,11 +209,17 @@ export component AppWindow inherits Window {
                 path <=> root.project-path;
                 projects: root.projects;
                 details: root.project-details;
+                pe-name <=> root.pe-name;
+                pe-author <=> root.pe-author;
+                pe-version <=> root.pe-version;
+                pe-locales <=> root.pe-locales;
+                pe-norms <=> root.pe-norms;
                 open-clicked => { root.pe-open-clicked(); }
                 list-clicked => { root.pe-list-clicked(); }
                 get-clicked(i) => { root.pe-get-clicked(i); }
                 save-clicked(i) => { root.pe-save-clicked(i); }
                 close-clicked(i) => { root.pe-close-clicked(i); }
+                apply-clicked => { root.pe-apply-clicked(); }
             }
             if root.current-page == 3: UndoStackPage {
                 vertical-stretch: 1;
@@ -246,6 +253,7 @@ export component AppWindow inherits Window {
                 quick <=> root.quick;
                 messages: root.check-messages;
                 select-check(value) => { root.rc-select-check(value); }
+                refresh-clicked => { root.rc-refresh-clicked(); }
                 run-clicked => { root.rc-run-clicked(); }
                 cancel-clicked => { root.rc-cancel-clicked(); }
                 check-toggled(i, checked) => { root.rc-check-toggled(i, checked); }

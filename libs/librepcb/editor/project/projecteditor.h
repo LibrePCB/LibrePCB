@@ -25,8 +25,9 @@
  ******************************************************************************/
 #include "../utils/uiobjectlist.h"
 #include "ui.h"
-#include <librepcb/core/rulecheck/rulecheckmessage.h>
+
 #include <librepcb/core/project/projectloader.h>
+#include <librepcb/core/rulecheck/rulecheckmessage.h>
 #include <librepcb/core/serialization/sexpression.h>
 #include <librepcb/core/utils/signalslot.h>
 

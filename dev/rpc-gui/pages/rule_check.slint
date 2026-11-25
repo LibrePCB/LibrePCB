@@ -17,6 +17,7 @@ export component RuleCheckPage {
     in-out property <bool> quick;
     in property <[RuleCheckMessageData]> messages;
     callback select-check(string);
+    callback refresh-clicked();
     callback run-clicked();
     callback cancel-clicked();
     callback check-toggled(int, bool);
@@ -39,6 +40,12 @@ export component RuleCheckPage {
             CheckBox {
                 text: "quick";
                 checked <=> root.quick;
+            }
+
+            Button {
+                text: "Refresh";
+                enabled: root.authenticated && (!root.running);
+                clicked => { root.refresh-clicked(); }
             }
 
             Button {

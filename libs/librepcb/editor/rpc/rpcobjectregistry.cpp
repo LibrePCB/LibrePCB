@@ -25,6 +25,7 @@
 #include "api/rpcerrors.h"
 
 #include <QtCore>
+
 #include <cstdlib>
 
 /*******************************************************************************
@@ -44,7 +45,7 @@ static uint32_t getNextHandle() noexcept {
   // stale handles from RPC clients as valid after LibrePCB has been restarted.
   static uint32_t handle = static_cast<uint32_t>(std::rand());
   ++handle;
-  if (handle == 0) ++handle; // Skip handle 0 to make QVariant::toInt() working
+  if (handle == 0) ++handle;  // Skip handle 0 to make QVariant::toInt() working
   return handle;
 }
 

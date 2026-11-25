@@ -104,15 +104,14 @@ void RuleCheckRpc::run(GuiApplication& app, RpcObjectRegistry& registry,
     // ERC: Synchronous.
     const auto messages = editor->runErc();
     if (!messages) throw RpcInternalError("ERC failed.");
-    sendResponse(*messages,
-                 editor->getProject().getErcMessageApprovals());
+    sendResponse(*messages, editor->getProject().getErcMessageApprovals());
   } else if (auto editor =
                  registry.tryGetAs<BoardEditor>(request.getArg("obj"))) {
     // DRC: Asynchronous.
+    request.send(RpcNotification().progress(5));
     BoardDesignRuleCheck& drc = editor->startDrc(quick);
     if (!drc.isRunning()) throw RpcInternalError();
     request.makeAsync(drc);
-    request.send(RpcNotification().progress(5));
     QObject::connect(&request, &RpcRequest::cancelled, &drc,
                      &BoardDesignRuleCheck::cancel);
     QObject::connect(&drc, &BoardDesignRuleCheck::progressPercent, &request,
@@ -141,6 +140,10 @@ void RuleCheckRpc::set(GuiApplication& app, RpcObjectRegistry& registry,
   const auto handles = getArg<QList<QByteArray>>(request, "messages");
   const bool approved = getArg<bool>(request, "approved");
 
+  // TODO: This does not work properly yet because RuleCheckMessagesModel
+  // keeps a copy of approvals, without watching for approval changes in
+  // the actual storage location.
+
   if (auto editor = registry.tryGetAs<ProjectEditor>(request.getArg("obj"))) {
     // ERC
     bool modified = false;
@@ -152,17 +155,18 @@ void RuleCheckRpc::set(GuiApplication& app, RpcObjectRegistry& registry,
     }
     if (modified) {
       editor->setManualModificationsMade();
-      editor->scheduleErcRun(); // Not sure if needed.
+      editor->scheduleErcRun();  // Not sure if needed.
     }
     request.send();
   } else if (auto editor =
-             registry.tryGetAs<BoardEditor>(request.getArg("obj"))) {
+                 registry.tryGetAs<BoardEditor>(request.getArg("obj"))) {
     // DRC
     for (const auto& handle : handles) {
       const auto approval = SExpression::parse(handle, FilePath());
       editor->getBoard().setDrcMessageApproved(*approval, approved);
     }
-    request.send();
+    editor->getProjectEditor().setManualModificationsMade();
+    request.send(RpcInternalError());
   } else {
     throw RpcInvalidHandle();
   }

@@ -395,8 +395,7 @@ void ProjectEditor::redo() noexcept {
   }
 }
 
-RuleCheckMessageList runErc(){
-
+RuleCheckMessageList runErc() {
 }
 
 bool ProjectEditor::requestClose() noexcept {

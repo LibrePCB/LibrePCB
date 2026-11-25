@@ -56,13 +56,13 @@ class ProjectEditorPage:
             value = _split_list(str(getattr(self.app, prop)))
             if value != self._details.get(key, []):
                 params[key] = value
-        obj = self._details_obj
-        if obj is None and len(self._handles) == 1:
-            obj = self._handles[0]
-        if params and obj is not None:
+        # Use the handle of the project whose details are currently
+        # displayed (filled by ProjectEditor/get).
+        if params and (self._details_obj is not None):
             self.app.call(
-                "ProjectEditor/set", {"obj": obj, **params},
-                lambda status, payload: self._on_details(status, payload, obj))
+                "ProjectEditor/set", {"obj": self._details_obj, **params},
+                lambda status, payload: self._on_details(
+                    status, payload, self._details_obj))
 
     # --- Response handlers ---------------------------------------------
 
@@ -71,16 +71,14 @@ class ProjectEditorPage:
         self.app._pages["UndoStack"].select(index)
 
     def _on_opened(self, status, payload):
-        # The open response carries the details: pre-fill the set form.
-        self._on_details(status, payload)
-        # Opening changes the project list, so refresh it automatically.
-        if status == 0:
-            self.list_clicked()
+        # A single method call per button: open only opens. The user can
+        # click List to refresh the project list and Get to fill the
+        # properties / DRC entries of a project.
+        pass
 
     def _on_closed(self, status, payload):
-        # Closing changes the project list, so refresh it automatically.
-        if status == 0:
-            self.list_clicked()
+        # A single method call per button: close only closes.
+        pass
 
     def _on_list(self, status, payload):
         if status != 0:
@@ -96,9 +94,6 @@ class ProjectEditorPage:
             for project in projects
         ])
         self.app._pages["UndoStack"].set_projects(projects)
-        self.app._pages["RuleCheck"].set_projects(projects)
-        if (self._details_obj is None) and (len(self._handles) == 1):
-            self._details_obj = self._handles[0]
 
     def _on_details(self, status, payload, obj=None):
         if status != 0:
@@ -113,13 +108,6 @@ class ProjectEditorPage:
         self.app.pe_version = payload.get("version", "")
         self.app.pe_locales = ", ".join(payload.get("locale_order", []))
         self.app.pe_norms = ", ".join(payload.get("norm_order", []))
-        # Feed the RuleCheck page with the board (DRC) entries.
-        boards = [
-            {"name": board["name"], "obj": board["obj"]}
-            for board in payload.get("boards", [])
-        ]
-        self.app._pages["RuleCheck"].set_boards(
-            self._details_obj, boards)
 
 
 def _split_list(text):

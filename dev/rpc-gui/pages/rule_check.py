@@ -16,36 +16,45 @@ class RuleCheckPage:
     # --- Object management (called by the ProjectEditor page) ----------
 
     def set_projects(self, projects):
-        """Update the project entries (ERC), keeping boards (DRC) of
-        still-open projects."""
+        """Update the entries when the project list was fetched: An ERC
+        entry per project, keeping the board (DRC) entries of still-open
+        projects (their boards are refreshed by the per-project gets)."""
         project_handles = {p["obj"] for p in projects}
         self._objects = [
             entry
             for entry in self._objects
-            if entry["board"] or entry["obj"] in project_handles
+            if entry["project"] in project_handles
         ]
         known = {entry["obj"] for entry in self._objects}
         for p in projects:
             if p["obj"] not in known:
                 self._objects.append(
                     {"name": p["name"], "obj": p["obj"],
-                     "project": p["obj"], "board": False})
+                     "project": p["obj"], "project_name": p["name"],
+                     "board": False})
         self._update_model()
 
     def set_boards(self, project, boards):
-        """Update the board entries (DRC) of the given project."""
+        """Update the board (DRC) entries of the given project, keeping
+        the entries of all other projects."""
+        project_name = next(
+            (entry["name"] for entry in self._objects
+             if (entry["obj"] == project) and (not entry["board"])), "")
         self._objects = [
             entry
             for entry in self._objects
-            if (not entry["board"]) or (entry["obj"] in {
-                b["obj"] for b in boards})
+            if not (entry["board"] and (entry["project"] == project))
         ]
-        known = {entry["obj"] for entry in self._objects}
-        for b in boards:
-            if b["obj"] not in known:
-                self._objects.append(
-                    {"name": b["name"], "obj": b["obj"],
-                     "project": project, "board": True})
+        # Insert the boards right after the project's ERC entry.
+        index = next(
+            (i for i, entry in enumerate(self._objects)
+             if (entry["obj"] == project) and (not entry["board"])),
+            len(self._objects))
+        for i, b in enumerate(boards):
+            self._objects.insert(index + 1 + i, {
+                "name": b["name"], "obj": b["obj"],
+                "project": project, "project_name": project_name,
+                "board": True})
         self._update_model()
 
     def select_check(self, value):
@@ -58,6 +67,11 @@ class RuleCheckPage:
                 return
 
     # --- Command handlers ----------------------------------------------
+
+    def refresh_clicked(self):
+        """Manually rebuild the dropdown from ProjectEditor/list and one
+        ProjectEditor/get per project."""
+        self.app.call("ProjectEditor/list", {}, self._on_refresh_list)
 
     def run_clicked(self):
         if (self._selected is None) or self._running_msgid:
@@ -105,6 +119,26 @@ class RuleCheckPage:
                        "messages": sorted(self._checked),
                        "approved": approved})
 
+    def _on_refresh_list(self, status, payload):
+        if status != 0:
+            return
+        projects = payload.get("projects", [])
+        self.set_projects(projects)
+        for project in projects:
+            self.app.call(
+                "ProjectEditor/get", {"obj": project["obj"]},
+                lambda status, payload, project=project:
+                self._on_refresh_details(status, payload, project))
+
+    def _on_refresh_details(self, status, payload, project):
+        if status != 0:
+            return
+        boards = [
+            {"name": board["name"], "obj": board["obj"]}
+            for board in payload.get("boards", [])
+        ]
+        self.set_boards(project["obj"], boards)
+
     def _on_run(self, status, payload):
         self._running_msgid = None
         self.app.rulecheck_running = False
@@ -118,12 +152,22 @@ class RuleCheckPage:
     def _update_model(self):
         self.app.check_entries = slint.ListModel(
             [_label(entry) for entry in self._objects])
-        # Auto-select the first entry (the Run button needs a selection).
-        if (self._selected is None) and self._objects:
-            self._selected = self._objects[0]["obj"]
-            self._selected_project = self._objects[0].get(
+        # Keep the selection if it still exists, otherwise select the
+        # first entry (the Run button needs a selection).
+        selected = next(
+            (entry for entry in self._objects
+             if entry["obj"] == self._selected), None)
+        if selected is None and self._objects:
+            selected = self._objects[0]
+        if selected is not None:
+            self._selected = selected["obj"]
+            self._selected_project = selected.get(
                 "project", self._selected)
-            self.app.check_index = 0
+            self.app.check_index = self._objects.index(selected)
+        else:
+            self._selected = None
+            self._selected_project = None
+            self.app.check_index = -1
         self.app.check_messages = slint.ListModel([
             {
                 "checked": message["obj"] in self._checked,
@@ -137,4 +181,6 @@ class RuleCheckPage:
 
 
 def _label(entry):
-    return ("DRC: " if entry["board"] else "ERC: ") + entry["name"]
+    if entry["board"]:
+        return f"{entry['project_name']}: {entry['name']} (DRC)"
+    return f"{entry['name']} (ERC)"

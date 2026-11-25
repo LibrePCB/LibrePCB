@@ -181,6 +181,10 @@ class Gui(ns.AppWindow):
         self._pages["RuleCheck"].select_check(value)
 
     @slint.callback
+    def rc_refresh_clicked(self):
+        self._pages["RuleCheck"].refresh_clicked()
+
+    @slint.callback
     def rc_run_clicked(self):
         self._pages["RuleCheck"].run_clicked()
 
