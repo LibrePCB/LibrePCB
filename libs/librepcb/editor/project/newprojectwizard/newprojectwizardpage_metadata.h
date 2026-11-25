@@ -66,8 +66,7 @@ public:
   // Getters
   QString getProjectName() const noexcept;
   QString getProjectAuthor() const noexcept;
-  bool isLicenseSet() const noexcept;
-  FilePath getProjectLicenseFilePath() const noexcept;
+  QString getProjectLicenseIdentifier() const noexcept;
   FilePath getFullFilePath() const noexcept { return mFullFilePath; }
 
   // Operator Overloadings

@@ -17,6 +17,7 @@ from client import RpcClient, fmt_value, fmt_uuid
 from pages.protocol import ProtocolPage
 from pages.project_editor import ProjectEditorPage
 from pages.rule_check import RuleCheckPage
+from pages.graphics_export import GraphicsExportPage
 from pages.undo_stack import UndoStackPage
 from pages.remote_library import RemoteLibraryPage
 from pages.workspace_db import WorkspaceDbPage
@@ -41,6 +42,7 @@ PAGES = {
     "UndoStack": 3,
     "RemoteLibrary": 4,
     "WorkspaceDb": 5,
+    "GraphicsExport": 6,
 }
 
 ns = slint.load_file("app.slint")
@@ -52,8 +54,11 @@ class Gui(ns.AppWindow):
         self._auto_connect = True
         self.classes = slint.ListModel(api.CLASSES)
         self.current_page = PAGES["ProjectEditor"]
+        self.selected_class = api.CLASSES.index("ProjectEditor")
         if os.path.isfile(DEFAULT_PROJECT_PATH):
             self.project_path = DEFAULT_PROJECT_PATH
+        self.create_path = ""
+        self.create_name = ""
         self.client = None
         self._log_lines = []
         self.log = ""
@@ -64,10 +69,13 @@ class Gui(ns.AppWindow):
         self.check_entries = slint.ListModel([])
         self.check_messages = slint.ListModel([])
         self.quick = False
+        self.ge_entries = slint.ListModel([])
+        self.ge_status = ""
         self._pages = {
             "Protocol": ProtocolPage(self),
             "ProjectEditor": ProjectEditorPage(self),
             "RuleCheck": RuleCheckPage(self),
+            "GraphicsExport": GraphicsExportPage(self),
             "UndoStack": UndoStackPage(self),
             "RemoteLibrary": RemoteLibraryPage(self),
             "WorkspaceDb": WorkspaceDbPage(self),
@@ -149,6 +157,10 @@ class Gui(ns.AppWindow):
         self._pages["Protocol"].ping_clicked()
 
     # --- ProjectEditor page -----------------------------------------------
+
+    @slint.callback
+    def pe_create_clicked(self):
+        self._pages["ProjectEditor"].create_clicked()
 
     @slint.callback
     def pe_open_clicked(self):
@@ -245,6 +257,20 @@ class Gui(ns.AppWindow):
     @slint.callback
     def db_wait_clicked(self):
         self._pages["WorkspaceDb"].wait_clicked()
+
+    # --- GraphicsExport page -------------------------------------------------
+
+    @slint.callback
+    def ge_select_render(self, value):
+        self._pages["GraphicsExport"].select(value)
+
+    @slint.callback
+    def ge_refresh_clicked(self):
+        self._pages["GraphicsExport"].refresh_clicked()
+
+    @slint.callback
+    def ge_render_clicked(self):
+        self._pages["GraphicsExport"].render_clicked()
 
     # --- RPC plumbing --------------------------------------------------------
 

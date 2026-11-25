@@ -24,6 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include <librepcb/core/fileio/filepath.h>
+#include <librepcb/core/types/elementname.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -37,6 +38,7 @@ namespace librepcb {
 
 class Project;
 class Workspace;
+class WorkspaceSettings;
 struct UiTheme;
 
 namespace editor {
@@ -75,6 +77,12 @@ public:
 
   // General Methods
   std::unique_ptr<Project> createProject() const;
+  static std::unique_ptr<Project> createProject(
+      const WorkspaceSettings& wsSettings, const FilePath& fp,
+      const ElementName& name, const QString& author,
+      const QString& licenseIdentifier,
+      NewProjectWizardPage_Initialization* initPage,
+      NewProjectWizardPage_EagleImport* eagleImportPage);
 
   // Operator Overloadings
   NewProjectWizard& operator=(const NewProjectWizard& rhs) = delete;

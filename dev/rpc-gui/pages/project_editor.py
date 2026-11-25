@@ -14,6 +14,16 @@ class ProjectEditorPage:
 
     # --- Command handlers ----------------------------------------------
 
+    def create_clicked(self):
+        path = self.app.create_path.strip()
+        if not path:
+            return
+        params = {"path": path}
+        name = self.app.create_name.strip()
+        if name:
+            params["name"] = name
+        self.app.call("ProjectEditor/create", params)
+
     def open_clicked(self):
         path = self.app.project_path.strip()
         if not path:
@@ -33,11 +43,11 @@ class ProjectEditorPage:
 
     def save_clicked(self, index):
         self._select(index)
-        self.app.call("ProjectEditor.save", {"obj": self._handles[index]})
+        self.app.call("ProjectEditor/save", {"obj": self._handles[index]})
 
     def close_clicked(self, index):
         self._select(index)
-        self.app.call("ProjectEditor.close", {"obj": self._handles[index]},
+        self.app.call("ProjectEditor/close", {"obj": self._handles[index]},
                       self._on_closed)
 
     def apply_clicked(self):

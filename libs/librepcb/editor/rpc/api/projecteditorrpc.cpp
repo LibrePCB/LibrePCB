@@ -25,6 +25,7 @@
 #include "../../guiapplication.h"
 #include "../../project/board/boardeditor.h"
 #include "../../project/cmd/cmdprojectedit.h"
+#include "../../project/newprojectwizard/newprojectwizard.h"
 #include "../../project/projecteditor.h"
 #include "../../project/schematic/schematiceditor.h"
 #include "../../undostack.h"
@@ -41,6 +42,8 @@
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/schematic/schematic.h>
+#include <librepcb/core/workspace/workspace.h>
+#include <librepcb/core/workspace/workspacesettings.h>
 
 /*******************************************************************************
  *  Namespace
@@ -129,6 +132,24 @@ void ProjectEditorRpc::list(GuiApplication& app, RpcObjectRegistry& registry,
     projects.append(summary(*editor, registry));
   }
   request.send({{"projects", projects}});
+}
+
+void ProjectEditorRpc::create(GuiApplication& app, RpcObjectRegistry& registry,
+                              RpcRequest& request) {
+  Q_UNUSED(registry);
+  const FilePath fp(getArg<QString>(request, "path"));
+  const auto name = getOptionalArg<ElementName>(request, "name")
+                        .value_or(ElementName(fp.getCompleteBasename()));
+  const auto license =
+      getOptionalArg<QString>(request, "license").value_or(QString());
+  const auto& ws = app.getWorkspace().getSettings();
+  auto project = NewProjectWizard::createProject(
+      ws, fp, name, ws.userName.get(), license, nullptr, nullptr);
+  project.reset();  // Release lock.
+  auto editor = app.openProjectNonInteractive(
+      fp, &TransactionalFileSystem::RestoreMode::abort);
+  if (!editor) throw RpcInternalError();
+  request.send(details(*editor, registry));
 }
 
 void ProjectEditorRpc::open(GuiApplication& app, RpcObjectRegistry& registry,

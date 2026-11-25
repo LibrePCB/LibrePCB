@@ -1,0 +1,84 @@
+import { Button, CheckBox, ComboBox, SpinBox } from "std-widgets.slint";
+
+export component GraphicsExportPage {
+    in property <bool> authenticated;
+    in property <[string]> entries;
+    in-out property <int> current-index: -1;
+    in-out property <int> dpi: 100;
+    in-out property <bool> flip: false;
+    in-out property <bool> realistic: false;
+    in property <image> image;
+    in property <bool> running;
+    in property <string> status;
+    callback select-render(string);
+    callback refresh-clicked();
+    callback render-clicked();
+
+    VerticalLayout {
+        spacing: 8px;
+
+        HorizontalLayout {
+            spacing: 6px;
+
+            ComboBox {
+                model: root.entries;
+                current-index <=> root.current-index;
+                selected(value) => { root.select-render(value); }
+                horizontal-stretch: 1;
+            }
+
+            Button {
+                text: "Refresh";
+                enabled: root.authenticated && (!root.running);
+                clicked => { root.refresh-clicked(); }
+            }
+
+            Button {
+                text: "Render";
+                enabled: root.authenticated && (!root.running)
+                    && root.current-index >= 0;
+                clicked => { root.render-clicked(); }
+            }
+        }
+
+        HorizontalLayout {
+            spacing: 6px;
+
+            Text {
+                text: "DPI:";
+                vertical-alignment: center;
+            }
+
+            SpinBox {
+                value <=> root.dpi;
+                minimum: 1;
+                maximum: 1000;
+                step-size: 10;
+            }
+
+            CheckBox {
+                text: "flip";
+                checked <=> root.flip;
+            }
+
+            CheckBox {
+                text: "realistic";
+                checked <=> root.realistic;
+            }
+
+            Rectangle { horizontal-stretch: 1; }
+
+            Text {
+                text: root.status;
+                vertical-alignment: center;
+                color: #808080;
+            }
+        }
+
+        Image {
+            source: root.image;
+            image-fit: contain;
+            vertical-stretch: 1;
+        }
+    }
+}

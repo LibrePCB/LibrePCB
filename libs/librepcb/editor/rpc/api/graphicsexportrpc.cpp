@@ -23,7 +23,9 @@
 #include "graphicsexportrpc.h"
 
 #include "../../guiapplication.h"
+#include "../../project/board/boardeditor.h"
 #include "../../project/projecteditor.h"
+#include "../../project/schematic/schematiceditor.h"
 #include "../rpcnotification.h"
 #include "../rpcobjectregistry.h"
 #include "../rpcrequest.h"
@@ -62,25 +64,28 @@ void GraphicsExportRpc::render(GuiApplication& app, RpcObjectRegistry& registry,
   Q_UNUSED(app);
 
   auto settings = std::make_shared<GraphicsExportSettings>();
-  settings->setPixmapDpi(getOptionalArg<qint64>(request, "dpi").value_or(100));
+  settings->setPixmapDpi(getOptionalArg<qint64>(request, "dpi").value_or(300));
   settings->setMirror(getOptionalArg<bool>(request, "flip").value_or(false));
 
   QStringList painterErrors;
   std::shared_ptr<GraphicsPagePainter> painter;
-  if (auto schematic = registry.tryGetAs<Schematic>(request.getArg("obj"))) {
-    painter = std::make_shared<SchematicPainter>(*schematic, &painterErrors);
+  if (auto editor = registry.tryGetAs<SchematicEditor>(request.getArg("obj"))) {
+    painter = std::make_shared<SchematicPainter>(editor->getSchematic(),
+                                                 &painterErrors);
     settings->loadColorsFromScheme(&BaseColorScheme::schematicLibrePcbLight(),
                                    &BaseColorScheme::boardLibrePcbDark(), 0);
-  } else if (auto board = registry.tryGetAs<Board>(request.getArg("obj"))) {
+  } else if (auto editor =
+                 registry.tryGetAs<BoardEditor>(request.getArg("obj"))) {
+    Board& board = editor->getBoard();
     if (getOptionalArg<bool>(request, "realistic").value_or(false)) {
       painter = std::make_shared<RealisticBoardPainter>(
-          board->buildScene3D(std::nullopt));
-      settings->loadBoardRenderingColors(board->getInnerLayerCount());
+          board.buildScene3D(std::nullopt));
+      settings->loadBoardRenderingColors(board.getInnerLayerCount());
     } else {
-      painter = std::make_shared<BoardPainter>(*board);
+      painter = std::make_shared<BoardPainter>(board);
       settings->loadColorsFromScheme(&BaseColorScheme::schematicLibrePcbLight(),
                                      &BaseColorScheme::boardLibrePcbDark(),
-                                     board->getInnerLayerCount());
+                                     board.getInnerLayerCount());
     }
   }
   if (!painter) throw RpcInvalidHandle();
@@ -108,7 +113,8 @@ void GraphicsExportRpc::render(GuiApplication& app, RpcObjectRegistry& registry,
   };
 
   request.makeAsync(*exporter);
-  request.send(RpcNotification().result({{"errors", painterErrors}}));
+  request.send(
+      RpcNotification().result({{"errors", toVariant(painterErrors)}}));
   QObject::connect(&request, &RpcRequest::cancelled, exporter,
                    &GraphicsExport::cancel);
   QObject::connect(exporter, &GraphicsExport::succeeded, &request,

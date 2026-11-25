@@ -68,6 +68,12 @@ public:
                    RpcRequest& request);
 
   /**
+   * @brief Create a new project and open it.
+   */
+  static void create(GuiApplication& app, RpcObjectRegistry& registry,
+                     RpcRequest& request);
+
+  /**
    * @brief Open a project by file path. If the project is already open,
    *        nothing is changed and the summary of the already open project is
    *        returned.

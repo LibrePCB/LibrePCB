@@ -35,6 +35,8 @@ def _fmt(value):
         return "[" + ", ".join(_fmt(item) for item in value) + "]"
     if value is None:
         return "nil"
+    if isinstance(value, (bytes, bytearray)):
+        return f"<binary {len(value)} bytes>"
     if isinstance(value, str):
         # Strings are always printed with single quotes, so they can be
         # distinguished from non-string objects (e.g. UUID ext values).

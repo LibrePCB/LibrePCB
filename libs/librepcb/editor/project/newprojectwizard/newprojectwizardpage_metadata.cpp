@@ -14,7 +14,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/>.
  */
 
 /*******************************************************************************
@@ -83,33 +83,31 @@ NewProjectWizardPage_Metadata::NewProjectWizardPage_Metadata(
   mUi->edtAuthor->setText(ws.getSettings().userName.get());
   mUi->cbxLicense->addItem(tr("None"), QString());
   // add SPDX license identifiers
-  mUi->cbxLicense->addItem(tr("CC0-1.0 (no restrictions)"),
-                           QString("licenses/cc0-1.0.txt"));
+  mUi->cbxLicense->addItem(tr("CC0-1.0 (no restrictions)"), QString("cc0-1.0"));
   mUi->cbxLicense->addItem(tr("CC-BY-4.0 (requires attribution)"),
-                           QString("licenses/cc-by-4.0.txt"));
+                           QString("cc-by-4.0"));
   mUi->cbxLicense->addItem(
       tr("CC-BY-SA-4.0 (requires attribution + share alike)"),
-      QString("licenses/cc-by-sa-4.0.txt"));
+      QString("cc-by-sa-4.0"));
   mUi->cbxLicense->addItem(
       tr("CC-BY-NC-4.0 (requires attribution + non commercial)"),
-      QString("licenses/cc-by-nc-4.0.txt"));
+      QString("cc-by-nc-4.0"));
   mUi->cbxLicense->addItem(tr("CC-BY-NC-SA-4.0 (requires attribution + non "
                               "commercial + share alike)"),
-                           QString("licenses/cc-by-nc-sa-4.0.txt"));
+                           QString("cc-by-nc-sa-4.0"));
   mUi->cbxLicense->addItem(tr("CC-BY-NC-ND-4.0 (requires attribution + non "
                               "commercial + no derivatives)"),
-                           QString("licenses/cc-by-nc-nd-4.0.txt"));
+                           QString("cc-by-nc-nd-4.0"));
   mUi->cbxLicense->addItem(
       tr("CC-BY-ND-4.0 (requires attribution + no derivatives)"),
-      QString("licenses/cc-by-nd-4.0.txt"));
-  mUi->cbxLicense->addItem(tr("TAPR-OHL-1.0"),
-                           QString("licenses/tapr-ohl-1.0.txt"));
+      QString("cc-by-nd-4.0"));
+  mUi->cbxLicense->addItem(tr("TAPR-OHL-1.0"), QString("tapr-ohl-1.0"));
   mUi->cbxLicense->addItem(tr("CERN-OHL-P-2.0 (permissive)"),
-                           QString("licenses/cern-ohl-p-2.0.txt"));
+                           QString("cern-ohl-p-2.0"));
   mUi->cbxLicense->addItem(tr("CERN-OHL-W-2.0 (weakly reciprocal)"),
-                           QString("licenses/cern-ohl-w-2.0.txt"));
+                           QString("cern-ohl-w-2.0"));
   mUi->cbxLicense->addItem(tr("CERN-OHL-S-2.0 (strongly reciprocal)"),
-                           QString("licenses/cern-ohl-s-2.0.txt"));
+                           QString("cern-ohl-s-2.0"));
   mUi->cbxLicense->setCurrentIndex(0);  // no license
 
   // Restore client settings.
@@ -167,19 +165,9 @@ QString NewProjectWizardPage_Metadata::getProjectAuthor() const noexcept {
   return mUi->edtAuthor->text();
 }
 
-bool NewProjectWizardPage_Metadata::isLicenseSet() const noexcept {
-  return !mUi->cbxLicense->currentData(Qt::UserRole).toString().isEmpty();
-}
-
-FilePath NewProjectWizardPage_Metadata::getProjectLicenseFilePath()
+QString NewProjectWizardPage_Metadata::getProjectLicenseIdentifier()
     const noexcept {
-  QString licenseFileName =
-      mUi->cbxLicense->currentData(Qt::UserRole).toString();
-  if (!licenseFileName.isEmpty()) {
-    return Application::getResourcesDir().getPathTo(licenseFileName);
-  } else {
-    return FilePath();
-  }
+  return mUi->cbxLicense->currentData(Qt::UserRole).toString();
 }
 
 /*******************************************************************************

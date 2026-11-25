@@ -273,6 +273,24 @@ List all open projects.
 
 ---
 
+### ProjectEditor/create {#doc_rpc_api_method_ProjectEditor_create}
+
+Create a new project and open it.
+
+**Params:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `path` | `string` | Absolute *.lpp file path. Its directory must not exist yet or must be empty. |
+| `name` | `string?` | If provided, the project's name will be set. Otherwise, the file basename will be used as project name. |
+| `license` | `string?` | SPDX license identifier of the license to set on the project. Note that only a small set of licenses are supported. If omitted, no `LICENSE.txt` will be added to the project. |
+
+**Result:** [`ProjectEditorSummary`](@ref doc_rpc_api_type_ProjectEditorSummary)
+
+**Since:** 2.2.0
+
+---
+
 ### ProjectEditor/open {#doc_rpc_api_method_ProjectEditor_open}
 
 Open a project by file path. If the project is already open, nothing is changed and the summary of the already open project is returned.
@@ -404,10 +422,8 @@ Render a single graphics scene to an image and return it.
 | Name | Type | Description |
 |------|------|-------------|
 | `format` | `string` (default: `png`) | Image format. |
-| `dpi` | `integer` (default: `100`) | Resolution. |
-| `region` | `array` of `Point` | Region to render (top_left/bottom_right). If omitted, the whole scene is rendered. |
+| `dpi` | `integer` (default: `300`) | Resolution. |
 | `flip` | `bool` | If true, the rendering will be flipped to the bottom side. Only supported for boards. |
-| `layers` | `map` of `map` | Layers to render. Map key is the layer ID, value may contain 'color' to specify the color. If omitted, default values will be used. |
 | `realistic` | `bool` | If true, a realistic rendering will be done. Only supported for boards. |
 
 **Result:**
@@ -417,7 +433,6 @@ Render a single graphics scene to an image and return it.
 | Name | Type | Description |
 |------|------|-------------|
 | `image` | `binary` | Rendered image in the requested format as a binary blob. |
-| `region` | `array` of `Point` | Region represented by the image (coordinates of pixels at [0,0] and [N,N]). |
 | `errors` | `array` of `string` | Any occurred rendering errors if the image could be rendered partially. If the image could not be rendered at all, an RPC error is returned instead. |
 
 

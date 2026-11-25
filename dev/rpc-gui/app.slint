@@ -9,6 +9,7 @@ import {
     ProjectEditorPage,
     ProjectRowData,
 } from "pages/project_editor.slint";
+import { GraphicsExportPage } from "pages/graphics_export.slint";
 import { UndoStackPage } from "pages/undo_stack.slint";
 import {
     RemoteLibraryPage,
@@ -42,6 +43,8 @@ export component AppWindow inherits Window {
 
     // --- ProjectEditor page -----------------------------------------------
     in-out property <string> project-path;
+    in-out property <string> create-path;
+    in-out property <string> create-name;
     in property <[ProjectRowData]> projects;
     in property <string> project-details;
     in-out property <string> pe-name;
@@ -49,6 +52,7 @@ export component AppWindow inherits Window {
     in-out property <string> pe-version;
     in-out property <string> pe-locales;
     in-out property <string> pe-norms;
+    callback pe-create-clicked();
     callback pe-open-clicked();
     callback pe-list-clicked();
     callback pe-get-clicked(int);
@@ -91,6 +95,19 @@ export component AppWindow inherits Window {
 
     // --- WorkspaceDb page --------------------------------------------------
     callback db-wait-clicked();
+
+    // --- GraphicsExport page -----------------------------------------------
+    in property <[string]> ge-entries;
+    in-out property <int> ge-index: -1;
+    in-out property <int> ge-dpi: 100;
+    in-out property <bool> ge-flip: false;
+    in-out property <bool> ge-realistic: false;
+    in property <image> ge-image;
+    in property <bool> ge-running;
+    in property <string> ge-status;
+    callback ge-select-render(string);
+    callback ge-refresh-clicked();
+    callback ge-render-clicked();
 
     // --- Connection callbacks ------------------------------------------------
     callback connect-clicked();
@@ -207,6 +224,8 @@ export component AppWindow inherits Window {
                 vertical-stretch: 1;
                 authenticated: root.authenticated;
                 path <=> root.project-path;
+                create-path <=> root.create-path;
+                create-name <=> root.create-name;
                 projects: root.projects;
                 details: root.project-details;
                 pe-name <=> root.pe-name;
@@ -214,6 +233,7 @@ export component AppWindow inherits Window {
                 pe-version <=> root.pe-version;
                 pe-locales <=> root.pe-locales;
                 pe-norms <=> root.pe-norms;
+                create-clicked => { root.pe-create-clicked(); }
                 open-clicked => { root.pe-open-clicked(); }
                 list-clicked => { root.pe-list-clicked(); }
                 get-clicked(i) => { root.pe-get-clicked(i); }
@@ -265,6 +285,21 @@ export component AppWindow inherits Window {
                 authenticated: root.authenticated;
                 progress: root.progress;
                 wait-clicked => { root.db-wait-clicked(); }
+            }
+            if root.current-page == 6: GraphicsExportPage {
+                vertical-stretch: 1;
+                authenticated: root.authenticated;
+                entries: root.ge-entries;
+                current-index <=> root.ge-index;
+                dpi <=> root.ge-dpi;
+                flip <=> root.ge-flip;
+                realistic <=> root.ge-realistic;
+                image: root.ge-image;
+                running: root.ge-running;
+                status: root.ge-status;
+                select-render(value) => { root.ge-select-render(value); }
+                refresh-clicked => { root.ge-refresh-clicked(); }
+                render-clicked => { root.ge-render-clicked(); }
             }
             if root.current-page < 0: Text {
                 vertical-stretch: 1;

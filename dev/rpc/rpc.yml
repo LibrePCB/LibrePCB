@@ -442,6 +442,28 @@ classes:
             items: ProjectEditorSummary
             description: All open projects, in the order of their editor tabs.
 
+      - name: create
+        description: Create a new project and open it.
+        static: true
+        params:
+          - name: path
+            type: string
+            description: >-
+              Absolute *.lpp file path. Its directory must not exist yet or
+              must be empty.
+          - name: name
+            type: string?
+            description: >-
+              If provided, the project's name will be set. Otherwise, the
+              file basename will be used as project name.
+          - name: license
+            type: string?
+            description: >-
+              SPDX license identifier of the license to set on the project.
+              Note that only a small set of licenses are supported. If
+              omitted, no `LICENSE.txt` will be added to the project.
+        result: ProjectEditorSummary
+
       - name: open
         description: >-
           Open a project by file path. If the project is already open,
@@ -555,27 +577,27 @@ classes:
             description: Image format.
           - name: dpi
             type: integer
-            default: 100
+            default: 300
             description: Resolution.
-          - name: region
-            type: array
-            items: Point
-            description: >-
-              Region to render (top_left/bottom_right). If omitted, the whole
-              scene is rendered.
+          #- name: region
+          #  type: array
+          #  items: Point
+          #  description: >-
+          #    Region to render (top_left/bottom_right). If omitted, the whole
+          #    scene is rendered.
           - name: flip
             type: bool
             default: false
             description: >-
               If true, the rendering will be flipped to the bottom side. Only
               supported for boards.
-          - name: layers
-            type: map
-            items: map
-            description: >-
-              Layers to render. Map key is the layer ID, value may contain
-              'color' to specify the color. If omitted, default values will
-              be used.
+          #- name: layers
+          #  type: map
+          #  items: map
+          #  description: >-
+          #    Layers to render. Map key is the layer ID, value may contain
+          #    'color' to specify the color. If omitted, default values will
+          #    be used.
           - name: realistic
             type: bool
             default: false
@@ -587,12 +609,12 @@ classes:
             type: binary
             description: >-
               Rendered image in the requested format as a binary blob.
-          - name: region
-            type: array
-            items: Point
-            description: >-
-              Region represented by the image (coordinates of pixels at [0,0]
-              and [N,N]).
+          #- name: region
+          #  type: array
+          #  items: Point
+          #  description: >-
+          #    Region represented by the image (coordinates of pixels at [0,0]
+          #    and [N,N]).
           - name: errors
             type: array
             items: string

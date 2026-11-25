@@ -107,8 +107,22 @@ void NewProjectWizard::setLocationOverride(const FilePath& dir) noexcept {
  ******************************************************************************/
 
 std::unique_ptr<Project> NewProjectWizard::createProject() const {
+  return createProject(
+      mWorkspace.getSettings(), mPageMetadata->getFullFilePath(),
+      ElementName(cleanElementName(mPageMetadata->getProjectName())),
+      mPageMetadata->getProjectAuthor(),
+      mPageMetadata->getProjectLicenseIdentifier(), mPageInitialization,
+      mPageEagleImport);
+}
+
+std::unique_ptr<Project> NewProjectWizard::createProject(
+    const WorkspaceSettings& wsSettings, const FilePath& fp,
+    const ElementName& name, const QString& author,
+    const QString& licenseIdentifier,
+    NewProjectWizardPage_Initialization* initPage,
+    NewProjectWizardPage_EagleImport* eagleImportPage) {
   // Try to remove directory after creation failed and if it doesn't exist now.
-  const FilePath projectDir = mPageMetadata->getFullFilePath().getParentDir();
+  const FilePath projectDir = fp.getParentDir();
   const bool projectDirExisted = projectDir.isExistingDir();
   auto sg = scopeGuard([projectDir, projectDirExisted]() {
     if (!projectDirExisted) QDir(projectDir.toStr()).removeRecursively();
@@ -124,40 +138,39 @@ std::unique_ptr<Project> NewProjectWizard::createProject() const {
   TransactionalDirectory dir(fs);
 
   // create project and set some metadata
-  std::unique_ptr<Project> project =
-      Project::create(std::make_unique<TransactionalDirectory>(fs),
-                      mPageMetadata->getFullFilePath().getFilename());
-  project->setName(ElementName(
-      cleanElementName(mPageMetadata->getProjectName())));  // can throw
-  project->setAuthor(mPageMetadata->getProjectAuthor());
+  std::unique_ptr<Project> project = Project::create(
+      std::make_unique<TransactionalDirectory>(fs), fp.getFilename());
+  project->setName(name);
+  project->setAuthor(author);
 
   // set project settings (copy from workspace settings)
-  project->setLocaleOrder(mWorkspace.getSettings().libraryLocaleOrder.get());
-  project->setNormOrder(mWorkspace.getSettings().libraryNormOrder.get());
+  project->setLocaleOrder(wsSettings.libraryLocaleOrder.get());
+  project->setNormOrder(wsSettings.libraryNormOrder.get());
 
   // add schematic
-  if (mPageInitialization && mPageInitialization->getCreateSchematic()) {
-    Schematic* schematic = new Schematic(
-        *project, std::make_unique<TransactionalDirectory>(),
-        mPageInitialization->getSchematicDirName(), Uuid::createRandom(),
-        ElementName(mPageInitialization->getSchematicName()));  // can throw
+  if (initPage && initPage->getCreateSchematic()) {
+    Schematic* schematic =
+        new Schematic(*project, std::make_unique<TransactionalDirectory>(),
+                      initPage->getSchematicDirName(), Uuid::createRandom(),
+                      ElementName(initPage->getSchematicName()));  // can throw
     project->addSchematic(*schematic);
   }
 
   // add board
-  if (mPageInitialization && mPageInitialization->getCreateBoard()) {
-    Board* board = new Board(
-        *project, std::make_unique<TransactionalDirectory>(),
-        mPageInitialization->getBoardDirName(), Uuid::createRandom(),
-        ElementName(mPageInitialization->getBoardName()));  // can throw
+  if (initPage && initPage->getCreateBoard()) {
+    Board* board =
+        new Board(*project, std::make_unique<TransactionalDirectory>(),
+                  initPage->getBoardDirName(), Uuid::createRandom(),
+                  ElementName(initPage->getBoardName()));  // can throw
     board->addDefaultContent();
     project->addBoard(*board);
   }
 
   // copy license file
-  if (mPageMetadata->isLicenseSet()) {
+  if (!licenseIdentifier.isEmpty()) {
     try {
-      FilePath source = mPageMetadata->getProjectLicenseFilePath();
+      const FilePath source = Application::getResourcesDir().getPathTo(
+          "licenses/" % licenseIdentifier % ".txt");
       dir.write("LICENSE.txt", FileUtils::readFile(source));  // can throw
     } catch (Exception& e) {
       qCritical() << "Could not copy the license file:" << e.getMsg();
@@ -169,8 +182,8 @@ std::unique_ptr<Project> NewProjectWizard::createProject() const {
     FilePath source =
         Application::getResourcesDir().getPathTo("project/readme_template");
     QByteArray content = FileUtils::readFile(source);  // can throw
-    content.replace("{PROJECT_NAME}", mPageMetadata->getProjectName().toUtf8());
-    if (mPageMetadata->isLicenseSet()) {
+    content.replace("{PROJECT_NAME}", name->toUtf8());
+    if (!licenseIdentifier.isEmpty()) {
       content.replace("{LICENSE_TEXT}", "See [LICENSE.txt](LICENSE.txt).");
     } else {
       content.replace("{LICENSE_TEXT}", "No license set.");
@@ -199,9 +212,9 @@ std::unique_ptr<Project> NewProjectWizard::createProject() const {
   }
 
   // Import EAGLE project, if needed.
-  if (mPageEagleImport) {
+  if (eagleImportPage) {
     try {
-      mPageEagleImport->import(*project);  // can throw
+      eagleImportPage->import(*project);  // can throw
     } catch (const Exception& e) {
       throw RuntimeError(__FILE__, __LINE__,
                          tr("EAGLE import failed:") % "\n\n" % e.getMsg());

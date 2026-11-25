@@ -9,6 +9,8 @@ export struct ProjectRowData {
 export component ProjectEditorPage {
     in property <bool> authenticated;
     in-out property <string> path;
+    in-out property <string> create-path;
+    in-out property <string> create-name;
     in property <[ProjectRowData]> projects;
     in property <string> details;
     // --- The set form (absent arguments are not modified) --------------
@@ -17,6 +19,7 @@ export component ProjectEditorPage {
     in-out property <string> pe-version;
     in-out property <string> pe-locales;
     in-out property <string> pe-norms;
+    callback create-clicked();
     callback open-clicked();
     callback list-clicked();
     callback get-clicked(int);
@@ -26,6 +29,29 @@ export component ProjectEditorPage {
 
     VerticalLayout {
         spacing: 8px;
+
+        // Create a new project (license not supported yet).
+        HorizontalLayout {
+            spacing: 6px;
+
+            LineEdit {
+                text <=> root.create-path;
+                placeholder-text: "New Project File Path";
+                horizontal-stretch: 1;
+            }
+
+            LineEdit {
+                text <=> root.create-name;
+                placeholder-text: "Project Name (optional)";
+                horizontal-stretch: 1;
+            }
+
+            Button {
+                text: "Create";
+                enabled: root.authenticated;
+                clicked => { root.create-clicked(); }
+            }
+        }
 
         HorizontalLayout {
             spacing: 6px;
@@ -49,8 +75,11 @@ export component ProjectEditorPage {
             }
         }
 
+        // The project list only takes the height it needs; the details
+        // text field below absorbs the remaining vertical space.
         ListView {
-            vertical-stretch: 2;
+            vertical-stretch: 0;
+            min-height: 80px;
 
             for project[i] in root.projects: HorizontalLayout {
                 spacing: 6px;
