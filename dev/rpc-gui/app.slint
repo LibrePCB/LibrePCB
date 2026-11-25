@@ -14,6 +14,7 @@ import {
     RemoteLibraryPage,
     LibraryRowData,
 } from "pages/remote_library.slint";
+import { RuleCheckPage } from "pages/rule_check.slint";
 import { WorkspaceDbPage } from "pages/workspace_db.slint";
 
 export component AppWindow inherits Window {
@@ -42,11 +43,17 @@ export component AppWindow inherits Window {
     in-out property <string> project-path;
     in property <[ProjectRowData]> projects;
     in property <string> project-details;
+    in-out property <string> pe-name;
+    in-out property <string> pe-author;
+    in-out property <string> pe-version;
+    in-out property <string> pe-locales;
+    in-out property <string> pe-norms;
     callback pe-open-clicked();
     callback pe-list-clicked();
     callback pe-get-clicked(int);
     callback pe-save-clicked(int);
     callback pe-close-clicked(int);
+    callback pe-apply-clicked();
 
     // --- UndoStack page ----------------------------------------------------
     in property <[string]> project-entries;
@@ -66,8 +73,21 @@ export component AppWindow inherits Window {
     callback rl-apply-clicked();
     callback rl-get-clicked(int);
 
-    // --- WorkspaceDb page --------------------------------------------------
+    // --- RuleCheck page ----------------------------------------------------
+    in property <bool> rulecheck-running;
     in property <int> progress;
+    in property <[string]> check-entries;
+    in-out property <int> check-index: -1;
+    in-out property <bool> quick;
+    in property <[RuleCheckMessageData]> check-messages;
+    callback rc-select-check(string);
+    callback rc-run-clicked();
+    callback rc-cancel-clicked();
+    callback rc-check-toggled(int, bool);
+    callback rc-approve-clicked();
+    callback rc-unapprove-clicked();
+
+    // --- WorkspaceDb page --------------------------------------------------
     callback db-wait-clicked();
 
     // --- Connection callbacks ------------------------------------------------

@@ -16,6 +16,7 @@ import api
 from client import RpcClient, fmt_value, fmt_uuid
 from pages.protocol import ProtocolPage
 from pages.project_editor import ProjectEditorPage
+from pages.rule_check import RuleCheckPage
 from pages.undo_stack import UndoStackPage
 from pages.remote_library import RemoteLibraryPage
 from pages.workspace_db import WorkspaceDbPage
@@ -35,6 +36,7 @@ PAGES = {
     "UndoStack": 2,
     "RemoteLibrary": 3,
     "WorkspaceDb": 4,
+    "RuleCheck": 5,
 }
 
 ns = slint.load_file("app.slint")
@@ -55,9 +57,13 @@ class Gui(ns.AppWindow):
         self.libraries = slint.ListModel([])
         self.project_entries = slint.ListModel([])
         self.undo_handle_valid = False
+        self.check_entries = slint.ListModel([])
+        self.check_messages = slint.ListModel([])
+        self.quick = False
         self._pages = {
             "Protocol": ProtocolPage(self),
             "ProjectEditor": ProjectEditorPage(self),
+            "RuleCheck": RuleCheckPage(self),
             "UndoStack": UndoStackPage(self),
             "RemoteLibrary": RemoteLibraryPage(self),
             "WorkspaceDb": WorkspaceDbPage(self),
@@ -158,6 +164,36 @@ class Gui(ns.AppWindow):
     @slint.callback
     def pe_close_clicked(self, index):
         self._pages["ProjectEditor"].close_clicked(index)
+
+    @slint.callback
+    def pe_apply_clicked(self):
+        self._pages["ProjectEditor"].apply_clicked()
+
+    # --- RuleCheck page ------------------------------------------------------
+
+    @slint.callback
+    def rc_select_check(self, value):
+        self._pages["RuleCheck"].select_check(value)
+
+    @slint.callback
+    def rc_run_clicked(self):
+        self._pages["RuleCheck"].run_clicked()
+
+    @slint.callback
+    def rc_cancel_clicked(self):
+        self._pages["RuleCheck"].cancel_clicked()
+
+    @slint.callback
+    def rc_check_toggled(self, index, checked):
+        self._pages["RuleCheck"].check_toggled(index, checked)
+
+    @slint.callback
+    def rc_approve_clicked(self):
+        self._pages["RuleCheck"].approve_clicked()
+
+    @slint.callback
+    def rc_unapprove_clicked(self):
+        self._pages["RuleCheck"].unapprove_clicked()
 
     # --- UndoStack page ----------------------------------------------------
 

@@ -9,43 +9,72 @@ class ProjectEditorPage:
     def __init__(self, app):
         self.app = app
         self._handles = []
+        self._details_obj = None  # The handle of the last get/set project.
+        self._details = None  # The details of the last get/set project.
+
+    # --- Command handlers ----------------------------------------------
 
     def open_clicked(self):
         path = self.app.project_path.strip()
         if not path:
             return
-        self.app.call("ProjectEditor/open", {"path": path}, self._on_opened)
-
-    def _on_opened(self, status, payload):
-        # Opening changes the project list, so refresh it automatically.
-        if status == 0:
-            self.list_clicked()
+        self.app.call("ProjectEditor/open", {"path": path})
 
     def list_clicked(self):
         self.app.call("ProjectEditor/list", {}, self._on_list)
 
     def get_clicked(self, index):
         self._select(index)
-        self.app.call("ProjectEditor/get", {"obj": self._handles[index]},
-                      self._on_details)
+        self.app.call(
+            "ProjectEditor/get", {"obj": self._handles[index]},
+            lambda status, payload: self._on_details(
+                status, payload, self._handles[index]))
 
     def save_clicked(self, index):
         self._select(index)
-        self.app.call("ProjectEditor/save", {"obj": self._handles[index]})
+        self.app.call("ProjectEditor.save", {"obj": self._handles[index]})
 
     def close_clicked(self, index):
         self._select(index)
-        self.app.call("ProjectEditor/close", {"obj": self._handles[index]},
+        self.app.call("ProjectEditor.close", {"obj": self._handles[index]},
                       self._on_closed)
+
+    def apply_clicked(self):
+        """Send only the fields which were modified by the user (absent
+        arguments are not modified by the server)."""
+        if self._details is None:
+            return
+        params = {}
+        for key, prop in [("name", "pe_name"), ("author", "pe_author"),
+                          ("version", "pe_version")]:
+            value = str(getattr(self.app, prop)).strip()
+            if value != self._details.get(key, ""):
+                params[key] = value
+        for key, prop in [("locale_order", "pe_locales"),
+                          ("norm_order", "pe_norms")]:
+            value = _split_list(str(getattr(self.app, prop)))
+            if value != self._details.get(key, []):
+                params[key] = value
+        if params:
+            self.app.call(
+                "ProjectEditor/set", {"obj": self._details_obj, **params},
+                self._on_details)
+
+    # --- Response handlers ---------------------------------------------
+
+    def _select(self, index):
+        # Make the handle of the last used row available to other pages.
+        self.app._pages["UndoStack"].select(index)
+
+    def _on_opened(self, status, payload):
+        # Opening changes the project list, so refresh it automatically.
+        if status == 0:
+            self.list_clicked()
 
     def _on_closed(self, status, payload):
         # Closing changes the project list, so refresh it automatically.
         if status == 0:
             self.list_clicked()
-
-    def _select(self, index):
-        # Make the handle of the last used row available to other pages.
-        self.app._pages["UndoStack"].select(index)
 
     def _on_list(self, status, payload):
         if status != 0:
@@ -61,7 +90,28 @@ class ProjectEditorPage:
             for project in projects
         ])
         self.app._pages["UndoStack"].set_projects(projects)
+        self.app._pages["RuleCheck"].set_projects(projects)
 
-    def _on_details(self, status, payload):
-        if status == 0:
-            self.app.project_details = fmt_details(payload)
+    def _on_details(self, status, payload, obj=None):
+        if status != 0:
+            return
+        if obj is not None:
+            self._details_obj = obj
+        self._details = payload
+        self.app.project_details = fmt_details(payload)
+        # Pre-fill the set form (also the baseline for the diff).
+        self.app.pe_name = payload.get("name", "")
+        self.app.pe_author = payload.get("author", "")
+        self.app.pe_version = payload.get("version", "")
+        self.app.pe_locales = ", ".join(payload.get("locale_order", []))
+        self.app.pe_norms = ", ".join(payload.get("norm_order", []))
+        # Feed the RuleCheck page with the board (DRC) entries.
+        boards = [
+            {"name": board["name"], "obj": board["obj"]}
+            for board in payload.get("boards", [])
+        ]
+        self.app._pages["RuleCheck"].set_boards(boards)
+
+
+def _split_list(text):
+    return [part.strip() for part in text.split(",") if part.strip()]

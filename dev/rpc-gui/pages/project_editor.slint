@@ -11,11 +11,18 @@ export component ProjectEditorPage {
     in-out property <string> path;
     in property <[ProjectRowData]> projects;
     in property <string> details;
+    // --- The set form (absent arguments are not modified) --------------
+    in-out property <string> pe-name;
+    in-out property <string> pe-author;
+    in-out property <string> pe-version;
+    in-out property <string> pe-locales;
+    in-out property <string> pe-norms;
     callback open-clicked();
     callback list-clicked();
     callback get-clicked(int);
     callback save-clicked(int);
     callback close-clicked(int);
+    callback apply-clicked();
 
     VerticalLayout {
         spacing: 8px;
@@ -88,6 +95,52 @@ export component ProjectEditorPage {
                     enabled: root.authenticated;
                     clicked => { root.close-clicked(i); }
                 }
+            }
+        }
+
+        // The set form: fields are pre-filled from the last get result;
+        // Apply sends only the fields modified by the user.
+        HorizontalLayout {
+            spacing: 6px;
+
+            LineEdit {
+                text <=> root.pe-name;
+                placeholder-text: "Name";
+                horizontal-stretch: 2;
+            }
+
+            LineEdit {
+                text <=> root.pe-author;
+                placeholder-text: "Author";
+                horizontal-stretch: 2;
+            }
+
+            LineEdit {
+                text <=> root.pe-version;
+                placeholder-text: "Version";
+                horizontal-stretch: 1;
+            }
+
+            Button {
+                text: "Apply";
+                enabled: root.authenticated;
+                clicked => { root.apply-clicked(); }
+            }
+        }
+
+        HorizontalLayout {
+            spacing: 6px;
+
+            LineEdit {
+                text <=> root.pe-locales;
+                placeholder-text: "Locales (comma-separated)";
+                horizontal-stretch: 1;
+            }
+
+            LineEdit {
+                text <=> root.pe-norms;
+                placeholder-text: "Norms (comma-separated)";
+                horizontal-stretch: 1;
             }
         }
 

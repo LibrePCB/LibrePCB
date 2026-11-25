@@ -1,0 +1,2566 @@
+[
+  {
+    "annotations": {
+      "readOnlyHint": false
+    },
+    "description": "Open a LibrePCB workspace, or create a new one if the directory does not exist or is empty. The workspace contains the libraries and is required for all library tools and for adding parts to a project.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "description": "Absolute path to the workspace directory",
+          "type": "string"
+        },
+        "userName": {
+          "description": "Optional user name, used as author of new elements",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path"
+      ],
+      "type": "object"
+    },
+    "name": "workspace_open"
+  },
+  {
+    "annotations": {
+      "readOnlyHint": true
+    },
+    "description": "List the libraries available for download from the LibrePCB API server.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "name": "library_list_remote"
+  },
+  {
+    "annotations": {
+      "readOnlyHint": false
+    },
+    "description": "Download and install (or update) libraries from the LibrePCB API server, including their dependencies.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "names": {
+          "description": "Names of the libraries, e.g. 'LibrePCB Base'",
+          "items": {
+            "description": "Library name",
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "names"
+      ],
+      "type": "object"
+    },
+    "name": "library_install"
+  },
+  {
+    "annotations": {
+      "readOnlyHint": true
+    },
+    "description": "Search the installed libraries by keyword (case-insensitive substring of name, description or keywords; devices also by part number). An empty query lists all elements. Results are sorted by name.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "limit": {
+          "description": "Maximum number of results, default 50",
+          "minimum": 1,
+          "type": "integer"
+        },
+        "offset": {
+          "description": "Number of results to skip, default 0",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "query": {
+          "description": "Keyword, e.g. 'resistor', or '' for all",
+          "type": "string"
+        },
+        "type": {
+          "description": "Type of library element",
+          "enum": [
+            "component",
+            "device",
+            "symbol",
+            "package",
+            "componentCategory",
+            "packageCategory"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "query",
+        "type"
+      ],
+      "type": "object"
+    },
+    "name": "library_search"
+  },
+  {
+    "annotations": {
+      "readOnlyHint": true
+    },
+    "description": "Get details of a library element: pins of a symbol; signals, symbol variants, attributes and devices of a component; pads, footprints, pad geometry, courtyard, keep-outs and holes (of one footprint, relative to the origin) of a package; additionally pad-signal-map and parts of a device.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "element": {
+          "description": "Name or UUID of the element",
+          "type": "string"
+        },
+        "footprint": {
+          "description": "Footprint of a package or device, default: the first one",
+          "type": "string"
+        },
+        "type": {
+          "description": "Type of library element",
+          "enum": [
+            "component",
+            "device",
+            "symbol",
+            "package"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "element"
+      ],
+      "type": "object"
+    },
+    "name": "library_get"
+  },
+  {
+    "annotations": {
+      "readOnlyHint": false
+    },
+    "description": "Create a new local library in the workspace for your own parts.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "dependencies": {
+          "description": "Libraries whose elements are used, e.g. ['LibrePCB Base']",
+          "items": {
+            "description": "Library name",
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "description": {
+          "description": "Optional description",
+          "type": "string"
+        },
+        "name": {
+          "description": "Library name, e.g. 'Custom Parts'",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "type": "object"
+    },
+    "name": "library_create"
+  },
+  {
+    "annotations": {
+      "readOnlyHint": false
+    },
+    "description": "Create a schematic symbol with pins and a rectangular body in a local library. Name and value texts are added automatically above and below the body. Returns the result of the symbol check.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "bodyFrom": {
+          "description": "One corner of the body rectangle ([x, y] in mm)",
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "type": "array"
+        },
+        "bodyTo": {
+          "description": "Opposite corner of the body rectangle ([x, y] in mm)",
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "type": "array"
+        },
+        "categories": {
+          "description": "Component categories",
+          "items": {
+            "description": "Name or UUID",
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "description": {
+          "description": "Optional description",
+          "type": "string"
+        },
+        "library": {
+          "description": "Name of the local library",
+          "type": "string"
+        },
+        "name": {
+          "description": "Symbol name, e.g. 'LM317'",
+          "type": "string"
+        },
+        "pins": {
+          "description": "The pins",
+          "items": {
+            "properties": {
+              "length": {
+                "description": "Pin length in mm, default 2.54",
+                "type": "number"
+              },
+              "name": {
+                "description": "Pin name, e.g. 'VCC'",
+                "type": "string"
+              },
+              "position": {
+                "description": "Outer end of the pin where wires connect, on the 2.54mm grid ([x, y] in mm)",
+                "items": {
+                  "type": "number"
+                },
+                "maxItems": 2,
+                "minItems": 2,
+                "type": "array"
+              },
+              "rotation": {
+                "description": "Direction from the outer end towards the symbol body in degrees: 0 = to the right (pin on the left side), 180 = to the left (pin on the right side), 90 = up, 270 = down",
+                "type": "number"
+              }
+            },
+            "required": [
+              "name",
+              "position",
+              "rotation"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "library",
+        "name",
+        "pins",
+        "bodyFrom",
+        "bodyTo"
+      ],
+      "type": "object"
+    },
+    "name": "symbol_create"
+  },
+  {
+    "annotations": {
+      "readOnlyHint": false
+    },
+    "description": "Create a package with one footprint in a local library: pads, a package outline from the body size, a courtyard around body and pads, name/value texts, and optionally holes, keep-outs and a silkscreen outline with pin 1 marker. The origin should be the center of the body. Returns the result of the package check.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "assemblyType": {
+          "description": "Default: derived from the pads; 'none' for footprints without a part to mount, e.g. test pads",
+          "enum": [
+            "smt",
+            "tht",
+            "mixed",
+            "none",
+            "other"
+          ],
+          "type": "string"
+        },
+        "body": {
+          "description": "Size [width, height] of the body, centered at the origin, default: around the pads ([x, y] in mm)",
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "type": "array"
+        },
+        "categories": {
+          "description": "Package categories",
+          "items": {
+            "description": "Name or UUID",
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "courtyardMargin": {
+          "description": "Courtyard distance to body and pads, default 0.25",
+          "type": "number"
+        },
+        "description": {
+          "description": "Optional description",
+          "type": "string"
+        },
+        "holes": {
+          "description": "Non-plated holes, e.g. for mounting pegs",
+          "items": {
+            "properties": {
+              "diameter": {
+                "description": "Diameter",
+                "type": "number"
+              },
+              "position": {
+                "description": "Center ([x, y] in mm)",
+                "items": {
+                  "type": "number"
+                },
+                "maxItems": 2,
+                "minItems": 2,
+                "type": "array"
+              }
+            },
+            "required": [
+              "position",
+              "diameter"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "keepouts": {
+          "description": "Keep-out zones, e.g. below an antenna or a hole",
+          "items": {
+            "properties": {
+              "layers": {
+                "description": "Copper layers, default top (the side of the part, mirrored on the bottom side)",
+                "enum": [
+                  "top",
+                  "bottom",
+                  "inner",
+                  "all"
+                ],
+                "type": "string"
+              },
+              "rules": {
+                "description": "Default ['noCopper', 'noPlanes']",
+                "items": {
+                  "description": "Rule",
+                  "enum": [
+                    "noCopper",
+                    "noPlanes",
+                    "noExposure",
+                    "noDevices"
+                  ],
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "vertices": {
+                "description": "Area of the keep-out (closed automatically)",
+                "items": {
+                  "description": "[x, y] in mm, or [x, y, angle] to draw an arc with this angle in degrees (positive = counter-clockwise) to the next vertex",
+                  "items": {
+                    "type": "number"
+                  },
+                  "maxItems": 3,
+                  "minItems": 2,
+                  "type": "array"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "vertices"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "legend": {
+          "description": "Draw the body outline and a pin 1 marker on the top silkscreen, default false",
+          "type": "boolean"
+        },
+        "library": {
+          "description": "Name of the local library",
+          "type": "string"
+        },
+        "name": {
+          "description": "Package name, e.g. 'QFN-16 3x3'",
+          "type": "string"
+        },
+        "pads": {
+          "description": "The pads",
+          "items": {
+            "properties": {
+              "drill": {
+                "description": "Drill diameter in mm, makes it a plated THT pad",
+                "type": "number"
+              },
+              "name": {
+                "description": "Pad name, e.g. '1'",
+                "type": "string"
+              },
+              "paste": {
+                "description": "Solder paste on an SMT pad, default true",
+                "type": "boolean"
+              },
+              "position": {
+                "description": "Pad center relative to the package origin ([x, y] in mm)",
+                "items": {
+                  "type": "number"
+                },
+                "maxItems": 2,
+                "minItems": 2,
+                "type": "array"
+              },
+              "rotation": {
+                "description": "Rotation in degrees",
+                "type": "number"
+              },
+              "shape": {
+                "description": "Pad shape, default roundrect for SMT and round for THT pads. 'round' with different width and height is an oblong pad. 'custom' takes its outline from 'vertices'.",
+                "enum": [
+                  "rect",
+                  "roundrect",
+                  "round",
+                  "octagon",
+                  "custom"
+                ],
+                "type": "string"
+              },
+              "side": {
+                "description": "Side of an SMT pad, default top",
+                "enum": [
+                  "top",
+                  "bottom"
+                ],
+                "type": "string"
+              },
+              "size": {
+                "description": "Pad size [width, height] ([x, y] in mm)",
+                "items": {
+                  "type": "number"
+                },
+                "maxItems": 2,
+                "minItems": 2,
+                "type": "array"
+              },
+              "slotLength": {
+                "description": "Total length of a slotted drill along the pad's x axis, 'drill' is its width",
+                "type": "number"
+              },
+              "vertices": {
+                "description": "Outline of a custom pad, relative to the pad center (closed automatically)",
+                "items": {
+                  "description": "[x, y] in mm, or [x, y, angle] to draw an arc with this angle in degrees (positive = counter-clockwise) to the next vertex",
+                  "items": {
+                    "type": "number"
+                  },
+                  "maxItems": 3,
+                  "minItems": 2,
+                  "type": "array"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "name",
+              "position",
+              "size"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "library",
+        "name",
+        "pads"
+      ],
+      "type": "object"
+    },
+    "name": "package_create"
+  },
+  {
+    "annotations": {
+      "readOnlyHint": false
+    },
+    "description": "Create a component from one symbol, or from several gates (e.g. the two halves and the supply of a dual op-amp). One signal is created for each symbol pin, named like the pin; a pin name used in several gates gets the gate suffix ('OUT_A'). Signals are passive and optional unless set in 'signals'; the ERC reports unconnected required signals. Returns the result of the component check.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "categories": {
+          "description": "Component categories",
+          "items": {
+            "description": "Name or UUID",
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "defaultValue": {
+          "description": "Default value, e.g. '{{MPN or DEVICE}}'",
+          "type": "string"
+        },
+        "description": {
+          "description": "Optional description",
+          "type": "string"
+        },
+        "gates": {
+          "description": "Gates, instead of 'symbol'",
+          "items": {
+            "properties": {
+              "position": {
+                "description": "Position of the gate when placing the part, default [0, 0] ([x, y] in mm)",
+                "items": {
+                  "type": "number"
+                },
+                "maxItems": 2,
+                "minItems": 2,
+                "type": "array"
+              },
+              "suffix": {
+                "description": "Gate suffix, e.g. 'A'",
+                "type": "string"
+              },
+              "symbol": {
+                "description": "Name or UUID of the symbol",
+                "type": "string"
+              }
+            },
+            "required": [
+              "symbol",
+              "suffix"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "library": {
+          "description": "Name of the local library",
+          "type": "string"
+        },
+        "name": {
+          "description": "Component name, e.g. 'LM317'",
+          "type": "string"
+        },
+        "prefix": {
+          "description": "Designator prefix, e.g. 'U'",
+          "type": "string"
+        },
+        "signals": {
+          "additionalProperties": {
+            "properties": {
+              "required": {
+                "description": "Must be connected, default false",
+                "type": "boolean"
+              },
+              "role": {
+                "description": "Electrical role, default passive",
+                "enum": [
+                  "passive",
+                  "power",
+                  "input",
+                  "output",
+                  "inout",
+                  "opendrain"
+                ],
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "description": "Properties per signal name, e.g. {\"VCC\": {\"role\": \"power\", \"required\": true}}",
+          "type": "object"
+        },
+        "symbol": {
+          "description": "Name or UUID of the symbol of one gate",
+          "type": "string"
+        }
+      },
+      "required": [
+        "library",
+        "name",
+        "prefix"
+      ],
+      "type": "object"
+    },
+    "name": "component_create"
+  },
+  {
+    "annotations": {
+      "readOnlyHint": false
+    },
+    "description": "Create a device which maps the signals of a component to the pads of a package. Returns the result of the device check.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "categories": {
+          "description": "Component categories",
+          "items": {
+            "description": "Name or UUID",
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "component": {
+          "description": "Name or UUID of the component",
+          "type": "string"
+        },
+        "description": {
+          "description": "Optional description",
+          "type": "string"
+        },
+        "library": {
+          "description": "Name of the local library",
+          "type": "string"
+        },
+        "name": {
+          "description": "Device name, e.g. 'LM317 SOT-223'",
+          "type": "string"
+        },
+        "package": {
+          "description": "Name or UUID of the package",
+          "type": "string"
+        },
+        "padSignalMap": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Signal name for each pad name, e.g. {\"1\": \"ADJ\"}",
+          "type": "object"
+        },
+        "parts": {
+          "description": "Orderable parts",
+          "items": {
+            "properties": {
+              "manufacturer": {
+                "description": "Manufacturer",
+                "type": "string"
+              },
+              "mpn": {
+                "description": "Part number",
+                "type": "string"
+              }
+            },
+            "required": [
+              "mpn"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "library",
+        "name",
+        "component",
+        "package",
+        "padSignalMap"
+      ],
+      "type": "object"
+    },
+    "name": "device_create"
+  },
+  {
+    "annotations": {
+      "readOnlyHint": false
+    },
+    "description": "Open a LibrePCB project (*.lpp). Closes the previously opened project without saving. Unless readOnly is set, the project directory stays locked until it is closed, so it cannot be open in the LibrePCB application at the same time.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "description": "Absolute path to the *.lpp file",
+          "type": "string"
+        },
+        "readOnly": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "path"
+      ],
+      "type": "object"
+    },
+    "name": "project_open"
+  },
+  {
+    "annotations": {
+      "readOnlyHint": false
+    },
+    "description": "Close the project without saving and release its lock.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "name": "project_close"
+  },
+  {
+    "annotations": {
+      "readOnlyHint": false
+    },
+    "description": "Save the project to disk.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "name": "project_save"
+  },
+  {
+    "annotations": {
+      "readOnlyHint": true
+    },
+    "description": "Get name, version, schematic pages, boards and counts of the open project.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "name": "project_summary"
+  },
+  {
+    "annotations": {
+      "readOnlyHint": false
+    },
+    "description": "Change the project name, version or author. They appear in title blocks, output file names (version) and via placeholders like {{PROJECT}}, {{VERSION}} and {{AUTHOR}}.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "author": {
+          "description": "Author",
+          "type": "string"
+        },
+        "name": {
+          "description": "Project name",
+          "type": "string"
+        },
+        "version": {
+          "description": "Version, e.g. 'v1.0' or '2'",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "name": "project_set_metadata"
+  },
+  {
+    "annotations": {
+      "readOnlyHint": true
+    },
+    "description": "List all parts with designator, value, library component and their placement in schematics and boards (positions in mm).",
+    "inputSchema": {
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "name": "parts_list"
+  },
+  {
+    "annotations": {
+      "readOnlyHint": true
+    },
+    "description": "List all nets with their connected pins ('<designator>.<signal>').",
+    "inputSchema": {
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "name": "netlist_get"
+  },
+  {
+    "annotations": {
+      "readOnlyHint": true
+    },
+    "description": "Run the electrical rule check of the schematics. Each message has an ID (to approve it), the marked areas ('locations', center and size in mm, one message may cover several places) and an explanation, which is given only at the first message with the same explanation.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "name": "erc_run"
+  },
+  {
+    "annotations": {
+      "readOnlyHint": false
+    },
+    "description": "Approve ERC messages which are fine by intention, so they don't count as open issues anymore. Save the project to keep the approvals.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "approved": {
+          "description": "Approve (default) or revoke the approval",
+          "type": "boolean"
+        },
+        "ids": {
+          "description": "IDs of the messages, as returned by the check",
+          "items": {
+            "description": "Message ID",
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "ids"
+      ],
+      "type": "object"
+    },
+    "name": "erc_approve"
+  },
+  {
+    "annotations": {
+      "readOnlyHint": true
+    },
+    "description": "Run the design rule check of a board (planes are rebuilt first). Each message has an ID (to approve it), the marked areas ('locations', center and size in mm, one message may cover several places) and an explanation, which is given only at the first message with the same explanation.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "board": {
+          "type": [
+            "string",
+            "integer"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "name": "drc_run"
+  },
+  {
+    "annotations": {
+      "readOnlyHint": false
+    },
+    "description": "Approve DRC messages which you reviewed and accept by intention, so they don't count as open issues anymore. Approve only messages you can explain: clearance errors are often real shorts. Save the project to keep the approvals.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "approved": {
+          "description": "Approve (default) or revoke the approval",
+          "type": "boolean"
+        },
+        "board": {
+          "type": [
+            "string",
+            "integer"
+          ]
+        },
+        "ids": {
+          "description": "IDs of the messages, as returned by the check",
+          "items": {
+            "description": "Message ID",
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "ids"
+      ],
+      "type": "object"
+    },
+    "name": "drc_approve"
+  },
+  {
+    "annotations": {
+      "readOnlyHint": true
+    },
+    "description": "Render a schematic page as PNG image, optionally only a region (e.g. at a higher DPI to read details).",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "dpi": {
+          "description": "Resolution, default 100",
+          "maximum": 1200,
+          "minimum": 10,
+          "type": "integer"
+        },
+        "region": {
+          "properties": {
+            "from": {
+              "description": "One corner ([x, y] in mm)",
+              "items": {
+                "type": "number"
+              },
+              "maxItems": 2,
+              "minItems": 2,
+              "type": "array"
+            },
+            "to": {
+              "description": "Opposite corner ([x, y] in mm)",
+              "items": {
+                "type": "number"
+              },
+              "maxItems": 2,
+              "minItems": 2,
+              "type": "array"
+            }
+          },
+          "required": [
+            "from",
+            "to"
+          ],
+          "type": "object"
+        },
+        "schematic": {
+          "type": [
+            "string",
+            "integer"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "name": "render_schematic"
+  },
+  {
+    "annotations": {
+      "readOnlyHint": true
+    },
+    "description": "Render a board as PNG image, either with colored layers (good to check placement and routing) or as a realistic rendering. Optionally only a region (e.g. at a higher DPI to inspect details) or only some layers. Returns the mapping from pixels to board coordinates.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "board": {
+          "type": [
+            "string",
+            "integer"
+          ]
+        },
+        "dpi": {
+          "description": "Resolution, default 600",
+          "maximum": 1200,
+          "minimum": 10,
+          "type": "integer"
+        },
+        "layers": {
+          "description": "Only these layers of the 'layers' style, e.g. ['board_copper_top', 'board_outlines'], or also 'board_courtyard_top' or 'board_package_outlines_top' (in magenta). An unknown name lists all names.",
+          "items": {
+            "description": "Layer name",
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "region": {
+          "properties": {
+            "from": {
+              "description": "One corner ([x, y] in mm)",
+              "items": {
+                "type": "number"
+              },
+              "maxItems": 2,
+              "minItems": 2,
+              "type": "array"
+            },
+            "to": {
+              "description": "Opposite corner ([x, y] in mm)",
+              "items": {
+                "type": "number"
+              },
+              "maxItems": 2,
+              "minItems": 2,
+              "type": "array"
+            }
+          },
+          "required": [
+            "from",
+            "to"
+          ],
+          "type": "object"
+        },
+        "side": {
+          "enum": [
+            "top",
+            "bottom"
+          ],
+          "type": "string"
+        },
+        "style": {
+          "enum": [
+            "layers",
+            "realistic"
+          ],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "name": "render_board"
+  },
+  {
+    "annotations": {
+      "readOnlyHint": false
+    },
+    "description": "Create a new project with one schematic page ('Main') and one board ('default', 100x80mm outline) and open it.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "description": "Project name",
+          "type": "string"
+        },
+        "path": {
+          "description": "Absolute path of the new *.lpp file, its directory must not exist yet or be empty",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "name"
+      ],
+      "type": "object"
+    },
+    "name": "project_create"
+  },
+  {
+    "annotations": {
+      "readOnlyHint": false
+    },
+    "description": "Undo the last change.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "name": "undo"
+  },
+  {
+    "annotations": {
+      "readOnlyHint": false
+    },
+    "description": "Redo the last undone change.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "name": "redo"
+  },
+  {
+    "annotations": {
+      "readOnlyHint": false
+    },
+    "description": "Add a part (a component from the workspace libraries) to a schematic page. Choose a device to define the footprint and part number now, or later with board_place_device. Returns the designator and the pin positions.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "attributes": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Attribute values with unit suffix, e.g. {\"RESISTANCE\": \"100k\"} or {\"CAPACITANCE\": \"4.7u\"}",
+          "type": "object"
+        },
+        "component": {
+          "description": "Name or UUID of the component, e.g. 'Capacitor' or 'Diode'",
+          "type": "string"
+        },
+        "designator": {
+          "description": "Optional designator, e.g. 'R1'",
+          "type": "string"
+        },
+        "device": {
+          "description": "Optional name or UUID of the device",
+          "type": "string"
+        },
+        "mirror": {
+          "description": "Mirror the symbol",
+          "type": "boolean"
+        },
+        "part": {
+          "description": "Part to order: an MPN of the device (required if the device has several parts), any part as {\"mpn\": ..., \"manufacturer\": ...}, or null for none.",
+          "properties": {
+            "manufacturer": {
+              "type": "string"
+            },
+            "mpn": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "mpn"
+          ],
+          "type": [
+            "string",
+            "null",
+            "object"
+          ]
+        },
+        "position": {
+          "description": "Position, on the 2.54mm grid ([x, y] in mm)",
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "type": "array"
+        },
+        "rotation": {
+          "description": "Rotation in degrees",
+          "type": "number"
+        },
+        "schematic": {
+          "description": "Name or index, default: the first one",
+          "type": [
+            "string",
+            "integer"
+          ]
+        },
+        "symbolVariant": {
+          "description": "Optional symbol variant, as listed by library_get for the component",
+          "type": "string"
+        },
+        "value": {
+          "description": "Optional value text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "component",
+        "position"
+      ],
+      "type": "object"
+    },
+    "name": "schematic_add_part"
+  },
+  {
+    "annotations": {
+      "readOnlyHint": false
+    },
+    "description": "Connect pins to one net. Each pin gets a short wire with a net label, so pins with the same label are connected without drawing wires across the page. Pins which already have a wire are kept as they are. Supply symbols (e.g. 'Supply GND') force their net name. Pins in a net with an automatic name like 'N1' join the net of the given or forced name.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "net": {
+          "description": "Optional net name, e.g. 'VCC'. Without a name an automatic name like 'N3' is used.",
+          "type": "string"
+        },
+        "pins": {
+          "description": "Pins to connect",
+          "items": {
+            "description": "Pin, e.g. 'U1.VCC' or 'R1.1'",
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "pins"
+      ],
+      "type": "object"
+    },
+    "name": "schematic_connect"
+  },
+  {
+    "annotations": {
+      "readOnlyHint": false
+    },
+    "description": "Draw a wire between two pins on the same schematic page, optionally through corners, and connect them to one net: a pin without net joins the net of the other pin, otherwise a new net is created. Pins of different nets cannot be wired (disconnect one first). Supply symbols force their net name, a net with an automatic name like 'N1' joins the net of that name. Returns the net.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "from": {
+          "description": "Pin, e.g. 'U1.VCC'",
+          "type": "string"
+        },
+        "points": {
+          "description": "Optional corners, on the 2.54mm grid",
+          "items": {
+            "description": "Corner ([x, y] in mm)",
+            "items": {
+              "type": "number"
+            },
+            "maxItems": 2,
+            "minItems": 2,
+            "type": "array"
+          },
+          "type": "array"
+        },
+        "to": {
+          "description": "Pin, e.g. 'C1.1'",
+          "type": "string"
+        }
+      },
+      "required": [
+        "from",
+        "to"
+      ],
+      "type": "object"
+    },
+    "name": "schematic_draw_wire"
+  },
+  {
+    "annotations": {
+      "readOnlyHint": false
+    },
+    "description": "Add a text (e.g. a note or a block title) to a schematic page.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "height": {
+          "description": "Text height in mm, default 2.5",
+          "type": "number"
+        },
+        "position": {
+          "description": "Bottom left corner of the text ([x, y] in mm)",
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "type": "array"
+        },
+        "rotation": {
+          "description": "Rotation in degrees",
+          "type": "number"
+        },
+        "schematic": {
+          "description": "Name or index, default: the first one",
+          "type": [
+            "string",
+            "integer"
+          ]
+        },
+        "text": {
+          "description": "The text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "text",
+        "position"
+      ],
+      "type": "object"
+    },
+    "name": "schematic_add_text"
+  },
+  {
+    "annotations": {
+      "readOnlyHint": false
+    },
+    "description": "Add a schematic page. Nets with the same name connect across pages.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "description": "Page name, e.g. 'Power Supply'",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "type": "object"
+    },
+    "name": "schematic_add_page"
+  },
+  {
+    "annotations": {
+      "readOnlyHint": false
+    },
+    "description": "Move, rotate, resize, hide or show the designator ('name') or value text of a part's symbol in the schematic.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "designator": {
+          "description": "e.g. 'R1'",
+          "type": "string"
+        },
+        "gate": {
+          "description": "Gate (symbol suffix, e.g. 'A') of a part with several symbols",
+          "type": "string"
+        },
+        "height": {
+          "description": "New text height in mm",
+          "type": "number"
+        },
+        "position": {
+          "description": "New position ([x, y] in mm)",
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "type": "array"
+        },
+        "rotation": {
+          "description": "New rotation in degrees",
+          "type": "number"
+        },
+        "text": {
+          "description": "Which text",
+          "enum": [
+            "name",
+            "value"
+          ],
+          "type": "string"
+        },
+        "visible": {
+          "description": "Show or remove the text",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "designator",
+        "text"
+      ],
+      "type": "object"
+    },
+    "name": "schematic_set_part_text"
+  },
+  {
+    "annotations": {
+      "readOnlyHint": false
+    },
+    "description": "Remove all wires from pins and disconnect them from their net.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "pins": {
+          "description": "Pins to disconnect",
+          "items": {
+            "description": "Pin, e.g. 'U1.VCC'",
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "pins"
+      ],
+      "type": "object"
+    },
+    "name": "schematic_disconnect"
+  },
+  {
+    "annotations": {
+      "readOnlyHint": false
+    },
+    "description": "Rename a net. A net with an automatic name like 'N1' merges into an existing net of the new name.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "description": "New net name, e.g. 'SPI_SCK'",
+          "type": "string"
+        },
+        "net": {
+          "description": "Current net name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "net",
+        "name"
+      ],
+      "type": "object"
+    },
+    "name": "net_rename"
+  },
+  {
+    "annotations": {
+      "readOnlyHint": false
+    },
+    "description": "Create or change a net class and move nets into it, e.g. a class for power nets with wider traces. Nets start in the class 'default'. Trace width and via drill are defaults for new traces and vias (board_route, board_add_via); clearance, width and via drill minimums are checked by the DRC in addition to the board's DRC settings.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "defaultTraceWidth": {
+          "description": "Default trace width in mm, null for the board default",
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "defaultViaDrill": {
+          "description": "Default via drill in mm, null for the board default",
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "minClearance": {
+          "description": "Minimum copper clearance to other nets in mm",
+          "type": "number"
+        },
+        "minViaDrill": {
+          "description": "Minimum via drill in mm",
+          "type": "number"
+        },
+        "minWidth": {
+          "description": "Minimum copper width in mm",
+          "type": "number"
+        },
+        "name": {
+          "description": "Net class name, e.g. 'Power'",
+          "type": "string"
+        },
+        "nets": {
+          "description": "Nets to move here",
+          "items": {
+            "description": "Net name",
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "newName": {
+          "description": "Optional new name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "type": "object"
+    },
+    "name": "net_class_set"
+  },
+  {
+    "annotations": {
+      "readOnlyHint": true
+    },
+    "description": "Get the value, symbols and pins (position and net) of a part.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "designator": {
+          "description": "e.g. 'U1'",
+          "type": "string"
+        }
+      },
+      "required": [
+        "designator"
+      ],
+      "type": "object"
+    },
+    "name": "part_get"
+  },
+  {
+    "annotations": {
+      "readOnlyHint": false
+    },
+    "description": "Change designator, value, attributes or the ordered part number of a part.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "attributes": {
+          "additionalProperties": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "description": "Attribute values, e.g. {\"RESISTANCE\": \"2.2k\"}. New names add text attributes (e.g. {\"TOLERANCE\": \"1%\"}), null removes one.",
+          "type": "object"
+        },
+        "designator": {
+          "description": "Current designator, e.g. 'R1'",
+          "type": "string"
+        },
+        "newDesignator": {
+          "description": "Optional new designator",
+          "type": "string"
+        },
+        "part": {
+          "description": "Optional part to order: an MPN of the chosen device, any part as {\"mpn\": ..., \"manufacturer\": ...}, or null for none",
+          "properties": {
+            "manufacturer": {
+              "type": "string"
+            },
+            "mpn": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "mpn"
+          ],
+          "type": [
+            "string",
+            "null",
+            "object"
+          ]
+        },
+        "value": {
+          "description": "Optional new value text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "designator"
+      ],
+      "type": "object"
+    },
+    "name": "part_set_properties"
+  },
+  {
+    "annotations": {
+      "readOnlyHint": false
+    },
+    "description": "Move, rotate or mirror the symbol of a part (one gate of a part with several symbols). Short wires with net labels created by schematic_connect move along, other wires stay attached to the pins. Board traces are not affected.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "designator": {
+          "description": "e.g. 'U1'",
+          "type": "string"
+        },
+        "gate": {
+          "description": "Gate (symbol suffix, e.g. 'A') of a part with several symbols",
+          "type": "string"
+        },
+        "mirror": {
+          "description": "Mirrored or not",
+          "type": "boolean"
+        },
+        "position": {
+          "description": "New position ([x, y] in mm)",
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "type": "array"
+        },
+        "rotation": {
+          "description": "New rotation in degrees",
+          "type": "number"
+        }
+      },
+      "required": [
+        "designator",
+        "position"
+      ],
+      "type": "object"
+    },
+    "name": "schematic_move_part"
+  },
+  {
+    "annotations": {
+      "readOnlyHint": false
+    },
+    "description": "Remove a part from the schematics (and boards) including its wires.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "designator": {
+          "description": "e.g. 'R1'",
+          "type": "string"
+        }
+      },
+      "required": [
+        "designator"
+      ],
+      "type": "object"
+    },
+    "name": "part_remove"
+  },
+  {
+    "annotations": {
+      "readOnlyHint": false
+    },
+    "description": "Replace the board outline, either by a rectangle from (0, 0) to (width, height) or by a polygon. Use board_add_cutout for holes and slots inside the board.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "board": {
+          "description": "Board name or index, default: the first one",
+          "type": [
+            "string",
+            "integer"
+          ]
+        },
+        "height": {
+          "description": "Height in mm of a rectangle",
+          "type": "number"
+        },
+        "vertices": {
+          "description": "Polygon outline (closed automatically)",
+          "items": {
+            "description": "[x, y] in mm, or [x, y, angle] to draw an arc with this angle in degrees (positive = counter-clockwise) to the next vertex",
+            "items": {
+              "type": "number"
+            },
+            "maxItems": 3,
+            "minItems": 2,
+            "type": "array"
+          },
+          "type": "array"
+        },
+        "width": {
+          "description": "Width in mm of a rectangle",
+          "type": "number"
+        }
+      },
+      "type": "object"
+    },
+    "name": "board_set_outline"
+  },
+  {
+    "annotations": {
+      "readOnlyHint": false
+    },
+    "description": "Add a cutout (a hole or slot milled into the board), either a polygon or a circle.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "board": {
+          "description": "Board name or index, default: the first one",
+          "type": [
+            "string",
+            "integer"
+          ]
+        },
+        "center": {
+          "description": "Center of a round cutout ([x, y] in mm)",
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "type": "array"
+        },
+        "diameter": {
+          "description": "Diameter of a round cutout",
+          "type": "number"
+        },
+        "vertices": {
+          "description": "Polygon of the cutout (closed automatically)",
+          "items": {
+            "description": "[x, y] in mm, or [x, y, angle] to draw an arc with this angle in degrees (positive = counter-clockwise) to the next vertex",
+            "items": {
+              "type": "number"
+            },
+            "maxItems": 3,
+            "minItems": 2,
+            "type": "array"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "name": "board_add_cutout"
+  },
+  {
+    "annotations": {
+      "readOnlyHint": false
+    },
+    "description": "Place a part on the board, or move it if already placed. The device (and thus the package) is taken from the schematic part if chosen there, otherwise it must be given. Returns the pads with their positions and nets. board_query shows what occupies an area.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "board": {
+          "description": "Board name or index, default: the first one",
+          "type": [
+            "string",
+            "integer"
+          ]
+        },
+        "designator": {
+          "description": "e.g. 'R1'",
+          "type": "string"
+        },
+        "device": {
+          "description": "Name or UUID of the device, e.g. 'Capacitor 3216 (1206)'",
+          "type": "string"
+        },
+        "footprint": {
+          "description": "Optional footprint name of the package",
+          "type": "string"
+        },
+        "position": {
+          "description": "Position of the part origin ([x, y] in mm)",
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "type": "array"
+        },
+        "rotation": {
+          "description": "Rotation in degrees",
+          "type": "number"
+        },
+        "side": {
+          "description": "Board side, default top",
+          "enum": [
+            "top",
+            "bottom"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "designator",
+        "position"
+      ],
+      "type": "object"
+    },
+    "name": "board_place_device"
+  },
+  {
+    "annotations": {
+      "readOnlyHint": true
+    },
+    "description": "Get device, footprint, placement, pads (position, net, layers), courtyard, keep-outs and holes of a part on the board, in board coordinates.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "board": {
+          "description": "Board name or index, default: the first one",
+          "type": [
+            "string",
+            "integer"
+          ]
+        },
+        "designator": {
+          "description": "e.g. 'U1'",
+          "type": "string"
+        }
+      },
+      "required": [
+        "designator"
+      ],
+      "type": "object"
+    },
+    "name": "board_get_part"
+  },
+  {
+    "annotations": {
+      "readOnlyHint": false
+    },
+    "description": "Draw a trace on one copper layer between two points of the same net, optionally through corners. An end is a pad ('<designator>.<pad>', e.g. 'U1.8'), a via or junction ID ('via:...', 'point:...'), or a position [x, y] on a trace, junction or via of the net on that layer. A trace there is split into two (new IDs) for a T-junction. To change the layer, end at a via. Without 'width', the default trace width of the net class or else of the board design rules is used (0.5 mm unless changed). Returns the IDs of the new traces, the width, and clearance violations of the new copper from a quick check (the trace is kept; use board_remove_items or undo to revert it). board_query shows which layers are free along a planned path.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "board": {
+          "description": "Board name or index, default: the first one",
+          "type": [
+            "string",
+            "integer"
+          ]
+        },
+        "check": {
+          "description": "Check the clearances of the new copper, default true",
+          "type": "boolean"
+        },
+        "from": {
+          "description": "Start, e.g. 'R1.1'",
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "type": [
+            "string",
+            "array"
+          ]
+        },
+        "layer": {
+          "description": "Copper layer: 'top', 'bottom', or 'inner1' to 'innerN' if the board has inner layers",
+          "type": "string"
+        },
+        "points": {
+          "description": "Optional corners",
+          "items": {
+            "description": "Corner ([x, y] in mm)",
+            "items": {
+              "type": "number"
+            },
+            "maxItems": 2,
+            "minItems": 2,
+            "type": "array"
+          },
+          "type": "array"
+        },
+        "to": {
+          "description": "End, e.g. 'U1.7' or [12.5, 8]",
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "type": [
+            "string",
+            "array"
+          ]
+        },
+        "width": {
+          "description": "Optional trace width in mm",
+          "type": "number"
+        }
+      },
+      "required": [
+        "from",
+        "to",
+        "layer"
+      ],
+      "type": "object"
+    },
+    "name": "board_route"
+  },
+  {
+    "annotations": {
+      "readOnlyHint": false
+    },
+    "description": "Add a through via (connecting all copper layers) to a net. Returns its ID for board_route and clearance violations from a quick check.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "board": {
+          "description": "Board name or index, default: the first one",
+          "type": [
+            "string",
+            "integer"
+          ]
+        },
+        "check": {
+          "description": "Check the clearances of the via, default true",
+          "type": "boolean"
+        },
+        "drill": {
+          "description": "Optional drill diameter in mm, default from the net class or the design rules",
+          "type": "number"
+        },
+        "net": {
+          "description": "Net name, e.g. 'GND'",
+          "type": "string"
+        },
+        "position": {
+          "description": "Position ([x, y] in mm)",
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "type": "array"
+        },
+        "size": {
+          "description": "Optional outer diameter in mm, default from the annular ring design rule",
+          "type": "number"
+        }
+      },
+      "required": [
+        "net",
+        "position"
+      ],
+      "type": "object"
+    },
+    "name": "board_add_via"
+  },
+  {
+    "annotations": {
+      "readOnlyHint": false
+    },
+    "description": "Add a copper plane (filled area) of a net on a layer, covering the whole board or the given area. It is filled automatically around pads and traces of other nets and is clipped by keep-outs (board_add_keepout).",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "board": {
+          "description": "Board name or index, default: the first one",
+          "type": [
+            "string",
+            "integer"
+          ]
+        },
+        "clearance": {
+          "description": "Optional clearance to other copper in mm",
+          "type": "number"
+        },
+        "connectStyle": {
+          "description": "How pads are connected, default thermal",
+          "enum": [
+            "thermal",
+            "solid",
+            "none"
+          ],
+          "type": "string"
+        },
+        "layer": {
+          "description": "Copper layer: 'top', 'bottom', or 'inner1' to 'innerN' if the board has inner layers",
+          "type": "string"
+        },
+        "net": {
+          "description": "Net name, e.g. 'GND'",
+          "type": "string"
+        },
+        "priority": {
+          "description": "Optional priority, overlapping planes with higher priority are filled first, default 0",
+          "type": "number"
+        },
+        "vertices": {
+          "description": "Optional area, default: whole board (closed automatically)",
+          "items": {
+            "description": "[x, y] in mm, or [x, y, angle] to draw an arc with this angle in degrees (positive = counter-clockwise) to the next vertex",
+            "items": {
+              "type": "number"
+            },
+            "maxItems": 3,
+            "minItems": 2,
+            "type": "array"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "net",
+        "layer"
+      ],
+      "type": "object"
+    },
+    "name": "board_add_plane"
+  },
+  {
+    "annotations": {
+      "readOnlyHint": false
+    },
+    "description": "Add a keep-out zone where copper, planes, stop mask openings or devices are not allowed, e.g. below a PCB antenna or around a mounting hole.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "board": {
+          "description": "Board name or index, default: the first one",
+          "type": [
+            "string",
+            "integer"
+          ]
+        },
+        "layers": {
+          "description": "Copper layers: 'both' (top and bottom, default), 'all' (including inner layers) or one layer like 'top'",
+          "type": "string"
+        },
+        "rules": {
+          "description": "What is not allowed in the zone, default ['noCopper', 'noPlanes']. 'noCopper' applies to traces, vias and pads, 'noExposure' to stop mask openings.",
+          "items": {
+            "description": "Rule",
+            "enum": [
+              "noCopper",
+              "noPlanes",
+              "noExposure",
+              "noDevices"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "vertices": {
+          "description": "Area of the zone (closed automatically)",
+          "items": {
+            "description": "[x, y] in mm, or [x, y, angle] to draw an arc with this angle in degrees (positive = counter-clockwise) to the next vertex",
+            "items": {
+              "type": "number"
+            },
+            "maxItems": 3,
+            "minItems": 2,
+            "type": "array"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "vertices"
+      ],
+      "type": "object"
+    },
+    "name": "board_add_keepout"
+  },
+  {
+    "annotations": {
+      "readOnlyHint": false
+    },
+    "description": "Add a text to the board, e.g. product name, version or connector labels on the silkscreen (legend). Texts on bottom layers are mirrored automatically. Placeholders like {{PROJECT}}, {{VERSION}} or {{BOARD}} are substituted.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "align": {
+          "description": "Horizontal alignment at the anchor, default left. The anchor is always at the bottom of the text.",
+          "enum": [
+            "left",
+            "center",
+            "right"
+          ],
+          "type": "string"
+        },
+        "board": {
+          "description": "Board name or index, default: the first one",
+          "type": [
+            "string",
+            "integer"
+          ]
+        },
+        "height": {
+          "description": "Text height in mm, default 1.0",
+          "type": "number"
+        },
+        "layer": {
+          "description": "Layer, default top_legend (top silkscreen)",
+          "enum": [
+            "top_legend",
+            "bot_legend",
+            "top_cu",
+            "bot_cu",
+            "top_documentation",
+            "bot_documentation",
+            "brd_documentation"
+          ],
+          "type": "string"
+        },
+        "position": {
+          "description": "Anchor of the text, see 'align' ([x, y] in mm)",
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "type": "array"
+        },
+        "rotation": {
+          "description": "Rotation in degrees",
+          "type": "number"
+        },
+        "strokeWidth": {
+          "description": "Line width in mm, default 0.15",
+          "type": "number"
+        },
+        "text": {
+          "description": "The text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "text",
+        "position"
+      ],
+      "type": "object"
+    },
+    "name": "board_add_text"
+  },
+  {
+    "annotations": {
+      "readOnlyHint": false
+    },
+    "description": "Move, rotate, resize, hide or show the designator ('name') or value text of placed parts, e.g. to keep it off pads and other parts. Several parts can be given to change them alike (e.g. hide all values).",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "align": {
+          "description": "New horizontal alignment at the anchor, which is then at the bottom of the text as with board_add_text. Footprint texts are often centered on their anchor.",
+          "enum": [
+            "left",
+            "center",
+            "right"
+          ],
+          "type": "string"
+        },
+        "board": {
+          "description": "Board name or index, default: the first one",
+          "type": [
+            "string",
+            "integer"
+          ]
+        },
+        "designator": {
+          "description": "e.g. 'R1' or ['R1', 'R2']",
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "string",
+            "array"
+          ]
+        },
+        "height": {
+          "description": "New text height in mm",
+          "type": "number"
+        },
+        "position": {
+          "description": "New anchor position ([x, y] in mm)",
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "type": "array"
+        },
+        "rotation": {
+          "description": "New rotation in degrees",
+          "type": "number"
+        },
+        "text": {
+          "description": "Which text",
+          "enum": [
+            "name",
+            "value"
+          ],
+          "type": "string"
+        },
+        "visible": {
+          "description": "Show or remove the text",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "designator",
+        "text"
+      ],
+      "type": "object"
+    },
+    "name": "board_set_part_text"
+  },
+  {
+    "annotations": {
+      "readOnlyHint": false
+    },
+    "description": "Add a non-plated hole (NPTH), e.g. for a mounting screw without a footprint.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "board": {
+          "description": "Board name or index, default: the first one",
+          "type": [
+            "string",
+            "integer"
+          ]
+        },
+        "diameter": {
+          "description": "Diameter in mm",
+          "type": "number"
+        },
+        "position": {
+          "description": "Center ([x, y] in mm)",
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "type": "array"
+        }
+      },
+      "required": [
+        "position",
+        "diameter"
+      ],
+      "type": "object"
+    },
+    "name": "board_add_hole"
+  },
+  {
+    "annotations": {
+      "readOnlyHint": true
+    },
+    "description": "List the items on a board with their IDs (for board_modify_item, board_remove_items and board_route), optionally only some types, those of a net, on a layer or overlapping an area. Types: traces, vias, points (junctions and corners of traces), planes, keepouts, polygons (board outline, cutouts, drawings), texts (including the name/value texts of parts), holes (NPTH) and pads.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "area": {
+          "properties": {
+            "from": {
+              "description": "One corner ([x, y] in mm)",
+              "items": {
+                "type": "number"
+              },
+              "maxItems": 2,
+              "minItems": 2,
+              "type": "array"
+            },
+            "to": {
+              "description": "Opposite corner ([x, y] in mm)",
+              "items": {
+                "type": "number"
+              },
+              "maxItems": 2,
+              "minItems": 2,
+              "type": "array"
+            }
+          },
+          "required": [
+            "from",
+            "to"
+          ],
+          "type": "object"
+        },
+        "board": {
+          "description": "Board name or index, default: the first one",
+          "type": [
+            "string",
+            "integer"
+          ]
+        },
+        "layer": {
+          "description": "Only items on this layer: a copper layer ('top', 'bottom', 'inner1', ...) or a layer ID like 'top_legend' or 'brd_cutouts'",
+          "type": "string"
+        },
+        "net": {
+          "description": "Only items of this net",
+          "type": "string"
+        },
+        "types": {
+          "description": "Item types to list, default all except pads and points",
+          "items": {
+            "description": "Item type",
+            "enum": [
+              "traces",
+              "vias",
+              "points",
+              "planes",
+              "keepouts",
+              "polygons",
+              "texts",
+              "holes",
+              "pads"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "name": "board_list_items"
+  },
+  {
+    "annotations": {
+      "readOnlyHint": true
+    },
+    "description": "Show what is inside a rectangle of the board, to find free space for parts, traces and vias before placing them: the parts reaching into it (with their courtyard box and the pads inside), the traces passing through it as whole paths (from end to end, with the trace IDs in order), vias, holes, keep-outs (also those of parts), texts with their box and the planes covering it. Items count when their actual shape overlaps the rectangle. 'free' tells for each copper layer whether the rectangle holds no pad, trace or via of any net (planes keep their clearance by themselves), 'withinBoard' whether it lies inside the board outline and off cutouts. To check whether a trace or via fits, query the area it would cover, enlarged by the clearance, with its net. Keep the rectangle small, the whole board gives a long answer.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "board": {
+          "description": "Board name or index, default: the first one",
+          "type": [
+            "string",
+            "integer"
+          ]
+        },
+        "from": {
+          "description": "One corner ([x, y] in mm)",
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "type": "array"
+        },
+        "net": {
+          "description": "Optional net whose own copper does not count as blocking in 'free'",
+          "type": "string"
+        },
+        "to": {
+          "description": "Opposite corner ([x, y] in mm)",
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "type": "array"
+        }
+      },
+      "required": [
+        "from",
+        "to"
+      ],
+      "type": "object"
+    },
+    "name": "board_query"
+  },
+  {
+    "annotations": {
+      "readOnlyHint": false
+    },
+    "description": "Remove board items by their IDs (see board_list_items). 'net:<name>' removes all traces and vias of a net. Removing a junction removes its traces. Pads are removed with their part (part_remove).",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "board": {
+          "description": "Board name or index, default: the first one",
+          "type": [
+            "string",
+            "integer"
+          ]
+        },
+        "ids": {
+          "description": "IDs like 'trace:<uuid>', or 'net:<name>'",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "ids"
+      ],
+      "type": "object"
+    },
+    "name": "board_remove_items"
+  },
+  {
+    "annotations": {
+      "readOnlyHint": false
+    },
+    "description": "Change a board item given by its ID (see board_list_items). Fields per type: trace: width, layer. via: position, drill, size. point (junction or corner): position. plane: vertices, layer, net, priority, connectStyle, clearance. keepout: vertices, layers, rules. polygon: vertices. text: text, position, rotation, height, align, layer. hole: position, diameter. Traces follow moved vias and points.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "align": {
+          "description": "New horizontal alignment, anchored at the bottom",
+          "enum": [
+            "left",
+            "center",
+            "right"
+          ],
+          "type": "string"
+        },
+        "board": {
+          "description": "Board name or index, default: the first one",
+          "type": [
+            "string",
+            "integer"
+          ]
+        },
+        "clearance": {
+          "description": "New plane clearance in mm",
+          "type": "number"
+        },
+        "connectStyle": {
+          "description": "New pad connection",
+          "enum": [
+            "thermal",
+            "solid",
+            "none"
+          ],
+          "type": "string"
+        },
+        "diameter": {
+          "description": "New hole diameter in mm",
+          "type": "number"
+        },
+        "drill": {
+          "description": "New via drill diameter in mm",
+          "type": "number"
+        },
+        "height": {
+          "description": "New text height in mm",
+          "type": "number"
+        },
+        "id": {
+          "description": "Item ID, e.g. 'via:<uuid>'",
+          "type": "string"
+        },
+        "layer": {
+          "description": "New layer: copper layer name for traces and planes, layer ID like 'top_legend' for texts",
+          "type": "string"
+        },
+        "layers": {
+          "description": "New keep-out layers: 'both', 'all' or one layer",
+          "type": "string"
+        },
+        "net": {
+          "description": "New net of a plane",
+          "type": "string"
+        },
+        "position": {
+          "description": "New position ([x, y] in mm)",
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "type": "array"
+        },
+        "priority": {
+          "description": "New plane priority",
+          "type": "number"
+        },
+        "rotation": {
+          "description": "New rotation in degrees",
+          "type": "number"
+        },
+        "rules": {
+          "description": "New rules",
+          "items": {
+            "description": "Rule",
+            "enum": [
+              "noCopper",
+              "noPlanes",
+              "noExposure",
+              "noDevices"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "size": {
+          "description": "New via outer diameter in mm",
+          "type": "number"
+        },
+        "text": {
+          "description": "New text",
+          "type": "string"
+        },
+        "vertices": {
+          "description": "New outline (closed automatically)",
+          "items": {
+            "description": "[x, y] in mm, or [x, y, angle] to draw an arc with this angle in degrees (positive = counter-clockwise) to the next vertex",
+            "items": {
+              "type": "number"
+            },
+            "maxItems": 3,
+            "minItems": 2,
+            "type": "array"
+          },
+          "type": "array"
+        },
+        "width": {
+          "description": "New trace width in mm",
+          "type": "number"
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "type": "object"
+    },
+    "name": "board_modify_item"
+  },
+  {
+    "annotations": {
+      "readOnlyHint": true
+    },
+    "description": "Get the board setup: inner copper layer count, PCB thickness, design rules (defaults for new traces and vias), DRC settings (minimum values), net classes with their nets, and the available design rule presets of PCB manufacturers (for board_set_settings).",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "board": {
+          "description": "Board name or index, default: the first one",
+          "type": [
+            "string",
+            "integer"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "name": "board_get_settings"
+  },
+  {
+    "annotations": {
+      "readOnlyHint": false
+    },
+    "description": "Change the board setup: apply a design rule preset of a PCB manufacturer, set inner copper layers (named 'inner1' ... in other tools), PCB thickness, defaults for new traces and vias, and DRC minimum values. Net classes are set with net_class_set.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "board": {
+          "description": "Board name or index, default: the first one",
+          "type": [
+            "string",
+            "integer"
+          ]
+        },
+        "defaultTraceWidth": {
+          "description": "Default width of new traces in mm (if the net class has none)",
+          "type": "number"
+        },
+        "defaultViaDrill": {
+          "description": "Default drill of new vias in mm (if the net class has none)",
+          "type": "number"
+        },
+        "innerLayers": {
+          "description": "Number of inner copper layers",
+          "maximum": 62,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "minCopperBoardClearance": {
+          "description": "DRC minimum in mm: Copper to board edge",
+          "type": "number"
+        },
+        "minCopperClearance": {
+          "description": "DRC minimum in mm: Copper to copper of other nets",
+          "type": "number"
+        },
+        "minCopperNpthClearance": {
+          "description": "DRC minimum in mm: Copper to non-plated holes",
+          "type": "number"
+        },
+        "minCopperWidth": {
+          "description": "DRC minimum in mm: Copper width",
+          "type": "number"
+        },
+        "minDrillBoardClearance": {
+          "description": "DRC minimum in mm: Drill to board edge",
+          "type": "number"
+        },
+        "minDrillDrillClearance": {
+          "description": "DRC minimum in mm: Drill to drill",
+          "type": "number"
+        },
+        "minNpthDrill": {
+          "description": "DRC minimum in mm: Drill diameter of non-plated holes",
+          "type": "number"
+        },
+        "minOutlineToolDiameter": {
+          "description": "DRC minimum in mm: Milling tool diameter for inner corners",
+          "type": "number"
+        },
+        "minPthAnnularRing": {
+          "description": "DRC minimum in mm: Annular ring of plated holes",
+          "type": "number"
+        },
+        "minPthDrill": {
+          "description": "DRC minimum in mm: Drill diameter of plated holes",
+          "type": "number"
+        },
+        "minSilkscreenTextHeight": {
+          "description": "DRC minimum in mm: Silkscreen text height",
+          "type": "number"
+        },
+        "minSilkscreenWidth": {
+          "description": "DRC minimum in mm: Silkscreen line width",
+          "type": "number"
+        },
+        "preset": {
+          "description": "Design rule preset of a PCB manufacturer as listed by board_get_settings, or 'default'. Applied first, then the other values.",
+          "type": "string"
+        },
+        "thickness": {
+          "description": "PCB thickness in mm",
+          "type": "number"
+        }
+      },
+      "type": "object"
+    },
+    "name": "board_set_settings"
+  },
+  {
+    "annotations": {
+      "readOnlyHint": true
+    },
+    "description": "Get the routing status of a board: unplaced parts, placed parts and the unrouted connections (air wires). Planes are filled first.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "board": {
+          "description": "Board name or index, default: the first one",
+          "type": [
+            "string",
+            "integer"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "name": "board_status"
+  },
+  {
+    "annotations": {
+      "readOnlyHint": false
+    },
+    "description": "Generate the production data (Gerber/Excellon, assembly and schematic PDFs, pick&place, BOM, archives) into the project's output directory. Adds the default set of output jobs if the project has none yet (saved with project_save).",
+    "inputSchema": {
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "name": "output_jobs_run"
+  }
+]

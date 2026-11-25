@@ -108,6 +108,7 @@ void RuleCheckRpc::run(GuiApplication& app, RpcObjectRegistry& registry,
     // that this is free of side effects: Approvals of messages which have
     // disappeared are not cleaned up here (the GUI does that with its
     // periodic runs).
+    if (quick) throw RpcInvalidArgs("Quick check is only for the DRC.");
     const ElectricalRuleCheck erc(editor->getProject());
     sendResponse(erc.runChecks(),
                  editor->getProject().getErcMessageApprovals());

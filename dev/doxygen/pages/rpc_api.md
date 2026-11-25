@@ -355,7 +355,11 @@ Various kinds of rule checks - library checks, electrical rule check (ERC), and 
 
 Runs the check and return all emitted messages, together with their approved state.
 
-**Params:** None
+**Params:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `quick` | `bool` | Run only the most important checks, not the complete suite of checks. This is much faster than the full check, but will return only a partial result. This flag is only supported for the DRC, not for the other checks. |
 
 **Result:**
 

@@ -1,0 +1,123 @@
+import { Button, CheckBox, ComboBox, ListView, ProgressIndicator } from "std-widgets.slint";
+
+export struct RuleCheckMessageData {
+    checked: bool,
+    severity: string,
+    message: string,
+    description: string,
+    approved: bool,
+}
+
+export component RuleCheckPage {
+    in property <bool> authenticated;
+    in property <bool> running;
+    in property <int> progress;
+    in property <[string]> check-entries;
+    in-out property <int> check-index: -1;
+    in-out property <bool> quick;
+    in property <[RuleCheckMessageData]> messages;
+    callback select-check(string);
+    callback run-clicked();
+    callback cancel-clicked();
+    callback check-toggled(int, bool);
+    callback approve-clicked();
+    callback unapprove-clicked();
+
+    VerticalLayout {
+        spacing: 8px;
+
+        HorizontalLayout {
+            spacing: 6px;
+
+            ComboBox {
+                model: root.check-entries;
+                current-index <=> root.check-index;
+                selected(value) => { root.select-check(value); }
+                horizontal-stretch: 1;
+            }
+
+            CheckBox {
+                text: "quick";
+                checked <=> root.quick;
+            }
+
+            Button {
+                text: "Run";
+                enabled: root.authenticated && (!root.running)
+                    && root.check-index >= 0;
+                clicked => { root.run-clicked(); }
+            }
+
+            Button {
+                text: "Cancel";
+                enabled: root.authenticated && root.running;
+                clicked => { root.cancel-clicked(); }
+            }
+        }
+
+        ProgressIndicator {
+            progress: root.progress / 100;
+            visible: root.running;
+        }
+
+        ListView {
+            vertical-stretch: 1;
+
+            for message[i] in root.messages: HorizontalLayout {
+                spacing: 6px;
+
+                CheckBox {
+                    checked: message.checked;
+                    toggled => { root.check-toggled(i, self.checked); }
+                }
+
+                Text {
+                    text: message.severity;
+                    color: message.severity == "error" ? #c04040
+                        : message.severity == "warning" ? #d08000 : #808080;
+                    vertical-alignment: center;
+                }
+
+                VerticalLayout {
+                    horizontal-stretch: 1;
+
+                    Text {
+                        text: message.message;
+                        font-weight: 700;
+                        overflow: elide;
+                    }
+
+                    Text {
+                        text: message.description;
+                        font-size: 10px;
+                        color: #808080;
+                        overflow: elide;
+                        visible: message.description != "";
+                    }
+                }
+
+                Text {
+                    text: message.approved ? "✓" : "";
+                    color: #40a040;
+                    vertical-alignment: center;
+                }
+            }
+        }
+
+        HorizontalLayout {
+            spacing: 6px;
+
+            Button {
+                text: "Approve Checked";
+                enabled: root.authenticated;
+                clicked => { root.approve-clicked(); }
+            }
+
+            Button {
+                text: "Unapprove Checked";
+                enabled: root.authenticated;
+                clicked => { root.unapprove-clicked(); }
+            }
+        }
+    }
+}
