@@ -413,15 +413,16 @@ Set the approved state of multiple messages (bulk setter). The handles of a prev
 
 Provides access to 2D renderings.
 
-### GraphicsExport/render {#doc_rpc_api_method_GraphicsExport_render}
+### GraphicsExport/run {#doc_rpc_api_method_GraphicsExport_run}
 
-Render a single graphics scene to an image and return it.
+Run a graphics export of a complete schematic, a single sheet, or a board.
 
 **Params:**
 
 | Name | Type | Description |
 |------|------|-------------|
-| `format` | `string` (default: `png`) | Image format. |
+| `path` | `string` | Absolute destination file path. If not provided, the file(s) will be returned as binary blobs in the response. |
+| `format` | `string` (default: `png`) | Image format. Only respected if `path` is absent, If `path` is given, the format will be auto-detected from its file extension. |
 | `dpi` | `integer` (default: `300`) | Resolution. |
 | `flip` | `bool` | If true, the rendering will be flipped to the bottom side. Only supported for boards. |
 | `realistic` | `bool` | If true, a realistic rendering will be done. Only supported for boards. |
@@ -432,7 +433,8 @@ Render a single graphics scene to an image and return it.
 
 | Name | Type | Description |
 |------|------|-------------|
-| `image` | `binary` | Rendered image in the requested format as a binary blob. |
+| `paths` | `array` of `string` | Absolute file paths to the written output files. Only provided if a `path` was passed. |
+| `files` | `array` of `binary` | Output files (image or PDF) in the requested format as binary blobs. Only provided if `path` was not passed. |
 | `errors` | `array` of `string` | Any occurred rendering errors if the image could be rendered partially. If the image could not be rendered at all, an RPC error is returned instead. |
 
 

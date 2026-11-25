@@ -59,6 +59,14 @@ inline QVariant toVariant(const QStringList& list) noexcept {
   return QVariant(list).value<QVariantList>();
 }
 
+inline QVariant toVariant(const QList<QByteArray>& list) noexcept {
+  QVariantList l;
+  for (const auto& item : list) {
+    l.append(item);
+  }
+  return l;
+}
+
 template <typename T, typename F>
 inline QVariantList toVariant(const T& list, F convertItem) {
   QVariantList result;
@@ -146,6 +154,16 @@ struct RpcArgTraits<QByteArray> {
   static constexpr const char* NAME = "binary";
   static std::optional<QByteArray> tryFromVariant(const QVariant& v) noexcept {
     if (v.userType() == QMetaType::QByteArray) return v.toByteArray();
+    return std::nullopt;
+  }
+};
+
+template <>
+struct RpcArgTraits<QColor> {
+  static constexpr const char* NAME = "color";
+  static std::optional<QColor> tryFromVariant(const QVariant& v) noexcept {
+    const QColor color(v.toString());
+    if (color.isValid()) return color;
     return std::nullopt;
   }
 };

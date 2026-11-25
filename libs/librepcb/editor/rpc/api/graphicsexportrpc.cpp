@@ -59,13 +59,14 @@ namespace rpc {
  *  Command Handlers
  ******************************************************************************/
 
-void GraphicsExportRpc::render(GuiApplication& app, RpcObjectRegistry& registry,
-                               RpcRequest& request) {
+void GraphicsExportRpc::run(GuiApplication& app, RpcObjectRegistry& registry,
+                            RpcRequest& request) {
   Q_UNUSED(app);
 
   auto settings = std::make_shared<GraphicsExportSettings>();
   settings->setPixmapDpi(getOptionalArg<qint64>(request, "dpi").value_or(300));
   settings->setMirror(getOptionalArg<bool>(request, "flip").value_or(false));
+  settings->setBackgroundColor(getOptionalArg<QColor>(request, "background").value_or(Qt::transparent));
 
   QStringList painterErrors;
   std::shared_ptr<GraphicsPagePainter> painter;
@@ -103,7 +104,9 @@ void GraphicsExportRpc::render(GuiApplication& app, RpcObjectRegistry& registry,
       request.send(RpcCommandFailed(error));
     } else {
       try {
-        request.send({{"image", FileUtils::readFile(fp)}});
+        request.send({
+            {"files", toVariant(QList<QByteArray>{FileUtils::readFile(fp)})},
+        });
       } catch (const Exception& e) {
         request.send(RpcCommandFailed(e.getMsg()));
       }

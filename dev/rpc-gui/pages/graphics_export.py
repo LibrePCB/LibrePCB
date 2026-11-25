@@ -82,11 +82,12 @@ class GraphicsExportPage:
             "dpi": self.app.ge_dpi,
             "flip": self.app.ge_flip,
             "realistic": self.app.ge_realistic,
+            "background": "#ffffff",
         }
         self.app.ge_running = True
         self.app.ge_status = "Rendering..."
         self._rendering_msgid = self.app.call(
-            "GraphicsExport/render", params, self._on_render)
+            "GraphicsExport/run", params, self._on_render)
 
     def _on_render(self, status, payload):
         self._rendering_msgid = None
@@ -94,7 +95,7 @@ class GraphicsExportPage:
         if status != 0:
             self.app.ge_status = "Render failed."
             return
-        data = payload.get("image")
+        data = payload.get("files")[0]
         if not isinstance(data, (bytes, bytearray)):
             self.app.ge_status = "No image in response."
             return

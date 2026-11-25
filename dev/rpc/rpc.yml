@@ -568,13 +568,22 @@ classes:
     description: Provides access to 2D renderings.
     since: "2.2.0"
     methods:
-      - name: render
-        description: Render a single graphics scene to an image and return it.
+      - name: run
+        description: >-
+          Run a graphics export of a complete schematic, a single sheet, or
+          a board.
         params:
+          - name: path
+            type: string
+            description: >-
+              Absolute destination file path. If not provided, the file(s) will
+              be returned as binary blobs in the response.
           - name: format
             type: string
             default: png
-            description: Image format.
+            description: >-
+              Image format. Only respected if `path` is absent, If `path` is
+              given, the format will be auto-detected from its file extension.
           - name: dpi
             type: integer
             default: 300
@@ -604,14 +613,26 @@ classes:
             description: >-
               If true, a realistic rendering will be done. Only supported for
               boards.
+          - name: background
+            type: string
+            default: "#00000000"
+            description: Hex RGB(A) background color.
         result:
-          - name: image
-            type: binary
+          - name: paths
+            type: array
+            items: string
             description: >-
-              Rendered image in the requested format as a binary blob.
-          #- name: region
+              Absolute file paths to the written output files. Only provided
+              if a `path` was passed.
+          - name: files
+            type: array
+            items: binary
+            description: >-
+              Output files (image or PDF) in the requested format as binary
+              blobs. Only provided if `path` was not passed.
+          #- name: regions
           #  type: array
-          #  items: Point
+          #  items: Rect2D
           #  description: >-
           #    Region represented by the image (coordinates of pixels at [0,0]
           #    and [N,N]).

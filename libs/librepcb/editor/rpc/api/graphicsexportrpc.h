@@ -62,10 +62,11 @@ public:
   // General Methods
 
   /**
-   * @brief Render a single graphics scene to an image and return it.
+   * @brief Run a graphics export of a complete schematic, a single sheet, or
+   *        a board.
    */
-  static void render(GuiApplication& app, RpcObjectRegistry& registry,
-                     RpcRequest& request);
+  static void run(GuiApplication& app, RpcObjectRegistry& registry,
+                  RpcRequest& request);
 };
 
 /*******************************************************************************
