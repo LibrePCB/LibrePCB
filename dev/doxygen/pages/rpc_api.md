@@ -47,6 +47,21 @@ to the executed command.
 
 # Data Types {#doc_rpc_api_types}
 
+## Attribute {#doc_rpc_api_type_Attribute}
+
+An attribute.
+
+**Fields:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `name` | `string` | Attribute name (key). |
+| `type` | [`AttributeType`](@ref doc_rpc_api_type_AttributeType) | Type of the attribute. |
+| `value` | `string` | Value of the attribute. If type is not string, the value has to be a valid number, otherwise it will be rejected. |
+| `unit` | `AttributeUnit` | TODO |
+
+---
+
 ## ProjectEditorSummary {#doc_rpc_api_type_ProjectEditorSummary}
 
 A summary of an open project.
@@ -126,6 +141,22 @@ A summary of a remote library.
 
 ---
 
+## ElectricalRuleCheckMessage {#doc_rpc_api_type_ElectricalRuleCheckMessage}
+
+An electrical rule check (ERC) message.
+
+**Fields:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `obj` | `handle` | The object handle of the message (a hash of its approval), to be passed in the "obj"-like parameters of the `set` method. |
+| `severity` | `ErcSeverity` | The severity of the message. |
+| `message` | `string` | The human-readable message. |
+| `description` | `string?` | An optional, more detailed description of the message, if available. |
+| `approved` | `bool` | Whether the message is currently approved. |
+
+---
+
 ## UndoStackDetails {#doc_rpc_api_type_UndoStackDetails}
 
 The state of a document's undo stack.
@@ -148,6 +179,19 @@ Information about the workspace library database.
 
 ---
 
+## AttributeType (Enum) {#doc_rpc_api_type_AttributeType}
+| Value | Description |
+|-------|-------------|
+| `string` |  |
+| `resistance` |  |
+| `capacitance` |  |
+| `inductance` |  |
+| `voltage` |  |
+| `current` |  |
+| `power` |  |
+| `frequency` |  |
+
+---
 ## BackupRestoreMode (Enum) {#doc_rpc_api_type_BackupRestoreMode}
 | Value | Description |
 |-------|-------------|
@@ -269,11 +313,11 @@ Set project metadata and settings.
 | `name` | `string` | Project name. |
 | `author` | `string` | Project author. |
 | `version` | `string` | Project version. |
-| `attributes` | `array` of `Attribute` | Project attributes. |
+| `attributes` | `array` of [`Attribute`](@ref doc_rpc_api_type_Attribute) | Project attributes. |
 | `locale_order` | `array` of `string` | Locale order. |
 | `norm_order` | `array` of `string` | Norm order. |
 
-**Result:** None
+**Result:** [`ProjectEditorDetails`](@ref doc_rpc_api_type_ProjectEditorDetails)
 
 **Since:** 2.2.0
 
@@ -296,6 +340,46 @@ Save project to disk.
 Close project. Attention: If there were unsaved changes in the project, they will be discarded. Call `save` first, if desired.
 
 **Params:** None
+
+**Result:** None
+
+**Since:** 2.2.0
+
+---
+
+## Class ElectricalRuleCheck {#doc_rpc_api_class_ElectricalRuleCheck}
+
+The ERC of a project.
+
+### ElectricalRuleCheck/run {#doc_rpc_api_method_ElectricalRuleCheck_run}
+
+Runs the ERC and returns all emitted messages, together with their approved state. Note that the result only reflects the current state of the project — it does not trigger any background re-run of the ERC.
+
+**Params:** None
+
+**Result:**
+
+**Fields:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `messages` | `array` of [`ElectricalRuleCheckMessage`](@ref doc_rpc_api_type_ElectricalRuleCheckMessage) |  |
+
+
+**Since:** 2.2.0
+
+---
+
+### ElectricalRuleCheck/set {#doc_rpc_api_method_ElectricalRuleCheck_set}
+
+Set the approved state of multiple ERC messages (bulk setter). The handles of a previous `run()` call are only valid as long as the ERC messages did not change.
+
+**Params:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `messages` | `array` of `handle` | The object handles of the ERC messages to modify. |
+| `approved` | `bool` | The approved state to set on all given messages. |
 
 **Result:** None
 

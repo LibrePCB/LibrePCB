@@ -7,6 +7,7 @@
 CLASSES = [
     "Protocol",
     "ProjectEditor",
+    "ElectricalRuleCheck",
     "UndoStack",
     "RemoteLibrary",
     "WorkspaceDb",

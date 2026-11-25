@@ -882,6 +882,8 @@ add_library(
   project/schematic/symbolinstancepropertiesdialog.h
   project/schematic/symbolinstancepropertiesdialog.ui
   rpc/api/commands.cpp
+  rpc/api/electricalrulecheckrpc.cpp
+  rpc/api/electricalrulecheckrpc.h
   rpc/api/projecteditorrpc.cpp
   rpc/api/projecteditorrpc.h
   rpc/api/protocolrpc.cpp

@@ -314,6 +314,29 @@ structs:
         type: string?
         description: The latest available version, if known.
 
+  - name: ElectricalRuleCheckMessage
+    description: An electrical rule check (ERC) message.
+    fields:
+      - name: obj
+        type: handle
+        description: >-
+          The object handle of the message (a hash of its approval), to be
+          passed in the "obj"-like parameters of the `set` method.
+      - name: severity
+        type: ErcSeverity
+        description: The severity of the message.
+      - name: message
+        type: string
+        description: The human-readable message.
+      - name: description
+        type: string?
+        description: >-
+          An optional, more detailed description of the message, if
+          available.
+      - name: approved
+        type: bool
+        description: Whether the message is currently approved.
+
   - name: UndoStackDetails
     description: The state of a document's undo stack.
     fields:
@@ -486,7 +509,11 @@ classes:
     since: "2.2.0"
     methods:
       - name: run
-        description: Runs the ERC and returns all emitted messages.
+        description: >-
+          Runs the ERC and returns all emitted messages, together with
+          their approved state. Note that the result only reflects the
+          current state of the project — it does not trigger any
+          background re-run of the ERC.
         params: []
         result:
           - name: messages
@@ -494,14 +521,18 @@ classes:
             items: ElectricalRuleCheckMessage
 
       - name: set
-        description: Set properties on multiple ERC messages (bulk setter).
+        description: >-
+          Set the approved state of multiple ERC messages (bulk setter).
+          The handles of a previous `run()` call are only valid as long as
+          the ERC messages did not change.
         params:
-          - name: objs
-            type: string
-            description: Message object handles.
+          - name: messages
+            type: array
+            items: handle
+            description: The object handles of the ERC messages to modify.
           - name: approved
             type: bool
-            description: The approved state.
+            description: The approved state to set on all given messages.
 
   - name: UndoStack
     description: >-

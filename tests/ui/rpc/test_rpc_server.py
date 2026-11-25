@@ -144,8 +144,8 @@ def test_rpc_server(librepcb, helpers):
                 rpc4.send([3, 1])
                 message = rpc4.receive()
                 assert message[0:2] == [1, 1], message
-                assert message[2] == 33, message  # Status: the error code.
-                assert message[3]["message"] == "Access denied", message
+                assert message[2] == 99, message  # Status: the error code.
+                assert message[3]["message"] == "Request cancelled", message
             finally:
                 rpc4.close()
 

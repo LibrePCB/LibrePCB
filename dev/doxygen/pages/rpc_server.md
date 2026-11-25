@@ -53,9 +53,9 @@ There are two ways to authenticate:
   client. The application asks the user whether to accept the connection
   (via a notification). If the user accepts it, the connection is
   authenticated and a new token is issued, which the client shall store
-  for future connections. If the user denies the request (or the client
-  cancels it), the request is answered with an error
-  ([code 33](@ref doc_rpc_api_errors)).
+  for future connections. If the user denies the request, the request is
+  answered with an error ([code 33](@ref doc_rpc_api_errors)); if the
+  client cancels it, with [code 99](@ref doc_rpc_api_errors).
 
 The success result is a map with some application information:
 

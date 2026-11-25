@@ -49,6 +49,65 @@ struct RpcEnumTraits;
  ******************************************************************************/
 
 /**
+ * @brief The AttributeType enum (see the API specification)
+ *
+ * The values are transferred as strings in lower_snake_case (the C++
+ * identifiers are derived from them). They are read from request
+ * arguments with the generic argument readers in rpchelpers.h.
+ */
+enum class AttributeType {
+  String,
+  Resistance,
+  Capacitance,
+  Inductance,
+  Voltage,
+  Current,
+  Power,
+  Frequency,
+};
+
+/**
+ * @brief Conversion data for the AttributeType enum
+ *
+ * Used by the generic argument readers in rpchelpers.h.
+ */
+template <>
+struct RpcEnumTraits<AttributeType> {
+  /// The enum name (used in error messages).
+  static constexpr const char* NAME = "AttributeType";
+
+  /// The map from wire strings to enum values.
+  static const QHash<QString, AttributeType>& mapFromString() noexcept {
+    static const QHash<QString, AttributeType> map = {
+        {"string", AttributeType::String},
+        {"resistance", AttributeType::Resistance},
+        {"capacitance", AttributeType::Capacitance},
+        {"inductance", AttributeType::Inductance},
+        {"voltage", AttributeType::Voltage},
+        {"current", AttributeType::Current},
+        {"power", AttributeType::Power},
+        {"frequency", AttributeType::Frequency},
+    };
+    return map;
+  }
+
+  /// The map from enum values to wire strings.
+  static const QHash<AttributeType, QString>& mapToString() noexcept {
+    static const QHash<AttributeType, QString> map = {
+        {AttributeType::String, "string"},
+        {AttributeType::Resistance, "resistance"},
+        {AttributeType::Capacitance, "capacitance"},
+        {AttributeType::Inductance, "inductance"},
+        {AttributeType::Voltage, "voltage"},
+        {AttributeType::Current, "current"},
+        {AttributeType::Power, "power"},
+        {AttributeType::Frequency, "frequency"},
+    };
+    return map;
+  }
+};
+
+/**
  * @brief The BackupRestoreMode enum (see the API specification)
  *
  * The values are transferred as strings in lower_snake_case (the C++

@@ -206,7 +206,8 @@ struct RpcArgTraits<std::shared_ptr<Attribute>> {
     // Very ugly!
     const auto map = v.toMap();
     const auto key = AttributeKey(map.value("name").toString());
-    const auto& type = AttributeType::fromString(map.value("type").toString());
+    const auto& type =
+        ::librepcb::AttributeType::fromString(map.value("type").toString());
     const auto value = map.value("value").toString();
     const auto unit = type.getUnitFromString(map.value("unit").toString());
     return std::make_shared<Attribute>(key, type, value, unit);
