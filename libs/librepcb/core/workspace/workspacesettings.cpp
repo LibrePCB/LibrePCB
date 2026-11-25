@@ -34,6 +34,8 @@
  ******************************************************************************/
 namespace librepcb {
 
+static const char* sOfficialApiUrl = "https://api.librepcb.org";
+
 /*******************************************************************************
  *  Non-Member Functions
  ******************************************************************************/
@@ -51,8 +53,12 @@ std::unique_ptr<SExpression> serialize(
 
 template <>
 WorkspaceSettings::ApiEndpoint deserialize(const SExpression& node) {
-  WorkspaceSettings::ApiEndpoint ep;
-  ep.url = deserialize<QUrl>(node.getChild("@0"));
+  WorkspaceSettings::ApiEndpoint ep{
+      deserialize<Url>(node.getChild("@0")),
+      false,
+      false,
+      false,
+  };
   if (const SExpression* child = node.tryGetChild("libraries")) {
     ep.useForLibraries = deserialize<bool>(child->getChild("@0"));
   } else {
@@ -61,12 +67,12 @@ WorkspaceSettings::ApiEndpoint deserialize(const SExpression& node) {
   if (const SExpression* child = node.tryGetChild("parts")) {
     ep.useForPartsInfo = deserialize<bool>(child->getChild("@0"));
   } else {
-    ep.useForPartsInfo = (ep.url == QUrl("https://api.librepcb.org"));
+    ep.useForPartsInfo = (ep.url.toStr() == sOfficialApiUrl);
   }
   if (const SExpression* child = node.tryGetChild("order")) {
     ep.useForOrder = deserialize<bool>(child->getChild("@0"));
   } else {
-    ep.useForOrder = (ep.url == QUrl("https://api.librepcb.org"));
+    ep.useForOrder = (ep.url.toStr() == sOfficialApiUrl);
   }
   return ep;
 }
@@ -89,16 +95,17 @@ WorkspaceSettings::WorkspaceSettings(QObject* parent)
     userName("user", "", this),
     libraryLocaleOrder("library_locale_order", "locale", QStringList(), this),
     libraryNormOrder("library_norm_order", "norm", QStringList(), this),
-    apiEndpoints("api_endpoints", "endpoint",
-                 QList<ApiEndpoint>{
-                     ApiEndpoint{
-                         QUrl("https://api.librepcb.org"),
-                         true,  // Use for libraries
-                         true,  // Use for parts info
-                         true,  // Use for order
-                     },
-                 },
-                 this),
+    apiEndpoints(
+        "api_endpoints", "endpoint",
+        QList<ApiEndpoint>{
+            ApiEndpoint{
+                Url::fromString(sOfficialApiUrl, QUrl::TolerantMode, false),
+                true,  // Use for libraries
+                true,  // Use for parts info
+                true,  // Use for order
+            },
+        },
+        this),
     librariesAutoUpdateMode("library_updates", AutoUpdateMode::Install, this),
     autofetchLivePartInformation("autofetch_live_part_information", true, this),
     externalWebBrowserCommands("external_web_browser", "command", QStringList(),
@@ -268,7 +275,7 @@ std::unique_ptr<SExpression> WorkspaceSettings::serialize() {
 std::optional<WorkspaceSettings::ApiEndpoint>
     WorkspaceSettings::getApiEndpointForPartsInfo() const noexcept {
   for (const ApiEndpoint& ep : apiEndpoints.get()) {
-    if (ep.useForPartsInfo && ep.url.isValid()) {
+    if (ep.useForPartsInfo) {
       return ep;
     }
   }
@@ -278,7 +285,7 @@ std::optional<WorkspaceSettings::ApiEndpoint>
 std::optional<WorkspaceSettings::ApiEndpoint>
     WorkspaceSettings::getApiEndpointForOrder() const noexcept {
   for (const ApiEndpoint& ep : apiEndpoints.get()) {
-    if (ep.useForOrder && ep.url.isValid()) {
+    if (ep.useForOrder) {
       return ep;
     }
   }

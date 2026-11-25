@@ -524,7 +524,8 @@ void LibraryTab::refreshUiData() noexcept {
   mVersionError = slint::SharedString();
   mVersionParsed = mLibrary.getVersion();
   mDeprecated = mLibrary.isDeprecated();
-  mUrl = q2s(mLibrary.getUrl().toString());
+  mUrl = mLibrary.getUrl() ? q2s(mLibrary.getUrl()->toPrettyStr())
+                           : slint::SharedString();
   mUrlError = slint::SharedString();
   mDependencies->setUuids(mLibrary.getDependencies());
   mManufacturer = q2s(*mLibrary.getManufacturer());
@@ -552,9 +553,9 @@ void LibraryTab::commitUiData() noexcept {
     }
     cmd->setVersion(mVersionParsed);
     cmd->setDeprecated(mDeprecated);
-    const QString urlStr = s2q(mUrl);
-    if (urlStr != mLibrary.getUrl().toString()) {
-      cmd->setUrl(QUrl(urlStr.trimmed(), QUrl::TolerantMode));
+    const QString urlStr = s2q(mUrl).trimmed();
+    if ((!mLibrary.getUrl()) || (urlStr != mLibrary.getUrl()->toPrettyStr())) {
+      cmd->setUrl(Url::tryFromUserInput(urlStr));
     }
     cmd->setDependencies(mDependencies->getUuids());
     const QString manufacturer = s2q(mManufacturer);

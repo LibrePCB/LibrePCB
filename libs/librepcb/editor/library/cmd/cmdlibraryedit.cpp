@@ -54,7 +54,7 @@ CmdLibraryEdit::~CmdLibraryEdit() noexcept {
  *  Setters
  ******************************************************************************/
 
-void CmdLibraryEdit::setUrl(const QUrl& url) noexcept {
+void CmdLibraryEdit::setUrl(const std::optional<Url>& url) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewUrl = url;
 }

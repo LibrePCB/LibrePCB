@@ -520,6 +520,8 @@ add_library(
   types/stroketextspacing.cpp
   types/stroketextspacing.h
   types/tag.h
+  types/url.cpp
+  types/url.h
   types/uuid.cpp
   types/uuid.h
   types/version.cpp

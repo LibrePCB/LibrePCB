@@ -61,31 +61,32 @@ void ApiEndpointListModelLegacy::add(
     const QPersistentModelIndex& itemIndex) noexcept {
   Q_UNUSED(itemIndex);
 
-  if (!mNewUrl.isValid()) {
+  if (!mNewUrl) {
     return;
   }
 
   for (const auto& ep : std::as_const(mValues)) {
-    if (ep.url == mNewUrl) {
+    if (ep.url == *mNewUrl) {
       QMessageBox::critical(nullptr, tr("Error"),
                             QString("URL already exists."));
       return;
     }
   }
 
-  const bool isOfficialApi = (mNewUrl == QUrl("https://api.librepcb.org"));
+  const bool isOfficialApi = (mNewUrl->toStr() == "https://api.librepcb.org");
 
-  WorkspaceSettings::ApiEndpoint ep;
-  ep.url = mNewUrl;
-  ep.useForLibraries = isOfficialApi;
-  ep.useForPartsInfo = isOfficialApi && mValues.isEmpty();
-  ep.useForOrder = isOfficialApi && mValues.isEmpty();
+  const WorkspaceSettings::ApiEndpoint ep{
+      *mNewUrl,
+      isOfficialApi,
+      isOfficialApi && mValues.isEmpty(),
+      isOfficialApi && mValues.isEmpty(),
+  };
 
   beginInsertRows(QModelIndex(), mValues.count(), mValues.count());
   mValues.append(ep);
   endInsertRows();
 
-  mNewUrl = QUrl();
+  mNewUrl = std::nullopt;
   emit dataChanged(index(mValues.count(), 0),
                    index(mValues.count(), _COLUMN_COUNT - 1));
 }
@@ -148,8 +149,9 @@ QVariant ApiEndpointListModelLegacy::data(const QModelIndex& index,
       : nullptr;
   switch (index.column()) {
     case COLUMN_URL: {
-      const QString url = item ? item->url.toString() : mNewUrl.toString();
-      const bool showPlaceholder = (!item) && mNewUrl.isEmpty();
+      const QString url =
+          item ? item->url.toStr() : (mNewUrl ? mNewUrl->toStr() : QString());
+      const bool showPlaceholder = (!item) && (!mNewUrl);
       const QString placeholder = tr("Click here a add an URL");
       switch (role) {
         case Qt::DisplayRole:
@@ -269,11 +271,11 @@ bool ApiEndpointListModelLegacy::setData(const QModelIndex& itemIndex,
       ? &mValues[itemIndex.row()]
       : nullptr;
   if ((itemIndex.column() == COLUMN_URL) && role == Qt::EditRole) {
-    QUrl url = QUrl::fromUserInput(value.toString().trimmed());
+    const auto url = Url::tryFromUserInput(value.toString());
     if (!item) {
       mNewUrl = url;
-    } else if (url.isValid()) {
-      item->url = url;
+    } else if (url) {
+      item->url = *url;
     }
   } else if ((itemIndex.column() == COLUMN_LIBRARIES) &&
              (role == Qt::CheckStateRole) && item) {

@@ -24,12 +24,14 @@
  *  Includes
  ******************************************************************************/
 #include "../../job/outputjob.h"
+#include "../../types/url.h"
 #include "../librarybaseelement.h"
 #include "organizationpcbdesignrules.h"
 
 #include <QtCore>
 
 #include <memory>
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -59,7 +61,7 @@ public:
   // Getters
   const QByteArray& getLogoPng() const noexcept { return mLogoPng; }
   QPixmap getLogoPixmap() const noexcept;
-  const QUrl& getUrl() const noexcept { return mUrl; }
+  const std::optional<Url>& getUrl() const noexcept { return mUrl; }
   const QString& getCountry() const noexcept { return mCountry; }
   const QStringList& getFabs() const noexcept { return mFabs; }
   const QStringList& getShipping() const noexcept { return mShipping; }
@@ -85,7 +87,7 @@ public:
 
   // Setters
   void setLogoPng(const QByteArray& png) noexcept { mLogoPng = png; }
-  void setUrl(const QUrl& url) noexcept { mUrl = url; }
+  void setUrl(const std::optional<Url>& url) noexcept { mUrl = url; }
   void setCountry(const QString& country) noexcept { mCountry = country; }
   void setFabs(const QStringList& list) noexcept { mFabs = list; }
   void setShipping(const QStringList& list) noexcept { mShipping = list; }
@@ -134,7 +136,7 @@ private:  // Methods
 
 private:  // Data
   QByteArray mLogoPng;
-  QUrl mUrl;
+  std::optional<Url> mUrl;
   QString mCountry;
   QStringList mFabs;
   QStringList mShipping;

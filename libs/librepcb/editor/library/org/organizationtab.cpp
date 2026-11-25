@@ -391,7 +391,8 @@ void OrganizationTab::refreshUiData() noexcept {
   mVersionError = slint::SharedString();
   mVersionParsed = mOrganization->getVersion();
   mDeprecated = mOrganization->isDeprecated();
-  mUrl = q2s(mOrganization->getUrl().toString());
+  mUrl = mOrganization->getUrl() ? q2s(mOrganization->getUrl()->toPrettyStr())
+                                 : slint::SharedString();
   mUrlError = slint::SharedString();
   mPriority = mOrganization->getPriority();
 
@@ -419,9 +420,10 @@ void OrganizationTab::commitUiData() noexcept {
     }
     cmd->setVersion(mVersionParsed);
     cmd->setDeprecated(mDeprecated);
-    const QString urlStr = s2q(mUrl);
-    if (urlStr != mOrganization->getUrl().toString()) {
-      cmd->setUrl(QUrl(urlStr.trimmed(), QUrl::TolerantMode));
+    const QString urlStr = s2q(mUrl).trimmed();
+    if ((!mOrganization->getUrl()) ||
+        (urlStr != mOrganization->getUrl()->toPrettyStr())) {
+      cmd->setUrl(Url::tryFromUserInput(urlStr));
     }
     cmd->setPriority(mPriority);
     mUndoStack->execCmd(cmd.release());

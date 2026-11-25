@@ -27,6 +27,7 @@
 #include <librepcb/core/library/cmp/componentprefix.h>
 #include <librepcb/core/types/circuitidentifier.h>
 #include <librepcb/core/types/elementname.h>
+#include <librepcb/core/types/url.h>
 #include <librepcb/core/types/version.h>
 
 #include <QtCore>
@@ -159,9 +160,8 @@ std::optional<CircuitIdentifier> validateCircuitIdentifier(
     const QString& input, slint::SharedString& error,
     bool isDuplicate) noexcept;
 
-std::optional<QUrl> validateUrl(const QString& input,
-                                slint::SharedString& error,
-                                bool allowEmpty = false) noexcept;
+std::optional<Url> validateUrl(const QString& input, slint::SharedString& error,
+                               bool allowEmpty = false) noexcept;
 
 std::optional<ComponentPrefix> validateComponentPrefix(
     const QString& input, slint::SharedString& error) noexcept;

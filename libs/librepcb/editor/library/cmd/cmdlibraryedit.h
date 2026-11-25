@@ -51,7 +51,7 @@ public:
   ~CmdLibraryEdit() noexcept override;
 
   // Setters
-  void setUrl(const QUrl& url) noexcept;
+  void setUrl(const std::optional<Url>& url) noexcept;
   void setDependencies(const QSet<Uuid>& deps) noexcept;
   void setIcon(const QByteArray& png) noexcept;
   void setManufacturer(const SimpleString& value) noexcept;
@@ -72,8 +72,8 @@ protected:  // Methods
 private:  // Data
   Library& mLibrary;
 
-  QUrl mOldUrl;
-  QUrl mNewUrl;
+  std::optional<Url> mOldUrl;
+  std::optional<Url> mNewUrl;
   QSet<Uuid> mOldDependencies;
   QSet<Uuid> mNewDependencies;
   QByteArray mOldIcon;

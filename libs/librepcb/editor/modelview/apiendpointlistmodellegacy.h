@@ -27,6 +27,8 @@
 
 #include <QtCore>
 
+#include <optional>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -88,7 +90,7 @@ public:
 
 private:  // Data
   QList<WorkspaceSettings::ApiEndpoint> mValues;
-  QUrl mNewUrl;
+  std::optional<Url> mNewUrl;
 };
 
 /*******************************************************************************

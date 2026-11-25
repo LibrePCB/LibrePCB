@@ -425,9 +425,9 @@ void AddComponentDialog::treeComponents_itemDoubleClicked(QTreeWidgetItem* item,
   if (item && item->parent() && item->parent()->parent() && (column == 2)) {
     const auto data =
         item->data(2, Qt::UserRole).value<PartInformationDelegate::Data>();
-    if (data.info && data.info->pricingUrl.isValid()) {
+    if (data.info && data.info->pricingUrl) {
       DesktopServices ds(mSettings);
-      ds.openWebUrl(data.info->pricingUrl);
+      ds.openWebUrl(data.info->pricingUrl->toQUrl());
     }
   } else if (item) {
     // On macOS, the main window looses focus and we don't get mouse move
@@ -482,18 +482,18 @@ void AddComponentDialog::customComponentsContextMenuRequested(
 
   QMenu menu(this);
   menu.addAction(mActionCopyMpn.get());
-  if (partInfo && partInfo->productUrl.isValid()) {
+  if (partInfo && partInfo->productUrl) {
     menu.addAction(
         cmd.openProductWebsite.createAction(this, this, [this, partInfo]() {
           DesktopServices ds(mSettings);
-          ds.openWebUrl(partInfo->productUrl);
+          ds.openWebUrl(partInfo->productUrl->toQUrl());
         }));
   }
-  if (partInfo && partInfo->pricingUrl.isValid()) {
+  if (partInfo && partInfo->pricingUrl) {
     menu.addAction(
         cmd.openPricingWebsite.createAction(this, this, [this, partInfo]() {
           DesktopServices ds(mSettings);
-          ds.openWebUrl(partInfo->pricingUrl);
+          ds.openWebUrl(partInfo->pricingUrl->toQUrl());
         }));
   }
   if (partInfo && (!partInfo->resources.isEmpty())) {
@@ -502,7 +502,7 @@ void AddComponentDialog::customComponentsContextMenuRequested(
                     partInfo->resources.first().name + "...", &menu);
     connect(action, &QAction::triggered, this, [this, partInfo]() {
       DesktopServices ds(mSettings);
-      ds.openWebUrl(partInfo->resources.first().url);
+      ds.openWebUrl(partInfo->resources.first().url.toQUrl());
     });
     menu.addAction(action);
   }

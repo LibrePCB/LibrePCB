@@ -366,7 +366,8 @@ static int openWorkspace(FilePath& path) {
   PartInformationProvider::instance().setCacheDir(Application::getCacheDir());
   auto applyPartInformationProviderSettings = [&ws]() {
     const auto ep = ws.getSettings().getApiEndpointForPartsInfo();
-    PartInformationProvider::instance().setApiEndpoint(ep ? ep->url : QUrl());
+    PartInformationProvider::instance().setApiEndpoint(ep ? ep->url.toQUrl()
+                                                          : QUrl());
   };
   applyPartInformationProviderSettings();
   QObject::connect(
