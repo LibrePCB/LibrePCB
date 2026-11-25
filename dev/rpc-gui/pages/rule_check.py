@@ -10,6 +10,7 @@ class RuleCheckPage:
         self._messages = []  # The raw result, for row actions.
         self._checked = set()  # Handles of the checked messages.
         self._selected = None  # The handle of the selected object.
+        self._selected_project = None  # Its project handle (for set).
         self._running_msgid = None  # The pending RuleCheck/run request.
 
     # --- Object management (called by the ProjectEditor page) ----------
@@ -27,11 +28,12 @@ class RuleCheckPage:
         for p in projects:
             if p["obj"] not in known:
                 self._objects.append(
-                    {"name": p["name"], "obj": p["obj"], "board": False})
+                    {"name": p["name"], "obj": p["obj"],
+                     "project": p["obj"], "board": False})
         self._update_model()
 
-    def set_boards(self, boards):
-        """Update the board entries (DRC)."""
+    def set_boards(self, project, boards):
+        """Update the board entries (DRC) of the given project."""
         self._objects = [
             entry
             for entry in self._objects
@@ -42,7 +44,8 @@ class RuleCheckPage:
         for b in boards:
             if b["obj"] not in known:
                 self._objects.append(
-                    {"name": b["name"], "obj": b["obj"], "board": True})
+                    {"name": b["name"], "obj": b["obj"],
+                     "project": project, "board": True})
         self._update_model()
 
     def select_check(self, value):
@@ -50,6 +53,8 @@ class RuleCheckPage:
         for entry in self._objects:
             if _label(entry) == value:
                 self._selected = entry["obj"]
+                self._selected_project = entry.get(
+                    "project", entry["obj"])
                 return
 
     # --- Command handlers ----------------------------------------------
@@ -92,8 +97,12 @@ class RuleCheckPage:
     def _call_set(self, approved):
         if not self._checked:
             return
+        # The approved state lives on the project, so the project handle
+        # is the object of this request (even for DRC messages).
+        obj = self._selected_project or self._selected
         self.app.call("RuleCheck/set",
-                      {"messages": sorted(self._checked),
+                      {"obj": obj,
+                       "messages": sorted(self._checked),
                        "approved": approved})
 
     def _on_run(self, status, payload):
@@ -112,6 +121,8 @@ class RuleCheckPage:
         # Auto-select the first entry (the Run button needs a selection).
         if (self._selected is None) and self._objects:
             self._selected = self._objects[0]["obj"]
+            self._selected_project = self._objects[0].get(
+                "project", self._selected)
             self.app.check_index = 0
         self.app.check_messages = slint.ListModel([
             {

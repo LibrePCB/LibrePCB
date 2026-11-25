@@ -56,11 +56,13 @@ class ProjectEditorPage:
             value = _split_list(str(getattr(self.app, prop)))
             if value != self._details.get(key, []):
                 params[key] = value
-        if params:
+        obj = self._details_obj
+        if obj is None and len(self._handles) == 1:
+            obj = self._handles[0]
+        if params and obj is not None:
             self.app.call(
-                "ProjectEditor/set", {"obj": self._details_obj, **params},
-                lambda status, payload: self._on_details(
-                    status, payload, self._details_obj))
+                "ProjectEditor/set", {"obj": obj, **params},
+                lambda status, payload: self._on_details(status, payload, obj))
 
     # --- Response handlers ---------------------------------------------
 
@@ -69,6 +71,8 @@ class ProjectEditorPage:
         self.app._pages["UndoStack"].select(index)
 
     def _on_opened(self, status, payload):
+        # The open response carries the details: pre-fill the set form.
+        self._on_details(status, payload)
         # Opening changes the project list, so refresh it automatically.
         if status == 0:
             self.list_clicked()
@@ -93,6 +97,8 @@ class ProjectEditorPage:
         ])
         self.app._pages["UndoStack"].set_projects(projects)
         self.app._pages["RuleCheck"].set_projects(projects)
+        if (self._details_obj is None) and (len(self._handles) == 1):
+            self._details_obj = self._handles[0]
 
     def _on_details(self, status, payload, obj=None):
         if status != 0:
@@ -112,7 +118,8 @@ class ProjectEditorPage:
             {"name": board["name"], "obj": board["obj"]}
             for board in payload.get("boards", [])
         ]
-        self.app._pages["RuleCheck"].set_boards(boards)
+        self.app._pages["RuleCheck"].set_boards(
+            self._details_obj, boards)
 
 
 def _split_list(text):

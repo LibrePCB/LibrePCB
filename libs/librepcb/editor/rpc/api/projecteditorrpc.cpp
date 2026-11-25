@@ -54,71 +54,68 @@ namespace rpc {
  ******************************************************************************/
 
 static QVariantMap summary(const Attribute& obj) {
-  QVariantMap result;
-  result.insert("name", *obj.getKey());
-  result.insert("type", obj.getType().getName());
-  result.insert("value", obj.getValue());
-  result.insert("unit", obj.getUnit() ? obj.getUnit()->getName() : QVariant());
-  return result;
+  return {
+      {"name", *obj.getKey()},
+      {"type", obj.getType().getName()},
+      {"value", obj.getValue()},
+      {"unit", obj.getUnit() ? obj.getUnit()->getName() : QVariant()},
+  };
 }
 
 static QVariantMap summary(SchematicEditor& obj, RpcObjectRegistry& registry) {
   Schematic& schematic = obj.getSchematic();
-
-  QVariantMap result;
-  result.insert("obj", registry.getHandle(obj));
-  result.insert("uuid", toVariant(schematic.getUuid()));
-  result.insert("name", *schematic.getName());
-  return result;
+  return {
+      {"obj", registry.getHandle(obj)},
+      {"uuid", toVariant(schematic.getUuid())},
+      {"name", *schematic.getName()},
+  };
 }
 
 static QVariantMap summary(BoardEditor& obj, RpcObjectRegistry& registry) {
   Board& board = obj.getBoard();
-
-  QVariantMap result;
-  result.insert("obj", registry.getHandle(obj));
-  result.insert("uuid", toVariant(board.getUuid()));
-  result.insert("name", *board.getName());
-  return result;
+  return {
+      {"obj", registry.getHandle(obj)},
+      {"uuid", toVariant(board.getUuid())},
+      {"name", *board.getName()},
+  };
 }
 
 static QVariantMap summary(ProjectEditor& obj, RpcObjectRegistry& registry) {
   const Project& project = obj.getProject();
-
-  QVariantMap result;
-  result.insert("obj", registry.getHandle(obj));
-  result.insert("name", *project.getName());
-  result.insert("path", project.getFilepath().toStr());
-  result.insert("dirty", obj.hasUnsavedChanges());
-  return result;
+  return {
+      {"obj", registry.getHandle(obj)},
+      {"name", *project.getName()},
+      {"path", project.getFilepath().toStr()},
+      {"dirty", obj.hasUnsavedChanges()},
+  };
 }
 
 static QVariantMap details(ProjectEditor& obj, RpcObjectRegistry& registry) {
   const Project& project = obj.getProject();
-
-  QVariantMap result;
-  result.insert("uuid", toVariant(project.getUuid()));
-  result.insert("name", *project.getName());
-  result.insert("path", project.getFilepath().toStr());
-  result.insert("dirty", obj.hasUnsavedChanges());
-  result.insert("author", project.getAuthor());
-  result.insert("version", *project.getVersion());
-  result.insert("attributes",
-                toVariant(project.getAttributes(),
-                          [&](const Attribute& obj) { return summary(obj); }));
-  result.insert("locale_order", toVariant(project.getLocaleOrder()));
-  result.insert("norm_order", toVariant(project.getNormOrder()));
-  result.insert("sheets",
-                toVariant(obj.getSchematics(),
-                          [&](const std::shared_ptr<SchematicEditor>& obj) {
-                            return summary(*obj, registry);
-                          }));
-  result.insert(
-      "boards",
+  const auto attributes =
+      toVariant(project.getAttributes(),
+                [&](const Attribute& obj) { return summary(obj); });
+  const auto sheets = toVariant(
+      obj.getSchematics(), [&](const std::shared_ptr<SchematicEditor>& obj) {
+        return summary(*obj, registry);
+      });
+  const auto boards =
       toVariant(obj.getBoards(), [&](const std::shared_ptr<BoardEditor>& obj) {
         return summary(*obj, registry);
-      }));
-  return result;
+      });
+  return {
+      {"uuid", toVariant(project.getUuid())},
+      {"name", *project.getName()},
+      {"path", project.getFilepath().toStr()},
+      {"dirty", obj.hasUnsavedChanges()},
+      {"author", project.getAuthor()},
+      {"version", *project.getVersion()},
+      {"attributes", attributes},
+      {"locale_order", toVariant(project.getLocaleOrder())},
+      {"norm_order", toVariant(project.getNormOrder())},
+      {"sheets", sheets},
+      {"boards", boards},
+  };
 }
 
 /*******************************************************************************

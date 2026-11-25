@@ -108,10 +108,6 @@ private:  // Data
 
   /// All handles, by object.
   QHash<QObject*, uint32_t> mHandles;
-
-  /// The next handle to assign (the counter is static and survives server
-  /// restarts, so handle values are never reused).
-  static uint32_t sNextHandle;
 };
 
 /*******************************************************************************

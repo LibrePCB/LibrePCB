@@ -43,8 +43,7 @@ namespace rpc {
 
 static QVariantMap details(WorkspaceLibraryDb& obj) {
   Q_UNUSED(obj);
-  QVariantMap result;
-  return result;
+  return {};
 }
 
 /*******************************************************************************

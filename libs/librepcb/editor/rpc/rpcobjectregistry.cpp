@@ -25,6 +25,7 @@
 #include "api/rpcerrors.h"
 
 #include <QtCore>
+#include <cstdlib>
 
 /*******************************************************************************
  *  Namespace
@@ -38,7 +39,14 @@ using namespace rpc;
  *  Constructors / Destructor
  ******************************************************************************/
 
-uint32_t RpcObjectRegistry::sNextHandle = 0;
+static uint32_t getNextHandle() noexcept {
+  // Start with a random handle, to reduce the risk of accidentally considering
+  // stale handles from RPC clients as valid after LibrePCB has been restarted.
+  static uint32_t handle = static_cast<uint32_t>(std::rand());
+  ++handle;
+  if (handle == 0) ++handle; // Skip handle 0 to make QVariant::toInt() working
+  return handle;
+}
 
 RpcObjectRegistry::RpcObjectRegistry(QObject* parent) noexcept
   : QObject(parent) {
@@ -56,7 +64,7 @@ uint32_t RpcObjectRegistry::getHandle(QObject& obj) noexcept {
   if (existing != mHandles.constEnd()) {
     return existing.value();
   }
-  const uint32_t handle = ++sNextHandle;  // Skip handle 0!
+  const uint32_t handle = getNextHandle();
   mObjects.insert(handle, &obj);
   mHandles.insert(&obj, handle);
   connect(&obj, &QObject::destroyed, this,

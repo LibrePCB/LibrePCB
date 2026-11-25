@@ -395,6 +395,10 @@ void ProjectEditor::redo() noexcept {
   }
 }
 
+RuleCheckMessageList runErc(){
+
+}
+
 bool ProjectEditor::requestClose() noexcept {
   if ((mUndoStack->isClean() && (!mManualModificationsMade)) ||
       (!mProject->getDirectory().isWritable())) {
@@ -764,15 +768,17 @@ void ProjectEditor::scheduleErcRun() noexcept {
   mErcTimer.start(mActiveSchematicTabs.isEmpty() ? 1000 : 100);
 }
 
-void ProjectEditor::runErc() noexcept {
+std::optional<RuleCheckMessageList> ProjectEditor::runErc() noexcept {
+  std::optional<RuleCheckMessageList> messages;
+
   try {
     QElapsedTimer timer;
     timer.start();
     ElectricalRuleCheck erc(*mProject);
-    const auto messages = erc.runChecks();
+    messages = erc.runChecks();
 
     // Detect disappeared messages & remove their approvals.
-    QSet<SExpression> approvals = RuleCheckMessage::getAllApprovals(messages);
+    QSet<SExpression> approvals = RuleCheckMessage::getAllApprovals(*messages);
     mSupportedErcApprovals |= approvals;
     mDisappearedErcApprovals = mSupportedErcApprovals - approvals;
     approvals = mProject->getErcMessageApprovals() - mDisappearedErcApprovals;
@@ -800,16 +806,18 @@ void ProjectEditor::runErc() noexcept {
       connect(mErcMessages.get(), &RuleCheckMessagesModel::highlightRequested,
               this, &ProjectEditor::ercMessageHighlightRequested);
     }
-    mErcMessages->setMessages(messages, approvals);
+    mErcMessages->setMessages(*messages, approvals);
     mErcExecutionError.clear();
 
     qDebug() << "ERC succeeded after" << timer.elapsed() << "ms.";
   } catch (const Exception& e) {
+    messages = std::nullopt;
     mErcExecutionError = e.getMsg();
     qCritical() << "ERC failed:" << e.getMsg();
   }
 
   onUiDataChanged.notify();
+  return messages;
 }
 
 void ProjectEditor::projectSettingsChanged() noexcept {

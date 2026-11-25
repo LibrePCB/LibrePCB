@@ -25,7 +25,7 @@
  ******************************************************************************/
 #include "../utils/uiobjectlist.h"
 #include "ui.h"
-
+#include <librepcb/core/rulecheck/rulecheckmessage.h>
 #include <librepcb/core/project/projectloader.h>
 #include <librepcb/core/serialization/sexpression.h>
 #include <librepcb/core/utils/signalslot.h>
@@ -106,6 +106,9 @@ public:
 
   void undo() noexcept;
   void redo() noexcept;
+
+  void scheduleErcRun() noexcept;
+  std::optional<RuleCheckMessageList> runErc() noexcept;
 
   /**
    * @brief Request to close the project
@@ -206,8 +209,6 @@ private:
    * @return File path to the temporary migration log.
    */
   FilePath openMigrationLog() noexcept;
-  void scheduleErcRun() noexcept;
-  void runErc() noexcept;
   void projectSettingsChanged() noexcept;
   void refreshBuses() noexcept;
 

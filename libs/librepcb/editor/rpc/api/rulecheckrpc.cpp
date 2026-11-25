@@ -54,10 +54,8 @@ using namespace rpc;
 /// The object handle of an ERC message: A hash of the approval, i.e. a
 /// deterministic identifier which survives re-runs of the ERC as long as
 /// the message (resp. its approval) stays the same.
-static QString getObj(const RuleCheckMessage& msg) noexcept {
-  const QByteArray data = msg.getApproval().toByteArray();
-  return QString::fromLatin1(
-      QCryptographicHash::hash(data, QCryptographicHash::Sha256).toHex());
+static QByteArray getObj(const RuleCheckMessage& msg) noexcept {
+  return msg.getApproval().toByteArray();
 }
 
 static const char* severityToString(RuleCheckMessage::Severity severity) {
@@ -73,13 +71,13 @@ static const char* severityToString(RuleCheckMessage::Severity severity) {
 
 static QVariantMap summary(const RuleCheckMessage& msg,
                            const QSet<SExpression>& approved) {
-  QVariantMap result;
-  result.insert("obj", getObj(msg));
-  result.insert("severity", severityToString(msg.getSeverity()));
-  result.insert("message", msg.getMessage());
-  result.insert("description", msg.getDescription());
-  result.insert("approved", approved.contains(msg.getApproval()));
-  return result;
+  return {
+      {"obj", getObj(msg)},
+      {"severity", severityToString(msg.getSeverity())},
+      {"message", msg.getMessage()},
+      {"description", msg.getDescription()},
+      {"approved", approved.contains(msg.getApproval())},
+  };
 }
 
 /*******************************************************************************
@@ -104,13 +102,9 @@ void RuleCheckRpc::run(GuiApplication& app, RpcObjectRegistry& registry,
 
   if (auto editor = registry.tryGetAs<ProjectEditor>(request.getArg("obj"))) {
     // ERC: Synchronous.
-    // Run the ERC and map the messages to the wire representation. Note
-    // that this is free of side effects: Approvals of messages which have
-    // disappeared are not cleaned up here (the GUI does that with its
-    // periodic runs).
-    if (quick) throw RpcInvalidArgs("Quick check is only for the DRC.");
-    const ElectricalRuleCheck erc(editor->getProject());
-    sendResponse(erc.runChecks(),
+    const auto messages = editor->runErc();
+    if (!messages) throw RpcInternalError("ERC failed.");
+    sendResponse(*messages,
                  editor->getProject().getErcMessageApprovals());
   } else if (auto editor =
                  registry.tryGetAs<BoardEditor>(request.getArg("obj"))) {
@@ -144,35 +138,34 @@ void RuleCheckRpc::run(GuiApplication& app, RpcObjectRegistry& registry,
 void RuleCheckRpc::set(GuiApplication& app, RpcObjectRegistry& registry,
                        RpcRequest& request) {
   Q_UNUSED(app);
-  auto& editor = registry.getAs<ProjectEditor>(request.getArg("obj"));
-  const auto handles = getArg<QList<QString>>(request, "messages");
+  const auto handles = getArg<QList<QByteArray>>(request, "messages");
   const bool approved = getArg<bool>(request, "approved");
 
-  // Resolve the handles to approvals by running the ERC again: The handle
-  // of a message is only valid while the messages do not change, so
-  // handles of disappeared messages are rejected.
-  const ElectricalRuleCheck erc(editor.getProject());
-  QHash<QString, SExpression> approvals;
-  for (const auto& msg : erc.runChecks()) {
-    approvals.insert(getObj(*msg), msg->getApproval());
-  }
-
-  // Apply the approved state to all given messages.
-  bool modified = false;
-  for (const auto& handle : handles) {
-    const auto it = approvals.constFind(handle);
-    if (it == approvals.constEnd()) {
-      throw RpcInvalidHandle(
-          QString("Unknown ERC message handle: %1").arg(handle));
+  if (auto editor = registry.tryGetAs<ProjectEditor>(request.getArg("obj"))) {
+    // ERC
+    bool modified = false;
+    for (const auto& handle : handles) {
+      const auto approval = SExpression::parse(handle, FilePath());
+      if (editor->getProject().setErcMessageApproved(*approval, approved)) {
+        modified = true;
+      }
     }
-    if (editor.getProject().setErcMessageApproved(*it, approved)) {
-      modified = true;
+    if (modified) {
+      editor->setManualModificationsMade();
+      editor->scheduleErcRun(); // Not sure if needed.
     }
+    request.send();
+  } else if (auto editor =
+             registry.tryGetAs<BoardEditor>(request.getArg("obj"))) {
+    // DRC
+    for (const auto& handle : handles) {
+      const auto approval = SExpression::parse(handle, FilePath());
+      editor->getBoard().setDrcMessageApproved(*approval, approved);
+    }
+    request.send();
+  } else {
+    throw RpcInvalidHandle();
   }
-  if (modified) {
-    editor.setManualModificationsMade();
-  }
-  request.send();
 }
 
 /*******************************************************************************

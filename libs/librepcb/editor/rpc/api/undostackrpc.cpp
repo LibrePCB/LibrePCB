@@ -46,12 +46,12 @@ static UndoStack& getObj(RpcObjectRegistry& registry, RpcRequest& request) {
 }
 
 static QVariantMap details(UndoStack& obj) {
-  QVariantMap result;
-  result.insert("id", obj.getUniqueStateId());
-  result.insert("clean", obj.isClean());
-  result.insert("prev", obj.canUndo() ? obj.getUndoCmdText() : QVariant());
-  result.insert("next", obj.canRedo() ? obj.getRedoCmdText() : QVariant());
-  return result;
+  return {
+      {"id", obj.getUniqueStateId()},
+      {"clean", obj.isClean()},
+      {"prev", obj.canUndo() ? obj.getUndoCmdText() : QVariant()},
+      {"next", obj.canRedo() ? obj.getRedoCmdText() : QVariant()},
+  };
 }
 
 static void throwIfCmdGroupActive(UndoStack& obj) {
