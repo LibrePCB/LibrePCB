@@ -104,12 +104,12 @@ void RemoteLibraryRpc::list(GuiApplication& app, RpcObjectRegistry& registry,
   model.ensurePopulated(false);
 
   auto sendResponse = [&request, &model]() {
-    QVariantMap result;
-    result.insert("libraries",
-                  modelToVariant(model, [](const ui::LibraryInfoData& obj) {
-                    return summary(obj);
-                  }));
-    request.send(result);
+    request.send({
+        {"libraries",
+         modelToVariant(
+             model,
+             [](const ui::LibraryInfoData& obj) { return summary(obj); })},
+    });
   };
 
   if (!model.isOnlineCheckInProgress()) {

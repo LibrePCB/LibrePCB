@@ -20,8 +20,9 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "electricalrulecheckrpc.h"
+#include "rulecheckrpc.h"
 
+#include "../../project/board/boardeditor.h"
 #include "../../project/projecteditor.h"
 #include "../rpcnotification.h"
 #include "../rpcobjectregistry.h"
@@ -29,6 +30,8 @@
 #include "rpcerrors.h"
 #include "rpchelpers.h"
 
+#include <librepcb/core/project/board/board.h>
+#include <librepcb/core/project/board/drc/boarddesignrulecheck.h>
 #include <librepcb/core/project/erc/electricalrulecheck.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/rulecheck/rulecheckmessage.h>
@@ -65,45 +68,80 @@ static const char* severityToString(RuleCheckMessage::Severity severity) {
       return "warning";
     case RuleCheckMessage::Severity::Error:
       return "error";
-    default:
-      Q_ASSERT(false);
-      return "error";
   }
+}
+
+static QVariantMap summary(const RuleCheckMessage& msg,
+                           const QSet<SExpression>& approved) {
+  QVariantMap result;
+  result.insert("obj", getObj(msg));
+  result.insert("severity", severityToString(msg.getSeverity()));
+  result.insert("message", msg.getMessage());
+  result.insert("description", msg.getDescription());
+  result.insert("approved", approved.contains(msg.getApproval()));
+  return result;
 }
 
 /*******************************************************************************
  *  Command Handlers
  ******************************************************************************/
 
-void ElectricalRuleCheckRpc::run(GuiApplication& app,
-                                 RpcObjectRegistry& registry,
-                                 RpcRequest& request) {
+void RuleCheckRpc::run(GuiApplication& app, RpcObjectRegistry& registry,
+                       RpcRequest& request) {
   Q_UNUSED(app);
-  auto& editor = registry.getAs<ProjectEditor>(request.getArg("obj"));
+  const bool quick = getOptionalArg<bool>(request, "quick").value_or(false);
 
-  // Run the ERC and map the messages to the wire representation. Note
-  // that this is free of side effects: Approvals of messages which have
-  // disappeared are not cleaned up here (the GUI does that with its
-  // periodic runs).
-  const ElectricalRuleCheck erc(editor.getProject());
-  const auto messages = erc.runChecks();
-  const auto& approved = editor.getProject().getErcMessageApprovals();
-  QVariantList list;
-  for (const auto& msg : messages) {
-    QVariantMap item;
-    item.insert("obj", getObj(*msg));
-    item.insert("severity", severityToString(msg->getSeverity()));
-    item.insert("message", msg->getMessage());
-    item.insert("description", msg->getDescription());
-    item.insert("approved", approved.contains(msg->getApproval()));
-    list.append(item);
+  auto sendResponse = [&request](const RuleCheckMessageList& messages,
+                                 const QSet<SExpression>& approved) {
+    request.send({
+        {"messages",
+         toVariant(messages,
+                   [&](const std::shared_ptr<const RuleCheckMessage>& msg) {
+                     return summary(*msg, approved);
+                   })},
+    });
+  };
+
+  if (auto editor = registry.tryGetAs<ProjectEditor>(request.getArg("obj"))) {
+    // ERC: Synchronous.
+    // Run the ERC and map the messages to the wire representation. Note
+    // that this is free of side effects: Approvals of messages which have
+    // disappeared are not cleaned up here (the GUI does that with its
+    // periodic runs).
+    const ElectricalRuleCheck erc(editor->getProject());
+    sendResponse(erc.runChecks(),
+                 editor->getProject().getErcMessageApprovals());
+  } else if (auto editor =
+                 registry.tryGetAs<BoardEditor>(request.getArg("obj"))) {
+    // DRC: Asynchronous.
+    BoardDesignRuleCheck& drc = editor->startDrc(quick);
+    if (!drc.isRunning()) throw RpcInternalError();
+    request.makeAsync(drc);
+    request.send(RpcNotification().progress(5));
+    QObject::connect(&request, &RpcRequest::cancelled, &drc,
+                     &BoardDesignRuleCheck::cancel);
+    QObject::connect(&drc, &BoardDesignRuleCheck::progressPercent, &request,
+                     [&request](int percent) {
+                       request.send(RpcNotification().progress(percent));
+                     });
+    QObject::connect(
+        &drc, &BoardDesignRuleCheck::finished, &request,
+        [editor, &request,
+         sendResponse](const BoardDesignRuleCheck::Result& result) {
+          if (result.errors.isEmpty()) {
+            sendResponse(result.messages,
+                         editor->getBoard().getDrcMessageApprovals());
+          } else {
+            request.send(RpcCommandFailed(result.errors.join("; ")));
+          }
+        });
+  } else {
+    throw RpcInvalidHandle();
   }
-  request.send({{"messages", list}});
 }
 
-void ElectricalRuleCheckRpc::set(GuiApplication& app,
-                                 RpcObjectRegistry& registry,
-                                 RpcRequest& request) {
+void RuleCheckRpc::set(GuiApplication& app, RpcObjectRegistry& registry,
+                       RpcRequest& request) {
   Q_UNUSED(app);
   auto& editor = registry.getAs<ProjectEditor>(request.getArg("obj"));
   const auto handles = getArg<QList<QString>>(request, "messages");

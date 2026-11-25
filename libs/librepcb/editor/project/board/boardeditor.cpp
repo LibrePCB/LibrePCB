@@ -320,7 +320,7 @@ void BoardEditor::startPlanesRebuild(bool force) noexcept {
   }
 }
 
-void BoardEditor::startDrc(bool quick) noexcept {
+BoardDesignRuleCheck& BoardEditor::startDrc(bool quick) noexcept {
   // Abort any ongoing run.
   mDrc->cancel();
 
@@ -334,6 +334,7 @@ void BoardEditor::startDrc(bool quick) noexcept {
   mDrcUndoStackState = mProjectEditor.getUndoStack().getUniqueStateId();
   mDrc->start(mBoard, mBoard.getDrcSettings(), quick);  // can throw
   onUiDataChanged.notify();
+  return *mDrc;
 }
 
 void BoardEditor::registerActiveTab(Board2dTab* tab) noexcept {

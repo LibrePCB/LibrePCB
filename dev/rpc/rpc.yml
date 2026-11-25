@@ -314,7 +314,7 @@ structs:
         type: string?
         description: The latest available version, if known.
 
-  - name: ElectricalRuleCheckMessage
+  - name: RuleCheckMessage
     description: An electrical rule check (ERC) message.
     fields:
       - name: obj
@@ -504,32 +504,40 @@ classes:
         params: []
         result: []
 
-  - name: ElectricalRuleCheck
-    description: The ERC of a project.
+  - name: RuleCheck
+    description: >-
+      Various kinds of rule checks - library checks, electrical rule check
+      (ERC), and design rule check (DRC).
     since: "2.2.0"
     methods:
       - name: run
         description: >-
-          Runs the ERC and returns all emitted messages, together with
-          their approved state. Note that the result only reflects the
-          current state of the project — it does not trigger any
-          background re-run of the ERC.
-        params: []
+          Runs the check and return all emitted messages, together with
+          their approved state.
+        params:
+          - name: quick
+            type: bool
+            default: false
+            description: >-
+              Run only the most important checks, not the complete suite of
+              checks. This is much faster than the full check, but will
+              return only a partial result. This flag is only supported for
+              the DRC, not for the other checks.
         result:
           - name: messages
             type: array
-            items: ElectricalRuleCheckMessage
+            items: RuleCheckMessage
 
       - name: set
         description: >-
-          Set the approved state of multiple ERC messages (bulk setter).
+          Set the approved state of multiple messages (bulk setter).
           The handles of a previous `run()` call are only valid as long as
           the ERC messages did not change.
         params:
           - name: messages
             type: array
             items: handle
-            description: The object handles of the ERC messages to modify.
+            description: The object handles of the messages to modify.
           - name: approved
             type: bool
             description: The approved state to set on all given messages.

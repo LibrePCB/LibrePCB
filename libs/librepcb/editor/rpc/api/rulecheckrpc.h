@@ -22,8 +22,8 @@
 // the specification. The method implementations are hand-written in the
 // corresponding .cpp file.
 
-#ifndef LIBREPCB_EDITOR_ELECTRICALRULECHECKRPC_H
-#define LIBREPCB_EDITOR_ELECTRICALRULECHECKRPC_H
+#ifndef LIBREPCB_EDITOR_RULECHECKRPC_H
+#define LIBREPCB_EDITOR_RULECHECKRPC_H
 
 /*******************************************************************************
  *  Includes
@@ -43,35 +43,34 @@ class RpcRequest;
 namespace rpc {
 
 /*******************************************************************************
- *  Class ElectricalRuleCheckRpc
+ *  Class RuleCheckRpc
  ******************************************************************************/
 
 /**
- * @brief The ElectricalRuleCheck RPC API (see the RPC server documentation)
+ * @brief The RuleCheck RPC API (see the RPC server documentation)
  *
- * The ERC of a project.
+ * Various kinds of rule checks - library checks, electrical rule check (ERC),
+ * and design rule check (DRC).
  */
-class ElectricalRuleCheckRpc final {
+class RuleCheckRpc final {
 public:
   // Constructors / Destructor
-  Q_DECLARE_TR_FUNCTIONS(ElectricalRuleCheckRpc)
+  Q_DECLARE_TR_FUNCTIONS(RuleCheckRpc)
 
 public:
-  ElectricalRuleCheckRpc() = delete;
+  RuleCheckRpc() = delete;
 
   // General Methods
 
   /**
-   * @brief Runs the ERC and returns all emitted messages, together with their
-   *        approved state. Note that the result only reflects the current
-   *        state of the project — it does not trigger any background re-run
-   *        of the ERC.
+   * @brief Runs the check and return all emitted messages, together with
+   *        their approved state.
    */
   static void run(GuiApplication& app, RpcObjectRegistry& registry,
                   RpcRequest& request);
 
   /**
-   * @brief Set the approved state of multiple ERC messages (bulk setter). The
+   * @brief Set the approved state of multiple messages (bulk setter). The
    *        handles of a previous `run()` call are only valid as long as the
    *        ERC messages did not change.
    */

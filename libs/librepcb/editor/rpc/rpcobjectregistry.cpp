@@ -56,7 +56,7 @@ uint32_t RpcObjectRegistry::getHandle(QObject& obj) noexcept {
   if (existing != mHandles.constEnd()) {
     return existing.value();
   }
-  const uint32_t handle = ++sNextHandle;
+  const uint32_t handle = ++sNextHandle;  // Skip handle 0!
   mObjects.insert(handle, &obj);
   mHandles.insert(&obj, handle);
   connect(&obj, &QObject::destroyed, this,

@@ -80,7 +80,7 @@ public:
   bool isRebuildingPlanes() const noexcept;
   void schedulePlanesRebuild();
   void startPlanesRebuild(bool force = false) noexcept;
-  void startDrc(bool quick) noexcept;
+  BoardDesignRuleCheck& startDrc(bool quick) noexcept;
   void registerActiveTab(Board2dTab* tab) noexcept;
   void unregisterActiveTab(Board2dTab* tab) noexcept;
   void registerActiveTab(Board3dTab* tab) noexcept;

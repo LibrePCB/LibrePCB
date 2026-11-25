@@ -25,11 +25,11 @@
  *  Includes
  ******************************************************************************/
 #include "../rpcrequest.h"
-#include "electricalrulecheckrpc.h"
 #include "projecteditorrpc.h"
 #include "protocolrpc.h"
 #include "remotelibraryrpc.h"
 #include "rpcerrors.h"
+#include "rulecheckrpc.h"
 #include "undostackrpc.h"
 #include "workspacedbrpc.h"
 
@@ -63,8 +63,8 @@ void rpcDispatchCommand(GuiApplication& app, RpcObjectRegistry& registry,
       {"ProjectEditor/set", &ProjectEditorRpc::set},
       {"ProjectEditor/save", &ProjectEditorRpc::save},
       {"ProjectEditor/close", &ProjectEditorRpc::close},
-      {"ElectricalRuleCheck/run", &ElectricalRuleCheckRpc::run},
-      {"ElectricalRuleCheck/set", &ElectricalRuleCheckRpc::set},
+      {"RuleCheck/run", &RuleCheckRpc::run},
+      {"RuleCheck/set", &RuleCheckRpc::set},
       {"UndoStack/get", &UndoStackRpc::get},
       {"UndoStack/undo", &UndoStackRpc::undo},
       {"UndoStack/redo", &UndoStackRpc::redo},

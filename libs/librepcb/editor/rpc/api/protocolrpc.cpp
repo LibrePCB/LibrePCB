@@ -71,30 +71,28 @@ void ProtocolRpc::initialize(GuiApplication& app, RpcObjectRegistry& registry,
       getArg<QString>(request, "name").simplified().left(32);
   const QVariant token = request.getArg("token");
 
-  auto createResponse = [clientName, &app](QString token) {
+  auto sendResponse = [clientName, &app, &request](QString token) {
     static const Uuid session = Uuid::createRandom();
-
     if (token.isEmpty()) {
       token = Uuid::createRandom().toStr();
       getAuthenticatedTokens().insert(token);
       qInfo() << "RPC client" << clientName << "connected.";
     }
-
-    QVariantMap result;
-    result.insert("format", "1.0");
-    result.insert("server", "librepcb");
-    result.insert("version", Application::getVersion());
-    result.insert("session", session.toStr());
-    result.insert("workspace", app.getWorkspace().getPath().toStr());
-    result.insert("token", token);
-    return result;
+    request.send({
+        {"format", "1.0"},
+        {"server", "librepcb"},
+        {"version", Application::getVersion()},
+        {"session", session.toStr()},
+        {"workspace", app.getWorkspace().getPath().toStr()},
+        {"token", token},
+    });
   };
 
   if (!token.isNull()) {
     const bool authenticated =
         getAuthenticatedTokens().contains(token.toString());
     if (authenticated) {
-      request.send(createResponse(token.toString()));
+      sendResponse(token.toString());
     } else {
       request.send(RpcAccessDenied());
     }
@@ -108,9 +106,7 @@ void ProtocolRpc::initialize(GuiApplication& app, RpcObjectRegistry& registry,
             .arg(clientName),
         tr("Accept Connection"), QString(), true);
     QObject::connect(notification.get(), &Notification::buttonClicked, &request,
-                     [&request, createResponse]() {
-                       request.send(createResponse(QString()));
-                     });
+                     [sendResponse]() { sendResponse(QString()); });
     QObject::connect(notification.get(), &Notification::destroyed, &request,
                      [&request]() { request.send(RpcAccessDenied()); });
     QObject::connect(&request, &RpcRequest::cancelled, notification.get(),

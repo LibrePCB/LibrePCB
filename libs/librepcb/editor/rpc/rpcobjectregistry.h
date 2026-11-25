@@ -71,6 +71,11 @@ public:
    */
   uint32_t getHandle(QObject& obj) noexcept;
 
+  template <typename T>
+  T* tryGetAs(const QVariant& handle) const {
+    return qobject_cast<T*>(mObjects.value(handle.toUInt(), nullptr));
+  }
+
   /**
    * @brief Look up the object referenced by a request's handle
    *
@@ -83,8 +88,7 @@ public:
    */
   template <typename T>
   T& getAs(const QVariant& handle) const {
-    const uint32_t value = handle.toUInt();  // 0 if not a number.
-    if (T* obj = qobject_cast<T*>(mObjects.value(value))) {
+    if (T* obj = tryGetAs<T>(handle)) {
       return *obj;
     }
     throwInvalidHandle();

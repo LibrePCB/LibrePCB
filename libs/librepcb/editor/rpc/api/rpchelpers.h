@@ -63,11 +63,7 @@ template <typename T, typename F>
 inline QVariantList toVariant(const T& list, F convertItem) {
   QVariantList result;
   for (const auto& obj : list) {
-    if constexpr (std::is_pointer_v<std::remove_reference_t<decltype(obj)>>) {
-      result.append(convertItem(*obj));
-    } else {
-      result.append(convertItem(obj));
-    }
+    result.append(convertItem(obj));
   }
   return result;
 }

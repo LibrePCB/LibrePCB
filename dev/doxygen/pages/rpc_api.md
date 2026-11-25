@@ -141,7 +141,7 @@ A summary of a remote library.
 
 ---
 
-## ElectricalRuleCheckMessage {#doc_rpc_api_type_ElectricalRuleCheckMessage}
+## RuleCheckMessage {#doc_rpc_api_type_RuleCheckMessage}
 
 An electrical rule check (ERC) message.
 
@@ -347,13 +347,13 @@ Close project. Attention: If there were unsaved changes in the project, they wil
 
 ---
 
-## Class ElectricalRuleCheck {#doc_rpc_api_class_ElectricalRuleCheck}
+## Class RuleCheck {#doc_rpc_api_class_RuleCheck}
 
-The ERC of a project.
+Various kinds of rule checks - library checks, electrical rule check (ERC), and design rule check (DRC).
 
-### ElectricalRuleCheck/run {#doc_rpc_api_method_ElectricalRuleCheck_run}
+### RuleCheck/run {#doc_rpc_api_method_RuleCheck_run}
 
-Runs the ERC and returns all emitted messages, together with their approved state. Note that the result only reflects the current state of the project — it does not trigger any background re-run of the ERC.
+Runs the check and return all emitted messages, together with their approved state.
 
 **Params:** None
 
@@ -363,22 +363,22 @@ Runs the ERC and returns all emitted messages, together with their approved stat
 
 | Name | Type | Description |
 |------|------|-------------|
-| `messages` | `array` of [`ElectricalRuleCheckMessage`](@ref doc_rpc_api_type_ElectricalRuleCheckMessage) |  |
+| `messages` | `array` of [`RuleCheckMessage`](@ref doc_rpc_api_type_RuleCheckMessage) |  |
 
 
 **Since:** 2.2.0
 
 ---
 
-### ElectricalRuleCheck/set {#doc_rpc_api_method_ElectricalRuleCheck_set}
+### RuleCheck/set {#doc_rpc_api_method_RuleCheck_set}
 
-Set the approved state of multiple ERC messages (bulk setter). The handles of a previous `run()` call are only valid as long as the ERC messages did not change.
+Set the approved state of multiple messages (bulk setter). The handles of a previous `run()` call are only valid as long as the ERC messages did not change.
 
 **Params:**
 
 | Name | Type | Description |
 |------|------|-------------|
-| `messages` | `array` of `handle` | The object handles of the ERC messages to modify. |
+| `messages` | `array` of `handle` | The object handles of the messages to modify. |
 | `approved` | `bool` | The approved state to set on all given messages. |
 
 **Result:** None

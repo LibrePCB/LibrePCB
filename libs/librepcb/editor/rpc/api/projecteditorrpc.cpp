@@ -103,11 +103,11 @@ static QVariantMap details(ProjectEditor& obj, RpcObjectRegistry& registry) {
   result.insert("locale_order", toVariant(project.getLocaleOrder()));
   result.insert("norm_order", toVariant(project.getNormOrder()));
   result.insert("sheets",
-                toVariant(project.getSchematics(), [&](Schematic& obj) {
-                  return summary(obj, registry);
+                toVariant(project.getSchematics(), [&](Schematic* obj) {
+                  return summary(*obj, registry);
                 }));
-  result.insert("boards", toVariant(project.getBoards(), [&](Board& obj) {
-                  return summary(obj, registry);
+  result.insert("boards", toVariant(project.getBoards(), [&](Board* obj) {
+                  return summary(*obj, registry);
                 }));
   return result;
 }
@@ -122,9 +122,7 @@ void ProjectEditorRpc::list(GuiApplication& app, RpcObjectRegistry& registry,
   for (const auto& editor : app.getProjects()) {
     projects.append(summary(*editor, registry));
   }
-  QVariantMap result;
-  result.insert("projects", projects);
-  request.send(result);
+  request.send({{"projects", projects}});
 }
 
 void ProjectEditorRpc::open(GuiApplication& app, RpcObjectRegistry& registry,
