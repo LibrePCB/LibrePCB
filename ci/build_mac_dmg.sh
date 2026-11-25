@@ -24,6 +24,7 @@ popd
 
 # Test if the bundles are working (hopefully catching deployment issues).
 ./build/install/LibrePCB.app/Contents/MacOS/librepcb-cli --version
+./build/install/LibrePCB.app/Contents/MacOS/librepcb-mcp --version
 ./build/install/LibrePCB.app/Contents/MacOS/librepcb --exit-after-startup
 
 # Print checksums to allow fully transparent public verification.
